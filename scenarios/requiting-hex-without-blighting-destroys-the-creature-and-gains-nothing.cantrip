@@ -1,0 +1,35 @@
+# The optional additional cost declined (CR 601.2b: it is paid only if the caster chooses to), although Bot1 has an Ornithopter to blight:
+# the Llanowar Elves is destroyed all the same, no counter goes on the Ornithopter, and "if this spell's additional cost was paid" is
+# false, so no life is gained. The twin that pays it is "...blighting-your-own-creature-puts-the-counter-on-it-and-gains-two-life".
+
+[Bot1 Deck]
+Mox Jet
+Ornithopter
+Requiting Hex
+Island x4
+Island x14
+
+[Bot2 Deck]
+Mox Emerald
+Llanowar Elves
+Island x5
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Requiting Hex.Cast
+Bot1.Modes(Cast without blighting)
+Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield.Ornithopter.Counters.MinusOneMinusOne = (absent)
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot2.Graveyard = Llanowar Elves

@@ -1,0 +1,46 @@
+# CR 707.10: a copy of a spell copies the additional costs paid for it. Bot1 casts Requiting Hex with blight at Bot2's Llanowar Elves
+# (the counter on Bot1's Ornithopter), then flashes in Lutri, the Spellchaser, whose enters trigger copies the Hex, aimed at the same
+# Elves. The copy resolves first and destroys it, gaining 2 life because its additional cost was paid; the original's target is gone,
+# so it does nothing (CR 608.2b). Bot1 ends at 22: a copy that had not paid the cost would have gained nothing (and the original, which
+# has, never resolves).
+
+[Bot1 Deck]
+Mox Jet
+Black Lotus
+Ornithopter
+Requiting Hex
+Lutri, the Spellchaser
+Island x3
+Island x14
+
+[Bot2 Deck]
+Mox Emerald
+Llanowar Elves
+Island x5
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Requiting Hex.Cast
+Bot1.Modes(Blight 1)
+Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+Bot1.Choose(Ornithopter)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Lutri, the Spellchaser.Cast
+Bot1.Pass
+Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot1.Battlefield.Ornithopter.Counters.MinusOneMinusOne = 1
+Bot1.Graveyard = Requiting Hex; Black Lotus
+Bot2.Graveyard = Llanowar Elves

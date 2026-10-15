@@ -1,0 +1,39 @@
+# Blighting the creature the Hex itself targets: the -1/-1 counter makes Bot1's Llanowar Elves a 0/0, which dies to the state-based action
+# after the cast (CR 704.5f, 701.68a), so the Hex's only target is illegal as it would resolve and it does not resolve (CR 608.2b): the
+# additional cost was paid, but "you gain 2 life" is part of the spell's effect, so no life is gained. Compare
+# "...blight-kills-a-one-toughness-creature-and-the-spell-still-resolves", where the target is another creature.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Llanowar Elves
+Requiting Hex
+Island x4
+Island x14
+
+[Bot2 Deck]
+Mox Emerald
+Llanowar Elves
+Island x5
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Requiting Hex.Cast
+Bot1.Modes(Blight 1)
+Bot1.Target(Bot1.Battlefield.Llanowar Elves)
+Bot1.Choose(Llanowar Elves)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Graveyard = Requiting Hex; Llanowar Elves
+Bot2.Battlefield = Mox Emerald; Llanowar Elves

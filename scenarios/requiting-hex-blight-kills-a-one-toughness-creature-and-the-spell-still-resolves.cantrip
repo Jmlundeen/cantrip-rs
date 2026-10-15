@@ -1,0 +1,38 @@
+# Blight puts a -1/-1 counter on Bot1's own Llanowar Elves (1/1) as the cost is paid (CR 701.68a, 601.2h); it is a 0/0 and dies to the
+# state-based action the next time one is checked (CR 704.5f) - after the Hex is cast, with the Hex still on the stack. The Hex targets
+# Bot2's Elves, which is untouched, so it resolves: that Elves is destroyed and Bot1 gains 2 life. Both Elves are in graveyards.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Llanowar Elves
+Requiting Hex
+Island x4
+Island x14
+
+[Bot2 Deck]
+Mox Emerald
+Llanowar Elves
+Island x5
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Requiting Hex.Cast
+Bot1.Modes(Blight 1)
+Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+Bot1.Choose(Llanowar Elves)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot1.Graveyard = Requiting Hex; Llanowar Elves
+Bot2.Graveyard = Llanowar Elves

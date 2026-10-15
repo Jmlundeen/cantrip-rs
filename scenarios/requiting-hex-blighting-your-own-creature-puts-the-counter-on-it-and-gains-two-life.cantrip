@@ -1,0 +1,41 @@
+# Requiting Hex: "As an additional cost to cast this spell, you may blight 1. Destroy target creature with mana value 2 or less. If this
+# spell's additional cost was paid, you gain 2 life." To blight 1 is to put a -1/-1 counter on a creature you control (CR 701.68a): Bot1's
+# Ornithopter (0/2) takes it, so it is a -1/1 and survives, and the counter is on Bot1's creature, not on Bot2's Llanowar Elves, which
+# is destroyed by the spell itself. The cost was paid, so Bot1 gains 2 life. The twin that declines the cost is
+# "...without-blighting-destroys-the-creature-and-gains-nothing".
+
+[Bot1 Deck]
+Mox Jet
+Ornithopter
+Requiting Hex
+Island x4
+Island x14
+
+[Bot2 Deck]
+Mox Emerald
+Llanowar Elves
+Island x5
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Requiting Hex.Cast
+Bot1.Modes(Blight 1)
+Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+Bot1.Choose(Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot1.Battlefield.Ornithopter.Counters.MinusOneMinusOne = 1
+Bot1.Battlefield.Ornithopter.Power = -1
+Bot1.Battlefield.Ornithopter.Toughness = 1
+Bot2.Battlefield = Mox Emerald
+Bot2.Life = 20
+Bot2.Graveyard = Llanowar Elves
