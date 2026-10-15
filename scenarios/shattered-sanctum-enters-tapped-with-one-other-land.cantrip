@@ -1,0 +1,17 @@
+# Shattered Sanctum: one other land is not two, so it enters tapped - the boundary under the 'two or more' of its text.
+
+[Bot1 Deck]
+Plains
+Shattered Sanctum
+Plains x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Shattered Sanctum.Play
+
+[Expect]
+Bot1.Battlefield.Shattered Sanctum.Tapped = true

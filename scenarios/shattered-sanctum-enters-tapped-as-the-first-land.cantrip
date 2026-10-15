@@ -1,0 +1,14 @@
+# Shattered Sanctum: with no other land it enters tapped (CR 614.1c) - the land itself is not counted.
+
+[Bot1 Deck]
+Shattered Sanctum
+Plains x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Shattered Sanctum.Play
+
+[Expect]
+Bot1.Battlefield.Shattered Sanctum.Tapped = true

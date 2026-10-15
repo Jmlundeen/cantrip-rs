@@ -1,0 +1,22 @@
+# Shattered Sanctum: with two other lands it enters untapped (CR 614.1c) and its mana ability adds {B} (chosen as it is activated).
+
+[Bot1 Deck]
+Plains
+Plains
+Shattered Sanctum
+Plains x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Shattered Sanctum.Play
+Bot1.Battlefield.Shattered Sanctum.Activate(Color: Black)
+
+[Expect]
+Bot1.Battlefield.Shattered Sanctum.Tapped = true
+Bot1.Mana = {B}
