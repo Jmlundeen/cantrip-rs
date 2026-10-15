@@ -1,0 +1,49 @@
+# Bot2 changes the text of Bot1's Grist spell on the stack with Artificial Evolution, Insect to Elf (CR 612.1; the effect
+# goes on applying to the permanent it becomes, CR 400.7a). Grist's +1 then makes a 1/1 black and green Elf token
+# (CR 612.4) and "if an Insect card was milled" asks for an Elf card: Llanowar Elves, milled first, repeats the process
+# and puts a loyalty counter on Grist (3 + 1 + 1 = 5), and the Island milled next ends it.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Pearl
+Grist, the Hunger Tide
+Island x4
+Llanowar Elves
+Island x13
+
+[Bot2 Deck]
+Island
+Artificial Evolution
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Grist, the Hunger Tide.Cast
+Bot1.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Artificial Evolution.Cast(Stack.Grist, the Hunger Tide)
+Bot2.Modes(Insect)
+Bot2.Modes(Elf)
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 0
+[Bot1.Main2]
+Bot1.Battlefield.Grist, the Hunger Tide.Activate(Ability: +1)
+[Bot1.End]
+
+[Expect]
+Bot1.Battlefield.Grist, the Hunger Tide.Counters.Loyalty = 5
+Bot1.Battlefield.Grist, the Hunger Tide.Subtypes = Grist
+Bot1.Battlefield.Elf#1.Subtypes = Elf
+Bot1.Battlefield.Elf#2.Subtypes = Elf
+Bot1.Battlefield.Elf#1.Colors = Black; Green
+Bot1.Graveyard = Island; Llanowar Elves

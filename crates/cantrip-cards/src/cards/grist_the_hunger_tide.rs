@@ -20,7 +20,7 @@ pub static INSECT: CardDef = CardDef {
 fn insect_types(q: &dyn LayerQuery, grist: ObjectId, chars: &mut Chars) {
     if !q.state().obj(grist).zone.is(ZoneKind::Battlefield) {
         chars.types = chars.types.with(CardType::Creature);
-        chars.subtypes = chars.subtypes.with(Subtype::Insect);
+        chars.subtypes = chars.subtypes.with(q.words(grist).subtype(Subtype::Insect));
     }
 }
 
@@ -37,10 +37,11 @@ fn insect_size(q: &dyn LayerQuery, grist: ObjectId, chars: &mut Chars) {
 fn plus_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let player = item.controller;
     let grist = item.object;
+    let insect = g.words(grist).subtype(Subtype::Insect);
     loop {
         cantrip_mechanics::tokens::create(g, player, &INSECT, 1)?;
         let Some(&milled) = g.mill(player, 1).first() else { return Ok(()) };
-        if !g.chars(milled).has_subtype(Subtype::Insect) {
+        if !g.chars(milled).has_subtype(insect) {
             return Ok(());
         }
         if targets::permanent(g, grist) {
