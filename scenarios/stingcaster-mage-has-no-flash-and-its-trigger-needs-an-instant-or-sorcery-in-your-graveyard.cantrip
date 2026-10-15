@@ -1,5 +1,5 @@
 # Stingcaster Mage has haste but not flash (it is not Snapcaster Mage): with Bot2's Lightning Bolt on the stack, Bot1's next
-# priority does not offer it (CR 307.1, 307.5 / creature spells are cast at sorcery speed), though it is cast in Bot1's own
+# priority does not offer it (Bot1 has a Mountain and a Mox Ruby untapped, so cost is not the reason) (CR 117.1a, 307.1: a creature spell without flash is cast only in its owner's main phase with the stack empty), though it is cast in Bot1's own
 # main phase on turn 3 (the control). Its trigger is "target instant or sorcery card in your graveyard" (CR 115.1): Bot1's
 # graveyard holds only Ornithopter (a creature card) and Bot2's graveyard holds the Bolt, so there is no legal target, the
 # trigger is removed from the stack without asking anything (CR 603.3d), and the Bolt in the other graveyard gains nothing.
@@ -7,9 +7,10 @@
 [Bot1 Deck]
 Mountain
 Ornithopter
+Mox Ruby
 Mountain
 Stingcaster Mage
-Mountain x3
+Mountain x2
 Mountain x10
 
 [Bot2 Deck]
@@ -20,6 +21,7 @@ Mountain x10
 
 [Actions]
 Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
 Bot1.Hand.Ornithopter.Cast
 Bot1.Pass
 [T2 Bot2.Main1]
@@ -32,7 +34,7 @@ Bot1.Pass
 Bot1.Hand.Mountain.Play
 Bot1.Hand.Stingcaster Mage.Cast
 Bot1.Battlefield.Mountain.Activate
-Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
 Bot1.Pass
 ! Bot1.Target
 [T3 Bot1.Main2]

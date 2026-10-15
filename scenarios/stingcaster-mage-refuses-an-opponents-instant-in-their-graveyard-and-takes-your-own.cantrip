@@ -1,0 +1,55 @@
+# "Target instant or sorcery card in your graveyard" (CR 115.1): Bot2's Lightning Bolt (cast at Bot1 on turn 2) is in
+# Bot2's graveyard, and Bot1's graveyard holds a Lightning Bolt and a Chain Lightning. Stingcaster Mage's trigger refuses
+# Bot2's Bolt and takes Bot1's own Chain Lightning (the positive control), which is cast again from the graveyard for {R}:
+# Bot2 takes 3 + 3 + 3 and 17 - 9... the Bolt is Bot1's first spell (3), Chain Lightning's two casts are 3 each.
+
+[Bot1 Deck]
+Mox Ruby
+Black Lotus
+Lightning Bolt
+Chain Lightning
+Stingcaster Mage
+Mountain
+Forest
+Mountain
+Forest x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x5
+Island x10
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Chain Lightning.Cast(Bot2)
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Stingcaster Mage.Cast
+Bot1.Pass
+! Bot1.Target(Bot2.Graveyard.Lightning Bolt)
+Bot1.Target(Bot1.Graveyard.Chain Lightning)
+Bot1.Pass
+Bot1.Graveyard.Chain Lightning.Cast(Bot2)
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot2.Life = 11
+Bot1.Life = 17
+Exile = Chain Lightning
+Bot1.Graveyard = Black Lotus; Lightning Bolt
+Bot2.Graveyard = Lightning Bolt

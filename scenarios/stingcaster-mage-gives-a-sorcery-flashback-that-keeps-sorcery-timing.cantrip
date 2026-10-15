@@ -1,0 +1,37 @@
+# The granted flashback changes the cost and the zone, not the timing (CR 702.34a, 117.1a). Bot1 casts Chain Lightning (a
+# sorcery) at Bot2, then Stingcaster Mage with Black Lotus's red mana. While the Mage's trigger is on the stack the Chain
+# Lightning in the graveyard is not offered (a sorcery needs an empty stack); once the trigger has resolved, in the main
+# phase, it is, for {R} (its mana cost) out of what the Lotus left, and it is exiled afterwards. Bot2 takes 3 + 3.
+
+[Bot1 Deck]
+Mox Ruby
+Black Lotus
+Chain Lightning
+Stingcaster Mage
+Forest x3
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Chain Lightning.Cast(Bot2)
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Stingcaster Mage.Cast
+Bot1.Pass
+? Stack.Count = 1
+! Bot1.Graveyard.Chain Lightning.Cast
+Bot1.Pass
+Bot1.Graveyard.Chain Lightning.Cast(Bot2)
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot2.Life = 14
+Exile = Chain Lightning
+Bot1.Graveyard = Black Lotus
