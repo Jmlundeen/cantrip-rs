@@ -17,9 +17,9 @@ fn affects(view: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Char
 
 /// Layer 4: a replacement of his card types, not an addition (CR 613.1d): he stops being a planeswalker, and the
 /// subtype Kaito goes with it. He stays legendary: a supertype is not a card type.
-fn become_a_ninja_creature(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
+fn become_a_ninja_creature(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
     chars.types = TypeSet::of(&[CardType::Creature]);
-    chars.subtypes = SubtypeSet::of(&[Subtype::Ninja]);
+    chars.subtypes = SubtypeSet::of(&[q.words(source).subtype(Subtype::Ninja)]);
 }
 
 /// Layer 6: hexproof.
@@ -67,7 +67,7 @@ fn tap_and_stun(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 fn ninjas_you_control(view: &dyn LayerQuery, source: ObjectId, affected: ObjectId, chars: &Chars) -> bool {
     view.state().obj(affected).controller == view.state().obj(source).controller
         && chars.is(CardType::Creature)
-        && chars.has_subtype(Subtype::Ninja)
+        && chars.has_subtype(view.words(source).subtype(Subtype::Ninja))
 }
 
 fn plus_one_plus_one(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {

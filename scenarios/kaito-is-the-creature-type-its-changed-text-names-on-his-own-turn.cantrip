@@ -1,0 +1,47 @@
+# Kaito, Bane of Nightmares: "During your turn, as long as Kaito has one or more loyalty counters on him, he's a 3/4
+# Ninja creature". Artificial Evolution changes his text, Ninja to Elf (CR 612.1), so on his controller's turn he is a
+# 3/4 Elf creature, not a Ninja (CR 612), and on the opponent's turn he is a planeswalker again.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Mox Ruby
+Kaito, Bane of Nightmares
+Artificial Evolution
+Island x14
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Kaito, Bane of Nightmares.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Kaito, Bane of Nightmares.Subtypes = Ninja
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Kaito, Bane of Nightmares)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Ninja)
+Bot1.Modes(Elf)
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Kaito, Bane of Nightmares.Types = Planeswalker
+[T3 Bot1.Main1]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Kaito, Bane of Nightmares.Types = Creature
+Bot1.Battlefield.Kaito, Bane of Nightmares.Subtypes = Elf
+Bot1.Battlefield.Kaito, Bane of Nightmares.Power = 3
+Bot1.Battlefield.Kaito, Bane of Nightmares.Toughness = 4
