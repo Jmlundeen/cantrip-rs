@@ -16,7 +16,7 @@ fn rebels(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 fn untapped_rebel(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
-    q.controller(id) == asker.controller && !q.obj(id).tapped && q.chars(id).has_subtype(Subtype::Rebel)
+    q.controller(id) == asker.controller && !q.obj(id).tapped && q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Rebel))
 }
 
 /// Return this card from your graveyard to the battlefield tapped.
