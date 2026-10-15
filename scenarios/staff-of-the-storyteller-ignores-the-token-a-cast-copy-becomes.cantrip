@@ -1,0 +1,50 @@
+# CR 111.13, 707.10f: "whenever you create one or more creature tokens" is not met by the token a copy of a permanent spell
+# becomes as it resolves, which is not created. Bot1 casts Staff of the Storyteller on turn 1 (its Spirit puts a story counter
+# on it: the positive control) and Entombs an Ornithopter; on turn 3 Uldaros Theorix exiles the Ornithopter and the sacrificed Black
+# Lotus and casts copies of both. The Ornithopter token is a creature token that enters, and the Staff keeps its one counter.
+
+[Bot1 Deck]
+Plains
+Staff of the Storyteller
+Entomb
+Uldaros Theorix
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Black Lotus
+Ornithopter
+Plains x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Staff of the Storyteller.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Ornithopter)
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Uldaros Theorix.Cast
+Bot1.Target(Ornithopter)
+Bot1.Target(Black Lotus)
+Bot1.Choose(Ornithopter)
+Bot1.Choose(Black Lotus)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Staff of the Storyteller.Counters.Story = 1
+Bot1.Battlefield.Ornithopter.Token = true
+Bot1.Battlefield.Spirit.Token = true
+Exile = Black Lotus; Ornithopter
+Stack.Count = 0

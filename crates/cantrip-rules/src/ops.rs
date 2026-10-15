@@ -765,8 +765,9 @@ pub fn create_tokens_worded(
     words: Words,
     spell: Option<&StackItem>,
 ) -> R<Vec<ObjectId>> {
-    // CR 614.1a: how many of each there are is decided by what would replace the creation, before any of them is made.
-    let replaced = replace::token_batch(cx, tokens);
+    // CR 614.1a: how many of each there are is decided by what would replace the creation, before any of them is made. The
+    // token a copy of a permanent spell becomes as it resolves is not created (CR 111.13, 707.10f), so nothing replaces it.
+    let replaced = if spell.is_some() { None } else { replace::token_batch(cx, tokens) };
     let tokens = replaced.as_deref().unwrap_or(tokens);
     let before: Vec<ObjectId> = cx.s().battlefield().to_vec();
     let mut events = Vec::new();

@@ -1,0 +1,48 @@
+# CR 111.13, 707.10f: the token a copy of a permanent spell becomes as it resolves is not created, so Elspeth, Storm Slayer's
+# "if one or more tokens would be created under your control" does not apply to it. Bot1 puts Elspeth onto the battlefield on
+# turn 1 (Mox Pearl and Plains for her white, three more Moxen), and on turn 3 sacrifices Black Lotus for its mana to cast
+# Uldaros Theorix, whose ability exiles the Lotus from the graveyard and casts a copy of it: exactly one Black Lotus token, where
+# Elspeth would have made two of a token that was created.
+
+[Bot1 Deck]
+Plains
+Elspeth, Storm Slayer
+Uldaros Theorix
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Black Lotus
+Plains x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Elspeth, Storm Slayer.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Uldaros Theorix.Cast
+Bot1.Target(Black Lotus)
+Bot1.Choose(Black Lotus)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Black Lotus; Elspeth, Storm Slayer; Mox Emerald; Mox Jet; Mox Pearl; Mox Sapphire; Plains; Uldaros Theorix
+Bot1.Battlefield.Black Lotus.Token = true
+Exile = Black Lotus
+Stack.Count = 0
