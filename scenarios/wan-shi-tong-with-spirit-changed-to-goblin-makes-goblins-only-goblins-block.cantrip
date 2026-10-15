@@ -1,0 +1,59 @@
+# Artificial Evolution changes the creature type Spirit to Goblin in Wan Shi Tong's text (CR 612.1), kept as the spell
+# becomes the permanent (CR 400.7a). The tokens his trigger makes are then 1/1 Goblins "with 'This token can't block or
+# be blocked by non-Goblin creatures'" (CR 612.4, the token's words are the text that made it): Bot2's Ignoble Hierarch,
+# a Goblin, may block one of them, which no Goblin could do to a Spirit token.
+
+[Bot1 Deck]
+Island
+Sol Ring
+Black Lotus
+Wan Shi Tong, All-Knowing
+Artificial Evolution
+Mox Sapphire
+Plains
+Island
+Island
+Island
+Plains
+Swamp
+
+[Bot2 Deck]
+Forest
+Ignoble Hierarch
+Forest x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Wan Shi Tong, All-Knowing.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Stack.Wan Shi Tong, All-Knowing)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Spirit)
+Bot1.Modes(Goblin)
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Sol Ring)
+Bot1.Modes(Second from the top)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Goblin#1.Subtypes = Goblin
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Ignoble Hierarch.Cast
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot1.Attack(Wan Shi Tong, All-Knowing; Goblin; Goblin)
+Bot2.Block(Ignoble Hierarch > Goblin)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Graveyard = Ignoble Hierarch

@@ -6,7 +6,7 @@ use cantrip_oracle as oracle;
 /// creature must be a Spirit.
 fn spirit_blocking(q: &dyn Query, source: ObjectId, blocker: ObjectId, attacker: ObjectId) -> bool {
     let other = if source == blocker { attacker } else { blocker };
-    q.chars(other).has_subtype(Subtype::Spirit)
+    q.chars(other).has_subtype(q.words(source).subtype(Subtype::Spirit))
 }
 
 /// The 1/1 colorless Spirit creature token with "This token can't block or be blocked by non-Spirit creatures."
