@@ -577,6 +577,7 @@ impl TriggeredDef {
         modal: None,
         divide: None,
         subject_chooses_targets: false,
+        ward: false,
     };
 }
 
@@ -625,6 +626,8 @@ pub struct TriggeredDef {
     /// targets (Oath of Druids and Oath of Mages at each player's upkeep). Targeting is otherwise the controller's: legality, hexproof
     /// and the ability itself stay theirs.
     pub subject_chooses_targets: bool,
+    /// A ward ability (CR 702.21a): a targeting rule can stop it from triggering (`TargetingRuleKind::SuppressWard`).
+    pub ward: bool,
 }
 
 #[derive(Clone, Copy)]
@@ -798,6 +801,27 @@ pub type CastRule = fn(&dyn Query, &Asker, PlayerId) -> bool;
 /// attacker of a possible block, either of which may be the object itself; false forbids the block. "This creature can't
 /// block or be blocked by non-Spirit creatures" (Wan Shi Tong's Spirits).
 pub type BlockRule = fn(&dyn Query, ObjectId, ObjectId, ObjectId) -> bool;
+
+/// What a [`TargetingRule`] changes about targeting.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum TargetingRuleKind {
+    /// The creatures it names "can be the targets of spells and abilities as though they didn't have hexproof" (CR 702.11b,
+    /// 609.4): hexproof, granted before or after, does not stop targeting them. Shroud and protection still do.
+    IgnoreHexproof,
+    /// "Ward abilities of those creatures don't trigger" (CR 702.21a): a ward ability of the object it names does not trigger
+    /// when it becomes a target.
+    SuppressWard,
+}
+
+/// A static ability that changes targeting rules for the objects it names (CR 604, 609.4), while its source is on the
+/// battlefield: `applies` is asked of the source and of an object that is or would be a target, and sees the layers as they
+/// are before the abilities layer. "Creatures your opponents control can be the targets of spells and abilities as though they
+/// didn't have hexproof. Ward abilities of those creatures don't trigger" (Nowhere to Run).
+#[derive(Clone, Copy)]
+pub struct TargetingRule {
+    pub kind: TargetingRuleKind,
+    pub applies: fn(&dyn LayerQuery, ObjectId, ObjectId) -> bool,
+}
 
 /// A replacement of a turn beginning (CR 614.10, 500.11): "if you would begin your turn while [condition], you may skip
 /// that turn instead. If you do, [on_skip]". Time Vault. A skipped turn is not taken: its steps, its untap and its
@@ -1051,6 +1075,8 @@ pub struct CardDef {
     pub cast_rules: &'static [CastRule],
     /// Its static abilities that limit blocking (CR 509.1b), while it is on the battlefield.
     pub block_rules: &'static [BlockRule],
+    /// Its static abilities that change who can target what and whether ward triggers, while it is on the battlefield.
+    pub targeting_rules: &'static [TargetingRule],
     /// Its static abilities that make some damage unpreventable (CR 615.12).
     pub unpreventable_damage: &'static [UnpreventableRule],
     /// "Each creature you control assigns combat damage equal to its toughness rather than its power" (CR 510.1a):
@@ -1152,6 +1178,7 @@ impl CardDef {
         dungeon: &[],
         cast_rules: &[],
         block_rules: &[],
+        targeting_rules: &[],
         unpreventable_damage: &[],
         damage_by_toughness: &[],
         spend_any_color: &[],
@@ -1205,6 +1232,8 @@ pub struct CardTable {
     pub any_cast_limit: bool,
     /// Which cards have block rules (CR 509.1b): looked at only for the blocker and the attacker of a possible block.
     pub block_rules: Vec<bool>,
+    /// Per card: it has a targeting rule. Read to find the few battlefield sources of one, never to ask the table.
+    pub targeting_rules: Vec<bool>,
     /// Which cards have a triggered mana ability: looked for among the permanents only when a permanent is tapped for mana.
     pub mana_triggers: Vec<bool>,
     /// Which cards have cost changes (CR 601.2f): the board is looked at for their sources, never for the card table's
@@ -1256,6 +1285,7 @@ impl CardTable {
         let cost_changes: Vec<bool> = cards.iter().map(|c| !c.cost_changes.is_empty() || !c.ability_discounts.is_empty()).collect();
         let activation_rules: Vec<bool> = cards.iter().map(|c| !c.activation_rules.is_empty()).collect();
         let block_rules: Vec<bool> = cards.iter().map(|c| !c.block_rules.is_empty()).collect();
+        let targeting_rules: Vec<bool> = cards.iter().map(|c| !c.targeting_rules.is_empty()).collect();
         let mana_triggers: Vec<bool> =
             cards.iter().map(|c| c.abilities.iter().any(|a| matches!(a, AbilityDef::Triggered(t) if t.mana_ability))).collect();
         let intrinsic = CardId(
@@ -1278,6 +1308,7 @@ impl CardTable {
             any_replaces,
             any_cast_limit,
             block_rules,
+            targeting_rules,
             mana_triggers,
             cost_changes,
             activation_rules,

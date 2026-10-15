@@ -531,7 +531,10 @@ pub fn can_target(cards: &CardTable, state: &GameState, asker: &Asker, target: T
                 if target_chars.has(Keyword::Shroud) {
                     return false;
                 }
-                if target_chars.has(Keyword::Hexproof) && obj.controller != asker.controller {
+                if target_chars.has(Keyword::Hexproof)
+                    && obj.controller != asker.controller
+                    && !targeting_rule(cards, state, TargetingRuleKind::IgnoreHexproof, id)
+                {
                     return false;
                 }
                 let mut source_chars = chars(cards, state, asker.source);
@@ -549,6 +552,18 @@ pub fn can_target(cards: &CardTable, state: &GameState, asker: &Asker, target: T
             true
         }
     }
+}
+
+/// Whether a targeting rule of `kind` (CR 609.4, 702.11, 702.21) applies to `subject`: some permanent on the battlefield has a static
+/// ability that names it. Found from the board, so asked only when it would change the answer (a hexproof target, a ward trigger).
+pub fn targeting_rule(cards: &CardTable, state: &GameState, kind: TargetingRuleKind, subject: ObjectId) -> bool {
+    let view = View { cards, state, stop: Layer::Ability };
+    state.battlefield().iter().any(|&source| {
+        let obj = state.obj(source);
+        let card = cards.current(obj);
+        cards.targeting_rules[card.0 as usize]
+            && cards.get(card).targeting_rules.iter().any(|r| r.kind == kind && (r.applies)(&view, source, subject))
+    })
 }
 
 /// Summoning sickness (CR 302.6): a creature that has not been under its controller's control continuously since

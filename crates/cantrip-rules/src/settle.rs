@@ -575,6 +575,10 @@ fn consider(cx: &Cx, source: ObjectId, look_back: bool, event: &Event, mask: Eve
             {
                 continue;
             }
+            // "Ward abilities of those creatures don't trigger" (CR 702.21a, Nowhere to Run): asked only of a ward that matched.
+            if t.ward && layers::targeting_rule(cx.cards(), cx.s(), TargetingRuleKind::SuppressWard, source) {
+                continue;
+            }
             found.push((
                 PendingTrigger { source, ability, controller, subject: fired.subject, data: fired.data, members: Span::default() },
                 t,

@@ -286,6 +286,7 @@ pub const fn ward<const N: u8>(text: &'static str) -> AbilityDef {
         listens: EventMask::BECAME_TARGET,
         matches: ward_matches,
         effect: ward_effect::<N>,
+        ward: true,
         ..TriggeredDef::BLANK
     })
 }
@@ -313,6 +314,7 @@ pub const fn ward_life<const N: u8>(text: &'static str) -> AbilityDef {
         listens: EventMask::BECAME_TARGET,
         matches: ward_matches,
         effect: ward_life_effect::<N>,
+        ward: true,
         ..TriggeredDef::BLANK
     })
 }
@@ -339,6 +341,7 @@ pub const fn ward_discard(text: &'static str) -> AbilityDef {
         listens: EventMask::BECAME_TARGET,
         matches: ward_matches,
         effect: ward_discard_effect,
+        ward: true,
         ..TriggeredDef::BLANK
     })
 }
