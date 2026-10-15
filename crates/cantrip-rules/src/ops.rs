@@ -751,9 +751,11 @@ pub fn create_tokens_batch(cx: &mut Cx, tokens: &[(CardId, PlayerId)], tapped: b
 }
 
 /// Creates tokens whose text has `words` (CR 612.4): `create_tokens_batch` with the words given, not the creating text's.
-/// `spell` is the copy of a permanent spell the token is the permanent of (CR 707.10f), if it is: such a token is not
+/// `spell` is the copy of a permanent spell, as it resolves, the token is the permanent of (CR 707.10f), if it is: such a token is not
 /// created (CR 111.13) but enters from the stack as the spell resolves, so its `ZoneChange` is `old: spell, from: Stack,
 /// reason: Resolve`, as any permanent spell's is, and "if you cast it" (`cast_of(old)`, CR 707.12, 603.4) finds the copy's cast.
+/// An Aura spell's token enters attached to what the spell targeted, wherever that is (CR 303.4f, 608.3b, 707.10c): a
+/// creature card in a graveyard for Animate Dead (CR 303.4a), as the Aura card itself would.
 pub fn create_tokens_worded(
     cx: &mut Cx,
     tokens: &[(CardId, PlayerId)],
@@ -761,7 +763,7 @@ pub fn create_tokens_worded(
     copy: Option<Copiable>,
     with: &[(CounterKind, i16)],
     words: Words,
-    spell: Option<ObjectId>,
+    spell: Option<&StackItem>,
 ) -> R<Vec<ObjectId>> {
     // CR 614.1a: how many of each there are is decided by what would replace the creation, before any of them is made.
     let replaced = replace::token_batch(cx, tokens);
@@ -812,7 +814,8 @@ pub fn create_tokens_worded(
             seen_by: 0,
         });
         let copy = if words.is_printed() { copy } else { Some(Copiable { words, ..Copiable::of(card) }) };
-        let mut entering = Entering { object: id, controller, tapped, counters: entry_counters(with), copy, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_odd: None, attach: None, attach_player: None, x: 0 , transformed: false, protector: None, instead: None };
+        let aura = spell.filter(|_| cx.card(card).enchant.is_some());
+        let mut entering = Entering { object: id, controller, tapped, counters: entry_counters(with), copy, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_odd: None, attach: aura.and_then(|i| i.targets[0].object()), attach_player: aura.and_then(|i| i.targets[0].player()), x: 0 , transformed: false, protector: None, instead: None };
         prepare_entry(cx, &mut entering)?;
         entering.counters = replace::counters(cx, id, controller, true, entering.counters);
         cx.st().update_obj(id, |o| {
@@ -823,6 +826,9 @@ pub fn create_tokens_worded(
             // What the token chose as it entered (CR 614.12): a copy of Painter's Servant picks its own color.
             o.chosen_color = entering.chosen_color;
             o.chosen_subtype = entering.chosen_subtype;
+            // An Aura enters attached to what it targeted (CR 303.4f, 608.3b).
+            o.attached_to = entering.attach;
+            o.attached_player = entering.attach_player;
         });
         note_statics(cx, id);
         // A token copy of a planeswalker or a Saga enters with its loyalty or lore counter too.
@@ -831,7 +837,7 @@ pub fn create_tokens_worded(
         cx.st().update_obj(id, |o| o.counters = with.counters);
         cx.st().zone_push(Zone::BATTLEFIELD, id);
         events.push(match spell {
-            Some(spell) => Event::ZoneChange { old: spell, new: id, from: Zone::STACK, to: Zone::BATTLEFIELD, reason: ZoneReason::Resolve },
+            Some(spell) => Event::ZoneChange { old: spell.object, new: id, from: Zone::STACK, to: Zone::BATTLEFIELD, reason: ZoneReason::Resolve },
             None => Event::ZoneChange { old: id, new: id, from: Zone::GONE, to: Zone::BATTLEFIELD, reason: ZoneReason::Created },
         });
         if lore {
@@ -1119,7 +1125,7 @@ pub fn change_spell_controller(cx: &mut Cx, spell: ObjectId, player: PlayerId) {
 }
 
 /// A copy of a permanent spell resolves (CR 707.10f): the copy is put onto the battlefield as a token that is a copy of
-/// the spell's permanent. An Aura token is attached to what the spell targeted (CR 303.4f, 707.10c); the copy itself
+/// the spell's permanent. An Aura token enters attached to what the spell targeted (CR 303.4f, 608.3b, 707.10c); the copy itself
 /// ceases to exist on the stack (CR 707.10a).
 pub fn resolve_copy_as_token(cx: &mut Cx, item: &StackItem, at: usize) -> R<()> {
     let spell = *cx.s().obj(item.object);
@@ -1129,13 +1135,7 @@ pub fn resolve_copy_as_token(cx: &mut Cx, item: &StackItem, at: usize) -> R<()> 
     let values = spell.copy.unwrap_or_else(|| Copiable::of(spell.card));
     let words = if values.has_exceptions() { Words::NONE } else { cantrip_api::words(cx.s(), item.object) };
     let copy = if values.has_exceptions() { Some(values) } else { None };
-    let made = create_tokens_worded(cx, &[(values.card, item.controller)], false, copy, &[], words, Some(item.object))?;
-    if let Some(&token) = made.first()
-        && cx.card(layers::chars(cx.cards(), cx.s(), token).card).enchant.is_some()
-        && let Some(host) = item.targets[0].object()
-    {
-        attach(cx, token, host);
-    }
+    create_tokens_worded(cx, &[(values.card, item.controller)], false, copy, &[], words, Some(item))?;
     Ok(())
 }
 
