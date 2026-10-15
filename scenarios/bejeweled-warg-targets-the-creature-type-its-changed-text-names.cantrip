@@ -1,0 +1,39 @@
+# Artificial Evolution replaces the creature type Wolf with Goblin in Bejeweled Warg's text (CR 612.1, indefinitely),
+# its type line included: it is a Goblin, and "put a +1/+1 counter on target Wolf you control" now says Goblin, so the
+# only legal target is the Warg itself. As printed, with no Wolf left to name, the mode would have no target.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Emerald
+Mox Jet
+Bejeweled Warg
+Artificial Evolution
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Bejeweled Warg.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Bejeweled Warg)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Wolf)
+Bot1.Modes(Goblin)
+? Bot1.Battlefield.Bejeweled Warg.Subtypes = Goblin
+[T3 Bot1.Main1]
+Bot1.Attack(Bejeweled Warg)
+Bot1.Modes(Put a +1/+1 counter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Bejeweled Warg.Counters.PlusOnePlusOne = 1

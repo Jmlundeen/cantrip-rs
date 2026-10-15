@@ -7,7 +7,7 @@ use cantrip_oracle as oracle;
 fn wolf_you_control(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     matches!(t, Target::Object(id)
         if targets::permanent(q, id) && q.controller(id) == asker.controller
-            && q.chars(id).has_subtype(Subtype::Wolf))
+            && q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Wolf)))
 }
 
 /// Mode 0: a +1/+1 counter on the Wolf (CR 700.2).
