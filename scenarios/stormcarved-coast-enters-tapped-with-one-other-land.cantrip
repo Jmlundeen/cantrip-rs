@@ -1,0 +1,17 @@
+# Stormcarved Coast: one other land is not two, so it enters tapped - the boundary under the 'two or more' of its text.
+
+[Bot1 Deck]
+Island
+Stormcarved Coast
+Island x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Stormcarved Coast.Play
+
+[Expect]
+Bot1.Battlefield.Stormcarved Coast.Tapped = true

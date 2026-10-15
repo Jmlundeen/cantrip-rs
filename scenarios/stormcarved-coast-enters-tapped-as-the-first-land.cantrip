@@ -1,0 +1,14 @@
+# Stormcarved Coast: with no other land it enters tapped (CR 614.1c) - the land itself is not counted.
+
+[Bot1 Deck]
+Stormcarved Coast
+Island x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Stormcarved Coast.Play
+
+[Expect]
+Bot1.Battlefield.Stormcarved Coast.Tapped = true

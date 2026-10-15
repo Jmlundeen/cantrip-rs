@@ -1,0 +1,22 @@
+# Stormcarved Coast: with two other lands it enters untapped (CR 614.1c) and its mana ability adds {R} (chosen as it is activated).
+
+[Bot1 Deck]
+Island
+Island
+Stormcarved Coast
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Stormcarved Coast.Play
+Bot1.Battlefield.Stormcarved Coast.Activate(Color: Red)
+
+[Expect]
+Bot1.Battlefield.Stormcarved Coast.Tapped = true
+Bot1.Mana = {R}
