@@ -747,10 +747,13 @@ pub fn create_tokens_batch(cx: &mut Cx, tokens: &[(CardId, PlayerId)], tapped: b
         Cause::Spell(source) | Cause::Ability { source, .. } if copy.is_none() => cantrip_api::words(cx.s(), source),
         _ => Words::NONE,
     };
-    create_tokens_worded(cx, tokens, tapped, copy, with, words)
+    create_tokens_worded(cx, tokens, tapped, copy, with, words, None)
 }
 
 /// Creates tokens whose text has `words` (CR 612.4): `create_tokens_batch` with the words given, not the creating text's.
+/// `spell` is the copy of a permanent spell the token is the permanent of (CR 707.10f), if it is: such a token is not
+/// created (CR 111.13) but enters from the stack as the spell resolves, so its `ZoneChange` is `old: spell, from: Stack,
+/// reason: Resolve`, as any permanent spell's is, and "if you cast it" (`cast_of(old)`, CR 707.12, 603.4) finds the copy's cast.
 pub fn create_tokens_worded(
     cx: &mut Cx,
     tokens: &[(CardId, PlayerId)],
@@ -758,6 +761,7 @@ pub fn create_tokens_worded(
     copy: Option<Copiable>,
     with: &[(CounterKind, i16)],
     words: Words,
+    spell: Option<ObjectId>,
 ) -> R<Vec<ObjectId>> {
     // CR 614.1a: how many of each there are is decided by what would replace the creation, before any of them is made.
     let replaced = replace::token_batch(cx, tokens);
@@ -826,7 +830,10 @@ pub fn create_tokens_worded(
         let lore = enters_with_intrinsic_counters(cx.cards(), &mut with);
         cx.st().update_obj(id, |o| o.counters = with.counters);
         cx.st().zone_push(Zone::BATTLEFIELD, id);
-        events.push(Event::ZoneChange { old: id, new: id, from: Zone::GONE, to: Zone::BATTLEFIELD, reason: ZoneReason::Created });
+        events.push(match spell {
+            Some(spell) => Event::ZoneChange { old: spell, new: id, from: Zone::STACK, to: Zone::BATTLEFIELD, reason: ZoneReason::Resolve },
+            None => Event::ZoneChange { old: id, new: id, from: Zone::GONE, to: Zone::BATTLEFIELD, reason: ZoneReason::Created },
+        });
         if lore {
             events.push(Event::CountersPut { object: id, kind: CounterKind::Lore, amount: 1, by: Some(controller) });
         }
@@ -1120,7 +1127,9 @@ pub fn resolve_copy_as_token(cx: &mut Cx, item: &StackItem, at: usize) -> R<()> 
     cx.st().zone_remove(Zone::STACK, item.object);
     cx.st().update_obj(item.object, |o| o.zone = Zone::GONE);
     let values = spell.copy.unwrap_or_else(|| Copiable::of(spell.card));
-    let made = create_token_copies(cx, values, item.controller, 1)?;
+    let words = if values.has_exceptions() { Words::NONE } else { cantrip_api::words(cx.s(), item.object) };
+    let copy = if values.has_exceptions() { Some(values) } else { None };
+    let made = create_tokens_worded(cx, &[(values.card, item.controller)], false, copy, &[], words, Some(item.object))?;
     if let Some(&token) = made.first()
         && cx.card(layers::chars(cx.cards(), cx.s(), token).card).enchant.is_some()
         && let Some(host) = item.targets[0].object()
