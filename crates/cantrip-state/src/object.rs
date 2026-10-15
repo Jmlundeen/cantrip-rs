@@ -725,15 +725,20 @@ pub enum ManaRestriction {
     /// "Spend this mana only to cast artifact spells" (CR 106.6; Mishra's Workshop): not on an ability, nor on any other
     /// spell.
     ArtifactSpells,
+    /// "Spend this mana only to cast an instant or sorcery spell" (CR 106.6, 304, 307; Great Hall of the Biblioplex,
+    /// Tablet of Discovery, and the same limit on Abstract Paintmage and Cormela, Glamour Thief): not on an ability, nor
+    /// on any other spell. A spell with flashback or kicker is still an instant or sorcery spell, so it is paid as one.
+    InstantOrSorcerySpells,
 }
 
 impl ManaRestriction {
-    pub const COUNT: usize = 4;
+    pub const COUNT: usize = 5;
     pub const ALL: [ManaRestriction; ManaRestriction::COUNT] = [
         ManaRestriction::NotNonartifactSpells,
         ManaRestriction::GainsHaste,
         ManaRestriction::LegendaryUncounterable,
         ManaRestriction::ArtifactSpells,
+        ManaRestriction::InstantOrSorcerySpells,
     ];
 
     /// The name a scenario's `Spend:` and the state dump write it by: the limit and the effect, as the C# engine does.
@@ -743,6 +748,7 @@ impl ManaRestriction {
             ManaRestriction::GainsHaste => "GainsHaste",
             ManaRestriction::LegendaryUncounterable => "LegendarySpells, CantBeCountered",
             ManaRestriction::ArtifactSpells => "ArtifactSpells",
+            ManaRestriction::InstantOrSorcerySpells => "InstantOrSorcerySpells",
         }
     }
 

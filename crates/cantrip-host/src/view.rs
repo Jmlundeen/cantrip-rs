@@ -405,6 +405,8 @@ impl<'a> Projector<'a> {
                             ManaSpendFilterView::NotNonartifactSpells
                         } else if i == ManaRestriction::ArtifactSpells as usize {
                             ManaSpendFilterView::ArtifactSpells
+                        } else if i == ManaRestriction::InstantOrSorcerySpells as usize {
+                            ManaSpendFilterView::InstantOrSorcerySpells
                         } else {
                             ManaSpendFilterView::None
                         },

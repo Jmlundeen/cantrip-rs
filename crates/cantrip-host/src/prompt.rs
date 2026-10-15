@@ -214,6 +214,7 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
     match o.restriction {
         Some(ManaRestriction::NotNonartifactSpells) => m.filter = ManaSpendFilterView::NotNonartifactSpells,
         Some(ManaRestriction::ArtifactSpells) => m.filter = ManaSpendFilterView::ArtifactSpells,
+        Some(ManaRestriction::InstantOrSorcerySpells) => m.filter = ManaSpendFilterView::InstantOrSorcerySpells,
         _ => {}
     }
     let candidates: Vec<TargetMessage> = o.target_candidates.iter().filter_map(|t| target_message(handles, *t)).collect();

@@ -96,6 +96,7 @@ pub fn translate(
                 restriction: match a.filter {
                     ManaSpendFilterView::NotNonartifactSpells => Some(ManaRestriction::NotNonartifactSpells),
                     ManaSpendFilterView::ArtifactSpells => Some(ManaRestriction::ArtifactSpells),
+                    ManaSpendFilterView::InstantOrSorcerySpells => Some(ManaRestriction::InstantOrSorcerySpells),
                     _ => None,
                 },
             };
@@ -219,6 +220,7 @@ pub fn payload_of(answer: &Answer, request: &Request, handles: &mut HandleSpace,
             a.filter = match action.restriction {
                 Some(ManaRestriction::NotNonartifactSpells) => ManaSpendFilterView::NotNonartifactSpells,
                 Some(ManaRestriction::ArtifactSpells) => ManaSpendFilterView::ArtifactSpells,
+                Some(ManaRestriction::InstantOrSorcerySpells) => ManaSpendFilterView::InstantOrSorcerySpells,
                 _ => ManaSpendFilterView::None,
             };
             // A mana ability's sacrifice goes to the wire as `Sacrifice`, not a target (`prompt::option_message`).
