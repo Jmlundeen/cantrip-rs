@@ -182,6 +182,7 @@ pub enum Subtype {
     Halfling,
     Hamster,
     Harpy,
+    Heartwood,
     Hedgehog,
     Hellion,
     Hero,
@@ -477,7 +478,7 @@ pub enum Subtype {
 }
 
 impl Subtype {
-    pub const ALL: [Subtype; 463] = [
+    pub const ALL: [Subtype; 464] = [
         Subtype::Adventure,
         Subtype::Advisor,
         Subtype::Aetherborn,
@@ -649,6 +650,7 @@ impl Subtype {
         Subtype::Halfling,
         Subtype::Hamster,
         Subtype::Harpy,
+        Subtype::Heartwood,
         Subtype::Hedgehog,
         Subtype::Hellion,
         Subtype::Hero,
@@ -1116,6 +1118,7 @@ impl Subtype {
             Subtype::Halfling => "Halfling",
             Subtype::Hamster => "Hamster",
             Subtype::Harpy => "Harpy",
+            Subtype::Heartwood => "Heartwood",
             Subtype::Hedgehog => "Hedgehog",
             Subtype::Hellion => "Hellion",
             Subtype::Hero => "Hero",

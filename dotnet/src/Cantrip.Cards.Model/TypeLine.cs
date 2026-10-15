@@ -219,7 +219,7 @@ public sealed class SubtypeSet
     public static readonly SubtypeSet Artifact = new("artifact types", [CardType.Artifact],
     [
         "Attraction", "Blood", "Bobblehead", "Book", "Clue", "Contraption", "Equipment", "Food", "Fortification", "Gold",
-        "Incubator", "Infinity", "Junk", "Lander", "Map", "Mutagen", "Powerstone", "Spacecraft", "Stone", "Treasure",
+        "Heartwood", "Incubator", "Infinity", "Junk", "Lander", "Map", "Mutagen", "Powerstone", "Spacecraft", "Stone", "Treasure",
         "Vehicle", "Vibranium",
     ]);
 

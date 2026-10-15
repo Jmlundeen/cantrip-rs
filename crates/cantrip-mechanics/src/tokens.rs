@@ -352,6 +352,25 @@ pub static GOLD: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+/// A red and green Heartwood artifact token with "{T}: Add {R} or {G}." Predefined by the card that makes it (CR 111.10:
+/// the printed reminder text and its ruling give the token's colors, subtype and ability). Aerid Konstrari makes it.
+pub static HEARTWOOD: CardDef = CardDef {
+    name: "Heartwood Token",
+    has_cost: false,
+    colors: Some(ColorSet(0b11000)),
+    types: TypeSet::of(&[CardType::Artifact]),
+    subtypes: SubtypeSet::of(&[Subtype::Heartwood]),
+    abilities: &[crate::mana::tap_for_either(Color::Red, Color::Green, "{T}: Add {R} or {G}.")],
+    text: "{T}: Add {R} or {G}.",
+    ..CardDef::BLANK
+};
+
+/// Creates a Heartwood token under `controller`.
+pub fn create_heartwood(g: &mut dyn Game, controller: PlayerId) -> Result<(), Suspend> {
+    create(g, controller, &HEARTWOOD, 1)?;
+    Ok(())
+}
+
 /// Creates `count` tokens of `def` under `controller` (CR 111.1), untapped: the card file lists `def` in its `EXTRA`. The
 /// tokens are created together (CR 101.4). Every card that makes a Soldier, a Servo or a Rebel calls it, as do those that
 /// make a token of their own.
