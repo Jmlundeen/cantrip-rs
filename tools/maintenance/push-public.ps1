@@ -52,7 +52,7 @@ Write-Output "Public main is at $($Synced.Substring(0, 9)); $($Pending.Count) co
 Invoke-Git log --reverse --first-parent --format='  %h %s' "$Synced..$Source"
 if ($DryRun) { exit 0 }
 if (-not $Yes) {
-    $Answer = Read-Host "Publish these to $Public? [y/N]"
+    $Answer = Read-Host "Publish these to ${Public}? [y/N]"
     if ($Answer -notmatch '^(y|yes)$') { Write-Output 'Nothing published.'; exit 1 }
 }
 
