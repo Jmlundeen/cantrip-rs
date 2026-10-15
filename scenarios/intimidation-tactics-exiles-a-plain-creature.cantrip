@@ -1,0 +1,25 @@
+# Intimidation Tactics: a creature card that is no artifact is a legal choice. Bot2 holds Walking Ballista, Sol Ring and
+# Llanowar Elves; Bot1 takes the Llanowar Elves and the other two stay in hand.
+
+[Bot1 Deck]
+Swamp
+Intimidation Tactics
+Swamp x10
+
+[Bot2 Deck]
+Walking Ballista
+Sol Ring
+Llanowar Elves
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Intimidation Tactics.Cast(Bot2)
+Bot1.Choose(Llanowar Elves)
+
+[Expect]
+Turn = 1
+Exile = Llanowar Elves
+Bot2.Graveyard.Count = 0
+Bot2.Hand = Island; Island; Island; Island; Walking Ballista; Sol Ring

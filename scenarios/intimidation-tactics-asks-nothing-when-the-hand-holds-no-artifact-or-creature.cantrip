@@ -1,0 +1,27 @@
+# Intimidation Tactics: Bot2's hand is a Lightning Bolt, a Counterspell and Islands - no artifact and no creature - so there
+# is no card to choose: Bot1 is asked nothing (the refused Choose) and nothing is exiled. (The neighbouring scenarios, where
+# the same spell is asked a choice of a hand with an artifact or a creature in it, are the positive control.)
+
+[Bot1 Deck]
+Swamp
+Intimidation Tactics
+Swamp x10
+
+[Bot2 Deck]
+Lightning Bolt
+Counterspell
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Intimidation Tactics.Cast(Bot2)
+Bot1.Pass
+! Bot1.Choose
+[Bot1.Main2]
+
+[Expect]
+Turn = 1
+Exile.Count = 0
+Bot2.Hand.Count = 7
+Bot1.Graveyard = Intimidation Tactics

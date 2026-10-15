@@ -1,0 +1,28 @@
+# Intimidation Tactics: "You choose an artifact or creature card from it. Exile that card." Bot2's hand holds a Sol Ring (an
+# artifact), a Llanowar Elves (a creature), a Lightning Bolt (neither) and Islands; Bot1 takes the Sol Ring and it is exiled,
+# not discarded: Bot2's graveyard stays empty. The spell is also refused at Bot1 itself ("target opponent").
+
+[Bot1 Deck]
+Swamp
+Intimidation Tactics
+Swamp x10
+
+[Bot2 Deck]
+Sol Ring
+Llanowar Elves
+Lightning Bolt
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+! Bot1.Hand.Intimidation Tactics.Cast(Bot1)
+Bot1.Hand.Intimidation Tactics.Cast(Bot2)
+Bot1.Choose(Sol Ring)
+
+[Expect]
+Turn = 1
+Bot1.Graveyard = Intimidation Tactics
+Exile = Sol Ring
+Bot2.Graveyard.Count = 0
+Bot2.Hand = Island; Island; Island; Island; Llanowar Elves; Lightning Bolt

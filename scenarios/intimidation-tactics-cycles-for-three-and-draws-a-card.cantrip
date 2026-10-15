@@ -1,0 +1,32 @@
+# Intimidation Tactics: Cycling {3} from the hand. Bot1 taps three Moxen, discards the card and draws a Swamp: 4 cards in
+# hand, 9 in the library. No spell is cast, so Bot2's hand is untouched. A card cycled this way cannot be cycled again from
+# the graveyard.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Intimidation Tactics
+Swamp x3
+Swamp x10
+
+[Bot2 Deck]
+Sol Ring
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Intimidation Tactics.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Graveyard.Intimidation Tactics.Activate
+
+[Expect]
+Bot1.Graveyard = Intimidation Tactics
+Bot1.Hand.Count = 4
+Bot1.Library.Count = 9
+Exile.Count = 0
+Bot2.Hand.Count = 7
