@@ -1,0 +1,54 @@
+# The Hall's granted "Whenever you cast an instant or sorcery spell, this creature gets +1/+0" (CR 601.2i, 603.2) does not
+# trigger for a creature spell of yours (a Blazing Rootwalla cast with the sixth Mox Ruby) nor for an instant of the
+# opponent's (Bot2's Lightning Bolt at Bot1): the Hall stays 2/4. The positive control is the Hall's own scenario,
+# great-hall-of-the-biblioplex-becomes-a-wizard-creature-and-gets-power-from-instants.
+
+[Bot1 Deck]
+Great Hall of the Biblioplex
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Blazing Rootwalla
+Island x13
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Great Hall of the Biblioplex.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Battlefield.Mox Ruby#4.Activate
+Bot1.Battlefield.Mox Ruby#5.Activate
+Bot1.Battlefield.Great Hall of the Biblioplex.Activate(Ability: {5})
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby#6.Activate
+Bot1.Hand.Blazing Rootwalla.Cast
+Bot1.Pass
+Bot2.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Great Hall of the Biblioplex.Power = 2
+Bot1.Battlefield.Great Hall of the Biblioplex.Toughness = 4
+Bot1.Battlefield.Blazing Rootwalla.Types = Creature
+Bot1.Life = 17

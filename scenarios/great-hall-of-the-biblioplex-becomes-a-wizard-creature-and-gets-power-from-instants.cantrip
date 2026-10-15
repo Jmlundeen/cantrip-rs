@@ -1,0 +1,60 @@
+# Great Hall of the Biblioplex: "{5}: If this land isn't a creature, it becomes a 2/4 Wizard creature with 'Whenever you
+# cast an instant or sorcery spell, this creature gets +1/+0 until end of turn.' It's still a land." (CR 205.1b, 611.2a,
+# 613). Turn 3: five Mox Rubies pay {5} and the Hall is a 2/4 Wizard land creature, for good (no duration). Turn 5: it is
+# activated again - the Hall already is a creature, so nothing happens (a second grant of the trigger would pump it twice) -
+# then it taps for its restricted {R} and a Lightning Bolt is cast: one trigger, +1/+0, the Hall is 3/4.
+
+[Bot1 Deck]
+Great Hall of the Biblioplex
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Lightning Bolt
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Great Hall of the Biblioplex.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Great Hall of the Biblioplex.Types = Land
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Battlefield.Mox Ruby#4.Activate
+Bot1.Battlefield.Mox Ruby#5.Activate
+Bot1.Battlefield.Great Hall of the Biblioplex.Activate(Ability: {5})
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Great Hall of the Biblioplex.Types = Land; Creature
+? Bot1.Battlefield.Great Hall of the Biblioplex.Subtypes = Wizard
+? Bot1.Battlefield.Great Hall of the Biblioplex.Power = 2
+? Bot1.Battlefield.Great Hall of the Biblioplex.Toughness = 4
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Battlefield.Mox Ruby#4.Activate
+Bot1.Battlefield.Mox Ruby#5.Activate
+Bot1.Battlefield.Great Hall of the Biblioplex.Activate(Ability: {5})
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Great Hall of the Biblioplex.Activate(Ability: Pay 1 life; Color: R)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Great Hall of the Biblioplex.Power = 3
+Bot1.Battlefield.Great Hall of the Biblioplex.Toughness = 4

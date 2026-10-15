@@ -1,0 +1,41 @@
+# Great Hall of the Biblioplex's "{5}: ... it becomes a 2/4 Wizard creature": the Hall is destroyed by Bot2's Wasteland
+# with the ability on the stack. The ability resolves with nothing to change (CR 400.7, 608.2b): no new object is a
+# creature, and the Hall is in the graveyard as the land card it is.
+
+[Bot1 Deck]
+Great Hall of the Biblioplex
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Island x14
+
+[Bot2 Deck]
+Wasteland
+Island x19
+
+[Actions]
+Bot1.Hand.Great Hall of the Biblioplex.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot2.Hand.Wasteland.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Battlefield.Mox Ruby#4.Activate
+Bot1.Battlefield.Mox Ruby#5.Activate
+Bot1.Battlefield.Great Hall of the Biblioplex.Activate(Ability: {5})
+Bot2.Battlefield.Wasteland.Activate(Ability: Destroy; Bot1.Battlefield.Great Hall of the Biblioplex)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Great Hall of the Biblioplex
+Bot2.Graveyard = Wasteland
+Bot1.Battlefield.Count = 5
+Stack =

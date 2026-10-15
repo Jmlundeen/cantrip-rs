@@ -1,0 +1,35 @@
+# Great Hall of the Biblioplex: "{T}, Pay 1 life: Add one mana of any color. Spend this mana only to cast an instant or
+# sorcery spell" (CR 106.6, 605.1a). Turn 1: the color chosen is blue and the {U} pays for a Brainstorm (an instant) while
+# Bot1 pays 1 life. Turn 3: the color chosen is red and the {R} pays for a Chain Lightning (a sorcery). The only mana
+# either spell could be paid with is the Hall's restricted mana.
+
+[Bot1 Deck]
+Great Hall of the Biblioplex
+Brainstorm
+Chain Lightning
+Island x4
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Great Hall of the Biblioplex.Play
+Bot1.Battlefield.Great Hall of the Biblioplex.Activate(Ability: Pay 1 life; Color: U)
+? Bot1.Mana = {U} (InstantOrSorcerySpells)
+? Bot1.Life = 19
+Bot1.Hand.Brainstorm.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Island; Island)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Great Hall of the Biblioplex.Activate(Ability: Pay 1 life; Color: R)
+? Bot1.Mana = {R} (InstantOrSorcerySpells)
+Bot1.Hand.Chain Lightning.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 18
+Bot2.Life = 17
+Bot1.Graveyard = Chain Lightning; Brainstorm

@@ -1,0 +1,24 @@
+# Great Hall of the Biblioplex: "{T}: Add {C}." is an ordinary mana ability: no life is paid and the mana has no
+# restriction (CR 605.1a), so it pays for the Sol Ring, an artifact that is neither an instant nor a sorcery.
+
+[Bot1 Deck]
+Great Hall of the Biblioplex
+Sol Ring
+Island x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Great Hall of the Biblioplex.Play
+Bot1.Battlefield.Great Hall of the Biblioplex.Activate(Ability: {T}: Add {C})
+? Bot1.Mana = {C}
+? Bot1.Life = 20
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield = Great Hall of the Biblioplex; Sol Ring
+Bot1.Life = 20

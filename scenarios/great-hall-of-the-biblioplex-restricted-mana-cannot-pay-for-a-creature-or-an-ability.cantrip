@@ -1,0 +1,36 @@
+# Great Hall of the Biblioplex's restricted mana pays for an instant or sorcery spell only (CR 106.6), not for a creature
+# spell nor an activated ability. The Hall (1 life, restricted {R}) and a Mox Ruby (unrestricted {R}) are tapped: the first
+# Blazing Rootwalla is cast with the Mox's {R} (the creature control; the restricted {R} stays in the pool). With only the
+# restricted {R} left, the second Rootwalla cannot be cast, and the first one's "{R}: +2/+0" cannot be activated. On
+# turn 3 the Mox Ruby's {R}, untapped again, pays for that activation, the control for the ability.
+
+[Bot1 Deck]
+Great Hall of the Biblioplex
+Mox Ruby
+Blazing Rootwalla
+Blazing Rootwalla
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Great Hall of the Biblioplex.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Great Hall of the Biblioplex.Activate(Ability: Pay 1 life; Color: R)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Blazing Rootwalla.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {R} (InstantOrSorcerySpells)
+! Bot1.Hand.Blazing Rootwalla.Cast
+! Bot1.Battlefield.Blazing Rootwalla.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Blazing Rootwalla.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 19
+Bot1.Battlefield.Blazing Rootwalla.Power = 3
