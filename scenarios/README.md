@@ -129,7 +129,7 @@ game goes back to before it and Bot1 is asked again. It is offered while that ac
 tapped, sacrificed from the battlefield, removed counters, added mana or cost life (a land, Black Lotus, Lotus Petal,
 Pentad Prism, a Treasure); never for an ability whose cost discards (Lion's Eye Diamond) or one that triggered
 anything (Chromatic Star). Any other answer clears it, a pass or a cast spell included, so tap after the spell you
-want to pay with has resolved. `! Bot1.Undo` says nothing may be taken back at Bot1's next priority or payment.
+want to pay with has resolved. `! Bot1.Undo` says nothing may be taken back at Bot1's next priority or payment. `! Bot1.PayCost` says Bot1's next "unless pays" question does not offer paying (the mana they hold cannot pay it).
 
 The script ends when every line is played and the stack is empty. A line that isn't possible within 4 turns fails.
 The failure report shows what each player was last offered, written as script lines, followed by a trace and a full

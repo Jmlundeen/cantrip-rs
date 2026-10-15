@@ -1,0 +1,40 @@
+# CR 106.6, 715.3: Stomp, the instant half of Bonecrusher Giant, is an instant spell while it is cast, so Tablet of Discovery's
+# restricted {R}{R} pays its {1}{R}. With nothing else in the pool the cast is still offered (the advice judges the
+# Adventure face by its own type), and it resolves: Bot2 takes 2 damage and the Giant goes to exile on an adventure. The
+# Giant itself (a creature spell) is not what the mana is for; it costs {2}{R} and could not be paid by {R}{R} anyway.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Tablet of Discovery
+Bonecrusher Giant
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Hand.Tablet of Discovery.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Tablet of Discovery.Activate(Ability: Spend)
+? Bot1.Mana = {R}{R} (InstantOrSorcerySpells)
+Bot1.Hand.Bonecrusher Giant.Cast(Bot2; Ability: Adventure)
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main1]
+
+[Expect]
+Bot2.Life = 18
+Exile = Bonecrusher Giant

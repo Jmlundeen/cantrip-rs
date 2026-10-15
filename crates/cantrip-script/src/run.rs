@@ -538,6 +538,19 @@ impl<'s> Run<'s> {
                 continue;
             }
 
+            // `! Bot1.PayCost`: at the player's next "unless pays" question, paying is not among the options.
+            if let Some(ScriptStep::Refused { action, line, text }) = self.current()
+                && matches!(action.verb, ScriptVerb::PayCost)
+                && request.player == player_of(action.bot)
+                && let RequestKind::UnlessPays { options, .. } = &request.kind
+            {
+                if options.iter().any(|o| o.kind == ActionKind::PayCost) {
+                    return fail(format!("line {line} says {text} must not be offered, but it is"));
+                }
+                self.next();
+                continue;
+            }
+
             // `! Bot1.Undo`: at the player's next priority or payment, there is no mana ability to take back.
             if let Some(ScriptStep::Refused { action, line, text }) = self.current()
                 && matches!(action.verb, ScriptVerb::Undo)
