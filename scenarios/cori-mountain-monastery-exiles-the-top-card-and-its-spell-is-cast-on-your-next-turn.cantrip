@@ -1,0 +1,42 @@
+# "{3}{R}, {T}: Exile the top card of your library. Until the end of your next turn, you may play that card." The Monastery
+# enters tapped on turn 1 (no Plains or Island), so it is first used on turn 3, paid by four Moxen. It exiles the top
+# card, Lightning Bolt, which is cast from exile on turn 5, Bot1's next turn, paying its {R} and all its other costs
+# (CR 601.2); the exile is empty afterwards.
+
+[Bot1 Deck]
+Cori Mountain Monastery
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Emerald
+Mountain
+Mountain
+Mountain
+Lightning Bolt
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Cori Mountain Monastery.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Cori Mountain Monastery.Activate(Ability: Exile)
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Lightning Bolt
+Exile.Count = 0
+Bot2.Life = 17

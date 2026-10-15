@@ -1,0 +1,20 @@
+# "...unless you control a Plains or an Island": the Island branch, read by land type and not by name. Volcanic Island is
+# an Island by type, so the Monastery enters untapped beside it (turn 3). Without a Plains, the Plains branch is false.
+
+[Bot1 Deck]
+Volcanic Island
+Cori Mountain Monastery
+Mountain x5
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Volcanic Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Cori Mountain Monastery.Play
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Cori Mountain Monastery.Tapped = false

@@ -1,0 +1,37 @@
+# The ability with an empty library: there is no top card, so nothing is exiled and nothing happens (the exile is of "the top card", which
+# is not there). The deck is exactly the seven-card hand and the turn-3 draw, so the library is empty when the
+# ability resolves, and the script stops before turn 5's draw.
+
+[Bot1 Deck]
+Cori Mountain Monastery
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Emerald
+Mountain
+Mountain
+Mountain
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Cori Mountain Monastery.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T3 Bot1.Main1]
+? Bot1.Library.Count = 0
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Cori Mountain Monastery.Activate(Ability: Exile)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Exile.Count = 0
+Bot1.Battlefield.Cori Mountain Monastery.Tapped = true
+Stack.Count = 0
