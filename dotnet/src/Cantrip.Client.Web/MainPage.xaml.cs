@@ -2032,7 +2032,7 @@ public sealed partial class MainPage : Page
 
     /// <summary>
     /// Passes priority for the player when the dock's settings and stops say they would only pass (deciding through
-    /// AutoPass.Wanted), and declares no attackers for Pass Turn.
+    /// AutoPass.Wanted), and declares the chosen attackers, if any, for Pass Turn.
     /// </summary>
     private void AutoAnswer(GameClient client)
     {
@@ -2050,10 +2050,11 @@ public sealed partial class MainPage : Page
             return;
         }
 
-        // Passing the turn attacks with nothing but what must attack, a goaded creature (CR 701.15b).
+        // Passing the turn attacks with what was chosen to, though the attack was not locked in, and what must attack, a
+        // goaded creature (CR 701.15b).
         if (_passTurn && client.Prompt?.Prompt is DeclareAttackersPromptMessage passing)
         {
-            Send(client, passing.Default());
+            Send(client, PassTurnAttack(passing));
             return;
         }
 

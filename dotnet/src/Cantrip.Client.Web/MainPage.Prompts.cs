@@ -1705,18 +1705,42 @@ public sealed partial class MainPage
 
     // --- Combat ---
 
+    /// <summary>The attacks chosen so far: each creature sent somewhere, against what it was sent at.</summary>
+    private List<AttackMessage> DeclaredAttacks() =>
+    [
+        .. _attacking.Select(pair => new AttackMessage
+        {
+            Attacker = new ViewHandle(pair.Key),
+            TargetPlayer = pair.Value.Player,
+            TargetPermanent = pair.Value.Permanent,
+        }),
+    ];
+
+    /// <summary>
+    /// The attack Pass Turn declares: the creatures chosen, though the attack was not locked in - one picked up and
+    /// not yet sent anywhere at the first thing it may attack, seats first - and any creature that must attack and was
+    /// left home (CR 701.15b), as the default would send it.
+    /// </summary>
+    private AttackersDeclaredAnswer PassTurnAttack(DeclareAttackersPromptMessage prompt)
+    {
+        List<AttackMessage> attacks = DeclaredAttacks();
+        foreach (int creature in _pending)
+        {
+            if (!_attacking.ContainsKey(creature) && prompt.AttacksFor(new ViewHandle(creature)) is [var first, ..])
+            {
+                attacks.Add(first);
+            }
+        }
+
+        var required = (AttackersDeclaredAnswer)prompt.Default();
+        attacks.AddRange(required.Attacks.Where(attack => attacks.All(chosen => chosen.Attacker != attack.Attacker)));
+        return new AttackersDeclaredAnswer { Attacks = attacks };
+    }
+
     /// <summary>Declares attackers, each against a defender of its own (CR 508.1), clicked on the battlefield.</summary>
     private void FillAttackers(GameClient client, DeclareAttackersPromptMessage prompt)
     {
-        List<AttackMessage> declared =
-        [
-            .. _attacking.Select(pair => new AttackMessage
-            {
-                Attacker = new ViewHandle(pair.Key),
-                TargetPlayer = pair.Value.Player,
-                TargetPermanent = pair.Value.Permanent,
-            }),
-        ];
+        List<AttackMessage> declared = DeclaredAttacks();
 
         // A goaded creature left home (CR 701.15b): what the server would refuse, so the button waits and the dock says why.
         AttackRequirementMessage? unmet = prompt.Requirements.FirstOrDefault(requirement => !requirement.MetBy(declared));
