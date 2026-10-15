@@ -1,0 +1,34 @@
+# Artificial Evolution replaces the creature type Wizard with Goblin in Astrologian's Planisphere's text (CR 612.1,
+# indefinitely): "equipped creature is a Wizard in addition to its other types" now says Goblin, so the Hero job select
+# made is a Goblin, not a Wizard (CR 613.1d).
+
+[Bot1 Deck]
+Island
+Mox Pearl
+Mox Sapphire
+Astrologian's Planisphere
+Artificial Evolution
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Astrologian's Planisphere.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Artificial Evolution.Cast(Astrologian's Planisphere)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Wizard)
+Bot1.Modes(Goblin)
+
+[Expect]
+Bot1.Battlefield.Astrologian's Planisphere.AttachedTo = Hero
+Bot1.Battlefield.Hero.Subtypes = Goblin; Hero

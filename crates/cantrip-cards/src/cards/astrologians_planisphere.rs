@@ -30,8 +30,8 @@ fn job_select(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 /// "Equipped creature is a Wizard in addition to its other types" (layer 4).
-fn wizard(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.subtypes = chars.subtypes.with(Subtype::Wizard);
+fn wizard(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
+    chars.subtypes = chars.subtypes.with(view.words(source).subtype(Subtype::Wizard));
 }
 
 /// The equipped creature has the Equipment's delayed ability 0 (CR 613.1f): one triggered ability with two conditions, an
