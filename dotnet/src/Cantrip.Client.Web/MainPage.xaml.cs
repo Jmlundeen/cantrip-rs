@@ -1564,21 +1564,14 @@ public sealed partial class MainPage : Page
         LayOutHalf(client, _opponentHalf, theirs, _opponentCombat, aligned, cardWidth);
         LayOutHalf(client, _myHalf, mine, _myCombat, aligned, cardWidth);
 
-        // The spell being paid for stands on the stack, not in the hand it was cast from.
-        PayCostsPromptMessage? paying = client.Prompt?.Prompt as PayCostsPromptMessage;
-        List<ObjectView> hand = InHandOrder([.. client.MyHand().Where(card => paying is null || card.Handle != paying.Spell)]);
+        // A spell being paid for is on the stack already (CR 601.2a), and so is an ability (CR 602.2a): its source stays
+        // where it is.
+        List<ObjectView> hand = InHandOrder([.. client.MyHand()]);
         _hand = hand;
         LayOutHand(client);
         _handEmpty.Visibility = hand.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
 
-        // The spell being paid for is drawn on top: to the player who announced it, it has left the hand.
-        List<ObjectView> stack = [.. client.Zone(ZoneKindView.Stack, 0)];
-        if (paying is not null && client.Object(paying.Spell) is { } announced && !stack.Contains(announced))
-        {
-            stack.Add(announced);
-        }
-
-        LayOutStack(client, [.. stack, .. StagedTriggers(client)]);
+        LayOutStack(client, [.. client.Zone(ZoneKindView.Stack, 0), .. StagedTriggers(client)]);
         LayOutChoices();
 
         // After the flights' layout pass, so a stack window that has just appeared has a size to aim from.

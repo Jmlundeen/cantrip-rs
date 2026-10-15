@@ -1739,7 +1739,10 @@ public sealed class PayCostsPromptMessage : PromptPayload
     [Key(0)]
     public int Player { get; set; }
 
-    /// <summary>The spell being paid for. Still in the caster's hand: it reaches the stack once it is paid for.</summary>
+    /// <summary>
+    /// The spell being paid for, on the stack already (CR 601.2a); or, for an ability, its source, wherever that is - the
+    /// ability itself is on the stack (CR 602.2a).
+    /// </summary>
     [Key(1)]
     public ViewHandle Spell { get; set; }
 
