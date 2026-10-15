@@ -1,0 +1,35 @@
+# Improvisation Capstone: a spell with no legal target is not offered (CR 608.2g, 601.2c). Four Swords to Plowshares (1 each, so
+# the exile stops at 4) need a creature to target and there is none, so nothing is castable and Bot1 is asked nothing (the
+# refused Choose); all four stay in exile. The scenario that casts a Counterspell at a Bolt it has just cast, and the Bolts
+# cast in the others, are the positive control.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Improvisation Capstone
+Island x3
+Swords to Plowshares
+Swords to Plowshares
+Swords to Plowshares
+Swords to Plowshares
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Improvisation Capstone.Cast
+! Bot1.Choose
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Exile.Count = 5

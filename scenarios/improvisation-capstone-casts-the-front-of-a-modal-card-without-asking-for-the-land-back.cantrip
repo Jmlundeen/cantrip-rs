@@ -1,0 +1,37 @@
+# Improvisation Capstone: Valakut Awakening // Valakut Stoneforge is a modal double-faced card whose back is a land. Only the
+# spell face can be cast (CR 712.8a: a land is not cast), so no face is asked (the refused Modes) and it is cast as Valakut
+# Awakening: Bot1 puts no cards on the bottom and draws one. The Swords to Plowshares exiled with it (3 + 1 = 4) has no creature to
+# target and is not offered.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Improvisation Capstone
+Island x3
+Valakut Awakening
+Swords to Plowshares
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Improvisation Capstone.Cast
+Bot1.Choose(Valakut Awakening)
+Bot1.Choose()
+! Bot1.Modes
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Hand.Count = 4
+Bot1.Library.Count = 9
+Exile.Count = 2

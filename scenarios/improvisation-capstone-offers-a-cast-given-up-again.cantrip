@@ -1,0 +1,38 @@
+# Improvisation Capstone: a cast the player gives up (CR 733.1) leaves the card in exile, and it is offered again. Bot1
+# chooses a Lightning Bolt, cancels at its target, is offered it again and casts it at Bot2 (17). The other Bolts are declined.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Improvisation Capstone
+Island x3
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Improvisation Capstone.Cast
+Bot1.Choose(Lightning Bolt)
+Bot1.Cancel
+Bot1.Choose(Lightning Bolt)
+Bot1.Target(Bot2)
+Bot1.Choose()
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot2.Life = 17
+Exile.Count = 4

@@ -1,0 +1,39 @@
+# Improvisation Capstone: the total is 4 or greater when the exile stops, and may overshoot it - Bonecrusher Giant (3) then
+# Inevitable Defeat (4) make 7, and the Bolt below them stays in the library. The Giant is an Adventurer, so its caster is asked
+# which face to cast (CR 715.3, 608.2g) and casts Stomp: 2 damage to Bot2 (18), and the card goes to exile on an adventure.
+# Inevitable Defeat needs a nonland permanent to target and there is none, so it is not offered (no further Choose).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Improvisation Capstone
+Island x3
+Bonecrusher Giant
+Inevitable Defeat
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Improvisation Capstone.Cast
+Bot1.Choose(Bonecrusher Giant)
+Bot1.Modes(Stomp)
+Bot1.Target(Bot2)
+! Bot1.Choose
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot2.Life = 18
+Exile.Count = 3
+Bot1.Library.Count = 11

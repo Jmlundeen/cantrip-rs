@@ -1,0 +1,41 @@
+# Improvisation Capstone: the spells are cast as it resolves, so timing restrictions by type are ignored (ruling). A creature
+# (Llanowar Elves) and a sorcery (Duress) are cast while the Capstone resolves, with the stack holding the Capstone's own
+# resolution, and resolve afterwards: the Elves are on the battlefield, and Duress takes the Lightning Bolt from Bot2's hand.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Improvisation Capstone
+Island x3
+Llanowar Elves
+Duress
+Dark Ritual
+Dark Ritual
+Island x10
+
+[Bot2 Deck]
+Lightning Bolt
+Island x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Improvisation Capstone.Cast
+Bot1.Choose(Llanowar Elves)
+Bot1.Choose(Duress)
+Bot1.Target(Bot2)
+Bot1.Choose()
+Bot1.Pass
+Bot1.Choose(Lightning Bolt)
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Battlefield = Llanowar Elves
+Bot2.Graveyard = Lightning Bolt
