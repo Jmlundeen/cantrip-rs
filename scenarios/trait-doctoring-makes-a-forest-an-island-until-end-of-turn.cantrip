@@ -1,0 +1,38 @@
+# Trait Doctoring replaces the basic land type Forest with Island in Bot1's Forest's type line (CR 612.1) until end of
+# turn: it taps for {U} (CR 305.6) and is called Forest still (CR 612.2). On the next turn it is a Forest again. With no
+# creature to encode it on, cipher asks nothing and the card goes to the graveyard.
+
+[Bot1 Deck]
+Forest
+Island
+Trait Doctoring
+Island x13
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Trait Doctoring.Cast(Forest)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Replace a basic land type)
+Bot1.Modes(Forest)
+! Bot1.Modes(Forest)
+Bot1.Modes(Island)
+? Bot1.Battlefield.Forest.Subtypes = Island
+! Bot1.Choose
+Bot1.Battlefield.Forest.Activate
+? Bot1.Mana = {U}
+? Bot1.Graveyard = Trait Doctoring
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Forest.Subtypes = Forest
+Bot1.Battlefield.Forest.Activate
+? Bot1.Mana = {G}
+
+[Expect]
+Turn = 5
+Exile.Count = 0

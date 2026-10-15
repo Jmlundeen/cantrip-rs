@@ -1,0 +1,57 @@
+# Cipher (CR 702.99): Bot1 encodes Trait Doctoring on Llanowar Elves as it resolves, and the card stays in exile. When
+# the Elves deal combat damage to Bot2, their controller may cast a copy of the encoded card without paying its mana
+# cost: the copy makes Bot2's Island a Swamp until end of turn and ceases to exist (CR 707.10), and the card is still
+# encoded. The next time the Elves connect, Bot1 declines.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Island
+Trait Doctoring
+Forest x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Trait Doctoring.Cast(Forest)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Replace a color word)
+Bot1.Colors(Green)
+Bot1.Colors(Blue)
+Bot1.Choose(Llanowar Elves)
+? Exile = Trait Doctoring
+? Bot1.Graveyard =
+Bot1.Attack(Llanowar Elves)
+[T3 Bot1.CombatDamage]
+Bot1.Accept
+Bot1.Target(Bot2.Battlefield.Island)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Replace a basic land type)
+Bot1.Modes(Island)
+Bot1.Modes(Swamp)
+? Bot2.Battlefield.Island.Subtypes = Swamp
+? Exile = Trait Doctoring
+? Bot1.Graveyard =
+? Stack.Count = 0
+[T5 Bot1.Main1]
+? Bot2.Battlefield.Island.Subtypes = Island
+Bot1.Attack(Llanowar Elves)
+[T5 Bot1.CombatDamage]
+Bot1.Decline
+
+[Expect]
+Turn = 5
+Bot2.Life = 18
+Exile = Trait Doctoring
+Bot1.Graveyard =

@@ -1,0 +1,38 @@
+# Trait Doctoring replaces Mountain with Island in Arid Mesa's text. The Mesa is sacrificed to pay for its own ability,
+# and the ability, independent of it (CR 113.7a), searches for the land types its text named as it was sacrificed
+# (CR 608.2h): an Island or a Plains card, no longer a Mountain.
+
+[Bot1 Deck]
+Island
+Arid Mesa
+Trait Doctoring
+Forest x5
+Mountain
+Island
+Plains
+Forest x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Arid Mesa.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Trait Doctoring.Cast(Arid Mesa)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Replace a basic land type)
+Bot1.Modes(Mountain)
+Bot1.Modes(Island)
+Bot1.Battlefield.Arid Mesa.Activate
+Bot1.Pass
+Bot2.Pass
+! Bot1.Search(Mountain)
+Bot1.Search(Island)
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Arid Mesa; Trait Doctoring
+Bot1.Battlefield = Island; Island

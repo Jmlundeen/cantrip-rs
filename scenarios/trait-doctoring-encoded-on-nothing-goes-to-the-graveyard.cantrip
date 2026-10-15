@@ -1,0 +1,37 @@
+# Cipher's encoding is a "may" (CR 702.99a): Bot1 has Llanowar Elves to encode Trait Doctoring on and chooses none, so
+# the card goes to the graveyard as an ordinary sorcery would, and the Elves have no ability that copies it.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Island
+Trait Doctoring
+Forest x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Trait Doctoring.Cast(Forest)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Replace a color word)
+Bot1.Colors(Green)
+Bot1.Colors(Blue)
+Bot1.Choose()
+? Bot1.Graveyard = Trait Doctoring
+Bot1.Attack(Llanowar Elves)
+[T3 Bot1.CombatDamage]
+! Bot1.Accept
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 19
+Exile.Count = 0
