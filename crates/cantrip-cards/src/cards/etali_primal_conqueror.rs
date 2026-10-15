@@ -15,23 +15,13 @@ fn dig(g: &mut dyn Game, player: PlayerId, found: &mut Vec<ObjectId>) {
 }
 
 /// Each player exiles cards from the top of their library until they exile a nonland card, from the active player on
-/// (CR 101.4). You may cast any number of spells from among the nonland cards exiled this way without paying their mana costs:
-/// offered one at a time, in the order the controller likes, until they decline or none is castable.
+/// (CR 101.4). You may cast any number of spells from among the nonland cards exiled this way without paying their mana costs.
 fn exile_and_cast_free(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let mut found: Vec<ObjectId> = Vec::new();
     for player in g.state().apnap().collect::<Vec<_>>() {
         dig(g, player, &mut found);
     }
-    loop {
-        let castable: Vec<ObjectId> = found
-            .iter()
-            .copied()
-            .filter(|&c| is_live(g, c) && g.obj(c).zone.is(ZoneKind::Exile) && g.could_cast_during_resolution(c))
-            .collect();
-        let chosen = choose::cards_from(g, item.controller, item.object, Purpose::Cast, found.clone(), castable, 1, true)?;
-        let Some(&card) = chosen.first() else { return Ok(()) };
-        g.cast_during_resolution(card, Some(ManaCost::ZERO))?;
-    }
+    choose::cast_any_number_free(g, item.controller, item.object, &found)
 }
 
 fn give_poison(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {

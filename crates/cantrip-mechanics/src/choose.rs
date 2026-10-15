@@ -81,3 +81,18 @@ pub fn cast_way(g: &mut dyn Game, player: PlayerId, card: ObjectId, ways: Vec<Ca
         }
     }
 }
+
+/// "You may cast any number of spells from among [these cards] without paying their mana costs" (CR 608.2g, 118.9): the
+/// controller is offered the castable ones among `cards` one at a time, in the order they like, until they decline or none
+/// is castable. Each is cast as the effect resolves, so it takes its face (when it has several) and its targets as any cast
+/// does; a cast given up leaves the card where it was, to be offered again. A card is castable only while it is still
+/// where it was (`could_cast_during_resolution` asks), so one already cast is not offered.
+/// Etali, Primal Conqueror and Improvisation Capstone print it.
+pub fn cast_any_number_free(g: &mut dyn Game, player: PlayerId, source: ObjectId, cards: &[ObjectId]) -> Result<(), Suspend> {
+    loop {
+        let castable: Vec<ObjectId> = cards.iter().copied().filter(|&c| g.could_cast_during_resolution(c)).collect();
+        let chosen = cards_from(g, player, source, Purpose::Cast, cards.to_vec(), castable, 1, true)?;
+        let Some(&card) = chosen.first() else { return Ok(()) };
+        g.cast_during_resolution(card, Some(ManaCost::ZERO))?;
+    }
+}
