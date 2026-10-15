@@ -3,11 +3,12 @@ use cantrip_mechanics::{Animation, animate, mana};
 use cantrip_oracle as oracle;
 
 fn becomes_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let words = g.words(item.object);
     let animation = Animation {
         power: 4,
         toughness: 4,
-        colors: ColorSet(0b00011),
-        subtype: Subtype::Elemental,
+        colors: words.colors(ColorSet(0b00011)),
+        subtype: words.subtype(Subtype::Elemental),
         keywords: Keywords::of(&[Keyword::Flying, Keyword::Vigilance]),
     };
     animate(g, item.object, item.object, &animation, Duration::EndOfTurn);
