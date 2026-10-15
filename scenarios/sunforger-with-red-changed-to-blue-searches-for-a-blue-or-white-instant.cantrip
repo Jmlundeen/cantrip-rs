@@ -1,0 +1,56 @@
+# Trait Doctoring replaces the color word red with blue in Sunforger's text until end of turn (CR 612.1), so its ability
+# searches for "a blue or white instant card with mana value 4 or less": Lightning Bolt, red, is refused and Ancestral
+# Recall, blue, is found and cast for free. The {R}{W} in its cost is mana symbols, not words, and is paid as printed.
+
+[Bot1 Deck]
+Mountain
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Sol Ring
+Ornithopter
+Sunforger
+Trait Doctoring
+Lightning Bolt
+Ancestral Recall
+Plains x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sunforger.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Sunforger.Activate(Ability: Equip; Ornithopter)
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Trait Doctoring.Cast(Sunforger)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Replace a color word)
+Bot1.Colors(Red)
+Bot1.Colors(Blue)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sunforger.Activate(Ability: Unattach)
+! Bot1.Search(Lightning Bolt)
+Bot1.Search(Ancestral Recall)
+Bot1.Target(Bot1)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Ancestral Recall
+Exile = Trait Doctoring
+Bot1.Hand.Count = 3
+Bot1.Battlefield.Sunforger.AttachedTo = (absent)

@@ -8,9 +8,11 @@ fn plus_four_power(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
 }
 
 /// A red or white instant card with mana value 4 or less.
-fn quality(q: &dyn Query, card: ObjectId) -> bool {
-    let c = q.chars(card);
-    c.is(CardType::Instant) && (c.colors.has(Color::Red) || c.colors.has(Color::White)) && q.mana_value(card) <= 4
+fn quality(red: Color, white: Color) -> impl Fn(&dyn Query, ObjectId) -> bool {
+    move |q, card| {
+        let c = q.chars(card);
+        c.is(CardType::Instant) && (c.colors.has(red) || c.colors.has(white)) && q.mana_value(card) <= 4
+    }
 }
 
 /// "Search your library for a red or white instant card with mana value 4 or less and cast that card without paying
@@ -19,7 +21,8 @@ fn quality(q: &dyn Query, card: ObjectId) -> bool {
 /// be cast stays in the library and is shuffled with it.
 fn search_and_cast(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
-    let found = search_library(g, you, item.object, 1, true, quality)?;
+    let words = g.words(item.object);
+    let found = search_library(g, you, item.object, 1, true, quality(words.color(Color::Red), words.color(Color::White)))?;
     if let Some(&card) = found.first()
         && g.could_cast_during_resolution(card)
     {
