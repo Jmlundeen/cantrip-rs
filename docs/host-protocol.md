@@ -14,6 +14,7 @@ Requests and replies (a reply is `{"Ok": {...}}` or `{"Rejected": {"Code": "..."
 | Request | Reply |
 | --- | --- |
 | `{"Cmd":"NewGame","Seats":[{"Name":"Alice","Deck":["Island", ...]}, ...],"Seed":123,"Shuffle":true,"FirstPlayer":1,"Chooser":null}` | `{"GameId":1,"Decklists":{"1":[ObjectView, ...], ...}}` - decks are card names, top first when unshuffled; `FirstPlayer` fixes who goes first, `Chooser` asks that seat instead (CR 103.1); a printed `ObjectView` per deck card, in deck order, for the welcome. A card the engine has not ported is `Rejected` with `InvalidSetup`, naming it |
+| `{"Cmd":"NewGame","Seats":[{"Name":"You","Deck":[]}, ...],"Seed":1,"Scenario":{"Name":"...","Text":"...","Driven":[1]}}` | the same: a table playing a `.cantrip` scenario, its decks, order and dice the scenario's; the `Driven` seats are answered by the table and every other by the script, and each step carries a `Scenario` object (`docs/scenarios-in-the-browser.md`) |
 | `{"Cmd":"Start","GameId":1}` | a step |
 | `{"Cmd":"Answer","GameId":1,"RequestId":7,"Seat":1,"Answer":{AnswerPayload}}` | a step, or `Rejected` with `IllegalAnswer`, `StaleReply`, `UnknownHandle` or `NotYourTurnToAnswer`, after which the request is still outstanding |
 | `{"Cmd":"Concede","GameId":1,"Seat":1}` | a step |

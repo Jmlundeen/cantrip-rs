@@ -164,6 +164,11 @@ impl Scripted {
         }
     }
 
+    /// The permanent whose mana ability `player` may take back now, as the script's game has it.
+    pub fn undo_offered(&self, player: PlayerId) -> Option<ObjectId> {
+        self.run.undo.offered(player)
+    }
+
     /// The `[Expect]` lines about what a client shows, for the pages to judge once the script is over.
     pub fn client_expectations(&self) -> Vec<Expectation> {
         self.run.script.expectations.iter().filter(|e| e.is_client()).cloned().collect()

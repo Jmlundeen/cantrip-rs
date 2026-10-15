@@ -102,6 +102,17 @@ pub fn translate(
             if let Some(s) = a.sacrifice {
                 action.targets.push(Target::Object(object(handles, game, s)?));
             }
+            // A handle names an object and every earlier one it was (`HandleSpace::rebind`): the source is the one the
+            // offered option names - Channel's mana ability, offered from the card that granted it, which has moved since.
+            if let Some(source) = action.source
+                && let RequestKind::PayCosts { options, .. } | RequestKind::Priority { options } = &request.kind
+                && !options.iter().any(|o| o.kind == kind && o.index == action.index && o.source == Some(source))
+                && let Some(o) = options
+                    .iter()
+                    .find(|o| o.kind == kind && o.index == action.index && o.source.is_some_and(|s| handles.existing(s) == a.source))
+            {
+                action.source = o.source;
+            }
             // A cancel or a decline names no source, whatever the option it matches carries.
             if matches!(kind, ActionKind::CancelCasting | ActionKind::DeclineCost | ActionKind::PayCost | ActionKind::ConfirmCasting)
                 && let RequestKind::PayCosts { options, .. } | RequestKind::UnlessPays { options, .. } | RequestKind::Priority { options } = &request.kind
@@ -181,4 +192,100 @@ pub fn translate(
                 .collect::<Result<_, Untranslatable>>()?,
         ),
     })
+}
+
+fn wire_target(handles: &mut HandleSpace, t: Target) -> TargetMessage {
+    match t {
+        Target::Player(p) => TargetMessage::player(seat(p)),
+        Target::Ability(serial) => TargetMessage::object(handles.handle(ability_key(serial))),
+        Target::Object(id) => TargetMessage::object(handles.handle(id)),
+        Target::None => TargetMessage::player(0),
+    }
+}
+
+/// An engine answer as the wire's, in a seat's handles: the inverse of [`translate`], for saying what a scripted seat
+/// is meant to answer (`Session::scenario`). Objects the seat has no handle for are given one.
+pub fn payload_of(answer: &Answer, request: &Request, handles: &mut HandleSpace, game: &Game) -> AnswerPayload {
+    match answer {
+        Answer::Pass => AnswerPayload::PassAnswer(PassAnswer {}),
+        Answer::Cancel => AnswerPayload::CancelAnnouncementAnswer(CancelAnnouncementAnswer {}),
+        Answer::Cards(ids) => AnswerPayload::CardsChosenAnswer(CardsChosenAnswer { cards: ids.iter().map(|&id| handles.handle(id)).collect() }),
+        Answer::Act(action) => {
+            let source = action.source.map_or(ViewHandle::NONE, |s| handles.handle(s));
+            let mut a = TakeActionAnswer::new(crate::prompt::action_kind_view(action.kind), source);
+            a.ability_index = i32::from(action.index);
+            a.color = action.color.map(color_view);
+            a.mana = action.mana.map(mana_view);
+            a.filter = match action.restriction {
+                Some(ManaRestriction::NotNonartifactSpells) => ManaSpendFilterView::NotNonartifactSpells,
+                Some(ManaRestriction::ArtifactSpells) => ManaSpendFilterView::ArtifactSpells,
+                _ => ManaSpendFilterView::None,
+            };
+            // A mana ability's sacrifice goes to the wire as `Sacrifice`, not a target (`prompt::option_message`).
+            let sacrifices = action.kind == ActionKind::ActivateAbility
+                && action.source.is_some_and(|s| {
+                    matches!(
+                        game.chars(s).abilities().nth(action.index as usize).map(|a| game.cards.ability(a)),
+                        Some(AbilityDef::Activated(d)) if d.mana.is_some() && d.cost.permanents.is_some()
+                    )
+                });
+            if sacrifices && let Some(Target::Object(id)) = action.targets.first() {
+                a.sacrifice = Some(handles.handle(*id));
+            } else {
+                a.targets = action.targets.iter().map(|&t| wire_target(handles, t)).collect();
+            }
+            AnswerPayload::TakeActionAnswer(a)
+        }
+        Answer::Targets(ts) => AnswerPayload::TargetsChosenAnswer(TargetsChosenAnswer { targets: ts.iter().map(|&t| wire_target(handles, t)).collect() }),
+        Answer::Modes(ms) => AnswerPayload::ModesChosenAnswer(ModesChosenAnswer { modes: ms.iter().map(|&m| i32::from(m)).collect() }),
+        Answer::Subtype(st) => {
+            let index = match &request.kind {
+                RequestKind::ChooseSubtype { choices, .. } => choices.iter().position(|c| c == st).map_or(-1, |i| i as i32),
+                _ => -1,
+            };
+            AnswerPayload::ModesChosenAnswer(ModesChosenAnswer { modes: vec![index] })
+        }
+        Answer::Colors(cs) => AnswerPayload::ColorsChosenAnswer(ColorsChosenAnswer { colors: cs.iter().map(|&c| color_view(c)).collect() }),
+        Answer::Yes => AnswerPayload::MayChosenAnswer(MayChosenAnswer { accept: true }),
+        Answer::No => AnswerPayload::MayChosenAnswer(MayChosenAnswer { accept: false }),
+        Answer::Attack(attacks) => AnswerPayload::AttackersDeclaredAnswer(AttackersDeclaredAnswer {
+            attacks: attacks
+                .iter()
+                .map(|&(attacker, at)| match at {
+                    Target::Player(p) => AttackMessage { attacker: handles.handle(attacker), target_player: seat(p), target_permanent: ViewHandle::NONE },
+                    other => {
+                        let permanent = match other {
+                            Target::Object(id) => handles.handle(id),
+                            _ => ViewHandle::NONE,
+                        };
+                        AttackMessage { attacker: handles.handle(attacker), target_player: 0, target_permanent: permanent }
+                    }
+                })
+                .collect(),
+        }),
+        Answer::Block(blocks) => AnswerPayload::BlockersDeclaredAnswer(BlockersDeclaredAnswer {
+            blocks: blocks.iter().map(|&(b, a)| BlockMessage { blocker: handles.handle(b), attacker: handles.handle(a) }).collect(),
+        }),
+        Answer::Player(p) => AnswerPayload::PlayerChosenAnswer(PlayerChosenAnswer { player: seat(*p) }),
+        Answer::Name(id) => AnswerPayload::CardNamedAnswer(CardNamedAnswer { name: id.map_or(String::new(), |c| game.cards.get(c).name.to_string()) }),
+        Answer::Order(order) => AnswerPayload::TriggersOrderedAnswer(TriggersOrderedAnswer { order: order.iter().map(|&o| i32::from(o)).collect() }),
+        Answer::Index(i) => AnswerPayload::ReplacementChosenAnswer(ReplacementChosenAnswer { index: i32::from(*i) }),
+        Answer::Shares(shares) => AnswerPayload::CombatDamageAssignedAnswer(CombatDamageAssignedAnswer {
+            shares: shares
+                .iter()
+                .map(|&(source, creature, amount)| DamageShareMessage {
+                    source: handles.handle(source),
+                    creature: creature.map_or(ViewHandle::NONE, |c| handles.handle(c)),
+                    amount: i32::from(amount),
+                })
+                .collect(),
+        }),
+        Answer::Placements { placements, shuffle } => AnswerPayload::CardsDistributedAnswer(CardsDistributedAnswer {
+            placements: placements.iter().map(|p| p.iter().map(|&id| handles.handle(id)).collect()).collect(),
+            shuffle: *shuffle,
+        }),
+        Answer::Divided(shares) => AnswerPayload::TargetsDividedAnswer(TargetsDividedAnswer {
+            shares: shares.iter().map(|&(t, amount)| TargetShareMessage { target: wire_target(handles, t), amount: i32::from(amount) }).collect(),
+        }),
+    }
 }

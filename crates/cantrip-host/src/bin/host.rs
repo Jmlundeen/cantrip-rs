@@ -25,6 +25,10 @@ enum Request {
         first_player: Option<i32>,
         #[serde(rename = "Chooser", default)]
         chooser: Option<i32>,
+        /// A `.cantrip` scenario to play instead of a dealt game: its decks, order and dice are the scenario's, and the
+        /// seats named in `Driven` are answered by the table, every other by the script (docs/scenarios-in-the-browser.md).
+        #[serde(rename = "Scenario", default)]
+        scenario: Option<ScenarioSpec>,
     },
     Start {
         #[serde(rename = "GameId")]
@@ -67,6 +71,16 @@ fn yes() -> bool {
 }
 
 #[derive(Deserialize)]
+struct ScenarioSpec {
+    #[serde(rename = "Name")]
+    name: String,
+    #[serde(rename = "Text")]
+    text: String,
+    #[serde(rename = "Driven", default)]
+    driven: Vec<i32>,
+}
+
+#[derive(Deserialize)]
 struct SeatSpec {
     #[serde(rename = "Name")]
     name: String,
@@ -90,9 +104,15 @@ fn ok(value: Value) -> Value {
 impl Host {
     fn handle(&mut self, request: Request) -> Value {
         match request {
-            Request::NewGame { seats, seed, shuffle, first_player, chooser } => {
-                let deal = Deal { seats: seats.into_iter().map(|s| (s.name, s.deck)).collect(), seed, shuffle, first_player, chooser };
-                match Session::new(deal) {
+            Request::NewGame { seats, seed, shuffle, first_player, chooser, scenario } => {
+                let made = match scenario {
+                    Some(spec) => Session::scenario(&spec.text, &spec.name, seats.into_iter().map(|s| s.name).collect(), &spec.driven),
+                    None => {
+                        let deal = Deal { seats: seats.into_iter().map(|s| (s.name, s.deck)).collect(), seed, shuffle, first_player, chooser };
+                        Session::new(deal)
+                    }
+                };
+                match made {
                     Ok(session) => {
                         let id = self.next_game;
                         self.next_game += 1;

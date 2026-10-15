@@ -14,10 +14,11 @@ use std::collections::{HashMap, HashSet};
 use std::panic::AssertUnwindSafe;
 
 use cantrip_engine::undo::Undo;
+use cantrip_script::{Advance, Expectation, Expected, GameScript, Intent, Scripted};
 use cantrip_engine::*;
 use serde_json::{Value, json};
 
-use crate::answer::{Untranslatable, translate};
+use crate::answer::{Untranslatable, payload_of, translate};
 use crate::events::{Proto, Teller, Tracker};
 use crate::handles::HandleSpace;
 use crate::prompt::{prompt, request_objects};
@@ -54,6 +55,22 @@ pub struct Session {
     extra: Vec<HashSet<ObjectId>>,
     /// The mana abilities that can still be taken back (`cantrip_engine::undo`).
     undoable: Undo<Told>,
+    /// A scenario being played at this table (`Session::scenario`), or none for a game dealt from decks.
+    scenario: Option<Scenario>,
+}
+
+/// A `.cantrip` scenario played at a table (docs/scenarios-in-the-browser.md): the script answers for every seat but the
+/// driven ones, and says what a driven seat is meant to answer, which it must. Its runner keeps a game of its own, which
+/// the session swaps with the live one for each move (`std::mem::swap`), so each is the one game in turn.
+struct Scenario {
+    scripted: Scripted,
+    driven: Vec<PlayerId>,
+    /// The question a driven seat is asked now, and what the script means.
+    expected: Option<Expected>,
+    /// Checks of what a client shows that came up since the last step, for the driving pages.
+    checks: Vec<Expectation>,
+    /// How it ended: `Ok` with what the pages are still to judge, or the failure's report.
+    verdict: Option<Result<Vec<Expectation>, String>>,
 }
 
 /// What the host keeps beside a mana ability that can be taken back (`cantrip_engine::undo`): what was told of it, and
@@ -115,6 +132,7 @@ impl Session {
             told: Vec::new(),
             extra: vec![HashSet::new(); seats],
             undoable: Undo::default(),
+            scenario: None,
             game,
         };
         // A first player named outright is not asked: the question is answered as it is posed.
@@ -126,6 +144,161 @@ impl Session {
             session.told.push(Proto::StartingPlayer { chooser: request.player, player: first });
         }
         Ok(session)
+    }
+
+    /// A table playing the scenario `text`: dealt as the scenario runner deals it, its seats named `names`, the `driven`
+    /// seats answered by the table's clients and every other by the script.
+    pub fn scenario(text: &str, name: &str, names: Vec<String>, driven: &[i32]) -> Result<Session, Rejection> {
+        let script = GameScript::parse(text, name).map_err(|e| Rejection::new("InvalidSetup", format!("{name}: {e}")))?;
+        let cards = cards();
+        let mut decklists = Vec::new();
+        for i in 0..script.decks.len() {
+            let mut shown = Vec::new();
+            for card_name in script.decklist(i) {
+                let id = card(&card_name)
+                    .ok_or_else(|| Rejection::new("InvalidSetup", format!("{name} names {card_name}, which is not a card the engine has")))?;
+                shown.push(printed(cards.get(cards.fronts[id.0 as usize].unwrap_or(id))));
+            }
+            decklists.push(shown);
+        }
+        let seats = decklists.len();
+        let names: Vec<String> = (0..seats).map(|i| names.get(i).cloned().unwrap_or_else(|| format!("Bot{}", i + 1))).collect();
+        let mut scripted = Scripted::deal(script).map_err(|f| Rejection::new("InvalidSetup", f.report))?;
+        let game = scripted.game().clone();
+        let mut session = Session {
+            tracker: Tracker::new(&game),
+            names,
+            decklists,
+            handles: (0..seats).map(|_| HandleSpace::new()).collect(),
+            published: 0,
+            sequence: 0,
+            conceded: vec![false; seats],
+            told: Vec::new(),
+            extra: vec![HashSet::new(); seats],
+            undoable: Undo::default(),
+            scenario: Some(Scenario {
+                scripted,
+                driven: driven.iter().filter_map(|&s| player_at(s)).collect(),
+                expected: None,
+                checks: Vec::new(),
+                verdict: None,
+            }),
+            game,
+        };
+        session.play_scenario();
+        Ok(session)
+    }
+
+    /// Plays the scenario on to the next question to a driven seat, gathering the checks of what clients show on the
+    /// way, or to its end and its verdict.
+    fn play_scenario(&mut self) {
+        let Some(scenario) = self.scenario.as_mut() else { return };
+        scenario.expected = None;
+        std::mem::swap(&mut self.game, scenario.scripted.game());
+        loop {
+            match scenario.scripted.advance(&scenario.driven) {
+                Ok(Advance::Ask(expected)) => {
+                    scenario.expected = Some(expected);
+                    break;
+                }
+                Ok(Advance::Check(check)) => scenario.checks.push(check),
+                Ok(Advance::Done) => {
+                    let verdict = scenario.scripted.verdict().map(|_| scenario.scripted.client_expectations()).map_err(|f| f.report);
+                    scenario.verdict = Some(verdict);
+                    break;
+                }
+                Err(f) => {
+                    scenario.verdict = Some(Err(f.report));
+                    break;
+                }
+            }
+        }
+        std::mem::swap(&mut self.game, scenario.scripted.game());
+        // What the script's own seats answered is not this table's to take back.
+        if let Some(expected) = &scenario.expected
+            && scenario.scripted.undo_offered(expected.request.player).is_none()
+        {
+            self.undoable.clear();
+        }
+    }
+
+    /// The scenario's part of a step: what each driven seat is meant to answer, the checks for the pages, and the verdict.
+    fn scenario_step(&mut self) -> Option<Value> {
+        let scenario = self.scenario.as_mut()?;
+        let expected = scenario.expected.as_ref().map(|e| {
+            let p = e.request.player;
+            let answer = match &e.intent {
+                Intent::Undo => Value::Null,
+                Intent::Answer(a) => {
+                    serde_json::to_value(payload_of(a, &e.request, &mut self.handles[p.index()], &self.game)).expect("an answer serialises")
+                }
+            };
+            json!({ "Seat": seat(p), "RequestId": e.request.id, "Answer": answer, "Undo": matches!(e.intent, Intent::Undo), "Line": e.line })
+        });
+        let checks: Vec<Value> = scenario.checks.drain(..).map(|c| json!({ "Line": c.line, "Key": c.key, "Value": c.value })).collect();
+        let verdict = scenario.verdict.as_ref().map(|v| match v {
+            Ok(client) => json!({
+                "Passed": true,
+                "Client": client.iter().map(|c| json!({ "Line": c.line, "Key": c.key, "Value": c.value })).collect::<Vec<_>>(),
+            }),
+            Err(report) => json!({ "Passed": false, "Report": report }),
+        });
+        Some(json!({ "Expected": expected, "Checks": checks, "Verdict": verdict }))
+    }
+
+    /// A driven seat's answer to a scenario's question: given through the script, which fails the scenario if it is not
+    /// the answer the script means.
+    fn answer_scenario(&mut self, request: &Request, payload: &AnswerPayload) -> Result<Value, Rejection> {
+        let undo = matches!(payload, AnswerPayload::TakeActionAnswer(TakeActionAnswer { kind: ActionKindView::UndoManaAbility, .. }));
+        let intent = if undo {
+            Intent::Undo
+        } else {
+            Intent::Answer(translate(payload, request, &self.handles[request.player.index()], &self.game).map_err(|e| match e {
+                Untranslatable::UnknownHandle(d) => Rejection::new("UnknownHandle", d),
+                Untranslatable::Illegal(d) => Rejection::new("IllegalAnswer", d),
+            })?)
+        };
+        let noted = match &intent {
+            Intent::Answer(a) => Some(Undo::<Told>::before(&self.game, request.player, a)),
+            Intent::Undo => None,
+        };
+        let kept = noted.as_ref().filter(|n| n.is_mana()).map(|_| (self.tracker.clone(), self.handles.clone(), self.published));
+        let scenario = self.scenario.as_mut().expect("a scenario");
+        std::mem::swap(&mut self.game, scenario.scripted.game());
+        let given = scenario.scripted.answered(intent);
+        std::mem::swap(&mut self.game, scenario.scripted.game());
+        if let Err(f) = given {
+            scenario.verdict = Some(Err(f.report));
+            scenario.expected = None;
+            return Ok(self.step());
+        }
+        let mut pushed = false;
+        if undo {
+            // The script's game went back already; the table's handles, tracking and told events follow it.
+            if let Some(told) = self.undoable.take_back(&mut self.game, request.player) {
+                self.tracker = told.tracker;
+                for (space, earlier) in self.handles.iter_mut().zip(told.handles) {
+                    space.restore(earlier);
+                }
+                self.published = told.published;
+                if !told.told.is_empty() {
+                    self.told.push(Proto::Retracted { sequences: told.told.collect() });
+                }
+            }
+        } else if let Some(noted) = noted
+            && self.undoable.may_take_back(&self.game, &noted)
+            && let Some((tracker, handles, published)) = kept
+        {
+            let first = self.sequence + 1 + self.told.len() as u64;
+            self.undoable.push(noted, Told { tracker, handles, published, told: first..first });
+            pushed = true;
+        }
+        self.play_scenario();
+        let step = self.step();
+        if pushed && let Some(told) = self.undoable.last_kept() {
+            told.told.end = self.sequence + 1;
+        }
+        Ok(step)
     }
 
     pub fn decklists(&self) -> HashMap<String, Vec<ObjectView>> {
@@ -237,14 +410,18 @@ impl Session {
             Outcome::Draw => (GameOutcomeView::Draw, 0),
             Outcome::Won(p) => (GameOutcomeView::TeamWon, seat(p)),
         };
-        json!({
+        let mut step = json!({
             "Requests": requests,
             "Views": views,
             "Events": seat_events,
             "Finished": self.game.is_over(),
             "Outcome": outcome,
             "WinningTeam": winning_team,
-        })
+        });
+        if let Some(scenario) = self.scenario_step() {
+            step["Scenario"] = scenario;
+        }
+        step
     }
 
     pub fn answer(&mut self, request_id: u32, seat_number: i32, payload: &AnswerPayload) -> Result<Value, Rejection> {
@@ -256,6 +433,9 @@ impl Session {
         }
         if seat(request.player) != seat_number {
             return Err(Rejection::new("NotYourTurnToAnswer", format!("request {request_id} belongs to seat {}", seat(request.player))));
+        }
+        if self.scenario.is_some() {
+            return self.answer_scenario(&request, payload);
         }
         if let AnswerPayload::TakeActionAnswer(TakeActionAnswer { kind: ActionKindView::UndoManaAbility, .. }) = payload {
             return self.undo(request.player);

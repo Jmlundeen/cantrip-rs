@@ -1,0 +1,51 @@
+# Scenarios at a table and in the browser
+
+A `.cantrip` scenario (`scenarios/README.md`) is played two ways, and means the same thing both ways:
+
+- **Headless**, by the scenario runner alone (`crates/cantrip-script`): `cargo test`, or `corpus` for reports. Every
+  seat is answered by the script.
+- **At a table**, through the native host and the real server, with some seats **driven**: a browser page in the seat,
+  driven by Playwright, clicks its way to each answer. The script answers every other seat.
+
+What a line means - the answer it gives, the default when it does not apply, the `?` checks, the refusals and
+`[Expect]` - is written once, in Rust, in the runner. At a table the runner does not answer a driven seat's question; it
+says what the script means, and the seat's answer must be exactly that, or the scenario fails at the line. So a browser
+run proves every line of the scenario can be reached by clicking, and fails pointing at the step of the UI that cannot.
+
+## The pieces
+
+| Piece | Where | What it does |
+| --- | --- | --- |
+| `Scripted` | `cantrip-script/src/run.rs` | the runner with driven seats: `advance` plays on to a driven seat's question (`Advance::Ask` with the `Intent`), a client check (`Advance::Check`) or the end (`Advance::Done`); `answered` takes the seat's answer and fails at the line if it is not the one meant; `verdict` judges `[Expect]` |
+| `Session::scenario` | `cantrip-host/src/session.rs` | a table playing a scenario: dealt as the runner deals it, the runner's game swapped with the table's for each move; each step carries `Scenario` (below) |
+| `payload_of` | `cantrip-host/src/answer.rs` | the engine's answer as the wire's, in the driven seat's handles: the inverse of `translate` |
+| `NewGame` with `Scenario` | `docs/host-protocol.md` | `{"Name": ..., "Text": ..., "Driven": [1]}` |
+
+`every_scenario_ends_the_same_with_its_seats_driven` (cantrip-script) and
+`every_scenario_passes_at_a_table_with_bot1_driven` (cantrip-host) play the whole corpus both ways and require the same
+result: what the host says to answer is what the script means, over the wire and in the seat's own handles.
+
+## A step's `Scenario`
+
+```
+"Scenario": {
+  "Expected": {"Seat": 1, "RequestId": 7, "Answer": {AnswerPayload}, "Undo": false, "Line": "14: Bot1.Hand.Island.Play"},
+  "Checks": [{"Line": 20, "Key": "Client.Bot1.Stack", "Value": "Black Lotus"}],
+  "Verdict": null
+}
+```
+
+- `Expected` is the driven seat's question now and the answer the script means (`Undo` for `Bot1.Undo`, with no
+  `Answer`); `Line` is null for a default (a pass, no attack) or a payment the line in progress implies.
+- `Checks` are the `? Client....` lines reached since the last step, for the driving pages to judge now.
+- `Verdict` comes once the scenario is over: `{"Passed": true, "Client": [...]}`, the `[Expect]` lines about clients
+  still to be judged by the pages, or `{"Passed": false, "Report": "..."}` with the runner's failure report.
+
+None of this is for the client: the server keeps it to itself and hands it to whatever drives the seats.
+
+## Client expectations
+
+A key starting `Client.` is about what a client shows, not the game's state: what the stack row holds, whether a
+button is offered, that a card in an opponent's hand stays hidden, that a revealed card is shown, that a concession
+ends the game on screen. A headless run has no client and skips them; at a table they go to the driving pages, in
+`? ` checks as they come up and in `[Expect]` at the end.

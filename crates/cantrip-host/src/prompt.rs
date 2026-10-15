@@ -152,7 +152,7 @@ fn target_message(handles: &mut HandleSpace, target: Target) -> Option<TargetMes
     }
 }
 
-fn action_kind_view(kind: ActionKind) -> ActionKindView {
+pub(crate) fn action_kind_view(kind: ActionKind) -> ActionKindView {
     match kind {
         ActionKind::PlayLand => ActionKindView::PlayLand,
         ActionKind::CastSpell => ActionKindView::CastSpell,
