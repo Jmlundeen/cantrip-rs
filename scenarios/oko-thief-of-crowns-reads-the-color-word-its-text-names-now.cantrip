@@ -1,0 +1,42 @@
+# Trait Doctoring replaces the color word green with red in Oko, Thief of Crowns' text until end of turn (CR 612.1): the +1
+# says "becomes a red Elk creature", so Bot1's Mox Jet becomes a red Elk, not a green one. Mana symbols are not words.
+
+[Bot1 Deck]
+Island
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Oko, Thief of Crowns
+Trait Doctoring
+Island x14
+
+[Bot2 Deck]
+Swamp x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Oko, Thief of Crowns.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Trait Doctoring.Cast(Oko, Thief of Crowns)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Replace a color word)
+Bot1.Colors(Green)
+Bot1.Colors(Red)
+Bot1.Battlefield.Oko, Thief of Crowns.Activate(Mox Jet; Ability: Elk)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Mox Jet.Types = Creature
+Bot1.Battlefield.Mox Jet.Subtypes = Elk
+Bot1.Battlefield.Mox Jet.Colors = Red

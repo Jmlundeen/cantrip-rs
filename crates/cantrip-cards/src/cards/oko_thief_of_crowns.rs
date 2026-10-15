@@ -20,10 +20,11 @@ fn artifact_or_creature(q: &dyn Query, _: &Asker, t: Target) -> bool {
 fn elk(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(target) = targets::object(g, item, 0) else { return Ok(()) };
     let source = item.object;
+    let words = g.words(source);
     g.add_effect(source, target, EffectKind::LoseAllAbilities, Duration::Indefinite);
     g.add_effect(source, target, EffectKind::SetTypes(TypeSet::of(&[CardType::Creature])), Duration::Indefinite);
-    g.add_effect(source, target, EffectKind::AddSubtype(Subtype::Elk), Duration::Indefinite);
-    g.add_effect(source, target, EffectKind::SetColors(ColorSet::of(Color::Green)), Duration::Indefinite);
+    g.add_effect(source, target, EffectKind::AddSubtype(words.subtype(Subtype::Elk)), Duration::Indefinite);
+    g.add_effect(source, target, EffectKind::SetColors(words.colors(ColorSet::of(Color::Green))), Duration::Indefinite);
     g.add_effect(source, target, EffectKind::SetPt(3, 3), Duration::Indefinite);
     Ok(())
 }
