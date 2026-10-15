@@ -1,0 +1,46 @@
+# Inevitable Defeat: "Its controller loses 3 life" - the controller, not the owner. Bot1 takes Bot2's Mox Sapphire with a kicked
+# Thieving Skydiver on turn 3 (Black Lotus pays {1}{U} and the kicker), then exiles the Mox it now controls with Defeat: Bot1
+# loses 3 and gains 3 and ends at 20, and Bot2, the owner, is untouched at 20 (in the scenario that exiles it from Bot2, the
+# first scenario has Bot2, its controller, lose the life).
+
+[Bot1 Deck]
+Black Lotus
+Thieving Skydiver
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Emerald
+Inevitable Defeat
+Forest x12
+
+[Bot2 Deck]
+Mox Sapphire
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Thieving Skydiver.Cast(Kicked: 1)
+Bot1.Target(Bot2.Battlefield.Mox Sapphire)
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Mox Sapphire.Tapped = false
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Inevitable Defeat.Cast(Mox Sapphire)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Life = 20
+Bot2.Life = 20
+Exile = Mox Sapphire

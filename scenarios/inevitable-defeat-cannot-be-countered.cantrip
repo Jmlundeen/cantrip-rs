@@ -1,0 +1,47 @@
+# Inevitable Defeat: "This spell can't be countered." Bot2 taps an Island and Mox Sapphire for a Counterspell, which resolves and
+# does nothing; Defeat then resolves and exiles Bot2's Mox Emerald: Bot2 loses 3 (17), Bot1 gains 3 (23).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Emerald
+Inevitable Defeat
+Forest x2
+Forest x10
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Emerald
+Counterspell
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Emerald.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Inevitable Defeat.Cast(Bot2.Battlefield.Mox Emerald)
+? Stack = Inevitable Defeat
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Inevitable Defeat)
+? Stack = Counterspell; Inevitable Defeat
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Life = 23
+Bot2.Life = 17
+Exile = Mox Emerald
+Bot1.Graveyard = Inevitable Defeat
+Bot2.Graveyard = Counterspell
