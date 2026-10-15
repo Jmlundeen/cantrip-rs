@@ -522,7 +522,8 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 .cards
                 .cards
                 .iter()
-                .filter(|c| c.name != "Intrinsic" && !c.name.is_empty() && !(*nonland_only && c.is(CardType::Land)))
+                // A split card has two names and a player names one of them (CR 709.4a): its halves are listed, not the whole.
+                .filter(|c| c.name != "Intrinsic" && !c.name.is_empty() && c.split.is_none() && !(*nonland_only && c.is(CardType::Land)))
                 .map(|c| c.name.to_string())
                 .collect();
             names.sort();

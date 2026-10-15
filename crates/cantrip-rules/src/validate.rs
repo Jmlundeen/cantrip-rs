@@ -271,6 +271,8 @@ pub fn check(game: &Game, request: &Request, answer: &Answer) -> Result<(), Reje
         }
         (RequestKind::ChooseName { nonland_only, .. }, Answer::Name(name)) => match name {
             Some(card) if *nonland_only && game.cards.get(*card).is(CardType::Land) => no("a land is not a nonland card name"),
+            // CR 709.4a: a player naming a split card names one of its two names, not both.
+            Some(card) if game.cards.get(*card).split.is_some() => no("name one of a split card's names, not both"),
             _ => Ok(()),
         },
         (RequestKind::ChooseSubtype { choices, .. }, Answer::Subtype(s)) => {
