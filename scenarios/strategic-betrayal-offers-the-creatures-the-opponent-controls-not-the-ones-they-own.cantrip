@@ -1,0 +1,62 @@
+# Strategic Betrayal says "a creature they control": control, not ownership. Each player's Thieving Skydiver (kicked, X = 1)
+# has taken the other's artifact creature, so Bot2 controls Skydiver and Bot1's Ornithopter while Bot1 controls Bot2's
+# Haywire Mite. Bot2 may not choose Haywire Mite (it owns it, Bot1 controls it) and chooses Ornithopter, which is exiled
+# (to its owner's exile; the whole zone is shared in the dump) while Bot1's controlled Mite stays.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Ornithopter
+Thieving Skydiver
+Strategic Betrayal
+Swamp
+Swamp
+Swamp
+Swamp x12
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Haywire Mite
+Thieving Skydiver
+Island
+Island
+Island x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Haywire Mite.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Thieving Skydiver.Cast(Kicked: 1)
+Bot1.Target(Haywire Mite)
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Island#2.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Thieving Skydiver.Cast(Kicked: 1)
+Bot2.Target(Ornithopter)
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Strategic Betrayal.Cast(Bot2)
+! Bot2.Choose(Haywire Mite)
+Bot2.Choose(Ornithopter)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Island; Mox Sapphire; Swamp; Swamp; Thieving Skydiver; Haywire Mite
+Bot2.Battlefield = Island; Island; Mox Sapphire; Thieving Skydiver
+Exile = Ornithopter
+Stack.Count = 0

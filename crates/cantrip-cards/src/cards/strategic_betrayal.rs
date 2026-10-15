@@ -4,7 +4,7 @@ use cantrip_oracle as oracle;
 
 /// "Target opponent exiles a creature they control and their graveyard." The opponent chooses the creature (asked even
 /// when there is only one, none when there is none); the creature and every card in their graveyard are exiled together
-/// (CR 701.13, 101.4).
+/// (CR 701.13). The choice is made as the spell resolves (CR 608.2d), among the creatures they control then.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(victim) = item.targets[0].player() else { return Ok(()) };
     let creatures: Vec<ObjectId> = g.permanents_of(victim).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
