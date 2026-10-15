@@ -319,9 +319,10 @@ pub fn choose_color(g: &mut dyn Game, player: PlayerId, source: ObjectId) -> Res
     })
 }
 
-/// `searcher` searches the library of `owner` (CR 701.23, 701.23f; the two are the same player for "search your library") for up to `count` cards (exactly as many as can be found, when not
-/// `optional`) that pass `eligible`. Asked only when the library has cards; the search is recorded either way. The
-/// library is listed bottom first, as the C# engine lists it.
+/// `searcher` searches the library of `owner` (CR 701.23, 701.23f; the two are the same player for "search your
+/// library") for up to `count` cards (exactly as many as can be found, when not `optional`) that pass `eligible`.
+/// Asked only when the library has cards; the search is recorded either way. The library is listed bottom first, as
+/// the C# engine lists it.
 pub fn search_library(
     g: &mut dyn Game,
     searcher: PlayerId,
