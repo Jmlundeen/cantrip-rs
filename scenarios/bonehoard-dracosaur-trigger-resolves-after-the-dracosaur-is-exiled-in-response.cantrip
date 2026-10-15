@@ -1,6 +1,6 @@
 # The upkeep trigger is on the stack independent of its source (CR 113.7a): Bot2 exiles the Dracosaur with Swords to
 # Plowshares in response, and the trigger still resolves. It exiles Mountain and Lightning Bolt, grants the play of
-# both, and makes the Dinosaur and the Treasure. Bot1 then plays the Mountain from exile.
+# both, and makes the Dinosaur and the Treasure. Bot1 then plays the Mountain from exile and casts the Bolt from exile at Bot2: a grant lost with the source would fail here.
 
 [Bot1 Deck]
 Mox Ruby
@@ -39,9 +39,14 @@ Bot2.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Bonehoard Dracosaur)
 Bot1.Exile.Mountain.Play
 ? Bot1.Battlefield.Dinosaur.Power = 3
 ? Bot1.Battlefield.Treasure Token.Tapped = false
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
 
 [Expect]
 Turn = 3
 Bot1.Life = 25
+Bot2.Life = 17
+Exile.Count = 1
 Bot1.Battlefield.Mountain.Tapped = false
 Bot1.Battlefield.Bonehoard Dracosaur = (absent)

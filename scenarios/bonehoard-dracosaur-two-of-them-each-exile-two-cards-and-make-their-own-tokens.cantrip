@@ -1,0 +1,62 @@
+# Two Bonehoard Dracosaurs: at Bot1's upkeep on turn 5 both trigger and resolve one after the other, each exiling the
+# next two cards of the library and judging only its own two. One pair is two Islands (a Dinosaur, no Treasure), the
+# other Lightning Bolt and Sol Ring (a Treasure, no Dinosaur), so whichever resolves first, the board gets exactly one
+# more Dinosaur and one Treasure, and all four cards are exiled. On turn 3 only the first Dracosaur was there (two
+# Islands: its Dinosaur); the second is cast that turn with Mox Sapphire drawn for it.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Black Lotus
+Bonehoard Dracosaur
+Bonehoard Dracosaur
+Mountain
+Island
+Island
+Mox Sapphire
+Island
+Island
+Lightning Bolt
+Sol Ring
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Bonehoard Dracosaur.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Count = 6
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Bonehoard Dracosaur.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Count = 10
+? Exile.Count = 6
+? Bot1.Library.Count = 9
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Dinosaur#1.Power = 3
+Bot1.Battlefield.Dinosaur#2.Power = 3
+Bot1.Battlefield.Treasure Token.Tapped = false

@@ -1,0 +1,35 @@
+# Bonehoard Dracosaur at an upkeep with an empty library: nothing is exiled, so neither "exiled a land card" nor "exiled a
+# nonland card" holds and no token is made. Bot1's whole deck is the opening hand. The script stops in the upkeep, before
+# the draw that would lose the game. The control is the scenarios where the same trigger makes tokens.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Black Lotus
+Bonehoard Dracosaur
+Island x3
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Bonehoard Dracosaur.Cast
+Bot1.Pass
+[T3 Bot1.Upkeep]
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Exile.Count = 0
+Bot1.Battlefield.Count = 3
+Bot1.Battlefield.Dinosaur = (absent)
+Bot1.Battlefield.Treasure Token = (absent)
