@@ -1,3 +1,4 @@
+# Browser
 # Taking back a Treasure's mana (cantrip_engine::undo): Generous Plunderer makes Bot1 a Treasure in its upkeep (and
 # Bot2 a tapped one). Bot1 sacrifices its Treasure for green, then takes it back: the token is on the battlefield again
 # - it had ceased to exist in the graveyard (CR 111.8) - and the pool is empty.

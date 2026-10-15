@@ -448,6 +448,10 @@ public sealed class PlayerRail : Border
     /// The mana pool as chips, the ones already shown kept where only their count has changed: tapping a land for mana
     /// changes one number, not the row.
     /// </summary>
+    /// <summary>The mana chips shown, each with the element a click lands on, for a page driven by a test (MainPage.Test.cs).</summary>
+    public IEnumerable<(ManaChipSpec Spec, FrameworkElement Chip)> Chips() =>
+        _chips.Select((chip, i) => (chip.Spec, (FrameworkElement)_manaRow.Children[i]));
+
     private void ShowMana(IReadOnlyList<ManaChipSpec> mana)
     {
         _mana = mana;

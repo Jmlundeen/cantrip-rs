@@ -1,3 +1,4 @@
+# Browser
 # Taking back mana while paying for a spell (cantrip_engine::undo): Pentad Prism costs {2}. Bot1 casts it and taps a
 # Forest towards the cost, then takes the Forest back: it is untapped and the spell is still waiting on its whole {2}.
 # Both Forests then pay for it, and the Prism is cast - which is not taken back (a cast spell never is), so nothing is

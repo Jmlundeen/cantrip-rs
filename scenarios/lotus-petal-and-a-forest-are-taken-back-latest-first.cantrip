@@ -1,3 +1,4 @@
+# Browser
 # Taking back mana abilities latest first (cantrip_engine::undo): with priority, Bot1 taps the Forest, then sacrifices
 # the Lotus Petal, for green. The first Undo brings the Petal back and leaves the Forest's {G}; the second untaps the
 # Forest and empties the pool, and nothing more is offered to take back.

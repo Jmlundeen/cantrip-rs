@@ -120,6 +120,8 @@ public sealed partial class MainPage
             json.WriteBoolean("over", client?.IsOver ?? false);
             json.WriteString("phase", client?.Released is not null ? "Released" : client?.Table is { Forming: true } ? "Forming" : client?.Table?.Phase.ToString() ?? string.Empty);
             json.WriteString("prompt", client?.Prompt?.Prompt?.GetType().Name ?? string.Empty);
+            json.WriteNumber("requestId", client?.Prompt?.RequestId ?? 0);
+            json.WriteNumber("seat", client?.Seat ?? 0);
             json.WriteString("fixture", _fixture ? _fixtureName : string.Empty);
             json.WriteString("answered", _fixture ? Answered(_fixtureTransport) : string.Empty);
             json.WriteString("art", ClientConfig.ArtTemplate);
@@ -184,12 +186,24 @@ public sealed partial class MainPage
                     GeneralTransform toPage = board.TransformToVisual(Root);
                     // An event's rows by name: a booster pack's cards are told from the pool's by it, not by where they are.
                     string row = board == _pileBoard ? "pack" : board == _gridBoard ? "grid" : board == _mainBoard ? "pool" : board == _sideBoard ? "sideboard" : string.Empty;
+                    // The table's rows by name, as a scenario's client checks read them (docs/scenarios-in-the-browser.md).
+                    string place = board == _stackBoard ? "stack"
+                        : board == _handBoard ? "hand"
+                        : board == _myHalf.Board ? "battlefield"
+                        : board == _opponentHalf.Board ? "opponent-battlefield"
+                        : board == _myHalf.Graveyard.Board ? "graveyard"
+                        : board == _opponentHalf.Graveyard.Board ? "opponent-graveyard"
+                        : board == _choiceBoard ? "choice"
+                        : string.Empty;
                     foreach ((ObjectView card, Rect box, bool visible, Point? lower, Point? raise) in board.Targets())
                     {
                         json.WriteStartObject();
                         json.WriteString("name", card.Known || card.FaceDown ? card.Name : string.Empty);
                         json.WriteBoolean("visible", visible);
                         json.WriteString("row", row);
+                        json.WriteString("place", place);
+                        json.WriteNumber("handle", card.Handle.Value);
+                        json.WriteBoolean("tapped", card.Tapped);
                         WriteBox(json, toPage.TransformBounds(box));
                         if (lower is { } down && raise is { } up)
                         {
@@ -218,6 +232,43 @@ public sealed partial class MainPage
                         WriteBox(json, toPage.TransformBounds(box));
                         json.WriteEndObject();
                     }
+                }
+            }
+
+            json.WriteEndArray();
+
+            // Each player's box, which a click on targets them, and the mana in their pool, which a click spends.
+            json.WriteStartArray("players");
+            if (ready)
+            {
+                foreach (PlayerRail rail in (PlayerRail[])[_myHalf.Rail, _opponentHalf.Rail])
+                {
+                    if (rail.XamlRoot is null || rail.Seat == 0 || rail.Avatar.ActualWidth <= 0)
+                    {
+                        continue;
+                    }
+
+                    json.WriteStartObject();
+                    json.WriteNumber("seat", rail.Seat);
+                    WriteBox(json, rail.Avatar.TransformToVisual(Root).TransformBounds(new Rect(0, 0, rail.Avatar.ActualWidth, rail.Avatar.ActualHeight)));
+                    json.WriteStartArray("mana");
+                    foreach ((PlayerRail.ManaChipSpec spec, FrameworkElement chip) in rail.Chips())
+                    {
+                        if (chip.ActualWidth <= 0)
+                        {
+                            continue;
+                        }
+
+                        json.WriteStartObject();
+                        json.WriteString("type", spec.Type.ToString());
+                        json.WriteNumber("count", spec.Count);
+                        json.WriteBoolean("clickable", spec.Click is not null);
+                        WriteBox(json, chip.TransformToVisual(Root).TransformBounds(new Rect(0, 0, chip.ActualWidth, chip.ActualHeight)));
+                        json.WriteEndObject();
+                    }
+
+                    json.WriteEndArray();
+                    json.WriteEndObject();
                 }
             }
 

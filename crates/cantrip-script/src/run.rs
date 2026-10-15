@@ -1,4 +1,4 @@
-﻿//! Plays a `GameScript` against the native engine with the C# runner's semantics
+//! Plays a `GameScript` against the native engine with the C# runner's semantics
 //! (`src/Cantrip.Scripting/ScriptRunner.cs`): one cursor over the whole list, each line tried against whatever the
 //! engine asks, the simplest answer given whenever the line under the cursor does not apply.
 
@@ -671,7 +671,7 @@ impl<'s> Run<'s> {
         let Some((request, decision)) = self.asked.take() else {
             return fail("an answer came with nothing asked");
         };
-        if given != decision.intent {
+        if !self.same_but_for_interchangeable(&given, &decision.intent) {
             let what = match decision.line {
                 Some(step) => format!("line {}: {}", step.line, step.text),
                 None => "the default".to_string(),
@@ -679,6 +679,57 @@ impl<'s> Run<'s> {
             return fail(format!("{} answered {given:?} to {}, but {what} means {:?}", bot(request.player), kind_name(&request.kind), decision.intent));
         }
         self.carry_out(&request, decision)
+    }
+
+    /// Whether two answers are the same once objects nobody could tell apart are taken for one another: two untapped
+    /// Forests of one player, two Islands in a hand (scenarios/README.md: same-named cards in one place are
+    /// interchangeable). A page clicking the top of a pile of Forests answers what the script means by "a Forest".
+    fn same_but_for_interchangeable(&self, given: &Intent, meant: &Intent) -> bool {
+        match (given, meant) {
+            (Intent::Undo, Intent::Undo) => true,
+            (Intent::Answer(a), Intent::Answer(b)) => a == b || self.canonical(a) == self.canonical(b),
+            _ => false,
+        }
+    }
+
+    /// The answer with each object it names replaced by the first object it is indistinguishable from.
+    fn canonical(&self, answer: &Answer) -> Answer {
+        let s = &self.game.state;
+        let signature = |id: ObjectId| {
+            let o = s.obj(id);
+            // Summoning sickness tells creatures apart (CR 302.6), and nothing else.
+            let sick = o.controlled_since == s.turn.number && self.game.chars(id).is(CardType::Creature);
+            (self.game.name(id), o.owner, o.controller, o.zone, o.token, o.tapped, o.damage, o.counters, sick)
+        };
+        let one = |id: ObjectId| -> ObjectId {
+            if id.index() >= s.objects.len() {
+                return id;
+            }
+            let wanted = signature(id);
+            (0..s.objects.len() as u32).map(ObjectId).find(|&other| live(s, other) && signature(other) == wanted).unwrap_or(id)
+        };
+        let target = |t: Target| match t {
+            Target::Object(id) => Target::Object(one(id)),
+            other => other,
+        };
+        match answer {
+            Answer::Act(a) => {
+                let mut a = a.clone();
+                a.source = a.source.map(one);
+                a.targets = a.targets.iter().map(|&t| target(t)).collect();
+                Answer::Act(a)
+            }
+            Answer::Cards(ids) => Answer::Cards(ids.iter().map(|&id| one(id)).collect()),
+            Answer::Targets(ts) => Answer::Targets(ts.iter().map(|&t| target(t)).collect()),
+            Answer::Attack(v) => Answer::Attack(v.iter().map(|&(a, t)| (one(a), target(t))).collect()),
+            Answer::Block(v) => Answer::Block(v.iter().map(|&(b, a)| (one(b), one(a))).collect()),
+            Answer::Shares(v) => Answer::Shares(v.iter().map(|&(a, c, n)| (one(a), c.map(one), n)).collect()),
+            Answer::Placements { placements, shuffle } => {
+                Answer::Placements { placements: placements.iter().map(|p| p.iter().map(|&id| one(id)).collect()).collect(), shuffle: *shuffle }
+            }
+            Answer::Divided(v) => Answer::Divided(v.iter().map(|&(t, n)| (target(t), n)).collect()),
+            other => other.clone(),
+        }
     }
 
     fn decide(&mut self, request: &Request) -> R<()> {

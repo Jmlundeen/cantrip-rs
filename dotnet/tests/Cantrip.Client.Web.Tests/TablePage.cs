@@ -39,9 +39,15 @@ public sealed class TablePage : IAsyncDisposable
     /// Opens the client with these query parameters and <c>test</c>, for a test that pictures what it does under
     /// <paramref name="pictures"/> (<see cref="WebClient.Pictures"/>). <paramref name="settings"/> are the player's
     /// settings as the page keeps them in localStorage, by name without the page's prefix ("auto-scale", "scale"), there
-    /// before the page reads them.
+    /// before the page reads them; <paramref name="storage"/> is anything else in localStorage, by its full key
+    /// ("cantrip-stops-mine").
     /// </summary>
-    public static async Task<TablePage> OpenAsync(WebClient web, string query, string pictures, IReadOnlyDictionary<string, string>? settings = null)
+    public static async Task<TablePage> OpenAsync(
+        WebClient web,
+        string query,
+        string pictures,
+        IReadOnlyDictionary<string, string>? settings = null,
+        IReadOnlyDictionary<string, string>? storage = null)
     {
         IBrowserContext context = await web.Browser.NewContextAsync(new BrowserNewContextOptions
         {
@@ -51,6 +57,11 @@ public sealed class TablePage : IAsyncDisposable
         foreach ((string name, string value) in settings ?? new Dictionary<string, string>())
         {
             await context.AddInitScriptAsync($"localStorage.setItem({JsonSerializer.Serialize("cantrip-setting-" + name)}, {JsonSerializer.Serialize(value)});");
+        }
+
+        foreach ((string key, string value) in storage ?? new Dictionary<string, string>())
+        {
+            await context.AddInitScriptAsync($"localStorage.setItem({JsonSerializer.Serialize(key)}, {JsonSerializer.Serialize(value)});");
         }
 
         IPage page = await context.NewPageAsync();
@@ -220,7 +231,7 @@ public sealed class TablePage : IAsyncDisposable
 
     private static string Describe(TableState? state) => state is null
         ? "nothing published (the client never started)"
-        : $"ready {state.Ready}, busy {state.Busy} ({state.Doing}), over {state.Over}, prompt '{state.Prompt}', {state.Cards.Count} cards";
+        : $"ready {state.Ready}, busy {state.Busy} ({state.Doing}), over {state.Over}, prompt '{state.Prompt}' (request {state.RequestId}), {state.Cards.Count} cards";
 
     public async ValueTask DisposeAsync() => await _context.DisposeAsync();
 }
@@ -250,7 +261,22 @@ public sealed record TableState(
     IReadOnlyList<MentionState>? Mentions = null,
     string Art = "",
     string Answered = "",
-    int Selected = 0);
+    int Selected = 0,
+    int RequestId = 0,
+    int Seat = 0,
+    IReadOnlyList<PlayerState>? Players = null,
+    IReadOnlyList<EffectState>? Effects = null);
+
+/// <summary>A player's box on the page, which a click on targets them, and the mana in their pool.</summary>
+public sealed record PlayerState(int Seat, float X, float Y, float W, float H, IReadOnlyList<ManaChipState> Mana);
+
+/// <summary>A kind of mana in a pool, how much, whether a click spends one, and where it is.</summary>
+public sealed record ManaChipState(string Type, int Count, bool Clickable, float X, float Y, float W, float H);
+
+/// <summary>An ability shown resolving: the way it cut, and each arrow's target and way.</summary>
+public sealed record EffectState(string Feeling, bool Lit, IReadOnlyList<ArrowState> Arrows);
+
+public sealed record ArrowState(string To, string Feeling);
 
 /// <summary>An event's pairings as the page shows them: the round, whether final, how long before it begins, each match in words.</summary>
 public sealed record PairingsState(int Round, bool Final, int StartsIn, IReadOnlyList<string> Matches);
@@ -262,7 +288,20 @@ public sealed record LogState(int Lines, int Shown);
 /// A card on the page: its name (empty when this seat may not see it), the middle and size of its box, and which of an
 /// event's rows it is in - <c>pack</c>, <c>pool</c> or <c>sideboard</c> - if any.
 /// </summary>
-public sealed record CardState(string Name, bool Visible, float X, float Y, float W, float H, Spot? Lower, Spot? Raise, string Row = "", Spot? FlewFrom = null);
+public sealed record CardState(
+    string Name,
+    bool Visible,
+    float X,
+    float Y,
+    float W,
+    float H,
+    Spot? Lower,
+    Spot? Raise,
+    string Row = "",
+    Spot? FlewFrom = null,
+    string Place = "",
+    int Handle = 0,
+    bool Tapped = false);
 
 /// <summary>A card named in a line of text - the game log, a draft's picks - where its name is, and whether it is in view.</summary>
 public sealed record MentionState(string Name, bool Visible, float X, float Y, float W, float H);

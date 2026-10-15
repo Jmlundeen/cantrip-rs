@@ -1,3 +1,4 @@
+# Browser
 # Taking back a mana ability whose cost removes a counter (cantrip_engine::undo): Pentad Prism, cast with two Forests,
 # has one charge counter (sunburst, green). Bot1 removes it for blue and takes that back: the counter is on the Prism
 # again and the pool is empty.
