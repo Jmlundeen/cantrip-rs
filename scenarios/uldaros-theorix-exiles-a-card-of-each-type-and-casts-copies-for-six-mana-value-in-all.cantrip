@@ -1,0 +1,70 @@
+# Uldaros Theorix: "When Uldaros Theorix enters, if you cast him, exile up to one target nonland card of each card type from
+# your graveyard. Copy those cards. You may cast any number of spells with total mana value 6 or less from among the copies
+# without paying their mana costs." Bot1 fills its graveyard on turn 1 (Dark Ritual makes the mana for three Entombs, which
+# take Ornithopter, Ponder and The Theorist, Jace Beleren; an Entomb shuffles, so what is left in the library is Swamps
+# and the draws do not depend on the shuffle) and casts Uldaros on turn 5 with Black Lotus (blue), which is sacrificed for the
+# mana and so is in the graveyard too. Its trigger takes an artifact (the Lotus), a creature (the Ornithopter), an
+# instant (Dark Ritual), a planeswalker (Jace) and a sorcery (Ponder), all exiled. Bot1 then casts Jace (4), Ponder (1)
+# and Dark Ritual (1): exactly 6, as many as are allowed - and the two cards of mana value 0, the Ornithopter and the Lotus,
+# cost nothing more. A permanent spell cast this way becomes a token (CR 707.10f): the Jace, Ornithopter and Lotus
+# on the battlefield are tokens, and the exiled cards they copy stay in exile. The Entombs are not chosen (one instant only
+# is taken) and stay in the graveyard.
+
+[Bot1 Deck]
+Swamp
+Dark Ritual
+Entomb
+Entomb
+Entomb
+Black Lotus
+Uldaros Theorix
+Ornithopter
+Ponder
+The Theorist, Jace Beleren
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Ornithopter)
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Ponder)
+Bot1.Hand.Entomb.Cast
+Bot1.Search(The Theorist, Jace Beleren)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Uldaros Theorix.Cast
+Bot1.Target(Black Lotus)
+Bot1.Target(Ornithopter)
+Bot1.Target(Dark Ritual)
+Bot1.Target(The Theorist, Jace Beleren)
+Bot1.Target(Ponder)
+Bot1.Choose(The Theorist, Jace Beleren)
+Bot1.Choose(Ponder)
+Bot1.Choose(Dark Ritual)
+Bot1.Choose(Ornithopter)
+Bot1.Choose(Black Lotus)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Black Lotus; Ornithopter; Swamp; Swamp; Swamp; The Theorist, Jace Beleren; Uldaros Theorix
+Bot1.Battlefield.Black Lotus.Token = true
+Bot1.Battlefield.Ornithopter.Token = true
+Bot1.Battlefield.The Theorist, Jace Beleren.Token = true
+Bot1.Battlefield.Uldaros Theorix.Token = (absent)
+Bot1.Battlefield.The Theorist, Jace Beleren.Counters.Loyalty = 3
+Exile = Black Lotus; Dark Ritual; Ornithopter; Ponder; The Theorist, Jace Beleren
+Bot1.Graveyard = Entomb; Entomb; Entomb
+Stack.Count = 0

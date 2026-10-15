@@ -1,0 +1,56 @@
+# Known bug: a token copy of an Aura spell is attached only to a target on the battlefield (ops::attach), so the token Animate Dead
+# a copy resolves into is not attached to the creature card in the graveyard it targeted (CR 707.10f, 303.4f) and is put away at once.
+# Uldaros Theorix exiles Animate Dead and Black Lotus from Bot1's graveyard; an Ornithopter (a creature card) is also in the
+# graveyard, left alone: the Animate Dead copy has a legal target, is offered, and is cast, choosing the Ornithopter card as
+# its target (CR 303.4). The Aura spell copy resolves into a token Animate Dead (CR 707.10f) and the Ornithopter comes
+# back under Bot1's control, enchanted by it - the positive control of the neighbouring scenario, where no creature card gave the
+# copy a target and it was not offered. It costs 2 of the six, and the Lotus 0.
+
+[Bot1 Deck]
+Swamp
+Dark Ritual
+Entomb
+Entomb
+Black Lotus
+Uldaros Theorix
+Swamp
+Animate Dead
+Ornithopter
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Animate Dead)
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Ornithopter)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Uldaros Theorix.Cast
+Bot1.Target(Black Lotus)
+Bot1.Target(Animate Dead)
+Bot1.Choose(Animate Dead)
+Bot1.Target(Bot1.Graveyard.Ornithopter)
+Bot1.Choose(Black Lotus)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Animate Dead; Black Lotus; Ornithopter; Swamp; Swamp; Swamp; Uldaros Theorix
+Bot1.Battlefield.Animate Dead.Token = true
+Bot1.Battlefield.Animate Dead.AttachedTo = Ornithopter
+Bot1.Battlefield.Ornithopter.Power = -1
+Bot1.Battlefield.Black Lotus.Token = true
+Exile = Animate Dead; Black Lotus
+Stack.Count = 0

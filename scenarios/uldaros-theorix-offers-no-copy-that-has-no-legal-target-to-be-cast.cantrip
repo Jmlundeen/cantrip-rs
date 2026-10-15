@@ -1,0 +1,46 @@
+# Uldaros Theorix: a copy can only be cast if it can be cast (CR 601.2c), and an Aura spell needs something to enchant. Bot1
+# exiles Animate Dead (an Aura: "enchant creature card in a graveyard") and the Black Lotus, but no graveyard holds a
+# creature card, so the Animate Dead copy has no target and is not offered: only the Lotus is, and after it no question is
+# asked (the refusal). The neighbouring scenario, with a creature card in the graveyard, is the positive control.
+
+[Bot1 Deck]
+Swamp
+Dark Ritual
+Entomb
+Black Lotus
+Uldaros Theorix
+Swamp
+Swamp
+Animate Dead
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Animate Dead)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Uldaros Theorix.Cast
+Bot1.Target(Black Lotus)
+Bot1.Target(Animate Dead)
+Bot1.Choose(Black Lotus)
+! Bot1.Choose
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Black Lotus; Swamp; Swamp; Swamp; Uldaros Theorix
+Bot1.Battlefield.Black Lotus.Token = true
+Exile = Animate Dead; Black Lotus
+Stack.Count = 0

@@ -1,0 +1,66 @@
+# Uldaros Theorix: "cast any number of spells with total mana value 6 or less". Bot1 (graveyard filled as in the neighbouring
+# scenario: three Entombs take Tarfire, Mind Twist and The Theorist, Jace Beleren; Dark Ritual and the sacrificed Black Lotus
+# are there too) exiles Lotus, Tarfire, Dark Ritual, Jace and Mind Twist. It casts Tarfire (1, a Kindred Instant - it
+# is the kindred of the set, Dark Ritual the instant: a card is a target for one type, so Tarfire being both is no
+# problem), Jace (4) and Mind Twist (1): 6 in all, the mana value of a copy cast for X of 0 being its printed one without
+# the X. Mind Twist is cast for X = 0, so it discards nothing from Bot2's hand. Dark Ritual (1) is now over the six and
+# is not offered; the Black Lotus (0) still is, and is cast. After that nothing is castable and no question is asked
+# (the refusal) - the first question, with Dark Ritual in it, is the positive control.
+
+[Bot1 Deck]
+Swamp
+Dark Ritual
+Entomb
+Entomb
+Entomb
+Black Lotus
+Uldaros Theorix
+Tarfire
+Mind Twist
+The Theorist, Jace Beleren
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Tarfire)
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Mind Twist)
+Bot1.Hand.Entomb.Cast
+Bot1.Search(The Theorist, Jace Beleren)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Uldaros Theorix.Cast
+Bot1.Target(Black Lotus)
+Bot1.Target(Tarfire)
+Bot1.Target(Dark Ritual)
+Bot1.Target(The Theorist, Jace Beleren)
+Bot1.Target(Mind Twist)
+Bot1.Choose(Tarfire)
+Bot1.Target(Bot2)
+Bot1.Choose(The Theorist, Jace Beleren)
+Bot1.Choose(Mind Twist)
+Bot1.Choose(Black Lotus)
+! Bot1.Choose
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Black Lotus; Swamp; Swamp; Swamp; The Theorist, Jace Beleren; Uldaros Theorix
+Bot1.Battlefield.Black Lotus.Token = true
+Bot1.Battlefield.The Theorist, Jace Beleren.Token = true
+Exile = Black Lotus; Dark Ritual; Mind Twist; Tarfire; The Theorist, Jace Beleren
+Bot2.Life = 18
+Bot2.Hand.Count = 7
+Stack.Count = 0

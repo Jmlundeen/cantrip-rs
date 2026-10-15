@@ -1,0 +1,67 @@
+# Uldaros Theorix: "up to one target nonland card of each card type". Bot1's graveyard holds Ornithopter (artifact creature),
+# Urza's Saga (an Enchantment Land), Tarfire (a Kindred Instant), Dark Ritual and three Entombs (instants), and the Black
+# Lotus sacrificed to cast him (artifact). The first target question refuses Urza's Saga, which is a land card whatever else
+# it is; the Ornithopter - the positive control, offered in the same question - is chosen. It is one target, so the next question does not offer it
+# again for its other type (CR 115.3). Tarfire is chosen (it can stand for the kindred), and then Dark Ritual for the
+# instant: a Kindred Instant card and an Instant card can both be chosen, since each is a different type. With
+# the instant taken, the Entombs, instants too, are no longer offered, and the Lotus still is. Four cards are exiled and cast, all of
+# mana value 1 or less; Urza's Saga and the three Entombs stay in the graveyard.
+
+[Bot1 Deck]
+Swamp
+Dark Ritual
+Entomb
+Entomb
+Entomb
+Black Lotus
+Uldaros Theorix
+Ornithopter
+Urza's Saga
+Tarfire
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Ornithopter)
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Urza's Saga)
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Tarfire)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Uldaros Theorix.Cast
+! Bot1.Target(Urza's Saga)
+Bot1.Target(Ornithopter)
+! Bot1.Target(Ornithopter)
+Bot1.Target(Tarfire)
+Bot1.Target(Dark Ritual)
+! Bot1.Target(Entomb)
+Bot1.Target(Black Lotus)
+Bot1.Choose(Ornithopter)
+Bot1.Choose(Black Lotus)
+Bot1.Choose(Dark Ritual)
+Bot1.Choose(Tarfire)
+Bot1.Target(Bot2)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Black Lotus; Ornithopter; Swamp; Swamp; Swamp; Uldaros Theorix
+Bot1.Battlefield.Black Lotus.Token = true
+Bot1.Battlefield.Ornithopter.Token = true
+Exile = Black Lotus; Dark Ritual; Ornithopter; Tarfire
+Bot1.Graveyard = Entomb; Entomb; Urza's Saga; Entomb
+Bot2.Life = 18
+Stack.Count = 0

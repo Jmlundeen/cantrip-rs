@@ -1,0 +1,33 @@
+# Uldaros Theorix: "When Uldaros Theorix enters, if you cast him" - he was not cast. Bot1 Entombs Uldaros on turn 1 (Dark Ritual
+# for the mana) and Reanimates him (losing 6 life, his mana value): he enters, but the ability does not trigger - no target is
+# asked for (the refusal) and the Dark Ritual and Entomb in Bot1's graveyard are not exiled. The positive control is the
+# neighbouring scenarios, where he is cast and the same graveyard cards are chosen.
+
+[Bot1 Deck]
+Swamp
+Dark Ritual
+Entomb
+Reanimate
+Swamp x3
+Uldaros Theorix
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Uldaros Theorix)
+Bot1.Hand.Reanimate.Cast(Bot1.Graveyard.Uldaros Theorix)
+! Bot1.Target
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Swamp; Uldaros Theorix
+Bot1.Graveyard = Reanimate; Entomb; Dark Ritual
+Bot1.Life = 14
+Exile.Count = 0
+Stack.Count = 0

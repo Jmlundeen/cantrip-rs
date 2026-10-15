@@ -1,0 +1,57 @@
+# Uldaros Theorix targets the Ornithopter (a creature) and the Black Lotus (an artifact) in Bot1's graveyard. In response Bot2's
+# Deathrite Shaman exiles the Ornithopter ({G}, {T}: exile target creature card from a graveyard). That target is now illegal
+# (CR 608.2b, 400.7): the ability does the rest - the Lotus is exiled, copied and cast (as a token), while the Ornithopter
+# is neither exiled by it nor copied or cast: it is the Shaman's exile that put it there, and it stays a card in exile
+# with no token of it on the battlefield.
+
+[Bot1 Deck]
+Swamp
+Entomb
+Swamp
+Swamp
+Black Lotus
+Uldaros Theorix
+Swamp x3
+Ornithopter
+Swamp x12
+
+[Bot2 Deck]
+Swamp
+Deathrite Shaman
+Forest
+Island x4
+Island x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Ornithopter)
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Deathrite Shaman.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Uldaros Theorix.Cast
+Bot1.Target(Ornithopter)
+Bot1.Target(Black Lotus)
+Bot2.Battlefield.Deathrite Shaman.Activate(Ability: {G}; Bot1.Graveyard.Ornithopter)
+Bot2.Battlefield.Forest.Activate
+Bot1.Choose(Black Lotus)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Black Lotus; Swamp; Swamp; Swamp; Uldaros Theorix
+Bot1.Battlefield.Black Lotus.Token = true
+Exile = Black Lotus; Ornithopter
+Bot2.Life = 22
+Stack.Count = 0

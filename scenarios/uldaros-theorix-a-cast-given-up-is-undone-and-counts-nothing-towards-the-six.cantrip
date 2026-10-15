@@ -1,0 +1,62 @@
+# Uldaros Theorix: a player may give up a cast (CR 733.1) and it is undone as if never begun. Bot1 exiles Black Lotus, Tarfire,
+# Dark Ritual, Jace and Mind Twist (as in the neighbouring scenario), starts casting the Tarfire copy and cancels at its
+# target. Nothing was cast, so nothing counts towards the six: Jace (4), Mind Twist (1) and Dark Ritual (1) are cast for 6
+# in all, and the Lotus (0). The Tarfire (1) is then over the six and is not offered again. Bot2 is not hit by it.
+
+[Bot1 Deck]
+Swamp
+Dark Ritual
+Entomb
+Entomb
+Entomb
+Black Lotus
+Uldaros Theorix
+Tarfire
+Mind Twist
+The Theorist, Jace Beleren
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Tarfire)
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Mind Twist)
+Bot1.Hand.Entomb.Cast
+Bot1.Search(The Theorist, Jace Beleren)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Uldaros Theorix.Cast
+Bot1.Target(Black Lotus)
+Bot1.Target(Tarfire)
+Bot1.Target(Dark Ritual)
+Bot1.Target(The Theorist, Jace Beleren)
+Bot1.Target(Mind Twist)
+Bot1.Choose(Tarfire)
+Bot1.Cancel
+Bot1.Choose(The Theorist, Jace Beleren)
+Bot1.Choose(Mind Twist)
+Bot1.Choose(Dark Ritual)
+Bot1.Choose(Black Lotus)
+! Bot1.Choose
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Black Lotus; Swamp; Swamp; Swamp; The Theorist, Jace Beleren; Uldaros Theorix
+Bot1.Battlefield.Black Lotus.Token = true
+Bot1.Battlefield.The Theorist, Jace Beleren.Token = true
+Exile = Black Lotus; Dark Ritual; Mind Twist; Tarfire; The Theorist, Jace Beleren
+Bot2.Life = 20
+Stack.Count = 0
