@@ -1,0 +1,39 @@
+# CR 608.2b: Bot2 puts two Disdainful Strokes on Bot1's Wrath of God (mana value 4). The top one counters it; the second
+# finds its only target gone, is not resolved and is put into the graveyard, so nothing is countered twice and the stack
+# empties. Bot2's Ornithopter lives because the Wrath is countered.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Wrath of God
+Plains x17
+
+[Bot2 Deck]
+Island
+Black Lotus
+Ornithopter
+Disdainful Stroke
+Disdainful Stroke
+Island x15
+
+[Actions]
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Wrath of God.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Disdainful Stroke.Cast(Stack.Wrath of God)
+Bot2.Hand.Disdainful Stroke.Cast(Stack.Wrath of God)
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Wrath of God; Black Lotus
+Bot2.Graveyard.Count = 3
+Bot2.Battlefield = Island; Ornithopter

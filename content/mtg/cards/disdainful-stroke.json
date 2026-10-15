@@ -1,0 +1,6 @@
+{
+  "name": "Disdainful Stroke",
+  "manaCost": "{1}{U}",
+  "type": "Instant",
+  "oracleText": "Counter target spell with mana value 4 or greater."
+}

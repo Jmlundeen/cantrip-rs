@@ -1,0 +1,31 @@
+# "Target spell with mana value 4 or greater" (CR 115.1, 202.3): Wheel of Fortune has mana value 3, so Bot2's Disdainful Stroke
+# is not offered with it as a target (the refusal), and the Wheel resolves (Bot1 draws seven). The positive control, the same
+# Stroke on a mana value 4 spell, is disdainful-stroke-counters-a-spell-of-mana-value-four.
+
+[Bot1 Deck]
+Black Lotus
+Wheel of Fortune
+Mountain x18
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Disdainful Stroke
+Island x17
+
+[Actions]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Wheel of Fortune.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+! Bot2.Hand.Disdainful Stroke.Cast(Stack.Wheel of Fortune)
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard.Count = 8
+Bot1.Hand.Count = 7

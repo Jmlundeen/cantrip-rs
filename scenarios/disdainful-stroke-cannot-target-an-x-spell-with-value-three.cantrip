@@ -1,0 +1,30 @@
+# CR 202.3e: Mind Twist with X = 2 is mana value 3 on the stack, so Disdainful Stroke is not offered with it as a target; Mind
+# Twist resolves and Bot2 discards two cards at random (its graveyard holds two cards).
+
+[Bot1 Deck]
+Black Lotus
+Mind Twist
+Swamp x18
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Disdainful Stroke
+Island x17
+
+[Actions]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Mind Twist.Cast(Bot2; X: 2)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+! Bot2.Hand.Disdainful Stroke.Cast(Stack.Mind Twist)
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Mind Twist; Black Lotus
+Bot2.Graveyard.Count = 2

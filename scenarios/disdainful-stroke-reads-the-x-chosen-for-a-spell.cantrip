@@ -1,0 +1,34 @@
+# "If a spell has {X} in its mana cost, use the value chosen for X" (CR 202.3e): Mind Twist with X = 3 is a mana value 4 spell
+# on the stack, so Bot2's Disdainful Stroke counters it and Bot2 keeps its hand. Black Lotus and Mox Jet pay {3}{B}.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mind Twist
+Swamp x17
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Disdainful Stroke
+Island x17
+
+[Actions]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Mind Twist.Cast(Bot2; X: 3)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Disdainful Stroke.Cast(Stack.Mind Twist)
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Mind Twist; Black Lotus
+Bot2.Graveyard = Disdainful Stroke
+Bot2.Hand.Count = 5
