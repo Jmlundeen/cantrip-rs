@@ -1,0 +1,50 @@
+# Artificial Evolution changes the text of Pyrogoyf, Lhurgoyf to Goblin (CR 612.1): "Whenever this creature or another
+# Goblin creature you control enters" now. Pyrogoyf's own entering deals 1 (Black Lotus is the one card type in the
+# graveyards) before the change; after it, Goblin Welder entering triggers Pyrogoyf and deals 1 more.
+
+[Bot1 Deck]
+Pyrogoyf
+Black Lotus
+Mox Jet
+Mox Sapphire
+Mox Ruby
+Artificial Evolution
+Goblin Welder
+Island x9
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Pyrogoyf.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 19
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Pyrogoyf)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Lhurgoyf)
+Bot1.Modes(Goblin)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Goblin Welder.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot2.Life = 18
+Bot1.Battlefield.Pyrogoyf.Subtypes = Goblin

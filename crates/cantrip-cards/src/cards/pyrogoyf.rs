@@ -11,7 +11,7 @@ fn lhurgoyf_enters(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fir
                 return Fired::about(Target::Object(*new));
             }
             let chars = q.chars(*new);
-            if chars.is(CardType::Creature) && chars.has_subtype(Subtype::Lhurgoyf) && q.controller(*new) == q.controller(source) {
+            if chars.is(CardType::Creature) && chars.has_subtype(q.words(source).subtype(Subtype::Lhurgoyf)) && q.controller(*new) == q.controller(source) {
                 Fired::about(Target::Object(*new))
             } else {
                 None
