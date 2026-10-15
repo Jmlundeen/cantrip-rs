@@ -1,29 +1,40 @@
-//! Paradigm (CR 702.170a): "Then exile this spell. After you first resolve a spell with this name, you may cast a copy
-//! of it from exile without paying its mana cost at the beginning of each of your first main phases." Germination
-//! Practicum prints it.
+//! Paradigm (CR 702.192a): "If this is the first time a spell you control with this spell's name has resolved this game, at the
+//! beginning of each of your precombat main phases for the rest of the game, create a copy of this object in exile. You may
+//! cast the copy without paying its mana cost" and "Exile this spell." Germination Practicum and Improvisation Capstone print it.
 //!
 //! A card with paradigm sets `paradigm: true` (the core exiles the spell as it resolves) and lists `TRIGGER` among its
-//! `abilities`.
+//! `abilities`. The delayed trigger is the card's own triggered ability, kept in exile and only for the first spell of its
+//! name to resolve. Known gap: the API has no delayed trigger that lasts for the rest of the game, so it ends if that card
+//! leaves exile (the ruling says it would go on, and cast a copy from nothing).
 
 use cantrip_api::*;
 
-/// Whether this card was exiled by paradigm: it left the stack for exile as it resolved, asked of the event history. A
-/// card exiled any other way has no paradigm to use.
-fn exiled_as_it_resolved(q: &dyn Query, card: ObjectId) -> bool {
-    q.history().all().iter().any(|r| {
-        matches!(r.event, Event::ZoneChange { new, from, to, reason: ZoneReason::Resolve, .. }
-            if new == card && from.is(ZoneKind::Stack) && to.is(ZoneKind::Exile))
-    })
+/// "If this is the first time a spell you control with this spell's name has resolved this game": the first spell with this
+/// card's name that its owner cast to resolve, asked of the event history, is this card as it left the stack. A spell that
+/// was countered or had no legal target did not resolve, and a second spell of the name resolving later makes no second
+/// delayed trigger (CR 702.192a). Only the object the first spell became is the one that triggers.
+fn is_the_first_to_resolve(q: &dyn Query, card: ObjectId) -> bool {
+    let owner = q.obj(card).owner;
+    let first = q.history().all().iter().find_map(|r| match r.event {
+        Event::ZoneChange { old, new, from, to, reason: ZoneReason::Resolve }
+            if from.is(ZoneKind::Stack)
+                && !to.is(ZoneKind::Gone)
+                && crate::same_name(q, new, card)
+                && q.history().all().iter().any(|c| matches!(&c.event, Event::Cast(cast) if cast.spell == old && cast.player == owner)) =>
+        {
+            Some((new, to))
+        }
+        _ => None,
+    });
+    first.is_some_and(|(new, to)| new == card && to.is(ZoneKind::Exile))
 }
 
-/// "At the beginning of each of your first main phases" (CR 505.1): its owner's precombat main phase, while the card the
-/// spell was is still in exile where paradigm put it.
+/// "At the beginning of each of your precombat main phases" (CR 505.1, 702.192a): its owner's precombat main phase, for
+/// the card the first such spell was, whether or not it is still in exile where paradigm put it.
 fn your_first_main_phase(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
         Event::StepBegan { step: Step::PrecombatMain }
-            if q.obj(source).zone.is(ZoneKind::Exile)
-                && q.state().turn.active == q.obj(source).owner
-                && exiled_as_it_resolved(q, source) =>
+            if q.state().turn.active == q.obj(source).owner && is_the_first_to_resolve(q, source) =>
         {
             Fired::PLAIN
         }

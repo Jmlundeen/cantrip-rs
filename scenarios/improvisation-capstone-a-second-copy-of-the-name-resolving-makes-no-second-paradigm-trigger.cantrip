@@ -1,0 +1,73 @@
+# CR 702.192a: paradigm's delayed trigger is made only "if this is the first time a spell you control with this spell's name has
+# resolved this game". Bot1 resolves a first Improvisation Capstone on turn 1 and a second on turn 3 (the three Black Lotuses
+# kept back from turn 1 pay for it). Both are exiled, but only the first makes the trigger: on turn 3 the one copy is cast
+# (declined casts), and on turn 5 Bot1 is offered a single copy, not two (the refused second Accept). A second trigger would dig
+# four more cards from the library, which the library count rules out (10, not 6).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Black Lotus
+Black Lotus
+Black Lotus
+Improvisation Capstone
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Improvisation Capstone
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Island
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Improvisation Capstone.Cast
+Bot1.Choose()
+[T1 Bot1.Main2]
+? Bot1.Library.Count = 24
+[T3 Bot1.Main1]
+Bot1.Accept
+Bot1.Choose()
+? Bot1.Library.Count = 19
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Improvisation Capstone.Cast
+Bot1.Choose()
+[T3 Bot1.Main2]
+? Bot1.Library.Count = 15
+[T5 Bot1.Main1]
+Bot1.Accept
+Bot1.Choose()
+Bot1.Pass
+! Bot1.Accept
+[T5 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Library.Count = 10
+Exile.Count = 18
