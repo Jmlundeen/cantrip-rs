@@ -1,0 +1,47 @@
+# Twinned Vision's flashback needs a card to discard (CR 118.8, 601.2h): with an empty hand it is not offered even though the mana
+# is there. T1: six artifacts and Vision are the opening hand; Mox Ruby + Mox Sapphire pay for Vision from the hand, which draws a
+# Forest that is played, leaving the hand empty. Black Lotus (untapped, three blue) could pay the flashback, yet `!` holds. T3 is the
+# positive control: the turn's draw (an Island) is in hand, the flashback is cast with Lotus blue, the Island is discarded as its
+# cost and the two cards drawn (Swamp, Plains) are exactly the hand left.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Sapphire
+Black Lotus
+Twinned Vision
+Mox Jet
+Mox Pearl
+Mox Emerald
+Forest
+Island
+Swamp
+Plains
+Swamp x8
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Twinned Vision.Cast
+Bot1.Pass
+Bot1.Hand.Forest.Play
+! Bot1.Graveyard.Twinned Vision.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Graveyard.Twinned Vision.Cast(Ability: Flashback)
+Bot1.Choose(Island)
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Twinned Vision
+Bot1.Graveyard = Island; Black Lotus
+Bot1.Hand = Plains; Swamp

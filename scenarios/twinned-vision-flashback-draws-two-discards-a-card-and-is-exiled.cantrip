@@ -44,3 +44,4 @@ Bot1.Choose(Plains)
 Exile = Twinned Vision
 Bot1.Graveyard = Plains
 Bot1.Hand.Count = 6
+Bot1.Hand = Forest; Forest; Forest; Forest; Island; Swamp

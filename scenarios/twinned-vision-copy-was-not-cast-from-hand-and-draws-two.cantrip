@@ -1,7 +1,7 @@
 # A copy of Twinned Vision was never cast, so it is not "cast from your hand" and draws two cards instead of one (CR 707.10,
 # 601.2a). Bot1 casts Vision from the hand (Mox Ruby + Mox Sapphire), and with it on the stack flashes in Lutri (Black Lotus,
 # blue x3), whose enters trigger copies it. The copy resolves first (draws two), then the original (cast from the hand, draws one).
-# Hand: 7 - 5 cast = 2, + 3 drawn = 5.
+# Hand: 7 - 5 cast = 2; the copy resolves first (2 drawn, hand 4, the original alone on the stack), then the original (1 drawn, hand 5).
 
 [Bot1 Deck]
 Mox Ruby
@@ -28,8 +28,13 @@ Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
 Bot1.Hand.Lutri, the Spellchaser.Cast
 Bot1.Pass
 Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+? Bot1.Hand.Count = 4
+? Stack = Twinned Vision
 [T1 Bot1.Main2]
 
 [Expect]
 Bot1.Hand.Count = 5
+Bot1.Hand = Forest; Plains; Swamp; Swamp; Swamp
 Bot1.Graveyard = Twinned Vision; Black Lotus
