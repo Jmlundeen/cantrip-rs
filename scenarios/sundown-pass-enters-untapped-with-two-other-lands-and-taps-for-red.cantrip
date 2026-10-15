@@ -1,0 +1,22 @@
+# Sundown Pass: with two other lands it enters untapped (CR 614.1c) and its mana ability adds {R} (chosen as it is activated).
+
+[Bot1 Deck]
+Mountain
+Mountain
+Sundown Pass
+Mountain x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Sundown Pass.Play
+Bot1.Battlefield.Sundown Pass.Activate(Color: Red)
+
+[Expect]
+Bot1.Battlefield.Sundown Pass.Tapped = true
+Bot1.Mana = {R}
