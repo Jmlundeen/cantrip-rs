@@ -1,0 +1,48 @@
+# Artificial Evolution changes the text of Bot1's Figure of Destiny, Spirit to Elf (CR 612.1), so the card does what the
+# changed text says: its first stage makes it a Kithkin Elf, and the second stage, "if this creature is a Spirit", now
+# asks whether it is an Elf and makes it a 4/4 Kithkin Elf Warrior (CR 612). It never becomes a Spirit.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Figure of Destiny
+Artificial Evolution
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Figure of Destiny.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Figure of Destiny)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Spirit)
+Bot1.Modes(Elf)
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Figure of Destiny.Activate(Ability: Kithkin Spirit with)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Figure of Destiny.Subtypes = Elf; Kithkin
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Figure of Destiny.Activate(Ability: Warrior with)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Figure of Destiny.Power = 4
+Bot1.Battlefield.Figure of Destiny.Toughness = 4
+Bot1.Battlefield.Figure of Destiny.Subtypes = Elf; Kithkin; Warrior
