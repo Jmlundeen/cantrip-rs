@@ -1,0 +1,65 @@
+# Ghost Vacuum's second ability makes each creature it exiled "a 1/1 Spirit in addition to its other types". Artificial
+# Evolution changes the text of Bot1's Ghost Vacuum, Spirit to Elf (CR 612.1), so the Dark Confidant it released is
+# a 1/1 Elf in addition to its other types, not a Spirit (CR 612). The Vacuum has been sacrificed by then: the ability
+# reads the words its source last had on the battlefield (CR 113.7a).
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Ghost Vacuum
+Artificial Evolution
+Lightning Bolt
+Island
+Island x20
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Dark Confidant
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ghost Vacuum.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Dark Confidant.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Dark Confidant)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Ghost Vacuum)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Spirit)
+Bot1.Modes(Elf)
+Bot1.Battlefield.Ghost Vacuum.Activate(Ability: Exile target; Bot2.Graveyard.Dark Confidant)
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Ghost Vacuum.Activate(Ability: Put each)
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Dark Confidant.Power = 1
+Bot1.Battlefield.Dark Confidant.Toughness = 1
+Bot1.Battlefield.Dark Confidant.Counters.Flying = 1
+Bot1.Battlefield.Dark Confidant.Subtypes = Elf; Human; Wizard

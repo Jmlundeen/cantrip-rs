@@ -15,11 +15,12 @@ fn exile_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// sacrificed as a cost, and the exile link outlives it (CR 113.7a).
 fn release(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let cards: Vec<ObjectId> = g.exiled_with(item.object).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
+    let spirit = g.words(item.object).subtype(Subtype::Spirit);
     for card in cards {
         let arrived = g.put_onto_battlefield_with_counters(card, item.controller, false, &[(CounterKind::Flying, 1)])?;
         if targets::permanent(g, arrived) {
             g.add_effect(item.object, arrived, EffectKind::SetPt(1, 1), Duration::Indefinite);
-            g.add_effect(item.object, arrived, EffectKind::AddSubtype(Subtype::Spirit), Duration::Indefinite);
+            g.add_effect(item.object, arrived, EffectKind::AddSubtype(spirit), Duration::Indefinite);
         }
     }
     Ok(())
