@@ -5,7 +5,7 @@ use cantrip_oracle as oracle;
 /// Counter target spell if it's blue.
 fn counter_blue(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(spell) = targets::object(g, item, 0)
-        && g.chars(spell).colors.has(Color::Blue)
+        && g.chars(spell).colors.has(g.words(item.object).color(Color::Blue))
     {
         g.counter(spell);
     }
@@ -15,7 +15,7 @@ fn counter_blue(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// Destroy target permanent if it's blue.
 fn destroy_blue(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(p) = targets::object(g, item, 0)
-        && g.chars(p).colors.has(Color::Blue)
+        && g.chars(p).colors.has(g.words(item.object).color(Color::Blue))
     {
         g.destroy(p);
     }
