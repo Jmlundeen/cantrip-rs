@@ -1,0 +1,6 @@
+{
+  "name": "Day of Judgment",
+  "manaCost": "{2}{W}{W}",
+  "type": "Sorcery",
+  "oracleText": "Destroy all creatures."
+}

@@ -1,0 +1,43 @@
+# Destroy all creatures: each player's creatures die (the caster's own included), lands stay. Bot2's Forest in the
+# graveyard is its hand-size discard.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Plains x5
+Day of Judgment
+Plains x14
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Forest.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Day of Judgment.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Forest.Activate
+[T7 Bot1.Main2]
+
+[Expect]
+Turn = 7
+Bot1.Battlefield = Forest; Plains; Plains; Plains
+Bot1.Graveyard = Day of Judgment; Llanowar Elves
+Bot2.Battlefield = Forest
+Bot2.Graveyard = Llanowar Elves; Forest
+Stack.Count = 0

@@ -1,0 +1,50 @@
+# Day of Judgment does not say the creatures can't be regenerated, unlike Wrath of God: a regeneration shield made in response
+# replaces the destruction (CR 701.19a), so Bot2's Llanowar Elves is tapped and survives while Bot1's own Elves (tapped for
+# mana, no shield) is destroyed.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Plains x5
+Day of Judgment
+Plains x14
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Yavimaya Hollow
+Forest x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Forest.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+[T4 Bot2.Main1]
+Bot2.Hand.Yavimaya Hollow.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Day of Judgment.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Forest.Activate
+Bot2.Battlefield.Yavimaya Hollow.Activate(Bot2.Battlefield.Llanowar Elves; Ability: Regenerate)
+Bot2.Battlefield.Forest.Activate
+[T7 Bot1.Main2]
+
+[Expect]
+Turn = 7
+Bot1.Graveyard = Day of Judgment; Llanowar Elves
+Bot2.Battlefield = Forest; Llanowar Elves; Yavimaya Hollow
+Bot2.Battlefield.Yavimaya Hollow.Tapped = true
+Bot2.Battlefield.Llanowar Elves.Tapped = true
+Bot2.Graveyard.Count = 0
+Stack.Count = 0
