@@ -2,17 +2,18 @@ use cantrip_api::*;
 use cantrip_mechanics::{top_of_library, triggers::this_enters};
 use cantrip_oracle as oracle;
 
-/// Blue mana symbols in a permanent's mana cost (CR 700.5): hybrid and Phyrexian blue symbols each count once. A copy
+/// Mana symbols of `color` (blue as the Oracle prints it, or what a text change made it) in a permanent's mana cost (CR 700.5): hybrid and Phyrexian blue symbols each count once. A copy
 /// counts the cost it copies (CR 707.2), none if it has none (CR 707.9b).
-fn blue_symbols(q: &dyn Query, id: ObjectId) -> u32 {
+fn symbols_of(q: &dyn Query, id: ObjectId, color: Color) -> u32 {
+    let mana = color.mana();
     let values = q.copiable_values(id);
     if values.no_cost {
         return 0;
     }
     let cost = q.card(values.card).cost;
-    cost.symbols[Mana::U as usize] as u32
-        + cost.hybrid.iter().flatten().filter(|(a, b)| *a == Mana::U || *b == Mana::U).count() as u32
-        + cost.phyrexian[Mana::U as usize] as u32
+    cost.symbols[mana as usize] as u32
+        + cost.hybrid.iter().flatten().filter(|(a, b)| *a == mana || *b == mana).count() as u32
+        + cost.phyrexian[mana as usize] as u32
 }
 
 /// "Look at the top X cards of your library, where X is your devotion to blue. Put up to one of them on top of your
@@ -20,7 +21,8 @@ fn blue_symbols(q: &dyn Query, id: ObjectId) -> u32 {
 /// cards in your library, you win the game."
 fn look_and_win(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
-    let devotion: u32 = g.permanents_of(you).into_iter().map(|id| blue_symbols(g, id)).sum();
+    let color = g.words(item.object).color(Color::Blue);
+    let devotion: u32 = g.permanents_of(you).into_iter().map(|id| symbols_of(g, id, color)).sum();
     let looked = top_of_library(g, you, devotion as usize);
     if !looked.is_empty() {
         let ask = RequestKind::DistributeCards {
