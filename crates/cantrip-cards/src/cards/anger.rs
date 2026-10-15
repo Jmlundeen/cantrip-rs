@@ -9,7 +9,7 @@ fn affects(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Ch
     if !so_far.is(CardType::Creature) || state.obj(affected).controller != you {
         return false;
     }
-    state.battlefield().iter().any(|&id| state.obj(id).controller == you && q.chars(id).has_subtype(Subtype::Mountain))
+    state.battlefield().iter().any(|&id| state.obj(id).controller == you && q.chars(id).has_subtype(q.words(source).subtype(Subtype::Mountain)))
 }
 
 fn apply(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
