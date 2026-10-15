@@ -38,13 +38,14 @@ fn mind_swap(g: &mut dyn Game, entry: &mut Entering) -> Result<(), Suspend> {
         Answer::Targets(t) => t.first().and_then(|t| t.object()).unwrap_or(cards[0]),
         _ => cards[0],
     };
+    let words = g.words(entering);
     entry.copy = Some(
         g.copiable_values(chosen)
             .named("Superior Spider-Man")
             .sized(4, 4)
-            .with_subtype(Subtype::Spider)
-            .with_subtype(Subtype::Human)
-            .with_subtype(Subtype::Hero),
+            .with_subtype(words.subtype(Subtype::Spider))
+            .with_subtype(words.subtype(Subtype::Human))
+            .with_subtype(words.subtype(Subtype::Hero)),
     );
     let me = g.card_id(&CARD);
     g.reflexive_trigger(entering, controller, AbilityRef::delayed(me, 0), Target::Object(chosen));

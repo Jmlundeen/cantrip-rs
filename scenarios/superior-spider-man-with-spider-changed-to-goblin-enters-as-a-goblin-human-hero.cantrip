@@ -1,0 +1,58 @@
+# Artificial Evolution changes the creature type Spider to Goblin in the Superior Spider-Man spell's text (CR 612.1), and
+# the changed text stays with the permanent it becomes (CR 400.7a). Mind Swap then says "he's a 4/4 Goblin Human Hero in
+# addition to his other types": he enters as a copy of Bot2's Ornithopter that is a Goblin, not a Spider (CR 707.9b). His
+# name stays Superior Spider-Man (CR 612.2).
+
+[Bot1 Deck]
+Sol Ring
+Damn
+Superior Spider-Man
+Swamp
+Swamp
+Island
+Artificial Evolution
+Mox Sapphire
+Swamp x13
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Swamp.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Damn.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Superior Spider-Man.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Stack.Superior Spider-Man)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Spider)
+Bot1.Modes(Goblin)
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Target(Bot2.Graveyard.Ornithopter)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Exile = Ornithopter
+Bot2.Graveyard.Count = 0
+Bot1.Battlefield.Superior Spider-Man.Power = 4
+Bot1.Battlefield.Superior Spider-Man.Toughness = 4
+Bot1.Battlefield.Superior Spider-Man.Subtypes = Goblin; Hero; Human; Thopter
