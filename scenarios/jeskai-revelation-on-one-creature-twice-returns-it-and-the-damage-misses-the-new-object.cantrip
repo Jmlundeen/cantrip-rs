@@ -1,0 +1,43 @@
+# The same Ornithopter is both targets. It is returned first and is then a new object in the hand (CR 400.7), so the 4
+# damage - the second target, no longer the object that was chosen - isn't dealt to it and it isn't put into the graveyard.
+# The rest of the spell still happens.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Emerald
+Jeskai Revelation
+Island
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Plains x18
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Jeskai Revelation.Cast
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard.Count = 0
+Bot2.Battlefield.Count = 0
+Bot2.Hand.Count = 8
+Bot1.Life = 24
+Bot1.Battlefield.Count = 6

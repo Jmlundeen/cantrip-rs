@@ -1,0 +1,44 @@
+# A token returned to hand ceases to exist (CR 111.7, 704.5d): Bot2's Lingering Souls (cast with Black Lotus) makes two
+# Spirit tokens, Bot1 returns one, and Bot2's hand does not gain it - nor does the graveyard.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Emerald
+Jeskai Revelation
+Island
+Island x10
+
+[Bot2 Deck]
+Black Lotus
+Lingering Souls
+Plains x18
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Lingering Souls.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Jeskai Revelation.Cast
+Bot1.Target(Bot2.Battlefield.Spirit)
+Bot1.Target(Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Count = 1
+Bot2.Hand.Count = 6
+Bot2.Graveyard = Lingering Souls; Black Lotus
+Bot2.Life = 16
