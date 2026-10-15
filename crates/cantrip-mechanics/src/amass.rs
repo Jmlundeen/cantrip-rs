@@ -6,6 +6,8 @@ use crate::choose;
 use cantrip_api::*;
 
 /// Amass `subtype` `n`: `token` is the 0/0 black `subtype` Army creature token created when `controller` has no Army.
+/// `subtype` is the word the card prints, read through `source`'s text (CR 612.2): the rest of the Army is the keyword
+/// action's own (CR 701.47a), which no text change reaches.
 pub fn amass(
     g: &mut dyn Game,
     controller: PlayerId,
@@ -23,10 +25,13 @@ pub fn amass(
             })
             .collect()
     };
+    let printed = subtype;
+    let subtype = g.words(source).subtype(printed);
     let mut candidates = armies(g);
     if candidates.is_empty() {
         let token = g.card_id(token);
-        g.create_tokens(token, controller, 1, false)?;
+        let words = Words::NONE.changed(Word::Subtype(printed), Word::Subtype(subtype));
+        g.create_tokens_worded(&[(token, controller)], false, None, words)?;
         candidates = armies(g);
     }
     let army = match candidates.as_slice() {

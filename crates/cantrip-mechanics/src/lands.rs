@@ -21,19 +21,22 @@ pub const fn sub(subtype: Subtype) -> u16 {
     subtype as u16
 }
 
-fn has_subtype_numbered(chars: &Chars, n: u16) -> bool {
-    chars.subtypes.iter().any(|s| s as u16 == n)
+/// The subtype a template's number names, as `source`'s text has that word now (CR 612.2).
+fn word(q: &dyn Query, source: ObjectId, n: u16) -> Subtype {
+    let printed = Subtype::ALL.into_iter().find(|&s| s as u16 == n).expect("a subtype's number");
+    q.words(source).subtype(printed)
 }
 
-fn controls_land_type<const A: u16>(q: &dyn Query, controller: PlayerId) -> bool {
-    q.state().battlefield().iter().any(|&id| q.controller(id) == controller && has_subtype_numbered(&q.chars(id), A))
+fn controls_land_type(q: &dyn Query, controller: PlayerId, land_type: Subtype) -> bool {
+    q.state().battlefield().iter().any(|&id| q.controller(id) == controller && q.chars(id).has_subtype(land_type))
 }
 
 /// "This land enters tapped unless you control a [land type]" (CR 614.1c): read on the battlefield as it is while the land
 /// enters, so the land itself is not counted, through the layers (a land of any kind may have the type). Arena of Glory
 /// (Mountain), Castle Locthwain (Swamp) and Shifting Woodland (Forest) print it.
 pub fn enters_tapped_unless_you_control<const TYPE: u16>(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
-    if !controls_land_type::<TYPE>(g, entering.controller) {
+    let land_type = word(g, entering.object, TYPE);
+    if !controls_land_type(g, entering.controller, land_type) {
         entering.tapped = true;
     }
     Ok(())
@@ -81,15 +84,17 @@ pub const fn bounce_land<const A: u8, const B2: u8>(text: &'static str) -> [Abil
 }
 
 fn fetch_two_types<const A: u16, const B2: u16>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    search_to_battlefield(g, item.controller, item.object, Find::ONE, false, |q, c| {
+    let (a, b) = (word(g, item.object, A), word(g, item.object, B2));
+    search_to_battlefield(g, item.controller, item.object, Find::ONE, false, move |q, c| {
         let chars = q.chars(c);
-        has_subtype_numbered(&chars, A) || has_subtype_numbered(&chars, B2)
+        chars.has_subtype(a) || chars.has_subtype(b)
     })?;
     Ok(())
 }
 
 /// A fetch land's ability (CR 701.23): "{T}, Pay 1 life, Sacrifice this land: Search your library for a [type A] or [type B]
-/// card, put it onto the battlefield, then shuffle." `text` is the full text. Flooded Strand and Arid Mesa print it.
+/// card, put it onto the battlefield, then shuffle." `text` is the full text. The types are the ones the land's text named
+/// as it was sacrificed (CR 612.2, 113.7a). Flooded Strand and Arid Mesa print it.
 pub const fn fetch_land<const A: u16, const B2: u16>(text: &'static str) -> AbilityDef {
     AbilityDef::Activated(ActivatedDef {
         text,
@@ -164,11 +169,11 @@ fn add_one<const N: u8>(g: &mut dyn Game, asker: &Asker, _: Option<Color>) -> Re
 }
 
 fn controls_either<const A: u16, const B2: u16>(q: &dyn Query, asker: &Asker) -> bool {
-    controls_land_type::<A>(q, asker.controller) || controls_land_type::<B2>(q, asker.controller)
+    controls_land_type(q, asker.controller, word(q, asker.source, A)) || controls_land_type(q, asker.controller, word(q, asker.source, B2))
 }
 
 /// A verge's two mana abilities (CR 602.5b): "{T}: Add {PRIMARY}." and "{T}: Add {SECOND}. Activate only if you control a
-/// [type A] or a [type B]", read through the layers. Blazemire Verge and Thornspire Verge print it.
+/// [type A] or a [type B]", read through the layers, the types as the verge's text names them (CR 612.2). Blazemire Verge and Thornspire Verge print it.
 pub const fn verge<const PRIMARY: u8, const SECOND: u8, const A: u16, const B2: u16>(
     primary_text: &'static str,
     second_text: &'static str,

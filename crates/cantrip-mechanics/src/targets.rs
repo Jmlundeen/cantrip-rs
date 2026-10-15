@@ -55,6 +55,12 @@ pub const CREATURE_OR_PLANESWALKER: TargetSpec = TargetSpec { min: 1, max: 1, fi
 pub const PLAYER: TargetSpec = TargetSpec { min: 1, max: 1, filter: player_filter };
 pub const OPPONENT: TargetSpec = TargetSpec { min: 1, max: 1, filter: opponent_filter };
 pub const SPELL: TargetSpec = TargetSpec { min: 1, max: 1, filter: spell_filter };
+/// "Target spell or permanent" (CR 115.1): Artificial Evolution and Venser, Shaper Savant print it.
+pub const SPELL_OR_PERMANENT: TargetSpec = TargetSpec { min: 1, max: 1, filter: spell_or_permanent_filter };
+
+fn spell_or_permanent_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    spell_filter(q, asker, t) || permanent_filter(q, asker, t)
+}
 
 /// Whether a target is a card in a graveyard with one of these types.
 pub fn card_in_graveyard(q: &dyn Query, t: Target, types: &[CardType]) -> bool {

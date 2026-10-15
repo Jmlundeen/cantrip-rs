@@ -68,7 +68,8 @@ pub fn attached_object(view: &dyn LayerQuery, source: ObjectId, affected: Object
 /// Kaldra Compleat print it.
 pub fn living_weapon(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let germ = g.card_id(&crate::tokens::GERM);
-    let made = g.create_tokens(germ, item.controller, 1, false)?;
+    // The Germ is the keyword's (CR 702.92a), whatever the card's text says now.
+    let made = g.create_tokens_worded(&[(germ, item.controller)], false, None, Words::NONE)?;
     if let Some(&token) = made.first()
         && is_live(g, token)
         && g.is_on_battlefield(token)

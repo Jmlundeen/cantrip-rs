@@ -32,7 +32,8 @@ fn attacks(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
 fn create_warriors<const N: u8>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let warrior = g.card_id(&WARRIOR);
     let tokens: Vec<(CardId, PlayerId)> = (0..N).map(|_| (warrior, item.controller)).collect();
-    let created = g.create_tokens_attacking(&tokens, item.subject)?;
+    // The Warriors are the keyword's (CR 702.181a), whatever the card's text says now.
+    let created = g.create_tokens_worded(&tokens, true, Some(item.subject), Words::NONE)?;
     let o = *g.obj(item.object);
     let card = o.copy.map(|c| c.card).unwrap_or(o.card);
     g.delayed_trigger_about(

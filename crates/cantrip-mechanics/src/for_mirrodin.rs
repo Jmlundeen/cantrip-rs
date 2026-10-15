@@ -22,7 +22,8 @@ pub static REBEL: CardDef = CardDef {
 /// equipped.
 fn create_and_attach(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let rebel = g.card_id(&REBEL);
-    let made = g.create_tokens(rebel, item.controller, 1, false)?;
+    // The Rebel is the keyword's (CR 702.163a), whatever the card's text says now.
+    let made = g.create_tokens_worded(&[(rebel, item.controller)], false, None, Words::NONE)?;
     let Some(&token) = made.first() else { return Ok(()) };
     if is_live(g, token) && g.is_on_battlefield(token) && is_live(g, item.object) && g.is_on_battlefield(item.object) {
         g.attach(item.object, token);
