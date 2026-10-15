@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::mana::{add_c, tap_for};
-use cantrip_mechanics::pump;
+use cantrip_mechanics::{Animation, animate, pump};
 use cantrip_oracle as oracle;
 
 /// "{T}, Pay 1 life: Add one mana of any color. Spend this mana only to cast an instant or sorcery spell." (CR 106.6,
@@ -14,19 +14,22 @@ fn add_restricted(g: &mut dyn Game, asker: &Asker, color: Option<Color>) -> Resu
 
 /// "{5}: If this land isn't a creature, it becomes a 2/4 Wizard creature with '...' It's still a land." The check is
 /// made as the ability resolves; the change has no duration (CR 611.2a), so it lasts while the land stays where it is.
-/// A land that has left the battlefield is a new object (CR 400.7) and is not changed. Its colors are not set: the
-/// effect says nothing of them.
+/// The text names no colors, so they are not changed.
 fn becomes_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let me = item.object;
-    if !g.is_on_battlefield(me) || g.obj(me).became.is_some() || g.chars(me).is(CardType::Creature) {
+    if g.chars(me).is(CardType::Creature) {
         return Ok(());
     }
     let card = g.obj(me).card;
-    let wizard = g.words(me).subtype(Subtype::Wizard);
-    g.add_effect(me, me, EffectKind::AddTypes(TypeSet::of(&[CardType::Creature])), Duration::Indefinite);
-    g.add_effect(me, me, EffectKind::AddSubtype(wizard), Duration::Indefinite);
-    g.add_effect(me, me, EffectKind::SetPt(2, 4), Duration::Indefinite);
-    g.add_effect(me, me, EffectKind::AddAbility(AbilityRef::delayed(card, 0)), Duration::Indefinite);
+    let animation = Animation {
+        power: 2,
+        toughness: 4,
+        colors: None,
+        subtype: Some(g.words(me).subtype(Subtype::Wizard)),
+        keywords: Keywords::NONE,
+        ability: Some(AbilityRef::delayed(card, 0)),
+    };
+    animate(g, me, me, &animation, Duration::Indefinite);
     Ok(())
 }
 
