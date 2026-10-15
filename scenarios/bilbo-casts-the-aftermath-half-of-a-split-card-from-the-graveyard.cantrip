@@ -1,0 +1,44 @@
+# CR 702.127a, 709.3, 709.3b, 715.3: Bilbo, Thief in the Night casts "an artifact, instant, or sorcery spell from your graveyard", and
+# the spell is the half chosen. Leave // Chance in the graveyard offers both halves (Chance is aftermath: castable from a graveyard),
+# so Bot1 is asked which, and casts Chance (a sorcery, {3}{R}, {1} less for Bilbo) on turn 3, paid with three Moxen tapped while
+# the trigger was on the stack. It is exiled as it resolves (aftermath, and Bilbo's own exile). Leave // Chance was Entombed.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Entomb
+Bilbo, Thief in the Night
+Leave // Chance
+Island x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Leave // Chance)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Bilbo, Thief in the Night.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Bilbo, Thief in the Night)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Choose(Leave // Chance)
+Bot1.Modes(Chance)
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Leave // Chance
+Bot1.Graveyard = Island; Entomb
+Stack.Count = 0

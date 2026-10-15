@@ -280,7 +280,11 @@ fn leave_stack(cx: &mut Cx, item: &StackItem, reason: ZoneReason) {
         return;
     }
     let exiled = (item.way > 0 && item.way < WAY_SPLIT_RIGHT && def.ways[item.way as usize - 1].exile_after)
-        || (item.exile_after && (def.is(CardType::Instant) || def.is(CardType::Sorcery)));
+        || (item.exile_after && {
+        // The spell it was cast as (CR 709.3b, 715.3b): a half or an Adventure is judged by its own types.
+        let spell = cx.card(face(cx.s(), item.object));
+        spell.is(CardType::Instant) || spell.is(CardType::Sorcery)
+    });
     let to = if exiled { Zone::exile(obj.owner) } else { Zone::graveyard(obj.owner) };
     ops::move_to_for(cx, item.object, to, reason);
 }

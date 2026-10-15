@@ -1,0 +1,58 @@
+# CR 608.2b, 707.10c, 707.10f: a copy of an Aura spell whose only target is illegal as it resolves does not resolve, so it never
+# becomes a token. As in the neighbouring scenario Uldaros Theorix casts a copy of Animate Dead aimed at the Ornithopter card in
+# Bot1's graveyard, but Bot2, which has had a Soul-Guide Lantern since turn 2, sacrifices it in response and exiles that graveyard.
+# The target is gone: no token Animate Dead, and the Ornithopter does not come back. (The copy ceases to exist, CR 707.10a.)
+
+[Bot1 Deck]
+Swamp
+Dark Ritual
+Entomb
+Entomb
+Black Lotus
+Uldaros Theorix
+Swamp
+Animate Dead
+Ornithopter
+Swamp x12
+
+[Bot2 Deck]
+Island
+Soul-Guide Lantern
+Island x18
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Animate Dead)
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Ornithopter)
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Soul-Guide Lantern.Cast
+Bot2.Target(Bot1.Graveyard.Dark Ritual)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Uldaros Theorix.Cast
+Bot1.Target(Black Lotus)
+Bot1.Target(Animate Dead)
+Bot1.Choose(Animate Dead)
+Bot1.Target(Bot1.Graveyard.Ornithopter)
+Bot1.Choose(Black Lotus)
+Bot2.Battlefield.Soul-Guide Lantern.Activate(Ability: Exile each opponent's graveyard)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Black Lotus; Swamp; Swamp; Swamp; Uldaros Theorix
+Bot1.Graveyard.Count = 0
+Exile = Animate Dead; Black Lotus; Dark Ritual; Entomb; Entomb; Ornithopter
+Stack.Count = 0

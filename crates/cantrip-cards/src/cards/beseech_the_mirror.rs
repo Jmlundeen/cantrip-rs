@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{bargain, search_library, effects};
+use cantrip_mechanics::{bargain, choose, search_library, effects};
 use cantrip_oracle as oracle;
 
 /// "Search your library for a card, exile it face down, then shuffle. If this spell was bargained, you may cast the
@@ -20,13 +20,16 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     }
     g.shuffle(you);
     let Some(card) = exiled else { return Ok(()) };
-    if bargain::bargained(item)
-        && g.card(g.obj(card).card).cost.mana_value() <= 4
-        && g.could_cast_during_resolution(card)
-        && effects::ask_may(g, you, card, Purpose::Cast)?
-        && g.cast_during_resolution(card, Some(ManaCost::ZERO))?
-    {
-        return Ok(());
+    if bargain::bargained(item) {
+        // "If that spell's mana value is 4 or less": the face it is cast as is the spell (CR 709.3b, 715.3b).
+        let ways = g.cast_ways_during_resolution(card).into_iter().filter(|w| w.mana_value <= 4).collect::<Vec<_>>();
+        if !ways.is_empty()
+            && effects::ask_may(g, you, card, Purpose::Cast)?
+            && let Some(way) = choose::cast_way(g, you, card, ways)?
+            && g.cast_during_resolution_as(card, CastTerms { instead: Some(ManaCost::ZERO), way: Some(way.way), ..CastTerms::default() })?
+        {
+            return Ok(());
+        }
     }
     if is_live(g, card) && g.obj(card).zone.is(ZoneKind::Exile) {
         g.return_to_hand(&[card]);

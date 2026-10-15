@@ -1,0 +1,43 @@
+# CR 702.85a, 709.3, 709.3b: cascade exiles Life // Death (mana value 3 as the card, under Bloodbraid Challenger's 4) and its
+# controller casts one half of it for free: the spell cast is that half, not the card. Both halves (Life 1, Death 2) are under 4,
+# but Death needs a creature card in a graveyard to target and there is none, so only Life can be cast and nothing is asked
+# (the refusal): a face that can't be cast is no choice (CR 709.3a). Life makes lands 1/1 creatures until end of turn. Cascade's own
+# filter on the spell's mana value keeps a face over the limit out too; no card here has a face dearer than the card itself except
+# a modal double-faced one, and none exists in the content.
+
+[Bot1 Deck]
+Forest
+Mox Ruby
+Mox Emerald
+Mox Jet
+Mox Pearl
+Bloodbraid Challenger
+Island
+Life // Death
+Island x5
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Bloodbraid Challenger.Cast
+Bot1.Accept
+! Bot1.Modes
+? Stack.Count = 2
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Graveyard = Life // Death
+Bot1.Battlefield.Forest.Types = Land; Creature
+Stack.Count = 0

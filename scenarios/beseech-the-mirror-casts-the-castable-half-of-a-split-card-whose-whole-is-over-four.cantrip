@@ -1,0 +1,35 @@
+# CR 709.3, 709.3a, 709.3b, 702.127a, 118.9: Beseech the Mirror's free cast is allowed "if that spell's mana value is 4 or less". Leave //
+# Chance is 6 as a card in exile (2 + 4), but the spell cast is one half: Leave (2). Chance is an aftermath half, cast only from a
+# graveyard, so from exile it is no way to cast it and Bot1 is not asked which half (the refusal). Bot1 returns the Swamp it
+# controls to its hand with Leave. Bargain's sacrifice is Mox Jet, tapped for {B} first, as in the neighbouring scenario.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Black Lotus
+Beseech the Mirror
+Island x3
+Leave // Chance
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Beseech the Mirror.Cast
+Bot1.Modes(Bargain:)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Choose(Mox Jet)
+Bot1.Search(Leave // Chance)
+Bot1.Accept
+! Bot1.Modes
+[T2 Bot2.Upkeep]
+
+[Expect]
+Bot1.Graveyard = Leave // Chance; Beseech the Mirror; Mox Jet; Black Lotus
+Exile.Count = 0
+Stack.Count = 0

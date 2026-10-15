@@ -20,16 +20,22 @@ fn outside_hand_costs_one_less(q: &dyn Query, source: ObjectId, player: PlayerId
 fn recast(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     let graveyard = g.state().zone(Zone::graveyard(you)).to_vec();
-    let eligible: Vec<ObjectId> = graveyard
-        .iter()
-        .copied()
-        .filter(|&card| {
-            let c = g.chars(card);
-            (c.is(CardType::Artifact) || c.is(CardType::Instant) || c.is(CardType::Sorcery)) && g.could_cast_during_resolution(card)
-        })
-        .collect();
+    // "An artifact, instant, or sorcery spell": the face cast is the spell (CR 709.3b, 715.3b), so it is the face that is judged.
+    let ways_of = |g: &dyn Game, card: ObjectId| -> Vec<CastWay> {
+        g.cast_ways_during_resolution(card)
+            .into_iter()
+            .filter(|w| {
+                let face = g.card(w.face);
+                face.is(CardType::Artifact) || face.is(CardType::Instant) || face.is(CardType::Sorcery)
+            })
+            .collect()
+    };
+    let eligible: Vec<ObjectId> = graveyard.iter().copied().filter(|&card| !ways_of(g, card).is_empty()).collect();
     if let Some(&chosen) = choose::cards_from(g, you, item.object, Purpose::Cast, graveyard, eligible, 1, true)?.first() {
-        g.cast_during_resolution_as(chosen, CastTerms { exile_after: true, ..CastTerms::default() })?;
+        let ways = ways_of(g, chosen);
+        if let Some(way) = choose::cast_way(g, you, chosen, ways)? {
+            g.cast_during_resolution_as(chosen, CastTerms { exile_after: true, way: Some(way.way), ..CastTerms::default() })?;
+        }
     }
     Ok(())
 }

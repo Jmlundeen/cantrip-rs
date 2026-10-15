@@ -67,3 +67,17 @@ pub fn one_of(g: &mut dyn Game, player: PlayerId, source: ObjectId, modes: Vec<L
         _ => Ok(0),
     }
 }
+
+/// The face a card is cast as (CR 709.3, 715.3, 712.8a), chosen from `ways` (`Game::cast_ways_during_resolution`, narrowed to
+/// the ones the effect allows: a mana value, a type), as the player puts it on the stack. Nothing is asked when there is one;
+/// `None` when there is none. Uldaros Theorix, Beseech the Mirror and Bilbo, Thief in the Night print a restriction on the spell.
+pub fn cast_way(g: &mut dyn Game, player: PlayerId, card: ObjectId, ways: Vec<CastWay>) -> Result<Option<CastWay>, Suspend> {
+    match ways.len() {
+        0 => Ok(None),
+        1 => Ok(Some(ways[0])),
+        _ => {
+            let faces = ways.iter().map(|w| Label::Name(w.face)).collect();
+            Ok(Some(ways[one_of(g, player, card, faces)? as usize]))
+        }
+    }
+}

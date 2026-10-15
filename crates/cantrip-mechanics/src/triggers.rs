@@ -76,11 +76,15 @@ fn cascade_resolves(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
             break;
         }
     }
-    if let Some(card) = hit
-        && g.could_cast_during_resolution(card)
-        && matches!(g.ask(player, RequestKind::May { source: card, purpose: Purpose::Cast })?, Answer::Yes)
-    {
-        g.cast_during_resolution(card, Some(ManaCost::ZERO))?;
+    // "You may cast it without paying its mana cost if the resulting spell's mana value is less than this spell's": the face
+    // cast is the spell, so only a face under the limit may be (CR 702.85a, 709.3b, 715.3b).
+    if let Some(card) = hit {
+        let ways: Vec<CastWay> = g.cast_ways_during_resolution(card).into_iter().filter(|w| u32::from(w.mana_value) < limit).collect();
+        if !ways.is_empty() && matches!(g.ask(player, RequestKind::May { source: card, purpose: Purpose::Cast })?, Answer::Yes)
+            && let Some(way) = crate::choose::cast_way(g, player, card, ways)?
+        {
+            g.cast_during_resolution_as(card, CastTerms { instead: Some(ManaCost::ZERO), way: Some(way.way), ..CastTerms::default() })?;
+        }
     }
 
     // What was cast has left exile with its identity; the rest go to the bottom, shuffled among themselves.

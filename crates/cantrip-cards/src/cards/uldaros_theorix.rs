@@ -80,14 +80,9 @@ fn exile_copy_and_cast(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
         let castable: Vec<ObjectId> = found.iter().copied().filter(|&c| !fitting(g, c).is_empty()).collect();
         let chosen = choose::cards_from(g, you, item.object, Purpose::Cast, found.clone(), castable, 1, true)?;
         let Some(&card) = chosen.first() else { return Ok(()) };
-        let ways = fitting(g, card);
         // The face is chosen before the spell is put onto the stack (CR 709.3), asked only when there is a choice.
-        let way = if ways.len() > 1 {
-            let faces = ways.iter().map(|w| Label::Name(w.face)).collect();
-            ways[choose::one_of(g, you, card, faces)? as usize]
-        } else {
-            ways[0]
-        };
+        let ways = fitting(g, card);
+        let Some(way) = choose::cast_way(g, you, card, ways)? else { return Ok(()) };
         let terms = CastTerms { instead: Some(ManaCost::ZERO), copy: true, way: Some(way.way), ..CastTerms::default() };
         // A cast the player gives up is undone (CR 733.1): the copy is not cast and counts for nothing, and they may choose again.
         if g.cast_during_resolution_as(card, terms)? {
