@@ -67,7 +67,7 @@ fn grow_artifact(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.add_counters(artifact, CounterKind::PlusOne, 3);
     if !g.chars(artifact).is(CardType::Creature) {
         g.add_effect(item.object, artifact, EffectKind::AddTypes(TypeSet::of(&[CardType::Creature])), Duration::Indefinite);
-        g.add_effect(item.object, artifact, EffectKind::AddSubtype(Subtype::Robot), Duration::Indefinite);
+        g.add_effect(item.object, artifact, EffectKind::AddSubtype(g.words(item.object).subtype(Subtype::Robot)), Duration::Indefinite);
         g.add_effect(item.object, artifact, EffectKind::SetPt(0, 0), Duration::Indefinite);
     }
     Ok(())
