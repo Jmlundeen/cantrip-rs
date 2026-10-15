@@ -561,7 +561,11 @@ pub fn targeting_rule(cards: &CardTable, state: &GameState, kind: TargetingRuleK
     state.battlefield().iter().any(|&source| {
         let obj = state.obj(source);
         let card = cards.current(obj);
+        // A permanent that has lost all its abilities has no static abilities (CR 613.1f).
+        let lost = !state.effects.is_empty()
+            && state.effects.iter().any(|e| e.affected == source && e.kind == EffectKind::LoseAllAbilities);
         cards.targeting_rules[card.0 as usize]
+            && !lost
             && cards.get(card).targeting_rules.iter().any(|r| r.kind == kind && (r.applies)(&view, source, subject))
     })
 }
