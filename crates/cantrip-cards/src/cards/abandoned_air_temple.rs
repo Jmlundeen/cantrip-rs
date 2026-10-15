@@ -17,11 +17,7 @@ fn enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
 
 /// Put a +1/+1 counter on each creature you control.
 fn counters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let creatures: Vec<ObjectId> =
-        g.permanents_of(item.controller).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
-    for id in creatures {
-        g.add_counters(id, CounterKind::PlusOne, 1);
-    }
+    cantrip_mechanics::effects::counters_on_creatures_you_control(g, item.controller, CounterKind::PlusOne, 1);
     Ok(())
 }
 

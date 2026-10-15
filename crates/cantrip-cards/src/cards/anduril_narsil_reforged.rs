@@ -7,11 +7,7 @@ use cantrip_oracle as oracle;
 fn counters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     let n = if g.state().player(you).citys_blessing { 2 } else { 1 };
-    for id in g.permanents_of(you) {
-        if g.chars(id).is(CardType::Creature) {
-            g.add_counters(id, CounterKind::PlusOne, n);
-        }
-    }
+    cantrip_mechanics::effects::counters_on_creatures_you_control(g, you, CounterKind::PlusOne, n);
     Ok(())
 }
 

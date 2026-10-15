@@ -35,19 +35,15 @@ fn make_illusion(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     cantrip_mechanics::tokens::create(g, item.controller, &ILLUSION, 1).map(|_| ())
 }
 
-/// One of "for each opponent, up to one target artifact or creature that player controls" (CR 115.1, 115.3): a
-/// artifact or creature an opponent controls, when no earlier slot chose one that opponent controls. A slot is one
-/// target each, so there is a slot for each opponent a game can have (up to three) and each is optional; the filter
-/// leaves a slot nothing to choose once every opponent has one.
-fn one_per_opponent(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+/// The slot for one opponent of "for each opponent, up to one target artifact or creature that player controls" (CR 601.2c,
+/// 115.1): an artifact or creature that opponent controls. The core makes a slot of its own for each opponent
+/// (`TargetSpec::EACH_OPPONENT`) and says which one this is.
+fn controlled_by_the_slots_opponent(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     let Target::Object(id) = t else { return false };
-    targets::permanent(q, id)
-        && filters::artifact_or_creature(q, asker, id)
-        && q.controller(id) != asker.controller
-        && !q.chosen_targets().iter().any(|c| matches!(c, Target::Object(e) if q.controller(*e) == q.controller(id)))
+    targets::permanent(q, id) && filters::artifact_or_creature(q, asker, id) && Some(q.controller(id)) == q.slot_opponent()
 }
 
-const UP_TO_ONE: TargetSpec = TargetSpec { min: 0, max: 1, filter: one_per_opponent };
+const FOR_EACH_OPPONENT: TargetSpec = TargetSpec { min: 0, max: TargetSpec::EACH_OPPONENT, filter: controlled_by_the_slots_opponent };
 
 /// "\u{2212}2: For each opponent, return up to one target artifact or creature that player controls to its owner's
 /// hand." The targets still legal are returned together (CR 608.2b).
@@ -63,11 +59,7 @@ fn ultimate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     g.draw(you, 3);
     let x = g.state().zone(Zone::hand(you)).len() as i16;
-    for id in g.permanents_of(you) {
-        if g.chars(id).is(CardType::Creature) {
-            g.add_counters(id, CounterKind::PlusOne, x);
-        }
-    }
+    cantrip_mechanics::effects::counters_on_creatures_you_control(g, you, CounterKind::PlusOne, x);
     Ok(())
 }
 
@@ -91,7 +83,7 @@ pub static CARD: CardDef = CardDef {
             text: "\u{2212}2: For each opponent, return up to one target artifact or creature that player controls to its owner's hand.",
             cost: Cost { loyalty: Some(-2), ..Cost::NONE },
             timing: Timing::Sorcery,
-            targets: &[UP_TO_ONE, UP_TO_ONE, UP_TO_ONE],
+            targets: &[FOR_EACH_OPPONENT],
             effect: bounce,
             ..ActivatedDef::BLANK
         }),
