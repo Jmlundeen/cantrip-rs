@@ -27,7 +27,10 @@ fn word(q: &dyn Query, source: ObjectId, n: u16) -> Subtype {
     q.words(source).subtype(printed)
 }
 
-fn controls_land_type(q: &dyn Query, controller: PlayerId, land_type: Subtype) -> bool {
+/// Whether `controller` controls a permanent with the land type `land_type`, through the layers (CR 305.6, 613). Arena of
+/// Glory, Castle Locthwain and Shifting Woodland's "unless you control a [land type]" and Cori Mountain Monastery's "unless
+/// you control a Plains or an Island" ask it.
+pub fn controls_land_type(q: &dyn Query, controller: PlayerId, land_type: Subtype) -> bool {
     q.state().battlefield().iter().any(|&id| q.controller(id) == controller && q.chars(id).has_subtype(land_type))
 }
 
