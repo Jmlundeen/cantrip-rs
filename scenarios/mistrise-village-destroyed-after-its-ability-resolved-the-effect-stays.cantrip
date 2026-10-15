@@ -1,0 +1,53 @@
+# Bot1 activates Mistrise Village; once the ability has resolved, Bot2 sacrifices Wasteland to destroy the Village (a
+# nonbasic land). The effect is about Bot1, not the land (CR 611.2c): it outlives its source, so the Lightning Bolt Bot1
+# casts afterwards still can't be countered and Bot2's Counterspell fails. Bot2 is at 17.
+
+[Bot1 Deck]
+Forest
+Mox Sapphire
+Mox Ruby
+Mistrise Village
+Lightning Bolt
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Wasteland
+Mox Sapphire
+Mox Sapphire
+Counterspell
+Forest x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot2.Hand.Wasteland.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mistrise Village.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mistrise Village.Activate(Ability: next spell)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+Bot2.Battlefield.Wasteland.Activate(Ability: Destroy; Bot1.Battlefield.Mistrise Village)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield = Forest; Mox Sapphire; Mox Ruby
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Lightning Bolt)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot2.Life = 17
+Bot1.Graveyard = Lightning Bolt; Mistrise Village
+Bot2.Graveyard = Counterspell; Wasteland
