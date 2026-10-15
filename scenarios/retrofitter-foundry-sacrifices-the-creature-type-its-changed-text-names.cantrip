@@ -1,0 +1,49 @@
+# Artificial Evolution changes the text of Retrofitter Foundry, Servo to Goblin (CR 612.1), for good. Its second ability
+# now makes a Goblin token (CR 612.4), and its third ability's cost is "Sacrifice a Goblin": the Goblin token pays it and
+# Bot1 gets the Thopter. A Servo would no longer do.
+
+[Bot1 Deck]
+Retrofitter Foundry
+Artificial Evolution
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Island
+Island x9
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Retrofitter Foundry.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Retrofitter Foundry)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Servo)
+Bot1.Modes(Goblin)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Retrofitter Foundry.Activate(Ability: {2}, {T})
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Goblin.Subtypes = Goblin
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Retrofitter Foundry.Activate(Ability: Thopter artifact creature token with flying; Sacrifice: Goblin)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield.Thopter.Subtypes = Thopter
+Bot1.Battlefield.Count = 6

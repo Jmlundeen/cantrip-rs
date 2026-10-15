@@ -26,12 +26,12 @@ pub static CONSTRUCT: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
-fn is_servo(q: &dyn Query, _: &Asker, id: ObjectId) -> bool {
-    q.chars(id).has_subtype(Subtype::Servo)
+fn is_servo(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
+    q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Servo))
 }
 
-fn is_thopter(q: &dyn Query, _: &Asker, id: ObjectId) -> bool {
-    q.chars(id).has_subtype(Subtype::Thopter)
+fn is_thopter(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
+    q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Thopter))
 }
 
 /// {3}: Untap this artifact.
