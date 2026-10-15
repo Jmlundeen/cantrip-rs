@@ -2,8 +2,8 @@ use cantrip_api::*;
 use cantrip_mechanics::{damage_divided, targets};
 use cantrip_oracle as oracle;
 
-fn red_card(q: &dyn Query, _: &Asker, id: ObjectId) -> bool {
-    q.chars(id).colors.has(Color::Red)
+fn red_card(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
+    q.chars(id).colors.has(q.words(asker.source).color(Color::Red))
 }
 
 /// Pyrokinesis deals 4 damage divided as you choose among any number of target creatures (CR 601.2d): each target takes
