@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::copy::{create_token_copy_of_it, not_a_token};
 use cantrip_mechanics::triggers::this_dies;
 use cantrip_oracle as oracle;
 
@@ -25,17 +26,9 @@ fn gain_and_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// "If it's not a token" (CR 603.4), judged on the creature as it last existed on the battlefield.
-fn not_a_token(q: &dyn Query, asker: &Asker) -> bool {
-    !q.obj(asker.source).token
-}
-
-/// Create a token that's a copy of it (as it last existed, CR 707.2), except it's an artifact in addition to its other
-/// types (CR 707.9b).
+/// Create a token that's a copy of it, except it's an artifact in addition to its other types (CR 707.9b).
 fn create_copy(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let values = g.copiable_values(item.object).with_type(CardType::Artifact);
-    g.create_token_copies_of(values, item.controller, 1)?;
-    Ok(())
+    create_token_copy_of_it(g, item, |_, values| values.with_type(CardType::Artifact))
 }
 
 pub static CARD: CardDef = CardDef {

@@ -50,3 +50,25 @@ pub fn enter_as_copy(
     entry.copy = Some(exception(g, values));
     Ok(())
 }
+
+/// The intervening "if it isn't a token" of "When this creature dies, if it isn't a token, create a token that's a copy
+/// of it" (CR 603.4, 111.7): judged on the creature as it last existed on the battlefield (CR 603.10a). Use as
+/// `TriggeredDef::condition` with `look_back: true`. Sphinx of False Conclusions and Vaultborn Tyrant print it.
+pub fn not_a_token(q: &dyn Query, asker: &Asker) -> bool {
+    !q.obj(asker.source).token
+}
+
+/// "Create a token that's a copy of it" (CR 707.2, 111.1) for the ability's controller: the copiable values of the
+/// ability's object as it last existed, with `exception` applied for the copy's exceptions (CR 707.9b), as
+/// `enter_as_copy` takes them. Sphinx of False Conclusions copies as is; Vaultborn Tyrant's copy is an artifact in
+/// addition to its other types.
+pub fn create_token_copy_of_it(
+    g: &mut dyn Game,
+    item: &StackItem,
+    exception: fn(&dyn Query, Copiable) -> Copiable,
+) -> Result<(), Suspend> {
+    let values = g.copiable_values(item.object);
+    let values = exception(g, values);
+    g.create_token_copies_of(values, item.controller, 1)?;
+    Ok(())
+}
