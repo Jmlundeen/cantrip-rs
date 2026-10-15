@@ -1,0 +1,61 @@
+# Artificial Evolution replaces the creature type Robot with Goblin in Does Machines' text (CR 612.1, indefinitely): at
+# level 3 the artifact that is not a creature becomes a 0/0 Goblin creature in addition to its other types, not a Robot.
+# Level 2 and 3 are gained on turn 3 with a Sol Ring, five other sources and the Islands.
+
+[Bot1 Deck]
+Does Machines
+Artificial Evolution
+Sol Ring
+Island
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Island
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Does Machines.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Choose(Island; Island)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Artificial Evolution.Cast(Does Machines)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Robot)
+Bot1.Modes(Goblin)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Does Machines.Activate(Ability: Level 2)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Does Machines.Activate(Ability: Level 3)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Mox Pearl)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Mox Pearl.Types = Artifact; Creature
+Bot1.Battlefield.Mox Pearl.Subtypes = Goblin
