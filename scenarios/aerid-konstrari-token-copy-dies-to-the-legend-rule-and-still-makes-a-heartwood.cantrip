@@ -1,0 +1,51 @@
+# A token copy of Aerid Konstrari (Three Steps Ahead, {U} and the {3} mode) is legendary too, so the legend rule makes
+# Bot1 keep one (CR 704.5j). Bot1 keeps the original and the token is put into the graveyard: a token that dies (CR 700.4)
+# still triggers its "dies" ability, looked back on as it was on the battlefield (CR 603.10a, 111.7: it ceases to exist
+# afterwards). Heartwoods: the original's enters, the token's enters, and the token's death - three - and nothing
+# of Aerid Konstrari's goes to the graveyard (a token is not a card).
+
+[Bot1 Deck]
+Forest
+Mox Ruby
+Mox Emerald
+Mox Emerald
+Aerid Konstrari
+Mox Sapphire
+Three Steps Ahead
+Forest
+Forest x10
+
+[Bot2 Deck]
+Plains x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Aerid Konstrari.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Three Steps Ahead.Cast
+Bot1.Modes(Create a token)
+Bot1.Target(Aerid Konstrari)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Aerid Konstrari)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Forest; Forest; Mox Ruby; Mox Emerald; Mox Emerald; Mox Sapphire; Aerid Konstrari; Heartwood Token; Heartwood Token; Heartwood Token
+Bot1.Graveyard = Three Steps Ahead

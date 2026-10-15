@@ -1,0 +1,58 @@
+# The +X/+0 of the {6} ability is fixed when the ability resolves (CR 608.2h: information about the game is used once, as
+# the effect is applied, and the continuous effect is a fixed number, CR 611.2c): five artifacts, so Aerid Konstrari is
+# 10/4. In the second main phase Bot2 destroys a Mox Emerald with Disenchant, leaving Bot1 four artifacts, and Aerid Konstrari is
+# still 10/4. The Mox is really gone, so a recount would have given 9.
+
+[Bot1 Deck]
+Forest
+Mox Ruby
+Mox Emerald
+Mox Emerald
+Aerid Konstrari
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Disenchant
+Plains x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Aerid Konstrari.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Heartwood Token.Activate(Color: Green)
+Bot1.Battlefield.Aerid Konstrari.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Aerid Konstrari.Power = 10
+[T3 Bot1.Main2]
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Mox Emerald#1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield = Forest; Forest; Mox Ruby; Mox Emerald; Aerid Konstrari; Heartwood Token; Heartwood Token
+? Bot1.Battlefield.Aerid Konstrari.Power = 10
+
+[Expect]
+Bot1.Battlefield.Aerid Konstrari.Power = 10
+Bot1.Battlefield.Aerid Konstrari.Toughness = 4

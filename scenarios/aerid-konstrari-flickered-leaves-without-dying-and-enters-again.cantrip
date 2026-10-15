@@ -1,0 +1,42 @@
+# Ephemerate exiles Aerid Konstrari and returns it: it left the battlefield but did not die (CR 700.4: only a move to the
+# graveyard is dying), so there is no dies trigger and it never reaches the graveyard, while the returned permanent is a
+# new object (CR 400.7) whose enters trigger makes a second Heartwood. Two tokens, not three; the original is not
+# duplicated either.
+
+[Bot1 Deck]
+Forest
+Mox Ruby
+Mox Emerald
+Mox Emerald
+Aerid Konstrari
+Mox Pearl
+Ephemerate
+Forest x10
+
+[Bot2 Deck]
+Plains x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Aerid Konstrari.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ephemerate.Cast(Aerid Konstrari)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+? Exile = Ephemerate
+
+[Expect]
+Bot1.Battlefield = Forest; Mox Ruby; Mox Emerald; Mox Emerald; Mox Pearl; Aerid Konstrari; Heartwood Token; Heartwood Token
+Bot1.Graveyard.Count = 0

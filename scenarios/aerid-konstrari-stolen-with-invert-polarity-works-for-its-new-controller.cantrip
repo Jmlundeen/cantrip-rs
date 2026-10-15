@@ -1,0 +1,81 @@
+# Control, not ownership: Bot2 casts Aerid Konstrari on turn 2 and Bot1 wins the flip of Invert Polarity (the first coin
+# face is a win), so Bot1 controls it as it enters and its enters trigger makes the Heartwood for Bot1 (CR 603.3a: the
+# controller of the source puts it on the stack and controls it). On turn 3 Bot1's {6} makes a Heartwood for Bot1 and
+# X counts the artifacts Bot1 controls: four Moxen and two Heartwoods is 6, so 11/4 - Bot2's three Moxen are not counted
+# (a count of nine would make it 14/4). On turn 4 Bot2, the owner, kills it with two Lightning Bolts: it goes to Bot2's
+# graveyard but the dies trigger is controlled by the controller it had on the battlefield (CR 603.10a, 400.7), Bot1,
+# whose third Heartwood arrives. Bot2 never gets one.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Ruby
+Invert Polarity
+Mox Jet
+Mox Pearl
+Mountain
+Island x13
+
+[Bot2 Deck]
+Forest
+Mox Ruby
+Mox Emerald
+Mox Emerald
+Aerid Konstrari
+Lightning Bolt
+Lightning Bolt
+Mountain
+Island x12
+
+[Dice]
+1
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Aerid Konstrari.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Invert Polarity.Cast(Aerid Konstrari)
+[T2 Bot2.Main2]
+? Bot1.Battlefield = Island; Mox Sapphire; Mox Ruby; Mox Jet; Mox Pearl; Aerid Konstrari; Heartwood Token
+? Bot2.Battlefield = Forest; Mox Ruby; Mox Emerald; Mox Emerald
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Heartwood Token.Activate(Color: Red)
+Bot1.Battlefield.Aerid Konstrari.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Aerid Konstrari.Power = 11
+? Bot1.Battlefield = Island; Mountain; Mox Sapphire; Mox Ruby; Mox Jet; Mox Pearl; Aerid Konstrari; Heartwood Token; Heartwood Token
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Aerid Konstrari)
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Aerid Konstrari)
+[T4 Bot2.Main2]
+? Bot2.Graveyard = Aerid Konstrari; Lightning Bolt; Lightning Bolt
+
+[Expect]
+Bot1.Battlefield = Island; Mountain; Mox Sapphire; Mox Ruby; Mox Jet; Mox Pearl; Heartwood Token; Heartwood Token; Heartwood Token
+Bot2.Battlefield = Forest; Mountain; Mox Ruby; Mox Emerald; Mox Emerald
+Bot2.Graveyard = Aerid Konstrari; Lightning Bolt; Lightning Bolt

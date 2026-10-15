@@ -1,0 +1,61 @@
+# Two activations of the {6} ability are two +X/+0 effects that add up (CR 611.2, 613.4c). On turn 5 Bot1 controls
+# five Moxen, the enters Heartwood and a Black Lotus. The first activation (two Forests, three Moxen, the Heartwood) resolves with the
+# Lotus still there: Moxen x5, Heartwood, Lotus and the new Heartwood is 8 artifacts, so Aerid Konstrari is 13/4. The second (the
+# other two Moxen, the Lotus's three mana sacrificed as part of paying, and the new Heartwood) counts the first
+# activation's token and not the sacrificed Lotus: the five Moxen and three Heartwoods is 8 again, so 21/4.
+
+[Bot1 Deck]
+Forest
+Mox Ruby
+Mox Emerald
+Mox Emerald
+Aerid Konstrari
+Mox Jet
+Mox Pearl
+Forest
+Black Lotus
+Forest x10
+
+[Bot2 Deck]
+Plains x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Aerid Konstrari.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Heartwood Token.Activate(Color: Red)
+Bot1.Battlefield.Aerid Konstrari.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Aerid Konstrari.Power = 13
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Heartwood Token#2.Activate(Color: Green)
+Bot1.Battlefield.Aerid Konstrari.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Aerid Konstrari.Power = 21
+
+[Expect]
+Bot1.Battlefield.Aerid Konstrari.Power = 21
+Bot1.Battlefield.Aerid Konstrari.Toughness = 4
