@@ -1,0 +1,46 @@
+# Twinned Vision flashed back (CR 702.34a) for {1}{U/R}{U/R} plus discarding a card: it was not cast from the hand, so it draws
+# two cards instead of one, then is exiled. T1: hand cast with Moxen (draws one). T3: all three Moxen pay ({1} from Mox Jet,
+# {U/R}{U/R} from Ruby and Sapphire), a Plains is discarded as the additional cost (CR 118.8), two cards are drawn.
+# Hand: opening 7, T1 casts 4 cards (3) and draws 1 (4); T3 draws for the turn (5), discards Plains (4) and draws two (6).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Sapphire
+Mox Jet
+Twinned Vision
+Plains
+Forest
+Forest
+Forest
+Swamp
+Island
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Twinned Vision.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Graveyard.Twinned Vision.Cast(Ability: Flashback)
+Bot1.Choose(Plains)
+! Bot1.Graveyard.Twinned Vision.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Twinned Vision
+Bot1.Graveyard = Plains
+Bot1.Hand.Count = 6

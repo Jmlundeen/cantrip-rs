@@ -1,0 +1,30 @@
+# Twinned Vision cast from hand draws one card (the "wasn't cast from your hand" clause is false). Mox Ruby and Mox Sapphire
+# pay {1}{U/R}; it goes to the graveyard. Hand: 7 - 3 played/cast + 1 drawn = 5.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Sapphire
+Twinned Vision
+Forest
+Forest
+Forest
+Forest
+Plains
+Plains
+Island x10
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Twinned Vision.Cast
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 5
+Bot1.Graveyard = Twinned Vision
+Bot1.Hand = Forest; Forest; Forest; Forest; Plains
