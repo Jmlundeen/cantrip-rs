@@ -19,7 +19,7 @@ fn reanimate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(card) = targets::object(g, item, 0) else { return Ok(()) };
     let entered = g.put_onto_battlefield(card, item.controller, false)?;
     if g.obj(entered).zone.is(ZoneKind::Battlefield) {
-        g.add_effect(item.object, entered, EffectKind::AddSubtype(Subtype::Phyrexian), Duration::Indefinite);
+        g.add_effect(item.object, entered, EffectKind::AddSubtype(g.words(item.object).subtype(Subtype::Phyrexian)), Duration::Indefinite);
     }
     Ok(())
 }

@@ -1,0 +1,50 @@
+# Artificial Evolution changes the text of Portal to Phyrexia on the battlefield, Phyrexian to Goblin (CR 612.1), and for
+# good: at the next upkeep it puts Bot2's discarded Llanowar Elves onto the battlefield as a Goblin in addition to its
+# other types, not a Phyrexian.
+
+[Bot1 Deck]
+Portal to Phyrexia
+Ancient Tomb
+Sol Ring
+Black Lotus
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Artificial Evolution
+Island x9
+
+[Bot2 Deck]
+Island x8
+Llanowar Elves
+Island x7
+
+[Actions]
+Bot1.Hand.Ancient Tomb.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Ancient Tomb.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Portal to Phyrexia.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Portal to Phyrexia)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Phyrexian)
+Bot1.Modes(Goblin)
+Bot2.Discard(Llanowar Elves)
+[T5 Bot1.Main1]
+
+[Expect]
+Turn = 5
+Bot2.Graveyard.Count = 1
+Bot1.Battlefield.Llanowar Elves.Subtypes = Druid; Elf; Goblin
