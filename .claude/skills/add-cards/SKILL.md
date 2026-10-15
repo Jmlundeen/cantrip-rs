@@ -1,6 +1,6 @@
 ---
 name: add-cards
-description: Add one or more Magic cards to the Cantrip rules engine - each card exact to its Oracle text and the Comprehensive Rules, built from the engine's shared rules verbs and keyword mechanics, with scenarios that execute every line of its code and cover its corner cases and interactions - and, for many cards, run them through parallel agents and land their work. Use whenever a card is added, implemented or fixed, by anyone.
+description: Add one or more Magic cards to the Cantrip rules engine - each card exact to its Oracle text and the Comprehensive Rules, built from the engine's shared rules verbs and keyword mechanics, with scenarios that execute every line of its code and cover its corner cases and interactions, playable end to end in the web client and by the bots - and, for many cards, run them through parallel agents and land their work. Use whenever a card is added, implemented or fixed, by anyone.
 ---
 
 # Adding cards
@@ -24,6 +24,15 @@ CLAUDE.md is the repository's rules. The `write-game-script` skill is the scenar
    card's corner cases and its interactions with the rest of the game. Measured, not claimed
    (`tools\card-coverage.cmd`).
 4. **An independent review against the Oracle text and the rules** before it lands.
+5. **The card works end to end, in the client.** A card is done when a person at a table in the web client can play
+   it: see everything the card puts into the game (a state on an object - doors, a chosen name or type, counters of a
+   new kind, a face, a designation; a revealed card; a new zone or pile), make every choice it asks with wording that
+   says what the choice does, and take every action it offers (an activated ability, a special action, an alternative
+   cost, an optional cost) with its cost shown. The bots that sit in a seat - the tactical bot
+   (`dotnet/src/Cantrip.Client/Tactics`), the draft bot where it reads cards, and the language-model client - answer
+   its questions sensibly, never by a reading of a question meant for something else (a "choose a creature to
+   blight" read as "choose one to keep" blights the best creature). If the engine side works and the client cannot show
+   or offer it, the card is not done.
 
 ## Where code goes
 
@@ -121,14 +130,32 @@ calling, means it was not the same thing. Leave that in its own card.
    (it runs the card's scenarios under `cargo-llvm-cov`; install it once with `rustup component add
    llvm-tools-preview` and `cargo install cargo-llvm-cov --locked`).
    A line no scenario can reach is wrong code or a missing scenario, never an exception.
-8. **Verify:** plain `cargo run --profile cards -p cantrip-script --bin corpus` shows `0 fail` and no fewer passing
+8. **The client.** Ask what a player needs from the client to play this card, and check each against what the client
+   already presents (`docs/web-client.md`; `crates/cantrip-host` builds the views, prompts and actions the client
+   draws; `dotnet/src/Cantrip.Client.Presentation` and `Cantrip.Client.Web` draw them):
+   - **State:** anything new on an object, a player or a zone reaches the host view (`crates/cantrip-host/src/view.rs`)
+     and is drawn - legibly, at table size, for both the owner and the opponent as the rules allow them to see it.
+   - **Questions:** every `g.ask(..)` the card makes has a prompt the client shows with wording true to what the choice
+     does. A new `Purpose` or `RequestKind` gets its own view and caption; never map it onto an existing one that means
+     something else.
+   - **Actions:** every ability, special action and cost the card offers is clickable, with its cost and what it
+     does shown, and distinguishable from the card's other actions.
+   - **Bots:** the tactical bot and the language-model client handle every new question and action on purpose.
+   A card that only uses what the client already shows and asks needs no client change - the review confirms it. Any
+   card that needs one makes the change in the same work, and proves it with a browser scenario: `# Browser` at the
+   top and `? Client.` checks of what the page shows (`docs/scenarios-in-the-browser.md`), run with
+   `tools\test.cmd /filter "ScenarioInBrowser"` (or `tools\scenario-in-browser.cmd name` to watch). If the browser
+   driver cannot click its way through the new prompt or action, extend `ScenarioPlayer`/`TablePage` - the same rule as
+   the harness: never drop the check to fit the driver. A protocol change bumps the version and passes the wire-shape
+   test, in the same commit as the change.
+9. **Verify:** plain `cargo run --profile cards -p cantrip-script --bin corpus` shows `0 fail` and no fewer passing
    than before; `set CANTRIP_VERIFY=1 & cargo test --profile cards --workspace` is green; if the core or mechanics
-   changed, the benchmark and `tools\test.cmd`; wall-clock tests only when the change touches what they cover
-   (CLAUDE.md).
-9. **Review** (below), then commit: `Card: <Name>` - the content JSON, the card file and its scenarios - one card per
-    commit; core and mechanics changes in their own commits before it (`Engine: ...`, `Mechanics: ...`). Commit and
-    push as CLAUDE.md says; a contributor without push access opens a pull request with the coverage report and
-    the review in its description.
+   changed, the benchmark and `tools\test.cmd`; if the client, the host or the protocol changed, `tools\test.cmd /noweb`
+   and the card's browser scenarios; other wall-clock tests only when the change touches what they cover (CLAUDE.md).
+10. **Review** (below), then commit: `Card: <Name>` - the content JSON, the card file and its scenarios - one card per
+    commit; core, mechanics and client changes in their own commits before it (`Engine: ...`, `Mechanics: ...`,
+    `Client: ...`). Commit and push as CLAUDE.md says; a contributor without push access opens a pull request with the
+    coverage report and the review in its description.
 
 ## Scenarios: what a card owes
 
@@ -195,7 +222,10 @@ reads it with the Oracle text, the rulings and the CR open:
 - the scenarios against "what a card owes", the coverage report and the branch list;
 - any core or mechanics change against its rule, its second card (a non-keyword recipe) and the benchmark;
 - overlap: code in the card that an existing shared function already does, or that does the same as code in another
-  card, which should have been shared.
+  card, which should have been shared;
+- the client: everything the card puts into the game is shown, every question it asks has a true caption, every
+  action it offers is clickable with its cost, the bots answer its questions on purpose, and a browser scenario proves
+  whatever the client had to learn - or the reviewer confirms the card needs nothing the client did not already do.
 
 The reviewer changes nothing silently: each finding is fixed by the author or recorded as the reason the card does not
 land. Self-reported "exact" is not proof.
@@ -208,8 +238,10 @@ The coordinator dispatches, lands and keeps the queue; it does not implement car
 2. **One agent per batch**, in its own worktree, in the background. Its prompt: this skill's loop for each card (the
    list inline); the core is closed to it unless the prompt opens it, though a missing keyword module may be added in
    `cantrip-mechanics`; a card blocked by the core is skipped with its exact gap (the rule, and what `cantrip-api`
-   lacks), never faked; one commit per card; at the end `git rebase main`, the corpus and the verify tests; no push;
-   a report of implemented cards with their coverage, skipped cards with their gaps, and anything odd found in the core.
+   lacks), never faked; the client work a card needs (step 8) is part of the card, not a follow-up; one commit per
+   card; at the end `git rebase main`, the corpus and the verify tests; no push; a report of implemented cards with
+   their coverage and what each needed from the client, skipped cards with their gaps, and anything odd found in the
+   core. Browser tests are heavy: one agent at a time runs them, so an agent runs only its own cards' browser scenarios.
 3. **Gaps** that several skipped cards share become a core-feature agent: the core open to it, each feature built to
    its rule, the waiting cards implemented, the benchmark run. Feature agents work on separate rules areas; running agents
    are told what landed so they rebase.
