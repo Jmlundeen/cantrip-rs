@@ -1,0 +1,48 @@
+# Known bug: a copy cast from Uldaros Theorix is always cast as the card itself (cast_during_resolution, way 0), so the Adventure half
+# of an Adventurer cannot be chosen (CR 715.3a, 715.4); the rules let a player cast either the creature or its Adventure.
+# Uldaros Theorix and an Adventurer (CR 715): Bot1 exiles Bonecrusher Giant (a creature card, mana value 3 as the creature, Stomp is
+# 2 as the Adventure) and casts the copy as Stomp, which deals 2 damage to Bot2; the copy is not put on an adventure (it ceases to
+# exist, CR 707.10a), and no Giant token appears.
+
+[Bot1 Deck]
+Swamp
+Dark Ritual
+Entomb
+Black Lotus
+Uldaros Theorix
+Swamp
+Swamp
+Bonecrusher Giant
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Bonecrusher Giant)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Uldaros Theorix.Cast
+Bot1.Target(Black Lotus)
+Bot1.Target(Bonecrusher Giant)
+Bot1.Choose(Bonecrusher Giant; Ability: Adventure)
+Bot1.Target(Bot2)
+Bot1.Choose()
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield = Swamp; Swamp; Swamp; Uldaros Theorix
+Exile = Black Lotus; Bonecrusher Giant
+Stack.Count = 0

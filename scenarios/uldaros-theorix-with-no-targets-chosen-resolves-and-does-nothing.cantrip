@@ -1,0 +1,40 @@
+# Uldaros Theorix: every slot is "up to one", so the ability may be put on the stack with no target at all (CR 115.6, 601.2c)
+# and then resolves doing nothing. Bot1's graveyard holds Dark Ritual and the sacrificed Black Lotus, both candidates; Bot1
+# chooses none. Nothing is exiled, no copy is offered (the refusal), and both cards stay in the graveyard.
+
+[Bot1 Deck]
+Swamp
+Dark Ritual
+Black Lotus
+Uldaros Theorix
+Swamp
+Swamp
+Swamp
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Dark Ritual.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Uldaros Theorix.Cast
+Bot1.Target()
+! Bot1.Choose
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Swamp; Swamp; Swamp; Uldaros Theorix
+Bot1.Graveyard = Black Lotus; Dark Ritual
+Exile.Count = 0
+Stack.Count = 0

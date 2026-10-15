@@ -1,0 +1,50 @@
+# Known bug: a token made as a cast copy of a permanent spell enters with ZoneChange{old: new, reason: Created}, naming no spell, so "if you cast it" (history cast_of(old)) is false for it (CR 707.12, 707.10f).
+# Uldaros Theorix: a copy of a card that is cast is a cast spell (CR 707.12), and when the copy of a permanent spell resolves it
+# becomes a token (CR 707.10f) - so "if you cast him" holds for that token and its enters ability triggers. Bot1 Entombs a
+# second Uldaros on turn 1 and, on turn 5, casts the first with Black Lotus: his ability exiles the Uldaros in the graveyard
+# (a creature) and the sacrificed Lotus (an artifact), and Bot1 casts a copy of the Uldaros for 6. The token Uldaros enters and
+# its own ability triggers: it exiles Dark Ritual (the one card left that fits a type) and casts a copy of it.
+
+[Bot1 Deck]
+Swamp
+Dark Ritual
+Entomb
+Black Lotus
+Uldaros Theorix
+Swamp
+Swamp
+Uldaros Theorix
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Uldaros Theorix)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Uldaros Theorix.Cast
+Bot1.Target(Black Lotus)
+Bot1.Target(Bot1.Graveyard.Uldaros Theorix)
+Bot1.Choose(Uldaros Theorix)
+Bot1.Target(Dark Ritual)
+Bot1.Choose(Dark Ritual)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Swamp; Swamp; Swamp; Uldaros Theorix; Uldaros Theorix
+Bot1.Battlefield.Uldaros Theorix#1.Token = (absent)
+Bot1.Battlefield.Uldaros Theorix#2.Token = true
+Exile = Black Lotus; Dark Ritual; Uldaros Theorix
+Stack.Count = 0

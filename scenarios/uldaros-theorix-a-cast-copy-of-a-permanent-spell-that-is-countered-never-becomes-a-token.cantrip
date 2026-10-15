@@ -1,0 +1,56 @@
+# Uldaros Theorix: the copy he casts is a spell, and it can be countered. Bot1 Entombs The Theorist, Jace Beleren, then exiles it
+# with Black Lotus, and casts a copy of Jace; Bot2 counters that spell with Counterspell. A copy of a card that leaves the stack
+# ceases to exist (CR 707.10a): no token Jace, and no card in the graveyard; the exiled Jace stays in exile.
+
+[Bot1 Deck]
+Swamp
+Dark Ritual
+Entomb
+Black Lotus
+Uldaros Theorix
+Swamp
+Swamp
+The Theorist, Jace Beleren
+Swamp x12
+
+[Bot2 Deck]
+Island
+Island
+Counterspell
+Island x4
+Island x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Hand.Entomb.Cast
+Bot1.Search(The Theorist, Jace Beleren)
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Uldaros Theorix.Cast
+Bot1.Target(Black Lotus)
+Bot1.Target(The Theorist, Jace Beleren)
+Bot1.Choose(The Theorist, Jace Beleren)
+Bot1.Choose()
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Counterspell.Cast(Stack.The Theorist, Jace Beleren)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Swamp; Swamp; Swamp; Uldaros Theorix
+Exile = Black Lotus; The Theorist, Jace Beleren
+Bot1.Graveyard = Entomb; Dark Ritual
+Bot2.Graveyard = Counterspell
+Stack.Count = 0

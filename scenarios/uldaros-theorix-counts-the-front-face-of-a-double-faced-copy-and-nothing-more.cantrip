@@ -1,0 +1,53 @@
+# Uldaros Theorix and a double-faced card (CR 712.8a, 712.11): a double-faced card in exile has the characteristics of its front face
+# only, so Aang, Swift Savior (a creature, mana value 3) counts 3 towards the six and is cast, front face up, as a copy that
+# becomes a token. Bot1 exiles Aang, The Theorist, Jace Beleren (4) and the sacrificed Black Lotus (0): after Aang, 3 is left, so
+# Jace is not castable and is not offered, but the Lotus is. (This engine has no modal double-faced card among its cards: this is the
+# transforming one, whose back face cannot be cast.)
+
+[Bot1 Deck]
+Swamp
+Dark Ritual
+Entomb
+Entomb
+Black Lotus
+Uldaros Theorix
+Swamp
+Aang, Swift Savior
+The Theorist, Jace Beleren
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Aang, Swift Savior)
+Bot1.Hand.Entomb.Cast
+Bot1.Search(The Theorist, Jace Beleren)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Uldaros Theorix.Cast
+Bot1.Target(Black Lotus)
+Bot1.Target(Aang, Swift Savior)
+Bot1.Target(The Theorist, Jace Beleren)
+Bot1.Choose(Aang, Swift Savior)
+Bot1.Choose(Black Lotus)
+! Bot1.Choose
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Aang, Swift Savior; Black Lotus; Swamp; Swamp; Swamp; Uldaros Theorix
+Bot1.Battlefield.Aang, Swift Savior.Token = true
+Bot1.Battlefield.Aang, Swift Savior.Power = 2
+Exile = Aang, Swift Savior; Black Lotus; The Theorist, Jace Beleren
+Stack.Count = 0

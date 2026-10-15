@@ -75,7 +75,7 @@ fn exile_copy_and_cast(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
         let castable: Vec<ObjectId> = found
             .iter()
             .copied()
-            .filter(|&c| is_live(g, c) && g.obj(c).zone.is(ZoneKind::Exile) && g.mana_value(c) <= left && g.could_cast_during_resolution(c))
+            .filter(|&c| g.mana_value(c) <= left && g.could_cast_during_resolution(c))
             .collect();
         let chosen = choose::cards_from(g, you, item.object, Purpose::Cast, found.clone(), castable, 1, true)?;
         let Some(&card) = chosen.first() else { return Ok(()) };
@@ -91,7 +91,7 @@ fn exile_copy_and_cast(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
 
 pub static CARD: CardDef = CardDef {
     abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When Uldaros Theorix enters, if you cast him, exile up to one target nonland card of each card type from your graveyard. Copy those cards. You may cast any number of spells with total mana value 6 or less from among the copies without paying their mana costs.",
+        text: "When Uldaros Theorix enters, if you cast him, exile up to one target nonland card of each card type from your graveyard. Copy those cards. You may cast any number of spells with total mana value 6 or less from among the copies without paying their mana costs. (Permanent spells cast this way become tokens.)",
         listens: EventMask::ZONE_CHANGE,
         matches: this_enters_if_cast,
         targets: &SLOTS,

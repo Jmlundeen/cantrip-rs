@@ -1,5 +1,5 @@
 # Known bug: a token copy of an Aura spell is attached only to a target on the battlefield (ops::attach), so the token Animate Dead
-# a copy resolves into is not attached to the creature card in the graveyard it targeted (CR 707.10f, 303.4f) and is put away at once.
+# a copy resolves into is not attached to the creature card in the graveyard it targeted (CR 707.10f, 608.3b, 303.4a) and is put away at once.
 # Uldaros Theorix exiles Animate Dead and Black Lotus from Bot1's graveyard; an Ornithopter (a creature card) is also in the
 # graveyard, left alone: the Animate Dead copy has a legal target, is offered, and is cast, choosing the Ornithopter card as
 # its target (CR 303.4). The Aura spell copy resolves into a token Animate Dead (CR 707.10f) and the Ornithopter comes

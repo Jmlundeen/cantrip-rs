@@ -1,0 +1,41 @@
+# Uldaros Theorix: "You may cast any number of spells" - including none of the ones still castable. Bot1 exiles Black Lotus and
+# Dark Ritual, casts a copy of the Ritual, and then declines the Lotus, which at mana value 0 is still castable (the question
+# is asked: the Lotus is in it). Nothing more is cast: the Lotus stays in exile and no token Lotus appears.
+
+[Bot1 Deck]
+Swamp
+Dark Ritual
+Black Lotus
+Uldaros Theorix
+Swamp
+Swamp
+Swamp
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Dark Ritual.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Uldaros Theorix.Cast
+Bot1.Target(Black Lotus)
+Bot1.Target(Dark Ritual)
+Bot1.Choose(Dark Ritual)
+Bot1.Choose()
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Swamp; Swamp; Swamp; Uldaros Theorix
+Exile = Black Lotus; Dark Ritual
+Stack.Count = 0
