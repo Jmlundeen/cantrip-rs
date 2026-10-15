@@ -56,21 +56,25 @@ pub struct Session {
 }
 
 /// A mana ability a player may take back: where the game was before it, and what was told of it since. Taking it back
-/// is a courtesy of the table, not a rule, so it is offered only while the activation did nothing but tap, add mana
-/// and cost life, and nothing has happened since but more of the same: never past a trigger, a card seen or another
-/// player's answer.
+/// is a courtesy of the table, not a rule, so it is offered only while the activation did nothing but tap, sacrifice,
+/// add mana and cost life, and nothing has happened since but more of the same: never past a trigger, a card seen or
+/// another player's answer. A Black Lotus is taken back; a Lion's Eye Diamond, whose cost shows the hand, never is.
 struct Undoable {
     player: PlayerId,
     /// The permanent whose ability it was, which the client shows the undo on.
     source: ObjectId,
     node: NodeId,
     tracker: Tracker,
+    /// Each seat's handles: a sacrificed permanent's handle moved to the card in the graveyard, which taking it back
+    /// unmakes.
+    handles: Vec<HandleSpace>,
     published: usize,
     /// The sequences of the entries told of it.
     told: std::ops::Range<u64>,
 }
 
-/// The source of a mana ability `answer` activates (CR 605.1a), if it activates one.
+/// The source of a mana ability `answer` activates (CR 605.1a), if it activates one that could be taken back: not one
+/// whose cost discards, which shows what was in the hand.
 fn mana_activation(game: &Game, answer: &Answer) -> Option<ObjectId> {
     let Answer::Act(action) = answer else { return None };
     let source = action.source.filter(|_| action.kind == ActionKind::ActivateAbility)?;
@@ -78,12 +82,14 @@ fn mana_activation(game: &Game, answer: &Answer) -> Option<ObjectId> {
         return Some(source);
     }
     match game.chars(source).abilities().nth(action.index as usize).map(|a| game.cards.ability(a)) {
-        Some(AbilityDef::Activated(d)) if d.mana.is_some() => Some(source),
+        Some(AbilityDef::Activated(d)) if d.mana.is_some() && !d.cost.discard_hand && !d.cost.discard_self && d.cost.discard.is_none() => {
+            Some(source)
+        }
         _ => None,
     }
 }
 
-/// Whether these entries are only what a mana ability does: taps, mana, and life paid or lost for it.
+/// Whether these entries are only what a mana ability does: taps, sacrifices, mana, and life paid or lost for it.
 fn only_mana(records: &[Record]) -> bool {
     records.iter().all(|r| {
         matches!(
@@ -94,7 +100,8 @@ fn only_mana(records: &[Record]) -> bool {
                 | Event::AbilityActivated { .. }
                 | Event::Resolved { .. }
                 | Event::Damage { target: Target::Player(_), .. }
-        )
+                | Event::ZoneChange { reason: ZoneReason::Sacrifice, .. }
+        ) && !matches!(r.event, Event::ZoneChange { from, .. } if from.kind() != ZoneKind::Battlefield)
     })
 }
 
@@ -296,6 +303,8 @@ impl Session {
         })?;
 
         let mana = mana_activation(&self.game, &answer);
+        let (triggers, stack) = (self.game.state.triggers.len(), self.game.state.stack.len());
+        let before_handles = if mana.is_some() { self.handles.clone() } else { Vec::new() };
         let (node, log_from) = (self.game.checkpoint(), self.game.log.len());
         let before = self.game.clone();
         let outcome = std::panic::catch_unwind(AssertUnwindSafe(|| self.game.answer(request.id, request.player, answer.clone())));
@@ -312,13 +321,21 @@ impl Session {
             next.player == request.player && matches!(next.kind, RequestKind::Priority { .. } | RequestKind::PayCosts { .. })
         });
         match mana {
-            Some(source) if asks_again && only_mana(&self.game.log[log_from..]) => {
+            // A trigger is something the ability did (Chromatic Star's draw), waiting or on the stack, even before anyone
+            // has seen what it does.
+            Some(source)
+                if asks_again
+                    && only_mana(&self.game.log[log_from..])
+                    && self.game.state.triggers.len() <= triggers
+                    && self.game.state.stack.len() <= stack =>
+            {
                 let first = self.sequence + 1 + self.told.len() as u64;
                 self.undoable.push(Undoable {
                     player: request.player,
                     source,
                     node,
                     tracker: self.tracker.clone(),
+                    handles: before_handles,
                     published: self.published,
                     told: first..first,
                 });
@@ -355,6 +372,9 @@ impl Session {
         let undo = self.undoable.pop().expect("checked");
         self.game.goto(undo.node);
         self.tracker = undo.tracker;
+        for (space, earlier) in self.handles.iter_mut().zip(undo.handles) {
+            space.restore(earlier);
+        }
         self.published = undo.published;
         if !undo.told.is_empty() {
             self.told.push(Proto::Retracted { sequences: undo.told.collect() });
@@ -516,6 +536,133 @@ mod tests {
             };
         }
         panic!("Llanowar Elves was never paid for");
+    }
+
+    /// Plays on until seat 1 may activate a mana ability of the permanent named `name` with priority, activates it for
+    /// green, and returns that option and the step after it.
+    fn activate_mana_of(session: &mut Session, name: &str) -> (ActionOptionMessage, Value) {
+        let mut step = session.step();
+        let mut allow_cast = true;
+        for _ in 0..2_000 {
+            let r = &step["Requests"][0];
+            assert!(!r.is_null(), "{name}'s mana ability was never offered before the game ended");
+            let prompt: PromptPayload = serde_json::from_value(r["Prompt"].clone()).unwrap();
+            let (id, seat) = (r["RequestId"].as_u64().unwrap() as u32, r["Seat"].as_i64().unwrap() as i32);
+            let named = |h: ViewHandle| step["Views"]["1"]["Objects"].as_array().unwrap().iter().any(|o| o["Handle"] == json!(h) && o["Name"] == name);
+            if seat == 1
+                && let PromptPayload::PriorityPromptMessage(p) = &prompt
+                && let Some(mana) = p.options.iter().find(|o| AutoMana::is(o) && named(o.source))
+            {
+                let mut answer = TakeActionAnswer::take(mana);
+                answer.color = mana.color_choices.contains(&ColorView::Green).then_some(ColorView::Green);
+                let after = session.answer(id, seat, &AnswerPayload::TakeActionAnswer(answer)).ok().unwrap();
+                return (mana.clone(), after);
+            }
+            let answer = match &prompt {
+                PromptPayload::MayPromptMessage(_) if seat == 1 => AnswerPayload::MayChosenAnswer(MayChosenAnswer { accept: true }),
+                _ => choose(&prompt, &mut allow_cast),
+            };
+            step = match session.answer(id, seat, &answer) {
+                Ok(step) => step,
+                Err(_) => session.answer(id, seat, &prompt.default_answer()).ok().expect("the default answer is taken"),
+            };
+        }
+        panic!("{name}'s mana ability was never offered");
+    }
+
+    struct AutoMana;
+    impl AutoMana {
+        fn is(o: &ActionOptionMessage) -> bool {
+            o.kind == ActionKindView::ActivateAbility && (!o.produces.is_empty() || o.produces_of_any_one_color > 0)
+        }
+    }
+
+    /// Activates `name`'s mana ability and takes it back: offered, its green gone after, and the permanent on the
+    /// battlefield under the handle it had, its ability offered again.
+    fn takes_back(top: &[&str], filler: &str, name: &str) {
+        let mut session = Session::new(deal(top, filler, 20 - top.len())).ok().unwrap();
+        let (used, after) = activate_mana_of(&mut session, name);
+        assert_eq!(green_in_pool(&after), 1, "{name}: its mana is in the pool");
+        let undo = options_of(&after).into_iter().find(|o| o.kind == ActionKindView::UndoManaAbility).unwrap_or_else(|| panic!("{name}: Undo is offered"));
+        assert_eq!(undo.source, used.source, "{name}: on it");
+
+        let r = &after["Requests"][0];
+        let (id, seat) = (r["RequestId"].as_u64().unwrap() as u32, r["Seat"].as_i64().unwrap() as i32);
+        let undone = session.answer(id, seat, &AnswerPayload::TakeActionAnswer(TakeActionAnswer::take(&undo))).ok().unwrap();
+        assert_eq!(green_in_pool(&undone), 0, "{name}: its mana is gone");
+        assert_eq!(zone_of(&undone, used.source), json!("Battlefield"), "{name}: back, under the handle it had");
+        assert!(options_of(&undone).iter().any(|o| o.source == used.source && AutoMana::is(o)), "{name}: and can be used again");
+        assert!(!options_of(&undone).iter().any(|o| o.kind == ActionKindView::UndoManaAbility), "{name}: nothing more to take back");
+    }
+
+    #[test]
+    fn sacrificed_and_spent_mana_artifacts_are_taken_back() {
+        takes_back(&["Lotus Petal"], "Forest", "Lotus Petal");
+        takes_back(&["Pentad Prism"], "Forest", "Pentad Prism");
+        // Generous Plunderer makes the Treasure in its controller's upkeep.
+        takes_back(&["Generous Plunderer"], "Mountain", "Treasure Token");
+    }
+
+    /// Chromatic Star is not taken back: going to the graveyard, it draws a card.
+    #[test]
+    fn chromatic_star_is_not_taken_back() {
+        let mut session = Session::new(deal(&["Chromatic Star"], "Forest", 19)).ok().unwrap();
+        let (_, mut step) = activate_mana_of(&mut session, "Chromatic Star");
+        // Its {1} is paid with a Forest; until then nothing has happened, and the activation may be taken back.
+        let mut allow_cast = false;
+        loop {
+            let r = &step["Requests"][0];
+            let prompt: PromptPayload = serde_json::from_value(r["Prompt"].clone()).unwrap();
+            if !matches!(prompt, PromptPayload::PayCostsPromptMessage(_)) {
+                break;
+            }
+            let (id, seat) = (r["RequestId"].as_u64().unwrap() as u32, r["Seat"].as_i64().unwrap() as i32);
+            step = session.answer(id, seat, &choose(&prompt, &mut allow_cast)).ok().unwrap();
+        }
+        assert_eq!(green_in_pool(&step), 1, "the Star's mana");
+        assert!(!options_of(&step).iter().any(|o| o.kind == ActionKindView::UndoManaAbility), "no Undo");
+    }
+
+    fn options_of(step: &Value) -> Vec<ActionOptionMessage> {
+        match serde_json::from_value::<PromptPayload>(step["Requests"][0]["Prompt"].clone()).unwrap() {
+            PromptPayload::PriorityPromptMessage(p) => p.options,
+            PromptPayload::PayCostsPromptMessage(p) => p.options,
+            _ => Vec::new(),
+        }
+    }
+
+    fn zone_of(step: &Value, handle: ViewHandle) -> Value {
+        step["Views"]["1"]["Objects"].as_array().unwrap().iter().find(|o| o["Handle"] == json!(handle)).map_or(Value::Null, |o| o["Zone"].clone())
+    }
+
+    fn green_in_pool(step: &Value) -> i64 {
+        step["Views"]["1"]["Players"].as_array().unwrap().iter().map(|p| p["Mana"][4].as_i64().unwrap()).sum()
+    }
+
+    /// Black Lotus is taken back: sacrificed, it is on the battlefield again under the handle it had, its mana gone.
+    #[test]
+    fn a_sacrificed_black_lotus_is_taken_back() {
+        let mut session = Session::new(deal(&["Black Lotus"], "Forest", 19)).ok().unwrap();
+        let (lotus, after) = activate_mana_of(&mut session, "Black Lotus");
+        assert_eq!(green_in_pool(&after), 3);
+        assert_ne!(zone_of(&after, lotus.source), json!("Battlefield"), "sacrificed");
+        let undo = options_of(&after).into_iter().find(|o| o.kind == ActionKindView::UndoManaAbility).expect("Undo is offered");
+
+        let r = &after["Requests"][0];
+        let (id, seat) = (r["RequestId"].as_u64().unwrap() as u32, r["Seat"].as_i64().unwrap() as i32);
+        let undone = session.answer(id, seat, &AnswerPayload::TakeActionAnswer(TakeActionAnswer::take(&undo))).ok().unwrap();
+        assert_eq!(green_in_pool(&undone), 0, "its mana is gone");
+        assert_eq!(zone_of(&undone, lotus.source), json!("Battlefield"), "back, under the handle it had");
+        assert!(options_of(&undone).iter().any(|o| o.source == lotus.source && o.produces_of_any_one_color == 3), "and can be used again");
+    }
+
+    /// Lion's Eye Diamond is never taken back: its cost discards the hand, and what was in it has been seen.
+    #[test]
+    fn lions_eye_diamond_is_not_taken_back() {
+        let mut session = Session::new(deal(&["Lion's Eye Diamond"], "Forest", 19)).ok().unwrap();
+        let (_, after) = activate_mana_of(&mut session, "Lion's Eye Diamond");
+        assert_eq!(green_in_pool(&after), 3);
+        assert!(!options_of(&after).iter().any(|o| o.kind == ActionKindView::UndoManaAbility), "no Undo");
     }
 
     /// A mana ability whose cost is its own {T} names no permanent to tap: `Tap` is for a tap cost paid by a permanent

@@ -65,6 +65,14 @@ impl HandleSpace {
         }
     }
 
+    /// Back to the handles of an earlier position, the game having gone back to it: every handle names what it named
+    /// then. A handle minted since is never minted again.
+    pub fn restore(&mut self, earlier: HandleSpace) {
+        let next = self.next;
+        *self = earlier;
+        self.next = next;
+    }
+
     /// Drop every handle whose object `visible` refuses.
     pub fn retain(&mut self, visible: impl Fn(ObjectId) -> bool) {
         let gone: Vec<ObjectId> = self.by_handle.values().copied().filter(|o| !visible(*o)).collect();
