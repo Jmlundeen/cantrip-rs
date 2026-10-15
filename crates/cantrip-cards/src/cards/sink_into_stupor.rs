@@ -22,11 +22,7 @@ fn spell_or_nonland_permanent_of_an_opponent(q: &dyn Query, asker: &Asker, t: Ta
 /// just leaves the stack (CR 400.3).
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(id) = targets::object(g, item, 0) else { return Ok(()) };
-    if g.state().stack.iter().any(|i| i.kind == StackKind::Spell && i.object == id) {
-        g.remove_spell(id, CounterTo::Hand);
-    } else {
-        g.return_to_hand(&[id]);
-    }
+    cantrip_mechanics::effects::return_spell_or_permanent_to_hand(g, id);
     Ok(())
 }
 
