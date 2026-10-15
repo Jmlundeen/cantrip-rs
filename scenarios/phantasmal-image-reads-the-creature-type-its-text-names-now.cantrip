@@ -1,0 +1,41 @@
+# Artificial Evolution changes the text of Phantasmal Image's spell, Illusion to Goblin (CR 612.1, 400.7a): it enters as a
+# copy of Llanowar Elves "except it's a Goblin in addition to its other types", so it is an Elf Druid Goblin, not an Illusion.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Llanowar Elves
+Phantasmal Image
+Artificial Evolution
+Island x13
+
+[Bot2 Deck]
+Swamp x16
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Phantasmal Image.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Artificial Evolution.Cast(Stack.Phantasmal Image)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Illusion)
+Bot1.Modes(Goblin)
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves#1.Subtypes = Druid; Elf
+Bot1.Battlefield.Llanowar Elves#2.Subtypes = Druid; Elf; Goblin

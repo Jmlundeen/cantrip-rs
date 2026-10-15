@@ -30,8 +30,12 @@ pub static EXCEPTION: CardDef = CardDef {
 fn enter_as_copy(g: &mut dyn Game, entry: &mut Entering) -> Result<(), Suspend> {
     cantrip_mechanics::copy::enter_as_copy(g, entry, |c| c.is(CardType::Creature), |q, copy| {
         let exception = AbilityRef { card: q.card_id(&EXCEPTION), index: 0 };
-        copy.with_subtype(Subtype::Illusion).with_ability(exception)
-    })
+        copy.with_ability(exception)
+    })?;
+    // "It's an Illusion": the creature type is a word of this card's text (CR 612), so it is the type that text names now.
+    let illusion = g.words(entry.object).subtype(Subtype::Illusion);
+    entry.copy = entry.copy.map(|copy| copy.with_subtype(illusion));
+    Ok(())
 }
 
 pub static CARD: CardDef = CardDef {
