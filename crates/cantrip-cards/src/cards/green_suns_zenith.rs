@@ -8,9 +8,10 @@ use cantrip_oracle as oracle;
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let player = item.controller;
     let x = item.x as u32;
+    let green = g.words(item.object).color(Color::Green);
     search_to_battlefield(g, player, item.object, Find::ONE, false, |q, c| {
         let chars = q.chars(c);
-        chars.is(CardType::Creature) && chars.colors.has(Color::Green) && q.mana_value(c) <= x
+        chars.is(CardType::Creature) && chars.colors.has(green) && q.mana_value(c) <= x
     })?;
     g.put_into_library(&[item.object], LibraryPlace::ShuffledIn);
     Ok(())
