@@ -2872,8 +2872,6 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
     let discards = choose_discards(cx, player, source, &def.cost)?;
     let exiles = choose_exiles(cx, player, source, &def.cost)?;
     let tappers = choose_tappers(cx, player, source, &def.cost)?;
-    let beheld = choose_behold(cx, player, source, &def.cost)?;
-    let blighted = choose_blight(cx, player, source, &def.cost)?;
     let counter = choose_counter_kind(cx, player, source, &def.cost)?;
     // Mana of any color pays for it (CR 609.4b): every symbol is paid as generic mana.
     if mana.mana_value() > 0 && static_rules::spend_any_color_for(cx, player, source) {
@@ -2886,8 +2884,6 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
     pay_permanents(cx, &def.cost, &chosen);
     pay_discards(cx, &discards);
     pay_exiles(cx, &exiles);
-    pay_behold(cx, player, &beheld);
-    pay_blight(cx, &def.cost, blighted);
     pay_life_and_counters(cx, player, source, &def.cost);
     if let Some(kind) = counter {
         cx.st().update_obj(source, |o| o.counters[kind as usize] = (o.counters[kind as usize] - 1).max(0));

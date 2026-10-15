@@ -317,11 +317,11 @@ pub struct Cost {
     /// Behold N (CR 701.4a): for each, choose a permanent you control or reveal a card from your hand that passes the
     /// filter ("behold a Dragon"), chosen as the cost is chosen. Nothing moves: a permanent is only chosen, a hand card
     /// is revealed as the cost is paid (CR 601.2h). Payable only with that many to choose among. Dispelling Exhale,
-    /// Caustic Exhale, Kinsbaile Aspirant.
+    /// Caustic Exhale, Kinsbaile Aspirant. Paid when a spell is cast only: an activation does not choose or pay it yet.
     pub behold: Option<(u8, ObjectFilter)>,
     /// Blight N (CR 701.68a): put this many -1/-1 counters on a creature you control, chosen as the cost is chosen and
     /// put as it is paid. Payable only with a creature to put them on (CR 701.68b). Requiting Hex, Cinder Strike,
-    /// Gristle Glutton.
+    /// Paid when a spell is cast only: an activation does not choose or pay it yet.
     pub blight: u8,
 }
 
@@ -332,7 +332,7 @@ pub enum VariableCost {
     /// {X} (CR 601.2b, 107.3a): Immoral Bargain.
     SacrificeX(ObjectFilter),
     /// Sacrifice one or more permanents you control that pass the filter (CR 701.21a): as an optional additional cost, the
-    /// spell's `kicked` is how many were. Plumb the Forbidden.
+    /// spell's `paid` is how many were. Plumb the Forbidden.
     SacrificeOneOrMore(ObjectFilter),
     /// Exile any number of other cards from your graveyard with this many card types or more among them (CR 205.2a):
     /// Nethergoyf's escape.
@@ -409,8 +409,12 @@ impl Cost {
         c.variable = self.variable.or(other.variable);
         c.discard_hand |= other.discard_hand;
         c.collect_evidence += other.collect_evidence;
+        // Two beholds add only when they ask for the same quality (CR 701.4a): one filter can't stand for two.
         c.behold = match (self.behold, other.behold) {
-            (Some((a, f)), Some((b, _))) => Some((a + b, f)),
+            (Some((a, f)), Some((b, g))) => {
+                debug_assert!(f as usize == g as usize, "two beholds of different qualities can't be combined");
+                Some((a + b, f))
+            }
             (a, b) => a.or(b),
         };
         c.blight += other.blight;

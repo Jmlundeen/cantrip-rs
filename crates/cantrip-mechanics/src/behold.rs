@@ -1,7 +1,7 @@
 //! Behold (CR 701.4a): "choose a [quality] permanent you control or reveal a [quality] card from your hand", used here as
-//! an additional cost ("as an additional cost to cast this spell, you may behold a Dragon"). Dispelling Exhale, Piercing
-//! Exhale and Osseous Exhale print it, and Caustic Exhale, Kinsbaile Aspirant and Silvergill Mentor print it as a choice
-//! with another cost.
+//! an additional cost ("as an additional cost to cast this spell, you may behold a Dragon"). Dispelling Exhale is in the
+//! engine; Piercing Exhale and Osseous Exhale print it as an optional cost, and Caustic Exhale, Kinsbaile Aspirant and
+//! Silvergill Mentor print it as a choice with another cost.
 //!
 //! Choosing the permanent or revealing the card is the core's (`Cost::behold`, paid as the other costs are, CR 601.2h);
 //! nothing moves. A card with the optional kind gives `optional(filter)` as its `optional_cost`, and "if a Dragon was
