@@ -493,27 +493,13 @@ pub enum EffectKind {
     /// `to` (Trait Doctoring, Artificial Evolution). Card code reads its words through `Query::words`; the layers change
     /// the type line.
     ChangeText { from: Word, to: Word },
-    /// "The next [kind of] spell you cast this turn [gets something]" (CR 611.2c, 601.2): a rule about the effect's controller,
-    /// so it reaches a spell that does not exist yet and outlives its `affected` object, which is only the source. It applies
-    /// as the spell is cast and is used up by it.
-    NextSpell(NextSpell),
-}
-
-/// What the next spell a player casts gets, and which spells count as "the next" (`EffectKind::NextSpell`). Mistrise Village
-/// ("The next spell you cast this turn can't be countered") uses it with any spell; "the next creature spell" and "the next
-/// instant or sorcery spell you cast this turn" are the same effect with `types` set.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
-pub struct NextSpell {
-    /// The spell must have one of these card types; `TypeSet::NONE` for any spell.
-    pub types: TypeSet,
-    pub grant: SpellGrant,
-}
-
-/// What a spell gets from a `NextSpell` effect as it is cast.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
-pub enum SpellGrant {
-    /// It can't be countered (CR 701.5a).
-    CantBeCountered,
+    /// "The next spell you cast this turn can't be countered" (CR 611.2c, 601.2, 701.5a; Mistrise Village): a rule about the
+    /// effect's controller that reaches a spell that does not exist yet, so it outlives its `affected` object, which is only the
+    /// source. It marks the next spell that player casts, as it is cast and before anyone has priority, and is used up by it.
+    /// It is in the core, though one printed card has it, because only the core is there while a spell is being cast: a
+    /// card file can't mark a spell during casting, and a delayed trigger would go on the stack above the spell and could
+    /// be answered. A kind of spell ("the next creature spell") is a filter to add when a printed card needs one.
+    NextSpellCantBeCountered,
 }
 
 impl EffectKind {
@@ -531,7 +517,7 @@ impl EffectKind {
                 | EffectKind::CreaturesCantBlock(_)
                 | EffectKind::PlayFromGraveyard
                 | EffectKind::PlayerManaAbility(_)
-                | EffectKind::NextSpell(_)
+                | EffectKind::NextSpellCantBeCountered
         )
     }
 }

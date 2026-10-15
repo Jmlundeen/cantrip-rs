@@ -1756,31 +1756,15 @@ fn stack_item(kind: StackKind, object: ObjectId, ability: AbilityRef, controller
     item
 }
 
-/// "The next spell you cast this turn ..." (CR 611.2c, 601.2): each `NextSpell` effect of `player` whose kind of spell this
-/// is applies to it as it is cast, before anyone has priority, and is used up. An effect whose kind of spell this is not
-/// waits for a later one; two effects that fit both apply to this one.
+/// "The next spell you cast this turn can't be countered" (CR 611.2c, 601.2, 701.5a): each such effect of `player` marks
+/// this spell as it is cast, before anyone has priority, and is used up; two before one spell both apply to it.
 fn apply_next_spell_effects(cx: &mut Cx, player: PlayerId, spell: ObjectId) {
-    if !cx.s().effects.iter().any(|e| matches!(e.kind, EffectKind::NextSpell(_))) {
+    let ours = |e: &cantrip_state::ContinuousEffect| e.kind == EffectKind::NextSpellCantBeCountered && e.controller == player;
+    if !cx.s().effects.iter().any(ours) {
         return;
     }
-    let types = cx.chars(spell).types;
-    let applied: Vec<Option<SpellGrant>> = cx
-        .s()
-        .effects
-        .iter()
-        .map(|e| match e.kind {
-            EffectKind::NextSpell(n) if e.controller == player && (n.types == TypeSet::NONE || n.types.iter().any(|t| types.has(t))) => {
-                Some(n.grant)
-            }
-            _ => None,
-        })
-        .collect();
-    for grant in applied.iter().flatten() {
-        match grant {
-            SpellGrant::CantBeCountered => cx.st().update_obj(spell, |o| o.marks.cant_be_countered = true),
-        }
-    }
-    let keep: Vec<bool> = applied.iter().map(|a| a.is_none()).collect();
+    cx.st().update_obj(spell, |o| o.marks.cant_be_countered = true);
+    let keep: Vec<bool> = cx.s().effects.iter().map(|e| !ours(e)).collect();
     cx.st().effects_keep(&keep);
 }
 

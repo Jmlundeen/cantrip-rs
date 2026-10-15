@@ -7,8 +7,7 @@ use cantrip_oracle as oracle;
 /// controller, which marks the next spell that player casts this turn as it is cast, before anyone has priority, and ends
 /// with the turn if they cast none. Each activation is its own effect, so two before the next spell both apply to it.
 fn next_spell_cant_be_countered(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let effect = EffectKind::NextSpell(NextSpell { types: TypeSet::NONE, grant: SpellGrant::CantBeCountered });
-    g.add_player_effect(item.controller, item.object, effect, Duration::EndOfTurn);
+    g.add_player_effect(item.controller, item.object, EffectKind::NextSpellCantBeCountered, Duration::EndOfTurn);
     Ok(())
 }
 
