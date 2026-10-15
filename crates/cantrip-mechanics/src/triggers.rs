@@ -43,6 +43,23 @@ pub fn landfall(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired>
     }
 }
 
+/// "When you unlock this door" on the Room's right half (CR 709.5h): the Room permanent was given that half's unlocked
+/// designation by its controller, whether as it entered because the half was cast (CR 709.5d) or after (CR 709.5e-f).
+/// Ritual Chamber, Awakening Hall and Cadaver Lab print it. (The left half's is the same with `DOOR_LEFT`, added with the
+/// first card that has one.)
+pub fn you_unlock_this_right_door(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    you_unlock_this_door(q, source, event, DOOR_RIGHT)
+}
+
+fn you_unlock_this_door(q: &dyn Query, source: ObjectId, event: &Event, door: u8) -> Option<Fired> {
+    match event {
+        Event::DoorUnlocked { permanent, door: unlocked, player } if *permanent == source && *unlocked == door && *player == q.controller(source) => {
+            Fired::PLAIN
+        }
+        _ => None,
+    }
+}
+
 /// "When you cast this spell" (CR 603.2, 601.2i): the spell itself, from wherever it was cast. Sage of the Skies and
 /// every cascade card print it.
 pub fn cast_this_spell(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
