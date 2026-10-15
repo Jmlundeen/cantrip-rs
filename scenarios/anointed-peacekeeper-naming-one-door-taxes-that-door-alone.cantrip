@@ -1,0 +1,34 @@
+# A Room has two names and a player naming it names one of them (CR 709.4a); an object has the chosen name if one of its names is
+# it. Bot1's Anointed Peacekeeper names Unholy Annex, so on turn 2 Bot2 may not cast the Annex door: with only a Swamp and Black Lotus
+# (four mana) the spell would cost {2}{B} + {2} = 5 (the refusal). Naming the other door instead (the next scenario) leaves it at 3.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Anointed Peacekeeper
+Plains x17
+
+[Bot2 Deck]
+Swamp
+Black Lotus
+Unholy Annex // Ritual Chamber
+Swamp x17
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Anointed Peacekeeper.Cast
+Bot1.Pass
+Bot1.Name(Unholy Annex)
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+! Bot2.Hand.Unholy Annex // Ritual Chamber.Cast(Ability: Unholy Annex)
+
+[Expect]
+Bot2.Battlefield.Count = 2

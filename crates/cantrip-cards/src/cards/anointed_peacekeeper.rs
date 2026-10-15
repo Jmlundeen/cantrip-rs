@@ -15,7 +15,9 @@ fn enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
         let id = g.chars(card).card;
         let def = g.card(id);
         if !def.is(CardType::Land) && suggestion.is_none_or(|(value, _)| def.cost.mana_value() > value) {
-            suggestion = Some((def.cost.mana_value(), id));
+            // A split card has two names and a player names one of them (CR 709.4a): its left half's.
+            let named = def.split.map_or(id, |(left, _)| g.card_id(left));
+            suggestion = Some((def.cost.mana_value(), named));
         }
     }
     if let Answer::Name(name) = g.ask(you, RequestKind::ChooseName { source, looked_at: hand, suggestion: suggestion.map(|s| s.1), nonland_only: false })? {
@@ -33,7 +35,7 @@ fn tax(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed) -> i8 
         Costed::Spell(id) => (id, true),
         Costed::Ability(id, _) => (id, false),
     };
-    if q.card(q.chars(object).card).name != q.card(chosen).name || (spell && player == q.controller(source)) {
+    if !cantrip_mechanics::library::object_has_name(q, object, chosen) || (spell && player == q.controller(source)) {
         return 0;
     }
     2
