@@ -1,0 +1,23 @@
+# The Mountain branch: Mistrise Village enters untapped beside a Mountain (turn 3) and taps for {U}, which pays Brainstorm
+# (the mana is blue, not red). The Forest branch is the sibling scenario.
+
+[Bot1 Deck]
+Mountain
+Mistrise Village
+Brainstorm
+Mountain x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mistrise Village.Play
+Bot1.Battlefield.Mistrise Village.Activate(Ability: Add)
+Bot1.Hand.Brainstorm.Cast
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Mistrise Village.Tapped = true
+Bot1.Graveyard = Brainstorm

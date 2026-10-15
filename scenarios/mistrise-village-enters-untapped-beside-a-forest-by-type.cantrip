@@ -1,0 +1,20 @@
+# The Forest branch, read by land type and not by name: Savannah is a Forest Plains and no Mountain, so
+# the Mountain branch is false and the Forest branch decides. Mistrise
+# Village enters untapped (turn 3).
+
+[Bot1 Deck]
+Savannah
+Mistrise Village
+Mountain x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Savannah.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mistrise Village.Play
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Mistrise Village.Tapped = false

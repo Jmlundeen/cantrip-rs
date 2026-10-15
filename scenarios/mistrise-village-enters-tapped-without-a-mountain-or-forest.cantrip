@@ -1,0 +1,20 @@
+# "...unless you control a Mountain or a Forest": with only an Island, neither branch is true and Mistrise Village enters
+# tapped (CR 614.1c), so it can't be tapped for mana that turn. Sibling scenarios show the Mountain and Forest branches.
+
+[Bot1 Deck]
+Island
+Mistrise Village
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mistrise Village.Play
+! Bot1.Battlefield.Mistrise Village.Activate
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Mistrise Village.Tapped = true

@@ -1,0 +1,48 @@
+# Bot1 activates Mistrise Village on turn 3 and casts nothing that turn. The effect lasts "this turn" (CR 611.2a, 514.2):
+# it is gone at cleanup, so the Lightning Bolt Bot1 casts on turn 5 is the first spell of a new turn and is countered by
+# Bot2's Counterspell as any spell is. Compare the sibling scenario where the Bolt is cast the turn the ability resolves.
+
+[Bot1 Deck]
+Forest
+Mox Sapphire
+Mox Ruby
+Mistrise Village
+Lightning Bolt
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Forest x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mistrise Village.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mistrise Village.Activate(Ability: next spell)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Lightning Bolt)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot2.Life = 20
+Bot1.Graveyard = Lightning Bolt
+Bot2.Graveyard = Counterspell

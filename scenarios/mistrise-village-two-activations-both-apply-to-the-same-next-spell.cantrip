@@ -1,0 +1,71 @@
+# Bot1 has two Mistrise Villages and activates both on turn 5 before casting anything, then casts two Lightning Bolts at
+# Bot2, who counters each. Each activation is its own effect "the next spell you cast this turn" (CR 611.2c): both
+# apply to the same next spell, the first Bolt, and both are used up by it. So the first Bolt resists its Counterspell and
+# the second, cast with no effect left, is countered. If the second effect had waited for the second Bolt, both would resolve.
+
+[Bot1 Deck]
+Forest
+Mox Sapphire
+Mox Sapphire
+Mox Ruby
+Mox Ruby
+Mistrise Village
+Lightning Bolt
+Lightning Bolt
+Mistrise Village
+Forest x10
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Sapphire
+Mox Sapphire
+Counterspell
+Counterspell
+Forest x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mistrise Village.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mistrise Village.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mistrise Village.Activate(Ability: next spell)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mistrise Village.Activate(Ability: next spell)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Lightning Bolt)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 17
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Lightning Bolt)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot2.Life = 17
+Bot1.Graveyard = Lightning Bolt; Lightning Bolt
+Bot2.Graveyard = Counterspell; Counterspell
