@@ -8,8 +8,8 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-fn island(q: &dyn Query, _: &Asker, id: ObjectId) -> bool {
-    q.chars(id).has_subtype(Subtype::Island)
+fn island(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
+    q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Island))
 }
 
 pub static CARD: CardDef = CardDef {
