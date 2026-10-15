@@ -1,0 +1,29 @@
+# Strategic Betrayal against a single creature and an empty graveyard: the opponent is still asked which creature to exile
+# (the Choose line must fire or the script fails), and only that creature leaves.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Strategic Betrayal
+Swamp x14
+
+[Bot2 Deck]
+Ornithopter
+Swamp x14
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Strategic Betrayal.Cast(Bot2)
+Bot2.Choose(Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Count = 0
+Exile = Ornithopter
+Stack.Count = 0

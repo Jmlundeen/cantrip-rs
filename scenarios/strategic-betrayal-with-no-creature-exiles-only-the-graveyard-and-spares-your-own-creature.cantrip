@@ -1,0 +1,37 @@
+# Strategic Betrayal when the opponent controls no creature: nothing is chosen (a bare ! Bot2.Choose would fail if asked),
+# the graveyard is still exiled, and a creature Bot1 controls and a noncreature permanent Bot2 controls are untouched
+# ("a creature they control").
+
+[Bot1 Deck]
+Swamp
+Swamp
+Strategic Betrayal
+Ornithopter
+Swamp x14
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Swamp x14
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Strategic Betrayal.Cast(Bot2)
+! Bot2.Choose
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Mox Ruby
+Bot2.Graveyard.Count = 0
+Exile = Lightning Bolt
+Bot1.Battlefield = Swamp; Swamp; Ornithopter
+Stack.Count = 0

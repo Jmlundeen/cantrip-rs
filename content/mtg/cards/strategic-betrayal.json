@@ -1,0 +1,6 @@
+{
+  "name": "Strategic Betrayal",
+  "manaCost": "{1}{B}",
+  "type": "Sorcery",
+  "oracleText": "Target opponent exiles a creature they control and their graveyard."
+}
