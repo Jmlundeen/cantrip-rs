@@ -255,6 +255,9 @@ chosen from a revealed hand) and fails if the named card is among those it may t
 card exists in the game. It shows a cost or choice leaves something out (a token as "a nontoken artifact"); pair it with the
 `Bot1.Choose(Thopter Foundry)` that takes the legal card on the next line. Without arguments it is the bare refusal below.
 
+A color choice, `! Bot1.Colors(Blue)`, is checked at that player's next color question and fails if the named color is on offer
+(a replacement color that may not be the one being replaced); pair it with the `Bot1.Colors(...)` that answers it on the next line.
+
 A "you may" choice, `! Bot1.Accept`, fails if that player is asked one before their next priority: the way to show a
 choice is *not* offered (a choice made impossible, CR 608.2d), which a default Decline would otherwise hide. Put `Bot1.Pass`
 lines before it for the priorities that come first, so it lands on the resolution that would ask.
