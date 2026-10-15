@@ -1,0 +1,32 @@
+# The Theorist, Jace Beleren's -2 is "up to one target": Bot2 controls an Ornithopter that is a legal target, and Bot1 chooses
+# none (the question is asked: the Ornithopter is a candidate - the control of a refusal elsewhere). The ability still
+# costs its loyalty (4 -> 2 after the turn-1 +1), and the Ornithopter stays on the battlefield.
+
+[Bot1 Deck]
+Island
+Black Lotus
+The Theorist, Jace Beleren
+Island x4
+Island x12
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.The Theorist, Jace Beleren.Cast
+Bot1.Battlefield.The Theorist, Jace Beleren.Activate(Ability: +1)
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.The Theorist, Jace Beleren.Activate(Ability: For each opponent)
+Bot1.Target()
+[Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Ornithopter
+Bot1.Battlefield.The Theorist, Jace Beleren.Counters.Loyalty = 2
+Stack.Count = 0

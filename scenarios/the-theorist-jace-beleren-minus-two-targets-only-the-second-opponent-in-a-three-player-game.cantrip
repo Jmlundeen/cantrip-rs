@@ -1,0 +1,49 @@
+# The Theorist, Jace Beleren's -2 has a slot for each opponent (CR 601.2c): in a three-player game Bot2's slot and Bot3's. Bot1
+# chooses nothing for Bot2, whose Ornithopter is a candidate, and Bot3's Sol Ring for Bot3's slot. The target keeps its
+# slot (the second, Bot3's), so it is still legal as the ability resolves: Sol Ring returns to Bot3's hand and the
+# Ornithopter stays. Bot3's slot offers none of Bot2's permanents, and Bot2's none of Bot3's (the refusal).
+
+[Bot1 Deck]
+Island
+Black Lotus
+The Theorist, Jace Beleren
+Island x4
+Island x12
+
+[Bot2 Deck]
+Ornithopter
+Island x6
+Island x12
+
+[Bot3 Deck]
+Island
+Sol Ring
+Island x5
+Island x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.The Theorist, Jace Beleren.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot3.Main1]
+Bot3.Hand.Island.Play
+Bot3.Battlefield.Island.Activate
+Bot3.Hand.Sol Ring.Cast
+[T4 Bot1.Main1]
+Bot1.Battlefield.The Theorist, Jace Beleren.Activate(Ability: For each opponent)
+! Bot1.Target(Bot3.Battlefield.Sol Ring)
+Bot1.Target()
+! Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Target(Bot3.Battlefield.Sol Ring)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Ornithopter
+Bot3.Battlefield = Island
+Bot3.Hand = Island; Island; Island; Island; Island; Island; Sol Ring
+Bot1.Battlefield.The Theorist, Jace Beleren.Counters.Loyalty = 1
+Stack.Count = 0

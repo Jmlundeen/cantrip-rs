@@ -1,0 +1,51 @@
+# The Theorist, Jace Beleren's -6 with no creature to put counters on: "Draw three cards. Then put X +1/+1 counters on each
+# creature you control" still draws three. Bot1 makes Illusions with the +1 on turns 1, 3 and 5 (Jace at 6), and Bot2's Balance
+# on turn 6 makes Bot1 sacrifice all of them (Bot2 has no creature). On turn 7 the -6 draws three and there is no creature
+# to count for: nothing else happens, and Jace, at 0 loyalty, goes to the graveyard.
+
+[Bot1 Deck]
+Island
+Black Lotus
+The Theorist, Jace Beleren
+Island x4
+Island x20
+
+[Bot2 Deck]
+Plains
+Plains
+Plains
+Balance
+Plains x3
+Plains x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.The Theorist, Jace Beleren.Cast
+Bot1.Battlefield.The Theorist, Jace Beleren.Activate(Ability: +1)
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.The Theorist, Jace Beleren.Activate(Ability: +1)
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.The Theorist, Jace Beleren.Activate(Ability: +1)
+[T6 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Balance.Cast
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.The Theorist, Jace Beleren.Activate(Ability: Draw three cards)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Island; Island; Island; Island
+Bot1.Hand.Count = 9
+Bot1.Graveyard = The Theorist, Jace Beleren; Island; Black Lotus
+Stack.Count = 0

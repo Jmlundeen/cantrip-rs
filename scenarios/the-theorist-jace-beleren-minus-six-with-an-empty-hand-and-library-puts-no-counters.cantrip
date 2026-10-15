@@ -1,0 +1,62 @@
+# The Theorist, Jace Beleren's -6 counts X after the draw: with no cards in the library nothing is drawn (CR 121.4), and with an
+# empty hand X is 0, so no counters are put on the Illusions ("zero counters" is nothing, CR 107.1b). Bot1's deck is exactly the
+# 13 cards its game draws: Jace draws on Bot2's turns 2, 4 and 6, and turns 3 and 5 draw; Bot2 empties Bot1's hand on turn 6
+# with Mind Twist for 7 (Black Lotus, three Swamps and two Moxen), and on turn 7 Bot1 draws its last card, plays it and uses the -6
+# (Jace at 6 after three +1s) with nothing in hand or library. The three Illusions have no counters, and Bot1 then loses for
+# having drawn from an empty library (CR 704.5b).
+
+[Bot1 Deck]
+Island
+Black Lotus
+The Theorist, Jace Beleren
+Island x4
+Island x6
+
+[Bot2 Deck]
+Swamp
+Black Lotus
+Mox Jet
+Mox Pearl
+Mind Twist
+Swamp
+Swamp
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.The Theorist, Jace Beleren.Cast
+Bot1.Battlefield.The Theorist, Jace Beleren.Activate(Ability: +1)
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.The Theorist, Jace Beleren.Activate(Ability: +1)
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.The Theorist, Jace Beleren.Activate(Ability: +1)
+[T6 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Mind Twist.Cast(Bot1; X: 7)
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+? Bot1.Hand.Count = 0
+? Bot1.Library.Count = 0
+Bot1.Battlefield.The Theorist, Jace Beleren.Activate(Ability: Draw three cards)
+
+[Expect]
+Result = Bot2 won
+Bot1.Battlefield.Illusion#1.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Illusion#1.Power = 1

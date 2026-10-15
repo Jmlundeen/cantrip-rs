@@ -1,0 +1,31 @@
+# The Theorist, Jace Beleren, ruling: "Your opponent will draw the card they normally draw in their draw step before you draw
+# a card from Jace's first ability." The draw is a turn-based action (CR 504.1) and the trigger goes on the stack after it
+# (CR 603.3). In Bot2's turn-2 draw step, with Jace's trigger on the stack, Bot2 already has its eighth card and Bot1 has
+# not drawn yet; once the trigger has resolved, Bot1 has.
+
+[Bot1 Deck]
+Island
+Black Lotus
+The Theorist, Jace Beleren
+Island x4
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.The Theorist, Jace Beleren.Cast
+[T2 Bot2.Draw]
+? Stack.Count = 1
+? Bot2.Hand.Count = 8
+? Bot1.Hand.Count = 4
+[T2 Bot2.Main1]
+? Stack.Count = 0
+? Bot1.Hand.Count = 5
+
+[Expect]
+Turn = 2
