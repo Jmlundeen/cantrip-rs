@@ -1,0 +1,35 @@
+# Bonehoard Dracosaur with a one-card library: it exiles "the top two cards" as far as there are cards, so the lone
+# Mountain is exiled and the Dinosaur is made (a land was exiled), but no Treasure (no nonland card was). The draw step
+# that follows would empty the library and lose the game (CR 704.5b), so the script stops in the upkeep.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Black Lotus
+Bonehoard Dracosaur
+Island x3
+Mountain
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Bonehoard Dracosaur.Cast
+Bot1.Pass
+[T3 Bot1.Upkeep]
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Exile = Mountain
+Bot1.Battlefield.Dinosaur.Power = 3
+Bot1.Battlefield.Treasure Token = (absent)

@@ -1,0 +1,46 @@
+# Bonehoard Dracosaur exiles Sol Ring and Lightning Bolt at Bot1's upkeep: no land, so no Dinosaur token; two nonland
+# cards still make only ONE Treasure (ruling). Both may be cast this turn paying all costs: the Treasure pays for Sol Ring
+# ({1}), the Mox Ruby for the Bolt, which hits Bot2. Bot1 gets no token it should not have.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Black Lotus
+Bonehoard Dracosaur
+Island x3
+Sol Ring
+Lightning Bolt
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Bonehoard Dracosaur.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Treasure Token.Tapped = false
+? Bot1.Battlefield.Dinosaur = (absent)
+Bot1.Exile.Sol Ring.Cast
+Bot1.Battlefield.Treasure Token.Activate(Color: Blue)
+Bot1.Pass
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Bot2.Life = 17
+Exile.Count = 0
+Bot1.Battlefield.Sol Ring.Tapped = false
+Bot1.Battlefield.Treasure Token = (absent)
+Bot1.Graveyard = Lightning Bolt; Black Lotus

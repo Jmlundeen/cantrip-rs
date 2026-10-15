@@ -1,0 +1,43 @@
+# Bonehoard Dracosaur exiles Mountain and Lightning Bolt: a land card AND a nonland card, so a Dinosaur token and a
+# Treasure token (ruling). The Bolt is not cast on turn 3, and "this turn" is over: on turn 5 it is still in exile but
+# can no longer be cast (refusal, with Mox Ruby untapped and Bot2 a legal target). The control for the refusal is the
+# Bolt cast the turn it was exiled (the two-nonland scenario). Bot2's upkeep on turn 2 exiles nothing: "your upkeep".
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Black Lotus
+Bonehoard Dracosaur
+Island x3
+Mountain
+Lightning Bolt
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Bonehoard Dracosaur.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+? Exile.Count = 0
+[T3 Bot1.Main1]
+? Exile.Count = 2
+? Bot1.Battlefield.Dinosaur.Power = 3
+? Bot1.Battlefield.Treasure Token.Tapped = false
+[T5 Bot1.Main1]
+! Bot1.Exile.Lightning Bolt.Cast
+! Bot1.Exile.Mountain.Play
+
+[Expect]
+Turn = 5
+Bot2.Life = 20

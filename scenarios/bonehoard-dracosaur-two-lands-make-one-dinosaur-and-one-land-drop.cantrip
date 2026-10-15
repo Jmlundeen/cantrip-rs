@@ -1,0 +1,45 @@
+# Bonehoard Dracosaur, cast on turn 1 off two Moxen and a Black Lotus. At Bot1's next upkeep it exiles the top two cards,
+# Mountain and Forest. "If you exiled a land card" makes ONE 3/1 red Dinosaur token however many lands were exiled
+# (ruling), and no Treasure since no nonland card was exiled. Both lands may be played this turn, but under the ordinary
+# land rule (CR 305.2) only one: Bot1 plays the Mountain from exile and may not play the Forest too. The refusal is
+# placed after the Mountain play, where the land drop is spent; the positive control is the Mountain play itself.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Black Lotus
+Bonehoard Dracosaur
+Island x3
+Mountain
+Forest
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Bonehoard Dracosaur.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Exile.Mountain.Play
+! Bot1.Exile.Forest.Play
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Dinosaur.Power = 3
+Bot1.Battlefield.Dinosaur.Toughness = 1
+Bot1.Battlefield.Dinosaur.Colors = Red
+Bot1.Battlefield.Dinosaur.Subtypes = Dinosaur
+Bot1.Battlefield.Treasure Token = (absent)
+Bot1.LandsPlayed = 1
+Exile = Forest
