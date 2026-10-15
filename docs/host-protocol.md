@@ -38,6 +38,13 @@ prompt and the seat's view. Seats are numbered from one. A game is resumed the w
 the same seed and decks, `Start`, and the recorded answers sent again in order, so the host is deterministic for a seed
 and nothing in it is a snapshot.
 
+A mana ability can be taken back. While the last answer a seat gave activated one, and it and everything since did only
+what mana abilities do (tap, add mana, cost life), that seat's next priority or pay-costs prompt offers an
+`UndoManaAbility` option on the permanent; taking it moves the game back to before the activation through the game-log
+tree (`Game::goto`) and sends an `EventsRetractedEvent` naming the sequences told of it. Any other answer, a
+concession, or anything else happening (a trigger, a card seen, a spell finished casting) clears what can be taken
+back. An undo is an answer like any other, so a resumed game replays it.
+
 The cards a host knows are the ones the native engine has ported (`docs/adding-cards.md`); a deck naming any other
 is refused at the deal. The decks under `decks/demo` and `decks/spike` are kept to ported cards, and
 `NativeHostGameTests` deals them through the real binary.

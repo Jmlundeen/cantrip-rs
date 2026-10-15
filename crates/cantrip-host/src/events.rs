@@ -62,6 +62,8 @@ pub enum Proto {
     Ended { outcome: GameOutcomeView, winning_team: i32 },
     Monarch { player: PlayerId },
     ExtraTurn { player: PlayerId, count: i32 },
+    /// Entries told earlier that no longer stand: a mana ability taken back, and with it what it was told to have done.
+    Retracted { sequences: Vec<u64> },
     StartingPlayer { chooser: PlayerId, player: PlayerId },
     Mulligan { player: PlayerId, count: i32 },
     Kept { player: PlayerId, cards: i32 },
@@ -79,7 +81,7 @@ struct Seen {
 }
 
 /// What has been told so far, to say what is new.
-#[derive(Default)]
+#[derive(Clone, Default)]
 pub struct Tracker {
     turn: i32,
     last_step: Option<Step>,
@@ -459,6 +461,9 @@ impl Teller<'_> {
             Proto::Ended { outcome, winning_team } => {
                 Some(GameEventView::GameEndedEvent(GameEndedEvent { outcome: *outcome, winning_team: *winning_team }))
             }
+            Proto::Retracted { sequences } => Some(GameEventView::EventsRetractedEvent(EventsRetractedEvent {
+                sequences: sequences.iter().map(|&s| s as i64).collect(),
+            })),
             Proto::Monarch { player } => Some(GameEventView::MonarchBecameEvent(MonarchBecameEvent { player: seat(*player) })),
             Proto::ExtraTurn { player, count } => {
                 Some(GameEventView::ExtraTurnAddedEvent(ExtraTurnAddedEvent { player: seat(*player), count: *count }))

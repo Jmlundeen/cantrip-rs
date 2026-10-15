@@ -51,6 +51,51 @@ pub struct Session {
     told: Vec<Proto>,
     /// What each seat is being shown beyond its zones, as of the last step.
     extra: Vec<HashSet<ObjectId>>,
+    /// The mana abilities that can still be taken back, latest last.
+    undoable: Vec<Undoable>,
+}
+
+/// A mana ability a player may take back: where the game was before it, and what was told of it since. Taking it back
+/// is a courtesy of the table, not a rule, so it is offered only while the activation did nothing but tap, add mana
+/// and cost life, and nothing has happened since but more of the same: never past a trigger, a card seen or another
+/// player's answer.
+struct Undoable {
+    player: PlayerId,
+    /// The permanent whose ability it was, which the client shows the undo on.
+    source: ObjectId,
+    node: NodeId,
+    tracker: Tracker,
+    published: usize,
+    /// The sequences of the entries told of it.
+    told: std::ops::Range<u64>,
+}
+
+/// The source of a mana ability `answer` activates (CR 605.1a), if it activates one.
+fn mana_activation(game: &Game, answer: &Answer) -> Option<ObjectId> {
+    let Answer::Act(action) = answer else { return None };
+    let source = action.source.filter(|_| action.kind == ActionKind::ActivateAbility)?;
+    if action.index >= PLAYER_MANA_ABILITY {
+        return Some(source);
+    }
+    match game.chars(source).abilities().nth(action.index as usize).map(|a| game.cards.ability(a)) {
+        Some(AbilityDef::Activated(d)) if d.mana.is_some() => Some(source),
+        _ => None,
+    }
+}
+
+/// Whether these entries are only what a mana ability does: taps, mana, and life paid or lost for it.
+fn only_mana(records: &[Record]) -> bool {
+    records.iter().all(|r| {
+        matches!(
+            r.event,
+            Event::Tapped { .. }
+                | Event::TappedForMana { .. }
+                | Event::LifeChange { .. }
+                | Event::AbilityActivated { .. }
+                | Event::Resolved { .. }
+                | Event::Damage { target: Target::Player(_), .. }
+        )
+    })
 }
 
 /// Dealing a game: the seats' names and decks, and the conditions beyond the seed.
@@ -99,6 +144,7 @@ impl Session {
             conceded: vec![false; seats],
             told: Vec::new(),
             extra: vec![HashSet::new(); seats],
+            undoable: Vec::new(),
             game,
         };
         // A first player named outright is not asked: the question is answered as it is posed.
@@ -196,13 +242,22 @@ impl Session {
         let mut requests = Vec::new();
         if let Some(request) = pending {
             let index = request.player.index();
+            let undo = self.undoable.last().filter(|u| u.player == request.player).map(|u| u.source);
             match prompt(&self.game, &request, &mut self.handles[index]) {
-                Ok((payload, may_cancel)) => requests.push(json!({
+                Ok((mut payload, may_cancel)) => {
+                    if let Some(source) = undo
+                        && let PromptPayload::PriorityPromptMessage(PriorityPrompt { options, .. })
+                        | PromptPayload::PayCostsPromptMessage(PayCostsPrompt { options, .. }) = &mut payload
+                    {
+                        options.push(ActionOptionMessage::new(ActionKindView::UndoManaAbility, self.handles[index].handle(source)));
+                    }
+                    requests.push(json!({
                     "RequestId": request.id,
                     "Seat": seat(request.player),
                     "Prompt": payload,
                     "MayCancel": may_cancel,
-                })),
+                    }));
+                }
                 Err(why) => eprintln!("cantrip-native-host: cannot relay {:?}: {why}", request.kind),
             }
         }
@@ -232,11 +287,16 @@ impl Session {
         if seat(request.player) != seat_number {
             return Err(Rejection::new("NotYourTurnToAnswer", format!("request {request_id} belongs to seat {}", seat(request.player))));
         }
+        if let AnswerPayload::TakeActionAnswer(TakeActionAnswer { kind: ActionKindView::UndoManaAbility, .. }) = payload {
+            return self.undo(request.player);
+        }
         let answer = translate(payload, &request, &self.handles[request.player.index()], &self.game).map_err(|e| match e {
             Untranslatable::UnknownHandle(d) => Rejection::new("UnknownHandle", d),
             Untranslatable::Illegal(d) => Rejection::new("IllegalAnswer", d),
         })?;
 
+        let mana = mana_activation(&self.game, &answer);
+        let (node, log_from) = (self.game.checkpoint(), self.game.log.len());
         let before = self.game.clone();
         let outcome = std::panic::catch_unwind(AssertUnwindSafe(|| self.game.answer(request.id, request.player, answer.clone())));
         match outcome {
@@ -244,8 +304,31 @@ impl Session {
             Ok(Err(Rejected(why))) => return Err(Rejection::new("IllegalAnswer", why)),
             Err(_) => {
                 self.game = before;
+                self.undoable.clear();
                 return Err(Rejection::new("IllegalAnswer", "the engine failed on that answer; the game is as it was"));
             }
+        }
+        let asks_again = self.pending().is_some_and(|next| {
+            next.player == request.player && matches!(next.kind, RequestKind::Priority { .. } | RequestKind::PayCosts { .. })
+        });
+        match mana {
+            Some(source) if asks_again && only_mana(&self.game.log[log_from..]) => {
+                let first = self.sequence + 1 + self.told.len() as u64;
+                self.undoable.push(Undoable {
+                    player: request.player,
+                    source,
+                    node,
+                    tracker: self.tracker.clone(),
+                    published: self.published,
+                    told: first..first,
+                });
+                let step = self.step();
+                if let Some(undo) = self.undoable.last_mut() {
+                    undo.told.end = self.sequence + 1;
+                }
+                return Ok(step);
+            }
+            _ => self.undoable.clear(),
         }
         match (&request.kind, &answer) {
             (RequestKind::ChooseStartingPlayer { .. }, Answer::Player(first)) => {
@@ -263,12 +346,29 @@ impl Session {
     }
 
     /// The seat gives up: it loses, and the game ends if one side is left.
+    /// Takes back the latest mana ability `player` activated: the game goes back to the node it was activated at, by
+    /// the tree (`Game::goto`), and what was told of it is retracted.
+    fn undo(&mut self, player: PlayerId) -> Result<Value, Rejection> {
+        if self.undoable.last().is_none_or(|u| u.player != player) {
+            return Err(Rejection::new("IllegalAnswer", "there is no mana ability to take back"));
+        }
+        let undo = self.undoable.pop().expect("checked");
+        self.game.goto(undo.node);
+        self.tracker = undo.tracker;
+        self.published = undo.published;
+        if !undo.told.is_empty() {
+            self.told.push(Proto::Retracted { sequences: undo.told.collect() });
+        }
+        Ok(self.step())
+    }
+
     pub fn concede(&mut self, seat_number: i32) -> Result<Value, Rejection> {
         let p = player_at(seat_number).filter(|p| p.index() < self.names.len()).ok_or_else(|| Rejection::new("NotYourTurnToAnswer", "no such seat"))?;
         if self.game.is_over() {
             return Err(Rejection::new("IllegalAnswer", "the game is over"));
         }
         self.conceded[p.index()] = true;
+        self.undoable.clear();
         self.game.state.update_player(p, |pl| pl.lost = true);
         let standing: Vec<PlayerId> = self.game.state.apnap().collect();
         match standing.as_slice() {
@@ -354,6 +454,68 @@ mod tests {
 
     fn of_type<'a>(events: &'a [Value], kind: &str) -> Vec<&'a Value> {
         events.iter().filter(|e| e["$type"] == kind).collect()
+    }
+
+    /// A mana ability is taken back: the game returns to before it, the land untapped and its mana gone, and nothing
+    /// more is offered to take back. One that finishes paying for a spell is not offered: the spell is cast.
+    #[test]
+    fn a_mana_ability_is_taken_back() {
+        let mut session = Session::new(deal(&["Llanowar Elves"], "Forest", 19)).ok().unwrap();
+        let mut step = session.step();
+        let mut allow_cast = true;
+        let request = |step: &Value| {
+            let r = &step["Requests"][0];
+            let prompt: PromptPayload = serde_json::from_value(r["Prompt"].clone()).unwrap();
+            (r["RequestId"].as_u64().unwrap() as u32, r["Seat"].as_i64().unwrap() as i32, prompt)
+        };
+        let options = |prompt: &PromptPayload| match prompt {
+            PromptPayload::PriorityPromptMessage(p) => p.options.clone(),
+            PromptPayload::PayCostsPromptMessage(p) => p.options.clone(),
+            _ => Vec::new(),
+        };
+        let mana = |prompt: &PromptPayload| options(prompt).into_iter().find(|o| o.kind == ActionKindView::ActivateAbility && !o.produces.is_empty());
+        let undo = |prompt: &PromptPayload| options(prompt).into_iter().find(|o| o.kind == ActionKindView::UndoManaAbility);
+        let take = |o: &ActionOptionMessage| AnswerPayload::TakeActionAnswer(TakeActionAnswer::take(o));
+        let mut taken_back = false;
+        for _ in 0..2_000 {
+            let (id, seat, prompt) = request(&step);
+            if !taken_back
+                && matches!(prompt, PromptPayload::PriorityPromptMessage(_))
+                && let Some(forest) = mana(&prompt)
+            {
+                let tapped = session.answer(id, seat, &take(&forest)).ok().unwrap();
+                let (id, seat, prompt) = request(&tapped);
+                assert!(mana(&prompt).is_none(), "the Forest is tapped: {prompt:?}");
+                let green = |step: &Value| step["Views"]["1"]["Players"].as_array().unwrap().iter().map(|p| p["Mana"][4].as_i64().unwrap()).sum::<i64>();
+                assert_eq!(green(&tapped), 1, "the Forest's mana is in the pool");
+                let back = undo(&prompt).expect("Undo is offered");
+                assert_eq!(back.source, forest.source, "on the Forest");
+
+                step = session.answer(id, seat, &take(&back)).ok().unwrap();
+                let (_, _, prompt) = request(&step);
+                assert_eq!(mana(&prompt).map(|o| o.source), Some(forest.source), "the Forest is untapped");
+                assert!(undo(&prompt).is_none(), "nothing more to take back");
+                let pools: Vec<&Value> = step["Views"]["1"]["Players"].as_array().unwrap().iter().map(|p| &p["Mana"]).collect();
+                assert!(pools.iter().all(|pool| pool.as_array().unwrap().iter().all(|n| n == 0)), "its mana is gone: {pools:?}");
+                taken_back = true;
+                continue;
+            }
+            if let PromptPayload::PayCostsPromptMessage(_) = &prompt
+                && let Some(forest) = mana(&prompt)
+            {
+                step = session.answer(id, seat, &take(&forest)).ok().unwrap();
+                let (_, _, prompt) = request(&step);
+                assert!(undo(&prompt).is_none(), "the spell is cast, and its mana not taken back: {prompt:?}");
+                assert!(taken_back);
+                return;
+            }
+            let answer = choose(&prompt, &mut allow_cast);
+            step = match session.answer(id, seat, &answer) {
+                Ok(step) => step,
+                Err(_) => session.answer(id, seat, &prompt.default_answer()).ok().expect("the default answer is taken"),
+            };
+        }
+        panic!("Llanowar Elves was never paid for");
     }
 
     /// A mana ability whose cost is its own {T} names no permanent to tap: `Tap` is for a tap cost paid by a permanent
