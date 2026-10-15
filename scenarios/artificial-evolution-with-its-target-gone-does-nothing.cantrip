@@ -1,0 +1,39 @@
+# Artificial Evolution's only target, Ornithopter, is killed by Lightning Bolt in response, so the spell has no legal target on
+# resolution and does not resolve (CR 608.2b): no creature type is asked for, in either part of the choice. The positive
+# control is artificial-evolution-changes-a-creature-type-in-a-type-line-for-good.
+
+[Bot1 Deck]
+Island
+Ornithopter
+Artificial Evolution
+Island x14
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x14
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Artificial Evolution.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Ornithopter
+! Bot1.Modes
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Graveyard = Artificial Evolution; Ornithopter
+Bot2.Graveyard = Lightning Bolt

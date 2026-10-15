@@ -1,0 +1,51 @@
+# Artificial Evolution changes the text of the permanent, not what other effects have made it (CR 612.1, 613.1c; the ruling:
+# "if a creature's creature type has been changed by a spell or ability, changing the card's text won't affect or alter the
+# new creature type"). Oko's +1 makes Llanowar Elves a plain Elk (a layer 4 effect, after text-changing in layer 3); Artificial
+# Evolution then replaces Elk with Goblin in its text, which has no Elk in it, and the Elves stay an Elk. Replacing Elf with
+# Goblin first, as artificial-evolution-changes-a-creature-type-in-a-type-line-for-good does, is the positive control: that
+# one is in the printed type line and changes.
+
+[Bot1 Deck]
+Forest
+Mox Sapphire
+Mox Pearl
+Llanowar Elves
+Oko, Thief of Crowns
+Artificial Evolution
+Island
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Oko, Thief of Crowns.Cast
+Bot1.Pass
+Bot1.Battlefield.Oko, Thief of Crowns.Activate(Llanowar Elves; Ability: Elk)
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Llanowar Elves.Subtypes = Elk
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Artificial Evolution.Cast(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Elk)
+Bot1.Modes(Goblin)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Graveyard = Artificial Evolution
+Bot1.Battlefield.Llanowar Elves.Subtypes = Elk
+Bot1.Battlefield.Llanowar Elves.Colors = Green

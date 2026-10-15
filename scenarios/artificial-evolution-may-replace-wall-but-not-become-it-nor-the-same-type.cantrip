@@ -1,0 +1,68 @@
+# Artificial Evolution's two creature types: the one replaced may be any, Wall included, but the new one "can't be Wall" and,
+# as the ruling has it, must be a different word from the first (CR 612.1). Each limit is a refusal beside the choice that
+# is legal. Concealing Curtains is a Wall: Wall is offered as the type to replace and not as the new type, and it becomes a
+# Goblin. Goblin Welder's Goblin may not become a Goblin, so it becomes an Elf; its name still says Goblin (CR 612.2). Bot2's
+# Swamp has no creature types or words at all, and may still be targeted (a permanent with nothing to change); it is
+# unchanged.
+
+[Bot1 Deck]
+Island
+Island
+Island
+Artificial Evolution
+Artificial Evolution
+Artificial Evolution
+Island
+Island x13
+
+[Bot2 Deck]
+Swamp
+Concealing Curtains
+Mountain
+Goblin Welder
+Swamp x14
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Concealing Curtains.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Goblin Welder.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Artificial Evolution.Cast(Concealing Curtains)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Wall)
+! Bot1.Modes(Wall)
+Bot1.Modes(Goblin)
+? Bot2.Battlefield.Concealing Curtains.Subtypes = Goblin
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Artificial Evolution.Cast(Goblin Welder)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Goblin)
+! Bot1.Modes(Goblin)
+Bot1.Modes(Elf)
+? Bot2.Battlefield.Goblin Welder.Subtypes = Artificer; Elf
+Bot1.Battlefield.Island#3.Activate
+Bot1.Hand.Artificial Evolution.Cast(Bot2.Battlefield.Swamp)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Elf)
+Bot1.Modes(Goblin)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot2.Battlefield.Swamp.Subtypes = Swamp
+Bot2.Battlefield.Goblin Welder.Subtypes = Artificer; Elf
+Bot2.Battlefield.Concealing Curtains.Subtypes = Goblin
