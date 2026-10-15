@@ -84,6 +84,7 @@ fn keyword_name(k: u8) -> &'static str {
         26 => "Daybound",
         27 => "Nightbound",
         28 => "SplitSecond",
+        32 => "Changeling",
         _ => "?",
     }
 }
@@ -321,7 +322,9 @@ impl StateDump {
                     .map(|t| t.name().to_string())
                     .collect();
                 d.list(&format!("{key}.Types"), types, true);
-                let mut subtypes: Vec<String> = c.subtypes.iter().map(|t| t.name().to_string()).collect();
+                // Every creature type (Changeling, CR 702.73a) is one entry, not three hundred.
+                let every = Subtype::CREATURE_TYPES.iter().all(|&t| c.subtypes.has(t));
+                let mut subtypes: Vec<String> = c.subtypes.iter().filter(|t| !(every && t.is_creature_type())).map(|t| t.name().to_string()).chain(every.then(|| "(every creature type)".to_string())).collect();
                 if !subtypes.is_empty() {
                     subtypes.sort();
                     d.list(&format!("{key}.Subtypes"), subtypes, true);
@@ -332,7 +335,7 @@ impl StateDump {
                     d.list(&format!("{key}.Colors"), colors, true);
                 }
                 let mut keywords: Vec<String> =
-                    (0..32u8).filter(|&k| c.keywords.0 & (1 << k) != 0).map(|k| keyword_name(k).to_string()).collect();
+                    (0..64u8).filter(|&k| c.keywords.0 & (1u64 << k) != 0).map(|k| keyword_name(k).to_string()).collect();
                 if !keywords.is_empty() {
                     keywords.sort();
                     d.list(&format!("{key}.Keywords"), keywords, true);

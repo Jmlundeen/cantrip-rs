@@ -558,6 +558,10 @@ pub enum Keyword {
     CantBeBlockedByPowerTwoOrLess = 30,
     /// "This creature can't be blocked except by three or more creatures" (CR 509.1b).
     CantBeBlockedExceptByThreeOrMore = 31,
+    /// Changeling (CR 702.73a): "This object is every creature type", a characteristic-defining ability that works in
+    /// every zone (CR 604.3). The layers add the creature types (`cantrip-rules` `layers.rs`), so card code asks
+    /// `has_subtype` as for any creature type. Printed on Firdoch Core.
+    Changeling = 32,
 }
 
 /// Day and night (CR 731.1): the designation the game itself has, belonging to no player. A game starts with neither
@@ -572,27 +576,27 @@ pub enum DayNight {
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Default)]
-pub struct Keywords(pub u32);
+pub struct Keywords(pub u64);
 
 impl Keywords {
     pub const NONE: Keywords = Keywords(0);
 
     pub const fn of(keywords: &[Keyword]) -> Keywords {
-        let mut bits = 0u32;
+        let mut bits = 0u64;
         let mut i = 0;
         while i < keywords.len() {
-            bits |= 1 << keywords[i] as u8;
+            bits |= 1u64 << keywords[i] as u8;
             i += 1;
         }
         Keywords(bits)
     }
 
     pub fn has(self, k: Keyword) -> bool {
-        self.0 & (1 << k as u8) != 0
+        self.0 & (1u64 << k as u8) != 0
     }
 
     pub fn with(self, k: Keyword) -> Keywords {
-        Keywords(self.0 | (1 << k as u8))
+        Keywords(self.0 | (1u64 << k as u8))
     }
 }
 

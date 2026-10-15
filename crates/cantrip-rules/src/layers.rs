@@ -227,7 +227,7 @@ fn initial(cards: &CardTable, card: CardId, copy: Option<&Copiable>) -> Chars {
         abilities[n] = Some(extra);
         n += 1;
     }
-    Chars {
+    let mut chars = Chars {
         card,
         name: copy_name.unwrap_or_else(|| renamed(def, words)),
         types: TypeSet(def.types.0 | extra_types.0),
@@ -250,6 +250,21 @@ fn initial(cards: &CardTable, card: CardId, copy: Option<&Copiable>) -> Chars {
         must_attack: false,
         abilities,
         no_cost,
+    };
+    changeling(&mut chars);
+    chars
+}
+
+/// Changeling (CR 702.73a): "This object is every creature type", a characteristic-defining ability that works in every
+/// zone (CR 604.3) and applies first in layer 4 (CR 613.3). It gives only what the object can have: creature types
+/// belong to creatures and kindreds (CR 205.3d, 205.3m). Only the printed ability is a characteristic-defining one
+/// (CR 604.3a), so one granted in layer 6 gives nothing. A non-creature, non-Kindred object with Changeling that later
+/// becomes a creature is not given the types: no printed card can reach that case (Firdoch Core is a Kindred).
+fn changeling(chars: &mut Chars) {
+    if chars.keywords.has(Keyword::Changeling) && (chars.is(CardType::Creature) || chars.is(CardType::Kindred)) {
+        for t in Subtype::CREATURE_TYPES {
+            chars.subtypes = chars.subtypes.with(t);
+        }
     }
 }
 
@@ -333,7 +348,8 @@ fn apply_effect(effect: &ContinuousEffect, layer: Layer, chars: &mut Chars) {
         match (layer, effect.kind) {
             // CR 612.1: a subtype in the type line is a word of its text; the rules text's words are read by card code.
             (Layer::Text, EffectKind::ChangeText { from: Word::Subtype(from), to: Word::Subtype(to) }) => {
-                if chars.subtypes.has(from) {
+                // Changeling's creature types stay: its ability applies after the layer-3 change.
+                if chars.subtypes.has(from) && !(from.is_creature_type() && chars.keywords.has(Keyword::Changeling)) {
                     chars.subtypes = chars.subtypes.without(from).with(to);
                 }
             }
