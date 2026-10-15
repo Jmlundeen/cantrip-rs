@@ -1,0 +1,39 @@
+# Flashfreeze: "Counter target red or green spell." Bot2 casts Mox Ruby, a colorless artifact spell, and Flashfreeze is
+# not offered against it (the refusal); then Bot2 casts a red Lightning Bolt at Bot1 and the same Flashfreeze counters it
+# (the positive control, the red half of "red or green"), so Bot1 keeps all its life and the Bolt goes to the graveyard.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Flashfreeze
+Island x12
+
+[Bot2 Deck]
+Mox Ruby
+Mountain
+Lightning Bolt
+Mountain x12
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+! Bot1.Hand.Flashfreeze.Cast(Stack.Mox Ruby)
+Bot2.Pass
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Flashfreeze.Cast(Stack.Lightning Bolt)
+[T2 Bot2.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 20
+Bot1.Graveyard = Flashfreeze
+Bot2.Graveyard = Lightning Bolt
+Bot2.Battlefield = Mox Ruby; Mountain

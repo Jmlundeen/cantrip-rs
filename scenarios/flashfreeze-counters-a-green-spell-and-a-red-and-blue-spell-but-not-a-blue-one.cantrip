@@ -1,0 +1,64 @@
+# Flashfreeze on Bot1's turn 3. Green Llanowar Elves are countered (the green half of "red or green"). Brainstorm, a
+# blue spell, is not a legal target and the permanent Elves are not a spell (the refusals). Third Path Iconoclast, red
+# and blue, is countered by the second Flashfreeze: a multicolored spell is red if one of its colors is red.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Mox Sapphire
+Llanowar Elves
+Third Path Iconoclast
+Brainstorm
+Island
+Island x10
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Flashfreeze
+Flashfreeze
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Flashfreeze.Cast(Stack.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Brainstorm.Cast
+! Bot2.Hand.Flashfreeze.Cast(Stack.Brainstorm)
+Bot2.Pass
+Bot1.Hand.Third Path Iconoclast.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Flashfreeze.Cast(Stack.Third Path Iconoclast)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Third Path Iconoclast; Brainstorm; Llanowar Elves
+Bot2.Graveyard = Flashfreeze; Flashfreeze
