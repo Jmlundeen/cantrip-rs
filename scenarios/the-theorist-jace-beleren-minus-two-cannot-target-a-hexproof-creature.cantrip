@@ -1,0 +1,42 @@
+# The Theorist, Jace Beleren's -2 cannot choose a hexproof creature (CR 702.11b): Bot2 controls Sylvan Caryatid (hexproof)
+# and an Ornithopter, and when Bot1's -2 asks for the target, the Caryatid is refused while the Ornithopter - the positive
+# control, asked in the same question - is chosen and returns to Bot2's hand. The Caryatid stays.
+
+[Bot1 Deck]
+Island
+Black Lotus
+The Theorist, Jace Beleren
+Island x4
+Island x12
+
+[Bot2 Deck]
+Island
+Mox Emerald
+Sylvan Caryatid
+Ornithopter
+Island x3
+Island x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.The Theorist, Jace Beleren.Cast
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Sylvan Caryatid.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.The Theorist, Jace Beleren.Activate(Ability: For each opponent)
+! Bot1.Target(Bot2.Battlefield.Sylvan Caryatid)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Island; Mox Emerald; Sylvan Caryatid
+Bot2.Hand = Island; Island; Island; Island; Ornithopter
+Bot1.Battlefield.The Theorist, Jace Beleren.Counters.Loyalty = 1
+Stack.Count = 0

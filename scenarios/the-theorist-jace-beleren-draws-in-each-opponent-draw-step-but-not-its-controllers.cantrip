@@ -1,0 +1,32 @@
+# The Theorist, Jace Beleren: "At the beginning of each opponent's draw step, you draw a card." Bot1 casts Jace on turn 1
+# (Black Lotus and an Island; no loyalty ability used). Bot1 has 4 cards in hand. In Bot2's draw step on turn 2 Bot2 draws
+# its normal card (8 in hand) and Bot1 draws one too (5). In Bot1's own draw step on turn 3 the trigger does not fire
+# (CR 603.2b, "each opponent's"): Bot1 draws only its normal card (6) - the control for the first check.
+
+[Bot1 Deck]
+Island
+Black Lotus
+The Theorist, Jace Beleren
+Island x4
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.The Theorist, Jace Beleren.Cast
+[T2 Bot2.Main1]
+? Bot1.Hand.Count = 5
+? Bot2.Hand.Count = 8
+? Bot1.Library.Count = 11
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 6
+? Bot1.Library.Count = 10
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.The Theorist, Jace Beleren.Counters.Loyalty = 3

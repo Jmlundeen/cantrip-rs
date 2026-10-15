@@ -1,0 +1,52 @@
+# The Theorist, Jace Beleren's -6: "Draw three cards. Then put X +1/+1 counters on each creature you control, where X is
+# the number of cards in your hand." Bot1 casts Jace on turn 1 and uses the +1 on turns 1, 3 and 5 (loyalty 6 after turn 5): three
+# Illusions. On turn 5 with Jace at 5 the -6 is refused (it cannot be paid, CR 606.6) - the control is the same ability offered on
+# turn 7 at loyalty 6. Bot2 has an Ornithopter, which gets nothing. On turn 7 Bot1 has 7 cards in hand (every turn draws one,
+# Jace draws one in each of Bot2's draw steps, one Island is played a turn), so the -6 draws three (10) and X is counted
+# AFTER the draw: each Illusion gets 10 counters, 11/11. Jace goes to 0 and is put into the graveyard (CR 704.5i).
+
+[Bot1 Deck]
+Island
+Black Lotus
+The Theorist, Jace Beleren
+Island x4
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Island x30
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.The Theorist, Jace Beleren.Cast
+Bot1.Battlefield.The Theorist, Jace Beleren.Activate(Ability: +1)
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.The Theorist, Jace Beleren.Activate(Ability: +1)
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+! Bot1.Battlefield.The Theorist, Jace Beleren.Activate(Ability: Draw three cards)
+Bot1.Battlefield.The Theorist, Jace Beleren.Activate(Ability: +1)
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+? Bot1.Hand.Count = 7
+? Bot1.Battlefield.The Theorist, Jace Beleren.Counters.Loyalty = 6
+Bot1.Battlefield.The Theorist, Jace Beleren.Activate(Ability: Draw three cards)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 10
+Bot1.Battlefield = Island; Island; Island; Island; Illusion; Illusion; Illusion
+Bot1.Battlefield.Illusion#1.Counters.PlusOnePlusOne = 10
+Bot1.Battlefield.Illusion#2.Counters.PlusOnePlusOne = 10
+Bot1.Battlefield.Illusion#3.Counters.PlusOnePlusOne = 10
+Bot1.Battlefield.Illusion#1.Power = 11
+Bot1.Battlefield.Illusion#1.Toughness = 11
+Bot1.Graveyard = The Theorist, Jace Beleren; Black Lotus
+Bot2.Battlefield = Ornithopter
+Bot2.Battlefield.Ornithopter.Counters.PlusOnePlusOne = (absent)
+Stack.Count = 0

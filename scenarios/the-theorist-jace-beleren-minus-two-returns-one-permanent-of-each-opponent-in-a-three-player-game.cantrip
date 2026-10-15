@@ -1,0 +1,57 @@
+# The Theorist, Jace Beleren in a three-player game. "At the beginning of each opponent's draw step, you draw a card" fires
+# in Bot2's draw step and again in Bot3's: Bot1 draws on both turns. Bot1 casts Jace on turn 1 (Black Lotus and an
+# Island); Bot2 has an Ornithopter and a Mox Jet, Bot3 a Sol Ring. On turn 4 the -2 "for each opponent, return up to one target
+# artifact or creature that player controls": Bot1 picks Bot2's Ornithopter, and then Bot2's Mox Jet is not on offer for the
+# next target (one per opponent) - Bot3's Sol Ring is; no third target is asked for, as both opponents have one. Ornithopter
+# and Sol Ring go to their owners' hands, the Mox Jet stays.
+
+[Bot1 Deck]
+Island
+Black Lotus
+The Theorist, Jace Beleren
+Island x4
+Island x12
+
+[Bot2 Deck]
+Ornithopter
+Mox Jet
+Island x5
+Island x12
+
+[Bot3 Deck]
+Island
+Sol Ring
+Island x5
+Island x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.The Theorist, Jace Beleren.Cast
+[T2 Bot2.Main1]
+? Bot1.Hand.Count = 6
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot3.Main1]
+? Bot1.Hand.Count = 7
+Bot3.Hand.Island.Play
+Bot3.Battlefield.Island.Activate
+Bot3.Hand.Sol Ring.Cast
+[T4 Bot1.Main1]
+? Bot1.Hand.Count = 8
+Bot1.Battlefield.The Theorist, Jace Beleren.Activate(Ability: For each opponent)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+! Bot1.Target(Bot2.Battlefield.Mox Jet)
+Bot1.Target(Bot3.Battlefield.Sol Ring)
+! Bot1.Target
+[Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Mox Jet
+Bot2.Hand = Island; Island; Island; Island; Island; Island; Ornithopter
+Bot3.Battlefield = Island
+Bot3.Hand = Island; Island; Island; Island; Island; Island; Sol Ring
+Bot1.Battlefield.The Theorist, Jace Beleren.Counters.Loyalty = 1
+Stack.Count = 0

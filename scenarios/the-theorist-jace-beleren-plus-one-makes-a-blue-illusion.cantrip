@@ -1,0 +1,33 @@
+# The Theorist, Jace Beleren's +1: "Create a 1/1 blue Illusion creature token." Bot1 casts Jace on turn 1 with Black Lotus
+# (UUU) and an Island, then loyalty-activates +1 the same turn: Jace goes 3 -> 4 and a blue Illusion creature token 1/1
+# appears under Bot1's control (CR 111.1, 606.4).
+
+[Bot1 Deck]
+Island
+Black Lotus
+The Theorist, Jace Beleren
+Island x4
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.The Theorist, Jace Beleren.Cast
+Bot1.Battlefield.The Theorist, Jace Beleren.Activate(Ability: +1)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Illusion; Island; The Theorist, Jace Beleren
+Bot1.Battlefield.The Theorist, Jace Beleren.Counters.Loyalty = 4
+Bot1.Battlefield.Illusion.Colors = Blue
+Bot1.Battlefield.Illusion.Types = Creature
+Bot1.Battlefield.Illusion.Subtypes = Illusion
+Bot1.Battlefield.Illusion.Power = 1
+Bot1.Battlefield.Illusion.Toughness = 1
+Bot1.Hand.Count = 4
+Stack.Count = 0

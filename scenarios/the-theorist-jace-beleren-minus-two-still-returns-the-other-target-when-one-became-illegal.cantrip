@@ -1,0 +1,53 @@
+# The Theorist, Jace Beleren's -2 with two targets in a three-player game, one of which becomes illegal (CR 608.2b): Bot1
+# targets Bot2's Ornithopter and Bot3's Sol Ring. In response Bot2 Lightning Bolts its own Ornithopter, which dies. The
+# ability still resolves for the target that is legal: Sol Ring goes to Bot3's hand, and the Ornithopter (a card in
+# Bot2's graveyard now - a new object, CR 400.7) is not touched.
+
+[Bot1 Deck]
+Island
+Black Lotus
+The Theorist, Jace Beleren
+Island x4
+Island x12
+
+[Bot2 Deck]
+Ornithopter
+Mox Ruby
+Lightning Bolt
+Island x4
+Island x12
+
+[Bot3 Deck]
+Island
+Sol Ring
+Island x5
+Island x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.The Theorist, Jace Beleren.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot3.Main1]
+Bot3.Hand.Island.Play
+Bot3.Battlefield.Island.Activate
+Bot3.Hand.Sol Ring.Cast
+[T4 Bot1.Main1]
+Bot1.Battlefield.The Theorist, Jace Beleren.Activate(Ability: For each opponent)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Target(Bot3.Battlefield.Sol Ring)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Mox Ruby
+Bot2.Graveyard = Ornithopter; Lightning Bolt
+Bot3.Battlefield = Island
+Bot3.Hand = Island; Island; Island; Island; Island; Island; Sol Ring
+Bot1.Battlefield.The Theorist, Jace Beleren.Counters.Loyalty = 1
+Stack.Count = 0
