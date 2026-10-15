@@ -4,11 +4,7 @@ use cantrip_oracle as oracle;
 
 /// Put two +1/+1 counters on each creature you control.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    for id in g.permanents_of(item.controller) {
-        if g.chars(id).is(CardType::Creature) {
-            g.add_counters(id, CounterKind::PlusOne, 2);
-        }
-    }
+    cantrip_mechanics::effects::counters_on_creatures_you_control(g, item.controller, CounterKind::PlusOne, 2);
     Ok(())
 }
 

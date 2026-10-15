@@ -15,11 +15,7 @@ fn grow(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if power <= 0 {
         return Ok(());
     }
-    let creatures: Vec<ObjectId> =
-        g.permanents_of(item.controller).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
-    for id in creatures {
-        g.add_counters(id, CounterKind::PlusOne, power);
-    }
+    cantrip_mechanics::effects::counters_on_creatures_you_control(g, item.controller, CounterKind::PlusOne, power);
     Ok(())
 }
 

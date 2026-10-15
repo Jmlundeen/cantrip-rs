@@ -3,11 +3,10 @@
 
 use cantrip_api::*;
 
-/// "Draw N cards" (CR 121.1). Chromatic Star and Mind Stone print "draw a card"; Coveted Jewel and Bankrupt in Blood draw
-/// three.
 /// "Put `n` `kind` counters on each creature you control": on the creatures `player` controls as it is read, one after the
 /// other. The creatures, for what the rest of the sentence does to "those creatures". Abandoned Air Temple, Elspeth,
-/// Storm Slayer, Anduril, Narsil Reforged and The Theorist, Jace Beleren print it.
+/// Storm Slayer, Anduril, Narsil Reforged, Gavony Township, Germination Practicum, Ouroboroid and The Theorist, Jace
+/// Beleren print it.
 pub fn counters_on_creatures_you_control(g: &mut dyn Game, player: PlayerId, kind: CounterKind, n: i16) -> Vec<ObjectId> {
     let creatures: Vec<ObjectId> = g.permanents_of(player).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
     for &id in &creatures {
@@ -16,6 +15,8 @@ pub fn counters_on_creatures_you_control(g: &mut dyn Game, player: PlayerId, kin
     creatures
 }
 
+/// "Draw N cards" (CR 121.1). Chromatic Star and Mind Stone print "draw a card"; Coveted Jewel and Bankrupt in Blood draw
+/// three.
 pub fn draw<const N: u32>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.draw(item.controller, N);
     Ok(())
