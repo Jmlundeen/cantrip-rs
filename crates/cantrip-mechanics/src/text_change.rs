@@ -29,25 +29,21 @@ pub fn color_word_or_basic_land_type(g: &mut dyn Game, player: PlayerId, source:
 
 /// One color of `choices`.
 fn one_color(g: &mut dyn Game, player: PlayerId, source: ObjectId, choices: ColorSet) -> Result<Color, Suspend> {
-    match g.ask(player, RequestKind::ChooseColors { source, choices, count: 1 })? {
-        Answer::Colors(colors) => Ok(colors[0]),
-        _ => unreachable!("the core answers a color choice with colors"),
-    }
+    let ask = RequestKind::ChooseColors { source, choices, count: 1 };
+    let Answer::Colors(colors) = g.ask(player, ask)? else { unreachable!("the core answers a color choice with colors") };
+    Ok(colors[0])
 }
 
 /// One subtype of `choices`.
 pub fn one_subtype(g: &mut dyn Game, player: PlayerId, source: ObjectId, choices: Vec<Subtype>) -> Result<Subtype, Suspend> {
-    match g.ask(player, RequestKind::ChooseSubtype { source, choices })? {
-        Answer::Subtype(s) => Ok(s),
-        _ => unreachable!("the core answers a subtype choice with a subtype"),
-    }
+    let ask = RequestKind::ChooseSubtype { source, choices };
+    let Answer::Subtype(chosen) = g.ask(player, ask)? else { unreachable!("the core answers a subtype choice with a subtype") };
+    Ok(chosen)
 }
 
-/// "Change the text of [it] by replacing all instances of `from` with `to`" for `duration` (CR 612.1, 611.2): an object
-/// that has left the stack or the battlefield since it was targeted is a new object, and nothing changes.
+/// "Change the text of [it] by replacing all instances of `from` with `to`" for `duration` (CR 612.1, 611.2). `object` is the
+/// resolving spell's target as `targets::object` returned it, so it is still the object that was targeted (CR 400.7, 608.2b);
+/// the effect applies to a permanent or a spell, and goes on applying to the permanent a permanent spell becomes (CR 400.7a).
 pub fn change(g: &mut dyn Game, source: ObjectId, object: ObjectId, (from, to): (Word, Word), duration: Duration) {
-    let obj = g.obj(object);
-    if is_live(g, object) && (obj.zone.is(ZoneKind::Battlefield) || obj.zone.is(ZoneKind::Stack)) {
-        g.add_effect(source, object, EffectKind::ChangeText { from, to }, duration);
-    }
+    g.add_effect(source, object, EffectKind::ChangeText { from, to }, duration);
 }
