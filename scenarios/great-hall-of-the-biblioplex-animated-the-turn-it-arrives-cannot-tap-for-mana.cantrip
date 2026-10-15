@@ -1,0 +1,39 @@
+# CR 302.6, 605.1a: a creature's {T} ability can't be activated unless it has been under its controller's control continuously
+# since their most recent turn began, and that includes a land that has become a creature. The Hall is played on turn 1 and
+# animated the same turn by five Mox Rubies, so neither of its {T} mana abilities may be activated. (The control: on later turns
+# the Hall taps as a creature, in great-hall-of-the-biblioplex-becomes-a-wizard-creature-and-gets-power-from-instants.)
+
+[Bot1 Deck]
+Great Hall of the Biblioplex
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Great Hall of the Biblioplex.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Battlefield.Mox Ruby#4.Activate
+Bot1.Battlefield.Mox Ruby#5.Activate
+Bot1.Battlefield.Great Hall of the Biblioplex.Activate(Ability: {5})
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Great Hall of the Biblioplex.Types = Land; Creature
+! Bot1.Battlefield.Great Hall of the Biblioplex.Activate(Ability: Pay 1 life)
+! Bot1.Battlefield.Great Hall of the Biblioplex.Activate(Ability: {T}: Add {C})
+
+[Expect]
+Bot1.Battlefield.Great Hall of the Biblioplex.Tapped = false
+Bot1.Life = 20
