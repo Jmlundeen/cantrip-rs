@@ -3,7 +3,7 @@
 //! types as `Subtype`'s discriminant (`sub(Subtype::Plains)`), because a function pointer cannot capture them.
 //!
 //! The "enters tapped" part of a land is `mana::enters_tapped`, `mana::enters_tapped_unless_pay_two_life` (shock lands) or
-//! `enters_tapped_unless_you_control` below; the card sets it in `enters`.
+//! `enters_tapped_unless_you_control` or `enters_tapped_unless_you_control_either` below; the card sets it in `enters`.
 
 use crate::library::{search_to_battlefield, Find};
 use crate::{choose, effects, mana, triggers};
@@ -40,6 +40,17 @@ pub fn controls_land_type(q: &dyn Query, controller: PlayerId, land_type: Subtyp
 pub fn enters_tapped_unless_you_control<const TYPE: u16>(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
     let land_type = word(g, entering.object, TYPE);
     if !controls_land_type(g, entering.controller, land_type) {
+        entering.tapped = true;
+    }
+    Ok(())
+}
+
+/// "This land enters tapped unless you control a [land type] or a [land type]" (CR 614.1c): as `enters_tapped_unless_you_control`
+/// with two land types, each read through the layers and the land's words (CR 612.2). Cori Mountain Monastery (Plains or
+/// Island) and Mistrise Village (Mountain or Forest) print it.
+pub fn enters_tapped_unless_you_control_either<const A: u16, const B: u16>(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
+    let (a, b) = (word(g, entering.object, A), word(g, entering.object, B));
+    if !controls_land_type(g, entering.controller, a) && !controls_land_type(g, entering.controller, b) {
         entering.tapped = true;
     }
     Ok(())
