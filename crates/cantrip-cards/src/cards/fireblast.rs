@@ -7,8 +7,8 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-fn mountain(q: &dyn Query, _: &Asker, id: ObjectId) -> bool {
-    q.chars(id).has_subtype(Subtype::Mountain)
+fn mountain(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
+    q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Mountain))
 }
 
 pub static CARD: CardDef = CardDef {
