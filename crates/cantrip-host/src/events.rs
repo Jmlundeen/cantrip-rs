@@ -52,7 +52,9 @@ pub enum Proto {
     Tap { object: ObjectId, tapped: bool },
     Cast { spell: ObjectId, controller: PlayerId, targets: Vec<Target>, x: Option<i32>, modes: Vec<String>, kicked: i32, gift: Option<PlayerId> },
     AbilityPut { serial: u32, source: ObjectId, controller: PlayerId, text: String, targets: Vec<Target>, triggered: bool, modes: Vec<String> },
-    AbilityResolved { serial: u32, source: ObjectId, controller: PlayerId, targets: Vec<Target> },
+    /// `first` is the log sequence of the first entry its effect made: the entries from there up to this one are what it
+    /// did, and none before.
+    AbilityResolved { serial: u32, source: ObjectId, controller: PlayerId, targets: Vec<Target>, first: u64 },
     Revealed { player: PlayerId, cards: Vec<ObjectId> },
     Counters { object: ObjectId, name: String, count: i32 },
     Transformed { object: ObjectId, from: String, to: String },
@@ -71,6 +73,7 @@ pub enum Proto {
 #[derive(Clone, Debug)]
 struct Seen {
     source: ObjectId,
+    ability: AbilityRef,
     controller: PlayerId,
     targets: Vec<Target>,
 }
@@ -87,6 +90,9 @@ pub struct Tracker {
     ended: bool,
     monarch: Option<PlayerId>,
     extra_turns: usize,
+    /// What made the latest log record, and the sequence the first entry it made was or will be given: a resolution
+    /// that stopped to ask a question carries on in a later collection.
+    run: Option<(Cause, u64)>,
 }
 
 fn spell_facts(game: &Game, spell: ObjectId) -> (Vec<Target>, Option<i32>, Vec<String>, i32, Option<PlayerId>) {
@@ -177,24 +183,46 @@ impl Tracker {
         }
     }
 
-    /// Everything the game did since the last collection: the log entries in `events`, then what the position says
-    /// that they do not.
-    pub fn collect(&mut self, game: &Game, events: &[Event]) -> Vec<Proto> {
-        let mut out = Vec::new();
-        for event in events {
-            self.proto_of(game, event, &mut out);
-        }
+    /// Everything the game did since the last collection: the log entries in `records`, then what the position says
+    /// that they do not. `next` is the sequence the first entry returned will be given.
+    pub fn collect(&mut self, game: &Game, records: &[Record], next: u64) -> Vec<Proto> {
         let state = &game.state;
+        let now: HashSet<u32> = state.stack.iter().filter(|i| i.kind != StackKind::Spell).map(|i| i.serial).collect();
+
+        let mut out = Vec::new();
+        for record in records {
+            if self.run.is_none_or(|(cause, _)| cause != record.cause) {
+                self.run = Some((record.cause, next + out.len() as u64));
+            }
+            // An ability that has resolved is told of where it did, after the entries its effect made (CR 608.2m).
+            if let Event::Resolved { source, ability } = record.event {
+                let resolved = self
+                    .stack
+                    .iter()
+                    .filter(|(serial, seen)| seen.source == source && seen.ability == ability && !now.contains(serial))
+                    .map(|(serial, _)| *serial)
+                    .min();
+                if let Some(seen) = resolved.and_then(|serial| self.stack.remove(&serial).map(|seen| (serial, seen))) {
+                    let (serial, seen) = seen;
+                    let first = match self.run {
+                        Some((Cause::Ability { source: s, ability: a }, first)) if s == source && a == ability => first,
+                        _ => next + out.len() as u64,
+                    };
+                    out.push(Proto::AbilityResolved { serial, source: seen.source, controller: seen.controller, targets: seen.targets, first });
+                }
+                continue;
+            }
+            self.proto_of(game, &record.event, &mut out);
+        }
         self.turn = state.turn.number as i32;
         self.active = state.turn.active;
 
-        // Abilities on the stack: new ones were put there, missing ones resolved (or were countered).
-        let mut now: HashSet<u32> = HashSet::new();
+        // Abilities on the stack: new ones were put there, missing ones left it without resolving - countered, or with
+        // every target gone - and did nothing.
         for item in state.stack.iter().filter(|i| i.kind != StackKind::Spell) {
-            now.insert(item.serial);
             if !self.stack.contains_key(&item.serial) {
                 let text = game.cards.ability(item.ability).text().to_string();
-                self.stack.insert(item.serial, Seen { source: item.object, controller: item.controller, targets: item.targets().to_vec() });
+                self.stack.insert(item.serial, Seen { source: item.object, ability: item.ability, controller: item.controller, targets: item.targets().to_vec() });
                 out.push(Proto::AbilityPut {
                     serial: item.serial,
                     source: item.object,
@@ -210,7 +238,8 @@ impl Tracker {
         gone.sort();
         for serial in gone {
             if let Some(seen) = self.stack.remove(&serial) {
-                out.push(Proto::AbilityResolved { serial, source: seen.source, controller: seen.controller, targets: seen.targets });
+                let first = next + out.len() as u64;
+                out.push(Proto::AbilityResolved { serial, source: seen.source, controller: seen.controller, targets: seen.targets, first });
             }
         }
 
@@ -401,7 +430,7 @@ impl Teller<'_> {
                     modes: modes.clone(),
                 }))
             }
-            Proto::AbilityResolved { serial, source, controller, targets } => {
+            Proto::AbilityResolved { serial, source, controller, targets, first } => {
                 let ability = self.handles.existing(ability_key(*serial));
                 let source = self.handle_for(*source);
                 let targets = targets.iter().filter_map(|t| self.target(*t)).collect();
@@ -409,7 +438,7 @@ impl Teller<'_> {
                     ability,
                     source,
                     controller: seat(*controller),
-                    first: 0,
+                    first: *first as i64,
                     targets,
                     power_toughness: Vec::new(),
                 }))

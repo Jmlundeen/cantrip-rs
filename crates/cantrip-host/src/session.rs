@@ -148,10 +148,11 @@ impl Session {
     pub fn step(&mut self) -> Value {
         let from = self.published.min(self.game.log.len());
         let bound = self.publishable().max(from);
-        let events: Vec<Event> = self.game.log[from..bound].iter().map(|r| r.event).collect();
+        let records: Vec<Record> = self.game.log[from..bound].to_vec();
         self.published = bound;
         let mut protos = std::mem::take(&mut self.told);
-        protos.extend(self.tracker.collect(&self.game, &events));
+        let next = self.sequence + 1 + protos.len() as u64;
+        protos.extend(self.tracker.collect(&self.game, &records, next));
 
         let pending = self.pending();
         let revealed: HashSet<ObjectId> = protos
@@ -397,6 +398,29 @@ mod tests {
                 assert_eq!(flips.len(), 1, "seat {seat}");
                 assert_eq!((flips[0]["Player"].as_i64(), flips[0]["Won"].as_bool()), (Some(1), Some(won)), "seat {seat}");
             }
+        }
+    }
+
+    /// What an ability did is the entries from its `First` up to its resolution, and nothing it did not make: Mana
+    /// Crypt's trigger flipped a coin and took life, and the step, the draw and the trigger itself came before it.
+    #[test]
+    fn a_resolved_ability_owns_only_the_entries_its_effect_made() {
+        let mut session = Session::new(deal(&["Mana Crypt"], "Plains", 19)).ok().unwrap();
+        session.game.state.force_rolls(&[2]);
+        let heard = play_until(&mut session, |events| {
+            let flipped = events.iter().position(|e| e["$type"] == "CoinFlippedEvent");
+            flipped.is_some_and(|at| events[at..].iter().any(|e| e["$type"] == "AbilityResolvedEvent"))
+        });
+        for seat in ["1", "2"] {
+            let events = &heard[seat];
+            let resolved = events.iter().find(|e| e["$type"] == "AbilityResolvedEvent").unwrap();
+            let (first, at) = (resolved["First"].as_u64().unwrap(), resolved["Sequence"].as_u64().unwrap());
+            let made: Vec<&str> = events
+                .iter()
+                .filter(|e| (first..at).contains(&e["Sequence"].as_u64().unwrap()))
+                .map(|e| e["$type"].as_str().unwrap())
+                .collect();
+            assert_eq!(made, ["CoinFlippedEvent", "LifeChangedEvent"], "seat {seat}");
         }
     }
 
