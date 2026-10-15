@@ -1,0 +1,62 @@
+# "Destroy all creatures" can be regenerated (CR 701.19, 614.8): in response, Bot2 regenerates one of its two Ornithopters with
+# Yavimaya Hollow. The regenerated one is tapped and stays on the battlefield (a battlefield is not a zone the search
+# looks in); the other dies, is exiled from Bot2's graveyard as the evidence-collected effect asks, and the Ornithopter in
+# Bot2's hand and the one in its library are exiled with it. Bot2 draws one card for the one from its hand.
+
+[Bot1 Deck]
+Swamp
+Mox Ruby
+Faithless Looting
+Black Lotus
+Deadly Cover-Up
+Griselbrand
+Swamp
+Swamp
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Yavimaya Hollow
+Mox Emerald
+Ornithopter
+Ornithopter
+Ornithopter
+Island
+Island
+Island
+Ornithopter
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Griselbrand; Swamp)
+Bot2.Hand.Yavimaya Hollow.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Deadly Cover-Up.Cast
+Bot1.Modes(Collect evidence)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Choose(Griselbrand)
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Yavimaya Hollow.Activate(Bot2.Battlefield.Ornithopter; Ability: Regenerate)
+Bot1.Pass
+Bot1.Choose(Ornithopter)
+Bot1.Choose(Ornithopter)
+Bot1.Search(Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Exile.Count = 4
+Bot2.Hand.Count = 4
+Bot2.Battlefield.Ornithopter.Tapped = true
+Bot2.Graveyard.Count = 0

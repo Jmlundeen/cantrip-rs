@@ -1,0 +1,39 @@
+# CR 701.59a and the ruling: "If you can't exile enough cards to meet or exceed the required mana value, you can't choose to
+# collect evidence at all." Bot1's graveyard is empty when it casts Deadly Cover-Up, so the collect-evidence option is not
+# offered (the refusal) and the spell is cast without it; both Ornithopters die and nothing is exiled. The positive control,
+# the same option offered with enough mana value in the graveyard, is the all-three-zones scenario.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Deadly Cover-Up
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp x14
+
+[Bot2 Deck]
+Ornithopter
+Island x6
+Island
+Island x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Deadly Cover-Up.Cast
+! Bot1.Modes(Collect evidence)
+Bot1.Modes(Cast without)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot2.Graveyard = Ornithopter

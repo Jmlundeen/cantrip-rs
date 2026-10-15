@@ -1,0 +1,59 @@
+# Deadly Cover-Up with evidence collected: Bot1 exiles Griselbrand (mana value 8) from its graveyard as the additional cost
+# (CR 701.59a), then destroys Bot2's two Ornithopters, which land in Bot2's graveyard. Bot1 exiles one of them from there, and
+# searches Bot2's graveyard, hand and library for the rest of that name: all of them are exiled, Bot2 shuffles and draws one
+# card for the one exiled from its hand (not for the ones from the graveyard and the library).
+
+[Bot1 Deck]
+Swamp
+Mox Ruby
+Faithless Looting
+Black Lotus
+Deadly Cover-Up
+Griselbrand
+Swamp
+Swamp
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Ornithopter
+Island x4
+Island
+Ornithopter
+Ornithopter
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Griselbrand; Swamp)
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Deadly Cover-Up.Cast
+Bot1.Modes(Collect evidence)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Choose(Griselbrand)
+Bot1.Pass
+Bot1.Choose(Ornithopter)
+Bot1.Choose(Ornithopter)
+Bot1.Choose(Ornithopter)
+Bot1.Search(Ornithopter; Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Exile.Count = 6
+Bot2.Battlefield.Count = 1
+Bot2.Graveyard.Count = 0
+Bot2.Library.Count = 9
+Bot2.Hand = Island; Island; Island; Island; Island

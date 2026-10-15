@@ -1,0 +1,51 @@
+# Deadly Cover-Up cast without its optional additional cost: "Destroy all creatures" takes Bot1's own Ornithopter and Bot2's,
+# and nothing is exiled - not Griselbrand, though the graveyard holds the evidence to collect (CR 601.2b: the additional
+# cost is optional), and not an Ornithopter from Bot2's graveyard, hand or library ("If evidence was collected" is false).
+# The positive control, evidence collected from the same graveyard, is ...-exiles-every-card-of-the-name-from-all-three-zones.
+
+[Bot1 Deck]
+Swamp
+Mox Ruby
+Faithless Looting
+Black Lotus
+Deadly Cover-Up
+Griselbrand
+Ornithopter
+Swamp
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Island x5
+Island
+Ornithopter
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Griselbrand; Swamp)
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Deadly Cover-Up.Cast
+Bot1.Modes(Cast without)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot1.Battlefield.Count = 3
+Bot1.Graveyard.Count = 6
+Bot2.Graveyard = Ornithopter
+Bot2.Hand.Count = 7
