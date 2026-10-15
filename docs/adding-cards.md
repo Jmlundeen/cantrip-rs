@@ -24,7 +24,7 @@ The whole corpus runs in a fraction of a second, so run it after every card rath
    text) and the scenarios whose decks hold it. A new card's JSON is its characteristics only; the
    build generates the Rust constant from it, so there is nothing to run. The scenarios say what has to be true, and they name the
    options of a question in the order the engine offers them ("the first one offered"), so a card asks its questions
-   in the order the rules and the cards already ported do.
+   in the order the rules and the cards already implemented do.
 2. **Write the card's file** in `crates/cantrip-cards/src/cards/<card_name>.rs` (`new-card.py` writes it
    with the characteristics only). Nothing else has to change: the registry is generated from the files in that folder.
    Adding a card creates files only (its JSON, its Rust file, its scenarios) and edits none that another card's
@@ -85,7 +85,7 @@ stops there (`?` carries the `Suspend` out). Once the question is answered, the 
   globals, no clocks, no `HashMap` iteration.
 - Everything before the question is done again on the re-run. That is correct and cheap (the engine rolls the first
   run back). Never keep state across runs anywhere but the game.
-- Ask what the rules ask, when they ask it, the way the cards already ported do. A question with one possible answer
+- Ask what the rules ask, when they ask it, the way the cards already implemented do. A question with one possible answer
   is skipped in some places and not in others (a lone copy candidate is taken; a sacrifice of exactly as many as
   there are is taken; a discard is always asked unless the hand is empty); match the existing cards, since the
   scenarios rely on it.
@@ -168,7 +168,7 @@ Card crates depend on `cantrip-api`, `cantrip-mechanics` and `cantrip-oracle` on
 
 ## What already exists
 
-Before writing anything, look at what the cards already ported do (`crates/cantrip-cards/src/cards/`). Most
+Before writing anything, look at what the cards already implemented do (`crates/cantrip-cards/src/cards/`). Most
 shapes have an example:
 
 - a targeted spell (Lightning Bolt);

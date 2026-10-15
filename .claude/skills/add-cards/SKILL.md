@@ -1,6 +1,6 @@
 ---
 name: add-cards
-description: Add one or more Magic cards to the Cantrip rules engine - each card exact to its Oracle text and the Comprehensive Rules, built from the engine's shared rules verbs and keyword mechanics, with scenarios that execute every line of its code and cover its corner cases and interactions - and, for many cards, run them through parallel agents and land their work. Use whenever a card is added, implemented, ported or fixed, by anyone.
+description: Add one or more Magic cards to the Cantrip rules engine - each card exact to its Oracle text and the Comprehensive Rules, built from the engine's shared rules verbs and keyword mechanics, with scenarios that execute every line of its code and cover its corner cases and interactions - and, for many cards, run them through parallel agents and land their work. Use whenever a card is added, implemented or fixed, by anyone.
 ---
 
 # Adding cards
@@ -109,11 +109,11 @@ calling, means it was not the same thing. Leave that in its own card.
    the card, and writes `crates/cantrip-cards/src/cards/<card_name>.rs` over its generated constant.
 4. **Look before writing.** Read `crates/cantrip-api/src/game.rs` (the verbs) and grep `crates/cantrip-mechanics/src`
    (the keyword modules, `targets`, `triggers`, `library`, `lands`, `effects`, `tokens`, `delayed`, `copy`, `hand`,
-   `chosen_type`, `history`, `combat`, `replacements`), and read two or three ported cards with similar text. Most
+   `chosen_type`, `history`, `combat`, `replacements`), and read two or three implemented cards with similar text. Most
    cards need nothing new.
 5. **Write the card.** Its file adds behaviour with struct update syntax over the generated constant
    (`CardDef { spell: Some(..), ..oracle::LIGHTNING_BOLT }`). Ask questions with `g.ask(..)` in the order the rules ask
-   them, offering options in the order the engine and the ported cards do (scenarios answer by name and position).
+   them, offering options in the order the engine and the implemented cards do (scenarios answer by name and position).
    Doc comments quote the Oracle sentence each function implements and cite the CR.
 6. **Write the scenarios** (next section) and run them until they pass:
    `cargo run --profile cards -p cantrip-script --bin corpus -- --card "Card Name"`.
@@ -202,16 +202,16 @@ land. Self-reported "exact" is not proof.
 
 ## Many cards: agents
 
-The coordinator dispatches, lands and keeps the queue; it does not port cards itself in a batch.
+The coordinator dispatches, lands and keeps the queue; it does not implement cards itself in a batch.
 
 1. **Batches** of 15-30 cards, in list order (never pre-sorted by difficulty).
 2. **One agent per batch**, in its own worktree, in the background. Its prompt: this skill's loop for each card (the
    list inline); the core is closed to it unless the prompt opens it, though a missing keyword module may be added in
    `cantrip-mechanics`; a card blocked by the core is skipped with its exact gap (the rule, and what `cantrip-api`
    lacks), never faked; one commit per card; at the end `git rebase main`, the corpus and the verify tests; no push;
-   a report of ported cards with their coverage, skipped cards with their gaps, and anything odd found in the core.
+   a report of implemented cards with their coverage, skipped cards with their gaps, and anything odd found in the core.
 3. **Gaps** that several skipped cards share become a core-feature agent: the core open to it, each feature built to
-   its rule, the waiting cards ported, the benchmark run. Feature agents work on separate rules areas; running agents
+   its rule, the waiting cards implemented, the benchmark run. Feature agents work on separate rules areas; running agents
    are told what landed so they rebase.
 4. **Review agents** read the batch's cards read-only against the review list, before they land.
 5. **Land** each finished branch on `main` (cherry-pick its commits; a conflict stops for a look), then the corpus

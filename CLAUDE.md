@@ -56,7 +56,7 @@ Force the position instead. A `.cantrip` scenario names both decklists in order 
 - The harness is `crates/cantrip-script` (parser, runner, state dump).
   `cargo run --profile cards -p cantrip-script --bin corpus -- --card "Name"` runs one card's scenarios with full
   failure reports; no arguments runs them all (`cargo test` makes one test per scenario file, so adding one lists
-  nothing); `-- --missing 40` ranks the unported cards that block the most.
+  nothing); `-- --missing 40` ranks the missing cards that block the most.
 - `python tools\maintenance\new-card.py "Name"` prints a card's sources and scenarios and starts its file;
   `tools\card-coverage.cmd "Name"` lists the lines of its file that no scenario runs. Adding a card follows the
   `add-cards` skill: exact to the rules, every line covered, corner cases and interactions scenario'd, reviewed.
