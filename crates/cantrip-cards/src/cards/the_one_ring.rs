@@ -1,15 +1,6 @@
 use cantrip_api::*;
 use cantrip_oracle as oracle;
 
-/// "When The One Ring enters, if you cast it" (CR 603.4): a permanent spell that resolved is the one cast
-/// (`ZoneReason::Resolve` is exactly that).
-fn enters_cast(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
-    match event {
-        Event::ZoneChange { new, to, reason: ZoneReason::Resolve, .. } if *new == source && to.is(ZoneKind::Battlefield) => Fired::PLAIN,
-        _ => None,
-    }
-}
-
 /// "You gain protection from everything until your next turn" (CR 702.16j, 611.2b).
 fn protect_you(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.add_effect(item.object, item.object, EffectKind::PlayerProtectionFromEverything, Duration::UntilNextTurnOf(item.controller));
@@ -41,7 +32,7 @@ pub static CARD: CardDef = CardDef {
         AbilityDef::Triggered(TriggeredDef {
             text: "When The One Ring enters, if you cast it, you gain protection from everything until your next turn.",
             listens: EventMask::ZONE_CHANGE,
-            matches: enters_cast,
+            matches: cantrip_mechanics::triggers::this_enters_if_cast,
             effect: protect_you,
             ..TriggeredDef::BLANK
         }),

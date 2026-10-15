@@ -10,6 +10,20 @@ pub fn this_enters(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fir
     }
 }
 
+/// "When this enters, if you cast it" (CR 603.4, 603.6a): the permanent entered as the spell that resolved, and that spell
+/// was cast - the history says so. A permanent put onto the battlefield, or a copy of a permanent spell (a token, CR 707.10f),
+/// was not cast. Lutri, The One Ring and Uldaros Theorix print it.
+pub fn this_enters_if_cast(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::ZoneChange { old, new, to, reason: ZoneReason::Resolve, .. }
+            if *new == source && to.is(ZoneKind::Battlefield) && q.history().cast_of(*old).is_some() =>
+        {
+            Fired::PLAIN
+        }
+        _ => None,
+    }
+}
+
 /// An intervening "if it's on the battlefield" (CR 603.4), checked as the ability triggers and again as it resolves: the
 /// permanent is still the object that triggered (CR 400.7) and has not left. Animate Dead and Necromancy print it.
 pub fn this_is_on_the_battlefield(q: &dyn Query, asker: &Asker) -> bool {
