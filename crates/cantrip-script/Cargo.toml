@@ -4,6 +4,7 @@ description = "The .cantrip scenario runner, with the C# runner's semantics, aga
 version.workspace = true
 edition.workspace = true
 publish.workspace = true
+license.workspace = true
 
 [features]
 staged = ["cantrip-engine/staged"]

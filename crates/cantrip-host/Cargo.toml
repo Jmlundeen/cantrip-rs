@@ -4,6 +4,7 @@ description = "The sidecar Cantrip.Server runs the native engine as: the JSON-li
 version.workspace = true
 edition.workspace = true
 publish.workspace = true
+license.workspace = true
 
 [lib]
 name = "cantrip_host"

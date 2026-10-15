@@ -4,6 +4,7 @@ description = "The bricks: turn structure, priority, stack, targeting, layers, t
 version.workspace = true
 edition.workspace = true
 publish.workspace = true
+license.workspace = true
 
 [dependencies]
 cantrip-state.workspace = true

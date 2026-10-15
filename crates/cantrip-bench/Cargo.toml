@@ -4,6 +4,7 @@ description = "What the engine costs per decision (docs/engine-design.md, Perfor
 version.workspace = true
 edition.workspace = true
 publish.workspace = true
+license.workspace = true
 
 [features]
 staged = ["cantrip-engine/staged", "cantrip-script/staged"]

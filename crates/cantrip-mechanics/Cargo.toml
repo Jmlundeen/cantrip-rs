@@ -4,6 +4,7 @@ description = "Shared mechanics: the parameterised recipes printed cards share (
 version.workspace = true
 edition.workspace = true
 publish.workspace = true
+license.workspace = true
 
 [dependencies]
 cantrip-api.workspace = true

@@ -4,6 +4,7 @@ description = "The spike's cards: every one code, built from cantrip-api and can
 version.workspace = true
 edition.workspace = true
 publish.workspace = true
+license.workspace = true
 
 [features]
 # Duress and Liliana of the Veil's -2 written as explicit stages instead of re-run with recorded answers, to measure

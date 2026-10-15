@@ -19,6 +19,7 @@ members = [
 version = "0.1.0"
 edition = "2024"
 publish = false
+license = "Unlicense"
 
 [workspace.dependencies]
 cantrip-state = { path = "crates/cantrip-state" }
