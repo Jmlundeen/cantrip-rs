@@ -9,7 +9,7 @@ use cantrip_oracle as oracle;
 fn forest_tapped_for_mana(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
         Event::TappedForMana { permanent, player }
-            if *player == q.controller(source) && q.chars(*permanent).has_subtype(Subtype::Forest) =>
+            if *player == q.controller(source) && q.chars(*permanent).has_subtype(q.words(source).subtype(Subtype::Forest)) =>
         {
             Fired::about(Target::Object(*permanent))
         }
@@ -39,7 +39,7 @@ fn animate_land(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.add_counters(land, CounterKind::PlusOne, 3);
     g.untap(land);
     g.add_effect(item.object, land, EffectKind::AddTypes(TypeSet::of(&[CardType::Creature])), Duration::Indefinite);
-    g.add_effect(item.object, land, EffectKind::AddSubtype(Subtype::Elemental), Duration::Indefinite);
+    g.add_effect(item.object, land, EffectKind::AddSubtype(g.words(item.object).subtype(Subtype::Elemental)), Duration::Indefinite);
     g.add_effect(item.object, land, EffectKind::AddKeywords(Keywords::of(&[Keyword::Vigilance, Keyword::Haste])), Duration::Indefinite);
     g.add_effect(item.object, land, EffectKind::SetPt(0, 0), Duration::Indefinite);
     Ok(())
@@ -51,7 +51,8 @@ fn emblem_and_forests(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
     tokens::create_emblem(g, item.controller, &EMBLEM);
     let you = item.controller;
     let forests = g.state().zone(Zone::library(you)).len().min(255) as u8;
-    let found = search_library(g, you, item.object, forests, true, |q, c| q.chars(c).has_subtype(Subtype::Forest))?;
+    let forest = g.words(item.object).subtype(Subtype::Forest);
+    let found = search_library(g, you, item.object, forests, true, |q, c| q.chars(c).has_subtype(forest))?;
     let lands: Vec<(ObjectId, PlayerId, bool)> = found.into_iter().map(|c| (c, you, true)).collect();
     g.put_all_onto_battlefield_as(&lands)?;
     g.shuffle(you);

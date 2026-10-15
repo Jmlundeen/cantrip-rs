@@ -1,0 +1,40 @@
+# Trait Doctoring replaces the basic land type Forest with Island in Nissa, Who Shakes the World's text until end of turn
+# (CR 612.1): she says "Whenever you tap an Island for mana, add an additional {G}". Bot1's Island taps for {U}{G}.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Jet
+Mox Ruby
+Nissa, Who Shakes the World
+Mox Sapphire
+Trait Doctoring
+Island x13
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Nissa, Who Shakes the World.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Trait Doctoring.Cast(Nissa, Who Shakes the World)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Replace a basic land type)
+Bot1.Modes(Forest)
+Bot1.Modes(Island)
+Bot1.Battlefield.Island.Activate
+
+[Expect]
+Turn = 1
+Bot1.Mana = {U}{G}
