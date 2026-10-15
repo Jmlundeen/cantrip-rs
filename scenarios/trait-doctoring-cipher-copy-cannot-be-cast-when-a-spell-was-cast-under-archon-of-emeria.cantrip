@@ -1,0 +1,80 @@
+# Known bug: a spell cast while another spell or ability resolves ignores "each player can't cast more than one spell each turn" (Archon of Emeria, CR 101.2, 601.2): could_cast_during_resolution in cantrip-rules checks may_cast but not cast_limit, so Bot1, who has cast a spell this turn, is offered the cipher copy.
+# The copy the cipher trigger makes is cast during the trigger's resolution (CR 702.99a, 707.12), so the rules on casting apply to
+# it. If you can't cast it, you don't (the ruling: it ceases to exist at once, with no later chance). Trait Doctoring is
+# encoded on Llanowar Elves. On turn 5 the Elves connect with no Archon of Emeria out, and the copy is offered and cast (the
+# positive control). Bot2's Archon of Emeria ("each player can't cast more than one spell each turn") comes down on
+# turn 6; on turn 7 Bot1 casts a second Llanowar Elves before combat and then connects with the first. The trigger resolves
+# and offers nothing (`! Bot1.Accept`), and the card is still encoded and still exiled (CR 702.99c).
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Island
+Trait Doctoring
+Llanowar Elves
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Plains
+Plains
+Plains
+Archon of Emeria
+Plains x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Trait Doctoring.Cast(Bot2.Battlefield.Plains)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Replace a color word)
+Bot1.Colors(Green)
+Bot1.Colors(Blue)
+Bot1.Choose(Llanowar Elves)
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Attack(Llanowar Elves)
+[T5 Bot1.CombatDamage]
+Bot1.Accept
+Bot1.Target(Bot2.Battlefield.Plains)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Replace a basic land type)
+Bot1.Modes(Plains)
+Bot1.Modes(Island)
+? Bot2.Battlefield.Plains#1.Subtypes = Island
+[T6 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Plains#2.Activate
+Bot2.Battlefield.Plains#3.Activate
+Bot2.Hand.Archon of Emeria.Cast
+[T7 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Llanowar Elves)
+[T7 Bot1.CombatDamage]
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+! Bot1.Accept
+[T7 Bot1.Main2]
+
+[Expect]
+Turn = 7
+Bot2.Life = 18
+Exile = Trait Doctoring
+Stack.Count = 0
+Bot1.Graveyard =

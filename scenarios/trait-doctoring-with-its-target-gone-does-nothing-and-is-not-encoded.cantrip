@@ -1,0 +1,49 @@
+# Trait Doctoring's only target, Ornithopter, is killed by Lightning Bolt in response, so the spell has no legal target on
+# resolution and does not resolve (CR 608.2b): no word is asked for, and its cipher does nothing either (CR 702.99a: encoding
+# is part of the spell's resolution), so the card goes to the graveyard and no creature, Llanowar Elves least of all, is
+# asked about. The positive control is trait-doctoring-encoded-on-a-creature-is-cast-again-when-it-deals-combat-damage.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Ornithopter
+Island
+Trait Doctoring
+Forest x13
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Trait Doctoring.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Ornithopter
+! Bot1.Modes
+! Bot1.Colors
+! Bot1.Choose
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+? Bot1.Graveyard = Trait Doctoring; Ornithopter
+? Stack.Count = 0
+
+[Expect]
+Turn = 3
+Exile.Count = 0
+Bot1.Battlefield = Forest; Island; Llanowar Elves
+Bot1.Graveyard = Trait Doctoring; Ornithopter

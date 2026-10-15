@@ -1,0 +1,55 @@
+# Trait Doctoring changes the words printed on a permanent, not the abilities it was given (CR 612.3; its ruling: "if you've
+# changed 'green' to 'blue,' and the permanent gains protection from green ... the permanent will have protection from
+# green"). Mother of Runes gives Llanowar Elves protection from red, and Trait Doctoring then replaces red with blue in the
+# Elves' text: Lightning Bolt still cannot target the Elves. The positive control is the same Bolt at Mother of Runes, which has
+# no protection: it is a legal target and dies. The new color may not be the old one: red is not offered to replace red.
+
+[Bot1 Deck]
+Mox Pearl
+Mother of Runes
+Forest
+Llanowar Elves
+Island
+Trait Doctoring
+Forest x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x14
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Mother of Runes.Cast
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Trait Doctoring.Cast(Llanowar Elves)
+Bot1.Battlefield.Mother of Runes.Activate(Llanowar Elves)
+Bot1.Colors(Red)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Replace a color word)
+Bot1.Colors(Red)
+! Bot1.Colors(Red)
+Bot1.Colors(Blue)
+Bot1.Choose()
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+! Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot2.Hand.Lightning Bolt.Cast(Mother of Runes)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield = Forest; Island; Llanowar Elves; Mox Pearl
+Bot1.Graveyard = Mother of Runes; Trait Doctoring
+Bot2.Graveyard = Lightning Bolt

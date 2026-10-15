@@ -1,0 +1,45 @@
+# Trait Doctoring's "target permanent" (CR 115.1, 110.1): neither a player nor a card in a hand can be its target, where
+# Artificial Evolution's "target spell or permanent" (artificial-evolution-targets-a-spell-or-a-permanent-and-nothing-else)
+# names a spell as well. A spell can never be Trait Doctoring's target in a game: it is a sorcery, cast with an empty
+# stack, and so is the copy that cipher casts as it resolves. A permanent that can't be targeted (hexproof, CR 702.11b), Bot2's
+# Sylvan Caryatid, is refused too. The positive control is the same cast at Bot1's Forest, which is offered where those are not.
+
+[Bot1 Deck]
+Forest
+Island
+Trait Doctoring
+Island x14
+
+[Bot2 Deck]
+Forest
+Mox Jet
+Sylvan Caryatid
+Mountain
+Island x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Sylvan Caryatid.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+? Bot2.Battlefield = Forest; Mox Jet; Sylvan Caryatid
+! Bot1.Hand.Trait Doctoring.Cast(Bot2)
+! Bot1.Hand.Trait Doctoring.Cast(Bot2.Hand.Mountain)
+! Bot1.Hand.Trait Doctoring.Cast(Bot2.Battlefield.Sylvan Caryatid)
+Bot1.Hand.Trait Doctoring.Cast(Bot1.Battlefield.Forest)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Replace a basic land type)
+Bot1.Modes(Forest)
+Bot1.Modes(Island)
+? Bot1.Battlefield.Forest.Subtypes = Island
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Trait Doctoring

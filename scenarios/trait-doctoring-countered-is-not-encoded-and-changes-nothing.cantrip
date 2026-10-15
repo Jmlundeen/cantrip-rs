@@ -1,0 +1,46 @@
+# A countered spell does not resolve (CR 701.5a), so none of its effects happen, its cipher included (the ruling: "the card will go
+# to its owner's graveyard and won't be encoded on a creature"). Bot2's Spell Pierce counters Trait Doctoring, unless Bot1
+# pays {2}, which Bot1 declines to. No word is chosen (`! Bot1.Modes`), no creature is asked about (`! Bot1.Choose`) though
+# Llanowar Elves is one Bot1 controls, and the Forest keeps its type. The positive control, the same cast resolving, is
+# trait-doctoring-encoded-on-a-creature-is-cast-again-when-it-deals-combat-damage.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Island
+Trait Doctoring
+Forest x13
+
+[Bot2 Deck]
+Island
+Spell Pierce
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Trait Doctoring.Cast(Forest)
+Bot1.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Spell Pierce.Cast(Stack.Trait Doctoring)
+Bot2.Pass
+Bot1.Pass
+Bot1.Decline
+! Bot1.Modes
+! Bot1.Choose
+[T3 Bot1.Main2]
+? Bot1.Graveyard = Trait Doctoring
+? Bot1.Battlefield.Forest.Subtypes = Forest
+
+[Expect]
+Turn = 3
+Exile.Count = 0
+Stack.Count = 0
+Bot1.Graveyard = Trait Doctoring
+Bot2.Graveyard = Spell Pierce

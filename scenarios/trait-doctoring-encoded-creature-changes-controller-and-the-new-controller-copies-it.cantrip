@@ -1,0 +1,65 @@
+# Cipher: the card stays encoded on its creature even if the creature changes controller (CR 702.99c), and the creature's
+# ability is the creature's, so its new controller controls it (the ruling: "that player will create a copy of the encoded
+# card and may cast it"). Bot1 encodes Trait Doctoring on Haywire Mite. Bot2's kicked Thieving Skydiver takes the Mite
+# (an artifact creature of mana value 1). When the Mite deals combat damage to Bot1 on Bot2's turn, it is Bot2 who is asked,
+# who chooses the copy's target and its words, and the card, which Bot1 owns, stays in exile.
+
+[Bot1 Deck]
+Island
+Haywire Mite
+Island
+Trait Doctoring
+Island x13
+
+[Bot2 Deck]
+Island
+Island
+Island
+Thieving Skydiver
+Island x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Haywire Mite.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Trait Doctoring.Cast(Bot2.Battlefield.Island)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Replace a color word)
+Bot1.Colors(Blue)
+Bot1.Colors(Red)
+Bot1.Choose(Haywire Mite)
+? Exile = Trait Doctoring
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Island#2.Activate
+Bot2.Battlefield.Island#3.Activate
+Bot2.Hand.Thieving Skydiver.Cast(Kicked: 1)
+[T6 Bot2.Main2]
+? Bot2.Battlefield = Island; Island; Island; Haywire Mite; Thieving Skydiver
+[T8 Bot2.Main1]
+Bot2.Attack(Haywire Mite)
+[T8 Bot2.CombatDamage]
+Bot2.Accept
+Bot2.Target(Bot1.Battlefield.Island)
+Bot2.Pass
+Bot1.Pass
+Bot2.Modes(Replace a basic land type)
+Bot2.Modes(Island)
+Bot2.Modes(Swamp)
+? Bot1.Battlefield.Island#1.Subtypes = Swamp
+! Bot1.Accept
+
+[Expect]
+Turn = 8
+Bot1.Life = 19
+Exile = Trait Doctoring
+Bot1.Graveyard =

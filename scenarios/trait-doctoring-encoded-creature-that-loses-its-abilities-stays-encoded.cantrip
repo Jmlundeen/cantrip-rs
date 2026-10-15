@@ -1,0 +1,65 @@
+# Cipher gives the creature an ability (CR 702.99a); the encoded card does not stop being encoded when the creature loses that
+# ability (CR 702.99c: it ends when the card leaves exile or the creature leaves the battlefield), as the ruling says. The
+# Wondrous Wasp makes Bot1's Llanowar Elves lose all abilities for as long as it stays: on turn 5 the Elves connect and
+# nothing triggers (`! Bot1.Accept`) while Trait Doctoring is still in exile. Once Bot2 bolts the Wasp, the Elves have the
+# ability again, and on turn 7 the same card is offered to be copied: it was encoded the whole time.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Island
+Trait Doctoring
+Forest x12
+
+[Bot2 Deck]
+Island
+Mountain
+The Wondrous Wasp
+Lightning Bolt
+Island x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Trait Doctoring.Cast(Forest)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Replace a color word)
+Bot1.Colors(Green)
+Bot1.Colors(Blue)
+Bot1.Choose(Llanowar Elves)
+? Exile = Trait Doctoring
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.The Wondrous Wasp.Cast
+Bot2.Target(Bot1.Battlefield.Llanowar Elves)
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Llanowar Elves.Tapped = false
+Bot1.Attack(Llanowar Elves)
+[T5 Bot1.CombatDamage]
+? Stack.Count = 0
+! Bot1.Accept
+[T5 Bot1.Main2]
+? Bot2.Life = 19
+? Exile = Trait Doctoring
+[T6 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.The Wondrous Wasp)
+[T7 Bot1.Main1]
+Bot1.Attack(Llanowar Elves)
+[T7 Bot1.CombatDamage]
+Bot1.Decline
+
+[Expect]
+Turn = 7
+Bot2.Life = 18
+Exile = Trait Doctoring
+Bot2.Graveyard = The Wondrous Wasp; Lightning Bolt

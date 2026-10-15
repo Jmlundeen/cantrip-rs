@@ -1,0 +1,70 @@
+# The copy the cipher trigger makes is cast during the trigger's resolution (CR 702.99a, 707.12), so what forbids casting a spell
+# forbids it: it is Bot2's own Trait Doctoring, encoded on Bot2's Llanowar Elves. On turn 4 the Elves connect and, with no
+# Teferi out, Bot2 is offered the copy and casts it (the positive control). Bot1's Teferi, Time Raveler ("each opponent can
+# cast spells only any time they could cast a sorcery", CR 307.1) comes down on turn 5; on turn 6 the Elves connect with the
+# trigger on the stack, which is not a time Bot2 could cast a sorcery, so the trigger resolves and offers nothing (the ruling:
+# if you can't cast the copy you don't, and it ceases to exist). The card is still encoded and exiled (CR 702.99c).
+
+[Bot1 Deck]
+Plains
+Island
+Plains
+Teferi, Time Raveler
+Plains x12
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Island
+Trait Doctoring
+Forest x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Trait Doctoring.Cast(Bot1.Battlefield.Plains)
+Bot2.Pass
+Bot1.Pass
+Bot2.Modes(Replace a color word)
+Bot2.Colors(White)
+Bot2.Colors(Blue)
+Bot2.Choose(Llanowar Elves)
+Bot2.Attack(Llanowar Elves)
+[T4 Bot2.CombatDamage]
+Bot2.Accept
+Bot2.Target(Bot1.Battlefield.Plains)
+Bot2.Pass
+Bot1.Pass
+Bot2.Modes(Replace a basic land type)
+Bot2.Modes(Plains)
+Bot2.Modes(Island)
+? Bot1.Battlefield.Plains.Subtypes = Island
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Teferi, Time Raveler.Cast
+[T6 Bot2.Main1]
+Bot2.Attack(Llanowar Elves)
+[T6 Bot2.CombatDamage]
+? Stack.Count = 1
+Bot2.Pass
+Bot1.Pass
+! Bot2.Accept
+[T6 Bot2.Main2]
+
+[Expect]
+Turn = 6
+Bot1.Life = 18
+Exile = Trait Doctoring
+Stack.Count = 0
+Bot2.Graveyard =

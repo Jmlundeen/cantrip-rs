@@ -1,0 +1,60 @@
+# Cipher encodes a card "on a creature you control" (CR 702.99a), chosen as the spell resolves; the ruling adds that a
+# noncreature permanent has to be a creature before the spell starts resolving. Bot1 turns Creeping Tar Pit into a creature
+# land first, then casts Trait Doctoring at Bot2's Forest. Offered as the creature to encode on: the Tar Pit. Not offered:
+# Bot1's Island or Mox Jet (noncreature permanents), and Bot2's Llanowar Elves (a creature, but not Bot1's). The card goes
+# to exile encoded on the Tar Pit, not to the graveyard, and it stays encoded when the Tar Pit stops being a creature at
+# end of turn (CR 702.99c).
+
+[Bot1 Deck]
+Creeping Tar Pit
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Island
+Trait Doctoring
+Forest
+Forest x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x14
+
+[Actions]
+Bot1.Hand.Creeping Tar Pit.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Creeping Tar Pit.Activate(Ability: Elemental)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Creeping Tar Pit.Types = Land; Creature
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Trait Doctoring.Cast(Bot2.Battlefield.Forest)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Replace a color word)
+Bot1.Colors(Green)
+Bot1.Colors(Blue)
+! Bot1.Choose(Island)
+! Bot1.Choose(Mox Jet)
+! Bot1.Choose(Llanowar Elves)
+Bot1.Choose(Creeping Tar Pit)
+? Exile = Trait Doctoring
+? Bot1.Graveyard =
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Creeping Tar Pit.Types = Land
+
+[Expect]
+Turn = 4
+Exile = Trait Doctoring
+Bot1.Graveyard =

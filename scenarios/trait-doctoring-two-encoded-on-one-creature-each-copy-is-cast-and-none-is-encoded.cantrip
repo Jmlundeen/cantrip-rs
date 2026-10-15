@@ -1,0 +1,81 @@
+# Two Trait Doctorings encoded on Llanowar Elves (CR 702.99): each exiled card gives the creature its own ability, so when the
+# Elves deal combat damage there are two triggers and each one, resolving, copies and casts its own encoded card. A copy of
+# a cipher spell is not represented by a card, so it is not encoded (CR 702.99a): when the copies resolve nothing is asked
+# about a creature to encode them on (`! Bot1.Choose`, though the Elves are a creature Bot1 controls), they cease to exist
+# (CR 707.10), and the two cards are still exiled, still encoded. The first copy changes a basic land type, the second
+# a color word. Trait Doctoring has no word to change in Llanowar Elves, whose text is only a mana symbol, and that is no
+# reason not to target it (the ruling: any permanent may be targeted); both are encoded on it as they resolve.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Island
+Island
+Trait Doctoring
+Trait Doctoring
+Forest
+Forest x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Trait Doctoring.Cast(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Replace a color word)
+Bot1.Colors(Green)
+Bot1.Colors(Blue)
+Bot1.Choose(Llanowar Elves)
+? Exile = Trait Doctoring
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Trait Doctoring.Cast(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Replace a color word)
+Bot1.Colors(Green)
+Bot1.Colors(Blue)
+Bot1.Choose(Llanowar Elves)
+? Exile.Count = 2
+Bot1.Attack(Llanowar Elves)
+[T5 Bot1.CombatDamage]
+Bot1.Triggers(Llanowar Elves; Llanowar Elves)
+? Stack.Count = 2
+Bot1.Accept
+Bot1.Target(Bot2.Battlefield.Island)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Replace a basic land type)
+Bot1.Modes(Island)
+Bot1.Modes(Swamp)
+! Bot1.Choose
+? Bot2.Battlefield.Island.Subtypes = Swamp
+? Exile.Count = 2
+? Stack.Count = 1
+Bot1.Accept
+Bot1.Target(Bot2.Battlefield.Island)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Replace a color word)
+Bot1.Colors(Blue)
+Bot1.Colors(Red)
+! Bot1.Choose
+? Bot2.Battlefield.Island.Colors = (absent)
+? Stack.Count = 0
+
+[Expect]
+Turn = 5
+Bot2.Life = 19
+Exile = Trait Doctoring; Trait Doctoring
+Exile.Count = 2
+Bot1.Graveyard =
