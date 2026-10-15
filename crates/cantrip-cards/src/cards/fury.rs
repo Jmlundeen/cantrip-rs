@@ -3,8 +3,8 @@ use cantrip_mechanics::evoke;
 use cantrip_mechanics::{damage_divided, targets, triggers::this_enters};
 use cantrip_oracle as oracle;
 
-fn red_card(q: &dyn Query, _: &Asker, id: ObjectId) -> bool {
-    q.chars(id).colors.has(Color::Red)
+fn red_card(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
+    q.chars(id).colors.has(q.words(asker.source).color(Color::Red))
 }
 
 /// Fury deals 4 damage divided as you choose among any number of target creatures and/or planeswalkers (CR 601.2d):
