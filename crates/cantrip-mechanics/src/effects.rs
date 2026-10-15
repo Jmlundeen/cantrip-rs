@@ -10,6 +10,14 @@ pub fn draw<const N: u32>(g: &mut dyn Game, item: &StackItem) -> Result<(), Susp
     Ok(())
 }
 
+/// "Draw a card, then discard a card" (CR 121.1, 701.9): the controller draws, then chooses a card of their hand and
+/// discards it. Currency Converter and Sphinx of False Conclusions print it.
+pub fn loot(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    g.draw(item.controller, 1);
+    crate::discard_chosen(g, item.controller, item.object, 1)?;
+    Ok(())
+}
+
 /// "You gain N life" (CR 119.3). Zuran Orb and Inventor's Fair print it (two and one).
 pub fn gain_life<const N: i32>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.gain_life(item.controller, N);

@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{choose, discard_chosen, tokens};
+use cantrip_mechanics::{choose, tokens};
 use cantrip_oracle as oracle;
 
 /// "Whenever you discard a card": the card, in the graveyard, is what the ability is about.
@@ -20,12 +20,6 @@ fn exile_discarded(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if cantrip_mechanics::effects::ask_may(g, item.controller, item.object, Purpose::Optional)? {
         g.exile_with(&[card], item.object, false);
     }
-    Ok(())
-}
-
-fn loot(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.draw(item.controller, 1);
-    discard_chosen(g, item.controller, item.object, 1)?;
     Ok(())
 }
 
@@ -73,7 +67,7 @@ pub static CARD: CardDef = CardDef {
         AbilityDef::Activated(ActivatedDef {
             text: "{2}, {T}: Draw a card, then discard a card.",
             cost: Cost { mana: mana(2, 0, 0, 0, 0, 0), tap: true, ..Cost::NONE },
-            effect: loot,
+            effect: cantrip_mechanics::effects::loot,
             ..ActivatedDef::BLANK
         }),
         AbilityDef::Activated(ActivatedDef {
