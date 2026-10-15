@@ -504,6 +504,9 @@ pub trait Game: Query {
         before - self.obj(object).counters(kind)
     }
     fn add_effect(&mut self, source: ObjectId, affected: ObjectId, kind: EffectKind, duration: Duration);
+    /// An effect about `controller` and not an object (`EffectKind::outlives_affected`), for the player who controls the
+    /// resolving ability or spell (CR 109.5: "you") even if its source has since changed hands or left.
+    fn add_player_effect(&mut self, controller: PlayerId, source: ObjectId, kind: EffectKind, duration: Duration);
     /// `player` gains control of a permanent (CR 108.4, 613.1b) for `duration`, by `source`'s spell or ability.
     fn gain_control(&mut self, source: ObjectId, permanent: ObjectId, player: PlayerId, duration: Duration) {
         self.add_effect(source, permanent, EffectKind::Control(player), duration);

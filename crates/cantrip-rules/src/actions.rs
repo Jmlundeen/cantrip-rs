@@ -1756,6 +1756,34 @@ fn stack_item(kind: StackKind, object: ObjectId, ability: AbilityRef, controller
     item
 }
 
+/// "The next spell you cast this turn ..." (CR 611.2c, 601.2): each `NextSpell` effect of `player` whose kind of spell this
+/// is applies to it as it is cast, before anyone has priority, and is used up. An effect whose kind of spell this is not
+/// waits for a later one; two effects that fit both apply to this one.
+fn apply_next_spell_effects(cx: &mut Cx, player: PlayerId, spell: ObjectId) {
+    if !cx.s().effects.iter().any(|e| matches!(e.kind, EffectKind::NextSpell(_))) {
+        return;
+    }
+    let types = cx.chars(spell).types;
+    let applied: Vec<Option<SpellGrant>> = cx
+        .s()
+        .effects
+        .iter()
+        .map(|e| match e.kind {
+            EffectKind::NextSpell(n) if e.controller == player && (n.types == TypeSet::NONE || n.types.iter().any(|t| types.has(t))) => {
+                Some(n.grant)
+            }
+            _ => None,
+        })
+        .collect();
+    for grant in applied.iter().flatten() {
+        match grant {
+            SpellGrant::CantBeCountered => cx.st().update_obj(spell, |o| o.marks.cant_be_countered = true),
+        }
+    }
+    let keep: Vec<bool> = applied.iter().map(|a| a.is_none()).collect();
+    cx.st().effects_keep(&keep);
+}
+
 /// Casting a spell (CR 601.2): it moves to the stack, its costs are chosen and paid, and it becomes cast. Cast as an
 /// effect resolves (`resolving`, CR 608.2g) its targets are chosen here, not announced with an action, and `instead`
 /// is the cost it is cast for rather than its mana cost (CR 118.9).
@@ -2061,6 +2089,7 @@ fn cast(
     if restrictions & (1 << ManaRestriction::LegendaryUncounterable as u8) != 0 {
         cx.st().update_obj(spell, |o| o.marks.cant_be_countered = true);
     }
+    apply_next_spell_effects(cx, player, spell);
     let extra_chosen = choose_permanents(cx, player, spell, &extra)?;
     let (extra_sacrifices, extra_exiles) = choose_variable(cx, player, spell, &extra, item.x)?;
     // An optional cost that sacrifices one or more: how many were is how many times the spell was "kicked" (Plumb the

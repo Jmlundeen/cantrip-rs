@@ -992,6 +992,12 @@ impl cantrip_api::Game for Cx<'_> {
         }
     }
 
+    fn add_player_effect(&mut self, controller: PlayerId, source: ObjectId, kind: EffectKind, duration: Duration) {
+        debug_assert!(kind.outlives_affected(), "a player's effect is about the player, not an object");
+        let timestamp = self.g.state.timestamp();
+        self.g.state.effect_push(ContinuousEffect { source, controller, timestamp, affected: source, kind, duration });
+    }
+
     fn counter(&mut self, spell: ObjectId) {
         resolve::counter(self, spell);
     }

@@ -493,6 +493,27 @@ pub enum EffectKind {
     /// `to` (Trait Doctoring, Artificial Evolution). Card code reads its words through `Query::words`; the layers change
     /// the type line.
     ChangeText { from: Word, to: Word },
+    /// "The next [kind of] spell you cast this turn [gets something]" (CR 611.2c, 601.2): a rule about the effect's controller,
+    /// so it reaches a spell that does not exist yet and outlives its `affected` object, which is only the source. It applies
+    /// as the spell is cast and is used up by it.
+    NextSpell(NextSpell),
+}
+
+/// What the next spell a player casts gets, and which spells count as "the next" (`EffectKind::NextSpell`). Mistrise Village
+/// ("The next spell you cast this turn can't be countered") uses it with any spell; "the next creature spell" and "the next
+/// instant or sorcery spell you cast this turn" are the same effect with `types` set.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub struct NextSpell {
+    /// The spell must have one of these card types; `TypeSet::NONE` for any spell.
+    pub types: TypeSet,
+    pub grant: SpellGrant,
+}
+
+/// What a spell gets from a `NextSpell` effect as it is cast.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum SpellGrant {
+    /// It can't be countered (CR 701.5a).
+    CantBeCountered,
 }
 
 impl EffectKind {
@@ -510,6 +531,7 @@ impl EffectKind {
                 | EffectKind::CreaturesCantBlock(_)
                 | EffectKind::PlayFromGraveyard
                 | EffectKind::PlayerManaAbility(_)
+                | EffectKind::NextSpell(_)
         )
     }
 }
