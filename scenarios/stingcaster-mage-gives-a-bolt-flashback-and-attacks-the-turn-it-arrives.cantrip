@@ -1,0 +1,38 @@
+# Stingcaster Mage (2/1 haste): "When this creature enters, target instant or sorcery card in your graveyard gains flashback
+# until end of turn. The flashback cost is equal to its mana cost" (CR 702.34a). Bot1 bolts Bot2 with a Mox Ruby, casts
+# Stingcaster Mage with Black Lotus's red mana, aims the trigger at the Bolt in the graveyard and casts it again for {R}
+# out of what the Lotus left: Bot2 is on 14 and the Bolt was exiled instead of returning to the graveyard. The Mage has
+# haste (CR 702.10), so it attacks the turn it came in and Bot2 drops to 12.
+
+[Bot1 Deck]
+Mox Ruby
+Black Lotus
+Lightning Bolt
+Stingcaster Mage
+Forest x3
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Stingcaster Mage.Cast
+Bot1.Pass
+Bot1.Graveyard.Lightning Bolt.Cast(Bot2)
+? Bot2.Life = 17
+Bot1.Attack(Stingcaster Mage > Bot2)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 12
+Exile = Lightning Bolt
+Bot1.Graveyard = Black Lotus
+Bot1.Battlefield.Stingcaster Mage.Power = 2
+Bot1.Battlefield.Stingcaster Mage.Toughness = 1
+Bot1.Battlefield.Stingcaster Mage.Keywords = Haste
