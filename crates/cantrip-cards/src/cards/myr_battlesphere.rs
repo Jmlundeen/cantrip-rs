@@ -27,10 +27,11 @@ fn myr(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// neither (CR 310.9b), and a permanent that has stopped being a planeswalker is no longer "the planeswalker".
 fn tap_myr(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let player = item.controller;
+    let myr = g.words(item.object).subtype(Subtype::Myr);
     let untapped_myr: Vec<ObjectId> = g
         .permanents_of(player)
         .into_iter()
-        .filter(|&id| !g.obj(id).tapped && g.chars(id).subtypes.has(Subtype::Myr))
+        .filter(|&id| !g.obj(id).tapped && g.chars(id).subtypes.has(myr))
         .collect();
     let chosen = choose::cards(g, player, item.object, Purpose::TapToPay, untapped_myr, u8::MAX, true)?;
     if chosen.is_empty() {

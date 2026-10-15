@@ -1,0 +1,51 @@
+# Artificial Evolution changes the text of Myr Battlesphere's spell, Myr to Goblin (CR 612.1, 400.7a): it makes four
+# Goblin artifact creature tokens (CR 612.4) and, attacking, taps "X untapped Goblins you control" for +X/+0 and X
+# damage. Bot1 taps three of the tokens: 7 power, and 3 damage first, so 20 - 3 - 7 = 10.
+
+[Bot1 Deck]
+Plains
+Sol Ring
+Black Lotus
+Mox Sapphire
+Myr Battlesphere
+Mox Jet
+Island
+Artificial Evolution
+Plains x20
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Myr Battlesphere.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Stack.Myr Battlesphere)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Myr)
+Bot1.Modes(Goblin)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Goblin#1.Subtypes = Goblin
+Bot1.Attack(Myr Battlesphere > Bot2)
+Bot1.Choose(Goblin#1; Goblin#2; Goblin#3)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 10
+Bot1.Battlefield.Myr Battlesphere.Power = 7
+Bot1.Battlefield.Goblin#1.Tapped = true
+Bot1.Battlefield.Goblin#4.Tapped = false
