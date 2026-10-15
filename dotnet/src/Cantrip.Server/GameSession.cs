@@ -55,6 +55,12 @@ public sealed class GameSession : IDisposable
     /// </summary>
     private readonly Dictionary<PlayerId, (HashSet<string> Ids, List<ObjectView> Cards)> _printed = [];
 
+    /// <summary>
+    /// A scenario's part of each step, for whatever drives the seats (docs/scenarios-in-the-browser.md); never sent to a
+    /// client. Raised as the step is published, before its messages go out.
+    /// </summary>
+    public event Action<ScenarioProgress>? ScenarioProgressed;
+
     /// <summary>A session over whichever rules engine <paramref name="rules"/> is.</summary>
     public GameSession(IRulesHost rules)
     {
@@ -347,6 +353,10 @@ public sealed class GameSession : IDisposable
     private void Publish(RulesStep step)
     {
         _latestStep = step;
+        if (step.Scenario is { } progress)
+        {
+            ScenarioProgressed?.Invoke(progress);
+        }
 
         foreach (PlayerId id in Seats)
         {

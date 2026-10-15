@@ -24,6 +24,13 @@ public sealed class GameServerOptions
     public IReadOnlyList<DeckList> Decks { get; init; } = [];
     /// <summary>Explicit test/tool bootstrap only. Normal hosting requires selection and readiness.</summary>
     public bool AutoStart { get; init; }
+
+    /// <summary>
+    /// A <c>.cantrip</c> scenario to play instead of the decks (docs/scenarios-in-the-browser.md): the table starts once
+    /// its driven seats are seated and ready, the script answers every other seat, and each step's scenario part is
+    /// raised as <see cref="GameServer.ScenarioProgressed"/>. <see cref="Players"/> must be the scenario's seat count.
+    /// </summary>
+    public ScenarioSpec? Scenario { get; init; }
     /// <summary>
     /// The rules engine the table deals through: the native engine's sidecar unless a test stands another in its place.
     /// </summary>
@@ -167,7 +174,7 @@ public sealed class GameServer : IAsyncDisposable
         if (options.Decks.Count > 128 || options.Decks.Any(deck => string.IsNullOrWhiteSpace(deck.Name)
             || deck.Name.Length > 96 || deck.Count is < 1 or > 2000)
             || options.Decks.Select(deck => deck.Name).Distinct(StringComparer.Ordinal).Count() != options.Decks.Count
-            || (options.Event is null && options.Decks.Count == 0))
+            || (options.Event is null && options.Scenario is null && options.Decks.Count == 0))
             throw new ArgumentException("Provide 1–128 uniquely named decks, each with 1–2000 cards.", nameof(options));
         if (options.Event is { } hosted && hosted.Seats != options.Players)
             throw new ArgumentException($"The event has {hosted.Seats} players; the table has {options.Players} seats.", nameof(options));
@@ -808,6 +815,12 @@ public sealed class GameServer : IAsyncDisposable
             return;
         }
 
+        if (_options.Scenario is { } scenario)
+        {
+            StartScenario(scenario);
+            return;
+        }
+
         if (_phase != TablePhase.Setup || _members.Count != _options.Players || _members.Values.Any(member => !member.Ready || member.Connection is null)) return;
         List<Member> members = [.. _members.Values.OrderBy(member => member.Seat)];
         List<string> names = [.. members.Select(member => member.Name)];
@@ -835,6 +848,49 @@ public sealed class GameServer : IAsyncDisposable
         BroadcastTable();
         _started.TrySetResult();
     }
+
+    /// <summary>
+    /// Deals a scenario once its driven seats are seated and ready; the seats the script plays need no one, and are named
+    /// for the script's players (<c>Bot2</c>).
+    /// </summary>
+    private void StartScenario(ScenarioSpec scenario)
+    {
+        if (_phase != TablePhase.Setup
+            || scenario.Driven.Any(seat => !_members.TryGetValue(seat, out Member? member) || !member.Ready || member.Connection is null))
+        {
+            return;
+        }
+
+        List<RulesSeat> seats = [.. Enumerable.Range(1, _options.Players)
+            .Select(seat => new RulesSeat(_members.TryGetValue(seat, out Member? member) ? member.Name : $"Bot{seat}", []))];
+        try
+        {
+            var session = new GameSession(_options.Rules.Create(seats, _options.Seed, new RulesGameOptions { Scenario = scenario }));
+            session.ScenarioProgressed += progress => ScenarioProgressed?.Invoke(progress);
+            session.Start();
+            _session = session;
+        }
+        catch (Exception error) when (error is not OutOfMemoryException)
+        {
+            _app.Logger.LogWarning(error, "The scenario {Name} could not be dealt.", scenario.Name);
+            Note("a scenario was refused");
+            foreach (Member member in _members.Values)
+                if (member.Connection is { } connection) Refuse(connection, ErrorCode.InvalidSetup, "The scenario could not start: " + error.Message);
+            BroadcastTable();
+            return;
+        }
+
+        Note($"the scenario {scenario.Name} started");
+        _phase = TablePhase.Playing;
+        BroadcastTable();
+        _started.TrySetResult();
+    }
+
+    /// <summary>
+    /// A scenario's part of each step of the game (<see cref="GameServerOptions.Scenario"/>), raised on the table's own
+    /// thread as the step is published: what each driven seat is meant to answer, the client checks, and the verdict.
+    /// </summary>
+    public event Action<ScenarioProgress>? ScenarioProgressed;
 
     /// <summary>
     /// Deals the event's game once it is ready: every deck submitted, or a round that was being played when the table

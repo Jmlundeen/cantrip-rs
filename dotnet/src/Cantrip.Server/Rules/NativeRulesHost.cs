@@ -79,15 +79,24 @@ public sealed class NativeRulesHost : IRulesHost
         }
 
         var host = new NativeRulesHost(transport, seats, history ?? []);
-        NewGameReply dealt = host.Send<NewGameReply>(new
-        {
-            Cmd = "NewGame",
-            Seats = seats.Select(seat => new { seat.Name, seat.Deck }).ToList(),
-            Seed = seed,
-            options.Shuffle,
-            options.FirstPlayer,
-            options.Chooser,
-        });
+        var named = seats.Select(seat => new { seat.Name, seat.Deck }).ToList();
+        NewGameReply dealt = host.Send<NewGameReply>(options.Scenario is { } scenario
+            ? new
+            {
+                Cmd = "NewGame",
+                Seats = named,
+                Seed = seed,
+                Scenario = new { scenario.Name, scenario.Text, scenario.Driven },
+            }
+            : new
+            {
+                Cmd = "NewGame",
+                Seats = named,
+                Seed = seed,
+                options.Shuffle,
+                options.FirstPlayer,
+                options.Chooser,
+            });
 
         host.GameId = dealt.GameId;
         foreach (int seat in host._seatNumbers)
@@ -314,7 +323,31 @@ public sealed class NativeRulesHost : IRulesHost
                 request.Presentation ?? PromptPresentation.Describe(prompt, request.MayCancel, _views.GetValueOrDefault(request.Seat))));
         }
 
-        return new RulesStep(requests, reply.Views, events, _sequence, reply.Finished);
+        return new RulesStep(requests, reply.Views, events, _sequence, reply.Finished, Progress(reply.Scenario));
+    }
+
+    /// <summary>A step's scenario part as the server keeps it, or null for a dealt game.</summary>
+    private static ScenarioProgress? Progress(ScenarioReply? reply)
+    {
+        if (reply is null)
+        {
+            return null;
+        }
+
+        ScenarioExpected? expected = reply.Expected is { } e
+            ? new ScenarioExpected(
+                e.Seat,
+                e.RequestId,
+                e.Answer is { ValueKind: JsonValueKind.Object } answer ? ProtocolJson.Deserialize<AnswerPayload>(answer) : null,
+                e.Undo,
+                e.Line)
+            : null;
+        ScenarioVerdict? verdict = reply.Verdict is { } v
+            ? new ScenarioVerdict(v.Passed, v.Report, [.. v.Client.Select(Check)])
+            : null;
+        return new ScenarioProgress(expected, [.. reply.Checks.Select(Check)], verdict);
+
+        static ScenarioCheck Check(CheckReply c) => new(c.Line, c.Key, c.Value);
     }
 
     /// <summary>
@@ -374,6 +407,49 @@ public sealed class NativeRulesHost : IRulesHost
         public GameOutcomeView Outcome { get; set; }
 
         public int WinningTeam { get; set; }
+
+        /// <summary>A scenario's part of the step (docs/scenarios-in-the-browser.md), absent for a dealt game.</summary>
+        public ScenarioReply? Scenario { get; set; }
+    }
+
+    private sealed class ScenarioReply
+    {
+        public ExpectedReply? Expected { get; set; }
+
+        public List<CheckReply> Checks { get; set; } = [];
+
+        public VerdictReply? Verdict { get; set; }
+    }
+
+    private sealed class ExpectedReply
+    {
+        public int Seat { get; set; }
+
+        public int RequestId { get; set; }
+
+        public JsonElement? Answer { get; set; }
+
+        public bool Undo { get; set; }
+
+        public string? Line { get; set; }
+    }
+
+    private sealed class CheckReply
+    {
+        public int Line { get; set; }
+
+        public string Key { get; set; } = string.Empty;
+
+        public string Value { get; set; } = string.Empty;
+    }
+
+    private sealed class VerdictReply
+    {
+        public bool Passed { get; set; }
+
+        public string? Report { get; set; }
+
+        public List<CheckReply> Client { get; set; } = [];
     }
 
     private sealed class RequestReply

@@ -23,6 +23,9 @@ public sealed class RulesGameOptions
 
     /// <summary>Whether the decks are shuffled. False deals them in order, which is what a scenario wants.</summary>
     public bool Shuffle { get; init; } = true;
+
+    /// <summary>A <c>.cantrip</c> scenario to play instead of dealing the seats' decks; null for a dealt game.</summary>
+    public ScenarioSpec? Scenario { get; init; }
 }
 
 /// <summary>Deals a game on a rules engine, from a description of its seats.</summary>

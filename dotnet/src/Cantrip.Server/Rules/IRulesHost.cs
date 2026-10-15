@@ -86,7 +86,8 @@ public sealed record RulesStep(
     IReadOnlyDictionary<int, PlayerView> Views,
     IReadOnlyDictionary<int, IReadOnlyList<(long Sequence, GameEventView View)>> Events,
     long Sequence,
-    bool Finished);
+    bool Finished,
+    ScenarioProgress? Scenario = null);
 
 /// <summary>One question outstanding, in the handle space of the seat it is for.</summary>
 /// <param name="RequestId">The host's id for it, echoed back with the answer. Never reused within a game.</param>
