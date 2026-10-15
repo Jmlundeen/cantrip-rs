@@ -1,0 +1,37 @@
+# Tablet of Discovery: "You may play that card this turn" (CR 611.2): the permission ends with the turn. The milled
+# Lightning Bolt is left in the graveyard on turn 1; on turn 3 three untapped Mox Rubies could pay for it, but it is
+# refused, because the permission lapsed. (The same Bolt is cast on turn 1 in
+# tablet-of-discovery-mills-a-card-and-it-can-be-cast-this-turn-only, the control.)
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Tablet of Discovery
+Island
+Island
+Island
+Lightning Bolt
+Chain Lightning
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Hand.Tablet of Discovery.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+! Bot1.Graveyard.Lightning Bolt.Cast(Bot2)
+
+[Expect]
+Bot1.Graveyard = Lightning Bolt

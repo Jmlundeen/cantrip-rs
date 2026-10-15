@@ -1,0 +1,35 @@
+# Tablet of Discovery: "mill a card" with an empty library mills nothing (CR 701.17), so there is no card to play: the
+# enters trigger resolves without a card or a permission and the game goes on. Bot1's library is empty after the
+# opening seven (no draw on the first turn).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Tablet of Discovery
+Island
+Island
+Island
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Hand.Tablet of Discovery.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main1]
+
+[Expect]
+Bot1.Graveyard =
+Bot1.Library.Count = 0
+Bot1.Battlefield.Tablet of Discovery.Tapped = false
+Stack =

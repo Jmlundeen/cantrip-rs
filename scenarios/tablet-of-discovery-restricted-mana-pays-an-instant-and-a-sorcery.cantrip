@@ -1,0 +1,46 @@
+# Tablet of Discovery: "{T}: Add {R}{R}. Spend this mana only to cast instant and sorcery spells" (CR 106.6). Three Mox
+# Rubies pay for the Tablet, which then taps for its restricted {R}{R}: the pool shows the restriction, and the two
+# red mana pay for a Lightning Bolt (an instant) and a Chain Lightning (a sorcery), the Mountain's {R} staying untapped.
+# Nothing else in the pool could have paid, so the spells prove the restricted mana pays for both kinds.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Tablet of Discovery
+Lightning Bolt
+Chain Lightning
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Hand.Tablet of Discovery.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Tablet of Discovery.Activate(Ability: Spend)
+? Bot1.Mana = {R}{R} (InstantOrSorcerySpells)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {R} (InstantOrSorcerySpells)
+Bot1.Hand.Chain Lightning.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = 
+
+[Expect]
+Bot2.Life = 14
+Bot1.Graveyard = Chain Lightning; Lightning Bolt; Island
+Bot1.Battlefield.Mountain.Tapped = false

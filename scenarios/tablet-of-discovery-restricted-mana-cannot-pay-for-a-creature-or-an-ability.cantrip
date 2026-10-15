@@ -1,0 +1,49 @@
+# Tablet of Discovery's restricted {R}{R} pays for instant and sorcery spells only (CR 106.6): not a creature spell and not
+# an activated ability. The Mountain's {R} casts the first Blazing Rootwalla (the creature control); then, with only the
+# restricted {R}{R} floating, the second Rootwalla cannot be cast and the first one's "{R}: +2/+0" cannot be activated.
+# The Tablet is tapped first, so both are floating when the Rootwalla is cast: its {R} is the Mountain's.
+# On turn 3 the Tablet's other ability, an unrestricted {R}, pays for that activation (the control for the ability).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Tablet of Discovery
+Blazing Rootwalla
+Blazing Rootwalla
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Hand.Tablet of Discovery.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Tablet of Discovery.Activate(Ability: Spend)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Blazing Rootwalla.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {R}{R} (InstantOrSorcerySpells)
+! Bot1.Hand.Blazing Rootwalla.Cast
+! Bot1.Battlefield.Blazing Rootwalla.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Tablet of Discovery.Activate(Ability: Add {R}.)
+Bot1.Battlefield.Blazing Rootwalla.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Blazing Rootwalla.Power = 3
+Bot1.Hand = Blazing Rootwalla; Island

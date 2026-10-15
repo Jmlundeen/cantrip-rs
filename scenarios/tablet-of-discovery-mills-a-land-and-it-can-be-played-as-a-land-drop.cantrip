@@ -1,0 +1,37 @@
+# Tablet of Discovery: "You may play that card this turn" says play, not cast (CR 305.1): the milled Mountain is played
+# from the graveyard as the turn's land drop (no land was played from the hand), and it taps for {R}.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Tablet of Discovery
+Island
+Island
+Island
+Mountain
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Hand.Tablet of Discovery.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Graveyard.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+? Bot1.Mana = {R}
+
+[Expect]
+Bot1.Battlefield.Mountain.Tapped = true
+Bot1.LandsPlayed = 1
+Bot1.Graveyard =

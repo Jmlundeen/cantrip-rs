@@ -1,0 +1,41 @@
+# Tablet of Discovery: "When this artifact enters, mill a card. You may play that card this turn." (CR 701.17, 601.3). The
+# eighth card, a Lightning Bolt, is milled by the enters trigger and cast from the graveyard this turn, paid with the
+# Tablet's restricted {R}{R} (so also an instant spell cast from a graveyard). Its pair, "...is no longer castable next
+# turn", is the same position with the Bolt left alone until turn 3.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Tablet of Discovery
+Island
+Island
+Island
+Lightning Bolt
+Chain Lightning
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Hand.Tablet of Discovery.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Tablet of Discovery.Activate(Ability: Spend)
+Bot1.Graveyard.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 17
+Bot1.Graveyard = Lightning Bolt
+Bot1.Hand = Island; Island; Island

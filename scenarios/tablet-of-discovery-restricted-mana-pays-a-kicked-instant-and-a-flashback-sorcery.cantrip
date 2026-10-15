@@ -1,0 +1,55 @@
+# Tablet of Discovery's {R}{R} may be spent only to cast instant and sorcery spells (CR 106.6), and a spell cast with a kicker
+# or from the graveyard with flashback is still an instant or sorcery spell (CR 702.33, 702.34), so the mana pays for it.
+# Turn 3: the restricted {R}{R} and the three Mox Rubies' {R} pay for a kicked Burst Lightning ({R} plus kicker {4}), 4
+# damage. Turn 5: the {R}{R} and the Mountain's {R} pay for Faithless Looting's flashback {2}{R} from the graveyard, where
+# the Tablet's enters trigger milled it on turn 1.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Tablet of Discovery
+Island
+Island
+Faithless Looting
+Burst Lightning
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Hand.Tablet of Discovery.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Tablet of Discovery.Activate(Ability: Spend)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+? Bot1.Mana = {R}{R}{R} {R}{R} (InstantOrSorcerySpells)
+Bot1.Hand.Burst Lightning.Cast(Bot2; Kicked: 1)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 16
+[T5 Bot1.Main1]
+Bot1.Battlefield.Tablet of Discovery.Activate(Ability: Spend)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Graveyard.Faithless Looting.Cast(Ability: Flashback)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 16
+Bot1.Graveyard = Island; Island; Burst Lightning
+Exile = Faithless Looting

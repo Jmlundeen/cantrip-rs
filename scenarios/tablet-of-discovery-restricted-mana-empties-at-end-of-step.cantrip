@@ -1,0 +1,36 @@
+# Tablet of Discovery's restricted {R}{R} empties from the pool as the step ends (CR 106.4), like any mana. It is tapped in
+# the first main phase and floats there: the Lightning Bolt in hand could be cast with it (the positive control, checked
+# by the pool still holding it). In the second main phase the pool is empty and, with no other mana, the Bolt cannot be cast.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Tablet of Discovery
+Lightning Bolt
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Hand.Tablet of Discovery.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Tablet of Discovery.Activate(Ability: Spend)
+? Bot1.Mana = {R}{R} (InstantOrSorcerySpells)
+Bot1.Pass
+[Bot1.Main2]
+? Bot1.Mana =
+! Bot1.Hand.Lightning Bolt.Cast(Bot2)
+
+[Expect]
+Bot1.Hand = Lightning Bolt; Island; Island
