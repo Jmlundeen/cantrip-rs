@@ -115,9 +115,10 @@ pub enum Rest {
 
 /// "Look at the top `count` cards of your library. Put between `min` and `max` of them that pass `wanted` into your hand
 /// and the rest on the bottom of your library" (CR 401.2, 701.20-ish "look"): `reveal` makes it "you may reveal". A
-/// library with fewer cards shows what it has (CR 609.3), and `min` shrinks to the cards that qualify. With nothing
-/// qualifying and a random bottom nobody is asked. The cards taken, as they are in the hand. Once Upon a Time and
-/// Narset, Parter of Veils (one, revealed, random), Dig Through Time and Stock Up (two, chosen order) print it.
+/// library with fewer cards shows what it has (CR 609.3), and `min` and `max` shrink to the cards that qualify. With
+/// nothing qualifying the player is still asked, to see the cards (the look is the instruction, the taking only its
+/// option), and the hand takes none. The cards taken, as they are in the hand. Once Upon a Time and Narset, Parter of
+/// Veils (one, revealed, random), Dig Through Time and Stock Up (two, chosen order) print it.
 pub fn look_at_top(
     g: &mut dyn Game,
     player: PlayerId,
@@ -133,24 +134,23 @@ pub fn look_at_top(
         return Ok(Vec::new());
     }
     let takeable: Vec<ObjectId> = looked.iter().copied().filter(|&c| wanted(&g.chars(c))).collect();
-    let mut taken = Vec::new();
-    let mut bottom = Vec::new();
-    if !takeable.is_empty() || rest == Rest::BottomChosen {
-        let min = min.min(takeable.len() as u8);
-        let ask = RequestKind::DistributeCards {
-            source,
-            cards: looked.clone(),
-            destinations: vec![
-                Destination { kind: DestinationKind::Hand, min, max, eligible: takeable },
-                Destination { kind: DestinationKind::LibraryBottom, min: 0, max: u8::MAX, eligible: looked.clone() },
-            ],
-            may_shuffle: false,
-        };
-        if let Answer::Placements { placements, .. } = g.ask(player, ask)? {
-            taken = placements.first().cloned().unwrap_or_default();
-            bottom = placements.get(1).cloned().unwrap_or_default();
+    let min = min.min(takeable.len() as u8);
+    let max = max.min(takeable.len() as u8);
+    let ask = RequestKind::DistributeCards {
+        source,
+        cards: looked.clone(),
+        destinations: vec![
+            Destination { kind: DestinationKind::Hand, min, max, eligible: takeable },
+            Destination { kind: DestinationKind::LibraryBottom, min: 0, max: u8::MAX, eligible: looked.clone() },
+        ],
+        may_shuffle: false,
+    };
+    let (taken, bottom) = match g.ask(player, ask)? {
+        Answer::Placements { placements, .. } => {
+            (placements.first().cloned().unwrap_or_default(), placements.get(1).cloned().unwrap_or_default())
         }
-    }
+        _ => (Vec::new(), Vec::new()),
+    };
     let taken = if taken.is_empty() {
         taken
     } else {

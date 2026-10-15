@@ -1,8 +1,8 @@
 # Narset, Parter of Veils: -2 once per turn (a loyalty ability, CR 606.3: a second activation the same turn is refused), and
 # not at all when she has fewer than two loyalty counters (5 to 3 on turn 1, 3 to 1 on turn 3, refused on turn 5). Turn 1's
-# look finds nothing she may take (an Ornithopter and three Plains: no question is asked, ! Arrange); turn 3's finds a
-# Brainstorm, which Bot1 declines to reveal (the may). "Each opponent can't draw more than one card each turn" limits only
-# the opponents: Bot1's own Brainstorm draws all three cards.
+# look finds nothing she may take (an Ornithopter and three Plains: Bot1 sees them and all four go to the bottom); turn
+# 3's finds a Brainstorm, which Bot1 declines to reveal (the may). "Each opponent can't draw more than one card each
+# turn" limits only the opponents: Bot1's own Brainstorm draws all three cards.
 
 [Bot1 Deck]
 Narset, Parter of Veils
@@ -35,7 +35,7 @@ Bot1.Battlefield.Mox Sapphire.Activate
 Bot1.Battlefield.Mox Pearl.Activate
 Bot1.Hand.Narset, Parter of Veils.Cast
 Bot1.Battlefield.Narset, Parter of Veils.Activate(Ability: Look at the top four)
-! Bot1.Arrange
+Bot1.Arrange( | Ornithopter; Plains; Plains; Plains)
 [T1 Bot1.Main2]
 ! Bot1.Battlefield.Narset, Parter of Veils.Activate
 ? Bot1.Battlefield.Narset, Parter of Veils.Counters.Loyalty = 3
