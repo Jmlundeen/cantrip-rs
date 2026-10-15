@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{choose, same_name};
+use cantrip_mechanics::{choose, library::{self, Find}, same_name};
 use cantrip_oracle as oracle;
 
 /// "As an additional cost to cast this spell, you may collect evidence 6" (CR 701.59a, 601.2b): announced like any
@@ -7,20 +7,6 @@ use cantrip_oracle as oracle;
 const OPTIONAL_COST: OptionalCost = OptionalCost { cost: Cost { collect_evidence: 6, ..Cost::NONE } };
 
 const LABELS: &[&str] = &["Cast without collecting evidence", "Collect evidence 6"];
-
-/// The library part of the search: you search the owner's library for any number of cards with the exiled card's name
-/// (CR 701.23). The searcher is the one asked; the library is the owner's. Nothing is asked of an empty library, and the
-/// search is not a search of the searcher's own library, so no `searched` event is made for it.
-fn search_owners_library(g: &mut dyn Game, you: PlayerId, owner: PlayerId, source: ObjectId, exiled: ObjectId) -> Result<Vec<ObjectId>, Suspend> {
-    let mut library: Vec<ObjectId> = g.state().zone(Zone::library(owner)).to_vec();
-    library.reverse();
-    let eligible: Vec<ObjectId> = library.iter().copied().filter(|&c| same_name(g, exiled, c)).collect();
-    if library.is_empty() {
-        return Ok(Vec::new());
-    }
-    let answer = g.ask(you, RequestKind::SearchLibrary { source, library, eligible, count: u8::MAX, optional: true })?;
-    Ok(if let Answer::Cards(cards) = answer { cards } else { Vec::new() })
-}
 
 /// "Destroy all creatures. If evidence was collected, exile a card from an opponent's graveyard. Then search its
 /// owner's graveyard, hand, and library for any number of cards with that name and exile them. That player shuffles,
@@ -43,16 +29,17 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(chosen) = choose::card(g, you, item.object, Purpose::Exile, graveyards)? else { return Ok(()) };
     let owner = g.obj(chosen).owner;
     let exiled = g.exile(chosen);
-    let mut found = Vec::new();
     let graveyard: Vec<ObjectId> = g.state().zone(Zone::graveyard(owner)).iter().copied().filter(|&c| same_name(g, exiled, c)).collect();
-    found.extend(choose::cards(g, you, item.object, Purpose::Exile, graveyard, u8::MAX, true)?);
+    let mut found = choose::cards(g, you, item.object, Purpose::Exile, graveyard, u8::MAX, true)?;
+    let in_graveyard = found.len();
     let hand: Vec<ObjectId> = g.state().zone(Zone::hand(owner)).iter().copied().filter(|&c| same_name(g, exiled, c)).collect();
-    let from_hand = choose::cards(g, you, item.object, Purpose::Exile, hand, u8::MAX, true)?;
-    found.extend(from_hand.iter().copied());
-    found.extend(search_owners_library(g, you, owner, item.object, exiled)?);
-    g.exile_all(&found);
-    g.shuffle(owner);
-    g.draw(owner, from_hand.len() as u32);
+    found.extend(choose::cards(g, you, item.object, Purpose::Exile, hand, u8::MAX, true)?);
+    let cards_found = found.len();
+    // The library is searched and everything found goes to exile together; the owner shuffles (CR 701.23, 406.2).
+    let moved = library::search_to_exile(g, you, owner, item.object, Find::ONE.up_to(u8::MAX), &found, |q, c| same_name(q, exiled, c))?;
+    // A card for each one that actually reached exile from the hand: a replacement may have sent one elsewhere.
+    let from_hand = moved[in_graveyard..cards_found].iter().filter(|&&c| g.obj(c).zone.is(ZoneKind::Exile)).count();
+    g.draw(owner, from_hand as u32);
     Ok(())
 }
 
