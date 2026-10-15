@@ -1,0 +1,50 @@
+# Bot1 and Bot2 each control a Geist (the legend rule is per controller). Each Lightning Greaves ({2}) costs {1}, never {0}:
+# on turn 3 Bot1 taps only Mox Jet before casting it, and on turn 4 Bot2 does the same, and neither has mana left over.
+
+[Bot1 Deck]
+Island
+Mox Pearl
+Mox Jet
+Geist of Saint Thalia
+Lightning Greaves
+Island x15
+
+[Bot2 Deck]
+Island
+Mox Pearl
+Mox Jet
+Geist of Saint Thalia
+Lightning Greaves
+Island x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Geist of Saint Thalia.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Geist of Saint Thalia.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Lightning Greaves.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Lightning Greaves.Cast
+? Bot2.Mana =
+Bot2.Pass
+[Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Lightning Greaves.Tapped = false
+Bot2.Battlefield.Lightning Greaves.Tapped = false

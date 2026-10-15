@@ -1,0 +1,51 @@
+# Thalia ("Noncreature spells cost {1} more", everyone's) and Geist ("... you cast cost {1} less") together, both Bot1's.
+# Bot1 casts three Moxen (free), Thalia and Geist (creature spells, untaxed) on turn 1. On turn 3 Lightning Greaves ({2}) costs
+# {2} for Bot1 (+1 -1): Island and Mox Pearl pay it with nothing left. On turn 2 Bot2, with no Geist, pays Thalia's {1} for Mox
+# Jet ({0}): tapping its Island first leaves nothing floating after the cast.
+
+[Bot1 Deck]
+Island
+Mox Pearl
+Mox Jet
+Mox Ruby
+Thalia, Guardian of Thraben
+Geist of Saint Thalia
+Lightning Greaves
+Island x10
+
+[Bot2 Deck]
+Island
+Mox Jet
+Island x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Thalia, Guardian of Thraben.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Geist of Saint Thalia.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Mox Jet.Cast
+? Bot2.Mana =
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Lightning Greaves.Cast
+? Bot1.Mana =
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Lightning Greaves.Tapped = false
+Bot1.Battlefield.Mox Jet.Tapped = false
+Bot2.Battlefield.Mox Jet.Tapped = false

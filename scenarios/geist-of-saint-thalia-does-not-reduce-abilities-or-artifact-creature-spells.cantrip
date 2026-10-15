@@ -1,0 +1,44 @@
+# The discount is for noncreature spells only. With Geist out (Island + Mox Pearl on turn 1), Lavaspur Boots ({1}, a noncreature
+# spell) is free, but its Equip {1} is an activated ability, not a spell, and is paid in full off Mox Jet (an empty pool is
+# checked: nothing is left over, so no reduction was taken). Haywire Mite ({1}) is an artifact creature spell, and a creature
+# spell: it costs its full {1}, paid by Mox Ruby, which ends tapped.
+
+[Bot1 Deck]
+Island
+Mox Pearl
+Mox Jet
+Mox Ruby
+Geist of Saint Thalia
+Lavaspur Boots
+Haywire Mite
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Geist of Saint Thalia.Cast
+Bot1.Pass
+Bot1.Hand.Lavaspur Boots.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Lavaspur Boots.Activate(Geist of Saint Thalia)
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Haywire Mite.Cast
+? Bot1.Mana =
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Lavaspur Boots.AttachedTo = Geist of Saint Thalia
+Bot1.Battlefield.Mox Jet.Tapped = true
+Bot1.Battlefield.Mox Ruby.Tapped = true
+Bot1.Battlefield.Haywire Mite.Types = Artifact; Creature

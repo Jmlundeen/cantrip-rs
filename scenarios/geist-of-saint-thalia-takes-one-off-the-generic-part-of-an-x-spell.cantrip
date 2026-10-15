@@ -1,0 +1,37 @@
+# CR 601.2f: the total cost includes X, and the reduction takes {1} off the generic part. With Geist out, Mind Twist for X = 2
+# ({2}{B}) costs {1}{B}: Mox Jet and Mox Ruby pay it (a full-price cast would owe a third mana and the script fail), and Mox Sapphire, left untapped, is not needed.
+# Bot2 discards two cards at random.
+
+[Bot1 Deck]
+Island
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Geist of Saint Thalia
+Mind Twist
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Geist of Saint Thalia.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Mind Twist.Cast(Bot2; X: 2)
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Mind Twist
+Bot2.Hand.Count = 5
+Bot1.Battlefield.Mox Sapphire.Tapped = false

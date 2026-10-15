@@ -1,0 +1,40 @@
+# The discount is a static ability of the Geist on the battlefield. Bot1 casts Geist on turn 1 (Island + Mox Ruby) and exiles it with
+# its own Swords to Plowshares (Mox Pearl). On turn 3 Lightning Greaves ({2}) costs the full {2}: Island and Mox Jet pay it with
+# nothing left over (a surviving discount would leave one floating).
+
+[Bot1 Deck]
+Island
+Mox Pearl
+Mox Jet
+Mox Ruby
+Geist of Saint Thalia
+Swords to Plowshares
+Lightning Greaves
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Geist of Saint Thalia.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Swords to Plowshares.Cast(Geist of Saint Thalia)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Lightning Greaves.Cast
+? Bot1.Mana =
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Exile = Geist of Saint Thalia
+Bot1.Battlefield.Lightning Greaves.Tapped = false

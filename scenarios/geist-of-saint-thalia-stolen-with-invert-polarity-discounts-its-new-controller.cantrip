@@ -1,0 +1,56 @@
+# Control, not ownership: Bot2 casts Geist on turn 2 (Island + Mox Pearl) and Bot1 wins the flip of Invert Polarity
+# ({U}{U}{R}: Island, Mox Sapphire, Mox Ruby), so Bot1 controls Bot2's Geist. On turn 3 Bot1's Lightning Greaves ({2}) costs {1}
+# (Mox Jet alone); on turn 4 Bot2, the owner, pays the full {2}. The first coin face is a win.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Invert Polarity
+Lightning Greaves
+Island x15
+
+[Bot2 Deck]
+Island
+Mox Pearl
+Mox Jet
+Geist of Saint Thalia
+Lightning Greaves
+Island x15
+
+[Dice]
+1
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Geist of Saint Thalia.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Invert Polarity.Cast(Geist of Saint Thalia)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Lightning Greaves.Cast
+? Bot1.Mana =
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Lightning Greaves.Cast
+? Bot2.Mana =
+Bot2.Pass
+[Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Geist of Saint Thalia.Power = 1
+Bot2.Battlefield.Lightning Greaves.Tapped = false
