@@ -1,0 +1,56 @@
+# Uldaros Theorix and a split card (CR 709.3, 709.3a, 709.3b): the copy of Life // Death is cast as one half and only that half's
+# mana value counts towards the six. Bot1 exiles Life // Death (3 as the two halves together in exile) and The Theorist, Jace
+# Beleren (4) and casts the Death copy (2) and then Jace (4): 6 in all. Counted as the whole card, 3 + 4 = 7, Jace would be over
+# the six and not offered. Death returns the Ornithopter card from the graveyard, left untargeted by Uldaros for it.
+
+[Bot1 Deck]
+Swamp
+Dark Ritual
+Entomb
+Entomb
+Entomb
+Black Lotus
+Uldaros Theorix
+Life // Death
+Ornithopter
+The Theorist, Jace Beleren
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Life // Death)
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Ornithopter)
+Bot1.Hand.Entomb.Cast
+Bot1.Search(The Theorist, Jace Beleren)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Uldaros Theorix.Cast
+Bot1.Target(Life // Death)
+Bot1.Target(The Theorist, Jace Beleren)
+Bot1.Choose(Life // Death)
+Bot1.Modes(Death)
+Bot1.Target(Bot1.Graveyard.Ornithopter)
+Bot1.Choose(The Theorist, Jace Beleren)
+! Bot1.Choose
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Ornithopter; Swamp; Swamp; Swamp; The Theorist, Jace Beleren; Uldaros Theorix
+Bot1.Battlefield.Ornithopter.Token = (absent)
+Bot1.Battlefield.The Theorist, Jace Beleren.Token = true
+Exile = Life // Death; The Theorist, Jace Beleren
+Stack.Count = 0

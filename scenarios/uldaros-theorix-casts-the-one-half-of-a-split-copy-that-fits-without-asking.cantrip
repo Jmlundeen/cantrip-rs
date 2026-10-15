@@ -1,0 +1,59 @@
+# Uldaros Theorix and a split card (CR 709.3, 709.3a): only the half chosen is evaluated to be cast, so a copy of Life // Death
+# is castable with 1 of the six left although the card in exile is worth 3 - and only Life (1) fits, not Death (2), so no
+# half is asked for. Bot1 exiles Jace (4), Tarfire (1) and Life // Death and casts Jace and Tarfire first, leaving 1: the
+# Life copy is cast at once (the refusal, with the neighbouring scenario, where both halves fit and Bot1 is asked, as the positive
+# control). Life makes Bot1's lands 1/1 creatures until end of turn.
+
+[Bot1 Deck]
+Swamp
+Dark Ritual
+Entomb
+Entomb
+Entomb
+Black Lotus
+Uldaros Theorix
+Tarfire
+Life // Death
+The Theorist, Jace Beleren
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Tarfire)
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Life // Death)
+Bot1.Hand.Entomb.Cast
+Bot1.Search(The Theorist, Jace Beleren)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Uldaros Theorix.Cast
+Bot1.Target(Tarfire)
+Bot1.Target(Life // Death)
+Bot1.Target(The Theorist, Jace Beleren)
+Bot1.Choose(The Theorist, Jace Beleren)
+Bot1.Choose(Tarfire)
+Bot1.Target(Bot2)
+Bot1.Choose(Life // Death)
+! Bot1.Modes
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Swamp; Swamp; Swamp; The Theorist, Jace Beleren; Uldaros Theorix
+Bot1.Battlefield.Swamp#1.Types = Land; Creature
+Bot1.Battlefield.Swamp#3.Types = Land; Creature
+Bot2.Life = 18
+Exile = Life // Death; Tarfire; The Theorist, Jace Beleren
+Stack.Count = 0
