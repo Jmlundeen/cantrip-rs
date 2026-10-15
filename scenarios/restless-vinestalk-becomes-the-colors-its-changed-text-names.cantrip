@@ -1,0 +1,45 @@
+# Trait Doctoring replaces the color word blue with red in Restless Vinestalk's text until end of turn (CR 612.1): "this
+# land becomes a 5/5 green and red Plant creature with trample". The mana symbols in its cost ({3}{G}{U}) are not words
+# and are paid as printed, and it is still a land.
+
+[Bot1 Deck]
+Restless Vinestalk
+Trait Doctoring
+Mox Sapphire
+Mox Emerald
+Mox Jet
+Black Lotus
+Island
+Island x9
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Restless Vinestalk.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Trait Doctoring.Cast(Restless Vinestalk)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Replace a color word)
+Bot1.Colors(Blue)
+Bot1.Colors(Red)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Restless Vinestalk.Activate(Ability: 5/5)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Battlefield.Restless Vinestalk.Colors = Green; Red
+Bot1.Battlefield.Restless Vinestalk.Subtypes = Plant
+Bot1.Battlefield.Restless Vinestalk.Types = Land; Creature
+Bot1.Battlefield.Restless Vinestalk.Power = 5
+

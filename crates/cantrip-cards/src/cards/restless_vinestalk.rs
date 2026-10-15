@@ -6,11 +6,12 @@ use cantrip_mechanics::{Animation, animate};
 use cantrip_oracle as oracle;
 
 fn becomes_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let words = g.words(item.object);
     let animation = Animation {
         power: 5,
         toughness: 5,
-        colors: ColorSet(ColorSet::of(Color::Green).0 | ColorSet::of(Color::Blue).0),
-        subtype: Subtype::Plant,
+        colors: words.colors(ColorSet(ColorSet::of(Color::Green).0 | ColorSet::of(Color::Blue).0)),
+        subtype: words.subtype(Subtype::Plant),
         keywords: Keywords::of(&[Keyword::Trample]),
     };
     animate(g, item.object, item.object, &animation, Duration::EndOfTurn);
