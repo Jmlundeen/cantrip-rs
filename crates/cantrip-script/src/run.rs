@@ -8,7 +8,7 @@ use cantrip_engine::undo::Undo;
 use cantrip_engine::*;
 
 use crate::dump::{StateDump, bot};
-use crate::parse::{self, ActionStep, GameScript, HandoverStep, ScriptStep, ScriptVerb, WaitStep, bot_id, split_copy};
+use crate::parse::{self, ActionStep, Expectation, GameScript, HandoverStep, ScriptStep, ScriptVerb, WaitStep, bot_id, split_copy};
 
 /// How many turns a line may wait to become possible before the script is taken to be stuck.
 pub const TURNS_TO_WAIT: u32 = 4;
@@ -59,6 +59,27 @@ impl Casting {
     }
 }
 
+/// What the script means a player to answer a question with.
+#[derive(Clone, Debug, PartialEq)]
+pub enum Intent {
+    Answer(Answer),
+    /// Take back the latest mana ability (`Bot1.Undo`).
+    Undo,
+}
+
+/// Where playing on stopped.
+enum Stop<'s> {
+    Done,
+    Asked(Request),
+    Check(&'s Expectation),
+}
+
+/// An intention, and the line it comes from (none for a default or a payment the line in progress implies).
+struct Decision<'s> {
+    intent: Intent,
+    line: Option<&'s ActionStep>,
+}
+
 struct Run<'s> {
     script: &'s GameScript,
     game: Game,
@@ -72,27 +93,130 @@ struct Run<'s> {
     colors: Option<Vec<Color>>,
     /// The mana abilities that can be taken back (`Bot1.Undo`), as the host offers them.
     undo: Undo<()>,
+    /// A driven player's question, and what the script means them to answer, until they do.
+    asked: Option<(Request, Decision<'s>)>,
 }
 
 pub fn run(script: &GameScript) -> Result<ScriptResult, ScriptFailure> {
-    let decks: Vec<Vec<String>> = (0..script.decks.len()).map(|i| script.decklist(i)).collect();
-    let chooser = if script.opening { Some(PlayerId((script.chooser.max(1) - 1) as u8)) } else { None };
-    let mut game = deal(&decks, 1, false, chooser).map_err(|m| ScriptFailure { message: m.clone(), report: m })?;
-    // CANTRIP_VERIFY=1: every rollback is checked to restore the state exactly.
-    game.verify = std::env::var_os("CANTRIP_VERIFY").is_some();
-    game.state.force_rolls(&script.dice);
-    let mut run = Run { script, game, cursor: 0, since: 1, casting: None, trace: Vec::new(), handed_over: false, colors: None, undo: Undo::default() };
+    let mut run = Run::deal(script)?;
     match run.play() {
         Ok(()) => {
-            let dump = StateDump::of(&run.game);
-            let mismatches = dump.mismatches(&script.expectations);
-            if mismatches.is_empty() {
-                Ok(ScriptResult { game: run.game, dump, trace: run.trace, handed_over: run.handed_over })
-            } else {
-                Err(run.failure(format!("the game did not end as expected:\n  {}", mismatches.join("\n  "))))
-            }
+            let dump = run.judge()?;
+            Ok(ScriptResult { game: run.game, dump, trace: run.trace, handed_over: run.handed_over })
         }
         Err(Fail(message)) => Err(run.failure(message)),
+    }
+}
+
+/// A scenario played through a table rather than by the runner alone (`docs/scenarios-in-the-browser.md`): the runner
+/// answers for the seats it plays, and stops on each question to a driven seat - a browser page, say - with what the
+/// script means it to answer, which the seat's answer must then be.
+pub struct Scripted {
+    run: Run<'static>,
+}
+
+/// Where a scenario played through a table stopped.
+pub enum Advance {
+    /// A driven seat is asked something, and the script means this answer.
+    Ask(Expected),
+    /// A check of what a client shows (`? Client.Bot1.Stack = ...`), to be judged by the driven seats' pages now.
+    Check(Expectation),
+    /// The script is over: [`Scripted::verdict`] judges the game, and [`Scripted::client_expectations`] are for the pages.
+    Done,
+}
+
+/// A driven seat's question, and what the script means it to answer.
+pub struct Expected {
+    pub request: Request,
+    pub intent: Intent,
+    /// The line it comes from, `12: Bot1.Hand.Island.Play`, or none for a default or a payment the line in progress implies.
+    pub line: Option<String>,
+}
+
+impl Scripted {
+    /// Deals the scenario's game. The script lives as long as the process: a table plays few.
+    pub fn deal(script: GameScript) -> Result<Scripted, ScriptFailure> {
+        let script: &'static GameScript = Box::leak(Box::new(script));
+        Ok(Scripted { run: Run::deal(script)? })
+    }
+
+    pub fn script(&self) -> &GameScript {
+        self.run.script
+    }
+
+    /// The game the scenario is played in, which a table may hold in its stead between steps (`std::mem::swap`).
+    pub fn game(&mut self) -> &mut Game {
+        &mut self.run.game
+    }
+
+    /// Plays on, answering for every player but the `driven` ones, until a driven player is asked (`Some`) or the
+    /// script ends (`None`; [`Scripted::verdict`] then judges it).
+    pub fn advance(&mut self, driven: &[PlayerId]) -> Result<Advance, ScriptFailure> {
+        match self.run.play_until(driven) {
+            Ok(Stop::Done) => Ok(Advance::Done),
+            Ok(Stop::Check(check)) => Ok(Advance::Check(check.clone())),
+            Ok(Stop::Asked(request)) => {
+                let (_, decision) = self.run.asked.as_ref().expect("held");
+                let line = decision.line.map(|step| format!("{}: {}", step.line, step.text));
+                Ok(Advance::Ask(Expected { request, intent: decision.intent.clone(), line }))
+            }
+            Err(Fail(message)) => Err(self.run.failure(message)),
+        }
+    }
+
+    /// The `[Expect]` lines about what a client shows, for the pages to judge once the script is over.
+    pub fn client_expectations(&self) -> Vec<Expectation> {
+        self.run.script.expectations.iter().filter(|e| e.is_client()).cloned().collect()
+    }
+
+    /// The driven player's answer to the question `advance` stopped on. A failure if it is not the one the script means.
+    pub fn answered(&mut self, given: Intent) -> Result<(), ScriptFailure> {
+        self.run.answered(given).map_err(|Fail(message)| self.run.failure(message))
+    }
+
+    /// Whether the game ended as the scenario expects, once `advance` has said it is over.
+    pub fn verdict(&mut self) -> Result<StateDump, ScriptFailure> {
+        self.run.judge()
+    }
+
+    /// A failure of the scenario found outside the runner, with the runner's report.
+    pub fn failure(&self, message: String) -> ScriptFailure {
+        self.run.failure(message)
+    }
+}
+
+impl<'s> Run<'s> {
+    fn deal(script: &'s GameScript) -> Result<Run<'s>, ScriptFailure> {
+        let decks: Vec<Vec<String>> = (0..script.decks.len()).map(|i| script.decklist(i)).collect();
+        let chooser = if script.opening { Some(PlayerId((script.chooser.max(1) - 1) as u8)) } else { None };
+        let mut game = deal(&decks, 1, false, chooser).map_err(|m| ScriptFailure { message: m.clone(), report: m })?;
+        // CANTRIP_VERIFY=1: every rollback is checked to restore the state exactly.
+        game.verify = std::env::var_os("CANTRIP_VERIFY").is_some();
+        game.state.force_rolls(&script.dice);
+        Ok(Run {
+            script,
+            game,
+            cursor: 0,
+            since: 1,
+            casting: None,
+            trace: Vec::new(),
+            handed_over: false,
+            colors: None,
+            undo: Undo::default(),
+            asked: None,
+        })
+    }
+
+    /// The game as it ended, judged against `[Expect]`.
+    fn judge(&self) -> Result<StateDump, ScriptFailure> {
+        let dump = StateDump::of(&self.game);
+        let mismatches = dump.mismatches(&self.script.expectations);
+        if !mismatches.is_empty() {
+            return Err(self.failure(format!("the game did not end as expected:
+  {}", mismatches.join("
+  "))));
+        }
+        Ok(dump)
     }
 }
 
@@ -295,14 +419,25 @@ impl<'s> Run<'s> {
     }
 
     fn play(&mut self) -> R<()> {
+        match self.play_until(&[])? {
+            Stop::Done => Ok(()),
+            _ => unreachable!("no player is driven"),
+        }
+    }
+
+    /// Plays on, answering for every player but the `driven` ones, until the script ends, a driven player is asked (its
+    /// intention held in `asked` until [`Run::answered`]), or, with a player driven, a check of what a client shows comes up.
+    fn play_until(&mut self, driven: &[PlayerId]) -> R<Stop<'s>> {
         let mut asks = 0;
         loop {
-            self.run_checks()?;
+            if let Some(check) = self.run_checks(!driven.is_empty())? {
+                return Ok(Stop::Check(check));
+            }
             if self.game.is_over() {
                 if let Some(step) = self.current() {
                     return fail(format!("the game ended before line {}: {}", step.line(), step.text()));
                 }
-                return Ok(());
+                return Ok(Stop::Done);
             }
             asks += 1;
             if asks > ASK_LIMIT {
@@ -318,7 +453,7 @@ impl<'s> Run<'s> {
                 && stack_empty
                 && matches!(request.kind, RequestKind::Priority { .. })
             {
-                return Ok(());
+                return Ok(Stop::Done);
             }
 
             if let Some(ScriptStep::Handover(h)) = self.current()
@@ -326,7 +461,7 @@ impl<'s> Run<'s> {
             {
                 self.handed_over = true;
                 self.next();
-                return Ok(());
+                return Ok(Stop::Done);
             }
 
             // `! Bot1.Accept`, `! Bot1.Choose`, a bare `! Bot1.Target` or `! Bot2.Block`...: the player is not asked that kind of question
@@ -457,12 +592,26 @@ impl<'s> Run<'s> {
                 continue;
             }
 
+            if driven.contains(&request.player) {
+                let decision = self.intend(&request)?;
+                self.asked = Some((request.clone(), decision));
+                return Ok(Stop::Asked(request));
+            }
             self.decide(&request)?;
         }
     }
 
-    fn run_checks(&mut self) -> R<()> {
+    /// Runs the checks under the cursor. A check of what a client shows is handed out when a client is watching
+    /// (`watched`) and skipped when none is.
+    fn run_checks(&mut self, watched: bool) -> R<Option<&'s Expectation>> {
         while let Some(ScriptStep::Check { expectation, .. }) = self.current() {
+            if expectation.is_client() {
+                self.next();
+                if watched {
+                    return Ok(Some(expectation));
+                }
+                continue;
+            }
             let dump = StateDump::of(&self.game);
             let mismatches = dump.mismatches(std::slice::from_ref(expectation));
             if let Some(m) = mismatches.first() {
@@ -470,7 +619,7 @@ impl<'s> Run<'s> {
             }
             self.next();
         }
-        Ok(())
+        Ok(None)
     }
 
     fn waiting(&self, h: &HandoverStep, request: &Request) -> bool {
@@ -511,19 +660,40 @@ impl<'s> Run<'s> {
         Ok(())
     }
 
+    /// A driven player answered the question `play_until` stopped on: it must be the answer the script means, which is
+    /// then given (`None` is a mana ability taken back).
+    fn answered(&mut self, given: Intent) -> R<()> {
+        let Some((request, decision)) = self.asked.take() else {
+            return fail("an answer came with nothing asked");
+        };
+        if given != decision.intent {
+            let what = match decision.line {
+                Some(step) => format!("line {}: {}", step.line, step.text),
+                None => "the default".to_string(),
+            };
+            return fail(format!("{} answered {given:?} to {}, but {what} means {:?}", bot(request.player), kind_name(&request.kind), decision.intent));
+        }
+        self.carry_out(&request, decision)
+    }
+
     fn decide(&mut self, request: &Request) -> R<()> {
+        let decision = self.intend(request)?;
+        self.carry_out(request, decision)
+    }
+
+    /// What the script means the asked player to answer: the line under the cursor if it applies, else the payment the
+    /// line in progress implies, else the default. Called once per question: it moves the payment in progress on.
+    fn intend(&mut self, request: &Request) -> R<Decision<'s>> {
         // `Bot1.Undo`: the latest mana ability the player activated is taken back, and they are asked again.
         if let Some(ScriptStep::Action(step)) = self.current()
             && matches!(step.verb, ScriptVerb::Undo)
             && request.player == player_of(step.bot)
             && answers(step.verb, &request.kind)
         {
-            if self.undo.take_back(&mut self.game, request.player).is_none() {
+            if self.undo.offered(request.player).is_none() {
                 return fail(format!("line {}: {} has no mana ability to take back", step.line, bot(request.player)));
             }
-            self.trace.push(format!("T{} {}: line {} {}", self.turn(), bot(request.player), step.line, step.text));
-            self.next();
-            return Ok(());
+            return Ok(Decision { intent: Intent::Undo, line: Some(step) });
         }
 
         let paying = self.casting.as_ref().is_some_and(|c| c.player == request.player)
@@ -533,50 +703,69 @@ impl<'s> Run<'s> {
                 self.casting = None;
             }
         } else if let Some(auto) = self.auto_pay(request)? {
-            return self.deliver(request, auto, None);
+            return Ok(Decision { intent: Intent::Answer(auto), line: None });
         }
 
         if let Some(ScriptStep::Action(step)) = self.current()
             && request.player == player_of(step.bot)
             && let Some(answer) = self.matches(step, request)?
         {
-            self.next();
-            self.deliver(request, answer.clone(), Some(step))?;
-            let act = match &answer {
-                Answer::Act(a) => Some(a.kind),
-                _ => None,
-            };
-            match (&request.kind, act) {
-                (RequestKind::Priority { .. }, Some(ActionKind::CastSpell | ActionKind::ActivateAbility)) => {
-                    self.colors = colors_of(step)?;
-                    let x = x_of(step)?;
-                    let mut casting = Casting::new(request.player, x, spend_of(step)?);
-                    casting.convoke = names_of(step, "Convoke");
-                    casting.delve = match step.named("Delve") {
-                        None => 0,
-                        Some(text) => match text.trim().parse::<u32>() {
-                            Ok(n) => n,
-                            Err(_) => return fail(format!("line {}: {text} is not a number", step.line)),
-                        },
-                    };
-                    self.casting = Some(casting);
-                }
-                (RequestKind::UnlessPays { .. }, Some(ActionKind::PayCost)) => {
-                    self.casting = Some(Casting::new(request.player, None, spend_of(step)?));
-                }
-                (_, Some(ActionKind::ActivateAbility)) => {
-                    if self.casting.is_some() {
-                        let more = spend_of(step)?;
-                        self.casting.as_mut().unwrap().spend.extend(more);
-                    }
-                }
-                _ => {}
-            }
-            return Ok(());
+            return Ok(Decision { intent: Intent::Answer(answer), line: Some(step) });
         }
 
-        let answer = self.default(request)?;
-        self.deliver(request, answer, None)
+        Ok(Decision { intent: Intent::Answer(self.default(request)?), line: None })
+    }
+
+    /// Gives the answer `intend` decided on, and moves the cursor past its line.
+    fn carry_out(&mut self, request: &Request, decision: Decision<'s>) -> R<()> {
+        let answer = match decision.intent {
+            Intent::Undo => {
+                let step = decision.line.expect("an Undo line");
+                if self.undo.take_back(&mut self.game, request.player).is_none() {
+                    return fail(format!("line {}: {} has no mana ability to take back", step.line, bot(request.player)));
+                }
+                self.trace.push(format!("T{} {}: line {} {}", self.turn(), bot(request.player), step.line, step.text));
+                self.next();
+                return Ok(());
+            }
+            Intent::Answer(answer) => answer,
+        };
+        let Some(step) = decision.line else {
+            return self.deliver(request, answer, None);
+        };
+        self.next();
+        self.deliver(request, answer.clone(), Some(step))?;
+        let act = match &answer {
+            Answer::Act(a) => Some(a.kind),
+            _ => None,
+        };
+        match (&request.kind, act) {
+            (RequestKind::Priority { .. }, Some(ActionKind::CastSpell | ActionKind::ActivateAbility)) => {
+                self.colors = colors_of(step)?;
+                let x = x_of(step)?;
+                let mut casting = Casting::new(request.player, x, spend_of(step)?);
+                casting.convoke = names_of(step, "Convoke");
+                casting.delve = match step.named("Delve") {
+                    None => 0,
+                    Some(text) => match text.trim().parse::<u32>() {
+                        Ok(n) => n,
+                        Err(_) => return fail(format!("line {}: {text} is not a number", step.line)),
+                    },
+                };
+                self.casting = Some(casting);
+            }
+            (RequestKind::UnlessPays { .. }, Some(ActionKind::PayCost)) => {
+                self.casting = Some(Casting::new(request.player, None, spend_of(step)?));
+            }
+            (_, Some(ActionKind::ActivateAbility)) => {
+                if self.casting.is_some() {
+                    let more = spend_of(step)?;
+                    self.casting.as_mut().unwrap().spend.extend(more);
+                }
+            }
+            _ => {}
+        }
+        Ok(())
     }
 
     /// Paying from the pool without being told (`AutoPay`): `Spend:` first, then any pool mana that pays what is owed.

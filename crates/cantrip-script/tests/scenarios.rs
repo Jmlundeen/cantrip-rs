@@ -49,3 +49,64 @@ fn a_wrong_expectation_fails() {
     let failure = run(&script).err().expect("a wrong expectation must fail");
     assert!(failure.message.contains("Bot2.Graveyard"), "{}", failure.message);
 }
+
+/// Plays a scenario through `Scripted` with every seat driven, each answering exactly what the script means: the way a
+/// table plays it with browsers in the seats. Returns the final dump, or the failure.
+fn driven(script: GameScript) -> Result<String, String> {
+    use cantrip_engine::PlayerId;
+    use cantrip_script::{Advance, Scripted};
+    let seats: Vec<PlayerId> = (0..script.decks.len() as u8).map(PlayerId).collect();
+    let mut table = Scripted::deal(script).map_err(|f| f.message)?;
+    loop {
+        match table.advance(&seats).map_err(|f| f.message)? {
+            Advance::Ask(expected) => table.answered(expected.intent).map_err(|f| f.message)?,
+            Advance::Check(_) => {}
+            Advance::Done => return table.verdict().map(|dump| dump.render()).map_err(|f| f.message),
+        }
+    }
+}
+
+/// Driven seats change nothing: every scenario that runs ends the same when each of its seats answers what the script
+/// means as when the runner answers alone.
+#[test]
+fn every_scenario_ends_the_same_with_its_seats_driven() {
+    let mut differ = Vec::new();
+    let mut entries: Vec<PathBuf> = std::fs::read_dir(scripts()).unwrap().map(|e| e.unwrap().path()).filter(|p| p.extension().is_some_and(|e| e == "cantrip")).collect();
+    entries.sort();
+    for path in entries {
+        let Ok(script) = GameScript::load(&path) else { continue };
+        if (0..script.decks.len()).flat_map(|i| script.decklist(i)).any(|c| cantrip_engine::card(&c).is_none()) {
+            continue;
+        }
+        let alone = run(&script).map(|r| r.dump.render()).map_err(|f| f.message);
+        if alone.is_err() {
+            continue;
+        }
+        let through = driven(script);
+        if through != alone {
+            differ.push(format!("{}: {:?}", path.file_name().unwrap().to_string_lossy(), through.err()));
+        }
+    }
+    assert!(differ.is_empty(), "{} scenarios end differently driven:\n{}", differ.len(), differ.join("\n"));
+}
+
+/// A driven seat that answers other than the script means fails at the line.
+#[test]
+fn a_driven_seat_answering_otherwise_fails_at_the_line() {
+    use cantrip_engine::{Answer, PlayerId};
+    use cantrip_script::{Advance, Intent, Scripted};
+    let script = GameScript::load(&scripts().join("duress-takes-the-named-card.cantrip")).unwrap();
+    let mut table = Scripted::deal(script).unwrap();
+    loop {
+        match table.advance(&[PlayerId(0)]).unwrap() {
+            Advance::Ask(expected) if expected.line.is_some() => {
+                let failure = table.answered(Intent::Answer(Answer::Pass)).err().expect("a pass where a line plays fails");
+                assert!(failure.message.contains(expected.line.as_deref().unwrap()), "{}", failure.message);
+                return;
+            }
+            Advance::Ask(expected) => table.answered(expected.intent).unwrap(),
+            Advance::Check(_) => {}
+            Advance::Done => panic!("no line was ever asked of Bot1"),
+        }
+    }
+}

@@ -43,6 +43,16 @@ pub struct Expectation {
     pub line: usize,
 }
 
+impl Expectation {
+    /// The prefix of a key about what a client shows rather than the game's state (`Client.Bot1.Stack`): judged by a
+    /// browser driving that seat, and skipped by a headless run, which has no client to look at.
+    pub const CLIENT: &'static str = "Client.";
+
+    pub fn is_client(&self) -> bool {
+        self.key.starts_with(Self::CLIENT)
+    }
+}
+
 impl fmt::Display for Expectation {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{} = {}", self.key, self.value)

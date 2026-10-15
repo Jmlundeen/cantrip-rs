@@ -362,7 +362,7 @@ impl StateDump {
     /// What does not hold, one line each.
     pub fn mismatches(&self, expectations: &[Expectation]) -> Vec<String> {
         let mut out = Vec::new();
-        for e in expectations {
+        for e in expectations.iter().filter(|e| !e.is_client()) {
             if e.value == "(absent)" {
                 if let Some(actual) = self.values.get(&e.key) {
                     out.push(format!("line {}: {} expected to be absent, was \"{actual}\"", e.line, e.key));
