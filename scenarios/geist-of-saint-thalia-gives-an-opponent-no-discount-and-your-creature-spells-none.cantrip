@@ -1,0 +1,47 @@
+# The discount is for the Geist's controller only. Bot1 casts Geist on turn 1 (Island + Mox Pearl). On turn 2 Bot2 casts Lightning
+# Greaves ({2}) off Mox Jet and Mox Ruby and pays all of it (the empty pool is checked: a discount would leave a mana floating,
+# since both Moxen are tapped before the cast). On turn 3 Bot1 casts Samut ({1}{R}), a creature spell, at full price off Mountain and
+# Island (empty pool again).
+
+[Bot1 Deck]
+Island
+Mox Pearl
+Geist of Saint Thalia
+Mountain
+Samut, Hazoret's Champion
+Island x15
+
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Lightning Greaves
+Island x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Geist of Saint Thalia.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Greaves.Cast
+? Bot2.Mana =
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Samut, Hazoret's Champion.Cast
+? Bot1.Mana =
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Mox Jet; Mox Ruby; Lightning Greaves
+Bot1.Battlefield.Samut, Hazoret's Champion.Tapped = false
+Bot1.Battlefield.Mountain.Tapped = true

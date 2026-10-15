@@ -1,0 +1,11 @@
+{
+  "name": "Geist of Saint Thalia",
+  "manaCost": "{1}{U}",
+  "type": "Legendary Creature — Spirit Cleric",
+  "power": 1,
+  "toughness": 2,
+  "oracleText": "Flying\nNoncreature spells you cast cost {1} less to cast.",
+  "keywords": [
+    "Flying"
+  ]
+}

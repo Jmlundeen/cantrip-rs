@@ -1,0 +1,49 @@
+# "Noncreature spells you cast cost {1} less to cast" (CR 601.2f, 118.7c). Bot1 casts three Moxen (free), then Geist ({1}{U}) off
+# Island and Mox Pearl: no Geist yet, so it pays full price. With Geist out, Lightning Greaves ({2}) costs {1}: Mox Jet alone pays
+# it (the empty pool is checked, and had the discount not applied the cast would still be owing). Lightning Bolt ({R}) has no
+# generic part, so it is not made free: it still taps Mox Ruby. Greaves's Equip {0} (an ability, not a spell) is asked nothing.
+# The Geist itself is a creature spell and not reduced either.
+
+[Bot1 Deck]
+Island
+Mox Pearl
+Mox Jet
+Mox Ruby
+Geist of Saint Thalia
+Lightning Greaves
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Geist of Saint Thalia.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Lightning Greaves.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Battlefield.Lightning Greaves.Activate(Geist of Saint Thalia)
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Mox Jet.Tapped = true
+Bot1.Battlefield.Mox Ruby.Tapped = true
+Bot1.Battlefield.Island.Tapped = true
+Bot1.Battlefield.Mox Pearl.Tapped = true
+Bot1.Battlefield.Lightning Greaves.AttachedTo = Geist of Saint Thalia
+Bot1.Graveyard = Lightning Bolt
