@@ -1,0 +1,49 @@
+# Artificial Evolution changes the text of Bot1's Figure of Fable, Scout to Elf (CR 612.1), so the card does what the
+# changed text says: its first stage makes it a 2/3 Kithkin Elf, and the second stage, "if this creature is a Scout",
+# now asks whether it is an Elf and makes it a 4/5 Kithkin Soldier (CR 612). It never becomes a Scout.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Figure of Fable
+Artificial Evolution
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Figure of Fable.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Figure of Fable)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Scout)
+Bot1.Modes(Elf)
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Figure of Fable.Activate(Ability: Kithkin Scout with)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Figure of Fable.Subtypes = Elf; Kithkin
+? Bot1.Battlefield.Figure of Fable.Power = 2
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Figure of Fable.Activate(Ability: Soldier with)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Figure of Fable.Power = 4
+Bot1.Battlefield.Figure of Fable.Toughness = 5
+Bot1.Battlefield.Figure of Fable.Subtypes = Kithkin; Soldier
