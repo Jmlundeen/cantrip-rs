@@ -1,0 +1,34 @@
+# Improvisation Capstone: "until you exile cards with total mana value 4 or greater" stops when the library has run out.
+# Bot1's library is two Islands, total 0: both are exiled, the library is empty, and since a land is no spell nothing is
+# offered (a bare `! Bot1.Choose` proves no question is asked; the neighbouring scenarios are the positive control where
+# a spell among the exiled cards is offered). Bot1 does not lose: it never draws from the empty library before the end.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Improvisation Capstone
+Island x3
+Island
+Island
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Improvisation Capstone.Cast
+! Bot1.Choose
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Library.Count = 0
+Exile.Count = 3
+Bot1.Graveyard = Black Lotus; Black Lotus; Black Lotus

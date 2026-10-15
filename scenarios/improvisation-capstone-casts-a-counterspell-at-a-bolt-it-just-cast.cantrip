@@ -1,0 +1,41 @@
+# Improvisation Capstone: the spells are cast while it resolves (CR 608.2g), so a free Counterspell among the exiled cards has
+# a spell to target when a free Lightning Bolt cast first is on the stack. Library: Bolt (1), Counterspell (2), Bolt (4
+# in all): the second Bolt is exiled and left. Bot1 casts the first Bolt at Bot2, then the Counterspell at that Bolt:
+# Bot2 stays at 20 and both go to Bot1's graveyard.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Improvisation Capstone
+Island x3
+Lightning Bolt
+Counterspell
+Lightning Bolt
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Improvisation Capstone.Cast
+Bot1.Choose(Lightning Bolt)
+Bot1.Target(Bot2)
+Bot1.Choose(Counterspell)
+Bot1.Target(Stack.Lightning Bolt)
+Bot1.Choose()
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot2.Life = 20
+Bot1.Graveyard = Counterspell; Lightning Bolt; Black Lotus; Black Lotus; Black Lotus
+Exile.Count = 2

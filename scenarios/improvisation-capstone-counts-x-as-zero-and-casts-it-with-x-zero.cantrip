@@ -1,0 +1,42 @@
+# Improvisation Capstone: Walking Ballista ({X}{X}) has mana value 0 in exile (CR 202.3e), so it adds nothing to the total
+# and the exile goes on through four Lightning Bolts (1+1+1+1) rather than stopping at the Ballista; and cast for free it
+# has X = 0 (ruling: "you must choose 0 as the value of X"), so it enters with no counters and dies as a 0/0. The fifth
+# Bolt stays in the library. Bot1 casts only the Ballista; the four Bolts stay exiled.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Improvisation Capstone
+Island x3
+Walking Ballista
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Improvisation Capstone.Cast
+Bot1.Choose(Walking Ballista)
+Bot1.Choose()
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Battlefield.Count = 0
+Bot1.Graveyard = Walking Ballista; Black Lotus; Black Lotus; Black Lotus
+Exile.Count = 5
+Bot1.Library.Count = 11
+Bot2.Life = 20
