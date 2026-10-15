@@ -1,0 +1,44 @@
+# Artificial Evolution changes the text of Robber of the Rich, Rogue to Goblin (CR 612.1). It attacks, exiles the top
+# card of Bot2's library (Bot2 holds more cards), and "during any turn you attacked with a Goblin" Bot1 may cast that
+# card: Robber is the Goblin it attacked with, so Bot1 casts Mox Pearl from exile. Read as printed, Robber is no Rogue
+# any more and the card could not be cast.
+
+[Bot1 Deck]
+Robber of the Rich
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Artificial Evolution
+Island
+Island
+Island x9
+
+[Bot2 Deck]
+Island x7
+Mox Pearl
+Island x8
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Robber of the Rich.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Robber of the Rich)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Rogue)
+Bot1.Modes(Goblin)
+Bot1.Attack(Robber of the Rich > Bot2)
+[T1 Bot1.Main2]
+Bot1.Exile.Mox Pearl.Cast
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Exile.Count = 0
+Bot1.Battlefield.Mox Pearl.Tapped = false
