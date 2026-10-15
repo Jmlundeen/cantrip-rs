@@ -3,8 +3,8 @@ use cantrip_mechanics::evoke;
 use cantrip_mechanics::{targets, triggers::this_enters};
 use cantrip_oracle as oracle;
 
-fn green_card(q: &dyn Query, _: &Asker, id: ObjectId) -> bool {
-    q.chars(id).colors.has(Color::Green)
+fn green_card(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
+    q.chars(id).colors.has(q.words(asker.source).color(Color::Green))
 }
 
 /// "Up to one target player puts all the cards from their graveyard on the bottom of their library in a random order"
