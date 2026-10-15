@@ -1,0 +1,6 @@
+{
+  "name": "Jeskai Revelation",
+  "manaCost": "{4}{U}{R}{W}",
+  "type": "Instant",
+  "oracleText": "Return target spell or permanent to its owner's hand. Jeskai Revelation deals 4 damage to any target. Create two 1/1 white Monk creature tokens with prowess. Draw two cards. You gain 4 life."
+}

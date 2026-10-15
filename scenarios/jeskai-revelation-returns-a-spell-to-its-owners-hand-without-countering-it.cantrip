@@ -1,0 +1,48 @@
+# "Target spell or permanent": Bot2's Lightning Bolt aimed at Bot1 is returned to Bot2's hand, not countered (it never
+# reaches the graveyard) and never resolves, so Bot1 takes no damage: 20 + 4 from Jeskai Revelation. The 4 damage hits Bot2.
+# Bot1 sets its mana out on turn 1 and spends it in response, on Bot2's turn 2.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Emerald
+Jeskai Revelation
+Island
+Island x10
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Plains x16
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Jeskai Revelation.Cast
+Bot1.Target(Stack.Lightning Bolt)
+Bot1.Target(Bot2)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 24
+Bot2.Life = 16
+Bot2.Graveyard.Count = 0
+Bot2.Hand = Lightning Bolt; Plains; Plains; Plains; Plains; Plains; Plains
+Bot1.Graveyard = Jeskai Revelation; Black Lotus
+Bot1.Hand.Count = 3
+Stack.Count = 0
