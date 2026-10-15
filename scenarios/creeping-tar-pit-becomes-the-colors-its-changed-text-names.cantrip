@@ -1,0 +1,41 @@
+# Trait Doctoring replaces the color word black with red in Creeping Tar Pit's text until end of turn (CR 612.1), and
+# the Tar Pit, animated that turn, becomes a 3/2 blue and red Elemental creature, not blue and black (CR 612.4).
+
+[Bot1 Deck]
+Creeping Tar Pit
+Island
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Trait Doctoring
+Mox Ruby
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Creeping Tar Pit.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Trait Doctoring.Cast(Creeping Tar Pit)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Replace a color word)
+Bot1.Colors(Black)
+Bot1.Colors(Red)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Creeping Tar Pit.Activate(Ability: Until end of turn)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Creeping Tar Pit.Types = Land; Creature
+
+[Expect]
+Bot1.Battlefield.Creeping Tar Pit.Colors = Blue; Red
+Bot1.Battlefield.Creeping Tar Pit.Power = 3

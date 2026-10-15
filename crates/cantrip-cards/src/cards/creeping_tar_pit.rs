@@ -5,11 +5,12 @@ use cantrip_oracle as oracle;
 /// "Until end of turn, this land becomes a 3/2 blue and black Elemental creature. It's still a land. It can't be
 /// blocked this turn."
 fn becomes_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let words = g.words(item.object);
     let animation = Animation {
         power: 3,
         toughness: 2,
-        colors: ColorSet(0b00110),
-        subtype: Subtype::Elemental,
+        colors: words.colors(ColorSet(0b00110)),
+        subtype: words.subtype(Subtype::Elemental),
         keywords: Keywords::NONE,
     };
     animate(g, item.object, item.object, &animation, Duration::EndOfTurn);
