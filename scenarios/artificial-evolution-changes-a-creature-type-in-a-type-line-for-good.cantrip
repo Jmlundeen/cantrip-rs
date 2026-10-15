@@ -1,0 +1,35 @@
+# Artificial Evolution changes the text of Bot2's Llanowar Elves, Elf to Goblin (CR 612.1): its type line says Goblin
+# Druid, its name is still Llanowar Elves (CR 612.2), and the change lasts indefinitely, past the turn's end. Any
+# creature type may be replaced; the new one can't be Wall.
+
+[Bot1 Deck]
+Island
+Artificial Evolution
+Island x13
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x13
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Artificial Evolution.Cast(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Elf)
+! Bot1.Modes(Wall)
+Bot1.Modes(Goblin)
+? Bot2.Battlefield.Llanowar Elves.Subtypes = Druid; Goblin
+[T4 Bot2.Main1]
+
+[Expect]
+Turn = 4
+Bot1.Graveyard = Artificial Evolution
+Bot2.Battlefield.Llanowar Elves.Subtypes = Druid; Goblin

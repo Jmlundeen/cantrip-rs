@@ -1,0 +1,32 @@
+# Artificial Evolution targets a spell too: Bot1 changes Bot2's Llanowar Elves spell, Elf to Goblin, in response. The
+# effect goes on applying to the permanent the spell becomes (CR 400.7a): Llanowar Elves enters a Goblin Druid.
+
+[Bot1 Deck]
+Island
+Artificial Evolution
+Island x13
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x13
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Artificial Evolution.Cast(Stack.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Elf)
+Bot1.Modes(Goblin)
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot2.Battlefield = Forest; Llanowar Elves
+Bot2.Battlefield.Llanowar Elves.Subtypes = Druid; Goblin
