@@ -1,0 +1,36 @@
+# The loot's discard is a real discard (CR 701.9), so the card discarded to Sphinx of False Conclusions's attack trigger is
+# discarded with madness (CR 702.35): Basking Rootwalla goes to exile instead of the graveyard and Bot1 casts it for {0}.
+# It ends on the battlefield, not in the graveyard; the Sphinx connects for 4.
+
+[Bot1 Deck]
+Mox Sapphire
+Black Lotus
+Sphinx of False Conclusions
+Basking Rootwalla
+Forest
+Forest
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Sphinx of False Conclusions.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+[T3 Bot1.Main1]
+Bot1.Attack(Sphinx of False Conclusions > Bot2)
+Bot1.Pass
+Bot1.Choose(Basking Rootwalla)
+Bot1.Accept
+[T3 Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot2.Life = 16
+Bot1.Battlefield = Mox Sapphire; Sphinx of False Conclusions; Basking Rootwalla
+Bot1.Graveyard = Black Lotus

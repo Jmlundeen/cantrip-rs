@@ -1,18 +1,11 @@
 use cantrip_api::*;
+use cantrip_mechanics::copy::{create_token_copy_of_it, not_a_token};
 use cantrip_mechanics::{effects::loot, triggers::{this_attacks, this_dies}};
 use cantrip_oracle as oracle;
 
-/// "If it isn't a token" (CR 603.4): checked as the creature dies and again as the ability resolves, on the creature as
-/// it last existed on the battlefield.
-fn not_a_token(q: &dyn Query, asker: &Asker) -> bool {
-    !q.obj(asker.source).token
-}
-
-/// "Create a token that's a copy of it" (CR 707.2, 111.1): the copiable values of the creature as it last existed.
+/// "Create a token that's a copy of it": no exceptions.
 fn create_copy(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let values = g.copiable_values(item.object);
-    g.create_token_copies_of(values, item.controller, 1)?;
-    Ok(())
+    create_token_copy_of_it(g, item, |_, values| values)
 }
 
 pub static CARD: CardDef = CardDef {

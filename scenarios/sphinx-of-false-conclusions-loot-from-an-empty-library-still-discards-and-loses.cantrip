@@ -1,0 +1,32 @@
+# Drawing from an empty library (CR 121.4) does not stop the rest of the effect: Bot1's library is empty when the Sphinx's
+# attack trigger resolves, so the draw does nothing, the discard still happens (a Forest goes to the graveyard) and Bot1
+# loses the next time state-based actions are checked (CR 704.5b). Bot2 wins.
+
+[Bot1 Deck]
+Mox Sapphire
+Black Lotus
+Sphinx of False Conclusions
+Forest
+Forest
+Forest
+Forest
+Island
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Sphinx of False Conclusions.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+[T3 Bot1.Main1]
+Bot1.Attack(Sphinx of False Conclusions > Bot2)
+Bot1.Pass
+Bot1.Choose(Forest)
+
+[Expect]
+Result = Bot2 won
+Bot1.Library.Count = 0
+Bot1.Graveyard = Forest; Black Lotus

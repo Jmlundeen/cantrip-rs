@@ -1,0 +1,39 @@
+# "Draw a card, then discard a card" with an empty hand beforehand: Bot1 plays out its whole hand, so the Sphinx's attack
+# trigger draws a Forest and the only card in hand is the one discarded. The hand is empty again afterwards and the Forest
+# is in the graveyard.
+
+[Bot1 Deck]
+Mox Sapphire
+Black Lotus
+Sphinx of False Conclusions
+Mox Jet
+Mox Pearl
+Mox Ruby
+Mox Emerald
+Forest
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Sphinx of False Conclusions.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+? Bot1.Hand.Count = 0
+Bot1.Attack(Sphinx of False Conclusions > Bot2)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 0
+Bot1.Graveyard = Forest; Black Lotus
+Bot2.Life = 16

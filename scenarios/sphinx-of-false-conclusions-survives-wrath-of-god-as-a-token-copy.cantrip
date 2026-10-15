@@ -1,0 +1,43 @@
+# Wrath of God destroys every creature at once (CR 701.8, 120.1; they can't be regenerated); the Sphinx of False Conclusions
+# dies with the sweep and its "when this creature dies" trigger (CR 603.10a, looked back on) then makes the token copy,
+# which arrives after the sweep has finished and so is not destroyed by it. The card is in the graveyard, the token on the
+# battlefield.
+
+[Bot1 Deck]
+Mox Sapphire
+Black Lotus
+Sphinx of False Conclusions
+Forest x4
+Forest x10
+
+[Bot2 Deck]
+Mox Pearl
+Black Lotus
+Wrath of God
+Plains x4
+Plains x10
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Sphinx of False Conclusions.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Wrath of God.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Mox Sapphire; Sphinx of False Conclusions
+Bot1.Battlefield.Sphinx of False Conclusions.Token = true
+Bot1.Battlefield.Sphinx of False Conclusions.Damage = 0
+Bot1.Graveyard = Sphinx of False Conclusions; Black Lotus
+Bot2.Graveyard = Wrath of God; Black Lotus

@@ -39,6 +39,7 @@ Bot2.Pass
 Bot1.Pass
 ? Bot1.Battlefield.Sphinx of False Conclusions.Power = 4
 ? Bot1.Graveyard = Sphinx of False Conclusions; Black Lotus
+? Bot1.Battlefield.Sphinx of False Conclusions.Token = true
 [T3 Bot1.Main1]
 Bot1.Attack(Sphinx of False Conclusions > Bot2)
 Bot1.Pass
@@ -55,5 +56,6 @@ Bot1.Pass
 Turn = 3
 Stack.Count = 0
 Bot1.Battlefield = Mox Sapphire
-Bot1.Graveyard.Count = 3
+Bot1.Graveyard = Forest; Sphinx of False Conclusions; Black Lotus
 Bot2.Life = 20
+Bot2.Graveyard = Lightning Bolt; Lightning Bolt

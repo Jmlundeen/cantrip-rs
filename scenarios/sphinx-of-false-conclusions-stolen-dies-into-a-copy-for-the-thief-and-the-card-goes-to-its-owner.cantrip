@@ -1,0 +1,65 @@
+# Sudden Substitution trades Bot2's Lightning Bolt for Bot1's Sphinx of False Conclusions (CR 701.12), so Bot2 controls a
+# Sphinx that Bot1 owns. When Bot2 bolts it, the card goes to its owner's graveyard (CR 400.3) but "create a token that's
+# a copy of it" is the ability of the Sphinx's controller when it died (CR 603.3a, 603.10a): the token arrives under
+# Bot2's control and is Bot2's own. Bot1 as the new Bolt's controller aims it at Bot2 (17).
+
+[Bot1 Deck]
+Island
+Island
+Black Lotus
+Mox Sapphire
+Mox Jet
+Sphinx of False Conclusions
+Sudden Substitution
+Island
+Island x10
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Mountain x3
+Mountain x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Sphinx of False Conclusions.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sudden Substitution.Cast
+Bot1.Target(Stack.Lightning Bolt)
+Bot1.Target(Bot1.Battlefield.Sphinx of False Conclusions)
+Bot1.Target(Bot2)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Sphinx of False Conclusions)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot2.Life = 17
+Bot1.Life = 20
+Bot2.Battlefield = Mountain; Mox Ruby; Sphinx of False Conclusions
+Bot2.Battlefield.Sphinx of False Conclusions.Power = 4
+Bot2.Battlefield.Sphinx of False Conclusions.Token = true
+Bot1.Graveyard = Sphinx of False Conclusions; Sudden Substitution; Black Lotus
+Bot2.Graveyard = Lightning Bolt; Lightning Bolt
+Exile.Count = 0
