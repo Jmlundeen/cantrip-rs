@@ -355,6 +355,37 @@ mod tests {
         events.iter().filter(|e| e["$type"] == kind).collect()
     }
 
+    /// A mana ability whose cost is its own {T} names no permanent to tap: `Tap` is for a tap cost paid by a permanent
+    /// of the player's choosing, and the client asks for one on the board when it is set - a Forest or a Gleemox
+    /// clicked to pay for a spell would ask which permanent to tap, offering only itself.
+    #[test]
+    fn a_mana_ability_tapping_itself_names_no_permanent_to_tap() {
+        let mut session = Session::new(deal(&["Gleemox", "Llanowar Elves"], "Forest", 18)).ok().unwrap();
+        let mut step = session.step();
+        let mut allow_cast = true;
+        let mut checked = 0;
+        for _ in 0..2_000 {
+            let request = &step["Requests"][0];
+            let prompt: PromptPayload = serde_json::from_value(request["Prompt"].clone()).unwrap();
+            if let PromptPayload::PayCostsPromptMessage(p) = &prompt {
+                for o in p.options.iter().filter(|o| o.kind == ActionKindView::ActivateAbility && !o.produces.is_empty() || o.produces_of_any_one_color > 0) {
+                    assert_eq!(o.tap, None, "{}", o.description);
+                    checked += 1;
+                }
+                if checked >= 2 {
+                    return;
+                }
+            }
+            let (id, seat) = (request["RequestId"].as_u64().unwrap() as u32, request["Seat"].as_i64().unwrap() as i32);
+            let answer = choose(&prompt, &mut allow_cast);
+            step = match session.answer(id, seat, &answer) {
+                Ok(step) => step,
+                Err(_) => session.answer(id, seat, &prompt.default_answer()).ok().expect("the default answer is taken"),
+            };
+        }
+        panic!("no cost was paid with both mana sources on offer");
+    }
+
     #[test]
     fn a_forced_coin_flip_reaches_every_seat() {
         for (face, won) in [(1u8, true), (2, false)] {

@@ -250,9 +250,6 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
                         m.produces_of_any_one_color = i32::from(d.adds_any.max(1));
                     }
                     m.cost_text = cost_text_of(&d.cost, def.name);
-                    if d.cost.tap {
-                        m.tap = Some(source);
-                    }
                     // A mana ability's sacrifice comes with the activation: the engine takes it as a target.
                     if d.cost.permanents.is_some() && o.targets_required > 0 {
                         m.sacrifice_candidates = candidates.iter().map(|t| t.object).collect();
