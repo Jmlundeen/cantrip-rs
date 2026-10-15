@@ -1,0 +1,59 @@
+# Everything returns once Nowhere to Run has left. Bot1's Nowhere to Run kills Bot2's Ornithopter on turn three; on turn four
+# Bot2 Disenchants it. On turn five Bot1's Lightning Bolt at Bot2's Sedgemoor Witch (Ward - Pay 3 life) triggers the Witch's ward
+# again: Bot1 pays 3 life (20 to 17) and the Bolt resolves and kills the Witch. (The same Bolt with the enchantment out is
+# scenario nowhere-to-run-ward-of-an-opponents-creature-does-not-trigger: no payment, 20 life.)
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Nowhere to Run
+Lightning Bolt
+Island x14
+
+[Bot2 Deck]
+Forest
+Mox Jet
+Mox Emerald
+Mox Pearl
+Mox Ruby
+Sedgemoor Witch
+Ornithopter
+Disenchant
+Island x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Sedgemoor Witch.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Nowhere to Run.Cast
+Bot1.Pass
+Bot1.Target(Ornithopter)
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Disenchant.Cast(Nowhere to Run)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Sedgemoor Witch)
+Bot1.Accept
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 17
+Bot2.Graveyard = Sedgemoor Witch; Disenchant; Ornithopter

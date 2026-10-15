@@ -1,0 +1,48 @@
+# Only hexproof is ignored. On turn five Bot1's Nowhere to Run enters trigger targets Bot2's Elvish Mystic, and Bot2 responds by
+# tapping Mother of Runes for protection from black. Nowhere to Run's permission does not touch protection (CR 702.16b), so the
+# target is illegal on resolution (CR 608.2b), the trigger does nothing and the Mystic lives as a 1/1. (Without the response
+# the same trigger kills it: nowhere-to-run-keeps-its-controllers-own-hexproof-creature-safe-from-the-opponent.)
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Nowhere to Run
+Swamp
+Island x16
+
+[Bot2 Deck]
+Forest
+Mox Pearl
+Mother of Runes
+Elvish Mystic
+Island x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Mother of Runes.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Nowhere to Run.Cast
+Bot1.Pass
+Bot1.Target(Elvish Mystic)
+Bot2.Battlefield.Mother of Runes.Activate(Elvish Mystic)
+Bot2.Colors(Black)
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Elvish Mystic.Toughness = 1
+Bot2.Battlefield.Elvish Mystic.Power = 1
+Bot2.Graveyard.Count = 0
+Bot1.Battlefield.Nowhere to Run.Types = Enchantment

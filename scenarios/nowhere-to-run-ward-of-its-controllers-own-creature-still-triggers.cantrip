@@ -1,0 +1,47 @@
+# Only the ward of "creatures your opponents control" is switched off. Bot1 controls both Nowhere to Run and a Sedgemoor Witch
+# (Ward - Pay 3 life), so when Bot2's Lightning Bolt targets the Witch the ward ability triggers as ever: Bot2 declines to
+# pay, the Bolt is countered and the Witch is undamaged.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Mox Pearl
+Sedgemoor Witch
+Nowhere to Run
+Swamp
+Island x12
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x14
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sedgemoor Witch.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Nowhere to Run.Cast
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Sedgemoor Witch)
+Bot2.Decline
+Bot1.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot2.Graveyard = Lightning Bolt; Mountain
+Bot1.Battlefield.Sedgemoor Witch.Damage = 0
+Bot1.Battlefield.Nowhere to Run.Types = Enchantment

@@ -1,0 +1,56 @@
+# "Creatures your opponents control" - only creatures. Bot1's Nowhere to Run is cast on turn three and Bot2 responds with
+# Dawn's Truce, so every permanent Bot2 controls has hexproof. Once Nowhere to Run has resolved, its enters trigger targets the
+# Ornithopter (a creature, hexproof ignored) and, with the trigger still on the stack, Bot1's Disenchant cannot be aimed at
+# Bot2's Mox Emerald: an artifact, not a creature, so its hexproof counts (the refusal, with the mana for it untapped).
+# The trigger then resolves and the Ornithopter dies.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Pearl
+Mox Ruby
+Nowhere to Run
+Disenchant
+Island x14
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mox Emerald
+Ornithopter
+Dawn's Truce
+Island x14
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Nowhere to Run.Cast
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Dawn's Truce.Cast
+Bot2.Decline
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Mox Emerald.Keywords = Hexproof
+? Bot2.Battlefield.Ornithopter.Keywords = Flying; Hexproof
+Bot1.Pass
+? Stack.Count = 1
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Hand.Disenchant.Cast(Bot2.Battlefield.Mox Emerald)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Ornithopter; Dawn's Truce
+Bot2.Battlefield.Mox Emerald.Keywords = Hexproof

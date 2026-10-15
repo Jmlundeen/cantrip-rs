@@ -1,0 +1,59 @@
+# Ruling: if a spell targeting a creature with ward is on the stack, Nowhere to Run leaving the battlefield does not make the
+# ward trigger - a ward ability triggers when the creature becomes a target (CR 702.21a, 603.2), and it did not then. Bot1's
+# Nowhere to Run kills Bot2's Ornithopter on turn three; Bot1 aims Lightning Bolt at Bot2's Sedgemoor Witch (Ward - Pay 3 life);
+# Bot2 Disenchants the Nowhere to Run in response. The Bolt resolves, the Witch dies, and Bot1 is never asked to pay 3 life.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Nowhere to Run
+Lightning Bolt
+Island x14
+
+[Bot2 Deck]
+Forest
+Mox Jet
+Mox Emerald
+Mox Pearl
+Mox Ruby
+Sedgemoor Witch
+Ornithopter
+Disenchant
+Island x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Sedgemoor Witch.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Nowhere to Run.Cast
+Bot1.Pass
+Bot1.Target(Ornithopter)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Sedgemoor Witch)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Disenchant.Cast(Nowhere to Run)
+Bot2.Pass
+! Bot1.Decline
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Graveyard = Lightning Bolt; Nowhere to Run
+Bot2.Graveyard = Ornithopter; Sedgemoor Witch; Disenchant

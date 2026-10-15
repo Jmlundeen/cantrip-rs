@@ -1,0 +1,50 @@
+# Only hexproof is ignored. Bot2's Mother of Runes wears Lightning Greaves (shroud: no player may target it, CR 702.18a), and
+# Bot1's Nowhere to Run enters trigger cannot choose her even though she is a creature an opponent controls: the refusal
+# names her, beside the positive control on the next line, where the trigger takes one of Bot2's two Ornithopters (no shroud)
+# and kills it.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Nowhere to Run
+Island x16
+
+[Bot2 Deck]
+Forest
+Mox Pearl
+Mox Jet
+Mother of Runes
+Lightning Greaves
+Ornithopter
+Ornithopter
+Island x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Mother of Runes.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Lightning Greaves.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Lightning Greaves.Activate(Mother of Runes)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Nowhere to Run.Cast
+Bot1.Pass
+! Bot1.Target(Mother of Runes)
+Bot1.Target(Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Ornithopter
+Bot2.Battlefield.Ornithopter.Toughness = 2
+Bot2.Battlefield.Mother of Runes.Keywords = Haste; Shroud
+Bot2.Battlefield.Mother of Runes.Toughness = 1

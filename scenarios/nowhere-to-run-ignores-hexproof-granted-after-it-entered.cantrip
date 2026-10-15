@@ -1,0 +1,52 @@
+# The permission is "as though they didn't have hexproof", not "they lose hexproof" (CR 609.4, 702.11b): hexproof an opponent's
+# creature gains after Nowhere to Run is on the battlefield is ignored too. Bot1's Nowhere to Run kills one of Bot2's two Elvish
+# Mystics on turn three. On turn four Bot2 casts Snakeskin Veil on the other - the check shows it really has hexproof - and
+# Bot1's Lightning Bolt, cast once the Veil has resolved, is aimed at it all the same and kills the 2/2.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Nowhere to Run
+Lightning Bolt
+Island x14
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Elvish Mystic
+Elvish Mystic
+Snakeskin Veil
+Forest
+Island x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Nowhere to Run.Cast
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Snakeskin Veil.Cast(Elvish Mystic)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Elvish Mystic.Keywords = Hexproof
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Elvish Mystic)
+Bot1.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot2.Graveyard = Elvish Mystic; Snakeskin Veil; Elvish Mystic
+Bot1.Graveyard = Lightning Bolt

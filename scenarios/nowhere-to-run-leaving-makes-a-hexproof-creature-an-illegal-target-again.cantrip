@@ -1,0 +1,65 @@
+# The permission lasts only while Nowhere to Run is on the battlefield. On turn five Bot1 casts it (the enters trigger kills
+# Bot2's Elvish Mystic), then Lightning Bolt at Bot2's hexproof Sylvan Caryatid - a legal target while the enchantment is out.
+# Bot2 responds with Disenchant on Nowhere to Run; it resolves first, and the Bolt's target is illegal on resolution
+# (CR 608.2b, and the ruling: "that creature becomes an illegal target for that spell or ability"), so the Bolt does nothing and
+# the Caryatid is undamaged. A second Bolt is then refused at the Caryatid, the way it would have been before the enchantment.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Nowhere to Run
+Lightning Bolt
+Lightning Bolt
+Swamp
+Island x12
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Mox Jet
+Sylvan Caryatid
+Elvish Mystic
+Disenchant
+Plains
+Island x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Sylvan Caryatid.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Nowhere to Run.Cast
+Bot1.Pass
+Bot1.Target(Elvish Mystic)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Sylvan Caryatid)
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Disenchant.Cast(Nowhere to Run)
+Bot2.Pass
+Bot1.Pass
+! Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Sylvan Caryatid)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Lightning Bolt; Nowhere to Run
+Bot2.Graveyard = Elvish Mystic; Disenchant
+Bot2.Battlefield.Sylvan Caryatid.Damage = 0

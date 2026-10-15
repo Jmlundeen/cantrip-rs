@@ -1,0 +1,48 @@
+# Nowhere to Run: its own enters trigger targets "a creature an opponent controls" and the static ability is already in
+# force when the trigger is put on the stack, so Bot2's hexproof Sylvan Caryatid (0/3) is a legal target and the -3/-3 kills
+# it (CR 702.11b, 609.4). The refusal before the cast is the positive control: with no Nowhere to Run on the battlefield,
+# Bot1's own Lightning Bolt cannot be aimed at the Caryatid. Bot2's Elvish Mystic, not hexproof, is a second candidate and
+# lives, so the trigger took the target it was told to.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Nowhere to Run
+Lightning Bolt
+Island x14
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Sylvan Caryatid
+Elvish Mystic
+Island x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Sylvan Caryatid.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Sylvan Caryatid)
+Bot1.Hand.Nowhere to Run.Cast
+Bot1.Pass
+Bot1.Target(Sylvan Caryatid)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Sylvan Caryatid
+Bot2.Battlefield.Elvish Mystic.Toughness = 1
+Bot1.Battlefield.Nowhere to Run.Types = Enchantment
