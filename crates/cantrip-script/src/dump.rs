@@ -259,6 +259,9 @@ impl StateDump {
                     d.set(format!("{key}.FaceDown"), true);
                     d.set(format!("{key}.FaceDownName"), game.cards.get(obj.card).name);
                 }
+                if obj.token {
+                    d.set(format!("{key}.Token"), true);
+                }
                 if obj.prepared {
                     d.set(format!("{key}.Prepared"), true);
                 }
