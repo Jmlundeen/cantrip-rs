@@ -229,6 +229,10 @@ pub enum CardChoicePurposeView {
     PutOnBottom,
     Attach,
     Encode,
+    /// What a cost beholds (CR 701.4a): a permanent chosen or a card revealed, nothing lost.
+    Behold,
+    /// The creature a cost puts -1/-1 counters on (CR 701.68a).
+    Blight,
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]

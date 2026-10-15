@@ -250,7 +250,10 @@ public sealed partial class TacticalPlay
         // Giving something up, or taking something: which end of the ranking is wanted.
         bool losing = prompt.Purpose is CardChoicePurposeView.Discard or CardChoicePurposeView.Sacrifice or CardChoicePurposeView.Exile
             or CardChoicePurposeView.PutOnBottom or CardChoicePurposeView.PutIntoGraveyard or CardChoicePurposeView.PutOnTop
-            or CardChoicePurposeView.ExileToPay or CardChoicePurposeView.TapToPay or CardChoicePurposeView.Destroy;
+            or CardChoicePurposeView.ExileToPay or CardChoicePurposeView.TapToPay or CardChoicePurposeView.Destroy
+            // Blight (CR 701.68a) shrinks its own creature: the one worth least takes the counters. Behold loses nothing, so the
+            // ordinary best-first ranking stands (every candidate already is the quality the cost names).
+            or CardChoicePurposeView.Blight;
 
         List<ObjectView> known = [.. prompt.Eligible.Select(client.Object).OfType<ObjectView>()];
         bool theirs = known.Count > 0 && known.TrueForAll(card => card.Owner != client.Seat && card.Controller != client.Seat);

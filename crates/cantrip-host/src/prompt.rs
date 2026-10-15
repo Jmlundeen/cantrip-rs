@@ -348,6 +348,8 @@ fn purpose_view(purpose: Purpose, opening: bool) -> CardChoicePurposeView {
         Purpose::PutOnBottom => V::PutOnBottom,
         Purpose::Attach => V::Attach,
         Purpose::Encode => V::Encode,
+        Purpose::Behold => V::Behold,
+        Purpose::Blight => V::Blight,
         Purpose::SeparatePiles
         | Purpose::ChoosePile
         | Purpose::CopyAsEnters
@@ -358,9 +360,7 @@ fn purpose_view(purpose: Purpose, opening: bool) -> CardChoicePurposeView {
         | Purpose::RevealForMiracle
         | Purpose::CastForMiracleCost
         | Purpose::PromiseGift
-        | Purpose::AlternativeCost
-        | Purpose::Behold
-        | Purpose::Blight => V::Keep,
+        | Purpose::AlternativeCost => V::Keep,
     }
 }
 

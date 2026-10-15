@@ -22,7 +22,8 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
         bool keep = prompt.Purpose == CardChoicePurposeView.Keep;
         bool permanents = prompt.Purpose is CardChoicePurposeView.Sacrifice or CardChoicePurposeView.ReturnToHand
             or CardChoicePurposeView.Untap or CardChoicePurposeView.Keep or CardChoicePurposeView.TapToPay
-            or CardChoicePurposeView.Destroy or CardChoicePurposeView.Attach or CardChoicePurposeView.Encode;
+            or CardChoicePurposeView.Destroy or CardChoicePurposeView.Attach or CardChoicePurposeView.Encode
+            or CardChoicePurposeView.Blight;
         // A mulligan's bottoming is asked by the rules and has no source; an effect's (Valakut Awakening) names its own.
         string source = legend ? "The legend rule"
             : client.Object(context?.Source ?? prompt.Source)?.Name
@@ -90,6 +91,8 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
                 : picked.Count == 1 ? "Put it on the bottom" : $"Put {picked.Count} on the bottom",
             CardChoicePurposeView.Attach => picked.Count == 0 ? "Attach nothing" : picked.Count == 1 ? "Attach it" : $"Attach {picked.Count}",
             CardChoicePurposeView.Encode => picked.Count == 0 ? "Encode on nothing" : "Encode on it",
+            CardChoicePurposeView.Behold => picked.Count == 1 ? "Behold it" : $"Behold {picked.Count}",
+            CardChoicePurposeView.Blight => "Put the counter on it",
             // "Discard nothing" only where declining is an answer; a mandatory discard still counts down to its number.
             _ => picked.Count == 0 && prompt.UpTo ? "Discard nothing"
                 : picked.Count == 1 ? "Discard it" : $"Discard {picked.Count}",
@@ -157,6 +160,8 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
         CardChoicePurposeView.PutOnBottom => PromptActionView.PutOnLibraryBottom,
         CardChoicePurposeView.Attach => PromptActionView.Attach,
         CardChoicePurposeView.Encode => PromptActionView.Encode,
+        CardChoicePurposeView.Behold => PromptActionView.Behold,
+        CardChoicePurposeView.Blight => PromptActionView.Blight,
         _ => PromptActionView.Choose,
     };
 
@@ -182,6 +187,8 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
         PromptActionView.PutOnLibraryBottom => "put on the bottom of your library",
         PromptActionView.Attach => "attach",
         PromptActionView.Encode => "encode it on",
+        PromptActionView.Behold => "behold",
+        PromptActionView.Blight => "blight (put -1/-1 counters on)",
         _ => "choose",
     };
 }

@@ -281,6 +281,12 @@ public enum CardChoicePurposeView
 
     /// <summary>Exile the spell with cipher encoded on the chosen creature you control, or on none (CR 702.99a).</summary>
     Encode = 21,
+
+    /// <summary>Choose a permanent you control, or a card in your hand to reveal, of the quality the prompt names, to pay a cost (CR 701.4a); nothing is lost.</summary>
+    Behold = 22,
+
+    /// <summary>Choose the creature you control that gets the -1/-1 counters a cost puts on a creature (CR 701.68a).</summary>
+    Blight = 23,
 }
 
 /// <summary>Where cards found by a library search go (CR 701.23).</summary>
