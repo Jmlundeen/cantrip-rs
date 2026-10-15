@@ -1,0 +1,46 @@
+# The same game as "...beholding-a-dragon-permanent-asks-four...", cast without the optional cost although a Dragon is on the
+# battlefield to behold: the ransom is the plain {2} (CR 601.2b: an optional additional cost is paid only if the caster chooses to), and
+# Bot2's Black Lotus leaves {R}{R}, which pays it. The Bolt resolves.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Mox Emerald
+Phyrexian Dragon Engine
+Dispelling Exhale
+Island
+Island x14
+
+[Bot2 Deck]
+Mountain
+Black Lotus
+Lightning Bolt
+Mountain x4
+Mountain x13
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Phyrexian Dragon Engine.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Black Lotus.Cast
+[T4 Bot2.Main1]
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Dispelling Exhale.Cast
+Bot1.Modes(Cast without beholding)
+Bot1.Target(Stack.Lightning Bolt)
+Bot2.Pass
+Bot2.PayCost
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 17
+Bot1.Graveyard = Dispelling Exhale
+Bot2.Graveyard = Lightning Bolt; Black Lotus

@@ -1,0 +1,51 @@
+# Dispelling Exhale: "As an additional cost to cast this spell, you may behold a Dragon. Counter target spell unless its controller pays {2}.
+# If a Dragon was beheld, counter that spell unless its controller pays {4} instead." Behold is CR 701.4a: choose a Dragon you control (here
+# the Phyrexian Dragon Engine, an artifact creature) or reveal one from your hand; nothing moves, so the Engine stays on the battlefield.
+# Bot2's Black Lotus leaves {R}{R} after the Bolt - enough for {2}, not for {4} - so the Bolt is countered. The twin scenario that casts
+# it without beholding is "...without-beholding-asks-two-and-the-bolt-is-paid-for".
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Mox Emerald
+Phyrexian Dragon Engine
+Dispelling Exhale
+Island
+Island x14
+
+[Bot2 Deck]
+Mountain
+Black Lotus
+Lightning Bolt
+Mountain x4
+Mountain x13
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Phyrexian Dragon Engine.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Black Lotus.Cast
+[T4 Bot2.Main1]
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Dispelling Exhale.Cast
+Bot1.Modes(Behold a Dragon)
+Bot1.Target(Stack.Lightning Bolt)
+Bot1.Choose(Phyrexian Dragon Engine)
+Bot2.Pass
+Bot2.Decline
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield.Phyrexian Dragon Engine.Tapped = false
+Bot1.Battlefield.Phyrexian Dragon Engine.Counters = (absent)
+Bot1.Graveyard = Dispelling Exhale
+Bot2.Graveyard = Lightning Bolt; Black Lotus

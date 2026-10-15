@@ -1,0 +1,57 @@
+# CR 707.10: a copy of a spell copies "all decisions made for it, including ... additional or alternative costs", so the copy of an
+# Exhale cast with a Dragon beheld is beheld too and asks {4}. Bot1 casts Dispelling Exhale beheld (the Kokusho in hand is revealed) at
+# Bot2's Bolt, then flashes in Lutri, the Spellchaser, whose enters trigger copies the Exhale (the copy aimed at the Bolt again).
+# Bot2 has exactly {R}{R}{R}{R} spare after the Bolt: the copy, on top of the stack, asks {4} and Bot2 pays it all, so the pool is empty
+# when the original asks for its own {4} (a copy that asked only {2} would leave {R}{R} floating), which Bot2 declines: the Bolt is countered.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Black Lotus
+Kokusho, the Evening Star
+Dispelling Exhale
+Lutri, the Spellchaser
+Island
+Island x14
+
+[Bot2 Deck]
+Mountain
+Black Lotus
+Lightning Bolt
+Mountain x4
+Mountain x13
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Black Lotus.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mountain#2.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Dispelling Exhale.Cast
+Bot1.Modes(Behold a Dragon)
+Bot1.Target(Stack.Lightning Bolt)
+Bot1.Choose(Kokusho, the Evening Star)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Lutri, the Spellchaser.Cast
+Bot1.Pass
+Bot1.Target(Stack.Lightning Bolt)
+Bot1.Pass
+Bot2.PayCost
+? Bot2.Mana =
+Bot2.Decline
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Hand = Kokusho, the Evening Star; Island; Island
+Bot1.Graveyard = Dispelling Exhale; Black Lotus
+Bot1.Battlefield.Lutri, the Spellchaser.Types = Creature
+Bot2.Graveyard = Lightning Bolt; Black Lotus

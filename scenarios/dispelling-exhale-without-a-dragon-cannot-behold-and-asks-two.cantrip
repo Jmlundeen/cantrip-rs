@@ -1,0 +1,44 @@
+# Behold needs a Dragon to choose or reveal (CR 701.4a): Bot1 controls only a Llanowar Elves and holds no Dragon card, so the choice to
+# pay the additional cost is not offered at all (! Bot1.Modes with the behold), and the ransom is {2}, which Bot2 pays. The positive
+# control is "...beholding-a-dragon-permanent-asks-four...", the same game with a Dragon to behold.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Mox Emerald
+Llanowar Elves
+Dispelling Exhale
+Island x2
+Island x15
+
+[Bot2 Deck]
+Mountain
+Black Lotus
+Lightning Bolt
+Mountain x4
+Mountain x13
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Black Lotus.Cast
+[T4 Bot2.Main1]
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Dispelling Exhale.Cast
+! Bot1.Modes(Behold a Dragon)
+Bot1.Target(Stack.Lightning Bolt)
+Bot2.Pass
+Bot2.PayCost
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 17
+Bot1.Graveyard = Dispelling Exhale
+Bot2.Graveyard = Lightning Bolt; Black Lotus

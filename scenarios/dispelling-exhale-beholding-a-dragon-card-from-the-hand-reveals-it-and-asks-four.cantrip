@@ -1,0 +1,42 @@
+# Behold (CR 701.4a) is "choose a Dragon you control or reveal a Dragon card from your hand": here Bot1 controls no Dragon, so the
+# only choice is the Kokusho in its hand, which is revealed and stays in the hand (nothing moves). A Dragon was beheld, so the ransom is
+# {4}; Bot2's Black Lotus leaves {R}{R} and cannot pay, and the Bolt is countered.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Kokusho, the Evening Star
+Dispelling Exhale
+Island x3
+Island x14
+
+[Bot2 Deck]
+Mountain
+Black Lotus
+Lightning Bolt
+Mountain x4
+Mountain x13
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Black Lotus.Cast
+[T4 Bot2.Main1]
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Dispelling Exhale.Cast
+Bot1.Modes(Behold a Dragon)
+Bot1.Target(Stack.Lightning Bolt)
+Bot1.Choose(Kokusho, the Evening Star)
+Bot2.Pass
+Bot2.Decline
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Hand = Kokusho, the Evening Star; Island; Island; Island; Island
+Bot1.Graveyard = Dispelling Exhale
+Bot2.Graveyard = Lightning Bolt; Black Lotus
