@@ -1,0 +1,71 @@
+# Unholy Annex cast as its left door, then Ritual Chamber's door unlocked by paying its {3}{B}{B} (CR 709.5e): a special
+# action, so no stack and no response, taken only with priority and an empty stack during a main phase of its controller's
+# turn. Each refusal is made where every other condition holds, so it cannot pass for another reason: with four mana sources
+# it is refused for cost (Bot1's own main phase, Annex alone on the battlefield with its colorless costs paid for); with five
+# (the Swamp played on turn 3) it is refused in Bot1's beginning of combat step and on Bot2's turn; and on turn 5, in a main
+# phase of Bot1's with five sources, it is taken. Unlocking gives the designation (CR 709.5f), so "when you unlock this
+# door" triggers (CR 709.5h): a 6/6 Demon. The Room is then both doors at once: both names, a mana value of 8
+# (CR 709.5, 709.4b), and the end step ability of Annex now with a Demon to count: the opponent loses 2 and Bot1 gains 2
+# (Annex had cost Bot1 2 life at the end of turns 1 and 3, 20 -> 16, and drawn a card each time).
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Unholy Annex // Ritual Chamber
+Mox Jet
+Mox Jet
+Mox Jet
+Swamp
+Swamp
+Swamp
+Swamp x15
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Unholy Annex // Ritual Chamber.Cast(Ability: Unholy Annex)
+Bot1.Pass
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Unholy Annex.Doors = Unholy Annex
+? Bot1.Battlefield.Unholy Annex.ManaValue = 3
+# Four sources, {3}{B}{B} owed: refused for cost, in a main phase with an empty stack.
+! Bot1.Battlefield.Unholy Annex.Activate(Ability: right door)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.BeginCombat]
+# Five sources, but not a main phase.
+! Bot1.Battlefield.Unholy Annex.Activate(Ability: right door)
+[T4 Bot2.Main1]
+# Five sources, but Bot2's turn.
+! Bot1.Battlefield.Unholy Annex.Activate(Ability: right door)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Unholy Annex.Activate(Ability: right door)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+? Stack.Count = 1
+Bot1.Pass
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Unholy Annex // Ritual Chamber.Doors = Unholy Annex; Ritual Chamber
+? Bot1.Battlefield.Unholy Annex // Ritual Chamber.ManaValue = 8
+? Bot1.Battlefield.Unholy Annex // Ritual Chamber.Colors = Black
+? Bot1.Battlefield.Demon.Power = 6
+[T6 Bot2.Upkeep]
+
+[Expect]
+Bot1.Battlefield = Demon; Mox Jet; Mox Jet; Mox Jet; Swamp; Swamp; Unholy Annex // Ritual Chamber
+Bot1.Life = 18
+Bot2.Life = 18

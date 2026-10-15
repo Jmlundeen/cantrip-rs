@@ -1,0 +1,65 @@
+# A Room that leaves the battlefield and returns is a new object (CR 400.7), and it did not enter as a spell, so it enters
+# with neither door unlocked (CR 709.5d): Bot1's Flickerwisp exiles its Unholy Annex (cast as the left door, Black Lotus
+# paying), and it returns at the beginning of the end step with no name, no abilities and no mana value to speak of - Annex
+# had been exiled, so its end step ability did not trigger that turn, and the returned Room does not draw either.
+# Locked doors are unlocked for their mana cost (CR 709.5e): on turn 3 the nameless Room's right door is, and "when you
+# unlock this door" triggers for the new object, giving the 6/6 Demon the first Room, which had only the left door, never made.
+# Two Mox Pearls and a Mox Jet pay for Flickerwisp's {1}{W}{W} on turn 1; two Swamps and the Jet pay Ritual Chamber's
+# {3}{B}{B} with the Pearls' generic mana on turn 3.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Unholy Annex // Ritual Chamber
+Mox Jet
+Mox Pearl
+Mox Pearl
+Flickerwisp
+Swamp
+Swamp x15
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Unholy Annex // Ritual Chamber.Cast(Ability: Unholy Annex)
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Hand.Flickerwisp.Cast
+Bot1.Pass
+Bot1.Target(Unholy Annex)
+Bot1.Pass
+[T1 Bot1.Main2]
+? Exile = Unholy Annex // Ritual Chamber
+[T2 Bot2.Upkeep]
+? Bot1.Battlefield..Doors.Count = 0
+? Bot1.Battlefield..ManaValue = 0
+? Bot1.Battlefield..Types = Enchantment
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.#1.Activate(Ability: right door)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Ritual Chamber.Doors = Ritual Chamber
+Bot1.Battlefield.Ritual Chamber.ManaValue = 5
+Bot1.Battlefield.Demon.Power = 6
+Bot1.Life = 20

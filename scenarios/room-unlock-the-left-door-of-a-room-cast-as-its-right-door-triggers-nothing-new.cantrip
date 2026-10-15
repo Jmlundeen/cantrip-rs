@@ -1,0 +1,50 @@
+# The other way round: Ritual Chamber cast first (a Demon as it enters, CR 709.5h), then Unholy Annex's door unlocked on
+# turn 3 for its {2}{B} (CR 709.5e). The Room goes from Ritual Chamber alone, mana value 5, to both names and 8. Unlocking
+# the left door triggers nothing - "when you unlock this door" is Ritual Chamber's, and the Room still has the one Demon -
+# but gives the Room Annex's end step ability, which with a Demon to count draws a card, drains the opponent for 2 and gains
+# Bot1 2 life. Black Lotus, Mox Jet and a Swamp pay for the first cast; the Jet and two Swamps for the unlock.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Unholy Annex // Ritual Chamber
+Mox Jet
+Swamp
+Swamp
+Swamp
+Swamp x15
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Unholy Annex // Ritual Chamber.Cast(Ability: Ritual Chamber)
+Bot1.Pass
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Ritual Chamber.Doors = Ritual Chamber
+? Bot1.Battlefield.Ritual Chamber.ManaValue = 5
+? Bot1.Battlefield.Demon.Power = 6
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Ritual Chamber.Activate(Ability: left door)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+? Stack.Count = 0
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Unholy Annex // Ritual Chamber.Doors = Unholy Annex; Ritual Chamber
+? Bot1.Battlefield.Unholy Annex // Ritual Chamber.ManaValue = 8
+[T4 Bot2.Upkeep]
+
+[Expect]
+Bot1.Battlefield = Demon; Mox Jet; Swamp; Swamp; Unholy Annex // Ritual Chamber
+Bot1.Life = 22
+Bot2.Life = 18

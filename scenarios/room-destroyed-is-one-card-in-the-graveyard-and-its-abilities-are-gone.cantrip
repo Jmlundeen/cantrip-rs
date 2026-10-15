@@ -1,0 +1,45 @@
+# A Room destroyed (CR 701.8) is a single card in its owner's graveyard (CR 709.2): Bot2's Disenchant destroys Bot1's Unholy
+# Annex on Bot2's second turn, after it has made Bot1 draw and lose 2 life at the end of turn 3, and its end step ability
+# does nothing on turn 5. Bot1 cast it on turn 1 with Black Lotus.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Unholy Annex // Ritual Chamber
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp x15
+
+[Bot2 Deck]
+Plains
+Plains
+Disenchant
+Plains x17
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Unholy Annex // Ritual Chamber.Cast(Ability: Unholy Annex)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Unholy Annex)
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T6 Bot2.Upkeep]
+
+[Expect]
+Bot1.Graveyard = Unholy Annex // Ritual Chamber; Black Lotus
+Bot1.Battlefield = Swamp; Swamp; Swamp
+Bot1.Life = 16

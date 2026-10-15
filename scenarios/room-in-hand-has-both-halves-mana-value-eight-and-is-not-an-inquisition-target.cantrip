@@ -1,0 +1,29 @@
+# In every zone but the battlefield and the stack a Room card has the characteristics of both halves combined (CR 709.4,
+# 709.4b): Unholy Annex // Ritual Chamber in Bot1's hand is {2}{B}{3}{B}{B}, a mana value of 8, so Bot2's Inquisition of
+# Kozilek ("mana value 3 or less") may not take it, though the half Unholy Annex alone, {2}{B}, would be eligible. Bot2 takes
+# the Mox Jet, the control that the choice is offered at all.
+
+[Bot1 Deck]
+Swamp
+Unholy Annex // Ritual Chamber
+Mox Jet
+Swamp x17
+
+[Bot2 Deck]
+Swamp
+Inquisition of Kozilek
+Swamp x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Inquisition of Kozilek.Cast(Bot1)
+! Bot2.Choose(Unholy Annex // Ritual Chamber)
+Bot2.Choose(Mox Jet)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Mox Jet
+Bot1.Hand.Count = 5
+Bot1.Hand = Swamp; Swamp; Swamp; Swamp; Unholy Annex // Ritual Chamber

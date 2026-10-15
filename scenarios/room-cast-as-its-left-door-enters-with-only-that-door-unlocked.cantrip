@@ -1,0 +1,39 @@
+# Unholy Annex // Ritual Chamber, a Room (CR 709.5), cast as its left half. Only that door is unlocked as it enters
+# (CR 709.5d), so on the battlefield the Room is named, costed, colored and written by Unholy Annex alone: a mana value of
+# 3 and not the card's 8 (CR 709.5, 709.4b), and nothing of Ritual Chamber - no 6/6 Demon (its "when you unlock this
+# door" door is locked), only Annex's end step ability, which draws a card and, with no Demon, costs 2 life.
+# Black Lotus pays for it on the first turn; the last wait is for Bot1's end step to have resolved.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Unholy Annex // Ritual Chamber
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp x15
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Unholy Annex // Ritual Chamber.Cast(Ability: Unholy Annex)
+Bot1.Pass
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Unholy Annex.Doors = Unholy Annex
+? Bot1.Battlefield.Unholy Annex.ManaValue = 3
+? Bot1.Battlefield.Unholy Annex.Colors = Black
+? Bot1.Battlefield.Unholy Annex.Types = Enchantment
+? Bot1.Battlefield.Unholy Annex.Subtypes = Room
+[T2 Bot2.Upkeep]
+
+[Expect]
+Bot1.Battlefield = Swamp; Unholy Annex
+Bot1.Life = 18
+Bot2.Life = 20
+Bot1.Hand.Count = 5
