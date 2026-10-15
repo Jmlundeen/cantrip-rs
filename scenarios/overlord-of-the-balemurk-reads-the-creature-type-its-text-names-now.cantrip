@@ -1,0 +1,39 @@
+# Artificial Evolution changes the text of Overlord of the Balemurk's spell, Avatar to Goblin (CR 612.1, 400.7a): its enters
+# ability returns a "non-Goblin creature card", so Overlord of the Mistmoors, an Avatar, milled by it is a legal choice
+# and Bot1 takes it. Mox Sapphire pays for the change, Jet and Ruby for the impending cost.
+
+[Bot1 Deck]
+Mox Jet
+Mox Sapphire
+Mox Ruby
+Overlord of the Balemurk
+Artificial Evolution
+Swamp
+Swamp
+Overlord of the Mistmoors
+Swamp x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Overlord of the Balemurk.Cast(Ability: Impending)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Stack.Overlord of the Balemurk)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Avatar)
+Bot1.Modes(Goblin)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Overlord of the Mistmoors)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Overlord of the Mistmoors; Swamp; Swamp
+Bot1.Battlefield.Overlord of the Balemurk.Counters.Time = 5

@@ -17,13 +17,14 @@ fn enters_or_attacks(_: &dyn Query, source: ObjectId, event: &Event) -> Option<F
 fn mill_then_return(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     g.mill(you, 4);
+    let avatar = g.words(item.object).subtype(Subtype::Avatar);
     let graveyard = g.state().zone(Zone::graveyard(you)).to_vec();
     let eligible: Vec<ObjectId> = graveyard
         .iter()
         .copied()
         .filter(|&c| {
             let chars = g.chars(c);
-            chars.is(CardType::Planeswalker) || (chars.is(CardType::Creature) && !chars.has_subtype(Subtype::Avatar))
+            chars.is(CardType::Planeswalker) || (chars.is(CardType::Creature) && !chars.has_subtype(avatar))
         })
         .collect();
     if let Some(chosen) = choose::cards_from(g, you, item.object, Purpose::PutIntoHand, graveyard, eligible, 1, true)?.first() {
