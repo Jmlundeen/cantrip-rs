@@ -3,8 +3,8 @@ use cantrip_mechanics::{evoke, targets};
 use cantrip_mechanics::triggers::this_enters;
 use cantrip_oracle as oracle;
 
-fn white_card(q: &dyn Query, _: &Asker, id: ObjectId) -> bool {
-    q.chars(id).colors.has(Color::White)
+fn white_card(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
+    q.chars(id).colors.has(q.words(asker.source).color(Color::White))
 }
 
 /// "Other target creature" (CR 115.1): a creature on the battlefield that is not this one.
