@@ -52,6 +52,10 @@ Three layers, kept apart by the compiler (`cantrip-api` is all a card can see):
   refuses them, and a player who leaves takes their spells and abilities with them, so a resolving ability's
   controller is always in the game. `seats()` is every seat, for walking zones by owner, never for "each player". Only
   a player named another way (Fecundity's "that creature's controller") is asked `in_game(p)`;
+- name a color word, basic land type or creature type its rules text uses without reading it through the words of the
+  object whose text it is (`g.words(item.object).subtype(Subtype::Goblin)`, `view.words(source).color(Color::Red)`):
+  a text-changing effect (CR 612) has to change what the card does (`docs/adding-cards.md`, "Words of its rules
+  text"). Mana symbols are not words, and the type line and the tokens it makes follow by themselves;
 - build a choice question by hand that `cantrip_mechanics::choose` asks (`card`, `cards`, `card_from`, `cards_from`,
   `player`, `one_of`), or write a fallback arm for an answer of the wrong shape: the core checks every answer against
   its question before the card sees it;

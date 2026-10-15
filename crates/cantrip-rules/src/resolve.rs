@@ -337,6 +337,11 @@ pub fn resolve(cx: &mut Cx) -> R<Flow> {
                     &[ops::Moving { id: item.object, to: Zone::BATTLEFIELD, entering: Some(entering), reason: None }],
                     ZoneReason::Resolve,
                 );
+                if let Some(new) = cx.s().obj(item.object).became
+                    && cx.s().obj(new).zone.is(ZoneKind::Battlefield)
+                {
+                    ops::carry_effects(cx, item.object, new);
+                }
                 // A creature spell paid for with mana that gives it haste has it until end of turn (CR 106.6).
                 if cx.s().obj(item.object).marks.gains_haste
                     && let Some(new) = cx.s().obj(item.object).became

@@ -1058,6 +1058,7 @@ public sealed class Decisions
             CardChoicePurposeView.ReturnToHand => $"{source}: return {many}{kind} permanent(s) to their owner's hand.",
             CardChoicePurposeView.Untap => $"{source}: untap {many}{kind} permanent(s).",
             CardChoicePurposeView.Attach => $"{source}: attach {many}{kind} permanent(s) you control to the creature.",
+            CardChoicePurposeView.Encode => $"{source}: choose up to one creature you control to exile it encoded on (cipher).",
             CardChoicePurposeView.KeepLegend => "You control more than one legend with the same name. Choose the one to keep; the rest go to the graveyard.",
             CardChoicePurposeView.Keep => $"{source}: choose the{kind} one to keep. The rest are sacrificed.",
             CardChoicePurposeView.Cast => $"{source}: choose {many}{kind} card(s) to cast from the graveyard.",

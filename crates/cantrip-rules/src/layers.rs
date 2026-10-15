@@ -55,8 +55,8 @@ impl LayerQuery for View<'_> {
 /// More permanents with static abilities than any game has at once; past it, the rest are not looked at.
 const MAX_STATIC_SOURCES: usize = 32;
 
-const LAYERS: [Layer; 7] =
-    [Layer::Type, Layer::Color, Layer::Ability, Layer::PtDefine, Layer::PtSet, Layer::PtModify, Layer::PtSwitch];
+const LAYERS: [Layer; 8] =
+    [Layer::Text, Layer::Type, Layer::Color, Layer::Ability, Layer::PtDefine, Layer::PtSet, Layer::PtModify, Layer::PtSwitch];
 
 /// The characteristics with every layer before `stop` applied (CR 613.1): the copiable values, then each layer's
 /// static abilities and other continuous effects in turn, statics before effects, each in timestamp order.
@@ -95,7 +95,8 @@ pub fn chars_before(cards: &CardTable, state: &GameState, id: ObjectId, stop: La
 
     let on_battlefield = obj.zone.is(ZoneKind::Battlefield) && obj.became.is_none();
     // What could apply at all, found once: most objects have no effects, no statics touch them, and no counters.
-    let has_effects = on_battlefield && state.effects.iter().any(|e| e.affected == id);
+    // A spell's text can be changed too (CR 612.1: "target spell or permanent").
+    let has_effects = (on_battlefield || spell) && state.effects.iter().any(|e| e.affected == id);
     let has_counters = on_battlefield && obj.counters.iter().any(|&c| c != 0);
     let has_own = !def.statics.is_empty();
     // The permanents (and graveyard cards) whose static abilities could apply, found once for every layer: most games
@@ -192,6 +193,14 @@ fn static_sources<'a>(cards: &CardTable, state: &'a GameState) -> std::cell::Ref
                 }
             }
         }
+        // A card encoded on a creature functions in exile (CR 702.99a).
+        if cards.exile_statics {
+            for p in state.seats() {
+                for &source in state.zone(Zone::exile(p)) {
+                    note(&mut made.list, source, ZoneKind::Exile);
+                }
+            }
+        }
         // CR 613.7: static abilities apply in the timestamp order of the objects that have them.
         made.list.sort_by_key(|&(source, _)| state.obj(source).timestamp);
         made.epoch = state.epoch;
@@ -203,9 +212,9 @@ fn static_sources<'a>(cards: &CardTable, state: &'a GameState) -> std::cell::Ref
 /// (`copy`), with the abilities the card prints.
 fn initial(cards: &CardTable, card: CardId, copy: Option<&Copiable>) -> Chars {
     let def = cards.get(card);
-    let (extra_types, extra_subtypes, extra_abilities, extra_keywords, colors, pt, no_cost, copy_name) = match copy {
-        Some(c) => (c.extra_types, c.extra_subtypes, c.extra_abilities, c.extra_keywords, c.colors, c.pt, c.no_cost, c.name),
-        None => (TypeSet::NONE, SubtypeSet::NONE, [None; 4], Keywords::NONE, None, None, false, None),
+    let (extra_types, extra_subtypes, extra_abilities, extra_keywords, colors, pt, no_cost, copy_name, words) = match copy {
+        Some(c) => (c.extra_types, c.extra_subtypes, c.extra_abilities, c.extra_keywords, c.colors, c.pt, c.no_cost, c.name, c.words),
+        None => (TypeSet::NONE, SubtypeSet::NONE, [None; 4], Keywords::NONE, None, None, false, None, Words::NONE),
     };
     let mut abilities = [None; MAX_ABILITIES];
     let mut n = 0;
@@ -220,12 +229,14 @@ fn initial(cards: &CardTable, card: CardId, copy: Option<&Copiable>) -> Chars {
     }
     Chars {
         card,
-        name: copy_name.unwrap_or(def.name),
+        name: copy_name.unwrap_or_else(|| renamed(def, words)),
         types: TypeSet(def.types.0 | extra_types.0),
         supertypes: def.supertypes,
-        subtypes: def.subtypes.union(extra_subtypes),
-        // CR 707.9b: a copy that says what it is gets that, not what the card it copies is (707.9d).
-        colors: colors.unwrap_or_else(|| def.colors()),
+        // CR 612.4: a token's subtypes are what the text that made it named.
+        subtypes: words.subtypes(def.subtypes).union(extra_subtypes),
+        // CR 707.9b: a copy that says what it is gets that, not what the card it copies is (707.9d). A token's color
+        // words are its text's (CR 612.4).
+        colors: colors.unwrap_or_else(|| words.colors(def.colors())),
         power: pt.map(|(p, _)| p).or(def.power),
         toughness: pt.map(|(_, t)| t).or(def.toughness),
         keywords: Keywords(def.keywords.0 | extra_keywords.0),
@@ -239,6 +250,18 @@ fn initial(cards: &CardTable, card: CardId, copy: Option<&Copiable>) -> Chars {
         must_attack: false,
         abilities,
         no_cost,
+    }
+}
+
+/// A token's name under changed text (CR 612.2a): a token named for its creature type ("Spirit") is named for the type
+/// the text names now.
+fn renamed(def: &CardDef, words: Words) -> &'static str {
+    if words.is_printed() {
+        return def.name;
+    }
+    match Subtype::named(def.name) {
+        Some(s) if s.is_creature_type() && def.subtypes.has(s) => words.subtype(s).name(),
+        _ => def.name,
     }
 }
 
@@ -308,6 +331,12 @@ fn statics(
 fn apply_effect(effect: &ContinuousEffect, layer: Layer, chars: &mut Chars) {
     {
         match (layer, effect.kind) {
+            // CR 612.1: a subtype in the type line is a word of its text; the rules text's words are read by card code.
+            (Layer::Text, EffectKind::ChangeText { from: Word::Subtype(from), to: Word::Subtype(to) }) => {
+                if chars.subtypes.has(from) {
+                    chars.subtypes = chars.subtypes.without(from).with(to);
+                }
+            }
             // CR 205.1b: added types are added; a land that becomes a creature is still a land.
             (Layer::Type, EffectKind::AddTypes(types)) => chars.types = TypeSet(chars.types.0 | types.0),
             (Layer::Type, EffectKind::AddSubtype(s)) => chars.subtypes = chars.subtypes.with(s),

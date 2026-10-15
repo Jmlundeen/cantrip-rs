@@ -225,6 +225,7 @@ pub enum CardChoicePurposeView {
     Splice,
     PutOnBottom,
     Attach,
+    Encode,
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]

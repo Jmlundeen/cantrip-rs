@@ -107,6 +107,7 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
         }
         if from.is(ZoneKind::Battlefield) {
             let c = layers::chars(cx.cards(), cx.s(), m.id);
+            let words = cantrip_api::words(cx.s(), m.id);
             cx.st().last_known_push(LastKnown {
                 id: m.id,
                 types: c.types,
@@ -116,6 +117,7 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
                 toughness: c.toughness,
                 keywords: c.keywords,
                 abilities: c.abilities,
+                words,
             });
         }
         cx.st().zone_remove(from, m.id);
@@ -683,6 +685,20 @@ pub fn create_token_copies(cx: &mut Cx, values: Copiable, controller: PlayerId, 
 }
 
 /// Creates tokens (CR 111.2): each a new object on the battlefield, from no zone.
+/// The effects of resolved spells and abilities on a permanent spell go on applying to the permanent it becomes
+/// (CR 400.7a): a spell whose text was changed is a permanent with that text.
+pub fn carry_effects(cx: &mut Cx, spell: ObjectId, permanent: ObjectId) {
+    let carried: Vec<cantrip_state::ContinuousEffect> = cx.s().effects.iter().filter(|e| e.affected == spell && !e.kind.outlives_affected()).copied().collect();
+    if carried.is_empty() {
+        return;
+    }
+    let keep: Vec<bool> = cx.s().effects.iter().map(|e| e.affected != spell || e.kind.outlives_affected()).collect();
+    cx.st().effects_keep(&keep);
+    for e in carried {
+        cx.st().effect_push(cantrip_state::ContinuousEffect { affected: permanent, ..e });
+    }
+}
+
 pub fn create_tokens(cx: &mut Cx, card: CardId, controller: PlayerId, count: u32, tapped: bool) -> R<Vec<ObjectId>> {
     create_tokens_as(cx, card, controller, count, tapped, None, &[])
 }
@@ -703,6 +719,24 @@ fn create_tokens_as(
 /// Creates tokens of several definitions as one instruction (CR 111.1, 101.4): all enter at once, and what watches
 /// them sees one event (CR 603.2c).
 pub fn create_tokens_batch(cx: &mut Cx, tokens: &[(CardId, PlayerId)], tapped: bool, copy: Option<Copiable>, with: &[(CounterKind, i16)]) -> R<Vec<ObjectId>> {
+    // CR 612.4, 612.2a: a token is what the text that makes it says, so a changed text makes tokens of the colors and
+    // creature types it names now.
+    let words = match cx.cause() {
+        Cause::Spell(source) | Cause::Ability { source, .. } if copy.is_none() => cantrip_api::words(cx.s(), source),
+        _ => Words::NONE,
+    };
+    create_tokens_worded(cx, tokens, tapped, copy, with, words)
+}
+
+/// Creates tokens whose text has `words` (CR 612.4): `create_tokens_batch` with the words given, not the creating text's.
+pub fn create_tokens_worded(
+    cx: &mut Cx,
+    tokens: &[(CardId, PlayerId)],
+    tapped: bool,
+    copy: Option<Copiable>,
+    with: &[(CounterKind, i16)],
+    words: Words,
+) -> R<Vec<ObjectId>> {
     // CR 614.1a: how many of each there are is decided by what would replace the creation, before any of them is made.
     let replaced = replace::token_batch(cx, tokens);
     let tokens = replaced.as_deref().unwrap_or(tokens);
@@ -751,6 +785,7 @@ pub fn create_tokens_batch(cx: &mut Cx, tokens: &[(CardId, PlayerId)], tapped: b
             face_down: false,
             seen_by: 0,
         });
+        let copy = if words.is_printed() { copy } else { Some(Copiable { words, ..Copiable::of(card) }) };
         let mut entering = Entering { object: id, controller, tapped, counters: entry_counters(with), copy, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_odd: None, attach: None, attach_player: None, x: 0 , transformed: false, protector: None, instead: None };
         prepare_entry(cx, &mut entering)?;
         entering.counters = replace::counters(cx, id, controller, true, entering.counters);
@@ -1697,16 +1732,21 @@ pub fn fight(cx: &mut Cx, first: ObjectId, second: ObjectId) {
 /// been declared as attackers, so no "whenever attacks" ability sees them. Outside combat they are only tapped tokens.
 pub fn create_tokens_attacking(cx: &mut Cx, tokens: &[(CardId, PlayerId)], defender: Target) -> R<Vec<ObjectId>> {
     let created = create_tokens_batch(cx, tokens, true, None, &[])?;
+    attack_with_tokens(cx, &created, defender);
+    Ok(created)
+}
+
+/// Makes created tokens attack `defender` (CR 508.4), when there is a combat to attack in.
+pub fn attack_with_tokens(cx: &mut Cx, created: &[ObjectId], defender: Target) {
     if cx.s().turn.attacked {
         let mut attackers = cx.s().attackers.clone();
-        for &id in &created {
+        for &id in created {
             if live(cx.s(), id) && cx.s().obj(id).zone.is(ZoneKind::Battlefield) {
                 attackers.push(Attacker { id, target: defender, blocked: false });
             }
         }
         cx.st().set_attackers(attackers);
     }
-    Ok(created)
 }
 
 /// Puts a card onto the battlefield tapped and attacking `defender` (CR 508.4): ninjutsu's "put this card onto the

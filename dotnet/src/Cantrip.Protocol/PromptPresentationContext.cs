@@ -7,7 +7,7 @@ public enum PromptActionView
 {
     Choose, Discard, PutOnLibrary, Keep, Sacrifice, Exile, ReturnToHand, Untap, PutOntoBattlefield,
     PutIntoHand, Cast, Tap, Distribute, Pay, OrderReplacement, Destroy, Vote, PutIntoGraveyard, Play, Splice,
-    PutOnLibraryBottom, Attach,
+    PutOnLibraryBottom, Attach, Encode,
 }
 
 public enum PromptCauseView { Effect, Cost, Rule }

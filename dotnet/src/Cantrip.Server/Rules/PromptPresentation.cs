@@ -100,6 +100,7 @@ internal static class PromptPresentation
         CardChoicePurposeView.Splice => PromptActionView.Splice,
         CardChoicePurposeView.PutOnBottom => PromptActionView.PutOnLibraryBottom,
         CardChoicePurposeView.Attach => PromptActionView.Attach,
+        CardChoicePurposeView.Encode => PromptActionView.Encode,
         _ => PromptActionView.Choose,
     };
 }

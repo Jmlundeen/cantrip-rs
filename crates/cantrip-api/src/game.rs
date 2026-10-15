@@ -90,6 +90,13 @@ pub trait Query {
     /// An object's characteristics after every continuous effect (CR 613).
     fn chars(&self, id: ObjectId) -> Chars;
 
+    /// The words an object's text has now (CR 612): every color word, basic land type and creature type its rules text
+    /// names is read through these, `words(source).subtype(Subtype::Goblin)` for "Goblin", so a text-changing effect
+    /// changes what the card does.
+    fn words(&self, id: ObjectId) -> Words {
+        crate::words(self.state(), id)
+    }
+
     /// The id of a definition in the card table (a token's, an exception's).
     fn card_id(&self, def: &'static CardDef) -> CardId;
 
@@ -426,6 +433,11 @@ pub trait Game: Query {
     /// attackers, so nothing that watches attackers being declared sees them. They are put onto the battlefield
     /// together, as one instruction. Outside combat they are just tapped tokens.
     fn create_tokens_attacking(&mut self, tokens: &[(CardId, PlayerId)], defender: Target) -> Result<Vec<ObjectId>, Suspend>;
+    /// Creates tokens together whose text has `words` (CR 612.4), tapped, or tapped and attacking `attacking`. Every other
+    /// way of creating tokens gives them the words of the text making them, so a text change reaches the colors and
+    /// creature types it names (CR 612.2a); a keyword's own token is the rules' (its reminder text is no rules text),
+    /// so For Mirrodin!'s Rebel is made with `Words::NONE`.
+    fn create_tokens_worded(&mut self, tokens: &[(CardId, PlayerId)], tapped: bool, attacking: Option<Target>, words: Words) -> Result<Vec<ObjectId>, Suspend>;
     /// Exiles cards together and remembers them as exiled with `by` (CR 607.2a, 610.3). With `until_leaves` they return
     /// to where they were exiled from the moment `by` is no longer on the battlefield (CR 610.3), no stack and nothing
     /// to respond to; and if `by` has already left, nothing is exiled at all (CR 610.3b). The new objects.

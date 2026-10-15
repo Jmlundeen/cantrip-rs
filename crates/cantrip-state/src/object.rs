@@ -209,6 +209,9 @@ pub struct Copiable {
     pub no_cost: bool,
     /// "Except its name is X" (CR 707.9b): its name, whatever the copied card is called.
     pub name: Option<&'static str>,
+    /// The words of its text changed from the card's (CR 612.4, 612.2a): a token made by an ability whose text was
+    /// changed has the colors and creature types the changed text names, and so does a copy of it.
+    pub words: Words,
 }
 
 impl Copiable {
@@ -224,6 +227,7 @@ impl Copiable {
             pt: None,
             no_cost: false,
             name: None,
+            words: Words::NONE,
         }
     }
 
@@ -243,6 +247,7 @@ impl Copiable {
             || self.pt.is_some()
             || self.name.is_some()
             || self.no_cost
+            || !self.words.is_printed()
     }
 
     /// "Except it's a [type] in addition to its other types."
@@ -482,6 +487,10 @@ pub enum EffectKind {
     /// Marks that a copy effect until end of turn (CR 707.2, 611.2b) changed the `affected` permanent's copiable values, and
     /// holds what they were: put back when the effect ends. The copy itself is in `Obj::copy`.
     RestoreCopy(Option<Copiable>),
+    /// A text-changing effect (CR 612, layer 3): every instance of `from` in the object's rules text and type line is
+    /// `to` (Trait Doctoring, Artificial Evolution). Card code reads its words through `Query::words`; the layers change
+    /// the type line.
+    ChangeText { from: Word, to: Word },
 }
 
 impl EffectKind {
@@ -645,6 +654,8 @@ pub struct LastKnown {
     /// Its abilities as it last had them, those granted by effects included: a leaves-the-battlefield ability it was given still
     /// triggers (CR 603.10a).
     pub abilities: [Option<AbilityRef>; 8],
+    /// The words of its text as it last had them (CR 612): an ability of it that resolves after it has gone reads them.
+    pub words: Words,
 }
 
 /// A player (CR 102).

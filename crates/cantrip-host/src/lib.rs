@@ -13,4 +13,5 @@ pub mod handles;
 pub mod prompt;
 pub mod protocol;
 pub mod session;
+pub mod text;
 pub mod view;

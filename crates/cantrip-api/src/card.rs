@@ -101,9 +101,12 @@ pub enum LibraryPlace {
 }
 
 /// The layers and sublayers a static ability's effect applies in (CR 613.1, 613.4), in order. Copy effects (layer 1)
-/// are the object's copiable values; control (2) is the object's controller itself; text (3) has no effects yet.
+/// are the object's copiable values; control (2) is the object's controller itself.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Layer {
+    /// Layer 3: text-changing effects (CR 612), on the type line here; card code reads its rules text's words through
+    /// `Query::words`.
+    Text,
     /// Layer 4: card types, subtypes, supertypes.
     Type,
     /// Layer 5: colors.
@@ -130,6 +133,10 @@ pub trait LayerQuery {
     fn cards(&self) -> &CardTable;
     /// Another object's characteristics, through the layers before the one being applied.
     fn chars(&self, id: ObjectId) -> Chars;
+    /// The words an object's text has now (CR 612): what a static ability names, read through its source's words.
+    fn words(&self, id: ObjectId) -> Words {
+        crate::words(self.state(), id)
+    }
 }
 
 /// Whether a static ability applies to `affected`, given what the earlier layers made it (`so_far`).
@@ -150,7 +157,8 @@ pub struct StaticDef {
     pub apply: StaticApply,
     pub everywhere: bool,
     pub own: bool,
-    /// The zone its source functions from (CR 113.6b): the battlefield, or the graveyard for Anger's kind.
+    /// The zone its source functions from (CR 113.6b): the battlefield, the graveyard for Anger's kind, or exile for
+    /// cipher's (CR 702.99a).
     pub from: ZoneKind,
 }
 
@@ -1179,6 +1187,8 @@ pub struct CardTable {
     pub any_statics: bool,
     /// Whether any card has a static ability that functions from a graveyard, so graveyards are looked in at all.
     pub graveyard_statics: bool,
+    /// Whether any card has a static ability that functions from exile (cipher's, CR 702.99a), so exile is looked in.
+    pub exile_statics: bool,
     /// Which cards have play rules, and whether any does: land plays look for them only when one might.
     pub play_rules: Vec<bool>,
     pub any_play_rules: bool,
@@ -1231,6 +1241,7 @@ impl CardTable {
         let statics: Vec<bool> = cards.iter().map(|c| c.statics.iter().any(|s| !s.own)).collect();
         let any_statics = statics.iter().any(|&s| s);
         let graveyard_statics = cards.iter().any(|c| c.statics.iter().any(|s| s.from == ZoneKind::Graveyard));
+        let exile_statics = cards.iter().any(|c| c.statics.iter().any(|s| s.from == ZoneKind::Exile));
         let play_rules: Vec<bool> = cards.iter().map(|c| !c.play_rules.is_empty()).collect();
         let any_play_rules = play_rules.iter().any(|&s| s);
         let replaces: Vec<bool> = cards.iter().map(|c| !c.replacements.is_empty()).collect();
@@ -1254,6 +1265,7 @@ impl CardTable {
             statics,
             any_statics,
             graveyard_statics,
+            exile_statics,
             play_rules,
             any_play_rules,
             replaces,

@@ -108,6 +108,17 @@ stops there (`?` carries the `Suspend` out). Once the question is answered, the 
 
 Their defaults (what the runner answers when no line applies) are in `crates/cantrip-script/src/run.rs`, `default`.
 
+**Words of its rules text: read through `words`.** A text-changing effect (CR 612: Trait Doctoring, Artificial
+Evolution) replaces a color word, basic land type or creature type in an object's text, and the card then does what
+the changed text says. So every color word, basic land type and creature type a card's rules text uses as one is read
+through the words of the object whose text it is: `g.words(item.object).color(Color::Blue)` for "if it's blue",
+`view.words(source).subtype(Subtype::Goblin)` in a static ability for "other Goblins", `q.words(asker.source)` in a
+condition. Mana symbols (`{U}`) are not words, and a card's name is never changed (CR 612.2), nor is a keyword's
+reminder text. The layers change the type line, and a token gets the colors and creature types of the text that makes
+it without the card doing anything (CR 612.4); a token a keyword's own rules make (For Mirrodin!'s Rebel) is created
+with `create_tokens_worded(.., Words::NONE)`. An object that has left the battlefield keeps the words it last had
+(`words` reads its last-known information), so a sacrificed source's ability reads them too.
+
 ## Asking about the past: the event history
 
 Every rules event since the game began is in the history, in order: `q.history()` (`cantrip_api::history`). Each

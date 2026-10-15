@@ -39,6 +39,26 @@ pub struct Chars {
     pub no_cost: bool,
 }
 
+/// The words `id`'s text has now (CR 612): the ones its copiable values changed (a token made by changed text), then
+/// each text-changing effect on it in timestamp order. Printed, for nearly every object. An object that has left the
+/// battlefield has the words it last had there (CR 113.7a, 608.2h): a fetch land sacrificed to its own ability searches
+/// for the land types its text named.
+pub fn words(state: &GameState, id: ObjectId) -> Words {
+    let obj = state.obj(id);
+    if obj.became.is_some() {
+        return state.last_known(id).map_or(Words::NONE, |l| l.words);
+    }
+    let mut words = obj.copy.map_or(Words::NONE, |c| c.words);
+    for e in &state.effects {
+        if let EffectKind::ChangeText { from, to } = e.kind
+            && e.affected == id
+        {
+            words = words.changed(from, to);
+        }
+    }
+    words
+}
+
 impl Chars {
     pub fn is(&self, t: CardType) -> bool {
         self.types.has(t)

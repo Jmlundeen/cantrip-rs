@@ -403,8 +403,94 @@ impl SubtypeSet {
         self.0.iter().all(|&w| w == 0)
     }
 
+    pub fn without(self, s: Subtype) -> SubtypeSet {
+        let mut bits = self.0;
+        let n = s as usize;
+        bits[n / 64] &= !(1 << (n % 64));
+        SubtypeSet(bits)
+    }
+
     pub fn iter(self) -> impl Iterator<Item = Subtype> {
         Subtype::ALL.into_iter().filter(move |s| self.has(*s))
+    }
+}
+
+/// A word a text-changing effect can replace (CR 612.2): a color word, or a subtype used as a subtype - a basic land
+/// type or a creature type. Mana symbols are not words, and a name is never changed.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum Word {
+    Color(Color),
+    Subtype(Subtype),
+}
+
+/// The words an object's text has now, against the words printed on it (CR 612): the text-changing effects on it in
+/// timestamp order, each replacing every instance of one word with another. Card code names a word in its rules text
+/// through these (`Query::words`), so "a blue spell" asks `words.color(Color::Blue)` and reads red once that word was
+/// changed to red.
+#[derive(Clone, Copy, PartialEq, Eq, Hash, Default, Debug)]
+pub struct Words {
+    changes: [Option<(Word, Word)>; Words::MAX],
+}
+
+impl Words {
+    /// More text changes than any object gets; past it, the rest are not kept.
+    pub const MAX: usize = 4;
+    pub const NONE: Words = Words { changes: [None; Words::MAX] };
+
+    /// Whether the text is as printed.
+    pub fn is_printed(&self) -> bool {
+        self.changes[0].is_none()
+    }
+
+    /// The text with every instance of `from` replaced by `to` (CR 612.1), after the changes made so far.
+    pub fn changed(mut self, from: Word, to: Word) -> Words {
+        if let Some(slot) = self.changes.iter().position(|c| c.is_none()) {
+            self.changes[slot] = Some((from, to));
+        }
+        self
+    }
+
+    /// Every change of `other` after these.
+    pub fn then(self, other: Words) -> Words {
+        other.changes.into_iter().flatten().fold(self, |w, (from, to)| w.changed(from, to))
+    }
+
+    /// The word printed as `printed`, as the text has it now.
+    pub fn word(&self, printed: Word) -> Word {
+        self.changes.iter().flatten().fold(printed, |w, &(from, to)| if w == from { to } else { w })
+    }
+
+    /// The color word printed as `printed`, as the text has it now: "destroy target blue permanent" says `color(Blue)`.
+    pub fn color(&self, printed: Color) -> Color {
+        match self.word(Word::Color(printed)) {
+            Word::Color(c) => c,
+            Word::Subtype(_) => printed,
+        }
+    }
+
+    /// Each color word of `printed`, as the text has it now: "a 1/1 white and black Inkling" made under changed text.
+    pub fn colors(&self, printed: ColorSet) -> ColorSet {
+        if self.is_printed() {
+            return printed;
+        }
+        printed.iter().fold(ColorSet::NONE, |set, c| set.with(self.color(c)))
+    }
+
+    /// The land or creature type printed as `printed`, as the text has it now: "other Goblins get +1/+1" says
+    /// `subtype(Goblin)`.
+    pub fn subtype(&self, printed: Subtype) -> Subtype {
+        match self.word(Word::Subtype(printed)) {
+            Word::Subtype(s) => s,
+            Word::Color(_) => printed,
+        }
+    }
+
+    /// Each subtype of `printed`, as the text has it now: a type line, or a token's types.
+    pub fn subtypes(&self, printed: SubtypeSet) -> SubtypeSet {
+        if self.is_printed() {
+            return printed;
+        }
+        printed.iter().fold(SubtypeSet::NONE, |set, s| set.with(self.subtype(s)))
     }
 }
 

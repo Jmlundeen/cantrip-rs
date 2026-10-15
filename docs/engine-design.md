@@ -180,6 +180,11 @@ question over writing each card as explicit stages, which the spike measured, an
 
 - **Computed on query** (`chars()`), through the layers (613), from the object's card, its counters and the
   continuous effects that apply.
+- **Text-changing effects (612, layer 3)** are `EffectKind::ChangeText { from, to }`, a `Word` (a color word or a
+  subtype) replaced by another. The layers change the type line; card code reads every word of its rules text through
+  `Query::words` (`Words`, the changes in timestamp order), so the card does what its changed text says. A token's
+  colors and creature types are those of the text that made it (`Copiable::words`, 612.4), a permanent spell's effects
+  go on to the permanent (400.7a), and an object that has left keeps the words it last had (`LastKnown::words`).
 - **A card's printed characteristics are made once** (`CardTable::printed`), as a pure function of the card, both
   before and after the ability layer, so an object nothing acts on costs a lookup.
 - **The static-ability sources are found once per position** (the epoch cache above), not on every query.

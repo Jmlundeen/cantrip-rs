@@ -328,6 +328,7 @@ fn purpose_view(purpose: Purpose, opening: bool) -> CardChoicePurposeView {
         Purpose::Splice => V::Splice,
         Purpose::PutOnBottom => V::PutOnBottom,
         Purpose::Attach => V::Attach,
+        Purpose::Encode => V::Encode,
         Purpose::SeparatePiles
         | Purpose::ChoosePile
         | Purpose::CopyAsEnters

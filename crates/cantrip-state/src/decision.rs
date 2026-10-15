@@ -390,6 +390,8 @@ pub enum Purpose {
     Splice,
     PutOnBottom,
     Attach,
+    /// A creature to exile a card with cipher encoded on (CR 702.99a).
+    Encode,
     /// Whether to promise a gift (CR 702.174a).
     PromiseGift,
     /// "You may reveal this card from your hand as you draw it" (CR 702.94a): miracle.

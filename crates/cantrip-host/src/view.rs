@@ -568,7 +568,7 @@ impl<'a> Projector<'a> {
             name: def.name.to_string(),
             mana_cost: cost_text(def),
             mana_value: Query::mana_value(game, id) as i32,
-            oracle_text: def.text.to_string(),
+            oracle_text: crate::text::changed_text(def.text, def.name, Query::words(game, id)),
             supertypes: supertypes_view(c.supertypes),
             card_types: types_view(c.types),
             subtypes: subtypes_view(c.subtypes),
@@ -587,7 +587,8 @@ impl<'a> Projector<'a> {
             harnessed: effect(EffectKind::Harnessed),
             choices,
             class_level: if on_battlefield { i32::from(obj.class_level) } else { 0 },
-            is_copy: obj.copy.is_some() || obj.card_copy,
+            // A token whose text was changed as it was made has copiable values of its own and is no copy (CR 612.4).
+            is_copy: obj.copy.is_some_and(|c| Copiable { words: Words::NONE, ..c } != Copiable::of(obj.card)) || obj.card_copy,
             starting_counter: if on_battlefield { None } else { def.loyalty.map(i32::from) },
             other_face: def.back.map(|back| Box::new(printed(back))),
             ..Default::default()

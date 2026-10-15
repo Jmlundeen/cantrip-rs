@@ -275,6 +275,9 @@ public enum CardChoicePurposeView
 
     /// <summary>Attach the chosen Auras or Equipment to a permanent as an effect resolves (CR 701.3a).</summary>
     Attach = 20,
+
+    /// <summary>Exile the spell with cipher encoded on the chosen creature you control, or on none (CR 702.99a).</summary>
+    Encode = 21,
 }
 
 /// <summary>Where cards found by a library search go (CR 701.23).</summary>
