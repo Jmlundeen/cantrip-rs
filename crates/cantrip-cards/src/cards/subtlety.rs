@@ -4,8 +4,8 @@ use cantrip_mechanics::{evoke, targets};
 use cantrip_mechanics::triggers::this_enters;
 use cantrip_oracle as oracle;
 
-fn blue_card(q: &dyn Query, _: &Asker, id: ObjectId) -> bool {
-    q.chars(id).colors.has(Color::Blue)
+fn blue_card(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
+    q.chars(id).colors.has(q.words(asker.source).color(Color::Blue))
 }
 
 /// "Target creature spell or planeswalker spell" (CR 115.1): a spell on the stack with one of those types.
