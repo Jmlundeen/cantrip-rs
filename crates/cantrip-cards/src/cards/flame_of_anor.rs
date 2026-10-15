@@ -27,7 +27,8 @@ fn damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// "If you control a Wizard as you cast this spell, you may choose two instead" (CR 700.2): asked once, as the modes
 /// are announced, so a Wizard that leaves in response leaves both modes chosen.
 fn two_with_a_wizard(q: &dyn Query, asker: &Asker) -> u8 {
-    if q.permanents_of(asker.controller).into_iter().any(|id| q.chars(id).has_subtype(Subtype::Wizard)) { 2 } else { 1 }
+    let wizard = q.words(asker.source).subtype(Subtype::Wizard);
+    if q.permanents_of(asker.controller).into_iter().any(|id| q.chars(id).has_subtype(wizard)) { 2 } else { 1 }
 }
 
 static MODAL: ModalDef = ModalDef {
