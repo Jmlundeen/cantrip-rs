@@ -319,30 +319,31 @@ pub fn choose_color(g: &mut dyn Game, player: PlayerId, source: ObjectId) -> Res
     })
 }
 
-/// Searches a player's library (CR 701.23) for up to `count` cards (exactly as many as can be found, when not
+/// `searcher` searches the library of `owner` (CR 701.23, 701.23f; the two are the same player for "search your library") for up to `count` cards (exactly as many as can be found, when not
 /// `optional`) that pass `eligible`. Asked only when the library has cards; the search is recorded either way. The
 /// library is listed bottom first, as the C# engine lists it.
 pub fn search_library(
     g: &mut dyn Game,
-    player: PlayerId,
+    searcher: PlayerId,
+    owner: PlayerId,
     source: ObjectId,
     count: u8,
     optional: bool,
     eligible: impl Fn(&dyn Query, ObjectId) -> bool,
 ) -> Result<Vec<ObjectId>, Suspend> {
-    let mut library: Vec<ObjectId> = g.state().zone(Zone::library(player)).to_vec();
+    let mut library: Vec<ObjectId> = g.state().zone(Zone::library(owner)).to_vec();
     library.reverse();
     let found = if library.is_empty() {
         Vec::new()
     } else {
         let can: Vec<ObjectId> = library.iter().copied().filter(|&c| eligible(g, c)).collect();
         let count = if optional { count.max(1) } else { count.max(1).min(can.len() as u8) };
-        match g.ask(player, RequestKind::SearchLibrary { source, library, eligible: can, count, optional })? {
+        match g.ask(searcher, RequestKind::SearchLibrary { source, library, eligible: can, count, optional })? {
             Answer::Cards(cards) => cards,
             _ => Vec::new(),
         }
     };
-    g.searched(player);
+    g.searched(searcher, owner);
     Ok(found)
 }
 

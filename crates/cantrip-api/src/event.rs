@@ -33,7 +33,8 @@ pub enum Event {
     /// seen by that player alone.
     Looked { player: PlayerId, card: ObjectId },
     /// A library was searched (CR 701.23).
-    Searched { player: PlayerId },
+    /// `player` searched the library of `library` (CR 701.23, 701.23f): their own, or another player's.
+    Searched { player: PlayerId, library: PlayerId },
     Tapped { permanent: ObjectId },
     /// A permanent was tapped for mana (CR 605.1b): a mana ability with {T} in its cost was activated. Recorded for the history;
     /// the triggered mana abilities it triggers (`TriggeredDef::mana_ability`) resolve at once, where the tap happens.
@@ -96,7 +97,7 @@ impl Event {
             | Event::Looked { player, .. }
             | Event::AbilityActivated { player, .. }
             | Event::Cycled { player, .. }
-            | Event::Searched { player }
+            | Event::Searched { player, .. }
             | Event::AttackersDeclared { player, .. }
             | Event::TappedForMana { player, .. }
             | Event::BecameMonarch { player }

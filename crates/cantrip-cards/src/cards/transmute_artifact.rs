@@ -12,7 +12,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(sacrificed) = choose::card(g, player, item.object, Purpose::Sacrifice, artifacts)? {
         let value = g.mana_value(sacrificed);
         if !g.sacrifice(&[sacrificed]).is_empty() {
-            let found = search_library(g, player, item.object, 1, true, |q, c| q.chars(c).is(CardType::Artifact))?;
+            let found = search_library(g, player, player, item.object, 1, true, |q, c| q.chars(c).is(CardType::Artifact))?;
             if let Some(&card) = found.first() {
                 let cost = g.mana_value(card);
                 let enter = if cost <= value {

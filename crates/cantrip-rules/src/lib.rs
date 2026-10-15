@@ -885,8 +885,8 @@ impl cantrip_api::Game for Cx<'_> {
         self.g.state.set_extra_turns(turns);
     }
 
-    fn searched(&mut self, player: PlayerId) {
-        self.emit(Event::Searched { player });
+    fn searched(&mut self, player: PlayerId, library: PlayerId) {
+        self.emit(Event::Searched { player, library });
     }
 
     fn attach(&mut self, attachment: ObjectId, host: ObjectId) {

@@ -19,7 +19,7 @@ fn enters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// "Whenever an opponent searches their library" (CR 701.23): whether or not the search finds anything.
 fn opponent_searches(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
-        Event::Searched { player } if *player != q.controller(source) => Fired::PLAIN,
+        Event::Searched { player, library } if player == library && *player != q.controller(source) => Fired::PLAIN,
         _ => None,
     }
 }

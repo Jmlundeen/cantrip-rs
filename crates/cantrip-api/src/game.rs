@@ -432,8 +432,10 @@ pub trait Game: Query {
     /// Puts cards already in a player's library on its bottom in a random order (CR 401.4), drawn from the game's own
     /// random source: "put the rest on the bottom of your library in a random order". Nothing changes zones.
     fn bottom_in_random_order(&mut self, player: PlayerId, cards: &[ObjectId]);
-    /// Records that a player searched their library, for whatever watches searches.
-    fn searched(&mut self, player: PlayerId);
+    /// Records that `player` searched the library of `library` (CR 701.23, 701.23f: a player may search another
+    /// player's library, and "searches their library" is only the case where the two are the same), for whatever
+    /// watches searches.
+    fn searched(&mut self, player: PlayerId, library: PlayerId);
     /// Attaches an Aura or Equipment to a permanent (CR 701.3a): nothing happens if it could not be attached there
     /// (CR 701.3b) or already is. It becomes a new object with respect to what it is attached to (CR 701.3c, 613.7e).
     fn attach(&mut self, attachment: ObjectId, host: ObjectId);

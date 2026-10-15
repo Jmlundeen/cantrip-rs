@@ -22,7 +22,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let mut lands: Vec<(ObjectId, PlayerId, bool)> = Vec::new();
     for &player in &order {
         let count = controllers.iter().filter(|&&p| p == player).count() as u8;
-        let found = search_library(g, player, item.object, count, true, |q, c| {
+        let found = search_library(g, player, player, item.object, count, true, |q, c| {
             let chars = q.chars(c);
             chars.is(CardType::Land) && chars.supertypes.basic
         })?;

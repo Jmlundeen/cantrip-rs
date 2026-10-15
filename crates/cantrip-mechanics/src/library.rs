@@ -29,11 +29,37 @@ impl Find {
 }
 
 fn find(g: &mut dyn Game, player: PlayerId, source: ObjectId, find: Find, eligible: impl Fn(&dyn Query, ObjectId) -> bool) -> Result<Vec<ObjectId>, Suspend> {
-    let found = search_library(g, player, source, find.count, find.optional, eligible)?;
+    let found = search_library(g, player, player, source, find.count, find.optional, eligible)?;
     if find.reveal {
         g.reveal(player, &found);
     }
     Ok(found)
+}
+
+/// "Search [a player's] library for [cards] and exile them, then that player shuffles" (CR 701.23, 701.23f, 406.2):
+/// `searcher` searches the library of `owner` (the same player, or another), and the cards found, together with `also`
+/// (cards the same search found in other zones, such as the graveyard and hand: CR 701.23a lets a search span zones),
+/// go to exile at once, `also` first, as a search (`ZoneReason::Search`). Each card goes to its owner's exile. The new
+/// objects, in that order, so a caller can tell which of `also` were exiled. Deadly Cover-Up searches another player's
+/// library and exiles what it finds with the graveyard and hand cards of the same search; Ugin, Eye of the Storms' -11
+/// searches its controller's own.
+pub fn search_to_exile(
+    g: &mut dyn Game,
+    searcher: PlayerId,
+    owner: PlayerId,
+    source: ObjectId,
+    how: Find,
+    also: &[ObjectId],
+    eligible: impl Fn(&dyn Query, ObjectId) -> bool,
+) -> Result<Vec<ObjectId>, Suspend> {
+    let found = search_library(g, searcher, owner, source, how.count, how.optional, eligible)?;
+    if how.reveal {
+        g.reveal(searcher, &found);
+    }
+    let moves: Vec<(ObjectId, Zone)> = also.iter().chain(found.iter()).map(|&c| (c, Zone::exile(g.obj(c).owner))).collect();
+    let moved = g.move_together(&moves, ZoneReason::Search);
+    g.shuffle(owner);
+    Ok(moved)
 }
 
 /// "Search your library for [cards], put them into your hand, then shuffle" (CR 701.23): the cards found, as they are

@@ -11,7 +11,7 @@ use cantrip_oracle as oracle;
 /// asked of the resulting spell, X being zero (CR 118.9, 202.3).
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
-    let found = search_library(g, you, item.object, 1, false, |_, _| true)?;
+    let found = search_library(g, you, you, item.object, 1, false, |_, _| true)?;
     let mut exiled = None;
     if let Some(&card) = found.first() {
         let new = g.exile_face_down(&[card], None);

@@ -22,7 +22,7 @@ fn quality(red: Color, white: Color) -> impl Fn(&dyn Query, ObjectId) -> bool {
 fn search_and_cast(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     let words = g.words(item.object);
-    let found = search_library(g, you, item.object, 1, true, quality(words.color(Color::Red), words.color(Color::White)))?;
+    let found = search_library(g, you, you, item.object, 1, true, quality(words.color(Color::Red), words.color(Color::White)))?;
     if let Some(&card) = found.first()
         && g.could_cast_during_resolution(card)
     {

@@ -15,7 +15,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     all.reverse();
     all.extend_from_slice(g.state().zone(Zone::graveyard(who)));
     // The library is searched whatever is in it or chosen.
-    g.searched(who);
+    g.searched(who, who);
     if !all.is_empty() {
         let chosen = choose::cards(g, who, item.object, Purpose::PutOnTop, all.clone(), 5, false)?;
         let rest: Vec<ObjectId> = all.iter().copied().filter(|c| !chosen.contains(c)).collect();

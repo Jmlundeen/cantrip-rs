@@ -1,0 +1,77 @@
+# "Whenever an opponent searches their library" (CR 701.23, 701.23f). Bot1's Wan Shi Tong sees Bot2's Demonic Tutor search
+# Bot2's own library (+1/+1 counter and a card), but not Bot2's Deadly Cover-Up searching BOT1's library for Ornithopters:
+# that opponent is not searching "their" library, so the counter stays at one. Yavimaya Hollow regenerates Wan Shi Tong
+# (and Bot1's Ornithopter dies) in response to the Cover-Up, which would otherwise destroy it. Bot1 exiled: Griselbrand and
+# Ornithopters; the one in Bot1's hand draws it a card.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Wan Shi Tong, Librarian
+Mox Emerald
+Yavimaya Hollow
+Ornithopter
+Ornithopter
+Island x6
+Ornithopter
+Island x10
+
+[Bot2 Deck]
+Swamp
+Mox Ruby
+Mox Jet
+Black Lotus
+Faithless Looting
+Demonic Tutor
+Deadly Cover-Up
+Swamp
+Swamp
+Swamp
+Swamp
+Griselbrand
+Swamp x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Wan Shi Tong, Librarian.Cast(X: 0)
+Bot1.Pass
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Demonic Tutor.Cast
+Bot2.Pass
+Bot2.Search(Griselbrand)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Faithless Looting.Cast
+Bot2.Pass
+Bot2.Choose(Griselbrand; Swamp)
+? Bot1.Battlefield.Wan Shi Tong, Librarian.Counters.PlusOnePlusOne = 1
+[T3 Bot1.Main1]
+Bot1.Hand.Yavimaya Hollow.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Deadly Cover-Up.Cast
+Bot2.Modes(Collect evidence)
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Swamp.Activate
+Bot2.Choose(Griselbrand)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Yavimaya Hollow.Activate(Bot1.Battlefield.Wan Shi Tong, Librarian; Ability: Regenerate)
+Bot2.Pass
+Bot2.Choose(Ornithopter)
+Bot2.Choose(Ornithopter)
+Bot2.Search(Ornithopter)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Wan Shi Tong, Librarian.Counters.PlusOnePlusOne = 1
+Exile.Count = 4

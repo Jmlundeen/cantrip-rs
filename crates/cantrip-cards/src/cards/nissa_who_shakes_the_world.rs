@@ -52,7 +52,7 @@ fn emblem_and_forests(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
     let you = item.controller;
     let forests = g.state().zone(Zone::library(you)).len().min(255) as u8;
     let forest = g.words(item.object).subtype(Subtype::Forest);
-    let found = search_library(g, you, item.object, forests, true, |q, c| q.chars(c).has_subtype(forest))?;
+    let found = search_library(g, you, you, item.object, forests, true, |q, c| q.chars(c).has_subtype(forest))?;
     let lands: Vec<(ObjectId, PlayerId, bool)> = found.into_iter().map(|c| (c, you, true)).collect();
     g.put_all_onto_battlefield_as(&lands)?;
     g.shuffle(you);
