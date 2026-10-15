@@ -1,0 +1,33 @@
+# Trait Doctoring replaces the basic land type Swamp with Island in Urborg's text until end of turn (CR 612.1), so
+# "Each land is a Swamp in addition to its other land types" says Island: Urborg and Bot2's Forest are Islands, not
+# Swamps, and Urborg taps for {U} (CR 305.6). Urborg is still called Urborg (CR 612.2).
+
+[Bot1 Deck]
+Island
+Urborg, Tomb of Yawgmoth
+Trait Doctoring
+Island x13
+
+[Bot2 Deck]
+Forest x15
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Urborg, Tomb of Yawgmoth.Play
+? Bot2.Battlefield.Forest.Subtypes = Forest; Swamp
+Bot1.Battlefield.Island.Activate(Ability: Add {U})
+Bot1.Hand.Trait Doctoring.Cast(Urborg, Tomb of Yawgmoth)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Replace a basic land type)
+Bot1.Modes(Swamp)
+Bot1.Modes(Island)
+Bot1.Battlefield.Urborg, Tomb of Yawgmoth.Activate
+? Bot1.Mana = {U}
+
+[Expect]
+Bot2.Battlefield.Forest.Subtypes = Forest; Island
+Bot1.Battlefield.Urborg, Tomb of Yawgmoth.Subtypes = Island
