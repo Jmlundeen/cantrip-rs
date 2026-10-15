@@ -306,3 +306,20 @@ pub fn card_has_name(q: &dyn Query, card: CardId, wanted: CardId) -> bool {
     let def = q.card(card);
     def.name == name || def.split.is_some_and(|(left, right)| left.name == name || right.name == name)
 }
+
+/// Whether the object `id` has the name `wanted` (CR 201.2a, 709.4a): "an object has the chosen name if one of its names is
+/// the chosen name". A Room on the battlefield has the names of its unlocked doors alone (CR 709.5), any other split
+/// card both halves', and a copy that says "except its name is X" that name (CR 707.9b). Anointed Peacekeeper's "sources with
+/// the chosen name" and any card that asks of a permanent or spell whether it is named so.
+pub fn object_has_name(q: &dyn Query, id: ObjectId, wanted: CardId) -> bool {
+    let name = q.card(wanted).name;
+    let c = q.chars(id);
+    if c.name == name {
+        return true;
+    }
+    let def = q.card(c.card);
+    if def.is_room() && q.obj(id).zone.is(ZoneKind::Battlefield) {
+        return def.unlocked_doors(q.obj(id).marks.doors).any(|half| half.name == name);
+    }
+    card_has_name(q, c.card, wanted)
+}
