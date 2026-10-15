@@ -663,6 +663,10 @@ impl cantrip_api::Game for Cx<'_> {
         ops::exile_face_down(self, cards, by)
     }
 
+    fn encode(&mut self, card: ObjectId, creature: ObjectId) -> Option<ObjectId> {
+        ops::encode(self, card, creature)
+    }
+
     fn look_at(&mut self, player: PlayerId, cards: &[ObjectId]) {
         ops::look_at(self, player, cards);
     }

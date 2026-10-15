@@ -442,6 +442,9 @@ pub trait Game: Query {
     /// to where they were exiled from the moment `by` is no longer on the battlefield (CR 610.3), no stack and nothing
     /// to respond to; and if `by` has already left, nothing is exiled at all (CR 610.3b). The new objects.
     fn exile_with(&mut self, cards: &[ObjectId], by: ObjectId, until_leaves: bool) -> Vec<ObjectId>;
+    /// Exiles a spell card encoded on a creature (CR 702.99a): linked to it as `exile_with` links, and marked encoded
+    /// (`ExileLink::encoded`), which only cipher's encoding is. The card in exile, if it got there.
+    fn encode(&mut self, card: ObjectId, creature: ObjectId) -> Option<ObjectId>;
     /// Exiles cards together face down (CR 406.3), linked to `by` if an ability exiled them (CR 607.2a). Each is hidden
     /// from every player who could not see where it came from; `look_at` shows it to one more. The new objects.
     fn exile_face_down(&mut self, cards: &[ObjectId], by: Option<ObjectId>) -> Vec<ObjectId>;

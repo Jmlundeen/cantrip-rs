@@ -1,0 +1,52 @@
+# A card is encoded on a creature only while the creature stays on the battlefield (CR 702.99c). Llanowar Elves, with
+# Trait Doctoring encoded on it, deals combat damage to Bot2; with the trigger on the stack Bot2 kills the Elves with
+# Lightning Bolt. When the trigger resolves nothing is encoded on that creature any more, so no copy is offered, and
+# the card stays in exile.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Island
+Trait Doctoring
+Forest x12
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Trait Doctoring.Cast(Forest)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Replace a color word)
+Bot1.Colors(Green)
+Bot1.Colors(Blue)
+Bot1.Choose(Llanowar Elves)
+Bot1.Attack(Llanowar Elves)
+[T3 Bot1.CombatDamage]
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Llanowar Elves)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Llanowar Elves
+Bot1.Pass
+Bot2.Pass
+! Bot1.Accept
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 19
+Exile = Trait Doctoring
+Stack.Count = 0

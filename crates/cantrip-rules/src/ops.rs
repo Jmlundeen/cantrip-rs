@@ -316,10 +316,24 @@ pub fn exile_with(cx: &mut Cx, cards: &[ObjectId], by: ObjectId, until_leaves: b
     let new = move_together(cx, &moves, ZoneReason::Exile);
     for (&n, from) in new.iter().zip(from) {
         if cx.s().obj(n).zone.is(ZoneKind::Exile) {
-            cx.st().update_obj(n, |o| o.exiled = Some(ExileLink { by, from, until_leaves }));
+            cx.st().update_obj(n, |o| o.exiled = Some(ExileLink { by, from, until_leaves, encoded: false }));
         }
     }
     new
+}
+
+/// Exiles a spell card encoded on a creature (CR 702.99a, 702.99b): exiled linked to it, and marked as encoded there.
+pub fn encode(cx: &mut Cx, card: ObjectId, creature: ObjectId) -> Option<ObjectId> {
+    let new = *exile_with(cx, &[card], creature, false).first()?;
+    if !cx.s().obj(new).zone.is(ZoneKind::Exile) {
+        return None;
+    }
+    cx.st().update_obj(new, |o| {
+        if let Some(link) = &mut o.exiled {
+            link.encoded = true;
+        }
+    });
+    Some(new)
 }
 
 /// Exiles cards together face down (CR 406.3, 708.2): linked to `by` when an ability exiled them (CR 607.2a). A face-down
@@ -685,14 +699,16 @@ pub fn create_token_copies(cx: &mut Cx, values: Copiable, controller: PlayerId, 
 }
 
 /// Creates tokens (CR 111.2): each a new object on the battlefield, from no zone.
-/// The effects of resolved spells and abilities on a permanent spell go on applying to the permanent it becomes
-/// (CR 400.7a): a spell whose text was changed is a permanent with that text.
+/// The effects of resolved spells and abilities that change a permanent spell's characteristics go on applying to the
+/// permanent it becomes (CR 400.7a): a spell whose text was changed is a permanent with that text. Only text changes
+/// are carried, the one such effect a spell can have now.
 pub fn carry_effects(cx: &mut Cx, spell: ObjectId, permanent: ObjectId) {
-    let carried: Vec<cantrip_state::ContinuousEffect> = cx.s().effects.iter().filter(|e| e.affected == spell && !e.kind.outlives_affected()).copied().collect();
+    let carries = |e: &cantrip_state::ContinuousEffect| e.affected == spell && matches!(e.kind, EffectKind::ChangeText { .. });
+    let carried: Vec<cantrip_state::ContinuousEffect> = cx.s().effects.iter().filter(|e| carries(e)).copied().collect();
     if carried.is_empty() {
         return;
     }
-    let keep: Vec<bool> = cx.s().effects.iter().map(|e| e.affected != spell || e.kind.outlives_affected()).collect();
+    let keep: Vec<bool> = cx.s().effects.iter().map(|e| !carries(e)).collect();
     cx.st().effects_keep(&keep);
     for e in carried {
         cx.st().effect_push(cantrip_state::ContinuousEffect { affected: permanent, ..e });

@@ -20,22 +20,24 @@ pub fn encode(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let creatures: Vec<ObjectId> =
         g.permanents_of(item.controller).into_iter().filter(|&c| g.chars(c).is(CardType::Creature)).collect();
     if let Some(&creature) = choose::cards(g, item.controller, spell, Purpose::Encode, creatures, 1, true)?.first() {
-        g.exile_with(&[spell], creature, false);
+        g.encode(spell, creature);
     }
     Ok(())
 }
 
-/// The creature this card is encoded on (CR 702.99b): the one it was exiled linked to, while the card is still in exile
-/// and the creature still the permanent it was.
-fn encoded_on(q: &dyn LayerQuery, card: ObjectId) -> Option<ObjectId> {
-    let obj = q.state().obj(card);
-    let link = obj.exiled?;
-    let creature = q.state().obj(link.by);
-    (obj.zone.is(ZoneKind::Exile) && creature.became.is_none() && creature.zone.is(ZoneKind::Battlefield)).then_some(link.by)
+/// The creature this card is encoded on (CR 702.99b, 702.99c): the one cipher exiled it encoded on, while the card is
+/// still in exile and the creature still the permanent it was. A card exiled linked to a creature any other way is not
+/// encoded.
+fn encoded_on(state: &GameState, card: ObjectId) -> Option<ObjectId> {
+    let obj = state.obj(card);
+    let link = obj.exiled.filter(|l| l.encoded)?;
+    let creature = state.obj(link.by);
+    (obj.zone.is(ZoneKind::Exile) && obj.became.is_none() && creature.became.is_none() && creature.zone.is(ZoneKind::Battlefield))
+        .then_some(link.by)
 }
 
 fn affects(view: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Chars) -> bool {
-    encoded_on(view, source) == Some(affected)
+    encoded_on(view.state(), source) == Some(affected)
 }
 
 /// "That creature has" the ability (CR 702.99a, 613.1f): the card's delayed ability 0, an ability of the creature, so
@@ -57,14 +59,15 @@ pub const STATIC: StaticDef = StaticDef {
 };
 
 /// "You may copy the encoded card and you may cast the copy without paying its mana cost" (CR 702.99a, 707.12): the card
-/// encoded on this creature that granted this ability, if it still is. The card stays encoded.
+/// encoded on this creature that granted this ability, if it still is: a creature that has left the battlefield since
+/// the ability triggered has no card encoded on it any more (CR 702.99c). The card stays encoded.
 fn cast_a_copy(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let creature = item.object;
     let encoded = g
         .state()
         .seats()
         .flat_map(|p| g.state().zone(Zone::exile(p)).iter().copied())
-        .find(|&c| g.obj(c).card == item.ability.card && g.obj(c).exiled.is_some_and(|l| l.by == creature));
+        .find(|&c| g.obj(c).card == item.ability.card && encoded_on(g.state(), c) == Some(creature));
     let Some(card) = encoded else { return Ok(()) };
     if !g.could_cast_during_resolution(card) {
         return Ok(());

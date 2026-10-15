@@ -135,6 +135,8 @@ pub struct ExileLink {
     pub from: Zone,
     /// "Until [by] leaves the battlefield" (CR 610.3): it returns as soon as `by` is no longer there.
     pub until_leaves: bool,
+    /// Exiled encoded on `by` by cipher (CR 702.99b): it is encoded on that creature while both stay where they are.
+    pub encoded: bool,
 }
 
 impl Obj {
