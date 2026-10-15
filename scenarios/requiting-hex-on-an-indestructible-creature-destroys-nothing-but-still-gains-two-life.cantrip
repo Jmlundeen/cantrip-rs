@@ -1,0 +1,41 @@
+# Requiting Hex with blight paid, at Bot2's Iron-Shield Elf (mana value 2), which Bot2 makes indestructible in response by discarding a
+# card: "destroy" does nothing to it (CR 702.12b), but the spell still resolves, so "if this spell's additional cost was paid, you gain 2
+# life" still happens. The Elf survives, the counter is on Bot1's Ornithopter and Bot1 is at 22.
+
+[Bot1 Deck]
+Mox Jet
+Ornithopter
+Requiting Hex
+Island x4
+Island x14
+
+[Bot2 Deck]
+Island
+Mox Jet
+Iron-Shield Elf
+Island x4
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Iron-Shield Elf.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Requiting Hex.Cast
+Bot1.Modes(Blight 1)
+Bot1.Target(Bot2.Battlefield.Iron-Shield Elf)
+Bot1.Choose(Ornithopter)
+Bot2.Battlefield.Iron-Shield Elf.Activate
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot1.Battlefield.Ornithopter.Counters.MinusOneMinusOne = 1
+Bot2.Battlefield.Iron-Shield Elf.Keywords = Indestructible
+Bot2.Graveyard = Island

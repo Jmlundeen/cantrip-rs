@@ -1,0 +1,53 @@
+# Dispelling Exhale beholding a Dragon asks {4} (CR 701.4a, 118.12); an opponent who can pay it keeps the spell. Bot2 has
+# {R}{R}{R}{R} after the Bolt - exactly the {4} - and pays it, so the Bolt is not countered and Bot1 takes 3.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Mox Emerald
+Phyrexian Dragon Engine
+Dispelling Exhale
+Kokusho, the Evening Star
+Island x14
+
+[Bot2 Deck]
+Mountain
+Black Lotus
+Lightning Bolt
+Mountain x4
+Mountain x13
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Phyrexian Dragon Engine.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Black Lotus.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mountain#2.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Dispelling Exhale.Cast
+Bot1.Modes(Behold a Dragon)
+Bot1.Target(Stack.Lightning Bolt)
+Bot1.Choose(Phyrexian Dragon Engine)
+Bot2.Pass
+Bot2.PayCost
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 17
+Bot1.Battlefield.Phyrexian Dragon Engine.Tapped = false
+Bot1.Battlefield.Phyrexian Dragon Engine.Counters = (absent)
+Bot1.Graveyard = Dispelling Exhale
+Bot1.Hand = Kokusho, the Evening Star; Island; Island
+Bot1.Revealed = (absent)
+Bot2.Graveyard = Lightning Bolt; Black Lotus

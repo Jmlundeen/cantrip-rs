@@ -232,6 +232,19 @@ impl StateDump {
             d.set(format!("{b}.Mana"), mana);
             let names = |ids: &[ObjectId]| ids.iter().map(|&id| game.name(id).to_string()).collect::<Vec<_>>();
             d.list(&format!("{b}.Hand"), names(s.zone(Zone::hand(p))), false);
+            // Cards this player revealed, in order, from the history (`Event::Revealed`): a beheld card (CR 701.4a), a spliced one.
+            let revealed: Vec<String> = game
+                .history()
+                .all()
+                .iter()
+                .filter_map(|r| match r.event {
+                    Event::Revealed { player, card } if player == p => Some(game.name(card).to_string()),
+                    _ => None,
+                })
+                .collect();
+            if !revealed.is_empty() {
+                d.list(&format!("{b}.Revealed"), revealed, false);
+            }
             d.list(&format!("{b}.Library"), names(s.zone(Zone::library(p))), true);
             let mut graveyard = names(s.zone(Zone::graveyard(p)));
             graveyard.reverse();

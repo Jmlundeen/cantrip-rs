@@ -1,7 +1,8 @@
 # Dispelling Exhale: "As an additional cost to cast this spell, you may behold a Dragon. Counter target spell unless its controller pays {2}.
 # If a Dragon was beheld, counter that spell unless its controller pays {4} instead." Behold is CR 701.4a: choose a Dragon you control (here
 # the Phyrexian Dragon Engine, an artifact creature) or reveal one from your hand; nothing moves, so the Engine stays on the battlefield.
-# Bot2's Black Lotus leaves {R}{R} after the Bolt - enough for {2}, not for {4} - so the Bolt is countered. The twin scenario that casts
+# A Dragon card (Kokusho) is in the hand as well, so the choice is between a permanent and a card; the permanent is chosen and nothing
+# is revealed. Bot2's Black Lotus leaves {R}{R} after the Bolt - enough for {2}, not for {4} - so the Bolt is countered. The twin scenario that casts
 # it without beholding is "...without-beholding-asks-two-and-the-bolt-is-paid-for".
 
 [Bot1 Deck]
@@ -10,7 +11,7 @@ Mox Sapphire
 Mox Emerald
 Phyrexian Dragon Engine
 Dispelling Exhale
-Island
+Kokusho, the Evening Star
 Island x14
 
 [Bot2 Deck]
@@ -48,4 +49,6 @@ Bot1.Life = 20
 Bot1.Battlefield.Phyrexian Dragon Engine.Tapped = false
 Bot1.Battlefield.Phyrexian Dragon Engine.Counters = (absent)
 Bot1.Graveyard = Dispelling Exhale
+Bot1.Hand = Kokusho, the Evening Star; Island; Island
+Bot1.Revealed = (absent)
 Bot2.Graveyard = Lightning Bolt; Black Lotus

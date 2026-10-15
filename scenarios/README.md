@@ -310,6 +310,8 @@ kind, place it where the action could otherwise be taken, with a wait or `BotN.P
   (empty when both are locked), and the mana value they leave it. The Room is named by its unlocked doors (`Unholy Annex`,
   `Unholy Annex // Ritual Chamber`), and by nothing at all when neither is (`Bot1.Battlefield.#1`). A locked door is
   unlocked by `Bot1.Battlefield.Unholy Annex.Activate(Ability: right door)`, a special action paid with the mana abilities that follow.
+- `BotN.Revealed` (present once the player has revealed a card): the cards they revealed, in order, from the history; a beheld
+  card (CR 701.4a) is revealed from a hand, a beheld permanent is not
 - `BotN.Battlefield.<Name>.Tapped` and `.Types` (computed card types, `Land; Creature` for an animated land); for
   creatures also `.Power`, `.Toughness`, `.Damage` and `.SummoningSick`
 - `BotN.Battlefield.<Name>.Token` (`true`) for a token, absent for a card

@@ -1,0 +1,41 @@
+# Requiting Hex: "Destroy target creature with mana value 2 or less." Bot2 has a Phyrexian Dragon Engine (mana value 3) and a Llanowar
+# Elves (mana value 1): the Hex cannot be cast at the Engine (! ... Cast(Engine)) but can at the Elves (the positive control, on the next
+# line), which it destroys; the Engine is untouched.
+
+[Bot1 Deck]
+Mox Jet
+Ornithopter
+Requiting Hex
+Island x4
+Island x14
+
+[Bot2 Deck]
+Mox Emerald
+Black Lotus
+Llanowar Elves
+Phyrexian Dragon Engine
+Island x4
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Phyrexian Dragon Engine.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Requiting Hex.Cast(Bot2.Battlefield.Phyrexian Dragon Engine)
+Bot1.Hand.Requiting Hex.Cast
+Bot1.Modes(Blight 1)
+Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+Bot1.Choose(Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot2.Battlefield = Mox Emerald; Phyrexian Dragon Engine
+Bot2.Graveyard = Llanowar Elves; Black Lotus
