@@ -1,0 +1,45 @@
+# Artificial Evolution changes the text of Minsc & Boo's spell, Hamster to Goblin (CR 612.1, 400.7a): the permanent says
+# "Boo, a legendary 1/1 red Goblin creature token" (CR 612.4) and "If the sacrificed creature was a Goblin, draw X
+# cards". The -2 sacrificing that Goblin Boo draws a card, which a Hamster test would not (Boo is no Hamster).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Mox Jet
+Mox Pearl
+Minsc & Boo, Timeless Heroes
+Mox Sapphire
+Artificial Evolution
+Mountain x13
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Minsc & Boo, Timeless Heroes.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Stack.Minsc & Boo, Timeless Heroes)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Hamster)
+Bot1.Modes(Goblin)
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+[Bot1.Main1]
+? Bot1.Battlefield.Boo.Subtypes = Goblin
+Bot1.Battlefield.Minsc & Boo, Timeless Heroes.Activate(Ability: Sacrifice)
+Bot1.Target(Bot2)
+
+[Expect]
+Bot2.Life = 19
+Bot1.Hand.Count = 1

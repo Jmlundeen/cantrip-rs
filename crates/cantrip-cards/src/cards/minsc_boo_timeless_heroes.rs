@@ -76,7 +76,7 @@ fn damage_and_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Target::Object(sacrificed) = item.subject else { return Ok(()) };
     let chars = g.chars(sacrificed);
     let power = chars.power.unwrap_or(0).max(0) as u16;
-    let hamster = chars.has_subtype(Subtype::Hamster);
+    let hamster = chars.has_subtype(g.words(item.object).subtype(Subtype::Hamster));
     damage_target(g, item, 0, power);
     if hamster {
         g.draw(item.controller, power as u32);
