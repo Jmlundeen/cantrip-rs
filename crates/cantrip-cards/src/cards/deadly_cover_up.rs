@@ -3,7 +3,7 @@ use cantrip_mechanics::{choose, library::{self, Find}, same_name};
 use cantrip_oracle as oracle;
 
 /// "As an additional cost to cast this spell, you may collect evidence 6" (CR 701.59a, 601.2b): announced like any
-/// optional additional cost; the spell is `kicked` when it was paid.
+/// optional additional cost; the spell has `paid` set when it was paid.
 const OPTIONAL_COST: OptionalCost = OptionalCost { cost: Cost { collect_evidence: 6, ..Cost::NONE } };
 
 const LABELS: &[&str] = &["Cast without collecting evidence", "Collect evidence 6"];
@@ -21,7 +21,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     let creatures: Vec<ObjectId> = g.state().battlefield().iter().copied().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
     g.destroy_all(&creatures);
-    if item.kicked == 0 {
+    if item.paid == 0 {
         return Ok(());
     }
     let opponents: Vec<PlayerId> = g.state().opponents(you).collect();
