@@ -2,7 +2,7 @@ use cantrip_api::*;
 use cantrip_oracle as oracle;
 
 fn forest_you_control(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
-    q.chars(id).has_subtype(Subtype::Forest) && q.controller(id) == asker.controller
+    q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Forest)) && q.controller(id) == asker.controller
 }
 
 /// "Add three mana in any combination of {R} and/or {G}" (CR 106.1b): each mana is a color of its own choosing.
