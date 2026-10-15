@@ -1,0 +1,33 @@
+# Trait Doctoring replaces the basic land type Forest with Swamp in Yavimaya's text until end of turn (CR 612.1), so
+# "Each land is a Forest in addition to its other land types" says Swamp: Bot2's Island is a Swamp, not a Forest, and
+# Yavimaya taps for {B} (CR 305.6). Yavimaya is still called Yavimaya, Cradle of Growth (CR 612.2).
+
+[Bot1 Deck]
+Island
+Yavimaya, Cradle of Growth
+Trait Doctoring
+Island x13
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Yavimaya, Cradle of Growth.Play
+? Bot2.Battlefield.Island.Subtypes = Forest; Island
+Bot1.Battlefield.Island.Activate(Ability: Add {U})
+Bot1.Hand.Trait Doctoring.Cast(Yavimaya, Cradle of Growth)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Replace a basic land type)
+Bot1.Modes(Forest)
+Bot1.Modes(Swamp)
+Bot1.Battlefield.Yavimaya, Cradle of Growth.Activate
+? Bot1.Mana = {B}
+
+[Expect]
+Bot2.Battlefield.Island.Subtypes = Island; Swamp
+Bot1.Battlefield.Yavimaya, Cradle of Growth.Subtypes = Swamp
