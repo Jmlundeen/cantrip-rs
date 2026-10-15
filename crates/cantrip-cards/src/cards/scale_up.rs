@@ -8,10 +8,11 @@ use cantrip_oracle as oracle;
 /// color (CR 105.3); the base power and toughness are set in layer 7b (CR 613.4b), so counters and pumps count on top.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
+    let words = g.words(item.object);
     let creatures = overload::affected(g, item, |chars, controller| chars.is(CardType::Creature) && controller == you);
     for creature in creatures {
-        g.add_effect(item.object, creature, EffectKind::SetCreatureType(Subtype::Wurm), Duration::EndOfTurn);
-        g.add_effect(item.object, creature, EffectKind::SetColors(ColorSet::of(Color::Green)), Duration::EndOfTurn);
+        g.add_effect(item.object, creature, EffectKind::SetCreatureType(words.subtype(Subtype::Wurm)), Duration::EndOfTurn);
+        g.add_effect(item.object, creature, EffectKind::SetColors(words.colors(ColorSet::of(Color::Green))), Duration::EndOfTurn);
         g.add_effect(item.object, creature, EffectKind::SetPt(6, 4), Duration::EndOfTurn);
     }
     Ok(())

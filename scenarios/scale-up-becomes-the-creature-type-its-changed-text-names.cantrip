@@ -1,0 +1,41 @@
+# Artificial Evolution changes the text of Scale Up on the stack, Wurm to Goblin (CR 612.1): "target creature you
+# control becomes a green Goblin with base power and toughness 6/4", so Llanowar Elves ends up a Goblin, not a Wurm.
+# The color word green is untouched, and the text change is made before Scale Up resolves.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Sapphire
+Llanowar Elves
+Scale Up
+Artificial Evolution
+Island
+Island x8
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Scale Up.Cast(Llanowar Elves)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Stack.Scale Up)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Wurm)
+Bot1.Modes(Goblin)
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Battlefield.Llanowar Elves.Subtypes = Goblin
+Bot1.Battlefield.Llanowar Elves.Colors = Green
+Bot1.Battlefield.Llanowar Elves.Power = 6
+Bot1.Battlefield.Llanowar Elves.Toughness = 4
