@@ -8,8 +8,8 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-fn mountain(q: &dyn Query, _: &Asker, id: ObjectId) -> bool {
-    q.chars(id).has_subtype(Subtype::Mountain)
+fn mountain(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
+    q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Mountain))
 }
 
 /// "If it's your turn" (CR 118.9): the alternative cost may be paid only on its caster's own turn.
