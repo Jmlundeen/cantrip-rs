@@ -1,0 +1,42 @@
+# Artificial Evolution changes the text of Seasoned Dungeoneer, Warrior to Goblin (CR 612.1). It is a Human Goblin now
+# (the type line follows the text), so when it attacks, its trigger's "target attacking Cleric, Rogue, Goblin, or
+# Wizard" can target it: it explores (CR 701.44) and the land on top of the library goes to Bot1's hand. Read as
+# printed, no creature would be a legal target and the trigger would do nothing.
+
+[Bot1 Deck]
+Seasoned Dungeoneer
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Artificial Evolution
+Island
+Island
+Island x9
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Seasoned Dungeoneer.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Seasoned Dungeoneer)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Warrior)
+Bot1.Modes(Goblin)
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Seasoned Dungeoneer.Subtypes = Goblin; Human
+? Bot1.Hand.Count = 3
+Bot1.Attack(Seasoned Dungeoneer > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Hand.Count = 4

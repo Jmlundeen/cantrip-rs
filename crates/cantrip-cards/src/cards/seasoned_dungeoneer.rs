@@ -8,7 +8,8 @@ fn attacking_party_member(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     (targets::CREATURE.filter)(q, asker, t)
         && matches!(t, Target::Object(id) if q.is_attacking(id) && {
             let c = q.chars(id);
-            [Subtype::Cleric, Subtype::Rogue, Subtype::Warrior, Subtype::Wizard].iter().any(|&s| c.has_subtype(s))
+            let words = q.words(asker.source);
+            [Subtype::Cleric, Subtype::Rogue, Subtype::Warrior, Subtype::Wizard].iter().any(|&s| c.has_subtype(words.subtype(s)))
         })
 }
 
