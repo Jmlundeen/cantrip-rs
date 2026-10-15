@@ -1,0 +1,57 @@
+# CR 106.6, 118.12: The Mightstone and Weakstone's {C}{C} "can't be spent to cast nonartifact spells"; paying the "unless its
+# controller pays {2}" of Bot2's Lose Focus is not casting a spell, so it may. Turn 3: Bot1 casts Lightning Bolt (not an artifact) with a Mox
+# Ruby, Bot2 responds with Lose Focus and Bot1 pays the {2} with the Mightstone's restricted {C}{C} (the Moxen stay
+# untapped), so the Bolt resolves. Its twin with Mishra's Workshop, whose mana is for artifact spells only, is
+# mishras-workshop-mana-cannot-pay-an-unless-its-controller-pays-cost.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mox Ruby
+The Mightstone and Weakstone
+Lightning Bolt
+Island x13
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Lose Focus
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Battlefield.Mox Ruby#4.Activate
+Bot1.Battlefield.Mox Ruby#5.Activate
+Bot1.Hand.The Mightstone and Weakstone.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.The Mightstone and Weakstone.Activate
+? Bot1.Mana = {C}{C} (NotNonartifactSpells)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Lose Focus.Cast(Stack.Lightning Bolt)
+Bot1.Pass
+Bot1.PayCost
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Mox Ruby#2.Tapped = false
+Bot2.Graveyard = Lose Focus

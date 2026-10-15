@@ -17,6 +17,7 @@ pub static CARD: CardDef = CardDef {
             mana: Some(add_one_of_any_color),
             any_color: true,
             adds_any: 1,
+            restricted: Some(ManaRestriction::LegendaryUncounterable),
             ..ActivatedDef::BLANK
         }),
     ],

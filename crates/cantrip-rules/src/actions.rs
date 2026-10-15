@@ -850,12 +850,12 @@ pub struct Available {
     consume: u32,
     /// The permanents that change what things cost.
     changers: Vec<ObjectId>,
-    /// Restricted mana in the pool that pays for artifact spells only (CR 106.6).
-    artifact_only: [u8; 6],
-    /// Restricted mana in the pool that pays for instant and sorcery spells only (CR 106.6).
-    instant_only: [u8; 6],
-    /// Of that, what is not limited to spells (CR 106.6): it pays for an ability too.
-    ability_ok: [u8; 6],
+    /// Restricted mana the pool and the one-ability mana sources hold, by `ManaRestriction` (CR 106.6): each kind pays
+    /// only what `Available::covers_spell` and `covers_ability` say it may. Mana that pays anything (`GainsHaste`) is in
+    /// `fixed`.
+    restricted: [[u8; 6]; ManaRestriction::COUNT],
+    /// Of the same, mana of any one color a mana ability adds (Great Hall of the Biblioplex, Delighted Halfling).
+    restricted_flex: [u32; ManaRestriction::COUNT],
 }
 
 pub fn available(cx: &Cx, player: PlayerId) -> Available {
@@ -866,17 +866,12 @@ pub fn available(cx: &Cx, player: PlayerId) -> Available {
 /// tapped for mana to pay it (CR 602.2b, 605.3b).
 fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Available {
     let mut fixed = cx.s().player(player).pool.0;
-    for r in [ManaRestriction::GainsHaste, ManaRestriction::LegendaryUncounterable] {
-        for m in 0..6 {
-            fixed[m] += cx.s().player(player).restricted[r as usize].0[m];
-        }
-    }
-    let mut artifact_only = cx.s().player(player).restricted[ManaRestriction::NotNonartifactSpells as usize].0;
-    let mut ability_ok = artifact_only;
+    let mut restricted = cx.s().player(player).restricted.map(|pool| pool.0);
+    // Mana that pays anything is not a limit (CR 106.6): it is spent as ordinary mana is.
     for m in 0..6 {
-        artifact_only[m] += cx.s().player(player).restricted[ManaRestriction::ArtifactSpells as usize].0[m];
+        fixed[m] += std::mem::take(&mut restricted[ManaRestriction::GainsHaste as usize][m]);
     }
-    let mut instant_only = cx.s().player(player).restricted[ManaRestriction::InstantOrSorcerySpells as usize].0;
+    let mut restricted_flex = [0u32; ManaRestriction::COUNT];
     let mut flex: u32 = 0;
     let mut consume: u32 = 0;
     // Mana abilities of the player's own (CR 605.1a): paid with life, as often as the life total allows (CR 119.4).
@@ -916,7 +911,7 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
             spent = spent.max(def.cost.mana.mana_value());
             widest = widest.max(def.adds.0.iter().map(|&n| n as u32).sum::<u32>() + def.adds_any as u32);
             if def.adds.0.iter().all(|&n| n == 0) && def.adds_any == 0 {
-                return Available { fixed, flex, consume: 0, unknown: true, changers: cost_change_sources(cx), artifact_only, instant_only, ability_ok };
+                return Available { fixed, flex, consume: 0, unknown: true, changers: cost_change_sources(cx), restricted, restricted_flex };
             }
         }
         if count > 0 {
@@ -924,17 +919,17 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
         }
         match (count, only) {
             (0, _) => {}
-            (1, Some(def)) if def.restricted.is_some() => {
+            (1, Some(def)) if def.restricted == Some(ManaRestriction::GainsHaste) => {
                 for m in 0..6 {
-                    if def.restricted == Some(ManaRestriction::InstantOrSorcerySpells) {
-                        instant_only[m] += def.adds.0[m];
-                        continue;
-                    }
-                    artifact_only[m] += def.adds.0[m];
-                    if def.restricted == Some(ManaRestriction::NotNonartifactSpells) {
-                        ability_ok[m] += def.adds.0[m];
-                    }
+                    fixed[m] += def.adds.0[m];
                 }
+                flex += def.adds_any as u32;
+            }
+            (1, Some(def)) if let Some(kind) = def.restricted => {
+                for m in 0..6 {
+                    restricted[kind as usize][m] += def.adds.0[m];
+                }
+                restricted_flex[kind as usize] += def.adds_any as u32;
             }
             (1, Some(def)) => {
                 for m in 0..6 {
@@ -945,42 +940,66 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
             _ => flex += widest,
         }
     }
-    Available { fixed, flex, consume, unknown: false, changers: cost_change_sources(cx), artifact_only, instant_only, ability_ok }
+    Available { fixed, flex, consume, unknown: false, changers: cost_change_sources(cx), restricted, restricted_flex }
+}
+
+/// What a spell is, as far as the mana limited to some spells is concerned (CR 106.6).
+#[derive(Clone, Copy)]
+pub struct SpellKind {
+    pub artifact: bool,
+    pub instant_or_sorcery: bool,
+    pub legendary: bool,
+}
+
+/// The kind of spell a card or face is when cast.
+fn spell_kind(def: &CardDef) -> SpellKind {
+    SpellKind {
+        artifact: def.is(CardType::Artifact),
+        instant_or_sorcery: def.is(CardType::Instant) || def.is(CardType::Sorcery),
+        legendary: def.supertypes.legendary,
+    }
 }
 
 impl Available {
-    /// Whether `cost` could be paid for a spell of this kind: restricted mana in the pool that may pay for artifact
-    /// spells counts for one (CR 106.6).
-    pub fn covers_spell(&self, cost: &ManaCost, artifact: bool, instant_or_sorcery: bool) -> bool {
-        let mut extra = [0u8; 6];
-        for m in 0..6 {
-            if artifact {
-                extra[m] += self.artifact_only[m];
-            }
-            if instant_or_sorcery {
-                extra[m] += self.instant_only[m];
-            }
-        }
-        if extra.iter().any(|&n| n > 0) {
-            let mut with = Available { fixed: self.fixed, flex: self.flex, consume: self.consume, unknown: self.unknown, changers: Vec::new(), artifact_only: [0; 6], instant_only: [0; 6], ability_ok: [0; 6] };
+    /// This with the restricted mana of the given kinds added to what any spell or ability may spend.
+    fn with_restricted(&self, kinds: &[ManaRestriction]) -> Available {
+        let mut with = Available {
+            fixed: self.fixed,
+            flex: self.flex,
+            consume: self.consume,
+            unknown: self.unknown,
+            changers: Vec::new(),
+            restricted: [[0; 6]; ManaRestriction::COUNT],
+            restricted_flex: [0; ManaRestriction::COUNT],
+        };
+        for &kind in kinds {
             for m in 0..6 {
-                with.fixed[m] += extra[m];
+                with.fixed[m] += self.restricted[kind as usize][m];
             }
-            return with.covers(cost);
+            with.flex += self.restricted_flex[kind as usize];
         }
-        self.covers(cost)
+        with
+    }
+
+    /// Whether `cost` could be paid for a spell of this kind: restricted mana that may be spent on a spell like it counts
+    /// (CR 106.6, 601.2g).
+    pub fn covers_spell(&self, cost: &ManaCost, kind: SpellKind) -> bool {
+        let mut kinds = Vec::new();
+        if kind.artifact {
+            kinds.extend([ManaRestriction::NotNonartifactSpells, ManaRestriction::ArtifactSpells]);
+        }
+        if kind.instant_or_sorcery {
+            kinds.push(ManaRestriction::InstantOrSorcerySpells);
+        }
+        if kind.legendary {
+            kinds.push(ManaRestriction::LegendaryUncounterable);
+        }
+        self.with_restricted(&kinds).covers(cost)
     }
 
     /// Whether `cost` could be paid for an ability: restricted mana that is not limited to spells counts.
     pub fn covers_ability(&self, cost: &ManaCost) -> bool {
-        if self.ability_ok.iter().any(|&n| n > 0) {
-            let mut with = Available { fixed: self.fixed, flex: self.flex, consume: self.consume, unknown: self.unknown, changers: Vec::new(), artifact_only: [0; 6], instant_only: [0; 6], ability_ok: [0; 6] };
-            for m in 0..6 {
-                with.fixed[m] += self.ability_ok[m];
-            }
-            return with.covers(cost);
-        }
-        self.covers(cost)
+        self.with_restricted(&[ManaRestriction::NotNonartifactSpells]).covers(cost)
     }
 
     /// Whether `cost` could be paid with it (advice, CR 601.2g).
@@ -1476,7 +1495,7 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
                     let mut option = ActionOption::on(ActionKind::CastSpell, id, way);
                     if {
                         let a = available.get_or_init(|| self::available(cx, player));
-                        a.covers_spell(&least_cost(cx, a, player, id, half, half.cost), half.is(CardType::Artifact), half.is(CardType::Instant) || half.is(CardType::Sorcery))
+                        a.covers_spell(&least_cost(cx, a, player, id, half, half.cost), spell_kind(half))
                     } && offer_spell(cx, &asker, half, &mut option)
                     {
                         options.push(option);
@@ -1493,7 +1512,7 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
                 let mut option = ActionOption::on(ActionKind::CastSpell, id, WAY_BACK_FACE);
                 if {
                     let a = available.get_or_init(|| self::available(cx, player));
-                    a.covers_spell(&least_cost(cx, a, player, id, back, back.cost), back.is(CardType::Artifact), back.is(CardType::Instant) || back.is(CardType::Sorcery))
+                    a.covers_spell(&least_cost(cx, a, player, id, back, back.cost), spell_kind(back))
                 } && offer_spell(cx, &asker, back, &mut option)
                 {
                     options.push(option);
@@ -1508,7 +1527,7 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
                 let mut option = ActionOption::on(ActionKind::CastSpell, id, WAY_BESTOW);
                 if {
                     let a = available.get_or_init(|| self::available(cx, player));
-                    a.covers_spell(&least_cost(cx, a, player, id, bestow, bestow.cost), bestow.is(CardType::Artifact), bestow.is(CardType::Instant) || bestow.is(CardType::Sorcery))
+                    a.covers_spell(&least_cost(cx, a, player, id, bestow, bestow.cost), spell_kind(bestow))
                 } && offer_spell(cx, &asker, bestow, &mut option)
                 {
                     options.push(option);
@@ -1523,7 +1542,7 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
                 let mut option = ActionOption::on(ActionKind::CastSpell, id, WAY_ADVENTURE);
                 if {
                     let a = available.get_or_init(|| self::available(cx, player));
-                    a.covers_spell(&least_cost(cx, a, player, id, adventure, adventure.cost), adventure.is(CardType::Artifact), adventure.is(CardType::Instant) || adventure.is(CardType::Sorcery))
+                    a.covers_spell(&least_cost(cx, a, player, id, adventure, adventure.cost), spell_kind(adventure))
                 } && offer_spell(cx, &asker, adventure, &mut option)
                 {
                     options.push(option);
@@ -1611,7 +1630,7 @@ fn has_mana_source(cx: &Cx, id: ObjectId, player: PlayerId) -> bool {
 fn covers_total(cx: &Cx, a: &Available, player: PlayerId, card: ObjectId, def: &CardDef, cost: ManaCost, exiled: u8) -> bool {
     let no_mana = def.keywords.has(Keyword::CantSpendManaToCast);
     if !def.pay_with.any() && !no_mana {
-        return a.covers_spell(&cost, def.is(CardType::Artifact), def.is(CardType::Instant) || def.is(CardType::Sorcery));
+        return a.covers_spell(&cost, spell_kind(def));
     }
     let mut cost = cost;
     let mut creatures: Vec<ColorSet> = Vec::new();
@@ -1635,7 +1654,7 @@ fn covers_total(cx: &Cx, a: &Available, player: PlayerId, card: ObjectId, def: &
     }
     cost = convoked(&cost, &creatures);
     cost.generic = cost.generic.saturating_sub(generic.min(255) as u8);
-    if no_mana { cost.is_zero() } else { a.covers_spell(&cost, def.is(CardType::Artifact), def.is(CardType::Instant) || def.is(CardType::Sorcery)) }
+    if no_mana { cost.is_zero() } else { a.covers_spell(&cost, spell_kind(def)) }
 }
 
 /// The text an option is matched by: an alternative cost's or an ability's.

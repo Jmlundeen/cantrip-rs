@@ -1,0 +1,36 @@
+# CR 106.6, 118.12: Mishra's Workshop's {C}{C}{C} may be spent only to cast artifact spells, and paying the "unless its
+# controller pays {2}" of Bot2's Lose Focus is not casting one. Turn 3: Bot1 casts Sol Ring with one of the Workshop's {C}
+# (an artifact spell, which it may pay), leaving {C}{C} floating; Bot2 responds with Lose Focus and paying {2} is not
+# offered, so Sol Ring is countered. The Mightstone's mana, which may pay, is in
+# the-mightstone-and-weakstone-mana-pays-an-unless-its-controller-pays-cost.
+
+[Bot1 Deck]
+Mishra's Workshop
+Sol Ring
+Island x15
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Lose Focus
+Island x15
+
+[Actions]
+Bot1.Hand.Mishra's Workshop.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mishra's Workshop.Activate
+? Bot1.Mana = {C}{C}{C} (ArtifactSpells)
+Bot1.Hand.Sol Ring.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Lose Focus.Cast(Stack.Sol Ring)
+Bot1.Pass
+! Bot1.PayCost
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Sol Ring
+Bot2.Graveyard = Lose Focus

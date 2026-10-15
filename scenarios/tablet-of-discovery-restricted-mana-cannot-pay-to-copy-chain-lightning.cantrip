@@ -1,0 +1,44 @@
+# CR 106.6, 707.10: Chain Lightning's "that player may pay {R}{R}" is not casting a spell, so Tablet of Discovery's restricted
+# {R}{R} cannot pay it. Bot2 taps the Tablet in response to Bot1's Chain Lightning (its Mox Rubies are tapped from paying
+# for the Tablet), takes 3, and is not offered paying to copy it. With the Mountains of
+# chain-lightning-pays-to-copy-it-back-at-its-caster as the positive control.
+
+[Bot1 Deck]
+Mountain
+Chain Lightning
+Mountain x18
+
+[Bot2 Deck]
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Tablet of Discovery
+Island x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Ruby#2.Activate
+Bot2.Battlefield.Mox Ruby#3.Activate
+Bot2.Hand.Tablet of Discovery.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Chain Lightning.Cast(Bot2)
+Bot2.Battlefield.Tablet of Discovery.Activate(Ability: Spend)
+Bot1.Pass
+? Bot2.Mana = {R}{R} (InstantOrSorcerySpells)
+! Bot2.PayCost
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Graveyard = Chain Lightning
+Stack.Count = 0

@@ -1,0 +1,28 @@
+# CR 106.6: Delighted Halfling's restricted {R} is the only mana Bot1 has on turn 3 (the Forests are not tapped), so a
+# Lightning Bolt cannot be cast with it and is not offered (the advice does not count mana that cannot pay for the spell),
+# while Ragavan, Nimble Pilferer, a legendary {R} creature, is the positive control and is cast with it.
+
+[Bot1 Deck]
+Forest
+Delighted Halfling
+Lightning Bolt
+Ragavan, Nimble Pilferer
+Forest
+Forest x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Delighted Halfling.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Delighted Halfling.Activate(Ability: any color; Color: Red)
+? Bot1.Mana = {R} (LegendarySpells, CantBeCountered)
+! Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Hand.Ragavan, Nimble Pilferer.Cast
+
+[Expect]
+Bot1.Battlefield = Delighted Halfling; Forest; Ragavan, Nimble Pilferer
+Bot2.Life = 20
