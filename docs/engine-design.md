@@ -301,8 +301,7 @@ Known gaps:
   (Humility) would remove it, though CR 709.5e says the unlock is not an ability; a copy effect's "except its name is X"
   is overwritten by `layers::doors`, which names a Room by its unlocked doors; `resolve_copy_as_token` drops the copy
   exceptions of a Room spell's copy; a granted cast from a graveyard (Serra Paragon) is judged on the whole Room card, mana
-  value 8, never on a door (Known bug scenario `serra-paragon-casts-either-door-of-a-room-in-the-graveyard`); and a card
-  name chosen for a Room may be the combined name, where CR 709.4a allows only one of its two names.
+  value 8, never on a door (Known bug scenario `serra-paragon-casts-either-door-of-a-room-in-the-graveyard`).
 
 ## Open questions
 
