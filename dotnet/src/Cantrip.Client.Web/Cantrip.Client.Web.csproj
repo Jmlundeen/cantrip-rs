@@ -28,7 +28,7 @@
 
     <!-- The splash shown while the page loads: the Cantrip image at the repository root, centred on its own colour, at the
          size the default splash was drawn at. -->
-    <UnoSplashScreenFile>$(MSBuildThisFileDirectory)..\..\cantrip.png</UnoSplashScreenFile>
+    <UnoSplashScreenFile>$(MSBuildThisFileDirectory)..\..\..\cantrip.png</UnoSplashScreenFile>
     <UnoSplashScreenBaseSize>300,300</UnoSplashScreenBaseSize>
     <UnoSplashScreenColor>#1C0433</UnoSplashScreenColor>
   </PropertyGroup>
