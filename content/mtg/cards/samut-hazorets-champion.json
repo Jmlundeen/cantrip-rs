@@ -1,0 +1,8 @@
+{
+  "name": "Samut, Hazoret's Champion",
+  "manaCost": "{1}{R}",
+  "type": "Legendary Creature — Human Warrior Cleric",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Creatures you control have haste."
+}

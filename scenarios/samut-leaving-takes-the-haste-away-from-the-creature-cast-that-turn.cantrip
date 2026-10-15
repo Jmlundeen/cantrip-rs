@@ -1,0 +1,40 @@
+# Samut's haste is a static ability, so it lasts only while he is on the battlefield. Bot1 casts Llanowar Elves, then Samut, then
+# exiles Samut with its own Swords to Plowshares: the Elves, cast this turn, no longer have haste and cannot attack (CR 302.6): the engine asks nothing when no creature may attack, so it is read off the state (summoning sick,
+# no keywords) at the end of the turn.
+# Control: samut-gives-haste-to-its-controllers-creatures-and-itself-but-not-the-opponents has the same Elves attacking with him.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Mox Jet
+Samut, Hazoret's Champion
+Llanowar Elves
+Swords to Plowshares
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Samut, Hazoret's Champion.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Swords to Plowshares.Cast(Samut, Hazoret's Champion)
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Exile = Samut, Hazoret's Champion
+Bot1.Life = 22
+Bot1.Battlefield.Llanowar Elves.Keywords = (absent)
+Bot1.Battlefield.Llanowar Elves.SummoningSick = true
