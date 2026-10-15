@@ -1,0 +1,6 @@
+{
+  "name": "Shoot the Sheriff",
+  "manaCost": "{1}{B}",
+  "type": "Instant",
+  "oracleText": "Destroy target non-outlaw creature. (Assassins, Mercenaries, Pirates, Rogues, and Warlocks are outlaws. Everyone else is fair game.)"
+}

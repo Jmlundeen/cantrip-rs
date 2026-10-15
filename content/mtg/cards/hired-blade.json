@@ -1,0 +1,11 @@
+{
+  "name": "Hired Blade",
+  "manaCost": "{2}{B}",
+  "type": "Creature — Human Assassin",
+  "power": 3,
+  "toughness": 2,
+  "oracleText": "Flash (You may cast this spell any time you could cast an instant.)",
+  "keywords": [
+    "Flash"
+  ]
+}

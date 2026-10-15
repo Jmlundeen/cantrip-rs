@@ -1,0 +1,38 @@
+# Shoot the Sheriff says nothing about regeneration, so it can be regenerated (CR 701.8, 701.19): Bot2 makes a shield for
+# Llanowar Elves with Yavimaya Hollow in response and the destruction is replaced; the Elves stay, tapped.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Shoot the Sheriff
+Swamp x14
+
+[Bot2 Deck]
+Yavimaya Hollow
+Mox Emerald
+Mox Emerald
+Llanowar Elves
+Forest x14
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Yavimaya Hollow.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Shoot the Sheriff.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot2.Battlefield.Yavimaya Hollow.Activate(Bot2.Battlefield.Llanowar Elves; Ability: Regenerate)
+Bot2.Battlefield.Mox Emerald.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Shoot the Sheriff
+Bot2.Battlefield.Llanowar Elves.Tapped = true
+Bot2.Graveyard.Count = 0
+Stack.Count = 0

@@ -1,0 +1,11 @@
+{
+  "name": "Misshapen Fiend",
+  "manaCost": "{1}{B}",
+  "type": "Creature — Horror Mercenary",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "Flying",
+  "keywords": [
+    "Flying"
+  ]
+}

@@ -1,0 +1,52 @@
+# Outlaws also include Assassins (Hired Blade, Human Assassin) and Warlocks (Sedgemoor Witch, Human Warlock): both are
+# refused as targets while Ornithopter beside them, sharing none of the five types, is the legal one. Shoot the Sheriff
+# is an instant: Bot1 casts it during Bot2's turn 4, after Bot2 has cast the Witch.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Shoot the Sheriff
+Swamp x14
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Hired Blade
+Sedgemoor Witch
+Ornithopter
+Swamp
+Swamp x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Hired Blade.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Swamp#2.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Sedgemoor Witch.Cast
+[T4 Bot2.Main2]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+! Bot1.Hand.Shoot the Sheriff.Cast(Bot2.Battlefield.Hired Blade)
+! Bot1.Hand.Shoot the Sheriff.Cast(Bot2.Battlefield.Sedgemoor Witch)
+! Bot1.Hand.Shoot the Sheriff.Cast(Bot2.Battlefield.Mox Jet)
+Bot1.Hand.Shoot the Sheriff.Cast(Bot2.Battlefield.Ornithopter)
+
+[Expect]
+Turn = 4
+Bot2.Battlefield = Swamp; Swamp; Mox Jet; Mox Ruby; Hired Blade; Sedgemoor Witch
+Bot2.Graveyard = Ornithopter
+Stack.Count = 0
