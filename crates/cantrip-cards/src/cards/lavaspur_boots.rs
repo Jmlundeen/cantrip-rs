@@ -1,13 +1,9 @@
 use cantrip_api::*;
-use cantrip_mechanics::{attach::{attached_object, equip}, triggers::ward};
+use cantrip_mechanics::{attach::{attached_object, equip}, statics::have_haste, triggers::ward};
 use cantrip_oracle as oracle;
 
 fn plus_one_power(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.power = chars.power.map(|v| v + 1);
-}
-
-fn haste(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.keywords = chars.keywords.with(Keyword::Haste);
 }
 
 /// The equipped creature has ward {1} (CR 702.21a): the Boots' own delayed ability 0, a triggered ability that the
@@ -35,7 +31,7 @@ pub static CARD: CardDef = CardDef {
             text: "Equipped creature has haste.",
             layer: Layer::Ability,
             affects: attached_object,
-            apply: haste,
+            apply: have_haste,
             ..StaticDef::BLANK
         },
         StaticDef {

@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::statics::have_haste;
 use cantrip_oracle as oracle;
 
 /// Creatures its owner controls, while the owner controls a Mountain. The source functions only from the graveyard
@@ -12,16 +13,12 @@ fn affects(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Ch
     state.battlefield().iter().any(|&id| state.obj(id).controller == you && q.chars(id).has_subtype(q.words(source).subtype(Subtype::Mountain)))
 }
 
-fn apply(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.keywords = chars.keywords.with(Keyword::Haste);
-}
-
 pub static CARD: CardDef = CardDef {
     statics: &[StaticDef {
         text: "As long as this card is in your graveyard and you control a Mountain, creatures you control have haste.",
         layer: Layer::Ability,
         affects,
-        apply,
+        apply: have_haste,
         from: ZoneKind::Graveyard,
         ..StaticDef::BLANK
     }],

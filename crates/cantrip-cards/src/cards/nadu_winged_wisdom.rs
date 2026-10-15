@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::top_of_library;
+use cantrip_mechanics::{statics::your_creatures, top_of_library};
 use cantrip_oracle as oracle;
 
 /// "Whenever this creature becomes the target of a spell or ability" (CR 115.1): anyone's, its controller's own included.
@@ -22,11 +22,6 @@ fn reveal_top(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         g.return_to_hand(&[top]);
     }
     Ok(())
-}
-
-/// Creatures you control, Nadu itself among them: "creatures you control have ..." is not "other".
-fn your_creatures(view: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool {
-    so_far.is(CardType::Creature) && view.state().obj(affected).controller == view.state().obj(source).controller
 }
 
 /// Gives the creature Nadu's own delayed ability 0 (CR 613.1f). The creature is the ability's source, so the limit of

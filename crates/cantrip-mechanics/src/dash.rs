@@ -21,16 +21,12 @@ fn dashed(view: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Chars
     affected == source && view.state().obj(source).cast_way == 1
 }
 
-fn give_haste(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.keywords = chars.keywords.with(Keyword::Haste);
-}
-
 /// "If this permanent's dash cost was paid, it has haste", read on every pass.
 pub const HASTE: StaticDef = StaticDef {
     text: "As long as this permanent's dash cost was paid, it has haste.",
     layer: Layer::Ability,
     affects: dashed,
-    apply: give_haste,
+    apply: crate::statics::have_haste,
     ..StaticDef::BLANK
 };
 

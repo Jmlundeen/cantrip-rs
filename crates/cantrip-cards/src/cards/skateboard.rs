@@ -1,5 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::attach::{attached_object, equip};
+use cantrip_mechanics::statics::have_haste;
 use cantrip_mechanics::targets;
 use cantrip_mechanics::triggers::this_enters;
 use cantrip_oracle as oracle;
@@ -14,10 +15,6 @@ fn tap_target(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 fn plus_one_power(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.power = chars.power.map(|v| v + 1);
-}
-
-fn gains_haste(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.keywords = chars.keywords.with(Keyword::Haste);
 }
 
 pub static CARD: CardDef = CardDef {
@@ -44,7 +41,7 @@ pub static CARD: CardDef = CardDef {
             text: "Equipped creature has haste.",
             layer: Layer::Ability,
             affects: attached_object,
-            apply: gains_haste,
+            apply: have_haste,
             ..StaticDef::BLANK
         },
     ],
