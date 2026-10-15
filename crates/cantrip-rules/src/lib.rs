@@ -1050,6 +1050,10 @@ impl cantrip_api::Game for Cx<'_> {
         actions::cast_during_resolution(self, card, CastTerms { instead, ..Default::default() }).map_err(|_| Suspend)
     }
 
+    fn cast_ways_during_resolution(&self, card: ObjectId) -> Vec<CastWay> {
+        actions::cast_ways_during_resolution(self, card)
+    }
+
     fn cast_during_resolution_as(&mut self, card: ObjectId, terms: CastTerms) -> Result<bool, Suspend> {
         actions::cast_during_resolution(self, card, terms).map_err(|_| Suspend)
     }

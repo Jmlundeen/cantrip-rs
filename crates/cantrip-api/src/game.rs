@@ -56,6 +56,23 @@ pub struct CastTerms {
     /// Cast a copy of the card, which stays where it is (CR 707.12, 702.170a): the copy is a card_copy in the same zone, and
     /// ceases to exist when it leaves the stack or the cast is given up.
     pub copy: bool,
+    /// The way it is cast (CR 709.3, 715.3, 712.8a): one of `CastWay::way` from `cast_ways_during_resolution`, for a card that
+    /// can be cast as a half, its Adventure or its back face. Left out, a card with one way is cast that way and one with
+    /// several asks its caster which, as they choose it as they cast it.
+    pub way: Option<u8>,
+}
+
+/// One way a card could be cast as an effect resolves (CR 608.2g): the card as itself, one half of a split card (CR 709.3),
+/// its Adventure (CR 715.3) or the back face of a modal double-faced card (CR 712.8a). Only that face is evaluated to see if
+/// it can be cast (CR 709.3a, 715.3a, 712.8a) and only it is on the stack (CR 709.3b), so its mana value is the spell's.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct CastWay {
+    /// What `CastTerms::way` names.
+    pub way: u8,
+    /// The face that would be cast.
+    pub face: CardId,
+    /// Its mana value as the spell on the stack: the printed cost's, an X in it being 0 (CR 107.3b).
+    pub mana_value: u32,
 }
 
 /// Whether a spell or ability controlled by `causer` may cause `player` to discard (or, with `sacrifice`, to sacrifice)
@@ -547,6 +564,11 @@ pub trait Game: Query {
     /// The same, with terms (CR 608.2g): mana of any type may pay for it, an instant or sorcery is exiled instead of
     /// going to a graveyard.
     fn cast_during_resolution_as(&mut self, card: ObjectId, terms: CastTerms) -> Result<bool, Suspend>;
+    /// Each way the resolving effect's controller could cast `card` now (CR 608.2g), the faces it offers judged one at a time
+    /// (CR 709.3a, 715.3a): a split card's halves, an aftermath half only from a graveyard (CR 702.127a); an Adventurer as itself
+    /// and as its Adventure; a modal double-faced card's two faces. Fuse is no way here: it applies in a hand only
+    /// (CR 702.102a). Empty when `could_cast_during_resolution` is false.
+    fn cast_ways_during_resolution(&self, card: ObjectId) -> Vec<CastWay>;
     /// `player` may play or cast `card` from where it is (CR 601.3, 305.1) under `grant`: a card in exile or a
     /// graveyard, a new object after a move (CR 400.7), so the permission is for this object only.
     fn allow_play(&mut self, card: ObjectId, player: PlayerId, grant: PlayGrant);

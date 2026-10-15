@@ -1,0 +1,43 @@
+# Cascade (CR 702.85a) casts the card it exiles, and a player casting an Adventurer card chooses whether to cast the creature or
+# its Adventure (CR 715.3), as the cast is made even by an effect (CR 608.2g). Bot1 casts Bloodbraid Challenger (mana value 4); cascade
+# exiles the Island (a land) and then Bonecrusher Giant (mana value 3 as the creature, so it is under 4), and Bot1, asked which
+# face, casts Stomp (CR 715.3a): 2 damage to Bot2 as the Adventure spell, which is then exiled on an adventure (CR 715.3d) and not
+# put on the battlefield as the Giant.
+
+[Bot1 Deck]
+Forest
+Mox Ruby
+Mox Emerald
+Mox Jet
+Mox Pearl
+Bloodbraid Challenger
+Island
+Bonecrusher Giant
+Island x5
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Bloodbraid Challenger.Cast
+Bot1.Accept
+Bot1.Modes(Stomp)
+Bot1.Target(Bot2)
+? Stack.Count = 2
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield = Bloodbraid Challenger; Forest; Mox Emerald; Mox Jet; Mox Pearl; Mox Ruby
+Exile = Bonecrusher Giant
+Stack.Count = 0

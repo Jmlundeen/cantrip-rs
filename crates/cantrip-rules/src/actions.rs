@@ -1705,7 +1705,7 @@ pub fn act(cx: &mut Cx, player: PlayerId) -> R<Flow> {
                 (instead, 0)
             };
             let exile_after = permitted.is_some_and(|p| p.grant.exile_after);
-            cast(cx, player, source, action.index, &action.targets, CastTerms { instead, any_type, life, more, exile_after, copy: false }, false)?
+            cast(cx, player, source, action.index, &action.targets, CastTerms { instead, any_type, life, more, exile_after, copy: false, way: None }, false)?
         }
         ActionKind::ActivateAbility if action.index >= PLAYER_MANA_ABILITY => {
             activate_mana(cx, player, source, action.index, action.color, false, &[])?;
@@ -1768,7 +1768,7 @@ fn cast(
     terms: CastTerms,
     resolving: bool,
 ) -> R<()> {
-    let CastTerms { instead, any_type, exile_after, life, more, copy: _ } = terms;
+    let CastTerms { instead, any_type, exile_after, life, more, copy: _, way: _ } = terms;
     let printed = cx.s().obj(card).card;
     let whole = cx.card(printed);
     // Cast as its Adventure (CR 715.3), it is that spell and nothing else on the stack (CR 715.3b).
@@ -2139,24 +2139,52 @@ fn cast(
 /// Whether the resolving effect's controller could cast `card` now (CR 608.2g): it is not a land and every target it
 /// needs has a legal choice.
 pub fn could_cast_during_resolution(cx: &Cx, card: ObjectId) -> bool {
-    let Some(player) = cx.s().stack.last().map(|i| i.controller) else { return false };
+    !cast_ways_during_resolution(cx, card).is_empty()
+}
+
+/// Each way the resolving effect's controller could cast `card` now (CR 608.2g), each face judged alone (CR 709.3a, 715.3a,
+/// 712.8a): the card itself unless it is a land or a split card (whose halves are what is cast, CR 709.3), a split card's two
+/// halves (an aftermath half only from a graveyard, CR 702.127a), an Adventurer's Adventure, and a modal double-faced card's
+/// back face. Fuse is not among them: it applies only in a hand (CR 702.102a).
+pub fn cast_ways_during_resolution(cx: &Cx, card: ObjectId) -> Vec<CastWay> {
+    let Some(player) = cx.s().stack.last().map(|i| i.controller) else { return Vec::new() };
     if !static_rules::may_cast(cx, player) {
-        return false;
+        return Vec::new();
     }
     let obj = cx.s().obj(card);
     if !live(cx.s(), card) || matches!(obj.zone.kind(), ZoneKind::Battlefield | ZoneKind::Stack) {
-        return false;
+        return Vec::new();
     }
     let def = cx.card(obj.card);
-    if def.is(CardType::Land) {
-        return false;
-    }
     let asker = Asker { source: card, controller: player };
-    if let Some(modal) = def.modal {
-        return modes_possible(cx, &asker, modal);
+    let castable = |face: &'static CardDef| match face.modal {
+        Some(modal) => modes_possible(cx, &asker, modal),
+        None => face.spell_targets().iter().all(|spec| !spec.required() || !target_candidates(cx, &asker, spec).is_empty()),
+    };
+    let mut ways = Vec::new();
+    if let Some((left, right)) = def.split {
+        for (way, half) in [(WAY_SPLIT_LEFT, left), (WAY_SPLIT_RIGHT, right)] {
+            if (!half.aftermath || obj.zone.is(ZoneKind::Graveyard)) && castable(half) {
+                ways.push(CastWay { way, face: cx.card_id(half), mana_value: half.cost.mana_value() });
+            }
+        }
+        return ways;
     }
-    let specs: &[TargetSpec] = def.spell_targets();
-    specs.iter().all(|spec| !spec.required() || !target_candidates(cx, &asker, spec).is_empty())
+    if !def.is(CardType::Land) && castable(def) {
+        ways.push(CastWay { way: 0, face: obj.card, mana_value: cx.mana_value(card) });
+    }
+    if let Some(adventure) = def.adventure
+        && castable(adventure)
+    {
+        ways.push(CastWay { way: WAY_ADVENTURE, face: cx.card_id(adventure), mana_value: adventure.cost.mana_value() });
+    }
+    if let Some(back) = def.back
+        && back.has_cost
+        && castable(back)
+    {
+        ways.push(CastWay { way: WAY_BACK_FACE, face: cx.card_id(back), mana_value: back.cost.mana_value() });
+    }
+    ways
 }
 
 /// Whether the resolving effect's controller could play `card` as a land now (CR 305.1, 608.2g): it is a land card not
@@ -2189,15 +2217,37 @@ pub fn play_land_during_resolution(cx: &mut Cx, card: ObjectId) -> R<Option<Obje
 
 /// Casts `card` as an effect resolves (CR 608.2g). A cast given up (CR 733.1) is undone, and nothing happens.
 pub fn cast_during_resolution(cx: &mut Cx, card: ObjectId, terms: CastTerms) -> R<bool> {
-    if !could_cast_during_resolution(cx, card) {
-        return Ok(false);
-    }
+    let ways = cast_ways_during_resolution(cx, card);
     let player = cx.s().stack.last().expect("a resolving item").controller;
+    // CR 709.3, 715.3, 712.8a: which face is cast is chosen as it is cast, before it goes on the stack.
+    let way = match (terms.way, ways.len()) {
+        (_, 0) => return Ok(false),
+        (Some(way), _) if ways.iter().any(|w| w.way == way) => way,
+        (Some(_), _) => return Ok(false),
+        (None, 1) => ways[0].way,
+        (None, _) => {
+            let modes = ways.iter().map(|w| Label::Name(w.face)).collect();
+            let ask = RequestKind::ChooseModes {
+                source: card,
+                modes,
+                eligible: (0..ways.len() as u8).collect(),
+                count: 1,
+                at_most: 0,
+                affordable: Vec::new(),
+                additional_cost: false,
+                repeat: false,
+            };
+            match cx.ask_core(player, ask, false)? {
+                Answer::Modes(chosen) => ways[chosen.first().copied().unwrap_or(0) as usize % ways.len()].way,
+                _ => ways[0].way,
+            }
+        }
+    };
     let mark = cx.s().mark();
     let log_mark = cx.g.log.len();
     // CR 707.12: it is a copy of the card that is cast, and the card stays where it is. A cast given up reverts the copy too.
     let card = if terms.copy { ops::copy_card(cx, card, player) } else { card };
-    match cast(cx, player, card, 0, &[], terms, true) {
+    match cast(cx, player, card, way, &[], terms, true) {
         Ok(()) => Ok(true),
         Err(Stop::Cancel) => {
             cx.st().revert(mark);
