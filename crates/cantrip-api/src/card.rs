@@ -314,6 +314,15 @@ pub struct Cost {
     /// Collect evidence N (CR 701.59a): exile cards with total mana value N or more from your graveyard, other than the
     /// source, chosen as the cost is chosen.
     pub collect_evidence: u8,
+    /// Behold N (CR 701.4a): for each, choose a permanent you control or reveal a card from your hand that passes the
+    /// filter ("behold a Dragon"), chosen as the cost is chosen. Nothing moves: a permanent is only chosen, a hand card
+    /// is revealed as the cost is paid (CR 601.2h). Payable only with that many to choose among. Dispelling Exhale,
+    /// Caustic Exhale, Kinsbaile Aspirant.
+    pub behold: Option<(u8, ObjectFilter)>,
+    /// Blight N (CR 701.68a): put this many -1/-1 counters on a creature you control, chosen as the cost is chosen and
+    /// put as it is paid. Payable only with a creature to put them on (CR 701.68b). Requiting Hex, Cinder Strike,
+    /// Gristle Glutton.
+    pub blight: u8,
 }
 
 /// A cost part whose size is the payer's to set, chosen as the cost is chosen.
@@ -364,6 +373,7 @@ impl Cost {
         }
         c.life = self.life.saturating_mul(n);
         c.exile_from_graveyard = self.exile_from_graveyard.saturating_mul(n);
+        c.blight = self.blight.saturating_mul(n);
         c.exile_from_hand = self.exile_from_hand.map(|(k, f)| (k.saturating_mul(n), f)).filter(|_| n > 0);
         c.discard = self.discard.map(|(k, f)| (k.saturating_mul(n), f)).filter(|_| n > 0);
         c.permanents = self.permanents.map(|p| PermanentCost { count: p.count.saturating_mul(n), ..p }).filter(|_| n > 0);
@@ -399,6 +409,11 @@ impl Cost {
         c.variable = self.variable.or(other.variable);
         c.discard_hand |= other.discard_hand;
         c.collect_evidence += other.collect_evidence;
+        c.behold = match (self.behold, other.behold) {
+            (Some((a, f)), Some((b, _))) => Some((a + b, f)),
+            (a, b) => a.or(b),
+        };
+        c.blight += other.blight;
         c
     }
 
@@ -428,6 +443,8 @@ impl Cost {
             variable: None,
             discard_hand: false,
             collect_evidence: 0,
+            behold: None,
+            blight: 0,
         };
 
     pub const fn sacrifice(count: u8, filter: ObjectFilter) -> Cost {
@@ -691,7 +708,8 @@ pub struct Divide {
 
 /// An optional additional cost that is not mana (CR 601.2b): teamwork's "tap any number of creatures you control with
 /// total power N or more". Announced once, like a kicker, by choosing between paying it and not, before any target;
-/// paid with the other costs. A spell that paid it has `kicked` 1 (the C# engine's optional cost paid).
+/// paid with the other costs. A spell that paid it has `paid` 1 (how many, for a cost that sacrifices one or more),
+/// which is not `kicked`: a card with a kicker and an optional cost of this kind is not ambiguous.
 #[derive(Clone, Copy)]
 pub struct OptionalCost {
     pub cost: Cost,

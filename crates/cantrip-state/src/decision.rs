@@ -400,6 +400,10 @@ pub enum Purpose {
     CastForMiracleCost,
     /// Whether to pay another cost rather than an activated ability's (CR 118.9).
     AlternativeCost,
+    /// What a cost beholds (CR 701.4a): a permanent chosen or a card revealed from the hand.
+    Behold,
+    /// The creature a cost blights (CR 701.68a).
+    Blight,
 }
 
 /// The text of one option, as an index, so no string is built at runtime.

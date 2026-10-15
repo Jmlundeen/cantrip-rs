@@ -358,7 +358,9 @@ fn purpose_view(purpose: Purpose, opening: bool) -> CardChoicePurposeView {
         | Purpose::RevealForMiracle
         | Purpose::CastForMiracleCost
         | Purpose::PromiseGift
-        | Purpose::AlternativeCost => V::Keep,
+        | Purpose::AlternativeCost
+        | Purpose::Behold
+        | Purpose::Blight => V::Keep,
     }
 }
 

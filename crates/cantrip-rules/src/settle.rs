@@ -540,6 +540,7 @@ fn put_trigger(cx: &mut Cx, trigger: PendingTrigger) -> R<()> {
         target_count: targets.len() as u8,
         x: 0,
         kicked: 0,
+        paid: 0,
         modes: mask,
         way: 0,
         choice: 0,

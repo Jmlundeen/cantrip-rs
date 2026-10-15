@@ -110,7 +110,7 @@ fn spell_facts(game: &Game, spell: ObjectId) -> (Vec<Target>, Option<i32>, Vec<S
         }
     }
     let x = (def.cost.x > 0).then_some(i32::from(item.x));
-    (item.targets().to_vec(), x, modes, i32::from(item.kicked), item.gift)
+    (item.targets().to_vec(), x, modes, i32::from(item.kicked) + i32::from(item.paid), item.gift)
 }
 
 impl Tracker {

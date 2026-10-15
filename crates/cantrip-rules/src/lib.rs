@@ -118,6 +118,7 @@ impl Game {
                     became: None,
                     exile_on_leave: false,
                     kicked: 0,
+                    paid: 0,
                     spent: ManaPool::default(),
                     cast_way: 0,
                     class_level: 0,

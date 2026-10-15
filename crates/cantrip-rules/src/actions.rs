@@ -120,6 +120,15 @@ fn can_pay_other(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost) -
             return false;
         }
     }
+    if let Some((n, _)) = cost.behold
+        && behold_candidates(cx, source, controller, cost).len() < n as usize
+    {
+        return false;
+    }
+    // CR 701.68b: a player who controls no creature can't choose to blight.
+    if cost.blight > 0 && blight_candidates(cx, controller).is_empty() {
+        return false;
+    }
     if let Some(t) = cost.tap_creatures {
         let (_, powers) = tap_candidates(cx, source, controller, &t);
         if powers.iter().map(|&p| p as u32).sum::<u32>() < t.power as u32 {
@@ -127,6 +136,61 @@ fn can_pay_other(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost) -
         }
     }
     true
+}
+
+/// What a cost that beholds may choose among (CR 701.4a): the permanents its payer controls and the cards in their hand,
+/// the source apart, that pass the filter.
+fn behold_candidates(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost) -> Vec<ObjectId> {
+    let Some((_, filter)) = cost.behold else { return Vec::new() };
+    let asker = Asker { source, controller };
+    let mut out = cx.permanents_of(controller);
+    out.extend(cx.s().zone(Zone::hand(controller)).iter().copied());
+    out.retain(|&id| id != source && filter(cx, &asker, id));
+    out
+}
+
+/// Chooses what a cost beholds (CR 701.4a, 601.2h), always asked, even when the choice is forced.
+fn choose_behold(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) -> R<Vec<ObjectId>> {
+    let Some((n, _)) = cost.behold else { return Ok(Vec::new()) };
+    let eligible = behold_candidates(cx, source, player, cost);
+    let ask = RequestKind::ChooseCards { source, purpose: Purpose::Behold, cards: eligible.clone(), eligible, count: n, up_to: false };
+    match cx.ask_core(player, ask, true)? {
+        Answer::Cards(cards) => Ok(cards),
+        _ => Err(Stop::Cancel),
+    }
+}
+
+/// Pays the behold part of a cost (CR 701.4a): each card chosen from the hand is revealed; a permanent is only chosen.
+fn pay_behold(cx: &mut Cx, player: PlayerId, chosen: &[ObjectId]) {
+    let revealed: Vec<ObjectId> = chosen.iter().copied().filter(|&id| cx.s().obj(id).zone.is(ZoneKind::Hand)).collect();
+    if !revealed.is_empty() {
+        Game::reveal(cx, player, &revealed);
+    }
+}
+
+/// The creatures a cost that blights may put its counters on (CR 701.68a).
+fn blight_candidates(cx: &Cx, controller: PlayerId) -> Vec<ObjectId> {
+    cx.permanents_of(controller).into_iter().filter(|&id| cx.chars(id).is(CardType::Creature)).collect()
+}
+
+/// Chooses the creature a cost blights (CR 701.68a, 601.2h), always asked, even when the choice is forced.
+fn choose_blight(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) -> R<Option<ObjectId>> {
+    if cost.blight == 0 {
+        return Ok(None);
+    }
+    let eligible = blight_candidates(cx, player);
+    let ask = RequestKind::ChooseCards { source, purpose: Purpose::Blight, cards: eligible.clone(), eligible, count: 1, up_to: false };
+    match cx.ask_core(player, ask, true)? {
+        Answer::Cards(cards) => cards.first().copied().map(Some).ok_or(Stop::Cancel),
+        _ => Err(Stop::Cancel),
+    }
+}
+
+/// Pays the blight part of a cost (CR 701.68a): the -1/-1 counters go on the creature chosen.
+fn pay_blight(cx: &mut Cx, cost: &Cost, chosen: Option<ObjectId>) {
+    if let Some(creature) = chosen {
+        ops::add_counters(cx, creature, CounterKind::MinusOne, cost.blight as i16);
+    }
 }
 
 /// The creatures that could be tapped for crew or saddle (CR 702.122a, 702.171a): the controller's other untapped
@@ -1825,6 +1889,7 @@ fn stack_item(kind: StackKind, object: ObjectId, ability: AbilityRef, controller
         target_count: targets.len() as u8,
         x: 0,
         kicked: 0,
+        paid: 0,
         modes: 0,
         way: 0,
         choice: 0,
@@ -1976,8 +2041,8 @@ fn cast(
     {
         extra = extra.and(optional.cost);
         cost.mana = add_cost(cost.mana, optional.cost.mana);
-        item.kicked = 1;
-        cx.st().update_obj(spell, |o| o.kicked = 1);
+        item.paid = 1;
+        cx.st().update_obj(spell, |o| o.paid = 1);
     }
 
     // CR 601.2b: X, and how many times it is kicked, are announced, and the total cost follows (CR 601.2f).
@@ -2159,16 +2224,20 @@ fn cast(
     }
     apply_next_spell_effects(cx, player, spell);
     let extra_chosen = choose_permanents(cx, player, spell, &extra)?;
+    let beheld = choose_behold(cx, player, spell, &cost)?;
+    let extra_beheld = choose_behold(cx, player, spell, &extra)?;
+    let blighted = choose_blight(cx, player, spell, &cost)?;
+    let extra_blighted = choose_blight(cx, player, spell, &extra)?;
     let (extra_sacrifices, extra_exiles) = choose_variable(cx, player, spell, &extra, item.x)?;
-    // An optional cost that sacrifices one or more: how many were is how many times the spell was "kicked" (Plumb the
-    // Forbidden's linked trigger reads it).
+    // An optional cost that sacrifices one or more: how many were is how many times it was paid (Plumb the Forbidden's
+    // linked trigger reads it).
     if matches!(extra.variable, Some(VariableCost::SacrificeOneOrMore(_))) {
         let n = extra_sacrifices.len().min(255) as u8;
         let at = cx.s().stack.len() - 1;
         let mut with = cx.s().stack[at];
-        with.kicked = n;
+        with.paid = n;
         cx.st().stack_set(at, with);
-        cx.st().update_obj(spell, |o| o.kicked = n);
+        cx.st().update_obj(spell, |o| o.paid = n);
     }
     let extra_discards = choose_discards(cx, player, spell, &extra)?;
     let extra_tappers = choose_tappers(cx, player, spell, &extra)?;
@@ -2187,6 +2256,10 @@ fn cast(
     pay_exiles(cx, &extra_evidence);
     pay_life_and_counters(cx, player, spell, &cost);
     pay_permanents(cx, &extra, &extra_chosen);
+    pay_behold(cx, player, &beheld);
+    pay_behold(cx, player, &extra_beheld);
+    pay_blight(cx, &cost, blighted);
+    pay_blight(cx, &extra, extra_blighted);
     ops::sacrifice(cx, &extra_sacrifices);
     pay_discards(cx, &extra_discards);
     pay_life_and_counters(cx, player, spell, &extra);
@@ -2799,6 +2872,8 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
     let discards = choose_discards(cx, player, source, &def.cost)?;
     let exiles = choose_exiles(cx, player, source, &def.cost)?;
     let tappers = choose_tappers(cx, player, source, &def.cost)?;
+    let beheld = choose_behold(cx, player, source, &def.cost)?;
+    let blighted = choose_blight(cx, player, source, &def.cost)?;
     let counter = choose_counter_kind(cx, player, source, &def.cost)?;
     // Mana of any color pays for it (CR 609.4b): every symbol is paid as generic mana.
     if mana.mana_value() > 0 && static_rules::spend_any_color_for(cx, player, source) {
@@ -2811,6 +2886,8 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
     pay_permanents(cx, &def.cost, &chosen);
     pay_discards(cx, &discards);
     pay_exiles(cx, &exiles);
+    pay_behold(cx, player, &beheld);
+    pay_blight(cx, &def.cost, blighted);
     pay_life_and_counters(cx, player, source, &def.cost);
     if let Some(kind) = counter {
         cx.st().update_obj(source, |o| o.counters[kind as usize] = (o.counters[kind as usize] - 1).max(0));

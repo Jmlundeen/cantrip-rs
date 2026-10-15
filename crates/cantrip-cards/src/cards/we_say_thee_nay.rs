@@ -5,7 +5,7 @@ use cantrip_oracle as oracle;
 /// Counter target spell unless its controller pays {2}. Counter that spell unless its controller pays {4} instead if
 /// this spell was cast using teamwork.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let ransom = if item.kicked > 0 { mana(4, 0, 0, 0, 0, 0) } else { mana(2, 0, 0, 0, 0, 0) };
+    let ransom = if item.paid > 0 { mana(4, 0, 0, 0, 0, 0) } else { mana(2, 0, 0, 0, 0, 0) };
     counter_unless_pays(g, item, 0, ransom)?;
     Ok(())
 }

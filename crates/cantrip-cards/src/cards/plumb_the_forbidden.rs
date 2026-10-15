@@ -13,12 +13,12 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// "When you do" (CR 603.12): the cost of sacrificing creatures was paid, so the spell was "kicked" as many times as
 /// creatures were sacrificed for it.
 fn sacrificed_creatures(q: &dyn Query, asker: &Asker) -> bool {
-    q.obj(asker.source).kicked > 0
+    q.obj(asker.source).paid > 0
 }
 
 /// Copy this spell for each creature sacrificed this way (CR 707.10).
 fn copy_for_each(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    for _ in 0..g.obj(item.object).kicked {
+    for _ in 0..g.obj(item.object).paid {
         g.copy_spell(item.object, item.controller, false)?;
     }
     Ok(())

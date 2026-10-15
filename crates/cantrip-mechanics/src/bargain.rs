@@ -18,5 +18,5 @@ pub const LABELS: &[&str] = &["Cast without bargain", "Bargain: Sacrifice an art
 
 /// "If this spell was bargained": it was cast with its optional cost paid.
 pub fn bargained(item: &StackItem) -> bool {
-    item.kicked > 0
+    item.paid > 0
 }

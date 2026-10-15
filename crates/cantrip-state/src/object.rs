@@ -35,6 +35,10 @@ pub struct Obj {
     /// How many times its kicker (or squad, or multikicker) cost was paid as it was cast (CR 702.33d), carried from
     /// the spell to the permanent it becomes.
     pub kicked: u8,
+    /// How many times its `optional_cost` (an additional cost that is not kicker: bargain, teamwork, behold, blight,
+    /// CR 601.2b) was paid as it was cast, carried from the spell to the permanent it becomes. Kept apart from `kicked`
+    /// so a card with kicker and another optional cost is not ambiguous.
+    pub paid: u8,
     /// The mana spent to cast it, by kind (CR 601.2h): what converge and "if at least two of a color were spent"
     /// read. Carried from the spell to the permanent; a copy has none.
     pub spent: ManaPool,
@@ -164,6 +168,7 @@ impl Obj {
             became: None,
             exile_on_leave: false,
             kicked: 0,
+            paid: 0,
             spent: ManaPool::default(),
             cast_way: 0,
             class_level: 0,
@@ -352,6 +357,8 @@ pub struct StackItem {
     pub x: u16,
     /// How many times it was kicked (CR 702.33).
     pub kicked: u8,
+    /// How many times its `optional_cost` was paid (CR 601.2b, 707.10: a copy has the same).
+    pub paid: u8,
     /// Which way it was cast (0 for the mana cost, n for the nth alternative cost), or activated.
     pub way: u8,
     /// The modes chosen as it was put on the stack (CR 700.2): a bit for each mode of its modal definition.
