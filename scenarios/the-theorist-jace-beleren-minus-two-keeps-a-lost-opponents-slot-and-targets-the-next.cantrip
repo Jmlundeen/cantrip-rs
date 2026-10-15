@@ -1,0 +1,43 @@
+# The Theorist, Jace Beleren's -2 has a slot for each opponent (CR 601.2c), and a player who has left the game keeps their seat
+# (CR 800.4a), so the others keep their places. Bot2's library has exactly its seven cards, so it loses by drawing on turn 2.
+# On turn 4 Bot2's slot has nothing to choose (it is not asked) and holds no target, and the question that is asked is Bot3's slot:
+# Bot3's Sol Ring is the target and returns to Bot3's hand, still legal as the ability resolves.
+
+[Bot1 Deck]
+Island
+Black Lotus
+The Theorist, Jace Beleren
+Island x4
+Island x12
+
+[Bot2 Deck]
+Island x7
+
+[Bot3 Deck]
+Island
+Sol Ring
+Island x5
+Island x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.The Theorist, Jace Beleren.Cast
+[T3 Bot3.Main1]
+Bot3.Hand.Island.Play
+Bot3.Battlefield.Island.Activate
+Bot3.Hand.Sol Ring.Cast
+[T4 Bot1.Main1]
+Bot1.Battlefield.The Theorist, Jace Beleren.Activate(Ability: For each opponent)
+Bot1.Target(Bot3.Battlefield.Sol Ring)
+! Bot1.Target
+[Bot1.Main2]
+
+[Expect]
+Bot2.Status = Lost
+Bot3.Battlefield = Island
+Bot3.Hand = Island; Island; Island; Island; Island; Island; Sol Ring
+Bot1.Battlefield.The Theorist, Jace Beleren.Counters.Loyalty = 1
+Stack.Count = 0

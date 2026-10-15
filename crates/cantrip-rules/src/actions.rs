@@ -2130,7 +2130,7 @@ fn cast(
     }));
     let nth = cx.history().casts_by(player).count().min(255) as u8;
     cx.emit(Event::SpellCast { spell, player, nth });
-    for &t in targets {
+    for &t in targets.iter().filter(|&&t| t != Target::None) {
         cx.emit(Event::BecameTarget { target: t, by: spell, controller: player });
     }
     Ok(())
@@ -2697,7 +2697,7 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
         ops::move_to_for(cx, source, Zone::hand(cx.s().obj(source).owner), ZoneReason::Other);
     }
     cx.emit(Event::AbilityActivated { source, ability, player });
-    for &t in &targets {
+    for &t in targets.iter().filter(|&&t| t != Target::None) {
         cx.emit(Event::BecameTarget { target: t, by: source, controller: player });
     }
     Ok(())

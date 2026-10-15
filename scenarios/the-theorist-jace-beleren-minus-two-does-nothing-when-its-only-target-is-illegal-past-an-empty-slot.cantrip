@@ -1,0 +1,49 @@
+# The Theorist, Jace Beleren's -2 in a three-player game, with an empty slot before the target (CR 608.2b): Bot1 chooses nothing
+# for Bot2, whose Ornithopter is a candidate, and Bot3's Ornithopter for Bot3's slot; the targets are [none, Ornithopter]. In response
+# Bot3 Lightning Bolts its own Ornithopter, which dies. Its only target is now illegal, so the ability does nothing: Bot2's
+# Ornithopter - not a target - is not returned either, and stays on the battlefield.
+
+[Bot1 Deck]
+Island
+Black Lotus
+The Theorist, Jace Beleren
+Island x4
+Island x12
+
+[Bot2 Deck]
+Ornithopter
+Island x6
+Island x12
+
+[Bot3 Deck]
+Ornithopter
+Mox Ruby
+Lightning Bolt
+Island x4
+Island x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.The Theorist, Jace Beleren.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot3.Main1]
+Bot3.Hand.Ornithopter.Cast
+Bot3.Hand.Mox Ruby.Cast
+[T4 Bot1.Main1]
+Bot1.Battlefield.The Theorist, Jace Beleren.Activate(Ability: For each opponent)
+Bot1.Target()
+Bot1.Target(Bot3.Battlefield.Ornithopter)
+Bot3.Battlefield.Mox Ruby.Activate
+Bot3.Hand.Lightning Bolt.Cast(Bot3.Battlefield.Ornithopter)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Ornithopter
+Bot3.Battlefield = Mox Ruby
+Bot3.Graveyard = Ornithopter; Lightning Bolt
+Bot1.Battlefield.The Theorist, Jace Beleren.Counters.Loyalty = 1
+Stack.Count = 0

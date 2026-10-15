@@ -554,7 +554,7 @@ fn put_trigger(cx: &mut Cx, trigger: PendingTrigger) -> R<()> {
     item.targets[..targets.len()].copy_from_slice(&targets);
     item.shares[..shares.len()].copy_from_slice(&shares);
     cx.st().stack_push(item);
-    for t in targets {
+    for t in targets.into_iter().filter(|&t| t != Target::None) {
         cx.emit(Event::BecameTarget { target: t, by: trigger.source, controller: trigger.controller });
     }
     Ok(())

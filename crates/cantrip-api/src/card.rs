@@ -240,7 +240,7 @@ impl TargetSpec {
     pub const COUNTED: u8 = u8::MAX;
 
     /// A `max` of this is "for each opponent, up to one target ...": the slot stands for one slot of its own for each
-    /// opponent of the controller (CR 601.2c, 115.1), at most one target each, in seat order. The slot for an opponent
+    /// opponent of the controller (CR 601.2c, 115.1), at most one target each, in seat order. It is not valid inside a mode (a modal slot reads a `max` above 1 as a range). The slot for an opponent
     /// is asked about `Query::slot_opponent`, and an opponent who has left the game keeps their slot, with nothing to
     /// choose, so the others keep their places (CR 800.4a). Its `min` is 0.
     pub const EACH_OPPONENT: u8 = u8::MAX - 2;

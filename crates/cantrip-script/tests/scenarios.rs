@@ -110,3 +110,26 @@ fn a_driven_seat_answering_otherwise_fails_at_the_line() {
         }
     }
 }
+
+/// An "up to" slot that chose nothing is no target (CR 601.2c, 115.1): it keeps its place among the item's slots as
+/// `Target::None`, and nothing becomes the target of the ability because of it. In The Theorist, Jace Beleren's -2 here the
+/// first opponent's slot chose nothing and the second's chose the Sol Ring: the history holds one `BecameTarget`, for the Sol Ring.
+#[test]
+fn a_slot_that_chose_nothing_makes_no_became_target_event() {
+    use cantrip_engine::*;
+    let path = scripts().join("the-theorist-jace-beleren-minus-two-targets-only-the-second-opponent-in-a-three-player-game.cantrip");
+    let script = GameScript::load(&path).unwrap();
+    let result = run(&script).unwrap_or_else(|f| panic!("\n{}", f.report));
+    let became: Vec<Target> = result
+        .game
+        .history()
+        .all()
+        .iter()
+        .filter_map(|r| match r.event {
+            Event::BecameTarget { target, .. } => Some(target),
+            _ => None,
+        })
+        .collect();
+    assert_eq!(became.len(), 1, "{became:?}");
+    assert!(matches!(became[0], Target::Object(_)), "{became:?}");
+}
