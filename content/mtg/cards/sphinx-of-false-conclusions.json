@@ -1,0 +1,12 @@
+{
+  "name": "Sphinx of False Conclusions",
+  "manaCost": "{2}{U}{U}",
+  "type": "Creature — Sphinx Illusion",
+  "power": 4,
+  "toughness": 2,
+  "oracleText": "Flash\nFlying\nWhenever this creature attacks, draw a card, then discard a card.\nWhen this creature dies, if it isn't a token, create a token that's a copy of it.",
+  "keywords": [
+    "Flash",
+    "Flying"
+  ]
+}

@@ -1,0 +1,40 @@
+# "When this creature dies" (CR 700.4): a Sphinx of False Conclusions exiled by Swords to Plowshares never goes to the
+# graveyard from the battlefield, so there is no trigger and no copy. Bot1 gains 4 life, the Sphinx is in exile, and its
+# controller has no creature (a control is the dies case in the sibling scenarios, where the copy does arrive).
+
+[Bot1 Deck]
+Mox Sapphire
+Black Lotus
+Sphinx of False Conclusions
+Forest x4
+Forest x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Swords to Plowshares
+Plains x4
+Plains x10
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Sphinx of False Conclusions.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Sphinx of False Conclusions)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Stack.Count = 0
+Exile = Sphinx of False Conclusions
+Bot1.Life = 24
+Bot1.Battlefield = Mox Sapphire
+Bot1.Graveyard = Black Lotus
+Bot2.Graveyard = Swords to Plowshares

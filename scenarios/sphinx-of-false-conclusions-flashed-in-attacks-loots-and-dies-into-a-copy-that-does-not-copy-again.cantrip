@@ -1,0 +1,68 @@
+# Sphinx of False Conclusions (4/2 flash, flying) in one game. Bot1 flashes it in during Bot2's turn 2 upkeep (CR 702.8a)
+# with Black Lotus and Mox Sapphire, so it has been under Bot1's control since before turn 3 and can attack. "Whenever
+# this creature attacks, draw a card, then discard a card": Bot1 draws and chooses a Forest to discard. Bot2 answers
+# with a Lightning Bolt: "When this creature dies, if it isn't a token, create a token that's a copy of it" puts a token
+# Sphinx onto the battlefield (CR 707.2) while the card stays in the graveyard. A second Bolt kills the token, which is a
+# token, so the intervening "if" (CR 603.4) fails and nothing else is created.
+
+[Bot1 Deck]
+Mox Sapphire
+Black Lotus
+Sphinx of False Conclusions
+Forest
+Forest
+Forest
+Forest
+Island
+Forest x10
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Mountain x3
+Mountain
+Mountain x10
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Upkeep]
+Bot1.Hand.Sphinx of False Conclusions.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 5
+Bot1.Attack(Sphinx of False Conclusions > Bot2)
+Bot1.Pass
+Bot1.Choose(Forest)
+? Bot1.Hand.Count = 5
+? Bot1.Graveyard = Forest; Black Lotus
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Sphinx of False Conclusions)
+Bot2.Battlefield.Mountain.Activate
+Bot1.Pass
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 2
+? Bot1.Battlefield.Sphinx of False Conclusions.Power = 4
+? Bot1.Battlefield.Sphinx of False Conclusions.Toughness = 2
+? Bot1.Battlefield.Sphinx of False Conclusions.Keywords = Flash; Flying
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Sphinx of False Conclusions)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Exile.Count = 0
+Bot2.Life = 20
+Bot1.Battlefield = Mox Sapphire
+Bot1.Graveyard = Sphinx of False Conclusions; Forest; Black Lotus
+Bot2.Graveyard = Lightning Bolt; Lightning Bolt
