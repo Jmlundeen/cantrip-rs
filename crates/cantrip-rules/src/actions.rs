@@ -579,13 +579,21 @@ pub fn mana_ability_options(cx: &Cx, player: PlayerId, options: &mut Vec<ActionO
 /// The candidates for one target slot (CR 601.2c), in a stable order: players in turn order, then objects on the
 /// battlefield, the stack and in graveyards.
 pub fn target_candidates(cx: &Cx, asker: &Asker, spec: &TargetSpec) -> Vec<Target> {
-    target_candidates_given(cx, asker, spec, &[], Target::None)
+    target_candidates_given(cx, asker, spec, &[], Target::None, None)
 }
 
-/// The candidates for a slot after the slots before it chose `earlier` (CR 601.2c).
-pub fn target_candidates_given(cx: &Cx, asker: &Asker, spec: &TargetSpec, earlier: &[Target], subject: Target) -> Vec<Target> {
+/// The candidates for a slot after the slots before it chose `earlier` (CR 601.2c); `slot_player` is the opponent the slot
+/// is for when it is one of a `TargetSpec::EACH_OPPONENT`.
+pub fn target_candidates_given(
+    cx: &Cx,
+    asker: &Asker,
+    spec: &TargetSpec,
+    earlier: &[Target],
+    subject: Target,
+    slot_player: Option<PlayerId>,
+) -> Vec<Target> {
     let s = cx.s();
-    let cx = &crate::resolve::Given { q: cx, earlier, subject };
+    let cx = &crate::resolve::Given { q: cx, earlier, subject, slot_player };
     let mut out = Vec::new();
     for p in s.seats() {
         let t = Target::Player(p);
@@ -1991,6 +1999,7 @@ fn cast(
     // CR 702.47c, 601.2c: the targets of spliced text are chosen after the spell's own, in the order the cards were spliced.
     if item.data.iter().any(|&d| d != 0) {
         let mut all = targets.clone();
+        all.resize(crate::resolve::expand_specs(cx.s(), player, specs).len().max(all.len()), Target::None);
         for &spliced in item.data.iter().filter(|&&d| d != 0) {
             let specs = cx.card(CardId(spliced as u16 - 1)).spell.map_or(&[][..], |s| s.targets);
             if !specs.is_empty() {
@@ -2242,36 +2251,48 @@ pub fn cast_transformed_during_resolution(cx: &mut Cx, card: ObjectId) -> R<bool
 }
 
 /// Each target slot's targets, asked in slot order (CR 601.2c), each a target of the slot's own (a player may be
-/// chosen for two slots).
+/// chosen for two slots). A slot that chose nothing ("up to") keeps its place with `Target::None` among the slots, so
+/// every target stays at the index of its slot (CR 601.2c, 115.1), as far as the last one that chose.
 fn choose_slots(cx: &mut Cx, player: PlayerId, source: ObjectId, specs: &[TargetSpec], counted: u16) -> R<Vec<Target>> {
     let asker = Asker { source, controller: player };
+    let slots = crate::resolve::expand_specs(cx.s(), player, specs);
     let mut targets = Vec::new();
-    for spec in specs {
-        let candidates = target_candidates_given(cx, &asker, spec, if specs.len() > 1 { &targets } else { &[] }, Target::None);
-        if candidates.is_empty() {
-            // A required slot with nothing to aim at is not a legal announcement (CR 601.2c): given up whole.
-            if spec.required() {
-                return Err(Stop::Cancel);
+    for (spec, slot_player) in &slots {
+        let before = targets.len();
+        'slot: {
+            let candidates =
+                target_candidates_given(cx, &asker, spec, if slots.len() > 1 { &targets } else { &[] }, Target::None, *slot_player);
+            if candidates.is_empty() {
+                // A required slot with nothing to aim at is not a legal announcement (CR 601.2c): given up whole.
+                if spec.required() {
+                    return Err(Stop::Cancel);
+                }
+                break 'slot;
             }
-            continue;
+            let (least, most) = spec.bounds(counted);
+            if most == 0 {
+                break 'slot;
+            }
+            let count = (most as usize).min(candidates.len()) as u8;
+            let ask = RequestKind::ChooseTarget {
+                source,
+                purpose: Purpose::Targets,
+                candidates,
+                optional: least == 0,
+                count,
+                any_number: false,
+            };
+            match cx.ask_core(player, ask, true)? {
+                Answer::Targets(chosen) => targets.extend(chosen),
+                _ => return Err(Stop::Cancel),
+            }
         }
-        let (least, most) = spec.bounds(counted);
-        if most == 0 {
-            continue;
+        if slots.len() > 1 && spec.max <= 1 && targets.len() == before {
+            targets.push(Target::None);
         }
-        let count = (most as usize).min(candidates.len()) as u8;
-        let ask = RequestKind::ChooseTarget {
-            source,
-            purpose: Purpose::Targets,
-            candidates,
-            optional: least == 0,
-            count,
-            any_number: false,
-        };
-        match cx.ask_core(player, ask, true)? {
-            Answer::Targets(chosen) => targets.extend(chosen),
-            _ => return Err(Stop::Cancel),
-        }
+    }
+    while targets.last() == Some(&Target::None) {
+        targets.pop();
     }
     Ok(targets)
 }

@@ -963,7 +963,7 @@ pub fn copy_spell(cx: &mut Cx, spell: ObjectId, copier: PlayerId, new_targets: b
     if new_targets {
         item = retarget(cx, top, copy, spell, copier)?;
     }
-    for &t in item.targets() {
+    for &t in item.targets().iter().filter(|&&t| t != Target::None) {
         cx.emit(Event::BecameTarget { target: t, by: copy, controller: copier });
     }
     cx.emit(Event::Copied { copy, original: spell, player: copier });
@@ -990,6 +990,10 @@ fn retarget(cx: &mut Cx, top: usize, object: ObjectId, asked_about: ObjectId, ch
         let len = if specs.len() == 1 { count } else { 1 };
         let current: Vec<Target> = item.targets[slot_start..slot_start + len].to_vec();
         slot_start += len;
+        // A slot that chose no target (CR 601.2c) has none to change (CR 115.7d).
+        if current.iter().all(|&t| t == Target::None) {
+            continue;
+        }
         let candidates = crate::actions::target_candidates(cx, &asker, spec);
         if candidates.len() <= current.len() && candidates.iter().all(|c| current.contains(c)) {
             continue;
@@ -1022,7 +1026,7 @@ pub fn choose_new_targets(cx: &mut Cx, spell: ObjectId, chooser: PlayerId) -> R<
     };
     let before = cx.s().stack[at];
     let after = retarget(cx, at, spell, spell, chooser)?;
-    for &t in after.targets() {
+    for &t in after.targets().iter().filter(|&&t| t != Target::None) {
         if !before.targets().contains(&t) {
             cx.emit(Event::BecameTarget { target: t, by: spell, controller: after.controller });
         }
@@ -1047,11 +1051,17 @@ pub fn change_target(cx: &mut Cx, of: Target, chooser: PlayerId) -> R<()> {
     // Nobody is asked anything when some target has nowhere else to go, since then nothing changes at all.
     let mut options: Vec<Vec<Target>> = Vec::with_capacity(count);
     for slot in 0..count {
-        let Some(spec) = crate::resolve::slot_spec(cx.cards(), cx.s(), &item, slot) else { return Ok(()) };
-        let others: Vec<Target> = crate::actions::target_candidates_given(cx, &asker, spec, &item.targets[..slot], Target::None)
-            .into_iter()
-            .filter(|&t| t != item.targets[slot])
-            .collect();
+        // A slot that chose no target has none to change.
+        if item.targets[slot] == Target::None {
+            options.push(Vec::new());
+            continue;
+        }
+        let Some((spec, slot_player)) = crate::resolve::slot_spec(cx.cards(), cx.s(), &item, slot) else { return Ok(()) };
+        let others: Vec<Target> =
+            crate::actions::target_candidates_given(cx, &asker, &spec, &item.targets[..slot], Target::None, slot_player)
+                .into_iter()
+                .filter(|&t| t != item.targets[slot])
+                .collect();
         if others.is_empty() {
             return Ok(());
         }
@@ -1059,6 +1069,9 @@ pub fn change_target(cx: &mut Cx, of: Target, chooser: PlayerId) -> R<()> {
     }
     let mut changed = item;
     for (slot, others) in options.into_iter().enumerate() {
+        if others.is_empty() {
+            continue;
+        }
         changed.targets[slot] = if others.len() == 1 {
             others[0]
         } else {
@@ -1077,7 +1090,7 @@ pub fn change_target(cx: &mut Cx, of: Target, chooser: PlayerId) -> R<()> {
         };
     }
     cx.st().stack_set(at, changed);
-    for &t in changed.targets() {
+    for &t in changed.targets().iter().filter(|&&t| t != Target::None) {
         cx.emit(Event::BecameTarget { target: t, by: item.object, controller: item.controller });
     }
     Ok(())

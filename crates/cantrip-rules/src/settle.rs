@@ -402,48 +402,66 @@ fn choose_trigger_targets(
 ) -> R<bool> {
     let asker = Asker { source: trigger.source, controller: trigger.controller };
     let start = targets.len();
-    for spec in specs {
-        let candidates = target_candidates_given(cx, &asker, spec, if specs.len() > 1 { &targets[start..] } else { &[] }, trigger.subject);
-        if candidates.is_empty() {
-            if spec.required() {
-                // With no legal target, it is removed from the stack (CR 603.3d).
-                return Ok(false);
+    let slots = crate::resolve::expand_specs(cx.s(), trigger.controller, specs);
+    for (spec, slot_player) in &slots {
+        let before = targets.len();
+        'slot: {
+            let candidates = target_candidates_given(
+                cx,
+                &asker,
+                spec,
+                if slots.len() > 1 { &targets[start..] } else { &[] },
+                trigger.subject,
+                *slot_player,
+            );
+            if candidates.is_empty() {
+                if spec.required() {
+                    // With no legal target, it is removed from the stack (CR 603.3d).
+                    return Ok(false);
+                }
+                break 'slot;
             }
-            continue;
+            // A lone required candidate is no choice, for an ability with one target slot only (the C# engine asks each of several).
+            if spec.min > 0 && spec.max == 1 && candidates.len() == 1 && (slots.len() == 1 || all_of_few) {
+                targets.push(candidates[0]);
+                break 'slot;
+            }
+            if all_of_few && spec.min > 0 && candidates.len() <= spec.max as usize {
+                targets.extend(candidates);
+                break 'slot;
+            }
+            // A bound that is the number of times the source was kicked, or its X (CR 702.33d, 107.3m).
+            let source = cx.s().obj(trigger.source);
+            let counted = if source.x > 0 { source.x } else { source.kicked as u16 };
+            let (least, most) = spec.bounds(counted);
+            if most == 0 {
+                break 'slot;
+            }
+            let count = (most as usize).min(candidates.len()) as u8;
+            let ask = RequestKind::ChooseTarget {
+                source: trigger.source,
+                purpose: Purpose::Targets,
+                candidates,
+                optional: least == 0,
+                count,
+                any_number: false,
+            };
+            // The ability's controller chooses its targets (CR 603.3d), unless it says that player does: the one it is about.
+            let chooser = match trigger.subject {
+                Target::Player(p) if triggered(cx, trigger.ability).subject_chooses_targets && !cx.s().player(p).lost => p,
+                _ => trigger.controller,
+            };
+            if let Answer::Targets(chosen) = cx.ask_core(chooser, ask, false)? {
+                targets.extend(chosen);
+            }
         }
-        // A lone required candidate is no choice, for an ability with one target slot only (the C# engine asks each of several).
-        if spec.min > 0 && spec.max == 1 && candidates.len() == 1 && (specs.len() == 1 || all_of_few) {
-            targets.push(candidates[0]);
-            continue;
+        // A slot that chose nothing keeps its place (CR 601.2c, 115.1).
+        if slots.len() > 1 && spec.max <= 1 && targets.len() == before {
+            targets.push(Target::None);
         }
-        if all_of_few && spec.min > 0 && candidates.len() <= spec.max as usize {
-            targets.extend(candidates);
-            continue;
-        }
-        // A bound that is the number of times the source was kicked, or its X (CR 702.33d, 107.3m).
-        let source = cx.s().obj(trigger.source);
-        let counted = if source.x > 0 { source.x } else { source.kicked as u16 };
-        let (least, most) = spec.bounds(counted);
-        if most == 0 {
-            continue;
-        }
-        let count = (most as usize).min(candidates.len()) as u8;
-        let ask = RequestKind::ChooseTarget {
-            source: trigger.source,
-            purpose: Purpose::Targets,
-            candidates,
-            optional: least == 0,
-            count,
-            any_number: false,
-        };
-        // The ability's controller chooses its targets (CR 603.3d), unless it says that player does: the one it is about.
-        let chooser = match trigger.subject {
-            Target::Player(p) if triggered(cx, trigger.ability).subject_chooses_targets && !cx.s().player(p).lost => p,
-            _ => trigger.controller,
-        };
-        if let Answer::Targets(chosen) = cx.ask_core(chooser, ask, false)? {
-            targets.extend(chosen);
-        }
+    }
+    while targets.len() > start && targets.last() == Some(&Target::None) {
+        targets.pop();
     }
     Ok(true)
 }

@@ -54,9 +54,25 @@ fn slot_widths(specs: &[TargetSpec], target_count: usize) -> Vec<usize> {
         .collect()
 }
 
-/// The spec of an item's target `slot`: for a modal item the slots of its chosen modes in printed order (CR 700.2c,
-/// 601.2c), a slot of a range holding several targets.
-pub(crate) fn slot_spec(cards: &CardTable, state: &GameState, item: &StackItem, slot: usize) -> Option<&'static TargetSpec> {
+/// The slots a list of target specs stands for, for a spell or ability controlled by `controller` (CR 601.2c): one each,
+/// except that a `TargetSpec::EACH_OPPONENT` is a slot of at most one target for each seat but the controller's, in seat
+/// order, each with the opponent it is for. A player who has left keeps their seat, so the others keep their places.
+pub(crate) fn expand_specs(state: &GameState, controller: PlayerId, specs: &[TargetSpec]) -> Vec<(TargetSpec, Option<PlayerId>)> {
+    let mut out = Vec::with_capacity(specs.len());
+    for spec in specs {
+        if spec.max == TargetSpec::EACH_OPPONENT {
+            let each = TargetSpec { min: 0, max: 1, ..*spec };
+            out.extend(state.seats().filter(|&p| p != controller).map(|p| (each, Some(p))));
+        } else {
+            out.push((*spec, None));
+        }
+    }
+    out
+}
+
+/// The spec of an item's target `slot`, and the opponent the slot is for if it is one of an each-opponent spec: for a
+/// modal item the slots of its chosen modes in printed order (CR 700.2c, 601.2c), a slot of a range holding several targets.
+pub(crate) fn slot_spec(cards: &CardTable, state: &GameState, item: &StackItem, slot: usize) -> Option<(TargetSpec, Option<PlayerId>)> {
     if let Some(modal) = modal_of(cards, state, item) {
         let mut specs: Vec<&'static TargetSpec> = Vec::new();
         for (i, mode) in modal.modes.iter().enumerate() {
@@ -68,7 +84,7 @@ pub(crate) fn slot_spec(cards: &CardTable, state: &GameState, item: &StackItem, 
         let mut n = 0;
         for (spec, width) in specs.into_iter().zip(slot_widths(&owned, item.target_count as usize)) {
             if slot < n + width {
-                return Some(spec);
+                return Some((*spec, None));
             }
             n += width;
         }
@@ -81,12 +97,15 @@ pub(crate) fn slot_spec(cards: &CardTable, state: &GameState, item: &StackItem, 
         for &spliced in item.data.iter().filter(|&&d| d != 0) {
             let added = cards.get(CardId(spliced as u16 - 1)).spell.map_or(&[][..], |s| s.targets);
             if slot < at + added.len() {
-                return Some(&added[slot - at]);
+                return Some((added[slot - at], None));
             }
             at += added.len();
         }
     }
-    specs.get(slot.min(specs.len().saturating_sub(1)))
+    if specs.iter().any(|s| s.max == TargetSpec::EACH_OPPONENT) {
+        return expand_specs(state, item.controller, specs).get(slot).copied();
+    }
+    specs.get(slot.min(specs.len().saturating_sub(1))).map(|s| (*s, None))
 }
 
 /// Runs the chosen modes of a modal item in printed order (CR 700.2d), each as if it were a spell of its own with
@@ -106,7 +125,7 @@ pub fn run_modes(cx: &mut Cx, item: &StackItem, modal: &ModalDef) -> Result<(), 
             sub.targets[..n].copy_from_slice(&item.targets[next..next + n]);
             sub.target_count = n as u8;
             next += n;
-            if n > 0 && (0..n).all(|slot| !target_legal(cx.cards(), cx.s(), &cx.g.log, &sub, slot)) {
+            if sub.targets().iter().any(|&t| t != Target::None) && (0..n).all(|slot| !target_legal(cx.cards(), cx.s(), &cx.g.log, &sub, slot)) {
                 continue;
             }
             (mode.effect)(cx, &sub)?;
@@ -119,7 +138,11 @@ pub fn run_modes(cx: &mut Cx, item: &StackItem, modal: &ModalDef) -> Result<(), 
 /// still takes it, and nothing forbids the source to target it.
 pub fn target_legal(cards: &CardTable, state: &GameState, events: &[Record], item: &StackItem, slot: usize) -> bool {
     let target = item.targets[slot];
-    let Some(spec) = slot_spec(cards, state, item, slot) else {
+    // A slot that chose no target (an "up to" slot) has nothing to be legal (CR 601.2c).
+    if target == Target::None {
+        return false;
+    }
+    let Some((spec, slot_player)) = slot_spec(cards, state, item, slot) else {
         return false;
     };
     let asker = Asker { source: item.object, controller: item.controller };
@@ -131,7 +154,7 @@ pub fn target_legal(cards: &CardTable, state: &GameState, events: &[Record], ite
     let q = Reader { cards, state, events };
     // A slot of its own sees what the slots before it chose (CR 601.2c).
     let earlier = if item.target_count > 1 { &item.targets[..slot] } else { &[][..] };
-    (spec.filter)(&Given { q: &q, earlier, subject: item.subject }, &asker, target) && layers::can_target(cards, state, &asker, target)
+    (spec.filter)(&Given { q: &q, earlier, subject: item.subject, slot_player }, &asker, target) && layers::can_target(cards, state, &asker, target)
 }
 
 /// A `Query` that also says what the earlier target slots chose, for the filter of a later one.
@@ -140,6 +163,8 @@ pub struct Given<'a> {
     pub earlier: &'a [Target],
     /// The subject of the event the ability triggered on.
     pub subject: Target,
+    /// The opponent the slot is for, when it is one of a `TargetSpec::EACH_OPPONENT`.
+    pub slot_player: Option<PlayerId>,
 }
 
 impl Query for Given<'_> {
@@ -173,6 +198,10 @@ impl Query for Given<'_> {
 
     fn event_subject(&self) -> Target {
         self.subject
+    }
+
+    fn slot_opponent(&self) -> Option<PlayerId> {
+        self.slot_player
     }
 }
 
@@ -262,7 +291,8 @@ pub fn resolve(cx: &mut Cx) -> R<Flow> {
 
     // CR 608.2b: a spell or ability whose every target has become illegal does nothing.
     let count = item.target_count as usize;
-    let mut fizzles = count > 0 && (0..count).all(|slot| !target_legal(cx.cards(), cx.s(), &cx.g.log, &item, slot));
+    let chose_any = item.targets().iter().any(|&t| t != Target::None);
+    let mut fizzles = chose_any && (0..count).all(|slot| !target_legal(cx.cards(), cx.s(), &cx.g.log, &item, slot));
     // CR 702.103e: a bestowed Aura spell whose target is illegal does not fizzle: it ceases to be bestowed and resolves as
     // the creature spell it is.
     if fizzles && item.kind == StackKind::Spell && item.way == WAY_BESTOW {

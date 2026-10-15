@@ -162,6 +162,12 @@ pub trait Query {
         &[]
     }
 
+    /// The opponent the target slot being chosen or checked is for, when it is one of a `TargetSpec::EACH_OPPONENT`
+    /// ("for each opponent, up to one target creature that player controls", CR 601.2c). `None` outside such a slot.
+    fn slot_opponent(&self) -> Option<PlayerId> {
+        None
+    }
+
     /// The subject of the event a triggered ability triggered on (`Fired::subject`), for the filter of its targets: "target
     /// planeswalker that player controls", where the player is the one the damage was dealt to (CR 603.3d). `Target::None`
     /// outside a trigger's target filter.
