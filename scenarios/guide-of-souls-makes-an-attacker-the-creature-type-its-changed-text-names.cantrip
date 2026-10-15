@@ -1,0 +1,57 @@
+# Guide of Souls' attack trigger makes its target "an Angel in addition to its other types". Artificial Evolution changes
+# the text of Bot1's Guide of Souls, Angel to Elf (CR 612.1), so the attacking creature it puts counters on becomes an
+# Elf, not an Angel (CR 612). Three Ornithopters entering bank the three energy counters it spends.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Guide of Souls
+Artificial Evolution
+Ornithopter
+Ornithopter
+Ornithopter
+Plains x14
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Guide of Souls.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Energy = 3
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Guide of Souls)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Angel)
+Bot1.Modes(Elf)
+[T3 Bot1.BeginCombat]
+Bot1.Attack(Guide of Souls)
+Bot1.Accept
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Energy = 0
+Bot1.Battlefield.Guide of Souls.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Guide of Souls.Counters.Flying = 1
+Bot1.Battlefield.Guide of Souls.Subtypes = Cleric; Elf; Human

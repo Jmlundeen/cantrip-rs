@@ -51,7 +51,7 @@ fn empower(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
     g.add_counters(creature, CounterKind::PlusOne, 2);
     g.add_counters(creature, CounterKind::Flying, 1);
-    g.add_effect(item.object, creature, EffectKind::AddSubtype(Subtype::Angel), Duration::Indefinite);
+    g.add_effect(item.object, creature, EffectKind::AddSubtype(g.words(item.object).subtype(Subtype::Angel)), Duration::Indefinite);
     Ok(())
 }
 
