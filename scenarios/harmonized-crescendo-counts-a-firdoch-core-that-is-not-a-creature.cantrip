@@ -1,0 +1,51 @@
+# Firdoch Core (Changeling, CR 702.73a) is every creature type, and as a Kindred (CR 308, 205.3m) a permanent that has
+# creature types without being a creature: Harmonized Crescendo, choosing Zubera - a type neither Ornithopter (Thopter)
+# nor any card in the game is - draws one card for the Core and none for the Ornithopter. Bot1 casts the Core on turn 1
+# (Jet, Ruby and Pearl), and on turn 3 pays Crescendo's {4}{U}{U} with the Island, Mox Sapphire, those three Moxen and the
+# Core's own mana. The Core is still a noncreature artifact: its types are Kindred and Artifact only.
+
+[Bot1 Deck]
+Ornithopter
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Island
+Firdoch Core
+Harmonized Crescendo
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Firdoch Core.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Firdoch Core.Activate(Ability: {T}; Color: U)
+Bot1.Hand.Harmonized Crescendo.Cast
+Bot1.Modes(Zubera)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Hand.Count = 1
+Bot1.Graveyard = Harmonized Crescendo
+Bot1.Battlefield.Firdoch Core.Types = Kindred; Artifact
+Bot1.Battlefield.Firdoch Core.Subtypes = (every creature type)
+Bot1.Battlefield.Ornithopter.Subtypes = Thopter

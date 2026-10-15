@@ -1,0 +1,42 @@
+# A copy copies the copiable values (CR 707.2), and Changeling (CR 702.73a) is one of them: Phyrexian Metamorph entering
+# as a copy of Firdoch Core is a Kindred Artifact - Shapeshifter and every creature type, as the Core is. Bot1 casts
+# the Core on turn 1 (Sol Ring and a Swamp) and the Metamorph on turn 3 (Mox Sapphire's {U}, Sol Ring and Mox Jet).
+# Other artifacts could be copied, so the Core is chosen by name.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Sapphire
+Sol Ring
+Firdoch Core
+Phyrexian Metamorph
+Mox Ruby
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Firdoch Core.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Phyrexian Metamorph.Cast
+Bot1.Accept
+Bot1.Target(Bot1.Battlefield.Firdoch Core)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Firdoch Core#1.Subtypes = (every creature type)
+Bot1.Battlefield.Firdoch Core#2.Subtypes = (every creature type)
+Bot1.Battlefield.Firdoch Core#2.Types = Kindred; Artifact
+Bot1.Battlefield.Firdoch Core#2.Keywords = Changeling

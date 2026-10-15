@@ -1,0 +1,40 @@
+# Changeling's "every creature type" (CR 702.73a) is a characteristic-defining ability, not a word of the card's text
+# (CR 612.1 changes only the words of its type line and rules text), so Artificial Evolution replacing Shapeshifter - the
+# one creature type in Firdoch Core's type line - with Zombie leaves the Core every creature type, Shapeshifter and
+# Zombie included. Bot1 casts the Core on turn 1 (Sol Ring and a Swamp) and the instant on turn 3 with Mox Sapphire.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Sapphire
+Sol Ring
+Firdoch Core
+Artificial Evolution
+Mox Ruby
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Firdoch Core.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Firdoch Core)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Shapeshifter)
+Bot1.Modes(Zombie)
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Graveyard = Artificial Evolution
+Bot1.Battlefield.Firdoch Core.Subtypes = (every creature type)

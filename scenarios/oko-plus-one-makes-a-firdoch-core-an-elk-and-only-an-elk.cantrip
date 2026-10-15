@@ -1,0 +1,52 @@
+# A creature type that an effect sets replaces the types Changeling gave (CR 205.1b, 613.3; Firdoch Core's ruling: it is
+# only that new creature type, and the effect that made it every type is simply overwritten). Oko's +1 makes the Core a
+# green 3/3 Elk creature that loses all abilities, so it is no longer an outlaw: Bot2's Shoot the Sheriff, refused for
+# the animated Core in firdoch-core-animated-is-an-outlaw-and-keeps-its-own-types, destroys it. Bot1 casts the Core on
+# turn 1 (Sol Ring and a Swamp) and Oko on turn 3 (Mox Emerald, Mox Sapphire, Mox Jet).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Emerald
+Mox Sapphire
+Sol Ring
+Firdoch Core
+Oko, Thief of Crowns
+Swamp x12
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Shoot the Sheriff
+Swamp x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Firdoch Core.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Oko, Thief of Crowns.Cast
+Bot1.Pass
+Bot1.Battlefield.Oko, Thief of Crowns.Activate(Firdoch Core; Ability: Elk)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Firdoch Core.Subtypes = Elk
+Bot1.Pass
+Bot2.Hand.Shoot the Sheriff.Cast(Bot1.Battlefield.Firdoch Core)
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+
+[Expect]
+Bot1.Graveyard = Firdoch Core

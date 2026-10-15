@@ -1,0 +1,65 @@
+# Firdoch Core is a Kindred Artifact - Shapeshifter with Changeling (CR 702.73a): every creature type, so it is a Pirate,
+# an Assassin and the rest of Shoot the Sheriff's outlaws (CR 700.12) once "{4}: This artifact becomes a 4/4 artifact
+# creature until end of turn" makes it a creature. It keeps the types it has (Kindred, Artifact) and gains Creature
+# (CR 205.1b); the 4/4 is its base power and toughness. Bot2's Shoot the Sheriff is refused against the animated Core
+# and allowed against Ornithopter, a creature with no outlaw type (the positive control). Before the Core is animated
+# it is not a creature, so no creature spell may target it either way. Bot1 casts Sol Ring with Mox Jet on turn 1 and
+# the Core with Sol Ring and Mox Ruby; on turn 3 the animation costs Sol Ring's {C}{C} and two more.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Sol Ring
+Firdoch Core
+Swamp
+Swamp
+Swamp x12
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Ornithopter
+Shoot the Sheriff
+Swamp
+Swamp
+Swamp x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Firdoch Core.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+? Bot1.Battlefield.Firdoch Core.Types = Kindred; Artifact
+? Bot1.Battlefield.Firdoch Core.Subtypes = (every creature type)
+Bot1.Battlefield.Firdoch Core.Activate(Ability: {4})
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Firdoch Core.Types = Kindred; Artifact; Creature
+? Bot1.Battlefield.Firdoch Core.Power = 4
+Bot1.Pass
+! Bot2.Hand.Shoot the Sheriff.Cast(Bot1.Battlefield.Firdoch Core)
+Bot2.Hand.Shoot the Sheriff.Cast(Bot2.Battlefield.Ornithopter)
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+
+[Expect]
+Bot1.Battlefield.Firdoch Core.Types = Kindred; Artifact; Creature
+Bot1.Battlefield.Firdoch Core.Subtypes = (every creature type)
+Bot1.Battlefield.Firdoch Core.Keywords = Changeling
+Bot1.Battlefield.Firdoch Core.Power = 4
+Bot1.Battlefield.Firdoch Core.Toughness = 4
+Bot2.Graveyard = Shoot the Sheriff; Ornithopter

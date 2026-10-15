@@ -1,0 +1,9 @@
+{
+  "name": "Firdoch Core",
+  "manaCost": "{3}",
+  "type": "Kindred Artifact — Shapeshifter",
+  "oracleText": "Changeling (This card is every creature type.)\n{T}: Add one mana of any color.\n{4}: This artifact becomes a 4/4 artifact creature until end of turn.",
+  "keywords": [
+    "Changeling"
+  ]
+}

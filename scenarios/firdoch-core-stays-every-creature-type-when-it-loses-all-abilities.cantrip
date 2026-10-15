@@ -1,0 +1,61 @@
+# Changeling is a characteristic-defining ability (CR 702.73a) and applies in layer 4 before a loses-all-abilities effect
+# applies in layer 6 (CR 613.1d, 613.1f, 613.3; Firdoch Core's ruling): The Wondrous Wasp takes the animated Core's
+# abilities - Changeling is no longer among its keywords - and it is still every creature type, an outlaw Shoot the
+# Sheriff may not destroy. It also has no abilities left to activate (its {4} and its mana ability). Bot1 animates
+# the Core on turn 3 with Sol Ring and two Moxen, then flashes the Wasp in with Mox Sapphire and a Swamp.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Sol Ring
+Firdoch Core
+Mox Sapphire
+The Wondrous Wasp
+Swamp x12
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Shoot the Sheriff
+Swamp x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Firdoch Core.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Firdoch Core.Activate(Ability: {4})
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Firdoch Core.Types = Kindred; Artifact; Creature
+? Bot1.Battlefield.Firdoch Core.Keywords = Changeling
+Bot1.Hand.The Wondrous Wasp.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Target(Bot1.Battlefield.Firdoch Core)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Firdoch Core.Keywords = (absent)
+! Bot1.Battlefield.Firdoch Core.Activate
+! Bot2.Hand.Shoot the Sheriff.Cast(Bot1.Battlefield.Firdoch Core)
+
+[Expect]
+Bot1.Battlefield.Firdoch Core.Types = Kindred; Artifact; Creature
+Bot1.Battlefield.Firdoch Core.Subtypes = (every creature type)
+Bot1.Battlefield.Firdoch Core.Keywords = (absent)
+Bot1.Battlefield.Firdoch Core.Power = 4
+Bot1.Battlefield.The Wondrous Wasp.Subtypes = Hero; Human

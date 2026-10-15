@@ -1,0 +1,52 @@
+# "{4}: This artifact becomes a 4/4 artifact creature until end of turn" (CR 611.2c) affects the object that activated
+# it: Bot2's Disenchant destroys the Core in response, and the ability, resolving with its source gone, animates nothing
+# (CR 400.7: the Core in the graveyard is a new object, and an effect from the ability does not apply to it). Bot1
+# casts the Core on turn 1 (Sol Ring and a Swamp) and pays {4} on turn 3 with Sol Ring and two Moxen; Bot2 pays
+# Disenchant with Mox Pearl and a Swamp.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Sol Ring
+Firdoch Core
+Swamp
+Swamp x12
+
+[Bot2 Deck]
+Swamp
+Mox Pearl
+Disenchant
+Swamp x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Firdoch Core.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Firdoch Core.Activate(Ability: {4})
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Firdoch Core)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Swamp.Activate
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Graveyard = Firdoch Core
+Bot2.Graveyard = Disenchant
+Bot1.Battlefield.Count = 4

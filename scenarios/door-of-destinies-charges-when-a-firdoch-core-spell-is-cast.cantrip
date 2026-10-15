@@ -1,0 +1,43 @@
+# A spell on the stack has the creature types of the card (CR 205.3, 604.3): Firdoch Core's Changeling (CR 702.73a) makes
+# it a Kithkin spell, though it is no creature spell, so Door of Destinies - which chose Kithkin as it entered - charges
+# when the Core is cast (the Core is a Kindred Artifact: CR 205.3m gives a Kindred creature types). Ornithopter, a
+# Thopter, cast first on turn 3, is the control: no charge counter. Bot1 casts the Door with four Moxen on turn 1 and
+# the Core with three on turn 3.
+
+[Bot1 Deck]
+Door of Destinies
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Firdoch Core
+Ornithopter
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Door of Destinies.Cast
+Bot1.Modes(Kithkin)
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+? Bot1.Battlefield.Door of Destinies.Counters.Charge = (absent)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Firdoch Core.Cast
+
+[Expect]
+Bot1.Battlefield.Door of Destinies.Counters.Charge = 1

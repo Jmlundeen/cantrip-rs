@@ -1,0 +1,34 @@
+# Firdoch Core is every creature type in every zone (CR 702.73a, 604.3): in the library it is an Insect card, so Grist's
+# +1 ("If an Insect card was milled this way, put a loyalty counter on Grist and repeat this process") repeats when the
+# Core is milled, though the Core is no creature card (a Kindred Artifact). Llanowar Elves, milled next, is a Creature
+# - Elf Druid and not an Insect (the control): the process ends there. Two passes: two tokens, two cards milled, and one
+# loyalty counter for the Core on top of the +1 itself (3 + 1 + 1 = 5).
+
+[Bot1 Deck]
+Bayou x3
+Grist, the Hunger Tide
+Forest x5
+Firdoch Core
+Llanowar Elves
+Forest x13
+
+[Bot2 Deck]
+Forest x22
+
+[Actions]
+Bot1.Hand.Bayou.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Bayou.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Bayou.Play
+Bot1.Battlefield.Bayou#1.Activate(Ability: Add {B})
+Bot1.Battlefield.Bayou#2.Activate(Ability: Add {G})
+Bot1.Battlefield.Bayou#3.Activate(Ability: Add {G})
+Bot1.Hand.Grist, the Hunger Tide.Cast
+[T5 Bot1.Main2]
+Bot1.Battlefield.Grist, the Hunger Tide.Activate(Ability: +1)
+[T5 Bot1.End]
+
+[Expect]
+Bot1.Battlefield.Grist, the Hunger Tide.Counters.Loyalty = 5
+Bot1.Graveyard = Llanowar Elves; Firdoch Core
