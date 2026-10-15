@@ -7,9 +7,10 @@ fn becomes_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let animation = Animation {
         power: 4,
         toughness: 4,
-        colors: words.colors(ColorSet(0b00011)),
-        subtype: words.subtype(Subtype::Elemental),
+        colors: Some(words.colors(ColorSet(0b00011))),
+        subtype: Some(words.subtype(Subtype::Elemental)),
         keywords: Keywords::of(&[Keyword::Flying, Keyword::Vigilance]),
+        ability: None,
     };
     animate(g, item.object, item.object, &animation, Duration::EndOfTurn);
     Ok(())

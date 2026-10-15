@@ -9,9 +9,10 @@ fn becomes_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let animation = Animation {
         power: 3,
         toughness: 2,
-        colors: words.colors(ColorSet(0b00110)),
-        subtype: words.subtype(Subtype::Elemental),
+        colors: Some(words.colors(ColorSet(0b00110))),
+        subtype: Some(words.subtype(Subtype::Elemental)),
         keywords: Keywords::NONE,
+        ability: None,
     };
     animate(g, item.object, item.object, &animation, Duration::EndOfTurn);
     g.add_effect(item.object, item.object, EffectKind::AddKeywords(Keywords::of(&[Keyword::CantBeBlocked])), Duration::EndOfTurn);

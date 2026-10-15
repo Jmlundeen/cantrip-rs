@@ -407,27 +407,37 @@ pub fn surveil(g: &mut dyn Game, player: PlayerId, source: ObjectId, count: usiz
     Ok(())
 }
 
-/// What "becomes a P/T [colors] [subtype] creature with [keywords]" makes of a permanent (CR 205.1b, 613.1).
+/// What "becomes a P/T [colors] [subtype] creature with [keywords]" makes of a permanent (CR 205.1b, 613.1). `colors`
+/// and `subtype` are `None` when the text names none ("becomes a 4/4 artifact creature"): the permanent keeps its own.
 pub struct Animation {
     pub power: i16,
     pub toughness: i16,
-    pub colors: ColorSet,
-    pub subtype: Subtype,
+    pub colors: Option<ColorSet>,
+    pub subtype: Option<Subtype>,
     pub keywords: Keywords,
+    /// A triggered or activated ability the permanent is given for the duration (CR 613.1f), if the text gives one.
+    pub ability: Option<AbilityRef>,
 }
 
 /// "Until end of turn, this land becomes a P/T [colors] [subtype] creature with [keywords]. It's still a land":
 /// the creature type is added (layer 4) with its subtype, the colors replace its own (5), the keywords are granted (6)
 /// and the base power and toughness set (7b), so counters and pumps count on top. Celestial Colonnade and Creeping Tar
-/// Pit print it.
+/// Pit print it, and Firdoch Core, which names no colors or creature type, leaves those two out.
 pub fn animate(g: &mut dyn Game, source: ObjectId, permanent: ObjectId, a: &Animation, duration: Duration) {
     if !g.is_on_battlefield(permanent) || g.obj(permanent).became.is_some() {
         return;
     }
     g.add_effect(source, permanent, EffectKind::AddTypes(TypeSet::of(&[CardType::Creature])), duration);
-    g.add_effect(source, permanent, EffectKind::AddSubtype(a.subtype), duration);
-    g.add_effect(source, permanent, EffectKind::SetColors(a.colors), duration);
+    if let Some(subtype) = a.subtype {
+        g.add_effect(source, permanent, EffectKind::AddSubtype(subtype), duration);
+    }
+    if let Some(colors) = a.colors {
+        g.add_effect(source, permanent, EffectKind::SetColors(colors), duration);
+    }
     g.add_effect(source, permanent, EffectKind::AddKeywords(a.keywords), duration);
+    if let Some(ability) = a.ability {
+        g.add_effect(source, permanent, EffectKind::AddAbility(ability), duration);
+    }
     g.add_effect(source, permanent, EffectKind::SetPt(a.power, a.toughness), duration);
 }
 
