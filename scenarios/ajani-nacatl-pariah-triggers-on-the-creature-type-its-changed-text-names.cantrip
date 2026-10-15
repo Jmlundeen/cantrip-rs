@@ -1,0 +1,48 @@
+# Artificial Evolution replaces the creature type Cat with Elf in Ajani's text (CR 612.1, indefinitely): "whenever one or
+# more other Cats you control die" now means Elves, so Bot2's Lightning Bolt on Bot1's Llanowar Elves offers the
+# exile-and-return and Ajani comes back transformed. As printed, an Elf dying would do nothing to him.
+
+[Bot1 Deck]
+Ajani, Nacatl Pariah
+Llanowar Elves
+Artificial Evolution
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Mox Emerald
+Plains x13
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x13
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ajani, Nacatl Pariah.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Ajani, Nacatl Pariah)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Cat)
+Bot1.Modes(Elf)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Accept
+
+[Expect]
+Bot1.Battlefield.Ajani, Nacatl Avenger.Types = Planeswalker
+Bot1.Graveyard = Llanowar Elves; Artificial Evolution

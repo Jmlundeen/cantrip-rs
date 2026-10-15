@@ -32,7 +32,7 @@ fn cats_die(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
                 && from.is(ZoneKind::Battlefield)
                 && to.is(ZoneKind::Graveyard)
                 && q.obj(*old).controller == q.obj(source).controller
-                && q.chars(*old).has_subtype(Subtype::Cat) =>
+                && q.chars(*old).has_subtype(q.words(source).subtype(Subtype::Cat)) =>
         {
             Fired::about(Target::Object(*old))
         }
@@ -54,7 +54,7 @@ fn exile_and_return(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 fn plus_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     for id in g.permanents_of(item.controller) {
-        if g.chars(id).has_subtype(Subtype::Cat) {
+        if g.chars(id).has_subtype(g.words(item.object).subtype(Subtype::Cat)) {
             g.add_counters(id, CounterKind::PlusOne, 1);
         }
     }
@@ -63,7 +63,7 @@ fn plus_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 /// "If you control a red permanent other than Ajani."
 fn controls_other_red(q: &dyn Query, asker: &Asker) -> bool {
-    q.permanents_of(asker.controller).into_iter().any(|id| id != asker.source && q.chars(id).colors.has(Color::Red))
+    q.permanents_of(asker.controller).into_iter().any(|id| id != asker.source && q.chars(id).colors.has(q.words(asker.source).color(Color::Red)))
 }
 
 /// "0: Create a 2/1 white Cat Warrior creature token. When you do, if you control a red permanent other than Ajani,
