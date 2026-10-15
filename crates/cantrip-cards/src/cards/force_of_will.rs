@@ -2,8 +2,8 @@ use cantrip_api::*;
 use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
 
-fn blue_card(q: &dyn Query, _: &Asker, id: ObjectId) -> bool {
-    q.chars(id).colors.has(Color::Blue)
+fn blue_card(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
+    q.chars(id).colors.has(q.words(asker.source).color(Color::Blue))
 }
 
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
