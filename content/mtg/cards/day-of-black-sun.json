@@ -1,0 +1,6 @@
+{
+  "name": "Day of Black Sun",
+  "manaCost": "{X}{B}{B}",
+  "type": "Sorcery",
+  "oracleText": "Each creature with mana value X or less loses all abilities until end of turn. Destroy those creatures."
+}

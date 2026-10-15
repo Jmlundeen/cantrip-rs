@@ -1,0 +1,47 @@
+# X = 1 (CR 202.3 boundary, "or less"): Haywire Mite, mana value exactly 1, and Ornithopter (0) are destroyed, but both lose
+# all abilities first, so the Mite's "When this creature dies, you gain 2 life" is not there to trigger (the ruling; compare
+# the Damnation scenario, where it gains 2): Bot1 stays at 20. Bot2's Sylvan Caryatid has mana value 2, one above X, so it
+# is untouched and keeps Defender and Hexproof.
+
+[Bot1 Deck]
+Mox Pearl
+Ornithopter
+Haywire Mite
+Black Lotus
+Day of Black Sun
+Swamp x12
+
+[Bot2 Deck]
+Forest
+Mox Pearl
+Sylvan Caryatid
+Forest x12
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Haywire Mite.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Sylvan Caryatid.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Day of Black Sun.Cast(X: 1)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Life = 20
+Bot1.Graveyard = Day of Black Sun; Haywire Mite; Ornithopter; Black Lotus
+Bot2.Battlefield.Sylvan Caryatid.Keywords = Defender; Hexproof
+Stack.Count = 0

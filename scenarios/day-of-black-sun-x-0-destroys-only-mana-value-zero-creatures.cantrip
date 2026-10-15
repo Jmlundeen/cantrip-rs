@@ -1,0 +1,35 @@
+# X = 0: only creatures of mana value 0 are "X or less". Bot2's Ornithopter (an artifact creature of mana value 0) is
+# destroyed; its Llanowar Elves (mana value 1) is not. Bot1 pays only {B}{B}.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Day of Black Sun
+Swamp x12
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Ornithopter
+Forest x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Day of Black Sun.Cast(X: 0)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Day of Black Sun
+Bot2.Graveyard = Ornithopter
+Bot2.Battlefield = Forest; Llanowar Elves
+Stack.Count = 0
