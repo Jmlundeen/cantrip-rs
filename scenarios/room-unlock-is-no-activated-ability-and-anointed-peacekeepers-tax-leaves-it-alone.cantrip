@@ -1,0 +1,61 @@
+# The unlock cost is paid by a special action (CR 709.5e, 116.2), which is no activated ability, so what makes activated
+# abilities cost more does not touch it. Bot2's Anointed Peacekeeper names Unholy Annex // Ritual Chamber (the card in Bot1's
+# hand): "activated abilities of sources with the chosen name cost {2} more" would make the unlock cost {5}{2}, and Bot1 has
+# exactly five mana sources on turn 3. The unlock is offered and taken at its printed {3}{B}{B}.
+# Bot1 cast Unholy Annex on turn 1 with Black Lotus; Bot2 casts the Peacekeeper on turn 2 with Black Lotus and Mox Pearl.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Unholy Annex // Ritual Chamber
+Mox Jet
+Mox Jet
+Mox Jet
+Swamp
+Swamp
+Swamp x15
+
+[Bot2 Deck]
+Plains
+Black Lotus
+Mox Pearl
+Anointed Peacekeeper
+Plains x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Unholy Annex // Ritual Chamber.Cast(Ability: Unholy Annex)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Anointed Peacekeeper.Cast
+Bot2.Pass
+Bot2.Name(Unholy Annex // Ritual Chamber)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Unholy Annex.Activate(Ability: right door)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Unholy Annex // Ritual Chamber.Doors = Unholy Annex; Ritual Chamber
+Bot1.Battlefield.Demon.Power = 6

@@ -1,0 +1,38 @@
+# A Room that enters without being cast enters with neither door unlocked (CR 709.5d): Bot1's Show and Tell puts Unholy Annex //
+# Ritual Chamber from the hand onto the battlefield. It is nameless with no abilities, and no door was unlocked, so there is no
+# Demon; at Bot1's end step it neither draws nor costs life. (Bot2 has no card to put onto the battlefield.) Black Lotus and
+# Mox Sapphire pay for the {2}{U}{U}.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Show and Tell
+Unholy Annex // Ritual Chamber
+Swamp
+Swamp
+Swamp
+Swamp x15
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Show and Tell.Cast
+Bot1.Pass
+Bot1.Choose(Unholy Annex // Ritual Chamber)
+[T1 Bot1.Main2]
+? Bot1.Battlefield..Doors.Count = 0
+? Bot1.Battlefield..Types = Enchantment
+? Bot1.Battlefield..ManaValue = 0
+[T2 Bot2.Upkeep]
+
+[Expect]
+Bot1.Battlefield.Count = 2
+Bot1.Life = 20
+Bot1.Hand.Count = 3

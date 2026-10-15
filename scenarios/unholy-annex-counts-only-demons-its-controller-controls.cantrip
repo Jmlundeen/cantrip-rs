@@ -1,0 +1,51 @@
+# "If you control a Demon": Bot2's Demon, from its own Ritual Chamber on turn 2, is not Bot1's, so at the end of turn 3 Bot1's
+# Unholy Annex draws a card and takes the other branch, "otherwise, you lose 2 life" - and Bot2 loses nothing. (At the end of turn 1
+# Bot1 had lost 2 as well, with no Demon anywhere: 20 -> 18 -> 16.) The same ability with Bot1's own Demon is the drain in the
+# other Room scenarios.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Unholy Annex // Ritual Chamber
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp x15
+
+[Bot2 Deck]
+Swamp
+Black Lotus
+Mox Jet
+Unholy Annex // Ritual Chamber
+Swamp
+Swamp
+Swamp
+Swamp x15
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Unholy Annex // Ritual Chamber.Cast(Ability: Unholy Annex)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Unholy Annex // Ritual Chamber.Cast(Ability: Ritual Chamber)
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T4 Bot2.Upkeep]
+
+[Expect]
+Bot2.Battlefield.Demon.Power = 6
+Bot1.Life = 16
+Bot2.Life = 20

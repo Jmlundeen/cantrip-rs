@@ -1,0 +1,44 @@
+# A copy of a Room is a Room whose doors are locked (CR 709.5d, 707.2): the existence of each half is part of the copiable
+# values (CR 709.5b), but the unlocked designations are not, and a permanent that did not enter as a cast spell has neither.
+# Faithless Looting discards Unholy Annex // Ritual Chamber and a Swamp, so the graveyard has four card types (delirium: an
+# enchantment, a sorcery, an artifact from Black Lotus, a land), and Shifting Woodland becomes a copy of the Room card: an
+# enchantment with no name, no mana cost, no abilities but the unlocks, and no door unlocked, though the card in the graveyard is
+# the very one that would have had Annex's door had it been cast. Mox Ruby pays for the Looting; Black Lotus and Mox Emerald for the
+# Woodland's {2}{G}{G}.
+
+[Bot1 Deck]
+Shifting Woodland
+Mox Ruby
+Faithless Looting
+Unholy Annex // Ritual Chamber
+Black Lotus
+Mox Emerald
+Swamp
+Swamp x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Shifting Woodland.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Unholy Annex // Ritual Chamber; Swamp)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Shifting Woodland.Activate(Bot1.Graveyard.Unholy Annex // Ritual Chamber; Ability: Delirium)
+[T1 Bot1.Main2]
+? Bot1.Battlefield..Doors.Count = 0
+? Bot1.Battlefield..Types = Enchantment
+? Bot1.Battlefield..Subtypes = Room
+? Bot1.Battlefield..ManaValue = 0
+
+[Expect]
+Bot1.Battlefield.Count = 3

@@ -1,0 +1,40 @@
+# A Room spell is only the half cast while it is on the stack (CR 709.3b), and a countered one (CR 701.6) is put into its owner's
+# graveyard as the single card it is (CR 709.2). Bot1's Counterspell, paid with Black Lotus, answers Bot2's Unholy Annex: no door
+# is ever unlocked, the permanent never exists, and the end step ability never triggers (Bot2 keeps its 20 life and its hand).
+
+[Bot1 Deck]
+Black Lotus
+Counterspell
+Swamp
+Swamp
+Swamp
+Swamp x16
+
+[Bot2 Deck]
+Swamp
+Black Lotus
+Unholy Annex // Ritual Chamber
+Swamp
+Swamp
+Swamp
+Swamp x16
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Unholy Annex // Ritual Chamber.Cast(Ability: Unholy Annex)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Counterspell.Cast(Stack.Unholy Annex)
+Bot1.Pass
+[T3 Bot1.Upkeep]
+
+[Expect]
+Bot2.Graveyard = Unholy Annex // Ritual Chamber; Black Lotus
+Bot2.Battlefield = Swamp
+Bot2.Life = 20
+Bot1.Graveyard = Counterspell; Black Lotus
