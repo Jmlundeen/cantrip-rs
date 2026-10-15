@@ -1146,11 +1146,14 @@ fn activated_options(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOption>)
             }
             // An activation whose mana cost the player cannot meet is not offered, as a spell they cannot afford is not
             // (CR 602.2b): a seat handed it would cancel at the payment and be handed it again, forever.
-            if def.cost.mana.x == 0 && def.cost.mana.mana_value() > 0 && !def.tap_creatures_for_mana && !def.waterbend {
+            let owed = if def.special_action { special_action_cost(cx, id, ability, def) } else { def.cost.mana };
+            if owed.x == 0 && owed.mana_value() > 0 && !def.tap_creatures_for_mana && !def.waterbend {
                 // The source's own mana abilities cannot pay for an ability that taps it (CR 602.2b, 605.3b).
                 let own = (def.cost.tap && has_mana_source(cx, id, player)).then(|| available_without(cx, player, Some(id)));
                 let a = own.as_ref().unwrap_or_else(|| available.get_or_init(|| self::available(cx, player)));
-                let mut cost = change_with(cx, &a.changers, player, Costed::Ability(id, ability), def.cost.mana, None);
+                // A special action is no activated ability (CR 116.2): what changes the cost of activating abilities does not
+                // touch it, and `special_action` pays the cost as it stands.
+                let mut cost = if def.special_action { owed } else { change_with(cx, &a.changers, player, Costed::Ability(id, ability), owed, None) };
                 // Mana of any color pays for it (CR 609.4b): every symbol is paid as generic mana.
                 if static_rules::spend_any_color_for(cx, player, id) {
                     cost = ManaCost { generic: cost.mana_value().min(255) as u8, ..ManaCost::ZERO };
@@ -2847,15 +2850,34 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
     Ok(())
 }
 
+/// The mana a special action costs (CR 116.2): the ability's own, except for the two the rules word as "pay the mana cost of
+/// the object": turning a face-down creature card face up costs its mana cost, with X as 0 (CR 701.40b, 107.3b), and
+/// unlocking a Room's door the mana cost of that door (CR 709.5e).
+fn special_action_cost(cx: &Cx, source: ObjectId, ability: AbilityRef, def: &ActivatedDef) -> ManaCost {
+    let card = cx.s().obj(source).card;
+    if ability.card == cx.cards().face_down {
+        return ManaCost { x: 0, ..cx.card(card).cost };
+    }
+    if ability.card == cx.cards().intrinsic {
+        // The Room the permanent is, which a copy of one is too (CR 709.5, 707.2).
+        let room = cx.card(cx.chars(source).card);
+        let door = match ability.index {
+            cantrip_api::intrinsic::UNLOCK_LEFT => room.split.map(|h| h.0),
+            cantrip_api::intrinsic::UNLOCK_RIGHT => room.split.map(|h| h.1),
+            _ => None,
+        };
+        if let Some(door) = door {
+            return door.cost;
+        }
+    }
+    def.cost.mana
+}
+
 /// A special action (CR 116.2) from an ability: its mana cost is paid, and its effect done at once with no stack. The
 /// effect asks no questions and has no targets.
 fn special_action(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef) -> R<()> {
     let def = activated(cx, ability).expect("activated");
-    let mut mana = def.cost.mana;
-    if ability.card == cx.cards().face_down {
-        // Turning a manifested creature card face up costs its own mana cost (CR 701.40b), with X as 0 (CR 107.3b).
-        mana = ManaCost { x: 0, ..cx.card(cx.s().obj(source).card).cost };
-    }
+    let mana = special_action_cost(cx, source, ability, def);
     if mana != ManaCost::ZERO {
         pay_mana(cx, player, source, mana)?;
     }

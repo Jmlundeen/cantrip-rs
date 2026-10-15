@@ -151,7 +151,10 @@ pub trait Query {
         if c.no_cost {
             return 0;
         }
-        let cost = self.card(c.card).cost;
+        let def = self.card(c.card);
+        // A Room on the battlefield has the mana cost of its unlocked doors alone (CR 709.5); anywhere else the card's.
+        let on_battlefield = self.obj(id).zone.is(ZoneKind::Battlefield);
+        let cost = if def.is_room() && on_battlefield { def.room_cost(self.obj(id).marks.doors) } else { def.cost };
         let x = if self.obj(id).zone.is(ZoneKind::Stack) {
             self.obj(id).x
         } else {
@@ -480,6 +483,10 @@ pub trait Game: Query {
     fn put_onto_battlefield_face_down(&mut self, object: ObjectId, controller: PlayerId) -> Result<ObjectId, Suspend>;
     /// Turns a face-down permanent face up (CR 701.40b, 708.2). Nothing if it is not one.
     fn turn_face_up(&mut self, permanent: ObjectId);
+    /// `player` unlocks a door of a Room (CR 709.5f): the permanent is given that half's unlocked designation, which
+    /// triggers "when you unlock this door" (CR 709.5h). `door` is `DOOR_LEFT` or `DOOR_RIGHT`. Nothing if the permanent is
+    /// not a Room on the battlefield or the door is already unlocked.
+    fn unlock_door(&mut self, permanent: ObjectId, door: u8, player: PlayerId);
     fn exile(&mut self, object: ObjectId) -> ObjectId {
         let owner = self.obj(object).owner;
         self.move_to(object, Zone::exile(owner))

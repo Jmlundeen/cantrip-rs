@@ -74,18 +74,27 @@ fn main() {
                     }
                     cards.push((part, source.clone()));
                 }
+                // The types and subtypes of both halves (CR 709.4c, 709.5a): a Room's shared type line is on each.
                 let mut words: Vec<String> = Vec::new();
+                let mut subtypes: Vec<String> = Vec::new();
                 for h in &halves {
-                    for w in split_type(&str_of(h, "type")).0 {
+                    let (types, subs) = split_type(&str_of(h, "type"));
+                    for w in types {
                         if !words.contains(&w) {
                             words.push(w);
                         }
                     }
+                    for w in subs {
+                        if !subtypes.contains(&w) {
+                            subtypes.push(w);
+                        }
+                    }
                 }
+                let subtypes_text = if subtypes.is_empty() { String::new() } else { format!(" \u{2014} {}", subtypes.join(" ")) };
                 let mut combined = Card::new();
                 combined.insert("name".into(), card["name"].clone());
                 combined.insert("manaCost".into(), Value::String(halves.iter().map(|h| str_of(h, "manaCost")).collect()));
-                combined.insert("type".into(), Value::String(words.join(" ")));
+                combined.insert("type".into(), Value::String(format!("{}{}", words.join(" "), subtypes_text)));
                 combined.insert("oracleText".into(), Value::String(halves.iter().map(|h| str_of(h, "oracleText")).collect::<Vec<_>>().join("\n//\n")));
                 combined.insert("split".into(), Value::Bool(true));
                 card = combined;

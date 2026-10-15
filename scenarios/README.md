@@ -306,6 +306,10 @@ kind, place it where the action could otherwise be taken, with a wait or `BotN.P
 - `BotN.Looked`, the cards the player has looked at, in the order they looked (a look at one card of a hand, Urza's Bauble),
   once they have looked at any and absent until then
 - `BotN.Hand`, `.Library`, `.Graveyard`, `.Battlefield`, `.Emblems` (CR 114, from the command zone), each with `.Count`
+- `BotN.Battlefield.<Name>.Doors` and `.ManaValue` for a Room (CR 709.5): the names of its unlocked doors, left first
+  (empty when both are locked), and the mana value they leave it. The Room is named by its unlocked doors (`Unholy Annex`,
+  `Unholy Annex // Ritual Chamber`), and by nothing at all when neither is (`Bot1.Battlefield.#1`). A locked door is
+  unlocked by `Bot1.Battlefield.Unholy Annex.Activate(Ability: right door)`, a special action paid with the mana abilities that follow.
 - `BotN.Battlefield.<Name>.Tapped` and `.Types` (computed card types, `Land; Creature` for an animated land); for
   creatures also `.Power`, `.Toughness`, `.Damage` and `.SummoningSick`
 - `BotN.Battlefield.<Name>.Token` (`true`) for a token, absent for a card

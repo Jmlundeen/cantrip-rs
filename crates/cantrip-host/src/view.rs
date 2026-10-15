@@ -596,6 +596,19 @@ impl<'a> Projector<'a> {
             ..Default::default()
         };
 
+        if def.is_room() && on_battlefield {
+            // A Room on the battlefield (CR 709.5) is its unlocked doors: their names, costs and text; a locked door is
+            // one the client can show as locked.
+            let doors = obj.marks.doors;
+            view.name = c.name.to_string();
+            // With neither door unlocked there is no mana cost at all (CR 709.5), not {0}.
+            view.mana_cost = if doors & (DOOR_LEFT | DOOR_RIGHT) == 0 { String::new() } else { def.room_cost(doors).to_string() };
+            // The doors' text, read through the words it has now (CR 612).
+            let text = def.unlocked_doors(doors).map(|half| half.text).collect::<Vec<_>>().join("
+");
+            view.oracle_text = crate::text::changed_text(&text, def.name, Query::words(game, id));
+            view.unlocked_doors = vec![doors & DOOR_LEFT != 0, doors & DOOR_RIGHT != 0];
+        }
         if obj.face_down {
             // Face down (CR 708.2a, 406.3): what it is face down goes to every seat, a nameless 2/2 on the battlefield and no
             // characteristics at all in exile; what it really is only to a seat that may look at it, its controller

@@ -168,7 +168,13 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
             activated_turn: 0,
             activated_mask: 0,
             x: if entering && from.is(ZoneKind::Stack) { old.x } else { 0 },
-            marks: Marks { cast_untimely: entering && from.is(ZoneKind::Stack) && old.marks.cast_untimely, ..Marks::default() },
+            marks: Marks {
+                cast_untimely: entering && from.is(ZoneKind::Stack) && old.marks.cast_untimely,
+                // CR 709.5d: a Room enters with the unlocked designation of the half that was cast as a spell, and with
+                // neither if neither was.
+                doors: if entering && from.is(ZoneKind::Stack) && cx.cards().get(old.card).is_room() { cast_door(old.cast_way) } else { 0 },
+                ..Marks::default()
+            },
             transformed: false,
             exiled: None,
             face_down: false,
@@ -250,6 +256,10 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
             }
         }
         events.push(Event::ZoneChange { old: m.id, new: new_id, from, to, reason });
+        // CR 709.5h: a door unlocked as the Room enters is unlocked all the same ("when you unlock this door" triggers).
+        if entering && cx.s().obj(new_id).marks.doors != 0 {
+            events.push(Event::DoorUnlocked { permanent: new_id, door: cx.s().obj(new_id).marks.doors, player: cx.s().obj(new_id).controller });
+        }
         if lore {
             events.push(Event::CountersPut { object: new_id, kind: CounterKind::Lore, amount: 1, by: Some(cx.s().obj(new_id).controller) });
         }
@@ -396,6 +406,29 @@ pub fn turn_face_up(cx: &mut Cx, id: ObjectId) {
         o.copy = None;
     });
     note_statics(cx, id);
+}
+
+/// The door whose half was cast, by the way it was cast (CR 709.3, 709.5d): none for anything but a split card's halves.
+fn cast_door(way: u8) -> u8 {
+    match way {
+        WAY_SPLIT_LEFT => DOOR_LEFT,
+        WAY_SPLIT_RIGHT => DOOR_RIGHT,
+        _ => 0,
+    }
+}
+
+/// Unlocks a door of a Room (CR 709.5f): the permanent is given the half's unlocked designation, the same object
+/// (CR 709.5c), and "when you unlock this door" triggers (CR 709.5h). Nothing if it is not a Room on the battlefield or
+/// the door is already unlocked.
+pub fn unlock_door(cx: &mut Cx, id: ObjectId, door: u8, player: PlayerId) {
+    if !live(cx.s(), id) || !cx.s().obj(id).zone.is(ZoneKind::Battlefield) || cx.s().obj(id).marks.doors & door != 0 {
+        return;
+    }
+    if !cx.card(cx.chars(id).card).is_room() {
+        return;
+    }
+    cx.st().update_obj(id, |o| o.marks.doors |= door);
+    cx.emit(Event::DoorUnlocked { permanent: id, door, player });
 }
 
 /// CR 610.3: cards exiled "until [a permanent] leaves the battlefield" return, as a one-shot effect that follows the
@@ -1133,10 +1166,16 @@ pub fn resolve_copy_as_token(cx: &mut Cx, item: &StackItem, at: usize) -> R<()> 
     cx.st().stack_remove(at);
     cx.st().zone_remove(Zone::STACK, item.object);
     cx.st().update_obj(item.object, |o| o.zone = Zone::GONE);
-    let values = spell.copy.unwrap_or_else(|| Copiable::of(spell.card));
+    // A copy of a Room spell keeps the choice of door and the characteristics of both (CR 709.5b); the token it becomes is a
+    // Room that enters with that door unlocked (CR 709.5d, 707.10f).
+    let door = if cx.cards().get(spell.card).is_room() { cast_door(spell.cast_way) } else { 0 };
+    let values = if door != 0 { Copiable::of(spell.card) } else { spell.copy.unwrap_or_else(|| Copiable::of(spell.card)) };
     let words = if values.has_exceptions() { Words::NONE } else { cantrip_api::words(cx.s(), item.object) };
     let copy = if values.has_exceptions() { Some(values) } else { None };
-    create_tokens_worded(cx, &[(values.card, item.controller)], false, copy, &[], words, Some(item))?;
+    let tokens = create_tokens_worded(cx, &[(values.card, item.controller)], false, copy, &[], words, Some(item))?;
+    for token in tokens.into_iter().filter(|_| door != 0) {
+        unlock_door(cx, token, door, item.controller);
+    }
     Ok(())
 }
 

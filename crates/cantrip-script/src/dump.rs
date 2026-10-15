@@ -263,6 +263,13 @@ impl StateDump {
                 if obj.token {
                     d.set(format!("{key}.Token"), true);
                 }
+                // A Room (CR 709.5): its unlocked doors by name, and the mana value they leave it, whatever the doors are.
+                let room = game.cards.get(c.card);
+                if room.is_room() {
+                    let doors: Vec<String> = room.unlocked_doors(obj.marks.doors).map(|half| half.name.to_string()).collect();
+                    d.list(&format!("{key}.Doors"), doors, true);
+                    d.set(format!("{key}.ManaValue"), game.mana_value(id));
+                }
                 if obj.prepared {
                     d.set(format!("{key}.Prepared"), true);
                 }

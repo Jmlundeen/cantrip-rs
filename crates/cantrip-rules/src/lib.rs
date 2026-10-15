@@ -679,6 +679,10 @@ impl cantrip_api::Game for Cx<'_> {
         ops::turn_face_up(self, permanent);
     }
 
+    fn unlock_door(&mut self, permanent: ObjectId, door: u8, player: PlayerId) {
+        ops::unlock_door(self, permanent, door, player);
+    }
+
     fn move_together(&mut self, moves: &[(ObjectId, Zone)], reason: ZoneReason) -> Vec<ObjectId> {
         let moves: Vec<ops::Moving> = moves.iter().map(|&(id, to)| ops::Moving::to(id, to)).collect();
         ops::move_together(self, &moves, reason)

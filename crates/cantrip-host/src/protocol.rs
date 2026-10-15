@@ -417,6 +417,9 @@ pub struct ObjectView {
     pub class_level: i32,
     pub protector: i32,
     pub halves: Vec<ObjectView>,
+    /// For a Room on the battlefield (CR 709.5): whether its left and right doors are unlocked, in that order. Empty for
+    /// anything else. A locked door is unlocked by an activation offered on the Room (CR 709.5e).
+    pub unlocked_doors: Vec<bool>,
     pub starting_counter: Option<i32>,
 }
 

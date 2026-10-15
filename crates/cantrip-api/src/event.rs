@@ -63,6 +63,10 @@ pub enum Event {
     /// A spell's characteristics as it became cast (CR 601.2i), recorded just before its `SpellCast`: what "the second
     /// creature spell you cast this turn" reads.
     Cast(Cast),
+    /// A door of a Room was unlocked (CR 709.5f, 709.5h): the permanent was given the unlocked designation of that half
+    /// (`DOOR_LEFT` or `DOOR_RIGHT`) by `player`, whether as it entered because the half was cast (CR 709.5d), by the
+    /// special action (CR 709.5e) or by an instruction to unlock.
+    DoorUnlocked { permanent: ObjectId, door: u8, player: PlayerId },
     /// A spell was copied (CR 707.10): `copy` is the new spell on the stack, controlled by `player`, who made it. It is
     /// not cast (CR 707.10a), so it is no `SpellCast`: magecraft's "or copy".
     Copied { copy: ObjectId, original: ObjectId, player: PlayerId },
@@ -102,6 +106,7 @@ impl Event {
             | Event::TappedForMana { player, .. }
             | Event::BecameMonarch { player }
             | Event::Copied { player, .. }
+            | Event::DoorUnlocked { player, .. }
             | Event::CoinFlipped { player, .. }
             | Event::DieRolled { player, .. }
             | Event::Done { player, .. } => Some(player),
@@ -135,7 +140,10 @@ impl Event {
             Event::ClassLevel { object: o, .. }
             | Event::CountersPut { object: o, .. }
             | Event::Transformed { object: o } => o == object,
-            Event::Tapped { permanent } | Event::TappedForMana { permanent, .. } | Event::Monstrous { permanent } => permanent == object,
+            Event::Tapped { permanent }
+            | Event::TappedForMana { permanent, .. }
+            | Event::Monstrous { permanent }
+            | Event::DoorUnlocked { permanent, .. } => permanent == object,
             Event::Unattached { attachment, from } => attachment == object || from == object,
             Event::LifeChange { .. } | Event::Searched { .. } | Event::AttackersDeclared { .. } | Event::StepBegan { .. } | Event::BecameMonarch { .. } | Event::ChosenAtRandom { .. } | Event::CoinFlipped { .. } | Event::DieRolled { .. } => false,
         }
@@ -182,6 +190,7 @@ impl EventMask {
     pub const CHOSEN_AT_RANDOM: EventMask = EventMask(1 << 31);
     pub const LOOKED: EventMask = EventMask(1 << 32);
     pub const MODES_CHOSEN: EventMask = EventMask(1 << 33);
+    pub const DOOR_UNLOCKED: EventMask = EventMask(1 << 34);
 
     /// An event's kind as the history files it: every event has one. `of` is what triggers listen for, which leaves
     /// out the records no ability triggers on.
@@ -230,6 +239,7 @@ impl EventMask {
             Event::LifeChange { .. } => EventMask::LIFE_CHANGE,
             Event::Countered { .. } => EventMask::COUNTERED,
             Event::Copied { .. } => EventMask::COPIED,
+            Event::DoorUnlocked { .. } => EventMask::DOOR_UNLOCKED,
             _ => EventMask(0),
         }
     }

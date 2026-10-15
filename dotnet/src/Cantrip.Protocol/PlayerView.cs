@@ -22,7 +22,7 @@ namespace Cantrip.Protocol;
 public sealed class PlayerView
 {
     /// <summary>Protocol version, checked at the handshake so mismatched builds fail loudly.</summary>
-    public const int ProtocolVersion = 146;
+    public const int ProtocolVersion = 147;
 
     [Key(0)]
     public int Version { get; set; } = ProtocolVersion;
@@ -483,6 +483,11 @@ public sealed class ObjectView
     /// </summary>
     [Key(46)]
     public List<ObjectView> Halves { get; set; } = [];
+
+    /// <summary>A Room on the battlefield (CR 709.5): whether its left and right doors are unlocked, in that order; empty
+    /// for anything else. A locked door is unlocked by an activation offered on the Room (CR 709.5e).</summary>
+    [Key(48)]
+    public List<bool> UnlockedDoors { get; set; } = [];
 
     /// <summary>
     /// For a planeswalker or a battle anywhere but the battlefield, the loyalty or defense it would enter with

@@ -49,6 +49,10 @@ pub const WAY_OVERLOAD: u8 = 250;
 pub const WAY_SPLIT_LEFT: u8 = 239;
 pub const WAY_SPLIT_RIGHT: u8 = 238;
 
+/// The doors of a Room (CR 709.5, 709.5j), as the bits of `Marks::doors`: the left half and the right.
+pub const DOOR_LEFT: u8 = 1;
+pub const DOOR_RIGHT: u8 = 2;
+
 /// How a card is cast transformed (CR 712.11a): a Siege's "cast it transformed", as a way number.
 pub const WAY_TRANSFORMED: u8 = 252;
 
@@ -224,6 +228,26 @@ impl ManaCost {
 
     pub fn is_zero(&self) -> bool {
         self.mana_value() == 0
+    }
+
+    /// The two costs added symbol by symbol (CR 709.4b: a split card's mana cost is its halves' combined; a Room's
+    /// is that of its unlocked doors, CR 709.5).
+    pub fn plus(&self, other: &ManaCost) -> ManaCost {
+        let mut sum = *self;
+        sum.generic = sum.generic.saturating_add(other.generic);
+        sum.x = sum.x.saturating_add(other.x);
+        for i in 0..6 {
+            sum.symbols[i] = sum.symbols[i].saturating_add(other.symbols[i]);
+        }
+        for i in 0..5 {
+            sum.phyrexian[i] = sum.phyrexian[i].saturating_add(other.phyrexian[i]);
+        }
+        for pair in other.hybrid.iter().flatten() {
+            if let Some(slot) = sum.hybrid.iter().position(|h| h.is_none()) {
+                sum.hybrid[slot] = Some(*pair);
+            }
+        }
+        sum
     }
 
     pub fn colors(&self) -> ColorSet {

@@ -78,6 +78,41 @@ pub const SIEGE_DEFEAT: u8 = 9;
 /// Suspend's two triggered abilities (CR 702.62a): the upkeep one and the one for the last counter removed.
 pub const SUSPEND_UPKEEP: u8 = 10;
 pub const SUSPEND_CAST: u8 = 11;
+/// The unlock special actions of a Room's locked doors (CR 709.5e): the rules give one for each locked door.
+pub const UNLOCK_LEFT: u8 = 12;
+pub const UNLOCK_RIGHT: u8 = 13;
+
+/// "A player who controls a permanent that has one or more locked halves may pay the mana cost of a locked half of that
+/// permanent to give that permanent the appropriate unlocked designation" (CR 709.5e). The cost is the door's own, which
+/// the rules read off the permanent (`actions::special_action`), not off this ability.
+fn unlock_left(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    g.unlock_door(item.object, DOOR_LEFT, item.controller);
+    Ok(())
+}
+
+fn unlock_right(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    g.unlock_door(item.object, DOOR_RIGHT, item.controller);
+    Ok(())
+}
+
+fn left_is_locked(q: &dyn Query, asker: &Asker) -> bool {
+    q.obj(asker.source).marks.doors & DOOR_LEFT == 0
+}
+
+fn right_is_locked(q: &dyn Query, asker: &Asker) -> bool {
+    q.obj(asker.source).marks.doors & DOOR_RIGHT == 0
+}
+
+const fn unlock(text: &'static str, effect: Effect, condition: Condition) -> AbilityDef {
+    AbilityDef::Activated(ActivatedDef {
+        text,
+        effect,
+        timing: Timing::Sorcery,
+        special_action: true,
+        condition: Some(condition),
+        ..ActivatedDef::BLANK
+    })
+}
 
 /// "At the beginning of your upkeep, if this card is suspended, remove a time counter from it." (CR 702.62a)
 fn suspend_upkeep(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -144,6 +179,8 @@ pub static INTRINSIC: CardDef = CardDef {
         inherent("When the last defense counter is removed from this permanent, exile it. Then you may cast it transformed without paying its mana cost.", siege_defeated),
         inherent("Suspend: at the beginning of your upkeep, if this card is suspended, remove a time counter from it.", suspend_upkeep),
         inherent("Suspend: when the last time counter is removed from this card, if it's exiled, you may cast it without paying its mana cost.", suspend_cast),
+        unlock("Unlock the left door by paying its mana cost.", unlock_left, left_is_locked),
+        unlock("Unlock the right door by paying its mana cost.", unlock_right, right_is_locked),
     ],
     ..CardDef::BLANK
 };

@@ -290,6 +290,19 @@ Known gaps:
 - No scenario reaches Questing Beast's unpreventable damage, Emrakul's extra turn on cast, or Tamiyo's -7 emblem.
 - Suspend does not give a creature cast that way haste (no card in content needs it), and several creatures put onto
   the battlefield one after another by an effect (Ghost Vacuum) enter one at a time rather than together.
+- Rooms (CR 709.5) are built: `Marks::doors` holds the unlocked designations, `layers::doors` gives a Room on the
+  battlefield the name, mana cost and abilities of its unlocked doors, the unlock special action is an intrinsic ability
+  per locked door (`intrinsic::UNLOCK_LEFT`/`UNLOCK_RIGHT`, cost read off the door), and `Event::DoorUnlocked` is what
+  "when you unlock this door" listens for. Not yet: a door with static abilities, replacement effects or an enters
+  rule (the card table refuses one), instructions to unlock or lock a door (`Game::unlock_door` exists for the first,
+  nothing locks), "fully unlocks", and a copy of a Room spell (`resolve_copy_as_token` gives the token its door, but
+  no card in content can copy a Room spell to prove it).
+  Known deviations from the rules: the unlock is an intrinsic ability entry, so an effect that removes abilities
+  (Humility) would remove it, though CR 709.5e says the unlock is not an ability; a copy effect's "except its name is X"
+  is overwritten by `layers::doors`, which names a Room by its unlocked doors; `resolve_copy_as_token` drops the copy
+  exceptions of a Room spell's copy; a granted cast from a graveyard (Serra Paragon) is judged on the whole Room card, mana
+  value 8, never on a door (Known bug scenario `serra-paragon-casts-either-door-of-a-room-in-the-graveyard`); and a card
+  name chosen for a Room may be the combined name, where CR 709.4a allows only one of its two names.
 
 ## Open questions
 

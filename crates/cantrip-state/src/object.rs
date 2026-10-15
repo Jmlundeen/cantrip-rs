@@ -95,6 +95,10 @@ pub struct Obj {
 /// when the object does: a permanent that changes zones is a new object (CR 400.7) with none.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Default)]
 pub struct Marks {
+    /// The unlocked designations of a permanent with a shared type line (CR 709.5c): `DOOR_LEFT` is "left half unlocked",
+    /// `DOOR_RIGHT` "right half unlocked". Given as it enters (CR 709.5d) or by an unlock (CR 709.5e-f); a new object
+    /// (CR 400.7) has neither.
+    pub doors: u8,
     /// The player whose next untap step it sits out (CR 701.43a).
     pub exerted_by: Option<PlayerId>,
     /// It has become monstrous (CR 701.37b).

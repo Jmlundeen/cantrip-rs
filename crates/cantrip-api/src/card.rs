@@ -1194,6 +1194,23 @@ impl CardDef {
         self.colors.unwrap_or_else(|| self.cost.colors())
     }
 
+    /// A Room (CR 709.5): a split card whose halves share a type line, each half a door.
+    pub fn is_room(&self) -> bool {
+        self.split.is_some() && self.subtypes.has(Subtype::Room)
+    }
+
+    /// The doors of a Room that the unlocked designations `doors` name, left first (CR 709.5c).
+    pub fn unlocked_doors(&self, doors: u8) -> impl Iterator<Item = &'static CardDef> {
+        let (left, right) = self.split.map_or((None, None), |(l, r)| (Some(l), Some(r)));
+        [left.filter(|_| doors & DOOR_LEFT != 0), right.filter(|_| doors & DOOR_RIGHT != 0)].into_iter().flatten()
+    }
+
+    /// The mana cost of a Room permanent with the unlocked designations `doors`: the combined costs of its unlocked
+    /// doors, and none at all when neither is (CR 709.5, 709.4b).
+    pub fn room_cost(&self, doors: u8) -> ManaCost {
+        self.unlocked_doors(doors).fold(ManaCost::ZERO, |sum, half| sum.plus(&half.cost))
+    }
+
     pub fn is(&self, t: CardType) -> bool {
         self.types.has(t)
     }
@@ -1245,6 +1262,9 @@ pub struct CardTable {
     pub intrinsic: CardId,
     /// What a face-down permanent is (CR 708.2a): its copiable values.
     pub face_down: CardId,
+    /// A Room's two doors (CR 709.5), by the Room's id: the ids of its halves, whose abilities its permanent has while
+    /// they are unlocked.
+    pub halves: Vec<Option<(CardId, CardId)>>,
     /// A double-faced card's back face, by the front's id (CR 711).
     pub backs: Vec<Option<CardId>>,
     /// The front face of a back face, by the back's id: a decklist may name either face.
@@ -1316,18 +1336,36 @@ impl CardTable {
             face_down,
             undercity,
             backs: Vec::new(),
+            halves: Vec::new(),
             fronts: Vec::new(),
             printed: Vec::new(),
         };
         let count = table.cards.len();
         table.printed = (0..count).map(|_| [std::sync::OnceLock::new(), std::sync::OnceLock::new()]).collect();
         table.backs = vec![None; count];
+        table.halves = vec![None; count];
         table.fronts = vec![None; count];
         for front in 0..count {
             if let Some(back) = table.cards[front].back {
                 let back = table.find(back.name).expect("a back face is in the table");
                 table.backs[front] = Some(back);
                 table.fronts[back.0 as usize] = Some(CardId(front as u16));
+            }
+            // A Room's doors (CR 709.5): the abilities of an unlocked one are the permanent's. What a door's text does
+            // beyond abilities (static abilities, replacement effects, entering rules) is read off the card, not off the
+            // door, so a door that has any is refused until those follow the designations: never quietly absent.
+            let card = table.cards[front];
+            if card.is_room() {
+                let (left, right) = card.split.expect("a Room is a split card");
+                for half in [left, right] {
+                    assert!(
+                        half.statics.is_empty() && half.replacements.is_empty() && half.enters.is_none(),
+                        "{}: a door with static abilities, replacement effects or an enters rule is not supported yet (CR 709.5)",
+                        half.name
+                    );
+                }
+                let ids = (table.find(left.name), table.find(right.name));
+                table.halves[front] = Some((ids.0.expect("a door is in the card table"), ids.1.expect("a door is in the card table")));
             }
         }
         table

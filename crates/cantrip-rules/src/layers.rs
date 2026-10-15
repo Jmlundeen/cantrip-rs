@@ -69,12 +69,18 @@ pub fn chars_before(cards: &CardTable, state: &GameState, id: ObjectId, stop: La
         None => cards.face(obj.card, obj.transformed),
     };
     let def = cards.get(card);
+    // A Room on the battlefield (CR 709.5): the name, mana cost and abilities of its unlocked doors alone, which no
+    // card-only cache can hold, as they are the object's. In every other zone the card has both halves (CR 709.4).
+    let room = def.is_room() && obj.zone.is(ZoneKind::Battlefield);
     let start = || {
         let mut chars = match &obj.copy {
             Some(c) => initial(cards, card, Some(c)),
             None => *printed(cards, card, false),
         };
         chars.spell = spell;
+        if room {
+            doors(cards, card, obj.marks.doors, obj.copy.is_some_and(|c| c.colors.is_some()), &mut chars);
+        }
         chars
     };
 
@@ -104,12 +110,12 @@ pub fn chars_before(cards: &CardTable, state: &GameState, id: ObjectId, stop: La
     let found = (cards.any_statics && state.statics_seen).then(|| static_sources(cards, state));
     let sources: &[(ObjectId, ZoneKind)] = found.as_ref().map_or(&[], |f| &f.list);
     if !has_effects && !has_counters && !has_own && sources.is_empty() {
-        if obj.copy.is_none() && !spell {
+        if obj.copy.is_none() && !spell && !room {
             // Nothing acts on it: the card's own values, made once.
             return *printed(cards, card, stop > Layer::Ability);
         }
         let mut chars = start();
-        if stop > Layer::Ability && obj.copy.is_none() {
+        if stop > Layer::Ability && obj.copy.is_none() && !room {
             let mut full = *printed(cards, card, true);
             full.spell = spell;
             return full;
@@ -266,6 +272,50 @@ fn changeling(chars: &mut Chars) {
             chars.subtypes = chars.subtypes.with(t);
         }
     }
+}
+
+/// What a Room's unlocked designations leave of it (CR 709.5): "as long as this permanent doesn't have the 'left half
+/// unlocked' designation, it doesn't have the name, mana cost, or rules text of this object's left half", and the same of
+/// the right. The name is that of the unlocked doors (none, one, or both), its colors those of their mana costs unless a
+/// copy effect says otherwise (CR 707.9b), its abilities the unlocked doors', then any a copy effect added, and last the
+/// unlock special action (CR 709.5e) of each door still locked.
+fn doors(cards: &CardTable, card: CardId, unlocked: u8, colors_stated: bool, chars: &mut Chars) {
+    let def = cards.get(card);
+    let (left, right) = def.split.expect("a Room has two doors");
+    let (left_id, right_id) = cards.halves[card.0 as usize].expect("a Room's doors are in the card table");
+    chars.name = match unlocked & (DOOR_LEFT | DOOR_RIGHT) {
+        0 => "",
+        DOOR_LEFT => left.name,
+        DOOR_RIGHT => right.name,
+        _ => def.name,
+    };
+    if !colors_stated {
+        chars.colors = def.room_cost(unlocked).colors();
+    }
+    let mut abilities = [None; MAX_ABILITIES];
+    let mut n = 0;
+    let mut push = |ability: AbilityRef| {
+        if n < MAX_ABILITIES {
+            abilities[n] = Some(ability);
+            n += 1;
+        }
+    };
+    for (door, half, id) in [(DOOR_LEFT, left, left_id), (DOOR_RIGHT, right, right_id)] {
+        if unlocked & door != 0 {
+            for index in 0..half.abilities.len() {
+                push(AbilityRef { card: id, index: index as u8 });
+            }
+        }
+    }
+    for ability in chars.abilities.into_iter().flatten() {
+        push(ability);
+    }
+    for (door, index) in [(DOOR_LEFT, cantrip_api::intrinsic::UNLOCK_LEFT), (DOOR_RIGHT, cantrip_api::intrinsic::UNLOCK_RIGHT)] {
+        if unlocked & door == 0 {
+            push(AbilityRef { card: cards.intrinsic, index });
+        }
+    }
+    chars.abilities = abilities;
 }
 
 /// A token's name under changed text (CR 612.2a): a token named for its creature type ("Spirit") is named for the type
