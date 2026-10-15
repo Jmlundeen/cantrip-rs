@@ -45,6 +45,25 @@ pub fn enters_tapped_unless_you_control<const TYPE: u16>(g: &mut dyn Game, enter
     Ok(())
 }
 
+/// "Destroy target [permanent]. Its controller may search their library for a basic land card, put it onto the battlefield
+/// [tapped], then shuffle": the permanent `item` targeted in `slot`, if it is still a legal target (CR 608.2b). Its controller
+/// is the one it last had (CR 608.2h), asked to search after the destruction and even when the permanent was not destroyed
+/// (indestructible, regenerated); declining skips the search and the shuffle. Erode (tapped), Ghost Quarter (untapped) and
+/// Avengers Disassembled (tapped) print it.
+pub fn destroy_target_its_controller_may_fetch_basic(g: &mut dyn Game, item: &StackItem, slot: usize, tapped: bool) -> Result<(), Suspend> {
+    let Some(permanent) = crate::targets::object(g, item, slot) else { return Ok(()) };
+    let owner = g.controller(permanent);
+    g.destroy(permanent);
+    if !effects::ask_may(g, owner, item.object, Purpose::Optional)? {
+        return Ok(());
+    }
+    search_to_battlefield(g, owner, item.object, Find::ONE, tapped, |q, c| {
+        let chars = q.chars(c);
+        chars.is(CardType::Land) && chars.supertypes.basic
+    })?;
+    Ok(())
+}
+
 fn add_two<const A: u8, const B2: u8>(g: &mut dyn Game, asker: &Asker, _: Option<Color>) -> Result<(), Suspend> {
     g.add_mana(asker.controller, Mana::ALL[A as usize], 1);
     g.add_mana(asker.controller, Mana::ALL[B2 as usize], 1);
