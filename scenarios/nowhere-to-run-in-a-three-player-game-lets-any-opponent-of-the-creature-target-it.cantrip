@@ -1,0 +1,64 @@
+# Three players: "as though they didn't have hexproof" is about the creatures, so it is not only Bot1's spells that may target
+# Bot2's hexproof Sylvan Caryatid while Bot1's Nowhere to Run is out. On turn three, with no Nowhere to Run yet, Bot3's
+# Lightning Bolt is refused at the Caryatid (the control). On turn four Bot1 casts Nowhere to Run (its trigger takes Bot3's
+# Ornithopter); then Bot2's Bolt is refused at Bot1's own hexproof Caryatid (Bot1 controls it, so it is not one of the creatures
+# Bot1's opponents control) and Bot3's Bolt is aimed at Bot2's Caryatid and kills it.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Sylvan Caryatid
+Swamp
+Nowhere to Run
+Island x12
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Sylvan Caryatid
+Lightning Bolt
+Mountain x12
+
+[Bot3 Deck]
+Mountain
+Lightning Bolt
+Ornithopter
+Mountain x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sylvan Caryatid.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Sylvan Caryatid.Cast
+[T3 Bot3.Main1]
+Bot3.Hand.Mountain.Play
+Bot3.Hand.Ornithopter.Cast
+! Bot3.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Sylvan Caryatid)
+[T4 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Nowhere to Run.Cast
+Bot1.Pass
+Bot1.Target(Ornithopter)
+! Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Sylvan Caryatid)
+Bot3.Battlefield.Mountain.Activate
+Bot3.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Sylvan Caryatid)
+Bot3.Pass
+[T4 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Sylvan Caryatid
+Bot3.Graveyard = Ornithopter; Lightning Bolt
+Bot1.Battlefield.Sylvan Caryatid.Damage = 0

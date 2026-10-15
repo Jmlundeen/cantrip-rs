@@ -1,0 +1,47 @@
+# "Ward abilities of those creatures don't trigger" stops a trigger, not one that is already on the stack. Bot2's Lightning Bolt
+# targets Bot1's Sedgemoor Witch (Ward - Pay 3 life) and the ward ability triggers; Bot2 then flashes in Nowhere to Run in
+# response. Its enters trigger kills the Witch (-3/-3), and the ward ability, already on the stack, still resolves: Bot2 is asked
+# and pays 3 life (20 to 17). Had the ward been dropped, Bot2 would not have been asked and would still be at 20.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Sedgemoor Witch
+Island x14
+
+[Bot2 Deck]
+Mountain
+Mox Jet
+Mox Ruby
+Lightning Bolt
+Nowhere to Run
+Mountain x12
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sedgemoor Witch.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Sedgemoor Witch)
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Nowhere to Run.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Accept
+Bot1.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Graveyard = Sedgemoor Witch
+Bot2.Battlefield.Nowhere to Run.Types = Enchantment

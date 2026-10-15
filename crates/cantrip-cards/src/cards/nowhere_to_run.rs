@@ -3,11 +3,9 @@ use cantrip_mechanics::{targets, triggers::this_enters};
 use cantrip_oracle as oracle;
 
 /// "Target creature an opponent controls gets -3/-3 until end of turn" (CR 611.2a): -3/-3 from the layer 7c, on the creature
-/// if it is still the creature that was targeted.
+/// if it is still a legal target, which includes still being the creature that was targeted (CR 608.2b, 400.7).
 fn minus_three(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(creature) = targets::object(g, item, 0)
-        && g.is_on_battlefield(creature)
-    {
+    if let Some(creature) = targets::object(g, item, 0) {
         g.add_effect(item.object, creature, EffectKind::Pump(-3, -3), Duration::EndOfTurn);
     }
     Ok(())

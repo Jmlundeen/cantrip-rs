@@ -1,0 +1,45 @@
+# The enters trigger's target is judged on resolution (CR 608.2b): Bot1's Nowhere to Run targets Bot2's Elvish Mystic, Bot1
+# kills the Mystic with Lightning Bolt in response, and the trigger, its only target gone, does nothing. The other creature,
+# Bot2's Ornithopter, is not affected by it and stays a 0/2.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Nowhere to Run
+Lightning Bolt
+Island x14
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Elvish Mystic
+Ornithopter
+Island x14
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Nowhere to Run.Cast
+Bot1.Pass
+Bot1.Target(Elvish Mystic)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Elvish Mystic)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Elvish Mystic
+Bot2.Battlefield.Ornithopter.Toughness = 2
+Bot1.Battlefield.Nowhere to Run.Types = Enchantment
