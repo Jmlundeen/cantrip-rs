@@ -7,6 +7,8 @@ pub mod affinity;
 pub mod amass;
 pub mod attach;
 pub mod bargain;
+pub mod behold;
+pub mod blight;
 pub mod bestow;
 pub mod boast;
 pub mod battle_cry;
