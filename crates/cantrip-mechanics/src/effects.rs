@@ -15,6 +15,25 @@ pub fn counters_on_creatures_you_control(g: &mut dyn Game, player: PlayerId, kin
     creatures
 }
 
+fn creatures_on_the_battlefield(g: &dyn Game) -> Vec<ObjectId> {
+    g.state().battlefield().iter().copied().filter(|&id| g.chars(id).is(CardType::Creature)).collect()
+}
+
+/// "Destroy all creatures." Every creature goes at once, in battlefield order (CR 701.8a, 101.4); regeneration and
+/// indestructible are the verb's business. Day of Judgment prints it.
+pub fn destroy_all_creatures(g: &mut dyn Game, _: &StackItem) -> Result<(), Suspend> {
+    let creatures = creatures_on_the_battlefield(g);
+    g.destroy_all(&creatures);
+    Ok(())
+}
+
+/// "Destroy all creatures. They can't be regenerated." (CR 701.19c). Wrath of God and Damnation print it.
+pub fn destroy_all_creatures_no_regen(g: &mut dyn Game, _: &StackItem) -> Result<(), Suspend> {
+    let creatures = creatures_on_the_battlefield(g);
+    g.destroy_all_no_regen(&creatures);
+    Ok(())
+}
+
 /// "Draw N cards" (CR 121.1). Chromatic Star and Mind Stone print "draw a card"; Coveted Jewel and Bankrupt in Blood draw
 /// three.
 pub fn draw<const N: u32>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
