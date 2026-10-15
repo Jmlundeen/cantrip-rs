@@ -35,6 +35,31 @@ A game of three or four players names more decks, `[Bot3 Deck]` and `[Bot4 Deck]
 game of more than two draws on their first turn (CR 103.8a). A script with no `[Bot3 Deck]` is the duel it always was.
 
 
+## In the browser: `# Browser` and `Client.`
+
+A scenario also plays at a real table with Bot1 a browser page (`docs/scenarios-in-the-browser.md`): the table plays the
+script, and the page is clicked through each of Bot1's answers, which must be exactly what the line means - so every
+line is shown to be reachable by a person clicking. A `# Browser` line puts a scenario in that suite (a wall-clock test:
+`tools\test.cmd /filter "FullyQualifiedName~ScenarioInBrowser"`); `tools\scenario-in-browser.cmd name` plays any one in a
+window to watch.
+
+A key starting `Client.` is about what the page shows, not the game's state, and is skipped by a headless run:
+
+```
+? Client.Bot1.Stack.Count = 1            while an equip ability is paid for, the stack row shows it alone
+? Client.Bot1.Arrows = player 2; Blood Token   what a resolving ability's arrows point at
+```
+
+| Key | The page for that player shows |
+| --- | --- |
+| `Client.Bot1.Stack`, `.Hand`, `.Battlefield`, `.OpponentBattlefield` | the cards in that row, compared as a set; each with `.Count` |
+| `Client.Bot1.OpponentHand` | the cards known in the opponent's hand: empty when nothing in it has been shown |
+| `Client.Bot1.Button.Undo` | `shown` or `absent`: a button whose label holds the text |
+| `Client.Bot1.Arrows` | what the latest resolution's arrows point at: card names, or `player 2` |
+| `Client.Bot1.Over` | `true` once the page says the game is over |
+
+Only Bot1 is a page for now, so only `Client.Bot1.` keys can be judged.
+
 ## Known bugs
 
 A scenario asserts what the rules require, never what the engine happens to do. When the engine or a card gets it
@@ -312,8 +337,8 @@ verb that would otherwise have answered it, and by the player being asked.
 
 A script that ends this way is two things at once. Run as a test it plays to the handover and checks its `[Expect]`
 block, which is how it proves it reached the position it describes. It was also a position to deal to a real session for
-a person or a bot to answer from, through the C# engine, which is gone; serving a handover from the Rust engine to the
-web client is not built yet.
+a person or a bot to answer from, through the C# engine, which is gone; a table plays a scenario now
+(`docs/scenarios-in-the-browser.md`), but stopping at a handover for a person to take the seat is not built yet.
 
 Name the question. A bare `[Handover]` stops at whatever is asked next, which is usually one or two questions early
 and silently so: priority passes in the declare-blockers step come before combat damage is divided. Until the named

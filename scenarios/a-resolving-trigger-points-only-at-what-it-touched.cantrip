@@ -1,0 +1,24 @@
+# Browser
+# What the client shows as an ability resolves: Voldaren Epicure's enters trigger deals 1 damage to Bot2 and makes a
+# Blood token, and its arrows point at those two and nothing else - not at the lands played or tapped before it, which
+# the events since the game began would name if the resolution claimed them all.
+
+[Bot1 Deck]
+Mountain
+Voldaren Epicure
+Island x13
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Voldaren Epicure.Cast
+Bot1.Pass
+Bot1.Pass
+? Client.Bot1.Arrows = player 2; Blood Token
+
+[Expect]
+Bot2.Life = 19
+Bot1.Battlefield = Mountain; Voldaren Epicure; Blood Token

@@ -64,8 +64,10 @@ Force the position instead. A `.cantrip` scenario names both decklists in order 
 The client draws on canvases, so there is no DOM to find a card in. Open the page with `&test` and it publishes where
 every card and control is, by name, on `globalThis.cantripTest`; drive it with Playwright - screenshots, and real
 mouse clicks at those places (`docs/web-client.md`), in `dotnet/tests/Cantrip.Client.Web.Tests`, where `TablePage`
-does the reading and clicking. Serving a handed-over scenario position to the web client went with the C# engine and
-is not rebuilt yet.
+does the reading and clicking. A scenario plays in the browser too (`docs/scenarios-in-the-browser.md`): a real table
+plays the script, Bot1 a page that `ScenarioPlayer` clicks through it, every answer the one the line means; `# Browser`
+puts a scenario in that suite, `Client.` keys check what the page shows, and `tools\scenario-in-browser.cmd name` plays
+one to watch.
 
 If the harness cannot express what a test needs — state detection, a new prompt, a new assertion — extend it. That
 is cheaper than a seed hunt and it stays fixed.

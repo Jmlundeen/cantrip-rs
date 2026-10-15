@@ -43,6 +43,37 @@ result: what the host says to answer is what the script means, over the wire and
 
 None of this is for the client: the server keeps it to itself and hands it to whatever drives the seats.
 
+## The browser driver
+
+`ScenarioPlayer` (`dotnet/tests/Cantrip.Client.Web.Tests`) starts a `ScenarioTable` (a real server on a loopback port,
+`Cantrip.Server.Host`), opens Bot1's page and, for each `Expected`, clicks there with real mouse events at the places the
+page publishes under `?test` (`MainPage.Test.cs`: every card with its handle and row, each player's box and pool, every
+control): the card by its handle, a menu's row by the colour it adds, the pool's mana, a target, a player's box, the
+button. A pass is the pass key. An answer it cannot click its way to yet fails naming it and what the page offered; it
+grows prompt by prompt.
+
+Nothing on the page may answer for the player, or a strict run would fail where the page passed by itself: the page
+opens with auto-mana off (a menu asks the colour), a stop at every step of both players' turns, and Hold Priority on. A
+question the page did answer by itself - a pass it would make for anyone - is noted, and judged by the table like a
+click.
+
+Objects nobody could tell apart count as one (`Run::same_but_for_interchangeable`): a click on the top of a pile of
+untapped Forests answers what the script means by "a Forest", and the script's own answer is the one given, so later
+checks of `Forest#1` mean what they say.
+
+`ScenarioInBrowserTests` plays every scenario marked `# Browser`, or `CANTRIP_SCENARIO=name` alone (with
+`CANTRIP_WEB_HEADED=1`, to watch: `tools\scenario-in-browser.cmd`). `ScenarioTableTests` (Cantrip.Server.Tests) plays
+scenarios with Bot1 a protocol client sending the expected answers themselves: the table's half, so a browser run that
+fails is the page's.
+
+## Not yet
+
+- Only Bot1 is a page; the other seats are the script's. Checks of what another seat's page shows, hidden information
+  above all (that Bot2's page never shows Bot1's hand), want Bot2 driven too.
+- Things a player does that are not answers to a question - a concession, Pass Turn, a stop toggled - have no lines yet.
+- The driver clicks its way to priority actions, payments, may, card choices, targets, attacks and blocks; other
+  prompts fail as not driven yet.
+
 ## Client expectations
 
 A key starting `Client.` is about what a client shows, not the game's state: what the stack row holds, whether a

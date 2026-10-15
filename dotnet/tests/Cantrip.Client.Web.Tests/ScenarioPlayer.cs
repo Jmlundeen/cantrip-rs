@@ -358,7 +358,10 @@ public sealed class ScenarioPlayer
         }
 
         string what = string.Join('.', parts.Skip(2));
-        string? shown = Read(what, state);
+        // A list's .Count, as the dump's lists have one.
+        string? shown = what.EndsWith(".Count", StringComparison.Ordinal) && Read(what[..^".Count".Length], state) is { } list
+            ? list.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Length.ToString(System.Globalization.CultureInfo.InvariantCulture)
+            : Read(what, state);
         if (shown is null)
         {
             return $"line {check.Line}: {check.Key} is not a client key: {ClientKeys}";
@@ -368,7 +371,7 @@ public sealed class ScenarioPlayer
     }
 
     private const string ClientKeys =
-        "Stack, Hand, Battlefield, OpponentBattlefield, OpponentHand (the cards known in it), Button.<label> (shown or absent), Arrows (the latest resolution's targets), Over";
+        "Stack, Hand, Battlefield, OpponentBattlefield, OpponentHand (the cards known in it), each with .Count, Button.<label> (shown or absent), Arrows (the latest resolution's targets), Over";
 
     private static string? Read(string what, TableState state)
     {

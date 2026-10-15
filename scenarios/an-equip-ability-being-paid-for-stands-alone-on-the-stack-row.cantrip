@@ -1,0 +1,29 @@
+# Browser
+# What the client shows while an ability is paid for: Skullclamp's equip ability is on the stack from the moment it is
+# activated (CR 602.2a), and the stack row shows it alone - not the Equipment beside it, as a spell being cast would
+# stand there. Paid with an Island, Skullclamp is attached to the Ornithopter.
+
+[Bot1 Deck]
+Island
+Skullclamp
+Ornithopter
+Island
+Island x11
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Skullclamp.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Skullclamp.Activate(Ornithopter)
+? Client.Bot1.Stack.Count = 1
+? Client.Bot1.Battlefield = Island; Island; Skullclamp; Ornithopter
+Bot1.Battlefield.Island.Activate
+
+[Expect]
+Bot1.Battlefield.Skullclamp.AttachedTo = Ornithopter
