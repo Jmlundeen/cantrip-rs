@@ -1,0 +1,47 @@
+# "When Aerid Konstrari enters or dies": the same ability triggers on the death too (CR 603.10a, looking back at the
+# creature as it left the battlefield). Bot2 kills the 5/4 with two Lightning Bolts, so Bot1 ends with the enters token
+# and the dies token: two Heartwood tokens, Aerid Konstrari in the graveyard.
+
+[Bot1 Deck]
+Forest
+Mox Ruby
+Mox Emerald
+Mox Emerald
+Aerid Konstrari
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Mountain x13
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Aerid Konstrari.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+? Bot1.Battlefield = Forest; Mox Ruby; Mox Emerald; Mox Emerald; Aerid Konstrari; Heartwood Token
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Aerid Konstrari)
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Aerid Konstrari)
+[T2 Bot2.Main2]
+? Bot1.Graveyard = Aerid Konstrari
+? Bot1.Battlefield = Forest; Mox Ruby; Mox Emerald; Mox Emerald; Heartwood Token; Heartwood Token
+
+[Expect]
+Bot1.Graveyard = Aerid Konstrari
+Bot1.Battlefield = Forest; Mox Ruby; Mox Emerald; Mox Emerald; Heartwood Token; Heartwood Token
+Bot2.Graveyard.Count = 2

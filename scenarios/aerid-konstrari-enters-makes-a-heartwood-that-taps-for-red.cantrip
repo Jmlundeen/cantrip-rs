@@ -1,0 +1,44 @@
+# Aerid Konstrari's enters trigger creates a Heartwood token: a red and green artifact with the subtype Heartwood
+# (CR 111.10, the token's printed reminder text) and "{T}: Add {R} or {G}." (CR 605.1a, 106.5). On Bot1's next turn
+# the token taps for red. Blue is refused beside the positive control of red, so the refusal cannot pass for the wrong
+# reason (the token is there, untapped and offered).
+
+[Bot1 Deck]
+Forest
+Mox Ruby
+Mox Emerald
+Mox Emerald
+Aerid Konstrari
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Plains x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Aerid Konstrari.Cast
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Heartwood Token.Types = Artifact
+? Bot1.Battlefield.Heartwood Token.Subtypes = Heartwood
+? Bot1.Battlefield.Heartwood Token.Colors = Green; Red
+? Bot1.Battlefield.Heartwood Token.Tapped = false
+? Bot1.Battlefield.Aerid Konstrari.Power = 5
+? Bot1.Battlefield.Aerid Konstrari.Toughness = 4
+? Bot1.Battlefield.Aerid Konstrari.Keywords = Flying
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Heartwood Token.Activate(Color: Blue)
+Bot1.Battlefield.Heartwood Token.Activate(Color: Red)
+? Bot1.Mana = {R}
+
+[Expect]
+Bot1.Battlefield = Forest; Mox Ruby; Mox Emerald; Mox Emerald; Aerid Konstrari; Heartwood Token
+Bot1.Battlefield.Heartwood Token.Tapped = true

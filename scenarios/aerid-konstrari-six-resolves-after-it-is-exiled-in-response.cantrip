@@ -1,0 +1,50 @@
+# The {6} ability is independent of its source once activated (CR 113.7a, 608.2h): Bot2 exiles Aerid Konstrari with Path
+# to Exile in response, and the ability still creates its Heartwood token. Aerid Konstrari is no longer on the
+# battlefield (a new object if it came back, CR 400.7), so it gets no +X/+0 and being exiled it did not die, so there is
+# no dies trigger: Bot1 ends with exactly two Heartwood tokens (the enters one and this one), and no creature.
+
+[Bot1 Deck]
+Forest
+Mox Ruby
+Mox Emerald
+Mox Emerald
+Aerid Konstrari
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Plains
+Path to Exile
+Plains x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Aerid Konstrari.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Heartwood Token.Activate(Color: Green)
+Bot1.Battlefield.Aerid Konstrari.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Path to Exile.Cast(Bot1.Battlefield.Aerid Konstrari)
+[T3 Bot1.Main2]
+? Exile = Aerid Konstrari
+? Bot1.Graveyard.Count = 0
+
+[Expect]
+Bot1.Battlefield = Forest; Forest; Mox Ruby; Mox Emerald; Mox Emerald; Heartwood Token; Heartwood Token
+Bot1.Graveyard.Count = 0

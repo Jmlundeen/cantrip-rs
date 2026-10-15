@@ -1,0 +1,58 @@
+# "{6}: Create a Heartwood token. Then Aerid Konstrari gets +X/+0 until end of turn, where X is the number of artifacts
+# you control." Bot1 controls three Moxen and the Heartwood from the enters trigger; the ability makes a second, and X is
+# counted after it (CR 608.2c "then"): five artifacts, so Aerid Konstrari is 10/4. Bot2's Mox Pearl is an artifact Bot1
+# does not control and a Forest is not an artifact, so neither counts. The pump is real (Bot2 takes 10 in the air) and
+# lasts until end of turn (CR 611.2a, 514.2): back to 5/4 on Bot2's turn.
+
+[Bot1 Deck]
+Forest
+Mox Ruby
+Mox Emerald
+Mox Emerald
+Aerid Konstrari
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Plains x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Aerid Konstrari.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Heartwood Token.Activate(Color: Green)
+? Bot1.Mana = {R}{G}{G}{G}{G}{G}
+Bot1.Battlefield.Aerid Konstrari.Activate
+[T3 Bot1.DeclareAttackers]
+? Bot1.Battlefield.Aerid Konstrari.Power = 10
+? Bot1.Battlefield.Aerid Konstrari.Toughness = 4
+Bot1.Attack(Aerid Konstrari > Bot2)
+[T3 Bot1.Main2]
+? Bot2.Life = 10
+? Bot1.Battlefield.Aerid Konstrari.Power = 10
+[T4 Bot2.Upkeep]
+? Bot1.Battlefield.Aerid Konstrari.Power = 5
+
+[Expect]
+Bot1.Battlefield = Forest; Forest; Mox Ruby; Mox Emerald; Mox Emerald; Aerid Konstrari; Heartwood Token; Heartwood Token
+Bot2.Life = 10
+Bot2.Battlefield = Plains; Mox Pearl
