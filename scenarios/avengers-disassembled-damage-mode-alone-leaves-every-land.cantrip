@@ -1,0 +1,68 @@
+# "Choose one or both", the damage mode alone: 3 damage to each creature (the caster's Embereth Shieldbreaker, Bot2's Llanowar
+# Elves and Sylvan Caryatid, whose 3 toughness is exactly lethal) and nothing else: no land is targeted or destroyed, so
+# Bot2 has no search and its Forests stay. Ulvenwald Oddity (4/4) survives with 3 damage.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Embereth Shieldbreaker
+Avengers Disassembled
+Mountain
+Mountain
+Mountain
+Mountain x12
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Mox Jet
+Ulvenwald Oddity
+Sylvan Caryatid
+Llanowar Elves
+Forest
+Forest x3
+Island
+Forest x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Embereth Shieldbreaker.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Ulvenwald Oddity.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Sylvan Caryatid.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Avengers Disassembled.Cast
+Bot1.Modes(1)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Graveyard = Embereth Shieldbreaker; Avengers Disassembled
+Bot2.Graveyard = Llanowar Elves; Sylvan Caryatid
+Bot2.Battlefield = Forest; Forest; Mox Emerald; Mox Jet; Mox Pearl; Ulvenwald Oddity
+Bot2.Battlefield.Ulvenwald Oddity.Damage = 3

@@ -1,0 +1,75 @@
+# "Choose one or both": both modes. Mode 1 deals 3 damage to each creature, the caster's own Embereth Shieldbreaker (2/1)
+# included and Bot2's Sylvan Caryatid (0/3, hexproof, which the spell does not target) and Llanowar Elves (1/1): all die,
+# while Ulvenwald Oddity (4/4) survives with 3 damage marked. Mode 2 destroys target land, a Forest of Bot2's, and its
+# controller (Bot2) searches for a basic land and puts it onto the battlefield tapped: an Island, tapped.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Embereth Shieldbreaker
+Avengers Disassembled
+Mountain
+Mountain
+Mountain
+Mountain x12
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Mox Jet
+Ulvenwald Oddity
+Sylvan Caryatid
+Llanowar Elves
+Forest
+Forest x3
+Island
+Forest x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Embereth Shieldbreaker.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Ulvenwald Oddity.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Sylvan Caryatid.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Avengers Disassembled.Cast
+Bot1.Modes(1; 2)
+! Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+Bot1.Target(Bot2.Battlefield.Forest)
+Bot2.Accept
+Bot2.Search(Island)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Graveyard = Embereth Shieldbreaker; Avengers Disassembled
+Bot1.Battlefield = Mountain; Mountain; Mountain; Mox Ruby
+Bot2.Graveyard = Llanowar Elves; Sylvan Caryatid; Forest
+Bot2.Battlefield = Forest; Island; Mox Emerald; Mox Jet; Mox Pearl; Ulvenwald Oddity
+Bot2.Battlefield.Island.Tapped = true
+Bot2.Battlefield.Ulvenwald Oddity.Damage = 3

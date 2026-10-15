@@ -1,0 +1,51 @@
+# CR 608.2b: a spell with targets does not resolve at all when every one of its targets is illegal, and the land is the
+# only target Avengers Disassembled has, so the damage mode (which targets nothing) does not happen either. Bot1 chooses
+# both modes and targets Bot2's Fabled Passage; in response Bot2 sacrifices it for a Forest (tapped). Avengers
+# Disassembled is put into the graveyard without effect: Bot2's Llanowar Elves is undamaged and Bot2 is not asked to search
+# a second time.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Avengers Disassembled
+Mountain
+Mountain
+Mountain
+Mountain x12
+
+[Bot2 Deck]
+Fabled Passage
+Mox Emerald
+Llanowar Elves
+Island x4
+Forest x4
+Island x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Fabled Passage.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Avengers Disassembled.Cast
+Bot1.Modes(1; 2)
+Bot1.Target(Bot2.Battlefield.Fabled Passage)
+Bot2.Battlefield.Fabled Passage.Activate
+Bot2.Search(Forest)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Graveyard = Avengers Disassembled
+Bot2.Graveyard = Fabled Passage
+Bot2.Battlefield = Forest; Llanowar Elves; Mox Emerald
+Bot2.Battlefield.Llanowar Elves.Damage = 0
+Bot2.Battlefield.Forest.Tapped = true

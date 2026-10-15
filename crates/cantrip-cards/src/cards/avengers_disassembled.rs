@@ -1,0 +1,50 @@
+use cantrip_api::*;
+use cantrip_mechanics::lands::destroy_target_its_controller_may_fetch_basic;
+use cantrip_mechanics::targets;
+use cantrip_oracle as oracle;
+
+/// Mode 0: "Avengers Disassembled deals 3 damage to each creature." One event for every creature (CR 120.2, 603.2c),
+/// the creatures being those on the battlefield as the mode is carried out (CR 608.2c).
+fn damage_creatures(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let hits: Vec<(ObjectId, Target, u16)> = g
+        .state()
+        .battlefield()
+        .iter()
+        .copied()
+        .filter(|&id| g.chars(id).is(CardType::Creature))
+        .map(|id| (item.object, Target::Object(id), 3))
+        .collect();
+    g.damage_together(&hits);
+    Ok(())
+}
+
+/// Mode 1: "Destroy target land. Its controller may search their library for a basic land card, put it onto the
+/// battlefield tapped, then shuffle."
+fn destroy_land(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    destroy_target_its_controller_may_fetch_basic(g, item, 0, true)
+}
+
+/// "Choose one or both" (CR 700.2): the modes are carried out in the order printed (CR 700.2d).
+static MODAL: ModalDef = ModalDef {
+    modes: &[
+        ModeDef {
+            text: "Avengers Disassembled deals 3 damage to each creature.",
+            targets: &[],
+            effect: damage_creatures,
+            cost: ManaCost::ZERO,
+        },
+        ModeDef {
+            text: "Destroy target land. Its controller may search their library for a basic land card, put it onto the battlefield tapped, then shuffle.",
+            targets: &[targets::LAND],
+            effect: destroy_land,
+            cost: ManaCost::ZERO,
+        },
+    ],
+    min: 1,
+    max: 2,
+    escalate: None,
+    repeat: false,
+    allowed: None,
+};
+
+pub static CARD: CardDef = CardDef { spell: Some(SpellDef::MODAL), modal: Some(&MODAL), ..oracle::AVENGERS_DISASSEMBLED };

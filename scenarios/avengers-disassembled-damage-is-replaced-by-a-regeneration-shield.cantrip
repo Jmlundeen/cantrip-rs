@@ -1,0 +1,53 @@
+# The damage mode with a replacement in the way: Bot2's Sylvan Caryatid (0/3) has 3 damage marked, which is lethal, but a
+# regeneration shield made with Yavimaya Hollow in response replaces the destruction (CR 701.19a, 704.5g): the Caryatid is
+# tapped, removed of its damage and still on the battlefield, while Bot2's Llanowar Elves (no shield) dies.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Mountain
+Avengers Disassembled
+Mountain x14
+
+[Bot2 Deck]
+Forest
+Mox Pearl
+Mox Emerald
+Sylvan Caryatid
+Llanowar Elves
+Yavimaya Hollow
+Forest
+Forest x14
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Sylvan Caryatid.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Yavimaya Hollow.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Avengers Disassembled.Cast
+Bot1.Modes(1)
+Bot2.Battlefield.Yavimaya Hollow.Activate(Bot2.Battlefield.Sylvan Caryatid; Ability: Regenerate)
+Bot2.Battlefield.Forest.Activate
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot2.Graveyard = Llanowar Elves
+Bot2.Battlefield.Sylvan Caryatid.Tapped = true
+Bot2.Battlefield.Sylvan Caryatid.Damage = 0

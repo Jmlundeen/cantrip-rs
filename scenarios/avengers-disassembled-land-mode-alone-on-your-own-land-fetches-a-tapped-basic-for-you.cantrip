@@ -1,0 +1,53 @@
+# "Choose one or both", the land mode alone, targeting the caster's own Mountain: "its controller" is Bot1 itself, who
+# may search for a basic land card (the Wasteland in the library is not one, refused beside the Mountain it takes) and puts
+# it onto the battlefield tapped. The damage mode was not chosen: Embereth Shieldbreaker and Bot2's Llanowar Elves live.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Embereth Shieldbreaker
+Avengers Disassembled
+Mountain
+Mountain
+Mountain
+Mountain
+Mountain
+Wasteland
+Mountain x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Embereth Shieldbreaker.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Avengers Disassembled.Cast
+Bot1.Modes(2)
+Bot1.Target(Bot1.Battlefield.Mountain)
+Bot1.Accept
+! Bot1.Search(Wasteland)
+Bot1.Search(Mountain)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Graveyard = Avengers Disassembled; Mountain
+Bot1.Battlefield = Embereth Shieldbreaker; Mountain; Mountain; Mountain; Mox Ruby
+Bot2.Battlefield = Forest; Llanowar Elves
