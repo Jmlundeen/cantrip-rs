@@ -1,0 +1,40 @@
+# Layer order (CR 613.1): the keyword is granted to whatever is a creature when layer 6 is applied: a Vehicle is
+# not a creature until crewed, and once it is, Samut's "creatures you control have haste" covers it. Smuggler's Copter is cast on
+# turn 1, crewed by Samut (summoning-sick creatures may crew) and attacks at once for 3 in the air.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Emerald
+Samut, Hazoret's Champion
+Smuggler's Copter
+Island
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Samut, Hazoret's Champion.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Smuggler's Copter.Cast
+Bot1.Pass
+Bot1.Battlefield.Smuggler's Copter.Activate(Ability: Crew)
+[T1 Bot1.DeclareAttackers]
+Bot1.Attack(Smuggler's Copter)
+Bot1.Decline
+[T1 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Smuggler's Copter.Keywords = Flying; Haste
+Bot1.Battlefield.Samut, Hazoret's Champion.Tapped = true

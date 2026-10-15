@@ -1,0 +1,32 @@
+# Haste is checked when attackers are declared, not when the creature enters: Llanowar Elves is cast first (summoning sick, checked),
+# then Samut resolves and the Elves have haste (CR 702.10, 302.6), so both attack on turn 1 and Bot2 takes 2 + 1.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Samut, Hazoret's Champion
+Llanowar Elves
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+? Bot1.Battlefield.Llanowar Elves.SummoningSick = true
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Samut, Hazoret's Champion.Cast
+Bot1.Pass
+Bot1.Attack(Samut, Hazoret's Champion; Llanowar Elves > Bot2)
+? Bot1.Battlefield.Llanowar Elves.SummoningSick = false
+[T1 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17

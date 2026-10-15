@@ -1,7 +1,7 @@
 # "Creatures you control have haste." Bot1 casts Mox Ruby/Pearl/Emerald, Samut ({1}{R}) and Llanowar Elves ({G}) on turn 1 and attacks
-# with both at once: Samut himself and the Elves have haste, so Bot2 takes 2 + 1. On turn 2 Bot2 (no Samut of its own; his
-# haste is for his controller's creatures only) casts its own Llanowar Elves and is still summoning sick (no haste); the control is Bot1's
-# attack above with the same creature. (The engine asks Bot2 nothing when no creature can attack, so this is read off the state.)
+# with both at once: Samut himself and the Elves have haste (SummoningSick false, checked), so Bot2 takes 2 + 1. Bot2, with no Samut of
+# its own, casts Llanowar Elves on turn 2. On turn 4 it casts Ornithopter and may attack with the older Elves (the control) but
+# not with the Ornithopter, which is summoning sick: Samut's haste is for his controller's creatures only.
 
 [Bot1 Deck]
 Mox Ruby
@@ -14,6 +14,7 @@ Island x15
 [Bot2 Deck]
 Mox Emerald
 Llanowar Elves
+Ornithopter
 Island x15
 
 [Actions]
@@ -28,16 +29,21 @@ Bot1.Battlefield.Mox Emerald.Activate
 Bot1.Hand.Llanowar Elves.Cast
 Bot1.Pass
 Bot1.Attack(Samut, Hazoret's Champion; Llanowar Elves > Bot2)
+? Bot1.Battlefield.Llanowar Elves.SummoningSick = false
 [T2 Bot2.Main1]
 Bot2.Hand.Mox Emerald.Cast
 Bot2.Battlefield.Mox Emerald.Activate
 Bot2.Hand.Llanowar Elves.Cast
 Bot2.Pass
-[T2 Bot2.Main2]
+[T4 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+! Bot2.Attack(Ornithopter > Bot1)
+Bot2.Attack(Llanowar Elves > Bot1)
+[T4 Bot2.Main2]
 
 [Expect]
 Bot2.Life = 17
-Bot2.Battlefield.Llanowar Elves.Keywords = (absent)
-Bot2.Battlefield.Llanowar Elves.SummoningSick = true
-Bot1.Battlefield.Llanowar Elves.Keywords = Haste
-Bot1.Battlefield.Samut, Hazoret's Champion.Keywords = Haste
+Bot1.Life = 19
+Bot2.Battlefield.Ornithopter.SummoningSick = true
+Bot2.Battlefield.Llanowar Elves.SummoningSick = false

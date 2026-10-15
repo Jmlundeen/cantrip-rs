@@ -1,0 +1,61 @@
+# Control, not ownership. Bot2 casts Ornithopter and Samut on turn 2 and Bot1 wins the flip of Invert Polarity ({U}{U}{R}), taking the
+# Samut spell: Bot1 controls Bot2's Samut. On turn 3 Bot1 casts Llanowar Elves and attacks with it and the Samut at once, 2 + 1.
+# On turn 4 Bot2, the owner, casts Llanowar Elves, which is summoning sick: it may attack with the older Ornithopter (the control)
+# but not with the Elves, since Bot2 no longer controls a Samut.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Ruby
+Mox Emerald
+Invert Polarity
+Llanowar Elves
+Island x15
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Mox Emerald
+Ornithopter
+Samut, Hazoret's Champion
+Llanowar Elves
+Island x15
+
+[Dice]
+1
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Samut, Hazoret's Champion.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Invert Polarity.Cast(Samut, Hazoret's Champion)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot1.Attack(Samut, Hazoret's Champion; Llanowar Elves > Bot2)
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+! Bot2.Attack(Llanowar Elves > Bot1)
+Bot2.Attack(Ornithopter > Bot1)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Samut, Hazoret's Champion.Keywords = Haste
+Bot1.Battlefield.Llanowar Elves.Keywords = Haste
+Bot2.Battlefield.Llanowar Elves.SummoningSick = true
