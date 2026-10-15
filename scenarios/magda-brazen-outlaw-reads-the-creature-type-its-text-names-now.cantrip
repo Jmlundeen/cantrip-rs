@@ -1,0 +1,47 @@
+# Artificial Evolution changes the text of Magda, Brazen Outlaw, Dwarf to Elf (CR 612.1): she now says "Other Elves you
+# control get +1/+0" and "Whenever an Elf you control becomes tapped, create a Treasure token". Bot1's Llanowar Elves is
+# 2/1 and, tapped for mana, makes a Treasure, which it would do for neither as a Dwarf text.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Magda, Brazen Outlaw
+Artificial Evolution
+Llanowar Elves
+Forest x13
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Magda, Brazen Outlaw.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Magda, Brazen Outlaw)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Dwarf)
+Bot1.Modes(Elf)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves.Power = 2
+[T3 Bot1.Main1]
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Magda, Brazen Outlaw.Subtypes = Berserker; Elf
+Bot1.Battlefield.Treasure Token.Types = Artifact

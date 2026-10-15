@@ -6,7 +6,7 @@ use cantrip_oracle as oracle;
 /// "Other Dwarves you control".
 fn other_dwarves_you_control(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool {
     let s = q.state();
-    affected != source && so_far.has_subtype(Subtype::Dwarf) && s.obj(affected).controller == s.obj(source).controller
+    affected != source && so_far.has_subtype(q.words(source).subtype(Subtype::Dwarf)) && s.obj(affected).controller == s.obj(source).controller
 }
 
 fn plus_one_power(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
@@ -17,7 +17,8 @@ fn plus_one_power(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
 fn dwarf_becomes_tapped(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
         Event::Tapped { permanent }
-            if q.controller(*permanent) == q.controller(source) && q.chars(*permanent).has_subtype(Subtype::Dwarf) =>
+            if q.controller(*permanent) == q.controller(source)
+                && q.chars(*permanent).has_subtype(q.words(source).subtype(Subtype::Dwarf)) =>
         {
             Fired::PLAIN
         }
@@ -36,9 +37,10 @@ fn treasure_you_control(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
 /// "Search your library for an artifact or Dragon card, put that card onto the battlefield, then shuffle."
 fn tutor(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let player = item.controller;
+    let dragon = g.words(item.object).subtype(Subtype::Dragon);
     search_to_battlefield(g, player, item.object, Find::ONE, false, |q, c| {
         let chars = q.chars(c);
-        chars.is(CardType::Artifact) || chars.has_subtype(Subtype::Dragon)
+        chars.is(CardType::Artifact) || chars.has_subtype(dragon)
     })?;
     Ok(())
 }
