@@ -13,6 +13,7 @@
 use std::collections::{HashMap, HashSet};
 use std::panic::AssertUnwindSafe;
 
+use cantrip_engine::undo::Undo;
 use cantrip_engine::*;
 use serde_json::{Value, json};
 
@@ -51,19 +52,13 @@ pub struct Session {
     told: Vec<Proto>,
     /// What each seat is being shown beyond its zones, as of the last step.
     extra: Vec<HashSet<ObjectId>>,
-    /// The mana abilities that can still be taken back, latest last.
-    undoable: Vec<Undoable>,
+    /// The mana abilities that can still be taken back (`cantrip_engine::undo`).
+    undoable: Undo<Told>,
 }
 
-/// A mana ability a player may take back: where the game was before it, and what was told of it since. Taking it back
-/// is a courtesy of the table, not a rule, so it is offered only while the activation did nothing but tap, sacrifice,
-/// add mana and cost life, and nothing has happened since but more of the same: never past a trigger, a card seen or
-/// another player's answer. A Black Lotus is taken back; a Lion's Eye Diamond, whose cost shows the hand, never is.
-struct Undoable {
-    player: PlayerId,
-    /// The permanent whose ability it was, which the client shows the undo on.
-    source: ObjectId,
-    node: NodeId,
+/// What the host keeps beside a mana ability that can be taken back (`cantrip_engine::undo`): what was told of it, and
+/// the tracking and handles as they were before it.
+struct Told {
     tracker: Tracker,
     /// Each seat's handles: a sacrificed permanent's handle moved to the card in the graveyard, which taking it back
     /// unmakes.
@@ -71,38 +66,6 @@ struct Undoable {
     published: usize,
     /// The sequences of the entries told of it.
     told: std::ops::Range<u64>,
-}
-
-/// The source of a mana ability `answer` activates (CR 605.1a), if it activates one that could be taken back: not one
-/// whose cost discards, which shows what was in the hand.
-fn mana_activation(game: &Game, answer: &Answer) -> Option<ObjectId> {
-    let Answer::Act(action) = answer else { return None };
-    let source = action.source.filter(|_| action.kind == ActionKind::ActivateAbility)?;
-    if action.index >= PLAYER_MANA_ABILITY {
-        return Some(source);
-    }
-    match game.chars(source).abilities().nth(action.index as usize).map(|a| game.cards.ability(a)) {
-        Some(AbilityDef::Activated(d)) if d.mana.is_some() && !d.cost.discard_hand && !d.cost.discard_self && d.cost.discard.is_none() => {
-            Some(source)
-        }
-        _ => None,
-    }
-}
-
-/// Whether these entries are only what a mana ability does: taps, sacrifices, mana, and life paid or lost for it.
-fn only_mana(records: &[Record]) -> bool {
-    records.iter().all(|r| {
-        matches!(
-            r.event,
-            Event::Tapped { .. }
-                | Event::TappedForMana { .. }
-                | Event::LifeChange { .. }
-                | Event::AbilityActivated { .. }
-                | Event::Resolved { .. }
-                | Event::Damage { target: Target::Player(_), .. }
-                | Event::ZoneChange { reason: ZoneReason::Sacrifice, .. }
-        ) && !matches!(r.event, Event::ZoneChange { from, .. } if from.kind() != ZoneKind::Battlefield)
-    })
 }
 
 /// Dealing a game: the seats' names and decks, and the conditions beyond the seed.
@@ -151,7 +114,7 @@ impl Session {
             conceded: vec![false; seats],
             told: Vec::new(),
             extra: vec![HashSet::new(); seats],
-            undoable: Vec::new(),
+            undoable: Undo::default(),
             game,
         };
         // A first player named outright is not asked: the question is answered as it is posed.
@@ -249,7 +212,7 @@ impl Session {
         let mut requests = Vec::new();
         if let Some(request) = pending {
             let index = request.player.index();
-            let undo = self.undoable.last().filter(|u| u.player == request.player).map(|u| u.source);
+            let undo = self.undoable.offered(request.player);
             match prompt(&self.game, &request, &mut self.handles[index]) {
                 Ok((mut payload, may_cancel)) => {
                     if let Some(source) = undo
@@ -302,10 +265,8 @@ impl Session {
             Untranslatable::Illegal(d) => Rejection::new("IllegalAnswer", d),
         })?;
 
-        let mana = mana_activation(&self.game, &answer);
-        let (triggers, stack) = (self.game.state.triggers.len(), self.game.state.stack.len());
-        let before_handles = if mana.is_some() { self.handles.clone() } else { Vec::new() };
-        let (node, log_from) = (self.game.checkpoint(), self.game.log.len());
+        let noted = Undo::<Told>::before(&self.game, request.player, &answer);
+        let kept = noted.is_mana().then(|| (self.tracker.clone(), self.handles.clone(), self.published));
         let before = self.game.clone();
         let outcome = std::panic::catch_unwind(AssertUnwindSafe(|| self.game.answer(request.id, request.player, answer.clone())));
         match outcome {
@@ -317,35 +278,16 @@ impl Session {
                 return Err(Rejection::new("IllegalAnswer", "the engine failed on that answer; the game is as it was"));
             }
         }
-        let asks_again = self.pending().is_some_and(|next| {
-            next.player == request.player && matches!(next.kind, RequestKind::Priority { .. } | RequestKind::PayCosts { .. })
-        });
-        match mana {
-            // A trigger is something the ability did (Chromatic Star's draw), waiting or on the stack, even before anyone
-            // has seen what it does.
-            Some(source)
-                if asks_again
-                    && only_mana(&self.game.log[log_from..])
-                    && self.game.state.triggers.len() <= triggers
-                    && self.game.state.stack.len() <= stack =>
-            {
-                let first = self.sequence + 1 + self.told.len() as u64;
-                self.undoable.push(Undoable {
-                    player: request.player,
-                    source,
-                    node,
-                    tracker: self.tracker.clone(),
-                    handles: before_handles,
-                    published: self.published,
-                    told: first..first,
-                });
-                let step = self.step();
-                if let Some(undo) = self.undoable.last_mut() {
-                    undo.told.end = self.sequence + 1;
-                }
-                return Ok(step);
+        if self.undoable.may_take_back(&self.game, &noted)
+            && let Some((tracker, handles, published)) = kept
+        {
+            let first = self.sequence + 1 + self.told.len() as u64;
+            self.undoable.push(noted, Told { tracker, handles, published, told: first..first });
+            let step = self.step();
+            if let Some(told) = self.undoable.last_kept() {
+                told.told.end = self.sequence + 1;
             }
-            _ => self.undoable.clear(),
+            return Ok(step);
         }
         match (&request.kind, &answer) {
             (RequestKind::ChooseStartingPlayer { .. }, Answer::Player(first)) => {
@@ -366,18 +308,16 @@ impl Session {
     /// Takes back the latest mana ability `player` activated: the game goes back to the node it was activated at, by
     /// the tree (`Game::goto`), and what was told of it is retracted.
     fn undo(&mut self, player: PlayerId) -> Result<Value, Rejection> {
-        if self.undoable.last().is_none_or(|u| u.player != player) {
+        let Some(told) = self.undoable.take_back(&mut self.game, player) else {
             return Err(Rejection::new("IllegalAnswer", "there is no mana ability to take back"));
-        }
-        let undo = self.undoable.pop().expect("checked");
-        self.game.goto(undo.node);
-        self.tracker = undo.tracker;
-        for (space, earlier) in self.handles.iter_mut().zip(undo.handles) {
+        };
+        self.tracker = told.tracker;
+        for (space, earlier) in self.handles.iter_mut().zip(told.handles) {
             space.restore(earlier);
         }
-        self.published = undo.published;
-        if !undo.told.is_empty() {
-            self.told.push(Proto::Retracted { sequences: undo.told.collect() });
+        self.published = told.published;
+        if !told.told.is_empty() {
+            self.told.push(Proto::Retracted { sequences: told.told.collect() });
         }
         Ok(self.step())
     }

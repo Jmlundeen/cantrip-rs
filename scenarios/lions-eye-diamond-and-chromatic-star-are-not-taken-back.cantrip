@@ -1,0 +1,34 @@
+# What is never taken back (cantrip_engine::undo): Lion's Eye Diamond's cost discards the hand, which shows it, and
+# Chromatic Star going to the graveyard triggers its draw. Neither is offered to take back; a Forest tapped after them
+# is, which shows the offer is there to refuse. The Star's red and the Diamond's three are all in the pool.
+
+[Bot1 Deck]
+Forest
+Lion's Eye Diamond
+Chromatic Star
+Forest
+Island x11
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Chromatic Star.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Chromatic Star.Activate(Color: Red)
+Bot1.Battlefield.Forest.Activate
+! Bot1.Undo
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Undo
+Bot1.Hand.Lion's Eye Diamond.Cast
+Bot1.Pass
+Bot1.Battlefield.Lion's Eye Diamond.Activate(Color: Red)
+! Bot1.Undo
+
+[Expect]
+Bot1.Hand.Count = 0
+Bot1.Mana = {R}{R}{R}{R}

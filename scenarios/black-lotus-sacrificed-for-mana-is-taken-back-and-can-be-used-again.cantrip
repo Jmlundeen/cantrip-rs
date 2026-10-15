@@ -1,0 +1,27 @@
+# Taking back a mana ability (cantrip_engine::undo, the table's courtesy): Black Lotus is sacrificed for three green, and
+# Bot1 takes it back. The Lotus is on the battlefield again and the mana is gone; nothing more is offered to take back.
+# Used again for blue, it is sacrificed for good.
+
+[Bot1 Deck]
+Black Lotus
+Island x14
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+? Bot1.Mana = {G}{G}{G}
+? Bot1.Graveyard = Black Lotus
+Bot1.Undo
+? Bot1.Mana =
+? Bot1.Battlefield = Black Lotus
+? Bot1.Graveyard.Count = 0
+! Bot1.Undo
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+
+[Expect]
+Bot1.Mana = {U}{U}{U}
+Bot1.Graveyard = Black Lotus
+Bot1.Battlefield.Count = 0

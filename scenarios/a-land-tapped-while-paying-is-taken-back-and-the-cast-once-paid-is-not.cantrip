@@ -1,0 +1,32 @@
+# Taking back mana while paying for a spell (cantrip_engine::undo): Pentad Prism costs {2}. Bot1 casts it and taps a
+# Forest towards the cost, then takes the Forest back: it is untapped and the spell is still waiting on its whole {2}.
+# Both Forests then pay for it, and the Prism is cast - which is not taken back (a cast spell never is), so nothing is
+# offered. Sunburst counts one color, green: one charge counter.
+
+[Bot1 Deck]
+Forest
+Forest
+Pentad Prism
+Island x12
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Pentad Prism.Cast
+Bot1.Battlefield.Forest.Activate
+? Bot1.Battlefield.Forest#1.Tapped = true
+Bot1.Undo
+? Bot1.Battlefield.Forest#1.Tapped = false
+? Bot1.Battlefield.Forest#2.Tapped = false
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+! Bot1.Undo
+
+[Expect]
+Bot1.Battlefield.Pentad Prism.Counters.Charge = 1
+Bot1.Battlefield.Forest#1.Tapped = true
+Bot1.Battlefield.Forest#2.Tapped = true

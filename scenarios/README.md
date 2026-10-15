@@ -99,6 +99,13 @@ are answered by lines as usual.
 
 A **refusal**, `! Bot1.Graveyard.Embereth Shieldbreaker.Cast`, says what must *not* be offered; see [Refusals](#refusals).
 
+`Bot1.Undo` takes back the latest mana ability Bot1 activated, as the table offers it (`cantrip_engine::undo`): the
+game goes back to before it and Bot1 is asked again. It is offered while that activation and everything since only
+tapped, sacrificed from the battlefield, removed counters, added mana or cost life (a land, Black Lotus, Lotus Petal,
+Pentad Prism, a Treasure); never for an ability whose cost discards (Lion's Eye Diamond) or one that triggered
+anything (Chromatic Star). Any other answer clears it, a pass or a cast spell included, so tap after the spell you
+want to pay with has resolved. `! Bot1.Undo` says nothing may be taken back at Bot1's next priority or payment.
+
 The script ends when every line is played and the stack is empty. A line that isn't possible within 4 turns fails.
 The failure report shows what each player was last offered, written as script lines, followed by a trace and a full
 state dump.

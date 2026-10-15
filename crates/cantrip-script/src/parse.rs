@@ -492,8 +492,8 @@ impl ScriptStep {
         }
         if let Some(rest) = line.strip_prefix('!') {
             let action = ActionStep::parse(rest.trim(), number)?;
-            if !matches!(action.verb, ScriptVerb::Play | ScriptVerb::Cast | ScriptVerb::Activate | ScriptVerb::Foretell | ScriptVerb::Suspend | ScriptVerb::Block | ScriptVerb::Attack | ScriptVerb::Search | ScriptVerb::Accept | ScriptVerb::Modes | ScriptVerb::Target) && !action.verb.is_question() {
-                return Err(ParseError("a refusal (!) names a Play, Cast, Activate, Foretell, Suspend, Block, Attack, Search, Accept, Modes or Target that must not be offered, as ! Bot1.Hand.Island.Play, ! Bot2.Block(Bear > Ox), ! Bot1.Search(Plains), ! Bot1.Accept, ! Bot1.Modes(1; 2) or ! Bot1.Target(Island)".into()));
+            if !matches!(action.verb, ScriptVerb::Play | ScriptVerb::Cast | ScriptVerb::Activate | ScriptVerb::Foretell | ScriptVerb::Suspend | ScriptVerb::Block | ScriptVerb::Attack | ScriptVerb::Search | ScriptVerb::Accept | ScriptVerb::Modes | ScriptVerb::Target | ScriptVerb::Undo) && !action.verb.is_question() {
+                return Err(ParseError("a refusal (!) names a Play, Cast, Activate, Foretell, Suspend, Block, Attack, Search, Accept, Modes, Target or Undo that must not be offered, as ! Bot1.Hand.Island.Play, ! Bot2.Block(Bear > Ox), ! Bot1.Search(Plains), ! Bot1.Accept, ! Bot1.Modes(1; 2), ! Bot1.Target(Island) or ! Bot1.Undo".into()));
             }
             return Ok(ScriptStep::Refused { line: number, text: line.to_string(), action });
         }

@@ -3,8 +3,9 @@
 
 use std::sync::OnceLock;
 
+pub mod undo;
+
 pub use cantrip_api::*;
-pub use cantrip_rules::tree::NodeId;
 pub use cantrip_rules::{Game, Rejected, Setup, chars, describe, distribution_problem, live, summoning_sick};
 
 /// The simplest legal distribution of looked-at cards (the C# `CardDistribution.Greedy`): each destination's

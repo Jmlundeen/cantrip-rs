@@ -4,6 +4,7 @@
 
 use std::collections::VecDeque;
 
+use cantrip_engine::undo::Undo;
 use cantrip_engine::*;
 
 use crate::dump::{StateDump, bot};
@@ -69,6 +70,8 @@ struct Run<'s> {
     /// The colors an activation line named (`Colors: Red, Red, Green`) for the "any combination" question its mana
     /// ability asks next, as the C# runner takes them.
     colors: Option<Vec<Color>>,
+    /// The mana abilities that can be taken back (`Bot1.Undo`), as the host offers them.
+    undo: Undo<()>,
 }
 
 pub fn run(script: &GameScript) -> Result<ScriptResult, ScriptFailure> {
@@ -78,7 +81,7 @@ pub fn run(script: &GameScript) -> Result<ScriptResult, ScriptFailure> {
     // CANTRIP_VERIFY=1: every rollback is checked to restore the state exactly.
     game.verify = std::env::var_os("CANTRIP_VERIFY").is_some();
     game.state.force_rolls(&script.dice);
-    let mut run = Run { script, game, cursor: 0, since: 1, casting: None, trace: Vec::new(), handed_over: false, colors: None };
+    let mut run = Run { script, game, cursor: 0, since: 1, casting: None, trace: Vec::new(), handed_over: false, colors: None, undo: Undo::default() };
     match run.play() {
         Ok(()) => {
             let dump = StateDump::of(&run.game);
@@ -160,6 +163,7 @@ fn answers(verb: ScriptVerb, kind: &RequestKind) -> bool {
     match verb {
         V::Play | V::Cast | V::Activate | V::Foretell | V::Suspend | V::Pass => matches!(kind, RequestKind::Priority { .. }),
         V::PayCost => matches!(kind, RequestKind::PayCosts { .. }),
+        V::Undo => matches!(kind, RequestKind::Priority { .. } | RequestKind::PayCosts { .. }),
         V::Accept | V::Decline => matches!(kind, RequestKind::May { .. } | RequestKind::UnlessPays { .. }),
         V::Choose => matches!(kind, RequestKind::ChooseCards { .. } | RequestKind::TapForPower { .. } | RequestKind::CollectEvidence { .. }),
         V::ChoosePlayer => matches!(kind, RequestKind::ChoosePlayer { .. }),
@@ -275,8 +279,14 @@ impl<'s> Run<'s> {
                 }
             }
         }
+        let noted = Undo::<()>::before(&self.game, request.player, &answer);
         match self.game.answer(request.id, request.player, answer.clone()) {
-            Ok(()) => Ok(()),
+            Ok(()) => {
+                if self.undo.may_take_back(&self.game, &noted) {
+                    self.undo.push(noted, ());
+                }
+                Ok(())
+            }
             Err(Rejected(why)) => match step {
                 Some(s) => fail(format!("line {}: the engine refused {}: {why}", s.line, s.text)),
                 None => fail(format!("the engine refused {who}'s unscripted answer ({answer:?}): {why}")),
@@ -388,6 +398,19 @@ impl<'s> Run<'s> {
                 continue;
             }
 
+            // `! Bot1.Undo`: at the player's next priority or payment, there is no mana ability to take back.
+            if let Some(ScriptStep::Refused { action, line, text }) = self.current()
+                && matches!(action.verb, ScriptVerb::Undo)
+                && request.player == player_of(action.bot)
+                && answers(action.verb, &request.kind)
+            {
+                if let Some(source) = self.undo.offered(request.player) {
+                    return fail(format!("line {line} says {text}, but {}'s mana ability may be taken back", self.game.name(source)));
+                }
+                self.next();
+                continue;
+            }
+
             if let Some(ScriptStep::Refused { action, line, text }) = self.current()
                 && request.player == player_of(action.bot)
                 && answers(action.verb, &request.kind)
@@ -489,6 +512,20 @@ impl<'s> Run<'s> {
     }
 
     fn decide(&mut self, request: &Request) -> R<()> {
+        // `Bot1.Undo`: the latest mana ability the player activated is taken back, and they are asked again.
+        if let Some(ScriptStep::Action(step)) = self.current()
+            && matches!(step.verb, ScriptVerb::Undo)
+            && request.player == player_of(step.bot)
+            && answers(step.verb, &request.kind)
+        {
+            if self.undo.take_back(&mut self.game, request.player).is_none() {
+                return fail(format!("line {}: {} has no mana ability to take back", step.line, bot(request.player)));
+            }
+            self.trace.push(format!("T{} {}: line {} {}", self.turn(), bot(request.player), step.line, step.text));
+            self.next();
+            return Ok(());
+        }
+
         let paying = self.casting.as_ref().is_some_and(|c| c.player == request.player)
             && matches!(request.kind, RequestKind::PayCosts { .. });
         if !paying {
