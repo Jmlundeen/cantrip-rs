@@ -1,0 +1,44 @@
+# Carnage, Crimson Chaos: "When Carnage enters, return target creature card with mana value 3 or less from your
+# graveyard to the battlefield. It gains 'This creature attacks each combat if able' and 'When this creature deals
+# combat damage to a player, sacrifice it.'" Faithless Looting discards Carnage and a Guerrilla Gorilla on turn 5; Carnage
+# comes back by mayhem and returns the Gorilla, the one legal target, so the trigger takes it without asking. The Gorilla came under Bot1's control that turn, so it is not made to attack
+# then (the ruling). On turn 7, with no Attack line at all (the default declares no attackers), the Gorilla alone attacks
+# - Carnage herself gained nothing - deals 2 to Bot2, and is sacrificed by its own gained trigger.
+
+[Bot1 Deck]
+Mountain
+Swamp
+Mountain
+Faithless Looting
+Carnage, Crimson Chaos
+Guerrilla Gorilla
+Mountain
+Mountain x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Carnage, Crimson Chaos; Guerrilla Gorilla)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Graveyard.Carnage, Crimson Chaos.Cast(Ability: Mayhem)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Guerrilla Gorilla.SummoningSick = true
+? Bot1.Battlefield.Carnage, Crimson Chaos.Keywords = Trample
+? Bot1.Graveyard = Faithless Looting
+? Bot2.Life = 20
+[T7 Bot1.Main2]
+
+[Expect]
+Turn = 7
+Bot2.Life = 18
+Bot1.Battlefield = Mountain; Swamp; Mountain; Carnage, Crimson Chaos
+Bot1.Graveyard = Guerrilla Gorilla; Faithless Looting

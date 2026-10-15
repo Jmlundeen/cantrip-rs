@@ -1,0 +1,31 @@
+# Seasoned Pyromancer: two nonland cards discarded make two Elementals, created together. Bot1 discards two Ornithopters and draws two.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Black Lotus
+Seasoned Pyromancer
+Ornithopter
+Ornithopter
+
+Plains x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Seasoned Pyromancer.Cast
+Bot1.Choose(Ornithopter; Ornithopter)
+[T3 Bot1.Upkeep]
+
+[Expect]
+Bot1.Battlefield = Mountain; Mox Ruby; Seasoned Pyromancer; Elemental; Elemental
+Bot1.Hand.Count = 3
+Bot1.Graveyard.Count = 3

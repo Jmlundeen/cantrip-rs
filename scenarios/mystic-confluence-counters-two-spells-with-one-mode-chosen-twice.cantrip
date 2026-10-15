@@ -1,0 +1,46 @@
+# Mystic Confluence chooses "counter target spell unless its controller pays {3}" twice and "draw a card" once, each counter mode aimed
+# at one of Bot2's two Ancestral Recalls. Bot2 has used its mana (two Mox Sapphires) and cannot pay for either, so both are countered
+# and Bot2 draws nothing; Bot1 draws one.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Black Lotus
+Mystic Confluence
+Island
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Sapphire
+Ancestral Recall
+Ancestral Recall
+Island x3
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Ancestral Recall.Cast(Bot2)
+Bot2.Battlefield.Mox Sapphire#2.Activate
+Bot2.Hand.Ancestral Recall.Cast(Bot2)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Mystic Confluence.Cast
+Bot1.Modes(1; 1; 3)
+Bot1.Target(Stack.Ancestral Recall#1)
+Bot1.Target(Stack.Ancestral Recall#2)
+[Bot2.Main2]
+
+[Expect]
+Bot2.Graveyard = Ancestral Recall; Ancestral Recall
+Stack.Count = 0

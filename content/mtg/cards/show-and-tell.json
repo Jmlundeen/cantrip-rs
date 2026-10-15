@@ -1,0 +1,6 @@
+{
+  "name": "Show and Tell",
+  "manaCost": "{2}{U}",
+  "type": "Sorcery",
+  "oracleText": "Each player may put an artifact, creature, enchantment, or land card from their hand onto the battlefield."
+}

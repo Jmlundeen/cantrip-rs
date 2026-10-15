@@ -1,0 +1,30 @@
+# Rebuild's Cycling {2} (CR 702.29a): paid with two Moxen it discards the Rebuild from hand and draws a card, at instant speed,
+# without casting it - nothing returns to a hand: the Moxen stay on the battlefield (tapped) and the opponent's Mox Pearl is
+# untouched.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Rebuild
+Island x16
+
+[Bot2 Deck]
+Mox Pearl
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Rebuild.Activate(Ability: Cycling)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Rebuild
+Bot1.Hand.Count = 5
+Bot1.Battlefield = Mox Sapphire; Mox Jet
+Bot2.Battlefield = Mox Pearl

@@ -1,0 +1,11 @@
+{
+  "name": "Flickerwisp",
+  "manaCost": "{1}{W}{W}",
+  "type": "Creature — Elemental",
+  "power": 3,
+  "toughness": 1,
+  "oracleText": "Flying\nWhen this creature enters, exile another target permanent. Return that card to the battlefield under its owner's control at the beginning of the next end step.",
+  "keywords": [
+    "Flying"
+  ]
+}

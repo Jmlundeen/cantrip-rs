@@ -1,0 +1,43 @@
+# Colossus Hammer: Equip {8} makes a 0/2 flying Ornithopter a 10/12 that has lost flying. Bot1 casts Sol Ring, the
+# Ornithopter and the Hammer on turn 1 off three Moxen, then on turn 3 pays the whole {8} with the Moxen, Sol Ring and
+# Black Lotus.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Ornithopter
+Sol Ring
+Black Lotus
+Colossus Hammer
+Island x13
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Colossus Hammer.Cast
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Ornithopter.Keywords = Flying
+? Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Colossus Hammer.Activate(Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Colossus Hammer.AttachedTo = Ornithopter
+Bot1.Battlefield.Ornithopter.Power = 10
+Bot1.Battlefield.Ornithopter.Toughness = 12

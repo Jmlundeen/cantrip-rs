@@ -1,0 +1,25 @@
+# "When this creature dies, you gain 2 life" is not tied to its own ability: Bot2's Lightning Bolt kills the 1/1 Mite and Bot1 gains 2.
+
+[Bot1 Deck]
+Haywire Mite
+Mox Pearl
+Forest x14
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x13
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Haywire Mite.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Haywire Mite)
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 22
+Bot1.Graveyard = Haywire Mite

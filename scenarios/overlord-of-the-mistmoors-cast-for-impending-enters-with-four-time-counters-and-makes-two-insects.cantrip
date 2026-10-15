@@ -1,0 +1,48 @@
+# Overlord of the Mistmoors cast on turn 7 for its impending cost {2}{W}{W} (CR 702.176a) off four Plains. It enters with
+# four time counters and, with a time counter on it, is not a creature: its types are Enchantment alone, and with the Creature type its
+# creature types go too (CR 205.1a), though it is a creature spell on the stack. "Whenever this permanent enters" still triggers, so Bot1 has
+# two 2/1 white Insect tokens with flying. Bot1's end step takes one counter; the opponent's end step on turn 8 takes none.
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Plains
+Overlord of the Mistmoors
+Plains
+Plains
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Overlord of the Mistmoors.Cast(Ability: Impending)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Overlord of the Mistmoors.Counters.Time = 4
+? Bot1.Battlefield.Overlord of the Mistmoors.Types = Enchantment
+? Bot1.Battlefield.Overlord of the Mistmoors.Subtypes = (absent)
+? Bot1.Battlefield.Insect#1.Power = 2
+? Bot1.Battlefield.Insect#1.Toughness = 1
+? Bot1.Battlefield.Insect#1.Keywords = Flying
+? Bot1.Battlefield.Insect#2.Keywords = Flying
+[T9 Bot1.Main1]
+? Bot1.Battlefield.Overlord of the Mistmoors.Counters.Time = 3
+
+[Expect]
+Bot1.Battlefield = Insect; Insect; Overlord of the Mistmoors; Plains; Plains; Plains; Plains
+Bot1.Battlefield.Overlord of the Mistmoors.Types = Enchantment

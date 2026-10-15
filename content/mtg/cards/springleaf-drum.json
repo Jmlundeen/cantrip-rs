@@ -1,0 +1,6 @@
+{
+  "name": "Springleaf Drum",
+  "manaCost": "{1}",
+  "type": "Artifact",
+  "oracleText": "{T}, Tap an untapped creature you control: Add one mana of any color."
+}

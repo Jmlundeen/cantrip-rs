@@ -1,0 +1,34 @@
+# Grist, the Hunger Tide in a library is a green creature card with mana value 3 ("As long as Grist isn't on the
+# battlefield, it's a 1/1 Insect creature"), so Green Sun's Zenith for X = 3 finds it, as the ruling's Chord of
+# Calling would; on the battlefield it is just a planeswalker, with its printed loyalty.
+
+[Bot1 Deck]
+Bayou x3
+Forest
+Green Sun's Zenith
+Forest x7
+Grist, the Hunger Tide
+Forest x9
+
+[Bot2 Deck]
+Forest x22
+
+[Actions]
+Bot1.Hand.Bayou.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Bayou.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Bayou.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Bayou#1.Activate(Ability: Add {G})
+Bot1.Battlefield.Bayou#2.Activate(Ability: Add {G})
+Bot1.Battlefield.Bayou#3.Activate(Ability: Add {G})
+Bot1.Hand.Green Sun's Zenith.Cast(X: 3)
+Bot1.Search(Grist, the Hunger Tide)
+[T7 Bot1.End]
+
+[Expect]
+Bot1.Battlefield.Grist, the Hunger Tide.Types = Planeswalker
+Bot1.Battlefield.Grist, the Hunger Tide.Counters.Loyalty = 3

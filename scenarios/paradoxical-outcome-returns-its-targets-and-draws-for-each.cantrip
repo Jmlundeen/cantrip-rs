@@ -1,0 +1,41 @@
+# Paradoxical Outcome: "Return any number of target nonland, nontoken permanents you control to their owners' hands. Draw a
+# card for each card returned to your hand this way." Bot1 returns Ornithopter and Mox Jet (not Sol Ring or Mox Sapphire,
+# which it leaves out) and draws two cards.
+
+[Bot1 Deck]
+Island
+Sol Ring
+Mox Sapphire
+Mox Jet
+Ornithopter
+Paradoxical Outcome
+Island
+Island x10
+
+[Bot2 Deck]
+Swamp x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Paradoxical Outcome.Cast
+Bot1.Target(Ornithopter; Mox Jet)
+Bot1.Pass
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Hand = Island; Island; Island; Mox Jet; Ornithopter
+Bot1.Graveyard = Paradoxical Outcome
+Bot1.Battlefield = Island; Sol Ring; Mox Sapphire

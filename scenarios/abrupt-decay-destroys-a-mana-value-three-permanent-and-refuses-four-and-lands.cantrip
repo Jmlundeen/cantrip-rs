@@ -1,0 +1,40 @@
+# "Destroy target nonland permanent with mana value 3 or less." Bot2 has Brazen Borrower (mana value 3), Displacer Kitten (mana value 4) and an Island. Abrupt Decay
+# cannot target the Kitten (too expensive) or the Island (a land) - the refusals - and destroys the Borrower (the positive control: the same action at mana value 3).
+
+[Bot1 Deck]
+Forest
+Mox Jet
+Abrupt Decay
+Forest x12
+
+[Bot2 Deck]
+Island
+Black Lotus
+Black Lotus
+Brazen Borrower
+Displacer Kitten
+Island x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Brazen Borrower.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Displacer Kitten.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Abrupt Decay.Cast(Bot2.Battlefield.Island)
+! Bot1.Hand.Abrupt Decay.Cast(Displacer Kitten)
+Bot1.Hand.Abrupt Decay.Cast(Brazen Borrower)
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Graveyard = Brazen Borrower; Black Lotus; Black Lotus
+Bot2.Battlefield = Island; Displacer Kitten

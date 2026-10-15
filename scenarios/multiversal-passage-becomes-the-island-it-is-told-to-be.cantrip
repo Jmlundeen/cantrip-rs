@@ -1,0 +1,29 @@
+# Multiversal Passage: "As this land enters, choose a basic land type. Then you may pay 2 life. If you don't, it
+# enters tapped. This land is the chosen type."
+#
+# The first paragraph is one replacement effect (CR 614.1c, 614.12): the type is chosen, then the 2 life is paid or
+# not, in the order printed, and nothing asks which applies first. Naming Island makes the land an Island (CR 305.7),
+# and nothing on the card says "{T}: Add {U}" — that ability comes from the subtype (CR 305.6), which is what tapping
+# it for blue at the end proves.
+
+[Bot1 Deck]
+Multiversal Passage
+Plains x14
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Multiversal Passage.Play
+Bot1.Modes(Island)
+Bot1.Accept
+Bot1.Battlefield.Multiversal Passage.Activate
+
+[Expect]
+Turn = 1
+Bot1.Life = 18
+Bot1.Mana = {U}
+Bot1.LandsPlayed = 1
+Bot1.Battlefield = Multiversal Passage
+Bot1.Battlefield.Multiversal Passage.Tapped = true
+Bot1.Battlefield.Multiversal Passage.Types = Land

@@ -1,0 +1,23 @@
+# Consider: "Surveil 1. Draw a card." in that order, so a library of one card is surveilled before it is drawn (CR 701.46a).
+# Bot1 puts the only card, Lightning Bolt, into the graveyard; the draw that follows is from an empty library, and the
+# state-based action makes Bot1 lose the game (CR 704.5b) with Consider already resolved.
+
+[Bot1 Deck]
+Island
+Consider
+Island x5
+Lightning Bolt
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Consider.Cast
+Bot1.Arrange(| Lightning Bolt)
+
+[Expect]
+Result = Bot2 won
+Bot1.Graveyard = Consider; Lightning Bolt
+Bot1.Library.Count = 0

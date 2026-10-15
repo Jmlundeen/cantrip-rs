@@ -1,0 +1,29 @@
+# "Target nonland permanent": Bot2's Island is refused as a target while Bot2's Ornithopter, the positive control, is a
+# legal target and goes back to its owner's hand.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Echoing Truth
+Island x17
+
+[Bot2 Deck]
+Island
+Ornithopter
+Island x17
+
+[Actions]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Echoing Truth.Cast(Bot2.Battlefield.Island)
+Bot1.Hand.Echoing Truth.Cast(Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Island
+Bot2.Hand.Count = 7

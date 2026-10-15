@@ -1,0 +1,44 @@
+# "{T}, Sacrifice ten nonland permanents: Each opponent loses 10 life." Bot1 casts Bolas's Citadel on turn 1 (Mox Jet, Mox Ruby,
+# Mox Pearl and Black Lotus pay), then four Ornithopters off the top of the library for no life (mana value 0). Its ten nonland
+# permanents are now the five Moxen, the Citadel itself (tapped as a cost, then sacrificed with the rest) and the four
+# Ornithopters, and Bot2 goes from 20 to 10 life. The Black Lotus was sacrificed for mana, so it is not one of them.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Mox Sapphire
+Bolas's Citadel
+Ornithopter x4
+Swamp x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Bolas's Citadel.Cast
+Bot1.Library.Ornithopter.Cast
+Bot1.Library.Ornithopter.Cast
+Bot1.Library.Ornithopter.Cast
+Bot1.Library.Ornithopter.Cast
+Bot1.Battlefield.Bolas's Citadel.Activate
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 10
+Bot1.Life = 20
+Bot1.Battlefield.Count = 0
+Bot1.Graveyard.Count = 11
+Stack.Count = 0

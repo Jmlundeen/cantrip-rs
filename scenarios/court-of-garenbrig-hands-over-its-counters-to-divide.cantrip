@@ -1,0 +1,55 @@
+# Court of Garenbrig's upkeep trigger, "distribute two +1/+1 counters among up to two target creatures" (CR 601.2d),
+# with a creature of each player's to choose from, and the script stops with the division unanswered. Dealt to a
+# session it is the board a client is brought to in order to work a divided-target screen: whose creature gets what
+# has to be plain from the board itself, since a creature on either side may be chosen.
+
+[Bot1 Deck]
+Forest
+Forest
+Forest
+Guerrilla Gorilla
+Court of Garenbrig
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Forest
+Mountain
+Llanowar Elves
+Embereth Shieldbreaker
+Forest
+Mountain
+Forest
+Forest x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Embereth Shieldbreaker.Cast
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Court of Garenbrig.Cast
+[Handover Bot1.Divide]
+
+[Expect]
+Step = Upkeep
+ActivePlayer = Bot1
+Monarch = Bot1
+Bot1.Battlefield.Court of Garenbrig.Tapped = false
+Bot1.Battlefield.Guerrilla Gorilla.Power = 2
+Bot2.Battlefield.Llanowar Elves.Power = 1
+Bot2.Battlefield.Embereth Shieldbreaker.Power = 2
+# Nothing has been distributed: the division is the question still outstanding.
+Bot1.Battlefield.Guerrilla Gorilla.Counters.PlusOnePlusOne = (absent)

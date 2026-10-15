@@ -1,0 +1,39 @@
+# Black Widow comes down on turn 3 and connects on turn 5. Bot2 exiles a Forest and an Island off the top of its library
+# before it reaches Lightning Bolt. Bot1 declines the +1/+1 counter, so the Bolt is Bot1's to cast this turn, and it
+# pays the {R} with a Swamp (mana of any type can be spent) to bolt Bot2. The Bolt is Bot2's card, so it goes to Bot2's
+# graveyard, on top of the two Mountains it discarded to hand size.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Black Widow, Super Spy
+Swamp x12
+
+[Bot2 Deck]
+Mountain x9
+Forest
+Island
+Lightning Bolt
+Mountain x5
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Black Widow, Super Spy.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Attack(Black Widow, Super Spy)
+Bot1.Decline
+[T5 Bot1.Main2]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+
+[Expect]
+Bot2.Life = 15
+Bot2.Graveyard = Lightning Bolt; Mountain; Mountain
+Exile = Forest; Island
+Bot1.Battlefield.Black Widow, Super Spy.Power = 2
+Bot2.Library.Count = 5

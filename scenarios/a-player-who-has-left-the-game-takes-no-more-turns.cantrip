@@ -1,0 +1,26 @@
+# A player who has left a game that goes on takes no more turns (CR 800.4a): the turn passes to the next player still in
+# it. Bot2's library holds just its opening seven, so it loses by drawing from an empty library on turn 2 (CR 704.5b).
+# Turn 3 is Bot3's, turn 4 Bot1's, and turn 5, which would have been Bot2's, is Bot3's again.
+
+[Bot1 Deck]
+Plains x20
+
+[Bot2 Deck]
+Plains x7
+
+[Bot3 Deck]
+Forest x20
+
+[Actions]
+[T3 Bot3.Main1]
+Bot3.Hand.Forest.Play
+[T4 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot3.Main1]
+Bot3.Hand.Forest.Play
+
+[Expect]
+Turn = 5
+ActivePlayer = Bot3
+Bot2.Status = Lost
+Bot3.Battlefield.Count = 2

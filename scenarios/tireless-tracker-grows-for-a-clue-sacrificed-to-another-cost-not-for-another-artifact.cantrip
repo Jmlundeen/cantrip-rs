@@ -1,0 +1,48 @@
+# "Whenever you sacrifice a Clue" is any Clue sacrificed for any reason (the ruling), not only to its own ability:
+# Krark-Clan Ironworks sacrificing the Clue grows the Tracker. Sacrificing a Mox, an artifact that is not a Clue, to the
+# same cost does not.
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Tireless Tracker
+Forest
+Krark-Clan Ironworks
+Island x8
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Tireless Tracker.Cast
+Bot2.Pass
+Bot1.Hand.Forest.Play
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Krark-Clan Ironworks.Cast
+Bot2.Pass
+Bot1.Battlefield.Krark-Clan Ironworks.Activate(Sacrifice: Clue Token)
+Bot2.Pass
+? Bot1.Battlefield.Tireless Tracker.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Krark-Clan Ironworks.Activate(Sacrifice: Mox Ruby)
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Mox Ruby
+Bot1.Battlefield.Tireless Tracker.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Tireless Tracker.Power = 4
+Bot1.Battlefield.Tireless Tracker.Toughness = 3

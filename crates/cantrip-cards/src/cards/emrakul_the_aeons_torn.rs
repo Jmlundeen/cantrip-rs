@@ -1,0 +1,65 @@
+use cantrip_api::*;
+use cantrip_mechanics::triggers::{annihilator, cast_this_spell};
+use cantrip_oracle as oracle;
+
+/// "When you cast this spell, take an extra turn after this one." Triggers from the stack (CR 603.2, 702.85a's shape).
+fn extra_turn(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    g.add_extra_turns(item.controller, 1);
+    Ok(())
+}
+
+/// "When Emrakul is put into a graveyard from anywhere" (CR 113.6k): the card is in the graveyard it was put into.
+fn put_into_graveyard(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::ZoneChange { new, to, .. } if *new == source && to.is(ZoneKind::Graveyard) => Fired::PLAIN,
+        _ => None,
+    }
+}
+
+/// "Its owner shuffles their graveyard into their library."
+fn shuffle_graveyard_in(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let owner = g.obj(item.object).owner;
+    let graveyard = g.state().zone(Zone::graveyard(owner)).to_vec();
+    g.put_into_library(&graveyard, LibraryPlace::Top);
+    g.shuffle(owner);
+    Ok(())
+}
+
+/// "Protection from spells that are one or more colors."
+fn protection(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
+    chars.protection_colored_spells = true;
+}
+
+fn itself(_: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Chars) -> bool {
+    source == affected
+}
+
+pub static CARD: CardDef = CardDef {
+    abilities: &[
+        AbilityDef::Triggered(TriggeredDef {
+            text: "When you cast this spell, take an extra turn after this one.",
+            listens: EventMask::SPELL_CAST,
+            matches: cast_this_spell,
+            effect: extra_turn,
+            anywhere: true,
+            ..TriggeredDef::BLANK
+        }),
+        annihilator::<6>("Annihilator 6 (Whenever this creature attacks, defending player sacrifices six permanents.)"),
+        AbilityDef::Triggered(TriggeredDef {
+            text: "When Emrakul is put into a graveyard from anywhere, its owner shuffles their graveyard into their library.",
+            listens: EventMask::ZONE_CHANGE,
+            matches: put_into_graveyard,
+            effect: shuffle_graveyard_in,
+            anywhere: true,
+            ..TriggeredDef::BLANK
+        }),
+    ],
+    statics: &[StaticDef {
+        text: "Protection from spells that are one or more colors",
+        layer: Layer::Ability,
+        affects: itself,
+        apply: protection,
+        ..StaticDef::BLANK
+    }],
+    ..oracle::EMRAKUL_THE_AEONS_TORN
+};

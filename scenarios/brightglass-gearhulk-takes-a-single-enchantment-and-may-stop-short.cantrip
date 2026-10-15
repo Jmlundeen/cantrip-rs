@@ -1,0 +1,32 @@
+# "Up to two": Bot1 takes only the Fastbond (an enchantment of mana value 1, CR 701.23) and leaves the Sol Ring and the Elves
+# in the library, which has been shuffled (so its order is not asserted, only what it holds).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Black Lotus
+Brightglass Gearhulk
+Island x3
+Sol Ring
+Llanowar Elves
+Fastbond
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Brightglass Gearhulk.Cast
+Bot1.Accept
+Bot1.Search(Fastbond)
+
+[Expect]
+Bot1.Hand = Island; Island; Island; Fastbond
+Bot1.Library.Count = 12

@@ -1,0 +1,54 @@
+# Fable of the Mirror-Breaker's back face, Reflection of Kiki-Jiki: "{1}, {T}: Create a token that's a copy of another target
+# nonlegendary creature you control, except it has haste. Sacrifice it at the beginning of the next end step." On turn 7
+# Bot1 controls the Reflection, a Goblin Shaman, and a Ragavan (legendary); Bot2 controls an Ornithopter. The Reflection
+# cannot copy the legendary Ragavan, the opponent's Ornithopter, or itself (the refusals, each naming that target), and
+# can copy the Goblin Shaman (the positive control): the token has haste and attacks at once with the original, each
+# making a Treasure ("Whenever this token attacks"), and the copy is sacrificed at the beginning of that turn's end step.
+# Fable is cast on turn 1 with Black Lotus's red mana; chapter II is declined on turn 3; chapter III flips it on turn 5.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Black Lotus
+Fable of the Mirror-Breaker
+Ragavan, Nimble Pilferer
+Mountain
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Fable of the Mirror-Breaker.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Choose()
+[T5 Bot1.Main1]
+Bot1.Pass
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Ragavan, Nimble Pilferer.Cast
+Bot1.Pass
+! Bot1.Battlefield.Reflection of Kiki-Jiki.Activate(Ragavan, Nimble Pilferer)
+! Bot1.Battlefield.Reflection of Kiki-Jiki.Activate(Bot2.Battlefield.Ornithopter)
+! Bot1.Battlefield.Reflection of Kiki-Jiki.Activate(Reflection of Kiki-Jiki)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Reflection of Kiki-Jiki.Activate(Goblin Shaman)
+Bot1.Pass
+Bot1.Attack(Goblin Shaman#1 > Bot2; Goblin Shaman#2 > Bot2)
+[T7 Bot1.Main2]
+? Bot1.Battlefield.Goblin Shaman#2.Keywords = Haste
+? Bot2.Life = 16
+? Bot1.Battlefield.Treasure Token#2.Tapped = false
+[T8 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield = Mountain; Mountain; Mox Ruby; Reflection of Kiki-Jiki; Ragavan, Nimble Pilferer; Goblin Shaman; Treasure Token; Treasure Token
+Bot1.Battlefield.Goblin Shaman.Keywords = (absent)

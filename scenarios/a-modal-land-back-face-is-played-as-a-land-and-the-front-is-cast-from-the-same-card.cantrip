@@ -1,0 +1,26 @@
+# Bala Ged Recovery is a modal double-faced card (CR 712.4): one copy is played as its back face, the land Bala Ged
+# Sanctuary, which enters tapped; the other is cast as a sorcery for {2}{G} (Black Lotus's three green mana) and returns
+# the Black Lotus from the graveyard.
+
+[Bot1 Deck]
+Black Lotus
+Bala Ged Recovery
+Bala Ged Recovery
+Forest x4
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Bala Ged Recovery.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Bala Ged Recovery.Cast(Bot1.Graveyard.Black Lotus)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Bala Ged Sanctuary.Tapped = true
+Bot1.Battlefield.Count = 1
+Bot1.Hand = Black Lotus; Forest; Forest; Forest; Forest
+Bot1.Graveyard = Bala Ged Recovery

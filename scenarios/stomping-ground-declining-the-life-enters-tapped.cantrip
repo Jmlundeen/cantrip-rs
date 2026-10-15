@@ -1,0 +1,17 @@
+# Stomping Ground: declining to pay 2 life as it enters leaves it tapped and Bot1's life unchanged (CR 614.12a).
+
+[Bot1 Deck]
+Stomping Ground
+Plains x19
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Stomping Ground.Play
+Bot1.Decline
+? Bot1.Battlefield.Stomping Ground.Tapped = true
+
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield.Stomping Ground.Tapped = true

@@ -1,0 +1,47 @@
+# Two Classes on one board, handed over with Bot1 holding priority in its first main phase: Innkeeper's Talent at its
+# first level and Does Machines raised to its second. It is how the client draws a Class that this position exists to
+# picture - a Saga's frame turned over, the levels down the right beside a tall illustration, each headed by the cost
+# to gain it with its number on the ribbon, the reminder in italics at the top, and a level the Class has not reached
+# drawn spent:
+
+[Bot1 Deck]
+Tropical Island
+Mox Sapphire
+Mox Emerald
+Black Lotus
+Innkeeper's Talent
+Does Machines
+Island x12
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Tropical Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Tropical Island.Activate(Ability: {G})
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Innkeeper's Talent.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Does Machines.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Does Machines.Activate
+Bot1.Pass
+Bot1.Pass
+[Handover Bot1.Pass]
+
+[Expect]
+Turn = 1
+Step = Main1
+ActivePlayer = Bot1
+PriorityPlayer = Bot1
+Stack.Count = 0
+Bot1.Battlefield.Does Machines.ClassLevel = 2

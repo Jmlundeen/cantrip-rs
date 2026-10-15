@@ -1,0 +1,52 @@
+# Bot2's Ornithopter is exiled by Swords to Plowshares on turn 3 (no void counter), and on turn 4 Bot2 discards a Mountain
+# to hand size under Dauthi Voidwalker, so it is exiled with a void counter instead. On turn 5 the Voidwalker is sacrificed:
+# the Mountain is the only exiled card an opponent owns with a void counter, so there is nothing to choose and the Ornithopter
+# is not offered. "Play" includes a land: Bot1 plays Bot2's Mountain from exile as its land for the turn, without
+# paying anything.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Dauthi Voidwalker
+Swamp
+Mox Pearl
+Swords to Plowshares
+Swamp x14
+
+[Bot2 Deck]
+Ornithopter
+Swamp x6
+Swamp
+Mountain
+Swamp x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dauthi Voidwalker.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Swords to Plowshares.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Dauthi Voidwalker.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Exile.Mountain.Play
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Exile = Ornithopter
+Bot1.Battlefield.Mountain.Types = Land
+Bot1.LandsPlayed = 1
+Bot1.Graveyard = Dauthi Voidwalker; Swords to Plowshares

@@ -1,0 +1,58 @@
+# Golos, Tireless Pilgrim: entering, it fetches a land onto the battlefield tapped (a Forest); on turn 3 its five-color
+# ability exiles the top three cards of the library, and one of them, a Lightning Bolt, is cast from exile for no mana.
+# The library is all Lightning Bolts but the Forest, so the search's shuffle cannot matter.
+
+[Bot1 Deck]
+Golos, Tireless Pilgrim
+Gleemox
+Sol Ring
+Mox Emerald
+Mox Pearl
+Mox Jet
+Mox Ruby
+Forest
+Lightning Bolt x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Gleemox.Activate(Color: Blue)
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Golos, Tireless Pilgrim.Cast
+Bot1.Pass
+Bot1.Search(Forest)
+? Bot1.Battlefield.Forest.Tapped = true
+[T3 Bot1.Main1]
+Bot1.Battlefield.Gleemox.Activate(Color: Blue)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Golos, Tireless Pilgrim.Activate(Ability: Exile the top three)
+Bot1.Pass
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Forest.Tapped = false
+Bot2.Life = 17
+Exile.Count = 2
+Bot1.Graveyard = Lightning Bolt
+Bot1.Library.Count = 8

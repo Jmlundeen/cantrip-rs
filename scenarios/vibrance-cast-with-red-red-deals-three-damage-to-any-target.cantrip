@@ -1,0 +1,49 @@
+# Vibrance: "When this creature enters, if {R}{R} was spent to cast it, this creature deals 3 damage to any target."
+# Bot1 casts it for two Mountains and three Swamps (CR 106.1b: the whole payment counts, at least two red), and its
+# ability kills Bot2's Llanowar Elves. Only one green was not spent, so the land search never triggers: Bot1 is asked
+# for no search and gains no life.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Swamp
+Swamp
+Swamp
+Vibrance
+Island
+Forest x13
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Island x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Vibrance.Cast
+Bot1.Target(Llanowar Elves)
+
+[Expect]
+Turn = 9
+Stack.Count = 0
+Bot1.Life = 20
+Bot2.Life = 20
+Bot1.Battlefield = Mountain; Mountain; Swamp; Swamp; Swamp; Vibrance
+Bot1.Hand = Island; Forest; Forest; Forest; Forest
+Bot2.Battlefield = Forest

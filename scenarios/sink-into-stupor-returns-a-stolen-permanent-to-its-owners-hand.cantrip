@@ -1,0 +1,49 @@
+# "Return target spell or nonland permanent an opponent controls to its OWNER's hand": Bot1's Coveted Jewel is stolen by Bot2's unblocked Llanowar Elves on
+# turn 4, so Bot2 controls it; on turn 5 Sink into Stupor returns it, not to Bot2's hand but to Bot1's, whose card it is (CR 108.3, 400.3).
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Sapphire
+Gleemox
+Coveted Jewel
+Sink into Stupor
+Plains
+Plains
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x12
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Black)
+Bot1.Hand.Coveted Jewel.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T4 Bot2.Main1]
+Bot2.Attack(Llanowar Elves > Bot1)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Blue)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sink into Stupor.Cast(Bot2.Battlefield.Coveted Jewel)
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Forest; Llanowar Elves
+Bot1.Hand = Coveted Jewel; Plains; Plains; Plains; Plains; Plains; Plains

@@ -1,0 +1,57 @@
+# Bloodtithe Harvester makes a Blood token on turn 3 and a second one makes another on turn 5. The first taps and
+# sacrifices itself: Adeline gets -X/-X where X is twice the two Blood tokens Bot1 controls, and her toughness of 4 is
+# gone. Bot1 then pays {1}, taps a Blood, discards Lightning Bolt and sacrifices the Blood to draw Mox Jet.
+
+[Bot1 Deck]
+Swamp
+Mountain
+Bloodtithe Harvester
+Bloodtithe Harvester
+Swamp
+Lightning Bolt
+Swamp
+Swamp
+Swamp
+Mox Jet
+Swamp x5
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Adeline, Resplendent Cathar
+Plains
+Plains x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Bloodtithe Harvester.Cast
+[T3 Bot1.Main2]
+? Bot1.Battlefield = Swamp; Mountain; Bloodtithe Harvester; Blood Token
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Adeline, Resplendent Cathar.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Bloodtithe Harvester.Cast
+Bot1.Battlefield.Bloodtithe Harvester.Activate(Adeline, Resplendent Cathar)
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Blood Token.Activate
+Bot1.Choose(Lightning Bolt)
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Swamp; Swamp; Mountain; Bloodtithe Harvester; Blood Token
+Bot1.Graveyard = Lightning Bolt; Bloodtithe Harvester
+Bot1.Hand = Swamp; Swamp; Swamp; Mox Jet
+Bot2.Battlefield = Plains; Plains; Mox Pearl
+Bot2.Graveyard = Adeline, Resplendent Cathar

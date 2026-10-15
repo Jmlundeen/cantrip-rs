@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- What the table shows and does that is not drawing: which actions a card offers (CardActions), when a seat passes
+       by itself (AutoPass), how the server's log is set out under turn and step headings (GameJournal), and the canned
+       prompt positions the web client shows under ?prompt=NAME and its browser tests draw (PromptFixtures). -->
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Cantrip.Client.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Presentation can only see client-side state and wire contracts, never hosting or rules. -->
+    <ProjectReference Include="..\Cantrip.Client\Cantrip.Client.csproj" />
+  </ItemGroup>
+
+</Project>

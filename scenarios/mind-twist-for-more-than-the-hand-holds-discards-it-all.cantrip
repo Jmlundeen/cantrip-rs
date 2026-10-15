@@ -1,0 +1,34 @@
+# "Target player discards X cards at random": a player with fewer than X cards discards what they have (CR 701.9b), and any player may be
+# the target, the caster included. Bot1 puts four Moxen onto the battlefield and Mind Twists itself for X = 3 with two Islands left
+# in hand: both are discarded, nothing more can be and nothing goes wrong.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Mind Twist
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Mind Twist.Cast(Bot1; X: 3)
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 0
+Bot1.Graveyard = Mind Twist; Island; Island
+Bot2.Hand.Count = 7

@@ -1,0 +1,33 @@
+# {4}: Put a +1/+1 counter on it. Bot1 casts the Ballista for X = 1 ({2}) with Mox Sapphire and Mox Pearl, then pays {4} (Mox Ruby, Mox Emerald, Mox Jet and Black Lotus) and it grows to 2/2.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Mox Jet
+Mox Pearl
+Walking Ballista
+Black Lotus
+Mox Sapphire
+Island x11
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Walking Ballista.Cast(X: 1)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Walking Ballista.Activate(Ability: Put a +1/+1 counter)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Walking Ballista.Power = 2

@@ -1,0 +1,40 @@
+# Griselbrand: "Flying, lifelink" and "Pay 7 life: Draw seven cards." Entomb puts it into the graveyard and Reanimate
+# brings it back at the cost of 8 life (20 -> 12). Paying 7 (12 -> 5) draws seven. With 5 life left the ability cannot be
+# paid again (CR 119.4: a player can pay life only if their life total is at least that much): refused, though Griselbrand
+# is untapped and in play.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Entomb
+Reanimate
+Swamp x3
+Griselbrand
+Swamp x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Griselbrand)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Reanimate.Cast(Bot1.Graveyard.Griselbrand)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 12
+? Bot1.Battlefield.Griselbrand.Keywords = Flying; Lifelink
+Bot1.Battlefield.Griselbrand.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 5
+? Bot1.Hand.Count = 10
+! Bot1.Battlefield.Griselbrand.Activate
+Bot1.Pass
+
+[Expect]
+Turn = 1
+Bot1.Life = 5

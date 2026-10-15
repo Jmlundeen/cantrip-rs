@@ -1,0 +1,71 @@
+# What the tactical seat thinks a position is worth (TacticalModel): log-odds of winning, per feature,
+# and the policy.* weights it plays by. Made by tools\bot-train.cmd, not by hand.
+#
+# Fitted to 4000 games the seat played against itself with rw-aggro, then tuned by play: 300 steps of 200 games.
+# Against the hand-written prior the result won 2132 of 4000 (53.3 % +/- 1.5 %); the fit alone won 1982 (49.5 %),
+# so what it gained, the tuning gained. A weight this file does not name is the prior's (TacticalModel.Prior):
+# policy.unread and policy.select are, since no card in that deck exercises either.
+active = 0.1008
+creature = 0.1257
+creature.deathtouch = 0.2126
+creature.defender = -0.1458
+creature.doublestrike = 0.1208
+creature.firststrike = -0.004
+creature.flying = 0.0709
+creature.hexproof = 0.0955
+creature.indestructible = 0.2582
+creature.lifelink = 0.193
+creature.menace = 0.0322
+creature.power = 0.0838
+creature.prowess = -0.0175
+creature.reach = 0.028
+creature.text = 0.1862
+creature.token = -0.0966
+creature.toughness = 0.205
+creature.trample = -0.0419
+creature.vigilance = 0.0531
+hand = 0.274
+land.1-4 = 0.5128
+land.5+ = 0.0272
+life.0-5 = 0.2957
+life.10-20 = 0.0514
+life.20+ = 0.0595
+life.5-10 = 0.1651
+permanent.artifact = 0.2112
+permanent.enchantment = 0.1471
+permanent.loyalty = 0.0858
+permanent.manavalue = 0.1424
+permanent.planeswalker = 0.5319
+policy.attacktrigger = 0.2987
+policy.bounce = 0.3605
+policy.connect = 0.2022
+policy.crackback = 0.4567
+policy.exposed = 2.9203
+policy.grow = 0.1501
+policy.harm = 0.3149
+policy.help = 0.1652
+policy.margin = 0.0308
+policy.tempo = 0.0196
+card:Adeline, Resplendent Cathar = -0.0064
+card:Cat = -0.0158
+card:Clue Token = 0.1197
+card:Cori-Steel Cutter = 0.0121
+card:Dragon's Rage Channeler = -0.1371
+card:Elemental = -0.0847
+card:Figure of Destiny = 0.0504
+card:Guide of Souls = 0.1834
+card:Hero of Bladehold = 0.2088
+card:Human = 0.0041
+card:Inti, Seneschal of the Sun = -0.1474
+card:Luminarch Aspirant = 0.0679
+card:Monastery Mentor = -0.0355
+card:Monk = 0.0092
+card:Mother of Runes = 0.0508
+card:Ocelot Pride = 0.1235
+card:Phlage, Titan of Fire's Fury = 0.0942
+card:Ragavan, Nimble Pilferer = -0.0081
+card:Seasoned Pyromancer = -0.0692
+card:Soldier = 0.038
+card:Thalia, Guardian of Thraben = -0.0112
+card:Thraben Inspector = -0.2563
+card:Treasure Token = 0.1484

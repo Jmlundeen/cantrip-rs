@@ -1,0 +1,22 @@
+# Raucous Theater enters tapped and its enters trigger surveils 1: the Mountain on top of the library goes to the
+# graveyard, and the tapped Swamp Mountain is the land Bot1 has.
+
+[Bot1 Deck]
+Raucous Theater
+Island x6
+Mountain
+Island x9
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Raucous Theater.Play
+Bot1.Arrange( | Mountain)
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Raucous Theater.Tapped = true
+Bot1.Battlefield.Raucous Theater.Subtypes = Mountain; Swamp
+Bot1.Graveyard = Mountain
+Bot1.Library.Count = 9

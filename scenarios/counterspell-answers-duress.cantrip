@@ -1,0 +1,38 @@
+# Bot2 casts Duress on its first turn; Bot1 taps an Island and a Mox in response and counters it.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Counterspell
+4 Island
+10 Island
+
+[Bot2 Deck]
+Swamp
+Duress
+5 Swamp
+10 Swamp
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Duress.Cast(Bot1)
+? Stack = Duress
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Counterspell.Cast(Duress)
+? Stack = Counterspell; Duress
+
+[Expect]
+Turn = 2
+ActivePlayer = Bot2
+Stack.Count = 0
+Bot1.Graveyard = Counterspell
+Bot2.Graveyard = Duress
+Bot1.Hand = Island; Island; Island; Island
+Bot1.Battlefield = Island; Mox Sapphire
+Bot1.Battlefield.Island.Tapped = true
+Bot1.Battlefield.Mox Sapphire.Tapped = true
+Bot2.Hand.Count = 6

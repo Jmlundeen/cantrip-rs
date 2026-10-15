@@ -1,0 +1,36 @@
+# Force of Vigor, two targets: when one becomes illegal before it resolves, the spell still does what it can to the other
+# (CR 608.2b). Bot2 casts it on Bot1's turn 1 for its alternative cost (exiling the Elvish Mystic), targeting Black Lotus
+# and Mox Sapphire; Bot1 answers by tapping the Black Lotus for mana, which sacrifices it, so only the Mox Sapphire
+# is destroyed by the spell (Bot1's Lotus is in the graveyard because it was sacrificed, not destroyed).
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Island x18
+
+[Bot2 Deck]
+Force of Vigor
+Elvish Mystic
+Forest x18
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Force of Vigor.Cast(Ability: green card)
+Bot2.Target(Black Lotus; Mox Sapphire)
+Bot2.Choose(Elvish Mystic)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Battlefield =
+Bot1.Graveyard = Mox Sapphire; Black Lotus
+Bot2.Graveyard = Force of Vigor
+Exile = Elvish Mystic

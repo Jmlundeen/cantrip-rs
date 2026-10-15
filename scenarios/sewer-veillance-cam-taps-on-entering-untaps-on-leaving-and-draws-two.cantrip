@@ -1,0 +1,35 @@
+# Sewer-veillance Cam: entering, it taps Bot2's Ornithopter; sacrificed for {3}{U} it draws two cards and, leaving
+# the battlefield, untaps the Ornithopter again.
+
+[Bot1 Deck]
+Island
+Island
+Black Lotus
+Sewer-veillance Cam
+Plains x3
+Plains x10
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Island#1.Activate
+Bot1.Hand.Sewer-veillance Cam.Cast
+Bot1.Modes(Tap)
+? Bot2.Battlefield.Ornithopter.Tapped = true
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Sewer-veillance Cam.Activate
+Bot1.Modes(Untap)
+
+[Expect]
+Bot2.Battlefield.Ornithopter.Tapped = false
+Bot1.Hand.Count = 6
+Bot1.Graveyard = Sewer-veillance Cam; Black Lotus

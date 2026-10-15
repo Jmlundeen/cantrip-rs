@@ -1,0 +1,57 @@
+# Level 3, gained for {5}{U} from level 2, adds "whenever you cast an instant or sorcery spell, create a 1/1 blue and
+# red Otter with prowess". The Bolt cast afterwards makes a second Otter, and that trigger resolves before the Bolt
+# does. The first Otter was there for prowess to pump on the Lotus and the Bolt (3/3); the second was not (1/1).
+# Level 2 with an empty graveyard has no target, so its trigger does nothing.
+
+[Bot1 Deck]
+Island
+Mox Ruby
+Mox Sapphire
+Stormchaser's Talent
+Black Lotus
+Island
+Island
+Lightning Bolt
+Island
+Island x10
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Stormchaser's Talent.Cast
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Stormchaser's Talent.Activate(Ability: Level 2)
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Island#3.Activate
+Bot1.Battlefield.Stormchaser's Talent.Activate(Ability: Level 3)
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Stormchaser's Talent.ClassLevel = 3
+Bot1.Battlefield = Island; Island; Island; Mox Ruby; Mox Sapphire; Stormchaser's Talent; Otter; Otter
+Bot1.Battlefield.Otter#1.Power = 3
+Bot1.Battlefield.Otter#2.Power = 1
+Bot2.Life = 17
+Stack.Count = 0

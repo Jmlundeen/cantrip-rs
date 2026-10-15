@@ -1,0 +1,41 @@
+# Bow of Nylea's fourth mode says "up to four target cards": with no card in the graveyard it can still be chosen (zero
+# targets is a legal choice, CR 601.2c) and resolves doing nothing. The library keeps its ten cards.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Emerald
+Mox Ruby
+Bow of Nylea
+Forest x3
+Forest x10
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Bow of Nylea.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Bow of Nylea.Activate
+Bot1.Modes(Put up to four)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Bow of Nylea.Tapped = true
+Bot1.Graveyard.Count = 0
+Bot1.Library.Count = 10
+Stack.Count = 0

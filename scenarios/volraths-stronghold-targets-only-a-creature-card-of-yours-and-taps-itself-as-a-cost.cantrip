@@ -1,0 +1,53 @@
+# Volrath's Stronghold: "{1}{B}, {T}: Put target creature card from your graveyard on top of your library." The target is a
+# creature card in the controller's own graveyard: a Faithless Looting (not a creature card) and Bot2's Ornithopter (a creature
+# card in the wrong graveyard, killed by Bot1's Bolt) are refused beside the Llanowar Elves that Looting discarded (the positive
+# control). The {T} is part of the cost: Mox Jet and Mox Pearl pay the {1}{B}, the Stronghold ends
+# tapped, and the Elves are the next card Bot1 draws.
+
+[Bot1 Deck]
+Mountain
+Volrath's Stronghold
+Mox Ruby
+Mox Jet
+Mox Pearl
+Lightning Bolt
+Faithless Looting
+Island
+Llanowar Elves
+Island
+Island x10
+
+[Bot2 Deck]
+Island
+Ornithopter
+Island x14
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Volrath's Stronghold.Play
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Choose(Llanowar Elves; Island)
+! Bot1.Battlefield.Volrath's Stronghold.Activate(Bot1.Graveyard.Faithless Looting; Ability: Put target)
+! Bot1.Battlefield.Volrath's Stronghold.Activate(Bot2.Graveyard.Ornithopter; Ability: Put target)
+Bot1.Battlefield.Volrath's Stronghold.Activate(Bot1.Graveyard.Llanowar Elves; Ability: Put target)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Library = Llanowar Elves; Island; Island; Island; Island; Island; Island; Island; Island; Island; Island
+Bot1.Battlefield.Volrath's Stronghold.Tapped = true
+Bot2.Graveyard = Ornithopter

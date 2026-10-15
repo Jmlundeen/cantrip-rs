@@ -1,0 +1,22 @@
+# Mox Opal (metalcraft): "{T}: Add one mana of any color. Activate only if you control three or more artifacts." With
+# only itself and Mox Ruby it cannot be activated (the refusal); once Mox Jet makes three artifacts it adds blue.
+
+[Bot1 Deck]
+Mox Opal
+Mox Ruby
+Mox Jet
+Mountain x17
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Opal.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+! Bot1.Battlefield.Mox Opal.Activate
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Opal.Activate(Color: Blue)
+
+[Expect]
+Bot1.Mana = {U}

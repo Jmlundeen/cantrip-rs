@@ -1,0 +1,28 @@
+# Commercial District, a Mountain Forest that enters tapped with "surveil 1": the other half of the scenario that sends the card to the
+# graveyard - Bot1 keeps the top card (Arrange with the card in the first group), so the graveyard stays empty and the library is
+# unchanged. It has both land types, taps for {G} on turn 3 and offers no {U} (the refusal beside the {G}).
+
+[Bot1 Deck]
+Commercial District
+Plains x6
+Island
+Plains x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Commercial District.Play
+Bot1.Arrange(Island |)
+? Bot1.Battlefield.Commercial District.Tapped = true
+? Bot1.Battlefield.Commercial District.Subtypes = Forest; Mountain
+? Bot1.Graveyard.Count = 0
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Commercial District.Activate(Ability: {U})
+Bot1.Battlefield.Commercial District.Activate(Ability: {G})
+? Bot1.Mana = {G}
+
+[Expect]
+Turn = 3
+Bot1.Graveyard.Count = 0
+Bot1.Hand = Plains; Plains; Plains; Plains; Plains; Plains; Island

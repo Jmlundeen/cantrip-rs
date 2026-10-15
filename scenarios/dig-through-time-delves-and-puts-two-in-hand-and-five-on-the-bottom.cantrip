@@ -1,0 +1,41 @@
+# Delve (CR 702.66a) on an instant: five sacrificed Lotus Petals leave five cards in the graveyard and five blue mana
+# floating; Dig Through Time ({6}{U}{U}) exiles three of those cards for {3} and the mana pays the other five. It looks
+# at the seven cards of the library and Bot1 puts the Mountain and the Mox Ruby into its hand and the other five on the
+# bottom, in the order named, the first lowest.
+
+[Bot1 Deck]
+Lotus Petal x5
+Dig Through Time
+Island
+Mountain
+Swamp
+Plains
+Forest
+Island
+Mox Ruby
+Mox Jet
+
+[Bot2 Deck]
+Forest x22
+
+[Actions]
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Battlefield.Lotus Petal.Activate(Color: Blue)
+Bot1.Battlefield.Lotus Petal.Activate(Color: Blue)
+Bot1.Battlefield.Lotus Petal.Activate(Color: Blue)
+Bot1.Battlefield.Lotus Petal.Activate(Color: Blue)
+Bot1.Battlefield.Lotus Petal.Activate(Color: Blue)
+Bot1.Hand.Dig Through Time.Cast(Delve: 3)
+Bot1.Arrange(Mountain; Mox Ruby | Swamp; Plains; Forest; Island; Mox Jet)
+[Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Hand = Island; Mountain; Mox Ruby
+Bot1.Library = Swamp; Plains; Forest; Island; Mox Jet
+Exile.Count = 3
+Bot1.Graveyard.Count = 3

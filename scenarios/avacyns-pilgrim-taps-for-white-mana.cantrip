@@ -1,0 +1,22 @@
+# Avacyn's Pilgrim costs {G} and taps for {W}.
+
+[Bot1 Deck]
+Forest
+Avacyn's Pilgrim
+Forest x13
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Avacyn's Pilgrim.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Avacyn's Pilgrim.Activate
+? Bot1.Mana = {W}
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Forest; Avacyn's Pilgrim
+Bot1.Battlefield.Avacyn's Pilgrim.Tapped = true

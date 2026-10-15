@@ -1,0 +1,38 @@
+# There is no {T} in the cost: with two Ornithopters in play Bot1 activates it twice in one turn, sacrificing one
+# Ornithopter each time and dealing 2 to Bot2 each time: 16. Black Lotus pays for the enchantment and the first {2}, Mox Jet and
+# Mox Pearl the second.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Pearl
+Weaponize the Monsters
+Ornithopter
+Ornithopter
+Island
+Island x13
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Weaponize the Monsters.Cast
+Bot1.Pass
+Bot1.Battlefield.Weaponize the Monsters.Activate(Bot2)
+Bot1.Choose(Ornithopter)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Weaponize the Monsters.Activate(Bot2)
+Bot1.Choose(Ornithopter)
+[Bot1.Main2]
+? Turn = 1
+
+[Expect]
+Bot2.Life = 16
+Bot1.Graveyard = Ornithopter; Ornithopter; Black Lotus

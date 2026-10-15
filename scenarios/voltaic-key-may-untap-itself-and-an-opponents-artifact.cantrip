@@ -1,0 +1,45 @@
+# "Untap target artifact" - any artifact, the Key itself and an opponent's included. Turn 1: Sol Ring pays for two activations aimed at
+# the Voltaic Key itself ({T} is a cost, so it is tapped when it targets itself, and it untaps on resolution), after which it
+# is untapped and the pool is empty. Turn 2: Bot2 taps its Mox Emerald for mana and Bot1 answers with Mox Ruby's {R} and the Key,
+# untapping Bot2's Mox (the Key's controller need not be the artifact's).
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Sol Ring
+Voltaic Key
+Mox Ruby
+Island x12
+
+[Bot2 Deck]
+Mox Emerald
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Voltaic Key.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Voltaic Key.Activate(Voltaic Key)
+Bot1.Pass
+Bot1.Battlefield.Voltaic Key.Activate(Voltaic Key)
+Bot1.Pass
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Voltaic Key.Tapped = false
+? Bot1.Mana =
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+? Bot2.Battlefield.Mox Emerald.Tapped = true
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Voltaic Key.Activate(Bot2.Battlefield.Mox Emerald)
+Bot1.Pass
+
+[Expect]
+Bot2.Battlefield.Mox Emerald.Tapped = false
+Turn = 2
+Bot1.Battlefield.Voltaic Key.Tapped = true

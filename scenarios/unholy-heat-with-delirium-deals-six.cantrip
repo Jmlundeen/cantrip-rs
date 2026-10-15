@@ -1,0 +1,53 @@
+# Delirium (CR 207.2c, 702.131): on turn 1 Black Lotus pays for a Wheel of Fortune that puts an Ornithopter (artifact creature), three
+# Islands (land) and itself (the Wheel, a sorcery) and the Lotus (artifact) into Bot1's graveyard: four types, so on turn 3 Unholy Heat
+# deals 6 instead of 2 and kills Bot2's Cogwork Librarian (3/3), which 2 damage would not (the other scenario). The same Wheel makes Bot2
+# discard its seven Islands and draw its Moxen and Librarian.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Wheel of Fortune
+Ornithopter
+Island
+Island
+Island
+Unholy Heat
+Mox Ruby
+Island x12
+
+[Bot2 Deck]
+Island x7
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Cogwork Librarian
+Island x2
+Island x6
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Wheel of Fortune.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Cogwork Librarian.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Unholy Heat.Cast(Bot2.Battlefield.Cogwork Librarian)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard.Count = 8
+Bot2.Battlefield.Count = 4

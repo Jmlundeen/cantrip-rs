@@ -1,0 +1,47 @@
+# What the Equipment grants lasts only while it is attached (CR 613.1f, 301.5c): Bot1's Hero is a Wizard that grows on a
+# noncreature spell, as the existing scenarios show. Bot2's Disenchant destroys the Planisphere on turn 4, the Hero is just a Hero
+# and a 1/1 again, and the noncreature spell Bot1 casts afterwards (Mox Ruby) puts no counter on it. The Hero token itself stays.
+
+[Bot1 Deck]
+Island
+Island
+Astrologian's Planisphere
+Mox Ruby
+Island x3
+Island x10
+
+[Bot2 Deck]
+Plains
+Plains
+Disenchant
+Plains x4
+Plains x10
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Astrologian's Planisphere.Cast
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Hero.Subtypes = Hero; Wizard
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Plains#2.Activate
+Bot2.Hand.Disenchant.Cast(Astrologian's Planisphere)
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Hero.Subtypes = Hero
+Bot1.Battlefield.Hero.Power = 1
+Bot1.Battlefield.Hero.Counters.PlusOnePlusOne = (absent)
+Bot1.Graveyard = Astrologian's Planisphere

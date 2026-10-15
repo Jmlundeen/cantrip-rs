@@ -1,0 +1,6 @@
+{
+  "name": "Talisman of Indulgence",
+  "manaCost": "{2}",
+  "type": "Artifact",
+  "oracleText": "{T}: Add {C}.\n{T}: Add {B} or {R}. This artifact deals 1 damage to you."
+}

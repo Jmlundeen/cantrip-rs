@@ -1,0 +1,27 @@
+# A search for a quality may find nothing (CR 701.23b): the library holds no artifact or enchantment, so Bot1 finds nothing, the
+# Tutor still resolves to the graveyard, and the next draw is some card of the library. The Tutor is cast on turn one, so the
+# library has eight cards afterwards, none of them moved to the hand.
+
+[Bot1 Deck]
+Plains
+Enlightened Tutor
+Plains x5
+Lightning Bolt
+Island
+Counterspell
+Plains x5
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Enlightened Tutor.Cast
+! Bot1.Search(Lightning Bolt)
+Bot1.Search()
+
+[Expect]
+Bot1.Graveyard = Enlightened Tutor
+Bot1.Library.Count = 8
+Bot1.Hand.Count = 5

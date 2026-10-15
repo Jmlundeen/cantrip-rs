@@ -1,0 +1,54 @@
+# Bow of Nylea's fourth mode, "up to four target cards": it is one instance of "target", so one card cannot be chosen
+# for two of the four (CR 115.3). The graveyard holds Lightning Bolt and Burst Lightning; after the Bolt is chosen for the
+# first slot, it is not a candidate for the second (the refusal), and Burst Lightning is (the positive control). The
+# controller orders the two (Burst Lightning first, so it lies above the Bolt) as they go under the Forest.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Mox Ruby
+Lightning Bolt
+Burst Lightning
+Bow of Nylea
+Forest
+Forest
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Burst Lightning.Cast(Bot2)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Bow of Nylea.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Bow of Nylea.Activate
+Bot1.Modes(Put up to four)
+Bot1.Target(Lightning Bolt)
+! Bot1.Target(Lightning Bolt)
+Bot1.Target(Burst Lightning)
+Bot1.Pass
+Bot1.Arrange(Burst Lightning; Lightning Bolt)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard.Count = 0
+Bot1.Library = Forest; Burst Lightning; Lightning Bolt

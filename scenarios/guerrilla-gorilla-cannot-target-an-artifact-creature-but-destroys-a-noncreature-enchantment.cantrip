@@ -1,0 +1,44 @@
+# Guerrilla Gorilla: "Destroy target noncreature artifact or noncreature enchantment." Bot2 controls an Ornithopter (an artifact
+# creature, not a legal target: the refusal, naming it) and a Military Intelligence (a noncreature enchantment, the control).
+# Bot1 sacrifices the Gorilla on turn 3 and destroys the enchantment; the Ornithopter stays.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Guerrilla Gorilla
+Forest x17
+
+[Bot2 Deck]
+Island
+Mox Jet
+Ornithopter
+Military Intelligence
+Island x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+Bot1.Pass
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Military Intelligence.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Guerrilla Gorilla.Activate(Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Guerrilla Gorilla.Activate(Bot2.Battlefield.Military Intelligence)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Military Intelligence
+Bot2.Battlefield = Island; Mox Jet; Ornithopter
+Bot1.Graveyard = Guerrilla Gorilla

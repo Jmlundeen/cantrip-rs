@@ -1,0 +1,56 @@
+# Two ways to attach. "{B}{B}: Attach this Equipment to target creature you control" is a plain activated ability, usable at
+# instant speed: in Bot2's upkeep on turn four it puts the Plating on Bot1's first Ornithopter, a 6/2 (six artifacts Bot1
+# controls: three Moxen, the Plating, two Ornithopters; Bot2's Sol Ring, cast first, is not counted). "Equip {1}" is
+# sorcery speed (CR 702.6a), so it is refused in the upkeep (the refusal) and used in Bot1's main phase on turn five
+# (the positive control), where it moves the Plating to the second Ornithopter and the first loses the bonus. Equip
+# targets a creature you control only: Bot2's Ornithopter is refused beside it.
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Jet
+Swamp
+Cranial Plating
+Ornithopter
+Ornithopter
+Swamp x9
+
+[Bot2 Deck]
+Sol Ring
+Mountain
+Ornithopter
+Mountain x12
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Cranial Plating.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Hand.Ornithopter.Cast
+[T4 Bot2.Upkeep]
+! Bot1.Battlefield.Cranial Plating.Activate(Ability: Equip {1})
+Bot1.Battlefield.Cranial Plating.Activate(Ornithopter#1; Ability: {B}{B})
+Bot1.Battlefield.Mox Jet#3.Activate
+Bot1.Battlefield.Swamp.Activate
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Cranial Plating.AttachedTo = Ornithopter
+? Bot1.Battlefield.Ornithopter#1.Power = 6
+[T5 Bot1.Main1]
+! Bot1.Battlefield.Cranial Plating.Activate(Bot2.Battlefield.Ornithopter; Ability: Equip {1})
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Cranial Plating.Activate(Ornithopter#2; Ability: Equip {1})
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Ornithopter#2.Power = 6
+Bot1.Battlefield.Ornithopter#1.Power = 0
+Bot2.Battlefield.Ornithopter.Power = 0

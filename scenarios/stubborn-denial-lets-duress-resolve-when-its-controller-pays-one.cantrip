@@ -1,0 +1,31 @@
+# Bot2 casts Duress with its Swamp and keeps a Mox Jet untapped; Bot1 answers with Stubborn Denial (no creature with
+# power 4 or greater, so no ferocious) and Bot2 pays the {1}, so Duress resolves.
+
+[Bot1 Deck]
+Mox Sapphire
+Stubborn Denial
+Island x18
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Duress
+Swamp x17
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Duress.Cast(Bot1)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Stubborn Denial.Cast(Duress)
+Bot1.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.PayCost
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Stubborn Denial
+Bot2.Graveyard = Duress
+Bot2.Battlefield.Mox Jet.Tapped = true

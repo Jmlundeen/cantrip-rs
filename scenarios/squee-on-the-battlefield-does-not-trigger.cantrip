@@ -1,0 +1,24 @@
+# "From your graveyard": Squee on the battlefield as its owner's upkeep begins is not in the graveyard (CR 113.6k), so
+# nothing triggers and nothing is asked.
+
+[Bot1 Deck]
+Black Lotus
+Squee, Goblin Nabob
+Mountain x5
+Mountain x15
+
+[Bot2 Deck]
+Mountain x7
+Mountain x15
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Squee, Goblin Nabob.Cast
+[T3 Bot1.Upkeep]
+? Stack.Count = 0
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield = Squee, Goblin Nabob
+Bot1.Graveyard = Black Lotus

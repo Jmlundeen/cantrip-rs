@@ -1,0 +1,47 @@
+# "At the beginning of your end step, if you're the monarch" (CR 603.4): Bot2 becomes the monarch on turn 2 with Emberwilde Captain, so on turn 3 Bot1 is not the monarch at its end step and the trigger does not
+# happen, though an Ornithopter is in its graveyard (Bot1 Bolts its own, which also drains with Grave Venerations). Without a trigger there is no target question and the Ornithopter stays in the graveyard.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Grave Venerations
+Ornithopter
+Mox Ruby
+Lightning Bolt
+Plains
+Plains x10
+
+[Bot2 Deck]
+Black Lotus
+Mox Ruby
+Emberwilde Captain
+Mountain x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Grave Venerations.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Emberwilde Captain.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter)
+Bot1.Pass
+[T3 Bot1.End]
+[T4 Bot2.Main1]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Ornithopter; Lightning Bolt; Black Lotus
+Bot1.Life = 21
+Bot2.Life = 19
+Monarch = Bot2

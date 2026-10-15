@@ -1,0 +1,33 @@
+# "Target creature or planeswalker": damage to a planeswalker removes that many loyalty counters (CR 120.3c). With an empty graveyard (no
+# delirium) Unholy Heat deals 2 to Bot2's Liliana of the Veil, which enters with 3 loyalty and is left with 1.
+
+[Bot1 Deck]
+Mox Ruby
+Unholy Heat
+Island x14
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Liliana of the Veil
+Swamp x12
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Liliana of the Veil.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Unholy Heat.Cast(Bot2.Battlefield.Liliana of the Veil)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Liliana of the Veil.Counters.Loyalty = 1

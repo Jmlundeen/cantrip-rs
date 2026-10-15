@@ -1,0 +1,25 @@
+# Occult Epiphany with X = 0: draw zero and discard zero cards, so no card type and no Spirit.
+
+[Bot1 Deck]
+Mox Sapphire
+Occult Epiphany
+Island x5
+Island x10
+
+[Bot2 Deck]
+Swamp x15
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Occult Epiphany.Cast(X: 0)
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Hand.Count = 5
+Bot1.Battlefield = Mox Sapphire
+Bot1.Graveyard = Occult Epiphany

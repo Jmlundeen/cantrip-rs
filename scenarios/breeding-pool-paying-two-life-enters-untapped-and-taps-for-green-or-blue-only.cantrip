@@ -1,0 +1,28 @@
+# Breeding Pool, a Forest Island: "As this land enters, you may pay 2 life. If you don't, it enters tapped." Accepting
+# pays 2 life and it enters untapped (the positive control for the declined case in breeding-pool-declining-the-life-
+# enters-tapped), and it taps for {G} or {U} - its basic land types' mana abilities (CR 305.6) - and no other color,
+# nor colorless.
+
+[Bot1 Deck]
+Breeding Pool
+Plains x19
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Breeding Pool.Play
+Bot1.Accept
+? Bot1.Life = 18
+? Bot1.Battlefield.Breeding Pool.Tapped = false
+! Bot1.Battlefield.Breeding Pool.Activate(Color: White)
+! Bot1.Battlefield.Breeding Pool.Activate(Color: Black)
+! Bot1.Battlefield.Breeding Pool.Activate(Color: Red)
+! Bot1.Battlefield.Breeding Pool.Activate(Color: Colorless)
+Bot1.Battlefield.Breeding Pool.Activate(Ability: {U})
+? Bot1.Mana = {U}
+
+[Expect]
+Bot1.Life = 18
+Bot1.Battlefield.Breeding Pool.Subtypes = Forest; Island
+Bot1.Battlefield.Breeding Pool.Tapped = true

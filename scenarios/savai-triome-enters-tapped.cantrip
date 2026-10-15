@@ -1,0 +1,14 @@
+# Savai Triome enters tapped, so it cannot be activated the turn it is played.
+
+[Bot1 Deck]
+Savai Triome
+Plains x19
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Savai Triome.Play
+
+[Expect]
+Bot1.Battlefield.Savai Triome.Tapped = true

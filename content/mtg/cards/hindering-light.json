@@ -1,0 +1,6 @@
+{
+  "name": "Hindering Light",
+  "manaCost": "{W}{U}",
+  "type": "Instant",
+  "oracleText": "Counter target spell that targets you or a permanent you control.\nDraw a card."
+}

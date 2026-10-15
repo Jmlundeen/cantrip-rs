@@ -1,0 +1,33 @@
+# One loyalty ability per planeswalker each turn (CR 606.3): after the +1 on turn 1 (loyalty 5) the -3 is refused in the
+# same turn. On turn 3 the -3 is taken (the positive control, loyalty 2, with no target: "up to one", an empty Target) and still
+# draws; on turn 5 another -3 is refused because its loyalty cost cannot be paid (2 < 3).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Teferi, Time Raveler
+Island x16
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Teferi, Time Raveler.Cast
+Bot1.Battlefield.Teferi, Time Raveler.Activate(Ability: +1)
+? Bot1.Battlefield.Teferi, Time Raveler.Counters.Loyalty = 5
+! Bot1.Battlefield.Teferi, Time Raveler.Activate(Ability: Return up to one)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Teferi, Time Raveler.Activate(Ability: Return up to one)
+? Bot1.Battlefield.Teferi, Time Raveler.Counters.Loyalty = 2
+[T5 Bot1.Main1]
+! Bot1.Battlefield.Teferi, Time Raveler.Activate(Ability: Return up to one)
+
+[Expect]
+Bot1.Hand.Count = 6

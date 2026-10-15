@@ -1,0 +1,6 @@
+{
+  "name": "Hymn to Tourach",
+  "manaCost": "{B}{B}",
+  "type": "Sorcery",
+  "oracleText": "Target player discards two cards at random."
+}

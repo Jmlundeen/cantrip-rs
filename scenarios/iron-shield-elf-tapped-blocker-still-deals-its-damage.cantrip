@@ -1,0 +1,41 @@
+# "Tap it" is no cost and does not remove a blocker from combat (CR 506.4): Cathar Commando (3/1) attacks on turn 4, the
+# Elf blocks, and Bot1 discards an Island to make it indestructible and tap it. The tapped Elf still deals its 3 damage
+# (the Commando dies) and survives the Commando's 3 damage.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Iron-Shield Elf
+Island x4
+Island x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Cathar Commando
+Island x14
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Iron-Shield Elf.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Cathar Commando.Cast
+[T4 Bot2.Main1]
+Bot2.Attack(Cathar Commando)
+Bot1.Block(Iron-Shield Elf > Cathar Commando)
+Bot1.Battlefield.Iron-Shield Elf.Activate
+Bot1.Choose(Island)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot2.Graveyard = Cathar Commando
+Bot1.Battlefield.Iron-Shield Elf.Damage = 3
+Bot1.Battlefield.Iron-Shield Elf.Tapped = true
+Bot1.Graveyard = Island

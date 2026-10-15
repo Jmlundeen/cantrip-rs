@@ -1,0 +1,31 @@
+# Bot1 casts Chain of Smog at Bot2 on turn 3: Bot2 discards two cards, then may copy the spell (CR 707.10) and does,
+# choosing Bot1 as the copy's new target (CR 707.10c). The copy is Bot2's, costs nothing and is not cast; Bot1 discards
+# two cards, is asked whether to copy it in turn, and declines by default. Only the card is left in Bot1's graveyard.
+
+[Bot1 Deck]
+Chain of Smog
+Swamp x6
+Swamp x10
+
+[Bot2 Deck]
+Swamp x7
+Swamp x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Swamp.Play
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Chain of Smog.Cast(Bot2)
+Bot2.Accept
+Bot2.Target(Bot1)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Hand.Count = 3
+Bot2.Hand.Count = 5
+Bot1.Graveyard.Count = 3
+Bot2.Graveyard.Count = 2
+Stack.Count = 0

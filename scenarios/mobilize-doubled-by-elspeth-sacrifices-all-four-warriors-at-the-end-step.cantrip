@@ -1,0 +1,47 @@
+# Mobilize 2 creates two Warrior tokens; with Elspeth, Storm Slayer's replacement (CR 614.1a) it creates four, and "sacrifice
+# them at the beginning of the next end step" must sacrifice every token created, since the delayed triggered ability
+# affects all the objects the effect created (CR 603.7c). Turn 3: the Voice attacks with four Warriors, and at the end step
+# all four are sacrificed: only the Voice, Elspeth and the lands and artifacts remain.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Black Lotus
+Voice of Victory
+Elspeth, Storm Slayer
+Plains x3
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Voice of Victory.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Elspeth, Storm Slayer.Cast
+Bot1.Pass
+Bot1.Attack(Voice of Victory > Bot2)
+[T3 Bot1.Blockers]
+? Combat.Attackers.Count = 5
+[T3 Bot1.Main2]
+? Bot2.Life = 15
+[T3 Bot1.End]
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Plains; Mox Pearl; Mox Jet; Voice of Victory; Elspeth, Storm Slayer

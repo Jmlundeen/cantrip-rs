@@ -1,0 +1,29 @@
+# Haywire Mite sacrificed for its own ability ({G}, sacrifice: exile target noncreature artifact or enchantment) still
+# dies: its trigger gains Bot1 two life (CR 603.10a) while the ability exiles Bot1's own Mox Emerald.
+
+[Bot1 Deck]
+Mox Emerald
+Haywire Mite
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest x13
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Haywire Mite.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Haywire Mite.Activate(Bot1.Battlefield.Mox Emerald)
+
+[Expect]
+Exile = Mox Emerald
+Bot1.Graveyard = Haywire Mite
+Bot1.Life = 22

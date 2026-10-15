@@ -1,0 +1,48 @@
+# As the other Hullbreacher Brainstorm, but Bot2 keeps a Black Lotus in hand. Brainstorm draws nothing and asks for the
+# two cards to put back, but only one card is in the hand: that card goes on top of the library, as much as possible
+# being done (CR 608.2c), with no question to answer.
+
+[Bot1 Deck]
+Island
+Sol Ring
+Black Lotus
+Hullbreacher
+Island x20
+
+[Bot2 Deck]
+Island
+Brainstorm
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Emerald
+Black Lotus
+Island x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Hullbreacher.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+? Bot2.Hand = Brainstorm; Black Lotus
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Brainstorm.Cast
+[T2 Bot2.Main2]
+
+[Expect]
+Bot2.Hand.Count = 0
+Bot2.Library.Count = 13
+Bot2.Library = Black Lotus; Island; Island; Island; Island; Island; Island; Island; Island; Island; Island; Island; Island

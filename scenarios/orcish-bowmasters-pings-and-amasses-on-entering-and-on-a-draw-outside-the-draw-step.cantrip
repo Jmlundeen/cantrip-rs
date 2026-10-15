@@ -1,0 +1,41 @@
+# Bot1's Orcish Bowmasters enters: 1 damage to Bot2 and an Orc Army token with a +1/+1 counter. Bot2's draw for the turn is
+# the first draw of its draw step, which the Bowmasters leave alone; Ponder's draw is not, so it pings again and the existing
+# Army gets a second counter.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Orcish Bowmasters
+Swamp x4
+Swamp x10
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Ponder
+Island x4
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Orcish Bowmasters.Cast
+Bot1.Target(Bot2)
+[T2 Bot2.Main1]
+? Bot2.Life = 19
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Ponder.Cast
+Bot1.Target(Bot2)
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot2.Life = 18
+Bot1.Battlefield.Orc Army.Power = 2
+Bot1.Battlefield.Orc Army.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Orc Army.Subtypes = Army; Orc

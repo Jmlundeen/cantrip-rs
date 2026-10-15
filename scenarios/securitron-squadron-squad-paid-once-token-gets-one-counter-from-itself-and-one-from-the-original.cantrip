@@ -1,0 +1,37 @@
+# Securitron Squadron with squad paid once (five mana): one token copy enters. The token's own ability triggers for
+# itself as it enters (the card's ruling: a token copy sees itself) and the original's triggers for it too: two
+# counters, a 4/4. The copy was never cast, so its own squad ability makes nothing more.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Sol Ring
+Black Lotus
+Securitron Squadron
+Island x12
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Securitron Squadron.Cast(Kicked: 1)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Plains; Mox Pearl; Mox Sapphire; Mox Jet; Sol Ring; Securitron Squadron; Securitron Squadron
+Bot1.Battlefield.Securitron Squadron#1.Power = 2
+Bot1.Battlefield.Securitron Squadron#2.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Securitron Squadron#2.Power = 4

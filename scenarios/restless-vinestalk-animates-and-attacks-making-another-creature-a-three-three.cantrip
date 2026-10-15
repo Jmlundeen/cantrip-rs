@@ -1,0 +1,47 @@
+# Restless Vinestalk enters tapped. On turn 3 five Moxen pay {3}{G}{U} and it becomes a 5/5 trampling Plant creature
+# (still a land); attacking, its trigger gives Bot2's Elvish Mystic base power and toughness 3/3 until end of turn.
+
+[Bot1 Deck]
+Restless Vinestalk
+Mox Emerald
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Mox Ruby
+Island x14
+
+[Bot2 Deck]
+Forest
+Elvish Mystic
+Forest x18
+
+[Actions]
+Bot1.Hand.Restless Vinestalk.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+? Bot1.Battlefield.Restless Vinestalk.Tapped = true
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Restless Vinestalk.Activate(Ability: becomes a 5/5)
+Bot1.Attack(Restless Vinestalk > Bot2)
+Bot1.Target(Bot2.Battlefield.Elvish Mystic)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Elvish Mystic.Power = 3
+? Bot2.Battlefield.Elvish Mystic.Toughness = 3
+? Bot1.Battlefield.Restless Vinestalk.Power = 5
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 15
+Bot1.Battlefield.Restless Vinestalk.Types = Land; Creature

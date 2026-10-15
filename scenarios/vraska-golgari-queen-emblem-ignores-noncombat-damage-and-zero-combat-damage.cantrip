@@ -1,0 +1,56 @@
+# The emblem: "Whenever a creature you control deals combat damage to a player, that player loses the game." Bot1 gets it on turn 7 after three +2 activations and the -9. Walking Ballista then pings Bot2
+# for 1 (damage from a creature, but not combat damage) and an Ornithopter attacks for 0 combat damage (no damage is dealt): Bot2 is still in the game at 19.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Mox Emerald
+Vraska, Golgari Queen
+Llanowar Elves
+Swamp
+Swamp
+Ornithopter
+Walking Ballista
+Swamp
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Vraska, Golgari Queen.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Vraska, Golgari Queen.Activate(Ability: sacrifice)
+Bot1.Choose()
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Vraska, Golgari Queen.Activate(Ability: sacrifice)
+Bot1.Choose()
+Bot1.Hand.Ornithopter.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Vraska, Golgari Queen.Activate(Ability: sacrifice)
+Bot1.Choose()
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Walking Ballista.Cast(X: 1)
+[T7 Bot1.Main1]
+Bot1.Battlefield.Vraska, Golgari Queen.Activate(Ability: emblem)
+Bot1.Pass
+Bot1.Battlefield.Walking Ballista.Activate(Ability: Remove a +1/+1 counter; Bot2)
+Bot1.Pass
+Bot1.Attack(Ornithopter)
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Result = InProgress
+Bot1.Emblems.Count = 1
+Bot2.Life = 19

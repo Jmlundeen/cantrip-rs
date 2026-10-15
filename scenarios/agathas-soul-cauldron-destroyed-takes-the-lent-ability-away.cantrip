@@ -1,0 +1,62 @@
+# Agatha's Soul Cauldron: the abilities it lends last only while it is on the battlefield (CR 611.3a). Turn 3: Looting
+# discards Blazing Rootwalla, the Cauldron exiles it and Ornithopter gets a counter and "{R}: +2/+0" (paid with Mox
+# Sapphire, so Ornithopter attacks as a 3/3 in the positive control). Abrade then destroys the Cauldron. Turn 5: the
+# Ornithopter is still a creature with the counter, but its pump is gone - refused, though the Rootwalla card is still
+# in exile.
+
+[Bot1 Deck]
+Mountain
+Mox Sapphire
+Mox Ruby
+Ornithopter
+Agatha's Soul Cauldron
+Faithless Looting
+Blazing Rootwalla
+Abrade
+Mountain x2
+Mountain x14
+
+[Bot2 Deck]
+Island x13
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Agatha's Soul Cauldron.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Blazing Rootwalla; Mountain)
+Bot1.Battlefield.Agatha's Soul Cauldron.Activate(Bot1.Graveyard.Blazing Rootwalla)
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Ornithopter.Activate(Ability: +2/+0)
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Ornithopter.Power = 3
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Abrade.Cast
+Bot1.Modes(Destroy target artifact)
+Bot1.Target(Agatha's Soul Cauldron)
+Bot1.Pass
+[T5 Bot1.Main1]
+! Bot1.Battlefield.Ornithopter.Activate(Ability: +2/+0)
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Abrade; Agatha's Soul Cauldron; Faithless Looting; Mountain
+Exile = Blazing Rootwalla
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1

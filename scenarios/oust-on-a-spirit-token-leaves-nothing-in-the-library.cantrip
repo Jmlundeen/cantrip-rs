@@ -1,0 +1,35 @@
+# Putting a creature into its owner's library (CR 401.4): a token that leaves the battlefield ceases to exist (CR 111.7,
+# 704.5d), so Oust on one of Bot2's Spirit tokens puts nothing second from the top. Its controller still gains 3 life.
+
+[Bot1 Deck]
+Mox Pearl
+Oust
+Plains x30
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Lingering Souls
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Lingering Souls.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Oust.Cast(Bot2.Battlefield.Spirit)
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Graveyard = Oust
+Bot2.Life = 23
+Bot2.Battlefield.Count = 4
+Bot2.Library.Count = 26

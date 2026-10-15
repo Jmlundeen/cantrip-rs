@@ -1,0 +1,32 @@
+# Tempest Technique cast after Black Lotus: storm copies it once. The copy of the Aura spell chooses a new target (the
+# other Ornithopter, CR 707.10c) and resolves as a token Aura (CR 707.10f). Each Ornithopter, 0/2, is enchanted and
+# gets +1/+1 for each of the two enchantments Bot1 controls: 2/4.
+[Bot1 Deck]
+Plains
+Ornithopter
+Ornithopter
+Black Lotus
+Tempest Technique
+Plains
+Plains
+Plains x15
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Tempest Technique.Cast(Ornithopter#1)
+Bot1.Target(Ornithopter#2)
+[T3 Bot1.Main2]
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Ornithopter#1.Power = 2
+Bot1.Battlefield.Ornithopter#2.Power = 2
+Bot1.Battlefield.Ornithopter#1.Toughness = 4
+Bot1.Graveyard = Black Lotus

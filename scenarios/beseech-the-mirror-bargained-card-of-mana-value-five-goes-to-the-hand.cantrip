@@ -1,0 +1,36 @@
+# CR 702.166a, 406.3. Bargained, the free cast is only for a card of mana value 4 or less: Emeritus of Ideation (mana
+# value 5) is found and exiled face down, the "you may cast it" question is never asked (! Bot1.Accept holds until the
+# resolution has finished), and the card is put into the hand. Paired with the four-mana-value scenario, where the same
+# question is asked and accepted.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Black Lotus
+Beseech the Mirror
+Island x3
+Emeritus of Ideation
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Beseech the Mirror.Cast
+Bot1.Modes(Bargain:)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Choose(Mox Jet)
+Bot1.Search(Emeritus of Ideation)
+! Bot1.Accept
+[T2 Bot2.Upkeep]
+
+[Expect]
+Exile.Count = 0
+Stack.Count = 0
+Bot1.Battlefield = Swamp
+Bot1.Hand = Emeritus of Ideation; Island; Island; Island
+Bot1.Graveyard = Beseech the Mirror; Mox Jet; Black Lotus

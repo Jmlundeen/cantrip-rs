@@ -1,0 +1,21 @@
+# Wastewood Verge: its {B} ability is offered only while you control a Swamp or a Forest (CR 602.5b). Alone it
+# makes {G}; once a Forest is in play (a Swamp would do as well) it makes {B}.
+
+[Bot1 Deck]
+Wastewood Verge
+Forest
+Plains x18
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Wastewood Verge.Play
+! Bot1.Battlefield.Wastewood Verge.Activate(Ability: {B})
+Bot1.Battlefield.Wastewood Verge.Activate(Ability: {G})
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Wastewood Verge.Activate(Ability: {B})
+
+[Expect]
+Bot1.Mana = {B}

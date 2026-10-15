@@ -1,0 +1,37 @@
+# Smuggler's Copter: "If you do, discard a card" depends on a card actually being drawn (CR 608.2c). Bot1's library holds
+# one card, drawn in its turn-3 draw step, so when the crewed Copter attacks and Bot1 accepts the loot the library is empty:
+# nothing is drawn, so nothing is discarded (the hand is untouched), and Bot1, having tried to draw from an empty library,
+# loses the game (CR 704.5b).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Sol Ring
+Llanowar Elves
+Smuggler's Copter
+Forest
+Forest
+Forest
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Smuggler's Copter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Smuggler's Copter.Activate(Ability: Crew)
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Smuggler's Copter)
+Bot1.Accept
+
+[Expect]
+Result = Bot2 won
+Bot1.Hand.Count = 3
+Bot1.Graveyard.Count = 0

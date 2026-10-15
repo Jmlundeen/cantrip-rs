@@ -1,0 +1,34 @@
+# Spymaster's Vault: "Target creature you control connives X, where X is the number of creatures that died this turn." Bot2's
+# Ornithopter is not a legal target (the refusal, naming it); Bot1's Llanowar Elves is (the positive control). No creature died this
+# turn, so X is 0 and it does not connive at all (CR 701.50e): no card is drawn, no counter is put on it.
+
+[Bot1 Deck]
+Swamp
+Spymaster's Vault
+Llanowar Elves
+Mox Emerald
+Forest x16
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Spymaster's Vault.Play
+Bot1.Battlefield.Swamp.Activate
+! Bot1.Battlefield.Spymaster's Vault.Activate(Ability: connives; Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Spymaster's Vault.Activate(Ability: connives; Bot1.Battlefield.Llanowar Elves)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Spymaster's Vault.Tapped = true
+Bot1.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot1.Hand.Count = 4

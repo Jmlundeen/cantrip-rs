@@ -1,0 +1,70 @@
+# Aragorn's attack trigger: "up to one target creature can't block this turn. If you're the monarch, creatures can't
+# block this turn." Bot2's own Aragorn took the crown on turn 2, so on turn 3 Bot1's Aragorn is not the monarch's and
+# only the target, Cathar Commando, is barred: the refusal of Commando blocking Elvish Mystic sits beside Bot2's
+# Aragorn blocking the same Mystic, the positive control that a creature that is not the target still can. The
+# unblocked Aragorn then hurts the monarch and takes the crown.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Mox Emerald
+Aragorn, King of Gondor
+Elvish Mystic
+Plains x12
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Mox Emerald
+Aragorn, King of Gondor
+Cathar Commando
+Plains x12
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Aragorn, King of Gondor.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Elvish Mystic.Cast
+? Monarch = Bot1
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Aragorn, King of Gondor.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Cathar Commando.Cast
+[T3 Bot1.Main1]
+? Monarch = Bot2
+Bot1.Attack(Aragorn, King of Gondor; Elvish Mystic)
+Bot1.Target(Cathar Commando)
+! Bot2.Block(Cathar Commando > Elvish Mystic)
+Bot2.Block(Aragorn, King of Gondor > Elvish Mystic)
+[T3 Bot1.Main2]
+
+[Expect]
+Monarch = Bot1
+Bot1.Graveyard = Elvish Mystic
+Bot1.Life = 24
+Bot2.Life = 20
+Bot2.Battlefield.Cathar Commando.Damage = 0

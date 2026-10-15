@@ -1,0 +1,51 @@
+# Hullbreacher: "If an opponent would draw a card except the first one ..., instead you create a Treasure token." With two
+# Hullbreachers on the battlefield each draw is still replaced once (CR 616.1, 614.6: a replaced event is gone and the
+# second replacement has nothing left to apply to). Bot1 flashes both in on turn 1; on turn 2 Bot2 draws for the turn
+# (the exempt first card of its draw step) and casts Brainstorm: its three draws become exactly three Treasures, not six.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Black Lotus
+Hullbreacher
+Hullbreacher
+Island
+Island x20
+
+[Bot2 Deck]
+Mox Sapphire
+Brainstorm
+Island x6
+Mountain
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Hullbreacher.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Hullbreacher.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Brainstorm.Cast
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Hullbreacher#1.Power = 3
+Bot1.Battlefield.Treasure Token#3.Types = Artifact
+Bot1.Battlefield.Count = 8
+Bot2.Library.Count = 15

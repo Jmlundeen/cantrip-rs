@@ -1,0 +1,6 @@
+{
+  "name": "Candelabra of Tawnos",
+  "manaCost": "{1}",
+  "type": "Artifact",
+  "oracleText": "{X}, {T}: Untap X target lands."
+}

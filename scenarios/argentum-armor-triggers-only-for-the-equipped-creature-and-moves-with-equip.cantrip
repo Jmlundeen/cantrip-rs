@@ -1,0 +1,73 @@
+# "Whenever equipped creature attacks, destroy target permanent." Turn 5: the Armor equips the Ornithopter and the unequipped Haywire Mite attacks alone: no trigger, Bot2's Islands
+# stay (the control for the next attack). Turn 7: Equip {6} again moves the Armor to the Mite (the Ornithopter goes back to 0/2, the Mite is 7/7), both attack, and the Armor triggers
+# once, for the Mite alone, destroying one Island.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Sol Ring
+Mox Pearl
+Mox Jet
+Argentum Armor
+Haywire Mite
+Ornithopter
+Plains
+Plains
+Plains x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Haywire Mite.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Argentum Armor.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Argentum Armor.Activate(Ornithopter)
+Bot1.Attack(Haywire Mite > Bot2)
+[T5 Bot1.Main2]
+? Bot2.Life = 19
+? Bot2.Battlefield.Count = 2
+? Bot1.Battlefield.Argentum Armor.AttachedTo = Ornithopter
+[T6 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Argentum Armor.Activate(Haywire Mite)
+Bot1.Attack(Haywire Mite; Ornithopter > Bot2)
+Bot1.Target(Bot2.Battlefield.Island)
+[T7 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 12
+Bot2.Battlefield.Count = 2
+Bot2.Graveyard = Island
+Bot1.Battlefield.Argentum Armor.AttachedTo = Haywire Mite
+Bot1.Battlefield.Haywire Mite.Power = 7
+Bot1.Battlefield.Ornithopter.Power = 0

@@ -1,0 +1,52 @@
+# Witch Enchanter: "destroy target artifact or enchantment AN OPPONENT CONTROLS". The target question offers Bot2's Mox Jet and its Curse of
+# Predation (an enchantment, an Aura on Bot1 but controlled by Bot2); Bot1's own Mox Pearl and Bot2's Llanowar Elves (a creature) are
+# not candidates (! Target), and the Curse, chosen by Bot1, is destroyed. Everything else stays.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Mox Jet
+Mox Emerald
+Witch Enchanter
+Plains x14
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Mox Ruby
+Curse of Predation
+Llanowar Elves
+Forest x13
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Curse of Predation.Cast(Bot1)
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Witch Enchanter.Cast
+! Bot1.Target(Bot1.Battlefield.Mox Pearl)
+! Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+Bot1.Target(Bot2.Battlefield.Curse of Predation)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Curse of Predation
+Bot2.Battlefield = Forest; Mox Emerald; Mox Jet; Mox Ruby; Llanowar Elves
+Bot1.Battlefield = Mox Pearl; Mox Ruby; Mox Jet; Mox Emerald; Witch Enchanter

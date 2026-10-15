@@ -1,0 +1,60 @@
+# Waterbend (CR 701.67a): "While paying a waterbend cost, you can tap your artifacts and creatures to help. Each one
+# pays for {1}." Aang, Swift Savior's "Waterbend {8}: Transform Aang." on turn 5: six pool mana (a Plains and five Moxen)
+# and the Sol Ring and Black Lotus tapped, rather than spent, for the other two. No mana ability is offered once a
+# permanent has been tapped to pay (CR 601.2g-h), so the mana is made first. Aang and La, Ocean's Fury is a 5/5.
+
+[Bot1 Deck]
+Plains
+Mox Sapphire
+Mox Pearl
+Mox Ruby
+Mox Emerald
+Aang, Swift Savior
+Sol Ring
+Mox Jet
+Black Lotus
+Plains x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Aang, Swift Savior.Cast
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Aang, Swift Savior.Activate(Ability: Waterbend; Convoke: Sol Ring, Black Lotus)
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Aang and La, Ocean's Fury.Power = 5
+Bot1.Battlefield.Sol Ring.Tapped = true
+Bot1.Battlefield.Black Lotus.Tapped = true

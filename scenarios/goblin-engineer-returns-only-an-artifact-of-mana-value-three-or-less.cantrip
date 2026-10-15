@@ -1,0 +1,53 @@
+# Goblin Engineer: "Return target artifact card with mana value 3 or less from your graveyard to the battlefield."
+# Bot1's Engineer buries Krark-Clan Ironworks (mana value 4) on turn 1. On turn 3 the only artifact card in the graveyard
+# is too expensive, so the ability is not offered at all (refused). Bot1 then sacrifices a Pyrite Spellbomb (mana value 1)
+# to draw a card, and now the ability is offered: it sacrifices Mox Jet and returns the Spellbomb, leaving the Ironworks
+# in the graveyard.
+
+[Bot1 Deck]
+Goblin Engineer
+Mox Ruby
+Mox Jet
+Mountain
+Pyrite Spellbomb
+Island
+Island
+Krark-Clan Ironworks
+Island x10
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Pyrite Spellbomb.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Goblin Engineer.Cast
+Bot1.Pass
+Bot1.Accept
+Bot1.Search(Krark-Clan Ironworks)
+? Bot1.Graveyard = Krark-Clan Ironworks
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Goblin Engineer.Activate(Ability: Return target artifact)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Pyrite Spellbomb.Activate(Ability: Draw)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Pyrite Spellbomb; Krark-Clan Ironworks
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Goblin Engineer.Activate(Ability: Return target artifact; Bot1.Graveyard.Pyrite Spellbomb)
+Bot1.Choose(Mox Jet)
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Mox Jet; Krark-Clan Ironworks
+Bot1.Battlefield = Mountain; Mox Ruby; Goblin Engineer; Pyrite Spellbomb

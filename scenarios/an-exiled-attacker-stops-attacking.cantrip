@@ -1,0 +1,44 @@
+# An attacker is exiled by Swords to Plowshares after attackers are declared. CR 506.4: a permanent that leaves the
+# battlefield is removed from combat, so it stops being an attacking creature at once.
+#
+# It used to stay in the attack declarations until combat was over. Nothing was dealt any damage, because damage
+# checks the battlefield, but every reader of combat still saw it: the client went on drawing the exiled creature in
+# its attacking group until the end of combat step.
+
+[Bot1 Deck]
+Forest
+Forest
+Guerrilla Gorilla
+Forest x12
+
+[Bot2 Deck]
+Plains
+Plains
+Swords to Plowshares
+Plains x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot2.Hand.Plains.Play
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+Bot2.Hand.Plains.Play
+Bot1.Attack(Guerrilla Gorilla)
+? Combat.Attackers = Guerrilla Gorilla > Bot2
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Guerrilla Gorilla)
+[Bot1.Blockers]
+
+[Expect]
+Step = Blockers
+ActivePlayer = Bot1
+# Gone from the battlefield and therefore gone from combat, while combat is still under way.
+Combat.Attackers.Count = 0
+Bot1.Battlefield = Forest; Forest
+Exile = Guerrilla Gorilla
+Bot2.Graveyard = Swords to Plowshares
+# Swords to Plowshares gives the life to the creature's controller (CR 608.2h), not to its caster.
+Bot1.Life = 22
+Bot2.Life = 20

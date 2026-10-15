@@ -1,0 +1,11 @@
+{
+  "name": "Sentinel of the Nameless City",
+  "manaCost": "{2}{G}",
+  "type": "Creature — Merfolk Warrior Scout",
+  "power": 3,
+  "toughness": 4,
+  "oracleText": "Vigilance\nWhenever this creature enters or attacks, create a Map token. (It's an artifact with \"{1}, {T}, Sacrifice this token: Target creature you control explores. Activate only as a sorcery.\")",
+  "keywords": [
+    "Vigilance"
+  ]
+}

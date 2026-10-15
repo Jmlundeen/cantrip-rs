@@ -1,0 +1,26 @@
+# "Enters tapped unless you control two or fewer other lands": with three other lands (CR 614.1c) Botanical Sanctum enters
+# tapped, so it adds no mana the turn it is played; the neighbouring scenarios, with none and with two other lands, are
+# the positive controls that it enters untapped.
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Botanical Sanctum
+Plains x16
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Botanical Sanctum.Play
+! Bot1.Battlefield.Botanical Sanctum.Activate
+
+[Expect]
+Bot1.Battlefield.Botanical Sanctum.Tapped = true

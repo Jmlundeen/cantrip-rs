@@ -1,0 +1,37 @@
+# Sheoldred's Edict, second mode: "Each opponent sacrifices a creature token of their choice." Bot2 controls two Spirit
+# tokens (from Lingering Souls) and an Ornithopter; it sacrifices a Spirit and keeps the other and the Ornithopter.
+
+[Bot1 Deck]
+Swamp
+Sheoldred's Edict
+Swamp x13
+
+[Bot2 Deck]
+Black Lotus
+Lingering Souls
+Ornithopter
+Island x4
+Island x14
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Lingering Souls.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Sheoldred's Edict.Cast
+Bot1.Modes(2)
+Bot2.Choose(Spirit)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Count = 2
+Bot2.Battlefield.Ornithopter.Types = Artifact; Creature
+Bot2.Graveyard.Count = 2

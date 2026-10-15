@@ -1,0 +1,36 @@
+# CR 715.4 / 608.2b: Petty Theft has one target, Bot2's Elvish Mystic, and Bot1 kills it with Lightning Bolt in response,
+# so Petty Theft is removed from the stack without resolving and the Borrower goes to the graveyard, not exile.
+
+[Bot1 Deck]
+Island
+Mox Jet
+Mox Ruby
+Brazen Borrower
+Lightning Bolt
+Island x12
+
+[Bot2 Deck]
+Mox Emerald
+Elvish Mystic
+Island x12
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Brazen Borrower.Cast(Elvish Mystic; Ability: Adventure)
+Bot1.Hand.Lightning Bolt.Cast(Elvish Mystic)
+[T3 Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot1.Graveyard = Brazen Borrower; Lightning Bolt
+Bot2.Graveyard = Elvish Mystic

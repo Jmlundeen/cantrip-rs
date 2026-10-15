@@ -1,0 +1,46 @@
+# The Mind Stone, harnessed: "At the beginning of your end step, exile up to one other target nonland permanent you
+# control, then return that card to the battlefield under its owner's control." Three Black Lotuses, Sol Ring and a
+# Mox Sapphire cast The Mind Stone and Sicarian Infiltrator (whose Benediction draws a card as it enters) and harness
+# the Stone, all on turn 1. At the end step the infinity ability targets the Infiltrator; it is exiled and comes back
+# as a new object (CR 400.7), so its enters ability triggers again and Bot1 draws a second card.
+
+[Bot1 Deck]
+The Mind Stone
+Sicarian Infiltrator
+Black Lotus x3
+Mox Sapphire
+Sol Ring
+Plains
+Island
+Plains x17
+
+[Bot2 Deck]
+Island x22
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.The Mind Stone.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Sicarian Infiltrator.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.The Mind Stone.Activate(Ability: Harness)
+[T1 Bot1.Main2]
+? Bot1.Hand = Plains
+Bot1.Target(Sicarian Infiltrator)
+
+[Expect]
+Turn = 1
+Step = End
+Stack.Count = 0
+Exile.Count = 0
+Bot1.Battlefield = The Mind Stone; Sol Ring; Mox Sapphire; Sicarian Infiltrator
+Bot1.Battlefield.Sicarian Infiltrator.Tapped = false
+Bot1.Hand = Plains; Island
+Bot1.Graveyard = Black Lotus; Black Lotus; Black Lotus

@@ -1,0 +1,37 @@
+# "Sacrifice a land": with only a Mox Emerald (no land) the ability is not offered (refusal). With a Forest it is, the turn Safekeeper arrives (the cost has no {T}, so summoning sickness does not matter), targeting itself, and the sacrificed Forest goes
+# to the graveyard. The shroud lasts "until end of turn": on turn 2 Bot2's Lightning Bolt can target the Safekeeper and kills it.
+
+[Bot1 Deck]
+Mox Emerald
+Sylvan Safekeeper
+Forest
+Forest x13
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x13
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sylvan Safekeeper.Cast
+Bot1.Pass
+! Bot1.Battlefield.Sylvan Safekeeper.Activate(Sylvan Safekeeper)
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Sylvan Safekeeper.Activate(Sylvan Safekeeper)
+Bot1.Choose(Forest)
+Bot1.Pass
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Sylvan Safekeeper)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Sylvan Safekeeper; Forest
+Bot1.Battlefield.Count = 1

@@ -1,0 +1,45 @@
+# "Return all permanents to their owners' hands": the Clue token Thraben Inspector made ceases to exist in hand (CR 111.8, 704.5d) while the Inspector itself returns to Bot1's hand, and Bot2's Elvish Mystic, reanimated under Bot1's control, goes to its owner Bot2's hand,
+# not Bot1's. Upheaval itself, a sorcery, is not a permanent and goes to the graveyard.
+
+[Bot1 Deck]
+Island
+Mox Pearl
+Thraben Inspector
+Sol Ring
+Black Lotus
+Mox Jet
+Reanimate
+Upheaval
+Island x12
+
+[Bot2 Deck]
+Island x7
+Elvish Mystic
+Island x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Thraben Inspector.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Reanimate.Cast(Bot2.Graveyard.Elvish Mystic)
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Upheaval.Cast
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Count = 0
+Bot2.Battlefield.Count = 0
+Bot1.Graveyard = Upheaval; Black Lotus; Reanimate
+Bot1.Hand = Island; Mox Pearl; Thraben Inspector; Sol Ring; Mox Jet
+Bot2.Hand.Count = 8

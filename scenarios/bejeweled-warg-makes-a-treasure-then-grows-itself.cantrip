@@ -1,0 +1,37 @@
+# Bejeweled Warg, cast on turn 1 off a Mox, connects on turn 3 and Bot1 chooses the Treasure mode as the trigger goes on
+# the stack. On turn 5 it connects again and Bot1 chooses the counter mode: the Warg is the only Wolf Bot1 controls, so
+# its target is not asked. Bot1 then cracks the Treasure for red, the only red it has, to Bolt Bot2.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Bejeweled Warg
+Lightning Bolt
+Forest x10
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Bejeweled Warg.Cast
+Bot1.Attack(Bejeweled Warg)
+Bot1.Modes(Create a Treasure token)
+[T3 Bot1.Main2]
+? Bot1.Battlefield = Forest; Mox Emerald; Bejeweled Warg; Treasure Token
+? Bot2.Life = 17
+Bot1.Attack(Bejeweled Warg)
+Bot1.Modes(Put a +1/+1 counter)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Treasure Token.Activate(Color: Red)
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Forest; Mox Emerald; Bejeweled Warg
+Bot1.Battlefield.Bejeweled Warg.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Bejeweled Warg.Power = 4
+Bot1.Graveyard = Lightning Bolt
+Bot2.Life = 11

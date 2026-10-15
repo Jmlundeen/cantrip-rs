@@ -1,0 +1,24 @@
+# Rain of Filth grants the lands its controller has "Sacrifice this land: Add {B}." until end of turn: the tapped Swamp
+# is sacrificed for {B}.
+
+[Bot1 Deck]
+Swamp
+Rain of Filth
+Swamp x13
+
+[Bot2 Deck]
+Forest x14
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Rain of Filth.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Swamp.Activate(Ability: Sacrifice)
+[Handover Bot1.Pass]
+
+[Expect]
+Bot1.Graveyard = Swamp; Rain of Filth
+Bot1.Battlefield.Count = 0
+Bot1.Mana = {B}

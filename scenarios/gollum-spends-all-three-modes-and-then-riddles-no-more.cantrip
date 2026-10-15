@@ -1,0 +1,43 @@
+# "Choose one that hasn't been chosen": Bot2 casts five free spells with mana value 0 (four Moxen and Ornithopter) into a Gollum that chose even. The first riddle takes the counter
+# and the second drains 2 (both asked), the third has one mode left and takes it without asking (draw a card), and the fourth and fifth do nothing (this implementation has the
+# ability not trigger at all once every mode is taken).
+
+[Bot1 Deck]
+Swamp
+Swamp
+Gollum, Riddle Master
+Swamp x11
+
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Ornithopter
+Island x13
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Gollum, Riddle Master.Cast
+Bot1.Name(Even)
+[T4 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot1.Modes(Put a +1/+1 counter)
+Bot2.Hand.Mox Ruby.Cast
+Bot1.Modes(Each opponent loses)
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Ornithopter.Cast
+[T4 Bot2.Main2]
+
+[Expect]
+Turn = 4
+Bot1.Battlefield.Gollum, Riddle Master.ChosenModes = 1, 2, 3
+Bot1.Battlefield.Gollum, Riddle Master.Counters.PlusOnePlusOne = 1
+Bot1.Life = 22
+Bot2.Life = 18
+Bot1.Hand.Count = 6

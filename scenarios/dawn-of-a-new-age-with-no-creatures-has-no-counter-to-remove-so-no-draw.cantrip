@@ -1,0 +1,26 @@
+# Dawn of a New Age with no creature to count enters with no hope counter. At the beginning of Bot1's end step there is
+# no counter to remove, so "if you do, draw a card" does not happen; it has none, so it is sacrificed and Bot1 gains 4 life.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Dawn of a New Age
+Island x13
+
+[Bot2 Deck]
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dawn of a New Age.Cast
+[Bot1.Main2]
+? Bot1.Battlefield.Dawn of a New Age.Types = Enchantment
+[T2 Bot2.Main1]
+
+[Expect]
+Bot1.Life = 24
+Bot1.Graveyard = Dawn of a New Age
+Bot1.Hand.Count = 4

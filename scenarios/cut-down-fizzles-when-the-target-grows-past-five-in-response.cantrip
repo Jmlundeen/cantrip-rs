@@ -1,0 +1,45 @@
+# Cut Down on Cecil, Dark Knight (2/3, total 5). In response Bot2 activates Arwen, Mortal Queen's ability on Cecil: it gets a
+# +1/+1 counter, becoming 3/4 with total 7, so on resolution it is no longer a legal target (CR 608.2b) and Cut Down does
+# nothing; Cecil survives with the counter and indestructible, and Cut Down is in the graveyard.
+
+[Bot1 Deck]
+Mox Jet
+Cut Down
+Island x15
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mox Emerald
+Arwen, Mortal Queen
+Plains
+Mox Jet
+Cecil, Dark Knight
+Plains x13
+
+[Actions]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Arwen, Mortal Queen.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Cecil, Dark Knight.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cut Down.Cast(Cecil, Dark Knight)
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Arwen, Mortal Queen.Activate(Cecil, Dark Knight)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Cut Down; Island
+Bot2.Battlefield.Cecil, Dark Knight.Counters.PlusOnePlusOne = 1
+Bot2.Battlefield.Cecil, Dark Knight.Power = 3
+Bot2.Battlefield.Cecil, Dark Knight.Keywords = Deathtouch; Indestructible; Lifelink

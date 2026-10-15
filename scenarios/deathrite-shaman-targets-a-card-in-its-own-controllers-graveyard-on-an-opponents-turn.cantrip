@@ -1,0 +1,33 @@
+# "From a graveyard" is any graveyard, its controller's own included, and the abilities are activated at instant
+# speed: here in the opponent's upkeep, exiling the Lightning Bolt its controller cast the turn before.
+
+[Bot1 Deck]
+Swamp
+Deathrite Shaman
+Mountain
+Lightning Bolt
+Swamp
+Swamp
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Deathrite Shaman.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+[T4 Bot2.Upkeep]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Deathrite Shaman.Activate(Bot1.Graveyard.Lightning Bolt; Ability: instant)
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard.Count = 0
+Exile = Lightning Bolt
+Bot2.Life = 15

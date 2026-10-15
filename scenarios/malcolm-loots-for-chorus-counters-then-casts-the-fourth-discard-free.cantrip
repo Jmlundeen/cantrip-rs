@@ -1,0 +1,45 @@
+# Malcolm, Alluring Scoundrel: each combat damage to a player puts a chorus counter on it and loots. Three hits discard a
+# Plains each; on the fourth hit there are four chorus counters, so the Ancestral Recall discarded may be cast for free
+# and draws Bot1 three cards.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Malcolm, Alluring Scoundrel
+Plains
+Plains
+Plains
+Ancestral Recall
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Malcolm, Alluring Scoundrel.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Malcolm, Alluring Scoundrel)
+Bot1.Choose(Plains)
+[T5 Bot1.Main1]
+Bot1.Attack(Malcolm, Alluring Scoundrel)
+Bot1.Choose(Plains)
+[T7 Bot1.Main1]
+Bot1.Attack(Malcolm, Alluring Scoundrel)
+Bot1.Choose(Plains)
+? Bot1.Battlefield.Malcolm, Alluring Scoundrel.Counters.Chorus = 3
+[T9 Bot1.Main1]
+Bot1.Attack(Malcolm, Alluring Scoundrel)
+Bot1.Choose(Ancestral Recall)
+Bot1.Accept
+Bot1.Target(Bot1)
+[Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot2.Life = 12
+Bot1.Battlefield.Malcolm, Alluring Scoundrel.Counters.Chorus = 4
+Bot1.Graveyard = Ancestral Recall; Plains; Plains; Plains

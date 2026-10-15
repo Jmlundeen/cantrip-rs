@@ -1,0 +1,38 @@
+# Mana Drain: cast during Bot1's own postcombat main phase, the next main phase is the precombat main of its next turn
+# (turn 5), not the one it is in. Bot2's Lightning Bolt is countered in turn 3's second main phase; Bot1's pool is empty
+# there and holds {C} when turn 5's first main phase begins.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Mana Drain
+Mox Ruby
+Island x17
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main2]
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Mana Drain.Cast(Lightning Bolt)
+? Bot1.Mana =
+[T5 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {C}
+
+[Expect]
+Turn = 5
+Bot2.Graveyard = Lightning Bolt

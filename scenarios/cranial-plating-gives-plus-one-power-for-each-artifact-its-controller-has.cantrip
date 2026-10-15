@@ -1,0 +1,29 @@
+# Cranial Plating: "Equipped creature gets +1/+0 for each artifact you control", the Plating itself counted. Bot1 has
+# two Moxen, the Plating and an Ornithopter, four artifacts, so the equipped 0/2 Ornithopter is a 4/2.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Cranial Plating
+Ornithopter
+Island x13
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Cranial Plating.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Cranial Plating.Activate(Ornithopter; Ability: Equip {1})
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Cranial Plating.AttachedTo = Ornithopter
+Bot1.Battlefield.Ornithopter.Power = 4
+Bot1.Battlefield.Ornithopter.Toughness = 2

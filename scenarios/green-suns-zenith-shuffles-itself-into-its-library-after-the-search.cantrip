@@ -1,0 +1,29 @@
+# Green Sun's Zenith for X = 1 puts Llanowar Elves onto the battlefield, then, as its last instruction (CR 608.2m), shuffles itself into the library: it is in no graveyard.
+
+[Bot1 Deck]
+Forest
+Forest
+Green Sun's Zenith
+Forest x7
+Llanowar Elves
+Forest x10
+
+[Bot2 Deck]
+Forest x22
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Green Sun's Zenith.Cast(X: 1)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Search(Llanowar Elves)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Forest; Forest; Llanowar Elves
+Bot1.Graveyard.Count = 0
+Bot1.Library.Count = 13
+Stack.Count = 0

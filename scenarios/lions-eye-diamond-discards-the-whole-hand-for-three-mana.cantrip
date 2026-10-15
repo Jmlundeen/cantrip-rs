@@ -1,0 +1,35 @@
+# Lion's Eye Diamond: "Discard your hand, Sacrifice this artifact: Add three mana of any one color." Marauding Mako comes
+# down on turn 1. On turn 3 Bot1 plays a land, casts the Diamond and activates it for red: the four cards left in its hand
+# are discarded together, so the Mako's one trigger puts four +1/+1 counters on it, the Diamond is sacrificed and RRR is
+# in the mana pool.
+
+[Bot1 Deck]
+Mountain
+Marauding Mako
+Lion's Eye Diamond
+Mountain
+Lightning Bolt
+Mountain
+Mountain
+Mox Jet
+Mountain
+Mountain x12
+
+[Bot2 Deck]
+Island x13
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Marauding Mako.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Lion's Eye Diamond.Cast
+Bot1.Pass
+Bot1.Battlefield.Lion's Eye Diamond.Activate(Color: Red)
+
+[Expect]
+Bot1.Hand.Count = 0
+Bot1.Graveyard.Count = 5
+Bot1.Battlefield.Marauding Mako.Counters.PlusOnePlusOne = 4
+Bot1.Mana = {R}{R}{R}

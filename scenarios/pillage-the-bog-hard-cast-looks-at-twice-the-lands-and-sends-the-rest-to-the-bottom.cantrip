@@ -1,0 +1,35 @@
+# Cast for its mana cost {B}{G} rather than plotted, Pillage the Bog looks at the top X cards where X is twice the lands
+# Bot1 controls as it resolves (CR 608.2c): two lands, four cards (Mountain, Black Lotus, two Islands). One goes to the hand,
+# the rest on the bottom of the library (the order is random: only the count is asserted), so the library keeps its size
+# less the one card taken.
+
+[Bot1 Deck]
+Pillage the Bog
+Swamp
+Forest
+Island x4
+Island
+Mountain
+Black Lotus
+Island
+Island
+Island x6
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Pillage the Bog.Cast
+Bot1.Arrange(Black Lotus | Mountain; Island; Island)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Pillage the Bog
+Bot1.Hand.Count = 6
+Bot1.Library.Count = 9

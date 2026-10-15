@@ -1,0 +1,37 @@
+# "Whenever you discard": Bot1's Hymn to Tourach makes Bot2 discard two cards, and Bot1's Marauding Mako gets nothing.
+# Bot2 plays its lands so that no cleanup discard adds to its graveyard.
+
+[Bot1 Deck]
+Mountain
+Marauding Mako
+Hymn to Tourach
+Swamp
+Swamp
+Swamp
+Swamp
+15 Swamp
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Marauding Mako.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Hymn to Tourach.Cast(Bot2)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Marauding Mako.Power = 1
+Bot2.Graveyard.Count = 2
+Bot1.Graveyard = Hymn to Tourach

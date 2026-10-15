@@ -1,0 +1,6 @@
+{
+  "name": "Military Intelligence",
+  "manaCost": "{1}{U}",
+  "type": "Enchantment",
+  "oracleText": "Whenever you attack with two or more creatures, draw a card."
+}

@@ -1,0 +1,26 @@
+# Two other lands is still "two or fewer": Botanical Sanctum, played third, enters untapped and its green half pays for
+# a Llanowar Elves the same turn.
+
+[Bot1 Deck]
+Plains
+Plains
+Botanical Sanctum
+Llanowar Elves
+Plains x16
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Botanical Sanctum.Play
+Bot1.Battlefield.Botanical Sanctum.Activate(Color: Green)
+Bot1.Hand.Llanowar Elves.Cast
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Plains; Plains; Botanical Sanctum; Llanowar Elves
+Bot1.Battlefield.Botanical Sanctum.Tapped = true

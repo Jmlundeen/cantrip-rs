@@ -1,0 +1,38 @@
+# Chain of Smog: "Target player discards two cards" discards the whole hand if it has fewer (CR 701.9), and the player
+# still "may copy this spell". Bot1 casts it at itself on turn 3 with five cards left in hand and keeps the target for
+# each copy: 5 -> 3 -> 1 -> 0 (one card discarded) -> 0 (nothing to discard, the copy is still offered) and then
+# declines. The copies are not cast.
+
+[Bot1 Deck]
+Chain of Smog
+Swamp x6
+Swamp x10
+
+[Bot2 Deck]
+Swamp x7
+Swamp x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Swamp.Play
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Chain of Smog.Cast(Bot1)
+Bot1.Accept
+Bot1.Target(Bot1)
+Bot1.Accept
+Bot1.Target(Bot1)
+Bot1.Accept
+Bot1.Target(Bot1)
+Bot1.Accept
+Bot1.Target(Bot1)
+Bot1.Decline
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Hand.Count = 0
+Bot1.Graveyard.Count = 6
+Bot2.Hand.Count = 7
+Stack.Count = 0

@@ -1,0 +1,34 @@
+# Emeritus of Truce: Bot1 makes its own Inkling (2 creatures) against Bot2's three Ornithopters, so it becomes prepared and
+# a copy of Swords to Plowshares waits in exile.
+
+[Bot1 Deck]
+Plains x3
+Emeritus of Truce
+Plains x16
+
+[Bot2 Deck]
+Ornithopter x3
+Mountain x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Emeritus of Truce.Cast
+Bot1.Target(Bot1)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Emeritus of Truce.Prepared = true
+? Exile = Swords to Plowshares
+
+[Expect]
+Bot1.Battlefield = Plains; Plains; Plains; Emeritus of Truce; Inkling
+Bot2.Battlefield.Count = 3

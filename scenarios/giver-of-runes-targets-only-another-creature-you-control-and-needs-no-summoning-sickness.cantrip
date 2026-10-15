@@ -1,0 +1,41 @@
+# Giver of Runes: "{T}: Another target creature you control..." Its tap symbol needs it to have been under its controller's
+# control since the turn began: on turn 1, with the Giver and Elves just cast, the ability is not offered (the refusal;
+# the positive control is turn 3). On turn 3 the Giver is not a legal target of its own ability, nor is Bot2's Ornithopter
+# (the refusals, each naming that target), while the Llanowar Elves is (the control, which taps the Giver).
+
+[Bot1 Deck]
+Plains
+Mox Emerald
+Giver of Runes
+Llanowar Elves
+Plains x3
+Plains x13
+
+[Bot2 Deck]
+Mountain
+Ornithopter
+Mountain x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Giver of Runes.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+! Bot1.Battlefield.Giver of Runes.Activate(Llanowar Elves)
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Giver of Runes.Activate(Giver of Runes)
+! Bot1.Battlefield.Giver of Runes.Activate(Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Giver of Runes.Activate(Llanowar Elves)
+Bot1.Accept
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Giver of Runes.Tapped = true

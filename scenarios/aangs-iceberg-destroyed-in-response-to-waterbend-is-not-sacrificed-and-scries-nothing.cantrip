@@ -1,0 +1,71 @@
+# Aang's Iceberg: "Waterbend {3}: Sacrifice this enchantment. If you do, scry 2." With the Iceberg cast on turn 3 with no
+# target ("up to one"), on turn 5 Bot1 pays for the ability and Bot2 responds by destroying the Iceberg with Disenchant.
+# The ability resolves with nothing to sacrifice, so there is no scry (CR 608.2c, 701.21a). That is proved by the scry
+# line that follows it: Bot1's Preordain then casts and its own scry 2 takes `Arrange(Forest | Mountain)`, so the Forest
+# is drawn; had the Iceberg scried first it would have taken that line, left Preordain's scry at its default, and the
+# Mountain would have been drawn.
+
+[Bot1 Deck]
+Plains
+Plains
+Mox Pearl
+Aang's Iceberg
+Plains
+Mox Sapphire
+Preordain
+Island
+Swamp
+Mountain
+Forest
+Plains x20
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Disenchant
+Plains x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Aang's Iceberg.Cast
+Bot1.Pass
+Bot1.Target()
+Bot1.Pass
+Bot2.Pass
+? Exile.Count = 0
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Aang's Iceberg.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Disenchant.Cast(Aang's Iceberg)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Step = Main1
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Preordain.Cast
+Bot1.Pass
+Bot1.Arrange(Forest | Mountain)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Preordain; Aang's Iceberg
+Bot2.Graveyard = Disenchant
+Bot1.Hand = Forest; Island; Swamp
+Bot1.Library.Count = 21

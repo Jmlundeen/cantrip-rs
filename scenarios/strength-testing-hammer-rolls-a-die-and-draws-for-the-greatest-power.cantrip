@@ -1,0 +1,36 @@
+# Strength-Testing Hammer: the equipped Ornithopter attacks alone and rolls a die for +X/+0 (X is random, so the
+# scenario asserts nothing about the damage). Bot2 has no creatures, so the attacker has the greatest power
+# (at least 1 against nothing) and the trigger draws a card.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Strength-Testing Hammer
+Ornithopter
+Plains x14
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Strength-Testing Hammer.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Strength-Testing Hammer.Activate(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot1.Attack(Ornithopter > Bot2)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 3
+Bot1.Battlefield.Strength-Testing Hammer.AttachedTo = Ornithopter

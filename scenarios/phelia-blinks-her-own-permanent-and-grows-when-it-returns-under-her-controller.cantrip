@@ -1,0 +1,39 @@
+# Phelia, Exuberant Shepherd: whenever she attacks she exiles up to one other nonland permanent, and at the beginning
+# of the next end step it returns under its owner's control; it entered under Phelia's controller's control, so she gets
+# a +1/+1 counter. Here the permanent is Bot1's own Mox Ruby.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Phelia, Exuberant Shepherd
+Plains
+Plains
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Phelia, Exuberant Shepherd.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Phelia, Exuberant Shepherd > Bot2)
+Bot1.Target(Mox Ruby)
+[T3 Bot1.Main2]
+? Exile = Mox Ruby
+? Bot1.Battlefield = Mox Pearl; Phelia, Exuberant Shepherd
+[T4 Bot2.Main1]
+
+[Expect]
+Turn = 4
+Exile.Count = 0
+Bot2.Life = 18
+Bot1.Battlefield = Mox Pearl; Mox Ruby; Phelia, Exuberant Shepherd
+Bot1.Battlefield.Mox Ruby.Tapped = false
+Bot1.Battlefield.Phelia, Exuberant Shepherd.Counters.PlusOnePlusOne = 1

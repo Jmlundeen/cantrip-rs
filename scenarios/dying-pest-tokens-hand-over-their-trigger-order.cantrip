@@ -1,0 +1,55 @@
+# Two Pest tokens and a Doomed Traveler die to the same Wrath of God, so their controller orders three dies-triggers
+# (CR 603.3b; two identical Pest triggers alone would be ordered by the engine, the order cannot matter) whose token sources
+# are gone: a token that has been destroyed reaches the graveyard and then stops existing (CR 111.7), while the ability
+# it triggered is still waiting to go on the stack. The script stops with that ordering unanswered. Played as a test it
+# proves the position is reached; dealt to a session it is the board that made a real client's projection throw, because
+# the prompt reveals sources that are in no zone at all.
+#
+# Pest Infestation is cast for X=1, the smallest way to get two tokens carrying a death trigger; the Traveler's different
+# trigger is what makes the order matter, so the question is asked rather than skipped.
+
+[Bot1 Deck]
+Forest
+Plains
+Plains
+Plains
+Pest Infestation
+Wrath of God
+Doomed Traveler
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Doomed Traveler.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Pest Infestation.Cast(X: 1)
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Wrath of God.Cast
+[Handover Bot1.Triggers]
+
+[Expect]
+Turn = 7
+Step = Main1
+ActivePlayer = Bot1
+# The tokens are not on the battlefield and not in the graveyard either: destroyed, they reached it and ceased to
+# exist (CR 111.7), which is exactly what leaves the ordering question pointing at objects that are nowhere.
+Bot1.Battlefield = Forest; Plains; Plains; Plains
+Bot1.Graveyard = Wrath of God; Doomed Traveler; Pest Infestation
+# Neither trigger has resolved: ordering them is the question still outstanding.
+Bot1.Life = 20
+Stack.Count = 0

@@ -1,0 +1,58 @@
+# The initiative ventures into the Undercity (CR 726.2, 701.49) once when taken and again at each of its controller's
+# upkeeps. Bot1 takes it with Caves of Chaos Adventurer on turn 1 (Secret Entrance fetches a Forest) and then walks
+# Secret Entrance -> Forge (+2 counters on the Adventurer, turn 3) -> Trap! (Bot2 loses 5, turn 5) -> Archives (draw a
+# card, turn 7) -> Throne of the Dead Three (turn 9: reveal ten, a Llanowar Elves enters with three +1/+1 counters and
+# hexproof, then shuffle). The last room completes the dungeon (CR 309.7).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Caves of Chaos Adventurer
+Island
+Island
+Forest
+Island
+Island
+Island
+Mountain
+Llanowar Elves
+Mountain x10
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Caves of Chaos Adventurer.Cast
+Bot1.Search(Forest)
+[T3 Bot1.Upkeep]
+Bot1.Modes(Forge)
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Caves of Chaos Adventurer.Counters.PlusOnePlusOne = 2
+? Bot1.Dungeon = Undercity: Forge
+[T5 Bot1.Upkeep]
+Bot1.Modes(Trap)
+Bot1.Target(Bot2)
+[T5 Bot1.Main1]
+? Bot2.Life = 15
+? Bot1.Dungeon = Undercity: Trap!
+[T7 Bot1.Main1]
+? Bot1.Dungeon = Undercity: Archives
+[T9 Bot1.Upkeep]
+Bot1.Choose(Llanowar Elves)
+[T9 Bot1.Main1]
+? Bot1.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = 3
+? Bot1.Battlefield.Llanowar Elves.Keywords = Hexproof
+
+[Expect]
+Bot1.DungeonsCompleted = 1
+Initiative = Bot1

@@ -1,0 +1,43 @@
+# Galvanic Discharge "target creature or planeswalker": the first, aimed at Bot2's Narset, Parter of Veils, pays all three
+# energy (3 damage, loyalty 5 to 2) and is not asked a fourth time with none left (! Accept after the third). The second
+# gains three more and pays two: loyalty 0, Narset dies, and one energy remains.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Galvanic Discharge
+Galvanic Discharge
+Mountain x3
+Mountain x13
+
+[Bot2 Deck]
+Black Lotus
+Narset, Parter of Veils
+Island x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Narset, Parter of Veils.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Galvanic Discharge.Cast(Bot2.Battlefield.Narset, Parter of Veils)
+Bot1.Accept
+Bot1.Accept
+Bot1.Accept
+! Bot1.Accept
+? Bot1.Energy = 0
+? Bot2.Battlefield.Narset, Parter of Veils.Counters.Loyalty = 2
+Bot1.Hand.Galvanic Discharge.Cast(Bot2.Battlefield.Narset, Parter of Veils)
+Bot1.Accept
+Bot1.Accept
+Bot1.Decline
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Energy = 1
+Bot2.Battlefield.Count = 0
+Bot2.Graveyard = Narset, Parter of Veils; Black Lotus

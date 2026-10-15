@@ -1,0 +1,33 @@
+# With three players: Bot1's Curse enchants Bot2. When Bot3 (an opponent of the Curse's controller) attacks Bot2 with its Elvish Mystic, the trigger gives Bot1 a Gold token and "each opponent attacking that player does the same": Bot3 gets one too. Bot2, the enchanted player, gets none.
+
+[Bot1 Deck]
+Mox Ruby
+Curse of Opulence
+Mountain x14
+
+[Bot2 Deck]
+Island x20
+
+[Bot3 Deck]
+Forest
+Elvish Mystic
+Forest x13
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Curse of Opulence.Cast(Bot2)
+Bot1.Pass
+[T3 Bot3.Main1]
+Bot3.Hand.Forest.Play
+Bot3.Battlefield.Forest.Activate
+Bot3.Hand.Elvish Mystic.Cast
+Bot3.Pass
+[T6 Bot3.Main1]
+Bot3.Attack(Elvish Mystic > Bot2)
+[T6 Bot3.Main2]
+
+[Expect]
+Bot1.Battlefield.Count = 3
+Bot3.Battlefield.Count = 3
+Bot2.Battlefield.Count = 0

@@ -1,0 +1,85 @@
+# Fatal Push, revolt: "Destroy that creature if it has mana value 4 or less instead if a permanent left the battlefield
+# under your control this turn." On turn 3 Bot1 Lightning Bolts its own Ornithopter (a permanent leaving under its
+# control), then pushes Bot2's Auriok Salvagers (mana value 4): it dies. On turn 5 it does the same with a second
+# Ornithopter and pushes Bot2's Golos (mana value 5): it survives, the revolt limit being 4.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Fatal Push
+Fatal Push
+Lightning Bolt
+Lightning Bolt
+Ornithopter
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mox Sapphire
+Auriok Salvagers
+Island
+Golos, Tireless Pilgrim
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Auriok Salvagers.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter#1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Fatal Push.Cast(Auriok Salvagers)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Graveyard = Auriok Salvagers
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Golos, Tireless Pilgrim.Cast
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Fatal Push.Cast(Golos, Tireless Pilgrim)
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Auriok Salvagers
+Bot2.Battlefield.Golos, Tireless Pilgrim.Power = 3
+Bot1.Graveyard.Count = 6

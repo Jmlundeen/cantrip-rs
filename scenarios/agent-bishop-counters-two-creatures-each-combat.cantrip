@@ -1,0 +1,39 @@
+# Agent Bishop, Man in Black puts a +1/+1 counter on each of up to two target creatures as combat begins on its
+# controller's turn. Cast on turn 3 beside a Mother of Runes from turn 1, it triggers that combat, and one question
+# takes both targets: itself and the Mother. Each ends with one counter.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mother of Runes
+Agent Bishop, Man in Black
+Plains
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Mother of Runes.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Agent Bishop, Man in Black.Cast
+Bot1.Target(Agent Bishop, Man in Black; Mother of Runes)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Plains; Mox Pearl; Mother of Runes; Plains; Agent Bishop, Man in Black
+Bot1.Battlefield.Agent Bishop, Man in Black.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Agent Bishop, Man in Black.Power = 2
+Bot1.Battlefield.Agent Bishop, Man in Black.Toughness = 3
+Bot1.Battlefield.Mother of Runes.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Mother of Runes.Power = 2

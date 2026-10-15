@@ -1,0 +1,37 @@
+# Reported from a playtest: Ajani did not transform when the Cat token died blocking. He does. The Cat token is
+# the only other Cat on the battlefield, it dies to a blocker's damage on the opponent's turn, and "whenever one or
+# more other Cats you control die" offers the exile-and-return; accepting returns him as the planeswalker.
+#
+# The choice itself is pictured by ajanis-dying-cat-token-hands-over-the-transform-choice.
+
+[Bot1 Deck]
+Plains x4
+Ajani, Nacatl Pariah
+Plains x16
+
+[Bot2 Deck]
+Forest x4
+Fanatic of Rhonas
+Forest x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Ajani, Nacatl Pariah.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Fanatic of Rhonas.Cast
+[T6 Bot2.DeclareAttackers]
+Bot2.Attack(Fanatic of Rhonas > Bot1)
+Bot1.Block(Cat Warrior > Fanatic of Rhonas)
+Bot1.Accept
+
+[Expect]
+Bot1.Battlefield = Plains; Plains; Ajani, Nacatl Avenger
+Bot1.Life = 20

@@ -1,0 +1,46 @@
+# Cori-Steel Cutter: "Flurry - Whenever you cast your second spell each turn, create a 1/1 white Monk creature token with
+# prowess. You may attach this Equipment to it." and "Equipped creature gets +1/+1 and has trample and haste."
+# Turn 3: Lightning Bolt is the first spell (no Monk), Mox Jet the second (one Monk, attached on Accept) and Mox Sapphire the
+# third (no second Monk, but the Monk's prowess sees a noncreature spell: +1/+1). The Monk is a 2/2 with haste and trample,
+# so it attacks the turn it arrives: with prowess 3 damage, and the Bolt's 3 is Bot2's life from 20 to 14.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Cori-Steel Cutter
+Lightning Bolt
+Mox Jet
+Mox Sapphire
+Mountain
+Mountain x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Cori-Steel Cutter.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Accept
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Monk.Keywords = Haste; Trample
+? Bot1.Battlefield.Monk.Power = 3
+Bot1.Attack(Monk > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Bot1.Battlefield.Cori-Steel Cutter.AttachedTo = Monk
+Bot1.Battlefield = Mountain; Mountain; Mox Ruby; Mox Jet; Mox Sapphire; Cori-Steel Cutter; Monk

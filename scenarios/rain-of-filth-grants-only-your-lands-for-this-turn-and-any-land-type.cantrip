@@ -1,0 +1,36 @@
+# Rain of Filth gives "Sacrifice this land: Add {B}." to the lands its controller has as it resolves, until end of turn:
+# an Island is sacrificed for {B} (the ability does not care about the land's type); Bot2's Forest did not gain it
+# (refusal beside Bot1's own land, the positive control); and on Bot1's next turn the effect is gone, so the remaining
+# Island cannot be sacrificed (refusal).
+
+[Bot1 Deck]
+Mox Jet
+Island
+Island
+Rain of Filth
+Island x16
+
+[Bot2 Deck]
+Forest
+Forest x19
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Rain of Filth.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot2.Battlefield.Forest.Activate(Ability: Sacrifice)
+Bot1.Battlefield.Island.Activate(Ability: Sacrifice)
+? Bot1.Mana = {B}
+[T5 Bot1.Main1]
+! Bot1.Battlefield.Island.Activate(Ability: Sacrifice)
+
+[Expect]
+Bot1.Battlefield = Mox Jet; Island
+Bot1.Graveyard = Island; Rain of Filth

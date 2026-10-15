@@ -1,0 +1,27 @@
+# Blooming Marsh: with two other lands it enters untapped, and taps for green; played as the fourth land it
+# enters tapped (CR 614.1c). The first Marsh taps for green the turn it arrives, so it entered untapped; the second arrives tapped.
+
+[Bot1 Deck]
+Forest
+Forest
+Blooming Marsh
+Forest
+Blooming Marsh
+Plains x15
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Blooming Marsh.Play
+Bot1.Battlefield.Blooming Marsh.Activate(Color: Green)
+[T7 Bot1.Main1]
+Bot1.Hand.Blooming Marsh.Play
+
+[Expect]
+Bot1.Battlefield.Blooming Marsh#1.Tapped = false
+Bot1.Battlefield.Blooming Marsh#2.Tapped = true

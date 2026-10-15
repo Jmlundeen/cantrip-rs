@@ -1,0 +1,30 @@
+# With no Name line the answer is the engine's suggestion: the costliest nonland card of the hand looked at, the first of
+# equals. Bot2's hand holds a Mountain, Lightning Bolt (1), Counterspell (2) and Brainstorm (1): Counterspell is named,
+# not the Bolt before it nor the Brainstorm after it, and not the land.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Sol Ring
+Anointed Peacekeeper
+Plains x12
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Counterspell
+Brainstorm
+Mountain x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Anointed Peacekeeper.Cast
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Anointed Peacekeeper.ChosenName = Counterspell

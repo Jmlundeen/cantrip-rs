@@ -1,0 +1,65 @@
+# Ugin, Eye of the Storms (cast on turn 3 off an Island, five Moxen and Sol Ring) exiles Bot2's green Llanowar Elves
+# with its cast trigger, and its +2 gains 3 life and draws a card. On turn 5 its 0 adds {C}{C}{C}, which pays for a
+# second Sol Ring, a colorless spell: Ugin's second ability exiles Bot2's Elvish Mystic.
+
+[Bot1 Deck]
+Island
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Sol Ring
+Ugin, Eye of the Storms
+Island
+Sol Ring
+Island x6
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest
+Elvish Mystic
+Forest x3
+Forest x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Ugin, Eye of the Storms.Cast
+Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot1.Battlefield.Ugin, Eye of the Storms.Activate(Ability: +2)
+[T3 Bot1.Main2]
+? Exile = Llanowar Elves
+? Bot1.Life = 23
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Ugin, Eye of the Storms.Activate(Ability: Add)
+Bot1.Hand.Sol Ring.Cast
+Bot1.Target(Bot2.Battlefield.Elvish Mystic)
+
+[Expect]
+Exile = Llanowar Elves; Elvish Mystic
+Bot1.Life = 23

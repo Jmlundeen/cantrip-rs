@@ -1,0 +1,25 @@
+# Only lands "you control" count (CR 109.4): Bot2 has three Mountains in play when Bot1 plays its first land of the game,
+# Seachrome Coast, on turn 7, and it enters untapped and taps for white at once.
+
+[Bot1 Deck]
+Seachrome Coast
+Plains x6
+Plains x10
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Seachrome Coast.Play
+Bot1.Battlefield.Seachrome Coast.Activate(Color: White)
+? Bot1.Mana = {W}
+
+[Expect]
+Bot1.Battlefield.Seachrome Coast.Tapped = true

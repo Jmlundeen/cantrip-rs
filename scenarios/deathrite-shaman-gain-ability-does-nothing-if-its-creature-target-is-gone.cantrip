@@ -1,0 +1,41 @@
+# Deathrite Shaman, G+T: a second Deathrite Shaman exiles the same creature card in response; the first ability's
+# target is gone as it resolves, so its controller gains no life from it (CR 608.2b).
+
+[Bot1 Deck]
+Swamp
+Deathrite Shaman
+Forest
+Deathrite Shaman
+Forest
+Forest
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Mountain x7
+Llanowar Elves
+Llanowar Elves
+Mountain x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Deathrite Shaman.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Deathrite Shaman.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Deathrite Shaman#1.Activate(Bot2.Graveyard.Llanowar Elves#1; Ability: creature)
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Deathrite Shaman#2.Activate(Bot2.Graveyard.Llanowar Elves#1; Ability: creature)
+? Stack.Count = 2
+Bot1.Pass
+
+[Expect]
+Bot2.Graveyard.Count = 1
+Exile.Count = 1
+Bot1.Life = 22
+Bot2.Life = 20

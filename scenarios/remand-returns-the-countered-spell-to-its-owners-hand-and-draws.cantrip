@@ -1,0 +1,31 @@
+# Remand counters Bot2's Brainstorm, which returns to Bot2's hand instead of the graveyard, and Bot1 draws a card.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Remand
+Island x12
+
+[Bot2 Deck]
+Island
+Brainstorm
+Island x13
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Brainstorm.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Remand.Cast(Brainstorm)
+? Stack = Remand; Brainstorm
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Remand
+Bot1.Hand.Count = 5
+Bot2.Graveyard.Count = 0
+Bot2.Hand = Brainstorm; Island; Island; Island; Island; Island; Island

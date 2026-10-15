@@ -1,0 +1,31 @@
+# "Any number of target" includes none: Bot1 casts Paradoxical Outcome with an empty target list. It resolves, returns
+# nothing and draws no card (the draw is one per card returned); the hand is exactly what it was after casting.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Mox Ruby
+Paradoxical Outcome
+Island x15
+
+[Bot2 Deck]
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Paradoxical Outcome.Cast
+Bot1.Target()
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 2
+Bot1.Battlefield.Count = 4
+Bot1.Graveyard = Paradoxical Outcome

@@ -1,0 +1,36 @@
+# Expedition Map: "Search your library for a land card". The Ornithopter and the Mox Jet in the library are not land
+# cards (! Search), and the Volcanic Island, a nonbasic land, is: it is the card put into Bot1's hand.
+
+[Bot1 Deck]
+Island
+Island
+Expedition Map
+Island
+Island
+Island
+Island
+Island
+Ornithopter
+Mox Jet
+Volcanic Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Expedition Map.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Expedition Map.Activate
+! Bot1.Search(Ornithopter)
+! Bot1.Search(Mox Jet)
+Bot1.Search(Volcanic Island)
+
+[Expect]
+Bot1.Hand = Island; Island; Island; Island; Island; Volcanic Island
+Bot1.Graveyard = Expedition Map

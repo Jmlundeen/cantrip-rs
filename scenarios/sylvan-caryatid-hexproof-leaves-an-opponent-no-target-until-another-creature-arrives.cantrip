@@ -1,0 +1,39 @@
+# Hexproof (CR 702.11): on turn 2 the Caryatid is the only creature, enchantment or planeswalker on the battlefield, so Bot2's Get Lost
+# has no legal target and is not offered (the refusal, with Plains and Mox Pearl ready to pay). After Bot1's Ornithopter arrives on turn 3
+# Get Lost is cast on it on turn 4 (the positive control: the same spell, a creature without hexproof) and destroys it, while the
+# Caryatid is still there.
+
+[Bot1 Deck]
+Forest
+Mox Ruby
+Sylvan Caryatid
+Ornithopter
+Forest x12
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Get Lost
+Plains x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sylvan Caryatid.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+! Bot2.Hand.Get Lost.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+[T4 Bot2.Main1]
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Get Lost.Cast(Bot1.Battlefield.Ornithopter)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Ornithopter
+Bot1.Battlefield.Sylvan Caryatid.Power = 0

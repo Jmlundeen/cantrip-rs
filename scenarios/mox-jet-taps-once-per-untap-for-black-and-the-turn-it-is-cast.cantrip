@@ -1,0 +1,34 @@
+# Mox Jet, "{T}: Add {B}": cast for {0} and tapped the turn it enters (it is an artifact, not a creature: no summoning
+# sickness) for exactly {B}, which pays for a Duress. Once tapped it offers no second activation that turn (! Activate; the
+# first activation and the untapped one on turn 3 are the positive controls), and it untaps for turn 3.
+
+[Bot1 Deck]
+Mox Jet
+Duress
+Duress
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+? Bot1.Mana = {B}
+Bot1.Hand.Duress.Cast(Bot2)
+! Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mox Jet.Tapped = true
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Mox Jet.Tapped = false
+Bot1.Battlefield.Mox Jet.Activate
+? Bot1.Mana = {B}
+Bot1.Hand.Duress.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Duress; Duress
+Bot1.Battlefield.Mox Jet.Tapped = true

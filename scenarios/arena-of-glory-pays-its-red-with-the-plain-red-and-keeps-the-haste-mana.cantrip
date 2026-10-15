@@ -1,0 +1,32 @@
+# Arena of Glory's exert ability costs {R}, a mana ability's own mana cost, and which pool mana pays it is the
+# player's choice (CR 602.2b via 601.2h). The first Arena turns one Mountain's {R} into {R}{R} that grants haste
+# (CR 106.6); the second Arena's {R} could then be paid with the other Mountain's plain {R} or with haste mana.
+# `Spend: R` names the unrestricted red precisely, so all four red left grant haste.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Arena of Glory
+Arena of Glory
+Island x3
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Arena of Glory.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Arena of Glory.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Arena of Glory.Activate(Ability: Exert)
+Bot1.Battlefield.Arena of Glory.Activate(Ability: Exert; Spend: R)
+
+[Expect]
+Turn = 7
+Bot1.Mana = {R}{R}{R}{R} (GainsHaste)

@@ -1,0 +1,11 @@
+{
+  "name": "Chaos Defiler",
+  "manaCost": "{3}{B}{R}",
+  "type": "Artifact Creature — Demon Construct",
+  "power": 5,
+  "toughness": 4,
+  "oracleText": "Trample\nBattle Cannon — When this creature enters or dies, for each opponent, choose a nonland permanent that player controls. Destroy one of them chosen at random.",
+  "keywords": [
+    "Trample"
+  ]
+}

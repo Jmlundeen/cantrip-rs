@@ -1,0 +1,20 @@
+# Cycling {1} (CR 702.29a) works from the hand: Bot1 pays {1} with a Mox Ruby and discards the Crater to draw a card; the
+# Crater is in the graveyard, not on the battlefield, and the hand is the same size.
+
+[Bot1 Deck]
+Mox Ruby
+Footfall Crater
+Mountain x13
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Footfall Crater.Activate(Ability: Cycling)
+
+[Expect]
+Bot1.Graveyard = Footfall Crater
+Bot1.Hand.Count = 6
+Bot1.Library.Count = 7

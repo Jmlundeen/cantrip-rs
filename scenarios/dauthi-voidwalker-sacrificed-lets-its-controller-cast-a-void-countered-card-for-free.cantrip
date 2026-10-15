@@ -1,0 +1,51 @@
+# "{T}, Sacrifice this creature: Choose an exiled card an opponent owns with a void counter on it. You may play it this
+# turn without paying its mana cost." Bot2 discards Lightning Bolt and a Mountain to Faithless Looting under Bot1's
+# Dauthi Voidwalker, so both are exiled with a void counter instead (CR 614.1), and so is Faithless Looting as it
+# leaves the stack. Bot1 sacrifices Dauthi Voidwalker, chooses among the three, and casts the Bolt from Bot2's exile
+# with no mana. Dauthi Voidwalker is gone by then, so the Bolt goes to its owner's graveyard when it resolves, and the
+# other two stay in exile with their void counters.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Dauthi Voidwalker
+Swamp x17
+
+[Bot2 Deck]
+Mountain
+Mountain
+Lightning Bolt
+Faithless Looting
+Mountain x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dauthi Voidwalker.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Faithless Looting.Cast
+Bot2.Choose(Lightning Bolt; Mountain)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Dauthi Voidwalker.Activate
+Bot1.Choose(Lightning Bolt)
+Bot1.Pass
+Bot2.Pass
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot2.Life = 17
+Exile = Faithless Looting; Mountain
+Bot1.Graveyard = Dauthi Voidwalker
+Bot2.Graveyard = Lightning Bolt

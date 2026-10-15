@@ -1,0 +1,21 @@
+# Tolarian Academy's {T}: Add {U} for each artifact you control is counted as it is activated: with Mox Sapphire and
+# Mox Ruby on the battlefield it adds {U}{U}.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Tolarian Academy
+Island x17
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Tolarian Academy.Play
+Bot1.Battlefield.Tolarian Academy.Activate
+
+[Expect]
+Bot1.Mana = {U}{U}
+Bot1.Battlefield.Tolarian Academy.Tapped = true

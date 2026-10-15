@@ -1,0 +1,29 @@
+# Bankrupt in Blood: as an additional cost sacrifice two creatures; draw three cards. A Swamp and a Mox Jet pay {1}{B}.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Ornithopter
+Ornithopter
+Bankrupt in Blood
+Swamp x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Bankrupt in Blood.Cast
+Bot1.Choose(Ornithopter; Ornithopter)
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Graveyard = Bankrupt in Blood; Ornithopter; Ornithopter
+Bot1.Battlefield = Swamp; Mox Jet
+Bot1.Hand.Count = 5

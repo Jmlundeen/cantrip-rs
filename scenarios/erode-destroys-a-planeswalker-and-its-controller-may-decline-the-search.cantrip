@@ -1,0 +1,40 @@
+# Erode: "Destroy target creature or planeswalker. Its controller may search their library for a basic land card".
+# Bot2's Chandra, Torch of Defiance (a planeswalker, cast off Black Lotus and a Mox Ruby) is destroyed on turn 3. Bot2,
+# its controller, is asked whether to search and declines: nothing enters, nothing is tapped, the library is untouched.
+
+[Bot1 Deck]
+Plains
+Erode
+Plains x15
+
+[Bot2 Deck]
+Black Lotus
+Mox Ruby
+Chandra, Torch of Defiance
+Mountain x4
+Mountain x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Chandra, Torch of Defiance.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Erode.Cast(Bot2.Battlefield.Chandra, Torch of Defiance)
+Bot2.Decline
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Erode
+Bot2.Graveyard = Chandra, Torch of Defiance; Black Lotus
+Bot2.Battlefield = Mox Ruby
+Bot2.Library.Count = 11

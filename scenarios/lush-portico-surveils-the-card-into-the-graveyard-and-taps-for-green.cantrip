@@ -1,0 +1,22 @@
+# Surveil 1 (CR 701.46): the other branch of "you may put it into your graveyard" - the Mountain on top of the library is put
+# into the graveyard (`Arrange( | Mountain)`), and the tapped Portico taps for {G} the turn after, the other colour of "{G} or {W}".
+
+[Bot1 Deck]
+Lush Portico
+Island x6
+Mountain
+Island x9
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Lush Portico.Play
+Bot1.Arrange( | Mountain)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Lush Portico.Activate(Ability: {G})
+? Bot1.Mana = {G}
+
+[Expect]
+Bot1.Graveyard = Mountain
+Bot1.Library.Count = 8

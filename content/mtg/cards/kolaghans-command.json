@@ -1,0 +1,6 @@
+{
+  "name": "Kolaghan's Command",
+  "manaCost": "{1}{B}{R}",
+  "type": "Instant",
+  "oracleText": "Choose two —\n• Return target creature card from your graveyard to your hand.\n• Target player discards a card.\n• Destroy target artifact.\n• Kolaghan's Command deals 2 damage to any target."
+}

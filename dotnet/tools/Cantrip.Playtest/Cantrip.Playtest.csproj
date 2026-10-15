@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>cantrip-playtest</AssemblyName>
+
+    <!-- A game clones its whole state on every zone change, so a bulk run allocates hard on every thread. The
+         workstation collector turns that into the run's bottleneck; the server collector gives each core its own
+         heap and is what lets games played at once actually play at once. -->
+    <ServerGarbageCollection>true</ServerGarbageCollection>
+    <ConcurrentGarbageCollection>false</ConcurrentGarbageCollection>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Cantrip.Client\Cantrip.Client.csproj" />
+    <ProjectReference Include="..\..\src\Cantrip.Client.Embedded\Cantrip.Client.Embedded.csproj" />
+    <ProjectReference Include="..\..\src\Cantrip.Server\Cantrip.Server.csproj" />
+  </ItemGroup>
+
+</Project>

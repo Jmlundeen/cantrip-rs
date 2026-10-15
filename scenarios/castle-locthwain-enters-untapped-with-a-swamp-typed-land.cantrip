@@ -1,0 +1,20 @@
+# "Unless you control a Swamp" asks for the subtype, not the name: Underground Sea is an Island Swamp, so with it on the battlefield
+# Castle Locthwain enters untapped. (Positive control for castle-locthwain-enters-tapped-without-a-swamp.)
+
+[Bot1 Deck]
+Underground Sea
+Plains
+Castle Locthwain
+Plains x17
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Underground Sea.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Castle Locthwain.Play
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Castle Locthwain.Tapped = false

@@ -1,0 +1,45 @@
+# "Return a creature you control to its owner's hand" is a cost, so with no creature of your own the Ruse cannot be cast:
+# on turn two Bot2 casts an Ornithopter and then a Mox Jet with an Island and a Mox Sapphire open on Bot1's side but no Bot1 creature, and the
+# Ruse is refused against the Mox Jet (a spell, with Bot2's Ornithopter on the battlefield - an opponent's creature does
+# not do). On turn three Bot1 casts its own Ornithopter; on turn four the Ruse, with the same mana, returns it to
+# counter Bot2's second Ornithopter - any spell, a creature spell here, can be countered.
+
+[Bot1 Deck]
+Island
+Island
+Mox Sapphire
+Ornithopter
+Familiar's Ruse
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Mox Jet
+Ornithopter
+Ornithopter
+Swamp x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Mox Jet.Cast
+! Bot1.Hand.Familiar's Ruse.Cast(Stack.Mox Jet)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Ornithopter.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Familiar's Ruse.Cast(Stack.Ornithopter)
+Bot1.Choose(Ornithopter)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot2.Graveyard = Ornithopter
+Bot2.Battlefield = Ornithopter; Mox Jet
+Bot1.Battlefield = Island; Island; Mox Sapphire
+Bot1.Graveyard = Familiar's Ruse

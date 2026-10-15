@@ -1,0 +1,50 @@
+# Chapters I and II each grant "{T}: Add one mana of any color" to the creatures "you control" as they resolve (CR 611.2c): Bot2's
+# Ornithopter, which has been there since turn 2 and is no longer summoning sick on turn 4, is never given it (refusal), while Bot1's
+# Ornithopter - cast on turn 3 after chapter I, so without the grant from chapter I - has it from chapter II on turn 5 and taps for
+# red (the positive control). After chapter III on turn 7 the Saga has been sacrificed (CR 714.4).
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Guerrilla Gorilla
+Song of Freyalise
+Ornithopter
+Forest
+Forest x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Song of Freyalise.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+[T4 Bot2.Main1]
+! Bot2.Battlefield.Ornithopter.Activate(Ability: Add)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Ornithopter.Activate(Ability: Add; Color: Red)
+? Bot1.Mana = {R}
+[T7 Bot1.Main2]
+
+[Expect]
+Turn = 7
+Bot1.Battlefield = Forest; Forest; Mox Emerald; Mox Ruby; Guerrilla Gorilla; Ornithopter
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1

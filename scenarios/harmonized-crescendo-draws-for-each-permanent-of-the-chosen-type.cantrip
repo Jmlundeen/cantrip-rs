@@ -1,0 +1,34 @@
+# Harmonized Crescendo costs {4}{U}{U}: four Ornithopters tapped for convoke pay the generic mana, and Mox Sapphire and an
+# Island pay the blue. Bot1 chooses the creature type Thopter and draws a card for each of the four Thopters they
+# control. Bot1 starts with seven cards, casts six of them and draws four.
+
+[Bot1 Deck]
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Mox Sapphire
+Harmonized Crescendo
+Island
+Island x13
+
+[Bot2 Deck]
+Forest x22
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Harmonized Crescendo.Cast(Convoke: Ornithopter, Ornithopter, Ornithopter, Ornithopter)
+Bot1.Modes(Thopter)
+[Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Hand.Count = 4
+Bot1.Graveyard = Harmonized Crescendo

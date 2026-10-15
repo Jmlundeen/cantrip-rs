@@ -1,0 +1,35 @@
+# The control for Headliner Scarlett's "creatures target player controls can't block": aimed at Bot1 itself, it leaves Bot2's Ornithopter free to block her, and the 0/2 blocker dies to her 3 damage.
+
+[Bot1 Deck]
+Sol Ring
+Headliner Scarlett
+Mountain x5
+Mountain x12
+
+[Bot2 Deck]
+Ornithopter
+Island x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mountain.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Headliner Scarlett.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Target(Bot1)
+Bot1.Pass
+Bot1.Attack(Headliner Scarlett)
+Bot2.Block(Ornithopter > Headliner Scarlett)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 20
+Bot2.Graveyard = Ornithopter

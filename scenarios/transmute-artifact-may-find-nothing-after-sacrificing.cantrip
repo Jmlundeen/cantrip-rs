@@ -1,0 +1,29 @@
+# Bot1 sacrifices its Mox Sapphire and chooses to find nothing in the search (a search for a quality may fail, CR 701.23b): nothing enters,
+# nothing is put into the graveyard from the library, and the Sol Ring stays in it.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Transmute Artifact
+Island x3
+Island x3
+Sol Ring
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Transmute Artifact.Cast
+Bot1.Choose(Mox Sapphire)
+Bot1.Search()
+
+[Expect]
+Bot1.Battlefield = Island
+Bot1.Library.Count = 14
+Bot1.Graveyard = Transmute Artifact; Mox Sapphire; Black Lotus

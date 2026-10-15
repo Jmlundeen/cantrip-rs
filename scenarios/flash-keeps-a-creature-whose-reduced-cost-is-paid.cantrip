@@ -1,0 +1,32 @@
+# Flash puts Dark Confidant (cost {1}{B}) from the hand onto the battlefield; Bot1 pays its cost reduced by {2}, {B},
+# with a Mox Jet tapped while the spell resolves, so Dark Confidant stays.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Flash
+Dark Confidant
+Island x2
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Flash.Cast
+Bot1.Choose(Dark Confidant)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.PayCost
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Graveyard = Flash
+Bot1.Battlefield = Island; Mox Sapphire; Mox Jet; Dark Confidant

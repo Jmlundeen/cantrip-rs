@@ -1,0 +1,39 @@
+# "At the beginning of combat on your turn": Bishop, cast turn one, puts a counter on itself that combat (the control:
+# the trigger does ask). Bot2's combat on turn two asks nothing (`! Bot1.Target`) and adds no counter. On turn three
+# Bot1's trigger takes Bot2's Ornithopter as a target beside Bishop - "target creatures" are not limited to your own -
+# and each gets a counter.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Pearl
+Agent Bishop, Man in Black
+Plains x10
+
+[Bot2 Deck]
+Ornithopter
+Island x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Hand.Agent Bishop, Man in Black.Cast
+Bot1.Target(Agent Bishop, Man in Black)
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+! Bot1.Target
+[T2 Bot2.Main2]
+? Bot1.Battlefield.Agent Bishop, Man in Black.Counters.PlusOnePlusOne = 1
+? Bot2.Battlefield.Ornithopter.Counters.PlusOnePlusOne = (absent)
+[T3 Bot1.Main1]
+Bot1.Target(Agent Bishop, Man in Black; Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Agent Bishop, Man in Black.Counters.PlusOnePlusOne = 2
+Bot2.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot2.Battlefield.Ornithopter.Power = 1

@@ -1,0 +1,50 @@
+# Vibrance evoked for {G}{G} (CR 702.74a): the search and the evoke sacrifice trigger together, and Bot1 puts the
+# sacrifice on the stack first so the search resolves while Vibrance is still on the battlefield (the ruling of
+# 2025-11-17). The life is gained, then Vibrance is sacrificed. Reanimated on turn 5 it enters again, but this object
+# was never cast (CR 400.7), so no mana was spent to cast it and neither ability triggers: no second search, no
+# second 2 life, only Reanimate's 5.
+
+[Bot1 Deck]
+Forest
+Forest
+Vibrance
+Swamp
+Reanimate
+Island
+Island
+Island x4
+Plains
+Plains
+Island x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Vibrance.Cast(Ability: Evoke)
+Bot1.Triggers(sacrifice; search)
+? Stack.Count = 2
+Bot1.Search(Plains)
+? Stack.Count = 1
+? Bot1.Battlefield = Forest; Forest; Vibrance
+? Bot1.Life = 22
+[T3 Bot1.Main2]
+? Bot1.Graveyard = Vibrance
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Reanimate.Cast(Bot1.Graveyard.Vibrance)
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Life = 17
+Bot2.Life = 20
+Bot1.Battlefield = Forest; Forest; Swamp; Vibrance
+Bot1.Hand.Count = 5
+Bot1.Graveyard = Reanimate

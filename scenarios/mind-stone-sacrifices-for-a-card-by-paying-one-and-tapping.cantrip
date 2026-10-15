@@ -1,0 +1,32 @@
+# Mind Stone, cast on turn 3 with two Islands. On turn 5 an Island's mana pays the {1}, and {T}, sacrificing the Stone
+# draws a card: it ends in the graveyard and Bot1 draws on turn 3, turn 5 and from the Stone.
+
+[Bot1 Deck]
+Island
+Island
+Island
+Mind Stone
+Island
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Mind Stone.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#3.Activate
+Bot1.Battlefield.Mind Stone.Activate(Ability: Draw)
+
+[Expect]
+Bot1.Graveyard = Mind Stone
+Bot1.Hand.Count = 6
+Bot1.Library.Count = 10

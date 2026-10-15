@@ -1,0 +1,32 @@
+# Bot1 casts Time Warp on turn 1 targeting itself (Black Lotus, Mox Sapphire and an Island pay {3}{U}{U}). Turn 2 is
+# Bot1's again: it untaps, draws and plays a second land. Turn 3 goes back to Bot2.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Black Lotus
+Time Warp
+Island x4
+Island x10
+
+[Bot2 Deck]
+Swamp x17
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Time Warp.Cast(Bot1)
+[T2 Bot1.Main1]
+? ActivePlayer = Bot1
+Bot1.Hand.Island.Play
+[T3 Bot2.Main1]
+
+[Expect]
+Turn = 3
+ActivePlayer = Bot2
+Bot1.Graveyard = Time Warp; Black Lotus
+Bot1.Battlefield = Island; Island; Mox Sapphire

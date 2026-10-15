@@ -1,0 +1,41 @@
+use cantrip_api::*;
+use cantrip_mechanics::{attach::attached_object, targets};
+use cantrip_oracle as oracle;
+
+/// "As long as this Aura entered this turn, enchanted creature has hexproof" (CR 702.11): every new object records the
+/// turn it was made in `controlled_since`, which for an Aura is the turn it entered. A static ability is computed by the
+/// layers, which read the state and not the event history, so this is the one "entered this turn" not asked of the
+/// history; it would be wrong only for an Aura whose control changed the turn it entered.
+fn enchanted_and_entered_this_turn(view: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool {
+    attached_object(view, source, affected, so_far) && view.state().obj(source).controlled_since == view.state().turn.number
+}
+
+fn hexproof(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
+    chars.keywords = chars.keywords.with(Keyword::Hexproof);
+}
+
+fn plus_one_plus_one(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
+    chars.power = chars.power.map(|v| v + 1);
+    chars.toughness = chars.toughness.map(|v| v + 1);
+}
+
+pub static CARD: CardDef = CardDef {
+    enchant: Some(targets::CREATURE_YOU_CONTROL),
+    statics: &[
+        StaticDef {
+            text: "As long as this Aura entered this turn, enchanted creature has hexproof.",
+            layer: Layer::Ability,
+            affects: enchanted_and_entered_this_turn,
+            apply: hexproof,
+            ..StaticDef::BLANK
+        },
+        StaticDef {
+            text: "Enchanted creature gets +1/+1.",
+            layer: Layer::PtModify,
+            affects: attached_object,
+            apply: plus_one_plus_one,
+            ..StaticDef::BLANK
+        },
+    ],
+    ..oracle::SHARDMAGES_RESCUE
+};

@@ -1,0 +1,45 @@
+# Turn 1: with the Explorer out Bot1 plays two lands and landfall mills a card for each (library 12 to 10). Turn 2: Bot2 plays a Plains, which is not a land Bot1 controls, so nothing is milled, and may not play a second one (the
+# Explorer's extra land is for its controller only). Turn 3: Bot1 plays a Forest (landfall) and Bot2 exiles the Explorer in response with Swords to Plowshares; with it gone Bot1 may not play a second land.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Icetill Explorer
+Forest
+Island
+Forest
+Island
+Forest x12
+
+[Bot2 Deck]
+Plains
+Plains
+Swords to Plowshares
+Plains x12
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Icetill Explorer.Cast
+Bot1.Hand.Forest.Play
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+? Bot1.Library.Count = 10
+Bot2.Hand.Plains.Play
+? Bot1.Library.Count = 10
+! Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Icetill Explorer)
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+! Bot1.Hand.Island.Play
+
+[Expect]
+Stack.Count = 0
+Exile = Icetill Explorer
+Bot1.LandsPlayed = 1

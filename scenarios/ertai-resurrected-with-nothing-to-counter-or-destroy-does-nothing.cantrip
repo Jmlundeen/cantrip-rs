@@ -1,0 +1,31 @@
+# Ertai Resurrected: with no other spell or ability on the stack and no other creature or planeswalker on the battlefield,
+# neither mode has a legal target, so the trigger is removed from the stack and nothing happens: no card is drawn and
+# Ertai stays. Bot1 casts it main phase, turn 1, off a Lotus and a Mox. (That Ertai is no target of its own modes is the
+# neighbouring scenario.)
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Ertai Resurrected
+Island x4
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ertai Resurrected.Cast
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Battlefield = Mox Sapphire; Ertai Resurrected
+Bot1.Hand.Count = 4

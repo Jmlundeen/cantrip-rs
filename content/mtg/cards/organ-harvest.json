@@ -1,0 +1,6 @@
+{
+  "name": "Organ Harvest",
+  "manaCost": "{B}",
+  "type": "Sorcery",
+  "oracleText": "Your team may sacrifice any number of creatures. For each creature sacrificed this way, you add {B}{B}."
+}

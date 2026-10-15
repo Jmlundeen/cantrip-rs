@@ -1,0 +1,28 @@
+# Urborg, Tomb of Yawgmoth: any land that is a Swamp has "{T}: Add {B}" (CR 305.6) — Urborg itself, and an
+# opponent's Forest, which still has its own {G} ability: the second Forest taps for green.
+
+[Bot1 Deck]
+Urborg, Tomb of Yawgmoth
+Plains x19
+
+[Bot2 Deck]
+Forest
+Forest x19
+
+[Actions]
+Bot1.Hand.Urborg, Tomb of Yawgmoth.Play
+Bot1.Battlefield.Urborg, Tomb of Yawgmoth.Activate
+? Bot1.Mana = {B}
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate(Ability: Add {B})
+? Bot2.Mana = {B}
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest#2.Activate(Ability: Add {G})
+? Bot2.Mana = {G}
+
+[Expect]
+Bot2.Battlefield.Forest#1.Tapped = false
+Bot2.Battlefield.Forest#2.Tapped = true
+Bot2.Battlefield.Forest#2.Subtypes = Forest; Swamp

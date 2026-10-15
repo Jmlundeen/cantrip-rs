@@ -1,0 +1,26 @@
+# Noncreature spells (Mox, Black Lotus, Looting) are not counted: one creature spell is only the first.
+[Bot1 Deck]
+Vengevine
+Faithless Looting
+Llanowar Elves
+Ignoble Hierarch
+Mox Ruby
+Black Lotus
+Birds of Paradise
+Forest x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Choose(Vengevine; Forest)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Llanowar Elves.Cast
+? Stack = Llanowar Elves
+
+[Expect]
+Bot1.Graveyard = Black Lotus; Faithless Looting; Forest; Vengevine

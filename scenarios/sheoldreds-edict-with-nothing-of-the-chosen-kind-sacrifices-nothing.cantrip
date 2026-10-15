@@ -1,0 +1,33 @@
+# Sheoldred's Edict: the first mode takes a NONTOKEN creature. Bot2 controls only a Spirit token, so nothing is sacrificed;
+# the third mode, with no planeswalker either, would do nothing as well (the neighbouring scenarios are the positive controls).
+
+[Bot1 Deck]
+Swamp
+Sheoldred's Edict
+Swamp x13
+
+[Bot2 Deck]
+Black Lotus
+Lingering Souls
+Island x5
+Island x14
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Lingering Souls.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Sheoldred's Edict.Cast
+Bot1.Modes(1)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Count = 2
+Bot2.Graveyard = Lingering Souls; Black Lotus

@@ -1,0 +1,31 @@
+# "Mills three cards" with fewer than three in the library mills as many as there are (CR 701.17a, 121.4 only loses a
+# player who has to draw): Bot2's library holds one card when Brain Freeze resolves on turn 3. It is milled, the library
+# is empty, and Bot2 has not lost; losing would take a draw from it on turn 4.
+
+[Bot1 Deck]
+Island
+Island
+Island
+Brain Freeze
+Island x3
+Island x10
+
+[Bot2 Deck]
+Island x7
+Mountain
+Swamp
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Brain Freeze.Cast(Bot2)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Result = InProgress
+Bot2.Library.Count = 0
+Bot2.Graveyard = Swamp; Mountain

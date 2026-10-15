@@ -1,0 +1,43 @@
+# Bot1 taps three Islands for Frantic Search on its third turn, draws two, discards two, and is left choosing up to
+# three lands to untap. A Sol Ring and Bot2's Swamp share the board, so the choice is made among permanents that are
+# not all offered. The position the client's in-place choice on the battlefield is pictured from:
+
+[Bot1 Deck]
+Island
+Island
+Island
+Frantic Search
+Sol Ring
+Guerrilla Gorilla
+Lightning Bolt
+Counterspell
+Ponder
+Brainstorm
+Mana Leak
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot2.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Frantic Search.Cast
+Bot1.Choose(Guerrilla Gorilla; Lightning Bolt)
+[Handover Bot1.Choose]
+
+[Expect]
+Turn = 5
+Stack = Frantic Search
+Bot1.Graveyard = Lightning Bolt; Guerrilla Gorilla
+Bot1.Battlefield.Count = 4
+Bot2.Battlefield = Swamp

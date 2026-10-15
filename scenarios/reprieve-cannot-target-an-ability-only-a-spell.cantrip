@@ -1,0 +1,33 @@
+# "Target spell": with only Marsh Flats' ability on the stack Reprieve is not offered, though Bot1 could pay for it; with
+# Duress, a spell, cast by the fetched Swamp's mana, it is, and returns it to Bot2's hand.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Reprieve
+Plains x12
+
+[Bot2 Deck]
+Marsh Flats
+Duress
+Swamp
+Swamp x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Marsh Flats.Play
+Bot2.Battlefield.Marsh Flats.Activate
+! Bot1.Hand.Reprieve.Cast
+Bot1.Pass
+Bot2.Search(Swamp)
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Duress.Cast(Bot1)
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Reprieve.Cast(Duress)
+
+[Expect]
+Bot2.Hand.Count = 7
+Bot1.Graveyard = Reprieve

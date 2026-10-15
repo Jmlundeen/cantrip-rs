@@ -1,0 +1,37 @@
+# Basking Rootwalla's ability is an instant-speed activation: Bot1 pumps it on Bot2's turn 4 in response to Burst
+# Lightning, which deals only 2 to the resulting 3/3 (a 1/1 would have died). The pump and the damage both end in
+# cleanup, so on turn 5 it is a 1/1 again.
+
+[Bot1 Deck]
+Forest
+Basking Rootwalla
+Forest x18
+
+[Bot2 Deck]
+Mountain
+Burst Lightning
+Mountain x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Basking Rootwalla.Cast
+Bot1.Battlefield.Forest.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Burst Lightning.Cast(Bot1.Battlefield.Basking Rootwalla)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Basking Rootwalla.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Basking Rootwalla.Toughness = 3
+[T4 Bot2.Main2]
+? Bot1.Battlefield.Basking Rootwalla.Damage = 2
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Basking Rootwalla.Power = 1
+
+[Expect]
+Bot1.Battlefield = Forest; Forest; Basking Rootwalla

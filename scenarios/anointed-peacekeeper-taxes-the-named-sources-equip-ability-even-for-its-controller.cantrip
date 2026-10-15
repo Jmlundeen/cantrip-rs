@@ -1,0 +1,51 @@
+# Activated abilities of sources with the chosen name cost {2} more, whoever controls the source (CR 602.2b, 601.2f).
+# Bot1's Lightning Greaves equips an Ornithopter for {0} on turn 1, before Anointed Peacekeeper names it (the positive
+# control: no mana in the pool at all). On turn 5 Bot1 moves it to a second Ornithopter, paying {2} from Sol Ring: the
+# pool is empty afterwards, and the equip would have been free if the ability were not taxed.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Lightning Greaves
+Ornithopter
+Anointed Peacekeeper
+Sol Ring
+Plains
+Ornithopter
+Plains x8
+
+[Bot2 Deck]
+Mountain x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Lightning Greaves.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Lightning Greaves.Activate(Ornithopter)
+[Bot1.Main2]
+? Bot1.Battlefield.Ornithopter.Keywords = Flying; Haste; Shroud
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Anointed Peacekeeper.Cast
+Bot1.Name(Lightning Greaves)
+[T5 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Sol Ring.Activate
+? Bot1.Mana = {C}{C}
+Bot1.Battlefield.Lightning Greaves.Activate(Ornithopter#2)
+? Bot1.Mana =
+[Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Ornithopter#1.Keywords = Flying
+Bot1.Battlefield.Ornithopter#2.Keywords = Flying; Haste; Shroud

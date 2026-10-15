@@ -1,0 +1,44 @@
+# "You can't spend mana to cast this spell" + convoke: two green creatures pay the {B/G}{B/G}, five colorless ones the
+# {5}. Both Forests stay untapped, because nothing else was asked of them.
+[Bot1 Deck]
+Forest
+Forest
+Llanowar Elves
+Birds of Paradise
+Hogaak, Arisen Necropolis
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Forest x15
+
+[Bot2 Deck]
+Forest x22
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Birds of Paradise.Cast
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Hand.Ornithopter.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+[T7 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Hogaak, Arisen Necropolis.Cast(Convoke: Llanowar Elves, Birds of Paradise, Ornithopter, Ornithopter, Ornithopter, Ornithopter, Ornithopter)
+[Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Battlefield.Hogaak, Arisen Necropolis.Power = 8
+Bot1.Battlefield.Hogaak, Arisen Necropolis.Keywords = CantSpendManaToCast; CastFromYourGraveyard; Trample
+Bot1.Battlefield.Llanowar Elves.Tapped = true
+Bot1.Battlefield.Birds of Paradise.Tapped = true
+Bot1.Battlefield.Forest#1.Tapped = false
+Bot1.Battlefield.Forest#2.Tapped = false

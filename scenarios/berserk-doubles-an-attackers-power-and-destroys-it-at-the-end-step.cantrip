@@ -1,0 +1,37 @@
+# Berserk: "Cast this spell only before the combat damage step. Target creature gains trample and gets +X/+0 until end of
+# turn, where X is its power. At the beginning of the next end step, destroy that creature if it attacked this turn."
+# Bot1 attacks with Marauding Mako on turn 3 and casts Berserk in the declare attackers step: the 2/1 deals 2 to Bot2, and
+# the Mako is destroyed at the end step. In the second main phase the second Berserk is no longer offered.
+
+[Bot1 Deck]
+Mountain
+Mox Emerald
+Marauding Mako
+Berserk
+Berserk
+Mountain
+Mountain x14
+
+[Bot2 Deck]
+Island x13
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Marauding Mako.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Attack(Marauding Mako > Bot2)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Berserk.Cast(Bot1.Battlefield.Marauding Mako)
+Bot1.Pass
+[T3 Bot1.Main2]
+! Bot1.Hand.Berserk.Cast
+[T4 Bot2.Upkeep]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Graveyard = Marauding Mako; Berserk

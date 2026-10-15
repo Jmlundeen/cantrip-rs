@@ -1,0 +1,24 @@
+# Inquisition of Kozilek and a split card (CR 708.4): outside the stack a split card's mana value is the total of both halves,
+# so Life // Death in Bot2's hand is Life {G} + Death {1}{B} = 3 and eligible, where the Sunfall (5) is not. Bot1 takes
+# Life // Death; the Sunfall stays in Bot2's hand.
+
+[Bot1 Deck]
+Swamp
+Inquisition of Kozilek
+Swamp x10
+
+[Bot2 Deck]
+Sunfall
+Life // Death
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Inquisition of Kozilek.Cast(Bot2)
+Bot1.Choose(Life // Death)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Life // Death
+Bot2.Hand.Count = 6

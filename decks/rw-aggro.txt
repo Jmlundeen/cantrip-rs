@@ -1,0 +1,51 @@
+# RW Aggro: a one-drop on turn one, another on turn two, and burn for whatever gets in the way.
+#
+# Forty cards, singleton but for the basics. Fifteen creatures, almost all of them one or two mana, with Adeline, Hero
+# of Bladehold and Monastery Mentor turning a board into more of one; seven pieces of removal, most of which can go to
+# the face instead. Nothing above four mana, because a deck that wants the game over by turn six has no use for it.
+#
+#   tools\bots-deck-duel.cmd -Deck1 rw-aggro -Deck2 ub-reanimator -Games 400
+
+# One mana
+1 Ragavan, Nimble Pilferer
+1 Dragon's Rage Channeler
+1 Figure of Destiny
+1 Ocelot Pride
+1 Thraben Inspector
+1 Mother of Runes
+1 Guide of Souls
+
+# Two and up
+1 Luminarch Aspirant
+1 Thalia, Guardian of Thraben
+1 Adeline, Resplendent Cathar
+1 Inti, Seneschal of the Sun
+1 Monastery Mentor
+1 Seasoned Pyromancer
+1 Hero of Bladehold
+1 Phlage, Titan of Fire's Fury
+
+# Burn and removal
+1 Lightning Bolt
+1 Chain Lightning
+1 Swords to Plowshares
+1 Path to Exile
+1 Burst Lightning
+1 Abrade
+1 Flame Slash
+
+# Equipment
+1 Cori-Steel Cutter
+
+# Lands
+1 Plateau
+1 Sacred Foundry
+1 Elegant Parlor
+1 Inspiring Vantage
+1 Sunbaked Canyon
+1 Arid Mesa
+1 Wooded Foothills
+1 Windswept Heath
+1 Arena of Glory
+4 Mountain
+4 Plains

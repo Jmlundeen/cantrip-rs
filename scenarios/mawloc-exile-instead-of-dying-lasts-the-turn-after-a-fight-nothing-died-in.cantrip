@@ -1,0 +1,52 @@
+# Mawloc: "If that creature would die THIS TURN, exile it instead" - the replacement is made by the ability itself, and holds
+# for the whole turn. Mawloc (X = 0, a 2/2) fights Bot2's Aang, Swift Savior (2/3): Mawloc dies, Aang survives with 2 damage,
+# and later in the turn a Lightning Bolt that would kill Aang exiles it instead of putting it into the graveyard.
+
+[Bot1 Deck]
+Mountain
+Forest
+Mox Ruby
+Mawloc
+Lightning Bolt
+Mountain x20
+
+[Bot2 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Aang, Swift Savior
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Aang, Swift Savior.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Mawloc.Cast(X: 0)
+Bot1.Target(Aang, Swift Savior)
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Aang, Swift Savior)
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Exile = Aang, Swift Savior
+Bot2.Graveyard.Count = 0
+Bot1.Graveyard = Lightning Bolt; Mawloc

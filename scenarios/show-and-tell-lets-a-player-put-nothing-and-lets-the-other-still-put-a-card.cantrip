@@ -1,0 +1,40 @@
+# Show and Tell says "may": Bot1 chooses no card even though it has an eligible creature, and Bot2 still puts its land
+# onto the battlefield. Each player's choice is their own.
+
+[Bot1 Deck]
+Island
+Island
+Island
+Show and Tell
+Mother of Runes
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Plains
+Lightning Bolt
+Island x5
+Island x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose()
+Bot2.Choose(Plains)
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Island; Island; Island
+Bot1.Hand = Plains; Plains; Plains; Plains; Mother of Runes
+Bot2.Battlefield = Plains

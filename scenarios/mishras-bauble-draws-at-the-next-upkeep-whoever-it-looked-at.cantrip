@@ -1,0 +1,27 @@
+# Mishra's Bauble: "{T}, Sacrifice this artifact: Look at the top card of target player's library. Draw a card at the
+# beginning of the next turn's upkeep." Bot1 targets Bot2's library on turn 1: the Bauble is sacrificed as a cost, nothing is
+# drawn yet, and at the beginning of turn 2's upkeep (Bot2's turn) Bot1 draws one card - once, not again on turn 3's.
+
+[Bot1 Deck]
+Mishra's Bauble
+Island x7
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mishra's Bauble.Cast
+Bot1.Pass
+Bot1.Battlefield.Mishra's Bauble.Activate(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 6
+? Bot1.Graveyard = Mishra's Bauble
+[T2 Bot2.Main1]
+? Bot1.Hand.Count = 7
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 8
+
+[Expect]
+Turn = 3

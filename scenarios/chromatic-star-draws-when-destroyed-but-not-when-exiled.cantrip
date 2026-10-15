@@ -1,0 +1,52 @@
+# "When this artifact is put into a graveyard from the battlefield, draw a card": any trip to the graveyard counts, not
+# only its own sacrifice, and a trip anywhere else does not. Bot1 has two Stars out. On turn two Bot2's Disenchant
+# destroys one: it goes to the graveyard and Bot1 draws (hand 3 -> 4). On turn four Bot2's Prismatic Ending (X=1, one
+# color spent) exiles the other: no graveyard, no draw (hand 5 -> 5, after the turn-three draw).
+
+[Bot1 Deck]
+Plains
+Mox Jet
+Chromatic Star
+Chromatic Star
+Plains
+Plains
+Plains
+Plains x12
+
+[Bot2 Deck]
+Plains
+Plains
+Mox Pearl
+Disenchant
+Prismatic Ending
+Plains x3
+Plains x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Chromatic Star.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Chromatic Star.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Disenchant.Cast(Chromatic Star)
+[T2 Bot2.Main2]
+? Bot1.Graveyard = Chromatic Star
+? Bot1.Hand.Count = 4
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains#1.Activate
+Bot2.Battlefield.Plains#2.Activate
+Bot2.Hand.Prismatic Ending.Cast(Chromatic Star; X: 1)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield = Plains; Mox Jet
+Bot1.Graveyard = Chromatic Star
+Bot1.Hand.Count = 5
+Exile = Chromatic Star

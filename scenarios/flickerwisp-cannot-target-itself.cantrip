@@ -1,0 +1,33 @@
+# "Exile another target permanent": Flickerwisp is itself a permanent on the battlefield when its enters trigger asks for a
+# target, but it is not "another" one, so it is not among the candidates (the refusal), while a Plains is (the choice that
+# follows). The Plains is in exile until the end step.
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Flickerwisp
+Plains x3
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Hand.Flickerwisp.Cast
+Bot1.Pass
+! Bot1.Target(Flickerwisp)
+Bot1.Target(Plains#3)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Exile = Plains

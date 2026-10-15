@@ -1,0 +1,55 @@
+use cantrip_api::*;
+use cantrip_mechanics::attach::attached_object;
+use cantrip_mechanics::reconfigure;
+use cantrip_mechanics::targets;
+use cantrip_oracle as oracle;
+
+/// "{W}: Exile target card from a graveyard. If it was a permanent card, put a +1/+1 counter on this permanent."
+fn exile_from_graveyard(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let Some(card) = targets::object(g, item, 0) else { return Ok(()) };
+    let types = g.chars(card).types;
+    let permanent = types.has(CardType::Artifact)
+        || types.has(CardType::Creature)
+        || types.has(CardType::Enchantment)
+        || types.has(CardType::Land)
+        || types.has(CardType::Planeswalker)
+        || types.has(CardType::Battle);
+    g.exile(card);
+    if permanent && targets::permanent(g, item.object) {
+        g.add_counters(item.object, CounterKind::PlusOne, 1);
+    }
+    Ok(())
+}
+
+/// "Equipped creature gets +1/+1 for each +1/+1 counter on this Equipment."
+fn per_counter(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
+    let n = q.state().obj(source).counters(CounterKind::PlusOne).max(0);
+    chars.power = chars.power.map(|v| v + n);
+    chars.toughness = chars.toughness.map(|v| v + n);
+}
+
+pub static CARD: CardDef = CardDef {
+    abilities: &[
+        AbilityDef::Activated(ActivatedDef {
+            text: "{W}: Exile target card from a graveyard. If it was a permanent card, put a +1/+1 counter on this permanent.",
+            cost: Cost { mana: mana(0, 1, 0, 0, 0, 0), ..Cost::NONE },
+            targets: &[targets::CARD_IN_A_GRAVEYARD],
+            effect: exile_from_graveyard,
+            ..ActivatedDef::BLANK
+        }),
+        reconfigure::attach(mana(2, 0, 0, 0, 0, 0), "Reconfigure {2} ({2}: Attach this permanent to another target creature you control. Reconfigure only as a sorcery.)"),
+        reconfigure::unattach(mana(2, 0, 0, 0, 0, 0), "Reconfigure {2} ({2}: Unattach this permanent. Reconfigure only if it is attached to a creature and only as a sorcery.)"),
+    ],
+    statics: &[
+        StaticDef {
+            text: "Equipped creature gets +1/+1 for each +1/+1 counter on this Equipment.",
+            layer: Layer::PtModify,
+            affects: attached_object,
+            apply: per_counter,
+            ..StaticDef::BLANK
+        },
+        reconfigure::NOT_A_CREATURE_WHILE_ATTACHED,
+    ],
+    reconfigure: true,
+    ..oracle::LION_SASH
+};

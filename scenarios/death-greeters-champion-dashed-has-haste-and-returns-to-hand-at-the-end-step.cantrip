@@ -1,0 +1,26 @@
+# Dash {3}{R} (CR 702.109a): cast for its dash cost the Champion has haste, so it attacks the turn it arrives, and it is
+# returned to its owner's hand at the beginning of the next end step. Backing itself up makes it a 3/2 double striker:
+# 20 - 6 = 14. Black Lotus and a Mox Ruby pay for the dash.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Death-Greeter's Champion
+Island x12
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Death-Greeter's Champion.Cast(Ability: Dash)
+Bot1.Attack(Death-Greeter's Champion > Bot2)
+[Bot1.End]
+
+[Expect]
+Bot2.Life = 14
+Bot1.Hand = Death-Greeter's Champion; Island; Island; Island; Island
+Bot1.Battlefield = Mox Ruby

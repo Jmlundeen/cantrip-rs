@@ -1,0 +1,45 @@
+# Mox Amber: "Add one mana of any color among legendary creatures and planeswalkers you control." Only legendary
+# creatures and planeswalkers, and only Bot1's own, give a color: Cecil, Dark Knight (black) does. Llanowar Elves is a green
+# creature but not legendary, Bot2's Thalia, Guardian of Thraben is a white legendary creature it does not control,
+# and Mox Amber itself is a legendary artifact, so green and white are refused beside the black it may add, and so are
+# the other colors and colorless.
+
+[Bot1 Deck]
+Swamp
+Mox Amber
+Cecil, Dark Knight
+Mox Emerald
+Llanowar Elves
+Swamp x15
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Thalia, Guardian of Thraben
+Plains x15
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Amber.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Cecil, Dark Knight.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Thalia, Guardian of Thraben.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Mox Amber.Activate(Color: Green)
+! Bot1.Battlefield.Mox Amber.Activate(Color: White)
+! Bot1.Battlefield.Mox Amber.Activate(Color: Red)
+! Bot1.Battlefield.Mox Amber.Activate(Color: Blue)
+! Bot1.Battlefield.Mox Amber.Activate(Color: Colorless)
+Bot1.Battlefield.Mox Amber.Activate(Color: Black)
+? Bot1.Mana = {B}
+
+[Expect]
+Bot1.Battlefield.Mox Amber.Tapped = true

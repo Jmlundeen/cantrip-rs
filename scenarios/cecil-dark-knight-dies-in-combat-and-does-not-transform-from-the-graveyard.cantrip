@@ -1,0 +1,56 @@
+# Cecil, Dark Knight: damage dealt to a creature counts too, and the trigger works from last-known information
+# (CR 603.10a). Bot1 bolts itself to 11 on turn 1; on turn 3 Cecil attacks, Bot2's Cathar Commando (3/1) blocks, and
+# both die (deathtouch, 3 damage). Cecil dealt 2, so Bot1 loses 2 (9, at most 10) - but the condition's "untap Cecil and
+# transform it" finds no Cecil on the battlefield (CR 400.7), and the card in the graveyard does not come back.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Cecil, Dark Knight
+Swamp
+Swamp x12
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Cathar Commando
+Plains x15
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Cecil, Dark Knight.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Cathar Commando.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+[T3 Bot1.Main1]
+? Bot1.Life = 11
+Bot1.Attack(Cecil, Dark Knight)
+Bot2.Block(Cathar Commando > Cecil, Dark Knight)
+[T3 Bot1.Main2]
+? Bot1.Life = 9
+
+[Expect]
+Bot1.Life = 9
+Bot1.Graveyard = Cecil, Dark Knight; Lightning Bolt; Lightning Bolt; Lightning Bolt; Black Lotus
+Bot2.Graveyard = Cathar Commando
+Bot1.Battlefield = Swamp

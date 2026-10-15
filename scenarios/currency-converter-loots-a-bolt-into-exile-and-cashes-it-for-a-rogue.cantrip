@@ -1,0 +1,46 @@
+# Currency Converter's three lines in one game. "{2}, {T}: Draw a card, then discard a card" throws away the Bolt;
+# "whenever you discard a card, you may exile that card from your graveyard" catches it on the way, so the Bolt is
+# exiled with the artifact rather than lying in the graveyard. Two turns later "{T}: Put a card exiled with this
+# artifact into its owner's graveyard" spends it: one card in the store is no choice, and a nonland card pays out a
+# 2/2 black Rogue rather than a Treasure.
+
+[Bot1 Deck]
+Swamp
+Currency Converter
+Swamp
+Lightning Bolt
+Swamp
+Swamp
+Swamp
+Swamp
+Forest
+Swamp x11
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Currency Converter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Currency Converter.Activate(Ability: Draw a card)
+Bot1.Choose(Lightning Bolt)
+Bot1.Accept
+? Exile = Lightning Bolt
+? Bot1.Graveyard.Count = 0
+[T5 Bot1.Main1]
+Bot1.Battlefield.Currency Converter.Activate(Ability: Treasure)
+
+[Expect]
+Turn = 5
+Exile.Count = 0
+Bot1.Graveyard = Lightning Bolt
+Bot1.Battlefield = Currency Converter; Rogue; Swamp; Swamp
+Bot1.Battlefield.Rogue.Power = 2
+Bot1.Battlefield.Rogue.Toughness = 2
+Bot1.Battlefield.Currency Converter.Tapped = true
+Stack.Count = 0

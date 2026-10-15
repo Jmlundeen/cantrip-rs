@@ -1,0 +1,118 @@
+use cantrip_api::*;
+use cantrip_mechanics::choose;
+use cantrip_mechanics::targets;
+use cantrip_oracle as oracle;
+
+/// The 1/1 black and green Insect creature token the +1 makes.
+pub static INSECT: CardDef = CardDef {
+    name: "Insect",
+    has_cost: false,
+    colors: Some(ColorSet(0b10100)),
+    types: TypeSet::of(&[CardType::Creature]),
+    subtypes: SubtypeSet::of(&[Subtype::Insect]),
+    power: Some(1),
+    toughness: Some(1),
+    ..CardDef::BLANK
+};
+
+/// "As long as Grist isn't on the battlefield, it's a 1/1 Insect creature in addition to its other types": a
+/// characteristic-defining ability (CR 604.3) that works in every zone, in two layers (CR 613.1d, 613.4a).
+fn insect_types(q: &dyn LayerQuery, grist: ObjectId, chars: &mut Chars) {
+    if !q.state().obj(grist).zone.is(ZoneKind::Battlefield) {
+        chars.types = chars.types.with(CardType::Creature);
+        chars.subtypes = chars.subtypes.with(Subtype::Insect);
+    }
+}
+
+fn insect_size(q: &dyn LayerQuery, grist: ObjectId, chars: &mut Chars) {
+    if !q.state().obj(grist).zone.is(ZoneKind::Battlefield) {
+        chars.power = Some(1);
+        chars.toughness = Some(1);
+    }
+}
+
+/// +1: "Create a 1/1 black and green Insect creature token, then mill a card. If an Insect card was milled this way,
+/// put a loyalty counter on Grist and repeat this process." Grist herself, milled, is an Insect card. The counter goes only on Grist if
+/// she is still the permanent that activated this; otherwise the ability goes on making tokens and milling.
+fn plus_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let player = item.controller;
+    let grist = item.object;
+    loop {
+        cantrip_mechanics::tokens::create(g, player, &INSECT, 1)?;
+        let Some(&milled) = g.mill(player, 1).first() else { return Ok(()) };
+        if !g.chars(milled).has_subtype(Subtype::Insect) {
+            return Ok(());
+        }
+        if targets::permanent(g, grist) {
+            g.add_counters(grist, CounterKind::Loyalty, 1);
+        }
+    }
+}
+
+/// -2: "You may sacrifice a creature. When you do, destroy target creature or planeswalker." The creature is chosen
+/// as the ability resolves, not targeted, and the reflexive trigger exists only if one was sacrificed (CR 603.12),
+/// whether or not Grist is still on the battlefield.
+fn minus_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let player = item.controller;
+    let creatures: Vec<ObjectId> = g.permanents_of(player).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
+    let chosen = choose::cards(g, player, item.object, Purpose::Sacrifice, creatures, 1, true)?;
+    let Some(&creature) = chosen.first() else { return Ok(()) };
+    g.sacrifice(&[creature]);
+    let me = g.card_id(&CARD);
+    g.reflexive_trigger(item.object, player, AbilityRef::delayed(me, 0), Target::None);
+    Ok(())
+}
+
+fn destroy_target(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    cantrip_mechanics::destroy_target(g, item, 0);
+    Ok(())
+}
+
+/// -5: "Each opponent loses life equal to the number of creature cards in your graveyard", counted as it resolves.
+fn minus_five(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let player = item.controller;
+    let count = g.state().zone(Zone::graveyard(player)).iter().filter(|&&card| g.chars(card).is(CardType::Creature)).count();
+    if count > 0 {
+        g.each_opponent_loses_life(player, count as i32);
+    }
+    Ok(())
+}
+
+pub static CARD: CardDef = CardDef {
+    abilities: &[
+        AbilityDef::Activated(ActivatedDef {
+            text: "+1: Create a 1/1 black and green Insect creature token, then mill a card. If an Insect card was milled this way, put a loyalty counter on Grist and repeat this process.",
+            cost: Cost { loyalty: Some(1), ..Cost::NONE },
+            timing: Timing::Sorcery,
+            effect: plus_one,
+            ..ActivatedDef::BLANK
+        }),
+        AbilityDef::Activated(ActivatedDef {
+            text: "\u{2212}2: You may sacrifice a creature. When you do, destroy target creature or planeswalker.",
+            cost: Cost { loyalty: Some(-2), ..Cost::NONE },
+            timing: Timing::Sorcery,
+            effect: minus_two,
+            ..ActivatedDef::BLANK
+        }),
+        AbilityDef::Activated(ActivatedDef {
+            text: "\u{2212}5: Each opponent loses life equal to the number of creature cards in your graveyard.",
+            cost: Cost { loyalty: Some(-5), ..Cost::NONE },
+            timing: Timing::Sorcery,
+            effect: minus_five,
+            ..ActivatedDef::BLANK
+        }),
+    ],
+    delayed: &[AbilityDef::Triggered(TriggeredDef {
+        text: "When you do, destroy target creature or planeswalker.",
+        targets: &[targets::CREATURE_OR_PLANESWALKER],
+        effect: destroy_target,
+        ..TriggeredDef::BLANK
+    })],
+    statics: &[
+        StaticDef { text: "As long as Grist isn't on the battlefield, it's a 1/1 Insect creature in addition to its other types.", layer: Layer::Type, apply: insect_types, own: true, ..StaticDef::BLANK },
+        StaticDef { text: "As long as Grist isn't on the battlefield, it's a 1/1 Insect creature in addition to its other types.", layer: Layer::PtDefine, apply: insect_size, own: true, ..StaticDef::BLANK },
+    ],
+    ..oracle::GRIST_THE_HUNGER_TIDE
+};
+
+pub static EXTRA: &[&CardDef] = &[&INSECT];

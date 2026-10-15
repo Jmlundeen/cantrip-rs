@@ -1,0 +1,24 @@
+# The real card-choice presenter receives an authorized opposing hand, not a guessed own-hand fixture.
+[Bot1 Deck]
+Swamp
+Duress
+Swamp x10
+
+[Bot2 Deck]
+Lightning Bolt
+Counterspell
+Guerrilla Gorilla
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Duress.Cast(Bot2)
+[Handover Bot1.Choose]
+
+[Expect]
+Turn = 1
+Stack = Duress
+Bot1.Graveyard.Count = 0
+Bot2.Hand.Count = 7
+Bot2.Graveyard.Count = 0

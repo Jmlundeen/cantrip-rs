@@ -1,0 +1,6 @@
+{
+  "name": "Mystic Forge",
+  "manaCost": "{4}",
+  "type": "Artifact",
+  "oracleText": "You may look at the top card of your library any time.\nYou may cast artifact spells and colorless spells from the top of your library.\n{T}, Pay 1 life: Exile the top card of your library."
+}

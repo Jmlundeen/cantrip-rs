@@ -1,0 +1,44 @@
+# Rebound's cast is a cast like any other (CR 702.88a, 601.2c), so a card with no legal target cannot be cast and
+# simply stays in exile - the 2019-06-14 ruling: "If you choose not to cast the card, or if you can't (perhaps because
+# there are no legal targets available), the card will stay exiled. You won't get another chance to cast it on a
+# future turn." Bot1 blinks Thraben Inspector on turn 3; Bot2 bolts the Inspector on turn 4; at Bot1's turn 5 upkeep
+# Bot1 controls no creature, nothing is offered, and Ephemerate stays in exile on turn 7 too.
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Thraben Inspector
+Ephemerate
+Plains
+Plains
+Plains x13
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Thraben Inspector.Cast
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Ephemerate.Cast(Thraben Inspector)
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Thraben Inspector)
+[T5 Bot1.Main1]
+? Exile = Ephemerate
+! Bot1.Exile.Ephemerate.Cast
+[T7 Bot1.Main1]
+! Bot1.Exile.Ephemerate.Cast
+
+[Expect]
+Turn = 7
+Exile = Ephemerate
+Bot1.Graveyard = Thraben Inspector
+Bot1.Battlefield = Plains; Plains; Clue Token; Clue Token

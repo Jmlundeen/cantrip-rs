@@ -1,0 +1,65 @@
+# Worldspine Wurm: cast on turn three from eleven mana, it dies to Bot2's Wrath of God on turn four. Its death makes
+# three 5/5 green Wurm tokens with trample, and being put into a graveyard shuffles the card itself into its owner's
+# library, so only the Black Lotus is in Bot1's graveyard and the library grows by one.
+
+[Bot1 Deck]
+Ancient Tomb
+Mana Crypt
+Black Lotus
+Mox Emerald
+Sol Ring
+Worldspine Wurm
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Sol Ring
+Wrath of God
+Plains x2
+Plains x10
+
+[Actions]
+Bot1.Hand.Ancient Tomb.Play
+Bot1.Hand.Mana Crypt.Cast
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Ancient Tomb.Activate
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Worldspine Wurm.Cast
+Bot1.Pass
+[Bot1.Main2]
+? Bot1.Battlefield.Worldspine Wurm.Power = 15
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Hand.Wrath of God.Cast
+Bot2.Pass
+[T5 Bot1.Upkeep]
+
+[Expect]
+Bot1.Graveyard = Black Lotus
+Bot1.Library.Count = 11
+Bot1.Battlefield = Ancient Tomb; Forest; Mana Crypt; Mox Emerald; Sol Ring; Wurm; Wurm; Wurm
+Bot1.Battlefield.Wurm#1.Power = 5
+Bot1.Battlefield.Wurm#1.Toughness = 5
+Bot1.Battlefield.Wurm#1.Keywords = Trample
+Bot2.Graveyard = Wrath of God

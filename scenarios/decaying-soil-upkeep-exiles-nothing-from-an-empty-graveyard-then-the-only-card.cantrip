@@ -1,0 +1,58 @@
+# Decaying Soil: "At the beginning of your upkeep, exile a card from your graveyard." On turn 3 the graveyard is empty and
+# nothing is exiled. Bot1 then casts a Lightning Bolt; on turn 5 the Bolt is the only card in the graveyard and is
+# exiled, with nothing to choose. The threshold ability is not on the Soil (one card, not seven), so the Ornithopter
+# that Bot2 bolts on turn 6 does not trigger it: the stack is empty and the Ornithopter stays in the graveyard.
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Ruby
+Decaying Soil
+Lightning Bolt
+Ornithopter
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Decaying Soil.Cast
+Bot1.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+? Exile.Count = 0
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+? Exile = Lightning Bolt
+? Bot1.Graveyard.Count = 0
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T6 Bot2.Main1]
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 0
+[T6 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Ornithopter
+Exile = Lightning Bolt
+Bot2.Life = 17

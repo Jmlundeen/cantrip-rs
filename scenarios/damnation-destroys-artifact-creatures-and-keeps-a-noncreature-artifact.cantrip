@@ -1,0 +1,40 @@
+# Destroy all creatures: an artifact creature is a creature (Ornithopter, Haywire Mite) and dies; a noncreature artifact
+# (Sol Ring) stays. They are destroyed at the same time (CR 701.8b), so Haywire Mite's "when this creature dies, you gain
+# 2 life" triggers as it dies with Ornithopter (CR 603.10a): 20 + 2 = 22.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Ornithopter
+Sol Ring
+Haywire Mite
+Damnation
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Haywire Mite.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+? Bot1.Battlefield.Ornithopter.Types = Artifact; Creature
+Bot1.Hand.Damnation.Cast
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot1.Graveyard = Damnation; Haywire Mite; Ornithopter; Black Lotus
+Bot1.Battlefield = Mox Pearl; Sol Ring

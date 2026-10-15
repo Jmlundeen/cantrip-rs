@@ -1,0 +1,51 @@
+# "+1/+0 for each artifact you control" is continuous (CR 611.3a): equipped on turn three, the first Ornithopter is a 5/2
+# (two Moxen, the Plating, two Ornithopters). Bot2's Disenchant destroys a Mox Jet at the end of that turn and the
+# Ornithopter is a 4/2 on turn four. Then Bot2's Lightning Bolt kills the equipped Ornithopter: the Equipment stays on the
+# battlefield, unattached (CR 704.5n), and the remaining Ornithopter has no bonus.
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Cranial Plating
+Ornithopter
+Ornithopter
+Swamp x10
+
+[Bot2 Deck]
+Mountain
+Mox Pearl
+Mox Ruby
+Disenchant
+Lightning Bolt
+Mountain x10
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Cranial Plating.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Cranial Plating.Activate(Ornithopter#1; Ability: Equip {1})
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Ornithopter#1.Power = 5
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Mox Jet#2)
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Ornithopter#1.Power = 4
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter#1)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Jet; Cranial Plating; Ornithopter
+Bot1.Battlefield.Cranial Plating.AttachedTo = (absent)
+Bot1.Battlefield.Ornithopter.Power = 0

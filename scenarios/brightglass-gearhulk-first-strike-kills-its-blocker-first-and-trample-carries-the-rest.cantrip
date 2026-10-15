@@ -1,0 +1,50 @@
+# Brightglass Gearhulk: "First strike, trample" (CR 702.7b, 702.19c). Blocked by a 2/2, it deals its damage in the first
+# combat damage step - 2 to the Gorilla, the 2 beyond lethal to Bot2 - so the Gorilla is dead before it can strike back and
+# the Gearhulk ends combat undamaged.
+
+[Bot1 Deck]
+Forest
+Forest
+Plains
+Plains
+Brightglass Gearhulk
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Forest
+Forest
+Guerrilla Gorilla
+Swamp x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot2.Hand.Forest.Play
+Bot1.Hand.Forest.Play
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+Bot1.Hand.Plains.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Brightglass Gearhulk.Cast
+Bot1.Decline
+[T9 Bot1.Main1]
+Bot1.Attack(Brightglass Gearhulk)
+Bot2.Block(Guerrilla Gorilla > Brightglass Gearhulk)
+Bot1.AssignDamage(Brightglass Gearhulk > Guerrilla Gorilla: 2; Brightglass Gearhulk > Bot2: 2)
+[Bot1.Main2]
+
+[Expect]
+Turn = 9
+Step = Main2
+Bot2.Life = 18
+Bot2.Battlefield.Count = 2
+Bot2.Graveyard = Guerrilla Gorilla; Swamp
+Bot1.Battlefield.Brightglass Gearhulk.Damage = 0

@@ -1,0 +1,42 @@
+# Biomass Mutation with X = 3: Elvish Mystic (1/1) and Ornithopter (0/2) both become 3/3 until end of turn, and the
+# opponent's Llanowar Elves is left alone.
+
+[Bot1 Deck]
+Forest
+Elvish Mystic
+Black Lotus
+Biomass Mutation
+Ornithopter
+Forest
+Forest
+Forest x12
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Biomass Mutation.Cast(X: 3)
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Elvish Mystic.Power = 3
+Bot1.Battlefield.Elvish Mystic.Toughness = 3
+Bot1.Battlefield.Ornithopter.Power = 3
+Bot1.Battlefield.Ornithopter.Toughness = 3
+Bot2.Battlefield.Llanowar Elves.Power = 1

@@ -1,0 +1,33 @@
+# Bot2 casts Duress on its first turn; Bot1, tapped out of nothing but with an Island in play, casts Daze for its
+# alternative cost, returning the Island. Bot2 has no mana left to pay the {1}, so Duress is countered.
+
+[Bot1 Deck]
+Island
+Daze
+5 Island
+10 Island
+
+[Bot2 Deck]
+Swamp
+Duress
+5 Swamp
+10 Swamp
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Duress.Cast(Bot1)
+Bot1.Hand.Daze.Cast(Duress; Ability: Return an Island)
+Bot1.Choose(Island)
+? Stack = Daze; Duress
+
+[Expect]
+Turn = 2
+ActivePlayer = Bot2
+Stack.Count = 0
+Bot1.Graveyard = Daze
+Bot2.Graveyard = Duress
+Bot1.Battlefield.Count = 0
+Bot1.Hand = Island; Island; Island; Island; Island; Island
+Bot2.Hand.Count = 6

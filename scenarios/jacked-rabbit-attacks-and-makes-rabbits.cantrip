@@ -1,0 +1,30 @@
+# Jacked Rabbit cast for X = 1 enters with a +1/+1 counter, so it is a 2/3; when it attacks it makes two 1/1 white Rabbit
+# tokens, which are not attacking. The script ends with the trigger resolved, before damage.
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Jacked Rabbit
+Plains x10
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Plains.Play
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Jacked Rabbit.Cast(X: 1)
+Bot1.Attack(Jacked Rabbit)
+
+[Expect]
+Bot1.Battlefield = Plains; Plains; Plains; Jacked Rabbit; Rabbit; Rabbit
+Bot1.Battlefield.Jacked Rabbit.Power = 2
+Bot1.Battlefield.Jacked Rabbit.Toughness = 3
+Step = Attackers
+Combat.Attackers = Jacked Rabbit > Bot2
+Bot2.Life = 20

@@ -1,0 +1,38 @@
+# Prepare (CR 722): Emeritus of Ideation enters prepared, which puts a copy of Ancestral Recall in exile that its
+# controller may cast. Casting it unprepares the creature and takes the copy with it, so nothing is left behind.
+
+[Bot1 Deck]
+Island x5
+Emeritus of Ideation
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Emeritus of Ideation.Cast
+[T11 Bot1.Main1]
+? Exile = Ancestral Recall
+? Bot1.Battlefield.Emeritus of Ideation.Prepared = true
+Bot1.Battlefield.Island.Activate
+Bot1.Exile.Ancestral Recall.Cast(Bot1)
+[T11 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Island; Island; Island; Island; Island; Emeritus of Ideation
+Exile.Count = 0
+Bot1.Graveyard.Count = 0

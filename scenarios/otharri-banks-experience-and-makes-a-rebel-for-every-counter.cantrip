@@ -1,0 +1,62 @@
+# Otharri, Suns' Glory is cast on turn 9 and attacks the same turn, because he has haste. His trigger gives Bot1 an
+# experience counter and then makes one 2/2 red Rebel per experience counter (CR 122.1, 508.4) — so the first attack
+# makes one Rebel, tapped and attacking, and it was never declared. Lifelink on a 3/3 flier takes Bot2 to 15 and puts
+# Bot1 to 23, and the Rebel adds 2 more.
+#
+# Turn 11 is the half a single attack cannot show: a second counter, and now two Rebels at once rather than one,
+# because the count is the player's running total and not anything on the creature. Otharri dying and buying himself
+# back out of the graveyard is the other half, and it is in CubeOtharriTests, which can kill him on purpose.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Mountain
+Plains
+Plains
+Otharri, Suns' Glory
+Mountain x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Otharri, Suns' Glory.Cast
+Bot1.Pass
+Bot2.Pass
+
+# Haste: he attacks the turn he arrives. The counter comes before the count, so one Rebel, not none.
+Bot1.Attack(Otharri, Suns' Glory > Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Experience = 1
+? Combat.Attackers = Otharri, Suns' Glory > Bot2; Rebel > Bot2
+? Bot1.Battlefield.Rebel.Tapped = True
+[T9 Bot1.Main2]
+? Bot2.Life = 15
+? Bot1.Life = 23
+
+[T11 Bot1.Main1]
+Bot1.Attack(Otharri, Suns' Glory > Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Experience = 2
+[T11 Bot1.Main2]
+
+[Expect]
+Turn = 11
+Bot1.Experience = 2
+Bot1.Battlefield = Mountain; Mountain; Mountain; Plains; Plains; Otharri, Suns' Glory; Rebel; Rebel; Rebel

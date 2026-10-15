@@ -1,0 +1,37 @@
+# Only two cards are left in the library when Flow State resolves with an instant and a sorcery in the graveyard:
+# both go to the hand, and nothing is left for the bottom.
+
+[Bot1 Deck]
+Mountain
+Island
+Mountain
+Chain Lightning
+Lightning Bolt
+Flow State
+Swamp
+Swamp
+Swamp
+Counterspell
+Ancestral Recall
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Chain Lightning.Cast(Bot2)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Hand.Flow State.Cast
+Bot1.Arrange(Counterspell; Ancestral Recall | )
+
+[Expect]
+Bot1.Hand = Swamp; Swamp; Swamp; Counterspell; Ancestral Recall
+Bot1.Library.Count = 0

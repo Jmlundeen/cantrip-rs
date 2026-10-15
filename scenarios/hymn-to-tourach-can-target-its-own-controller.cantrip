@@ -1,0 +1,26 @@
+# "Target player": Bot1 casts Hymn on itself and discards the two other cards of its hand (a Swamp pair), the Hymn going to
+# the graveyard after them.
+
+[Bot1 Deck]
+Swamp
+Hymn to Tourach
+Swamp
+Island
+Island
+Swamp x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Hymn to Tourach.Cast(Bot1)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 3
+Bot1.Graveyard.Count = 3

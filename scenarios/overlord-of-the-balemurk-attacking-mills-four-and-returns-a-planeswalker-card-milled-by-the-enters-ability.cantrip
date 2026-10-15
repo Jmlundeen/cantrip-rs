@@ -1,0 +1,43 @@
+# Cast for its mana cost it is a 5/5 creature with no time counters. Its enters ability mills Chandra and the player
+# returns nothing; attacking next turn triggers the same ability again, and now Chandra - milled by an earlier
+# resolution, not by this one - is returned (the ruling: any eligible card in the graveyard).
+
+[Bot1 Deck]
+Swamp
+Swamp
+Black Lotus
+Overlord of the Balemurk
+Swamp
+Swamp
+Swamp
+Swamp
+Chandra, Torch of Defiance
+Lightning Bolt
+Swamp
+Swamp
+Swamp x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Overlord of the Balemurk.Cast
+Bot1.Choose()
+[T5 Bot1.Main1]
+Bot1.Attack(Overlord of the Balemurk)
+Bot1.Choose(Chandra, Torch of Defiance)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 15
+Bot1.Battlefield.Overlord of the Balemurk.Types = Enchantment; Creature
+Bot1.Battlefield.Overlord of the Balemurk.Counters.Time = (absent)
+Bot1.Hand.Count = 6
+Bot1.Hand = Chandra, Torch of Defiance; Swamp; Swamp; Swamp; Swamp; Swamp

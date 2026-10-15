@@ -1,0 +1,21 @@
+# Urza's Bauble: "Look at a card at random in target player's hand." The look moves nothing but it happens, and the game
+# records it as Bot1's: Bot2's hand is all Swamps, so the card looked at is a Swamp whichever is picked at random. Aimed
+# at its own controller the look is just as real: Bot1's hand is all Islands. Bot2 looked at nothing.
+
+[Bot1 Deck]
+Urza's Bauble
+Urza's Bauble
+Island x14
+
+[Bot2 Deck]
+Swamp x14
+
+[Actions]
+Bot1.Hand.Urza's Bauble.Cast
+Bot1.Battlefield.Urza's Bauble.Activate(Bot2)
+Bot1.Hand.Urza's Bauble.Cast
+Bot1.Battlefield.Urza's Bauble.Activate(Bot1)
+
+[Expect]
+Bot1.Looked = Swamp; Island
+Bot2.Looked = (absent)

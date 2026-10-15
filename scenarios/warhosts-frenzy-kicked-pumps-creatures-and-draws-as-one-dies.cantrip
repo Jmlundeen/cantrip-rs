@@ -1,0 +1,40 @@
+# Warhost's Frenzy, kicked with {B}: creatures you control get +2/+0 until end of turn, and whenever a creature you
+# control dies this turn Bot1 draws a card. Bot1 then sacrifices the Ornithopter (a 2/2 until then) to Village Rites,
+# drawing for the death on top of the two cards Village Rites draws.
+
+[Bot1 Deck]
+Swamp
+Mox Ruby
+Black Lotus
+Ornithopter
+Warhost's Frenzy
+Village Rites
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Warhost's Frenzy.Cast(Kicked: 1)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Pass
+[T1 Bot1.End]
+? Bot1.Battlefield.Ornithopter.Power = 2
+? Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot1.Hand.Village Rites.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Choose(Ornithopter)
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Hand.Count = 4
+Bot1.Battlefield = Swamp; Mox Ruby
+Bot1.Graveyard = Village Rites; Ornithopter; Warhost's Frenzy; Black Lotus

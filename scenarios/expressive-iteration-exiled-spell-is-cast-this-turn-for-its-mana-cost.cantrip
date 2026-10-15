@@ -1,0 +1,34 @@
+# "You may play the exiled card this turn": the exiled Lightning Bolt is cast from exile paying its {R} like any spell (from a
+# Mountain played first), at Bot2, who goes to 17. Nothing is left in exile.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Sapphire
+Expressive Iteration
+Mountain
+Swamp
+Swamp
+Swamp
+Swamp
+Lightning Bolt
+Island
+Swamp x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Expressive Iteration.Cast
+Bot1.Arrange(Swamp | Island | Lightning Bolt)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+[T1 Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot2.Life = 17

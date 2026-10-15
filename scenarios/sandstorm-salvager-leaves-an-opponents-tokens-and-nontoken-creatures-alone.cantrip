@@ -1,0 +1,48 @@
+# "Each creature token you control": Bot2 has a Salvager of its own and its Golem token, Bot1 has a Salvager and its Golem. Bot1's
+# ability on turn 3 puts a counter on its own Golem alone (a 4/4 with trample) - not on Bot2's Golem (a 3/3), not on either
+# Salvager (a nontoken creature, 1/1).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Mox Jet
+Sandstorm Salvager
+Forest x13
+
+[Bot2 Deck]
+Mox Emerald
+Mox Ruby
+Mox Jet
+Sandstorm Salvager
+Forest x13
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Sandstorm Salvager.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Sandstorm Salvager.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Sandstorm Salvager.Activate
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Golem.Power = 4
+Bot1.Battlefield.Golem.Keywords = Trample
+Bot2.Battlefield.Golem.Power = 3
+Bot2.Battlefield.Golem.Keywords = (absent)
+Bot1.Battlefield.Sandstorm Salvager.Power = 1
+Bot2.Battlefield.Sandstorm Salvager.Power = 1

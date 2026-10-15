@@ -1,0 +1,8 @@
+{
+  "name": "Hexdrinker",
+  "manaCost": "{G}",
+  "type": "Creature — Snake",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "Level up {1} ({1}: Put a level counter on this. Level up only as a sorcery.)\nLEVEL 3-7\n4/4\nProtection from instants\nLEVEL 8+\n6/6\nProtection from everything"
+}

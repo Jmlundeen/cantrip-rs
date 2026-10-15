@@ -1,0 +1,30 @@
+# "Enters tapped unless you control two or fewer other lands": with three other lands (turn 7) the Gorge enters tapped, one more
+# than the limit that lets it enter untapped (the existing scenario has it untapped with two). On turn 9 it taps for {R}, the
+# other colour of "{R} or {G}".
+
+[Bot1 Deck]
+Mountain
+Mountain
+Mountain
+Copperline Gorge
+Mountain x14
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Copperline Gorge.Play
+? Bot1.Battlefield.Copperline Gorge.Tapped = true
+[T9 Bot1.Main1]
+Bot1.Battlefield.Copperline Gorge.Activate(Color: Red)
+? Bot1.Mana = {R}
+
+[Expect]
+Turn = 9
+Bot1.Battlefield.Copperline Gorge.Tapped = true

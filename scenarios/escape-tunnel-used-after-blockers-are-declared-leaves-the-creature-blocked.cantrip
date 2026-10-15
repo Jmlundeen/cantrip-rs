@@ -1,0 +1,30 @@
+# CR 509.1b / 509.1h: "can't be blocked" matters when blockers are declared; an attacker already blocked stays blocked.
+# Bot2's Ornithopter blocks Elvish Mystic and only then does Bot1 sacrifice the Tunnel: the Mystic still fights the
+# Ornithopter and Bot2 takes no damage.
+
+[Bot1 Deck]
+Forest
+Elvish Mystic
+Escape Tunnel
+Forest x12
+
+[Bot2 Deck]
+Ornithopter
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Escape Tunnel.Play
+Bot1.Attack(Elvish Mystic > Bot2)
+Bot2.Block(Ornithopter > Elvish Mystic)
+Bot1.Battlefield.Escape Tunnel.Activate(Ability: can't be blocked; Bot1.Battlefield.Elvish Mystic)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot2.Battlefield.Ornithopter.Damage = 1
+Bot1.Graveyard = Escape Tunnel

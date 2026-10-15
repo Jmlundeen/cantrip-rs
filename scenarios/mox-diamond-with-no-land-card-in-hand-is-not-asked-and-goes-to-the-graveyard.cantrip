@@ -1,0 +1,30 @@
+# "You may discard a land card": the only cards in Bot1's hand besides Mox Diamond are a Legion Leadership - a modal double-faced
+# card whose front face is an instant, so in hand it is not a land card (CR 712.8a: only the front face counts),
+# so there is nothing to discard, no question is asked, and Mox Diamond is put into the graveyard (CR 614.12a).
+# The land play is spent first, so the hand holds nothing else.
+
+[Bot1 Deck]
+Island
+Mox Diamond
+Legion Leadership
+Black Lotus
+Mox Ruby
+Mox Jet
+Mox Emerald
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Diamond.Cast
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Mox Diamond
+Bot1.Hand = Legion Leadership

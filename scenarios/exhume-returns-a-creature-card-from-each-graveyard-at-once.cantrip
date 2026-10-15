@@ -1,0 +1,46 @@
+# Exhume: each player puts a creature card from their own graveyard onto the battlefield (CR 101.4, 110.2a). Both
+# players have entombed a creature; each is asked in turn and the two enter together, each under its owner's control.
+
+[Bot1 Deck]
+Swamp
+Entomb
+Exhume
+Swamp
+Swamp
+Swamp
+Swamp
+Llanowar Elves
+Swamp x12
+
+[Bot2 Deck]
+Swamp
+Entomb
+Swamp x8
+Ornithopter
+Swamp x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Llanowar Elves)
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Entomb.Cast
+Bot2.Search(Ornithopter)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Exhume.Cast
+Bot1.Choose(Llanowar Elves)
+Bot2.Choose(Ornithopter)
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Graveyard = Exhume; Entomb
+Bot2.Graveyard = Entomb
+Bot1.Battlefield = Swamp; Swamp; Llanowar Elves
+Bot2.Battlefield = Swamp; Ornithopter

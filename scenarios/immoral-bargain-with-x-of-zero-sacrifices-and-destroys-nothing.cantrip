@@ -1,0 +1,31 @@
+# X = 0 is a legal announcement: no creature is sacrificed, no target is chosen, and "destroy 0 target nonland permanents"
+# does nothing: the Bargain just goes to the graveyard (no Choose, no Target question) and Bot2's Mox Pearl stays.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Ruby
+Immoral Bargain
+Island x16
+
+[Bot2 Deck]
+Mox Pearl
+Island x19
+
+[Actions]
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Immoral Bargain.Cast(X: 0)
+! Bot1.Choose
+! Bot1.Target
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Immoral Bargain
+Bot2.Battlefield = Mox Pearl

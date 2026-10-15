@@ -1,0 +1,28 @@
+# Scale Up reads "target creature you control" (CR 115.1): it can be aimed at Bot1's own Ornithopter and not at Bot2's.
+
+[Bot1 Deck]
+Mox Emerald
+Ornithopter
+Scale Up
+Forest x17
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+! Bot1.Hand.Scale Up.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Hand.Scale Up.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Power = 6
+Bot2.Battlefield.Ornithopter.Power = 0

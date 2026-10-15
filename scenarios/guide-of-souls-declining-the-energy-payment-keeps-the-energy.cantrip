@@ -1,0 +1,33 @@
+# Three Ornithopters entering give Guide of Souls three energy (and 3 life). When Bot1 attacks on turn 3 it may pay {E}{E}{E}; it declines, so
+# the energy stays and the Ornithopter gets no counters.
+
+[Bot1 Deck]
+Mox Pearl
+Guide of Souls
+Ornithopter
+Ornithopter
+Ornithopter
+Island x2
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Guide of Souls.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+? Bot1.Energy = 3
+Bot1.Attack(Ornithopter)
+Bot1.Decline
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Energy = 3
+Bot1.Battlefield.Ornithopter#1.Counters.PlusOnePlusOne = (absent)
+Bot1.Life = 23

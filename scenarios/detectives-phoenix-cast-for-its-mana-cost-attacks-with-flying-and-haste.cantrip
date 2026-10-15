@@ -1,0 +1,30 @@
+# Detective's Phoenix cast for {2}{R} is a creature spell, not a bestowed Aura: it resolves as a 2/2 enchantment creature
+# with flying and haste (printed), and haste lets it attack the turn it is cast.
+[Bot1 Deck]
+Detective's Phoenix
+Mountain x6
+Mountain x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Detective's Phoenix.Cast
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Pass
+Bot1.Attack(Detective's Phoenix > Bot2)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Detective's Phoenix.Types = Enchantment; Creature
+Bot1.Battlefield.Detective's Phoenix.Power = 2
+Bot1.Battlefield.Detective's Phoenix.Keywords = Flying; Haste
+Bot1.Battlefield.Detective's Phoenix.AttachedTo = (absent)
+Bot2.Life = 18

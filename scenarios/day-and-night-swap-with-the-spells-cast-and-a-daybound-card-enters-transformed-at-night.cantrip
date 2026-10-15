@@ -1,0 +1,55 @@
+# Day and night (CR 731, 502.2). Bot1's Outland Liberator on turn 1 makes it day (CR 702.145d). Bot2 casts nothing on
+# turn 2, so the untap step of turn 3 turns it night and the Liberator over into Frenzied Trapbreaker. Bot1 casts two
+# Moxen on turn 3, so the untap step of turn 4 makes it day again (a player who casts two or more spells in their own turn)
+# and the Trapbreaker is the Liberator again. Bot2 casts nothing on turn 4 either, so turn 5 is night once more, and the
+# second Liberator Bot1 casts then enters transformed (CR 702.145b), a 3/3 Nightbound that no effect could turn back.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Outland Liberator
+Mox Ruby
+Mox Pearl
+Outland Liberator
+Forest
+Forest x3
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Outland Liberator.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+? DayNight = Day
+[T3 Bot1.Main1]
+? DayNight = Night
+? Bot1.Battlefield.Frenzied Trapbreaker.Power = 3
+? Bot1.Battlefield.Frenzied Trapbreaker.Keywords = Nightbound
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T4 Bot2.Main1]
+? DayNight = Day
+? Bot1.Battlefield.Outland Liberator.Power = 2
+? Bot1.Battlefield.Outland Liberator.Keywords = Daybound
+[T5 Bot1.Main1]
+? DayNight = Night
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Outland Liberator.Cast
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+DayNight = Night
+Bot1.Battlefield = Forest; Forest; Mox Emerald; Mox Ruby; Mox Pearl; Frenzied Trapbreaker; Frenzied Trapbreaker

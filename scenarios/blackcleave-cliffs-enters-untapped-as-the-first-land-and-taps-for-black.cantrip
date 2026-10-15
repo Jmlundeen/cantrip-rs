@@ -1,0 +1,19 @@
+# "Enters tapped unless you control two or fewer other lands" with none: Blackcleave Cliffs is untapped as the first land.
+# {T}: Add {B} or {R} - here the black half pays for Dark Ritual, which makes {B}{B}{B}.
+
+[Bot1 Deck]
+Blackcleave Cliffs
+Dark Ritual
+Plains x15
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Blackcleave Cliffs.Play
+Bot1.Battlefield.Blackcleave Cliffs.Activate(Color: Black)
+Bot1.Hand.Dark Ritual.Cast
+
+[Expect]
+Bot1.Mana = {B}{B}{B}
+Bot1.Battlefield.Blackcleave Cliffs.Tapped = true

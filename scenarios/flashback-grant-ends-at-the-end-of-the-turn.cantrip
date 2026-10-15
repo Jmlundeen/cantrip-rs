@@ -1,0 +1,34 @@
+# "Gains flashback until end of turn" (CR 611.2c, 514.2): on turn 1 Flashback lets the Lightning Bolt in the graveyard be cast, but
+# Bot1 does not; by turn 3 the grant has ended and the Bolt is not offered from the graveyard, although a Mountain is untapped
+# for it. A second Flashback cast on turn 3 gives it back (the positive control), and the Bolt is cast and exiled.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Lightning Bolt
+Flashback
+Flashback
+Mountain
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Hand.Flashback.Cast(Bot1.Graveyard.Lightning Bolt)
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+! Bot1.Graveyard.Lightning Bolt.Cast
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Hand.Flashback.Cast(Bot1.Graveyard.Lightning Bolt)
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Graveyard.Lightning Bolt.Cast(Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Exile = Lightning Bolt

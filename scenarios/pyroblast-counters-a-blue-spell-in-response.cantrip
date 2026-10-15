@@ -1,0 +1,28 @@
+# Pyroblast's first mode counters target spell because it is blue: Bot2's Brainstorm.
+
+[Bot1 Deck]
+Mountain
+Pyroblast
+Mountain x13
+
+[Bot2 Deck]
+Island
+Brainstorm
+Island x13
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Brainstorm.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Pyroblast.Cast
+Bot1.Modes(1)
+Bot1.Target(Brainstorm)
+? Stack = Pyroblast; Brainstorm
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Pyroblast
+Bot2.Graveyard = Brainstorm

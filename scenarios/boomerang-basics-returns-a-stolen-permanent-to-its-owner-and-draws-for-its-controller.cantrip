@@ -1,0 +1,41 @@
+# Boomerang Basics: "Return target nonland permanent to its owner's hand. If you controlled that permanent, draw a card."
+# Bot1 takes Bot2's Mox Pearl with Dack Fayden (-2), controls it, and bounces it: it goes to its owner Bot2's hand (not
+# Bot1's), and Bot1, who controlled it, draws. Bot1 holds 2 cards while the Boomerang is on the stack and 3 after the draw.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Dack Fayden
+Boomerang Basics
+Plains
+Plains x2
+Plains x12
+
+[Bot2 Deck]
+Mox Pearl
+Plains x19
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dack Fayden.Cast
+[T3 Bot1.Main2]
+Bot1.Battlefield.Dack Fayden.Activate(Bot2.Battlefield.Mox Pearl; Ability: Gain control)
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Boomerang Basics.Cast(Bot1.Battlefield.Mox Pearl)
+? Bot1.Hand.Count = 2
+[T3 Bot1.End]
+
+[Expect]
+Bot2.Hand.Count = 8
+Bot1.Hand.Count = 3
+Bot1.Battlefield = Dack Fayden; Mox Jet; Mox Ruby; Mox Sapphire; Mox Sapphire

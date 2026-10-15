@@ -1,0 +1,6 @@
+{
+  "name": "Tinker",
+  "manaCost": "{2}{U}",
+  "type": "Sorcery",
+  "oracleText": "As an additional cost to cast this spell, sacrifice an artifact.\nSearch your library for an artifact card, put that card onto the battlefield, then shuffle."
+}

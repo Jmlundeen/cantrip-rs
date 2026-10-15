@@ -1,0 +1,42 @@
+# Strength-Testing Hammer: "Whenever equipped creature attacks, roll a six-sided die. That creature gets +X/+0 until end of
+# turn, where X is the result." The die shows a 6, so the Ornithopter (0/2) attacks as a 6/2 and Bot2 goes to 14; it has the
+# greatest power among creatures on the battlefield, so Bot1 draws.
+
+[Dice]
+6
+
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Strength-Testing Hammer
+Ornithopter
+Plains x14
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Strength-Testing Hammer.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Strength-Testing Hammer.Activate(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot1.Attack(Ornithopter > Bot2)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Bot1.Battlefield.Ornithopter.Power = 6
+Bot1.Hand.Count = 3
+Bot1.Battlefield.Strength-Testing Hammer.AttachedTo = Ornithopter

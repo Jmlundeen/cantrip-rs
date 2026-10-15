@@ -1,0 +1,48 @@
+# CR 608.2b: Echoing Return has one target; when Bot2 exiles that Ornithopter from the graveyard with Lion Sash in response, the spell does nothing at all - the other Ornithopter, a same-named card that was only to come
+# along with the target, stays in the graveyard.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Faithless Looting
+Echoing Return
+Ornithopter
+Ornithopter
+Mox Jet
+Island x10
+
+[Bot2 Deck]
+Plains
+Mox Sapphire
+Mox Pearl
+Lion Sash
+Island x11
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Ornithopter; Ornithopter)
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Lion Sash.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Echoing Return.Cast(Bot1.Graveyard.Ornithopter)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Lion Sash.Activate(Bot1.Graveyard.Ornithopter)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Exile = Ornithopter
+Bot1.Graveyard = Echoing Return; Faithless Looting; Ornithopter
+Bot1.Hand.Count = 3

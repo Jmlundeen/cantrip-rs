@@ -1,0 +1,47 @@
+# The control for impractical-joke-makes-protection-from-red-prevent-no-combat-damage: the same combat with the Joke left in
+# hand. Bot2's Giver of Runes gives its blocking Ornithopter protection from red and the damage from the red Embereth
+# Shieldbreaker is prevented (CR 702.16e), so the Ornithopter survives with no damage.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Embereth Shieldbreaker
+Impractical Joke
+Mountain
+Mountain
+Mountain
+Mountain x12
+
+[Bot2 Deck]
+Plains
+Giver of Runes
+Ornithopter
+Plains x4
+Plains x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Embereth Shieldbreaker.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Giver of Runes.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Ornithopter.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Attack(Embereth Shieldbreaker > Bot2)
+Bot2.Block(Ornithopter > Embereth Shieldbreaker)
+[T5 Bot1.Blockers]
+Bot1.Pass
+Bot2.Battlefield.Giver of Runes.Activate(Bot2.Battlefield.Ornithopter)
+Bot2.Decline
+Bot2.Colors(Red)
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Ornithopter.Damage = 0

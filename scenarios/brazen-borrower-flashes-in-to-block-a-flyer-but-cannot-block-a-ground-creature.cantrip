@@ -1,0 +1,40 @@
+# "Flash" from hand: Bot1 casts the Borrower in Bot2's declare attackers step on turn 4, after Elvish Mystic and
+# Ornithopter attack. "Can block only creatures with flying": the Borrower may not block the Mystic (refusal) but may
+# block the Ornithopter (the positive control, 3 damage kills it). The Mystic's damage goes through.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Brazen Borrower
+Island x12
+
+[Bot2 Deck]
+Mox Emerald
+Elvish Mystic
+Ornithopter
+Island x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Hand.Ornithopter.Cast
+[T4 Bot2.Main1]
+Bot2.Attack(Elvish Mystic; Ornithopter)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Brazen Borrower.Cast
+! Bot1.Block(Brazen Borrower > Elvish Mystic)
+Bot1.Block(Brazen Borrower > Ornithopter)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 19
+Bot2.Graveyard = Ornithopter
+Bot1.Battlefield = Island; Mox Sapphire; Mox Jet; Brazen Borrower

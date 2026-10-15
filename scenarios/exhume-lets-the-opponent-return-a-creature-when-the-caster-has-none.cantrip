@@ -1,0 +1,43 @@
+# The caster's own graveyard holds no creature card (an Entomb for a Lightning Bolt), so Bot1 puts nothing and is asked
+# nothing (the refused Choose), while Bot2, whose graveyard holds an Ornithopter, still puts it onto the battlefield (its only creature card, which the unscripted answer takes):
+# Exhume is symmetrical, not "you return a creature".
+
+[Bot1 Deck]
+Swamp
+Entomb
+Exhume
+Swamp
+Swamp
+Swamp
+Swamp
+Lightning Bolt
+Swamp x12
+
+[Bot2 Deck]
+Swamp
+Entomb
+Swamp x8
+Ornithopter
+Swamp x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Lightning Bolt)
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Entomb.Cast
+Bot2.Search(Ornithopter)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Exhume.Cast
+! Bot1.Choose
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Swamp; Swamp
+Bot2.Battlefield = Swamp; Ornithopter

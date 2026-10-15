@@ -1,0 +1,30 @@
+# Mind Stone's {T}: Add {C} is a mana ability: on turn 5 it alone pays Pyrite Spellbomb's {1}, and the Stone stays.
+
+[Bot1 Deck]
+Island
+Island
+Island
+Mind Stone
+Pyrite Spellbomb
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Mind Stone.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mind Stone.Activate(Ability: Add)
+Bot1.Hand.Pyrite Spellbomb.Cast
+
+[Expect]
+Bot1.Battlefield = Island; Island; Mind Stone; Pyrite Spellbomb
+Bot1.Battlefield.Mind Stone.Tapped = true
+Bot1.Battlefield.Island#1.Tapped = false

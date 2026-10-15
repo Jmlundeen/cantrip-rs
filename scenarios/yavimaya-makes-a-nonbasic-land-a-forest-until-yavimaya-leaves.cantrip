@@ -1,0 +1,31 @@
+# Yavimaya, Cradle of Growth: "Each land is a Forest in addition to its other land types."
+#
+# A land with no land type of its own gains Forest, and with it {T}: Add {G} (CR 305.6), beside the abilities it
+# prints. The effect is Yavimaya's static ability, so it lasts only while Yavimaya is on the battlefield (CR 611.3a):
+# once the opponent's Strip Mine destroys it, the Plains is a Plains again and nothing else.
+
+[Bot1 Deck]
+Yavimaya, Cradle of Growth
+Plains x14
+
+[Bot2 Deck]
+Strip Mine
+Island x14
+
+[Actions]
+Bot1.Hand.Yavimaya, Cradle of Growth.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Strip Mine.Play
+? Bot2.Battlefield.Strip Mine.Subtypes = Forest
+Bot2.Battlefield.Strip Mine.Activate(Ability: Add {G})
+? Bot2.Mana = {G}
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+? Bot1.Battlefield.Plains.Subtypes = Forest; Plains
+[T4 Bot2.Main1]
+Bot2.Battlefield.Strip Mine.Activate(Bot1.Battlefield.Yavimaya, Cradle of Growth; Ability: Destroy)
+
+[Expect]
+Bot1.Graveyard = Yavimaya, Cradle of Growth
+Bot2.Graveyard = Strip Mine
+Bot1.Battlefield.Plains.Subtypes = Plains

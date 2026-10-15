@@ -1,0 +1,51 @@
+# Caves of Chaos Adventurer comes down on turn 1 off three Moxen and a Mountain. Entering, it takes the initiative, and
+# taking it ventures into Undercity: Secret Entrance fetches the Forest. At Bot1's turn-3 upkeep the initiative ventures
+# again, and of Secret Entrance's two arrows Bot1 follows the one to Lost Well and scries 2. The Adventurer attacks for
+# 5, exiles the Mountain on top, and Bot1 plays that Mountain from exile as its land for the turn.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Caves of Chaos Adventurer
+Island
+Island
+Forest
+Mountain x10
+
+[Bot2 Deck]
+Forest x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Caves of Chaos Adventurer.Cast
+Bot1.Search(Forest)
+? Initiative = Bot1
+? Bot1.Dungeon = Undercity: Secret Entrance
+? Bot1.Hand = Island; Island; Forest
+[T3 Bot1.Upkeep]
+Bot1.Modes(Lost Well)
+[T3 Bot1.Main1]
+? Bot1.Dungeon = Undercity: Lost Well
+Bot1.Attack(Caves of Chaos Adventurer)
+[T3 Bot1.Main2]
+? Exile = Mountain
+Bot1.Exile.Mountain.Play
+
+[Expect]
+Turn = 3
+Initiative = Bot1
+Bot1.Dungeon = Undercity: Lost Well
+Bot2.Life = 15
+Bot1.LandsPlayed = 1
+Exile.Count = 0
+Bot1.Battlefield = Mountain; Mountain; Mox Ruby; Mox Pearl; Mox Sapphire; Caves of Chaos Adventurer
+Bot1.Hand = Island; Island; Forest; Mountain

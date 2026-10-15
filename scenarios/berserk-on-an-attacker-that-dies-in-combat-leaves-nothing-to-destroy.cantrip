@@ -1,0 +1,48 @@
+# Berserk: the delayed trigger "destroy that creature if it attacked this turn" finds nothing when the creature is already
+# gone (CR 400.7: the card in the graveyard is a new object, not "that creature"; CR 603.7c). Bot1's Embereth Shieldbreaker
+# attacks, Bot2's Shieldbreaker blocks it, and Berserk is cast on the attacker after the block (a 4/1 trampler, 2 lethal to
+# the 2/1 blocker, 2 to Bot2). Both die in combat; at the end step the trigger does nothing and the game goes on.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Emerald
+Embereth Shieldbreaker
+Berserk
+Forest x10
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Embereth Shieldbreaker
+Mountain x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Embereth Shieldbreaker.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Embereth Shieldbreaker.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+[T3 Bot1.Main1]
+Bot1.Attack(Embereth Shieldbreaker > Bot2)
+Bot2.Block(Embereth Shieldbreaker > Embereth Shieldbreaker)
+[T3 Bot1.Blockers]
+Bot1.Hand.Berserk.Cast(Bot1.Battlefield.Embereth Shieldbreaker)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.AssignDamage(Embereth Shieldbreaker > Embereth Shieldbreaker: 2; Embereth Shieldbreaker > Bot2: 2)
+[T4 Bot2.Upkeep]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Graveyard = Embereth Shieldbreaker; Berserk
+Bot2.Graveyard = Embereth Shieldbreaker
+Bot1.Battlefield = Mountain; Mox Ruby; Mox Emerald

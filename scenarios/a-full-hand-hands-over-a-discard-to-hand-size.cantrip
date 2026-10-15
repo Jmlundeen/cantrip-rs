@@ -1,0 +1,30 @@
+# Eight cards at the cleanup step, so one of them has to go (CR 514.1). Handed over there, because the screen that
+# asks is one a player gets stuck on: it names a number, and a client that lets a second card be picked when it asked
+# for one leaves the answer button dead with no word about which of the two picks to take back.
+#
+# then click a Mountain, then a Forest. The second click takes the first pick back and picks the Forest instead, as
+# every other single choice does, rather than holding both.
+
+[Bot1 Deck]
+Swamp
+Mountain
+Island
+Forest
+Plains
+Volcanic Island
+Tropical Island
+Island x11
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+# Nothing is played at all: a hand nobody spends from is eight cards deep the moment turn 3's draw lands.
+[Handover Bot1.Discard]
+
+[Expect]
+Turn = 3
+Step = Cleanup
+ActivePlayer = Bot1
+Bot1.Hand.Count = 8
+Bot1.Battlefield.Count = 0

@@ -1,0 +1,23 @@
+# Waterlogged Teachings is a modal double-faced card (CR 712.4): played as its back face it is Inundated Archive, a land
+# that enters tapped and taps for {U} or {B}; on the next turn it pays Vampiric Tutor's {B}.
+
+[Bot1 Deck]
+Waterlogged Teachings
+Vampiric Tutor
+Island x5
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Waterlogged Teachings.Play
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Inundated Archive.Tapped = true
+[T3 Bot1.Main1]
+Bot1.Hand.Vampiric Tutor.Cast
+Bot1.Battlefield.Inundated Archive.Activate(Color: Black)
+Bot1.Search(Island)
+
+[Expect]
+Bot1.Life = 18

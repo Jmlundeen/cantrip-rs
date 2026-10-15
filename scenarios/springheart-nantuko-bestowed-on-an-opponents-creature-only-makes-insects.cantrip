@@ -1,0 +1,35 @@
+# Bestowed on Bot2's Llanowar Elves it gives them +1/+1 (CR 702.103, 303.4): the enchanted creature is the opponent's, so the landfall "if this permanent is attached to a creature you control" does not hold. Bot1's Forest asks nothing and makes an Insect.
+
+[Bot1 Deck]
+Mox Emerald
+Springheart Nantuko
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x12
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Springheart Nantuko.Cast(Bot2.Battlefield.Llanowar Elves; Ability: Bestow)
+Bot1.Pass
+Bot1.Hand.Forest.Play
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Bot2.Battlefield.Llanowar Elves.Power = 2
+Bot1.Battlefield.Springheart Nantuko.AttachedTo = Llanowar Elves
+Bot1.Battlefield.Insect.Power = 1
+Bot1.Battlefield.Forest#2.Tapped = false

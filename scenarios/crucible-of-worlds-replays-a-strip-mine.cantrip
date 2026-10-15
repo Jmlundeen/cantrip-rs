@@ -1,0 +1,33 @@
+# Bot1 plays Strip Mine on turn one and casts Crucible of Worlds off a Black Lotus. On turn three it sacrifices the
+# Strip Mine to destroy Bot2's only land, and then plays that same Strip Mine again straight out of its graveyard,
+# using the turn's one land play (CR 305.1, 305.2). Bot2 is left with nothing on the battlefield.
+
+[Bot1 Deck]
+Strip Mine
+Black Lotus
+Crucible of Worlds
+Swamp x4
+Swamp x9
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Strip Mine.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Crucible of Worlds.Cast
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Strip Mine.Activate(Bot2.Battlefield.Island; Ability: Destroy)
+? Bot1.Graveyard = Strip Mine; Black Lotus
+Bot1.Graveyard.Strip Mine.Play
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Crucible of Worlds; Strip Mine
+Bot1.Graveyard = Black Lotus
+Bot1.LandsPlayed = 1
+Bot1.Hand.Count = 5
+Bot2.Battlefield.Count = 0
+Bot2.Graveyard = Island

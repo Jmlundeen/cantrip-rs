@@ -1,0 +1,32 @@
+# Both abilities have {T} in the cost: once the Stone has been tapped for {C} the draw ability is refused, even with the
+# Island's mana available to pay its {1}; untapped, on turn 5, it is offered and used (the positive control).
+
+[Bot1 Deck]
+Island
+Island
+Island
+Mind Stone
+Island x5
+Island x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Mind Stone.Cast
+Bot1.Pass
+Bot1.Battlefield.Mind Stone.Activate(Ability: Add)
+? Bot1.Mana = {C}
+! Bot1.Battlefield.Mind Stone.Activate(Ability: Draw)
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Mind Stone.Activate(Ability: Draw)
+
+[Expect]
+Bot1.Graveyard = Mind Stone

@@ -1,0 +1,24 @@
+# Concealed Courtyard enters untapped when you control two or fewer other lands, and its mana ability takes the color
+# asked for: here it is the third land and taps for {B} the turn it arrives.
+
+[Bot1 Deck]
+Plains
+Plains
+Concealed Courtyard
+Island x14
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Concealed Courtyard.Play
+Bot1.Battlefield.Concealed Courtyard.Activate(Color: Black)
+? Bot1.Mana = {B}
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Concealed Courtyard.Tapped = true

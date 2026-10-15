@@ -1,0 +1,31 @@
+# Elvish Spirit Guide is a 2/2 green Elf Spirit creature card ({2}{G}) as well as a source of mana from the hand: cast
+# normally with Mox Emerald, Mox Jet and Mox Pearl it enters as a 2/2 Creature, and nothing is exiled.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Pearl
+Elvish Spirit Guide
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Elvish Spirit Guide.Cast
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Elvish Spirit Guide.Power = 2
+Bot1.Battlefield.Elvish Spirit Guide.Toughness = 2
+Bot1.Battlefield.Elvish Spirit Guide.Types = Creature
+Bot1.Battlefield.Elvish Spirit Guide.Subtypes = Elf; Spirit
+Exile.Count = 0

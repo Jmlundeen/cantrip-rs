@@ -1,0 +1,6 @@
+{
+  "name": "Ashnod's Altar",
+  "manaCost": "{3}",
+  "type": "Artifact",
+  "oracleText": "Sacrifice a creature: Add {C}{C}."
+}

@@ -1,0 +1,34 @@
+# Windbrisk Heights enters tapped and hides Plains (hideaway 4, CR 702.75a). After Bot1 attacks with three different
+# creatures, its {W}, {T} ability plays the exiled card as a land during resolution (CR 305.1, 608.2g): the turn's land
+# play was unused, since the Heights itself was last turn's.
+[Bot1 Deck]
+Windbrisk Heights
+Mox Pearl
+Ornithopter
+Ornithopter
+Ornithopter
+Island
+Island
+Plains
+Island x3
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Windbrisk Heights.Play
+Bot1.Arrange(Plains | Island; Island; Island)
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter#1 > Bot2; Ornithopter#2 > Bot2; Ornithopter#3 > Bot2)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Windbrisk Heights.Activate(Ability: You may play)
+Bot1.Accept
+[Bot1.Main2]
+[Expect]
+Exile.Count = 0
+Bot2.Life = 20
+Bot1.Battlefield = Windbrisk Heights; Mox Pearl; Ornithopter; Ornithopter; Ornithopter; Plains
+Bot1.LandsPlayed = 1

@@ -1,0 +1,39 @@
+# The cost sacrifices "a creature" you control (CR 118.3): with only Bot2's Ornithopter on the battlefield the untapped
+# Station cannot be activated, and once Bot1 has an Ornithopter of its own it can, pinging Bot2's creature ("any
+# target": a creature, 1 damage on a 0/2).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Blasting Station
+Ornithopter
+Plains x12
+
+[Bot2 Deck]
+Ornithopter
+Plains x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Blasting Station.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Blasting Station.Activate
+Bot1.Hand.Ornithopter.Cast
+Bot1.Decline
+Bot1.Battlefield.Blasting Station.Activate(Bot2.Battlefield.Ornithopter)
+Bot1.Choose(Ornithopter)
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot2.Battlefield.Ornithopter.Damage = 1
+
+[Expect]
+Bot1.Graveyard = Ornithopter
+Bot1.Battlefield.Blasting Station.Tapped = true

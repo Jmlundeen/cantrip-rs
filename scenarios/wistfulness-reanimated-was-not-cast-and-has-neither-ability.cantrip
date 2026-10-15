@@ -1,0 +1,40 @@
+# "If {G}{G} was spent to cast it" / "if {U}{U} was spent to cast it": Wistfulness put onto the battlefield by Reanimate
+# was not cast, so no mana was spent on it and neither enters ability triggers. The opponent's Sol Ring stays and
+# nothing is drawn; Reanimate's {B} paid for Reanimate, not for Wistfulness.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Entomb
+Reanimate
+Swamp x4
+Wistfulness
+Swamp x11
+
+[Bot2 Deck]
+Sol Ring
+Forest x6
+Forest x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Wistfulness)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Reanimate.Cast(Bot1.Graveyard.Wistfulness)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Wistfulness.Power = 6
+Bot1.Life = 15
+Bot2.Battlefield = Forest; Sol Ring
+Bot1.Hand.Count = 4
+Exile.Count = 0

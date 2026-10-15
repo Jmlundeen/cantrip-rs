@@ -1,0 +1,42 @@
+# "You may play lands from your graveyard" lasts while Mole Man is on the battlefield. Bot1 plays Marsh Flats and cracks it on
+# turn one (two landfalls, two Moloids; the Flats are in the graveyard). On turn two Bot2 plays a Mountain: not a land Bot1
+# controls, so no third Moloid, and bolts the Mole Man. On turn three the Flats can no longer be played from the graveyard (the
+# refusal; the positive control is the existing scenario, where Mole Man lives).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Pearl
+Mole Man, Moloid Master
+Marsh Flats
+Mountain
+Mountain
+Swamp
+Mountain x12
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x13
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Mole Man, Moloid Master.Cast
+Bot1.Hand.Marsh Flats.Play
+Bot1.Battlefield.Marsh Flats.Activate
+Bot1.Search(Swamp)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Mole Man, Moloid Master)
+[T3 Bot1.Main1]
+? Bot1.Graveyard = Mole Man, Moloid Master; Marsh Flats
+! Bot1.Graveyard.Marsh Flats.Play
+
+[Expect]
+Bot1.Battlefield.Count = 6

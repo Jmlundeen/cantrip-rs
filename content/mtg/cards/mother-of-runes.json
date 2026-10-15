@@ -1,0 +1,8 @@
+{
+  "name": "Mother of Runes",
+  "manaCost": "{W}",
+  "type": "Creature — Human Cleric",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "{T}: Target creature you control gains protection from the color of your choice until end of turn."
+}

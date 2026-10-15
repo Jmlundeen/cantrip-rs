@@ -1,0 +1,38 @@
+# Occult Epiphany, X = 3: "a 1/1 white Spirit ... for each card type among cards discarded this way" - types, not cards.
+# Bot1 draws three and discards an Ornithopter (an artifact creature: two types) and two Islands (one type, counted once):
+# three Spirits, not four or two. The Black Lotus (three blue) and the Mox Sapphire pay {3}{U}.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Occult Epiphany
+Island
+Island
+Island
+Island
+Ornithopter
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Swamp x15
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Occult Epiphany.Cast(X: 3)
+Bot1.Choose(Ornithopter; Island; Island)
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Graveyard.Count = 5
+Bot1.Battlefield.Count = 4
+Bot1.Hand.Count = 4

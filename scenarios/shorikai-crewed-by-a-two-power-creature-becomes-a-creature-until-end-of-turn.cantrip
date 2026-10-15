@@ -1,0 +1,65 @@
+# Crew 8, paid with Shorikai's own Pilots. Each loot makes a 1/1 Pilot that "crews Vehicles as though its power were
+# 2 greater" (CR 702.122b), so it counts as three. On turn 3 the second loot leaves two Pilots, six towards eight, and
+# Crew is not offered; the Priest's 2 makes eight exactly, and Shorikai becomes an 8/8 artifact creature.
+# Neither the Pilot made this turn nor the Priest cast this turn is kept from crewing by summoning sickness: crewing
+# taps them, but its cost has no {T} of theirs (CR 302.6). "Until end of turn": on turn 5 it is an artifact alone.
+
+[Bot1 Deck]
+Tundra
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Sol Ring
+Shorikai, Genesis Engine
+Island
+Plains
+Brazen Borrower
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Tundra.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Tundra.Activate(Ability: {W})
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Shorikai, Genesis Engine.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Shorikai, Genesis Engine.Activate(Ability: Draw two cards)
+Bot1.Choose(Island)
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Shorikai, Genesis Engine.Activate(Ability: Draw two cards)
+Bot1.Choose(Island)
+Bot1.Pass
+! Bot1.Battlefield.Shorikai, Genesis Engine.Activate(Ability: Crew)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Tundra.Activate(Ability: {U})
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Brazen Borrower.Cast
+Bot1.Pass
+Bot1.Battlefield.Shorikai, Genesis Engine.Activate(Ability: Crew)
+Bot1.Choose(Pilot; Pilot; Brazen Borrower)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Shorikai, Genesis Engine.Types = Artifact; Creature
+? Bot1.Battlefield.Shorikai, Genesis Engine.Power = 8
+? Bot1.Battlefield.Shorikai, Genesis Engine.Toughness = 8
+? Bot1.Battlefield.Brazen Borrower.Tapped = true
+? Bot1.Battlefield.Pilot#1.Tapped = true
+? Bot1.Battlefield.Pilot#2.SummoningSick = true
+? Bot1.Battlefield.Pilot#2.Tapped = true
+[T5 Bot1.Main1]
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Tundra; Plains; Mox Pearl; Mox Sapphire; Mox Jet; Sol Ring; Shorikai, Genesis Engine; Pilot; Pilot; Brazen Borrower
+Bot1.Battlefield.Shorikai, Genesis Engine.Types = Artifact
+Bot1.Battlefield.Shorikai, Genesis Engine.Tapped = false
+Bot1.Graveyard = Island; Island

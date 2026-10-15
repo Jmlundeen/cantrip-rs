@@ -1,0 +1,38 @@
+# "Total power and toughness 5 or less": Cecil, Dark Knight is 2/3, exactly 5, a legal target and destroyed; Keen-Eyed Curator
+# is 3/3, total 6, refused as a target, and so is Mox Jet, which is not a creature at all. All three sit on Bot2's side
+# (Mox Emerald and Forest pay for the Curator on turn 2, Mox Jet for Cecil), so the Cecil cast is the positive control.
+
+[Bot1 Deck]
+Mox Jet
+Cut Down
+Island x15
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Keen-Eyed Curator
+Cecil, Dark Knight
+Island x13
+
+[Actions]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Keen-Eyed Curator.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Cecil, Dark Knight.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+! Bot1.Hand.Cut Down.Cast(Bot2.Battlefield.Keen-Eyed Curator)
+! Bot1.Hand.Cut Down.Cast(Bot2.Battlefield.Mox Jet)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cut Down.Cast(Cecil, Dark Knight)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Cecil, Dark Knight
+Bot2.Battlefield = Forest; Mox Emerald; Mox Jet; Keen-Eyed Curator
+Bot1.Graveyard = Cut Down

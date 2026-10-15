@@ -1,0 +1,36 @@
+# Colorless is not a color: a red Mox pays Sol Ring, whose {C}{C} plus a white Mox and Black Lotus's three blue pay
+# the six. Of those mana only white and blue are colors, so X is two (the Moxen's red went into Sol Ring, which is
+# not mana spent to cast Together as One).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Sol Ring
+Black Lotus
+Together as One
+Island
+Island
+Island x6
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+? Bot1.Mana = {W}{U}{U}{U}{C}{C}
+Bot1.Hand.Together as One.Cast
+Bot1.Target(Bot1)
+Bot1.Target(Bot2)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 4
+Bot2.Life = 18
+Bot1.Life = 22

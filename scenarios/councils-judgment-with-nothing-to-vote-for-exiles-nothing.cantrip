@@ -1,0 +1,32 @@
+# "A nonland permanent you don't control": Bot2 controls only a Plains and Bot1 only its own Mox Pearl and lands, so there is nothing
+# to vote for. Council's Judgment resolves and exiles nothing - and nobody is asked, though two players could vote.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Plains
+Council's Judgment
+Plains x12
+
+[Bot2 Deck]
+Plains
+Plains x13
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Council's Judgment.Cast
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot1.Battlefield = Mox Pearl; Plains; Plains
+Bot2.Battlefield = Plains
+Bot1.Graveyard = Council's Judgment

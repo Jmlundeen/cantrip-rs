@@ -1,0 +1,20 @@
+# Simian Spirit Guide: exiling it from the hand adds {R}, which pays for a Lightning Bolt on the opponent.
+
+[Bot1 Deck]
+Simian Spirit Guide
+Lightning Bolt
+Island x5
+Island x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Simian Spirit Guide.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+
+[Expect]
+Turn = 1
+Exile = Simian Spirit Guide
+Bot2.Life = 17
+Bot1.Graveyard = Lightning Bolt

@@ -1,0 +1,36 @@
+# Cycling {3} from the hand: an Island and a Sol Ring's {C}{C} pay it, the Triome is discarded and a card drawn. A second
+# Triome, in play, taps for {U} on turn 3 and {W} on turn 5 (its other types; red is in the existing scenario).
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Sol Ring
+Raugrin Triome
+Raugrin Triome
+Island x2
+Island x13
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Raugrin Triome.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Raugrin Triome.Play
+[T5 Bot1.Main1]
+Bot1.Battlefield.Raugrin Triome.Activate(Ability: {U})
+? Bot1.Mana = {U}
+[T7 Bot1.Main1]
+Bot1.Battlefield.Raugrin Triome.Activate(Ability: {W})
+
+[Expect]
+Bot1.Mana = {W}
+Bot1.Graveyard = Raugrin Triome

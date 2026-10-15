@@ -1,0 +1,42 @@
+# Every card in Bot1's opening hand costs nothing, so the hand is empty once the turn-3 draw is played: "discard your
+# hand, then draw three cards" discards nothing (no Choose question) and still draws three. Ravager is cast on turn 1
+# and cannot attack until turn 3, where it must.
+
+[Bot1 Deck]
+Black Lotus
+Anje's Ravager
+Ornithopter
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Mountain
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Anje's Ravager.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mountain.Play
+? Bot1.Hand.Count = 0
+[T3 Bot1.DeclareAttackers]
+! Bot1.Choose
+Bot1.Pass
+Bot2.Pass
+? Combat.Attackers = Anje's Ravager > Bot2
+? Bot1.Graveyard.Count = 1
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 3
+Bot1.Graveyard.Count = 1
+Bot2.Life = 17

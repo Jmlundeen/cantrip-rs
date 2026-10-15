@@ -1,0 +1,57 @@
+# Guardian Scalelord: "Whenever this creature attacks, return target nonland permanent card with mana value X or less from your
+# graveyard to the battlefield, where X is this creature's power." Backup 1 on itself makes it a 4/5 on turn 1. On turn 3
+# Bot1's graveyard holds a Black Lotus (artifact, mana value 0), a Llanowar Elves (creature, 1) - the two legal targets - and a
+# Lightning Bolt (not a permanent card), a Forest (a land) and an Emeritus of Ideation (mana value 5, over the power 4):
+# none of those three is a candidate (the refusal). The Elves comes back. Faithless Looting (and its flashback) put the cards there.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Black Lotus
+Faithless Looting
+Guardian Scalelord
+Forest
+Llanowar Elves
+Lightning Bolt
+Emeritus of Ideation
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Llanowar Elves; Lightning Bolt)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Guardian Scalelord.Cast
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Graveyard.Faithless Looting.Cast(Ability: Flashback)
+Bot1.Choose(Emeritus of Ideation; Forest)
+Bot1.Attack(Guardian Scalelord > Bot2)
+! Bot1.Target(Lightning Bolt; Forest; Emeritus of Ideation)
+Bot1.Target(Llanowar Elves)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Guardian Scalelord.Power = 4
+Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot2.Life = 16

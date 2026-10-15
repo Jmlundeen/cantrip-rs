@@ -1,0 +1,50 @@
+# Atraxa's enters trigger reveals exactly ten cards (paid with four Moxen and a Black Lotus). The eleventh card is a
+# sorcery that would be offered, and by the default answer taken, if it were revealed; it is not, so only the artifact
+# creature, the instant and a land are taken, the creature type has nothing left to take (Ornithopter went as the
+# artifact), and the library is the unrevealed Wrath of God and Island on top with the seven revealed Islands below
+# them: every card not taken is put on the bottom, none removed.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Black Lotus
+Atraxa, Grand Unifier
+Island
+Ornithopter
+Lightning Bolt
+Island x8
+Wrath of God
+Island
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Atraxa, Grand Unifier.Cast
+Bot1.Pass
+Bot1.Choose(Ornithopter)
+Bot1.Choose(Lightning Bolt)
+Bot1.Choose(Island)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Island; Ornithopter; Lightning Bolt; Island
+Bot1.Library = Wrath of God; Island; Island; Island; Island; Island; Island; Island; Island
+Bot1.Library.Count = 9

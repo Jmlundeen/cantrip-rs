@@ -1,0 +1,29 @@
+# Only permanent cards count: two Lightning Bolts discarded to Faithless Looting, and Looting itself, are an instant
+# and a sorcery, so every counter stays.
+
+[Bot1 Deck]
+Swamp
+Mountain
+Moonshadow
+Faithless Looting
+Lightning Bolt x2
+Island
+Island x30
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Moonshadow.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Lightning Bolt; Lightning Bolt)
+[T4 Bot2.Upkeep]
+
+[Expect]
+Bot1.Battlefield.Moonshadow.Counters.MinusOneMinusOne = 6
+Bot1.Graveyard.Count = 3

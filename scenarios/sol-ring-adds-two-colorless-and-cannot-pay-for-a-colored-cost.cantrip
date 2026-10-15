@@ -1,0 +1,32 @@
+# Sol Ring: "{T}: Add {C}{C}" - two colorless mana and no color: red, green and the rest are refused beside colorless (the positive
+# control). Colorless mana cannot pay for a colored symbol (CR 106.1b, 118.1), so with only the Ring's {C}{C} (the Mountain
+# is tapped for the Ring) a Lightning Bolt is not castable - the cast is refused - while the same two mana pay for a Mind
+# Stone ({2}), the positive control.
+
+[Bot1 Deck]
+Mountain
+Sol Ring
+Lightning Bolt
+Mind Stone
+Mountain x3
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+! Bot1.Battlefield.Sol Ring.Activate(Color: Red)
+! Bot1.Battlefield.Sol Ring.Activate(Color: Green)
+! Bot1.Battlefield.Sol Ring.Activate(Color: Blue)
+Bot1.Battlefield.Sol Ring.Activate
+? Bot1.Mana = {C}{C}
+! Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Hand.Mind Stone.Cast
+
+[Expect]
+Bot2.Life = 20
+Bot1.Battlefield = Mountain; Sol Ring; Mind Stone
+Bot1.Battlefield.Sol Ring.Tapped = true

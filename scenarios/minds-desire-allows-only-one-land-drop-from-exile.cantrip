@@ -1,0 +1,35 @@
+# Mind's Desire: a land among the exiled cards is played under the ordinary rules (CR 305.2): only one land per turn. The
+# four copies and the original exile five Mountains, one is played from exile (the positive control, as in the existing
+# scenario), and a second is refused because the land drop is spent.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mind's Desire
+Island
+Island
+Mountain x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Mind's Desire.Cast
+[Bot1.Main2]
+Bot1.Exile.Mountain.Play
+! Bot1.Exile.Mountain.Play
+! Bot1.Hand.Island.Play
+
+[Expect]
+Bot1.Battlefield.Mountain.Tapped = false
+Exile.Count = 4

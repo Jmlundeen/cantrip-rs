@@ -1,0 +1,35 @@
+# The copied creature's own "when this enters" ability triggers for the Image (CR 707.9a, and the card's ruling), since
+# the Image is the copy from the moment it enters (CR 614.1c): copying Bot2's Thraben Inspector, Bot1 investigates and
+# gets the Clue. The Image is an Illusion as well as a Human Soldier (CR 707.9b).
+
+[Bot1 Deck]
+Island
+Island
+Island
+Phantasmal Image
+Island x10
+
+[Bot2 Deck]
+Plains
+Thraben Inspector
+Plains x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Thraben Inspector.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Phantasmal Image.Cast
+Bot1.Accept
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield = Island; Island; Thraben Inspector; Clue Token
+Bot1.Battlefield.Thraben Inspector.Subtypes = Human; Illusion; Soldier
+Bot1.Battlefield.Thraben Inspector.Toughness = 2
+Bot2.Battlefield = Plains; Thraben Inspector; Clue Token

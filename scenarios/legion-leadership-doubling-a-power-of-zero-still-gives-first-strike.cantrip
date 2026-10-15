@@ -1,0 +1,24 @@
+# Doubling a power of 0 adds +0/+0 (CR 701.10a), but the first strike is still gained: the Ornithopter stays 0/2.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Ornithopter
+Legion Leadership
+Forest x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Legion Leadership.Cast(Ornithopter)
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Ornithopter.Keywords = FirstStrike; Flying

@@ -1,0 +1,55 @@
+# (Kokusho costs {4}{B}{B}, six lands, so it is cast on turn 11.)
+# Kokusho's dies trigger drains (crates/cantrip-cards/src/cards/kokusho_the_evening_star.rs). Each opponent loses 5 and its controller gains exactly what was lost — a number
+# the declarative verbs cannot say, because it depends on how many opponents there are and how much life they had.
+
+[Bot1 Deck]
+Kokusho, the Evening Star
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp x16
+
+[Bot2 Deck]
+Vindicate
+Plains
+Plains
+Swamp
+Plains
+Plains
+Plains
+Plains x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Plains.Play
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Plains.Play
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Swamp.Play
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Plains.Play
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Plains.Play
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Kokusho, the Evening Star.Cast
+[T12 Bot2.Main1]
+? Bot1.Battlefield.Kokusho, the Evening Star.Power = 5
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Vindicate.Cast(Kokusho, the Evening Star)
+
+[Expect]
+Bot1.Life = 25
+Bot2.Life = 15
+Bot1.Graveyard = Kokusho, the Evening Star
+Bot2.Graveyard = Vindicate

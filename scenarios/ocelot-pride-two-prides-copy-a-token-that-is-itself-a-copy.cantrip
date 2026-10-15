@@ -1,0 +1,50 @@
+# Ocelot Pride: "...for each token you control that entered this turn, create a token that's a copy of it." Bot1 controls two
+# Ocelot Prides and, on turn 7, ten permanents (the city's blessing). Attacking with one Pride gains life, so both trigger
+# at the beginning of the end step. The first makes a Cat and a copy of it (two Cats). The second makes a Cat and then, for
+# each of the three tokens that entered this turn - two of them copies of a Cat - a copy of it: three more, six Cats in all.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Ocelot Pride
+Ocelot Pride
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Plains x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Ocelot Pride.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ocelot Pride.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+[T7 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Attack(Ocelot Pride#1)
+[T9 Bot1.Main1]
+
+[Expect]
+Turn = 9
+Bot1.Life = 21
+Bot1.Battlefield.Count = 16

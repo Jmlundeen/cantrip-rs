@@ -1,0 +1,52 @@
+# Emeritus of Ideation: "If you do, this creature becomes prepared" - one that is already prepared stays so, with no
+# second copy of its prepare spell (CR 722.3: a creature is prepared or it is not). Bot1 never casts the Ancestral Recall
+# copy it entered with, fills its graveyard (nine cards), attacks and accepts: eight are exiled, and the one copy in exile
+# is still the only one.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Black Lotus
+Mox Ruby
+Mox Emerald
+Emeritus of Ideation
+Lightning Bolt
+Brain Freeze
+Island x30
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Emeritus of Ideation.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Emeritus of Ideation.Prepared = true
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Brain Freeze.Cast(Bot1)
+Bot1.Pass
+Bot1.Attack(Emeritus of Ideation > Bot2)
+Bot1.Accept
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Emeritus of Ideation.Prepared = true
+Exile.Count = 9
+Bot1.Graveyard.Count = 1

@@ -1,0 +1,33 @@
+# The target becoming illegal (CR 608.2b): Bot2 Bolts its own Ornithopter in response, so Get Lost has no legal target on resolution,
+# does nothing at all and creates no Map tokens - they come only from resolving against the permanent.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Get Lost
+Plains x14
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Ornithopter
+Island x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Get Lost.Cast(Bot2.Battlefield.Ornithopter)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Mountain
+Bot2.Graveyard = Ornithopter; Lightning Bolt
+Bot1.Graveyard = Get Lost

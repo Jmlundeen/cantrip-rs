@@ -1,0 +1,11 @@
+* text=auto eol=lf
+
+# cmd.exe reads a batch file by byte offset and assumes a two-byte line ending.
+# With LF only it lands one character into the next line after a GOTO, so an
+# argument loop runs fragments of its own source ("'m' is not recognized..."
+# from a REM line). Batch files only ever run on Windows, so they are checked
+# out with CRLF; stored LF like everything else.
+*.cmd text eol=crlf
+
+*.png binary
+*.tgz binary

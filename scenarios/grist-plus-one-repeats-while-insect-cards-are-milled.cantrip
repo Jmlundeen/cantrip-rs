@@ -1,0 +1,33 @@
+# Grist's +1 repeats for each Insect card milled: Haywire Mite and Icetill Explorer are Insects, Llanowar Elves is not.
+# Three passes: three tokens, three cards milled, and a loyalty counter for each of the two Insects on top of the +1
+# itself (3 + 1 + 2 = 6).
+
+[Bot1 Deck]
+Bayou x3
+Grist, the Hunger Tide
+Forest x5
+Haywire Mite
+Icetill Explorer
+Llanowar Elves
+Forest x13
+
+[Bot2 Deck]
+Forest x22
+
+[Actions]
+Bot1.Hand.Bayou.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Bayou.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Bayou.Play
+Bot1.Battlefield.Bayou#1.Activate(Ability: Add {B})
+Bot1.Battlefield.Bayou#2.Activate(Ability: Add {G})
+Bot1.Battlefield.Bayou#3.Activate(Ability: Add {G})
+Bot1.Hand.Grist, the Hunger Tide.Cast
+[T5 Bot1.Main2]
+Bot1.Battlefield.Grist, the Hunger Tide.Activate(Ability: +1)
+[T5 Bot1.End]
+
+[Expect]
+Bot1.Battlefield.Grist, the Hunger Tide.Counters.Loyalty = 6
+Bot1.Graveyard = Llanowar Elves; Icetill Explorer; Haywire Mite

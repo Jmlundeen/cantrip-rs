@@ -1,0 +1,44 @@
+# Malcolm, Alluring Scoundrel: "you may cast the discarded card" - on the fourth hit Bot1 discards Ancestral Recall and
+# declines: it stays in the graveyard, nothing is drawn (the three Plains discarded earlier could not have been cast anyway).
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Malcolm, Alluring Scoundrel
+Plains
+Plains
+Plains
+Ancestral Recall
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Malcolm, Alluring Scoundrel.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Malcolm, Alluring Scoundrel)
+Bot1.Choose(Plains)
+[T5 Bot1.Main1]
+Bot1.Attack(Malcolm, Alluring Scoundrel)
+Bot1.Choose(Plains)
+[T7 Bot1.Main1]
+Bot1.Attack(Malcolm, Alluring Scoundrel)
+Bot1.Choose(Plains)
+? Bot1.Battlefield.Malcolm, Alluring Scoundrel.Counters.Chorus = 3
+[T9 Bot1.Main1]
+Bot1.Attack(Malcolm, Alluring Scoundrel)
+Bot1.Choose(Ancestral Recall)
+Bot1.Decline
+[Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot2.Life = 12
+Bot1.Battlefield.Malcolm, Alluring Scoundrel.Counters.Chorus = 4
+Bot1.Graveyard = Ancestral Recall; Plains; Plains; Plains
+Bot1.Hand.Count = 8

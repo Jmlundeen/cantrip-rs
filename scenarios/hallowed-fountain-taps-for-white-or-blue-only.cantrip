@@ -1,0 +1,22 @@
+# Hallowed Fountain, a Plains Island, taps for {W} or {U} through its basic land types (CR 305.6) and for nothing else:
+# black, red, green and colorless are refused beside the white it does add (the positive control).
+
+[Bot1 Deck]
+Hallowed Fountain
+Plains x19
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Hallowed Fountain.Play
+Bot1.Accept
+! Bot1.Battlefield.Hallowed Fountain.Activate(Color: Black)
+! Bot1.Battlefield.Hallowed Fountain.Activate(Color: Red)
+! Bot1.Battlefield.Hallowed Fountain.Activate(Color: Green)
+! Bot1.Battlefield.Hallowed Fountain.Activate(Color: Colorless)
+Bot1.Battlefield.Hallowed Fountain.Activate(Ability: {W})
+? Bot1.Mana = {W}
+
+[Expect]
+Bot1.Battlefield.Hallowed Fountain.Tapped = true

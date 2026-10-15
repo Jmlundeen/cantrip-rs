@@ -1,0 +1,47 @@
+# Declining teamwork (CR 601.2b): the same position as with teamwork, but the ransom is {2}, which Bot2 pays by
+# sacrificing its Black Lotus. The Bolt resolves, Gorilla stays untapped.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Guerrilla Gorilla
+Island
+We Say Thee Nay!
+Island x15
+
+[Bot2 Deck]
+Mountain
+Black Lotus
+Lightning Bolt
+Mountain x4
+Mountain x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Guerrilla Gorilla.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.We Say Thee Nay!.Cast
+Bot1.Modes(Cast without teamwork)
+Bot1.Target(Stack.Lightning Bolt)
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.PayCost
+[T4 Bot2.Main2]
+
+[Expect]
+Turn = 4
+Stack.Count = 0
+Bot1.Life = 17
+Bot1.Graveyard = We Say Thee Nay!; Black Lotus
+Bot2.Graveyard = Lightning Bolt; Black Lotus
+Bot1.Battlefield.Guerrilla Gorilla.Tapped = false

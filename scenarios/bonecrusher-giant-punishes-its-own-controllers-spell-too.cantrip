@@ -1,0 +1,37 @@
+# "That spell's controller" is whoever controls the spell, the Giant's own controller included. On turn 7 Bot1 casts Stomp
+# at their own Bonecrusher Giant: the Giant's trigger deals 2 to Bot1, then Stomp's 2 damage lands on the 4/3 Giant,
+# which survives.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Mountain
+Bonecrusher Giant
+Mountain
+Bonecrusher Giant
+Mountain x10
+
+[Bot2 Deck]
+Mountain x14
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Hand.Bonecrusher Giant.Cast
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Bonecrusher Giant.Cast(Bot1.Battlefield.Bonecrusher Giant; Ability: Stomp)
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 18
+Bot1.Battlefield = Mountain; Mountain; Mountain; Mountain; Bonecrusher Giant
+Exile = Bonecrusher Giant

@@ -1,0 +1,25 @@
+# "Activate only if you control a Swamp or a Mountain": the other half of the "or". With only a Plains beside it the
+# Verge refuses {R} (and still makes {B}); once a Mountain is in play, {R} is offered.
+
+[Bot1 Deck]
+Blazemire Verge
+Plains
+Mountain
+Plains x17
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Blazemire Verge.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+! Bot1.Battlefield.Blazemire Verge.Activate(Ability: {R})
+Bot1.Battlefield.Blazemire Verge.Activate(Ability: {B})
+? Bot1.Mana = {B}
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Blazemire Verge.Activate(Ability: {R})
+
+[Expect]
+Bot1.Mana = {R}

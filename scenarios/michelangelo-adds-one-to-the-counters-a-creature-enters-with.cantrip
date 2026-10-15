@@ -1,0 +1,28 @@
+# "If a creature you control would enter the battlefield with a number of +1/+1 counters on it, it enters with that
+# many plus one instead" (ruling 2026-01-27): Walking Ballista cast for X=1 enters with 2 counters, as a 2/2.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Michelangelo, Weirdness to 11
+Walking Ballista
+Forest
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Forest x17
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Michelangelo, Weirdness to 11.Cast
+Bot1.Hand.Walking Ballista.Cast(X: 1)
+
+[Expect]
+Bot1.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Walking Ballista.Power = 2
+Bot1.Battlefield.Walking Ballista.Toughness = 2

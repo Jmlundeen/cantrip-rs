@@ -1,0 +1,38 @@
+# Door of Destinies chooses Elf as it enters: casting Ornithopter does nothing, casting Elvish Mystic puts a charge
+# counter on it, and the Mystic is a 2/2.
+
+[Bot1 Deck]
+Forest
+Forest
+Sol Ring
+Door of Destinies
+Elvish Mystic
+Ornithopter
+Forest
+Forest x12
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Door of Destinies.Cast
+Bot1.Modes(Elf)
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Hand.Elvish Mystic.Cast
+
+[Expect]
+Bot1.Battlefield.Door of Destinies.Counters.Charge = 1
+Bot1.Battlefield.Elvish Mystic.Power = 2
+Bot1.Battlefield.Elvish Mystic.Toughness = 2
+Bot1.Battlefield.Ornithopter.Power = 0

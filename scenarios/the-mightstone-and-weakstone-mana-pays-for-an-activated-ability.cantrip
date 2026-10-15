@@ -1,0 +1,44 @@
+# Mind Stone is on the battlefield from turn 3. On turn 5 Bot1 casts The Mightstone and Weakstone with Sol Ring and three
+# Forests, then pays Mind Stone's {1} with the Mightstone's mana, which is not a spell: it can be spent on an activated ability.
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Forest
+Forest
+The Mightstone and Weakstone
+Mind Stone
+Badgermole Cub
+Forest x12
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Mind Stone.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.The Mightstone and Weakstone.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.The Mightstone and Weakstone.Activate
+Bot1.Battlefield.Mind Stone.Activate(Ability: Draw)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield = Forest; Forest; Forest; Sol Ring; The Mightstone and Weakstone
+Bot1.Hand.Count = 6
+Bot1.Battlefield.The Mightstone and Weakstone.Tapped = true

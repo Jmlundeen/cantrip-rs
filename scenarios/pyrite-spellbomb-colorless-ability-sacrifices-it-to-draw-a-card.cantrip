@@ -1,0 +1,27 @@
+# Its second ability: {1}, Sacrifice it: draw a card. No target needed; the Spellbomb is in the graveyard and the top card, an Island, is in hand.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Pyrite Spellbomb
+Swamp x2
+Island
+Swamp x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Pyrite Spellbomb.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Pyrite Spellbomb.Activate(Ability: Draw a card)
+[Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Pyrite Spellbomb
+Bot1.Hand.Count = 6

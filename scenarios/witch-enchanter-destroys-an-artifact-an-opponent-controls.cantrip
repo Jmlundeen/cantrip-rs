@@ -1,0 +1,31 @@
+# Witch Enchanter ({3}{W}: Black Lotus for three white, Mox Pearl) enters and its trigger destroys Bot2's Sol Ring, the
+# only artifact or enchantment an opponent controls. Bot1's own Mox Pearl is not a legal target (it is Bot1's).
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Witch Enchanter
+Island x4
+Island x10
+
+[Bot2 Deck]
+Island
+Sol Ring
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Witch Enchanter.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Island
+Bot2.Graveyard = Sol Ring
+Bot1.Battlefield = Mox Pearl; Witch Enchanter

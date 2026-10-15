@@ -1,0 +1,34 @@
+# "Exile up to one OTHER target creature": Solitude is not among its own trigger's candidates (the refusal) while Bot2's Ornithopter
+# is. The Ornithopter has power 0, so its controller gains no life.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Black Lotus
+Solitude
+Island x3
+Island x13
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Solitude.Cast
+Bot1.Pass
+! Bot1.Target(Solitude)
+Bot1.Target(Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Ornithopter
+Bot2.Life = 20

@@ -1,0 +1,35 @@
+# Six: "mill three cards. You may put a land card from among them into your hand." When no land is among the three milled
+# (three Llanowar Elves) there is nothing to choose and nothing is asked: the hand is unchanged.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Six
+Forest
+Forest
+Forest
+Forest
+Forest
+Llanowar Elves
+Llanowar Elves
+Llanowar Elves
+Forest x10
+
+[Bot2 Deck]
+Island x22
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Six.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Six)
+[T3 Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Hand.Count = 4
+Bot1.Graveyard = Llanowar Elves; Llanowar Elves; Llanowar Elves; Black Lotus

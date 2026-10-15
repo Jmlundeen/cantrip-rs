@@ -1,0 +1,27 @@
+# Town Greeter: "mill four cards" with two cards left mills as many as possible (CR 701.17b) - Starting Town and the
+# Island - and the Town card from among them may still be put into hand for 2 life.
+
+[Bot1 Deck]
+Forest x3
+Town Greeter
+Forest x4
+Starting Town
+Island
+
+[Bot2 Deck]
+Mountain x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Town Greeter.Cast
+Bot1.Choose(Starting Town)
+
+[Expect]
+Bot1.Life = 22
+Bot1.Hand = Forest; Forest; Forest; Forest; Forest; Starting Town
+Bot1.Graveyard = Island
+Bot1.Library.Count = 0

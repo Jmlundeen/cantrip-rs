@@ -1,0 +1,11 @@
+{
+  "name": "Caves of Chaos Adventurer",
+  "manaCost": "{3}{R}",
+  "type": "Creature — Human Barbarian",
+  "power": 5,
+  "toughness": 3,
+  "oracleText": "Trample\nWhen this creature enters, you take the initiative.\nWhenever this creature attacks, exile the top card of your library. If you've completed a dungeon, you may play that card this turn without paying its mana cost. Otherwise, you may play that card this turn.",
+  "keywords": [
+    "Trample"
+  ]
+}

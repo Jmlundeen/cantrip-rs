@@ -1,0 +1,44 @@
+# Ephemerate (CR 702.88a): "Exile target creature you control, then return it to the battlefield under its owner's
+# control." Cast from the hand it is exiled as it resolves instead of going to the graveyard, and at the beginning of
+# its controller's next upkeep may be cast from exile without paying its mana cost.
+#
+# Bot1 casts Thraben Inspector on turn 1 (a Clue), and Ephemerate on it on turn 3: the Inspector returns as a new
+# object (CR 400.7) and investigates again (a second Clue), and Ephemerate waits in exile rather than the graveyard.
+# On turn 5, Bot1's next upkeep, Bot1 casts it from exile for nothing and blinks the Inspector once more (a third
+# Clue). That cast was not from a hand, so Ephemerate is put into the graveyard as it resolves and does not rebound.
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Thraben Inspector
+Ephemerate
+Plains
+Plains
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Thraben Inspector.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Ephemerate.Cast(Thraben Inspector)
+[T3 Bot1.Main2]
+? Exile.Count = 1
+? Bot1.Graveyard.Count = 0
+? Bot1.Battlefield = Plains; Plains; Thraben Inspector; Clue Token; Clue Token
+[T5 Bot1.Upkeep]
+Bot1.Accept
+Bot1.Target(Thraben Inspector)
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Exile.Count = 0
+Bot1.Graveyard = Ephemerate
+Bot1.Battlefield = Plains; Plains; Thraben Inspector; Clue Token; Clue Token; Clue Token

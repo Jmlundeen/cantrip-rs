@@ -1,0 +1,26 @@
+# "You may attach that Equipment": Bot1 declines, so the Hammer stays unattached and the Ornithopter is a plain 0/2 without indestructible.
+
+[Bot1 Deck]
+Ornithopter
+Black Lotus
+Mox Jet
+Hammer of Nazahn
+Swamp x13
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Hammer of Nazahn.Cast
+Bot1.Decline
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Hammer of Nazahn.AttachedTo = (absent)
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Ornithopter.Keywords = Flying

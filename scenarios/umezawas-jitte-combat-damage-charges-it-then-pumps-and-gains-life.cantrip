@@ -1,0 +1,46 @@
+# Umezawa's Jitte is equipped to a Rootwalla on turn 3 and it connects: two charge counters. Bot1 spends one on the
+# +2/+2 mode (the Rootwalla is a 3/3 until end of turn) and one on "you gain 2 life".
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Basking Rootwalla
+Umezawa's Jitte
+Forest
+Forest
+Forest x12
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Basking Rootwalla.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Umezawa's Jitte.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Umezawa's Jitte.Activate(Ability: Equip; Basking Rootwalla)
+Bot1.Attack(Basking Rootwalla > Bot2)
+[T3 Bot1.Main2]
+? Bot2.Life = 19
+? Bot1.Battlefield.Umezawa's Jitte.Counters.Charge = 2
+Bot1.Battlefield.Umezawa's Jitte.Activate(Ability: Remove)
+Bot1.Modes(Equipped creature gets +2/+2)
+[T3 Bot1.End]
+? Bot1.Battlefield.Basking Rootwalla.Power = 3
+? Bot1.Battlefield.Basking Rootwalla.Toughness = 3
+? Bot1.Battlefield.Umezawa's Jitte.Counters.Charge = 1
+Bot1.Battlefield.Umezawa's Jitte.Activate(Ability: Remove)
+Bot1.Modes(You gain 2 life)
+
+[Expect]
+Bot1.Life = 22
+Bot1.Battlefield.Umezawa's Jitte.AttachedTo = Basking Rootwalla

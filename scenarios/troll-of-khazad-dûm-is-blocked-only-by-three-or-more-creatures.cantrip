@@ -1,0 +1,45 @@
+# Troll of Khazad-dûm can't be blocked except by three or more creatures (CR 509.1b). On turn 3 Bot2's two Ornithopters
+# may block the other attacker, Bot1's Ornithopter, but no block of the Troll is allowed; on turn 5 its three Ornithopters
+# block it together and no damage reaches Bot2 (the 6 of turn 3 are all it has taken).
+[Bot1 Deck]
+Swamp
+Mox Jet
+Black Lotus
+Sol Ring
+Troll of Khazad-dûm
+Ornithopter
+Swamp
+Swamp x20
+[Bot2 Deck]
+Ornithopter x3
+Island x4
+Island x20
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Troll of Khazad-dûm.Cast
+[Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Troll of Khazad-dûm > Bot2; Ornithopter > Bot2)
+! Bot2.Block(Ornithopter#1 > Troll of Khazad-dûm)
+! Bot2.Block(Ornithopter#2 > Troll of Khazad-dûm)
+Bot2.Block(Ornithopter#1 > Ornithopter)
+[T4 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T5 Bot1.Main1]
+Bot1.Attack(Troll of Khazad-dûm > Bot2)
+Bot2.Block(Ornithopter#1 > Troll of Khazad-dûm; Ornithopter#2 > Troll of Khazad-dûm; Ornithopter#3 > Troll of Khazad-dûm)
+[Bot1.Main2]
+[Expect]
+Bot2.Life = 14
+Bot2.Graveyard.Count = 3

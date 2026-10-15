@@ -1,0 +1,55 @@
+# "Your graveyard" is the graveyard of the ability's controller, not of Eternal Witness's owner. Bot2 bolts Bot1's
+# Witness and reanimates it: Bot2 controls the trigger, so it targets Reanimate in Bot2's own graveyard (put there as
+# Reanimate finished resolving, before the trigger went on the stack) and returns it to Bot2's hand, while the
+# Lightning Bolt in Bot1's graveyard is not a candidate.
+
+[Bot1 Deck]
+Mountain
+Forest
+Forest
+Lightning Bolt
+Eternal Witness
+Forest
+Forest
+Forest x20
+
+[Bot2 Deck]
+Mountain
+Swamp
+Lightning Bolt
+Reanimate
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Eternal Witness.Cast
+Bot1.Decline
+[T6 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Eternal Witness)
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Reanimate.Cast(Eternal Witness)
+Bot2.Target(Reanimate)
+Bot2.Accept
+[Bot2.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot2.Battlefield = Mountain; Swamp; Eternal Witness
+Bot1.Graveyard = Lightning Bolt
+Bot2.Graveyard = Lightning Bolt
+Bot2.Hand = Reanimate; Island; Island; Island; Island; Island; Island
+Bot2.Life = 14

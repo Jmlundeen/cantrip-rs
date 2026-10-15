@@ -1,0 +1,32 @@
+# The hexproof lasts only the turn the Aura entered. Cast on turn one, the Rescue makes the Elves a 2/2; on turn two Bot2's Lightning
+# Bolt can target them, and kills them. The Aura, enchanting nothing, is put into the graveyard (CR 704.5m).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Llanowar Elves
+Shardmage's Rescue
+Forest x11
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x13
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Shardmage's Rescue.Cast(Llanowar Elves)
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Llanowar Elves.Keywords = (absent)
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Shardmage's Rescue; Llanowar Elves
+Bot2.Graveyard = Lightning Bolt

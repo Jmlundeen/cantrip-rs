@@ -1,0 +1,2189 @@
+using Cantrip.Client.Presentation;
+using Cantrip.Protocol;
+using Microsoft.UI.Text;
+
+namespace Cantrip.Client.Web;
+
+/// <summary>
+/// The dock: what the server is asking, and whatever answers do not belong to a card, over the shared
+/// <see cref="PromptSelection"/>; each <c>Fill</c> is checked against its screen in the prompt gallery.
+/// </summary>
+public sealed partial class MainPage
+{
+    private static KeyBinding PassKey => PlayerSettings.KeyFor(Hotkey.Pass);
+    private static KeyBinding CancelKey => PlayerSettings.KeyFor(Hotkey.Cancel);
+    private static KeyBinding AttackAllKey => PlayerSettings.KeyFor(Hotkey.AttackAll);
+
+    private static string Suffix(KeyBinding key) => Hotkeys.Suffix(key);
+
+    /// <summary>Where <see cref="AddButton"/> puts a button: the dock, or the choice window's footer while it carries the prompt.</summary>
+    private FlowPanel _buttons = null!;
+    private FlowPanel _dockButtons = null!;
+    private TextBlock _errorLabel = null!;
+
+    /// <summary>What the Pass, Cancel and Attack-all keys press on the dock as it stands; null where the dock has no such button.</summary>
+    private Action? _pass;
+    private Action? _cancel;
+    private Action? _attackAll;
+
+    /// <summary>
+    /// Says what the server is asking and offers whatever does not belong to a card.
+    /// </summary>
+    private void FillPrompt(GameClient client)
+    {
+        ClearChoices();
+        _dockButtons.Children.Clear();
+        _buttons = _dockButtons;
+        _pass = null;
+        _attackAll = null;
+        _cancel = null;
+
+        if (!client.IsConnected)
+        {
+            Prompt("Disconnected", "The connection to the server was lost.");
+            return;
+        }
+
+        if (client.View is null && client.Errors.Count > 0)
+        {
+            Prompt("Could not join", client.Errors[^1].Detail);
+            return;
+        }
+
+        if (client.IsOver)
+        {
+            Prompt(DescribeOutcome(client), "The game is over.");
+            ShowErrors(client);
+            return;
+        }
+
+        if (_targeting is { } announced)
+        {
+            int candidates = announced.TargetCandidates.Count;
+            Prompt(
+                $"{(announced.TargetsOptional ? "Up to one target" : "Target")} for {client.Object(announced.Source)?.Name ?? "it"}",
+                (candidates == 1 ? "1 possible target" : $"{candidates} possible targets")
+                    + (announced.TargetsOptional ? ", or none" : string.Empty));
+
+            // "Up to one target" (CR 601.2c): aiming at nothing is a choice the action offers, not a way out of it.
+            if (announced.TargetsOptional)
+            {
+                AddButton(_pickedTargets.Count == 0 ? "No target" : "Done with 1 target", () =>
+                {
+                    LetGraveyardsGo(client);
+                    SendTargets(client);
+                }, primary: true);
+            }
+
+            // Nothing has been announced yet, so backing out costs nothing and needs no message.
+            AddCancelButton(() =>
+            {
+                _targeting = null;
+                LetGraveyardsGo(client);
+                _needsRedraw = true;
+            });
+
+            ShowErrors(client);
+            return;
+        }
+
+        // The permanent a cost taps or sacrifices, picked on the board the way a target is.
+        if (_selection.CostChoice is [var costing, ..])
+        {
+            int candidates = _costTakes.Count;
+            Prompt(
+                $"{client.Object(costing.Source)?.Name ?? "An ability"}: choose a permanent to {CardActions.CostVerb(costing)}",
+                $"{costing.CostText}  ·  {(candidates == 1 ? "1 possible choice" : $"{candidates} possible choices")}"
+                    + "  ·  click it on the battlefield");
+
+            AddCancelButton(() =>
+            {
+                _selection.CostChoice = null;
+                _needsRedraw = true;
+            });
+
+            ShowErrors(client);
+            return;
+        }
+
+        switch (client.Prompt?.Prompt)
+        {
+            case PriorityPromptMessage priority:
+                Prompt(Moment(client), OnTopOfStack(client) ?? Available(client, priority));
+                _pass = () => Send(client, new PassAnswer());
+                AddButton(PassLabel(client), _pass, primary: true).Tooltip = "Pass priority" + Suffix(PassKey);
+                AddResolveAllButton(client);
+                break;
+
+            case DiscardPromptMessage discard:
+                Prompt(
+                    discard.Count == 1 ? "Discard a card" : $"Discard {discard.Count} cards",
+                    $"{_picked.Count} of {discard.Count} chosen");
+
+                AddButton(
+                    "Discard",
+                    () => Send(client, new CardsChosenAnswer { Cards = [.. _picked.Select(h => new ViewHandle(h))] }),
+                    enabled: _picked.Count == discard.Count,
+                    primary: true);
+
+                break;
+
+            case PayCostsPromptMessage pay:
+                FillPayment(client, pay);
+                break;
+
+            case SearchLibraryPromptMessage search:
+                FillSearch(client, search);
+                break;
+
+            case ChooseCardsPromptMessage choose:
+                FillChooseCards(client, choose);
+                break;
+
+            case ChooseTargetPromptMessage target:
+                FillChooseTarget(client, target);
+                break;
+
+            case ChooseDividedTargetsPromptMessage divide:
+                FillDivideTargets(client, divide);
+                break;
+
+            case UnlessPaysPromptMessage unless:
+                FillUnlessPays(client, unless);
+                break;
+
+            case MayPromptMessage may:
+                FillMay(client, may);
+                break;
+
+            case ChooseModesPromptMessage modes:
+                FillChooseModes(client, modes);
+                break;
+
+            case OrderTriggersPromptMessage triggers:
+                FillOrderTriggers(client, triggers);
+                break;
+
+            case ChooseReplacementPromptMessage replacement:
+                FillChooseReplacement(client, replacement);
+                break;
+
+            case NameCardPromptMessage naming:
+                FillNameCard(client, naming);
+                break;
+
+            case ChoosePlayerPromptMessage choosing:
+                FillChoosePlayer(client, choosing);
+                break;
+
+            case ChooseStartingPlayerPromptMessage starting:
+                FillChooseStartingPlayer(client, starting);
+                break;
+
+            case MulliganPromptMessage mulligan:
+                FillMulligan(client, mulligan);
+                break;
+
+            case ChooseColorsPromptMessage colors:
+                FillChooseColors(client, colors);
+                break;
+
+            case DistributeCardsPromptMessage distribute:
+                FillDistribute(client, distribute);
+                break;
+
+            case DeclareAttackersPromptMessage attackers:
+                FillAttackers(client, attackers);
+                break;
+
+            case DeclareBlockersPromptMessage blockers:
+                FillBlockers(client, blockers);
+                break;
+
+            case AssignCombatDamagePromptMessage assign:
+                FillAssignDamage(client, assign);
+                break;
+
+            case null:
+                // Nobody holds priority while another player is answering a prompt of their own, so the wait is named
+                // after the other player rather than after nobody.
+                Prompt(
+                    client.Seat == 0 ? "Joining" : client.View is { Turn: 0 } ? "The game is starting" : Moment(client),
+                    client.Seat == 0
+                        ? "Waiting for a seat"
+                        : client.View?.PriorityPlayer is > 0 and var holder
+                            ? $"Waiting for {NameOf(client, holder)}"
+                            : "Waiting for the other player");
+
+                break;
+
+            case { } unknown:
+                // A question this build has no dock for: the prompt knows the simplest legal answer to itself.
+                Prompt(Spaced(unknown.GetType().Name), "This build has no screen for this question yet.");
+                AddButton("Continue", () => Send(client, unknown.Default()), primary: true);
+                break;
+        }
+
+        // A spell or ability still being announced can be given up at any of its questions.
+        if (client.Prompt is { MayCancel: true })
+        {
+            AddCancelButton(() => Send(client, new CancelAnnouncementAnswer()));
+        }
+
+        ShowErrors(client);
+    }
+
+    /// <summary>A readable title for a prompt this build has no dock for: <c>ChooseModesPromptMessage</c> reads as "Choose modes".</summary>
+    private static string Spaced(string typeName)
+    {
+        string bare = typeName.EndsWith("PromptMessage", StringComparison.Ordinal)
+            ? typeName[..^"PromptMessage".Length]
+            : typeName;
+
+        var text = new System.Text.StringBuilder();
+
+        foreach (char letter in bare)
+        {
+            if (char.IsUpper(letter) && text.Length > 0)
+            {
+                text.Append(' ').Append(char.ToLowerInvariant(letter));
+            }
+            else
+            {
+                text.Append(letter);
+            }
+        }
+
+        return text.Length == 0 ? "A decision" : text.ToString();
+    }
+
+    /// <summary>What the Auto-mana key does while a cost is being paid, for the dock line to end with.</summary>
+    private string AutoManaNote()
+    {
+        if (!_actions.Offered.Any(option => AutoMana.IsManaAbility(option) && Ways(option) > 1))
+        {
+            return string.Empty;
+        }
+
+        KeyBinding key = PlayerSettings.KeyFor(Hotkey.AutoMana);
+        return PlayerSettings.AutoManaByDefault
+            ? $"  ·  auto-mana is picking, hold {key} to choose"
+            : $"  ·  hold {key} to have the colour picked";
+
+        int Ways(ActionOptionMessage option) =>
+            option.ProducesOfAnyOneColor > 0 || option.ProducesOfAnyColorEach > 0
+                ? Math.Max(option.ColorChoices.Count, 2)
+                : _actions.For(option.Source).Count;
+    }
+
+    // --- Paying ---
+
+    private void FillPayment(GameClient client, PayCostsPromptMessage prompt)
+    {
+        string name = client.Object(prompt.Spell)?.Name ?? "the spell";
+        bool owing = AutoPlay.Owing(prompt);
+
+        // A {C} still owed (CR 107.4c) is paid only with colorless mana.
+        string colorless = prompt.RemainingColorless > 0 ? "  ·  only colorless mana pays {C}" : string.Empty;
+
+        if (prompt.AnnouncesXOrKicks)
+        {
+            FillAnnouncement(client, prompt, name);
+            return;
+        }
+
+        if (!prompt.HasX)
+        {
+            // The pool covers the cost in one way, and something other than mana could pay some of it instead
+            // (CR 601.2h): the player confirms the pool, or taps or exiles to keep some of it.
+            bool covered = !owing && _actions.Confirm is not null;
+
+            string how = covered
+                ? "Okay pays it from your pool"
+                : _actions.Assignable.Count > 0
+                ? _actions.Any
+                    ? "click mana in your pool, or tap a land"
+                    : "click mana in your pool"
+                : _actions.Any
+                    ? "tap a land"
+                    : "nothing untapped can pay it";
+
+            // Waterbend (CR 701.67a) and improvise (CR 702.126a).
+            List<ActionOptionMessage> tapping = prompt.Options.FindAll(option => option.Kind == ActionKindView.TapToPay);
+            if (tapping.Count > 0)
+            {
+                bool artifactsOnly = tapping.TrueForAll(option =>
+                    client.Object(option.Source)?.CardTypes.Contains(CardTypeView.Artifact) ?? false);
+
+                // Convoke (CR 702.51a) describes each tap, since a creature may pay one of its colors as well as {1}.
+                how = tapping.Exists(option => option.Description.Length > 0)
+                    ? $"{how}  ·  or tap a creature to help pay"
+                    : $"{how}  ·  or tap an {(artifactsOnly ? "artifact" : "artifact or creature")} for {{1}}";
+            }
+
+            // Delve (CR 702.66a).
+            if (prompt.Options.Exists(option => option.Kind == ActionKindView.ExileToPay))
+            {
+                how = $"{how}  ·  or exile a card from your graveyard for {{1}}";
+            }
+
+            // A Phyrexian mana symbol (CR 107.4f).
+            if (_actions.PayLife.Count > 0)
+            {
+                how = $"{how}  ·  or pay life for {{{CardActions.Symbol(_actions.PayLife[0].Produces[0])}/P}}";
+            }
+
+            // "You can't spend mana to cast this spell" (CR 601.2h, 106.4): lands and pool mana are no help, whatever the
+            // board offers, so only what is not mana is named.
+            if (prompt.SpendsNoMana)
+            {
+                List<string> ways = [];
+                if (prompt.Options.Exists(option => option.Kind == ActionKindView.TapToPay))
+                {
+                    ways.Add("tap a creature to help pay");
+                }
+
+                if (prompt.Options.Exists(option => option.Kind == ActionKindView.ExileToPay))
+                {
+                    ways.Add("exile a card from your graveyard for {1}");
+                }
+
+                how = ways.Count > 0
+                    ? $"no mana can pay it  ·  {string.Join("  ·  or ", ways)}"
+                    : "no mana can pay it, and nothing else left can";
+                colorless = string.Empty;
+            }
+
+            Prompt(
+                _actions.Assignable.Count > 0 ? $"Choose mana for {name}" : $"Pay for {name}",
+                covered
+                    ? $"your pool covers {prompt.Total}  ·  {how}"
+                    : $"{prompt.Remaining} of {prompt.Total} still to pay  ·  {how}{colorless}{(prompt.SpendsNoMana ? string.Empty : AutoManaNote())}");
+
+            if (covered && _actions.Confirm is { } pay)
+            {
+                _pass = () => Send(client, AnswerFor(pay));
+                AddButton("Okay", () => Send(client, AnswerFor(pay)), primary: true).Tooltip =
+                    $"Pay {prompt.Total} with the mana in your pool" + Suffix(PassKey);
+            }
+
+            foreach (ActionOptionMessage life in _actions.PayLife)
+            {
+                AddButton($"Pay {life.LifeCost} life", () => Send(client, AnswerFor(life))).Tooltip =
+                    $"Pay {life.LifeCost} life instead of {{{CardActions.Symbol(life.Produces[0])}}}";
+            }
+
+            if (_actions.Cancel is { } cancel)
+            {
+                AddCancelButton(() => Send(client, AnswerFor(cancel)));
+            }
+
+            return;
+        }
+
+        // Kicker (CR 702.33) and buyback (CR 702.27): the count being chosen is how many times that cost is paid.
+        bool kicker = prompt.Kicker.Length > 0;
+        string raise = !kicker
+            ? "  ·  tap a land or click mana in your pool to raise X"
+            : _actions.IncreaseX is null
+                ? string.Empty
+                : prompt.Buyback
+                    ? $"  ·  tap a land or click mana in your pool to buy it back for {prompt.Kicker}"
+                    : prompt.X == 0
+                        ? $"  ·  tap a land or click mana in your pool to kick it for {prompt.Kicker}"
+                        : $"  ·  tap a land or click mana in your pool to kick it again for {prompt.Kicker}";
+
+        Prompt(
+            !kicker ? $"Choose X for {name}" : prompt.Buyback ? $"Buy back {name}?" : $"Kick {name}?",
+            owing
+                ? $"{prompt.Remaining} of {prompt.Total} still to pay  ·  tap a land or click mana in your pool{colorless}"
+                : $"{prompt.Total} paid{raise}");
+
+        if (_actions.Confirm is { } confirm)
+        {
+            _pass = () => Send(client, AnswerFor(confirm));
+            AddButton("Okay", () => Send(client, AnswerFor(confirm)), primary: true).Tooltip =
+                (kicker ? $"Cast {Paid(prompt)}" : $"Cast with X = {prompt.X}") + Suffix(PassKey);
+        }
+        else
+        {
+            AddButton("Okay", () => { }, enabled: false).Tooltip = "Pay what is still owed first.";
+        }
+
+        AddXStepper(client, prompt);
+
+        if (_actions.Cancel is { } giveUp)
+        {
+            AddCancelButton(() => Send(client, AnswerFor(giveUp)));
+        }
+    }
+
+    /// <summary>The announcement (CR 601.2b): X, or how many times to kick, chosen before the targets and before anything is paid.</summary>
+    private void FillAnnouncement(GameClient client, PayCostsPromptMessage prompt, string name)
+    {
+        bool kicker = prompt.Kicker.Length > 0;
+        string reach = prompt.MostAffordable < 0
+            ? "not enough mana for it"
+            : prompt.XPaidInLife
+                ? prompt.MostAffordable > 0
+                    ? $"X is paid in life: up to {prompt.MostAffordable} leaves you alive"
+                    : "X is paid in life, and any at all would leave you with none"
+            : prompt.VariableKicker
+                ? prompt.MostAffordable >= 0 ? $"enough mana for X up to {prompt.MostAffordable}" : "not enough mana to kick it"
+            : kicker
+                ? prompt.Buyback
+                    ? prompt.MostAffordable > 0 ? "you have the mana to buy it back" : "not enough mana to buy it back"
+                    : prompt.MostAffordable > 0
+                        ? $"enough mana to kick it {Times(prompt.MostAffordable)}"
+                        : "not enough mana to kick it"
+                : $"enough mana for X up to {prompt.MostAffordable}";
+
+        Prompt(
+            !kicker ? $"Choose X for {name}" : prompt.Buyback ? $"Buy back {name}?" : $"Kick {name}?",
+            prompt.XPaidInLife
+                ? $"{prompt.Total} and {prompt.X} life  ·  {reach}  ·  targets and paying come next"
+                : $"{prompt.Total} in all  ·  {reach}  ·  targets and paying come next");
+
+        if (_actions.Confirm is { } confirm)
+        {
+            _pass = () => Send(client, AnswerFor(confirm));
+            AddButton("Okay", () => Send(client, AnswerFor(confirm)), primary: true).Tooltip =
+                (kicker ? $"Cast {Paid(prompt)}" : $"Announce X = {prompt.X}") + Suffix(PassKey);
+        }
+
+        AddXStepper(client, prompt);
+
+        if (_actions.Cancel is { } giveUp)
+        {
+            AddCancelButton(() => Send(client, AnswerFor(giveUp)));
+        }
+
+        static string Times(int times) => times switch
+        {
+            1 => "once",
+            _ => $"{times} times",
+        };
+    }
+
+    private static string Paid(PayCostsPromptMessage prompt) => prompt.VariableKicker
+        ? prompt.KickerPaid ? $"kicked with X = {prompt.X}" : "not kicked"
+        : prompt.Buyback
+        ? prompt.X == 0 ? "without buyback" : "with buyback"
+        : prompt.X switch
+        {
+            0 => "not kicked",
+            1 => "kicked",
+            var times => $"kicked {times} times",
+        };
+
+    /// <summary>The step down, the value, and the step up, as one group the dock's flow cannot wrap apart.</summary>
+    private void AddXStepper(GameClient client, PayCostsPromptMessage prompt)
+    {
+        bool kicker = prompt.Kicker.Length > 0;
+        string down = !kicker ? "Lower X by one" : prompt.VariableKicker
+            ? "Lower X, or decline the kicker" : prompt.Buyback ? "Cast it without buying it back" : "Kick it one time fewer";
+        string up = !kicker
+            ? "Raise X by one"
+            : prompt.VariableKicker ? prompt.KickerPaid ? "Raise kicker X by one" : $"Pay kicker {prompt.Kicker}"
+            : prompt.Buyback ? $"Buy it back for {prompt.Kicker}" : $"Kick it once more for {prompt.Kicker}";
+
+        _buttons.Children.Add(Stepper(
+            8,
+            StepButton("−", down, _actions.DecreaseX),
+            new SymbolText(13, Theme.Fg, semibold: true) { Text = kicker ? Paid(prompt) : $"X = {prompt.X}" },
+            StepButton("+", up, _actions.IncreaseX)));
+
+        DockButton StepButton(string text, string tooltip, ActionOptionMessage? option)
+        {
+            var button = new DockButton(text, primary: false, enabled: option is not null) { Tooltip = tooltip };
+            if (option is not null)
+            {
+                button.Clicked += () => { Send(client, AnswerFor(option)); RedrawNow(); };
+            }
+
+            return button;
+        }
+    }
+
+    /// <summary>A step down, what it steps, and a step up, in one row.</summary>
+    private static StackPanel Stepper(double spacing, FrameworkElement lower, FrameworkElement label, FrameworkElement raise)
+    {
+        label.VerticalAlignment = VerticalAlignment.Center;
+        return new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = spacing,
+            HorizontalAlignment = HorizontalAlignment.Left,
+            Children = { lower, label, raise },
+        };
+    }
+
+    // --- Targets ---
+
+    /// <summary>Choosing a triggered ability's target as it goes on the stack (CR 603.3d).</summary>
+    private void FillChooseTarget(GameClient client, ChooseTargetPromptMessage prompt)
+    {
+        if (!_peekedForTargets)
+        {
+            _peekedForTargets = true;
+            PeekAtTargets(client, prompt.Candidates);
+        }
+
+        string source = client.Object(prompt.Source)?.Name ?? client.Object(prompt.Ability)?.Name ?? "An ability";
+        int count = prompt.Candidates.Count;
+
+        // Choosing is not targeting (CR 608.2d).
+        string noun = prompt.Targeted ? "target" : "choice";
+        string nouns = prompt.Targeted ? "targets" : "choices";
+
+        Prompt(
+            prompt.AnyNumber ? $"Any number of {nouns} for {source}"
+                : prompt.Count == 1 && prompt.Optional ? $"Up to one {noun} for {source}"
+                : prompt.Count == 1 ? $"{(prompt.Targeted ? "Target" : "Choice")} for {source}"
+                : prompt.Optional ? $"Up to {prompt.Count} {nouns} for {source}"
+                : prompt.Minimum > 0 ? $"{prompt.Minimum} to {prompt.Count} {nouns} for {source}"
+                : $"{prompt.Count} {nouns} for {source}",
+            prompt.Count == 1 && !prompt.AnyNumber
+                ? $"{prompt.Text}  ·  {(count == 1 ? $"1 possible {noun}" : $"{count} possible {nouns}")}"
+                : prompt.AnyNumber
+                ? $"{prompt.Text}  ·  {_pickedTargets.Count} of {count} chosen"
+                : $"{prompt.Text}  ·  {_pickedTargets.Count} of {prompt.Count} chosen, from {count}");
+
+        if (prompt.Optional)
+        {
+            AddButton(
+                _pickedTargets.Count switch
+                {
+                    0 => prompt.AnyNumber ? "Choose none" : prompt.Count == 1 ? $"No {noun}" : $"No {nouns}",
+                    1 => $"Done with 1 {noun}",
+                    var picked => $"Done with {picked} {nouns}",
+                },
+                () => SendTargets(client),
+                primary: true);
+        }
+        else if (prompt.Minimum > 0)
+        {
+            // A printed range, "one or two target creatures" (CR 601.2c): done once the minimum is reached.
+            AddButton(
+                _pickedTargets.Count == 1 ? $"Done with 1 {noun}" : $"Done with {_pickedTargets.Count} {nouns}",
+                () => SendTargets(client),
+                enabled: _pickedTargets.Count >= prompt.Minimum,
+                primary: true);
+        }
+    }
+
+    /// <summary>
+    /// Choosing a divided slot's targets and how its total splits among them together (CR 601.2d). The candidates on the
+    /// battlefield wear their shares, with a step down and up, the way blockers wear combat damage, so whose creature
+    /// gets what is read off the board; the dock says what has been chosen, and whose each one is.
+    /// </summary>
+    private void FillDivideTargets(GameClient client, ChooseDividedTargetsPromptMessage prompt)
+    {
+        if (!_peekedForTargets)
+        {
+            _peekedForTargets = true;
+            PeekAtTargets(client, prompt.Candidates);
+        }
+
+        string source = client.Object(prompt.Source)?.Name ?? client.Object(prompt.Ability)?.Name ?? "An ability";
+        int assigned = _dividedShares.Values.Sum();
+        int targeted = _dividedShares.Count(pair => pair.Value > 0);
+
+        Prompt(
+            $"Divide {prompt.Total} for {source}",
+            $"{prompt.Text}  ·  {assigned} of {prompt.Total} assigned, among {targeted} target{(targeted == 1 ? string.Empty : "s")}{(prompt.MaxTargets > 0 ? $" (up to {prompt.MaxTargets})" : string.Empty)}{(prompt.Optional ? "  ·  or no target at all" : string.Empty)}  ·  click a card to add one, or use its − and +");
+
+        bool none = prompt.Optional && assigned == 0;
+
+        AddButton(
+            none ? "Divide nothing" : "Divide",
+            () => Send(client, new TargetsDividedAnswer
+            {
+                Shares =
+                [
+                    .. _dividedShares
+                        .Where(pair => pair.Value > 0)
+                        .Select(pair => new TargetShareMessage
+                        {
+                            Target = new TargetMessage { Object = new ViewHandle(pair.Key) },
+                            Amount = pair.Value,
+                        }),
+                ],
+            }),
+            enabled: none || assigned == prompt.Total && (prompt.MaxTargets == 0 || targeted <= prompt.MaxTargets),
+            primary: true).Tooltip = (none ? "Choose no target" : "Lock in the division") + Suffix(PassKey);
+
+        if (assigned > 0)
+        {
+            AddButton("Clear", () =>
+            {
+                _dividedShares.Clear();
+                _needsRedraw = true;
+            });
+        }
+
+        foreach (TargetMessage candidate in prompt.Candidates)
+        {
+            if (candidate.IsPlayer)
+            {
+                continue;
+            }
+
+            int handle = candidate.Object.Value;
+            int share = _dividedShares.GetValueOrDefault(handle);
+            ObjectView? card = client.Object(candidate.Object);
+            string name = card is null ? "a creature" : $"{card.Name} ({(card.Controller == client.Seat ? "yours" : $"{NameOf(client, card.Controller)}'s")})";
+
+            // On the battlefield the card itself carries the steps, and the dock only names what has a share.
+            if (card?.Zone == ZoneKindView.Battlefield)
+            {
+                if (share > 0)
+                {
+                    _buttons.Children.Add(new SymbolText(13, Theme.Fg) { Text = $"{share}  {name}" });
+                }
+
+                continue;
+            }
+
+            bool canAddTarget = share > 0 || prompt.MaxTargets == 0 || targeted < prompt.MaxTargets;
+
+            _buttons.Children.Add(Stepper(
+                6,
+                Step("−", share > 0, () => _dividedShares[handle] = Math.Max(0, share - 1)),
+                new SymbolText(13, Theme.Fg) { Text = $"{share}  {name}" },
+                Step("+", assigned < prompt.Total && canAddTarget, () => _dividedShares[handle] = share + 1)));
+        }
+    }
+
+    /// <summary>A − or + beside a share: changes it and redraws.</summary>
+    private DockButton Step(string text, bool enabled, Action change)
+    {
+        var button = new DockButton(text, primary: false, enabled: enabled);
+        button.Clicked += () =>
+        {
+            change();
+            _needsRedraw = true;
+            RedrawNow();
+        };
+
+        return button;
+    }
+
+    // --- Modes, players, colours, names, replacements ---
+
+    /// <summary>Past this many options the dock does not lay out a button for each; it finds them by typing instead.</summary>
+    private const int LongOptionList = 12;
+
+    /// <summary>How many of a long list's options, the best matches for what is typed, the dock shows at once.</summary>
+    private const int OptionsShown = 8;
+
+    /// <summary>
+    /// Choosing a modal spell's modes (CR 700.2), or one of a card's named options (CR 614.12a): one button per mode, or
+    /// for a long list - every creature type (CR 205.3m) - a box to type in and buttons for the options it matches.
+    /// </summary>
+    private void FillChooseModes(GameClient client, ChooseModesPromptMessage prompt)
+    {
+        string source = client.Object(prompt.Source)?.Name ?? "A spell";
+        string count = Spelled(prompt.Count);
+        bool range = prompt.Most > prompt.Count;
+        bool oneClick = prompt.Count == 1 && !range;
+        bool searched = prompt.Modes.Count > LongOptionList;
+
+        Prompt(
+            prompt.Heading.Length > 0 ? prompt.Heading
+                : prompt.AdditionalCost ? $"{source}: choose an additional cost to pay"
+                : range ? $"{source}: choose {count} or more"
+                : $"{source}: choose {count}",
+            (prompt.Heading.Length > 0
+                ? prompt.Source.IsNone ? "Its room ability triggers as you move in" : "Chosen, not targeted"
+                : prompt.AdditionalCost
+                ? "Paid along with its mana cost"
+                : oneClick
+                ? "Each mode's target is chosen next"
+                : range
+                ? $"{_pickedModes.Count} chosen  ·  each one past the first costs, up to {Spelled(prompt.Most)}"
+                : $"{_pickedModes.Count} of {prompt.Count} chosen{(prompt.MayRepeat ? "  ·  the same mode may be chosen more than once" : string.Empty)}")
+            + (searched ? $"  ·  type to find one of {prompt.Modes.Count}" : string.Empty));
+
+        string Label(int mode)
+        {
+            int times = _pickedModes.Count(picked => picked == mode);
+            return times == 0 ? prompt.Modes[mode] : $"×{times}  {prompt.Modes[mode]}";
+        }
+
+        bool Pressable(int mode) =>
+            prompt.Eligible.Contains(mode)
+            && (oneClick || _pickedModes.Count < prompt.Most || (!prompt.MayRepeat && _pickedModes.Contains(mode)));
+
+        void Press(int mode)
+        {
+            if (oneClick)
+            {
+                Send(client, new ModesChosenAnswer { Modes = [mode] });
+                return;
+            }
+
+            if (!prompt.MayRepeat && _pickedModes.Remove(mode))
+            {
+                _needsRedraw = true;
+                return;
+            }
+
+            if (_pickedModes.Count < prompt.Most)
+            {
+                _pickedModes.Add(mode);
+                _needsRedraw = true;
+            }
+        }
+
+        if (searched)
+        {
+            AddOptionSearch(prompt, Label, Pressable, Press);
+        }
+        else
+        {
+            for (int i = 0; i < prompt.Modes.Count; i++)
+            {
+                int mode = i;
+                AddButton(Label(mode), () => Press(mode), enabled: Pressable(mode));
+            }
+        }
+
+        if (!oneClick)
+        {
+            if (_pickedModes.Count > 0)
+            {
+                AddButton("Clear", () =>
+                {
+                    _pickedModes.Clear();
+                    _needsRedraw = true;
+                });
+            }
+
+            AddButton(
+                "Done",
+                () => Send(client, new ModesChosenAnswer { Modes = [.. _pickedModes] }),
+                enabled: _pickedModes.Count >= prompt.Count && _pickedModes.Count <= prompt.Most,
+                primary: true);
+        }
+    }
+
+    /// <summary>
+    /// A long list of options found by typing, as a card name is: a box, then a button for each of the best few matches
+    /// (<see cref="OptionFilter"/>), changed as the typing changes without rebuilding the dock, so the box keeps its
+    /// caret. Enter presses the one option the typing settles on. Options already picked stay in view.
+    /// </summary>
+    private void AddOptionSearch(ChooseModesPromptMessage prompt, Func<int, string> label, Func<int, bool> pressable, Action<int> press)
+    {
+        FlowPanel panel = _buttons;
+        var field = new TextBox
+        {
+            PlaceholderText = "Type to find one",
+            Text = _selection.NameTyped,
+            Width = 220,
+            FontSize = 13,
+        };
+
+        panel.Children.Add(field);
+        List<UIElement> shown = [];
+
+        void Pressed(int mode)
+        {
+            press(mode);
+            RedrawNow();
+        }
+
+        void Show()
+        {
+            foreach (UIElement old in shown)
+            {
+                panel.Children.Remove(old);
+            }
+
+            shown.Clear();
+            List<int> matches = OptionFilter.Matches(prompt.Modes, prompt.Eligible, _selection.NameTyped);
+            List<int> listed = [.. _pickedModes.Distinct().Where(mode => !matches.Take(OptionsShown).Contains(mode)), .. matches.Take(OptionsShown)];
+
+            foreach (int mode in listed)
+            {
+                var button = new DockButton(label(mode), primary: false, enabled: pressable(mode));
+                button.Clicked += () => Pressed(mode);
+                shown.Add(button);
+            }
+
+            int more = matches.Count - Math.Min(matches.Count, OptionsShown);
+            if (matches.Count == 0 || more > 0)
+            {
+                shown.Add(new SymbolText(13, Theme.FgMuted)
+                {
+                    Text = matches.Count == 0 ? "Nothing matches" : $"{more} more  ·  keep typing",
+                    VerticalAlignment = VerticalAlignment.Center,
+                });
+            }
+
+            int at = panel.Children.IndexOf(field) + 1;
+            foreach (UIElement element in shown)
+            {
+                panel.Children.Insert(at++, element);
+            }
+        }
+
+        Show();
+
+        field.TextChanged += (_, _) =>
+        {
+            _selection.NameTyped = field.Text;
+            Show();
+        };
+
+        field.KeyDown += (_, e) =>
+        {
+            if (e.Key == Windows.System.VirtualKey.Enter
+                && OptionFilter.Settled(prompt.Modes, prompt.Eligible, _selection.NameTyped) is int settled
+                && pressable(settled))
+            {
+                Pressed(settled);
+            }
+
+            // Typing is not a hotkey: Space in an option must not pass priority.
+            e.Handled = true;
+        };
+    }
+
+    private static string Spelled(int count) =>
+        count switch { 1 => "one", 2 => "two", 3 => "three", _ => count.ToString(System.Globalization.CultureInfo.InvariantCulture) };
+
+    /// <summary>A player chosen, not targeted (CR 608.2d, 614.12a): one button per eligible seat.</summary>
+    private void FillChoosePlayer(GameClient client, ChoosePlayerPromptMessage prompt)
+    {
+        string source = client.Object(prompt.Source)?.Name ?? "A spell";
+        string action = prompt.Verb switch
+        {
+            "Draw" => prompt.Amount == 1 ? "draws a card" : $"draws {prompt.Amount} cards",
+            "Gift" => "is promised the gift",
+            _ => prompt.Verb,
+        };
+
+        if (prompt.Verb == "Protection")
+        {
+            Prompt($"{source}: choose a player", "This creature has protection from the chosen player.");
+        }
+        else if (prompt.Verb == "Protect")
+        {
+            // CR 310.9a, 310.12a: a battle's protector, chosen as it enters, or again when it has none (CR 704.5x).
+            Prompt($"{source}: choose who protects it", "Its protector defends it, and can't attack it; anyone else facing them may.");
+        }
+        else
+        {
+            Prompt($"{source}: choose an opponent", $"The player you choose {action}");
+        }
+
+        foreach (int seat in prompt.Candidates)
+        {
+            AddButton(NameOf(client, seat), () => Send(client, new PlayerChosenAnswer { Player = seat }), primary: seat == prompt.Candidates[0]);
+        }
+    }
+
+    /// <summary>
+    /// Who takes the first turn (CR 103.1), asked of the seat chosen at random before any hand is dealt: play first or
+    /// draw first, or in a bigger game which player goes first.
+    /// </summary>
+    private void FillChooseStartingPlayer(GameClient client, ChooseStartingPlayerPromptMessage prompt)
+    {
+        List<int> others = [.. prompt.Candidates.Where(seat => seat != prompt.Player)];
+
+        Prompt(
+            "You choose who goes first",
+            others.Count == 1
+                ? "Play first and skip your first draw, or draw first and let your opponent start"
+                : "Play first, or choose who does; turns go on in seating order from them");
+
+        AddButton("Play First", () => Send(client, new PlayerChosenAnswer { Player = prompt.Player }), primary: true);
+
+        if (others.Count == 1)
+        {
+            AddButton("Draw First", () => Send(client, new PlayerChosenAnswer { Player = others[0] }));
+            return;
+        }
+
+        foreach (int seat in others)
+        {
+            AddButton($"{NameOf(client, seat)} plays first", () => Send(client, new PlayerChosenAnswer { Player = seat }));
+        }
+    }
+
+    /// <summary>Keep the opening hand or take a mulligan (CR 103.5); the hand itself is in the hand row below.</summary>
+    private void FillMulligan(GameClient client, MulliganPromptMessage prompt)
+    {
+        int hand = client.Zone(ZoneKindView.Hand, client.Seat).Count;
+        int bottom = Math.Max(0, hand - prompt.Keeps);
+
+        Prompt(
+            prompt.Mulligans switch
+            {
+                0 => "Your opening hand",
+                1 => "Your hand after a mulligan",
+                _ => $"Your hand after {prompt.Mulligans} mulligans",
+            },
+            bottom == 0
+                ? "Keep it, or shuffle it away for a new hand"
+                : $"Keeping it puts {(bottom == 1 ? "a card" : $"{bottom} cards")} of your choice on the bottom of your library");
+
+        AddButton($"Keep {prompt.Keeps}", () => Send(client, new MayChosenAnswer { Accept = false }), primary: true);
+        AddButton("Mulligan", () => Send(client, new MayChosenAnswer { Accept = true }));
+    }
+
+    /// <summary>One or more colors chosen as a spell or ability resolves (CR 202.2b).</summary>
+    private void FillChooseColors(GameClient client, ChooseColorsPromptMessage prompt)
+    {
+        string source = client.Object(prompt.Source)?.Name ?? "An ability";
+        string many = prompt.Count switch { 1 => "a color", 2 => "two colors", 3 => "three colors", _ => $"{prompt.Count} colors" };
+        string doing = prompt.Verb switch
+        {
+            "AddMana" when prompt.Count == 1 => "One mana of that color is added",
+            "AddMana" => $"One mana of each is added  ·  {_pickedColors.Count} of {prompt.Count} chosen",
+            "GainProtection" when prompt.Count == 1 => "That creature gains protection from it until end of turn",
+            _ when prompt.Count == 1 => "Chosen, not targeted",
+            _ => $"{_pickedColors.Count} of {prompt.Count} chosen",
+        };
+
+        Prompt($"{source}: choose {many}", doing);
+
+        foreach (ColorView color in prompt.Choices)
+        {
+            ColorView chosen = color;
+            int times = _pickedColors.Count(picked => picked == (int)chosen);
+            string label = $"{{{CardActions.Symbol(chosen)}}}";
+
+            if (prompt.Count == 1)
+            {
+                AddButton(label, () => Send(client, new ColorsChosenAnswer { Colors = [chosen] }));
+                continue;
+            }
+
+            AddButton(
+                times == 0 ? label : $"×{times}  {label}",
+                () =>
+                {
+                    if (!prompt.MayRepeat && _pickedColors.Remove((int)chosen))
+                    {
+                        _needsRedraw = true;
+                        return;
+                    }
+
+                    if (_pickedColors.Count < prompt.Count)
+                    {
+                        _pickedColors.Add((int)chosen);
+                        _needsRedraw = true;
+                    }
+                },
+                enabled: _pickedColors.Count < prompt.Count || (!prompt.MayRepeat && times > 0));
+        }
+
+        if (prompt.Count <= 1)
+        {
+            return;
+        }
+
+        if (_pickedColors.Count > 0)
+        {
+            AddButton("Clear", () =>
+            {
+                _pickedColors.Clear();
+                _needsRedraw = true;
+            });
+        }
+
+        AddButton(
+            "Done",
+            () => Send(client, new ColorsChosenAnswer { Colors = [.. _pickedColors.Select(picked => (ColorView)picked)] }),
+            enabled: _pickedColors.Count == prompt.Count,
+            primary: true);
+    }
+
+    /// <summary>
+    /// A card name chosen as a permanent enters (CR 614.12a, 201.4). The hand being looked at is laid out to click; any
+    /// other name is typed, and the button names whatever the typing settles on.
+    /// </summary>
+    private void FillNameCard(GameClient client, NameCardPromptMessage prompt)
+    {
+        string source = client.Object(prompt.Source)?.Name ?? "This permanent";
+        bool looking = prompt.Owner > 0;
+        string owner = looking ? NameOf(client, prompt.Owner) : string.Empty;
+
+        Prompt(
+            $"{source}: choose a card name",
+            !looking ? "Type any card name"
+            : prompt.Hand.Count == 0 ? $"{owner}'s hand is empty  ·  type any name"
+            : $"Looking at {owner}'s hand  ·  click a card, or type any name");
+
+        if (looking)
+        {
+            OpenChoices($"{owner}'s hand", closable: false, Math.Max(1, prompt.Hand.Count));
+
+            if (prompt.Hand.Count == 0)
+            {
+                ShowChoicesEmpty("Their hand is empty.");
+            }
+
+            foreach (ViewHandle handle in prompt.Hand)
+            {
+                if (client.Object(handle) is not { } card)
+                {
+                    continue;
+                }
+
+                string name = card.Name;
+                bool nameable = prompt.Names.BinarySearch(name, StringComparer.Ordinal) >= 0;
+                AddChoice(card, new CardLook(Actionable: nameable, Clicked: nameable ? () => Send(client, new CardNamedAnswer { Name = name }) : null));
+            }
+        }
+
+        var field = new TextBox
+        {
+            PlaceholderText = "Any card name",
+            Text = _selection.NameTyped,
+            Width = 220,
+            FontSize = 13,
+        };
+
+        _buttons.Children.Add(field);
+
+        string? Match() => CardNameMatch(prompt.Names, _selection.NameTyped);
+
+        DockButton naming = AddButton(
+            Match() is { } matched ? $"Name {matched}" : "Name a card",
+            () =>
+            {
+                if (Match() is { } chosen)
+                {
+                    Send(client, new CardNamedAnswer { Name = chosen });
+                }
+            },
+            enabled: Match() is not null,
+            primary: true);
+
+        field.TextChanged += (_, _) =>
+        {
+            _selection.NameTyped = field.Text;
+            string? matched = Match();
+            naming.Caption = matched is null ? "Name a card" : $"Name {matched}";
+            naming.Enabled = matched is not null;
+        };
+
+        field.KeyDown += (_, e) =>
+        {
+            if (e.Key == Windows.System.VirtualKey.Enter && Match() is { } chosen)
+            {
+                Send(client, new CardNamedAnswer { Name = chosen });
+                RedrawNow();
+            }
+
+            // Typing is not a hotkey: Space in a name must not pass priority.
+            e.Handled = true;
+        };
+
+        if (prompt.Suggestion.Length > 0)
+        {
+            AddButton($"Name {prompt.Suggestion}", () => Send(client, new CardNamedAnswer { Name = prompt.Suggestion }));
+        }
+    }
+
+    private static string? CardNameMatch(IReadOnlyList<string> names, string typed)
+    {
+        string text = typed.Trim();
+
+        if (text.Length == 0)
+        {
+            return null;
+        }
+
+        if (names.FirstOrDefault(n => string.Equals(n, text, StringComparison.OrdinalIgnoreCase)) is { } exact)
+        {
+            return exact;
+        }
+
+        List<string> starting = [.. names.Where(n => n.StartsWith(text, StringComparison.OrdinalIgnoreCase)).Take(2)];
+
+        if (starting.Count > 0)
+        {
+            return starting.Count == 1 ? starting[0] : null;
+        }
+
+        List<string> containing = [.. names.Where(n => n.Contains(text, StringComparison.OrdinalIgnoreCase)).Take(2)];
+        return containing.Count == 1 ? containing[0] : null;
+    }
+
+    /// <summary>Which of several replacement effects applies first (CR 616.1).</summary>
+    private void FillChooseReplacement(GameClient client, ChooseReplacementPromptMessage prompt)
+    {
+        string subject = client.Object(prompt.Subject)?.Name ?? "it";
+
+        Prompt(
+            $"{subject}: which applies first?",
+            $"{prompt.Sources.Count} effects want to change this  ·  the rest follow");
+
+        for (int i = 0; i < prompt.Sources.Count; i++)
+        {
+            int index = i;
+            string source = client.Object(prompt.Sources[i])?.Name ?? "An effect";
+            string hint = i < prompt.Hints.Count ? prompt.Hints[i] : string.Empty;
+
+            AddButton(
+                hint.Length > 0 ? $"{source}: {hint}" : source,
+                () => Send(client, new ReplacementChosenAnswer { Index = index }),
+                primary: index == 0);
+        }
+    }
+
+    // --- Triggers ---
+
+    /// <summary>
+    /// Which of your simultaneous triggers goes on the stack next (CR 603.3b), in a Stack Triggers window: each clicked
+    /// to put it on the stack, where it stands over what is there until the order is sent with the last click.
+    /// </summary>
+    private void FillOrderTriggers(GameClient client, OrderTriggersPromptMessage prompt)
+    {
+        List<int> left = [.. _selection.TriggersLeft(prompt.Sources.Count)];
+
+        Prompt(
+            _triggerOrder.Count == 0
+                ? $"{prompt.Sources.Count} of your abilities triggered"
+                : $"{left.Count} still to put on the stack",
+            "click them in order  ·  the last one on resolves first");
+
+        OpenChoices("Stack Triggers", closable: false, left.Count);
+
+        foreach (int index in left)
+        {
+            AddChoice(TriggerStandIn(client, prompt, index), new CardLook(Actionable: true, Clicked: () => PlaceTrigger(client, prompt, index)));
+        }
+
+        if (left.Count > 1)
+        {
+            AddButton("Stack All", () => StackTriggersAsShown(client, prompt), primary: true).Tooltip =
+                $"Put all {left.Count} on the stack in the order shown, first one here first.\n"
+                + "The last one shown goes on last, on top, and resolves first."
+                + Suffix(PassKey);
+        }
+
+        if (_triggerOrder.Count > 0)
+        {
+            AddButton("Start over", () =>
+            {
+                _triggerOrder.Clear();
+                _needsRedraw = true;
+            });
+        }
+    }
+
+    private void PlaceTrigger(GameClient client, OrderTriggersPromptMessage prompt, int index)
+    {
+        if (_triggerOrder.Contains(index))
+        {
+            return;
+        }
+
+        _triggerOrder.Add(index);
+        _needsRedraw = true;
+
+        if (_triggerOrder.Count == prompt.Sources.Count)
+        {
+            SendTriggerOrder(client, prompt);
+        }
+    }
+
+    private void StackTriggersAsShown(GameClient client, OrderTriggersPromptMessage prompt)
+    {
+        List<int> order = _selection.TriggerOrderAsShown(prompt.Sources.Count);
+        _triggerOrder.Clear();
+        _triggerOrder.AddRange(order);
+        SendTriggerOrder(client, prompt);
+    }
+
+    /// <summary>The abilities put in order and sent, still standing on the stack until the server's own take their places.</summary>
+    private (List<ObjectView> StandIns, HashSet<ViewHandle> StackBefore)? _landingTriggers;
+
+    /// <summary>Sends the order now standing, and leaves the stand-ins on the stack until the real abilities arrive.</summary>
+    private void SendTriggerOrder(GameClient client, OrderTriggersPromptMessage prompt)
+    {
+        _landingTriggers = (
+            [.. _triggerOrder.Select(i => TriggerStandIn(client, prompt, i))],
+            [.. client.Zone(ZoneKindView.Stack, 0).Select(item => item.Handle)]);
+
+        var answer = new TriggersOrderedAnswer();
+        answer.Order.AddRange(_triggerOrder);
+        Send(client, answer);
+    }
+
+    /// <summary>A triggered ability as it will look on the stack before it is there, with a handle the server can never use.</summary>
+    private static ObjectView TriggerStandIn(GameClient client, OrderTriggersPromptMessage prompt, int index) => new()
+    {
+        Handle = new ViewHandle(-(((client.Prompt?.RequestId ?? 0) * 64) + index + 1)),
+        Zone = ZoneKindView.Stack,
+        Kind = ObjectKindView.AbilityOnStack,
+        Owner = client.Seat,
+        Controller = client.Seat,
+        Name = client.Object(prompt.Sources[index])?.Name ?? "An ability",
+        OracleText = index < prompt.Texts.Count ? prompt.Texts[index] : string.Empty,
+    };
+
+    /// <summary>
+    /// The triggered abilities put in order so far, drawn on top of the stack: those picked while the prompt is open,
+    /// and after the order is sent, those still waiting for the server's own abilities to replace them.
+    /// </summary>
+    private List<ObjectView> StagedTriggers(GameClient client) =>
+        client.Prompt?.Prompt is OrderTriggersPromptMessage prompt
+            ? [.. _triggerOrder.Select(i => TriggerStandIn(client, prompt, i))]
+            : _landingTriggers?.StandIns ?? [];
+
+    /// <summary>
+    /// Hands each stand-in's place to the ability the server put on the stack for it, once they have arrived: the ones
+    /// new to the stack since the order was sent, in the order sent. Given up on at the next question if they never came,
+    /// so a stand-in cannot linger.
+    /// </summary>
+    private void LandTriggers(GameClient client)
+    {
+        if (_landingTriggers is not { } landing)
+        {
+            return;
+        }
+
+        List<ObjectView> arrived =
+        [
+            .. client.Zone(ZoneKindView.Stack, 0)
+                .Where(item => item.Kind == ObjectKindView.AbilityOnStack && !landing.StackBefore.Contains(item.Handle)),
+        ];
+
+        if (arrived.Count >= landing.StandIns.Count)
+        {
+            for (int i = 0; i < landing.StandIns.Count; i++)
+            {
+                _flights.Alias(landing.StandIns[i].Handle, arrived[i].Handle);
+            }
+
+            _landingTriggers = null;
+            _needsRedraw = true;
+        }
+        else if (client.Prompt is not null)
+        {
+            _landingTriggers = null;
+            _needsRedraw = true;
+        }
+    }
+
+    // --- Paying mid-resolution, searching, choosing cards ---
+
+    private void FillUnlessPays(GameClient client, UnlessPaysPromptMessage prompt)
+    {
+        string source = client.Object(prompt.Source)?.Name ?? "A spell";
+        string subject = client.Object(prompt.Subject)?.Name ?? "it";
+
+        Prompt(
+            prompt.Verb switch
+            {
+                "CopySpell" => $"{source}: pay {prompt.Total} to copy {subject}?",
+                "UntapSource" => $"{source}: pay {prompt.Total} to untap {subject}?",
+                "CreateCopyToken" => $"{source}: pay {prompt.Total} to create a copy of {subject}?",
+                "ReturnToHand" => prompt.Subject == ViewHandle.None
+                    ? $"{source}: pay {prompt.Total}? That card has left your graveyard, so paying returns nothing"
+                    : $"{source}: pay {prompt.Total} to return {subject} to your hand?",
+                _ => $"{source}: pay {prompt.Total} or lose {subject}?",
+            },
+            _actions.Pay is not null
+                ? $"{prompt.Total} is covered"
+                : _actions.Any
+                    ? $"{prompt.Remaining} still to pay  ·  tap a land"
+                    : $"{prompt.Remaining} still to pay  ·  nothing untapped can pay it");
+
+        if (_actions.Pay is { } pay)
+        {
+            AddButton($"Pay {prompt.Total}", () => Send(client, AnswerFor(pay)), primary: true);
+        }
+
+        if (_actions.Decline is { } decline)
+        {
+            AddButton("Don't pay", () => Send(client, AnswerFor(decline)), primary: _actions.Pay is null);
+        }
+    }
+
+    /// <summary>Whether a library search shows only the cards it can take (the choice window's "Show only valid choices").</summary>
+    private bool _searchValidOnly = true;
+
+    /// <summary>A library search (CR 701.19), in the choice window, since a library is not on the board.</summary>
+    private void FillSearch(GameClient client, SearchLibraryPromptMessage prompt)
+    {
+        string destination = prompt.Destination switch
+        {
+            SearchDestinationView.TopOfLibrary => "to put on top",
+            SearchDestinationView.Graveyard => "to put into your graveyard",
+            SearchDestinationView.Battlefield => "to put onto the battlefield",
+            SearchDestinationView.Exile => "to exile",
+            SearchDestinationView.ExileFaceDown => "to exile face down",
+            SearchDestinationView.Cast => "to cast",
+            _ => "to put into your hand",
+        };
+
+        Prompt(
+            "Search your library",
+            prompt.Count == 1
+                ? $"Choose a card {destination}  ·  {_picked.Count} chosen"
+                : $"Choose {(prompt.Optional ? "up to " : string.Empty)}{prompt.Count} {destination}  ·  {_picked.Count} chosen");
+
+        HashSet<int> eligible = [.. prompt.Eligible.Select(card => card.Value)];
+        List<ObjectView> shown =
+        [
+            .. prompt.Library
+                .Where(card => !_searchValidOnly || eligible.Contains(card.Value))
+                .Select(client.Object)
+                .OfType<ObjectView>(),
+        ];
+
+        // In the library's order unless the player sorts them, and in one run unless they group them; the window is sized
+        // by rows, so a grouped library counts each section's last row whole, and its headings.
+        IReadOnlyList<CardGroup> groups = CardArrangement.Arrange(shown, _searchSort, _searchGrouping);
+        bool grouped = _searchGrouping != CardGrouping.None;
+        int slots = grouped
+            ? groups.Sum(group => (group.Cards.Count + ChoiceColumns - 1) / ChoiceColumns * ChoiceColumns)
+            : shown.Count;
+        float headings = grouped ? groups.Count * (SearchHeadingHeight + ChoiceGap) : 0f;
+
+        OpenChoices("Search your library", closable: false, Math.Max(1, slots), viewControls: true, headings: headings);
+        ShowPicked(client, prompt.Count);
+
+        if (shown.Count == 0)
+        {
+            ShowChoicesEmpty("Nothing in your library can be taken.");
+        }
+
+        foreach (CardGroup group in groups)
+        {
+            if (grouped)
+            {
+                AddChoiceSection(group.Heading, group.Cards.Count);
+            }
+
+            foreach (ObjectView card in group.Cards)
+            {
+                int handle = card.Handle.Value;
+                bool canTake = eligible.Contains(handle);
+
+                AddChoice(card, new CardLook(
+                    Selected: _picked.Contains(handle),
+                    Dimmed: !canTake,
+                    Actionable: canTake && !_picked.Contains(handle) && _selection.CanPick(prompt.Count),
+                    Clicked: canTake && (_picked.Contains(handle) || _selection.CanPick(prompt.Count)) ? () => Pick(handle, prompt.Count) : null));
+            }
+        }
+
+        AddButton(
+            _picked.Count == 0 ? "Take" : _picked.Count == 1 ? "Take 1 card" : $"Take {_picked.Count} cards",
+            () => Send(client, new CardsChosenAnswer { Cards = [.. _picked.Select(h => new ViewHandle(h))] }),
+            enabled: prompt.Optional ? _picked.Count > 0 && _picked.Count <= prompt.Count : _picked.Count == prompt.Count,
+            primary: true);
+
+        if (prompt.Optional)
+        {
+            // CR 701.23b: a search for a stated quality may fail to find.
+            AddButton("Take nothing", () => Send(client, new CardsChosenAnswer()));
+        }
+    }
+
+    /// <summary>Choosing cards as a spell resolves: on the board where they are, or in the choice window.</summary>
+    private void FillChooseCards(GameClient client, ChooseCardsPromptMessage prompt)
+    {
+        CardChoicePresentation model = CardChoicePresentation.Describe(client, prompt, _picked);
+        Prompt(model.Title, model.Detail);
+
+        if (model.BoardZone is null)
+        {
+            OpenChoices(model.TrayTitle, closable: false, prompt.Cards.Count);
+            HashSet<int> eligible = [.. prompt.Eligible.Select(card => card.Value)];
+
+            foreach (ViewHandle card in prompt.Cards)
+            {
+                int handle = card.Value;
+                bool canPick = eligible.Contains(handle);
+
+                if (client.Object(card) is { } shown)
+                {
+                    AddChoice(shown, new CardLook(
+                        Selected: _picked.Contains(handle),
+                        Dimmed: !canPick,
+                        Actionable: canPick && !_picked.Contains(handle) && _selection.CanPick(prompt.Count),
+                        Clicked: canPick && (_picked.Contains(handle) || _selection.CanPick(prompt.Count)) ? () => Pick(handle, prompt.Count) : null,
+                        Annotation: PutBackAnnotation(prompt, handle)));
+                }
+            }
+        }
+
+        // An exact number of permanents answers itself on the last click: no button.
+        if (!model.AnswersOnLastPick)
+        {
+            AddButton(
+                model.Confirm,
+                () => Send(client, new CardsChosenAnswer { Cards = [.. _picked.Select(h => new ViewHandle(h))] }),
+                enabled: model.CanSubmit,
+                primary: true);
+        }
+    }
+
+    // --- May ---
+
+    /// <summary>A "you may" choice as a spell or ability resolves (CR 608.2d).</summary>
+    private void FillMay(GameClient client, MayPromptMessage prompt)
+    {
+        string source = client.Object(prompt.Source)?.Name ?? "A spell";
+
+        void Ask(string title, string detail, string yes, string no, bool yesIsPrimary = true)
+        {
+            Prompt(title, detail);
+            AddButton(yes, () => Send(client, new MayChosenAnswer { Accept = true }), primary: yesIsPrimary);
+            AddButton(no, () => Send(client, new MayChosenAnswer { Accept = false }));
+        }
+
+        string Named(string fallback) => client.Object(prompt.Source)?.Name ?? fallback;
+
+        switch (prompt.Verb)
+        {
+            case "PayLife":
+                Ask($"{Named("This land")}: pay {prompt.Amount} life?", "If you don't, it enters tapped", $"Pay {prompt.Amount} life", "Enter tapped");
+                return;
+
+            case "PayLifeToLookAgain":
+                Ask(
+                    $"{source}: pay {prompt.Amount} life to look again?",
+                    "The cards you are looking at go on the bottom  ·  click your library to see them",
+                    $"Pay {prompt.Amount} life",
+                    "Keep these");
+                return;
+
+            // Master of Death: the card is in its owner's graveyard, so the dock says where the payment sends it.
+            case "PayLifeToReturn":
+                Ask(
+                    $"{source}: pay {prompt.Amount} life to return it to your hand?",
+                    "It is in your graveyard",
+                    $"Pay {prompt.Amount} life",
+                    "Leave it");
+                return;
+
+            // Ad Nauseam: Amount is the life the card just revealed cost, not a price for the next one.
+            case "RevealAgain":
+                Ask(
+                    $"{source}: reveal another card?",
+                    $"The last one cost {prompt.Amount} life  ·  you lose life equal to the next one's mana value",
+                    "Reveal another",
+                    "Stop",
+                    yesIsPrimary: false);
+                return;
+
+            // Ripple (CR 702.60a): Amount is how many cards would be revealed, four or the whole of a shorter library.
+            case "RevealForRipple":
+                Ask(
+                    $"{source}: reveal the top {(prompt.Amount == 1 ? "card" : $"{prompt.Amount} cards")} of your library?",
+                    "Cast any with the spell's name for free  ·  the rest go on the bottom",
+                    "Reveal",
+                    "Don't reveal");
+                return;
+
+            case "PayLifeUnlessCountered":
+                Ask($"Pay {prompt.Amount} life, or {source} is countered?", "Ward", $"Pay {prompt.Amount} life", "Don't pay");
+                return;
+
+            case "DiscardUnlessCountered":
+                Ask($"Discard a card, or {source} is countered?", "Ward", "Discard a card", "Don't pay");
+                return;
+
+            // Miracle (CR 702.94a): neither button is primary, so spamming Pass can never reveal a card.
+            case "RevealForMiracle":
+                Ask(
+                    $"Reveal {Named("that card")} for its miracle cost?",
+                    "Every player sees it from now on, even if you then decide not to cast it",
+                    "Reveal",
+                    "Keep it hidden",
+                    yesIsPrimary: false);
+                return;
+
+            // Gift (CR 702.174a): an optional additional cost, announced as the spell is cast. Neither button is primary,
+            // so passing through the announcement never gives an opponent anything by accident.
+            case "PromiseGift":
+                Ask(
+                    $"{Named("This spell")}: promise an opponent a gift?",
+                    "They receive it before the spell's other effects, and the spell does more if you do",
+                    "Promise a gift",
+                    "No gift",
+                    yesIsPrimary: false);
+                return;
+
+            case "CastForMiracleCost":
+                Ask($"Cast {Named("that card")} for its miracle cost?", "You pay the miracle cost instead of its mana cost", "Cast", "Don't cast");
+                return;
+
+            // Madness (CR 702.35a): the discarded card waits in exile; declining sends it to the graveyard.
+            case "CastForMadnessCost":
+                Ask($"Cast {Named("that card")} for its madness cost?", "You pay the madness cost instead of its mana cost. If you don't, it is put into your graveyard", "Cast", "Don't cast");
+                return;
+
+            // Rebound (CR 702.88a): the spell waits in exile; declining leaves it there for good.
+            case "rebound.cast":
+                Ask($"Cast {Named("that card")} without paying its mana cost?", "Rebound: if you don't, it stays exiled and you won't get another chance", "Cast", "Don't cast");
+                return;
+
+            // A Siege's defeat (CR 310.12b): cast back face up, for nothing.
+            case "CastTransformed":
+                Ask($"Cast {Named("that card")} transformed without paying its mana cost?", "It is cast as its back face. If you don't, it stays in exile", "Cast", "Don't cast");
+                return;
+
+            case "CastWithoutPaying":
+                Ask($"Cast {Named("that card")} without paying its mana cost?", "If you don't, it goes to the bottom of your library", "Cast", "Don't cast");
+                return;
+
+            // Paradigm (CR 702.192a, 707.12): the card offered is a copy, made for this one cast.
+            case "CastCopyWithoutPaying":
+                Ask($"Cast a copy of {Named("that card")} without paying its mana cost?", "If you don't, the copy ceases to exist", "Cast", "Don't cast");
+                return;
+
+            case "CastDiscarded":
+                Ask($"Cast {Named("that card")} without paying its mana cost?", "If you don't, it stays in your graveyard", "Cast", "Don't cast");
+                return;
+
+            case "PlayLandDuringResolution" or "CastDuringResolution" or "CastFoundOrPutIntoHand":
+                ObjectView? seen = client.Object(prompt.Source);
+                string card = seen switch
+                {
+                    { Name.Length: > 0 } => seen.Name,
+                    { FaceDownName.Length: > 0 } => seen.FaceDownName,
+                    _ => "that card",
+                };
+
+                if (prompt.Verb == "PlayLandDuringResolution")
+                {
+                    Ask($"Play {card}?", "It uses one of your land plays this turn. If you don't, it stays where it is", "Play", "Don't play");
+                    return;
+                }
+
+                if (prompt.Verb == "CastFoundOrPutIntoHand")
+                {
+                    Ask($"Cast {card} without paying its mana cost?", "If you don't, it goes into your hand", "Cast", "Don't cast");
+                    return;
+                }
+
+                Ask(
+                    prompt.Amount == 1 ? $"Cast {card} without paying its mana cost?" : $"Cast {card}?",
+                    prompt.Amount == 1 ? "If you don't, it stays where it is" : "You pay its costs. If you don't, it stays where it is",
+                    "Cast",
+                    "Don't cast");
+                return;
+
+            case "CastExiled":
+                Ask($"Cast {Named("that card")}?", "You pay its costs. If you don't, it stays in exile", "Cast", "Don't cast");
+                return;
+
+            case "PutOnTop":
+                Ask($"{source}: put your spell on top of your library?", "If you don't, it goes on the bottom", "Top", "Bottom");
+                return;
+
+            case "PutOnBottom":
+                Ask($"Put {Named("that card")} on the bottom of its owner's library?", "If you don't, it stays on top", "Bottom", "Leave on top");
+                return;
+
+            case "PutCountersOrCast":
+                Ask($"{source}: put a +1/+1 counter on it?", "If you don't, you may cast the exiled card this turn, with mana of any type", "Put a counter", "Cast it instead");
+                return;
+
+            case "CopySpell":
+                Ask($"{source}: copy it?", "The copy is yours, and you may choose a new target for it", "Copy it", "Don't copy");
+                return;
+
+            case "PutIntoGraveyard":
+                Ask($"Put {Named("that card")} into your graveyard?", "If you don't, it stays on top of your library", "Graveyard", "Leave on top");
+                return;
+
+            case "PayEnergy":
+                Ask($"{source}: pay an energy counter?", $"{prompt.Amount} energy left. Keep paying, or stop here", "Pay 1 energy", "Stop paying");
+                return;
+
+            case "PayEnergyCost":
+                Ask($"{source}: pay {prompt.Amount} energy?", $"You have the counters. Spend {prompt.Amount}, or pay nothing", $"Pay {prompt.Amount} energy", "Don't pay");
+                return;
+
+            case "RemoveACounterToDestroy":
+                Ask($"{source}: remove a counter from it?", "If you don't, the permanent it is aimed at is not destroyed", "Remove a counter", "Keep the counter");
+                return;
+
+            case "BeginOnBattlefield":
+                Ask($"Begin the game with {Named("that card")} on the battlefield?", "If you don't, it stays in your opening hand", "Put it out", "Keep it in hand");
+                return;
+
+            case "ProtectFromColorless":
+                Ask($"{source}: protection from colorless?", "If you don't, you choose a color instead", "From colorless", "Choose a color");
+                return;
+
+            case "RevealUntilCreature":
+                Ask(
+                    $"{source}: reveal until you reveal a creature card?",
+                    "That creature goes onto the battlefield; everything else revealed goes to your graveyard",
+                    "Reveal",
+                    "Don't reveal");
+                return;
+
+            case "RevealUntilSharesCreatureType":
+                Ask(
+                    $"{source}: reveal until you reveal a creature card that shares a creature type?",
+                    "That card goes into your hand; the rest go on the bottom of your library in a random order",
+                    "Reveal",
+                    "Don't reveal");
+                return;
+
+            case "ChooseOddOrEven":
+                Ask($"{source}: choose odd or even.", "Spells your opponents cast with that mana value will trigger it", "Odd", "Even");
+                return;
+
+            // Amount is how many graveyard cards would go; with none, a yes still shuffles (CR 701.24c-d).
+            case "ShuffleIntoLibrary":
+                Ask(
+                    prompt.Amount switch
+                    {
+                        <= 0 => $"{source}: shuffle your library?",
+                        1 => $"{source}: shuffle the targeted card into your library?",
+                        _ => $"{source}: shuffle the {prompt.Amount} targeted cards into your library?",
+                    },
+                    prompt.Amount <= 0 ? "No card from your graveyard goes in" : "From your graveyard. If you don't, they stay there",
+                    "Shuffle",
+                    "Don't shuffle");
+                return;
+
+            case "HaveControllerDraw":
+                Ask($"{source}: let its controller draw a card?", HaveControllerDrawDetail(prompt.Amount), "They draw", "Mill them instead");
+                return;
+
+            // Pia's Revolution: asked of the opponent it targeted; yes costs them damage, no gives its controller a card.
+            case "TakeDamageInsteadOfReturn":
+                Ask(
+                    $"{source}: take {prompt.Amount} damage?",
+                    "If you don't, the artifact card returns to its owner's hand",
+                    $"Take {prompt.Amount} damage",
+                    "Let it return",
+                    yesIsPrimary: false);
+                return;
+
+            default:
+                break;
+        }
+
+        string action = prompt.Verb switch
+        {
+            "Attach" => "attach it to that creature",
+            "ReturnAndAttach" => "return it to the battlefield attached to that creature",
+            "SearchLibrary" or "SearchLibraryToHand" => "search your library",
+            "CreateTreasure" => "create a Treasure token",
+            "CreateToken" or "CreateTokens" => "create the token",
+            "Draw" => prompt.Amount == 1 ? "draw a card" : $"draw {prompt.Amount} cards",
+            "ExileAndReturn" => "exile it, then return it to the battlefield",
+            "DealDamage" => prompt.Amount == 1 ? "deal 1 damage to it" : $"deal {prompt.Amount} damage to it",
+            "Destroy" => "destroy it",
+            "Untap" => "untap it",
+            "ReturnToHand" => "return it to its owner's hand",
+            "Mill" => prompt.Amount == 1 ? "mill a card" : $"mill {prompt.Amount} cards",
+            _ => prompt.Verb,
+        };
+
+        // An ability waiting on the stack carries the sentence it was printed with, so that is the hint whenever there is one.
+        string detail = client.Object(prompt.Source) is { Kind: ObjectKindView.AbilityOnStack, OracleText.Length: > 0 } asking
+            ? asking.OracleText
+            : "You may, but you don't have to";
+
+        Ask($"{source}: {action}?", detail, "Yes", "No");
+    }
+
+    private static string HaveControllerDrawDetail(int mill) => mill switch
+    {
+        <= 0 => "If you don't, they mill nothing and you lose no life",
+        1 => "If you don't, they mill 1 card and you lose life equal to its mana value",
+        _ => $"If you don't, they mill {mill} cards and you lose life equal to their total mana value",
+    };
+
+    // --- Combat ---
+
+    /// <summary>Declares attackers, each against a defender of its own (CR 508.1), clicked on the battlefield.</summary>
+    private void FillAttackers(GameClient client, DeclareAttackersPromptMessage prompt)
+    {
+        List<AttackMessage> declared =
+        [
+            .. _attacking.Select(pair => new AttackMessage
+            {
+                Attacker = new ViewHandle(pair.Key),
+                TargetPlayer = pair.Value.Player,
+                TargetPermanent = pair.Value.Permanent,
+            }),
+        ];
+
+        // A goaded creature left home (CR 701.15b): what the server would refuse, so the button waits and the dock says why.
+        AttackRequirementMessage? unmet = prompt.Requirements.FirstOrDefault(requirement => !requirement.MetBy(declared));
+
+        Prompt(
+            "Declare attackers",
+            unmet is not null
+                ? $"{client.Object(unmet.Attacker)?.Name ?? "A creature"} is goaded and must attack"
+                  + (unmet.Players.Count > 0 ? $" {string.Join(" or ", unmet.Players.Select(seat => NameOf(client, seat)))}" : string.Empty)
+                : _pending.Count > 0
+                    ? $"Choose what to attack ({_pending.Count} selected)"
+                    : _attacking.Count switch
+                    {
+                        0 => $"{prompt.Eligible.Count} can attack",
+                        1 => "1 attacking",
+                        _ => $"{_attacking.Count} attacking",
+                    });
+
+        AddButton(
+            _attacking.Count == 0 ? "No attack" : $"Attack with {_attacking.Count}",
+            () => Send(client, new AttackersDeclaredAnswer { Attacks = declared }),
+            enabled: unmet is null,
+            primary: true).Tooltip = "Lock in the attack" + Suffix(PassKey);
+
+        if (_pending.Count > 0)
+        {
+            AddCancelButton(PutDown);
+        }
+
+        // Everything at once, offered only while nothing has been chosen.
+        if (_attacking.Count == 0 && prompt.Eligible.Count > 0 && prompt.AttackablePlayers.Count > 0
+            && prompt.Eligible.All(creature => !prompt.IsForbidden(new AttackMessage { Attacker = creature, TargetPlayer = prompt.AttackablePlayers[0] })))
+        {
+            _attackAll = () =>
+            {
+                foreach (ViewHandle creature in prompt.Eligible)
+                {
+                    int seat = prompt.Requirements.FirstOrDefault(r => r.Attacker == creature) is { Players.Count: > 0 } must
+                        ? must.Players[0]
+                        : prompt.AttackablePlayers[0];
+                    _attacking[creature.Value] = new AttackChoice(seat, ViewHandle.None);
+                }
+
+                _needsRedraw = true;
+            };
+
+            AddButton("Attack with all", _attackAll).Tooltip =
+                "Send all " + prompt.Eligible.Count + " at " + NameOf(client, prompt.AttackablePlayers[0]) + Suffix(AttackAllKey);
+        }
+
+        if (_attacking.Count > 0)
+        {
+            AddButton("Clear", () =>
+            {
+                _attacking.Clear();
+                _needsRedraw = true;
+            });
+        }
+    }
+
+    private void FillBlockers(GameClient client, DeclareBlockersPromptMessage prompt)
+    {
+        // An attacker with menace or the like, blocked by fewer creatures than it needs (CR 509.1b).
+        int shortIndex = Enumerable.Range(0, Math.Min(prompt.Attackers.Count, prompt.MinimumBlockers.Count))
+            .FirstOrDefault(
+                i => _blocking.Values.Count(attacker => attacker == i) is > 0 and var n && n < prompt.MinimumBlockers[i],
+                -1);
+
+        Prompt(
+            "Declare blockers",
+            _pending.Count > 0
+                ? $"Choose an attacker to block ({_pending.Count} selected)"
+                : shortIndex >= 0
+                    ? $"{client.Object(prompt.Attackers[shortIndex])?.Name} needs {prompt.MinimumBlockers[shortIndex]} or more blockers"
+                    : $"{prompt.Attackers.Count} attacking  ·  {_blocking.Count} blocking");
+
+        AddButton(
+            _blocking.Count == 0 ? "No blocks" : $"Block with {_blocking.Count}",
+            () => Send(client, new BlockersDeclaredAnswer
+            {
+                Blocks =
+                [
+                    .. _blocking.Select(pair => new BlockMessage
+                    {
+                        Blocker = new ViewHandle(pair.Key),
+                        Attacker = prompt.Attackers[pair.Value],
+                    }),
+                ],
+            }),
+            enabled: shortIndex < 0,
+            primary: true).Tooltip = "Lock in the blocks" + Suffix(PassKey);
+
+        if (_pending.Count > 0)
+        {
+            AddCancelButton(PutDown);
+        }
+
+        if (_blocking.Count > 0)
+        {
+            AddButton("Clear", () =>
+            {
+                _blocking.Clear();
+                _needsRedraw = true;
+            });
+        }
+    }
+
+    /// <summary>Divides each creature's combat damage among what it may hit (CR 510.1c-d, 702.19b).</summary>
+    private void FillAssignDamage(GameClient client, AssignCombatDamagePromptMessage prompt)
+    {
+        string problem = DivisionProblem(client, prompt);
+
+        Prompt(
+            "Assign combat damage",
+            problem.Length > 0
+                ? problem
+                : $"{prompt.Divisions.Count} creature{(prompt.Divisions.Count == 1 ? string.Empty : "s")} to divide  ·  each must add up to its power");
+
+        AddButton(
+            "Deal damage",
+            () => Send(client, new CombatDamageAssignedAnswer
+            {
+                Shares =
+                [
+                    .. _shares
+                        .Where(pair => pair.Value > 0)
+                        .Select(pair => new DamageShareMessage
+                        {
+                            Source = new ViewHandle(pair.Key.Source),
+                            Creature = new ViewHandle(pair.Key.Creature),
+                            Amount = pair.Value,
+                        }),
+                ],
+            }),
+            enabled: problem.Length == 0,
+            primary: true).Tooltip = "Lock in the division" + Suffix(PassKey);
+
+        foreach (DamageDivisionMessage division in prompt.Divisions)
+        {
+            string source = client.Object(division.Source)?.Name ?? "A creature";
+            int assigned = Assigned(division);
+
+            _buttons.Children.Add(new SymbolText(13, assigned == division.Damage ? Theme.Fg : Theme.FgMuted, semibold: true)
+            {
+                Text = $"{source}: {assigned} of {division.Damage}",
+            });
+
+            foreach (ViewHandle blocker in division.Creatures)
+            {
+                AddShareRow(division, blocker.Value, client.Object(blocker)?.Name ?? "a creature");
+            }
+
+            if (division.MayAssignToDefender)
+            {
+                AddShareRow(division, 0, $"{NameOf(client, division.Defender)}  (trample)");
+            }
+        }
+    }
+
+    private void AddShareRow(DamageDivisionMessage division, int creature, string name)
+    {
+        (int Source, int Creature) key = (division.Source.Value, creature);
+        int share = _shares.GetValueOrDefault(key);
+        bool room = Assigned(division) < division.Damage;
+
+        _buttons.Children.Add(Stepper(
+            6,
+            Step("−", share > 0, () => _shares[key] = Math.Max(0, share - 1)),
+            new SymbolText(13, Theme.Fg) { Text = $"{share}  {name}" },
+            Step("+", room, () => _shares[key] = share + 1)));
+    }
+
+    private int Assigned(DamageDivisionMessage division) =>
+        _shares.Where(pair => pair.Key.Source == division.Source.Value).Sum(pair => pair.Value);
+
+    /// <summary>Why the division cannot be sent yet, in words, or nothing when it can: the server's own checks (CR 510.1a, 702.19b).</summary>
+    private string DivisionProblem(GameClient client, AssignCombatDamagePromptMessage prompt)
+    {
+        foreach (DamageDivisionMessage division in prompt.Divisions)
+        {
+            string source = client.Object(division.Source)?.Name ?? "A creature";
+            int assigned = Assigned(division);
+
+            if (assigned != division.Damage)
+            {
+                return $"{source} has {division.Damage} damage to assign, not {assigned}";
+            }
+
+            if (division.MayAssignToDefender && _shares.GetValueOrDefault((division.Source.Value, 0)) > 0)
+            {
+                for (int i = 0; i < division.Creatures.Count; i++)
+                {
+                    int lethal = i < division.Lethal.Count ? division.Lethal[i] : 0;
+                    if (_shares.GetValueOrDefault((division.Source.Value, division.Creatures[i].Value)) < lethal)
+                    {
+                        return $"{source} must assign lethal damage to {client.Object(division.Creatures[i])?.Name ?? "each blocker"} before any reaches the player";
+                    }
+                }
+            }
+        }
+
+        return string.Empty;
+    }
+
+    // --- The dock's own parts ---
+
+    private void Prompt(string title, string? detail = null)
+    {
+        _promptTitle.Text = title;
+        _promptDetail.Text = detail ?? string.Empty;
+        _promptDetail.Visibility = detail is { Length: > 0 } ? Visibility.Visible : Visibility.Collapsed;
+        MirrorPromptInChoices();
+    }
+
+    /// <summary>Resolve All, beside Resolve while more than one thing is waiting.</summary>
+    private void AddResolveAllButton(GameClient client)
+    {
+        IReadOnlyList<ObjectView> stack = client.Zone(ZoneKindView.Stack, 0);
+        if (stack.Count < 2)
+        {
+            return;
+        }
+
+        AddButton("Resolve All", () =>
+        {
+            _resolveAll = [.. stack.Select(item => item.Handle)];
+            Send(client, new PassAnswer());
+        }).Tooltip =
+            $"Pass priority until all {stack.Count} things on the stack have resolved, stops included.\n" +
+            "Stops passing as soon as anything else is put on the stack, by you or your opponent.";
+    }
+
+    /// <summary>A Cancel button, which the Cancel key presses.</summary>
+    private void AddCancelButton(Action onPressed)
+    {
+        _cancel = onPressed;
+        AddButton("Cancel", onPressed).Tooltip = "Cancel" + Suffix(CancelKey);
+    }
+
+    private DockButton AddButton(string text, Action onPressed, bool enabled = true, bool primary = false)
+    {
+        var button = new DockButton(text, primary, enabled: enabled);
+        button.Clicked += () =>
+        {
+            onPressed();
+            RedrawNow();
+        };
+
+        // The first main button on the dock is what the Pass key presses, unless the prompt said otherwise.
+        if (primary && enabled)
+        {
+            _pass ??= onPressed;
+        }
+
+        _buttons.Children.Add(button);
+        return button;
+    }
+
+    private void ShowErrors(GameClient client)
+    {
+        if (client.Errors.Count == 0)
+        {
+            _errorLabel.Text = string.Empty;
+            _errorLabel.Visibility = Visibility.Collapsed;
+            return;
+        }
+
+        ErrorMessage latest = client.Errors[^1];
+        _errorLabel.Text = $"{latest.Code}: {latest.Detail}";
+        _errorLabel.Visibility = Visibility.Visible;
+    }
+
+    private static string DescribeOutcome(GameClient client)
+    {
+        GameOverMessage outcome = client.Outcome!;
+
+        if (outcome.Outcome == GameOutcomeView.Draw)
+        {
+            return "The game is a draw.";
+        }
+
+        return outcome.WinningTeam == (client.Me?.Team ?? 0) ? "You win." : "You lose.";
+    }
+
+    /// <summary>Where the game is, as the player would say it: "Your first main phase", "Bot 2's upkeep".</summary>
+    private static string Moment(GameClient client)
+    {
+        if (client.View is not { } view)
+        {
+            return string.Empty;
+        }
+
+        string whose = view.ActivePlayer == client.Seat ? "Your" : $"{NameOf(client, view.ActivePlayer)}'s";
+        return $"{whose} {StepPhrase(view.Step)}";
+    }
+
+    /// <summary>What is waiting on top of the stack, whose it is and what it is aimed at.</summary>
+    private string? OnTopOfStack(GameClient client)
+    {
+        IReadOnlyList<ObjectView> stack = client.Zone(ZoneKindView.Stack, 0);
+        if (stack.Count == 0)
+        {
+            return null;
+        }
+
+        ObjectView top = stack[^1];
+        string whose = top.Controller == client.Seat ? "you" : NameOf(client, top.Controller);
+        string what = top.Kind switch
+        {
+            ObjectKindView.SpellCopy => $"Copy of {top.Name}",
+
+            // Named after its source, as the log names it. How it got there is only known from the announcement, so an
+            // ability put on before this client was watching is just an ability.
+            ObjectKindView.AbilityOnStack => top.Name.Length > 0 ? $"{AbilityKind(top)} of {top.Name}" : AbilityKind(top),
+            _ => top.Name,
+        };
+
+        return top.Targets.Count == 0
+            ? $"{what} controlled by {whose}"
+            : $"{what} controlled by {whose}, at {Aimed(client, top.Targets)}";
+    }
+
+    private string AbilityKind(ObjectView ability) => _abilitiesTriggered.TryGetValue(ability.Handle, out bool triggered)
+        ? triggered ? "Triggered ability" : "Activated ability"
+        : "Ability";
+
+    private static string Aimed(GameClient client, IReadOnlyList<SpellTargetView> targets)
+    {
+        List<string> named = [];
+
+        foreach (SpellTargetView target in targets)
+        {
+            string name = target.IsPlayer
+                ? target.Player == client.Seat ? "you" : NameOf(client, target.Player)
+                : client.Object(target.Object)?.Name ?? "something gone";
+
+            named.Add(target.StillLegal ? name : $"{name} (no longer legal)");
+        }
+
+        return named.Count == 1
+            ? named[0]
+            : $"{string.Join(", ", named.Take(named.Count - 1))} and {named[^1]}";
+    }
+
+    /// <summary>What the priority prompt is offering, counted, not counting lands' own mana abilities.</summary>
+    private static string Available(GameClient client, PriorityPromptMessage priority)
+    {
+        HashSet<int> lands = [];
+        HashSet<int> spells = [];
+        HashSet<int> abilities = [];
+        HashSet<int> faceDown = [];
+        HashSet<int> plottable = [];
+        HashSet<int> suspendable = [];
+        HashSet<int> foretellable = [];
+        var companion = false;
+
+        foreach (ActionOptionMessage option in priority.Options)
+        {
+            switch (option.Kind)
+            {
+                case ActionKindView.PlayLand:
+                    lands.Add(option.Source.Value);
+                    break;
+
+                case ActionKindView.CastSpell:
+                    spells.Add(option.Source.Value);
+                    break;
+
+                case ActionKindView.ActivateAbility
+                    when client.Object(option.Source)?.CardTypes.Contains(CardTypeView.Land) != true:
+                    abilities.Add(option.Source.Value);
+                    break;
+
+                case ActionKindView.TurnFaceUp:
+                    faceDown.Add(option.Source.Value);
+                    break;
+
+                case ActionKindView.TakeCompanion:
+                    companion = true;
+                    break;
+
+                case ActionKindView.Plot:
+                    plottable.Add(option.Source.Value);
+                    break;
+
+                case ActionKindView.Suspend:
+                    suspendable.Add(option.Source.Value);
+                    break;
+
+                case ActionKindView.Foretell:
+                    foretellable.Add(option.Source.Value);
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        List<string> parts = [];
+
+        if (companion)
+        {
+            parts.Add("Take your companion");
+        }
+
+        if (lands.Count > 0)
+        {
+            parts.Add("Play a land");
+        }
+
+        if (spells.Count > 0)
+        {
+            parts.Add(spells.Count == 1 ? "Cast a spell" : $"Cast a spell ({spells.Count} castable)");
+        }
+
+        if (abilities.Count > 0)
+        {
+            parts.Add(abilities.Count == 1 ? "Activate an ability" : $"Activate an ability ({abilities.Count})");
+        }
+
+        if (faceDown.Count > 0)
+        {
+            parts.Add(faceDown.Count == 1 ? "Turn a card face up" : $"Turn a card face up ({faceDown.Count})");
+        }
+
+        if (plottable.Count > 0)
+        {
+            parts.Add(plottable.Count == 1 ? "Plot a card" : $"Plot a card ({plottable.Count})");
+        }
+
+        if (suspendable.Count > 0)
+        {
+            parts.Add(suspendable.Count == 1 ? "Suspend a card" : $"Suspend a card ({suspendable.Count})");
+        }
+
+        if (foretellable.Count > 0)
+        {
+            parts.Add(foretellable.Count == 1 ? "Foretell a card" : $"Foretell a card ({foretellable.Count})");
+        }
+
+        return parts.Count == 0 ? "Nothing to play" : string.Join("  ·  ", parts);
+    }
+
+    private static string StepPhrase(TurnStepView step) => step switch
+    {
+        TurnStepView.Untap => "untap step",
+        TurnStepView.Upkeep => "upkeep",
+        TurnStepView.Draw => "draw step",
+        TurnStepView.PrecombatMain => "first main phase",
+        TurnStepView.BeginCombat => "beginning of combat",
+        TurnStepView.DeclareAttackers => "declare attackers step",
+        TurnStepView.DeclareBlockers => "declare blockers step",
+        TurnStepView.CombatDamage => "combat damage step",
+        TurnStepView.EndOfCombat => "end of combat",
+        TurnStepView.PostcombatMain => "second main phase",
+        TurnStepView.End => "end step",
+        TurnStepView.Cleanup => "cleanup step",
+        _ => "turn",
+    };
+
+    private static string NameOf(GameClient client, int seat)
+    {
+        if (seat == 0)
+        {
+            return "nobody";
+        }
+
+        return client.View?.Players.FirstOrDefault(player => player.Seat == seat)?.Name ?? $"seat {seat}";
+    }
+}

@@ -1,0 +1,60 @@
+# The shocklands' "As this land enters, you may pay 2 life" (Breeding Pool, Godless Shrine, Hallowed Fountain share it):
+# a player can pay life only if their life total is at least the amount (CR 119.4), so at 1 life the choice is not
+# offered and the land enters tapped. Bot1 pays for Breeding Pool on turn 1 (18) and for Godless Shrine on turn 3
+# (4, after Bot2's four Bolts took it to 6), Bot2's fifth Bolt makes it 1, and turn 5's Hallowed Fountain is not
+# asked about and enters tapped. The two paid lands entered untapped (the positive controls).
+
+[Bot1 Deck]
+Breeding Pool
+Godless Shrine
+Hallowed Fountain
+Plains x17
+
+[Bot2 Deck]
+Mountain
+Black Lotus
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Mountain
+Mountain x12
+
+[Actions]
+Bot1.Hand.Breeding Pool.Play
+Bot1.Accept
+? Bot1.Life = 18
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot1.Life = 6
+Bot1.Hand.Godless Shrine.Play
+Bot1.Accept
+? Bot1.Life = 4
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+? Bot1.Life = 1
+Bot1.Hand.Hallowed Fountain.Play
+! Bot1.Accept
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 1
+Bot1.Battlefield.Breeding Pool.Tapped = false
+Bot1.Battlefield.Godless Shrine.Tapped = false
+Bot1.Battlefield.Hallowed Fountain.Tapped = true

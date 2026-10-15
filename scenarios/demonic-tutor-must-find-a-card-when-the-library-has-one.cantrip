@@ -1,0 +1,28 @@
+# "Search your library for a card" names no quality, so (CR 701.23b) the searcher must find one when the library holds any: the
+# prompt takes exactly one card and `Search()` with none is refused by the harness. Bot1 names Black Lotus, which goes to the
+# hand and leaves the library (shuffled, so only what it holds is asserted). Two Moxen pay {1}{B}.
+
+[Bot1 Deck]
+Demonic Tutor
+Mox Jet
+Mox Ruby
+Island x4
+Black Lotus
+Island x8
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Demonic Tutor.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot1.Search(Black Lotus)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Library.Count = 8
+Bot1.Hand = Island; Island; Island; Island; Black Lotus

@@ -1,0 +1,6 @@
+{
+  "name": "Negate",
+  "manaCost": "{1}{U}",
+  "type": "Instant",
+  "oracleText": "Counter target noncreature spell."
+}

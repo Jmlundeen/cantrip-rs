@@ -1,0 +1,46 @@
+# The Jitte's second mode: a charge counter makes Bot2's Basking Rootwalla a 0/0, which dies as a state-based action.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Basking Rootwalla
+Umezawa's Jitte
+Forest
+Forest
+Forest x12
+
+[Bot2 Deck]
+Forest
+Basking Rootwalla
+Forest x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Basking Rootwalla.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Umezawa's Jitte.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Basking Rootwalla.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Umezawa's Jitte.Activate(Ability: Equip; Basking Rootwalla)
+Bot1.Attack(Basking Rootwalla > Bot2)
+[T3 Bot1.Main2]
+Bot1.Battlefield.Umezawa's Jitte.Activate(Ability: Remove)
+Bot1.Modes(Target creature gets -1/-1)
+Bot1.Target(Bot2.Battlefield.Basking Rootwalla)
+
+[Expect]
+Bot2.Battlefield = Forest
+Bot2.Graveyard = Basking Rootwalla
+Bot2.Life = 19
+Bot1.Battlefield.Umezawa's Jitte.Counters.Charge = 1

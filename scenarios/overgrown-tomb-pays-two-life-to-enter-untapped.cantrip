@@ -1,0 +1,17 @@
+# Overgrown Tomb: as it enters you may pay 2 life; paying keeps it untapped (and it taps for {G}, being a Forest).
+
+[Bot1 Deck]
+Overgrown Tomb
+Plains x19
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Overgrown Tomb.Play
+Bot1.Accept
+Bot1.Battlefield.Overgrown Tomb.Activate(Ability: {G})
+
+[Expect]
+Bot1.Life = 18
+Bot1.Mana = {G}

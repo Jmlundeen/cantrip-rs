@@ -1,0 +1,40 @@
+# The One Ring, cast, gives its controller protection from everything until their next turn (CR 702.16j): Bot2's hasty
+# Vengevine attacks on turn 2 and all its damage is prevented. On turn 4 the protection is over and it hits for 4. The
+# Ring's {T} puts a burden counter on it and draws that many cards; at Bot1's next upkeep it loses 1 life for the counter.
+[Bot1 Deck]
+Plains
+Black Lotus
+The One Ring
+Plains x4
+Plains x20
+[Bot2 Deck]
+Forest
+Black Lotus
+Vengevine
+Forest x4
+Forest x20
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.The One Ring.Cast
+[Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Vengevine.Cast
+Bot2.Attack(Vengevine > Bot1)
+[T2 Bot2.Main2]
+? Bot1.Life = 20
+[T3 Bot1.Main1]
+Bot1.Battlefield.The One Ring.Activate
+[T4 Bot2.Main1]
+Bot2.Attack(Vengevine > Bot1)
+[T4 Bot2.Main2]
+? Bot1.Life = 16
+[T5 Bot1.Main1]
+? Bot1.Life = 15
+[Expect]
+Bot1.Battlefield.The One Ring.Counters.Burden = 1

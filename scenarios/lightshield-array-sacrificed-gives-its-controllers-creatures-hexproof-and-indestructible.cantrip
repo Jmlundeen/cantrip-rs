@@ -1,0 +1,67 @@
+# After the defeated Siege is cast transformed (as in the other Gobakhan scenario) Bot1 sacrifices the Lightshield Array in its
+# second main phase: its Guerrilla Gorilla gains hexproof and indestructible until end of turn, so Bot2's Lightning Bolt cannot
+# target it (the refused Cast; the Bolt at Bot1's face is the control) and Bot2's own Ornithopter gains neither.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Guerrilla Gorilla
+Plains
+Mox Pearl
+Invasion of Gobakhan
+Plains
+Plains x10
+
+[Bot2 Deck]
+Mountain
+Mountain
+Lightning Bolt
+Lightning Bolt
+Ornithopter
+Mountain x3
+Mountain x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Invasion of Gobakhan.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Attack(Guerrilla Gorilla > Bot1.Battlefield.Invasion of Gobakhan)
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Attack(Guerrilla Gorilla > Bot1.Battlefield.Invasion of Gobakhan)
+Bot1.Pass
+Bot1.Accept
+Bot1.Pass
+[T5 Bot1.Main2]
+Bot1.Battlefield.Lightshield Array.Activate
+Bot1.Pass
+[T5 Bot1.End]
+? Bot1.Battlefield.Guerrilla Gorilla.Keywords = Hexproof; Indestructible; Reach
+? Bot2.Battlefield.Ornithopter.Keywords = Flying
+Bot2.Battlefield.Mountain.Activate
+! Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Guerrilla Gorilla)
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Pass
+[T6 Bot2.Main1]
+
+[Expect]
+Bot1.Life = 17
+Bot1.Graveyard.Count = 1

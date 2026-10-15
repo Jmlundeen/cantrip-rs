@@ -1,0 +1,33 @@
+# "Name Sticker" Goblin: "When this creature enters from anywhere other than a graveyard or exile". Entomb puts it into the
+# graveyard and Reanimate returns it (Bot1 loses 3): it enters from a graveyard, so there is no trigger and no die roll;
+# the pool is empty and nothing is on the stack.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Entomb
+Reanimate
+Swamp x3
+"Name Sticker" Goblin
+Swamp x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search("Name Sticker" Goblin)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Reanimate.Cast(Bot1.Graveyard."Name Sticker" Goblin)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Bot1.Mana =
+? Bot1.Life = 17
+
+[Expect]
+Turn = 1
+Bot1.Battlefield = Swamp; Mox Jet; "Name Sticker" Goblin

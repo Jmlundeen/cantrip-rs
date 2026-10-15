@@ -1,0 +1,39 @@
+# Assault Formation: "Each creature you control assigns combat damage equal to its toughness rather than its power" and
+# "{G}: Target creature with defender can attack this turn as though it didn't have defender." Sylvan Caryatid is a 0/3
+# defender. On turn 3 Bot1 pays {G} and attacks with it, and it deals 3 combat damage to Bot2, its toughness.
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Black Lotus
+Assault Formation
+Sylvan Caryatid
+Forest
+Forest x14
+
+[Bot2 Deck]
+Island x13
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Assault Formation.Cast
+Bot1.Pass
+Bot1.Hand.Sylvan Caryatid.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Assault Formation.Activate(Bot1.Battlefield.Sylvan Caryatid; Ability: attack this turn)
+Bot1.Pass
+Bot1.Attack(Sylvan Caryatid > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17

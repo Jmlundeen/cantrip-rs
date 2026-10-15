@@ -1,0 +1,30 @@
+# Noble Hierarch's "{T}: Add {G}, {W}, or {U}": it cannot tap the turn it is cast (the refusal on turn 1, the activation on
+# turn 3 the control); black and red are not among its colors (refusals beside the {W} it makes on turn 3); on turn 5 it
+# makes {U}.
+
+[Bot1 Deck]
+Forest
+Noble Hierarch
+Forest x5
+Forest x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Noble Hierarch.Cast
+! Bot1.Battlefield.Noble Hierarch.Activate
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Noble Hierarch.Activate(Color: Black)
+! Bot1.Battlefield.Noble Hierarch.Activate(Color: Red)
+Bot1.Battlefield.Noble Hierarch.Activate(Color: White)
+? Bot1.Mana = {W}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Noble Hierarch.Activate(Color: Blue)
+? Bot1.Mana = {U}
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Noble Hierarch.Tapped = true

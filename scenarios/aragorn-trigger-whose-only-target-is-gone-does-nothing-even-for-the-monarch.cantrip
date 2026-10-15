@@ -1,0 +1,58 @@
+# CR 608.2b: the attack trigger has one target, Cathar Commando, and Bot1 kills it with Lightning Bolt in response. The
+# trigger is then removed from the stack without resolving, so its second sentence ("If you're the monarch, creatures
+# can't block this turn") never happens although Bot1 holds the crown: Ornithopter blocks Elvish Mystic.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Mox Emerald
+Aragorn, King of Gondor
+Elvish Mystic
+Lightning Bolt
+Plains x12
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Ornithopter
+Cathar Commando
+Plains x12
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Aragorn, King of Gondor.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Elvish Mystic.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Cathar Commando.Cast
+[T3 Bot1.Main1]
+? Monarch = Bot1
+Bot1.Attack(Aragorn, King of Gondor; Elvish Mystic)
+Bot1.Target(Cathar Commando)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Cathar Commando)
+[T3 Bot1.DeclareBlockers]
+Bot2.Block(Ornithopter > Elvish Mystic)
+[T3 Bot1.Main2]
+
+[Expect]
+Monarch = Bot1
+Bot2.Graveyard = Cathar Commando
+Bot2.Battlefield = Plains; Mox Pearl; Ornithopter
+Bot2.Life = 16
+Bot1.Life = 24

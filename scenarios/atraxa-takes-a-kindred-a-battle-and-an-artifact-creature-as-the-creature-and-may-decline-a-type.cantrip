@@ -1,0 +1,52 @@
+# Atraxa's trigger asks once for each card type that an untaken revealed card has, in the order Kindred, artifact, battle,
+# creature, enchantment, instant, land, planeswalker, sorcery. Tarfire is a kindred instant: taken for kindred it is no
+# longer there to be the instant, and nothing else is an instant, so no question is asked for it. Ornithopter, an artifact creature, is taken as the creature
+# after Sol Ring was the artifact. Invasion of Gobakhan is the battle. "You may": nothing is taken for the land, so the
+# Islands go to the bottom of the library with the eleventh card still on top.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Black Lotus
+Atraxa, Grand Unifier
+Island
+Tarfire
+Sol Ring
+Invasion of Gobakhan
+Ornithopter
+Island x6
+Wrath of God
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Atraxa, Grand Unifier.Cast
+Bot1.Pass
+Bot1.Choose(Tarfire)
+Bot1.Choose(Sol Ring)
+Bot1.Choose(Invasion of Gobakhan)
+Bot1.Choose(Ornithopter)
+Bot1.Choose()
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Island; Tarfire; Sol Ring; Invasion of Gobakhan; Ornithopter
+Bot1.Library.Count = 7

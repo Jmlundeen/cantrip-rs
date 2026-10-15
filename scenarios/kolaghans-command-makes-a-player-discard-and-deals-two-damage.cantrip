@@ -1,0 +1,36 @@
+# Kolaghan's Command: Bot1 chooses two modes, "target player discards a card" and "2 damage to any target", and aims
+# both at Bot2, who discards a card and goes to 18.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Kolaghan's Command
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Kolaghan's Command.Cast
+Bot1.Modes(2; 4)
+Bot1.Target(Bot2)
+Bot1.Target(Bot2)
+Bot1.Pass
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot2.Life = 18
+Bot2.Hand.Count = 6
+Bot2.Graveyard = Island
+Bot1.Graveyard = Kolaghan's Command

@@ -1,0 +1,39 @@
+# Untimely Malfunction's second mode (CR 115.7a): Lightning Bolt aimed at Bot2 has its only target changed to the one other legal target, Bot1, which is not asked because it is the only choice.
+
+[Bot1 Deck]
+Lightning Bolt
+Mountain x20
+
+[Bot2 Deck]
+Sol Ring
+Untimely Malfunction
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Mountain.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Mountain.Activate
+Bot2.Hand.Untimely Malfunction.Cast
+Bot2.Modes(2)
+Bot2.Target(Lightning Bolt)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mountain.Activate
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Life = 17
+Bot2.Life = 20
+Bot1.Graveyard = Lightning Bolt
+Bot2.Graveyard = Untimely Malfunction
+Stack.Count = 0

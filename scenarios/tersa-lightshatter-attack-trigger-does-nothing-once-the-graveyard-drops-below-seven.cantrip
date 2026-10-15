@@ -1,0 +1,54 @@
+# Tersa Lightshatter: "Whenever Tersa Lightshatter attacks, if there are seven or more cards in your graveyard, exile a
+# card at random from your graveyard. You may play that card this turn." An intervening "if" is checked twice: when
+# the ability triggers and again as it resolves, and it does nothing if the condition no longer holds (CR 603.4).
+#
+# Turn 1: Bot1 Wheels off a Black Lotus (graveyard: Black Lotus, four Islands, Wheel of Fortune = 6) and casts Sol
+# Ring off its Mountain. Turn 2: Bot2 casts Ghost Vacuum. Turn 3: Bot1 casts Tersa, discarding one Island to her entry
+# ability (graveyard = 7), and attacks. The trigger goes on the stack with seven cards there; in response Bot2's Ghost
+# Vacuum exiles Black Lotus from Bot1's graveyard, leaving six. The trigger then resolves and does nothing, so Black
+# Lotus is the only card in exile and Bot1's graveyard stays at six.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Wheel of Fortune
+Island x4
+Sol Ring
+Tersa Lightshatter
+Island x5
+Island x10
+
+[Bot2 Deck]
+Swamp x7
+Ghost Vacuum
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Wheel of Fortune.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mountain.Activate
+? Bot1.Graveyard.Count = 6
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Ghost Vacuum.Cast
+Bot2.Battlefield.Swamp.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Tersa Lightshatter.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Choose(Island)
+? Bot1.Graveyard.Count = 7
+Bot1.Attack(Tersa Lightshatter > Bot2)
+? Stack.Count = 1
+Bot2.Battlefield.Ghost Vacuum.Activate(Black Lotus)
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Exile = Black Lotus
+Bot1.Graveyard.Count = 6
+Bot1.Battlefield = Mountain; Sol Ring; Tersa Lightshatter
+Bot2.Battlefield.Ghost Vacuum.Tapped = true

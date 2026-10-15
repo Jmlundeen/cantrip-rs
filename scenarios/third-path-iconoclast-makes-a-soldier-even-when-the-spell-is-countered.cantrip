@@ -1,0 +1,44 @@
+# The trigger is on casting, not on resolving: Bot2 counters Bot1's Lightning Bolt with the trigger still on the
+# stack, and Third Path Iconoclast's Soldier is created all the same.
+[Bot1 Deck]
+Third Path Iconoclast
+Mox Sapphire
+Mox Ruby
+Lightning Bolt
+Mountain
+Island x15
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Third Path Iconoclast.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Stack.Count = 2
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Lightning Bolt)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot1.Graveyard = Lightning Bolt
+Bot2.Graveyard = Counterspell
+Bot1.Battlefield.Soldier.Types = Artifact; Creature
+Bot1.Battlefield.Soldier.Subtypes = Soldier
+Bot1.Battlefield.Soldier.Power = 1
+Bot1.Battlefield.Soldier.Toughness = 1
+Bot1.Battlefield.Count = 5

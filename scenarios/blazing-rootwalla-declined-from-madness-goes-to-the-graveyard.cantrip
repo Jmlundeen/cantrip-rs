@@ -1,0 +1,27 @@
+# Blazing Rootwalla's madness is a choice: discarded to Faithless Looting it is exiled, and when the linked trigger
+# resolves Bot1 declines to cast it, so it is put into the graveyard (CR 702.35a) - above the Looting, which finished
+# resolving before the trigger went on the stack - and nothing stays in exile. The discard still happened: the Mountain
+# chosen beside it is in the graveyard too.
+
+[Bot1 Deck]
+Mountain
+Blazing Rootwalla
+Faithless Looting
+Mountain x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Blazing Rootwalla; Mountain)
+? Exile.Count = 1
+Bot1.Decline
+
+[Expect]
+Bot1.Battlefield = Mountain
+Bot1.Graveyard = Blazing Rootwalla; Faithless Looting; Mountain
+Exile.Count = 0

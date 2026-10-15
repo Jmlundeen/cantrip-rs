@@ -1,0 +1,31 @@
+# "Draw a card" from an empty library (CR 121.4, 704.5b): the Stone's controller loses once state-based actions are
+# checked. The library is empty from turn 3's draw on, and the Stone is sacrificed the same turn.
+
+[Bot1 Deck]
+Island
+Island
+Mox Jet
+Mind Stone
+Island
+Island
+Island
+Island
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Mind Stone.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mind Stone.Activate(Ability: Draw)
+
+[Expect]
+Result = Bot2 won
+Bot1.Library.Count = 0

@@ -1,0 +1,6 @@
+{
+  "name": "Disenchant",
+  "manaCost": "{1}{W}",
+  "type": "Instant",
+  "oracleText": "Destroy target artifact or enchantment."
+}

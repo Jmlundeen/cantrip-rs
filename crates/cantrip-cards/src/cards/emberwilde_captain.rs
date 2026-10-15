@@ -1,0 +1,53 @@
+use cantrip_api::*;
+use cantrip_mechanics::triggers::this_enters;
+use cantrip_oracle as oracle;
+
+/// "Whenever an opponent attacks you" (CR 508.1): one declaration, however many creatures attack, with at least one
+/// attacking the controller directly, not a planeswalker or battle they control (CR 506.2). "That player" is the
+/// attacking player.
+fn opponent_attacks_you(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    let me = q.controller(source);
+    match event {
+        Event::AttackersDeclared { player, .. }
+            if q.state().attackers.iter().any(|a| a.target == Target::Player(me)) =>
+        {
+            Fired::about(Target::Player(*player))
+        }
+        _ => None,
+    }
+}
+
+/// "While you're the monarch" (CR 725.1): an intervening "if" (CR 603.4), checked as it triggers and as it resolves.
+fn you_are_the_monarch(q: &dyn Query, asker: &Asker) -> bool {
+    q.state().player(asker.controller).monarch
+}
+
+/// Dealt by the permanent, equal to the number of cards in that player's hand as the ability resolves.
+fn burn(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if let Target::Player(p) = item.subject {
+        let cards = g.state().zone(Zone::hand(p)).len() as u16;
+        g.damage(item.object, Target::Player(p), cards);
+    }
+    Ok(())
+}
+
+pub static CARD: CardDef = CardDef {
+    abilities: &[
+        AbilityDef::Triggered(TriggeredDef {
+            text: "When this creature enters, you become the monarch.",
+            listens: EventMask::ZONE_CHANGE,
+            matches: this_enters,
+            effect: cantrip_mechanics::effects::become_monarch,
+            ..TriggeredDef::BLANK
+        }),
+        AbilityDef::Triggered(TriggeredDef {
+            text: "Whenever an opponent attacks you while you're the monarch, this creature deals damage to that player equal to the number of cards in their hand.",
+            listens: EventMask::ATTACKERS_DECLARED,
+            matches: opponent_attacks_you,
+            condition: Some(you_are_the_monarch),
+            effect: burn,
+            ..TriggeredDef::BLANK
+        }),
+    ],
+    ..oracle::EMBERWILDE_CAPTAIN
+};

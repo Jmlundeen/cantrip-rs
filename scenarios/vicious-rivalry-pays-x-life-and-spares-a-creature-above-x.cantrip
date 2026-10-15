@@ -1,0 +1,54 @@
+# Vicious Rivalry with X = 2 pays 2 life as an additional cost (CR 118.8) and destroys each artifact and creature with mana value 2 or
+# less: Bot2's Llanowar Elves (1) and its three Moxen (0) die, and so do Bot1's own Moxen and Sol Ring (1). Bot2's Endurance (mana
+# value 3) and its Forest (a land) survive: the limit is the X paid, and only artifacts and creatures are destroyed.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Sol Ring
+Vicious Rivalry
+Island
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Mox Emerald
+Mox Ruby
+Endurance
+Llanowar Elves
+Forest x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Endurance.Cast
+Bot2.Pass
+Bot2.Target(Bot2)
+Bot2.Pass
+Bot2.Battlefield.Mox Emerald#2.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Vicious Rivalry.Cast(X: 2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 18
+Bot1.Battlefield.Count = 0
+Bot2.Battlefield = Forest; Endurance

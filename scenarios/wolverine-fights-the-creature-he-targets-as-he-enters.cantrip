@@ -1,0 +1,43 @@
+# Wolverine, Fierce Fighter: "When Wolverine enters, he fights up to one other target creature." (CR 701.14a)
+# Wolverine (3/5) comes down on turn 7 and fights Bot2's Guerrilla Gorilla (2/2): each deals damage equal to its power to
+# the other at once, so the Gorilla dies and Wolverine is left with 2 damage. The companion script
+# wolverine-flickered-in-response-does-not-fight shows the same fight not happening once he has left and come back.
+
+[Bot1 Deck]
+Mountain
+Forest
+Island
+Mountain
+Wolverine, Fierce Fighter
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Forest
+Guerrilla Gorilla
+Forest
+Forest x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Forest.Play
+Bot1.Hand.Forest.Play
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+Bot1.Hand.Island.Play
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Wolverine, Fierce Fighter.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Target(Guerrilla Gorilla)
+
+[Expect]
+Turn = 7
+Bot1.Battlefield.Wolverine, Fierce Fighter.Damage = 2
+Bot2.Battlefield = Forest; Forest
+Bot2.Graveyard = Guerrilla Gorilla

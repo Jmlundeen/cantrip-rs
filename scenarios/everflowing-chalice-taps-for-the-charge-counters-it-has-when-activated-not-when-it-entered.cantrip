@@ -1,0 +1,38 @@
+# Everflowing Chalice's "{T}: Add {C} for each charge counter on this artifact" counts the counters as they stand when
+# it is activated, not the number it was kicked: kicked once, it enters with one charge counter, Tezzeret's Gambit
+# proliferates a second onto it (CR 701.34a), and on the next turn it taps for {C}{C}.
+
+[Bot1 Deck]
+Island
+Mox Ruby
+Mox Emerald
+Everflowing Chalice
+Tezzeret's Gambit
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Everflowing Chalice.Cast(Kicked: 1)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Tezzeret's Gambit.Cast
+Bot1.Target(Everflowing Chalice)
+? Bot1.Battlefield.Everflowing Chalice.Counters.Charge = 2
+[T5 Bot1.Main1]
+Bot1.Battlefield.Everflowing Chalice.Activate
+? Bot1.Mana = {C}{C}
+
+[Expect]
+Bot1.Battlefield.Everflowing Chalice.Counters.Charge = 2
+Stack.Count = 0

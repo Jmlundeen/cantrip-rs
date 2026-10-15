@@ -1,0 +1,49 @@
+# Nadu, Winged Wisdom gives every creature its controller has "Whenever this creature becomes the target of a spell or
+# ability, reveal the top card of your library. If it's a land card, put it onto the battlefield. Otherwise, put it into
+# your hand. This ability triggers only twice each turn." Bot1 aims three Impolite Entrances at Nadu itself in one turn:
+# the first two reveal a Swamp onto the battlefield each and the third, though it targets, triggers nothing (CR 603.2h).
+
+[Bot1 Deck]
+Mox Ruby
+Mountain
+Forest
+Island
+Nadu, Winged Wisdom
+Impolite Entrance
+Impolite Entrance
+Impolite Entrance
+Mountain
+Swamp x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Nadu, Winged Wisdom.Cast
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Impolite Entrance.Cast(Nadu, Winged Wisdom)
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Impolite Entrance.Cast(Nadu, Winged Wisdom)
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Impolite Entrance.Cast(Nadu, Winged Wisdom)
+Bot1.Pass
+[T7 Bot1.Main2]
+
+[Expect]
+Turn = 7
+Stack.Count = 0
+Bot1.Graveyard = Impolite Entrance; Impolite Entrance; Impolite Entrance
+Bot1.Battlefield = Forest; Island; Mountain; Mountain; Mox Ruby; Nadu, Winged Wisdom; Swamp; Swamp

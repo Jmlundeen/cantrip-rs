@@ -1,0 +1,49 @@
+# Sheoldred, the Apocalypse under Bot2's control: "an opponent" is Bot1, so Bot1's draw on turn 3 costs it 2 life (18) and Bot2's
+# own draw on turn 4 gains it 2 (22). Her triggers need her on the battlefield: after Bot1's draw on turn 5 (16) it destroys her
+# with Wrath of God, and from then on no draw changes anyone's life: Bot2's on turn 6 (22) and Bot1's on turn 7 (16).
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Wrath of God
+Plains
+Plains
+Plains
+Plains
+Plains x13
+
+[Bot2 Deck]
+Swamp
+Black Lotus
+Sheoldred, the Apocalypse
+Swamp x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Sheoldred, the Apocalypse.Cast
+[T3 Bot1.Main1]
+? Bot1.Life = 18
+[T4 Bot2.Main1]
+? Bot2.Life = 22
+[T5 Bot1.Main1]
+? Bot1.Life = 16
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Wrath of God.Cast
+Bot1.Pass
+Bot2.Pass
+[T6 Bot2.Main1]
+? Bot2.Life = 22
+[T7 Bot1.Main1]
+
+[Expect]
+Bot1.Life = 16
+Bot2.Life = 22
+Bot2.Graveyard = Sheoldred, the Apocalypse; Black Lotus

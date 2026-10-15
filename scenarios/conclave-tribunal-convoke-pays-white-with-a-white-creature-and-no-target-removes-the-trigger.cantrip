@@ -1,0 +1,40 @@
+# Convoke (CR 702.51): a creature tapped for it pays {1} or one mana of its color. Three Mox Jets can pay only generic
+# mana, so the {W} of {3}{W} is paid by the white Mother of Runes tapped for convoke, and the Mox Pearl, which could
+# have paid it, stays untapped. Bot2 controls only a Plains (a land), so there is no legal target (CR 603.3d): the
+# trigger is never put on the stack (no target question) and the Tribunal stays on the battlefield.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Jet
+Mox Jet
+Mother of Runes
+Conclave Tribunal
+Plains x10
+
+[Bot2 Deck]
+Plains x14
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Mother of Runes.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Jet#3.Activate
+Bot1.Hand.Conclave Tribunal.Cast(Convoke: Mother of Runes)
+! Bot1.Target
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Pearl; Mox Jet; Mox Jet; Mox Jet; Mother of Runes; Conclave Tribunal
+Bot1.Battlefield.Mother of Runes.Tapped = true
+Bot1.Battlefield.Mox Pearl.Tapped = false
+Exile.Count = 0
+Bot2.Battlefield = Plains

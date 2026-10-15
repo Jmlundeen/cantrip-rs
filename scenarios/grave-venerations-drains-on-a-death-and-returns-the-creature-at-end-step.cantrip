@@ -1,0 +1,44 @@
+# Four Moxen pay for Grave Venerations on turn 1 and Bot1 becomes the monarch. Bot1 also casts Ornithopter, which Bot2
+# Lightning Bolts on turn 2: "whenever a creature you control dies" drains Bot2 for 1 and gains Bot1 1 (the Moxen are not
+# creatures). At Bot1's end step on turn 3, as the monarch, Bot1 returns the Ornithopter to their hand.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Mox Pearl
+Grave Venerations
+Ornithopter
+Plains x15
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Grave Venerations.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+[T3 Bot1.Main2]
+? Bot1.Life = 21
+? Bot2.Life = 19
+? Bot1.Graveyard = Ornithopter
+Bot1.Target(Ornithopter)
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Life = 21
+Bot2.Life = 19
+Bot1.Graveyard =

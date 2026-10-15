@@ -1,0 +1,41 @@
+# "Another target creature": Arwen is not a legal target of her own ability, shown by a refusal that names her beside the
+# positive control, the same activation targeting Ornithopter. Removing the indestructible counter is a cost, so once it is
+# spent the ability cannot be activated again, even with another creature to target and {1} available.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Emerald
+Arwen, Mortal Queen
+Ornithopter
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Arwen, Mortal Queen.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+! Bot1.Battlefield.Arwen, Mortal Queen.Activate(Arwen, Mortal Queen)
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Arwen, Mortal Queen.Activate(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Arwen, Mortal Queen.Counters.Indestructible = (absent)
+! Bot1.Battlefield.Arwen, Mortal Queen.Activate(Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter.Keywords = Flying; Indestructible; Lifelink
+Bot1.Battlefield.Arwen, Mortal Queen.Counters.PlusOnePlusOne = 1

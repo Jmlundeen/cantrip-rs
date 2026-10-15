@@ -1,0 +1,19 @@
+# Mox Amber is a legendary artifact: a second one on the battlefield under the same controller is put into the graveyard by the
+# legend rule (CR 704.5j), the controller choosing which to keep. The Mox, free to cast, comes down twice and one remains.
+
+[Bot1 Deck]
+Mox Amber
+Mox Amber
+Island x15
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Amber.Cast
+Bot1.Hand.Mox Amber.Cast
+Bot1.Choose(Mox Amber)
+
+[Expect]
+Bot1.Graveyard = Mox Amber
+Bot1.Battlefield = Mox Amber

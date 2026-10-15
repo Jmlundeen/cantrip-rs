@@ -1,0 +1,34 @@
+# "Whenever one or more cards are put into a library": a token is not a card. Thraben Inspector's Clue token is targeted by Wan Shi Tong's enters trigger and its owner puts it into the library: it ceases to exist and no Spirits are made (the Clue and no other permanent of Bot1 is changed).
+
+[Bot1 Deck]
+Island
+Mox Pearl
+Thraben Inspector
+Sol Ring
+Black Lotus
+Wan Shi Tong, All-Knowing
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Thraben Inspector.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Wan Shi Tong, All-Knowing.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Target(Clue Token)
+Bot1.Modes(On the bottom)
+[T1 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Library.Count = 10
+Bot1.Battlefield = Island; Mox Pearl; Thraben Inspector; Sol Ring; Wan Shi Tong, All-Knowing

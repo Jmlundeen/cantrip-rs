@@ -1,0 +1,39 @@
+# An instant card and a sorcery card in the graveyard: Flow State instead puts two of the top three into the hand and the last on the bottom. The graveyard is checked as it resolves, so Flow State itself, still on the stack, is not one of them.
+
+[Bot1 Deck]
+Mountain
+Island
+Mountain
+Chain Lightning
+Lightning Bolt
+Flow State
+Swamp
+Swamp
+Swamp
+Counterspell
+Ancestral Recall
+Brainstorm
+Island x3
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Chain Lightning.Cast(Bot2)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Hand.Flow State.Cast
+Bot1.Arrange(Counterspell; Brainstorm | Ancestral Recall)
+
+[Expect]
+Bot1.Graveyard = Flow State; Lightning Bolt; Chain Lightning
+Bot1.Hand = Swamp; Swamp; Swamp; Counterspell; Brainstorm
+Bot1.Library = Island; Island; Island; Ancestral Recall

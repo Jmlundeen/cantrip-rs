@@ -1,0 +1,45 @@
+# A spell cast with flashback is exiled whether it resolves, is countered or leaves the stack some other way
+# (CR 702.34a, ruling 2021-03-19). Bot2 counters the flashed-back Firebolt; the player is not damaged and Firebolt
+# goes to exile (Bot2 also discards two Islands to hand size).
+
+[Bot1 Deck]
+Firebolt
+Mountain x6
+Mountain x20
+
+[Bot2 Deck]
+Island x5
+Counterspell
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Firebolt.Cast(Bot2)
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Graveyard.Firebolt.Cast(Bot2; Ability: Flashback)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Counterspell.Cast(Firebolt)
+
+[Expect]
+Bot2.Life = 18
+Exile = Firebolt
+Bot1.Graveyard.Count = 0
+Bot2.Graveyard = Counterspell; Island; Island

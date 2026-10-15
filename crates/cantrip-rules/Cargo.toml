@@ -1,0 +1,10 @@
+[package]
+name = "cantrip-rules"
+description = "The bricks: turn structure, priority, stack, targeting, layers, triggers, state-based actions, combat, mana, costs."
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+[dependencies]
+cantrip-state.workspace = true
+cantrip-api.workspace = true

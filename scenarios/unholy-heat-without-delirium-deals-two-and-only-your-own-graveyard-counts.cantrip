@@ -1,0 +1,56 @@
+# Delirium - "four or more card types among cards in your graveyard" (CR 207.2c, 702.131): Bot1's graveyard holds a Culling the Weak
+# (instant) and the Ornithopter it sacrificed (artifact, creature): three types, one short, so Unholy Heat deals 2 and Bot2's Cogwork
+# Librarian (3/3) survives with 2 damage. Bot2's own graveyard holds a Forest (a fourth type, land) discarded to Mox Diamond: it is
+# not Bot1's graveyard, so it does not count - had it counted, 6 damage would have killed the Librarian.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Ornithopter
+Culling the Weak
+Unholy Heat
+Island
+Island
+Island x12
+
+[Bot2 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Cogwork Librarian
+Mox Diamond
+Forest
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Cogwork Librarian.Cast
+Bot2.Hand.Mox Diamond.Cast
+Bot2.Accept
+Bot2.Choose(Forest)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Culling the Weak.Cast
+Bot1.Choose(Ornithopter)
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Unholy Heat.Cast(Bot2.Battlefield.Cogwork Librarian)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Cogwork Librarian.Damage = 2
+Bot1.Graveyard = Unholy Heat; Culling the Weak; Ornithopter
+Bot2.Graveyard = Forest

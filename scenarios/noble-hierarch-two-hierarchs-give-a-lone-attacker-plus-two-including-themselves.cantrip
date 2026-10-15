@@ -1,0 +1,35 @@
+# Noble Hierarch's exalted: each instance triggers separately (CR 702.83b), so with two Hierarchs a creature attacking alone gets
+# +2/+2: an Ornithopter on turn 3 (power 2, Bot2 to 18), and a Noble Hierarch itself on turn 5 (a creature its controller
+# controls, attacking alone; its own exalted counts, power 2, Bot2 to 16).
+
+[Bot1 Deck]
+Forest
+Noble Hierarch
+Noble Hierarch
+Ornithopter
+Forest x5
+Forest x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Noble Hierarch.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Hand.Noble Hierarch.Cast
+Bot1.Attack(Ornithopter > Bot2)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Ornithopter.Power = 2
+? Bot2.Life = 18
+[T5 Bot1.Main1]
+Bot1.Attack(Noble Hierarch#1 > Bot2)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Noble Hierarch#1.Power = 2
+
+[Expect]
+Bot2.Life = 16

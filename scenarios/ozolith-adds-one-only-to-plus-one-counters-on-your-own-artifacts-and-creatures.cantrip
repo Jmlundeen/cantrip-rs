@@ -1,0 +1,51 @@
+# "If one or more +1/+1 counters would be put on an artifact or creature you control, that many plus one are put instead" (CR 122.6, 614.1a). Bristly Bill's landfall counter: on Bot2's Elvish Mystic (not a permanent Bot1 controls) it is one,
+# on Bot1's own Bristly Bill two.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Emerald
+Mox Ruby
+Ozolith, the Shattered Spire
+Bristly Bill, Spine Sower
+Forest
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Forest
+Elvish Mystic
+Forest x13
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ozolith, the Shattered Spire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Bristly Bill, Spine Sower.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Target(Bot2.Battlefield.Elvish Mystic)
+Bot1.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Target(Bristly Bill, Spine Sower)
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Bot2.Battlefield.Elvish Mystic.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Bristly Bill, Spine Sower.Counters.PlusOnePlusOne = 2

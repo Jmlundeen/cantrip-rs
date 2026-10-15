@@ -1,0 +1,27 @@
+# Psychic Frog's "Discard a card: Put a +1/+1 counter on this creature." (CR 602.2): the discard is a cost, chosen as
+# the ability is activated and paid before it goes on the stack, so the Island is gone and the Frog a 2/3 once it
+# resolves.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Psychic Frog
+Island x12
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Psychic Frog.Cast
+Bot1.Battlefield.Psychic Frog.Activate(Ability: Discard)
+Bot1.Choose(Island)
+
+[Expect]
+Bot1.Battlefield.Psychic Frog.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Psychic Frog.Power = 2
+Bot1.Battlefield.Psychic Frog.Toughness = 3
+Bot1.Graveyard = Island

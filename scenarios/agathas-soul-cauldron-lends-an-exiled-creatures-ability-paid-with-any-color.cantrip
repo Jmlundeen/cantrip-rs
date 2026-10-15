@@ -1,0 +1,51 @@
+# Agatha's Soul Cauldron: "You may spend mana as though it were mana of any color to activate abilities of creatures you
+# control", "{T}: Exile target card from a graveyard. When a creature card is exiled this way, put a +1/+1 counter on target
+# creature you control" and "Creatures you control with +1/+1 counters on them have all activated abilities of all creature
+# cards exiled with" it. Faithless Looting discards Blazing Rootwalla on turn 3; the Cauldron exiles it and puts a counter
+# on Ornithopter, which now has the Rootwalla's "{R}: +2/+0": Bot1 pays it with Mox Sapphire's blue mana, and the 1/3
+# Ornithopter attacks as a 3/3.
+
+[Bot1 Deck]
+Mountain
+Mox Sapphire
+Mox Ruby
+Ornithopter
+Agatha's Soul Cauldron
+Faithless Looting
+Blazing Rootwalla
+Mountain
+Mountain x14
+
+[Bot2 Deck]
+Island x13
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Agatha's Soul Cauldron.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Blazing Rootwalla; Mountain)
+Bot1.Battlefield.Agatha's Soul Cauldron.Activate(Bot1.Graveyard.Blazing Rootwalla)
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Ornithopter.Activate(Ability: +2/+0)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter.Power = 3

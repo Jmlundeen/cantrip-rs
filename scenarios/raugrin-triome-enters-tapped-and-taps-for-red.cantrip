@@ -1,0 +1,21 @@
+# Raugrin Triome is an Island Mountain Plains, so it taps for {U}, {R} or {W}, and it enters tapped: Bot1 cannot use it
+# on the turn it is played, and on the next turn taps it for {R}.
+
+[Bot1 Deck]
+Raugrin Triome
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Raugrin Triome.Play
+! Bot1.Battlefield.Raugrin Triome.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Raugrin Triome.Activate(Ability: {R})
+? Bot1.Mana = {R}
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Raugrin Triome.Subtypes = Island; Mountain; Plains
+Bot1.Battlefield.Raugrin Triome.Tapped = true

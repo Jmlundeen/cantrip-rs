@@ -1,0 +1,39 @@
+# Ad Nauseam: reveal the top card and put it into hand, lose life equal to its mana value, and may repeat. Bot1 takes
+# Sol Ring (1 life), Mox Pearl (0) and Sylvan Caryatid (2), then declines a fourth: 3 life lost in all.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Mox Jet
+Ad Nauseam
+Swamp
+Swamp
+Swamp
+Sol Ring
+Mox Pearl
+Sylvan Caryatid
+Duress
+Swamp x6
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ad Nauseam.Cast
+Bot1.Accept
+Bot1.Accept
+Bot1.Decline
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Life = 17
+Bot1.Graveyard = Ad Nauseam; Black Lotus
+Bot1.Hand = Swamp; Swamp; Swamp; Sol Ring; Mox Pearl; Sylvan Caryatid
+Bot1.Library.Count = 7

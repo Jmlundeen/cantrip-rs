@@ -1,0 +1,43 @@
+# "Each opponent loses that much life" with three players: Cathar Commando saddles the Bronco, the revealed Cathar
+# Commando is worth 2, and both Bot2 and Bot3 lose 2 (Bot2 also takes the 2 combat damage); Bot1 loses nothing.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Emerald
+Mox Pearl
+Caustic Bronco
+Cathar Commando
+Swamp
+Swamp
+Swamp
+Cathar Commando
+Swamp x6
+
+[Bot2 Deck]
+Island x20
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Caustic Bronco.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Cathar Commando.Cast
+[T4 Bot1.Main1]
+Bot1.Battlefield.Caustic Bronco.Activate
+Bot1.Choose(Cathar Commando)
+Bot1.Attack(Caustic Bronco > Bot2)
+[T4 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 16
+Bot3.Life = 18

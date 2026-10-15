@@ -1,0 +1,18 @@
+# Witch Enchanter played as its back face, Witch-Blessed Meadow: "As this land enters, you may pay 3 life. If you don't,
+# it enters tapped" (CR 614.12a, 712.4). Accepted, it costs 3 life and enters untapped.
+
+[Bot1 Deck]
+Witch Enchanter
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Witch Enchanter.Play
+Bot1.Accept
+[Bot1.Main2]
+
+[Expect]
+Bot1.Life = 17
+Bot1.Battlefield.Witch-Blessed Meadow.Tapped = false

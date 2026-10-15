@@ -1,0 +1,47 @@
+# A spell whose only target has become illegal does not resolve (CR 608.2b): in response to Path to Exile, Bot2's Giver of
+# Runes (no longer summoning sick on turn 5) gives its Ornithopter protection from white. Nothing is exiled, and Bot2 is
+# not asked whether to search: the "may search" belongs to the effect that did not happen.
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Path to Exile
+Plains x3
+Plains x10
+
+[Bot2 Deck]
+Plains
+Giver of Runes
+Ornithopter
+Plains x4
+Forest
+Plains x11
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Giver of Runes.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Path to Exile.Cast(Bot2.Battlefield.Ornithopter)
+Bot2.Battlefield.Giver of Runes.Activate(Ornithopter)
+Bot2.Decline
+Bot2.Colors(White)
+Bot1.Pass
+! Bot2.Accept
+[T5 Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot1.Graveyard = Path to Exile
+Bot2.Battlefield.Ornithopter.Damage = 0
+Bot2.Battlefield.Count = 3

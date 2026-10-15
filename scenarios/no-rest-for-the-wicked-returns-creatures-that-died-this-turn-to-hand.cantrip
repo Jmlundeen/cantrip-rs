@@ -1,0 +1,37 @@
+# No Rest for the Wicked, sacrificed, returns to its controller's hand the creature cards in their graveyard that were put
+# there from the battlefield this turn: Bot2's Lightning Bolt kills Bot1's Llanowar Elves on turn 2, and after it
+# resolves the sacrifice puts the Elves in Bot1's hand. The Enchantment itself is in the graveyard.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Ruby
+Llanowar Elves
+No Rest for the Wicked
+Forest x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x5
+Mountain x10
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.No Rest for the Wicked.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+[T2 Bot2.Main2]
+Bot1.Battlefield.No Rest for the Wicked.Activate
+[T3 Bot1.Upkeep]
+
+[Expect]
+Bot1.Hand = Forest; Forest; Llanowar Elves
+Bot1.Graveyard = No Rest for the Wicked

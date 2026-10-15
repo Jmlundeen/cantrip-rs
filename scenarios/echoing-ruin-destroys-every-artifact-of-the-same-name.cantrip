@@ -1,0 +1,32 @@
+# Echoing Ruin destroys the target artifact and every other artifact with the same name: both of Bot2's Mox Rubies
+# go together, and its Mox Jet, which has another name, stays.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Echoing Ruin
+Mountain x30
+
+[Bot2 Deck]
+Mox Ruby
+Mox Ruby
+Mox Jet
+Island x30
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Echoing Ruin.Cast(Bot2.Battlefield.Mox Ruby)
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Graveyard = Echoing Ruin
+Bot2.Battlefield = Mox Jet
+Bot2.Graveyard = Mox Ruby; Mox Ruby

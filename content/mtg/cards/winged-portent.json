@@ -1,0 +1,6 @@
+{
+  "name": "Winged Portent",
+  "manaCost": "{1}{U}{U}",
+  "type": "Instant",
+  "oracleText": "Cleave {4}{G}{U} (You may cast this spell for its cleave cost. If you do, remove the words in square brackets.)\nDraw a card for each creature you control [with flying]."
+}

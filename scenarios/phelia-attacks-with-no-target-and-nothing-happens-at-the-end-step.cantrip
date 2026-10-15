@@ -1,0 +1,36 @@
+# Phelia, Exuberant Shepherd: "exile up to one other target nonland permanent" -- up to one includes none. On turn 3 Phelia
+# attacks with a Mox Pearl available to exile and Bot1 chooses no target: nothing is exiled, and the end-step return
+# (which exists all the same, CR 603.7d) has nothing to return and gives no counter.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Phelia, Exuberant Shepherd
+Plains
+Plains
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Phelia, Exuberant Shepherd.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Phelia, Exuberant Shepherd > Bot2)
+Bot1.Target()
+[T3 Bot1.Main2]
+? Exile.Count = 0
+[T4 Bot2.Main1]
+
+[Expect]
+Turn = 4
+Exile.Count = 0
+Bot2.Life = 18
+Bot1.Battlefield.Phelia, Exuberant Shepherd.Counters.PlusOnePlusOne = (absent)

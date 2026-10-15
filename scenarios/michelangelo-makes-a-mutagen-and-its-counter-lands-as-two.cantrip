@@ -1,0 +1,26 @@
+# "When Michelangelo enters, create a Mutagen token", and "that many plus one": the Mutagen's own one +1/+1 counter, put
+# on Michelangelo (a creature Bot1 controls), becomes two (CR 122.6, 614.1a). 1/1 with two counters is 3/3.
+
+[Bot1 Deck]
+Black Lotus
+Michelangelo, Weirdness to 11
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Forest x17
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Michelangelo, Weirdness to 11.Cast
+Bot1.Battlefield.Mutagen Token.Activate(Bot1.Battlefield.Michelangelo, Weirdness to 11)
+
+[Expect]
+Bot1.Battlefield.Count = 1
+Bot1.Battlefield.Michelangelo, Weirdness to 11.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Michelangelo, Weirdness to 11.Power = 3

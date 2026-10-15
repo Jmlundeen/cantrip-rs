@@ -1,0 +1,26 @@
+# The hybrid {U/R} of Warp is paid with a red mana as well as a blue one; warped on turn 1 the Emissary is on the
+# battlefield for the artifact spell cast after it (Mox Jet), which makes a Drone that stays when the Emissary is exiled
+# at the beginning of the end step.
+
+[Bot1 Deck]
+Mountain
+Pinnacle Emissary
+Mox Jet
+Island x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Pinnacle Emissary.Cast(Ability: Warp)
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Pass
+[T2 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield = Mountain; Mox Jet; Drone
+Exile = Pinnacle Emissary

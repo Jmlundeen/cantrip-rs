@@ -1,0 +1,12 @@
+{
+  "name": "Strength of the Harvest",
+  "manaCost": "{2}{G/W}",
+  "type": "Enchantment — Aura",
+  "oracleText": "Enchant creature\nEnchanted creature gets +1/+1 for each creature and/or enchantment you control.",
+  "backFacePlayableAsLand": true,
+  "backFace": {
+    "name": "Haven of the Harvest",
+    "type": "Land",
+    "oracleText": "This land enters tapped.\n{T}: Add {G} or {W}."
+  }
+}

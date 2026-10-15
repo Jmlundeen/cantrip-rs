@@ -1,0 +1,36 @@
+# Sunburst counts colors, not mana: Black Lotus's three black mana pay for X = 3 and the Explosives enters with ONE charge
+# counter (CR 702.44a), so it destroys mana value 1 (Bot2's Sol Ring) and leaves the mana value 2 Mind Stone.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Engineered Explosives
+Island x20
+
+[Bot2 Deck]
+Sol Ring
+Mind Stone
+Mox Jet
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Engineered Explosives.Cast(X: 3)
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Hand.Mind Stone.Cast
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Engineered Explosives.Counters.Charge = 1
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Engineered Explosives.Activate
+
+[Expect]
+Bot2.Battlefield = Mox Jet; Mind Stone
+Bot2.Graveyard = Sol Ring

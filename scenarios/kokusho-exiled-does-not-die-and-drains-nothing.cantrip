@@ -1,0 +1,37 @@
+# The trigger is "when Kokusho dies" (CR 700.4): Bot2's Swords to Plowshares exiles it instead, so nothing drains - Bot2 stays at 20 - and
+# Bot1 only gains the 5 life Swords itself gives its controller. The death scenario (Vindicate) is the existing one, the positive control.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Black Lotus
+Kokusho, the Evening Star
+Swamp x10
+
+[Bot2 Deck]
+Plains
+Swords to Plowshares
+Plains x14
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Kokusho, the Evening Star.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Kokusho, the Evening Star)
+[T2 Bot2.Main2]
+
+[Expect]
+Exile = Kokusho, the Evening Star
+Bot2.Life = 20
+Bot1.Life = 25

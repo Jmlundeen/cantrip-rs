@@ -1,0 +1,43 @@
+# Daze's alternative cost needs "an Island you control": with only a Mountain in play it is refused (! Cast with
+# Ability: Return an Island) at Bot2's first Duress, which takes the spare Lightning Bolt. On turn 3 Bot1 plays a Volcanic
+# Island, an Island by its land type though not a basic one, and at the second Duress returns it to counter that
+# Duress (the positive control: the same Daze with an Island in play); the Mountain stays.
+
+[Bot1 Deck]
+Mountain
+Volcanic Island
+Daze
+Lightning Bolt
+Lightning Bolt
+Mountain x3
+Mountain x10
+
+[Bot2 Deck]
+Swamp
+Swamp
+Duress
+Duress
+Swamp x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Duress.Cast(Bot1)
+! Bot1.Hand.Daze.Cast(Duress; Ability: Return an Island)
+Bot2.Choose(Lightning Bolt)
+[T3 Bot1.Main1]
+Bot1.Hand.Volcanic Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Duress.Cast(Bot1)
+Bot1.Hand.Daze.Cast(Duress; Ability: Return an Island)
+Bot1.Choose(Volcanic Island)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield = Mountain
+Bot1.Hand = Lightning Bolt; Mountain; Mountain; Mountain; Volcanic Island
+Bot1.Graveyard = Daze; Lightning Bolt
+Bot2.Graveyard = Duress; Duress

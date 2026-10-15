@@ -1,0 +1,43 @@
+# The position of a-token-copy-of-painters-servant-chooses-its-own-color, handed to Bot1 at the token's question: Three
+# Steps Ahead is resolving, the token copy of Painter's Servant is being created, and its "As this creature enters,
+# choose a color" is asked before it is on the battlefield (CR 614.12).
+#
+# The question names the token, and the token is nowhere yet: it is not on the battlefield, so no view of the table
+# has it. A served game used to stop here with "Seat 1 was prompted about ... (Painter's Servant, a Token in
+# Battlefield owned by seat 1), which is not in their view". See ScriptedPositionsThroughTransportTests.
+#
+# The first Colors line answers the card's own choice; the handover is the second time the question is put.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Black Lotus
+Mox Sapphire
+Painter's Servant
+Three Steps Ahead
+Island
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Painter's Servant.Cast
+Bot1.Colors(Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Three Steps Ahead.Cast
+Bot1.Modes(2)
+Bot1.Target(Painter's Servant)
+[Handover Bot1.Colors]
+
+[Expect]
+Turn = 1
+Step = Main1
+Stack = Three Steps Ahead
+Bot1.Battlefield = Island; Mox Sapphire; Painter's Servant
+Bot1.Battlefield.Painter's Servant.ChosenColor = Blue

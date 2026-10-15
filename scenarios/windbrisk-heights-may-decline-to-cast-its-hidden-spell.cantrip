@@ -1,0 +1,32 @@
+# "You may play the exiled card": the hidden card is a Lightning Bolt and Bot1, with three attackers, declines to cast it. It stays exiled and Bot2
+# keeps its 20 life.
+[Bot1 Deck]
+Windbrisk Heights
+Mox Pearl
+Ornithopter
+Ornithopter
+Ornithopter
+Island
+Island
+Lightning Bolt
+Island x3
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Windbrisk Heights.Play
+Bot1.Arrange(Lightning Bolt | Island; Island; Island)
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter#1 > Bot2; Ornithopter#2 > Bot2; Ornithopter#3 > Bot2)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Windbrisk Heights.Activate(Ability: You may play)
+Bot1.Decline
+[Bot1.Main2]
+[Expect]
+Bot2.Life = 20
+Exile.Count = 1
+Bot1.Battlefield = Windbrisk Heights; Mox Pearl; Ornithopter; Ornithopter; Ornithopter

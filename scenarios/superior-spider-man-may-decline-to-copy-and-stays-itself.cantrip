@@ -1,0 +1,45 @@
+# Mind Swap is a "may": with an Ornithopter in Bot2's graveyard, Bot1 declines to copy it. Superior Spider-Man enters as himself, a 4/4 Spider Human
+# Hero without flying, and the Ornithopter is not exiled.
+
+[Bot1 Deck]
+Sol Ring
+Damn
+Superior Spider-Man
+Swamp
+Swamp
+Island
+Swamp x14
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Swamp.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Damn.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Superior Spider-Man.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Decline
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Exile.Count = 0
+Bot2.Graveyard = Ornithopter
+Bot1.Battlefield.Superior Spider-Man.Power = 4
+Bot1.Battlefield.Superior Spider-Man.Types = Creature
+Bot1.Battlefield.Superior Spider-Man.Subtypes = Hero; Human; Spider
+Bot1.Battlefield.Superior Spider-Man.Keywords = (absent)

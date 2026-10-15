@@ -1,0 +1,20 @@
+# Gleemox costs {0} and its {T}: Add one mana of any color is a mana ability: on turn 1 it alone pays for Lightning Bolt's {R}.
+
+[Bot1 Deck]
+Gleemox
+Lightning Bolt
+Island x15
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Gleemox.Cast
+Bot1.Battlefield.Gleemox.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+
+[Expect]
+Bot1.Battlefield = Gleemox
+Bot1.Battlefield.Gleemox.Tapped = true
+Bot1.Graveyard = Lightning Bolt
+Bot2.Life = 17

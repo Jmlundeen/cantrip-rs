@@ -1,0 +1,38 @@
+# Wishclaw Talisman: "An opponent gains control of this artifact" - with two opponents the controller chooses which one.
+# Bot1 casts it on turn 1, uses it on turn 5 (its second turn after Bot2 and Bot3) and chooses Bot3: Bot3 gets it with two
+# wish counters, Bot2 does not.
+
+[Bot1 Deck]
+Island
+Mox Jet
+Wishclaw Talisman
+Island x4
+Island x4
+Sol Ring
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Wishclaw Talisman.Cast
+Bot1.Pass
+[T4 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Wishclaw Talisman.Activate
+Bot1.Search(Sol Ring)
+Bot1.ChoosePlayer(Bot3)
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot3.Battlefield.Wishclaw Talisman.Counters.Wish = 2
+Bot2.Battlefield.Count = 0

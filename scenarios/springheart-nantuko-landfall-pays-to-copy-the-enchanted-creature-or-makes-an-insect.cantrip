@@ -1,0 +1,43 @@
+# Springheart Nantuko's landfall: "you may pay {1}{G} if this permanent is attached to a creature you control. If you do,
+# create a token that's a copy of that creature. If you didn't create a token this way, create a 1/1 green Insect creature
+# token." Bestowed on Llanowar Elves, a Forest on turn 3 asks for {1}{G}, paid by the Forest and a Mox, and makes a token
+# copy of the Elves. On turn 5 Bot1 declines and gets an Insect instead.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Forest
+Llanowar Elves
+Springheart Nantuko
+Forest
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Springheart Nantuko.Cast(Bot1.Battlefield.Llanowar Elves; Ability: Bestow)
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.PayCost
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Count = 7
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Decline
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Count = 9
+Bot1.Battlefield.Insect.Power = 1

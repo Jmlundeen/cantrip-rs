@@ -1,0 +1,51 @@
+# "You may play the exiled card": with three different powers after the counter (0, 1 and 2) Bot1 is asked and declines.
+# The ability is done: Mox Ruby stays in exile face down, and the counter was put on the Elves.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Ornithopter
+Plains
+Llanowar Elves
+Collector's Cage
+Forest
+Forest
+Forest
+Forest
+Mox Ruby
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Collector's Cage.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Llanowar Elves#1.Activate
+Bot1.Arrange(Mox Ruby | Forest; Forest; Forest; Forest)
+Bot1.Hand.Ornithopter.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Collector's Cage.Activate(Bot1.Battlefield.Llanowar Elves#2)
+Bot1.Battlefield.Forest.Activate
+Bot1.Decline
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Exile.Count = 1
+Bot1.Battlefield.Llanowar Elves#2.Power = 2
+Bot1.Battlefield.Mox Ruby = (absent)

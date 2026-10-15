@@ -1,0 +1,6 @@
+{
+  "name": "Cranial Plating",
+  "manaCost": "{2}",
+  "type": "Artifact — Equipment",
+  "oracleText": "Equipped creature gets +1/+0 for each artifact you control.\n{B}{B}: Attach this Equipment to target creature you control.\nEquip {1}"
+}

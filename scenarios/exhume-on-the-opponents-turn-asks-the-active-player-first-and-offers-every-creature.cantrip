@@ -1,0 +1,56 @@
+# CR 101.4: the choices are made in turn order starting with the active player, here Bot2, who casts Exhume on turn 2. Bot1
+# has two creature cards in its graveyard (Ornithopter on top of Llanowar Elves, both entombed on turn 1) and returns the
+# lower one, which an unscripted answer would not pick: it is asked after Bot2, so Bot2's choice comes first in the script.
+# Had Bot1 been asked first, the cursor on Bot2's line would have left it the first card offered, the Ornithopter.
+
+[Bot1 Deck]
+Mox Jet
+Swamp
+Entomb
+Entomb
+Swamp
+Swamp
+Swamp
+Llanowar Elves
+Ornithopter
+Swamp x12
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Entomb
+Exhume
+Swamp
+Swamp
+Swamp
+Ornithopter
+Swamp x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Llanowar Elves)
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Ornithopter)
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Entomb.Cast
+Bot2.Search(Ornithopter)
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Exhume.Cast
+Bot2.Choose(Ornithopter)
+Bot1.Choose(Llanowar Elves)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield = Swamp; Mox Jet; Llanowar Elves
+Bot1.Graveyard = Entomb; Ornithopter; Entomb
+Bot2.Battlefield = Swamp; Mox Jet; Mox Ruby; Ornithopter

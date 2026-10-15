@@ -1,0 +1,30 @@
+# Mana Drain on a Mox Sapphire (mana value 0): the spell is countered, and "add {C} equal to its mana value" adds none.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Mana Drain
+Mox Ruby
+Island x17
+
+[Bot2 Deck]
+Mox Sapphire
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Mana Drain.Cast(Mox Sapphire)
+[T3 Bot1.Main1]
+? Bot1.Mana =
+
+[Expect]
+Turn = 3
+Bot2.Graveyard = Mox Sapphire
+Bot2.Battlefield.Count = 0

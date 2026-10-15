@@ -1,0 +1,32 @@
+# Ivora, Insatiable Heir: "whenever it deals combat damage to a player, create a Blood token." Blocked by Bot2's
+# Ornithopter (0/2) the 1/1 trampler cannot assign lethal damage to the blocker and have any left over for the player, so
+# it deals 1 to a creature and none to Bot2: no second Blood token (the only one is from entering). Compare the
+# trampling attack that does hurt the player, in ivora-grows-for-each-card-you-discard-....
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Ivora, Insatiable Heir
+Mountain x14
+
+[Bot2 Deck]
+Ornithopter
+Island x14
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ivora, Insatiable Heir.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Ivora, Insatiable Heir > Bot2)
+Bot2.Block(Ornithopter > Ivora, Insatiable Heir)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot2.Battlefield.Ornithopter.Damage = 1
+Bot1.Battlefield = Blood Token; Ivora, Insatiable Heir; Mountain; Mox Ruby

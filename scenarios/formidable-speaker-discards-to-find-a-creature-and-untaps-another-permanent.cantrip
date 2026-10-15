@@ -1,0 +1,42 @@
+# Formidable Speaker: entering, its controller discards an Island and so searches for a creature card (Llanowar Elves,
+# put into the hand). On turn 3 "{1}, {T}: Untap another target permanent" untaps the Mox Jet that paid for it.
+# The library is Llanowar Elves and Islands, so the shuffle cannot matter.
+
+[Bot1 Deck]
+Formidable Speaker
+Gleemox
+Mox Emerald
+Mox Jet
+Island
+Island
+Island
+Llanowar Elves
+Island x10
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Gleemox.Activate(Color: Blue)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Formidable Speaker.Cast
+Bot1.Pass
+Bot1.Choose(Island)
+Bot1.Search(Llanowar Elves)
+? Bot1.Hand = Island; Island; Llanowar Elves
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Formidable Speaker.Activate(Ability: Untap another; Mox Jet)
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Island
+Bot1.Battlefield.Formidable Speaker.Tapped = true
+Bot1.Battlefield.Mox Jet.Tapped = false

@@ -1,0 +1,6 @@
+{
+  "name": "Mox Jet",
+  "manaCost": "{0}",
+  "type": "Artifact",
+  "oracleText": "{T}: Add {B}."
+}

@@ -1,0 +1,42 @@
+# Rancor's death trigger goes on the stack when its Llanowar Elves is bolted; Bot2 answers with Ghost Vacuum, exiling Rancor from the
+# graveyard. "Return it to its owner's hand" finds it gone (a new object in exile, CR 400.7) and does nothing.
+
+[Bot1 Deck]
+Forest
+Forest
+Llanowar Elves
+Rancor
+Forest x3
+Forest x13
+
+[Bot2 Deck]
+Mountain
+Ghost Vacuum
+Lightning Bolt
+Island x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Ghost Vacuum.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Hand.Rancor.Cast(Llanowar Elves)
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot2.Battlefield.Ghost Vacuum.Activate(Bot1.Graveyard.Rancor)
+[T4 Bot2.Main2]
+
+[Expect]
+Exile = Rancor
+Bot1.Hand.Count = 4
+Bot1.Graveyard = Llanowar Elves

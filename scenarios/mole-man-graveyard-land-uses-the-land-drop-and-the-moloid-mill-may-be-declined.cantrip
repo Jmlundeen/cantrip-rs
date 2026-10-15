@@ -1,0 +1,43 @@
+# A land played from the graveyard is still the turn's land play (CR 305.2): on turn three, after Bot1 plays a Mountain from its
+# hand, the Marsh Flats in the graveyard cannot also be played (the refusal); on turn five, with the land play unused, it can (the
+# positive control) and makes a Moloid. The Moloid's "you may mill a card" can be declined: attacking with it mills nothing.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Pearl
+Mole Man, Moloid Master
+Marsh Flats
+Mountain
+Mountain
+Swamp
+Mountain x12
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Mole Man, Moloid Master.Cast
+Bot1.Hand.Marsh Flats.Play
+Bot1.Battlefield.Marsh Flats.Activate
+Bot1.Search(Swamp)
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+! Bot1.Graveyard.Marsh Flats.Play
+[T5 Bot1.Main1]
+Bot1.Graveyard.Marsh Flats.Play
+[T5 Bot1.Attackers]
+Bot1.Attack(Moloid#1 > Bot2)
+Bot1.Decline
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Count = 11
+Bot2.Life = 19

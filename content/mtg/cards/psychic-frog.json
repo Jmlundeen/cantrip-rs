@@ -1,0 +1,8 @@
+{
+  "name": "Psychic Frog",
+  "manaCost": "{U}{B}",
+  "type": "Creature — Frog",
+  "power": 1,
+  "toughness": 2,
+  "oracleText": "Whenever this creature deals combat damage to a player or planeswalker, draw a card.\nDiscard a card: Put a +1/+1 counter on this creature.\nExile three cards from your graveyard: This creature gains flying until end of turn."
+}

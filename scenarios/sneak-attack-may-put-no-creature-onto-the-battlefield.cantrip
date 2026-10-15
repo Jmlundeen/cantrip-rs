@@ -1,0 +1,33 @@
+# Sneak Attack: "You MAY put a creature card": Bot1 chooses none, so the Ornithopter stays in hand and is never sacrificed.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Sneak Attack
+Mox Ruby
+Ornithopter
+Mountain
+Mountain x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sneak Attack.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Sneak Attack.Activate
+Bot1.Choose()
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Battlefield = Mountain; Mox Ruby; Sneak Attack
+Bot1.Hand.Count = 3

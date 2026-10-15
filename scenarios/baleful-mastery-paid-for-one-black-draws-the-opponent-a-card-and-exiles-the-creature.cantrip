@@ -1,0 +1,35 @@
+# Baleful Mastery: "You may pay {1}{B} rather than pay this spell's mana cost (CR 118.9). If the {1}{B} cost was paid, an
+# opponent draws a card. Exile target creature or planeswalker." In a duel there is one opponent, so nobody is asked: Bot1
+# exiles Bot2's Llanowar Elves for {1}{B} on turn 3 and Bot2 draws the card.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Baleful Mastery
+Swamp x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Baleful Mastery.Cast(Bot2.Battlefield.Llanowar Elves; Ability: {1}{B})
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Forest
+Exile = Llanowar Elves
+Bot1.Graveyard = Baleful Mastery
+Bot2.Hand.Count = 7
+Bot2.Library.Count = 3

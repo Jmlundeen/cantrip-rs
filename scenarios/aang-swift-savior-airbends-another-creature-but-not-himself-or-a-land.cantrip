@@ -1,0 +1,61 @@
+# Aang, Swift Savior: "When Aang enters, airbend up to one other target creature or spell." On turn 3 Bot1 casts Aang
+# while Bot2 controls Llanowar Elves and a Forest. The trigger's target question refuses Aang himself ("other") and the
+# Forest (not a creature or a spell), and takes the Elves (positive control): airbend (CR 701.65a) exiles the Elves, and
+# only their owner may cast them from exile, for {2}. On turn 4 Bot2 does, with two Forests; Bot1 is never offered that
+# cast.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Aang, Swift Savior
+Plains x20
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest
+Forest x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Aang, Swift Savior.Cast
+Bot1.Pass
+! Bot1.Target(Aang, Swift Savior)
+! Bot1.Target(Bot2.Battlefield.Forest)
+Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Exile.Count = 1
+? Bot2.Battlefield.Llanowar Elves = (absent)
+! Bot1.Exile.Llanowar Elves.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest#1.Activate
+Bot2.Battlefield.Forest#2.Activate
+Bot2.Exile.Llanowar Elves.Cast
+Bot2.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Turn = 4
+Exile.Count = 0
+Bot2.Battlefield = Forest; Forest; Llanowar Elves
+Bot2.Battlefield.Forest#1.Tapped = true
+Bot2.Battlefield.Forest#2.Tapped = true
+Bot1.Battlefield.Aang, Swift Savior.Tapped = false

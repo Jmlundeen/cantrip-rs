@@ -1,0 +1,29 @@
+# "a CREATURE you control": Ozolith puts a +1/+1 counter on itself, a noncreature artifact Bot1 controls. Ozolith's own
+# replacement makes it two; Michelangelo's does not apply, so it is not three (the sibling scenario, where the same
+# two replacements meet on a creature, gives three).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Michelangelo, Weirdness to 11
+Ozolith, the Shattered Spire
+Forest
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Forest x17
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Ozolith, the Shattered Spire.Cast
+Bot1.Hand.Michelangelo, Weirdness to 11.Cast
+Bot1.Battlefield.Ozolith, the Shattered Spire.Activate(Bot1.Battlefield.Ozolith, the Shattered Spire)
+
+[Expect]
+Bot1.Battlefield.Ozolith, the Shattered Spire.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Michelangelo, Weirdness to 11.Counters.PlusOnePlusOne = (absent)

@@ -1,0 +1,24 @@
+# A search may find nothing (CR 701.23b): with only a Mind Stone (cost {2}) in the library, chapter III finds nothing and the Saga is
+# still sacrificed once the chapter has resolved.
+
+[Bot1 Deck]
+Urza's Saga
+Forest x6
+Forest
+Forest
+Mind Stone
+Forest x6
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Urza's Saga.Play
+[T5 Bot1.Main1]
+! Bot1.Search(Mind Stone)
+Bot1.Search()
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Count = 0
+Bot1.Graveyard = Urza's Saga

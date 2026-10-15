@@ -1,0 +1,8 @@
+{
+  "name": "Haywire Mite",
+  "manaCost": "{1}",
+  "type": "Artifact Creature — Insect",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "When this creature dies, you gain 2 life.\n{G}, Sacrifice this creature: Exile target noncreature artifact or noncreature enchantment."
+}

@@ -1,0 +1,42 @@
+# Rancor can only enchant a creature: with none out the refusal holds although Bot1 has the mana, and once Llanowar Elves is out it is cast on it (the control):
+# the Elves are a 3/1 with trample. Bot2's Lightning Bolt kills the Elves on turn 4, Rancor is put into the graveyard from the battlefield, and
+# returns to Bot1's hand.
+
+[Bot1 Deck]
+Forest
+Forest
+Llanowar Elves
+Rancor
+Forest x3
+Forest x13
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+! Bot1.Hand.Rancor.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Hand.Rancor.Cast(Llanowar Elves)
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Llanowar Elves.Power = 3
+? Bot1.Battlefield.Llanowar Elves.Keywords = Trample
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Hand.Count = 5
+Bot1.Graveyard = Llanowar Elves
+Bot1.Battlefield.Count = 2

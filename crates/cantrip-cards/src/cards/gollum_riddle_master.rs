@@ -1,0 +1,79 @@
+use cantrip_api::*;
+use cantrip_mechanics::choose;
+use cantrip_mechanics::targets;
+use cantrip_oracle as oracle;
+
+/// "As Gollum enters, choose odd or even" (CR 614.12a), kept on the permanent as the chosen quality. Zero is even.
+fn enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
+    let card = g.obj(entering.object).card;
+    let odd = choose::one_of(g, entering.controller, entering.object, vec![Label::Card(card, 0), Label::Card(card, 1)])? == 0;
+    entering.chosen_odd = Some(odd);
+    Ok(())
+}
+
+/// "Whenever an opponent casts a spell with mana value of the chosen quality": a spell, not an ability, and one of an opponent's.
+fn opponent_casts_a_matching_spell(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    let Event::SpellCast { spell, player, .. } = event else { return None };
+    let odd = q.obj(source).marks.chosen_odd?;
+    if *player == q.controller(source) || (q.mana_value(*spell) % 2 == 1) != odd {
+        return None;
+    }
+    Fired::PLAIN
+}
+
+/// "Choose one that hasn't been chosen": a mode this Gollum chose before, as its ability went on the stack, is spent - even
+/// if that ability was then countered - read from the event history. A Gollum that left and came back is a new object
+/// (CR 400.7) with every mode to choose again. With all three spent the ability still triggers and is removed as it would
+/// be put on the stack (CR 603.3c, 700.2).
+fn not_chosen_before(q: &dyn Query, asker: &Asker, mode: u8) -> bool {
+    !q.history().all().iter().any(|r| {
+        matches!(r.event, Event::ModesChosen { source, modes, .. } if source == asker.source && modes & (1 << mode) != 0)
+    })
+}
+
+/// "Put a +1/+1 counter on Gollum": nothing to put it on once Gollum has left.
+fn counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if targets::permanent(g, item.object) {
+        g.add_counters(item.object, CounterKind::PlusOne, 1);
+    }
+    Ok(())
+}
+
+/// "Each opponent loses 2 life and you gain 2 life."
+fn drain(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    g.each_opponent_loses_life(item.controller, 2);
+    g.gain_life(item.controller, 2);
+    Ok(())
+}
+
+/// "Draw a card."
+fn draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    g.draw(item.controller, 1);
+    Ok(())
+}
+
+static RIDDLE: ModalDef = ModalDef {
+    modes: &[
+        ModeDef { text: "Put a +1/+1 counter on Gollum.", targets: &[], effect: counter, cost: ManaCost::ZERO },
+        ModeDef { text: "Each opponent loses 2 life and you gain 2 life.", targets: &[], effect: drain, cost: ManaCost::ZERO },
+        ModeDef { text: "Draw a card.", targets: &[], effect: draw, cost: ManaCost::ZERO },
+    ],
+    min: 1,
+    max: 1,
+    escalate: None,
+    repeat: false,
+    allowed: Some(not_chosen_before),
+};
+
+pub static CARD: CardDef = CardDef {
+    enters: Some(enters),
+    labels: &["Odd", "Even"],
+    abilities: &[AbilityDef::Triggered(TriggeredDef {
+        text: "Whenever an opponent casts a spell with mana value of the chosen quality, choose one that hasn't been chosen \u{2014} put a +1/+1 counter on Gollum; or each opponent loses 2 life and you gain 2 life; or draw a card.",
+        listens: EventMask::SPELL_CAST,
+        matches: opponent_casts_a_matching_spell,
+        modal: Some(&RIDDLE),
+        ..TriggeredDef::BLANK
+    })],
+    ..oracle::GOLLUM_RIDDLE_MASTER
+};

@@ -1,0 +1,43 @@
+# Faerie Mastermind: "{3}{U}: Each player draws a card." Bot1 activates it in its own turn 3 main phase: Bot1 (the active
+# player, who has drawn once already that turn) and Bot2 each draw a card. Bot1's second draw of the turn does not trigger
+# its own Mastermind ("an opponent draws"), and Bot2's draw is its first that turn, so nothing triggers and each hand
+# gains exactly one card. Mastermind comes down on turn 1 with the Mox Sapphire's blue and a colorless from Sol Ring.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Sol Ring
+Faerie Mastermind
+Island x3
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Faerie Mastermind.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Faerie Mastermind.Activate
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 4
+Bot1.Library.Count = 14
+Bot2.Hand.Count = 8
+Bot2.Library.Count = 11
+Stack.Count = 0

@@ -1,0 +1,50 @@
+# Wistfulness cast for {3}{G/U}{G/U} with two Forests and three Islands: the two hybrid symbols alone could not take
+# both {G}{G} and {U}{U}, but each ability reads the total cost, generic mana included (ruling 2025-11-17), so both
+# trigger: the opponent's Oath of Druids, an enchantment, is exiled, and Bot1 draws two and then discards one.
+
+[Bot1 Deck]
+Wistfulness
+Forest
+Forest
+Island
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Forest
+Oath of Druids
+Forest x5
+Forest x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Oath of Druids.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Wistfulness.Cast
+[T9 Bot1.Main2]
+
+[Expect]
+Exile = Oath of Druids
+Bot1.Battlefield.Wistfulness.Power = 6
+Bot1.Hand.Count = 6
+Bot1.Graveyard.Count = 1

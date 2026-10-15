@@ -1,0 +1,34 @@
+# Skateboard: entering, it taps target permanent (Bot2's Mox Emerald); equipped for {1}, an Ornithopter is a 1/2 with
+# haste and flying.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Skateboard
+Ornithopter
+Plains x16
+
+[Bot2 Deck]
+Mox Emerald
+Plains x19
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot2.Hand.Mox Emerald.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Skateboard.Cast
+Bot1.Target(Bot2.Battlefield.Mox Emerald)
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Skateboard.Activate(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Mox Emerald.Tapped = true
+Bot1.Battlefield.Skateboard.AttachedTo = Ornithopter
+Bot1.Battlefield.Ornithopter.Power = 1
+Bot1.Battlefield.Ornithopter.Keywords = Flying; Haste

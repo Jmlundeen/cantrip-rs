@@ -1,0 +1,24 @@
+# A position about how the client moves cards, handed over with Bot1 holding priority in its first main phase: a
+# Forest on the battlefield and Llanowar Elves in hand. Clicking the Elves casts them, and the card flies from the
+# hand to the stack; tapping the Forest for them turns it where it stands; and once the Elves resolve they fly from
+# the stack to the battlefield.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Forest x16
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+[Handover Bot1.Pass]
+
+[Expect]
+Turn = 1
+Step = Main1
+ActivePlayer = Bot1
+PriorityPlayer = Bot1
+Bot1.Battlefield = Forest
+Bot1.Hand.Count = 6

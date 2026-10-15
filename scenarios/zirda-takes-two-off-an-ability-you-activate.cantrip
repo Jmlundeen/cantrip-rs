@@ -1,0 +1,58 @@
+# Zirda, the Dawnwaker: "Abilities you activate that aren't mana abilities cost {2} less to activate." Inventors' Fair's
+# {4}, {T}, sacrifice ability costs {2} for Bot1 with Zirda out: it pays with two Moxen and searches out a Sol Ring (the
+# ability needs three artifacts, the three Moxen). Only two of the three Moxen are tapped for it.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Zirda, the Dawnwaker
+Inventors' Fair
+Island x3
+Sol Ring
+Island x10
+
+[Bot2 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Inventors' Fair
+Island x3
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Zirda, the Dawnwaker.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Inventors' Fair.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Inventors' Fair.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Inventors' Fair.Activate(Ability: Search)
+Bot1.Search(Sol Ring)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand.Count = 4
+Bot1.Battlefield.Mox Jet.Tapped = false
+Bot1.Graveyard = Inventors' Fair

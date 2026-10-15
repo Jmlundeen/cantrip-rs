@@ -1,0 +1,23 @@
+# Ponder with an empty library: nothing to look at, and the draw from an empty library loses the game at the next
+# state-based check (CR 704.5b).
+
+[Bot1 Deck]
+Mox Sapphire
+Ponder
+Plains
+Plains
+Plains
+Plains
+Plains
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ponder.Cast
+
+[Expect]
+Result = Bot2 won

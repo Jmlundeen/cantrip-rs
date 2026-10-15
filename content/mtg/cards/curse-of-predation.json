@@ -1,0 +1,6 @@
+{
+  "name": "Curse of Predation",
+  "manaCost": "{2}{G}",
+  "type": "Enchantment — Aura Curse",
+  "oracleText": "Enchant player\nWhenever a creature attacks enchanted player, put a +1/+1 counter on it."
+}

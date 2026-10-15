@@ -1,0 +1,45 @@
+# "As an additional cost to cast this spell, sacrifice an artifact or creature" (CR 118.8, 601.2b): with neither on the
+# battlefield Fanatical Offering is not castable (refused with both Swamps untapped), and once Bot1 has an Ornithopter
+# (an artifact creature) it is. On turn 5 the second Offering sacrifices the Map token the first one made, a token
+# being an artifact, and makes a new Map; the old one is gone.
+
+[Bot1 Deck]
+Swamp
+Fanatical Offering
+Fanatical Offering
+Ornithopter
+Swamp
+Swamp
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+! Bot1.Hand.Fanatical Offering.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Fanatical Offering.Cast
+Bot1.Choose(Ornithopter)
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Graveyard = Fanatical Offering; Ornithopter
+? Bot1.Battlefield.Count = 3
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Fanatical Offering.Cast
+Bot1.Choose(Map Token)
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Count = 4
+Bot1.Graveyard = Fanatical Offering; Fanatical Offering; Ornithopter

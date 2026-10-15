@@ -1,0 +1,35 @@
+# Guerrilla Gorilla: "Sacrifice this creature: Destroy target noncreature artifact or noncreature enchantment. Activate only as
+# a sorcery." On Bot2's turn 2, with its Mox Jet on the battlefield, the ability is not offered (the refusal); on Bot1's
+# turn 3 it is (the positive control): the Gorilla is sacrificed as the cost and the Mox Jet destroyed.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Guerrilla Gorilla
+Forest x17
+
+[Bot2 Deck]
+Mox Jet
+Island x19
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+Bot1.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+! Bot1.Battlefield.Guerrilla Gorilla.Activate(Bot2.Battlefield.Mox Jet)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Guerrilla Gorilla.Activate(Bot2.Battlefield.Mox Jet)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Guerrilla Gorilla
+Bot2.Graveyard = Mox Jet
+Bot2.Battlefield.Count = 0

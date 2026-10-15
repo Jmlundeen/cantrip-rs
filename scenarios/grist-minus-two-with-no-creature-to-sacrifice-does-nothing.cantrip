@@ -1,0 +1,38 @@
+# Grist's -2, "You may sacrifice a creature. When you do, destroy target creature or planeswalker", with no creature of Bot1's to sacrifice
+# (Grist on the battlefield is only a planeswalker): nothing is asked, nothing is sacrificed and no "when you do" exists, so Bot2's
+# Llanowar Elves survives. The loyalty cost is still paid: 3 - 2 = 1.
+
+[Bot1 Deck]
+Bayou x3
+Grist, the Hunger Tide
+Forest
+Forest
+Forest x14
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x20
+
+[Actions]
+Bot1.Hand.Bayou.Play
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Bayou.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Bayou.Play
+Bot1.Battlefield.Bayou#1.Activate(Ability: Add {B})
+Bot1.Battlefield.Bayou#2.Activate(Ability: Add {G})
+Bot1.Battlefield.Bayou#3.Activate(Ability: Add {G})
+Bot1.Hand.Grist, the Hunger Tide.Cast
+[T5 Bot1.Main2]
+Bot1.Battlefield.Grist, the Hunger Tide.Activate(Ability: sacrifice)
+Bot1.Pass
+[T5 Bot1.End]
+
+[Expect]
+Bot1.Battlefield.Grist, the Hunger Tide.Counters.Loyalty = 1
+Bot2.Battlefield.Llanowar Elves.Types = Creature
+Stack.Count = 0

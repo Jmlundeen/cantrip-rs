@@ -1,0 +1,37 @@
+# CR 608.2b and 715.4: Bot1 casts Stomp at Bot2's Elvish Mystic and then Lightning Bolts it in response. With its only target gone Stomp does nothing and, not having resolved, is put into the graveyard instead of exile
+# (the Giant cannot be cast from exile later). Bot2 loses no life.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Bonecrusher Giant
+Lightning Bolt
+Mountain x12
+
+[Bot2 Deck]
+Forest
+Elvish Mystic
+Forest x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Bonecrusher Giant.Cast(Elvish Mystic; Ability: Stomp)
+Bot1.Hand.Lightning Bolt.Cast(Elvish Mystic)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Exile.Count = 0
+Bot2.Graveyard = Elvish Mystic
+Bot1.Graveyard = Bonecrusher Giant; Lightning Bolt

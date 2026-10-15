@@ -1,0 +1,26 @@
+# Flash (CR 702.8a) and "enters with a -1/-1 counter" (CR 614.1c): Bot1 casts the Guardian in Bot2's second main phase, where a
+# sorcery-speed creature could not be cast, and it arrives as a 2/3 flyer carrying one -1/-1 counter. (On Bot1's own turn
+# it would be the same; the counter is part of entering, not a trigger.)
+
+[Bot1 Deck]
+Island
+Black Lotus
+Glen Elendra Guardian
+Island x14
+
+[Bot2 Deck]
+Swamp x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main2]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Glen Elendra Guardian.Cast
+[T2 Bot2.End]
+
+[Expect]
+Bot1.Battlefield.Glen Elendra Guardian.Counters.MinusOneMinusOne = 1
+Bot1.Battlefield.Glen Elendra Guardian.Power = 2
+Bot1.Battlefield.Glen Elendra Guardian.Toughness = 3
+Bot1.Battlefield.Glen Elendra Guardian.Keywords = Flash; Flying

@@ -1,0 +1,27 @@
+use cantrip_api::*;
+use cantrip_mechanics::mana;
+use cantrip_oracle as oracle;
+
+/// Until end of turn, lands you control gain "Sacrifice this land: Add {B}." The set is fixed as this resolves
+/// (CR 611.2c): a land that arrives later never gains the ability.
+fn grant(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let this = g.obj(item.object).card;
+    for land in g.permanents_of(item.controller) {
+        if g.chars(land).is(CardType::Land) {
+            g.add_effect(item.object, land, EffectKind::AddAbility(AbilityRef::delayed(this, 0)), Duration::EndOfTurn);
+        }
+    }
+    Ok(())
+}
+
+pub static CARD: CardDef = CardDef {
+    spell: Some(SpellDef { targets: &[], effect: grant }),
+    delayed: &[AbilityDef::Activated(ActivatedDef {
+        text: "Sacrifice this land: Add {B}.",
+        cost: Cost { sacrifice_self: true, ..Cost::NONE },
+        mana: Some(mana::add_b),
+        adds: ManaPool([0, 0, 1, 0, 0, 0]),
+        ..ActivatedDef::BLANK
+    })],
+    ..oracle::RAIN_OF_FILTH
+};

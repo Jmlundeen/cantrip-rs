@@ -1,0 +1,58 @@
+# Level 3 (reached on turn 1): "If you would put one or more counters ... put twice that many". Bot2's Walking Ballista cast for X = 1 enters with one counter - Bot2 is putting them, so they are not doubled - while Bot1's own X = 1 Ballista on turn 3
+# enters with two, and the Talent's combat trigger (+1/+1 counter on it) doubles to two more: four.
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Black Lotus
+Innkeeper's Talent
+Mox Emerald
+Mox Ruby
+Walking Ballista
+Forest x12
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Walking Ballista
+Island x13
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Innkeeper's Talent.Cast
+Bot1.Pass
+Bot1.Battlefield.Innkeeper's Talent.Activate(Ability: Level 2)
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Innkeeper's Talent.Activate(Ability: Level 3)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Walking Ballista.Cast(X: 1)
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Walking Ballista.Cast(X: 1)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 4

@@ -1,0 +1,41 @@
+# "You may discard a card. If you do, draw two cards": with no card in hand there is nothing to discard, so Bot1 is asked
+# nothing (the refused Choose) and draws nothing. Every other card of the hand is cast first; the library stays at 20.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Lotus Petal
+Melded Moxite
+Mox Emerald
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Melded Moxite.Cast
+Bot1.Pass
+Bot1.Pass
+! Bot1.Choose
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 0
+Bot1.Library.Count = 20
+Bot1.Graveyard.Count = 0

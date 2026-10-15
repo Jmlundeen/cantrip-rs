@@ -1,0 +1,27 @@
+# Karn is cast on turn 1 off Black Lotus and a Mox Jet from a seven-card deck, so Bot1's library is empty. The +1 has no card to
+# reveal and nobody is asked; Karn still gains the loyalty (it is a cost, CR 606.4) and Bot1 has not lost (it only loses by drawing).
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Karn, Scion of Urza
+Island x4
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Karn, Scion of Urza.Cast
+Bot1.Pass
+Bot1.Battlefield.Karn, Scion of Urza.Activate(Ability: Reveal the top two)
+[T1 Bot1.Main2]
+
+[Expect]
+Result = InProgress
+Bot1.Battlefield.Karn, Scion of Urza.Counters.Loyalty = 6
+Bot1.Hand.Count = 4
+Exile.Count = 0

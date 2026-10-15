@@ -1,0 +1,35 @@
+# Doomsday: five cards chosen from the library and graveyard together, the rest of both exiled, the five put on top
+# in the order their owner picks them (the last picked on top, nothing shuffled), and half of 20 life lost. Black
+# Lotus, spent to pay for it, is in the graveyard and is chosen from there.
+
+[Bot1 Deck]
+Doomsday
+Black Lotus
+Swamp x5
+Lightning Bolt
+Counterspell
+Mana Leak
+Ancestral Recall
+Time Walk
+Mox Pearl
+Sol Ring
+Swamp
+Island
+Island
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Doomsday.Cast
+Bot1.Choose(Counterspell; Mana Leak; Black Lotus; Sol Ring; Time Walk)
+[Bot1.Main1]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Library = Time Walk; Sol Ring; Black Lotus; Mana Leak; Counterspell
+Bot1.Graveyard = Doomsday
+Exile = Lightning Bolt; Ancestral Recall; Mox Pearl; Swamp; Island; Island
+Bot1.Life = 10

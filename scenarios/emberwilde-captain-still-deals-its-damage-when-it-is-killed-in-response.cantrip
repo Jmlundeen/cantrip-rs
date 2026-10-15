@@ -1,0 +1,49 @@
+# Bot2 attacks on turn 4 with an Elvish Mystic and answers the Captain's trigger with Lightning Bolt on the Captain (it has
+# 2 toughness). The ability is already on the stack and independent of its source: it still resolves and the damage is dealt by the
+# Captain as it last existed (CR 113.7a), equal to the five cards left in Bot2's hand as it resolves (the Bolt has left it).
+# Bot1 is still the monarch as it resolves, so the intervening if (CR 603.4) holds without its source.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Sol Ring
+Emberwilde Captain
+Mountain
+Mountain
+Mountain
+Mountain x12
+
+[Bot2 Deck]
+Forest
+Elvish Mystic
+Mountain
+Lightning Bolt
+Forest
+Forest
+Forest
+Forest x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Emberwilde Captain.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Attack(Elvish Mystic > Bot1)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Emberwilde Captain)
+[T4 Bot2.Main2]
+
+[Expect]
+Monarch = Bot2
+Bot2.Life = 15
+Bot1.Graveyard = Emberwilde Captain

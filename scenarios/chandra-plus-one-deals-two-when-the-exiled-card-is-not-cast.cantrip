@@ -1,0 +1,53 @@
+# Chandra, Torch of Defiance +1: "Exile the top card of your library. You may cast that card. If you don't, Chandra deals
+# 2 damage to each opponent." Four turns, four ways of not casting: turn 1 the card is a land (it cannot be cast);
+# turn 3 it is a Disenchant with nothing to target (it cannot be cast, so Bot1 is not even asked); turn 5 it is a
+# Disenchant with Mox Ruby to target (it could be cast, Bot1 is asked and declines); turn 7 the library is empty and
+# nothing is exiled. Each time Bot2 takes 2 (20 -> 12); every exiled card stays in exile.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Chandra, Torch of Defiance
+Mox Ruby
+Island
+Island
+Island
+Island
+Mountain
+Disenchant
+Island
+Disenchant
+Island
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Chandra, Torch of Defiance.Cast
+Bot1.Battlefield.Chandra, Torch of Defiance.Activate(Ability: Exile the top)
+[T1 Bot1.Main2]
+? Bot2.Life = 18
+[T3 Bot1.Main1]
+Bot1.Battlefield.Chandra, Torch of Defiance.Activate(Ability: Exile the top)
+[T3 Bot1.Main2]
+? Bot2.Life = 16
+[T5 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Chandra, Torch of Defiance.Activate(Ability: Exile the top)
+Bot1.Decline
+[T5 Bot1.Main2]
+? Bot2.Life = 14
+[T7 Bot1.Main1]
+Bot1.Battlefield.Chandra, Torch of Defiance.Activate(Ability: Exile the top)
+[T7 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 12
+Exile = Island; Disenchant; Disenchant
+Bot1.Library.Count = 0
+Bot1.Battlefield.Chandra, Torch of Defiance.Counters.Loyalty = 8

@@ -1,0 +1,55 @@
+# Ulvenwald Oddity (4/4 trample, haste) is cast on turn 1. On turn 3 its {5}{G}{G} turns it over: it is Ulvenwald
+# Behemoth, an 8/8, and on turn 5 a Llanowar Elves cast beside it is a 2/2 with trample and haste.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Ulvenwald Oddity
+Mox Jet
+Mox Sapphire
+Sol Ring
+Llanowar Elves
+Forest x8
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ulvenwald Oddity.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Ulvenwald Oddity.Activate
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Ulvenwald Behemoth.Power = 8
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Ulvenwald Behemoth.Power = 8
+Bot1.Battlefield.Ulvenwald Behemoth.Toughness = 8
+Bot1.Battlefield.Llanowar Elves.Power = 2
+Bot1.Battlefield.Llanowar Elves.Keywords = Haste; Trample
+Bot1.Battlefield.Llanowar Elves.SummoningSick = false

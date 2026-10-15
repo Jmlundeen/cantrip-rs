@@ -1,0 +1,8 @@
+{
+  "name": "Fear of Missing Out",
+  "manaCost": "{1}{R}",
+  "type": "Enchantment Creature — Nightmare",
+  "power": 2,
+  "toughness": 3,
+  "oracleText": "When this creature enters, discard a card, then draw a card.\nDelirium — Whenever this creature attacks for the first time each turn, if there are four or more card types among cards in your graveyard, untap target creature. After this phase, there is an additional combat phase."
+}

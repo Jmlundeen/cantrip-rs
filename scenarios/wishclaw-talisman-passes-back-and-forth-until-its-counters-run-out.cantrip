@@ -1,0 +1,53 @@
+# Wishclaw Talisman: three wish counters, each use passes it to an opponent. Bot1 uses it on turn 3 (2 left, Bot2 gets it),
+# Bot2 on its own turn 4 (1 left, back to Bot1), Bot1 on turn 5 (0 left, to Bot2 again). On turn 6 Bot2 controls it with
+# its untapped Islands but no counter to remove: refused (the turn-4 use is the positive control).
+
+[Bot1 Deck]
+Island
+Mox Jet
+Wishclaw Talisman
+Island x4
+Island x2
+Sol Ring
+Mox Pearl
+Island x10
+
+[Bot2 Deck]
+Island x7
+Island x2
+Mox Ruby
+Black Lotus
+Island x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Wishclaw Talisman.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Wishclaw Talisman.Activate
+Bot1.Search(Sol Ring)
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Wishclaw Talisman.Activate
+Bot2.Search(Black Lotus)
+Bot2.Pass
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Wishclaw Talisman.Counters.Wish = 1
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Wishclaw Talisman.Activate
+Bot1.Search(Mox Pearl)
+Bot1.Pass
+[T6 Bot2.Main1]
+Bot2.Hand.Island.Play
+! Bot2.Battlefield.Wishclaw Talisman.Activate
+
+[Expect]
+Bot2.Battlefield.Wishclaw Talisman.Types = Artifact

@@ -1,0 +1,56 @@
+# Elspeth's loyalty abilities: one per turn per planeswalker (CR 606.3), so after the +1 on turn 1 the 0 is refused. Her
+# 0 touches only creatures she controls: Bot2's Tireless Tracker (a 3/2) gets no counter and no flying on turn 3. Her -3
+# targets "a creature an opponent controls with mana value 3 or greater" (CR 115.1, 202.3): on turn 5 Bot2's Elvish
+# Mystic (value 1) and her own Soldier token are refused, the Tracker (value 3) is the control and is destroyed.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Jet
+Elspeth, Storm Slayer
+Plains x3
+Plains x10
+
+[Bot2 Deck]
+Black Lotus
+Tireless Tracker
+Forest
+Elvish Mystic
+Forest x3
+Forest x10
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Elspeth, Storm Slayer.Cast
+Bot1.Battlefield.Elspeth, Storm Slayer.Activate(Ability: #1)
+Bot1.Pass
+! Bot1.Battlefield.Elspeth, Storm Slayer.Activate(Ability: #2)
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Tireless Tracker.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Elspeth, Storm Slayer.Activate(Ability: #2)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Soldier#1.Power = 2
+? Bot2.Battlefield.Tireless Tracker.Power = 3
+? Bot2.Battlefield.Tireless Tracker.Keywords = (absent)
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T5 Bot1.Main1]
+! Bot1.Battlefield.Elspeth, Storm Slayer.Activate(Ability: #3; Bot2.Battlefield.Elvish Mystic)
+! Bot1.Battlefield.Elspeth, Storm Slayer.Activate(Ability: #3; Bot1.Battlefield.Soldier)
+Bot1.Battlefield.Elspeth, Storm Slayer.Activate(Ability: #3; Bot2.Battlefield.Tireless Tracker)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Tireless Tracker; Black Lotus
+Bot2.Battlefield.Elvish Mystic.Power = 1
+Bot1.Battlefield.Elspeth, Storm Slayer.Counters.Loyalty = 3

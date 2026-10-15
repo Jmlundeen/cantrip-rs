@@ -1,0 +1,43 @@
+# Corpse Dance with buyback ({2}{B} plus {2}): Bot1 bolts its own Ornithopter on turn 1, then on turn 3 pays five mana
+# for Corpse Dance with buyback. The Ornithopter comes back from the graveyard, and at the beginning of the end step it
+# is exiled, while Corpse Dance itself returns to Bot1's hand as it resolves.
+
+[Bot1 Deck]
+Mountain
+Ornithopter
+Lightning Bolt
+Corpse Dance
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Island x9
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter)
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Corpse Dance.Cast(Kicked: 1)
+[T3 Bot1.Main2]
+? Bot1.Battlefield = Mox Emerald; Mox Jet; Mox Pearl; Mox Sapphire; Mountain; Ornithopter
+? Bot1.Hand = Corpse Dance
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Hand = Corpse Dance
+Exile = Ornithopter
+Bot1.Graveyard = Lightning Bolt

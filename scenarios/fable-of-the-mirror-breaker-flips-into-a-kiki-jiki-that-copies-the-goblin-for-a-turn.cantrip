@@ -1,0 +1,47 @@
+# Fable of the Mirror-Breaker through all three chapters (CR 714): chapter I (as it enters) makes a Goblin Shaman, chapter II
+# (the lore counter added after Bot1's draw step on turn 3) discards a Mountain and draws a card, and chapter III on
+# turn 5 exiles the Saga and returns it transformed (CR 712.14a) as Reflection of Kiki-Jiki, a 2/2 Enchantment Creature
+# that is no longer a Saga and has no lore counter (so nothing sacrifices it). On turn 7 it copies the Goblin Shaman, a
+# nonlegendary creature (CR 707.9b: the token has haste), and the copy is sacrificed at the beginning of that turn's end step.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Black Lotus
+Fable of the Mirror-Breaker
+Mountain x3
+Mountain x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Fable of the Mirror-Breaker.Cast
+[T3 Bot1.Main1]
+Bot1.Choose(Mountain)
+? Bot1.Battlefield.Fable of the Mirror-Breaker.Counters.Lore = 2
+[T5 Bot1.Main1]
+Bot1.Pass
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Reflection of Kiki-Jiki.Types = Enchantment; Creature
+? Bot1.Battlefield.Reflection of Kiki-Jiki.Subtypes = Goblin; Shaman
+? Bot1.Battlefield.Reflection of Kiki-Jiki.Power = 2
+? Bot1.Battlefield.Reflection of Kiki-Jiki.Counters.Lore = (absent)
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Reflection of Kiki-Jiki.Activate(Goblin Shaman)
+Bot1.Pass
+[T7 Bot1.Main2]
+? Bot1.Battlefield.Goblin Shaman#1.Keywords = (absent)
+? Bot1.Battlefield.Goblin Shaman#2.Keywords = Haste
+? Bot1.Battlefield.Goblin Shaman#2.Power = 2
+[T9 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield = Mountain; Mox Ruby; Reflection of Kiki-Jiki; Goblin Shaman
+Bot1.Graveyard = Mountain; Black Lotus
+Bot1.Library.Count = 8

@@ -1,0 +1,48 @@
+# One of two targets becoming illegal does not stop the rest (CR 608.2b): Bot1 targets Bot2's Mox Jet and its own Lightning
+# Bolt, and in response Bot2 taps the Mox and Disenchants it. The Mox is not shuffled anywhere (it is already in Bot2's
+# graveyard), and the Bolt is still shuffled into Bot1's library.
+
+[Bot1 Deck]
+Mox Ruby
+Lightning Bolt
+Forest
+Forest
+Cathartic Parting
+Plains
+Plains
+Plains x12
+
+[Bot2 Deck]
+Mox Jet
+Mox Pearl
+Disenchant
+Plains x12
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Cathartic Parting.Cast
+Bot1.Target(Bot2.Battlefield.Mox Jet)
+Bot1.Target(Bot1.Graveyard.Lightning Bolt)
+Bot1.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Disenchant.Cast(Bot2.Battlefield.Mox Jet)
+Bot2.Pass
+Bot1.Accept
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Disenchant; Mox Jet
+Bot2.Library.Count = 7
+Bot1.Graveyard = Cathartic Parting
+Bot1.Library.Count = 12

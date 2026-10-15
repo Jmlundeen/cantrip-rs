@@ -1,0 +1,29 @@
+# Lutri, the Spellchaser: "Flash. When Lutri enters, if you cast it, copy target instant or sorcery spell you control. You may choose new
+# targets for the copy." Bot1 casts Lightning Bolt at Bot2 and, with it on the stack, flashes in Lutri (Black Lotus pays {1}{U/R}{U/R} with
+# blue). The enters trigger copies the Bolt (CR 707.10) and the copy is aimed at Bot2 again: 6 damage in all.
+
+[Bot1 Deck]
+Black Lotus
+Lutri, the Spellchaser
+Mox Ruby
+Lightning Bolt
+Island x14
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Hand.Lutri, the Spellchaser.Cast
+Bot1.Pass
+Bot1.Target(Bot2)
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Bot1.Battlefield.Lutri, the Spellchaser.Types = Creature

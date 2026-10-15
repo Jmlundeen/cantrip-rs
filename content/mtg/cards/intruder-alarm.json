@@ -1,0 +1,6 @@
+{
+  "name": "Intruder Alarm",
+  "manaCost": "{2}{U}",
+  "type": "Enchantment",
+  "oracleText": "Creatures don't untap during their controllers' untap steps.\nWhenever a creature enters, untap all creatures."
+}

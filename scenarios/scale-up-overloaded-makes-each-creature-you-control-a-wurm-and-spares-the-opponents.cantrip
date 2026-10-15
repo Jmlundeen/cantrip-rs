@@ -1,0 +1,45 @@
+# Overload {4}{G}{G}: "each creature you control" becomes a green Wurm 6/4 until end of turn; Bot2's Ornithopter does not.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Mox Ruby
+Sol Ring
+Ornithopter
+Ornithopter
+Scale Up
+Forest x13
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Scale Up.Cast(Ability: Overload)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Sol Ring.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Ornithopter#1.Power = 6
+Bot1.Battlefield.Ornithopter#2.Power = 6
+Bot1.Battlefield.Ornithopter#1.Subtypes = Wurm
+Bot2.Battlefield.Ornithopter.Power = 0
+Bot2.Battlefield.Ornithopter.Subtypes = Thopter
+Bot1.Graveyard = Scale Up

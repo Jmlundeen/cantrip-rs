@@ -1,0 +1,14 @@
+{
+  "name": "Krang, Utrom Warlord",
+  "manaCost": "{9}",
+  "type": "Legendary Artifact Creature — Utrom Robot",
+  "power": 9,
+  "toughness": 9,
+  "oracleText": "Flying, trample, indestructible, haste\nOther artifact creatures you control have flying, trample, indestructible, and haste.",
+  "keywords": [
+    "Flying",
+    "Trample",
+    "Indestructible",
+    "Haste"
+  ]
+}

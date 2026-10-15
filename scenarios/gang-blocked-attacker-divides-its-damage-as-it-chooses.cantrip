@@ -1,0 +1,46 @@
+# A 4/4 attacks into a 1/1 and a 2/1 that both block it (CR 510.1c). Its controller may put every point on the 2/1,
+# so the 1/1 lives; the engine's own division would have killed both.
+
+[Bot1 Deck]
+Island
+Swamp
+Island
+Swamp
+Superior Spider-Man
+Island x10
+
+[Bot2 Deck]
+Forest
+Mountain
+Mountain
+Llanowar Elves
+Embereth Shieldbreaker
+Forest x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Embereth Shieldbreaker.Cast
+Bot1.Hand.Island.Play
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Superior Spider-Man.Cast
+Bot1.Attack(Superior Spider-Man)
+Bot2.Block(Llanowar Elves > Superior Spider-Man; Embereth Shieldbreaker > Superior Spider-Man)
+Bot1.AssignDamage(Superior Spider-Man > Embereth Shieldbreaker: 4)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot2.Battlefield.Llanowar Elves.Damage = 0
+Bot2.Graveyard = Embereth Shieldbreaker
+Bot1.Battlefield.Superior Spider-Man.Damage = 3

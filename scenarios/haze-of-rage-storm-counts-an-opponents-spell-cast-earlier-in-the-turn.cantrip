@@ -1,0 +1,43 @@
+# Haze of Rage's storm counts "each spell cast before it this turn", whoever cast it: Bot2 casts a Lightning Bolt at Bot1 in
+# Bot1's upkeep, so the Haze cast in Main1 has one spell before it and is copied once, pumping Bot1's Ornithopter twice
+# (power 2), with no buyback and the Haze in the graveyard.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Ornithopter
+Haze of Rage
+Island x3
+Island x13
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Upkeep]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Haze of Rage.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Power = 2
+
+[Expect]
+Bot1.Life = 17
+Bot1.Graveyard = Haze of Rage

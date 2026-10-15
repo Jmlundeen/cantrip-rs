@@ -1,0 +1,57 @@
+# Ledger Shredder, played for real. The ruling: a creature told to connive that has left the battlefield still
+# connives, and a nonland discard puts a counter on nothing. Turn 5 Bot1 casts its second Pyrite Spellbomb; with the
+# trigger on the stack Bot2 Lightning Bolts the Shredder. The trigger still resolves for Bot1, its controller: Bot1
+# draws the third Spellbomb and discards it.
+
+[Bot1 Deck]
+Island
+Ledger Shredder
+Island
+Pyrite Spellbomb
+Pyrite Spellbomb
+Island
+Island
+Island
+Island
+Pyrite Spellbomb
+Island x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island
+Island
+Island
+Island
+Island
+Island x11
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Ledger Shredder.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Pyrite Spellbomb.Cast
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Pyrite Spellbomb.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ledger Shredder)
+Bot1.Choose(Pyrite Spellbomb)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Graveyard = Pyrite Spellbomb; Ledger Shredder
+Bot1.Battlefield.Count = 5
+Bot1.Hand.Count = 3
+Bot2.Graveyard = Lightning Bolt
+Stack.Count = 0

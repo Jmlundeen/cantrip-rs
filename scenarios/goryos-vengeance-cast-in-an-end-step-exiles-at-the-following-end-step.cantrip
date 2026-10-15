@@ -1,0 +1,33 @@
+# Goryo's Vengeance is an instant. Cast during Bot2's end step on turn 2 it returns Leovold, Emissary of Trest at once, but "the
+# beginning of the next end step" (CR 603.7) is not that end step - it has already begun - so Leovold stays through turn 3's
+# turn and is exiled only at the beginning of Bot1's own end step.
+
+[Bot1 Deck]
+Mox Jet
+Black Lotus
+Entomb
+Goryo's Vengeance
+Island x3
+Leovold, Emissary of Trest
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Entomb.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Search(Leovold, Emissary of Trest)
+[T2 Bot2.End]
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Goryo's Vengeance.Cast(Bot1.Graveyard.Leovold, Emissary of Trest)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Leovold, Emissary of Trest.Power = 3
+[T4 Bot2.Main1]
+
+[Expect]
+Turn = 4
+Exile = Leovold, Emissary of Trest
+Bot1.Battlefield = Mox Jet

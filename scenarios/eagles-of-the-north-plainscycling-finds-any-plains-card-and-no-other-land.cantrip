@@ -1,0 +1,24 @@
+# Plainscycling {1} searches for a card with the Plains subtype (CR 702.29e): Sacred Foundry (Mountain Plains) is one, a
+# Mountain is not (the refusal sits beside the card found).
+
+[Bot1 Deck]
+Island
+Eagles of the North
+Island x5
+Mountain
+Sacred Foundry
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Eagles of the North.Activate
+! Bot1.Search(Mountain)
+Bot1.Search(Sacred Foundry)
+
+[Expect]
+Bot1.Graveyard = Eagles of the North
+Bot1.Hand = Island; Island; Island; Island; Island; Sacred Foundry

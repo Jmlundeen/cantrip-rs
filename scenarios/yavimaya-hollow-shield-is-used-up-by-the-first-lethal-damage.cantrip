@@ -1,0 +1,39 @@
+# One regeneration shield replaces one destruction (CR 701.19a): Bot1 Bolts the Elves twice. The first Bolt is answered by the Hollow's
+# ability ({G} from a Forest, tapping the Hollow), the Elves regenerate (tapped, damage removed); the shield is gone, and the second Bolt,
+# with the Hollow tapped and nothing to answer, destroys them.
+
+[Bot1 Deck]
+Lightning Bolt
+Lightning Bolt
+Mountain x20
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Yavimaya Hollow
+Forest x17
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Forest.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Yavimaya Hollow.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Battlefield.Mountain.Activate
+Bot2.Battlefield.Yavimaya Hollow.Activate(Bot2.Battlefield.Llanowar Elves; Ability: Regenerate)
+Bot2.Battlefield.Forest.Activate
+? Bot2.Battlefield.Llanowar Elves.Damage = 0
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Battlefield.Mountain#2.Activate
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Llanowar Elves
+Bot1.Graveyard = Lightning Bolt; Lightning Bolt

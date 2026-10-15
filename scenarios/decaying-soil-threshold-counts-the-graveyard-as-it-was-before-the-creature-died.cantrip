@@ -1,0 +1,83 @@
+# Decaying Soil: "Threshold -- As long as there are seven or more cards in your graveyard, this enchantment has 'Whenever a
+# nontoken creature is put into your graveyard from the battlefield, you may pay {1}...'". A creature leaving the
+# battlefield is looked back on (CR 603.10a): the graveyard is counted as it was before the creature arrived, so the
+# creature that makes the seventh card does not trigger it.
+#
+# T1 Bot1 casts the Soil (the Moxen pay). T3 upkeep: nothing is in the graveyard, so the Soil's upkeep trigger exiles
+# nothing and asks nothing. Bot1 casts an Ornithopter, then Brain Freeze on itself with storm 1 (one spell before it):
+# two mills of three, and with Brain Freeze itself, seven cards. T5 upkeep: the Soil exiles one (the Brain Freeze, chosen from seven), so
+# six remain. Bot1 casts a Walking Ballista with X = 0, which dies at once as it enters: six cards before, so no trigger
+# (a check that the stack is empty), seven after. T6: Bot2's Bolt kills the Ornithopter with seven cards in the
+# graveyard before it: the trigger goes on the stack, Bot1 pays {1}, and the Ornithopter returns to its hand.
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Ruby
+Decaying Soil
+Mox Sapphire
+Mox Ruby
+Brain Freeze
+Ornithopter
+Island x6
+Walking Ballista
+Island x30
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Decaying Soil.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot1.Graveyard.Count = 0
+? Exile.Count = 0
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Brain Freeze.Cast(Bot1)
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Graveyard.Count = 7
+[T5 Bot1.Upkeep]
+Bot1.Choose(Brain Freeze)
+[T5 Bot1.Main1]
+? Bot1.Graveyard.Count = 6
+? Exile = Brain Freeze
+Bot1.Hand.Walking Ballista.Cast(X: 0)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Bot1.Graveyard.Count = 7
+[T6 Bot2.Main1]
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 1
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.PayCost
+[T6 Bot2.Main2]
+
+[Expect]
+Bot1.Hand = Ornithopter
+Bot1.Graveyard.Count = 7
+Stack.Count = 0

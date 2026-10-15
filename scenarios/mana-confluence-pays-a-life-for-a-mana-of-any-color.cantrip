@@ -1,0 +1,24 @@
+# Mana Confluence: "{T}, Pay 1 life: Add one mana of any color." Tapped for blue it pays for Ancestral Recall and costs
+# Bot1 one life.
+
+[Bot1 Deck]
+Mana Confluence
+Ancestral Recall
+Plains x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mana Confluence.Play
+Bot1.Battlefield.Mana Confluence.Activate(Color: Blue)
+? Bot1.Mana = {U}
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+[Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 19
+Bot1.Graveyard = Ancestral Recall
+Bot1.Hand.Count = 8
+Bot1.Battlefield.Mana Confluence.Tapped = true

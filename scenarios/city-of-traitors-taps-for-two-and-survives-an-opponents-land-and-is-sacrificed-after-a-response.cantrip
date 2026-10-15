@@ -1,0 +1,31 @@
+# {T}: Add {C}{C} pays Mind Stone's {2} on turn 1. An opponent's land (turn 2) is not "you play", so the City stays.
+# On turn 3 Bot1's own Island is played, the sacrifice trigger goes on the stack, and in response the City still taps
+# for {C}{C} and pays Mind Stone's {1}, tap and sacrifice to draw a card; then the City is sacrificed.
+
+[Bot1 Deck]
+City of Traitors
+Mind Stone
+Island
+Island x12
+
+[Bot2 Deck]
+Island x13
+
+[Actions]
+Bot1.Hand.City of Traitors.Play
+Bot1.Battlefield.City of Traitors.Activate
+Bot1.Hand.Mind Stone.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+? Bot1.Battlefield = City of Traitors; Mind Stone
+Bot1.Hand.Island.Play
+Bot1.Battlefield.City of Traitors.Activate
+Bot1.Battlefield.Mind Stone.Activate(Ability: Draw)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Island
+Bot1.Graveyard = City of Traitors; Mind Stone
+Bot1.Hand.Count = 6

@@ -1,0 +1,57 @@
+# -X/-X is not destruction: Arwen, Mortal Queen's indestructible counter does not save her from Toxic Deluge for X = 2 (toughness
+# 0 is a state-based action, CR 704.5f, which indestructibility does not stop). A second Deluge on a later turn, for X = 1 against
+# a new Arwen, shrinks it to 1/1 for the turn only: it survives, and the next turn it is a 2/2 again (until end of turn).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Toxic Deluge
+Toxic Deluge
+Island x15
+
+[Bot2 Deck]
+Mox Pearl
+Mox Emerald
+Mox Sapphire
+Arwen, Mortal Queen
+Mox Jet
+Arwen, Mortal Queen
+Island x14
+
+[Actions]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Arwen, Mortal Queen.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Toxic Deluge.Cast(X: 2)
+[T3 Bot1.Main2]
+? Bot2.Graveyard.Count = 1
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Arwen, Mortal Queen.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Toxic Deluge.Cast(X: 1)
+[T5 Bot1.Main2]
+? Bot2.Battlefield.Arwen, Mortal Queen.Power = 1
+[T6 Bot2.Main1]
+? Bot2.Battlefield.Arwen, Mortal Queen.Power = 2
+
+[Expect]
+Bot1.Life = 17
+Bot2.Graveyard = Arwen, Mortal Queen

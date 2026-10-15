@@ -1,0 +1,32 @@
+# Imperial Seal is a sorcery (CR 307.1): Bot1 holding it with a Swamp untapped is refused it in Bot2's turn 2 and casts it
+# in its own main phase on turn 3 as the control. The card it finds, Black Lotus, was already on top of the library (below
+# the card drawn for turn 3), and stays there: Bot1 draws and casts it on turn 5. The Seal costs 2 life.
+
+[Bot1 Deck]
+Swamp
+Imperial Seal
+Swamp x5
+Swamp
+Black Lotus
+Swamp x10
+
+[Bot2 Deck]
+Swamp x15
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+! Bot1.Hand.Imperial Seal.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Imperial Seal.Cast
+Bot1.Search(Black Lotus)
+[T3 Bot1.Main2]
+? Bot1.Life = 18
+[T5 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+
+[Expect]
+Bot1.Battlefield.Black Lotus.Tapped = false
+Bot1.Library.Count = 10

@@ -1,0 +1,26 @@
+# Manifold Key: "{1}, {T}: Untap another target artifact." A Mox Pearl pays for the Key, a Mox Jet pays {1} to activate
+# it, and the Key untaps the tapped Pearl.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Manifold Key
+Plains x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Manifold Key.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Manifold Key.Activate(Mox Pearl; Ability: Untap)
+[Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Mox Pearl.Tapped = false
+Bot1.Battlefield.Mox Jet.Tapped = true
+Bot1.Battlefield.Manifold Key.Tapped = true

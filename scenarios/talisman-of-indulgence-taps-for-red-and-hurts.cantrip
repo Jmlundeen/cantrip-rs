@@ -1,0 +1,28 @@
+# Talisman of Indulgence has two mana abilities: {C} for free, or {B} or {R} for 1 damage. Bot1 casts it off a Swamp and
+# Mox Jet, then on its next turn taps it for red (a color the Swamp could not make) to Bolt Bot2, taking 1 damage.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Talisman of Indulgence
+Lightning Bolt
+Swamp x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Talisman of Indulgence.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Talisman of Indulgence.Activate(Ability: {B} or {R}; Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+
+[Expect]
+Turn = 3
+Bot1.Life = 19
+Bot2.Life = 17
+Bot1.Graveyard = Lightning Bolt

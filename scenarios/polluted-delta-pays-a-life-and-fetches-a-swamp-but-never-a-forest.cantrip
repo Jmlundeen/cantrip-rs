@@ -1,0 +1,27 @@
+# Polluted Delta: {T}, pay 1 life, sacrifice it - search for an Island or Swamp card and put it onto the battlefield
+# untapped. A Forest is in the library but is not an Island or a Swamp, so it is not offered (the refusal), while the
+# Swamp is found and enters untapped.
+
+[Bot1 Deck]
+Polluted Delta
+Mountain x6
+Forest
+Swamp
+Island
+Mountain x10
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Polluted Delta.Play
+Bot1.Battlefield.Polluted Delta.Activate
+! Bot1.Search(Forest)
+Bot1.Search(Swamp)
+
+[Expect]
+Bot1.Life = 19
+Bot1.Graveyard = Polluted Delta
+Bot1.Battlefield = Swamp
+Bot1.Battlefield.Swamp.Tapped = false
+Bot1.Library.Count = 12

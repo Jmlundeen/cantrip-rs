@@ -1,0 +1,6 @@
+{
+  "name": "Impolite Entrance",
+  "manaCost": "{R}",
+  "type": "Sorcery",
+  "oracleText": "Target creature gains trample and haste until end of turn.\nDraw a card."
+}

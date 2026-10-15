@@ -1,0 +1,46 @@
+# The ruling: "Once your end step begins, it's too late to make a card leave your graveyard in order to cause this
+# ability to trigger" (CR 603.4: an intervening "if" false as the step begins means no trigger at all). Nothing has
+# left Bot1's graveyard when its turn-3 end step begins, so the stack is empty there; Bot2 then sacrifices Soul-Guide
+# Lantern to exile Bot1's graveyard. Gau does not trigger late, and at Bot2's end step on turn 4 the card left on
+# another turn, not "this turn", so Bot2 keeps all its life.
+
+[Bot1 Deck]
+Mountain
+Sol Ring
+Gau, Feral Youth
+Faithless Looting
+Mountain
+Mountain
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Island
+Soul-Guide Lantern
+Island x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Soul-Guide Lantern.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Gau, Feral Youth.Cast
+Bot1.Hand.Faithless Looting.Cast
+[T3 Bot1.End]
+? Stack.Count = 0
+Bot2.Battlefield.Soul-Guide Lantern.Activate(Ability: Exile each)
+[T4 Bot2.End]
+? Stack.Count = 0
+[T5 Bot1.Upkeep]
+
+[Expect]
+Bot1.Graveyard.Count = 0
+Bot2.Life = 20

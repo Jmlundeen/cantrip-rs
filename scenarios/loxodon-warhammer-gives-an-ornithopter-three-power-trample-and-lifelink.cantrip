@@ -1,0 +1,41 @@
+# Loxodon Warhammer: "Equipped creature gets +3/+0 and has trample and lifelink." Three Moxen pay for the Warhammer on
+# turn 1 and for Equip {3} on turn 3; the equipped Ornithopter attacks as a 3/2 and Bot1 gains the 3 it deals.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Ornithopter
+Loxodon Warhammer
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Loxodon Warhammer.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Loxodon Warhammer.Activate(Ornithopter)
+Bot1.Attack(Ornithopter)
+[Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot2.Life = 17
+Bot1.Life = 23
+Bot1.Battlefield.Loxodon Warhammer.AttachedTo = Ornithopter
+Bot1.Battlefield.Ornithopter.Power = 3
+Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot1.Battlefield.Ornithopter.Keywords = Flying; Lifelink; Trample

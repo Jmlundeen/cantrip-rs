@@ -1,0 +1,36 @@
+# "When The Meathook Massacre enters, each creature gets -X/-X": cast for {B}{B} alone, X is 0 and an Ornithopter keeps its 0/2 (no creature dies to a
+# -0/-0). The drain is still live: Bot1 then Bolts its own Ornithopter and, because a creature it controls died, Bot2 loses 1 life (19).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Ornithopter
+The Meathook Massacre
+Lightning Bolt
+Island x14
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.The Meathook Massacre.Cast(X: 0)
+Bot1.Pass
+Bot1.Pass
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter)
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Bot2.Life = 19
+Bot1.Life = 20
+Bot1.Graveyard = Ornithopter; Lightning Bolt

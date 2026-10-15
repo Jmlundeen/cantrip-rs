@@ -1,0 +1,12 @@
+{
+  "name": "Endurance",
+  "manaCost": "{1}{G}{G}",
+  "type": "Creature — Elemental Incarnation",
+  "power": 3,
+  "toughness": 4,
+  "oracleText": "Flash\nReach\nWhen this creature enters, up to one target player puts all the cards from their graveyard on the bottom of their library in a random order.\nEvoke—Exile a green card from your hand.",
+  "keywords": [
+    "Flash",
+    "Reach"
+  ]
+}

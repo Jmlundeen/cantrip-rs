@@ -1,0 +1,34 @@
+# The trigger is independent of its source once on the stack (CR 113.7a): Bot1 casts Lightning Bolt on turn three with the Iconoclast
+# out, and Bot2 bolts the Iconoclast in response to the trigger. The Iconoclast dies, but the Soldier token is still created.
+
+[Bot1 Deck]
+Third Path Iconoclast
+Mox Sapphire
+Mox Ruby
+Lightning Bolt
+Island x16
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x13
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Third Path Iconoclast.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Third Path Iconoclast)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Lightning Bolt; Third Path Iconoclast
+Bot1.Battlefield.Soldier.Types = Artifact; Creature
+Bot2.Life = 17

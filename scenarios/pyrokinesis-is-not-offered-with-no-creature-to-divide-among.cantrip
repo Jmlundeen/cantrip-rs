@@ -1,0 +1,34 @@
+# Pyrokinesis divides a literal 4 among "any number of target creatures" (CR 601.2d): each target gets at least one, so
+# a positive total needs at least one target and a board with no creature is no legal announcement (CR 601.2c). The
+# offer used to skip divided slots altogether, so it said the cast was possible; a bot cast it, the division found
+# nothing to aim at and quietly gave the cast up, and the bot cast it again for ever - a game that never moved, with
+# nothing in the log and no prompt to anyone else.
+#
+# On turn 1 nothing is on the battlefield, so neither way to cast it is offered, though Lightning Bolt could pay the
+# pitch cost. Once Bot2 has Llanowar Elves, the same pitch cast is offered and kills it.
+
+[Bot1 Deck]
+Pyrokinesis
+Lightning Bolt
+Mountain x5
+Mountain x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x5
+Forest x10
+
+[Actions]
+! Bot1.Hand.Pyrokinesis.Cast
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Pyrokinesis.Cast(Ability: Exile)
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Pyrokinesis
+Exile = Lightning Bolt
+Bot2.Graveyard = Llanowar Elves

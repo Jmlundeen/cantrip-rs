@@ -1,0 +1,39 @@
+# Two +1s (turns 1 and 3) put two cards into exile with silver counters (Bot2 gives Bot1 the Island each time, so the Lightning
+# Bolt and the Guerrilla Gorilla are exiled). On turn 5 the -1 offers both and Bot1 takes the Gorilla; the Bolt stays in exile.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Karn, Scion of Urza
+Island x4
+Island
+Lightning Bolt
+Island
+Island
+Guerrilla Gorilla
+Island x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Karn, Scion of Urza.Cast
+Bot1.Pass
+Bot1.Battlefield.Karn, Scion of Urza.Activate(Ability: Reveal the top two)
+Bot2.Choose(Island)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Karn, Scion of Urza.Activate(Ability: Reveal the top two)
+Bot2.Choose(Island)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Karn, Scion of Urza.Activate(Ability: Put a card you own)
+Bot1.Choose(Guerrilla Gorilla)
+[T5 Bot1.Main2]
+
+[Expect]
+Exile = Lightning Bolt
+Bot1.Hand.Count = 9
+Bot1.Battlefield.Karn, Scion of Urza.Counters.Loyalty = 6

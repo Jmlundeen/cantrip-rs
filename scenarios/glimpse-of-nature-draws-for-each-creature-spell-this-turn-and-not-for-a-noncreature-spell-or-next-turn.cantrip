@@ -1,0 +1,47 @@
+# "Whenever you cast a creature spell this turn, draw a card" (CR 603.7b: a delayed trigger lasting the turn). Bot1 casts Glimpse of
+# Nature, then a Sol Ring (not a creature spell: no draw) and two Ornithopters (a draw each), so the hand ends at three
+# cards. On turn 3, with the trigger gone, a third Ornithopter draws nothing.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Glimpse of Nature
+Sol Ring
+Ornithopter
+Ornithopter
+Ornithopter
+Forest x3
+Forest x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Glimpse of Nature.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+? Bot1.Hand.Count = 3
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Pass
+? Bot1.Hand.Count = 3
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Pass
+[T1 Bot1.Main2]
+? Bot1.Hand.Count = 3
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 4
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 3

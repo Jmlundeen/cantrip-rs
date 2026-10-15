@@ -1,0 +1,36 @@
+# The token is "a copy of that creature" (CR 707.2): its copiable values are Llanowar Elves's, not the +1/+1 the Aura gives the original. After the Forest's landfall and the {1}{G} payment there are two Elves, the enchanted one a 2/2 and the token a 1/1,
+# and no Insect (a token was created).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Forest
+Llanowar Elves
+Springheart Nantuko
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Springheart Nantuko.Cast(Bot1.Battlefield.Llanowar Elves; Ability: Bestow)
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.PayCost
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Count = 7
+Bot1.Battlefield.Llanowar Elves#1.Power = 2
+Bot1.Battlefield.Llanowar Elves#2.Power = 1

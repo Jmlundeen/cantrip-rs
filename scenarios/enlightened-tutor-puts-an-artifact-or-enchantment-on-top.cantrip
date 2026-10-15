@@ -1,0 +1,29 @@
+# Bot1 casts Enlightened Tutor and searches for Mox Sapphire among instants and lands: the artifact goes to the top of
+# the library, not to the hand, and only artifacts and enchantments could be taken.
+
+[Bot1 Deck]
+Plains
+Enlightened Tutor
+Plains x5
+Lightning Bolt
+Island
+Mox Sapphire
+Counterspell
+Plains x6
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Enlightened Tutor.Cast
+Bot1.Search(Mox Sapphire)
+
+[Expect]
+Turn = 1
+Bot1.Battlefield = Plains
+Bot1.Graveyard = Enlightened Tutor
+Bot1.Hand.Count = 5
+Bot1.Library.Count = 10
+Bot1.Hand = Plains; Plains; Plains; Plains; Plains

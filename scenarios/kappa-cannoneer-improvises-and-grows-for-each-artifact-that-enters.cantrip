@@ -1,0 +1,37 @@
+# Kappa Cannoneer ({5}{U}, improvise): Mox Sapphire pays the {U} and five Ornithopters, tapped after the mana is made, pay
+# the {5}. It enters with a +1/+1 counter for itself; on turn 3 another artifact, a second Mox Sapphire, enters under
+# Bot1's control and puts a second one on it, so it is a 6/6.
+
+[Bot1 Deck]
+Mox Sapphire
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Kappa Cannoneer
+Mox Sapphire
+Island x13
+
+[Bot2 Deck]
+Forest x22
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Kappa Cannoneer.Cast(Convoke: Ornithopter, Ornithopter, Ornithopter, Ornithopter, Ornithopter)
+[Bot1.Main2]
+? Bot1.Battlefield.Kappa Cannoneer.Counters.PlusOnePlusOne = 1
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Kappa Cannoneer.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Kappa Cannoneer.Power = 6
+Bot1.Battlefield.Kappa Cannoneer.Toughness = 6

@@ -1,0 +1,45 @@
+# Death (half of Life // Death): "Return target creature card from your graveyard to the battlefield. You lose life equal to its
+# mana value." Bot1's graveyard holds a Faithless Looting (not a creature card) and an Ulvenwald Oddity (mana value 4);
+# Bot2's graveyard holds an Ornithopter (a creature card, not Bot1's). The refusals name each wrong card as the target;
+# the Oddity is the positive control, returned to the battlefield, and Bot1 loses 4 life, as the card's mana value in the
+# graveyard says (20 - 4 = 16). Death is castable only because a legal target exists.
+
+[Bot1 Deck]
+Mountain
+Mox Jet
+Faithless Looting
+Life // Death
+Ulvenwald Oddity
+Island
+Mountain
+Island x13
+
+[Bot2 Deck]
+Ornithopter
+Island x6
+Island x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Ulvenwald Oddity; Island)
+[T2 Bot2.Main1]
+Bot2.Discard(Ornithopter)
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Life // Death.Cast(Bot2.Graveyard.Ornithopter; Ability: Death)
+! Bot1.Hand.Life // Death.Cast(Bot1.Graveyard.Faithless Looting; Ability: Death)
+Bot1.Hand.Life // Death.Cast(Ability: Death; Bot1.Graveyard.Ulvenwald Oddity)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 16
+Bot1.Battlefield = Mountain; Mountain; Mox Jet; Ulvenwald Oddity
+Bot2.Graveyard = Ornithopter

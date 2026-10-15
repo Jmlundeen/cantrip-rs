@@ -1,0 +1,46 @@
+# Casting Mox Jet pumps the one Ornithopter on the battlefield; a second Ornithopter cast afterwards is a creature spell (no trigger) and is not one of "those creatures" (CR 611.2c), so it is 0/2.
+
+[Bot1 Deck]
+Ornithopter
+Ornithopter
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Jeskai Ascendancy
+Mox Jet
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Jeskai Ascendancy.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Ornithopter.Tapped = true
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Decline
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield.Ornithopter#1.Power = 1
+Bot1.Battlefield.Ornithopter#2.Power = 0
+Bot1.Hand.Count = 1

@@ -1,0 +1,39 @@
+# Territorial Kavu: "the number of basic land types among lands YOU control". Bot1 controls a Mountain and a Forest when it
+# casts the Kavu on turn 3 while Bot2 controls a Tundra (Plains Island): the Kavu is 2/2, the opponent's types not counted. On
+# turn 5 Bot1 plays its own Tundra: the types are Mountain, Forest, Plains and Island, a 4/4, a dual land counting both of its
+# types and a type counted once however many lands have it.
+
+[Bot1 Deck]
+Mountain
+Forest
+Territorial Kavu
+Tundra
+Mountain
+Mountain
+Mountain
+Mountain x4
+Mountain x10
+
+[Bot2 Deck]
+Tundra
+Island x19
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Tundra.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Territorial Kavu.Cast
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Territorial Kavu.Power = 2
+[T5 Bot1.Main1]
+Bot1.Hand.Tundra.Play
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Territorial Kavu.Power = 4
+Bot1.Battlefield.Territorial Kavu.Toughness = 4

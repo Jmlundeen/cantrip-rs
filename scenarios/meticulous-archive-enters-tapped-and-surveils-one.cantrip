@@ -1,0 +1,23 @@
+# Meticulous Archive enters tapped and, as it enters, surveils 1: Bot1 puts the Lightning Bolt on top of its library
+# into the graveyard.
+
+[Bot1 Deck]
+Meticulous Archive
+Island x6
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Swamp x15
+
+[Actions]
+Bot1.Hand.Meticulous Archive.Play
+Bot1.Arrange(| Lightning Bolt)
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Battlefield = Meticulous Archive
+Bot1.Battlefield.Meticulous Archive.Tapped = true
+Bot1.Graveyard = Lightning Bolt
+Bot1.Library.Count = 10

@@ -1,0 +1,36 @@
+# With exactly one card in hand when its enters trigger resolves (an Island; the Riddler, Black Lotus and the Moxen have been cast and
+# a land played) the Riddler's replacement adds one: "draw that many cards plus one" (CR 614.1a), so the draw is two and the library goes from 12 to 10.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Jet
+Quantum Riddler
+Island
+Island
+Mox Ruby
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Quantum Riddler.Cast
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 3
+Bot1.Library.Count = 10

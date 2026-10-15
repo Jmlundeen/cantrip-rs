@@ -1,0 +1,32 @@
+# Only the Frog's own combat damage draws: Bot2's Lightning Bolt hits Bot1 for 3 on turn 2 (damage by another source, not
+# combat) and Bot1's hand stays at four Islands.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Psychic Frog
+Island x4
+Island x20
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Psychic Frog.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 17
+Bot1.Hand.Count = 4

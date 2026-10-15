@@ -1,0 +1,51 @@
+# The reflexive trigger's "if you control a red permanent other than Ajani" is checked again as it resolves (CR 603.4).
+# Bot1 uses the 0 with Ragavan out; the Cat is made and the trigger, targeting Bot2, goes on the stack. Bot2 responds
+# with Lightning Bolt on Ragavan, the last red permanent, so the trigger does nothing: Bot2 stays at 20 life.
+# (The positive control, same position without the Bolt, is ajani-avenger-zero-with-a-red-permanent-...)
+
+[Bot1 Deck]
+Plains x2
+Ajani, Nacatl Pariah
+Mountain
+Ragavan, Nimble Pilferer
+Plains x2
+Plains x12
+
+[Bot2 Deck]
+Mountain
+Mountain
+Island
+Lightning Bolt
+Lightning Bolt
+Island x2
+Island x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Ajani, Nacatl Pariah.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Cat Warrior)
+Bot1.Accept
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Ragavan, Nimble Pilferer.Cast
+Bot1.Battlefield.Ajani, Nacatl Avenger.Activate(Ability: 0: Create)
+Bot1.Target(Bot2)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ragavan, Nimble Pilferer)
+[Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot2.Life = 20
+Bot1.Graveyard = Ragavan, Nimble Pilferer
+Bot1.Battlefield.Cat Warrior.Power = 2
+Stack.Count = 0

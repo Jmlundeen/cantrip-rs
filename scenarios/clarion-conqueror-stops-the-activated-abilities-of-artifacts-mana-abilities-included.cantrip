@@ -1,0 +1,44 @@
+# Clarion Conqueror: "Activated abilities of artifacts, creatures, and planeswalkers can't be activated." Mana abilities are
+# activated abilities (CR 605.1a), so an artifact's are stopped too. Bot1 uses Mox Ruby and Sol Ring on turn 1 (the controls),
+# then pays for Clarion Conqueror with Black Lotus. On turn 3 neither Mox Ruby's, nor Sol Ring's, nor Sensei's Divining Top's
+# abilities are offered, while a land's mana ability still is.
+
+[Bot1 Deck]
+Black Lotus
+Clarion Conqueror
+Mox Ruby
+Sol Ring
+Plains
+Plains
+Sensei's Divining Top
+Plains x20
+
+[Bot2 Deck]
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Sensei's Divining Top.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Clarion Conqueror.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Battlefield.Sol Ring.Activate
+! Bot1.Battlefield.Sensei's Divining Top.Activate(Ability: Draw a card)
+! Bot1.Battlefield.Sensei's Divining Top.Activate(Ability: Look at the top)
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield = Clarion Conqueror; Mox Ruby; Plains; Sensei's Divining Top; Sol Ring
+Bot1.Graveyard = Black Lotus

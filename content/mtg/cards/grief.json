@@ -1,0 +1,11 @@
+{
+  "name": "Grief",
+  "manaCost": "{2}{B}{B}",
+  "type": "Creature — Elemental Incarnation",
+  "power": 3,
+  "toughness": 2,
+  "oracleText": "Menace\nWhen this creature enters, target opponent reveals their hand. You choose a nonland card from it. That player discards that card.\nEvoke—Exile a black card from your hand.",
+  "keywords": [
+    "Menace"
+  ]
+}

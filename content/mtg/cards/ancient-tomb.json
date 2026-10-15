@@ -1,0 +1,5 @@
+{
+  "name": "Ancient Tomb",
+  "type": "Land",
+  "oracleText": "{T}: Add {C}{C}. Ancient Tomb deals 2 damage to you."
+}

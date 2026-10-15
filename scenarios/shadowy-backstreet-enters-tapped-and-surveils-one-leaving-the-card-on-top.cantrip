@@ -1,0 +1,22 @@
+# Shadowy Backstreet enters tapped and its enters trigger surveils 1: the Island on top of the library stays there
+# (nothing goes to the graveyard), and the tapped Plains Swamp is the land Bot1 has.
+
+[Bot1 Deck]
+Shadowy Backstreet
+Mountain x6
+Island
+Mountain x9
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Shadowy Backstreet.Play
+Bot1.Arrange(Island | )
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Shadowy Backstreet.Tapped = true
+Bot1.Battlefield.Shadowy Backstreet.Subtypes = Plains; Swamp
+Bot1.Graveyard.Count = 0
+Bot1.Library.Count = 10

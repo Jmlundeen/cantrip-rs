@@ -1,0 +1,32 @@
+# Burst Lightning's "any target" includes a creature: unkicked it deals 2 to Bot2's Ulvenwald Oddity (4/4), which
+# survives with 2 damage marked, the other half of the kicked scenario where 4 damage kills it exactly.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Burst Lightning
+Island x12
+
+[Bot2 Deck]
+Forest
+Black Lotus
+Ulvenwald Oddity
+Forest x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot2.Hand.Forest.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Ulvenwald Oddity.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Forest.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Burst Lightning.Cast(Bot2.Battlefield.Ulvenwald Oddity)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Ulvenwald Oddity.Damage = 2
+Bot2.Battlefield.Ulvenwald Oddity.Toughness = 4
+Bot1.Graveyard = Burst Lightning

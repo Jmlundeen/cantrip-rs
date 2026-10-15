@@ -1,0 +1,41 @@
+# "Exile the top card of your library" with no card in the library does nothing, and nothing is lost for it (a player loses for drawing from an
+# empty library, CR 704.5b, not for having none). Bot1's deck is its opening hand, a Forest that Secret Entrance fetches on turn 1 and one Island
+# drawn on turn 3, so the library is empty when the Adventurer attacks: Bot2 takes 5, nothing is exiled and the game goes on.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Caves of Chaos Adventurer
+Island
+Island
+Forest
+Island
+
+[Bot2 Deck]
+Forest x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Caves of Chaos Adventurer.Cast
+Bot1.Search(Forest)
+[T3 Bot1.Upkeep]
+Bot1.Modes(Lost Well)
+[T3 Bot1.Main1]
+Bot1.Attack(Caves of Chaos Adventurer)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Result = InProgress
+Bot2.Life = 15
+Exile.Count = 0
+Bot1.Library.Count = 0

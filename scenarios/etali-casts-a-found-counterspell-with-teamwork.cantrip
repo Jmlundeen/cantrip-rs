@@ -1,0 +1,61 @@
+# The same dig as etali-casts-a-bolt-and-then-a-counterspell-found-in-the-same-dig, with the optional cost taken:
+# Bot2 casts We Say Thee Nay! for nothing as Etali's trigger resolves and announces teamwork, tapping the Thicket
+# Gorilla (power 2) for it. An optional additional cost may be paid beside a free cast (CR 601.2f, 118.9d), and it is
+# announced before the target is chosen, which is why this spell's target cannot be asked ahead of the cast.
+#
+# With teamwork the ransom is {4}. Bot2 has a Forest and nothing else, so its own Bolt is countered and Bot1 stays
+# at 20.
+
+[Bot1 Deck]
+Island x8
+We Say Thee Nay!
+Island x10
+
+[Bot2 Deck]
+Forest
+Black Lotus
+Black Lotus
+Black Lotus
+Guerrilla Gorilla
+Mountain
+Etali, Primal Conqueror
+Island
+Island
+Lightning Bolt
+Island x10
+
+[Actions]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Guerrilla Gorilla.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Black Lotus#1.Activate(Color: Red)
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Etali, Primal Conqueror.Cast
+Bot2.Choose(Lightning Bolt)
+Bot2.Target(Bot1)
+Bot2.Choose(We Say Thee Nay!)
+Bot2.Modes(Teamwork 2)
+Bot2.Target(Stack.Lightning Bolt)
+Bot2.Choose(Guerrilla Gorilla)
+? Stack = We Say Thee Nay!; Lightning Bolt
+? Bot2.Battlefield.Guerrilla Gorilla.Tapped = true
+Bot2.Pass
+Bot2.Decline
+[T4 Bot2.Main2]
+
+[Expect]
+Turn = 4
+Step = Main2
+Stack.Count = 0
+Exile.Count = 0
+Bot1.Life = 20
+Bot1.Graveyard = We Say Thee Nay!; Island
+Bot2.Graveyard = Lightning Bolt; Black Lotus; Black Lotus; Black Lotus
+Bot2.Battlefield.Guerrilla Gorilla.Tapped = true
+Bot2.Battlefield.Forest.Tapped = false

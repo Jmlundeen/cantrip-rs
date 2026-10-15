@@ -1,0 +1,56 @@
+# Second Sunrise returns artifact, creature, enchantment and land CARDS put into graveyards from the battlefield this
+# turn; a token that left the battlefield ceased to exist and is not a card in the graveyard (CR 111.7, 704.5d).
+# Fable of the Mirror-Breaker's chapter I makes a Goblin Shaman token on turn 5, Bot2 Lightning Bolts it at Bot1's end
+# step, and Second Sunrise brings back nothing: no Goblin Shaman on the battlefield. (Bot2 discarded an Island to hand
+# size on turn 4.)
+
+[Bot1 Deck]
+Plains
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Fable of the Mirror-Breaker
+Second Sunrise
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x5
+Island x13
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Fable of the Mirror-Breaker.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains#2.Activate
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Goblin Shaman.Types = Creature
+[T5 Bot1.End]
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Goblin Shaman)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Pass
+Bot1.Pass
+Bot1.Hand.Second Sunrise.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Battlefield.Mox Jet.Activate
+
+[Expect]
+Bot1.Battlefield = Fable of the Mirror-Breaker; Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire; Plains; Plains; Plains
+Bot1.Graveyard = Second Sunrise
+Bot2.Graveyard = Lightning Bolt; Island

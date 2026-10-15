@@ -1,0 +1,25 @@
+# The cost sacrifices a creature: Mox Jet and the other artifacts Bot1 controls are not creatures, so the ability is refused
+# even with {2} available. The positive control is weaponize-the-monsters-sacrifices-a-creature-to-deal-two-damage.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Pearl
+Weaponize the Monsters
+Island x16
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Weaponize the Monsters.Cast
+Bot1.Pass
+! Bot1.Battlefield.Weaponize the Monsters.Activate(Bot2)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20

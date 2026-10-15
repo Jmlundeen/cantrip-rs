@@ -1,0 +1,53 @@
+# Bloodforged Battle-Axe: "create a token that's a copy of this Equipment" uses the Equipment's last known
+# information when it has left the battlefield (CR 608.2h, 707.2). On turn 3 the equipped Ornithopter connects and the
+# Axe's trigger goes on the stack; Bot2 pays {1}{W} (a Plains and a Mox Jet) for Disenchant on the Axe in response. The
+# Axe is destroyed, the trigger still resolves, and Bot1 ends with a token Axe (unattached) beside a card Axe in the graveyard.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Ornithopter
+Bloodforged Battle-Axe
+Plains x20
+
+[Bot2 Deck]
+Plains
+Mox Jet
+Disenchant
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Bloodforged Battle-Axe.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Bloodforged Battle-Axe.Activate(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+[T3 Bot1.Damage]
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Disenchant.Cast(Bloodforged Battle-Axe)
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot2.Graveyard = Disenchant
+Bot1.Graveyard = Bloodforged Battle-Axe
+Bot1.Battlefield.Bloodforged Battle-Axe.AttachedTo = (absent)
+Bot1.Battlefield.Ornithopter.Power = 0

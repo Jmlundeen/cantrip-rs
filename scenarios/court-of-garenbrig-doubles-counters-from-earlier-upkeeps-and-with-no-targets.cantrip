@@ -1,0 +1,30 @@
+# Bot1 is the monarch. Upkeep of turn 3: both counters go on Ornithopter (2), then doubling makes 4. Upkeep of turn 5: the
+# trigger is put on the stack with no targets ("up to two" allows none, an empty Divide), yet the second sentence still
+# happens: the four counters already there are doubled to 8. The doubling reads the counters the creature has, not the
+# ones this trigger put.
+
+[Bot1 Deck]
+Black Lotus
+Court of Garenbrig
+Ornithopter
+Forest x17
+
+[Bot2 Deck]
+Forest x18
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Court of Garenbrig.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+[T3 Bot1.Upkeep]
+Bot1.Divide(Ornithopter: 2)
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 4
+[T5 Bot1.Upkeep]
+Bot1.Divide()
+[T5 Bot1.Main1]
+
+[Expect]
+Monarch = Bot1
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 8

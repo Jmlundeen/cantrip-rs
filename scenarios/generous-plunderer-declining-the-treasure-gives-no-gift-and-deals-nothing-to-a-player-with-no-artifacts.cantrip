@@ -1,0 +1,31 @@
+# Generous Plunderer: "you may create a Treasure token. When you do, target opponent creates a tapped Treasure token."
+# Declining creates neither, and with no artifact on Bot2's side the attack trigger "deals damage equal to the number of
+# artifacts they control" and so deals none: Bot2 takes only the Plunderer's combat damage (2).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Generous Plunderer
+Plains x17
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Generous Plunderer.Cast
+Bot1.Pass
+[T3 Bot1.Upkeep]
+Bot1.Decline
+Bot1.Attack(Generous Plunderer > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield = Mox Ruby; Mox Jet; Generous Plunderer
+Bot2.Battlefield.Count = 0

@@ -1,0 +1,24 @@
+# An instant: Bot1 casts it in Bot2's upkeep, puts Elvish Mystic on top of the library, and draws it at turn 3's draw step.
+
+[Bot1 Deck]
+Forest
+Worldly Tutor
+Forest x5
+Island
+Elvish Mystic
+Island x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Upkeep]
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Worldly Tutor.Cast
+Bot1.Search(Elvish Mystic)
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Hand.Count = 6
+Bot1.Graveyard = Worldly Tutor

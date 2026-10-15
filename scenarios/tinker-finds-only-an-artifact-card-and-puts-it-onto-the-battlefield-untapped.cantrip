@@ -1,0 +1,37 @@
+# "Search your library for an artifact card": Island and Lightning Bolt are not offered (refusals); Blightsteel Colossus, an
+# artifact creature, is, and arrives untapped and summoning sick.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Mox Pearl
+Tinker
+Island
+Island
+Island
+Lightning Bolt
+Blightsteel Colossus
+Island x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tinker.Cast
+Bot1.Choose(Mox Pearl)
+! Bot1.Search(Island)
+! Bot1.Search(Lightning Bolt)
+Bot1.Search(Blightsteel Colossus)
+
+[Expect]
+Bot1.Battlefield.Blightsteel Colossus.Tapped = false
+Bot1.Battlefield.Blightsteel Colossus.SummoningSick = true
+Bot1.Battlefield.Blightsteel Colossus.Types = Artifact; Creature

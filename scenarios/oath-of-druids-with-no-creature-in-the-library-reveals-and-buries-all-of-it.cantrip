@@ -1,0 +1,40 @@
+# Oath of Druids: "may reveal cards from the top of their library until they reveal a creature card. If the first player
+# does, that player puts that card onto the battlefield and all other cards revealed this way into their graveyard." Bot1's
+# library holds only three Swamps: it accepts at its turn-3 upkeep, reveals all of them (there is no creature card to stop
+# at), and they all go to the graveyard; nothing enters the battlefield. The script ends before the draw step, which an
+# empty library would lose.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Oath of Druids
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Oath of Druids.Cast
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot1.Accept
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Graveyard = Swamp; Swamp; Swamp
+Bot1.Library.Count = 0
+Bot1.Battlefield = Forest; Mox Emerald; Oath of Druids

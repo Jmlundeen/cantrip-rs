@@ -1,0 +1,49 @@
+# Crabomination: the enters ability targets an opponent, so an opponent who gains hexproof in response (Dawn's Truce, from
+# a held-up Plains and Mox Pearl) makes the only target illegal, and the ability does nothing (CR 608.2b): none of Bot2's
+# cards is exiled, and Bot1 is not asked to cast anything (! Bot1.Choose). Dawn's Truce's gift is not promised.
+# Crabomination is cast on turn 3 for {4}{B}{B}: Black Lotus's mana, a Mox Jet and two Swamps.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Black Lotus
+Swamp
+Crabomination
+Swamp x15
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Dawn's Truce
+Lightning Bolt
+Plains x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Crabomination.Cast
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Dawn's Truce.Cast
+Bot2.Decline
+! Bot1.Choose
+[T3 Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot2.Graveyard = Dawn's Truce
+Bot2.Library.Count = 12
+Bot1.Battlefield = Swamp; Swamp; Mox Jet; Crabomination

@@ -1,0 +1,31 @@
+# Faithless Looting discards Basking Rootwalla and a Mountain together: one trigger, two counters. The Rootwalla is
+# discarded into exile by madness and cast from there, and it was still discarded (CR 702.35a, 701.9c), so it counts.
+
+[Bot1 Deck]
+Mountain
+Marauding Mako
+Faithless Looting
+Basking Rootwalla
+Mountain
+Mountain
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Marauding Mako.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Basking Rootwalla; Mountain)
+Bot1.Accept
+
+[Expect]
+Bot1.Battlefield.Marauding Mako.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield = Mountain; Marauding Mako; Mountain; Basking Rootwalla
+Bot1.Graveyard = Faithless Looting; Mountain

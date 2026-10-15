@@ -1,0 +1,37 @@
+# Clarion Conqueror binds every player and every creature: Bot2's Llanowar Elves taps for mana on turn 4, before the Conqueror
+# (the control), and can't once Bot1 has cast it with Black Lotus on turn 5. Its land still taps for mana.
+
+[Bot1 Deck]
+Black Lotus
+Clarion Conqueror
+Plains x24
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x22
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Battlefield.Llanowar Elves.Activate
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Clarion Conqueror.Cast
+Bot1.Pass
+[T6 Bot2.Main1]
+! Bot2.Battlefield.Llanowar Elves.Activate
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Clarion Conqueror
+Bot2.Battlefield = Forest; Forest; Llanowar Elves

@@ -1,0 +1,40 @@
+# The restriction lasts only while the Alarm is on the battlefield (CR 502.3, 611.3): Bot1's Ornithopter attacks on turn three and
+# is tapped; Bot2's Disenchant destroys the Alarm on turn four, so on turn five the Ornithopter untaps as usual.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Ruby
+Ornithopter
+Intruder Alarm
+Island x12
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Disenchant
+Plains x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Intruder Alarm.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Ornithopter.Tapped = true
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Disenchant.Cast(Intruder Alarm)
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Graveyard = Intruder Alarm
+Bot1.Battlefield.Ornithopter.Tapped = false

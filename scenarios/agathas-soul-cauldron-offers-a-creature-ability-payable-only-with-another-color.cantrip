@@ -1,0 +1,45 @@
+# Agatha's Soul Cauldron: "You may spend mana as though it were mana of any color to activate abilities of creatures you
+# control." Turn 3 Bot1's Mountain and Mox Ruby are tapped (Blazing Rootwalla, Lightning Bolt) and only Mox Sapphire is
+# untapped, which makes {U}. Rootwalla's "{R}: +2/+0" is still offered and the {U} pays it: 3/1 with the Sapphire tapped.
+
+[Bot1 Deck]
+Mountain
+Mox Sapphire
+Mox Ruby
+Agatha's Soul Cauldron
+Blazing Rootwalla
+Lightning Bolt
+Mountain
+Mountain x14
+
+[Bot2 Deck]
+Island x13
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Agatha's Soul Cauldron.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Blazing Rootwalla.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Blazing Rootwalla.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Blazing Rootwalla.Power = 3
+Bot1.Battlefield.Mox Sapphire.Tapped = true

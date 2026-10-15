@@ -1,0 +1,39 @@
+# Glimmer Lens: For Mirrodin! makes a 2/2 Rebel token and attaches the Equipment to it. On turn 3 the equipped Rebel
+# and Ornithopter attack together, so Bot1 draws; on turn 5 the Rebel attacks alone and nothing is drawn.
+
+[Bot1 Deck]
+Glimmer Lens
+Mox Pearl
+Gleemox
+Ornithopter
+Island
+Island
+Island
+Island x11
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Blue)
+Bot1.Hand.Glimmer Lens.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Rebel; Ornithopter)
+[T3 Bot1.Main2]
+? Bot1.Hand.Count = 5
+[T5 Bot1.Main1]
+Bot1.Attack(Rebel)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 6
+Bot1.Battlefield.Glimmer Lens.AttachedTo = Rebel
+Bot2.Life = 16

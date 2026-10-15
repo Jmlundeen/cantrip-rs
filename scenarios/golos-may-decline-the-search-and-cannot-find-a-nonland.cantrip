@@ -1,0 +1,45 @@
+# "You may search your library for a land card": the library holds a Forest and Lightning Bolts, and only the Forest is a legal find
+# (refusal for the Bolt, 701.23). Bot1 declines to take it (`Search()`), so no land arrives and the Forest stays in the library
+# (the existing scenario takes it, the positive control). Cast with the same Moxen sequence the existing scenario uses.
+
+[Bot1 Deck]
+Golos, Tireless Pilgrim
+Gleemox
+Sol Ring
+Mox Emerald
+Mox Pearl
+Mox Jet
+Mox Ruby
+Forest
+Lightning Bolt x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Gleemox.Activate(Color: Blue)
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Golos, Tireless Pilgrim.Cast
+Bot1.Pass
+! Bot1.Search(Lightning Bolt)
+Bot1.Search()
+[T2 Bot2.Upkeep]
+
+[Expect]
+Bot1.Battlefield.Count = 7
+Bot1.Library.Count = 13

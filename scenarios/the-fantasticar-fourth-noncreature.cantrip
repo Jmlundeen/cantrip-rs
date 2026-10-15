@@ -1,0 +1,35 @@
+# Black Lotus is cast before The Fantasticar enters, but it still counts as the first noncreature spell this turn.
+# The Fantasticar itself is the second; the second Mox is the fourth. Accepting the sacrifice creates four Constructs.
+[Bot1 Deck]
+The Fantasticar
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.The Fantasticar.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Accept
+? Bot1.Battlefield.The Fantasticar.Types = Artifact; Creature
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Accept
+Bot1.Accept
+
+[Expect]
+Bot1.Battlefield.Construct#1.Types = Artifact; Creature
+Bot1.Battlefield.Construct#1.Power = 4
+Bot1.Battlefield.Construct#1.Toughness = 4
+Bot1.Battlefield.Construct#1.Keywords = Flying; Haste
+Bot1.Battlefield.Construct#2.Power = 4
+Bot1.Battlefield.Construct#3.Power = 4
+Bot1.Battlefield.Construct#4.Power = 4
+Bot1.Graveyard = The Fantasticar; Black Lotus

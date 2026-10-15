@@ -1,0 +1,35 @@
+# Paradox Engine: "Whenever you cast a spell, untap all nonland permanents you control." Only its controller's spells: Bot1 casts it
+# on turn 1 with Black Lotus's mana and two tapped Moxen. Bot2 casts an Ornithopter on turn 2 and Bot1's Moxen stay tapped
+# (the positive control, its own spell untapping them, is paradox-engine-untaps-nonland-permanents-when-you-cast-a-spell).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Black Lotus
+Paradox Engine
+Plains x16
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Paradox Engine.Cast
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Mox Jet.Tapped = true
+Bot1.Battlefield.Mox Ruby.Tapped = true
+Bot2.Battlefield = Ornithopter

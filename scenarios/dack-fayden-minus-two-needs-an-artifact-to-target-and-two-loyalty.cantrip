@@ -1,0 +1,53 @@
+# Dack Fayden -2: "Gain control of target artifact." Turn 1, with no artifact in play (the Black Lotus that cast Dack is
+# gone): not offered. Turn 3, Bot2 has a Sol Ring: it changes hands, Dack at 1 loyalty. Turn 5, Bot2's Mox Pearl is an
+# artifact to target, but Dack has 1 loyalty and cannot pay 2: not offered; the +1 is. (CR 606.6)
+
+[Bot1 Deck]
+Volcanic Island
+Black Lotus
+Dack Fayden
+Island x4
+Island x14
+
+[Bot2 Deck]
+Island
+Sol Ring
+Mox Pearl
+Island x4
+Island x14
+
+[Actions]
+Bot1.Hand.Volcanic Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Volcanic Island.Activate(Ability: Add {U})
+Bot1.Hand.Dack Fayden.Cast
+Bot1.Pass
+! Bot1.Battlefield.Dack Fayden.Activate(Ability: Gain control)
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Dack Fayden.Activate(Bot2.Battlefield.Sol Ring; Ability: Gain control)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Sol Ring.Types = Artifact
+? Bot1.Battlefield.Dack Fayden.Counters.Loyalty = 1
+[T4 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Sol Ring.Types = Artifact
+! Bot1.Battlefield.Dack Fayden.Activate(Ability: Gain control)
+Bot1.Battlefield.Dack Fayden.Activate(Bot1; Ability: draws two)
+Bot1.Choose(Island; Island)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Dack Fayden.Counters.Loyalty = 2
+Bot2.Battlefield = Island; Mox Pearl

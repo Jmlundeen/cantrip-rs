@@ -1,0 +1,50 @@
+# Bot1 casts Anger off Fiery Islets, which are not Mountains, and Bot2 bolts it. With Anger in the graveyard and no
+# Mountain under Bot1's control - Bot2's Mountain does not count - the Embereth Shieldbreaker cast on turn 9 has no haste.
+# Bot1 then plays a Mountain in the same main phase, and the Shieldbreaker has haste at once and attacks.
+
+[Bot1 Deck]
+Fiery Islet x4
+Anger
+Embereth Shieldbreaker
+Mountain
+Fiery Islet x10
+
+[Bot2 Deck]
+Mountain x2
+Lightning Bolt
+Mountain x13
+
+[Actions]
+Bot1.Hand.Fiery Islet.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Fiery Islet.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Fiery Islet.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Fiery Islet.Play
+Bot1.Battlefield.Fiery Islet#1.Activate(Color: Red; Ability: Pay 1 life)
+Bot1.Battlefield.Fiery Islet#2.Activate(Color: Red; Ability: Pay 1 life)
+Bot1.Battlefield.Fiery Islet#3.Activate(Color: Red; Ability: Pay 1 life)
+Bot1.Battlefield.Fiery Islet#4.Activate(Color: Red; Ability: Pay 1 life)
+Bot1.Hand.Anger.Cast
+[T8 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Anger)
+[T9 Bot1.Main1]
+? Bot1.Graveyard = Anger
+Bot1.Battlefield.Fiery Islet#1.Activate(Color: Red; Ability: Pay 1 life)
+Bot1.Battlefield.Fiery Islet#2.Activate(Color: Red; Ability: Pay 1 life)
+Bot1.Hand.Embereth Shieldbreaker.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Embereth Shieldbreaker.Keywords = (absent)
+Bot1.Hand.Mountain.Play
+? Bot1.Battlefield.Embereth Shieldbreaker.Keywords = Haste
+Bot1.Attack(Embereth Shieldbreaker)
+[T10 Bot2.Main1]
+? Bot1.Battlefield.Embereth Shieldbreaker.Keywords = Haste
+
+[Expect]
+Bot1.Life = 14
+Bot2.Life = 18

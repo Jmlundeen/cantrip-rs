@@ -1,0 +1,24 @@
+# "Draw two cards" with one card left: Bot1 draws it, then loses at the next state-based check (CR 704.5b). It is cast
+# for free in Bot2's turn 4, returning its two Islands, which an instant allows.
+
+[Bot1 Deck]
+Island
+Island
+Gush
+Island x4
+Island
+Island
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot1.Hand.Gush.Cast(Ability: Return two Islands)
+
+[Expect]
+Result = Bot2 won
+Bot1.Library.Count = 0

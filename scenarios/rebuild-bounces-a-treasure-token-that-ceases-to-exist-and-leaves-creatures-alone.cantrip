@@ -1,0 +1,43 @@
+# Rebuild: "Return all artifacts to their owners' hands." Ragavan, dashed on turn 1 with a Black Lotus, hits Bot2 and creates a
+# Treasure; in the second main phase Bot1 casts Rebuild with the three Moxen. The three Moxen return to hand (untapped, new
+# objects), the Treasure token goes to the hand and ceases to exist (CR 111.7, 704.5d), and Ragavan, which is not an artifact, is
+# left on the battlefield (to be returned by his dash at the end step, not by Rebuild).
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Ragavan, Nimble Pilferer
+Rebuild
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Ragavan, Nimble Pilferer.Cast(Ability: Dash)
+Bot1.Attack(Ragavan, Nimble Pilferer > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Treasure Token.Tapped = false
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Rebuild.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield = Ragavan, Nimble Pilferer
+? Bot1.Hand.Count = 4
+[T1 Bot1.End]
+
+[Expect]
+Bot1.Hand = Mox Sapphire; Mox Ruby; Mox Jet; Island; Ragavan, Nimble Pilferer
+Bot1.Graveyard = Rebuild; Black Lotus

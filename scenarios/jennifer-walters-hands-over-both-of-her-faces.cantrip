@@ -1,0 +1,41 @@
+# Both ways to cast a modal double-faced card offered at once (CR 712.2): the front face for {1}{W} and the back
+# face for {3}{G}{W}{W}, on one card in hand. Handed over at the priority prompt that offers them, so the menu a
+# click on the card opens can be pictured:
+#
+# then click Jennifer Walters in hand.
+#
+# That casting the back face works is jennifer-walters-is-cast-as-her-back-face.
+
+[Bot1 Deck]
+Plains x3
+Forest x3
+Jennifer Walters
+Plains x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T11 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+[Handover Bot1.Cast]
+
+[Expect]
+Bot1.Hand = Jennifer Walters; Plains; Plains; Plains; Plains; Plains
+Bot1.Mana = {W}{W}{W}{G}{G}{G}
+Stack.Count = 0

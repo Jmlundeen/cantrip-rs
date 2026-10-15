@@ -1,0 +1,59 @@
+# Abandoned Air Temple: "{3}{W}, {T}: Put a +1/+1 counter on each creature you control." On turn 3 Bot1 has a Plains
+# and the Temple (untapped, for the Plains), four Moxen of which three and the Plains pay {3}{W} (the Temple taps
+# itself as the cost), two Ornithopters (artifact creatures, one cast this turn and so summoning sick -- counters do not
+# care) and a Sol Ring (an artifact that is not a creature). Each Ornithopter gets a counter. The Sol Ring, Bot1's
+# Moxen, and Bot2's Llanowar Elves get none: the creatures must be ones you control.
+
+[Bot1 Deck]
+Plains
+Abandoned Air Temple
+Ornithopter
+Mox Pearl
+Mox Jet
+Mox Ruby
+Sol Ring
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Abandoned Air Temple.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Abandoned Air Temple.Activate(Ability: Put a +1/+1 counter)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Abandoned Air Temple.Tapped = true
+Bot1.Battlefield.Ornithopter#1.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter#2.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Sol Ring.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Mox Pearl.Counters.PlusOnePlusOne = (absent)
+Bot2.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = (absent)

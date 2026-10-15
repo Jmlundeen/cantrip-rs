@@ -1,0 +1,47 @@
+# "At the beginning of the next end step": Bot1 sacrifices the Jar during its own end step on turn 1, so the next end step is turn 2's. Bot2 plays turn 2 with the seven cards it drew (a Forest from them is played and stays),
+# and at its end step each player discards the hand they have and gets back the cards they exiled: Bot1 its Mountain, Bot2 its seven Islands (and the played Forest stays on the battlefield).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Mox Pearl
+Mox Emerald
+Memory Jar
+Mountain
+Swamp x14
+
+[Bot2 Deck]
+Island x7
+Forest x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Memory Jar.Cast
+Bot1.Pass
+[T1 Bot1.End]
+Bot1.Battlefield.Memory Jar.Activate
+Bot1.Pass
+Bot1.Pass
+[T2 Bot2.Main1]
+? Exile.Count = 8
+? Bot2.Hand.Count = 8
+Bot2.Hand.Forest.Play
+[T2 Bot2.End]
+Bot2.Pass
+
+[Expect]
+Exile.Count = 0
+Bot1.Hand = Mountain
+Bot2.Hand = Island; Island; Island; Island; Island; Island; Island
+Bot2.Battlefield = Forest
+Bot2.Graveyard.Count = 7

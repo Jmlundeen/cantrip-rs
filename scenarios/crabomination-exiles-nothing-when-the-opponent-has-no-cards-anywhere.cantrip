@@ -1,0 +1,57 @@
+# Crabomination: a zone with nothing in it contributes nothing. Bot2's whole deck is eight Ornithopters: its turn-2 draw
+# takes the last card of the library, and it casts all eight, so on turn 3 its library, graveyard and hand are all empty.
+# Crabomination's enters ability targets Bot2 and exiles nothing (and asks nothing: ! Bot1.Choose).
+# Crabomination is cast on turn 3 for {4}{B}{B}: Black Lotus's mana, a Mox Jet and two Swamps.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Black Lotus
+Swamp
+Crabomination
+Swamp x15
+
+[Bot2 Deck]
+Ornithopter x8
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Crabomination.Cast
+Bot1.Pass
+Bot1.Pass
+! Bot1.Choose
+[T3 Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot2.Hand.Count = 0
+Bot2.Library.Count = 0
+Bot2.Graveyard.Count = 0
+Bot2.Battlefield.Count = 8
+Bot1.Battlefield = Swamp; Swamp; Mox Jet; Crabomination

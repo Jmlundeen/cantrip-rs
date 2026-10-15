@@ -1,0 +1,58 @@
+# "You may play them this turn without paying their mana costs" (CR 305.1, 601.2): "play" includes a land, and playing one is
+# the turn's land play. Golos exiles three Forests on turn 3; Bot1 plays one from exile, and then neither another exiled Forest nor
+# the Forest in hand can be played (one land per turn, CR 305.2). On turn 5 the permission has ended: the two Forests left in exile
+# are not offered, while the land drop is open - the Forest in hand is played, the positive control.
+
+[Bot1 Deck]
+Golos, Tireless Pilgrim
+Gleemox
+Sol Ring
+Mox Emerald
+Mox Pearl
+Mox Jet
+Mox Ruby
+Forest x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Gleemox.Activate(Color: Blue)
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Golos, Tireless Pilgrim.Cast
+Bot1.Pass
+Bot1.Search(Forest)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Gleemox.Activate(Color: Blue)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Golos, Tireless Pilgrim.Activate(Ability: Exile the top three)
+Bot1.Pass
+Bot1.Exile.Forest.Play
+! Bot1.Exile.Forest.Play
+! Bot1.Hand.Forest.Play
+[T5 Bot1.Main1]
+! Bot1.Exile.Forest.Play
+Bot1.Hand.Forest.Play
+
+[Expect]
+Exile.Count = 2
+Bot1.Battlefield.Count = 10

@@ -1,0 +1,54 @@
+# Kolaghan's Command: "Destroy target artifact" and "2 damage to any target" (Bot2). In response Bot2 sacrifices the
+# target Pyrite Spellbomb to draw a card: the artifact mode has no target left, the damage mode still resolves (CR 608.2b:
+# only when every target is illegal does the spell not resolve).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Kolaghan's Command
+Island x16
+
+[Bot2 Deck]
+Island
+Pyrite Spellbomb
+Mox Pearl
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Pyrite Spellbomb.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Kolaghan's Command.Cast
+Bot1.Modes(3; 4)
+Bot1.Target(Pyrite Spellbomb)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Battlefield.Pyrite Spellbomb.Activate(Ability: Draw)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot2.Life = 18
+Bot2.Graveyard = Pyrite Spellbomb

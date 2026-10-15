@@ -1,0 +1,35 @@
+# 3 damage to Fanatic of Rhonas (1/4) leaves it alive with 3 damage marked, so nothing dies and Chainsaw gets no rev counter.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Chainsaw
+Plains x14
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Fanatic of Rhonas
+Forest x15
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Fanatic of Rhonas.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Chainsaw.Cast
+Bot1.Target(Fanatic of Rhonas)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot2.Battlefield.Fanatic of Rhonas.Damage = 3
+Bot1.Battlefield.Chainsaw.Counters.Rev = (absent)

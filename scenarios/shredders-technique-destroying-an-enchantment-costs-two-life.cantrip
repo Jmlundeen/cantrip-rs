@@ -1,0 +1,28 @@
+# Bot1 destroys Bot2's Sigarda's Aid and loses 2 life.
+
+[Bot1 Deck]
+Black Lotus
+Shredder's Technique
+Swamp x18
+
+[Bot2 Deck]
+Mox Pearl
+Sigarda's Aid
+Plains x18
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Sigarda's Aid.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Shredder's Technique.Cast(Bot2.Battlefield.Sigarda's Aid)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 18
+Bot2.Battlefield = Mox Pearl
+Bot2.Graveyard = Sigarda's Aid
+Bot1.Graveyard = Shredder's Technique; Black Lotus

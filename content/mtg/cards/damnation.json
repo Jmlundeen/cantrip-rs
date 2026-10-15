@@ -1,0 +1,6 @@
+{
+  "name": "Damnation",
+  "manaCost": "{2}{B}{B}",
+  "type": "Sorcery",
+  "oracleText": "Destroy all creatures. They can't be regenerated."
+}

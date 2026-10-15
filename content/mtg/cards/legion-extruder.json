@@ -1,0 +1,6 @@
+{
+  "name": "Legion Extruder",
+  "manaCost": "{1}{R}",
+  "type": "Artifact",
+  "oracleText": "When this artifact enters, it deals 2 damage to any target.\n{2}, {T}, Sacrifice another artifact: Create a 3/3 colorless Golem artifact creature token."
+}

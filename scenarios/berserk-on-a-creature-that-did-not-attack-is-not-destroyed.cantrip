@@ -1,0 +1,34 @@
+# Berserk: "At the beginning of the next end step, destroy that creature if it attacked this turn." The condition is read
+# when the delayed trigger resolves (CR 603.7), against the creature's attacks this turn (CR 508.1): Llanowar Elves, cast
+# in the precombat main phase, becomes a 2/1 with trample until end of turn (X is its power as Berserk resolves) but
+# never attacks, so it survives the end step. Compare berserk-doubles-an-attackers-power-and-destroys-it-at-the-end-step,
+# where the same creature attacked and is destroyed.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Berserk
+Forest
+Forest x12
+
+[Bot2 Deck]
+Island x13
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Berserk.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Battlefield.Forest.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves.Power = 2
+? Bot1.Battlefield.Llanowar Elves.Keywords = Trample
+[T4 Bot2.Upkeep]
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot1.Battlefield.Llanowar Elves.Keywords = (absent)
+Bot1.Graveyard = Berserk

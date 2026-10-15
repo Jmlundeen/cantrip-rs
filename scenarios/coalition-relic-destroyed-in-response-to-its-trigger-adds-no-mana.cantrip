@@ -1,0 +1,46 @@
+# Coalition Relic: the counters are removed "from this artifact" as the trigger resolves. Turn 1 the Relic stores a charge
+# counter. Turn 3, with its trigger on the stack, Bot1 destroys the Relic with Abrade: the Relic is gone and its counter
+# with it (CR 400.7), so nothing was removed and no mana is added - no color is even asked for.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mox Ruby
+Coalition Relic
+Abrade
+Mountain
+Mountain x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Coalition Relic.Cast
+Bot1.Pass
+Bot1.Battlefield.Coalition Relic.Activate(Ability: charge counter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Coalition Relic.Counters.Charge = 1
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Abrade.Cast
+Bot1.Modes(Destroy target artifact)
+Bot1.Target(Coalition Relic)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Abrade; Coalition Relic; Black Lotus
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Bot1.Mana =
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Abrade; Coalition Relic; Black Lotus
+Stack.Count = 0

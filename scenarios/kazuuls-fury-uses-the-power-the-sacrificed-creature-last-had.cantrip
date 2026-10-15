@@ -1,0 +1,48 @@
+# Kazuul's Fury: "deals damage equal to the sacrificed creature's power" -- its last-known power (CR 608.2h), here
+# raised by a pump. On turn 3 Bot1 pumps its Basking Rootwalla (1/1) to 3/3 for {1}{G}, then casts Kazuul's Fury, paying the
+# {2}{R} while it is being cast (after the sacrifice, which is why the mana payments come between the sacrifice and the cast
+# in the history) and sacrificing the Rootwalla: Bot2 takes 3, not 1.
+
+[Bot1 Deck]
+Forest
+Mox Ruby
+Mox Emerald
+Mox Jet
+Basking Rootwalla
+Kazuul's Fury
+Mountain
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Basking Rootwalla.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Basking Rootwalla.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Basking Rootwalla.Power = 3
+Bot1.Hand.Kazuul's Fury.Cast(Bot2)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Graveyard = Kazuul's Fury; Basking Rootwalla

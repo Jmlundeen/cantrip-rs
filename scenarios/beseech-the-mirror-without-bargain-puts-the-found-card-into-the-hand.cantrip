@@ -1,0 +1,32 @@
+# CR 406.3, 702.166a. Without bargain, Beseech the Mirror exiles the card it finds face down and puts it into its controller's
+# hand, never offering the free cast.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Black Lotus
+Beseech the Mirror
+Island x3
+Black Lotus
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Beseech the Mirror.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Search(Black Lotus)
+! Bot1.Accept
+[T2 Bot2.Upkeep]
+
+[Expect]
+Exile.Count = 0
+Stack.Count = 0
+Bot1.Battlefield = Mox Jet; Swamp
+Bot1.Hand = Black Lotus; Island; Island; Island
+Bot1.Graveyard = Beseech the Mirror; Black Lotus

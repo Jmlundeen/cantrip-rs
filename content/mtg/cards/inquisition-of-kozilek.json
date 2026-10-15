@@ -1,0 +1,6 @@
+{
+  "name": "Inquisition of Kozilek",
+  "manaCost": "{B}",
+  "type": "Sorcery",
+  "oracleText": "Target player reveals their hand. You choose a nonland card from it with mana value 3 or less. That player discards that card."
+}

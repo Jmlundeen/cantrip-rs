@@ -1,0 +1,19 @@
+[package]
+name = "cantrip-cards"
+description = "The spike's cards: every one code, built from cantrip-api and cantrip-mechanics only."
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+[features]
+# Duress and Liliana of the Veil's -2 written as explicit stages instead of re-run with recorded answers, to measure
+# the two card-code styles against each other (docs/engine-design.md, "Card code that asks questions").
+staged = []
+
+[dependencies]
+cantrip-api.workspace = true
+cantrip-mechanics.workspace = true
+cantrip-oracle.workspace = true
+
+[dev-dependencies]
+serde_json = "1"

@@ -1,0 +1,6 @@
+{
+  "name": "Pia's Revolution",
+  "manaCost": "{2}{R}",
+  "type": "Enchantment",
+  "oracleText": "Whenever a nontoken artifact is put into your graveyard from the battlefield, return that card to your hand unless target opponent has this enchantment deal 3 damage to them."
+}

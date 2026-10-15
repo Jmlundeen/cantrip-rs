@@ -1,0 +1,24 @@
+# Thassa's Oracle: devotion 2 looks at the top two cards; one goes on top, the other to the bottom, and with more cards
+# left in the library than that nobody wins.
+[Bot1 Deck]
+Thassa's Oracle
+Island x6
+Island
+Forest
+Swamp
+Plains
+Mountain
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Thassa's Oracle.Cast
+Bot1.Arrange(Swamp | Forest)
+[Bot1.Main2]
+[Expect]
+Result = InProgress
+Bot1.Library = Swamp; Plains; Mountain; Forest

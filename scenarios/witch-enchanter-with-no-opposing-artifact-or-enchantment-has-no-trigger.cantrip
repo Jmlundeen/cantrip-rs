@@ -1,0 +1,40 @@
+# Witch Enchanter's trigger is mandatory but needs a target (CR 603.3d): with only Bot1's own Moxen and Bot2's Llanowar Elves (a
+# creature) in play there is no legal target, so the trigger is not put on the stack and Bot1 is not asked to choose (! Target);
+# the Witch does not destroy Bot1's own artifacts instead.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Mox Jet
+Mox Emerald
+Witch Enchanter
+Plains x14
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x14
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Witch Enchanter.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target
+? Stack.Count = 0
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Pearl; Mox Ruby; Mox Jet; Mox Emerald; Witch Enchanter
+Bot1.Graveyard.Count = 0

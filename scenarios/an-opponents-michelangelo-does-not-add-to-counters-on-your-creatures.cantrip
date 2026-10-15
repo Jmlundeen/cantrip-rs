@@ -1,0 +1,36 @@
+# Michelangelo's replacement applies to creatures its controller controls, wherever the counters come from: Bot2's
+# Michelangelo leaves the counter Bot1's Mutagen puts on Bot1's own Mutagen Man at one.
+
+[Bot1 Deck]
+Black Lotus
+Mutagen Man, Living Ooze
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Black Lotus
+Michelangelo, Weirdness to 11
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Mutagen Man, Living Ooze.Cast(X: 1)
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Michelangelo, Weirdness to 11.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mutagen Token.Activate(Bot1.Battlefield.Mutagen Man, Living Ooze)
+
+[Expect]
+Bot1.Battlefield.Mutagen Man, Living Ooze.Counters.PlusOnePlusOne = 1

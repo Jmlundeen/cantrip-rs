@@ -1,0 +1,37 @@
+# Through the Breach: "You MAY put a creature card": Bot1 chooses none, so the Griselbrand stays in hand and nothing is
+# sacrificed. (The positive control is the existing scenario, where it is put in.)
+
+[Bot1 Deck]
+Through the Breach
+Griselbrand
+5 Mountain
+10 Mountain
+
+[Bot2 Deck]
+20 Island
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Battlefield.Mountain#4.Activate
+Bot1.Battlefield.Mountain#5.Activate
+Bot1.Hand.Through the Breach.Cast
+Bot1.Choose()
+Bot1.Pass
+[T9 Bot1.Main2]
+
+[Expect]
+Turn = 9
+Stack.Count = 0
+Bot1.Graveyard = Through the Breach
+Bot1.Hand.Count = 5

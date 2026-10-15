@@ -1,0 +1,11 @@
+{
+  "name": "Hullbreacher",
+  "manaCost": "{2}{U}",
+  "type": "Creature — Merfolk Pirate",
+  "power": 3,
+  "toughness": 2,
+  "oracleText": "Flash\nIf an opponent would draw a card except the first one they draw in each of their draw steps, instead you create a Treasure token.",
+  "keywords": [
+    "Flash"
+  ]
+}

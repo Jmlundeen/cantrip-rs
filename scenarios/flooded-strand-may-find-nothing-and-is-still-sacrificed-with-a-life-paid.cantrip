@@ -1,0 +1,22 @@
+# A search may find nothing (CR 701.23b): Bot1 answers Search() and the Strand is sacrificed and the life paid all the same - they were costs - with no land fetched and the library (a Plains and an Island still in it) shuffled but not shortened (12 cards).
+
+[Bot1 Deck]
+Flooded Strand
+Mountain x6
+Plains
+Island
+Mountain x10
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Flooded Strand.Play
+Bot1.Battlefield.Flooded Strand.Activate
+Bot1.Search()
+
+[Expect]
+Bot1.Life = 19
+Bot1.Battlefield.Count = 0
+Bot1.Graveyard = Flooded Strand
+Bot1.Library.Count = 12

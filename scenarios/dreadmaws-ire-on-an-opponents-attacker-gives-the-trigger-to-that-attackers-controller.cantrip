@@ -1,0 +1,32 @@
+# "Target attacking creature" is any attacking creature, and the granted ability belongs to that creature, so its controller
+# controls the trigger (CR 603.3a) and picks the artifact. On turn four Bot2's Ornithopter attacks Bot1; Bot1 casts the Ire
+# on it (Bot1's own pump hurts: a 2/4 flyer deals 2), and when it connects Bot2, not Bot1, chooses the target artifact
+# Bot1 controls - the Mox Pearl rather than the Mox Ruby.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Plains x3
+Dreadmaw's Ire
+Plains x10
+
+[Bot2 Deck]
+Ornithopter
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T4 Bot2.Attackers]
+Bot2.Attack(Ornithopter > Bot1)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Dreadmaw's Ire.Cast(Bot2.Battlefield.Ornithopter)
+Bot2.Target(Bot1.Battlefield.Mox Pearl)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 18
+Bot1.Battlefield = Mox Ruby
+Bot1.Graveyard = Mox Pearl; Dreadmaw's Ire

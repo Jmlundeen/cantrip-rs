@@ -1,0 +1,50 @@
+# Leovold, Emissary of Trest: only a spell or ability an OPPONENT controls targeting YOU or a permanent you control
+# triggers it. Bot2 bolts its own Ornithopter (an opponent's spell, but not Bot1's permanent), and on turn 3 Bot1 bolts
+# Bot2's other Ornithopter (Bot1's own spell): no trigger on the stack either time, and no draw prompt. The positive control is
+# the neighbouring scenario.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Leovold, Emissary of Trest
+Lightning Bolt
+Island x16
+
+[Bot2 Deck]
+Mountain
+Ornithopter
+Ornithopter
+Lightning Bolt
+Mountain x16
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Leovold, Emissary of Trest.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Ornithopter)
+Bot1.Pass
+[T3 Bot1.Main1]
+? Stack.Count = 0
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter)
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+? Stack.Count = 0
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Count = 1
+Bot2.Graveyard.Count = 3
+Bot1.Hand.Count = 2

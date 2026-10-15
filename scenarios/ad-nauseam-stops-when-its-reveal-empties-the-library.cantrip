@@ -1,0 +1,35 @@
+# Ad Nauseam: the last card of the library is revealed and taken like any other (Sol Ring, 1 life), and with the library
+# empty there is nothing left to repeat on, so the spell ends. The one Accept answers the first offer, made with Sol
+# Ring still in the library; a second offer would be made only if the library were not empty.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Mox Jet
+Ad Nauseam
+Swamp
+Swamp
+Swamp
+Mox Pearl
+Sol Ring
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ad Nauseam.Cast
+Bot1.Accept
+[Bot1.Main2]
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Life = 19
+Bot1.Library.Count = 0
+Bot1.Hand = Swamp; Swamp; Swamp; Mox Pearl; Sol Ring

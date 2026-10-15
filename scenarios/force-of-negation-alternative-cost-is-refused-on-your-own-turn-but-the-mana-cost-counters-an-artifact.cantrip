@@ -1,0 +1,37 @@
+# "If it's not your turn, you may exile a blue card from your hand rather than pay this spell's mana cost" (CR 118.9): on
+# Bot1's own turn 3, with a Brainstorm (blue) in hand and Bot1's second Mox Sapphire on the stack, the alternative cost is
+# refused. The mana cost {1}{U}{U}, two Islands and the first Mox Sapphire, is the control: it counters the artifact spell
+# (a noncreature spell) and exiles it rather than putting it into the graveyard.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Sapphire
+Force of Negation
+Brainstorm
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+! Bot1.Hand.Force of Negation.Cast(Stack.Mox Sapphire; Ability: exile a blue card)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Force of Negation.Cast(Stack.Mox Sapphire)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Mox Sapphire
+Bot1.Graveyard = Force of Negation
+Bot1.Hand = Brainstorm; Island; Island

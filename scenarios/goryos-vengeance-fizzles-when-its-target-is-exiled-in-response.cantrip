@@ -1,0 +1,42 @@
+# Bot1 entombs Headliner Scarlett and casts Goryo's Vengeance on it on turn 3; Bot2 answers with a Ghost Vacuum ({T}: exile target
+# card from a graveyard) on that Scarlett. The target is gone when Goryo's resolves, so it is countered on resolution
+# (CR 608.2b): nothing returns, there is no haste and no delayed exile ability.
+
+[Bot1 Deck]
+Mox Jet
+Black Lotus
+Entomb
+Goryo's Vengeance
+Island x3
+Island
+Headliner Scarlett
+Island x13
+
+[Bot2 Deck]
+Island
+Ghost Vacuum
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Ghost Vacuum.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Entomb.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Search(Headliner Scarlett)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Goryo's Vengeance.Cast(Bot1.Graveyard.Headliner Scarlett)
+Bot2.Battlefield.Ghost Vacuum.Activate(Bot1.Graveyard.Headliner Scarlett)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Exile = Headliner Scarlett
+Bot1.Battlefield = Mox Jet
+Bot1.Graveyard.Count = 3
+Stack.Count = 0

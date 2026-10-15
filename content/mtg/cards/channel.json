@@ -1,0 +1,6 @@
+{
+  "name": "Channel",
+  "manaCost": "{G}{G}",
+  "type": "Sorcery",
+  "oracleText": "Until end of turn, any time you could activate a mana ability, you may pay 1 life. If you do, add {C}."
+}

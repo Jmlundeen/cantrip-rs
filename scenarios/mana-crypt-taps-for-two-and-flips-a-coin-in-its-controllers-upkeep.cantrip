@@ -1,0 +1,27 @@
+# Mana Crypt: "{T}: Add {C}{C}" and "At the beginning of your upkeep, flip a coin. If you lose the flip, this artifact
+# deals 3 damage to you." Cast for free on turn 1, it taps for {C}{C}; its trigger is on the stack in Bot1's turn 3
+# upkeep and not in Bot2's turn 2 upkeep. The flip is random on each engine, so only that it happens is asserted.
+
+[Bot1 Deck]
+Mana Crypt
+Plains x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mana Crypt.Cast
+Bot1.Battlefield.Mana Crypt.Activate
+? Bot1.Mana = {C}{C}
+[T2 Bot2.Upkeep]
+? Stack.Count = 0
+[T3 Bot1.Upkeep]
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main1]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield = Mana Crypt

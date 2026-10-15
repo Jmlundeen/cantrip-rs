@@ -1,0 +1,39 @@
+# Overload (CR 702.96a): Vandalblast cast for {4}{R} has no target and destroys every artifact the caster does not control, and only those.
+
+[Bot1 Deck]
+Sol Ring
+Vandalblast
+Mountain x20
+
+[Bot2 Deck]
+Sol Ring
+Ornithopter
+Island x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mountain.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Vandalblast.Cast(Ability: Overload)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Sol Ring.Activate
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Graveyard = Vandalblast
+Bot1.Battlefield = Mountain; Mountain; Mountain; Sol Ring
+Bot2.Battlefield = Island
+Bot2.Graveyard = Ornithopter; Sol Ring
+Stack.Count = 0

@@ -1,0 +1,69 @@
+# Bloodbond March: "each player returns all cards with the same name as that spell from their graveyard to the battlefield".
+# Bot2 discards both its Dark Confidants to Faithless Looting on turn 2; Looting is no creature spell, so nothing returns.
+# On turn 3 Bot1 discards a Dark Confidant and a Llanowar Elves to its own Looting (still nothing returns), then casts
+# Dark Confidant: each player's graveyard is searched - Bot1's Confidant returns to Bot1, both of Bot2's return to Bot2
+# (all of them, under their owner's control), and the Elves, the Looting cards and the spell itself are untouched.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Bloodbond March
+Faithless Looting
+Dark Confidant
+Plains
+Dark Confidant
+Llanowar Elves
+Plains x13
+
+[Bot2 Deck]
+Mox Ruby
+Faithless Looting
+Dark Confidant
+Dark Confidant
+Plains x3
+Plains x3
+Plains x10
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Bloodbond March.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Faithless Looting.Cast
+Bot2.Pass
+Bot2.Choose(Dark Confidant; Dark Confidant)
+[T2 Bot2.Main2]
+? Bot2.Graveyard.Count = 3
+? Bot2.Battlefield.Count = 1
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Dark Confidant; Llanowar Elves)
+[T3 Bot1.Main1]
+? Bot1.Graveyard.Count = 3
+? Bot2.Battlefield.Count = 1
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Dark Confidant.Cast
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Count = 7
+Bot1.Battlefield.Dark Confidant#1.Types = Creature
+Bot1.Graveyard = Faithless Looting; Llanowar Elves
+Bot2.Battlefield.Count = 3
+Bot2.Battlefield.Dark Confidant#1.Types = Creature
+Bot2.Battlefield.Dark Confidant#2.Types = Creature
+Bot2.Graveyard = Faithless Looting

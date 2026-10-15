@@ -1,0 +1,37 @@
+# Cast for X = 0 it enters with no charge counters (sunburst counts colors spent, none) and, sacrificed, destroys each nonland
+# permanent with mana value 0: Bot1's two Moxen and Bot2's Mox Pearl, tapped or not. Lands have mana value 0 too but are not
+# "nonland", so Bot1's and Bot2's Islands survive, as does Bot2's Mind Stone (mana value 2).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Engineered Explosives
+Island x20
+
+[Bot2 Deck]
+Island
+Mox Pearl
+Mind Stone
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Engineered Explosives.Cast(X: 0)
+Bot1.Hand.Island.Play
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Mind Stone.Cast
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Engineered Explosives.Counters.Charge = (absent)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Engineered Explosives.Activate
+
+[Expect]
+Bot1.Battlefield = Island
+Bot1.Graveyard = Mox Ruby; Mox Jet; Engineered Explosives
+Bot2.Battlefield = Island; Mind Stone
+Bot2.Graveyard = Mox Pearl

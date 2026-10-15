@@ -1,0 +1,40 @@
+# "Return target spell or nonland permanent an opponent controls to its owner's hand." Turn 3: Bot2 controls only a Forest, a land, so there is nothing to
+# target and Sink into Stupor cannot be cast (CR 115.1, 601.2c) though Bot1 has the mana. Turn 4 Bot2 casts a Llanowar Elves; turn 5 the same cast is
+# offered and the Elves goes back to Bot2's hand.
+
+[Bot1 Deck]
+Mox Sapphire
+Gleemox
+Mox Jet
+Sink into Stupor
+Island x10
+
+[Bot2 Deck]
+Forest
+Forest
+Llanowar Elves
+Forest x10
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+! Bot1.Hand.Sink into Stupor.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Blue)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sink into Stupor.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Forest; Forest
+Bot1.Graveyard = Sink into Stupor

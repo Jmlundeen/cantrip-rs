@@ -1,0 +1,18 @@
+[package]
+name = "cantrip-host"
+description = "The sidecar Cantrip.Server runs the native engine as: the JSON-lines protocol of docs/phase-engine.md, projected per seat."
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+[lib]
+name = "cantrip_host"
+
+[[bin]]
+name = "cantrip-native-host"
+path = "src/bin/host.rs"
+
+[dependencies]
+cantrip-engine.workspace = true
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"

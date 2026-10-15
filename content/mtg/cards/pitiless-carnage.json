@@ -1,0 +1,6 @@
+{
+  "name": "Pitiless Carnage",
+  "manaCost": "{3}{B}",
+  "type": "Sorcery",
+  "oracleText": "Sacrifice any number of permanents you control, then draw that many cards.\nPlot {1}{B}{B} (You may pay {1}{B}{B} and exile this card from your hand. Cast it as a sorcery on a later turn without paying its mana cost. Plot only as a sorcery.)"
+}

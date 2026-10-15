@@ -1,0 +1,57 @@
+# A 4/4 attacks into a 1/1 and a 2/1 that both block it (CR 510.1c), and the script stops with the division still
+# unanswered. Played as a test it proves the position is reached; dealt to a session it is the board a client is
+# brought to in order to work the damage-assignment screen, which no shuffle can be relied on to produce.
+#
+# The actions are the gang block of gang-blocked-attacker-divides-its-damage-as-it-chooses, without its final
+# AssignDamage line: that is the question left for whoever picks the position up.
+
+[Bot1 Deck]
+Island
+Swamp
+Island
+Swamp
+Superior Spider-Man
+Island x10
+
+[Bot2 Deck]
+Forest
+Mountain
+Mountain
+Llanowar Elves
+Embereth Shieldbreaker
+Forest x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Embereth Shieldbreaker.Cast
+Bot1.Hand.Island.Play
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Superior Spider-Man.Cast
+Bot1.Attack(Superior Spider-Man)
+Bot2.Block(Llanowar Elves > Superior Spider-Man; Embereth Shieldbreaker > Superior Spider-Man)
+[Handover Bot1.AssignDamage]
+
+[Expect]
+Step = Damage
+ActivePlayer = Bot1
+Combat.Attackers = Superior Spider-Man > Bot2
+Combat.Blocks = Embereth Shieldbreaker > Superior Spider-Man; Llanowar Elves > Superior Spider-Man
+Bot1.Battlefield.Superior Spider-Man.Power = 4
+Bot2.Battlefield.Llanowar Elves.Toughness = 1
+Bot2.Battlefield.Embereth Shieldbreaker.Toughness = 1
+# Nothing has been dealt: the division is the question still outstanding, not one already answered.
+Bot1.Battlefield.Superior Spider-Man.Damage = 0
+Bot2.Battlefield.Llanowar Elves.Damage = 0
+Bot2.Battlefield.Embereth Shieldbreaker.Damage = 0
+Bot2.Life = 20

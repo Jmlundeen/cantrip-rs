@@ -1,0 +1,41 @@
+# Equip is sorcery-speed (CR 702.6a): in Bot2's upkeep re-equipping is refused though two Moxen are untapped, but in Bot1's own
+# main phase it works (the positive control, turn 1, onto the first Ornithopter). The equipped Ornithopter has power 0, so on
+# turn 3 it deals no combat damage and the Jitte gets no counters; with none, its remove-a-counter ability cannot be activated
+# (refusal), the cost being impossible.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Umezawa's Jitte
+Ornithopter
+Ornithopter
+Island x14
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Umezawa's Jitte.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Umezawa's Jitte.Activate(Ability: Equip; Ornithopter)
+[T2 Bot2.Upkeep]
+! Bot1.Battlefield.Umezawa's Jitte.Activate(Ability: Equip)
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+[T3 Bot1.Main2]
+! Bot1.Battlefield.Umezawa's Jitte.Activate(Ability: Remove a charge counter)
+
+[Expect]
+Bot2.Life = 20
+Bot1.Battlefield.Umezawa's Jitte.Counters.Charge = (absent)

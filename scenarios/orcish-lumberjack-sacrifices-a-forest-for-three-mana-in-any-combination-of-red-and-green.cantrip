@@ -1,0 +1,27 @@
+# Orcish Lumberjack: "{T}, Sacrifice a Forest: Add three mana in any combination of {R} and/or {G}." Cast off a Mountain
+# on turn one; on turn three Bot1 sacrifices its Forest and chooses each mana's color for itself: two red and one green.
+
+[Bot1 Deck]
+Mountain
+Orcish Lumberjack
+Forest
+Mountain x4
+Mountain x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Orcish Lumberjack.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Orcish Lumberjack.Activate(Sacrifice: Forest; Colors: R,R,G)
+
+[Expect]
+Turn = 3
+Bot1.Mana = {R}{R}{G}
+Bot1.Graveyard = Forest
+Bot1.Battlefield.Orcish Lumberjack.Tapped = true

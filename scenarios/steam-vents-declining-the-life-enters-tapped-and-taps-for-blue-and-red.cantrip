@@ -1,0 +1,22 @@
+# Declining the 2 life keeps 20 and the land enters tapped: refused on turn 1, {U} on turn 3, {R} on turn 5.
+
+[Bot1 Deck]
+Steam Vents
+Plains x14
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Steam Vents.Play
+Bot1.Decline
+! Bot1.Battlefield.Steam Vents.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Steam Vents.Activate(Ability: {U})
+? Bot1.Mana = {U}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Steam Vents.Activate(Ability: {R})
+
+[Expect]
+Bot1.Life = 20
+Bot1.Mana = {R}

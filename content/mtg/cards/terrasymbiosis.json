@@ -1,0 +1,6 @@
+{
+  "name": "Terrasymbiosis",
+  "manaCost": "{2}{G}",
+  "type": "Enchantment",
+  "oracleText": "Whenever you put one or more +1/+1 counters on a creature you control, you may draw that many cards. Do this only once each turn."
+}

@@ -1,0 +1,53 @@
+# Displacer Kitten: "exile up to one target nonland permanent you control, then return that card to the battlefield". A
+# token that leaves the battlefield ceases to exist (CR 111.7, 704.5d), so it is not "that card" and does not come back:
+# the Kitten's trigger on casting Mox Emerald (turn 3) exiles one of the two Spirit tokens of Lingering Souls and only one
+# is left. The Kitten came down on turn 1 off a Black Lotus and a Mox Ruby; the Souls was paid with the other three Moxen
+# (its own cast trigger was given no target).
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Displacer Kitten
+Lingering Souls
+Mox Emerald
+Plains x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Displacer Kitten.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Lingering Souls.Cast
+Bot1.Target()
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Target(Spirit)
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield = Mox Ruby; Mox Pearl; Mox Jet; Mox Sapphire; Mox Emerald; Displacer Kitten; Spirit
+Exile.Count = 0

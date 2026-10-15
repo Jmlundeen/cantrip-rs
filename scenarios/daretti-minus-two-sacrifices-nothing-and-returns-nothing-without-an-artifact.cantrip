@@ -1,0 +1,42 @@
+# "Sacrifice an artifact. If you do, return target artifact card ...": Bot1 pays for Daretti with four Mountains on turn 7
+# and, with +2, discards Mox Emerald into its graveyard. On turn 9 the -2 targets the Mox, but Bot1 controls no artifact
+# to sacrifice, so it was not sacrificed and the Mox stays in the graveyard (CR 608.2c). Loyalty is paid either way.
+
+[Bot1 Deck]
+Daretti, Scrap Savant
+Mox Emerald
+Mountain
+Mountain
+Mountain
+Mountain
+Island
+Island x20
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Battlefield.Mountain#4.Activate
+Bot1.Hand.Daretti, Scrap Savant.Cast
+Bot1.Battlefield.Daretti, Scrap Savant.Activate(Ability: Discard up to two)
+Bot1.Choose(Mox Emerald)
+[T7 Bot1.Main2]
+? Bot1.Graveyard = Mox Emerald
+[T9 Bot1.Main1]
+Bot1.Battlefield.Daretti, Scrap Savant.Activate(Ability: Sacrifice an artifact; Bot1.Graveyard.Mox Emerald)
+! Bot1.Choose
+[T9 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Mox Emerald
+Bot1.Battlefield.Daretti, Scrap Savant.Counters.Loyalty = 3

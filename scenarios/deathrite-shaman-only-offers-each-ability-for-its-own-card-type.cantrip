@@ -1,0 +1,32 @@
+# With only a land card in a graveyard, the instant/sorcery and creature abilities are not offered even with the mana for them; the land ability is.
+
+[Bot1 Deck]
+Swamp
+Deathrite Shaman
+Forest
+Swamp
+Forest
+Swamp
+Forest
+Swamp x10
+
+[Bot2 Deck]
+Mountain x7
+Forest
+Mountain x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Deathrite Shaman.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+! Bot1.Battlefield.Deathrite Shaman.Activate(Ability: instant)
+! Bot1.Battlefield.Deathrite Shaman.Activate(Ability: creature)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Pass
+Bot1.Battlefield.Deathrite Shaman.Activate(Bot2.Graveyard.Forest; Ability: land)
+Bot1.Pass
+
+[Expect]
+Exile.Count = 1

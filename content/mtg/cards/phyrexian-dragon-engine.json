@@ -1,0 +1,11 @@
+{
+  "name": "Phyrexian Dragon Engine",
+  "manaCost": "{3}",
+  "type": "Artifact Creature — Phyrexian Dragon",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Double strike\nWhen this creature enters from your graveyard, you may discard your hand. If you do, draw three cards.\nUnearth {3}{R}{R} ({3}{R}{R}: Return this card from your graveyard to the battlefield. It gains haste. Exile it at the beginning of the next end step or if it would leave the battlefield. Unearth only as a sorcery.)\n(Melds with Mishra, Claimed by Gix.)",
+  "keywords": [
+    "DoubleStrike"
+  ]
+}

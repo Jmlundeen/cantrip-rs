@@ -1,0 +1,39 @@
+# A token that is exiled ceases to exist and can't return (CR 111.7, 704.5d): the harnessed Mind Stone's end-step ability targets Ajani, Nacatl Pariah's Cat Warrior token, and the token is gone afterwards.
+# (A card blinked this way returns as a new object: the-mind-stone-harnessed-blinks-a-creature-that-draws-again.) Three Black Lotuses, Sol Ring and a Mox Pearl pay for the Stone, Ajani and the harness on turn 1.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+The Mind Stone
+Sol Ring
+Ajani, Nacatl Pariah
+Mox Pearl
+Plains x13
+
+[Bot2 Deck]
+Island x22
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.The Mind Stone.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Ajani, Nacatl Pariah.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.The Mind Stone.Activate(Ability: Harness)
+[T1 Bot1.Main2]
+Bot1.Target(Cat Warrior)
+
+[Expect]
+Turn = 1
+Step = End
+Stack.Count = 0
+Exile.Count = 0
+Bot1.Battlefield = The Mind Stone; Sol Ring; Mox Pearl; Ajani, Nacatl Pariah

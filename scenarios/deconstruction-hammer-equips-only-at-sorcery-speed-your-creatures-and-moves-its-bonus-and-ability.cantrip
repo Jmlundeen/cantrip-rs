@@ -1,0 +1,57 @@
+# Equip {1} is sorcery-speed and targets "a creature you control" (CR 702.6a, 301.5): refused on Bot2's turn and onto
+# Bot2's Ornithopter, allowed in Bot1's own main phase. Moving the Hammer from Bot1's Ornithopter to its Haywire Mite
+# takes the +1/+1 and the granted ability with it (CR 301.5c, 613.1f): the Ornithopter is a 0/2 that can no longer
+# activate it, the Mite a 2/2.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Ornithopter
+Haywire Mite
+Deconstruction Hammer
+Island x1
+Island x12
+
+[Bot2 Deck]
+Ornithopter
+Island x6
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Haywire Mite.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Deconstruction Hammer.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Deconstruction Hammer.Activate(Ornithopter)
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Ornithopter.Power = 1
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+! Bot1.Battlefield.Deconstruction Hammer.Activate(Haywire Mite)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Battlefield.Deconstruction Hammer.Activate(Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Deconstruction Hammer.Activate(Haywire Mite)
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Ornithopter.Power = 0
+? Bot1.Battlefield.Haywire Mite.Power = 2
+! Bot1.Battlefield.Ornithopter.Activate(Bot2.Battlefield.Ornithopter)
+
+[Expect]
+Bot1.Battlefield.Haywire Mite.Toughness = 2
+Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot1.Battlefield.Deconstruction Hammer.AttachedTo = Haywire Mite

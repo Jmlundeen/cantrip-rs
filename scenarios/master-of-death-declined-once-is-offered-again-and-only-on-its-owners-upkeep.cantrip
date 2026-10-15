@@ -1,0 +1,54 @@
+# Master of Death: "At the beginning of your upkeep, if this card is in your graveyard, you may pay 1 life. If you do,
+# return it to your hand." Bot1's Master (surveil 2 on entering: one card kept on top, one into the graveyard) dies to Bot2's
+# Lightning Bolt on turn 2. On turn 3's upkeep Bot1 declines to pay: it stays in the graveyard and Bot1 keeps its life
+# (20). Bot2's upkeep on turn 4 is not Bot1's, so nothing triggers (the stack is empty). On turn 5's upkeep Bot1 pays: it
+# is at 19 and the Master is back in its hand.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Master of Death
+Island
+Island
+Island
+Forest
+Mountain
+Island x10
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Master of Death.Cast
+Bot1.Pass
+Bot1.Arrange(Forest | Mountain)
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Master of Death)
+[T3 Bot1.Upkeep]
+Bot1.Decline
+? Bot1.Life = 20
+? Bot1.Graveyard = Master of Death; Mountain
+[T4 Bot2.Upkeep]
+? Stack.Count = 0
+[T5 Bot1.Upkeep]
+Bot1.Accept
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Life = 19
+Bot1.Hand.Count = 6
+Bot1.Graveyard = Mountain

@@ -1,0 +1,20 @@
+# "When you play another land": a second City of Traitors played on turn 3 is another land for the first, which is
+# sacrificed, but not for itself, so one City stays.
+
+[Bot1 Deck]
+City of Traitors
+City of Traitors
+Island x14
+
+[Bot2 Deck]
+Island x13
+
+[Actions]
+Bot1.Hand.City of Traitors.Play
+[T3 Bot1.Main1]
+Bot1.Hand.City of Traitors.Play
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = City of Traitors
+Bot1.Graveyard = City of Traitors

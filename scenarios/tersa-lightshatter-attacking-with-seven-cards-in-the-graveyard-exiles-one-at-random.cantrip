@@ -1,0 +1,41 @@
+# Tersa Lightshatter: attacking with seven or more cards in the graveyard exiles one of them at random (which one is not
+# asserted, only that exactly one leaves). Turn 1: Bot1 Wheels off a Black Lotus (graveyard: Lotus, Wheel and three
+# Islands = 5). Turn 3: Tersa's entry ability discards two more Islands (7) and she attacks; the trigger exiles a card,
+# leaving six, and Tersa's three damage lands.
+
+[Bot1 Deck]
+Black Lotus
+Wheel of Fortune
+Mountain
+Mox Ruby
+Island x3
+Tersa Lightshatter
+Mountain
+Island x5
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Wheel of Fortune.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Tersa Lightshatter.Cast
+Bot1.Choose(Island; Island)
+? Bot1.Graveyard.Count = 7
+Bot1.Attack(Tersa Lightshatter > Bot2)
+[Bot1.Main2]
+
+[Expect]
+Turn = 3
+Exile.Count = 1
+Bot1.Graveyard.Count = 6
+Bot2.Life = 17

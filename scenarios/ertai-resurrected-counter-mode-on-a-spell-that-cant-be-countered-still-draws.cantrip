@@ -1,0 +1,47 @@
+# Ertai Resurrected, first mode: "Counter target spell ... Its controller draws a card." Abrupt Decay can't be countered, so
+# the counter does nothing, but the draw is a separate instruction and still happens (CR 701.5): Bot1 flashes Ertai in
+# response to Bot2's Abrupt Decay aimed at its Mox Ruby, the Decay resolves and destroys the Mox, and Bot2 draws a card.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Ruby
+Ertai Resurrected
+Island x3
+Island x10
+
+[Bot2 Deck]
+Mox Jet
+Mox Emerald
+Abrupt Decay
+Plains x4
+Plains x12
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Abrupt Decay.Cast(Bot1.Battlefield.Mox Ruby)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ertai Resurrected.Cast
+Bot1.Modes(1)
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot1.Battlefield = Mox Sapphire; Ertai Resurrected
+Bot1.Graveyard = Mox Ruby; Black Lotus
+Bot2.Graveyard = Abrupt Decay
+Bot2.Hand.Count = 6

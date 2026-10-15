@@ -1,0 +1,24 @@
+{
+  "name": "Concealing Curtains",
+  "manaCost": "{B}",
+  "type": "Creature — Wall",
+  "power": 0,
+  "toughness": 4,
+  "oracleText": "Defender\n{2}{B}: Transform this creature. Activate only as a sorcery.",
+  "keywords": [
+    "Defender"
+  ],
+  "backFace": {
+    "name": "Revealing Eye",
+    "colorIndicator": [
+      "Black"
+    ],
+    "type": "Creature — Eye Horror",
+    "power": 3,
+    "toughness": 4,
+    "oracleText": "Menace\nWhen this creature transforms into Revealing Eye, target opponent reveals their hand. You may choose a nonland card from it. If you do, that player discards that card, then draws a card.",
+    "keywords": [
+      "Menace"
+    ]
+  }
+}

@@ -1,0 +1,41 @@
+# Ertai Resurrected, second mode: the target may be a planeswalker. Bot2 casts Narset, Parter of Veils off a Black Lotus;
+# Bot1 flashes in Ertai (a Black Lotus and a Mox Sapphire) and destroys it, and Bot2, Narset's controller, draws.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Ertai Resurrected
+Island x4
+Island x10
+
+[Bot2 Deck]
+Black Lotus
+Narset, Parter of Veils
+Plains x5
+Plains x12
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Narset, Parter of Veils.Cast
+Bot2.Pass
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ertai Resurrected.Cast
+Bot1.Modes(2)
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot2.Battlefield.Count = 0
+Bot2.Graveyard = Narset, Parter of Veils; Black Lotus
+Bot2.Hand.Count = 7
+Bot1.Battlefield = Mox Sapphire; Ertai Resurrected

@@ -1,0 +1,34 @@
+# Bot1 casts Mystical Tutor on its first turn and is left searching a library that holds instants and sorceries among
+# lands, creatures and artifacts, so only some of it can be taken. The position the client's library search is
+# pictured from: which cards it shows, the filter over them, and the row of cards picked.
+
+[Bot1 Deck]
+Island
+Mystical Tutor
+Island x5
+Lightning Bolt
+Guerrilla Gorilla
+Counterspell
+Island
+Brainstorm
+Swords to Plowshares
+Mox Sapphire
+Ponder
+Black Lotus
+Mana Leak
+Island x4
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Mystical Tutor.Cast
+[Handover Bot1.Search]
+
+[Expect]
+Turn = 1
+Bot1.Battlefield = Island
+Bot1.Library.Count = 14
+Stack = Mystical Tutor

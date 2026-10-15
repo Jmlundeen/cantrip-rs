@@ -1,0 +1,6 @@
+{
+  "name": "Swords to Plowshares",
+  "manaCost": "{W}",
+  "type": "Instant",
+  "oracleText": "Exile target creature. Its controller gains life equal to its power."
+}

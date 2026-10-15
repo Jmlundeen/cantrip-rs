@@ -1,0 +1,45 @@
+# Bankrupt in Blood: the additional cost (sacrifice two creatures) is paid as the spell is cast (CR 601.2h), so a spell
+# countered on the stack has already cost both creatures, and "Draw three cards" never happens (CR 608.2: only a
+# resolving spell follows its instructions). Bot2 counters it with Counterspell (an Island and Mox Sapphire).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Ornithopter
+Ornithopter
+Bankrupt in Blood
+Swamp x2
+Swamp x10
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Island x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Bankrupt in Blood.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Choose(Ornithopter; Ornithopter)
+Bot1.Pass
+Bot2.Hand.Counterspell.Cast(Stack.Bankrupt in Blood)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Bankrupt in Blood; Ornithopter; Ornithopter
+Bot2.Graveyard = Counterspell
+Bot1.Battlefield = Swamp; Mox Jet
+Bot1.Hand.Count = 3

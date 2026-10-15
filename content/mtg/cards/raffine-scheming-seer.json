@@ -1,0 +1,11 @@
+{
+  "name": "Raffine, Scheming Seer",
+  "manaCost": "{W}{U}{B}",
+  "type": "Legendary Creature — Sphinx Demon",
+  "power": 1,
+  "toughness": 4,
+  "oracleText": "Flying, ward {1}\nWhenever you attack, target attacking creature connives X, where X is the number of attacking creatures.",
+  "keywords": [
+    "Flying"
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "name": "Undercity",
+  "entryRoom": 0,
+  "rooms": [
+    {
+      "name": "Secret Entrance",
+      "text": "Search your library for a basic land card, reveal it, put it into your hand, then shuffle.",
+      "leadsTo": [1, 2],
+      "ability": { "effects": [{ "verb": "SearchLibrary", "amount": 1, "options": { "destination": "hand", "filter": "land,basic", "reveal": "true" } }] }
+    },
+    {
+      "name": "Forge", "text": "Put two +1/+1 counters on target creature.", "leadsTo": [3, 4],
+      "ability": { "target": { "kind": "creature", "text": "target creature" }, "effects": [{ "verb": "PutCounters", "amount": 2, "target": "target", "options": { "counter": "+1/+1" } }] }
+    },
+    { "name": "Lost Well", "text": "Scry 2.", "leadsTo": [4, 5], "ability": { "effects": [{ "verb": "Scry", "amount": 2 }] } },
+    {
+      "name": "Trap!", "text": "Target player loses 5 life.", "leadsTo": [6],
+      "ability": { "target": { "kind": "player", "text": "target player" }, "effects": [{ "verb": "LoseLife", "amount": 5, "target": "target" }] }
+    },
+    {
+      "name": "Arena", "text": "Goad target creature.", "leadsTo": [6, 7],
+      "ability": { "target": { "kind": "creature", "text": "target creature" }, "effects": [{ "verb": "Goad", "target": "target" }] }
+    },
+    { "name": "Stash", "text": "Create a Treasure token.", "leadsTo": [7], "ability": { "effects": [{ "verb": "CreateTokens", "amount": 1, "options": { "token": "Treasure" } }] } },
+    { "name": "Archives", "text": "Draw a card.", "leadsTo": [8], "ability": { "effects": [{ "verb": "Draw", "amount": 1 }] } },
+    {
+      "name": "Catacombs", "text": "Create a 4/1 black Skeleton creature token with menace.", "leadsTo": [8],
+      "ability": { "effects": [{ "verb": "CreateTokens", "amount": 1, "options": { "name": "Skeleton", "type": "Creature — Skeleton", "power": "4", "toughness": "1", "colors": "Black", "keywords": "Menace" } }] }
+    },
+    {
+      "name": "Throne of the Dead Three",
+      "text": "Reveal the top ten cards of your library. Put a creature card from among them onto the battlefield with three +1/+1 counters on it. It gains hexproof until your next turn. Then shuffle.",
+      "leadsTo": [], "ability": { "effects": [{ "verb": "undercity.throne" }] }
+    }
+  ]
+}

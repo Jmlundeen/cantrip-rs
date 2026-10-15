@@ -1,0 +1,42 @@
+# Blazing Rootwalla: "Activate only once each turn" counts per permanent (CR 602.5b): two Rootwallas each pump once on
+# turn 3, the one cast that turn included (the ability has no {T}, so summoning sickness is irrelevant), and then neither
+# is offered the ability again: an unaffordable
+# ability still counts as offered, so the refusal can only be the restriction.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Blazing Rootwalla
+Blazing Rootwalla
+Mountain
+Mountain x12
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Blazing Rootwalla.Cast
+Bot1.Battlefield.Mountain.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Blazing Rootwalla.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Blazing Rootwalla#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Blazing Rootwalla#2.Power = 3
+? Bot1.Battlefield.Blazing Rootwalla#1.Power = 1
+Bot1.Battlefield.Blazing Rootwalla#1.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Blazing Rootwalla#1.Power = 3
+! Bot1.Battlefield.Blazing Rootwalla.Activate
+
+[Expect]
+Bot1.Battlefield.Blazing Rootwalla#1.Power = 3
+Bot1.Battlefield.Blazing Rootwalla#2.Power = 3
+Bot1.Battlefield.Blazing Rootwalla#1.Toughness = 1

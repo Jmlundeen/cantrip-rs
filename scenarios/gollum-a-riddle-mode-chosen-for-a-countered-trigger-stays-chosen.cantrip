@@ -1,0 +1,51 @@
+# Gollum, Riddle Master: "choose one that hasn't been chosen". A modal triggered ability's mode is chosen as it is put on
+# the stack (CR 603.3c, 700.2), so a mode chosen for a trigger that is then countered has still been chosen. Gollum (even)
+# sees Bot2's Mox Jet (mana value 0) cast: Bot1 chooses the +1/+1 counter at once. In response Bot2 flashes in Ertai
+# Resurrected (mana value 4, even), which triggers Gollum again: the counter mode is spent - refused - and Bot1 chooses to
+# draw. That trigger resolves (Bot1 draws). Ertai enters and counters the first trigger (Bot1, its controller, draws). So
+# Gollum never gets the counter, Bot1 drew two cards, and the modes chosen are the counter and the draw - the counter
+# chosen though its ability never resolved.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Gollum, Riddle Master
+Swamp x11
+
+[Bot2 Deck]
+Island
+Black Lotus
+Mox Jet
+Ertai Resurrected
+Island x11
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Gollum, Riddle Master.Cast
+Bot1.Name(Even)
+[T4 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot1.Modes(Put a +1/+1 counter)
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Ertai Resurrected.Cast
+! Bot1.Modes(Put a +1/+1 counter)
+Bot1.Modes(Draw a card)
+Bot2.Modes(1)
+Bot2.Target(Stack.Gollum, Riddle Master)
+[T4 Bot2.Main2]
+
+[Expect]
+Turn = 4
+Stack.Count = 0
+Bot1.Battlefield.Gollum, Riddle Master.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Gollum, Riddle Master.ChosenModes = 1, 3
+Bot1.Hand.Count = 7
+Bot2.Battlefield = Island; Mox Jet; Ertai Resurrected

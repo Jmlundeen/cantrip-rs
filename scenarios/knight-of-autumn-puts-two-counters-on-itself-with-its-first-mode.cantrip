@@ -1,0 +1,32 @@
+# Knight of Autumn: choosing the first mode, Bot1 puts two +1/+1 counters on the Knight, which is then a 4/3.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Mox Jet
+Knight of Autumn
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Knight of Autumn.Cast
+Bot1.Pass
+Bot1.Modes(Put two +1/+1 counters)
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Battlefield.Knight of Autumn.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Knight of Autumn.Power = 4
+Bot1.Battlefield.Knight of Autumn.Toughness = 3

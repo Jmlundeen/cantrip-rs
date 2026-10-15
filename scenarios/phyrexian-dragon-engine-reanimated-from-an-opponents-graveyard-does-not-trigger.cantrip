@@ -1,0 +1,39 @@
+# "When this creature enters from your graveyard" (CR 603.6a): Bot2 discards Phyrexian Dragon Engine to Faithless Looting,
+# and Bot1 reanimates it with Reanimate. It enters under Bot1's control, but from Bot2's graveyard, so the trigger
+# never happens: Bot1 is asked nothing and keeps their hand.
+
+[Bot1 Deck]
+Reanimate
+Swamp
+Swamp
+Island x5
+Island x14
+
+[Bot2 Deck]
+Phyrexian Dragon Engine
+Faithless Looting
+Mountain x5
+Mountain x14
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Faithless Looting.Cast
+Bot2.Choose(Phyrexian Dragon Engine; Mountain)
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Reanimate.Cast(Bot2.Graveyard.Phyrexian Dragon Engine)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Bot1.Battlefield.Phyrexian Dragon Engine.Keywords = DoubleStrike
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Hand.Count = 6

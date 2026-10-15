@@ -1,0 +1,38 @@
+# CR 610.3c: if the Aura leaves the battlefield before its enters trigger resolves, the permanent is not exiled at all.
+# Bot1 kills the enchanted Ornithopter with its own Lightning Bolt in response (no ward against its controller), the Aura
+# goes to the graveyard, and Bot2's Ornithopter stays where it is.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Ornithopter
+Sheltered by Ghosts
+Lightning Bolt
+Plains x2
+Plains x10
+
+[Bot2 Deck]
+Ornithopter
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sheltered by Ghosts.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot2.Battlefield = Ornithopter
+Bot1.Graveyard = Sheltered by Ghosts; Ornithopter; Lightning Bolt

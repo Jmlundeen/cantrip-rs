@@ -1,0 +1,66 @@
+use cantrip_api::*;
+use cantrip_mechanics::targets;
+use cantrip_oracle as oracle;
+
+/// Four or more card types among the cards exiled with this creature (CR 610.3): the cards in exile whose link points
+/// back at it, their types counted without regard to how many cards have each.
+fn collection(q: &dyn LayerQuery, source: ObjectId) -> bool {
+    let s = q.state();
+    let mut types = TypeSet::NONE;
+    for seat in s.seats() {
+        for &id in s.zone(Zone::exile(seat)) {
+            if s.obj(id).exiled.is_some_and(|link| link.by == source) {
+                types = TypeSet(types.0 | q.chars(id).types.0);
+            }
+        }
+    }
+    types.0.count_ones() >= 4
+}
+
+fn itself_with_collection(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Chars) -> bool {
+    source == affected && collection(q, source)
+}
+
+fn plus_four(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
+    chars.power = chars.power.map(|p| p + 4);
+    chars.toughness = chars.toughness.map(|t| t + 4);
+}
+
+fn trample(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
+    chars.keywords = chars.keywords.with(Keyword::Trample);
+}
+
+/// Exile target card from a graveyard; it is exiled with this creature (CR 607.2a).
+fn exile_card(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if let Some(card) = targets::object(g, item, 0) {
+        g.exile_with(&[card], item.object, false);
+    }
+    Ok(())
+}
+
+pub static CARD: CardDef = CardDef {
+    abilities: &[AbilityDef::Activated(ActivatedDef {
+        text: "{1}: Exile target card from a graveyard.",
+        cost: Cost { mana: mana(1, 0, 0, 0, 0, 0), ..Cost::NONE },
+        targets: &[targets::CARD_IN_A_GRAVEYARD],
+        effect: exile_card,
+        ..ActivatedDef::BLANK
+    })],
+    statics: &[
+        StaticDef {
+            text: "As long as there are four or more card types among cards exiled with this creature, it gets +4/+4.",
+            layer: Layer::PtModify,
+            affects: itself_with_collection,
+            apply: plus_four,
+            ..StaticDef::BLANK
+        },
+        StaticDef {
+            text: "As long as there are four or more card types among cards exiled with this creature, it has trample.",
+            layer: Layer::Ability,
+            affects: itself_with_collection,
+            apply: trample,
+            ..StaticDef::BLANK
+        },
+    ],
+    ..oracle::KEEN_EYED_CURATOR
+};

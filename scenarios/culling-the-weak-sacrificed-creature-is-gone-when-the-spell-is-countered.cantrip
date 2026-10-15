@@ -1,0 +1,41 @@
+# The sacrifice is a cost (CR 601.2h): Bot1 pays it as Culling the Weak is cast, and when Bot2's Counterspell counters it the
+# Ornithopter is still gone and no black mana is added. Of two creatures Bot1 sacrifices the one it chooses, the Elvish
+# Mystic, and keeps the Ornithopter.
+
+[Bot1 Deck]
+Mox Jet
+Ornithopter
+Forest
+Elvish Mystic
+Culling the Weak
+Island x14
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Elvish Mystic.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Culling the Weak.Cast
+Bot1.Choose(Elvish Mystic)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Culling the Weak)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Forest; Mox Jet; Ornithopter
+Bot1.Graveyard = Culling the Weak; Elvish Mystic
+Bot1.Mana = 
+Bot2.Graveyard = Counterspell

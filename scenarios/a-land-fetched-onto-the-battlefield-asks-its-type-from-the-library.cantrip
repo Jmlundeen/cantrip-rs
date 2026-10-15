@@ -1,0 +1,31 @@
+# Crop Rotation finds Multiversal Passage, whose "as this land enters, choose a basic land type" is asked while the
+# card is still in the library it was found in (CR 614.12a): an entry replacement applies before the card moves.
+#
+# Handed over at that choice rather than answered, so a session can be dealt the position and show that the seat
+# being asked can see the card it is being asked about — a library is hidden from everybody, its owner included, and
+# the prompt is the only thing revealing this one. See ScriptedPromptVisibilityTests.
+
+[Bot1 Deck]
+Forest
+Crop Rotation
+Plains x5
+Multiversal Passage
+Plains x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Crop Rotation.Cast
+Bot1.Search(Multiversal Passage)
+[Handover Bot1.Modes]
+
+[Expect]
+Turn = 1
+Step = Main1
+Stack = Crop Rotation
+Bot1.Battlefield =
+Bot1.Graveyard = Forest
+Bot1.Library = Multiversal Passage; Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains

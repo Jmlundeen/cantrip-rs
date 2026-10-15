@@ -1,0 +1,29 @@
+# Manamorphose: "Add two mana in any combination of colors. Draw a card." Cast off a Mountain and a Mox Pearl, it adds
+# {U}{U} (the same color twice) and draws a card; the blue mana then pays for an Ancestral Recall.
+
+[Bot1 Deck]
+Mountain
+Mox Pearl
+Manamorphose
+Ancestral Recall
+Plains x3
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Manamorphose.Cast
+Bot1.Colors(Blue; Blue)
+? Bot1.Mana = {U}{U}
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+[Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Ancestral Recall; Manamorphose
+Bot1.Hand.Count = 7

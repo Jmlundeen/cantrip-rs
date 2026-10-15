@@ -1,0 +1,38 @@
+# "Its mana value" is the card's in the library (CR 202.3, 708.4): Brazen Borrower is 3 (its Adventure's {1}{U} is not
+# added), the split card Life // Death is 1 + 2 = 3, and Mind Twist is 1 (X is 0 outside the stack). The Confidant
+# triggers only in its controller's upkeep: nothing is revealed in Bot2's upkeep on turn 4.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Dark Confidant
+Island
+Island
+Island
+Island
+Brazen Borrower
+Island
+Life // Death
+Island
+Mind Twist
+Island x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dark Confidant.Cast
+[T3 Bot1.Main1]
+? Bot1.Life = 17
+[T4 Bot2.Main1]
+? Bot1.Life = 17
+[T5 Bot1.Main1]
+? Bot1.Life = 14
+[T7 Bot1.Main1]
+
+[Expect]
+Bot1.Life = 13

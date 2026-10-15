@@ -1,0 +1,30 @@
+# Vandalblast cast for {R} destroys one target artifact the caster does not control; the opponent's other artifact stays.
+
+[Bot1 Deck]
+Vandalblast
+Mountain x20
+
+[Bot2 Deck]
+Sol Ring
+Ornithopter
+Island x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Vandalblast.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Mountain.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Vandalblast
+Bot2.Battlefield = Island; Sol Ring
+Bot2.Graveyard = Ornithopter
+Stack.Count = 0

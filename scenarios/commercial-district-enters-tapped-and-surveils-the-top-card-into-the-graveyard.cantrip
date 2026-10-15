@@ -1,0 +1,21 @@
+# Commercial District enters tapped and its enters trigger surveils 1: the Mountain on top of the library goes to the
+# graveyard, and the tapped Mountain Forest is the land Bot1 has.
+
+[Bot1 Deck]
+Commercial District
+Island x6
+Mountain
+Island x9
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Commercial District.Play
+Bot1.Arrange( | Mountain)
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Commercial District.Tapped = true
+Bot1.Graveyard = Mountain
+Bot1.Library.Count = 9

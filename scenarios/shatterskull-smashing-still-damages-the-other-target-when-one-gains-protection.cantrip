@@ -1,0 +1,54 @@
+# One of several targets becoming illegal does not stop the rest (CR 608.2b, 601.2d): X = 4 is divided 2 and 2 between Bot2's
+# Ornithopter and its Giver of Runes. In response Giver, no longer summoning sick on turn 5, gives the Ornithopter protection
+# from red, so its share is not dealt, while the Giver (a 1/2) still takes its 2 and dies. Eight mana as in the other scenarios.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Mox Jet
+Sol Ring
+Shatterskull Smashing
+Forest x10
+
+[Bot2 Deck]
+Plains
+Giver of Runes
+Ornithopter
+Plains x4
+Plains x12
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Giver of Runes.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Shatterskull Smashing.Cast(X: 4)
+Bot1.Divide(Bot2.Battlefield.Ornithopter: 2; Bot2.Battlefield.Giver of Runes: 2)
+Bot2.Battlefield.Giver of Runes.Activate(Ornithopter)
+Bot2.Decline
+Bot2.Colors(Red)
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Giver of Runes
+Bot2.Battlefield.Ornithopter.Damage = 0
+Bot1.Battlefield.Count = 5

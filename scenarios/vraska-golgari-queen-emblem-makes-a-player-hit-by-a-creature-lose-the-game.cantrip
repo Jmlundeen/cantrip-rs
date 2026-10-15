@@ -1,0 +1,44 @@
+# Vraska, Golgari Queen reaches -9 on her fourth activation and Bot1 gets her emblem; Llanowar Elves then deals combat damage to Bot2, who loses the game (CR 104.3e) though at 19 life.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Vraska, Golgari Queen
+Forest
+Llanowar Elves
+Swamp
+Swamp
+Swamp x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Vraska, Golgari Queen.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Vraska, Golgari Queen.Activate(Ability: sacrifice)
+Bot1.Choose()
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Vraska, Golgari Queen.Activate(Ability: sacrifice)
+Bot1.Choose()
+[T5 Bot1.Main1]
+Bot1.Battlefield.Vraska, Golgari Queen.Activate(Ability: sacrifice)
+Bot1.Choose()
+[T7 Bot1.Main1]
+Bot1.Battlefield.Vraska, Golgari Queen.Activate(Ability: emblem)
+Bot1.Pass
+Bot1.Attack(Llanowar Elves)
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Result = Bot1 won
+Bot1.Emblems.Count = 1
+Bot2.Life = 19

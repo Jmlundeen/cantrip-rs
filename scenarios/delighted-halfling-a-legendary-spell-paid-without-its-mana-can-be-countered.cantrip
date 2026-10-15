@@ -1,0 +1,42 @@
+# Delighted Halfling: "Spend this mana only to cast a legendary spell, and that spell can't be countered." The
+# protection belongs to the spell that was cast with that mana (CR 106.6a-b), not to every legendary spell: on turn 3 Bot1
+# casts Cecil, Dark Knight with a Swamp, with the Halfling untapped and unused, and Bot2's Counterspell counters it. (The
+# existing scenario shows the same Counterspell failing against Cecil cast with the Halfling's mana.)
+
+[Bot1 Deck]
+Forest
+Delighted Halfling
+Swamp
+Cecil, Dark Knight
+Forest x3
+Forest x12
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Island x4
+Island x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Delighted Halfling.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Cecil, Dark Knight.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Pass
+Bot2.Hand.Counterspell.Cast(Stack.Cecil, Dark Knight)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Cecil, Dark Knight
+Bot2.Graveyard = Counterspell
+Bot1.Battlefield = Forest; Swamp; Delighted Halfling

@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Cantrip.Client\Cantrip.Client.csproj" />
+    <ProjectReference Include="..\..\src\Cantrip.Discord\Cantrip.Discord.csproj" />
+    <ProjectReference Include="..\Cantrip.TestKit\Cantrip.TestKit.csproj" />
+  </ItemGroup>
+
+</Project>

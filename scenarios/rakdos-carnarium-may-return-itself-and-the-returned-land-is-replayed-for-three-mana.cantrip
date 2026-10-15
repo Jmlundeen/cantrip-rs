@@ -1,0 +1,30 @@
+# "Return a land you control to its owner's hand" may name the Carnarium itself.
+# Bot1 returns the Carnarium on turn three, keeping its Swamp, and plays it again on turn five (its land play for that turn), returning
+# the Swamp this time. On turn seven, the Swamp played again, the Carnarium and the Swamp tap for {B}{R} and {B}: three mana from two lands.
+
+[Bot1 Deck]
+Swamp
+Rakdos Carnarium
+Swamp x13
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Rakdos Carnarium.Play
+Bot1.Choose(Rakdos Carnarium)
+? Bot1.Battlefield = Swamp
+[T5 Bot1.Main1]
+Bot1.Hand.Rakdos Carnarium.Play
+Bot1.Choose(Swamp)
+? Bot1.Battlefield = Rakdos Carnarium
+[T7 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Rakdos Carnarium.Activate
+Bot1.Battlefield.Swamp.Activate
+? Bot1.Mana = {B}{B}{R}
+
+[Expect]
+Bot1.Battlefield = Rakdos Carnarium; Swamp

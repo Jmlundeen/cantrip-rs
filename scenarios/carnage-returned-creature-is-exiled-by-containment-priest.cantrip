@@ -1,0 +1,54 @@
+# Carnage, Crimson Chaos puts the creature card onto the battlefield without casting it, so a replacement effect applies:
+# Bot2's Containment Priest ("If a nontoken creature would enter and it wasn't cast, exile it instead") exiles the
+# Llanowar Elves instead (it does not enter), and nothing is gained by it. Carnage herself was cast, so she enters.
+# Faithless Looting discards the Elves and an Island on turn 1; Bot2 has the Priest on turn 2.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Faithless Looting
+Carnage, Crimson Chaos
+Mountain
+Island
+Llanowar Elves
+Island
+Mountain x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Containment Priest
+Plains x17
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Llanowar Elves; Island)
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Containment Priest.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Carnage, Crimson Chaos.Cast
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Swamp; Mox Jet; Mox Ruby; Mountain; Carnage, Crimson Chaos
+Exile = Llanowar Elves
+Bot1.Graveyard = Faithless Looting; Island
+Stack.Count = 0

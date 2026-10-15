@@ -1,0 +1,46 @@
+# Dreadmaw's Ire needs an attacking creature (CR 508.1k): in the first main phase, with Mother of Runes not yet attacking,
+# the spell has no legal target and is not offered (the refusal). Mother attacks, Bot2's Ornithopter blocks, and after
+# blockers the Ire makes Mother a 3/3 trampler: two damage to the 0/2 Ornithopter, one tramples over to Bot2, and that
+# combat damage to a player triggers "destroy target artifact that player controls" - Bot1's own Mox Ruby is not a
+# candidate (the refusal) while Bot2's Sol Ring and Mox Jet are; the Sol Ring is chosen and the Jet survives.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Mother of Runes
+Dreadmaw's Ire
+Plains x12
+
+[Bot2 Deck]
+Mox Jet
+Sol Ring
+Ornithopter
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Mother of Runes.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+! Bot1.Hand.Dreadmaw's Ire.Cast(Bot1.Battlefield.Mother of Runes)
+Bot1.Attack(Mother of Runes > Bot2)
+Bot2.Block(Ornithopter > Mother of Runes)
+[T3 Bot1.Blockers]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Dreadmaw's Ire.Cast(Bot1.Battlefield.Mother of Runes)
+! Bot1.Target(Bot1.Battlefield.Mox Ruby)
+Bot1.Target(Bot2.Battlefield.Sol Ring)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 19
+Bot2.Battlefield = Mox Jet
+Bot2.Graveyard = Sol Ring; Ornithopter
+Bot1.Battlefield.Mother of Runes.Power = 3
+Bot1.Battlefield.Mother of Runes.Keywords = Trample

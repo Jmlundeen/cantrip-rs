@@ -1,0 +1,46 @@
+# Nissa, Who Shakes the World, +1: "up to one target noncreature land you control" (CR 606.3 one loyalty ability a turn).
+# Turn 1: she animates Forest #1; a second loyalty activation that turn is refused. Turn 3: the creature Forest #1, Bot2's
+# Forest and Bot1's Mox Emerald (not a land) are refused as targets, beside Forest #2, a noncreature land of Bot1's
+# (the positive control), which becomes a 3/3. Her -8 is refused at 6 loyalty (a loyalty cost is paid by removing counters,
+# CR 606.4, so she needs eight).
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Mox Emerald
+Nissa, Who Shakes the World
+Forest
+Plains
+Plains
+Plains x13
+
+[Bot2 Deck]
+Forest
+Forest x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Nissa, Who Shakes the World.Cast
+Bot1.Battlefield.Nissa, Who Shakes the World.Activate(Bot1.Battlefield.Forest; Ability: Put three)
+! Bot1.Battlefield.Nissa, Who Shakes the World.Activate(Ability: Put three)
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+! Bot1.Battlefield.Nissa, Who Shakes the World.Activate(Ability: emblem)
+! Bot1.Battlefield.Nissa, Who Shakes the World.Activate(Bot1.Battlefield.Forest#1; Ability: Put three)
+! Bot1.Battlefield.Nissa, Who Shakes the World.Activate(Bot2.Battlefield.Forest; Ability: Put three)
+! Bot1.Battlefield.Nissa, Who Shakes the World.Activate(Bot1.Battlefield.Mox Emerald; Ability: Put three)
+Bot1.Battlefield.Nissa, Who Shakes the World.Activate(Bot1.Battlefield.Forest#2; Ability: Put three)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Forest#1.Power = 3
+Bot1.Battlefield.Forest#2.Power = 3
+Bot1.Battlefield.Nissa, Who Shakes the World.Counters.Loyalty = 7
+Bot2.Battlefield.Forest.Types = Land

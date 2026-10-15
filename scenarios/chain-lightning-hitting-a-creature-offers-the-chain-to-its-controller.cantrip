@@ -1,0 +1,42 @@
+# "Then that player or that permanent's controller may pay {R}{R}": Bot1 Chain Lightnings Bot2's Llanowar Elves on turn 3.
+# The Elves is a permanent, so its controller, Bot2, is the one offered the chain; Bot2 pays {R}{R} with two Moxen, copies the
+# spell (CR 707.10) and aims the copy at Bot1, who takes 3 and declines the chain in turn. The Elves dies of the original's 3.
+
+[Bot1 Deck]
+Mountain
+Chain Lightning
+Mountain x12
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Mox Ruby
+Gleemox
+Forest x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Gleemox.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Chain Lightning.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Gleemox.Activate(Color: Red)
+Bot2.PayCost
+Bot2.Target(Bot1)
+Bot1.Decline
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Llanowar Elves
+Bot1.Life = 17
+Bot2.Life = 20
+Bot1.Graveyard = Chain Lightning
+Stack.Count = 0

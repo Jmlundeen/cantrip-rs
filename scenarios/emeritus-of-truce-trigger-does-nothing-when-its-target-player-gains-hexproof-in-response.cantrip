@@ -1,0 +1,47 @@
+# Emeritus of Truce: "target player creates a 1/1 ... Inkling". Bot1 targets Bot2 with the enters ability on turn 3 and Bot2
+# answers with Dawn's Truce (a Plains and a Mox Pearl held up since turn 2): its player gains hexproof, the only target
+# is illegal and the whole ability does nothing (CR 608.2b): no Inkling is made for anyone, and the "then if an opponent
+# controls more creatures" part is not carried out, so Emeritus does not become prepared (Bot2 controls no creature).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Emeritus of Truce
+Plains x16
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Dawn's Truce
+Plains x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Emeritus of Truce.Cast
+Bot1.Pass
+Bot1.Target(Bot2)
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Dawn's Truce.Cast
+Bot2.Decline
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Plains; Mox Pearl; Mox Jet; Emeritus of Truce
+Bot2.Battlefield = Plains; Mox Pearl
+Bot2.Graveyard = Dawn's Truce
+Bot1.Battlefield.Emeritus of Truce.Prepared = (absent)

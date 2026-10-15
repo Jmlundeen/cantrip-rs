@@ -1,0 +1,30 @@
+# "Whenever an opponent casts": Bot1's own Mox Jet (mana value 0, the chosen even quality) cast with Gollum on the battlefield does not trigger him; nothing happens to the
+# life totals or Gollum. (The opponent's spell triggering him is gollum-chosen-even-triggers-on-a-zero-cost-spell-and-not-on-an-odd-one.)
+
+[Bot1 Deck]
+Swamp
+Swamp
+Gollum, Riddle Master
+Mox Jet
+Swamp x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Gollum, Riddle Master.Cast
+Bot1.Name(Even)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Gollum, Riddle Master.ChosenModes = (absent)
+Bot1.Battlefield.Gollum, Riddle Master.Power = 3
+Bot2.Life = 20
+Bot1.Life = 20

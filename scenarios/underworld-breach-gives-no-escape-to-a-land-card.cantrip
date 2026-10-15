@@ -1,0 +1,44 @@
+# Underworld Breach: "Each nonland card in your graveyard has escape." Bot1's graveyard holds two Islands (discarded by Faithless
+# Looting) beside a Black Lotus, the Looting and a Lightning Bolt: an Island cannot be cast for any cost (the refusal) while the Bolt escapes
+# for {R} and three other cards exiled (the positive control). Everything happens on turn 1 with two Black Lotuses' red mana.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Black Lotus
+Lightning Bolt
+Underworld Breach
+Faithless Looting
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Island; Island)
+Bot1.Hand.Underworld Breach.Cast
+Bot1.Pass
+! Bot1.Graveyard.Island.Cast
+Bot1.Graveyard.Lightning Bolt.Cast(Bot2; Ability: Escape)
+Bot1.Choose(Black Lotus; Faithless Looting; Island)
+Bot1.Pass
+[Bot1.Main1]
+
+[Expect]
+Turn = 1
+Bot2.Life = 14
+Exile.Count = 3
+Bot1.Graveyard = Lightning Bolt; Island; Black Lotus

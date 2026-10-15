@@ -1,0 +1,40 @@
+# Hullbreacher: "If an opponent would draw a card except the first one they draw in each of their draw steps, instead you
+# create a Treasure token." Bot1 flashes it in on turn 1 with Sol Ring and Black Lotus. On turn 2 Bot2 draws for the
+# turn as usual (the exempt first card of its draw step), then casts Brainstorm: all three of its draws are replaced,
+# so it draws nothing and Bot1 gets three Treasure tokens. Brainstorm still makes Bot2 put two cards back, so its hand
+# shrinks to four and its library grows to fifteen.
+
+[Bot1 Deck]
+Island
+Sol Ring
+Black Lotus
+Hullbreacher
+Island x20
+
+[Bot2 Deck]
+Island
+Brainstorm
+Island x6
+Mountain
+Island x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Hullbreacher.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Brainstorm.Cast
+[T2 Bot2.Main2]
+
+[Expect]
+Bot2.Hand.Count = 4
+Bot2.Library.Count = 15
+Bot1.Battlefield = Hullbreacher; Island; Sol Ring; Treasure Token; Treasure Token; Treasure Token

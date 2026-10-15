@@ -1,0 +1,32 @@
+# CR 608.2b: Fists of Flame has one target; Bot1 kills its own Ornithopter in response with Lightning Bolt, so Fists
+# does not resolve at all and its "draw a card" does not happen either (hand count 2, not 3).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Ornithopter
+Fists of Flame
+Lightning Bolt
+Mountain
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Fists of Flame.Cast(Ornithopter)
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 2
+Bot1.Graveyard = Fists of Flame; Ornithopter; Lightning Bolt

@@ -1,0 +1,42 @@
+# Chronicle of Victory ({6}: Sol Ring, Mox Emerald and Black Lotus on turn one) chooses Elf. On turn three the Elvish
+# Mystic cast afterwards draws a card for it, and arrives a 3/3 with first strike and trample.
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Mox Emerald
+Black Lotus
+Chronicle of Victory
+Elvish Mystic
+Forest
+Forest x12
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Chronicle of Victory.Cast
+Bot1.Modes(Elf)
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 2
+Bot1.Battlefield.Elvish Mystic.Power = 3
+Bot1.Battlefield.Elvish Mystic.Toughness = 3
+Bot1.Battlefield.Elvish Mystic.Keywords = FirstStrike; Trample

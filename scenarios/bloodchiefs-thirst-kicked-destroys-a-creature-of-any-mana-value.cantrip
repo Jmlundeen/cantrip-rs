@@ -1,0 +1,41 @@
+# Kicked, the target is any creature: Barrowgoyf (mana value 3) dies to the spell.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Jet
+Mox Pearl
+Bloodchief's Thirst
+Island x15
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Jet
+Barrowgoyf
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Barrowgoyf.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Bloodchief's Thirst.Cast(Kicked: 1)
+Bot1.Target(Bot2.Battlefield.Barrowgoyf)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Barrowgoyf
+Bot1.Graveyard = Bloodchief's Thirst

@@ -1,0 +1,41 @@
+# "You may shuffle up to four target cards from your graveyard into your library": Bot1 names its Lightning Bolt as the
+# second target and then declines the "may" (CR 608.2d). Bot2's Sol Ring is still shuffled into its owner's library, and the
+# Bolt stays in the graveyard.
+
+[Bot1 Deck]
+Mox Ruby
+Lightning Bolt
+Mox Emerald
+Cathartic Parting
+Plains
+Plains
+Plains
+Plains x13
+
+[Bot2 Deck]
+Mox Ruby
+Sol Ring
+Plains x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Cathartic Parting.Cast
+Bot1.Target(Bot2.Battlefield.Sol Ring)
+Bot1.Target(Bot1.Graveyard.Lightning Bolt)
+Bot1.Decline
+[Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Mox Ruby
+Bot2.Library.Count = 13
+Bot1.Graveyard = Cathartic Parting; Lightning Bolt
+Bot1.Library.Count = 12

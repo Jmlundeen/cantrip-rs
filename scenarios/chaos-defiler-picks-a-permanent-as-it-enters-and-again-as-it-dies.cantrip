@@ -1,0 +1,56 @@
+# Chaos Defiler's Battle Cannon fires twice in one game: once as it enters, once as it dies. Both are the same
+# triggered ability (crates/cantrip-cards/src/cards/chaos_defiler.rs). The
+# permanent is chosen, not targeted, so Bot1 answers a Choose rather than a Target — and the second time, with only
+# one nonland permanent left to Bot2, nothing is asked at all.
+
+[Bot1 Deck]
+Badlands
+Mox Jet
+Mox Ruby
+Sol Ring
+Swamp
+Chaos Defiler
+Swamp x12
+
+[Bot2 Deck]
+Plains
+Mox Sapphire
+Sol Ring
+Swamp
+Vindicate
+Plains x12
+
+[Actions]
+Bot1.Hand.Badlands.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Badlands.Activate(Ability: {B})
+Bot1.Hand.Sol Ring.Cast
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Badlands.Activate(Ability: {R})
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Chaos Defiler.Cast
+Bot1.Choose(Bot2.Battlefield.Sol Ring)
+[T4 Bot2.Main1]
+? Bot2.Graveyard = Sol Ring
+? Bot1.Battlefield.Chaos Defiler.Power = 5
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Vindicate.Cast(Chaos Defiler)
+
+[Expect]
+Turn = 4
+Bot1.Battlefield = Badlands; Mox Jet; Mox Ruby; Sol Ring; Swamp
+Bot1.Graveyard = Chaos Defiler
+Bot2.Battlefield = Plains; Swamp
+Bot2.Graveyard = Mox Sapphire; Vindicate; Sol Ring

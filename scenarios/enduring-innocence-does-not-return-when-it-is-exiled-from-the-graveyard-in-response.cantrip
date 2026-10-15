@@ -1,0 +1,45 @@
+# The returning ability looks for the card in the graveyard where it died. Bot2 Bolts the Innocence on turn 2 and, with the death trigger on the
+# stack, exiles it with Ghost Vacuum. A card that has changed zones is a new object (CR 400.7), so the trigger finds nothing to return: the
+# Innocence stays in exile.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Enduring Innocence
+Plains x14
+
+[Bot2 Deck]
+Mox Ruby
+Mountain
+Ghost Vacuum
+Lightning Bolt
+Mountain x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Enduring Innocence.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Ghost Vacuum.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Enduring Innocence)
+Bot2.Pass
+Bot2.Battlefield.Ghost Vacuum.Activate(Ability: Exile target; Bot1.Graveyard.Enduring Innocence)
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Exile = Enduring Innocence
+Bot1.Battlefield.Count = 3
+Bot1.Graveyard.Count = 0
+Stack.Count = 0

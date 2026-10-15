@@ -1,0 +1,215 @@
+---
+name: add-cards
+description: Add one or more Magic cards to the Cantrip rules engine - each card exact to its Oracle text and the Comprehensive Rules, built from the engine's shared rules verbs and keyword mechanics, with scenarios that execute every line of its code and cover its corner cases and interactions - and, for many cards, run them through parallel agents and land their work. Use whenever a card is added, implemented, ported or fixed, by anyone.
+---
+
+# Adding cards
+
+This is the standard for every card in Cantrip, whoever writes it. A card that does not meet all of it is not added.
+`docs/adding-cards.md` is the reference for a card file's fields; `docs/engine-design.md` is the architecture;
+CLAUDE.md is the repository's rules. The `write-game-script` skill is the scenario syntax, in full.
+
+## The non-negotiables
+
+1. **The card is exactly what the rules say it is.** Its Oracle text, read with the Comprehensive Rules
+   (`docs/rules/MagicCompRules *.txt`) and the card's official rulings, is the whole specification. There is no
+   approximation, no "close enough", no simplification, no house rule, no behaviour that is right in the usual case
+   and wrong in a rare one, no "the bots never do that", no deviation of any kind - in what it does, in when it does
+   it, in what it asks, in whom it asks, in the order it asks, or in what it lets a player do. If the engine cannot do
+   what the card needs, the card waits: the missing rule is built in the core, properly and for every card (below),
+   or the card is not added and the gap is reported. A card that is wrong is worse than a card that is missing.
+2. **Rules belong to the engine, never to the card.** A card file holds only what that one card does alone. It calls
+   the engine's verbs for rules procedures and the shared mechanics for keywords and recipes.
+3. **Every line of the card's code is executed by its scenarios**, every branch both ways, and the scenarios cover the
+   card's corner cases and its interactions with the rest of the game. Measured, not claimed
+   (`tools\card-coverage.cmd`).
+4. **An independent review against the Oracle text and the rules** before it lands.
+
+## Where code goes
+
+Three layers, kept apart by the compiler (`cantrip-api` is all a card can see):
+
+| Layer | Crate | What goes there |
+| --- | --- | --- |
+| Core | `cantrip-state`, `cantrip-rules`, exposed by `cantrip-api` (`Game`, `Query`) | Every procedure the Comprehensive Rules define: destroy, sacrifice, exile, return to hand, put into a library, mill, discard, damage and its prevention, counters, control, targeting legality, protection/hexproof/ward, the stack, priority, layers, replacement and prevention ordering, triggers, state-based actions, combat, mana, costs, zones and new-object identity (CR 400.7), last-known information, simultaneity (CR 101.4, 603.10). Keywords that change a core procedure (trample, first strike, split second). |
+| Shared mechanics | `cantrip-mechanics` | **Every keyword action (CR 701) and keyword ability (CR 702), from the first card that has it**: one module named for the keyword, parameterised (`earthbend`, `evoke`, `storm`, `amass`, `flashback`, ...). Any other recipe two or more printed cards use exactly as written: target filters, trigger matchers, tutors, land templates, tokens, one-line effects, delayed end-step effects. |
+| Card | `crates/cantrip-cards/src/cards/<card>.rs` | Only this card's own conditions, values, branching and sequencing, over `Game`, `Query` and the shared mechanics. |
+
+**A card file must never:**
+
+- filter on indestructible, regeneration, protection, hexproof, shroud or ward to decide what a rules action does -
+  the verb does that (`destroy_all`, `destroy_target`, targeting);
+- build a zone destination the rules dictate (`Zone::graveyard(owner)`, `Zone::hand(owner)`, a library position), or
+  call `move_together` to perform a rules action that has a verb: use `destroy_all`/`destroy_all_no_regen`,
+  `sacrifice`, `exile_all`, `return_to_hand`, `put_into_library(.., LibraryPlace::..)`, `mill`, `discard_together`,
+  `discard_hand`, `library::search_to_hand`/`search_to_battlefield`/`search_to_top`;
+- shuffle or randomise by hand (`put_into_library(.., LibraryPlace::BottomInRandomOrder)`, `bottom_in_random_order`,
+  `library::random_of`);
+- loop over players or objects for something the rules make simultaneous (`damage_together`,
+  `each_opponent_loses_life`, `each_opponent_sacrifices`, `destroy_all`);
+- check whether a player has lost. "Each player" is `apnap()` (or `turn_order_from(p)` for "starting with you") and
+  "each opponent" is `opponents(p)`, and both already leave out players who have left the game (CR 800.4a). Targeting
+  refuses them, and a player who leaves takes their spells and abilities with them, so a resolving ability's
+  controller is always in the game. `seats()` is every seat, for walking zones by owner, never for "each player". Only
+  a player named another way (Fecundity's "that creature's controller") is asked `in_game(p)`;
+- build a choice question by hand that `cantrip_mechanics::choose` asks (`card`, `cards`, `card_from`, `cards_from`,
+  `player`, `one_of`), or write a fallback arm for an answer of the wrong shape: the core checks every answer against
+  its question before the card sees it;
+- read a printed cost where the rules mean mana value (`Query::mana_value`: copies, tokens, face-down permanents,
+  X on the stack);
+- implement a keyword, even one only this card has today;
+- copy something `cantrip-mechanics` or `cantrip-api` already has (target filters and `targets::object`, trigger
+  matchers, `effects`, `tokens`, `delayed`, `library`, `lands`), or define a token a shared definition covers;
+- keep a counter or a flag for something that happened earlier: the past is asked of the event history,
+  `q.history()` (a one-off query in the card; a question a second card asks moves to `cantrip_mechanics::history`);
+- hand-write a stale-object guard (`targets::permanent`, `cantrip_api::is_live`), or guard `sacrifice`, which already
+  skips objects that changed zones (CR 400.7);
+- produce a different event than the rules name: making Clue tokens is not investigating; moving cards to the
+  graveyard is not discarding (and skips madness); moving a card out of a library is not searching.
+
+**Adding to the core or to the mechanics.** A core feature mirrors the rule it implements, cites the CR, works for
+every card the rule describes, and is guarded on the game state - never on "does any card in the card table have X",
+because the table holds every card. It is benchmarked: `cargo run --release -p cantrip-bench -- --games 128`, the
+"engine answering" line, before and after, reported with the change. A non-keyword mechanic names
+in its doc comment at least two printed cards that use it exactly as written; if only one does, it stays in that card.
+A keyword module cites its CR rule and names the cards that use it. Never widen a central switch to encode a card.
+
+**Look for overlap before writing anything that could be shared.** When a card needs a mechanic that another card
+might also have - a keyword, a recipe, a choice, a history question, a target filter - first search the existing card
+files, `cantrip-mechanics` and `cantrip-api` for the same thing (grep the Oracle wording in `content/*/cards/*.json`
+too, to find the cards that print it). If an existing function does it, use it. If two or more cards already do the
+same thing in their own code, move it into one shared function and change those cards to call it, in the same change.
+Share what is functionally identical, when sharing makes each card's code simpler. Never stretch a shared function to
+cover something that only looks alike: a flag or parameter that only one caller uses, or a branch on which card is
+calling, means it was not the same thing. Leave that in its own card.
+
+## The loop for one card
+
+1. **Read the rules before any code.**
+   - The Oracle text (the card's `content/<dataset>/cards/<card>.json`, or the current Oracle text if the card is new
+     to content) and its official rulings.
+   - Every CR section its words touch: each keyword and keyword action, each "can't", "instead", "as ... enters",
+     "whenever", "at the beginning of", each cost and each kind of target. Write down, for each sentence of the Oracle
+     text, the rule that governs it.
+   - What the rules make the card do in the odd cases: no legal target, a target that becomes illegal, a source that
+     has left the battlefield, a copy, a token, a face-down permanent, an opponent controlling it, two of it, X of
+     zero, an empty library or hand, simultaneous events, a replacement effect in the way.
+2. **The card's content file.** If it does not exist, write `content/<dataset>/cards/<card-name>.json` with the
+   characteristics only: `name`, `manaCost`, `type`, `power`/`toughness`, `loyalty` or `defense`, `oracleText` exactly
+   as current Oracle text, core `keywords` (`Flying`, `FirstStrike`, ... - the list is in
+   `crates/cantrip-oracle/build.rs`), `colorIndicator`, `convoke`/`delve`/`improvise`, and faces (`backFace`,
+   `adventure`, `halves`, `aftermath`). Nothing else: what a card does is Rust. The build generates its constant;
+   there is no generator to run and no shared file to edit. A card whose Oracle text is only core keywords needs no
+   Rust file.
+3. **Start the file.** `python tools\maintenance\new-card.py "Card Name"` prints the JSON and every scenario that holds
+   the card, and writes `crates/cantrip-cards/src/cards/<card_name>.rs` over its generated constant.
+4. **Look before writing.** Read `crates/cantrip-api/src/game.rs` (the verbs) and grep `crates/cantrip-mechanics/src`
+   (the keyword modules, `targets`, `triggers`, `library`, `lands`, `effects`, `tokens`, `delayed`, `copy`, `hand`,
+   `chosen_type`, `history`, `combat`, `replacements`), and read two or three ported cards with similar text. Most
+   cards need nothing new.
+5. **Write the card.** Its file adds behaviour with struct update syntax over the generated constant
+   (`CardDef { spell: Some(..), ..oracle::LIGHTNING_BOLT }`). Ask questions with `g.ask(..)` in the order the rules ask
+   them, offering options in the order the engine and the ported cards do (scenarios answer by name and position).
+   Doc comments quote the Oracle sentence each function implements and cite the CR.
+6. **Write the scenarios** (next section) and run them until they pass:
+   `cargo run --profile cards -p cantrip-script --bin corpus -- --card "Card Name"`.
+7. **Measure coverage:** `tools\card-coverage.cmd "Card Name"` must report every line of the card's file executed
+   (it runs the card's scenarios under `cargo-llvm-cov`; install it once with `rustup component add
+   llvm-tools-preview` and `cargo install cargo-llvm-cov --locked`).
+   A line no scenario can reach is wrong code or a missing scenario, never an exception.
+8. **Verify:** plain `cargo run --profile cards -p cantrip-script --bin corpus` shows `0 fail` and no fewer passing
+   than before; `set CANTRIP_VERIFY=1 & cargo test --profile cards --workspace` is green; if the core or mechanics
+   changed, the benchmark and `tools\test.cmd`; wall-clock tests only when the change touches what they cover
+   (CLAUDE.md).
+9. **Review** (below), then commit: `Card: <Name>` - the content JSON, the card file and its scenarios - one card per
+    commit; core and mechanics changes in their own commits before it (`Engine: ...`, `Mechanics: ...`). Commit and
+    push as CLAUDE.md says; a contributor without push access opens a pull request with the coverage report and
+    the review in its description.
+
+## Scenarios: what a card owes
+
+A scenario (`scenarios/<what-it-proves>.cantrip`; syntax in `scenarios/README.md` and the `write-game-script` skill)
+is a real game: both decklists in order, every answer, and the state it must end in. Positions are forced by the
+script. **Never sweep RNG seeds**, and never rely on a bot's choices to reach a position.
+
+A card's scenarios, together, must:
+
+- **Execute every line of the card's code and take every branch both ways**: each `if` true and false, each `match`
+  arm, each early return, each mode, each way to cast it, each cost and alternative cost, each ability, each face.
+  `tools\card-coverage.cmd` checks the lines; the branches are on you, listed in the review.
+- **Prove each sentence of the Oracle text**, positively, and negatively wherever it limits anything - "can't",
+  "only", "unless", "up to", "another", "you control", "an opponent", "nontoken", "once each turn", a mana value or
+  type restriction: a refusal (`! Bot1.Hand.Card.Cast`, `! Bot2.Block(..)`, `! Bot1.Attack(..)`,
+  `! Bot1.Search(..)`) beside a positive control - the same action where the limit does not apply - so the refusal
+  cannot pass for the wrong reason.
+- **Cover every corner case the rules decide for this card**:
+  - targets: no legal target (it cannot be cast, or the trigger is removed), a target that becomes illegal before
+    resolution (CR 608.2b), one of several targets becoming illegal (the rest still happen), protection, hexproof,
+    shroud, ward;
+  - zone changes: the source left the battlefield before its ability resolves (last-known information, CR 113.7a,
+    608.2h), an object that left and came back is a new object (CR 400.7), a token that leaves ceases to exist;
+  - players: controller versus owner (steal it), each opponent, a player who has lost, APNAP order (CR 101.4);
+  - numbers: X of zero, zero or negative results, damage above toughness, life at or below zero, an empty library, an
+    empty hand, counters of more than one kind;
+  - other forms of the card: a copy of the spell (no mana spent, so X is 0), a token copy of the permanent, a
+    face-down permanent, another face;
+  - more than one: two of the card, two of its triggers at once and their order, "one or more" events as one;
+  - replacement and prevention: an effect that replaces what the card does (regeneration, "exile instead",
+    "can't be countered", damage prevention), and "can't be regenerated";
+  - timing: responses on the stack, split second, sorcery speed, combat, the step the card names, "until end of turn"
+    through cleanup;
+  - layers: an effect that changes the card's characteristics, and the card's own continuous effect against another
+    (timestamps, dependency, CR 613).
+- **Exercise the combinations the card enters into**: the cards and rules it most plausibly meets, above all those
+  that touch the same rules - a sweeper with indestructible and with regeneration; an enters trigger with a copy and a
+  flicker; a cost reduction with an alternative cost and X; a replacement with another replacement and the affected
+  player choosing their order (CR 616.1); a static ability with a layer-dependent one. One scenario per interaction.
+- **Assert the outcome precisely** (`[Expect]` and `?` checks): zones, life totals, counters, tapped state,
+  attachments, controller, the stack - the keys that prove the behaviour and no others, so a scenario fails for the
+  right reason.
+
+Name each scenario for the behaviour it proves (`wrath-of-god-destroys-a-creature-regenerated-in-response`) and start
+it with a `#` comment: what it shows, why its actions are arranged that way, and the rule it proves.
+
+If the harness cannot express something a scenario needs - a question, a check, a dump key - extend the harness
+(`crates/cantrip-script`) and its README. Never weaken the scenario to fit the harness.
+
+**A scenario that shows a bug is committed, not dropped.** If the engine or another card gets something wrong and you
+cannot fix it in this change, commit the scenario asserting the rules-correct outcome with a `# Known bug: <what, and
+the rule>` line at the top (`scenarios/README.md`, "Known bugs"). It is expected to fail; the fix removes the marker.
+Never delete, weaken or rewrite a scenario to pass because the engine is wrong, and never assert behaviour you know is
+wrong. "0 fail" means no unexpected failures; the known-bug count is reported beside it.
+
+## Review
+
+Before a card lands, someone other than its author - a person, or a separate agent that had no part in writing it -
+reads it with the Oracle text, the rulings and the CR open:
+
+- every sentence of the Oracle text against the code, and every line of the code against the text: nothing missing,
+  nothing extra, nothing approximate, nothing deviating from the rules;
+- the "never" list above, line by line;
+- the scenarios against "what a card owes", the coverage report and the branch list;
+- any core or mechanics change against its rule, its second card (a non-keyword recipe) and the benchmark;
+- overlap: code in the card that an existing shared function already does, or that does the same as code in another
+  card, which should have been shared.
+
+The reviewer changes nothing silently: each finding is fixed by the author or recorded as the reason the card does not
+land. Self-reported "exact" is not proof.
+
+## Many cards: agents
+
+The coordinator dispatches, lands and keeps the queue; it does not port cards itself in a batch.
+
+1. **Batches** of 15-30 cards, in list order (never pre-sorted by difficulty).
+2. **One agent per batch**, in its own worktree, in the background. Its prompt: this skill's loop for each card (the
+   list inline); the core is closed to it unless the prompt opens it, though a missing keyword module may be added in
+   `cantrip-mechanics`; a card blocked by the core is skipped with its exact gap (the rule, and what `cantrip-api`
+   lacks), never faked; one commit per card; at the end `git rebase main`, the corpus and the verify tests; no push;
+   a report of ported cards with their coverage, skipped cards with their gaps, and anything odd found in the core.
+3. **Gaps** that several skipped cards share become a core-feature agent: the core open to it, each feature built to
+   its rule, the waiting cards ported, the benchmark run. Feature agents work on separate rules areas; running agents
+   are told what landed so they rebase.
+4. **Review agents** read the batch's cards read-only against the review list, before they land.
+5. **Land** each finished branch on `main` (cherry-pick its commits; a conflict stops for a look), then the corpus
+   (0 fail), the verify tests, the benchmark if the core changed; push; remove the worktree and its branch.
+6. **Report** what landed, what was skipped and why, and the corpus line.

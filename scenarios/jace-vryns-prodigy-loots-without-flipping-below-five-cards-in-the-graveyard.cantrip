@@ -1,0 +1,39 @@
+# Jace, Vryn's Prodigy: "If there are five or more cards in your graveyard, exile Jace, then return him ... transformed."
+# Cast on turn 1 (two Moxen pay), Jace loots on turn 3 with an empty graveyard: he draws, discards the Island Bot1 names,
+# and with one card in the graveyard he stays Jace, tapped, with no loyalty counters. The control, where the fifth card flips
+# him, is jace-vryns-prodigy-flips-with-five-cards-in-the-graveyard-and-casts-a-bolt-again.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Jace, Vryn's Prodigy
+Island
+Island
+Island
+Island
+Mox Ruby
+Island x10
+
+[Bot2 Deck]
+Swamp x15
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Jace, Vryn's Prodigy.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Jace, Vryn's Prodigy.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Island)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Island
+Bot1.Battlefield.Jace, Vryn's Prodigy.Tapped = true
+Bot1.Hand.Count = 5

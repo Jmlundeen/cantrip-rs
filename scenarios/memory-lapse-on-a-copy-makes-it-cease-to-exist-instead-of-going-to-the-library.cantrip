@@ -1,0 +1,52 @@
+# Memory Lapse on a copy of a spell: a copy is not a card (CR 707.10), so when it is countered it ceases to exist rather than
+# being put on top of any library (CR 111.7, 704.5d). Bot2 casts an Ornithopter; Bot1 responds with a Lose Focus replicated
+# once, its copy aimed at the Ornithopter too; Bot2 answers the copy with Memory Lapse. Bot1's library keeps its size - the
+# copy is not in it, and neither is the original, which resolves, finds Bot2 with one mana left of three and no way to pay
+# {2}, and counters the Ornithopter into Bot2's graveyard.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Mox Sapphire
+Lose Focus
+Island x16
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Sapphire
+Ornithopter
+Memory Lapse
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Mox Sapphire#3.Activate
+Bot1.Hand.Lose Focus.Cast(Stack.Ornithopter; Kicked: 1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Stack.Ornithopter)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Memory Lapse.Cast(Stack.Lose Focus#1)
+? Stack.Count = 4
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Library.Count = 13
+Bot1.Graveyard = Lose Focus
+Bot2.Graveyard = Ornithopter; Memory Lapse

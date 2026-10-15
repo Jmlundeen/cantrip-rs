@@ -1,0 +1,22 @@
+# The back face played as a land (CR 712.4, 305.1): declining the 3 life, it enters tapped (CR 614.1c), life stays 20 and its
+# mana ability is refused that turn; on turn 3 it adds {R}. The paying branch is the existing pain-land scenario.
+
+[Bot1 Deck]
+Shatterskull Smashing
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Shatterskull Smashing.Play
+Bot1.Decline
+? Bot1.Life = 20
+! Bot1.Battlefield.Shatterskull, the Hammer Pass.Activate
+? Bot1.Battlefield.Shatterskull, the Hammer Pass.Tapped = true
+[T3 Bot1.Main1]
+Bot1.Battlefield.Shatterskull, the Hammer Pass.Activate
+? Bot1.Mana = {R}
+
+[Expect]
+Bot1.Life = 20

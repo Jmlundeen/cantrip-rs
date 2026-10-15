@@ -1,0 +1,50 @@
+# Sandstorm Salvager: "{2}, {T}: Put a +1/+1 counter on each creature token you control. They gain trample until end
+# of turn." Salvager itself is not a token: no counter, no trample. Bot2's own Salvager makes a token that is not
+# Bot1's to pump. Activated on Bot1's turn 7, after summoning sickness has passed.
+
+[Bot1 Deck]
+Forest x6
+Sandstorm Salvager
+Forest x13
+
+[Bot2 Deck]
+Sandstorm Salvager
+Forest x19
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Sandstorm Salvager.Cast
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Forest#3.Activate
+[T6 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Sandstorm Salvager.Cast
+Bot2.Battlefield.Forest#1.Activate
+Bot2.Battlefield.Forest#2.Activate
+Bot2.Battlefield.Forest#3.Activate
+[T7 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Sandstorm Salvager.Activate
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+
+[Expect]
+Bot1.Battlefield.Golem.Power = 4
+Bot1.Battlefield.Golem.Toughness = 4
+Bot1.Battlefield.Golem.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Golem.Keywords = Trample
+Bot1.Battlefield.Sandstorm Salvager.Power = 1
+Bot1.Battlefield.Sandstorm Salvager.Keywords = (absent)
+Bot1.Battlefield.Sandstorm Salvager.Tapped = true
+Bot2.Battlefield.Golem.Power = 3
+Bot2.Battlefield.Golem.Keywords = (absent)
+Bot2.Battlefield.Golem.Counters.PlusOnePlusOne = (absent)

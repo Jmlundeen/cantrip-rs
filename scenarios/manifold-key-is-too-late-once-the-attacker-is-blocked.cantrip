@@ -1,0 +1,44 @@
+# "Can't be blocked" restricts the declaration of blockers (CR 509.1b); it does not remove a block already made. Bot1 attacks with
+# Llanowar Elves, Bot2's Birds of Paradise blocks it, and only then does the Key make the Elves unblockable: it stays blocked,
+# deals its damage to the Birds (which die) and none to Bot2.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Mox Jet
+Mox Ruby
+Llanowar Elves
+Manifold Key
+Plains x14
+
+[Bot2 Deck]
+Forest
+Birds of Paradise
+Forest x18
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Manifold Key.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Birds of Paradise.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Llanowar Elves)
+Bot2.Block(Birds of Paradise > Llanowar Elves)
+[T3 Bot1.Blockers]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Manifold Key.Activate(Llanowar Elves; Ability: blocked)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot2.Graveyard = Birds of Paradise

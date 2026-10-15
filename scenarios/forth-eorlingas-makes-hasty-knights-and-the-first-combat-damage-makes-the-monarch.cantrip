@@ -1,0 +1,38 @@
+# Forth Eorlingas! with X = 2 on turn one: Mox Ruby pays for Sol Ring, then Plateau (R), Mox Pearl (W) and Sol Ring's two
+# pay {2}{R}{W}. The two Human Knights have haste and trample, attack together into an empty board, and the
+# combat damage of both is one batch: Bot1 becomes the monarch once, Bot2 is at 16.
+
+[Bot1 Deck]
+Plateau
+Mox Ruby
+Mox Pearl
+Sol Ring
+Forth Eorlingas!
+Plateau x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plateau.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot1.Battlefield.Plateau.Activate(Ability: {R})
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Forth Eorlingas!.Cast(X: 2)
+Bot1.Pass
+[T1 Bot1.Main1]
+Bot1.Attack(Human Knight; Human Knight#2)
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot2.Life = 16
+Monarch = Bot1
+Bot1.Battlefield.Count = 6

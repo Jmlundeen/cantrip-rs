@@ -1,0 +1,36 @@
+# Expressive Iteration looks at three cards: one to the hand, one to the bottom of the library, one exiled, and the
+# exiled card may be played this turn (CR 118.9) - here a Mountain, played from exile as the turn's land drop.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Sapphire
+Expressive Iteration
+Swamp
+Swamp
+Swamp
+Swamp
+Lightning Bolt
+Mountain
+Island
+Swamp x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Expressive Iteration.Cast
+Bot1.Arrange(Lightning Bolt | Island | Mountain)
+Bot1.Exile.Mountain.Play
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Exile.Count = 0
+Bot1.Graveyard = Expressive Iteration
+Bot1.Battlefield = Mox Ruby; Mox Sapphire; Mountain
+Bot1.Hand = Swamp; Swamp; Swamp; Swamp; Lightning Bolt
+Bot1.Library.Count = 11

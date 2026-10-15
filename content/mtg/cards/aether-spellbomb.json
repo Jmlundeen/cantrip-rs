@@ -1,0 +1,6 @@
+{
+  "name": "Aether Spellbomb",
+  "manaCost": "{1}",
+  "type": "Artifact",
+  "oracleText": "{U}, Sacrifice this artifact: Return target creature to its owner's hand.\n{1}, Sacrifice this artifact: Draw a card."
+}

@@ -1,0 +1,39 @@
+# Inventors' Fair: with four artifacts (four Moxen) Bot1 pays {4} from them, taps and sacrifices the Fair, and searches
+# its library for Sol Ring, which goes to its hand.
+
+[Bot1 Deck]
+Inventors' Fair
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Mox Ruby
+Island x2
+Sol Ring
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Inventors' Fair.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Inventors' Fair.Activate(Ability: Search)
+Bot1.Search(Sol Ring)
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Graveyard = Inventors' Fair
+Bot1.Hand = Island; Island; Sol Ring
+Bot1.Library.Count = 12

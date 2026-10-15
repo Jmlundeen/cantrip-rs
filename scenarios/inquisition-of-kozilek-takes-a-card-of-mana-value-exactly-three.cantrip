@@ -1,0 +1,23 @@
+# Inquisition of Kozilek's limit is "mana value 3 or less" (CR 202.3): an Archon of Emeria, mana value exactly 3, is
+# eligible and Bot1 takes it, while the Sunfall (5) beside it stays in Bot2's hand.
+
+[Bot1 Deck]
+Swamp
+Inquisition of Kozilek
+Swamp x10
+
+[Bot2 Deck]
+Sunfall
+Archon of Emeria
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Inquisition of Kozilek.Cast(Bot2)
+Bot1.Choose(Archon of Emeria)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Archon of Emeria
+Bot2.Hand.Count = 6

@@ -1,0 +1,40 @@
+# Concealing Curtains / Revealing Eye: "You may choose a nonland card from it." Bot2's hand is all Islands: the hand is
+# revealed, there is nothing to choose, no card is discarded and, since the draw only follows a discard, none is drawn.
+# (The same transformation takes Lightning Bolt out of a hand that has one: concealing-curtains-transforms-and-reveals-a-
+# hand-as-revealing-eye.)
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Concealing Curtains
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Concealing Curtains.Cast
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Concealing Curtains.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Mox Jet; Revealing Eye; Swamp; Swamp
+Bot2.Hand.Count = 7
+Bot2.Library.Count = 12
+Bot2.Graveyard.Count = 0
+Stack.Count = 0

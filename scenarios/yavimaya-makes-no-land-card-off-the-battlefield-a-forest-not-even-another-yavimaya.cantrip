@@ -1,0 +1,33 @@
+# Yavimaya, Cradle of Growth: "Each land is a Forest in addition to its other land types."
+#
+# Only lands on the battlefield (rulings 2021-06-18): a land card in the library is no Forest card while Yavimaya is
+# out, and neither is a second Yavimaya there. Misty Rainforest, a Forest itself while on the battlefield, searches for
+# "a Forest or Island card": the Island is there to be found, the Plains and the other Yavimaya are not.
+
+[Bot1 Deck]
+Yavimaya, Cradle of Growth
+Misty Rainforest
+Plains x5
+Plains
+Yavimaya, Cradle of Growth
+Island
+Plains x5
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Yavimaya, Cradle of Growth.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Misty Rainforest.Play
+? Bot1.Battlefield.Misty Rainforest.Subtypes = Forest
+Bot1.Battlefield.Misty Rainforest.Activate(Ability: Search)
+! Bot1.Search(Plains; Yavimaya, Cradle of Growth)
+Bot1.Search(Island)
+
+[Expect]
+Bot1.Battlefield = Yavimaya, Cradle of Growth; Island
+Bot1.Battlefield.Island.Subtypes = Forest; Island
+Bot1.Graveyard = Misty Rainforest
+Bot1.Library.Count = 6
+Bot1.Life = 19

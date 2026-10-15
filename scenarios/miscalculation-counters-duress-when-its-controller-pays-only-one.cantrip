@@ -1,0 +1,33 @@
+# Bot2 keeps a single Mox untapped after casting Duress: {1} is not the {2} Miscalculation asks, so it cannot pay.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Miscalculation
+4 Island
+10 Island
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Duress
+4 Swamp
+10 Swamp
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Duress.Cast(Bot1)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Miscalculation.Cast(Duress)
+Bot1.Pass
+Bot2.Decline
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Miscalculation
+Bot2.Graveyard = Duress

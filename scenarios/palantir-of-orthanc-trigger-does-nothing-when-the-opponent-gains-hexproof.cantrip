@@ -1,0 +1,51 @@
+# Palantír of Orthanc's trigger targets an opponent. Turn 1 it resolves normally (Bot2 lets Bot1 draw; one counter). On
+# turn 3 Bot2 responds to the end-step trigger with Dawn's Truce and gains hexproof: the only target is illegal, so the
+# ability does not resolve at all - no second counter, no scry, no question to Bot2.
+
+[Bot1 Deck]
+Island
+Sol Ring
+Mox Pearl
+Palantír of Orthanc
+Island x4
+Island x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Dawn's Truce
+Plains x4
+Plains x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Palantír of Orthanc.Cast
+Bot1.Pass
+[Bot1.Main2]
+Bot2.Accept
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.End]
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Dawn's Truce.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Palantír of Orthanc.Counters.Influence = 1
+
+[Expect]
+Turn = 4
+Bot1.Graveyard.Count = 0

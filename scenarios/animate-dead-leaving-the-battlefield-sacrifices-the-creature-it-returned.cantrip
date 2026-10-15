@@ -1,0 +1,48 @@
+# Animate Dead: "When this Aura leaves the battlefield, that creature's controller sacrifices it." Bot1 kills its own
+# Ornithopter with Cut Down and brings it back with Animate Dead on turn 1 (a 0/2 that is a -1/2 under the Aura); on turn 2
+# Bot2 Disenchants the Aura. The Aura leaving is what sacrifices the Ornithopter, so it goes to its owner's graveyard
+# (CR 701.21a, 603.6c). The Ornithopter stays on the battlefield until then - nothing else removes it.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Pearl
+Ornithopter
+Cut Down
+Animate Dead
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Disenchant
+Plains x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cut Down.Cast(Ornithopter)
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Animate Dead.Cast(Bot1.Graveyard.Ornithopter)
+Bot1.Pass
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Ornithopter.Power = -1
+? Bot1.Battlefield.Ornithopter.Toughness = 2
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Animate Dead)
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Swamp; Mox Jet; Mox Pearl
+Bot1.Graveyard = Ornithopter; Animate Dead; Cut Down
+Bot2.Graveyard = Disenchant

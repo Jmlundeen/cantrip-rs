@@ -1,0 +1,43 @@
+# Three players: "damage equal to its power to each opponent" hits both of Bot1's opponents (CR 102.2 - each opponent), not
+# just the one it attacked. On turn 1 Black Lotus pays for Gau and Faithless Looting and a Mountain for Sol Ring. On turn 4 Gau
+# attacks Bot2 (putting on a counter, a 3/3: 3 combat damage) and in the second main phase Looting is flashed back from the
+# graveyard with Sol Ring and a Mountain, so a card left Bot1's graveyard this turn and at the end step Gau deals 3 to
+# Bot2 and 3 to Bot3.
+
+[Bot1 Deck]
+Mountain
+Sol Ring
+Black Lotus
+Gau, Feral Youth
+Faithless Looting
+Mountain
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Gau, Feral Youth.Cast
+Bot1.Hand.Faithless Looting.Cast
+[T4 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+? Bot3.Life = 20
+Bot1.Attack(Gau, Feral Youth > Bot2)
+[T4 Bot1.Main2]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Graveyard.Faithless Looting.Cast(Ability: Flashback)
+[T5 Bot2.Upkeep]
+
+[Expect]
+Bot2.Life = 14
+Bot3.Life = 17

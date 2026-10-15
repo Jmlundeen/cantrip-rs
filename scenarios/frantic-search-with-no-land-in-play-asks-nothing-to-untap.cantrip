@@ -1,0 +1,35 @@
+# Frantic Search: "Untap up to three lands." Bot1 pays with three moxen and no land is on the battlefield (Bot2 has none
+# either): after the draw and discard nothing is asked and the spell is done. Bot1 discards two Islands.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Frantic Search
+Island x3
+Island x3
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Frantic Search.Cast
+Bot1.Choose(Island; Island)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Hand.Count = 3
+Bot1.Graveyard = Frantic Search; Island; Island

@@ -1,0 +1,41 @@
+# The effect is global: Bot2's Painter's Servant (black) makes Bot1's colorless Walking Ballista a black creature spell, so Bot1's Bontu's Monument discounts it. Bot1 builds the Monument on turn 1,
+# Bot2 casts the Servant on turn 2, and on turn 3 Bot1 casts the Ballista (X = 1, {1}{1}) paying a single mana.
+
+[Bot1 Deck]
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Bontu's Monument
+Walking Ballista
+Plains x15
+
+[Bot2 Deck]
+Mox Pearl
+Mox Ruby
+Painter's Servant
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Bontu's Monument.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Painter's Servant.Cast
+Bot2.Colors(Black)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Walking Ballista.Cast(X: 1)
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 1

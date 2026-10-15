@@ -1,0 +1,24 @@
+# Arid Mesa: {T}, pay 1 life, sacrifice it: search for a Mountain or Plains and put it onto the battlefield.
+
+[Bot1 Deck]
+Arid Mesa
+Forest x6
+Plains x2
+Mountain x2
+Forest x3
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Arid Mesa.Play
+Bot1.Battlefield.Arid Mesa.Activate
+Bot1.Search(Mountain)
+
+[Expect]
+Turn = 1
+Bot1.Life = 19
+Bot1.Graveyard = Arid Mesa
+Bot1.Battlefield = Mountain
+Bot1.Battlefield.Mountain.Tapped = false
+Bot1.Library.Count = 6

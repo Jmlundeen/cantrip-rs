@@ -1,0 +1,51 @@
+# Esika's Chariot: "create a token that's a copy of target token you control". Both players cast a Chariot off four Moxen
+# (Bot1 on turn 1, Bot2 on turn 2), so each controls two Cats. On turn 3 Bot1's Cats crew its Chariot and it attacks:
+# the trigger's target question refuses Bot2's Cats (tokens, but not Bot1's) and takes one of Bot1's own (tapped from
+# crewing, still a token it controls), so Bot1 ends with three Cats.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Mox Emerald
+Esika's Chariot
+Forest x12
+
+[Bot2 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Mox Emerald
+Esika's Chariot
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Esika's Chariot.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Esika's Chariot.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Esika's Chariot.Activate(Ability: Crew)
+Bot1.Attack(Esika's Chariot > Bot2)
+! Bot1.Target(Bot2.Battlefield.Cat)
+Bot1.Target(Bot1.Battlefield.Cat)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Cat#3.Power = 2
+Bot2.Battlefield.Cat#2.Power = 2
+Bot2.Life = 16

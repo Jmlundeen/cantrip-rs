@@ -1,0 +1,46 @@
+# Bot1 resolves Hexing Squelcher, then casts Lightning Bolt at Bot2. Bot2 taps two Islands for Counterspell, which
+# resolves and does nothing: "Spells you control can't be countered" reaches Bolt on the stack, not just permanents.
+# The Bolt then resolves for 3.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Mountain
+Hexing Squelcher
+Lightning Bolt
+Mountain
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Island
+Island
+Counterspell
+Island x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Hexing Squelcher.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Stack = Lightning Bolt
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Counterspell.Cast(Lightning Bolt)
+? Stack = Counterspell; Lightning Bolt
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot2.Life = 17
+Bot1.Graveyard = Lightning Bolt
+Bot2.Graveyard = Counterspell

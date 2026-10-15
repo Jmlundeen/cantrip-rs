@@ -1,0 +1,32 @@
+# "Target noncreature spell": Bot2's Elvish Mystic cannot be the target (refusal beside the Duress that can, which Bot1
+# counters unless Bot2 pays {1}: Bot2 has no mana left and Duress is countered).
+
+[Bot1 Deck]
+Island
+Stubborn Denial
+Island x14
+
+[Bot2 Deck]
+Swamp
+Mox Emerald
+Elvish Mystic
+Duress
+Swamp x12
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+! Bot1.Hand.Stubborn Denial.Cast(Elvish Mystic)
+Bot1.Pass
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Duress.Cast(Bot1)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Stubborn Denial.Cast(Duress)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot2.Graveyard = Duress

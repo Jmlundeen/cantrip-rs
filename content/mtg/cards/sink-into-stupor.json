@@ -1,0 +1,12 @@
+{
+  "name": "Sink into Stupor",
+  "manaCost": "{1}{U}{U}",
+  "type": "Instant",
+  "oracleText": "Return target spell or nonland permanent an opponent controls to its owner's hand.",
+  "backFacePlayableAsLand": true,
+  "backFace": {
+    "name": "Soporific Springs",
+    "type": "Land",
+    "oracleText": "As this land enters, you may pay 3 life. If you don't, it enters tapped.\n{T}: Add {U}."
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "Immoral Bargain",
+  "manaCost": "{1}{B}{G}",
+  "type": "Sorcery",
+  "oracleText": "As an additional cost to cast this spell, sacrifice X creatures.\nDestroy X target nonland permanents."
+}

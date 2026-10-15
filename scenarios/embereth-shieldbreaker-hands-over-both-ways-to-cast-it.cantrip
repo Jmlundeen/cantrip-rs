@@ -1,0 +1,35 @@
+# Embereth Shieldbreaker // Battle Display in hand on turn 3, with two untapped Mountains and Bot2's Sol Ring to
+# point an Adventure at. The handover stops on Bot1's priority with both ways to cast the card on offer (CR 715.3):
+# the creature for {1}{R}, and the Adventure for {R}. Pictures the action menu, where the Adventure reads as the
+# spell it casts — "Cast Battle Display" — rather than as the card it is printed on.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Embereth Shieldbreaker
+Mountain x12
+
+[Bot2 Deck]
+Mountain
+Sol Ring
+Mountain x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[Handover Bot1.Pass]
+
+[Expect]
+Turn = 3
+Step = Main1
+PriorityPlayer = Bot1
+Stack.Count = 0
+Bot1.Battlefield = Mountain; Mountain
+Bot1.Battlefield.Mountain#1.Tapped = false
+Bot1.Battlefield.Mountain#2.Tapped = false
+Bot1.Hand = Embereth Shieldbreaker; Mountain; Mountain; Mountain; Mountain; Mountain
+Bot2.Battlefield = Mountain; Sol Ring

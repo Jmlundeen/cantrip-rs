@@ -1,0 +1,5 @@
+{
+  "name": "Sunken Ruins",
+  "type": "Land",
+  "oracleText": "{T}: Add {C}.\n{U/B}, {T}: Add {U}{U}, {U}{B}, or {B}{B}."
+}

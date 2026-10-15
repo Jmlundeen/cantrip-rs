@@ -1,0 +1,40 @@
+# "Any target" includes a planeswalker (CR 115.1, 120.3c): Firebolt's 2 damage to Bot2's Elspeth, Storm Slayer, at 6 after
+# her +1, removes two loyalty counters and leaves her at 4. Her token doubling makes two Soldiers, untouched.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Firebolt
+Mountain x4
+Mountain x10
+
+[Bot2 Deck]
+Black Lotus
+Mox Pearl
+Mox Jet
+Elspeth, Storm Slayer
+Plains x3
+Plains x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Elspeth, Storm Slayer.Cast
+Bot2.Battlefield.Elspeth, Storm Slayer.Activate(Ability: #1)
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Firebolt.Cast(Elspeth, Storm Slayer)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Elspeth, Storm Slayer.Counters.Loyalty = 4
+Bot1.Graveyard = Firebolt
+Bot2.Life = 20

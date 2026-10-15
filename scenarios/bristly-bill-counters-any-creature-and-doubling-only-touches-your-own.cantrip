@@ -1,0 +1,62 @@
+# Landfall targets any creature and only counts lands Bot1 controls. Bot2's land entering on turn 2 puts nothing on Bill (checked before Bot1's first land). Bot1's lands on turns 3, 5 and 7 put counters on Bill, on
+# its own Ornithopter and on Bot2's Llanowar Elves. On turn 7 {3}{G}{G} then doubles the +1/+1 counters on each creature Bot1 controls: Bill 1 to 2 and the Ornithopter 1 to 2, while Bot2's Elves keeps
+# its single counter and Haywire Mite, which has none, stays at none.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Bristly Bill, Spine Sower
+Ornithopter
+Haywire Mite
+Forest
+Forest
+Forest
+Forest
+Plains x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x15
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Bristly Bill, Spine Sower.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Haywire Mite.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Bristly Bill, Spine Sower.Counters.PlusOnePlusOne = (absent)
+Bot1.Hand.Forest.Play
+Bot1.Target(Bristly Bill, Spine Sower)
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Target(Ornithopter)
+Bot1.Pass
+[T7 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Forest#3.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Bristly Bill, Spine Sower.Activate
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Bristly Bill, Spine Sower.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 2
+Bot2.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Haywire Mite.Counters.PlusOnePlusOne = (absent)

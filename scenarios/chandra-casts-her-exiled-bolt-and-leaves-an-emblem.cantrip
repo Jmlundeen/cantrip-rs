@@ -1,0 +1,58 @@
+# Bot1 casts Chandra, Torch of Defiance on turn one and her first +1 exiles the Lightning Bolt on top of its library;
+# Bot1 casts it at Bot2 (the +1 itself targets nothing), paid with a Mox Ruby, so Chandra deals no damage herself. Two more +1s add {R}{R} each, and on
+# turn seven her −7 takes her last loyalty: she is gone before it resolves, and Bot1 still gets the emblem. The Bolt
+# Bot1 then casts triggers it from the command zone, 5 damage at Bot2 before the Bolt's own 3. The game stops in the
+# second main phase with Bot1 to act, the emblem beside its graveyard.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mox Ruby
+Chandra, Torch of Defiance
+Island
+Island
+Island
+Lightning Bolt
+Island
+Island
+Lightning Bolt
+Island x5
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Chandra, Torch of Defiance.Cast
+Bot1.Battlefield.Chandra, Torch of Defiance.Activate(Ability: Exile the top)
+Bot1.Accept
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Mox Ruby.Activate
+[T3 Bot1.Main1]
+? Bot2.Life = 17
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Chandra, Torch of Defiance.Activate(Ability: Add)
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Chandra, Torch of Defiance.Activate(Ability: Add)
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Chandra, Torch of Defiance.Activate(Ability: emblem)
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Target(Bot2)
+[T7 Bot1.Main2]
+[Handover Bot1.Pass]
+
+[Expect]
+Turn = 7
+Step = Main2
+Bot2.Life = 9
+Bot1.Emblems.Count = 1
+Bot1.Graveyard = Lightning Bolt; Chandra, Torch of Defiance; Lightning Bolt; Black Lotus
+Exile.Count = 0

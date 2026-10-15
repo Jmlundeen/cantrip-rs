@@ -1,0 +1,33 @@
+# Coalition Relic tapped for a charge counter on turn 5 and handed over on turn 7 at the question its main phase
+# trigger asks: the counter is already off and Bot1 is choosing the color the mana comes back as. For picturing that
+# dock in a real game.
+
+[Bot1 Deck]
+Island
+Island
+Island
+Coalition Relic
+Island x13
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Island#3.Activate
+Bot1.Hand.Coalition Relic.Cast
+Bot1.Battlefield.Coalition Relic.Activate(Ability: charge counter)
+[Handover Bot1.Colors]
+
+[Expect]
+Turn = 7
+Step = Main1
+Bot1.Battlefield = Island; Island; Island; Coalition Relic
+# Untapped again by its own untap step, so it can store another counter once this is answered.
+Bot1.Battlefield.Coalition Relic.Tapped = false

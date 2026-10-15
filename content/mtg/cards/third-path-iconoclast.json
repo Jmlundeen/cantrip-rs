@@ -1,0 +1,8 @@
+{
+  "name": "Third Path Iconoclast",
+  "manaCost": "{U}{R}",
+  "type": "Creature — Human Monk",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "Whenever you cast a noncreature spell, create a 1/1 colorless Soldier artifact creature token."
+}

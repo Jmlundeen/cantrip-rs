@@ -1,0 +1,35 @@
+# Organ Harvest: "Your team may sacrifice any number of creatures. For each creature sacrificed this way, you add {B}{B}."
+# Bot1 controls Llanowar Elves and Ornithopter and sacrifices only the Elves: two black mana, and the Ornithopter stays.
+
+[Bot1 Deck]
+Swamp
+Mox Emerald
+Llanowar Elves
+Ornithopter
+Organ Harvest
+Swamp x2
+Swamp x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Organ Harvest.Cast
+Bot1.Pass
+Bot1.Choose(Llanowar Elves)
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Mana = {B}{B}
+Bot1.Graveyard = Organ Harvest; Llanowar Elves
+Bot1.Battlefield.Ornithopter.Types = Artifact; Creature

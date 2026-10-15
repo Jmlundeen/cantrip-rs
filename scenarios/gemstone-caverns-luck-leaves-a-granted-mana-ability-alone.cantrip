@@ -1,0 +1,51 @@
+# Gemstone Caverns' luck counter changes only its own printed "{T}: Add {C}" (CR 605.1a): the "instead" is part of
+# that one ability's text. A mana ability the land has been granted keeps adding what it says (CR 613.1f), so after
+# Rain of Filth the Caverns' "Sacrifice this land: Add {B}" still adds black, not a color of the player's choice.
+#
+# Bot2 is not the starting player, so the Caverns begins the game on the battlefield with a luck counter (the two
+# lines before any turn's). On its first turn Bot2 plays a Swamp for Rain of Filth, taps the lucky Caverns for red,
+# then sacrifices it for black. The sacrifice line names no color: were the grant rewritten to "any color", the
+# prompt would ask one and the default answer would not be black.
+#
+# Rain of Filth always takes the later layer-6 timestamp here (the Caverns has been out since before turn one), so
+# this is the order an every-ability rewrite happened to get right; PrintedManaAbilityRewriteGrantTests puts a
+# test-local granter first, the order that one got wrong.
+
+[Bot1 Deck]
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Gemstone Caverns
+Rain of Filth
+Swamp
+Plains
+Plains
+Plains
+Plains
+Plains x10
+
+[Actions]
+Bot2.Accept
+Bot2.Choose(Plains)
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Rain of Filth.Cast
+Bot2.Pass
+Bot1.Pass
+# The printed ability, still lucky: one mana of any color.
+Bot2.Battlefield.Gemstone Caverns.Activate(Ability: {T}; Color: Red)
+# The granted ability, untouched by the luck counter: black.
+Bot2.Battlefield.Gemstone Caverns.Activate(Ability: Sacrifice)
+[Handover Bot2.Pass]
+
+[Expect]
+Bot2.Graveyard = Gemstone Caverns; Rain of Filth
+Bot2.Mana = {B}{R}
+Exile = Plains

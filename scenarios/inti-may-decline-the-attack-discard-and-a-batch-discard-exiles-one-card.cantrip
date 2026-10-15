@@ -1,0 +1,42 @@
+# Inti, Seneschal of the Sun: the attack discard is a "may". Turn 3: Bot1 attacks and chooses no card, so there is no counter
+# and no exiled card (Inti stays a 2/2, Bot2 takes 2). Turn 5: Faithless Looting makes Bot1 discard two cards together,
+# which is one "whenever you discard one or more cards" (CR 603.2c): exactly one card is exiled from the top of the library.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Inti, Seneschal of the Sun
+Faithless Looting
+Mountain
+Mountain
+Mountain
+Mountain x3
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Inti, Seneschal of the Sun.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Inti, Seneschal of the Sun > Bot2)
+Bot1.Choose()
+[T3 Bot1.Main2]
+? Bot2.Life = 18
+? Exile.Count = 0
+? Bot1.Battlefield.Inti, Seneschal of the Sun.Power = 2
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Mountain; Mountain)
+[T5 Bot1.Main2]
+
+[Expect]
+Exile.Count = 1
+Bot1.Graveyard.Count = 3

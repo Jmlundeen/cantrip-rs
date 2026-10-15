@@ -1,0 +1,30 @@
+# Channel works only from the hand (an ability that works from the hand only): played as a land, Otawara taps for {U} but
+# its bounce is refused even with four Moxen untapped and a target available (Bot2's Ornithopter). The control is
+# otawara-channel-at-full-price-bounces-an-opposing-creature-but-never-a-land.
+
+[Bot1 Deck]
+Otawara, Soaring City
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Mox Ruby
+Island x15
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Otawara, Soaring City.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Otawara, Soaring City.Activate(Ability: Channel)
+Bot1.Battlefield.Otawara, Soaring City.Activate(Ability: Add)
+
+[Expect]
+Bot1.Mana = {U}
+Bot2.Battlefield = Ornithopter

@@ -1,0 +1,41 @@
+# Teferi, Time Raveler's +1: "Until your next turn, you may cast sorcery spells as though they had flash." Bot1 casts
+# Teferi off a Tundra and two Moxen and uses the +1 at once. On Bot2's upkeep (turn 2), where Duress's own sorcery
+# timing is out of reach (CR 307.1), Bot1 casts Duress off Mox Jet and it resolves, taking Bot2's Lightning Bolt.
+# A cast line matches only when the prompt offers it, so the Duress line itself proves the permission.
+
+[Bot1 Deck]
+Tundra
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Teferi, Time Raveler
+Duress
+Island
+Island x10
+
+[Bot2 Deck]
+Lightning Bolt
+Mountain x20
+
+[Actions]
+Bot1.Hand.Tundra.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Teferi, Time Raveler.Cast
+Bot1.Battlefield.Tundra.Activate(Ability: {U})
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Teferi, Time Raveler.Activate(Ability: +1)
+[T2 Bot2.Upkeep]
+Bot1.Hand.Duress.Cast(Bot2)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Choose(Lightning Bolt)
+
+[Expect]
+Turn = 2
+Step = Upkeep
+Stack.Count = 0
+Bot1.Graveyard = Duress
+Bot2.Graveyard = Lightning Bolt
+Bot1.Battlefield.Teferi, Time Raveler.Counters.Loyalty = 5

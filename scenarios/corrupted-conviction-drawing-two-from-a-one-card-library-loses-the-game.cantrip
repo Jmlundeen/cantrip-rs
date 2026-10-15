@@ -1,0 +1,21 @@
+# "Draw two cards" from a library of one card: the first card is drawn and the second draw from an empty library makes Bot1 lose when state-based actions are next checked (CR 704.5b, 121.4).
+
+[Bot1 Deck]
+Mox Jet
+Ornithopter
+Corrupted Conviction
+Island x4
+Island
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Corrupted Conviction.Cast
+
+[Expect]
+Result = Bot2 won
+Bot1.Hand.Count = 5

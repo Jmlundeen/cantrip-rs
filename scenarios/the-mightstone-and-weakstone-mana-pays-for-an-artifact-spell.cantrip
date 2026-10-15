@@ -1,0 +1,41 @@
+# On turn 5 Bot1 casts The Mightstone and Weakstone with three Forests and Sol Ring, takes its draw-two mode, then taps it for {C}{C}
+# and casts Mind Stone with that mana: it can be spent on an artifact spell. (No creature is in play, so the trigger has one mode and is not asked.)
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Forest
+Forest
+The Mightstone and Weakstone
+Mind Stone
+Badgermole Cub
+Forest x12
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.The Mightstone and Weakstone.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.The Mightstone and Weakstone.Activate
+Bot1.Hand.Mind Stone.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield = Forest; Forest; Forest; Sol Ring; The Mightstone and Weakstone; Mind Stone
+Bot1.Battlefield.The Mightstone and Weakstone.Tapped = true

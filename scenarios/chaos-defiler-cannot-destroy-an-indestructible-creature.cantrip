@@ -1,0 +1,41 @@
+# Bot2's only nonland permanent is Arwen, Mortal Queen (cast on turn 6 from a Plains and two Forests), which entered with an
+# indestructible counter. Battle Cannon chooses it (a lone candidate, unasked) and "destroy" does nothing to an
+# indestructible permanent (CR 702.12b): Arwen stays on the battlefield and nothing goes to Bot2's graveyard.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Chaos Defiler
+Swamp x16
+
+[Bot2 Deck]
+Plains
+Forest
+Forest
+Arwen, Mortal Queen
+Plains x14
+
+[Actions]
+Bot2.Hand.Forest.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Forest#2.Activate
+Bot2.Hand.Arwen, Mortal Queen.Cast
+[T7 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Chaos Defiler.Cast
+[T7 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Arwen, Mortal Queen.Counters.Indestructible = 1
+Bot2.Graveyard.Count = 0

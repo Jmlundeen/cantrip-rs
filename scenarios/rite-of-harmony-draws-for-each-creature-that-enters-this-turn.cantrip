@@ -1,0 +1,28 @@
+# Rite of Harmony: "whenever a creature or enchantment you control enters this turn, draw a card" (CR 603.7b). Bot1 casts
+# it off two Moxen, then casts an Elvish Mystic: one card is drawn. The Rite itself is in the graveyard.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Rite of Harmony
+Forest
+Elvish Mystic
+Forest x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Rite of Harmony.Cast
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Elvish Mystic.Cast
+
+[Expect]
+Bot1.Graveyard = Rite of Harmony
+Bot1.Hand.Count = 3
+Bot1.Battlefield.Count = 4

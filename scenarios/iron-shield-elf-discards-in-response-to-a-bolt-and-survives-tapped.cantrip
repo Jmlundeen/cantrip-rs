@@ -1,0 +1,37 @@
+# Iron-Shield Elf: Lightning Bolt is aimed at the 3/1 Elf, and Bot1 responds by discarding a card (a cost). The Elf
+# gains indestructible until end of turn and becomes tapped; lethal damage then does not destroy it (CR 702.12b).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Iron-Shield Elf
+Island x13
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x13
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Iron-Shield Elf.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Iron-Shield Elf)
+Bot1.Battlefield.Iron-Shield Elf.Activate
+Bot1.Choose(Island)
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot2.Graveyard = Lightning Bolt
+Bot1.Graveyard = Island
+Bot1.Battlefield.Iron-Shield Elf.Tapped = true
+Bot1.Battlefield.Iron-Shield Elf.Damage = 3
+Bot1.Battlefield.Iron-Shield Elf.Keywords = Indestructible

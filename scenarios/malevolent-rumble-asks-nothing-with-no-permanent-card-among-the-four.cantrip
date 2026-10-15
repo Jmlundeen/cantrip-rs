@@ -1,0 +1,38 @@
+# Malevolent Rumble: with no permanent card among the four revealed -- Lightning Bolt, Ponder, Brainstorm, Counterspell,
+# all instants and sorceries -- there is nothing to put into hand and nothing is asked: they all go to the graveyard and
+# the Eldrazi Spawn is made.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Malevolent Rumble
+Island
+Island
+Island
+Island
+Lightning Bolt
+Ponder
+Brainstorm
+Counterspell
+Island x6
+
+[Bot2 Deck]
+Swamp x14
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Malevolent Rumble.Cast
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard.Count = 5
+Bot1.Hand.Count = 4
+Bot1.Battlefield.Eldrazi Spawn.Power = 0
+Bot1.Library.Count = 6

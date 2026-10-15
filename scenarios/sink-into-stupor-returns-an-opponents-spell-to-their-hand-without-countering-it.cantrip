@@ -1,0 +1,30 @@
+# Sink into Stupor returns target spell an opponent controls to its owner's hand (CR 400.3): Bot2's Lightning Bolt
+# leaves the stack unresolved and is back in Bot2's hand, not in its graveyard, so Bot1 keeps its 20 life. Black Lotus,
+# cast on turn 1, pays for it in response.
+
+[Bot1 Deck]
+Black Lotus
+Sink into Stupor
+Island x5
+Island x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x5
+Mountain x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Sink into Stupor.Cast(Stack.Lightning Bolt)
+[T3 Bot1.Upkeep]
+
+[Expect]
+Bot1.Life = 20
+Stack.Count = 0
+Bot2.Graveyard.Count = 0
+Bot1.Graveyard.Count = 2

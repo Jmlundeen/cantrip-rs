@@ -1,0 +1,29 @@
+# Time Vault enters tapped and doesn't untap. When Bot1's turn would begin with it tapped, Bot1 may skip that turn
+# instead (CR 614.10) and untap it: the turn is not taken, so Bot2's turn is turn 3 and Bot1's next is turn 4. There
+# {T}: take an extra turn after this one, which is turn 5 for Bot1 again; the Vault is tapped and its offer declined.
+[Bot1 Deck]
+Island x2
+Time Vault
+Mox Jet
+Island x3
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Time Vault.Cast
+Bot1.Accept
+[T3 Bot2.Main1]
+? Turn = 3
+? Bot1.Battlefield.Time Vault.Tapped = false
+[T4 Bot1.Main1]
+Bot1.Battlefield.Time Vault.Activate
+Bot1.Decline
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Time Vault.Tapped = true
+[Expect]
+Turn = 5
+ActivePlayer = Bot1

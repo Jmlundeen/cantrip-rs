@@ -1,0 +1,43 @@
+# Endurance has reach and the enters trigger's player target is "up to one": Bot1 chooses none (Target()). Bot2's Ornithopter
+# flies in on turn 4; the Llanowar Elves cannot block it (! Block), the Endurance can (reach), and takes no damage from a
+# 0-power attacker. Bot1's graveyard is not touched when no player is chosen.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Emerald
+Mox Ruby
+Llanowar Elves
+Endurance
+Lightning Bolt
+Forest x14
+
+[Bot2 Deck]
+Ornithopter
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Endurance.Cast
+Bot1.Pass
+Bot1.Target()
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Attack(Ornithopter > Bot1)
+! Bot1.Block(Llanowar Elves > Ornithopter)
+Bot1.Block(Endurance > Ornithopter)
+[T4 Bot2.Main2]
+
+[Expect]
+Combat.Blocks.Count = 0
+Bot1.Life = 20
+Bot1.Battlefield.Endurance.Damage = 0

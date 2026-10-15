@@ -1,0 +1,43 @@
+# Galvanic Discharge's energy is part of its resolution: Bot2 responds with Snakeskin Veil on the Llanowar Elves, giving it
+# hexproof, so the Discharge's only target is illegal on resolution (CR 608.2b) and the spell does nothing at all - Bot1
+# gets no {E}{E}{E} and is asked nothing (! Accept).
+
+[Bot1 Deck]
+Mountain
+Mountain
+Galvanic Discharge
+Mountain x4
+Mountain x14
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Snakeskin Veil
+Forest x5
+Forest x13
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Galvanic Discharge.Cast(Llanowar Elves)
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Snakeskin Veil.Cast(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Accept
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Energy = 0
+Bot2.Battlefield.Llanowar Elves.Keywords = Hexproof
+Bot2.Battlefield.Llanowar Elves.Damage = 0
+Bot1.Graveyard = Galvanic Discharge

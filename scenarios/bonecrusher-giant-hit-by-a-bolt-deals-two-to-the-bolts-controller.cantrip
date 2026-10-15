@@ -1,0 +1,42 @@
+# Bonecrusher Giant: "Whenever this creature becomes the target of a spell, this creature deals 2 damage to that spell's
+# controller." Bot1 has the Giant out on turn 5; on turn 6 Bot2 casts Lightning Bolt at it. The Giant's trigger resolves
+# before the Bolt (and would even if the Bolt were countered), so Bot2 is at 18 as the Bolt kills the Giant.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Mountain
+Bonecrusher Giant
+Mountain x12
+
+[Bot2 Deck]
+Mountain
+Mountain
+Mountain
+Lightning Bolt
+Mountain x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Hand.Bonecrusher Giant.Cast
+[T6 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Bonecrusher Giant)
+? Bot2.Life = 20
+[T6 Bot2.Main2]
+? Bot2.Life = 18
+
+[Expect]
+Bot2.Life = 18
+Bot1.Life = 20
+Bot1.Graveyard = Bonecrusher Giant

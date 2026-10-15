@@ -1,0 +1,68 @@
+# A 4/3 is gang-blocked by a 1/1 and a 1/4, and the 1/4 is burned for 3 before damage is divided, so it comes into
+# the division already carrying damage (CR 120.3: damage is compared against toughness, not subtracted from it).
+#
+# The position a player actually has to read: how much is marked on each blocker is what decides whether the next
+# point kills it, so the damage-assignment screen has to show the share being set and the damage already there at
+# the same time. Handed over with the division unanswered, so the screen can be looked at and worked.
+
+[Bot1 Deck]
+Forest
+Forest
+Forest
+Forest
+Mountain
+Vengevine
+Lightning Bolt
+Forest x10
+
+[Bot2 Deck]
+Forest
+Forest
+Forest
+Llanowar Elves
+Fanatic of Rhonas
+Forest
+Forest
+Forest x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot1.Hand.Forest.Play
+Bot2.Hand.Forest.Play
+Bot1.Hand.Forest.Play
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest#1.Activate
+Bot2.Battlefield.Forest#2.Activate
+Bot2.Hand.Fanatic of Rhonas.Cast
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Vengevine.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Attack(Vengevine)
+Bot2.Block(Llanowar Elves > Vengevine; Fanatic of Rhonas > Vengevine)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Fanatic of Rhonas)
+[Handover Bot1.AssignDamage]
+
+[Expect]
+Step = Damage
+ActivePlayer = Bot1
+Combat.Attackers = Vengevine > Bot2
+Combat.Blocks = Fanatic of Rhonas > Vengevine; Llanowar Elves > Vengevine
+# The burn is already marked, and a 1/4 with 3 on it is still alive: one more point kills it, which is the whole
+# reason the number has to be on the card while the share beside it is being set.
+Bot2.Battlefield.Fanatic of Rhonas.Damage = 3
+Bot2.Battlefield.Fanatic of Rhonas.Toughness = 4
+Bot2.Battlefield.Llanowar Elves.Damage = 0
+Bot2.Battlefield.Llanowar Elves.Toughness = 1
+# Combat damage has not been dealt: the division is the outstanding question, not one already answered.
+Bot1.Battlefield.Vengevine.Damage = 0
+Bot1.Battlefield.Vengevine.Power = 4
+Bot2.Life = 20
+Bot1.Graveyard = Lightning Bolt

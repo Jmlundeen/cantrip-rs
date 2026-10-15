@@ -1,0 +1,40 @@
+# Bristly Bill: each land you play puts a +1/+1 counter on a creature (landfall), and {3}{G}{G} doubles the +1/+1
+# counters on your creatures: two landfalls give 2 counters, doubled to 4, so Bill is a 6/6.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Mox Jet
+Bristly Bill, Spine Sower
+Forest
+Forest
+Plains x13
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Bristly Bill, Spine Sower.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Bristly Bill, Spine Sower.Activate
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Bristly Bill, Spine Sower.Counters.PlusOnePlusOne = 4
+Bot1.Battlefield.Bristly Bill, Spine Sower.Power = 6

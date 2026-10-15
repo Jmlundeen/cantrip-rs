@@ -1,0 +1,28 @@
+# Bot2 taps its only mana source for the Bolt, so it has nothing to pay the {1} with: it can only decline, and the Bolt
+# is countered.
+
+[Bot1 Deck]
+Plains
+Mana Tithe
+Plains x20
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Mana Tithe.Cast(Lightning Bolt)
+Bot1.Pass
+Bot2.Decline
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Graveyard = Lightning Bolt

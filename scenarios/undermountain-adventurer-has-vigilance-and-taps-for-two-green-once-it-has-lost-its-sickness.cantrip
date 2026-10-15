@@ -1,0 +1,41 @@
+# The turn it enters the Adventurer cannot be tapped for mana (refusal); on turn 3 it attacks with vigilance and stays untapped,
+# is then tapped for {G}{G}, and it took the initiative when it entered.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Ruby
+Mox Pearl
+Undermountain Adventurer
+Island x2
+Island x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Undermountain Adventurer.Cast
+Bot1.Pass
+Bot1.Search()
+! Bot1.Battlefield.Undermountain Adventurer.Activate
+[T3 Bot1.Upkeep]
+Bot1.Modes(Forge)
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Undermountain Adventurer > Bot2)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Undermountain Adventurer.Tapped = false
+Bot1.Battlefield.Undermountain Adventurer.Activate
+
+[Expect]
+Initiative = Bot1
+Bot1.Mana = {G}{G}
+Bot2.Life = 15
+Bot1.Battlefield.Undermountain Adventurer.Tapped = true

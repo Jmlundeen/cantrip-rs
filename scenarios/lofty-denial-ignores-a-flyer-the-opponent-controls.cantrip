@@ -1,0 +1,40 @@
+# Only a creature with flying that its caster controls raises the price. Bot2 controls an Ornithopter and Bot1 does not, so Lofty Denial
+# asks Bot2 for {1}, which it pays with a second Mox Sapphire.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Lofty Denial
+Island x4
+Island x14
+
+[Bot2 Deck]
+Ornithopter
+Mox Sapphire
+Mox Sapphire
+Ancestral Recall
+Island x3
+Island x14
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Ancestral Recall.Cast(Bot2)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Lofty Denial.Cast(Ancestral Recall)
+Bot2.Pass
+Bot2.Battlefield.Mox Sapphire#2.Activate
+Bot2.PayCost
+[Bot2.Main2]
+
+[Expect]
+Bot2.Graveyard = Ancestral Recall
+Stack.Count = 0
+Bot2.Hand.Count = 7

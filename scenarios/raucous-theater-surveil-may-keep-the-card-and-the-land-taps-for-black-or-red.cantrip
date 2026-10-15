@@ -1,0 +1,27 @@
+# Surveil 1 on entering (CR 701.46a) is a choice: this time Bot1 leaves the Mountain on top (the graveyard scenario beside
+# this one puts it away), and draws it on turn 3. The Theater is a Swamp Mountain that entered tapped (CR 614.1c), so its
+# mana abilities are refused on turn 1; from turn 3 it adds {B} and on turn 5 {R}, one mana of one color each time.
+
+[Bot1 Deck]
+Raucous Theater
+Island x6
+Mountain
+Island x9
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Raucous Theater.Play
+Bot1.Arrange(Mountain)
+! Bot1.Battlefield.Raucous Theater.Activate(Ability: {B})
+[T3 Bot1.Main1]
+Bot1.Battlefield.Raucous Theater.Activate(Ability: {B})
+? Bot1.Mana = {B}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Raucous Theater.Activate(Ability: {R})
+? Bot1.Mana = {R}
+
+[Expect]
+Bot1.Graveyard.Count = 0
+Bot1.Hand.Count = 8

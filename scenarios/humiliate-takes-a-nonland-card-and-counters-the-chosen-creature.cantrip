@@ -1,0 +1,32 @@
+# Humiliate: Bot2 reveals a hand of Lightning Bolt and Islands, Bot1 takes the Bolt (a nonland card), and a +1/+1
+# counter goes on Bot1's lone creature, chosen on resolution without asking (not targeted).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Humiliate
+Ornithopter
+Island x3
+Island x10
+
+[Bot2 Deck]
+Lightning Bolt
+Island x6
+Island x9
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Humiliate.Cast(Bot2)
+Bot1.Choose(Lightning Bolt)
+
+[Expect]
+Stack.Count = 0
+Bot2.Graveyard = Lightning Bolt
+Bot2.Hand.Count = 6
+Bot1.Graveyard = Humiliate
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter.Power = 1

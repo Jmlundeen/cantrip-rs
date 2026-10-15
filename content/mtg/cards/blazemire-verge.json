@@ -1,0 +1,5 @@
+{
+  "name": "Blazemire Verge",
+  "type": "Land",
+  "oracleText": "{T}: Add {B}.\n{T}: Add {R}. Activate only if you control a Swamp or a Mountain."
+}

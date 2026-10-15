@@ -1,0 +1,65 @@
+# Bot1 casts Emberwilde Captain on turn 3 (becoming the monarch) and Oko, Thief of Crowns on turn 5. On turn 6 Bot2
+# attacks only Oko with an Elvish Mystic: that attacks a planeswalker, not Bot1 (CR 506.2), so the second ability does not
+# trigger and Bot2 keeps all its life. On turn 8 two Elvish Mystics attack, one at Oko and one at Bot1: that is one attack
+# on Bot1 and one trigger (not one per creature), and the Captain deals Bot2 damage equal to the cards in its hand.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Sol Ring
+Forest
+Emberwilde Captain
+Island
+Oko, Thief of Crowns
+Mountain x12
+
+[Bot2 Deck]
+Forest
+Elvish Mystic
+Forest
+Elvish Mystic
+Forest x4
+Forest x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Emberwilde Captain.Cast
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest#1.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Oko, Thief of Crowns.Cast
+Bot1.Pass
+[T6 Bot2.Main1]
+Bot2.Attack(Elvish Mystic > Bot1.Battlefield.Oko, Thief of Crowns)
+[T6 Bot2.Main2]
+? Bot2.Life = 20
+[T8 Bot2.Main1]
+Bot2.Attack(Elvish Mystic > Bot1.Battlefield.Oko, Thief of Crowns; Elvish Mystic#2 > Bot1)
+[T8 Bot2.Main2]
+
+[Expect]
+Monarch = Bot2
+Bot2.Life = 13
+Bot1.Life = 19

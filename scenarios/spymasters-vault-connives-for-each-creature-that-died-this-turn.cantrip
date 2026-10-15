@@ -1,0 +1,42 @@
+# Spymaster's Vault enters untapped because Bot1 controls a Swamp. Lightning Bolt kills Bot2's Llanowar Elves, so
+# {B}, {T}: the Ornithopter connives 1: draw a card, discard the Mox Pearl, and the nonland discard puts a +1/+1 counter
+# on it.
+
+[Bot1 Deck]
+Swamp
+Spymaster's Vault
+Mox Ruby
+Lightning Bolt
+Ornithopter
+Mox Pearl
+Plains
+Plains x13
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x18
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Spymaster's Vault.Play
+? Bot1.Battlefield.Spymaster's Vault.Tapped = false
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Spymaster's Vault.Activate(Ability: connives; Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot1.Choose(Mox Pearl)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Llanowar Elves
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot1.Graveyard = Mox Pearl; Lightning Bolt

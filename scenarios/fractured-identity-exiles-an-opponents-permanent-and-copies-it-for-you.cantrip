@@ -1,0 +1,44 @@
+# Fractured Identity: "Exile target nonland permanent. Each player other than its controller creates a token that's a
+# copy of it." Bot1 targets Bot2's Ornithopter on turn 3: it is exiled, and Bot1 (the only other player) gets a token
+# copy; Bot2 gets nothing.
+
+[Bot1 Deck]
+Fractured Identity
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Island
+Island x11
+
+[Bot2 Deck]
+Ornithopter
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Fractured Identity.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Fractured Identity
+Bot1.Battlefield = Mox Pearl; Mox Sapphire; Mox Jet; Mox Ruby; Mox Emerald; Ornithopter
+Bot2.Battlefield.Count = 0
+Exile = Ornithopter

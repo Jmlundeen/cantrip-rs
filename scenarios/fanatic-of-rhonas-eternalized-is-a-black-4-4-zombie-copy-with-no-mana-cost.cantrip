@@ -1,0 +1,44 @@
+# Eternalize (CR 702.129a): Bot1 discards Fanatic of Rhonas to Faithless Looting on turn 1, then pays {2}{G}{G} and exiles
+# it from the graveyard for a token that is a copy of it, except it is a black 4/4 Zombie with no mana cost (CR 707.9b).
+# The token keeps its other types and its printed abilities, so it is a Snake Druid Zombie that taps for {G}, and a
+# 4/4 now, so its ferocious mana is on offer once it is out. The card itself stays in exile.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Mox Emerald
+Sol Ring
+Faithless Looting
+Fanatic of Rhonas
+Mox Ruby
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Fanatic of Rhonas; Forest)
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Graveyard.Fanatic of Rhonas.Activate(Ability: Eternalize)
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Exile = Fanatic of Rhonas
+Bot1.Graveyard = Faithless Looting; Forest; Black Lotus
+Bot1.Battlefield = Forest; Mox Ruby; Mox Emerald; Sol Ring; Fanatic of Rhonas
+Bot1.Battlefield.Fanatic of Rhonas.Power = 4
+Bot1.Battlefield.Fanatic of Rhonas.Toughness = 4
+Bot1.Battlefield.Fanatic of Rhonas.Types = Creature
+Bot1.Battlefield.Fanatic of Rhonas.Subtypes = Druid; Snake; Zombie

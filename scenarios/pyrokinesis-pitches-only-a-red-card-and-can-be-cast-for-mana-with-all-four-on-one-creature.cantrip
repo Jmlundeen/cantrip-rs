@@ -1,0 +1,41 @@
+# Pyrokinesis: "You may exile a red card from your hand rather than pay this spell's mana cost" (CR 118.9). Bot1's hand
+# holds a blue card, Brainstorm, and no red one: the alternative cost cannot be paid, so that way is refused. The cast for
+# {4}{R}{R} (Black Lotus and three Moxen) is the positive control, and all 4 damage may go to one target (CR 601.2d: "any
+# number of target creatures", one is a number): it kills Bot2's Ornithopter.
+
+[Bot1 Deck]
+Pyrokinesis
+Brainstorm
+Mox Pearl
+Mox Jet
+Mox Ruby
+Black Lotus
+Island
+Island x12
+
+[Bot2 Deck]
+Ornithopter
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+! Bot1.Hand.Pyrokinesis.Cast(Ability: Exile)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Pyrokinesis.Cast
+Bot1.Divide(Ornithopter: 4)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Ornithopter
+Bot1.Graveyard = Pyrokinesis; Black Lotus
+Exile.Count = 0

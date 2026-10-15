@@ -1,0 +1,66 @@
+# "Whenever this creature deals combat damage to a player or planeswalker, draw a card." The Frog (1/2) attacks Bot2's Liliana of
+# the Veil on turn 3 and draws; attacks Bot2 on turn 5, unblocked, and draws; and on turn 7 is blocked by Bot2's Ornithopter,
+# dealing its damage to that creature, and draws nothing. Bot1 plays an Island each turn so the hand sizes stay clear of the
+# discard to seven.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Psychic Frog
+Island x4
+Island x20
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Liliana of the Veil
+Ornithopter
+Swamp
+Swamp
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Psychic Frog.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Liliana of the Veil.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Attack(Psychic Frog > Bot2.Battlefield.Liliana of the Veil)
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Hand.Count = 5
+? Bot2.Battlefield.Liliana of the Veil.Counters.Loyalty = 2
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Attack(Psychic Frog > Bot2)
+[T5 Bot1.Main2]
+? Bot1.Hand.Count = 6
+? Bot2.Life = 19
+[T6 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Attack(Psychic Frog > Bot2)
+Bot2.Block(Ornithopter > Bot1.Battlefield.Psychic Frog)
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 6
+Bot2.Life = 19

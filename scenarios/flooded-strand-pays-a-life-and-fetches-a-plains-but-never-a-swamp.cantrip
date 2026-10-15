@@ -1,0 +1,27 @@
+# Flooded Strand: {T}, pay 1 life, sacrifice it - search for a Plains or Island card and put it onto the battlefield
+# untapped. A Swamp is in the library but is not a Plains or an Island, so it is not offered (the refusal), while the
+# Plains is found and enters untapped.
+
+[Bot1 Deck]
+Flooded Strand
+Mountain x6
+Swamp
+Plains
+Island
+Mountain x10
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Flooded Strand.Play
+Bot1.Battlefield.Flooded Strand.Activate
+! Bot1.Search(Swamp)
+Bot1.Search(Plains)
+
+[Expect]
+Bot1.Life = 19
+Bot1.Graveyard = Flooded Strand
+Bot1.Battlefield = Plains
+Bot1.Battlefield.Plains.Tapped = false
+Bot1.Library.Count = 12

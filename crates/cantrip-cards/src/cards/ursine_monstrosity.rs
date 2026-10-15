@@ -1,0 +1,30 @@
+use cantrip_api::*;
+use cantrip_oracle as oracle;
+
+/// Mill a card and choose an opponent at random. This creature attacks that player this combat if able. Until end of turn, it
+/// gains indestructible and gets +1/+1 for each card type among cards in your graveyard (counted as the ability resolves).
+fn combat(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let me = item.controller;
+    g.mill(me, 1);
+    let opponents: Vec<PlayerId> = g.state().opponents(me).collect();
+    if !opponents.is_empty() {
+        if let Some(chosen) = cantrip_mechanics::library::random_of(g, &opponents) {
+            g.add_effect(item.object, item.object, EffectKind::MustAttackPlayer(chosen), Duration::EndOfTurn);
+        }
+    }
+    let types = g.state().zone(Zone::graveyard(me)).iter().fold(0u16, |all, &card| all | g.chars(card).types.0).count_ones() as i16;
+    g.add_effect(item.object, item.object, EffectKind::Pump(types, types), Duration::EndOfTurn);
+    g.add_effect(item.object, item.object, EffectKind::AddKeywords(Keywords::of(&[Keyword::Indestructible])), Duration::EndOfTurn);
+    Ok(())
+}
+
+pub static CARD: CardDef = CardDef {
+    abilities: &[AbilityDef::Triggered(TriggeredDef {
+        text: "At the beginning of combat on your turn, mill a card and choose an opponent at random. This creature attacks that player this combat if able. Until end of turn, this creature gains indestructible and gets +1/+1 for each card type among cards in your graveyard.",
+        listens: EventMask::STEP_BEGAN,
+        matches: cantrip_mechanics::triggers::beginning_of_your_combat,
+        effect: combat,
+        ..TriggeredDef::BLANK
+    })],
+    ..oracle::URSINE_MONSTROSITY
+};

@@ -1,0 +1,28 @@
+# Ignoble Hierarch: {T}: Add {B}, {R}, or {G}. Cast on turn 1, it has lost its summoning sickness by turn 3, where
+# Bot1 chooses red and spends it on Lightning Bolt, a color no land of Bot1's makes.
+
+[Bot1 Deck]
+Forest
+Ignoble Hierarch
+Lightning Bolt
+Forest
+Forest
+Forest
+Forest
+Forest x13
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Ignoble Hierarch.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Ignoble Hierarch.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+
+[Expect]
+Bot2.Life = 17
+Bot1.Graveyard = Lightning Bolt
+Bot1.Battlefield.Ignoble Hierarch.Tapped = true

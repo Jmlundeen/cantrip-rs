@@ -1,0 +1,25 @@
+# Gruul Turf enters tapped and, as it enters, returns a land its controller chooses to its owner's hand: Bot1
+# sends the Forest back and keeps the Turf. On Bot1's next turn the untapped Turf taps for {R}{G}.
+
+[Bot1 Deck]
+Forest
+Gruul Turf
+Forest x5
+Forest x10
+
+[Bot2 Deck]
+Mountain x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Gruul Turf.Play
+Bot1.Choose(Forest)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Gruul Turf.Activate
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Gruul Turf
+Bot1.Battlefield.Gruul Turf.Tapped = true
+Bot1.Mana = {R}{G}

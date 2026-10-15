@@ -1,0 +1,22 @@
+# Lotus Bloom has no mana cost, so it cannot be cast from hand at all (CR 118.6) - the cast is refused in the main phase -
+# and suspending it is a special action taken only when the card could be cast at that time (CR 702.62a), here as a sorcery:
+# refused in Bot1's upkeep, accepted in main phase 1 (the positive control), with a Bloom in exile afterwards.
+
+[Bot1 Deck]
+Lotus Bloom
+Lotus Bloom
+Island x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+! Bot1.Hand.Lotus Bloom.Suspend
+[T1 Bot1.Main1]
+! Bot1.Hand.Lotus Bloom.Cast
+Bot1.Hand.Lotus Bloom.Suspend
+? Exile.Count = 1
+
+[Expect]
+Exile.Count = 1
+Bot1.Hand.Count = 6

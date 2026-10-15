@@ -1,0 +1,30 @@
+# Green Sun's Zenith with X = 0 has no creature it can find (the Llanowar Elves has mana value 1): Bot1 finds nothing
+# (CR 701.23b), no creature enters, and the spell still shuffles itself into the library as its last instruction - it is in
+# no graveyard and the library has grown by one.
+
+[Bot1 Deck]
+Forest
+Forest
+Green Sun's Zenith
+Forest x4
+Forest
+Llanowar Elves
+Forest x10
+
+[Bot2 Deck]
+Forest x22
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Green Sun's Zenith.Cast(X: 0)
+Bot1.Battlefield.Forest.Activate
+! Bot1.Search(Llanowar Elves)
+Bot1.Search()
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Forest; Forest
+Bot1.Graveyard.Count = 0
+Bot1.Library.Count = 12

@@ -1,0 +1,38 @@
+# Forever Young: "Put any number of target creature cards from your graveyard on top of your library. Draw a card."
+# Faithless Looting puts Ornithopter and Elvish Mystic into the graveyard; Forever Young targets both, its caster orders
+# them (Ornithopter on top), and the draw takes Ornithopter, leaving Elvish Mystic on top.
+
+[Bot1 Deck]
+Forever Young
+Faithless Looting
+Mox Jet
+Mox Ruby
+Ornithopter
+Elvish Mystic
+Island
+Island x7
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Ornithopter; Elvish Mystic)
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Forever Young.Cast
+Bot1.Target(Ornithopter; Elvish Mystic)
+Bot1.Pass
+Bot1.Arrange(Ornithopter; Elvish Mystic)
+
+[Expect]
+Bot1.Graveyard = Forever Young; Faithless Looting
+Bot1.Hand = Island; Island; Ornithopter
+Bot1.Library = Elvish Mystic; Island; Island; Island; Island; Island

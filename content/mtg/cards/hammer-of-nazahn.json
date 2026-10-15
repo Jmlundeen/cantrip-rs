@@ -1,0 +1,6 @@
+{
+  "name": "Hammer of Nazahn",
+  "manaCost": "{4}",
+  "type": "Legendary Artifact — Equipment",
+  "oracleText": "Whenever Hammer of Nazahn or another Equipment you control enters, you may attach that Equipment to target creature you control.\nEquipped creature gets +2/+0 and has indestructible.\nEquip {4}"
+}

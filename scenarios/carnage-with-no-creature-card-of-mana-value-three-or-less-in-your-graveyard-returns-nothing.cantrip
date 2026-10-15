@@ -1,0 +1,42 @@
+# Carnage, Crimson Chaos: the only creature card in Bot1's graveyard is a Cogwork Librarian, mana value 4, so the enters
+# ability has no legal target and is removed from the stack (CR 603.3d); the Librarian stays in the graveyard and Carnage
+# is on the battlefield with nothing on the stack. Faithless Looting discards the Librarian and an Island on turn 1.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Faithless Looting
+Carnage, Crimson Chaos
+Mountain
+Island
+Cogwork Librarian
+Island
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Cogwork Librarian; Island)
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Carnage, Crimson Chaos.Cast
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Swamp; Mox Jet; Mox Ruby; Mountain; Carnage, Crimson Chaos
+Bot1.Graveyard = Faithless Looting; Island; Cogwork Librarian
+Stack.Count = 0

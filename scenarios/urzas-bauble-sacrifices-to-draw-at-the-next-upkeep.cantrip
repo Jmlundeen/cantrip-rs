@@ -1,0 +1,22 @@
+# Urza's Bauble costs {0}: Bot1 casts it, taps and sacrifices it targeting Bot2, and draws a card at the beginning of
+# the next turn's upkeep, which is Bot2's turn 2.
+
+[Bot1 Deck]
+Urza's Bauble
+Island x14
+
+[Bot2 Deck]
+Swamp x14
+
+[Actions]
+Bot1.Hand.Urza's Bauble.Cast
+Bot1.Battlefield.Urza's Bauble.Activate(Bot2)
+? Bot1.Hand.Count = 6
+? Bot1.Graveyard = Urza's Bauble
+[T2 Bot2.Main1]
+
+[Expect]
+Turn = 2
+Bot1.Hand.Count = 7
+Bot1.Library.Count = 7
+Bot2.Hand.Count = 8

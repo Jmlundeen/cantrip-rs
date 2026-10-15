@@ -1,0 +1,52 @@
+# "Once during each of your turns": Brazen Borrower (flash, mana value 3) sits in Bot1's graveyard with Serra Paragon out. On Bot2's turn 4, with {1}{U}{U} untapped (an Island, Mox Sapphire, Mox Pearl) and Bot2's spell on the stack so that a flash
+# creature could be cast, casting it from the graveyard is refused; on Bot1's own turn 5 it is cast from there (the positive control).
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Ruby
+Faithless Looting
+Serra Paragon
+Brazen Borrower
+Mox Sapphire
+Plains
+Plains
+Island
+Island x10
+
+[Bot2 Deck]
+Mox Jet
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Brazen Borrower; Plains)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Serra Paragon.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+! Bot1.Graveyard.Brazen Borrower.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Graveyard.Brazen Borrower.Cast(Ability: Once during each of your turns)
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Brazen Borrower.Power = 3

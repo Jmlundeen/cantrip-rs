@@ -1,0 +1,32 @@
+# Without the kicker the second sentence does not apply: the Ornithopter is a 2/2 until end of turn, but when Bot1 sacrifices it to
+# Village Rites no card is drawn for the death; only Village Rites' own two. Hand: 7 - five cast or played = 2, + 2 = 4.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Ornithopter
+Warhost's Frenzy
+Village Rites
+Swamp
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Warhost's Frenzy.Cast
+[T1 Bot1.End]
+? Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Village Rites.Cast
+Bot1.Choose(Ornithopter)
+
+[Expect]
+Bot1.Hand.Count = 4
+Bot1.Graveyard = Village Rites; Ornithopter; Warhost's Frenzy; Black Lotus

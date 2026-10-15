@@ -1,0 +1,22 @@
+# {T}: Add {C} (the pool shows it). Yavimaya Hollow is legendary (CR 704.5j): a second one, played on turn 3 by the same player,
+# leaves two, and one is put into the graveyard; the other stays.
+
+[Bot1 Deck]
+Yavimaya Hollow
+Yavimaya Hollow
+Forest x18
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Yavimaya Hollow.Play
+Bot1.Battlefield.Yavimaya Hollow.Activate(Ability: Add)
+? Bot1.Mana = {C}
+[T3 Bot1.Main1]
+Bot1.Hand.Yavimaya Hollow.Play
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Yavimaya Hollow
+Bot1.Graveyard = Yavimaya Hollow

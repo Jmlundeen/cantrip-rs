@@ -1,0 +1,38 @@
+# Cast for its impending cost it is a non-creature Enchantment with five time counters, and with the Creature type its
+# creature types go too (CR 205.1a); its enters ability mills four
+# cards and returns the non-Avatar creature card (Aang is an Avatar, Chandra a planeswalker, Bolt neither).
+
+[Bot1 Deck]
+Swamp
+Swamp
+Overlord of the Balemurk
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Figure of Destiny
+Aang, Swift Savior
+Chandra, Torch of Defiance
+Lightning Bolt
+Swamp x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Overlord of the Balemurk.Cast(Ability: Impending)
+Bot1.Choose(Figure of Destiny)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Overlord of the Balemurk.Types = Enchantment
+Bot1.Battlefield.Overlord of the Balemurk.Subtypes = (absent)
+Bot1.Battlefield.Overlord of the Balemurk.Counters.Time = 5
+Bot1.Hand.Count = 6
+Bot1.Hand = Figure of Destiny; Swamp; Swamp; Swamp; Swamp; Swamp

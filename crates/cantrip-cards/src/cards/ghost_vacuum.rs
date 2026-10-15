@@ -1,0 +1,46 @@
+use cantrip_api::*;
+use cantrip_mechanics::targets;
+use cantrip_oracle as oracle;
+
+/// Exile it; it is exiled with this artifact (CR 607.2a), where the second ability finds it.
+fn exile_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if let Some(card) = targets::object(g, item, 0) {
+        g.exile_with(&[card], item.object, false);
+    }
+    Ok(())
+}
+
+/// Put each creature card exiled with this artifact onto the battlefield under your control with a flying counter on it
+/// (CR 614.1c); each of them is a 1/1 Spirit in addition to its other types (CR 611.2c, 613.4b). The artifact was
+/// sacrificed as a cost, and the exile link outlives it (CR 113.7a).
+fn release(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let cards: Vec<ObjectId> = g.exiled_with(item.object).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
+    for card in cards {
+        let arrived = g.put_onto_battlefield_with_counters(card, item.controller, false, &[(CounterKind::Flying, 1)])?;
+        if targets::permanent(g, arrived) {
+            g.add_effect(item.object, arrived, EffectKind::SetPt(1, 1), Duration::Indefinite);
+            g.add_effect(item.object, arrived, EffectKind::AddSubtype(Subtype::Spirit), Duration::Indefinite);
+        }
+    }
+    Ok(())
+}
+
+pub static CARD: CardDef = CardDef {
+    abilities: &[
+        AbilityDef::Activated(ActivatedDef {
+            text: "{T}: Exile target card from a graveyard.",
+            cost: Cost { tap: true, ..Cost::NONE },
+            targets: &[cantrip_mechanics::targets::CARD_IN_A_GRAVEYARD],
+            effect: exile_it,
+            ..ActivatedDef::BLANK
+        }),
+        AbilityDef::Activated(ActivatedDef {
+            text: "{6}, {T}, Sacrifice this artifact: Put each creature card exiled with this artifact onto the battlefield under your control with a flying counter on it. Each of them is a 1/1 Spirit in addition to its other types. Activate only as a sorcery.",
+            cost: Cost { mana: mana(6, 0, 0, 0, 0, 0), tap: true, sacrifice_self: true, ..Cost::NONE },
+            timing: Timing::Sorcery,
+            effect: release,
+            ..ActivatedDef::BLANK
+        }),
+    ],
+    ..oracle::GHOST_VACUUM
+};

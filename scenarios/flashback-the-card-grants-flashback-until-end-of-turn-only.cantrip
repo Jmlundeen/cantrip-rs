@@ -1,0 +1,26 @@
+# Flashback (the card) gives a Lightning Bolt in the graveyard flashback until end of turn, at its mana cost (CR 702.34a):
+# Black Lotus's three red mana pay for the Bolt, Flashback, and the Bolt again from the graveyard, which is then exiled
+# instead of returning to the graveyard: Bot2 is on 14 and the Bolt is in exile.
+
+[Bot1 Deck]
+Black Lotus
+Lightning Bolt
+Flashback
+Forest
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Hand.Flashback.Cast(Bot1.Graveyard.Lightning Bolt)
+Bot1.Graveyard.Lightning Bolt.Cast(Bot2)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Exile = Lightning Bolt
+Bot1.Graveyard = Flashback; Black Lotus

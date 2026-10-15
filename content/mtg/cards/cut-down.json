@@ -1,0 +1,6 @@
+{
+  "name": "Cut Down",
+  "manaCost": "{B}",
+  "type": "Instant",
+  "oracleText": "Destroy target creature with total power and toughness 5 or less."
+}

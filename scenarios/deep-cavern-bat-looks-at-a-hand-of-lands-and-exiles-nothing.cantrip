@@ -1,0 +1,25 @@
+# Only a nonland card may be exiled: Bot2's hand is seven Islands, so none can be, and the unscripted answer (the first
+# eligible card, as it would be if an Island were eligible) exiles nothing.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Deep-Cavern Bat
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Deep-Cavern Bat.Cast
+Bot1.Pass
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot2.Hand.Count = 7

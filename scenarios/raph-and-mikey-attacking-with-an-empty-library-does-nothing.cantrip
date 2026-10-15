@@ -1,0 +1,35 @@
+# With an empty library there is nothing to reveal when Raph & Mikey attack (CR 701.16): the trigger resolves doing nothing and Bot1 does not lose
+# (nothing is drawn). Raph & Mikey, cast on turn 1 from the whole seven-card deck, hit for 7.
+
+[Bot1 Deck]
+Raph & Mikey, Troublemakers
+Black Lotus
+Mox Ruby
+Mox Emerald
+Gleemox
+Mox Jet
+Island
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Red)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Raph & Mikey, Troublemakers.Cast
+Bot1.Pass
+Bot1.Attack(Raph & Mikey, Troublemakers > Bot2)
+[T1 Bot1.Main2]
+
+[Expect]
+Result = InProgress
+Bot2.Life = 13
+Bot1.Library.Count = 0

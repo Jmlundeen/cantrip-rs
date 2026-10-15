@@ -1,0 +1,50 @@
+# Bot1 names Brazen Borrower. A spell on the stack as an Adventure has only the Adventure's characteristics (CR 715.4),
+# its name Petty Theft, so Bot2's Petty Theft is not a "spell with the chosen name" and costs its printed {1}{U}.
+# Bot2 floats {U}{U}{B}{R}, more than the Adventure would cost if it were taxed; only two mana is spent and two remain
+# (a Brazen Borrower cast as the creature would owe {2} more). Bot2 holds the surplus because the engine's advice for
+# whether an Adventure is affordable still judges its cost against the card in hand (`least_cost` in actions.rs), so
+# with exactly {1}{U} Petty Theft is not offered; the cast itself, shown here, is right.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Sol Ring
+Anointed Peacekeeper
+Plains x12
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Brazen Borrower
+Island x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Anointed Peacekeeper.Cast
+Bot1.Name(Brazen Borrower)
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+? Bot2.Mana = {U}{U}{B}{R}
+Bot2.Hand.Brazen Borrower.Cast(Sol Ring; Ability: Adventure; Spend: U, U)
+? Stack = Petty Theft
+Bot2.Pass
+? Bot2.Mana = {B}{R}
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Exile = Brazen Borrower

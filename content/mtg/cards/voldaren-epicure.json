@@ -1,0 +1,8 @@
+{
+  "name": "Voldaren Epicure",
+  "manaCost": "{R}",
+  "type": "Creature — Vampire",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "When this creature enters, it deals 1 damage to each opponent. Create a Blood token. (It's an artifact with \"{1}, {T}, Discard a card, Sacrifice this token: Draw a card.\")"
+}

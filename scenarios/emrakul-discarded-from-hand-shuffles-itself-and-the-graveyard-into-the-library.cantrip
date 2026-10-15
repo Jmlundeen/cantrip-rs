@@ -1,0 +1,23 @@
+# "When Emrakul is put into a graveyard from anywhere": here from the hand. Bot1 holds Emrakul among eight cards after its
+# turn-3 draw, discards it to the hand size (CR 514.1), and Emrakul's trigger then shuffles the graveyard, with Emrakul in
+# it, into the library: the graveyard is empty again and the library one card larger than the turn before.
+
+[Bot1 Deck]
+Emrakul, the Aeons Torn
+Island x6
+Mountain x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+[T3 Bot1.Main1]
+? Bot1.Library.Count = 19
+[T3 Bot1.End]
+Bot1.Discard(Emrakul, the Aeons Torn)
+[T4 Bot2.Upkeep]
+
+[Expect]
+Bot1.Graveyard.Count = 0
+Bot1.Library.Count = 20
+Bot1.Hand.Count = 7

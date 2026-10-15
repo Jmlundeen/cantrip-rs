@@ -1,0 +1,64 @@
+use cantrip_api::*;
+use cantrip_oracle as oracle;
+
+/// "Once during each of your turns, you may play a land from your graveyard or cast a permanent spell with mana value 3 or
+/// less from your graveyard." A way a permanent gives (CR 604, 118.9): the cost is the card's own mana cost for a spell and
+/// none for a land (the land drop is the engine's). One use of either, by this permanent, spends it: the history notes it
+/// against the permanent (`GRANTED_WAY_USED`).
+fn from_graveyard(q: &dyn Query, asker: &Asker, card: ObjectId, player: PlayerId) -> Option<Cost> {
+    if player != asker.controller || q.state().turn.active != player {
+        return None;
+    }
+    let used = q
+        .history()
+        .select(EventQuery::kind(EventMask::ABILITY_ACTIVATED).object(asker.source).this_turn())
+        .any(|r| matches!(r.event, Event::AbilityActivated { ability, .. } if ability.index == GRANTED_WAY_USED));
+    if used {
+        return None;
+    }
+    let c = q.chars(card);
+    if c.is(CardType::Land) {
+        return Some(Cost::NONE);
+    }
+    if c.is(CardType::Instant) || c.is(CardType::Sorcery) || q.mana_value(card) > 3 {
+        return None;
+    }
+    Some(Cost::mana(q.card(c.card).cost))
+}
+
+/// "When this permanent is put into a graveyard from the battlefield" (CR 700.4), judged as it was.
+fn put_into_graveyard(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::ZoneChange { old, from, to, .. } if *old == source && from.is(ZoneKind::Battlefield) && to.is(ZoneKind::Graveyard) => {
+            Fired::PLAIN
+        }
+        _ => None,
+    }
+}
+
+/// "Exile it and you gain 2 life": the card is exiled if it is still in the graveyard it went to; the life is gained either way.
+fn exile_and_gain(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if let Some(card) = g.found_after_move(item.object) {
+        g.exile(card);
+    }
+    g.gain_life(item.controller, 2);
+    Ok(())
+}
+
+pub static CARD: CardDef = CardDef {
+    granted_ways: &[GrantedWay {
+        text: "Once during each of your turns, you may play a land from your graveyard or cast a permanent spell with mana value 3 or less from your graveyard.",
+        cost: from_graveyard,
+        lands: true,
+        gains: Some(0),
+    }],
+    delayed: &[AbilityDef::Triggered(TriggeredDef {
+        text: "When this permanent is put into a graveyard from the battlefield, exile it and you gain 2 life.",
+        listens: EventMask::ZONE_CHANGE,
+        matches: put_into_graveyard,
+        effect: exile_and_gain,
+        look_back: true,
+        ..TriggeredDef::BLANK
+    })],
+    ..oracle::SERRA_PARAGON
+};

@@ -1,0 +1,43 @@
+# "Exile target creature" takes any creature, one's own included, and "its controller may search" is the exiled
+# creature's controller (CR 608.2h): Bot1 targets its own Spirit token, which ceases to exist in exile (CR 111.7, 704.5d),
+# and Bot1 itself is asked and fetches a basic Island tapped. One Spirit stays; the Path is in the graveyard.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Lingering Souls
+Path to Exile
+Plains
+Plains
+Plains
+Island
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Lingering Souls.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Path to Exile.Cast(Spirit)
+Bot1.Accept
+Bot1.Search(Island)
+[T3 Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot1.Graveyard = Path to Exile; Lingering Souls
+Bot1.Battlefield.Island.Tapped = true
+Bot1.Battlefield.Spirit.Keywords = Flying

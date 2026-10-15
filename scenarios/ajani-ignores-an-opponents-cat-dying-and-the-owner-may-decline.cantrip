@@ -1,0 +1,48 @@
+# "Other Cats you control" (CR 603.2): Bot2 casts its own Ajani on turn 4 and Bot1 Bolts Bot2's Cat Warrior on turn 5.
+# Bot1's Ajani does not trigger (the Cat is not Bot1's), so exactly one trigger (Bot2's) is on the stack once the Bolt resolves and Bot1 is never asked; Bot2's Ajani
+# does (the Cat is Bot2's, the positive control that the trigger works), and Bot2 declines the "you may": its Ajani stays
+# on the battlefield untransformed.
+
+[Bot1 Deck]
+Plains x2
+Ajani, Nacatl Pariah
+Mountain
+Lightning Bolt
+Plains x2
+Plains x12
+
+[Bot2 Deck]
+Plains x2
+Ajani, Nacatl Pariah
+Plains
+Plains x3
+Plains x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Ajani, Nacatl Pariah.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Plains#2.Activate
+Bot2.Hand.Ajani, Nacatl Pariah.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Cat Warrior)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+Bot2.Decline
+[Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Plains; Plains; Mountain; Ajani, Nacatl Pariah; Cat Warrior
+Bot2.Battlefield = Plains; Plains; Ajani, Nacatl Pariah
+Stack.Count = 0

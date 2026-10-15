@@ -1,0 +1,25 @@
+# Steam Vents is an Island Mountain: Gush's two Islands are Steam Vents (paid 2 life as it entered) and a plain Island.
+
+[Bot1 Deck]
+Steam Vents
+Island
+Gush
+Island x4
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Steam Vents.Play
+Bot1.Accept
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Gush.Cast(Ability: Return two Islands)
+Bot1.Choose(Steam Vents; Island)
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Count = 0
+Bot1.Life = 18
+Bot1.Graveyard = Gush

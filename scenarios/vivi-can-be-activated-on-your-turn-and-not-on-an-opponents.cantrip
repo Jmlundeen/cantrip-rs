@@ -1,0 +1,43 @@
+# Vivi Ornitier's mana ability may be activated only during its controller's turn (CR 602.5b). With a +1/+1 counter on
+# it (so the activation is worth making) it is offered in Bot1's own turn and used, and on Bot2's turn, when Bot1 gets
+# priority in Bot2's first main phase, Bot1 may not activate it however much it would like to.
+
+[Bot1 Deck]
+Island
+Mountain
+Plains
+Vivi Ornitier
+Lightning Bolt
+Island
+Island
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Vivi Ornitier.Cast
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+[T7 Bot1.Main2]
+Bot1.Battlefield.Vivi Ornitier.Activate
+Bot1.Colors(Blue)
+? Bot1.Mana = {U}
+[T8 Bot2.Main1]
+Bot1.Pass
+! Bot1.Battlefield.Vivi Ornitier.Activate
+Bot1.Pass
+
+[Expect]
+Turn = 8
+Bot1.Battlefield.Vivi Ornitier.Counters.PlusOnePlusOne = 1

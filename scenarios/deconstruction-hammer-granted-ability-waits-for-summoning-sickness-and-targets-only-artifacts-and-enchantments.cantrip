@@ -1,0 +1,58 @@
+# The granted ability has {T} in its cost, so the creature that has it follows the summoning-sickness rule (CR 302.6,
+# 602.5a): the Ornithopter cast and equipped on turn 1 cannot activate it that turn (refused beside the turn-3 activation,
+# which works). On turn 3 its targets are artifacts and enchantments only (CR 115.1): Bot2's Island is refused, Sol Ring
+# is the control. Paying sacrifices the Hammer and the creature is a 0/2 again.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mox Sapphire
+Ornithopter
+Deconstruction Hammer
+Island x12
+
+[Bot2 Deck]
+Island
+Sol Ring
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Deconstruction Hammer.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Deconstruction Hammer.Activate(Ornithopter)
+Bot1.Pass
+! Bot1.Battlefield.Ornithopter.Activate(Mox Jet)
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Battlefield.Ornithopter.Activate(Bot2.Battlefield.Island)
+Bot1.Battlefield.Ornithopter.Activate(Bot2.Battlefield.Sol Ring)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Island
+Bot2.Graveyard = Sol Ring
+Bot1.Graveyard = Deconstruction Hammer
+Bot1.Battlefield.Ornithopter.Power = 0

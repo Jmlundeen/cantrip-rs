@@ -1,0 +1,29 @@
+# The Great Henge is {7}{G}{G} and gets cheaper only by the power of a creature Bot1 controls. With none, it costs all nine, and Bot1's
+# eight mana (a Forest, four Moxen and Black Lotus) cannot cast it: the refusal. (The cost-reduction scenario is the positive control: the
+# same eight mana pays {6}{G}{G} with a Llanowar Elves out.)
+
+[Bot1 Deck]
+Forest
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Mox Emerald
+Black Lotus
+The Great Henge
+Forest x13
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+! Bot1.Hand.The Great Henge.Cast
+
+[Expect]
+Bot1.Battlefield.Count = 6

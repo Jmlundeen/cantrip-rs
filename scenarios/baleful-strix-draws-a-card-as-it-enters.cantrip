@@ -1,0 +1,26 @@
+# Baleful Strix ({U}{B}) draws a card when it enters.
+
+[Bot1 Deck]
+Island
+Swamp
+Baleful Strix
+Island x13
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Baleful Strix.Cast
+[T3 Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Island; Swamp; Baleful Strix
+Bot1.Hand.Count = 6
+Bot1.Library.Count = 7

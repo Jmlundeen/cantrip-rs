@@ -1,0 +1,23 @@
+# "{T}: Add {W} or {U}" - the controller names the colour each time (CR 106.1b, 605.3b): white on turn 3, blue on turn 5.
+# It entered tapped on turn 1 (CR 614.12), so there was no mana from it before then.
+
+[Bot1 Deck]
+Celestial Colonnade
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Celestial Colonnade.Play
+? Bot1.Battlefield.Celestial Colonnade.Tapped = true
+[T3 Bot1.Main1]
+Bot1.Battlefield.Celestial Colonnade.Activate(Color: White)
+? Bot1.Mana = {W}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Celestial Colonnade.Activate(Color: Blue)
+? Bot1.Mana = {U}
+
+[Expect]
+Turn = 5
+Bot1.Mana = {U}

@@ -1,0 +1,69 @@
+# Etali, Primal Conqueror's dig finds Lightning Bolt on top of Bot2's library and We Say Thee Nay! on top of Bot1's,
+# and Bot2 casts both for nothing as the trigger resolves: the Bolt at Bot1, then the counterspell, whose only legal
+# target is that Bolt.
+#
+# We Say Thee Nay! is the point. Its target is chosen after its optional cost, teamwork, is announced (CR 601.2b-c),
+# so a cast made as an effect resolves must not aim it beforehand the way it aims a Lightning Bolt. It did: the cast
+# then refused the target it had just been handed, after the answer was already taken, and the game was left with
+# nobody asked anything. Here the cast asks in the order a cast from hand does — teamwork or not, then the target —
+# and the game goes on.
+#
+# Bot2 says no to teamwork, so the ransom is {2}, which Bot2 pays for its own Bolt out of the Forest and the Mox it
+# kept back. The Bolt resolves: 20 - 3 = 17. The counterspell is Bot1's card and goes to Bot1's graveyard, on top of
+# the Island Bot1 discarded to hand size on turn three.
+
+[Bot1 Deck]
+Island x8
+We Say Thee Nay!
+Island x10
+
+[Bot2 Deck]
+Forest
+Black Lotus
+Black Lotus
+Black Lotus
+Guerrilla Gorilla
+Mountain
+Etali, Primal Conqueror
+Mox Emerald
+Island
+Lightning Bolt
+Island x10
+
+[Actions]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Guerrilla Gorilla.Cast
+Bot2.Hand.Mox Emerald.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Black Lotus#1.Activate(Color: Red)
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Etali, Primal Conqueror.Cast
+Bot2.Choose(Lightning Bolt)
+Bot2.Target(Bot1)
+Bot2.Choose(We Say Thee Nay!)
+Bot2.Modes(Cast without teamwork)
+Bot2.Target(Stack.Lightning Bolt)
+? Stack = We Say Thee Nay!; Lightning Bolt
+? Exile.Count = 0
+Bot2.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.PayCost
+[T4 Bot2.Main2]
+
+[Expect]
+Turn = 4
+Step = Main2
+Stack.Count = 0
+Exile.Count = 0
+Bot1.Life = 17
+Bot1.Graveyard = We Say Thee Nay!; Island
+Bot2.Graveyard = Lightning Bolt; Black Lotus; Black Lotus; Black Lotus
+Bot2.Battlefield = Forest; Guerrilla Gorilla; Mox Emerald; Mountain; Etali, Primal Conqueror
+Bot2.Battlefield.Guerrilla Gorilla.Tapped = false

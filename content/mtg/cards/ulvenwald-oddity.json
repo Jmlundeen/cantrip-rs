@@ -1,0 +1,26 @@
+{
+  "name": "Ulvenwald Oddity",
+  "manaCost": "{2}{G}{G}",
+  "type": "Creature — Beast",
+  "power": 4,
+  "toughness": 4,
+  "oracleText": "Trample, haste\n{5}{G}{G}: Transform this creature.",
+  "keywords": [
+    "Trample",
+    "Haste"
+  ],
+  "backFace": {
+    "name": "Ulvenwald Behemoth",
+    "colorIndicator": [
+      "Green"
+    ],
+    "type": "Creature — Beast Horror",
+    "power": 8,
+    "toughness": 8,
+    "oracleText": "Trample, haste\nOther creatures you control get +1/+1 and have trample and haste.",
+    "keywords": [
+      "Trample",
+      "Haste"
+    ]
+  }
+}

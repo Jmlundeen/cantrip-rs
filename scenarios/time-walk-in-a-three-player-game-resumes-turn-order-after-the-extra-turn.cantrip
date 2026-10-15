@@ -1,0 +1,31 @@
+# Three players: Time Walk on turn 1 gives Bot1 turn 2 (the extra turn), then the order resumes with Bot2 on turn 3 and Bot3 on
+# turn 4 (CR 500.7: the extra turn is inserted, the rotation continues from the player after the one who took the turn).
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Time Walk
+Island x4
+Island x10
+
+[Bot2 Deck]
+Swamp x17
+
+[Bot3 Deck]
+Swamp x17
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Time Walk.Cast
+[T2 Bot1.Main1]
+? ActivePlayer = Bot1
+[T3 Bot2.Main1]
+[T4 Bot3.Main1]
+
+[Expect]
+Turn = 4
+ActivePlayer = Bot3
+Bot1.Graveyard = Time Walk

@@ -1,0 +1,40 @@
+# Three Steps Ahead, spree: more than one mode may be chosen, each adding its cost ({U}{U} + {1}{U} + {2} = six mana). On Bot2's turn 4 Bot1
+# counters Bot2's Ornithopter and draws two, discarding one, with a Black Lotus, a Mox Sapphire and two Islands held up.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Black Lotus
+Three Steps Ahead
+Island
+Island x3
+Island x14
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Three Steps Ahead.Cast
+Bot1.Modes(Counter target spell; Draw two)
+Bot1.Target(Stack.Ornithopter)
+Bot1.Choose(Island)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Ornithopter; Island
+Bot1.Graveyard = Three Steps Ahead; Island; Black Lotus

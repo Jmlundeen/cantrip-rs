@@ -1,0 +1,29 @@
+# Bot1 has two Islands in play on its third turn and no mana to spare (both Islands are untapped but Gush costs {4}{U}).
+# It casts Gush for its alternative cost, returning both Islands to its hand, and draws two cards when it resolves.
+
+[Bot1 Deck]
+Island
+Island
+Gush
+Island x3
+Island x2
+Island x10
+
+[Bot2 Deck]
+Swamp x18
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Gush.Cast(Ability: Return)
+Bot1.Choose(Island; Island)
+? Stack = Gush
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Gush
+Bot1.Battlefield.Count = 0
+Bot1.Hand.Count = 9
+Bot1.Library.Count = 8

@@ -1,0 +1,47 @@
+# Cori-Steel Cutter: the Monk is created whatever happens to the Equipment, but "you may attach this Equipment to it" can
+# only be done to an Equipment that is still on the battlefield (CR 701.3b). Bot2 holds a Plains and a Mox Pearl up and
+# answers the flurry ability with Disenchant on the Cutter: the Monk still arrives, as a plain 1/1, and no question about
+# attaching is asked (! Bot1.Accept). Lightning Bolt is the first spell of turn 3 and Mox Jet the second.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Cori-Steel Cutter
+Lightning Bolt
+Mox Jet
+Mountain x15
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Disenchant
+Plains x17
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Cori-Steel Cutter.Cast
+Bot1.Pass
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Disenchant.Cast(Cori-Steel Cutter)
+! Bot1.Accept
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mountain; Mountain; Mox Ruby; Mox Jet; Monk
+Bot1.Battlefield.Monk.Power = 1
+Bot1.Graveyard = Cori-Steel Cutter; Lightning Bolt
+Stack.Count = 0

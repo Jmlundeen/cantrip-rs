@@ -1,0 +1,6 @@
+{
+  "name": "Mana Crypt",
+  "manaCost": "{0}",
+  "type": "Artifact",
+  "oracleText": "At the beginning of your upkeep, flip a coin. If you lose the flip, this artifact deals 3 damage to you.\n{T}: Add {C}{C}."
+}

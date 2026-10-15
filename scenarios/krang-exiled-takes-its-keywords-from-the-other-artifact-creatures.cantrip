@@ -1,0 +1,57 @@
+# Krang, Utrom Warlord's grant to other artifact creatures is a static ability, so it lasts only while Krang is on
+# the battlefield (CR 611.3a). Indestructible does not stop Swords to Plowshares: Krang is exiled on turn 6, Bot1
+# gains 9 life, and Bot1's Painter's Servant is a plain 1/3 again.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Krang, Utrom Warlord
+Painter's Servant
+Forest x10
+
+[Bot2 Deck]
+Plains
+Swords to Plowshares
+Plains x13
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Krang, Utrom Warlord.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Forest.Activate
+[T5 Bot1.Main1]
+Bot1.Hand.Painter's Servant.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Painter's Servant.Keywords = Flying; Haste; Indestructible; Trample
+[T6 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains#1.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Krang, Utrom Warlord)
+[T6 Bot2.Main2]
+
+[Expect]
+Turn = 6
+Exile = Krang, Utrom Warlord
+Bot1.Life = 29
+Bot1.Battlefield.Painter's Servant.Keywords = (absent)
+Bot1.Battlefield.Painter's Servant.Power = 1
+Bot1.Battlefield.Painter's Servant.Toughness = 3

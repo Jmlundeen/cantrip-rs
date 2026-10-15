@@ -1,0 +1,29 @@
+# Class level abilities are sorcery speed (CR 716.2a, "gain the next level as a sorcery") and each level follows the one
+# before: in Bot2's upkeep Level 2 is refused (not Bot1's main phase), and in Bot1's own main phase Level 3 is refused at
+# level 1 (it needs level 2). Level 2 itself, in the same main phase, is the positive control, paid with Black Lotus and an Island.
+
+[Bot1 Deck]
+Island
+Stormchaser's Talent
+Black Lotus
+Island x16
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Stormchaser's Talent.Cast
+[T2 Bot2.Upkeep]
+! Bot1.Battlefield.Stormchaser's Talent.Activate(Ability: Level 2)
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Island.Play
+! Bot1.Battlefield.Stormchaser's Talent.Activate(Ability: Level 3)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Stormchaser's Talent.Activate(Ability: Level 2)
+
+[Expect]
+Bot1.Battlefield.Count = 4

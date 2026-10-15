@@ -1,0 +1,54 @@
+# Figure of Fable's three stages each replace the last: a 2/3 Kithkin Scout, a 4/5 Kithkin Soldier (no longer a Scout),
+# then a 7/8 Kithkin Avatar.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Figure of Fable
+Plains
+Plains
+Plains x12
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Figure of Fable.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Figure of Fable.Activate(Ability: Kithkin Scout)
+Bot1.Pass
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Figure of Fable.Activate(Ability: Kithkin Soldier)
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Figure of Fable.Activate(Ability: Kithkin Avatar)
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Figure of Fable.Power = 7
+Bot1.Battlefield.Figure of Fable.Toughness = 8
+Bot1.Battlefield.Figure of Fable.Subtypes = Avatar; Kithkin

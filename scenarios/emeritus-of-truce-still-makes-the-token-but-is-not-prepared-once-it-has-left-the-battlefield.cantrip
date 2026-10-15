@@ -1,0 +1,41 @@
+# Bot2 Lightning Bolts Emeritus of Truce with its enters trigger on the stack. Bot2's three Ornithopters are more than
+# Bot1's lone Inkling, but "this creature" is gone (CR 400.7), so nothing becomes prepared and no Swords to Plowshares
+# copy is made; the Inkling is still created for the targeted player.
+
+[Bot1 Deck]
+Plains x3
+Emeritus of Truce
+Plains x16
+
+[Bot2 Deck]
+Mountain
+Ornithopter x3
+Lightning Bolt
+Mountain x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Emeritus of Truce.Cast
+Bot1.Target(Bot1)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Emeritus of Truce)
+[T5 Bot1.Main2]
+? Exile.Count = 0
+
+[Expect]
+Bot1.Battlefield = Plains; Plains; Plains; Inkling
+Bot1.Graveyard = Emeritus of Truce
+Bot2.Graveyard = Lightning Bolt
+Bot2.Battlefield.Count = 4

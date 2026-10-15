@@ -1,0 +1,44 @@
+# "Exile three cards from your graveyard: This creature gains flying until end of turn." Bot1 discards two Islands to the Frog on
+# turn 1: with only two cards in the graveyard the ability is not offered (refused). On turn 3 a third discard makes three
+# and the Frog exiles them to gain flying (checked), which is gone again by Bot2's turn 4.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Psychic Frog
+Island x4
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Psychic Frog.Cast
+Bot1.Pass
+Bot1.Battlefield.Psychic Frog.Activate(Ability: Discard)
+Bot1.Choose(Island)
+Bot1.Pass
+Bot1.Battlefield.Psychic Frog.Activate(Ability: Discard)
+Bot1.Choose(Island)
+Bot1.Pass
+! Bot1.Battlefield.Psychic Frog.Activate(Ability: Exile three)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Psychic Frog.Activate(Ability: Discard)
+Bot1.Choose(Island)
+Bot1.Pass
+Bot1.Battlefield.Psychic Frog.Activate(Ability: Exile three)
+Bot1.Choose(Island; Island; Island)
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Psychic Frog.Keywords = Flying
+? Exile.Count = 3
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Psychic Frog.Keywords = (absent)
+
+[Expect]
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Psychic Frog.Power = 4

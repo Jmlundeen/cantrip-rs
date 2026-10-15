@@ -1,0 +1,39 @@
+# Broadside Bombardiers is cast on turn 5 off three Mountains and attacks (haste). With only itself and lands to
+# sacrifice, the boast is not offered: the cost is "another creature or artifact", and a land is neither. After combat
+# Mox Ruby (mana value 0) is cast, which is the positive control: the same boast is now offered, sacrifices the Mox
+# for 2 + 0 damage, and Bot2 has taken 2 from combat and 2 from the boast.
+
+[Bot1 Deck]
+Mountain
+Broadside Bombardiers
+Mox Ruby
+Mountain x4
+Mountain x6
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Hand.Broadside Bombardiers.Cast
+Bot1.Pass
+Bot1.Attack(Broadside Bombardiers > Bot2)
+! Bot1.Battlefield.Broadside Bombardiers.Activate
+[T5 Bot1.Main2]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Broadside Bombardiers.Activate(Bot2)
+Bot1.Choose(Mox Ruby)
+Bot1.Pass
+
+[Expect]
+Bot2.Life = 16
+Bot1.Graveyard = Mox Ruby
+Bot1.Battlefield.Broadside Bombardiers.Tapped = true

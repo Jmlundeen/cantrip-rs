@@ -1,0 +1,36 @@
+# Reflection of Kiki-Jiki: "Sacrifice it at the beginning of the next end step." Bot1 activates it during its own end step
+# on turn 7, after that turn's end step has begun, so the next end step is the one of Bot2's turn 8: the hasty copy of
+# the Goblin Shaman is still there in Bot2's main phase and gone on turn 9. (Made earlier in the turn, it is sacrificed
+# at that turn's end step: fable-of-the-mirror-breaker-flips-into-a-kiki-jiki-that-copies-the-goblin-for-a-turn.)
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Black Lotus
+Fable of the Mirror-Breaker
+Mountain x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Fable of the Mirror-Breaker.Cast
+[T3 Bot1.Main1]
+Bot1.Choose()
+[T5 Bot1.Main1]
+Bot1.Pass
+[T7 Bot1.End]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Reflection of Kiki-Jiki.Activate(Goblin Shaman)
+Bot1.Pass
+[T8 Bot2.Main1]
+? Bot1.Battlefield.Goblin Shaman#2.Keywords = Haste
+[T9 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield = Mountain; Mox Ruby; Reflection of Kiki-Jiki; Goblin Shaman
+Bot1.Battlefield.Goblin Shaman.Keywords = (absent)

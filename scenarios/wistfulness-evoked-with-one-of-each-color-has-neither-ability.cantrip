@@ -1,0 +1,32 @@
+# Wistfulness evoked with a Forest and an Island: only one {G} and one {U} was spent, and the abilities each need two of
+# their own color, so neither triggers. The opponent's Sol Ring stays, nothing is drawn, and evoke sacrifices it.
+
+[Bot1 Deck]
+Wistfulness
+Forest
+Island
+Forest x5
+Forest x10
+
+[Bot2 Deck]
+Sol Ring
+Forest x6
+Forest x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Wistfulness.Cast(Ability: Evoke)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Island.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Forest; Sol Ring
+Bot1.Graveyard = Wistfulness
+Bot1.Hand.Count = 5

@@ -1,0 +1,6 @@
+{
+  "name": "Tempered Steel",
+  "manaCost": "{1}{W}{W}",
+  "type": "Enchantment",
+  "oracleText": "Artifact creatures you control get +2/+2."
+}

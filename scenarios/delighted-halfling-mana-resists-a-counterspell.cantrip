@@ -1,0 +1,37 @@
+# Bot1 casts Delighted Halfling turn 1. On turn 5, once it has lost summoning sickness, Bot1 taps its second ability
+# for black, restricted to legendary spells and uncounterable, and casts Cecil, Dark Knight with it. Bot2 taps two
+# Islands for Counterspell, which resolves and does nothing: the mana that cast Cecil made it uncounterable.
+
+[Bot1 Deck]
+Forest
+Delighted Halfling
+Cecil, Dark Knight
+Forest x12
+
+[Bot2 Deck]
+Island
+Island
+Counterspell
+Island x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Delighted Halfling.Cast
+Bot2.Hand.Island.Play
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Battlefield.Delighted Halfling.Activate(Color: Black; Ability: any color)
+Bot1.Hand.Cecil, Dark Knight.Cast
+? Stack = Cecil, Dark Knight
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Counterspell.Cast(Cecil, Dark Knight)
+? Stack = Counterspell; Cecil, Dark Knight
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield = Forest; Delighted Halfling; Cecil, Dark Knight
+Bot2.Battlefield = Island; Island
+Bot2.Graveyard = Counterspell

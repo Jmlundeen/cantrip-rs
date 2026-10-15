@@ -1,0 +1,31 @@
+# The trigger targets a creature you control: with none, Hammer of Nazahn's own entering trigger is removed (CR 603.3d) and nothing is asked. A Mox Jet entering afterwards is not an
+# Equipment, and an Ornithopter is not either, so neither triggers it; the Hammer ends up unattached.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Hammer of Nazahn
+Ornithopter
+Swamp x13
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Hammer of Nazahn.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Hammer of Nazahn.AttachedTo = (absent)
+Bot1.Battlefield.Ornithopter.Power = 0

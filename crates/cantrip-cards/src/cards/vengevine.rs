@@ -1,0 +1,37 @@
+use cantrip_api::*;
+use cantrip_mechanics::effects::ask_may_return_this_card;
+use cantrip_oracle as oracle;
+
+/// "Whenever you cast a spell, if it's the second creature spell you cast this turn": this turn's history says how
+/// each spell was cast, this one included (CR 603.4: a fact about the past). It functions from its owner's graveyard
+/// (CR 113.6k), so it triggers only there.
+fn second_creature_spell(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    let Event::SpellCast { spell, player, .. } = event else { return None };
+    let owner = q.obj(source).owner;
+    if q.obj(source).zone != Zone::graveyard(owner) || *player != owner || !q.history().cast_of(*spell).is_some_and(|c| c.is(CardType::Creature)) {
+        return None;
+    }
+    let creatures = q.history().casts_by(owner).filter(|c| c.is(CardType::Creature)).count();
+    if creatures == 2 { Fired::PLAIN } else { None }
+}
+
+/// "You may return this card from your graveyard to the battlefield": nothing is asked once it is no longer the card that
+/// triggered (CR 400.7).
+fn return_to_battlefield(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if ask_may_return_this_card(g, item, Purpose::Optional)? {
+        g.put_onto_battlefield(item.object, item.controller, false)?;
+    }
+    Ok(())
+}
+
+pub static CARD: CardDef = CardDef {
+    abilities: &[AbilityDef::Triggered(TriggeredDef {
+        text: "Whenever you cast a spell, if it's the second creature spell you cast this turn, you may return this card from your graveyard to the battlefield.",
+        listens: EventMask::SPELL_CAST,
+        matches: second_creature_spell,
+        effect: return_to_battlefield,
+        anywhere: true,
+        ..TriggeredDef::BLANK
+    })],
+    ..oracle::VENGEVINE
+};

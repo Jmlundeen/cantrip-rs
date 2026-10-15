@@ -1,0 +1,24 @@
+# Touch the Spirit Realm cast with no artifact or creature on the battlefield (Black Lotus is sacrificed for the mana): "exile up to one
+# target artifact or creature" has no target and the enchantment simply stays.
+
+[Bot1 Deck]
+Black Lotus
+Touch the Spirit Realm
+Plains x3
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Touch the Spirit Realm.Cast
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Count = 1
+Exile.Count = 0

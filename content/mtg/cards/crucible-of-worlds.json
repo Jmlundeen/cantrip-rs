@@ -1,0 +1,6 @@
+{
+  "name": "Crucible of Worlds",
+  "manaCost": "{3}",
+  "type": "Artifact",
+  "oracleText": "You may play lands from your graveyard."
+}

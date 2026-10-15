@@ -1,0 +1,43 @@
+# "Target creature you don't control": Bot1's own Elvish Mystic is refused (named in the refusal), Bot2's is exiled. Bot2 then
+# searches for a basic land: a Volcanic Island is not one (refusal), a Forest is, and it enters tapped.
+
+[Bot1 Deck]
+Plains
+Mox Emerald
+Mox Jet
+Elvish Mystic
+Winds of Abandon
+Plains x12
+
+[Bot2 Deck]
+Forest
+Elvish Mystic
+Forest x5
+Forest
+Volcanic Island
+Forest x8
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Elvish Mystic.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Winds of Abandon.Cast(Bot1.Battlefield.Elvish Mystic)
+Bot1.Hand.Winds of Abandon.Cast(Bot2.Battlefield.Elvish Mystic)
+! Bot2.Search(Volcanic Island)
+Bot2.Search(Forest)
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Elvish Mystic
+Bot1.Battlefield.Elvish Mystic.Power = 1
+Bot2.Battlefield = Forest; Forest
+Bot2.Battlefield.Forest#2.Tapped = true

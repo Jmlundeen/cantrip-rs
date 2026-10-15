@@ -1,0 +1,17 @@
+# Watery Grave: as it enters you may pay 2 life; paying keeps it untapped, and as a Swamp it taps for {B}.
+
+[Bot1 Deck]
+Watery Grave
+Plains x19
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Watery Grave.Play
+Bot1.Accept
+Bot1.Battlefield.Watery Grave.Activate(Ability: {B})
+
+[Expect]
+Bot1.Life = 18
+Bot1.Mana = {B}

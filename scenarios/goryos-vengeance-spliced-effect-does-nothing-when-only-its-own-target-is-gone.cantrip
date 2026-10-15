@@ -1,0 +1,61 @@
+# Goryo's Vengeance spliced onto We Say Thee Nay! (CR 702.47) has a target slot of its own after the host's: Bot1 answers Bot2's Lightning Bolt with
+# the spliced spell targeting the Bolt and its entombed Headliner Scarlett. Bot2 then exiles the Scarlett with Ghost Vacuum. One of
+# the spell's targets is gone but the Bolt is still legal (CR 608.2b), so the spell resolves: it does what it can for the
+# Bolt (countered unless its caster pays {2}, which Bot2 cannot) and the spliced Goryo's text, whose only target is gone,
+# does nothing - no creature returns.
+
+[Bot1 Deck]
+Mox Jet
+Mox Sapphire
+Mox Ruby
+Black Lotus
+Entomb
+We Say Thee Nay!
+Goryo's Vengeance
+Island x1
+Headliner Scarlett
+Island x11
+
+[Bot2 Deck]
+Island
+Ghost Vacuum
+Mountain
+Lightning Bolt
+Island x3
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Entomb.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Search(Headliner Scarlett)
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Ghost Vacuum.Cast
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Battlefield.Mountain.Activate
+Bot1.Hand.We Say Thee Nay!.Cast
+Bot1.Modes(Cast without teamwork)
+Bot1.Choose(Goryo's Vengeance)
+Bot1.Target(Stack.Lightning Bolt)
+Bot1.Target(Bot1.Graveyard.Headliner Scarlett)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Ghost Vacuum.Activate(Bot1.Graveyard.Headliner Scarlett)
+[T4 Bot2.Main2]
+
+[Expect]
+Turn = 4
+Exile = Headliner Scarlett
+Bot2.Graveyard = Lightning Bolt
+Bot1.Life = 20
+Bot1.Battlefield.Count = 3
+Stack.Count = 0

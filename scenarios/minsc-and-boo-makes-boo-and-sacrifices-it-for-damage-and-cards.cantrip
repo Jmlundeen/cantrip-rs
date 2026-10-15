@@ -1,0 +1,38 @@
+# Minsc & Boo: when it enters Bot1 accepts and gets Boo, a 1/1 Hamster. The -2 sacrifices Boo (the only creature, so
+# nothing is asked); its reflexive trigger deals 1 damage (Boo's power) to Bot2 and, Boo being a Hamster, draws 1 card.
+# The four Moxen pay for it all on turn 1.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Mox Jet
+Mox Pearl
+Minsc & Boo, Timeless Heroes
+Mountain
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Minsc & Boo, Timeless Heroes.Cast
+Bot1.Accept
+[Bot1.Main1]
+? Bot1.Battlefield.Boo.Power = 1
+Bot1.Battlefield.Minsc & Boo, Timeless Heroes.Activate(Ability: Sacrifice)
+Bot1.Target(Bot2)
+
+[Expect]
+Bot2.Life = 19
+Bot1.Hand.Count = 3
+Bot1.Battlefield.Minsc & Boo, Timeless Heroes.Counters.Loyalty = 1
+Bot1.Battlefield.Count = 5

@@ -1,0 +1,33 @@
+# Two creatures entering at the same time are two events, so two triggers (CR 603.2c): Lingering Souls makes two Spirit tokens
+# at once under Impact Tremors, and Bot2 takes 2.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Pearl
+Mox Sapphire
+Impact Tremors
+Lingering Souls
+Island x12
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Impact Tremors.Cast
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Lingering Souls.Cast
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield.Count = 8

@@ -1,0 +1,40 @@
+# "Whenever a creature you control enters": only creatures, only yours. Bot1's Carnage Interpreter enters and pings once; the
+# four Clue tokens it makes are artifacts, not creatures, and ping nothing (Bot2 at 19, not 15). Then Bot2 casts an Ornithopter:
+# a creature, but not Bot1's, so nothing happens to either player.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Impact Tremors
+Carnage Interpreter
+Island x12
+
+[Bot2 Deck]
+Ornithopter
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Impact Tremors.Cast
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Carnage Interpreter.Cast
+[T2 Bot2.Main1]
+? Bot2.Life = 19
+Bot2.Hand.Ornithopter.Cast
+[T2 Bot2.Main2]
+
+[Expect]
+Bot2.Life = 19
+Bot1.Life = 20
+Bot2.Battlefield = Ornithopter

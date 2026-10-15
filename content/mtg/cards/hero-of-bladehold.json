@@ -1,0 +1,8 @@
+{
+  "name": "Hero of Bladehold",
+  "manaCost": "{2}{W}{W}",
+  "type": "Creature — Human Knight",
+  "power": 3,
+  "toughness": 4,
+  "oracleText": "Battle cry (Whenever this creature attacks, each other attacking creature gets +1/+0 until end of turn.)\nWhenever this creature attacks, create two 1/1 white Soldier creature tokens that are tapped and attacking."
+}

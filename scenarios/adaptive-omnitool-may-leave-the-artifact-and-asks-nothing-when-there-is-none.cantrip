@@ -1,0 +1,48 @@
+# Adaptive Omnitool: "You may reveal an artifact card from among them" and "put the rest on the bottom". On turn 3 the
+# top six hold a Sol Ring and Bot1 takes nothing (Arrange with an empty hand group): the Sol Ring goes to the bottom
+# with the rest, so the library keeps its size. On turn 5 the top six hold no artifact card, and nobody is asked
+# (! Bot1.Arrange), the contrast to the question asked on turn 3.
+
+[Bot1 Deck]
+Plains
+Mox Jet
+Mox Pearl
+Adaptive Omnitool
+Ornithopter
+Plains
+Plains
+Plains
+Island
+Sol Ring
+Island x20
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Adaptive Omnitool.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Adaptive Omnitool.Activate(Ornithopter)
+Bot1.Attack(Ornithopter > Bot2)
+Bot1.Arrange( | Sol Ring; Island; Island; Island; Island; Island)
+[T3 Bot1.Main2]
+? Bot1.Library.Count = 22
+[T5 Bot1.Main1]
+! Bot1.Arrange
+Bot1.Attack(Ornithopter > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Hand = Plains; Plains; Island
+Bot1.Library.Count = 21

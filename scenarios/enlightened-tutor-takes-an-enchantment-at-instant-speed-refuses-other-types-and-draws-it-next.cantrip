@@ -1,0 +1,34 @@
+# "An artifact or enchantment card" and nothing else: the search offers neither the Lightning Bolt (instant), the Island (land)
+# nor the Counterspell (instant) - the refusals - while the Mox Sapphire (artifact) and Rancor (enchantment) are the cards
+# it can find. Cast in Bot2's upkeep (it is an instant), Bot1 takes Rancor, which goes on top of the library and so is the
+# card drawn in turn three's draw step, not the Lightning Bolt that was on top before.
+
+[Bot1 Deck]
+Plains
+Enlightened Tutor
+Plains x5
+Lightning Bolt
+Island
+Counterspell
+Mox Sapphire
+Rancor
+Plains x5
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Upkeep]
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Enlightened Tutor.Cast
+! Bot1.Search(Lightning Bolt)
+! Bot1.Search(Island)
+! Bot1.Search(Counterspell)
+Bot1.Search(Rancor)
+[T3 Bot1.Main1]
+? Bot1.Hand = Plains; Plains; Plains; Plains; Plains; Rancor
+
+[Expect]
+Bot1.Graveyard = Enlightened Tutor
+Bot1.Library.Count = 9

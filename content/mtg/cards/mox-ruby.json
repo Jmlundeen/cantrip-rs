@@ -1,0 +1,6 @@
+{
+  "name": "Mox Ruby",
+  "manaCost": "{0}",
+  "type": "Artifact",
+  "oracleText": "{T}: Add {R}."
+}

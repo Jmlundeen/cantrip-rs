@@ -1,0 +1,38 @@
+# Survival of the Fittest: only a creature card may be discarded for the cost, so a hand with none cannot activate it;
+# once a creature card is drawn, it can.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Survival of the Fittest
+Lightning Bolt
+Lightning Bolt
+Forest
+Forest
+Elvish Mystic
+Lightning Bolt
+Noble Hierarch
+Forest x8
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Survival of the Fittest.Cast
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Count = 2
+! Bot1.Battlefield.Survival of the Fittest.Activate
+[T3 Bot1.Main1]
+? Bot1.Hand = Lightning Bolt; Lightning Bolt; Forest; Forest; Elvish Mystic
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Survival of the Fittest.Activate
+Bot1.Choose(Elvish Mystic)
+Bot1.Search(Noble Hierarch)
+
+[Expect]
+Turn = 3
+Bot1.Hand = Lightning Bolt; Lightning Bolt; Forest; Forest; Noble Hierarch
+Bot1.Graveyard = Elvish Mystic; Black Lotus

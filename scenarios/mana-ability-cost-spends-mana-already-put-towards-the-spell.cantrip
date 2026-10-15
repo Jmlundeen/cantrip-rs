@@ -1,0 +1,39 @@
+# A mana ability whose own cost is mana is paid out of the same pool the spell is being paid from, so it can take mana
+# the player has already put towards the spell. Batroc the Leaper has a multikicker, which is what sends its payment
+# down the "cost with X" path, where what is committed is tracked across the whole conversation rather than re-derived
+# from the pool each time. Bot1 taps a Mountain for {R} towards Batroc's {R}, then sacrifices Chromatic Star for a
+# white mana — whose own {1} spends that very {R}. The {R} must stop being committed when it leaves the pool: the cost
+# owes it again, the second Mountain pays it, and Batroc is cast for {R} and {W} and not for a Red that is gone.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Chromatic Star
+Batroc the Leaper
+Island x3
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Chromatic Star.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Batroc the Leaper.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Chromatic Star.Activate(Color: White)
+Bot1.Battlefield.Mountain.Activate
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Batroc the Leaper; Mountain; Mountain
+Bot1.Battlefield.Batroc the Leaper.Power = 2
+Bot1.Battlefield.Mountain#1.Tapped = true
+Bot1.Battlefield.Mountain#2.Tapped = true
+Bot1.Graveyard = Chromatic Star
+Bot1.Mana = 
+Bot1.Hand.Count = 6

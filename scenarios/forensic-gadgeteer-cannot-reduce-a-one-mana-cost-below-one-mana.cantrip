@@ -1,0 +1,46 @@
+# Forensic Gadgeteer: "This effect can't reduce the mana in that cost to less than one mana." Skullclamp's equip {1} is
+# already one mana, so it stays {1}: a Mox Jet is tapped and its mana is spent on the equip, nothing left in the pool (an
+# uncapped discount would make the equip free and leave it floating). The Gadgeteer is cast on turn 1 with three Moxen;
+# Skullclamp and Ornithopter are artifact spells cast after it, so each investigates (Clues are not asserted).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Forensic Gadgeteer
+Skullclamp
+Ornithopter
+Mountain
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Forensic Gadgeteer.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Skullclamp.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Skullclamp.Activate(Ornithopter)
+? Bot1.Mana =
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Skullclamp.AttachedTo = Ornithopter
+Bot1.Battlefield.Ornithopter.Power = 1

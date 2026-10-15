@@ -1,0 +1,35 @@
+# "Permanent card": Bot1 casts Lightning Bolt at Bot2 on turn 5 and then Night Nurse. The Bolt was put into Bot1's
+# graveyard this turn but is an instant card, not a permanent card, so it is not a legal target, the trigger has
+# none, and the Bolt stays in the graveyard.
+
+[Bot1 Deck]
+Mountain
+Plains
+Lightning Bolt
+Night Nurse, Healer of Heroes
+Plains x3
+Plains x10
+
+[Bot2 Deck]
+Mountain x7
+Mountain x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+[T5 Bot1.Main2]
+? Bot1.Graveyard = Lightning Bolt
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Night Nurse, Healer of Heroes.Cast
+
+[Expect]
+Bot1.Graveyard = Lightning Bolt
+Bot1.Hand = Plains; Plains; Plains; Plains
+Bot1.Battlefield = Mountain; Night Nurse, Healer of Heroes; Plains; Plains
+Bot2.Life = 17

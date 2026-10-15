@@ -1,0 +1,41 @@
+# CR 707.2, 614.12. A choice made as a permanent entered is not one of its copiable values, so a token that is a copy
+# of Painter's Servant has the Servant's "As this creature enters, choose a color" and no color chosen: the token's
+# own controller is asked as the token is created, and the two Servants can be painting different colors.
+#
+# All on turn 1: a Black Lotus pays for the Servant (Blue is chosen for the card) and leaves {U} floating, and the
+# second Lotus with that {U} pays Three Steps Ahead's {U} and its copy mode's {3}. Red is chosen for the token.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Black Lotus
+Mox Sapphire
+Painter's Servant
+Three Steps Ahead
+Island
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Painter's Servant.Cast
+Bot1.Colors(Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Three Steps Ahead.Cast
+Bot1.Modes(2)
+Bot1.Target(Painter's Servant)
+Bot1.Colors(Red)
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Battlefield = Island; Mox Sapphire; Painter's Servant; Painter's Servant
+Bot1.Battlefield.Painter's Servant#1.ChosenColor = Blue
+Bot1.Battlefield.Painter's Servant#2.ChosenColor = Red
+Bot1.Graveyard = Three Steps Ahead; Black Lotus; Black Lotus

@@ -1,0 +1,46 @@
+# Manifold Key: "{3}, {T}: Target creature can't be blocked this turn." On turn 3 the Key makes Llanowar Elves
+# unblockable; Bot2's Birds of Paradise may not block it but blocks the Ornithopter attacking beside it, so only the Elves
+# deal damage.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Mox Jet
+Mox Ruby
+Llanowar Elves
+Ornithopter
+Manifold Key
+Plains x13
+
+[Bot2 Deck]
+Forest
+Birds of Paradise
+Forest x18
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Manifold Key.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Birds of Paradise.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Manifold Key.Activate(Llanowar Elves; Ability: blocked)
+Bot1.Attack(Llanowar Elves; Ornithopter)
+! Bot2.Block(Birds of Paradise > Llanowar Elves)
+Bot2.Block(Birds of Paradise > Ornithopter)
+[Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot2.Life = 19

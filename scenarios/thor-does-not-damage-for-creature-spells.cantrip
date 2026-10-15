@@ -1,0 +1,29 @@
+# Thor has no eligible card to exile when he enters. Casting a creature afterward must not
+# produce his noncreature-spell damage trigger.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Black Lotus
+Thor, God of Thunder
+Dragon's Rage Channeler
+Island
+Island
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Thor, God of Thunder.Cast
+Bot1.Hand.Dragon's Rage Channeler.Cast
+
+[Expect]
+Bot2.Life = 20
+Bot1.Battlefield.Thor, God of Thunder.Keywords = Flying
+Bot1.Battlefield.Dragon's Rage Channeler.Power = 1

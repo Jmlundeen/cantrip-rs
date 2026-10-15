@@ -1,0 +1,8 @@
+{
+  "name": "Thraben Inspector",
+  "manaCost": "{W}",
+  "type": "Creature — Human Soldier",
+  "power": 1,
+  "toughness": 2,
+  "oracleText": "When this creature enters, investigate. (Create a Clue token. It's an artifact with \"{2}, Sacrifice this token: Draw a card.\")"
+}

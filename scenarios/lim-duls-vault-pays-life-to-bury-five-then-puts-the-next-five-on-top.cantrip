@@ -1,0 +1,39 @@
+# Lim-Dûl's Vault: look at the top five, pay 1 life to put them on the bottom and look at the next five, then shuffle
+# and put those five back on top in the order chosen. Five Plains are buried; the library ends as the five chosen cards
+# over the five Plains, and Bot1 is one life down.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Lim-Dûl's Vault
+Island
+Island
+Island
+Island
+Plains x5
+Brainstorm
+Ponder
+Counterspell
+Duress
+Lightning Bolt
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Lim-Dûl's Vault.Cast
+Bot1.Accept
+Bot1.Arrange(Plains; Plains; Plains; Plains; Plains)
+Bot1.Decline
+Bot1.Arrange(Ponder; Brainstorm; Duress; Counterspell; Lightning Bolt)
+[Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 19
+Bot1.Graveyard = Lim-Dûl's Vault
+Bot1.Library = Ponder; Brainstorm; Duress; Counterspell; Lightning Bolt; Plains; Plains; Plains; Plains; Plains

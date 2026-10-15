@@ -1,0 +1,52 @@
+# Control for Shadowspear's "lose indestructible": the same Lightning Bolt at Bot2's Ornithopter wearing Hammer of Nazahn
+# (+2/+0, indestructible) without Shadowspear's ability activated. The 3 damage is lethal on the 2/2 but indestructible
+# keeps it (CR 702.12b), so it stays on the battlefield with the damage marked.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Shadowspear
+Lightning Bolt
+Island x15
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Sol Ring
+Ornithopter
+Hammer of Nazahn
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Shadowspear.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Hammer of Nazahn.Cast
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Accept
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot2.Graveyard.Count = 0
+Bot2.Battlefield.Ornithopter.Damage = 3
+Bot2.Battlefield.Ornithopter.Keywords = Flying; Indestructible
+Bot1.Graveyard = Lightning Bolt

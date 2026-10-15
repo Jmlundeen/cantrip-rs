@@ -1,0 +1,38 @@
+# Terrasymbiosis: Luminarch Aspirant's +1/+1 counter at the beginning of combat is a counter its controller puts on a
+# creature they control (CR 122.6a), so they may draw that many cards. The draw is spent only by a yes: declined on one
+# turn, it is offered again on the next.
+[Bot1 Deck]
+Forest
+Plains
+Forest
+Luminarch Aspirant
+Terrasymbiosis
+Plains
+Forest
+Forest x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Luminarch Aspirant.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Terrasymbiosis.Cast
+[Bot1.BeginCombat]
+Bot1.Decline
+[Bot1.Main2]
+? Bot1.Battlefield.Luminarch Aspirant.Counters.PlusOnePlusOne = 2
+? Bot1.Library.Count = 18
+[T7 Bot1.BeginCombat]
+Bot1.Accept
+[T7 Bot1.Main2]
+[Expect]
+Bot1.Battlefield.Luminarch Aspirant.Counters.PlusOnePlusOne = 3
+Bot1.Library.Count = 16

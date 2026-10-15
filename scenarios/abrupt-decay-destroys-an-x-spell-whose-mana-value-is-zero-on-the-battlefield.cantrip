@@ -1,0 +1,34 @@
+# Mana value off the stack: Bot2 casts Walking Ballista for X = 2 (four mana), but on the battlefield X is 0 (CR 107.3m), so its mana value is 0 and Abrupt Decay may
+# target it. The Ballista still enters with two counters (a 2/2), and Abrupt Decay destroys it.
+
+[Bot1 Deck]
+Forest
+Mox Jet
+Abrupt Decay
+Forest x12
+
+[Bot2 Deck]
+Island
+Black Lotus
+Walking Ballista
+Island x11
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Walking Ballista.Cast(X: 2)
+Bot2.Battlefield.Island.Activate
+[T3 Bot1.Main1]
+? Bot2.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Abrupt Decay.Cast(Walking Ballista)
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Graveyard = Walking Ballista; Black Lotus
+Bot2.Battlefield = Island

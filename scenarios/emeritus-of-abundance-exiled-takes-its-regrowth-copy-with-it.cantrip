@@ -1,0 +1,36 @@
+# CR 722.3c: the prepared creature's Regrowth is a copy that exists only while it is prepared. Bot2 exiles the Emeritus with Swords to Plowshares; the only card in exile is then the Emeritus - the Regrowth copy has ceased to exist -
+# and Bot1 gains 3 life.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Emeritus of Abundance
+Forest x14
+
+[Bot2 Deck]
+Plains
+Swords to Plowshares
+Plains x13
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Emeritus of Abundance.Cast
+Bot1.Pass
+? Exile.Count = 0
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Emeritus of Abundance)
+Bot2.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Exile = Emeritus of Abundance
+Bot1.Life = 23

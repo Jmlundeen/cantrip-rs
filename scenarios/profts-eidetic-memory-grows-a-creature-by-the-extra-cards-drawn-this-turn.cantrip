@@ -1,0 +1,35 @@
+# Proft's Eidetic Memory draws one card as it enters and Brainstorm draws three more: four cards this turn, so at the
+# beginning of combat Bot1's Ornithopter gets four minus one, three, +1/+1 counters.
+
+[Bot1 Deck]
+Island
+Ornithopter
+Mox Sapphire
+Mox Pearl
+Proft's Eidetic Memory
+Brainstorm
+Island
+Island x12
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Proft's Eidetic Memory.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Brainstorm.Cast
+Bot1.Choose(Island; Island)
+[T1 Bot1.BeginCombat]
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 3
+Bot1.Battlefield.Ornithopter.Power = 3

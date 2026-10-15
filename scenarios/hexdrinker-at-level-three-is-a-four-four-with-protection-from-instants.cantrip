@@ -1,0 +1,40 @@
+# Hexdrinker at level 3 (CR 711.2): 4/4 with protection from instants (CR 702.16). Bot2's Fatal Push, an instant, has no
+# legal target (Hexdrinker is the only creature), so it is not offered (the control: at level 2 it is, and kills it).
+
+[Bot1 Deck]
+Forest
+Hexdrinker
+Mox Ruby
+Mox Jet
+Mox Pearl
+Forest x10
+
+[Bot2 Deck]
+Swamp
+Fatal Push
+Swamp x5
+Swamp x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Hexdrinker.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Hexdrinker.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Hexdrinker.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Hexdrinker.Activate
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+! Bot2.Hand.Fatal Push.Cast
+[T3 Bot1.Upkeep]
+
+[Expect]
+Bot1.Battlefield.Hexdrinker.Power = 4
+Bot1.Battlefield.Hexdrinker.Toughness = 4
+Bot1.Battlefield.Hexdrinker.Counters.Level = 3
+Bot2.Graveyard.Count = 0

@@ -1,0 +1,71 @@
+# The emblem ("Whenever an artifact is put into your graveyard from the battlefield, return that card to the battlefield at
+# the beginning of the next end step") on turn 11 (as in the other emblem scenario; loyalty 3, 5, 7, 9, 11). The Lotus Petal Bot1
+# sacrifices comes back (the positive control). What does not: Mother of Runes, which Bot2's Bolt kills on turn 12 (not an
+# artifact), Bot2's own Lotus Petal, sacrificed on the same turn (it goes to Bot2's graveyard, not "your" graveyard), and a
+# Mox Emerald that Bot1 discards with +2 on turn 13 (an artifact, but from the hand, not the battlefield).
+
+[Bot1 Deck]
+Daretti, Scrap Savant
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Mox Pearl
+Lotus Petal
+Mother of Runes
+Island x9
+Mox Emerald
+Island x20
+
+[Bot2 Deck]
+Mountain
+Lotus Petal
+Lightning Bolt
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Daretti, Scrap Savant.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Mother of Runes.Cast
+Bot1.Pass
+Bot1.Battlefield.Daretti, Scrap Savant.Activate(Ability: Discard up to two)
+Bot1.Choose(Island)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Daretti, Scrap Savant.Activate(Ability: Discard up to two)
+Bot1.Choose(Island)
+[T7 Bot1.Main1]
+Bot1.Battlefield.Daretti, Scrap Savant.Activate(Ability: Discard up to two)
+Bot1.Choose(Island)
+[T9 Bot1.Main1]
+Bot1.Battlefield.Daretti, Scrap Savant.Activate(Ability: Discard up to two)
+Bot1.Choose(Island)
+[T11 Bot1.Main1]
+Bot1.Battlefield.Daretti, Scrap Savant.Activate(Ability: You get an emblem)
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Battlefield.Lotus Petal.Activate(Color: Red)
+[T12 Bot2.Main1]
+? Bot1.Battlefield.Lotus Petal.Tapped = False
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Mother of Runes)
+Bot2.Pass
+Bot2.Hand.Lotus Petal.Cast
+Bot2.Battlefield.Lotus Petal.Activate(Color: Red)
+[T13 Bot1.Main1]
+Bot1.Battlefield.Daretti, Scrap Savant.Activate(Ability: Discard up to two)
+Bot1.Choose(Mox Emerald)
+[T14 Bot2.Main1]
+
+[Expect]
+Bot1.Emblems.Count = 1
+Bot1.Battlefield = Daretti, Scrap Savant; Mox Ruby; Mox Jet; Mox Sapphire; Mox Pearl; Lotus Petal
+Bot1.Graveyard = Mox Emerald; Mother of Runes; Island; Island; Island; Island
+Bot2.Battlefield = Mountain

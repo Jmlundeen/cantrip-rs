@@ -1,0 +1,30 @@
+# Marauding Mako comes down on turn 1. On turn 3 Bot1 cycles Miscalculation for {2}: the discard is one card, so the
+# trigger puts one +1/+1 counter on the Mako, and the cycled card's draw still happens.
+
+[Bot1 Deck]
+Mountain
+Marauding Mako
+Mountain
+Miscalculation
+4 Mountain
+15 Mountain
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Marauding Mako.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Miscalculation.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Marauding Mako.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Marauding Mako.Power = 2
+
+[Expect]
+Bot1.Battlefield.Marauding Mako.Counters.PlusOnePlusOne = 1
+Bot1.Graveyard = Miscalculation

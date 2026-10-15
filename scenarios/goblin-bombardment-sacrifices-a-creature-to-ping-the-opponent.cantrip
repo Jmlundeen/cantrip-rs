@@ -1,0 +1,31 @@
+# Goblin Bombardment: Bot1 casts an Elvish Mystic on turn one and the Bombardment on turn three, then sacrifices the
+# Mystic as the cost of its ability to deal 1 damage to Bot2.
+
+[Bot1 Deck]
+Forest
+Elvish Mystic
+Mountain
+Goblin Bombardment
+Forest x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Goblin Bombardment.Cast
+Bot1.Pass
+Bot1.Battlefield.Goblin Bombardment.Activate(Bot2)
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Bot2.Life = 19
+Bot1.Graveyard = Elvish Mystic
+Bot1.Battlefield = Forest; Mountain; Goblin Bombardment

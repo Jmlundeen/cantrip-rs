@@ -1,0 +1,31 @@
+# The targets are any lands, not only your own: Bot1 pays X of 1 with an Island and untaps Bot2's tapped Island, which
+# Bot2 had tapped for mana on Bot1's turn.
+
+[Bot1 Deck]
+Candelabra of Tawnos
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Candelabra of Tawnos.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+? Bot2.Battlefield.Island.Tapped = True
+Bot1.Battlefield.Candelabra of Tawnos.Activate(X: 1)
+Bot1.Target(Bot2.Battlefield.Island)
+Bot1.Battlefield.Island.Activate
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Island.Tapped = False

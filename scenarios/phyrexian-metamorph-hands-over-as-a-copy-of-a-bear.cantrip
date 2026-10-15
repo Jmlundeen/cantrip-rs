@@ -1,0 +1,47 @@
+# Bot1's Phyrexian Metamorph enters as a copy of Bot2's Guerrilla Gorilla (CR 707.2), an artifact in addition to its other
+# types (CR 707.9b), and the position is handed to Bot1 with both Gorillas on the table. Bot1's reads Guerrilla Gorilla, art and
+# all, with "Copy" on its art; held up to read, Phyrexian Metamorph stands beside it as printed.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Island
+Island
+Phyrexian Metamorph
+Island x9
+
+[Bot2 Deck]
+Forest
+Forest
+Guerrilla Gorilla
+Forest x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Phyrexian Metamorph.Cast
+Bot1.Accept
+Bot1.Target(Guerrilla Gorilla)
+[Handover Bot1.Pass]
+
+[Expect]
+Turn = 5
+Step = Main1
+Stack.Count = 0
+Bot1.Battlefield = Island; Island; Island; Mox Sapphire; Guerrilla Gorilla
+Bot1.Battlefield.Guerrilla Gorilla.Types = Creature; Artifact
+Bot2.Battlefield = Forest; Forest; Guerrilla Gorilla

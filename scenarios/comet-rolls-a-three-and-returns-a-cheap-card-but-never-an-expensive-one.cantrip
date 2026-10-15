@@ -1,0 +1,59 @@
+# Comet, Stellar Pup: "3 - [-1], then return a card with mana value 2 or less from your graveyard to your hand." The [Dice] fix
+# the rolls: 6 ([+1] and two more activations), then 3, then 3.
+#
+# Bot1's graveyard holds a Lightning Bolt (mana value 1, cast on turn 1) and a Wrath of God (mana value 4, discarded to Bot2's
+# Duress on turn 2). The first 3 offers only the Bolt, and Bot1 returns it; the second finds only the Wrath, which is too
+# expensive, so nothing is asked and nothing returns. Loyalty 5 + 1 - 1 - 1 = 4.
+
+[Dice]
+6; 3; 3
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Sol Ring
+Comet, Stellar Pup
+Lightning Bolt
+Wrath of God
+Island x20
+
+[Bot2 Deck]
+Swamp
+Duress
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Duress.Cast(Bot1)
+Bot2.Choose(Wrath of God)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Comet, Stellar Pup.Cast
+Bot1.Pass
+Bot1.Battlefield.Comet, Stellar Pup.Activate
+Bot1.Pass
+Bot1.Battlefield.Comet, Stellar Pup.Activate
+Bot1.Pass
+Bot1.Choose(Lightning Bolt)
+Bot1.Battlefield.Comet, Stellar Pup.Activate
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Comet, Stellar Pup.Counters.Loyalty = 4
+Bot1.Graveyard = Wrath of God
+Bot1.Hand = Island; Lightning Bolt

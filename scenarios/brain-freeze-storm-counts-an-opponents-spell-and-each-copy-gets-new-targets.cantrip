@@ -1,0 +1,46 @@
+# Storm counts every spell cast before it this turn, whoever cast it (CR 702.40a). Bot2 casts Lightning Bolt in Bot1's
+# upkeep and Bot1 casts Mox Sapphire, so Brain Freeze on turn 3 is copied twice. The copies' controller may choose new
+# targets (CR 702.40a, 707.10c): the first copy is aimed at Bot1 itself, the second keeps Bot2. Bot2 mills 3 twice, Bot1 once.
+
+[Bot1 Deck]
+Island
+Island
+Mox Sapphire
+Brain Freeze
+Island x3
+Island x12
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x5
+Island x14
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Upkeep]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Brain Freeze.Cast(Bot2)
+Bot1.Target(Bot1)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Life = 17
+Bot2.Library.Count = 7
+Bot1.Library.Count = 8
+Bot2.Graveyard.Count = 7
+Bot1.Graveyard.Count = 4

@@ -1,0 +1,8 @@
+{
+  "name": "Lotus Cobra",
+  "manaCost": "{1}{G}",
+  "type": "Creature — Snake",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "Landfall — Whenever a land you control enters, add one mana of any color."
+}

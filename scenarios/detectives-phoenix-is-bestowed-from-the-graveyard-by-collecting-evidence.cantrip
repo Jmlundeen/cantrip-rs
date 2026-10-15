@@ -1,0 +1,42 @@
+# Detective's Phoenix: "Bestow - {R}, Collect evidence 6" and "You may cast this card from your graveyard using its bestow
+# ability." Faithless Looting discards the Phoenix and Griselbrand on turn 3. Bot1 casts the Phoenix from the graveyard as an
+# Aura on Ornithopter for {R}, exiling Griselbrand (mana value 8, enough evidence; the Phoenix itself does not count): the
+# Ornithopter becomes a 2/4 flyer with haste and Griselbrand is in exile.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Faithless Looting
+Ornithopter
+Detective's Phoenix
+Griselbrand
+Mountain
+Mountain x14
+
+[Bot2 Deck]
+Island x13
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Detective's Phoenix; Griselbrand)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Graveyard.Detective's Phoenix.Cast(Bot1.Battlefield.Ornithopter; Ability: Bestow)
+Bot1.Choose(Griselbrand)
+Bot1.Pass
+
+[Expect]
+Exile.Count = 1
+Bot1.Battlefield.Detective's Phoenix.AttachedTo = Ornithopter
+Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Ornithopter.Toughness = 4
+Bot1.Battlefield.Ornithopter.Keywords = Flying; Haste
+Bot1.Battlefield.Detective's Phoenix.Types = Enchantment

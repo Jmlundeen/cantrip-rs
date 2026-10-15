@@ -1,0 +1,44 @@
+# Bot1's Flickerwisp targets Bot2's Mountain. Bot2 taps the Mountain for mana and Lightning Bolts the Flickerwisp in response. The
+# enters trigger is independent of its source: the Mountain is exiled all the same, and comes back untapped at the beginning
+# of the next end step (a new object, CR 400.7).
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Flickerwisp
+Plains x3
+Plains x13
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Hand.Flickerwisp.Cast
+Bot1.Pass
+Bot1.Target(Bot2.Battlefield.Mountain)
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Flickerwisp)
+[T5 Bot1.Main2]
+? Exile = Mountain
+? Bot1.Graveyard = Flickerwisp
+[T6 Bot2.Main1]
+
+[Expect]
+Turn = 6
+Exile.Count = 0
+Bot2.Battlefield = Mountain
+Bot2.Battlefield.Mountain.Tapped = false

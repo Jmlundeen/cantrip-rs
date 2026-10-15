@@ -1,0 +1,35 @@
+# Bot2 controls no artifacts, so Override asks Bot1 for {0} (CR 118.5): Bot1, with no mana at all, pays it and Thicket
+# Gorilla resolves.
+
+[Bot1 Deck]
+Guerrilla Gorilla
+Forest x6
+Forest x10
+
+[Bot2 Deck]
+Override
+Island x6
+Island x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot2.Hand.Island.Play
+Bot1.Hand.Forest.Play
+Bot2.Hand.Island.Play
+Bot1.Hand.Forest.Play
+Bot2.Hand.Island.Play
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Override.Cast(Guerrilla Gorilla)
+Bot1.Pass
+Bot1.PayCost
+
+[Expect]
+Turn = 7
+Bot1.Battlefield = Forest; Forest; Forest; Forest; Guerrilla Gorilla
+Bot2.Graveyard = Override

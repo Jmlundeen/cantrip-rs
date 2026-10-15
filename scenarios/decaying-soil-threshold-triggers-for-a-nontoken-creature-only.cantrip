@@ -1,0 +1,98 @@
+# Decaying Soil with threshold (Brain Freeze with storm 6 on Bot1 on turn 1: 22 cards in the graveyard). "Whenever a
+# nontoken creature is put into your graveyard from the battlefield, you may pay {1}": on turn 4 Bot2 kills, in turn,
+# Bot1's Golem token (a token: no trigger, and the stack is empty), destroys Bot1's tapped Mox Jet with Abrade (an
+# artifact, not a creature: no trigger), and Lightning Bolts the Sandstorm Salvager that made the Golem -- a nontoken
+# creature, the positive control: the Soil's ability goes on the stack, Bot1 pays {1} with a Mox Ruby and the Salvager
+# returns to its hand.
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Ruby
+Decaying Soil
+Mox Sapphire
+Mox Emerald
+Brain Freeze
+Island x21
+Sandstorm Salvager
+Island x20
+
+[Bot2 Deck]
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Abrade
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Decaying Soil.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Brain Freeze.Cast(Bot1)
+Bot1.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+[T3 Bot1.Upkeep]
+Bot1.Choose(Island)
+[T3 Bot1.Main1]
+? Bot1.Graveyard.Count = 21
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sandstorm Salvager.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 8
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Ruby#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Golem)
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 0
+? Bot1.Battlefield.Count = 7
+Bot2.Battlefield.Mox Ruby#2.Activate
+Bot2.Battlefield.Mox Ruby#3.Activate
+Bot2.Hand.Abrade.Cast
+Bot2.Modes(Destroy target artifact)
+Bot2.Target(Bot1.Battlefield.Mox Jet#1)
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 0
+? Bot1.Graveyard.Count = 22
+Bot2.Battlefield.Mox Ruby#4.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Sandstorm Salvager)
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 1
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.PayCost
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Hand = Sandstorm Salvager
+Stack.Count = 0

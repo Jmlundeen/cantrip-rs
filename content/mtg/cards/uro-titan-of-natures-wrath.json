@@ -1,0 +1,8 @@
+{
+  "name": "Uro, Titan of Nature's Wrath",
+  "manaCost": "{1}{G}{U}",
+  "type": "Legendary Creature — Elder Giant",
+  "power": 6,
+  "toughness": 6,
+  "oracleText": "When Uro enters, sacrifice it unless it escaped.\nWhenever Uro enters or attacks, you gain 3 life and draw a card, then you may put a land card from your hand onto the battlefield.\nEscape—{G}{G}{U}{U}, Exile five other cards from your graveyard. (You may cast this card from your graveyard for its escape cost.)"
+}

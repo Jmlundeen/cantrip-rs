@@ -1,0 +1,21 @@
+# Swampcycling {1} is a cycling ability (CR 702.29e): from the hand, Bot1 pays {1}, discards the Troll and searches its
+# library for a Swamp, which goes into its hand.
+[Bot1 Deck]
+Island
+Troll of Khazad-dûm
+Island x5
+Swamp
+Island x10
+[Bot2 Deck]
+Island x15
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Troll of Khazad-dûm.Activate
+Bot1.Search(Swamp)
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Graveyard = Troll of Khazad-dûm
+Bot1.Hand = Island; Island; Island; Island; Island; Swamp
+Bot1.Library.Count = 10

@@ -1,0 +1,42 @@
+# Grist's +1 after Grist has left the battlefield (the ruling): Bot2 bolts her twice in response, so she is in the
+# graveyard as the ability resolves. It still makes a token and mills, and still repeats on each Insect card milled
+# (Haywire Mite, Icetill Explorer), putting no loyalty counter anywhere, and stops on the Llanowar Elves.
+
+[Bot1 Deck]
+Bayou x3
+Grist, the Hunger Tide
+Forest x5
+Haywire Mite
+Icetill Explorer
+Llanowar Elves
+Forest x13
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt x2
+Mountain x19
+
+[Actions]
+Bot1.Hand.Bayou.Play
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Bayou.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Bayou.Play
+Bot1.Battlefield.Bayou#1.Activate(Ability: Add {B})
+Bot1.Battlefield.Bayou#2.Activate(Ability: Add {G})
+Bot1.Battlefield.Bayou#3.Activate(Ability: Add {G})
+Bot1.Hand.Grist, the Hunger Tide.Cast
+[T5 Bot1.Main2]
+Bot1.Battlefield.Grist, the Hunger Tide.Activate(Ability: +1)
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Grist, the Hunger Tide)
+Bot2.Battlefield.Mountain#2.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Grist, the Hunger Tide)
+[T5 Bot1.End]
+
+[Expect]
+Bot1.Graveyard = Llanowar Elves; Icetill Explorer; Haywire Mite; Grist, the Hunger Tide
+Bot1.Battlefield = Bayou; Bayou; Bayou; Insect; Insect; Insect

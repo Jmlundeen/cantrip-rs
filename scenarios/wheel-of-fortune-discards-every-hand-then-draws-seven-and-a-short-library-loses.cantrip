@@ -1,0 +1,39 @@
+# "Each player discards their hand, then draws seven cards" (CR 101.4, 701.9): Bot1 casts Wheel of Fortune off three Moxen with
+# Lightning Bolt, Counterspell and Island still in hand; those and Bot2's seven Islands all go to the graveyards before anyone
+# draws. Bot2's deck holds only ten cards, so after discarding seven its library of three gives three cards, and Bot2 loses the
+# game for the draw from an empty library (CR 704.5b). Bot1's own seven are drawn in full.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Wheel of Fortune
+Lightning Bolt
+Counterspell
+Island
+Island x10
+
+[Bot2 Deck]
+Island x7
+Mountain x3
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Wheel of Fortune.Cast
+Bot1.Pass
+
+[Expect]
+Result = Bot1 won
+Bot1.Hand.Count = 7
+Bot1.Graveyard.Count = 4
+Bot2.Graveyard.Count = 7
+Bot2.Hand.Count = 3
+Bot2.Library.Count = 0

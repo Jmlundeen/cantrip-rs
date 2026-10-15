@@ -1,0 +1,56 @@
+# Aragorn enters on turn 1 and makes Bot1 the monarch, who draws the Plains at the end step. On turn 3 it attacks as the
+# monarch, so no creature can block: its lifelink damage goes through. On turn 4 Bot2's Guerrilla Gorilla deals combat damage
+# to the monarch and takes the crown.
+
+[Bot1 Deck]
+Volcanic Island
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Aragorn, King of Gondor
+Island
+Island
+Plains
+Island x10
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Guerrilla Gorilla
+Forest x10
+
+[Actions]
+Bot1.Hand.Volcanic Island.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Volcanic Island.Activate(Ability: {U})
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Aragorn, King of Gondor.Cast
+Bot2.Hand.Forest.Play
+? Monarch = Bot1
+? Bot1.Hand = Island; Island; Plains
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Aragorn, King of Gondor)
+Bot1.Target(Guerrilla Gorilla)
+[T3 Bot1.Main2]
+? Bot2.Life = 16
+? Bot1.Life = 24
+Bot2.Attack(Guerrilla Gorilla)
+[T4 Bot2.Main2]
+
+[Expect]
+Turn = 4
+Monarch = Bot2
+Bot1.Life = 22
+Bot2.Life = 16
+Bot1.Battlefield = Volcanic Island; Mox Pearl; Mox Sapphire; Mox Ruby; Aragorn, King of Gondor
+Bot1.Battlefield.Aragorn, King of Gondor.Tapped = false
+Bot2.Battlefield = Forest; Mox Emerald; Guerrilla Gorilla
+Combat.Blocks.Count = 0

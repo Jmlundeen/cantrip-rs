@@ -1,0 +1,6 @@
+{
+  "name": "Earthcraft",
+  "manaCost": "{1}{G}",
+  "type": "Enchantment",
+  "oracleText": "Tap an untapped creature you control: Untap target basic land."
+}

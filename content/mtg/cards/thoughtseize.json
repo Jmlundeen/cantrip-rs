@@ -1,0 +1,6 @@
+{
+  "name": "Thoughtseize",
+  "manaCost": "{B}",
+  "type": "Sorcery",
+  "oracleText": "Target player reveals their hand. You choose a nonland card from it. That player discards that card. You lose 2 life."
+}

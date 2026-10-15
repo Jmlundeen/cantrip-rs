@@ -1,0 +1,31 @@
+# "{3}: Untap this artifact." has no condition: with the Monolith untapped, paying {3} (Moxen) leaves it untapped, and it still taps for {C}{C}{C} afterwards.
+
+[Bot1 Deck]
+Black Lotus
+Basalt Monolith
+Mox Ruby
+Mox Jet
+Mox Pearl
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Basalt Monolith.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+? Bot1.Battlefield.Basalt Monolith.Tapped = false
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Add)
+? Bot1.Mana = {C}{C}{C}
+
+[Expect]
+Bot1.Battlefield.Basalt Monolith.Tapped = true

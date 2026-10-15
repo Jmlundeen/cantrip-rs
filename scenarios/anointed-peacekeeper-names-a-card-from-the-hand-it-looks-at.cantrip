@@ -1,0 +1,31 @@
+# Bot1 casts Anointed Peacekeeper off a Plains, Mox Pearl and Sol Ring, looks at Bot2's hand as it enters and names
+# Lightning Bolt rather than Counterspell, the costliest card there, which is what an unscripted answer would name.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Sol Ring
+Anointed Peacekeeper
+Plains x11
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Counterspell
+Mountain x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Anointed Peacekeeper.Cast
+Bot1.Name(Lightning Bolt)
+
+[Expect]
+Turn = 1
+Bot1.Battlefield = Plains; Mox Pearl; Sol Ring; Anointed Peacekeeper
+Bot1.Battlefield.Anointed Peacekeeper.ChosenName = Lightning Bolt
+Bot2.Hand = Mountain; Lightning Bolt; Counterspell; Mountain; Mountain; Mountain; Mountain

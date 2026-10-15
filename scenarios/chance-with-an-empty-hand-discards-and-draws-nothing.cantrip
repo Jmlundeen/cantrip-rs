@@ -1,0 +1,39 @@
+# Chance: "Discard any number of cards, then draw that many cards." With no card in hand there is nothing to discard and so nothing to
+# draw, and nobody is asked. Bot1 has put its whole hand onto the battlefield on turn 1 (Moxen and Black Lotus are free), cast Leave
+# with no targets, and then casts Chance from the graveyard for {3}{R}; Chance is exiled and the library is untouched.
+
+[Bot1 Deck]
+Leave // Chance
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Black Lotus
+Mox Emerald
+Island x10
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Leave // Chance.Cast(Ability: Leave)
+Bot1.Pass
+[T1 Bot1.Main2]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Graveyard.Leave // Chance.Cast(Ability: Chance)
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Exile.Count = 1
+Bot1.Hand.Count = 0
+Bot1.Library.Count = 10

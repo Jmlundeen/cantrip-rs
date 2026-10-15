@@ -1,0 +1,32 @@
+# "You choose a nonland card from it" (CR 608.2c): a revealed hand of nothing but lands has no card to choose, so nothing is
+# discarded and the spell still resolves. Bot2's seven Islands stay in hand; Bot1 casts Drill Bit on turn 1 with Moxen.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Drill Bit
+Swamp x3
+Swamp x10
+
+[Bot2 Deck]
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Drill Bit.Cast(Bot2)
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot2.Hand.Count = 7
+Bot2.Graveyard.Count = 0
+Bot1.Graveyard = Drill Bit

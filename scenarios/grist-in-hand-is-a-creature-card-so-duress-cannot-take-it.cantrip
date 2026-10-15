@@ -1,0 +1,25 @@
+# Grist, the Hunger Tide: "As long as Grist isn't on the battlefield, it's a 1/1 Insect creature in addition to its
+# other types." In hand Grist is a creature card, so Duress ("a noncreature, nonland card") finds nothing to take
+# (the ruling's own example).
+
+[Bot1 Deck]
+Bayou x3
+Grist, the Hunger Tide
+Forest x18
+
+[Bot2 Deck]
+Swamp
+Duress
+Swamp x20
+
+[Actions]
+Bot1.Hand.Bayou.Play
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Duress.Cast(Bot1)
+[T2 Bot2.End]
+
+[Expect]
+Bot2.Graveyard = Duress
+Bot1.Graveyard.Count = 0
+Bot1.Hand = Bayou; Bayou; Grist, the Hunger Tide; Forest; Forest; Forest

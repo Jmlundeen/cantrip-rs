@@ -1,0 +1,6 @@
+{
+  "name": "Paradoxical Outcome",
+  "manaCost": "{3}{U}",
+  "type": "Instant",
+  "oracleText": "Return any number of target nonland, nontoken permanents you control to their owners' hands. Draw a card for each card returned to your hand this way."
+}

@@ -1,0 +1,41 @@
+# Unearth is "only as a sorcery" (CR 702.84a, 602.5d): with four lands in play on the opponent's turn the card in the
+# graveyard is not offered it, and the same ability is offered in Bot1's own main phase on turn 9, the control. (An
+# option offered but not affordable still counts as offered, so the refusal is about timing and not the mana.)
+
+[Bot1 Deck]
+Phyrexian Dragon Engine
+Faithless Looting
+Mountain x5
+Mountain x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Phyrexian Dragon Engine; Mountain)
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T8 Bot2.Main1]
+Bot1.Pass
+! Bot1.Graveyard.Phyrexian Dragon Engine.Activate
+[T9 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Graveyard.Phyrexian Dragon Engine.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Phyrexian Dragon Engine.Keywords = DoubleStrike; Haste
+
+[Expect]
+Turn = 9

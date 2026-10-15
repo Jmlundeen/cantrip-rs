@@ -1,0 +1,31 @@
+# "Target player" can be the caster (CR 115.2): Bot1 reveals its own hand and chooses the Lightning Bolt to discard, and
+# the Swamp, a land, could not have been chosen. Cast for {2}{B} from three Moxen on turn 1.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Drill Bit
+Lightning Bolt
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Drill Bit.Cast(Bot1)
+Bot1.Choose(Lightning Bolt)
+
+[Expect]
+Bot1.Graveyard = Drill Bit; Lightning Bolt
+Bot1.Hand = Swamp; Swamp

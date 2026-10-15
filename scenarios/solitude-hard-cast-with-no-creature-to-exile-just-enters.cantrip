@@ -1,0 +1,32 @@
+# Solitude cast for {3}{W}{W} (Black Lotus, a Mox Pearl and a Mox Jet) with no other creature on the battlefield: "exile up to one other
+# target creature" has no target, the trigger still resolves with none, nobody gains life, and Solitude stays (its evoke cost
+# was not paid).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Black Lotus
+Solitude
+Island x3
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Solitude.Cast
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Solitude.Power = 3
+Bot1.Life = 20
+Bot2.Life = 20
+Exile.Count = 0

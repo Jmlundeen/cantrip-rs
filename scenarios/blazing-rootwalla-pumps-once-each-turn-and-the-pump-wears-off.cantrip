@@ -1,0 +1,49 @@
+# Blazing Rootwalla: "{R}: This creature gets +2/+0 until end of turn. Activate only once each turn." Turn 5 it is
+# pumped once (3/1 - the toughness does not move) with two Mountains untapped for a second; a second activation that
+# turn is not offered (CR 602.5b), the pump wears off at the end step, and on turn 7 it is activatable again (the
+# restriction counts per turn).
+
+[Bot1 Deck]
+Mountain
+Mountain
+Blazing Rootwalla
+Mountain
+Mountain
+Mountain
+Mountain
+Mountain
+Mountain x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Blazing Rootwalla.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+? Bot1.Battlefield.Blazing Rootwalla.Power = 1
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Blazing Rootwalla.Activate
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Blazing Rootwalla.Power = 3
+? Bot1.Battlefield.Blazing Rootwalla.Toughness = 1
+! Bot1.Battlefield.Blazing Rootwalla.Activate
+Bot1.Pass
+[T7 Bot1.Main1]
+? Bot1.Battlefield.Blazing Rootwalla.Power = 1
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Blazing Rootwalla.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Blazing Rootwalla.Power = 3
+
+[Expect]
+Turn = 7
+Bot1.Battlefield.Blazing Rootwalla.Power = 3
+Bot1.Battlefield.Blazing Rootwalla.Toughness = 1

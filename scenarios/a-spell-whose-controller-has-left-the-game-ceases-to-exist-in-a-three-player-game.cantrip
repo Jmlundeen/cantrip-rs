@@ -1,0 +1,54 @@
+# When a player leaves the game, all objects that player owns leave the game, and spells they control cease to exist (CR 800.4a).
+# On turn 4 Bot1 pays 19 life for Toxic Deluge (X = 19) to sit at 1 life, then casts Lightning Bolt at Bot2. Bot2 responds with a
+# Lightning Bolt of its own, paid with the Mox Ruby it left untapped, and Bot1 loses. The game goes on (Bot2 and Bot3 remain),
+# and Bot1's Bolt is gone with its owner, as is every card Bot1 owned: Bot2 is still at 20 and Bot1's graveyard is empty.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Black Lotus
+Toxic Deluge
+Lightning Bolt
+Mountain
+Mountain
+Island x14
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x16
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+[T4 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Toxic Deluge.Cast(X: 19)
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+? Bot1.Life = 1
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Pass
+Bot3.Pass
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+
+[Expect]
+Result = InProgress
+Bot2.Life = 20
+Bot1.Graveyard.Count = 0

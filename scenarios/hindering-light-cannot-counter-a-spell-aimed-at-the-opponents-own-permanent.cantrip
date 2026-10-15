@@ -1,0 +1,34 @@
+# Hindering Light: the spell must target "you or a permanent you control". Bot2's Lightning Bolt is aimed at Bot2's own
+# Ornithopter, which Bot1 does not control: the Light cannot be cast on it (the refusal, naming the Bolt; the positive control
+# is hindering-light-counters-a-spell-aimed-at-a-permanent-its-controller-controls). The Bolt resolves and kills the Ornithopter.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Hindering Light
+Plains x17
+
+[Bot2 Deck]
+Mountain
+Ornithopter
+Lightning Bolt
+Mountain x17
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Ornithopter)
+! Bot1.Hand.Hindering Light.Cast(Stack.Lightning Bolt)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot2.Graveyard = Ornithopter; Lightning Bolt
+Bot1.Hand.Count = 5

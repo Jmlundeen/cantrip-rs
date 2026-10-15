@@ -1,0 +1,52 @@
+# A Siege Bot1 controls can be attacked by Bot1's own creatures, its protector being Bot2 (CR 310.9b, 310.12a). Bot1's
+# Gorilla hits Invasion of Gobakhan for 2 on turn 3 (3 defense counters become 1, CR 120.3h) and for 2 more on turn 5, taking
+# off the last. That defeats it (CR 310.12b): it is exiled and Bot1 casts it transformed without paying, a Lightshield Array.
+# At Bot1's end step the Array puts a +1/+1 counter on each creature that attacked this turn (CR 508.1): the Gorilla.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Guerrilla Gorilla
+Plains
+Mox Pearl
+Invasion of Gobakhan
+Plains
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Invasion of Gobakhan.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Attack(Guerrilla Gorilla > Bot1.Battlefield.Invasion of Gobakhan)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Invasion of Gobakhan.Counters.Defense = 1
+[T5 Bot1.Main1]
+Bot1.Attack(Guerrilla Gorilla > Bot1.Battlefield.Invasion of Gobakhan)
+Bot1.Pass
+Bot1.Accept
+Bot1.Pass
+[T5 Bot1.End]
+Bot1.Pass
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Forest; Plains; Mox Emerald; Mox Pearl; Guerrilla Gorilla; Lightshield Array
+Bot1.Battlefield.Guerrilla Gorilla.Counters.PlusOnePlusOne = 1
+Bot2.Life = 20
+Exile.Count = 0

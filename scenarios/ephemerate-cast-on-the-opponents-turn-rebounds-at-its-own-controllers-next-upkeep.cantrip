@@ -1,0 +1,37 @@
+# "At the beginning of your next upkeep" (CR 702.88a) is its controller's upkeep, not the next upkeep of anyone. Bot1
+# casts Ephemerate during Bot2's turn 4 upkeep; it waits in exile through Bot2's turn and is cast from exile at Bot1's
+# upkeep on turn 5, not at an opponent's.
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Thraben Inspector
+Ephemerate
+Plains
+Plains
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Thraben Inspector.Cast
+[T4 Bot2.Upkeep]
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Ephemerate.Cast(Thraben Inspector)
+[T4 Bot2.Main1]
+? Exile.Count = 1
+[T5 Bot1.Upkeep]
+Bot1.Accept
+Bot1.Target(Thraben Inspector)
+
+[Expect]
+Turn = 5
+Exile.Count = 0
+Bot1.Graveyard = Ephemerate
+Bot1.Battlefield = Plains; Plains; Thraben Inspector; Clue Token; Clue Token; Clue Token

@@ -1,0 +1,46 @@
+# "Counter target spell": with Bot1's Duress and, above it, Haywire Mite's activated ability (exiling Bot2's Mox Jet) on the stack, Bot2's Miscalculation cannot target the ability (refusal) but can target Duress
+# (the positive control), which Bot1 then pays {2} for... it cannot, so Duress is countered while the ability still resolves.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Haywire Mite
+Mox Emerald
+Duress
+Forest
+Forest x10
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Miscalculation
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Haywire Mite.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Duress.Cast(Bot2)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Haywire Mite.Activate(Bot2.Battlefield.Mox Jet)
+! Bot2.Hand.Miscalculation.Cast(Stack.Haywire Mite)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Miscalculation.Cast(Duress)
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Duress; Haywire Mite
+Exile = Mox Jet
+Bot2.Graveyard = Miscalculation

@@ -1,0 +1,30 @@
+# Wistfulness evoked with two Islands: {U}{U} was spent, so the second enters ability draws two cards and then discards
+# one (net one card up). {G}{G} was not spent, so the opponent's Sol Ring stays.
+
+[Bot1 Deck]
+Wistfulness
+Island x6
+Island x10
+
+[Bot2 Deck]
+Sol Ring
+Forest x6
+Forest x10
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Wistfulness.Cast(Ability: Evoke)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Forest; Sol Ring
+Bot1.Graveyard.Count = 2
+Bot1.Hand.Count = 6

@@ -1,0 +1,38 @@
+# Thor enters on turn one and exiles the Lightning Bolt from the graveyard: "Until the end of your next turn, you may
+# play that card." Bot1's next turn is turn three, and the Bolt is left alone then (casting it on turn three is
+# thor-plays-an-exiled-instant-on-his-next-turn). On turn five, with a Mountain untapped, the Bolt is still in exile
+# but can no longer be cast — the permission ended with turn three.
+
+[Bot1 Deck]
+Mountain
+Lightning Bolt
+Black Lotus
+Black Lotus
+Thor, God of Thunder
+Island
+Island
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Thor, God of Thunder.Cast
+[T5 Bot1.Main1]
+? Exile = Lightning Bolt
+? Bot1.Battlefield.Mountain.Tapped = false
+! Bot1.Exile.Lightning Bolt.Cast
+[T5 Bot1.End]
+! Bot1.Exile.Lightning Bolt.Cast
+
+[Expect]
+Turn = 5
+Exile = Lightning Bolt
+Bot2.Life = 17

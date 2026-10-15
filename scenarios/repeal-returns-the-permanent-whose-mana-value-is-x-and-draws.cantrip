@@ -1,0 +1,38 @@
+# Repeal with X = 2: the target is chosen once X is announced and must have mana value 2 (CR 107.3a). Bot1 has a Sol Ring
+# (mana value 1) and a Mind Stone (mana value 2) in play; the Mind Stone goes back to its owner's hand and a card is drawn.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Sol Ring
+Mind Stone
+Repeal
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Mind Stone.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Repeal.Cast(X: 2)
+Bot1.Target(Bot1.Battlefield.Mind Stone)
+
+[Expect]
+Bot1.Graveyard = Repeal
+Bot1.Battlefield.Sol Ring.Tapped = false
+Bot1.Hand.Count = 3
+Bot1.Battlefield.Count = 5

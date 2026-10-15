@@ -1,0 +1,56 @@
+# Krang gives "artifact creatures" flying, trample, indestructible and haste: after Krang (turn 5) the Ornithopter has them (its own flying is printed). On turn 7 Oko's +1 makes the Ornithopter a green Elk creature
+# with base 3/3 that has lost all abilities and is no longer an artifact (as in the Mox Sapphire scenario): the type change comes in layer 4, so in layer 6 Krang has no artifact creature to give anything to, and the Elk has no keywords at all.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Ornithopter
+Mox Ruby
+Krang, Utrom Warlord
+Oko, Thief of Crowns
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Krang, Utrom Warlord.Cast
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Ornithopter.Keywords = Flying; Haste; Indestructible; Trample
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Oko, Thief of Crowns.Cast
+Bot1.Pass
+Bot1.Battlefield.Oko, Thief of Crowns.Activate(Ornithopter; Ability: Elk)
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Types = Creature
+Bot1.Battlefield.Ornithopter.Power = 3
+Bot1.Battlefield.Ornithopter.Keywords = (absent)
+Bot1.Battlefield.Krang, Utrom Warlord.Keywords = Flying; Haste; Indestructible; Trample

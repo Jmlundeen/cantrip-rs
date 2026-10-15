@@ -1,0 +1,48 @@
+# Gemstone Caverns' opening-hand action (CR 103.6a), played for real: the opening hands are dealt, Bot2 is not the
+# starting player, and before turn one begins it puts the land out with a luck counter and exiles a card from hand.
+# The luck counter then makes the land's printed "{T}: Add {C}" produce one mana of any color instead, which Bot2
+# spends on a Swamp-less black spell on its own first turn.
+#
+# The window is the first thing in the game, so the two lines that answer it come before any turn's: a .cantrip
+# script's cursor is matched against whatever question is outstanding, not against a turn.
+
+[Bot1 Deck]
+Forest
+Forest
+Forest
+Guerrilla Gorilla
+Forest
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Gemstone Caverns
+Dark Ritual
+Plains
+Plains
+Plains
+Plains
+Plains
+Plains x10
+
+[Actions]
+# Before turn one: the opening-hand action, then the card it exiles.
+Bot2.Accept
+Bot2.Choose(Plains)
+Bot1.Hand.Forest.Play
+# One mana of any color off a land that prints {C}: black, for a Ritual with no Swamp anywhere.
+Bot2.Battlefield.Gemstone Caverns.Activate(Color: Black)
+Bot2.Hand.Dark Ritual.Cast
+Bot2.Pass
+Bot1.Pass
+[Handover Bot1.Pass]
+
+[Expect]
+# The land began the game on the battlefield, with its counter still on it.
+Bot2.Battlefield.Gemstone Caverns.Counters.Luck = 1
+Exile = Plains
+Bot2.Graveyard = Dark Ritual
+# Bot2 never played a land and never cast anything else: the three black mana are the Ritual's, off the Caverns.
+Bot2.Mana = {B}{B}{B}
+Bot1.Battlefield = Forest

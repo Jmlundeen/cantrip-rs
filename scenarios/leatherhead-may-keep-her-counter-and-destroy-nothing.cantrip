@@ -1,0 +1,38 @@
+# Leatherhead, Swamp Stalker: "you may remove a counter from her". Bot1 declines after connecting on turn 3: the hexproof counter
+# stays on her, nothing is destroyed and the Sol Ring Bot2 controls survives.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Mox Jet
+Leatherhead, Swamp Stalker
+Forest x15
+
+[Bot2 Deck]
+Island
+Sol Ring
+Island x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Leatherhead, Swamp Stalker.Cast
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Leatherhead, Swamp Stalker > Bot2)
+Bot1.Decline
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Island; Sol Ring
+Bot2.Life = 15
+Bot1.Battlefield.Leatherhead, Swamp Stalker.Counters.Hexproof = 1

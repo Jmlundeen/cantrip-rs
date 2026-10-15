@@ -1,0 +1,9 @@
+{
+  "name": "Shardmage's Rescue",
+  "manaCost": "{W}",
+  "type": "Enchantment — Aura",
+  "oracleText": "Flash\nEnchant creature you control\nAs long as this Aura entered this turn, enchanted creature has hexproof.\nEnchanted creature gets +1/+1.",
+  "keywords": [
+    "Flash"
+  ]
+}

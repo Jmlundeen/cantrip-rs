@@ -1,0 +1,31 @@
+# Two Time Walks in one turn (Black Lotus for {U}{U}{U} and Mox Jet) give two extra turns after this one (CR 500.7, extra turns
+# are taken one after another): turns 2 and 3 are Bot1's, and Bot2's first turn is turn 4.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Time Walk
+Time Walk
+Island x16
+
+[Bot2 Deck]
+Swamp x17
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Time Walk.Cast
+Bot1.Hand.Time Walk.Cast
+[T2 Bot1.Main1]
+? ActivePlayer = Bot1
+[T3 Bot1.Main1]
+? ActivePlayer = Bot1
+[T4 Bot2.Main1]
+
+[Expect]
+Turn = 4
+ActivePlayer = Bot2
+Bot1.Graveyard = Time Walk; Time Walk; Black Lotus
+Bot2.Hand.Count = 8

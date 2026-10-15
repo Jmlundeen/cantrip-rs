@@ -1,0 +1,29 @@
+# Open the Armory: a search for a card with a stated quality may find nothing (CR 701.23b): Bot1 takes neither the Aura nor the Equipment, nothing is revealed, and both stay in the library.
+
+[Bot1 Deck]
+Island
+Mox Pearl
+Open the Armory
+Island x4
+Mox Ruby
+Animate Dead
+Colossus Hammer
+Island x8
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Open the Armory.Cast
+Bot1.Pass
+Bot1.Search()
+
+[Expect]
+Bot1.Graveyard = Open the Armory
+Bot1.Hand.Count = 4
+Bot1.Library.Count = 11

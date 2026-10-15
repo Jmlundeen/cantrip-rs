@@ -1,0 +1,34 @@
+# Tezzeret gains loyalty from later artifacts, then his emblem makes a noncreature artifact a 3/3 Robot.
+[Bot1 Deck]
+Tezzeret, Cruel Captain
+Black Lotus
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Sol Ring
+Island x15
+
+[Bot2 Deck]
+Forest x22
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Tezzeret, Cruel Captain.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Tezzeret, Cruel Captain.Activate(Ability: emblem)
+Bot1.Target(Sol Ring)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Emblems.Count = 1
+Bot1.Battlefield.Sol Ring.Types = Artifact; Creature
+Bot1.Battlefield.Sol Ring.Counters.PlusOnePlusOne = 3
+Bot1.Battlefield.Sol Ring.Power = 3
+Bot1.Battlefield.Sol Ring.Toughness = 3

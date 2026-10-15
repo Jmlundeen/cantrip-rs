@@ -1,0 +1,22 @@
+# Surveil 1 may put the card into the graveyard (CR 701.46a): Bot1 sends the Lightning Bolt on top to the graveyard, so the
+# next draw is a different card. The Forest Island taps for blue on turn three as well as green.
+
+[Bot1 Deck]
+Hedge Maze
+Island x6
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Swamp x15
+
+[Actions]
+Bot1.Hand.Hedge Maze.Play
+Bot1.Arrange(| Lightning Bolt)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Hedge Maze.Activate(Ability: {U})
+
+[Expect]
+Bot1.Graveyard = Lightning Bolt
+Bot1.Mana = {U}
+Bot1.Hand.Count = 7

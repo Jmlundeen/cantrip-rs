@@ -1,0 +1,35 @@
+# Cycling {3} (CR 702.29): the second Jetmir's Garden in hand is discarded for three Moxen's mana and Bot1 draws a card. The Garden on
+# the battlefield taps for {R} on turn 3 and for {W} on turn 5 (with the existing scenario's {G}: the three basic land types give it
+# three mana abilities, CR 305.6).
+
+[Bot1 Deck]
+Jetmir's Garden
+Jetmir's Garden
+Mox Ruby
+Mox Emerald
+Mox Jet
+Island x3
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Jetmir's Garden.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Jetmir's Garden.Activate(Ability: Cycling)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Jetmir's Garden.Activate(Ability: {R})
+? Bot1.Mana = {R}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Jetmir's Garden.Activate(Ability: {W})
+? Bot1.Mana = {W}
+
+[Expect]
+Turn = 5
+Bot1.Graveyard = Jetmir's Garden

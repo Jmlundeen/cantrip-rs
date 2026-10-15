@@ -1,0 +1,32 @@
+# Annul counters target artifact or enchantment spell: Bot2 answers Bot1's Sol Ring with it.
+
+[Bot1 Deck]
+Plains
+Plains
+Sol Ring
+Plains x12
+
+[Bot2 Deck]
+Island
+Annul
+Island x13
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+? Stack = Sol Ring
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Annul.Cast(Sol Ring)
+? Stack = Annul; Sol Ring
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Graveyard = Sol Ring
+Bot2.Graveyard = Annul
+Bot1.Battlefield = Plains; Plains

@@ -1,0 +1,42 @@
+# "Counter target artifact or enchantment spell": only a spell, and only one of those types. On turn three Bot1 casts
+# Llanowar Elves with Bot2's Island open and a Sol Ring on the battlefield: neither the creature spell nor the Sol Ring
+# permanent (not a spell) is a target, so Annul is not offered at all. Then Rancor, an enchantment spell, is cast on the
+# Elves and the same Annul, with the same mana, counters it (the positive control). It ends in Bot1's graveyard.
+
+[Bot1 Deck]
+Forest
+Forest
+Sol Ring
+Llanowar Elves
+Rancor
+Forest x10
+
+[Bot2 Deck]
+Island
+Annul
+Island x13
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Hand.Llanowar Elves.Cast
+! Bot2.Hand.Annul.Cast(Stack.Llanowar Elves)
+! Bot2.Hand.Annul.Cast(Bot1.Battlefield.Sol Ring)
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Rancor.Cast(Llanowar Elves)
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Annul.Cast(Stack.Rancor)
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Rancor
+Bot2.Graveyard = Annul
+Bot1.Battlefield = Forest; Forest; Sol Ring; Llanowar Elves
+Bot1.Battlefield.Llanowar Elves.Power = 1

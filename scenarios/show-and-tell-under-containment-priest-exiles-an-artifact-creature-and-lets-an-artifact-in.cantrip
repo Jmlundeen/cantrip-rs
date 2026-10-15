@@ -1,0 +1,41 @@
+# Containment Priest: "If a nontoken creature would enter and it wasn't cast, exile it instead" applies to creatures only
+# and to every player's. Bot1 casts the Priest (cast, so it enters) and then Show and Tell: Bot1 puts Sol Ring onto the
+# battlefield and it enters (not a creature), while Bot2's Ornithopter, an artifact creature, is exiled instead - being an
+# artifact too does not save it (CR 614.12: it is judged as it would exist on the battlefield). The exiled card goes to its
+# owner's exile.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Jet
+Containment Priest
+Show and Tell
+Sol Ring
+Ornithopter
+Plains x10
+
+[Bot2 Deck]
+Ornithopter
+Plains x7
+Plains x10
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Containment Priest.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Show and Tell.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Sol Ring)
+Bot2.Choose(Ornithopter)
+
+[Expect]
+Bot1.Battlefield = Mox Sapphire; Mox Jet; Containment Priest; Sol Ring
+Exile = Ornithopter
+Bot2.Battlefield.Count = 0

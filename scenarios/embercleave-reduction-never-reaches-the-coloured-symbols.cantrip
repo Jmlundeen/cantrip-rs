@@ -1,0 +1,37 @@
+# Five attacking Ornithopters would reduce Embercleave by five, but only the generic {4} can go (CR 601.2f): it still costs
+# {R}{R}, and Mox Ruby and a Mountain, the two red mana floating, pay for it exactly with nothing left.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Embercleave
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+[T5 Bot1.Main1]
+Bot1.Attack(Ornithopter#1; Ornithopter#2; Ornithopter#3; Ornithopter#4; Ornithopter#5)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Embercleave.Cast
+Bot1.Target(Ornithopter#1)
+? Bot1.Mana = 
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Embercleave.AttachedTo = Ornithopter

@@ -1,0 +1,33 @@
+# Sunset Saboteur (cast on turn 1 off a Swamp and Mox Jet) attacks on turn 3: its trigger puts a +1/+1 counter on the
+# Ornithopter Bot2 cast, and the menacing 4/1 is unblocked by the lone Ornithopter.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Sunset Saboteur
+Swamp x13
+
+[Bot2 Deck]
+Island
+Ornithopter
+Island x14
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sunset Saboteur.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Sunset Saboteur > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 16
+Bot2.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot2.Battlefield.Ornithopter.Power = 1
+Bot2.Battlefield.Ornithopter.Toughness = 3

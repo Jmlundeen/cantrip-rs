@@ -1,0 +1,72 @@
+# Celestial Colonnade is played on turn 1, when it enters tapped, and sits there as a land. On turn 9 Bot1 has five
+# other mana sources, animates it, and attacks: layer 4 makes it a creature without taking the land away, layer 7b
+# gives it 4/4, and layer 6 gives it flying and vigilance, so Bot2's ground Elvish Spirit Guide is offered no block and the
+# Colonnade never taps to attack. The trailing wait on turn 10 shows the effect ending in the cleanup step: it is a
+# plain Land again, with no power to read.
+#
+# Turn 9 rather than turn 6 because the Colonnade itself is not tapped for mana here — spending it would leave it
+# tapped and unable to attack, which is the interesting half of the card.
+
+[Bot1 Deck]
+Celestial Colonnade
+Mox Pearl
+Plains
+Plains
+Plains
+Island
+Plains
+Plains x14
+
+[Bot2 Deck]
+Forest
+Forest
+Forest
+Elvish Spirit Guide
+Forest x16
+
+[Actions]
+Bot1.Hand.Celestial Colonnade.Play
+Bot1.Hand.Mox Pearl.Cast
+? Bot1.Battlefield.Celestial Colonnade.Tapped = True
+
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Spirit Guide.Cast
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Celestial Colonnade.Activate(Ability: Until end of turn)
+Bot1.Attack(Celestial Colonnade > Bot2)
+? Bot1.Battlefield.Celestial Colonnade.Types = Land; Creature
+? Bot1.Battlefield.Celestial Colonnade.Power = 4
+[T9 Bot1.Main2]
+? Bot2.Life = 16
+? Bot1.Battlefield.Celestial Colonnade.Tapped = False
+[T10 Bot2.Main1]
+
+[Expect]
+Turn = 10
+Bot2.Life = 16
+Bot1.Battlefield.Celestial Colonnade.Types = Land
+Bot1.Battlefield.Celestial Colonnade.Tapped = False
+Bot2.Battlefield.Elvish Spirit Guide.Power = 2

@@ -1,0 +1,37 @@
+# CR 610.3b: if the Bat has left the battlefield before its enters ability resolves, the card is never exiled. On turn 3
+# Bot1 casts the Bat with two Moxen; with the trigger on the stack Bot2 Bolts the Bat. The Counterspell, which Bot1 would
+# have chosen, is still in Bot2's hand and nothing is in exile.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Deep-Cavern Bat
+Island x20
+
+[Bot2 Deck]
+Island
+Lightning Bolt
+Counterspell
+Mountain
+Island x3
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Deep-Cavern Bat.Cast
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Deep-Cavern Bat)
+Bot1.Choose(Counterspell)
+[T3 Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot1.Graveyard = Deep-Cavern Bat
+Bot2.Hand = Counterspell; Island; Island; Island; Island; Island

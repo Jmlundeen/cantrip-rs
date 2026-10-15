@@ -1,0 +1,32 @@
+# Only the colored ability hurts: "{T}: Add {C}." costs nothing (turn 3, life stays 20) and "{T}: Add {U} or {B}. This
+# artifact deals 1 damage to you" is dealt to its controller as the mana is added (CR 605.3b, 120.3a): black on turn 5, life
+# 19. The existing scenario has the blue choice.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Talisman of Dominance
+Swamp x4
+Swamp x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Talisman of Dominance.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Talisman of Dominance.Activate(Ability: {T}: Add {C})
+? Bot1.Mana = {C}
+? Bot1.Life = 20
+[T5 Bot1.Main1]
+Bot1.Battlefield.Talisman of Dominance.Activate(Ability: {U} or {B}; Color: Black)
+? Bot1.Mana = {B}
+
+[Expect]
+Bot1.Life = 19

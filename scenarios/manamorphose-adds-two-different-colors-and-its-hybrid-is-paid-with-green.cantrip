@@ -1,0 +1,27 @@
+# Manamorphose costs {1}{R/G}: a Forest (green) and a Mox Pearl pay it. It adds two different colors, {R}{G}, and draws.
+# The pool holds exactly those two.
+
+[Bot1 Deck]
+Forest
+Mox Pearl
+Manamorphose
+Plains x4
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Manamorphose.Cast
+Bot1.Colors(Red; Green)
+? Bot1.Mana = {R}{G}
+[Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Manamorphose
+Bot1.Hand.Count = 5

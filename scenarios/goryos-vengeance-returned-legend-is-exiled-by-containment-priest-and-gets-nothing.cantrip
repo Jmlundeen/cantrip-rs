@@ -1,0 +1,44 @@
+# Bot2's Containment Priest exiles a nontoken creature that would enter without being cast. Goryo's Vengeance returns Headliner
+# Scarlett on turn 5 and she is exiled instead: she never enters, so her enters trigger does not happen, and the card has no
+# haste or end-step exile to give.
+
+[Bot1 Deck]
+Mox Jet
+Black Lotus
+Entomb
+Goryo's Vengeance
+Island x3
+Island x2
+Headliner Scarlett
+Island x12
+
+[Bot2 Deck]
+Plains
+Plains
+Containment Priest
+Plains x17
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains#1.Activate
+Bot2.Battlefield.Plains#2.Activate
+Bot2.Hand.Containment Priest.Cast
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Entomb.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Search(Headliner Scarlett)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Goryo's Vengeance.Cast(Bot1.Graveyard.Headliner Scarlett)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Exile = Headliner Scarlett
+Bot1.Battlefield = Mox Jet
+Stack.Count = 0

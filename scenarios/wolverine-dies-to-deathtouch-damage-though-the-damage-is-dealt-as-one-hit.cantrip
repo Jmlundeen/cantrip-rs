@@ -1,0 +1,37 @@
+# The replacement keeps the damage dealt (it only heals what was already there), so a deathtouch source still destroys him (CR 702.2b):
+# Wolverine's enters fight with Cecil, Dark Knight deals 3 to Cecil (toughness 3, destroyed) and Cecil deals 2 deathtouch damage to
+# Wolverine, a 3/5, which kills him. Both are in the graveyard.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Mox Jet
+Mox Pearl
+Wolverine, Fierce Fighter
+Island x15
+
+[Bot2 Deck]
+Mox Jet
+Cecil, Dark Knight
+Island x14
+
+[Actions]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Cecil, Dark Knight.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Wolverine, Fierce Fighter.Cast
+Bot1.Target(Cecil, Dark Knight)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Wolverine, Fierce Fighter
+Bot2.Graveyard = Cecil, Dark Knight

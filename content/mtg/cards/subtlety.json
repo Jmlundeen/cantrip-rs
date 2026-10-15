@@ -1,0 +1,12 @@
+{
+  "name": "Subtlety",
+  "manaCost": "{2}{U}{U}",
+  "type": "Creature — Elemental Incarnation",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Flash\nFlying\nWhen this creature enters, choose up to one target creature spell or planeswalker spell. Its owner puts it on their choice of the top or bottom of their library.\nEvoke—Exile a blue card from your hand.",
+  "keywords": [
+    "Flash",
+    "Flying"
+  ]
+}

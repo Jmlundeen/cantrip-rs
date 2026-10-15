@@ -1,0 +1,28 @@
+# Tropical Island could produce {G} or {U}: sacrificed to Squandered Resources it adds blue, the color a Forest could not
+# (CR 106.7). The Squandered Resources was cast on turn 3 off the Swamp and Forest.
+
+[Bot1 Deck]
+Swamp
+Forest
+Tropical Island
+Squandered Resources
+Swamp x10
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Squandered Resources.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Tropical Island.Play
+Bot1.Battlefield.Squandered Resources.Activate(Sacrifice: Tropical Island; Color: Blue)
+? Bot1.Mana = {U}
+
+[Expect]
+Bot1.Graveyard = Tropical Island
+Bot1.Battlefield = Swamp; Forest; Squandered Resources

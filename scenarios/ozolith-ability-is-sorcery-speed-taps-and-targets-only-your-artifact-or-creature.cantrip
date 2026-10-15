@@ -1,0 +1,50 @@
+# "{1}{G}, {T}: Put a +1/+1 counter on target artifact or creature you control. Activate only as a sorcery": refused in the beginning of combat on turn 1 with the mana untapped. On turn 3 Bot2's Elvish Mystic and Bot1's Forest are refused as targets
+# (an opponent's creature, a land) and the Ornithopter accepted (the positive control): Ozolith adds one more, so the Ornithopter has two counters (a 2/4). Tapped, Ozolith refuses a second use (mana was still untapped).
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Ozolith, the Shattered Spire
+Ornithopter
+Forest
+Forest x12
+
+[Bot2 Deck]
+Forest
+Elvish Mystic
+Forest x13
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ozolith, the Shattered Spire.Cast
+Bot1.Pass
+[T1 Bot1.BeginCombat]
+! Bot1.Battlefield.Ozolith, the Shattered Spire.Activate(Ornithopter; Ability: Put a +1/+1)
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+! Bot1.Battlefield.Ozolith, the Shattered Spire.Activate(Bot2.Battlefield.Elvish Mystic; Ability: Put a +1/+1)
+! Bot1.Battlefield.Ozolith, the Shattered Spire.Activate(Forest; Ability: Put a +1/+1)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Ozolith, the Shattered Spire.Activate(Ornithopter; Ability: Put a +1/+1)
+Bot1.Pass
+Bot1.Pass
+! Bot1.Battlefield.Ozolith, the Shattered Spire.Activate(Ornithopter; Ability: Put a +1/+1)
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Ozolith, the Shattered Spire.Tapped = true

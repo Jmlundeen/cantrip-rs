@@ -1,0 +1,29 @@
+# Thoughtseize: the caster chooses a NONLAND card from the revealed hand (the Islands are not on offer), the target
+# discards it, and the caster loses 2 life. Bot2's hand: a Lightning Bolt, a Counterspell and Islands; Bot1 takes the Counterspell.
+
+[Bot1 Deck]
+Mox Jet
+Thoughtseize
+Island x5
+Island x10
+
+[Bot2 Deck]
+Lightning Bolt
+Counterspell
+Island x5
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Thoughtseize.Cast(Bot2)
+Bot1.Choose(Counterspell)
+[Bot1.Main2]
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Life = 18
+Bot2.Graveyard = Counterspell
+Bot2.Hand.Count = 6

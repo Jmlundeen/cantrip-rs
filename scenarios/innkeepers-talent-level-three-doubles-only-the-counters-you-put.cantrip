@@ -1,0 +1,60 @@
+# Level 3 (reached on turn 1): "If you would put one or more counters ... put twice that many". The Talent's own combat trigger puts a +1/+1 counter on Bot1's Ornithopter and it gets two. On turn 2 Bot2's Bristly Bill puts a counter
+# on that same Ornithopter (landfall, Bot2's Forest) and Bot2 is the one putting it, so it is not doubled: three counters in all. (The Ornithopter has a counter, so level 2's ward {1} makes Bot2 pay {1} for the trigger, which it does with the Forest.)
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Black Lotus
+Innkeeper's Talent
+Mox Emerald
+Mox Ruby
+Ornithopter
+Forest x12
+
+[Bot2 Deck]
+Mox Emerald
+Mox Pearl
+Bristly Bill, Spine Sower
+Forest
+Forest x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Innkeeper's Talent.Cast
+Bot1.Pass
+Bot1.Battlefield.Innkeeper's Talent.Activate(Ability: Level 2)
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Innkeeper's Talent.Activate(Ability: Level 3)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Bristly Bill, Spine Sower.Cast
+Bot2.Pass
+Bot2.Hand.Forest.Play
+Bot2.Target(Bot1.Battlefield.Ornithopter)
+Bot2.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.PayCost
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 3
+Bot1.Battlefield.Ornithopter.Power = 3

@@ -1,0 +1,40 @@
+# Playing a land from the graveyard is playing a land (CR 305.2): with Bot1's land play for turn 1 already used on a Plains, Mishra's Workshop in the graveyard can't be played with Serra Paragon (refusal). On turn 3, before any other land,
+# it can (the positive control).
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Ruby
+Faithless Looting
+Serra Paragon
+Mishra's Workshop
+Plains
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Mishra's Workshop; Plains)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Serra Paragon.Cast
+Bot1.Pass
+Bot1.Hand.Plains.Play
+! Bot1.Graveyard.Mishra's Workshop.Play
+[T3 Bot1.Main1]
+Bot1.Graveyard.Mishra's Workshop.Play(Ability: Once during each of your turns)
+
+[Expect]
+Bot1.Battlefield = Mishra's Workshop; Mox Pearl; Mox Ruby; Plains; Serra Paragon

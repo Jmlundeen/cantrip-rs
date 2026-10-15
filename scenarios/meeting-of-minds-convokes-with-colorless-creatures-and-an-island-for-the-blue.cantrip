@@ -1,0 +1,32 @@
+# Convoke (CR 702.51a): Meeting of Minds costs {3}{U}. Each of three Ornithopters tapped while casting pays {1}, and the
+# Island's mana pays the {U}. A colorless creature has no color to pay with, so it can only pay generic mana.
+
+[Bot1 Deck]
+Ornithopter
+Ornithopter
+Ornithopter
+Meeting of Minds
+Island
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Forest x22
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Meeting of Minds.Cast(Convoke: Ornithopter, Ornithopter, Ornithopter)
+[Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Hand.Count = 4
+Bot1.Battlefield.Ornithopter#1.Tapped = true
+Bot1.Battlefield.Ornithopter#2.Tapped = true
+Bot1.Battlefield.Ornithopter#3.Tapped = true
+Bot1.Mana =

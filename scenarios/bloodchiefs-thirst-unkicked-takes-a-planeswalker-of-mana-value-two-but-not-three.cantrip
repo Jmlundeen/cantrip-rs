@@ -1,0 +1,46 @@
+# The "mana value 2 or less" limit applies to planeswalkers too. Bot2 has Dack Fayden (mana value 3) and Wrenn and Six
+# (mana value 2) in play off five Moxen on turn two. Unkicked, Thirst offers Wrenn and Six and not Dack (the refusal beside
+# the positive control in the same question), and Wrenn and Six is destroyed.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Bloodchief's Thirst
+Swamp x13
+
+[Bot2 Deck]
+Mox Ruby
+Mox Ruby
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Dack Fayden
+Wrenn and Six
+Swamp x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Ruby#1.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Dack Fayden.Cast
+Bot2.Battlefield.Mox Ruby#2.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Wrenn and Six.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Bloodchief's Thirst.Cast
+! Bot1.Target(Bot2.Battlefield.Dack Fayden)
+Bot1.Target(Bot2.Battlefield.Wrenn and Six)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Wrenn and Six
+Bot2.Battlefield.Dack Fayden.Types = Planeswalker

@@ -1,0 +1,39 @@
+# Currency Converter: "Whenever YOU discard a card" - Bot1's own Wheel of Fortune makes both players discard their hands at
+# once, and only Bot1's three discards are offered to its Converter, not the seven of Bot2. Bot1 accepts three times; if
+# Bot2's cards were offered too, they would be offered first (Bot1's triggers go on the stack first, Bot2's resolve
+# before them) and take the accepts. Bot1 casts the Wheel with a Black Lotus.
+
+[Bot1 Deck]
+Mox Jet
+Currency Converter
+Black Lotus
+Wheel of Fortune
+Lightning Bolt
+Forest
+Swamp
+Swamp x20
+
+[Bot2 Deck]
+Island x7
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Currency Converter.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Wheel of Fortune.Cast
+Bot1.Accept
+Bot1.Accept
+Bot1.Accept
+[Bot1.Main2]
+
+[Expect]
+Turn = 1
+Exile.Count = 3
+Exile = Lightning Bolt; Forest; Swamp
+Bot2.Graveyard.Count = 7
+Bot2.Hand.Count = 7

@@ -1,0 +1,50 @@
+# Flametongue Kavu: "When this creature enters, it deals 4 damage to target creature." The target is any creature
+# that can be targeted (CR 115.1, 702.11): Bot2's Sylvan Caryatid has hexproof, so it is refused beside the Kavu itself
+# and Embereth Shieldbreaker, the creature chosen, which dies (4 damage on a 2/1). The Caryatid is untouched.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Flametongue Kavu
+Mountain x4
+Mountain x10
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Mox Jet
+Sylvan Caryatid
+Embereth Shieldbreaker
+Forest
+Forest x10
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Sylvan Caryatid.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Embereth Shieldbreaker.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Flametongue Kavu.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Sylvan Caryatid)
+Bot1.Target(Embereth Shieldbreaker)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Embereth Shieldbreaker
+Bot2.Battlefield.Sylvan Caryatid.Damage = 0
+Bot1.Battlefield = Mountain; Flametongue Kavu

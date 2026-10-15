@@ -1,0 +1,54 @@
+# "If X is 6 or more, deals twice X damage instead": with X = 5 the total stays 5 (CR 601.2d, 120.3). Divided as 1 and 4
+# between Bot2's Soldier token and its Elspeth, Storm Slayer (a planeswalker is a legal target, CR 115.1), the Soldier dies and
+# Elspeth, at 6 loyalty after her +1, is at 2: had the damage been doubled she would be gone. Seven of the eight mana
+# Bot1's Lotus, four Moxen and Sol Ring give pay {5}{R}{R}.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Mox Jet
+Sol Ring
+Shatterskull Smashing
+Forest x10
+
+[Bot2 Deck]
+Black Lotus
+Mox Pearl
+Mox Jet
+Elspeth, Storm Slayer
+Plains x3
+Plains x10
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Elspeth, Storm Slayer.Cast
+Bot2.Battlefield.Elspeth, Storm Slayer.Activate(Ability: #1)
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Shatterskull Smashing.Cast(X: 5)
+Bot1.Divide(Bot2.Battlefield.Soldier#1: 1; Bot2.Battlefield.Elspeth, Storm Slayer: 4)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Elspeth, Storm Slayer.Counters.Loyalty = 2
+Bot2.Battlefield.Soldier.Toughness = 1
+Bot1.Graveyard.Count = 2

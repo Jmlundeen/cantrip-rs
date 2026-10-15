@@ -1,0 +1,29 @@
+# Sage of the Skies: the control for the case that copies. The Moxen were cast on turn 1; on turn 3 Bot1 casts the Sage as
+# the only spell of the turn, so the intervening "if you've cast another spell this turn" (CR 603.4) is false when the
+# cast trigger would trigger and it never goes on the stack: one Sage, no token.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Sage of the Skies
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Sage of the Skies.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+? Stack.Count = 1
+[Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Plains; Mox Pearl; Mox Jet; Sage of the Skies

@@ -1,0 +1,41 @@
+# Channel gives the player a mana ability of their own (CR 611.2a, 605.1a), not the card: it lasts until end of turn
+# whatever becomes of Channel. Bot1 casts Channel, then Timetwister paying {2} with that ability, and Timetwister
+# shuffles Channel from the graveyard into the library. The ability is still offered - with no card as its source,
+# since the card is now hidden - and taken once more, and the game hands over at Bot1's priority with it still offered.
+
+[Bot1 Deck]
+Channel
+Timetwister
+Forest
+Forest
+Island
+Forest
+Forest
+Forest x12
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Channel.Cast
+Bot1.Pass
+Bot1.Hand.Timetwister.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Channel.Activate
+Bot1.Channel.Activate
+Bot1.Pass
+Bot1.Channel.Activate
+[Handover Bot1.Pass]
+
+[Expect]
+Bot1.Life = 17
+Bot1.Mana = {C}
+Bot1.Graveyard = Timetwister
+Bot1.Hand.Count = 7

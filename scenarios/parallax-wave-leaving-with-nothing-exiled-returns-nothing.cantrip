@@ -1,0 +1,43 @@
+# "When this enchantment leaves the battlefield, each player returns to the battlefield all cards they own exiled with it": Bot1 casts Parallax Wave
+# on turn 1 and never uses it; Bot2 Disenchants it on turn 2. It exiled nothing, so nothing returns, and the Wave is simply in the graveyard.
+# The other cards Bot2 exiled by its own means (none here) would not count either: only cards exiled with this Wave.
+
+[Bot1 Deck]
+Mox Pearl
+Gleemox
+Mox Jet
+Mox Sapphire
+Parallax Wave
+Island x14
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Disenchant
+Plains x12
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: White)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Parallax Wave.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Parallax Wave)
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Parallax Wave
+Exile.Count = 0
+Stack.Count = 0
+Bot1.Battlefield.Count = 4

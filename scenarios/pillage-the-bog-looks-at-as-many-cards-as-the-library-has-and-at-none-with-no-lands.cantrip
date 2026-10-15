@@ -1,0 +1,46 @@
+# "Look at the top X cards" with X = twice the lands Bot1 controls. With no lands on turn 1 X is 0, there is nothing to look
+# at and no question is asked (a refusal; the next cast is the control that asks). On turn 3, with two lands, X is 4 but the
+# library holds only two cards (the Lotus was drawn), so Bot1 looks at those two and takes the Mountain, the Island going
+# to the bottom. Two Moxen pay {B}{G} both times.
+
+[Bot1 Deck]
+Pillage the Bog
+Pillage the Bog
+Mox Jet
+Mox Emerald
+Swamp
+Forest
+Island
+Black Lotus
+Island
+Mountain
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Pillage the Bog.Cast
+Bot1.Pass
+! Bot1.Arrange
+[T1 Bot1.Main2]
+? Bot1.Graveyard = Pillage the Bog
+? Bot1.Library.Count = 3
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Pillage the Bog.Cast
+Bot1.Arrange(Mountain | Island)
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Pillage the Bog; Pillage the Bog
+Bot1.Library.Count = 1
+Bot1.Hand = Black Lotus; Island; Mountain

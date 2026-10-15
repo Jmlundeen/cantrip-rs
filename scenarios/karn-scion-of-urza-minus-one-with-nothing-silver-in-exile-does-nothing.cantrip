@@ -1,0 +1,26 @@
+# Karn's -1 puts "a card you own with a silver counter on it from exile into your hand": with no such card in exile it does
+# nothing, and nobody is asked; Karn still pays the loyalty cost (5 to 4).
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Karn, Scion of Urza
+Island x4
+Island x6
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Karn, Scion of Urza.Cast
+Bot1.Pass
+Bot1.Battlefield.Karn, Scion of Urza.Activate(Ability: Put a card you own)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Karn, Scion of Urza.Counters.Loyalty = 4
+Bot1.Hand.Count = 4

@@ -1,0 +1,53 @@
+# "Whenever you attack": Raffine stays home on turn 3 while the Thraben Inspector attacks alone, and the Inspector connives 1
+# (X is the one attacking creature): it draws an Island and discards it. On turn 4 Bot2's Ornithopter attacks and Bot1 is asked
+# nothing (the refused Choose: a connive would ask what to discard): the trigger is for its controller's attacks only.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Raffine, Scheming Seer
+Plains
+Thraben Inspector
+Island
+Island
+Lightning Bolt
+Island
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Raffine, Scheming Seer.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Thraben Inspector.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Thraben Inspector > Bot2)
+Bot1.Choose(Island)
+[T3 Bot1.Main2]
+? Bot1.Graveyard = Island
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Ornithopter > Bot1)
+! Bot1.Choose
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Island
+Bot1.Battlefield.Thraben Inspector.Counters.PlusOnePlusOne = (absent)

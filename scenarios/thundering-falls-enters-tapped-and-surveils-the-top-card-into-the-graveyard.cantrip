@@ -1,0 +1,21 @@
+# Thundering Falls enters tapped and its enters trigger surveils 1: the Mountain on top of the library goes to the
+# graveyard, and the tapped Island Mountain is the land Bot1 has.
+
+[Bot1 Deck]
+Thundering Falls
+Island x6
+Mountain
+Island x9
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Thundering Falls.Play
+Bot1.Arrange( | Mountain)
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Thundering Falls.Tapped = true
+Bot1.Graveyard = Mountain
+Bot1.Library.Count = 9

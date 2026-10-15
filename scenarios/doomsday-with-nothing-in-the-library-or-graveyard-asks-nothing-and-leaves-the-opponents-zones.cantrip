@@ -1,0 +1,36 @@
+# Doomsday searches only its controller's library and graveyard. Bot1's deck is eight cards: after the turn-3 draw its library
+# is empty and its graveyard has nothing, so there is nothing to choose and nothing is asked (! Bot1.Choose), nothing is
+# exiled, and the half of 20 life is still lost. Bot2's library and its graveyard (the Island it discarded to hand size
+# on turn 2) are left alone. Doomsday is cast for {B}{B}{B} on turn 3: two Swamps and a Mox Jet.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Mox Jet
+Doomsday
+Island x4
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Doomsday.Cast
+Bot1.Pass
+! Bot1.Choose
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 10
+Bot1.Library.Count = 0
+Bot1.Graveyard = Doomsday
+Exile.Count = 0
+Bot2.Graveyard.Count = 1
+Bot2.Library.Count = 12

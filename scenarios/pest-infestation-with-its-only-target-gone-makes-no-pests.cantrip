@@ -1,0 +1,43 @@
+# CR 608.2b: a spell whose every target is illegal doesn't resolve at all. Pest Infestation (X = 1) targets Bot2's Mox Ruby; in response Bot2 Disenchants it. Nothing is destroyed again
+# and no Pest tokens are created, because the spell is countered on resolution.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Sapphire
+Pest Infestation
+Swamp x3
+Swamp x10
+
+[Bot2 Deck]
+Mox Pearl
+Mox Ruby
+Mox Jet
+Disenchant
+Island x3
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Pest Infestation.Cast(X: 1)
+Bot1.Target(Mox Ruby)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Disenchant.Cast(Mox Ruby)
+[Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Battlefield = Mox Pearl; Mox Jet
+Bot2.Graveyard = Disenchant; Mox Ruby
+Bot1.Battlefield = Mox Emerald; Mox Jet; Mox Sapphire
+Stack.Count = 0

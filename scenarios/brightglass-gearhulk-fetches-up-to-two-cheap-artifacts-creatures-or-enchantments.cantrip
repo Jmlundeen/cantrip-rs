@@ -1,0 +1,43 @@
+# "Search ... for up to two artifact, creature, and/or enchantment cards with mana value 1 or less" (CR 701.23): of a library
+# holding Lightning Bolt (an instant), Island (a land), Guerrilla Gorilla (a creature of mana value 3) and Wrath of God
+# (a sorcery) - all refused - and Sol Ring (artifact), Llanowar Elves (creature) and Fastbond (enchantment), all mana
+# value 1, Bot1 takes the Sol Ring and the Elves,; the prompt is for two at most, so the Fastbond stays. Black Lotus pays {G}{G}
+# with Mox Pearl and a Plains paying {W}{W} on turn 1.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Black Lotus
+Brightglass Gearhulk
+Island x3
+Lightning Bolt
+Island
+Guerrilla Gorilla
+Wrath of God
+Sol Ring
+Llanowar Elves
+Fastbond
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Brightglass Gearhulk.Cast
+Bot1.Accept
+! Bot1.Search(Lightning Bolt)
+! Bot1.Search(Island)
+! Bot1.Search(Guerrilla Gorilla)
+! Bot1.Search(Wrath of God)
+Bot1.Search(Sol Ring; Llanowar Elves)
+
+[Expect]
+Bot1.Hand = Island; Island; Island; Sol Ring; Llanowar Elves
+Bot1.Library.Count = 15

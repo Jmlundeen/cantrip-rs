@@ -1,0 +1,31 @@
+# "Whenever you play a land": a land that an effect puts onto the battlefield is not played (CR 305.1). Bot1 plays the
+# Marsh Flats as its second land (1 damage from Fastbond), cracks it (1 life) for a Swamp, and the Swamp deals no
+# damage: 20 - 1 - 1 = 18.
+
+[Bot1 Deck]
+Forest
+Fastbond
+Marsh Flats
+Island
+Island
+Island
+Island
+Swamp
+Island x8
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Fastbond.Cast
+Bot1.Hand.Marsh Flats.Play
+Bot1.Battlefield.Marsh Flats.Activate
+Bot1.Search(Swamp)
+Bot1.Pass
+
+[Expect]
+Bot1.Life = 18
+Bot1.LandsPlayed = 2
+Bot1.Battlefield = Forest; Fastbond; Swamp

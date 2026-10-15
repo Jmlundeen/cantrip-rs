@@ -1,0 +1,38 @@
+# Territorial Kavu, second mode: "Exile UP TO ONE target card from a graveyard" - Bot1 chooses none: the Island Bot2
+# discarded to hand size on turn 2 stays in its graveyard.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Emerald
+Territorial Kavu
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Forest
+Forest x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Territorial Kavu.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Attack(Territorial Kavu > Bot2)
+Bot1.Modes(Exile up to one)
+Bot1.Target()
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Exile.Count = 0
+Bot2.Graveyard.Count = 1

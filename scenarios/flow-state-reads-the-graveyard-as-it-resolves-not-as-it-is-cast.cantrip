@@ -1,0 +1,44 @@
+# Only a sorcery is in the graveyard as Flow State is cast; Bot1 answers it with Lightning Bolt, which resolves first.
+# The graveyard is read as Flow State resolves (CR 608.2c, 608.2h), so it finds an instant card and a sorcery card
+# there then and puts two of the top three into the hand.
+
+[Bot1 Deck]
+Mountain
+Island
+Mountain
+Chain Lightning
+Lightning Bolt
+Flow State
+Swamp
+Swamp
+Swamp
+Counterspell
+Ancestral Recall
+Brainstorm
+Island x3
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Chain Lightning.Cast(Bot2)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Flow State.Cast
+? Stack = Flow State
+? Bot1.Graveyard = Chain Lightning
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Arrange(Brainstorm; Ancestral Recall | Counterspell)
+
+[Expect]
+Bot2.Life = 14
+Bot1.Graveyard = Flow State; Lightning Bolt; Chain Lightning
+Bot1.Hand = Swamp; Swamp; Swamp; Brainstorm; Ancestral Recall
+Bot1.Library = Island; Island; Island; Counterspell

@@ -1,0 +1,21 @@
+# Ocelot Pride: "At the beginning of your end step, if you gained life this turn, ..." (an intervening if, CR 603.4). Bot1 gains
+# no life on turn 1 or turn 3 (the Pride does not attack), so no Cat is made at either end step.
+
+[Bot1 Deck]
+Plains
+Ocelot Pride
+Plains x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Ocelot Pride.Cast
+Bot1.Pass
+[T4 Bot2.Upkeep]
+
+[Expect]
+Bot1.Battlefield = Plains; Ocelot Pride
+Bot1.Life = 20

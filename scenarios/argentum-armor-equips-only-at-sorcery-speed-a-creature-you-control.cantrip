@@ -1,0 +1,55 @@
+# Equip {6} (CR 702.6a): "Equip only as a sorcery" and only to "target creature you control". Turn 5 with all six mana untapped: in the beginning of combat step the Armor cannot be
+# moved onto the Haywire Mite (refusal); in the second main phase it cannot be moved onto Bot2's Ornithopter or onto Mox Jet, which is not a creature (refusals), and it can be moved onto
+# the Mite (the positive control), which becomes 7/7.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Sol Ring
+Mox Pearl
+Mox Jet
+Argentum Armor
+Haywire Mite
+Ornithopter
+Plains
+Plains x8
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Haywire Mite.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Argentum Armor.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.BeginCombat]
+! Bot1.Battlefield.Argentum Armor.Activate(Haywire Mite)
+[T5 Bot1.Main2]
+! Bot1.Battlefield.Argentum Armor.Activate(Bot2.Battlefield.Ornithopter)
+! Bot1.Battlefield.Argentum Armor.Activate(Mox Jet)
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Argentum Armor.Activate(Haywire Mite)
+[T5 Bot1.End]
+
+[Expect]
+Bot1.Battlefield.Argentum Armor.AttachedTo = Haywire Mite
+Bot1.Battlefield.Haywire Mite.Power = 7

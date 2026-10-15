@@ -1,0 +1,52 @@
+# Guardian Scalelord's attack ability returns any nonland permanent card of mana value up to its power (4), a planeswalker
+# included: Liliana of the Veil (mana value 3) is discarded by Faithless Looting with a Rancor (an Aura, also legal), and
+# comes back under Bot1's control with her starting loyalty of 3.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Black Lotus
+Faithless Looting
+Guardian Scalelord
+Forest
+Liliana of the Veil
+Rancor
+Forest
+Forest
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Liliana of the Veil; Rancor)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Guardian Scalelord.Cast
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Graveyard.Faithless Looting.Cast(Ability: Flashback)
+Bot1.Choose(Forest; Forest)
+Bot1.Attack(Guardian Scalelord > Bot2)
+Bot1.Target(Liliana of the Veil)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Liliana of the Veil.Counters.Loyalty = 3
+Bot2.Life = 16

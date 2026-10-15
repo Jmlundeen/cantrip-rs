@@ -1,0 +1,31 @@
+# Winds of Abandon exiles one creature its caster does not control; that creature's controller searches for a basic land and puts it onto the battlefield tapped.
+
+[Bot1 Deck]
+Winds of Abandon
+Plains x20
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Winds of Abandon.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot2.Search(Island)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Winds of Abandon
+Bot2.Battlefield = Island; Island
+Bot2.Battlefield.Island#2.Tapped = true
+Exile = Ornithopter
+Bot2.Library.Count = 11
+Stack.Count = 0

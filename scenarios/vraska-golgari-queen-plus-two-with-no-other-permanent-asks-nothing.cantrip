@@ -1,0 +1,28 @@
+# +2: "You may sacrifice another permanent": with no other permanent there is nothing to choose from and nothing is asked. Black Lotus and Lotus Petal, both sacrificed for the mana, pay for Vraska
+# and leave her alone on the battlefield; her +2 takes her to 6 loyalty and gains and draws nothing.
+
+[Bot1 Deck]
+Black Lotus
+Lotus Petal
+Vraska, Golgari Queen
+Plains x4
+Plains x13
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Lotus Petal.Activate(Color: Green)
+Bot1.Hand.Vraska, Golgari Queen.Cast
+Bot1.Battlefield.Vraska, Golgari Queen.Activate(Ability: sacrifice)
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Life = 20
+Bot1.Hand.Count = 4
+Bot1.Battlefield = Vraska, Golgari Queen
+Bot1.Battlefield.Vraska, Golgari Queen.Counters.Loyalty = 6

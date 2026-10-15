@@ -1,0 +1,23 @@
+# Cast without kicker, Batroc is X = 0: he enters as a plain 2/2 with no +1/+1 counter, and his enters trigger has "up to 0"
+# targets, so it is never put on the stack and no target question is asked (the kicked control is
+# batroc-kicked-twice-enters-with-two-counters-and-hits-up-to-two-targets). Bot2 takes nothing.
+
+[Bot1 Deck]
+Black Lotus
+Batroc the Leaper
+Plains x15
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Batroc the Leaper.Cast
+! Bot1.Target
+[T3 Bot1.Main1]
+
+[Expect]
+Bot2.Life = 20
+Bot1.Battlefield.Batroc the Leaper.Power = 2
+Bot1.Battlefield.Batroc the Leaper.Counters.PlusOnePlusOne = (absent)

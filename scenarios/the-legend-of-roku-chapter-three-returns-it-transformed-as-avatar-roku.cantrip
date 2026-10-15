@@ -1,0 +1,37 @@
+# The Legend of Roku, chapter III: "Exile this Saga, then return it to the battlefield transformed under your control."
+# On Bot1's third turn (T5) the Saga is gone and Avatar Roku, a legendary 4/4 red Avatar creature, stands in its place.
+
+[Bot1 Deck]
+Mox Ruby
+Black Lotus
+The Legend of Roku
+Mountain x4
+Mountain x16
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.The Legend of Roku.Cast
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Colors(Red)
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Avatar Roku.Power = 4
+Bot1.Battlefield.Avatar Roku.Toughness = 4
+Bot1.Battlefield.Avatar Roku.Types = Creature
+Bot1.Battlefield.Avatar Roku.Subtypes = Avatar
+Bot1.Battlefield.Avatar Roku.SummoningSick = true
+Bot1.Battlefield = Avatar Roku; Mox Ruby

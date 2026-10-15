@@ -1,0 +1,52 @@
+# The -3's target, an Ornithopter in Bot1's graveyard (a rest card from the turn-3 +1), is exiled in response by Bot2's Deathrite Shaman on turn 5. The ability has no legal target (CR 608.2b)
+# and does nothing, but the loyalty cost was paid: Tamiyo ends at 3 loyalty. Timeline: turn 1 Tamiyo; turn 3 +1 naming Elvish Mystic (loyalty 6); turn 5 the -3 (loyalty 3).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Emerald
+Mox Jet
+Mox Ruby
+Tamiyo, Collector of Tales
+Plains
+Plains
+Elvish Mystic
+Ornithopter
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Forest
+Forest
+Deathrite Shaman
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Tamiyo, Collector of Tales.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Deathrite Shaman.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Tamiyo, Collector of Tales.Activate(Ability: Choose a nonland card name)
+Bot1.Name(Elvish Mystic)
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Battlefield.Tamiyo, Collector of Tales.Activate(Ability: Return target card; Ornithopter)
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Deathrite Shaman.Activate(Ability: creature card; Bot1.Graveyard.Ornithopter)
+[Bot1.Main2]
+
+[Expect]
+Turn = 5
+Exile = Ornithopter
+Bot1.Battlefield.Tamiyo, Collector of Tales.Counters.Loyalty = 3

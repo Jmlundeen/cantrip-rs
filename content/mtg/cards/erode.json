@@ -1,0 +1,6 @@
+{
+  "name": "Erode",
+  "manaCost": "{W}",
+  "type": "Instant",
+  "oracleText": "Destroy target creature or planeswalker. Its controller may search their library for a basic land card, put it onto the battlefield tapped, then shuffle."
+}

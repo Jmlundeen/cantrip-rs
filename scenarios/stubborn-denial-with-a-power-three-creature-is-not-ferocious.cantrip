@@ -1,0 +1,38 @@
+# Ferocious needs power 4 or greater: Cathar Commando (3/1) is not enough, so Stubborn Denial is only "unless its controller
+# pays {1}"; Bot2 has Mox Emerald open and pays, so the Duress resolves.
+
+[Bot1 Deck]
+Island
+Mox Pearl
+Mox Jet
+Cathar Commando
+Stubborn Denial
+Island x10
+
+[Bot2 Deck]
+Swamp
+Mox Emerald
+Duress
+Swamp x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cathar Commando.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Duress.Cast(Bot1)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Stubborn Denial.Cast(Duress)
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.PayCost
+[T2 Bot2.Main2]
+
+[Expect]
+Bot2.Graveyard = Duress
+Bot1.Graveyard = Stubborn Denial

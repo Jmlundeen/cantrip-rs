@@ -1,0 +1,46 @@
+# Tinker finds Mox Diamond, whose "if this artifact would enter, you may discard a land card instead" is settled
+# while the card is still in the library it was found in (CR 614.12a): an entry replacement applies before the card
+# moves. Two questions come out of it, both about a card in a library: whether to discard, and then which land.
+#
+# The first is answered and the script hands over at the second, the choice of land. That one is an ordinary cost
+# choice which knows nothing about libraries, so a session dealt this position shows that the seat choosing is shown
+# the Mox by the engine for as long as its entry is being settled, whatever is asked. See
+# ScriptedPromptVisibilityTests.
+#
+# Black Lotus pays for Tinker and Mox Sapphire is the artifact sacrificed, so the whole thing happens on turn one,
+# with two different lands left in hand to choose between.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Tinker
+Island
+Forest
+Island
+Island x3
+Mox Diamond
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Tinker.Cast
+Bot1.Choose(Mox Sapphire)
+Bot1.Search(Mox Diamond)
+Bot1.Accept
+[Handover Bot1.Choose]
+
+[Expect]
+Turn = 1
+Step = Main1
+Stack = Tinker
+Bot1.Battlefield = Island
+Bot1.Hand = Forest; Island; Island
+Bot1.Graveyard = Mox Sapphire; Black Lotus
+Bot1.Library = Island; Island; Island; Mox Diamond; Island; Island; Island; Island; Island; Island; Island; Island; Island; Island

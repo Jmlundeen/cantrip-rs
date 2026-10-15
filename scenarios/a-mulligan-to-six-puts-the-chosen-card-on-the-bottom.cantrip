@@ -1,0 +1,31 @@
+# CR 103.5, the London mulligan. Bot1 plays first and mulligans once: its seven go back, it draws seven more, and on
+# keeping it puts one of them of its choosing on the bottom. Bot2 keeps its first seven. Each deck is a single card
+# over and over, so the mulligan's shuffle cannot change what is expected: the counts are the point.
+#
+# The starting player declares first; Bot2 then keeps without waiting on Bot1's second hand.
+
+[Opening]
+Chooser: Bot1
+
+[Bot1 Deck]
+Island x20
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.PlayFirst
+Bot1.Mulligan
+Bot2.Keep
+Bot1.Keep
+Bot1.Choose(Island)
+[T1 Bot1.Main1]
+
+[Expect]
+Turn = 1
+ActivePlayer = Bot1
+# Six in hand and the seventh under the library: the starting player does not draw on turn one (CR 103.8a).
+Bot1.Hand.Count = 6
+Bot1.Library.Count = 14
+Bot2.Hand.Count = 7
+Bot2.Library.Count = 13

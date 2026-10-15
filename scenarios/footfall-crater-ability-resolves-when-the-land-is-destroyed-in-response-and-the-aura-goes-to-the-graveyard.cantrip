@@ -1,0 +1,31 @@
+# The granted ability is the land's (CR 113.7a, 608.2): Bot2's Strip Mine targets the enchanted Mountain, and Bot1 responds by
+# tapping it to activate the ability on its Ornithopter. The Mountain is destroyed, the Aura - enchanting nothing - is put into
+# the graveyard (CR 704.5m), and the ability still resolves, so the Ornithopter ends the turn with trample and haste.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Ornithopter
+Footfall Crater
+Mountain x12
+
+[Bot2 Deck]
+Strip Mine
+Island x14
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Footfall Crater.Cast(Mountain)
+[T2 Bot2.Main1]
+Bot2.Hand.Strip Mine.Play
+Bot2.Battlefield.Strip Mine.Activate(Bot1.Battlefield.Mountain; Ability: Destroy)
+Bot1.Battlefield.Mountain.Activate(Ornithopter; Ability: trample)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Ruby; Ornithopter
+Bot1.Graveyard = Footfall Crater; Mountain
+Bot1.Battlefield.Ornithopter.Keywords = Flying; Haste; Trample

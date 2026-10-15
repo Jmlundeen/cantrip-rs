@@ -1,0 +1,24 @@
+# Urborg, Tomb of Yawgmoth: "Each land is a Swamp in addition to its other land types." Both players' lands gain
+# Swamp, keeping their other land types and their names, and Urborg itself is a Swamp too (CR 305.7, 613.1d).
+
+[Bot1 Deck]
+Urborg, Tomb of Yawgmoth
+Plains
+Plains x18
+
+[Bot2 Deck]
+Forest
+Forest x19
+
+[Actions]
+Bot1.Hand.Urborg, Tomb of Yawgmoth.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+
+[Expect]
+Bot1.Battlefield.Urborg, Tomb of Yawgmoth.Subtypes = Swamp
+Bot1.Battlefield.Plains.Subtypes = Plains; Swamp
+Bot1.Battlefield.Plains.Types = Land
+Bot2.Battlefield.Forest.Subtypes = Forest; Swamp

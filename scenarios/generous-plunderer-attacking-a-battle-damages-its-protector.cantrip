@@ -1,0 +1,50 @@
+# Generous Plunderer: "Whenever this creature attacks, it deals damage to defending player equal to the number of artifacts
+# they control." When a creature attacks a battle, the defending player is the battle's protector (CR 508.5, 310.9d), not its
+# controller. Bot1 casts Invasion of Gobakhan, which Bot2 protects, and attacks it on turn 3 with the Plunderer. Bot1 controls
+# three artifacts (three Moxen) and Bot2 two, so Bot2 takes 2 from the trigger and Bot1 takes nothing.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Generous Plunderer
+Mox Pearl
+Invasion of Gobakhan
+Plains
+Plains
+Plains x15
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Emerald
+Swamp x17
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Generous Plunderer.Cast
+Bot1.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+[T3 Bot1.Upkeep]
+Bot1.Decline
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Invasion of Gobakhan.Cast
+Bot1.Pass
+Bot1.Attack(Generous Plunderer > Bot1.Battlefield.Invasion of Gobakhan)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Life = 20

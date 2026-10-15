@@ -1,0 +1,42 @@
+# "Cast that card" needs a legal target: Mana Tithe (a white instant, mana value 1) is found but there is no spell to target, so it can't be cast and stays in the library, which is then shuffled. The cost was still paid.
+
+[Bot1 Deck]
+Mountain
+Sol Ring
+Ornithopter
+Plains
+Sunforger
+Mountain
+Mountain
+Plains x3
+Mana Tithe
+Plains x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sunforger.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Sunforger.Activate(Ability: Equip; Ornithopter)
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+? Bot1.Battlefield.Ornithopter.Power = 4
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Sunforger.Activate(Ability: Unattach)
+Bot1.Search(Mana Tithe)
+[Bot1.Main2]
+[Expect]
+Bot2.Life = 20
+Bot1.Battlefield.Sunforger.AttachedTo = (absent)
+Bot1.Graveyard.Count = 0
+Bot1.Library.Count = 22

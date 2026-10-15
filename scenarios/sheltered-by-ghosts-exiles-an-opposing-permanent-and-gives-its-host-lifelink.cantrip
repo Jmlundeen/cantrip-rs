@@ -1,0 +1,33 @@
+# Sheltered by Ghosts: on turn 3 Bot1 enchants its Ornithopter. Entering, the Aura exiles Bot2's Ornithopter until it
+# leaves, and the enchanted one is a 1/2 flyer with lifelink.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Ornithopter
+Sheltered by Ghosts
+Plains x3
+Plains x10
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sheltered by Ghosts.Cast(Bot1.Battlefield.Ornithopter)
+
+[Expect]
+Exile = Ornithopter
+Bot2.Battlefield.Count = 0
+Bot1.Battlefield.Ornithopter.Power = 1
+Bot1.Battlefield.Ornithopter.Keywords = Flying; Lifelink
+Bot1.Battlefield.Ornithopter.AttachedTo = (absent)
+Bot1.Battlefield.Sheltered by Ghosts.AttachedTo = Ornithopter

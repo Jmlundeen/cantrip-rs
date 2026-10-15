@@ -1,0 +1,77 @@
+# Spectacular Spider-Man's second ability grants hexproof and indestructible until end of turn to the creatures its
+# controller has when it resolves, which is layer 6. It pays for that by sacrificing itself as a cost, so the ability
+# resolves with its own source already in the graveyard and never grants anything to it.
+#
+# Bot2 casts Wrath of God on turn 8. Bot1 holds priority and activates in response; the Giver of Runes is
+# indestructible when "destroy all creatures" resolves and lives, while the Spider-Man is in the graveyard from the
+# cost rather than from the Wrath. On turn 9 the grant is gone and the Giver is an ordinary creature again.
+
+[Bot1 Deck]
+Plains
+Plains
+Mother of Runes
+Giver of Runes
+Plains
+Plains
+Spectacular Spider-Man
+Plains x14
+
+[Bot2 Deck]
+Plains
+Plains
+Plains
+Plains
+Wrath of God
+Plains
+Plains
+Plains x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Mother of Runes.Cast
+
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Giver of Runes.Cast
+
+[T6 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+
+[T8 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Wrath of God.Cast
+Bot2.Pass
+
+# Flashed in while the Wrath is on the stack, then sacrificed for its own ability, which resolves first.
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Spectacular Spider-Man.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Spectacular Spider-Man.Activate(Ability: Sacrifice)
+? Bot1.Graveyard = Spectacular Spider-Man
+
+[T9 Bot1.Main1]
+
+[Expect]
+Turn = 9
+Bot1.Battlefield = Plains; Plains; Plains; Plains; Mother of Runes; Giver of Runes
+Bot1.Battlefield.Giver of Runes.Power = 1
+Bot1.Battlefield.Giver of Runes.Toughness = 2
+Bot1.Graveyard = Spectacular Spider-Man
+Bot2.Graveyard = Wrath of God
+Bot2.Battlefield.Count = 4

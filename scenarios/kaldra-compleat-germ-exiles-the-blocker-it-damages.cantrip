@@ -1,0 +1,86 @@
+# Kaldra Compleat: living weapon makes a Germ and attaches the Equipment to it, so the token is a 5/5 first striker with
+# trample, indestructible and haste that can attack the turn it is made. Blocked by Bot2's Myr Battlesphere (4/7), it
+# deals its 5 first-strike damage to it, which does not kill it, and "whenever this creature deals combat damage to a
+# creature, exile that creature" exiles the Battlesphere.
+
+[Bot1 Deck]
+Plains
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Sol Ring
+Kaldra Compleat
+Plains x12
+
+[Bot2 Deck]
+Mountain
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Sol Ring
+Myr Battlesphere
+Mountain x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Hand.Myr Battlesphere.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Kaldra Compleat.Cast
+Bot1.Pass
+Bot1.Attack(Phyrexian Germ > Bot2)
+Bot2.Block(Myr Battlesphere > Phyrexian Germ)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Exile.Count = 1
+Bot2.Life = 20
+Bot1.Battlefield.Phyrexian Germ.Power = 5
+Bot1.Battlefield.Phyrexian Germ.Toughness = 5
+Bot1.Battlefield.Phyrexian Germ.Keywords = FirstStrike; Haste; Indestructible; Trample

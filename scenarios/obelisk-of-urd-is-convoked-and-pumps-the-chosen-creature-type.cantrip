@@ -1,0 +1,36 @@
+# Obelisk of Urd costs {6}: Black Lotus pays three and three Ornithopters, tapped to convoke, pay the rest. Thopter is the
+# chosen creature type as it enters, so every Ornithopter is a 2/4.
+
+[Bot1 Deck]
+Black Lotus
+Ornithopter
+Ornithopter
+Ornithopter
+Obelisk of Urd
+Forest
+Forest
+Forest x12
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Obelisk of Urd.Cast(Convoke: Ornithopter, Ornithopter, Ornithopter)
+Bot1.Modes(Thopter)
+
+[Expect]
+Bot1.Battlefield.Ornithopter#1.Power = 2
+Bot1.Battlefield.Ornithopter#1.Toughness = 4
+Bot1.Battlefield.Ornithopter#1.Tapped = true
+Bot1.Battlefield.Ornithopter#2.Power = 2
+Bot1.Battlefield.Ornithopter#2.Toughness = 4
+Bot1.Battlefield.Ornithopter#2.Tapped = true
+Bot1.Battlefield.Ornithopter#3.Power = 2
+Bot1.Battlefield.Ornithopter#3.Toughness = 4
+Bot1.Battlefield.Ornithopter#3.Tapped = true

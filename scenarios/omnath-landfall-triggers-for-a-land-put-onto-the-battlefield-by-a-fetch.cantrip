@@ -1,0 +1,39 @@
+# "Whenever a land you control enters": not only played lands. Bot1 plays Marsh Flats (first landfall: +4 life) and cracks
+# it (1 life): the Swamp it fetches enters, the second landfall resolves, and {R}{G}{W}{U} is in the mana pool.
+
+[Bot1 Deck]
+Marsh Flats
+Mox Ruby
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Omnath, Locus of Creation
+Island
+Island
+Swamp
+Island x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Omnath, Locus of Creation.Cast
+Bot1.Pass
+Bot1.Hand.Marsh Flats.Play
+Bot1.Pass
+Bot1.Battlefield.Marsh Flats.Activate
+Bot1.Search(Swamp)
+Bot1.Pass
+
+[Expect]
+Bot1.Life = 23
+Bot1.Mana = {W}{U}{R}{G}
+Bot1.Battlefield.Swamp.Tapped = false

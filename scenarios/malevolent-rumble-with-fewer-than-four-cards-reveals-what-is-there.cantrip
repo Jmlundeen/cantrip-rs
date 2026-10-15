@@ -1,0 +1,34 @@
+# Malevolent Rumble reveals "the top four cards": with only two cards in the library it reveals those two. Bot1 keeps the
+# Guerrilla Gorilla and the Lightning Bolt goes to the graveyard; the library is left empty (Bot1 would lose at its next draw,
+# which the script does not reach), and the Eldrazi Spawn is made.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Malevolent Rumble
+Island
+Island
+Island
+Island
+Guerrilla Gorilla
+Lightning Bolt
+
+[Bot2 Deck]
+Swamp x14
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Malevolent Rumble.Cast
+Bot1.Arrange(Guerrilla Gorilla | Lightning Bolt)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 5
+Bot1.Graveyard = Malevolent Rumble; Lightning Bolt
+Bot1.Library.Count = 0
+Bot1.Battlefield.Eldrazi Spawn.Power = 0

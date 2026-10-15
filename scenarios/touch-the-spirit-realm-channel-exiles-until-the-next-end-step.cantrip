@@ -1,0 +1,34 @@
+# Touch the Spirit Realm's channel ability, {1}{W} and discarding it, exiles Bot2's Llanowar Elves, which come back
+# under Bot2's control at the beginning of the next end step.
+
+[Bot1 Deck]
+Touch the Spirit Realm
+Plains
+Mox Jet
+Plains x13
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x5
+Forest x10
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Touch the Spirit Realm.Activate(Bot2.Battlefield.Llanowar Elves)
+[T3 Bot1.Main2]
+? Exile = Llanowar Elves
+? Bot1.Graveyard = Touch the Spirit Realm
+[T3 Bot1.End]
+
+[Expect]
+Exile.Count = 0
+Bot2.Battlefield = Forest; Llanowar Elves

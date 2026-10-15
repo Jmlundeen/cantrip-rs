@@ -1,0 +1,48 @@
+# Gix's Command, mode 3: "up to two creature cards". Three Ornithopters die to mode 2 (power 0), and Bot1 takes two
+# back: the third stays in the graveyard.
+
+[Bot1 Deck]
+Ornithopter
+Ornithopter
+Ornithopter
+Black Lotus
+Mox Jet
+Gleemox
+Gix's Command
+Island x12
+
+[Bot2 Deck]
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island x12
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Black)
+Bot1.Hand.Gix's Command.Cast
+Bot1.Modes(2; 3)
+Bot1.Pass
+Bot1.Choose(Ornithopter; Ornithopter)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Ornithopter; Ornithopter
+Bot1.Graveyard = Gix's Command; Ornithopter; Black Lotus

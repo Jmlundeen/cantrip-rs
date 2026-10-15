@@ -1,0 +1,35 @@
+# Esika's Chariot makes two Cat tokens as it enters; two turns later the Cats crew it (crew 4), and its attack trigger
+# copies a Cat, for three Cats in all, while the 4/4 Chariot hits for 4.
+
+[Bot1 Deck]
+Forest
+Forest
+Sol Ring
+Esika's Chariot
+Forest
+Forest
+Forest
+Forest x12
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Esika's Chariot.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Esika's Chariot.Activate(Ability: Crew)
+Bot1.Attack(Esika's Chariot > Bot2)
+Bot1.Target(Cat)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Forest; Forest; Sol Ring; Esika's Chariot; Cat; Cat; Cat
+Bot2.Life = 16

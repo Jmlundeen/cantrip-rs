@@ -1,0 +1,38 @@
+# "Deal combat damage to one or more players": a Human Knight blocked by Bot2's Ornithopter (0/2) deals all of its 2 damage to the Ornithopter (lethal damage first, so no
+# trample damage goes through) and nothing to Bot2, so Bot1 does not become the monarch. (The unblocked attack that does is in the original scenario.)
+
+[Bot1 Deck]
+Plateau
+Mox Pearl
+Mox Ruby
+Forth Eorlingas!
+Plateau x16
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Plateau.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Plateau.Activate(Ability: {R})
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Forth Eorlingas!.Cast(X: 1)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Human Knight)
+Bot2.Block(Ornithopter > Human Knight)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 20
+Bot2.Graveyard = Ornithopter
+Monarch = (absent)

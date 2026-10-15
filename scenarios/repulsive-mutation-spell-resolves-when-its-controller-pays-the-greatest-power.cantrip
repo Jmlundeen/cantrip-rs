@@ -1,0 +1,50 @@
+# Same cast, but Bot2 has a Sol Ring untapped and pays the {2} (the Mystic's power with the new counter), so the Lightning Bolt is not countered and Bot1 takes 3.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Elvish Mystic
+Repulsive Mutation
+Forest x13
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Sol Ring
+Lightning Bolt
+Mountain x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Repulsive Mutation.Cast(X: 1)
+Bot1.Target(Bot1.Battlefield.Elvish Mystic)
+Bot1.Target(Stack.Lightning Bolt)
+Bot2.Pass
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.PayCost
+[Bot2.Main2]
+
+[Expect]
+Bot1.Life = 17
+Bot2.Graveyard = Lightning Bolt
+Bot1.Battlefield.Elvish Mystic.Counters.PlusOnePlusOne = 1

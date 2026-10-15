@@ -1,0 +1,37 @@
+# The flying is given to "Spectacular Spider-Man" only if it is still on the battlefield as the ability resolves: Bot2's Lightning Bolt
+# kills the 3/2 in response and nothing happens to the card in the graveyard.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Spectacular Spider-Man
+Plains x20
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Spectacular Spider-Man.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Spectacular Spider-Man.Activate(Ability: flying)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Spectacular Spider-Man)
+Bot1.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Spectacular Spider-Man
+Bot1.Battlefield.Count = 3

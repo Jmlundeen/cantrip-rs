@@ -1,0 +1,44 @@
+# A Class's levels (CR 716): "{G}: Level 2" and "{3}{G}: Level 3" are activated only as a sorcery and each gains the next level only. On turn 3, with five untapped mana sources and the Talent at level 1: Level 2 is refused in the beginning of
+# combat step (sorcery speed), and in main phase 2 Level 3 is refused (level 1, not 2), Level 2 is done, Level 2 is refused again (already level 2) and Level 3 is done (the positive control for each).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Mox Jet
+Innkeeper's Talent
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Innkeeper's Talent.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T3 Bot1.BeginCombat]
+! Bot1.Battlefield.Innkeeper's Talent.Activate(Ability: Level 2)
+[T3 Bot1.Main2]
+! Bot1.Battlefield.Innkeeper's Talent.Activate(Ability: Level 3)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Innkeeper's Talent.Activate(Ability: Level 2)
+Bot1.Pass
+! Bot1.Battlefield.Innkeeper's Talent.Activate(Ability: Level 2)
+? Bot1.Battlefield.Innkeeper's Talent.ClassLevel = 2
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Innkeeper's Talent.Activate(Ability: Level 3)
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Innkeeper's Talent.ClassLevel = 3

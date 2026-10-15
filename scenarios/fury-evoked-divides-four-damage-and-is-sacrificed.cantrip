@@ -1,0 +1,33 @@
+# Bot2 casts a Llanowar Elves and an Ornithopter on turn 2. On turn 3 Bot1 evokes Fury, exiling Lightning Bolt (a red card)
+# from their hand instead of paying {3}{R}{R}. Its enters trigger deals 4 damage divided as Bot1 chooses: 1 to the Elves
+# and 3 to the Ornithopter, killing both (CR 601.2d). The evoke trigger then sacrifices Fury.
+
+[Bot1 Deck]
+Fury
+Lightning Bolt
+Mountain x18
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Ornithopter
+Forest x17
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Fury.Cast(Ability: Evoke)
+Bot1.Choose(Lightning Bolt)
+Bot1.Divide(Bot2.Battlefield.Llanowar Elves: 1; Bot2.Battlefield.Ornithopter: 3)
+[T3 Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Exile = Lightning Bolt
+Bot1.Graveyard = Fury
+Bot2.Graveyard.Count = 2
+Bot2.Battlefield = Forest

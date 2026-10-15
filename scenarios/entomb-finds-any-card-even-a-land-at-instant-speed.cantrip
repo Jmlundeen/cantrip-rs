@@ -1,0 +1,33 @@
+# "Search your library for a card" has no quality, so any card is a legal find, a land as well as a spell. In Bot2's end
+# step Bot1 casts Entomb (an instant, CR 304.1) and takes the Island; on turn 3 it casts the second one and takes the
+# Counterspell. Both go to Bot1's graveyard, not Bot2's, and the library shrinks by one each time.
+
+[Bot1 Deck]
+Swamp
+Entomb
+Entomb
+Swamp x4
+Lightning Bolt
+Island
+Counterspell
+Swamp x8
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.End]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Island)
+? Bot1.Graveyard = Entomb; Island
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Counterspell)
+
+[Expect]
+Bot1.Graveyard = Entomb; Counterspell; Entomb; Island
+Bot1.Library.Count = 8

@@ -1,0 +1,52 @@
+# Berserk: "Cast this spell only before the combat damage step" (CR 601.3) and "gains trample and gets +X/+0". Embereth
+# Shieldbreaker (2/1) attacks and Bot2's Ornithopter (0/2) blocks it. Cast in the declare blockers step, after the block
+# (still before combat damage - the positive control), Berserk makes it a 4/1 trampler: 2 damage is lethal to the
+# Ornithopter and the other 2 reach Bot2 (CR 702.19b). In the combat damage step a second Berserk is refused. The
+# Shieldbreaker attacked, so it is destroyed at the end step.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Emerald
+Embereth Shieldbreaker
+Berserk
+Berserk
+Forest
+Forest x10
+
+[Bot2 Deck]
+Island
+Ornithopter
+Island x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Embereth Shieldbreaker.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Embereth Shieldbreaker > Bot2)
+Bot2.Block(Ornithopter > Embereth Shieldbreaker)
+[T3 Bot1.Blockers]
+Bot1.Hand.Berserk.Cast(Bot1.Battlefield.Embereth Shieldbreaker)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Embereth Shieldbreaker.Power = 4
+? Bot1.Battlefield.Embereth Shieldbreaker.Keywords = Trample
+Bot1.AssignDamage(Embereth Shieldbreaker > Ornithopter: 2; Embereth Shieldbreaker > Bot2: 2)
+[T3 Bot1.Damage]
+? Bot2.Life = 18
+! Bot1.Hand.Berserk.Cast(Bot1.Battlefield.Embereth Shieldbreaker)
+[T4 Bot2.Upkeep]
+
+[Expect]
+Bot2.Life = 18
+Bot2.Graveyard = Ornithopter
+Bot1.Graveyard = Embereth Shieldbreaker; Berserk
+Bot1.Hand.Count = 3

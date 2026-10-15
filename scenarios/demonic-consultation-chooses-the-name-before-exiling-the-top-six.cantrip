@@ -1,0 +1,28 @@
+# Demonic Consultation: "Choose a card name. Exile the top six cards of your library, then reveal ..." The instructions
+# are followed in order (CR 608.2c), so while Bot1 is asked for the name nothing has been exiled yet. The script stops at
+# the naming question: the library still holds its twelve cards and exile is empty.
+
+[Bot1 Deck]
+Swamp
+Demonic Consultation
+Island x5
+Island x6
+Forest
+Forest
+Black Lotus
+Forest x3
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Demonic Consultation.Cast
+[Handover Bot1.Name]
+
+[Expect]
+Turn = 1
+Exile.Count = 0
+Bot1.Library.Count = 12
+Stack.Count = 1

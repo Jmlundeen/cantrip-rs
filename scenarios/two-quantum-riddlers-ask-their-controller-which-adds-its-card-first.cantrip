@@ -1,0 +1,64 @@
+# CR 616.1, on an instruction to draw (CR 121.2a). Bot1 controls Quantum Riddler and a token copy of it, with an empty
+# hand, and the token's "When this creature enters, draw a card" resolves. Both Riddlers' "if you would draw one or
+# more cards, you draw that many cards plus one instead" apply to that one instruction, so the affected player — the
+# one who would draw — chooses which applies first. The other still applies afterwards (CR 616.1f: no card has been
+# drawn yet, so the hand is still empty), and the instruction for one card draws three.
+#
+# The question used to be addressed to nobody: the instruction to draw was the one event the pipeline could not name
+# an affected player for, and a server refuses to send a prompt to seat 0.
+#
+# Everything happens on turn 1 so that the hand is empty when the draw is made: an Island, three Black Lotuses and a
+# Mox leave the Riddler and Three Steps Ahead, the Riddler is cast, and the copy is made in response to its enters
+# trigger. The token's trigger is then on top (three cards, hand of 0), and the original's resolves second with three
+# cards in hand, where neither effect applies, and draws one.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Black Lotus
+Black Lotus
+Mox Sapphire
+Quantum Riddler
+Three Steps Ahead
+Mountain
+Forest
+Swamp
+Plains
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Quantum Riddler.Cast
+? Bot1.Mana = {U}
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Three Steps Ahead.Cast
+Bot1.Modes(2)
+Bot1.Target(Quantum Riddler)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 2
+? Bot1.Hand.Count = 0
+Bot1.Pass
+Bot2.Pass
+Bot1.Replace(Quantum Riddler)
+? Bot1.Hand = Mountain; Forest; Swamp
+? Stack.Count = 1
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Hand = Mountain; Forest; Swamp; Plains
+Bot1.Battlefield = Island; Mox Sapphire; Quantum Riddler; Quantum Riddler
+Bot1.Graveyard = Three Steps Ahead; Black Lotus; Black Lotus; Black Lotus

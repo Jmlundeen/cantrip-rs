@@ -1,0 +1,42 @@
+# "Each opponent loses 5 life. You gain life equal to the life lost this way": in a game of three, Kokusho dying (sacrificed to
+# Culling the Weak the turn it is cast, Black Lotus and Mox Jet and Mox Ruby paying {3}{B}{B}, a Swamp the {B}) takes 5 from Bot2
+# and 5 from Bot3, and Bot1 gains the 10 actually lost.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Black Lotus
+Kokusho, the Evening Star
+Culling the Weak
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Island x20
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Kokusho, the Evening Star.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Culling the Weak.Cast
+Bot1.Choose(Kokusho, the Evening Star)
+Bot1.Pass
+[T2 Bot2.Upkeep]
+
+[Expect]
+Bot1.Life = 30
+Bot2.Life = 15
+Bot3.Life = 15
+Bot1.Graveyard = Culling the Weak; Kokusho, the Evening Star; Black Lotus

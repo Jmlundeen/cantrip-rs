@@ -1,0 +1,32 @@
+# The entry trigger raises loyalty, the 0 ability grows an artifact creature, and the -3 finds a cheap artifact.
+[Bot1 Deck]
+Tezzeret, Cruel Captain
+Black Lotus
+Mox Sapphire
+Haywire Mite
+Island
+Island
+Island
+Island x3
+Lotus Petal
+Island x12
+
+[Bot2 Deck]
+Forest x22
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Tezzeret, Cruel Captain.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Haywire Mite.Cast
+Bot1.Battlefield.Tezzeret, Cruel Captain.Activate(Haywire Mite; Ability: Untap target)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Tezzeret, Cruel Captain.Activate(Ability: Search your library)
+Bot1.Search(Lotus Petal)
+
+[Expect]
+Bot1.Battlefield.Haywire Mite.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Haywire Mite.Power = 2
+Bot1.Hand = Island; Island; Island; Island; Lotus Petal

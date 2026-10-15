@@ -1,0 +1,31 @@
+# Activated abilities of sources with the chosen name cost {2} more "unless they're mana abilities" (CR 605.1a). Bot1
+# names Sol Ring, which it controls; on turn 3 tapping it for {C}{C} owes nothing, so the pool holds the two mana at once
+# with no other source to pay a tax from (Bot1 has tapped nothing else).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Sol Ring
+Anointed Peacekeeper
+Plains x12
+
+[Bot2 Deck]
+Mountain x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Anointed Peacekeeper.Cast
+Bot1.Name(Sol Ring)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Sol Ring.Activate
+? Bot1.Mana = {C}{C}
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Sol Ring.Tapped = true
+Bot1.Mana = {C}{C}

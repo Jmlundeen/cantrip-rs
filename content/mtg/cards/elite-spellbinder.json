@@ -1,0 +1,11 @@
+{
+  "name": "Elite Spellbinder",
+  "manaCost": "{2}{W}",
+  "type": "Creature — Human Cleric",
+  "power": 3,
+  "toughness": 1,
+  "oracleText": "Flying\nWhen this creature enters, look at target opponent's hand. You may exile a nonland card from it. For as long as that card remains exiled, its owner may play it. A spell cast this way costs {2} more to cast.",
+  "keywords": [
+    "Flying"
+  ]
+}

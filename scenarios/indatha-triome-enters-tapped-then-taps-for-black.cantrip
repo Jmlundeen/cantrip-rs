@@ -1,0 +1,20 @@
+# Indatha Triome enters tapped (CR 614.1c); its Plains Swamp Forest types give it three mana abilities (CR 305.6), so on
+# the next turn it taps for {B}.
+
+[Bot1 Deck]
+Indatha Triome
+Plains x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Indatha Triome.Play
+? Bot1.Battlefield.Indatha Triome.Tapped = true
+[T3 Bot1.Main1]
+Bot1.Battlefield.Indatha Triome.Activate(Ability: {B})
+? Bot1.Mana = {B}
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Indatha Triome.Tapped = true

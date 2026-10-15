@@ -1,0 +1,50 @@
+# Aang's Iceberg (flash, {2}{W}) exiles the opponent's Sol Ring until it leaves. On turn 5 its Waterbend {3} is paid by
+# three Plains: it is sacrificed, the Sol Ring comes back, and its controller scries 2 (both cards stay on top).
+
+[Bot1 Deck]
+Plains
+Plains
+Mox Pearl
+Aang's Iceberg
+Plains
+Plains
+Plains
+Plains x15
+
+[Bot2 Deck]
+Island
+Sol Ring
+Island x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Aang's Iceberg.Cast
+Bot1.Pass
+Bot1.Target(Sol Ring)
+Bot1.Pass
+[T3 Bot1.Main2]
+? Exile = Sol Ring
+? Bot2.Battlefield.Count = 1
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Aang's Iceberg.Activate
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot2.Battlefield = Island; Sol Ring
+Bot1.Graveyard = Aang's Iceberg

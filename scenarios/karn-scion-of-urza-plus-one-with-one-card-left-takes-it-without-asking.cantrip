@@ -1,0 +1,27 @@
+# Karn's +1 with a single card left in the library reveals just that card: "an opponent chooses one of them" is no choice with one
+# card, so Bot2 is not asked, the card goes to Bot1's hand and nothing is exiled with a silver counter.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Karn, Scion of Urza
+Island x4
+Lightning Bolt
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Karn, Scion of Urza.Cast
+Bot1.Pass
+Bot1.Battlefield.Karn, Scion of Urza.Activate(Ability: Reveal the top two)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 5
+Bot1.Library.Count = 0
+Exile.Count = 0

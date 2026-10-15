@@ -1,0 +1,47 @@
+# Cecil, Dark Knight: "you lose that much life. Then if your life total is less than or equal to half your starting life
+# total, untap Cecil and transform it." Both sides of the condition, and its boundary. Turn 3: Cecil hits for 2 and Bot1
+# goes from 20 to 18 - above 10 - so Cecil stays a tapped Dark Knight. Turn 4: Bot2's two Bolts take Bot1 to 12. Turn 5:
+# Cecil hits again, 12 to exactly 10, which is "less than or equal to" half of 20, and Cecil untaps and transforms.
+
+[Bot1 Deck]
+Swamp
+Cecil, Dark Knight
+Swamp x5
+Swamp x12
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Lightning Bolt
+Mountain x5
+Mountain x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Cecil, Dark Knight.Cast
+Bot1.Battlefield.Swamp.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Attack(Cecil, Dark Knight)
+[T3 Bot1.Main2]
+? Bot1.Life = 18
+? Bot1.Battlefield.Cecil, Dark Knight.Tapped = true
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+? Bot1.Life = 12
+Bot1.Attack(Cecil, Dark Knight)
+[T5 Bot1.Main2]
+? Bot1.Life = 10
+? Bot1.Battlefield.Cecil, Redeemed Paladin.Tapped = false
+
+[Expect]
+Bot1.Life = 10
+Bot1.Battlefield.Cecil, Redeemed Paladin.Power = 4

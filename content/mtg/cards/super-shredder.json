@@ -1,0 +1,11 @@
+{
+  "name": "Super Shredder",
+  "manaCost": "{1}{B}",
+  "type": "Legendary Creature — Mutant Ninja Human",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "Menace\nWhenever another permanent leaves the battlefield, put a +1/+1 counter on Super Shredder.",
+  "keywords": [
+    "Menace"
+  ]
+}

@@ -1,0 +1,30 @@
+# Bitter Reunion: its enters trigger lets you discard a chosen card, and then you draw two.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Bitter Reunion
+Island
+Plains
+Plains
+Plains
+Swamp
+Forest
+Plains x11
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Bitter Reunion.Cast
+Bot1.Choose(Island)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Island
+Bot1.Hand.Count = 5
+Bot1.Library.Count = 11

@@ -1,0 +1,39 @@
+# "At the beginning of the end step, sacrifice this enchantment" means every end step, not only its controller's.
+# To bring Underworld Breach into Bot2's turn, Bot1 counters its first sacrifice trigger in Bot1's own end step with
+# Tishana's Tidebinder (Breach is an enchantment, so it keeps its abilities). It is still there in Bot2's main phase,
+# and at the beginning of Bot2's end step it triggers again and is sacrificed.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Black Lotus
+Underworld Breach
+Tishana's Tidebinder
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Red)
+Bot1.Hand.Underworld Breach.Cast
+[T1 Bot1.End]
+? Stack.Count = 1
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Tishana's Tidebinder.Cast
+Bot1.Target(Stack.Underworld Breach)
+[T2 Bot2.Main1]
+? Bot1.Battlefield = Mountain; Underworld Breach; Tishana's Tidebinder
+[T2 Bot2.End]
+[T3 Bot1.Upkeep]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Mountain; Tishana's Tidebinder
+Bot1.Graveyard = Underworld Breach; Black Lotus; Black Lotus

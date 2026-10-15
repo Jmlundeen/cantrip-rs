@@ -1,0 +1,28 @@
+# The Talisman's two mana abilities are separate: {T}: Add {C} deals no damage (life stays 20 on turn 3), while {T}: Add {U} or {R}
+# deals 1 damage to Bot1 (the blue on turn 5 takes it to 19). The damage is dealt by the artifact as part of the ability, once.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Talisman of Creativity
+Swamp x13
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Talisman of Creativity.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Talisman of Creativity.Activate(Ability: {C})
+? Bot1.Mana = {C}
+? Bot1.Life = 20
+[T5 Bot1.Main1]
+Bot1.Battlefield.Talisman of Creativity.Activate(Ability: {U} or {R}; Color: Blue)
+? Bot1.Mana = {U}
+
+[Expect]
+Bot1.Life = 19

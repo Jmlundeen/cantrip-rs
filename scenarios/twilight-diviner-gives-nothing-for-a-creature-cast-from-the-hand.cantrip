@@ -1,0 +1,38 @@
+# A creature that enters from the stack after being cast from the hand is neither entering from a graveyard nor cast
+# from one, so Twilight Diviner's second ability does not trigger (and the token of the clause is not made).
+
+[Bot1 Deck]
+Swamp
+Swamp
+Swamp
+Swamp
+Twilight Diviner
+Sedgemoor Witch
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Forest x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Twilight Diviner.Cast
+[T7 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Sedgemoor Witch.Cast
+
+[Expect]
+Turn = 7
+Stack.Count = 0
+Bot1.Battlefield = Swamp; Swamp; Swamp; Swamp; Twilight Diviner; Sedgemoor Witch

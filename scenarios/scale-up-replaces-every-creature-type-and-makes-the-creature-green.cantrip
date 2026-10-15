@@ -1,0 +1,37 @@
+# Scale Up: "target creature you control becomes a green Wurm with base power and toughness 6/4". Setting a creature type
+# replaces every creature type the creature had (CR 205.1a) and setting its color replaces the colors it had (CR 105.3,
+# 613.1e): Mother of Runes, a white Human Cleric 1/1, is a green Wurm 6/4 and no longer a Human or a Cleric. It is still a
+# creature, and the effect ends at the cleanup step (CR 514.2): on the opponent's next turn it is the white 1/1 again.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Mother of Runes
+Scale Up
+Forest x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mother of Runes.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Scale Up.Cast(Mother of Runes)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Mother of Runes.Subtypes = Wurm
+? Bot1.Battlefield.Mother of Runes.Colors = Green
+? Bot1.Battlefield.Mother of Runes.Types = Creature
+? Bot1.Battlefield.Mother of Runes.Power = 6
+? Bot1.Battlefield.Mother of Runes.Toughness = 4
+[T2 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Mother of Runes.Subtypes = Cleric; Human
+Bot1.Battlefield.Mother of Runes.Colors = White
+Bot1.Battlefield.Mother of Runes.Power = 1
+Bot1.Battlefield.Mother of Runes.Toughness = 1

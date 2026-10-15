@@ -1,0 +1,33 @@
+# Fable of the Mirror-Breaker, chapter II is a "may": Bot1 chooses no card, so nothing is discarded and nothing is drawn
+# (the hand stays Island, Swamp, Plains and the turn-3 Forest). Then chapter I's Goblin Shaman token ("Whenever this token
+# attacks, create a Treasure token.") attacks Bot2 on turn 3: a Treasure arrives and Bot2 takes 2.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Black Lotus
+Fable of the Mirror-Breaker
+Island
+Swamp
+Plains
+Forest x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Fable of the Mirror-Breaker.Cast
+[T3 Bot1.Main1]
+Bot1.Choose()
+Bot1.Attack(Goblin Shaman > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Island; Swamp; Plains; Forest
+Bot1.Graveyard = Black Lotus
+Bot1.Battlefield = Mountain; Mox Ruby; Fable of the Mirror-Breaker; Goblin Shaman; Treasure Token
+Bot2.Life = 18

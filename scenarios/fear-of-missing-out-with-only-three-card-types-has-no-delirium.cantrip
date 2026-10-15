@@ -1,0 +1,34 @@
+# Fear of Missing Out: the delirium trigger has an intervening "if there are four or more card types among cards in your
+# graveyard" (CR 603.4, 700.2). The graveyard holds an Ornithopter (artifact and creature), a spent Black Lotus (artifact) and two
+# Lightning Bolts (instant): three types, one short of the existing scenario's four (its Forest adds land). On turn 3 it attacks, the
+# trigger does not happen, nothing untaps and there is no additional combat phase: Bot2 is hit once, for 2.
+
+[Bot1 Deck]
+Ornithopter
+Black Lotus
+Lightning Bolt
+Fear of Missing Out
+Lightning Bolt
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Hand.Fear of Missing Out.Cast
+Bot1.Choose(Lightning Bolt)
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Fear of Missing Out)
+! Bot1.Target
+[T3 Bot1.Main2]
+? Bot2.Life = 18
+
+[Expect]
+Bot2.Life = 18
+Bot1.Graveyard = Lightning Bolt; Ornithopter; Lightning Bolt; Black Lotus

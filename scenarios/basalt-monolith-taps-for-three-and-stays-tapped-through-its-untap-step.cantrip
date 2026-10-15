@@ -1,0 +1,24 @@
+[Bot1 Deck]
+Black Lotus
+Basalt Monolith
+Island x14
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Basalt Monolith.Cast
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Add)
+? Bot1.Mana = {C}{C}{C}
+? Bot1.Battlefield.Basalt Monolith.Tapped = true
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+[Bot1.Main2]
+? Bot1.Battlefield.Basalt Monolith.Tapped = false
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Add)
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Basalt Monolith.Tapped = true
+
+[Expect]
+Turn = 3

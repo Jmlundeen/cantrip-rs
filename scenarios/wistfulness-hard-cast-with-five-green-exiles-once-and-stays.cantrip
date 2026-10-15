@@ -1,0 +1,41 @@
+# Wistfulness cast for {3}{G/U}{G/U} with five Forests: more than two {G} was spent, which does not multiply the effect
+# (ruling 2025-11-17); the opponent's Sol Ring is exiled once and the 6/5 stays, since evoke was not paid. No {U} was
+# spent, so nothing is drawn.
+
+[Bot1 Deck]
+Wistfulness
+Forest x6
+Forest x10
+
+[Bot2 Deck]
+Sol Ring
+Forest x6
+Forest x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Wistfulness.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+[T9 Bot1.Main2]
+
+[Expect]
+Exile = Sol Ring
+Bot1.Battlefield.Wistfulness.Power = 6
+Bot1.Battlefield.Wistfulness.Toughness = 5
+Bot1.Hand.Count = 5

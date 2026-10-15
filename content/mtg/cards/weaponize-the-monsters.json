@@ -1,0 +1,6 @@
+{
+  "name": "Weaponize the Monsters",
+  "manaCost": "{R}",
+  "type": "Enchantment",
+  "oracleText": "{2}, Sacrifice a creature: This enchantment deals 2 damage to any target."
+}

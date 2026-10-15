@@ -1,0 +1,33 @@
+# Zagoth Triome's cycling {3} from the hand: Bot1 pays it with an Island and the two mana of a Sol Ring (cast with a
+# Mox Sapphire), discards the Triome and draws a card. Cycling works only from the hand, so the discarded Triome offers
+# no second cycle from the graveyard.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Sol Ring
+Zagoth Triome
+Island x3
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Zagoth Triome.Activate
+! Bot1.Graveyard.Zagoth Triome.Activate
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Graveyard = Zagoth Triome
+Bot1.Hand.Count = 4
+Bot1.Library.Count = 12

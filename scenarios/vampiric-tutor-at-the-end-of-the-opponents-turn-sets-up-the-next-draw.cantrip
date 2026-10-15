@@ -1,0 +1,29 @@
+# Vampiric Tutor is an instant (CR 304.1): Bot1 casts it in Bot2's end step, puts the Black Lotus on top and loses 2 life, then
+# draws that very card in its own draw step on turn 3 and casts it. (The sorcery Imperial Seal cannot be cast then.)
+
+[Bot1 Deck]
+Swamp
+Vampiric Tutor
+Swamp x5
+Swamp
+Lightning Bolt
+Black Lotus
+Swamp x8
+
+[Bot2 Deck]
+Swamp x15
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.End]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Vampiric Tutor.Cast
+Bot1.Search(Black Lotus)
+? Bot1.Life = 18
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+
+[Expect]
+Bot1.Battlefield = Swamp; Black Lotus
+Bot1.Graveyard = Vampiric Tutor
+Bot1.Life = 18

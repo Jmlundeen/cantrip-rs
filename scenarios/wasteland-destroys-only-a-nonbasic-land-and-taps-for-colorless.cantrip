@@ -1,0 +1,32 @@
+# "Destroy target nonbasic land" (CR 115.1, 205.4a): Bot1's Forest, a basic land, is refused as a target and Bazaar of Baghdad,
+# nonbasic, is destroyed; Wasteland is tapped and sacrificed for it as a cost (CR 602.2b). On turn 2 it first adds {C}.
+
+[Bot1 Deck]
+Forest
+Bazaar of Baghdad
+Forest x5
+Forest x10
+
+[Bot2 Deck]
+Wasteland
+Island x6
+Island x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Wasteland.Play
+Bot2.Battlefield.Wasteland.Activate(Ability: {T}: Add {C})
+? Bot2.Mana = {C}
+[T3 Bot1.Main1]
+Bot1.Hand.Bazaar of Baghdad.Play
+[T4 Bot2.Main1]
+! Bot2.Battlefield.Wasteland.Activate(Ability: Destroy; Bot1.Battlefield.Forest)
+Bot2.Battlefield.Wasteland.Activate(Ability: Destroy; Bazaar of Baghdad)
+Bot2.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Bazaar of Baghdad
+Bot1.Battlefield = Forest
+Bot2.Graveyard = Wasteland

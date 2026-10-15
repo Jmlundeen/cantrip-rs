@@ -1,0 +1,61 @@
+# Otharri dies to Bot2's Lightning Bolt on turn 10 as in the return scenario. On turn 11 Bot1 pays {2}{R}{W} and taps a Rebel to return
+# him, and Bot2 answers with Ghost Vacuum, exiling him from the graveyard. The ability still resolves but there is nothing in the
+# graveyard to return ("return this card from your graveyard": it is a new object in exile), so Otharri stays exiled; the Rebel and the
+# mana are spent.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Mountain
+Plains
+Plains
+Otharri, Suns' Glory
+Mountain x14
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Ghost Vacuum
+Island x17
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Ghost Vacuum.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Otharri, Suns' Glory.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Otharri, Suns' Glory > Bot2)
+[T10 Bot2.Main1]
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Otharri, Suns' Glory)
+Bot2.Battlefield.Mountain.Activate
+[T11 Bot1.Main1]
+Bot1.Graveyard.Otharri, Suns' Glory.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Plains.Activate
+Bot2.Battlefield.Ghost Vacuum.Activate(Bot1.Graveyard.Otharri, Suns' Glory)
+[T11 Bot1.Main2]
+
+[Expect]
+Turn = 11
+Exile = Otharri, Suns' Glory
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Rebel.Tapped = true

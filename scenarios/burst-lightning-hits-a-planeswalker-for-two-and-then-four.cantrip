@@ -1,0 +1,46 @@
+# Burst Lightning at a planeswalker: unkicked it removes two loyalty counters from Bot2's Narset, Parter of Veils (5 to
+# 3), and a kicked one (4 damage instead of 2) then takes the remaining three and more, so Narset has 0 loyalty and is
+# put into the graveyard as a state-based action (CR 704.5i).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Emerald
+Burst Lightning
+Burst Lightning
+Mountain
+Island x12
+
+[Bot2 Deck]
+Black Lotus
+Narset, Parter of Veils
+Island x14
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Narset, Parter of Veils.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Burst Lightning.Cast(Bot2.Battlefield.Narset, Parter of Veils)
+[T3 Bot1.Main2]
+? Bot2.Battlefield.Narset, Parter of Veils.Counters.Loyalty = 3
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Burst Lightning.Cast(Bot2.Battlefield.Narset, Parter of Veils; Kicked: 1)
+[T3 Bot1.End]
+
+[Expect]
+Bot2.Battlefield.Count = 0
+Bot2.Graveyard = Narset, Parter of Veils; Black Lotus

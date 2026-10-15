@@ -1,0 +1,11 @@
+{
+  "name": "Cathar Commando",
+  "manaCost": "{1}{W}",
+  "type": "Creature — Human Soldier",
+  "power": 3,
+  "toughness": 1,
+  "oracleText": "Flash\n{1}, Sacrifice this creature: Destroy target artifact or enchantment.",
+  "keywords": [
+    "Flash"
+  ]
+}

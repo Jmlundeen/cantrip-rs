@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- So the conventional prompt mirror can be tested directly rather than only through a game. -->
+  <ItemGroup>
+    <InternalsVisibleTo Include="Cantrip.Server.Tests" />
+  </ItemGroup>
+
+  <!-- The cards each draft format leaves out of its cube (Banlist). -->
+  <ItemGroup>
+    <EmbeddedResource Include="Events\banlist.json" LogicalName="Cantrip.Server.Events.banlist.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Cantrip.Core\Cantrip.Core.csproj" />
+    <ProjectReference Include="..\Cantrip.Cards\Cantrip.Cards.csproj" />
+    <ProjectReference Include="..\Cantrip.Cards.Model\Cantrip.Cards.Model.csproj" />
+    <ProjectReference Include="..\Cantrip.Projection\Cantrip.Projection.csproj" />
+    <ProjectReference Include="..\Cantrip.Protocol\Cantrip.Protocol.csproj" />
+    <!-- Content: each card as printed and the set lists, for drafting and deck building. The rules are the native engine's. -->
+    <ProjectReference Include="..\Cantrip.Datasets\Cantrip.Datasets.csproj" />
+  </ItemGroup>
+
+</Project>

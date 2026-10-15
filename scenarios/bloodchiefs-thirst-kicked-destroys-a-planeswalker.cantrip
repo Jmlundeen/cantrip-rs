@@ -1,0 +1,44 @@
+# Kicked, Bloodchief's Thirst destroys a planeswalker of any mana value: Jace, the Mind Sculptor (mana value 4).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Jet
+Mox Pearl
+Bloodchief's Thirst
+Island x15
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Sapphire
+Mox Pearl
+Jace, the Mind Sculptor
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Jace, the Mind Sculptor.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Bloodchief's Thirst.Cast(Kicked: 1)
+Bot1.Target(Bot2.Battlefield.Jace, the Mind Sculptor)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Jace, the Mind Sculptor
+Bot1.Graveyard = Bloodchief's Thirst

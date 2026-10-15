@@ -1,0 +1,22 @@
+# Inspiring Vantage: with two other lands it enters untapped (CR 614.1c) and taps for either red or white.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Inspiring Vantage
+Plains x17
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Inspiring Vantage.Play
+Bot1.Battlefield.Inspiring Vantage.Activate(Color: White)
+
+[Expect]
+Bot1.Battlefield.Inspiring Vantage.Tapped = true
+Bot1.Mana = {W}

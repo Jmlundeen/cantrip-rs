@@ -1,0 +1,31 @@
+# "Second from the top" of a library that has one card is the bottom: Bot2's deck is nine cards, so after its turn-two draw one Forest
+# is left and the Llanowar Elves go under it. Oust names a creature only: with a Mox Jet beside it on Bot2's battlefield, the Jet is
+# refused as the target (the refusal) and the Elves are not (the positive control).
+
+[Bot1 Deck]
+Mox Pearl
+Oust
+Plains x13
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Mox Jet
+Forest x6
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Hand.Oust.Cast(Bot2.Battlefield.Mox Jet)
+Bot1.Hand.Oust.Cast(Bot2.Battlefield.Llanowar Elves)
+
+[Expect]
+Bot2.Library = Forest; Llanowar Elves
+Bot2.Life = 23
+Bot2.Battlefield = Forest; Mox Jet

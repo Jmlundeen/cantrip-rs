@@ -1,0 +1,28 @@
+# Sewer-veillance Cam has flash: cast during Bot2's upkeep on turn 4, its enters ability taps Bot2's Ornithopter, which
+# stays tapped through that turn (it untaps only in its controller's untap step).
+
+[Bot1 Deck]
+Island
+Island
+Sewer-veillance Cam
+Plains x17
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Upkeep]
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sewer-veillance Cam.Cast
+Bot1.Modes(Tap)
+Bot1.Pass
+[T4 Bot2.Main1]
+
+[Expect]
+Bot2.Battlefield.Ornithopter.Tapped = true

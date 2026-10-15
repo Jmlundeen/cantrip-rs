@@ -1,0 +1,49 @@
+# Skullclamp: "Whenever equipped creature dies, draw two cards." When Skullclamp and the creature it equips are
+# destroyed at the same time, the game looks back at the moment before the event (CR 603.10a): the creature was
+# equipped when it died, so the ability triggers even though Skullclamp itself went to the graveyard with it.
+#
+# Turn 1: Bot1 casts Guerrilla Gorilla and Skullclamp. Turn 3: Bot1 equips the Gorilla (a 3/1) and casts Vicious Rivalry for
+# X = 2, destroying every artifact and creature of mana value 2 or less at once: Mox Emerald, Sol Ring, Skullclamp and
+# the Gorilla. Bot1 then draws two, so its hand is its turn-3 draw plus both Skullclamp cards.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Sol Ring
+Guerrilla Gorilla
+Skullclamp
+Swamp
+Vicious Rivalry
+Island
+Plains
+Plains
+Island x10
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Skullclamp.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Skullclamp.Activate(Guerrilla Gorilla)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Vicious Rivalry.Cast(X: 2)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Life = 18
+Bot1.Battlefield = Forest; Swamp
+Bot1.Graveyard.Count = 5
+Bot1.Hand = Island; Plains; Plains

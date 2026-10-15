@@ -1,0 +1,47 @@
+# Bot1 casts Exorcise on Bot2's Sunset Saboteur and, holding priority, Lightning Bolts it: the Saboteur dies first, so
+# Exorcise's only target is gone when it resolves (CR 608.2b) and the spell does nothing - nothing is exiled and the
+# Saboteur is in the graveyard, not exile. (Its ward costs Bot1 a discard for each spell.)
+
+[Bot1 Deck]
+Plains
+Mountain
+Exorcise
+Lightning Bolt
+Plains
+Plains
+Mountain
+Plains x13
+
+[Bot2 Deck]
+Swamp
+Swamp
+Sunset Saboteur
+Swamp x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp#1.Activate
+Bot2.Battlefield.Swamp#2.Activate
+Bot2.Hand.Sunset Saboteur.Cast
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Exorcise.Cast(Bot2.Battlefield.Sunset Saboteur)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Sunset Saboteur)
+Bot1.Accept
+Bot1.Accept
+
+[Expect]
+Turn = 5
+Exile.Count = 0
+Bot2.Graveyard = Sunset Saboteur
+Bot1.Graveyard.Count = 4

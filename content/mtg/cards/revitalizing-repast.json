@@ -1,0 +1,12 @@
+{
+  "name": "Revitalizing Repast",
+  "manaCost": "{B/G}",
+  "type": "Instant",
+  "oracleText": "Put a +1/+1 counter on target creature. It gains indestructible until end of turn.",
+  "backFacePlayableAsLand": true,
+  "backFace": {
+    "name": "Old-Growth Grove",
+    "type": "Land",
+    "oracleText": "This land enters tapped.\n{T}: Add {B} or {G}."
+  }
+}

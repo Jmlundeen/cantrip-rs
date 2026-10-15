@@ -1,0 +1,51 @@
+# Shroud (CR 702.18) is hexproof's stricter sibling: nobody may target the creature, its own controller included.
+#
+# Bot1 plays a Sylvan Safekeeper and a Guerrilla Gorilla. Bot2 aims a Lightning Bolt at the Gorilla; Bot1 answers by
+# sacrificing a Forest to give it shroud. The Gorilla is no longer a legal target when the Bolt resolves, so the Bolt
+# is countered by the rules (CR 608.2b) and the Gorilla lives with no damage on it.
+
+[Bot1 Deck]
+Forest
+Sylvan Safekeeper
+Forest
+Guerrilla Gorilla
+13 Forest
+
+[Bot2 Deck]
+Mountain
+Mountain
+Lightning Bolt
+14 Mountain
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sylvan Safekeeper.Cast
+
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Guerrilla Gorilla)
+
+# The cost is a land, not mana, so this works with both Forests tapped.
+Bot1.Battlefield.Sylvan Safekeeper.Activate(Guerrilla Gorilla)
+Bot1.Choose(Forest)
+? Stack = Sylvan Safekeeper; Lightning Bolt
+
+[T5 Bot1.Main1]
+
+[Expect]
+Turn = 5
+Bot1.Life = 20
+Bot1.Battlefield = Forest; Sylvan Safekeeper; Guerrilla Gorilla
+Bot1.Graveyard = Forest
+Bot2.Graveyard = Lightning Bolt

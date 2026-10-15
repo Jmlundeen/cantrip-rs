@@ -1,0 +1,27 @@
+# Creatures that arrived this turn wear the summoning sickness mark over their art (CR 302.6), and a land beside them
+# does not. Two Ornithoptors share a pile, so the one beneath shows the mark only where the one above leaves its art
+# uncovered. Handed over in Bot1's first main phase with priority.
+
+[Bot1 Deck]
+Forest
+Ornithopter
+Ornithopter
+Llanowar Elves
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+[Handover Bot1.Pass]
+
+[Expect]
+Turn = 1
+Step = Main1
+Bot1.Battlefield = Forest; Llanowar Elves; Ornithopter; Ornithopter

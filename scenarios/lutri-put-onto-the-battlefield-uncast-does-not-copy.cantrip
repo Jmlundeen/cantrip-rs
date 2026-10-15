@@ -1,0 +1,49 @@
+# "When Lutri enters, if you cast it": a Lutri returned by Corpse Dance was not cast (CR 603.4, 603.6a). Turn 1: Bot1 flashes Lutri in
+# (no spell to copy, so the trigger has no target) and Bot2 Bolts it on turn 2. On turn 3 Bot1 casts Lightning Bolt at Bot2 and, with it on
+# the stack - a legal target for the trigger - responds with Corpse Dance, which returns Lutri from the graveyard. Lutri enters uncast: nothing
+# is copied, and Bot2 takes the one Bolt's 3.
+
+[Bot1 Deck]
+Black Lotus
+Lutri, the Spellchaser
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Corpse Dance
+Lightning Bolt
+Island x12
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x12
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Lutri, the Spellchaser.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Lutri, the Spellchaser)
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Hand.Corpse Dance.Cast
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Lutri, the Spellchaser.Types = Creature

@@ -1,0 +1,42 @@
+# Counterspell can target any spell, including another Counterspell: Bot1 casts an Ornithopter, Bot2 counters it, and Bot1
+# counters Bot2's Counterspell in response. The stack resolves from the top: Bot1's Counterspell counters Bot2's, so the
+# Ornithopter resolves and enters the battlefield (CR 608.2b/701.5a: the counter war cancels the first counter).
+
+[Bot1 Deck]
+Island
+Island
+Ornithopter
+Counterspell
+Island x16
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Island x16
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Ornithopter.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Ornithopter)
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Counterspell.Cast(Stack.Counterspell)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Island; Island; Ornithopter
+Bot1.Graveyard = Counterspell
+Bot2.Graveyard = Counterspell
+Stack.Count = 0

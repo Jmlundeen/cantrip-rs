@@ -1,0 +1,37 @@
+# "Second spell each turn": one Pyrite Spellbomb on turn 3 and one on turn 5 are each the first spell of their turn, so the
+# Shredder never connives and keeps its cards (no counter; the hand shrinks by exactly the spells and lands played).
+
+[Bot1 Deck]
+Island
+Island
+Mox Jet
+Ledger Shredder
+Pyrite Spellbomb
+Pyrite Spellbomb
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ledger Shredder.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Pyrite Spellbomb.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Island#1.Activate
+Bot1.Hand.Pyrite Spellbomb.Cast
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Ledger Shredder.Counters.PlusOnePlusOne = (absent)
+Bot1.Hand.Count = 3
+Bot1.Library.Count = 10

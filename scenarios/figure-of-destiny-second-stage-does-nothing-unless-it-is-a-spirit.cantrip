@@ -1,0 +1,44 @@
+# Figure of Destiny's "{R/W}{R/W}{R/W}: If this creature is a Spirit, it becomes ... 4/4": paid with the {W}{W}{W} of a Black
+# Lotus while the Figure is only a Kithkin, it is not a Spirit as the ability resolves, so nothing happens and it stays a
+# 1/1 Kithkin. After the first ability makes it a Spirit (2/2), the same second ability works (the positive control).
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Black Lotus
+Black Lotus
+Figure of Destiny
+Plains
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Figure of Destiny.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Figure of Destiny.Activate(Ability: Warrior with)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Figure of Destiny.Power = 1
+? Bot1.Battlefield.Figure of Destiny.Subtypes = Kithkin
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Figure of Destiny.Activate(Ability: Kithkin Spirit with)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Figure of Destiny.Activate(Ability: Warrior with)
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Figure of Destiny.Power = 4
+Bot1.Battlefield.Figure of Destiny.Subtypes = Kithkin; Spirit; Warrior

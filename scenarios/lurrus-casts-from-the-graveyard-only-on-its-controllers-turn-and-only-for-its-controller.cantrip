@@ -1,0 +1,52 @@
+# Lurrus of the Dream-Den: "Once during each of your turns, you may cast a permanent spell with mana value 2 or less from your
+# graveyard." Bot1's graveyard holds a Cathar Commando (flash, so only the turn restriction stops it). On Bot2's turn 2 it
+# cannot be cast (the refusal); on Bot1's turn 3 it can (the positive control). On Bot2's turn 4 Bot2 cannot cast the Mox Pearl in its
+# own graveyard: Lurrus's permission is Bot1's alone (the refusal). Faithless Looting puts the Commando there on turn 1.
+
+[Bot1 Deck]
+Mountain
+Mox Pearl
+Mox Jet
+Mox Ruby
+Faithless Looting
+Lurrus of the Dream-Den
+Plains
+Cathar Commando
+Plains
+Plains x12
+
+[Bot2 Deck]
+Island x7
+Mox Pearl
+Island x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Cathar Commando; Plains)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lurrus of the Dream-Den.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+! Bot1.Graveyard.Cathar Commando.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Graveyard.Cathar Commando.Cast(Ability: Once during each of your turns)
+Bot1.Pass
+[T4 Bot2.Main1]
+! Bot2.Graveyard.Mox Pearl.Cast
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Cathar Commando.Power = 3
+Bot2.Graveyard.Count = 1

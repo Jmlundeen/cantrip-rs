@@ -1,0 +1,56 @@
+# Agatha's Soul Cauldron: "You may spend mana as though it were mana of any color to activate abilities of creatures you
+# control" (CR 609.4b) - creatures only. Turn 3, Mox Sapphire's {U} is floating: Pyrite Spellbomb's "{R}, Sacrifice this
+# artifact" cannot use it (the engine asks for more mana, Mountain pays, and the {U} is still in the pool), but Blazing
+# Rootwalla's "{R}: +2/+0" is then paid with that same {U}, leaving Mox Ruby untapped. (Mox Ruby is untapped so that the
+# engine offers the pump at all: it does not yet offer an ability that only mana "as though of any color" could pay.)
+
+[Bot1 Deck]
+Mountain
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Blazing Rootwalla
+Pyrite Spellbomb
+Agatha's Soul Cauldron
+Mountain
+Mountain x14
+
+[Bot2 Deck]
+Island x13
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Blazing Rootwalla.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Pyrite Spellbomb.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Agatha's Soul Cauldron.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Pyrite Spellbomb.Activate(Bot2; Ability: {R})
+Bot1.Battlefield.Mountain.Activate
+? Bot1.Mana = {U}
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 18
+Bot1.Battlefield.Blazing Rootwalla.Activate
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Mana =
+Bot1.Battlefield.Blazing Rootwalla.Power = 3
+Bot1.Battlefield.Mox Ruby.Tapped = false

@@ -1,0 +1,36 @@
+# Sword of the Meek: "Whenever a 1/1 creature you control enters". An Ornithopter (0/2) entering on turn 3 is not 1/1, so nothing is asked
+# (! Bot1.Accept) and the Sword stays in the graveyard.
+
+[Bot1 Deck]
+Forest
+Mox Pearl
+Mox Emerald
+Mox Jet
+Sword of the Meek
+Disenchant
+Ornithopter
+Forest x9
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sword of the Meek.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Disenchant.Cast(Sword of the Meek)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+! Bot1.Accept
+
+[Expect]
+Bot1.Graveyard = Disenchant; Sword of the Meek
+Stack.Count = 0

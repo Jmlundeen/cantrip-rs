@@ -1,0 +1,55 @@
+# Sword of the Meek: the trigger checks that the card is still in the graveyard as it resolves. When Bot1's Llanowar Elves enters on turn 3,
+# Bot2 answers with Lion Sash ({W}: exile target card from a graveyard, from a Mox Pearl held up since turn 2), exiling the Sword; nothing is
+# asked when the trigger resolves (! Bot1.Accept).
+
+[Bot1 Deck]
+Forest
+Mox Pearl
+Mox Emerald
+Mox Jet
+Sword of the Meek
+Disenchant
+Llanowar Elves
+Forest x9
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mox Pearl
+Lion Sash
+Plains x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sword of the Meek.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Disenchant.Cast(Sword of the Meek)
+Bot1.Pass
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Lion Sash.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Lion Sash.Activate(Ability: Exile; Bot1.Graveyard.Sword of the Meek)
+! Bot1.Accept
+
+[Expect]
+Exile = Sword of the Meek
+Bot1.Graveyard = Disenchant
+Bot1.Battlefield.Llanowar Elves.Power = 1
+Stack.Count = 0

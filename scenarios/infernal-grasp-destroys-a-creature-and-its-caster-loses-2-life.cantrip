@@ -1,0 +1,32 @@
+# Infernal Grasp destroys target creature (Dark Confidant) and its caster loses 2 life.
+
+[Bot1 Deck]
+Swamp
+Infernal Grasp
+Island x15
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Dark Confidant
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Dark Confidant.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Infernal Grasp.Cast(Bot2.Battlefield.Dark Confidant)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Dark Confidant
+Bot1.Graveyard = Infernal Grasp
+Bot1.Life = 18
+Bot2.Life = 20

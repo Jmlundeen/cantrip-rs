@@ -1,0 +1,29 @@
+# Menace (CR 702.110): the 1/1 Moonshadow attacks on turn 3; a single Ornithopter may not block it (refusal), and the pair of
+# Ornithopters together may (the positive control): Bot2 takes no damage and neither dies.
+
+[Bot1 Deck]
+Swamp
+Moonshadow
+Swamp x14
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Island x14
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Moonshadow.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Moonshadow > Bot2)
+! Bot2.Block(Ornithopter#1 > Moonshadow)
+Bot2.Block(Ornithopter#1 > Moonshadow; Ornithopter#2 > Moonshadow)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot2.Battlefield.Count = 2

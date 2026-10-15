@@ -1,0 +1,33 @@
+# "As an additional cost to cast this spell, pay X life" (CR 119.4): X can be announced no higher than the life there is to pay.
+# Bot1 starts at 20 life, so X of 21 is refused while X of 1 is announced, paid and dealt (Ornithopter 0/2 survives with 1 damage).
+# The refusal is judged as the cast announces X, raising it one at a time; it holds because raising stops at 20.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Fire Covenant
+Swamp x16
+
+[Bot2 Deck]
+Ornithopter
+Forest x19
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Fire Covenant.Cast(X: 1)
+! Bot1.Hand.Fire Covenant.Cast(X: 21)
+Bot1.Divide(Ornithopter: 1)
+? Bot1.Life = 19
+[Bot1.Main2]
+
+[Expect]
+Bot1.Life = 19
+Bot2.Battlefield.Ornithopter.Damage = 1

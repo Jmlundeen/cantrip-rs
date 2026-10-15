@@ -1,0 +1,31 @@
+# "Exile target card from a graveyard": a permanent on the battlefield is not a card in a graveyard, so Bot1's Mox Jet is refused as
+# the target (the refusal) while the Island Bot2 discarded to hand size on turn two is not (the positive control, same ability, same
+# mana). One card is exiled, and the Curator, with one type (land) among its exiled cards, is still a 3/3.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Keen-Eyed Curator
+Forest x13
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Keen-Eyed Curator.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Battlefield.Keen-Eyed Curator.Activate(Bot1.Battlefield.Mox Jet)
+Bot1.Battlefield.Keen-Eyed Curator.Activate(Bot2.Graveyard.Island)
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Island
+Bot1.Battlefield.Mox Jet.Tapped = true
+Bot1.Battlefield.Keen-Eyed Curator.Power = 3

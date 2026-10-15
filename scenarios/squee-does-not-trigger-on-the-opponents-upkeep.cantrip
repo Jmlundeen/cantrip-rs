@@ -1,0 +1,32 @@
+# Bot1 declines on turn 3. Squee must not ask again in Bot2's upkeep on turn 4 ("your upkeep"): the Accept waits for Bot1's own upkeep on turn 5.
+
+[Bot1 Deck]
+Black Lotus
+Squee, Goblin Nabob
+Mountain x5
+Mountain x15
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x5
+Mountain x15
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Squee, Goblin Nabob.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Squee, Goblin Nabob)
+[T3 Bot1.Upkeep]
+Bot1.Decline
+[T4 Bot2.Main1]
+? Bot1.Graveyard.Count = 2
+[T5 Bot1.Upkeep]
+Bot1.Accept
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Graveyard = Black Lotus

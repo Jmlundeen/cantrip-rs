@@ -1,0 +1,40 @@
+# Embereth Shieldbreaker // Battle Display: "Destroy target artifact" - with no artifact on the battlefield the Adventure
+# cannot be cast at all (a spell with no legal target is not offered; the creature still is, the positive control on the
+# same turn). Once Bot2 has a Sol Ring it can, and Bot2's Counterspell counters it: a countered Adventure is put into the
+# graveyard, not exiled "on an adventure" (CR 715.4, 701.5), so the creature cannot be cast later from exile.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Embereth Shieldbreaker
+Mountain x12
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Island x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+! Bot1.Hand.Embereth Shieldbreaker.Cast(Ability: Adventure)
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Embereth Shieldbreaker.Cast(Mox Sapphire; Ability: Adventure)
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Battle Display)
+[T3 Bot1.Main2]
+? Exile.Count = 0
+? Bot1.Graveyard = Embereth Shieldbreaker
+! Bot1.Exile.Embereth Shieldbreaker.Cast
+
+[Expect]
+Turn = 3
+Bot2.Battlefield = Island; Mox Sapphire
+Bot1.Graveyard = Embereth Shieldbreaker
+Exile.Count = 0

@@ -1,0 +1,52 @@
+# Does Machines, level 2: "return up to two target artifact cards from your graveyard to your hand." The loot on entering
+# milled a Sol Ring and a Mox Jet and discarded an Island and a Mox Pearl, so Bot1's graveyard holds two artifact cards
+# and two others. The Island (not an artifact) and Bot2's Black Lotus (an artifact in the wrong graveyard) are refused as
+# targets, and "up to two" lets Bot1 take just the Sol Ring: the Mox Jet and Mox Pearl stay behind.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Sapphire
+Does Machines
+Island
+Island
+Mox Pearl
+Sol Ring
+Mox Jet
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Does Machines.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Choose(Island; Mox Pearl)
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+[T3 Bot1.Main1]
+? Bot2.Graveyard = Black Lotus
+Bot1.Battlefield.Does Machines.Activate(Ability: Level 2)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+! Bot1.Target(Island)
+! Bot1.Target(Black Lotus)
+Bot1.Target(Sol Ring)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Mox Pearl; Island; Mox Jet
+Bot1.Hand.Count = 5
+Bot2.Graveyard = Black Lotus

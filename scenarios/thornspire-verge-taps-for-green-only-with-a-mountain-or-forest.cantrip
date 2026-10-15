@@ -1,0 +1,21 @@
+# Thornspire Verge: its {G} ability is offered only while you control a Mountain or a Forest (CR 602.5b). Alone it
+# makes {R}; once a Forest is in play (a Mountain would do as well) it makes {G}.
+
+[Bot1 Deck]
+Thornspire Verge
+Forest
+Plains x18
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Thornspire Verge.Play
+! Bot1.Battlefield.Thornspire Verge.Activate(Ability: {G})
+Bot1.Battlefield.Thornspire Verge.Activate(Ability: {R})
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Thornspire Verge.Activate(Ability: {G})
+
+[Expect]
+Bot1.Mana = {G}

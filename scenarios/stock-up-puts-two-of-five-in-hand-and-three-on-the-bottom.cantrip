@@ -1,0 +1,37 @@
+# Stock Up looks at the top five cards: Bot1 puts the Mountain and the Mox Jet into the hand and the other three on the
+# bottom of the library, in the order named, the first lowest.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Stock Up
+Plains
+Plains
+Plains
+Island
+Mountain
+Swamp
+Forest
+Mox Jet
+Island x8
+
+[Bot2 Deck]
+Forest x22
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Stock Up.Cast
+Bot1.Arrange(Mountain; Mox Jet | Island; Swamp; Forest)
+[Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Hand = Plains; Plains; Plains; Mountain; Mox Jet
+Bot1.Graveyard = Stock Up
+Bot1.Library.Count = 11

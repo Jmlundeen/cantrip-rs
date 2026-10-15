@@ -1,0 +1,29 @@
+# Reckoner Shakedown with only lands in the opposing hand: no card can be chosen, so Bot1 puts two +1/+1 counters on
+# its creature instead (here a lone Elvish Mystic, taken without a question).
+
+[Bot1 Deck]
+Forest
+Elvish Mystic
+Swamp
+Reckoner Shakedown
+Forest x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Elvish Mystic.Activate
+Bot1.Hand.Reckoner Shakedown.Cast(Bot2)
+
+[Expect]
+Bot2.Graveyard.Count = 0
+Bot1.Battlefield.Elvish Mystic.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Elvish Mystic.Power = 3

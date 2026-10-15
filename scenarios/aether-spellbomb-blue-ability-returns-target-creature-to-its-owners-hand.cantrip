@@ -1,0 +1,31 @@
+# Aether Spellbomb's first ability: {U}, Sacrifice it: return target creature to its owner's hand. Bot1 casts the
+# Spellbomb on turn 1, Bot2 casts Ornithopter on turn 2, and on turn 3 Bot1 pays {U} and sacrifices the Spellbomb
+# (a cost, CR 602.2b) to bounce it. The Spellbomb is in the graveyard, the Ornithopter back in Bot2's hand.
+
+[Bot1 Deck]
+Island
+Aether Spellbomb
+Island x12
+
+[Bot2 Deck]
+Ornithopter
+Island x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Aether Spellbomb.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Aether Spellbomb.Activate(Bot2.Battlefield.Ornithopter; Ability: Return target creature)
+Bot1.Battlefield.Island.Activate
+[Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Aether Spellbomb
+Bot2.Hand.Count = 8
+Bot2.Battlefield.Count = 0
+Stack.Count = 0

@@ -1,0 +1,33 @@
+# Bot1's library is empty when its Ornithopter attacks on turn 3 (the deck is the opening hand and the turn-3 draw): the
+# trigger resolves and exiles nothing, and Bot1 has not lost - a player loses only by drawing from an empty library.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Connecting the Dots
+Ornithopter
+Mountain
+Mountain
+Mountain
+Mountain
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Connecting the Dots.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Attack(Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Result = InProgress
+Exile.Count = 0
+Bot1.Library.Count = 0

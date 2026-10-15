@@ -1,0 +1,43 @@
+# Sunforger: equipped Ornithopter is a 4/2. {R}{W} and unattaching it (CR 701.3d) searches for Lightning Bolt (a red
+# instant of mana value 1) and casts it for free at Bot2; the Equipment stays on the battlefield, attached to nothing.
+[Bot1 Deck]
+Mountain
+Sol Ring
+Ornithopter
+Plains
+Sunforger
+Mountain
+Mountain
+Plains x3
+Lightning Bolt
+Plains x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sunforger.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Sunforger.Activate(Ability: Equip; Ornithopter)
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+? Bot1.Battlefield.Ornithopter.Power = 4
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Sunforger.Activate(Ability: Unattach)
+Bot1.Search(Lightning Bolt)
+Bot1.Target(Bot2)
+[Bot1.Main2]
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Sunforger.AttachedTo = (absent)
+Bot1.Graveyard = Lightning Bolt

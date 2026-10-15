@@ -1,0 +1,56 @@
+# Gix's Command, modes 1 and 4. "Up to one creature": Bot1 declines to put the counters on its Ornithopter, so it stays a
+# 0/2 without lifelink. "Each opponent sacrifices a creature with the greatest power among creatures they control":
+# Bot2 controls a Llanowar Elves (power 1) and an Ornithopter (power 0), so the Elves is the only greatest and is
+# sacrificed with no choice, the Ornithopter staying.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Gleemox
+Gix's Command
+Ornithopter
+Island
+Island x12
+
+[Bot2 Deck]
+Mox Emerald
+Llanowar Elves
+Ornithopter
+Island
+Island
+Island
+Island
+Island
+Island x12
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Black)
+Bot1.Hand.Gix's Command.Cast
+Bot1.Modes(1; 4)
+Bot1.Pass
+Bot1.Decline
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Ornithopter.Keywords = Flying
+Bot2.Graveyard = Llanowar Elves
+Bot2.Battlefield = Mox Emerald; Ornithopter

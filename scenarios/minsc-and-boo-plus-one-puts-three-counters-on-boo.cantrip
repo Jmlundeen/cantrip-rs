@@ -1,0 +1,35 @@
+# Minsc & Boo +1: three +1/+1 counters on up to one target creature with trample or haste. Boo, made as Minsc & Boo
+# entered, has both, so it becomes a 4/4; the loyalty goes up to 4.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Mox Jet
+Mox Pearl
+Minsc & Boo, Timeless Heroes
+Mountain
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Minsc & Boo, Timeless Heroes.Cast
+Bot1.Accept
+[Bot1.Main1]
+Bot1.Battlefield.Minsc & Boo, Timeless Heroes.Activate(Ability: Put three; Bot1.Battlefield.Boo)
+
+[Expect]
+Bot1.Battlefield.Boo.Power = 4
+Bot1.Battlefield.Boo.Toughness = 4
+Bot1.Battlefield.Boo.Counters.PlusOnePlusOne = 3
+Bot1.Battlefield.Minsc & Boo, Timeless Heroes.Counters.Loyalty = 4

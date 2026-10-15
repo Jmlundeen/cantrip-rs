@@ -1,0 +1,60 @@
+# Coveted Jewel is cast for six off a Black Lotus and a Sol Ring, draws three as it enters, and is tapped for three
+# green. A Gorilla then gets through unblocked, and the Jewel's trigger (CR 509.1h) hands it across the table: three
+# cards for the attacker, the artifact under their control (CR 108.4), untapped again.
+#
+# Handed over in the combat damage step with the Jewel already on the other side of the table, so the board can be
+# pictured the moment after a permanent has changed hands.
+
+[Bot1 Deck]
+Forest
+Forest
+Guerrilla Gorilla
+Forest
+Forest
+Forest
+Forest
+Forest x13
+
+[Bot2 Deck]
+Island
+Black Lotus
+Sol Ring
+Island
+Coveted Jewel
+Island
+Island
+Island x13
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Island#2.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Coveted Jewel.Cast
+[T4 Bot2.Main2]
+? Bot2.Battlefield.Coveted Jewel.Tapped = false
+Bot2.Battlefield.Coveted Jewel.Activate(Color: Green)
+Bot1.Hand.Forest.Play
+Bot1.Attack(Guerrilla Gorilla)
+[T5 Bot1.Damage]
+[Handover Bot1.Pass]
+
+[Expect]
+Turn = 5
+Step = Damage
+Stack.Count = 0
+Bot1.Battlefield.Coveted Jewel.Tapped = false
+Bot1.Battlefield.Count = 5
+Bot1.Hand.Count = 8
+Bot2.Battlefield.Count = 3
+Combat.Attackers.Count = 1

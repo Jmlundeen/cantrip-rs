@@ -1,0 +1,6 @@
+{
+  "name": "Chain Lightning",
+  "manaCost": "{R}",
+  "type": "Sorcery",
+  "oracleText": "Chain Lightning deals 3 damage to any target. Then that player or that permanent's controller may pay {R}{R}. If the player does, they may copy this spell and may choose a new target for that copy."
+}

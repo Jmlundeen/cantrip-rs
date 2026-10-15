@@ -1,0 +1,6 @@
+{
+  "name": "Krark-Clan Ironworks",
+  "manaCost": "{4}",
+  "type": "Artifact",
+  "oracleText": "Sacrifice an artifact: Add {C}{C}."
+}

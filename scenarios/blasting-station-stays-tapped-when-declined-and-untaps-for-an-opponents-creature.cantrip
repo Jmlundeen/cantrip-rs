@@ -1,0 +1,44 @@
+# "Whenever a creature enters, you may untap this artifact": any creature, and the untap is a choice (CR 603.5,
+# 608.2d). Bot1 pings with the Station (sacrificing an Ornithopter), then a second Ornithopter enters and Bot1 declines,
+# so the Station stays tapped. On turn 2 Bot2's own Ornithopter enters, and Bot1 accepts: the Station untaps although
+# no creature of Bot1's entered, in the opponent's turn.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Blasting Station
+Ornithopter
+Ornithopter
+Plains
+Plains x10
+
+[Bot2 Deck]
+Ornithopter
+Plains x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Blasting Station.Cast
+Bot1.Battlefield.Blasting Station.Activate(Bot2)
+Bot1.Choose(Ornithopter)
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Decline
+? Bot1.Battlefield.Blasting Station.Tapped = true
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot1.Accept
+[T2 Bot2.Main2]
+? Bot1.Battlefield.Blasting Station.Tapped = false
+
+[Expect]
+Bot2.Life = 19
+Bot1.Graveyard = Ornithopter
+Bot1.Battlefield.Blasting Station.Tapped = false

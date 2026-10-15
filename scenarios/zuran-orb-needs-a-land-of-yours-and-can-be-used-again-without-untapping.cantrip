@@ -1,0 +1,37 @@
+# Zuran Orb: "Sacrifice a land: You gain 2 life." The cost is a land its controller controls (CR 118.1, 701.17): with no land
+# on turn 1, and with only Bot2's Island on the battlefield on turn 2, the ability is refused. The Orb has no {T}, so it is
+# activated as often as there are lands: on turn 5 Bot1 sacrifices its two Plains one after the other for 4 life (24), the first
+# time on the stack and the second after it (CR 602.2).
+
+[Bot1 Deck]
+Zuran Orb
+Plains
+Plains
+Plains x14
+
+[Bot2 Deck]
+Island x17
+
+[Actions]
+Bot1.Hand.Zuran Orb.Cast
+! Bot1.Battlefield.Zuran Orb.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+! Bot1.Battlefield.Zuran Orb.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Zuran Orb.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 22
+Bot1.Battlefield.Zuran Orb.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 24
+Bot1.Battlefield = Zuran Orb
+Bot1.Graveyard = Plains; Plains
+Bot2.Battlefield = Island

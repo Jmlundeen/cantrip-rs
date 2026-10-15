@@ -1,0 +1,35 @@
+# Tempered Steel (cast on turn 1 off a Plains, Mox Pearl and Mox Jet) gives artifact creatures its controller has +2/+2:
+# Bot1's Ornithopter is a 2/4, Bot2's own Ornithopter (cast on turn 2) stays a 0/2.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Tempered Steel
+Ornithopter
+Plains x12
+
+[Bot2 Deck]
+Island
+Ornithopter
+Island x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tempered Steel.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+
+[Expect]
+Turn = 2
+Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Ornithopter.Toughness = 4
+Bot2.Battlefield.Ornithopter.Power = 0
+Bot2.Battlefield.Ornithopter.Toughness = 2

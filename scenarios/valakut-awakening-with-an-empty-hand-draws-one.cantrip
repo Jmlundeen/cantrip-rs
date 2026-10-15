@@ -1,0 +1,32 @@
+# Valakut Awakening with nothing else in hand: there is nothing to put on the bottom and nothing is asked, "that many" is zero and
+# Bot1 draws zero plus one, the top card of the library (a Mox Sapphire).
+
+[Bot1 Deck]
+Black Lotus
+Valakut Awakening
+Island
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Emerald
+Mox Sapphire
+Island x5
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Valakut Awakening.Cast
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Mox Sapphire
+Bot1.Library.Count = 5

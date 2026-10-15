@@ -1,0 +1,56 @@
+# Dragon's Rage Channeler surveils twice off its own trigger, putting a Mountain (land) and a Guerrilla Gorilla
+# (creature) straight into the graveyard, while Chain Lightning and Lightning Bolt themselves resolve there too
+# (sorcery, instant). Four card types among cards in the graveyard turns delirium on: the Channeler becomes 3/3
+# with flying, and — with no [Handover] or Attack line at all — the unscripted default still has to send it in,
+# because the channeler attacks each combat if able (CR 508.1d), which Bot2's life total below proves.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Dragon's Rage Channeler
+Mountain
+Chain Lightning
+Lightning Bolt
+Mountain
+Mountain
+Mountain
+Mountain
+Guerrilla Gorilla
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Dragon's Rage Channeler.Cast
+
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Chain Lightning.Cast(Bot2)
+Bot1.Arrange(| Mountain)
+
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Arrange(| Guerrilla Gorilla)
+
+[T5 Bot1.BeginCombat]
+? Bot1.Graveyard = Lightning Bolt; Guerrilla Gorilla; Chain Lightning; Mountain
+? Bot1.Battlefield.Dragon's Rage Channeler.Power = 3
+? Bot1.Battlefield.Dragon's Rage Channeler.Toughness = 3
+? Bot1.Battlefield.Dragon's Rage Channeler.Keywords = Flying
+
+[T5 Bot1.Main2]
+? Bot2.Life = 11
+
+[Expect]
+Turn = 5
+Step = Main2
+Bot2.Life = 11
+Bot1.Battlefield.Dragon's Rage Channeler.Power = 3
+Bot1.Battlefield.Dragon's Rage Channeler.Toughness = 3
+Bot1.Battlefield.Dragon's Rage Channeler.Keywords = Flying
+Bot1.Graveyard = Lightning Bolt; Guerrilla Gorilla; Chain Lightning; Mountain

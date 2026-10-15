@@ -1,0 +1,37 @@
+# Two Confidants are two triggers in the same upkeep: on turn 5 Bot1 reveals Lightning Bolt (1) and Counterspell (2) and
+# loses 3; the Island revealed on turn 3 by the first Confidant alone costs nothing.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Mox Jet
+Mox Emerald
+Dark Confidant
+Dark Confidant
+Island
+Island
+Island
+Lightning Bolt
+Counterspell
+Island x9
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dark Confidant.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Dark Confidant.Cast
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Life = 17
+Bot1.Hand = Island; Island; Island; Island; Lightning Bolt; Counterspell

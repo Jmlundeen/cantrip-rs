@@ -1,0 +1,38 @@
+# Ivora, Insatiable Heir: "When Ivora enters and whenever it deals combat damage to a player, create a Blood token" and
+# "Whenever you discard a card, put a +1/+1 counter on Ivora." Cast on turn 3 it makes a Blood token. On turn 5 Bot1 cycles
+# Marauding Mako for {2}: the discard puts a counter on Ivora, a 2/2. Ivora then attacks, deals 2 combat damage to Bot2 and
+# makes a second Blood token.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Ivora, Insatiable Heir
+Mountain
+Mountain
+Mountain
+Marauding Mako
+Mountain x12
+
+[Bot2 Deck]
+Island x13
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Ivora, Insatiable Heir.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Marauding Mako.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Attack(Ivora, Insatiable Heir > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Marauding Mako
+Bot1.Battlefield = Blood Token; Blood Token; Ivora, Insatiable Heir; Mountain; Mountain; Mountain
+Bot1.Battlefield.Ivora, Insatiable Heir.Power = 2
+Bot2.Life = 18

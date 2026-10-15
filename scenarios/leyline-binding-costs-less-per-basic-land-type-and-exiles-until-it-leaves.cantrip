@@ -1,0 +1,36 @@
+# Leyline Binding: domain makes it cost {1} less for each basic land type among lands you control, so with a Plains, an
+# Island and a Swamp it costs {2}{W}. Its enters trigger exiles Bot2's Mox Jet until the Binding leaves (CR 610.3).
+
+[Bot1 Deck]
+Plains
+Island
+Swamp
+Leyline Binding
+Plains
+Plains
+Plains x12
+
+[Bot2 Deck]
+Mox Jet
+Island x19
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Leyline Binding.Cast
+[Bot1.Main2]
+? Exile = Mox Jet
+? Bot2.Battlefield.Count = 0
+
+[Expect]
+Stack.Count = 0
+Exile.Count = 1
+Bot1.Battlefield = Plains; Island; Swamp; Leyline Binding

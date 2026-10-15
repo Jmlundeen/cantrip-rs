@@ -1,0 +1,57 @@
+# Balance on turn 5 with each player at two lands, two creatures and four cards in hand (Bot2's Sol Ring is neither a
+# land nor a creature, so it is not counted). Nobody has more than the fewest of any kind, so nobody is asked and
+# nothing is sacrificed or discarded - only Balance itself leaves Bot1's hand (it goes to the graveyard as it resolves).
+
+[Bot1 Deck]
+Plains
+Ornithopter
+Ornithopter
+Plains
+Balance
+Swamp
+Swamp
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Island
+Ornithopter
+Ornithopter
+Sol Ring
+Island
+Mountain
+Mountain
+Mountain
+Mountain x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Sol Ring.Cast
+
+[T5 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Balance.Cast
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Count = 4
+Bot1.Hand.Count = 4
+Bot1.Graveyard = Balance
+Bot2.Battlefield.Count = 5
+Bot2.Hand.Count = 4
+Bot2.Graveyard.Count = 0

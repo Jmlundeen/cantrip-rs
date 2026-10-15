@@ -1,0 +1,30 @@
+# Fastbond (CR 305.2, 603.4): "You may play any number of lands on each of your turns. Whenever you play a land, if it
+# wasn't the first land you played this turn, this enchantment deals 1 damage to you." Bot1 plays a Forest, casts
+# Fastbond with it, then plays two more lands in the same turn. The first land cost nothing; each of the two after it
+# dealt 1 damage, so Bot1 is at 18.
+
+[Bot1 Deck]
+Forest
+Fastbond
+Forest
+Forest
+Island
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Fastbond.Cast
+Bot1.Hand.Forest.Play
+Bot1.Hand.Forest.Play
+
+[Expect]
+Turn = 1
+Bot1.Life = 18
+Bot1.LandsPlayed = 3
+Bot1.Battlefield = Fastbond; Forest; Forest; Forest

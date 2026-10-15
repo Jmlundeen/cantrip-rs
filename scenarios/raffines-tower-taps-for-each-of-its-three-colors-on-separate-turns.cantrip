@@ -1,0 +1,20 @@
+# A Plains Island Swamp taps for any of {W}, {U} or {B}: the Tower enters tapped on turn 1 and on turn 3 taps for {W}, on turn 5 for {U} (the third color, {B}, is the existing scenario).
+
+[Bot1 Deck]
+Raffine's Tower
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Raffine's Tower.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Raffine's Tower.Activate(Ability: {W})
+? Bot1.Mana = {W}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Raffine's Tower.Activate(Ability: {U})
+? Bot1.Mana = {U}
+
+[Expect]
+Bot1.Battlefield.Raffine's Tower.Tapped = true

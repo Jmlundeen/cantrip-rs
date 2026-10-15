@@ -1,0 +1,63 @@
+# Cabal Ritual: "Add {B}{B}{B}. Threshold - Add {B}{B}{B}{B}{B} instead if there are seven or more cards in your
+# graveyard." Bot1 casts Cabal Ritual on turns 3, 5 and 7 with Mox Jet and a Swamp paying {1}{B}; five Dark Rituals have
+# been cast first. Turn 3: 5 cards in the graveyard, {B}{B}{B} (13 in the pool with the 10 left over from the Rituals and the Ritual's own cost paid).
+# Turn 5: 6 cards in the graveyard (the first Ritual) and the second one on the stack, which is not counted: still
+# {B}{B}{B}, though 6 plus Bot2's discards would reach seven if both graveyards counted. Turn 7: 7 cards in Bot1's
+# own graveyard (the spell reaches the graveyard only after it resolves):
+# {B}{B}{B}{B}{B}.
+
+[Bot1 Deck]
+Mox Jet
+Swamp
+Dark Ritual x5
+Cabal Ritual
+Cabal Ritual
+Cabal Ritual
+Swamp x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard.Count = 5
+? Bot1.Mana = {B}{B}{B}{B}{B}{B}{B}{B}{B}{B}{B}{B}
+Bot1.Hand.Cabal Ritual.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {B}{B}{B}{B}{B}{B}{B}{B}{B}{B}{B}{B}{B}
+[T5 Bot1.Main1]
+? Bot1.Graveyard.Count = 6
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Cabal Ritual.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {B}{B}{B}
+[T7 Bot1.Main1]
+? Bot1.Graveyard.Count = 7
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Cabal Ritual.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {B}{B}{B}{B}{B}
+
+[Expect]
+Bot1.Graveyard.Count = 8

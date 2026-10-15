@@ -1,0 +1,16 @@
+# Botanical Sanctum: as the first land it enters untapped (two or fewer other lands) and taps for green or blue.
+
+[Bot1 Deck]
+Botanical Sanctum
+Plains x19
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Botanical Sanctum.Play
+Bot1.Battlefield.Botanical Sanctum.Activate(Color: Blue)
+
+[Expect]
+Bot1.Battlefield.Botanical Sanctum.Tapped = true
+Bot1.Mana = {U}

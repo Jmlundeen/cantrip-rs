@@ -1,0 +1,41 @@
+# Mishra's Workshop: "Spend this mana only to cast artifact spells" (CR 106.6). Its restricted {C}{C}{C} sits in the pool with
+# the Mox Emeralds' mana, and the pump of a Basking Rootwalla ({1}{G}, an activated ability, not a spell) is paid with the
+# two Emerald {G}, not with the Workshop's {C}: the {C}{C}{C} is still floating after it resolves (and is then spent on an
+# artifact spell, the Sol Ring, the positive control). The Rootwalla itself is cast with the first Emerald.
+
+[Bot1 Deck]
+Mishra's Workshop
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Basking Rootwalla
+Sol Ring
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mishra's Workshop.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Basking Rootwalla.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mishra's Workshop.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Battlefield.Basking Rootwalla.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Basking Rootwalla.Power = 3
+? Bot1.Mana = {C}{C}{C} (ArtifactSpells)
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {C}{C} (ArtifactSpells)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Sol Ring.Types = Artifact

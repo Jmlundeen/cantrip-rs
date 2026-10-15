@@ -1,0 +1,28 @@
+# Cast for its mana cost {2}{B}{B} (Black Lotus and Mox Jet) rather than evoked, Grief makes Bot2 discard its Lightning Bolt and
+# stays: the sacrifice trigger is conditional on the evoke cost having been paid, and it was not. A 3/2 menace on the battlefield.
+
+[Bot1 Deck]
+Grief
+Black Lotus
+Mox Jet
+Swamp x17
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Grief.Cast
+Bot1.Choose(Lightning Bolt)
+[Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot2.Graveyard = Lightning Bolt
+Bot1.Battlefield = Mox Jet; Grief
+Bot1.Battlefield.Grief.Keywords = Menace

@@ -1,0 +1,31 @@
+# Arena of Glory enters untapped beside a Mountain. Bot1 taps the Mountain for {R}, spends it on the Arena's exert
+# ability for {R}{R}, and casts Embereth Shieldbreaker with that mana, so the Shieldbreaker has haste and attacks the turn it
+# arrives. The exerted Arena sits out Bot1's next untap step and is still tapped on turn 5.
+
+[Bot1 Deck]
+Mountain
+Arena of Glory
+Embereth Shieldbreaker
+Mountain x13
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Arena of Glory.Play
+? Bot1.Battlefield.Arena of Glory.Tapped = false
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Arena of Glory.Activate(Ability: Exert)
+? Bot1.Battlefield.Arena of Glory.Exerted = true
+? Bot1.Mana = {R}{R} (GainsHaste)
+Bot1.Hand.Embereth Shieldbreaker.Cast
+Bot1.Attack(Embereth Shieldbreaker)
+[T5 Bot1.Main1]
+
+[Expect]
+Turn = 5
+Bot2.Life = 18
+Bot1.Battlefield.Arena of Glory.Tapped = true
+Bot1.Battlefield.Mountain.Tapped = false

@@ -1,0 +1,39 @@
+# Kyren Negotiations: the cost taps "an untapped creature you control", so each creature pays once. With two Ornithopters
+# Bot1 pings Bot2 twice (20 to 18), after which neither can be tapped and the ability is not offered (the first two
+# activations are the positive control for the refusal).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Black Lotus
+Ornithopter
+Ornithopter
+Kyren Negotiations
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Kyren Negotiations.Cast
+Bot1.Battlefield.Kyren Negotiations.Activate(Bot2)
+Bot1.Choose(Ornithopter)
+Bot1.Pass
+Bot1.Battlefield.Kyren Negotiations.Activate(Bot2)
+Bot1.Choose(Ornithopter)
+Bot1.Pass
+! Bot1.Battlefield.Kyren Negotiations.Activate
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield.Ornithopter#1.Tapped = true
+Bot1.Battlefield.Ornithopter#2.Tapped = true

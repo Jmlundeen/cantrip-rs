@@ -1,0 +1,29 @@
+# Shelldock Isle: "You may play the exiled card without paying its mana cost if a library has twenty or fewer cards in it".
+# Bot1's library has thirty-odd cards and Bot2's has twenty-one on turn 3 (29 cards, seven in its hand, one drawn on turn 2), so the
+# condition is false when the ability resolves and the Black Lotus hidden on turn 1 stays in exile. (The neighbouring
+# scenario, with Bot2's library at exactly twenty, is the positive control.)
+[Bot1 Deck]
+Shelldock Isle
+Mox Sapphire
+Island x5
+Black Lotus
+Island x3
+Island x30
+
+[Bot2 Deck]
+Island x29
+
+[Actions]
+Bot1.Hand.Shelldock Isle.Play
+Bot1.Arrange(Black Lotus | Island; Island; Island)
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Shelldock Isle.Activate(Ability: {U}, {T}: You may play)
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield = Shelldock Isle; Mox Sapphire
+Exile.Count = 1

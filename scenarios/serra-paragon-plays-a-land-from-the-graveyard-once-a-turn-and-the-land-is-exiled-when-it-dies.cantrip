@@ -1,0 +1,60 @@
+# Serra Paragon: "Once during each of your turns, you may play a land from your graveyard or cast a permanent spell with
+# mana value 3 or less from your graveyard. If you do, it gains 'When this permanent is put into a graveyard from the
+# battlefield, exile it and you gain 2 life.'" Faithless Looting discards Mishra's Workshop and Ornithopter. On turn 1 Bot1
+# plays the Workshop from the graveyard, and the Ornithopter then can't be cast from there: the once is spent by the land.
+# On turn 3 it is (the control). Bot2 destroys the Workshop with Wasteland and kills the Ornithopter with Lightning Bolt on
+# turn 4: both are exiled instead of staying in the graveyard, and Bot1 gains 2 life for each.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Ruby
+Faithless Looting
+Serra Paragon
+Plains
+Plains
+Mishra's Workshop
+Ornithopter
+Plains x20
+
+[Bot2 Deck]
+Wasteland
+Mountain
+Lightning Bolt
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Mishra's Workshop; Ornithopter)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Serra Paragon.Cast
+Bot1.Pass
+Bot1.Graveyard.Mishra's Workshop.Play(Ability: Once during each of your turns)
+! Bot1.Graveyard.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Wasteland.Play
+[T3 Bot1.Main1]
+Bot1.Graveyard.Ornithopter.Cast(Ability: Once during each of your turns)
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Battlefield.Wasteland.Activate(Ability: Sacrifice; Bot1.Battlefield.Mishra's Workshop)
+Bot2.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Life = 24
+Exile = Mishra's Workshop; Ornithopter
+Bot1.Battlefield = Mox Pearl; Mox Ruby; Serra Paragon

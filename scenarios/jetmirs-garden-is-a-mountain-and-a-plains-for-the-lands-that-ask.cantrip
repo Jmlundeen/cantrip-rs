@@ -1,0 +1,28 @@
+# Jetmir's Garden is a Mountain Forest Plains: Arena of Glory ("enters tapped unless you control a Mountain") comes in untapped on
+# turn 3 beside it, and Bleachbone Verge's "{T}: Add {W}. Activate only if you control a Plains or a Swamp" is offered on turn 5.
+# On turn 1 the Garden itself entered tapped.
+
+[Bot1 Deck]
+Jetmir's Garden
+Arena of Glory
+Bleachbone Verge
+Island x4
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Jetmir's Garden.Play
+? Bot1.Battlefield.Jetmir's Garden.Tapped = true
+[T3 Bot1.Main1]
+Bot1.Hand.Arena of Glory.Play
+? Bot1.Battlefield.Arena of Glory.Tapped = false
+[T5 Bot1.Main1]
+Bot1.Hand.Bleachbone Verge.Play
+Bot1.Battlefield.Bleachbone Verge.Activate(Ability: {W})
+? Bot1.Mana = {W}
+
+[Expect]
+Turn = 5
+Bot1.Mana = {W}

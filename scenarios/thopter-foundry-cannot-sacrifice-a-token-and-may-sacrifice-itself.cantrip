@@ -1,0 +1,52 @@
+# "Sacrifice a nontoken artifact": the Thopter tokens it makes are artifacts but tokens, so they are never offered (CR 111.1).
+# On turn 1 and 3 Bot1 sacrifices Mox Jet then Mox Sapphire, chosen among the Moxen and the Foundry. On turn 5 the only
+# nontoken artifact left is the Foundry itself, with two Thopter tokens beside it: a Thopter is refused as a sacrifice (the
+# choice offers the Foundry alone) and the Foundry is sacrificed as its own cost; the ability still resolves for a third
+# Thopter and 1 more life (CR 602.2b, 113.7a).
+
+[Bot1 Deck]
+Plains
+Mox Jet
+Mox Sapphire
+Thopter Foundry
+Plains
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Thopter Foundry.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Thopter Foundry.Activate
+Bot1.Choose(Mox Jet)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Thopter Foundry.Activate
+Bot1.Choose(Mox Sapphire)
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Battlefield.Thopter Foundry.Activate
+! Bot1.Choose(Thopter)
+Bot1.Choose(Thopter Foundry)
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 23
+Bot1.Graveyard = Thopter Foundry; Mox Sapphire; Mox Jet
+Bot1.Battlefield.Thopter#3.Keywords = Flying

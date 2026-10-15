@@ -1,0 +1,46 @@
+# Spirit Water Revival with the waterbend cost paid and nothing in the graveyard: there is nothing to shuffle in, the
+# library is shuffled all the same (CR 701.24a) and Bot1 draws seven. Six Ornithopters pay the waterbend {6} by tapping
+# (CR 701.67a, they are not required to be able to tap for mana, and summoning sickness does not matter to a cost that
+# is not {T}, CR 302.6), and two Islands and a Mox Sapphire pay the {1}{U}{U}, none of them tapped for the waterbend.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Island
+Ornithopter
+Spirit Water Revival
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+[T7 Bot1.Main1]
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Spirit Water Revival.Cast(Kicked: 1; Convoke: Ornithopter, Ornithopter, Ornithopter, Ornithopter, Ornithopter, Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand.Count = 7
+Bot1.Graveyard.Count = 0
+Exile = Spirit Water Revival

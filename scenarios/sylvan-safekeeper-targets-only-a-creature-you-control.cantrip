@@ -1,0 +1,37 @@
+# "Target creature you control gains shroud": Bot2's Elvish Mystic is refused as a target while Bot1's Guerrilla Gorilla is legal (the positive control), and gets shroud for the turn.
+
+[Bot1 Deck]
+Forest
+Sylvan Safekeeper
+Forest
+Guerrilla Gorilla
+Forest x12
+
+[Bot2 Deck]
+Forest
+Elvish Mystic
+Forest x13
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sylvan Safekeeper.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+Bot1.Pass
+! Bot1.Battlefield.Sylvan Safekeeper.Activate(Bot2.Battlefield.Elvish Mystic)
+Bot1.Battlefield.Sylvan Safekeeper.Activate(Guerrilla Gorilla)
+Bot1.Choose(Forest)
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Guerrilla Gorilla.Keywords = Reach; Shroud
+
+[Expect]
+Bot1.Graveyard = Forest

@@ -1,0 +1,35 @@
+# An empty graveyard: Flow State puts one of the top three into the hand.
+
+[Bot1 Deck]
+Mountain
+Island
+Mountain
+Swamp
+Swamp
+Flow State
+Swamp
+Swamp
+Swamp
+Counterspell
+Ancestral Recall
+Brainstorm
+Island x3
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Hand.Flow State.Cast
+Bot1.Arrange(Brainstorm | Counterspell; Ancestral Recall)
+
+[Expect]
+Bot1.Hand = Swamp; Swamp; Swamp; Swamp; Swamp; Brainstorm
+Bot1.Library = Island; Island; Island; Counterspell; Ancestral Recall

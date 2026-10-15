@@ -1,0 +1,35 @@
+# Jace, the Mind Sculptor, "+2: ... You may put that card on the bottom": Bot1 targets its own library on turn 1, sees
+# the Swamp on top and declines, so the Swamp stays on top (the positive control is the neighbouring scenario, where the
+# offer is accepted).
+
+[Bot1 Deck]
+Mox Sapphire
+Black Lotus
+Jace, the Mind Sculptor
+Island
+Island
+Island
+Island
+Swamp
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Jace, the Mind Sculptor.Cast
+Bot1.Pass
+Bot1.Battlefield.Jace, the Mind Sculptor.Activate(Bot1; Ability: #1)
+Bot1.Decline
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Jace, the Mind Sculptor.Counters.Loyalty = 5
+Bot1.Library.Count = 13

@@ -1,0 +1,42 @@
+# Without the alternative cost: Island and four Moxen pay {3}{U}{U} on turn 2 against Bot2's Duress; Bot1 stays at 20 life
+# and keeps Brainstorm.
+
+[Bot1 Deck]
+Island
+Force of Will
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Mox Pearl
+Brainstorm
+Island x12
+
+[Bot2 Deck]
+Swamp
+Duress
+Swamp x13
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Duress.Cast(Bot1)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Force of Will.Cast(Duress)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Exile.Count = 0
+Bot1.Hand = Brainstorm
+Bot1.Graveyard = Force of Will
+Bot2.Graveyard = Duress

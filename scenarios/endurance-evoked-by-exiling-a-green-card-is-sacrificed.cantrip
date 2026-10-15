@@ -1,0 +1,22 @@
+# Endurance's evoke cost: exile a green card (Llanowar Elves) from hand rather than pay {1}{G}{G}. Its enters trigger
+# and the evoke sacrifice both trigger; Endurance does not stay on the battlefield, and the Elves are in exile.
+
+[Bot1 Deck]
+Llanowar Elves
+Endurance
+Forest x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Endurance.Cast(Ability: Evoke)
+Bot1.Choose(Llanowar Elves)
+Bot1.Pass
+Bot1.Target(Bot1)
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Exile = Llanowar Elves
+Bot1.Battlefield.Count = 0

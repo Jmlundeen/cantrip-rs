@@ -1,0 +1,43 @@
+# The Wandering Emperor: "+1: Put a +1/+1 counter on up to one target creature. It gains first strike until end of turn."
+# On turn 3 Bot1 casts her at sorcery speed (two Plains and a Black Lotus pay) and uses +1 on its Ornithopter: it becomes a
+# 1/3 with first strike (4 loyalty). On turn 5 she uses +1 again with no target ("up to one"): no counter or keyword is
+# given to anything, and she is at 5 loyalty. The Ornithopter's first strike has ended with turn 3.
+
+[Bot1 Deck]
+Plains
+Plains
+Black Lotus
+The Wandering Emperor
+Ornithopter
+Island x12
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Hand.The Wandering Emperor.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.The Wandering Emperor.Activate(Ornithopter; Ability: +1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Power = 1
+? Bot1.Battlefield.Ornithopter.Keywords = FirstStrike; Flying
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Ornithopter.Keywords = Flying
+Bot1.Battlefield.The Wandering Emperor.Activate(Ability: +1)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.The Wandering Emperor.Counters.Loyalty = 5
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1

@@ -1,0 +1,39 @@
+# Two Sanguine Evangelists attacking each trigger battle cry (CR 702.91): each pumps "each other attacking creature" by +1/+0 until end of turn, so each Evangelist is a 3/1 (pumped by the other, not by itself) and Bot2 takes 6.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Sanguine Evangelist
+Mox Emerald
+Sanguine Evangelist
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sanguine Evangelist.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sanguine Evangelist.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Attack(Sanguine Evangelist; Sanguine Evangelist#2 > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14

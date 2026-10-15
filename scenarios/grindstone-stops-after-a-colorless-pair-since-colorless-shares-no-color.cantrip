@@ -1,0 +1,31 @@
+# Colorless cards share no color (CR 105.2a): Bot2's library starts Mox Jet, Mox Ruby, Lightning Bolt, Lightning Bolt. Grindstone mills the two Moxen and stops.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+Grindstone
+Swamp x12
+
+[Bot2 Deck]
+Island x7
+Mox Jet
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Island x4
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Grindstone.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Grindstone.Activate(Bot2)
+
+[Expect]
+Stack.Count = 0
+Bot2.Graveyard = Mox Ruby; Mox Jet
+Bot2.Library.Count = 6

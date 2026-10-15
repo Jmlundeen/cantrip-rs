@@ -1,0 +1,43 @@
+# "Whenever you attack, for each opponent, create a 1/1 white Human creature token that's tapped and attacking that player or
+# a planeswalker they control." Black Lotus pays for Adeline on turn 1. Bot2 casts Liliana of the Veil (loyalty 3) on turn 2
+# with a Swamp, a Mox Jet and a Mox Ruby. On turn 3 Adeline attacks Bot2 and Bot1 chooses Liliana for the Human: the Human
+# attacks Liliana (loyalty 3 - 1 = 2) while Adeline, 2/2 with the Human beside her, takes Bot2 to 18.
+
+[Bot1 Deck]
+Black Lotus
+Adeline, Resplendent Cathar
+Plains x18
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Liliana of the Veil
+Swamp x16
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Adeline, Resplendent Cathar.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Liliana of the Veil.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Adeline, Resplendent Cathar > Bot2)
+Bot1.Target(Bot2.Battlefield.Liliana of the Veil)
+Bot1.Pass
+Bot2.Pass
+? Combat.Attackers = Adeline, Resplendent Cathar > Bot2; Human > Liliana of the Veil
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot2.Battlefield.Liliana of the Veil.Counters.Loyalty = 2
+Bot1.Battlefield = Adeline, Resplendent Cathar; Human

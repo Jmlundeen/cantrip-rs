@@ -1,0 +1,48 @@
+# Destroy all creatures: an indestructible creature is not destroyed (CR 702.12b). Arwen, Mortal Queen enters with an
+# indestructible counter and survives Damnation, while Bot1's own Llanowar Elves, tapped to pay for it, dies.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Swamp
+Mox Jet
+Damnation
+Swamp x10
+
+[Bot2 Deck]
+Forest
+Mox Pearl
+Mox Emerald
+Arwen, Mortal Queen
+Forest x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Arwen, Mortal Queen.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Damnation.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Forest; Swamp; Mox Jet
+Bot1.Graveyard = Damnation; Llanowar Elves
+Bot2.Battlefield = Forest; Mox Pearl; Mox Emerald; Arwen, Mortal Queen
+Bot2.Battlefield.Arwen, Mortal Queen.Counters.Indestructible = 1
+Bot2.Battlefield.Arwen, Mortal Queen.Keywords = Indestructible
+Bot2.Graveyard.Count = 0
+Stack.Count = 0

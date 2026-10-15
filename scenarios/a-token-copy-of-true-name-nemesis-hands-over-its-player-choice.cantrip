@@ -1,0 +1,41 @@
+# A second question a token asks before it is anywhere: True-Name Nemesis's "As this creature enters, choose a player"
+# (CR 614.12), put to Bot1 as Three Steps Ahead creates a token copy of the Nemesis. The same position as
+# a-token-copy-of-painters-servant-hands-over-its-color-choice with a different kind of question, because what shows
+# the asked seat the token is the engine and not the prompt. See ScriptedPositionsThroughTransportTests.
+#
+# Turn 1: a Black Lotus pays {1}{U}{U} for the Nemesis, which chooses Bot2; the second Lotus and the Island pay Three
+# Steps Ahead's {U} and its copy mode's {3}. The handover is the second time the question is put.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Black Lotus
+Mox Sapphire
+True-Name Nemesis
+Three Steps Ahead
+Island
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.True-Name Nemesis.Cast
+Bot1.ChoosePlayer(Bot2)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Three Steps Ahead.Cast
+Bot1.Modes(2)
+Bot1.Target(True-Name Nemesis)
+[Handover Bot1.ChoosePlayer]
+
+[Expect]
+Turn = 1
+Step = Main1
+Stack = Three Steps Ahead
+Bot1.Battlefield = Island; Mox Sapphire; True-Name Nemesis

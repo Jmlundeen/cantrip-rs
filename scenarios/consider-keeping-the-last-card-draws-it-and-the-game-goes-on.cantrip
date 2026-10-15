@@ -1,0 +1,24 @@
+# The control for the empty-library loss: with the same one-card library, Bot1 leaves Lightning Bolt on top when it
+# surveils, and the draw takes it. The library is empty but nobody has tried to draw from it, so the game is still on
+# (CR 121.4, 704.5b); Consider is the only card in the graveyard.
+
+[Bot1 Deck]
+Island
+Consider
+Island x5
+Lightning Bolt
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Consider.Cast
+Bot1.Arrange(Lightning Bolt)
+
+[Expect]
+Result = InProgress
+Bot1.Graveyard = Consider
+Bot1.Hand.Count = 6
+Bot1.Library.Count = 0

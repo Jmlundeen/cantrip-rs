@@ -1,0 +1,32 @@
+# Curse of Opulence enchanting Bot2 (CR 303.4): "Whenever enchanted player is attacked, create a Gold token." Bot1 attacks Bot2 with two creatures on turn 3 and the trigger happens once for the combat (one or more creatures attacking), so Bot1 gets one Gold; "each opponent attacking that player does the same" adds
+# nobody else. The Gold token is an artifact that sacrifices for one mana of any color: {R}.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Curse of Opulence
+Ornithopter
+Haywire Mite
+Mountain x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Haywire Mite.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Curse of Opulence.Cast(Bot2)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter; Haywire Mite > Bot2)
+[T3 Bot1.Main2]
+Bot1.Battlefield.Gold Token.Activate(Color: Red)
+? Bot1.Mana = {R}
+
+[Expect]
+Bot1.Battlefield.Count = 5
+Bot2.Battlefield.Count = 0

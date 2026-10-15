@@ -1,0 +1,8 @@
+{
+  "name": "Delighted Halfling",
+  "manaCost": "{G}",
+  "type": "Creature — Halfling Citizen",
+  "power": 1,
+  "toughness": 2,
+  "oracleText": "{T}: Add {C}.\n{T}: Add one mana of any color. Spend this mana only to cast a legendary spell, and that spell can't be countered."
+}

@@ -1,0 +1,41 @@
+# Council's Judgment votes; it does not target, so hexproof does not matter (CR 115.1, 701.38a). Bot2's only nonland permanent is a
+# Sylvan Caryatid (hexproof): the single candidate takes every vote, nobody is asked, and it is exiled. Bot2's Forest is a land and
+# Bot1's own Mox Pearl is a permanent Bot1 controls, so neither could be voted for.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Plains
+Council's Judgment
+Plains x12
+
+[Bot2 Deck]
+Forest
+Forest
+Sylvan Caryatid
+Forest x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Forest#2.Activate
+Bot2.Hand.Sylvan Caryatid.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Hand.Council's Judgment.Cast
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Exile = Sylvan Caryatid
+Bot2.Battlefield = Forest; Forest
+Bot1.Battlefield = Mox Pearl; Plains; Plains; Plains

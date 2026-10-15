@@ -1,0 +1,44 @@
+# Goblin Welder: the chosen artifact is the first target. Bot2 answers the Welder's ability by destroying Bot1's Ornithopter
+# with Abrupt Decay, so the first target is illegal, the Welding Jar chosen from the graveyard is not returned (the second
+# target no longer sits in the graveyard of the artifact's controller either) and the Jar stays where it is.
+
+[Bot1 Deck]
+Mountain
+Goblin Welder
+Welding Jar
+Ornithopter
+Mountain
+Mountain x15
+
+[Bot2 Deck]
+Mox Jet
+Mox Emerald
+Abrupt Decay
+Island x17
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Goblin Welder.Cast
+Bot1.Hand.Welding Jar.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Welding Jar.Activate(Bot1.Battlefield.Ornithopter)
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Goblin Welder.Activate
+Bot1.Target(Ornithopter)
+Bot1.Target(Welding Jar)
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Abrupt Decay.Cast(Bot1.Battlefield.Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield = Mountain; Goblin Welder
+Bot1.Graveyard = Ornithopter; Welding Jar

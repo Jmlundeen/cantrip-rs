@@ -1,0 +1,50 @@
+# "Whenever you cast a creature spell": only its controller's spells (CR 603.7d). With Glimpse of Nature's trigger active on
+# turn 3 Bot2 flashes in a Brazen Borrower: neither player draws (Bot1's hand stays at five, Bot2's at four). Bot1's own
+# Ornithopter afterwards draws one (the positive control: the trigger was there all along).
+
+[Bot1 Deck]
+Forest
+Forest
+Glimpse of Nature
+Ornithopter
+Forest x3
+Forest x16
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Brazen Borrower
+Island x3
+Island x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Glimpse of Nature.Cast
+Bot1.Pass
+Bot1.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Brazen Borrower.Cast
+Bot1.Pass
+? Bot1.Hand.Count = 5
+? Bot2.Hand.Count = 4
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 5
+Bot2.Hand.Count = 4
+Bot2.Battlefield.Count = 4

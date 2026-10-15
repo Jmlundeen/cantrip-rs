@@ -1,0 +1,41 @@
+# Ragavan cast for its mana cost {R} has no haste (the contrast with the dashed scenario): Bot2 is still at 20 after turn 1, and
+# Ragavan is still on the battlefield after the end step (no dash return). On turn 3 it hits Bot2: a Treasure is created and the
+# top card of Bot2's library, an Island, is exiled - "you may CAST that card", not play it, so the Island cannot be played
+# (! Play) and stays in exile. The Treasure is Bot1's.
+
+[Bot1 Deck]
+Mox Ruby
+Ragavan, Nimble Pilferer
+Mountain x12
+
+[Bot2 Deck]
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island x11
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ragavan, Nimble Pilferer.Cast
+[T2 Bot2.Main1]
+? Bot2.Life = 20
+? Bot1.Battlefield.Ragavan, Nimble Pilferer.SummoningSick = true
+[T3 Bot1.Main1]
+Bot1.Attack(Ragavan, Nimble Pilferer > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+! Bot1.Exile.Island.Play
+[T3 Bot1.Main2]
+? Bot2.Life = 18
+
+[Expect]
+Exile = Island
+Bot1.Battlefield.Treasure Token.Tapped = false
+Bot1.Battlefield.Ragavan, Nimble Pilferer.Tapped = true

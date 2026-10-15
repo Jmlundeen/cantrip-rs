@@ -1,0 +1,45 @@
+# "Creatures you control gain haste until end of turn" affects only the creatures you control as the ability resolves
+# (CR 611.2c). Bot1 has Llanowar Elves (cast earlier on turn 3), sacrifices Bitter Reunion, and then casts Ragavan:
+# the Elves attack at once, Ragavan, which arrived after, is still summoning sick (the dump says so; a
+# summoning-sick creature is not even offered as an attacker, which a refusal cannot show).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Bitter Reunion
+Forest
+Llanowar Elves
+Ragavan, Nimble Pilferer
+Plains
+Plains x12
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Bitter Reunion.Cast
+Bot1.Choose()
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Bitter Reunion.Activate
+Bot1.Pass
+Bot1.Hand.Ragavan, Nimble Pilferer.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+[Bot1.DeclareAttackers]
+Bot1.Attack(Llanowar Elves > Bot2)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 19
+Bot1.Battlefield.Llanowar Elves.Keywords = Haste
+Bot1.Battlefield.Llanowar Elves.SummoningSick = false
+Bot1.Battlefield.Ragavan, Nimble Pilferer.SummoningSick = true
+Bot1.Graveyard = Bitter Reunion

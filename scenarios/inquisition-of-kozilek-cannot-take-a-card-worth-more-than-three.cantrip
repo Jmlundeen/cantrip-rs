@@ -1,0 +1,23 @@
+# Inquisition of Kozilek takes a nonland card with mana value 3 or less (CR 202.3): Bot2 holds Counterspell (2), Sunfall
+# (5) and Islands, so Bot1 may only take Counterspell.
+
+[Bot1 Deck]
+Swamp
+Inquisition of Kozilek
+Swamp x10
+
+[Bot2 Deck]
+Sunfall
+Counterspell
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Inquisition of Kozilek.Cast(Bot2)
+Bot1.Choose(Counterspell)
+
+[Expect]
+Turn = 1
+Bot1.Graveyard = Inquisition of Kozilek
+Bot2.Graveyard = Counterspell

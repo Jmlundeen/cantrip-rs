@@ -1,0 +1,62 @@
+# Infect (CR 702.90): damage from a source with it is dealt to a creature as -1/-1 counters and to a player as poison
+# counters, never as marked damage or lost life. Blightsteel Colossus (11/11 trample, infect) is cast on turn 3 with
+# three Black Lotuses, Sol Ring and a Mox, and attacks on turn 5 into a Guerrilla Gorilla that blocks it. Trample
+# assigns the Gorilla lethal damage - two - and the other nine to Bot2: two -1/-1 counters kill the Gorilla and nine
+# poison counters are one short of losing (CR 704.5c: ten do), while Bot2's life is untouched. The Gorilla's own two
+# damage is ordinary damage and is marked on the indestructible Colossus.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Black Lotus
+Black Lotus
+Mox Sapphire
+Mox Jet
+Sol Ring
+Blightsteel Colossus
+Island x14
+
+[Bot2 Deck]
+Forest
+Forest
+Guerrilla Gorilla
+Forest x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Blightsteel Colossus.Cast
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest#1.Activate
+Bot2.Battlefield.Forest#2.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+[T5 Bot1.Main1]
+Bot1.Attack(Blightsteel Colossus > Bot2)
+Bot2.Block(Guerrilla Gorilla > Blightsteel Colossus)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Step = Main2
+Bot2.Life = 20
+Bot2.Poison = 9
+Bot2.Battlefield = Forest; Forest
+Bot2.Graveyard = Guerrilla Gorilla
+Bot1.Battlefield.Blightsteel Colossus.Damage = 2

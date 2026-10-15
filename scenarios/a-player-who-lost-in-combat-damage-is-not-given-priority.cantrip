@@ -1,0 +1,87 @@
+# A player who has lost has left the game and is not given priority. In a game of three, Bot2 pays 18 life with Channel (2 left)
+# and has an Ornithopter; on turn 4 Bot1's two Cathar Commandos attack Bot2, who blocks one with the Ornithopter, and the other
+# deals Bot2's last life in combat damage. With the damage dealt Bot2 has lost, and the priority after Bot1's passes
+# with Fecundity's trigger for the Ornithopter on the stack is Bot3's, not Bot2's. (Today Bot2 is given it, the round of
+# passes counts him, and the trigger resolves without Bot3 ever being able to respond.)
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Pearl
+Sol Ring
+Cathar Commando
+Cathar Commando
+Fecundity
+Mox Emerald
+Plains x12
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Channel
+Ornithopter
+Island x3
+Island x12
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Cathar Commando.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Hand.Cathar Commando.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Channel.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+[T4 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Fecundity.Cast
+Bot1.Pass
+Bot1.Attack(Cathar Commando > Bot2; Cathar Commando#2 > Bot2)
+Bot2.Block(Ornithopter > Cathar Commando)
+Bot3.Pass
+Bot1.Pass
+? PriorityPlayer = Bot3
+[T4 Bot1.Main2]
+
+[Expect]
+Turn = 4
+Bot2.Status = Lost
+Bot2.Life = -1
+PriorityPlayer = Bot1

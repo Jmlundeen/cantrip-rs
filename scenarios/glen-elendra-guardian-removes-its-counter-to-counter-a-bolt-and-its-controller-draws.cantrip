@@ -1,0 +1,50 @@
+# Glen Elendra Guardian enters with a -1/-1 counter (a 2/3), and removing a counter is the cost of its ability: Bot1
+# counters Bot2's Lightning Bolt, Bot2 draws a card for it, and the Guardian is a 3/4 with no counter left.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Glen Elendra Guardian
+Island x15
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Glen Elendra Guardian.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+? Stack = Lightning Bolt
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Glen Elendra Guardian.Activate(Lightning Bolt)
+Bot1.Pass
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot1.Life = 20
+Bot2.Graveyard = Lightning Bolt
+Bot2.Hand.Count = 7
+Bot1.Battlefield.Glen Elendra Guardian.Power = 3
+Bot1.Battlefield.Glen Elendra Guardian.Toughness = 4

@@ -1,0 +1,39 @@
+# Memory Lapse: "If that spell is countered this way, put it on top of its owner's library". Abrupt Decay "can't be countered":
+# the Memory Lapse resolves and counters nothing, so the Decay is not moved to the library; it resolves, destroys Bot2's Mox
+# Sapphire and goes to the graveyard, and Bot1's library is untouched.
+
+[Bot1 Deck]
+Forest
+Mox Jet
+Abrupt Decay
+Forest x12
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Memory Lapse
+Island x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Abrupt Decay.Cast(Mox Sapphire)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Memory Lapse.Cast(Abrupt Decay)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Abrupt Decay
+Bot1.Library.Count = 7
+Bot2.Battlefield = Island
+Bot2.Graveyard = Mox Sapphire; Memory Lapse

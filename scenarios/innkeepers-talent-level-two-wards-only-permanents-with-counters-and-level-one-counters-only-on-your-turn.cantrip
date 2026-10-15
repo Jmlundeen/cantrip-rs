@@ -1,0 +1,58 @@
+# Level 1: "At the beginning of combat on your turn, put a +1/+1 counter on target creature you control" - Bot1's Ornithopter gets one on turns 1 and 3 (the opponent's Elvish Mystic is refused as a target on turn 3) and none on the
+# opponent's turns. Level 2 (paid on turn 1): "Permanents you control with counters on them have ward {1}". Turn 2: Bot2's Lightning Bolt at the Ornithopter (a counter on it) is countered unless Bot2 pays {1}, which it
+# cannot, so the Ornithopter lives; turn 4: its Bolt at the Haywire Mite, which has no counter and no ward, resolves and kills it (Bot1 gains 2).
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Innkeeper's Talent
+Ornithopter
+Haywire Mite
+Forest x13
+
+[Bot2 Deck]
+Mountain
+Mox Emerald
+Lightning Bolt
+Lightning Bolt
+Elvish Mystic
+Mountain x12
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Haywire Mite.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Innkeeper's Talent.Cast
+Bot1.Pass
+Bot1.Battlefield.Innkeeper's Talent.Activate(Ability: Level 2)
+Bot1.Pass
+Bot1.Target(Ornithopter)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Decline
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Ornithopter.Toughness = 3
+[T3 Bot1.BeginCombat]
+! Bot1.Target(Bot2.Battlefield.Elvish Mystic)
+Bot1.Target(Ornithopter)
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 2
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Haywire Mite)
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 22
+Bot1.Graveyard = Haywire Mite; Black Lotus
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 2
+Bot2.Graveyard = Lightning Bolt; Lightning Bolt

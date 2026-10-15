@@ -1,0 +1,11 @@
+{
+  "name": "Harvester of Misery",
+  "manaCost": "{3}{B}{B}",
+  "type": "Creature — Spirit",
+  "power": 5,
+  "toughness": 4,
+  "oracleText": "Menace\nWhen this creature enters, other creatures get -2/-2 until end of turn.\n{1}{B}, Discard this card: Target creature gets -2/-2 until end of turn.",
+  "keywords": [
+    "Menace"
+  ]
+}

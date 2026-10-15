@@ -1,0 +1,33 @@
+# A board about how the client draws a card tucked under a permanent, handed over with Bot1 holding priority in its
+# own main phase: Chrome Mox with the Counterspell it imprinted under it, beside two Islands, with more in hand.
+#
+# Tapping an Island or playing one lays the row out again, and the Mox and its Counterspell fly along it together. The
+# Counterspell stays under the Mox the whole way:
+#
+# then click an Island to tap it.
+
+[Bot1 Deck]
+Island
+Chrome Mox
+Counterspell
+Island x15
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Chrome Mox.Cast
+Bot1.Choose(Counterspell)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[Handover Bot1.Pass]
+
+[Expect]
+Turn = 3
+Step = Main1
+ActivePlayer = Bot1
+PriorityPlayer = Bot1
+Stack.Count = 0
+Exile = Counterspell
+Bot1.Battlefield.Count = 3

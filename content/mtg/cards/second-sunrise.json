@@ -1,0 +1,6 @@
+{
+  "name": "Second Sunrise",
+  "manaCost": "{1}{W}{W}",
+  "type": "Instant",
+  "oracleText": "Each player returns to the battlefield all artifact, creature, enchantment, and land cards in their graveyard that were put there from the battlefield this turn."
+}

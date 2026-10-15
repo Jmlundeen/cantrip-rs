@@ -1,0 +1,37 @@
+# Faerie Mastermind: "Whenever an opponent draws their second card each turn, you draw a card." Bot2's draw step is
+# their first draw of turn two; Brainstorm's three draws make the second, third and fourth, and only the second
+# triggers it (CR 120.3), so Bot1 draws exactly one card.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Faerie Mastermind
+Island x4
+Island x16
+
+[Bot2 Deck]
+Island
+Brainstorm
+Island x5
+Island x16
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Faerie Mastermind.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Brainstorm.Cast
+Bot2.Choose(Island; Island)
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot1.Battlefield = Island; Mox Sapphire; Faerie Mastermind
+Bot1.Hand.Count = 5
+Bot1.Library.Count = 15
+Bot2.Graveyard = Brainstorm
+Bot2.Hand.Count = 7

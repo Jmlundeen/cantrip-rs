@@ -1,0 +1,38 @@
+# Titania, Protector of Argoth cast with no land card in Bot1's graveyard: her enters trigger has nothing to return. When Bot2 cracks an
+# Arid Mesa on turn 2 its land goes to Bot2's graveyard, not "a land you control", so no Elemental appears (the control is Bot1's own
+# fetchland in the other scenario).
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Ruby
+Titania, Protector of Argoth
+Forest x3
+Forest x13
+
+[Bot2 Deck]
+Arid Mesa
+Island x7
+Mountain
+Island x11
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Titania, Protector of Argoth.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Arid Mesa.Play
+Bot2.Battlefield.Arid Mesa.Activate
+Bot2.Search(Mountain)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Count = 3
+Bot1.Battlefield.Titania, Protector of Argoth.Power = 5
+Bot2.Graveyard = Arid Mesa
+Bot2.Life = 19

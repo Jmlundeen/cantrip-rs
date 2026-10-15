@@ -1,0 +1,58 @@
+# Carnage, Crimson Chaos: "return target creature card with mana value 3 or less from your graveyard". Bot1's graveyard holds
+# Llanowar Elves (mana value 1) and Simian Spirit Guide (mana value 3, the limit), which are the two legal targets, and
+# a Cogwork Librarian (mana value 4), an Island and the sacrificed Black Lotus (not creature cards), while Bot2's graveyard holds an Ornithopter
+# (not Bot1's graveyard): none of those three is a candidate (the refusal). Choosing the Simian Spirit Guide returns it.
+# Faithless Looting, flashed back with Black Lotus's red mana, puts the cards of Bot1's into the graveyard on turn 1;
+# Bot2 discards an Ornithopter to hand size on turn 2; Carnage is cast on turn 3.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Black Lotus
+Faithless Looting
+Carnage, Crimson Chaos
+Island
+Llanowar Elves
+Simian Spirit Guide
+Cogwork Librarian
+Island
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Ornithopter x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Llanowar Elves; Simian Spirit Guide)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Graveyard.Faithless Looting.Cast(Ability: Flashback)
+Bot1.Choose(Cogwork Librarian; Island)
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+? Bot1.Graveyard.Count = 5
+? Bot2.Graveyard = Ornithopter
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Carnage, Crimson Chaos.Cast
+Bot1.Pass
+! Bot1.Target(Cogwork Librarian; Island; Black Lotus; Bot2.Graveyard.Ornithopter)
+Bot1.Target(Simian Spirit Guide)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Swamp; Mox Jet; Mox Ruby; Mountain; Carnage, Crimson Chaos; Simian Spirit Guide
+Bot1.Graveyard.Count = 4
+Bot2.Graveyard = Ornithopter

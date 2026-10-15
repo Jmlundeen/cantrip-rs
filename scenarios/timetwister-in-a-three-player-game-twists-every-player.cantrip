@@ -1,0 +1,32 @@
+# "Each player" (CR 101.4): in a game of three, all of them shuffle hand and graveyard into the library and draw seven. Bot1
+# casts Timetwister on turn 1 off Black Lotus; Black Lotus in its graveyard and its remaining hand go back into the library,
+# and Bot1 draws seven. Bot2 and Bot3, who have only their opening hands, put them back and draw seven too, so all three hold
+# seven cards and the libraries hold the rest; Timetwister alone is in a graveyard, Bot1's.
+
+[Bot1 Deck]
+Black Lotus
+Timetwister
+Island x5
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Timetwister.Cast
+
+[Expect]
+Bot1.Graveyard = Timetwister
+Bot2.Graveyard.Count = 0
+Bot3.Graveyard.Count = 0
+Bot1.Hand.Count = 7
+Bot2.Hand.Count = 7
+Bot3.Hand.Count = 7
+Bot1.Library.Count = 12
+Bot2.Library.Count = 13
+Bot3.Library.Count = 13

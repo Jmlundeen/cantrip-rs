@@ -1,0 +1,21 @@
+# "Return a land you control" is not a target and the Chancery is a land you control (CR 603.6a, 303): with a Plains beside it, Bot1 chooses to return the Chancery itself, and the Plains stays.
+
+[Bot1 Deck]
+Plains
+Azorius Chancery
+Plains x13
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Azorius Chancery.Play
+Bot1.Choose(Azorius Chancery)
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Plains
+Bot1.Hand = Azorius Chancery; Plains; Plains; Plains; Plains; Plains; Plains

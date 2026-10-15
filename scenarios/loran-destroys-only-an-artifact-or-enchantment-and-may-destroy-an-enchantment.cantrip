@@ -1,0 +1,39 @@
+# "Destroy up to one target artifact or enchantment": Bot2's Forest (a land) and Loran himself (a creature) are refused as targets, and Bot2's Innkeeper's Talent (an enchantment) is destroyed (the positive control;
+# Mox Emerald, an artifact, was equally legal).
+
+[Bot1 Deck]
+Plains
+Plains
+Mox Pearl
+Loran of the Third Path
+Plains x10
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Innkeeper's Talent
+Forest x11
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Innkeeper's Talent.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Loran of the Third Path.Cast
+! Bot1.Target(Bot2.Battlefield.Forest)
+! Bot1.Target(Loran of the Third Path)
+Bot1.Target(Innkeeper's Talent)
+
+[Expect]
+Stack.Count = 0
+Bot2.Graveyard = Innkeeper's Talent
+Bot2.Battlefield = Forest; Mox Emerald

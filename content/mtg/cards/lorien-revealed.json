@@ -1,0 +1,6 @@
+{
+  "name": "Lórien Revealed",
+  "manaCost": "{3}{U}{U}",
+  "type": "Sorcery",
+  "oracleText": "Draw three cards.\nIslandcycling {1} ({1}, Discard this card: Search your library for an Island card, reveal it, put it into your hand, then shuffle.)"
+}

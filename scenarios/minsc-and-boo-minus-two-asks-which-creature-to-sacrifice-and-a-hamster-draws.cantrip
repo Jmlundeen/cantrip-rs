@@ -1,0 +1,39 @@
+# Minsc & Boo -2: "Sacrifice a creature. When you do, Minsc & Boo deals X damage to any target, where X is that creature's power. If
+# the sacrificed creature was a Hamster, draw X cards." With an Ornithopter and Boo, the controller chooses which creature to
+# sacrifice: Boo (power 1, a Hamster), so Bot2 takes 1 and Bot1 draws a card.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Mox Jet
+Mox Pearl
+Minsc & Boo, Timeless Heroes
+Ornithopter
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Minsc & Boo, Timeless Heroes.Cast
+Bot1.Accept
+[Bot1.Main1]
+Bot1.Battlefield.Minsc & Boo, Timeless Heroes.Activate(Ability: Sacrifice)
+Bot1.Choose(Boo)
+Bot1.Target(Bot2)
+
+[Expect]
+Bot2.Life = 19
+Bot1.Hand.Count = 2
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Minsc & Boo, Timeless Heroes.Counters.Loyalty = 1

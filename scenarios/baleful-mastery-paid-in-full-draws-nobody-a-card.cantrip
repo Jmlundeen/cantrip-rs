@@ -1,0 +1,28 @@
+# Baleful Mastery paid for its mana cost, {3}{B}, is not the {1}{B} cost: "If the {1}{B} cost was paid, an opponent draws a
+# card" does not apply and Bot2's hand stays as it was while the creature is still exiled. Black Lotus makes the four mana
+# on turn 1 against Bot1's own Ornithopter.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Ornithopter
+Baleful Mastery
+Swamp x10
+
+[Bot2 Deck]
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Baleful Mastery.Cast(Ornithopter)
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Exile = Ornithopter
+Bot2.Hand.Count = 7
+Bot2.Library.Count = 3

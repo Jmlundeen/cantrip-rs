@@ -1,0 +1,29 @@
+# Flametongue Kavu: "target creature" is not optional (CR 603.3d): with no other creature on the battlefield the Kavu
+# itself is the only legal target, is put on the stack targeting itself and takes 4 damage from itself (CR 120.3): a 4/2,
+# it dies. Only one candidate, so nothing is asked.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Flametongue Kavu
+Mountain x4
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Flametongue Kavu.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Flametongue Kavu; Black Lotus
+Bot1.Battlefield = Mountain

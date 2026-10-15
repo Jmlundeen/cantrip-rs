@@ -1,0 +1,54 @@
+# Currency Converter: a Faithless Looting discards two cards at once, so the "whenever you discard a card" trigger
+# happens twice and Bot1 may exile each (a Lightning Bolt and a Forest). The cash-in ability "{T}: Put a card exiled with
+# this artifact into its owner's graveyard" does nothing with an empty store (tried first, on turn 1, tapping it for
+# nothing), then with two cards in the store it asks which (the Bolt: a nonland card, so a 2/2 black Rogue), and two turns
+# later with only the Forest left it takes it without asking (a land card, so a Treasure).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Currency Converter
+Faithless Looting
+Swamp
+Swamp
+Swamp
+Lightning Bolt
+Forest
+Swamp x3
+Swamp x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Currency Converter.Cast
+Bot1.Pass
+Bot1.Battlefield.Currency Converter.Activate(Ability: Treasure)
+Bot1.Pass
+? Bot1.Battlefield.Currency Converter.Tapped = true
+? Bot1.Battlefield.Count = 3
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Lightning Bolt; Forest)
+Bot1.Accept
+Bot1.Accept
+? Exile.Count = 2
+? Bot1.Graveyard = Faithless Looting
+[T3 Bot1.Main1]
+Bot1.Battlefield.Currency Converter.Activate(Ability: Treasure)
+Bot1.Choose(Lightning Bolt)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Currency Converter.Activate(Ability: Treasure)
+
+[Expect]
+Turn = 5
+Exile.Count = 0
+Bot1.Graveyard = Forest; Lightning Bolt; Faithless Looting
+Bot1.Battlefield = Mox Ruby; Mox Jet; Currency Converter; Rogue; Treasure Token
+Bot1.Battlefield.Rogue.Power = 2
+Bot1.Battlefield.Rogue.Toughness = 2

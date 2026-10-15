@@ -1,0 +1,26 @@
+{
+  "name": "Etali, Primal Conqueror",
+  "manaCost": "{5}{R}{R}",
+  "type": "Legendary Creature — Elder Dinosaur",
+  "power": 7,
+  "toughness": 7,
+  "oracleText": "Trample\nWhen Etali enters, each player exiles cards from the top of their library until they exile a nonland card. You may cast any number of spells from among the nonland cards exiled this way without paying their mana costs.\n{9}{G/P}: Transform Etali. Activate only as a sorcery.",
+  "keywords": [
+    "Trample"
+  ],
+  "backFace": {
+    "name": "Etali, Primal Sickness",
+    "colorIndicator": [
+      "Green",
+      "Red"
+    ],
+    "type": "Legendary Creature — Phyrexian Elder Dinosaur",
+    "power": 11,
+    "toughness": 11,
+    "oracleText": "Trample, indestructible\nWhenever Etali deals combat damage to a player, they get that many poison counters.",
+    "keywords": [
+      "Trample",
+      "Indestructible"
+    ]
+  }
+}

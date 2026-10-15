@@ -1,0 +1,6 @@
+{
+  "name": "Mox Amber",
+  "manaCost": "{0}",
+  "type": "Legendary Artifact",
+  "oracleText": "{T}: Add one mana of any color among legendary creatures and planeswalkers you control."
+}

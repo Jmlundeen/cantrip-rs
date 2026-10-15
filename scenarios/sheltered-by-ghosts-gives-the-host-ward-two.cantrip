@@ -1,0 +1,56 @@
+# "Enchanted creature ... has ward {2}": Bot2's Lightning Bolt at the enchanted Ornithopter triggers the ward; Bot2 has two
+# more mana (Mox Jet and Mox Emerald) but does not pay, so the Bolt is countered and the Ornithopter lives. The second Bolt,
+# with the {2} paid, is not countered and kills it - and the Aura going with it gives Bot2's exiled Mox Ruby back.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Ornithopter
+Sheltered by Ghosts
+Plains x3
+Plains x10
+
+[Bot2 Deck]
+Mountain
+Mountain
+Mox Jet
+Mox Emerald
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sheltered by Ghosts.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Target(Bot2.Battlefield.Mox Ruby)
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Decline
+Bot2.Pass
+[T4 Bot2.Main2]
+? Bot2.Graveyard = Lightning Bolt
+? Bot1.Battlefield.Ornithopter.Damage = 0
+[T6 Bot2.Main1]
+Bot2.Battlefield.Mountain#2.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.PayCost
+[T6 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Sheltered by Ghosts; Ornithopter
+Bot2.Battlefield = Mountain; Mountain; Mox Jet; Mox Emerald; Mox Ruby

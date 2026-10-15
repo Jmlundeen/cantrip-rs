@@ -1,0 +1,38 @@
+# Escape Tunnel's second ability: Elvish Mystic (power 1) can't be blocked this turn, so Bot2's Ornithopter may not
+# block it (it could block Bot1's Ornithopter, which keeps the block question asked); two turns later, without the Tunnel, the same block is allowed.
+
+[Bot1 Deck]
+Forest
+Elvish Mystic
+Escape Tunnel
+Ornithopter
+Forest
+Forest
+Forest
+Forest x12
+
+[Bot2 Deck]
+Ornithopter
+Island x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Escape Tunnel.Play
+Bot1.Battlefield.Escape Tunnel.Activate(Ability: can't be blocked; Bot1.Battlefield.Elvish Mystic)
+Bot1.Attack(Elvish Mystic > Bot2; Ornithopter > Bot2)
+! Bot2.Block(Ornithopter > Elvish Mystic)
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Attack(Elvish Mystic > Bot2)
+Bot2.Block(Ornithopter > Elvish Mystic)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 19
+Bot2.Battlefield.Ornithopter.Damage = 1
+Bot1.Graveyard = Escape Tunnel

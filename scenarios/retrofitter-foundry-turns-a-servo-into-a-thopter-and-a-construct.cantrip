@@ -1,0 +1,48 @@
+# Retrofitter Foundry: {2},{T} makes a Servo; {1},{T}, sacrifice a Servo makes a Thopter; {3} untaps the Foundry; and
+# {T}, sacrifice a Thopter makes a 4/4 Construct. Five Moxen pay the mana across turns 1 and 3.
+
+[Bot1 Deck]
+Retrofitter Foundry
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Retrofitter Foundry.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Retrofitter Foundry.Activate(Ability: Servo artifact creature token)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Servo.Power = 1
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Retrofitter Foundry.Activate(Ability: Sacrifice a Servo)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Thopter.Keywords = Flying
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Retrofitter Foundry.Activate(Ability: Untap)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Retrofitter Foundry.Tapped = false
+Bot1.Battlefield.Retrofitter Foundry.Activate(Ability: Sacrifice a Thopter)
+
+[Expect]
+Bot1.Battlefield.Construct.Power = 4
+Bot1.Battlefield.Count = 7
+Bot1.Battlefield.Retrofitter Foundry.Tapped = true

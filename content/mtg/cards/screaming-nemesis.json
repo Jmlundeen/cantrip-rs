@@ -1,0 +1,11 @@
+{
+  "name": "Screaming Nemesis",
+  "manaCost": "{2}{R}",
+  "type": "Creature — Spirit",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Haste\nWhenever this creature is dealt damage, it deals that much damage to any other target. If a player is dealt damage this way, they can't gain life for the rest of the game.",
+  "keywords": [
+    "Haste"
+  ]
+}

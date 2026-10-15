@@ -1,0 +1,20 @@
+# Worldspine Wurm: "When Worldspine Wurm is put into a graveyard from anywhere, shuffle it into its owner's library."
+# Discarded from the hand to the maximum hand size (it did not die, so no Wurm tokens), it goes back into the library.
+
+[Bot1 Deck]
+Worldspine Wurm
+Forest x16
+
+[Bot2 Deck]
+Island x17
+
+[Actions]
+[T3 Bot1.Main2]
+Bot1.Discard(Worldspine Wurm)
+[T4 Bot2.Upkeep]
+
+[Expect]
+Bot1.Graveyard.Count = 0
+Bot1.Hand.Count = 7
+Bot1.Library.Count = 10
+Bot1.Battlefield.Count = 0

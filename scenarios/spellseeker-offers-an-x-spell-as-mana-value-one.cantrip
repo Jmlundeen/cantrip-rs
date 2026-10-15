@@ -1,0 +1,29 @@
+# Repeal ({X}{U}) is offered although its printed cost has an X: in a library X is 0 (CR 107.3b), so its mana value is 1, and
+# Bot1 takes it. The decline branch is the scenario beside this one.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Spellseeker
+Plains x3
+Repeal
+Plains x12
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Spellseeker.Cast
+Bot1.Pass
+Bot1.Search(Repeal)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Repeal; Plains; Plains; Plains

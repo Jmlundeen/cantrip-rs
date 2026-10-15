@@ -1,0 +1,32 @@
+# A token that leaves the battlefield ceases to exist (CR 111.7, 704.5d), so Ephemerate on Ajani's Cat Warrior token exiles it for good: it does not return.
+# Exiling is not dying, so Ajani, Nacatl Pariah ("whenever one or more other Cats you control die") does not trigger and is never asked. Mox Pearls and a Plains pay
+# for everything on turn 1; Ephemerate then waits in exile to rebound.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Pearl
+Ajani, Nacatl Pariah
+Ephemerate
+Plains x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ajani, Nacatl Pariah.Cast
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Hand.Ephemerate.Cast(Cat Warrior)
+[Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Battlefield = Plains; Mox Pearl; Mox Pearl; Ajani, Nacatl Pariah
+Exile = Ephemerate
+Bot1.Graveyard.Count = 0
+Stack.Count = 0

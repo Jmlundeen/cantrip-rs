@@ -1,0 +1,42 @@
+# Paradise Mantle: "Equipped creature has {T}: Add one mana of any color" belongs to the creature only while the Mantle is on it.
+# Equipped to Bot1's first Ornithopter on turn 1 and moved to the second on turn 3, the first one is offered no mana ability
+# any more (! Activate) and the second taps for red (the positive control; the other scenario taps for blue). Equip {1} is
+# sorcery speed (refused on Bot2's turn 2) and equips only a creature its controller has (Bot2's Ornithopter is refused).
+
+[Bot1 Deck]
+Island
+Paradise Mantle
+Ornithopter
+Ornithopter
+Island x4
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Swamp x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Paradise Mantle.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Paradise Mantle.Activate(Ornithopter#1; Ability: Equip)
+[T2 Bot2.Main1]
+! Bot1.Battlefield.Paradise Mantle.Activate(Ornithopter#2; Ability: Equip)
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+! Bot1.Battlefield.Paradise Mantle.Activate(Bot2.Battlefield.Ornithopter; Ability: Equip)
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Paradise Mantle.Activate(Ornithopter#2; Ability: Equip)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Ornithopter#1.Activate
+Bot1.Battlefield.Ornithopter#2.Activate(Color: Red)
+
+[Expect]
+Bot1.Battlefield.Paradise Mantle.AttachedTo = Ornithopter
+Bot1.Mana = {R}
+Bot1.Battlefield.Ornithopter#2.Tapped = true
+Bot1.Battlefield.Ornithopter#1.Tapped = false

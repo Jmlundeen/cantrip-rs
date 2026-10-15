@@ -1,0 +1,32 @@
+# Bot1's Emeritus of Abundance enters prepared (CR 722.3a), putting its copy of Regrowth in exile (CR 722.3c), and the
+# position is handed to Bot1. Held up to read, the Emeritus shows Regrowth, its prepare spell (CR 722.2a), beside it as
+# printed, art and all, as a double-faced card shows its other face.
+
+[Bot1 Deck]
+Forest x5
+Emeritus of Abundance
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Emeritus of Abundance.Cast
+Bot1.Pass
+[Handover Bot1.Pass]
+
+[Expect]
+Turn = 5
+Step = Main1
+Stack.Count = 0
+Bot1.Battlefield = Forest; Forest; Forest; Emeritus of Abundance
+Bot1.Battlefield.Emeritus of Abundance.Prepared = true
+Exile = Regrowth

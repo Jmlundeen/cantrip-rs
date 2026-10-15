@@ -1,0 +1,38 @@
+# Ertai Resurrected: "Its controller draws a card" is the controller of the thing countered, whoever casts Ertai. Bot1
+# casts a Lightning Bolt at Bot2 and, holding priority, flashes in Ertai to counter its own Bolt: Bot2 takes no damage and
+# it is Bot1 that draws.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Ruby
+Lightning Bolt
+Ertai Resurrected
+Island x2
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ertai Resurrected.Cast
+Bot1.Modes(1)
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot2.Life = 20
+Bot1.Graveyard = Lightning Bolt; Black Lotus
+Bot1.Hand.Count = 3
+Bot2.Hand.Count = 7

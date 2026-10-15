@@ -1,0 +1,53 @@
+# "Whenever you cast a noncreature spell" (CR 603.2): Bot1's own creature spell (Ornithopter) and Bot2's noncreature
+# spell (Mox Sapphire) trigger neither the Monk nor the Mentor's prowess, and Bot1's own noncreature spell on turn 3 does
+# both. Prowess lasts until end of turn (CR 514.2): on Bot2's turn 4 the Mentor is a 2/2 again and the Monk a 1/1.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Monastery Mentor
+Ornithopter
+Mox Sapphire
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Mox Sapphire
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Monastery Mentor.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Monastery Mentor.Power = 2
+? Bot1.Battlefield.Count = 5
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+[T2 Bot2.Main2]
+? Bot1.Battlefield.Monastery Mentor.Power = 2
+? Bot1.Battlefield.Count = 5
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Monastery Mentor.Power = 3
+? Bot1.Battlefield.Count = 7
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Monastery Mentor.Power = 2
+Bot1.Battlefield.Monastery Mentor.Toughness = 2
+Bot1.Battlefield.Monk.Power = 1

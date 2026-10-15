@@ -1,0 +1,6 @@
+{
+  "name": "Rebuild",
+  "manaCost": "{2}{U}",
+  "type": "Instant",
+  "oracleText": "Return all artifacts to their owners' hands.\nCycling {2} ({2}, Discard this card: Draw a card.)"
+}

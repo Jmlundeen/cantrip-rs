@@ -1,0 +1,40 @@
+# "Doesn't untap during your untap step" restricts only that step (CR 502.3): Bot1's Monolith, tapped for mana on
+# turn one, stays tapped through turn three's untap step (the check at Main1), and untaps when Paradox Engine's trigger resolves
+# as an Ornithopter is cast, since "untap all nonland permanents you control" is not the untap step.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Grim Monolith
+Paradox Engine
+Ornithopter
+Island x12
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Grim Monolith.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Paradox Engine.Cast
+Bot1.Battlefield.Grim Monolith.Activate(Ability: Add)
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Grim Monolith.Tapped = true
+? Bot1.Battlefield.Mox Jet.Tapped = false
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Grim Monolith.Tapped = false

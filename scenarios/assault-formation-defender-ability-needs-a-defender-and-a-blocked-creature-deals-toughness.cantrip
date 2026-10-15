@@ -1,0 +1,64 @@
+# Assault Formation: "{G}: Target creature with defender can attack this turn as though it didn't have defender" and
+# "Each creature you control assigns combat damage equal to its toughness rather than its power".
+#
+# Turn 1: with only a Llanowar Elves (no defender) on the battlefield and a Gleemox left untapped to pay for it, the {G}
+# ability has no legal target and is not offered (CR 115.1); turn 3 Bot1 casts Sylvan Caryatid (0/3 defender), the positive control. Turn 5: Bot1 pays {G}, attacks with the
+# Caryatid and Bot2's Dark Confidant (2/1) blocks. The Caryatid assigns 3 damage, its toughness (the Confidant dies); the
+# Confidant is Bot2's creature, so it still assigns its power, 2, not its toughness of 1 (CR 510.1a).
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Gleemox
+Assault Formation
+Llanowar Elves
+Sylvan Caryatid
+Forest
+Forest x10
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Dark Confidant
+Swamp x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Assault Formation.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+[T1 Bot1.Main2]
+! Bot1.Battlefield.Assault Formation.Activate(Ability: attack this turn)
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Dark Confidant.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sylvan Caryatid.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Assault Formation.Activate(Bot1.Battlefield.Sylvan Caryatid; Ability: attack this turn)
+Bot1.Pass
+Bot1.Attack(Sylvan Caryatid > Bot2)
+Bot2.Block(Dark Confidant > Sylvan Caryatid)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Dark Confidant
+Bot2.Life = 20
+Bot1.Battlefield.Sylvan Caryatid.Damage = 2

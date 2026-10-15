@@ -1,0 +1,43 @@
+# Swords to Plowshares: "Exile target creature. Its controller gains life equal to its power." The power is read as the
+# creature last existed on the battlefield (CR 608.2h): with Swords on the stack aimed at Bot2's Embereth Shieldbreaker (2/1),
+# Bot2 responds with Berserk on it, doubling its power to 4, and gains 4 life, not 2 (24). It is Bot2's life: the caster Bot1 gains
+# nothing.
+
+[Bot1 Deck]
+Plains
+Swords to Plowshares
+Plains x14
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Mox Emerald
+Embereth Shieldbreaker
+Berserk
+Mountain x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Embereth Shieldbreaker.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Swords to Plowshares.Cast(Bot2.Battlefield.Embereth Shieldbreaker)
+Bot1.Battlefield.Plains.Activate
+Bot1.Pass
+Bot2.Hand.Berserk.Cast(Bot2.Battlefield.Embereth Shieldbreaker)
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot2.Life = 24
+Bot1.Life = 20
+Exile = Embereth Shieldbreaker
+Bot2.Graveyard = Berserk

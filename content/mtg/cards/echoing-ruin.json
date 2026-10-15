@@ -1,0 +1,6 @@
+{
+  "name": "Echoing Ruin",
+  "manaCost": "{1}{R}",
+  "type": "Sorcery",
+  "oracleText": "Destroy target artifact and all other artifacts with the same name as that artifact."
+}

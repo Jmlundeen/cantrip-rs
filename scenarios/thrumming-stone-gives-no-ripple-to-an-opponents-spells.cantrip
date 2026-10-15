@@ -1,0 +1,37 @@
+# "Spells you cast have ripple 4" is for the Stone's controller alone: Bot2 casts a Lightning Bolt at Bot1 with two more Bolts on top of
+# its library, and is never asked whether to reveal (no ripple question), so only that one Bolt resolves: Bot1 at 17. Bot1
+# has the Stone on the battlefield.
+
+[Bot1 Deck]
+Mountain
+Sol Ring
+Black Lotus
+Thrumming Stone
+Island x20
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x5
+Lightning Bolt
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Thrumming Stone.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+! Bot2.Accept
+
+[Expect]
+Bot1.Life = 17
+Bot2.Library.Count = 21
+Bot2.Graveyard = Lightning Bolt

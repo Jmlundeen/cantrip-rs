@@ -1,0 +1,29 @@
+# "Target creature": with no creature on the battlefield the spell has no legal target and is not offered (the refusal);
+# once Bot2 casts an Ornithopter on turn two the same spell, with the same mana untapped, is offered and is cast on it -
+# an opponent's creature is as legal as your own - and it becomes 2/4.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Battlefield Improvisation
+Plains x12
+
+[Bot2 Deck]
+Ornithopter
+Island x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+! Bot1.Hand.Battlefield Improvisation.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Battlefield Improvisation.Cast(Bot2.Battlefield.Ornithopter)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot2.Battlefield.Ornithopter.Power = 2
+Bot2.Battlefield.Ornithopter.Toughness = 4
+Bot1.Graveyard = Battlefield Improvisation

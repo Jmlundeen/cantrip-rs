@@ -1,0 +1,44 @@
+# Tamiyo, Seasoned Scholar: +2 on turns 3, 5 and 7 (loyalty 2, 4, 6, 8 after the transform on turn 3) and on turn 9 the -7: draw cards
+# equal to half the cards in the library, rounded up, and get an emblem with "You have no maximum hand size": the 25 cards in hand are still there after the cleanup step.
+[Bot1 Deck]
+Island x3
+Tamiyo, Inquisitive Student
+Ponder
+Brainstorm
+Island x40
+[Bot2 Deck]
+Forest x2
+Llanowar Elves
+Forest x20
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Tamiyo, Inquisitive Student.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Ponder.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Brainstorm.Cast
+Bot1.Battlefield.Tamiyo, Seasoned Scholar.Activate(Ability: Until your next turn)
+? Bot1.Battlefield.Tamiyo, Seasoned Scholar.Counters.Loyalty = 4
+[T5 Bot1.Main1]
+Bot1.Battlefield.Tamiyo, Seasoned Scholar.Activate(Ability: Until your next turn)
+[T7 Bot1.Main1]
+Bot1.Battlefield.Tamiyo, Seasoned Scholar.Activate(Ability: Until your next turn)
+[T9 Bot1.Main1]
+? Bot1.Battlefield.Tamiyo, Seasoned Scholar.Counters.Loyalty = 8
+Bot1.Battlefield.Tamiyo, Seasoned Scholar.Activate(Ability: Draw cards equal to half)
+[T9 Bot1.Main2]
+? Bot1.Library.Count = 16
+? Bot1.Hand.Count = 25
+[T10 Bot2.Main1]
+
+[Expect]
+Bot1.Emblems.Count = 1
+Bot1.Hand.Count = 25
+Bot1.Library.Count = 16

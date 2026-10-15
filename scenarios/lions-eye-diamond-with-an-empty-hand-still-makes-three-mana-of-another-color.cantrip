@@ -1,0 +1,31 @@
+# Discarding an empty hand is a cost that can be paid (CR 118.3 needs only that the player can; nothing is required to be
+# discarded): after every card is played, the Diamond still sacrifices itself for {B}{B}{B}.
+
+[Bot1 Deck]
+Lion's Eye Diamond
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Mox Sapphire
+Island
+Island x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Island.Play
+Bot1.Hand.Lion's Eye Diamond.Cast
+Bot1.Pass
+Bot1.Battlefield.Lion's Eye Diamond.Activate(Color: Black)
+
+[Expect]
+Bot1.Mana = {B}{B}{B}
+Bot1.Hand.Count = 0
+Bot1.Graveyard = Lion's Eye Diamond

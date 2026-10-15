@@ -1,0 +1,6 @@
+{
+  "name": "Unexpectedly Absent",
+  "manaCost": "{X}{W}{W}",
+  "type": "Instant",
+  "oracleText": "Put target nonland permanent into its owner's library just beneath the top X cards of that library."
+}

@@ -1,0 +1,34 @@
+# Baleful Mastery: "You may pay {1}{B} rather than pay this spell's mana cost. If the {1}{B} cost was paid, an opponent
+# draws a card. Exile target creature or planeswalker." Three players: the controller chooses which opponent draws as the
+# spell resolves (CR 608.2d), here Bot3, and the target is exiled. Bot1 casts it on turn 1 against its own Ornithopter
+# (the first player of a game of more than two draws on turn 1, CR 103.8a).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Ornithopter
+Baleful Mastery
+Swamp x10
+
+[Bot2 Deck]
+Island x10
+
+[Bot3 Deck]
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Baleful Mastery.Cast(Ornithopter; Ability: {1}{B})
+Bot1.Pass
+Bot1.ChoosePlayer(Bot3)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 4
+Exile = Ornithopter
+Bot2.Hand.Count = 7
+Bot3.Hand.Count = 8

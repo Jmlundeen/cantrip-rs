@@ -1,0 +1,43 @@
+# Grist's +1: "If an Insect card was milled this way ... repeat this process." Bot2's Dauthi Voidwalker exiles each
+# card that would go to Bot1's graveyard, but a milled card is found in the public zone it went to (CR 701.17c): the
+# exiled Haywire Mite and Icetill Explorer were still milled Insect cards, so the +1 repeats on each (3 + 1 + 2 = 6)
+# and stops on the Llanowar Elves.
+
+[Bot1 Deck]
+Bayou x3
+Grist, the Hunger Tide
+Forest x5
+Haywire Mite
+Icetill Explorer
+Llanowar Elves
+Forest x13
+
+[Bot2 Deck]
+Swamp
+Dauthi Voidwalker
+Swamp x20
+
+[Actions]
+Bot1.Hand.Bayou.Play
+Bot2.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Bayou.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp#1.Activate
+Bot2.Battlefield.Swamp#2.Activate
+Bot2.Hand.Dauthi Voidwalker.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Bayou.Play
+Bot1.Battlefield.Bayou#1.Activate(Ability: Add {B})
+Bot1.Battlefield.Bayou#2.Activate(Ability: Add {G})
+Bot1.Battlefield.Bayou#3.Activate(Ability: Add {G})
+Bot1.Hand.Grist, the Hunger Tide.Cast
+[T5 Bot1.Main2]
+Bot1.Battlefield.Grist, the Hunger Tide.Activate(Ability: +1)
+[T5 Bot1.End]
+
+[Expect]
+Bot1.Battlefield.Grist, the Hunger Tide.Counters.Loyalty = 6
+Bot1.Graveyard.Count = 0
+Exile = Haywire Mite; Icetill Explorer; Llanowar Elves

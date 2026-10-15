@@ -1,0 +1,31 @@
+# Bot1 casts Mox Sapphire and Mox Jet on its first turn. On that turn, which is not Bot2's, Bot2 casts Force of Vigor for
+# its alternative cost, exiling the Elvish Mystic (a green card), with no mana, and destroys both Moxen with the two
+# targets "up to two target artifacts and/or enchantments" allows.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Island x18
+
+[Bot2 Deck]
+Force of Vigor
+Elvish Mystic
+Forest x18
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Force of Vigor.Cast(Ability: green card)
+Bot2.Target(Bot1.Battlefield.Mox Sapphire; Bot1.Battlefield.Mox Jet)
+Bot2.Choose(Elvish Mystic)
+
+[Expect]
+Turn = 1
+Bot1.Battlefield =
+Bot1.Graveyard = Mox Jet; Mox Sapphire
+Bot2.Graveyard = Force of Vigor
+Exile = Elvish Mystic

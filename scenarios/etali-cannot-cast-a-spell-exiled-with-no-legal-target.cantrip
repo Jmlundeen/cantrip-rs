@@ -1,0 +1,35 @@
+# Etali, Primal Conqueror: a spell can only be cast as the ability resolves if it could be (CR 608.2g, 601.2): a
+# Counterspell needs a spell to target, and there is none on the stack, so the Counterspells found on top of both libraries
+# are not offered and stay in exile. The default answer to an offer is to take the first card, so a Counterspell
+# offered would be cast, fail and show; here the Etali's controller is asked nothing and both stay exiled. (The
+# neighbouring scenario with a Lightning Bolt found beside it is the positive control.)
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Etali, Primal Conqueror
+Island x3
+Counterspell
+Island x10
+
+[Bot2 Deck]
+Island x7
+Counterspell
+Island x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Etali, Primal Conqueror.Cast
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Exile = Counterspell; Counterspell
+Bot1.Graveyard = Black Lotus; Black Lotus; Black Lotus

@@ -1,0 +1,22 @@
+# Godless Shrine, a Plains Swamp, taps for {W} or {B} through its basic land types (CR 305.6) and for nothing else: green,
+# blue, red and colorless are refused beside the black it does add (the positive control).
+
+[Bot1 Deck]
+Godless Shrine
+Plains x19
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Godless Shrine.Play
+Bot1.Accept
+! Bot1.Battlefield.Godless Shrine.Activate(Color: Green)
+! Bot1.Battlefield.Godless Shrine.Activate(Color: Blue)
+! Bot1.Battlefield.Godless Shrine.Activate(Color: Red)
+! Bot1.Battlefield.Godless Shrine.Activate(Color: Colorless)
+Bot1.Battlefield.Godless Shrine.Activate(Ability: {B})
+? Bot1.Mana = {B}
+
+[Expect]
+Bot1.Battlefield.Godless Shrine.Tapped = true

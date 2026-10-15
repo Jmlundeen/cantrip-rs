@@ -1,0 +1,45 @@
+# Any untapped Myr may be tapped, not only this Battlesphere's tokens, and summoning sickness does not matter: the
+# tapping is no {T} cost (2020-08-07 rulings). The first Battlesphere, sneaked in on turn 1, is sacrificed at the end
+# step and leaves its four tokens; the second, sneaked in on turn 3 with haste, attacks and taps those four and one
+# of its own tokens, made this turn: +5/+0, 5 damage, then 9 combat damage.
+
+[Bot1 Deck]
+Mountain
+Sol Ring
+Black Lotus
+Sneak Attack
+Myr Battlesphere
+Myr Battlesphere
+Mountain x21
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Sneak Attack.Cast
+Bot1.Battlefield.Sneak Attack.Activate
+Bot1.Choose(Myr Battlesphere)
+[T2 Bot2.Main1]
+? Bot1.Graveyard = Myr Battlesphere; Black Lotus
+? Bot1.Battlefield.Count = 7
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Sneak Attack.Activate
+Bot1.Choose(Myr Battlesphere)
+Bot1.Attack(Myr Battlesphere > Bot2)
+Bot1.Choose(Myr#1; Myr#2; Myr#3; Myr#4; Myr#5)
+[Bot1.Main2]
+[Expect]
+Bot2.Life = 6
+Bot1.Battlefield.Myr Battlesphere.Power = 9
+Bot1.Battlefield.Myr#1.Tapped = true
+Bot1.Battlefield.Myr#5.Tapped = true
+Bot1.Battlefield.Myr#5.SummoningSick = true
+Bot1.Battlefield.Myr#6.Tapped = false

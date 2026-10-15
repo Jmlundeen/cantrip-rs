@@ -1,0 +1,52 @@
+# Clarion Conqueror: "Activated abilities of artifacts, creatures, and planeswalkers can't be activated." It stops
+# activated abilities only (CR 602.5): Baleful Strix, a creature, still draws a card from its enters trigger with the
+# Conqueror out on turn 3, while Mox Ruby's mana ability is refused. The effect lasts as long as the Conqueror is on the
+# battlefield: Swords to Plowshares exiles it on turn 5 (Bot1 gains its power, 3) and Mox Ruby then taps for {R}.
+
+[Bot1 Deck]
+Black Lotus
+Clarion Conqueror
+Mox Ruby
+Swamp
+Island
+Baleful Strix
+Swords to Plowshares
+Plains
+Plains
+Plains x20
+
+[Bot2 Deck]
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Clarion Conqueror.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+! Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Baleful Strix.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 3
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+! Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Clarion Conqueror)
+Bot1.Battlefield.Plains.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 23
+Bot1.Battlefield.Mox Ruby.Activate
+? Bot1.Mana = {R}
+
+[Expect]
+Exile = Clarion Conqueror
+Bot1.Life = 23

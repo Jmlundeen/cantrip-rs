@@ -1,0 +1,33 @@
+# Ad Nauseam: with no card in the library there is nothing to reveal (CR 701.20, 400.3), so no life is lost and the
+# spell simply ends. Bot1's whole deck is its opening hand, so the library is empty when it casts (turn 1 has no draw).
+# The positive control is the neighbouring scenario, which reveals with cards in the library.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Mox Jet
+Ad Nauseam
+Swamp
+Swamp
+Swamp
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ad Nauseam.Cast
+[Bot1.Main2]
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Life = 20
+Bot1.Library.Count = 0
+Bot1.Graveyard = Ad Nauseam; Black Lotus
+Bot1.Hand.Count = 3

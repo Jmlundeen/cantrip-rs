@@ -1,0 +1,6 @@
+{
+  "name": "Sneak Attack",
+  "manaCost": "{3}{R}",
+  "type": "Enchantment",
+  "oracleText": "{R}: You may put a creature card from your hand onto the battlefield. That creature gains haste. Sacrifice the creature at the beginning of the next end step."
+}

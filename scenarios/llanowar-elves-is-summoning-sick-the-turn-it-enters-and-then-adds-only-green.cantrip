@@ -1,0 +1,29 @@
+# Llanowar Elves: "{T}: Add {G}." A creature's {T} ability cannot be activated unless its controller has controlled it
+# continuously since the start of their most recent turn (CR 302.6, 602.5): on turn 1, the turn it enters, the ability is
+# refused; on turn 3 it is activated (the positive control) and adds {G} - green only: red, blue, white, black and colorless
+# are refused.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Forest x15
+
+[Bot2 Deck]
+Island x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+! Bot1.Battlefield.Llanowar Elves.Activate
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Llanowar Elves.Activate(Color: Red)
+! Bot1.Battlefield.Llanowar Elves.Activate(Color: Blue)
+! Bot1.Battlefield.Llanowar Elves.Activate(Color: White)
+! Bot1.Battlefield.Llanowar Elves.Activate(Color: Black)
+! Bot1.Battlefield.Llanowar Elves.Activate(Color: Colorless)
+Bot1.Battlefield.Llanowar Elves.Activate
+? Bot1.Mana = {G}
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Tapped = true

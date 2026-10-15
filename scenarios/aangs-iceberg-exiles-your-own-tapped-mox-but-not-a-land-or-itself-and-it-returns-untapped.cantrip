@@ -1,0 +1,55 @@
+# Aang's Iceberg: "When this enchantment enters, exile up to one other target nonland permanent until this enchantment
+# leaves the battlefield." On turn 3 Bot1 taps Mox Pearl for the Iceberg's {W}. The trigger refuses Bot2's Island (a
+# land) and the Iceberg itself ("other"), and takes Bot1's own tapped Mox Pearl (any nonland permanent: positive
+# control). On turn 4 Bot2 destroys the Iceberg with Disenchant; the exiled Mox returns (CR 610.3) as a new object
+# (CR 400.7), so it is untapped although it was tapped when it left.
+
+[Bot1 Deck]
+Plains
+Plains
+Mox Pearl
+Aang's Iceberg
+Plains
+Plains
+Plains
+Plains x15
+
+[Bot2 Deck]
+Island
+Plains
+Disenchant
+Plains x2
+Island x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Aang's Iceberg.Cast
+Bot1.Pass
+! Bot1.Target(Bot2.Battlefield.Island)
+! Bot1.Target(Aang's Iceberg)
+Bot1.Target(Mox Pearl)
+Bot1.Pass
+Bot2.Pass
+? Exile = Mox Pearl
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Disenchant.Cast(Aang's Iceberg)
+Bot2.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot1.Battlefield = Mox Pearl; Plains; Plains
+Bot1.Battlefield.Mox Pearl.Tapped = false
+Bot1.Graveyard = Aang's Iceberg
+Bot2.Graveyard = Disenchant

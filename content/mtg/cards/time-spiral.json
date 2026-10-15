@@ -1,0 +1,6 @@
+{
+  "name": "Time Spiral",
+  "manaCost": "{4}{U}{U}",
+  "type": "Sorcery",
+  "oracleText": "Exile Time Spiral. Each player shuffles their hand and graveyard into their library, then draws seven cards. You untap up to six lands."
+}

@@ -1,0 +1,32 @@
+# Ashnod's Altar: sacrifice a creature, add {C}{C}. Two Forests and an Avacyn's Pilgrim pay for the Altar, and the
+# Pilgrim is then sacrificed to it.
+
+[Bot1 Deck]
+Forest
+Forest
+Avacyn's Pilgrim
+Ashnod's Altar
+Forest x12
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Avacyn's Pilgrim.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Avacyn's Pilgrim.Activate
+Bot1.Hand.Ashnod's Altar.Cast
+? Stack = Ashnod's Altar
+[T3 Bot1.Main2]
+Bot1.Battlefield.Ashnod's Altar.Activate
+? Bot1.Mana = {C}{C}
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Avacyn's Pilgrim
+Bot1.Battlefield = Forest; Forest; Ashnod's Altar

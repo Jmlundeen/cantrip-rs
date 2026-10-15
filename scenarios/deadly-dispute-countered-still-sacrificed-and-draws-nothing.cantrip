@@ -1,0 +1,37 @@
+# The sacrifice is a cost, paid on announcement (CR 601.2h): Bot2 counters Deadly Dispute with Counterspell (Island and Mox
+# Sapphire), yet the Ornithopter is already in the graveyard, and the spell never resolves: no cards drawn, no Treasure.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Ornithopter
+Deadly Dispute
+Swamp x16
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Island x17
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Deadly Dispute.Cast
+Bot1.Choose(Ornithopter)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Deadly Dispute)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Deadly Dispute; Ornithopter
+Bot1.Battlefield = Swamp; Swamp
+Bot1.Hand.Count = 4

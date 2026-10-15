@@ -1,0 +1,7 @@
+{
+  "name": "Metallic Rebuke",
+  "manaCost": "{2}{U}",
+  "type": "Instant",
+  "oracleText": "Improvise (Your artifacts can help cast this spell. Each artifact you tap after you're done activating mana abilities pays for {1}.)\nCounter target spell unless its controller pays {3}.",
+  "improvise": true
+}

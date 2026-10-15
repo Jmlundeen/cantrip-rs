@@ -1,0 +1,35 @@
+# "Destroy" does nothing to an indestructible permanent (CR 702.12b): Bot2 answers Abrupt Decay by discarding a card for Iron-Shield Elf's indestructibility. The Elf survives
+# (tapped by its own ability) and Abrupt Decay is spent.
+
+[Bot1 Deck]
+Forest
+Mox Jet
+Abrupt Decay
+Forest x12
+
+[Bot2 Deck]
+Island
+Mox Jet
+Iron-Shield Elf
+Island x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Iron-Shield Elf.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Abrupt Decay.Cast(Iron-Shield Elf)
+Bot2.Battlefield.Iron-Shield Elf.Activate
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Abrupt Decay
+Bot2.Battlefield.Iron-Shield Elf.Keywords = Indestructible
+Bot2.Battlefield.Iron-Shield Elf.Tapped = true

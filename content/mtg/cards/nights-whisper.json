@@ -1,0 +1,6 @@
+{
+  "name": "Night's Whisper",
+  "manaCost": "{1}{B}",
+  "type": "Sorcery",
+  "oracleText": "You draw two cards and lose 2 life."
+}

@@ -1,0 +1,49 @@
+# After its third activation (turns 1, 3 and 5) the Bankbuster has no charge counters, and on turn 7 the draw ability is
+# refused though two Islands could pay: removing a counter is a cost. The Pilot it made crews Crew 3 alone ("as though its
+# power were 2 greater": 1 + 2 = 3, CR 702.122), so the Vehicle becomes a creature, attacks as a 4/4, and Bot2 takes 4. The
+# control for the refusal is the draw on turn 5.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Reckoner Bankbuster
+Island
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Reckoner Bankbuster.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Reckoner Bankbuster.Activate(Ability: Draw a card)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Reckoner Bankbuster.Activate(Ability: Draw a card)
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Reckoner Bankbuster.Activate(Ability: Draw a card)
+[T7 Bot1.Main1]
+! Bot1.Battlefield.Reckoner Bankbuster.Activate(Ability: Draw a card)
+Bot1.Battlefield.Reckoner Bankbuster.Activate(Ability: Crew)
+Bot1.Attack(Reckoner Bankbuster > Bot2)
+[T7 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot1.Battlefield.Pilot.Tapped = True

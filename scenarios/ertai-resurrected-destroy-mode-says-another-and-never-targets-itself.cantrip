@@ -1,0 +1,45 @@
+# Ertai Resurrected, second mode: "Destroy ANOTHER target creature or planeswalker". With two Ornithopters of Bot2's as
+# the other creatures on the battlefield, the target question is asked, and `! Bot1.Target(Ertai Resurrected)` checks that
+# Ertai itself is not among the candidates (it is on the battlefield beside them). Bot1 destroys one Ornithopter and Bot2
+# draws; the other and Ertai stay.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Ertai Resurrected
+Island x4
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Plains x5
+Plains x12
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ertai Resurrected.Cast
+Bot1.Modes(2)
+! Bot1.Target(Ertai Resurrected)
+Bot1.Target(Ornithopter)
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot2.Battlefield = Ornithopter
+Bot2.Graveyard = Ornithopter
+Bot2.Hand.Count = 7
+Bot1.Battlefield = Mox Sapphire; Ertai Resurrected

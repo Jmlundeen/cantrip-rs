@@ -1,0 +1,36 @@
+# "The second creature spell you cast this turn" counts spells cast, not spells resolved: the first creature spell is
+# Dazed, and the next one is still the second and brings Vengevine back.
+[Bot1 Deck]
+Vengevine
+Faithless Looting
+Llanowar Elves
+Ignoble Hierarch
+Mox Ruby
+Black Lotus
+Birds of Paradise
+Forest x13
+
+[Bot2 Deck]
+Daze
+Island x19
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Choose(Vengevine; Forest)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Llanowar Elves.Cast
+Bot2.Hand.Daze.Cast(Llanowar Elves; Ability: Return an Island)
+Bot2.Choose(Island)
+Bot1.Hand.Ignoble Hierarch.Cast
+Bot1.Accept
+
+[Expect]
+Bot1.Battlefield.Vengevine.Power = 4
+Bot1.Battlefield.Ignoble Hierarch.Types = Creature
+Bot1.Graveyard = Llanowar Elves; Black Lotus; Faithless Looting; Forest

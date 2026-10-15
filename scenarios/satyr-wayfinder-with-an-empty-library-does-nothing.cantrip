@@ -1,0 +1,23 @@
+# Satyr Wayfinder enters from a seven-card deck, so the library is empty: nothing is revealed, nothing is asked, nothing is milled.
+# Bot1 has not lost (it only loses by drawing).
+
+[Bot1 Deck]
+Black Lotus
+Satyr Wayfinder
+Forest x5
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Satyr Wayfinder.Cast
+Bot1.Pass
+
+[Expect]
+Result = InProgress
+Bot1.Library.Count = 0
+Bot1.Graveyard = Black Lotus
+Bot1.Battlefield.Count = 1

@@ -1,0 +1,37 @@
+# Deathrite Shaman's abilities all need {T}, so a creature that came under its controller's control this turn cannot
+# use them (CR 302.6). Bot2 discards a Forest to hand size on turn 2. On turn 3 Bot1 casts the Shaman and the land
+# ability is refused; on turn 5, the positive control, the same ability is offered and exiles the Forest, and the mana
+# is blue (any color, not only the red the other scenarios choose).
+
+[Bot1 Deck]
+Swamp
+Deathrite Shaman
+Forest
+Swamp
+Forest
+Swamp
+Forest
+Swamp x10
+
+[Bot2 Deck]
+Mountain x7
+Forest
+Mountain x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Deathrite Shaman.Cast
+Bot1.Pass
+! Bot1.Battlefield.Deathrite Shaman.Activate(Ability: land)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Deathrite Shaman.Activate(Bot2.Graveyard.Forest; Ability: land)
+Bot1.Colors(Blue)
+Bot1.Pass
+? Bot1.Mana = {U}
+
+[Expect]
+Exile.Count = 1
+Bot1.Battlefield.Deathrite Shaman.Tapped = true

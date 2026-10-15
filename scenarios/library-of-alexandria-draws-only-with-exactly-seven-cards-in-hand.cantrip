@@ -1,0 +1,23 @@
+# Library of Alexandria: "{T}: Draw a card. Activate only if you have exactly seven cards in hand." After the land play
+# on turn 1 there are six cards in hand, so the draw is not offered; on turn 3, after the draw step, there are seven and
+# it is.
+
+[Bot1 Deck]
+Library of Alexandria
+Plains x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Library of Alexandria.Play
+Bot1.Pass
+! Bot1.Battlefield.Library of Alexandria.Activate(Ability: Draw)
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 7
+Bot1.Battlefield.Library of Alexandria.Activate(Ability: Draw)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 8
+Bot1.Battlefield.Library of Alexandria.Tapped = true

@@ -1,0 +1,58 @@
+# Emeritus of Abundance enters prepared; casting its Regrowth copy on turn 5 unprepares it. Attacking on turn 13 with
+# seven lands does nothing (the intervening "if" fails), and attacking on turn 15 with eight lands makes it prepared again,
+# which puts a new copy of Regrowth in exile.
+
+[Bot1 Deck]
+Forest
+Mox Ruby
+Lightning Bolt
+Emeritus of Abundance
+Forest
+Forest
+Forest
+Forest x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Emeritus of Abundance.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Exile.Regrowth.Cast(Lightning Bolt)
+Bot1.Pass
+[T7 Bot1.Main1]
+? Bot1.Battlefield.Emeritus of Abundance.Prepared = (absent)
+Bot1.Hand.Forest.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T11 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T13 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Attack(Emeritus of Abundance > Bot2)
+[T13 Bot1.Main2]
+? Bot1.Battlefield.Emeritus of Abundance.Prepared = (absent)
+? Exile.Count = 0
+[T15 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Attack(Emeritus of Abundance > Bot2)
+[T15 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Emeritus of Abundance.Prepared = true
+Exile = Regrowth

@@ -1,0 +1,8 @@
+{
+  "name": "Gut, True Soul Zealot",
+  "manaCost": "{2}{R}",
+  "type": "Legendary Creature — Goblin Shaman",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Whenever you attack, you may sacrifice another creature or an artifact. If you do, create a 4/1 black Skeleton creature token with menace that's tapped and attacking.\nChoose a Background"
+}

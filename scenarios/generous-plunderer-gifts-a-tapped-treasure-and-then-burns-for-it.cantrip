@@ -1,0 +1,32 @@
+# Generous Plunderer: at its controller's upkeep they may create a Treasure token, and when they do, target opponent
+# creates a tapped Treasure token. When it attacks it deals damage to the defending player equal to the artifacts they
+# control: on turn 3 Bot2 holds the one gifted Treasure, so Bot2 takes 1 from the trigger and 2 from combat.
+
+[Bot1 Deck]
+Generous Plunderer
+Mox Ruby
+Gleemox
+Island x15
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Blue)
+Bot1.Hand.Generous Plunderer.Cast
+Bot1.Pass
+[T3 Bot1.Upkeep]
+Bot1.Accept
+Bot1.Attack(Generous Plunderer)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Ruby; Gleemox; Generous Plunderer; Treasure Token
+Bot2.Battlefield = Treasure Token
+Bot2.Battlefield.Treasure Token.Tapped = true
+Bot2.Life = 17

@@ -1,0 +1,33 @@
+# The granted keywords do their jobs: the Ornithopter (cast this turn, so it can attack only because of haste) becomes a 2/4 with the two counters, attacks, and deals 2 damage with
+# lifelink (Bot1 gains 2) and stays untapped because of vigilance.
+
+[Bot1 Deck]
+Mountain
+Mox Pearl
+Mox Jet
+Mox Ruby
+Ornithopter
+Angelfire Ignition
+Mountain x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Angelfire Ignition.Cast(Ornithopter)
+Bot1.Pass
+Bot1.Attack(Ornithopter > Bot2)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Life = 22
+Bot1.Battlefield.Ornithopter.Tapped = false

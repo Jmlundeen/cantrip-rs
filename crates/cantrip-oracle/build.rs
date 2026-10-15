@@ -1,0 +1,399 @@
+//! Generates every card's characteristics from `content/<dataset>/cards/*.json` into `$OUT_DIR/generated.rs`: one
+//! `CardDef` constant per card, its characteristics and nothing else (name, cost, colors, types, P/T, loyalty, keywords
+//! that are core keywords, Oracle text), and `PLAIN`, the cards that need no file of their own. A card's file in the
+//! cards crate adds its behavior with struct update syntax: `CardDef { spell: ..., ..oracle::LIGHTNING_BOLT }`.
+//!
+//! Adding a card is adding its JSON; nothing is checked in that this writes. Every subtype a card prints must be in
+//! `cantrip-state/src/subtypes.rs` (rules data, CR 205.3), or the build fails naming the card and the subtype.
+
+use std::collections::HashSet;
+use std::fmt::Write;
+use std::path::{Path, PathBuf};
+
+use serde_json::{Map, Value};
+
+type Card = Map<String, Value>;
+
+const TYPES: [&str; 9] = ["Artifact", "Creature", "Enchantment", "Instant", "Land", "Planeswalker", "Sorcery", "Battle", "Kindred"];
+const BASIC_LAND: [(&str, &str); 5] = [("Plains", "W"), ("Island", "U"), ("Swamp", "B"), ("Mountain", "R"), ("Forest", "G")];
+const KEYWORDS: [&str; 23] = [
+    "Flying", "Haste", "Vigilance", "Trample", "FirstStrike", "DoubleStrike", "Deathtouch", "Lifelink", "Reach", "Defender",
+    "Flash", "Hexproof", "Indestructible", "Menace", "Infect", "Shadow", "Shroud", "CantBeBlocked", "CantBeCountered",
+    "CantSpendManaToCast", "CastFromYourGraveyard", "Daybound", "Nightbound",
+];
+const COLORS: &str = "WUBRG";
+const COLOR_NAMES: [&str; 5] = ["White", "Blue", "Black", "Red", "Green"];
+/// The Oracle words of the core keywords a card can have and still need no file of its own.
+const KEYWORD_WORDS: [&str; 17] = [
+    "flying", "haste", "vigilance", "trample", "first strike", "double strike", "deathtouch", "lifelink", "reach", "defender",
+    "flash", "hexproof", "indestructible", "menace", "infect", "shadow", "shroud",
+];
+
+fn main() {
+    let manifest = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap());
+    let content = manifest.join("../../content");
+    let subtypes_rs = manifest.join("../cantrip-state/src/subtypes.rs");
+    println!("cargo:rerun-if-changed=build.rs");
+    println!("cargo:rerun-if-changed={}", subtypes_rs.display());
+    let known = known_subtypes(&subtypes_rs);
+
+    let mut cards: Vec<(Card, String)> = Vec::new(); // the card, and the file it came from
+    let mut datasets: Vec<PathBuf> = std::fs::read_dir(&content).unwrap().map(|e| e.unwrap().path()).collect();
+    datasets.sort();
+    for dataset in datasets {
+        let folder = dataset.join("cards");
+        if !folder.is_dir() {
+            continue;
+        }
+        println!("cargo:rerun-if-changed={}", folder.display());
+        let mut files: Vec<PathBuf> = std::fs::read_dir(&folder).unwrap().map(|e| e.unwrap().path()).collect();
+        files.sort();
+        for file in files {
+            if file.extension().and_then(|e| e.to_str()) != Some("json") {
+                continue;
+            }
+            println!("cargo:rerun-if-changed={}", file.display());
+            let source = file.file_name().unwrap().to_string_lossy().into_owned();
+            let text = std::fs::read_to_string(&file).unwrap();
+            let text = text.strip_prefix('\u{feff}').unwrap_or(&text);
+            let mut card: Card = match serde_json::from_str(text) {
+                Ok(Value::Object(m)) => m,
+                Ok(_) => panic!("{source}: a card is a JSON object"),
+                Err(e) => panic!("{source}: {e}"),
+            };
+            if let Some(halves) = card.get("halves").and_then(Value::as_array).filter(|h| h.len() == 2).cloned() {
+                // A split card (CR 709): each half is a constant of its own, which the card's file points `split:` at,
+                // and the card is both halves at once in every zone but the stack (CR 709.4): their costs added, their
+                // types together.
+                let halves: Vec<&Card> = halves.iter().map(|h| h.as_object().expect("a half is an object")).collect();
+                for half in &halves {
+                    let mut part = pick(half, &["name", "manaCost", "type", "oracleText"]);
+                    part.insert("part".into(), Value::Bool(true));
+                    if half.get("aftermath") == Some(&Value::Bool(true)) {
+                        part.insert("aftermath".into(), Value::Bool(true));
+                    }
+                    cards.push((part, source.clone()));
+                }
+                let mut words: Vec<String> = Vec::new();
+                for h in &halves {
+                    for w in split_type(&str_of(h, "type")).0 {
+                        if !words.contains(&w) {
+                            words.push(w);
+                        }
+                    }
+                }
+                let mut combined = Card::new();
+                combined.insert("name".into(), card["name"].clone());
+                combined.insert("manaCost".into(), Value::String(halves.iter().map(|h| str_of(h, "manaCost")).collect()));
+                combined.insert("type".into(), Value::String(words.join(" ")));
+                combined.insert("oracleText".into(), Value::String(halves.iter().map(|h| str_of(h, "oracleText")).collect::<Vec<_>>().join("\n//\n")));
+                combined.insert("split".into(), Value::Bool(true));
+                card = combined;
+            }
+            // An Adventure (CR 715) is a second set of characteristics: its own constant, which the card's file points
+            // `adventure:` at.
+            let adventure = card.get("adventure").and_then(Value::as_object).map(|a| {
+                let mut part = pick(a, &["name", "manaCost", "type", "oracleText"]);
+                part.insert("part".into(), Value::Bool(true));
+                part
+            });
+            cards.push((card, source.clone()));
+            if let Some(part) = adventure {
+                cards.push((part, source));
+            }
+        }
+    }
+
+    let mut out = String::new();
+    out.push_str("// Characteristics of every card in content/, generated by crates/cantrip-oracle/build.rs.\n\nuse cantrip_api::*;\n\n");
+    let mut names: HashSet<String> = HashSet::new();
+    let mut plain: Vec<String> = Vec::new();
+    let mut order: Vec<usize> = (0..cards.len()).collect();
+    order.sort_by(|&a, &b| str_of(&cards[a].0, "name").cmp(&str_of(&cards[b].0, "name")));
+    for i in order {
+        let (card, source) = &cards[i];
+        let name = str_of(card, "name");
+        let konst = ident(&name);
+        if !names.insert(konst.clone()) {
+            continue;
+        }
+        let fields = match face_fields(card, false, source, &known) {
+            Ok(f) => f,
+            Err(e) => {
+                println!("cargo:warning=skipped {name}: {e}");
+                continue;
+            }
+        };
+        if is_plain(card) {
+            plain.push(konst.clone());
+        }
+        // The back face of a double-faced card (CR 711.1) is a constant of its own, which the front refers to.
+        if let Some(back) = card.get("backFace").and_then(Value::as_object) {
+            let back_const = ident(&str_of(back, "name"));
+            if names.insert(back_const.clone()) {
+                let back_fields = face_fields(back, true, source, &known).unwrap_or_else(|e| panic!("{source}: back face: {e}"));
+                emit(&mut out, &back_const, &back_fields);
+            }
+        }
+        emit(&mut out, &konst, &fields);
+    }
+    out.push_str("/// The cards that are their characteristics and nothing more: keywords the core plays, a basic land type's mana\n");
+    out.push_str("/// (CR 305.6). Registered as they are unless a card file says more.\npub static PLAIN: &[&CardDef] = &[\n");
+    for c in &plain {
+        writeln!(out, "    &{c},").unwrap();
+    }
+    out.push_str("];\n");
+    std::fs::write(Path::new(&std::env::var("OUT_DIR").unwrap()).join("generated.rs"), out).unwrap();
+}
+
+fn emit(out: &mut String, konst: &str, fields: &[String]) {
+    writeln!(out, "pub const {konst}: CardDef = CardDef {{").unwrap();
+    for f in fields {
+        writeln!(out, "{f}").unwrap();
+    }
+    out.push_str("    ..CardDef::BLANK\n};\n\n");
+}
+
+fn pick(from: &Card, keys: &[&str]) -> Card {
+    keys.iter().filter_map(|k| from.get(*k).map(|v| (k.to_string(), v.clone()))).collect()
+}
+
+fn str_of(card: &Card, key: &str) -> String {
+    card.get(key).and_then(Value::as_str).unwrap_or("").to_string()
+}
+
+/// The names the `Subtype` enum has, read from its `name()` arms.
+fn known_subtypes(path: &Path) -> HashSet<String> {
+    let text = std::fs::read_to_string(path).unwrap();
+    let mut known = HashSet::new();
+    for line in text.lines() {
+        if let Some(rest) = line.trim().strip_prefix("Subtype::") {
+            if let Some((_, name)) = rest.split_once(" => \"") {
+                if let Some(name) = name.strip_suffix("\",") {
+                    known.insert(name.to_string());
+                }
+            }
+        }
+    }
+    assert!(!known.is_empty(), "no subtypes read from {}", path.display());
+    known
+}
+
+fn ident(name: &str) -> String {
+    let mut s = String::new();
+    let mut pending = false;
+    for c in name.replace('\'', "").chars() {
+        if c.is_ascii_alphanumeric() {
+            if pending && !s.is_empty() {
+                s.push('_');
+            }
+            pending = false;
+            s.push(c.to_ascii_uppercase());
+        } else {
+            pending = true;
+        }
+    }
+    if s.starts_with(|c: char| c.is_ascii_digit()) { format!("_{s}") } else { s }
+}
+
+fn subtype_ident(name: &str) -> String {
+    name.chars().filter(|c| c.is_ascii_alphanumeric()).collect()
+}
+
+fn rust_str(s: &str) -> String {
+    let mut out = String::from("\"");
+    for c in s.chars() {
+        match c {
+            '"' => out.push_str("\\\""),
+            '\\' => out.push_str("\\\\"),
+            '\n' => out.push_str("\\n"),
+            '\r' => out.push_str("\\r"),
+            '\t' => out.push_str("\\t"),
+            c if (c as u32) < 0x20 => write!(out, "\\u{{{:04x}}}", c as u32).unwrap(),
+            c => out.push(c),
+        }
+    }
+    out.push('"');
+    out
+}
+
+fn cost(text: &str) -> Result<String, String> {
+    let (mut generic, mut x) = (0u32, 0u32);
+    let mut symbols = [0u32; 6];
+    let mut hybrid: Vec<(char, char)> = Vec::new();
+    let mut phyrexian = [0u32; 5];
+    let mut rest = text;
+    while let Some(open) = rest.find('{') {
+        let Some(close) = rest[open..].find('}') else { break };
+        let sym = &rest[open + 1..open + close];
+        rest = &rest[open + close + 1..];
+        let cs: Vec<char> = sym.chars().collect();
+        let color = |c: char| COLORS.find(c);
+        if !sym.is_empty() && sym.chars().all(|c| c.is_ascii_digit()) {
+            generic += sym.parse::<u32>().unwrap();
+        } else if sym == "X" {
+            x += 1;
+        } else if cs.len() == 1 && color(cs[0]).is_some() {
+            symbols[color(cs[0]).unwrap()] += 1;
+        } else if sym == "C" {
+            symbols[5] += 1;
+        } else if cs.len() == 3 && color(cs[0]).is_some() && cs[1] == '/' && cs[2] == 'P' {
+            phyrexian[color(cs[0]).unwrap()] += 1;
+        } else if cs.len() == 3 && color(cs[0]).is_some() && cs[1] == '/' && color(cs[2]).is_some() {
+            hybrid.push((cs[0], cs[2]));
+        } else {
+            return Err(format!("mana symbol {{{sym}}}"));
+        }
+    }
+    if hybrid.len() > 6 {
+        return Err("more than six hybrid symbols".into());
+    }
+    let mut slots: Vec<String> = hybrid.iter().map(|(a, b)| format!("Some((Mana::{a}, Mana::{b}))")).collect();
+    slots.resize(6, "None".into());
+    Ok(format!(
+        "ManaCost {{ generic: {generic}, symbols: {symbols:?}, hybrid: [{}], phyrexian: {phyrexian:?}, x: {x} }}",
+        slots.join(", ")
+    ))
+}
+
+/// A type line split at its first dash into the card types and supertypes, and the subtypes.
+fn split_type(line: &str) -> (Vec<String>, Vec<String>) {
+    let chars: Vec<(usize, char)> = line.char_indices().collect();
+    let mut split = None;
+    for (n, &(at, c)) in chars.iter().enumerate() {
+        if !c.is_whitespace() {
+            continue;
+        }
+        let mut j = n;
+        while j < chars.len() && chars[j].1.is_whitespace() {
+            j += 1;
+        }
+        if j + 1 < chars.len() && (chars[j].1 == '\u{2014}' || chars[j].1 == '-') && chars[j + 1].1.is_whitespace() {
+            let mut k = j + 1;
+            while k < chars.len() && chars[k].1.is_whitespace() {
+                k += 1;
+            }
+            split = Some((at, chars.get(k).map_or(line.len(), |c| c.0)));
+            break;
+        }
+    }
+    let words = |s: &str| s.split_whitespace().map(str::to_string).collect::<Vec<_>>();
+    match split {
+        Some((a, b)) => (words(&line[..a]), words(&line[b..])),
+        None => (words(line), Vec::new()),
+    }
+}
+
+fn is_plain(card: &Card) -> bool {
+    if card.get("part") == Some(&Value::Bool(true)) {
+        return true;
+    }
+    if ["backFace", "adventure", "prepare", "halves", "split"].iter().any(|k| card.contains_key(*k)) {
+        return false;
+    }
+    let mut text = String::new();
+    let mut in_reminder = false;
+    for c in str_of(card, "oracleText").chars() {
+        match c {
+            '(' if !in_reminder => in_reminder = true,
+            ')' if in_reminder => in_reminder = false,
+            _ if in_reminder => {}
+            c => text.push(c),
+        }
+    }
+    text.split('\n')
+        .filter(|l| !l.trim().is_empty())
+        .all(|line| line.split(',').all(|part| KEYWORD_WORDS.contains(&part.trim().to_lowercase().as_str())))
+}
+
+/// The `CardDef` fields of one face: a card, or the back face of a double-faced card (CR 711).
+fn face_fields(card: &Card, is_back: bool, source: &str, known: &HashSet<String>) -> Result<Vec<String>, String> {
+    let name = str_of(card, "name");
+    let mana = match card.get("manaCost").and_then(Value::as_str) {
+        Some(t) => Some(cost(t)?),
+        None => None,
+    };
+    let (words, subs) = split_type(&str_of(card, "type"));
+    for s in &subs {
+        if !known.contains(s) {
+            panic!("{source}: {name} has the subtype {s}, which is not in cantrip-state/src/subtypes.rs (CR 205.3); add it there");
+        }
+    }
+    let types: Vec<String> = words.iter().filter(|w| TYPES.contains(&w.as_str())).map(|t| format!("CardType::{t}")).collect();
+    let has = |w: &str| words.iter().any(|x| x == w);
+    let keywords: Vec<String> = card
+        .get("keywords")
+        .and_then(Value::as_array)
+        .into_iter()
+        .flatten()
+        .filter_map(Value::as_str)
+        .filter(|k| KEYWORDS.contains(k))
+        .map(|k| format!("Keyword::{k}"))
+        .collect();
+    let mut fields = vec![format!("    name: {},", rust_str(&name))];
+    match mana {
+        Some(m) => fields.push(format!("    cost: {m},")),
+        None => fields.push("    has_cost: false,".into()),
+    }
+    // A color indicator (CR 204) defines the colors of a face; otherwise they follow its mana cost.
+    let indicator: Vec<usize> = card
+        .get("colorIndicator")
+        .and_then(Value::as_array)
+        .into_iter()
+        .flatten()
+        .filter_map(Value::as_str)
+        .filter_map(|c| COLOR_NAMES.iter().position(|n| *n == c))
+        .collect();
+    if !indicator.is_empty() {
+        fields.push(format!("    colors: Some(ColorSet({})),", indicator.iter().fold(0u32, |a, i| a | 1 << i)));
+    }
+    fields.push(format!("    types: TypeSet::of(&[{}]),", types.join(", ")));
+    let (basic, legendary, snow) = (has("Basic"), has("Legendary"), has("Snow"));
+    if basic || legendary || snow {
+        fields.push(format!("    supertypes: Supertypes {{ basic: {basic}, legendary: {legendary}, snow: {snow} }},"));
+    }
+    if !subs.is_empty() {
+        let list: Vec<String> = subs.iter().map(|s| format!("Subtype::{}", subtype_ident(s))).collect();
+        fields.push(format!("    subtypes: SubtypeSet::of(&[{}]),", list.join(", ")));
+    }
+    for key in ["power", "toughness", "loyalty", "defense"] {
+        match card.get(key) {
+            None | Some(Value::Null) => {}
+            Some(Value::Number(n)) if n.is_i64() => fields.push(format!("    {key}: Some({}),", n.as_i64().unwrap())),
+            Some(Value::String(s)) if !s.trim_start_matches('-').is_empty() && s.trim_start_matches('-').chars().all(|c| c.is_ascii_digit()) => {
+                fields.push(format!("    {key}: Some({}),", s.parse::<i64>().unwrap()))
+            }
+            Some(_) => fields.push(format!("    {key}: Some(0),")),
+        }
+    }
+    if !keywords.is_empty() {
+        fields.push(format!("    keywords: Keywords::of(&[{}]),", keywords.join(", ")));
+    }
+    // Convoke, delve and improvise (CR 702.51, 702.66, 702.126): what else may pay the total cost.
+    let flag = |k: &str| card.get(k) == Some(&Value::Bool(true));
+    if flag("convoke") || flag("delve") || flag("improvise") {
+        fields.push(format!(
+            "    pay_with: PayWith {{ convoke: {}, delve: {}, improvise: {} }},",
+            flag("convoke"),
+            flag("delve"),
+            flag("improvise")
+        ));
+    }
+    if flag("aftermath") {
+        fields.push("    aftermath: true,".into());
+    }
+    if !is_back {
+        if let Some(back) = card.get("backFace").and_then(Value::as_object) {
+            fields.push(format!("    back: Some(&{}),", ident(&str_of(back, "name"))));
+            if flag("backFacePlayableAsLand") {
+                fields.push("    back_land: true,".into());
+            }
+        }
+    }
+    let basics: Vec<String> = subs.iter().filter_map(|s| BASIC_LAND.iter().find(|(n, _)| n == s)).map(|(_, m)| format!("Mana::{m}")).collect();
+    if !basics.is_empty() {
+        fields.push(format!("    basic_land_types: &[{}],", basics.join(", ")));
+    }
+    fields.push(format!("    text: {},", rust_str(&str_of(card, "oracleText"))));
+    Ok(fields)
+}

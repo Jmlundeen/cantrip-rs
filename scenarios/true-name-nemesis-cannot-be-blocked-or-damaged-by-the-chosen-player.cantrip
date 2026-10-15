@@ -1,0 +1,75 @@
+# Bot1 casts True-Name Nemesis on turn one and chooses Bot2, so it has protection from Bot2 (CR 702.16).
+#
+# Turn four: Bot2's Fiery Confluence deals 1 damage to each creature and 2 to each opponent twice. Both Guerrilla Gorillas
+# take their 1, but the damage to the Nemesis, from a source Bot2 controls, is prevented (702.16e), so the 3/1 lives.
+# Bot2 then attacks with a Gorilla and the Nemesis blocks it: the Gorilla's combat damage is prevented too, and the Nemesis
+# kills it.
+# Turn five: the Nemesis and Bot1's own Gorilla attack. Bot2's untapped Gorilla may block Bot1's Gorilla, but not the Nemesis
+# (702.16f); Bot2 blocks nothing and takes 5. (Bot1's Gorilla is there so Bot2 is asked to block at all; with only the
+# Nemesis attacking there is no legal block and no question.) Scripts are two-seat, so a third player's creatures
+# blocking it is not covered here.
+
+[Bot1 Deck]
+Island
+Black Lotus
+True-Name Nemesis
+Forest
+Guerrilla Gorilla
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Forest
+Black Lotus
+Black Lotus
+Guerrilla Gorilla
+Guerrilla Gorilla
+Fiery Confluence
+Mountain
+Mountain x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.True-Name Nemesis.Cast
+Bot1.ChoosePlayer(Bot2)
+Bot2.Hand.Forest.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot2.Hand.Guerrilla Gorilla.Cast
+Bot2.Hand.Guerrilla Gorilla.Cast
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Fiery Confluence.Cast
+Bot2.Modes(1; 2; 2)
+[T4 Bot2.BeginCombat]
+? Bot2.Battlefield.Guerrilla Gorilla#1.Damage = 1
+? Bot1.Battlefield.Guerrilla Gorilla.Damage = 1
+? Bot1.Battlefield.True-Name Nemesis.Damage = 0
+? Bot1.Life = 16
+Bot2.Attack(Guerrilla Gorilla)
+Bot1.Block(True-Name Nemesis > Guerrilla Gorilla)
+[T4 Bot2.Main2]
+? Bot1.Battlefield.True-Name Nemesis.Damage = 0
+? Bot2.Battlefield.Guerrilla Gorilla.Damage = 1
+Bot1.Attack(True-Name Nemesis; Guerrilla Gorilla)
+! Bot2.Block(Guerrilla Gorilla > True-Name Nemesis)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Island; Forest; True-Name Nemesis; Guerrilla Gorilla
+Bot2.Battlefield = Forest; Mountain; Guerrilla Gorilla
+Bot2.Graveyard = Guerrilla Gorilla; Fiery Confluence; Black Lotus; Black Lotus
+Bot1.Life = 16
+Bot2.Life = 15

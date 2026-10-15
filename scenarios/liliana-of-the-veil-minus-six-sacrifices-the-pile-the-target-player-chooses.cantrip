@@ -1,0 +1,53 @@
+# Liliana of the Veil's −6: "Separate all permanents target player controls into two piles. That player sacrifices all
+# permanents in the pile of their choice." Liliana climbs to 6 with three +1s, then Bot1 puts Bot2's two creatures in
+# the first pile, which leaves its two Forests as the second (CR 700.3: only the target's permanents are separated, and
+# every one of them is in a pile). Bot2 chooses the first pile and sacrifices both creatures together; its lands stay,
+# and Liliana, at 0 loyalty, goes to the graveyard (CR 704.5i).
+
+[Bot1 Deck]
+Swamp x3
+Liliana of the Veil
+Island x20
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest
+Guerrilla Gorilla
+Forest x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest#1.Activate
+Bot2.Battlefield.Forest#2.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Swamp#3.Activate
+Bot1.Hand.Liliana of the Veil.Cast
+Bot1.Battlefield.Liliana of the Veil.Activate(Ability: Each player)
+[T7 Bot1.Main1]
+Bot1.Battlefield.Liliana of the Veil.Activate(Ability: Each player)
+[T9 Bot1.Main1]
+Bot1.Battlefield.Liliana of the Veil.Activate(Ability: Each player)
+[T11 Bot1.Main1]
+? Bot1.Battlefield.Liliana of the Veil.Counters.Loyalty = 6
+Bot1.Battlefield.Liliana of the Veil.Activate(Bot2; Ability: Separate)
+Bot1.Target(Bot2.Battlefield.Llanowar Elves; Bot2.Battlefield.Guerrilla Gorilla)
+Bot2.Modes(First pile)
+
+[Expect]
+Turn = 11
+Stack.Count = 0
+Bot1.Battlefield = Swamp; Swamp; Swamp
+Bot2.Battlefield = Forest; Forest
+Bot2.Battlefield.Count = 2

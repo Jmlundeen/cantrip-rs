@@ -1,0 +1,62 @@
+# Baloth Prime enters tapped with six stun counters (CR 122.1d). On turn 2 Bot2 cracks its own fetchland: that is an
+# opponent sacrificing a land, so nothing triggers. Bot1's untap step on turn 3 takes a stun counter off instead of
+# untapping it (6 -> 5). Bot1 then sacrifices Misty Rainforest to its own ability, which triggers Baloth Prime: a tapped
+# 4/4 Beast, and "untap this creature" takes off another counter (4). Baloth's own "{4}, Sacrifice a land" gains 2 life
+# and triggers it again (3), with a second tapped Beast. Life: 20 - 1 (fetch) + 2 = 21.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Mox Ruby
+Baloth Prime
+Misty Rainforest
+Plains
+Forest x6
+
+[Bot2 Deck]
+Misty Rainforest
+Island x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Baloth Prime.Cast
+Bot2.Hand.Misty Rainforest.Play
+? Bot1.Battlefield.Baloth Prime.Counters.Stun = 6
+? Bot1.Battlefield.Baloth Prime.Tapped = true
+Bot2.Battlefield.Misty Rainforest.Activate
+Bot2.Search(Island)
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Baloth Prime.Counters.Stun = 5
+? Bot1.Battlefield.Baloth Prime.Tapped = true
+? Bot1.Battlefield.Count = 5
+Bot1.Hand.Misty Rainforest.Play
+Bot1.Battlefield.Misty Rainforest.Activate
+Bot1.Search(Forest)
+? Bot1.Battlefield.Baloth Prime.Counters.Stun = 4
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Baloth Prime.Activate
+Bot1.Choose(Forest)
+
+[Expect]
+Turn = 3
+Bot1.Life = 21
+Bot2.Life = 19
+Bot2.Battlefield = Island
+Bot1.Battlefield = Forest; Mox Emerald; Mox Pearl; Mox Ruby; Baloth Prime; Beast; Beast
+Bot1.Battlefield.Baloth Prime.Counters.Stun = 3
+Bot1.Battlefield.Baloth Prime.Tapped = true
+Bot1.Battlefield.Beast#1.Tapped = true
+Bot1.Battlefield.Beast#2.Tapped = true
+Bot1.Battlefield.Beast#2.Power = 4
+Bot1.Hand = Plains; Forest

@@ -1,0 +1,22 @@
+# Raffine's Tower is a Plains Island Swamp, so it taps for {W}, {U} or {B}, and it enters tapped: Bot1 cannot use it on
+# the turn it is played, and on the next turn taps it for {B}.
+
+[Bot1 Deck]
+Raffine's Tower
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Raffine's Tower.Play
+! Bot1.Battlefield.Raffine's Tower.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Raffine's Tower.Activate(Ability: {B})
+? Bot1.Mana = {B}
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Raffine's Tower.Types = Land
+Bot1.Battlefield.Raffine's Tower.Subtypes = Island; Plains; Swamp
+Bot1.Battlefield.Raffine's Tower.Tapped = true

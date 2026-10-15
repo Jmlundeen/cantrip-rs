@@ -1,0 +1,52 @@
+# Cori-Steel Cutter, played for real. Turn 5 Bot1 equips the Goblin at sorcery speed and it becomes a 2/2 with trample
+# and haste. Turn 7 Bot1 casts two spells: the second is flurry's, so a 1/1 white Monk with prowess arrives and Bot1
+# accepts the offer to move the Equipment onto it — which leaves the Goblin its printed 1/1 and makes the Monk a 2/2.
+
+[Bot1 Deck]
+Mountain
+Goblin Welder
+Mountain
+Cori-Steel Cutter
+Mountain
+Lightning Bolt
+Pyrite Spellbomb
+Mountain x11
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Goblin Welder.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Cori-Steel Cutter.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Cori-Steel Cutter.Activate(Goblin Welder)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Cori-Steel Cutter.AttachedTo = Goblin Welder
+? Bot1.Battlefield.Goblin Welder.Power = 2
+? Bot1.Battlefield.Goblin Welder.Keywords = Haste; Trample
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Hand.Pyrite Spellbomb.Cast
+Bot1.Accept
+
+[Expect]
+Turn = 7
+Bot1.Battlefield = Mountain; Mountain; Mountain; Goblin Welder; Cori-Steel Cutter; Pyrite Spellbomb; Monk
+Bot1.Battlefield.Cori-Steel Cutter.AttachedTo = Monk
+Bot1.Battlefield.Monk.Power = 2
+Bot1.Battlefield.Monk.Toughness = 2
+Bot1.Battlefield.Goblin Welder.Power = 1
+Bot1.Graveyard = Lightning Bolt
+Bot2.Life = 17
+Stack.Count = 0

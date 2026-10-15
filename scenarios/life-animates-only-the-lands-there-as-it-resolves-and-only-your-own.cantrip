@@ -1,0 +1,41 @@
+# Life (half of Life // Death): "All lands you control become 1/1 creatures until end of turn. They're still lands." The set of
+# lands is fixed as it resolves (CR 611.2c): a Forest played afterwards is only a land, and Bot2's Island, which Bot1 does
+# not control, is untouched. The Forest in play since turn 3 attacks as a creature (it has been under Bot1's control since
+# the start of the turn) and deals 1, and the effect has ended by Bot1's next turn.
+
+[Bot1 Deck]
+Forest
+Forest
+Life // Death
+Forest
+Forest
+Forest
+Forest
+Forest x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Hand.Life // Death.Cast(Ability: Life)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Forest.Play
+? Bot1.Battlefield.Forest#3.Types = Land
+? Bot2.Battlefield.Island.Types = Land
+Bot1.Attack(Forest#2 > Bot2)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Forest#2.Types = Land; Creature
+? Bot2.Life = 19
+[T7 Bot1.Main1]
+? Bot1.Battlefield.Forest#2.Types = Land
+
+[Expect]
+Bot2.Life = 19

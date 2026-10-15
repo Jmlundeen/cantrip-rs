@@ -1,0 +1,6 @@
+{
+  "name": "Urza's Bauble",
+  "manaCost": "{0}",
+  "type": "Artifact",
+  "oracleText": "{T}, Sacrifice this artifact: Look at a card at random in target player's hand. You draw a card at the beginning of the next turn's upkeep."
+}

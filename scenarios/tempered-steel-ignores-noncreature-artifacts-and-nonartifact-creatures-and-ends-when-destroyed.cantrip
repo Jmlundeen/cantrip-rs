@@ -1,0 +1,47 @@
+# "Artifact creatures you control" needs both types: Mother of Runes (a creature, not an artifact) stays a 1/1 and a Mox Pearl (an
+# artifact, not a creature) gets nothing, while the Ornithopter is a 2/4. When Bot2's Disenchant destroys the Tempered Steel on turn
+# two, the Ornithopter is a 0/2 again.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Pearl
+Mox Jet
+Tempered Steel
+Ornithopter
+Mother of Runes
+Plains x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Disenchant
+Plains x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Hand.Mother of Runes.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tempered Steel.Cast
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Ornithopter.Power = 2
+? Bot1.Battlefield.Mother of Runes.Power = 1
+? Bot1.Battlefield.Mox Pearl#1.Types = Artifact
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Disenchant.Cast(Tempered Steel)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot1.Graveyard = Tempered Steel

@@ -1,0 +1,81 @@
+# Decaying Soil with threshold (Brain Freeze with storm 6 on Bot1 on turn 1). On turn 4 Bot2 Lightning Bolts Bot1's
+# Ornithopter and the Soil's trigger goes on the stack; in response Bot2's Deathrite Shaman exiles the Ornithopter card
+# from the graveyard. When the trigger resolves Bot1 is still offered to pay {1} (the card's text asks nothing about
+# where the card is) and pays it, but "that card" is no longer in the graveyard -- the one in exile is a new object
+# (CR 400.7) -- so it is not returned: Bot1's hand stays empty and the Ornithopter stays in exile (beside the Island the Soil's upkeep trigger exiled on turn 3).
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Ruby
+Decaying Soil
+Mox Sapphire
+Mox Emerald
+Brain Freeze
+Island x21
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Forest
+Deathrite Shaman
+Mox Ruby
+Lightning Bolt
+Forest
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Decaying Soil.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Brain Freeze.Cast(Bot1)
+Bot1.Pass
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Deathrite Shaman.Cast
+Bot2.Pass
+[T3 Bot1.Upkeep]
+Bot1.Choose(Island)
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 1
+Bot2.Battlefield.Forest#1.Activate
+Bot2.Battlefield.Deathrite Shaman.Activate(Bot1.Graveyard.Ornithopter; Ability: creature)
+Bot2.Pass
+Bot1.Pass
+? Exile = Island; Ornithopter
+? Stack.Count = 1
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.PayCost
+[T4 Bot2.Main2]
+
+[Expect]
+Stack.Count = 0
+Exile = Island; Ornithopter
+Bot1.Hand.Count = 0
+Bot1.Battlefield.Mox Ruby.Tapped = true
+Bot2.Life = 22

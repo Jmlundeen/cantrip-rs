@@ -1,0 +1,31 @@
+# "Under your control": Bot1 reanimates Bot2's Elvish Mystic (discarded to hand size, the card in Bot2's graveyard), losing 1 life. It is Bot1's creature while it lives, and when Bot1 kills it with Lightning Bolt it is put into its owner's
+# graveyard (CR 400.3), Bot2's, not Bot1's.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Reanimate
+Lightning Bolt
+Island x13
+
+[Bot2 Deck]
+Island x7
+Elvish Mystic
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Reanimate.Cast(Bot2.Graveyard.Elvish Mystic)
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Elvish Mystic)
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 19
+Bot2.Graveyard = Elvish Mystic
+Bot1.Graveyard = Lightning Bolt; Reanimate

@@ -1,0 +1,36 @@
+# Minsc & Boo +1: "Put three +1/+1 counters on up to one target creature with trample or haste." The Ornithopter has neither, so
+# it is not a target (the refusal, naming it); Boo has both (the positive control). The zero-target case is in
+# minsc-and-boo-plus-one-with-no-target-only-raises-loyalty.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Mox Jet
+Mox Pearl
+Minsc & Boo, Timeless Heroes
+Ornithopter
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Minsc & Boo, Timeless Heroes.Cast
+Bot1.Accept
+[Bot1.Main1]
+! Bot1.Battlefield.Minsc & Boo, Timeless Heroes.Activate(Ability: Put three; Ornithopter)
+Bot1.Battlefield.Minsc & Boo, Timeless Heroes.Activate(Ability: Put three; Bot1.Battlefield.Boo)
+
+[Expect]
+Bot1.Battlefield.Boo.Power = 4
+Bot1.Battlefield.Ornithopter.Power = 0

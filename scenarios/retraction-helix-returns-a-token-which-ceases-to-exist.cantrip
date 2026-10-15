@@ -1,0 +1,41 @@
+# The granted ability returns "target nonland permanent to its owner's hand" (CR 111.7): Get Lost destroys Bot2's Ornithopter and
+# Bot2 gets two Map tokens; on the same turn Bot1's Retraction Helix gives its Ornithopter (cast on turn 1, no longer summoning sick)
+# the ability and it returns one Map. A token that leaves the battlefield ceases to exist (CR 111.7), so it is not in Bot2's hand: the
+# hand stays at 7 and one Map remains.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Sapphire
+Ornithopter
+Get Lost
+Retraction Helix
+Plains
+Plains x10
+
+[Bot2 Deck]
+Ornithopter
+Island x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Get Lost.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Retraction Helix.Cast(Ornithopter)
+Bot1.Pass
+Bot1.Battlefield.Ornithopter.Activate(Bot2.Battlefield.Map Token#1)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Hand.Count = 7
+Bot2.Battlefield = Map Token
+Bot2.Graveyard = Ornithopter

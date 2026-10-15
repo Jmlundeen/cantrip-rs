@@ -1,0 +1,6 @@
+{
+  "name": "Voltaic Key",
+  "manaCost": "{1}",
+  "type": "Artifact",
+  "oracleText": "{1}, {T}: Untap target artifact."
+}

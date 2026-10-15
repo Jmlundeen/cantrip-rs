@@ -1,0 +1,48 @@
+# All Aboard is an instant: with Bot2's Lightning Bolt on the stack at Bot1's Ornithopter, Bot1 casts the prepared copy
+# in Bot2's turn and blinks the Ornithopter. The one that returns is a new object (CR 400.7), so the Bolt's only target
+# is gone and it does not resolve (CR 608.2b); the Ornithopter lives, undamaged.
+
+[Bot1 Deck]
+Ornithopter
+Island x5
+Skycoach Conductor
+Island x13
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Ornithopter.Cast
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Skycoach Conductor.Cast
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+? Bot1.Battlefield.Skycoach Conductor.Prepared = true
+[T8 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+? Stack = Lightning Bolt
+Bot1.Battlefield.Island.Activate
+Bot1.Exile.All Aboard.Cast(Bot1.Battlefield.Ornithopter)
+? Stack = All Aboard; Lightning Bolt
+[T8 Bot2.Main2]
+
+[Expect]
+Turn = 8
+Stack.Count = 0
+Exile.Count = 0
+Bot1.Battlefield = Island; Island; Island; Island; Ornithopter; Skycoach Conductor
+Bot1.Battlefield.Ornithopter.Damage = 0
+Bot1.Battlefield.Skycoach Conductor.Prepared = (absent)
+Bot1.Graveyard.Count = 0
+Bot2.Graveyard = Lightning Bolt; Mountain; Mountain

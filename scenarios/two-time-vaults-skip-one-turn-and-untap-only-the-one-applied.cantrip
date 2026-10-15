@@ -1,0 +1,38 @@
+# Two Time Vaults, both tapped as Bot1's turn 3 would begin: each is a replacement of the same event, and once the turn is skipped (CR
+# 614.10, 616.1) the other has nothing left to replace. Bot1 skips once and untaps one Vault; the other stays tapped, and no second
+# question is asked. Bot2's turn 3 follows (the turn Bot1 skipped is not taken) and Bot1's next turn is 4.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Time Vault
+Time Vault
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Time Vault.Cast
+Bot1.Hand.Time Vault.Cast
+Bot1.Accept
+! Bot1.Accept
+[T3 Bot2.Main1]
+? Turn = 3
+? Bot1.Battlefield.Time Vault#1.Tapped = false
+? Bot1.Battlefield.Time Vault#2.Tapped = true
+[T4 Bot1.Main1]
+
+[Expect]
+Turn = 4
+ActivePlayer = Bot1

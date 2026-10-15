@@ -1,0 +1,43 @@
+# The One Ring: "When The One Ring enters, if you cast it" (CR 603.4). Bot1 puts it onto the battlefield with Show and Tell
+# instead of casting it, so the trigger does not happen and Bot1 has no protection: Bot2's Lightning Bolt on turn 2 hits it for
+# 3 (the cast Ring of the neighbouring scenario protects from everything). The Ring still enters, indestructible.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Sapphire
+Show and Tell
+The One Ring
+Island x13
+
+[Bot2 Deck]
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Mountain
+Mountain x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(The One Ring)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 17
+Bot1.Battlefield.The One Ring.Keywords = Indestructible

@@ -1,0 +1,44 @@
+# Bow of Nylea: "Attacking creatures you control have deathtouch." A 1/1 Llanowar Elves attacking on turn 3 deals one
+# damage to the Ornithopter (0/2) that blocks it, and deathtouch is enough to destroy it. It has no deathtouch off the
+# attack (the Keywords key is absent after combat).
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Emerald
+Llanowar Elves
+Bow of Nylea
+Forest
+Forest
+Forest x12
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Bow of Nylea.Cast
+Bot1.Pass
+Bot1.Attack(Llanowar Elves > Bot2)
+Bot2.Block(Ornithopter > Llanowar Elves)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Ornithopter
+Bot1.Battlefield.Llanowar Elves.Damage = 0
+Bot1.Battlefield.Llanowar Elves.Keywords = (absent)

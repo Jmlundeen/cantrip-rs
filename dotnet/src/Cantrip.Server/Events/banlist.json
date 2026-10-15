@@ -1,0 +1,8 @@
+{
+  // Cards kept out of a draft format's cube because they do nothing there, by format (DraftFormats). A banned card is
+  // left out when the draft is dealt, as a card that is not loaded is.
+
+  // Cogwork Librarian's draft ability swaps it into a pack being passed; a Winston pile and a grid are not passed.
+  "winston": [ "Cogwork Librarian" ],
+  "grid": [ "Cogwork Librarian" ]
+}

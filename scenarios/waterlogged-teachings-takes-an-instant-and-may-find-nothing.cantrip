@@ -1,0 +1,42 @@
+# "An instant card or a card with flash": the instant branch (the existing scenario takes a flash creature). Lightning Bolt is found, while
+# Sol Ring (neither) and Guerrilla Gorilla (no flash) are refused. A second Waterlogged Teachings, cast on turn 3, is answered with
+# nothing (a quality search may find nothing, CR 701.23b); it is still cast and the library shuffled.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Waterlogged Teachings
+Waterlogged Teachings
+Mox Ruby
+Mox Pearl
+Island
+Lightning Bolt
+Sol Ring
+Guerrilla Gorilla
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Waterlogged Teachings.Cast
+! Bot1.Search(Sol Ring)
+! Bot1.Search(Guerrilla Gorilla)
+Bot1.Search(Lightning Bolt)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Waterlogged Teachings.Cast
+Bot1.Search()
+
+[Expect]
+Bot1.Graveyard = Waterlogged Teachings; Waterlogged Teachings; Black Lotus

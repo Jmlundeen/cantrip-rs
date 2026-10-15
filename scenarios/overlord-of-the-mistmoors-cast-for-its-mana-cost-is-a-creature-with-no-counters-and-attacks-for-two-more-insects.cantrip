@@ -1,0 +1,59 @@
+# Overlord of the Mistmoors cast for its mana cost {5}{W}{W} on turn 13 off seven Plains is an enchantment creature with
+# no time counters and nothing that takes any: it is a 6/6 creature at once, and its enters trigger made two Insects. On
+# turn 15 it attacks, having been under its controller's control since turn 13, and the attack trigger makes two more.
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Plains
+Plains
+Plains
+Plains
+Overlord of the Mistmoors
+Plains x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T11 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T13 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Overlord of the Mistmoors.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Overlord of the Mistmoors.Types = Enchantment; Creature
+? Bot1.Battlefield.Overlord of the Mistmoors.Counters.Time = (absent)
+? Bot1.Battlefield.Count = 10
+[T15 Bot1.Main1]
+? Bot1.Battlefield.Overlord of the Mistmoors.Counters.Time = (absent)
+Bot1.Attack(Overlord of the Mistmoors > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T15 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Count = 12
+Bot2.Life = 14

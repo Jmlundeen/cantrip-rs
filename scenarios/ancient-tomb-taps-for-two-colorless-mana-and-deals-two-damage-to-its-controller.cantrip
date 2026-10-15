@@ -1,0 +1,20 @@
+# Ancient Tomb's mana ability adds {C}{C} and, as it resolves, deals 2 damage to its controller.
+
+[Bot1 Deck]
+Ancient Tomb
+Plains x14
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Ancient Tomb.Play
+Bot1.Battlefield.Ancient Tomb.Activate
+? Bot1.Mana = {C}{C}
+? Bot1.Life = 18
+
+[Expect]
+Turn = 1
+Bot1.Life = 18
+Bot1.Battlefield = Ancient Tomb
+Bot1.Battlefield.Ancient Tomb.Tapped = true

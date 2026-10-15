@@ -1,0 +1,46 @@
+# "Name Sticker" Goblin rolls a d20 as it enters from hand and adds {R}{R}{R}{R}, {R}{R}{R}{R}{R} or {R}{R}{R}{R}{R}{R}
+# as the trigger resolves. The d20 shows 15 (15-20 | six {R}): four Lightning Bolts cast off the mana leave {R}{R}
+# in the pool, which empties at the end of the step.
+
+[Dice]
+15
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+"Name Sticker" Goblin
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Mountain
+Mountain x8
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand."Name Sticker" Goblin.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Bot1.Mana = {R}{R}
+[T3 Bot1.Main2]
+? Bot1.Mana =
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot2.Life = 8
+Bot1.Graveyard.Count = 4
+Bot1.Battlefield = Mountain; Mountain; Mox Ruby; "Name Sticker" Goblin

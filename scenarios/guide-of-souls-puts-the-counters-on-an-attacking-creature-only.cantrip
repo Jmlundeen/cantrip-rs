@@ -1,0 +1,36 @@
+# With three energy Bot1 accepts the payment on turn 3 while one Ornithopter and the Guide attack. The reflexive trigger's target must be an attacking
+# creature: the Ornithopters that stayed home are not candidates (the refusal), the attacker is, and gets two +1/+1 counters, flying and Angel.
+
+[Bot1 Deck]
+Mox Pearl
+Guide of Souls
+Ornithopter
+Ornithopter
+Ornithopter
+Island x2
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Guide of Souls.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+? Bot1.Energy = 3
+Bot1.Attack(Ornithopter; Guide of Souls)
+Bot1.Accept
+! Bot1.Target(Ornithopter#2)
+Bot1.Target(Ornithopter#1)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Energy = 0
+Bot1.Battlefield.Ornithopter#1.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Ornithopter#1.Subtypes = Angel; Thopter
+Bot1.Battlefield.Ornithopter#2.Counters.PlusOnePlusOne = (absent)

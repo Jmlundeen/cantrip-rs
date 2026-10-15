@@ -1,0 +1,71 @@
+# Concealing Curtains / Revealing Eye: "target opponent reveals their hand. You may choose a nonland card from it." Bot2
+# casts the eight free artifacts it holds on turn 2, so its hand is empty when Bot1 transforms the Curtains on turn 3:
+# nothing is revealed or chosen, nothing is discarded and no card is drawn.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Concealing Curtains
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Black Lotus
+Lotus Petal
+Mishra's Bauble
+Island x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Concealing Curtains.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Lotus Petal.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mishra's Bauble.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Concealing Curtains.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Mox Jet; Revealing Eye; Swamp; Swamp
+Bot2.Hand.Count = 0
+Bot2.Library.Count = 12
+Bot2.Graveyard.Count = 0
+Stack.Count = 0

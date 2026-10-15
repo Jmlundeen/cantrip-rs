@@ -1,0 +1,33 @@
+# Expedition Map: the sacrifice is a cost (CR 118.8), so the Map is gone and the mana spent even when the library has no
+# land card to find (CR 701.23b: Bot1 searches and finds nothing). Nothing is added to the hand.
+
+[Bot1 Deck]
+Island
+Island
+Expedition Map
+Island
+Island
+Island
+Island
+Ornithopter
+Mox Jet
+Ornithopter x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Expedition Map.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Expedition Map.Activate
+Bot1.Search()
+
+[Expect]
+Bot1.Hand = Island; Island; Island; Island; Ornithopter
+Bot1.Graveyard = Expedition Map
+Bot1.Battlefield = Island; Island

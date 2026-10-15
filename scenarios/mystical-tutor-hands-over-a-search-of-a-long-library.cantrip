@@ -1,0 +1,73 @@
+# Bot1 casts Mystical Tutor on its first turn and is left searching a library of some forty different instants and
+# sorceries, more than the search window shows at once. The position for how the client fills a long library search:
+# the faces in view first, then the rest in the window's order without waiting to be scrolled to.
+
+[Bot1 Deck]
+Island
+Mystical Tutor
+Abrade
+Abrupt Decay
+Balance
+Baleful Mastery
+Bitter Triumph
+Bone Shards
+Cabal Ritual
+Consider
+Crop Rotation
+Daze
+Dismember
+Enlightened Tutor
+Erode
+Exorcise
+Fatal Push
+Fiery Confluence
+Flame Slash
+Force of Negation
+Force of Vigor
+Hymn to Tourach
+Imperial Seal
+Mana Tithe
+Mine Collapse
+Mystic Confluence
+Natural Order
+No More Lies
+Oust
+Pyroblast
+Reprieve
+Sear
+Shallow Grave
+Sheoldred's Edict
+Snuff Out
+Stern Scolding
+Suplex
+Tear Asunder
+Time Spiral
+Time Warp
+Tinker
+Toxic Deluge
+Traumatic Critique
+Treasure Cruise
+Unearth
+Unexpectedly Absent
+Unholy Heat
+Vicious Rivalry
+Wheel of Fortune
+Winds of Abandon
+Worldly Tutor
+Yawgmoth's Will
+Island x5
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Mystical Tutor.Cast
+[Handover Bot1.Search]
+
+[Expect]
+Turn = 1
+Bot1.Battlefield = Island
+Bot1.Library.Count = 50
+Stack = Mystical Tutor

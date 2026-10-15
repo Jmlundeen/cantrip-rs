@@ -1,0 +1,48 @@
+# Skyclave Apparition's limit is "mana value 4 or less": Bot2's Memory Jar (mana value 5) is not a legal target (the refusal),
+# the Mox Jet (0) beside it is (the positive control, exiled). The boundary, a mana value of exactly 4, is the neighbouring
+# scenario's Ulvenwald Oddity.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Skyclave Apparition
+Plains x16
+
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mox Sapphire
+Mox Pearl
+Memory Jar
+Plains x14
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Memory Jar.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Pearl#3.Activate
+Bot1.Hand.Skyclave Apparition.Cast
+! Bot1.Target(Bot2.Battlefield.Memory Jar)
+Bot1.Target(Bot2.Battlefield.Mox Jet)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Mox Jet
+Bot2.Battlefield = Memory Jar; Mox Ruby; Mox Emerald; Mox Sapphire; Mox Pearl

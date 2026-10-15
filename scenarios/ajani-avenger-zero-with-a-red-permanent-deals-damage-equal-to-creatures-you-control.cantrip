@@ -1,0 +1,46 @@
+# Ajani, Nacatl Avenger's 0 with a red permanent other than Ajani: the token is made, then "when you do" the reflexive
+# trigger (CR 603.12) has Ajani deal damage equal to the number of creatures Bot1 controls -- Ragavan (red) and the new
+# Cat Warrior, so 2 -- to any target, here Bot2. Setup: Cat Bolted on turn 4, Ajani transforms; turn 5 Ragavan, then the 0.
+
+[Bot1 Deck]
+Plains x2
+Ajani, Nacatl Pariah
+Mountain
+Ragavan, Nimble Pilferer
+Plains x2
+Plains x12
+
+[Bot2 Deck]
+Mountain
+Island
+Island
+Lightning Bolt
+Island x3
+Island x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Ajani, Nacatl Pariah.Cast
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Cat Warrior)
+Bot1.Accept
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Ragavan, Nimble Pilferer.Cast
+Bot1.Battlefield.Ajani, Nacatl Avenger.Activate(Ability: 0: Create)
+Bot1.Target(Bot2)
+[Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot2.Life = 18
+Bot1.Battlefield.Cat Warrior.Power = 2
+Bot1.Battlefield.Ragavan, Nimble Pilferer.Damage = 0
+Stack.Count = 0

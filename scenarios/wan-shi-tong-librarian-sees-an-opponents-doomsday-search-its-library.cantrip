@@ -1,0 +1,35 @@
+# Doomsday searches its caster's library (and graveyard) with a choice of its own rather than the search prompt, and
+# it is still an opponent searching their library: Wan Shi Tong, cast with X = 1, gets its counter and Bot1 its card.
+
+[Bot1 Deck]
+Black Lotus
+Wan Shi Tong, Librarian
+Island x5
+Island x10
+
+[Bot2 Deck]
+Doomsday
+Black Lotus
+Swamp x5
+Swamp
+Counterspell
+Mana Leak
+Time Walk
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Wan Shi Tong, Librarian.Cast(X: 1)
+Bot1.Pass
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Doomsday.Cast
+Bot2.Choose(Counterspell; Time Walk; Black Lotus; Mana Leak)
+
+[Expect]
+Turn = 2
+Bot2.Library = Mana Leak; Black Lotus; Time Walk; Counterspell
+Bot1.Battlefield.Wan Shi Tong, Librarian.Counters.PlusOnePlusOne = 2
+Bot1.Hand.Count = 6

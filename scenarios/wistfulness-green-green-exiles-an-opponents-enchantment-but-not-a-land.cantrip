@@ -1,0 +1,47 @@
+# "Exile target artifact or enchantment an opponent controls": with {G}{G} spent (two Mox Emeralds among five mana, hard cast) Bot2's Forest (a land) is refused as a target, and its Innkeeper's Talent (an enchantment) is exiled (the positive control; its Mox Emerald, an artifact, was legal too).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Emerald
+Mox Ruby
+Mox Jet
+Mox Pearl
+Wistfulness
+Forest
+Forest x12
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Innkeeper's Talent
+Forest x13
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Innkeeper's Talent.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Wistfulness.Cast
+Bot1.Pass
+! Bot1.Target(Bot2.Battlefield.Forest)
+Bot1.Target(Innkeeper's Talent)
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Battlefield = Forest; Mox Emerald
+Exile = Innkeeper's Talent
+Bot1.Battlefield.Wistfulness.Power = 6

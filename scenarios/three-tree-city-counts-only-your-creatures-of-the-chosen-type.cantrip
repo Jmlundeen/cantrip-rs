@@ -1,0 +1,39 @@
+# Three Tree City, Elf chosen as it enters: its second ability adds mana equal to the number of creatures YOU control of the chosen type.
+# On turn 3 Bot1 has an Ornithopter (not an Elf) and Bot2 a Llanowar Elves (not Bot1's): the count is 0, so the {2} paid with two
+# Moxen buys no mana at all and the pool is empty. On turn 5 the plain "{T}: Add {C}" works (the City untapped), adding {C}.
+
+[Bot1 Deck]
+Three Tree City
+Mox Jet
+Mox Pearl
+Ornithopter
+Island x14
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x14
+
+[Actions]
+Bot1.Hand.Three Tree City.Play
+Bot1.Modes(Elf)
+? Bot1.Battlefield.Three Tree City.ChosenSubtype = Elf
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Three Tree City.Activate(Ability: {2}; Color: Green)
+? Bot1.Mana =
+? Bot1.Battlefield.Three Tree City.Tapped = true
+[T5 Bot1.Main1]
+Bot1.Battlefield.Three Tree City.Activate(Ability: Add {C})
+? Bot1.Mana = {C}
+
+[Expect]
+Turn = 5

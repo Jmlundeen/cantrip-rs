@@ -1,0 +1,50 @@
+# Avatar Roku, "{8}: Create a 4/4 red Dragon creature token with flying and firebending 4." Attacking on T7 adds
+# {R}{R}{R}{R} that lasts until end of combat (CR 702.189a); in the combat damage step that mana and the three Mountains
+# and Mox Ruby pay the {8}, and the Dragon enters as a red 4/4 Dragon creature with flying.
+
+[Bot1 Deck]
+Mox Ruby
+Black Lotus
+The Legend of Roku
+Mountain x4
+Mountain x16
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.The Legend of Roku.Cast
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Colors(Red)
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Attack(Avatar Roku > Bot2)
+[T7 Bot1.Damage]
+? Bot1.Mana = {R}{R}{R}{R} lasting {R}{R}{R}{R}
+Bot1.Battlefield.Avatar Roku.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+[T7 Bot1.Main2]
+? Bot1.Battlefield.Dragon.Power = 4
+
+[Expect]
+Bot1.Mana = 
+Bot1.Battlefield.Dragon.Power = 4
+Bot1.Battlefield.Dragon.Toughness = 4
+Bot1.Battlefield.Dragon.Types = Creature
+Bot1.Battlefield.Dragon.Subtypes = Dragon
+Bot1.Battlefield.Dragon.Keywords = Flying

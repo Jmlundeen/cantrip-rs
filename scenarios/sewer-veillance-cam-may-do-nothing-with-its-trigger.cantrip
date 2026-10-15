@@ -1,0 +1,29 @@
+# Sewer-veillance Cam: "you may tap or untap target creature". Cast with flash during Bot2's upkeep on turn 4, entering, Bot1
+# chooses "Do nothing": Bot2's untapped Ornithopter stays untapped. (The Tap choice at the same moment is the other scenario.)
+
+[Bot1 Deck]
+Island
+Island
+Sewer-veillance Cam
+Plains x17
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Upkeep]
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sewer-veillance Cam.Cast
+Bot1.Modes(Do nothing)
+Bot1.Pass
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield = Island; Island; Sewer-veillance Cam
+Bot2.Battlefield.Ornithopter.Tapped = false

@@ -1,0 +1,30 @@
+# "Whenever one or more permanent cards are put into your graveyard from anywhere ... remove a -1/-1 counter."
+# Faithless Looting discards two Islands at once: one event, one counter. Looting itself is a sorcery and adds none.
+
+[Bot1 Deck]
+Swamp
+Mountain
+Moonshadow
+Faithless Looting
+Island x30
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Moonshadow.Cast
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Moonshadow.Counters.MinusOneMinusOne = 6
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Island; Island)
+[T4 Bot2.Upkeep]
+
+[Expect]
+Bot1.Battlefield.Moonshadow.Counters.MinusOneMinusOne = 5
+Bot1.Battlefield.Moonshadow.Power = 2
+Bot1.Graveyard.Count = 3

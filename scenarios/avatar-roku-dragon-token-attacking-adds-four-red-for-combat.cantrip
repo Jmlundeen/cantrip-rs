@@ -1,0 +1,50 @@
+# The Dragon token Avatar Roku makes has firebending 4 as well (CR 702.189a, 707.2): on T9 it attacks alone and its
+# trigger adds {R}{R}{R}{R} that lasts through combat (the earlier turn's is long gone), which is lost as combat ends.
+
+[Bot1 Deck]
+Mox Ruby
+Black Lotus
+The Legend of Roku
+Mountain x4
+Mountain x16
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.The Legend of Roku.Cast
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Colors(Red)
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Attack(Avatar Roku > Bot2)
+[T7 Bot1.Damage]
+? Bot1.Mana = {R}{R}{R}{R} lasting {R}{R}{R}{R}
+Bot1.Battlefield.Avatar Roku.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+[T9 Bot1.Main1]
+Bot1.Attack(Dragon > Bot2)
+[T9 Bot1.Damage]
+? Bot1.Mana = {R}{R}{R}{R} lasting {R}{R}{R}{R}
+[T9 Bot1.Main2]
+? Bot1.Mana = 
+
+[Expect]
+Bot1.Mana = 
+Bot2.Life = 12
+Bot1.Battlefield.Dragon.Tapped = true

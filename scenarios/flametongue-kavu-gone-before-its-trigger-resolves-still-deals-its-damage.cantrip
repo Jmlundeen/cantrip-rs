@@ -1,0 +1,42 @@
+# Flametongue Kavu: the trigger's source is the Kavu, and if it has left the battlefield by the time the trigger
+# resolves the game uses its last-known information (CR 608.2h, 113.7a): it still deals 4 damage. Bot1 casts the Kavu on
+# turn 3 targeting Bot2's Ornithopter (0/2), and with the trigger on the stack exiles its own Kavu with Swords to
+# Plowshares (gaining its power, 4). The Ornithopter still takes 4 and dies; the Kavu is in exile.
+
+[Bot1 Deck]
+Mox Pearl
+Mountain
+Black Lotus
+Flametongue Kavu
+Swords to Plowshares
+Mountain x4
+Mountain x10
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Flametongue Kavu.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Ornithopter)
+Bot1.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Flametongue Kavu)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile = Flametongue Kavu
+Bot2.Graveyard = Ornithopter
+Bot1.Life = 24

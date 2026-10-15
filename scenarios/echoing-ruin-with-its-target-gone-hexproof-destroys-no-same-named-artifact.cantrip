@@ -1,0 +1,40 @@
+# Echoing Ruin targets one of Bot2's two Ornithopters (artifact creatures). Bot2 answers with Snakeskin Veil on that
+# Ornithopter: hexproof makes the spell's only target illegal on resolution, so the spell does not resolve (CR 608.2b) and
+# the same-named other Ornithopter is not destroyed either, though the effect would have named it.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Echoing Ruin
+Mountain x30
+
+[Bot2 Deck]
+Forest
+Ornithopter
+Ornithopter
+Snakeskin Veil
+Forest x30
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Forest.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Echoing Ruin.Cast(Bot2.Battlefield.Ornithopter#1)
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Snakeskin Veil.Cast(Bot2.Battlefield.Ornithopter#1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Forest; Ornithopter; Ornithopter
+Bot2.Battlefield.Ornithopter#1.Keywords = Flying; Hexproof
+Bot1.Graveyard = Echoing Ruin
+Bot2.Graveyard = Snakeskin Veil

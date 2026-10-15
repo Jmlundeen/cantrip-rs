@@ -1,0 +1,28 @@
+# Ursine Monstrosity's beginning-of-combat ability mills a Forest each combat (one card type in the graveyard), so it is a 4/4 with indestructible that must attack the opponent chosen at random (CR 508.1d): no attack is scripted, and it attacks anyway for 4.
+
+[Bot1 Deck]
+Sol Ring
+Ursine Monstrosity
+Forest x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Forest.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Ursine Monstrosity.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Sol Ring.Activate
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot2.Life = 16
+Bot1.Graveyard.Count = 2
+Bot1.Battlefield.Ursine Monstrosity.Power = 4
+Bot1.Battlefield.Ursine Monstrosity.Keywords = Indestructible; Trample
+Bot1.Battlefield.Ursine Monstrosity.Tapped = true

@@ -1,0 +1,30 @@
+# A library of one card: it is shown and, as "two of them" shrinks to what there is (CR 609.3), it goes into the hand and the library
+# is left empty (Bot1 has not yet had to draw from it).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Stock Up
+Plains
+Plains
+Plains
+Mountain
+
+[Bot2 Deck]
+Forest x22
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Stock Up.Cast
+Bot1.Arrange(Mountain | )
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Plains; Plains; Plains; Mountain
+Bot1.Library.Count = 0

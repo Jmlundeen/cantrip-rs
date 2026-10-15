@@ -1,0 +1,41 @@
+[Bot1 Deck]
+Enduring Innocence
+Haywire Mite
+Plains x18
+[Bot2 Deck]
+Haywire Mite
+Island x19
+[Actions]
+Bot1.Hand.Plains.Play
+[Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Haywire Mite.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Enduring Innocence.Cast
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Haywire Mite.Cast
+[Bot1.Main2]
+? Bot1.Battlefield.Enduring Innocence.Types = Enchantment; Creature
+? Bot1.Library.Count = 9
+? Stack.Count = 0
+[T8 Bot2.Main1]
+Bot2.Attack(Haywire Mite)
+Bot1.Block(Enduring Innocence > Haywire Mite)
+[T9 Bot1.Main1]
+[Expect]
+Turn = 9
+Bot1.Battlefield = Enduring Innocence; Haywire Mite; Plains; Plains; Plains; Plains
+Bot1.Battlefield.Enduring Innocence.Types = Enchantment
+Bot1.Battlefield.Enduring Innocence.Keywords = Lifelink
+Bot2.Battlefield = Island
+Bot2.Graveyard = Island; Haywire Mite; Island
+Stack.Count = 0

@@ -1,0 +1,46 @@
+# Generous Plunderer: "Whenever this creature attacks, it deals damage to defending player equal to the number of
+# artifacts they control." For a creature attacking a planeswalker the defending player is the planeswalker's controller
+# (CR 508.5). Bot2 casts Liliana of the Veil with a Swamp, a Mox Jet and a Mox Ruby, so it controls two artifacts: the
+# Plunderer attacks Liliana, Bot2 takes 2 from the trigger (and no combat damage), and Liliana is dealt 2 by the
+# Plunderer (loyalty 3 to 1). Bot1 declines the upkeep Treasure so that Bot2 holds only its two Moxen.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Generous Plunderer
+Plains x17
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Liliana of the Veil
+Swamp x16
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Generous Plunderer.Cast
+Bot1.Pass
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Liliana of the Veil.Cast
+Bot2.Pass
+[T3 Bot1.Upkeep]
+Bot1.Decline
+Bot1.Attack(Generous Plunderer > Bot2.Battlefield.Liliana of the Veil)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot2.Battlefield.Liliana of the Veil.Counters.Loyalty = 1

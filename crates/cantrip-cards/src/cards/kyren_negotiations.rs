@@ -1,0 +1,32 @@
+use cantrip_api::*;
+use cantrip_mechanics::targets;
+use cantrip_mechanics::TAP_AN_UNTAPPED_CREATURE;
+use cantrip_oracle as oracle;
+
+/// "Target player or planeswalker" (CR 115.1).
+fn player_or_planeswalker(q: &dyn Query, _: &Asker, t: Target) -> bool {
+    match t {
+        Target::Player(_) => true,
+        Target::Object(id) => targets::permanent(q, id) && q.chars(id).is(CardType::Planeswalker),
+        _ => false,
+    }
+}
+
+/// This enchantment deals 1 damage to target player or planeswalker.
+fn ping(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if g.target_legal(item, 0) {
+        g.damage(item.object, item.targets[0], 1);
+    }
+    Ok(())
+}
+
+pub static CARD: CardDef = CardDef {
+    abilities: &[AbilityDef::Activated(ActivatedDef {
+        text: "Tap an untapped creature you control: This enchantment deals 1 damage to target player or planeswalker.",
+        cost: TAP_AN_UNTAPPED_CREATURE,
+        targets: &[TargetSpec { min: 1, max: 1, filter: player_or_planeswalker }],
+        effect: ping,
+        ..ActivatedDef::BLANK
+    })],
+    ..oracle::KYREN_NEGOTIATIONS
+};

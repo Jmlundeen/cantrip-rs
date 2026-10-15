@@ -1,0 +1,34 @@
+# Oko, Thief of Crowns' +2: "Create a Food token." Oko comes down on turn one off a Forest and both Moxen and goes from
+# 4 loyalty to 6, with a Food artifact beside him.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Sapphire
+Oko, Thief of Crowns
+Forest x3
+Forest x10
+
+[Bot2 Deck]
+Swamp x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Oko, Thief of Crowns.Cast
+Bot1.Pass
+Bot1.Battlefield.Oko, Thief of Crowns.Activate(Ability: Food)
+Bot1.Pass
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Battlefield.Oko, Thief of Crowns.Counters.Loyalty = 6
+Bot1.Battlefield.Food Token.Types = Artifact
+Bot1.Battlefield.Food Token.Subtypes = Food

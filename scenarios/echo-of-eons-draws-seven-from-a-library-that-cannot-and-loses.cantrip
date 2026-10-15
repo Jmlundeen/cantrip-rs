@@ -1,0 +1,35 @@
+# Bot1's whole deck is its opening hand, so with Echo of Eons resolving its hand and graveyard are empty (everything was cast) and
+# its library has nothing: it "draws seven" from an empty library and loses at the next state-based action check (CR 121.4,
+# 704.5b). Bot2, whose library has cards, draws its seven and the game ends with Bot2 the winner.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mox Pearl
+Echo of Eons
+
+[Bot2 Deck]
+Swamp x22
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Echo of Eons.Cast
+Bot1.Pass
+
+[Expect]
+Result = Bot2 won
+Bot2.Hand.Count = 7

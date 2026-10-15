@@ -1,0 +1,45 @@
+# Carnage, Crimson Chaos: the returned creature gains its two abilities with no duration, for as long as it is that
+# object (CR 611.2a). Carnage returns a Guerrilla Gorilla on turn 5; on turn 7 Ephemerate exiles it and returns it, a new
+# object (CR 400.7) that has gained nothing. On turn 9 (Ephemerate's rebound declined, the default) the Gorilla is no
+# longer made to attack, and with no Attack line nothing attacks.
+
+[Bot1 Deck]
+Mountain
+Swamp
+Mountain
+Faithless Looting
+Carnage, Crimson Chaos
+Guerrilla Gorilla
+Plains
+Ephemerate
+Mountain x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Carnage, Crimson Chaos; Guerrilla Gorilla)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Graveyard.Carnage, Crimson Chaos.Cast(Ability: Mayhem)
+[T5 Bot1.Main2]
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Ephemerate.Cast(Guerrilla Gorilla)
+[T7 Bot1.Main2]
+? Bot1.Battlefield.Guerrilla Gorilla.Keywords = Reach
+[T9 Bot1.Main2]
+
+[Expect]
+Turn = 9
+Bot2.Life = 20
+Bot1.Battlefield.Guerrilla Gorilla.Keywords = Reach
+Bot1.Battlefield.Guerrilla Gorilla.SummoningSick = false

@@ -1,0 +1,60 @@
+# "Another target creature you control" (CR 115.1): the trigger cannot target the Oliphaunt itself or Bot2's Llanowar Elves
+# (both refused), and the target need not be attacking: Bot1 attacks with the Oliphaunt alone and its Haywire Mite
+# staying home gets +2/+0 and trample until end of turn; an Ornithopter is the other candidate that was not chosen.
+
+[Bot1 Deck]
+Sol Ring
+Black Lotus
+Mox Ruby
+Mox Jet
+Oliphaunt
+Haywire Mite
+Mox Pearl
+Ornithopter
+Mountain x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x6
+Forest x10
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Oliphaunt.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Haywire Mite.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Attack(Oliphaunt > Bot2)
+! Bot1.Target(Oliphaunt; Llanowar Elves)
+Bot1.Target(Haywire Mite)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Haywire Mite.Power = 3
+? Bot1.Battlefield.Haywire Mite.Keywords = Trample
+? Bot1.Battlefield.Ornithopter.Power = 0
+
+[Expect]
+Bot2.Life = 14
+Bot1.Battlefield.Ornithopter.Keywords = Flying

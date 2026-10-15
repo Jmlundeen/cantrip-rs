@@ -1,0 +1,42 @@
+# Bot1 attacks with Jacked Rabbit and Adeline, whose attack triggers go on the stack together, and takes the order the
+# client's Stack Triggers box lays out rather than picking one (CR 603.3b). The box shows them in the order they
+# triggered — the Rabbit's first, Adeline's second — and its Stack All button sends exactly that, which is what
+# clicking them left to right would have sent.
+#
+# The first one shown goes on the stack first, so it ends up at the bottom and resolves last: the stack reads Adeline
+# over Jacked Rabbit. That is the direction the box promises with "the last one on resolves first".
+
+[Bot1 Deck]
+Plains
+Sol Ring
+Black Lotus
+Adeline, Resplendent Cathar
+Plains
+Jacked Rabbit
+Plains
+Plains x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Adeline, Resplendent Cathar.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Jacked Rabbit.Cast(X: 2)
+[T5 Bot1.Main1]
+Bot1.Attack(Adeline, Resplendent Cathar; Jacked Rabbit)
+Bot1.Triggers(Jacked Rabbit; Adeline, Resplendent Cathar)
+? Stack.Count = 2
+? Stack = Adeline, Resplendent Cathar; Jacked Rabbit
+
+[Expect]
+Turn = 5

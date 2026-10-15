@@ -1,0 +1,48 @@
+# Kaito, Bane of Nightmares cast on turn 7, then his +1 for the emblem. During his controller's turn, with loyalty
+# counters on him, he stops being a planeswalker and is a 3/4 Ninja with hexproof (CR 613.1d, 500.1) — and the emblem's
+# "Ninjas you control get +1/+1" finds him, so he is a 4/5. Handed over at the attack, for picturing a planeswalker
+# that is a creature: power and toughness in the body box, loyalty beside the other counters.
+
+[Bot1 Deck]
+Island
+Island
+Swamp
+Swamp
+Kaito, Bane of Nightmares
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Kaito, Bane of Nightmares.Cast
+[T7 Bot1.Main2]
+? Bot1.Battlefield.Kaito, Bane of Nightmares.Types = Creature
+? Bot1.Battlefield.Kaito, Bane of Nightmares.Power = 3
+? Bot1.Battlefield.Kaito, Bane of Nightmares.Toughness = 4
+? Bot1.Battlefield.Kaito, Bane of Nightmares.Keywords = Hexproof
+Bot1.Battlefield.Kaito, Bane of Nightmares.Activate(Ability: You get an emblem)
+[T9 Bot1.Main1]
+[Handover Bot1.Attack]
+
+[Expect]
+Turn = 9
+Bot1.Emblems.Count = 1
+# Layer 7c over his own layer 7b: his emblem pumps him, because he is a Ninja while his static ability applies.
+Bot1.Battlefield.Kaito, Bane of Nightmares.Power = 4
+Bot1.Battlefield.Kaito, Bane of Nightmares.Toughness = 5
+Bot1.Battlefield.Kaito, Bane of Nightmares.Counters.Loyalty = 5
+Bot1.Battlefield.Kaito, Bane of Nightmares.SummoningSick = false

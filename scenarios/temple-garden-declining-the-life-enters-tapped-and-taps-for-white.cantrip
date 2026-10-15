@@ -1,0 +1,19 @@
+# Declining keeps 20 life and the Garden enters tapped (refused on turn 1); on turn 3 it taps for {W}.
+
+[Bot1 Deck]
+Temple Garden
+Island x14
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Temple Garden.Play
+Bot1.Decline
+! Bot1.Battlefield.Temple Garden.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Temple Garden.Activate(Ability: {W})
+
+[Expect]
+Bot1.Life = 20
+Bot1.Mana = {W}

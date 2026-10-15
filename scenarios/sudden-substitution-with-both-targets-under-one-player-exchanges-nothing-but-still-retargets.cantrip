@@ -1,0 +1,42 @@
+# An exchange of control needs two different controllers (CR 701.12b). Bot1 casts Lightning Bolt at Bot2 and, holding priority, a Sudden
+# Substitution aimed at that Bolt and its own Llanowar Elves: Bot1 controls both, so nothing changes hands (the Elves stay Bot1's,
+# the Bolt stays Bot1's), but "then the spell's controller may choose new targets" still applies and Bot1, the Bolt's controller,
+# aims it at itself: Bot1 takes 3, Bot2 none.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Ruby
+Llanowar Elves
+Sudden Substitution
+Lightning Bolt
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sudden Substitution.Cast
+Bot1.Target(Stack.Lightning Bolt)
+Bot1.Target(Bot1.Battlefield.Llanowar Elves)
+Bot1.Target(Bot1)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 17
+Bot2.Life = 20
+Bot1.Battlefield.Llanowar Elves.Tapped = false
+Bot2.Battlefield.Count = 0
+Stack.Count = 0

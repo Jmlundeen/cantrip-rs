@@ -1,0 +1,51 @@
+# Escape needs "four or more card types" among the OTHER cards exiled from the graveyard (the Nethergoyf's own creature type does
+# not count). Bot1's Entombs put an Entomb (instant), the Nethergoyf and an Ornithopter (artifact, creature) in the graveyard: three
+# types among the others (the Black Lotus sacrificed for mana is an artifact too), so the escape is not offered (refused). A third Entomb adds an Island (land): four, and on turn 3 the
+# Nethergoyf escapes, exiling the Entomb, Ornithopter and Island. The two other Entombs and the sacrificed Black Lotus stay: instant and artifact, a 2/3.
+
+[Bot1 Deck]
+Swamp
+Entomb
+Entomb
+Entomb
+Mox Jet
+Black Lotus
+Swamp
+Nethergoyf
+Ornithopter
+Island
+Swamp x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Nethergoyf)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Ornithopter)
+! Bot1.Graveyard.Nethergoyf.Cast
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Island)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Graveyard.Nethergoyf.Cast(Ability: Escape)
+Bot1.Choose(Entomb; Ornithopter; Island)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Exile.Count = 3
+Bot1.Graveyard.Count = 3
+Bot1.Battlefield.Nethergoyf.Power = 2
+Bot1.Battlefield.Nethergoyf.Toughness = 3

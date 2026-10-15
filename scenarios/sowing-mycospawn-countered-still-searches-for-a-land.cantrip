@@ -1,0 +1,47 @@
+# Sowing Mycospawn's search is a trigger "when you cast this spell", independent of the spell on the stack (CR 603.2): Bot2 counters the
+# Mycospawn with Counterspell while the search trigger is above it, and the trigger still resolves; Bot1 gets its Island onto the
+# battlefield though the creature goes to the graveyard.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Mox Jet
+Mox Pearl
+Sowing Mycospawn
+Swamp
+Swamp
+Swamp
+Island
+Swamp x10
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Island x16
+
+[Actions]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sowing Mycospawn.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Sowing Mycospawn)
+Bot1.Pass
+Bot2.Pass
+Bot1.Search(Island)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Sowing Mycospawn
+Bot1.Battlefield = Mox Emerald; Mox Ruby; Mox Jet; Mox Pearl; Island
+Bot2.Graveyard = Counterspell

@@ -1,0 +1,52 @@
+# Carnage, Crimson Chaos: the returned creature's gained "When this creature deals combat damage to a player,
+# sacrifice it." Carnage returns a Guerrilla Gorilla on turn 5. On turn 7 the Gorilla has to attack (no Attack line; the
+# default declares none) and Bot2's Fanatic of Rhonas blocks it. The Gorilla deals its damage to the Fanatic only, so
+# nothing triggers: it survives the 1 damage it takes and stays on the battlefield.
+
+[Bot1 Deck]
+Mountain
+Swamp
+Mountain
+Faithless Looting
+Carnage, Crimson Chaos
+Guerrilla Gorilla
+Mountain
+Mountain x20
+
+[Bot2 Deck]
+Forest
+Forest
+Forest
+Fanatic of Rhonas
+Forest x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Carnage, Crimson Chaos; Guerrilla Gorilla)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Graveyard.Carnage, Crimson Chaos.Cast(Ability: Mayhem)
+[T6 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Fanatic of Rhonas.Cast
+[T7 Bot1.DeclareAttackers]
+Bot2.Block(Fanatic of Rhonas > Guerrilla Gorilla)
+[T7 Bot1.Main2]
+
+[Expect]
+Turn = 7
+Bot2.Life = 20
+Bot1.Battlefield = Mountain; Swamp; Mountain; Carnage, Crimson Chaos; Guerrilla Gorilla
+Bot1.Battlefield.Guerrilla Gorilla.Damage = 1
+Bot2.Battlefield.Fanatic of Rhonas.Damage = 2

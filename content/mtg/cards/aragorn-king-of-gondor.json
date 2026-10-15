@@ -1,0 +1,12 @@
+{
+  "name": "Aragorn, King of Gondor",
+  "manaCost": "{1}{U}{R}{W}",
+  "type": "Legendary Creature — Human Noble",
+  "power": 4,
+  "toughness": 4,
+  "oracleText": "Vigilance, lifelink\nWhen Aragorn enters, you become the monarch.\nWhenever Aragorn attacks, up to one target creature can't block this turn. If you're the monarch, creatures can't block this turn.",
+  "keywords": [
+    "Vigilance",
+    "Lifelink"
+  ]
+}

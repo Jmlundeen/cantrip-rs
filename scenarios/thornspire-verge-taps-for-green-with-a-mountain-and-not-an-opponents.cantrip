@@ -1,0 +1,27 @@
+# "You control a Mountain or a Forest": a Mountain of its own enables {G}, the opponent's Mountain (turn 2) and Forest do not.
+
+[Bot1 Deck]
+Thornspire Verge
+Mountain
+Plains x14
+
+[Bot2 Deck]
+Mountain
+Forest
+Plains x14
+
+[Actions]
+Bot1.Hand.Thornspire Verge.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Thornspire Verge.Activate(Ability: {G})
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T5 Bot1.Main1]
+! Bot1.Battlefield.Thornspire Verge.Activate(Ability: {G})
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Thornspire Verge.Activate(Ability: {G})
+
+[Expect]
+Bot1.Mana = {G}

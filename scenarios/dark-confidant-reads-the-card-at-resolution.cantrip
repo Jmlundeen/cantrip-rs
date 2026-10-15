@@ -1,0 +1,42 @@
+# Brainstorm responds to the upkeep trigger. The original top card is a zero-mana Mountain, but the last
+# chosen card goes back on top: Blightsteel Colossus. Confidant must reveal that card and lose twelve life.
+# Time Walk is placed under it and becomes the ordinary draw. This exercises a suspended script resolution.
+
+[Bot1 Deck]
+Swamp
+Island
+Black Lotus
+Dark Confidant
+Brainstorm
+Island
+Guerrilla Gorilla
+Plains
+Mountain
+Time Walk
+Blightsteel Colossus
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Dark Confidant.Cast
+[T5 Bot1.Upkeep]
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Brainstorm.Cast
+Bot1.Choose(Time Walk; Blightsteel Colossus)
+[T5 Bot1.Main1]
+
+[Expect]
+Turn = 5
+Step = Main1
+Bot1.Life = 8
+Bot1.Hand = Black Lotus; Island; Guerrilla Gorilla; Plains; Mountain; Time Walk; Blightsteel Colossus
+Bot1.Graveyard = Brainstorm
+Bot1.Battlefield = Swamp; Island; Dark Confidant
+Stack.Count = 0

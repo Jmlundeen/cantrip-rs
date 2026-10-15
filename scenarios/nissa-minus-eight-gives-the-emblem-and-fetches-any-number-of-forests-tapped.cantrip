@@ -1,0 +1,43 @@
+# Nissa, Who Shakes the World at eight loyalty (three +1s without a target) uses her -8: the emblem makes lands indestructible, and Bot1 searches for two of the Forests in the library, which enter tapped (CR 701.23d: any number, fewer is allowed).
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Mox Emerald
+Nissa, Who Shakes the World
+Forest
+Forest
+Forest
+Forest
+Island x9
+Forest
+Forest
+Island x4
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Nissa, Who Shakes the World.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Nissa, Who Shakes the World.Activate(Ability: Put three)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Nissa, Who Shakes the World.Activate(Ability: Put three)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Nissa, Who Shakes the World.Activate(Ability: Put three)
+[T7 Bot1.Main1]
+Bot1.Battlefield.Nissa, Who Shakes the World.Activate(Ability: emblem)
+Bot1.Search(Forest; Forest)
+[T7 Bot1.Main2]
+
+[Expect]
+Turn = 7
+Bot1.Emblems.Count = 1
+Bot1.Battlefield.Forest#1.Keywords = Indestructible
+Bot1.Battlefield.Forest#2.Tapped = true
+Bot1.Battlefield.Forest#3.Tapped = true

@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Cantrip.Protocol\Cantrip.Protocol.csproj" />
+    <ProjectReference Include="..\Cantrip.Server\Cantrip.Server.csproj" />
+  </ItemGroup>
+
+  <!-- Hosting authority lives here. The executable bootstrap references this assembly; the separately compiled
+       presentation library cannot reach it. Public hosting methods expose transports, not engine state. -->
+
+</Project>

@@ -1,0 +1,42 @@
+# "You may choose the same mode more than once" (CR 700.2d): Mystic Confluence chooses "return target creature" twice
+# and "draw a card" once. Each choice of the bounce mode is an instance with a target of its own, so Bot2's two
+# Ornithopters go back to its hand, and the spell draws one card.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Black Lotus
+Mystic Confluence
+Island
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Forest x14
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Mystic Confluence.Cast
+Bot1.Modes(2; 2; 3)
+Bot1.Target(Ornithopter#1)
+Bot1.Target(Ornithopter#2)
+[Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot2.Battlefield.Count = 0
+Bot2.Hand.Count = 8
+Bot1.Hand.Count = 5
+Bot1.Graveyard = Mystic Confluence; Black Lotus
+Bot1.Mana =

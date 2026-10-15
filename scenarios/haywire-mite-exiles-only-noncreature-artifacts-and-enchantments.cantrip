@@ -1,0 +1,54 @@
+# "Exile target noncreature artifact or noncreature enchantment": Bot2's Ornithopter (an artifact creature), its Island and Bot1's own Haywire Mite are refused as targets, while Bot2's Mox Jet (a noncreature artifact) is exiled (the
+# positive control) and Bot1's Innkeeper's Talent (a noncreature enchantment) is exiled by the second Mite. Each Mite is sacrificed as the cost and its death trigger gains Bot1 2 life.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Haywire Mite
+Haywire Mite
+Innkeeper's Talent
+Mox Pearl
+Forest
+Forest x9
+
+[Bot2 Deck]
+Island
+Ornithopter
+Mox Jet
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Haywire Mite.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Haywire Mite.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+! Bot1.Battlefield.Haywire Mite.Activate(Bot2.Battlefield.Ornithopter)
+! Bot1.Battlefield.Haywire Mite.Activate(Bot2.Battlefield.Island)
+! Bot1.Battlefield.Haywire Mite.Activate(Bot1.Battlefield.Haywire Mite#2)
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Innkeeper's Talent.Cast
+Bot1.Pass
+Bot1.Battlefield.Haywire Mite.Activate(Bot2.Battlefield.Mox Jet)
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Haywire Mite.Activate(Innkeeper's Talent)
+Bot1.Pass
+
+[Expect]
+Exile = Mox Jet; Innkeeper's Talent
+Bot1.Life = 24
+Bot1.Graveyard = Haywire Mite; Haywire Mite
+Bot2.Battlefield = Island; Ornithopter

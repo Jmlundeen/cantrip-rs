@@ -1,0 +1,33 @@
+# Talisman of Conviction: "{T}: Add {C}." costs nothing and "{T}: Add {R} or {W}. This artifact deals 1 damage to you" hurts. Turn 3:
+# blue and green are not among the second ability's colors (the refusals, beside the red it makes on turn 5), the first ability
+# makes {C} with Bot1 still at 20, and a tapped Talisman offers neither (! Activate). Turn 5: red, and Bot1 is at 19.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Talisman of Conviction
+Swamp x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Talisman of Conviction.Cast
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Talisman of Conviction.Activate(Ability: {R} or {W}; Color: Blue)
+! Bot1.Battlefield.Talisman of Conviction.Activate(Ability: {R} or {W}; Color: Green)
+Bot1.Battlefield.Talisman of Conviction.Activate(Ability: Add {C})
+? Bot1.Mana = {C}
+? Bot1.Life = 20
+! Bot1.Battlefield.Talisman of Conviction.Activate
+[T5 Bot1.Main1]
+Bot1.Battlefield.Talisman of Conviction.Activate(Ability: {R} or {W}; Color: Red)
+? Bot1.Mana = {R}
+
+[Expect]
+Turn = 5
+Bot1.Life = 19

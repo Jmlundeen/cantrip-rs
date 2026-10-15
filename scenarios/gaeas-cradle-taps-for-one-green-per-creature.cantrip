@@ -1,0 +1,31 @@
+# Gaea's Cradle's {T}: Add {G} for each creature you control is a mana ability counted as it is activated: with Elvish
+# Mystic and Llanowar Elves on the battlefield it adds {G}{G}, which pays Sylvan Caryatid's {1}{G} by itself.
+
+[Bot1 Deck]
+Forest
+Elvish Mystic
+Llanowar Elves
+Gaea's Cradle
+Sylvan Caryatid
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Gaea's Cradle.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot1.Battlefield.Gaea's Cradle.Activate
+Bot1.Hand.Sylvan Caryatid.Cast
+
+[Expect]
+Bot1.Battlefield = Forest; Elvish Mystic; Llanowar Elves; Gaea's Cradle; Sylvan Caryatid
+Bot1.Battlefield.Gaea's Cradle.Tapped = true

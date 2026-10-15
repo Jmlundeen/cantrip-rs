@@ -1,0 +1,23 @@
+# Lórien Revealed: Islandcycling {1} discards it from hand and searches the library for an Island, which goes to hand.
+
+[Bot1 Deck]
+Plains
+Lórien Revealed
+Plains x5
+Island
+Plains x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Lórien Revealed.Activate(Ability: Islandcycling)
+Bot1.Search(Island)
+[Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Lórien Revealed
+Bot1.Hand = Plains; Plains; Plains; Plains; Plains; Island

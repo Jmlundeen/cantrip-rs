@@ -1,0 +1,78 @@
+# Dack Fayden's emblem: "Whenever you cast a spell that targets one or more permanents, gain control of those permanents."
+# Bot1 reaches the emblem on turn 7 and casts Lightning Bolt at Bot2's Concealing Curtains. With the emblem's ability
+# on the stack above the Bolt, Bot2 counters the Bolt. The ability is independent of the spell once triggered: it
+# resolves with the permanent it was cast to take (CR 608.2h), so Bot1 controls the Curtains although the Bolt is gone.
+
+[Bot1 Deck]
+Volcanic Island
+Black Lotus
+Dack Fayden
+Mox Jet
+Mox Ruby
+Lightning Bolt
+Island
+Island x20
+
+[Bot2 Deck]
+Swamp
+Concealing Curtains
+Island
+Island
+Counterspell
+Island x2
+Island x14
+
+[Actions]
+Bot1.Hand.Volcanic Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Volcanic Island.Activate(Ability: Add {U})
+Bot1.Hand.Dack Fayden.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Dack Fayden.Activate(Bot1; Ability: draws two)
+Bot1.Choose(Island; Island)
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Concealing Curtains.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Dack Fayden.Activate(Bot1; Ability: draws two)
+Bot1.Choose(Island; Island)
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Battlefield.Dack Fayden.Activate(Bot1; Ability: draws two)
+Bot1.Choose(Island; Island)
+[T6 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T7 Bot1.Main1]
+Bot1.Battlefield.Dack Fayden.Activate(Ability: emblem)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Concealing Curtains)
+Bot1.Pass
+Bot2.Battlefield.Island#1.Activate
+Bot2.Battlefield.Island#2.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Lightning Bolt)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main2]
+
+[Expect]
+Turn = 7
+Bot2.Graveyard = Counterspell
+Bot1.Battlefield.Concealing Curtains.Types = Creature
+Bot2.Battlefield = Swamp; Island; Island

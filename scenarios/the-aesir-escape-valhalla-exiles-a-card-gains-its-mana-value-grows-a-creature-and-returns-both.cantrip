@@ -1,0 +1,42 @@
+# The Aesir Escape Valhalla, cast on turn 1 with a Mind Stone (mana value 2) and a Black Lotus already in the graveyard:
+# chapter I exiles the Mind Stone (chosen over the Lotus) and gains 2 life, chapter II on turn 3 puts two +1/+1 counters on
+# the Ornithopter, and chapter III on turn 5 returns the Saga and the Mind Stone to Bot1's hand.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Jet
+Mox Ruby
+Mind Stone
+The Aesir Escape Valhalla
+Ornithopter
+Forest x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Mind Stone.Cast
+Bot1.Battlefield.Mind Stone.Activate(Ability: Draw a card)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.The Aesir Escape Valhalla.Cast
+Bot1.Choose(Mind Stone)
+[T1 Bot1.Main2]
+? Bot1.Life = 22
+? Exile = Mind Stone
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 2
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Exile.Count = 0
+Bot1.Hand = Mind Stone; The Aesir Escape Valhalla; Forest; Forest; Forest

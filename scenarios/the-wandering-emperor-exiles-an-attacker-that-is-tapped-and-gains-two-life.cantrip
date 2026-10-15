@@ -1,0 +1,34 @@
+# The Wandering Emperor: "-2: Exile target tapped creature. You gain 2 life." Bot2's Llanowar Elves attack on turn 4 and are
+# tapped by attacking. Bot1 flashes the Emperor in during that declare-attackers step (a Black Lotus and a Plains pay), the turn
+# she entered so she may activate at instant speed, and uses -2 on the tapped Elves: they are exiled, Bot1 is at 22 life and the
+# Emperor at 1 loyalty. Bot2's Forest is untapped and is not an eligible target in any case.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+The Wandering Emperor
+Island x12
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T4 Bot2.Main1]
+Bot2.Attack(Llanowar Elves > Bot1)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.The Wandering Emperor.Cast
+Bot1.Battlefield.The Wandering Emperor.Activate(Llanowar Elves; Ability: Exile target tapped)
+[T4 Bot2.Main2]
+
+[Expect]
+Exile = Llanowar Elves
+Bot1.Life = 22
+Bot1.Battlefield.The Wandering Emperor.Counters.Loyalty = 1

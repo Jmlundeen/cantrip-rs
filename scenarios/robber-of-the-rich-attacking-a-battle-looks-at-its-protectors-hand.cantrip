@@ -1,0 +1,44 @@
+# Robber of the Rich: "Whenever this creature attacks, if defending player has more cards in hand than you, exile the top
+# card of their library." When a creature attacks a battle, the defending player is the battle's protector (CR 508.5,
+# 310.9d). On turn 3 Bot1 casts Invasion of Gobakhan (Bot2 protects it) and the hasty Robber, ending with two cards in hand,
+# and attacks its own battle. Bot2 holds seven cards (it discarded its eighth at cleanup), more than Bot1, so the top card of Bot2's library, the Island, is exiled.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Robber of the Rich
+Invasion of Gobakhan
+Plains
+Plains
+Plains x15
+
+[Bot2 Deck]
+Swamp x8
+Island
+Swamp x10
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Robber of the Rich.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Invasion of Gobakhan.Cast
+Bot1.Pass
+? Bot1.Hand.Count = 2
+? Bot2.Hand.Count = 7
+Bot1.Attack(Robber of the Rich > Bot1.Battlefield.Invasion of Gobakhan)
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Island

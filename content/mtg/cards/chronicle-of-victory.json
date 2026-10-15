@@ -1,0 +1,6 @@
+{
+  "name": "Chronicle of Victory",
+  "manaCost": "{6}",
+  "type": "Legendary Artifact",
+  "oracleText": "As Chronicle of Victory enters, choose a creature type.\nCreatures you control of the chosen type get +2/+2 and have first strike and trample.\nWhenever you cast a spell of the chosen type, draw a card."
+}

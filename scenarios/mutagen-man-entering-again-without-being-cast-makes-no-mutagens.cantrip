@@ -1,0 +1,32 @@
+# "When Mutagen Man enters, create X Mutagen tokens": X is the X of the spell that became it (CR 107.3m). Cast with
+# X = 1 it makes one Mutagen; blinked by Ephemerate on turn 3 it enters again, was not cast, and its X is 0, so it
+# makes none (CR 107.3i). It has trample all along.
+
+[Bot1 Deck]
+Black Lotus
+Mutagen Man, Living Ooze
+Ephemerate
+Plains
+Forest
+Forest
+Forest
+Forest x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Mutagen Man, Living Ooze.Cast(X: 1)
+[T1 Bot1.Main2]
+? Bot1.Battlefield = Plains; Mutagen Man, Living Ooze; Mutagen Token
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Ephemerate.Cast(Mutagen Man, Living Ooze)
+
+[Expect]
+Exile.Count = 1
+Bot1.Battlefield = Plains; Mutagen Man, Living Ooze; Mutagen Token
+Bot1.Battlefield.Mutagen Man, Living Ooze.Keywords = Trample

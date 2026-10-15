@@ -1,0 +1,32 @@
+# Spellseeker's enter trigger searches for an instant or sorcery with mana value 2 or less: Lightning Bolt can be
+# found, Fireblast (mana value 6) is not among the cards offered.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Spellseeker
+Plains x3
+Lightning Bolt
+Fireblast
+Plains x12
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Spellseeker.Cast
+Bot1.Pass
+! Bot1.Search(Fireblast)
+Bot1.Search(Lightning Bolt)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Lightning Bolt; Plains; Plains; Plains
+Bot1.Battlefield.Spellseeker.Power = 1

@@ -1,0 +1,32 @@
+# Cards put into the graveyard from the library count (CR 603.2c "from anywhere"), and two milled together are one event:
+# Thought Scour on Bot1 mills two Islands and takes just one counter off.
+
+[Bot1 Deck]
+Swamp
+Island
+Moonshadow
+Thought Scour
+Swamp
+Swamp
+Swamp
+Swamp
+Island
+Island
+Swamp x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Moonshadow.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Thought Scour.Cast(Bot1)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Thought Scour; Island; Island
+Bot1.Battlefield.Moonshadow.Counters.MinusOneMinusOne = 5

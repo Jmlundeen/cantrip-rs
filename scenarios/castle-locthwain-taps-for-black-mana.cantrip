@@ -1,0 +1,23 @@
+# "{T}: Add {B}." Bot1 taps Castle Locthwain for {B} and casts Dark Ritual with it, leaving {B}{B}{B} floating.
+
+[Bot1 Deck]
+Swamp
+Castle Locthwain
+Dark Ritual
+Plains x17
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Castle Locthwain.Play
+Bot1.Battlefield.Castle Locthwain.Activate(Ability: Add)
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {B}{B}{B}
+
+[Expect]
+Bot1.Battlefield.Castle Locthwain.Tapped = true

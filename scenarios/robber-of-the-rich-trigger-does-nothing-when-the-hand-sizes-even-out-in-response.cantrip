@@ -1,0 +1,54 @@
+# Robber of the Rich: the "if defending player has more cards in hand than you" is an intervening if (CR 603.4), checked again
+# as the ability resolves. On turn 3 Bot1 holds five cards and Bot2 six, so Robber's attack triggers. In response Bot2 taps a
+# Mox Ruby and casts a Lightning Bolt at Bot1, dropping to five: the hands are equal when the ability would resolve, so it
+# does nothing and no card is exiled.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Robber of the Rich
+Island
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Mox Ruby
+Mox Ruby
+Lightning Bolt
+Island
+Island
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Robber of the Rich.Cast
+Bot1.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 5
+? Bot2.Hand.Count = 6
+Bot1.Attack(Robber of the Rich > Bot2)
+Bot2.Battlefield.Mox Ruby#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot1.Life = 17
+Stack.Count = 0

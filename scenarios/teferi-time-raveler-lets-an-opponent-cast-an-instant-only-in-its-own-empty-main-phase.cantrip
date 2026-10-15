@@ -1,0 +1,33 @@
+# "Each opponent can cast spells only any time they could cast a sorcery": in Bot2's own upkeep (turn 4) its Lightning Bolt is
+# refused, though Mox Ruby is untapped; in its own first main phase, with an empty stack, the same Bolt is allowed (the positive
+# control) and hits Bot1. Teferi's controller is not restricted, only his opponents.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Teferi, Time Raveler
+Island x16
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Teferi, Time Raveler.Cast
+Bot2.Hand.Mox Ruby.Cast
+[T4 Bot2.Upkeep]
+! Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+
+[Expect]
+Bot1.Life = 17

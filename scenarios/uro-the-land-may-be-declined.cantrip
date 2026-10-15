@@ -1,0 +1,31 @@
+# "Then you may put a land card from your hand onto the battlefield" is "up to one": Bot1 casts Uro (sacrificed, since it did not escape), gains 3, draws an Island and declines to put it onto the
+# battlefield, so it stays in hand.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Uro, Titan of Nature's Wrath
+Island
+Island x14
+
+[Bot2 Deck]
+Swamp x22
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Uro, Titan of Nature's Wrath.Cast
+Bot1.Triggers(sacrifice it unless; gain 3 life and draw)
+Bot1.Choose()
+[Bot1.Main2]
+
+[Expect]
+Bot1.Life = 23
+Bot1.Hand = Island; Island; Island; Island
+Bot1.Battlefield = Mox Emerald; Mox Sapphire; Mox Jet
+Bot1.Graveyard = Uro, Titan of Nature's Wrath

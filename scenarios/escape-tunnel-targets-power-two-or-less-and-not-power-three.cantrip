@@ -1,0 +1,38 @@
+# "Target creature with power 2 or less": Cathar Commando (3/1) is refused, Embereth Shieldbreaker (2/1, power exactly
+# two) is the legal target and becomes unblockable for the turn.
+
+[Bot1 Deck]
+Mountain
+Mox Pearl
+Mox Jet
+Mox Emerald
+Embereth Shieldbreaker
+Cathar Commando
+Escape Tunnel
+Mountain x9
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Embereth Shieldbreaker.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Cathar Commando.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Escape Tunnel.Play
+! Bot1.Battlefield.Escape Tunnel.Activate(Ability: can't be blocked; Bot1.Battlefield.Cathar Commando)
+Bot1.Battlefield.Escape Tunnel.Activate(Ability: can't be blocked; Bot1.Battlefield.Embereth Shieldbreaker)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Escape Tunnel
+Bot1.Battlefield.Embereth Shieldbreaker.Keywords = CantBeBlocked
+Bot1.Battlefield.Cathar Commando.Keywords = Flash

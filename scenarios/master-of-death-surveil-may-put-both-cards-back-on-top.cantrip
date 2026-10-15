@@ -1,0 +1,40 @@
+# Surveil 2 may keep both cards on top, in the order chosen: nothing goes to the graveyard.
+
+[Bot1 Deck]
+Island
+Swamp
+Island
+Master of Death
+Island
+Island
+Island
+Island
+Island
+Mana Leak
+Counterspell
+Island x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Swamp x5
+Swamp x14
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Master of Death.Cast
+Bot1.Arrange(Counterspell; Mana Leak |)
+[T6 Bot2.Upkeep]
+
+[Expect]
+Bot1.Graveyard.Count = 0
+Bot1.Library = Counterspell; Mana Leak; Island; Island; Island; Island; Island; Island; Island; Island; Island; Island

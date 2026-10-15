@@ -1,0 +1,45 @@
+use cantrip_api::*;
+use cantrip_mechanics::attach::{attached_object, equip};
+use cantrip_mechanics::effects;
+use cantrip_oracle as oracle;
+
+fn plus_two_zero(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
+    chars.power = chars.power.map(|v| v + 2);
+}
+
+/// "Whenever equipped creature dies" (CR 603.6c, 603.10a): the creature the Crown was attached to, judged on the board
+/// as it was before, so it triggers even though the Crown would be unattached from a corpse (CR 704.5n), and even when
+/// the Crown leaves at the same time.
+fn equipped_creature_dies(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::ZoneChange { old, from, to, .. }
+            if from.is(ZoneKind::Battlefield) && to.is(ZoneKind::Graveyard) && q.obj(source).attached_to == Some(*old) =>
+        {
+            Fired::PLAIN
+        }
+        _ => None,
+    }
+}
+
+pub static CARD: CardDef = CardDef {
+    abilities: &[
+        AbilityDef::Triggered(TriggeredDef {
+            text: "Whenever equipped creature dies, draw a card.",
+            listens: EventMask::ZONE_CHANGE,
+            matches: equipped_creature_dies,
+            effect: effects::draw::<1>,
+            look_back: true,
+            ..TriggeredDef::BLANK
+        }),
+        equip(mana(2, 0, 0, 0, 0, 0), "Equip {2}"),
+        equip(mana(0, 0, 0, 1, 0, 0), "Equip {B}"),
+    ],
+    statics: &[StaticDef {
+        text: "Equipped creature gets +2/+0.",
+        layer: Layer::PtModify,
+        affects: attached_object,
+        apply: plus_two_zero,
+        ..StaticDef::BLANK
+    }],
+    ..oracle::TRANSMOGRANTS_CROWN
+};

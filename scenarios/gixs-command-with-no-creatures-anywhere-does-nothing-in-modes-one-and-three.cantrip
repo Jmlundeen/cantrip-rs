@@ -1,0 +1,42 @@
+# Gix's Command, modes 1 and 3 with no creature on the battlefield and no creature card in Bot1's graveyard: neither mode
+# has anything to act on (the counters need a creature; nothing to return) and nothing is asked.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Gleemox
+Gix's Command
+Island
+Island
+Island x12
+
+[Bot2 Deck]
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island x12
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Black)
+Bot1.Hand.Gix's Command.Cast
+Bot1.Modes(1; 3)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Gix's Command; Black Lotus
+Bot1.Hand.Count = 4
+Stack.Count = 0

@@ -1,0 +1,6 @@
+{
+  "name": "Sear",
+  "manaCost": "{1}{R}",
+  "type": "Instant",
+  "oracleText": "Sear deals 4 damage to target creature or planeswalker."
+}

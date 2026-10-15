@@ -1,0 +1,22 @@
+# The first question of a real game (CR 103.1): Bot1, chosen to decide, is asked to play first or draw first before
+# anybody has a hand. The screen to look at is the choice itself, with both libraries full and both hands empty.
+
+[Opening]
+Chooser: Bot1
+
+[Bot1 Deck]
+Island x7
+Island x13
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+[Handover Bot1.PlayFirst]
+
+[Expect]
+Turn = 0
+Bot1.Hand.Count = 0
+Bot2.Hand.Count = 0
+Bot1.Library.Count = 20
+Bot2.Library.Count = 20

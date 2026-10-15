@@ -1,0 +1,83 @@
+# Level 3: "Whenever you cast an instant or sorcery spell, create a 1/1 blue and red Otter creature token with
+# prowess." The opponent's Bolt is not cast by you and Ornithopter is a creature spell, so neither makes an Otter;
+# Ponder (a sorcery) does, and so does a Bolt the opponent counters: the trigger is put on the stack above the spell
+# as it is cast, and does not care what becomes of it (CR 603.3b, and the card's ruling).
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Stormchaser's Talent
+Black Lotus
+Black Lotus
+Black Lotus
+Mox Ruby
+Ponder
+Ornithopter
+Lightning Bolt
+Island x11
+
+[Bot2 Deck]
+Mountain
+Mox Sapphire
+Lightning Bolt
+Counterspell
+Island
+Island
+Island
+Island x11
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Stormchaser's Talent.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Stormchaser's Talent.Activate(Ability: Level 2)
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Stormchaser's Talent.Activate(Ability: Level 3)
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Stormchaser's Talent.ClassLevel = 3
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T2 Bot2.Main2]
+? Bot1.Battlefield.Count = 5
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Ponder.Cast
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Count = 6
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Count = 7
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Lightning Bolt)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Island; Mox Sapphire; Mox Ruby; Stormchaser's Talent; Ornithopter; Otter; Otter; Otter
+Bot1.Life = 17
+Bot2.Life = 20
+Bot2.Graveyard = Counterspell; Lightning Bolt
+Bot1.Graveyard = Lightning Bolt; Ponder; Black Lotus; Black Lotus; Black Lotus
+Stack.Count = 0

@@ -1,0 +1,38 @@
+# "You may": Bot1 declines to copy Bot2's Guerrilla Gorilla, so Phantasmal Image enters as its printed 0/0 and the
+# state-based action for zero toughness puts it into its owner's graveyard (CR 704.5f).
+
+[Bot1 Deck]
+Island
+Island
+Island
+Phantasmal Image
+Island x10
+
+[Bot2 Deck]
+Forest
+Forest
+Guerrilla Gorilla
+Forest x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Phantasmal Image.Cast
+Bot1.Decline
+
+[Expect]
+Turn = 5
+Bot1.Graveyard = Phantasmal Image
+Bot1.Battlefield.Count = 3
+Bot2.Battlefield.Guerrilla Gorilla.Subtypes = Ape; Hero; Soldier

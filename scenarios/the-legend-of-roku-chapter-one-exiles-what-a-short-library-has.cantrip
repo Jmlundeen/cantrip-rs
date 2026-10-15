@@ -1,0 +1,29 @@
+# The Legend of Roku, chapter I: "Exile the top three cards of your library." With only two cards in the library it exiles those two
+# (the rest of the deck is in Bot1's hand) and the library is empty. Cast on turn 1 off a Mox Ruby and a Black Lotus.
+
+[Bot1 Deck]
+Mox Ruby
+Black Lotus
+The Legend of Roku
+Mountain x4
+Island
+Forest
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.The Legend of Roku.Cast
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Exile = Island; Forest
+Bot1.Library.Count = 0
+Bot1.Battlefield.The Legend of Roku.Counters.Lore = 1

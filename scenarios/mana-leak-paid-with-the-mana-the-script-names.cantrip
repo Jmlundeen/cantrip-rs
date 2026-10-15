@@ -1,0 +1,47 @@
+# Paying an "unless pays" cost (CR 118.12) asks which pool mana pays it whenever the pool could pay in more than one
+# way (CR 601.2h by analogy). Bot1 pays Mana Leak's {3} from {R}{U}{U}{B}: every way spends a blue, and `Spend: B, R`
+# puts the black and then the red in, so the second blue is the mana left.
+
+[Bot1 Deck]
+Guerrilla Gorilla
+Forest
+Forest
+Mountain
+Island
+Island
+Swamp
+Forest x10
+
+[Bot2 Deck]
+Mana Leak
+Island x6
+Island x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot2.Hand.Island.Play
+Bot1.Hand.Forest.Play
+Bot2.Hand.Island.Play
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Island.Play
+Bot1.Hand.Island.Play
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Mana Leak.Cast(Guerrilla Gorilla)
+# Without this pass Bot1 would tap its lands as soon as it had priority, before Mana Leak resolved.
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.PayCost(Spend: B, R)
+
+[Expect]
+Turn = 11
+Bot1.Battlefield = Forest; Forest; Island; Island; Mountain; Swamp; Guerrilla Gorilla
+Bot1.Mana = {U}
+Bot2.Graveyard = Mana Leak; Island; Island; Island

@@ -1,0 +1,6 @@
+{
+  "name": "Ancestral Recall",
+  "manaCost": "{U}",
+  "type": "Instant",
+  "oracleText": "Target player draws three cards."
+}

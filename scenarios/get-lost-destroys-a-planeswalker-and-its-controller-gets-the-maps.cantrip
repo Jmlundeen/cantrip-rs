@@ -1,0 +1,37 @@
+# A planeswalker is a legal target: Bot1's Get Lost destroys Bot2's Liliana of the Veil (cast with a Swamp and two Moxen) on turn
+# 3, and Bot2, her controller, gets the two Map tokens, not Bot1, the caster.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Get Lost
+Plains x14
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Liliana of the Veil
+Swamp x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Liliana of the Veil.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Get Lost.Cast(Bot2.Battlefield.Liliana of the Veil)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Liliana of the Veil
+Bot2.Battlefield = Swamp; Mox Jet; Mox Ruby; Map Token; Map Token
+Bot1.Battlefield = Plains; Mox Pearl

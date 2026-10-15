@@ -1,0 +1,11 @@
+{
+  "name": "Lurrus of the Dream-Den",
+  "manaCost": "{1}{W/B}{W/B}",
+  "type": "Legendary Creature — Cat Nightmare",
+  "power": 3,
+  "toughness": 2,
+  "oracleText": "Companion — Each permanent card in your starting deck has mana value 2 or less.\nLifelink\nOnce during each of your turns, you may cast a permanent spell with mana value 2 or less from your graveyard.",
+  "keywords": [
+    "Lifelink"
+  ]
+}

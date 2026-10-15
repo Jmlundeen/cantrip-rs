@@ -1,0 +1,44 @@
+# Boseiju, Who Endures, channel: "Destroy target artifact ... That player may search" - the search does not depend on the
+# permanent having been destroyed. Bot2's The One Ring is indestructible (CR 702.12b) so it stays on the battlefield, and
+# Bot2 still may search and puts an Island onto the battlefield. Bot2 casts the Ring with a Black Lotus and an Island.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Boseiju, Who Endures
+Island x4
+Island x10
+
+[Bot2 Deck]
+Island
+Black Lotus
+The One Ring
+Island x4
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.The One Ring.Cast
+Bot2.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Boseiju, Who Endures.Activate(Bot2.Battlefield.The One Ring)
+Bot1.Pass
+Bot2.Accept
+Bot2.Search(Island)
+[Bot1.Main1]
+
+[Expect]
+Turn = 3
+Bot2.Battlefield = Island; Island; The One Ring
+Bot2.Graveyard = Black Lotus

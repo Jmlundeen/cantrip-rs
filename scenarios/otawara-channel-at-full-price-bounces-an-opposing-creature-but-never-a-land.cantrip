@@ -1,0 +1,36 @@
+# With no legendary creature the channel costs the full {3}{U} (four Moxen). The target must be an artifact, creature,
+# enchantment or planeswalker: Bot2's Island is refused (positive control: the Ornithopter, which is bounced to Bot2's hand
+# at instant speed during Bot2's own turn 4).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Mox Ruby
+Otawara, Soaring City
+Island x15
+
+[Bot2 Deck]
+Island
+Ornithopter
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T4 Bot2.Main1]
+! Bot1.Hand.Otawara, Soaring City.Activate(Bot2.Battlefield.Island)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Otawara, Soaring City.Activate(Bot2.Battlefield.Ornithopter)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot2.Battlefield = Island
+Bot1.Graveyard = Otawara, Soaring City

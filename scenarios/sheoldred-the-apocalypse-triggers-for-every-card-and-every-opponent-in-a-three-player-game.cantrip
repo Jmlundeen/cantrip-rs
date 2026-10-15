@@ -1,0 +1,48 @@
+# Sheoldred, the Apocalypse: "Whenever you draw a card, you gain 2 life" and "Whenever an opponent draws a card, they lose
+# 2 life" - once per card and for each opponent (CR 603.2). In a three-player game her draw-step triggers cost Bot2 (turn 2)
+# and Bot3 (turn 3) 2 each (18). On turn 4 Bot1 draws (+2 = 22) and casts Wheel of Fortune: every player discards their hand
+# and draws seven, so Bot1 gains 2 for each of its seven cards (+14 = 36) and Bot2 and Bot3 lose 2 for each of their seven
+# (-14 = 4). Turn 1's draw (the first player draws in a game of more than two, CR 103.8a) came before she was there.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Sheoldred, the Apocalypse
+Mox Ruby
+Wheel of Fortune
+Mountain
+Swamp
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Sheoldred, the Apocalypse.Cast
+[T2 Bot2.Main1]
+? Bot2.Life = 18
+[T3 Bot3.Main1]
+? Bot3.Life = 18
+[T4 Bot1.Main1]
+? Bot1.Life = 22
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Wheel of Fortune.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+
+[Expect]
+Bot1.Life = 36
+Bot2.Life = 4
+Bot3.Life = 4

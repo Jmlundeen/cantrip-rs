@@ -1,0 +1,42 @@
+# Overload (CR 702.96a): Winds of Abandon cast for {4}{W}{W} exiles every creature its caster does not control; the one player who lost two searches once for two basic lands, which enter tapped together.
+
+[Bot1 Deck]
+Sol Ring
+Black Lotus
+Winds of Abandon
+Ornithopter
+Plains x20
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Winds of Abandon.Cast(Ability: Overload)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Plains.Activate
+Bot2.Search(Island; Island)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Winds of Abandon; Black Lotus
+Bot1.Battlefield = Plains; Plains; Sol Ring; Ornithopter
+Exile.Count = 2
+Bot2.Battlefield = Island; Island; Island
+Bot2.Battlefield.Island#2.Tapped = true
+Bot2.Battlefield.Island#3.Tapped = true
+Stack.Count = 0

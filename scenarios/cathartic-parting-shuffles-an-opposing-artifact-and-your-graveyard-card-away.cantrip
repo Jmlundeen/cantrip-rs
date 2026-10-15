@@ -1,0 +1,40 @@
+# Cathartic Parting: Bot2's Sol Ring is shuffled into its owner's library, and (the "may" accepted) Bot1's Lightning
+# Bolt is shuffled from its graveyard into its library.
+
+[Bot1 Deck]
+Mox Ruby
+Lightning Bolt
+Mox Emerald
+Cathartic Parting
+Plains
+Plains
+Plains
+Plains x13
+
+[Bot2 Deck]
+Mox Ruby
+Sol Ring
+Plains x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Cathartic Parting.Cast
+Bot1.Target(Bot2.Battlefield.Sol Ring)
+Bot1.Target(Bot1.Graveyard.Lightning Bolt)
+Bot1.Accept
+[Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Mox Ruby
+Bot2.Library.Count = 13
+Bot1.Graveyard = Cathartic Parting
+Bot1.Library.Count = 13

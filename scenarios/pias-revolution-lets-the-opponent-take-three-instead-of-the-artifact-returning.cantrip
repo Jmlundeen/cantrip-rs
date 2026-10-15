@@ -1,0 +1,40 @@
+# Pia's Revolution: a Lotus Petal sacrificed for mana is a nontoken artifact put into its owner's graveyard from the
+# battlefield, so the Revolution triggers and targets Bot2. Bot2 chooses to have the Revolution deal 3 damage to them,
+# so the Petal stays in the graveyard.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Pia's Revolution
+Lotus Petal
+Mountain x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Pia's Revolution.Cast
+Bot1.Pass
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Pass
+Bot1.Battlefield.Lotus Petal.Activate(Color: Red)
+Bot2.Accept
+[Bot1.Main2]
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot2.Life = 17
+Bot1.Graveyard = Lotus Petal
+Bot1.Hand.Count = 2
+Bot1.Battlefield = Mox Ruby; Mox Pearl; Mox Jet; Pia's Revolution

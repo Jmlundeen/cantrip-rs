@@ -1,0 +1,26 @@
+# Two Black Lotuses, one chosen blue and one chosen black: each adds three mana of that single color (CR 106.1 - the
+# pool shows UUU and BBB, never a mixture within one activation), and each Lotus was sacrificed as a cost, so both are in
+# the graveyard. The unspent mana empties at the end of the step (CR 500.4): nothing is left in Main2.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Island x14
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+? Bot1.Mana = {U}{U}{U}
+? Bot1.Graveyard.Count = 1
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+? Bot1.Mana = {U}{U}{U}{B}{B}{B}
+[Bot1.Main2]
+? Bot1.Mana =
+
+[Expect]
+Bot1.Graveyard = Black Lotus; Black Lotus
+Bot1.Battlefield.Count = 0

@@ -1,0 +1,45 @@
+# Spree (CR 702.172): only the chosen modes are paid for and happen, each with its own target. Modes 1 and 3 ({G} + {2} + {1})
+# are chosen, the trample mode is not: the counters go on Llanowar Elves (3/3, no trample) and the draw-two grant on Haywire Mite,
+# a different creature. Both attack Bot2 unblocked: the Mite's combat damage draws two cards, the Elves' damage draws nothing.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Mox Jet
+Llanowar Elves
+Haywire Mite
+Trash the Town
+Island x3
+Island x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Haywire Mite.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Trash the Town.Cast
+Bot1.Modes(1; 3)
+Bot1.Target(Llanowar Elves)
+Bot1.Target(Haywire Mite)
+Bot1.Attack(Llanowar Elves; Haywire Mite)
+[T3 Bot1.Main2]
+? Bot2.Life = 16
+? Bot1.Hand.Count = 3
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Llanowar Elves.Keywords = (absent)
+Bot1.Battlefield.Haywire Mite.Counters.PlusOnePlusOne = (absent)

@@ -1,0 +1,39 @@
+# "+2/+2 until end of turn": Bot2 bolts Bot1's Ornithopter (0/2) on turn two; Bot1 answers with Battlefield
+# Improvisation, making it 2/4, and it survives with three damage marked (CR 704.5g needs damage of at least toughness).
+# Damage and the bonus both end in the cleanup step (CR 514.2), so on turn three it is a 0/2 with no damage.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Ornithopter
+Battlefield Improvisation
+Plains x11
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x13
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Battlefield Improvisation.Cast(Ornithopter)
+[T2 Bot2.Main2]
+? Bot1.Battlefield.Ornithopter.Power = 2
+? Bot1.Battlefield.Ornithopter.Toughness = 4
+? Bot1.Battlefield.Ornithopter.Damage = 3
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot1.Battlefield.Ornithopter.Damage = 0
+Bot2.Graveyard = Lightning Bolt
+Bot1.Graveyard = Battlefield Improvisation

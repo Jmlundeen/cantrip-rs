@@ -1,0 +1,57 @@
+# "Artifacts and creatures your opponents control enter tapped": Bot1's own Ornithopter enters untapped; Bot2's Mox Jet and
+# Ornithopter enter tapped (seen on turn 3). Its Mind Stone, cast on turn 4, enters tapped and cannot be tapped for mana
+# that turn (refusal), but can on turn 6 (positive control). When Bot2's Bolt kills Spider-Woman on turn 4, the second Ornithopter
+# enters untapped.
+
+[Bot1 Deck]
+Island
+Mox Jet
+Spider-Woman, Stunning Savior
+Ornithopter
+Island x10
+
+[Bot2 Deck]
+Mountain
+Mountain
+Mox Jet
+Mind Stone
+Ornithopter
+Ornithopter
+Lightning Bolt
+Island x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Spider-Woman, Stunning Savior.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Ornithopter.Tapped = false
+? Bot2.Battlefield.Mox Jet.Tapped = true
+? Bot2.Battlefield.Ornithopter.Tapped = true
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Mind Stone.Cast
+Bot2.Pass
+! Bot2.Battlefield.Mind Stone.Activate
+Bot2.Battlefield.Mountain#2.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Spider-Woman, Stunning Savior)
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T6 Bot2.Main1]
+Bot2.Battlefield.Mind Stone.Activate(Ability: Add)
+
+[Expect]
+Bot2.Battlefield.Ornithopter#2.Tapped = false
+Bot1.Graveyard = Spider-Woman, Stunning Savior
+Bot2.Battlefield.Mind Stone.Tapped = true

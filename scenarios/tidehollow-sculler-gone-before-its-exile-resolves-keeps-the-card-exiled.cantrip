@@ -1,0 +1,42 @@
+# Tidehollow Sculler: its two abilities are independent triggers (CR 603.7, 607.2a rulings): "When this creature leaves
+# the battlefield, return the exiled card" does nothing if it triggers while the enters ability is still on the stack, since
+# nothing is exiled yet, and the enters ability then exiles the card for good. Bot1 casts the Sculler, targets Bot2, and with the
+# trigger on the stack Swords to Plowshares exiles its own Sculler (gaining 2): the leave trigger resolves first and returns
+# nothing, then Bot1 takes Lightning Bolt out of Bot2's hand, where it stays exiled.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Plains
+Tidehollow Sculler
+Swords to Plowshares
+Plains x14
+
+[Bot2 Deck]
+Lightning Bolt
+Island x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tidehollow Sculler.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Tidehollow Sculler)
+Bot1.Battlefield.Plains.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Lightning Bolt)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Life = 22
+Exile = Lightning Bolt; Tidehollow Sculler
+Bot2.Hand.Count = 6

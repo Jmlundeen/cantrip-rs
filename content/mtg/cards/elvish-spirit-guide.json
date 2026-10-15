@@ -1,0 +1,8 @@
+{
+  "name": "Elvish Spirit Guide",
+  "manaCost": "{2}{G}",
+  "type": "Creature — Elf Spirit",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Exile this card from your hand: Add {G}."
+}

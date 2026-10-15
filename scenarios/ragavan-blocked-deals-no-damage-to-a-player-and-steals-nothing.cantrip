@@ -1,0 +1,29 @@
+# Ragavan's trigger is "whenever Ragavan deals combat damage to a PLAYER": on turn 3 Bot2's Ornithopter blocks and takes the
+# damage, so no Treasure is made and nothing is exiled from Bot2's library (the unblocked hit, with a Treasure and an exiled
+# card, is the neighbouring scenario). Ragavan, a 2/1 against a 0/2, kills the Ornithopter and survives.
+
+[Bot1 Deck]
+Mox Ruby
+Ragavan, Nimble Pilferer
+Mountain x12
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ragavan, Nimble Pilferer.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Ragavan, Nimble Pilferer > Bot2)
+Bot2.Block(Ornithopter > Ragavan, Nimble Pilferer)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Exile.Count = 0
+Bot1.Battlefield = Mox Ruby; Ragavan, Nimble Pilferer
+Bot2.Graveyard = Ornithopter

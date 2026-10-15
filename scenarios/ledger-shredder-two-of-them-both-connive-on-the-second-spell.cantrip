@@ -1,0 +1,43 @@
+# Two Shredders are two triggers for the same second spell: the first spell Bot1 casts on turn 3 is the second Shredder
+# itself (so the first Shredder does not trigger, it being only the first spell), the next Pyrite Spellbomb is the second
+# spell, and both Shredders connive - each draws a Spellbomb, discards one (a nonland card) and grows to 2/4.
+
+[Bot1 Deck]
+Island
+Island
+Mox Jet
+Ledger Shredder
+Ledger Shredder
+Pyrite Spellbomb
+Pyrite Spellbomb
+Island
+Pyrite Spellbomb
+Pyrite Spellbomb
+Island x10
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ledger Shredder.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ledger Shredder.Cast
+? Bot1.Battlefield.Ledger Shredder.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Pyrite Spellbomb.Cast
+Bot1.Choose(Pyrite Spellbomb)
+Bot1.Choose(Pyrite Spellbomb)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Ledger Shredder#1.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ledger Shredder#2.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ledger Shredder#1.Power = 2
+Bot1.Battlefield.Ledger Shredder#2.Toughness = 4

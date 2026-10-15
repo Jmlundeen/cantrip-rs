@@ -1,0 +1,30 @@
+# Overload needs no target (CR 702.96a), so Damn cast for {2}{W}{W} with no creature anywhere is legal and simply does
+# nothing: four Mox Pearls pay on turn one, and it resolves to the graveyard with the artifacts untouched.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Damn
+Plains x10
+
+[Bot2 Deck]
+Plains x14
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Pearl#3.Activate
+Bot1.Battlefield.Mox Pearl#4.Activate
+Bot1.Hand.Damn.Cast(Ability: Overload)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Damn
+Bot1.Battlefield.Count = 4
+Stack.Count = 0

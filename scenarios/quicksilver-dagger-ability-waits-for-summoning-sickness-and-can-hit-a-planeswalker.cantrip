@@ -1,0 +1,45 @@
+# Quicksilver Dagger: the granted ability has {T} in its cost, so the creature can't use it the turn it comes in (CR 302.6):
+# `!` on turn 1 with the Ornithopter just cast, and on turn 3 the positive control, aimed at Bot2's Narset, Parter of
+# Veils ("target player or planeswalker"): Narset goes from 5 loyalty to 4 and Bot2 keeps its life.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Ornithopter
+Quicksilver Dagger
+Plains x2
+Plains x12
+
+[Bot2 Deck]
+Black Lotus
+Narset, Parter of Veils
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Quicksilver Dagger.Cast(Ornithopter)
+Bot1.Pass
+! Bot1.Battlefield.Ornithopter.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Narset, Parter of Veils.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Ornithopter.Activate(Narset, Parter of Veils)
+[Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 20
+Bot2.Battlefield.Narset, Parter of Veils.Counters.Loyalty = 4

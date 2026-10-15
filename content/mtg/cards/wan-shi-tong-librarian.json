@@ -1,0 +1,13 @@
+{
+  "name": "Wan Shi Tong, Librarian",
+  "manaCost": "{X}{U}{U}",
+  "type": "Legendary Creature — Bird Spirit",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "Flash\nFlying, vigilance\nWhen Wan Shi Tong enters, put X +1/+1 counters on him. Then draw half X cards, rounded down.\nWhenever an opponent searches their library, put a +1/+1 counter on Wan Shi Tong and draw a card.",
+  "keywords": [
+    "Flash",
+    "Flying",
+    "Vigilance"
+  ]
+}

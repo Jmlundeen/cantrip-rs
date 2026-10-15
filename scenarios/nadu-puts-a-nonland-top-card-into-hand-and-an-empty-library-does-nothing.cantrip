@@ -1,0 +1,44 @@
+# Nadu's granted ability: "reveal the top card of your library. If it's a land card, put it onto the battlefield. Otherwise, put it into your
+# hand." Bot1 has two cards left in the library, Mox Jet and Mox Pearl; the turn-3 draw takes the Jet. Bot1 then aims two Lightning Bolts
+# at its own Nadu. The first targeting reveals the Mox Pearl, not a land, so it goes to the hand; the second finds the library empty and
+# does nothing (and Bot1 does not lose: nothing is drawn). The two Bolts then kill Nadu (3/4).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Sapphire
+Gleemox
+Mox Ruby
+Nadu, Winged Wisdom
+Lightning Bolt
+Lightning Bolt
+Mox Jet
+Mox Pearl
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Green)
+Bot1.Hand.Nadu, Winged Wisdom.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Nadu, Winged Wisdom)
+Bot1.Hand.Lightning Bolt.Cast(Nadu, Winged Wisdom)
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Result = InProgress
+Bot1.Hand = Mox Jet; Mox Pearl
+Bot1.Library.Count = 0
+Bot1.Graveyard = Nadu, Winged Wisdom; Lightning Bolt; Lightning Bolt

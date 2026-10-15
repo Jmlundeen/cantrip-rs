@@ -1,0 +1,32 @@
+# "Its owner may play it": Bot1 exiles Bot2's Lightning Bolt on turn 1. On turn 3, with a Mountain in play, Bot1 is not offered a
+# cast of it (the card is still in exile, checked first), though Bot2 later can (the existing scenario).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Invasion of Gobakhan
+Mountain
+Plains x20
+
+[Bot2 Deck]
+Lightning Bolt
+Mountain x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Invasion of Gobakhan.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Choose(Lightning Bolt)
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+? Exile = Lightning Bolt
+! Bot1.Exile.Lightning Bolt.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Lightning Bolt

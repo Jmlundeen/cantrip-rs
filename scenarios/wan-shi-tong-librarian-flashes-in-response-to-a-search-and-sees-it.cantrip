@@ -1,0 +1,51 @@
+# Flash: Bot1 holds {X}{U}{U} open through Bot2's turn and casts Wan Shi Tong with X = 2 in response to Mystical Tutor.
+# It is on the battlefield by the time the tutor resolves, so Bot2's search then grows it from two counters to three
+# and draws a second card.
+
+[Bot1 Deck]
+Island
+Island
+Sol Ring
+Wan Shi Tong, Librarian
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island
+Island
+Mystical Tutor
+Island
+Island
+Island
+Island
+Island x4
+Brainstorm
+Counterspell
+Island x6
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Mystical Tutor.Cast
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Wan Shi Tong, Librarian.Cast(X: 2)
+Bot1.Pass
+Bot1.Pass
+Bot2.Search(Brainstorm)
+
+[Expect]
+Turn = 4
+ActivePlayer = Bot2
+Bot1.Battlefield.Wan Shi Tong, Librarian.Counters.PlusOnePlusOne = 3
+Bot1.Hand.Count = 6

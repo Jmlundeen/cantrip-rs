@@ -1,0 +1,39 @@
+# Ragavan: "Until end of turn, you may cast that card." Bot1 hits on turn 3 and exiles Bot2's Lightning Bolt but casts nothing; on
+# turn 3 the Bolt is castable (the refusal is placed on turn 5, with the Mox Ruby untapped and a target to aim at, and the
+# positive control is the same Cast on turn 3), and on turn 5 it is not offered: the permission lapsed at the end of turn 3 and
+# the card stays in exile.
+
+[Bot1 Deck]
+Mox Ruby
+Ragavan, Nimble Pilferer
+Mountain x12
+
+[Bot2 Deck]
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Lightning Bolt
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ragavan, Nimble Pilferer.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Ragavan, Nimble Pilferer > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+? Exile = Lightning Bolt
+[T5 Bot1.Main1]
+! Bot1.Exile.Lightning Bolt.Cast(Bot2)
+
+[Expect]
+Exile = Lightning Bolt
+Turn = 5

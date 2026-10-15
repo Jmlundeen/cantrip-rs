@@ -1,0 +1,27 @@
+# Orzhov Basilica's enters trigger uses the stack (CR 603.3): with it waiting, Bot1 taps the Plains for {W} in response, then the
+# trigger resolves and Bot1 returns that tapped Plains to its hand - the mana already made stays in the pool. The Plains is
+# back in the hand untapped (a new object, CR 400.7) and the Basilica, which entered tapped, stays.
+
+[Bot1 Deck]
+Plains
+Orzhov Basilica
+Plains x5
+Plains x10
+
+[Bot2 Deck]
+Swamp x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Orzhov Basilica.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Plains)
+? Bot1.Mana = {W}
+? Bot1.Battlefield = Orzhov Basilica
+? Bot1.Hand.Count = 7
+
+[Expect]
+Bot1.Battlefield.Orzhov Basilica.Tapped = true

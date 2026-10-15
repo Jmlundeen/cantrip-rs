@@ -1,0 +1,37 @@
+# Tidehollow Sculler (cast with two Moxen) reveals Bot2's hand and Bot1 exiles Llanowar Elves from it, leaving the
+# lands and the Lightning Bolt. When Bot2 bolts the Sculler, its second ability returns the Elves to Bot2's hand.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Tidehollow Sculler
+Plains x17
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Llanowar Elves
+Mountain x4
+Mountain x10
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tidehollow Sculler.Cast
+Bot1.Choose(Llanowar Elves)
+[T1 Bot1.Main2]
+? Bot2.Hand.Count = 6
+? Exile.Count = 1
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Tidehollow Sculler)
+[T2 Bot2.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot1.Graveyard = Tidehollow Sculler
+Bot2.Hand.Count = 6
+Bot2.Battlefield = Mountain

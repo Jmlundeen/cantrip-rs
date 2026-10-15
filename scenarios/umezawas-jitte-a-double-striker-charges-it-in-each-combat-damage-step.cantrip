@@ -1,0 +1,38 @@
+# Double strike deals combat damage in two steps (CR 702.4b, 510.4), each its own event, so the Jitte's trigger fires
+# in each: Death-Greeter's Champion (3/2 after backing itself up) connects twice and the Jitte has four charge counters.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Death-Greeter's Champion
+Umezawa's Jitte
+Forest
+Forest x14
+
+[Bot2 Deck]
+Island x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Death-Greeter's Champion.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Umezawa's Jitte.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Umezawa's Jitte.Activate(Ability: Equip; Death-Greeter's Champion)
+Bot1.Attack(Death-Greeter's Champion > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Bot1.Battlefield.Umezawa's Jitte.Counters.Charge = 4
+Bot1.Battlefield.Umezawa's Jitte.AttachedTo = Death-Greeter's Champion

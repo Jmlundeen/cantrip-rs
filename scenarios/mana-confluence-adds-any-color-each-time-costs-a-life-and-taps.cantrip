@@ -1,0 +1,25 @@
+# Any color, one life each time, and {T}: on turn 1 the Confluence taps for red (Bot1 at 19), paying for Lightning Bolt; tapped, it cannot be used again that turn (refusal). On turn 3 it taps for green ({G} in the pool, Bot1 at 18):
+# the same land adds two different colors on two turns (the positive control for the refusal).
+
+[Bot1 Deck]
+Mana Confluence
+Lightning Bolt
+Plains x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mana Confluence.Play
+Bot1.Battlefield.Mana Confluence.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+! Bot1.Battlefield.Mana Confluence.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mana Confluence.Activate(Color: Green)
+? Bot1.Mana = {G}
+? Bot1.Life = 18
+
+[Expect]
+Bot2.Life = 17
+Bot1.Life = 18

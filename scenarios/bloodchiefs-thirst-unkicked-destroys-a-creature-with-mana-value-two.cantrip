@@ -1,0 +1,29 @@
+# Unkicked, Bloodchief's Thirst destroys a target creature with mana value 2 or less: Dark Confidant (mana value 2).
+
+[Bot1 Deck]
+Swamp
+Bloodchief's Thirst
+Island x15
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Dark Confidant
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Dark Confidant.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Bloodchief's Thirst.Cast
+Bot1.Target(Bot2.Battlefield.Dark Confidant)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Dark Confidant
+Bot1.Graveyard = Bloodchief's Thirst

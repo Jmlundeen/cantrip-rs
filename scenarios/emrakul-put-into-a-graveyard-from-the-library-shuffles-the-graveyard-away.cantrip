@@ -1,0 +1,24 @@
+# Emrakul, the Aeons Torn: "When Emrakul is put into a graveyard from anywhere, its owner shuffles their graveyard into
+# their library." Entomb puts it into Bot1 graveyard from the library, and the ability, which goes on the stack once Entomb
+# has resolved and is in the graveyard too, shuffles both back: the graveyard is empty.
+
+[Bot1 Deck]
+Swamp
+Entomb
+Swamp x5
+Emrakul, the Aeons Torn
+Swamp x11
+
+[Bot2 Deck]
+Island x13
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Emrakul, the Aeons Torn)
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard.Count = 0
+Bot1.Library.Count = 13

@@ -1,0 +1,32 @@
+# Lotus Cobra: "Landfall - Whenever a land you control enters, add one mana of any color." The color is chosen as the
+# trigger resolves, so a Forest played on turn 3 gives {R} for the asking. The Cobra comes down on turn 1 off a Forest
+# and a Mox Emerald.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Lotus Cobra
+Forest
+Mountain
+Mountain
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Lotus Cobra.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Colors(Red)
+? Bot1.Mana = {R}
+[Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Forest; Forest; Mox Emerald; Lotus Cobra

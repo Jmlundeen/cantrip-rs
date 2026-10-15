@@ -1,0 +1,12 @@
+{
+  "name": "Bala Ged Recovery",
+  "manaCost": "{2}{G}",
+  "type": "Sorcery",
+  "oracleText": "Return target card from your graveyard to your hand.",
+  "backFacePlayableAsLand": true,
+  "backFace": {
+    "name": "Bala Ged Sanctuary",
+    "type": "Land",
+    "oracleText": "This land enters tapped.\n{T}: Add {G}."
+  }
+}

@@ -1,0 +1,37 @@
+# Spirit Water Revival with its waterbend cost paid: "you have no maximum hand size for the rest of the game" (CR 402.2).
+# After the spell Bot1 holds the Island it kept and the seven it drew, eight cards; at the cleanup step (CR 514.1) a player
+# with no maximum hand size discards nothing, and the spell has exiled itself. The unwaterbent companion discards to seven.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Emerald
+Ornithopter
+Island
+Spirit Water Revival
+Island x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Spirit Water Revival.Cast(Kicked: 1; Convoke: Mox Sapphire, Mox Pearl, Mox Jet, Mox Ruby, Mox Emerald, Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T6 Bot2.Main1]
+
+[Expect]
+Bot1.Hand.Count = 8
+Exile = Spirit Water Revival

@@ -1,0 +1,46 @@
+# Etali, Primal Conqueror is cast with three Black Lotuses and transformed with three more, its {G/P} paid with 2 life (CR 107.4f); as Etali, Primal Sickness (11/11) it deals 11 combat damage to Bot2, who also gets that many poison counters (CR 122.1f) and loses to them.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Black Lotus
+Black Lotus
+Black Lotus
+Etali, Primal Conqueror
+Ornithopter
+Island x12
+
+[Bot2 Deck]
+Island x7
+Ornithopter
+Island x12
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Etali, Primal Conqueror.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Choose()
+Bot1.Battlefield.Etali, Primal Conqueror.Activate(Ability: Transform)
+Bot1.Modes(1)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot1.Attack(Etali, Primal Sickness)
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Result = Bot1 won
+Bot2.Life = 9
+Bot2.Poison = 11

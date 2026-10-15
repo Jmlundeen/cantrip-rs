@@ -1,0 +1,27 @@
+# Village Rites' additional cost (CR 118.8) is a sacrifice of a creature, chosen once the mana is paid; it then draws
+# two cards.
+
+[Bot1 Deck]
+Swamp
+Ornithopter
+Village Rites
+Swamp x4
+Swamp x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Village Rites.Cast
+Bot1.Choose(Ornithopter)
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Battlefield = Swamp
+Bot1.Graveyard = Village Rites; Ornithopter
+Bot1.Hand.Count = 6
+Bot1.Library.Count = 8

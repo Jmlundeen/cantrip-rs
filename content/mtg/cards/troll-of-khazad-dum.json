@@ -1,0 +1,8 @@
+{
+  "name": "Troll of Khazad-dûm",
+  "manaCost": "{5}{B}",
+  "type": "Creature — Troll",
+  "power": 6,
+  "toughness": 5,
+  "oracleText": "This creature can't be blocked except by three or more creatures.\nSwampcycling {1} ({1}, Discard this card: Search your library for a Swamp card, reveal it, put it into your hand, then shuffle.)"
+}

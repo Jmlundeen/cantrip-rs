@@ -1,0 +1,6 @@
+{
+  "name": "Annul",
+  "manaCost": "{U}",
+  "type": "Instant",
+  "oracleText": "Counter target artifact or enchantment spell."
+}

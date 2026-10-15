@@ -1,0 +1,30 @@
+# Landfall is about "a land you control": Bot1's Mountain on turn 1 puts one counter on the Cub; Bot2's Island entering on turn 2 puts
+# none (the control: Bot1's own land).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Scythecat Cub
+Mountain
+Mountain x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Scythecat Cub.Cast
+Bot1.Pass
+Bot1.Hand.Mountain.Play
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Scythecat Cub.Counters.PlusOnePlusOne = 1
+Stack.Count = 0

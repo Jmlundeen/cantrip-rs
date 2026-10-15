@@ -1,0 +1,56 @@
+# Practiced Offense: a +1/+1 counter on each creature the target player controls, and the target creature gains the
+# caster's choice of double strike or lifelink until end of turn. Cast on turn one it gives Thraben Inspector a counter
+# and lifelink; flashed back on turn three for {1}{W} it gives it another and double strike, and the card is exiled.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Mox Jet
+Plains
+Thraben Inspector
+Practiced Offense
+Plains
+Plains x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Thraben Inspector.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Practiced Offense.Cast
+Bot1.Target(Bot1)
+Bot1.Target(Thraben Inspector)
+Bot1.Modes(Lifelink)
+[Bot1.Main2]
+? Bot1.Battlefield.Thraben Inspector.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Thraben Inspector.Keywords = Lifelink
+? Bot1.Graveyard = Practiced Offense
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Graveyard.Practiced Offense.Cast(Ability: Flashback)
+Bot1.Target(Bot1)
+Bot1.Target(Thraben Inspector)
+Bot1.Modes(Double strike)
+[Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Exile = Practiced Offense
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Thraben Inspector.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Thraben Inspector.Keywords = DoubleStrike

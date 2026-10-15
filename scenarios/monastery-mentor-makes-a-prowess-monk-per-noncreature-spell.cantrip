@@ -1,0 +1,36 @@
+# Monastery Mentor: Mox Pearl, Mox Jet and Mox Ruby pay for it on turn 1. Casting Mox Sapphire (a noncreature spell)
+# pumps the Mentor with its own prowess and makes a Monk; casting Mox Emerald does it again, and now the first Monk's
+# prowess pumps it too. The second Monk arrives after the cast and is not pumped.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Monastery Mentor
+Mox Sapphire
+Mox Emerald
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Monastery Mentor.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Monastery Mentor.Power = 4
+Bot1.Battlefield.Monastery Mentor.Toughness = 4
+Bot1.Battlefield.Monk#1.Power = 2
+Bot1.Battlefield.Monk#2.Power = 1
+Bot1.Battlefield.Monk#1.Keywords = (absent)
+Bot1.Battlefield.Count = 8

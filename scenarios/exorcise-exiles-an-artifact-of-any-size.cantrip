@@ -1,0 +1,27 @@
+# Exorcise exiles Bot2's Mox Sapphire: an artifact is a legal target whatever its size, and the card leaves the game
+# in exile rather than going to the graveyard.
+
+[Bot1 Deck]
+Plains
+Plains
+Exorcise
+Plains x15
+
+[Bot2 Deck]
+Mox Sapphire
+Swamp x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Exorcise.Cast(Bot2.Battlefield.Mox Sapphire)
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Exorcise
+Bot2.Battlefield =
+Exile = Mox Sapphire

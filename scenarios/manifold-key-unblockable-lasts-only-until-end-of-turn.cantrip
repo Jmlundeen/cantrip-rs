@@ -1,0 +1,49 @@
+# "This turn": the Key makes the Elves unblockable on turn three, so Bot2's Birds of Paradise cannot block it (the refusal) and Bot2
+# takes 1. On turn five, with nothing done, the same attack can be blocked (the positive control, same blocker, same attacker) and the
+# Birds block and die: Bot2 stays at 19.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Mox Jet
+Mox Ruby
+Llanowar Elves
+Manifold Key
+Ornithopter
+Plains x13
+
+[Bot2 Deck]
+Forest
+Birds of Paradise
+Forest x18
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Manifold Key.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Birds of Paradise.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Manifold Key.Activate(Llanowar Elves; Ability: blocked)
+Bot1.Attack(Llanowar Elves; Ornithopter)
+! Bot2.Block(Birds of Paradise > Llanowar Elves)
+Bot2.Block(Birds of Paradise > Ornithopter)
+[T5 Bot1.Main1]
+Bot1.Attack(Llanowar Elves)
+Bot2.Block(Birds of Paradise > Llanowar Elves)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 19
+Bot2.Graveyard = Birds of Paradise

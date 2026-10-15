@@ -1,0 +1,30 @@
+# Dark Ritual adds {B}{B}{B} to the pool when it resolves, and mana empties from the pool at the end of every step and
+# phase (CR 106.4, 500.4): the three {B} are there in the precombat main phase after the Ritual resolves (net +2 from the
+# Swamp's {B}), and gone in the second main phase, so the second Duress cannot be paid for then (the first, cast in the first main phase, is the control).
+
+[Bot1 Deck]
+Swamp
+Dark Ritual
+Duress
+Duress
+Swamp x3
+Swamp x12
+
+[Bot2 Deck]
+Plains x7
+Plains x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {B}{B}{B}
+Bot1.Hand.Duress.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {B}{B}
+[T1 Bot1.Main2]
+? Bot1.Mana =
+! Bot1.Hand.Duress.Cast(Bot2)

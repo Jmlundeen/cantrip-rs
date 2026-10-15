@@ -1,0 +1,31 @@
+# "Up to one target creature": with Bot2's Birds of Paradise available Bot1 chooses no target (an empty Target), so nothing is
+# tapped and nothing loses its abilities: the Birds stay untapped and keep flying.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+The Wondrous Wasp
+Island x14
+
+[Bot2 Deck]
+Forest
+Birds of Paradise
+Forest x14
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Birds of Paradise.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.The Wondrous Wasp.Cast
+Bot1.Target()
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Birds of Paradise.Tapped = False
+Bot2.Battlefield.Birds of Paradise.Keywords = Flying

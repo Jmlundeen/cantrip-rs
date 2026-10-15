@@ -1,0 +1,50 @@
+# Faithless Looting (paid with Black Lotus) discards Bloodbraid Challenger and an Island on turn 1, so the graveyard holds
+# the Challenger and three other cards (Lotus, Looting, Island). On turn 3 Bot1 casts it from the graveyard for its escape
+# cost {3}{R}{G} (four Moxen and the turn's Forest), exiling three other cards (CR 702.138a). Cascade still triggers on the
+# escaped cast (CR 702.85a) and casts Lightning Bolt at Bot2; haste lets it attack at once: 20 - 3 - 4 = 13.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Emerald
+Mox Jet
+Mox Pearl
+Faithless Looting
+Bloodbraid Challenger
+Island
+Island
+Forest
+Lightning Bolt
+Island x8
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Bloodbraid Challenger; Island)
+[T3 Bot1.Main1]
+? Bot1.Graveyard.Count = 4
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Graveyard.Bloodbraid Challenger.Cast(Ability: Escape)
+Bot1.Accept
+Bot1.Target(Bot2)
+Bot1.Attack(Bloodbraid Challenger)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 13
+Exile.Count = 3
+Bot1.Graveyard = Lightning Bolt
+Bot1.Battlefield.Bloodbraid Challenger.Power = 4

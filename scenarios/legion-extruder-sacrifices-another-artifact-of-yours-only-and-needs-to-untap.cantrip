@@ -1,0 +1,65 @@
+# Legion Extruder: "{2}, {T}, Sacrifice another artifact: Create a 3/3 colorless Golem artifact creature token." The
+# artifact must be another one (not the Extruder) and one its controller controls (CR 118.1, 701.17): on turn 3 the only
+# other artifact is Bot2's Sol Ring, so the ability is not offered; on turn 5, with Bot1's own Mox Ruby (the positive
+# control), it makes a Golem; the tapped Extruder offers it no second time that turn; and on turn 7 the Golem token itself,
+# an artifact, is sacrificed for a new one. The enters trigger's 2 damage also kills Bot2's Ornithopter (0/2) on turn 3.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Legion Extruder
+Mox Ruby
+Mountain
+Mountain
+Mountain
+Mountain x12
+
+[Bot2 Deck]
+Island
+Sol Ring
+Ornithopter
+Island x4
+Island x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Legion Extruder.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Legion Extruder.Activate
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Legion Extruder.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Golem.Power = 3
+! Bot1.Battlefield.Legion Extruder.Activate
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Legion Extruder.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Ornithopter
+Bot2.Battlefield = Island; Sol Ring
+Bot1.Graveyard = Mox Ruby
+Bot1.Battlefield.Golem.Power = 3
+Bot1.Battlefield.Legion Extruder.Tapped = true

@@ -1,0 +1,48 @@
+# Ruling: if the Jitte leaves the battlefield after the +2/+2 mode is announced, the creature it was last attached to
+# gets the bonus (CR 608.2h). Bot1 spends a counter on the pump and, with it on the stack, Abrades its own Jitte; the
+# Rootwalla is still a 3/3 until end of turn.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Basking Rootwalla
+Umezawa's Jitte
+Forest
+Abrade
+Forest x13
+
+[Bot2 Deck]
+Island x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Basking Rootwalla.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Umezawa's Jitte.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Umezawa's Jitte.Activate(Ability: Equip; Basking Rootwalla)
+Bot1.Attack(Basking Rootwalla > Bot2)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Umezawa's Jitte.Counters.Charge = 2
+Bot1.Battlefield.Umezawa's Jitte.Activate(Ability: Remove)
+Bot1.Modes(Equipped creature gets +2/+2)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Abrade.Cast
+Bot1.Modes(Destroy target artifact)
+Bot1.Target(Umezawa's Jitte)
+[T3 Bot1.End]
+? Bot1.Battlefield.Basking Rootwalla.Power = 3
+? Bot1.Battlefield.Basking Rootwalla.Toughness = 3
+
+[Expect]
+Bot1.Graveyard = Abrade; Umezawa's Jitte
+Bot2.Life = 19

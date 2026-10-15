@@ -1,0 +1,55 @@
+# Emeritus of Ideation enters prepared on turn 1 (paid with two Mox Sapphires and a Black Lotus). On turn 3 Bot1 casts the
+# Ancestral Recall copy (unprepared now), a Lightning Bolt and a Brain Freeze with storm two on themselves: twelve cards (with the Black Lotus)
+# in the graveyard. Attacking, they accept exiling eight of them, and the Emeritus becomes prepared again: a new copy of
+# Ancestral Recall sits in exile with the eight cards.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Black Lotus
+Mox Ruby
+Mox Emerald
+Emeritus of Ideation
+Lightning Bolt
+Brain Freeze
+Island x30
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Emeritus of Ideation.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Emeritus of Ideation.Prepared = true
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Exile.Ancestral Recall.Cast(Bot1)
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Brain Freeze.Cast(Bot1)
+Bot1.Pass
+Bot1.Attack(Emeritus of Ideation > Bot2)
+Bot1.Accept
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Emeritus of Ideation.Prepared = true
+Exile.Count = 9
+Bot1.Graveyard.Count = 4

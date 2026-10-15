@@ -1,0 +1,36 @@
+# With no creature card in Bot1's graveyard Corpse Dance returns nothing and creates no exile at the end step (the graveyard is
+# empty), but its buyback still applies "as it resolves" (CR 702.27a): five mana on turn 1 and it is back in hand.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Corpse Dance
+Island
+Island x10
+
+[Bot2 Deck]
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Corpse Dance.Cast(Kicked: 1)
+Bot1.Pass
+[T2 Bot2.Main1]
+
+[Expect]
+Bot1.Hand = Corpse Dance; Island
+Bot1.Graveyard.Count = 0
+Exile.Count = 0
+Bot1.Battlefield.Count = 5

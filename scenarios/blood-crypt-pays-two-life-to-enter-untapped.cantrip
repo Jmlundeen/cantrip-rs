@@ -1,0 +1,17 @@
+# Blood Crypt: as it enters you may pay 2 life; paying keeps it untapped (and it taps for {R}).
+
+[Bot1 Deck]
+Blood Crypt
+Plains x19
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Blood Crypt.Play
+Bot1.Accept
+Bot1.Battlefield.Blood Crypt.Activate(Ability: {R})
+
+[Expect]
+Bot1.Life = 18
+Bot1.Mana = {R}

@@ -1,0 +1,32 @@
+# "Sacrifice a land: Add one mana of any type the sacrificed land could produce." Bazaar of Baghdad could produce no mana,
+# and a land is all the cost asks for, so Bot1 may sacrifice it; per CR 106.7 no mana is produced. Bot1 sacrifices the
+# Bazaar and ends with an empty pool; the Swamp and Forest, which the same ability could also sacrifice, stay.
+
+[Bot1 Deck]
+Swamp
+Forest
+Squandered Resources
+Bazaar of Baghdad
+Swamp x10
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Squandered Resources.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Bazaar of Baghdad.Play
+Bot1.Battlefield.Squandered Resources.Activate(Sacrifice: Bazaar of Baghdad)
+? Bot1.Graveyard = Bazaar of Baghdad
+? Bot1.Mana =
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Swamp; Forest; Squandered Resources
+Bot1.Graveyard = Bazaar of Baghdad
+Bot1.Mana =

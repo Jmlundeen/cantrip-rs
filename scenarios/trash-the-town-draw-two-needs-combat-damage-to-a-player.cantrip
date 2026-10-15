@@ -1,0 +1,38 @@
+# "Whenever this creature deals combat damage to a player": a creature the granted ability is on that is blocked deals its damage
+# to the blocker, not a player, so nothing is drawn (CR 510.1, 603.2). Mode 3 ({G} + {1}) on Haywire Mite, which Bot2's
+# Ornithopter blocks: Bot1 draws only its normal card for the turn. The unblocked case is the scenario beside this one.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Haywire Mite
+Trash the Town
+Island x3
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Island x6
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Haywire Mite.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Trash the Town.Cast
+Bot1.Modes(3)
+Bot1.Target(Haywire Mite)
+Bot1.Attack(Haywire Mite)
+Bot2.Block(Ornithopter > Haywire Mite)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot1.Hand.Count = 4
+Bot1.Battlefield.Haywire Mite.Damage = 0

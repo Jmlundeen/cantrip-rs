@@ -1,0 +1,45 @@
+# Invasion of Gobakhan: "When this Siege enters, look at target opponent's hand. You may exile a nonland card from it. For
+# as long as that card remains exiled, its owner may play it. A spell cast this way costs {2} more to cast." Bot1 takes
+# Bot2's Lightning Bolt on turn 1. Bot2 casts it from exile on turn 6, with three Mountains for {R} and the {2} more
+# (CR 601.2f): it burns Bot1 for 3. The Siege entered with three defense counters (CR 310.4b) and has them still.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Invasion of Gobakhan
+Plains x4
+Plains x10
+
+[Bot2 Deck]
+Lightning Bolt
+Mountain
+Mountain
+Mountain
+Mountain x3
+Mountain x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Invasion of Gobakhan.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Choose(Lightning Bolt)
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mountain.Activate
+Bot2.Exile.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+[T6 Bot2.Main2]
+
+[Expect]
+Turn = 6
+Bot1.Life = 17
+Exile.Count = 0
+Bot1.Battlefield.Invasion of Gobakhan.Counters.Defense = 3

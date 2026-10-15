@@ -1,0 +1,28 @@
+# Lim-Dûl's Vault: with no cards in the library there is nothing to look at: no life may be paid, nothing is asked and
+# nothing is shuffled. Bot1's whole deck is its opening hand.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Lim-Dûl's Vault
+Island
+Island
+Island
+Island
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Lim-Dûl's Vault.Cast
+[Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 20
+Bot1.Library.Count = 0
+Bot1.Graveyard = Lim-Dûl's Vault

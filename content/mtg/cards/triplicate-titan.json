@@ -1,0 +1,13 @@
+{
+  "name": "Triplicate Titan",
+  "manaCost": "{9}",
+  "type": "Artifact Creature — Golem",
+  "power": 9,
+  "toughness": 9,
+  "oracleText": "Flying, vigilance, trample\nWhen this creature dies, create a 3/3 colorless Golem artifact creature token with flying, a 3/3 colorless Golem artifact creature token with vigilance, and a 3/3 colorless Golem artifact creature token with trample.",
+  "keywords": [
+    "Flying",
+    "Vigilance",
+    "Trample"
+  ]
+}

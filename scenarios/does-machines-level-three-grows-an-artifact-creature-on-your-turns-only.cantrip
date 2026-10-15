@@ -1,0 +1,71 @@
+# Does Machines, level 3: "At the beginning of combat on your turn, put three +1/+1 counters on target artifact you
+# control. If it isn't a creature, it becomes a 0/0 Robot creature in addition to its other types." Ornithopter is
+# already a creature, so it only gets the counters (0/2 flying -> 3/5, no Robot type) and not a Mox, though a Mox is a
+# legal target. Level 3 is gained on turn 5 and the trigger fires at that combat; on Bot2's turn 6 it does not ("on your
+# turn"), so the counters stay at 3; turn 7 adds three more. Level 2, on turn 3, had no artifact card to return.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Does Machines
+Ornithopter
+Mox Jet
+Island
+Mox Sapphire
+Island
+Island
+Mox Pearl
+Island
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Does Machines.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Choose(Island; Island)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Does Machines.Activate(Ability: Level 2)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Does Machines.ClassLevel = 2
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Does Machines.Activate(Ability: Level 3)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 3
+? Bot1.Battlefield.Ornithopter.Power = 3
+? Bot1.Battlefield.Ornithopter.Toughness = 5
+[T7 Bot1.Main1]
+? Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 3
+Bot1.Target(Ornithopter)
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 6
+Bot1.Battlefield.Ornithopter.Types = Artifact; Creature
+Bot1.Battlefield.Ornithopter.Subtypes = Thopter
+Bot1.Battlefield.Ornithopter.Keywords = Flying

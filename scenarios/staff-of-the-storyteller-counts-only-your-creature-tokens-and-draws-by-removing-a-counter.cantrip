@@ -1,0 +1,59 @@
+# Staff of the Storyteller puts a story counter on itself "whenever you create one or more creature tokens" (CR 111.2,
+# 603.2c): its own Spirit on turn 1 makes the first. Bot2's Lingering Souls creating two Spirits on turn 2 adds nothing (not
+# "you"), and neither does Bot1's Fanatical Offering making a Map token on turn 3, which is not a creature. Its ability
+# ({W}, {T}, remove a counter: draw) is used on turn 3: the counter is gone and a card drawn; with the Staff tapped and no
+# counter it cannot be used again (refused).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Staff of the Storyteller
+Fanatical Offering
+Swamp
+Plains
+Plains
+Plains x3
+Plains x10
+
+[Bot2 Deck]
+Black Lotus
+Lingering Souls
+Plains x5
+Plains x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Staff of the Storyteller.Cast
+Bot1.Pass
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Staff of the Storyteller.Counters.Story = 1
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Lingering Souls.Cast
+Bot2.Pass
+[T2 Bot2.Main2]
+? Bot2.Battlefield.Count = 2
+? Bot1.Battlefield.Staff of the Storyteller.Counters.Story = 1
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Staff of the Storyteller.Activate
+Bot1.Pass
+! Bot1.Battlefield.Staff of the Storyteller.Activate
+Bot1.Battlefield.Swamp.Activate
+? Bot1.Hand.Count = 5
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Fanatical Offering.Cast
+Bot1.Choose(Spirit)
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Staff of the Storyteller.Counters.Story = (absent)
+
+[Expect]
+Bot1.Battlefield.Map Token.Types = Artifact

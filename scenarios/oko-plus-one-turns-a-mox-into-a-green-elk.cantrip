@@ -1,0 +1,38 @@
+# Oko, Thief of Crowns' +1: "Target artifact or creature loses all abilities and becomes a green Elk creature with base
+# power and toughness 3/3." Bot1's Mox Sapphire becomes a 3/3 Elk creature that is no longer an artifact, and its
+# mana ability is gone, so tapping it for blue is not offered. Oko goes from 4 to 5 loyalty.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Sapphire
+Oko, Thief of Crowns
+Forest x3
+Forest x10
+
+[Bot2 Deck]
+Swamp x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Oko, Thief of Crowns.Cast
+Bot1.Pass
+Bot1.Battlefield.Oko, Thief of Crowns.Activate(Mox Sapphire; Ability: Elk)
+Bot1.Pass
+! Bot1.Battlefield.Mox Sapphire.Activate
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Battlefield.Oko, Thief of Crowns.Counters.Loyalty = 5
+Bot1.Battlefield.Mox Sapphire.Types = Creature
+Bot1.Battlefield.Mox Sapphire.Subtypes = Elk
+Bot1.Battlefield.Mox Sapphire.Power = 3
+Bot1.Battlefield.Mox Sapphire.Toughness = 3

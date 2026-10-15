@@ -1,0 +1,8 @@
+{
+  "name": "Magda, Brazen Outlaw",
+  "manaCost": "{1}{R}",
+  "type": "Legendary Creature — Dwarf Berserker",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "Other Dwarves you control get +1/+0.\nWhenever a Dwarf you control becomes tapped, create a Treasure token.\nSacrifice five Treasures: Search your library for an artifact or Dragon card, put that card onto the battlefield, then shuffle."
+}

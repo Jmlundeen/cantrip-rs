@@ -1,0 +1,40 @@
+# Carnage, Crimson Chaos: "Mayhem {B}{R} (You may cast this card from your graveyard for {B}{R} if you discarded it
+# this turn. Timing rules still apply.)" Faithless Looting discards Carnage in Bot1's first main phase on turn 5. At
+# the beginning of combat that same turn she was discarded this turn and is still not offered: she is a creature
+# without flash (CR 118.9c, the ruling). In the second main phase she is cast from the graveyard with the two lands
+# Looting left untapped - {B}{R}, where her mana cost {2}{B}{R} would have needed four.
+
+[Bot1 Deck]
+Mountain
+Swamp
+Mountain
+Faithless Looting
+Carnage, Crimson Chaos
+Mountain
+Mountain
+Mountain x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Carnage, Crimson Chaos; Mountain)
+[T5 Bot1.BeginCombat]
+! Bot1.Graveyard.Carnage, Crimson Chaos.Cast
+[T5 Bot1.Main2]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Graveyard.Carnage, Crimson Chaos.Cast(Ability: Mayhem)
+[T5 Bot1.End]
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Mountain; Swamp; Mountain; Carnage, Crimson Chaos
+Bot1.Graveyard.Count = 2

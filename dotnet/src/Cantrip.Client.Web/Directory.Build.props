@@ -1,0 +1,24 @@
+<Project>
+
+  <!-- Deliberately does NOT import the repository-root Directory.Build.props: the root
+       targets net8.0 and holds every project to TreatWarningsAsErrors, while the Uno SDK chooses its own browser-wasm
+       target framework and brings generated code of its own. MSBuild walks up only until it finds the nearest
+       Directory.Build.props, so this file stops the search here. The Directory.Packages.props beside it does the same
+       for central package versions, which the Uno SDK manages itself. -->
+
+  <PropertyGroup>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+
+    <!--
+      NU1507: several package sources with central package management and no source mapping.
+      NETSDK1201: a runtime identifier no longer implies a self-contained app.
+      PRI257: the default language (en) is not one of the included resource languages.
+      CA1416: the Uno SDK names this app's platform BrowserWasm and the JavaScript interop APIs are marked "browser";
+              the analyzer counts those as two platforms, though they are the one this app runs on.
+    -->
+    <NoWarn>$(NoWarn);NU1507;NETSDK1201;PRI257;CA1416</NoWarn>
+  </PropertyGroup>
+
+</Project>

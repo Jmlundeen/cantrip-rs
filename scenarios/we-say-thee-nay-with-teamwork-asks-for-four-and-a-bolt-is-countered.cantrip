@@ -1,0 +1,49 @@
+# Teamwork 2 (an optional additional cost, CR 601.2b): Bot1 answers Bot2's Lightning Bolt with We Say Thee Nay!, announces
+# teamwork and taps its Guerrilla Gorilla (power 2) for it. Its target is chosen after that announcement. With teamwork
+# the ransom is {4}; Bot2's Black Lotus is only {3}, so the Bolt is countered and Bot1 stays at 20.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Guerrilla Gorilla
+Island
+We Say Thee Nay!
+Island x15
+
+[Bot2 Deck]
+Mountain
+Black Lotus
+Lightning Bolt
+Mountain x4
+Mountain x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Guerrilla Gorilla.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.We Say Thee Nay!.Cast
+Bot1.Modes(Teamwork 2)
+Bot1.Target(Stack.Lightning Bolt)
+Bot1.Choose(Guerrilla Gorilla)
+Bot2.Pass
+Bot2.Decline
+[T4 Bot2.Main2]
+
+[Expect]
+Turn = 4
+Stack.Count = 0
+Bot1.Life = 20
+Bot1.Graveyard = We Say Thee Nay!; Black Lotus
+Bot2.Graveyard = Lightning Bolt
+Bot1.Battlefield.Guerrilla Gorilla.Tapped = true
+Bot2.Battlefield.Black Lotus.Tapped = false

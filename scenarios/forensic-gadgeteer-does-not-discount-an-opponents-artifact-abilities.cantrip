@@ -1,0 +1,50 @@
+# Forensic Gadgeteer: "Activated abilities of artifacts you control cost {1} less to activate." Bot2's Cori-Steel Cutter is
+# an artifact, but Bot2 controls it: its equip {1}{R} costs the full two mana, paid with a Mox Ruby and a Mox Jet, and
+# nothing is left in the pool (a discounted cost would leave one floating).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Forensic Gadgeteer
+Island x16
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Cori-Steel Cutter
+Ornithopter
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Forensic Gadgeteer.Cast
+Bot1.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Cori-Steel Cutter.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Cori-Steel Cutter.Activate(Ornithopter)
+? Bot2.Mana =
+Bot2.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot2.Battlefield.Cori-Steel Cutter.AttachedTo = Ornithopter

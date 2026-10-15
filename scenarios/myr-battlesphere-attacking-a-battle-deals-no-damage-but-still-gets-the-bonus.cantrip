@@ -1,0 +1,45 @@
+# Myr Battlesphere attacks Bot1's own Invasion of Gobakhan, which Bot2 protects. A battle is neither "the player" nor
+# "the planeswalker it's attacking", so tapping two Myr gives it +2/+0 and deals no damage: the battle keeps all three
+# defense counters until combat damage, and Bot2 takes nothing.
+
+[Bot1 Deck]
+Plains
+Sol Ring
+Black Lotus
+Plains
+Myr Battlesphere
+Plains
+Invasion of Gobakhan
+Plains x20
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Myr Battlesphere.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Invasion of Gobakhan.Cast
+Bot1.Attack(Myr Battlesphere > Bot1.Battlefield.Invasion of Gobakhan)
+Bot1.Choose(Myr#1; Myr#2)
+? Bot1.Battlefield.Invasion of Gobakhan.Counters.Defense = 3
+? Bot1.Battlefield.Myr Battlesphere.Power = 6
+? Bot2.Life = 20
+[Bot1.Main2]
+[Expect]
+Bot2.Life = 20
+Bot1.Battlefield.Myr Battlesphere.Power = 6
+Bot1.Battlefield.Myr#1.Tapped = true
+Bot1.Battlefield.Myr#3.Tapped = false

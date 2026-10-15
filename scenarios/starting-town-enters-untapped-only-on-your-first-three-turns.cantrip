@@ -1,0 +1,41 @@
+# Starting Town: "This land enters tapped unless it's your first, second, or third turn of the game. {T}: Add {C}. {T}, Pay 1 life: Add one mana of any color."
+# Bot1 plays a Town on each of its turns 1, 3, 5 (its first three turns) and they enter untapped; on turn 7, its fourth turn, the fourth Town enters tapped.
+# Turn 1: the first Town pays 1 life for {R} (Bot1 19) to cast a Lightning Bolt (Bot2 17). Turn 3: the Town taps for {C} to cast a Sol Ring.
+
+[Bot1 Deck]
+Starting Town
+Starting Town
+Starting Town
+Starting Town
+Lightning Bolt
+Sol Ring
+Island
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Starting Town.Play
+? Bot1.Battlefield.Starting Town.Tapped = false
+Bot1.Battlefield.Starting Town.Activate(Ability: Pay 1 life; Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Starting Town.Play
+? Bot1.Battlefield.Starting Town#2.Tapped = false
+Bot1.Battlefield.Starting Town.Activate(Ability: Add {C})
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Starting Town.Play
+? Bot1.Battlefield.Starting Town#3.Tapped = false
+[T7 Bot1.Main1]
+Bot1.Hand.Starting Town.Play
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 19
+Bot2.Life = 17
+Bot1.Battlefield.Starting Town#4.Tapped = true
+Bot1.Battlefield.Starting Town#3.Tapped = false

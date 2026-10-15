@@ -1,0 +1,54 @@
+# Emperor of Bones: the creature card it returns is put onto the battlefield without being cast, so Bot2's Containment
+# Priest ("if a nontoken creature would enter and it wasn't cast, exile it instead") exiles it. At turn 3's combat the
+# Emperor exiles the Llanowar Elves; Adapt 2 puts counters on it, the trigger tries to return the Elves, and they are
+# exiled again (a new object): nothing new is on the battlefield, so there is no finality counter and nothing to sacrifice.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Emerald
+Mox Ruby
+Emperor of Bones
+Llanowar Elves
+Lightning Bolt
+Forest x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Containment Priest
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Emperor of Bones.Cast
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Containment Priest.Cast
+[T3 Bot1.Main1]
+Bot1.Target(Bot1.Graveyard.Llanowar Elves)
+[T3 Bot1.BeginCombat]
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Emperor of Bones.Activate(Ability: Adapt)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Llanowar Elves
+Bot1.Battlefield.Emperor of Bones.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Count = 5
+Stack.Count = 0

@@ -1,0 +1,55 @@
+# "Becomes prepared" when already prepared changes nothing (CR 722.3): the Emeritus enters prepared on turn 1 and, never having cast Regrowth, attacks on turn 15 with eight lands - Regrowth is still the single copy in exile,
+# not two, and the Emeritus is prepared. Vigilance: it is still untapped after attacking.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Emeritus of Abundance
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Emeritus of Abundance.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T11 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T13 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T15 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T17 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Attack(Emeritus of Abundance > Bot2)
+Bot1.Pass
+[T17 Bot1.Main2]
+
+[Expect]
+Exile = Regrowth
+Bot1.Battlefield.Emeritus of Abundance.Prepared = true
+Bot1.Battlefield.Emeritus of Abundance.Tapped = false
+Bot2.Life = 17

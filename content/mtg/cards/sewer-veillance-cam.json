@@ -1,0 +1,9 @@
+{
+  "name": "Sewer-veillance Cam",
+  "manaCost": "{U}",
+  "type": "Artifact",
+  "oracleText": "Flash\nWhen this artifact enters or leaves the battlefield, you may tap or untap target creature.\n{3}{U}, Sacrifice this artifact: Draw two cards.",
+  "keywords": [
+    "Flash"
+  ]
+}

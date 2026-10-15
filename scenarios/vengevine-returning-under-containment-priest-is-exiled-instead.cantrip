@@ -1,0 +1,42 @@
+# Vengevine returned from the graveyard was not cast, so Containment Priest's "if a nontoken creature would enter and it
+# wasn't cast, exile it instead" (CR 614.1a) replaces its entering: Bot1 loots Vengevine into the graveyard, casts a second creature
+# spell on turn 3 and accepts the return, and Vengevine goes to exile, not onto the battlefield, under Bot2's Priest cast on turn 2.
+
+[Bot1 Deck]
+Vengevine
+Faithless Looting
+Llanowar Elves
+Ignoble Hierarch
+Mox Ruby
+Black Lotus
+Birds of Paradise
+Forest x13
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Containment Priest
+Plains x14
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Containment Priest.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Choose(Vengevine; Forest)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Ignoble Hierarch.Cast
+Bot1.Accept
+
+[Expect]
+Exile = Vengevine
+Bot1.Graveyard.Count = 3
+Bot1.Battlefield = Mox Ruby; Llanowar Elves; Ignoble Hierarch

@@ -1,0 +1,31 @@
+# One kick ({2} more, four mana from Black Lotus and Mox Ruby): Batroc enters with one +1/+1 counter, a 3/3, and his
+# trigger hits up to X = 1 target for damage equal to his power: Bot2's Ornithopter (0/2) dies. A second target could not
+# be chosen with one kick (the trigger takes exactly the one named). Bot2's life is untouched, as the other candidate.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Batroc the Leaper
+Plains x15
+
+[Bot2 Deck]
+Ornithopter
+Island x15
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Batroc the Leaper.Cast(Kicked: 1)
+Bot1.Target(Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot2.Graveyard = Ornithopter
+Bot1.Battlefield.Batroc the Leaper.Power = 3
+Bot1.Battlefield.Batroc the Leaper.Counters.PlusOnePlusOne = 1

@@ -1,0 +1,35 @@
+# Metamorphosis Fanatic cast for its mana cost (Black Lotus, Mox Jet and a Sol Ring paid for by a Mox Ruby) with no creature
+# card in Bot1's graveyard: "return up to one target creature card" has no target, and it still enters, with nothing
+# returned and no question asked.
+
+[Bot1 Deck]
+Mox Ruby
+Sol Ring
+Mox Jet
+Black Lotus
+Metamorphosis Fanatic
+Island x2
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Metamorphosis Fanatic.Cast
+Bot1.Pass
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Metamorphosis Fanatic.Power = 4
+Bot1.Graveyard = Black Lotus
+Stack.Count = 0

@@ -1,0 +1,53 @@
+# "Whenever one or more other Cats you control die" is one trigger for Cats that die together (CR 603.2c). Bot1 casts a
+# second Ajani on turn 5, keeps the first under the legend rule (the second goes to the graveyard), and has two Cat Warrior
+# tokens (one from each Ajani). On turn 8 Bot2's Fiery Confluence deals 1 damage to each creature: both 2/1 Cats die,
+# the 1/2 Ajani survives. One trigger goes on the stack (checked before it resolves), Bot1 accepts it once and Ajani
+# comes back transformed.
+
+[Bot1 Deck]
+Plains x2
+Ajani, Nacatl Pariah
+Plains
+Ajani, Nacatl Pariah
+Plains x2
+Plains x12
+
+[Bot2 Deck]
+Mountain x4
+Fiery Confluence
+Mountain x3
+Mountain x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Ajani, Nacatl Pariah.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Ajani, Nacatl Pariah.Cast
+Bot1.Choose(Ajani, Nacatl Pariah#1)
+[T6 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T8 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mountain#2.Activate
+Bot2.Battlefield.Mountain#3.Activate
+Bot2.Battlefield.Mountain#4.Activate
+Bot2.Hand.Fiery Confluence.Cast
+Bot1.Pass
+? Stack.Count = 1
+Bot1.Accept
+
+[Expect]
+Bot1.Battlefield = Plains; Plains; Plains; Ajani, Nacatl Avenger
+Bot1.Graveyard = Ajani, Nacatl Pariah
+Stack.Count = 0

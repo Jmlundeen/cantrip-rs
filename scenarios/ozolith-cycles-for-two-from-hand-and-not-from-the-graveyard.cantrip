@@ -1,0 +1,29 @@
+# Cycling {2} (CR 702.29): Ozolith is discarded from hand for {2} (two Moxen; two more stay untapped, so the graveyard's cycling would be payable) and Bot1 draws a card; cycling works only from the hand, so the discarded card offers it no more (refusal).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Ozolith, the Shattered Spire
+Forest x14
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ozolith, the Shattered Spire.Activate(Ability: Cycling)
+Bot1.Pass
+Bot1.Pass
+! Bot1.Graveyard.Ozolith, the Shattered Spire.Activate(Ability: Cycling)
+
+[Expect]
+Bot1.Graveyard = Ozolith, the Shattered Spire
+Bot1.Hand.Count = 3

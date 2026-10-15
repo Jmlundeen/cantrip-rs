@@ -1,0 +1,53 @@
+# Vaultborn Tyrant gains 3 life and draws as it enters. When Bot2 bolts it to death, it returns as a token copy that is
+# an artifact in addition to its other types, which enters and gains and draws again; being a token, it would not
+# make another copy.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Black Lotus
+Sol Ring
+Vaultborn Tyrant
+Forest
+Forest x8
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Mountain x3
+Mountain x8
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Vaultborn Tyrant.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+? Bot1.Life = 20
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Vaultborn Tyrant)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Vaultborn Tyrant)
+[T3 Bot1.Upkeep]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Life = 26
+Bot1.Hand.Count = 3
+Bot1.Battlefield = Forest; Mox Emerald; Mox Pearl; Sol Ring; Vaultborn Tyrant
+Bot1.Battlefield.Vaultborn Tyrant.Types = Creature; Artifact
+Bot1.Battlefield.Vaultborn Tyrant.Damage = 0
+Bot1.Graveyard = Vaultborn Tyrant; Black Lotus
+Bot2.Graveyard = Lightning Bolt; Lightning Bolt

@@ -1,0 +1,54 @@
+# "...all creature cards in your graveyard that were put there from the battlefield this turn": Bot1's Elvish Mystic dies to its own Lightning Bolt on turn 1 and its Llanowar Elves to Bot2's Bolt on turn 4. Sacrificed on turn 4,
+# No Rest for the Wicked returns the Elves only; the Mystic, put there on an earlier turn, stays in the graveyard with the Bolt.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Emerald
+Mox Ruby
+Mox Jet
+Llanowar Elves
+Elvish Mystic
+Lightning Bolt
+No Rest for the Wicked
+Forest x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x12
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Elvish Mystic)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.No Rest for the Wicked.Cast
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Llanowar Elves)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.No Rest for the Wicked.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand = Llanowar Elves
+Bot1.Graveyard = No Rest for the Wicked; Elvish Mystic; Lightning Bolt

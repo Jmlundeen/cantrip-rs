@@ -1,0 +1,52 @@
+# Balance, cast by Bot1 on turn 5 with three lands, two creatures and three cards left in hand, against Bot2's one
+# land, no creatures and seven cards. Each kind is counted after the one before it has happened: Bot1 chooses which
+# two lands go and keeps the Tundra; Bot2, whose one land is the fewest, is not asked. Bot2 then chooses four of its
+# seven cards to discard, keeping the Lightning Bolt the default answer would have thrown away. Bot2 has no
+# creatures, so both of Bot1's go without a question.
+
+[Bot1 Deck]
+Plains
+Mother of Runes
+Tundra
+Mother of Runes
+Plains
+Balance
+Plains
+Plains x10
+
+[Bot2 Deck]
+Plains
+Lightning Bolt
+Island x5
+Island x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Mother of Runes.Cast
+
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+
+[T3 Bot1.Main1]
+Bot1.Hand.Tundra.Play
+Bot1.Battlefield.Tundra.Activate(Ability: {W})
+Bot1.Hand.Mother of Runes.Cast
+
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Tundra.Activate(Ability: {W})
+Bot1.Hand.Balance.Cast
+Bot1.Choose(Plains; Plains)
+Bot2.Choose(Island; Island; Island; Island)
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Tundra
+Bot1.Hand.Count = 3
+Bot1.Graveyard.Count = 5
+Bot2.Battlefield = Plains
+Bot2.Hand = Lightning Bolt; Island; Island
+# One Island went to hand size at the end of turn 4.
+Bot2.Graveyard.Count = 5

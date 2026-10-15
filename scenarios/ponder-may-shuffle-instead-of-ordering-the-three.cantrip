@@ -1,0 +1,35 @@
+# Ponder: "put them back in any order. You may shuffle." Bot1 chooses to shuffle; the three looked-at cards are all Islands
+# so which one a shuffle puts on top cannot matter (a shuffle takes the whole library, CR 701.20 / 103.2, and a library of
+# different cards would depend on the generator). Five Islands, one drawn: four are left. (The ordering branch is the
+# neighbouring scenarios'.)
+
+[Bot1 Deck]
+Mox Sapphire
+Ponder
+Plains
+Plains
+Plains
+Plains
+Plains
+Island
+Island
+Island
+Island
+Island
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ponder.Cast
+Bot1.Arrange(Shuffle)
+[Bot1.Main2]
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Hand.Count = 6
+Bot1.Library = Island; Island; Island; Island

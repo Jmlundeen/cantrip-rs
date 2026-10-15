@@ -1,0 +1,53 @@
+# Fallen Shinobi comes in by ninjutsu in place of Bot1's unblocked Guerrilla Gorilla and deals 5 combat damage to Bot2.
+# Bot2 exiles the top two cards of their library, a Lightning Bolt and an Island, and until end of turn Bot1 may play
+# both without paying: the Bolt goes at Bot2 (20 - 5 - 3 = 12) and the Island is played as Bot1's land for the turn.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Guerrilla Gorilla
+Mox Sapphire
+Mox Jet
+Fallen Shinobi
+Forest x2
+Forest x10
+
+[Bot2 Deck]
+Island x8
+Lightning Bolt
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Guerrilla Gorilla)
+[T3 Bot1.Blockers]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Fallen Shinobi.Activate(Ability: Ninjutsu)
+Bot1.Choose(Guerrilla Gorilla)
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+Bot1.Exile.Island.Play
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+
+[Expect]
+Turn = 3
+Bot2.Life = 12
+Bot1.Hand = Guerrilla Gorilla; Forest; Forest
+Bot1.Battlefield = Forest; Mox Emerald; Mox Sapphire; Mox Jet; Fallen Shinobi; Island
+Exile.Count = 0

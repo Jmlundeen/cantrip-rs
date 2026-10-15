@@ -1,0 +1,20 @@
+# Gitaxian Probe's {U/P} is paid with 2 life (CR 107.4f) when Bot1 has no blue mana: it looks at Bot2's hand (not modelled,
+# a private look) and draws a card. Bot1 starts with seven cards and ends with seven.
+
+[Bot1 Deck]
+Gitaxian Probe
+Plains x19
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Gitaxian Probe.Cast(Bot2)
+Bot1.Modes(1)
+[Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Life = 18
+Bot1.Hand.Count = 7
+Bot1.Graveyard = Gitaxian Probe

@@ -1,0 +1,11 @@
+{
+  "name": "Passageway Seer",
+  "manaCost": "{3}{B}",
+  "type": "Creature — Tiefling Warlock",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Lifelink\nWhen this creature enters, you take the initiative.\nAt the beginning of your end step, if you have the initiative, put a +1/+1 counter on this creature.",
+  "keywords": [
+    "Lifelink"
+  ]
+}

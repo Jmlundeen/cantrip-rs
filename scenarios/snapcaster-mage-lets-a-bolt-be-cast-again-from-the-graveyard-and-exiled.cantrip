@@ -1,0 +1,37 @@
+# Snapcaster Mage (flash): "When this creature enters, target instant or sorcery card in your graveyard gains flashback
+# until end of turn. The flashback cost is equal to its mana cost" (CR 702.34a). Lightning Bolt hits Bot2, Snapcaster
+# enters and targets the Bolt, and Black Lotus's red mana casts it again from the graveyard: Bot2 is on 14, and the
+# Bolt was exiled instead of going back to the graveyard.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Sapphire
+Mox Pearl
+Black Lotus
+Lightning Bolt
+Snapcaster Mage
+Forest
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Snapcaster Mage.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Graveyard.Lightning Bolt.Cast(Bot2)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Exile = Lightning Bolt
+Bot1.Graveyard = Black Lotus
+Bot1.Battlefield.Snapcaster Mage.Power = 2

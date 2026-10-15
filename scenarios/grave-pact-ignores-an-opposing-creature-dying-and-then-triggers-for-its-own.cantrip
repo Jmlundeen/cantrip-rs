@@ -1,0 +1,54 @@
+# "A creature you control dies": Bot1's Bolt kills Bot2's Ornithopter first, which triggers nothing (Bot2 keeps its
+# Elves and other Ornithopter, the refused Choose); then a second Bolt kills Bot1's own Ornithopter and Bot2 sacrifices
+# a creature of its choice, the second Ornithopter rather than the Elves.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Grave Pact
+Ornithopter
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Mountain
+Swamp x12
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Ornithopter
+Ornithopter
+Forest x2
+Forest x17
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Grave Pact.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter#1)
+! Bot2.Choose
+[T3 Bot1.Main2]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Choose(Ornithopter)
+[T3 Bot1.End]
+
+[Expect]
+Bot2.Graveyard = Ornithopter; Ornithopter
+Bot2.Battlefield = Forest; Llanowar Elves
+Bot1.Graveyard.Count = 4

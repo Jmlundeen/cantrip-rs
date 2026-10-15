@@ -1,0 +1,33 @@
+# A countered spell does nothing (CR 701.6a): Bot2's Counterspell leaves Bot1's hand and life as they were.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Night's Whisper
+Island x4
+Island x10
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Island x13
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Night's Whisper.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Night's Whisper)
+
+[Expect]
+Bot1.Life = 20
+Bot1.Hand.Count = 5
+Bot1.Graveyard = Night's Whisper

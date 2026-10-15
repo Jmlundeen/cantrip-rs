@@ -1,0 +1,35 @@
+# Thieving Skydiver kicked with X = 1 cannot take an artifact whose mana value is above X: Bot2's Wishclaw Talisman has
+# mana value 2, so there is no legal target, the enters trigger is removed and the Talisman stays Bot2's.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Thieving Skydiver
+Island x17
+
+[Bot2 Deck]
+Island
+Swamp
+Wishclaw Talisman
+Island x17
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Wishclaw Talisman.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Thieving Skydiver.Cast(Kicked: 1)
+[T5 Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Battlefield = Island; Island; Thieving Skydiver
+Bot2.Battlefield = Island; Swamp; Wishclaw Talisman

@@ -1,0 +1,38 @@
+# Regeneration (CR 701.19a): a shield made in response to Lightning Bolt replaces the destruction by lethal damage; the Elves tap, lose their damage and stay.
+
+[Bot1 Deck]
+Lightning Bolt
+Mountain x20
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Yavimaya Hollow
+Forest x17
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Forest.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Yavimaya Hollow.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Battlefield.Mountain.Activate
+Bot2.Battlefield.Yavimaya Hollow.Activate(Bot2.Battlefield.Llanowar Elves; Ability: Regenerate)
+Bot2.Battlefield.Forest.Activate
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Graveyard = Lightning Bolt
+Bot2.Battlefield = Forest; Llanowar Elves; Yavimaya Hollow
+Bot2.Battlefield.Llanowar Elves.Tapped = true
+Bot2.Battlefield.Llanowar Elves.Damage = 0
+Bot2.Graveyard.Count = 0
+Stack.Count = 0

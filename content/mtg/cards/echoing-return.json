@@ -1,0 +1,6 @@
+{
+  "name": "Echoing Return",
+  "manaCost": "{B}",
+  "type": "Sorcery",
+  "oracleText": "Return target creature card and all other cards with the same name as that card from your graveyard to your hand."
+}

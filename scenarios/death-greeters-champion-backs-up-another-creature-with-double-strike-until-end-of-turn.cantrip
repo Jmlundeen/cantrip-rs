@@ -1,0 +1,40 @@
+# Backup 1 (CR 702.165a): cast normally on turn three, the Champion puts its counter on Mother of Runes, which is
+# another creature, so Mother gains double strike until end of turn and, a 2/2 double striker, hits for four (20 - 4).
+# The Champion is not dashed: it has no haste (summoning sick, so only Mother is offered as an attacker), and it is
+# still on the battlefield afterwards. On turn five the double strike is gone but the counter stays.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Mox Jet
+Mother of Runes
+Death-Greeter's Champion
+Plains x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Mother of Runes.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Death-Greeter's Champion.Cast
+Bot1.Target(Mother of Runes)
+? Bot1.Battlefield.Death-Greeter's Champion.SummoningSick = true
+Bot1.Attack(Mother of Runes > Bot2)
+[T3 Bot1.Main2]
+? Bot2.Life = 16
+? Bot1.Battlefield.Mother of Runes.Keywords = DoubleStrike
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Mother of Runes.Keywords = (absent)
+? Bot1.Battlefield.Mother of Runes.Counters.PlusOnePlusOne = 1
+
+[Expect]
+Bot1.Battlefield = Mox Pearl; Mox Ruby; Mox Jet; Mother of Runes; Death-Greeter's Champion
+Bot1.Battlefield.Death-Greeter's Champion.Power = 2

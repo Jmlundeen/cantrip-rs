@@ -1,0 +1,31 @@
+# Bot2 casts Duress on its first turn; Bot1 casts Force of Negation for its alternative cost (it is not Bot1's turn),
+# exiling the Brainstorm from its hand (a blue card) with no mana and no life, and counters it. The countered Duress goes
+# to exile instead of Bot2's graveyard.
+
+[Bot1 Deck]
+Force of Negation
+Brainstorm
+Mox Sapphire
+Island x17
+
+[Bot2 Deck]
+Swamp
+Duress
+Swamp x18
+
+[Actions]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Duress.Cast(Bot1)
+? Stack = Duress
+Bot1.Hand.Force of Negation.Cast(Duress; Ability: exile a blue card)
+Bot1.Choose(Brainstorm)
+? Stack = Force of Negation; Duress
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot1.Life = 20
+Exile = Brainstorm; Duress
+Bot1.Graveyard = Force of Negation
+Bot2.Graveyard =

@@ -1,0 +1,43 @@
+# Bot1 casts Phantasmal Image and has it enter as a copy of Bot2's Guerrilla Gorilla rather than its printed 0/0, which
+# would die to CR 704.5f. It is an Illusion in addition to its other types (CR 707.9b), so its subtypes are Ape, Hero,
+# Illusion and Soldier, and it is a 2/2 creature; Bot2's own Gorilla is untouched (CR 707.2).
+
+[Bot1 Deck]
+Island
+Island
+Island
+Phantasmal Image
+Island x10
+
+[Bot2 Deck]
+Forest
+Forest
+Guerrilla Gorilla
+Forest x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Phantasmal Image.Cast
+Bot1.Accept
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Guerrilla Gorilla.Types = Creature
+Bot1.Battlefield.Guerrilla Gorilla.Subtypes = Ape; Hero; Illusion; Soldier
+Bot1.Battlefield.Guerrilla Gorilla.Power = 2
+Bot1.Battlefield.Guerrilla Gorilla.Toughness = 2
+Bot2.Battlefield.Guerrilla Gorilla.Subtypes = Ape; Hero; Soldier

@@ -1,0 +1,31 @@
+# The Legend of Roku, chapter II: "Add one mana of any color." The color is chosen as the chapter resolves, on Bot1's
+# second turn (T3) as the lore counter is added after its draw step... in its precombat main phase (CR 714.3c); Blue is
+# chosen here, so the pool holds {U} until that step ends.
+
+[Bot1 Deck]
+Mox Ruby
+Black Lotus
+The Legend of Roku
+Mountain x4
+Mountain x16
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.The Legend of Roku.Cast
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Colors(Blue)
+? Bot1.Mana = {U}
+
+[Expect]
+Bot1.Mana = {U}
+Bot1.Battlefield.The Legend of Roku.Counters.Lore = 2

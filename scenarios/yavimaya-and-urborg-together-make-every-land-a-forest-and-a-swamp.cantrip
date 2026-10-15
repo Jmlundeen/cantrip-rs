@@ -1,0 +1,32 @@
+# Yavimaya, Cradle of Growth and Urborg, Tomb of Yawgmoth together: each land is a Forest and a Swamp in addition to its other types
+# (CR 305.7, both Type-layer effects add a type and neither depends on the other). Bot1's Plains is a Forest Plains Swamp and taps for
+# {W}, {G} or {B}; each legendary land is both a Forest and a Swamp.
+
+[Bot1 Deck]
+Yavimaya, Cradle of Growth
+Urborg, Tomb of Yawgmoth
+Plains
+Plains
+Plains
+Plains
+Plains
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Yavimaya, Cradle of Growth.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Urborg, Tomb of Yawgmoth.Play
+? Bot1.Battlefield.Yavimaya, Cradle of Growth.Subtypes = Forest; Swamp
+? Bot1.Battlefield.Urborg, Tomb of Yawgmoth.Subtypes = Forest; Swamp
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+? Bot1.Battlefield.Plains.Subtypes = Forest; Plains; Swamp
+Bot1.Battlefield.Plains.Activate(Ability: {B})
+? Bot1.Mana = {B}
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Plains.Types = Land

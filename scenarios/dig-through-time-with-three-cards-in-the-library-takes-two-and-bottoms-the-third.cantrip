@@ -1,0 +1,39 @@
+# "Look at the top seven cards": a library of three shows all three (CR 609.3), two go to the hand and the remaining one is put on
+# the bottom, which is the library. Dig is cast for all eight mana (Black Lotus and five Moxen) with nothing to delve.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Emerald
+Dig Through Time
+Island
+Mountain
+Swamp
+
+[Bot2 Deck]
+Forest x22
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Dig Through Time.Cast
+Bot1.Arrange(Island; Swamp | Mountain)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Island; Swamp
+Bot1.Library = Mountain
+Bot1.Graveyard = Dig Through Time; Black Lotus

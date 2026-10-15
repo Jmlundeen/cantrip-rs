@@ -1,0 +1,7 @@
+# Twenty Tolarian Academies, to play two at once and see the legend rule ask which to keep (CR 704.5j).
+# Play it from your seat in a hosted game: --deck legend-rule-test
+20 Tolarian Academy
+1 Sol Ring
+1 Mind Stone
+1 Mox Sapphire
+17 Island

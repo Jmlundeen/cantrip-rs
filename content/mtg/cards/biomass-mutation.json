@@ -1,0 +1,6 @@
+{
+  "name": "Biomass Mutation",
+  "manaCost": "{X}{G/U}{G/U}",
+  "type": "Instant",
+  "oracleText": "Creatures you control have base power and toughness X/X until end of turn."
+}

@@ -1,0 +1,11 @@
+{
+  "name": "Bloodbraid Challenger",
+  "manaCost": "{3}{R}{G}",
+  "type": "Creature — Elf Berserker",
+  "power": 4,
+  "toughness": 3,
+  "oracleText": "Cascade\nHaste\nEscape—{3}{R}{G}, Exile three other cards from your graveyard. (You may cast this card from your graveyard for its escape cost.)",
+  "keywords": [
+    "Haste"
+  ]
+}

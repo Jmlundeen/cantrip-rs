@@ -1,0 +1,43 @@
+# Leovold, Emissary of Trest: "Each opponent can't draw more than one card each turn." Three Moxen cast it for free on
+# turn 1. In Bot1's turn 3 upkeep Bot2 has drawn nothing yet, so Ancestral Recall draws it one card of three; on its own
+# turn 4 it has drawn for the turn already, so the second Ancestral Recall draws it nothing.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Sapphire
+Leovold, Emissary of Trest
+Island x16
+
+[Bot2 Deck]
+Island
+Island
+Ancestral Recall
+Ancestral Recall
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Leovold, Emissary of Trest.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Upkeep]
+Bot1.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Ancestral Recall.Cast(Bot2)
+[T3 Bot1.Main1]
+? Bot2.Hand.Count = 7
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Ancestral Recall.Cast(Bot2)
+[Bot2.Main2]
+
+[Expect]
+Bot2.Hand.Count = 6
+Bot2.Graveyard = Ancestral Recall; Ancestral Recall

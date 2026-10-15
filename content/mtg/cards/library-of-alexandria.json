@@ -1,0 +1,5 @@
+{
+  "name": "Library of Alexandria",
+  "type": "Legendary Land",
+  "oracleText": "{T}: Add {C}.\n{T}: Draw a card. Activate only if you have exactly seven cards in hand."
+}

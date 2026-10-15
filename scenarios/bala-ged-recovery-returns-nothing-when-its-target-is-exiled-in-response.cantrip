@@ -1,0 +1,32 @@
+# Bala Ged Recovery's one target, Black Lotus in Bot1's graveyard, is exiled by Bot2's Ghost Vacuum while the spell is on
+# the stack. The target is illegal on resolution, so the spell does nothing (CR 608.2b): the Lotus stays in exile and
+# Bala Ged Recovery goes to the graveyard.
+
+[Bot1 Deck]
+Bala Ged Recovery
+Black Lotus
+Forest x6
+Forest x10
+
+[Bot2 Deck]
+Mox Jet
+Ghost Vacuum
+Island x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Ghost Vacuum.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Bala Ged Recovery.Cast(Bot1.Graveyard.Black Lotus)
+Bot2.Battlefield.Ghost Vacuum.Activate(Bot1.Graveyard.Black Lotus)
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Black Lotus
+Bot1.Graveyard = Bala Ged Recovery
+Stack.Count = 0

@@ -1,0 +1,6 @@
+{
+  "name": "Time Warp",
+  "manaCost": "{3}{U}{U}",
+  "type": "Sorcery",
+  "oracleText": "Target player takes an extra turn after this one."
+}

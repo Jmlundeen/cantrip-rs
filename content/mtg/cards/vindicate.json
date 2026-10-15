@@ -1,0 +1,6 @@
+{
+  "name": "Vindicate",
+  "manaCost": "{1}{W}{B}",
+  "type": "Sorcery",
+  "oracleText": "Destroy target permanent."
+}

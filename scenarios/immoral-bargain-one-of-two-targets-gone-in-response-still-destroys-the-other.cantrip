@@ -1,0 +1,43 @@
+# X = 2: Bot1 sacrifices two Ornithopters and targets Bot2's Ornithopter and Mox Sapphire. In response Bot2 Lightning Bolts its
+# own Ornithopter; that target is illegal on resolution, but the Mox Sapphire, still legal, is destroyed (CR 608.2b).
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Ruby
+Ornithopter
+Ornithopter
+Immoral Bargain
+Island x14
+
+[Bot2 Deck]
+Mountain
+Mox Sapphire
+Ornithopter
+Lightning Bolt
+Island x16
+
+[Actions]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Immoral Bargain.Cast(X: 2)
+Bot1.Target(Bot2.Battlefield.Ornithopter; Bot2.Battlefield.Mox Sapphire)
+Bot1.Choose(Ornithopter; Ornithopter)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Mox Sapphire; Ornithopter; Lightning Bolt
+Bot2.Battlefield = Mountain
+Bot1.Graveyard = Immoral Bargain; Ornithopter; Ornithopter

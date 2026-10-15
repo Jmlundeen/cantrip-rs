@@ -1,0 +1,41 @@
+# Deathrite Shaman, B+T targets an instant OR sorcery card (here a sorcery). A second Deathrite Shaman exiles the same
+# card in response; the first ability's target is gone as it resolves, so no opponent loses life from it (CR 608.2b).
+
+[Bot1 Deck]
+Swamp
+Deathrite Shaman
+Forest
+Deathrite Shaman
+Swamp
+Forest
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Mountain x7
+Ponder
+Ponder
+Mountain x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Deathrite Shaman.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Deathrite Shaman.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Deathrite Shaman#1.Activate(Bot2.Graveyard.Ponder#1; Ability: instant)
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Deathrite Shaman#2.Activate(Bot2.Graveyard.Ponder#1; Ability: instant)
+? Stack.Count = 2
+Bot1.Pass
+
+[Expect]
+Bot2.Graveyard.Count = 1
+Exile.Count = 1
+Bot2.Life = 18
+Bot1.Life = 20

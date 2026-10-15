@@ -1,0 +1,30 @@
+# "Target creature you control": with only Bot2's Ornithopter on the battlefield Bot1 has no legal target and Ephemerate can't be cast (the refusal). Once Bot1 casts its
+# own Ornithopter (the positive control) Ephemerate can be, and it blinks Bot1's, leaving Bot2's alone.
+
+[Bot1 Deck]
+Plains
+Ornithopter
+Ephemerate
+Plains x17
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+! Bot1.Hand.Ephemerate.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Ephemerate.Cast(Bot1.Battlefield.Ornithopter)
+[Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Battlefield = Ornithopter
+Bot1.Battlefield = Plains; Ornithopter
+Exile = Ephemerate

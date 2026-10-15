@@ -1,0 +1,30 @@
+# Thoughtcast has affinity for artifacts (CR 702.41a): with three Moxen out, {4}{U} costs {1}{U}. Bot1 taps two Moxen
+# for it and draws two cards, ending with 7 - 3 - 1 + 2 = 5 in hand; Mox Pearl stays untapped.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Thoughtcast
+Island x3
+Island x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Thoughtcast.Cast
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Graveyard = Thoughtcast
+Bot1.Hand.Count = 5
+Bot1.Battlefield.Mox Sapphire.Tapped = true
+Bot1.Battlefield.Mox Ruby.Tapped = true
+Bot1.Battlefield.Mox Pearl.Tapped = false

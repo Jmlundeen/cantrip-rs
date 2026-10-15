@@ -1,0 +1,40 @@
+# Wan Shi Tong, Librarian (X = 0 for {U}{U}) has flying and vigilance: attacking on turn 3 beside Bot1's Llanowar Elves, Bot2's Llanowar
+# Elves cannot block it (! Block) but can block the other Elves (the positive control, so the question is asked at all), and Wan Shi Tong,
+# which deals 1 to Bot2, does not tap to attack; the two Elves trade.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Mox Sapphire
+Mox Sapphire
+Wan Shi Tong, Librarian
+Island x14
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Wan Shi Tong, Librarian.Cast(X: 0)
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Wan Shi Tong, Librarian; Llanowar Elves > Bot2)
+! Bot2.Block(Llanowar Elves > Wan Shi Tong, Librarian)
+Bot2.Block(Llanowar Elves > Llanowar Elves)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Wan Shi Tong, Librarian.Tapped = false
+? Bot1.Graveyard = Llanowar Elves
+
+[Expect]
+Bot2.Life = 19

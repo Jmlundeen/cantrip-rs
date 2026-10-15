@@ -1,0 +1,28 @@
+# Curse of Opulence, an Aura that enchants a player (CR 303.4): "Whenever enchanted player is attacked, create a Gold
+# token. Each opponent attacking that player does the same." Bot1 enchants itself on turn 1; on turn 4 Bot2 attacks it with
+# Ornithopter, and both players get a Gold token.
+
+[Bot1 Deck]
+Mountain
+Curse of Opulence
+Mountain x15
+
+[Bot2 Deck]
+Ornithopter
+Island x14
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Curse of Opulence.Cast(Bot1)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Attack(Ornithopter > Bot1)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield = Curse of Opulence; Gold Token; Mountain
+Bot2.Battlefield = Gold Token; Ornithopter

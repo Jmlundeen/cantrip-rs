@@ -1,0 +1,12 @@
+{
+  "name": "Valakut Awakening",
+  "manaCost": "{2}{R}",
+  "type": "Instant",
+  "oracleText": "Put any number of cards from your hand on the bottom of your library, then draw that many cards plus one.",
+  "backFacePlayableAsLand": true,
+  "backFace": {
+    "name": "Valakut Stoneforge",
+    "type": "Land",
+    "oracleText": "This land enters tapped.\n{T}: Add {R}."
+  }
+}

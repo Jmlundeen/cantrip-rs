@@ -1,0 +1,34 @@
+# Footfall Crater enchants a land, and the enchanted land has "{T}: Target creature gains trample and haste until end
+# of turn" (CR 613.1f): Bot1's Mountain, enchanted with the Crater (paid with Mox Ruby), taps to give Ornithopter
+# trample and haste.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Ornithopter
+Footfall Crater
+Mountain
+Mountain
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Footfall Crater.Cast(Mountain)
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate(Ornithopter; Ability: trample)
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Battlefield = Mountain; Mox Ruby; Ornithopter; Footfall Crater
+Bot1.Battlefield.Footfall Crater.AttachedTo = Mountain
+Bot1.Battlefield.Mountain.Tapped = true
+Bot1.Battlefield.Ornithopter.Keywords = Flying; Haste; Trample

@@ -1,0 +1,41 @@
+# A countered Time Warp does nothing (CR 701.5a, 608.2b): Bot1's cast on turn three is countered by Bot2's Counterspell, so turn four is
+# Bot2's ordinary turn and no extra turn for Bot1 follows turn three.
+
+[Bot1 Deck]
+Island
+Island
+Mox Sapphire
+Black Lotus
+Time Warp
+Island x4
+Island x10
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Island x14
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Time Warp.Cast(Bot1)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Time Warp)
+[T4 Bot2.Main1]
+? ActivePlayer = Bot2
+
+[Expect]
+Turn = 4
+Bot1.Graveyard = Time Warp; Black Lotus
+Bot2.Graveyard = Counterspell

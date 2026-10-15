@@ -1,0 +1,47 @@
+# Orcrist, Goblin-cleaver: equipped creature gets +2/+2 and has trample, and when it deals combat damage to a player its
+# controller chooses a creature type and gets a Treasure for each creature they control of that type. Turn one casts
+# Ornithopter (a Thopter) and Orcrist off Sol Ring and a Mox; turn three equips Ornithopter, which attacks as a 2/4, and
+# Bot1 chooses Thopter: one Thopter, one Treasure.
+
+[Bot1 Deck]
+Island
+Sol Ring
+Mox Ruby
+Mox Jet
+Mox Pearl
+Orcrist, Goblin-cleaver
+Ornithopter
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Orcrist, Goblin-cleaver.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Orcrist, Goblin-cleaver.Activate(Ornithopter; Ability: Equip)
+Bot1.Pass
+Bot1.Attack(Ornithopter > Bot2)
+Bot1.Modes(Thopter)
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Bot2.Life = 18
+Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Ornithopter.Toughness = 4
+Bot1.Battlefield.Ornithopter.Keywords = Flying; Trample
+Bot1.Battlefield.Treasure Token.Types = Artifact

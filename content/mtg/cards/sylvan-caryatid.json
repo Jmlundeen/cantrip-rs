@@ -1,0 +1,12 @@
+{
+  "name": "Sylvan Caryatid",
+  "manaCost": "{1}{G}",
+  "type": "Creature — Plant",
+  "power": 0,
+  "toughness": 3,
+  "oracleText": "Defender, hexproof\n{T}: Add one mana of any color.",
+  "keywords": [
+    "Defender",
+    "Hexproof"
+  ]
+}

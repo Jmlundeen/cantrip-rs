@@ -1,0 +1,40 @@
+# "Creatures target player controls can't block this turn" is a rule about the player until end of turn (CR 509.1b, 611.2c), not a
+# list of the creatures there were: Bot2 flashes Snapcaster Mage into play AFTER Scarlett's trigger has resolved (Island and
+# Mox Sapphire), and it still cannot block her. The refusal here names a legal-looking block that the engine never even
+# asks about (no block is possible at all, so no question comes); the control, with Scarlett aimed at her own controller, lets
+# the same Snapcaster block (headliner-scarlett-snapcaster-flashed-in-blocks-when-she-targets-her-controller).
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Headliner Scarlett
+Swamp x17
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Snapcaster Mage
+Island x17
+
+[Actions]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Headliner Scarlett.Cast
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Snapcaster Mage.Cast
+Bot1.Attack(Headliner Scarlett)
+! Bot2.Block(Snapcaster Mage > Headliner Scarlett)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot2.Battlefield.Snapcaster Mage.Damage = 0

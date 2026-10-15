@@ -1,0 +1,9 @@
+{
+  "name": "Abrupt Decay",
+  "manaCost": "{B}{G}",
+  "type": "Instant",
+  "oracleText": "This spell can't be countered.\nDestroy target nonland permanent with mana value 3 or less.",
+  "keywords": [
+    "CantBeCountered"
+  ]
+}

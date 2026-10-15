@@ -1,0 +1,59 @@
+# Escape - "Exile five other cards from your graveyard" (CR 702.138a): the card being cast does not count. On turn 3 the graveyard
+# holds Phlage and four other cards (the Petal that paid on turn 1 and three more sacrificed now): escape is not offered (the
+# refusal; Phlage herself would make it five). A fourth Petal is the fifth other card, and escape is cast with the four
+# Petals' {R}{R}{W}{W}: she stays (escaped, not sacrificed) and her enters trigger deals 3 and gains 3. On turn 5 she attacks, and
+# the attack trigger does the same again before her 6 combat damage: Bot2 goes 20, 17, 14, 11, 5; Bot1 gains 3 three times.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Phlage, Titan of Fire's Fury
+Lotus Petal
+Lotus Petal
+Lotus Petal
+Lotus Petal
+Lotus Petal
+Mountain x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Lotus Petal.Activate(Color: Red)
+Bot1.Hand.Phlage, Titan of Fire's Fury.Cast
+Bot1.Target(Bot2)
+[T3 Bot1.Main1]
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Pass
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Pass
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Pass
+Bot1.Battlefield.Lotus Petal.Activate(Color: Red)
+Bot1.Battlefield.Lotus Petal.Activate(Color: Red)
+Bot1.Battlefield.Lotus Petal.Activate(Color: White)
+? Bot1.Graveyard.Count = 5
+! Bot1.Graveyard.Phlage, Titan of Fire's Fury.Cast(Ability: Escape)
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Pass
+Bot1.Battlefield.Lotus Petal.Activate(Color: White)
+Bot1.Graveyard.Phlage, Titan of Fire's Fury.Cast(Ability: Escape)
+Bot1.Target(Bot2)
+[T5 Bot1.Main1]
+Bot1.Attack(Phlage, Titan of Fire's Fury > Bot2)
+Bot1.Target(Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot2.Life = 5
+Bot1.Life = 29
+Exile.Count = 5

@@ -1,0 +1,24 @@
+# Both abilities have {T}: once tapped for {W} (1 life) the draw ability is refused even with the mana in the pool for its {1};
+# untapped on turn 3 it is used (the positive control) with the Island's mana.
+
+[Bot1 Deck]
+Silent Clearing
+Island
+Island x6
+Island x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Silent Clearing.Play
+Bot1.Battlefield.Silent Clearing.Activate(Ability: Add; Color: White)
+! Bot1.Battlefield.Silent Clearing.Activate(Ability: Sacrifice)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Silent Clearing.Activate(Ability: Sacrifice)
+
+[Expect]
+Bot1.Life = 19
+Bot1.Graveyard = Silent Clearing

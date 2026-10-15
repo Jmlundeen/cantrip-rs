@@ -1,0 +1,37 @@
+# Springleaf Drum's cost, "Tap an untapped creature you control": with no creature of Bot1's own it is not offered on turn 1, nor
+# on turn 3 while Bot2 has an untapped Ornithopter (a creature, not Bot1's), and once Bot1 casts its own Ornithopter the first Drum
+# taps it (the positive control) and the second Drum, with the only creature now tapped, is refused.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Springleaf Drum
+Springleaf Drum
+Ornithopter
+Island x14
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Springleaf Drum.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Springleaf Drum.Cast
+! Bot1.Battlefield.Springleaf Drum.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Springleaf Drum.Activate
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Springleaf Drum.Activate(Tap: Ornithopter; Color: Blue)
+? Bot1.Mana = {U}
+! Bot1.Battlefield.Springleaf Drum#2.Activate
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Tapped = true
+Bot1.Battlefield.Springleaf Drum#1.Tapped = true
+Bot1.Battlefield.Springleaf Drum#2.Tapped = false

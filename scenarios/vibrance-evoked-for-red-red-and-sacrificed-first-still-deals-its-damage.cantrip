@@ -1,0 +1,37 @@
+# Vibrance evoked for two Mountains: its damage ability and the evoke sacrifice trigger together, and Bot1 lets the
+# sacrifice resolve first. The intervening "if" asks only what was spent to cast it (CR 603.4), which is still true,
+# and "this creature" deals the 3 damage as it last existed on the battlefield (CR 113.7a): Bot2 goes to 17.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Vibrance
+Island x4
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Vibrance.Cast(Ability: Evoke)
+Bot1.Triggers(damage; sacrifice)
+Bot1.Target(Bot2)
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+? Bot1.Graveyard = Vibrance
+? Bot2.Life = 20
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Life = 20
+Bot2.Life = 17
+Bot1.Battlefield = Mountain; Mountain
+Bot1.Graveyard = Vibrance

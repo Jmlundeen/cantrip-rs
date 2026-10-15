@@ -1,0 +1,50 @@
+# Adaptive Omnitool: the equipped creature gets +1/+1 for each artifact its controller controls (Omnitool, two Moxen
+# and the Ornithopter itself: +4/+4), and whenever it attacks its controller looks at the top six cards and may put an
+# artifact card from among them into hand; the rest go to the bottom. Bot1 takes the Sol Ring.
+
+[Bot1 Deck]
+Plains
+Mox Jet
+Mox Pearl
+Adaptive Omnitool
+Ornithopter
+Plains
+Plains
+Plains
+Island
+Island
+Sol Ring
+Island
+Island
+Island
+Island x4
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Adaptive Omnitool.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Adaptive Omnitool.Activate(Ornithopter)
+Bot1.Attack(Ornithopter > Bot2)
+Bot1.Arrange(Sol Ring | Island; Island; Island; Island; Island)
+? Bot1.Battlefield.Ornithopter.Power = 4
+? Bot1.Battlefield.Ornithopter.Toughness = 6
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot2.Life = 16
+Bot1.Hand = Plains; Plains; Sol Ring
+Bot1.Library.Count = 9

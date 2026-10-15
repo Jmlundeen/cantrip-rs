@@ -1,0 +1,49 @@
+# Path to Exile exiles the creature, then "its controller may search" for a basic land card (CR 701.23, 205.4a): Bot2 is
+# asked, and the Overgrown Tomb (a nonbasic land) is refused in its search while the Forest is found, entering tapped. On
+# turn 5, Bot2 declines for its next creature: the Ornithopter is exiled, no search is made and no land arrives.
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Path to Exile
+Path to Exile
+Plains x3
+Plains x10
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Island x5
+Island
+Overgrown Tomb
+Forest
+Forest
+Island x8
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Path to Exile.Cast(Ornithopter)
+Bot2.Accept
+! Bot2.Search(Overgrown Tomb)
+Bot2.Search(Forest)
+[T3 Bot1.Main2]
+? Bot2.Battlefield.Forest.Tapped = true
+? Exile = Ornithopter
+[T4 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Path to Exile.Cast(Ornithopter)
+Bot2.Decline
+[T5 Bot1.Main2]
+
+[Expect]
+Exile = Ornithopter; Ornithopter
+Bot2.Battlefield = Forest

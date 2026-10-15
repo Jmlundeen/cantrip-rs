@@ -1,0 +1,37 @@
+# Bitter Reunion: {1}, sacrifice it: creatures you control gain haste until end of turn, so a Llanowar Elves cast
+# this turn attacks at once.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Bitter Reunion
+Forest
+Llanowar Elves
+Plains
+Plains
+Plains x13
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Bitter Reunion.Cast
+Bot1.Choose()
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Bitter Reunion.Activate
+Bot1.Attack(Llanowar Elves > Bot2)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Bitter Reunion
+Bot2.Life = 19
+Bot1.Battlefield.Llanowar Elves.Keywords = Haste

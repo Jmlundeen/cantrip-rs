@@ -1,0 +1,50 @@
+//! Typecycling [cost] (CR 702.29e): "[Type]cycling [cost]" means "[Cost], Discard this card: Search your library for a
+//! [type] card, reveal it, put it into your hand. Then shuffle." Eagles of the North (Plainscycling), Generous Ent
+//! (Forestcycling), L\u{f3}rien Revealed (Islandcycling), Oliphaunt (Mountaincycling) and Troll of Khazad-d\u{fb}m
+//! (Swampcycling) print it. Plain cycling (CR 702.29a) is `triggers::cycling`.
+//!
+//! A card with typecycling lists `ability(subtype, cost, text)` among its `abilities`; `subtype` is the basic land type
+//! it searches for.
+
+use crate::search_library;
+use cantrip_api::*;
+
+macro_rules! search_for {
+    ($name:ident, $subtype:expr) => {
+        fn $name(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+            let player = item.controller;
+            let found = search_library(g, player, item.object, 1, true, |q, c| q.chars(c).has_subtype($subtype))?;
+            g.reveal(player, &found);
+            let moves: Vec<(ObjectId, Zone)> = found.iter().map(|&c| (c, Zone::hand(player))).collect();
+            g.move_together(&moves, ZoneReason::Search);
+            g.shuffle(player);
+            Ok(())
+        }
+    };
+}
+
+search_for!(search_plains, Subtype::Plains);
+search_for!(search_island, Subtype::Island);
+search_for!(search_swamp, Subtype::Swamp);
+search_for!(search_mountain, Subtype::Mountain);
+search_for!(search_forest, Subtype::Forest);
+
+/// The typecycling ability for a basic land type, from the hand. `text` is the ability's full text, which a scenario's
+/// `Ability:` matches.
+pub const fn ability(subtype: Subtype, mana: ManaCost, text: &'static str) -> AbilityDef {
+    let effect = match subtype {
+        Subtype::Plains => search_plains,
+        Subtype::Island => search_island,
+        Subtype::Swamp => search_swamp,
+        Subtype::Mountain => search_mountain,
+        Subtype::Forest => search_forest,
+        _ => panic!("typecycling is implemented for the basic land types"),
+    };
+    AbilityDef::Activated(ActivatedDef {
+        text,
+        cost: Cost { mana, discard_self: true, ..Cost::NONE },
+        effect,
+        from: ZoneKind::Hand,
+        ..ActivatedDef::BLANK
+    })
+}

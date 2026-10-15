@@ -1,0 +1,23 @@
+# The bounce is a triggered ability (CR 603), so Bot1 can tap the Island for mana in response and then return that tapped
+# Island: the Island is back in hand, the Aqueduct stays (tapped, having entered tapped) and the {U} stays in the pool
+# for the rest of the phase.
+
+[Bot1 Deck]
+Island
+Dimir Aqueduct
+Island x13
+
+[Bot2 Deck]
+Swamp x15
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Dimir Aqueduct.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Choose(Island)
+? Bot1.Mana = {U}
+? Bot1.Battlefield = Dimir Aqueduct
+
+[Expect]
+Bot1.Battlefield.Dimir Aqueduct.Tapped = true

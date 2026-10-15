@@ -1,0 +1,29 @@
+# "You may return a non-Avatar creature card or a planeswalker card": milling Lightning Bolt and three Islands leaves no
+# card to return, so Bot1 is not asked (the bare refusal sits after the Pass that lets the trigger resolve).
+
+[Bot1 Deck]
+Swamp
+Swamp
+Overlord of the Balemurk
+Island x4
+Island
+Lightning Bolt
+Island x3
+Island x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Overlord of the Balemurk.Cast(Ability: Impending)
+Bot1.Pass
+! Bot1.Choose
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard.Count = 4

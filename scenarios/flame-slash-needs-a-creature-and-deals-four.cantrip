@@ -1,0 +1,41 @@
+# "Flame Slash deals 4 damage to target creature." On turn 1 no creature is on the battlefield, so it cannot be cast (CR 601.2c). On turn 3
+# Bot2's Questing Beast, a 4/4, is there: the same cast is offered and the Beast takes exactly lethal damage and dies. A planeswalker or
+# player would not be a legal target (the filter is creatures only).
+
+[Bot1 Deck]
+Mountain
+Mountain
+Flame Slash
+Mountain x12
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Gleemox
+Mox Pearl
+Questing Beast
+Forest x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+! Bot1.Hand.Flame Slash.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Gleemox.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Gleemox.Activate(Color: Green)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Questing Beast.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Flame Slash.Cast(Questing Beast)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Questing Beast
+Bot1.Graveyard = Flame Slash

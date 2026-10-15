@@ -1,0 +1,25 @@
+# Only a nonland card can be exiled: Bot2's hand is seven Islands, so the unscripted choice (the first eligible card) takes none
+# and Bot2 keeps its whole hand.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Invasion of Gobakhan
+Plains x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Invasion of Gobakhan.Cast
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Exile.Count = 0
+Bot2.Hand.Count = 7

@@ -1,0 +1,48 @@
+use cantrip_api::*;
+use cantrip_mechanics::{mayhem, targets};
+use cantrip_mechanics::triggers::this_enters;
+use cantrip_oracle as oracle;
+
+/// "Target creature card with mana value 3 or less from your graveyard."
+fn cheap_creature_card(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    match t {
+        Target::Object(id) => {
+            targets::card_in_your_graveyard(q, asker, t, &[CardType::Creature]) && q.card(q.obj(id).card).cost.mana_value() <= 3
+        }
+        _ => false,
+    }
+}
+
+/// Return the creature card to the battlefield under the ability's controller. It gains "This creature attacks each
+/// combat if able" and the sacrifice trigger, for as long as that object stays (CR 611.2a, 400.7).
+fn reanimate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let Some(card) = targets::object(g, item, 0) else { return Ok(()) };
+    let returned = g.put_onto_battlefield(card, item.controller, false)?;
+    if !g.is_on_battlefield(returned) {
+        return Ok(());
+    }
+    g.add_effect(item.object, returned, EffectKind::MustAttack, Duration::Indefinite);
+    let this = g.obj(item.object).card;
+    g.add_effect(item.object, returned, EffectKind::AddAbility(AbilityRef::delayed(this, 0)), Duration::Indefinite);
+    Ok(())
+}
+
+pub static CARD: CardDef = CardDef {
+    abilities: &[AbilityDef::Triggered(TriggeredDef {
+        text: "When Carnage enters, return target creature card with mana value 3 or less from your graveyard to the battlefield. It gains \"This creature attacks each combat if able\" and \"When this creature deals combat damage to a player, sacrifice it.\"",
+        listens: EventMask::ZONE_CHANGE,
+        matches: this_enters,
+        targets: &[TargetSpec { min: 1, max: 1, filter: cheap_creature_card }],
+        effect: reanimate,
+        ..TriggeredDef::BLANK
+    })],
+    ways: &[mayhem::way(mana(0, 0, 0, 1, 1, 0), "Mayhem {B}{R}")],
+    delayed: &[AbilityDef::Triggered(TriggeredDef {
+        text: "When this creature deals combat damage to a player, sacrifice it.",
+        listens: EventMask::DAMAGE,
+        matches: cantrip_mechanics::triggers::deals_combat_damage_to_player,
+        effect: cantrip_mechanics::effects::sacrifice_self,
+        ..TriggeredDef::BLANK
+    })],
+    ..oracle::CARNAGE_CRIMSON_CHAOS
+};

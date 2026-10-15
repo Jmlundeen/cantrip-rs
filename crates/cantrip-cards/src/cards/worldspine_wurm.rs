@@ -1,0 +1,67 @@
+use cantrip_api::*;
+use cantrip_mechanics::tokens;
+use cantrip_mechanics::triggers::this_dies;
+use cantrip_oracle as oracle;
+
+/// The 5/5 green Wurm creature token with trample it makes.
+pub static WURM: CardDef = CardDef {
+    name: "Wurm",
+    has_cost: false,
+    colors: Some(ColorSet::of(Color::Green)),
+    types: TypeSet::of(&[CardType::Creature]),
+    subtypes: SubtypeSet::of(&[Subtype::Wurm]),
+    power: Some(5),
+    toughness: Some(5),
+    keywords: Keywords::of(&[Keyword::Trample]),
+    ..CardDef::BLANK
+};
+
+/// "When this creature dies, create three 5/5 green Wurm creature tokens with trample."
+fn three_wurms(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    tokens::create(g, item.controller, &WURM, 3)?;
+    Ok(())
+}
+
+/// "When this card is put into a graveyard from anywhere" (CR 603.6c, 603.10a): its own move into a graveyard, from any
+/// zone. It functions from the graveyard it has just reached.
+fn put_into_a_graveyard(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::ZoneChange { new, to, .. } if *new == source && to.is(ZoneKind::Graveyard) => Fired::PLAIN,
+        _ => None,
+    }
+}
+
+/// "Shuffle it into its owner's library": only the card that triggered it, still in that graveyard (CR 400.7); the
+/// library is shuffled once it is there.
+fn shuffle_it_in(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let card = item.object;
+    if !is_live(g, card) || !g.obj(card).zone.is(ZoneKind::Graveyard) {
+        return Ok(());
+    }
+    g.put_into_library(&[card], LibraryPlace::ShuffledIn);
+    Ok(())
+}
+
+pub static CARD: CardDef = CardDef {
+    abilities: &[
+        AbilityDef::Triggered(TriggeredDef {
+            text: "When this creature dies, create three 5/5 green Wurm creature tokens with trample.",
+            listens: EventMask::ZONE_CHANGE,
+            matches: this_dies,
+            look_back: true,
+            effect: three_wurms,
+            ..TriggeredDef::BLANK
+        }),
+        AbilityDef::Triggered(TriggeredDef {
+            text: "When Worldspine Wurm is put into a graveyard from anywhere, shuffle it into its owner's library.",
+            listens: EventMask::ZONE_CHANGE,
+            matches: put_into_a_graveyard,
+            effect: shuffle_it_in,
+            anywhere: true,
+            ..TriggeredDef::BLANK
+        }),
+    ],
+    ..oracle::WORLDSPINE_WURM
+};
+
+pub static EXTRA: &[&CardDef] = &[&WURM];

@@ -1,0 +1,36 @@
+# "You may put a +1/+1 counter on Black Widow. If you don't, you may cast the exiled nonland card." Bot1 accepts the counter:
+# Black Widow becomes 3/2 for good, and the exiled Lightning Bolt cannot be cast (the refusal; the decline scenario,
+# black-widow-steals-a-bolt-and-casts-it-with-black-mana, is its positive control). Lands exiled on the way stay exiled.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Black Widow, Super Spy
+Swamp x12
+
+[Bot2 Deck]
+Mountain x9
+Island
+Lightning Bolt
+Mountain x6
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Black Widow, Super Spy.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Attack(Black Widow, Super Spy)
+Bot1.Accept
+[T5 Bot1.Main2]
+! Bot1.Exile.Lightning Bolt.Cast
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield.Black Widow, Super Spy.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Black Widow, Super Spy.Power = 3
+Bot1.Battlefield.Black Widow, Super Spy.Toughness = 2
+Exile = Island; Lightning Bolt

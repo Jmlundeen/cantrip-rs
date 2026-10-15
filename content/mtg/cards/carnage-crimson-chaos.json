@@ -1,0 +1,11 @@
+{
+  "name": "Carnage, Crimson Chaos",
+  "manaCost": "{2}{B}{R}",
+  "type": "Legendary Creature — Symbiote Villain",
+  "power": 4,
+  "toughness": 3,
+  "oracleText": "Trample\nWhen Carnage enters, return target creature card with mana value 3 or less from your graveyard to the battlefield. It gains \"This creature attacks each combat if able\" and \"When this creature deals combat damage to a player, sacrifice it.\"\nMayhem {B}{R} (You may cast this card from your graveyard for {B}{R} if you discarded it this turn. Timing rules still apply.)",
+  "keywords": [
+    "Trample"
+  ]
+}

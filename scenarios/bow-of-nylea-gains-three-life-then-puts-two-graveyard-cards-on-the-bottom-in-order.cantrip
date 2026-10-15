@@ -1,0 +1,63 @@
+# Bow of Nylea's modal ability, choosing its mode as it is activated. Turn 3: "You gain 3 life". Turn 5: "Put up to
+# four target cards from your graveyard on the bottom of your library in any order" with a Lightning Bolt and a Burst
+# Lightning, which the controller orders (the Burst Lightning lowest, as the targets are chosen one slot each); Bot1's library is then just those two.
+
+[Bot1 Deck]
+Forest
+Mox Ruby
+Mox Ruby
+Mox Emerald
+Mox Emerald
+Lightning Bolt
+Burst Lightning
+Bow of Nylea
+Forest
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Burst Lightning.Cast(Bot2)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Bow of Nylea.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Bow of Nylea.Activate
+Bot1.Modes(You gain 3 life)
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Life = 23
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Bow of Nylea.Activate
+Bot1.Modes(Put up to four target cards)
+Bot1.Target(Lightning Bolt)
+Bot1.Target(Burst Lightning)
+Bot1.Pass
+Bot1.Arrange(Lightning Bolt; Burst Lightning)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard.Count = 0
+Bot1.Library = Lightning Bolt; Burst Lightning
+Bot2.Life = 15

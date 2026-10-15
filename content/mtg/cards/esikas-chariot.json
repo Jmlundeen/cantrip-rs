@@ -1,0 +1,8 @@
+{
+  "name": "Esika's Chariot",
+  "manaCost": "{3}{G}",
+  "type": "Legendary Artifact — Vehicle",
+  "power": 4,
+  "toughness": 4,
+  "oracleText": "When Esika's Chariot enters, create two 2/2 green Cat creature tokens.\nWhenever Esika's Chariot attacks, create a token that's a copy of target token you control.\nCrew 4"
+}

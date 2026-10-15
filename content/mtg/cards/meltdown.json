@@ -1,0 +1,6 @@
+{
+  "name": "Meltdown",
+  "manaCost": "{X}{R}",
+  "type": "Sorcery",
+  "oracleText": "Destroy each artifact with mana value X or less."
+}

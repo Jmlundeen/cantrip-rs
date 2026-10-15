@@ -1,0 +1,38 @@
+# Frantic Search: "Untap up to three lands" - any lands, fewer than three allowed. Turn 3 Bot1 taps both its Islands and
+# Mox Sapphire for it; it chooses one of its own Islands and Bot2's tapped Swamp (Bot2 tapped it on turn 2) and leaves the
+# other Island tapped.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Frantic Search
+Island x4
+Island x3
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Frantic Search.Cast
+Bot1.Choose(Island; Island)
+Bot1.Choose(Bot1.Battlefield.Island#1; Bot2.Battlefield.Swamp)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Island#1.Tapped = false
+Bot1.Battlefield.Island#2.Tapped = true
+Bot2.Battlefield.Swamp.Tapped = false

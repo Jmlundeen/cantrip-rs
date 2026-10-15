@@ -1,0 +1,25 @@
+# Ketria Triome (Forest Island Mountain) enters tapped, so it makes no mana on turn 1 (refusal), then {U} on turn 3,
+# {R} on turn 5 and {G} on turn 7 - one color a turn, each ability its own basic land type's.
+
+[Bot1 Deck]
+Ketria Triome
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Ketria Triome.Play
+! Bot1.Battlefield.Ketria Triome.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Ketria Triome.Activate(Ability: {U})
+? Bot1.Mana = {U}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Ketria Triome.Activate(Ability: {R})
+? Bot1.Mana = {R}
+[T7 Bot1.Main1]
+Bot1.Battlefield.Ketria Triome.Activate(Ability: {G})
+
+[Expect]
+Bot1.Mana = {G}
+Bot1.Battlefield.Ketria Triome.Subtypes = Forest; Island; Mountain

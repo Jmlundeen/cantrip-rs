@@ -1,0 +1,11 @@
+{
+  "name": "Birds of Paradise",
+  "manaCost": "{G}",
+  "type": "Creature — Bird",
+  "power": 0,
+  "toughness": 1,
+  "oracleText": "Flying\n{T}: Add one mana of any color.",
+  "keywords": [
+    "Flying"
+  ]
+}

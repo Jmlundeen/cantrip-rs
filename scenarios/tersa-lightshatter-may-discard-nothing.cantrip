@@ -1,0 +1,35 @@
+# Tersa Lightshatter: "discard up to two cards" includes none. Bot1 enters it with cards in hand and chooses nothing: no discard
+# and so no draw (hand and library unchanged). The control that two discards draw two is tersa-lightshatter-entry-discard-draw.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Tersa Lightshatter
+Island
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Tersa Lightshatter.Cast
+Bot1.Pass
+Bot1.Choose()
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 3
+Bot1.Graveyard.Count = 0
+Bot1.Library.Count = 13

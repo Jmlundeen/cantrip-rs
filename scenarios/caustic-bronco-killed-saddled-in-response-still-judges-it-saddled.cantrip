@@ -1,0 +1,43 @@
+# CR 608.2h: the trigger's "if this creature isn't saddled" is judged from the Bronco's last known information. Bot1
+# saddles it, attacks, and kills it with Lightning Bolt with the trigger on the stack: it was saddled when it left,
+# so Bot2 loses the 2 (there is no combat damage) and Bot1 loses nothing.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Emerald
+Mox Pearl
+Caustic Bronco
+Cathar Commando
+Mox Ruby
+Lightning Bolt
+Cathar Commando
+Swamp x6
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Caustic Bronco.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Cathar Commando.Cast
+Bot1.Battlefield.Caustic Bronco.Activate
+Bot1.Choose(Cathar Commando)
+Bot1.Attack(Caustic Bronco > Bot2)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Caustic Bronco)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 18
+Bot1.Graveyard = Caustic Bronco; Lightning Bolt

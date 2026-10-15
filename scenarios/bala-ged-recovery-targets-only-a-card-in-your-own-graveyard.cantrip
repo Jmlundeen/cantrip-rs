@@ -1,0 +1,37 @@
+# Bala Ged Recovery says "target card from your graveyard". Bot2's drawn Lightning Bolt is discarded at the end of turn 2,
+# so on turn 3 the only card in any graveyard is in Bot2's: Bot1's Bala Ged Recovery is not offered at all (no legal target,
+# CR 601.2c), and once Black Lotus is in Bot1's own graveyard a cast naming Bot2's Bolt is still refused while the same
+# cast at the Lotus is the positive control. The land face (played turn 1 as Bala Ged Sanctuary) entered tapped
+# and untaps for turn 3, where it taps for {G}.
+
+[Bot1 Deck]
+Bala Ged Recovery
+Bala Ged Recovery
+Black Lotus
+Forest x4
+Forest x10
+
+[Bot2 Deck]
+Island x7
+Lightning Bolt
+Island x10
+
+[Actions]
+Bot1.Hand.Bala Ged Recovery.Play
+? Bot1.Battlefield.Bala Ged Sanctuary.Tapped = True
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Bala Ged Sanctuary.Tapped = False
+? Bot2.Graveyard = Lightning Bolt
+! Bot1.Hand.Bala Ged Recovery.Cast
+Bot1.Battlefield.Bala Ged Sanctuary.Activate
+? Bot1.Mana = {G}
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+! Bot1.Hand.Bala Ged Recovery.Cast(Bot2.Graveyard.Lightning Bolt)
+Bot1.Hand.Bala Ged Recovery.Cast(Bot1.Graveyard.Black Lotus)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Lightning Bolt
+Bot1.Graveyard = Bala Ged Recovery
+Bot1.Hand = Black Lotus; Forest; Forest; Forest; Forest; Forest

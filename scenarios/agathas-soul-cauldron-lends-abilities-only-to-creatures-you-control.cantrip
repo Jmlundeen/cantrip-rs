@@ -1,0 +1,72 @@
+# Agatha's Soul Cauldron: "Creatures you control with +1/+1 counters on them have all activated abilities of..." - only
+# the Cauldron's controller's creatures. Bot2's Ornithopter has a +1/+1 counter (Snakeskin Veil) on turn 2; on turn 3
+# Bot1's Cauldron exiles a Blazing Rootwalla and Bot1's own countered Ornithopter gets "{R}: +2/+0" (positive control,
+# paid with Mox Sapphire) while Bot2's, also countered, is not given it, though Bot2's Mox Ruby could pay for it.
+
+[Bot1 Deck]
+Mountain
+Mox Sapphire
+Mox Ruby
+Ornithopter
+Agatha's Soul Cauldron
+Faithless Looting
+Blazing Rootwalla
+Mountain
+Mountain x14
+
+[Bot2 Deck]
+Mox Emerald
+Mox Ruby
+Ornithopter
+Snakeskin Veil
+Island x3
+Island x13
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Agatha's Soul Cauldron.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Snakeskin Veil.Cast(Bot2.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Blazing Rootwalla; Mountain)
+Bot1.Battlefield.Agatha's Soul Cauldron.Activate(Bot1.Graveyard.Blazing Rootwalla)
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Ornithopter.Activate(Ability: +2/+0)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+! Bot2.Battlefield.Ornithopter.Activate(Ability: +2/+0)
+Bot1.Pass
+
+[Expect]
+Bot2.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter.Power = 3
+Bot2.Battlefield.Ornithopter.Power = 1

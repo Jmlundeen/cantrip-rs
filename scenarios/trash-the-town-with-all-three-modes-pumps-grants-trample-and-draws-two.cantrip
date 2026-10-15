@@ -1,0 +1,46 @@
+# Trash the Town cast with all three spree modes ({G} plus {2}, {1} and {1}, off five Moxen) on Llanowar Elves: two
+# +1/+1 counters, trample until end of turn, and a granted "draws two when it deals combat damage to a player". The
+# 3/3 trampling Elves attack Bot2 for 3 and draw Bot1 two cards.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Llanowar Elves
+Trash the Town
+Island
+Island x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Trash the Town.Cast
+Bot1.Modes(1; 2; 3)
+Bot1.Target(Llanowar Elves)
+Bot1.Target(Llanowar Elves)
+Bot1.Target(Llanowar Elves)
+Bot1.Attack(Llanowar Elves)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Llanowar Elves.Power = 3
+Bot1.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Llanowar Elves.Keywords = Trample
+Bot1.Hand.Count = 3

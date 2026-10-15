@@ -1,0 +1,40 @@
+# Ferocious: Bot1 controls a Bonecrusher Giant (power 4), so Stubborn Denial counters Duress outright. Bot2 kept a
+# Mox Jet untapped to pay the {1} but is never asked: it stays untapped.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Bonecrusher Giant
+Stubborn Denial
+Island x14
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Duress
+Swamp x17
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Bonecrusher Giant.Cast
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Duress.Cast(Bot1)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Stubborn Denial.Cast(Duress)
+[Bot2.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Stubborn Denial
+Bot2.Graveyard = Duress
+Bot2.Battlefield.Mox Jet.Tapped = false

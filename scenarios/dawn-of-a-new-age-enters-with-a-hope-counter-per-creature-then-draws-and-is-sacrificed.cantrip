@@ -1,0 +1,29 @@
+# Dawn of a New Age enters with a hope counter for each creature you control: with an Ornithopter that is one. At the
+# beginning of Bot1's end step the counter comes off, Bot1 draws a card, and with none left the enchantment is
+# sacrificed and Bot1 gains 4 life.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Ornithopter
+Dawn of a New Age
+Island x13
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dawn of a New Age.Cast
+[Bot1.Main2]
+? Bot1.Battlefield.Dawn of a New Age.Counters.Hope = 1
+[T2 Bot2.Main1]
+
+[Expect]
+Bot1.Life = 24
+Bot1.Graveyard = Dawn of a New Age
+Bot1.Hand.Count = 4

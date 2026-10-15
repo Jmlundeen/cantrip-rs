@@ -1,0 +1,36 @@
+# Copying is a choice made as it enters, not a target (CR 608.2d), so hexproof does not stop it: Bot2's Sylvan Caryatid
+# (hexproof, defender) is the lone candidate and Bot1's Metamorph enters as a Caryatid of its own, an artifact in addition to
+# its creature type. Bot2's original is untouched.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Phyrexian Metamorph
+Island x17
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Sylvan Caryatid
+Forest x17
+
+[Actions]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Sylvan Caryatid.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Phyrexian Metamorph.Cast
+Bot1.Accept
+Bot1.Target(Bot2.Battlefield.Sylvan Caryatid)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Sylvan Caryatid.Keywords = Defender; Hexproof
+Bot1.Battlefield.Sylvan Caryatid.Types = Creature; Artifact
+Bot2.Battlefield.Sylvan Caryatid.Types = Creature

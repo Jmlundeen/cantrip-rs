@@ -1,0 +1,32 @@
+# Bot1 casts Court of Garenbrig on turn 1 (Black Lotus for {G}{G}{G}) and becomes the monarch. On turn 2 Bot2 casts its own
+# Court the same way and becomes the monarch instead (CR 725.2: the designation moves to the player who just became it).
+# In Bot1's upkeep on turn 3 the trigger still puts both counters on Ornithopter, but "then if you're the monarch" is false,
+# so nothing is doubled: Ornithopter has exactly 2. The monarch is Bot2.
+
+[Bot1 Deck]
+Black Lotus
+Court of Garenbrig
+Ornithopter
+Forest x17
+
+[Bot2 Deck]
+Black Lotus
+Court of Garenbrig
+Forest x18
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Court of Garenbrig.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Court of Garenbrig.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+[T3 Bot1.Upkeep]
+Bot1.Divide(Ornithopter: 2)
+[T3 Bot1.Main1]
+
+[Expect]
+Monarch = Bot2
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 2

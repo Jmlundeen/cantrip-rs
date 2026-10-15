@@ -1,0 +1,54 @@
+# Turn 5: Wrath of God kills Bot1's two Ornithopters and Bot2's Elvish Mystic together. "Whenever a creature you control dies" triggers once per creature of Bot1's: Bot2 loses 2 and Bot1 gains 2, and the opponent's Mystic drains nothing.
+# At Bot1's end step, as the monarch, it may return up to one creature card from its graveyard: Bot2's Mystic and Bot1's Wrath of God are refused as targets (an opponent's card, a noncreature) and an Ornithopter is chosen.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Grave Venerations
+Ornithopter
+Ornithopter
+Mox Pearl
+Wrath of God
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Forest
+Elvish Mystic
+Forest x13
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Grave Venerations.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Wrath of God.Cast
+Bot1.Pass
+[T5 Bot1.End]
+! Bot1.Target(Bot2.Graveyard.Elvish Mystic)
+! Bot1.Target(Wrath of God)
+Bot1.Target(Ornithopter)
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 22
+Bot2.Life = 18
+Bot2.Graveyard = Elvish Mystic
+Bot1.Graveyard = Wrath of God; Ornithopter; Black Lotus

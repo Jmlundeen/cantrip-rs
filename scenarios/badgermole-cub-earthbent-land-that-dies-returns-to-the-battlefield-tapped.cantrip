@@ -1,0 +1,31 @@
+# The land Badgermole Cub earthbent is a creature; Lightning Bolt kills it, and its delayed return puts it back onto the battlefield tapped, a plain land again (a new object).
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Badgermole Cub
+Forest x17
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Badgermole Cub.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Forest)
+Bot2.Battlefield.Mountain.Activate
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Bot1.Graveyard = Black Lotus
+Bot1.Battlefield = Forest; Badgermole Cub
+Bot1.Battlefield.Forest.Tapped = true
+Bot1.Battlefield.Forest.Types = Land
+Bot2.Graveyard = Lightning Bolt

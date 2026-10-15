@@ -1,0 +1,6 @@
+{
+  "name": "Repeal",
+  "manaCost": "{X}{U}",
+  "type": "Instant",
+  "oracleText": "Return target nonland permanent with mana value X to its owner's hand.\nDraw a card."
+}

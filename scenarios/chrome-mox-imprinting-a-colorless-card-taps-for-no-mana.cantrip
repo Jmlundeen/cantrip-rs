@@ -1,0 +1,25 @@
+# Chrome Mox: "{T}: Add one mana of any of the exiled card's colors." Emrakul, the Aeons Torn is colorless, so a Mox that
+# imprints it has no color to add (CR 106.5): Bot1 imprints it, taps the Mox, and the Mox is tapped with no mana in the
+# pool. Bot1 therefore cannot pay for the Mountain-less Lightning Bolt, which stays in hand.
+
+[Bot1 Deck]
+Chrome Mox
+Emrakul, the Aeons Torn
+Lightning Bolt
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Chrome Mox.Cast
+Bot1.Choose(Emrakul, the Aeons Torn)
+Bot1.Battlefield.Chrome Mox.Activate
+? Bot1.Mana =
+? Bot1.Battlefield.Chrome Mox.Tapped = true
+[Bot1.Main2]
+
+[Expect]
+Exile = Emrakul, the Aeons Torn
+Bot1.Hand = Lightning Bolt; Island; Island; Island; Island
+Bot2.Life = 20

@@ -1,0 +1,25 @@
+use cantrip_api::*;
+use cantrip_mechanics::triggers::this_dies;
+use cantrip_oracle as oracle;
+
+/// "Each opponent loses 5 life. You gain life equal to the life lost this way": measured rather than assumed, since an
+/// effect can change what is lost (CR 119.3, 608.2c).
+fn drain(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let lost = g.each_opponent_loses_life(item.controller, 5);
+    if lost > 0 {
+        g.gain_life(item.controller, lost);
+    }
+    Ok(())
+}
+
+pub static CARD: CardDef = CardDef {
+    abilities: &[AbilityDef::Triggered(TriggeredDef {
+        text: "When Kokusho, the Evening Star dies, each opponent loses 5 life. You gain life equal to the life lost this way.",
+        listens: EventMask::ZONE_CHANGE,
+        matches: this_dies,
+        effect: drain,
+        look_back: true,
+        ..TriggeredDef::BLANK
+    })],
+    ..oracle::KOKUSHO_THE_EVENING_STAR
+};

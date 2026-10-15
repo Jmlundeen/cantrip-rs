@@ -1,0 +1,46 @@
+# "Nonland, nontoken permanents you control": Deadly Dispute on turn 1 (sacrificing Mox Ruby) leaves a Treasure token. On turn 3
+# Paradoxical Outcome is refused with the Treasure token (a token), with an Island (a land) and with Bot2's Mox Jet (not
+# Bot1's) as the target; naming Bot1's own Mox Pearl, the positive control, is allowed and returns it: one card drawn.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Mox Pearl
+Deadly Dispute
+Paradoxical Outcome
+Island
+Island x12
+Island x4
+
+[Bot2 Deck]
+Mox Jet
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Deadly Dispute.Cast
+Bot1.Choose(Mox Ruby)
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Paradoxical Outcome.Cast(Treasure Token)
+! Bot1.Hand.Paradoxical Outcome.Cast(Island)
+! Bot1.Hand.Paradoxical Outcome.Cast(Bot2.Battlefield.Mox Jet)
+Bot1.Hand.Paradoxical Outcome.Cast
+Bot1.Target(Mox Pearl)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Jet; Mox Sapphire; Island; Island; Treasure Token
+Bot1.Graveyard = Paradoxical Outcome; Deadly Dispute; Mox Ruby

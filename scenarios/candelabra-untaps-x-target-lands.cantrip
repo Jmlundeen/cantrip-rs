@@ -1,0 +1,37 @@
+# Candelabra of Tawnos is "{X}, {T}: Untap X target lands". X is announced first, so the two lands are asked for
+# once it is rather than with the activation — and the mana those very lands made beforehand pays for untapping
+# them. Bot1 taps both for X of 2, untaps both, and spends the Mountain again on a Bolt it could not otherwise cast.
+
+[Bot1 Deck]
+Candelabra of Tawnos
+Island
+Mountain
+Lightning Bolt
+Island x3
+Island x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Candelabra of Tawnos.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Candelabra of Tawnos.Activate(X: 2)
+Bot1.Target(Bot1.Battlefield.Island; Bot1.Battlefield.Mountain)
+? Bot1.Battlefield.Mountain.Tapped = true
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+
+[Expect]
+Turn = 3
+Bot2.Life = 17
+Bot1.Graveyard = Lightning Bolt
+# The Candelabra paid with its own tap; the lands it untapped are free again, and the Mountain was spent a second time.
+Bot1.Battlefield.Candelabra of Tawnos.Tapped = true
+Bot1.Battlefield.Island.Tapped = false
+Bot1.Battlefield.Mountain.Tapped = true

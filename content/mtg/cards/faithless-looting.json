@@ -1,0 +1,6 @@
+{
+  "name": "Faithless Looting",
+  "manaCost": "{R}",
+  "type": "Sorcery",
+  "oracleText": "Draw two cards, then discard two cards.\nFlashback {2}{R} (You may cast this card from your graveyard for its flashback cost. Then exile it.)"
+}

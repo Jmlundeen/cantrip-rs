@@ -1,0 +1,50 @@
+# "Creatures you control of the chosen type get +2/+2": the chosen type is Human. Mother of Runes (Human Cleric) taps to convoke, paying
+# the white mana, and is a 3/3; the Ornithopter (a Thopter) is not of the chosen type and stays 0/2; Bot2's Thalia (also a Human) is
+# not controlled by Bot1 and stays 2/1.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Black Lotus
+Mother of Runes
+Ornithopter
+Obelisk of Urd
+Plains x12
+
+[Bot2 Deck]
+Mox Pearl
+Mox Pearl
+Mox Jet
+Thalia, Guardian of Thraben
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Mother of Runes.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Obelisk of Urd.Cast(Convoke: Mother of Runes)
+Bot1.Modes(Human)
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Pearl#1.Activate
+Bot2.Battlefield.Mox Pearl#2.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Thalia, Guardian of Thraben.Cast
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Mother of Runes.Power = 3
+Bot1.Battlefield.Mother of Runes.Toughness = 3
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot2.Battlefield.Thalia, Guardian of Thraben.Power = 2
+Bot2.Battlefield.Thalia, Guardian of Thraben.Toughness = 1

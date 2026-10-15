@@ -1,0 +1,35 @@
+# Etali, Primal Conqueror: "You MAY cast any number of spells" - including none. The dig finds a Lightning Bolt on top of
+# Bot1's library and another on top of Bot2's; Bot1 chooses to cast neither, so both stay in exile and Bot2 is not hurt.
+# The positive control is the neighbouring scenarios, where the same offer is taken.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Etali, Primal Conqueror
+Island x3
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Island x7
+Lightning Bolt
+Island x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Etali, Primal Conqueror.Cast
+Bot1.Choose()
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Life = 20
+Bot2.Life = 20
+Exile = Lightning Bolt; Lightning Bolt

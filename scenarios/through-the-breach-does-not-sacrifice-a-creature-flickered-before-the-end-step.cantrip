@@ -1,0 +1,50 @@
+# Through the Breach's "Sacrifice that creature at the beginning of the next end step" follows the object it put onto
+# the battlefield. On turn five Bot1 casts Displacer Kitten, then Through the Breach (the Kitten's trigger on that cast
+# targets nothing) and puts Griselbrand in with haste. A third Black Lotus is a noncreature spell, and the Kitten's
+# trigger on it blinks Griselbrand: it returns as a new object (CR 400.7), without the haste, and the delayed
+# sacrifice no longer refers to it. It survives the end step and is still there on Bot2's turn.
+
+[Bot1 Deck]
+Mountain
+Island
+Mountain
+Black Lotus
+Black Lotus
+Black Lotus
+Displacer Kitten
+Through the Breach
+Griselbrand
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Displacer Kitten.Cast
+Bot1.Pass
+Bot1.Hand.Through the Breach.Cast
+Bot1.Target()
+Bot1.Choose(Griselbrand)
+? Bot1.Battlefield.Griselbrand.Keywords = Flying; Haste; Lifelink
+Bot1.Hand.Black Lotus.Cast
+Bot1.Target(Griselbrand)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Griselbrand.Keywords = Flying; Lifelink
+[T6 Bot2.Main1]
+
+[Expect]
+Turn = 6
+Bot1.Battlefield = Mountain; Mountain; Island; Displacer Kitten; Griselbrand; Black Lotus
+Bot1.Battlefield.Griselbrand.Keywords = Flying; Lifelink
+Bot1.Graveyard = Through the Breach; Black Lotus; Black Lotus

@@ -1,0 +1,44 @@
+# Gut, True Soul Zealot is cast on turn 5 beside a Mind Stone. On turn 7 Gut attacks alone and "whenever you attack"
+# offers the optional sacrifice as it resolves; the Mind Stone pays, and the 4/1 black Skeleton with menace enters
+# tapped and attacking Bot2 (CR 508.4). It was never declared as an attacker, so nothing that watches attackers sees
+# it, but it is attacking: Bot2 takes 2 + 4.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Mountain
+Mind Stone
+Gut, True Soul Zealot
+Mountain x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Mind Stone.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Gut, True Soul Zealot.Cast
+[T7 Bot1.Main1]
+Bot1.Attack(Gut, True Soul Zealot > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Mind Stone)
+? Combat.Attackers = Gut, True Soul Zealot > Bot2; Skeleton > Bot2
+? Bot1.Battlefield.Skeleton.Tapped = True
+? Bot1.Battlefield.Skeleton.Power = 4
+? Bot1.Battlefield.Skeleton.Toughness = 1
+? Bot1.Graveyard = Mind Stone
+[T7 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Bot1.Battlefield = Mountain; Mountain; Mountain; Gut, True Soul Zealot; Skeleton

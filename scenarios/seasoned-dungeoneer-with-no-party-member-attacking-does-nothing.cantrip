@@ -1,0 +1,42 @@
+# The attack trigger has a target requirement: with only Llanowar Elves (a Druid) attacking there is no legal target, so the
+# trigger is not put on the stack (the bare Target refusal) and nothing explores; the Dungeoneer stays home. (The library
+# is all Lightning Bolts because the venture's land search shuffles it. The initiative's venture in turn 3's upkeep
+# puts the Forge's counters on the Dungeoneer, so the Elves' 1 damage is all Bot2 takes.)
+
+[Bot1 Deck]
+Black Lotus
+Swamp
+Mox Emerald
+Seasoned Dungeoneer
+Llanowar Elves
+Island
+Island
+Lightning Bolt x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Seasoned Dungeoneer.Cast
+Bot1.Search()
+[T3 Bot1.Upkeep]
+Bot1.Modes(Forge)
+Bot1.Target(Seasoned Dungeoneer)
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Llanowar Elves)
+! Bot1.Target
+! Bot1.Arrange
+! Bot1.Choose
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 19
+Bot1.Library.Count = 11
+Bot1.Battlefield.Seasoned Dungeoneer.Tapped = false

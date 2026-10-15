@@ -1,0 +1,33 @@
+# "Search your library for a creature card": the Lightning Bolt and the Forest in the library are not offered (refusals),
+# the Noble Hierarch is (and Birds of Paradise, discarded as the cost, goes to the graveyard).
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Survival of the Fittest
+Birds of Paradise
+Forest
+Forest
+Elvish Mystic
+Lightning Bolt
+Forest
+Noble Hierarch
+Forest x8
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Survival of the Fittest.Cast
+Bot1.Battlefield.Survival of the Fittest.Activate
+Bot1.Choose(Birds of Paradise)
+! Bot1.Search(Lightning Bolt)
+! Bot1.Search(Forest)
+Bot1.Search(Noble Hierarch)
+
+[Expect]
+Bot1.Graveyard = Birds of Paradise; Black Lotus
+Bot1.Hand.Count = 4

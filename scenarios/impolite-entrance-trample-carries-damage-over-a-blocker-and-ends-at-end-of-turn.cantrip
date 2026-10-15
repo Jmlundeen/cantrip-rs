@@ -1,0 +1,37 @@
+# Trample until end of turn: Cathar Commando (3/1) attacks on turn 3 after Impolite Entrance and Bot2's Ornithopter (0/2)
+# blocks; the Commando assigns lethal 2 to it and 1 tramples over (Bot2 on 19). On turn 5 the trample is gone.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Emerald
+Mox Ruby
+Cathar Commando
+Impolite Entrance
+Island x4
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Cathar Commando.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Impolite Entrance.Cast(Cathar Commando)
+Bot1.Attack(Cathar Commando > Bot2)
+Bot2.Block(Ornithopter > Cathar Commando)
+[T3 Bot1.Main2]
+? Bot2.Life = 19
+? Bot2.Graveyard = Ornithopter
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Cathar Commando.Keywords = Flash

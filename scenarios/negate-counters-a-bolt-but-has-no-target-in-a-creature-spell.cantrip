@@ -1,0 +1,42 @@
+# Negate counters target noncreature spell. Bot1 holds up an Island and Mox Sapphire. Bot2's Llanowar Elves is a
+# creature spell, so Negate is not offered against it (the refusal); Bot2's Lightning Bolt aimed at Bot1 two turns
+# later is countered, and Bot1 stays at 20 life.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Negate
+Island x17
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Mountain
+Lightning Bolt
+Forest x14
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+? Stack = Llanowar Elves
+! Bot1.Hand.Negate.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+? Stack = Lightning Bolt
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Negate.Cast(Lightning Bolt)
+
+[Expect]
+Turn = 4
+Stack.Count = 0
+Bot1.Life = 20
+Bot1.Graveyard = Negate
+Bot2.Graveyard = Lightning Bolt
+Bot2.Battlefield.Count = 3

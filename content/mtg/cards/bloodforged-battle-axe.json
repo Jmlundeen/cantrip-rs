@@ -1,0 +1,6 @@
+{
+  "name": "Bloodforged Battle-Axe",
+  "manaCost": "{1}",
+  "type": "Artifact — Equipment",
+  "oracleText": "Equipped creature gets +2/+0.\nWhenever equipped creature deals combat damage to a player, create a token that's a copy of this Equipment.\nEquip {2}"
+}

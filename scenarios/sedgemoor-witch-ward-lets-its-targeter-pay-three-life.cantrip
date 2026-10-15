@@ -1,0 +1,39 @@
+# Sedgemoor Witch's Ward-Pay 3 life: Bot2 accepts and pays 3 life (20 to 17), so its Lightning Bolt is not countered and
+# kills the Witch.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Sedgemoor Witch
+Island x16
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sedgemoor Witch.Cast
+Bot1.Pass
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Sedgemoor Witch)
+Bot2.Accept
+Bot1.Pass
+[T3 Bot1.Main1]
+
+[Expect]
+Turn = 3
+Bot2.Life = 17
+Bot1.Graveyard = Sedgemoor Witch
+Bot2.Graveyard = Lightning Bolt

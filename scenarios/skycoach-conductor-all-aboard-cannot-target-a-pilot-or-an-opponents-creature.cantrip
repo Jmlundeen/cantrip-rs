@@ -1,0 +1,45 @@
+# All Aboard says "target non-Pilot creature you control". Skycoach Conductor is a Pilot, and the only other creature is
+# Bot2's Ornithopter, so the copy in exile has no legal target and is not offered (CR 601.2c); it stays there and the
+# Conductor stays prepared. The positive control: once Bot1 has an Ornithopter of its own, the copy is cast at it.
+
+[Bot1 Deck]
+Island x5
+Skycoach Conductor
+Ornithopter
+Island x13
+
+[Bot2 Deck]
+Ornithopter
+Mountain x19
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Skycoach Conductor.Cast
+[T7 Bot1.Main1]
+? Exile = All Aboard
+Bot1.Hand.Island.Play
+Bot1.Pass
+! Bot1.Exile.All Aboard.Cast
+[T7 Bot1.Main2]
+? Bot1.Battlefield.Skycoach Conductor.Prepared = true
+? Exile = All Aboard
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Exile.All Aboard.Cast(Bot1.Battlefield.Ornithopter)
+[T7 Bot1.End]
+
+[Expect]
+Turn = 7
+Exile.Count = 0
+Bot1.Battlefield.Skycoach Conductor.Prepared = (absent)
+Bot1.Battlefield = Island; Island; Island; Island; Ornithopter; Skycoach Conductor
+Bot2.Battlefield = Ornithopter

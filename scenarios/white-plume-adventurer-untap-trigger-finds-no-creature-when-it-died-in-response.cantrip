@@ -1,0 +1,43 @@
+# White Plume Adventurer: "At the beginning of each opponent's upkeep, untap a creature you control." Its controller's only creature is the
+# Adventurer itself; with the trigger on the stack at Bot2's turn-4 upkeep, Bot2 kills it with a Lightning Bolt, and the trigger resolves with
+# no creature to untap and asks nothing (! Bot1.Choose). Bot1 casts the Adventurer on turn 1 off three Moxen (taking the initiative); at its turn-3 upkeep the initiative ventures into the Lost Well
+# rather than the Forge, whose counters would save the Adventurer from the Bolt.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+White Plume Adventurer
+Plains x16
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.White Plume Adventurer.Cast
+Bot1.Pass
+Bot1.Search()
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Upkeep]
+Bot1.Modes(Lost Well)
+[T4 Bot2.Upkeep]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(White Plume Adventurer)
+Bot1.Pass
+Bot1.Pass
+! Bot1.Choose
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Graveyard = White Plume Adventurer

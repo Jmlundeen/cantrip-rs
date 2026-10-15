@@ -1,0 +1,42 @@
+# Sunfall exiles an Ornithopter and makes an Incubator with a +1/+1 counter; paying {2} transforms it into a 0/0
+# Phyrexian artifact creature, which with the counter is a 1/1.
+
+[Bot1 Deck]
+Ornithopter
+Black Lotus
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Sunfall
+Island x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Sunfall.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Incubator Token.Activate(Ability: Transform)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Mox Pearl; Mox Jet; Mox Ruby; Mox Sapphire; Phyrexian Token
+Bot1.Battlefield.Phyrexian Token.Types = Artifact; Creature
+Bot1.Battlefield.Phyrexian Token.Power = 1
+Bot1.Battlefield.Phyrexian Token.Toughness = 1
+Bot1.Battlefield.Phyrexian Token.Counters.PlusOnePlusOne = 1

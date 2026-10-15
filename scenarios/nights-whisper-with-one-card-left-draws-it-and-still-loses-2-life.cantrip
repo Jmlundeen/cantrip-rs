@@ -1,0 +1,28 @@
+# With one card in the library, Night's Whisper draws it (the second draw finds the library empty) and the
+# life is still lost: both are part of the resolution, and only then does the state-based action for the
+# empty-library draw end the game (CR 704.5b).
+
+[Bot1 Deck]
+Swamp
+Swamp
+Night's Whisper
+Island x4
+Island x2
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Night's Whisper.Cast
+Bot1.Pass
+
+[Expect]
+Result = Bot2 won
+Bot1.Graveyard = Night's Whisper
+Bot1.Library.Count = 0
+Bot1.Life = 18

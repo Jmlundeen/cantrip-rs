@@ -1,0 +1,21 @@
+# Banishing Knack has "target creature": with no creature on the battlefield it is not offered, and once Bot1's
+# Ornithopter is there it is.
+
+[Bot1 Deck]
+Island
+Banishing Knack
+Ornithopter
+Island x12
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Island.Play
+! Bot1.Hand.Banishing Knack.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Banishing Knack.Cast(Ornithopter)
+
+[Expect]
+Bot1.Graveyard = Banishing Knack

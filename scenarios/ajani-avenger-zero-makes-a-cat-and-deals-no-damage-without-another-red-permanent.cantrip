@@ -1,0 +1,41 @@
+# Ajani, Nacatl Avenger's 0: "Create a 2/1 white Cat Warrior creature token. When you do, if you control a red
+# permanent other than Ajani, he deals damage ..." (CR 603.12, 603.4). Ajani is red and white himself, but "other than
+# Ajani" leaves him out, so with nothing else red the token is made and the reflexive trigger never goes on the
+# stack. Setup: Bot1's Cat dies to Lightning Bolt on turn 4 and Ajani transforms; on turn 5 Bot1 uses the 0.
+
+[Bot1 Deck]
+Plains x2
+Ajani, Nacatl Pariah
+Plains x3
+Plains x12
+
+[Bot2 Deck]
+Mountain
+Island
+Island
+Lightning Bolt
+Island x3
+Island x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Ajani, Nacatl Pariah.Cast
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Cat Warrior)
+Bot1.Accept
+[T5 Bot1.Main1]
+Bot1.Battlefield.Ajani, Nacatl Avenger.Activate(Ability: 0: Create)
+[Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Plains; Plains; Ajani, Nacatl Avenger; Cat Warrior
+Bot2.Life = 20
+Bot1.Life = 20
+Stack.Count = 0

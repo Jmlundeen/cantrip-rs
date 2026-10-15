@@ -1,0 +1,51 @@
+# Kappa Cannoneer's ward {4} paid: Bot2 casts four Moxen first (artifacts entering under Bot2's control do not trigger "another
+# artifact you control": the counter total stays 1), then a Lightning Bolt at the Cannoneer, and pays the ward {4} by tapping
+# the Moxen first (their mana floats). The ward is satisfied, the Bolt resolves and deals 3 to the 5/5.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Black Lotus
+Kappa Cannoneer
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Mountain
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Lightning Bolt
+Mountain x14
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Kappa Cannoneer.Cast(Convoke: Mox Ruby, Mox Jet, Mox Pearl)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+? Bot1.Battlefield.Kappa Cannoneer.Counters.PlusOnePlusOne = 1
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Kappa Cannoneer)
+Bot2.PayCost
+? Bot2.Mana =
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Kappa Cannoneer.Damage = 3
+Bot1.Battlefield.Kappa Cannoneer.Counters.PlusOnePlusOne = 1
+Bot2.Graveyard = Lightning Bolt

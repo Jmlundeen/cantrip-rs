@@ -1,0 +1,86 @@
+# Krang, Utrom Warlord: "Other artifact creatures you control have flying, trample, indestructible, and haste."
+# Bot1's Painter's Servant, cast on turn 5 after Krang, attacks the turn it arrives and flies over Bot2's own
+# Painter's Servant. The grant reaches only artifacts that are creatures and only Bot1's: Bot1's Llanowar Elves (a
+# creature, not an artifact), its Moxes (artifacts, not creatures) and Bot2's Painter's Servant have nothing.
+# Bot2's Wrath of God on turn 6 then destroys all creatures: Krang and Bot1's Servant are indestructible and stay,
+# while the Elves and Bot2's Servant die.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Krang, Utrom Warlord
+Painter's Servant
+Forest x10
+
+[Bot2 Deck]
+Plains
+Mox Emerald
+Painter's Servant
+Wrath of God
+Plains
+Plains
+Plains
+Plains x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Painter's Servant.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Krang, Utrom Warlord.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Llanowar Elves.Activate
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Painter's Servant.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Attack(Painter's Servant)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Painter's Servant.Keywords = Flying; Haste; Indestructible; Trample
+# entered this turn, but haste means summoning sickness does not apply (CR 702.10b)
+? Bot1.Battlefield.Painter's Servant.SummoningSick = false
+? Bot1.Battlefield.Llanowar Elves.Keywords = (absent)
+? Bot1.Battlefield.Mox Jet.Keywords = (absent)
+? Bot2.Battlefield.Painter's Servant.Keywords = (absent)
+? Bot2.Life = 19
+? Bot1.Battlefield.Painter's Servant.Tapped = true
+[T6 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Wrath of God.Cast
+Bot2.Battlefield.Plains#1.Activate
+Bot2.Battlefield.Plains#2.Activate
+Bot2.Battlefield.Plains#3.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+[T6 Bot2.Main2]
+
+[Expect]
+Turn = 6
+Bot1.Battlefield = Forest; Mox Pearl; Mox Sapphire; Mox Jet; Mox Ruby; Krang, Utrom Warlord; Painter's Servant
+Bot1.Graveyard = Llanowar Elves; Black Lotus
+Bot2.Battlefield = Plains; Plains; Plains; Mox Emerald
+Bot2.Graveyard = Wrath of God; Painter's Servant
+Bot2.Life = 19
+Bot1.Battlefield.Painter's Servant.Keywords = Flying; Haste; Indestructible; Trample

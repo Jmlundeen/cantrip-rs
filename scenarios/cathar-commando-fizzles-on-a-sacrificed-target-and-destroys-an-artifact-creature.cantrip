@@ -1,0 +1,51 @@
+# The ability's cost is sacrificing Cathar Commando, paid when it is activated (CR 602.2b), so it is gone even when the
+# target is not there to be destroyed: Bot2 sacrifices its Lotus Petal in response and the ability does nothing
+# (CR 608.2b). A second Commando then destroys Ornithopter, an artifact creature, which an "artifact or enchantment"
+# target allows.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Cathar Commando
+Cathar Commando
+Plains x3
+Plains x10
+
+[Bot2 Deck]
+Plains
+Lotus Petal
+Ornithopter
+Plains x4
+Plains x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Cathar Commando.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Lotus Petal.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Cathar Commando.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Cathar Commando.Activate(Lotus Petal)
+Bot2.Battlefield.Lotus Petal.Activate(Color: Blue)
+[T3 Bot1.Main2]
+? Bot1.Graveyard.Count = 1
+? Bot2.Graveyard = Lotus Petal
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Cathar Commando.Activate(Ornithopter)
+
+[Expect]
+Bot1.Graveyard = Cathar Commando; Cathar Commando
+Bot2.Graveyard = Ornithopter; Lotus Petal
+Bot2.Battlefield = Plains

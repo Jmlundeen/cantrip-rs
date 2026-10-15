@@ -1,0 +1,46 @@
+# "A +1/+1 counter on each creature you control": every creature, a summoning-sick one included, and no noncreature
+# artifact. On turn one two Ornithopters and four Moxen are out (all free), and the Township's ability gives each Ornithopter
+# a counter and the Moxen none. It is used again on turn three: the counters accumulate, two on each.
+
+[Bot1 Deck]
+Gavony Township
+Ornithopter
+Ornithopter
+Mox Emerald
+Mox Pearl
+Mox Jet
+Mox Ruby
+Island x12
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Gavony Township.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Gavony Township.Activate(Ability: Put a +1/+1 counter)
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Ornithopter#1.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Ornithopter#2.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Mox Jet.Counters.PlusOnePlusOne = (absent)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Gavony Township.Activate(Ability: Put a +1/+1 counter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Ornithopter#1.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Ornithopter#2.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Ornithopter#1.Power = 2

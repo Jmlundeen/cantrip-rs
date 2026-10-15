@@ -1,0 +1,36 @@
+# Ripple is "you may reveal": Bot1 declines, so nothing is revealed and the Bolts sitting in the top four stay on top of the
+# library; only the one Lightning Bolt cast does 3 (Bot2 at 17).
+
+[Bot1 Deck]
+Mountain
+Sol Ring
+Black Lotus
+Thrumming Stone
+Lightning Bolt
+Mountain
+Island
+Lightning Bolt
+Lightning Bolt
+Island
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Thrumming Stone.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Decline
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Library.Count = 22

@@ -1,0 +1,25 @@
+# "Search your library for a creature card" can come up empty (CR 701.23b): with only Islands and a Lightning Bolt left, none
+# is offered (refusals), Bot1 finds nothing, and the library is shuffled all the same - the Tutor is spent.
+
+[Bot1 Deck]
+Forest
+Worldly Tutor
+Forest x5
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Worldly Tutor.Cast
+! Bot1.Search(Lightning Bolt)
+! Bot1.Search(Island)
+Bot1.Search()
+
+[Expect]
+Bot1.Graveyard = Worldly Tutor
+Bot1.Library.Count = 11
+Bot1.Hand.Count = 5

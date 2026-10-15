@@ -1,0 +1,13 @@
+[package]
+name = "cantrip-bench"
+description = "What the engine costs per decision (docs/engine-design.md, Performance)."
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+[features]
+staged = ["cantrip-engine/staged", "cantrip-script/staged"]
+
+[dependencies]
+cantrip-engine.workspace = true
+cantrip-script.workspace = true

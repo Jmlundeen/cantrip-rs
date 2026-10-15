@@ -1,0 +1,45 @@
+# Plot {1}{B}{G} is a special action: Bot1 exiles Pillage the Bog from hand on turn one, and cannot cast it that turn (the
+# refusal). On turn three, with two lands, the free cast looks at the top four cards and puts Black Lotus in hand.
+
+[Bot1 Deck]
+Pillage the Bog
+Mox Jet
+Mox Emerald
+Mox Sapphire
+Swamp
+Forest
+Island
+Island
+Black Lotus
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Pillage the Bog.Activate(Ability: Plot)
+! Bot1.Exile.Pillage the Bog.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Exile.Pillage the Bog.Cast
+Bot1.Arrange(Black Lotus | Island; Island; Island)
+Bot1.Pass
+[Bot1.Main1]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Hand = Black Lotus; Island; Island
+Bot1.Graveyard = Pillage the Bog

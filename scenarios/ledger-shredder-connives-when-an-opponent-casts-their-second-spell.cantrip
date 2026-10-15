@@ -1,0 +1,50 @@
+# Ledger Shredder, played for real. "A player" is any player: Bot1 controls the Shredder, and on turn 4 Bot2 casts two
+# Pyrite Spellbombs. Bot2's second spell makes Bot1's Shredder connive (Bot1 draws, discards a nonland card, and the
+# Shredder grows), while Bot2's hand and library are untouched by it.
+
+[Bot1 Deck]
+Island
+Ledger Shredder
+Island
+Pyrite Spellbomb
+Island
+Island
+Island
+Pyrite Spellbomb
+Island x10
+
+[Bot2 Deck]
+Island
+Island
+Island
+Pyrite Spellbomb
+Pyrite Spellbomb
+Island
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Ledger Shredder.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Pyrite Spellbomb.Cast
+? Bot1.Battlefield.Ledger Shredder.Counters.PlusOnePlusOne = (absent)
+Bot2.Battlefield.Island#2.Activate
+Bot2.Hand.Pyrite Spellbomb.Cast
+Bot1.Choose(Pyrite Spellbomb)
+[T4 Bot2.Main2]
+
+[Expect]
+Turn = 4
+Bot1.Battlefield.Ledger Shredder.Counters.PlusOnePlusOne = 1
+Bot2.Hand.Count = 5
+Stack.Count = 0

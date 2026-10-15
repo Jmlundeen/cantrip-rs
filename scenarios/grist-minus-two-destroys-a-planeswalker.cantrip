@@ -1,0 +1,45 @@
+# Grist's −2: "destroy target creature or planeswalker." Bot2's own Grist is a planeswalker on the battlefield, and
+# the reflexive trigger destroys it after Bot1 sacrifices its Llanowar Elves.
+
+[Bot1 Deck]
+Bayou x3
+Grist, the Hunger Tide
+Llanowar Elves
+Forest x17
+
+[Bot2 Deck]
+Bayou x3
+Grist, the Hunger Tide
+Forest x18
+
+[Actions]
+Bot1.Hand.Bayou.Play
+Bot2.Hand.Bayou.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Bayou.Play
+Bot1.Battlefield.Bayou#1.Activate(Ability: Add {G})
+Bot1.Hand.Llanowar Elves.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Bayou.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Bayou.Play
+Bot2.Battlefield.Bayou#1.Activate(Ability: Add {B})
+Bot2.Battlefield.Bayou#2.Activate(Ability: Add {G})
+Bot2.Battlefield.Bayou#3.Activate(Ability: Add {G})
+Bot2.Hand.Grist, the Hunger Tide.Cast
+[T7 Bot1.Main1]
+Bot1.Hand.Bayou.Play
+Bot1.Battlefield.Bayou#1.Activate(Ability: Add {B})
+Bot1.Battlefield.Bayou#2.Activate(Ability: Add {G})
+Bot1.Battlefield.Bayou#3.Activate(Ability: Add {G})
+Bot1.Hand.Grist, the Hunger Tide.Cast
+[T7 Bot1.Main2]
+Bot1.Battlefield.Grist, the Hunger Tide.Activate(Ability: sacrifice)
+Bot1.Choose(Llanowar Elves)
+Bot1.Target(Bot2.Battlefield.Grist, the Hunger Tide)
+[T7 Bot1.End]
+
+[Expect]
+Bot1.Battlefield.Grist, the Hunger Tide.Counters.Loyalty = 1
+Bot1.Graveyard = Llanowar Elves
+Bot2.Graveyard = Grist, the Hunger Tide

@@ -1,0 +1,35 @@
+# "Counter up to one target spell": cast with no spell targeted, Repulsive Mutation just puts its X counters on the Mystic.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Elvish Mystic
+Repulsive Mutation
+Forest x13
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Repulsive Mutation.Cast(X: 1)
+Bot1.Target(Bot1.Battlefield.Elvish Mystic)
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Elvish Mystic.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Elvish Mystic.Power = 2
+Bot1.Graveyard = Repulsive Mutation

@@ -1,0 +1,56 @@
+# Build output
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+*.user
+*.suo
+artifacts/
+
+# Test / replay output
+TestResults/
+*.replay.json
+
+# OS
+Thumbs.db
+desktop.ini
+
+# Card art. Local files, not source: ~1GB of scans that nothing builds or tests
+# against (CardFaceAssets skips a dataset with no images folder), and every one of
+# them is a copyrighted printing. A checkout without them deals and plays fine.
+content/*/images/
+image-reference/
+
+# Agent worktrees
+.claude/worktrees/
+
+# A local note of the Discord bot token. Never commit it.
+tools/discord_token.txt
+
+# Playwright MCP screenshots and snapshots.
+.playwright-mcp/
+
+# Events and players for tools\draft.cmd, when no other data directory is given. A server's real data directory is
+# configured (--data, CANTRIP_DATA) and backed up; it never lives in the checkout.
+.cantrip-data/
+
+# Where tools\discord-bot.cmd builds the bot it runs, so that a bot left running does not hold the solution's own
+# build output.
+.cantrip-run/
+
+# The bot lab: pools of drafted decks, results and the notes the bot agents leave each other (tools\bot-*.cmd).
+# Regenerated from a seed and a commit, never source.
+.cantrip-lab/
+
+# Local worktrees for side branches and agents, and their logs.
+.worktrees/
+
+# Scraped card ratings tools/maintenance/pick-order.py ranks the cubes from: kept locally, not committed. The pick orders are.
+docs/cube-lists/card-ratings.json
+
+# Cargo build output of the rules engine, and the side target directories agents build into.
+/target/
+/target-*/
+
+# Rust binaries live in a crate's src/bin, which the C# build-output rule above would otherwise hide.
+!crates/**/src/bin/

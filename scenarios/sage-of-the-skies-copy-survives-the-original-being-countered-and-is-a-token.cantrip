@@ -1,0 +1,48 @@
+# Sage of the Skies: "When you cast this spell, if you've cast another spell this turn, copy this spell. (The copy becomes
+# a token.)" Bot1 casts a Mox Pearl and then the Sage (turn 3), so the trigger copies it. With the copy on top of the original,
+# Bot2 counters the original with Counterspell (an Island and a Mox Sapphire); the copy is a spell of its own (CR 707.10) and
+# resolves, becoming a 2/3 flying lifelink token (CR 707.10f) - the only Sage on the battlefield, and not a card.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Sage of the Skies
+Plains
+Plains x15
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Island x4
+Island x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Sage of the Skies.Cast
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Counterspell.Cast(Stack.Sage of the Skies#2)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Sage of the Skies.Power = 2
+Bot1.Battlefield.Sage of the Skies.Keywords = Flying; Lifelink
+Bot1.Graveyard = Sage of the Skies
+Bot2.Graveyard = Counterspell

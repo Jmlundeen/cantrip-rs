@@ -1,0 +1,35 @@
+# Thieving Skydiver kicked with X = 2 takes Bot2's Umezawa's Jitte (mana value 2) and, it being an Equipment, attaches
+# it to the Skydiver. Black Lotus and an Island pay {1}{U} and the kicker's {2}.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Thieving Skydiver
+Island x17
+
+[Bot2 Deck]
+Island
+Island
+Umezawa's Jitte
+Island x17
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot2.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island#1.Activate
+Bot2.Battlefield.Island#2.Activate
+Bot2.Hand.Umezawa's Jitte.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island#1.Activate
+Bot1.Hand.Thieving Skydiver.Cast(Kicked: 2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Island; Island; Thieving Skydiver; Umezawa's Jitte
+Bot1.Battlefield.Umezawa's Jitte.AttachedTo = Thieving Skydiver
+Bot2.Battlefield = Island; Island

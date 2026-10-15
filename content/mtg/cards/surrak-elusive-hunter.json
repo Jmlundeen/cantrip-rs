@@ -1,0 +1,12 @@
+{
+  "name": "Surrak, Elusive Hunter",
+  "manaCost": "{2}{G}",
+  "type": "Legendary Creature — Human Warrior",
+  "power": 4,
+  "toughness": 3,
+  "oracleText": "This spell can't be countered.\nTrample\nWhenever a creature you control or a creature spell you control becomes the target of a spell or ability an opponent controls, draw a card.",
+  "keywords": [
+    "CantBeCountered",
+    "Trample"
+  ]
+}

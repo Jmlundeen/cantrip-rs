@@ -1,0 +1,813 @@
+//! The game state and its one write API. Every write records how to undo it, so that a game can be moved back
+//! through what happened: make and unmake for search, and the rollback a re-run card effect needs.
+
+use crate::decision::*;
+use crate::object::*;
+use crate::vocab::*;
+
+/// Everything a game is. Plain data: cloning it is a handful of buffer copies, and nothing in it points anywhere.
+///
+/// Read freely; write only through the methods below. A field written directly is a write the journal does not
+/// know about, and a rollback across it leaves the game wrong; debug builds check that every rollback restores the
+/// state exactly.
+#[derive(Clone, Debug)]
+pub struct GameState {
+    pub players: Vec<Player>,
+    pub objects: Vec<Obj>,
+    /// Ordered object lists, one per zone slot (`Zone::slot`). Libraries are top first; the others in the order
+    /// objects arrived.
+    pub zones: Vec<Vec<ObjectId>>,
+    /// Top last.
+    pub stack: Vec<StackItem>,
+    pub turn: Turn,
+    pub effects: Vec<ContinuousEffect>,
+    /// Permissions to play cards from where they are, oldest first.
+    pub permissions: Vec<PlayPermission>,
+    pub triggers: Vec<PendingTrigger>,
+    pub delayed: Vec<Delayed>,
+    pub last_known: Vec<LastKnown>,
+    /// The stack items of spells that have left the stack (countered, resolved, exiled), as they last were on it: what a
+    /// rule reads of a spell that is no longer there (CR 608.2h, 707.10). Append-only.
+    pub left_stack: Vec<StackItem>,
+    /// What happened this turn (CR 603.2h, 608.2m, 601.2i), for the rules that ask about it.
+    /// The objects of the batches "one or more" abilities triggered by (`Span` names a run of it). Append-only.
+    pub members: Vec<ObjectId>,
+    pub attackers: Vec<Attacker>,
+    pub blocks: Vec<Block>,
+    /// Extra turns waiting to be taken (CR 500.7): the most recently created last, and taken first.
+    pub extra_turns: Vec<PlayerId>,
+    /// Whether an object whose card has static abilities has ever been made in this game: until one has, the layers
+    /// skip looking for static sources at all. Only ever set, so it can be stale only towards looking.
+    pub statics_seen: bool,
+    pub agenda: Vec<Frame>,
+    pub rng: Rng,
+    pub next_timestamp: u32,
+    /// Request ids are never reused, not even across a rollback, so this only ever counts up and is no part of the
+    /// position.
+    pub next_request: u32,
+    pub outcome: Outcome,
+    /// Set by any write that could change what a state-based action or trigger sees; cleared by the check.
+    pub unsettled: bool,
+    pub journal: Journal,
+    /// Counts every write and every undo, never going back: two reads of a state at one `epoch` see the same position.
+    /// Derived data below is valid for the epoch it was made at, so it is journal-safe by construction. No part of the
+    /// position.
+    pub epoch: u64,
+    /// The permanents whose static abilities could apply to anything, found by the layers (a function of the position).
+    pub static_sources: std::cell::RefCell<StaticSources>,
+}
+
+/// The layers' list of static-ability sources, made for one epoch of the state it sits in.
+#[derive(Clone, Debug)]
+pub struct StaticSources {
+    pub epoch: u64,
+    pub list: Vec<(ObjectId, ZoneKind)>,
+}
+
+impl GameState {
+    fn position(
+        &self,
+    ) -> (
+        &Vec<Player>,
+        &Vec<Obj>,
+        &Vec<Vec<ObjectId>>,
+        &Vec<StackItem>,
+        &Turn,
+        &Vec<ContinuousEffect>,
+        (&Vec<PendingTrigger>, &Vec<Delayed>, &Vec<LastKnown>, &Vec<PlayPermission>),
+        (&Vec<Attacker>, &Vec<Block>, &Vec<PlayerId>),
+        &Vec<Frame>,
+        (&Rng, u32, &Outcome, bool, &Vec<ObjectId>, &Vec<StackItem>),
+    ) {
+        (
+            &self.players,
+            &self.objects,
+            &self.zones,
+            &self.stack,
+            &self.turn,
+            &self.effects,
+            (&self.triggers, &self.delayed, &self.last_known, &self.permissions),
+            (&self.attackers, &self.blocks, &self.extra_turns),
+            &self.agenda,
+            (&self.rng, self.next_timestamp, &self.outcome, self.unsettled, &self.members, &self.left_stack),
+        )
+    }
+}
+
+/// Two states are the same position whatever their journals and request counters hold.
+impl PartialEq for GameState {
+    fn eq(&self, other: &GameState) -> bool {
+        self.position() == other.position()
+    }
+}
+
+impl Eq for GameState {}
+
+impl std::hash::Hash for GameState {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.position().hash(state);
+    }
+}
+
+/// The undo log. Not part of the position: two states that are the same game compare equal whatever their
+/// journals hold.
+/// A copy of a position (`clone`) starts with an empty journal at the same mark: the journal is the path's history,
+/// which the game-log tree keeps, not part of a position, and copying it would make a copy cost what the game has
+/// done so far. `GameState::clone_with_journal` copies it too.
+#[derive(Debug, Default)]
+pub struct Journal {
+    pub entries: Vec<Undo>,
+    /// How many entries have been forgotten from the front: a mark is absolute, so forgetting moves no mark.
+    pub base: u32,
+    /// Outstanding checkpoints. While there are none, the engine may drop entries no frame still needs.
+    pub holds: u32,
+}
+
+impl Clone for Journal {
+    fn clone(&self) -> Journal {
+        Journal { entries: Vec::new(), base: self.base + self.entries.len() as u32, holds: self.holds }
+    }
+}
+
+impl Journal {
+    /// A copy with every entry.
+    pub fn deep_clone(&self) -> Journal {
+        Journal { entries: self.entries.clone(), base: self.base, holds: self.holds }
+    }
+}
+
+impl PartialEq for Journal {
+    fn eq(&self, _: &Journal) -> bool {
+        true
+    }
+}
+
+impl Eq for Journal {}
+
+impl std::hash::Hash for Journal {
+    fn hash<H: std::hash::Hasher>(&self, _: &mut H) {}
+}
+
+/// How to undo one write.
+#[derive(Clone, Debug)]
+pub enum Undo {
+    Object(ObjectId, Box<Obj>),
+    ObjectPushed,
+    ObjectPopped(Box<Obj>),
+    Player(PlayerId, Player),
+    Turn(Turn),
+    ZoneInserted { slot: u16, at: u16 },
+    ZoneRemoved { slot: u16, at: u16, id: ObjectId },
+    StackPushed,
+    StackPopped(Box<StackItem>),
+    StackSet(u16, Box<StackItem>),
+    EffectPushed,
+    EffectRemoved(u16, Box<ContinuousEffect>),
+    EffectInserted(u16),
+    PermissionPushed,
+    PermissionRemoved(u16, PlayPermission),
+    PermissionInserted(u16),
+    TriggerPushed,
+    TriggerRemoved(u16, PendingTrigger),
+    TriggerInserted(u16),
+    DelayedPushed,
+    DelayedRemoved(u16, Delayed),
+    DelayedInserted(u16),
+    LastKnownPushed,
+    LastKnownPopped(Box<LastKnown>),
+    LeftStackPushed,
+    LeftStackPopped(Box<StackItem>),
+    /// Members appended since the list was this long.
+    MembersPushed(u32),
+    MembersPopped(Vec<ObjectId>),
+    AttackersSet(Vec<Attacker>),
+    BlocksSet(Vec<Block>),
+    ExtraTurnsSet(Vec<PlayerId>),
+    StaticsSeen(bool),
+    FramePushed,
+    FramePopped(Frame),
+    FrameRemoved(u16, Frame),
+    FrameInserted(u16),
+    FrameSet(u16, Frame),
+    Rng(Rng),
+    Timestamp(u32),
+    Outcome(Outcome),
+    Unsettled(bool),
+}
+
+/// A point in the journal to come back to.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Mark(pub u32);
+
+impl GameState {
+    pub fn new(players: usize, seed: u64) -> GameState {
+        GameState {
+            players: vec![Player { life: 20, starting_life: 20, ..Player::default() }; players],
+            objects: Vec::with_capacity(128),
+            zones: vec![Vec::new(); Zone::slots(players)],
+            stack: Vec::new(),
+            turn: Turn::default(),
+            effects: Vec::new(),
+            permissions: Vec::new(),
+            triggers: Vec::new(),
+            delayed: Vec::new(),
+            last_known: Vec::new(),
+            left_stack: Vec::new(),
+            members: Vec::new(),
+            attackers: Vec::new(),
+            blocks: Vec::new(),
+            extra_turns: Vec::new(),
+            statics_seen: false,
+            agenda: Vec::new(),
+            rng: Rng::new(seed),
+            next_timestamp: 1,
+            next_request: 1,
+            outcome: Outcome::InProgress,
+            unsettled: true,
+            journal: Journal::default(),
+            epoch: 0,
+            static_sources: std::cell::RefCell::new(StaticSources { epoch: u64::MAX, list: Vec::new() }),
+        }
+    }
+
+    // --- Reading ----------------------------------------------------------------------------------------------
+
+    pub fn obj(&self, id: ObjectId) -> &Obj {
+        &self.objects[id.index()]
+    }
+
+    pub fn player(&self, p: PlayerId) -> &Player {
+        &self.players[p.index()]
+    }
+
+    pub fn zone(&self, zone: Zone) -> &[ObjectId] {
+        &self.zones[zone.slot(self.players.len())]
+    }
+
+    pub fn battlefield(&self) -> &[ObjectId] {
+        self.zone(Zone::BATTLEFIELD)
+    }
+
+    /// Every seat at the table, in seat order, a player who has left the game included: for walking the zones by owner.
+    /// "Each player" is `apnap`, never this.
+    pub fn seats(&self) -> impl Iterator<Item = PlayerId> + use<> {
+        (0..self.players.len() as u8).map(PlayerId)
+    }
+
+    /// Whether `p` is still in the game: a player who has lost has left it (CR 800.4a).
+    pub fn in_game(&self, p: PlayerId) -> bool {
+        !self.players[p.index()].lost
+    }
+
+    /// The players still in the game in turn order starting from the active one (APNAP, CR 101.4, 800.4a).
+    pub fn apnap(&self) -> impl Iterator<Item = PlayerId> + use<> {
+        self.turn_order_from(self.turn.active)
+    }
+
+    /// The players still in the game in turn order starting from `first` (CR 101.4, 800.4a): "starting with you, each
+    /// player". A `first` who has left is passed over.
+    pub fn turn_order_from(&self, first: PlayerId) -> impl Iterator<Item = PlayerId> + use<> {
+        let n = self.players.len() as u8;
+        let left = self.left_mask();
+        (0..n).map(move |i| (first.0 + i) % n).filter(move |&i| left & (1 << i) == 0).map(PlayerId)
+    }
+
+    fn left_mask(&self) -> u32 {
+        self.players.iter().enumerate().fold(0, |mask, (i, pl)| mask | (pl.lost as u32) << i)
+    }
+
+    pub fn next_player(&self, p: PlayerId) -> PlayerId {
+        PlayerId((p.0 + 1) % self.players.len() as u8)
+    }
+
+    /// The opponents of `p` still in the game: a player who has lost has left it (CR 800.4a) and is no one's opponent.
+    pub fn opponents(&self, p: PlayerId) -> impl Iterator<Item = PlayerId> + use<> {
+        let n = self.players.len() as u8;
+        let left = self.left_mask();
+        (0..n).filter(move |&i| i != p.0 && left & (1 << i) == 0).map(PlayerId)
+    }
+
+    pub fn is_over(&self) -> bool {
+        self.outcome != Outcome::InProgress
+    }
+
+    pub fn mark(&self) -> Mark {
+        Mark(self.journal.base + self.journal.entries.len() as u32)
+    }
+
+    // --- Writing ----------------------------------------------------------------------------------------------
+
+    fn log(&mut self, undo: Undo) {
+        self.epoch += 1;
+        self.journal.entries.push(undo);
+    }
+
+    /// Changes one object's row.
+    pub fn update_obj(&mut self, id: ObjectId, f: impl FnOnce(&mut Obj)) {
+        let old = self.objects[id.index()];
+        f(&mut self.objects[id.index()]);
+        if self.objects[id.index()] != old {
+            self.log(Undo::Object(id, Box::new(old)));
+            self.set_unsettled();
+        }
+    }
+
+    /// A new object, in no zone's list yet.
+    pub fn push_obj(&mut self, obj: Obj) -> ObjectId {
+        let id = ObjectId(self.objects.len() as u32);
+        self.objects.push(obj);
+        self.log(Undo::ObjectPushed);
+        id
+    }
+
+    pub fn update_player(&mut self, p: PlayerId, f: impl FnOnce(&mut Player)) {
+        let old = self.players[p.index()];
+        f(&mut self.players[p.index()]);
+        if self.players[p.index()] != old {
+            self.log(Undo::Player(p, old));
+            self.set_unsettled();
+        }
+    }
+
+    pub fn update_turn(&mut self, f: impl FnOnce(&mut Turn)) {
+        let old = self.turn;
+        f(&mut self.turn);
+        if self.turn != old {
+            self.log(Undo::Turn(old));
+        }
+    }
+
+    pub fn zone_insert(&mut self, zone: Zone, at: usize, id: ObjectId) {
+        let slot = zone.slot(self.players.len());
+        self.zones[slot].insert(at, id);
+        self.log(Undo::ZoneInserted { slot: slot as u16, at: at as u16 });
+        self.set_unsettled();
+    }
+
+    pub fn zone_push(&mut self, zone: Zone, id: ObjectId) {
+        let at = self.zone(zone).len();
+        self.zone_insert(zone, at, id);
+    }
+
+    pub fn zone_remove(&mut self, zone: Zone, id: ObjectId) -> bool {
+        let slot = zone.slot(self.players.len());
+        let Some(at) = self.zones[slot].iter().position(|&o| o == id) else {
+            return false;
+        };
+        self.zones[slot].remove(at);
+        self.log(Undo::ZoneRemoved { slot: slot as u16, at: at as u16, id });
+        self.set_unsettled();
+        true
+    }
+
+    pub fn stack_push(&mut self, mut item: StackItem) {
+        // A new item is named by a timestamp (CR 115.1: abilities on the stack can be targeted); one put back after
+        // others were taken off it keeps its name.
+        if item.serial == 0 {
+            item.serial = self.timestamp();
+        }
+        self.stack.push(item);
+        self.log(Undo::StackPushed);
+        self.set_unsettled();
+    }
+
+    pub fn stack_pop(&mut self) -> Option<StackItem> {
+        let item = self.stack.pop()?;
+        self.log(Undo::StackPopped(Box::new(item)));
+        self.set_unsettled();
+        Some(item)
+    }
+
+    pub fn stack_set(&mut self, at: usize, item: StackItem) {
+        let old = self.stack[at];
+        self.stack[at] = item;
+        self.log(Undo::StackSet(at as u16, Box::new(old)));
+    }
+
+    /// Removes the item at `at`, keeping the order of the rest (a countered spell below the top).
+    pub fn stack_remove(&mut self, at: usize) -> StackItem {
+        // Popping down to it and pushing the rest back keeps the journal to its two kinds of stack entry.
+        let mut above = Vec::new();
+        while self.stack.len() > at + 1 {
+            above.push(self.stack_pop().expect("above"));
+        }
+        let item = self.stack_pop().expect("the item");
+        if item.kind == StackKind::Spell {
+            self.left_stack.push(item);
+            self.log(Undo::LeftStackPushed);
+        }
+        while let Some(back) = above.pop() {
+            self.stack_push(back);
+        }
+        item
+    }
+
+    pub fn effect_push(&mut self, effect: ContinuousEffect) {
+        self.effects.push(effect);
+        self.log(Undo::EffectPushed);
+        self.set_unsettled();
+    }
+
+    /// Removes every effect `remove` says to, keeping the order of the rest.
+    /// Keeps the effects at the indices `keep` marks true (one flag per effect, in order); the rest go.
+    pub fn effects_keep(&mut self, keep: &[bool]) {
+        debug_assert_eq!(keep.len(), self.effects.len(), "one flag per effect");
+        for i in (0..self.effects.len()).rev() {
+            if !keep[i] {
+                let effect = self.effects.remove(i);
+                self.log(Undo::EffectRemoved(i as u16, Box::new(effect)));
+                self.set_unsettled();
+            }
+        }
+    }
+
+    pub fn effects_retain(&mut self, mut keep: impl FnMut(&ContinuousEffect) -> bool) {
+        let mut i = self.effects.len();
+        while i > 0 {
+            i -= 1;
+            if !keep(&self.effects[i]) {
+                let effect = self.effects.remove(i);
+                self.log(Undo::EffectRemoved(i as u16, Box::new(effect)));
+                self.set_unsettled();
+            }
+        }
+    }
+
+    pub fn permission_push(&mut self, permission: PlayPermission) {
+        self.permissions.push(permission);
+        self.log(Undo::PermissionPushed);
+    }
+
+    /// Removes every permission `keep` says not to keep, keeping the order of the rest.
+    pub fn permissions_retain(&mut self, mut keep: impl FnMut(&PlayPermission) -> bool) {
+        let mut i = self.permissions.len();
+        while i > 0 {
+            i -= 1;
+            if !keep(&self.permissions[i]) {
+                let p = self.permissions.remove(i);
+                self.log(Undo::PermissionRemoved(i as u16, p));
+            }
+        }
+    }
+
+    pub fn trigger_push(&mut self, trigger: PendingTrigger) {
+        self.triggers.push(trigger);
+        self.log(Undo::TriggerPushed);
+    }
+
+    pub fn trigger_remove(&mut self, at: usize) -> PendingTrigger {
+        let trigger = self.triggers.remove(at);
+        self.log(Undo::TriggerRemoved(at as u16, trigger));
+        trigger
+    }
+
+    pub fn delayed_push(&mut self, delayed: Delayed) {
+        self.delayed.push(delayed);
+        self.log(Undo::DelayedPushed);
+    }
+
+    pub fn delayed_remove(&mut self, at: usize) -> Delayed {
+        let d = self.delayed.remove(at);
+        self.log(Undo::DelayedRemoved(at as u16, d));
+        d
+    }
+
+    pub fn last_known_push(&mut self, row: LastKnown) {
+        self.last_known.push(row);
+        self.log(Undo::LastKnownPushed);
+    }
+
+    /// Records a fact of this turn.
+
+
+    /// Keeps the objects of a batch for the ability it triggered.
+    pub fn members_push(&mut self, objects: &[ObjectId]) -> Span {
+        let start = self.members.len();
+        if objects.is_empty() {
+            return Span::default();
+        }
+        self.members.extend_from_slice(objects);
+        self.log(Undo::MembersPushed(start as u32));
+        Span { start: start as u32, len: objects.len() as u16 }
+    }
+
+    /// The objects a span names.
+    pub fn members(&self, span: Span) -> &[ObjectId] {
+        &self.members[span.start as usize..span.start as usize + span.len as usize]
+    }
+
+    /// The stack item a spell last had on the stack, if it has left it (CR 608.2h).
+    pub fn left_stack(&self, spell: ObjectId) -> Option<&StackItem> {
+        self.left_stack.iter().rev().find(|i| i.object == spell)
+    }
+
+    /// The characteristics an object last had on the battlefield, if it left it.
+    pub fn last_known(&self, id: ObjectId) -> Option<&LastKnown> {
+        self.last_known.iter().rev().find(|l| l.id == id)
+    }
+
+    pub fn set_attackers(&mut self, attackers: Vec<Attacker>) {
+        let old = std::mem::replace(&mut self.attackers, attackers);
+        self.log(Undo::AttackersSet(old));
+    }
+
+    pub fn set_blocks(&mut self, blocks: Vec<Block>) {
+        let old = std::mem::replace(&mut self.blocks, blocks);
+        self.log(Undo::BlocksSet(old));
+    }
+
+    pub fn see_statics(&mut self) {
+        if !self.statics_seen {
+            self.statics_seen = true;
+            self.log(Undo::StaticsSeen(false));
+        }
+    }
+
+    pub fn set_extra_turns(&mut self, turns: Vec<PlayerId>) {
+        let old = std::mem::replace(&mut self.extra_turns, turns);
+        self.log(Undo::ExtraTurnsSet(old));
+    }
+
+    pub fn frame_push(&mut self, frame: Frame) {
+        self.agenda.push(frame);
+        self.log(Undo::FramePushed);
+    }
+
+    pub fn frame_pop(&mut self) -> Frame {
+        let frame = self.agenda.pop().expect("a frame");
+        self.log(Undo::FramePopped(frame.clone()));
+        frame
+    }
+
+    /// Removes the frame at `at`, below any its run pushed.
+    pub fn frame_remove(&mut self, at: usize) -> Frame {
+        let frame = self.agenda.remove(at);
+        self.log(Undo::FrameRemoved(at as u16, frame.clone()));
+        frame
+    }
+
+    /// Changes the frame at `at`.
+    pub fn update_frame(&mut self, at: usize, f: impl FnOnce(&mut Frame)) {
+        let old = self.agenda[at].clone();
+        f(&mut self.agenda[at]);
+        if self.agenda[at] != old {
+            self.log(Undo::FrameSet(at as u16, old));
+        }
+    }
+
+    /// A random number below `bound`, from the state's own generator.
+    pub fn random(&mut self, bound: u32) -> u32 {
+        let old = self.rng;
+        let r = self.rng.below(bound);
+        self.log(Undo::Rng(old));
+        r
+    }
+
+    /// Rolls a die with this many sides (CR 706.2), from the state's own generator so that a game replays exactly.
+    pub fn roll_die(&mut self, sides: u32) -> u32 {
+        let old = self.rng;
+        let r = self.rng.roll(sides);
+        self.log(Undo::Rng(old));
+        r
+    }
+
+    /// Fixes the faces the next dice show (1 to 20, at most ten), for a scenario that must say what a die rolls.
+    pub fn force_rolls(&mut self, faces: &[u8]) {
+        let mut packed = 0u64;
+        for (i, &face) in faces.iter().take(10).enumerate() {
+            packed |= (face as u64 & 0b11111) << (5 * i);
+        }
+        self.rng.forced = packed;
+        self.rng.forced_len = faces.len().min(10) as u8;
+    }
+
+    pub fn timestamp(&mut self) -> u32 {
+        self.log(Undo::Timestamp(self.next_timestamp));
+        self.next_timestamp += 1;
+        self.next_timestamp - 1
+    }
+
+    /// A request id: never journalled, so never handed out twice.
+    pub fn request_id(&mut self) -> u32 {
+        self.next_request += 1;
+        self.next_request - 1
+    }
+
+    pub fn set_outcome(&mut self, outcome: Outcome) {
+        let old = self.outcome;
+        self.outcome = outcome;
+        self.log(Undo::Outcome(old));
+    }
+
+    pub fn set_unsettled(&mut self) {
+        if !self.unsettled {
+            self.unsettled = true;
+            self.log(Undo::Unsettled(false));
+        }
+    }
+
+    pub fn clear_unsettled(&mut self) {
+        if self.unsettled {
+            self.unsettled = false;
+            self.log(Undo::Unsettled(true));
+        }
+    }
+
+    // --- Moving through the journal ---------------------------------------------------------------------------
+
+    /// Undoes every write since `mark`.
+    /// Moves the state back to `mark` for the game-log tree (docs/engine-design.md, "The game log is the search
+    /// tree"): pops and undoes every entry after it, and hands back the entries in the order they were written with,
+    /// in the same order, the entries that redo them. Nothing is copied but the redo entries, made from the state as
+    /// each is undone.
+    /// A copy of the state and its whole journal, for one that must still be able to roll back.
+    pub fn clone_with_journal(&self) -> GameState {
+        let mut copy = self.clone();
+        copy.journal = self.journal.deep_clone();
+        copy
+    }
+
+    pub fn step_back(&mut self, mark: Mark) -> (Vec<Undo>, Vec<Undo>) {
+        assert!(mark.0 >= self.journal.base, "stepping back past what the journal still holds");
+        let mut undos = Vec::new();
+        let mut redos = Vec::new();
+        while self.journal.base + self.journal.entries.len() as u32 > mark.0 {
+            let undo = self.journal.entries.pop().expect("entry");
+            redos.push(self.inverse(&undo));
+            undos.push(undo.clone());
+            self.undo(undo);
+        }
+        undos.reverse();
+        redos.reverse();
+        (undos, redos)
+    }
+
+    /// The reverse of `step_back`: reapplies the redo entries in order and puts the original entries back on the
+    /// journal, so the state and its journal are as they were before stepping back.
+    pub fn step_forward(&mut self, undos: Vec<Undo>, redos: Vec<Undo>) {
+        for redo in redos {
+            self.undo(redo);
+        }
+        self.journal.entries.extend(undos);
+    }
+
+    pub fn rollback(&mut self, mark: Mark) {
+        assert!(mark.0 >= self.journal.base, "rolling back past what the journal still holds");
+        while self.journal.base + self.journal.entries.len() as u32 > mark.0 {
+            let undo = self.journal.entries.pop().expect("entry");
+            self.undo(undo);
+        }
+    }
+
+    fn undo(&mut self, undo: Undo) {
+        self.epoch += 1;
+        match undo {
+            Undo::Object(id, old) => self.objects[id.index()] = *old,
+            Undo::ObjectPushed => {
+                self.objects.pop();
+            }
+            Undo::ObjectPopped(obj) => self.objects.push(*obj),
+            Undo::Player(p, old) => self.players[p.index()] = old,
+            Undo::Turn(old) => self.turn = old,
+            Undo::ZoneInserted { slot, at } => {
+                self.zones[slot as usize].remove(at as usize);
+            }
+            Undo::ZoneRemoved { slot, at, id } => self.zones[slot as usize].insert(at as usize, id),
+            Undo::StackPushed => {
+                self.stack.pop();
+            }
+            Undo::StackPopped(item) => self.stack.push(*item),
+            Undo::StackSet(at, old) => self.stack[at as usize] = *old,
+            Undo::EffectPushed => {
+                self.effects.pop();
+            }
+            Undo::EffectRemoved(at, effect) => self.effects.insert(at as usize, *effect),
+            Undo::EffectInserted(at) => {
+                self.effects.remove(at as usize);
+            }
+            Undo::PermissionPushed => {
+                self.permissions.pop();
+            }
+            Undo::PermissionRemoved(at, p) => self.permissions.insert(at as usize, p),
+            Undo::PermissionInserted(at) => {
+                self.permissions.remove(at as usize);
+            }
+            Undo::TriggerPushed => {
+                self.triggers.pop();
+            }
+            Undo::TriggerRemoved(at, trigger) => self.triggers.insert(at as usize, trigger),
+            Undo::TriggerInserted(at) => {
+                self.triggers.remove(at as usize);
+            }
+            Undo::DelayedPushed => {
+                self.delayed.pop();
+            }
+            Undo::DelayedRemoved(at, d) => self.delayed.insert(at as usize, d),
+            Undo::DelayedInserted(at) => {
+                self.delayed.remove(at as usize);
+            }
+            Undo::LastKnownPushed => {
+                self.last_known.pop();
+            }
+            Undo::LastKnownPopped(row) => self.last_known.push(*row),
+            Undo::LeftStackPushed => {
+                self.left_stack.pop();
+            }
+            Undo::LeftStackPopped(item) => self.left_stack.push(*item),
+            Undo::MembersPushed(len) => self.members.truncate(len as usize),
+            Undo::MembersPopped(objects) => self.members.extend(objects),
+            Undo::AttackersSet(old) => self.attackers = old,
+            Undo::BlocksSet(old) => self.blocks = old,
+            Undo::ExtraTurnsSet(old) => self.extra_turns = old,
+            Undo::StaticsSeen(old) => self.statics_seen = old,
+            Undo::FramePushed => {
+                self.agenda.pop();
+            }
+            Undo::FramePopped(frame) => self.agenda.push(frame),
+            Undo::FrameRemoved(at, frame) => self.agenda.insert(at as usize, frame),
+            Undo::FrameInserted(at) => {
+                self.agenda.remove(at as usize);
+            }
+            Undo::FrameSet(at, old) => self.agenda[at as usize] = old,
+            Undo::Rng(old) => self.rng = old,
+            Undo::Timestamp(old) => self.next_timestamp = old,
+            Undo::Outcome(old) => self.outcome = old,
+            Undo::Unsettled(old) => self.unsettled = old,
+        }
+    }
+
+    /// Undoes every write since `mark` as new writes, each journalled with its own inverse, so that the history before
+    /// is kept: a later rollback to a point before `mark` puts back what this undid. This is what re-running a frame
+    /// uses, since a search may hold a checkpoint inside the run being undone.
+    pub fn revert(&mut self, mark: Mark) {
+        assert!(mark.0 >= self.journal.base, "reverting past what the journal still holds");
+        let mut at = (mark.0 - self.journal.base) as usize;
+        let end = self.journal.entries.len();
+        let undos: Vec<Undo> = self.journal.entries[at..end].iter().rev().cloned().collect();
+        for undo in undos {
+            let inverse = self.inverse(&undo);
+            self.undo(undo);
+            self.journal.entries.push(inverse);
+            at += 1;
+        }
+        let _ = at;
+    }
+
+    /// The entry that undoes applying `undo` to the state as it is now.
+    fn inverse(&self, undo: &Undo) -> Undo {
+        match undo {
+            Undo::Object(id, _) => Undo::Object(*id, Box::new(self.objects[id.index()])),
+            Undo::ObjectPushed => Undo::ObjectPopped(Box::new(*self.objects.last().expect("an object"))),
+            Undo::ObjectPopped(_) => Undo::ObjectPushed,
+            Undo::Player(p, _) => Undo::Player(*p, self.players[p.index()]),
+            Undo::Turn(_) => Undo::Turn(self.turn),
+            Undo::ZoneInserted { slot, at } => {
+                Undo::ZoneRemoved { slot: *slot, at: *at, id: self.zones[*slot as usize][*at as usize] }
+            }
+            Undo::ZoneRemoved { slot, at, .. } => Undo::ZoneInserted { slot: *slot, at: *at },
+            Undo::StackPushed => Undo::StackPopped(Box::new(*self.stack.last().expect("an item"))),
+            Undo::StackPopped(_) => Undo::StackPushed,
+            Undo::StackSet(at, _) => Undo::StackSet(*at, Box::new(self.stack[*at as usize])),
+            Undo::EffectPushed => Undo::EffectRemoved(self.effects.len() as u16 - 1, Box::new(*self.effects.last().expect("an effect"))),
+            Undo::EffectRemoved(at, _) => Undo::EffectInserted(*at),
+            Undo::EffectInserted(at) => Undo::EffectRemoved(*at, Box::new(self.effects[*at as usize])),
+            Undo::PermissionPushed => {
+                Undo::PermissionRemoved(self.permissions.len() as u16 - 1, *self.permissions.last().expect("a permission"))
+            }
+            Undo::PermissionRemoved(at, _) => Undo::PermissionInserted(*at),
+            Undo::PermissionInserted(at) => Undo::PermissionRemoved(*at, self.permissions[*at as usize]),
+            Undo::TriggerPushed => Undo::TriggerRemoved(self.triggers.len() as u16 - 1, *self.triggers.last().expect("a trigger")),
+            Undo::TriggerRemoved(at, _) => Undo::TriggerInserted(*at),
+            Undo::TriggerInserted(at) => Undo::TriggerRemoved(*at, self.triggers[*at as usize]),
+            Undo::DelayedPushed => Undo::DelayedRemoved(self.delayed.len() as u16 - 1, *self.delayed.last().expect("delayed")),
+            Undo::DelayedRemoved(at, _) => Undo::DelayedInserted(*at),
+            Undo::DelayedInserted(at) => Undo::DelayedRemoved(*at, self.delayed[*at as usize]),
+            Undo::LastKnownPushed => Undo::LastKnownPopped(Box::new(*self.last_known.last().expect("a row"))),
+            Undo::LastKnownPopped(_) => Undo::LastKnownPushed,
+            Undo::LeftStackPushed => Undo::LeftStackPopped(Box::new(*self.left_stack.last().expect("an item"))),
+            Undo::LeftStackPopped(_) => Undo::LeftStackPushed,
+            Undo::MembersPushed(len) => Undo::MembersPopped(self.members[*len as usize..].to_vec()),
+            Undo::MembersPopped(_) => Undo::MembersPushed(self.members.len() as u32),
+            Undo::AttackersSet(_) => Undo::AttackersSet(self.attackers.clone()),
+            Undo::BlocksSet(_) => Undo::BlocksSet(self.blocks.clone()),
+            Undo::ExtraTurnsSet(_) => Undo::ExtraTurnsSet(self.extra_turns.clone()),
+            Undo::StaticsSeen(_) => Undo::StaticsSeen(self.statics_seen),
+            Undo::FramePushed => Undo::FramePopped(self.agenda.last().expect("a frame").clone()),
+            Undo::FramePopped(_) => Undo::FramePushed,
+            Undo::FrameRemoved(at, _) => Undo::FrameInserted(*at),
+            Undo::FrameInserted(at) => Undo::FrameRemoved(*at, self.agenda[*at as usize].clone()),
+            Undo::FrameSet(at, _) => Undo::FrameSet(*at, self.agenda[*at as usize].clone()),
+            Undo::Rng(_) => Undo::Rng(self.rng),
+            Undo::Timestamp(_) => Undo::Timestamp(self.next_timestamp),
+            Undo::Outcome(_) => Undo::Outcome(self.outcome),
+            Undo::Unsettled(_) => Undo::Unsettled(self.unsettled),
+        }
+    }
+
+    /// Forgets the journal before `mark`, when nothing can roll back past it.
+    pub fn forget_before(&mut self, mark: Mark) {
+        let drop = mark.0.saturating_sub(self.journal.base).min(self.journal.entries.len() as u32);
+        self.journal.entries.drain(..drop as usize);
+        self.journal.base += drop;
+    }
+}

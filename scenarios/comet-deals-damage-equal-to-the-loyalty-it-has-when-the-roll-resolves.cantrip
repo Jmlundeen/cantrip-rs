@@ -1,0 +1,40 @@
+# "Comet deals damage equal to the number of loyalty counters on him": the number is read as the ability resolves, not fixed at five.
+# The dice show 6 then 4: the 6 is [+1] (loyalty 6) and two more activations, and the 4 deals 6 damage to Bot2, then [-2] leaves 4.
+
+[Dice]
+6; 4
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Sol Ring
+Comet, Stellar Pup
+Island x20
+
+[Bot2 Deck]
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Comet, Stellar Pup.Cast
+Bot1.Pass
+Bot1.Battlefield.Comet, Stellar Pup.Activate
+Bot1.Pass
+Bot1.Battlefield.Comet, Stellar Pup.Activate
+Bot1.Pass
+Bot1.Target(Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Bot1.Battlefield.Comet, Stellar Pup.Counters.Loyalty = 4

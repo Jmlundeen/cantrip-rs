@@ -1,0 +1,30 @@
+# "Exile a blue card from your hand": besides the Force, Bot1 holds only Lightning Bolt (red) and Mox Sapphire (colorless),
+# so against Bot2's Duress the alternative cost is refused (the Force cannot exile itself, which is not in the hand
+# while it is being cast); the scenario where a Brainstorm is held takes the same cost (force-of-will-pays-life-and-
+# exiles-a-blue-card-to-counter-duress).
+
+[Bot1 Deck]
+Force of Will
+Lightning Bolt
+Mox Sapphire
+Island x4
+Island x10
+
+[Bot2 Deck]
+Swamp
+Duress
+Swamp x13
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Duress.Cast(Bot1)
+! Bot1.Hand.Force of Will.Cast(Duress; Ability: exile a blue card)
+Bot1.Pass
+Bot2.Choose(Lightning Bolt)
+
+[Expect]
+Bot1.Life = 20
+Bot1.Graveyard = Lightning Bolt
+Bot1.Hand.Count = 6

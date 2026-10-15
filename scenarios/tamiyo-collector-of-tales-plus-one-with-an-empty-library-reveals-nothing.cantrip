@@ -1,0 +1,34 @@
+# +1 names a card and reveals "the top four cards of your library": with none left, nothing is revealed or moved (and nothing is lost for it). Bot1's deck is its opening hand, so its library is empty
+# when Tamiyo comes down on turn 1 and uses her +1 (loyalty 6) the turn she enters.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Emerald
+Mox Jet
+Mox Ruby
+Tamiyo, Collector of Tales
+Plains
+Plains
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Tamiyo, Collector of Tales.Cast
+Bot1.Battlefield.Tamiyo, Collector of Tales.Activate(Ability: Choose a nonland card name)
+Bot1.Name(Lightning Bolt)
+[Bot1.Main2]
+
+[Expect]
+Result = InProgress
+Bot1.Battlefield.Tamiyo, Collector of Tales.Counters.Loyalty = 6
+Bot1.Hand.Count = 2
+Bot1.Graveyard.Count = 0

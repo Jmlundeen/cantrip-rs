@@ -1,0 +1,26 @@
+# Bot1 evokes Grief on turn 1, exiling Dark Ritual (a black card) from their hand instead of paying {2}{B}{B}. Its enters
+# trigger has Bot2 reveal their hand and Bot1 choose a nonland card: Lightning Bolt, not the Mountains. The evoke
+# trigger then sacrifices Grief, so it ends in the graveyard.
+
+[Bot1 Deck]
+Grief
+Dark Ritual
+Swamp x18
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Grief.Cast(Ability: Evoke)
+Bot1.Choose(Dark Ritual)
+Bot1.Choose(Lightning Bolt)
+[Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Exile = Dark Ritual
+Bot1.Graveyard = Grief
+Bot2.Graveyard = Lightning Bolt
+Bot1.Battlefield.Count = 0

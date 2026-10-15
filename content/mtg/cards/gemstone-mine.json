@@ -1,0 +1,5 @@
+{
+  "name": "Gemstone Mine",
+  "type": "Land",
+  "oracleText": "This land enters with three mining counters on it.\n{T}, Remove a mining counter from this land: Add one mana of any color. If there are no mining counters on this land, sacrifice it."
+}

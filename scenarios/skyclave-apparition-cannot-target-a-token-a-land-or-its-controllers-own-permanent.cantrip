@@ -1,0 +1,46 @@
+# Skyclave Apparition's "nonland, nontoken permanent you don't control with mana value 4 or less": Bot2 dashes a Ragavan on turn 2
+# (it connects: a Treasure token), plays an Island and keeps a Mox Ruby and a Mox Jet. On turn 3 the Apparition's trigger cannot
+# target the Treasure (a token), the Island (a land) or Bot1's own Mox Pearl (not "you don't control"), but can target the
+# Mox Jet, which is exiled (the positive control). The Treasure Token and the Island stay.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Skyclave Apparition
+Plains x16
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Ragavan, Nimble Pilferer
+Island
+Plains x4
+Plains x13
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Ragavan, Nimble Pilferer.Cast(Ability: Dash)
+Bot2.Attack(Ragavan, Nimble Pilferer > Bot1)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Pearl#3.Activate
+Bot1.Hand.Skyclave Apparition.Cast
+! Bot1.Target(Bot2.Battlefield.Treasure Token)
+! Bot1.Target(Bot2.Battlefield.Island)
+! Bot1.Target(Bot1.Battlefield.Mox Pearl)
+Bot1.Target(Bot2.Battlefield.Mox Jet)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Exile.Count = 2
+Bot2.Battlefield = Island; Mox Ruby; Treasure Token

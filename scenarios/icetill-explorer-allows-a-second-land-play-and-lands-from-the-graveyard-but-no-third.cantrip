@@ -1,0 +1,35 @@
+# Icetill Explorer (CR 305.2, 305.1): "You may play an additional land on each of your turns. You may play lands from
+# your graveyard. Landfall - Whenever a land you control enters, mill a card." Bot1 casts it off two Black Lotuses,
+# plays a Forest (landfall mills the Forest on top of the library), then plays that Forest out of its graveyard as the
+# turn's second land (landfall mills an Island). A third land play is not offered, from the hand or the graveyard.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Black Lotus
+Icetill Explorer
+Forest
+Island
+Island
+Forest
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Icetill Explorer.Cast
+Bot1.Hand.Forest.Play
+Bot1.Graveyard.Forest.Play
+[Bot1.End]
+! Bot1.Hand.Island.Play
+
+[Expect]
+Turn = 1
+Bot1.LandsPlayed = 2
+Bot1.Battlefield = Forest; Forest; Icetill Explorer
+Bot1.Graveyard = Island; Black Lotus; Black Lotus

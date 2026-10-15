@@ -1,0 +1,8 @@
+{
+  "name": "Knight of Autumn",
+  "manaCost": "{1}{G}{W}",
+  "type": "Creature — Dryad Knight",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "When this creature enters, choose one —\n• Put two +1/+1 counters on this creature.\n• Destroy target artifact or enchantment.\n• You gain 4 life."
+}

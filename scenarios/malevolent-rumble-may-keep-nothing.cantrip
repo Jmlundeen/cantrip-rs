@@ -1,0 +1,38 @@
+# Malevolent Rumble: "You may put a permanent card from among them into your hand." Bot1 reveals a Guerrilla Gorilla, a
+# Forest, an Island and a Lightning Bolt and keeps none of them: all four go to the graveyard, and the Eldrazi Spawn is
+# made all the same. (The control that a permanent card is kept when chosen is
+# malevolent-rumble-keeps-a-permanent-card-and-buries-the-rest.)
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Malevolent Rumble
+Island
+Island
+Island
+Island
+Guerrilla Gorilla
+Forest
+Island
+Lightning Bolt
+Island x6
+
+[Bot2 Deck]
+Swamp x14
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Malevolent Rumble.Cast
+Bot1.Arrange( | Guerrilla Gorilla; Forest; Island; Lightning Bolt)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Malevolent Rumble; Lightning Bolt; Island; Forest; Guerrilla Gorilla
+Bot1.Hand.Count = 4
+Bot1.Battlefield.Eldrazi Spawn.Power = 0
+Bot1.Library.Count = 6

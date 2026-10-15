@@ -1,0 +1,30 @@
+# Demonic Consultation: the top six cards are exiled without being revealed, so a Black Lotus among them (the sixth) is
+# simply lost, and the search starts below them. The next Black Lotus is found after one Forest (exiled with the rest of what was
+# revealed), and the Black Lotus right under it is not touched: the search stops at the first card with the name.
+
+[Bot1 Deck]
+Swamp
+Demonic Consultation
+Island x5
+Island x5
+Black Lotus
+Forest
+Black Lotus
+Black Lotus
+Forest x2
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Demonic Consultation.Cast
+Bot1.Name(Black Lotus)
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Hand = Island; Island; Island; Island; Island; Black Lotus
+Exile.Count = 7
+Bot1.Library = Black Lotus; Forest; Forest

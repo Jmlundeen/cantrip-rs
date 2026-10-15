@@ -1,0 +1,28 @@
+# Shelldock Isle: "a library" means any player's. Bot1's library is big but Bot2's holds exactly twenty cards on turn 3
+# (28 cards, seven in its hand, one drawn on turn 2): twenty or fewer, so the hidden Black Lotus is played free onto the battlefield.
+[Bot1 Deck]
+Shelldock Isle
+Mox Sapphire
+Island x5
+Black Lotus
+Island x3
+Island x30
+
+[Bot2 Deck]
+Island x28
+
+[Actions]
+Bot1.Hand.Shelldock Isle.Play
+Bot1.Arrange(Black Lotus | Island; Island; Island)
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Shelldock Isle.Activate(Ability: {U}, {T}: You may play)
+Bot1.Accept
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield = Shelldock Isle; Mox Sapphire; Black Lotus
+Exile.Count = 0

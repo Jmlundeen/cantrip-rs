@@ -1,0 +1,93 @@
+# Dack Fayden -6: the emblem's "Whenever you cast a spell that targets one or more permanents, gain control of those
+# permanents." Dack climbs by +1s from turn 1 (the -6 is refused at 5 on turn 5 and allowed at 6 on turn 7). Turn 7:
+# Bot1's Lightning Bolt at Bot2 itself targets no permanent, nothing is taken; a second Bolt at Bot2's Concealing Curtains
+# (a 0/4) makes the emblem take it first, so it is Bot1's with 3 damage on it. Turn 8: Bot2's Snakeskin Veil on its own
+# Ornithopter targets a permanent but is not Bot1's spell: Bot2 keeps it.
+
+[Bot1 Deck]
+Volcanic Island
+Black Lotus
+Dack Fayden
+Lightning Bolt
+Lightning Bolt
+Mox Ruby
+Island
+Island x20
+
+[Bot2 Deck]
+Mox Jet
+Concealing Curtains
+Mox Emerald
+Ornithopter
+Snakeskin Veil
+Island x2
+Island x14
+
+[Actions]
+Bot1.Hand.Volcanic Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Volcanic Island.Activate(Ability: Add {U})
+Bot1.Hand.Dack Fayden.Cast
+Bot1.Pass
+Bot1.Battlefield.Dack Fayden.Activate(Bot1; Ability: draws two)
+Bot1.Choose(Island; Island)
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Concealing Curtains.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Dack Fayden.Activate(Bot1; Ability: draws two)
+Bot1.Choose(Island; Island)
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Dack Fayden.Counters.Loyalty = 5
+! Bot1.Battlefield.Dack Fayden.Activate(Ability: emblem)
+Bot1.Battlefield.Dack Fayden.Activate(Bot1; Ability: draws two)
+Bot1.Choose(Island; Island)
+[T7 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Dack Fayden.Activate(Ability: emblem)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 17
+? Bot2.Battlefield.Concealing Curtains.Types = Creature
+Bot1.Battlefield.Volcanic Island.Activate(Ability: Add {R})
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Concealing Curtains)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main2]
+? Bot1.Battlefield.Concealing Curtains.Damage = 3
+[T8 Bot2.Main1]
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Snakeskin Veil.Cast(Bot2.Battlefield.Ornithopter)
+? Stack.Count = 1
+Bot2.Pass
+Bot1.Pass
+[T8 Bot2.Main2]
+
+[Expect]
+Turn = 8
+Bot1.Emblems.Count = 1
+Bot1.Battlefield.Concealing Curtains.Types = Creature
+Bot2.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot2.Life = 17

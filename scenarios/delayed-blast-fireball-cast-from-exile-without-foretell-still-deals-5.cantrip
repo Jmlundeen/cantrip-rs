@@ -1,0 +1,40 @@
+# Chandra, Torch of Defiance's first +1 exiles Delayed Blast Fireball from the top of Bot1's library and Bot1 casts it
+# from there for its mana cost, {1}{R}{R}, three Moxen's. It was never foretold, but it was cast from exile, and "if this
+# spell was cast from exile" does not care how it got there: Bot2 takes 5, not 2.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mox Ruby
+Mox Jet
+Mox Ruby
+Chandra, Torch of Defiance
+Island
+Delayed Blast Fireball
+Island x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Chandra, Torch of Defiance.Cast
+Bot1.Battlefield.Chandra, Torch of Defiance.Activate(Ability: Exile the top)
+Bot1.Accept
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Step = Main2
+Bot2.Life = 15
+Bot1.Graveyard = Delayed Blast Fireball; Black Lotus
+Exile.Count = 0

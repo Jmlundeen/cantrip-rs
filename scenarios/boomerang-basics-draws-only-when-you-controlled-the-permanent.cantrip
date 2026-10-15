@@ -1,0 +1,30 @@
+# Boomerang Basics: returning your own nonland permanent draws a card; returning an opponent's does not.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Mox Ruby
+Boomerang Basics
+Boomerang Basics
+Plains x15
+
+[Bot2 Deck]
+Mox Ruby
+Plains x19
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Boomerang Basics.Cast(Bot1.Battlefield.Mox Ruby)
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Boomerang Basics.Cast(Bot2.Battlefield.Mox Ruby)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 5
+Bot2.Hand.Count = 8
+Bot2.Battlefield.Count = 0

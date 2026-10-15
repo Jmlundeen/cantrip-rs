@@ -1,0 +1,30 @@
+# The classic play: Bot2 aims Lightning Bolt at Bot1's Cecil, Dark Knight (2/3, legendary). In response Bot1 taps Karakas to
+# return Cecil to its owner's hand (it may target its own legendary creature), so the Bolt has no target on resolution and
+# is countered (CR 608.2b): Cecil survives, in hand.
+
+[Bot1 Deck]
+Karakas
+Mox Jet
+Cecil, Dark Knight
+Island x17
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Karakas.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cecil, Dark Knight.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Cecil, Dark Knight)
+Bot1.Battlefield.Karakas.Activate(Ability: Return; Cecil, Dark Knight)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield = Karakas; Mox Jet
+Bot2.Graveyard = Lightning Bolt
+Bot1.Hand.Count = 5

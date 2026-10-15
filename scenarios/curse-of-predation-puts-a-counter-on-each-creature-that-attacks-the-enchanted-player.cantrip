@@ -1,0 +1,35 @@
+# Curse of Predation, an Aura that enchants a player (CR 303.4): "Whenever a creature attacks enchanted player, put a +1/+1
+# counter on it." Bot1 enchants Bot2 on turn 1 and attacks with Ornithopter on turn 3: the counter makes it a 1/3, and Bot2
+# takes one damage.
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Mox Emerald
+Ornithopter
+Curse of Predation
+Forest x15
+
+[Bot2 Deck]
+Island x13
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Curse of Predation.Cast(Bot2)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot2.Life = 19

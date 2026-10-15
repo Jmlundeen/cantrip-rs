@@ -1,0 +1,6 @@
+{
+  "name": "Fecundity",
+  "manaCost": "{2}{G}",
+  "type": "Enchantment",
+  "oracleText": "Whenever a creature dies, that creature's controller may draw a card."
+}

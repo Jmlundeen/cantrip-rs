@@ -1,0 +1,51 @@
+# The tap is the ability's second instruction, not a cost: the Elf attacks (tapped), Bot2 Bolts it, and Bot1 discards an
+# Island and survives with 3 damage; on turn 4, with indestructible gone, a second Bolt kills it. The empty hand of
+# turn 1 (every card played) refuses the ability, the discard having nothing to pay it.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Iron-Shield Elf
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Mox Sapphire
+Island x4
+Island x10
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Island x14
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Iron-Shield Elf.Cast
+! Bot1.Battlefield.Iron-Shield Elf.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Attack(Iron-Shield Elf > Bot2)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Iron-Shield Elf)
+Bot1.Battlefield.Iron-Shield Elf.Activate
+Bot1.Choose(Island)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Iron-Shield Elf.Damage = 3
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Iron-Shield Elf)
+Bot1.Pass
+
+[Expect]
+Bot2.Life = 17
+Bot1.Graveyard = Iron-Shield Elf; Island

@@ -1,0 +1,61 @@
+# Nethergoyf's power is the number of card types among cards in your graveyard, its toughness that plus one. Bot1's graveyard
+# fills by Entomb: an Ornithopter (artifact and creature, two types) and an Island (land) join two Entombs (instant): four types,
+# a 4/5 (an empty graveyard was a 0/1). Bot2's Entomb for a Wheel of Fortune on turn 2 puts an instant and a sorcery in
+# Bot2's graveyard and changes nothing; a third Entomb for Demonic Tutor on turn 3 adds the sorcery type: a 5/6.
+
+[Bot1 Deck]
+Swamp
+Nethergoyf
+Entomb
+Entomb
+Entomb
+Mox Jet
+Black Lotus
+Ornithopter
+Island
+Demonic Tutor
+Swamp x20
+
+[Bot2 Deck]
+Swamp
+Entomb
+Swamp x8
+Wheel of Fortune
+Swamp x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Nethergoyf.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+? Bot1.Battlefield.Nethergoyf.Power = 0
+? Bot1.Battlefield.Nethergoyf.Toughness = 1
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Ornithopter)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Island)
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Nethergoyf.Power = 4
+? Bot1.Battlefield.Nethergoyf.Toughness = 5
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Entomb.Cast
+Bot2.Search(Wheel of Fortune)
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Nethergoyf.Power = 4
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Demonic Tutor)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Nethergoyf.Power = 5
+Bot1.Battlefield.Nethergoyf.Toughness = 6
+Bot2.Graveyard = Entomb; Wheel of Fortune

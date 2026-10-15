@@ -1,0 +1,38 @@
+# Town Greeter: "You may put a land card from among THEM into your hand": among the four cards just milled. An Island already in Bot1's
+# graveyard (discarded to Faithless Looting on turn 1) is not among them, and the four milled are Ornithopters, so Bot1 is not asked
+# to choose anything (! Choose) and gains no life; the Island stays in the graveyard with the four.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Emerald
+Faithless Looting
+Town Greeter
+Island
+Ornithopter
+Ornithopter x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Island; Ornithopter)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Town Greeter.Cast
+! Bot1.Choose
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Graveyard.Count = 7
+Bot1.Battlefield.Town Greeter.Power = 1

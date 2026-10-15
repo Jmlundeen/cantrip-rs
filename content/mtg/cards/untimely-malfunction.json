@@ -1,0 +1,6 @@
+{
+  "name": "Untimely Malfunction",
+  "manaCost": "{1}{R}",
+  "type": "Instant",
+  "oracleText": "Choose one —\n• Destroy target artifact.\n• Change the target of target spell or ability with a single target.\n• One or two target creatures can't block this turn."
+}

@@ -1,0 +1,36 @@
+# Affinity for artifacts reduces only the generic part (CR 601.2f, 702.41a): with six artifacts in play (five Moxen and a Sol Ring) the
+# reduction of {1} each is more than the generic {4}, but Thoughtcast still costs {U}. Mox Sapphire alone pays it, the other five
+# artifacts stay untapped, and the two cards are drawn.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Sol Ring
+Thoughtcast
+Island x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Thoughtcast.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Thoughtcast
+Bot1.Hand.Count = 2
+Bot1.Battlefield.Mox Ruby.Tapped = false
+Bot1.Battlefield.Mox Pearl.Tapped = false
+Bot1.Battlefield.Mox Emerald.Tapped = false
+Bot1.Battlefield.Sol Ring.Tapped = false

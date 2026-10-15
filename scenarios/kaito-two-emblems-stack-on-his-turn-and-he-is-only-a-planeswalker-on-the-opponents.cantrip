@@ -1,0 +1,42 @@
+# Two emblems (+1 on turns 1 and 3) are two separate "Ninjas you control get +1/+1" (CR 114.4): on turn 3 Kaito is a 3/4 Ninja creature plus 2 = 5/6, loyalty 6. On Bot2's turn 4 he is not a creature at all: a
+# planeswalker without power or toughness, which the emblems cannot pump.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Mox Pearl
+Kaito, Bane of Nightmares
+Island
+Island
+Island x12
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Kaito, Bane of Nightmares.Cast
+Bot1.Pass
+Bot1.Battlefield.Kaito, Bane of Nightmares.Activate(Ability: You get an emblem)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Kaito, Bane of Nightmares.Activate(Ability: You get an emblem)
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Kaito, Bane of Nightmares.Power = 5
+? Bot1.Battlefield.Kaito, Bane of Nightmares.Toughness = 6
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Kaito, Bane of Nightmares.Types = Planeswalker
+? Bot1.Battlefield.Kaito, Bane of Nightmares.Keywords = (absent)
+
+[Expect]
+Bot1.Emblems.Count = 2
+Bot1.Battlefield.Kaito, Bane of Nightmares.Counters.Loyalty = 6

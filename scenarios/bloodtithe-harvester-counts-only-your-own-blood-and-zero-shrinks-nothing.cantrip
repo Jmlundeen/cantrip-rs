@@ -1,0 +1,52 @@
+# "The number of Blood tokens you control": Bot2's own Harvester has made Bot2 a Blood token, which must not count for
+# Bot1. Bot1 cracks its only Blood in response to its Harvester's ability (discarding Swamp), so X is 0 and Bot2's
+# Elvish Mystic stays a 1/1; with Bot2's Blood counted it would have been -2/-2 and died.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Bloodtithe Harvester
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp x8
+
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Bloodtithe Harvester
+Mox Emerald
+Elvish Mystic
+Swamp x10
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Bloodtithe Harvester.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Bloodtithe Harvester.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Bloodtithe Harvester.Activate(Bot2.Battlefield.Elvish Mystic)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Blood Token.Activate
+Bot1.Choose(Swamp)
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Elvish Mystic.Power = 1
+Bot2.Battlefield.Elvish Mystic.Toughness = 1
+Bot2.Battlefield = Mox Jet; Mox Ruby; Mox Emerald; Bloodtithe Harvester; Blood Token; Elvish Mystic
+Bot1.Battlefield = Mox Jet; Mox Ruby
+Bot1.Graveyard = Swamp; Bloodtithe Harvester

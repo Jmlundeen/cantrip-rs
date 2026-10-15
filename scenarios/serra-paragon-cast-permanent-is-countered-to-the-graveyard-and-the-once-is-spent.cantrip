@@ -1,0 +1,54 @@
+# The exile clause belongs to the permanent ("when this permanent is put into a graveyard from the battlefield"), not to the spell: Bot1 casts its Ornithopter from the graveyard with Serra Paragon on turn 3 and Bot2 counters it with Counterspell,
+# so it goes to the graveyard (not exile), Bot1 gains no life, and the turn's single use is spent: casting it again is refused (with the permission of the next turn, turn 5, the positive control).
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Ruby
+Faithless Looting
+Serra Paragon
+Ornithopter
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Ornithopter; Plains)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Serra Paragon.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Graveyard.Ornithopter.Cast(Ability: Once during each of your turns)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Ornithopter)
+Bot1.Pass
+! Bot1.Graveyard.Ornithopter.Cast
+[T5 Bot1.Main1]
+Bot1.Graveyard.Ornithopter.Cast(Ability: Once during each of your turns)
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 20
+Exile.Count = 0
+Bot1.Battlefield.Ornithopter.Toughness = 2

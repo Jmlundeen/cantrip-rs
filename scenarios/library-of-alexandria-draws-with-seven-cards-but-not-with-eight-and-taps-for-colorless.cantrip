@@ -1,0 +1,27 @@
+# "Activate only if you have exactly seven cards in hand": on turn 1 the Library taps for {C} and pays for Sol Ring. On turn 7 Bot1 has eight cards after its draw (the Library cannot draw: refusal), plays a Plains to
+# have seven, and the same activation is offered and drawing (the positive control).
+
+[Bot1 Deck]
+Library of Alexandria
+Sol Ring
+Plains x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Library of Alexandria.Play
+Bot1.Battlefield.Library of Alexandria.Activate(Ability: Add)
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+[T7 Bot1.Main1]
+? Bot1.Hand.Count = 8
+! Bot1.Battlefield.Library of Alexandria.Activate(Ability: Draw)
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Library of Alexandria.Activate(Ability: Draw)
+Bot1.Pass
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 8
+Bot1.Battlefield.Sol Ring.Tapped = false

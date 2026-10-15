@@ -1,0 +1,37 @@
+# "Discard any number of cards": zero is a number. Bot1 casts Chance from the graveyard with two Islands in hand and chooses to discard
+# none, so it draws none either: its hand and library are as they were.
+
+[Bot1 Deck]
+Leave // Chance
+Mox Pearl
+Mox Jet
+Mox Ruby
+Black Lotus
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Leave // Chance.Cast(Ability: Leave)
+Bot1.Pass
+[T1 Bot1.Main2]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Graveyard.Leave // Chance.Cast(Ability: Chance)
+Bot1.Choose()
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Exile.Count = 1
+Bot1.Hand = Island; Island
+Bot1.Library.Count = 10

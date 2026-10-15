@@ -1,0 +1,127 @@
+@echo off
+rem ---------------------------------------------------------------------------
+rem Builds the solution, the web client included, and runs the tests: the .NET ones, then the native engine's (cargo
+rem test over the workspace at the root, which plays every scenario of scenarios\ whose cards it has).
+rem
+rem   test.cmd                          the fast tests: everything that does not
+rem                                     run on the wall clock
+rem   test.cmd /all                     every test, the wall-clock ones included
+rem   test.cmd /noweb                   every test but the browser tests
+rem   test.cmd /nobuild                 skip the build; test what is already built
+rem   test.cmd /filter "FullyQualifiedName~Swiss"
+rem                                     only matching .NET tests; the expression
+rem                                     is passed to dotnet test --filter as is,
+rem                                     and the native engine's tests are left
+rem                                     out (one scenario or card is run with
+rem                                     cargo run --profile cards -p
+rem                                     cantrip-script --bin corpus -- --card
+rem                                     "Name"; see scenarios\README.md)
+rem   test.cmd /detailed                print each test and full failure
+rem                                     messages
+rem
+rem Wall-clock tests wait on real time: the browser tests (Cantrip.Client.Web.Tests),
+rem and the tests marked [Trait("Category", "WallClock")] - real sockets, the
+rem Discord bot's tables, whole events played by bots. Run them when the work
+rem touches what they cover (/filter "Category=WallClock&FullyQualifiedName~Pod",
+rem say, or /all), not as a habit.
+rem
+rem The browser tests are not a nicety. They run the web client as a player gets
+rem it - the WebAssembly build, served, in Chrome, over a real WebSocket - and
+rem play one whole game in it and draw every prompt dock. Their pictures go under TestResults\web. They
+rem take the installed Chrome or Edge; see dotnet\tests\Cantrip.Client.Web.Tests.
+rem
+rem Exits non-zero if the build or any test fails, and always ends with one
+rem verdict line: "All tests passed.", "Tests failed." or "Build failed. No
+rem tests ran." Read that line, not the tail of the output - and beware piping
+rem this through `tail`, which hands back its own exit code.
+rem ---------------------------------------------------------------------------
+
+rem No delayed expansion: the /noweb filter carries a "!", which it would eat.
+rem Each option line is read again after its goto, so %ARGS% builds up anyway.
+setlocal
+
+set "ROOT=%~dp0.."
+set "BUILD=1"
+
+rem No MSBuild worker nodes left behind. Kept for reuse, they outlive the run as
+rem idle ".NET Host" processes, holding build assemblies, and a play test started
+rem afterwards could not build until they were killed by hand.
+set "MSBUILDDISABLENODEREUSE=1"
+set "ARGS="
+set "WEB=1"
+set "SLOW="
+
+:args
+if "%~1"=="" goto parsed
+if /i "%~1"=="/nobuild"  ( set "BUILD=" & shift & goto args )
+if /i "%~1"=="/noweb"    ( set "WEB=" & set "SLOW=1" & shift & goto args )
+if /i "%~1"=="/all"      ( set "SLOW=1" & shift & goto args )
+if /i "%~1"=="/filter"   ( set "ARGS=%ARGS% --filter "%~2"" & set "FILTERED=1" & shift & shift & goto args )
+if /i "%~1"=="/detailed" ( set "ARGS=%ARGS% --logger "console;verbosity=detailed"" & shift & goto args )
+if /i "%~1"=="/?"        goto usage
+echo Unknown option: %~1
+goto usage
+
+:parsed
+
+rem A filter given is the only filter: dotnet test takes one. Without one, the
+rem default leaves out the wall-clock tests, and /noweb only the browser's.
+if not defined ARGS if not defined SLOW set "ARGS=--filter "Category!=WallClock^&FullyQualifiedName!~Cantrip.Client.Web.Tests""
+if not defined ARGS if not defined WEB set "ARGS=--filter "FullyQualifiedName!~Cantrip.Client.Web.Tests""
+
+rem /noweb builds the solution filter that leaves the web client out: it is the
+rem slowest project by far and nothing /noweb runs needs it.
+set "SOLUTION=%ROOT%\dotnet\Cantrip.sln"
+if not defined WEB set "SOLUTION=%ROOT%\dotnet\Cantrip.NoWeb.slnf"
+
+rem A build failure ends the run, but it still goes through :report. Exiting here
+rem printed compiler errors and no verdict at all, which reads as success to
+rem anything that only keeps the tail of the output.
+if defined BUILD (
+  dotnet build "%SOLUTION%" -v q --nologo
+  if errorlevel 1 set "BUILDFAILED=1"
+)
+
+if defined BUILDFAILED (
+  set "RESULT=1"
+  goto report
+)
+
+dotnet test "%SOLUTION%" --no-build --nologo %ARGS%
+set "RESULT=%ERRORLEVEL%"
+
+rem The rules engine (the Rust workspace at the root): its unit tests and the scenario corpus. Run from the workspace's
+rem directory so its rust-toolchain.toml chooses the toolchain; the first build takes minutes, later ones seconds.
+rem CANTRIP_VERIFY=1 turns on the engine's own consistency checks while it plays (docs\engine-design.md). A /filter
+rem names dotnet tests, so it leaves these out.
+if "%RESULT%"=="0" if not defined FILTERED (
+  pushd "%ROOT%"
+  set "CANTRIP_VERIFY=1"
+  cargo test --profile cards --workspace --quiet
+  if errorlevel 1 set "RESULT=1"
+  popd
+)
+
+:report
+echo.
+if "%RESULT%"=="0" (
+  echo All tests passed.
+) else (
+  if defined BUILDFAILED (echo Build failed. No tests ran.) else (echo Tests failed.)
+)
+
+endlocal & exit /b %RESULT%
+
+:usage
+echo.
+echo Usage: test.cmd [/all ^| /noweb] [/nobuild] [/filter EXPRESSION] [/detailed]
+echo.
+echo   (default)            the fast tests: none that run on the wall clock
+echo   /all                 every test, browser and wall-clock tests included
+echo   /noweb               every test but the web client's browser tests
+echo   /nobuild             skip the build step
+echo   /filter EXPRESSION   run only matching .NET tests, e.g. "FullyQualifiedName~Swiss"
+echo   /detailed            list each test and print full failure messages
+echo.
+endlocal
+exit /b 1

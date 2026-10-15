@@ -1,0 +1,52 @@
+# The Undercity's last room, Throne of the Dead Three, when no creature card is among the top ten: nothing enters (and
+# nothing is asked), the library is shuffled and the dungeon is still completed (CR 309.7). Same walk as
+# undercity-forge-trap-archives-throne-completes-the-dungeon: Forge, Trap!, Archives, Throne.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Caves of Chaos Adventurer
+Island
+Island
+Forest
+Island
+Island
+Island
+Mountain
+Mountain x11
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Caves of Chaos Adventurer.Cast
+Bot1.Search(Forest)
+[T3 Bot1.Upkeep]
+Bot1.Modes(Forge)
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Caves of Chaos Adventurer.Counters.PlusOnePlusOne = 2
+? Bot1.Dungeon = Undercity: Forge
+[T5 Bot1.Upkeep]
+Bot1.Modes(Trap)
+Bot1.Target(Bot2)
+[T5 Bot1.Main1]
+? Bot2.Life = 15
+? Bot1.Dungeon = Undercity: Trap!
+[T7 Bot1.Main1]
+? Bot1.Dungeon = Undercity: Archives
+[T9 Bot1.Main1]
+
+[Expect]
+Bot1.DungeonsCompleted = 1
+Initiative = Bot1
+Bot1.Battlefield.Count = 5

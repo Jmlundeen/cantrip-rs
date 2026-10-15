@@ -1,0 +1,32 @@
+# Abrupt Decay "can't be countered": Bot2's Miscalculation (cast for {1}{U} off an Island and Mox Sapphire) targeting it does nothing to it even though Bot1, with no mana left, could not pay {2}. Decay resolves and destroys Bot2's Island... and Bot1 is never charged.
+
+[Bot1 Deck]
+Forest
+Mox Jet
+Abrupt Decay
+Forest x12
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Miscalculation
+Island x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Abrupt Decay.Cast(Mox Sapphire)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Miscalculation.Cast(Abrupt Decay)
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Abrupt Decay
+Bot2.Graveyard = Mox Sapphire; Miscalculation

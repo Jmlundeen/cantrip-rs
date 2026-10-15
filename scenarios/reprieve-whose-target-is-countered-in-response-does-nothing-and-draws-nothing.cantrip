@@ -1,0 +1,40 @@
+# CR 608.2b: Reprieve has one target, Bot2's Lightning Bolt; Bot1 counters that Bolt with its own Counterspell, cast
+# on top of Reprieve, so Reprieve finds no target and does not resolve - and its "draw a card" does not happen (hand 1, not 2).
+
+[Bot1 Deck]
+Island
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Reprieve
+Counterspell
+Island
+Island x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x14
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Reprieve.Cast(Lightning Bolt)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Counterspell.Cast(Stack.Lightning Bolt)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Hand.Count = 1
+Bot1.Graveyard = Reprieve; Counterspell
+Bot2.Graveyard = Lightning Bolt

@@ -1,0 +1,54 @@
+# Phyrexian Dragon Engine is discarded to Faithless Looting and unearthed on turn 9 for {3}{R}{R} (CR 702.84a): a sorcery-speed
+# activated ability that works from the graveyard. It returns with haste, and its "enters from your graveyard" trigger
+# lets Bot1 discard their hand and draw three. It attacks the turn it returns, and double strike makes 2 damage into 4.
+# At the beginning of the next end step unearth exiles it, so it never comes back to the graveyard.
+
+[Bot1 Deck]
+Phyrexian Dragon Engine
+Faithless Looting
+Mountain x5
+Mountain x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Phyrexian Dragon Engine; Mountain)
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+? Bot1.Graveyard = Faithless Looting; Mountain; Phyrexian Dragon Engine
+
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Graveyard.Phyrexian Dragon Engine.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+? Bot1.Hand.Count = 3
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Phyrexian Dragon Engine.Keywords = DoubleStrike; Haste
+Bot1.Attack(Phyrexian Dragon Engine > Bot2)
+Bot1.Pass
+Bot2.Pass
+[T9 Bot1.Main2]
+? Bot2.Life = 16
+[T11 Bot1.Main1]
+
+[Expect]
+Turn = 11
+Bot2.Life = 16
+Exile = Phyrexian Dragon Engine
+Bot1.Hand.Count = 4

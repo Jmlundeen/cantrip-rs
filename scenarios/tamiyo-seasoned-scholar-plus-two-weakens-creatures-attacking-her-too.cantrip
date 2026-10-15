@@ -1,0 +1,39 @@
+# Tamiyo, Seasoned Scholar's +2 covers "a creature attacks you or a planeswalker you control", herself included. With the
+# same turns as the transform scenario, Bot2's Llanowar Elves attacks Tamiyo on turn 4 and is weakened to 0 power: her loyalty stays 4 (the
+# ? check). On turn 6, her next turn having come and gone without another +2, the Elves deal their 1 to her: loyalty 3.
+[Bot1 Deck]
+Island x3
+Tamiyo, Inquisitive Student
+Ponder
+Brainstorm
+Island x20
+[Bot2 Deck]
+Forest x2
+Llanowar Elves
+Forest x20
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Tamiyo, Inquisitive Student.Cast
+[Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Ponder.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Brainstorm.Cast
+Bot1.Battlefield.Tamiyo, Seasoned Scholar.Activate(Ability: Until your next turn)
+? Bot1.Battlefield.Tamiyo, Seasoned Scholar.Counters.Loyalty = 4
+[T4 Bot2.Main1]
+Bot2.Attack(Llanowar Elves > Bot1.Battlefield.Tamiyo, Seasoned Scholar)
+[T4 Bot2.Main2]
+? Bot1.Battlefield.Tamiyo, Seasoned Scholar.Counters.Loyalty = 4
+[T6 Bot2.Main1]
+Bot2.Attack(Llanowar Elves > Bot1.Battlefield.Tamiyo, Seasoned Scholar)
+[T6 Bot2.Main2]
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield.Tamiyo, Seasoned Scholar.Counters.Loyalty = 3

@@ -1,0 +1,30 @@
+# Reckoner Shakedown: Bot1 reveals Bot2's hand, chooses the Lightning Bolt (the only nonland card) and Bot2 discards it.
+
+[Bot1 Deck]
+Swamp
+Island
+Island
+Reckoner Shakedown
+Island x16
+
+[Bot2 Deck]
+Lightning Bolt
+Island x19
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Reckoner Shakedown.Cast(Bot2)
+Bot1.Choose(Lightning Bolt)
+
+[Expect]
+Bot2.Graveyard = Lightning Bolt
+Bot2.Hand.Count = 6

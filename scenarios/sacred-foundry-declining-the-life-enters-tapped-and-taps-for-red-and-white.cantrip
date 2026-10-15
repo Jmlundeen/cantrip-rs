@@ -1,0 +1,23 @@
+# "If you don't, it enters tapped": Bot1 declines the 2 life, keeps 20, and cannot tap the Foundry on turn 1 (refusal); it taps
+# for {R} on turn 3 and {W} on turn 5.
+
+[Bot1 Deck]
+Sacred Foundry
+Plains x14
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Sacred Foundry.Play
+Bot1.Decline
+! Bot1.Battlefield.Sacred Foundry.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Sacred Foundry.Activate(Ability: {R})
+? Bot1.Mana = {R}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Sacred Foundry.Activate(Ability: {W})
+
+[Expect]
+Bot1.Life = 20
+Bot1.Mana = {W}

@@ -1,0 +1,51 @@
+# Displacer Kitten: if its target is gone when the trigger resolves, the trigger does nothing (CR 608.2b) and the card
+# is not returned. On turn 3 Bot1 casts Mox Emerald and the trigger targets Thraben Inspector; in response Bot2 kills the
+# Inspector with a Lightning Bolt (paid with its Mox Ruby). The Inspector stays in the graveyard and there is no second
+# Clue. The positive control is the neighbouring scenario, where the same trigger returns it.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Displacer Kitten
+Thraben Inspector
+Plains
+Plains
+Mox Emerald
+Plains x12
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x16
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Displacer Kitten.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Thraben Inspector.Cast
+Bot1.Pass
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Target(Thraben Inspector)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Thraben Inspector)
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Mox Ruby; Mox Pearl; Mox Emerald; Displacer Kitten; Clue Token
+Bot1.Graveyard.Count = 2
+Bot1.Graveyard = Thraben Inspector; Black Lotus
+Exile.Count = 0

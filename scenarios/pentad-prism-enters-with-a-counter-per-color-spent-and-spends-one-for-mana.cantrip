@@ -1,0 +1,28 @@
+# Pentad Prism: sunburst (it enters with a charge counter for each color of mana spent to cast it) and "Remove a charge
+# counter: Add one mana of any color." Cast with a red and a white mana it has two counters; removing one for blue leaves one.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Pentad Prism
+Island x4
+Island x10
+
+[Bot2 Deck]
+Swamp x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Pentad Prism.Cast
+Bot1.Pass
+Bot1.Battlefield.Pentad Prism.Activate(Color: Blue)
+
+[Expect]
+Turn = 1
+Bot1.Mana = {U}
+Bot1.Battlefield.Pentad Prism.Counters.Charge = 1

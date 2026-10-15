@@ -1,0 +1,41 @@
+# "If you win the flip, gain control of that spell and you may choose new targets for it." Bot2's Lightning Bolt aims at
+# Bot1; the flip is won (the first face of the coin), Bot1 takes the Bolt and aims it at Bot2, who goes to 17. The Bolt
+# is still Bot2's card, so it ends in Bot2's graveyard. Its mirror, a lost flip, is the scenario for the countered Bolt.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Island
+Invert Polarity
+Island x14
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt
+Mountain x3
+Mountain x12
+
+[Dice]
+1
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Island.Play
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Invert Polarity.Cast(Lightning Bolt)
+Bot1.Target(Bot2)
+[T3 Bot1.Upkeep]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 17
+Bot1.Graveyard = Invert Polarity
+Bot2.Graveyard = Lightning Bolt

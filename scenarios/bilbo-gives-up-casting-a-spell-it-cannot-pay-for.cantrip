@@ -1,0 +1,45 @@
+# Bilbo, Thief in the Night: "you may cast ... from your graveyard". The trigger does not ask for mana first, so a player
+# who cannot pay finds out while casting and gives the cast up (CR 733.1, 601.2): the spell goes back where it was. On
+# turn 5 Bot1 taps its Mountain and Island for mana in the first main phase, and the mana is gone by the time Bilbo
+# attacks. Bot1 chooses the Lightning Bolt, names its target, finds {R} unpayable and cancels: the Bolt is still in the
+# graveyard (not exiled, not on the stack) and Bot2 has taken only Bilbo's combat damage. The control is
+# bilbo-recasts-a-bolt-from-the-graveyard-and-exiles-it, where the Mountain is untapped.
+
+[Bot1 Deck]
+Mountain
+Lightning Bolt
+Bilbo, Thief in the Night
+Island
+Island
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Bilbo, Thief in the Night.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Attack(Bilbo, Thief in the Night)
+Bot1.Choose(Lightning Bolt)
+Bot1.Target(Bot2)
+Bot1.Cancel
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Lightning Bolt
+Exile.Count = 0
+Stack.Count = 0
+Bot2.Life = 15

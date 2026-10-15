@@ -1,0 +1,40 @@
+# Crabomination: "You may cast a spell from among cards exiled this way": the casting is optional. The same position as
+# crabomination-casts-the-card-exiled-from-the-graveyard, but Bot1 chooses no card: the Lightning Bolt stays in exile with
+# the two Islands, Bot2 takes no damage and its graveyard is empty.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Black Lotus
+Swamp
+Crabomination
+Swamp x15
+
+[Bot2 Deck]
+Island x7
+Lightning Bolt
+Island x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Crabomination.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Choose()
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Exile = Island; Island; Lightning Bolt
+Bot2.Graveyard.Count = 0
+Stack.Count = 0

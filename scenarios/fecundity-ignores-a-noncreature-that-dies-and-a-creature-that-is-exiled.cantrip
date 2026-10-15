@@ -1,0 +1,61 @@
+# Fecundity: only "a creature dies" counts. Bot1 destroys Bot2's Mox Ruby with Abrupt Decay (a permanent dying that is
+# not a creature) and exiles its Ornithopter with Path to Exile (a creature leaving without dying, CR 700.4): after each
+# the stack is empty, so no trigger was put on it. The positive control is the neighbouring scenarios, where a creature
+# that dies does trigger it.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Pearl
+Mox Ruby
+Fecundity
+Abrupt Decay
+Path to Exile
+Plains x14
+
+[Bot2 Deck]
+Mox Ruby
+Ornithopter
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Fecundity.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Abrupt Decay.Cast(Bot2.Battlefield.Mox Ruby)
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+? Stack.Count = 0
+? Bot2.Graveyard = Mox Ruby
+Bot1.Hand.Path to Exile.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Decline
+? Stack.Count = 0
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot2.Graveyard = Mox Ruby
+Exile = Ornithopter
+Bot2.Battlefield.Count = 0

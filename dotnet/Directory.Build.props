@@ -1,0 +1,33 @@
+<Project>
+
+  <!-- Shared settings for every Cantrip project except the web client, which carries its own
+       Directory.Build.props for the Uno SDK. See dotnet/src/Cantrip.Client.Web/Directory.Build.props. -->
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <!-- The XML is generated so the compiler checks the doc comments' cref links. It is not a documentation-lint
+         opt-in, so the warnings about comments being absent or partial stay off (they would otherwise be errors). -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591;CS1573;CS1572;CS1574;CS1712;CS0419</NoWarn>
+    <RootNamespace>$(MSBuildProjectName)</RootNamespace>
+    <SolutionRoot>$([MSBuild]::NormalizeDirectory('$(MSBuildThisFileDirectory)'))</SolutionRoot>
+  </PropertyGroup>
+
+  <!-- Determinism is enforced by the compiler, not by discipline. Any project that opts in by
+       setting EnforceDeterminism=true gets the banned-API list. -->
+  <ItemGroup Condition="'$(EnforceDeterminism)' == 'true'">
+    <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <AdditionalFiles Include="$(SolutionRoot)build\BannedSymbols.txt" />
+  </ItemGroup>
+
+</Project>

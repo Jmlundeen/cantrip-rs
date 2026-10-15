@@ -1,0 +1,6 @@
+{
+  "name": "Survival of the Fittest",
+  "manaCost": "{1}{G}",
+  "type": "Enchantment",
+  "oracleText": "{G}, Discard a creature card: Search your library for a creature card, reveal that card, put it into your hand, then shuffle."
+}

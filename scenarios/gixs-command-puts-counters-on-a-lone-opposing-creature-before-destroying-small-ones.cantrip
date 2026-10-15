@@ -1,0 +1,51 @@
+# Gix's Command, modes 1 and 2 in printed order. With one creature on the battlefield (Bot2's Llanowar Elves, since "up
+# to one creature" is not "you control") Bot1 accepts and the counters go on it without a choice of which: a 3/3 with
+# lifelink until end of turn. "Destroy each creature with power 2 or less" then finds its power is 3 and leaves it.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Gleemox
+Gix's Command
+Island
+Island
+Island x12
+
+[Bot2 Deck]
+Mox Emerald
+Llanowar Elves
+Island
+Island
+Island
+Island
+Island
+Island
+Island x12
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Black)
+Bot1.Hand.Gix's Command.Cast
+Bot1.Modes(1; 2)
+Bot1.Pass
+Bot1.Accept
+
+[Expect]
+Bot2.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = 2
+Bot2.Battlefield.Llanowar Elves.Power = 3
+Bot2.Battlefield.Llanowar Elves.Keywords = Lifelink
+Bot2.Graveyard.Count = 0

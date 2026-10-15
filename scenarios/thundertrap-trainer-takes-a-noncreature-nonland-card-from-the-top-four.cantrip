@@ -1,0 +1,31 @@
+# Thundertrap Trainer's enters ability looks at the top four cards: Llanowar Elves and Island cannot go to the hand, so
+# Bot1 takes Lightning Bolt and the other three go to the bottom of the library, in a random order.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Thundertrap Trainer
+Island x4
+Llanowar Elves
+Lightning Bolt
+Island
+Duress
+Island x6
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Thundertrap Trainer.Cast
+Bot1.Arrange(Lightning Bolt | Llanowar Elves; Island; Duress)
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Battlefield = Mox Sapphire; Mox Ruby; Thundertrap Trainer
+Bot1.Hand = Island; Island; Island; Island; Lightning Bolt
+Bot1.Library.Count = 9

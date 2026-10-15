@@ -1,0 +1,35 @@
+# "You may discard a card. If you do, draw two cards": with no card in hand there is nothing to discard, so nothing is
+# asked and nothing is drawn (CR 608.2c; the draw is conditional on a discard). Bot1 plays out the whole opening hand
+# (a land and five Moxen, all free) and casts Bitter Reunion last. The hand stays empty, the library is untouched.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Emerald
+Mox Sapphire
+Bitter Reunion
+Plains x13
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Bitter Reunion.Cast
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 0
+Bot1.Graveyard.Count = 0
+Bot1.Library.Count = 13
+Bot1.Battlefield.Bitter Reunion.Tapped = false
+Stack.Count = 0

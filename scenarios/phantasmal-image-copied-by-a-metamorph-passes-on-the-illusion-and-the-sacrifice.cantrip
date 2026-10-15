@@ -1,0 +1,66 @@
+# The Illusion type and the sacrifice ability are part of Phantasmal Image's copiable values (CR 707.9b, and the card's
+# 2017-03-14 ruling), so a Phyrexian Metamorph that copies the Image is an artifact Guerrilla Gorilla that is also an
+# Illusion and has "When this creature becomes the target of a spell or ability, sacrifice it". Bot2's Bolt at the
+# Metamorph sacrifices it and is countered for want of a target (CR 608.2b); the Image itself, never targeted, stays.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Island
+Island
+Phantasmal Image
+Island
+Phyrexian Metamorph
+Island x10
+
+[Bot2 Deck]
+Forest
+Forest
+Guerrilla Gorilla
+Mountain
+Lightning Bolt
+Forest x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Phantasmal Image.Cast
+Bot1.Accept
+[T6 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Phyrexian Metamorph.Cast
+Bot1.Accept
+Bot1.Target(Bot1.Battlefield.Guerrilla Gorilla)
+? Bot1.Battlefield.Guerrilla Gorilla#2.Types = Creature; Artifact
+? Bot1.Battlefield.Guerrilla Gorilla#2.Subtypes = Ape; Hero; Illusion; Soldier
+[T8 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Guerrilla Gorilla#2)
+? Stack = Guerrilla Gorilla; Lightning Bolt
+
+[Expect]
+Turn = 8
+Stack.Count = 0
+Bot1.Graveyard = Phyrexian Metamorph
+Bot1.Battlefield.Guerrilla Gorilla.Types = Creature
+Bot1.Battlefield.Guerrilla Gorilla.Subtypes = Ape; Hero; Illusion; Soldier
+Bot1.Battlefield.Guerrilla Gorilla.Damage = 0
+Bot2.Graveyard = Lightning Bolt

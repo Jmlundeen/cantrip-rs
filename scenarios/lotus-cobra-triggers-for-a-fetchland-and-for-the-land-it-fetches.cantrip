@@ -1,0 +1,36 @@
+# Landfall is per land entering, however it enters (CR 603.6a): playing Wooded Foothills is one trigger and the Mountain it fetches
+# onto the battlefield is another, two mana from one land drop - one chosen as each trigger resolves, here {R} then {U}.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Lotus Cobra
+Wooded Foothills
+Island
+Island
+Island
+Island
+Mountain
+Island x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Lotus Cobra.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Wooded Foothills.Play
+Bot1.Colors(Red)
+? Bot1.Mana = {R}
+Bot1.Battlefield.Wooded Foothills.Activate
+Bot1.Search(Mountain)
+Bot1.Colors(Blue)
+? Bot1.Mana = {U}{R}
+
+[Expect]
+Bot1.Life = 19
+Bot1.Battlefield = Forest; Mox Emerald; Lotus Cobra; Mountain

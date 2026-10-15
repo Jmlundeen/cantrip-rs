@@ -1,0 +1,44 @@
+# The sacrifice is a cost, paid on casting: Bot2's Counterspell counters Tinker and the Mox is gone all the same; the library
+# is not searched, so the Colossus stays in it.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Mox Pearl
+Tinker
+Island
+Island
+Island
+Blightsteel Colossus
+Island x10
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tinker.Cast
+Bot1.Choose(Mox Pearl)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Tinker)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Tinker; Mox Pearl
+Bot1.Battlefield = Mox Sapphire; Mox Ruby; Mox Jet
+Bot2.Graveyard = Counterspell

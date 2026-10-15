@@ -1,0 +1,30 @@
+# "On top of its owner's library": Bot1 steals Bot2's Sensei's Divining Top with a kicked Thieving Skydiver (X = 1) and taps it; Bot1 draws, and the Top goes on top of Bot2's library, its owner's, not Bot1's.
+
+[Bot1 Deck]
+Black Lotus
+Thieving Skydiver
+Plains x17
+
+[Bot2 Deck]
+Mox Ruby
+Sensei's Divining Top
+Island x18
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Sensei's Divining Top.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Thieving Skydiver.Cast(Kicked: 1)
+Bot1.Target(Sensei's Divining Top)
+Bot1.Battlefield.Sensei's Divining Top.Activate(Ability: Draw)
+[Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Library.Count = 13
+Bot1.Battlefield = Thieving Skydiver
+Bot1.Library.Count = 10

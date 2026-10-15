@@ -1,0 +1,53 @@
+# Deconstruction Hammer: equip {1} makes the Ornithopter a 1/3 with "{3}, {T}, Sacrifice Deconstruction Hammer: Destroy
+# target artifact or enchantment." On turn 3 it destroys Bot2's Sol Ring and the Hammer goes to the graveyard, so the
+# Ornithopter is a 0/2 again.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Emerald
+Ornithopter
+Deconstruction Hammer
+Island x14
+
+[Bot2 Deck]
+Island
+Sol Ring
+Island x18
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Deconstruction Hammer.Cast
+Bot1.Pass
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Deconstruction Hammer.Activate(Ornithopter)
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+? Bot1.Battlefield.Ornithopter.Power = 1
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Ornithopter.Activate(Bot2.Battlefield.Sol Ring)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Island
+Bot2.Graveyard = Sol Ring
+Bot1.Graveyard = Deconstruction Hammer
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Ornithopter.Tapped = true

@@ -1,0 +1,48 @@
+# The One Ring's {T}: "Put a burden counter on The One Ring, then draw a card for each burden counter on it": one card the first
+# time (turn 3), two the second (turn 5, with 2 counters). "At the beginning of YOUR upkeep, you lose 1 life for each burden
+# counter": nothing at turn 3 (no counters yet), 1 at turn 5, 2 at turn 7, and nothing at Bot2's upkeeps (Bot1 is at 20 on
+# turn 2). The protection from the cast has lapsed by turn 3.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+The One Ring
+Plains
+Plains
+Plains
+Plains
+Plains x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.The One Ring.Cast
+[T2 Bot2.Upkeep]
+? Bot1.Life = 20
+[T3 Bot1.Main1]
+? Bot1.Life = 20
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.The One Ring.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.The One Ring.Counters.Burden = 1
+? Bot1.Hand.Count = 5
+[T5 Bot1.Main1]
+? Bot1.Life = 19
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.The One Ring.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.The One Ring.Counters.Burden = 2
+? Bot1.Hand.Count = 7
+[T7 Bot1.Main1]
+? Bot1.Life = 17
+
+[Expect]
+Turn = 7
+Bot1.Battlefield.The One Ring.Counters.Burden = 2

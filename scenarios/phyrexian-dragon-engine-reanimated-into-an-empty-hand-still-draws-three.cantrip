@@ -1,0 +1,46 @@
+# "You may discard your hand. If you do, draw three cards" with no cards in hand: Bot1 empties the hand on turn 1 and
+# returns Phyrexian Dragon Engine from its own graveyard with Unearth the sorcery, not the keyword. It enters from
+# Bot1's graveyard, so it triggers; saying yes discards a hand of nothing, which is still discarding the hand, and
+# Bot1 draws three. Returned by a spell rather than its own unearth, it has no haste.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Faithless Looting
+Phyrexian Dragon Engine
+Unearth
+Ornithopter
+Ornithopter
+Ornithopter
+Mountain
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Phyrexian Dragon Engine; Mountain)
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Unearth.Cast(Bot1.Graveyard.Phyrexian Dragon Engine)
+? Bot1.Hand.Count = 0
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+? Bot1.Hand.Count = 3
+? Bot1.Battlefield.Phyrexian Dragon Engine.Keywords = DoubleStrike
+? Bot1.Battlefield.Phyrexian Dragon Engine.SummoningSick = True
+
+[Expect]
+Turn = 1
+Bot1.Hand.Count = 3
+Bot1.Graveyard = Unearth; Faithless Looting; Mountain; Black Lotus

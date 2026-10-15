@@ -1,0 +1,30 @@
+# Kyren Negotiations: "Tap an untapped creature you control: This enchantment deals 1 damage to target player or
+# planeswalker." Black Lotus's and a Mox Ruby's red mana pay for it, and the Elves, summoning sick, are tapped as the cost.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Black Lotus
+Llanowar Elves
+Kyren Negotiations
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Kyren Negotiations.Cast
+Bot1.Battlefield.Kyren Negotiations.Activate(Bot2)
+Bot1.Choose(Llanowar Elves)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 19
+Bot1.Battlefield.Llanowar Elves.Tapped = true

@@ -1,0 +1,8 @@
+{
+  "name": "Giver of Runes",
+  "manaCost": "{W}",
+  "type": "Creature — Kor Cleric",
+  "power": 1,
+  "toughness": 2,
+  "oracleText": "{T}: Another target creature you control gains protection from colorless or from the color of your choice until end of turn."
+}

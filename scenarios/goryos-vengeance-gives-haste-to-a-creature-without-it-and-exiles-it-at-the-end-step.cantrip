@@ -1,0 +1,35 @@
+# Leovold, Emissary of Trest has no haste of its own. Goryo's Vengeance returns it from the graveyard on turn 1 and it gains haste
+# (printed haste, as Headliner Scarlett has, would hide the effect): it attacks the turn it arrives, for 3, and is exiled at the
+# beginning of the end step.
+
+[Bot1 Deck]
+Mox Jet
+Black Lotus
+Entomb
+Goryo's Vengeance
+Island x3
+Leovold, Emissary of Trest
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Entomb.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Search(Leovold, Emissary of Trest)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Goryo's Vengeance.Cast(Bot1.Graveyard.Leovold, Emissary of Trest)
+? Stack.Count = 1
+Bot1.Attack(Leovold, Emissary of Trest > Bot2)
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Leovold, Emissary of Trest.Keywords = Haste
+[T2 Bot2.Main1]
+
+[Expect]
+Turn = 2
+Bot2.Life = 17
+Exile = Leovold, Emissary of Trest
+Bot1.Battlefield = Mox Jet

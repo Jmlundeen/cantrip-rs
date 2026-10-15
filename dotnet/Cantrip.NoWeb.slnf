@@ -1,0 +1,35 @@
+{
+  "solution": {
+    "path": "Cantrip.sln",
+    "projects": [
+      "src\\Cantrip.Art\\Cantrip.Art.csproj",
+      "src\\Cantrip.Cards.Model\\Cantrip.Cards.Model.csproj",
+      "src\\Cantrip.Cards\\Cantrip.Cards.csproj",
+      "src\\Cantrip.Client.Embedded\\Cantrip.Client.Embedded.csproj",
+      "src\\Cantrip.Client.Llm\\Cantrip.Client.Llm.csproj",
+      "src\\Cantrip.Client.Presentation\\Cantrip.Client.Presentation.csproj",
+      "src\\Cantrip.Client\\Cantrip.Client.csproj",
+      "src\\Cantrip.Core\\Cantrip.Core.csproj",
+      "src\\Cantrip.Datasets\\Cantrip.Datasets.csproj",
+      "src\\Cantrip.Discord\\Cantrip.Discord.csproj",
+      "src\\Cantrip.Projection\\Cantrip.Projection.csproj",
+      "src\\Cantrip.Protocol\\Cantrip.Protocol.csproj",
+      "src\\Cantrip.Server.Host\\Cantrip.Server.Host.csproj",
+      "src\\Cantrip.Server\\Cantrip.Server.csproj",
+      "tests\\Cantrip.Art.Tests\\Cantrip.Art.Tests.csproj",
+      "tests\\Cantrip.Cards.Tests\\Cantrip.Cards.Tests.csproj",
+      "tests\\Cantrip.Client.Llm.Tests\\Cantrip.Client.Llm.Tests.csproj",
+      "tests\\Cantrip.Client.Tests\\Cantrip.Client.Tests.csproj",
+      "tests\\Cantrip.Core.Tests\\Cantrip.Core.Tests.csproj",
+      "tests\\Cantrip.Discord.Tests\\Cantrip.Discord.Tests.csproj",
+      "tests\\Cantrip.Projection.Tests\\Cantrip.Projection.Tests.csproj",
+      "tests\\Cantrip.Server.Tests\\Cantrip.Server.Tests.csproj",
+      "tests\\Cantrip.TestKit\\Cantrip.TestKit.csproj",
+      "tools\\Cantrip.Bot\\Cantrip.Bot.csproj",
+      "tools\\Cantrip.BotLab\\Cantrip.BotLab.csproj",
+      "tools\\Cantrip.LlmGames\\Cantrip.LlmGames.csproj",
+      "tools\\Cantrip.Playtest\\Cantrip.Playtest.csproj",
+      "tools\\Cantrip.WebHost\\Cantrip.WebHost.csproj"
+    ]
+  }
+}

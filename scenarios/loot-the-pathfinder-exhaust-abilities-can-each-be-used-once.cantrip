@@ -1,0 +1,51 @@
+# Loot, the Pathfinder: "Exhaust - {G}, {T}: Add three mana of any one color", "Exhaust - {U}, {T}: Draw three cards" and
+# "Exhaust - {R}, {T}: Loot deals 3 damage to any target. (Activate each exhaust ability only once.)" Bot1 casts the
+# Moxen, Sol Ring and Loot on turn 1, draws three with the blue ability on turn 3 and deals 3 to Bot2 on turn 5. On
+# turn 7 neither is offered again (each ability is limited on its own), and the green mana ability, used for the first
+# time, still is: it gives RRR.
+
+[Bot1 Deck]
+Mountain
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Sol Ring
+Loot, the Pathfinder
+Island
+Island x20
+
+[Bot2 Deck]
+Island x13
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Loot, the Pathfinder.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Loot, the Pathfinder.Activate(Ability: Draw three cards)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Loot, the Pathfinder.Activate(Bot2; Ability: 3 damage)
+[T7 Bot1.Main1]
+! Bot1.Battlefield.Loot, the Pathfinder.Activate(Ability: Draw three cards)
+! Bot1.Battlefield.Loot, the Pathfinder.Activate(Ability: 3 damage)
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Loot, the Pathfinder.Activate(Color: Red)
+
+[Expect]
+Bot2.Life = 17
+Bot1.Mana = {R}{R}{R}

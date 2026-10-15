@@ -1,0 +1,20 @@
+# "When the last is removed, you may cast it without paying its mana cost": at turn 7's upkeep Bot1 declines, and the Bloom
+# is not cast - it stays in exile with no time counters (CR 702.62a), never reaching the battlefield. The accepting
+# control is lotus-bloom-suspended-for-three-upkeeps-is-cast-for-free-and-taps-for-three-mana.
+
+[Bot1 Deck]
+Lotus Bloom
+Island x20
+
+[Bot2 Deck]
+Island x13
+
+[Actions]
+Bot1.Hand.Lotus Bloom.Suspend
+[T7 Bot1.Upkeep]
+Bot1.Decline
+[T7 Bot1.Main1]
+
+[Expect]
+Exile.Count = 1
+Bot1.Battlefield.Count = 0

@@ -1,0 +1,6 @@
+{
+  "name": "Get Lost",
+  "manaCost": "{1}{W}",
+  "type": "Instant",
+  "oracleText": "Destroy target creature, enchantment, or planeswalker. Its controller creates two Map tokens. (They're artifacts with \"{1}, {T}, Sacrifice this token: Target creature you control explores. Activate only as a sorcery.\")"
+}

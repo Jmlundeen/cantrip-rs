@@ -1,0 +1,26 @@
+# "A Plains or Island card" means the card has the subtype (CR 205.3i): Tundra, a Plains Island, is found though it is not basic, and an Island too would be; Badlands (Swamp Mountain) is not offered (refusal) beside Tundra
+# (the positive control). The fetched Tundra enters untapped and Bot1 is at 19.
+
+[Bot1 Deck]
+Flooded Strand
+Mountain x6
+Badlands
+Tundra
+Island
+Mountain x10
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Flooded Strand.Play
+Bot1.Battlefield.Flooded Strand.Activate
+! Bot1.Search(Badlands)
+Bot1.Search(Tundra)
+
+[Expect]
+Bot1.Life = 19
+Bot1.Battlefield = Tundra
+Bot1.Battlefield.Tundra.Tapped = false
+Bot1.Graveyard = Flooded Strand
+Bot1.Library.Count = 12

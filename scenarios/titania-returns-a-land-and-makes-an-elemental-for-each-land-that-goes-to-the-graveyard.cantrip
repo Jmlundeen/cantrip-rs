@@ -1,0 +1,47 @@
+# Bot1 destroys its own Forest with Strip Mine on turn 3, leaving both lands in the graveyard. On turn 5 Titania
+# (cast off a Forest and four Moxen) returns Strip Mine from the graveyard as it enters. Using Strip Mine again to
+# destroy the Forest puts two lands into the graveyard from the battlefield, so Titania makes two 5/3 Elementals.
+
+[Bot1 Deck]
+Forest
+Strip Mine
+Forest
+Titania, Protector of Argoth
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Mox Jet
+Forest x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Strip Mine.Play
+Bot1.Battlefield.Strip Mine.Activate(Bot1.Battlefield.Forest; Ability: Destroy)
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Titania, Protector of Argoth.Cast
+Bot1.Target(Strip Mine)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Count = 7
+? Bot1.Graveyard = Forest
+Bot1.Battlefield.Strip Mine.Activate(Bot1.Battlefield.Forest; Ability: Destroy)
+[T5 Bot1.End]
+
+[Expect]
+Bot1.Battlefield.Elemental#1.Power = 5
+Bot1.Battlefield.Elemental#2.Power = 5
+Bot1.Battlefield.Count = 7
+Bot1.Graveyard.Count = 3

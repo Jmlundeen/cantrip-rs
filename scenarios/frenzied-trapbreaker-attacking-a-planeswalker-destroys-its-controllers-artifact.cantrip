@@ -1,0 +1,51 @@
+# Frenzied Trapbreaker: "...destroy target artifact or enchantment defending player controls." For a creature attacking a
+# planeswalker the defending player is the planeswalker's controller (CR 508.5). Turn 5 (night) the Trapbreaker attacks Bot2's
+# Liliana of the Veil: Bot2's Mox Pearl is a candidate, Bot1's own Mox Ruby is not (the refusal). The Pearl is destroyed and the
+# Trapbreaker's 3 damage kills Liliana (loyalty 3). Bot2 cast Liliana with a Swamp, a Mox Jet and a Mox Ruby on turn 2.
+
+[Bot1 Deck]
+Forest
+Forest
+Mox Ruby
+Outland Liberator
+Forest x16
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Mox Pearl
+Liliana of the Veil
+Swamp x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Liliana of the Veil.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Outland Liberator.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Attack(Frenzied Trapbreaker > Bot2.Battlefield.Liliana of the Veil)
+! Bot1.Target(Bot1.Battlefield.Mox Ruby)
+Bot1.Target(Bot2.Battlefield.Mox Pearl)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Liliana of the Veil; Mox Pearl
+Bot2.Battlefield = Swamp; Mox Jet; Mox Ruby
+Bot2.Life = 20

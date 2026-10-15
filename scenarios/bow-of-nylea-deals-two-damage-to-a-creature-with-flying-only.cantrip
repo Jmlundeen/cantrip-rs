@@ -1,0 +1,53 @@
+# Bow of Nylea's second mode, "deals 2 damage to target creature with flying": Bot2 controls an Ornithopter (0/2 flying)
+# and a Llanowar Elves (no flying). Bot1 chooses the mode on turn 3 and the Elves is not among the targets on offer
+# (the refusal, with the Ornithopter as the positive control, which then dies). The Elves is untouched.
+# Bow is cast on turn 1 with Forest, two Mox Emeralds and a Mox Ruby; the ability is paid on turn 3.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Emerald
+Mox Ruby
+Bow of Nylea
+Forest x3
+Forest x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Ornithopter
+Forest x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Bow of Nylea.Cast
+Bot1.Pass
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Bow of Nylea.Activate
+Bot1.Modes(deals 2 damage)
+! Bot1.Target(Llanowar Elves)
+Bot1.Target(Ornithopter)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Ornithopter
+Bot2.Battlefield = Forest; Llanowar Elves
+Bot2.Battlefield.Llanowar Elves.Damage = 0

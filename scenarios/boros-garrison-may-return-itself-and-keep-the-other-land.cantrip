@@ -1,0 +1,22 @@
+# With a Plains already in play Bot1 chooses to return the Garrison itself (any land you control qualifies): the Plains
+# stays, the Garrison is back in hand, and the land drop for the turn is used.
+
+[Bot1 Deck]
+Plains
+Boros Garrison
+Plains x18
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Boros Garrison.Play
+Bot1.Choose(Boros Garrison)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Plains
+Bot1.Hand.Count = 7
+Bot1.LandsPlayed = 1

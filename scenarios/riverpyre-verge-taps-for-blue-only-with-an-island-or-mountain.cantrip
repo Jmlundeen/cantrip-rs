@@ -1,0 +1,21 @@
+# Riverpyre Verge: its {U} ability is offered only while you control an Island or a Mountain (CR 602.5b). Alone it
+# makes {R}; once a Mountain is in play (an Island would do as well) it makes {U}.
+
+[Bot1 Deck]
+Riverpyre Verge
+Mountain
+Plains x18
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Riverpyre Verge.Play
+! Bot1.Battlefield.Riverpyre Verge.Activate(Ability: {U})
+Bot1.Battlefield.Riverpyre Verge.Activate(Ability: {R})
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Riverpyre Verge.Activate(Ability: {U})
+
+[Expect]
+Bot1.Mana = {U}

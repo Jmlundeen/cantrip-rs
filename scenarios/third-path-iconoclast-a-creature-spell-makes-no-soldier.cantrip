@@ -1,0 +1,25 @@
+# A creature spell (Ornithopter) is not a noncreature spell, so Third Path Iconoclast makes nothing for it.
+[Bot1 Deck]
+Third Path Iconoclast
+Mox Sapphire
+Mox Ruby
+Ornithopter
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Third Path Iconoclast.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ornithopter.Cast
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Types = Artifact; Creature
+Bot1.Battlefield.Third Path Iconoclast.Power = 2
+Bot1.Battlefield.Third Path Iconoclast.Subtypes = Human; Monk
+Bot1.Battlefield = Mox Ruby; Mox Sapphire; Ornithopter; Third Path Iconoclast

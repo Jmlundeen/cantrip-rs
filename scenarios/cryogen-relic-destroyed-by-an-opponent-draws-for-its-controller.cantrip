@@ -1,0 +1,40 @@
+# Cryogen Relic: "When this artifact enters or leaves the battlefield, draw a card." Leaving by any means triggers it
+# (CR 603.6c, 603.10a), not only through its own sacrifice, and its controller draws: Bot2's Disenchant destroys it on
+# turn 2 and Bot1, not Bot2, draws. Bot1: 7 cards, -3 played, +1 as the Relic enters (5), +1 as Disenchant destroys it (6).
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Cryogen Relic
+Island x3
+Island x3
+Island x14
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Disenchant
+Plains x4
+Plains x14
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Cryogen Relic.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Cryogen Relic)
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Cryogen Relic
+Bot1.Hand.Count = 6
+Bot2.Hand.Count = 5

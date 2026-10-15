@@ -1,0 +1,62 @@
+# Basking Rootwalla's "Activate only once each turn" applies to each instance of the ability on its own (CR 602.5c):
+# a Rootwalla with a +1/+1 counter also has the ability of the Rootwalla card exiled with Agatha's Soul Cauldron, and
+# the two identically worded abilities are each activatable once that turn — 2/2 with the counter, pumped twice to 6/6.
+
+[Bot1 Deck]
+Forest
+Mountain
+Basking Rootwalla
+Basking Rootwalla
+Faithless Looting
+Agatha's Soul Cauldron
+Forest
+Forest x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Basking Rootwalla.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Basking Rootwalla; Forest)
+Bot1.Decline
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Agatha's Soul Cauldron.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Agatha's Soul Cauldron.Activate(Bot1.Graveyard.Basking Rootwalla)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Basking Rootwalla.Power = 2
+[T7 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Basking Rootwalla.Activate(Ability: #1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Basking Rootwalla.Power = 4
+! Bot1.Battlefield.Basking Rootwalla.Activate(Ability: #1)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Basking Rootwalla.Activate(Ability: #2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Basking Rootwalla.Power = 6
+
+[Expect]
+Turn = 7
+Bot1.Battlefield.Basking Rootwalla.Power = 6
+Bot1.Battlefield.Basking Rootwalla.Toughness = 6

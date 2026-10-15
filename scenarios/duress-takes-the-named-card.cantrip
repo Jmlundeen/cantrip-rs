@@ -1,0 +1,24 @@
+# Bot1's Duress sees a hand with two eligible cards and takes the one the script names rather than the first.
+
+[Bot1 Deck]
+Swamp
+Duress
+Swamp x10
+
+[Bot2 Deck]
+Lightning Bolt
+Counterspell
+Guerrilla Gorilla
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Duress.Cast(Bot2)
+Bot1.Choose(Counterspell)
+
+[Expect]
+Turn = 1
+Bot1.Graveyard = Duress
+Bot2.Graveyard = Counterspell
+Bot2.Hand = Island; Island; Island; Island; Lightning Bolt; Guerrilla Gorilla

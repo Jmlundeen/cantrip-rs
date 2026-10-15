@@ -1,0 +1,47 @@
+# "Whenever you cast an artifact spell": the first Emissary does not trigger on its own cast, a Lightning Bolt is no artifact
+# and Bot2's Mox Jet is not cast by Bot1, so no Drone appears on turn 2; on turn 3 the second Emissary, an artifact
+# creature spell, makes one.
+
+[Bot1 Deck]
+Mountain
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Pinnacle Emissary
+Pinnacle Emissary
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Mox Jet
+Island x14
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Pinnacle Emissary.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot1.Pass
+? Bot1.Battlefield.Count = 5
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Pinnacle Emissary.Cast
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mountain; Mox Sapphire; Mox Ruby; Mox Jet; Pinnacle Emissary; Pinnacle Emissary; Drone
+Bot2.Life = 17

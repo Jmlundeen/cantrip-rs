@@ -1,0 +1,34 @@
+# Bot1's tapped Mana Vault (tapped for mana on turn 1) triggers in the turn-3 upkeep; in response Bot2 Disenchants it. The trigger resolves with no Vault left: Bot1 is not asked to pay {4},
+# nothing untaps, and with no Vault there is no draw-step damage (the life total stays 20).
+
+[Bot1 Deck]
+Mox Pearl
+Mana Vault
+Plains x16
+
+[Bot2 Deck]
+Mox Pearl
+Mox Ruby
+Disenchant
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Mana Vault.Cast
+Bot1.Battlefield.Mana Vault.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Upkeep]
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Disenchant.Cast(Mana Vault)
+[T3 Bot1.Main1]
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Mana Vault
+Bot1.Life = 20
+Stack.Count = 0

@@ -1,0 +1,30 @@
+# Tarfire at a creature: "any target" includes creatures. Bot2's Elvish Mystic (1/1) dies to 2 damage.
+
+[Bot1 Deck]
+Mountain
+Tarfire
+Mountain x6
+Mountain x20
+
+[Bot2 Deck]
+Forest
+Forest
+Elvish Mystic
+Forest x24
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Tarfire.Cast(Bot2.Battlefield.Elvish Mystic)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Tarfire
+Bot2.Graveyard = Elvish Mystic
+Bot2.Battlefield.Count = 1

@@ -1,0 +1,6 @@
+{
+  "name": "Flash",
+  "manaCost": "{1}{U}",
+  "type": "Instant",
+  "oracleText": "You may put a creature card from your hand onto the battlefield. If you do, sacrifice it unless you pay its mana cost reduced by {2}."
+}

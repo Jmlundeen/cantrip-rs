@@ -1,0 +1,6 @@
+{
+  "name": "Coveted Jewel",
+  "manaCost": "{6}",
+  "type": "Artifact",
+  "oracleText": "When this artifact enters, draw three cards.\n{T}: Add three mana of any one color.\nWhenever one or more creatures an opponent controls attack you and aren't blocked, that player draws three cards and gains control of this artifact. Untap it."
+}

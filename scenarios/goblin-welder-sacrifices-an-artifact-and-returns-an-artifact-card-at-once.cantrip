@@ -1,0 +1,31 @@
+# Goblin Welder: Bot1 sacrifices Welding Jar to put it in the graveyard, then on turn three taps the Welder to choose its Ornithopter and the Jar card in that same player's graveyard; they swap at once (CR 101.4), so the Jar is back and the Ornithopter gone.
+
+[Bot1 Deck]
+Mountain
+Goblin Welder
+Welding Jar
+Ornithopter
+Mountain
+Mountain x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Goblin Welder.Cast
+Bot1.Hand.Welding Jar.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Welding Jar.Activate(Bot1.Battlefield.Ornithopter)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Goblin Welder.Activate
+Bot1.Target(Ornithopter)
+Bot1.Target(Welding Jar)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Mountain; Goblin Welder; Welding Jar
+Bot1.Graveyard = Ornithopter
+Bot1.Battlefield.Goblin Welder.Tapped = true

@@ -1,0 +1,30 @@
+# X = 1: one life is paid and one damage is dealt to the only target, Ornithopter (0/2), which survives with damage marked.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Fire Covenant
+Swamp x16
+
+[Bot2 Deck]
+Ornithopter
+Forest x19
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Fire Covenant.Cast(X: 1)
+Bot1.Divide(Ornithopter: 1)
+? Bot1.Life = 19
+[Bot1.Main2]
+
+[Expect]
+Bot1.Life = 19
+Bot2.Battlefield.Ornithopter.Damage = 1

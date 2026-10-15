@@ -1,0 +1,26 @@
+# Force of Vigor says "up to two target artifacts and/or enchantments": with zero targets chosen it is still cast and
+# resolves doing nothing. Bot2 casts it on Bot1's turn 1 for its alternative cost (the Elvish Mystic is exiled) with no
+# artifact or enchantment anywhere, and Bot1's lone Island is untouched.
+
+[Bot1 Deck]
+Island
+Island x19
+
+[Bot2 Deck]
+Force of Vigor
+Elvish Mystic
+Forest x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Force of Vigor.Cast(Ability: green card)
+Bot2.Choose(Elvish Mystic)
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Battlefield = Island
+Bot2.Graveyard = Force of Vigor
+Exile = Elvish Mystic

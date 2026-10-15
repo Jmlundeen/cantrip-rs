@@ -1,0 +1,44 @@
+# "Target attacking Cleric, Rogue, Warrior, or Wizard": Llanowar Elves (a Druid) attacks too and is refused (beside the
+# Wizard, Tamiyo, which is chosen). Tamiyo explores a Lightning Bolt: a nonland card, so she gets a +1/+1 counter. (The
+# library is all Lightning Bolts because the venture's land search shuffles it. The initiative's venture on turn 3 puts
+# the Forge's two counters on the Dungeoneer.)
+
+[Bot1 Deck]
+Black Lotus
+Swamp
+Mox Emerald
+Mox Sapphire
+Seasoned Dungeoneer
+Llanowar Elves
+Tamiyo, Inquisitive Student
+Lightning Bolt x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Tamiyo, Inquisitive Student.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Seasoned Dungeoneer.Cast
+Bot1.Search()
+[T3 Bot1.Upkeep]
+Bot1.Modes(Forge)
+Bot1.Target(Seasoned Dungeoneer)
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Seasoned Dungeoneer; Llanowar Elves; Tamiyo, Inquisitive Student)
+! Bot1.Target(Llanowar Elves)
+Bot1.Target(Tamiyo, Inquisitive Student)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Tamiyo, Inquisitive Student.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Tamiyo, Inquisitive Student.Power = 1
+Bot2.Life = 13

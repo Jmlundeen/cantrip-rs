@@ -1,0 +1,6 @@
+{
+  "name": "Upheaval",
+  "manaCost": "{4}{U}{U}",
+  "type": "Sorcery",
+  "oracleText": "Return all permanents to their owners' hands."
+}

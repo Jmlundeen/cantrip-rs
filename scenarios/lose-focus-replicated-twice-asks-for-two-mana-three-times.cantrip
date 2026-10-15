@@ -1,0 +1,58 @@
+# Bot1 casts Guerrilla Gorilla into Lose Focus replicated twice (CR 702.56a): Bot2 pays {1}{U} and {U} twice over, and the
+# "when you cast this spell" trigger copies the spell once per payment, each copy left aimed at the Gorilla. That is
+# three separate "counter unless its controller pays {2}". Bot1 has four Forests spare, pays for both copies, and then
+# has nothing left for the spell itself, so the Gorilla is countered after all.
+
+[Bot1 Deck]
+Guerrilla Gorilla
+Forest x6
+Forest x10
+
+[Bot2 Deck]
+Lose Focus
+Island x5
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot2.Hand.Island.Play
+Bot1.Hand.Forest.Play
+Bot2.Hand.Island.Play
+Bot1.Hand.Forest.Play
+Bot2.Hand.Island.Play
+Bot1.Hand.Forest.Play
+Bot2.Hand.Island.Play
+Bot1.Hand.Forest.Play
+# Bot2's fifth land keeps its hand at seven, so nothing is discarded to hand size before the real turn.
+Bot2.Hand.Island.Play
+[T11 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Lose Focus.Cast(Guerrilla Gorilla; Kicked: 2)
+# Each copy is offered new targets (CR 707.10c) and kept where it was.
+Bot2.Target(Guerrilla Gorilla)
+Bot2.Target(Guerrilla Gorilla)
+# Without the pass Bot1 would tap its Forests the moment it had priority, before the first copy resolved.
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.PayCost
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.PayCost
+Bot1.Decline
+[T11 Bot1.Main2]
+
+[Expect]
+Turn = 11
+Bot1.Battlefield = Forest; Forest; Forest; Forest; Forest; Forest
+Bot1.Graveyard = Guerrilla Gorilla
+Bot2.Graveyard = Lose Focus
+Bot2.Battlefield = Island; Island; Island; Island; Island
+Stack.Count = 0

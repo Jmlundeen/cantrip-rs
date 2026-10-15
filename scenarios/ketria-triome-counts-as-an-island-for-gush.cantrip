@@ -1,0 +1,25 @@
+# Gush's two Islands are by subtype: the Triome (Forest Island Mountain, entering tapped is irrelevant) and a plain Island
+# are returned to the hand, and two cards are drawn.
+
+[Bot1 Deck]
+Island
+Ketria Triome
+Gush
+Island x4
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Ketria Triome.Play
+Bot1.Hand.Gush.Cast(Ability: Return two Islands)
+Bot1.Choose(Island; Ketria Triome)
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Count = 0
+Bot1.Graveyard = Gush
+Bot1.Hand.Count = 9

@@ -1,0 +1,12 @@
+{
+  "name": "Shatterskull Smashing",
+  "manaCost": "{X}{R}{R}",
+  "type": "Sorcery",
+  "oracleText": "Shatterskull Smashing deals X damage divided as you choose among up to two target creatures and/or planeswalkers. If X is 6 or more, Shatterskull Smashing deals twice X damage divided as you choose among them instead.",
+  "backFacePlayableAsLand": true,
+  "backFace": {
+    "name": "Shatterskull, the Hammer Pass",
+    "type": "Land",
+    "oracleText": "As this land enters, you may pay 3 life. If you don't, it enters tapped.\n{T}: Add {R}."
+  }
+}

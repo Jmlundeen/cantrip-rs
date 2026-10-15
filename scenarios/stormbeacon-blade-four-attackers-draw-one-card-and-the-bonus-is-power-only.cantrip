@@ -1,0 +1,39 @@
+# Stormbeacon Blade: "Whenever equipped creature attacks, draw a card if you control three or more attacking creatures" - one
+# trigger for the one equipped creature, so four attackers draw a single card, not one per attacker. "+3/+0" changes power only:
+# the equipped Ornithopter is a 3/2 and Bot2 takes 3 from it (20 to 17). The three attackers beside it are 0/2.
+# Equip {2} is paid with the Lotus's leftover mana; the Blade itself with the Pearl's {W} and one more.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Stormbeacon Blade
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Plains x14
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Stormbeacon Blade.Cast
+Bot1.Battlefield.Stormbeacon Blade.Activate(Bot1.Battlefield.Ornithopter#1)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter#1; Ornithopter#2; Ornithopter#3; Ornithopter#4 > Bot2)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Ornithopter#1.Power = 3
+? Bot1.Battlefield.Ornithopter#1.Toughness = 2
+
+[Expect]
+Bot2.Life = 17
+Bot1.Hand.Count = 2

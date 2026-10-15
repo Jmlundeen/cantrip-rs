@@ -1,0 +1,17 @@
+# Steam Vents: as it enters you may pay 2 life; paying keeps it untapped (and it taps for {U}).
+
+[Bot1 Deck]
+Steam Vents
+Plains x19
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Steam Vents.Play
+Bot1.Accept
+Bot1.Battlefield.Steam Vents.Activate(Ability: {U})
+
+[Expect]
+Bot1.Life = 18
+Bot1.Mana = {U}

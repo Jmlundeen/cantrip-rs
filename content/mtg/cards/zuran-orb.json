@@ -1,0 +1,6 @@
+{
+  "name": "Zuran Orb",
+  "manaCost": "{0}",
+  "type": "Artifact",
+  "oracleText": "Sacrifice a land: You gain 2 life."
+}

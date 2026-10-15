@@ -1,0 +1,62 @@
+# "Target instant or sorcery card in your graveyard" (CR 115.1): with an Ornithopter (a creature card) and Bot2's Lightning
+# Bolt (the wrong graveyard) also in graveyards, Snapcaster's trigger refuses them and takes Bot1's Imperial Seal, a sorcery
+# (the existing scenario takes an instant). The Seal gains flashback {B}, its mana cost: it can be cast from the graveyard in
+# Bot1's main phase, as a sorcery still, and is exiled afterwards (CR 702.34a). Bot1's own Lightning Bolt is the second
+# candidate, left alone.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Imperial Seal
+Lightning Bolt
+Snapcaster Mage
+Ornithopter
+Plains
+Swamp
+Black Lotus
+Plains x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x5
+Mountain x10
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Imperial Seal.Cast
+Bot1.Search(Swamp)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Snapcaster Mage.Cast
+Bot1.Pass
+! Bot1.Target(Ornithopter; Bot2.Graveyard.Lightning Bolt)
+Bot1.Target(Imperial Seal)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Graveyard.Imperial Seal.Cast
+Bot1.Search(Black Lotus)
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Imperial Seal
+Bot1.Life = 16
+Bot2.Life = 17

@@ -1,0 +1,29 @@
+# The additional cost is paid before the spell resolves (CR 601.2h): Bot1 targets its own Chromatic Star and sacrifices it to pay, so the
+# target is gone on resolution and the Rite does nothing (CR 608.2b), though the Star's "put into a graveyard from the battlefield" trigger
+# still draws a card (the hand ends at 5 with it, one more than without). The Rite goes to the graveyard, castable again with flashback.
+
+[Bot1 Deck]
+Plains
+Swamp
+Chromatic Star
+Rite of Oblivion
+Plains x13
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Chromatic Star.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Rite of Oblivion.Cast(Chromatic Star)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Rite of Oblivion; Chromatic Star
+Bot1.Hand.Count = 5
+Exile.Count = 0

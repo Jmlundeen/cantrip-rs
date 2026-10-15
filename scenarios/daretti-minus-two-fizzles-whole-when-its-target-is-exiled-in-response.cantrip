@@ -1,0 +1,46 @@
+# CR 608.2b: the -2's only target, Mox Emerald in Bot1's graveyard, is exiled by Bot2's Ghost Vacuum in response, so the
+# ability does nothing at all: Bot1 is not even asked which artifact to sacrifice and keeps all four Moxen. (Four Moxen pay
+# for Daretti on turn 1; +2 discards Mox Emerald; Bot2 casts Ghost Vacuum on turn 2.)
+
+[Bot1 Deck]
+Daretti, Scrap Savant
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Mox Pearl
+Mox Emerald
+Island
+Island x20
+
+[Bot2 Deck]
+Island
+Ghost Vacuum
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Daretti, Scrap Savant.Cast
+Bot1.Battlefield.Daretti, Scrap Savant.Activate(Ability: Discard up to two)
+Bot1.Choose(Mox Emerald; Island)
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Ghost Vacuum.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Daretti, Scrap Savant.Activate(Ability: Sacrifice an artifact; Bot1.Graveyard.Mox Emerald)
+Bot2.Battlefield.Ghost Vacuum.Activate(Bot1.Graveyard.Mox Emerald)
+! Bot1.Choose
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Mox Emerald
+Bot1.Battlefield = Daretti, Scrap Savant; Mox Ruby; Mox Jet; Mox Sapphire; Mox Pearl
+Bot1.Battlefield.Daretti, Scrap Savant.Counters.Loyalty = 3

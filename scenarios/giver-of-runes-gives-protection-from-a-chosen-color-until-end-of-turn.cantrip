@@ -1,0 +1,58 @@
+# Giver of Runes: "...gains protection from colorless or from the color of your choice until end of turn." Turn 3: Bot1
+# declines colorless and chooses black for its attacking Llanowar Elves; Bot2's Concealing Curtains (black, 0/4) cannot
+# block it (the refusal) though it can block Bot1's other attacker, a Haywire Mite (the positive control, and the
+# second attacker the question needs). Turn 5, the protection over, the Curtains block the Elves.
+
+[Bot1 Deck]
+Plains
+Mox Emerald
+Mox Ruby
+Giver of Runes
+Llanowar Elves
+Haywire Mite
+Plains
+Plains x13
+
+[Bot2 Deck]
+Swamp
+Concealing Curtains
+Swamp x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Giver of Runes.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Haywire Mite.Cast
+Bot1.Pass
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Concealing Curtains.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Giver of Runes.Activate(Llanowar Elves)
+Bot1.Decline
+Bot1.Colors(Black)
+Bot1.Pass
+Bot1.Attack(Llanowar Elves > Bot2; Haywire Mite > Bot2)
+! Bot2.Block(Concealing Curtains > Llanowar Elves)
+Bot2.Block(Concealing Curtains > Haywire Mite)
+[T3 Bot1.Main2]
+? Bot2.Life = 19
+[T5 Bot1.Main1]
+Bot1.Attack(Llanowar Elves > Bot2)
+Bot2.Block(Concealing Curtains > Llanowar Elves)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 19
+Bot2.Battlefield.Concealing Curtains.Damage = 1
+Bot1.Battlefield.Llanowar Elves.Damage = 0

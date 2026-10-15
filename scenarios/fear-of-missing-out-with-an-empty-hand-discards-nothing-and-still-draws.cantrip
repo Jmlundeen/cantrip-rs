@@ -1,0 +1,36 @@
+# Fear of Missing Out: "When this creature enters, discard a card, then draw a card." With no other card in hand the
+# discard does nothing (CR 701.9b: a player discards what they can) and is not asked about, and the draw still happens.
+# Bot1 casts four Ornithopters and Mox Ruby, Mox Emerald and the creature itself: hand 0 when it enters, 1 after the draw.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Fear of Missing Out
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Fear of Missing Out.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 1
+Bot1.Graveyard.Count = 0

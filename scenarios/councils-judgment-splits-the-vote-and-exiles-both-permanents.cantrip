@@ -1,0 +1,41 @@
+# Council's Judgment is a vote (CR 701.38a), not a target: both players are asked, starting with the caster, over the
+# same list of nonland permanents Bot1 does not control. Bot1 votes for the Sol Ring and Bot2 for its own Mox
+# Sapphire, so each has one vote, both are tied for most, and both are exiled at once. Bot2's Plains was never on
+# offer, and neither was Bot1's own Mox Pearl.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Plains
+Council's Judgment
+Plains x12
+
+[Bot2 Deck]
+Plains
+Mox Sapphire
+Sol Ring
+Plains x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Council's Judgment.Cast
+Bot1.Choose(Bot2.Battlefield.Sol Ring)
+Bot2.Choose(Bot2.Battlefield.Mox Sapphire)
+
+[Expect]
+Turn = 3
+Exile = Mox Sapphire; Sol Ring
+Bot1.Battlefield = Mox Pearl; Plains; Plains
+Bot1.Graveyard = Council's Judgment
+Bot2.Battlefield = Plains
+Bot2.Graveyard.Count = 0

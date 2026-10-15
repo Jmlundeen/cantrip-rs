@@ -1,0 +1,21 @@
+# Without the waterbend additional cost, Bot1 draws two (5 + 2 = 7 cards in hand) and the spell ends in exile, not the graveyard.
+
+[Bot1 Deck]
+Black Lotus
+Spirit Water Revival
+Island x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Spirit Water Revival.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 7
+Bot1.Library.Count = 11
+Exile = Spirit Water Revival
+Bot1.Graveyard = Black Lotus

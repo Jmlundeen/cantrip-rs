@@ -1,0 +1,28 @@
+# Sandstorm Salvager: "When this creature enters, create a 3/3 colorless Golem artifact creature token."
+
+[Bot1 Deck]
+Forest x6
+Sandstorm Salvager
+Forest x13
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Sandstorm Salvager.Cast
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Forest#3.Activate
+
+[Expect]
+Bot1.Battlefield.Sandstorm Salvager.Power = 1
+Bot1.Battlefield.Sandstorm Salvager.Toughness = 1
+Bot1.Battlefield.Golem.Power = 3
+Bot1.Battlefield.Golem.Toughness = 3
+Bot1.Battlefield.Golem.Types = Artifact; Creature
+Bot1.Battlefield.Golem.Subtypes = Golem

@@ -1,0 +1,6 @@
+{
+  "name": "Stock Up",
+  "manaCost": "{2}{U}",
+  "type": "Sorcery",
+  "oracleText": "Look at the top five cards of your library. Put two of them into your hand and the rest on the bottom of your library in any order."
+}

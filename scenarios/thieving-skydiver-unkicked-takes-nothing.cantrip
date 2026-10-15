@@ -1,0 +1,28 @@
+# Thieving Skydiver cast unkicked.
+# Cast without paying the kicker, the intervening if of its enters trigger is false: no trigger, and Bot2 keeps its Sol Ring.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Thieving Skydiver
+Island x17
+
+[Bot2 Deck]
+Island
+Sol Ring
+Island x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Thieving Skydiver.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Island; Thieving Skydiver
+Bot2.Battlefield = Island; Sol Ring

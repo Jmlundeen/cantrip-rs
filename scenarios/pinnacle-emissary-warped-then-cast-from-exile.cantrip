@@ -1,0 +1,71 @@
+# Warp, end to end (CR 702.185a). Bot1 casts Pinnacle Emissary off one Island for its warp cost {U/R} on turn 1 — one
+# hybrid mana, paid without a question — and the static ability on the stack creates a delayed triggered ability that
+# exiles the permanent at the beginning of that turn's end step. Nothing goes on the stack for the creation, so Bot2
+# never gets a window for it.
+#
+# It waits in exile until a later turn, where its owner casts it again for its real {1}{U}{R} and not for its warp cost
+# a second time. Mishra's Bauble then gives it an artifact spell to see cast, and the Drone token it makes is a 1/1
+# colourless artifact creature with flying that can block only creatures with flying: when Bot2's Fanatic of Rhonas
+# (no flying, no reach) and Ornithopter (flying) attack on turn 6, the Drone may block the Ornithopter but not the Fanatic.
+
+[Bot1 Deck]
+Island
+Pinnacle Emissary
+Mountain
+Island
+Mishra's Bauble
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Forest
+Forest
+Fanatic of Rhonas
+Forest x3
+Forest x13
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Pinnacle Emissary.Cast(Ability: Warp)
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Count = 2
+? Exile.Count = 0
+
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+? Bot1.Battlefield = Island
+? Exile = Pinnacle Emissary
+Bot1.Hand.Mountain.Play
+
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Fanatic of Rhonas.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Exile.Pinnacle Emissary.Cast
+Bot1.Hand.Mishra's Bauble.Cast
+[T6 Bot2.DeclareAttackers]
+Bot2.Attack(Fanatic of Rhonas > Bot1; Ornithopter > Bot1)
+! Bot1.Block(Drone > Fanatic of Rhonas)
+Bot1.Block(Drone > Ornithopter; Pinnacle Emissary > Fanatic of Rhonas)
+
+[Expect]
+Turn = 6
+Stack.Count = 0
+Exile.Count = 0
+Bot1.Battlefield = Drone; Island; Island; Mishra's Bauble; Mountain; Pinnacle Emissary
+Bot1.Battlefield.Pinnacle Emissary.Power = 3
+Bot1.Battlefield.Pinnacle Emissary.Toughness = 3
+Bot1.Battlefield.Drone.Power = 1
+Bot1.Battlefield.Drone.Toughness = 1
+Bot1.Battlefield.Drone.Types = Artifact; Creature

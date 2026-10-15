@@ -1,0 +1,53 @@
+# Aang, Swift Savior has flash. In response to Bot2's Lightning Bolt aimed at Bot1 (turn 2), Bot1 flashes him in and
+# airbends the Bolt (CR 701.65a): "Exile it. While it's exiled, its owner may cast it for {2} rather than its mana cost."
+# The spell is exiled from the stack, so it does not resolve and is not countered: Bot1 is still at 20. On turn 4 Bot2
+# casts it again from exile for {2} (two Mountains) and Bot1 is at 17.
+
+[Bot1 Deck]
+Plains
+Mox Sapphire
+Mox Pearl
+Mox Emerald
+Aang, Swift Savior
+Plains x20
+
+[Bot2 Deck]
+Lightning Bolt
+Mountain
+Mountain
+Mountain x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Aang, Swift Savior.Cast
+Bot1.Pass
+Bot1.Target(Lightning Bolt)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main2]
+? Bot1.Life = 20
+? Exile.Count = 1
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mountain.Activate
+Bot2.Exile.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Turn = 4
+Bot1.Life = 17
+Exile.Count = 0

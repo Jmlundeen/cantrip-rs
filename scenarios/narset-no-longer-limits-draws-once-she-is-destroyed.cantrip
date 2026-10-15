@@ -1,0 +1,52 @@
+# Narset's draw limit is a static ability of the permanent: once Bot2's Lightning Bolt kills her (3 loyalty after her -2),
+# Bot2, who has already drawn for the turn, may draw all three cards of its Brainstorm. With Narset in play (the other
+# scenario) the same Brainstorm draws none. Bot2 ends turn 2 with its 8 cards, less a Mountain, a Mox Ruby, a Mox Sapphire,
+# the Bolt and the Brainstorm, plus three drawn, less two put back: 4.
+
+[Bot1 Deck]
+Narset, Parter of Veils
+Island
+Mox Sapphire
+Mox Pearl
+Plains
+Plains
+Plains
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Mox Sapphire
+Lightning Bolt
+Brainstorm
+Island
+Island
+Island x13
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Narset, Parter of Veils.Cast
+Bot1.Battlefield.Narset, Parter of Veils.Activate(Ability: Look at the top four)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Narset, Parter of Veils)
+Bot1.Pass
+Bot2.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Brainstorm.Cast
+Bot2.Choose(Island; Island)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Count = 3
+Bot2.Hand.Count = 4

@@ -1,0 +1,56 @@
+# Pyroblast, second mode: "Destroy target permanent if it's blue." Bot1 has two Pyroblasts and two Mox Rubies. On turn 3 it aims
+# the first at Bot2's Llanowar Elves, which is green: it resolves and does nothing, and the Elves survive. The second
+# is aimed at Bot2's Faerie Mastermind, which is blue, and destroys it. (A Mox is colorless, so only a creature can show it.)
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Pyroblast
+Pyroblast
+Island x15
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Emerald
+Mox Jet
+Faerie Mastermind
+Llanowar Elves
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Faerie Mastermind.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Pyroblast.Cast
+Bot1.Modes(2)
+Bot1.Target(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Llanowar Elves.Power = 1
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Pyroblast.Cast
+Bot1.Modes(2)
+Bot1.Target(Faerie Mastermind)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Faerie Mastermind
+Bot2.Battlefield.Llanowar Elves.Power = 1
+Bot1.Graveyard = Pyroblast; Pyroblast

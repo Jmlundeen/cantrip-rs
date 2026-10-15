@@ -1,0 +1,5 @@
+{
+  "name": "Mishra's Workshop",
+  "type": "Land",
+  "oracleText": "{T}: Add {C}{C}{C}. Spend this mana only to cast artifact spells."
+}

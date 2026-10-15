@@ -1,0 +1,35 @@
+# Oath of Druids with an empty library: Bot1 may reveal "until they reveal a creature card", and with nothing to reveal
+# nothing happens at all -- no card moves and Bot1 has not lost (it would only at its next draw, which the script does not
+# reach). Bot1's whole deck is its opening hand.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Oath of Druids
+Swamp
+Swamp
+Swamp
+Swamp
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Oath of Druids.Cast
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot1.Accept
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Graveyard.Count = 0
+Result = InProgress
+Bot1.Battlefield = Forest; Mox Emerald; Oath of Druids

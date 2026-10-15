@@ -1,0 +1,23 @@
+# Boros Garrison: it enters tapped and its trigger returns a land you control (chosen, not targeted) to hand; here
+# the Mountain goes back, and next turn the untapped Garrison taps for {R}{W}.
+
+[Bot1 Deck]
+Mountain
+Boros Garrison
+Plains x18
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Boros Garrison.Play
+Bot1.Choose(Mountain)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Boros Garrison.Activate
+
+[Expect]
+Bot1.Battlefield = Boros Garrison
+Bot1.Hand.Count = 8
+Bot1.Mana = {W}{R}

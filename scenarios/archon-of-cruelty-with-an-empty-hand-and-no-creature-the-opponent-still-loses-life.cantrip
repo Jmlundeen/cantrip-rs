@@ -1,0 +1,62 @@
+# Archon of Cruelty: each part of the trigger does what it can. On turn 3 Bot2 controls only artifacts (no creature or
+# planeswalker to sacrifice, and an artifact is not on offer) and has played its whole hand (nothing to discard), yet it
+# still loses 3 life and Bot1 still draws a card and gains 3. Bot2's graveyard holds only the Mox Pearl the turn-1 enter
+# trigger made it discard, the control that the same trigger does discard when there is a card to discard.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Sol Ring
+Mox Jet
+Mox Ruby
+Mox Pearl
+Archon of Cruelty
+Swamp x10
+
+[Bot2 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Mox Emerald
+Mox Jet
+Mox Ruby
+Mox Pearl
+Sol Ring
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Archon of Cruelty.Cast
+Bot2.Choose(Mox Pearl)
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Mox Jet.Activate
+? Bot2.Hand.Count = 0
+[T3 Bot1.Main1]
+Bot1.Attack(Archon of Cruelty > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Life = 26
+Bot2.Life = 8
+Bot2.Hand.Count = 0
+Bot2.Graveyard = Mox Pearl
+Bot2.Battlefield.Count = 7

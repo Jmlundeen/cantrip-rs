@@ -1,0 +1,33 @@
+# "Reveal the top card of your library and put it into your hand": with no card there is nothing to reveal, so no
+# life is lost either (the mana value of no card is not 0 of a card). Bot1's library is empty by turn 3's attack.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Emerald
+Caustic Bronco
+Swamp
+Swamp
+Swamp
+Swamp
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Caustic Bronco.Cast
+[T3 Bot1.Main1]
+? Bot1.Library.Count = 0
+Bot1.Attack(Caustic Bronco > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Result = InProgress
+Bot1.Life = 20
+Bot1.Hand.Count = 4
+Bot2.Life = 18

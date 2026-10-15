@@ -1,0 +1,48 @@
+# "Whenever you cast a spell of the chosen type" (CR 603.2): Bot2's own Llanowar Elves, cast on turn 2, puts no counter on Bot1's
+# Door of Destinies (Elf is chosen), and Bot2's Elf is no bigger than 1/1 - the bonus is for creatures *you control*. Bot1's
+# Mystic on turn 1 had made one counter (a 2/2); the Llanowar Elves it casts on turn 3 make the second, so both Elves are 3/3.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Emerald
+Door of Destinies
+Elvish Mystic
+Llanowar Elves
+Forest
+Forest x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x12
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Door of Destinies.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Modes(Elf)
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Door of Destinies.Counters.Charge = 1
+? Bot1.Battlefield.Elvish Mystic.Power = 2
+? Bot2.Battlefield.Llanowar Elves.Power = 1
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Door of Destinies.Counters.Charge = 2
+Bot1.Battlefield.Elvish Mystic.Power = 3
+Bot1.Battlefield.Llanowar Elves.Power = 3
+Bot1.Battlefield.Llanowar Elves.Toughness = 3
+Bot2.Battlefield.Llanowar Elves.Power = 1

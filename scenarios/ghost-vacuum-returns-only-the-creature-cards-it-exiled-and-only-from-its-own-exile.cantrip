@@ -1,0 +1,67 @@
+# Bot1 Lightning Bolts its own Ornithopter on turn 1 (a creature card and an instant in its graveyard). Two Ghost Vacuums: the first exiles the Ornithopter on turn 3 and the Bolt on turn 5. On turn 7 the second Vacuum is released
+# with nothing exiled with it: it is sacrificed and nothing returns (the first one's cards are not its). On turn 9 the first Vacuum's {6}, {T}, sacrifice ability is sorcery speed: refused in the beginning of combat with everything
+# untapped, done in main phase 2, returning the Ornithopter as a 1/1 Spirit with a flying counter and leaving the Bolt, which is not a creature, in exile.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Ornithopter
+Ghost Vacuum
+Ghost Vacuum
+Lightning Bolt
+Mountain x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ghost Vacuum.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Ghost Vacuum.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter)
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Ghost Vacuum.Activate(Ability: Exile target; Bot1.Graveyard.Ornithopter)
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Ghost Vacuum.Activate(Ability: Exile target; Bot1.Graveyard.Lightning Bolt)
+Bot1.Pass
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Battlefield.Mountain#4.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Ghost Vacuum#2.Activate(Ability: Put each)
+Bot1.Pass
+? Exile.Count = 2
+[T9 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T9 Bot1.BeginCombat]
+! Bot1.Battlefield.Ghost Vacuum.Activate(Ability: Put each)
+[T9 Bot1.Main2]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Battlefield.Mountain#4.Activate
+Bot1.Battlefield.Mountain#5.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Ghost Vacuum.Activate(Ability: Put each)
+Bot1.Pass
+
+[Expect]
+Exile = Lightning Bolt
+Bot1.Battlefield.Ornithopter.Power = 1
+Bot1.Battlefield.Ornithopter.Counters.Flying = 1
+Bot1.Battlefield.Ornithopter.Subtypes = Spirit; Thopter
+Bot1.Graveyard = Ghost Vacuum; Ghost Vacuum

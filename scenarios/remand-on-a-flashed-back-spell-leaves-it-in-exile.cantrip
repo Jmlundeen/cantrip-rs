@@ -1,0 +1,40 @@
+# Bot1 flashes back Firebolt on turn 3; Bot2 Remands it. Firebolt does no damage (Bot2 is only at 18 from the first cast), is exiled, and does not return to Bot1's hand.
+
+[Bot1 Deck]
+Mox Ruby
+Firebolt
+Black Lotus
+Sol Ring
+Mountain x3
+Mountain x15
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Remand
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Firebolt.Cast(Bot2)
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Graveyard.Firebolt.Cast(Bot2; Ability: Flashback)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Remand.Cast(Firebolt)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Exile = Firebolt
+Bot1.Hand.Count = 4
+Bot1.Graveyard.Count = 1

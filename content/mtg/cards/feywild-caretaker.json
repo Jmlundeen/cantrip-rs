@@ -1,0 +1,8 @@
+{
+  "name": "Feywild Caretaker",
+  "manaCost": "{4}{U}",
+  "type": "Creature — Orc Wizard",
+  "power": 3,
+  "toughness": 4,
+  "oracleText": "When this creature enters, you take the initiative.\nAt the beginning of your end step, if you have the initiative, create a 1/1 blue Faerie Dragon creature token with flying."
+}

@@ -1,0 +1,50 @@
+# X is read on resolution (CR 608.2h): with the trigger on the stack after Brainstorm (four cards drawn this turn, X would be
+# 3), Bot1 draws three more with Ancestral Recall, so X is 6 and Elvish Mystic gets six counters. Bot2's Ornithopter is
+# not a candidate (refusal beside the pick of the Mystic).
+
+[Bot1 Deck]
+Island
+Ornithopter
+Mox Sapphire
+Mox Pearl
+Proft's Eidetic Memory
+Mox Emerald
+Elvish Mystic
+Brainstorm
+Ancestral Recall
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Island x16
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Proft's Eidetic Memory.Cast
+Bot1.Pass
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Brainstorm.Cast
+Bot1.Choose(Island; Island)
+[T3 Bot1.BeginCombat]
+! Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Target(Elvish Mystic)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Elvish Mystic.Counters.PlusOnePlusOne = 6
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = (absent)

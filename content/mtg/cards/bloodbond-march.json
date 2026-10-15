@@ -1,0 +1,6 @@
+{
+  "name": "Bloodbond March",
+  "manaCost": "{2}{B}{G}",
+  "type": "Enchantment",
+  "oracleText": "Whenever a player casts a creature spell, each player returns all cards with the same name as that spell from their graveyard to the battlefield."
+}

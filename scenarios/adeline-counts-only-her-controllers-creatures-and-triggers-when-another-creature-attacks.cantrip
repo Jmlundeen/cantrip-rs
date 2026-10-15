@@ -1,0 +1,34 @@
+# Adeline's power counts only creatures Bot1 controls ("you control"), so Bot2's Ornithopter adds nothing: with Bot1's own
+# Ornithopter she is a 2/4. "Whenever you attack" does not need Adeline to attack: Ornithopter attacks alone, Adeline
+# stays home, and the Human token still arrives tapped and attacking Bot2 (CR 508.4); Adeline is then a 3/4.
+
+[Bot1 Deck]
+Black Lotus
+Adeline, Resplendent Cathar
+Ornithopter
+Plains x17
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Adeline, Resplendent Cathar.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Adeline, Resplendent Cathar.Power = 2
+Bot1.Attack(Ornithopter > Bot2)
+Bot1.Pass
+Bot2.Pass
+? Combat.Attackers = Ornithopter > Bot2; Human > Bot2
+? Bot1.Battlefield.Adeline, Resplendent Cathar.Power = 3
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 19
+Bot1.Battlefield.Adeline, Resplendent Cathar.Tapped = False
+Bot1.Battlefield = Adeline, Resplendent Cathar; Ornithopter; Human

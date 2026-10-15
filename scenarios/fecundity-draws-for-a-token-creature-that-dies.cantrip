@@ -1,0 +1,46 @@
+# Fecundity: "Whenever a creature dies" includes a token, which is put into the graveyard before it ceases to exist
+# (CR 700.4, 111.7), and the creature's controller is asked even when that is Fecundity's own controller. Bot1 casts
+# Fecundity (three Moxen) and a Lingering Souls (a Black Lotus), then bolts one of its own Spirit tokens on turn 3 and
+# accepts the draw.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Ruby
+Fecundity
+Black Lotus
+Lingering Souls
+Lightning Bolt
+Plains x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Fecundity.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Lingering Souls.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Spirit)
+Bot1.Pass
+Bot1.Accept
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Hand.Count = 2
+Bot1.Battlefield.Count = 5

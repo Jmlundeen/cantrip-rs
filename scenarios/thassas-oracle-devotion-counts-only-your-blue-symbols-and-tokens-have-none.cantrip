@@ -1,0 +1,63 @@
+# Thassa's Oracle: "X is your devotion to blue" - each {U} in the mana costs of permanents you control. Bot1 controls Oko
+# ({1}{G}{U}: one), a Food token Oko made (no mana cost: none) and the Oracle itself ({U}{U}: two), so X = 3; Bot2's Faerie
+# Mastermind ({1}{U}) is not counted. Bot1 looks at exactly three cards, keeps Mountain on top, and puts the two Swamps on
+# the bottom. The library is larger than 3, so nobody wins.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Sapphire
+Oko, Thief of Crowns
+Island
+Thassa's Oracle
+Island
+Island
+Mountain
+Swamp
+Swamp
+Plains x8
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Faerie Mastermind
+Island x4
+Island x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Oko, Thief of Crowns.Cast
+Bot1.Pass
+Bot1.Battlefield.Oko, Thief of Crowns.Activate(Ability: Food)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Faerie Mastermind.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Thassa's Oracle.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Mountain | Swamp; Swamp)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Result = InProgress
+Bot1.Library.Count = 11

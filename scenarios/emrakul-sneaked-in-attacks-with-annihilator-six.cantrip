@@ -1,0 +1,69 @@
+# Emrakul, the Aeons Torn: "Flying, protection from spells that are one or more colors, annihilator 6". On turn 2 Bot2
+# lays out eight permanents. On turn 3 Bot1 casts Sneak Attack (Black Lotus, Mox Ruby and a Mountain) and puts Emrakul
+# onto the battlefield with its {R} ability; hasty, it attacks, and annihilator 6 makes Bot2 sacrifice six of its eight
+# permanents, keeping Sol Ring and Black Lotus. Emrakul's 15 flying damage leaves Bot2 at 5. At the end step Sneak Attack
+# sacrifices Emrakul, and as it goes to the graveyard it shuffles the graveyard (the Lotus too) into the library.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mox Ruby
+Sneak Attack
+Emrakul, the Aeons Torn
+Mountain
+Mountain x14
+
+[Bot2 Deck]
+Island
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Mox Emerald
+Sol Ring
+Black Lotus
+Island x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sneak Attack.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Sneak Attack.Activate
+Bot1.Choose(Emrakul, the Aeons Torn)
+Bot1.Pass
+Bot1.Attack(Emrakul, the Aeons Torn > Bot2)
+Bot2.Choose(Island; Mox Pearl; Mox Jet; Mox Ruby; Mox Sapphire; Mox Emerald)
+[T3 Bot1.Main2]
+? Bot2.Life = 5
+[T4 Bot2.Upkeep]
+
+[Expect]
+Bot2.Battlefield = Sol Ring; Black Lotus
+Bot1.Graveyard.Count = 0
+Bot1.Library.Count = 14

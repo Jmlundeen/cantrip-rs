@@ -1,0 +1,36 @@
+# Mind's Desire with storm: after three Moxen and Black Lotus (four spells cast before it) there are four copies, and
+# the original and each copy shuffles the library and exiles its top card, which may be played this turn without paying
+# its cost. The library is all Mountains so the shuffle cannot matter: five are exiled, and one is played as the land
+# drop straight from exile.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mind's Desire
+Mountain
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Mind's Desire.Cast
+[Bot1.Main2]
+Bot1.Exile.Mountain.Play
+
+[Expect]
+Bot1.Battlefield.Mountain.Tapped = false
+Exile.Count = 4
+Stack.Count = 0
+Bot1.Library.Count = 8

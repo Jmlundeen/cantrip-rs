@@ -1,0 +1,9 @@
+[package]
+name = "cantrip-api"
+description = "The public surface card code is written against: types, queries, operations, the request kinds. The only engine crate card code may depend on."
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+[dependencies]
+cantrip-state.workspace = true

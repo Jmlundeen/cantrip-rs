@@ -1,0 +1,8 @@
+{
+  "name": "Satyr Wayfinder",
+  "manaCost": "{1}{G}",
+  "type": "Creature — Satyr",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "When this creature enters, reveal the top four cards of your library. You may put a land card from among them into your hand. Put the rest into your graveyard."
+}

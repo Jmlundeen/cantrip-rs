@@ -1,0 +1,33 @@
+# Once Upon a Time: the free cast is an option ("you may cast it without paying"), not a requirement: as Bot1's first spell
+# it is cast for its mana cost, {1}{G} from a Forest and a Mox Emerald (the "without" way is the other option; see the
+# other scenarios). "You may reveal a creature or land card" is optional too: of the top five, an Ornithopter and an
+# Island qualify, and Bot1 takes neither; all five go to the bottom, leaving the hand with six cards.
+
+[Bot1 Deck]
+Once Upon a Time
+Forest
+Mox Emerald
+Island x4
+Ornithopter
+Island
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Once Upon a Time.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot1.Arrange( | Ornithopter; Island; Lightning Bolt; Lightning Bolt; Lightning Bolt)
+
+[Expect]
+Bot1.Hand.Count = 4
+Bot1.Library.Count = 15
+Bot1.Graveyard = Once Upon a Time

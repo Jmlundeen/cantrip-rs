@@ -1,0 +1,37 @@
+# Shardmage's Rescue (flash): "as long as this Aura entered this turn, enchanted creature has hexproof", and +1/+1.
+# Cast in response to Bot2's Lightning Bolt on turn 2, it makes Llanowar Elves hexproof so the Bolt has no legal target and
+# fizzles; by turn 3 the Aura did not enter this turn, the hexproof is gone and only the +1/+1 is left.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Llanowar Elves
+Shardmage's Rescue
+Forest x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x5
+Mountain x10
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Shardmage's Rescue.Cast(Bot1.Battlefield.Llanowar Elves)
+[T2 Bot2.Main2]
+? Bot1.Battlefield.Llanowar Elves.Keywords = Hexproof
+? Bot1.Battlefield.Llanowar Elves.Power = 2
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Keywords = (absent)
+Bot1.Battlefield.Llanowar Elves.Power = 2
+Bot1.Battlefield.Shardmage's Rescue.AttachedTo = Llanowar Elves
+Bot2.Graveyard = Lightning Bolt

@@ -1,0 +1,23 @@
+# "Any number of cards": Bot1 chooses none of its five other cards, so none goes to the bottom, none is ordered, and it draws just the one.
+
+[Bot1 Deck]
+Black Lotus
+Valakut Awakening
+Island
+Plains
+Swamp
+Mox Sapphire
+Island x6
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Valakut Awakening.Cast
+Bot1.Choose()
+
+[Expect]
+Bot1.Hand.Count = 6
+Bot1.Library.Count = 4

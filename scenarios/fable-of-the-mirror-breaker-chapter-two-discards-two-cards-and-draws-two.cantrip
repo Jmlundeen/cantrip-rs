@@ -1,0 +1,33 @@
+# Fable of the Mirror-Breaker, chapter II: "You may discard up to two cards. If you do, draw that many cards." Bot1 discards
+# two (Island and Swamp) of its four cards and draws two Forests: the hand ends at four cards (Plains and three Forests),
+# the two discards join the spent Black Lotus in the graveyard. Chapter I's Goblin Shaman arrives on turn 1 as Fable is cast
+# with the Black Lotus's three red mana.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Black Lotus
+Fable of the Mirror-Breaker
+Island
+Swamp
+Plains
+Forest x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Fable of the Mirror-Breaker.Cast
+[T3 Bot1.Main1]
+Bot1.Choose(Island; Swamp)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Fable of the Mirror-Breaker.Counters.Lore = 2
+Bot1.Hand = Plains; Forest; Forest; Forest
+Bot1.Graveyard.Count = 3
+Bot1.Library.Count = 10

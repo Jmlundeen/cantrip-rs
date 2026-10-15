@@ -1,0 +1,32 @@
+# Weaponize the Monsters: {2}, sacrifice a creature: it deals 2 damage to any target. Bot1 pays with two Moxen, sacrifices
+# its Ornithopter (the only creature, so it is not asked) and burns Bot2.
+
+[Bot1 Deck]
+Mox Ruby
+Weaponize the Monsters
+Mox Jet
+Mox Pearl
+Ornithopter
+Swamp x2
+Swamp x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Weaponize the Monsters.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Weaponize the Monsters.Activate(Bot2)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot2.Life = 18
+Bot1.Graveyard = Ornithopter
+Bot1.Battlefield = Mox Ruby; Mox Jet; Mox Pearl; Weaponize the Monsters

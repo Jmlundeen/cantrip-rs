@@ -1,0 +1,34 @@
+# Daze has two ways to be cast: "You may return an Island you control to its owner's hand rather than pay this spell's mana
+# cost" is optional. Bot1, holding an Island and a Mox Sapphire, casts it for its mana cost {1}{U} with no Ability: named
+# (CR 601.2b: the printed cost), and the Island stays on the battlefield, tapped; Bot2 has no mana left, so Duress is countered.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Daze
+Island x4
+Island x10
+
+[Bot2 Deck]
+Swamp
+Duress
+Swamp x16
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Duress.Cast(Bot1)
+Bot1.Hand.Daze.Cast(Duress)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield = Island; Mox Sapphire
+Bot1.Battlefield.Island.Tapped = true
+Bot1.Graveyard = Daze
+Bot2.Graveyard = Duress

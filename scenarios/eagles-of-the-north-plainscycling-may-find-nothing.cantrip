@@ -1,0 +1,23 @@
+# A search for a quality may find nothing (CR 701.23b): with Plains in the library, Bot1 still takes none, and the
+# Eagles are in the graveyard all the same.
+
+[Bot1 Deck]
+Island
+Eagles of the North
+Island x5
+Plains
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Eagles of the North.Activate
+Bot1.Search()
+
+[Expect]
+Bot1.Graveyard = Eagles of the North
+Bot1.Hand.Count = 5
+Bot1.Library.Count = 11

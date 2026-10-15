@@ -1,0 +1,61 @@
+# Shelldock Isle's "{U}, {T}: You may play the exiled card ..." is linked to its own hideaway ability (CR 607.2a), and
+# an Isle that leaves the battlefield and comes back is a new object with no memory of the old one (CR 400.7).
+#
+# Turn 1: Bot1 plays Shelldock Isle and hides Black Lotus, then casts Mox Sapphire and Sol Ring. Turn 2: Bot2's Strip
+# Mine destroys the Isle. Turn 3: Bot1 casts Crucible of Worlds and plays the Isle again from its graveyard; the new
+# Isle's hideaway hides Mox Ruby. Turn 5: the new Isle's ability plays Mox Ruby - the card it exiled itself - and
+# Black Lotus, exiled by the old Isle, stays in exile. It is face down there, so the dump names it only by count
+# (Exile.Count = 1); it is on no battlefield, hand or graveyard. Every library holds twenty or fewer cards throughout.
+# Black Lotus is deliberately the card exiled first: were the new Isle wrongly linked to both, the older card is the one
+# a first-found or first-offered pick would reach, and Bot1.Accept would put Black Lotus, not Mox Ruby, onto the
+# battlefield, which the exact Bot1.Battlefield below refuses.
+
+[Bot1 Deck]
+Shelldock Isle
+Mox Sapphire
+Sol Ring
+Crucible of Worlds
+Island
+Island
+Island
+Black Lotus
+Island x3
+Island
+Mox Ruby
+Island x3
+Island x5
+
+[Bot2 Deck]
+Strip Mine
+Swamp x19
+
+[Actions]
+Bot1.Hand.Shelldock Isle.Play
+Bot1.Arrange(Black Lotus | Island; Island; Island)
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+? Exile.Count = 1
+[T2 Bot2.Main1]
+Bot2.Hand.Strip Mine.Play
+Bot2.Battlefield.Strip Mine.Activate(Shelldock Isle; Ability: Destroy)
+[T3 Bot1.Main1]
+Bot1.Hand.Crucible of Worlds.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Graveyard.Shelldock Isle.Play
+Bot1.Arrange(Mox Ruby | Island; Island; Island)
+? Exile.Count = 2
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Shelldock Isle.Activate(Ability: {U}, {T}: You may play)
+Bot1.Battlefield.Island.Activate
+Bot1.Accept
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Exile.Count = 1
+Bot1.Battlefield = Shelldock Isle; Island; Mox Sapphire; Sol Ring; Crucible of Worlds; Mox Ruby
+Bot1.Graveyard.Count = 0
+Bot1.Hand = Island; Island; Island; Island

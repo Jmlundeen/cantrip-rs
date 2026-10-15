@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>cantrip-web-host</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- WebClientFiles, which is how the Discord bot serves the client too. -->
+    <ProjectReference Include="..\..\src\Cantrip.Server.Host\Cantrip.Server.Host.csproj" />
+  </ItemGroup>
+
+</Project>

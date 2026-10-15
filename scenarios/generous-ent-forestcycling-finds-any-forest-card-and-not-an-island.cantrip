@@ -1,0 +1,23 @@
+# Forestcycling {1} searches for a card with the Forest subtype (CR 702.29e): Bayou (Swamp Forest) is one, an Island is
+# not (the refusal sits beside the card found).
+
+[Bot1 Deck]
+Generous Ent
+Island x6
+Island
+Bayou
+Island x10
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Generous Ent.Activate(Ability: Forestcycling)
+! Bot1.Search(Island)
+Bot1.Search(Bayou)
+
+[Expect]
+Bot1.Graveyard = Generous Ent
+Bot1.Hand = Island; Island; Island; Island; Island; Bayou

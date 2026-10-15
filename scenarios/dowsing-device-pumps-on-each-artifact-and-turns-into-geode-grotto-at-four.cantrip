@@ -1,0 +1,45 @@
+# Dowsing Device's one trigger covers its own entry and another artifact's: Ornithopter gets +1/+0 and haste from each, and when
+# Mind Stone is the fourth artifact the Device transforms into Geode Grotto, whose pump on a later turn counts the three artifacts left.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Ornithopter
+Sol Ring
+Dowsing Device
+Mind Stone
+Mountain
+Mountain x12
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Dowsing Device.Cast
+Bot1.Target(Ornithopter)
+? Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Hand.Mind Stone.Cast
+Bot1.Target(Ornithopter)
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Geode Grotto.Activate(Ability: {2}{R}; Bot1.Battlefield.Ornithopter)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mountain; Mountain; Mountain; Ornithopter; Sol Ring; Geode Grotto; Mind Stone
+Bot1.Battlefield.Ornithopter.Power = 3
+Bot1.Battlefield.Ornithopter.Keywords = Flying; Haste
+Bot1.Battlefield.Geode Grotto.Types = Land

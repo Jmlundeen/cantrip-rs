@@ -1,0 +1,42 @@
+# Stern Scolding counters a creature spell with power or toughness 2 or less (Bot2's Llanowar Elves), and is not offered
+# against a creature spell with both above 2 (Bot2's Sheoldred, the Apocalypse, a 4/5). Bot1 keeps a second Scolding
+# and an untapped Mox Sapphire for the refusal.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Stern Scolding
+Stern Scolding
+Island x12
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Black Lotus
+Mox Jet
+Sheoldred, the Apocalypse
+Swamp x11
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Stern Scolding.Cast(Llanowar Elves)
+? Stack = Stern Scolding; Llanowar Elves
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Sheoldred, the Apocalypse.Cast
+! Bot1.Hand.Stern Scolding.Cast
+Bot1.Pass
+
+[Expect]
+Bot2.Graveyard = Black Lotus; Llanowar Elves
+Bot2.Battlefield = Forest; Mox Jet; Sheoldred, the Apocalypse

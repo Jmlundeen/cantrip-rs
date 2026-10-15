@@ -1,0 +1,42 @@
+# Does Machines: "Gain the next level as a sorcery to add its ability" (CR 716.2, 716.3). Level 2 is not gained on the
+# opponent's turn (turn 2, with the mana untapped: the sorcery timing refuses it), is gained on Bot1's own turn 3 (the
+# positive control), level 3 is not available at level 1, and level 2 is not available again at level 2. With no artifact
+# card in the graveyard (the loot milled and discarded Islands), "up to two target artifact cards" has no target: the
+# trigger is put on the stack with none and nothing is asked.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Does Machines
+Island x3
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Does Machines.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Choose(Island; Island)
+[T2 Bot2.Main1]
+! Bot1.Battlefield.Does Machines.Activate(Ability: Level 2)
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Does Machines.Activate(Ability: Level 3)
+Bot1.Battlefield.Does Machines.Activate(Ability: Level 2)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Target
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Does Machines.ClassLevel = 2
+! Bot1.Battlefield.Does Machines.Activate(Ability: Level 2)
+
+[Expect]
+Bot1.Battlefield.Does Machines.ClassLevel = 2

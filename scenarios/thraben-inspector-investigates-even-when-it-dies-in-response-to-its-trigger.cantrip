@@ -1,0 +1,32 @@
+# The trigger exists independently of its source (CR 113.7a): Bot2 Lightning Bolts Thraben Inspector with the investigate trigger on the stack, the Inspector dies, and Bot1 still gets a Clue.
+
+[Bot1 Deck]
+Plains
+Plains
+Thraben Inspector
+Plains x12
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x13
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Thraben Inspector.Cast
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Thraben Inspector)
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Thraben Inspector
+Bot1.Battlefield.Clue Token.Types = Artifact

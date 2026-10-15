@@ -1,0 +1,35 @@
+# Cycling {3} (CR 702.29): the second Indatha Triome in hand is discarded for three Moxen's mana and Bot1 draws a card.
+# The Triome on the battlefield, a Plains Swamp Forest by type (CR 305.6), taps for {W} on turn 3 and for {G} on turn 5 -
+# with the existing scenario's {B}, all three colours of the reminder text.
+
+[Bot1 Deck]
+Indatha Triome
+Indatha Triome
+Mox Ruby
+Mox Emerald
+Mox Jet
+Island x3
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Indatha Triome.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Indatha Triome.Activate(Ability: Cycling)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Indatha Triome.Activate(Ability: {W})
+? Bot1.Mana = {W}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Indatha Triome.Activate(Ability: {G})
+? Bot1.Mana = {G}
+
+[Expect]
+Turn = 5
+Bot1.Graveyard = Indatha Triome

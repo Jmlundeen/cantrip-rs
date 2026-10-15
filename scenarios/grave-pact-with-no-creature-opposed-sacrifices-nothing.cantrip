@@ -1,0 +1,40 @@
+# Bot2 controls no creature: when Bot1's Ornithopter dies there is nothing for it to sacrifice, and its Sol Ring and Forest
+# stay (only creatures are sacrificed, CR 701.21a).
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Grave Pact
+Ornithopter
+Mox Ruby
+Lightning Bolt
+Swamp
+Swamp x13
+
+[Bot2 Deck]
+Forest
+Sol Ring
+Forest x18
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Grave Pact.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+! Bot2.Choose
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Ornithopter; Lightning Bolt; Black Lotus
+Bot2.Graveyard.Count = 0
+Bot2.Battlefield = Forest; Sol Ring

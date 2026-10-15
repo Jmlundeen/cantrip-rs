@@ -1,0 +1,38 @@
+# "{T}: Add {C}{C}{C}" needs it untapped. Turn 1: Black Lotus pays for the Monolith, which taps for mana. Turn 3, still tapped (it skipped its untap step): tapping it for mana is refused. Three Moxen pay
+# for "{3}: Untap this artifact." and then it taps again for {C}{C}{C} (the positive control: the same activation, once untapped).
+
+[Bot1 Deck]
+Black Lotus
+Basalt Monolith
+Mox Ruby
+Mox Jet
+Mox Pearl
+Island
+Island
+Island x8
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Basalt Monolith.Cast
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Add)
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+! Bot1.Battlefield.Basalt Monolith.Activate(Ability: Add)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Add)
+? Bot1.Mana = {C}{C}{C}
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Basalt Monolith.Tapped = true

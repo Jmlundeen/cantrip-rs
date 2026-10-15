@@ -1,0 +1,45 @@
+# Aura Shards: whenever a creature you control enters, you may destroy target artifact or enchantment. The target is
+# chosen as the trigger goes on the stack and the "may" is asked as it resolves: Bot1 destroys Bot2's Mox Ruby with the
+# first Ornithopter and declines with the second, so its own Mox Jet stays.
+
+[Bot1 Deck]
+Forest
+Mox Pearl
+Mox Jet
+Aura Shards
+Ornithopter
+Ornithopter
+Forest
+Forest x8
+
+[Bot2 Deck]
+Island
+Mox Ruby
+Island x13
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Aura Shards.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Target(Bot2.Battlefield.Mox Ruby)
+Bot1.Accept
+[T3 Bot1.Main2]
+? Bot2.Battlefield = Island
+Bot1.Hand.Ornithopter.Cast
+Bot1.Target(Bot1.Battlefield.Mox Jet)
+Bot1.Decline
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot2.Graveyard = Mox Ruby
+Bot1.Battlefield = Forest; Mox Pearl; Mox Jet; Aura Shards; Ornithopter; Ornithopter

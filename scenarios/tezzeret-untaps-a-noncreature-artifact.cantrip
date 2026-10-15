@@ -1,0 +1,23 @@
+# The 0 ability untaps a noncreature artifact without adding a +1/+1 counter.
+[Bot1 Deck]
+Tezzeret, Cruel Captain
+Black Lotus
+Mox Sapphire
+Island x4
+Island x15
+
+[Bot2 Deck]
+Forest x22
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Tezzeret, Cruel Captain.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Tezzeret, Cruel Captain.Activate(Mox Sapphire; Ability: Untap target)
+
+[Expect]
+Bot1.Battlefield.Mox Sapphire.Tapped = false
+Bot1.Battlefield.Mox Sapphire.Types = Artifact
+Bot1.Battlefield.Tezzeret, Cruel Captain.Counters.Loyalty = 5

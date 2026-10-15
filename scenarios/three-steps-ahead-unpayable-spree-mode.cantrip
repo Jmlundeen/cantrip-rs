@@ -1,0 +1,39 @@
+# Three Steps Ahead with one Island: spree (CR 702.172a) is cast with at least one mode, each adding its own cost,
+# so {U} alone never casts it. With the stack empty and no creature, the draw mode ({2}) is the only one eligible, and
+# one Island cannot pay for it. A cast that cannot be paid is not offered (CR 601.2, 118.3), so the card is refused with
+# the {U} still floating, where a bot once announced it, chose that mode, found {2} it could not pay, gave it up and
+# announced it again for ever. The positive control is turn 6, with three Islands: the same cast, the draw mode, is
+# offered and paid.
+
+[Bot1 Deck]
+Island
+Island x14
+
+[Bot2 Deck]
+Island
+Three Steps Ahead
+Island x13
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+! Bot2.Hand.Three Steps Ahead.Cast
+? PriorityPlayer = Bot2
+? Stack.Count = 0
+? Bot2.Mana = {U}
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island#1.Activate
+Bot2.Battlefield.Island#2.Activate
+Bot2.Battlefield.Island#3.Activate
+Bot2.Hand.Three Steps Ahead.Cast
+Bot2.Modes(3)
+Bot2.Choose(Island)
+
+[Expect]
+Turn = 6
+Stack.Count = 0
+Bot2.Graveyard = Three Steps Ahead; Island

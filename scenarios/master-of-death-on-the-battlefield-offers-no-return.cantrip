@@ -1,0 +1,42 @@
+# At its owner's upkeep Master of Death on the battlefield is not in the graveyard, so nothing triggers.
+
+[Bot1 Deck]
+Island
+Swamp
+Island
+Master of Death
+Island
+Island
+Island
+Island
+Island
+Mana Leak
+Counterspell
+Island x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Swamp x5
+Swamp x14
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Master of Death.Cast
+Bot1.Arrange(Mana Leak | Counterspell)
+[T7 Bot1.Upkeep]
+? Stack.Count = 0
+[T7 Bot1.Main1]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield = Island; Swamp; Island; Master of Death

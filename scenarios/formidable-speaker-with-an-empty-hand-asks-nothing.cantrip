@@ -1,0 +1,38 @@
+# "When this creature enters, you may discard a card. If you do, search your library for a creature card": with no card in hand there is
+# nothing to discard, so nothing is asked and nothing is searched for (CR 701.9). Bot1 puts its whole hand onto the battlefield on turn
+# 1 (five Moxen and a Black Lotus are free) and casts the Speaker last; the library, with a creature in it, is untouched.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Pearl
+Mox Ruby
+Mox Sapphire
+Black Lotus
+Formidable Speaker
+Llanowar Elves
+Island x10
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Formidable Speaker.Cast
+Bot1.Pass
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 0
+Bot1.Library.Count = 11
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Formidable Speaker.Types = Creature

@@ -1,0 +1,43 @@
+# The second ability "triggers only once each turn" (CR 603.2h): two Reanimates in one turn copy only the first
+# creature that returned. The Gorilla returned first, so the Gorilla is the only token and the Mystic is not copied.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Swamp
+Twilight Diviner
+Reanimate
+Reanimate
+Swamp
+Swamp
+Swamp
+Guerrilla Gorilla
+Elvish Mystic
+Swamp x10
+
+[Bot2 Deck]
+Forest x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Twilight Diviner.Cast
+Bot1.Arrange( | Guerrilla Gorilla; Elvish Mystic)
+[T7 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Reanimate.Cast(Guerrilla Gorilla)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Reanimate.Cast(Elvish Mystic)
+
+[Expect]
+Turn = 7
+Stack.Count = 0
+Bot1.Battlefield = Swamp; Swamp; Swamp; Swamp; Twilight Diviner; Guerrilla Gorilla; Guerrilla Gorilla; Elvish Mystic

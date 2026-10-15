@@ -1,0 +1,30 @@
+# Black Lotus is an artifact spell before it is an ability: cast on turn 3 it can be countered. Bot2 (Mox Sapphire and an
+# Island, played on turn 2) counters it with Counterspell, so it goes from the stack to the graveyard unsacrificed and
+# never produces mana. The mana ability itself is not on the stack, so it cannot be responded to once it is on the
+# battlefield (the control is every other Lotus scenario).
+
+[Bot1 Deck]
+Black Lotus
+Island x15
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Island x15
+
+[Actions]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Black Lotus)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Black Lotus
+Bot1.Battlefield.Count = 0
+Bot1.Mana =
+Bot2.Graveyard = Counterspell

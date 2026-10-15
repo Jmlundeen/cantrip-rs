@@ -1,0 +1,40 @@
+# Ertai Resurrected's second mode destroys another target creature, and that creature's controller draws a card: Bot1
+# destroys Bot2's Ornithopter (the only creature but Ertai itself, which "another" excludes), so Bot2 draws.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Ertai Resurrected
+Island
+Island
+Island x16
+
+[Bot2 Deck]
+Ornithopter
+Mountain x6
+Mountain x16
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ertai Resurrected.Cast
+Bot1.Modes(2)
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield = Island; Mox Sapphire; Mox Jet; Mox Ruby; Ertai Resurrected
+Bot2.Graveyard = Ornithopter
+Bot2.Hand.Count = 8

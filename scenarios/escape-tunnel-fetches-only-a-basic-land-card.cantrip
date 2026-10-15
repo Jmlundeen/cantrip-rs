@@ -1,0 +1,24 @@
+# "A basic land card": a nonbasic land (Volcanic Island) and a nonland card are not offered, a basic Forest is, and it
+# enters tapped.
+
+[Bot1 Deck]
+Escape Tunnel
+Island x6
+Volcanic Island
+Lightning Bolt
+Forest
+Island x9
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Escape Tunnel.Play
+Bot1.Battlefield.Escape Tunnel.Activate(Ability: Search your library)
+! Bot1.Search(Volcanic Island)
+! Bot1.Search(Lightning Bolt)
+Bot1.Search(Forest)
+
+[Expect]
+Bot1.Battlefield = Forest
+Bot1.Battlefield.Forest.Tapped = true

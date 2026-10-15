@@ -1,0 +1,35 @@
+# Overload (CR 702.96a): Damn cast for {2}{W}{W} has no target and destroys every creature, its caster's own included.
+
+[Bot1 Deck]
+Sol Ring
+Damn
+Ornithopter
+Plains x20
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Damn.Cast(Ability: Overload)
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Sol Ring.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Damn; Ornithopter
+Bot1.Battlefield = Plains; Plains; Sol Ring
+Bot2.Battlefield = Island
+Bot2.Graveyard = Ornithopter
+Stack.Count = 0

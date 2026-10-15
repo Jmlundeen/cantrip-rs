@@ -1,0 +1,40 @@
+# Shifting Woodland: Wheel of Fortune fills the graveyard with a sorcery, an artifact, a creature and a land (delirium, CR 207.2c), so its {2}{G}{G} ability may be activated; it becomes a copy of the Ornithopter card in the graveyard until end of turn (CR 707.2), an Ornithopter named so.
+
+[Bot1 Deck]
+Sol Ring
+Mountain
+Shifting Woodland
+Wheel of Fortune
+Ornithopter
+Black Lotus
+Mox Emerald
+Forest
+Mountain x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mountain.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Shifting Woodland.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+! Bot1.Battlefield.Shifting Woodland.Activate(Ability: Delirium)
+Bot1.Hand.Wheel of Fortune.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Pass
+Bot1.Battlefield.Shifting Woodland.Activate(Bot1.Graveyard.Ornithopter; Ability: Delirium)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Mountain; Sol Ring; Mox Emerald; Ornithopter
+Bot1.Battlefield.Ornithopter.Types = Artifact; Creature
+Bot1.Battlefield.Ornithopter.Tapped = true
+Bot1.Battlefield.Ornithopter.Keywords = Flying

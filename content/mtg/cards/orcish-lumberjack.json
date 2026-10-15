@@ -1,0 +1,8 @@
+{
+  "name": "Orcish Lumberjack",
+  "manaCost": "{R}",
+  "type": "Creature — Orc",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "{T}, Sacrifice a Forest: Add three mana in any combination of {R} and/or {G}."
+}

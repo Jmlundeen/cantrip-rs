@@ -1,0 +1,47 @@
+# Bonecrusher Giant: "Whenever this creature becomes the target of a spell, ..." — a spell, and nothing else. On turn 8
+# Bot2 casts Flametongue Kavu; the Kavu spell targets nothing, and its enters trigger, which does target the Giant, is an
+# ability rather than a spell. The Giant dies to the 4 damage and Bot2 takes none.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Mountain
+Bonecrusher Giant
+Mountain x12
+
+[Bot2 Deck]
+Mountain
+Mountain
+Mountain
+Mountain
+Flametongue Kavu
+Mountain x11
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Hand.Bonecrusher Giant.Cast
+[T6 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T8 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mountain#2.Activate
+Bot2.Battlefield.Mountain#3.Activate
+Bot2.Battlefield.Mountain#4.Activate
+Bot2.Hand.Flametongue Kavu.Cast
+Bot2.Target(Bonecrusher Giant)
+[T8 Bot2.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot1.Graveyard = Bonecrusher Giant
+Bot2.Battlefield = Mountain; Mountain; Mountain; Mountain; Flametongue Kavu

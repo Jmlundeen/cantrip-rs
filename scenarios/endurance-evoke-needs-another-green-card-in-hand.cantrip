@@ -1,0 +1,32 @@
+# Endurance's evoke cost, "Exile a green card from your hand" (CR 118.9): the Endurance being cast is on the stack, not in
+# the hand, so with only non-green cards beside it the evoke is not offered (! Cast with Ability: Evoke). On turn 3 a Llanowar
+# Elves is drawn and the same evoke is offered and taken (the positive control): the Elves are exiled.
+
+[Bot1 Deck]
+Endurance
+Forest
+Mountain
+Forest
+Mountain
+Forest
+Forest
+Llanowar Elves
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+! Bot1.Hand.Endurance.Cast(Ability: Evoke)
+[T3 Bot1.Main1]
+Bot1.Hand.Endurance.Cast(Ability: Evoke)
+Bot1.Choose(Llanowar Elves)
+Bot1.Pass
+Bot1.Target(Bot1)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Llanowar Elves
+Bot1.Battlefield = Forest

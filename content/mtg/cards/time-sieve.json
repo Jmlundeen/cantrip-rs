@@ -1,0 +1,6 @@
+{
+  "name": "Time Sieve",
+  "manaCost": "{U}{B}",
+  "type": "Artifact",
+  "oracleText": "{T}, Sacrifice five artifacts: Take an extra turn after this one."
+}

@@ -1,0 +1,6 @@
+{
+  "name": "Demonic Tutor",
+  "manaCost": "{1}{B}",
+  "type": "Sorcery",
+  "oracleText": "Search your library for a card, put that card into your hand, then shuffle."
+}

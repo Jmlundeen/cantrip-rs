@@ -1,0 +1,29 @@
+# Strip Mine may target itself (it is a land when the ability is announced). The cost, tapping and sacrificing it, is paid
+# first (CR 602.2b), so the target is gone when the ability resolves and it does nothing (CR 608.2b): Bot1's Forest and
+# Bot2's Island are untouched. Strip Mine is in its owner's graveyard.
+
+[Bot1 Deck]
+Strip Mine
+Forest
+Forest x5
+Forest x10
+
+[Bot2 Deck]
+Island
+Island x6
+Island x10
+
+[Actions]
+Bot1.Hand.Strip Mine.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Strip Mine.Activate(Ability: Destroy; Strip Mine)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Strip Mine
+Bot1.Battlefield = Forest
+Bot2.Battlefield = Island

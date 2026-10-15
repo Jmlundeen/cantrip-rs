@@ -1,0 +1,41 @@
+# Liliana of the Veil's −2: "Target player sacrifices a creature." The target player chooses which (CR 701.21a): Bot2
+# keeps its Llanowar Elves and sacrifices its Guerrilla Gorilla, and Liliana goes from 3 loyalty to 1.
+
+[Bot1 Deck]
+Swamp x3
+Liliana of the Veil
+Island x20
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest
+Guerrilla Gorilla
+Forest x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest#1.Activate
+Bot2.Battlefield.Forest#2.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Swamp#3.Activate
+Bot1.Hand.Liliana of the Veil.Cast
+Bot1.Battlefield.Liliana of the Veil.Activate(Bot2; Ability: sacrifices a creature)
+Bot2.Choose(Guerrilla Gorilla)
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Liliana of the Veil.Counters.Loyalty = 1
+Bot2.Graveyard = Guerrilla Gorilla
+Bot2.Battlefield = Forest; Forest; Llanowar Elves

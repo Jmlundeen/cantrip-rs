@@ -1,0 +1,11 @@
+{
+  "name": "Generous Plunderer",
+  "manaCost": "{1}{R}",
+  "type": "Creature — Human Rogue",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Menace\nAt the beginning of your upkeep, you may create a Treasure token. When you do, target opponent creates a tapped Treasure token.\nWhenever this creature attacks, it deals damage to defending player equal to the number of artifacts they control.",
+  "keywords": [
+    "Menace"
+  ]
+}

@@ -1,0 +1,37 @@
+# "Pay life equal to its mana value rather than pay its mana cost": a player can't pay more life than their life total
+# (CR 119.4). Bot1 casts Bolas's Citadel on turn 1 and then Griselbrand (mana value 8) twice off the top of the library, 20 -> 12 -> 4
+# life. The third Griselbrand on top can't be cast for 8 life (the refusal; the first two casts are its positive control).
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Mox Sapphire
+Bolas's Citadel
+Griselbrand x3
+Swamp x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Bolas's Citadel.Cast
+Bot1.Library.Griselbrand.Cast
+Bot1.Library.Griselbrand.Cast
+Bot1.Pass
+! Bot1.Library.Griselbrand.Cast
+[Bot1.Main2]
+
+[Expect]
+Bot1.Life = 4
+Bot1.Library.Count = 9

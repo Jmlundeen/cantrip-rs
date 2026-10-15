@@ -1,0 +1,35 @@
+# Dawn of a New Age with no creature to count has no hope counter. In response to its end-step trigger Bot1 destroys it
+# with Disenchant. There was no counter to remove (no card is drawn), its last known state has none, so "sacrifice it and
+# you gain 4 life" still happens as far as it can: it cannot be sacrificed again, and the life is gained.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Dawn of a New Age
+Disenchant
+Island x13
+
+[Bot2 Deck]
+Island x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dawn of a New Age.Cast
+Bot1.Pass
+[T1 Bot1.End]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Disenchant.Cast(Dawn of a New Age)
+[T2 Bot2.Main1]
+
+[Expect]
+Bot1.Life = 24
+Bot1.Graveyard = Disenchant; Dawn of a New Age
+Bot1.Hand.Count = 1

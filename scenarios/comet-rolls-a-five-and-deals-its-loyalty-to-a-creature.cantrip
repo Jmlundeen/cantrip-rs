@@ -1,0 +1,45 @@
+# Comet, Stellar Pup rolls a 5, the other face of "4 or 5": Bot1 chooses Bot2's Llanowar Elves as the ability resolves. Comet
+# (five loyalty) deals 5 to it, so it dies, and then loses 2 loyalty (CR 120.3, 606.4).
+
+[Dice]
+5
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Sol Ring
+Comet, Stellar Pup
+Island x20
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Comet, Stellar Pup.Cast
+Bot1.Pass
+Bot1.Battlefield.Comet, Stellar Pup.Activate
+Bot1.Pass
+Bot1.Target(Llanowar Elves)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Llanowar Elves
+Bot2.Life = 20
+Bot1.Battlefield.Comet, Stellar Pup.Counters.Loyalty = 3

@@ -1,0 +1,40 @@
+# Bot1 casts Burst Lightning kicked (CR 702.33) off a Mountain and four Moxen: 4 damage to Bot2 instead of 2. On its
+# next turn it casts the second one with two mana floating, which is not enough to kick it and does not: 2 damage.
+# 20 - 4 - 2 = 14.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Emerald
+Mox Jet
+Mox Pearl
+Burst Lightning
+Burst Lightning
+Island x5
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Burst Lightning.Cast(Bot2; Kicked: 1)
+[Bot1.Main2]
+? Bot2.Life = 16
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Burst Lightning.Cast(Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Bot1.Graveyard = Burst Lightning; Burst Lightning

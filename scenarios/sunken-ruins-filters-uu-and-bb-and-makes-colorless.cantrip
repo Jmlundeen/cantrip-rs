@@ -1,0 +1,35 @@
+# Sunken Ruins: "{T}: Add {C}." and "{U/B}, {T}: Add {U}{U}, {U}{B}, or {B}{B}." Turn 3 an Island pays {U/B} for {U}{U};
+# turn 5 a Swamp pays it for {B}{B}; turn 7 the Ruins tap for {C} alone.
+
+[Bot1 Deck]
+Mountain
+Sunken Ruins
+Island
+Swamp
+Swamp x4
+Swamp x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Sunken Ruins.Play
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Sunken Ruins.Activate(Ability: {U/B}, {T})
+Bot1.Colors(Blue; Blue)
+? Bot1.Mana = {U}{U}
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Sunken Ruins.Activate(Ability: {U/B}, {T})
+Bot1.Colors(Black; Black)
+? Bot1.Mana = {B}{B}
+[T7 Bot1.Main1]
+Bot1.Battlefield.Sunken Ruins.Activate(Ability: {T}: Add {C})
+? Bot1.Mana = {C}
+
+[Expect]
+Bot1.Life = 20

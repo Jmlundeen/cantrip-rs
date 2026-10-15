@@ -1,0 +1,61 @@
+# The hidden card is a Swamp, which is played, not cast (CR 305.1, 608.2g), so it needs a land play left (CR 305.2). On turn 5
+# Bot1 has already played its Forest: the three different powers (2, 1, 0) are there but nothing is asked and the Swamp
+# stays hidden (the refused Accept says it is not asked). On turn 7 the same activation
+# comes before any land play: Bot1 is asked, accepts, and the Swamp enters.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Ornithopter
+Plains
+Llanowar Elves
+Collector's Cage
+Forest
+Forest
+Forest
+Forest
+Swamp
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Collector's Cage.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Llanowar Elves#1.Activate
+Bot1.Arrange(Swamp | Forest; Forest; Forest; Forest)
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Collector's Cage.Activate(Bot1.Battlefield.Llanowar Elves#2)
+Bot1.Battlefield.Forest.Activate
+! Bot1.Accept
+[T5 Bot1.Main2]
+? Exile.Count = 1
+? Bot1.LandsPlayed = 1
+[T7 Bot1.Main1]
+Bot1.Battlefield.Collector's Cage.Activate(Bot1.Battlefield.Llanowar Elves#2)
+Bot1.Battlefield.Forest.Activate
+Bot1.Accept
+[T7 Bot1.Main2]
+
+[Expect]
+Turn = 7
+Exile.Count = 0
+Bot1.Battlefield.Swamp.Types = Land
+Bot1.LandsPlayed = 1
+Bot1.Battlefield.Llanowar Elves#2.Power = 3

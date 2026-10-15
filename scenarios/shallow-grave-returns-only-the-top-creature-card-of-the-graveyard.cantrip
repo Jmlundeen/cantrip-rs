@@ -1,0 +1,60 @@
+# Shallow Grave: "Return the top creature card of your graveyard to the battlefield." Bot2 Lightning Bolts Bot1's Ornithopter and
+# then its Llanowar Elves on turn 2, so the Elves are the top creature card (the Ornithopter is under them). On turn 3 Bot1 casts
+# Shallow Grave (Mox Jet and Mox Pearl pay): only the Elves return, with haste until end of turn, and they are exiled at the
+# beginning of that turn's end step; the Ornithopter stays in the graveyard.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Pearl
+Ornithopter
+Llanowar Elves
+Shallow Grave
+Island
+Island x15
+
+[Bot2 Deck]
+Mox Ruby
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Ornithopter)
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby#2.Activate
+Bot2.Hand.Lightning Bolt.Cast(Llanowar Elves)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Shallow Grave.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves.Keywords = Haste
+? Bot1.Graveyard = Shallow Grave; Ornithopter
+[T3 Bot1.End]
+[T4 Bot2.Upkeep]
+
+[Expect]
+Exile = Llanowar Elves
+Bot1.Graveyard = Shallow Grave; Ornithopter

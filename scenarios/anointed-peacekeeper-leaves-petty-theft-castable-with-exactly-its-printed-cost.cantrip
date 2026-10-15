@@ -1,0 +1,42 @@
+# Bot1 names Brazen Borrower with Anointed Peacekeeper. On the stack as an Adventure the spell is Petty Theft and has
+# only its characteristics (CR 715.4), so it is not a spell with the chosen name and costs its printed {1}{U}. Bot2 has
+# exactly {U}{U} (an Island and Mox Sapphire), and Petty Theft must be castable and returns Sol Ring to Bot1's hand.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Sol Ring
+Anointed Peacekeeper
+Plains x12
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Brazen Borrower
+Island x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Anointed Peacekeeper.Cast
+Bot1.Name(Brazen Borrower)
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+? Bot2.Mana = {U}{U}
+Bot2.Hand.Brazen Borrower.Cast(Sol Ring; Ability: Adventure)
+? Stack = Petty Theft
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Exile = Brazen Borrower
+Bot1.Hand = Plains; Plains; Plains; Sol Ring
+Bot2.Mana = 

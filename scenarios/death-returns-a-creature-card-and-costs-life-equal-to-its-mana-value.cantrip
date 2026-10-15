@@ -1,0 +1,35 @@
+# Life // Death, a split card (CR 709): Death, cast from the hand for {1}{B}, returns target creature card from its
+# controller's graveyard to the battlefield and they lose life equal to its mana value. Faithless Looting puts Marauding
+# Mako (mana value 1) into Bot1's graveyard on turn 1; on turn 3 Death returns it and Bot1 goes to 19.
+
+[Bot1 Deck]
+Mountain
+Mox Jet
+Faithless Looting
+Life // Death
+Marauding Mako
+Island
+Mountain
+Island x13
+
+[Bot2 Deck]
+Island x13
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Marauding Mako; Island)
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Life // Death.Cast(Ability: Death; Bot1.Graveyard.Marauding Mako)
+Bot1.Pass
+
+[Expect]
+Bot1.Life = 19
+Bot1.Battlefield = Marauding Mako; Mountain; Mountain; Mox Jet

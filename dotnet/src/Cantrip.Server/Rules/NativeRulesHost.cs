@@ -1,0 +1,402 @@
+using System.Text.Json;
+using Cantrip.Protocol;
+
+namespace Cantrip.Server.Rules;
+
+/// <summary>
+/// The native Rust engine behind <see cref="IRulesHost"/>: one game in the <c>cantrip-native-host</c> sidecar, driven
+/// over an <see cref="IHostTransport"/> with the requests and replies of the host's JSON-lines protocol
+/// (<c>crates/cantrip-host</c>).
+/// <para>
+/// Translates nothing. The host emits <c>Cantrip.Protocol</c>'s own types, already projected for each seat and in
+/// each seat's own handle space, so this reads them (<see cref="ProtocolJson"/>) and forwards them. What is kept here
+/// is only what the session asks between steps — the decklists for the welcome, the latest views for who may concede,
+/// the cards asked for as printed — and the answers given, which is how the game is resumed: a fresh deal from the same
+/// seed and decks, and the answers sent again.
+/// </para>
+/// <para>
+/// Under this host a view's <see cref="ObjectView.CardId"/> is the card's name: the engine knows cards by name, and
+/// the client already finds art by the slug of the face's name.
+/// </para>
+/// </summary>
+public sealed class NativeRulesHost : IRulesHost
+{
+    private readonly IHostTransport _transport;
+    private readonly IReadOnlyList<RulesSeat> _seats;
+    private readonly List<int> _seatNumbers;
+    private readonly List<string> _names;
+    private readonly IReadOnlyList<RulesAnswer> _resume;
+    private readonly Dictionary<int, List<DeckCardView>> _decklists = [];
+    private readonly Dictionary<string, ObjectView?> _oracles = new(StringComparer.Ordinal);
+    private readonly List<RulesAnswer> _history = [];
+
+    /// <summary>Each seat's view as of the last step, for the questions a session asks between steps.</summary>
+    private IReadOnlyDictionary<int, PlayerView> _views = new Dictionary<int, PlayerView>();
+
+    private bool _started;
+    private bool _finished;
+    private bool _closed;
+    private GameOutcomeView _outcome;
+    private int _winningTeam;
+
+    /// <summary>
+    /// How far the log has been brought: the host's own count when its events carry a <c>Sequence</c>, else events
+    /// numbered here as they arrive.
+    /// </summary>
+    private long _sequence;
+
+    private NativeRulesHost(IHostTransport transport, IReadOnlyList<RulesSeat> seats, IReadOnlyList<RulesAnswer> resume)
+    {
+        _transport = transport;
+        _seats = seats;
+        _resume = resume;
+        _seatNumbers = [.. Enumerable.Range(1, seats.Count)];
+        _names = [.. seats.Select(seat => seat.Name)];
+    }
+
+    /// <summary>The host's id for this game, in every request after the first.</summary>
+    public int GameId { get; private set; }
+
+    /// <summary>
+    /// Deals a new game in the host, or deals one again and gives it <paramref name="history"/>'s answers once more
+    /// when <see cref="Start"/> is called: a game is resumed the way it always was.
+    /// </summary>
+    /// <exception cref="RulesRejectedException">The host would not deal it: a deck names a card it does not know.</exception>
+    public static NativeRulesHost NewGame(
+        IHostTransport transport,
+        IReadOnlyList<RulesSeat> seats,
+        ulong seed,
+        RulesGameOptions options,
+        IReadOnlyList<RulesAnswer>? history = null)
+    {
+        ArgumentNullException.ThrowIfNull(transport);
+        ArgumentNullException.ThrowIfNull(seats);
+        ArgumentNullException.ThrowIfNull(options);
+
+        if (seats.Count == 0)
+        {
+            throw new ArgumentException("A game needs at least one seat.", nameof(seats));
+        }
+
+        var host = new NativeRulesHost(transport, seats, history ?? []);
+        NewGameReply dealt = host.Send<NewGameReply>(new
+        {
+            Cmd = "NewGame",
+            Seats = seats.Select(seat => new { seat.Name, seat.Deck }).ToList(),
+            Seed = seed,
+            options.Shuffle,
+            options.FirstPlayer,
+            options.Chooser,
+        });
+
+        host.GameId = dealt.GameId;
+        foreach (int seat in host._seatNumbers)
+        {
+            host._decklists[seat] = Decklist(dealt.Decklists.TryGetValue(seat, out List<ObjectView>? cards) ? cards : []);
+        }
+
+        return host;
+    }
+
+    /// <summary>
+    /// A deck as the welcome lists it: by name, with how many, in name order, each as printed. The host sends the deck
+    /// card by card in deck order, which is the one thing a decklist must not say.
+    /// </summary>
+    private static List<DeckCardView> Decklist(IReadOnlyList<ObjectView> cards) =>
+        [.. cards
+            .GroupBy(card => card.CardId, StringComparer.Ordinal)
+            .Select(copies => new DeckCardView { Name = copies.First().Name, Count = copies.Count(), Card = copies.First() })
+            .OrderBy(entry => entry.Name, StringComparer.Ordinal)];
+
+    public IReadOnlyList<int> Seats => _seatNumbers;
+
+    public IReadOnlyList<string> SeatNames => _names;
+
+    /// <summary>A seat's team as the last view says; its own number before any view, which is every seat for itself.</summary>
+    public int Team(int seat) => Summary(seat)?.Team ?? seat;
+
+    public IReadOnlyList<DeckCardView> Decklist(int seat) =>
+        _decklists.TryGetValue(seat, out List<DeckCardView>? deck) ? deck : [];
+
+    public bool IsOver => _finished;
+
+    public GameOutcomeView Outcome => _outcome;
+
+    public int WinningTeam => _winningTeam;
+
+    public IReadOnlyList<RulesAnswer> History => _history;
+
+    public RulesStep Start()
+    {
+        if (_started)
+        {
+            throw new InvalidOperationException("The game has already started.");
+        }
+
+        _started = true;
+        RulesStep step = Take(Send<StepReply>(new { Cmd = "Start", GameId }));
+        if (_resume.Count == 0)
+        {
+            return step;
+        }
+
+        // The recorded answers given again, each to the question then outstanding for its seat. Everything that
+        // happened along the way is published together with the position reached, as a live game
+        // publishes it: a seat joining a resumed game reads the whole log, not just the last move.
+        Dictionary<int, List<(long Sequence, GameEventView View)>> replayed = [];
+        Gather(replayed, step);
+        foreach (RulesAnswer recorded in _resume)
+        {
+            RulesRequest asked = step.Requests.FirstOrDefault(request => request.Seat == recorded.Seat)
+                ?? throw new InvalidOperationException(
+                    $"The history answers for seat {recorded.Seat} where nothing was asked of it, so it does not replay.");
+
+            try
+            {
+                step = Answer(asked.RequestId, recorded.Seat, recorded.Answer);
+            }
+            catch (RulesRejectedException refused)
+            {
+                throw new InvalidOperationException($"The history does not replay: {refused.Code}, {refused.Detail}");
+            }
+
+            Gather(replayed, step);
+        }
+
+        return step with
+        {
+            Events = replayed.ToDictionary(
+                seat => seat.Key,
+                seat => (IReadOnlyList<(long Sequence, GameEventView View)>)seat.Value),
+        };
+    }
+
+    private static void Gather(Dictionary<int, List<(long Sequence, GameEventView View)>> into, RulesStep step)
+    {
+        foreach ((int seat, IReadOnlyList<(long Sequence, GameEventView View)> events) in step.Events)
+        {
+            (into.TryGetValue(seat, out List<(long Sequence, GameEventView View)>? gathered) ? gathered : into[seat] = []).AddRange(events);
+        }
+    }
+
+    public RulesStep Answer(int requestId, int seat, AnswerPayload answer)
+    {
+        ArgumentNullException.ThrowIfNull(answer);
+
+        RulesStep step = Take(Send<StepReply>(new { Cmd = "Answer", GameId, RequestId = requestId, Seat = seat, Answer = answer }));
+        _history.Add(new RulesAnswer(seat, answer));
+        return step;
+    }
+
+    /// <summary>
+    /// Only when conceding ends the game (CR 104.3a, 800.4a), read off the last view the way the rules decide it: the
+    /// seat is in the game, and everyone else still in it is of one team.
+    /// </summary>
+    public bool CanConcede(int seat)
+    {
+        if (!_started || _finished || Summary(seat) is not { Status: PlayerStatusView.Active } me)
+        {
+            return false;
+        }
+
+        PlayerView view = _views.Values.First();
+        return view.Players
+            .Where(player => player.Seat != me.Seat && player.Status == PlayerStatusView.Active)
+            .Select(player => player.Team)
+            .Distinct()
+            .Count() == 1;
+    }
+
+    public RulesStep Concede(int seat)
+    {
+        if (!CanConcede(seat))
+        {
+            throw new InvalidOperationException($"Seat {seat} cannot concede now.");
+        }
+
+        return Take(Send<StepReply>(new { Cmd = "Concede", GameId, Seat = seat }));
+    }
+
+    public PlayerView View(int seat)
+    {
+        if (!_started)
+        {
+            throw new InvalidOperationException("Only a started game has a view.");
+        }
+
+        return Send<ViewReply>(new { Cmd = "View", GameId, Seat = seat }).View
+            ?? throw new InvalidOperationException($"The host sent no view for seat {seat}.");
+    }
+
+    public ObjectView? Oracle(string cardId)
+    {
+        ArgumentNullException.ThrowIfNull(cardId);
+
+        if (!_oracles.TryGetValue(cardId, out ObjectView? card))
+        {
+            card = Send<OracleReply>(new { Cmd = "Oracle", Name = cardId }).Card;
+            _oracles[cardId] = card;
+        }
+
+        return card;
+    }
+
+    public void Dispose()
+    {
+        if (_closed)
+        {
+            return;
+        }
+
+        _closed = true;
+        try
+        {
+            Send<JsonElement>(new { Cmd = "Close", GameId });
+        }
+        catch (Exception error) when (error is InvalidOperationException or IOException or JsonException or RulesRejectedException or ObjectDisposedException)
+        {
+            // Closing is a courtesy to a host that is still there; one that has gone has nothing to close.
+        }
+    }
+
+    private PlayerSummaryView? Summary(int seat) =>
+        _views.Values.FirstOrDefault()?.Players.FirstOrDefault(player => player.Seat == seat);
+
+    /// <summary>A step as the host sent it, with what this side keeps of it noted.</summary>
+    private RulesStep Take(StepReply reply)
+    {
+        _views = reply.Views;
+        _finished = reply.Finished;
+        _outcome = reply.Outcome;
+        _winningTeam = reply.WinningTeam;
+
+        Dictionary<int, IReadOnlyList<(long Sequence, GameEventView View)>> events = [];
+        foreach (int seat in _seatNumbers)
+        {
+            List<(long Sequence, GameEventView View)> numbered = [];
+            foreach (JsonElement element in reply.Events.TryGetValue(seat, out List<JsonElement>? batch) ? batch : [])
+            {
+                // The host's own number when it gives one, so the same event is the same log line for every seat and
+                // a retraction can name it; else counted here, which keeps the log in order and nothing more.
+                long sequence;
+                if (element.ValueKind == JsonValueKind.Object
+                    && element.TryGetProperty("Sequence", out JsonElement given)
+                    && given.ValueKind == JsonValueKind.Number)
+                {
+                    sequence = given.GetInt64();
+                    _sequence = Math.Max(_sequence, sequence);
+                }
+                else
+                {
+                    sequence = ++_sequence;
+                }
+
+                GameEventView view = ProtocolJson.Deserialize<GameEventView>(element)
+                    ?? throw new InvalidOperationException("The host sent a null event.");
+
+                numbered.Add((sequence, view));
+            }
+
+            events[seat] = numbered;
+        }
+
+        List<RulesRequest> requests = [];
+        foreach (RequestReply request in reply.Requests)
+        {
+            PromptPayload prompt = request.Prompt
+                ?? throw new InvalidOperationException($"Request {request.RequestId} carries no prompt.");
+
+            requests.Add(new RulesRequest(
+                request.RequestId,
+                request.Seat,
+                prompt,
+                request.MayCancel,
+                request.Presentation ?? PromptPresentation.Describe(prompt, request.MayCancel, _views.GetValueOrDefault(request.Seat))));
+        }
+
+        return new RulesStep(requests, reply.Views, events, _sequence, reply.Finished);
+    }
+
+    /// <summary>
+    /// One exchange: the request as a JSON line, the reply's <c>Ok</c> read as <typeparamref name="TReply"/>, or its
+    /// <c>Rejected</c> thrown.
+    /// </summary>
+    private TReply Send<TReply>(object request)
+    {
+        string line = ProtocolJson.Serialize(request);
+        string reply = _transport.Exchange(line);
+
+        using JsonDocument document = JsonDocument.Parse(reply);
+        JsonElement root = document.RootElement;
+
+        if (root.ValueKind == JsonValueKind.Object && root.TryGetProperty("Ok", out JsonElement ok))
+        {
+            return ProtocolJson.Deserialize<TReply>(ok)
+                ?? throw new InvalidOperationException($"The host's reply to {Describe(request)} was empty: {reply}");
+        }
+
+        if (root.ValueKind == JsonValueKind.Object && root.TryGetProperty("Rejected", out JsonElement rejected))
+        {
+            string code = rejected.TryGetProperty("Code", out JsonElement codeElement) ? codeElement.GetString() ?? string.Empty : string.Empty;
+            string detail = rejected.TryGetProperty("Detail", out JsonElement detailElement) ? detailElement.GetString() ?? string.Empty : string.Empty;
+
+            throw new RulesRejectedException(
+                Enum.TryParse(code, ignoreCase: false, out ErrorCode known) ? known : ErrorCode.IllegalAnswer,
+                detail.Length > 0 ? detail : $"the host rejected {Describe(request)} with {code}.");
+        }
+
+        throw new InvalidOperationException($"The host's reply to {Describe(request)} is neither Ok nor Rejected: {reply}");
+    }
+
+    private static string Describe(object request) =>
+        request.GetType().GetProperty("Cmd")?.GetValue(request)?.ToString() ?? "a request";
+
+    // --- The replies, as the host writes them. Settable, as everything ProtocolJson reads is. ---
+
+    private sealed class NewGameReply
+    {
+        public int GameId { get; set; }
+
+        public Dictionary<int, List<ObjectView>> Decklists { get; set; } = [];
+    }
+
+    private sealed class StepReply
+    {
+        public List<RequestReply> Requests { get; set; } = [];
+
+        public Dictionary<int, PlayerView> Views { get; set; } = [];
+
+        /// <summary>Each seat's events as elements, so a <c>Sequence</c> the host puts beside the event can be read first.</summary>
+        public Dictionary<int, List<JsonElement>> Events { get; set; } = [];
+
+        public bool Finished { get; set; }
+
+        public GameOutcomeView Outcome { get; set; }
+
+        public int WinningTeam { get; set; }
+    }
+
+    private sealed class RequestReply
+    {
+        public int RequestId { get; set; }
+
+        public int Seat { get; set; }
+
+        public PromptPayload? Prompt { get; set; }
+
+        public bool MayCancel { get; set; }
+
+        /// <summary>Not in the protocol as laid out; read when a host sends it, worked out here when it does not.</summary>
+        public PromptPresentationContext? Presentation { get; set; }
+    }
+
+    private sealed class ViewReply
+    {
+        public PlayerView? View { get; set; }
+    }
+
+    private sealed class OracleReply
+    {
+        public ObjectView? Card { get; set; }
+    }
+}

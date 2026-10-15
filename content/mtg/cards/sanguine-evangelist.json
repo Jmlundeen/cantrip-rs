@@ -1,0 +1,8 @@
+{
+  "name": "Sanguine Evangelist",
+  "manaCost": "{2}{W}",
+  "type": "Creature — Vampire Cleric",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "Battle cry (Whenever this creature attacks, each other attacking creature gets +1/+0 until end of turn.)\nWhen this creature enters or dies, create a 1/1 black Bat creature token with flying."
+}

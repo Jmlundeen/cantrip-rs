@@ -1,0 +1,35 @@
+# Hexproof: Sylvan Caryatid (mana value 2, so within the limit) cannot be targeted by Abrupt Decay (refusal); Mox Sapphire, also within the limit and without
+# hexproof, can (the positive control) and is destroyed.
+
+[Bot1 Deck]
+Forest
+Mox Jet
+Abrupt Decay
+Forest x12
+
+[Bot2 Deck]
+Island
+Black Lotus
+Sylvan Caryatid
+Mox Sapphire
+Island x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Sylvan Caryatid.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Abrupt Decay.Cast(Sylvan Caryatid)
+Bot1.Hand.Abrupt Decay.Cast(Mox Sapphire)
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Graveyard = Mox Sapphire; Black Lotus
+Bot2.Battlefield = Island; Sylvan Caryatid

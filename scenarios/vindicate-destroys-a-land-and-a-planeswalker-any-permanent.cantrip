@@ -1,0 +1,51 @@
+# "Destroy target permanent": not only creatures and artifacts. On turn three Bot1 casts one Vindicate on Bot2's Island and another on
+# Bot2's Dack Fayden (loyalty 3): both are destroyed. Mana: Pearl, Jet and Ruby for the first, a second Pearl and the Black Lotus
+# (black) for the second.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Pearl
+Mox Jet
+Mox Ruby
+Black Lotus
+Vindicate
+Vindicate
+Plains x12
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Dack Fayden
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Dack Fayden.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Vindicate.Cast(Bot2.Battlefield.Island)
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Vindicate.Cast(Bot2.Battlefield.Dack Fayden)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Dack Fayden; Island
+Bot1.Graveyard = Vindicate; Black Lotus; Vindicate

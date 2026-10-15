@@ -1,0 +1,51 @@
+use cantrip_api::*;
+use cantrip_mechanics::targets;
+use cantrip_oracle as oracle;
+
+/// "Each creature you control assigns combat damage equal to its toughness rather than its power" (CR 510.1a).
+fn your_creature(q: &dyn Query, asker: &Asker, creature: ObjectId) -> bool {
+    q.controller(creature) == asker.controller && q.chars(creature).is(CardType::Creature)
+}
+
+/// "Target creature with defender" (CR 115.1).
+fn creature_with_defender(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    (targets::CREATURE.filter)(q, asker, t) && matches!(t, Target::Object(id) if q.chars(id).has(Keyword::Defender))
+}
+
+/// "{G}: Target creature with defender can attack this turn as though it didn't have defender" (CR 702.3b, 609.4).
+fn attack_despite_defender(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if let Some(creature) = targets::object(g, item, 0) {
+        g.add_effect(item.object, creature, EffectKind::CanAttackDespiteDefender, Duration::EndOfTurn);
+    }
+    Ok(())
+}
+
+/// "{2}{G}: Creatures you control get +0/+1 until end of turn."
+fn plus_one_toughness(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    for id in g.permanents_of(item.controller) {
+        if g.chars(id).is(CardType::Creature) {
+            g.add_effect(item.object, id, EffectKind::Pump(0, 1), Duration::EndOfTurn);
+        }
+    }
+    Ok(())
+}
+
+pub static CARD: CardDef = CardDef {
+    abilities: &[
+        AbilityDef::Activated(ActivatedDef {
+            text: "{G}: Target creature with defender can attack this turn as though it didn't have defender.",
+            cost: Cost::mana(mana(0, 0, 0, 0, 0, 1)),
+            targets: &[TargetSpec { min: 1, max: 1, filter: creature_with_defender }],
+            effect: attack_despite_defender,
+            ..ActivatedDef::BLANK
+        }),
+        AbilityDef::Activated(ActivatedDef {
+            text: "{2}{G}: Creatures you control get +0/+1 until end of turn.",
+            cost: Cost::mana(mana(2, 0, 0, 0, 0, 1)),
+            effect: plus_one_toughness,
+            ..ActivatedDef::BLANK
+        }),
+    ],
+    damage_by_toughness: &[your_creature],
+    ..oracle::ASSAULT_FORMATION
+};

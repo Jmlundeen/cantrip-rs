@@ -1,0 +1,19 @@
+# Waterlogged Grove: {T}, pay 1 life: add {G} or {U}. Bot1 taps it for blue and is down to 19 life.
+
+[Bot1 Deck]
+Waterlogged Grove
+Island x6
+Island x10
+
+[Bot2 Deck]
+Swamp x15
+
+[Actions]
+Bot1.Hand.Waterlogged Grove.Play
+Bot1.Battlefield.Waterlogged Grove.Activate(Ability: Add; Color: Blue)
+
+[Expect]
+Turn = 1
+Bot1.Life = 19
+Bot1.Mana = {U}
+Bot1.Battlefield.Waterlogged Grove.Tapped = true

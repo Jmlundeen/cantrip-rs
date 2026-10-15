@@ -1,0 +1,38 @@
+# Mother of Runes: the color is chosen on resolution, and protection makes the target of a spell already on the stack
+# illegal (CR 702.16b, 608.2b). Bot2's Lightning Bolt names Mother; Bot1 taps her in response for protection from red, and
+# the Bolt does nothing. Mother came in on turn 1, but Bot1 has not yet controlled her since the start of its own turn until turn 3, so the Bolt waits for turn 4 (CR 302.6).
+
+[Bot1 Deck]
+Mox Pearl
+Mother of Runes
+Ornithopter
+Plains x4
+Plains x14
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Mother of Runes.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Mother of Runes)
+Bot1.Battlefield.Mother of Runes.Activate(Mother of Runes)
+Bot1.Colors(Red)
+Bot1.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Turn = 4
+Stack.Count = 0
+Bot1.Battlefield.Mother of Runes.Damage = 0
+Bot1.Graveyard.Count = 0
+Bot2.Graveyard = Lightning Bolt

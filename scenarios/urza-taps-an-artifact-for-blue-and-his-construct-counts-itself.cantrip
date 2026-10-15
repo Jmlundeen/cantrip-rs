@@ -1,0 +1,34 @@
+# Urza, Lord High Artificer: "Tap an untapped artifact you control: Add {U}" is a mana ability whose artifact is chosen
+# with the activation (Tap: Sol Ring), and the Construct he makes is "0/0 +1/+1 for each artifact you control": Sol Ring and the
+# Construct itself, so a 2/2. The blue mana casts Preordain.
+
+[Bot1 Deck]
+Island
+Sol Ring
+Island
+Urza, Lord High Artificer
+Preordain
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Island.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Urza, Lord High Artificer.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+[T5 Bot1.Main1]
+Bot1.Battlefield.Urza, Lord High Artificer.Activate(Ability: Add; Tap: Sol Ring)
+Bot1.Hand.Preordain.Cast
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Sol Ring.Tapped = true
+Bot1.Battlefield.Construct.Power = 2
+Bot1.Graveyard = Preordain

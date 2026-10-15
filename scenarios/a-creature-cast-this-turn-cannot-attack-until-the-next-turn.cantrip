@@ -1,0 +1,26 @@
+# Summoning sickness (CR 302.6): the Ornithopter cast in Bot1's main phase on turn 3 is not offered as an attacker, though Mother of Runes is;
+# on turn 5 it may attack.
+
+[Bot1 Deck]
+Plains
+Ornithopter
+Mother of Runes
+Plains x12
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Mother of Runes.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+! Bot1.Attack(Ornithopter > Bot2)
+Bot1.Attack(Mother of Runes)
+[T5 Bot1.Main1]
+Bot1.Attack(Mother of Runes; Ornithopter > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18

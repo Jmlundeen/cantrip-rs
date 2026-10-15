@@ -1,0 +1,58 @@
+# Phlage, Titan of Fire's Fury: cast on turn one it deals 3, gains 3 and is sacrificed; on turn three four Lotus Petals
+# pay its escape cost {R}{R}{W}{W} and five other cards are exiled from the graveyard (the five Petals), and since it
+# escaped it is not sacrificed: it stays on the battlefield and its enters trigger deals 3 and gains 3 once more.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Phlage, Titan of Fire's Fury
+Lotus Petal
+Lotus Petal
+Lotus Petal
+Lotus Petal
+Lotus Petal
+Mountain x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Lotus Petal.Activate(Color: Red)
+Bot1.Hand.Phlage, Titan of Fire's Fury.Cast
+Bot1.Target(Bot2)
+[Bot1.Main2]
+? Bot2.Life = 17
+? Bot1.Graveyard.Count = 2
+[T3 Bot1.Main1]
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Pass
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Pass
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Pass
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Pass
+Bot1.Battlefield.Lotus Petal.Activate(Color: Red)
+Bot1.Battlefield.Lotus Petal.Activate(Color: Red)
+Bot1.Battlefield.Lotus Petal.Activate(Color: White)
+Bot1.Battlefield.Lotus Petal.Activate(Color: White)
+Bot1.Graveyard.Phlage, Titan of Fire's Fury.Cast(Ability: Escape)
+Bot1.Target(Bot2)
+[Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot2.Life = 14
+Bot1.Life = 26
+Bot1.Graveyard.Count = 0
+Exile.Count = 5
+Bot1.Battlefield = Mox Ruby; Mox Pearl; Phlage, Titan of Fire's Fury

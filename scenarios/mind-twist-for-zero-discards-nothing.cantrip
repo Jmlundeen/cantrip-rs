@@ -1,0 +1,21 @@
+# X = 0 is a legal choice: Mind Twist for {B} alone makes Bot2 discard zero cards at random, so its hand is untouched (CR 107.3).
+
+[Bot1 Deck]
+Mox Jet
+Mind Twist
+Island x14
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Mind Twist.Cast(Bot2; X: 0)
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot2.Hand.Count = 7
+Bot2.Graveyard.Count = 0
+Bot1.Graveyard = Mind Twist

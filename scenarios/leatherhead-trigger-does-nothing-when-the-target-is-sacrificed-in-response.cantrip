@@ -1,0 +1,55 @@
+# Leatherhead, Swamp Stalker: the reflexive "destroy target artifact or enchantment that player controls" has one target; when it
+# is gone as the ability resolves, the ability does nothing (CR 608.2b). Turn 3 she connects with Bot2 and Bot1 removes her
+# hexproof counter, targeting Bot2's Mind Stone; Bot2 answers by paying {1} with a Mox Jet it held up and sacrificing the
+# Mind Stone to draw a card. The other Moxen, which were candidates too, are not destroyed.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Mox Jet
+Leatherhead, Swamp Stalker
+Forest x15
+
+[Bot2 Deck]
+Forest
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mind Stone
+Forest x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Leatherhead, Swamp Stalker.Cast
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Mind Stone.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Leatherhead, Swamp Stalker > Bot2)
+Bot1.Accept
+Bot1.Target(Mind Stone)
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mind Stone.Activate(Ability: Draw)
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Mind Stone
+Bot2.Battlefield = Forest; Mox Pearl; Mox Jet; Mox Ruby
+Bot2.Life = 15

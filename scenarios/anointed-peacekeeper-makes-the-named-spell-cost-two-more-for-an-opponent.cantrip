@@ -1,0 +1,42 @@
+# Bot1 casts Anointed Peacekeeper on turn 1 and names Lightning Bolt. On turn 2 Bot2 casts Lightning Bolt with all three
+# of its mana, a Mountain's {R} and Sol Ring's {C}{C}: the Bolt costs {2} more, so nothing is left floating.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Sol Ring
+Anointed Peacekeeper
+Plains x11
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Sol Ring
+Lightning Bolt
+Mountain x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Anointed Peacekeeper.Cast
+Bot1.Name(Lightning Bolt)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Bot1.Life = 17
+Bot2.Mana = 
+Bot1.Graveyard.Count = 0
+Bot2.Graveyard = Lightning Bolt

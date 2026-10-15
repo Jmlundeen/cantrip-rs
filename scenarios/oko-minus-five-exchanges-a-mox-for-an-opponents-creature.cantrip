@@ -1,0 +1,47 @@
+# Oko, Thief of Crowns' -5: "Exchange control of target artifact or creature you control and target creature an
+# opponent controls with power 3 or less." Oko +2 on turn one (6 loyalty), then on turn three Bot1 trades Mox Sapphire
+# for Bot2's Llanowar Elves (a 1/1), leaving Oko on 1.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Sapphire
+Oko, Thief of Crowns
+Forest x3
+Forest x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Oko, Thief of Crowns.Cast
+Bot1.Pass
+Bot1.Battlefield.Oko, Thief of Crowns.Activate(Ability: Food)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Oko, Thief of Crowns.Activate(Ability: Exchange)
+Bot1.Target(Mox Sapphire)
+Bot1.Target(Llanowar Elves)
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield.Oko, Thief of Crowns.Counters.Loyalty = 1
+Bot1.Battlefield.Llanowar Elves.Types = Creature
+Bot2.Battlefield.Mox Sapphire.Types = Artifact

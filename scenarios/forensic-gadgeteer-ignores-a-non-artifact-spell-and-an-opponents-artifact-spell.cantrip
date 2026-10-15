@@ -1,0 +1,43 @@
+# Forensic Gadgeteer: "Whenever you cast an artifact spell, investigate." Bot1 casts a Lightning Bolt (not an artifact
+# spell) with the Gadgeteer on the battlefield, and Bot2 casts a Mox Pearl (an artifact spell, but not Bot1's): neither makes a
+# Clue. (The three Moxen Bot1 casts before the Gadgeteer is on the battlefield make none either; the positive control, its
+# own artifact spell, is forensic-gadgeteer-investigates-on-an-artifact-spell-and-makes-clues-cost-one.)
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Forensic Gadgeteer
+Mountain
+Lightning Bolt
+Island
+Island x13
+
+[Bot2 Deck]
+Mox Pearl
+Island x19
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Forensic Gadgeteer.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+[T3 Bot1.Upkeep]
+
+[Expect]
+Bot1.Battlefield = Mountain; Mox Sapphire; Mox Jet; Mox Ruby; Forensic Gadgeteer
+Bot2.Battlefield = Mox Pearl
+Bot2.Life = 17

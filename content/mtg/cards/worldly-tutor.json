@@ -1,0 +1,6 @@
+{
+  "name": "Worldly Tutor",
+  "manaCost": "{G}",
+  "type": "Instant",
+  "oracleText": "Search your library for a creature card, reveal it, then shuffle and put the card on top."
+}

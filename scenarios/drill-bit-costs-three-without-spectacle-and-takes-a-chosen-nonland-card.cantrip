@@ -1,0 +1,35 @@
+# Spectacle is an alternative cost (CR 702.137a): with no opponent having lost life this turn it is refused, and Drill Bit
+# is cast for its mana cost {2}{B} (three Moxen). The revealed hand (Counterspell, Islands) gives up the nonland card
+# Bot1 chooses; the lands stay.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Drill Bit
+Swamp x3
+Swamp x10
+
+[Bot2 Deck]
+Counterspell
+Island x6
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+! Bot1.Hand.Drill Bit.Cast(Bot2; Ability: Spectacle)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Drill Bit.Cast(Bot2)
+Bot1.Choose(Counterspell)
+
+[Expect]
+Bot2.Graveyard = Counterspell
+Bot2.Hand.Count = 6
+Bot1.Graveyard = Drill Bit

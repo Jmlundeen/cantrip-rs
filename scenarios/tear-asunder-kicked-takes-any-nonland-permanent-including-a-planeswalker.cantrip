@@ -1,0 +1,42 @@
+# Tear Asunder kicked: "exile target nonland permanent instead". Bot2's Forest (a land) is not a candidate (! Target) while its
+# Narset, Parter of Veils (a planeswalker, neither artifact nor enchantment, so out of reach unkicked) is, and is exiled. The
+# kicker {1}{B} is paid with a Mox Jet and a Mox Pearl besides the {1}{G}.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Mox Pearl
+Tear Asunder
+Island
+Island x10
+
+[Bot2 Deck]
+Forest
+Black Lotus
+Narset, Parter of Veils
+Forest x13
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot2.Hand.Forest.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Narset, Parter of Veils.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Tear Asunder.Cast(Kicked: 1)
+! Bot1.Target(Bot2.Battlefield.Forest)
+Bot1.Target(Bot2.Battlefield.Narset, Parter of Veils)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Narset, Parter of Veils
+Bot2.Battlefield = Forest

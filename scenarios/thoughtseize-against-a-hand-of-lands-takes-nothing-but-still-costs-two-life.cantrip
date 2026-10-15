@@ -1,0 +1,25 @@
+# Thoughtseize: "You lose 2 life" is not conditional on the discard. Bot2's hand is seven Islands, no nonland card to
+# choose, so nothing is discarded, and Bot1 still loses 2.
+
+[Bot1 Deck]
+Mox Jet
+Thoughtseize
+Island x5
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Thoughtseize.Cast(Bot2)
+[Bot1.Main2]
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Life = 18
+Bot2.Graveyard.Count = 0
+Bot2.Hand.Count = 7

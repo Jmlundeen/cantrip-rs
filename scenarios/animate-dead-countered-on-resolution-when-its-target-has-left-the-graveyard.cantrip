@@ -1,0 +1,45 @@
+# Animate Dead is an Aura spell that targets a creature card in a graveyard. Bot1's Ornithopter dies on turn 1; on turn 3
+# Bot1 casts Animate Dead on it and Bot2 answers with Ghost Vacuum, exiling the target. The target is illegal on resolution,
+# so the spell is countered (CR 608.2b) and goes to the graveyard without ever entering: no Ornithopter returns and
+# nothing is sacrificed.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Ornithopter
+Cut Down
+Animate Dead
+Swamp
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Plains
+Ghost Vacuum
+Plains x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cut Down.Cast(Ornithopter)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Ghost Vacuum.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Animate Dead.Cast(Bot1.Graveyard.Ornithopter)
+Bot1.Pass
+Bot2.Battlefield.Ghost Vacuum.Activate(Ability: Exile target; Bot1.Graveyard.Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Exile = Ornithopter
+Bot1.Battlefield = Swamp; Swamp; Mox Jet
+Bot1.Graveyard = Animate Dead; Cut Down

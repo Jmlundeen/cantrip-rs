@@ -1,0 +1,53 @@
+# Portal to Phyrexia with no creature anywhere: Bot2 has nothing to sacrifice (and is not asked, ! Choose), and at Bot1's next
+# upkeep no graveyard holds a creature card, so "put target creature card from a graveyard" has no legal target (CR 603.3d)
+# and the trigger is not put on the stack: nothing waits there for Bot1 to answer.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Mountain
+Portal to Phyrexia
+Lotus Petal
+Mountain x12
+
+[Bot2 Deck]
+Forest
+Forest x14
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Lotus Petal.Activate(Color: Red)
+Bot1.Hand.Portal to Phyrexia.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot2.Choose
+[T3 Bot1.Main2]
+[T5 Bot1.Upkeep]
+? Stack.Count = 0
+
+[Expect]
+Turn = 5

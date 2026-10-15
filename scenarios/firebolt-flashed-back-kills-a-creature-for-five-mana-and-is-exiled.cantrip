@@ -1,0 +1,47 @@
+# Firebolt's flashback {4}{R}: castable from the graveyard for five mana, at any target (here
+# a 1/1 creature), and exiled afterwards instead of returning to the graveyard (CR 702.34a).
+# Firebolt is cast on turn 1 for {R}; Bot1 has five lands on turn 9.
+
+[Bot1 Deck]
+Firebolt
+Mountain x6
+Mountain x20
+
+[Bot2 Deck]
+Plains
+Mother of Runes
+Plains x25
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Firebolt.Cast(Bot2)
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Mother of Runes.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+[T9 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Graveyard.Firebolt.Cast(Bot2.Battlefield.Mother of Runes; Ability: Flashback)
+
+[Expect]
+Bot2.Graveyard = Mother of Runes; Plains
+Bot2.Life = 18
+Exile = Firebolt
+Bot1.Graveyard.Count = 0

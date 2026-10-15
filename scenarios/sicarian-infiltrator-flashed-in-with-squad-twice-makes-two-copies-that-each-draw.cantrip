@@ -1,0 +1,46 @@
+# Sicarian Infiltrator ({2}{U}, 1/2; printed Oracle: "Flash / Squad {2} / Benediction of the Omnissiah - When this
+# creature enters, draw a card.") cast with flash on Bot2's upkeep (turn 2), squad paid twice (CR 702.157a): seven
+# mana from Black Lotus, Sol Ring, Mox Sapphire and an Island. It enters with two linked triggers: squad makes two
+# token copies (CR 707.2), and its Benediction draws a card. Each token is a copy, so it has Benediction too and draws
+# a card as it enters (CR 603.6a); a token was never cast, so its own squad ability makes nothing more.
+# Three Infiltrators, three cards drawn.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Pearl
+Sol Ring
+Black Lotus
+Sicarian Infiltrator
+Plains
+Swamp
+Swamp
+Swamp
+Island x10
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Upkeep]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Sicarian Infiltrator.Cast(Kicked: 2)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+
+[Expect]
+Turn = 2
+Step = Upkeep
+Stack.Count = 0
+Bot1.Battlefield = Island; Mox Sapphire; Mox Pearl; Sol Ring; Sicarian Infiltrator; Sicarian Infiltrator; Sicarian Infiltrator
+Bot1.Battlefield.Sicarian Infiltrator#2.Power = 1
+Bot1.Battlefield.Sicarian Infiltrator#3.Toughness = 2
+Bot1.Hand = Plains; Swamp; Swamp; Swamp
+Bot1.Graveyard = Black Lotus

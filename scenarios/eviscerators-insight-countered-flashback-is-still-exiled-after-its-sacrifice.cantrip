@@ -1,0 +1,63 @@
+# Flashback pays the additional cost too: on turn 9 Bot1 pays {4}{B} with five Swamps and sacrifices the Ornithopter. Bot2 counters
+# the flashback with Counterspell and the Insight is exiled anyway - "then exile it" does not need the spell to resolve (CR 702.34a) - the Ornithopter already sacrificed and nothing drawn.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Eviscerator's Insight
+Ornithopter
+Swamp
+Swamp
+Swamp
+Swamp x20
+
+[Bot2 Deck]
+Island
+Island
+Island
+Island
+Counterspell
+Island x15
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Eviscerator's Insight.Cast
+Bot1.Choose(Mox Jet)
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T8 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Graveyard.Eviscerator's Insight.Cast(Ability: Flashback)
+Bot1.Choose(Ornithopter)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Island#2.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Eviscerator's Insight)
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Exile = Eviscerator's Insight
+Bot1.Graveyard = Ornithopter; Mox Jet
+Bot2.Graveyard = Counterspell

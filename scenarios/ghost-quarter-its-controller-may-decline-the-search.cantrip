@@ -1,0 +1,24 @@
+# Ghost Quarter: "Its controller MAY search" - Bot2 declines after its Island is destroyed, so nothing is fetched. The
+# positive control is the neighbouring scenario, where the offer is accepted.
+
+[Bot1 Deck]
+Ghost Quarter
+Island x17
+
+[Bot2 Deck]
+Island x8
+Forest
+Island x9
+
+[Actions]
+Bot1.Hand.Ghost Quarter.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Ghost Quarter.Activate(Ability: Destroy; Bot2.Battlefield.Island)
+Bot2.Decline
+
+[Expect]
+Bot1.Graveyard = Ghost Quarter
+Bot2.Graveyard = Island
+Bot2.Battlefield.Count = 0

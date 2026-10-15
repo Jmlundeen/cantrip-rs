@@ -1,0 +1,33 @@
+# "You can't spend mana to cast this spell": only three creatures could be tapped for convoke, which is short of
+# Hogaak's cost, and the {G} floating from a Lotus Petal pays nothing, so the cast cannot be paid and is not offered at
+# all (CR 601.2, 118.3). Hogaak stays in hand and the mana floating. The sibling scripts that tap seven creatures, or
+# five and two exiled cards, are the positive control.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Ornithopter
+Ornithopter
+Lotus Petal
+Hogaak, Arisen Necropolis
+Forest
+Forest x15
+
+[Bot2 Deck]
+Forest x22
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Battlefield.Lotus Petal.Activate(Color: Green)
+! Bot1.Hand.Hogaak, Arisen Necropolis.Cast
+
+[Expect]
+Bot1.Hand = Forest; Hogaak, Arisen Necropolis
+Bot1.Mana = {G}
+Bot1.Battlefield.Llanowar Elves.Tapped = false
+Bot1.Battlefield.Ornithopter#1.Tapped = false

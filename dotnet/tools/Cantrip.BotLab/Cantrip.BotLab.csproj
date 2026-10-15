@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>cantrip-botlab</AssemblyName>
+
+    <!-- A game per core, each cloning its state on every zone change: the server collector, as cantrip-playtest. -->
+    <ServerGarbageCollection>true</ServerGarbageCollection>
+    <ConcurrentGarbageCollection>false</ConcurrentGarbageCollection>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Cantrip.Client\Cantrip.Client.csproj" />
+    <ProjectReference Include="..\..\src\Cantrip.Client.Embedded\Cantrip.Client.Embedded.csproj" />
+    <ProjectReference Include="..\..\src\Cantrip.Server\Cantrip.Server.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,35 @@
+# With three Mountains in play, Fireblast sacrifices two of them and deals 4 damage to a creature, destroying it; the
+# third Mountain stays.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Fireblast
+Mountain
+Mountain x4
+Mountain x10
+
+[Bot2 Deck]
+Forest
+Forest
+Outland Liberator
+Forest x4
+Forest x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Forest.Play
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Forest#2.Activate
+Bot2.Hand.Outland Liberator.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Fireblast.Cast(Bot2.Battlefield.Outland Liberator; Ability: Sacrifice)
+Bot1.Choose(Mountain; Mountain)
+
+[Expect]
+Bot2.Graveyard = Outland Liberator
+Bot1.Graveyard = Fireblast; Mountain; Mountain
+Bot1.Battlefield = Mountain
+Bot2.Life = 20

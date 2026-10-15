@@ -1,0 +1,33 @@
+# "Sacrifice a creature" is the whole cost: with no creature the ability is refused (cast on turn 1 with Mountain and
+# Mox Jet), and once Elvish Mystic arrives that same turn - summoning sick, which a cost with no {T} does not mind - it
+# is sacrificed for 1 damage to Bot2.
+
+[Bot1 Deck]
+Mountain
+Mox Jet
+Mox Emerald
+Goblin Bombardment
+Elvish Mystic
+Island x12
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Goblin Bombardment.Cast
+Bot1.Pass
+! Bot1.Battlefield.Goblin Bombardment.Activate(Bot2)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Pass
+Bot1.Battlefield.Goblin Bombardment.Activate(Bot2)
+Bot1.Pass
+
+[Expect]
+Bot2.Life = 19
+Bot1.Graveyard = Elvish Mystic

@@ -1,0 +1,8 @@
+{
+  "name": "White Plume Adventurer",
+  "manaCost": "{2}{W}",
+  "type": "Creature — Orc Cleric",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "When this creature enters, you take the initiative.\nAt the beginning of each opponent's upkeep, untap a creature you control. If you've completed a dungeon, untap all creatures you control instead."
+}

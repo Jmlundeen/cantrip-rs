@@ -1,0 +1,65 @@
+# "Equipped creature gets +10/+10 and loses flying." Spectacular Spider-Man gains flying until end of turn on turn 3; the Hammer, attached after that (an Equipment gets a new timestamp when it becomes attached, CR 613.7e),
+# takes it away again and gives +10/+10 (13/12). On turn 5 the flying ability is activated a second time, its effect is newer than the Hammer's, and Spider-Man flies again, still 13/12.
+# Equip {8} "only as a sorcery" and only on a creature you control: refused in the beginning of combat step and on Bot2's Ornithopter, accepted in the second main phase on Spider-Man.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Spectacular Spider-Man
+Colossus Hammer
+Sol Ring
+Black Lotus
+Mox Sapphire
+Island x12
+
+[Bot2 Deck]
+Ornithopter
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Spectacular Spider-Man.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Colossus Hammer.Cast
+Bot1.Battlefield.Sol Ring.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Spectacular Spider-Man.Activate(Ability: gains flying)
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Spectacular Spider-Man.Keywords = Flash; Flying
+[T3 Bot1.BeginCombat]
+! Bot1.Battlefield.Colossus Hammer.Activate(Spectacular Spider-Man)
+[T3 Bot1.Main2]
+! Bot1.Battlefield.Colossus Hammer.Activate(Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Colossus Hammer.Activate(Spectacular Spider-Man)
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Spectacular Spider-Man.Keywords = Flash
+? Bot1.Battlefield.Spectacular Spider-Man.Power = 13
+? Bot1.Battlefield.Spectacular Spider-Man.Toughness = 12
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Spectacular Spider-Man.Activate(Ability: gains flying)
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Spectacular Spider-Man.Keywords = Flash; Flying
+
+[Expect]
+Bot1.Battlefield.Colossus Hammer.AttachedTo = Spectacular Spider-Man
+Bot1.Battlefield.Spectacular Spider-Man.Power = 13

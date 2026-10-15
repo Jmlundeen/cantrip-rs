@@ -1,0 +1,38 @@
+# "Black creature spells you cast cost {1} less" and "Whenever you cast a creature spell" are about Bontu's Monument's controller only.
+# Bot1 controls it; on turn 2 Bot2 casts Dark Confidant ({1}{B}) after tapping Mox Jet and Mox Ruby. The full {1}{B} is spent (a
+# discount would leave the Ruby's red mana floating) and neither life total moves.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Bontu's Monument
+Plains x16
+
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Dark Confidant
+Plains x17
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Bontu's Monument.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Dark Confidant.Cast
+? Bot2.Mana = 
+[Bot2.Main2]
+
+[Expect]
+Bot2.Battlefield = Mox Jet; Mox Ruby; Dark Confidant
+Bot1.Life = 20
+Bot2.Life = 20

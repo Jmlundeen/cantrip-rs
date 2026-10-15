@@ -1,0 +1,50 @@
+# Reach (CR 702.17): Bot2's Ornithopter (flying) attacks on turn 4; Elvish Mystic may not block it (refusal) and
+# Generous Ent may (positive control) and kills it. Then Bot1 pays {2} and sacrifices the Food token for 3 life.
+
+[Bot1 Deck]
+Generous Ent
+Mox Emerald
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Gleemox
+Elvish Mystic
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Green)
+Bot1.Hand.Generous Ent.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Gleemox.Activate(Color: Green)
+Bot1.Hand.Elvish Mystic.Cast
+[T4 Bot2.Main1]
+Bot2.Attack(Ornithopter > Bot1)
+! Bot1.Block(Elvish Mystic > Ornithopter)
+Bot1.Block(Generous Ent > Ornithopter)
+[T4 Bot2.Main2]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Food Token.Activate
+
+[Expect]
+Bot2.Graveyard = Ornithopter
+Bot1.Life = 23
+Bot1.Battlefield.Count = 8

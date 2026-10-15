@@ -1,0 +1,49 @@
+# -5/-5 is not destruction: Quantum Riddler (4/6) becomes -1/1 and survives, and the shrink ends at cleanup, so on
+# turn 4 it is a 4/6 again.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Dismember
+Island x12
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Mox Pearl
+Quantum Riddler
+Island x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Quantum Riddler.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Dismember.Cast(Quantum Riddler)
+Bot1.Modes()
+[T3 Bot1.Main2]
+? Bot2.Battlefield.Quantum Riddler.Power = -1
+? Bot2.Battlefield.Quantum Riddler.Toughness = 1
+[T4 Bot2.Main1]
+
+[Expect]
+Bot2.Battlefield.Quantum Riddler.Power = 4
+Bot2.Battlefield.Quantum Riddler.Toughness = 6

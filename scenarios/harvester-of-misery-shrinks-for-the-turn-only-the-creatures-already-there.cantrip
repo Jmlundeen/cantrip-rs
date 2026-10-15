@@ -1,0 +1,60 @@
+# "Other creatures get -2/-2 until end of turn" (CR 611.2c): the creatures on the battlefield as the trigger resolves are
+# changed - Bot1's own first Ornithopter (0/2) dies, Bot2's Cogwork Librarian (3/3) is a 1/1 - and an Ornithopter
+# Bot1 casts afterwards is untouched (an 0/2 that would die otherwise). The Librarian is a 3/3 again on turn 5. On turn 5 the second
+# Harvester's discard ability is offered from the hand, but not from the Harvester on the battlefield (refusal beside it).
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Swamp
+Harvester of Misery
+Ornithopter
+Ornithopter
+Harvester of Misery
+Swamp x9
+
+[Bot2 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Cogwork Librarian
+Island x12
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Cogwork Librarian.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Harvester of Misery.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main2]
+? Bot1.Graveyard.Count = 2
+? Bot2.Battlefield.Cogwork Librarian.Power = 1
+? Bot1.Battlefield.Ornithopter.Toughness = 2
+[T5 Bot1.Main1]
+? Bot2.Battlefield.Cogwork Librarian.Power = 3
+Bot1.Hand.Swamp.Play
+! Bot1.Battlefield.Harvester of Misery.Activate
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Harvester of Misery.Activate(Bot2.Battlefield.Cogwork Librarian)
+
+[Expect]
+Bot2.Battlefield.Cogwork Librarian.Power = 1
+Bot1.Battlefield.Ornithopter.Toughness = 2

@@ -1,0 +1,6 @@
+{
+  "name": "Goblin Bombardment",
+  "manaCost": "{1}{R}",
+  "type": "Enchantment",
+  "oracleText": "Sacrifice a creature: This enchantment deals 1 damage to any target."
+}

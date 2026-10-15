@@ -1,0 +1,30 @@
+# "Two Islands you control" is by subtype and by controller: an Island of its own and an opponent's Island do not pay
+# it, and once Tundra (Plains Island) arrives, the Island and Tundra do, leaving the opponent's Island where it is.
+
+[Bot1 Deck]
+Island
+Tundra
+Gush
+Island x4
+Island x10
+
+[Bot2 Deck]
+Island
+Island x6
+Island x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot2.Hand.Island.Play
+! Bot1.Hand.Gush.Cast(Ability: Return)
+Bot1.Hand.Tundra.Play
+Bot1.Hand.Gush.Cast(Ability: Return)
+Bot1.Choose(Island; Tundra)
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Count = 0
+Bot1.Graveyard = Gush
+Bot2.Battlefield = Island
+Bot1.Hand.Count = 9

@@ -1,0 +1,38 @@
+# "Target artifact you don't control": Bot1's own Mox Jet and Bot2's Elvish Mystic (not an artifact) are refused (named in the
+# refusals), Bot2's Ornithopter - an artifact creature - is the legal target and is destroyed. A sorcery: refused in Bot2's turn 2
+# with the Ornithopter there and red mana open.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Vandalblast
+Island x14
+
+[Bot2 Deck]
+Forest
+Elvish Mystic
+Ornithopter
+Forest x12
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Pass
+! Bot1.Hand.Vandalblast.Cast(Bot2.Battlefield.Ornithopter)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Hand.Vandalblast.Cast(Bot1.Battlefield.Mox Jet)
+! Bot1.Hand.Vandalblast.Cast(Bot2.Battlefield.Elvish Mystic)
+Bot1.Hand.Vandalblast.Cast(Bot2.Battlefield.Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Ornithopter
+Bot2.Battlefield = Forest; Elvish Mystic
+Bot1.Battlefield = Mox Ruby; Mox Jet

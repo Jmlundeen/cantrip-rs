@@ -1,0 +1,49 @@
+# Echo of Eons: each player shuffles hand and graveyard into their library and draws seven. Bot1 casts it on turn one
+# with an Island and five Moxen, and again from the graveyard for its flashback cost {2}{U} on turn three, after
+# which it is exiled. Every card in the decks is an Island or a Swamp, so which seven are drawn cannot matter.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mox Pearl
+Echo of Eons
+Island x15
+
+[Bot2 Deck]
+Swamp x22
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Echo of Eons.Cast
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 8
+? Bot1.Graveyard = Echo of Eons
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Graveyard.Echo of Eons.Cast(Ability: Flashback)
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Hand.Count = 7
+Bot1.Library.Count = 7
+Bot1.Graveyard.Count = 0
+Exile = Echo of Eons
+Bot2.Hand.Count = 7
+Bot2.Library.Count = 15

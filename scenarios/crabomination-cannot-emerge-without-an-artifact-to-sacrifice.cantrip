@@ -1,0 +1,42 @@
+# Crabomination: "Emerge from artifact {5}{B}{B}" needs an artifact to sacrifice (CR 702.119). On turn 13 Bot1 has seven
+# Swamps and nothing else, so the {5}{B}{B} is all paid for but there is no artifact (or any other sacrifice that would
+# make emerge legal): emerge is not offered (the refusal), and the plain cast for {4}{B}{B} is (the positive control, which
+# then resolves). The existing emerge scenario shows emerge offered once a Mind Stone is on the battlefield.
+
+[Bot1 Deck]
+Swamp x6
+Crabomination
+Swamp x25
+
+[Bot2 Deck]
+Island x40
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T11 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T13 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Swamp#3.Activate
+Bot1.Battlefield.Swamp#4.Activate
+Bot1.Battlefield.Swamp#5.Activate
+Bot1.Battlefield.Swamp#6.Activate
+Bot1.Battlefield.Swamp#7.Activate
+! Bot1.Hand.Crabomination.Cast(Ability: Emerge)
+Bot1.Hand.Crabomination.Cast
+Bot1.Pass
+[T13 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Count = 8
+Bot1.Battlefield.Crabomination.Power = 5

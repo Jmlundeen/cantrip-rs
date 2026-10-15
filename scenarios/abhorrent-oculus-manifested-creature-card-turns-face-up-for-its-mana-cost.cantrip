@@ -1,0 +1,58 @@
+# CR 701.40b, 708.2a, 708.8. A creature card manifested face down is a nameless 2/2 creature that its controller may turn
+# face up at any time they have priority by paying its mana cost: a special action, so it uses no stack, and it is not
+# entering the battlefield, so Snapcaster Mage's "when this enters" does not trigger. Turned face up it is the same
+# permanent, and the card it really is: a 2/1 with flash.
+#
+# Turn 1 is the Abhorrent Oculus opening the other manifest scenarios use. On Bot2's upkeep the Oculus manifests dread:
+# Snapcaster Mage goes onto the battlefield face down and Lightning Bolt into the graveyard. On Bot1's turn 3 the Mage is
+# turned face up for {1}{U}, paid with Sol Ring and Mox Sapphire.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Wheel of Fortune
+Island x4
+Mox Sapphire
+Sol Ring
+Abhorrent Oculus
+Island x4
+Snapcaster Mage
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Wheel of Fortune.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Abhorrent Oculus.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Choose(Island; Island; Island; Island; Black Lotus; Wheel of Fortune)
+[T2 Bot2.Upkeep]
+Bot1.Arrange(Snapcaster Mage | Lightning Bolt)
+[T3 Bot1.Main1]
+? Bot1.Battlefield..FaceDown = true
+? Bot1.Battlefield..FaceDownName = Snapcaster Mage
+? Bot1.Battlefield..Power = 2
+? Bot1.Battlefield..Toughness = 2
+Bot1.Battlefield.#1.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+? Bot1.Battlefield.Snapcaster Mage.FaceDown = (absent)
+[Handover Bot1.Attack]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield.Snapcaster Mage.Power = 2
+Bot1.Battlefield.Snapcaster Mage.Toughness = 1
+Bot1.Battlefield.Snapcaster Mage.Keywords = Flash
+Bot1.Battlefield.Snapcaster Mage.SummoningSick = false
+Bot1.Graveyard = Lightning Bolt

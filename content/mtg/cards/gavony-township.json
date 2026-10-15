@@ -1,0 +1,5 @@
+{
+  "name": "Gavony Township",
+  "type": "Land",
+  "oracleText": "{T}: Add {C}.\n{2}{G}{W}, {T}: Put a +1/+1 counter on each creature you control."
+}

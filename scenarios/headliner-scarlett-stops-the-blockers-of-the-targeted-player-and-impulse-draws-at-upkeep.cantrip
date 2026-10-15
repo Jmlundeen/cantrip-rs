@@ -1,0 +1,40 @@
+# Headliner Scarlett (haste) enters with "creatures target player controls can't block this turn" aimed at Bot2 (CR 509.1b, 611.2c), and hits for 3; at her controller's next upkeep she exiles the top card of the library and Bot1 plays it from exile as its land for the turn.
+
+[Bot1 Deck]
+Sol Ring
+Headliner Scarlett
+Mountain x5
+Mountain x12
+
+[Bot2 Deck]
+Ornithopter
+Island x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mountain.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Headliner Scarlett.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot1.Attack(Headliner Scarlett)
+[T5 Bot1.Main1]
+? Exile.Count = 1
+Bot1.Exile.Mountain.Play
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot2.Life = 17
+Bot2.Battlefield.Ornithopter.Damage = 0
+Exile.Count = 0
+Bot1.LandsPlayed = 1
+Bot1.Battlefield = Mountain; Mountain; Mountain; Sol Ring; Headliner Scarlett

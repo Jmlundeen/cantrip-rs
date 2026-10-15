@@ -1,0 +1,51 @@
+# Skyclave Apparition's two abilities are separate (CR 603.10, 113.7a): Bot2 kills the Apparition with Lightning Bolt in response to its
+# enters trigger. The leaves-the-battlefield trigger goes on the stack above it and resolves first, when nothing has been exiled
+# yet, so no Illusion is made; then the enters trigger resolves and exiles Bot2's Mind Stone for good. Bot2 gets no token.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Skyclave Apparition
+Plains x16
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Mind Stone
+Lightning Bolt
+Plains x14
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Mind Stone.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Pearl#3.Activate
+Bot1.Hand.Skyclave Apparition.Cast
+Bot1.Target(Bot2.Battlefield.Mind Stone)
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Skyclave Apparition)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Mind Stone
+Bot1.Graveyard = Skyclave Apparition
+Bot2.Battlefield = Forest; Mox Emerald; Mox Ruby
+Stack.Count = 0

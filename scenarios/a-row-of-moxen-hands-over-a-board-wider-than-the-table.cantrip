@@ -1,0 +1,40 @@
+# Five different Moxen cast on the first turn beside a Forest, handed over with Bot1 holding priority in that main
+# phase: six permanents none alike, so six piles on one row. At a card size the settings fix large, the row is wider
+# than the table and the half is scrolled across - by the mouse wheel too - and never down. Each Mox is let resolve
+# before the next is cast, rather than cast in answer to the one before.
+
+[Bot1 Deck]
+Forest
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Black Lotus
+Forest x11
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+[Handover Bot1.Pass]
+
+[Expect]
+Turn = 1
+Step = Main1
+ActivePlayer = Bot1
+PriorityPlayer = Bot1
+Stack.Count = 0
+Bot1.Battlefield.Count = 6
+Bot1.Hand = Black Lotus

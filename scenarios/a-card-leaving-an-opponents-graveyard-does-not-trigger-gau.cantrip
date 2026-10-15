@@ -1,0 +1,45 @@
+# "If a card left YOUR graveyard this turn." Both players have a Gau. On turn 2 Bot2's Soul-Guide Lantern exiles
+# Faithless Looting from Bot1's graveyard: Bot1's Gau deals 2 to Bot2 at the beginning of Bot2's end step, and Bot2's
+# own Gau, whose controller's graveyard nothing left, does nothing to Bot1.
+
+[Bot1 Deck]
+Mountain
+Sol Ring
+Black Lotus
+Gau, Feral Youth
+Faithless Looting
+Mountain
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Island
+Soul-Guide Lantern
+Black Lotus
+Gau, Feral Youth
+Island
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Gau, Feral Youth.Cast
+Bot1.Hand.Faithless Looting.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Soul-Guide Lantern.Cast
+Bot2.Target(Bot1.Graveyard.Faithless Looting)
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Gau, Feral Youth.Cast
+[T3 Bot1.Upkeep]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 18

@@ -1,0 +1,46 @@
+# Magda attacks on turns 3, 5, 7 and 9 and each tap makes a Treasure (the Dwarf that becomes tapped is Magda herself). With four
+# Treasures on turn 9 "Sacrifice five Treasures" is not offered (the refusal); on turn 11 a fifth tap makes it payable and
+# Bot1 sacrifices all five to search for an artifact or Dragon card: it may find Kokusho, the Evening Star (a Dragon, not an
+# artifact) but not a Mountain (the refusal), and the card goes onto the battlefield.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Magda, Brazen Outlaw
+Mountain x4
+Mountain x5
+Kokusho, the Evening Star
+Sol Ring
+Mountain x8
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Magda, Brazen Outlaw.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Magda, Brazen Outlaw > Bot2)
+[T5 Bot1.Main1]
+Bot1.Attack(Magda, Brazen Outlaw > Bot2)
+[T7 Bot1.Main1]
+Bot1.Attack(Magda, Brazen Outlaw > Bot2)
+[T9 Bot1.Main1]
+Bot1.Attack(Magda, Brazen Outlaw > Bot2)
+[T9 Bot1.Main2]
+? Bot1.Battlefield.Treasure Token#4.Types = Artifact
+! Bot1.Battlefield.Magda, Brazen Outlaw.Activate
+[T11 Bot1.Main1]
+Bot1.Attack(Magda, Brazen Outlaw > Bot2)
+[T11 Bot1.Main2]
+Bot1.Battlefield.Magda, Brazen Outlaw.Activate
+! Bot1.Search(Mountain)
+Bot1.Search(Kokusho, the Evening Star)
+
+[Expect]
+Bot1.Battlefield.Kokusho, the Evening Star.Types = Creature
+Bot1.Battlefield.Count = 4
+Bot2.Life = 10

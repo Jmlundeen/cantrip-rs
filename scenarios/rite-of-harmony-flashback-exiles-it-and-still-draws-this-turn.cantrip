@@ -1,0 +1,35 @@
+# Flashed back from the graveyard on turn 3 for {2}{G}{W} (four Moxen), the Rite is exiled afterwards but its delayed trigger
+# still works that turn: the Ornithopter that enters draws a card.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Mox Jet
+Mox Ruby
+Rite of Harmony
+Ornithopter
+Island x14
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Rite of Harmony.Cast
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 3
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Graveyard.Rite of Harmony.Cast(Ability: Flashback)
+Bot1.Hand.Ornithopter.Cast
+
+[Expect]
+Exile = Rite of Harmony
+Bot1.Hand.Count = 3

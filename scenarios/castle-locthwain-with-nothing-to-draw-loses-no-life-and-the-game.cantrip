@@ -1,0 +1,36 @@
+# Draw a card with an empty library and an empty hand: nothing is drawn, so the hand holds 0 cards and no life is lost, and Bot1 loses the game the next
+# time state-based actions are checked (CR 121.4, 704.5b). Bot1's deck is exactly its opening hand plus one Ornithopter, drawn on turn 3 and cast, so the
+# library and the hand are both empty when Castle Locthwain's ability resolves; life stays 20.
+
+[Bot1 Deck]
+Castle Locthwain
+Swamp
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Mox Sapphire
+Ornithopter
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Castle Locthwain.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Castle Locthwain.Activate(Ability: Draw a card)
+
+[Expect]
+Result = Bot2 won
+Bot1.Life = 20
+Bot1.Hand.Count = 0

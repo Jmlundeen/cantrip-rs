@@ -1,0 +1,9 @@
+[package]
+name = "cantrip-mechanics"
+description = "Shared mechanics: the parameterised recipes printed cards share (cantrip-api only), the counterpart of Cantrip.CardLibrary."
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+[dependencies]
+cantrip-api.workspace = true

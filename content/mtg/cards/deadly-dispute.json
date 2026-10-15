@@ -1,0 +1,6 @@
+{
+  "name": "Deadly Dispute",
+  "manaCost": "{1}{B}",
+  "type": "Instant",
+  "oracleText": "As an additional cost to cast this spell, sacrifice an artifact or creature.\nDraw two cards and create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")"
+}

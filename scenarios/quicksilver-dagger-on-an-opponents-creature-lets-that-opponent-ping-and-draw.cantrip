@@ -1,0 +1,46 @@
+# Quicksilver Dagger: "Enchanted creature has '{T}: ... You draw a card'" - the ability is the creature's, controlled by the
+# creature's controller, so the "you" who draws is that player, not the Dagger's. Bot1 enchants Bot2's Ornithopter on turn 3;
+# on turn 4 Bot2 taps it to deal 1 damage to Bot1 and draws a card.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Quicksilver Dagger
+Plains x3
+Plains x12
+
+[Bot2 Deck]
+Ornithopter
+Island x5
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Quicksilver Dagger.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Battlefield.Ornithopter.Activate(Bot1)
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Turn = 4
+Stack.Count = 0
+Bot1.Life = 19
+Bot2.Hand.Count = 9
+Bot1.Hand.Count = 4
+Bot2.Battlefield.Ornithopter.Tapped = true

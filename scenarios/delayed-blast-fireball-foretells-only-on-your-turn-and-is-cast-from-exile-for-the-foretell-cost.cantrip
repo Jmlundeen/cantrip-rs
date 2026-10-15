@@ -1,0 +1,45 @@
+# Foretell is "during your turn": refused in Bot2's turn 2 with {2} available (Sol Ring), allowed on turn 3. The foretold
+# card is not cast for its mana cost from exile: on turn 4, with the three mana of {1}{R}{R} available, casting it is
+# refused; on turn 5, with {4}{R}{R}, it is cast and deals 5 to Bot2.
+
+[Bot1 Deck]
+Mountain
+Sol Ring
+Mox Jet
+Mox Pearl
+Delayed Blast Fireball
+Mountain
+Mountain
+Island x10
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+! Bot1.Hand.Delayed Blast Fireball.Foretell
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Delayed Blast Fireball.Foretell
+[T4 Bot2.Main1]
+! Bot1.Exile.Delayed Blast Fireball.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Exile.Delayed Blast Fireball.Cast
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 15
+Bot1.Graveyard = Delayed Blast Fireball
+Exile.Count = 0

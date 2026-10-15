@@ -1,0 +1,38 @@
+# "A land you control enters": Bot2 playing a Mountain on turn two asks Bot1 for nothing (`! Bot1.Colors`). On turn three Bot1's
+# Forest triggers it, and Bot2 bolts the Cobra in response: the Cobra dies, but the triggered ability, already on the stack, still
+# adds the mana (CR 113.7a) - a triggered mana ability is not a mana ability (CR 605.1b), and the color is chosen as it resolves.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Lotus Cobra
+Forest
+Mountain
+Mountain
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Lotus Cobra.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+! Bot1.Colors
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Lotus Cobra)
+Bot1.Colors(Red)
+? Bot1.Mana = {R}
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Lotus Cobra

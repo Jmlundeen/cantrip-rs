@@ -1,0 +1,50 @@
+# "You" in All That Glitters is the Aura's controller (CR 109.5), wherever the enchanted creature is. Bot1 enchants
+# Bot2's Ornithopter. Bot1 controls Bow of Nylea (an Enchantment Artifact, so it counts once, not twice) and the Aura:
+# 2, so the 0/2 becomes 2/4. Bot2's own Ornithopter and Sol Ring are not counted.
+
+[Bot1 Deck]
+Forest
+Forest
+Plains
+Bow of Nylea
+All That Glitters
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Plains
+Ornithopter
+Sol Ring
+Plains
+Plains
+Plains
+Plains
+Plains x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Bow of Nylea.Cast
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.All That Glitters.Cast(Bot2.Battlefield.Ornithopter)
+[T7 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Ornithopter.Power = 2
+Bot2.Battlefield.Ornithopter.Toughness = 4
+Bot1.Battlefield.All That Glitters.AttachedTo = Ornithopter

@@ -1,0 +1,43 @@
+# The Aetherspark's +1 attaches it to Llanowar Elves (a +1/+1 counter, loyalty 5). While attached it can't be attacked
+# (CR 508.1c: the opponent's Elves may attack Bot1 but not the planeswalker), and the equipped Elves' 2 combat damage
+# on Bot1's turn puts 2 loyalty counters on it.
+[Bot1 Deck]
+Forest x3
+Black Lotus
+Llanowar Elves
+The Aetherspark
+Forest x20
+[Bot2 Deck]
+Forest x2
+Llanowar Elves
+Forest x20
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.The Aetherspark.Cast
+Bot1.Battlefield.The Aetherspark.Activate(Llanowar Elves)
+? Bot1.Battlefield.The Aetherspark.Counters.Loyalty = 5
+Bot1.Attack(Llanowar Elves > Bot2)
+[Bot1.Main2]
+? Bot1.Battlefield.The Aetherspark.AttachedTo = Llanowar Elves
+? Bot1.Battlefield.The Aetherspark.Counters.Loyalty = 7
+? Bot1.Battlefield.The Aetherspark.Keywords = CantBeAttacked
+? Bot2.Life = 18
+[T4 Bot2.Main1]
+! Bot2.Attack(Llanowar Elves > Bot1.Battlefield.The Aetherspark)
+Bot2.Attack(Llanowar Elves > Bot1)
+[T5 Bot1.Main1]
+[Expect]
+Bot1.Life = 19
+Bot1.Battlefield.The Aetherspark.Counters.Loyalty = 7

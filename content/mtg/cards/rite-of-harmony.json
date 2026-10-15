@@ -1,0 +1,6 @@
+{
+  "name": "Rite of Harmony",
+  "manaCost": "{G}{W}",
+  "type": "Instant",
+  "oracleText": "Whenever a creature or enchantment you control enters this turn, draw a card.\nFlashback {2}{G}{W} (You may cast this card from your graveyard for its flashback cost. Then exile it.)"
+}

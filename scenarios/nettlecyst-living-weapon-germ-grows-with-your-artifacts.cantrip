@@ -1,0 +1,34 @@
+# Nettlecyst has living weapon: it makes a 0/0 black Phyrexian Germ and attaches to it, and the Germ gets +1/+1 for
+# each artifact and/or enchantment its controller controls. Three Moxen pay for it, so with the Equipment itself there
+# are four: a 4/4 Germ. Casting a fourth Mox afterwards makes it 5/5 at once.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Nettlecyst
+Mox Emerald
+Mountain
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Nettlecyst.Cast
+[Bot1.Main2]
+? Bot1.Battlefield.Phyrexian Germ.Power = 4
+Bot1.Hand.Mox Emerald.Cast
+
+[Expect]
+Bot1.Battlefield.Phyrexian Germ.Power = 5
+Bot1.Battlefield.Phyrexian Germ.Toughness = 5
+Bot1.Battlefield.Phyrexian Germ.Subtypes = Germ; Phyrexian
+Bot1.Battlefield.Nettlecyst.AttachedTo = Phyrexian Germ

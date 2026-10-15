@@ -1,0 +1,28 @@
+# Worldly Tutor searches for a creature card, shuffles and puts that card on top of the library. A Lightning Bolt in the
+# library is not a creature, so it is not offered (the refusal); the Snapcaster Mage is found and drawn next turn.
+
+[Bot1 Deck]
+Forest
+Worldly Tutor
+Forest x5
+Lightning Bolt
+Snapcaster Mage
+Forest x8
+
+[Bot2 Deck]
+Forest x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Worldly Tutor.Cast
+! Bot1.Search(Lightning Bolt)
+Bot1.Search(Snapcaster Mage)
+? Bot1.Library.Count = 10
+[T3 Bot1.Main1]
+
+[Expect]
+Turn = 3
+Bot1.Hand = Forest; Forest; Forest; Forest; Forest; Snapcaster Mage
+Bot1.Graveyard = Worldly Tutor
+Bot1.Library.Count = 9

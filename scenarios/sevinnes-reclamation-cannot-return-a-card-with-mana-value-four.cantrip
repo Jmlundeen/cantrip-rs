@@ -1,0 +1,50 @@
+# Sevinne's Reclamation: "target permanent card with mana value 3 or less". Entomb puts Chandra, Torch of Defiance (mana
+# value 4) into the graveyard: with only her there, Reclamation has no legal target and is not offered although the mana is
+# there (a refusal). A second Entomb adds Palantír of Orthanc (mana value 3); on turn 3 the Reclamation returns the
+# Palantír and leaves Chandra in the graveyard. Cast from the hand, it offers no copy.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Pearl
+Mox Ruby
+Entomb
+Entomb
+Sevinne's Reclamation
+Chandra, Torch of Defiance
+Palantír of Orthanc
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Chandra, Torch of Defiance)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Hand.Sevinne's Reclamation.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Palantír of Orthanc)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sevinne's Reclamation.Cast(Bot1.Graveyard.Palantír of Orthanc)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield.Palantír of Orthanc.Types = Artifact
+Bot1.Graveyard = Sevinne's Reclamation; Entomb; Entomb; Chandra, Torch of Defiance

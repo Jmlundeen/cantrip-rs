@@ -1,0 +1,52 @@
+# The effects last until end of turn and concern "your graveyard". Turn one: two Lightning Bolts go to Bot1's graveyard. Turn two: Bot2 casts
+# a Mother of Runes. Turn three: Bot1 casts the Will, then one Bolt from the graveyard at the Mother: the Bolt is exiled instead of going to
+# the graveyard, while the Mother (Bot2's card, Bot2's graveyard) is not exiled. The second Bolt stays in the graveyard, castable that turn
+# (not cast); on turn five the permission is gone and it is refused (even with a Mox Ruby untapped).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Jet
+Mox Jet
+Lightning Bolt
+Lightning Bolt
+Yawgmoth's Will
+Plains x12
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mother of Runes
+Plains x12
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Mother of Runes.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Yawgmoth's Will.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Graveyard.Lightning Bolt.Cast(Bot2.Battlefield.Mother of Runes)
+[T3 Bot1.Main2]
+? Bot2.Graveyard = Mother of Runes
+? Exile.Count = 2
+[T5 Bot1.Main1]
+! Bot1.Graveyard.Lightning Bolt.Cast(Bot2)
+
+[Expect]
+Bot1.Graveyard = Lightning Bolt
+Exile = Lightning Bolt; Yawgmoth's Will

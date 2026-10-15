@@ -1,0 +1,32 @@
+# Dash's return is "from the battlefield to its owner's hand" at the next end step (CR 702.109a): a dashed Champion that
+# has died by then is in the graveyard and stays there. Dashed on turn three off a Black Lotus and a Mox Ruby, it backs
+# itself up (3/2) and Bot2's Lightning Bolt kills it in the second main phase; the end step returns nothing.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Death-Greeter's Champion
+Island x12
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x13
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Death-Greeter's Champion.Cast(Ability: Dash)
+[T3 Bot1.Main2]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Death-Greeter's Champion)
+[T3 Bot1.End]
+
+[Expect]
+Bot1.Graveyard = Death-Greeter's Champion; Black Lotus
+Bot1.Hand.Count = 5

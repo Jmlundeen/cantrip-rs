@@ -1,0 +1,49 @@
+# "For each mana in this ability's activation cost, you may tap an untapped creature you control rather than pay that mana"
+# (CR 118.1, 602.2b): two Ornithopters pay two of the four, and two Moxen pay the rest. "Activate only as a sorcery"
+# (CR 602.5d): the ability is refused during Bot2's turn 2, with Bot1's creatures and Moxen untapped, and activated in
+# Bot1's own main phase on turn 3 as the control.
+
+[Bot1 Deck]
+Mox Pearl
+Heirloom Epic
+Ornithopter
+Ornithopter
+Mox Jet
+Mox Ruby
+Forest
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Heirloom Epic.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+! Bot1.Battlefield.Heirloom Epic.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Heirloom Epic.Activate(Convoke: Ornithopter, Ornithopter)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Heirloom Epic.Tapped = true
+Bot1.Battlefield.Ornithopter#1.Tapped = true
+Bot1.Battlefield.Ornithopter#2.Tapped = true
+Bot1.Battlefield.Mox Jet.Tapped = true
+Bot1.Battlefield.Mox Ruby.Tapped = true
+Bot1.Battlefield.Mox Pearl.Tapped = false
+Bot1.Hand.Count = 3

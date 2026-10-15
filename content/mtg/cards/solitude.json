@@ -1,0 +1,12 @@
+{
+  "name": "Solitude",
+  "manaCost": "{3}{W}{W}",
+  "type": "Creature — Elemental Incarnation",
+  "power": 3,
+  "toughness": 2,
+  "oracleText": "Flash\nLifelink\nWhen this creature enters, exile up to one other target creature. That creature's controller gains life equal to its power.\nEvoke—Exile a white card from your hand.",
+  "keywords": [
+    "Flash",
+    "Lifelink"
+  ]
+}

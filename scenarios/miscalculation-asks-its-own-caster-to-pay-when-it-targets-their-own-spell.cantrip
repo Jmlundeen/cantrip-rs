@@ -1,0 +1,41 @@
+# "Its controller" is the targeted spell's controller, even when that is Miscalculation's own caster: Bot1 counters
+# its own Duress, and it is Bot1, not Bot2, who is asked for {2} and pays it, so Duress resolves.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Duress
+Miscalculation
+10 Swamp
+
+[Bot2 Deck]
+Island
+5 Island
+10 Island
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Duress.Cast(Bot2)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Miscalculation.Cast(Duress)
+? Stack = Miscalculation; Duress
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.PayCost
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Mox Ruby.Tapped = true
+Bot1.Battlefield.Mox Pearl.Tapped = true
+Bot1.Graveyard = Duress; Miscalculation
+Bot2.Graveyard.Count = 0

@@ -1,0 +1,37 @@
+# Two legendary creatures (Cecil, Dark Knight and Ragavan, Nimble Pilferer) make the channel {1}{U}: Mox Sapphire and Mox Pearl
+# are enough to bounce Bot2's Ornithopter (the one-legend case, one less, is otawara-channel-costs-one-less-per-legendary-creature).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Mox Pearl
+Cecil, Dark Knight
+Ragavan, Nimble Pilferer
+Otawara, Soaring City
+Island x13
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cecil, Dark Knight.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ragavan, Nimble Pilferer.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Otawara, Soaring City.Activate(Bot2.Battlefield.Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Count = 0
+Bot1.Graveyard = Otawara, Soaring City

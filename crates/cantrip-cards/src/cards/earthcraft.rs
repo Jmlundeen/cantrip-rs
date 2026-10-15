@@ -1,0 +1,27 @@
+use cantrip_api::*;
+use cantrip_mechanics::{TAP_AN_UNTAPPED_CREATURE, targets};
+use cantrip_oracle as oracle;
+
+/// "Target basic land" (CR 115.1): a land on the battlefield with the basic supertype.
+fn basic_land(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    (targets::LAND.filter)(q, asker, t) && matches!(t, Target::Object(id) if q.chars(id).supertypes.basic)
+}
+
+/// Untap target basic land.
+fn untap_land(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if let Some(land) = targets::object(g, item, 0) {
+        g.untap(land);
+    }
+    Ok(())
+}
+
+pub static CARD: CardDef = CardDef {
+    abilities: &[AbilityDef::Activated(ActivatedDef {
+        text: "Tap an untapped creature you control: Untap target basic land.",
+        cost: TAP_AN_UNTAPPED_CREATURE,
+        targets: &[TargetSpec { min: 1, max: 1, filter: basic_land }],
+        effect: untap_land,
+        ..ActivatedDef::BLANK
+    })],
+    ..oracle::EARTHCRAFT
+};

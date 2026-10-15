@@ -1,0 +1,35 @@
+# Mishra's Workshop's mana can only be spent on artifact spells: Bot1 taps the Workshop and two Mox Sapphires with Bot2's
+# Duress on the stack and casts Daze for its mana cost {1}{U}, a spell that is not an artifact. The {1} is paid with the
+# second Sapphire, not with the Workshop's {C} (which the engine would spend first if it could), so the Workshop's
+# {C}{C}{C} is still in the pool afterwards, still restricted.
+
+[Bot1 Deck]
+Mishra's Workshop
+Mox Sapphire
+Mox Sapphire
+Daze
+Island x16
+
+[Bot2 Deck]
+Swamp
+Duress
+Swamp x16
+
+[Actions]
+Bot1.Hand.Mishra's Workshop.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Duress.Cast(Bot1)
+Bot1.Battlefield.Mishra's Workshop.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Daze.Cast(Duress)
+? Bot1.Mana = {C}{C}{C} (ArtifactSpells)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot2.Graveyard = Duress
+Bot1.Graveyard = Daze

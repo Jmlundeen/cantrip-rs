@@ -1,0 +1,41 @@
+# "While this creature has a -1/-1 counter on it": Brain Freeze with storm 5 mills Bot1 six separate times, each a
+# separate event of land cards from the library, so six triggers take all six counters off and Moonshadow is a 7/7.
+# Faithless Looting then discards two Islands, and with no counter left nothing triggers at all: the stack is empty at
+# the very next priority.
+
+[Bot1 Deck]
+Mox Jet
+Moonshadow
+Mox Sapphire
+Mox Pearl
+Mox Ruby
+Brain Freeze
+Faithless Looting
+Island x30
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Moonshadow.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Brain Freeze.Cast(Bot1)
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Moonshadow.Power = 7
+? Bot1.Graveyard.Count = 19
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Island; Island)
+? Stack.Count = 0
+
+[Expect]
+Bot1.Battlefield.Moonshadow.Counters.MinusOneMinusOne = (absent)
+Bot1.Battlefield.Moonshadow.Power = 7
+Bot1.Battlefield.Moonshadow.Toughness = 7
+Bot1.Graveyard.Count = 22

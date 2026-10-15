@@ -1,0 +1,24 @@
+# "Activate only if you control a Plains or a Swamp": an Island does not enable the {W} ability (turn 3, refused), a Swamp
+# does (turn 5, the positive control), and the Verge itself - neither a Plains nor a Swamp - never enabled it.
+
+[Bot1 Deck]
+Bleachbone Verge
+Island
+Swamp
+Island x17
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Bleachbone Verge.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+! Bot1.Battlefield.Bleachbone Verge.Activate(Ability: {W})
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Bleachbone Verge.Activate(Ability: {W})
+? Bot1.Mana = {W}
+
+[Expect]
+Bot1.Mana = {W}

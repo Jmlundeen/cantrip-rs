@@ -1,0 +1,8 @@
+{
+  "name": "Twilight Diviner",
+  "manaCost": "{2}{B}",
+  "type": "Creature — Elf Cleric",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "When this creature enters, surveil 2. (Look at the top two cards of your library, then put any number of them into your graveyard and the rest on top of your library in any order.)\nWhenever one or more other creatures you control enter, if they entered or were cast from a graveyard, create a token that's a copy of one of them. This ability triggers only once each turn."
+}

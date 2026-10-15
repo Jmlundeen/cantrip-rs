@@ -1,0 +1,46 @@
+# Carnage, Crimson Chaos: mayhem asks how she came to be in the graveyard. Discarded by Faithless Looting on turn 5,
+# she is cast for {B}{R} (with no creature card in the graveyard her enters trigger has no target and is removed).
+# Bot2 bolts her at the beginning of combat; she is back in the same graveyard the same turn, but by dying, not by
+# being discarded (CR 400.7), so in the second main phase she is not offered again.
+
+[Bot1 Deck]
+Mountain
+Swamp
+Mountain
+Faithless Looting
+Carnage, Crimson Chaos
+Mountain
+Mountain
+Mountain x20
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Carnage, Crimson Chaos; Mountain)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Graveyard.Carnage, Crimson Chaos.Cast(Ability: Mayhem)
+[T5 Bot1.BeginCombat]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Carnage, Crimson Chaos)
+[T5 Bot1.Main2]
+? Bot1.Graveyard.Count = 3
+! Bot1.Graveyard.Carnage, Crimson Chaos.Cast
+[T5 Bot1.End]
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Mountain; Swamp; Mountain
+Bot2.Graveyard = Lightning Bolt; Island
+Bot1.Graveyard.Count = 3

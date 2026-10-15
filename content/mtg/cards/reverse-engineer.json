@@ -1,0 +1,7 @@
+{
+  "name": "Reverse Engineer",
+  "manaCost": "{3}{U}{U}",
+  "type": "Sorcery",
+  "oracleText": "Improvise (Your artifacts can help cast this spell. Each artifact you tap after you're done activating mana abilities pays for {1}.)\nDraw three cards.",
+  "improvise": true
+}

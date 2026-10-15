@@ -1,0 +1,32 @@
+# Life lost equal to the mana value can be more than the life left: two Blightsteel Colossi (mana value 12) take Bot1
+# from 20 to 8 on turn 3 and finish it on turn 5, and Bot2 wins.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Dark Confidant
+Island
+Island
+Island
+Island
+Blightsteel Colossus
+Island
+Blightsteel Colossus
+Island x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dark Confidant.Cast
+[T3 Bot1.Main1]
+? Bot1.Life = 8
+[T5 Bot1.Upkeep]
+Bot1.Pass
+
+[Expect]
+Result = Bot2 won

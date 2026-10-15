@@ -1,0 +1,41 @@
+# Goblin Engineer: entering, its controller may search for an artifact card and put it into the graveyard (Mox Jet);
+# on turn 3 "{R}, {T}, Sacrifice an artifact" sacrifices Gleemox to return that Mox Jet to the battlefield.
+# The library is Mox Jet and Islands, so the shuffle cannot matter.
+
+[Bot1 Deck]
+Goblin Engineer
+Gleemox
+Mox Ruby
+Mountain
+Island
+Island
+Island
+Mox Jet
+Island x10
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Blue)
+Bot1.Hand.Goblin Engineer.Cast
+Bot1.Pass
+Bot1.Accept
+Bot1.Search(Mox Jet)
+? Bot1.Graveyard = Mox Jet
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Goblin Engineer.Activate(Ability: Return target artifact; Bot1.Graveyard.Mox Jet)
+Bot1.Choose(Gleemox)
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Gleemox
+Bot1.Battlefield = Mountain; Mox Ruby; Goblin Engineer; Mox Jet
+Bot1.Battlefield.Goblin Engineer.Tapped = true

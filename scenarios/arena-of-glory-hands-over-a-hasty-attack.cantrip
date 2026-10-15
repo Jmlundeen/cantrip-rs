@@ -1,0 +1,26 @@
+# Arena of Glory exerted for {R}{R} that casts Embereth Shieldbreaker, handed over at the attack: the Shieldbreaker has haste, so it
+# is offered as an attacker the turn it arrived, and the Arena shows as exerted. For picturing the board.
+
+[Bot1 Deck]
+Mountain
+Arena of Glory
+Embereth Shieldbreaker
+Mountain x13
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Arena of Glory.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Arena of Glory.Activate(Ability: Exert)
+Bot1.Hand.Embereth Shieldbreaker.Cast
+[Handover Bot1.Attack]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Arena of Glory.Exerted = true
+# Haste: not summoning sick the turn it arrived.
+Bot1.Battlefield.Embereth Shieldbreaker.SummoningSick = false

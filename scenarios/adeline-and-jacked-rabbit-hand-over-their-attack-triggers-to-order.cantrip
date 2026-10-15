@@ -1,0 +1,40 @@
+# Bot1 puts out Adeline on its first turn and Jacked Rabbit with two +1/+1 counters on its second, then attacks with
+# both. Adeline's "whenever you attack" and the Rabbit's "whenever this creature attacks" trigger together, and Bot1 is
+# left putting them on the stack in an order of its choosing (CR 603.3b). The position the client's Stack Triggers box
+# is pictured from, with a creature wearing counters on the board:
+
+[Bot1 Deck]
+Plains
+Sol Ring
+Black Lotus
+Adeline, Resplendent Cathar
+Plains
+Jacked Rabbit
+Plains
+Plains x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Adeline, Resplendent Cathar.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Jacked Rabbit.Cast(X: 2)
+[T5 Bot1.Main1]
+Bot1.Attack(Adeline, Resplendent Cathar; Jacked Rabbit)
+[Handover Bot1.Triggers]
+
+[Expect]
+Turn = 5
+Combat.Attackers.Count = 2
+Stack.Count = 0
+Bot1.Battlefield.Jacked Rabbit.Counters.PlusOnePlusOne = 2

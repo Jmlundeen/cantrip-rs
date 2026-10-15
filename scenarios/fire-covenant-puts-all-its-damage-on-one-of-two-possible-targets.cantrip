@@ -1,0 +1,37 @@
+# "Any number of target creatures": with Llanowar Elves and Ornithopter both available Bot1 targets only the Ornithopter and
+# puts all of X = 3 on it (it dies, overkill allowed); the Elves is untouched. Bot1 pays 3 life.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Fire Covenant
+Swamp x16
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Ornithopter
+Forest x17
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Fire Covenant.Cast(X: 3)
+Bot1.Divide(Ornithopter: 3)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Life = 17
+Bot2.Graveyard = Ornithopter
+Bot2.Battlefield = Forest; Llanowar Elves
+Bot2.Battlefield.Llanowar Elves.Damage = 0

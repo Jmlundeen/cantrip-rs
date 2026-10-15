@@ -1,0 +1,30 @@
+# "Target opponent": with two opponents Bot1 targets Bot3, who reveals a hand of a Lightning Bolt and Mountains and discards the
+# Bolt; Bot2, holding a Bolt too, is untouched.
+
+[Bot1 Deck]
+Grief
+Dark Ritual
+Swamp x18
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Bot3 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Grief.Cast(Ability: Evoke)
+Bot1.Choose(Dark Ritual)
+Bot1.Target(Bot3)
+Bot1.Choose(Lightning Bolt)
+[Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot3.Graveyard = Lightning Bolt
+Bot2.Graveyard.Count = 0
+Bot2.Hand.Count = 7

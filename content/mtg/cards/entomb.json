@@ -1,0 +1,6 @@
+{
+  "name": "Entomb",
+  "manaCost": "{B}",
+  "type": "Instant",
+  "oracleText": "Search your library for a card, put that card into your graveyard, then shuffle."
+}

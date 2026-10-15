@@ -1,0 +1,47 @@
+# From the Catacombs on a creature card in Bot2's graveyard (Bot2 discarded its Ornithopter to hand size on turn 2): it
+# enters under Bot1's control with a corpse counter. When Bot1 Lightning Bolts it, "if that creature would leave the
+# battlefield, exile it instead": it goes to exile, not to its owner's graveyard.
+
+[Bot1 Deck]
+Swamp
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+From the Catacombs
+Lightning Bolt
+Swamp x13
+
+[Bot2 Deck]
+Island x7
+Ornithopter
+Island x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+? Bot2.Graveyard = Ornithopter
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.From the Catacombs.Cast(Bot2.Graveyard.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Counters.Corpse = 1
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Ornithopter
+Bot2.Graveyard.Count = 0
+Bot1.Battlefield.Count = 6

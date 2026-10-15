@@ -1,0 +1,32 @@
+# Flying (CR 702.9b): Birds of Paradise attacking cannot be blocked by Bot2's Elvish Mystic (refusal) but can by its Ornithopter, a flier (the positive control), which takes no damage from the 0-power Birds.
+
+[Bot1 Deck]
+Forest
+Forest
+Birds of Paradise
+Forest x12
+
+[Bot2 Deck]
+Forest
+Elvish Mystic
+Ornithopter
+Forest x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Birds of Paradise.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Birds of Paradise > Bot2)
+! Bot2.Block(Elvish Mystic > Birds of Paradise)
+Bot2.Block(Ornithopter > Birds of Paradise)
+? Combat.Blocks.Count = 1
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20

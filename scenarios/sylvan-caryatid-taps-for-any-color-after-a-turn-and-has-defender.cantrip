@@ -1,0 +1,33 @@
+# "{T}: Add one mana of any color" on a creature needs it not to be summoning sick (CR 302.6): the turn it is cast (turn 1) the ability is
+# not offered; on turn 3 (after combat) it taps for blue. Defender (CR 702.3): it is not allowed to attack (the refusal), while the Ornithopter
+# declared beside it is (the positive control: the same declaration of attackers).
+
+[Bot1 Deck]
+Forest
+Mox Ruby
+Sylvan Caryatid
+Ornithopter
+Forest x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sylvan Caryatid.Cast
+[T1 Bot1.Main2]
+! Bot1.Battlefield.Sylvan Caryatid.Activate
+[T3 Bot1.DeclareAttackers]
+! Bot1.Attack(Sylvan Caryatid > Bot2)
+Bot1.Attack(Ornithopter > Bot2)
+[T3 Bot1.Main2]
+Bot1.Battlefield.Sylvan Caryatid.Activate(Color: Blue)
+? Bot1.Mana = {U}
+
+[Expect]
+Bot2.Life = 20
+Bot1.Battlefield.Sylvan Caryatid.Keywords = Defender; Hexproof

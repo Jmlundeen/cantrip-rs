@@ -1,0 +1,25 @@
+# "{U/P} can be paid with either {U} or 2 life" (CR 107.4f): Black Lotus gives {R}{R}{R} for the generic {3} and, with no blue mana
+# left, Bot1 pays 2 life for the Phyrexian symbol (the existing scenario pays blue). It draws two cards, then proliferates with
+# nothing to choose.
+
+[Bot1 Deck]
+Black Lotus
+Tezzeret's Gambit
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Tezzeret's Gambit.Cast
+Bot1.Modes(1)
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Life = 18
+Bot1.Hand.Count = 7
+Bot1.Graveyard = Tezzeret's Gambit; Black Lotus

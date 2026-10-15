@@ -1,0 +1,31 @@
+# Relic of Sauron: {T}: add two mana in any combination of {U}, {B} and/or {R} (CR 106.1b), each mana a color of its
+# own choosing: here blue and black.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Relic of Sauron
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Relic of Sauron.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Relic of Sauron.Activate(Ability: Add 2 mana; Colors: Blue, Black)
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Relic of Sauron.Tapped = true
+Bot1.Mana = {U}{B}

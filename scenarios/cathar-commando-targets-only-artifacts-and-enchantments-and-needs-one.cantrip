@@ -1,0 +1,46 @@
+# "Destroy target artifact or enchantment" (CR 115.1, 602.2b): with none on the battlefield the ability cannot be
+# activated at all (turn 3). Once Bot2 has a Fastbond, an Elvish Mystic and a Forest, only the enchantment is a target:
+# the creature and the land are refused beside it, and the destroyed Fastbond is the positive control.
+
+[Bot1 Deck]
+Plains
+Plains
+Cathar Commando
+Plains x3
+Plains x10
+
+[Bot2 Deck]
+Forest
+Elvish Mystic
+Fastbond
+Forest x4
+Forest x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Cathar Commando.Cast
+Bot1.Pass
+! Bot1.Battlefield.Cathar Commando.Activate
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Fastbond.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+! Bot1.Battlefield.Cathar Commando.Activate(Bot2.Battlefield.Elvish Mystic)
+! Bot1.Battlefield.Cathar Commando.Activate(Bot1.Battlefield.Plains)
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Cathar Commando.Activate(Fastbond)
+
+[Expect]
+Bot1.Graveyard = Cathar Commando
+Bot2.Graveyard = Fastbond
+Bot2.Battlefield = Forest; Forest; Elvish Mystic

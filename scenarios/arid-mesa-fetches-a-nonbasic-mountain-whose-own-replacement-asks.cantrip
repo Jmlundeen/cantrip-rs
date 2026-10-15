@@ -1,0 +1,28 @@
+# Arid Mesa: "a Mountain or Plains card" is any card with that land type, not only a basic one. The Blood Crypt is a Swamp
+# Mountain, so it is among the cards the Mesa may find (! Bot1.Search(Swamp) shows the plain Swamp is not), and the Crypt
+# enters through its own "as this land enters, you may pay 2 life" question: Bot1 declines and it enters tapped, with
+# the Mesa's 1 life paid and the Mesa sacrificed.
+
+[Bot1 Deck]
+Arid Mesa
+Forest x6
+Blood Crypt
+Swamp
+Plains
+Forest x15
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Arid Mesa.Play
+Bot1.Battlefield.Arid Mesa.Activate
+! Bot1.Search(Swamp)
+Bot1.Search(Blood Crypt)
+Bot1.Decline
+
+[Expect]
+Bot1.Life = 19
+Bot1.Graveyard = Arid Mesa
+Bot1.Battlefield = Blood Crypt
+Bot1.Battlefield.Blood Crypt.Tapped = true

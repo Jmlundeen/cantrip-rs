@@ -1,0 +1,32 @@
+# With three players "target opponent" is a choice: on turn 4 Loran taps targeting Bot3, so Bot1 and Bot3 each draw a card and Bot2 draws nothing. Bot2 and Bot3 both hold seven cards before, and Bot3 ends with one more than Bot2.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Loran of the Third Path
+Plains x16
+
+[Bot2 Deck]
+Island x20
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Loran of the Third Path.Cast
+Bot1.Pass
+[T4 Bot1.Main1]
+Bot1.Battlefield.Loran of the Third Path.Activate(Bot3)
+Bot1.Pass
+[T4 Bot1.Main2]
+
+[Expect]
+Bot3.Hand.Count = 8
+Bot2.Hand.Count = 7

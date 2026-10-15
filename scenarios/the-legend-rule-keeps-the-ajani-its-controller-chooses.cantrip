@@ -1,0 +1,31 @@
+# The legend rule (CR 704.5j): Bot1 casts a second Ajani, Nacatl Pariah on turn 3, with the first still out, and is asked
+# which to keep. The older one is chosen, so the one that stays is no longer summoning sick, and the newer goes to the
+# graveyard, not destroyed. Both Ajanis' enters triggers still make their Cat Warrior, one each.
+
+[Bot1 Deck]
+Plains x2
+Mox Pearl
+Ajani, Nacatl Pariah x2
+Plains x3
+Plains x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Ajani, Nacatl Pariah.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Ajani, Nacatl Pariah.Cast
+Bot1.Choose(Ajani, Nacatl Pariah#1)
+
+[Expect]
+Bot1.Graveyard = Ajani, Nacatl Pariah
+Bot1.Battlefield = Plains; Plains; Mox Pearl; Ajani, Nacatl Pariah; Cat Warrior; Cat Warrior
+Bot1.Battlefield.Ajani, Nacatl Pariah.SummoningSick = false

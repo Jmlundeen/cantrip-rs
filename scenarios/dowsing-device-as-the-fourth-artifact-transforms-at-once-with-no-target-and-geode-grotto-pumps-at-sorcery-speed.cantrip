@@ -1,0 +1,47 @@
+# "Up to one target creature you control" - with no creature, the Device's trigger for its own entry has no target and still does the rest: with three Moxen already out it is the fourth artifact and
+# "then transform this artifact" turns it into Geode Grotto (a land, no longer an artifact). On turn 3 a freshly cast Ornithopter does not trigger it any more, and the Grotto's {2}{R}, {T} ability is "only as a
+# sorcery": refused in the beginning of combat step with everything untapped, accepted in the second main phase, giving the Ornithopter haste and +X/+0 for the four artifacts Bot1 controls (3 Moxen and itself).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Dowsing Device
+Ornithopter
+Mountain x13
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dowsing Device.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Geode Grotto.Types = Land
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Pass
+? Stack.Count = 0
+? Bot1.Battlefield.Ornithopter.Power = 0
+[T3 Bot1.BeginCombat]
+! Bot1.Battlefield.Geode Grotto.Activate(Ability: {2}{R}; Ornithopter)
+[T3 Bot1.Main2]
+Bot1.Battlefield.Geode Grotto.Activate(Ability: {2}{R}; Ornithopter)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+[T3 Bot1.End]
+
+[Expect]
+Bot1.Battlefield.Geode Grotto.Types = Land
+Bot1.Battlefield.Geode Grotto.Tapped = true
+Bot1.Battlefield.Ornithopter.Power = 4
+Bot1.Battlefield.Ornithopter.Keywords = Flying; Haste

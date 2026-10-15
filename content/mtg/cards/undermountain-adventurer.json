@@ -1,0 +1,11 @@
+{
+  "name": "Undermountain Adventurer",
+  "manaCost": "{3}{G}",
+  "type": "Creature — Giant Warrior",
+  "power": 3,
+  "toughness": 4,
+  "oracleText": "Vigilance\nWhen this creature enters, you take the initiative.\n{T}: Add {G}{G}. If you've completed a dungeon, add six {G} instead.",
+  "keywords": [
+    "Vigilance"
+  ]
+}

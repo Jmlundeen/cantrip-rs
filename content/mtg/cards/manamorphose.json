@@ -1,0 +1,6 @@
+{
+  "name": "Manamorphose",
+  "manaCost": "{1}{R/G}",
+  "type": "Instant",
+  "oracleText": "Add two mana in any combination of colors.\nDraw a card."
+}

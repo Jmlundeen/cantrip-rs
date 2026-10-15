@@ -1,0 +1,49 @@
+# Overload with two opponents (CR 702.96a, 701.23h): each of Bot2's and Bot3's Elvish Mystics is exiled and each player
+# searches, in turn order, for one basic land that enters tapped.
+
+[Bot1 Deck]
+Plains
+Sol Ring
+Black Lotus
+Winds of Abandon
+Plains x20
+
+[Bot2 Deck]
+Forest
+Elvish Mystic
+Forest x12
+
+[Bot3 Deck]
+Forest
+Elvish Mystic
+Forest x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T3 Bot3.Main1]
+Bot3.Hand.Forest.Play
+Bot3.Battlefield.Forest.Activate
+Bot3.Hand.Elvish Mystic.Cast
+[T4 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Winds of Abandon.Cast(Ability: Overload)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Plains.Activate
+Bot2.Search(Forest)
+Bot3.Search(Forest)
+[T4 Bot1.Main2]
+
+[Expect]
+Exile.Count = 2
+Bot2.Battlefield = Forest; Forest
+Bot3.Battlefield = Forest; Forest
+Bot2.Battlefield.Forest#2.Tapped = true
+Bot3.Battlefield.Forest#2.Tapped = true

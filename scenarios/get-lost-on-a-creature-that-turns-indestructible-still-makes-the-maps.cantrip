@@ -1,0 +1,39 @@
+# The Maps are not conditional on the destruction: Bot2 discards a card in response to make its Iron-Shield Elf indestructible
+# (CR 702.12b), Get Lost's destroy does nothing, and Bot2 still creates two Map tokens (Get Lost's text and rulings: "its
+# controller creates two Map tokens" whether or not it was destroyed).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Get Lost
+Plains x14
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Iron-Shield Elf
+Island
+Swamp x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Iron-Shield Elf.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Get Lost.Cast(Bot2.Battlefield.Iron-Shield Elf)
+Bot2.Battlefield.Iron-Shield Elf.Activate
+Bot2.Choose(Island)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Swamp; Mox Jet; Iron-Shield Elf; Map Token; Map Token
+Bot2.Battlefield.Iron-Shield Elf.Keywords = Indestructible
+Bot2.Battlefield.Iron-Shield Elf.Tapped = true
+Bot2.Graveyard = Island

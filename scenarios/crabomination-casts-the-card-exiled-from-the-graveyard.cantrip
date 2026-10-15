@@ -1,0 +1,44 @@
+# Crabomination: Bot2's discard to hand size on turn 2 puts a Lightning Bolt (the card drawn) into its graveyard, the only
+# card there, so it is the card at random taken from the graveyard. It is the one spell among the three exiled cards
+# (the others are Islands from the top of the library and the hand), and Bot1 casts it without paying its mana cost, at
+# Bot2: 3 damage, and the Bolt goes to its owner's graveyard. Crabomination is cast on turn 3 for {4}{B}{B}.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Black Lotus
+Swamp
+Crabomination
+Swamp x15
+
+[Bot2 Deck]
+Island x7
+Lightning Bolt
+Island x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Crabomination.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Choose(Lightning Bolt)
+Bot1.Target(Bot2)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Exile = Island; Island
+Bot2.Graveyard = Lightning Bolt
+Bot2.Hand.Count = 6
+Bot2.Library.Count = 11

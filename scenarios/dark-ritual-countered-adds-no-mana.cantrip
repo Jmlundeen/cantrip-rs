@@ -1,0 +1,39 @@
+# Dark Ritual is a spell, not a mana ability (CR 605.1, 601.2): it uses the stack, so it can be responded to. Countered
+# by Bot2's Counterspell (an Island and Mox Sapphire), it adds no mana and the Swamp's mana is gone (-1 net): Bot1's pool
+# stays empty, and the Ritual is in the graveyard.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Dark Ritual
+Swamp x4
+Swamp x12
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Island x4
+Island x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot2.Hand.Counterspell.Cast(Stack.Dark Ritual)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Pass
+Bot1.Pass
+? Bot1.Mana =
+
+[Expect]
+Bot1.Graveyard = Dark Ritual
+Bot2.Graveyard = Counterspell
+Bot1.Mana =

@@ -1,0 +1,21 @@
+# Surveil 1 may put the top card into the graveyard: the Island goes there. The Backstreet entered tapped on turn 1 and is
+# untapped on turn 3, where its intrinsic basic land types (Plains Swamp) let it tap for {B} or {W} (here black).
+
+[Bot1 Deck]
+Shadowy Backstreet
+Mountain x6
+Island
+Mountain x11
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Shadowy Backstreet.Play
+Bot1.Arrange( | Island)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Shadowy Backstreet.Activate(Ability: {B})
+
+[Expect]
+Bot1.Graveyard = Island
+Bot1.Mana = {B}

@@ -1,0 +1,28 @@
+# An opponent's noncreature spell (Lightning Bolt) does not trigger Third Path Iconoclast.
+[Bot1 Deck]
+Third Path Iconoclast
+Mox Sapphire
+Mox Ruby
+Island x17
+
+[Bot2 Deck]
+Lightning Bolt
+Mountain x19
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Third Path Iconoclast.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain#1.Play
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Battlefield.Mountain#1.Activate
+[Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Third Path Iconoclast.Power = 2
+Bot1.Battlefield.Third Path Iconoclast.Toughness = 1
+Bot1.Life = 17
+Bot1.Battlefield.Count = 3

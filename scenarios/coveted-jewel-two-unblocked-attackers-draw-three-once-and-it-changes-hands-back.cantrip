@@ -1,0 +1,57 @@
+# "Whenever one or more creatures an opponent controls attack you and aren't blocked": two unblocked Llanowar Elves are one event
+# (CR 509.1h), so Bot2 draws three cards once, not six, gains control of the Jewel and untaps it (turn 4). It works both ways: on turn 5
+# Bot1's Ornithopter attacks Bot2, who has no untapped blocker (the Elves are tapped from attacking), and Bot1 draws three and takes the
+# Jewel back (CR 108.4).
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Coveted Jewel
+Ornithopter
+Plains
+Plains
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Llanowar Elves
+Forest x12
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Coveted Jewel.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Llanowar Elves.Cast
+[T4 Bot2.Main1]
+Bot2.Attack(Llanowar Elves; Llanowar Elves > Bot1)
+[T4 Bot2.Main2]
+? Bot2.Battlefield.Coveted Jewel.Tapped = false
+? Bot2.Hand.Count = 8
+[T5 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Coveted Jewel.Tapped = false
+Bot2.Battlefield.Count = 4
+Bot1.Hand.Count = 9

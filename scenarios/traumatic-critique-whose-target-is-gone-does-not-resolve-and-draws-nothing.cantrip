@@ -1,0 +1,36 @@
+# CR 608.2b: X = 1 at Bot2's Ornithopter, which Bot1 kills with Lightning Bolt in response: Traumatic Critique does nothing
+# at all, so the two cards are not drawn (the hand ends at 2 cards, not 4).
+
+[Bot1 Deck]
+Mountain
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Traumatic Critique
+Lightning Bolt
+Island
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Island x14
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Traumatic Critique.Cast(Bot2.Battlefield.Ornithopter; X: 1)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+
+[Expect]
+Bot1.Hand.Count = 2
+Bot2.Graveyard = Ornithopter
+Bot1.Graveyard = Traumatic Critique; Lightning Bolt

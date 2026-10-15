@@ -1,0 +1,48 @@
+# Life // Death, a split card (CR 709), pictured from both sides at once: one copy has been cast as Life, so every
+# land Bot1 controls is a 1/1 creature that is still a land, and a second copy is still in hand, where the client
+# draws the whole card — the name "Life // Death", the two halves' costs and text — and offers two ways to cast it,
+# one per half.
+#
+# The position a player has to read: the card in hand is one card with two spells on it, and which one is being cast
+# is a choice made at the moment of casting rather than something the card says by itself. The spent copy in the
+# graveyard is the same card again (CR 709.4), not the half that was cast.
+
+[Bot1 Deck]
+Forest
+Forest
+Forest
+Life // Death
+Life // Death
+Forest
+Forest
+Forest x12
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Life // Death.Cast(Ability: Life)
+Bot1.Pass
+[Handover Bot1.Pass]
+
+[Expect]
+Turn = 5
+Step = Main1
+ActivePlayer = Bot1
+PriorityPlayer = Bot1
+Stack.Count = 0
+# The card that was cast as Life is in the graveyard as the whole card, not as either half (CR 709.4).
+Bot1.Graveyard = Life // Death
+Bot1.Hand = Forest; Forest; Forest; Forest; Life // Death
+# Every land its controller has, a 1/1 that is still a land, including the one already tapped for the spell.
+Bot1.Battlefield.Count = 3
+Bot1.Battlefield.Forest#1.Types = Land; Creature
+Bot1.Battlefield.Forest#1.Power = 1
+Bot1.Battlefield.Forest#1.Toughness = 1
+Bot1.Battlefield.Forest#3.Types = Land; Creature

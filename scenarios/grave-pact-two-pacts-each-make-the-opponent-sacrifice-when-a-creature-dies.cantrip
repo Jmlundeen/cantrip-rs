@@ -1,0 +1,64 @@
+# Two Grave Pacts trigger separately for one death (CR 603.2): when Bot2's Lightning Bolt kills Bot1's Ornithopter, Bot2 sacrifices
+# a creature for each, chosen one after the other: first one of its three Ornithopters, then one of the two left, keeping the last. Bot1 casts the second Pact on turn 3 with two Swamps, Mox Jet and Mox Ruby.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Grave Pact
+Grave Pact
+Ornithopter
+Mox Ruby
+Mox Jet
+Swamp
+Swamp x12
+
+[Bot2 Deck]
+Mountain
+Ornithopter
+Ornithopter
+Ornithopter
+Lightning Bolt
+Mountain
+Mountain
+Mountain x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Grave Pact.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Grave Pact.Cast
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Choose(Ornithopter)
+Bot2.Choose(Ornithopter)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Ornithopter; Black Lotus
+Bot2.Graveyard.Count = 3
+Bot2.Battlefield = Mountain; Mountain; Ornithopter

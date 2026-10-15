@@ -1,0 +1,39 @@
+# Lavaspur Boots: Equip {1} makes a 1/1 Rootwalla a 2/1 with haste, and it attacks for 2 the turn it arrives.
+
+[Bot1 Deck]
+Forest
+Forest
+Basking Rootwalla
+Lavaspur Boots
+Forest
+Forest
+Mountain
+Forest x13
+
+[Bot2 Deck]
+Mountain
+Mountain
+Lightning Bolt
+Mountain x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Lavaspur Boots.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Basking Rootwalla.Cast
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Lavaspur Boots.Activate(Basking Rootwalla)
+Bot1.Attack(Basking Rootwalla > Bot2)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Lavaspur Boots.AttachedTo = Basking Rootwalla
+
+[Expect]
+Bot1.Battlefield.Basking Rootwalla.Power = 2
+Bot1.Battlefield.Basking Rootwalla.Toughness = 1
+Bot1.Battlefield.Basking Rootwalla.Keywords = Haste
+Bot2.Life = 18

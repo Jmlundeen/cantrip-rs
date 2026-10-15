@@ -1,0 +1,21 @@
+# Escape Tunnel fetches a basic land card: the Triome is nonbasic, so it may not be found (the refusal sits beside the
+# basic Forest that is).
+
+[Bot1 Deck]
+Escape Tunnel
+Island x6
+Ketria Triome
+Forest
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Escape Tunnel.Play
+Bot1.Battlefield.Escape Tunnel.Activate(Ability: Search your library)
+! Bot1.Search(Ketria Triome)
+Bot1.Search(Forest)
+
+[Expect]
+Bot1.Battlefield = Forest

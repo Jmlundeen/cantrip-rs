@@ -1,0 +1,11 @@
+{
+  "name": "Abhorrent Oculus",
+  "manaCost": "{2}{U}",
+  "type": "Creature — Eye",
+  "power": 5,
+  "toughness": 5,
+  "oracleText": "As an additional cost to cast this spell, exile six cards from your graveyard.\nFlying\nAt the beginning of each opponent's upkeep, manifest dread. (Look at the top two cards of your library. Put one onto the battlefield face down as a 2/2 creature and the other into your graveyard. Turn it face up any time for its mana cost if it's a creature card.)",
+  "keywords": [
+    "Flying"
+  ]
+}

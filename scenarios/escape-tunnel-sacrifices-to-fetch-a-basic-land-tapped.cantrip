@@ -1,0 +1,20 @@
+# Escape Tunnel's first ability: tap and sacrifice it to search for a basic land, which enters tapped.
+
+[Bot1 Deck]
+Escape Tunnel
+Island x6
+Forest
+Island x11
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Escape Tunnel.Play
+Bot1.Battlefield.Escape Tunnel.Activate(Ability: Search your library)
+Bot1.Search(Forest)
+
+[Expect]
+Bot1.Battlefield = Forest
+Bot1.Battlefield.Forest.Tapped = true
+Bot1.Graveyard = Escape Tunnel

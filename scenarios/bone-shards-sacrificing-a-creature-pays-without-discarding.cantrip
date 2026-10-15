@@ -1,0 +1,43 @@
+# The other additional cost of Bone Shards: sacrifice a creature (CR 601.2b, 118.8). Bot1 controls an Ornithopter and a
+# Llanowar Elves and chooses to sacrifice the Ornithopter; the Elves stays, and nothing is discarded. Bot2's Llanowar Elves is
+# destroyed.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Ornithopter
+Llanowar Elves
+Bone Shards
+Mox Emerald
+Island
+Island x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Bone Shards.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Modes(Sacrifice a creature)
+Bot1.Choose(Ornithopter)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Swamp; Swamp; Mox Emerald; Llanowar Elves
+Bot1.Graveyard = Bone Shards; Ornithopter
+Bot1.Hand = Island; Island
+Bot2.Graveyard = Llanowar Elves

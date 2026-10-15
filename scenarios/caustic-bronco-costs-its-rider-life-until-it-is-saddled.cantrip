@@ -1,0 +1,55 @@
+# Caustic Bronco attacks unsaddled on turn 3: it reveals Guerrilla Gorilla and puts it into Bot1's hand, and Bot1 loses 2.
+# On turn 5 Bot1 saddles it (CR 702.171a) by tapping Mother of Runes and Guerrilla Gorilla, power 1 + 2 of the 3 it needs,
+# and attacks again: it reveals Alpha Deathclaw, and now Bot2 loses 6 instead. Bronco's 2 combat damage lands twice.
+
+[Bot1 Deck]
+Bayou
+Mox Jet
+Mox Emerald
+Mox Pearl
+Caustic Bronco
+Mother of Runes
+Guerrilla Gorilla
+Swamp
+Guerrilla Gorilla
+Swamp
+Alpha Deathclaw
+Swamp x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Bayou.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Bayou.Activate(Ability: {B})
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Caustic Bronco.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Mother of Runes.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+Bot1.Attack(Caustic Bronco > Bot2)
+[T3 Bot1.Main2]
+? Bot1.Life = 18
+? Bot2.Life = 18
+? Bot1.Hand = Guerrilla Gorilla
+[T5 Bot1.Main1]
+Bot1.Battlefield.Caustic Bronco.Activate
+Bot1.Choose(Mother of Runes; Guerrilla Gorilla)
+Bot1.Attack(Caustic Bronco > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Life = 18
+Bot2.Life = 10
+Bot1.Hand = Guerrilla Gorilla; Swamp; Alpha Deathclaw
+Bot1.Battlefield.Caustic Bronco.Saddled = true
+Bot1.Battlefield.Mother of Runes.Tapped = true
+Bot1.Battlefield.Guerrilla Gorilla.Tapped = true

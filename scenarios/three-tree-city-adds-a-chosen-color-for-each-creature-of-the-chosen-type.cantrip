@@ -1,0 +1,31 @@
+# Three Tree City is played choosing Elf. With Llanowar Elves and Elvish Mystic on the battlefield, its {2}, {T} ability
+# (paid with a Forest and Llanowar Elves) adds the chosen color once per Elf, counted as it resolves: {G}{G}.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Elvish Mystic
+Three Tree City
+Forest x3
+Forest x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Three Tree City.Play
+Bot1.Modes(Elf)
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Elvish Mystic.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Battlefield.Three Tree City.Activate(Ability: {2}; Color: Green)
+
+[Expect]
+Bot1.Mana = {G}{G}
+Bot1.Battlefield.Three Tree City.Tapped = true

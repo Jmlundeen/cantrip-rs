@@ -1,0 +1,11 @@
+{
+  "name": "Spider-Woman, Stunning Savior",
+  "manaCost": "{1}{W/U}",
+  "type": "Legendary Creature — Spider Human Hero",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Flying\nVenom Blast — Artifacts and creatures your opponents control enter tapped.",
+  "keywords": [
+    "Flying"
+  ]
+}

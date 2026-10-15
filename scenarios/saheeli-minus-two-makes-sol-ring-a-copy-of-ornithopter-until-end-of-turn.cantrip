@@ -1,0 +1,40 @@
+# Saheeli, Sublime Artificer: casting Mox Ruby (a noncreature spell) makes a Servo; her -2 makes Sol Ring a copy of Ornithopter until end of turn (CR 707.2): an artifact creature with flying, named Ornithopter.
+
+[Bot1 Deck]
+Sol Ring
+Ornithopter
+Mox Ruby
+Saheeli, Sublime Artificer
+Mountain
+Mountain
+Mountain
+Mountain x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Saheeli, Sublime Artificer.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Saheeli, Sublime Artificer.Activate
+Bot1.Target(Sol Ring)
+Bot1.Target(Ornithopter)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Mountain; Mountain; Mox Ruby; Ornithopter; Ornithopter; Saheeli, Sublime Artificer; Servo
+Bot1.Battlefield.Ornithopter#2.Keywords = Flying
+Bot1.Battlefield.Ornithopter#2.Types = Artifact; Creature
+Bot1.Battlefield.Saheeli, Sublime Artificer.Counters.Loyalty = 3

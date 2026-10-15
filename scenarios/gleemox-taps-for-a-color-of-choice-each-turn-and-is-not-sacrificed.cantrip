@@ -1,0 +1,25 @@
+# Unlike Black Lotus, Gleemox is only tapped: it adds one mana of the color chosen ({U} on turn 1, {G} on turn 3), stays on
+# the battlefield, cannot be tapped again while tapped (refusal, then the untapped Gleemox on turn 3 is the positive control),
+# and "This card is banned" is no rules text. Mana empties at the end of the step.
+
+[Bot1 Deck]
+Gleemox
+Island x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Gleemox.Cast
+Bot1.Battlefield.Gleemox.Activate(Color: Blue)
+? Bot1.Mana = {U}
+! Bot1.Battlefield.Gleemox.Activate
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Gleemox.Tapped = False
+? Bot1.Mana =
+Bot1.Battlefield.Gleemox.Activate(Color: Green)
+? Bot1.Mana = {G}
+
+[Expect]
+Bot1.Battlefield = Gleemox
+Bot1.Battlefield.Gleemox.Tapped = True

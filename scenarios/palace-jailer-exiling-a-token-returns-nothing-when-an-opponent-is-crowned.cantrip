@@ -1,0 +1,56 @@
+# A token that leaves the battlefield ceases to exist (CR 111.7, 704.5d), so when the exile "until an opponent becomes the monarch" ends
+# (CR 610.3) there is nothing to return. Bot2's Grist makes an Insect token on turn 2; on turn 3 Palace Jailer exiles it; on turn 4 Bot2's Llanowar
+# Elves connect, Bot2 becomes the monarch, and the Insect does not come back.
+
+[Bot1 Deck]
+Sol Ring
+Palace Jailer
+Plains
+Plains
+Plains x15
+
+[Bot2 Deck]
+Forest
+Mox Jet
+Mox Emerald
+Mox Ruby
+Grist, the Hunger Tide
+Llanowar Elves
+Forest
+Forest x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Plains.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Grist, the Hunger Tide.Cast
+Bot2.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot2.Battlefield.Grist, the Hunger Tide.Activate(Ability: Create a 1/1)
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Palace Jailer.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Target(Bot2.Battlefield.Insect)
+[T3 Bot1.Main2]
+[T4 Bot2.Main1]
+Bot2.Attack(Llanowar Elves > Bot1)
+[T4 Bot2.Main2]
+
+[Expect]
+Monarch = Bot2
+Exile.Count = 0
+Bot2.Battlefield.Count = 6

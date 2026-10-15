@@ -1,0 +1,43 @@
+# Ledger Shredder, played for real. Same turn 5 second spell, but Bot1 discards a land to the connive: no counter.
+# The Shredder draws and discards an Island, so it stays a 1/3.
+
+[Bot1 Deck]
+Island
+Ledger Shredder
+Island
+Pyrite Spellbomb
+Pyrite Spellbomb
+Island
+Island
+Island
+Island
+Pyrite Spellbomb
+Island x10
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Ledger Shredder.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Pyrite Spellbomb.Cast
+? Bot1.Battlefield.Ledger Shredder.Power = 1
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Pyrite Spellbomb.Cast
+Bot1.Choose(Island)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Ledger Shredder.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Ledger Shredder.Power = 1
+Bot1.Battlefield.Ledger Shredder.Toughness = 3
+Bot1.Graveyard.Count = 1
+Stack.Count = 0

@@ -1,0 +1,352 @@
+# Stress position for large boards: Zirda, the Dawnwaker makes Basalt Monolith's untap cost {1}, so each tap and
+# untap nets two colorless, and 99 loops float 201 for a Forth Eorlingas! with X = 201. Handed over as Bot1 declares
+# attackers with 201 hasty Knights beside seven other permanents on the battlefield, to time game actions against a board
+# of two hundred permanents and look at it in the client.
+#
+# Turn 1 casts both Moxen, then Sol Ring off Mox Ruby and Zirda off the Plateau, Mox Pearl and Sol Ring. Turn 3 casts the
+# Monolith off Sol Ring and a Mox, and keeps both Plateaus for the {R}{W}. Each untap is let resolve before the
+# next tap; the pool keeps its mana while the ability resolves, within the one main phase.
+
+[Bot1 Deck]
+Plateau
+Mox Ruby
+Mox Pearl
+Sol Ring
+Zirda, the Dawnwaker
+Basalt Monolith
+Forth Eorlingas!
+Plateau x10
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Plateau.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Zirda, the Dawnwaker.Cast
+Bot1.Battlefield.Plateau.Activate(Ability: {R})
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plateau.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Basalt Monolith.Cast
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: Untap)
+Bot1.Pass
+Bot1.Battlefield.Basalt Monolith.Activate(Ability: {T})
+Bot1.Battlefield.Plateau#1.Activate(Ability: {R})
+Bot1.Battlefield.Plateau#2.Activate(Ability: {W})
+Bot1.Hand.Forth Eorlingas!.Cast(X: 201)
+Bot1.Pass
+[Handover Bot1.Attack]
+
+[Expect]
+Turn = 3
+Step = Attackers
+ActivePlayer = Bot1
+Bot1.Battlefield.Count = 208
+Bot1.Hand.Count = 0

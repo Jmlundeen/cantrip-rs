@@ -1,0 +1,37 @@
+# Mind's Desire: "exile the top card of your library" exiles what there is (a library with fewer cards is not
+# a failure): the library holds two Mountains but four copies and the original resolve, so two Mountains are exiled and the
+# other three resolutions exile nothing and do not draw or lose. Bot1's library is empty afterwards.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mind's Desire
+Island
+Island
+Mountain
+Mountain
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Mind's Desire.Cast
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Turn = 1
+Result = InProgress
+Bot1.Library.Count = 0
+Exile.Count = 2

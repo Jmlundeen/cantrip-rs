@@ -1,0 +1,33 @@
+# Trinket Mage searches for "an artifact card with mana value 1 or less": a Mind Stone (mana value 2) and a Thoughtcast are not on offer
+# (the refusal), so the search may find nothing (CR 701.23b) and Bot1 takes nothing.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Trinket Mage
+Island x3
+Mind Stone
+Thoughtcast
+Island x9
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Trinket Mage.Cast
+Bot1.Accept
+! Bot1.Search(Mind Stone; Thoughtcast)
+Bot1.Search()
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Hand = Island; Island; Island
+Bot1.Library.Count = 11

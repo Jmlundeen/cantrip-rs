@@ -1,0 +1,59 @@
+# Decaying Soil, then a Brain Freeze with storm six on Bot1 themselves: 22 cards in their graveyard, well past threshold.
+# Turn 3: the upkeep exiles a card from the graveyard (a choice of 22), and when Bot2's Lightning Bolt kills Bot1's
+# Ornithopter, Soil's threshold ability offers {1}; paying it returns the Ornithopter to Bot1's hand.
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Ruby
+Decaying Soil
+Mox Sapphire
+Mox Ruby
+Brain Freeze
+Island x21
+Ornithopter
+Island x5
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Decaying Soil.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Brain Freeze.Cast(Bot1)
+Bot1.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot1.Graveyard.Count = 21
+? Exile.Count = 1
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.PayCost
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Ornithopter
+Bot1.Graveyard.Count = 21
+Exile.Count = 1

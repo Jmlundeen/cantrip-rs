@@ -1,0 +1,36 @@
+# Banner of Kinship chooses Elf as it enters and enters with a fellowship counter for each Elf its controller has
+# (one: Elvish Mystic, not counting the Banner), so the Mystic is a 2/2 and the Ornithopter is untouched.
+
+[Bot1 Deck]
+Forest
+Elvish Mystic
+Black Lotus
+Banner of Kinship
+Ornithopter
+Forest
+Forest
+Forest x12
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Banner of Kinship.Cast
+Bot1.Modes(Elf)
+
+[Expect]
+Bot1.Battlefield.Banner of Kinship.Counters.Fellowship = 1
+Bot1.Battlefield.Elvish Mystic.Power = 2
+Bot1.Battlefield.Elvish Mystic.Toughness = 2
+Bot1.Battlefield.Ornithopter.Power = 0

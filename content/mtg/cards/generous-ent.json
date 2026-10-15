@@ -1,0 +1,11 @@
+{
+  "name": "Generous Ent",
+  "manaCost": "{5}{G}",
+  "type": "Creature — Treefolk",
+  "power": 5,
+  "toughness": 7,
+  "oracleText": "Reach\nWhen this creature enters, create a Food token. (It's an artifact with \"{2}, {T}, Sacrifice this token: You gain 3 life.\")\nForestcycling {1} ({1}, Discard this card: Search your library for a Forest card, reveal it, put it into your hand, then shuffle.)",
+  "keywords": [
+    "Reach"
+  ]
+}

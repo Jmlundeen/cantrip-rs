@@ -1,0 +1,70 @@
+# Cecil, Dark Knight: "Whenever Cecil deals damage, you lose that much life. Then if your life total is less than or
+# equal to half your starting life total, untap Cecil and transform it." Bot2 burns Bot1 down to 8 with four Lightning
+# Bolts on turn 2. On turn 3 Cecil hits for 2, Bot1 loses 2 (6, at most 10) and he turns over, untapped, into Cecil,
+# Redeemed Paladin, a 4/4 with lifelink. On turn 5 the Paladin and the Gorilla attack; "Whenever Cecil attacks, other
+# attacking creatures gain indestructible until end of turn" gives the Gorilla indestructible. 4 life gained (6 to 10),
+# 2 + 6 damage to Bot2 (20 to 12).
+
+[Bot1 Deck]
+Swamp
+Mox Emerald
+Cecil, Dark Knight
+Forest
+Guerrilla Gorilla
+Swamp x2
+Swamp x10
+
+[Bot2 Deck]
+Mox Ruby
+Black Lotus
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Mountain
+Mountain x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Cecil, Dark Knight.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot1.Life = 8
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+Bot1.Pass
+Bot1.Attack(Cecil, Dark Knight)
+[T3 Bot1.Main2]
+? Bot1.Life = 6
+? Bot1.Battlefield.Cecil, Redeemed Paladin.Tapped = false
+? Bot1.Battlefield.Cecil, Redeemed Paladin.Power = 4
+[T5 Bot1.Main1]
+Bot1.Attack(Cecil, Redeemed Paladin; Guerrilla Gorilla)
+Bot1.Pass
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Guerrilla Gorilla.Keywords = Indestructible; Reach
+
+[Expect]
+Turn = 5
+Bot1.Life = 10
+Bot2.Life = 12

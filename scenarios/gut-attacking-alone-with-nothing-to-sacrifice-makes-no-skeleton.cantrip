@@ -1,0 +1,30 @@
+# "Whenever you attack, you may sacrifice another creature or an artifact": Gut attacks alone on turn 7 with only lands beside it.
+# "Another" keeps Gut from being its own sacrifice, and a land is neither a creature nor an artifact, so there is nothing to offer and
+# nobody is asked: no Skeleton is made. Gut connects for 2.
+
+[Bot1 Deck]
+Mountain x7
+Gut, True Soul Zealot
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Hand.Gut, True Soul Zealot.Cast
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Attack(Gut, True Soul Zealot > Bot2)
+[T7 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield.Count = 5

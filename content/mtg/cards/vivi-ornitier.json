@@ -1,0 +1,8 @@
+{
+  "name": "Vivi Ornitier",
+  "manaCost": "{1}{U}{R}",
+  "type": "Legendary Creature — Wizard",
+  "power": 0,
+  "toughness": 3,
+  "oracleText": "{0}: Add X mana in any combination of {U} and/or {R}, where X is Vivi Ornitier's power. Activate only during your turn and only once each turn.\nWhenever you cast a noncreature spell, put a +1/+1 counter on Vivi Ornitier and it deals 1 damage to each opponent."
+}

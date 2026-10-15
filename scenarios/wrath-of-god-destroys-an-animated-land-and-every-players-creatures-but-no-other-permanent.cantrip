@@ -1,0 +1,56 @@
+# Wrath of God: "Destroy all creatures" - every creature on the battlefield as it is right now (CR 613): Bot1's Restless
+# Vinestalk, animated into a 5/5 Plant creature land this turn, and Bot2's Ornithopter, an artifact creature, are destroyed (CR 701.8),
+# while the Moxen (artifacts that are not creatures) and Bot2's land stay. Turn 5: Bot1 animates the Vinestalk with Mox Emerald,
+# Mox Sapphire, Mox Jet, Mox Ruby and Mox Pearl, then casts Wrath of God with a Black Lotus and an Island.
+
+[Bot1 Deck]
+Restless Vinestalk
+Mox Emerald
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Mox Ruby
+Wrath of God
+Island
+Black Lotus
+Island x12
+
+[Bot2 Deck]
+Island
+Ornithopter
+Island x14
+
+[Actions]
+Bot1.Hand.Restless Vinestalk.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Restless Vinestalk.Activate(Ability: becomes a 5/5)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Restless Vinestalk.Types = Land; Creature
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Wrath of God.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Wrath of God; Restless Vinestalk; Black Lotus
+Bot2.Graveyard = Ornithopter
+Bot1.Battlefield = Mox Emerald; Mox Sapphire; Mox Pearl; Mox Jet; Mox Ruby; Island
+Bot2.Battlefield = Island

@@ -1,0 +1,28 @@
+# Gemstone Caverns: "If Gemstone Caverns has a luck counter on it, instead add one mana of any color." Bot1 is the
+# starting player, so the opening-hand action ("if you're not the starting player", CR 103.6a) does not apply to its
+# Caverns: Bot1 plays it as an ordinary land on turn 1, it has no luck counter, and tapping it adds {C}. The luck
+# counter's case is gemstone-caverns-begins-the-game-on-the-battlefield.
+
+[Bot1 Deck]
+Gemstone Caverns
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Plains x16
+
+[Actions]
+Bot1.Hand.Gemstone Caverns.Play
+Bot1.Battlefield.Gemstone Caverns.Activate
+? Bot1.Mana = {C}
+[Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot1.Battlefield.Gemstone Caverns.Tapped = true
+Bot1.Hand.Count = 6

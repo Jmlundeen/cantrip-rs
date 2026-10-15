@@ -1,0 +1,33 @@
+# Fists of Flame: draw a card, then the target creature gains trample and gets +1/+0 for each card drawn this turn,
+# counted as the spell resolves. On turn three Bot1 has drawn for the turn and then with Fists, so Ornithopter
+# (0/2) becomes 2/2 with flying and trample.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Ornithopter
+Fists of Flame
+Mountain
+Mountain
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Fists of Flame.Cast(Ornithopter)
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Graveyard = Fists of Flame
+Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot1.Battlefield.Ornithopter.Keywords = Flying; Trample

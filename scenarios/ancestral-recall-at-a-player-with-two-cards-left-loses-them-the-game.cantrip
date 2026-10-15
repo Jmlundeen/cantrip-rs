@@ -1,0 +1,20 @@
+# CR 121.4 / 704.5b: Recall draws what it can, two cards, and the third draw from an empty library loses Bot2 the game
+# the next time state-based actions are checked.
+
+[Bot1 Deck]
+Island
+Ancestral Recall
+Island x18
+
+[Bot2 Deck]
+Island x9
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot2)
+
+[Expect]
+Result = Bot1 won
+Bot2.Hand.Count = 9
+Bot2.Library.Count = 0

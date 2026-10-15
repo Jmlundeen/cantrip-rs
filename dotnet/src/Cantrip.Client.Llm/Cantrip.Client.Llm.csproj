@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Cantrip.Client\Cantrip.Client.csproj" />
+  </ItemGroup>
+
+  <!-- A seat, so it sees what a seat sees: the client and the protocol, and no engine. The rules are not consulted
+       here any more than they are in the web client — every choice this offers came out of a prompt.
+
+       No package reference either. OpenRouter's endpoint is an HTTP POST with a JSON body, which the framework
+       already does, and a provider SDK would tie the experiment's one real variable — which model is playing — to a
+       dependency instead of a command-line argument. -->
+
+</Project>

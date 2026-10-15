@@ -1,0 +1,29 @@
+# The granted ability returns a target nonland permanent: Island is refused (beside Ornithopter returning itself, the
+# positive control, which is "target nonland permanent" with no "other" and goes to its owner's hand).
+
+[Bot1 Deck]
+Island
+Ornithopter
+Banishing Knack
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Hand.Banishing Knack.Cast(Ornithopter)
+Bot1.Pass
+! Bot1.Battlefield.Ornithopter.Activate(Bot1.Battlefield.Island)
+Bot1.Battlefield.Ornithopter.Activate(Bot1.Battlefield.Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Island; Island
+Bot1.Hand.Count = 5

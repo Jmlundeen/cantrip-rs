@@ -1,0 +1,39 @@
+# Boomerang Basics: "target nonland permanent". Bot1's Plains is not a legal target (the refusal, beside the Ornithopter,
+# the same spell with a legal target as control). Bot2 answers the Boomerang aimed at the Ornithopter with a Lightning
+# Bolt: the target is gone on resolution (CR 608.2b), the spell does nothing, so there is no return and no draw.
+
+[Bot1 Deck]
+Mox Sapphire
+Ornithopter
+Plains
+Boomerang Basics
+Plains x3
+Plains x14
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Hand.Boomerang Basics.Cast(Bot1.Battlefield.Plains)
+Bot1.Hand.Boomerang Basics.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Plains; Mox Sapphire
+Bot1.Graveyard = Boomerang Basics; Ornithopter
+Bot1.Hand.Count = 4

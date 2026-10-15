@@ -1,0 +1,43 @@
+# The control for the gift: the same Wrath of God turn, but Bot1 declines to promise the gift. Dawn's Truce then gives hexproof and no indestructible, so the Ornithopter is destroyed, and Bot2 draws no card.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Ornithopter
+Dawn's Truce
+Plains x14
+
+[Bot2 Deck]
+Mox Emerald
+Elvish Mystic
+Black Lotus
+Mox Pearl
+Wrath of God
+Island x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Wrath of God.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Dawn's Truce.Cast
+Bot1.Decline
+Bot1.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Plains; Mox Pearl
+Bot1.Graveyard = Ornithopter; Dawn's Truce
+Bot2.Graveyard = Wrath of God; Elvish Mystic; Black Lotus
+Bot2.Hand.Count = 3

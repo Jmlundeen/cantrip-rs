@@ -1,0 +1,38 @@
+# Bazaar of Baghdad's ability is independent of its source once activated (CR 113.7a, 608.2h): the tap was a cost, and
+# Bot2's Wasteland destroys the land in response (a nonbasic land), yet the ability still draws two cards and discards
+# three of the player's choice. Bazaar ends in the graveyard.
+
+[Bot1 Deck]
+Bazaar of Baghdad
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Lightning Bolt
+Counterspell
+Swamp x8
+
+[Bot2 Deck]
+Wasteland
+Island x14
+
+[Actions]
+Bot1.Hand.Bazaar of Baghdad.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Wasteland.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Bazaar of Baghdad.Activate
+Bot2.Battlefield.Wasteland.Activate(Bazaar of Baghdad; Ability: Destroy)
+? Stack.Count = 2
+? Bot1.Battlefield.Bazaar of Baghdad.Tapped = true
+Bot1.Pass
+Bot1.Choose(Swamp; Swamp; Swamp)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Swamp; Swamp; Swamp; Bazaar of Baghdad
+Bot1.Hand.Count = 6
+Bot1.Battlefield.Count = 0
+Bot2.Graveyard = Wasteland

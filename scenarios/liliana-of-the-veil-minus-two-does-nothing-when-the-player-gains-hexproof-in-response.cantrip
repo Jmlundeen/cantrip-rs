@@ -1,0 +1,51 @@
+# Liliana of the Veil's −2: "Target player sacrifices a creature." Bot2 answers with Dawn's Truce (a Plains and a Mox Pearl held
+# since turn 2), gaining hexproof, so the only target is illegal and the ability does nothing (CR 608.2b): its Llanowar Elves
+# is not sacrificed. Liliana was cast on turn 1 with a Swamp, a Mox Jet and a Mox Ruby, and paid her −2 on turn 3 (loyalty 3 to 1).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Liliana of the Veil
+Swamp x16
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mox Emerald
+Llanowar Elves
+Dawn's Truce
+Plains x15
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Liliana of the Veil.Cast
+Bot1.Pass
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Liliana of the Veil.Activate(Bot2; Ability: sacrifices a creature)
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Dawn's Truce.Cast
+Bot2.Decline
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Plains; Mox Pearl; Mox Emerald; Llanowar Elves
+Bot2.Graveyard = Dawn's Truce
+Bot1.Battlefield.Liliana of the Veil.Counters.Loyalty = 1

@@ -1,0 +1,32 @@
+# The enters trigger needs a target, "nonland permanent an opponent controls": Bot2 controls only an Island, so the trigger is not put on
+# the stack (the bare Target refusal) and the Aura simply stays on Bot1's Ornithopter.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Ornithopter
+Sheltered by Ghosts
+Plains x3
+Plains x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sheltered by Ghosts.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+! Bot1.Target
+[T3 Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot1.Battlefield.Sheltered by Ghosts.AttachedTo = Ornithopter
+Bot2.Battlefield = Island

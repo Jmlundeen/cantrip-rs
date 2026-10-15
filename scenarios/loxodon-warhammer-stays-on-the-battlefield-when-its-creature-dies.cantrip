@@ -1,0 +1,48 @@
+# State-based actions put an Equipment whose creature has left the battlefield unattached, not into the graveyard (CR
+# 704.5n): Bot2's Lightning Bolt kills the equipped Ornithopter and the Warhammer stays, attached to nothing.
+
+[Bot1 Deck]
+Island
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Loxodon Warhammer
+Ornithopter
+Island x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x14
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Loxodon Warhammer.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Loxodon Warhammer.Activate(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Loxodon Warhammer.AttachedTo = Ornithopter
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Ornithopter)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Ornithopter
+Bot1.Battlefield.Loxodon Warhammer.AttachedTo = (absent)
+Bot1.Battlefield.Loxodon Warhammer.Tapped = false

@@ -1,0 +1,24 @@
+# Prismatic Vista: {T}, pay 1 life, sacrifice it: search for a basic land card of any type and put it onto the battlefield.
+# Here a Forest is fetched, though the library also holds a Mountain.
+
+[Bot1 Deck]
+Prismatic Vista
+Island x6
+Mountain
+Forest
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Prismatic Vista.Play
+Bot1.Battlefield.Prismatic Vista.Activate
+Bot1.Search(Forest)
+
+[Expect]
+Turn = 1
+Bot1.Life = 19
+Bot1.Graveyard = Prismatic Vista
+Bot1.Battlefield = Forest
+Bot1.Battlefield.Forest.Tapped = false

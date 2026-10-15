@@ -1,0 +1,38 @@
+# Berserk: "Target creature" is any creature, and the delayed trigger destroys it if "it attacked this turn" whoever
+# controls it. Bot2's Embereth Shieldbreaker attacks on turn 4 and Bot1, who has an instant-speed Berserk and a Forest,
+# casts it on the attacker in the declare attackers step: it hits for 4 (2 + 2, trample) and is destroyed at the end
+# step, though Bot1 does not control it.
+
+[Bot1 Deck]
+Forest
+Berserk
+Forest x13
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Embereth Shieldbreaker
+Mountain x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Embereth Shieldbreaker.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+[T4 Bot2.Main1]
+Bot2.Attack(Embereth Shieldbreaker > Bot1)
+Bot1.Hand.Berserk.Cast(Bot2.Battlefield.Embereth Shieldbreaker)
+Bot1.Battlefield.Forest.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Embereth Shieldbreaker.Power = 4
+[T5 Bot1.Upkeep]
+
+[Expect]
+Bot1.Life = 16
+Bot2.Graveyard = Embereth Shieldbreaker
+Bot2.Battlefield = Mountain; Mox Ruby
+Bot1.Graveyard = Berserk

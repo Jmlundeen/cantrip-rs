@@ -1,0 +1,23 @@
+# Volcanic Island has both basic land types (Island Mountain), so either of the Tarn's types finds it (CR 205.3i); it enters
+# untapped. A Plains in the library is not findable (refusal).
+
+[Bot1 Deck]
+Scalding Tarn
+Plains x6
+Plains
+Volcanic Island
+Plains x10
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Scalding Tarn.Play
+Bot1.Battlefield.Scalding Tarn.Activate
+! Bot1.Search(Plains)
+Bot1.Search(Volcanic Island)
+
+[Expect]
+Bot1.Life = 19
+Bot1.Battlefield = Volcanic Island
+Bot1.Battlefield.Volcanic Island.Tapped = False

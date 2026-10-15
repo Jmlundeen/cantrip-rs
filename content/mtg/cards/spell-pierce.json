@@ -1,0 +1,6 @@
+{
+  "name": "Spell Pierce",
+  "manaCost": "{U}",
+  "type": "Instant",
+  "oracleText": "Counter target noncreature spell unless its controller pays {2}."
+}

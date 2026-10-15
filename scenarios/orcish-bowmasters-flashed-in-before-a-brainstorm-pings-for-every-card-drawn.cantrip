@@ -1,0 +1,39 @@
+# Orcish Bowmasters has flash. In response to Bot2's Brainstorm (draw three) Bot1 casts it: the enters trigger pings Bot2
+# and makes the Army, then Brainstorm draws three cards and none of them is the first of a draw step, so the Bowmasters
+# triggers three more times: four pings in all (20 to 16) and an Army with four counters.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Orcish Bowmasters
+Swamp x4
+Swamp x10
+
+[Bot2 Deck]
+Island
+Brainstorm
+Island x5
+Island x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Brainstorm.Cast
+Bot1.Hand.Orcish Bowmasters.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot1.Target(Bot2)
+Bot1.Target(Bot2)
+Bot1.Target(Bot2)
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Bot2.Life = 16
+Bot1.Battlefield.Orc Army.Counters.PlusOnePlusOne = 4

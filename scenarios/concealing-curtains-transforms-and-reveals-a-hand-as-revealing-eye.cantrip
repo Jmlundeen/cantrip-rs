@@ -1,0 +1,41 @@
+# Concealing Curtains comes down as a 0/4 Wall on turn 1. On turn 3 its {2}{B} turns it over, and the back face's
+# "when this creature transforms into Revealing Eye" reveals Bot2's hand, takes the Lightning Bolt out of it, and
+# gives Bot2 a card back off the top.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Concealing Curtains
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Lightning Bolt
+Counterspell
+Island x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Concealing Curtains.Cast
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Concealing Curtains.Power = 0
+? Bot1.Battlefield.Concealing Curtains.Keywords = Defender
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Concealing Curtains.Activate
+Bot1.Choose(Lightning Bolt)
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Mox Jet; Revealing Eye; Swamp; Swamp
+Bot1.Battlefield.Revealing Eye.Power = 3
+Bot1.Battlefield.Revealing Eye.Toughness = 4
+Bot1.Battlefield.Revealing Eye.Keywords = Menace
+Bot2.Graveyard = Lightning Bolt
+Bot2.Hand = Counterspell; Island; Island; Island; Island; Island; Island
+Stack.Count = 0

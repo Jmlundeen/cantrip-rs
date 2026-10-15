@@ -1,0 +1,79 @@
+# Sear: "4 damage to target creature or planeswalker". Bot2's Chandra, Torch of Defiance (cast off Black Lotus and Mox Ruby,
+# then +1 to 5 loyalty) takes 4 damage and survives on 1 loyalty (damage to a planeswalker removes loyalty counters); the
+# second Sear removes the last and she is put into the graveyard. A third Sear kills Bot2's 0/4 Concealing Curtains
+# (exactly lethal).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+Sear
+Sear
+Sear
+Mountain x14
+
+[Bot2 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+Chandra, Torch of Defiance
+Concealing Curtains
+Island x2
+Island x13
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Chandra, Torch of Defiance.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Chandra, Torch of Defiance.Activate(Ability: Add)
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Concealing Curtains.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sear.Cast(Bot2.Battlefield.Chandra, Torch of Defiance)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Chandra, Torch of Defiance.Counters.Loyalty = 1
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sear.Cast(Bot2.Battlefield.Chandra, Torch of Defiance)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Graveyard.Count = 2
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Sear.Cast(Bot2.Battlefield.Concealing Curtains)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Bot2.Graveyard.Count = 3
+Bot1.Graveyard = Sear; Sear; Sear

@@ -1,0 +1,71 @@
+# Oath of Druids: "At the beginning of each player's upkeep, that player chooses target player who controls more creatures
+# than they do and is their opponent." In a game of three, Bot1 owns the Oath and a Llanowar Elves, Bot3 an Elvish Mystic,
+# and Bot2 has no creature. At Bot2's upkeep on turn 5 either of them is a legal target, and Bot2 chooses Bot3. In
+# response Bot3 exiles its own Elvish Mystic with Swords to Plowshares: the Oath's only target is gone, the ability
+# does nothing, and Bot2 is not asked to reveal (its library of 21 is down only by the seven dealt and two draws, turns 2 and 5).
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Oath of Druids
+Llanowar Elves
+Swamp
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Swamp x8
+Forest
+Forest
+Elvish Mystic
+Swamp x10
+
+[Bot3 Deck]
+Mox Emerald
+Mox Pearl
+Elvish Mystic
+Swords to Plowshares
+Plains
+Plains
+Plains
+Plains x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Oath of Druids.Cast
+Bot1.Pass
+[T3 Bot3.Main1]
+Bot3.Hand.Mox Emerald.Cast
+Bot3.Pass
+Bot3.Hand.Mox Pearl.Cast
+Bot3.Pass
+Bot3.Battlefield.Mox Emerald.Activate
+Bot3.Hand.Elvish Mystic.Cast
+Bot3.Pass
+[T5 Bot2.Upkeep]
+Bot2.Target(Bot3)
+Bot2.Pass
+Bot3.Battlefield.Mox Pearl.Activate
+Bot3.Hand.Swords to Plowshares.Cast(Bot3.Battlefield.Elvish Mystic)
+Bot3.Pass
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+! Bot2.Accept
+[T5 Bot2.Main1]
+
+[Expect]
+Turn = 5
+Exile = Elvish Mystic
+Bot2.Battlefield.Count = 0
+Bot2.Library.Count = 12

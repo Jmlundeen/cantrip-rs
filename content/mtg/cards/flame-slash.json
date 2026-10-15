@@ -1,0 +1,6 @@
+{
+  "name": "Flame Slash",
+  "manaCost": "{R}",
+  "type": "Sorcery",
+  "oracleText": "Flame Slash deals 4 damage to target creature."
+}

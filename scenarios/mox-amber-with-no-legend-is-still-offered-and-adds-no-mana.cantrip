@@ -1,0 +1,19 @@
+# Mox Amber with no legendary creature or planeswalker to read a color from has no color to choose, but it is still
+# offered and can be tapped: it adds no mana (CR 106.5).
+
+[Bot1 Deck]
+Mox Amber
+Mountain x15
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Amber.Cast
+Bot1.Battlefield.Mox Amber.Activate
+? Bot1.Mana =
+? Bot1.Battlefield.Mox Amber.Tapped = true
+
+[Expect]
+Bot1.Mana =
+Bot1.Battlefield.Mox Amber.Tapped = true

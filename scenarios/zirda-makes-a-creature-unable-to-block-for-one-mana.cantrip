@@ -1,0 +1,61 @@
+# Zirda, the Dawnwaker: "{1}, {T}: Target creature can't block this turn." Its own cost is {1} (the {2} reduction cannot
+# take it below one mana). Turn 3 Zirda (cast on turn 1) taps with a Mox Jet to stop Bot2's Ornithopter blocking; Bot1's
+# Llanowar Elves attacks and Bot2 cannot block with it (refused). On turn 5, with Zirda unused, the same block is allowed
+# (the positive control) and takes place.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Zirda, the Dawnwaker
+Forest
+Llanowar Elves
+Forest
+Forest x14
+
+[Bot2 Deck]
+Ornithopter
+Forest
+Elvish Mystic
+Forest x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Zirda, the Dawnwaker.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Zirda, the Dawnwaker.Activate(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Llanowar Elves > Bot2)
+! Bot2.Block(Ornithopter > Llanowar Elves)
+[T5 Bot1.Main1]
+Bot1.Attack(Llanowar Elves > Bot2)
+Bot2.Block(Ornithopter > Llanowar Elves)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot2.Life = 19

@@ -1,0 +1,29 @@
+# Played as a land, Zagoth Triome enters tapped (CR 614.1c): its mana abilities are refused that turn. It is a Swamp Forest
+# Island with a basic land type for each of three colors (CR 305.6), and on turns 3, 5 and 7 it adds {B}, {G} and {U} in turn,
+# one mana of one color each time. Its cycling is a hand ability and plays no part once it is on the battlefield.
+
+[Bot1 Deck]
+Zagoth Triome
+Island x6
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Zagoth Triome.Play
+! Bot1.Battlefield.Zagoth Triome.Activate(Ability: {B})
+? Bot1.Battlefield.Zagoth Triome.Tapped = true
+? Bot1.Battlefield.Zagoth Triome.Subtypes = Forest; Island; Swamp
+[T3 Bot1.Main1]
+Bot1.Battlefield.Zagoth Triome.Activate(Ability: {B})
+? Bot1.Mana = {B}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Zagoth Triome.Activate(Ability: {G})
+? Bot1.Mana = {G}
+[T7 Bot1.Main1]
+Bot1.Battlefield.Zagoth Triome.Activate(Ability: {U})
+? Bot1.Mana = {U}
+
+[Expect]
+Bot1.Battlefield.Zagoth Triome.Tapped = true

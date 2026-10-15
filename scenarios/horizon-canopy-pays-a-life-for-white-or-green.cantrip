@@ -1,0 +1,19 @@
+# Horizon Canopy: {T}, pay 1 life: add {G} or {W}. Bot1 taps it for white and is down to 19 life.
+
+[Bot1 Deck]
+Horizon Canopy
+Island x6
+Island x10
+
+[Bot2 Deck]
+Swamp x15
+
+[Actions]
+Bot1.Hand.Horizon Canopy.Play
+Bot1.Battlefield.Horizon Canopy.Activate(Ability: Add; Color: White)
+
+[Expect]
+Turn = 1
+Bot1.Life = 19
+Bot1.Mana = {W}
+Bot1.Battlefield.Horizon Canopy.Tapped = true

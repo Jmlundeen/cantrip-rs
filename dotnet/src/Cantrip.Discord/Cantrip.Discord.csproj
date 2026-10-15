@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- The Discord bot: a Discord adapter (DiscordBot) over a matchmaker that knows nothing of Discord. The
+       matchmaker is what is tested; the adapter only translates interactions into its calls and its games back
+       into messages. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>cantrip-discord</AssemblyName>
+    <RootNamespace>Cantrip.Discord</RootNamespace>
+    <!-- Every project runs globalization-invariant (Directory.Build.props), where naming a culture throws. Discord.Net
+         names one for each guild's preferred locale as the guild arrives, and without this that update fails. Named
+         cultures still behave as the invariant culture; they just no longer throw. -->
+    <PredefinedCulturesOnly>false</PredefinedCulturesOnly>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Cantrip.Discord.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- For the web client and its art, which the bot serves itself (ClientSite). -->
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Discord.Net.WebSocket" />
+    <!-- What plays the seats a queue keeps for bots (BotSeats). -->
+    <ProjectReference Include="..\Cantrip.Client\Cantrip.Client.csproj" />
+    <ProjectReference Include="..\Cantrip.Server\Cantrip.Server.csproj" />
+    <ProjectReference Include="..\Cantrip.Server.Host\Cantrip.Server.Host.csproj" />
+  </ItemGroup>
+
+</Project>

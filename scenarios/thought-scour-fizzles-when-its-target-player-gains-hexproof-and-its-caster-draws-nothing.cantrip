@@ -1,0 +1,35 @@
+# Bot2 casts Thought Scour on Bot1, and Bot1 answers with Dawn's Truce, gaining hexproof: its only target illegal,
+# Thought Scour does not resolve (CR 608.2b), so nothing is milled and Bot2, its controller, draws no card.
+
+[Bot1 Deck]
+Plains
+Plains
+Dawn's Truce
+Swamp x4
+Forest
+Mountain
+Swamp x5
+
+[Bot2 Deck]
+Island
+Thought Scour
+Mountain x5
+Mountain x8
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot2.Hand.Island.Play
+Bot1.Hand.Plains.Play
+[T4 Bot2.Main1]
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Thought Scour.Cast(Bot1)
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Dawn's Truce.Cast
+
+[Expect]
+Bot1.Graveyard = Dawn's Truce
+Bot1.Library.Count = 6
+Bot2.Graveyard = Thought Scour
+Bot2.Hand.Count = 7
+Bot2.Library.Count = 6

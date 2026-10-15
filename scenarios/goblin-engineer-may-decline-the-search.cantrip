@@ -1,0 +1,33 @@
+# Goblin Engineer: "you may search your library for an artifact card". Bot1 declines: nothing is put into the graveyard and
+# the Mox Jet stays in the library (the positive control is
+# goblin-engineer-buries-an-artifact-then-sacrifices-another-to-return-it).
+
+[Bot1 Deck]
+Goblin Engineer
+Mox Ruby
+Mountain
+Island
+Island
+Island
+Island
+Mox Jet
+Island x10
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Goblin Engineer.Cast
+Bot1.Pass
+Bot1.Decline
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard.Count = 0
+Bot1.Library.Count = 11
+Bot1.Battlefield = Mountain; Mox Ruby; Goblin Engineer

@@ -1,0 +1,67 @@
+# Gix's Command, "Choose two": modes 1 and 4. Bot1 puts two +1/+1 counters on its own Ornithopter (it gains lifelink),
+# then each opponent sacrifices a creature with the greatest power among their creatures: Bot2's Elvish Mystic and
+# Llanowar Elves tie at power 1, so Bot2 chooses the Mystic. No mode has a target; everything is chosen on resolution.
+
+[Bot1 Deck]
+Gix's Command
+Mox Jet
+Gleemox
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Ornithopter
+Island x11
+
+[Bot2 Deck]
+Mox Emerald
+Gleemox
+Elvish Mystic
+Llanowar Elves
+Island
+Island
+Island
+Island x11
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Gleemox.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Gleemox.Activate(Color: Green)
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Pass
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Black)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Gix's Command.Cast
+Bot1.Modes(1; 4)
+Bot1.Pass
+Bot1.Accept
+Bot1.Target(Ornithopter)
+Bot2.Choose(Elvish Mystic)
+
+[Expect]
+Bot1.Graveyard = Gix's Command
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Ornithopter.Keywords = Flying; Lifelink
+Bot2.Graveyard = Elvish Mystic
+Bot2.Battlefield = Mox Emerald; Gleemox; Llanowar Elves

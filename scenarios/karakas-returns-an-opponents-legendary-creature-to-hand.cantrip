@@ -1,0 +1,32 @@
+# Karakas: "{T}: Return target legendary creature to its owner's hand" reaches an opponent's creature too. Bot2 casts
+# the legendary Gau, Feral Youth; on turn 3 Bot1 taps Karakas to send it back to Bot2's hand.
+
+[Bot1 Deck]
+Karakas
+Plains x19
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Gau, Feral Youth
+Plains x17
+
+[Actions]
+Bot1.Hand.Karakas.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Gau, Feral Youth.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Karakas.Activate(Ability: Return; Bot2.Battlefield.Gau, Feral Youth)
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield.Karakas.Tapped = true
+Bot2.Battlefield = Mountain; Mox Ruby
+Bot2.Hand = Gau, Feral Youth; Plains; Plains; Plains; Plains; Plains

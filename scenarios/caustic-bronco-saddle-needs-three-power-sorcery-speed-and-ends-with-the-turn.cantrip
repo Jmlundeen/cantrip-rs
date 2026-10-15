@@ -1,0 +1,60 @@
+# Saddle 3: a lone Mother of Runes (power 1) cannot pay it (refusal beside the saddle that Cathar Commando, power 3 and
+# summoning sick, pays with: tapping for a cost is not a {T} ability of its own, CR 702.171a). On turn 3 the saddled
+# Bronco reveals Cathar Commando (mana value 2) and Bot2 loses 2 as well as 2 combat damage. On turn 5, with Bot1's
+# own Cathar Commando still on the stack, saddle is refused (sorcery speed); the Bronco then attacks unsaddled, since
+# the saddling ended with turn 3, and Bot1 loses the 2 instead.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Emerald
+Mox Pearl
+Caustic Bronco
+Mother of Runes
+Cathar Commando
+Swamp
+Cathar Commando
+Swamp
+Cathar Commando
+Swamp x6
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Caustic Bronco.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Mother of Runes.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+! Bot1.Battlefield.Caustic Bronco.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Cathar Commando.Cast
+Bot1.Pass
+Bot1.Battlefield.Caustic Bronco.Activate
+Bot1.Choose(Cathar Commando)
+Bot1.Attack(Caustic Bronco > Bot2)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Caustic Bronco.Saddled = true
+? Bot1.Life = 20
+? Bot2.Life = 16
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Cathar Commando.Cast
+! Bot1.Battlefield.Caustic Bronco.Activate
+Bot1.Pass
+Bot1.Attack(Caustic Bronco > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 18
+Bot2.Life = 14
+Bot1.Battlefield.Caustic Bronco.Saddled = (absent)

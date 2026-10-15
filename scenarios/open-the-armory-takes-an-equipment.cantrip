@@ -1,0 +1,29 @@
+# Open the Armory: Bot1 takes the Equipment (Colossus Hammer) - the other branch of "an Aura or Equipment card" - and leaves the Aura in the library.
+
+[Bot1 Deck]
+Island
+Mox Pearl
+Open the Armory
+Island x4
+Mox Ruby
+Animate Dead
+Colossus Hammer
+Island x8
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Open the Armory.Cast
+Bot1.Pass
+Bot1.Search(Colossus Hammer)
+
+[Expect]
+Bot1.Graveyard = Open the Armory
+Bot1.Hand = Island; Island; Island; Island; Colossus Hammer
+Bot1.Library.Count = 10

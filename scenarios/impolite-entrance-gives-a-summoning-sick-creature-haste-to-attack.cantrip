@@ -1,0 +1,27 @@
+# "Haste until end of turn": Elvish Mystic, cast this turn, attacks after Impolite Entrance and deals 1 damage to Bot2;
+# the card is drawn all the same.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Elvish Mystic
+Impolite Entrance
+Island x4
+Island x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Impolite Entrance.Cast(Elvish Mystic)
+Bot1.Attack(Elvish Mystic > Bot2)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 19
+Bot1.Hand.Count = 4

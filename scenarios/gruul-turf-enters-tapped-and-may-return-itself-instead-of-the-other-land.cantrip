@@ -1,0 +1,32 @@
+# With a Forest in play the player chooses which land the Turf returns (CR 603.6a): on turn 3 the Turf itself, leaving the
+# untapped Forest (it still taps for G); on turn 5 the replayed Turf returns the Forest instead and stays. A Turf that
+# stays has entered tapped (CR 614.1c), so its mana ability is refused that turn.
+
+[Bot1 Deck]
+Forest
+Gruul Turf
+Forest x5
+Forest x10
+
+[Bot2 Deck]
+Mountain x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Gruul Turf.Play
+Bot1.Choose(Gruul Turf)
+[T3 Bot1.Main2]
+Bot1.Battlefield.Forest.Activate
+? Bot1.Mana = {G}
+? Bot1.Battlefield.Count = 1
+[T5 Bot1.Main1]
+Bot1.Hand.Gruul Turf.Play
+Bot1.Choose(Forest)
+[T5 Bot1.Main2]
+! Bot1.Battlefield.Gruul Turf.Activate
+? Bot1.Battlefield.Gruul Turf.Tapped = true
+
+[Expect]
+Bot1.Battlefield = Gruul Turf
+Bot1.LandsPlayed = 1

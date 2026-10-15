@@ -1,0 +1,40 @@
+# Thor, God of Thunder: "Whenever you cast a noncreature spell, Thor deals damage equal to that spell's mana value to any
+# target." Bot1 casts Thor on turn 1 off two Black Lotuses (no card in its graveyard, so the enters trigger has no target). On turn
+# 2 Bot2 casts a Brainstorm, a noncreature spell, but it is Bot2's spell and not Bot1's: nothing triggers, the stack empties,
+# and both players are still at 20.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Black Lotus
+Thor, God of Thunder
+Island
+Island
+Island x12
+
+[Bot2 Deck]
+Island
+Brainstorm
+Island x13
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Thor, God of Thunder.Cast
+Bot1.Pass
+Bot2.Pass
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Brainstorm.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Choose(Island; Island)
+? Stack.Count = 0
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 20

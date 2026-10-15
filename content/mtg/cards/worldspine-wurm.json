@@ -1,0 +1,11 @@
+{
+  "name": "Worldspine Wurm",
+  "manaCost": "{8}{G}{G}{G}",
+  "type": "Creature — Wurm",
+  "power": 15,
+  "toughness": 15,
+  "oracleText": "Trample\nWhen this creature dies, create three 5/5 green Wurm creature tokens with trample.\nWhen Worldspine Wurm is put into a graveyard from anywhere, shuffle it into its owner's library.",
+  "keywords": [
+    "Trample"
+  ]
+}

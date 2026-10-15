@@ -1,0 +1,55 @@
+# Bloodforged Battle-Axe: only combat damage makes a copy (CR 510.2). On turn 1 Bot1 casts the Axe and a Walking
+# Ballista with two counters; on turn 3 it equips the Ballista and removes a counter to deal 1 damage to Bot2 -- the
+# equipped creature deals noncombat damage to a player, and there is no copy (the seven permanents are still seven).
+# Then the Ballista (a 1/1 with the Axe's +2/+0) attacks, deals 3 combat damage, and the Axe makes a token copy.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Mox Emerald
+Bloodforged Battle-Axe
+Walking Ballista
+Sol Ring
+Plains x20
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Bloodforged Battle-Axe.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Walking Ballista.Cast(X: 2)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Bloodforged Battle-Axe.Activate(Bot1.Battlefield.Walking Ballista)
+Bot1.Pass
+Bot1.Battlefield.Walking Ballista.Activate(Bot2; Ability: Remove)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 19
+? Bot1.Battlefield.Count = 7
+? Bot1.Battlefield.Walking Ballista.Power = 3
+Bot1.Attack(Walking Ballista > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot1.Battlefield.Count = 8

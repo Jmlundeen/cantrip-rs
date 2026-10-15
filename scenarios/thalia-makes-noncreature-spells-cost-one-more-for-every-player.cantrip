@@ -1,0 +1,32 @@
+# Bot1 casts Mox Pearl for free and then Thalia with Plains and the Mox. On turn 2 Bot2's Mox Ruby, which costs {0},
+# now costs {1}: the Mountain is tapped to cast it, and Thalia herself (a creature) was not taxed.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Thalia, Guardian of Thraben
+Plains x12
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Mountain x13
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Thalia, Guardian of Thraben.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mountain.Activate
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Bot1.Battlefield = Plains; Mox Pearl; Thalia, Guardian of Thraben
+Bot2.Battlefield = Mountain; Mox Ruby
+Bot2.Battlefield.Mountain.Tapped = true
+Bot2.Battlefield.Mox Ruby.Tapped = false

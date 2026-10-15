@@ -1,0 +1,56 @@
+# All That Glitters counts the artifacts and enchantments its controller has, the Aura itself included, and not an
+# opponent's. Bot1 enchants its own Ornithopter (an artifact creature) with Sol Ring out: Ornithopter, Sol Ring and the
+# Aura make 3, so a 0/2 is 3/5, though Bot2 has a Sol Ring of its own. Before any creature exists the Aura cannot be
+# cast (it enchants a creature: CR 303.4a), and Bot2's Disenchant on Bot1's Sol Ring drops the bonus to 2 (CR 613.4c).
+
+[Bot1 Deck]
+Plains
+Sol Ring
+Ornithopter
+All That Glitters
+Plains
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Plains
+Sol Ring
+Disenchant
+Plains
+Plains
+Plains
+Plains
+Plains x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+! Bot1.Hand.All That Glitters.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.All That Glitters.Cast(Ornithopter)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Ornithopter.Power = 3
+? Bot1.Battlefield.Ornithopter.Toughness = 5
+? Bot1.Battlefield.All That Glitters.AttachedTo = Ornithopter
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Plains#2.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Sol Ring)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Ornithopter.Toughness = 4
+Bot1.Graveyard = Sol Ring
+Bot2.Battlefield.Sol Ring.Tapped = false

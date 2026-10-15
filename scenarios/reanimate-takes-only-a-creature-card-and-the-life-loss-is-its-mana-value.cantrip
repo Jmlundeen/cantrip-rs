@@ -1,0 +1,33 @@
+# "Target creature card from a graveyard ... You lose life equal to that card's mana value": Bot1's graveyard holds Lightning Bolt and Brazen Borrower (both discarded to Faithless Looting). The Bolt is refused as a target (not a creature card);
+# the Borrower is reanimated (the positive control): it comes onto the battlefield under Bot1's control, summoning sick, and Bot1 loses 3 life (its mana value), ending at 17.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Faithless Looting
+Reanimate
+Lightning Bolt
+Brazen Borrower
+Mox Pearl
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Lightning Bolt; Brazen Borrower)
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Reanimate.Cast(Lightning Bolt)
+Bot1.Hand.Reanimate.Cast(Brazen Borrower)
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 17
+Bot1.Battlefield.Brazen Borrower.SummoningSick = true
+Bot1.Graveyard = Reanimate; Faithless Looting; Lightning Bolt

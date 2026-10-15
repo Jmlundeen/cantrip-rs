@@ -1,0 +1,37 @@
+# "Destroy target creature": destruction is not "can't be regenerated" for indestructible (CR 702.12b). Bot1 casts Damn on
+# Bot2's Ornithopter on turn three and Bot2 answers with Revitalizing Repast, giving it indestructible until end of turn
+# (and a +1/+1 counter): the target is still legal, the spell resolves, and the Ornithopter survives with damage-free
+# toughness 3.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Damn
+Swamp x12
+
+[Bot2 Deck]
+Mox Jet
+Ornithopter
+Revitalizing Repast
+Mox Jet
+Swamp x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Damn.Cast(Bot2.Battlefield.Ornithopter)
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Revitalizing Repast.Cast(Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Damn
+Bot2.Graveyard = Revitalizing Repast
+Bot2.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot2.Battlefield.Ornithopter.Toughness = 3

@@ -1,0 +1,56 @@
+# Plumb the Forbidden: "When you do, copy this spell for each creature sacrificed this way" is a triggered ability that
+# goes on the stack above the spell (CR 603.12), and copies of a spell that has left the stack are made from its last-known
+# information (CR 707.10, as for storm). Bot1 sacrifices two Ornithopters; with the trigger on the stack Bot2 counters the
+# original with Counterspell (an Island and a Mox Sapphire). The trigger still resolves and makes two copies, which each
+# draw a card and cost 1 life: Bot1 draws two (the countered original draws nothing) and is at 18. Bot1 holds 4 cards:
+# 3 left after the first turn's plays, 1 drawn for the turn, a Swamp played and Plumb cast, then the 2 drawn by the copies.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Ornithopter
+Ornithopter
+Plumb the Forbidden
+Swamp
+Swamp
+Island x12
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Island x4
+Island x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Plumb the Forbidden.Cast
+Bot1.Modes(2)
+Bot1.Choose(Ornithopter)
+Bot1.Choose(Ornithopter)
+Bot1.Pass
+Bot2.Hand.Counterspell.Cast(Stack.Plumb the Forbidden)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 18
+Bot2.Graveyard = Counterspell
+Bot1.Hand.Count = 4

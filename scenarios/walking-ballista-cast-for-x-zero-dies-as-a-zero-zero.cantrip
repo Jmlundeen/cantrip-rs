@@ -1,0 +1,16 @@
+# X = 0 makes {X}{X} cost nothing and the Ballista enters with no counters: a 0/0 that state-based actions put into the graveyard (CR 704.5f).
+
+[Bot1 Deck]
+Walking Ballista
+Island x16
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Walking Ballista.Cast(X: 0)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Count = 0
+Bot1.Graveyard = Walking Ballista

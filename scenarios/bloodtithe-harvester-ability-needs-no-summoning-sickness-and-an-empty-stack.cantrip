@@ -1,0 +1,45 @@
+# "{T}, Sacrifice ...: Activate only as a sorcery": the Harvester cannot be used the turn it arrives ({T} and CR 302.6)
+# nor, on turn 5, while Bot1's own Lightning Bolt is on the stack (CR 602.5d / 307.1); it can once the Bolt has
+# resolved, and the single Blood token makes X = 2, which kills Bot2's Elvish Mystic (the positive control).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Bloodtithe Harvester
+Lightning Bolt
+Swamp
+Swamp
+Swamp
+Swamp x8
+
+[Bot2 Deck]
+Mox Emerald
+Elvish Mystic
+Swamp x14
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Bloodtithe Harvester.Cast
+[T3 Bot1.Main2]
+! Bot1.Battlefield.Bloodtithe Harvester.Activate(Bot2.Battlefield.Elvish Mystic)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+! Bot1.Battlefield.Bloodtithe Harvester.Activate(Bot2.Battlefield.Elvish Mystic)
+Bot1.Pass
+Bot1.Battlefield.Bloodtithe Harvester.Activate(Bot2.Battlefield.Elvish Mystic)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot2.Graveyard = Elvish Mystic
+Bot1.Graveyard = Bloodtithe Harvester; Lightning Bolt
+Bot1.Battlefield = Mox Jet; Mox Ruby; Blood Token

@@ -1,0 +1,39 @@
+# Tapping a Mountain for mana on turn 5 (a land is no Dwarf) makes no Treasure: the count below stays exact. The same five Treasures, sacrificed on turn 11, fetch an artifact that is not a Dragon: Sol Ring comes onto the battlefield.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Magda, Brazen Outlaw
+Mountain x4
+Mountain x5
+Kokusho, the Evening Star
+Sol Ring
+Mountain x8
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Magda, Brazen Outlaw.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Magda, Brazen Outlaw > Bot2)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Attack(Magda, Brazen Outlaw > Bot2)
+[T7 Bot1.Main1]
+Bot1.Attack(Magda, Brazen Outlaw > Bot2)
+[T9 Bot1.Main1]
+Bot1.Attack(Magda, Brazen Outlaw > Bot2)
+[T11 Bot1.Main1]
+Bot1.Attack(Magda, Brazen Outlaw > Bot2)
+[T11 Bot1.Main2]
+Bot1.Battlefield.Magda, Brazen Outlaw.Activate
+Bot1.Search(Sol Ring)
+
+[Expect]
+Bot1.Battlefield.Sol Ring.Types = Artifact
+Bot1.Battlefield.Count = 4

@@ -1,0 +1,34 @@
+# CR 701.23, 406.3. Bargained, the free cast is optional: declining it for Cogwork Librarian (castable, mana value 4)
+# puts the exiled card into the hand instead ("if it wasn't cast this way").
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Black Lotus
+Beseech the Mirror
+Island x3
+Cogwork Librarian
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Beseech the Mirror.Cast
+Bot1.Modes(Bargain:)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Choose(Mox Jet)
+Bot1.Search(Cogwork Librarian)
+Bot1.Decline
+[T2 Bot2.Upkeep]
+
+[Expect]
+Exile.Count = 0
+Stack.Count = 0
+Bot1.Battlefield = Swamp
+Bot1.Hand = Cogwork Librarian; Island; Island; Island
+Bot1.Graveyard = Beseech the Mirror; Mox Jet; Black Lotus

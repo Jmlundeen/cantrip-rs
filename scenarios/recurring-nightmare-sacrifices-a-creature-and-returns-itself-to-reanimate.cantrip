@@ -1,0 +1,48 @@
+# Recurring Nightmare: Bot1 sacrifices Cecil and returns the Nightmare to its hand as the cost, and Ragavan (killed by
+# Bot1's own Lightning Bolt) returns from the graveyard to the battlefield.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mountain
+Ragavan, Nimble Pilferer
+Cecil, Dark Knight
+Lightning Bolt
+Recurring Nightmare
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ragavan, Nimble Pilferer.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cecil, Dark Knight.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ragavan, Nimble Pilferer)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Recurring Nightmare.Cast
+Bot1.Pass
+Bot1.Battlefield.Recurring Nightmare.Activate(Bot1.Graveyard.Ragavan, Nimble Pilferer)
+Bot1.Choose(Cecil, Dark Knight)
+Bot1.Pass
+[Bot1.Main1]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Hand = Island; Recurring Nightmare
+Bot1.Battlefield = Mountain; Mox Jet; Mox Ruby; Ragavan, Nimble Pilferer
+Bot1.Graveyard = Cecil, Dark Knight; Lightning Bolt

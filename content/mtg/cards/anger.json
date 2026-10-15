@@ -1,0 +1,11 @@
+{
+  "name": "Anger",
+  "manaCost": "{3}{R}",
+  "type": "Creature — Incarnation",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Haste\nAs long as this card is in your graveyard and you control a Mountain, creatures you control have haste.",
+  "keywords": [
+    "Haste"
+  ]
+}

@@ -1,0 +1,33 @@
+# Cast from the hand for {3} on turn 5, Phyrexian Dragon Engine enters from the hand, not from a graveyard, so its trigger
+# never goes on the stack (CR 603.6a): the hand is neither discarded nor drawn into. It has no haste either, and double
+# strike alone is its keyword. Unearth works only from the graveyard, so the permanent is not offered it.
+
+[Bot1 Deck]
+Phyrexian Dragon Engine
+Mountain x6
+Mountain x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Phyrexian Dragon Engine.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Bot1.Battlefield.Phyrexian Dragon Engine.Keywords = DoubleStrike
+? Bot1.Battlefield.Phyrexian Dragon Engine.SummoningSick = True
+! Bot1.Battlefield.Phyrexian Dragon Engine.Activate
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Hand.Count = 5

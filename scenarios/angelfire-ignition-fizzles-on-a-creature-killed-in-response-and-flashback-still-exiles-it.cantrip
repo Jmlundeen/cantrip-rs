@@ -1,0 +1,61 @@
+# "Target creature" (a plain artifact, Mox Ruby, is refused; the Ornithopter, an artifact creature, is the control). Bot2 kills the target in response (Lightning Bolt) and Angelfire Ignition does
+# nothing (CR 608.2b): no counters, no keywords, and it goes to the graveyard. Flashed back at the other Ornithopter, a second Bolt does the same and, cast with flashback, the card is exiled
+# instead of going to the graveyard even though it never resolved (CR 702.34a).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Pearl
+Mox Jet
+Ornithopter
+Ornithopter
+Black Lotus
+Angelfire Ignition
+Island x8
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Island x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Angelfire Ignition.Cast(Mox Ruby)
+Bot1.Hand.Angelfire Ignition.Cast(Ornithopter)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+[T3 Bot1.Main2]
+? Stack.Count = 0
+? Bot1.Battlefield = Mountain; Mox Ruby; Mox Pearl; Mox Jet; Ornithopter; Black Lotus
+? Bot1.Graveyard = Angelfire Ignition; Ornithopter
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Graveyard.Angelfire Ignition.Cast(Ornithopter; Ability: Flashback)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+[T3 Bot1.End]
+
+[Expect]
+Stack.Count = 0
+Exile = Angelfire Ignition
+Bot1.Battlefield = Mountain; Mox Ruby; Mox Pearl; Mox Jet
+Bot1.Graveyard = Ornithopter; Black Lotus; Ornithopter

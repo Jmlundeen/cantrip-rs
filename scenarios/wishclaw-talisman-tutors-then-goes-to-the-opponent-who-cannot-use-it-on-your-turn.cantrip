@@ -1,0 +1,42 @@
+# Wishclaw Talisman enters with three wish counters. Bot1 pays {1}, taps it and removes one to search out a Sol Ring; the
+# Talisman then goes to Bot2 (the lone opponent, so nobody is asked) with two counters. "Activate only during your
+# turn": on Bot1's next turn Bot2 controls it and is refused, though Bot1 could use it on their own turn above.
+
+[Bot1 Deck]
+Wishclaw Talisman
+Island x3
+Mox Jet
+Island x2
+Island x2
+Sol Ring
+Island x8
+
+[Bot2 Deck]
+Island x17
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Wishclaw Talisman.Cast
+Bot1.Pass
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Wishclaw Talisman.Activate
+Bot1.Search(Sol Ring)
+Bot1.Pass
+[Bot1.Main2]
+? Bot2.Battlefield = Island; Wishclaw Talisman
+? Bot2.Battlefield.Wishclaw Talisman.Counters.Wish = 2
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Pass
+! Bot2.Battlefield.Wishclaw Talisman.Activate
+
+[Expect]
+Bot1.Hand = Island; Island; Island; Island; Island; Island; Sol Ring
+Bot2.Battlefield = Island; Island; Wishclaw Talisman
+Bot2.Battlefield.Wishclaw Talisman.Counters.Wish = 2

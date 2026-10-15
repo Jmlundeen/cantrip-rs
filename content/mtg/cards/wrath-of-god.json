@@ -1,0 +1,6 @@
+{
+  "name": "Wrath of God",
+  "manaCost": "{2}{W}{W}",
+  "type": "Sorcery",
+  "oracleText": "Destroy all creatures. They can't be regenerated."
+}

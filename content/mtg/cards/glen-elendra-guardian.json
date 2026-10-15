@@ -1,0 +1,12 @@
+{
+  "name": "Glen Elendra Guardian",
+  "manaCost": "{2}{U}",
+  "type": "Creature — Faerie Wizard",
+  "power": 3,
+  "toughness": 4,
+  "oracleText": "Flash\nFlying\nThis creature enters with a -1/-1 counter on it.\n{1}{U}, Remove a counter from this creature: Counter target noncreature spell. Its controller draws a card.",
+  "keywords": [
+    "Flash",
+    "Flying"
+  ]
+}

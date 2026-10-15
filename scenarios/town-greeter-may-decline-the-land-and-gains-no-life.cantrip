@@ -1,0 +1,35 @@
+# Town Greeter mills a Town among four cards but Bot1 chooses nothing, so the land stays in the graveyard and no life is gained.
+
+[Bot1 Deck]
+Forest
+Forest
+Forest
+Town Greeter
+Forest
+Forest
+Forest
+Forest
+Starting Town
+Forest
+Island
+Swamp
+Forest x6
+
+[Bot2 Deck]
+Mountain x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Town Greeter.Cast
+Bot1.Choose()
+
+[Expect]
+Bot1.Life = 20
+Bot1.Hand = Forest; Forest; Forest; Forest; Forest
+Bot1.Graveyard = Swamp; Island; Forest; Starting Town
+Bot1.Library.Count = 6
+Bot1.Battlefield.Town Greeter.Power = 1

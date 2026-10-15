@@ -1,0 +1,40 @@
+# Daretti's +2 with no cards in hand: there is nothing to discard (up to two), so nothing is asked and, drawing "that
+# many", nothing is drawn: the library is untouched and the loyalty cost is still paid. Every card of Bot1's hand is
+# cast first (five Moxen and a Black Lotus pay for Daretti and cost nothing more).
+
+[Bot1 Deck]
+Daretti, Scrap Savant
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Mox Pearl
+Mox Emerald
+Black Lotus
+Island x20
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Daretti, Scrap Savant.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+? Bot1.Hand.Count = 0
+Bot1.Battlefield.Daretti, Scrap Savant.Activate(Ability: Discard up to two)
+! Bot1.Choose
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 0
+Bot1.Library.Count = 20
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Daretti, Scrap Savant.Counters.Loyalty = 5

@@ -1,0 +1,41 @@
+# Shredder's Technique: "If an enchantment was destroyed this way, you lose 2 life." Bot2 saves its Springheart Nantuko,
+# an enchantment creature, with a regeneration shield from Yavimaya Hollow (CR 701.19a): nothing was destroyed, so Bot1
+# loses nothing. The scenario that lets the Nantuko die is the positive control, where an enchantment creature costs 2.
+
+[Bot1 Deck]
+Black Lotus
+Shredder's Technique
+Swamp x18
+
+[Bot2 Deck]
+Yavimaya Hollow
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Springheart Nantuko
+Forest x15
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Yavimaya Hollow.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Springheart Nantuko.Cast
+Bot2.Battlefield.Mox Emerald#1.Activate
+Bot2.Battlefield.Mox Emerald#2.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Shredder's Technique.Cast(Bot2.Battlefield.Springheart Nantuko)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Battlefield.Yavimaya Hollow.Activate(Bot2.Battlefield.Springheart Nantuko; Ability: Regenerate)
+Bot2.Battlefield.Mox Emerald#3.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Life = 20
+Bot1.Graveyard = Shredder's Technique; Black Lotus
+Bot2.Battlefield.Springheart Nantuko.Tapped = true
+Bot2.Graveyard.Count = 0
+Stack.Count = 0

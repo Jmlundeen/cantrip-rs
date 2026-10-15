@@ -1,0 +1,32 @@
+# The enters trigger needs a target card in a graveyard: with both graveyards empty when the Lantern is cast on turn 1 it is removed from the stack (nothing is asked, nothing exiled). Bot1 then Bolts Bot2, so its own graveyard holds a Lightning Bolt,
+# and Bot2's discards to hand size leave Islands in its graveyard. On turn 5 "{T}, Sacrifice: Exile each opponent's graveyard" exiles both of Bot2's Islands and leaves Bot1's Bolt.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Soul-Guide Lantern
+Lightning Bolt
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Soul-Guide Lantern.Cast
+Bot1.Pass
+Bot1.Pass
+? Exile.Count = 0
+[T5 Bot1.Main1]
+? Bot2.Graveyard.Count = 2
+Bot1.Battlefield.Soul-Guide Lantern.Activate(Ability: Exile each opponent's graveyard)
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Exile.Count = 2
+Bot2.Graveyard.Count = 0
+Bot1.Graveyard = Soul-Guide Lantern

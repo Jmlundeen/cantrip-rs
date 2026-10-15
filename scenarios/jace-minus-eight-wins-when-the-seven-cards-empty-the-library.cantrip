@@ -1,0 +1,35 @@
+# Same turns as the -8 that does not win, but Bot1's library is exactly seven cards when the -8 resolves: it draws all seven, no
+# draw was made from an empty library (so the static ability did not apply), and "then if your library has no cards in it, you win"
+# does.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Jace, Wielder of Mysteries
+Island x27
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Jace, Wielder of Mysteries.Cast
+Bot1.Pass
+Bot1.Battlefield.Jace, Wielder of Mysteries.Activate(Bot1; Ability: Target player mills)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Jace, Wielder of Mysteries.Activate(Bot1; Ability: Target player mills)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Jace, Wielder of Mysteries.Activate(Bot1; Ability: Target player mills)
+[T7 Bot1.Main1]
+Bot1.Battlefield.Jace, Wielder of Mysteries.Activate(Bot1; Ability: Target player mills)
+[T9 Bot1.Main1]
+? Bot1.Battlefield.Jace, Wielder of Mysteries.Counters.Loyalty = 8
+? Bot1.Library.Count = 7
+Bot1.Battlefield.Jace, Wielder of Mysteries.Activate(Ability: Draw seven)
+
+[Expect]
+Result = Bot1 won

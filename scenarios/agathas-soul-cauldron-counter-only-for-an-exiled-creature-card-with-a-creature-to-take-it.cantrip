@@ -1,0 +1,54 @@
+# Agatha's Soul Cauldron: "{T}: Exile target card from a graveyard. When a creature card is exiled this way, put a +1/+1
+# counter on target creature you control." Bot2 discards its newest card to hand size each turn: an Ornithopter on turn 2,
+# an Island on turn 4, an Ornithopter on turn 6. Turn 3: the Cauldron exiles the creature card while Bot1 controls no
+# creature (the Cauldron is not one), so the reflexive trigger has no target and nothing happens (CR 603.3d). Turn 5, with
+# Bot1's Ornithopter out: it exiles the Island, not a creature card, so no counter. Turn 7: a creature card, and the
+# counter goes on the Ornithopter (the positive control for both refusals).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Agatha's Soul Cauldron
+Ornithopter
+Mountain x3
+Mountain x14
+
+[Bot2 Deck]
+Island x7
+Ornithopter
+Island
+Ornithopter
+Island x6
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Agatha's Soul Cauldron.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Agatha's Soul Cauldron.Activate(Bot2.Graveyard.Ornithopter)
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+? Exile = Ornithopter
+? Stack.Count = 0
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Agatha's Soul Cauldron.Activate(Bot2.Graveyard.Island)
+Bot1.Pass
+Bot1.Pass
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = (absent)
+[T7 Bot1.Main1]
+Bot1.Battlefield.Agatha's Soul Cauldron.Activate(Bot2.Graveyard.Ornithopter)
+Bot1.Pass
+Bot1.Pass
+[T7 Bot1.Main2]
+
+[Expect]
+Exile = Ornithopter; Island; Ornithopter
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1

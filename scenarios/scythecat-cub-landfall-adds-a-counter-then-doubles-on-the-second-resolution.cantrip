@@ -1,0 +1,32 @@
+# Scythecat Cub: turn 1 a Plains is the first landfall of that turn (one +1/+1 counter). On turn 3 Scalding Tarn
+# entering is the first landfall again (two counters), and the Mountain it fetches is the second, which doubles the
+# counters on the Cub instead (2 become 4, where adding one would make 3).
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Scythecat Cub
+Scalding Tarn
+Plains x3
+Mountain x10
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Scythecat Cub.Cast
+Bot1.Pass
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Scythecat Cub.Counters.PlusOnePlusOne = 1
+Bot1.Hand.Scalding Tarn.Play
+Bot1.Pass
+Bot1.Battlefield.Scalding Tarn.Activate
+Bot1.Search(Mountain)
+
+[Expect]
+Bot1.Battlefield.Scythecat Cub.Counters.PlusOnePlusOne = 4
+Bot1.Battlefield.Scythecat Cub.Power = 6

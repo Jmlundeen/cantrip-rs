@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>cantrip-bot</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Cantrip.Client\Cantrip.Client.csproj" />
+    <ProjectReference Include="..\..\src\Cantrip.Client.Llm\Cantrip.Client.Llm.csproj" />
+  </ItemGroup>
+
+</Project>

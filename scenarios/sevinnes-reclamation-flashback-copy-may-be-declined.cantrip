@@ -1,0 +1,40 @@
+# Sevinne's Reclamation: a spent Black Lotus and a cracked Scalding Tarn are in the graveyard (both mana value 0). The
+# first Reclamation, cast from the hand, returns the Lotus, which pays for the flashback ({4}{W}) with its second life.
+# Cast from the graveyard it may be copied: Bot1 declines, so only the original returns the Lotus again and the Tarn stays
+# in the graveyard. The card itself ends exiled by flashback.
+
+[Bot1 Deck]
+Scalding Tarn
+Black Lotus
+Mox Pearl
+Mox Ruby
+Mox Jet
+Sevinne's Reclamation
+Plains
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Scalding Tarn.Play
+Bot1.Battlefield.Scalding Tarn.Activate
+Bot1.Search(Mountain)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sevinne's Reclamation.Cast(Bot1.Graveyard.Black Lotus)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Graveyard.Sevinne's Reclamation.Cast(Bot1.Graveyard.Black Lotus; Ability: Flashback)
+Bot1.Decline
+
+[Expect]
+Exile = Sevinne's Reclamation
+Bot1.Graveyard = Scalding Tarn
+Bot1.Battlefield = Mountain; Mox Pearl; Mox Ruby; Mox Jet; Black Lotus

@@ -1,0 +1,57 @@
+# Wrenn and Six's emblem: "Instant and sorcery cards in your graveyard have retrace." (CR 702.81a)
+# Embereth Shieldbreaker is a creature card in the graveyard; only its main characteristics exist there (CR 715.4),
+# so its sorcery Adventure, Battle Display, is not an instant or sorcery card and gets no retrace. Chain Lightning is
+# a sorcery card and is retraced by discarding a land.
+#
+# Wrenn comes down on turn 3 and ticks up each turn to 7 loyalty by turn 9. Holding eight cards at the end of turn 9
+# puts Shieldbreaker in the graveyard by discarding to hand size. On turn 11 Chain Lightning is cast from hand, Wrenn
+# goes to -7, and with an untapped Mountain and a land in hand, Shieldbreaker offers no cast at all from the graveyard
+# while Chain Lightning is retraced (the Forest discarded) for 3 more. Bot2's Sol Ring is there so that Battle Display
+# ("destroy target artifact") would have a target: without one it would go unoffered for that reason alone.
+
+[Bot1 Deck]
+Mountain
+Forest
+Wrenn and Six
+Chain Lightning
+Embereth Shieldbreaker
+Mountain
+Forest
+Island x20
+
+[Bot2 Deck]
+Swamp
+Sol Ring
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Wrenn and Six.Cast
+Bot1.Battlefield.Wrenn and Six.Activate(Ability: Return)
+Bot1.Battlefield.Wrenn and Six.Activate(Ability: Return)
+Bot1.Battlefield.Wrenn and Six.Activate(Ability: Return)
+Bot1.Battlefield.Wrenn and Six.Activate(Ability: Return)
+Bot1.Discard(Embereth Shieldbreaker)
+[T11 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Chain Lightning.Cast(Bot2)
+Bot1.Battlefield.Wrenn and Six.Activate(Ability: emblem)
+Bot1.Pass
+! Bot1.Graveyard.Embereth Shieldbreaker.Cast
+? Bot1.Emblems.Count = 1
+Bot1.Battlefield.Mountain.Activate
+Bot1.Graveyard.Chain Lightning.Cast(Bot2)
+Bot1.Choose(Forest)
+
+[Expect]
+Bot2.Life = 14
+Bot2.Battlefield = Swamp; Sol Ring
+Bot1.Emblems.Count = 1
+Bot1.Graveyard = Chain Lightning; Forest; Wrenn and Six; Embereth Shieldbreaker

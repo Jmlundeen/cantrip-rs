@@ -1,0 +1,33 @@
+# Sunset Saboteur has Ward -- Discard a card. Bot1 casts it on turn 1 (Swamp and Mox Jet). On turn 2 Bot2 Lightning Bolts
+# it; the ward trigger asks Bot2 whether to discard, Bot2 declines, so the Bolt is countered and the Saboteur lives.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Sunset Saboteur
+Swamp x13
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x14
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sunset Saboteur.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Sunset Saboteur)
+Bot2.Decline
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot1.Battlefield = Swamp; Mox Jet; Sunset Saboteur
+Bot1.Battlefield.Sunset Saboteur.Damage = 0
+Bot2.Graveyard = Lightning Bolt
+Bot2.Hand.Count = 6

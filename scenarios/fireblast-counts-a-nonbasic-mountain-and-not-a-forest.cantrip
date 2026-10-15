@@ -1,0 +1,31 @@
+# "Sacrifice two Mountains" is by subtype: a Mountain and a basic Forest do not pay it, and once Taiga (Mountain
+# Forest) arrives, the Mountain and Taiga do, leaving the Forest.
+
+[Bot1 Deck]
+Mountain
+Forest
+Fireblast
+Taiga
+Mountain x3
+Mountain x10
+
+[Bot2 Deck]
+Forest
+Forest x6
+Forest x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Forest.Play
+Bot1.Hand.Forest.Play
+! Bot1.Hand.Fireblast.Cast(Bot2; Ability: Sacrifice)
+Bot2.Hand.Forest.Play
+Bot1.Hand.Taiga.Play
+Bot1.Hand.Fireblast.Cast(Bot2; Ability: Sacrifice)
+Bot1.Choose(Mountain; Taiga)
+
+[Expect]
+Bot2.Life = 16
+Bot1.Battlefield = Forest
+Bot1.Graveyard.Count = 3
+Stack.Count = 0

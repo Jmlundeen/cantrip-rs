@@ -1,0 +1,28 @@
+# The mulligan decision (CR 103.5) for a person to look at: Bot1 chose to play first, the hands are dealt, and Bot1
+# — declaring first as the starting player — is asked whether to keep its seven. A hand worth thinking about: three
+# lands and four spells.
+
+[Opening]
+Chooser: Bot1
+
+[Bot1 Deck]
+Island
+Swamp
+Counterspell
+Duress
+Island
+Guerrilla Gorilla
+Lightning Bolt
+Island x13
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.PlayFirst
+[Handover Bot1.Mulligan]
+
+[Expect]
+Turn = 0
+Bot1.Hand = Island; Island; Swamp; Counterspell; Duress; Guerrilla Gorilla; Lightning Bolt
+Bot2.Hand.Count = 7

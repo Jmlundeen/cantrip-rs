@@ -1,0 +1,26 @@
+# Fewer than four cards: it looks at the two that remain, takes the Lightning Bolt and puts the Island on the bottom (the
+# only card of the library).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Thundertrap Trainer
+Island x4
+Lightning Bolt
+Island
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Thundertrap Trainer.Cast
+Bot1.Arrange(Lightning Bolt | Island)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Island; Island; Island; Island; Lightning Bolt
+Bot1.Library = Island

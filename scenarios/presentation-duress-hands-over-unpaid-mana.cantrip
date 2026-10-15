@@ -1,0 +1,20 @@
+# A spell being paid for is already on the stack (CR 601.2a, 601.2h), not in hand, while the payment presenter asks for black mana.
+[Bot1 Deck]
+Swamp
+Duress
+Swamp x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Duress.Cast(Bot2)
+[Handover Bot1.PayCost]
+
+[Expect]
+Turn = 1
+Stack.Count = 1
+Bot1.Hand.Count = 5
+Bot1.Battlefield.Swamp.Tapped = false
+Bot1.Graveyard.Count = 0

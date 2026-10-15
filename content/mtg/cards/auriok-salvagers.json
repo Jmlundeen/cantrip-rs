@@ -1,0 +1,8 @@
+{
+  "name": "Auriok Salvagers",
+  "manaCost": "{3}{W}",
+  "type": "Creature — Human Soldier",
+  "power": 2,
+  "toughness": 4,
+  "oracleText": "{1}{W}: Return target artifact card with mana value 1 or less from your graveyard to your hand."
+}

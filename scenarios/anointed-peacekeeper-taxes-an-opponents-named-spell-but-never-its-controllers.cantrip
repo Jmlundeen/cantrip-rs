@@ -1,0 +1,50 @@
+# Bot1 names Sol Ring with Anointed Peacekeeper. On turn 2 Bot2 needs all three of its mana (a Mountain, Mox Ruby and
+# Mox Jet) for Sol Ring and nothing is left over: the opponent's spell costs {2} more. On turn 3 Bot1 casts its own Sol
+# Ring paying a single Plains: "spells your opponents cast" does not tax its controller's (the positive control).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Sol Ring
+Anointed Peacekeeper
+Sol Ring
+Plains x12
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Sol Ring
+Mountain x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Anointed Peacekeeper.Cast
+Bot1.Name(Sol Ring)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+? Bot2.Mana = {B}{R}{R}
+Bot2.Hand.Sol Ring.Cast
+? Bot2.Mana =
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#2.Activate
+? Bot1.Mana = {W}
+Bot1.Hand.Sol Ring.Cast
+? Bot1.Mana =
+[Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Plains; Plains; Mox Pearl; Sol Ring; Sol Ring; Anointed Peacekeeper
+Bot2.Battlefield = Mountain; Mox Ruby; Mox Jet; Sol Ring

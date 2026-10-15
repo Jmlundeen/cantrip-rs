@@ -1,0 +1,42 @@
+# Atraxa enters with no cards in Bot1's library (its deck is exactly the seven cards of its hand, and Bot1 skips its
+# first draw): the trigger reveals nothing, asks nothing and takes nothing; Bot1 does not lose until it draws.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Black Lotus
+Atraxa, Grand Unifier
+Island
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Atraxa, Grand Unifier.Cast
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Turn = 1
+Result = InProgress
+Bot1.Library.Count = 0
+Bot1.Life = 20
+Bot1.Hand = Island
+Bot1.Battlefield.Atraxa, Grand Unifier.Power = 7

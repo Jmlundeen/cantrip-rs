@@ -1,0 +1,31 @@
+# Vampiric Tutor searches for any card, shuffles and puts that card on top of the library, and its caster loses 2 life
+# (life loss, not damage): Bot1 finds the Black Lotus buried in the library and draws it on its next turn.
+
+[Bot1 Deck]
+Swamp
+Vampiric Tutor
+Swamp x5
+Lightning Bolt
+Black Lotus
+Swamp x8
+
+[Bot2 Deck]
+Swamp x15
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Vampiric Tutor.Cast
+Bot1.Search(Black Lotus)
+? Bot1.Library.Count = 10
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Life = 18
+Bot2.Life = 20
+Bot1.Graveyard = Vampiric Tutor
+Bot1.Library.Count = 9
+Bot1.Battlefield = Swamp; Black Lotus

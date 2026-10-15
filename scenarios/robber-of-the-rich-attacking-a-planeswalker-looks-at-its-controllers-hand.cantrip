@@ -1,0 +1,62 @@
+# Robber of the Rich: the defending player of an attack on a planeswalker is the planeswalker's controller (CR 506.2). On
+# turn 2 Bot2 casts Dack Fayden (an Island and two Moxen pay) and uses its +1, leaving four cards in hand; on turn 3 Bot1
+# plays a Mountain and a Mox Pearl, leaving three, and Robber (haste) attacks Dack Fayden. Bot2 has more cards in hand than Bot1,
+# so the trigger exiles the top card of Bot2's library, an Island.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Robber of the Rich
+Island
+Mountain
+Mox Pearl
+Island x10
+
+[Bot2 Deck]
+Island
+Mox Ruby
+Mox Jet
+Dack Fayden
+Island
+Island
+Island
+Island
+Lightning Bolt
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Robber of the Rich.Cast
+Bot1.Pass
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Island.Activate(Ability: Add {U})
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Dack Fayden.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Dack Fayden.Activate(Bot2; Ability: draws two)
+Bot2.Pass
+Bot1.Pass
+Bot2.Choose(Island; Island)
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 3
+? Bot2.Hand.Count = 4
+Bot1.Attack(Robber of the Rich > Bot2.Battlefield.Dack Fayden)
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Island

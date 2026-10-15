@@ -1,0 +1,14 @@
+{
+  "name": "Witch Enchanter",
+  "manaCost": "{3}{W}",
+  "type": "Creature — Human Warlock",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "When this creature enters, destroy target artifact or enchantment an opponent controls.",
+  "backFacePlayableAsLand": true,
+  "backFace": {
+    "name": "Witch-Blessed Meadow",
+    "type": "Land",
+    "oracleText": "As this land enters, you may pay 3 life. If you don't, it enters tapped.\n{T}: Add {W}."
+  }
+}

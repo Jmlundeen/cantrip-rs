@@ -1,0 +1,13 @@
+{
+  "name": "Otharri, Suns' Glory",
+  "manaCost": "{3}{R}{W}",
+  "type": "Legendary Creature — Phoenix",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Flying, lifelink, haste\nWhenever Otharri attacks, you get an experience counter. Then create a 2/2 red Rebel creature token that's tapped and attacking for each experience counter you have.\n{2}{R}{W}, Tap an untapped Rebel you control: Return this card from your graveyard to the battlefield tapped.",
+  "keywords": [
+    "Flying",
+    "Lifelink",
+    "Haste"
+  ]
+}

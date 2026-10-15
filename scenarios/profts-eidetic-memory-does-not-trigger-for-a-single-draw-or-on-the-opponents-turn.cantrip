@@ -1,0 +1,39 @@
+# The trigger has an intervening "if you've drawn more than one card this turn" and fires "on your turn": the card drawn as
+# Proft's enters is one (turn 1), so nothing happens at beginning of combat; on turn 2 Bot1 draws three with Ancestral Recall in
+# Bot2's upkeep, but it is not Bot1's turn, so the Ornithopter gets no counters then either.
+
+[Bot1 Deck]
+Island
+Ornithopter
+Mox Sapphire
+Mox Pearl
+Proft's Eidetic Memory
+Ancestral Recall
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Proft's Eidetic Memory.Cast
+Bot1.Pass
+Bot1.Pass
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = (absent)
+[T2 Bot2.Upkeep]
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = (absent)
+Bot1.Hand.Count = 5

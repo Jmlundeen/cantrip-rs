@@ -1,0 +1,35 @@
+use cantrip_api::*;
+use cantrip_mechanics::{counter_unless_pays, targets};
+use cantrip_oracle as oracle;
+
+/// Put X +1/+1 counters on target creature you control. Then counter up to one target spell unless its controller pays
+/// mana equal to the greatest power among creatures you control. In order (CR 608.2c): the counters go on first, so the
+/// greatest power is read with them on, once, among the creatures its controller controls.
+fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if item.x > 0
+        && let Some(creature) = targets::object(g, item, 0)
+    {
+        g.add_counters(creature, CounterKind::PlusOne, item.x as i16);
+    }
+    if targets::object(g, item, 1).is_some() {
+        let greatest = g
+            .permanents_of(item.controller)
+            .into_iter()
+            .map(|id| g.chars(id))
+            .filter(|c| c.is(CardType::Creature))
+            .filter_map(|c| c.power)
+            .max()
+            .unwrap_or(0)
+            .clamp(0, 255) as u8;
+        counter_unless_pays(g, item, 1, mana(greatest, 0, 0, 0, 0, 0))?;
+    }
+    Ok(())
+}
+
+pub static CARD: CardDef = CardDef {
+    spell: Some(SpellDef {
+        targets: &[targets::CREATURE_YOU_CONTROL, TargetSpec { min: 0, max: 1, filter: targets::SPELL.filter }],
+        effect,
+    }),
+    ..oracle::REPULSIVE_MUTATION
+};

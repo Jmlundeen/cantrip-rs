@@ -1,0 +1,37 @@
+# Myr Battlesphere: "When this creature enters, create four 1/1 colorless Myr artifact creature tokens." Bot1 casts it on its
+# second turn with Sol Ring and Black Lotus and ends with the creature and four Myr tokens.
+
+[Bot1 Deck]
+Plains
+Sol Ring
+Black Lotus
+Plains
+Myr Battlesphere
+Plains x20
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Myr Battlesphere.Cast
+[T4 Bot2.Upkeep]
+
+[Expect]
+Bot1.Battlefield.Myr Battlesphere.Power = 4
+Bot1.Battlefield.Myr Battlesphere.Toughness = 7
+Bot1.Battlefield.Count = 8
+Bot1.Battlefield.Myr#1.Types = Artifact; Creature
+Bot1.Battlefield.Myr#1.Subtypes = Myr
+Bot1.Battlefield.Myr#1.Power = 1
+Bot1.Battlefield.Myr#1.Toughness = 1
+Bot1.Battlefield.Myr#4.Power = 1

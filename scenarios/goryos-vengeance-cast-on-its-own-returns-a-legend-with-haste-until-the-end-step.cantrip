@@ -1,0 +1,30 @@
+# Goryo's Vengeance cast on its own returns Headliner Scarlett from the graveyard with haste; she is exiled at the beginning of the end step.
+
+[Bot1 Deck]
+Mox Jet
+Black Lotus
+Entomb
+Goryo's Vengeance
+Island x3
+Headliner Scarlett
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Entomb.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Search(Headliner Scarlett)
+Bot1.Hand.Goryo's Vengeance.Cast(Bot1.Graveyard.Headliner Scarlett)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Target(Bot2)
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Headliner Scarlett.Keywords = Haste
+[T2 Bot2.Main1]
+
+[Expect]
+Turn = 2
+Exile = Headliner Scarlett

@@ -1,0 +1,35 @@
+# Bot1 casts Gollum, Riddle Master off two Swamps and chooses odd as he enters. Bot2's Lightning Bolt has mana
+# value 1, which is the chosen quality, so the riddle triggers; Bot1 takes "draw a card" and that mode is spent.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Gollum, Riddle Master
+Swamp x11
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Gollum, Riddle Master.Cast
+Bot1.Name(Odd)
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Modes(Draw a card)
+
+[Expect]
+Turn = 4
+Bot1.Life = 17
+Bot1.Battlefield = Swamp; Swamp; Gollum, Riddle Master
+Bot1.Battlefield.Gollum, Riddle Master.ChosenParity = odd
+Bot1.Battlefield.Gollum, Riddle Master.ChosenModes = 3
+Bot2.Graveyard = Lightning Bolt

@@ -1,0 +1,52 @@
+# Two Connecting the Dots (the second cast on turn 3) both trigger when the Ornithopter attacks, so each exiles one card
+# face down, linked to its own enchantment (CR 607.2a). Sacrificing one of them puts only the card it exiled into the
+# hand: the other card stays in exile, waiting for the other enchantment.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Sol Ring
+Connecting the Dots
+Connecting the Dots
+Ornithopter
+Mountain
+Mountain
+Lightning Bolt
+Ancestral Recall
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Connecting the Dots.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Connecting the Dots.Cast
+Bot1.Pass
+Bot1.Attack(Ornithopter)
+[T3 Bot1.Damage]
+? Exile.Count = 2
+[T3 Bot1.Main2]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Connecting the Dots.Activate
+[Bot1.End]
+
+[Expect]
+Exile.Count = 1
+Bot1.Graveyard.Count = 2
+Bot1.Hand.Count = 1
+Bot1.Battlefield.Connecting the Dots.Types = Enchantment

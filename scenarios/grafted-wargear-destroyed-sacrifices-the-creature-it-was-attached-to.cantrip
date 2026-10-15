@@ -1,0 +1,51 @@
+# Grafted Wargear: "Whenever this Equipment becomes unattached from a permanent, sacrifice that permanent." The Equipment
+# leaving the battlefield unattaches it too, and the ability looks back in time (CR 603.10a) at what it was attached to:
+# Bot2 destroys the Wargear with Disenchant (a Plains and a Mox Pearl held since its turn 2) and Bot1 sacrifices the
+# Llanowar Elves it equipped.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Sapphire
+Mox Pearl
+Grafted Wargear
+Llanowar Elves
+Plains x14
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Disenchant
+Plains x17
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Grafted Wargear.Cast
+Bot1.Pass
+Bot1.Battlefield.Grafted Wargear.Activate(Llanowar Elves)
+Bot1.Pass
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Disenchant.Cast(Grafted Wargear)
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Llanowar Elves; Grafted Wargear
+Bot1.Battlefield = Mox Emerald; Mox Jet; Mox Sapphire; Mox Pearl

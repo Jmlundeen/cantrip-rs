@@ -1,0 +1,27 @@
+# Gemstone Mine's {T} cost can be paid once a turn (CR 602.2b): after Bot1 taps it for blue on turn 1 it is refused a
+# second activation, and with two counters left it is not sacrificed ("if there are no mining counters"). On turn 3 it is
+# untapped again (the control) and gives green, any color being allowed (CR 106.1b); one counter is left.
+
+[Bot1 Deck]
+Gemstone Mine
+Island x6
+Island x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Gemstone Mine.Play
+Bot1.Battlefield.Gemstone Mine.Activate(Color: Blue)
+? Bot1.Mana = {U}
+! Bot1.Battlefield.Gemstone Mine.Activate
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Gemstone Mine.Counters.Mining = 2
+Bot1.Battlefield.Gemstone Mine.Activate(Color: Green)
+? Bot1.Mana = {G}
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Gemstone Mine
+Bot1.Battlefield.Gemstone Mine.Counters.Mining = 1
+Bot1.Battlefield.Gemstone Mine.Tapped = true

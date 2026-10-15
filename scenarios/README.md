@@ -1,0 +1,317 @@
+# Game scripts
+
+Each `*.cantrip` file here is one test case of the engine's scenario corpus. A script is two ordered decklists, a
+sparse list of actions, and the state the game should end in. The harness is `crates/cantrip-script`
+(parser, runner, state dump): `cargo test --profile cards --workspace` plays every scenario whose cards the engine has
+(`crates/cantrip-script/tests/scenarios.rs`), and `cargo run --profile cards -p cantrip-script --bin corpus -- --card "Name"` runs one card's
+scenarios and prints the full report of any that fail (`docs/adding-cards.md`). The corpus began as the C# engine's
+test suite; the C# engine and its harness are gone, and this folder is the engine-independent record of what a card does.
+
+```
+# comment lines start with #
+
+[Bot1 Deck]            top of the library first; the first seven cards are the opening hand
+Island
+4 Island               (or: Island x4)
+
+[Bot2 Deck]
+...
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot2.Hand.Duress.Cast(Bot1)
+[T5 Bot1.Main2]        wait for a step: [Bot1.Main2], or with a turn number
+? Stack.Count = 1      check the state right here
+! Bot1.Hand.Island.Play   Bot1's next priority must not offer this
+
+[Expect]
+Bot1.Graveyard = Counterspell
+```
+
+Bot1 goes first and libraries are not shuffled, unless the script has an `[Opening]` section (below).
+
+A game of three or four players names more decks, `[Bot3 Deck]` and `[Bot4 Deck]`, and everything that names a player
+(`Bot3.Hand.Island.Play`, `Bot1.ChoosePlayer(Bot4)`, `Bot3.Life`) takes them in turn order after Bot2. The first player of a
+game of more than two draws on their first turn (CR 103.8a). A script with no `[Bot3 Deck]` is the duel it always was.
+
+
+## Known bugs
+
+A scenario asserts what the rules require, never what the engine happens to do. When the engine or a card gets it
+wrong, the scenario is still committed - asserting the correct outcome - with a marker line at the top:
+
+```
+# Known bug: Clarion Conqueror bars an ability of a card in hand (CR 109.2).
+```
+
+A marked scenario is expected to fail (a panic counts): `cargo test` passes it while it fails, and `corpus` counts it
+under "known bugs", apart from the failures. The day it passes, both report it as fixed - an error until the marker
+line is removed in the same change as the fix. A scenario is never deleted, weakened or rewritten to pass because the
+engine is wrong, and never kept outside `scenarios/`.
+
+## A real start: `[Opening]`
+
+```
+[Opening]
+Chooser: Bot2          optional; Bot1 chooses otherwise
+```
+
+With an `[Opening]` section the game starts as a real one does (CR 103): nobody is fixed to go first, the chooser is
+asked to play or draw first **before any hand is dealt**, and then each player, the starting player first, keeps or
+mulligans (CR 103.5, the London mulligan). The hands are still the first seven of each decklist; a mulligan shuffles
+the hand back with the game's own generator, so after one a script names counts, not cards — or uses a deck of one card
+repeated, so the shuffle cannot matter.
+
+| Line | Answers |
+| --- | --- |
+| `Bot1.PlayFirst` · `Bot1.DrawFirst` | who takes the first turn, asked of the chooser (default: play first); `DrawFirst` hands it to the next seat, which in a duel is the other player |
+| `Bot1.Keep` · `Bot1.Mulligan` | keep the hand or take a mulligan (default: keep) |
+| `Bot1.Choose(Island)` | after keeping with mulligans taken, the cards put on the bottom, the last named lowest (default: the first in hand) |
+
+`[Handover Bot1.PlayFirst]` and `[Handover Bot1.Mulligan]` stop on those questions for the web client.
+
+## Dice: `[Dice]`
+
+Randomness belongs in fuzzing, so a scenario says what a die shows. A `[Dice]` section lists the faces (1 to 20) the dice show
+in the order they are rolled, `6; 1; 3`; once they are used up dice are random again. Comet, Stellar Pup rolls one.
+A coin flip is a two-sided die (CR 705.1) and takes its face from the same list: face 1 wins the flip, face 2 loses it. So does a
+choice made at random (CR 701.9c): one of N things is a die of N sides (up to 20), face k choosing the k-th (the first card of
+a graveyard, the first opponent in turn order). Every roll, flip and random choice goes through the game (`roll_die`, `flip_coin`,
+`choose_at_random`) and is recorded as `DieRolled`, `CoinFlipped` or `ChosenAtRandom` in the event history, where triggers
+("whenever you flip a coin", "win a flip", "roll a die") see it.
+
+## How lines are played
+
+There is **one cursor for the whole list**. When the engine asks a player something, the line under the cursor is
+tried. If the line belongs to that player and the prompt offers what it describes, it is taken and the cursor moves on.
+Otherwise the player gives a default answer: pass, no attackers or blockers, decline to pay, discard the newest cards.
+
+Because of that, a line happens **as soon as it can**. Use a wait (`[Bot1.Main2]`) when that is too early, or
+`Bot1.Pass` to give up priority once. For example, to tap lands while Mana Leak resolves rather than in response to it.
+
+A `? Key = Value` check runs at the next prompt after the line before it. Right after a cast, the spell is still on
+the stack, so check the battlefield after a later line or a wait. A cast with `X:` or `Kicked:` stops at its pay
+prompt first, where the spell is still in hand and the stack empty, so check it after a wait.
+
+A cast an effect makes as it resolves — cascade's, Etali's — has no `Cast` line to say an X or a kicker on, so it is
+announced with X of 0 and unkicked, and paid out of the pool; its other questions (a target, teamwork's creatures)
+are answered by lines as usual.
+
+A **refusal**, `! Bot1.Graveyard.Embereth Shieldbreaker.Cast`, says what must *not* be offered; see [Refusals](#refusals).
+
+The script ends when every line is played and the stack is empty. A line that isn't possible within 4 turns fails.
+The failure report shows what each player was last offered, written as script lines, followed by a trace and a full
+state dump.
+
+The cursor is matched against whatever question is outstanding, not against a turn, so the **opening-hand window**
+(CR 103.6) is scripted with ordinary lines placed before any turn's. A card in an opening hand that offers an action
+— Gemstone Caverns' "you may begin the game with this card on the battlefield" — asks its holder before turn one
+begins, and `Bot2.Accept` / `Bot2.Decline` answers it; the trace writes those moments as `T0 Untap`. Unanswered, the
+default declines, so a scenario that does not care about such a card need say nothing.
+
+## Actions
+
+| Line | Answers |
+| --- | --- |
+| `Bot1.Hand.Island.Play` | play a land |
+| `Bot1.Hand.Lightning Bolt.Cast(Bot2)` | cast; arguments are targets |
+| `Bot1.Hand.Mind Twist.Cast(Bot2; X: 3)` | X is raised and pool mana applied automatically |
+| `Bot1.Hand.Wheel of Fortune.Cast` with `{R}{R}{R}{B}` floating | when the pool could pay in more than one way, the engine asks which mana; a script takes the first kind offered, which is the engine's own preference (restricted mana, then colourless, then colours the cost does not name) |
+| `Bot1.Battlefield.Chromatic Star.Activate(Color: Red; Spend: B)` | `Spend:` (on any cast or activation) names the pool mana to put towards a cost the pool could pay in more than one way, one per question in the order asked, comma-separated — a symbol (`W U B R G C`) for unrestricted mana, or the symbol and what restricts it (`R GainsHaste`, `C ArtifactSpells`) — for a spell's cost, a mana ability's own mana cost (CR 602.2b), or an "unless pays" cost on `PayCost(Spend: B, R)`; unsaid takes the first kind offered |
+| `Bot1.Battlefield.Island.Activate` | activate an ability, including a mana ability while paying |
+| `Bot1.Battlefield.Cathar Commando.Activate(Bot2.Battlefield.Sol Ring)` | arguments are targets, as for `Cast` |
+| `Bot1.Battlefield.Tundra.Activate(Ability: {U})` | pick one of several abilities by part of its text |
+| `Bot1.Battlefield.Basking Rootwalla.Activate(Ability: #2)` | pick the source's Nth ability, mana abilities first, where two read the same — one it prints and an identical one it acquired (CR 602.5c); also in a refusal |
+| `Bot1.Battlefield.Candelabra of Tawnos.Activate(X: 2)` | X in an ability's cost, raised the way a cast's is |
+| `Bot1.Hand.Batroc the Leaper.Cast(Kicked: 2)` | kicker or multikicker paid that many times; unsaid is not kicked |
+| `Bot1.Hand.Hogaak, Arisen Necropolis.Cast(Convoke: Llanowar Elves, Ornithopter; Delve: 2)` | what pays a cost instead of mana (CR 601.2h): `Convoke:` taps the named creatures, one per question in the order given (CR 702.51a), and `Delve:` exiles that many graveyard cards, the first offered each time (CR 702.66a) |
+| `Bot1.Hand.Daze.Cast(Duress; Ability: Return)` | cast for an alternative cost by part of its text, as its Adventure with `Ability: Adventure`, or as one half of a split card with `Ability: Death`; without `Ability:`, the mana cost — which a split card, never cast as itself, does not offer |
+| `Bot1.Battlefield.Black Lotus.Activate(Color: Blue)` | mana of any one color |
+| `Bot1.Battlefield.Urza, Lord High Artificer.Activate(Ability: Add; Tap: Sol Ring)` | choose the untapped permanent paying a mana ability's tap cost |
+| `Bot1.Channel.Activate` | a mana ability the player has of their own (CR 611.2a), named by the card that gave it and no zone: it has no source, so it is offered wherever that card has gone |
+| `Bot1.Battlefield.Squandered Resources.Activate(Sacrifice: Strip Mine; Color: C)` | a cost that sacrifices one of several permanents names which; `Color: C` (or `Colorless`) answers colorless where the ability's type can be it (CR 106.7) |
+| `Bot1.Pass` · `Bot1.PayCost` · `Bot1.Decline` · `Bot1.Undo` · `Bot1.Cancel` | priority, unless-costs, mana undo, cancel a spell or ability at any question before it is on the stack |
+| `Bot1.Accept` · `Bot1.Decline` | a "you may" choice, such as Path to Exile's search (default: decline) |
+| `Bot1.Choose(Lightning Bolt; Island)` | Duress, Brainstorm (last chosen ends on top) |
+| `Bot1.Discard(Island)` · `Bot1.Search(Black Lotus)` | hand size, library search (`Search()` finds nothing) |
+| `Bot1.Arrange(Top1; Top2 \| Bottom1)` · `Bot1.Arrange(Shuffle)` | cards looked at and placed: one `\|`-separated group per destination, in the order the prompt lists them — scry (top \| bottom), surveil (top \| graveyard), Ponder (top), Stock Up (hand \| bottom) |
+| `Bot1.Attack(Grizzly Bears; Hill Giant > Bot2)` | attackers |
+| `Bot2.Block(Serra Angel > Grizzly Bears)` | blockers |
+| `Bot1.AssignDamage(Ox > Lurker: 1; Ox > Raider: 3)` · `Bot1.AssignDamage(Ox > Bot2: 3)` | how a gang-blocked attacker, a trampler, or a blocker on two attackers divides its combat damage (CR 510.1); a creature the line leaves out keeps the engine's own division (default: the engine's division, lethal to each in turn) |
+| `Bot1.Divide(Grizzly Bears: 2; Bot2.Battlefield.Hill Giant: 1)` · `Bot1.Divide()` | a divided slot's targets and each one's share, chosen together as the spell or ability is announced (CR 601.2d): Fire Covenant's damage, Court of Garenbrig's counters; the shares add up to the total, and an empty line chooses no target where the slot says "up to" (default: the whole total on the first candidate) |
+| `Bot1.Target(Sol Ring)` · `Bot1.Target()` | a triggered ability's target as it goes on the stack, or a chosen mode's as a modal spell is cast; `Target()` chooses none for "up to one" (default: none if optional, else the first candidate) |
+| `Bot1.Target(Island; Mountain)` | a slot that takes several — "Untap X target lands", asked once the mana is paid — takes exactly that many, and they must be different permanents; "up to two target creatures" takes as many as the line gives, at most two |
+| `Bot1.Modes(1; 4)` · `Bot1.Modes(Destroy target artifact)` | a modal spell's modes as it is cast, or a modal triggered ability's as it goes on the stack, by number from 1 or part of their text (default: the first eligible); also the next room of a dungeon when there are two, `Bot1.Modes(Lost Well)` |
+| `Bot1.Name(Lightning Bolt)` | a card name chosen as a permanent enters, as Anointed Peacekeeper's; any card the game knows (default: the costliest nonland card in the hand looked at) |
+| `Bot1.Colors(Red; Green)` | colors chosen as a spell or ability resolves (CR 202.2b), by name and in the order asked for; a color repeats where the ability allows it, as Coalition Relic's one mana per charge counter does (default: the first on offer) |
+| `Bot1.Replace(Archon of Emeria)` | which of two applicable replacement effects applies first (CR 616.1), by its source card's name or part of its hint (default: the first offered) |
+| `Bot1.ChoosePlayer(Bot2)` | a player chosen without targeting (CR 608.2d, 614.12a), as True-Name Nemesis asks as it enters (default: the first in turn order) |
+
+A preparation card's spell (CR 722.3c) is named in a line by its own name, `Bot1.Exile.All Aboard.Cast(...)`, though no deck can hold it; it exists only as the copy in exile.
+
+Arguments are separated by `;`, because card names contain commas. Names can be qualified when they are ambiguous:
+`Stack.Duress`, `Bot2.Battlefield.Grizzly Bears`, `Island#2`. Copies are numbered in battlefield order, and top first
+for libraries, graveyards and the stack (`Stack.Duress#1` is the topmost Duress; unnumbered, a name takes the first
+candidate the question offers, which for two spells of that name on the stack is the bottom-most). A target shared by two players' permanents must be qualified. Same-named cards
+in one place are interchangeable, so the first one offered is used.
+
+A permanent is named by the name it shows, so a transformed one is written by its **back face's** name:
+`Bot1.Battlefield.Concealing Curtains.Activate` turns it over and `Bot1.Battlefield.Revealing Eye.Attack` plays it
+afterwards. Either face's name reaches the card in a decklist too.
+
+A face-down permanent (CR 708.2a) has no name: `Bot1.Battlefield.#1.Activate` turns the first one face up for its card's mana cost (a
+special action, paid like a spell's cost with the mana abilities that follow), and `#2` the second; its dump keys are
+`Bot1.Battlefield.#1.FaceDown` and `.FaceDownName` (what it really is), or with a lone one `Bot1.Battlefield..FaceDown`.
+
+## Refusals
+
+A line starting with `!` says what the game must **not** offer, which no ordinary line can prove — a line never offered
+only fails after four turns, without saying why:
+
+```
+[T5 Bot1.Main1]
+! Bot1.Exile.Lightning Bolt.Cast                      Thor's permission has run out
+! Bot1.Battlefield.The Wandering Emperor.Activate     no second loyalty ability this turn
+! Bot2.Block(Grizzly Bears > True-Name Nemesis)        protection from Bot2
+```
+
+A play, cast or activation is checked the next time that player has priority, without answering it, and fails
+listing what was offered, written as script lines. It is matched as the line would be: the card in that zone, and
+with `Ability:` the option whose text contains it. A refused `Cast` without `Ability:` refuses every way of casting
+the card, not only for its mana cost. Whether an option the player cannot pay for is offered at all depends on the action (many unpayable casts are not offered), so a refusal for want of mana proves nothing; refuse for the rule in question and give the player the mana. A refused activation
+with `Color:` (`! Bot1.Battlefield.Chrome Mox.Activate(Color: Green)`) is offered only where that color is among the colors the
+ability may add: the colors it lets the player choose from, or the fixed mana it adds (`! Bot1.Battlefield.Llanowar Elves.Activate(Color: Blue)`);
+`Color: Colorless` (or `C`) likewise asks whether it may add colorless mana.
+
+A refused question to a player who has lost the game (`! Bot2.Accept`) holds once the stack is empty and they were asked
+nothing: a player who has left the game is given no priority and no choice (CR 800.4a).
+
+A refusal with `X:`, `! Bot1.Hand.Fire Covenant.Cast(X: 21)`, written right after the cast or activation that announces X,
+says X cannot be announced that high (life to pay, creatures to sacrifice): it is judged there, raising X one at a time, and holds
+if raising stops short of the number and fails if it gets there. The card announcing must be the one named. Written where
+nothing is announcing, it is an ordinary refusal of the action (the `X:` is only part of the line).
+
+A block, `! Bot2.Block(Blocker > Attacker)`, is checked the next time that player declares blockers, and fails if
+that pair is allowed. Both creatures must be in the question (an untapped blocker, an attacker attacking that
+player), or the refusal fails as proving nothing. The engine does not ask for blockers when no block is possible at
+all, so a refusal of the only possible block needs some other attacker the defender could block. The one exception is a
+block an effect forbids outright (Headliner Scarlett's "creatures target player controls can't block"): when the question
+never comes, the refusal holds if, with priority in the declare-blockers step, the blocker is an untapped creature of that
+player, the attacker is attacking that player, and no such block was made; otherwise it fails as proving nothing.
+The pairs of one refusal are one declaration: `! Bot2.Block(Bear > Moonshadow)` holds for an attacker with menace (a lone blocker is not
+legal, CR 702.110b), while naming two blockers for it, `! Bot2.Block(Bear#1 > Moonshadow; Bear#2 > Moonshadow)`, would fail.
+
+An attack, `! Bot1.Attack(Sylvan Caryatid > Bot2)`, is checked at the next declaration of attackers and fails if that attacker may attack the
+target. The attacker must be one the question offers, or else one that only a restriction (Defender, "can't attack", summoning sickness) can have left
+out: the asked player's own, untapped, with another creature of theirs offered in the same question.
+
+A search, `! Bot1.Search(Plains)`, is checked at that player's next library search, and fails if a Plains is among
+the cards it may find. The card must be in the library searched, or the refusal fails as proving nothing. A search for
+a quality may always find nothing (CR 701.23b), so this is the only way to show a card is not one; the search itself
+is still answered by the next line, `Bot1.Search()` or another card.
+
+A target, `! Bot1.Target(Lightning Bolt)`, is checked at that player's next target question and fails if the named object is among its
+candidates; it fails as proving nothing when no such card exists anywhere in the game. It shows a spell or ability cannot target something
+(a creature card, not an instant, in "target creature card in your graveyard"); pair it with the legal target named on the next line.
+
+A mode choice, `! Bot1.Modes(1; 2)`, is checked at that player's next modes question and fails if the question would accept exactly
+those modes (too many for "choose one", a mode that is not eligible): the way to show a spell offers fewer modes than another case
+does ("choose one, or both if ..."). Pair it with the same line where the condition holds.
+
+A card choice, `! Bot1.Choose(Thopter)`, is checked at that player's next choice of cards (a sacrifice or discard cost, a card
+chosen from a revealed hand) and fails if the named card is among those it may take; it fails as proving nothing when no such
+card exists in the game. It shows a cost or choice leaves something out (a token as "a nontoken artifact"); pair it with the
+`Bot1.Choose(Thopter Foundry)` that takes the legal card on the next line. Without arguments it is the bare refusal below.
+
+A "you may" choice, `! Bot1.Accept`, fails if that player is asked one before their next priority: the way to show a
+choice is *not* offered (a choice made impossible, CR 608.2d), which a default Decline would otherwise hide. Put `Bot1.Pass`
+lines before it for the priorities that come first, so it lands on the resolution that would ask.
+
+The same holds for the other questions, written bare: `! Bot1.Choose`, `! Bot1.Decline`, `! Bot1.Discard`, `! Bot1.Colors`, `! Bot1.Name`,
+`! Bot1.Arrange`, `! Bot1.ChoosePlayer`, `! Bot1.Modes` and `! Bot1.Target` (without arguments) fail if that player is asked that kind
+of question before their next priority: a discard, a search result, a placement or a target that should not be asked for (an
+empty hand, a lone candidate, nothing to reveal). Pair each with a scenario that does ask it.
+`! Bot1.Discard` is the discard to hand size at cleanup (no maximum hand size): a refusal is checked until the player's next priority, so
+place it after the `Bot1.Pass` of the end step (`[T5 Bot1.End]`, `Bot1.Pass`) or the end step's own priority ends it first.
+
+A bare `! Bot2.Block` is the same for the declaration of blockers: it fails if Bot2 is asked to declare blockers before their next
+priority, which shows that no block is possible at all ("creatures can't block this turn" leaves nothing to refuse with
+`! Bot2.Block(Blocker > Attacker)`, since the engine then asks nothing). Put `[T3 Bot1.DeclareBlockers]` before it, because Bot2
+gets priority earlier in the turn, in the declare attackers step; pair it with a scenario in which a block is possible.
+
+A refusal answers nothing, and the player goes on to the next line. Because it lands on the *next* question of its
+kind, place it where the action could otherwise be taken, with a wait or `BotN.Pass` before it:
+
+- Any priority counts, upkeep included, and a sorcery-speed action is never offered in an upkeep or with a spell on
+  the stack, so a refusal placed there holds for that reason alone.
+- Targets are not considered unless the line names them, but a spell with no legal target is not offered at all. Give a
+  targeted spell something to target, or it goes unoffered for the wrong reason. A refusal that names its targets,
+  `! Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Figure of Fable)`, refuses only the option that can be announced with
+  them (here: protection or hexproof keeps Figure of Fable out of the Bolt's candidates) and fails as proving nothing if no
+  object has that name; the Bolt cast at something else is the positive control.
+- **Pair every refusal with a positive control**: the same action, or the same pair, taken or offered where the rule
+  under test does not apply (Lightning Bolt cast before Teferi arrives; the blocker blocking another attacker). Without
+  one, a refusal also passes when the card is simply not where the line says, or never could have done it.
+
+## Expectations
+
+`Key = Value` against the dump. A failing script prints every key. The keys are:
+
+- `Turn`, `Step`, `ActivePlayer`, `PriorityPlayer`, `Result` (`InProgress`, `Bot1 won`, `Draw`)
+- `Monarch` (`Bot1`), once a player has become the monarch (CR 725) and absent until then; `Initiative` likewise (CR 726)
+- `DayNight` (`Day`, `Night`), once the game has a designation (CR 731.1) and absent while it is neither. The game's
+  own, so it names no player.
+- `Stack`, `Exile`, `Combat.Attackers`, `Combat.Blocks`, each with `.Count`
+- `Exile` lists a card exiled face down as `(face down)` (CR 406.3), and `Exile.FaceDown` says what those cards are (the dump sees
+  everything; a player's view does not)
+- `BotN.Life`, `.Poison`, `.Energy`, `.Status` (`Lost`, once the player has lost the game and absent until then), `.Mana` (`{U}{U}`), `.LandsPlayed`
+- `BotN.Experience` — counters on the player by name (CR 122.1), one key per kind and only for a kind they have any
+  of, spelled as `CounterKind.Token` spells it (`.Experience`, `.Rad`). Poison and energy keep their own keys above.
+- `BotN.Dungeon` (`Undercity: Forge`) while in a dungeon, and `BotN.DungeonsCompleted` once one is completed (CR 309.7)
+- `BotN.Looked`, the cards the player has looked at, in the order they looked (a look at one card of a hand, Urza's Bauble),
+  once they have looked at any and absent until then
+- `BotN.Hand`, `.Library`, `.Graveyard`, `.Battlefield`, `.Emblems` (CR 114, from the command zone), each with `.Count`
+- `BotN.Battlefield.<Name>.Tapped` and `.Types` (computed card types, `Land; Creature` for an animated land); for
+  creatures also `.Power`, `.Toughness`, `.Damage` and `.SummoningSick`
+- `BotN.Battlefield.<Name>.Subtypes` (computed, sorted: `Hero; Wizard`), absent when it has none
+- `BotN.Battlefield.<Name>.Colors` (computed, sorted: `Green; White`), absent when it is colorless
+- `BotN.Battlefield.<Name>.Counters.PlusOnePlusOne` (or `.Lifelink`, any `CounterKind`), for a permanent that has
+  counters of that kind
+- `BotN.Battlefield.<Name>.Keywords` (`Indestructible; Lifelink`, sorted), computed keywords, absent when it has none
+- `BotN.Battlefield.<Name>.Monstrous`, `true` for a monstrous permanent (CR 701.37b) and absent otherwise
+- `BotN.Battlefield.<Name>.Saddled`, `true` for a permanent saddled this turn (CR 702.171b) and absent otherwise
+- `BotN.Battlefield.<Name>.Prepared`, `true` for a prepared permanent (CR 722.3a) and absent otherwise; while it is
+  set, that permanent's preparation card is the copy in `Exile`
+- `BotN.Battlefield.<Name>.Chosen<Key>`, one per quality chosen about a permanent and kept on it (CR 614.12a):
+  `ChosenName` for a card name, `ChosenParity` for Gollum's odd or even, `ChosenColor` for a chosen colour,
+  `ChosenSubtype` for a chosen creature type (Three Tree City); and `ChosenModes`, the modes its modal abilities have
+  chosen, numbered from 1 and read from the history (`1, 3` for Gollum's counter and draw)
+- `BotN.Battlefield.<Name>.Exerted`, `true` for an exerted permanent (CR 701.43a) and absent otherwise
+- `BotN.Battlefield.<Name>.GoadedBy` (`Bot2`), the players who goaded a creature (CR 701.15a), absent otherwise
+- `BotN.Battlefield.<Name>.AttachedTo` (`Grizzly Bears`), what an Aura or Equipment enchants or equips, absent otherwise
+
+Lists use `;`. Library, graveyard and stack are listed top first and compared in order. Hand, battlefield and exile
+are compared as sets.
+
+A key described above as absent is asserted absent with `(absent)`: `Bot2.Battlefield.Deep-Cavern Bat.Keywords =
+(absent)` holds when it has no keywords at all, and fails if the key is there. It also fails when the dump has no
+other key on the same object (`Bot2.Battlefield.Deep-Cavern Bat.`, or for a `.Counters.` key the permanent itself),
+so a misspelt or departed object cannot pass vacuously. Anywhere else a missing key fails.
+
+## Handing a position over
+
+`[Handover Bot1.AssignDamage]` stops the script with that question outstanding instead of answering it. Named by the
+verb that would otherwise have answered it, and by the player being asked.
+
+A script that ends this way is two things at once. Run as a test it plays to the handover and checks its `[Expect]`
+block, which is how it proves it reached the position it describes. It was also a position to deal to a real session for
+a person or a bot to answer from, through the C# engine, which is gone; serving a handover from the Rust engine to the
+web client is not built yet.
+
+Name the question. A bare `[Handover]` stops at whatever is asked next, which is usually one or two questions early
+and silently so: priority passes in the declare-blockers step come before combat damage is divided. Until the named
+question is asked, the seats go on answering by default, and a handover that never arrives fails the script after
+four turns like any other line.
+
+Expectations then describe the position mid-game rather than a finished one, which is the point: `Step = Damage`,
+`Combat.Blocks = ...`, and every `.Damage` still `0` says the division is outstanding and not already answered.

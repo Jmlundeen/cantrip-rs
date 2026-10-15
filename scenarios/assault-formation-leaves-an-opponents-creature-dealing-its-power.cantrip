@@ -1,0 +1,35 @@
+# Assault Formation changes only "each creature you control": Bot2's Dark Confidant (2/1) still assigns combat damage equal
+# to its power. Bot1 has the Formation on turn 1; on turn 4 the Confidant attacks and Bot1 takes 2, not its toughness of 1
+# (CR 510.1a).
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Assault Formation
+Forest x10
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Dark Confidant
+Swamp x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Assault Formation.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Dark Confidant.Cast
+[T4 Bot2.Main1]
+Bot2.Attack(Dark Confidant > Bot1)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 18

@@ -1,0 +1,39 @@
+# A countered Ancestral Recall never resolves (CR 701.6a): Bot2 casts it on turn 4 and Bot1, holding two untapped
+# Islands from turns 1 and 3, counters it. Bot2 draws only its turn's card.
+
+[Bot1 Deck]
+Island
+Island
+Island
+Island
+Island
+Counterspell
+Island
+Island x14
+
+[Bot2 Deck]
+Island
+Island
+Ancestral Recall
+Island x10
+Island x6
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Ancestral Recall.Cast(Bot2)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Counterspell.Cast(Stack.Ancestral Recall)
+[Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Counterspell
+Bot2.Graveyard = Ancestral Recall
+Bot2.Hand.Count = 6

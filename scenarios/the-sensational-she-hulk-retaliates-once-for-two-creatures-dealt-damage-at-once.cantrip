@@ -1,0 +1,54 @@
+# The Sensational She-Hulk (cast on turn 1 as in the declined-retaliation scenario) and an Ornithopter double-block Bot2's Sunset
+# Saboteur (menace) on turn 6; the Saboteur deals 2 to each at the same moment. That is one trigger for each creature dealt damage,
+# two in all. Bot1 aims both at Bot2 and the first, accepted, deals 2; the second finds "do this only once each turn" already done
+# and does nothing, so Bot2 loses just 2 (and no question is asked for the second).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Emerald
+Sol Ring
+Black Lotus
+Jennifer Walters
+Ornithopter
+Island x2
+Island x14
+
+[Bot2 Deck]
+Swamp
+Swamp
+Sunset Saboteur
+Swamp x17
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Jennifer Walters.Cast(Ability: back face)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp#1.Activate
+Bot2.Battlefield.Swamp#2.Activate
+Bot2.Hand.Sunset Saboteur.Cast
+Bot2.Pass
+[T6 Bot2.Main1]
+Bot2.Attack(Sunset Saboteur > Bot1)
+Bot1.Block(Ornithopter > Sunset Saboteur; The Sensational She-Hulk > Sunset Saboteur)
+Bot2.AssignDamage(Sunset Saboteur > Ornithopter: 2; Sunset Saboteur > The Sensational She-Hulk: 2)
+Bot1.Target(Bot2)
+Bot1.Target(Bot2)
+Bot1.Accept
+[T6 Bot2.Main2]
+
+[Expect]
+Turn = 6
+Bot2.Life = 18

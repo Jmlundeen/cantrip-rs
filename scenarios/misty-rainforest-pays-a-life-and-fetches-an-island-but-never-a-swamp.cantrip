@@ -1,0 +1,27 @@
+# Misty Rainforest: {T}, pay 1 life, sacrifice it - search for a Forest or Island card and put it onto the battlefield
+# untapped. A Swamp is in the library but is not a Forest or an Island, so it is not offered (the refusal), while the
+# Island is found and enters untapped.
+
+[Bot1 Deck]
+Misty Rainforest
+Mountain x6
+Swamp
+Island
+Forest
+Mountain x10
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Misty Rainforest.Play
+Bot1.Battlefield.Misty Rainforest.Activate
+! Bot1.Search(Swamp)
+Bot1.Search(Island)
+
+[Expect]
+Bot1.Life = 19
+Bot1.Graveyard = Misty Rainforest
+Bot1.Battlefield = Island
+Bot1.Battlefield.Island.Tapped = false
+Bot1.Library.Count = 12

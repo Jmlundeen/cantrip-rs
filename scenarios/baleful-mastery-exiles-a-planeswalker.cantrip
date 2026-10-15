@@ -1,0 +1,35 @@
+# "Exile target creature or planeswalker": Bot2's Wrenn and Six (cast on turn 2 with two Moxen) is exiled by Baleful Mastery,
+# paid for with {1}{B} on turn 3, and Bot2 draws the card.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Baleful Mastery
+Swamp x10
+
+[Bot2 Deck]
+Mox Ruby
+Mox Emerald
+Wrenn and Six
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Wrenn and Six.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Baleful Mastery.Cast(Bot2.Battlefield.Wrenn and Six; Ability: {1}{B})
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Wrenn and Six
+Bot2.Battlefield = Mox Ruby; Mox Emerald
+Bot2.Hand.Count = 6

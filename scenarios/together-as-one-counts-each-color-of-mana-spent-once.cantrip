@@ -1,0 +1,37 @@
+# Converge: Black Lotus gives three red, and a white, a blue and a black Mox one each - six mana of four colors. X is
+# four however many mana of a color was spent: Bot1 draws four, Together as One deals four to Bot2, Bot1 gains four.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Together as One
+Island
+Island
+Island x6
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+? Bot1.Mana = {W}{U}{B}{R}{R}{R}
+Bot1.Hand.Together as One.Cast
+Bot1.Target(Bot1)
+Bot1.Target(Bot2)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 6
+Bot1.Library.Count = 2
+Bot2.Life = 16
+Bot1.Life = 24
+Bot1.Graveyard = Together as One; Black Lotus

@@ -1,0 +1,41 @@
+# Lim-Dûl's Vault: the payment can be repeated. Bot1 pays 1 life twice (18 left): the first five (Plains) and the next
+# five (Swamps) go to the bottom in turn, the third five are the cards it keeps on top, and it declines a third payment.
+# Library: the kept five over ten Plains.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Lim-Dûl's Vault
+Island
+Island
+Island
+Island
+Plains x5
+Plains x5
+Brainstorm
+Ponder
+Counterspell
+Duress
+Lightning Bolt
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Lim-Dûl's Vault.Cast
+Bot1.Accept
+Bot1.Arrange(Plains; Plains; Plains; Plains; Plains)
+Bot1.Accept
+Bot1.Arrange(Plains; Plains; Plains; Plains; Plains)
+Bot1.Decline
+Bot1.Arrange(Duress; Ponder; Lightning Bolt; Brainstorm; Counterspell)
+[Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 18
+Bot1.Library = Duress; Ponder; Lightning Bolt; Brainstorm; Counterspell; Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains

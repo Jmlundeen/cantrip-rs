@@ -1,0 +1,38 @@
+# "Look at the top X cards ... X is the number of lands you control": with three Islands but only two cards left in the
+# library, Consult looks at those two, and kicked (take two) puts both into the hand, leaving the library empty without
+# any loss (nothing is drawn). Mox Sapphire is not a land and does not add to X.
+
+[Bot1 Deck]
+Island
+Island
+Island
+Mox Sapphire
+Consult the Star Charts
+Island
+Island
+Island
+Island
+Lightning Bolt
+Counterspell
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Consult the Star Charts.Cast(Kicked: 1)
+[T5 Bot1.Main2]
+
+[Expect]
+Result = InProgress
+Bot1.Library.Count = 0
+Bot1.Hand = Island; Island; Island; Island; Lightning Bolt; Counterspell

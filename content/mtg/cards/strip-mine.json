@@ -1,0 +1,5 @@
+{
+  "name": "Strip Mine",
+  "type": "Land",
+  "oracleText": "{T}: Add {C}.\n{T}, Sacrifice this land: Destroy target land."
+}

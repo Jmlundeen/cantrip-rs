@@ -1,0 +1,20 @@
+# "Return a land you control to its owner's hand" is not a target and not optional: with Boros Garrison as the only land
+# Bot1 controls, it must return itself (CR 603.3, 608.2d). Nothing is chosen (a single candidate asks no question),
+# and the Garrison is back in hand. The control, a choice among two lands, is boros-garrison-enters-tapped-and-returns-a-land-to-hand.
+
+[Bot1 Deck]
+Boros Garrison
+Plains x19
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Boros Garrison.Play
+! Bot1.Choose
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Count = 0
+Bot1.Hand.Count = 7
+Bot1.LandsPlayed = 1

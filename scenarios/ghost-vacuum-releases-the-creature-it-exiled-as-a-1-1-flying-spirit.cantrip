@@ -1,0 +1,64 @@
+# Ghost Vacuum: "{T}: Exile target card from a graveyard." and "{6}, {T}, Sacrifice Ghost Vacuum: Put each creature
+# card exiled with Ghost Vacuum onto the battlefield under your control with a flying counter on it. Each of them is a
+# 1/1 Spirit in addition to its other types. Activate only as a sorcery."
+#
+# Turn 1: Bot1 casts Ghost Vacuum. Turn 2: Bot2 casts Dark Confidant. Turn 3: Bot1 Bolts it and exiles it with the Vacuum.
+# Turn 5: Bot1 spends six mana and the Vacuum: Bot2's Dark Confidant enters under Bot1's control with a flying counter, a
+# 1/1 Human Wizard Spirit (the counter gives flying, CR 122.1b; the 2/1 is set to 1/1, CR 613.4b).
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Emerald
+Ghost Vacuum
+Lightning Bolt
+Island x20
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Dark Confidant
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ghost Vacuum.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Dark Confidant.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Dark Confidant)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot1.Battlefield.Ghost Vacuum.Activate(Ability: Exile target; Bot2.Graveyard.Dark Confidant)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Ghost Vacuum.Activate(Ability: Put each)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Dark Confidant.Power = 1
+Bot1.Battlefield.Dark Confidant.Toughness = 1
+Bot1.Battlefield.Dark Confidant.Counters.Flying = 1
+Bot1.Battlefield.Dark Confidant.Keywords = Flying
+Bot1.Battlefield.Dark Confidant.Subtypes = Human; Spirit; Wizard
+Bot1.Graveyard = Ghost Vacuum; Lightning Bolt
+Exile.Count = 0

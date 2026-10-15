@@ -1,0 +1,45 @@
+# Engineered Explosives has sunburst: cast with X = 2 for black and red mana it enters with two charge counters.
+# Sacrificed for {2}, it destroys every nonland permanent with mana value 2 (Bot2's Mind Stone) and leaves the
+# mana value 1 Sol Ring and the mana value 0 Moxen alone, its own controller's included.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Engineered Explosives
+Island x20
+
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Sol Ring
+Mind Stone
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Engineered Explosives.Cast(X: 2)
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Mind Stone.Cast
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Engineered Explosives.Counters.Charge = 2
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Engineered Explosives.Activate
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield = Mox Jet; Mox Ruby
+Bot1.Graveyard = Engineered Explosives
+Bot2.Battlefield = Mox Jet; Mox Ruby; Mox Pearl; Sol Ring
+Bot2.Graveyard = Mind Stone

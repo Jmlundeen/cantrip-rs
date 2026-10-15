@@ -1,0 +1,52 @@
+# X is announced and paid as the ability is activated (CR 602.2b, 107.3b): X = 3 takes five Moxen's mana with {R}{G}.
+# Bot2's Lightning Bolt kills the targeted Ornithopter in response, so the ability has no legal target and does nothing
+# (CR 608.2b), though its cost, the Wolf Run's tap and the mana, was paid.
+
+[Bot1 Deck]
+Kessig Wolf Run
+Ornithopter
+Mox Ruby
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Island x13
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x5
+Mountain x13
+
+[Actions]
+Bot1.Hand.Kessig Wolf Run.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Kessig Wolf Run.Activate(X: 3; Ability: gains trample; Ornithopter)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Ornithopter
+Bot1.Battlefield.Kessig Wolf Run.Tapped = true
+Bot1.Battlefield.Mox Pearl.Tapped = true

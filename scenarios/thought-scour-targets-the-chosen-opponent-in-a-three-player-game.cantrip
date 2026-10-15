@@ -1,0 +1,37 @@
+# Thought Scour: "Target player mills two cards" - any player, so in a three-player game Bot1 may aim it at Bot3 and leave Bot2
+# alone (CR 115.1): Bot3's graveyard gets its top two cards, Bot2's library is untouched, and Bot1 draws a card. (The
+# first player of a game of more than two draws on turn 1, CR 103.8a: Bot1 has eight cards, plays one, casts one and draws one.)
+
+[Bot1 Deck]
+Island
+Thought Scour
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Bot3 Deck]
+Island
+Island
+Mountain
+Mountain
+Swamp
+Swamp
+Plains
+Forest
+Forest
+Island x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Thought Scour.Cast(Bot3)
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+
+[Expect]
+Bot3.Graveyard = Forest; Forest
+Bot3.Library.Count = 10
+Bot2.Graveyard.Count = 0
+Bot1.Hand.Count = 7

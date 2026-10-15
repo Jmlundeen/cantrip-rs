@@ -1,0 +1,15 @@
+{
+  "name": "Invasion of Gobakhan",
+  "manaCost": "{1}{W}",
+  "type": "Battle — Siege",
+  "defense": 3,
+  "oracleText": "(As a Siege enters, choose an opponent to protect it. You and others can attack it. When it's defeated, exile it, then cast it transformed.)\nWhen this Siege enters, look at target opponent's hand. You may exile a nonland card from it. For as long as that card remains exiled, its owner may play it. A spell cast this way costs {2} more to cast.",
+  "backFace": {
+    "name": "Lightshield Array",
+    "colorIndicator": [
+      "White"
+    ],
+    "type": "Enchantment",
+    "oracleText": "At the beginning of your end step, put a +1/+1 counter on each creature that attacked this turn.\nSacrifice this enchantment: Creatures you control gain hexproof and indestructible until end of turn."
+  }
+}

@@ -1,0 +1,43 @@
+# Sage of the Skies: "if you've cast another spell this turn" counts only the Sage's own controller's spells (CR 603.4).
+# On turn 3 Bot2 casts a Lightning Bolt at Bot1 in Bot1's main phase, and Bot1 then casts the Sage as the only spell it has
+# cast: the condition is false, the trigger never goes on the stack, and there is one Sage and no token. The Moxen were
+# cast on turn 1. Compare the sibling scenarios where Bot1's own earlier spell makes the copy.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Sage of the Skies
+Plains
+Island x20
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+Bot1.Hand.Sage of the Skies.Cast
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 17
+Bot1.Battlefield.Count = 5

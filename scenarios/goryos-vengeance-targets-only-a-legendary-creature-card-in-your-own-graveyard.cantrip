@@ -1,0 +1,51 @@
+# "Return target legendary creature card from your graveyard": on turn 1 Bot1 entombs an Ornithopter (a creature card, not
+# legendary) and on turn 2 Bot2 entombs a Headliner Scarlett (legendary, but in Bot2's graveyard). On turn 3 Goryo's Vengeance
+# has no legal target, so it is not offered (the refusal); after Bot1 entombs its own Headliner Scarlett the same spell is
+# castable on it - the positive control - and it returns with haste.
+
+[Bot1 Deck]
+Mox Jet
+Black Lotus
+Entomb
+Entomb
+Goryo's Vengeance
+Island x2
+Ornithopter
+Headliner Scarlett
+Island x12
+
+[Bot2 Deck]
+Mox Jet
+Entomb
+Island x6
+Headliner Scarlett
+Island x11
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Entomb.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Search(Ornithopter)
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Entomb.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Search(Headliner Scarlett)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+! Bot1.Hand.Goryo's Vengeance.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Headliner Scarlett)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Goryo's Vengeance.Cast(Bot1.Graveyard.Headliner Scarlett)
+Bot1.Target(Bot2)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Headliner Scarlett.Keywords = Haste
+
+[Expect]
+Turn = 3
+Bot1.Graveyard.Count = 5
+Bot2.Graveyard = Entomb; Headliner Scarlett

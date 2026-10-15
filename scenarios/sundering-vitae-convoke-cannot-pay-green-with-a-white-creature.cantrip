@@ -1,0 +1,37 @@
+# Convoke: "each creature you tap pays for {1} or one mana of that creature's color". Bot1's two Giver of Runes are white, so they can pay generic mana but not the {G} of Sundering Vitae: on turn 3, with no green source, it is not offered (refusal) though
+# the Plains and Mox Pearl are untapped. After a Forest is played (green mana for the {G}) the Givers pay {2} and it is cast (the positive control), destroying Bot2's Mox Jet.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Giver of Runes
+Giver of Runes
+Sundering Vitae
+Forest
+Plains x12
+
+[Bot2 Deck]
+Mox Jet
+Plains x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Giver of Runes.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Giver of Runes.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+! Bot1.Hand.Sundering Vitae.Cast(Mox Jet)
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sundering Vitae.Cast(Mox Jet; Convoke: Giver of Runes, Giver of Runes)
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Graveyard = Mox Jet
+Bot1.Battlefield.Giver of Runes#1.Tapped = true
+Bot1.Battlefield.Giver of Runes#2.Tapped = true

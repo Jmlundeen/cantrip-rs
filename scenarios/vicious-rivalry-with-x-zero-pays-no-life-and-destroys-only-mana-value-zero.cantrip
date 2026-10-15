@@ -1,0 +1,38 @@
+# Vicious Rivalry with X = 0: "pay X life" costs nothing, and "Destroy all artifacts and creatures with mana value 0 or less" takes the
+# mana value 0 permanents, whoever controls them: Bot1's Mox Jet, Mox Emerald and Ornithopter and Bot2's Mox Pearl go, the Sol Ring
+# (mana value 1) stays, and Bot1 is still at 20.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Sol Ring
+Ornithopter
+Vicious Rivalry
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Mox Pearl
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Vicious Rivalry.Cast(X: 0)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield = Sol Ring
+Bot2.Battlefield.Count = 0
+Bot1.Graveyard = Vicious Rivalry; Ornithopter; Mox Emerald; Mox Jet

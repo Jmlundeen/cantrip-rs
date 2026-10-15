@@ -1,0 +1,24 @@
+# "{T}: Add one mana of any color." is a {T} cost on a creature (CR 302.6): the turn Birds of Paradise is cast it cannot be tapped (refusal). Next turn it can, and the red mana it adds casts
+# Lightning Bolt, which Bot1's only land (a Forest) could not.
+
+[Bot1 Deck]
+Forest
+Birds of Paradise
+Lightning Bolt
+Forest x12
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Birds of Paradise.Cast
+Bot1.Pass
+! Bot1.Battlefield.Birds of Paradise.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Birds of Paradise.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+
+[Expect]
+Bot2.Life = 17

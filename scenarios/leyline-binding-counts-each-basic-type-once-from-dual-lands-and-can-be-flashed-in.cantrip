@@ -1,0 +1,41 @@
+# Domain counts basic land TYPES among lands you control (CR 205.3i): Tundra (Plains Island) and Bayou (Swamp Forest) give four,
+# so Leyline Binding costs {1}{W}, paid with exactly those two lands (nothing floats afterwards). Bot2's Mountains
+# do not count: with them the cost would have been lower still. It has flash, so Bot1 casts it during Bot2's turn 4, once the Ornithopter that Bot2 has just cast has resolved, and its trigger exiles that.
+
+[Bot1 Deck]
+Tundra
+Bayou
+Leyline Binding
+Swamp
+Tundra x2
+Swamp x12
+
+[Bot2 Deck]
+Mountain
+Mountain
+Ornithopter
+Mountain x17
+
+[Actions]
+Bot1.Hand.Tundra.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Bayou.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+Bot1.Battlefield.Tundra.Activate(Ability: {W})
+Bot1.Battlefield.Bayou.Activate(Ability: {B})
+Bot1.Hand.Leyline Binding.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Exile = Ornithopter
+Bot2.Battlefield = Mountain; Mountain
+Bot1.Battlefield = Tundra; Bayou; Leyline Binding

@@ -1,0 +1,31 @@
+# Candelabra's X of 2 targets Bot1's two Islands, both tapped to pay. In response Bot2 sacrifices Strip Mine to destroy
+# the first; the ability still resolves for the remaining legal target (CR 608.2b) and untaps the second Island.
+
+[Bot1 Deck]
+Candelabra of Tawnos
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Strip Mine
+Island x16
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Candelabra of Tawnos.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Strip Mine.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Candelabra of Tawnos.Activate(X: 2)
+Bot1.Target(Bot1.Battlefield.Island; Bot1.Battlefield.Island#2)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot2.Battlefield.Strip Mine.Activate(Ability: Destroy; Bot1.Battlefield.Island)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Island
+Bot1.Battlefield.Island.Tapped = False

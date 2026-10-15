@@ -1,0 +1,47 @@
+# "Whenever another permanent leaves the battlefield": a token counts (it leaves, then ceases to exist) and so does any player's
+# permanent. Turn two: Bot2's Lightning Bolt kills one of Bot1's Spirit tokens: one counter (2/2). Turn four: Bot2's Strip Mine is
+# sacrificed to destroy Bot1's Swamp: the Strip Mine leaving and the Swamp leaving are two permanents, two more counters: a 4/4.
+
+[Bot1 Deck]
+Swamp
+Mox Pearl
+Mox Pearl
+Mox Jet
+Mox Ruby
+Super Shredder
+Lingering Souls
+Swamp x12
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Strip Mine
+Mountain x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Super Shredder.Cast
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Lingering Souls.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Spirit)
+[T2 Bot2.Main2]
+? Bot1.Battlefield.Super Shredder.Counters.PlusOnePlusOne = 1
+[T4 Bot2.Main1]
+Bot2.Hand.Strip Mine.Play
+Bot2.Battlefield.Strip Mine.Activate(Bot1.Battlefield.Swamp; Ability: Destroy)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Super Shredder.Counters.PlusOnePlusOne = 3
+Bot1.Battlefield.Super Shredder.Power = 4

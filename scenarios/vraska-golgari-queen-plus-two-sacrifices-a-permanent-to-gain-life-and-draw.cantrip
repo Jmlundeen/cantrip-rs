@@ -1,0 +1,32 @@
+# Vraska, Golgari Queen's +2: Bot1 sacrifices the Mox Emerald it has already used, so it gains 1 life and draws a card.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Vraska, Golgari Queen
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Vraska, Golgari Queen.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Vraska, Golgari Queen.Activate(Ability: sacrifice)
+Bot1.Choose(Mox Emerald)
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Life = 21
+Bot1.Hand.Count = 5
+Bot1.Graveyard = Mox Emerald; Black Lotus
+Bot1.Battlefield = Vraska, Golgari Queen
+Bot1.Battlefield.Vraska, Golgari Queen.Counters.Loyalty = 6

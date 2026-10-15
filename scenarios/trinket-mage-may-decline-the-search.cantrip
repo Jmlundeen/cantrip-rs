@@ -1,0 +1,31 @@
+# Trinket Mage: "you may search your library". Bot1 declines: no search is made, nothing is taken and the library keeps its eleven cards.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Trinket Mage
+Island x3
+Sol Ring
+Thoughtcast
+Mox Jet
+Island x8
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Trinket Mage.Cast
+Bot1.Decline
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Hand = Island; Island; Island
+Bot1.Library.Count = 11

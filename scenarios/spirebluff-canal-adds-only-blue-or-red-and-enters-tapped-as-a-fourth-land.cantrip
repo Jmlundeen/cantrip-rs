@@ -1,0 +1,33 @@
+# Spirebluff Canal: "{T}: Add {U} or {R}." and "enters tapped unless you control two or fewer other lands" (CR 614.1c).
+# It adds red as well as blue (the existing scenario taps it for blue), and white, black, green and colorless are
+# refused. As Bot1's fourth land (three others) it enters tapped and is used the next time it untaps.
+
+[Bot1 Deck]
+Island
+Island
+Island
+Spirebluff Canal
+Island x16
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Spirebluff Canal.Play
+? Bot1.Battlefield.Spirebluff Canal.Tapped = true
+[T9 Bot1.Main1]
+! Bot1.Battlefield.Spirebluff Canal.Activate(Color: White)
+! Bot1.Battlefield.Spirebluff Canal.Activate(Color: Black)
+! Bot1.Battlefield.Spirebluff Canal.Activate(Color: Green)
+! Bot1.Battlefield.Spirebluff Canal.Activate(Color: Colorless)
+Bot1.Battlefield.Spirebluff Canal.Activate(Color: Red)
+? Bot1.Mana = {R}
+
+[Expect]
+Bot1.Battlefield.Spirebluff Canal.Tapped = true

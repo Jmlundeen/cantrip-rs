@@ -1,0 +1,26 @@
+# Bot1 targets Bot2: Bot2 mills its top two cards (Forest, Plains) and Bot1, the caster, draws a card (Forest).
+
+[Bot1 Deck]
+Island
+Thought Scour
+Swamp x5
+Forest
+Swamp x3
+
+[Bot2 Deck]
+Mountain x7
+Forest
+Plains
+Mountain x6
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Thought Scour.Cast(Bot2)
+
+[Expect]
+Bot2.Graveyard = Plains; Forest
+Bot2.Library.Count = 6
+Bot1.Graveyard = Thought Scour
+Bot1.Hand = Swamp; Swamp; Swamp; Swamp; Swamp; Forest
+Bot1.Library.Count = 3

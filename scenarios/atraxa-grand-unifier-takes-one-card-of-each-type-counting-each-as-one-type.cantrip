@@ -1,0 +1,60 @@
+# Atraxa, Grand Unifier ({3}{G}{W}{U}{B}, paid with four Moxen and a Black Lotus): its enters trigger reveals the top
+# ten cards and lets Bot1 take one card of each type. The Ornithopter is taken as the artifact, so it is no longer there
+# to be the creature and the Satyr Wayfinder is taken for that; one instant of the two, one land of the two; the rest
+# go to the bottom of the library.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Black Lotus
+Atraxa, Grand Unifier
+Plains
+Lightning Bolt
+Counterspell
+Ornithopter
+Satyr Wayfinder
+Island
+Island
+Sol Ring
+Demonic Tutor
+Liliana of the Veil
+Conclave Tribunal
+Island x23
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Atraxa, Grand Unifier.Cast
+Bot1.Pass
+Bot1.Choose(Ornithopter)
+Bot1.Choose(Satyr Wayfinder)
+Bot1.Choose(Conclave Tribunal)
+Bot1.Choose(Lightning Bolt)
+Bot1.Choose(Island)
+Bot1.Choose(Liliana of the Veil)
+Bot1.Choose(Demonic Tutor)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Atraxa, Grand Unifier.Power = 7
+Bot1.Hand = Ornithopter; Satyr Wayfinder; Conclave Tribunal; Lightning Bolt; Island; Liliana of the Veil; Demonic Tutor
+Bot1.Library.Count = 26

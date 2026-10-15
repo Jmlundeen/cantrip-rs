@@ -1,0 +1,38 @@
+# A target that becomes illegal before resolution (CR 608.2b): Bot1 casts Thirst on Bot2's Mother of Runes (mana value
+# 1) on turn five, and Bot2 answers with the Mother's own ability, choosing black. Protection from black makes the target
+# illegal, so the spell is countered on resolution and the Mother lives. (The Mother, cast on turn two, is no longer
+# summoning sick on turn four, so it could be used by then.)
+
+[Bot1 Deck]
+Swamp
+Swamp
+Swamp
+Bloodchief's Thirst
+Swamp x12
+
+[Bot2 Deck]
+Mox Pearl
+Mother of Runes
+Plains x13
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Mother of Runes.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Hand.Bloodchief's Thirst.Cast
+Bot1.Target(Bot2.Battlefield.Mother of Runes)
+Bot2.Battlefield.Mother of Runes.Activate(Mother of Runes)
+Bot2.Colors(Black)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Mox Pearl; Mother of Runes
+Bot1.Graveyard = Bloodchief's Thirst
+Bot2.Graveyard.Count = 0

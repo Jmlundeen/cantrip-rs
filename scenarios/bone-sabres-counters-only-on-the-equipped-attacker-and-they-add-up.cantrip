@@ -1,0 +1,52 @@
+# "Whenever equipped creature attacks, put four +1/+1 counters on it": the unequipped Ornithopter attacking alone on
+# turn 3 triggers nothing (Ornithopter#1; the equip goes on #2),
+# the equipped one gets four counters on turn 5 and four more on turn 7 - eight in all, the counters staying
+# on the creature between attacks.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Bone Sabres
+Ornithopter
+Ornithopter
+Plains
+Plains x12
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Plains.Play
+Bot1.Hand.Bone Sabres.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Bone Sabres.Activate(Bot1.Battlefield.Ornithopter#2)
+Bot1.Pass
+Bot1.Attack(Ornithopter#1)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Ornithopter#1.Counters.PlusOnePlusOne = (absent)
+? Bot1.Battlefield.Ornithopter#2.Counters.PlusOnePlusOne = (absent)
+[T5 Bot1.Main1]
+Bot1.Attack(Ornithopter#2)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Ornithopter#2.Counters.PlusOnePlusOne = 4
+[T7 Bot1.Main1]
+Bot1.Attack(Ornithopter#2)
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Ornithopter#2.Counters.PlusOnePlusOne = 8
+Bot1.Battlefield.Ornithopter#1.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Bone Sabres.AttachedTo = Ornithopter
+Bot2.Life = 8

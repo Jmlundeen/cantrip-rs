@@ -1,0 +1,40 @@
+# The Warg (3/2, trample) is blocked by Cathar Commando (3/1): it assigns 1 lethal damage to the Commando and
+# tramples 2 over, and the Commando's 3 damage kills it as it connects. The trigger is still put on the stack, but its
+# first mode has no Wolf left to target, so only the Treasure mode is eligible and is taken without a question (the
+# bare refusal; the other scenarios, where both modes are eligible, ask).
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Bejeweled Warg
+Forest x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Cathar Commando
+Plains x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Bejeweled Warg.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Cathar Commando.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Bejeweled Warg)
+Bot2.Block(Cathar Commando > Bejeweled Warg)
+! Bot1.Modes
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot2.Graveyard = Cathar Commando
+Bot1.Graveyard = Bejeweled Warg
+Bot1.Battlefield = Forest; Mox Emerald; Treasure Token

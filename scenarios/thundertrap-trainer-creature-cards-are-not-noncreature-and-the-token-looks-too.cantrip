@@ -1,0 +1,45 @@
+# An artifact creature (Ornithopter) and a creature (Elvish Mystic) are not "noncreature" cards, so with offspring the first
+# trigger finds only Lightning Bolt among Ornithopter, Mystic and Island; the token copy's own enters ability then looks at
+# the next four (Counterspell, Duress and two Islands) and takes Counterspell: two looks, two cards.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Emerald
+Sol Ring
+Thundertrap Trainer
+Ornithopter
+Elvish Mystic
+Island
+Lightning Bolt
+Counterspell
+Duress
+Island x2
+Island x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Thundertrap Trainer.Cast(Kicked: 1)
+Bot1.Arrange(Lightning Bolt | Ornithopter; Elvish Mystic; Island)
+Bot1.Arrange(Counterspell | Duress; Island; Island)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Lightning Bolt; Counterspell
+Bot1.Battlefield.Count = 8

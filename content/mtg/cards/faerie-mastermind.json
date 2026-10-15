@@ -1,0 +1,12 @@
+{
+  "name": "Faerie Mastermind",
+  "manaCost": "{1}{U}",
+  "type": "Creature — Faerie Rogue",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "Flash\nFlying\nWhenever an opponent draws their second card each turn, you draw a card.\n{3}{U}: Each player draws a card.",
+  "keywords": [
+    "Flash",
+    "Flying"
+  ]
+}

@@ -1,0 +1,37 @@
+# Legion Leadership doubles target creature's power until end of turn (+X/+0 for the power it has as the spell
+# resolves, CR 701.10) and gives it first strike: Revitalizing Repast first makes Llanowar Elves a 2/2 with indestructible,
+# so Legion Leadership makes it 4/2.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Mox Jet
+Llanowar Elves
+Legion Leadership
+Revitalizing Repast
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Revitalizing Repast.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Legion Leadership.Cast(Bot1.Battlefield.Llanowar Elves)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Power = 4
+Bot1.Battlefield.Llanowar Elves.Toughness = 2
+Bot1.Battlefield.Llanowar Elves.Keywords = FirstStrike; Indestructible
+Bot1.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = 1

@@ -1,0 +1,40 @@
+# Laelia, the Blade Reforged: cast with haste off three Moxen, it attacks and exiles the top card of Bot1's library,
+# a Mountain. That exile puts a +1/+1 counter on Laelia (so she deals 3 to Bot2), and Bot1 may play the Mountain from
+# exile this turn.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Laelia, the Blade Reforged
+Island x3
+Mountain
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Laelia, the Blade Reforged.Cast
+Bot1.Pass
+Bot1.Attack(Laelia, the Blade Reforged > Bot2)
+[T1 Bot1.Main2]
+Bot1.Exile.Mountain.Play
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot2.Life = 17
+Exile.Count = 0
+Bot1.Battlefield.Laelia, the Blade Reforged.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Laelia, the Blade Reforged.Power = 3
+Bot1.Battlefield.Mountain.Tapped = false

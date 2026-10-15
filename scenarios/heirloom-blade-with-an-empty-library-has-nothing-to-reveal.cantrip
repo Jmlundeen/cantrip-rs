@@ -1,0 +1,35 @@
+# Heirloom Blade: Bot1's library is empty when the equipped Ornithopter dies; the may-ability is accepted and nothing
+# happens (no card is drawn and Bot1 does not lose).
+
+[Bot1 Deck]
+Ornithopter
+Heirloom Blade
+Black Lotus
+Mox Jet
+Mox Ruby
+Lightning Bolt
+Island
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Heirloom Blade.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Heirloom Blade.Activate(Ornithopter)
+[Bot1.Main2]
+? Bot1.Battlefield.Ornithopter.Power = 3
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter)
+Bot1.Accept
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand = Island
+Bot1.Library.Count = 0
+Result = InProgress

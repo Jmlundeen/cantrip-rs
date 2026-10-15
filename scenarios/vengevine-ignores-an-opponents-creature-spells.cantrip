@@ -1,0 +1,31 @@
+# "Whenever you cast": two creature spells cast by the opponent do not bring Vengevine back from its owner's graveyard.
+[Bot1 Deck]
+Vengevine
+Faithless Looting
+Llanowar Elves
+Ignoble Hierarch
+Mox Ruby
+Black Lotus
+Birds of Paradise
+Forest x13
+
+[Bot2 Deck]
+Black Lotus
+Llanowar Elves
+Ignoble Hierarch
+Forest x17
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Choose(Vengevine; Forest)
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Ignoble Hierarch.Cast
+? Stack = Ignoble Hierarch
+
+[Expect]
+Bot1.Graveyard = Faithless Looting; Forest; Vengevine

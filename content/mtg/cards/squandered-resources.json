@@ -1,0 +1,6 @@
+{
+  "name": "Squandered Resources",
+  "manaCost": "{B}{G}",
+  "type": "Enchantment",
+  "oracleText": "Sacrifice a land: Add one mana of any type the sacrificed land could produce."
+}

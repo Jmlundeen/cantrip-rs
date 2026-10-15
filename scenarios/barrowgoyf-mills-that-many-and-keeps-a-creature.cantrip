@@ -1,0 +1,52 @@
+# Bot2 bolts Bot1 (an instant in a graveyard), Bot1 Duresses Bot2 (a sorcery), and Bot2 discards a Mountain to hand size
+# (a land), so Barrowgoyf is a 3/4. It attacks on turn 7 unblocked, deals 3 with lifelink, and its trigger mills that
+# many: an Island, a Guerrilla Gorilla and a Swamp. Bot1 takes the Gorilla, the only creature card among them, into its hand.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Swamp
+Duress
+Barrowgoyf
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Island
+Guerrilla Gorilla
+Swamp x5
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Duress.Cast(Bot2)
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Swamp#3.Activate
+Bot1.Hand.Barrowgoyf.Cast
+[T7 Bot1.Main1]
+Bot1.Attack(Barrowgoyf)
+Bot1.Accept
+Bot1.Choose(Guerrilla Gorilla)
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 17
+Bot1.Graveyard = Swamp; Island; Duress
+Bot1.Hand = Swamp; Swamp; Swamp; Swamp; Swamp; Guerrilla Gorilla
+Bot1.Battlefield.Barrowgoyf.Power = 3
+Bot1.Battlefield.Barrowgoyf.Toughness = 4
+Bot1.Library.Count = 4

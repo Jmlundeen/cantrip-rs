@@ -1,0 +1,53 @@
+# "Whenever you sacrifice a land" is exactly that (CR 701.21a): a land of yours destroyed by an opponent's Wasteland is
+# not sacrificed, a Lotus Petal sacrificed for mana is not a land, and neither makes a Beast. Only the Forest Bot1 then
+# sacrifices to Baloth Prime's own ability does: one tapped Beast, and the untap is spent on a stun counter. Bot2's own
+# Wasteland sacrificing itself as its cost is an opponent's land and triggers nothing either.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Mox Ruby
+Baloth Prime
+Lotus Petal
+Bazaar of Baghdad
+Forest x10
+
+[Bot2 Deck]
+Wasteland
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Baloth Prime.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Wasteland.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Bazaar of Baghdad.Play
+Bot2.Battlefield.Wasteland.Activate(Bazaar of Baghdad; Ability: Destroy)
+[T3 Bot1.Main2]
+? Bot1.Graveyard = Bazaar of Baghdad
+? Bot1.Battlefield.Count = 6
+Bot1.Battlefield.Lotus Petal.Activate(Color: Green)
+? Bot1.Battlefield.Count = 5
+? Bot1.Battlefield.Baloth Prime.Counters.Stun = 5
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Baloth Prime.Activate
+Bot1.Choose(Forest)
+
+[Expect]
+Bot1.Battlefield = Mox Emerald; Mox Pearl; Mox Ruby; Baloth Prime; Beast
+Bot1.Battlefield.Baloth Prime.Counters.Stun = 4
+Bot1.Battlefield.Beast.Tapped = true
+Bot1.Life = 22

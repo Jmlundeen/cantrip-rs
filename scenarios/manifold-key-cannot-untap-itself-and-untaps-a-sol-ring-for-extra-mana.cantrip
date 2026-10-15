@@ -1,0 +1,28 @@
+# "Untap another target artifact" (CR 115.1): the Key itself is refused as the target (the refusal) beside a Sol Ring, which is
+# not. The Sol Ring tapped for {C}{C} pays the Key's {1}, is untapped by it, and is tapped once more for mana.
+
+[Bot1 Deck]
+Mox Jet
+Sol Ring
+Manifold Key
+Plains x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Manifold Key.Cast
+Bot1.Battlefield.Sol Ring.Activate
+! Bot1.Battlefield.Manifold Key.Activate(Manifold Key; Ability: Untap)
+Bot1.Battlefield.Manifold Key.Activate(Sol Ring; Ability: Untap)
+Bot1.Pass
+[Bot1.Main2]
+? Bot1.Battlefield.Sol Ring.Tapped = false
+Bot1.Battlefield.Sol Ring.Activate
+
+[Expect]
+Bot1.Battlefield.Manifold Key.Tapped = true
+Bot1.Battlefield.Sol Ring.Tapped = true

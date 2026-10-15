@@ -1,0 +1,46 @@
+# Mind Swap: Superior Spider-Man enters as a copy of the Ornithopter in Bot2's graveyard (a choice, not a target), except his name is Superior Spider-Man and he is a 4/4 Spider Human Hero in addition to his other types (CR 707.9b); the Ornithopter is exiled when he does.
+
+[Bot1 Deck]
+Sol Ring
+Damn
+Superior Spider-Man
+Swamp
+Swamp
+Island
+Swamp x14
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Swamp.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Damn.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Superior Spider-Man.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Accept
+Bot1.Target(Bot2.Graveyard.Ornithopter)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Exile = Ornithopter
+Bot2.Graveyard.Count = 0
+Bot1.Battlefield.Superior Spider-Man.Power = 4
+Bot1.Battlefield.Superior Spider-Man.Toughness = 4
+Bot1.Battlefield.Superior Spider-Man.Types = Artifact; Creature
+Bot1.Battlefield.Superior Spider-Man.Subtypes = Hero; Human; Spider; Thopter
+Bot1.Battlefield.Superior Spider-Man.Keywords = Flying

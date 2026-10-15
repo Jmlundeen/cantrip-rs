@@ -1,0 +1,26 @@
+# Grim Monolith: {T}: Add {C}{C}{C}; {4}: Untap it (the floating Lotus mana and its own three pay for that); and it does
+# not untap during its controller's untap step.
+
+[Bot1 Deck]
+Black Lotus
+Grim Monolith
+Island x14
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Grim Monolith.Cast
+Bot1.Battlefield.Grim Monolith.Activate(Ability: Add)
+? Bot1.Battlefield.Grim Monolith.Tapped = true
+Bot1.Battlefield.Grim Monolith.Activate(Ability: Untap)
+[Bot1.Main2]
+? Bot1.Battlefield.Grim Monolith.Tapped = false
+Bot1.Battlefield.Grim Monolith.Activate(Ability: Add)
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Grim Monolith.Tapped = true
+
+[Expect]
+Turn = 3

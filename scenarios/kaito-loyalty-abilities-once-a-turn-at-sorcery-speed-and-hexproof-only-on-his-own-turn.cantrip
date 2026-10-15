@@ -1,0 +1,61 @@
+# Kaito cast on turn 1 (four Moxen): +1 for the emblem makes him loyalty 5, and a second loyalty ability that turn is refused (CR 606.3). Turn 2 Bot2 Lightning Bolts him - a planeswalker on its turn, not hexproof - to loyalty 2. Turn 3, in the
+# beginning of combat, his 0 is refused (sorcery speed), and in main phase 2 his 0 is done: no opponent lost life this turn, so Surveil 2 draws nothing. Still in turn 3, Bot2's second Lightning Bolt cannot target him (hexproof
+# during his controller's turn: refusal), but on turn 4 it can (the positive control), and with loyalty 0 he goes to the graveyard; the emblem stays.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Mox Pearl
+Kaito, Bane of Nightmares
+Island
+Island
+Island x12
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Mountain x12
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Kaito, Bane of Nightmares.Cast
+Bot1.Pass
+Bot1.Battlefield.Kaito, Bane of Nightmares.Activate(Ability: You get an emblem)
+Bot1.Pass
+! Bot1.Battlefield.Kaito, Bane of Nightmares.Activate(Ability: Surveil)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Kaito, Bane of Nightmares)
+Bot2.Pass
+[T3 Bot1.BeginCombat]
+? Bot1.Battlefield.Kaito, Bane of Nightmares.Counters.Loyalty = 2
+! Bot1.Battlefield.Kaito, Bane of Nightmares.Activate(Ability: Surveil)
+[T3 Bot1.Main2]
+Bot1.Battlefield.Kaito, Bane of Nightmares.Activate(Ability: Surveil)
+Bot1.Pass
+Bot1.Arrange(Island; Island | )
+Bot1.Pass
+? Bot1.Hand.Count = 3
+Bot2.Battlefield.Mox Ruby.Activate
+! Bot2.Hand.Lightning Bolt.Cast(Kaito, Bane of Nightmares)
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Kaito, Bane of Nightmares)
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Emblems.Count = 1
+Bot1.Graveyard = Kaito, Bane of Nightmares

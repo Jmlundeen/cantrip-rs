@@ -1,0 +1,52 @@
+# Consult the Star Charts looks at one card per land its controller controls, not one per permanent: the Mox Sapphire
+# pays for the spells but never widens the look. Unkicked on turn 3 it looks at two and takes one; kicked on turn 5,
+# off three Islands and the Mox, it looks at three and takes two. What is left over goes to the bottom, under whatever
+# an earlier Consult put there.
+
+[Bot1 Deck]
+Island
+Island
+Island
+Mox Sapphire
+Consult the Star Charts
+Consult the Star Charts
+Island
+Lightning Bolt
+Counterspell
+Swords to Plowshares
+Wrath of God
+Duress
+Guerrilla Gorilla
+Sol Ring
+Island x6
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Consult the Star Charts.Cast
+Bot1.Arrange(Counterspell | Swords to Plowshares)
+[T3 Bot1.Main2]
+? Bot1.Library = Wrath of God; Duress; Guerrilla Gorilla; Sol Ring; Island; Island; Island; Island; Island; Island; Swords to Plowshares
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Consult the Star Charts.Cast(Kicked: 1)
+Bot1.Arrange(Sol Ring; Guerrilla Gorilla | Duress)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Hand = Island; Lightning Bolt; Counterspell; Wrath of God; Sol Ring; Guerrilla Gorilla
+Bot1.Graveyard = Consult the Star Charts; Consult the Star Charts
+Bot1.Library = Island; Island; Island; Island; Island; Island; Swords to Plowshares; Duress
+Bot1.Battlefield = Island; Island; Island; Mox Sapphire

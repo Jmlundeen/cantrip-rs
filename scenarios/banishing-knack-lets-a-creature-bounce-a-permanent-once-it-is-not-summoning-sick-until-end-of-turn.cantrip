@@ -1,0 +1,45 @@
+# Banishing Knack: until end of turn target creature gains "{T}: Return target nonland permanent to its owner's hand".
+# The creature is the source, so a fresh Ornithopter cannot use it on turn 1 (summoning sickness), but on turn 3 it
+# returns Bot2's Mox Ruby; on turn 5 the grant is gone.
+
+[Bot1 Deck]
+Island
+Ornithopter
+Banishing Knack
+Island
+Island
+Banishing Knack
+Island
+Island x8
+
+[Bot2 Deck]
+Island
+Mox Ruby
+Island x13
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Banishing Knack.Cast(Ornithopter)
+[T1 Bot1.Main2]
+! Bot1.Battlefield.Ornithopter.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Banishing Knack.Cast(Ornithopter)
+Bot1.Battlefield.Ornithopter.Activate(Bot2.Battlefield.Mox Ruby)
+[T3 Bot1.Main2]
+? Bot2.Hand.Count = 7
+[T5 Bot1.Main1]
+! Bot1.Battlefield.Ornithopter.Activate
+
+[Expect]
+Turn = 5
+Bot2.Battlefield = Island
+Bot2.Hand.Count = 7
+Bot1.Battlefield.Ornithopter.Tapped = false
+Bot1.Graveyard = Banishing Knack; Banishing Knack

@@ -1,0 +1,8 @@
+{
+  "name": "Keen-Eyed Curator",
+  "manaCost": "{G}{G}",
+  "type": "Creature — Raccoon Scout",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "As long as there are four or more card types among cards exiled with this creature, it gets +4/+4 and has trample.\n{1}: Exile target card from a graveyard."
+}

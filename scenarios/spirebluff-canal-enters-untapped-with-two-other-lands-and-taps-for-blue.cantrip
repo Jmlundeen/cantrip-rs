@@ -1,0 +1,24 @@
+# Spirebluff Canal enters untapped when you control two or fewer other lands, and taps for either {U} or {R}: the
+# third land taps for {U} the turn it arrives.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Spirebluff Canal
+Island x14
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Spirebluff Canal.Play
+Bot1.Battlefield.Spirebluff Canal.Activate(Color: Blue)
+? Bot1.Mana = {U}
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Spirebluff Canal.Tapped = true

@@ -1,0 +1,58 @@
+use cantrip_api::*;
+use cantrip_mechanics::{choose, targets};
+use cantrip_mechanics::triggers::this_enters;
+use cantrip_mechanics::library::random_of;
+use cantrip_oracle as oracle;
+
+/// "A card at random from a zone": the card at a random place in it (CR 701.9c), nothing from an empty zone.
+fn at_random(g: &mut dyn Game, zone: Zone) -> Option<ObjectId> {
+    let cards: Vec<ObjectId> = g.state().zone(zone).to_vec();
+    random_of(g, &cards)
+}
+
+/// Target opponent exiles the top card of their library, a card at random from their graveyard, and a card at random
+/// from their hand. You may cast a spell from among cards exiled this way without paying its mana cost. The three
+/// cards leave together; a zone with nothing in it contributes nothing; only a card that could be cast at all (not a
+/// land, a target to be found for it) is a choice.
+fn plunder(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let Target::Player(opponent) = item.targets[0] else { return Ok(()) };
+    let mut taken: Vec<ObjectId> = Vec::new();
+    taken.extend(g.state().zone(Zone::library(opponent)).first().copied());
+    taken.extend(at_random(g, Zone::graveyard(opponent)));
+    taken.extend(at_random(g, Zone::hand(opponent)));
+    if taken.is_empty() {
+        return Ok(());
+    }
+    // Only the cards that really arrived in exile: a replacement can send a card somewhere else instead.
+    let exiled: Vec<ObjectId> = g.exile_all(&taken).into_iter().filter(|&c| is_live(g, c) && g.obj(c).zone.is(ZoneKind::Exile)).collect();
+    let castable: Vec<ObjectId> = exiled.iter().copied().filter(|&c| g.could_cast_during_resolution(c)).collect();
+    if let Some(&card) = choose::cards_from(g, item.controller, item.object, Purpose::Cast, exiled, castable, 1, true)?.first() {
+        g.cast_during_resolution(card, Some(ManaCost::ZERO))?;
+    }
+    Ok(())
+}
+
+pub static CARD: CardDef = CardDef {
+    ways: &[WayDef {
+        text: "Emerge from artifact {5}{B}{B}",
+        cost: Cost {
+            mana: mana(5, 0, 0, 2, 0, 0),
+            permanents: Some(PermanentCost { count: 1, filter: cantrip_mechanics::targets::filters::artifact, to_hand: false }),
+            emerge: true,
+            ..Cost::NONE
+        },
+        from: ZoneKind::Hand,
+        exile_after: false,
+        condition: None,
+        instant_speed: false,
+    }],
+    abilities: &[AbilityDef::Triggered(TriggeredDef {
+        text: "When this creature enters, target opponent exiles the top card of their library, a card at random from their graveyard, and a card at random from their hand. You may cast a spell from among cards exiled this way without paying its mana cost.",
+        listens: EventMask::ZONE_CHANGE,
+        matches: this_enters,
+        targets: &[targets::OPPONENT],
+        effect: plunder,
+        ..TriggeredDef::BLANK
+    })],
+    ..oracle::CRABOMINATION
+};

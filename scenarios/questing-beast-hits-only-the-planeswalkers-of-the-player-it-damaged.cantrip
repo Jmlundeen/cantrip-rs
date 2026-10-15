@@ -1,0 +1,46 @@
+# "Whenever Questing Beast deals combat damage to an opponent, it deals that much damage to target planeswalker that player controls": three
+# players. Bot3 controls a Wrenn and Six, Bot2 controls no planeswalker. The Beast (cast with haste on turn 4) attacks Bot2 and deals 4:
+# Bot2 has no planeswalker, and Bot3's is not "that player's", so the trigger has no target and Wrenn and Six keeps all 3 loyalty.
+
+[Bot1 Deck]
+Mox Emerald
+Gleemox
+Mox Pearl
+Mox Jet
+Questing Beast
+Plains x4
+Plains x10
+
+[Bot2 Deck]
+Plains x14
+
+[Bot3 Deck]
+Mox Ruby
+Mox Emerald
+Wrenn and Six
+Plains x12
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+[T3 Bot3.Main1]
+Bot3.Hand.Mox Ruby.Cast
+Bot3.Hand.Mox Emerald.Cast
+Bot3.Battlefield.Mox Ruby.Activate
+Bot3.Battlefield.Mox Emerald.Activate
+Bot3.Hand.Wrenn and Six.Cast
+[T4 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Green)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Questing Beast.Cast
+Bot1.Pass
+Bot1.Attack(Questing Beast > Bot2)
+[T4 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot3.Battlefield.Wrenn and Six.Counters.Loyalty = 3

@@ -1,0 +1,26 @@
+# Mishra's Workshop adds {C}{C}{C} to be spent only to cast artifact spells: Mind Stone and Sol Ring are cast with it, three
+# mana for three, leaving nothing in the pool.
+
+[Bot1 Deck]
+Mishra's Workshop
+Mind Stone
+Sol Ring
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mishra's Workshop.Play
+Bot1.Battlefield.Mishra's Workshop.Activate
+Bot1.Hand.Mind Stone.Cast
+Bot1.Pass
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+[Bot1.Main1]
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Mana =
+Bot1.Battlefield = Mind Stone; Mishra's Workshop; Sol Ring

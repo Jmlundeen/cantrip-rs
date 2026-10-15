@@ -1,0 +1,43 @@
+# Upheaval returns all permanents to their owners' hands: Bot1's own mana sources and Bot2's Swamp alike, and Bot1
+# is left with nothing on the battlefield.
+
+[Bot1 Deck]
+Upheaval
+Island
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Mox Ruby
+Sol Ring
+Island x12
+
+[Bot2 Deck]
+Swamp x14
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot2.Hand.Swamp.Play
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Count = 6
+? Bot2.Battlefield.Count = 1
+Bot1.Hand.Upheaval.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Sol Ring.Activate
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield.Count = 0
+Bot2.Battlefield.Count = 0
+Bot1.Graveyard = Upheaval
+Bot1.Hand.Count = 7
+Bot2.Hand.Count = 8

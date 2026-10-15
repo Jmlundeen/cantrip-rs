@@ -1,0 +1,64 @@
+# A Phantasmal Image that copies another Image enters as what that one copied (CR 707.3), Guerrilla Gorilla, with the first
+# Image's Illusion type and sacrifice ability among the values it copied (CR 707.9b) — and its own exception adds the
+# ability again, so it has two. Illusion is a type it already has, so it is an Illusion once. Bot2's Bolt at it
+# triggers both (CR 603.2): two abilities above the Bolt; the first sacrifices it, the second finds nothing to do, and
+# the Bolt is countered for want of a target (CR 608.2b). The first Image, never targeted, stays.
+
+[Bot1 Deck]
+Island
+Island
+Island
+Phantasmal Image
+Phantasmal Image
+Island
+Island x10
+
+[Bot2 Deck]
+Forest
+Forest
+Guerrilla Gorilla
+Mountain
+Lightning Bolt
+Forest x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Phantasmal Image.Cast
+Bot1.Accept
+[T6 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Phantasmal Image.Cast
+Bot1.Accept
+Bot1.Target(Bot1.Battlefield.Guerrilla Gorilla)
+? Bot1.Battlefield.Guerrilla Gorilla#2.Subtypes = Ape; Hero; Illusion; Soldier
+? Bot1.Battlefield.Guerrilla Gorilla#2.Power = 2
+[T8 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Guerrilla Gorilla#2)
+Bot1.Pass
+? Stack = Guerrilla Gorilla; Lightning Bolt
+? Bot1.Graveyard = Phantasmal Image
+
+[Expect]
+Turn = 8
+Stack.Count = 0
+Bot1.Graveyard = Phantasmal Image
+Bot1.Battlefield.Guerrilla Gorilla.Subtypes = Ape; Hero; Illusion; Soldier
+Bot1.Battlefield.Guerrilla Gorilla.Damage = 0
+Bot2.Graveyard = Lightning Bolt

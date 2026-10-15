@@ -1,0 +1,24 @@
+# "Then you may pay 2 life. If you don't, it enters tapped": Bot1 chooses Forest and declines, so the Passage enters tapped and Bot1 keeps all 20 life. On turn 3 it has untapped and,
+# being a Forest, taps for {G}.
+
+[Bot1 Deck]
+Multiversal Passage
+Plains x15
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Multiversal Passage.Play
+Bot1.Modes(Forest)
+Bot1.Decline
+? Bot1.Battlefield.Multiversal Passage.Tapped = true
+? Bot1.Life = 20
+[T3 Bot1.Main1]
+Bot1.Battlefield.Multiversal Passage.Activate
+? Bot1.Mana = {G}
+
+[Expect]
+Turn = 3
+Bot1.Life = 20
+Bot1.Battlefield.Multiversal Passage.Subtypes = Forest

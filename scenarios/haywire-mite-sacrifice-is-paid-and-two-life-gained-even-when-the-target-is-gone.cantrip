@@ -1,0 +1,31 @@
+# The sacrifice is a cost: Bot1 activates the Mite at Bot2's Black Lotus and Bot2 answers by sacrificing the Lotus for mana. The ability's only target is gone and it does nothing (CR 608.2b), but the Mite is already in the
+# graveyard and its death trigger gained Bot1 2 life. The Lotus is in the graveyard, not exiled.
+
+[Bot1 Deck]
+Mox Emerald
+Haywire Mite
+Forest x14
+
+[Bot2 Deck]
+Black Lotus
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Haywire Mite.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Haywire Mite.Activate(Black Lotus)
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Exile.Count = 0
+Bot1.Life = 22
+Bot2.Graveyard = Black Lotus
+Bot1.Graveyard = Haywire Mite

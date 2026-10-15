@@ -1,0 +1,26 @@
+# "This land enters tapped" (CR 614.1c): on the turn Bot1 plays Creeping Tar Pit its mana ability is not offered, since
+# the {T} cost cannot be paid. On turn 3 it is untapped and adds {B} (chosen), on turn 5 {U}: one mana of either color,
+# never both.
+
+[Bot1 Deck]
+Creeping Tar Pit
+Island x6
+Island x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Creeping Tar Pit.Play
+! Bot1.Battlefield.Creeping Tar Pit.Activate(Ability: Add)
+? Bot1.Battlefield.Creeping Tar Pit.Tapped = true
+[T3 Bot1.Main1]
+Bot1.Battlefield.Creeping Tar Pit.Activate(Ability: Add; Color: Black)
+? Bot1.Mana = {B}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Creeping Tar Pit.Activate(Ability: Add; Color: Blue)
+? Bot1.Mana = {U}
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Creeping Tar Pit.Tapped = true

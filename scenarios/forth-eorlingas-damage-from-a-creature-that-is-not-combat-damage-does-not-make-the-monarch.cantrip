@@ -1,0 +1,39 @@
+# "Combat damage": Walking Ballista (X = 1) removes its counter to ping Bot2 for 1 on the turn Forth Eorlingas! (X = 0) is cast. A creature dealt that damage but outside
+# combat doesn't satisfy the ability, so Bot1 is not the monarch.
+
+[Bot1 Deck]
+Plateau
+Mox Pearl
+Mox Ruby
+Mox Sapphire
+Walking Ballista
+Forth Eorlingas!
+Plateau x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plateau.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Walking Ballista.Cast(X: 1)
+Bot1.Pass
+Bot1.Battlefield.Plateau.Activate(Ability: {R})
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Forth Eorlingas!.Cast(X: 0)
+Bot1.Pass
+Bot1.Battlefield.Walking Ballista.Activate(Ability: Remove a +1/+1 counter; Bot2)
+Bot1.Pass
+
+[Expect]
+Turn = 1
+Bot2.Life = 19
+Monarch = (absent)
+Bot1.Graveyard = Walking Ballista; Forth Eorlingas!

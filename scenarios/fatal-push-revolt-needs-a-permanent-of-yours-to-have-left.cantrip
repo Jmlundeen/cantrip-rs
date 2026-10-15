@@ -1,0 +1,54 @@
+# Fatal Push, revolt: the permanent must have left "under your control". On turn 3 Bot1 Lightning Bolts Bot2's
+# Ornithopter (a permanent leaving under Bot2's control, not Bot1's), then pushes Bot2's Monastery Mentor (mana value 3):
+# there is no revolt, so it survives. The positive control, fatal-push-with-revolt-kills-mana-value-four-but-not-five,
+# bolts Bot1's own Ornithopter first.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Fatal Push
+Lightning Bolt
+Island x20
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Monastery Mentor
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Monastery Mentor.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Graveyard = Ornithopter
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Fatal Push.Cast(Monastery Mentor)
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Ornithopter
+Bot2.Battlefield.Monastery Mentor.Power = 2
+Bot1.Graveyard = Fatal Push; Lightning Bolt

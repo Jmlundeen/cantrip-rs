@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- The web client driven in a real browser by Playwright: the built client served as it would be, a real server or
+       a scripted scenario behind it over a real WebSocket, and a page clicked with real mouse events. Needs the web
+       client built (tools\test.cmd builds it) and a Chromium: the installed Chrome or Edge, or Playwright's own
+       (bin\Debug\net8.0\playwright.ps1 install chromium). -->
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="Microsoft.Playwright" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Cantrip.Client\Cantrip.Client.csproj" />
+    <ProjectReference Include="..\..\src\Cantrip.Client.Presentation\Cantrip.Client.Presentation.csproj" />
+    <ProjectReference Include="..\..\src\Cantrip.Server\Cantrip.Server.csproj" />
+    <ProjectReference Include="..\..\src\Cantrip.Server.Host\Cantrip.Server.Host.csproj" />
+  </ItemGroup>
+
+</Project>

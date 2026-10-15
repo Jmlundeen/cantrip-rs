@@ -1,0 +1,33 @@
+# Voltaic Key ({1}, {T}: untap target artifact) untaps a tapped Sol Ring, which taps for {C}{C} a second time: one of
+# the first activation's two mana pays for the Key, so the pool ends with three.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Pearl
+Sol Ring
+Voltaic Key
+Swamp x2
+Swamp x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Voltaic Key.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Voltaic Key.Activate(Sol Ring)
+Bot1.Battlefield.Sol Ring.Activate
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Mana = {C}{C}{C}
+Bot1.Battlefield.Sol Ring.Tapped = true
+Bot1.Battlefield.Voltaic Key.Tapped = true

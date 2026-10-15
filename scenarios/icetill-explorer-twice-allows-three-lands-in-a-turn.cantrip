@@ -1,0 +1,35 @@
+# "You may play an additional land on each of your turns" stacks (CR 305.2b): with two Icetill Explorers (cast off three Black Lotuses) Bot1 plays three lands on turn 1 - two Forests from its hand and a third out of its graveyard, where landfall milled it - and a fourth is not offered.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Icetill Explorer
+Icetill Explorer
+Forest
+Forest
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Icetill Explorer.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Icetill Explorer.Cast
+Bot1.Pass
+Bot1.Hand.Forest.Play
+Bot1.Hand.Forest.Play
+Bot1.Graveyard.Forest.Play
+[Bot1.Main2]
+! Bot1.Graveyard.Forest.Play
+
+[Expect]
+Bot1.LandsPlayed = 3

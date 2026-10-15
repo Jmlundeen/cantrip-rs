@@ -1,0 +1,31 @@
+# Fabled Passage's search is for a card with a stated quality, so failing to find is legal even with basics in the
+# library (CR 701.23b): Bot1 declines with four lands' worth of Plains to fetch, the library is still shuffled, and no
+# land is put onto the battlefield or untapped. The three Forests stay as they were.
+
+[Bot1 Deck]
+Forest
+Forest
+Forest
+Fabled Passage
+Plains x13
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Forest#1.Play
+Bot2.Hand.Island#1.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest#1.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Fabled Passage.Play
+Bot1.Battlefield.Fabled Passage.Activate
+Bot1.Search()
+
+[Expect]
+Turn = 7
+Bot1.Graveyard = Fabled Passage
+Bot1.Battlefield = Forest; Forest; Forest
+Bot1.Library.Count = 7

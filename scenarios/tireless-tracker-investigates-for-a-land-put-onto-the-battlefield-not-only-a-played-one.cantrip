@@ -1,0 +1,36 @@
+# Landfall (CR 207.2c and the ruling): any land entering under your control, not only one played. Wooded Foothills
+# played makes a Clue; the Forest it fetches onto the battlefield makes a second.
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Mox Ruby
+Tireless Tracker
+Wooded Foothills
+Island
+Island
+Forest
+Island x8
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Tireless Tracker.Cast
+Bot2.Pass
+Bot1.Hand.Wooded Foothills.Play
+Bot2.Pass
+? Bot1.Battlefield.Count = 6
+Bot1.Battlefield.Wooded Foothills.Activate
+Bot1.Search(Forest)
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Wooded Foothills
+Bot1.Battlefield = Mox Emerald; Mox Pearl; Mox Ruby; Tireless Tracker; Clue Token; Forest; Clue Token
+Bot1.Battlefield.Tireless Tracker.Power = 3

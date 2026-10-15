@@ -1,0 +1,6 @@
+{
+  "name": "Bitter Reunion",
+  "manaCost": "{1}{R}",
+  "type": "Enchantment",
+  "oracleText": "When this enchantment enters, you may discard a card. If you do, draw two cards.\n{1}, Sacrifice this enchantment: Creatures you control gain haste until end of turn."
+}

@@ -1,0 +1,48 @@
+# Displacer Kitten: the permanent exiled and returned is a new object (CR 400.7). Thraben Inspector came down on turn 1 with
+# its Clue; on turn 3 Bot1 casts Mox Emerald (the card drawn that turn), the Kitten's trigger targets the Inspector, and it
+# returns with a second enters trigger (a second Clue) and summoning sick, as an Inspector that had stayed in play on turn
+# 3 would not be. The Kitten itself came down on turn 1 off a Black Lotus and a Mox Ruby.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Displacer Kitten
+Thraben Inspector
+Plains
+Plains
+Mox Emerald
+Plains x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Displacer Kitten.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Thraben Inspector.Cast
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Thraben Inspector.SummoningSick = false
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Target(Thraben Inspector)
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield = Mox Ruby; Mox Pearl; Mox Emerald; Displacer Kitten; Thraben Inspector; Clue Token; Clue Token
+Bot1.Battlefield.Thraben Inspector.SummoningSick = true
+Bot1.Battlefield.Displacer Kitten.SummoningSick = false

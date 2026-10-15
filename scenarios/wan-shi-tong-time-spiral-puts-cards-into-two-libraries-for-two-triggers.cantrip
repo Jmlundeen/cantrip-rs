@@ -1,0 +1,51 @@
+# "Whenever one or more cards are put into a library from anywhere" is one trigger for each library (CR 603.2c). Wan Shi Tong's own enters trigger on turn 1 sends Mox Ruby second from the top (2 Spirits). On turn 7 Bot1 casts Time Spiral: its spare Mox Emerald (hand) and Bot2's hand and
+# graveyard are shuffled into their libraries - two libraries, two triggers, four more Spirits (six in all).
+
+[Bot1 Deck]
+Island
+Island
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Mox Ruby
+Wan Shi Tong, All-Knowing
+Mox Emerald
+Time Spiral
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Wan Shi Tong, All-Knowing.Cast
+Bot1.Target(Mox Ruby)
+Bot1.Modes(Second from the top)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+[T7 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Time Spiral.Cast
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Exile = Time Spiral
+Bot1.Battlefield.Count = 13

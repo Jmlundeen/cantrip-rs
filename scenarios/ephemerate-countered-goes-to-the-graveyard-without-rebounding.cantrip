@@ -1,0 +1,40 @@
+# Rebound applies to a spell as it resolves (CR 702.88a, and the 2019-06-14 ruling): "If a spell with rebound that you
+# cast from your hand is countered ... none of its effects will happen, including rebound." Bot2's Spell Pierce
+# counters Ephemerate (Bot1 has one Plains left, not {2}), so it is put into Bot1's graveyard and nothing waits in
+# exile for the upkeep.
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Thraben Inspector
+Ephemerate
+Plains
+Plains
+Plains x13
+
+[Bot2 Deck]
+Island
+Spell Pierce
+Island x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Thraben Inspector.Cast
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Ephemerate.Cast(Thraben Inspector)
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Spell Pierce.Cast(Stack.Ephemerate)
+Bot1.Decline
+[T5 Bot1.Upkeep]
+? Exile.Count = 0
+
+[Expect]
+Turn = 5
+Exile.Count = 0
+Bot1.Graveyard = Ephemerate
+Bot1.Battlefield = Plains; Plains; Thraben Inspector; Clue Token

@@ -1,0 +1,18 @@
+# Thassa's Oracle: its devotion to blue (UU) is at least the one card left in its library, so its controller wins the game
+# (CR 104.2b); with a larger library it only arranges the cards it looked at.
+[Bot1 Deck]
+Thassa's Oracle
+Island x6
+Island
+Island
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Thassa's Oracle.Cast
+[Expect]
+Result = Bot1 won

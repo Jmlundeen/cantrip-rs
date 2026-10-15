@@ -1,0 +1,46 @@
+# Turn 7: Equip {2} moves the Equipment from the Hero to Thieving Skydiver. The Skydiver becomes a Wizard and the
+# next noncreature spell grows it, while the Hero is only a Hero again and stays 1/1.
+
+[Bot1 Deck]
+Island
+Island
+Astrologian's Planisphere
+Island
+Thieving Skydiver
+Island
+Aether Spellbomb
+Island x12
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Astrologian's Planisphere.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Thieving Skydiver.Cast
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Astrologian's Planisphere.Activate(Thieving Skydiver)
+[T7 Bot1.Main2]
+? Bot1.Battlefield.Astrologian's Planisphere.AttachedTo = Thieving Skydiver
+Bot1.Battlefield.Island#3.Activate
+Bot1.Hand.Aether Spellbomb.Cast
+[T7 Bot1.Main2]
+
+[Expect]
+Turn = 7
+Bot1.Battlefield.Thieving Skydiver.Subtypes = Merfolk; Rogue; Wizard
+Bot1.Battlefield.Thieving Skydiver.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Hero.Subtypes = Hero
+Bot1.Battlefield.Hero.Power = 1
+Stack.Count = 0

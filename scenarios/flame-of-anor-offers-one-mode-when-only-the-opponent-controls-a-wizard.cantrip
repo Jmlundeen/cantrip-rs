@@ -1,0 +1,44 @@
+# "If you control a Wizard as you cast this spell, you may choose two instead": Bot2 controls Snapcaster Mage (a Wizard) but Bot1 does not, so Bot1 may choose only
+# one mode (the refusal: two are not accepted). It chooses "5 damage to target creature" and kills the Snapcaster Mage (2/1). (The positive control, two modes with
+# its own Wizard, is flame-of-anor-chooses-two-modes-when-its-caster-controls-a-wizard.)
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Flame of Anor
+Island x15
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Jet
+Snapcaster Mage
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Snapcaster Mage.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Flame of Anor.Cast
+! Bot1.Modes(1; 3)
+Bot1.Modes(3)
+Bot1.Target(Snapcaster Mage)
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Battlefield = Mox Sapphire; Mox Jet
+Bot2.Graveyard = Snapcaster Mage
+Bot1.Graveyard = Flame of Anor

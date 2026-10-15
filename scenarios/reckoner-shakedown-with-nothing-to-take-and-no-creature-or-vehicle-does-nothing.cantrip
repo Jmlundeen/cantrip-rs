@@ -1,0 +1,54 @@
+# An empty hand to take from and no creature or Vehicle to put counters on: the Shakedown resolves and nothing at all happens,
+# nothing is asked of Bot1 (the refused Choose) and it goes to the graveyard.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Reckoner Shakedown
+Mox Ruby
+Island x20
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Pearl
+Mox Emerald
+Mox Ruby
+Mox Jet
+Lotus Petal
+Black Lotus
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Lotus Petal.Cast
+Bot2.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Reckoner Shakedown.Cast(Bot2)
+Bot1.Pass
+! Bot1.Choose
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Reckoner Shakedown
+Bot2.Hand.Count = 0

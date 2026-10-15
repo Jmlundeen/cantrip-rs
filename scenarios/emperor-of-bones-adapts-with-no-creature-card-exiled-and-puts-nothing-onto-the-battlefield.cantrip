@@ -1,0 +1,40 @@
+# Emperor of Bones: it may exile any card from a graveyard, but its counter trigger only returns a creature card.
+# At turn 3's combat it exiles the Lightning Bolt Bot1 cast on turn 1, a noncreature card; Adapt 2 puts two counters on
+# the Emperor, the trigger finds no creature card exiled with it and puts nothing onto the battlefield.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Emperor of Bones
+Lightning Bolt
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Emperor of Bones.Cast
+[T3 Bot1.Main1]
+Bot1.Target(Bot1.Graveyard.Lightning Bolt)
+[T3 Bot1.BeginCombat]
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Emperor of Bones.Activate(Ability: Adapt)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Lightning Bolt
+Bot1.Battlefield.Emperor of Bones.Counters.PlusOnePlusOne = 2
+Bot1.Graveyard.Count = 0
+Stack.Count = 0

@@ -1,0 +1,71 @@
+# Vaultborn Tyrant: "Whenever this creature or another creature you control with power 4 or greater enters, you gain 3 life and
+# draw a card." Bot1 casts the Tyrant on turn 1 (23 life). On turn 2 Bot2 casts a Bonecrusher Giant (power 4, but Bot2's
+# creature): Bot1 does not gain. On turn 3 Bot1 casts its own Bonecrusher Giant: it gains 3 (26) and draws; then a Llanowar Elves
+# (power 1): no trigger, still 26.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Black Lotus
+Sol Ring
+Vaultborn Tyrant
+Bonecrusher Giant
+Llanowar Elves
+Forest x12
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Bonecrusher Giant
+Island x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Vaultborn Tyrant.Cast
+Bot1.Pass
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Bonecrusher Giant.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot1.Life = 23
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Bonecrusher Giant.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 26
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+
+[Expect]
+Bot1.Life = 26

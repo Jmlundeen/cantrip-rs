@@ -1,0 +1,61 @@
+# Guide of Souls, both halves in one game: three other creatures entering bank three energy counters a life at a
+# time (its own entry is not "another creature"), and the attack trigger spends all three at once on one of the two
+# attackers -- two +1/+1 counters, a flying counter, and a creature type it keeps.
+# The Mothers are cast a turn apart so each entry is its own trigger, and the third is cast on the same turn it
+# attacks with the other two, which is what makes the total exactly three when the payment is offered.
+[Bot1 Deck]
+Guide of Souls
+Mother of Runes
+Mother of Runes
+Plains
+Plains
+Plains
+Plains
+Mother of Runes
+Plains x14
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Guide of Souls.Cast
+[Bot1.Main2]
+? Bot1.Life = 20
+? Bot1.Energy = 0
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Mother of Runes.Cast
+[T3 Bot1.Main2]
+? Bot1.Life = 21
+? Bot1.Energy = 1
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Mother of Runes.Cast
+[T5 Bot1.Main2]
+? Bot1.Life = 22
+? Bot1.Energy = 2
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Mother of Runes.Cast
+[T7 Bot1.BeginCombat]
+? Bot1.Life = 23
+? Bot1.Energy = 3
+Bot1.Attack(Mother of Runes; Mother of Runes)
+Bot1.Accept
+Bot1.Target(Mother of Runes)
+[T7 Bot1.Main2]
+? Bot1.Energy = 0
+[Expect]
+Turn = 7
+Bot1.Life = 23
+Bot1.Energy = 0
+Bot1.Battlefield.Mother of Runes#1.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Mother of Runes#1.Counters.Flying = 1
+Bot1.Battlefield.Mother of Runes#1.Power = 3
+Bot1.Battlefield.Mother of Runes#1.Toughness = 3
+Bot1.Battlefield.Mother of Runes#1.Keywords = Flying
+Bot2.Life = 16
+Stack.Count = 0

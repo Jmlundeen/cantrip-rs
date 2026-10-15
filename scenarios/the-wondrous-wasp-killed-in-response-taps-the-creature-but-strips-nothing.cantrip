@@ -1,0 +1,38 @@
+# Wasp's Sting taps the creature and strips its abilities "for as long as The Wondrous Wasp remains on the battlefield". Bot2
+# Bolts the Wasp in response to the trigger, so by the time it resolves the Wasp is gone: the Birds of Paradise is still tapped
+# (the tapping happens) but keeps its flying - the duration was over before it began (CR 611.2b).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+The Wondrous Wasp
+Island x14
+
+[Bot2 Deck]
+Forest
+Mox Ruby
+Birds of Paradise
+Lightning Bolt
+Forest x14
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Birds of Paradise.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.The Wondrous Wasp.Cast
+Bot1.Target(Bot2.Battlefield.Birds of Paradise)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.The Wondrous Wasp)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = The Wondrous Wasp
+Bot2.Battlefield.Birds of Paradise.Tapped = True
+Bot2.Battlefield.Birds of Paradise.Keywords = Flying

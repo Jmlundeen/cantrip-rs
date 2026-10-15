@@ -1,0 +1,8 @@
+{
+  "name": "Deathrite Shaman",
+  "manaCost": "{B/G}",
+  "type": "Creature — Elf Shaman",
+  "power": 1,
+  "toughness": 2,
+  "oracleText": "{T}: Exile target land card from a graveyard. Add one mana of any color. (Activate only as an instant.)\n{B}, {T}: Exile target instant or sorcery card from a graveyard. Each opponent loses 2 life.\n{G}, {T}: Exile target creature card from a graveyard. You gain 2 life."
+}

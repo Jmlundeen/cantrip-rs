@@ -1,0 +1,35 @@
+# "Noncreature spell" is judged by the card types on the stack: Ornithopter is an artifact creature, so it is a creature spell
+# and Negate is not offered against it (refusal); Sol Ring, a plain artifact, is a legal target in the same turn (the positive
+# control) and is countered. Bot1 holds Island and Mox Sapphire for {1}{U}.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Negate
+Island x17
+
+[Bot2 Deck]
+Mox Jet
+Sol Ring
+Ornithopter
+Island x17
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+? Stack = Ornithopter
+! Bot1.Hand.Negate.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Negate.Cast(Stack.Sol Ring)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot2.Graveyard = Sol Ring
+Bot2.Battlefield = Mox Jet; Ornithopter
+Bot1.Graveyard = Negate

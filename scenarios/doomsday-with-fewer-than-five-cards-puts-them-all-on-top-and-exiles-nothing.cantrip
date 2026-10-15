@@ -1,0 +1,25 @@
+# Doomsday with the library and graveyard holding fewer than five cards together: all of them go on top, none is
+# exiled (ruling 2018-03-16). Black Lotus is in the graveyard and three cards are in the library.
+
+[Bot1 Deck]
+Doomsday
+Black Lotus
+Swamp x5
+Counterspell
+Mana Leak
+Time Walk
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Doomsday.Cast
+Bot1.Choose(Counterspell; Time Walk; Black Lotus; Mana Leak)
+
+[Expect]
+Bot1.Library = Mana Leak; Black Lotus; Time Walk; Counterspell
+Bot1.Graveyard = Doomsday
+Exile.Count = 0
+Bot1.Life = 10

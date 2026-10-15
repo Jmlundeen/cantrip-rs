@@ -1,0 +1,37 @@
+# The Fantasticar: "you may sacrifice The Fantasticar. If you do, create four 4/4 ... Construct tokens." Lotus (1),
+# Fantasticar (2), Mox Ruby (3) and Mox Sapphire (4) are Bot1's noncreature spells; with the fourth spell's abilities on the
+# stack Bot1 casts Abrade (a fifth spell) on the Fantasticar and destroys it. It is gone when the ability resolves, so
+# there is nothing to sacrifice and no Construct is created.
+
+[Bot1 Deck]
+The Fantasticar
+Black Lotus
+Mox Ruby
+Mox Sapphire
+Abrade
+Mountain
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.The Fantasticar.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Decline
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Abrade.Cast
+Bot1.Modes(Destroy target artifact)
+Bot1.Target(The Fantasticar)
+Bot1.Pass
+[Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Graveyard = Abrade; The Fantasticar; Black Lotus
+Bot1.Battlefield.Count = 3

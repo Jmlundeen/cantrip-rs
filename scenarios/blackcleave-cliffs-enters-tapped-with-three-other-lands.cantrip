@@ -1,0 +1,23 @@
+# Blackcleave Cliffs: with three other lands it enters tapped.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Mountain
+Blackcleave Cliffs
+Plains x16
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Blackcleave Cliffs.Play
+
+[Expect]
+Bot1.Battlefield.Blackcleave Cliffs.Tapped = true

@@ -1,0 +1,46 @@
+# The other branch of "unless its controller pays {3}": Bot2, with four spare Moxen untapped, pays the ransom while the Rebuke
+# resolves (it taps the Moxen after passing priority, then PayCost), so the Lightning Bolt is not countered and hits Bot1
+# for 3. Bot1 improvised two Ornithopters for the generic part, as in the declined case.
+
+[Bot1 Deck]
+Island
+Ornithopter
+Ornithopter
+Metallic Rebuke
+Island x3
+Island x14
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Lightning Bolt
+Mountain x13
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Metallic Rebuke.Cast(Lightning Bolt; Convoke: Ornithopter, Ornithopter)
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.PayCost
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 17
+Bot1.Graveyard = Metallic Rebuke
+Bot2.Graveyard = Lightning Bolt

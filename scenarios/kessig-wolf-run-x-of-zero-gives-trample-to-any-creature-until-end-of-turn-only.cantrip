@@ -1,0 +1,38 @@
+# "{X}{R}{G}, {T}: Target creature gets +X/+0 and gains trample until end of turn": the target is any creature, an
+# opponent's included, and X may be 0 (CR 107.3a): Bot2's Ornithopter gets +0/+0 and trample on turn 3. The effect lasts
+# until end of turn (CR 514.2): on Bot2's turn 4 it is a plain flyer again.
+
+[Bot1 Deck]
+Kessig Wolf Run
+Mox Ruby
+Mox Emerald
+Island x4
+Island x13
+
+[Bot2 Deck]
+Ornithopter
+Island x6
+Island x13
+
+[Actions]
+Bot1.Hand.Kessig Wolf Run.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Kessig Wolf Run.Activate(X: 0; Ability: gains trample; Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot2.Battlefield.Ornithopter.Keywords = Flying; Trample
+? Bot2.Battlefield.Ornithopter.Power = 0
+[T4 Bot2.Main1]
+
+[Expect]
+Bot2.Battlefield.Ornithopter.Keywords = Flying
+Bot2.Battlefield.Ornithopter.Power = 0

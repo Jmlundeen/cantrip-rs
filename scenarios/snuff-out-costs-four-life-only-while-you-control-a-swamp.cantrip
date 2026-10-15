@@ -1,0 +1,31 @@
+# Snuff Out may be cast for 4 life only if you control a Swamp. On turn 3 Bot1 controls none, so the life cost is not
+# offered; once a Swamp is played it is, and Bot1 destroys Bot2's Llanowar Elves (a nonblack creature) for 4 life.
+
+[Bot1 Deck]
+Island
+Snuff Out
+Swamp
+Island x13
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x13
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+! Bot1.Hand.Snuff Out.Cast(Ability: Pay 4 life)
+Bot1.Pass
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Snuff Out.Cast(Llanowar Elves; Ability: Pay 4 life)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Life = 16
+Bot1.Graveyard = Snuff Out
+Bot2.Graveyard = Llanowar Elves

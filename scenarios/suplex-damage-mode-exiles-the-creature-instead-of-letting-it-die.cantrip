@@ -1,0 +1,32 @@
+# Suplex's first mode: the 3 damage kills Llanowar Elves, but the spell made a replacement effect (CR 614.1a, 611.2c) for that creature, so it is exiled instead of dying.
+
+[Bot1 Deck]
+Suplex
+Mountain x20
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x19
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Suplex.Cast
+Bot1.Modes(1)
+Bot1.Target(Llanowar Elves)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Suplex
+Bot2.Graveyard.Count = 0
+Exile = Llanowar Elves
+Stack.Count = 0

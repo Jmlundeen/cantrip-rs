@@ -1,0 +1,28 @@
+# Two Llanowar Elves are the last cards of Bot2's library: they share green, so Grindstone would repeat, but the library is empty, so it stops with both milled.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+Grindstone
+Swamp x12
+
+[Bot2 Deck]
+Island x7
+Llanowar Elves
+Llanowar Elves
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Grindstone.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Grindstone.Activate(Bot2)
+
+[Expect]
+Stack.Count = 0
+Bot2.Graveyard = Llanowar Elves; Llanowar Elves
+Bot2.Library.Count = 0

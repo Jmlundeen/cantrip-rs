@@ -1,0 +1,27 @@
+# Wooded Foothills: {T}, pay 1 life, sacrifice it - search for a Mountain or Forest card and put it onto the battlefield
+# untapped. A Swamp is in the library but is not a Mountain or a Forest, so it is not offered (the refusal), while the
+# Forest is found and enters untapped.
+
+[Bot1 Deck]
+Wooded Foothills
+Island x6
+Swamp
+Forest
+Mountain
+Island x10
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Wooded Foothills.Play
+Bot1.Battlefield.Wooded Foothills.Activate
+! Bot1.Search(Swamp)
+Bot1.Search(Forest)
+
+[Expect]
+Bot1.Life = 19
+Bot1.Graveyard = Wooded Foothills
+Bot1.Battlefield = Forest
+Bot1.Battlefield.Forest.Tapped = false
+Bot1.Library.Count = 12

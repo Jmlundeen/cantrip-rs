@@ -1,0 +1,26 @@
+# Urborg, Tomb of Yawgmoth: "Each land is a Swamp" includes Urborg itself, a Legendary Land with no land types of its own: on turn 1
+# it is a Swamp and taps for {B}. A second Urborg played on turn 3 breaks the legend rule (CR 704.5j): Bot1 keeps one and the other
+# goes to the graveyard, and the survivor is still a Swamp.
+
+[Bot1 Deck]
+Urborg, Tomb of Yawgmoth
+Urborg, Tomb of Yawgmoth
+Island x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Urborg, Tomb of Yawgmoth.Play
+? Bot1.Battlefield.Urborg, Tomb of Yawgmoth.Subtypes = Swamp
+Bot1.Battlefield.Urborg, Tomb of Yawgmoth.Activate(Ability: {B})
+? Bot1.Mana = {B}
+[T3 Bot1.Main1]
+Bot1.Hand.Urborg, Tomb of Yawgmoth.Play
+Bot1.Choose(Urborg, Tomb of Yawgmoth)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Urborg, Tomb of Yawgmoth.Subtypes = Swamp
+
+[Expect]
+Bot1.Battlefield.Count = 1
+Bot1.Graveyard = Urborg, Tomb of Yawgmoth

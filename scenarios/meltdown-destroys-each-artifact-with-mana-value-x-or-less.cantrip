@@ -1,0 +1,33 @@
+# Meltdown with X = 1 destroys each artifact with mana value 1 or less - both Moxen (0) and Sol Ring (1) - and leaves
+# Mind Stone (2). Everything is cast on turn 1: Mox Jet pays for Sol Ring, Sol Ring for Mind Stone, and the Mountain
+# and Mox Ruby for Meltdown.
+
+[Bot1 Deck]
+Mountain
+Mox Jet
+Mox Ruby
+Sol Ring
+Mind Stone
+Meltdown
+Mountain
+Mountain x12
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Mind Stone.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Meltdown.Cast(X: 1)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mountain; Mind Stone
+Bot1.Graveyard = Meltdown; Sol Ring; Mox Ruby; Mox Jet

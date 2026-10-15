@@ -1,0 +1,23 @@
+# "You lose 2 life" is not conditional on finding anything (CR 608.2c): with an empty library the search finds nothing,
+# the shuffle changes nothing, and Bot1 still goes to 18 and has not lost the game. Bot1's deck is exactly its opening hand.
+
+[Bot1 Deck]
+Swamp
+Imperial Seal
+Swamp x5
+
+[Bot2 Deck]
+Swamp x15
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Imperial Seal.Cast
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Result = InProgress
+Bot1.Life = 18
+Bot1.Graveyard = Imperial Seal
+Bot1.Library.Count = 0

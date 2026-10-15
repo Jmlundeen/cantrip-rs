@@ -1,0 +1,42 @@
+# Brightglass Gearhulk: the search is "up to two", so a player may take a single card (CR 701.23b), here only the Elves.
+
+[Bot1 Deck]
+Forest
+Forest
+Plains
+Plains
+Brightglass Gearhulk
+Island
+Island
+Island x3
+Sol Ring
+Llanowar Elves
+Fastbond
+Guerrilla Gorilla
+Wrath of God
+Lightning Bolt
+Island x20
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Brightglass Gearhulk.Cast
+Bot1.Accept
+Bot1.Search(Llanowar Elves)
+
+[Expect]
+Turn = 7
+Bot1.Hand = Island; Island; Island; Island; Island; Llanowar Elves
+Bot1.Library.Count = 25

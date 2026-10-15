@@ -1,0 +1,81 @@
+# Fatal Push: "Destroy target creature if it has mana value 2 or less." No permanent has left the battlefield under
+# Bot1's control, so no revolt. On turn 3 Bot1 pushes Bot2's Monastery Mentor (mana value 3): it survives. It pushes
+# Painter's Servant (mana value 2): it dies. On turn 5 it pushes a Walking Ballista that Bot2 cast with X = 2 on turn 4:
+# a creature on the battlefield has an X of 0, so its mana value is 0 and it dies.
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Jet
+Fatal Push
+Fatal Push
+Fatal Push
+Island
+Island x20
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mox Sapphire
+Monastery Mentor
+Painter's Servant
+Walking Ballista
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Monastery Mentor.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Painter's Servant.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Hand.Fatal Push.Cast(Monastery Mentor)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Monastery Mentor.Power = 2
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Fatal Push.Cast(Painter's Servant)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Graveyard = Painter's Servant
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Walking Ballista.Cast(X: 2)
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Jet#3.Activate
+Bot1.Hand.Fatal Push.Cast(Walking Ballista)
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Walking Ballista; Painter's Servant
+Bot2.Battlefield.Monastery Mentor.Power = 2
+Bot1.Graveyard.Count = 3

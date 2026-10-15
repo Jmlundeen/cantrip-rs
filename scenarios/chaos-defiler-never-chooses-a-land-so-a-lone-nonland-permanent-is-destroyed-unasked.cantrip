@@ -1,0 +1,34 @@
+# Bot2 controls a Plains and a Mox Sapphire. "Nonland permanent": the Plains is not a candidate, so the Mox is the only
+# one, nobody is asked (a land among the candidates would have made it two and asked), and the Mox is destroyed. The Plains stays.
+# The two-candidate question is the existing chaos-defiler-picks-a-permanent-as-it-enters-and-again-as-it-dies.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Pearl
+Chaos Defiler
+Swamp x15
+
+[Bot2 Deck]
+Plains
+Mox Sapphire
+Plains x15
+
+[Actions]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Chaos Defiler.Cast
+! Bot1.Choose
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Mox Sapphire
+Bot2.Battlefield = Plains

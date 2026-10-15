@@ -1,0 +1,38 @@
+# Badgermole Cub: "Whenever you tap a creature for mana, add an additional {G}" is a triggered mana ability of each Cub.
+# The first Cub earthbends the Forest (a creature land). Paying for the second Cub taps that creature, which adds {G}
+# and one additional {G} from the first Cub. Both earthbend the same Forest, so on turn 3 the Forest taps for {G} plus
+# one additional {G} from each Cub: {G}{G}{G}.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Badgermole Cub
+Badgermole Cub
+Forest x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Badgermole Cub.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Pass
+Bot1.Pass
+? Bot1.Mana = {G}
+Bot1.Hand.Badgermole Cub.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Forest.Counters.PlusOnePlusOne = 2
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+? Bot1.Mana = {G}{G}{G}
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Forest.Power = 2
+Bot1.Battlefield.Count = 3

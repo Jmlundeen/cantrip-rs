@@ -1,0 +1,45 @@
+# Ertai Resurrected, second mode: if its target is no longer legal when the trigger resolves, the trigger does nothing
+# (CR 608.2b) - and nobody draws, because "its controller draws" belongs to what was destroyed. In response to the
+# trigger aimed at Bot2's Ornithopter, Bot1 Lightning Bolts it itself (paid with the Mox Ruby). Bot2's hand holds the seven
+# cards it had after casting the Ornithopter.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Ruby
+Lightning Bolt
+Ertai Resurrected
+Island x2
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Plains x6
+Plains x12
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ertai Resurrected.Cast
+Bot1.Modes(2)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter)
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot2.Battlefield.Count = 0
+Bot2.Graveyard = Ornithopter
+Bot2.Hand.Count = 7
+Bot1.Battlefield = Mox Sapphire; Mox Ruby; Ertai Resurrected

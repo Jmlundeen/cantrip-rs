@@ -1,0 +1,51 @@
+# One counter mode and two draws: Bot2 pays the {3} with three more Mox Sapphires, so its Ancestral Recall resolves (and draws
+# three), while Bot1 draws two cards from the spell.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Black Lotus
+Mystic Confluence
+Island
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Sapphire
+Mox Sapphire
+Mox Sapphire
+Ancestral Recall
+Island x2
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Ancestral Recall.Cast(Bot2)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Mystic Confluence.Cast
+Bot1.Modes(1; 3; 3)
+Bot1.Target(Stack.Ancestral Recall)
+Bot2.Pass
+Bot2.Battlefield.Mox Sapphire#2.Activate
+Bot2.Battlefield.Mox Sapphire#3.Activate
+Bot2.Battlefield.Mox Sapphire#4.Activate
+Bot2.PayCost
+[Bot2.Main2]
+
+[Expect]
+Bot2.Graveyard = Ancestral Recall
+Stack.Count = 0
+Bot1.Hand.Count = 5

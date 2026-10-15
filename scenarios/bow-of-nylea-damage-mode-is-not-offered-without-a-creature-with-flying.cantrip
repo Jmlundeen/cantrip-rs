@@ -1,0 +1,49 @@
+# Bow of Nylea's modes need their targets: with only a Llanowar Elves (no flying) on the battlefield the damage mode is not
+# eligible (the refusal), while the counter mode is, as the positive control: it puts a +1/+1 counter on the Elves,
+# a creature the opponent controls ("target creature" is any creature).
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Emerald
+Mox Ruby
+Bow of Nylea
+Forest x3
+Forest x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Bow of Nylea.Cast
+Bot1.Pass
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Bow of Nylea.Activate
+! Bot1.Modes(deals 2 damage)
+Bot1.Modes(+1/+1 counter)
+Bot1.Target(Llanowar Elves)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = 1
+Bot2.Battlefield.Llanowar Elves.Power = 2
+Bot2.Battlefield.Llanowar Elves.Toughness = 2

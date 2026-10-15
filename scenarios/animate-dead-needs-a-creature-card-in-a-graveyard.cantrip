@@ -1,0 +1,45 @@
+# "Enchant creature card in a graveyard": with an Ornithopter on the battlefield and only a Lightning Bolt in a graveyard
+# (a creature, but not a card in a graveyard; a card in a graveyard, but not a creature) Animate Dead has no legal target
+# and cannot be cast (CR 303.4a, 601.2c). Once Cut Down has put the Ornithopter in the graveyard on turn 3, the same cast is
+# offered and returns it - the positive control for the refusal.
+
+[Bot1 Deck]
+Swamp
+Mox Ruby
+Mox Jet
+Ornithopter
+Lightning Bolt
+Cut Down
+Animate Dead
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+[T1 Bot1.Main2]
+! Bot1.Hand.Animate Dead.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cut Down.Cast(Ornithopter)
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Animate Dead.Cast(Bot1.Graveyard.Ornithopter)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Swamp; Swamp; Mox Ruby; Mox Jet; Ornithopter; Animate Dead
+Bot1.Battlefield.Animate Dead.AttachedTo = Ornithopter
+Bot1.Graveyard = Cut Down; Lightning Bolt
+Bot2.Life = 17

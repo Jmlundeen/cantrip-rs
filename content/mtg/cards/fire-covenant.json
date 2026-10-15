@@ -1,0 +1,6 @@
+{
+  "name": "Fire Covenant",
+  "manaCost": "{1}{B}{R}",
+  "type": "Instant",
+  "oracleText": "As an additional cost to cast this spell, pay X life.\nFire Covenant deals X damage divided as you choose among any number of target creatures."
+}

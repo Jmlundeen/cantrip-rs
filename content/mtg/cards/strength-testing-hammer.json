@@ -1,0 +1,6 @@
+{
+  "name": "Strength-Testing Hammer",
+  "manaCost": "{1}",
+  "type": "Artifact — Equipment",
+  "oracleText": "Whenever equipped creature attacks, roll a six-sided die. That creature gets +X/+0 until end of turn, where X is the result. Then if it has the greatest power or is tied for greatest power among creatures on the battlefield, draw a card.\nEquip {3}"
+}

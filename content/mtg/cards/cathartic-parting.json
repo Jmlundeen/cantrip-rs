@@ -1,0 +1,6 @@
+{
+  "name": "Cathartic Parting",
+  "manaCost": "{1}{G}",
+  "type": "Sorcery",
+  "oracleText": "The owner of target artifact or enchantment an opponent controls shuffles it into their library. You may shuffle up to four target cards from your graveyard into your library."
+}

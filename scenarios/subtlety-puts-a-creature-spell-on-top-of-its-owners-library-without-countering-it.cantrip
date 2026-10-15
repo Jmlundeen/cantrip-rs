@@ -1,0 +1,35 @@
+# Subtlety (flash, flying): "When this creature enters, choose up to one target creature spell or planeswalker spell. Its
+# owner puts it on their choice of the top or bottom of their library." Bot2 casts Llanowar Elves, Bot1 flashes in
+# Subtlety with Black Lotus's and an Island's blue mana and targets it; Bot2, its owner, chooses the top. The Elves never resolve and it
+# is not countered, so it is on top of Bot2's library and not in the graveyard.
+
+[Bot1 Deck]
+Black Lotus
+Subtlety
+Island x5
+Island x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x5
+Forest x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Island.Play
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Subtlety.Cast
+Bot1.Target(Stack.Llanowar Elves)
+Bot2.Accept
+[T2 Bot2.Main2]
+
+[Expect]
+Bot2.Library = Llanowar Elves; Forest; Forest; Forest; Forest; Forest; Forest; Forest; Forest; Forest
+Bot2.Graveyard.Count = 0
+Bot2.Battlefield = Forest
+Bot1.Battlefield = Island; Subtlety

@@ -1,0 +1,37 @@
+# Bot1 casts Abrupt Decay at Bot2's Mox Sapphire. Bot2 taps the Mox and an Island for Counterspell, which resolves and
+# does nothing: "This spell can't be countered." Abrupt Decay then resolves and destroys the Mox.
+
+[Bot1 Deck]
+Forest
+Mox Jet
+Abrupt Decay
+Forest x12
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Island x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Abrupt Decay.Cast(Mox Sapphire)
+? Stack = Abrupt Decay
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Abrupt Decay)
+? Stack = Counterspell; Abrupt Decay
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Graveyard = Abrupt Decay
+Bot1.Battlefield = Forest; Mox Jet
+Bot2.Battlefield = Island
+Bot2.Graveyard = Mox Sapphire; Counterspell

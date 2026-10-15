@@ -1,0 +1,53 @@
+# Otharri attacks on turn 9 and makes a Rebel; Bot2's Lightning Bolt kills him on turn 10 and, on turn 11, {2}{R}{W} and tapping a Rebel return him from the graveyard to the battlefield tapped (CR 113.6m); the Rebel pays for it by tapping, so nothing of Otharri's attack remains untapped.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Mountain
+Plains
+Plains
+Otharri, Suns' Glory
+Mountain x14
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Otharri, Suns' Glory.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Otharri, Suns' Glory > Bot2)
+[T10 Bot2.Main1]
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Otharri, Suns' Glory)
+Bot2.Battlefield.Mountain.Activate
+[T11 Bot1.Main1]
+Bot1.Graveyard.Otharri, Suns' Glory.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Plains.Activate
+[T11 Bot1.Main2]
+
+[Expect]
+Turn = 11
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Otharri, Suns' Glory.Tapped = true
+Bot1.Battlefield.Rebel.Tapped = true

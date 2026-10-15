@@ -1,0 +1,24 @@
+# Spirit Water Revival without its waterbend cost grants no exception to the maximum hand size (CR 402.2): Bot1 holds
+# eight cards after drawing two, discards one at the cleanup step (CR 514.1) and has seven. The companion scenario with the
+# additional cost paid keeps all eight.
+
+[Bot1 Deck]
+Black Lotus
+Spirit Water Revival
+Island x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Spirit Water Revival.Cast
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Hand.Count = 7
+Exile = Spirit Water Revival

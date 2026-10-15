@@ -1,0 +1,6 @@
+{
+  "name": "No Rest for the Wicked",
+  "manaCost": "{1}{B}",
+  "type": "Enchantment",
+  "oracleText": "Sacrifice this enchantment: Return to your hand all creature cards in your graveyard that were put there from the battlefield this turn."
+}

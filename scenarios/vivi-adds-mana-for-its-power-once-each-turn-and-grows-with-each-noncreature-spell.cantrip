@@ -1,0 +1,55 @@
+# Vivi Ornitier, "{0}: Add X mana in any combination of {U} and/or {R}, where X is Vivi Ornitier's power. Activate only
+# during your turn and only once each turn." Cast with no counters it is a 0/3, so the first activation adds nothing at
+# all (CR 106.5) and still spends the turn's use (CR 602.5b), which a second activation that turn finds out.
+# Two turns later a Lightning Bolt gives it a +1/+1 counter, and the activation then adds one mana of the colour chosen
+# as it resolves; used again that turn, it is refused.
+
+[Bot1 Deck]
+Island
+Mountain
+Plains
+Vivi Ornitier
+Lightning Bolt
+Island
+Island
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Vivi Ornitier.Cast
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Vivi Ornitier.Power = 0
+Bot1.Battlefield.Vivi Ornitier.Activate
+? Bot1.Mana =
+Bot1.Pass
+! Bot1.Battlefield.Vivi Ornitier.Activate
+Bot1.Pass
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+[T7 Bot1.Main2]
+? Bot2.Life = 16
+? Bot1.Battlefield.Vivi Ornitier.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Vivi Ornitier.Power = 1
+Bot1.Battlefield.Vivi Ornitier.Activate
+Bot1.Colors(Red)
+? Bot1.Mana = {R}
+Bot1.Pass
+! Bot1.Battlefield.Vivi Ornitier.Activate
+
+[Expect]
+Turn = 7
+Step = End
+Bot2.Life = 16
+Bot1.Battlefield.Vivi Ornitier.Power = 1

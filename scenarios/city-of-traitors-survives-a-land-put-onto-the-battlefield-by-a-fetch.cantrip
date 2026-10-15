@@ -1,0 +1,27 @@
+# "When you play another land" is the special action of playing a land (CR 305.1), not a land entering: Bot1 plays
+# Marsh Flats on turn 1, then City of Traitors on turn 3 (the Flats is the other land, played before it, so nothing
+# triggers) and cracks the Flats, which puts a Swamp onto the battlefield - the City is not sacrificed.
+
+[Bot1 Deck]
+Marsh Flats
+City of Traitors
+Island x6
+Swamp
+Island x6
+
+[Bot2 Deck]
+Island x13
+
+[Actions]
+Bot1.Hand.Marsh Flats.Play
+[T3 Bot1.Main1]
+Bot1.Hand.City of Traitors.Play
+Bot1.Battlefield.Marsh Flats.Activate
+Bot1.Search(Swamp)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = City of Traitors; Swamp
+Bot1.Graveyard = Marsh Flats
+Bot1.Life = 19

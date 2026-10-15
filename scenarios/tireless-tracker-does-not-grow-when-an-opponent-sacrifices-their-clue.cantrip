@@ -1,0 +1,43 @@
+# "Whenever YOU sacrifice a Clue": Bot2 investigating with Thraben Inspector and sacrificing its own Clue to draw puts
+# no counter on Bot1's Tracker (the Clue was sacrificed: Bot2 drew for it, five cards in hand).
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Mox Ruby
+Tireless Tracker
+Island x12
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Thraben Inspector
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Tireless Tracker.Cast
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Thraben Inspector.Cast
+Bot1.Pass
+Bot1.Pass
+? Bot2.Battlefield.Count = 5
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Clue Token.Activate
+Bot1.Pass
+
+[Expect]
+Bot2.Battlefield = Mox Pearl; Mox Jet; Mox Sapphire; Thraben Inspector
+Bot2.Hand.Count = 5
+Bot1.Battlefield.Tireless Tracker.Power = 3

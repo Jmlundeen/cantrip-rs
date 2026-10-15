@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Cantrip.Core\Cantrip.Core.csproj" />
+    <ProjectReference Include="..\Cantrip.Cards.Model\Cantrip.Cards.Model.csproj" />
+    <ProjectReference Include="..\Cantrip.Protocol\Cantrip.Protocol.csproj" />
+  </ItemGroup>
+
+</Project>

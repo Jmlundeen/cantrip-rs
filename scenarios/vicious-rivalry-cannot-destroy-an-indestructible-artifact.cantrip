@@ -1,0 +1,43 @@
+# Vicious Rivalry with X = 4 destroys every artifact and creature with mana value 4 or less - but destroying does nothing to an
+# indestructible permanent: Bot2's The One Ring (an artifact of mana value exactly 4) stays, while Bot2's Mox Jet and Bot1's Moxen go.
+# Bot1 pays 4 life. (The Ring's protection from everything is from damage, targets, enchanting and blocking, not from this.)
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Sol Ring
+Vicious Rivalry
+Island
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Black Lotus
+Mox Jet
+The One Ring
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.The One Ring.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Battlefield.Mox Jet.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Vicious Rivalry.Cast(X: 4)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 16
+Bot1.Battlefield.Count = 0
+Bot2.Battlefield = The One Ring
+Bot2.Graveyard = Mox Jet; Black Lotus

@@ -1,0 +1,35 @@
+# Luminarch Aspirant's trigger on turn 3 is aimed at the Mother of Runes cast that turn, and Bot2 is asked whether to let
+# it resolve. Handed over there so the web client can be seen showing a triggered ability resolving well for what it
+# touches: the Aspirant lit green, and an arrow from it to the Mother as the counter goes on.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Luminarch Aspirant
+Mother of Runes
+Plains
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Luminarch Aspirant.Cast
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Mother of Runes.Cast
+[T3 Bot1.BeginCombat]
+Bot1.Target(Mother of Runes)
+[Handover Bot2.Pass]
+
+[Expect]
+Turn = 3
+Stack = Luminarch Aspirant
+Bot1.Battlefield.Luminarch Aspirant.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Mother of Runes.Power = 1

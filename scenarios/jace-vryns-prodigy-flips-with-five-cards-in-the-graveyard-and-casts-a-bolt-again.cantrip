@@ -1,0 +1,47 @@
+# Jace, Vryn's Prodigy: "{T}: Draw a card, then discard a card. If there are five or more cards in your graveyard, exile Jace,
+# then return him to the battlefield transformed." Turn 1 Bot1 sacrifices Black Lotus for three Lightning Bolts, so four cards
+# lie in its graveyard. Cast on turn 3, Jace loots on turn 5: the discard makes five, and he returns as Jace, Telepath Unbound
+# with five loyalty. His -3 lets Bot1 cast a Lightning Bolt from the graveyard, exiled afterwards, at Bot2: 20 - 9 - 3.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Ruby
+Black Lotus
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Jace, Vryn's Prodigy
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Swamp x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Jace, Vryn's Prodigy.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Jace, Vryn's Prodigy.Activate
+Bot1.Choose(Island)
+? Bot1.Battlefield.Jace, Telepath Unbound.Counters.Loyalty = 5
+Bot1.Battlefield.Jace, Telepath Unbound.Activate(Bot1.Graveyard.Lightning Bolt; Ability: #2)
+
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Graveyard.Lightning Bolt.Cast(Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 8
+Bot1.Battlefield.Jace, Telepath Unbound.Counters.Loyalty = 2

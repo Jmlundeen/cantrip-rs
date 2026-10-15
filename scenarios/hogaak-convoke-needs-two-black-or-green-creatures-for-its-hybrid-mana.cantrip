@@ -1,0 +1,45 @@
+# Hogaak, Arisen Necropolis: convoke pays each generic mana with any creature, but a colored mana only with a creature
+# of that color (CR 702.51a), and its two {B/G} are hybrid, so each needs a black or green creature. On turn 5 Bot1 has
+# seven creatures, Llanowar Elves and six colorless Ornithopters: enough bodies, but only one of them is black or green,
+# so the cast is not offered. On turn 7 a Birds of Paradise gives the second green creature and Hogaak is cast, tapping
+# the Elves, the Birds and five Ornithopters (the positive control; the sixth Ornithopter stays untapped).
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Hogaak, Arisen Necropolis
+Ornithopter
+Ornithopter
+Birds of Paradise
+Forest x14
+
+[Bot2 Deck]
+Forest x22
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+! Bot1.Hand.Hogaak, Arisen Necropolis.Cast
+[T7 Bot1.Main1]
+Bot1.Hand.Birds of Paradise.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Hogaak, Arisen Necropolis.Cast(Convoke: Llanowar Elves, Birds of Paradise, Ornithopter, Ornithopter, Ornithopter, Ornithopter, Ornithopter)
+[Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Battlefield.Hogaak, Arisen Necropolis.Power = 8
+Bot1.Battlefield.Ornithopter#6.Tapped = false

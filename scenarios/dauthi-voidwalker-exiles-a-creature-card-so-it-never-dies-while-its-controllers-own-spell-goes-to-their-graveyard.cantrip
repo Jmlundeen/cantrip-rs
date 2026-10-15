@@ -1,0 +1,43 @@
+# Bot2's Haywire Mite ("when this creature dies, you gain 2 life") is destroyed by Bot1's Infernal Grasp under Dauthi
+# Voidwalker: a card going to an opponent's graveyard is exiled with a void counter instead (CR 614.1), so the Mite never
+# dies and Bot2 gains nothing. The Infernal Grasp itself is Bot1's own card going to Bot1's graveyard, and goes there.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Dauthi Voidwalker
+Swamp
+Infernal Grasp
+Swamp x15
+
+[Bot2 Deck]
+Haywire Mite
+Swamp x19
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dauthi Voidwalker.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Haywire Mite.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Infernal Grasp.Cast(Bot2.Battlefield.Haywire Mite)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Bot2.Life = 20
+Bot1.Life = 18
+Exile = Haywire Mite
+Bot2.Graveyard.Count = 0
+Bot1.Graveyard = Infernal Grasp

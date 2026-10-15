@@ -1,0 +1,42 @@
+# A Wan Shi Tong Spirit "can't block or be blocked by non-Spirit creatures" (CR 509.1b): Bot2's Ornithopter may block Wan Shi Tong (the control) but not the Spirit attacking beside him, so the Spirit's 1 damage goes through.
+
+[Bot1 Deck]
+Island
+Sol Ring
+Black Lotus
+Wan Shi Tong, All-Knowing
+Island
+Island
+Island
+Plains
+Swamp
+Swamp
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Wan Shi Tong, All-Knowing.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Target(Sol Ring)
+Bot1.Modes(Second from the top)
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot1.Attack(Wan Shi Tong, All-Knowing; Spirit; Spirit)
+! Bot2.Block(Ornithopter > Spirit)
+Bot2.Block(Ornithopter > Wan Shi Tong, All-Knowing)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 18
+Bot2.Graveyard = Ornithopter

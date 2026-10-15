@@ -1,0 +1,12 @@
+{
+  "name": "Waterlogged Teachings",
+  "manaCost": "{3}{U/B}",
+  "type": "Instant",
+  "oracleText": "Search your library for an instant card or a card with flash, reveal it, put it into your hand, then shuffle.",
+  "backFacePlayableAsLand": true,
+  "backFace": {
+    "name": "Inundated Archive",
+    "type": "Land",
+    "oracleText": "This land enters tapped.\n{T}: Add {U} or {B}."
+  }
+}

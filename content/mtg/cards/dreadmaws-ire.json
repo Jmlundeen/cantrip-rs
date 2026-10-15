@@ -1,0 +1,6 @@
+{
+  "name": "Dreadmaw's Ire",
+  "manaCost": "{R}",
+  "type": "Instant",
+  "oracleText": "Until end of turn, target attacking creature gets +2/+2 and gains trample and \"Whenever this creature deals combat damage to a player, destroy target artifact that player controls.\""
+}

@@ -1,0 +1,52 @@
+# Only an opponent's search triggers it. Bot1 casts Wan Shi Tong with X = 2 and, two turns later, searches its own
+# library with Mystical Tutor: no counter and no card from the second ability.
+
+[Bot1 Deck]
+Island
+Island
+Sol Ring
+Wan Shi Tong, Librarian
+Mystical Tutor
+Island
+Island
+Island x3
+Brainstorm
+Island x10
+
+[Bot2 Deck]
+Island
+Island
+Mystical Tutor
+Island
+Island
+Island
+Island
+Island x4
+Brainstorm
+Counterspell
+Island x6
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Wan Shi Tong, Librarian.Cast(X: 2)
+Bot1.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#3.Activate
+Bot1.Hand.Mystical Tutor.Cast
+Bot1.Search(Brainstorm)
+Bot1.Pass
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Wan Shi Tong, Librarian.Counters.PlusOnePlusOne = 2
+Bot1.Graveyard = Mystical Tutor

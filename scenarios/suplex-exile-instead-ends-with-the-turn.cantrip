@@ -1,0 +1,54 @@
+# "If that creature would die this turn" is limited to this turn (CR 514.2, 611.2c): Suplex's 3 damage does not kill the 0/4
+# Concealing Curtains on turn 3 and the damage wears off at cleanup. On turn 5 it takes two Lightning Bolts (3 + 3 against
+# a toughness of 4) and dies: the exile replacement is over, so it goes to Bot2's graveyard.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mountain
+Suplex
+Lightning Bolt
+Lightning Bolt
+Mountain x2
+Mountain x10
+
+[Bot2 Deck]
+Swamp
+Concealing Curtains
+Swamp x5
+Swamp x10
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Concealing Curtains.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Suplex.Cast
+Bot1.Modes(1)
+Bot1.Target(Concealing Curtains)
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot2.Battlefield.Concealing Curtains.Damage = 3
+[T5 Bot1.Main1]
+? Bot2.Battlefield.Concealing Curtains.Damage = 0
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Concealing Curtains)
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Concealing Curtains)
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Concealing Curtains
+Exile.Count = 0

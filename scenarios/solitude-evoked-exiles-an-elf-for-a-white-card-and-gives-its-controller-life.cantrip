@@ -1,0 +1,32 @@
+# Solitude evoked by exiling Skyclave Apparition from the hand (CR 702.74a): its enter trigger exiles Bot2's Llanowar
+# Elves, whose controller gains life equal to its power (21), and the evoke trigger sacrifices Solitude.
+
+[Bot1 Deck]
+Solitude
+Skyclave Apparition
+Plains x18
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x18
+
+[Actions]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Solitude.Cast(Ability: Evoke)
+Bot1.Choose(Skyclave Apparition)
+Bot1.Triggers(exile; sacrifice)
+Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Exile = Skyclave Apparition; Llanowar Elves
+Bot2.Life = 21
+Bot2.Battlefield = Forest
+Bot1.Graveyard = Solitude
+Bot1.Battlefield.Count = 0

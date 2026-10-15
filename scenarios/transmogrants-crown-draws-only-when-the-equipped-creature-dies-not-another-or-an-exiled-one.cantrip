@@ -1,0 +1,53 @@
+# "Whenever equipped creature dies": dies means battlefield to graveyard (CR 700.4), and only the equipped one. Bot1 equips the Elves for {B}
+# on turn one beside an unequipped Ornithopter. Turn two: Bot2's Lightning Bolt kills the Ornithopter (not equipped: no card) and Swords to
+# Plowshares exiles the Elves (equipped, but not dying: no card). Bot1's hand stays empty and the Crown ends up unattached.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Emerald
+Transmogrant's Crown
+Llanowar Elves
+Ornithopter
+Island x10
+
+[Bot2 Deck]
+Mountain
+Mox Pearl
+Lightning Bolt
+Swords to Plowshares
+Mountain x12
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Transmogrant's Crown.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Transmogrant's Crown.Activate(Bot1.Battlefield.Llanowar Elves; Ability: Equip {B})
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Llanowar Elves.Power = 3
+? Bot1.Hand.Count = 0
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Llanowar Elves)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Hand.Count = 0
+Bot1.Graveyard = Ornithopter
+Exile = Llanowar Elves
+Bot1.Battlefield.Transmogrant's Crown.AttachedTo = (absent)

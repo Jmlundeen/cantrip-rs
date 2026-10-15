@@ -1,0 +1,37 @@
+# Twisted Image's switch is layer 7d (CR 613.4d): Luminarch Aspirant's +1/+1 counter makes Tamiyo, Inquisitive Student a
+# 1/4, and switching her power and toughness afterwards makes her 4/1 for the turn - the counter is applied first. The
+# card is drawn too.
+[Bot1 Deck]
+Island
+Tamiyo, Inquisitive Student
+Plains
+Luminarch Aspirant
+Twisted Image
+Island
+Island
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Tamiyo, Inquisitive Student.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Luminarch Aspirant.Cast
+[T3 Bot1.BeginCombat]
+Bot1.Target(Luminarch Aspirant)
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.BeginCombat]
+Bot1.Target(Tamiyo, Inquisitive Student)
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Twisted Image.Cast(Tamiyo, Inquisitive Student)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Tamiyo, Inquisitive Student.Power = 4
+? Bot1.Battlefield.Tamiyo, Inquisitive Student.Toughness = 1
+[Expect]
+Bot1.Library.Count = 17

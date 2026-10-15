@@ -1,0 +1,31 @@
+# The cost includes discarding a card, so with nothing in hand the ability is refused even with three artifacts to look at: Bot1's
+# whole opening hand is the Vault, Black Lotus and five Moxen, all played. The control is
+# fomori-vault-looks-at-one-card-per-artifact-and-keeps-one, where a card is in hand to discard.
+
+[Bot1 Deck]
+Fomori Vault
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Black Lotus
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Fomori Vault.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+? Bot1.Hand.Count = 0
+! Bot1.Battlefield.Fomori Vault.Activate(Ability: Look)
+
+[Expect]
+Bot1.Hand.Count = 0
+Bot1.Battlefield.Fomori Vault.Tapped = false

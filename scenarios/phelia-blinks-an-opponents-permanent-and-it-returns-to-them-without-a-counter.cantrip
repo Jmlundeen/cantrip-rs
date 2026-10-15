@@ -1,0 +1,40 @@
+# Phelia, Exuberant Shepherd exiling a permanent an opponent controls: it returns at the next end step under its owner's
+# control, and since it did not enter under Phelia's controller's control she gets no counter.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Phelia, Exuberant Shepherd
+Plains
+Plains
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Mox Jet
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Phelia, Exuberant Shepherd.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Phelia, Exuberant Shepherd > Bot2)
+Bot1.Target(Bot2.Battlefield.Mox Jet)
+[T3 Bot1.Main2]
+? Exile = Mox Jet
+[T4 Bot2.Main1]
+
+[Expect]
+Turn = 4
+Exile.Count = 0
+Bot2.Life = 18
+Bot2.Battlefield = Mox Jet
+Bot1.Battlefield = Mox Pearl; Mox Ruby; Phelia, Exuberant Shepherd
+Bot1.Battlefield.Phelia, Exuberant Shepherd.Counters.PlusOnePlusOne = (absent)

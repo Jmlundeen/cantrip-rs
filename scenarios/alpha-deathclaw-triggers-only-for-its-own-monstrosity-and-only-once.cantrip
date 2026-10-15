@@ -1,0 +1,134 @@
+# Alpha Deathclaw: "When this creature enters or becomes monstrous, destroy target permanent." Each player has one.
+# Bot2's is cast on turn 2 (destroying Bot1's Mox Ruby) and Bot1's on turn 3 (destroying Bot2's Mox Ruby). On turn 4
+# Bot2's becomes monstrous (Monstrosity 4, {5}{B}{G}) and its own trigger destroys Bot1's Bayou -- Bot1's Deathclaw
+# does not trigger: it is another permanent that became monstrous. On turn 5 Bot1's becomes monstrous and destroys
+# Bot2's Sol Ring, without a trigger from Bot2's. On turn 7 Bot1 activates Monstrosity again: the creature is already
+# monstrous (CR 701.37b), so it gets no more counters and nothing is destroyed.
+
+[Bot1 Deck]
+Bayou
+Mox Jet
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Sol Ring
+Alpha Deathclaw
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Bayou
+Mox Jet
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Sol Ring
+Alpha Deathclaw
+Swamp x20
+
+[Actions]
+Bot1.Hand.Bayou.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot2.Hand.Bayou.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Pass
+Bot2.Battlefield.Bayou.Activate(Ability: {B})
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Hand.Alpha Deathclaw.Cast
+Bot2.Pass
+Bot2.Target(Bot1.Battlefield.Mox Ruby)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Mox Ruby
+[T3 Bot1.Main1]
+Bot1.Battlefield.Bayou.Activate(Ability: {B})
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Alpha Deathclaw.Cast
+Bot1.Pass
+Bot1.Target(Bot2.Battlefield.Mox Ruby)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Graveyard = Mox Ruby
+[T4 Bot2.Main1]
+Bot2.Battlefield.Bayou.Activate(Ability: {B})
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Battlefield.Alpha Deathclaw.Activate
+Bot2.Pass
+Bot2.Target(Bot1.Battlefield.Bayou)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Bayou; Mox Ruby
+? Bot2.Battlefield.Alpha Deathclaw.Monstrous = true
+? Bot1.Battlefield.Alpha Deathclaw.Counters.PlusOnePlusOne = (absent)
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Alpha Deathclaw.Activate
+Bot1.Pass
+Bot1.Target(Bot2.Battlefield.Sol Ring)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Graveyard = Sol Ring; Mox Ruby
+? Bot1.Battlefield.Alpha Deathclaw.Monstrous = true
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Alpha Deathclaw.Activate
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Alpha Deathclaw.Counters.PlusOnePlusOne = 4
+Bot2.Battlefield.Alpha Deathclaw.Counters.PlusOnePlusOne = 4
+Bot1.Graveyard = Bayou; Mox Ruby
+Bot2.Graveyard = Sol Ring; Mox Ruby

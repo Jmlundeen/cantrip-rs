@@ -1,0 +1,27 @@
+# Bot1's Duress looks at Bot2's hand and takes Lightning Bolt, and the position is handed to Bot1 in its next main
+# phase. The cards Bot2 still holds from that hand are known to Bot1, so the fan in Bot2's rail shows them face up, and
+# each can be held up to read with the right button like any card on the table; the card Bot2 drew since is a back.
+
+[Bot1 Deck]
+Swamp
+Duress
+Swamp x16
+
+[Bot2 Deck]
+Lightning Bolt
+Guerrilla Gorilla
+Island x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Duress.Cast(Bot2)
+Bot1.Choose(Lightning Bolt)
+[T3 Bot1.Main1]
+[Handover Bot1.Pass]
+
+[Expect]
+Turn = 3
+Step = Main1
+ActivePlayer = Bot1
+Bot2.Graveyard = Lightning Bolt

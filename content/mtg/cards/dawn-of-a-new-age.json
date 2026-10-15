@@ -1,0 +1,6 @@
+{
+  "name": "Dawn of a New Age",
+  "manaCost": "{1}{W}",
+  "type": "Enchantment",
+  "oracleText": "This enchantment enters with a hope counter on it for each creature you control.\nAt the beginning of your end step, remove a hope counter from this enchantment. If you do, draw a card. Then if this enchantment has no hope counters on it, sacrifice it and you gain 4 life."
+}

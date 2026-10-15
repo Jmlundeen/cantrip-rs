@@ -1,0 +1,6 @@
+{
+  "name": "Lion's Eye Diamond",
+  "manaCost": "{0}",
+  "type": "Artifact",
+  "oracleText": "Discard your hand, Sacrifice this artifact: Add three mana of any one color. Activate only as an instant."
+}

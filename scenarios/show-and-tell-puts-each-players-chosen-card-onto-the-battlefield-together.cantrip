@@ -1,0 +1,42 @@
+# Show and Tell, cast by Bot1 on turn 5 with a creature and a land in hand, against Bot2's hand of a land, a Lightning
+# Bolt and Islands. Each player chooses during resolution: Bot1 first (the current player), then Bot2. Both chosen cards
+# end up on the battlefield and everything else stays in hand, Bot2's Lightning Bolt not being one of the four types.
+
+[Bot1 Deck]
+Island
+Island
+Island
+Show and Tell
+Mother of Runes
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Plains
+Lightning Bolt
+Island x5
+Island x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Mother of Runes)
+Bot2.Choose(Plains)
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Island; Island; Island; Mother of Runes
+Bot2.Battlefield = Plains
+Bot2.Hand = Lightning Bolt; Island; Island; Island; Island; Island
+Bot1.Graveyard = Show and Tell

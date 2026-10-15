@@ -1,0 +1,65 @@
+# Ravenous Robots: "Whenever you cast an artifact spell, create a 1/1 colorless Robot artifact creature token" - your spells
+# only and artifact spells only: Mox Jet (turn 1) makes a token, Bot2's Mox Sapphire (turn 2) and Bot1's Lightning Bolt
+# (turn 3) do not. "{R}, {T}: Creature tokens you control gain haste until end of turn" fixes its set as it resolves
+# (CR 611.2c): turn 3, a Mox Emerald cast first makes a token that gains haste and attacks, while the Ornithopter cast
+# after the ability makes a token that does not, and the Ornithopter itself (an artifact creature, but not a token) has no haste
+# either - those two have no Haste in the dump, beside the hasty token.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Ravenous Robots
+Mox Jet
+Mountain
+Lightning Bolt
+Mox Emerald
+Ornithopter
+Mountain x10
+
+[Bot2 Deck]
+Mox Sapphire
+Island x14
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ravenous Robots.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Robot.Types = Artifact; Creature
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 6
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Ravenous Robots.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Robot#2.Keywords = Haste
+? Bot1.Battlefield.Robot#3.Keywords = (absent)
+? Bot1.Battlefield.Ornithopter.Keywords = Flying
+Bot1.Attack(Robot#2 > Bot2)
+[T3 Bot1.Main2]
+
+
+[Expect]
+Bot1.Battlefield.Count = 10
+Bot2.Life = 16

@@ -1,0 +1,35 @@
+# Wan Shi Tong, All-Knowing enters and its owner puts Sol Ring into their library second from the top (their choice); a card put into a library from anywhere makes two 1/1 colorless Spirits, once, for the one library.
+
+[Bot1 Deck]
+Island
+Sol Ring
+Black Lotus
+Wan Shi Tong, All-Knowing
+Island
+Island
+Island
+Plains
+Swamp
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Wan Shi Tong, All-Knowing.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Target(Sol Ring)
+Bot1.Modes(Second from the top)
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Library = Plains; Sol Ring; Swamp
+Bot1.Battlefield = Island; Wan Shi Tong, All-Knowing; Spirit; Spirit
+Bot1.Battlefield.Spirit#1.Power = 1
+Bot1.Graveyard = Black Lotus
+Stack.Count = 0

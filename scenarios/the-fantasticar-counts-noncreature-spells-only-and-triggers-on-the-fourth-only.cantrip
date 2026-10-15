@@ -1,0 +1,38 @@
+# The Fantasticar: "your fourth noncreature spell each turn". Black Lotus (1), The Fantasticar (2), a Llanowar Elves (a
+# creature spell: not counted), Mox Pearl (3: only the animate trigger, the stack holds the Mox and that one ability),
+# Mox Sapphire (4: both abilities), Mox Jet (5: only the animate trigger; the Fantasticar is declined at the fourth, so it is
+# still there for it).
+
+[Bot1 Deck]
+The Fantasticar
+Black Lotus
+Llanowar Elves
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Forest
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.The Fantasticar.Cast
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+? Stack.Count = 2
+Bot1.Decline
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Decline
+Bot1.Decline
+Bot1.Hand.Mox Jet.Cast
+? Stack.Count = 2
+Bot1.Decline
+
+[Expect]
+Bot1.Battlefield.The Fantasticar.Types = Artifact

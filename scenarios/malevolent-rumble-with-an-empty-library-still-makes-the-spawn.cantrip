@@ -1,0 +1,31 @@
+# Malevolent Rumble with an empty library: nothing is revealed and nothing is asked, but the Eldrazi Spawn is still
+# created (the rest of the spell happens regardless). Bot1's whole deck is its seven-card opening hand.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Malevolent Rumble
+Island
+Island
+Island
+Island
+
+[Bot2 Deck]
+Swamp x14
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Malevolent Rumble.Cast
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Malevolent Rumble
+Bot1.Library.Count = 0
+Bot1.Battlefield.Eldrazi Spawn.Power = 0

@@ -1,0 +1,28 @@
+# X is the number of lands: with only Moxen on the battlefield X is 0, so nothing is looked at and nothing is put into
+# the hand (the question is never asked). It is an instant, cast with the Moxen's mana in Bot2's upkeep.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Consult the Star Charts
+Island x4
+Lightning Bolt
+Island x6
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Upkeep]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Consult the Star Charts.Cast
+! Bot1.Arrange
+[T2 Bot2.Main1]
+
+[Expect]
+Bot1.Graveyard = Consult the Star Charts
+Bot1.Hand.Count = 4
+Bot1.Library.Count = 7

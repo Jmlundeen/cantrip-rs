@@ -1,0 +1,65 @@
+# Archon of Emeria: "Nonbasic lands your opponents control enter tapped". A replacement effect that looks at what
+# enters judges it as it would exist on the battlefield (CR 614.12): a card manifested face down is a 2/2 creature
+# with no supertypes there (CR 701.40a, 708.2a), so a nonbasic land card manifested face down is not a nonbasic land
+# and enters untapped. The real nonbasic land entering tapped is a-shockland-under-an-archon-is-ordered-by-its-controller.
+#
+# Turn 1: Bot1 Wheels off a Black Lotus and casts Abhorrent Oculus by exiling six graveyard cards. Turn 2, Bot2's
+# upkeep: the Oculus manifests dread and Guerrilla Gorilla goes face down; Bot2 then casts Archon of Emeria off a Plains
+# and a Black Lotus. Turn 4, Bot2's upkeep: the Oculus manifests dread again and Bot1 puts Tundra - a nonbasic land
+# card - onto the battlefield face down, where it arrives untapped.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Wheel of Fortune
+Island x4
+Mox Sapphire
+Sol Ring
+Abhorrent Oculus
+Island x4
+Guerrilla Gorilla
+Lightning Bolt
+Island
+Tundra
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Plains x7
+Plains
+Black Lotus
+Archon of Emeria
+Plains x25
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Wheel of Fortune.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Abhorrent Oculus.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Choose(Island; Island; Island; Island; Black Lotus; Wheel of Fortune)
+[T2 Bot2.Upkeep]
+Bot1.Arrange(Guerrilla Gorilla | Lightning Bolt)
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Archon of Emeria.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+[T4 Bot2.Upkeep]
+Bot1.Arrange(Tundra | Lightning Bolt)
+? Bot1.Graveyard = Lightning Bolt; Lightning Bolt
+
+[Expect]
+Turn = 4
+Stack.Count = 0
+Bot1.Battlefield.Count = 6
+Bot1.Battlefield.#1.Tapped = false
+Bot1.Battlefield.#2.SummoningSick = true
+Bot1.Battlefield.#2.Tapped = false
+Bot2.Battlefield.Archon of Emeria.Tapped = false

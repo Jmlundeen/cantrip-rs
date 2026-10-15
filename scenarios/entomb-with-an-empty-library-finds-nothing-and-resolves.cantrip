@@ -1,0 +1,22 @@
+# Searching an empty library finds nothing but is still a search, so Entomb resolves without error (CR 701.23, 608.2c):
+# it is not countered and the game goes on. Bot1's deck is exactly its opening hand, so the library is empty on turn 1.
+
+[Bot1 Deck]
+Swamp
+Entomb
+Swamp x5
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Result = InProgress
+Bot1.Graveyard = Entomb
+Bot1.Library.Count = 0

@@ -1,0 +1,44 @@
+# Hymn to Tourach: target player discards two cards at random (CR 701.9b). Bot2 has cast everything but a Lotus Petal and a Black
+# Lotus by turn 3, so whichever the random choice would pick, both are discarded.
+
+[Bot1 Deck]
+Swamp
+Hymn to Tourach
+Swamp
+Swamp x20
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Pearl
+Mox Emerald
+Mox Ruby
+Mox Jet
+Lotus Petal
+Black Lotus
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Hymn to Tourach.Cast(Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Hand.Count = 0
+Bot2.Graveyard.Count = 2
+Bot1.Graveyard = Hymn to Tourach

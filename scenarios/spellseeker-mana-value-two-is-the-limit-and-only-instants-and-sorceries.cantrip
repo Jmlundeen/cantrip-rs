@@ -1,0 +1,34 @@
+# "An instant or sorcery card with mana value 2 or less" (CR 202.3, 205.2): a sorcery of mana value 3 (Lingering Souls), a
+# creature of mana value 1 (Llanowar Elves) and a mana value 0 artifact (Mox Ruby) are not offered. Counterspell, at exactly
+# 2, is offered and Bot1 takes it (a Repeal in the library is in the scenario beside this one).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Spellseeker
+Plains x3
+Lingering Souls
+Llanowar Elves
+Mox Ruby
+Counterspell
+Plains x10
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Spellseeker.Cast
+Bot1.Pass
+! Bot1.Search(Lingering Souls; Llanowar Elves; Mox Ruby)
+Bot1.Search(Counterspell)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Counterspell; Plains; Plains; Plains

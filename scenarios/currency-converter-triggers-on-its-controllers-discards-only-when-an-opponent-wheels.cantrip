@@ -1,0 +1,44 @@
+# Currency Converter: "Whenever you discard a card" counts a discard an opponent makes you do. Bot2's Wheel of Fortune
+# makes both players discard their hands at once: Bot1's four cards are each offered to its Converter and accepted (four
+# cards exiled), and Bot2's six are not (the neighbouring scenario shows that, with the Wheel cast by Bot1).
+
+[Bot1 Deck]
+Mox Jet
+Currency Converter
+Lightning Bolt
+Forest
+Swamp
+Swamp
+Swamp
+Swamp x20
+
+[Bot2 Deck]
+Black Lotus
+Wheel of Fortune
+Island x5
+Mountain
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Currency Converter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Wheel of Fortune.Cast
+Bot1.Accept
+Bot1.Accept
+Bot1.Accept
+Bot1.Accept
+[Bot2.Main2]
+
+[Expect]
+Turn = 2
+Exile = Lightning Bolt; Forest; Swamp; Swamp
+Bot1.Hand.Count = 7
+Bot2.Hand.Count = 7
+Bot2.Graveyard.Count = 8

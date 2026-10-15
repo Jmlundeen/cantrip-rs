@@ -1,0 +1,34 @@
+# "Search ... for an instant or sorcery card": Ornithopter (an artifact creature), an Island, Sol Ring and Bonecrusher Giant (a creature card, whose Adventure is not a card type in the library, CR 715.3) are not offered (refusals) while Lightning Bolt, an instant, and Time Walk,
+# a sorcery, are (positive controls). Bot1 takes Time Walk; the library is shuffled and it is put on top, the library size unchanged, and the next draw (turn 3) is Time Walk.
+
+[Bot1 Deck]
+Island
+Mystical Tutor
+Island x5
+Ornithopter
+Island
+Sol Ring
+Bonecrusher Giant
+Lightning Bolt
+Time Walk
+Island x6
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Mystical Tutor.Cast
+! Bot1.Search(Ornithopter)
+! Bot1.Search(Island)
+! Bot1.Search(Sol Ring)
+! Bot1.Search(Bonecrusher Giant)
+Bot1.Search(Time Walk)
+Bot1.Pass
+? Bot1.Library.Count = 12
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 6
+
+[Expect]
+Bot1.Hand = Island; Island; Island; Island; Island; Time Walk

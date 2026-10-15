@@ -1,0 +1,32 @@
+# Mother of Runes: "{T}: ..." - a creature's {T} ability can't be activated until its controller has controlled it since
+# the start of their most recent turn (CR 302.6). Turn 1: cast and refused (`!`); turn 3: the positive control, used on
+# Ornithopter (protection is not a dumped key; the Bolt scenarios show it works). Mother is tapped afterwards.
+
+[Bot1 Deck]
+Mox Pearl
+Mother of Runes
+Ornithopter
+Plains x4
+Plains x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Mother of Runes.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+! Bot1.Battlefield.Mother of Runes.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mother of Runes.Activate(Ornithopter)
+Bot1.Colors(Red)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Mother of Runes.Tapped = true

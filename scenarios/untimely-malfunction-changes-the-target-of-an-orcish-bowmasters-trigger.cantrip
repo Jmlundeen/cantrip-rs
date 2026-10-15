@@ -1,0 +1,45 @@
+# Untimely Malfunction's second mode on a triggered ability (CR 115.7a): Bot1's Orcish Bowmasters enters on turn 3 and its
+# trigger targets Bot2. In response Bot2 casts Untimely Malfunction on the trigger and, as its caster, picks the new
+# target: Bot1, the only other legal one. The 1 damage lands there (Bot1 19, Bot2 20) and the Bowmasters still amass.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Orcish Bowmasters
+Swamp x4
+Swamp x10
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Untimely Malfunction
+Mountain x4
+Mountain x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Orcish Bowmasters.Cast
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Hand.Untimely Malfunction.Cast
+Bot2.Modes(2)
+Bot2.Target(Stack.Orcish Bowmasters)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Life = 19
+Bot2.Life = 20
+Bot2.Graveyard = Untimely Malfunction
+Bot1.Battlefield.Orc Army.Counters.PlusOnePlusOne = 1

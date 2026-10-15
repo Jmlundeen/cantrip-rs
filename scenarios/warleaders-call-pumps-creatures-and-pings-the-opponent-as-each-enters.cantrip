@@ -1,0 +1,33 @@
+# Warleader's Call gives creatures you control +1/+1 and deals 1 damage to each opponent whenever one enters: Bot1
+# casts an Ornithopter (a 0/2 that becomes 1/3) and then a second, so Bot2 takes 2.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Warleader's Call
+Ornithopter
+Ornithopter
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Warleader's Call.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot2.Life = 18
+Bot1.Battlefield.Ornithopter#1.Power = 1
+Bot1.Battlefield.Ornithopter#1.Toughness = 3

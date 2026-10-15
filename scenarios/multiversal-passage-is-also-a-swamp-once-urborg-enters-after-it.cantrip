@@ -1,0 +1,25 @@
+# Urborg, Tomb of Yawgmoth entering after Multiversal Passage: Passage's older effect sets it to Island (CR 305.7),
+# then Urborg's newer one adds Swamp (CR 613.7, no dependency either way), so Passage is an Island and a Swamp and
+# taps for black as well as blue (CR 305.6).
+
+[Bot1 Deck]
+Multiversal Passage
+Plains
+Urborg, Tomb of Yawgmoth
+Plains x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Multiversal Passage.Play
+Bot1.Modes(Island)
+Bot1.Accept
+[T3 Bot1.Main1]
+Bot1.Hand.Urborg, Tomb of Yawgmoth.Play
+Bot1.Battlefield.Multiversal Passage.Activate(Ability: Add {B})
+
+[Expect]
+Turn = 3
+Bot1.Mana = {B}
+Bot1.Battlefield.Multiversal Passage.Subtypes = Island; Swamp

@@ -1,0 +1,56 @@
+# Tarmogoyf's size is the number of card types among cards in all graveyards (CR 604.3, 205.2a): 0/1 with empty graveyards; a Lightning Bolt in Bot1's graveyard (instant) makes it 1/2; the Island Bot2 discards to hand size on turn 2 (land) makes
+# it 2/3 - the graveyards of both players count; a second instant on turn 3 adds nothing (the type is counted once); and when Soul-Guide Lantern exiles the Island it is 1/2 again.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Mox Ruby
+Mox Jet
+Tarmogoyf
+Lightning Bolt
+Lightning Bolt
+Soul-Guide Lantern
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Tarmogoyf.Cast
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Tarmogoyf.Power = 0
+? Bot1.Battlefield.Tarmogoyf.Toughness = 1
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Tarmogoyf.Power = 1
+? Bot1.Battlefield.Tarmogoyf.Toughness = 2
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Tarmogoyf.Power = 2
+? Bot1.Battlefield.Tarmogoyf.Toughness = 3
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Tarmogoyf.Power = 2
+[T3 Bot1.Main2]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Soul-Guide Lantern.Cast
+Bot1.Pass
+Bot1.Target(Bot2.Graveyard.Island)
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Exile = Island
+Bot1.Battlefield.Tarmogoyf.Power = 1
+Bot1.Battlefield.Tarmogoyf.Toughness = 2

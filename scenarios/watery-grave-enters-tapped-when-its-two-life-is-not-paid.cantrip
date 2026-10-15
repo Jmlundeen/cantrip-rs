@@ -1,0 +1,16 @@
+# Watery Grave: declining to pay 2 life as it enters leaves Bot1 at 20 life with the land tapped.
+
+[Bot1 Deck]
+Watery Grave
+Plains x19
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Watery Grave.Play
+Bot1.Decline
+
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield.Watery Grave.Tapped = true

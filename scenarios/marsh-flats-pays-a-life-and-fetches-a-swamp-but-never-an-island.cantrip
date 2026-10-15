@@ -1,0 +1,26 @@
+# Marsh Flats: {T}, pay 1 life, sacrifice it - search for a Plains or Swamp card and put it onto the battlefield
+# untapped. An Island is in the library but is not a Plains or a Swamp, so it is not offered (the refusal), while the
+# Swamp is found and enters untapped.
+
+[Bot1 Deck]
+Marsh Flats
+Mountain x6
+Island
+Swamp
+Mountain x11
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Marsh Flats.Play
+Bot1.Battlefield.Marsh Flats.Activate
+! Bot1.Search(Island)
+Bot1.Search(Swamp)
+
+[Expect]
+Bot1.Life = 19
+Bot1.Graveyard = Marsh Flats
+Bot1.Battlefield = Swamp
+Bot1.Battlefield.Swamp.Tapped = false
+Bot1.Library.Count = 12

@@ -1,0 +1,47 @@
+# Screaming Nemesis: "Whenever this creature is dealt damage, it deals that much damage to any other target. If a player is
+# dealt damage this way, they can't gain life for the rest of the game" (CR 119.7). Bot2's Lightning Bolt kills it, and the
+# trigger (its last known information) deals 3 to Bot2 (17). Then Bot2's Swords to Plowshares on its own Llanowar Elves
+# would give it 1 life, but it can't gain any: it stays on 17.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Emerald
+Screaming Nemesis
+Forest x10
+
+[Bot2 Deck]
+Mountain
+Mox Emerald
+Mox Pearl
+Llanowar Elves
+Lightning Bolt
+Swords to Plowshares
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Screaming Nemesis.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Screaming Nemesis)
+Bot1.Target(Bot2)
+[T2 Bot2.Main2]
+? Bot2.Life = 17
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Bot2.Battlefield.Llanowar Elves)
+[T3 Bot1.Upkeep]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Graveyard = Screaming Nemesis
+Exile = Llanowar Elves

@@ -1,0 +1,6 @@
+{
+  "name": "Familiar's Ruse",
+  "manaCost": "{U}{U}",
+  "type": "Instant",
+  "oracleText": "As an additional cost to cast this spell, return a creature you control to its owner's hand.\nCounter target spell."
+}

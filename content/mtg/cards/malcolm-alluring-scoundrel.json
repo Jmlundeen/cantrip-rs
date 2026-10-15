@@ -1,0 +1,12 @@
+{
+  "name": "Malcolm, Alluring Scoundrel",
+  "manaCost": "{1}{U}",
+  "type": "Legendary Creature — Siren Pirate",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "Flash\nFlying\nWhenever Malcolm deals combat damage to a player, put a chorus counter on it. Draw a card, then discard a card. If there are four or more chorus counters on Malcolm, you may cast the discarded card without paying its mana cost.",
+  "keywords": [
+    "Flash",
+    "Flying"
+  ]
+}

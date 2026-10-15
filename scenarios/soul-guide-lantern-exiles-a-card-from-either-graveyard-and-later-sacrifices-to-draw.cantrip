@@ -1,0 +1,36 @@
+# "When this artifact enters, exile target card from a graveyard": Bot1's Lantern, cast on turn 3, exiles the Island that Bot2 discarded to hand size (its Lightning Bolt in Bot1's own graveyard was an equally legal target). On turn 5 "{1}, {T}, Sacrifice: Draw a card"
+# pays {1} with a Mox, sacrifices the Lantern and draws.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Soul-Guide Lantern
+Lightning Bolt
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Soul-Guide Lantern.Cast
+Bot1.Pass
+Bot1.Target(Bot2.Graveyard.Island)
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Soul-Guide Lantern.Activate(Ability: Draw a card)
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Exile.Count = 1
+Bot1.Graveyard = Soul-Guide Lantern; Lightning Bolt
+Bot1.Hand.Count = 6

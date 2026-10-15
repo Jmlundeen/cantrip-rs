@@ -1,0 +1,43 @@
+# Animated until end of turn, Creeping Tar Pit is a 3/2 Elemental creature that is still a land (CR 205.1b, 613.1d;
+# the dump has no color key, so the colors are not asserted): lethal damage from Bot2's Lightning Bolt destroys it (CR 704.5g) and it goes to the graveyard
+# as a land card, losing the animation with it.
+
+[Bot1 Deck]
+Creeping Tar Pit
+Mox Jet
+Mox Sapphire
+Mox Pearl
+Island x3
+Island x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x5
+Mountain x10
+
+[Actions]
+Bot1.Hand.Creeping Tar Pit.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Creeping Tar Pit.Activate(Ability: Until end of turn)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Creeping Tar Pit.Types = Land; Creature
+? Bot1.Battlefield.Creeping Tar Pit.Subtypes = Elemental
+? Bot1.Battlefield.Creeping Tar Pit.Power = 3
+? Bot1.Battlefield.Creeping Tar Pit.Toughness = 2
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Creeping Tar Pit)
+[T4 Bot2.Upkeep]
+
+[Expect]
+Bot1.Graveyard = Creeping Tar Pit
+Bot2.Graveyard = Lightning Bolt
+Bot1.Battlefield.Count = 3

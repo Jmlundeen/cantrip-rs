@@ -1,0 +1,33 @@
+# Consider is an instant. Bot1 casts it in Bot2's upkeep and surveils Lightning Bolt into its graveyard, drawing
+# Counterspell instead. On its own turn it casts the second and keeps the Island on top, so it draws that Island.
+
+[Bot1 Deck]
+Island
+Consider
+Consider
+Island x4
+Lightning Bolt
+Counterspell
+Mana Leak
+Island x10
+
+[Bot2 Deck]
+Swamp x14
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Upkeep]
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Consider.Cast
+Bot1.Arrange(| Lightning Bolt)
+? Bot1.Hand = Consider; Island; Island; Island; Island; Counterspell
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Consider.Cast
+Bot1.Arrange(Island)
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Consider; Consider; Lightning Bolt
+Bot1.Hand = Counterspell; Island; Island; Island; Island; Mana Leak
+Bot1.Library.Count = 9

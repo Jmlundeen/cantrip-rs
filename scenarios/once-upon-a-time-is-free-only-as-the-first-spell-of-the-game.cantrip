@@ -1,0 +1,30 @@
+# Once Upon a Time is Bot1's first spell of the game, so it is cast without paying its mana cost with no land in play. It
+# looks at the top five cards: only Ornithopter is a creature or land card, so it goes to the hand and the four Lightning
+# Bolts go to the bottom. A second Once Upon a Time is no longer free.
+
+[Bot1 Deck]
+Once Upon a Time
+Once Upon a Time
+Island x5
+Ornithopter
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Once Upon a Time.Cast(Ability: Without)
+Bot1.Arrange(Ornithopter | Lightning Bolt; Lightning Bolt; Lightning Bolt; Lightning Bolt)
+Bot1.Pass
+! Bot1.Hand.Once Upon a Time.Cast(Ability: Without)
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Graveyard = Once Upon a Time
+Bot1.Hand = Once Upon a Time; Island; Island; Island; Island; Island; Ornithopter
+Bot1.Library.Count = 14

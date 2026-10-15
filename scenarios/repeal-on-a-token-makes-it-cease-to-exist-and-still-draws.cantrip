@@ -1,0 +1,41 @@
+# A token returned to its owner's hand ceases to exist (CR 111.7, 704.5d) rather than being a card in the hand, and
+# Repeal still draws (the draw is not conditioned on the permanent). A Lingering Souls Spirit has mana value 0, so
+# Repeal with X = 0 takes it: one Spirit of the two is left, Bot1's hand gains only the drawn card.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Lingering Souls
+Island
+Repeal
+Island
+Island x3
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Lingering Souls.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Repeal.Cast(X: 0)
+Bot1.Target(Spirit)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Count = 5
+Bot1.Hand.Count = 3
+Bot1.Graveyard = Repeal; Lingering Souls
+Exile.Count = 0

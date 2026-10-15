@@ -1,0 +1,33 @@
+[Bot1 Deck]
+Island
+Black Lotus
+True-Name Nemesis
+Ornithopter
+Island
+Island
+Island
+Island x12
+
+[Bot2 Deck]
+Ornithopter
+Island x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.True-Name Nemesis.Cast
+Bot1.ChoosePlayer(Bot2)
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+? Bot1.Battlefield.True-Name Nemesis.ChosenPlayer = 2
+Bot1.Attack(True-Name Nemesis; Ornithopter)
+! Bot2.Block(Ornithopter > True-Name Nemesis)
+Bot2.Block(Ornithopter > Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 17

@@ -1,0 +1,45 @@
+# Jace, the Mind Sculptor, "-12: Exile all cards from target player's library, then that player shuffles their hand into
+# their library": Jace is cast on turn 1 with 3 loyalty and uses +2 on turns 1, 3, 5, 7 and 9 (13 loyalty), then the -12 on
+# turn 11 at Bot2. Bot2's library (eighteen Islands) is exiled, its seven-card hand becomes its library, and Jace is left
+# with 1 loyalty.
+
+[Bot1 Deck]
+Mox Sapphire
+Black Lotus
+Jace, the Mind Sculptor
+Island x4
+Island x20
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Jace, the Mind Sculptor.Cast
+Bot1.Pass
+Bot1.Battlefield.Jace, the Mind Sculptor.Activate(Bot2; Ability: #1)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Jace, the Mind Sculptor.Activate(Bot2; Ability: #1)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Jace, the Mind Sculptor.Activate(Bot2; Ability: #1)
+[T7 Bot1.Main1]
+Bot1.Battlefield.Jace, the Mind Sculptor.Activate(Bot2; Ability: #1)
+[T9 Bot1.Main1]
+Bot1.Battlefield.Jace, the Mind Sculptor.Activate(Bot2; Ability: #1)
+[T11 Bot1.Main1]
+Bot1.Battlefield.Jace, the Mind Sculptor.Activate(Bot2; Ability: #4)
+[T11 Bot1.Main2]
+
+[Expect]
+Turn = 11
+Stack.Count = 0
+Bot1.Battlefield.Jace, the Mind Sculptor.Counters.Loyalty = 1
+Exile.Count = 18
+Bot2.Hand.Count = 0
+Bot2.Library.Count = 7
+Bot2.Graveyard.Count = 5

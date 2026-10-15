@@ -1,0 +1,35 @@
+# Haze of Rage with buyback ({1}{R} plus {2}) is cast on turn 1 after four Moxen and an Ornithopter: storm copies it five
+# times, so the Ornithopter gets +1/+0 six times (0 to 6 power), and only the original, not a copy, returns to Bot1's
+# hand as it resolves.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Ornithopter
+Haze of Rage
+Island
+Island x13
+
+[Bot2 Deck]
+Forest x22
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Haze of Rage.Cast(Kicked: 1)
+[Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Hand = Haze of Rage; Island
+Bot1.Graveyard =
+Bot1.Battlefield.Ornithopter.Power = 6

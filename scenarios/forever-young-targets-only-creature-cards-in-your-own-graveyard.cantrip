@@ -1,0 +1,43 @@
+# "Target creature cards from your graveyard": Bot1's graveyard holds an Ornithopter and a Lightning Bolt (Faithless Looting's discards), and Bot2's holds an Elvish Mystic (its
+# newest card, discarded to hand size). Neither the instant nor the opponent's creature can be targeted (the refusals); the Ornithopter can (the positive control), and
+# goes on top of the library, then back to hand with the draw.
+
+[Bot1 Deck]
+Forever Young
+Faithless Looting
+Mox Jet
+Mox Ruby
+Ornithopter
+Lightning Bolt
+Island
+Island x8
+
+[Bot2 Deck]
+Island x7
+Elvish Mystic
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Ornithopter; Lightning Bolt)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Forever Young.Cast
+! Bot1.Target(Lightning Bolt)
+! Bot1.Target(Bot2.Graveyard.Elvish Mystic)
+Bot1.Target(Ornithopter)
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Forever Young; Faithless Looting; Lightning Bolt
+Bot2.Graveyard = Elvish Mystic
+Bot1.Hand = Island; Island; Island; Ornithopter

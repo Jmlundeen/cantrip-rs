@@ -1,0 +1,35 @@
+# Improvise (CR 702.126a): Reverse Engineer costs {3}{U}{U}. Two Mox Sapphires make the {U}{U}; the three Ornithopters,
+# artifacts that did not tap for mana, are tapped after the mana is made and each pays {1} of the {3}. The Moxen are
+# artifacts too, but tapped already, so they are not offered.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Ornithopter
+Ornithopter
+Ornithopter
+Reverse Engineer
+Island
+Island x14
+
+[Bot2 Deck]
+Forest x22
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Reverse Engineer.Cast(Convoke: Ornithopter, Ornithopter, Ornithopter)
+[Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Hand.Count = 4
+Bot1.Battlefield.Ornithopter#1.Tapped = true
+Bot1.Battlefield.Ornithopter#2.Tapped = true
+Bot1.Battlefield.Ornithopter#3.Tapped = true
+Bot1.Mana =

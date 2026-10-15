@@ -1,0 +1,25 @@
+# Only two cards are left when Satyr Wayfinder enters (a Forest and a Lightning Bolt): it reveals both, Bot1 takes the Forest and the
+# Bolt goes to the graveyard, even though four were to be revealed.
+
+[Bot1 Deck]
+Black Lotus
+Satyr Wayfinder
+Forest x5
+Forest
+Lightning Bolt
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Satyr Wayfinder.Cast
+Bot1.Pass
+Bot1.Arrange(Forest | Lightning Bolt)
+[Expect]
+Result = InProgress
+Bot1.Library.Count = 0
+Bot1.Hand.Count = 6
+Bot1.Graveyard = Lightning Bolt; Black Lotus

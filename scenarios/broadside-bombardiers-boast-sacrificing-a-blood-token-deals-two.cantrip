@@ -1,0 +1,42 @@
+# Bloodtithe Harvester ({B}{R}) arrives on turn 3 with its Blood token; Broadside Bombardiers attacks on turn 5 and
+# boasts, sacrificing the Blood token. A token's mana value is 0 (CR 202.3), and the token has ceased to exist by the
+# time the ability resolves, so the damage is 2 + 0: Bot2 takes 2 from the boast and 2 from combat.
+
+[Bot1 Deck]
+Swamp
+Mountain
+Bloodtithe Harvester
+Broadside Bombardiers
+Mountain
+Mountain x3
+Mountain x6
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Bloodtithe Harvester.Cast
+Bot1.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Broadside Bombardiers.Cast
+Bot1.Pass
+Bot1.Attack(Broadside Bombardiers > Bot2)
+Bot1.Battlefield.Broadside Bombardiers.Activate(Bot2)
+Bot1.Choose(Blood Token)
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot1.Battlefield.Bloodtithe Harvester.Types = Creature
+Bot1.Graveyard.Count = 0

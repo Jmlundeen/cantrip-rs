@@ -1,0 +1,39 @@
+# Turn 1: Forest after the Tracker -> Clue. Turn 3: a second Forest -> second Clue; one Clue is
+# sacrificed to its own ability, paid by two Moxes, and sacrificing a Clue puts a +1/+1 counter on the Tracker (3/2 -> 4/3). The other Clue stays.
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Mox Ruby
+Tireless Tracker
+Forest
+Forest
+Forest
+Island x8
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Tireless Tracker.Cast
+Bot2.Pass
+Bot1.Hand.Forest.Play
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Clue Token.Activate
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Tireless Tracker.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Tireless Tracker.Power = 4
+Bot1.Battlefield.Tireless Tracker.Toughness = 3
+Bot1.Battlefield.Count = 7

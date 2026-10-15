@@ -1,0 +1,38 @@
+# "Each card you've drawn this turn": on turn 4 Bot2 draws for the turn and takes three more with Ancestral Recall, but
+# Bot1 has drawn only the one card Fists gives it, so Ornithopter is a 1/2 (the opponent's draws do not count; Bot1
+# drew nothing in Bot2's turn).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Ornithopter
+Fists of Flame
+Mountain
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Island
+Island
+Ancestral Recall
+Island x13
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Ancestral Recall.Cast(Bot2)
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Fists of Flame.Cast(Ornithopter)
+
+[Expect]
+Bot2.Hand.Count = 9
+Bot1.Battlefield.Ornithopter.Power = 1
+Bot1.Battlefield.Ornithopter.Toughness = 2

@@ -1,0 +1,8 @@
+{
+  "name": "Palace Jailer",
+  "manaCost": "{2}{W}{W}",
+  "type": "Creature — Human Soldier",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "When this creature enters, you become the monarch.\nWhen this creature enters, exile target creature an opponent controls until an opponent becomes the monarch."
+}

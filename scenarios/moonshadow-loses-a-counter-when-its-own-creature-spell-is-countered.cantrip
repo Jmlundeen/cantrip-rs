@@ -1,0 +1,36 @@
+# "From anywhere" includes the stack (CR 400.7): Bot1's Elvish Mystic is countered by Bot2's Counterspell and the card goes
+# to Bot1's graveyard, so Moonshadow, still a 1/1 with six counters, loses one and is a 2/2.
+
+[Bot1 Deck]
+Swamp
+Mox Emerald
+Moonshadow
+Elvish Mystic
+Swamp x12
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Island x13
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Moonshadow.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Elvish Mystic)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Elvish Mystic
+Bot1.Battlefield.Moonshadow.Counters.MinusOneMinusOne = 5
+Bot1.Battlefield.Moonshadow.Power = 2

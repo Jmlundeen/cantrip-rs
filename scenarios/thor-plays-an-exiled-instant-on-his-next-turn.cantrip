@@ -1,0 +1,36 @@
+# Thor enters on turn one after Lightning Bolt has reached the graveyard. The permission survives
+# the first cleanup and the opponent's turn, allowing the Bolt to be cast during
+# the end step of Thor's next turn, the last priority window before it expires.
+
+[Bot1 Deck]
+Mountain
+Lightning Bolt
+Black Lotus
+Black Lotus
+Thor, God of Thunder
+Island
+Island
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Thor, God of Thunder.Cast
+[T3 Bot1.End]
+? Exile = Lightning Bolt
+Bot1.Battlefield.Mountain.Activate
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+Bot1.Target(Bot2)
+
+[Expect]
+Turn = 3
+Bot2.Life = 13
+Exile.Count = 0

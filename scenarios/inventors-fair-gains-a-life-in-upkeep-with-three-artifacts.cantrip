@@ -1,0 +1,28 @@
+# Inventors' Fair: with three artifacts (three Moxen) its controller gains 1 life at the beginning of their upkeep, and
+# not in the opponent's.
+
+[Bot1 Deck]
+Inventors' Fair
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Island x3
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Inventors' Fair.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+? Bot1.Life = 20
+[T3 Bot1.Main1]
+
+[Expect]
+Turn = 3
+Bot1.Life = 21

@@ -1,0 +1,31 @@
+# The alternative cost "sacrifice a Mountain" needs a permanent with the Mountain subtype (CR 205.3i): on turn 3, with only an
+# Island, the cost is not offered (the refusal; Bot2's Llanowar Elves is a legal target); after Bot1 plays Volcanic Island - a
+# Mountain by type - the same cast sacrifices it and 5 damage kills the Elves (the positive control).
+
+[Bot1 Deck]
+Island
+Volcanic Island
+Mine Collapse
+Island x4
+Island x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x12
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+! Bot1.Hand.Mine Collapse.Cast(Llanowar Elves; Ability: Sacrifice)
+Bot1.Hand.Volcanic Island.Play
+Bot1.Hand.Mine Collapse.Cast(Llanowar Elves; Ability: Sacrifice)
+
+[Expect]
+Bot2.Graveyard = Llanowar Elves
+Bot1.Graveyard = Mine Collapse; Volcanic Island
+Bot1.Battlefield = Island

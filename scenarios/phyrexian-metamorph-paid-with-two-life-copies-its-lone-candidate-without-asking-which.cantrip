@@ -1,0 +1,27 @@
+# {U/P} can be paid with 2 life instead of {U}: Black Lotus (three white) pays the generic {3} and Bot1 pays 2 life for the
+# phyrexian symbol (20 -> 18). Ornithopter is the only artifact or creature on the battlefield, so the copy is taken without a
+# which-one question (CR 608.2d: a choice, not a target); the Metamorph enters as an Ornithopter, a 0/2 flyer, still an artifact creature.
+
+[Bot1 Deck]
+Black Lotus
+Ornithopter
+Phyrexian Metamorph
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Phyrexian Metamorph.Cast
+Bot1.Modes(1)
+Bot1.Accept
+! Bot1.Target
+[Bot1.Main2]
+
+[Expect]
+Bot1.Life = 18
+Bot1.Battlefield = Ornithopter; Ornithopter
+Bot1.Battlefield.Ornithopter#2.Keywords = Flying

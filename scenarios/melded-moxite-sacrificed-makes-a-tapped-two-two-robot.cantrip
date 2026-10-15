@@ -1,0 +1,39 @@
+# Melded Moxite: "{3}, Sacrifice this artifact: Create a tapped 2/2 colorless Robot artifact creature token." The
+# Moxite is sacrificed as a cost; the token enters tapped, a colorless artifact creature Robot.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Melded Moxite
+Mountain
+Island
+Plains
+Plains
+Plains x15
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Melded Moxite.Cast
+Bot1.Choose()
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Melded Moxite.Activate
+[Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Melded Moxite
+Bot1.Battlefield.Robot.Tapped = true
+Bot1.Battlefield.Robot.Power = 2
+Bot1.Battlefield.Robot.Toughness = 2
+Bot1.Battlefield.Robot.Types = Artifact; Creature
+Bot1.Battlefield.Robot.Subtypes = Robot

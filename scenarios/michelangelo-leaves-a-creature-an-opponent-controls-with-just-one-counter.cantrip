@@ -1,0 +1,41 @@
+# "a creature you control": Bot1's Mutagen puts its counter on Bot2's Guerrilla Gorilla, which Michelangelo's replacement
+# does not touch, so it gets exactly one. (The positive control is the sibling scenario, where a creature Bot1
+# controls gets two.)
+
+[Bot1 Deck]
+Black Lotus
+Michelangelo, Weirdness to 11
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Black Lotus
+Guerrilla Gorilla
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Michelangelo, Weirdness to 11.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Guerrilla Gorilla.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mutagen Token.Activate(Bot2.Battlefield.Guerrilla Gorilla)
+Bot1.Battlefield.Forest.Activate
+
+[Expect]
+Bot2.Battlefield.Guerrilla Gorilla.Counters.PlusOnePlusOne = 1
+Bot2.Battlefield.Guerrilla Gorilla.Power = 3
+Bot1.Battlefield.Michelangelo, Weirdness to 11.Counters.PlusOnePlusOne = (absent)

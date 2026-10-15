@@ -1,0 +1,40 @@
+# "Destroy target creature, enchantment, or planeswalker": on turn 3 Bot2's only permanents are a Forest, a Mox Emerald and a
+# Sol Ring (artifacts and a land), none of them a legal target, so Get Lost is not offered although Bot1 could pay {1}{W} with a
+# Plains and Mox Pearl. After Bot2's Fastbond (an enchantment) arrives on turn 4, Get Lost is cast on it on turn 5: it is
+# destroyed and its controller, Bot2, gets two Map tokens.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Get Lost
+Plains x14
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Sol Ring
+Fastbond
+Forest x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+! Bot1.Hand.Get Lost.Cast
+[T4 Bot2.Main1]
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Fastbond.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Get Lost.Cast(Bot2.Battlefield.Fastbond)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Fastbond
+Bot2.Battlefield = Forest; Mox Emerald; Sol Ring; Map Token; Map Token

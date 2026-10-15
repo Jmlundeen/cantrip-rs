@@ -1,0 +1,26 @@
+# "This land enters tapped unless you control a Forest": the first Woodland enters tapped on turn 1 (nothing else in play); on
+# turn 3 a Forest arrives, and the second Woodland on turn 5 enters untapped and taps for {G} at once (the positive control).
+
+[Bot1 Deck]
+Shifting Woodland
+Shifting Woodland
+Forest
+Plains x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Shifting Woodland.Play
+? Bot1.Battlefield.Shifting Woodland.Tapped = true
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Shifting Woodland.Play
+? Bot1.Battlefield.Shifting Woodland#2.Tapped = false
+Bot1.Battlefield.Shifting Woodland#2.Activate
+? Bot1.Mana = {G}
+
+[Expect]
+Turn = 5
+Bot1.Mana = {G}

@@ -1,0 +1,28 @@
+# Badgermole Cub's earthbend 1 makes the Forest a 1/1 haste creature land; tapping that creature for mana adds an additional {G} at once (CR 605.1b), so the pool holds the {G} the Black Lotus left over and {G}{G} more.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Badgermole Cub
+Forest x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Badgermole Cub.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Pass
+Bot1.Pass
+? Bot1.Mana = {G}
+Bot1.Battlefield.Forest.Activate
+? Bot1.Mana = {G}{G}{G}
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Forest.Power = 1
+Bot1.Battlefield.Forest.Types = Land; Creature
+Bot1.Battlefield.Forest.Keywords = Haste

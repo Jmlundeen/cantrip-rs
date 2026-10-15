@@ -1,0 +1,38 @@
+# Ward {1}: the opponent's only Mountain pays for the Bolt, so it is countered unless they can pay {1} more.
+
+[Bot1 Deck]
+Forest
+Forest
+Basking Rootwalla
+Lavaspur Boots
+Forest
+Forest
+Mountain
+Forest x13
+
+[Bot2 Deck]
+Mountain
+Mountain
+Lightning Bolt
+Mountain x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Lavaspur Boots.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Basking Rootwalla.Cast
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Lavaspur Boots.Activate(Basking Rootwalla)
+[T3 Bot1.Main2]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Basking Rootwalla)
+
+[Expect]
+Bot1.Battlefield.Basking Rootwalla.Damage = 0
+Bot2.Graveyard = Lightning Bolt
+Stack.Count = 0

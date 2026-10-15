@@ -1,0 +1,25 @@
+# Rakdos Carnarium enters tapped and, when it enters, returns a land its controller chooses (not a target) to hand. Bot1
+# returns the Swamp; the Carnarium stays, and on the next turn taps for {B}{R}.
+
+[Bot1 Deck]
+Swamp
+Rakdos Carnarium
+Swamp x13
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Rakdos Carnarium.Play
+Bot1.Choose(Swamp)
+? Bot1.Battlefield = Rakdos Carnarium
+[T5 Bot1.Main1]
+Bot1.Battlefield.Rakdos Carnarium.Activate
+? Bot1.Mana = {B}{R}
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Rakdos Carnarium
+Bot1.Battlefield.Rakdos Carnarium.Tapped = true

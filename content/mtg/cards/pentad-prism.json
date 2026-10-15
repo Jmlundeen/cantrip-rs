@@ -1,0 +1,6 @@
+{
+  "name": "Pentad Prism",
+  "manaCost": "{2}",
+  "type": "Artifact",
+  "oracleText": "Sunburst (This artifact enters with a charge counter on it for each color of mana spent to cast it.)\nRemove a charge counter from this artifact: Add one mana of any color."
+}

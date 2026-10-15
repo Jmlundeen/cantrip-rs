@@ -1,0 +1,42 @@
+# Underworld Breach gives each nonland card in Bot1's graveyard escape: its mana cost plus exiling three other cards. With
+# two Lotuses and two Lightning Bolts in the graveyard, a Bolt escapes for {R}, exiling the other three, and Bot2 takes
+# the third Bolt (20 - 3 - 3 - 3 = 11).
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Black Lotus
+Lightning Bolt
+Lightning Bolt
+Underworld Breach
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Underworld Breach.Cast
+Bot1.Pass
+Bot1.Graveyard.Lightning Bolt.Cast(Bot2; Ability: Escape)
+Bot1.Choose(Black Lotus; Black Lotus; Lightning Bolt)
+Bot1.Pass
+[Bot1.Main1]
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot2.Life = 11
+Exile.Count = 3
+Bot1.Graveyard = Lightning Bolt

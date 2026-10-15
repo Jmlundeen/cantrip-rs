@@ -1,0 +1,6 @@
+{
+  "name": "Mox Diamond",
+  "manaCost": "{0}",
+  "type": "Artifact",
+  "oracleText": "If this artifact would enter, you may discard a land card instead. If you do, put this artifact onto the battlefield. If you don't, put it into its owner's graveyard.\n{T}: Add one mana of any color."
+}

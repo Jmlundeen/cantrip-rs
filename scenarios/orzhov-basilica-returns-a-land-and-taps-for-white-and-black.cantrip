@@ -1,0 +1,25 @@
+# Orzhov Basilica enters tapped and, as it enters, returns a land its controller chooses to its owner's hand: Bot1
+# sends the Plains back and keeps the Basilica. On Bot1's next turn the untapped Basilica taps for {W}{B}.
+
+[Bot1 Deck]
+Plains
+Orzhov Basilica
+Plains x5
+Plains x10
+
+[Bot2 Deck]
+Swamp x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Orzhov Basilica.Play
+Bot1.Choose(Plains)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Orzhov Basilica.Activate
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Orzhov Basilica
+Bot1.Battlefield.Orzhov Basilica.Tapped = true
+Bot1.Mana = {W}{B}

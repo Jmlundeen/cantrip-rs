@@ -1,0 +1,130 @@
+use cantrip_api::*;
+use cantrip_mechanics::{ninjutsu::ninjutsu, surveil, targets};
+use cantrip_oracle as oracle;
+
+// --- "During your turn, as long as Kaito has one or more loyalty counters on him, he's a 3/4 Ninja creature and has
+// --- hexproof" (CR 613): three effects, one per layer, each asking the same question afresh on every pass.
+
+/// His controller's turn (CR 500.1), and a loyalty counter on him (CR 122.1).
+fn ninja_form(view: &dyn LayerQuery, source: ObjectId, affected: ObjectId) -> bool {
+    let state = view.state();
+    source == affected && state.turn.active == state.obj(source).controller && state.obj(source).counters(CounterKind::Loyalty) > 0
+}
+
+fn affects(view: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Chars) -> bool {
+    ninja_form(view, source, affected)
+}
+
+/// Layer 4: a replacement of his card types, not an addition (CR 613.1d): he stops being a planeswalker, and the
+/// subtype Kaito goes with it. He stays legendary: a supertype is not a card type.
+fn become_a_ninja_creature(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
+    chars.types = TypeSet::of(&[CardType::Creature]);
+    chars.subtypes = SubtypeSet::of(&[Subtype::Ninja]);
+}
+
+/// Layer 6: hexproof.
+fn hexproof(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
+    chars.keywords = chars.keywords.with(Keyword::Hexproof);
+}
+
+/// Layer 7b: a base power and toughness on a card that has none printed.
+fn three_four(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
+    chars.power = Some(3);
+    chars.toughness = Some(4);
+}
+
+// --- The abilities ------------------------------------------------------------------------------------------------
+
+fn emblem(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    cantrip_mechanics::tokens::create_emblem(g, item.controller, &EMBLEM);
+    Ok(())
+}
+
+/// 0: "Surveil 2. Then draw a card for each opponent who lost life this turn" (CR 119.3): losing, not the net, so an
+/// opponent who lost 1 and gained 2 still counts.
+fn surveil_then_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    surveil(g, item.controller, item.object, 2)?;
+    let bleeding = cantrip_mechanics::history::opponents_who_lost_life_this_turn(g, item.controller) as u32;
+    if bleeding > 0 {
+        g.draw(item.controller, bleeding);
+    }
+    Ok(())
+}
+
+/// -2: tap target creature, then put two stun counters on it (a creature already tapped still gets the counters).
+fn tap_and_stun(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if let Some(creature) = targets::object(g, item, 0) {
+        g.tap(creature);
+        g.add_counters(creature, CounterKind::Stun, 2);
+    }
+    Ok(())
+}
+
+// --- The emblem ---------------------------------------------------------------------------------------------------
+
+/// "Ninjas you control get +1/+1" (layer 7c), from the command zone (CR 114.4): every Ninja creature its owner
+/// controls, Kaito himself among them while his own static ability makes him one.
+fn ninjas_you_control(view: &dyn LayerQuery, source: ObjectId, affected: ObjectId, chars: &Chars) -> bool {
+    view.state().obj(affected).controller == view.state().obj(source).controller
+        && chars.is(CardType::Creature)
+        && chars.has_subtype(Subtype::Ninja)
+}
+
+fn plus_one_plus_one(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
+    // CR 613.4b: a modifier only reaches something that has power and toughness to modify.
+    chars.power = chars.power.map(|v| v + 1);
+    chars.toughness = chars.toughness.map(|v| v + 1);
+}
+
+pub static EMBLEM: CardDef = CardDef {
+    name: "Kaito, Bane of Nightmares emblem",
+    has_cost: false,
+    statics: &[StaticDef {
+        text: "Ninjas you control get +1/+1.",
+        layer: Layer::PtModify,
+        affects: ninjas_you_control,
+        apply: plus_one_plus_one,
+        ..StaticDef::BLANK
+    }],
+    text: "Ninjas you control get +1/+1.",
+    ..CardDef::BLANK
+};
+
+pub static CARD: CardDef = CardDef {
+    abilities: &[
+        ninjutsu(
+            mana(1, 0, 1, 1, 0, 0),
+            "Ninjutsu {1}{U}{B} ({1}{U}{B}, Return an unblocked attacker you control to hand: Put this card onto the battlefield from your hand tapped and attacking.)",
+        ),
+        AbilityDef::Activated(ActivatedDef {
+            text: "+1: You get an emblem with \"Ninjas you control get +1/+1.\"",
+            cost: Cost { loyalty: Some(1), ..Cost::NONE },
+            timing: Timing::Sorcery,
+            effect: emblem,
+            ..ActivatedDef::BLANK
+        }),
+        AbilityDef::Activated(ActivatedDef {
+            text: "0: Surveil 2. Then draw a card for each opponent who lost life this turn.",
+            cost: Cost { loyalty: Some(0), ..Cost::NONE },
+            timing: Timing::Sorcery,
+            effect: surveil_then_draw,
+            ..ActivatedDef::BLANK
+        }),
+        AbilityDef::Activated(ActivatedDef {
+            text: "\u{2212}2: Tap target creature. Put two stun counters on it.",
+            cost: Cost { loyalty: Some(-2), ..Cost::NONE },
+            timing: Timing::Sorcery,
+            targets: &[targets::CREATURE],
+            effect: tap_and_stun,
+            ..ActivatedDef::BLANK
+        }),
+    ],
+    statics: &[
+        StaticDef { text: "During your turn, as long as Kaito has one or more loyalty counters on him, he's a Ninja creature.", layer: Layer::Type, affects, apply: become_a_ninja_creature, ..StaticDef::BLANK },
+        StaticDef { text: "During your turn, as long as Kaito has one or more loyalty counters on him, he has hexproof.", layer: Layer::Ability, affects, apply: hexproof, ..StaticDef::BLANK },
+        StaticDef { text: "During your turn, as long as Kaito has one or more loyalty counters on him, he's a 3/4.", layer: Layer::PtSet, affects, apply: three_four, ..StaticDef::BLANK },
+    ],
+    ..oracle::KAITO_BANE_OF_NIGHTMARES
+};
+
+pub static EXTRA: &[&CardDef] = &[&EMBLEM];

@@ -1,0 +1,37 @@
+# The discount is for black creature spells only; the drain is for any creature spell you cast. Bot1 casts Sylvan Caryatid (green,
+# {1}{G}) with Mox Emerald and Mox Jet: both are spent (a discount would leave mana floating), and the cast still makes Bot2
+# lose 1 life and Bot1 gain 1.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Bontu's Monument
+Mox Emerald
+Mox Jet
+Sylvan Caryatid
+Plains x13
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Bontu's Monument.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sylvan Caryatid.Cast
+? Bot1.Mana = 
+[Bot1.Main2]
+
+[Expect]
+Bot1.Life = 21
+Bot2.Life = 19
+Bot1.Battlefield.Sylvan Caryatid.Types = Creature

@@ -1,0 +1,31 @@
+# Preordain: scry 2, then draw a card. Lightning Bolt and Black Lotus are the top two cards; Bolt goes to the bottom and
+# Lotus stays on top, so the draw is Black Lotus and the library is left Counterspell, Island, Lightning Bolt.
+
+[Bot1 Deck]
+Island
+Preordain
+Island
+Island
+Island
+Island
+Island
+Lightning Bolt
+Black Lotus
+Counterspell
+Island
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Preordain.Cast
+Bot1.Arrange(Black Lotus | Lightning Bolt)
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Graveyard = Preordain
+Bot1.Hand = Island; Island; Island; Island; Island; Black Lotus
+Bot1.Library = Counterspell; Island; Lightning Bolt

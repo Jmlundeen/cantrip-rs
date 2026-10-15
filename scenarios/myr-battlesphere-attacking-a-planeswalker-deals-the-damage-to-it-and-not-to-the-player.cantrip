@@ -1,0 +1,51 @@
+# Attacking Karn, the trigger's X damage goes to the planeswalker Myr Battlesphere is attacking, not to the player
+# who controls it ("the player or planeswalker it's attacking"): Karn drops from 5 to 2 loyalty before combat damage,
+# and Bot2 stays at 20.
+
+[Bot1 Deck]
+Plains
+Sol Ring
+Black Lotus
+Plains
+Myr Battlesphere
+Plains x20
+
+[Bot2 Deck]
+Island
+Sol Ring
+Black Lotus
+Karn, Scion of Urza
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Myr Battlesphere.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Hand.Karn, Scion of Urza.Cast
+[T5 Bot1.Main1]
+Bot1.Attack(Myr Battlesphere > Bot2.Battlefield.Karn, Scion of Urza)
+Bot1.Choose(Myr#1; Myr#2; Myr#3)
+? Bot2.Battlefield.Karn, Scion of Urza.Counters.Loyalty = 2
+? Bot2.Life = 20
+[Bot1.Main2]
+[Expect]
+Bot2.Life = 20
+Bot2.Graveyard = Karn, Scion of Urza

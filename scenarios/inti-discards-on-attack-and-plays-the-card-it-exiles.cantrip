@@ -1,0 +1,46 @@
+# Inti, Seneschal of the Sun is cast on turn 3. On turn 5 it attacks alone and "whenever you attack" offers the
+# optional discard as it resolves; a Mountain pays for it. Two things follow at once: the reflexive "when you do"
+# puts a +1/+1 counter on the only attacking creature and gives it trample, and "whenever you discard one or more
+# cards" exiles the top card of the library, which Bot1 then casts out of exile in its second main phase.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Inti, Seneschal of the Sun
+Mountain
+Mountain
+Mountain
+Mountain
+Mountain
+Mountain
+Lightning Bolt
+Mountain x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Inti, Seneschal of the Sun.Cast
+[T5 Bot1.Main1]
+Bot1.Attack(Inti, Seneschal of the Sun > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Mountain)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Inti, Seneschal of the Sun.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Inti, Seneschal of the Sun.Keywords = Trample
+? Bot1.Battlefield.Inti, Seneschal of the Sun.Power = 3
+? Exile = Lightning Bolt
+? Bot2.Life = 17
+Bot1.Battlefield.Mountain.Activate
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+
+[Expect]
+Bot2.Life = 14
+Exile.Count = 0
+Bot1.Graveyard = Lightning Bolt; Mountain

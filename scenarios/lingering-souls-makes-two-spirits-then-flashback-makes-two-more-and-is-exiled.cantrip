@@ -1,0 +1,49 @@
+# Lingering Souls makes two 1/1 white Spirit creature tokens with flying; cast from the graveyard for its flashback cost
+# {1}{B} it makes two more and is exiled afterwards (CR 702.34a). Flashback is still a sorcery: it is refused in Bot2's
+# turn 2 and cast on turn 3 (the control). Once exiled it is not in the graveyard to be cast again.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Lingering Souls
+Swamp
+Swamp
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Lingering Souls.Cast
+Bot1.Pass
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Spirit#1.Keywords = Flying
+? Bot1.Battlefield.Spirit#2.Power = 1
+? Bot1.Battlefield.Spirit#2.Types = Creature
+? Bot1.Graveyard = Lingering Souls
+[T2 Bot2.Main1]
+! Bot1.Graveyard.Lingering Souls.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Graveyard.Lingering Souls.Cast(Ability: Flashback)
+Bot1.Pass
+[T3 Bot1.Main2]
+! Bot1.Exile.Lingering Souls.Cast
+! Bot1.Graveyard.Lingering Souls.Cast
+
+[Expect]
+Exile = Lingering Souls
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Spirit#4.Keywords = Flying

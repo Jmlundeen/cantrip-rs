@@ -1,0 +1,13 @@
+{
+  "name": "Blightsteel Colossus",
+  "manaCost": "{12}",
+  "type": "Artifact Creature — Phyrexian Golem",
+  "power": 11,
+  "toughness": 11,
+  "oracleText": "Trample, infect, indestructible\nIf Blightsteel Colossus would be put into a graveyard from anywhere, reveal Blightsteel Colossus and shuffle it into its owner's library instead.",
+  "keywords": [
+    "Trample",
+    "Infect",
+    "Indestructible"
+  ]
+}

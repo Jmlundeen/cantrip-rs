@@ -1,0 +1,51 @@
+# Three Ornithopters attack on turn 3 (a fourth is cast that turn, so Bot1's hand is empty): the enchantment triggers
+# once for each attacking creature (CR 508.3a) and exiles the top three cards of the library face down. In the second
+# main phase the enchantment is sacrificed with an empty hand - "discard your hand" is a cost that can be paid with no
+# cards (CR 117.3) - and puts all three exiled cards into their owner's hand together.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Connecting the Dots
+Ornithopter
+Ornithopter
+Mountain
+Ornithopter
+Ornithopter
+Lightning Bolt
+Ancestral Recall
+Brainstorm
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Connecting the Dots.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Attack(Ornithopter; Ornithopter#2; Ornithopter#3)
+[T3 Bot1.Damage]
+? Exile.Count = 3
+? Exile = (face down); (face down); (face down)
+? Bot1.Hand.Count = 0
+[T3 Bot1.Main2]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Connecting the Dots.Activate
+[Bot1.End]
+
+[Expect]
+Exile.Count = 0
+Bot1.Hand = Lightning Bolt; Ancestral Recall; Brainstorm
+Bot1.Graveyard = Connecting the Dots
+Bot1.Library.Count = 10

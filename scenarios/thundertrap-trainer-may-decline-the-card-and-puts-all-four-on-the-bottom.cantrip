@@ -1,0 +1,27 @@
+# "You may reveal": Lightning Bolt is the only legal card in the top four, but Bot1 takes none and all four cards go to the
+# bottom of the library, so the hand does not grow.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Thundertrap Trainer
+Island x4
+Lightning Bolt
+Island x3
+Island x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Thundertrap Trainer.Cast
+Bot1.Arrange( | Lightning Bolt; Island; Island; Island)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 4
+Bot1.Library.Count = 14

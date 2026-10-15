@@ -1,0 +1,32 @@
+# Seasoned Pyromancer: entering, Bot1 discards two cards (Mox Pearl and an Island), draws two, and gets one 1/1 red
+# Elemental token for the one nonland card discarded this way.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mountain
+Seasoned Pyromancer
+Mox Pearl
+Island
+Plains
+Plains x3
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Seasoned Pyromancer.Cast
+Bot1.Choose(Mox Pearl; Island)
+
+[Expect]
+Bot1.Graveyard.Count = 2
+Bot1.Hand.Count = 3
+Bot1.Battlefield = Mox Ruby; Mox Jet; Mountain; Seasoned Pyromancer; Elemental
+Bot1.Battlefield.Elemental.Power = 1

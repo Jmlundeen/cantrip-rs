@@ -1,0 +1,61 @@
+# Inventors' Fair: "{4}, {T}, Sacrifice Inventors' Fair: Search your library for an artifact card". Without Zirda,
+# Bot2 has only its three Moxen (three mana) to pay the {4}: the Fair's own mana ability cannot, since tapping it is part
+# of the cost already. The ability is not offered. Bot1, with Zirda out (abilities that aren't mana abilities cost {2}
+# less), pays {2} with two Moxen and finds a Sol Ring (turn 3).
+
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Zirda, the Dawnwaker
+Inventors' Fair
+Island x3
+Sol Ring
+Island x10
+
+[Bot2 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Inventors' Fair
+Island x3
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Zirda, the Dawnwaker.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Inventors' Fair.Play
+! Bot2.Battlefield.Inventors' Fair.Activate(Ability: Search)
+[T3 Bot1.Main1]
+Bot1.Hand.Inventors' Fair.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Inventors' Fair.Activate(Ability: Search)
+Bot1.Search(Sol Ring)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand.Count = 4
+Bot1.Battlefield.Mox Jet.Tapped = false
+Bot1.Graveyard = Inventors' Fair

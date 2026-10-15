@@ -1,0 +1,39 @@
+# On turn 1 Bot1 Lightning Bolts their own Ornithopter. On turn 3 From the Catacombs ({3}{B}{B}, paid with two Swamps and
+# three Moxen) puts it onto the battlefield under Bot1's control with a corpse counter, and Bot1 takes the initiative.
+
+[Bot1 Deck]
+Swamp
+Ornithopter
+Mox Ruby
+Lightning Bolt
+Mox Jet
+Mox Pearl
+From the Catacombs
+Swamp x13
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.From the Catacombs.Cast(Bot1.Graveyard.Ornithopter)
+[T3 Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Counters.Corpse = 1
+Bot1.Graveyard = From the Catacombs; Lightning Bolt
+Initiative = Bot1

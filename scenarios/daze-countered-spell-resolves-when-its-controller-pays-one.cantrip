@@ -1,0 +1,36 @@
+# Daze: "Counter target spell unless its controller pays {1}". Bot2 casts Duress with a Swamp and keeps a Mox Jet untapped;
+# Bot1 returns its Island to cast Daze, and Bot2 pays the {1} with the Mox, so the Duress is not countered and resolves:
+# Bot2 takes the Lightning Bolt from Bot1's hand (the existing scenario is the same turn with nothing left to pay).
+
+[Bot1 Deck]
+Island
+Daze
+Lightning Bolt
+Island x3
+Island x10
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Duress
+Swamp x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Duress.Cast(Bot1)
+Bot1.Hand.Daze.Cast(Duress; Ability: Return an Island)
+Bot1.Choose(Island)
+Bot1.Pass
+Bot2.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.PayCost
+Bot2.Choose(Lightning Bolt)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Lightning Bolt; Daze
+Bot2.Graveyard = Duress
+Bot2.Battlefield.Mox Jet.Tapped = true

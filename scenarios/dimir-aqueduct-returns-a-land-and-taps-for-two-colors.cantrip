@@ -1,0 +1,25 @@
+# Dimir Aqueduct enters tapped and, as it enters, returns a land its controller chooses to its owner's hand: Bot1
+# sends the Island back and keeps the Aqueduct. On Bot1's next turn the untapped Aqueduct taps for {U}{B}.
+
+[Bot1 Deck]
+Island
+Dimir Aqueduct
+Island x5
+Island x10
+
+[Bot2 Deck]
+Swamp x15
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Dimir Aqueduct.Play
+Bot1.Choose(Island)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Dimir Aqueduct.Activate
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Dimir Aqueduct
+Bot1.Battlefield.Dimir Aqueduct.Tapped = true
+Bot1.Mana = {U}{B}

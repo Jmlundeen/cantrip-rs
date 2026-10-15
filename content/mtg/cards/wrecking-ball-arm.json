@@ -1,0 +1,6 @@
+{
+  "name": "Wrecking Ball Arm",
+  "manaCost": "{2}",
+  "type": "Legendary Artifact — Equipment",
+  "oracleText": "Equipped creature has base power and toughness 7/7 and can't be blocked by creatures with power 2 or less.\nEquip legendary creature {3}\nEquip {7}"
+}

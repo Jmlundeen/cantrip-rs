@@ -1,0 +1,50 @@
+# Oliphaunt: "Whenever this creature attacks, another target creature you control gets +2/+0 and gains trample until
+# end of turn." Turn one: Mountain pays for Sol Ring, which with four Moxen pays {5}{R}. Turn three Bot1 draws and casts
+# Ornithopter, then attacks with Oliphaunt alone. The trigger puts +2/+0 and trample on Ornithopter (never Oliphaunt itself), which
+# becomes a 2/2 with flying and trample.
+
+[Bot1 Deck]
+Mountain
+Sol Ring
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Mox Pearl
+Oliphaunt
+Ornithopter
+Mountain x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Oliphaunt.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Attack(Oliphaunt > Bot2)
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Ornithopter.Keywords = Flying; Trample
+Bot1.Battlefield.Oliphaunt.Tapped = true

@@ -1,0 +1,35 @@
+# Metamorphosis Fanatic's miracle (CR 702.94a): drawn as the first card of Bot1's turn 3, it is revealed, and the linked
+# ability lets Bot1 cast it for {1}{B} from Black Lotus. Its enters ability returns Llanowar Elves, which Lightning Bolt
+# killed, with a lifelink counter that gives it lifelink (CR 614.1c, 122.1b).
+[Bot1 Deck]
+Forest
+Black Lotus
+Llanowar Elves
+Forest x4
+Metamorphosis Fanatic
+Forest x20
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x5
+Mountain x20
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Black Lotus.Cast
+[Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+[T3 Bot1.Draw]
+Bot1.Accept
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Accept
+Bot1.Target(Bot1.Graveyard.Llanowar Elves)
+[T3 Bot1.Main1]
+[Expect]
+Bot1.Battlefield = Forest; Llanowar Elves; Metamorphosis Fanatic
+Bot1.Battlefield.Llanowar Elves.Counters.Lifelink = 1
+Bot1.Battlefield.Llanowar Elves.Keywords = Lifelink
+Bot1.Graveyard = Black Lotus

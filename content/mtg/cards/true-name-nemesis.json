@@ -1,0 +1,8 @@
+{
+  "name": "True-Name Nemesis",
+  "manaCost": "{1}{U}{U}",
+  "type": "Creature — Merfolk Rogue",
+  "power": 3,
+  "toughness": 1,
+  "oracleText": "As this creature enters, choose a player.\nThis creature has protection from the chosen player."
+}

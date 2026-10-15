@@ -1,0 +1,50 @@
+# Court of Garenbrig's upkeep trigger divides its two +1/+1 counters between Bot1's Guerrilla Gorilla and Bot2's Cryptfen
+# Elves (CR 601.2d), chosen together with the targets by a Divide line. Bot1 is the monarch, so the Court then doubles
+# the counters on each creature Bot1 controls: the Gorilla's one becomes two, and the Elves keeps its one.
+
+[Bot1 Deck]
+Forest
+Forest
+Forest
+Guerrilla Gorilla
+Court of Garenbrig
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Forest
+Mountain
+Llanowar Elves
+Embereth Shieldbreaker
+Forest
+Mountain
+Forest
+Forest x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Embereth Shieldbreaker.Cast
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Court of Garenbrig.Cast
+Bot1.Divide(Guerrilla Gorilla: 1; Llanowar Elves: 1)
+[Bot1.Main1]
+
+[Expect]
+Monarch = Bot1
+Bot1.Battlefield.Guerrilla Gorilla.Counters.PlusOnePlusOne = 2
+Bot2.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = 1
+Bot2.Battlefield.Embereth Shieldbreaker.Counters.PlusOnePlusOne = (absent)

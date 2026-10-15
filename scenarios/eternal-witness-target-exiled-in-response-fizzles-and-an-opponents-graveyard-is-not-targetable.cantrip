@@ -1,0 +1,61 @@
+# Eternal Witness: "return target card from your graveyard to your hand." Only a card in its controller's own graveyard is a
+# candidate: Bot2's Dark Ritual is refused as the trigger goes on the stack, beside Bot1's own Lightning Bolt (and Burst
+# Lightning, so there is a choice to ask), which is chosen. Bot2 answers with Ghost Vacuum, exiling that Bolt; its target gone, the trigger is countered on resolution
+# (CR 608.2b) - the "you may" is never asked and nothing returns.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt
+Burst Lightning
+Mox Emerald
+Forest
+Eternal Witness
+Forest
+Forest x14
+
+[Bot2 Deck]
+Swamp
+Dark Ritual
+Ghost Vacuum
+Swamp x4
+Swamp x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Burst Lightning.Cast(Bot2)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Dark Ritual.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Ghost Vacuum.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Eternal Witness.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Dark Ritual)
+Bot1.Target(Lightning Bolt)
+Bot1.Pass
+Bot2.Battlefield.Ghost Vacuum.Activate(Bot1.Graveyard.Lightning Bolt)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+! Bot1.Accept
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Lightning Bolt
+Bot1.Graveyard = Burst Lightning
+Bot2.Graveyard = Dark Ritual
+Bot1.Battlefield = Mountain; Forest; Mox Ruby; Mox Emerald; Eternal Witness

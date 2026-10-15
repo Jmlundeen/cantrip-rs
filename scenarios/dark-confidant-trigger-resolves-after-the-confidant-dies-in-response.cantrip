@@ -1,0 +1,37 @@
+# The upkeep trigger is on the stack independent of its source: Bot2 bolts the Confidant in response, and the reveal and
+# the life loss (Sol Ring, 1) still happen.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Dark Confidant
+Island
+Island
+Island
+Island
+Sol Ring
+Island x8
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dark Confidant.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Upkeep]
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Dark Confidant)
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Graveyard = Dark Confidant
+Bot1.Life = 19
+Bot1.Hand = Island; Island; Island; Island; Island; Sol Ring

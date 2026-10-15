@@ -1,0 +1,21 @@
+# "As this land enters, you may pay 2 life. If you don't, it enters tapped": Bot1 accepts, loses 2 life (18) and the Stomping Ground enters untapped, tapping for {R} at once to cast Lightning Bolt (the payment for the red; the declined case is the existing scenario).
+
+[Bot1 Deck]
+Stomping Ground
+Lightning Bolt
+Plains x18
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Stomping Ground.Play
+Bot1.Accept
+Bot1.Battlefield.Stomping Ground.Activate(Ability: {R})
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+
+[Expect]
+Bot1.Life = 18
+Bot2.Life = 17
+Bot1.Battlefield.Stomping Ground.Tapped = true

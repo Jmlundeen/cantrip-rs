@@ -1,0 +1,22 @@
+# "Exile the top card of your library" with no card in it exiles nothing, so the second ability has no event to see: Laelia attacks
+# from a seven-card deck whose library is empty (Bot1 skips its first draw), stays 2/2 and deals 2.
+
+[Bot1 Deck]
+Black Lotus
+Laelia, the Blade Reforged
+Island x5
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Laelia, the Blade Reforged.Cast
+Bot1.Attack(Laelia, the Blade Reforged > Bot2)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield.Laelia, the Blade Reforged.Counters.PlusOnePlusOne = (absent)
+Exile.Count = 0

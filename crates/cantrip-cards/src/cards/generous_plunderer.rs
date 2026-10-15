@@ -1,0 +1,66 @@
+use cantrip_api::*;
+use cantrip_mechanics::targets;
+use cantrip_mechanics::tokens::TREASURE;
+use cantrip_oracle as oracle;
+
+/// You may create a Treasure token. When you do (CR 603.12), target opponent creates a tapped Treasure token: a
+/// creation that did not happen does not satisfy "when you do".
+fn maybe_treasure(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if !cantrip_mechanics::effects::ask_may(g, item.controller, item.object, Purpose::Optional)? {
+        return Ok(());
+    }
+    let made = cantrip_mechanics::tokens::create(g, item.controller, &TREASURE, 1)?;
+    if made.is_empty() {
+        return Ok(());
+    }
+    let this = g.card_id(&CARD);
+    g.reflexive_trigger(item.object, item.controller, AbilityRef::delayed(this, 0), Target::None);
+    Ok(())
+}
+
+/// Target opponent creates a tapped Treasure token. An opponent who has left the game took the only target with them.
+fn gift(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if let Target::Player(opponent) = item.targets[0] {
+        let treasure = g.card_id(&TREASURE);
+        g.create_tokens(treasure, opponent, 1, true)?;
+    }
+    Ok(())
+}
+
+/// It deals damage to defending player equal to the number of artifacts they control.
+fn raid(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let Some(defending) = g.defending_player(item.subject) else { return Ok(()) };
+    let artifacts = g.permanents_of(defending).into_iter().filter(|&id| g.chars(id).is(CardType::Artifact)).count();
+    if artifacts > 0 {
+        g.damage(item.object, Target::Player(defending), artifacts as u16);
+    }
+    Ok(())
+}
+
+pub static CARD: CardDef = CardDef {
+    abilities: &[
+        AbilityDef::Triggered(TriggeredDef {
+            text: "At the beginning of your upkeep, you may create a Treasure token. When you do, target opponent creates a tapped Treasure token.",
+            listens: EventMask::STEP_BEGAN,
+            matches: cantrip_mechanics::triggers::your_upkeep,
+            effect: maybe_treasure,
+            ..TriggeredDef::BLANK
+        }),
+        AbilityDef::Triggered(TriggeredDef {
+            text: "Whenever this creature attacks, it deals damage to defending player equal to the number of artifacts they control.",
+            listens: EventMask::ATTACKS,
+            matches: cantrip_mechanics::triggers::this_attacks_defender,
+            effect: raid,
+            ..TriggeredDef::BLANK
+        }),
+    ],
+    delayed: &[AbilityDef::Triggered(TriggeredDef {
+        text: "When you do, target opponent creates a tapped Treasure token.",
+        targets: &[targets::OPPONENT],
+        effect: gift,
+        ..TriggeredDef::BLANK
+    })],
+    ..oracle::GENEROUS_PLUNDERER
+};
+
+pub static EXTRA: &[&CardDef] = &[&TREASURE];

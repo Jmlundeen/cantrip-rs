@@ -1,0 +1,37 @@
+# "Target player draws X cards, Together as One deals X damage to any target, and you gain X life" are three separate effects (CR 608.2c) with
+# two targets: Bot1 aims both at Bot2, with X = 2 (blue from Black Lotus and red from Mox Ruby; the Sol Ring's colorless mana is no
+# colour, and Mox Pearl's white paid for the Sol Ring, not for the spell): Bot2 draws two, takes two and Bot1 gains two.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Sol Ring
+Mox Pearl
+Together as One
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Together as One.Cast
+Bot1.Target(Bot2)
+Bot1.Target(Bot2)
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Life = 22
+Bot2.Hand.Count = 9

@@ -1,0 +1,38 @@
+# "Enchanted land has ..." lasts only while the Aura is on it (CR 613.1f, 611.3): on turn one Bot1 uses the granted ability (the
+# positive control: it is offered), and on turn two Bot2's Disenchant destroys the Crater. On turn three the Mountain no longer
+# offers the ability (the refusal), though it still taps for {R}.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Ornithopter
+Footfall Crater
+Mountain x12
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Disenchant
+Plains x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Footfall Crater.Cast(Mountain)
+Bot1.Battlefield.Mountain.Activate(Ornithopter; Ability: trample)
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Disenchant.Cast(Footfall Crater)
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Mountain.Activate(Ornithopter; Ability: trample)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Footfall Crater
+Bot1.Battlefield = Mountain; Mox Ruby; Ornithopter
+Bot1.Battlefield.Ornithopter.Keywords = Flying

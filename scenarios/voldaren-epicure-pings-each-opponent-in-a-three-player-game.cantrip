@@ -1,0 +1,25 @@
+# "Each opponent": with Bot2 and Bot3 both in the game both take 1, and Bot1 makes one Blood token.
+
+[Bot1 Deck]
+Mountain
+Voldaren Epicure
+Mountain x12
+
+[Bot2 Deck]
+Island x14
+
+[Bot3 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Voldaren Epicure.Cast
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Bot2.Life = 19
+Bot3.Life = 19
+Bot1.Life = 20
+Bot1.Battlefield = Mountain; Voldaren Epicure; Blood Token

@@ -1,0 +1,24 @@
+# Savai Triome is a Mountain Plains Swamp: it enters tapped (CR 305.7 gives it the land types' mana abilities), and on turn 3 it taps for
+# {B} (the {U} is refused beside it, no such land type). Cycling works only from the hand (CR 702.29a): on the battlefield no
+# Cycling is offered (! Activate), the positive control being the neighbouring scenario that cycles it from the hand.
+
+[Bot1 Deck]
+Savai Triome
+Plains x19
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Savai Triome.Play
+? Bot1.Battlefield.Savai Triome.Subtypes = Mountain; Plains; Swamp
+? Bot1.Battlefield.Savai Triome.Tapped = true
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Savai Triome.Activate(Ability: Cycling)
+! Bot1.Battlefield.Savai Triome.Activate(Ability: {U})
+Bot1.Battlefield.Savai Triome.Activate(Ability: {B})
+? Bot1.Mana = {B}
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Savai Triome.Tapped = true

@@ -1,0 +1,32 @@
+# Voldaren Epicure is Bolted with its enters trigger on the stack. The trigger resolves anyway: the damage is dealt by
+# the creature as it last existed (CR 113.7a, 608.2h), so Bot2 still takes 1, and Bot1 still creates its Blood token.
+
+[Bot1 Deck]
+Mountain
+Voldaren Epicure
+Mountain x12
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Voldaren Epicure.Cast
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Voldaren Epicure)
+Bot2.Battlefield.Mountain.Activate
+? Stack.Count = 2
+? Bot2.Life = 20
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 20
+Bot2.Life = 19
+Bot1.Battlefield = Mountain; Blood Token
+Bot1.Graveyard = Voldaren Epicure
+Bot2.Graveyard = Lightning Bolt

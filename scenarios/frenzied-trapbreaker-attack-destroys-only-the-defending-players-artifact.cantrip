@@ -1,0 +1,40 @@
+# Frenzied Trapbreaker (the night face of Outland Liberator): "Whenever this creature attacks, destroy target artifact or
+# enchantment defending player controls." Turn 5 (night: Bot2 cast nothing on turn 4) it attacks Bot2, who controls a Mox
+# Jet and a Mox Pearl; Bot1's own Mox Ruby is not a candidate (the refusal), and the Mox Jet is destroyed.
+
+[Bot1 Deck]
+Forest
+Forest
+Mox Ruby
+Outland Liberator
+Forest x16
+
+[Bot2 Deck]
+Mox Jet
+Mox Pearl
+Island x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Outland Liberator.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Attack(Frenzied Trapbreaker > Bot2)
+! Bot1.Target(Bot1.Battlefield.Mox Ruby)
+Bot1.Target(Mox Jet)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Mox Jet
+Bot2.Battlefield = Mox Pearl
+Bot2.Life = 17
+Bot1.Battlefield.Mox Ruby.Tapped = false

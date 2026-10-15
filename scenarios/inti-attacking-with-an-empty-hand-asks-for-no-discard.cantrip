@@ -1,0 +1,46 @@
+# Inti, Seneschal of the Sun: "Whenever you attack, you may discard a card. When you do, ..." The discard is made as the
+# ability resolves, so a player with no card in hand is not asked and nothing follows (! Bot1.Choose): no counter on Inti
+# and, since nothing was discarded, no exiled card. Bot1 casts four Ornithopters and Inti on turn 1 and plays the Mountain it draws
+# on turn 3, so its hand is empty when Inti attacks.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Inti, Seneschal of the Sun
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Mountain
+Mountain x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Inti, Seneschal of the Sun.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Attack(Inti, Seneschal of the Sun > Bot2)
+! Bot1.Choose
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 0
+Exile.Count = 0
+Bot2.Life = 18
+Bot1.Battlefield.Inti, Seneschal of the Sun.Counters.PlusOnePlusOne = (absent)

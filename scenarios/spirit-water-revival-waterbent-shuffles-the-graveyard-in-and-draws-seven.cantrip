@@ -1,0 +1,35 @@
+# Black Lotus pays the {1}{U}{U}; the waterbend {6} is paid by tapping five Moxen and an Ornithopter. Black Lotus (the whole graveyard) is shuffled
+# into the library, Bot1 draws seven: 12 + 1 - 7 = 6 left, and the spell is exiled.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Emerald
+Ornithopter
+Spirit Water Revival
+Island x12
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Spirit Water Revival.Cast(Kicked: 1; Convoke: Mox Sapphire, Mox Pearl, Mox Jet, Mox Ruby, Mox Emerald, Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 7
+Bot1.Library.Count = 6
+Bot1.Graveyard.Count = 0
+Exile = Spirit Water Revival

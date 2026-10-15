@@ -1,0 +1,52 @@
+# Bloodforged Battle-Axe: a token copy of the Equipment has all its abilities (CR 707.2), and each Axe on the creature
+# triggers separately (CR 603.2c). On turn 3 the equipped Ornithopter (2/2) connects for 2 and the Axe copies itself; in
+# the second main phase Bot1 pays {2} to equip the token to the Ornithopter too (+2/+0 from each: a 4/2). On turn 5 it
+# connects for 4 and both Axes trigger, making two more tokens: four Axes in all, and Bot2 at 14.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Ornithopter
+Bloodforged Battle-Axe
+Plains x20
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Bloodforged Battle-Axe.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Bloodforged Battle-Axe.Activate(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Count = 7
+? Bot2.Life = 18
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Bloodforged Battle-Axe#2.Activate(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Ornithopter.Power = 4
+Bot1.Attack(Ornithopter > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Bot1.Battlefield.Count = 9

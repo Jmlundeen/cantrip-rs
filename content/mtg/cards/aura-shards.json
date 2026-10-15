@@ -1,0 +1,6 @@
+{
+  "name": "Aura Shards",
+  "manaCost": "{1}{G}{W}",
+  "type": "Enchantment",
+  "oracleText": "Whenever a creature you control enters, you may destroy target artifact or enchantment."
+}

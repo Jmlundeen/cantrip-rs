@@ -1,0 +1,43 @@
+# +1/-1: equipping Skullclamp to Elvish Mystic (1/1) makes it 2/0, which dies as a state-based action, and "whenever equipped creature dies" draws two cards. On turn 3 the clamp equips the Ornithopter (0/2), which survives as a 1/1 and draws nothing.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Mox Jet
+Skullclamp
+Elvish Mystic
+Ornithopter
+Island
+Island x14
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Skullclamp.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Skullclamp.Activate(Elvish Mystic)
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot1.Graveyard = Elvish Mystic
+? Bot1.Hand.Count = 4
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Skullclamp.Activate(Ornithopter)
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand.Count = 4
+Bot1.Battlefield.Skullclamp.AttachedTo = Ornithopter
+Bot1.Battlefield.Ornithopter.Power = 1
+Bot1.Battlefield.Ornithopter.Toughness = 1

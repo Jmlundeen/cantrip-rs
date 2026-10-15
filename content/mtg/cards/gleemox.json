@@ -1,0 +1,6 @@
+{
+  "name": "Gleemox",
+  "manaCost": "{0}",
+  "type": "Artifact",
+  "oracleText": "{T}: Add one mana of any color.\nThis card is banned."
+}

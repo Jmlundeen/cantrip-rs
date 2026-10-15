@@ -1,0 +1,38 @@
+# Fireblast's alternative cost sacrifices the two Mountains as the spell is cast (CR 601.2h), so they are already in
+# the graveyard while it waits on the stack, and countering it gives nothing back.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Fireblast
+Mountain x4
+Mountain x10
+
+[Bot2 Deck]
+Island
+Island
+Counterspell
+Island x4
+Island x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Island.Play
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Fireblast.Cast(Bot2; Ability: Sacrifice)
+Bot1.Choose(Mountain; Mountain)
+? Stack.Count = 1
+? Bot1.Battlefield.Count = 0
+? Bot1.Graveyard = Mountain; Mountain
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Island#2.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Fireblast)
+
+[Expect]
+Bot2.Life = 20
+Bot2.Graveyard = Counterspell
+Bot1.Graveyard = Fireblast; Mountain; Mountain
+Bot1.Battlefield.Count = 0
+Stack.Count = 0

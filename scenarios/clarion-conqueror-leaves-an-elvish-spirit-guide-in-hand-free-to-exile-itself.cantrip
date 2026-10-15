@@ -1,0 +1,34 @@
+# Clarion Conqueror: "Activated abilities of artifacts, creatures, and planeswalkers can't be activated." A description
+# that names a card type and no zone or the word "card" means a permanent of that type on the battlefield (CR 109.2), so an
+# Elvish Spirit Guide still in Bot1's hand is not a creature and exiling it for {G} stays allowed with the Conqueror out,
+# while the Llanowar Elves on the battlefield are stopped (the control). Compare the stopped permanents in the other
+# Clarion Conqueror scenarios.
+
+[Bot1 Deck]
+Black Lotus
+Clarion Conqueror
+Llanowar Elves
+Elvish Spirit Guide
+Mox Emerald
+Plains
+Plains x20
+
+[Bot2 Deck]
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Clarion Conqueror.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Hand.Elvish Spirit Guide.Activate
+? Bot1.Mana = {G}
+
+[Expect]
+Exile = Elvish Spirit Guide
+Bot1.Battlefield = Clarion Conqueror; Llanowar Elves; Mox Emerald

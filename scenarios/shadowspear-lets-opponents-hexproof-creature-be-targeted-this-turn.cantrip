@@ -1,0 +1,47 @@
+# Bot2's Sylvan Caryatid has hexproof, so Bot1 cannot target it with Lightning Bolt; after Bot1 pays {1} for
+# Shadowspear it can, and the Bolt kills the 0/3.
+
+[Bot1 Deck]
+Shadowspear
+Lightning Bolt
+Mox Pearl
+Mox Jet
+Mox Ruby
+Island x2
+Island x10
+
+[Bot2 Deck]
+Sylvan Caryatid
+Mox Emerald
+Mox Sapphire
+Island x2
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Shadowspear.Cast
+Bot1.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Sylvan Caryatid.Cast
+Bot2.Pass
+Bot1.Pass
+! Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Sylvan Caryatid)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Shadowspear.Activate(Ability: {1})
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Sylvan Caryatid)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Graveyard = Sylvan Caryatid
+Bot1.Graveyard = Lightning Bolt

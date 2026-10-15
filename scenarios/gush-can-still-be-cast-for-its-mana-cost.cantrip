@@ -1,0 +1,35 @@
+# The alternative cost is optional: with two Islands on the battlefield Gush is still cast for {4}{U}, paid by both
+# Islands and Black Lotus, and both Islands stay. It draws two.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Gush
+Island
+Island x3
+Island x10
+
+[Bot2 Deck]
+Swamp
+Swamp x6
+Swamp x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot2.Hand.Swamp.Play
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Gush.Cast
+? Stack = Gush
+? Bot1.Battlefield = Island; Island
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Island; Island
+Bot1.Graveyard = Gush; Black Lotus
+Bot1.Hand.Count = 6
+Bot1.Mana =

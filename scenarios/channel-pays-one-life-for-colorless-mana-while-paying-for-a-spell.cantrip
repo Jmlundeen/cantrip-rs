@@ -1,0 +1,36 @@
+# Channel (CR 611.2a, 605.1a): once it has resolved, "any time you could activate a mana ability" the player may pay
+# 1 life to add {C} - including in the middle of paying for a spell (CR 601.2g), where mana abilities are activated.
+# Bot1 casts Channel on turn 3 with two Forests, then casts Sol Ring with no mana in the pool and pays its {1} by
+# activating the ability Channel gave Bot1 - the player's own, not the card's - at the pay prompt: one life, no land.
+
+[Bot1 Deck]
+Channel
+Forest
+Forest
+Sol Ring
+Mind Stone
+Forest
+Forest
+Forest x12
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Channel.Cast
+Bot1.Pass
+? Bot1.Life = 20
+Bot1.Hand.Sol Ring.Cast
+Bot1.Channel.Activate
+Bot1.Pass
+
+[Expect]
+Bot1.Life = 19
+Bot1.Mana =
+Bot1.Battlefield = Forest; Forest; Sol Ring
+Bot1.Graveyard = Channel

@@ -1,0 +1,49 @@
+# Nethergoyf's escape cost exiles any number of other cards from its owner's graveyard with four or more card types among
+# them. Wheel of Fortune discards a Nethergoyf, Lightning Bolt (instant), Ponder (sorcery), Fabled Passage (land) and
+# Black Lotus (artifact); next turn Nethergoyf escapes from the graveyard, exiling the four others. Only the Wheel
+# (a sorcery) is left in the graveyard, so it is a 1/2.
+
+[Bot1 Deck]
+Wheel of Fortune
+Nethergoyf
+Lightning Bolt
+Ponder
+Fabled Passage
+Black Lotus
+Mox Ruby
+Mox Jet
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Wheel of Fortune.Cast
+Bot1.Pass
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Island#1.Activate
+Bot1.Graveyard.Nethergoyf.Cast(Ability: Escape)
+Bot1.Choose(Lightning Bolt; Ponder; Fabled Passage; Black Lotus)
+Bot1.Pass
+[Bot1.Main1]
+
+[Expect]
+Turn = 7
+Stack.Count = 0
+Bot1.Graveyard = Wheel of Fortune
+Exile.Count = 4
+Bot1.Battlefield.Nethergoyf.Power = 1
+Bot1.Battlefield.Nethergoyf.Toughness = 2

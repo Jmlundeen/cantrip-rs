@@ -1,0 +1,32 @@
+# Heirloom Epic: "{4}, {T}: Draw a card. For each mana in this ability's activation cost, you may tap an untapped creature
+# you control rather than pay that mana. Activate only as a sorcery." Four Ornithopters (summoning sick, which does not
+# matter: tapping them is a cost of the Epic's ability, not their own {T}) pay all four, with no mana spent.
+
+[Bot1 Deck]
+Mox Pearl
+Heirloom Epic
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Forest
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Heirloom Epic.Cast
+Bot1.Battlefield.Heirloom Epic.Activate(Convoke: Ornithopter, Ornithopter, Ornithopter, Ornithopter)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 2
+Bot1.Battlefield.Heirloom Epic.Tapped = true
+Bot1.Battlefield.Mox Pearl.Tapped = true

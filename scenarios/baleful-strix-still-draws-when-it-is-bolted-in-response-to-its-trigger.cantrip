@@ -1,0 +1,32 @@
+# "When this creature enters, draw a card": the trigger is independent of Strix once it is on the stack (CR 113.7a). Strix
+# is cast on turn three; Bot2, holding Lightning Bolt and an untapped Mountain, kills it in response to the trigger, and
+# Bot1 still draws. Strix dying draws nothing more.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Baleful Strix
+Island x13
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x13
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Baleful Strix.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Baleful Strix)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Baleful Strix
+Bot2.Graveyard = Lightning Bolt
+Bot1.Hand.Count = 6

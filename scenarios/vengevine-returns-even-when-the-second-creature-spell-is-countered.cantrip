@@ -1,0 +1,37 @@
+# The ability triggers on casting and resolves before the spell (ruling 2020-08-07): Bot2 Dazes the second creature
+# spell in response to the trigger, and Vengevine still comes back though Ignoble Hierarch never resolves.
+[Bot1 Deck]
+Vengevine
+Faithless Looting
+Llanowar Elves
+Ignoble Hierarch
+Mox Ruby
+Black Lotus
+Birds of Paradise
+Forest x13
+
+[Bot2 Deck]
+Daze
+Island x19
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Choose(Vengevine; Forest)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Ignoble Hierarch.Cast
+Bot2.Hand.Daze.Cast(Ignoble Hierarch; Ability: Return an Island)
+Bot2.Choose(Island)
+? Stack.Count = 3
+Bot1.Accept
+
+[Expect]
+Bot1.Battlefield.Vengevine.Power = 4
+Bot1.Graveyard = Ignoble Hierarch; Black Lotus; Faithless Looting; Forest
+Bot2.Graveyard = Daze

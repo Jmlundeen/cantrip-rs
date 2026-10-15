@@ -1,0 +1,27 @@
+# Two Fastbonds are two triggers for every land after the first: Forest (free), then two more lands cost 2 each.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Fastbond
+Fastbond
+Forest
+Forest
+Island x12
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Fastbond.Cast
+Bot1.Hand.Fastbond.Cast
+Bot1.Hand.Forest.Play
+Bot1.Hand.Forest.Play
+
+[Expect]
+Bot1.Life = 16
+Bot1.LandsPlayed = 3

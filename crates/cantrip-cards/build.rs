@@ -1,0 +1,39 @@
+//! The card registry, generated from the files in `src/cards`: one file per card, each with `pub static CARD`, and
+//! optionally `pub static EXTRA: &[&CardDef]` for definitions it brings with it (tokens, a copy's exception, the
+//! basics). Adding a card is adding its file, and nothing else.
+
+use std::fmt::Write;
+
+fn main() {
+    let dir = std::path::Path::new("src/cards");
+    println!("cargo:rerun-if-changed={}", dir.display());
+    let mut names: Vec<String> = std::fs::read_dir(dir)
+        .expect("src/cards")
+        .filter_map(|e| e.ok())
+        .map(|e| e.path())
+        .filter(|p| p.extension().is_some_and(|x| x == "rs") && p.file_stem().is_some_and(|s| s != "mod"))
+        .map(|p| p.file_stem().unwrap().to_string_lossy().to_string())
+        .collect();
+    names.sort();
+    let mut out = String::new();
+    for name in &names {
+        let path = dir.join(format!("{name}.rs"));
+        println!("cargo:rerun-if-changed={}", path.display());
+        writeln!(out, "#[path = {:?}]\nmod r#{name};", std::fs::canonicalize(&path).unwrap().display().to_string()).unwrap();
+    }
+    out.push_str("\n/// Every card definition the crate has.\npub fn all() -> Vec<&'static CardDef> {\n    let mut cards: Vec<&'static CardDef> = Vec::new();\n");
+    for name in &names {
+        let text = std::fs::read_to_string(dir.join(format!("{name}.rs"))).unwrap();
+        if text.contains("pub static CARD:") {
+            writeln!(out, "    cards.push(&r#{name}::CARD);").unwrap();
+        }
+        if text.contains("pub static EXTRA:") {
+            writeln!(out, "    cards.extend(r#{name}::EXTRA.iter().copied());").unwrap();
+        }
+    }
+    // Cards that are their characteristics alone; a card's own file, pushed first, wins over its entry there.
+    out.push_str("    let named: std::collections::HashSet<&str> = cards.iter().map(|c| c.name).collect();\n");
+    out.push_str("    cards.extend(cantrip_oracle::PLAIN.iter().copied().filter(|p| !named.contains(p.name)));\n");
+    out.push_str("    cards\n}\n");
+    std::fs::write(std::path::Path::new(&std::env::var("OUT_DIR").unwrap()).join("cards.rs"), out).unwrap();
+}

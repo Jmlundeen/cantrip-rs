@@ -1,0 +1,83 @@
+# Dack Fayden's emblem: "gain control of those permanents" - all of them, as they are when the ability resolves. Bot1
+# casts Fire Covenant (X = 2) at Bot2's Concealing Curtains and Ornithopter, 1 damage each. With the emblem's ability
+# on the stack Bot2 exiles its own Ornithopter with Swords to Plowshares: the ability takes only the Curtains. The
+# Covenant then deals its 1 damage to the Curtains (now Bot1's, still alive); the Ornithopter is no longer a legal target.
+
+[Bot1 Deck]
+Volcanic Island
+Black Lotus
+Dack Fayden
+Mox Jet
+Mox Ruby
+Fire Covenant
+Island
+Island x20
+
+[Bot2 Deck]
+Swamp
+Concealing Curtains
+Ornithopter
+Plains
+Swords to Plowshares
+Island x2
+Island x14
+
+[Actions]
+Bot1.Hand.Volcanic Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Volcanic Island.Activate(Ability: Add {U})
+Bot1.Hand.Dack Fayden.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Dack Fayden.Activate(Bot1; Ability: draws two)
+Bot1.Choose(Island; Island)
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Concealing Curtains.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Dack Fayden.Activate(Bot1; Ability: draws two)
+Bot1.Choose(Island; Island)
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Battlefield.Dack Fayden.Activate(Bot1; Ability: draws two)
+Bot1.Choose(Island; Island)
+[T7 Bot1.Main1]
+Bot1.Battlefield.Dack Fayden.Activate(Ability: emblem)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Volcanic Island.Activate(Ability: Add {R})
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Fire Covenant.Cast(X: 2)
+Bot1.Divide(Bot2.Battlefield.Concealing Curtains: 1; Bot2.Battlefield.Ornithopter: 1)
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Bot2.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main2]
+? Bot1.Battlefield.Concealing Curtains.Damage = 1
+
+[Expect]
+Turn = 7
+Bot1.Life = 18
+Bot1.Battlefield.Concealing Curtains.Types = Creature
+Bot2.Battlefield = Swamp; Plains
+Exile = Ornithopter

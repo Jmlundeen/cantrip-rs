@@ -1,0 +1,24 @@
+# Savai Triome's cycling {3}: from the hand, with three lands tapped, it is discarded and Bot1 draws a card.
+
+[Bot1 Deck]
+Savai Triome
+Island x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Savai Triome.Activate
+
+[Expect]
+Bot1.Graveyard = Savai Triome
+Bot1.Hand.Count = 6
+Bot1.Library.Count = 10

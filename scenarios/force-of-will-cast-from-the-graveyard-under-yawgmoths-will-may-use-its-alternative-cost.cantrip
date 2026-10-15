@@ -1,0 +1,41 @@
+# An alternative cost is used whatever zone the spell is cast from (CR 118.9, 601.2b). Bot2's Duress takes Force of Will
+# from Bot1's hand. On turn 3 Yawgmoth's Will (paid with Black Lotus) lets Bot1 cast it from the graveyard, and Bot1
+# counters its own Mox Sapphire with it for 1 life and a Brainstorm exiled from its hand, paying no mana. The Mox is
+# exiled and never enters.
+
+[Bot1 Deck]
+Island
+Force of Will
+Brainstorm
+Black Lotus
+Yawgmoth's Will
+Mox Sapphire
+Island
+Island x14
+
+[Bot2 Deck]
+Swamp
+Duress
+Swamp x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Duress.Cast(Bot1)
+Bot2.Choose(Force of Will)
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Yawgmoth's Will.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Graveyard.Force of Will.Cast(Mox Sapphire; Ability: exile a blue card)
+Bot1.Choose(Brainstorm)
+[T3 Bot1.End]
+
+[Expect]
+Bot1.Life = 19
+Bot1.Battlefield.Count = 1
+Stack.Count = 0
+Exile = Brainstorm; Force of Will; Mox Sapphire; Yawgmoth's Will
+Bot1.Graveyard = Black Lotus

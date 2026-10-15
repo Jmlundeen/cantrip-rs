@@ -1,0 +1,29 @@
+# CR 103.1: the player chosen to decide who goes first may hand the first turn to the other player. Bot1 chooses and
+# draws first, so Bot2 takes turn one, skipping its draw (CR 103.8a), and Bot1 draws on its own first turn.
+#
+# No hand is dealt until the choice is made; both keep their seven (CR 103.5).
+
+[Opening]
+Chooser: Bot1
+
+[Bot1 Deck]
+Island x12
+
+[Bot2 Deck]
+Forest x12
+
+[Actions]
+Bot1.DrawFirst
+Bot2.Keep
+Bot1.Keep
+[T1 Bot2.Main1]
+? ActivePlayer = Bot2
+? Bot2.Hand.Count = 7
+? Bot1.Hand.Count = 7
+[T2 Bot1.Main1]
+
+[Expect]
+Turn = 2
+ActivePlayer = Bot1
+Bot1.Hand.Count = 8
+Bot1.Library.Count = 4

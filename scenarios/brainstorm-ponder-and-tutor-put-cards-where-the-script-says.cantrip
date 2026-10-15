@@ -1,0 +1,48 @@
+# Choosing, arranging and searching. Bot1 Brainstorms two cards back (the last chosen ends on top), then Ponders and
+# puts Swords to Plowshares on top to draw it. Bot2 tutors for Black Lotus.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Brainstorm
+Ponder
+Island x3
+Counterspell
+Mana Leak
+Lightning Bolt
+Swords to Plowshares
+Island x8
+
+[Bot2 Deck]
+Swamp
+Swamp
+Demonic Tutor
+Swamp x4
+Swamp x3
+Black Lotus
+Swamp x5
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Brainstorm.Cast
+Bot1.Choose(Lightning Bolt; Island)
+? Bot1.Library = Island; Lightning Bolt; Swords to Plowshares; Island; Island; Island; Island; Island; Island; Island; Island
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ponder.Cast
+Bot1.Arrange(Swords to Plowshares; Island; Lightning Bolt)
+? Bot1.Library = Island; Lightning Bolt; Island; Island; Island; Island; Island; Island; Island; Island
+? Bot1.Hand = Swords to Plowshares; Counterspell; Mana Leak; Island; Island
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Demonic Tutor.Cast
+Bot2.Search(Black Lotus)
+
+[Expect]
+Turn = 4
+Bot2.Graveyard = Demonic Tutor
+Bot2.Hand = Black Lotus; Swamp; Swamp; Swamp; Swamp; Swamp; Swamp
+Bot2.Library.Count = 6

@@ -1,0 +1,43 @@
+# Concealing Curtains: "{2}{B}: Transform this creature. Activate only as a sorcery." Turn 3, Black Lotus' mana in the
+# pool, Bot1 casts a second Curtains: with that creature spell on the stack the first Curtains cannot be transformed
+# although the mana is there (CR 307.5 timing, sorcery-speed abilities need an empty stack). Once the spell has
+# resolved the same activation is offered and used: the positive control.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Concealing Curtains
+Concealing Curtains
+Black Lotus
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Lightning Bolt
+Island x13
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Concealing Curtains.Cast
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Concealing Curtains.Cast
+! Bot1.Battlefield.Concealing Curtains.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Concealing Curtains.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Choose(Lightning Bolt)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Revealing Eye.Types = Creature
+Bot1.Battlefield.Concealing Curtains.Types = Creature
+Bot2.Graveyard = Lightning Bolt

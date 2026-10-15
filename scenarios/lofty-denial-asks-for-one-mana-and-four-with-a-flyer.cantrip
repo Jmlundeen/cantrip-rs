@@ -1,0 +1,58 @@
+# Lofty Denial: "Counter target spell unless its controller pays {1}. If you control a creature with flying, counter that
+# spell unless its controller pays {4} instead." The first Ancestral Recall is paid for with one spare Island; once Bot1
+# has an Ornithopter the second needs {4}, which Bot2 cannot make, and it is countered. (The third card in Bot2's
+# graveyard is the Island it discards to hand size in between.)
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Lofty Denial
+Lofty Denial
+Ornithopter
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Mox Sapphire
+Island
+Island
+Ancestral Recall
+Ancestral Recall
+Island
+Island
+Island x13
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Ancestral Recall.Cast(Bot2)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Lofty Denial.Cast(Ancestral Recall)
+Bot2.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.PayCost
+[Bot2.Main2]
+? Bot2.Graveyard = Ancestral Recall
+? Bot2.Hand.Count = 8
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Ornithopter.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Ancestral Recall.Cast(Bot2)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Lofty Denial.Cast(Ancestral Recall)
+[Bot2.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot2.Graveyard.Count = 3
+Bot1.Graveyard = Lofty Denial; Lofty Denial

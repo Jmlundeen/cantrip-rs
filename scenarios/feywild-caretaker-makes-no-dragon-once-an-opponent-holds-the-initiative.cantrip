@@ -1,0 +1,74 @@
+# "At the beginning of your end step, if you have the initiative" (CR 603.4, 725): Bot1 takes the initiative on turn 1 and makes
+# a Faerie Dragon at its end step. On turn 2 Bot2 casts its own Feywild Caretaker and takes the initiative from Bot1 (CR 725.2),
+# making its own Dragon at its end step; on turn 3 Bot1 no longer has the initiative, so its end step makes nothing, and
+# Bot1's Dragon count stays at one while Bot2 holds it. (The turn 1 and turn 2 sequences are the existing scenario's: an Island, three
+# Moxen and a Sol Ring, with the venture into Undercity fetching a Forest.)
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Sol Ring
+Feywild Caretaker
+Island
+Forest
+Island x11
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Sol Ring
+Feywild Caretaker
+Island
+Forest
+Island x11
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Feywild Caretaker.Cast
+Bot1.Pass
+Bot1.Search(Forest)
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Hand.Feywild Caretaker.Cast
+Bot2.Pass
+Bot2.Search(Island)
+? Initiative = Bot2
+[T4 Bot2.Upkeep]
+? Initiative = Bot2
+
+[Expect]
+Bot1.Battlefield.Count = 7
+Bot2.Battlefield.Count = 7
+Initiative = Bot2
+Bot1.Battlefield.Faerie Dragon.Power = 1
+Bot2.Battlefield.Faerie Dragon.Power = 1

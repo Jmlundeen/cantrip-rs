@@ -1,0 +1,55 @@
+# Esika's Chariot: "Whenever Esika's Chariot attacks, create a token that's a copy of target token you control." Bot1
+# casts it on turn 1 (the Moxen and a Sol Ring pay), Bot2 Lightning Bolts both Cats on turn 2, and on turn 3 a Bonecrusher
+# Giant (power 4, not a token) crews it. The Chariot attacks with no token to target: the trigger is removed and no
+# token is created; the Chariot's 4 damage still lands.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Mox Emerald
+Mox Sapphire
+Esika's Chariot
+Sol Ring
+Bonecrusher Giant
+Forest x12
+
+[Bot2 Deck]
+Mox Ruby
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Esika's Chariot.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Cat)
+Bot2.Battlefield.Mox Ruby#2.Activate
+Bot2.Hand.Lightning Bolt.Cast(Cat)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Bonecrusher Giant.Cast
+Bot1.Battlefield.Esika's Chariot.Activate(Ability: Crew)
+Bot1.Attack(Esika's Chariot > Bot2)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot1.Battlefield.Count = 8
+Stack.Count = 0

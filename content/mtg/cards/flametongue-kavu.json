@@ -1,0 +1,8 @@
+{
+  "name": "Flametongue Kavu",
+  "manaCost": "{3}{R}",
+  "type": "Creature — Kavu",
+  "power": 4,
+  "toughness": 2,
+  "oracleText": "When this creature enters, it deals 4 damage to target creature."
+}

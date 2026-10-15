@@ -1,0 +1,11 @@
+{
+  "name": "Archon of Emeria",
+  "manaCost": "{2}{W}",
+  "type": "Creature — Archon",
+  "power": 2,
+  "toughness": 3,
+  "oracleText": "Flying\nEach player can't cast more than one spell each turn.\nNonbasic lands your opponents control enter tapped.",
+  "keywords": [
+    "Flying"
+  ]
+}

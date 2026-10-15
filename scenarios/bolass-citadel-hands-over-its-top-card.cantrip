@@ -1,0 +1,37 @@
+# Bot1 makes six mana on turn one and casts Bolas's Citadel, then the game stops in its second main phase with Bot1 to
+# act: the top of its library, Lightning Bolt, is shown to Bot1 alone and may be cast from there for 1 life.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Mox Jet
+Sol Ring
+Bolas's Citadel
+Swamp
+Swamp
+Lightning Bolt
+Island
+Swamp x7
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Bolas's Citadel.Cast
+[T1 Bot1.Main2]
+[Handover Bot1.Pass]
+
+[Expect]
+Turn = 1
+Step = Main2
+Bot1.Life = 20
+Bot1.Battlefield = Swamp; Mox Jet; Sol Ring; Bolas's Citadel
+Bot1.Library.Count = 9

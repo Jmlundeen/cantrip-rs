@@ -1,0 +1,48 @@
+# "Whenever one or more creatures die": Damnation destroys Bot1's Ornithopter and Bot2's Llanowar Elves and Elvish Mystic together, a single event (CR 700.4, 603.2c), so Chainsaw gets one rev counter, not three.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Black Lotus
+Chainsaw
+Ornithopter
+Damnation
+Plains x10
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Elvish Mystic
+Forest x12
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Chainsaw.Cast
+Bot1.Target()
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Damnation.Cast
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Damnation; Ornithopter; Black Lotus
+Bot2.Graveyard = Elvish Mystic; Llanowar Elves
+Bot1.Battlefield.Chainsaw.Counters.Rev = 1

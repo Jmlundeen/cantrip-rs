@@ -1,0 +1,27 @@
+# Wizard's Rockets enters tapped. Its mana ability announces X (CR 107.3a, 605.3a): X = 2 is paid with two Islands, it
+# is tapped and sacrificed, and adds two mana in any combination of colors (red and green chosen: the red casts Lightning Bolt). Going to the
+# graveyard draws its controller a card.
+[Bot1 Deck]
+Island x2
+Wizard's Rockets
+Lightning Bolt
+Island x3
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Wizard's Rockets.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+? Bot1.Battlefield.Wizard's Rockets.Tapped = false
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Wizard's Rockets.Activate(X: 2; Colors: Red, Green)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+[Bot1.Main2]
+[Expect]
+Bot1.Graveyard = Lightning Bolt; Wizard's Rockets
+Bot1.Library.Count = 18
+Bot2.Life = 17

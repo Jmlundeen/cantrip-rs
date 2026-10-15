@@ -1,0 +1,23 @@
+# A Forest Island is found by "Forest or Island card" (CR 305.6, 205.3i): Bot1 cracks a Misty Rainforest (a life paid), searches
+# for the Hedge Maze, and it enters tapped and surveils 1 (the top card, an Island of the shuffled library, goes to the graveyard) just as when played.
+
+[Bot1 Deck]
+Misty Rainforest
+Island x6
+Hedge Maze
+Island x10
+
+[Bot2 Deck]
+Swamp x15
+
+[Actions]
+Bot1.Hand.Misty Rainforest.Play
+Bot1.Battlefield.Misty Rainforest.Activate
+Bot1.Search(Hedge Maze)
+Bot1.Arrange(| Island)
+
+[Expect]
+Bot1.Life = 19
+Bot1.Battlefield = Hedge Maze
+Bot1.Battlefield.Hedge Maze.Tapped = true
+Bot1.Graveyard = Island; Misty Rainforest

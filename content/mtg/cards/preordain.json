@@ -1,0 +1,6 @@
+{
+  "name": "Preordain",
+  "manaCost": "{U}",
+  "type": "Sorcery",
+  "oracleText": "Scry 2, then draw a card."
+}

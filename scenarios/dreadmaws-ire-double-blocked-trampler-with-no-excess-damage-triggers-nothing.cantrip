@@ -1,0 +1,47 @@
+# The trigger needs combat damage to a *player* (CR 510.2, 702.19b) and a target artifact that player controls. Mother
+# of Runes attacks into two Ornithopters that double-block, and the Ire makes her a 3/3 trampler: two to the first
+# Ornithopter, one to the second, none left for Bot2 (lethal must be assigned to every blocker before the player,
+# CR 702.19b), so there is no damage to the player and the trigger never happens: Bot2's Sol Ring survives and no target
+# is asked for. The Ire's effects end at cleanup, so on turn five Mother has no trample.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Mother of Runes
+Dreadmaw's Ire
+Plains x12
+
+[Bot2 Deck]
+Sol Ring
+Mox Jet
+Ornithopter
+Ornithopter
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Mother of Runes.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Mother of Runes > Bot2)
+Bot2.Block(Ornithopter#1 > Mother of Runes; Ornithopter#2 > Mother of Runes)
+[T3 Bot1.Blockers]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Dreadmaw's Ire.Cast(Mother of Runes)
+! Bot1.Target
+[T3 Bot1.Main2]
+? Bot2.Life = 20
+? Bot2.Battlefield = Mox Jet; Ornithopter; Sol Ring
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Mother of Runes.Keywords = (absent)
+
+[Expect]
+Bot2.Graveyard = Ornithopter
+Bot1.Graveyard = Dreadmaw's Ire

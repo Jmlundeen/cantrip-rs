@@ -1,0 +1,35 @@
+# Half of one rounded down is zero: X = 1 puts one counter on it and draws no card.
+
+[Bot1 Deck]
+Island
+Island
+Sol Ring
+Wan Shi Tong, Librarian
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Wan Shi Tong, Librarian.Cast(X: 1)
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Wan Shi Tong, Librarian.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Wan Shi Tong, Librarian.Power = 2
+Bot1.Hand.Count = 4
+Bot1.Library.Count = 9

@@ -1,0 +1,39 @@
+# Force of Vigor: "If it's not your turn, you may exile a green card from your hand rather than pay this spell's mana cost."
+# On Bot2's own turn 2 the alternative cost is not offered even though an Elvish Mystic (a green card) is in its hand
+# (the refusal; the positive control is the same cast on Bot1's turn in force-of-vigor-exiles-a-green-card-to-destroy-
+# two-artifacts-on-the-opponents-turn), so it pays {2}{G}{G} with a Mox Emerald and a Black Lotus and destroys Bot1's
+# Mox Sapphire. The Mystic stays in the hand.
+
+[Bot1 Deck]
+Mox Sapphire
+Island x19
+
+[Bot2 Deck]
+Mox Emerald
+Black Lotus
+Force of Vigor
+Elvish Mystic
+Forest x16
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+! Bot2.Hand.Force of Vigor.Cast(Ability: green card)
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Force of Vigor.Cast
+Bot2.Target(Bot1.Battlefield.Mox Sapphire)
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield =
+Bot1.Graveyard = Mox Sapphire
+Bot2.Graveyard = Force of Vigor; Black Lotus
+Bot2.Hand = Elvish Mystic; Forest; Forest; Forest; Forest
+Exile.Count = 0

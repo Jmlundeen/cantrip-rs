@@ -1,0 +1,30 @@
+# "Destroy target creature or enchantment. If an enchantment was destroyed this way, you lose 2 life." Springheart Nantuko
+# is both: it is destroyed as the creature Bot1 aimed at and it is an enchantment, so Bot1 loses 2 life (CR 205.4, 701.8a).
+
+[Bot1 Deck]
+Black Lotus
+Shredder's Technique
+Swamp x18
+
+[Bot2 Deck]
+Mox Emerald
+Mox Emerald
+Springheart Nantuko
+Forest x17
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Springheart Nantuko.Cast
+Bot2.Battlefield.Mox Emerald#1.Activate
+Bot2.Battlefield.Mox Emerald#2.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Shredder's Technique.Cast(Bot2.Battlefield.Springheart Nantuko)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 18
+Bot2.Graveyard = Springheart Nantuko

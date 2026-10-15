@@ -1,0 +1,50 @@
+# Bestow - {R}, Collect evidence 6 (CR 702.103, 701.59). Turn 3 with an empty graveyard the Phoenix cannot be bestowed (refusal: there is no evidence to exile); Faithless Looting discards Griselbrand (mana value 8) and a Mountain,
+# after which it can be (the positive control). Bot1 bestows it on the Ornithopter, exiling Griselbrand, and Bot2 Lightning Bolts the Ornithopter in response. With its target gone the Aura spell
+# resolves as a creature (CR 702.103e): an unattached 2/2 Enchantment Creature with flying and haste.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Ornithopter
+Faithless Looting
+Detective's Phoenix
+Griselbrand
+Mountain
+Mountain x12
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt
+Mountain x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+! Bot1.Hand.Detective's Phoenix.Cast(Bot1.Battlefield.Ornithopter; Ability: Bestow)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Griselbrand; Mountain)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Detective's Phoenix.Cast(Bot1.Battlefield.Ornithopter; Ability: Bestow)
+Bot1.Choose(Griselbrand)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Exile.Count = 1
+Bot1.Graveyard = Ornithopter; Faithless Looting; Mountain
+Bot1.Battlefield.Detective's Phoenix.AttachedTo = (absent)
+Bot1.Battlefield.Detective's Phoenix.Types = Enchantment; Creature
+Bot1.Battlefield.Detective's Phoenix.Power = 2
+Bot1.Battlefield.Detective's Phoenix.Keywords = Flying; Haste

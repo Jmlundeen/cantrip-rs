@@ -1,0 +1,35 @@
+# Survival of the Fittest: {G}, discard a creature card, then search for a creature card, reveal it, put it into hand.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Survival of the Fittest
+Birds of Paradise
+Lightning Bolt
+Forest
+Forest
+Elvish Mystic
+Lightning Bolt
+Noble Hierarch
+Forest x8
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Survival of the Fittest.Cast
+Bot1.Battlefield.Survival of the Fittest.Activate
+Bot1.Choose(Birds of Paradise)
+? Stack.Count = 1
+? Bot1.Graveyard = Birds of Paradise; Black Lotus
+Bot1.Search(Noble Hierarch)
+[Bot1.Main1]
+
+[Expect]
+Turn = 1
+Bot1.Graveyard = Birds of Paradise; Black Lotus
+Bot1.Hand = Noble Hierarch; Lightning Bolt; Forest; Forest
+Bot1.Library.Count = 10

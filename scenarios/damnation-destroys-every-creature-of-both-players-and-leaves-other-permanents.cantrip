@@ -1,0 +1,42 @@
+# Destroy all creatures: each player's creatures die, lands stay.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Swamp x5
+Damnation
+Swamp x14
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Forest.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Damnation.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Forest.Activate
+[T7 Bot1.Main2]
+
+[Expect]
+Turn = 7
+Bot1.Battlefield = Forest; Swamp; Swamp; Swamp
+Bot1.Graveyard = Damnation; Llanowar Elves
+Bot2.Battlefield = Forest
+Bot2.Graveyard = Llanowar Elves; Forest
+Stack.Count = 0

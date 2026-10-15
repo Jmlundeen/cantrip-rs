@@ -1,0 +1,26 @@
+# Abandoned Air Temple: "This land enters tapped unless you control a basic land." Bot1's only other land is a Tundra
+# (the Plains and Island types, but not basic, CR 205.4a) and Bot2 controls a Plains, which is not Bot1's to count: on
+# turn 3 Bot1's Temple enters tapped. Bot2's own Temple on turn 4, beside its own Plains, enters untapped (the positive
+# control: the same land, the same turn of the game, but a basic land it controls).
+
+[Bot1 Deck]
+Tundra
+Abandoned Air Temple
+Island x20
+
+[Bot2 Deck]
+Plains
+Abandoned Air Temple
+Island x20
+
+[Actions]
+Bot1.Hand.Tundra.Play
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Abandoned Air Temple.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Abandoned Air Temple.Play
+
+[Expect]
+Bot1.Battlefield.Abandoned Air Temple.Tapped = true
+Bot2.Battlefield.Abandoned Air Temple.Tapped = false

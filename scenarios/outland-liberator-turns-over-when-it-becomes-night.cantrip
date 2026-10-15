@@ -1,0 +1,44 @@
+# Outland Liberator cast on turn 3 makes it day at once (CR 702.145d: a game that is neither day nor night and a
+# permanent with daybound on the battlefield). Bot2's turn 4 then goes by with nothing cast, so the untap step of
+# turn 5 finds it day and the previous turn's active player having cast no spells, and it becomes night (CR 502.2,
+# 731.2) — which turns the Liberator over into Frenzied Trapbreaker on the spot (CR 702.145c).
+#
+# Handed over at the attack, for picturing a board the client had never drawn: the designation is on the wire and
+# the phase bar says Night, with a 3/3 back face under it.
+
+[Bot1 Deck]
+Forest
+Forest
+Outland Liberator
+Forest x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Outland Liberator.Cast
+Bot1.Pass
+Bot2.Pass
+
+# CR 702.145d, as the state-based actions are checked: no card said so and no turn had to pass.
+? DayNight = Day
+? Bot1.Battlefield.Outland Liberator.Power = 2
+
+# Turn 4 is Bot2's and they cast nothing, so it is night by the time turn 5 begins — and not before: Bot1 cast a
+# spell on turn 3, so the untap step of turn 4 left it day.
+[T5 Bot1.Main1]
+? DayNight = Night
+? Bot1.Battlefield.Frenzied Trapbreaker.Power = 3
+
+[Handover Bot1.Attack]
+
+[Expect]
+Turn = 5
+DayNight = Night
+Bot1.Battlefield = Forest; Forest; Frenzied Trapbreaker
+Bot1.Battlefield.Frenzied Trapbreaker.Keywords = Nightbound

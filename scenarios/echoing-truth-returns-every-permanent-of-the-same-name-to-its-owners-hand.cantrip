@@ -1,0 +1,32 @@
+# Echoing Truth returns the target nonland permanent and every other permanent with the same name to their owners'
+# hands: both of Bot2's Ornithopters go back, and its Mox Jet, which has another name, stays.
+
+[Bot1 Deck]
+Island
+Island
+Echoing Truth
+Island x30
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Mox Jet
+Island x30
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Echoing Truth.Cast(Bot2.Battlefield.Ornithopter)
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Graveyard = Echoing Truth
+Bot2.Battlefield = Mox Jet
+Bot2.Hand.Count = 7

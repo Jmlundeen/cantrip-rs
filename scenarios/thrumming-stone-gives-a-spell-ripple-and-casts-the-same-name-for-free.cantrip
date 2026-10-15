@@ -1,0 +1,40 @@
+# Thrumming Stone: spells Bot1 casts have ripple 4 (CR 702.60a). Casting Lightning Bolt reveals the top four cards,
+# two of which are Bolts: both are cast for free at Bot2 (each a cast spell that has ripple too, declining to reveal), and
+# the other two cards go to the bottom. 3 x 3 = 9 damage.
+[Bot1 Deck]
+Mountain
+Sol Ring
+Black Lotus
+Thrumming Stone
+Lightning Bolt
+Mountain
+Island
+Island
+Lightning Bolt
+Lightning Bolt
+Island
+Island
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Thrumming Stone.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Accept
+Bot1.Choose(Lightning Bolt)
+Bot1.Target(Bot2)
+Bot1.Choose(Lightning Bolt)
+Bot1.Target(Bot2)
+[Bot1.Main2]
+[Expect]
+Bot2.Life = 11
+Bot1.Graveyard.Count = 4
+Bot1.Library.Count = 22

@@ -1,0 +1,37 @@
+# The switch (layer 7d, CR 613.4d) is applied after every modification (7c) whatever their timestamps. Giver of Runes (1/2) is switched by Twisted Image first, and then Dowsing Device (cast afterwards) gives it +1/+0 until end of turn: the pump counts first, 2/2
+# switched is 2/2 - not 2/1 plus 1/+0 = 3/1.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Giver of Runes
+Twisted Image
+Dowsing Device
+Island x14
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Giver of Runes.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Twisted Image.Cast(Giver of Runes)
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dowsing Device.Cast
+Bot1.Pass
+Bot1.Target(Giver of Runes)
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Giver of Runes.Power = 2
+Bot1.Battlefield.Giver of Runes.Toughness = 2

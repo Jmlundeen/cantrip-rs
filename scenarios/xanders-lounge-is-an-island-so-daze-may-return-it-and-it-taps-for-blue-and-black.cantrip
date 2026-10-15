@@ -1,0 +1,34 @@
+# Xander's Lounge is an Island Swamp Mountain, so it is "an Island you control" for Daze's alternative cost (CR 205.3i, 118.9): on turn 2 Bot2's Duress is countered by Bot1's Daze, returning the Lounge to hand, since Bot2 has
+# no {1} left to pay. Replayed on turn 3 it enters tapped; on turn 5 it taps for {U} and on turn 7 for {B} (its {R} is the existing scenario).
+
+[Bot1 Deck]
+Xander's Lounge
+Daze
+Island x16
+
+[Bot2 Deck]
+Swamp
+Duress
+Swamp x14
+
+[Actions]
+Bot1.Hand.Xander's Lounge.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Duress.Cast(Bot1)
+Bot1.Hand.Daze.Cast(Duress; Ability: Return)
+Bot1.Choose(Xander's Lounge)
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Xander's Lounge.Play
+[T5 Bot1.Main1]
+Bot1.Battlefield.Xander's Lounge.Activate(Ability: {U})
+? Bot1.Mana = {U}
+[T7 Bot1.Main1]
+Bot1.Battlefield.Xander's Lounge.Activate(Ability: {B})
+? Bot1.Mana = {B}
+
+[Expect]
+Bot2.Graveyard = Swamp; Duress
+Bot1.Graveyard = Daze

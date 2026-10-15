@@ -1,0 +1,36 @@
+# The copy effect of Saheeli's -2 lasts until end of turn (CR 611.2b): on Bot1's next turn the Ornithopter-copy is Sol Ring again, an artifact that taps for {C}{C}.
+
+[Bot1 Deck]
+Sol Ring
+Ornithopter
+Saheeli, Sublime Artificer
+Mountain
+Mountain
+Mountain
+Mountain
+Mountain x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Saheeli, Sublime Artificer.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Saheeli, Sublime Artificer.Activate
+Bot1.Target(Sol Ring)
+Bot1.Target(Ornithopter)
+Bot1.Pass
+[T5 Bot1.Main1]
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Mountain; Mountain; Ornithopter; Sol Ring; Saheeli, Sublime Artificer
+Bot1.Battlefield.Sol Ring.Types = Artifact

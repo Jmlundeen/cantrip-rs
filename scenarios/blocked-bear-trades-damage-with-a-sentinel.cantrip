@@ -1,0 +1,38 @@
+# Attack and block lines, with waits to see the result after damage: a 2/2 into a 1/4 leaves both alive and damaged.
+
+[Bot1 Deck]
+Forest
+Forest
+Guerrilla Gorilla
+Forest x10
+
+[Bot2 Deck]
+Forest
+Forest
+Forest
+Fanatic of Rhonas
+Forest x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot2.Hand.Forest.Play
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+Bot2.Hand.Forest.Play
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Fanatic of Rhonas.Cast
+Bot1.Attack(Guerrilla Gorilla)
+Bot2.Block(Fanatic of Rhonas > Guerrilla Gorilla)
+[Bot1.Main2]
+? Bot1.Battlefield.Guerrilla Gorilla.Damage = 1
+
+[Expect]
+Turn = 7
+Step = Main2
+Bot2.Life = 20
+Bot1.Battlefield.Guerrilla Gorilla.Damage = 1
+Bot2.Battlefield.Fanatic of Rhonas.Damage = 2

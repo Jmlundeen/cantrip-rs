@@ -1,0 +1,56 @@
+# Shadowspear's "{1}: Permanents your opponents control lose hexproof and indestructible until end of turn" (CR 613.1f):
+# Bot2's Ornithopter wears Hammer of Nazahn (+2/+0, indestructible). Bot1 pays {1}, then Lightning Bolt's 3 damage on the
+# 2/2 is lethal and, with indestructible gone, it is destroyed. The permanents are those Bot2 controls as the ability
+# resolves (CR 611.2c). The companion scenario without the activation shows the Ornithopter surviving the same Bolt.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Shadowspear
+Lightning Bolt
+Island x15
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Sol Ring
+Ornithopter
+Hammer of Nazahn
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Shadowspear.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Hammer of Nazahn.Cast
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Accept
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Shadowspear.Activate(Ability: {1})
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot2.Graveyard = Ornithopter
+Bot2.Battlefield = Hammer of Nazahn; Mox Jet; Mox Pearl; Mox Ruby; Sol Ring
+Bot1.Graveyard = Lightning Bolt

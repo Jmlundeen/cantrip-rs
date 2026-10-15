@@ -1,0 +1,39 @@
+# Currency Converter: "you MAY exile that card from your graveyard" - Bot1 declines both prompts for the two cards a
+# Faithless Looting discards, so they stay in the graveyard and nothing is exiled with the artifact. The positive control
+# is the neighbouring scenario, where the same two prompts are accepted.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Currency Converter
+Faithless Looting
+Swamp
+Swamp
+Swamp
+Lightning Bolt
+Forest
+Swamp x3
+Swamp x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Currency Converter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Lightning Bolt; Forest)
+Bot1.Decline
+Bot1.Decline
+[Bot1.Main2]
+
+[Expect]
+Turn = 1
+Exile.Count = 0
+Bot1.Graveyard = Faithless Looting; Forest; Lightning Bolt

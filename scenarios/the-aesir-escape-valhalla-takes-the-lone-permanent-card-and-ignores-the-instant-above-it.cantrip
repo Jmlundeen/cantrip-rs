@@ -1,0 +1,33 @@
+# One permanent card among the graveyard's cards is simply the one exiled, with no question: Black Lotus (sacrificed for the Saga's mana) is the only permanent card there; Bot1 casts Lightning
+# Bolt in response to chapter I, so a non-permanent Bolt is on top of the graveyard. Chapter I exiles the Lotus (mana value 0, no life), chapter II adds no counters (0), and chapter III returns both Saga and Lotus.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Lightning Bolt
+The Aesir Escape Valhalla
+Ornithopter
+Forest x14
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.The Aesir Escape Valhalla.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+[T1 Bot1.Main2]
+? Bot1.Life = 20
+? Exile = Black Lotus
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = (absent)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Graveyard = Lightning Bolt
+Bot1.Hand = Black Lotus; Forest; Forest; Forest; Forest; The Aesir Escape Valhalla

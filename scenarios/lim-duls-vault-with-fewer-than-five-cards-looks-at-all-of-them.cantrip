@@ -1,0 +1,32 @@
+# Lim-Dûl's Vault: with three cards in the library "the top five" are those three. Bot1 declines to pay and puts the three
+# back on top in the order it chooses.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Lim-Dûl's Vault
+Island
+Island
+Island
+Island
+Brainstorm
+Ponder
+Counterspell
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Lim-Dûl's Vault.Cast
+Bot1.Decline
+Bot1.Arrange(Counterspell; Brainstorm; Ponder)
+[Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 20
+Bot1.Library = Counterspell; Brainstorm; Ponder

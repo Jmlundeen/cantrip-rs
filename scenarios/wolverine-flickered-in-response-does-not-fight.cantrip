@@ -1,0 +1,62 @@
+# Wolverine, Fierce Fighter: "When Wolverine enters, he fights up to one other target creature."
+# If Wolverine leaves the battlefield before the trigger resolves, no fight damage is dealt to or by him (CR 701.14b),
+# and a Wolverine that has been exiled and returned is a new object (CR 400.7), not "he". So the target, still legal,
+# neither deals nor takes any damage.
+#
+# Displacer Kitten is out from turn 7. On turn 9 Wolverine enters and his trigger targets Bot2's Guerrilla Gorilla; in
+# response Bot1 casts Lightning Bolt at Bot2, and Kitten's trigger flickers Wolverine. The returned Wolverine's own
+# enters trigger targets nothing. When the first trigger resolves the Gorilla takes no damage and deals none, where a
+# fight (wolverine-fights-the-creature-he-targets-as-he-enters) would have killed it and marked 2 on Wolverine.
+
+[Bot1 Deck]
+Island
+Mountain
+Forest
+Island
+Displacer Kitten
+Wolverine, Fierce Fighter
+Lightning Bolt
+Mountain
+Island x20
+
+[Bot2 Deck]
+Forest
+Guerrilla Gorilla
+Forest
+Forest x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot2.Hand.Forest.Play
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+Bot1.Hand.Forest.Play
+Bot1.Hand.Island.Play
+Bot1.Hand.Displacer Kitten.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Wolverine, Fierce Fighter.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Target(Guerrilla Gorilla)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Target(Wolverine, Fierce Fighter)
+Bot1.Target()
+
+[Expect]
+Turn = 9
+Stack.Count = 0
+Bot2.Life = 17
+Bot1.Battlefield = Island; Island; Mountain; Mountain; Forest; Displacer Kitten; Wolverine, Fierce Fighter
+Bot1.Battlefield.Wolverine, Fierce Fighter.Damage = 0
+Bot2.Battlefield.Guerrilla Gorilla.Damage = 0
+Bot2.Battlefield = Forest; Forest; Guerrilla Gorilla

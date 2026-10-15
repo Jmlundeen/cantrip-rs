@@ -1,0 +1,44 @@
+# Nissa, Who Shakes the World: "Whenever you tap a Forest for mana, add an additional {G}" (CR 605.1b). It is the land that
+# is a Forest, not the mana: Breeding Pool (a Forest Island) tapped for {U} on turn 5 adds the extra {G} ({U}{G}), a
+# Mountain on turn 3 adds only its {R}, and an opponent's Forest tapped by Bot2 on turn 2 adds nothing extra for either
+# player ({G} only, "you tap").
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Mox Emerald
+Nissa, Who Shakes the World
+Mountain
+Breeding Pool
+Plains
+Plains x14
+
+[Bot2 Deck]
+Forest
+Forest x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Nissa, Who Shakes the World.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+? Bot2.Mana = {G}
+? Bot1.Mana =
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+? Bot1.Mana = {R}
+[T5 Bot1.Main1]
+Bot1.Hand.Breeding Pool.Play
+Bot1.Accept
+Bot1.Battlefield.Breeding Pool.Activate(Ability: {U})
+? Bot1.Mana = {U}{G}
+
+[Expect]
+Bot1.Battlefield.Nissa, Who Shakes the World.Counters.Loyalty = 5

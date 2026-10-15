@@ -1,0 +1,12 @@
+{
+  "name": "Cloak and Dagger, Entwined",
+  "manaCost": "{1}{W}{B}",
+  "type": "Legendary Creature — Human Hero",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Deathtouch, lifelink\nWhen Cloak and Dagger enter, choose target opponent and up to one target creature they control. They reveal their hand. You may exile a nonland card from their hand or the chosen creature until Cloak and Dagger leave the battlefield.",
+  "keywords": [
+    "Deathtouch",
+    "Lifelink"
+  ]
+}

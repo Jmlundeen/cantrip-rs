@@ -1,0 +1,36 @@
+# Palantír of Orthanc: Bot2 accepts the offer, so Bot1 draws a card instead of milling, and Bot2 loses no life. The
+# influence counter is on it all the same.
+
+[Bot1 Deck]
+Island
+Sol Ring
+Mox Pearl
+Palantír of Orthanc
+Island x3
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Swamp x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Palantír of Orthanc.Cast
+Bot1.Pass
+[Bot1.Main2]
+Bot1.Arrange(Lightning Bolt; Island | )
+Bot2.Accept
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Palantír of Orthanc.Counters.Influence = 1
+Bot1.Graveyard.Count = 0
+Bot1.Hand = Island; Island; Island; Lightning Bolt
+Bot2.Life = 20

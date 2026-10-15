@@ -1,0 +1,53 @@
+# Impractical Joke: "Damage can't be prevented this turn" (CR 615.12), cast with no target at all, so the damage it does
+# is none and only the rider matters. On turn 5 Bot1's Embereth Shieldbreaker (red, 2/1) attacks and Bot2's Ornithopter
+# (0/2) blocks it; Bot2's Giver of Runes gives the Ornithopter protection from red, whose damage prevention (CR 702.16e)
+# is itself prevented from happening: the Shieldbreaker's 2 damage is dealt and the Ornithopter dies. The same combat
+# without the Joke is impractical-joke-not-cast-protection-from-red-prevents-the-damage, where the Ornithopter survives.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Embereth Shieldbreaker
+Impractical Joke
+Mountain
+Mountain
+Mountain
+Mountain x12
+
+[Bot2 Deck]
+Plains
+Giver of Runes
+Ornithopter
+Plains x4
+Plains x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Embereth Shieldbreaker.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Giver of Runes.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Ornithopter.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Impractical Joke.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Embereth Shieldbreaker > Bot2)
+Bot2.Block(Ornithopter > Embereth Shieldbreaker)
+[T5 Bot1.Blockers]
+Bot1.Pass
+Bot2.Battlefield.Giver of Runes.Activate(Bot2.Battlefield.Ornithopter)
+Bot2.Decline
+Bot2.Colors(Red)
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Ornithopter

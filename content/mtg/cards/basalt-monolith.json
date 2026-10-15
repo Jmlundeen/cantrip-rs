@@ -1,0 +1,6 @@
+{
+  "name": "Basalt Monolith",
+  "manaCost": "{3}",
+  "type": "Artifact",
+  "oracleText": "This artifact doesn't untap during your untap step.\n{T}: Add {C}{C}{C}.\n{3}: Untap this artifact."
+}

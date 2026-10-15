@@ -1,0 +1,11 @@
+{
+  "name": "Kokusho, the Evening Star",
+  "manaCost": "{3}{B}{B}",
+  "type": "Legendary Creature — Dragon Spirit",
+  "power": 5,
+  "toughness": 5,
+  "oracleText": "Flying\nWhen Kokusho, the Evening Star dies, each opponent loses 5 life. You gain life equal to the life lost this way.",
+  "keywords": [
+    "Flying"
+  ]
+}

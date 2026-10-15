@@ -1,0 +1,53 @@
+# The Undercity again, by the other branches: the initiative taken on turn 1 (Secret Entrance fetches a Forest), turn 3
+# Lost Well (scry 2), turn 5 Arena (goad: Bot2's Ornithopter must attack, until Bot1's next turn), turn 7 Catacombs
+# (a 4/1 black Skeleton with menace).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Caves of Chaos Adventurer
+Island
+Island
+Forest
+Island
+Island
+Island
+Mountain x10
+
+[Bot2 Deck]
+Ornithopter
+Forest x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Caves of Chaos Adventurer.Cast
+Bot1.Search(Forest)
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Upkeep]
+Bot1.Modes(Lost Well)
+[T5 Bot1.Upkeep]
+Bot1.Modes(Arena)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+[T5 Bot1.Main1]
+? Bot2.Battlefield.Ornithopter.GoadedBy = Bot1
+[T7 Bot1.Upkeep]
+Bot1.Modes(Catacombs)
+[T7 Bot1.Main1]
+? Bot1.Dungeon = Undercity: Catacombs
+? Bot1.Battlefield.Skeleton.Power = 4
+? Bot1.Battlefield.Skeleton.Keywords = Menace
+
+[Expect]
+Initiative = Bot1

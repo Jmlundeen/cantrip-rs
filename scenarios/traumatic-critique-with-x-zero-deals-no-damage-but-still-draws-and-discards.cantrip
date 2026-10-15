@@ -1,0 +1,26 @@
+# X = 0 (CR 107.3): it costs {U}{R} and deals no damage to Bot2, but "draw two cards, then discard a card" still happens: the
+# hand grows by one.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Traumatic Critique
+Island x4
+Island x2
+Island x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Traumatic Critique.Cast(Bot2; X: 0)
+Bot1.Choose(Island)
+
+[Expect]
+Bot2.Life = 20
+Bot1.Hand.Count = 5
+Bot1.Graveyard = Traumatic Critique; Island

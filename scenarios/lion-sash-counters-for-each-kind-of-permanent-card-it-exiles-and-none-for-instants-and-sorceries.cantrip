@@ -1,0 +1,78 @@
+# "Exile target card from a graveyard. If it was a permanent card, put a +1/+1 counter on this permanent." Bot2's Wheel of
+# Fortune on turn 2 sends both hands to the graveyards. On turn 3 Lion Sash exiles Bot2's Lightning Bolt (instant) and
+# Demonic Tutor (sorcery), no counter for either, and its Island (a land card: a counter). On turn 5 it exiles Bot1's
+# Conclave Tribunal (enchantment), Liliana of the Veil (planeswalker), Invasion of Gobakhan (battle) and Llanowar Elves
+# (creature): a counter each. Five counters in all.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Lion Sash
+Conclave Tribunal
+Liliana of the Veil
+Invasion of Gobakhan
+Llanowar Elves
+Plains x20
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Wheel of Fortune
+Lightning Bolt
+Island
+Demonic Tutor
+Mountain x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Lion Sash.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Wheel of Fortune.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Lion Sash.Activate(Bot2.Graveyard.Lightning Bolt)
+Bot1.Pass
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Lion Sash.Activate(Bot2.Graveyard.Demonic Tutor)
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Lion Sash.Activate(Bot2.Graveyard.Island)
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Lion Sash.Counters.PlusOnePlusOne = 1
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Lion Sash.Activate(Bot1.Graveyard.Conclave Tribunal)
+Bot1.Pass
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Lion Sash.Activate(Bot1.Graveyard.Liliana of the Veil)
+Bot1.Pass
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Battlefield.Lion Sash.Activate(Bot1.Graveyard.Invasion of Gobakhan)
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Lion Sash.Activate(Bot1.Graveyard.Llanowar Elves)
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Exile.Count = 7
+Bot1.Battlefield.Lion Sash.Counters.PlusOnePlusOne = 5
+Bot1.Battlefield.Lion Sash.Power = 6

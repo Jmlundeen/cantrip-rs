@@ -1,0 +1,25 @@
+# A search may find nothing (CR 701.23b): Bot1 takes no card even though instants and sorceries are in the library (Lightning Bolt and Time Walk); the library is shuffled and nothing is put on top, so
+# the next draw is not necessarily one of them - here the library is only Islands and the two spells, with the library size unchanged.
+
+[Bot1 Deck]
+Island
+Mystical Tutor
+Island x5
+Lightning Bolt
+Time Walk
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Mystical Tutor.Cast
+Bot1.Search()
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Library.Count = 14
+Bot1.Graveyard = Mystical Tutor

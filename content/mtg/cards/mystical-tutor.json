@@ -1,0 +1,6 @@
+{
+  "name": "Mystical Tutor",
+  "manaCost": "{U}",
+  "type": "Instant",
+  "oracleText": "Search your library for an instant or sorcery card, reveal it, then shuffle and put that card on top."
+}

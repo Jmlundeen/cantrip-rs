@@ -1,0 +1,45 @@
+# The attack trigger is on the stack when Bot2 answers with Lightning Bolt: the equipped Ornithopter (0/2) dies, and the
+# trigger, resolving, finds no creature to put four counters on (CR 400.7: the Ornithopter that left is not one on the
+# battlefield) and does nothing. Bone Sabres is left on the battlefield unattached (CR 301.5c). The positive control is
+# bone-sabres-counters-only-on-the-equipped-attacker-and-they-add-up.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Bone Sabres
+Ornithopter
+Plains x14
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x14
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Bone Sabres.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Bone Sabres.Activate(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot1.Attack(Ornithopter)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Ornithopter
+Bot1.Battlefield = Mox Emerald; Mox Ruby; Mox Pearl; Bone Sabres
+Bot1.Battlefield.Bone Sabres.AttachedTo = (absent)
+Bot2.Life = 20

@@ -1,0 +1,12 @@
+[package]
+name = "cantrip-oracle"
+description = "Every card's characteristics, generated from content/ at build time by build.rs."
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+[dependencies]
+cantrip-api.workspace = true
+
+[build-dependencies]
+serde_json = "1"

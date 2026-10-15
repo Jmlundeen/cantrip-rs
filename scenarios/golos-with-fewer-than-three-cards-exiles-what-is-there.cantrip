@@ -1,0 +1,57 @@
+# "Exile the top three cards of your library" with fewer (CR 701.17 asks no more than exists): the deck is the opening hand, a Forest
+# the enters trigger fetches, the Bolt drawn on turn 3, and one more Lightning Bolt. The ability exiles that one card, which is cast for no
+# mana at Bot2, and the library is empty afterwards (Bot1 has not yet had to draw from it).
+
+[Bot1 Deck]
+Golos, Tireless Pilgrim
+Gleemox
+Sol Ring
+Mox Emerald
+Mox Pearl
+Mox Jet
+Mox Ruby
+Forest
+Lightning Bolt
+Lightning Bolt
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Gleemox.Activate(Color: Blue)
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Golos, Tireless Pilgrim.Cast
+Bot1.Pass
+Bot1.Search(Forest)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Gleemox.Activate(Color: Blue)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Golos, Tireless Pilgrim.Activate(Ability: Exile the top three)
+Bot1.Pass
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+
+[Expect]
+Bot1.Library.Count = 0
+Exile.Count = 0
+Bot2.Life = 17
+Bot1.Hand = Lightning Bolt

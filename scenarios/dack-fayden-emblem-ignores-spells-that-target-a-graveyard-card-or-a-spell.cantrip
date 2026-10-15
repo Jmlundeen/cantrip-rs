@@ -1,0 +1,68 @@
+# Dack Fayden's emblem needs a spell that "targets one or more permanents". Bot1 reaches the emblem on turn 7. Reanimate
+# targets a creature card in Bot2's graveyard (not a permanent): the emblem's ability does not trigger, only the Reanimate
+# is on the stack. On turn 8 Bot2 casts an Ornithopter and Bot1's Counterspell targets that spell (a spell is not a
+# permanent): again nothing triggers.
+
+[Bot1 Deck]
+Volcanic Island
+Black Lotus
+Dack Fayden
+Mox Jet
+Reanimate
+Counterspell
+Mox Sapphire
+Island x20
+
+[Bot2 Deck]
+Island x5
+Ornithopter
+Island
+Ornithopter
+Island x12
+
+[Actions]
+Bot1.Hand.Volcanic Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Volcanic Island.Activate(Ability: Add {U})
+Bot1.Hand.Dack Fayden.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Dack Fayden.Activate(Bot1; Ability: draws two)
+Bot1.Choose(Island; Island)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Dack Fayden.Activate(Bot1; Ability: draws two)
+Bot1.Choose(Island; Island)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Dack Fayden.Activate(Bot1; Ability: draws two)
+Bot1.Choose(Island; Island)
+[T7 Bot1.Main1]
+? Bot2.Graveyard = Island; Island; Ornithopter
+Bot1.Battlefield.Dack Fayden.Activate(Ability: emblem)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Reanimate.Cast(Bot2.Graveyard.Ornithopter)
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Types = Artifact; Creature
+[T8 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot1.Battlefield.Volcanic Island.Activate(Ability: Add {U})
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Counterspell.Cast(Stack.Ornithopter)
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+[T8 Bot2.Main2]
+
+[Expect]
+Turn = 8
+Bot2.Graveyard = Ornithopter; Island; Island
+Bot2.Battlefield.Count = 0

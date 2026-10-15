@@ -1,0 +1,6 @@
+{
+  "name": "Lightning Greaves",
+  "manaCost": "{2}",
+  "type": "Artifact — Equipment",
+  "oracleText": "Equipped creature has haste and shroud. (It can't be the target of spells or abilities.)\nEquip {0}"
+}

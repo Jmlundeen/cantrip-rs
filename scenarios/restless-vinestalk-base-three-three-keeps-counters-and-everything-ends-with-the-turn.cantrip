@@ -1,0 +1,49 @@
+# Restless Vinestalk: "up to one other target creature has base power and toughness 3/3 until end of turn" sets the base
+# (CR 613.4b), so a +1/+1 counter still applies on top (613.4c): Bot1's own Walking Ballista (X = 1, a 1/1 with a counter) is
+# 4/4 after the attack trigger, and the Vinestalk itself is not a legal target of its own "other" (refused beside the
+# Ballista). "Until end of turn" ends all of it: by Bot2's turn 4 the Ballista is a 1/1 again and the land is only a land.
+
+[Bot1 Deck]
+Restless Vinestalk
+Mox Emerald
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Mox Ruby
+Walking Ballista
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Restless Vinestalk.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Walking Ballista.Cast(X: 1)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Restless Vinestalk.Activate(Ability: becomes a 5/5)
+Bot1.Attack(Restless Vinestalk > Bot2)
+! Bot1.Target(Restless Vinestalk)
+Bot1.Target(Walking Ballista)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Walking Ballista.Power = 4
+? Bot1.Battlefield.Walking Ballista.Toughness = 4
+[T4 Bot2.Upkeep]
+? Bot1.Battlefield.Walking Ballista.Power = 1
+? Bot1.Battlefield.Restless Vinestalk.Types = Land
+
+[Expect]
+Bot2.Life = 15
+Bot1.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 1

@@ -1,0 +1,42 @@
+# Cryogen Relic draws a card as it enters and another as it leaves. Bot2 taps its Llanowar Elves for mana on turn 4, so the
+# Elves are still tapped on Bot1's turn 5: Bot1 sacrifices the Relic ({1}{U}) to put a stun counter on them, and draws
+# again as it leaves. Bot1 starts with seven cards, draws for turns 3 and 5 and for each of the Relic's two triggers.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Cryogen Relic
+Island x20
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest
+Forest x17
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Cryogen Relic.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Llanowar Elves.Activate
+? Bot2.Battlefield.Llanowar Elves.Tapped = True
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Cryogen Relic.Activate(Bot2.Battlefield.Llanowar Elves)
+[T5 Bot1.Main2]
+? Bot2.Battlefield.Llanowar Elves.Counters.Stun = 1
+
+[Expect]
+Bot2.Battlefield.Llanowar Elves.Counters.Stun = 1
+Bot1.Graveyard = Cryogen Relic

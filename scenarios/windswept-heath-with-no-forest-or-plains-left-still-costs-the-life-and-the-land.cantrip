@@ -1,0 +1,24 @@
+# Windswept Heath: the life and the sacrifice are costs (CR 602.2, 118.12), paid before the ability resolves, so a library
+# with no Forest or Plains card in it (only Islands and a Swamp) leaves Bot1 a life down and without the land, and
+# finding nothing (CR 701.23b) puts nothing onto the battlefield. The ability is still activatable with nothing to find.
+
+[Bot1 Deck]
+Windswept Heath
+Island x6
+Island x5
+Swamp x4
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Windswept Heath.Play
+Bot1.Battlefield.Windswept Heath.Activate
+! Bot1.Search(Island)
+Bot1.Search()
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 19
+Bot1.Graveyard = Windswept Heath
+Bot1.Battlefield.Count = 0

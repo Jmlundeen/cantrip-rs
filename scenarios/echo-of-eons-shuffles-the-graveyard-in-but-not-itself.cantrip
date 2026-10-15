@@ -1,0 +1,41 @@
+# "Each player shuffles their hand and graveyard into their library, then draws seven": Bot1's Lightning Bolt (cast at Bot2)
+# and its sacrificed Black Lotus are in the graveyard when Echo of Eons resolves and go into the library, while the Echo itself,
+# still on the stack as it resolves, is not in the graveyard to be shuffled (CR 608.2n: it goes there afterwards). So Bot1's library of
+# 10 becomes 12, and after the draw of seven it holds 5; the graveyard is the Echo alone.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Echo of Eons
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Swamp x22
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Echo of Eons.Cast
+Bot1.Pass
+
+[Expect]
+Bot2.Life = 17
+Bot1.Graveyard = Echo of Eons
+Bot1.Hand.Count = 7
+Bot1.Library.Count = 5
+Bot2.Hand.Count = 7
+Bot2.Library.Count = 15

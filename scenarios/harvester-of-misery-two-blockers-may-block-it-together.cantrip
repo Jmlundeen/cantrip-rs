@@ -1,0 +1,35 @@
+# Menace allows a block by two or more creatures: both of Bot2's Ornithopters block Harvester of Misery together and are
+# each assigned lethal damage (2 and 2 of its 5), so both die and Bot2 takes nothing.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Swamp
+Harvester of Misery
+Swamp x10
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Island x14
+
+[Actions]
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Harvester of Misery.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Harvester of Misery > Bot2)
+Bot2.Block(Ornithopter#1 > Harvester of Misery; Ornithopter#2 > Harvester of Misery)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Count = 0
+Bot2.Life = 20

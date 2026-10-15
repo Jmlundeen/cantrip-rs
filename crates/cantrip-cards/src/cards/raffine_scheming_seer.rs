@@ -1,0 +1,35 @@
+use cantrip_api::*;
+use cantrip_mechanics::targets;
+use cantrip_mechanics::{connive_n, triggers};
+use cantrip_oracle as oracle;
+
+/// "Target attacking creature" (CR 115.1, 506.4): attacking as the trigger resolves too, or it fizzles.
+fn attacking_creature(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    (targets::CREATURE.filter)(q, asker, t) && matches!(t, Target::Object(id) if q.is_attacking(id))
+}
+
+/// The target connives X, where X is the number of attacking creatures, counted as the ability resolves over every
+/// attacking creature, not only its controller's.
+fn connive_x(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
+    let attacking = g.state().battlefield().iter().filter(|&&id| g.is_attacking(id)).count();
+    if attacking < 1 {
+        return Ok(());
+    }
+    connive_n(g, creature, item.object, attacking.min(u8::MAX as usize) as u8)
+}
+
+pub static CARD: CardDef = CardDef {
+    abilities: &[
+        triggers::ward::<1>("Ward {1} (Whenever this creature becomes the target of a spell or ability an opponent controls, counter it unless that player pays {1}.)"),
+        AbilityDef::Triggered(TriggeredDef {
+            text: "Whenever you attack, target attacking creature connives X, where X is the number of attacking creatures.",
+            listens: EventMask::ATTACKERS_DECLARED,
+            matches: triggers::you_attack,
+            targets: &[TargetSpec { min: 1, max: 1, filter: attacking_creature }],
+            effect: connive_x,
+            ..TriggeredDef::BLANK
+        }),
+    ],
+    ..oracle::RAFFINE_SCHEMING_SEER
+};

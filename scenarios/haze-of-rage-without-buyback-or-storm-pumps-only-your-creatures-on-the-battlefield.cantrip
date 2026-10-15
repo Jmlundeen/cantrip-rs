@@ -1,0 +1,45 @@
+# Haze of Rage as the first spell of turn 3, without buyback: storm copies it for each spell cast before it this turn, none,
+# so it pumps once; "creatures you control get +1/+0 until end of turn" is a one-shot effect on the creatures there as it
+# resolves (CR 611.2c), so Bot1's Ornithopter has power 1, Bot2's has 0, and a second Ornithopter Bot1 casts afterwards
+# gets nothing. Without buyback the Haze goes to the graveyard, and the pump is gone at the next turn.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Ornithopter
+Ornithopter
+Haze of Rage
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Ornithopter
+Forest x22
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Haze of Rage.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Power = 1
+? Bot2.Battlefield.Ornithopter.Power = 0
+? Stack.Count = 0
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter#2.Power = 0
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Ornithopter#1.Power = 0
+
+[Expect]
+Bot1.Graveyard = Haze of Rage

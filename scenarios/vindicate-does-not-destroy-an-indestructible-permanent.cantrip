@@ -1,0 +1,36 @@
+# Destruction does nothing to an indestructible permanent (CR 702.12b): Bot2 answers Vindicate on its Ornithopter with Revitalizing
+# Repast, which gives it indestructible until end of turn (and a +1/+1 counter). The target is still legal, Vindicate resolves, and
+# the Ornithopter survives.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Vindicate
+Plains x12
+
+[Bot2 Deck]
+Mox Jet
+Ornithopter
+Revitalizing Repast
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Vindicate.Cast(Bot2.Battlefield.Ornithopter)
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Revitalizing Repast.Cast(Bot2.Battlefield.Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Vindicate
+Bot2.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1

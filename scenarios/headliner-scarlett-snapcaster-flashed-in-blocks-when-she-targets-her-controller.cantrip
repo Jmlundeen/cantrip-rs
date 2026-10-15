@@ -1,0 +1,39 @@
+# The control for headliner-scarlett-stops-a-creature-flashed-in-after-her-enter-trigger-resolved: with the trigger aimed at Bot1
+# itself, the Snapcaster Mage Bot2 flashes in afterwards is free to block Scarlett and does (a 2/1 against 3 damage: it dies,
+# and she takes 2).
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Headliner Scarlett
+Swamp x17
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Snapcaster Mage
+Island x17
+
+[Actions]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Headliner Scarlett.Cast
+Bot1.Target(Bot1)
+Bot1.Pass
+Bot2.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Snapcaster Mage.Cast
+Bot1.Attack(Headliner Scarlett)
+Bot2.Block(Snapcaster Mage > Headliner Scarlett)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot2.Graveyard = Snapcaster Mage
+Bot1.Battlefield.Headliner Scarlett.Damage = 2

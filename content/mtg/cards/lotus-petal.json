@@ -1,0 +1,6 @@
+{
+  "name": "Lotus Petal",
+  "manaCost": "{0}",
+  "type": "Artifact",
+  "oracleText": "{T}, Sacrifice Lotus Petal: Add one mana of any color."
+}

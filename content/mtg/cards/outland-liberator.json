@@ -1,0 +1,24 @@
+{
+  "name": "Outland Liberator",
+  "manaCost": "{1}{G}",
+  "type": "Creature — Human Werewolf",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "{1}, Sacrifice this creature: Destroy target artifact or enchantment.\nDaybound (If a player casts no spells during their own turn, it becomes night next turn.)",
+  "keywords": [
+    "Daybound"
+  ],
+  "backFace": {
+    "name": "Frenzied Trapbreaker",
+    "colorIndicator": [
+      "Green"
+    ],
+    "type": "Creature — Werewolf",
+    "power": 3,
+    "toughness": 3,
+    "oracleText": "{1}, Sacrifice this creature: Destroy target artifact or enchantment.\nWhenever this creature attacks, destroy target artifact or enchantment defending player controls.\nNightbound (If a player casts at least two spells during their own turn, it becomes day next turn.)",
+    "keywords": [
+      "Nightbound"
+    ]
+  }
+}

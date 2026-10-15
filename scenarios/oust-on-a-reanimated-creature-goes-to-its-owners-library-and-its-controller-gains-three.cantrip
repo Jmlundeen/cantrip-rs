@@ -1,0 +1,30 @@
+# Owner versus controller: Bot1 reanimates the Ornithopter that Bot2 discarded to hand size, so Bot1 controls it and Bot2 owns it.
+# Oust puts it into its owner's library, Bot2's (CR 401.4), second from the top, and the creature's controller - Bot1, not the owner -
+# gains 3 life.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Reanimate
+Oust
+Plains x12
+
+[Bot2 Deck]
+Island x7
+Ornithopter
+Island x8
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Reanimate.Cast(Bot2.Graveyard.Ornithopter)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Oust.Cast(Bot1.Battlefield.Ornithopter)
+
+[Expect]
+Bot1.Life = 23
+Bot2.Life = 20
+Bot1.Graveyard = Oust; Reanimate
+Bot2.Library.Count = 9

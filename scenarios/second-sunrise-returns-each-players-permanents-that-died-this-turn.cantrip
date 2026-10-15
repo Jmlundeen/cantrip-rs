@@ -1,0 +1,32 @@
+# Second Sunrise returns every player's artifact, creature, enchantment and land cards put into their graveyard from the
+# battlefield this turn, each to its owner's battlefield. Bot1 sacrifices its Black Lotus for the white mana to cast
+# it; in response Bot2 sacrifices its own Lotus for the red mana to Bolt Bot1. Both Lotuses come back.
+
+[Bot1 Deck]
+Black Lotus
+Second Sunrise
+Island x5
+Island x10
+
+[Bot2 Deck]
+Black Lotus
+Lightning Bolt
+Island x5
+Island x10
+
+[Actions]
+Bot2.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Second Sunrise.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Black Lotus
+Bot2.Battlefield = Black Lotus
+Bot1.Life = 17
+Bot1.Graveyard = Second Sunrise
+Bot2.Graveyard = Lightning Bolt

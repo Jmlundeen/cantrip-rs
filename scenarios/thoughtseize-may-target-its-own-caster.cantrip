@@ -1,0 +1,26 @@
+# Thoughtseize: "Target player" can be the caster. Bot1 reveals its own hand (a Lightning Bolt and Islands), discards the Bolt
+# by its own choice and loses 2 life.
+
+[Bot1 Deck]
+Mox Jet
+Thoughtseize
+Lightning Bolt
+Island x4
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Thoughtseize.Cast(Bot1)
+Bot1.Choose(Lightning Bolt)
+[Bot1.Main2]
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Life = 18
+Bot1.Graveyard = Thoughtseize; Lightning Bolt

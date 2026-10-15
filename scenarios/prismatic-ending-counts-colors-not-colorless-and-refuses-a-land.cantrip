@@ -1,0 +1,35 @@
+# Converge counts colors of mana spent (CR 105.1: colorless is not a color). On turn three Bot1 casts it with X = 2: a Sol Ring's
+# {C}{C} pays the generic and a Mox Pearl the {W}, so one color is spent and it exiles Bot2's Mother of Runes (mana value 1). A land is
+# not a legal target (the refusal, beside the Mother, the positive control), though the Island stays untouched.
+
+[Bot1 Deck]
+Mox Pearl
+Sol Ring
+Prismatic Ending
+Plains x13
+
+[Bot2 Deck]
+Island
+Mox Pearl
+Mother of Runes
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Mother of Runes.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+! Bot1.Hand.Prismatic Ending.Cast(Bot2.Battlefield.Island; X: 2)
+Bot1.Hand.Prismatic Ending.Cast(Bot2.Battlefield.Mother of Runes; X: 2)
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Mother of Runes
+Bot2.Battlefield = Island; Mox Pearl

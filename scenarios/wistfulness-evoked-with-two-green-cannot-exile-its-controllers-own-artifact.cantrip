@@ -1,0 +1,27 @@
+# "An artifact or enchantment an opponent controls": with only the caster's own Sol Ring on the battlefield, the green
+# enters ability has no legal target and is removed from the stack (CR 603.3d), leaving Sol Ring where it is.
+
+[Bot1 Deck]
+Sol Ring
+Wistfulness
+Forest x5
+Forest x10
+
+[Bot2 Deck]
+Forest x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Wistfulness.Cast(Ability: Evoke)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot1.Battlefield = Forest; Forest; Sol Ring
+Bot1.Graveyard = Wistfulness

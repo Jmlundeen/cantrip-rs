@@ -1,0 +1,30 @@
+# Anger: "As long as this card is in your graveyard and you control a Mountain, creatures you control have haste." With
+# Anger in Bot1's hand the Goblin Welder has no haste although Bot1 controls a Mountain (the Blood Crypt, a Swamp
+# Mountain by its land types, no card named Mountain); discarded to hand size on turn 7, Anger is in the graveyard and
+# the same Welder has haste.
+
+[Bot1 Deck]
+Blood Crypt
+Goblin Welder
+Anger
+Swamp x4
+Swamp x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Blood Crypt.Play
+Bot1.Accept
+Bot1.Battlefield.Blood Crypt.Activate(Ability: {R})
+Bot1.Hand.Goblin Welder.Cast
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Goblin Welder.Keywords = (absent)
+[T7 Bot1.Main1]
+Bot1.Discard(Anger)
+[T8 Bot2.Main1]
+? Bot1.Graveyard = Anger
+? Bot1.Battlefield.Goblin Welder.Keywords = Haste
+
+[Expect]
+Bot1.Graveyard = Anger

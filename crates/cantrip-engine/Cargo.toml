@@ -1,0 +1,15 @@
+[package]
+name = "cantrip-engine"
+description = "The engine as its users see it: the rules, every card crate, and the card table they make, built once per process."
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+[features]
+staged = ["cantrip-cards/staged"]
+
+[dependencies]
+cantrip-state.workspace = true
+cantrip-api.workspace = true
+cantrip-rules.workspace = true
+cantrip-cards.workspace = true

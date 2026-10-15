@@ -1,0 +1,38 @@
+# Etali, Primal Conqueror: "each player exiles cards from the top of their library until they exile a nonland card" - when
+# a library holds only lands the exiling goes on until it is empty, and nothing is found. Bot2's whole library is three
+# Islands (it has not drawn yet), all exiled; Bot1's top card is a Lightning Bolt, found and cast for free at Bot2, which
+# goes to 17 life. Bot1 pays for Etali with three Black Lotuses.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Etali, Primal Conqueror
+Island x3
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Island x7
+Island x3
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Etali, Primal Conqueror.Cast
+Bot1.Choose(Lightning Bolt)
+Bot1.Target(Bot2)
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot2.Life = 17
+Bot2.Library.Count = 0
+Exile.Count = 3
+Bot1.Graveyard = Lightning Bolt; Black Lotus; Black Lotus; Black Lotus
+Bot1.Battlefield = Etali, Primal Conqueror

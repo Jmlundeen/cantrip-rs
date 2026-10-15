@@ -1,0 +1,57 @@
+# "Whenever one or more other creatures you control with power 2 or less enter, draw a card. This ability triggers only once each turn."
+# Turn 1: Bot1 casts Enduring Innocence, then an Ornithopter (power 0: draws the top card) and a second Ornithopter the same turn (no
+# second draw). Turn 2: Bot2's Llanowar Elves enters (an opponent's creature: no draw). Turn 3: a third Ornithopter draws again, a new turn.
+# Turn 5: Cathar Commando (power 3) does not. Bot1 draws exactly twice from the Innocence, so nine cards are left in its library.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Enduring Innocence
+Ornithopter
+Ornithopter
+Plains
+Ornithopter
+Cathar Commando
+Plains
+Plains x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Enduring Innocence.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T1 Bot1.Main2]
+? Bot1.Hand.Count = 2
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Cathar Commando.Cast
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Library.Count = 9
+Bot1.Hand.Count = 1

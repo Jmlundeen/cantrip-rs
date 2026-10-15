@@ -1,0 +1,11 @@
+{
+  "name": "Wolverine, Fierce Fighter",
+  "manaCost": "{2}{R}{G}",
+  "type": "Legendary Creature — Mutant Berserker Hero",
+  "power": 3,
+  "toughness": 5,
+  "oracleText": "Haste\nWhen Wolverine enters, he fights up to one other target creature.\nIf damage would be dealt to Wolverine, instead that damage is dealt, but all other damage already dealt to him is healed.",
+  "keywords": [
+    "Haste"
+  ]
+}

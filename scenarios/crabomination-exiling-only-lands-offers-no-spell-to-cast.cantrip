@@ -1,0 +1,40 @@
+# Crabomination: "You may cast a spell from among cards exiled this way". Bot2's library, graveyard and hand hold only
+# Islands: the three Islands are exiled (the top of the library, the one in the graveyard from Bot2's discard to hand size, and
+# one from the hand) and none can be cast (a land is played, never cast), so nothing is offered (! Bot1.Choose).
+# Crabomination is cast on turn 3 for {4}{B}{B}: Black Lotus's mana, a Mox Jet and two Swamps.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Black Lotus
+Swamp
+Crabomination
+Swamp x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Crabomination.Cast
+Bot1.Pass
+Bot1.Pass
+! Bot1.Choose
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Island; Island; Island
+Bot2.Hand.Count = 6
+Bot2.Graveyard.Count = 0
+Bot2.Library.Count = 11
+Bot1.Battlefield = Swamp; Swamp; Mox Jet; Crabomination

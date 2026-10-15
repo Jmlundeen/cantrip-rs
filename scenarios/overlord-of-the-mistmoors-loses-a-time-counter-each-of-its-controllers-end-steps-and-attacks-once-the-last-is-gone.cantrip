@@ -1,0 +1,54 @@
+# Overlord of the Mistmoors cast for impending on turn 7 loses one time counter at the beginning of each of Bot1's end
+# steps (turns 7, 9, 11, 13) and none at Bot2's (CR 702.176a): 3 on turn 9, 2 on turn 11, 1 on turn 13. When the fourth
+# is removed it is a creature (CR 702.176a, 613.1d), so on turn 15 it has no counters, is a 6/6 enchantment creature and
+# attacks, and "whenever this permanent attacks" makes two more Insects. The two from entering did not attack.
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Plains
+Overlord of the Mistmoors
+Plains
+Plains
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Overlord of the Mistmoors.Cast(Ability: Impending)
+[T9 Bot1.Main1]
+? Bot1.Battlefield.Overlord of the Mistmoors.Counters.Time = 3
+? Bot1.Battlefield.Overlord of the Mistmoors.Types = Enchantment
+[T11 Bot1.Main1]
+? Bot1.Battlefield.Overlord of the Mistmoors.Counters.Time = 2
+[T13 Bot1.Main1]
+? Bot1.Battlefield.Overlord of the Mistmoors.Counters.Time = 1
+? Bot1.Battlefield.Overlord of the Mistmoors.Types = Enchantment
+[T15 Bot1.Main1]
+? Bot1.Battlefield.Overlord of the Mistmoors.Counters.Time = (absent)
+? Bot1.Battlefield.Overlord of the Mistmoors.Types = Enchantment; Creature
+? Bot1.Battlefield.Overlord of the Mistmoors.Power = 6
+? Bot1.Battlefield.Overlord of the Mistmoors.Subtypes = Avatar; Horror
+Bot1.Attack(Overlord of the Mistmoors > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T15 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Count = 9
+Bot2.Life = 14

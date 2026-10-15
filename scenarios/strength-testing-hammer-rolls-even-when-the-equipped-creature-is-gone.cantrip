@@ -1,0 +1,45 @@
+# The trigger's creature may be gone before it resolves: Bot1 attacks with the equipped Ornithopter and Bot2 Swords it with the trigger on the stack. The
+# die is rolled anyway and the missing creature gets nothing and has no power to compare, so Bot1 draws nothing (its hand stays at the two Plains).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Strength-Testing Hammer
+Ornithopter
+Plains
+Plains x14
+
+[Bot2 Deck]
+Plains
+Swords to Plowshares
+Plains x12
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Strength-Testing Hammer.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Strength-Testing Hammer.Activate(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot1.Attack(Ornithopter > Bot2)
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 2
+Exile = Ornithopter
+Bot1.Battlefield.Strength-Testing Hammer.AttachedTo = (absent)

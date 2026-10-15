@@ -1,0 +1,6 @@
+{
+  "name": "Forever Young",
+  "manaCost": "{1}{B}",
+  "type": "Sorcery",
+  "oracleText": "Put any number of target creature cards from your graveyard on top of your library.\nDraw a card."
+}

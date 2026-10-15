@@ -1,0 +1,6 @@
+{
+  "name": "Mox Opal",
+  "manaCost": "{0}",
+  "type": "Legendary Artifact",
+  "oracleText": "Metalcraft — {T}: Add one mana of any color. Activate only if you control three or more artifacts."
+}

@@ -1,0 +1,43 @@
+# Bestow {1}{G} (CR 702.103): Springheart Nantuko cast bestowed on Llanowar Elves is an Aura enchantment attached to
+# them (enchanted creature gets +1/+1, so the Elves are 2/2) and is not a creature. When Bot2's Lightning Bolt kills the
+# Elves, the Nantuko does not go to the graveyard: it becomes unattached and ceases to be bestowed (CR 702.103f), an
+# enchantment creature 1/1 again.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Forest
+Llanowar Elves
+Springheart Nantuko
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x5
+Mountain x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Springheart Nantuko.Cast(Bot1.Battlefield.Llanowar Elves; Ability: Bestow)
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+? Bot1.Battlefield.Llanowar Elves.Power = 2
+? Bot1.Battlefield.Springheart Nantuko.Types = Enchantment
+? Bot1.Battlefield.Springheart Nantuko.AttachedTo = Llanowar Elves
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield = Forest; Mox Emerald; Mox Pearl; Springheart Nantuko
+Bot1.Battlefield.Springheart Nantuko.Types = Enchantment; Creature
+Bot1.Battlefield.Springheart Nantuko.Power = 1
+Bot1.Graveyard = Llanowar Elves

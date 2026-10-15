@@ -1,0 +1,11 @@
+{
+  "name": "Clarion Conqueror",
+  "manaCost": "{2}{W}",
+  "type": "Creature — Dragon",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Flying\nActivated abilities of artifacts, creatures, and planeswalkers can't be activated.",
+  "keywords": [
+    "Flying"
+  ]
+}

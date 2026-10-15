@@ -1,0 +1,74 @@
+<!-- The Uno SDK version is pinned here rather than in a global.json, which is only honored when the build starts
+     from its own folder: this project is also built from the repository root. -->
+<Project Sdk="Uno.Sdk/6.7.30">
+  <PropertyGroup>
+    <TargetFrameworks>net10.0-browserwasm</TargetFrameworks>
+
+    <OutputType>Exe</OutputType>
+    <UnoSingleProject>true</UnoSingleProject>
+
+    <ApplicationTitle>Cantrip</ApplicationTitle>
+    <ApplicationId>cantrip.client.web</ApplicationId>
+    <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+    <ApplicationVersion>1</ApplicationVersion>
+    <ApplicationPublisher>Cantrip</ApplicationPublisher>
+    <Description>The Cantrip browser client.</Description>
+
+    <!-- https://aka.platform.uno/singleproject-features -->
+    <UnoFeatures>
+      SkiaRenderer;
+    </UnoFeatures>
+
+    <!-- JSImport, for the keys the window hears (KeyboardBridge), is generated as unsafe code. -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+    <!-- No Hot Design: its toolbar sat over the table in every Debug page, test pictures included, and it looks for a
+         dev server that a statically served build never has. -->
+    <UnoDisableHotDesign>true</UnoDisableHotDesign>
+
+    <!-- The splash shown while the page loads: the Cantrip image at the repository root, centred on its own colour, at the
+         size the default splash was drawn at. -->
+    <UnoSplashScreenFile>$(MSBuildThisFileDirectory)..\..\cantrip.png</UnoSplashScreenFile>
+    <UnoSplashScreenBaseSize>300,300</UnoSplashScreenBaseSize>
+    <UnoSplashScreenColor>#1C0433</UnoSplashScreenColor>
+  </PropertyGroup>
+
+  <!-- The shipping build: compiled ahead of time to WebAssembly rather than interpreted, which starts the table about ten
+       times sooner. Needs the wasm-tools workload. Slow the first time (several minutes); the compiled assemblies are
+       kept in obj, so a publish after a small change redoes only what changed. tools\play-release-build.cmd builds and
+       serves it. -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <RunAOTCompilation>true</RunAOTCompilation>
+    <WasmShellMonoRuntimeExecutionMode>InterpreterAndAOT</WasmShellMonoRuntimeExecutionMode>
+
+    <!-- No PWA service worker: a registered worker keeps serving an old build across reloads until it is unregistered,
+         which during development reads as a change that did nothing. An empty WasmPWAManifestFile is not enough, since
+         Uno.Sdk fills it in whenever Platforms/WebAssembly/manifest.webmanifest exists, so there is no such file. A
+         browser still holding an earlier build's worker is cleared by NoServiceWorker.js, below. -->
+  </PropertyGroup>
+
+  <!-- Loaded with the page, as Uno loads its own AppManifest.js: one clears away a service worker an earlier build left,
+       another hears keys on the window for the hotkeys (KeyboardBridge), and one names the tab (BrowserTitle). -->
+  <ItemGroup>
+    <EmbeddedResource Include="Platforms\WebAssembly\WasmScripts\NoServiceWorker.js" />
+    <EmbeddedResource Include="Platforms\WebAssembly\WasmScripts\Keys.js" />
+    <EmbeddedResource Include="Platforms\WebAssembly\WasmScripts\Ticket.js" />
+    <EmbeddedResource Include="Platforms\WebAssembly\WasmScripts\Title.js" />
+  </ItemGroup>
+
+  <!-- Card frames, icons, fonts and the frame template, from the tracked content files. -->
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\..\content\res\frames\retro\*.png" LogicalName="frame_%(Filename)%(Extension)" />
+    <EmbeddedResource Include="..\..\..\content\res\icons\*.png" LogicalName="icon_%(Filename)%(Extension)" />
+    <EmbeddedResource Include="..\..\..\content\res\fonts\*.ttf" LogicalName="%(Filename)%(Extension)" />
+    <EmbeddedResource Include="..\..\..\content\res\templates\retro.json" LogicalName="retro.json" />
+  </ItemGroup>
+
+  <!-- The client plays through Cantrip.Client and Cantrip.Protocol, and takes what a card offers, when to pass, how the
+       log is set out and the canned prompt positions (?prompt=NAME) from Cantrip.Client.Presentation. -->
+  <ItemGroup>
+    <ProjectReference Include="..\Cantrip.Client\Cantrip.Client.csproj" />
+    <ProjectReference Include="..\Cantrip.Client.Presentation\Cantrip.Client.Presentation.csproj" />
+  </ItemGroup>
+
+</Project>

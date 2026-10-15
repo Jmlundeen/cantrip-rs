@@ -1,0 +1,36 @@
+# In a three-player game Bot1's Time Warp on Bot3 (CR 500.7) makes turn two Bot3's extra turn, before Bot2, the next in turn order:
+# turn three is Bot2's, turn four Bot3's regular turn, turn five Bot1's.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Black Lotus
+Time Warp
+Island x4
+Island x10
+
+[Bot2 Deck]
+Swamp x17
+
+[Bot3 Deck]
+Mountain x17
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Time Warp.Cast(Bot3)
+[T2 Bot3.Main1]
+? ActivePlayer = Bot3
+[T3 Bot2.Main1]
+? ActivePlayer = Bot2
+[T4 Bot3.Main1]
+? ActivePlayer = Bot3
+[T5 Bot1.Main1]
+
+[Expect]
+Turn = 5
+ActivePlayer = Bot1

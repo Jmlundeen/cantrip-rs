@@ -1,0 +1,273 @@
+using System.Text.Json;
+using Microsoft.Playwright;
+using Xunit;
+
+namespace Cantrip.Client.Web.Tests;
+
+/// <summary>
+/// One page of the web client, driven as a player drives it. The table is drawn on canvases, so there is no DOM to find
+/// a card or a button in; the page is opened with <c>?test</c> and publishes where everything is, by name, on
+/// <c>globalThis.cantripTest</c> (the client's MainPage.Test.cs). Everything here reads that and then acts with real
+/// mouse events at those places, so a click goes through the same hit testing a person's does.
+/// </summary>
+public sealed class TablePage : IAsyncDisposable
+{
+    private static readonly JsonSerializerOptions Json = new() { PropertyNameCaseInsensitive = true };
+
+    /// <summary>How long a page may take to load and settle: a Debug build is interpreted and loads slowly.</summary>
+    private static readonly TimeSpan Patience = TimeSpan.FromSeconds(90);
+
+    private readonly IBrowserContext _context;
+    private readonly List<string> _errors = [];
+    private readonly string _pictures;
+    private int _pictured;
+
+    private TablePage(IBrowserContext context, IPage page, string pictures)
+    {
+        _context = context;
+        Page = page;
+        _pictures = pictures;
+        page.PageError += (_, error) => _errors.Add(error);
+    }
+
+    public IPage Page { get; }
+
+    /// <summary>Uncaught errors the page has thrown, which a test fails on.</summary>
+    public IReadOnlyList<string> Errors => _errors;
+
+    /// <summary>
+    /// Opens the client with these query parameters and <c>test</c>, for a test that pictures what it does under
+    /// <paramref name="pictures"/> (<see cref="WebClient.Pictures"/>). <paramref name="settings"/> are the player's
+    /// settings as the page keeps them in localStorage, by name without the page's prefix ("auto-scale", "scale"), there
+    /// before the page reads them.
+    /// </summary>
+    public static async Task<TablePage> OpenAsync(WebClient web, string query, string pictures, IReadOnlyDictionary<string, string>? settings = null)
+    {
+        IBrowserContext context = await web.Browser.NewContextAsync(new BrowserNewContextOptions
+        {
+            ViewportSize = WebClient.Headed ? ViewportSize.NoViewport : new ViewportSize { Width = WebClient.Width, Height = WebClient.Height },
+        });
+
+        foreach ((string name, string value) in settings ?? new Dictionary<string, string>())
+        {
+            await context.AddInitScriptAsync($"localStorage.setItem({JsonSerializer.Serialize("cantrip-setting-" + name)}, {JsonSerializer.Serialize(value)});");
+        }
+
+        IPage page = await context.NewPageAsync();
+        var table = new TablePage(context, page, pictures);
+        // Into the query, before any fragment the caller gave (a ticket after the hash).
+        int hash = query.IndexOf('#', StringComparison.Ordinal);
+        string address = hash < 0 ? $"{web.Site}?{query}&test" : $"{web.Site}?{query[..hash]}&test{query[hash..]}";
+        await page.GotoAsync(address);
+        return table;
+    }
+
+    /// <summary>
+    /// The page's state as it last published it; null until the client has started - and while the page is loading
+    /// again, as it does when its seat is moved to another table.
+    /// </summary>
+    public async Task<TableState?> StateAsync()
+    {
+        string? json;
+        try
+        {
+            json = await Page.EvaluateAsync<string?>("() => globalThis.cantripTest ?? null");
+        }
+        catch (PlaywrightException navigating) when (navigating.Message.Contains("context was destroyed", StringComparison.Ordinal)
+            || navigating.Message.Contains("navigating", StringComparison.OrdinalIgnoreCase))
+        {
+            return null;
+        }
+
+        return json is null ? null : JsonSerializer.Deserialize<TableState>(json, Json);
+    }
+
+    /// <summary>
+    /// Waits until the table is up and has stopped moving - no face being made, no art on its way, no card in the air -
+    /// for a few readings in a row, and returns it.
+    /// </summary>
+    public async Task<TableState> SettledAsync(Func<TableState, bool>? until = null)
+    {
+        DateTime giveUp = DateTime.UtcNow + Patience;
+        int still = 0;
+        TableState? state = null;
+
+        while (DateTime.UtcNow < giveUp)
+        {
+            state = await StateAsync();
+            still = state is { Ready: true, Busy: false } && (until?.Invoke(state) ?? true) ? still + 1 : 0;
+            if (still >= 3)
+            {
+                return state!;
+            }
+
+            await Task.Delay(100);
+        }
+
+        Assert.Fail($"The table never settled in {Patience.TotalSeconds:0} s. Last state: {Describe(state)}. Page errors: {string.Join(" | ", _errors)}");
+        return null!;
+    }
+
+    /// <summary>Waits for the game to end, however long a whole game takes.</summary>
+    public async Task<TableState> OverAsync(TimeSpan within)
+    {
+        DateTime giveUp = DateTime.UtcNow + within;
+        TableState? state = null;
+        while (DateTime.UtcNow < giveUp)
+        {
+            state = await StateAsync();
+            if (state?.Over == true)
+            {
+                return state;
+            }
+
+            await Task.Delay(250);
+        }
+
+        await PictureAsync("not-over");
+        Assert.Fail($"The game was not over in {within.TotalSeconds:0} s. Last state: {Describe(state)}. Page errors: {string.Join(" | ", _errors)}");
+        return null!;
+    }
+
+    /// <summary>The first card in view with this name.</summary>
+    public async Task<CardState> CardAsync(string name)
+    {
+        TableState state = await SettledAsync();
+        return state.Cards.FirstOrDefault(card => card.Visible && card.Name == name)
+            ?? throw new Xunit.Sdk.XunitException($"No card named '{name}' in view. In view: {string.Join(", ", state.Cards.Where(c => c.Visible).Select(c => c.Name).Distinct())}");
+    }
+
+    /// <summary>Turns the mouse wheel over a point, a notch down for a positive <paramref name="notches"/>.</summary>
+    public async Task WheelAsync(float x, float y, int notches)
+    {
+        await Page.Mouse.MoveAsync(x, y);
+        await Page.Mouse.WheelAsync(0, notches * 100);
+    }
+
+    /// <summary>Rests the pointer on a point, long enough for a tooltip to show.</summary>
+    public async Task RestAsync(float x, float y)
+    {
+        await Page.Mouse.MoveAsync(x - 3, y - 3);
+        await Page.Mouse.MoveAsync(x, y);
+        await Task.Delay(900);
+    }
+
+    /// <summary>Clicks a card in view, as a person clicks it.</summary>
+    public async Task ClickCardAsync(string name)
+    {
+        CardState card = await CardAsync(name);
+        await Page.Mouse.ClickAsync(card.X, card.Y);
+    }
+
+    /// <summary>Presses the step up, or down, beside the share of a division a card wears: combat damage, divided damage or counters.</summary>
+    public async Task StepShareAsync(string name, bool up)
+    {
+        CardState card = await CardAsync(name);
+        Spot step = (up ? card.Raise : card.Lower) ?? throw new Xunit.Sdk.XunitException($"'{name}' has no share to step.");
+        await Page.Mouse.ClickAsync(step.X, step.Y);
+    }
+
+    /// <summary>Holds a card up to read, as the right button held down does; <see cref="PutDownAsync"/> lets it go.</summary>
+    public async Task HoldUpAsync(string name) => await HoldUpAsync(await CardAsync(name));
+
+    /// <summary>Holds up this card, where there are several of one name.</summary>
+    public async Task HoldUpAsync(CardState card)
+    {
+        await Page.Mouse.MoveAsync(card.X, card.Y);
+        await Page.Mouse.DownAsync(new MouseDownOptions { Button = MouseButton.Right });
+    }
+
+    /// <summary>Holds a card up from its name in a line of text, as the right button held down on the name does.</summary>
+    public async Task HoldUpAsync(MentionState name)
+    {
+        await Page.Mouse.MoveAsync(name.X, name.Y);
+        await Page.Mouse.DownAsync(new MouseDownOptions { Button = MouseButton.Right });
+    }
+
+    public Task PutDownAsync() => Page.Mouse.UpAsync(new MouseUpOptions { Button = MouseButton.Right });
+
+    /// <summary>Clicks a control - a button, a toggle, a drop-down, a row of an open menu - by what it says.</summary>
+    public async Task ClickAsync(string label, string? kind = null)
+    {
+        TableState state = await SettledAsync();
+        ControlState control = state.Controls.FirstOrDefault(c => (kind is null || c.Kind == kind) && c.Label == label)
+            ?? state.Controls.FirstOrDefault(c => (kind is null || c.Kind == kind) && c.Label.Contains(label, StringComparison.Ordinal))
+            ?? throw new Xunit.Sdk.XunitException($"No control saying '{label}'. There are: {string.Join(", ", state.Controls.Select(c => $"{c.Kind} '{c.Label}'"))}");
+        await Page.Mouse.ClickAsync(control.X, control.Y);
+    }
+
+    /// <summary>Clicks into a box by its placeholder and types into it, key by key, as a person does.</summary>
+    public async Task TypeAsync(string placeholder, string text)
+    {
+        await ClickAsync(placeholder, "textbox");
+        await Page.Keyboard.TypeAsync(text, new KeyboardTypeOptions { Delay = 50 });
+    }
+
+    /// <summary>Picks an item from a drop-down by its caption, as Sort: Name.</summary>
+    public async Task ChooseAsync(string caption, string item)
+    {
+        await ClickAsync(caption, "dropdown");
+        await ClickAsync(item, "item");
+    }
+
+    /// <summary>Takes a picture of the page, numbered in the order taken, and returns where it went.</summary>
+    public async Task<string> PictureAsync(string name)
+    {
+        string path = Path.Combine(_pictures, $"{++_pictured:00}-{name}.png");
+        await Page.ScreenshotAsync(new PageScreenshotOptions { Path = path });
+        return path;
+    }
+
+    private static string Describe(TableState? state) => state is null
+        ? "nothing published (the client never started)"
+        : $"ready {state.Ready}, busy {state.Busy} ({state.Doing}), over {state.Over}, prompt '{state.Prompt}', {state.Cards.Count} cards";
+
+    public async ValueTask DisposeAsync() => await _context.DisposeAsync();
+}
+
+/// <summary>
+/// What the page publishes under <c>?test</c>. <see cref="Phase"/> is the table's: Setup, Drafting, DeckBuilding, Playing...
+/// <see cref="Art"/> is where it is asking for card art, as a URL template. <see cref="Answered"/> is, in the prompt
+/// gallery, the last answer the dock sent - its kind, and the indexes of any modes or options chosen.
+/// <see cref="Selected"/> is how many creatures are picked up to attack or block, not yet sent anywhere.
+/// </summary>
+public sealed record TableState(
+    bool Ready,
+    bool Busy,
+    string Doing,
+    bool Over,
+    string Prompt,
+    string Fixture,
+    string Outcome,
+    int Flown,
+    int Held,
+    LogState Log,
+    string Tooltip,
+    IReadOnlyList<CardState> Cards,
+    IReadOnlyList<ControlState> Controls,
+    string Phase,
+    PairingsState? Pairings = null,
+    IReadOnlyList<MentionState>? Mentions = null,
+    string Art = "",
+    string Answered = "",
+    int Selected = 0);
+
+/// <summary>An event's pairings as the page shows them: the round, whether final, how long before it begins, each match in words.</summary>
+public sealed record PairingsState(int Round, bool Final, int StartsIn, IReadOnlyList<string> Matches);
+
+/// <summary>How many lines the game log has, and how many of them the page has made as controls.</summary>
+public sealed record LogState(int Lines, int Shown);
+
+/// <summary>
+/// A card on the page: its name (empty when this seat may not see it), the middle and size of its box, and which of an
+/// event's rows it is in - <c>pack</c>, <c>pool</c> or <c>sideboard</c> - if any.
+/// </summary>
+public sealed record CardState(string Name, bool Visible, float X, float Y, float W, float H, Spot? Lower, Spot? Raise, string Row = "", Spot? FlewFrom = null);
+
+/// <summary>A card named in a line of text - the game log, a draft's picks - where its name is, and whether it is in view.</summary>
+public sealed record MentionState(string Name, bool Visible, float X, float Y, float W, float H);
+
+/// <summary>A control on the page: <c>button</c>, <c>toggle</c>, <c>dropdown</c> (by its caption), <c>textbox</c> (by its placeholder) or <c>item</c> (a menu row).</summary>
+public sealed record ControlState(string Kind, string Label, float X, float Y, float W, float H);
+
+public sealed record Spot(float X, float Y);

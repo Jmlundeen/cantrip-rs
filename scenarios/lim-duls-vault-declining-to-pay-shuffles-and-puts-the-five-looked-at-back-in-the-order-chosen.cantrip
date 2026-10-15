@@ -1,0 +1,37 @@
+# Lim-Dûl's Vault, "As many times as you choose": zero times. Bot1 looks at the top five of seven, pays nothing, and
+# after the shuffle puts those five on top in the order it chooses; the other two are under them, and life is untouched.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Lim-Dûl's Vault
+Island
+Island
+Island
+Island
+Brainstorm
+Ponder
+Counterspell
+Duress
+Lightning Bolt
+Plains
+Swamp
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Lim-Dûl's Vault.Cast
+Bot1.Decline
+Bot1.Arrange(Lightning Bolt; Duress; Counterspell; Ponder; Brainstorm)
+[Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 20
+Bot1.Library.Count = 7
+Bot1.Library = Lightning Bolt; Duress; Counterspell; Ponder; Brainstorm; Plains; Swamp

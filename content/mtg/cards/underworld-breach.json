@@ -1,0 +1,6 @@
+{
+  "name": "Underworld Breach",
+  "manaCost": "{1}{R}",
+  "type": "Enchantment",
+  "oracleText": "Each nonland card in your graveyard has escape. The escape cost is equal to the card's mana cost plus exile three other cards from your graveyard. (You may cast cards from your graveyard for their escape cost.)\nAt the beginning of the end step, sacrifice this enchantment."
+}

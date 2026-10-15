@@ -1,0 +1,33 @@
+# Thor exiles a Bolt from its controller's graveyard. Casting that card from exile triggers Thor,
+# whose one damage resolves before the Bolt's three damage.
+
+[Bot1 Deck]
+Mountain
+Lightning Bolt
+Black Lotus
+Black Lotus
+Thor, God of Thunder
+Island
+Island
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Thor, God of Thunder.Cast
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+Bot1.Target(Bot2)
+
+[Expect]
+Bot1.Battlefield.Thor, God of Thunder.Keywords = Flying
+Bot2.Life = 13
+Bot1.Graveyard = Lightning Bolt; Black Lotus; Black Lotus
+Exile.Count = 0

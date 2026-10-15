@@ -1,0 +1,37 @@
+# "Reveal cards from the top of your library until you reveal a creature card ... the rest on the bottom of your library in a random order": with no
+# creature in the library every card is revealed, none enters, and they all go back to the bottom (a library of five Islands is as it was).
+# Raph & Mikey (seven mana from Black Lotus and four Moxen) attack with haste on turn 1 and trample over for 7.
+
+[Bot1 Deck]
+Raph & Mikey, Troublemakers
+Black Lotus
+Mox Ruby
+Mox Emerald
+Gleemox
+Mox Jet
+Island
+Island x5
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Red)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Raph & Mikey, Troublemakers.Cast
+Bot1.Pass
+Bot1.Attack(Raph & Mikey, Troublemakers > Bot2)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 13
+Bot1.Library.Count = 5
+Bot1.Battlefield.Count = 5

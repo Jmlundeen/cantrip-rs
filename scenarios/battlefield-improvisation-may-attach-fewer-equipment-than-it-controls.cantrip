@@ -1,0 +1,41 @@
+# "Any number" includes fewer than all (CR 701.3a): with Lightning Greaves and Lavaspur Boots on the battlefield Bot1
+# chooses only the Boots, and the Greaves stay unattached. Mother of Runes is 4/3 (+1/+0 from the Boots) with haste.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mother of Runes
+Lightning Greaves
+Lavaspur Boots
+Battlefield Improvisation
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mother of Runes.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Lightning Greaves.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lavaspur Boots.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+[T3 Bot1.Main1]
+Bot1.Attack(Mother of Runes)
+Bot1.Hand.Battlefield Improvisation.Cast(Mother of Runes)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Choose(Lavaspur Boots)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Lightning Greaves.AttachedTo = (absent)
+Bot1.Battlefield.Lavaspur Boots.AttachedTo = Mother of Runes
+Bot1.Battlefield.Mother of Runes.Power = 4

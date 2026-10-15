@@ -1,0 +1,38 @@
+# Two cycles are two discards, so two triggers (CR 603.2c): Bot1 cycles a Miscalculation, and with that discard's
+# trigger still on the stack cycles the other. Each trigger counts its own one card, two counters in all.
+
+[Bot1 Deck]
+Mountain
+Marauding Mako
+Mox Ruby
+Mox Jet
+Miscalculation
+Miscalculation
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Marauding Mako.Cast
+Bot1.Battlefield.Mountain.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Miscalculation.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+? Stack.Count = 2
+Bot1.Hand.Miscalculation.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+? Stack.Count = 4
+
+[Expect]
+Bot1.Battlefield.Marauding Mako.Counters.PlusOnePlusOne = 2
+Bot1.Graveyard = Miscalculation; Miscalculation

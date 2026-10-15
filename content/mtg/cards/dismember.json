@@ -1,0 +1,6 @@
+{
+  "name": "Dismember",
+  "manaCost": "{1}{B/P}{B/P}",
+  "type": "Instant",
+  "oracleText": "({B/P} can be paid with either {B} or 2 life.)\nTarget creature gets -5/-5 until end of turn."
+}

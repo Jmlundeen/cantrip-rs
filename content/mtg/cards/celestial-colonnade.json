@@ -1,0 +1,5 @@
+{
+  "name": "Celestial Colonnade",
+  "type": "Land",
+  "oracleText": "This land enters tapped.\n{T}: Add {W} or {U}.\n{3}{W}{U}: Until end of turn, this land becomes a 4/4 white and blue Elemental creature with flying and vigilance. It's still a land."
+}

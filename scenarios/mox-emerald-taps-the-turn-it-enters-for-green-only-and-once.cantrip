@@ -1,0 +1,26 @@
+# "{T}: Add {G}": an artifact, not a creature, so it taps the turn it enters (no summoning sickness): Bot1 casts it for {0} and taps it at once for {G}, which pays for Elvish Mystic. Tapped it cannot be tapped again (refusal), and it
+# untaps next turn and gives {G} again (the positive control).
+
+[Bot1 Deck]
+Mox Emerald
+Elvish Mystic
+Elvish Mystic
+Forest x13
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Pass
+! Bot1.Battlefield.Mox Emerald.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+? Bot1.Mana = {G}
+
+[Expect]
+Bot1.Battlefield.Mox Emerald.Tapped = true
+Bot1.Battlefield.Elvish Mystic.Tapped = false

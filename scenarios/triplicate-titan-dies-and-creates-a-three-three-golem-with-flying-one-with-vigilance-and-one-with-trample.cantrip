@@ -1,0 +1,54 @@
+# Triplicate Titan: "When this creature dies, create a 3/3 colorless Golem artifact creature token with flying, a 3/3
+# colorless Golem artifact creature token with vigilance, and a 3/3 colorless Golem artifact creature token with
+# trample." Entombed and reanimated on turn one, then sacrificed to Phyrexian Altar: three Golems, each 3/3 and an
+# artifact creature, each with exactly one of the three keywords.
+
+[Bot1 Deck]
+Swamp
+Dark Ritual
+Entomb
+Reanimate
+Black Lotus
+Phyrexian Altar
+Swamp
+Triplicate Titan
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Triplicate Titan)
+Bot1.Hand.Reanimate.Cast(Bot1.Graveyard.Triplicate Titan)
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+? Bot1.Battlefield.Triplicate Titan.Keywords = Flying; Trample; Vigilance
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Phyrexian Altar.Cast
+Bot1.Pass
+Bot1.Battlefield.Phyrexian Altar.Activate(Sacrifice: Triplicate Titan; Color: Black)
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Battlefield = Swamp; Phyrexian Altar; Golem; Golem; Golem
+Bot1.Battlefield.Golem#1.Keywords = Flying
+Bot1.Battlefield.Golem#2.Keywords = Vigilance
+Bot1.Battlefield.Golem#3.Keywords = Trample
+Bot1.Battlefield.Golem#1.Power = 3
+Bot1.Battlefield.Golem#1.Toughness = 3
+Bot1.Battlefield.Golem#2.Power = 3
+Bot1.Battlefield.Golem#2.Toughness = 3
+Bot1.Battlefield.Golem#3.Power = 3
+Bot1.Battlefield.Golem#3.Toughness = 3
+Bot1.Battlefield.Golem#1.Types = Artifact; Creature
+Bot1.Battlefield.Golem#2.Types = Artifact; Creature
+Bot1.Battlefield.Golem#3.Types = Artifact; Creature
+Bot1.Battlefield.Golem#1.Subtypes = Golem
+Bot1.Battlefield.Golem#2.Subtypes = Golem
+Bot1.Battlefield.Golem#3.Subtypes = Golem

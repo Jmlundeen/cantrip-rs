@@ -1,0 +1,23 @@
+# Bot1's Ornithopter (0/2 Thopter) becomes a green 6/4 Wurm for the turn; it stays an artifact creature.
+
+[Bot1 Deck]
+Mox Emerald
+Ornithopter
+Scale Up
+Forest x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Scale Up.Cast(Ornithopter)
+Bot1.Battlefield.Mox Emerald.Activate
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Power = 6
+Bot1.Battlefield.Ornithopter.Toughness = 4
+Bot1.Battlefield.Ornithopter.Subtypes = Wurm
+Bot1.Graveyard = Scale Up

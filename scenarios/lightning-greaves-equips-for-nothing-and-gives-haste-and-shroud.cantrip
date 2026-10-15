@@ -1,0 +1,27 @@
+# Lightning Greaves: "Equipped creature has haste and shroud. Equip {0}". Bot1 pays {2} with two Moxen on turn 1, casts an
+# Ornithopter and equips it for nothing: it is a 0/2 flier with haste and shroud.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Lightning Greaves
+Ornithopter
+Island x16
+
+[Bot2 Deck]
+Mountain x17
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Lightning Greaves.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Lightning Greaves.Activate(Ornithopter)
+[Bot1.Main2]
+? Bot1.Battlefield.Ornithopter.Keywords = Flying; Haste; Shroud
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Keywords = Flying; Haste; Shroud

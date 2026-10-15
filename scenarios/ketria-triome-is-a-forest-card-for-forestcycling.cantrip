@@ -1,0 +1,22 @@
+# The Triome's basic land types are real (CR 305.6): Generous Ent's Forestcycling finds it as a card with the Forest
+# subtype, as it would a Bayou.
+
+[Bot1 Deck]
+Island
+Generous Ent
+Island x5
+Ketria Triome
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Generous Ent.Activate(Ability: Forestcycling)
+Bot1.Search(Ketria Triome)
+
+[Expect]
+Bot1.Graveyard = Generous Ent
+Bot1.Hand.Count = 6

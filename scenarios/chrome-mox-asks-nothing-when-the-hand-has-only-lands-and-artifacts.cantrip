@@ -1,0 +1,26 @@
+# Chrome Mox: "you may exile a nonartifact, nonland card from your hand". Bot1's hand, once the Mox is cast, is two
+# Islands, a Sol Ring and a Mox Jet -- lands and artifacts, none of which qualifies -- so nothing is asked and nothing is
+# exiled (a default answer would take the first card offered). The Mox is left with no imprint.
+
+[Bot1 Deck]
+Chrome Mox
+Island
+Sol Ring
+Mox Jet
+Island
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Chrome Mox.Cast
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot1.Hand = Island; Sol Ring; Mox Jet; Island; Island; Island
+Bot1.Battlefield = Chrome Mox

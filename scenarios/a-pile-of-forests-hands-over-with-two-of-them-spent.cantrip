@@ -1,0 +1,39 @@
+# A board about how the client draws piles of like lands, handed over with Bot1 holding priority in its own main
+# phase. Five Forests, two of them spent: the client draws the three untapped ones as one pile and the two tapped
+# ones as another, which is what a pile is for — five Forests are one fact about the turn and not five cards to read.
+#
+# Clicking one of the untapped ones taps it for mana, which takes a card out of one pile and puts it into the other
+# and slides everything left in the tapped pile along a step. That is the movement this position exists to picture:
+#
+# then click an untapped Forest, and another before the first one's cards have landed, which is how a player tapping
+# lands makes them.
+
+[Bot1 Deck]
+Forest x18
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+[Handover Bot1.Pass]
+
+[Expect]
+Turn = 9
+Step = Main1
+ActivePlayer = Bot1
+PriorityPlayer = Bot1
+Stack.Count = 0
+Bot1.Battlefield.Count = 5
+# Two spent and three still to spend, which is the two piles.
+Bot1.Mana = {G}{G}

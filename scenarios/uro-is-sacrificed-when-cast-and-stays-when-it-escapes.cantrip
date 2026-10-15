@@ -1,0 +1,49 @@
+# Uro: "When Uro enters, sacrifice it unless it escaped" (CR 702.138b) and "Whenever Uro enters or attacks, you gain 3
+# life and draw a card, then you may put a land card from your hand onto the battlefield". Cast for {1}{G}{U} on turn
+# 1 it gains 3, draws Black Lotus (which Bot1 keeps) and is sacrificed. Four Lotus Petals and that Black Lotus, all
+# sacrificed for mana, are five other cards in the graveyard, which the escape cost {G}{G}{U}{U} exiles; escaped, Uro
+# stays and gains 3 more, and the unanswered land question puts an Island onto the battlefield.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Sapphire
+Uro, Titan of Nature's Wrath
+Lotus Petal
+Lotus Petal
+Lotus Petal
+Lotus Petal
+Black Lotus
+Island x13
+
+[Bot2 Deck]
+Swamp x22
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Lotus Petal.Activate(Color: Green)
+Bot1.Hand.Uro, Titan of Nature's Wrath.Cast
+Bot1.Triggers(sacrifice it unless; gain 3 life and draw)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Lotus Petal.Activate(Color: Green)
+Bot1.Battlefield.Lotus Petal.Activate(Color: Green)
+Bot1.Battlefield.Lotus Petal.Activate(Color: Green)
+? Bot1.Life = 23
+? Bot1.Graveyard.Count = 6
+Bot1.Graveyard.Uro, Titan of Nature's Wrath.Cast(Ability: Escape)
+Bot1.Triggers(sacrifice it unless; gain 3 life and draw)
+[Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Life = 26
+Bot1.Battlefield = Island; Mox Emerald; Mox Sapphire; Uro, Titan of Nature's Wrath
+Exile.Count = 5
+Bot1.Graveyard.Count = 0

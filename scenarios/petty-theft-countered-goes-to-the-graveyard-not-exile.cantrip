@@ -1,0 +1,35 @@
+# CR 715.4: an Adventure spell that is countered is put into its owner's graveyard instead of exile, so the Borrower
+# can never be cast from exile. Bot2 counters Petty Theft with Counterspell (Island and Mox Sapphire held open).
+
+[Bot1 Deck]
+Island
+Island
+Brazen Borrower
+Island x12
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Island x12
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Brazen Borrower.Cast(Bot2.Battlefield.Mox Sapphire; Ability: Adventure)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Petty Theft)
+[T3 Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot1.Graveyard = Brazen Borrower
+Bot2.Graveyard = Counterspell
+Bot2.Battlefield = Island; Mox Sapphire

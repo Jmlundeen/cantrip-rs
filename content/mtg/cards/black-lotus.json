@@ -1,0 +1,6 @@
+{
+  "name": "Black Lotus",
+  "manaCost": "{0}",
+  "type": "Artifact",
+  "oracleText": "{T}, Sacrifice Black Lotus: Add three mana of any one color."
+}

@@ -1,0 +1,30 @@
+# Transmute Artifact, sacrificing Sol Ring (mana value 1) and finding a Mox Jet (mana value 0): it is not more than the sacrificed value, so it
+# enters with nothing to pay and nobody is asked (the unless-cost refusal).
+
+[Bot1 Deck]
+Island
+Black Lotus
+Sol Ring
+Transmute Artifact
+Island x3
+Island x3
+Mox Jet
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Transmute Artifact.Cast
+Bot1.Choose(Sol Ring)
+Bot1.Search(Mox Jet)
+
+[Expect]
+Bot1.Battlefield = Island; Mox Jet
+Bot1.Library.Count = 13

@@ -1,0 +1,44 @@
+# "Whenever equipped creature and at least one other creature attack" (CR 508.1, 603.2): the equipped creature must be
+# one of the attackers. On turn 3 the Ornithopter attacks while the equipped Rebel stays home, so nothing is drawn. On
+# turn 5 Bot1 moves the Lens to the Ornithopter (equip {1}{W}) and attacks with it and the Rebel, and it draws.
+
+[Bot1 Deck]
+Glimmer Lens
+Mox Pearl
+Gleemox
+Ornithopter
+Island
+Island
+Island
+Island x11
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Blue)
+Bot1.Hand.Glimmer Lens.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter)
+[T3 Bot1.Main2]
+? Bot1.Hand.Count = 4
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Blue)
+Bot1.Battlefield.Glimmer Lens.Activate(Ornithopter)
+Bot1.Pass
+Bot1.Attack(Ornithopter; Rebel)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 6
+Bot1.Battlefield.Glimmer Lens.AttachedTo = Ornithopter
+Bot2.Life = 18

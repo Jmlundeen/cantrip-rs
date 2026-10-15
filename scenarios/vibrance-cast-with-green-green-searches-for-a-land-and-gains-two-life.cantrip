@@ -1,0 +1,45 @@
+# Vibrance: "When this creature enters, if {G}{G} was spent to cast it, search your library for a land card, reveal it,
+# put it into your hand, then shuffle. You gain 2 life." Bot1 casts it for two Forests and three Swamps: it finds the
+# Plains, gains 2 life, and with no red spent deals no damage to anything.
+
+[Bot1 Deck]
+Forest
+Forest
+Swamp
+Swamp
+Swamp
+Vibrance
+Island
+Island x4
+Plains
+Island x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Vibrance.Cast
+Bot1.Search(Plains)
+
+[Expect]
+Turn = 9
+Stack.Count = 0
+Bot1.Life = 22
+Bot2.Life = 20
+Bot1.Battlefield = Forest; Forest; Swamp; Swamp; Swamp; Vibrance
+Bot1.Hand = Island; Island; Island; Island; Island; Plains
+Bot1.Library.Count = 8

@@ -1,0 +1,52 @@
+# "This card" is the Squee that triggered: Bot2 answers the trigger by exiling Bot1's graveyard with Soul-Guide
+# Lantern, and the card in exile is a new object (CR 400.7), so the ability does nothing and no May is asked - the
+# next question after the trigger leaves the stack is Bot1's upkeep priority.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Mountain
+Squee, Goblin Nabob
+Mountain x3
+Mountain x15
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Soul-Guide Lantern
+Swamp x4
+Swamp x14
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Soul-Guide Lantern.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Squee, Goblin Nabob.Cast
+[T6 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Squee, Goblin Nabob)
+[T7 Bot1.Upkeep]
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Battlefield.Soul-Guide Lantern.Activate(Ability: Exile each)
+Bot1.Pass
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Step = Upkeep
+[T7 Bot1.Main1]
+
+[Expect]
+Bot1.Graveyard.Count = 0
+Exile = Squee, Goblin Nabob
+Bot1.Hand.Count = 6

@@ -1,0 +1,25 @@
+# "Unless you control two or fewer other lands": four Moxen are not lands, so the Courtyard played as Bot1's first land
+# enters untapped (zero other lands) and taps for {W}, the other colour of its either-or ability.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Concealed Courtyard
+Island x15
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Concealed Courtyard.Play
+? Bot1.Battlefield.Concealed Courtyard.Tapped = False
+Bot1.Battlefield.Concealed Courtyard.Activate(Color: White)
+
+[Expect]
+Bot1.Mana = {W}

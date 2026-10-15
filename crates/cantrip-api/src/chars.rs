@@ -1,0 +1,90 @@
+//! Computed characteristics (CR 613): what an object is once every continuous effect has been applied.
+
+use cantrip_state::*;
+
+pub const MAX_ABILITIES: usize = 8;
+
+/// One object's characteristics as the layer system computed them.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Chars {
+    /// The card whose name and printed values it has: its own, or the one it copies.
+    pub card: CardId,
+    /// Its name: the card's, or the one a copy effect says it has (CR 707.9b).
+    pub name: &'static str,
+    pub types: TypeSet,
+    pub supertypes: Supertypes,
+    pub subtypes: SubtypeSet,
+    pub colors: ColorSet,
+    pub power: Option<i16>,
+    pub toughness: Option<i16>,
+    pub keywords: Keywords,
+    pub protection: ColorSet,
+    /// Protection from colorless (CR 702.16a).
+    pub protection_colorless: bool,
+    /// Protection from players (CR 702.16a): a bit per seat.
+    pub protection_players: u8,
+    /// Protection from objects of these card types (CR 702.16a): "protection from creatures", "protection from instants".
+    pub protection_types: TypeSet,
+    /// It is a spell on the stack (CR 112.1), not a card or a permanent: what "protection from spells" is about.
+    pub spell: bool,
+    /// Protection from spells that are one or more colors (CR 702.16a): Emrakul, the Aeons Torn.
+    pub protection_colored_spells: bool,
+    /// Protection from everything (CR 702.16e): from every source, whatever it is.
+    pub protection_everything: bool,
+    /// Attacks each combat if able (CR 508.1d).
+    pub must_attack: bool,
+    pub abilities: [Option<AbilityRef>; MAX_ABILITIES],
+    /// It has no mana cost (CR 118.6, 707.9b): a copy that says so, whatever the card it copies prints. Its mana
+    /// value is 0.
+    pub no_cost: bool,
+}
+
+impl Chars {
+    pub fn is(&self, t: CardType) -> bool {
+        self.types.has(t)
+    }
+
+    pub fn has(&self, k: Keyword) -> bool {
+        self.keywords.has(k)
+    }
+
+    /// Whether its protection covers a source with these characteristics (CR 702.16a): a color it is protected
+    /// from, or colorless.
+    pub fn protected_from(&self, source: &Chars) -> bool {
+        self.protection_everything
+            || self.protection.intersects(source.colors)
+            || (self.protection_colorless && source.colors.is_empty())
+            || self.protection_types.0 & source.types.0 != 0
+            || (self.protection_colored_spells && source.spell && !source.colors.is_empty())
+    }
+
+    /// Whether its protection covers a source with these characteristics controlled by `controller` (CR 702.16a):
+    /// its colors, colorless, or the player controlling it.
+    pub fn protected_from_by(&self, source: &Chars, controller: PlayerId) -> bool {
+        self.protected_from(source) || self.protection_players & (1 << controller.0) != 0
+    }
+
+    /// The fewest creatures that may block it (CR 509.1b): menace's two, "except by three or more creatures"'s three,
+    /// otherwise one. A creature blocked by fewer, but at least one, is not blocked legally.
+    pub fn minimum_blockers(&self) -> u8 {
+        if self.has(Keyword::CantBeBlockedExceptByThreeOrMore) {
+            3
+        } else if self.has(Keyword::Menace) {
+            2
+        } else {
+            1
+        }
+    }
+
+    pub fn has_subtype(&self, s: Subtype) -> bool {
+        self.subtypes.has(s)
+    }
+
+    pub fn abilities(&self) -> impl Iterator<Item = AbilityRef> + '_ {
+        self.abilities.iter().flatten().copied()
+    }
+
+    pub fn ability_count(&self) -> usize {
+        self.abilities.iter().flatten().count()
+    }
+}

@@ -1,0 +1,35 @@
+# Bot2 points a Lightning Bolt at Bot1's Goblin and Bot1 is asked whether to answer it. Handed over there, because
+# that is the one question in the game where what is on the stack, and what it is aimed at, is the whole of what the
+# player is deciding about: the dock has to name both while the button under it says Resolve.
+
+[Bot1 Deck]
+Mountain
+Goblin Welder
+Mountain x16
+
+[Bot2 Deck]
+Mountain
+Mountain
+Lightning Bolt
+Mountain x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Goblin Welder.Cast
+Bot2.Hand.Mountain.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Goblin Welder)
+[Handover Bot1.Pass]
+
+[Expect]
+Turn = 4
+ActivePlayer = Bot2
+PriorityPlayer = Bot1
+# Still on the stack: the handover is the window to respond in, not the resolution.
+Stack = Lightning Bolt
+Bot1.Battlefield.Goblin Welder.Damage = 0
+Bot1.Battlefield.Goblin Welder.Toughness = 1
+Bot2.Battlefield = Mountain; Mountain

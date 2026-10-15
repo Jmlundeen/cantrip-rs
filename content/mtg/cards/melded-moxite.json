@@ -1,0 +1,6 @@
+{
+  "name": "Melded Moxite",
+  "manaCost": "{1}{R}",
+  "type": "Artifact",
+  "oracleText": "When this artifact enters, you may discard a card. If you do, draw two cards.\n{3}, Sacrifice this artifact: Create a tapped 2/2 colorless Robot artifact creature token."
+}

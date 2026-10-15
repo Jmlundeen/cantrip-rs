@@ -1,0 +1,8 @@
+{
+  "name": "Bristly Bill, Spine Sower",
+  "manaCost": "{1}{G}",
+  "type": "Legendary Creature — Plant Druid",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Landfall — Whenever a land you control enters, put a +1/+1 counter on target creature.\n{3}{G}{G}: Double the number of +1/+1 counters on each creature you control."
+}

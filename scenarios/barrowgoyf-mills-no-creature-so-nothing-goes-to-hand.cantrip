@@ -1,0 +1,52 @@
+# Same game as barrowgoyf-mills-that-many-and-keeps-a-creature: Bot2's Lightning Bolt (instant), Bot1's Duress (sorcery)
+# and Bot2's Mountain discarded to hand size (land) make Barrowgoyf a 3/4 when it attacks on turn 7, unblocked.
+# Bot1 accepts and mills an Island, a Swamp and another Swamp: no creature card among them, so no card is chosen and
+# the hand is unchanged by the trigger. Milling a land adds no new type to the graveyards (a land is already there).
+
+[Bot1 Deck]
+Swamp
+Swamp
+Swamp
+Duress
+Barrowgoyf
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Island
+Swamp
+Swamp
+Guerrilla Gorilla
+Swamp x2
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Duress.Cast(Bot2)
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Swamp#3.Activate
+Bot1.Hand.Barrowgoyf.Cast
+[T7 Bot1.Main1]
+Bot1.Attack(Barrowgoyf)
+Bot1.Accept
+
+[Expect]
+Bot2.Life = 17
+Bot1.Graveyard = Swamp; Swamp; Island; Duress
+Bot1.Hand.Count = 5
+Bot1.Library.Count = 3
+Bot1.Battlefield.Barrowgoyf.Power = 3

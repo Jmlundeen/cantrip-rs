@@ -1,0 +1,33 @@
+# Three Steps Ahead, spree: "+ {1}{U} - Counter target spell." Bot1 holds a Black Lotus and a Mox Sapphire up since turn 1 and, with {U}{U} + {1}{U}
+# paid, chooses the counter mode against Bot2's Ornithopter on turn 2: the Ornithopter is countered and goes to Bot2's graveyard.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Black Lotus
+Three Steps Ahead
+Island x16
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Three Steps Ahead.Cast
+Bot1.Modes(Counter target spell)
+Bot1.Target(Stack.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Ornithopter
+Bot2.Battlefield.Count = 0
+Bot1.Graveyard = Three Steps Ahead; Black Lotus

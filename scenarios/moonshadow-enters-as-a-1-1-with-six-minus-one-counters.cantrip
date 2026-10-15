@@ -1,0 +1,21 @@
+# "This creature enters with six -1/-1 counters on it": the 7/7 arrives as a 1/1 with six counters, and with menace.
+
+[Bot1 Deck]
+Swamp
+Moonshadow
+Island x30
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Moonshadow.Cast
+[T2 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Moonshadow.Counters.MinusOneMinusOne = 6
+Bot1.Battlefield.Moonshadow.Power = 1
+Bot1.Battlefield.Moonshadow.Toughness = 1
+Bot1.Battlefield.Moonshadow.Keywords = Menace

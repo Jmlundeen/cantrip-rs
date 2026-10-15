@@ -1,0 +1,41 @@
+# Squad counts how many times the additional {2} was paid (CR 702.157a). Cast on turn one for {2}{U} alone, the Infiltrator makes no copy and
+# its Benediction draws one card (hand 4, with 3 Moxen and the Infiltrator on the battlefield). On turn three, cast again for {2}{U} plus
+# one squad payment ({2} more), it makes exactly one token copy, and both draw: three Infiltrators and four Moxen/seven permanents
+# (the Lotus is sacrificed), and a hand of 4 after the turn-three draw and two more draws.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Sicarian Infiltrator
+Sicarian Infiltrator
+Black Lotus
+Mox Ruby
+Plains x12
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sicarian Infiltrator.Cast
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Count = 4
+? Bot1.Hand.Count = 4
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sicarian Infiltrator.Cast(Kicked: 1)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Count = 7
+Bot1.Hand.Count = 4

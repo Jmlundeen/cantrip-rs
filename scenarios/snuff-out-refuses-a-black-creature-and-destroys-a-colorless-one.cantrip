@@ -1,0 +1,33 @@
+# "Target nonblack creature": Dark Confidant (black) is refused as the target (named in the refusal) and Ornithopter, which is
+# colorless and so nonblack, is the legal one (the positive control) and is destroyed for 4 life.
+
+[Bot1 Deck]
+Swamp
+Snuff Out
+Swamp x16
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Dark Confidant
+Ornithopter
+Swamp x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Dark Confidant.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+! Bot1.Hand.Snuff Out.Cast(Bot2.Battlefield.Dark Confidant; Ability: Pay 4 life)
+Bot1.Hand.Snuff Out.Cast(Bot2.Battlefield.Ornithopter; Ability: Pay 4 life)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 16
+Bot2.Graveyard = Ornithopter
+Bot2.Battlefield.Dark Confidant.Damage = 0

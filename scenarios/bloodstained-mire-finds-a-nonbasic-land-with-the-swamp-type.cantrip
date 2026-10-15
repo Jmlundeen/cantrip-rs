@@ -1,0 +1,29 @@
+# The search is for a Swamp or Mountain *card* (CR 205.3i): Overgrown Tomb has the subtype Swamp (and Forest), so the
+# Mire can fetch it, while a plain Forest and an Island cannot be. The shockland then asks about its two life as it
+# enters: Bot1 pays, so it enters untapped: 20 - 1 (the Mire) - 2 (the Tomb) = 17.
+
+[Bot1 Deck]
+Bloodstained Mire
+Plains x6
+Forest
+Island
+Overgrown Tomb
+Forest x9
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Bloodstained Mire.Play
+Bot1.Battlefield.Bloodstained Mire.Activate
+! Bot1.Search(Forest)
+! Bot1.Search(Island)
+Bot1.Search(Overgrown Tomb)
+Bot1.Accept
+
+[Expect]
+Bot1.Life = 17
+Bot1.Graveyard = Bloodstained Mire
+Bot1.Battlefield = Overgrown Tomb
+Bot1.Battlefield.Overgrown Tomb.Tapped = false
+Bot1.Battlefield.Overgrown Tomb.Subtypes = Forest; Swamp

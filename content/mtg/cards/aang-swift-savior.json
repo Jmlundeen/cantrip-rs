@@ -1,0 +1,23 @@
+{
+  "name": "Aang, Swift Savior",
+  "manaCost": "{1}{W}{U}",
+  "type": "Legendary Creature — Human Avatar Ally",
+  "power": 2,
+  "toughness": 3,
+  "oracleText": "Flash\nFlying\nWhen Aang enters, airbend up to one other target creature or spell. (Exile it. While it's exiled, its owner may cast it for {2} rather than its mana cost.)\nWaterbend {8}: Transform Aang. (While paying a waterbend cost, you can tap your artifacts and creatures to help. Each one pays for {1}.)",
+  "keywords": [
+    "Flash",
+    "Flying"
+  ],
+  "backFace": {
+    "name": "Aang and La, Ocean's Fury",
+    "type": "Legendary Creature — Avatar Spirit Ally",
+    "power": 5,
+    "toughness": 5,
+    "oracleText": "Reach, trample\nWhenever Aang and La attack, put a +1/+1 counter on each tapped creature you control.",
+    "keywords": [
+      "Reach",
+      "Trample"
+    ]
+  }
+}

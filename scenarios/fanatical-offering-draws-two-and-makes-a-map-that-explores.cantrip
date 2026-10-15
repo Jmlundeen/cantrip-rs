@@ -1,0 +1,42 @@
+# Fanatical Offering: sacrifice an artifact or creature as an additional cost (Mox Jet, after its mana is spent), draw
+# two cards and create a Map token. On turn three the Map ({1}, {T}, sacrifice, at sorcery speed) makes Ornithopter
+# explore (CR 701.44): the revealed Lightning Bolt is not a land, so Ornithopter gets a +1/+1 counter and Bot1 may
+# put the Bolt into the graveyard.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Fanatical Offering
+Ornithopter
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Lightning Bolt
+Swamp x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Fanatical Offering.Cast
+Bot1.Choose(Mox Jet)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Map Token.Activate(Bot1.Battlefield.Ornithopter)
+Bot1.Accept
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Graveyard = Lightning Bolt; Fanatical Offering; Mox Jet
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter.Power = 1

@@ -1,0 +1,8 @@
+{
+  "name": "Emberwilde Captain",
+  "manaCost": "{3}{R}",
+  "type": "Creature — Djinn Pirate",
+  "power": 4,
+  "toughness": 2,
+  "oracleText": "When this creature enters, you become the monarch.\nWhenever an opponent attacks you while you're the monarch, this creature deals damage to that player equal to the number of cards in their hand."
+}

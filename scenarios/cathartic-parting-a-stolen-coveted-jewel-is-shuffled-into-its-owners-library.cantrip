@@ -1,0 +1,61 @@
+# "The owner of target artifact or enchantment an opponent controls shuffles it into their library."
+#
+# Turn 1: Bot1 casts Coveted Jewel (Black Lotus and three Moxen pay the {6}) and draws three. Turn 3: while Bot1 controls the
+# Jewel it is not "an artifact an opponent controls", so Cathartic Parting cannot be cast (nothing else qualifies; the Elves is
+# no artifact). Turn 4: Bot2's Llanowar Elves attacks unblocked, so Bot2 draws three and gains control of the Jewel. Turn 5: now
+# the Jewel is an opponent's, Parting is cast on it and Bot1, its OWNER, shuffles it into Bot1's library - not Bot2's.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Pearl
+Coveted Jewel
+Cathartic Parting
+Forest
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Coveted Jewel.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+! Bot1.Hand.Cathartic Parting.Cast
+[T4 Bot2.Main1]
+Bot2.Attack(Llanowar Elves > Bot1)
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Cathartic Parting.Cast
+Bot1.Target(Bot2.Battlefield.Coveted Jewel)
+Bot1.Target()
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Count = 6
+Bot2.Battlefield = Forest; Llanowar Elves
+Bot1.Library.Count = 9
+Bot2.Library.Count = 10
+Bot1.Graveyard = Cathartic Parting; Black Lotus

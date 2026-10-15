@@ -1,0 +1,6 @@
+{
+  "name": "Firebolt",
+  "manaCost": "{R}",
+  "type": "Sorcery",
+  "oracleText": "Firebolt deals 2 damage to any target.\nFlashback {4}{R} (You may cast this card from your graveyard for its flashback cost. Then exile it.)"
+}

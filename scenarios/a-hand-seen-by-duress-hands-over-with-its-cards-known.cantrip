@@ -1,0 +1,29 @@
+# Bot1's Duress looks at Bot2's hand and takes Lightning Bolt, handed over to Bot2 in its own first main phase. Every
+# card Bot2 still holds from that hand is known to Bot1, and the client marks each with the eye on its frame's left
+# edge; the card Bot2 drew since is not marked. The pointer resting on an eye says what it means.
+
+[Bot1 Deck]
+Swamp
+Duress
+Swamp x16
+
+[Bot2 Deck]
+Lightning Bolt
+Guerrilla Gorilla
+Island x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Duress.Cast(Bot2)
+Bot1.Choose(Lightning Bolt)
+[T2 Bot2.Main1]
+[Handover Bot2.Pass]
+
+[Expect]
+Turn = 2
+Step = Main1
+ActivePlayer = Bot2
+PriorityPlayer = Bot2
+Bot2.Graveyard = Lightning Bolt
+Bot2.Hand.Count = 7

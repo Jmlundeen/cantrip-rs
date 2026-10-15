@@ -1,0 +1,16 @@
+# Miracle is a reveal only the drawing player is asked about (CR 702.94a): declined, the Fanatic just stays in Bot1's
+# hand and nothing is put on the stack.
+[Bot1 Deck]
+Forest x7
+Metamorphosis Fanatic
+Forest x20
+[Bot2 Deck]
+Mountain x20
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Draw]
+Bot1.Decline
+[T3 Bot1.Main1]
+[Expect]
+Stack.Count = 0
+Bot1.Hand.Count = 7

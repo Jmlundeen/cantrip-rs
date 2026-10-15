@@ -1,0 +1,43 @@
+# "Target creature": Sylvan Caryatid (hexproof) is not a candidate for Bot1's Dismember (the refusal names it), while
+# Bot2's Elvish Mystic is (the positive control, which dies).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Dismember
+Island x12
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Sylvan Caryatid
+Elvish Mystic
+Island x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Sylvan Caryatid.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Hand.Dismember.Cast(Sylvan Caryatid)
+Bot1.Hand.Dismember.Cast(Elvish Mystic)
+Bot1.Modes()
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Elvish Mystic
+Bot2.Battlefield.Sylvan Caryatid.Toughness = 3

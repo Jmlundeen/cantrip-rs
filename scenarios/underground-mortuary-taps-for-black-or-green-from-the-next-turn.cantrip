@@ -1,0 +1,26 @@
+# The Mortuary enters tapped (CR 614.1c), so its mana abilities are refused on turn 1; surveil keeps the Lightning Bolt on top.
+# From turn 3 it adds {B} and from turn 5 {G}: one mana of one color each time, the two lines of "({T}: Add {B} or {G}.)".
+
+[Bot1 Deck]
+Underground Mortuary
+Island x6
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Swamp x15
+
+[Actions]
+Bot1.Hand.Underground Mortuary.Play
+Bot1.Arrange(Lightning Bolt)
+! Bot1.Battlefield.Underground Mortuary.Activate(Ability: {B})
+[T3 Bot1.Main1]
+Bot1.Battlefield.Underground Mortuary.Activate(Ability: {B})
+? Bot1.Mana = {B}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Underground Mortuary.Activate(Ability: {G})
+? Bot1.Mana = {G}
+
+[Expect]
+Bot1.Graveyard.Count = 0
+Bot1.Hand.Count = 8

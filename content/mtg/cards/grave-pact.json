@@ -1,0 +1,6 @@
+{
+  "name": "Grave Pact",
+  "manaCost": "{1}{B}{B}{B}",
+  "type": "Enchantment",
+  "oracleText": "Whenever a creature you control dies, each other player sacrifices a creature of their choice."
+}

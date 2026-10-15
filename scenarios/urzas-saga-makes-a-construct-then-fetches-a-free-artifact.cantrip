@@ -1,0 +1,43 @@
+# Urza's Saga: chapter I gives it "{T}: Add {C}" and chapter II "{2}, {T}: Create a 0/0 Construct ..." for good, and
+# chapter III searches for an artifact card with mana cost {0} or {1} and puts it onto the battlefield (CR 714.2b).
+# Turn 3 (chapter II): two Moxen pay the {2} and the Saga taps, and the Construct counts every artifact Bot1 controls,
+# itself included (the Saga is a land): 3/3. Turn 5 (chapter III) fetches Mox Pearl, a {0} artifact, so the Construct
+# is 4/4, and the Saga is sacrificed once the chapter has resolved.
+
+[Bot1 Deck]
+Urza's Saga
+Mox Ruby
+Mox Emerald
+Forest x4
+Forest x10
+Mox Pearl
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Urza's Saga.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Urza's Saga.Counters.Lore = 2
+Bot1.Battlefield.Urza's Saga.Activate(Ability: Construct)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Construct.Power = 3
+? Bot1.Battlefield.Construct.Toughness = 3
+[T5 Bot1.Main1]
+Bot1.Search(Mox Pearl)
+[T5 Bot1.Main2]
+? Bot1.Battlefield = Mox Ruby; Mox Emerald; Mox Pearl; Construct
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Mox Ruby; Mox Emerald; Mox Pearl; Construct
+Bot1.Battlefield.Construct.Power = 4
+Bot1.Battlefield.Construct.Toughness = 4

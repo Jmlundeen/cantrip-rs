@@ -1,0 +1,41 @@
+# CR 508.4: a creature put onto the battlefield attacking is not declared as an attacker, and its controller chooses which
+# player, planeswalker or battle it attacks. Bot2 has Liliana of the Veil (loyalty 3). Hero attacks Bot2 and both Soldiers
+# attack Liliana: battle cry makes them 2/1 each, 4 damage, and she dies. Hero's 3 damage reaches Bot2, who goes to 17. (Bot2's Black Lotus, sacrificed for the mana, is in the graveyard too.)
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Hero of Bladehold
+Plains x4
+Plains x13
+
+[Bot2 Deck]
+Black Lotus
+Liliana of the Veil
+Island x18
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Hero of Bladehold.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Liliana of the Veil.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Hero of Bladehold > Bot2)
+Bot1.Triggers(battle cry; Soldier)
+Bot1.Target(Bot2.Battlefield.Liliana of the Veil)
+Bot1.Target(Bot2.Battlefield.Liliana of the Veil)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot2.Graveyard = Liliana of the Veil; Black Lotus
+Bot2.Battlefield.Count = 0

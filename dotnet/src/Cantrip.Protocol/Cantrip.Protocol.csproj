@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <PackageReference Include="MessagePack" />
+    <ProjectReference Include="..\Cantrip.Core\Cantrip.Core.csproj" />
+  </ItemGroup>
+
+  <!-- Deliberately does NOT reference the server. This is the arrow that mechanically enforces
+       "the client never implements rules": the web client's dependency closure is Protocol plus Core,
+       so the server is not even linked into the process unless it is also hosting a game. -->
+
+</Project>

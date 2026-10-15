@@ -1,0 +1,48 @@
+# Carnage, Crimson Chaos: "Trample" (CR 702.19b). Cast by mayhem on turn 5, she attacks on turn 7 into Bot2's Thicket
+# Gorilla. Two of her four damage are lethal to the Gorilla and the other two go through to Bot2.
+
+[Bot1 Deck]
+Mountain
+Swamp
+Mountain
+Faithless Looting
+Carnage, Crimson Chaos
+Mountain
+Mountain
+Mountain x20
+
+[Bot2 Deck]
+Forest
+Forest
+Guerrilla Gorilla
+Forest x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Carnage, Crimson Chaos; Mountain)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Graveyard.Carnage, Crimson Chaos.Cast(Ability: Mayhem)
+[T7 Bot1.DeclareAttackers]
+Bot1.Attack(Carnage, Crimson Chaos)
+Bot2.Block(Guerrilla Gorilla > Carnage, Crimson Chaos)
+Bot1.AssignDamage(Carnage, Crimson Chaos > Guerrilla Gorilla: 2; Carnage, Crimson Chaos > Bot2: 2)
+[T7 Bot1.Main2]
+
+[Expect]
+Turn = 7
+Bot2.Life = 18
+Bot2.Graveyard = Guerrilla Gorilla
+Bot1.Battlefield.Carnage, Crimson Chaos.Damage = 2

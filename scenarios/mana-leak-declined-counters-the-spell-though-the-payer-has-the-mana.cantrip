@@ -1,0 +1,33 @@
+# The payer chooses: Bot1 has three untapped Forests after casting Guerrilla Gorilla but declines Mana Leak's "unless its
+# controller pays {3}" (default Decline), so the Gorilla is countered (CR 118.12) and its mana is not spent.
+
+[Bot1 Deck]
+Guerrilla Gorilla
+Forest x6
+Forest x10
+
+[Bot2 Deck]
+Mana Leak
+Island x6
+Island x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot2.Hand.Island.Play
+Bot1.Hand.Forest.Play
+Bot2.Hand.Island.Play
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Mana Leak.Cast(Guerrilla Gorilla)
+Bot1.Pass
+Bot1.Decline
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Guerrilla Gorilla
+Bot1.Battlefield.Forest#3.Tapped = False
+Bot2.Graveyard = Mana Leak

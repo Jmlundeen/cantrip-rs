@@ -1,0 +1,49 @@
+# Same game as barrowgoyf-mills-that-many-and-keeps-a-creature: Bot2's Lightning Bolt (instant), Bot1's Duress (sorcery)
+# and Bot2's Mountain discarded to hand size (land) make Barrowgoyf a 3/4 when it attacks on turn 7, unblocked.
+# Bot1's library holds one card when the trigger resolves (three were to be milled): the Gorilla is milled and taken,
+# the library is empty, and Bot1 has not lost yet (it only loses by drawing from it, CR 704.5b).
+
+[Bot1 Deck]
+Swamp
+Swamp
+Swamp
+Duress
+Barrowgoyf
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Guerrilla Gorilla
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Duress.Cast(Bot2)
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Swamp#3.Activate
+Bot1.Hand.Barrowgoyf.Cast
+[T7 Bot1.Main1]
+Bot1.Attack(Barrowgoyf)
+Bot1.Accept
+Bot1.Choose(Guerrilla Gorilla)
+
+[Expect]
+Result = InProgress
+Bot2.Life = 17
+Bot1.Hand.Count = 6
+Bot1.Hand = Swamp; Swamp; Swamp; Swamp; Swamp; Guerrilla Gorilla
+Bot1.Library.Count = 0

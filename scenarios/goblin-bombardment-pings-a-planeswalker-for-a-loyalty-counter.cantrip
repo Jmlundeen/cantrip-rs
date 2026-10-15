@@ -1,0 +1,48 @@
+# Damage to a planeswalker removes that many loyalty counters (CR 120.3c): the ping at Jace, the Mind Sculptor takes it
+# from 3 to 2.
+
+[Bot1 Deck]
+Mountain
+Mox Jet
+Mox Emerald
+Goblin Bombardment
+Elvish Mystic
+Island x12
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Jace, the Mind Sculptor
+Island x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Goblin Bombardment.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Jace, the Mind Sculptor.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot2.Battlefield.Jace, the Mind Sculptor.Counters.Loyalty = 3
+Bot1.Battlefield.Goblin Bombardment.Activate(Bot2.Battlefield.Jace, the Mind Sculptor)
+Bot1.Pass
+
+[Expect]
+Bot2.Battlefield.Jace, the Mind Sculptor.Counters.Loyalty = 2

@@ -1,0 +1,38 @@
+# Smuggler's Copter (crew 1, flying): "Whenever this Vehicle attacks or blocks, you may draw a card. If you do, discard a
+# card." Llanowar Elves crews it on turn 3, it attacks for 3 in the air, and the loot draws an Island and discards it.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Sol Ring
+Llanowar Elves
+Smuggler's Copter
+Forest
+Forest
+Forest
+Island
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Smuggler's Copter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Smuggler's Copter.Activate(Ability: Crew)
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Smuggler's Copter)
+Bot1.Accept
+Bot1.Choose(Island)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Graveyard = Island

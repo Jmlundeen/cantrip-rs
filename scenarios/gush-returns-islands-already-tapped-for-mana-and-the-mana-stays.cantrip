@@ -1,0 +1,36 @@
+# Mana abilities may be activated before the cost is paid (CR 601.2g), and nothing in "return two Islands you control"
+# asks for untapped ones: both Islands are tapped for {U}{U} first, then returned to pay for Gush, and the {U}{U}
+# stays in the pool while Gush resolves and draws two.
+
+[Bot1 Deck]
+Island
+Island
+Gush
+Island x3
+Island x2
+Island x10
+
+[Bot2 Deck]
+Swamp
+Swamp x6
+Swamp x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot2.Hand.Swamp.Play
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Gush.Cast(Ability: Return)
+Bot1.Choose(Island; Island)
+? Stack = Gush
+? Bot1.Battlefield.Count = 0
+? Bot1.Mana = {U}{U}
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Gush
+Bot1.Battlefield.Count = 0
+Bot1.Hand.Count = 9
+Bot1.Mana = {U}{U}

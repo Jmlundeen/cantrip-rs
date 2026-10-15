@@ -1,0 +1,37 @@
+# Dawn of a New Age: at the beginning of the end step it has one hope counter. In response to the trigger Bot1 destroys it
+# with Disenchant. It can no longer have a counter removed, so no card is drawn ("if you do"), and its last known state
+# had a hope counter, so "if it has no hope counters" is false: no sacrifice and no life.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Ornithopter
+Dawn of a New Age
+Disenchant
+Island x13
+
+[Bot2 Deck]
+Island x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dawn of a New Age.Cast
+Bot1.Pass
+[T1 Bot1.End]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Disenchant.Cast(Dawn of a New Age)
+[T2 Bot2.Main1]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Graveyard = Disenchant; Dawn of a New Age
+Bot1.Hand.Count = 0

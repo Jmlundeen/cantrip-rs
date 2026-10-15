@@ -1,0 +1,35 @@
+# Cycling {3} from the hand (an Island and a Sol Ring), then a second Proving Ground in play taps for {B} and later {R}.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Sol Ring
+Ziatora's Proving Ground
+Ziatora's Proving Ground
+Island x2
+Island x13
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Ziatora's Proving Ground.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Ziatora's Proving Ground.Play
+[T5 Bot1.Main1]
+Bot1.Battlefield.Ziatora's Proving Ground.Activate(Ability: {B})
+? Bot1.Mana = {B}
+[T7 Bot1.Main1]
+Bot1.Battlefield.Ziatora's Proving Ground.Activate(Ability: {R})
+
+[Expect]
+Bot1.Mana = {R}
+Bot1.Graveyard = Ziatora's Proving Ground

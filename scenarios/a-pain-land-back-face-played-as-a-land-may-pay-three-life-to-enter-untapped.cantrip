@@ -1,0 +1,18 @@
+# Shatterskull Smashing played as its back face, Shatterskull, the Hammer Pass: "As this land enters, you may pay 3
+# life. If you don't, it enters tapped" (CR 614.12a, 712.4). Accepted, it costs 3 life and enters untapped.
+
+[Bot1 Deck]
+Shatterskull Smashing
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Shatterskull Smashing.Play
+Bot1.Accept
+[Bot1.Main2]
+
+[Expect]
+Bot1.Life = 17
+Bot1.Battlefield.Shatterskull, the Hammer Pass.Tapped = false

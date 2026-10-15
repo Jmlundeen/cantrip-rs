@@ -1,0 +1,51 @@
+# Teamwork 2: "tap any number of creatures you control with total power 2 or more" - two Llanowar Elves of power 1 each add up, and
+# tapping them as a cost is not a {T} ability, so being summoning sick does not matter (CR 302.6 is about {T} costs of the creature
+# itself): the Elves cast on turn 3 are still sick on turn 4. Bot1 casts We Say Thee Nay! with teamwork against Bot2's Bolt; the ransom is {4} and Bot2's Black Lotus leaves only {R}{R},
+# so the Bolt is countered. Both Elves are tapped.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Mox Emerald
+Llanowar Elves
+Llanowar Elves
+We Say Thee Nay!
+Island
+Island x13
+
+[Bot2 Deck]
+Mountain
+Black Lotus
+Lightning Bolt
+Mountain x4
+Mountain x13
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.We Say Thee Nay!.Cast
+Bot1.Modes(Teamwork 2)
+Bot1.Target(Stack.Lightning Bolt)
+Bot1.Choose(Llanowar Elves; Llanowar Elves)
+Bot2.Pass
+Bot2.Decline
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield.Llanowar Elves#1.Tapped = true
+Bot1.Battlefield.Llanowar Elves#2.Tapped = true
+Bot2.Graveyard = Lightning Bolt

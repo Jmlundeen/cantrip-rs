@@ -1,0 +1,38 @@
+# Bankrupt in Blood: "As an additional cost to cast this spell, sacrifice two creatures" (CR 118.8, 601.2b-h). The cost
+# can only be paid with creatures its caster controls, so it is not castable with one creature of its own - a noncreature
+# Mox and an opponent's creature do not count - and is castable the moment a second creature of its own arrives
+# (the positive control, on turn 3). The opponent's Ornithopter is never offered for the sacrifice and stays.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Ornithopter
+Bankrupt in Blood
+Swamp x3
+Ornithopter
+Swamp x10
+
+[Bot2 Deck]
+Island
+Ornithopter
+Island x13
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+[Bot1.Main1]
+! Bot1.Hand.Bankrupt in Blood.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+! Bot1.Hand.Bankrupt in Blood.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Bankrupt in Blood.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+
+[Expect]
+Bot1.Graveyard = Bankrupt in Blood; Ornithopter; Ornithopter
+Bot2.Battlefield = Island; Ornithopter

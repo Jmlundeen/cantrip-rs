@@ -1,0 +1,46 @@
+# "Creatures don't untap during their controllers' untap steps" applies to every creature, and "whenever a creature enters, untap
+# all creatures" to every creature entering. Bot1 attacks with its Ornithopter on turn three and Bot2 attacks with its own on
+# turn four. On turn five Bot1's stays tapped, and on turn six Bot2's does too (the Alarm is Bot1's, the rule is not). Bot1's
+# noncreature Mox untaps normally (turn three). Then Bot2 casts a second Ornithopter: its entering untaps all creatures, both
+# players', so both tapped Ornithopters untap.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Ruby
+Ornithopter
+Intruder Alarm
+Island x12
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Island x13
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Intruder Alarm.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Mox Sapphire.Tapped = false
+Bot1.Attack(Ornithopter > Bot2)
+[T4 Bot2.Attackers]
+Bot2.Attack(Ornithopter > Bot1)
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Ornithopter.Tapped = true
+[T6 Bot2.Main1]
+? Bot2.Battlefield.Ornithopter.Tapped = true
+Bot2.Hand.Ornithopter.Cast
+[T6 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Tapped = false
+Bot2.Battlefield.Ornithopter#1.Tapped = false
+Bot2.Battlefield.Ornithopter#2.Tapped = false

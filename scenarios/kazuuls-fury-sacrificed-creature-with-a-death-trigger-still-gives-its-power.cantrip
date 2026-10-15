@@ -1,0 +1,39 @@
+# Kazuul's Fury: the creature sacrificed to the additional cost dies as the spell is cast, so its own "when this creature
+# dies" ability triggers and goes on the stack above the Fury. Bot1 sacrifices a Haywire Mite (1/1; "When this creature dies,
+# you gain 2 life") on turn 3: the Mite's trigger resolves first (Bot1 at 22), then the Fury deals the Mite's power, 1, to Bot2.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Haywire Mite
+Kazuul's Fury
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Haywire Mite.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Kazuul's Fury.Cast(Bot2)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 19
+Bot1.Life = 22

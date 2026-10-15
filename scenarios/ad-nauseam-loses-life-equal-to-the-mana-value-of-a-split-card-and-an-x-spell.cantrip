@@ -1,0 +1,34 @@
+# Ad Nauseam: the life lost is the revealed card's mana value as it is in the library. A split card not on the stack has
+# the combined mana value of its halves (CR 202.3d: Life // Death is 1 + 2 = 3) and an X in a mana cost is 0 outside the
+# stack (CR 202.3e, 107.3g: Mind Twist is {X}{B}, so 1). Bot1 takes both, 4 life in all, and then declines.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Mox Jet
+Ad Nauseam
+Swamp
+Swamp
+Swamp
+Life // Death
+Mind Twist
+Swamp x6
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ad Nauseam.Cast
+Bot1.Accept
+Bot1.Decline
+
+[Expect]
+Bot1.Life = 16
+Bot1.Hand = Life // Death; Mind Twist; Swamp; Swamp; Swamp
+Bot1.Graveyard = Ad Nauseam; Black Lotus

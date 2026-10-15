@@ -1,0 +1,57 @@
+# Appa, Steadfast Guardian, played for real. Turn 7 Bot1 casts Appa in its main phase and the
+# enters trigger airbends two other nonland permanents it controls, Giver of Runes and Mother of Runes, in one go.
+# Turn 9 Bot1 casts Giver of Runes from exile for {2} (a spell cast from exile: an Ally arrives) and a second Giver of
+# Runes from its hand for {W} (not from exile: no second Ally). Mother of Runes stays exiled, uncast.
+
+[Bot1 Deck]
+Plains
+Giver of Runes
+Mother of Runes
+Appa, Steadfast Guardian
+Giver of Runes
+Plains
+Plains
+Plains x11
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Giver of Runes.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Mother of Runes.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Battlefield.Plains#4.Activate
+Bot1.Hand.Appa, Steadfast Guardian.Cast
+Bot1.Target(Giver of Runes; Mother of Runes)
+[T7 Bot1.Main2]
+? Exile = Giver of Runes; Mother of Runes
+? Bot1.Battlefield.Count = 5
+[T9 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Exile.Giver of Runes.Cast
+[T9 Bot1.Main2]
+? Bot1.Battlefield.Ally.Power = 1
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Hand.Giver of Runes.Cast
+
+[Expect]
+Turn = 9
+Bot1.Battlefield.Count = 9
+Bot1.Battlefield.Ally.Power = 1
+Bot1.Battlefield.Ally.Toughness = 1
+Bot1.Battlefield.Ally.Types = Creature
+Exile = Mother of Runes
+Stack.Count = 0

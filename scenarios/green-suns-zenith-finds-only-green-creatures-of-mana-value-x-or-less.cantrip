@@ -1,0 +1,35 @@
+# Green Sun's Zenith for X = 1 may find "a green creature card with mana value X or less": the Endurance (mana value 3) is
+# too costly, the Ornithopter is not green, and the Snakeskin Veil is green but not a creature (! Search, each beside the
+# Llanowar Elves, green, a creature and mana value 1, which is found and put onto the battlefield).
+
+[Bot1 Deck]
+Forest
+Forest
+Green Sun's Zenith
+Forest x4
+Forest
+Endurance
+Ornithopter
+Snakeskin Veil
+Llanowar Elves
+Forest x10
+
+[Bot2 Deck]
+Forest x22
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Green Sun's Zenith.Cast(X: 1)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+! Bot1.Search(Endurance)
+! Bot1.Search(Ornithopter)
+! Bot1.Search(Snakeskin Veil)
+Bot1.Search(Llanowar Elves)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Forest; Forest; Llanowar Elves
+Bot1.Graveyard.Count = 0

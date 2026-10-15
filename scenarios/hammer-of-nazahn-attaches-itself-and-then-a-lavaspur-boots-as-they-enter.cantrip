@@ -1,0 +1,38 @@
+# Hammer of Nazahn: when it enters, and again when another Equipment (Lavaspur Boots) enters, its controller may attach
+# that Equipment to a creature they control. The Ornithopter ends up 3/2 (+2 from the Hammer, +1 from the Boots) with
+# indestructible and haste, carrying both.
+
+[Bot1 Deck]
+Ornithopter
+Black Lotus
+Mox Jet
+Hammer of Nazahn
+Lavaspur Boots
+Swamp
+Swamp
+Swamp x9
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Hammer of Nazahn.Cast
+Bot1.Accept
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Lavaspur Boots.Cast
+Bot1.Accept
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Hammer of Nazahn.AttachedTo = Ornithopter
+Bot1.Battlefield.Lavaspur Boots.AttachedTo = Ornithopter
+Bot1.Battlefield.Ornithopter.Power = 3
+Bot1.Battlefield.Ornithopter.Keywords = Flying; Haste; Indestructible

@@ -1,0 +1,23 @@
+# With three players the target is chosen among both opponents: Bot1 targets Bot3, who draws three; Bot2 draws none.
+
+[Bot1 Deck]
+Island
+Ancestral Recall
+Island x18
+
+[Bot2 Deck]
+Island x20
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot3)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 6
+Bot2.Hand.Count = 7
+Bot3.Hand.Count = 10

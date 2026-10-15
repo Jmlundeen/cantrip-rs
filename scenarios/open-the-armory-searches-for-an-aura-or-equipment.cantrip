@@ -1,0 +1,35 @@
+# Open the Armory: "Search your library for an Aura or Equipment card, reveal it, put it into your hand, then shuffle."
+# Bot1's library holds an Aura (Animate Dead), an Equipment (Colossus Hammer) and a Mox Ruby, which is neither. Bot1
+# refuses the Mox Ruby as a find, and takes the Aura.
+
+[Bot1 Deck]
+Island
+Mox Pearl
+Open the Armory
+Island x4
+Mox Ruby
+Animate Dead
+Colossus Hammer
+Island x8
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Open the Armory.Cast
+Bot1.Pass
+! Bot1.Search(Mox Ruby)
+! Bot1.Search(Island)
+Bot1.Search(Animate Dead)
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Graveyard = Open the Armory
+Bot1.Hand.Count = 5
+Bot1.Hand = Island; Island; Island; Island; Animate Dead

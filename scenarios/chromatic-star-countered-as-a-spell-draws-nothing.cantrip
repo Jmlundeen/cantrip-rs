@@ -1,0 +1,36 @@
+# The draw needs the Star to be put into a graveyard *from the battlefield*. A Star countered on the stack goes to the graveyard
+# from the stack (CR 701.5a), so nothing triggers: the hand stays at its count. Bot2 holds Counterspell off an Island and
+# a Mox Sapphire.
+
+[Bot1 Deck]
+Plains
+Plains
+Chromatic Star
+Plains x4
+Plains x10
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Island x4
+Island x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Chromatic Star.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Chromatic Star)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Chromatic Star
+Bot1.Hand.Count = 5
+Bot1.Battlefield = Plains; Plains

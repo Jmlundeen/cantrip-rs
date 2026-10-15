@@ -1,0 +1,32 @@
+# Impractical Joke: "3 damage to up to one target creature or planeswalker." A player is not a legal target (refused,
+# beside the planeswalker that is), and damage dealt to a planeswalker removes that many loyalty counters (CR 120.3c):
+# Bot2's Liliana of the Veil, cast on turn 2 with a Black Lotus and left at 3 loyalty, is dealt 3 and goes to the graveyard.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Impractical Joke
+Mountain x12
+
+[Bot2 Deck]
+Black Lotus
+Liliana of the Veil
+Swamp x14
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Liliana of the Veil.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+! Bot1.Hand.Impractical Joke.Cast(Bot2)
+Bot1.Hand.Impractical Joke.Cast(Bot2.Battlefield.Liliana of the Veil)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Liliana of the Veil; Black Lotus
+Bot2.Life = 20

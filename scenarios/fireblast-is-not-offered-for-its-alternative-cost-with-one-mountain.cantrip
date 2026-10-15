@@ -1,0 +1,23 @@
+# Two lands but only one is a Mountain: Fireblast's alternative cost (sacrifice two Mountains) cannot be paid, and the
+# six-mana cost cannot either, so it is not offered at all.
+
+[Bot1 Deck]
+Mountain
+Forest
+Fireblast
+Mountain x4
+Mountain x10
+
+[Bot2 Deck]
+Forest
+Forest x6
+Forest x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Forest.Play
+Bot1.Hand.Forest.Play
+! Bot1.Hand.Fireblast.Cast(Bot2; Ability: Sacrifice)
+
+[Expect]
+Bot1.Hand.Count = 6

@@ -1,0 +1,30 @@
+# Tendrils of Agony, "You may choose new targets for the copies": one spell was cast before it (the Black Lotus), so there is one copy,
+# and Bot1 aims it at itself: it loses 2 and gains 2, as the copy's controller. The original drains Bot2: Bot2 at 18 and
+# Bot1 at 22.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Tendrils of Agony
+Swamp x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Tendrils of Agony.Cast(Bot2)
+Bot1.Target(Bot1)
+Bot1.Pass
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Life = 22
+Bot2.Life = 18

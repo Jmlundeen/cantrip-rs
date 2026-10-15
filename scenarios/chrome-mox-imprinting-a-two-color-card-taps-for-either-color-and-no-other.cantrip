@@ -1,0 +1,32 @@
+# Chrome Mox: "{T}: Add one mana of any of the exiled card's colors." Bot1 imprints Dack Fayden ({1}{U}{R}, a blue and
+# red card) on turn 1 and taps the Mox for red to cast a Lightning Bolt at Bot2; a green mana is not on offer (refused
+# while red is, the positive control). On turn 3 the same Mox taps for blue, the other color of the card: it is "any" of
+# the colors, not the first of them.
+
+[Bot1 Deck]
+Chrome Mox
+Dack Fayden
+Lightning Bolt
+Ancestral Recall
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Chrome Mox.Cast
+Bot1.Choose(Dack Fayden)
+! Bot1.Battlefield.Chrome Mox.Activate(Color: Green)
+Bot1.Battlefield.Chrome Mox.Activate(Color: Red)
+? Bot1.Mana = {R}
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Chrome Mox.Activate(Color: Blue)
+? Bot1.Mana = {U}
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Dack Fayden
+Bot2.Life = 17
+Bot1.Graveyard = Ancestral Recall; Lightning Bolt

@@ -1,0 +1,49 @@
+# Leatherhead, Swamp Stalker: "you may remove a counter from her" needs her on the battlefield. Turn 3 Bot2 blocks her with a
+# Ulvenwald Oddity (4/4): she tramples over for 1 and takes 4, so she dies as combat damage is dealt, and her trigger finds
+# nothing to remove a counter from (nothing is asked: ! Bot1.Accept). Bot2's Mox Pearl survives, and the Oddity dies.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Mox Jet
+Leatherhead, Swamp Stalker
+Forest x15
+
+[Bot2 Deck]
+Forest
+Black Lotus
+Ulvenwald Oddity
+Mox Pearl
+Forest x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Leatherhead, Swamp Stalker.Cast
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Ulvenwald Oddity.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Leatherhead, Swamp Stalker > Bot2)
+Bot2.Block(Ulvenwald Oddity > Leatherhead, Swamp Stalker)
+! Bot1.Accept
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Leatherhead, Swamp Stalker
+Bot2.Graveyard = Ulvenwald Oddity; Black Lotus
+Bot2.Battlefield = Forest; Mox Pearl
+Bot2.Life = 19

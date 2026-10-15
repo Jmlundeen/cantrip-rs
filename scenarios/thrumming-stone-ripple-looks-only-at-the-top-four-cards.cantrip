@@ -1,0 +1,36 @@
+# Ripple 4 reveals exactly four cards: the Lightning Bolt in fifth place is not among them, so it is not cast, and the four
+# revealed (none of them a Bolt) go to the bottom of the library; the unrevealed Bolt is now on top. Only the original Bolt hurts (17).
+
+[Bot1 Deck]
+Mountain
+Sol Ring
+Black Lotus
+Thrumming Stone
+Lightning Bolt
+Mountain
+Island
+Island
+Island
+Island
+Lightning Bolt
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Thrumming Stone.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Accept
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17

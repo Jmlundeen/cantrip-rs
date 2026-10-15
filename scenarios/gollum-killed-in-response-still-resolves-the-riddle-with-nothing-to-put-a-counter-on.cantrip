@@ -1,0 +1,41 @@
+# Gollum has chosen even; Bot2's Mox Jet triggers the riddle. Its mode is chosen as it goes on the stack (CR 603.3c,
+# 700.2): Bot1 takes the +1/+1 counter, before Bot2 can respond. In response Bot2 Bolts Gollum (3/1) with a Lightning
+# Bolt (mana value 1, odd, so it is no trigger). The riddle resolves with Gollum gone: with no Gollum to put the counter on,
+# nothing happens (CR 608.2b, 608.2h). Gollum is in the graveyard and both life totals are as before the Bolt.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Gollum, Riddle Master
+Swamp x11
+
+[Bot2 Deck]
+Mountain
+Mox Jet
+Lightning Bolt
+Mountain x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Gollum, Riddle Master.Cast
+Bot1.Name(Even)
+[T4 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot1.Modes(Put a +1/+1 counter)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Gollum, Riddle Master)
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Turn = 4
+Bot1.Graveyard = Gollum, Riddle Master
+Bot1.Battlefield = Swamp; Swamp
+Bot1.Life = 20
+Bot2.Life = 20

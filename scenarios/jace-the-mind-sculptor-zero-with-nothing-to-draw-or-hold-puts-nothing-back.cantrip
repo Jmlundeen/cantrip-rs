@@ -1,0 +1,39 @@
+# Jace, the Mind Sculptor, "0: Draw three cards, then put two cards from your hand on top of your library": Bot1's whole
+# deck is its seven opening cards, all of them cast (four free Moxen, a Black Lotus, a Mox Sapphire and Jace), so its library
+# and hand are both empty. Drawing three from an empty library draws nothing, there is nothing to put back, and Bot1 loses
+# at the next state-based check (CR 704.5b).
+
+[Bot1 Deck]
+Mox Sapphire
+Black Lotus
+Jace, the Mind Sculptor
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mox Pearl
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Jace, the Mind Sculptor.Cast
+Bot1.Pass
+Bot1.Battlefield.Jace, the Mind Sculptor.Activate(Ability: #2)
+
+[Expect]
+Result = Bot2 won
+Bot1.Hand.Count = 0

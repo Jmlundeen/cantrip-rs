@@ -1,0 +1,25 @@
+# Bot1 casts Thought Scour on itself: the top two cards (Forest, Mountain) are milled first, and only then is a card
+# drawn, so the card drawn is the third (Plains), not one of the milled ones.
+
+[Bot1 Deck]
+Island
+Thought Scour
+Swamp x5
+Forest
+Mountain
+Plains
+Swamp x3
+
+[Bot2 Deck]
+Mountain x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Thought Scour.Cast(Bot1)
+
+[Expect]
+Bot1.Graveyard = Thought Scour; Mountain; Forest
+Bot1.Hand = Swamp; Swamp; Swamp; Swamp; Swamp; Plains
+Bot1.Library.Count = 3
+Bot2.Library.Count = 8

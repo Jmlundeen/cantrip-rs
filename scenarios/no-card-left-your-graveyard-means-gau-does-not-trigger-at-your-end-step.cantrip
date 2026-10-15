@@ -1,0 +1,31 @@
+# The intervening "if" (CR 603.4) fails: a card only ever arrives in Bot1's graveyard (Faithless Looting after it
+# resolves, its two discards), none leaves it, so the ability does not trigger on either end step and Bot2 keeps its life.
+
+[Bot1 Deck]
+Mountain
+Sol Ring
+Black Lotus
+Gau, Feral Youth
+Faithless Looting
+Mountain
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Gau, Feral Youth.Cast
+Bot1.Hand.Faithless Looting.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Attack(Gau, Feral Youth)
+[T4 Bot2.Upkeep]
+
+[Expect]
+Bot2.Life = 17

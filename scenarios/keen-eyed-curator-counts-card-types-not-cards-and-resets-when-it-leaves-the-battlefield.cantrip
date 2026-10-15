@@ -1,0 +1,75 @@
+# "Four or more card types among cards exiled with this creature" (CR 607.2a, 610.3): Bot1 casts the Curator on turn one, then Wheel of
+# Fortune, which puts Bot2's whole hand (three Islands, an Ornithopter, a Lightning Bolt, a Sol Ring, a Demonic Tutor) into its
+# graveyard. Two Islands exiled on turn one are one type: still 3/3. On turn three a third Island is still land only, the Ornithopter
+# adds artifact and creature - four cards, three types, still 3/3 - and the Lightning Bolt makes four types: 7/7 with trample. An
+# Ephemerate then blinks the Curator: it returns as a new object (CR 400.7) that nothing was exiled with, a 3/3 without trample,
+# though all five cards are still in exile (beside the rebounding Ephemerate).
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Black Lotus
+Keen-Eyed Curator
+Wheel of Fortune
+Mox Jet
+Mox Pearl
+Ephemerate
+Forest x12
+
+[Bot2 Deck]
+Island
+Island
+Island
+Ornithopter
+Lightning Bolt
+Sol Ring
+Demonic Tutor
+Island x13
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Keen-Eyed Curator.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Wheel of Fortune.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Keen-Eyed Curator.Activate(Bot2.Graveyard.Island)
+Bot1.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Keen-Eyed Curator.Activate(Bot2.Graveyard.Island)
+Bot1.Pass
+Bot1.Pass
+? Exile.Count = 2
+? Bot1.Battlefield.Keen-Eyed Curator.Power = 3
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Keen-Eyed Curator.Activate(Bot2.Graveyard.Island)
+Bot1.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Keen-Eyed Curator.Activate(Bot2.Graveyard.Ornithopter)
+Bot1.Pass
+Bot1.Pass
+? Exile.Count = 4
+? Bot1.Battlefield.Keen-Eyed Curator.Power = 3
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Keen-Eyed Curator.Activate(Bot2.Graveyard.Lightning Bolt)
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Keen-Eyed Curator.Power = 7
+? Bot1.Battlefield.Keen-Eyed Curator.Keywords = Trample
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ephemerate.Cast(Keen-Eyed Curator)
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Exile.Count = 6
+Bot1.Battlefield.Keen-Eyed Curator.Power = 3
+Bot1.Battlefield.Keen-Eyed Curator.Keywords = (absent)

@@ -1,0 +1,41 @@
+# Three damage is divided 1 to Llanowar Elves and 2 to Ornithopter. In response Bot2 Bolts its own Elves (Mox Ruby for {R});
+# the Elves' share of the damage is lost (CR 608.2b, 601.2d) but the Ornithopter still takes its 2 and dies. The life was
+# paid as a cost regardless: Bot1 is at 17.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Fire Covenant
+Swamp x16
+
+[Bot2 Deck]
+Forest
+Mox Ruby
+Llanowar Elves
+Ornithopter
+Lightning Bolt
+Forest x15
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Fire Covenant.Cast(X: 3)
+Bot1.Divide(Llanowar Elves: 1; Ornithopter: 2)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Llanowar Elves)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Life = 17
+Bot2.Graveyard = Ornithopter; Llanowar Elves; Lightning Bolt

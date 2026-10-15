@@ -1,0 +1,47 @@
+# Narset, Parter of Veils ({1}{U}{U}, paid with an Island and two Moxen) on turn 1. Her -2 looks at the top four cards:
+# Brainstorm, Ornithopter and two Plains. Only Brainstorm is a noncreature, nonland card, so only it may go to the hand;
+# the rest go to the bottom. On turn 2 Bot2 draws for the turn, then casts its own Brainstorm: it may not draw a second
+# card this turn, so it draws none, then puts back two cards.
+
+[Bot1 Deck]
+Narset, Parter of Veils
+Island
+Mox Sapphire
+Mox Pearl
+Plains
+Plains
+Plains
+Brainstorm
+Ornithopter
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Island
+Brainstorm
+Island x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Narset, Parter of Veils.Cast
+Bot1.Battlefield.Narset, Parter of Veils.Activate(Ability: Look at the top four)
+Bot1.Arrange(Brainstorm | Ornithopter; Plains; Plains)
+[T1 Bot1.Main2]
+? Bot1.Hand.Count = 4
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Brainstorm.Cast
+Bot2.Choose(Island; Island)
+[T2 Bot2.Main2]
+? Bot2.Hand.Count = 4
+
+[Expect]
+Bot1.Hand.Count = 4
+Bot1.Battlefield.Narset, Parter of Veils.Counters.Loyalty = 3

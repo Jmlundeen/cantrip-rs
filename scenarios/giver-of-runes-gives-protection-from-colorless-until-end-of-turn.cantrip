@@ -1,0 +1,51 @@
+# Giver of Runes: "{T}: Another target creature you control gains protection from colorless or from the color of your choice
+# until end of turn." Turn 3: Bot1 gives its attacking Llanowar Elves protection from colorless; Bot2's Ornithopter
+# (colorless) cannot block it (the refusal) though it can block Bot1's own attacking Ornithopter (the positive control,
+# and the other attacker the question needs). Turn 5, the protection over, the same Ornithopter blocks the same Elves.
+
+[Bot1 Deck]
+Plains
+Mox Emerald
+Giver of Runes
+Llanowar Elves
+Ornithopter
+Plains x2
+Plains x13
+
+[Bot2 Deck]
+Mountain
+Ornithopter
+Mountain x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Giver of Runes.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Giver of Runes.Activate(Llanowar Elves)
+Bot1.Accept
+Bot1.Pass
+Bot1.Attack(Llanowar Elves > Bot2; Ornithopter > Bot2)
+! Bot2.Block(Bot2.Battlefield.Ornithopter > Llanowar Elves)
+Bot2.Block(Bot2.Battlefield.Ornithopter > Bot1.Battlefield.Ornithopter)
+[T3 Bot1.Main2]
+? Bot2.Life = 19
+[T5 Bot1.Main1]
+Bot1.Attack(Llanowar Elves > Bot2)
+Bot2.Block(Bot2.Battlefield.Ornithopter > Llanowar Elves)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 19
+Bot1.Battlefield.Llanowar Elves.Damage = 0
+Bot2.Battlefield.Ornithopter.Damage = 1

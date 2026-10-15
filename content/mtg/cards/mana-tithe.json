@@ -1,0 +1,6 @@
+{
+  "name": "Mana Tithe",
+  "manaCost": "{W}",
+  "type": "Instant",
+  "oracleText": "Counter target spell unless its controller pays {1}."
+}

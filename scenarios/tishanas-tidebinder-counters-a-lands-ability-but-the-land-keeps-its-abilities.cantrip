@@ -1,0 +1,55 @@
+# Bot2 activates Abandoned Air Temple's "{3}{W}, {T}: Put a +1/+1 counter on each creature you control" on turn four.
+# Bot1 flashes in Tishana's Tidebinder off a Black Lotus and counters it, so the Mother of Runes gets no counter.
+# The Temple is a land, not an artifact, creature or planeswalker, so it does not lose its abilities: on turn six,
+# with the Tidebinder still on the battlefield, Bot2 taps the Temple for {W} with its own mana ability.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Tishana's Tidebinder
+Island
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Plains
+Mother of Runes
+Black Lotus
+Abandoned Air Temple
+Plains
+Plains
+Plains
+Plains x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Mother of Runes.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot1.Hand.Island.Play
+Bot2.Hand.Abandoned Air Temple.Play
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Abandoned Air Temple.Activate(Ability: +1/+1 counter)
+? Stack.Count = 1
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Tishana's Tidebinder.Cast
+Bot1.Target(Stack.Abandoned Air Temple)
+[T4 Bot2.Main2]
+? Stack.Count = 0
+? Bot2.Battlefield.Mother of Runes.Power = 1
+[T6 Bot2.Main1]
+? Bot2.Battlefield.Abandoned Air Temple.Tapped = false
+Bot2.Battlefield.Abandoned Air Temple.Activate(Ability: Add {W})
+? Bot2.Battlefield.Abandoned Air Temple.Tapped = true
+
+[Expect]
+Turn = 6
+Bot1.Battlefield = Island; Island; Tishana's Tidebinder
+Bot2.Battlefield.Mother of Runes.Power = 1
+Bot2.Battlefield.Mother of Runes.Counters.PlusOnePlusOne = (absent)
+Bot2.Battlefield.Abandoned Air Temple.Tapped = true

@@ -1,0 +1,34 @@
+# The hidden card may be a spell: after three attackers the Heights lets Bot1 cast the exiled Lightning Bolt without paying its mana
+# cost (CR 118.9, 608.2g), at Bot2, who goes to 17. The attackers deal no damage (Ornithopters have no power).
+[Bot1 Deck]
+Windbrisk Heights
+Mox Pearl
+Ornithopter
+Ornithopter
+Ornithopter
+Island
+Island
+Lightning Bolt
+Island x3
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Windbrisk Heights.Play
+Bot1.Arrange(Lightning Bolt | Island; Island; Island)
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter#1 > Bot2; Ornithopter#2 > Bot2; Ornithopter#3 > Bot2)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Windbrisk Heights.Activate(Ability: You may play)
+Bot1.Accept
+Bot1.Target(Bot2)
+[Bot1.Main2]
+[Expect]
+Exile.Count = 0
+Bot2.Life = 17
+Bot1.Battlefield = Windbrisk Heights; Mox Pearl; Ornithopter; Ornithopter; Ornithopter
+Bot1.Graveyard = Lightning Bolt

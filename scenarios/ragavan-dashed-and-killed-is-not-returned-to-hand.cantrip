@@ -1,0 +1,36 @@
+# Dash (CR 702.109a): "it's returned from the battlefield to its owner's hand at the beginning of the next end step" - only if it is
+# still on the battlefield. Bot1 dashes Ragavan on turn 3 and attacks; Bot2 kills it with Lightning Bolt in the declare-attackers
+# step, so it never connects (no Treasure, nothing exiled), and at the end step it is in the graveyard, not in Bot1's hand.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Ragavan, Nimble Pilferer
+Mountain x12
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x14
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ragavan, Nimble Pilferer.Cast(Ability: Dash)
+Bot1.Attack(Ragavan, Nimble Pilferer > Bot2)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ragavan, Nimble Pilferer)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.End]
+
+[Expect]
+Bot1.Graveyard = Ragavan, Nimble Pilferer
+Bot1.Battlefield.Count = 2
+Bot2.Life = 20
+Exile.Count = 0

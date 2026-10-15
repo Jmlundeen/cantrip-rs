@@ -1,0 +1,49 @@
+# The same game as the one-void-card scenario, but Bot1 plays a Swamp from its hand on turn 5 and leaves Bot2's void-counter
+# Mountain in exile: "you may play it this turn" has run out when turn 7 comes, and the Mountain cannot be played then.
+# (The one-void-card scenario is the positive control: the same play on the turn the permission was given.)
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Dauthi Voidwalker
+Swamp
+Mox Pearl
+Swords to Plowshares
+Swamp x14
+
+[Bot2 Deck]
+Ornithopter
+Swamp x6
+Swamp
+Mountain
+Swamp x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dauthi Voidwalker.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Swords to Plowshares.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Dauthi Voidwalker.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Swamp.Play
+[T7 Bot1.Main1]
+! Bot1.Exile.Mountain.Play
+
+[Expect]
+Turn = 7
+Exile = Ornithopter; Mountain
+Bot1.LandsPlayed = 0

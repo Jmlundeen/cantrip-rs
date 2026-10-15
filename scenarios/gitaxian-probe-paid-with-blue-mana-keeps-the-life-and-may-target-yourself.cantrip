@@ -1,0 +1,24 @@
+# Gitaxian Probe's {U/P} paid with {U} instead of 2 life (CR 107.4f): Bot1 taps an Island and keeps its 20 life. The target
+# is "target player", any player including the caster: Bot1 looks at its own hand and draws a card, ending with six: the Island played, the Probe cast, one card drawn.
+
+[Bot1 Deck]
+Gitaxian Probe
+Island
+Plains x18
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Gitaxian Probe.Cast(Bot1)
+Bot1.Modes()
+Bot1.Battlefield.Island.Activate
+[Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Life = 20
+Bot1.Hand.Count = 6
+Bot1.Battlefield.Island.Tapped = true
+Bot1.Graveyard = Gitaxian Probe

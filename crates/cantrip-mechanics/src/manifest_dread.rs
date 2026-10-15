@@ -1,0 +1,35 @@
+//! Manifest dread (CR 701.62a): "Look at the top two cards of your library. Put one onto the battlefield face down as a
+//! 2/2 creature and the other into your graveyard." Abhorrent Oculus does it at the beginning of each opponent's upkeep.
+
+use crate::top_of_library;
+use cantrip_api::*;
+
+/// `player` looks at the top two cards of their library, manifests one (CR 701.40a: onto the battlefield face down as a
+/// 2/2 creature) and puts the other into their graveyard. A library of one card manifests that one; of none, nothing
+/// happens. The player is always asked, as the prompt names which card is which.
+pub fn manifest_dread(g: &mut dyn Game, player: PlayerId, source: ObjectId) -> Result<(), Suspend> {
+    let looked = top_of_library(g, player, 2);
+    if looked.is_empty() {
+        return Ok(());
+    }
+    let ask = RequestKind::DistributeCards {
+        source,
+        cards: looked.clone(),
+        destinations: vec![
+            Destination { kind: DestinationKind::BattlefieldFaceDown, min: 1, max: 1, eligible: looked.clone() },
+            Destination { kind: DestinationKind::Graveyard, min: 0, max: u8::MAX, eligible: looked.clone() },
+        ],
+        may_shuffle: false,
+    };
+    let mut manifested = looked[0];
+    if let Answer::Placements { placements, .. } = g.ask(player, ask)?
+        && let Some(&card) = placements.first().and_then(|p| p.first())
+    {
+        manifested = card;
+    }
+    g.put_onto_battlefield_face_down(manifested, player)?;
+    let rest: Vec<(ObjectId, Zone)> =
+        looked.into_iter().filter(|&c| c != manifested).map(|c| (c, Zone::graveyard(player))).collect();
+    g.move_together(&rest, ZoneReason::Other);
+    Ok(())
+}

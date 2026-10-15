@@ -1,0 +1,50 @@
+# Forge Anew's enters trigger targets an Equipment card in Bot1's graveyard (Bot2's Duress put the Battle-Axe there on turn 2).
+# With the trigger on the stack Bot2 exiles the Axe with Ghost Vacuum; the single target is illegal on resolution and nothing
+# returns (CR 608.2b). The Axe stays in exile.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Bloodforged Battle-Axe
+Forge Anew
+Island x15
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Duress
+Ghost Vacuum
+Swamp x15
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Duress.Cast(Bot1)
+Bot2.Choose(Bloodforged Battle-Axe)
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Ghost Vacuum.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Forge Anew.Cast
+Bot1.Pass
+Bot1.Pass
+Bot2.Battlefield.Ghost Vacuum.Activate(Ability: Exile target; Bot1.Graveyard.Bloodforged Battle-Axe)
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Bloodforged Battle-Axe
+Bot1.Battlefield = Forge Anew; Mox Jet; Mox Pearl; Mox Sapphire
+Stack.Count = 0

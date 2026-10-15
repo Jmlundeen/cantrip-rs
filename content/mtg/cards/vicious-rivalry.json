@@ -1,0 +1,6 @@
+{
+  "name": "Vicious Rivalry",
+  "manaCost": "{2}{B}{G}",
+  "type": "Sorcery",
+  "oracleText": "As an additional cost to cast this spell, pay X life.\nDestroy all artifacts and creatures with mana value X or less."
+}

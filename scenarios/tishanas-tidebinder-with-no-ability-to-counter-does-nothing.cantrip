@@ -1,0 +1,32 @@
+# "Up to one target": with no activated or triggered ability on the stack the Tidebinder's trigger has no target, resolves
+# and counters nothing; nothing is asked (the refused Target) and the Tidebinder stays.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Tishana's Tidebinder
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Tishana's Tidebinder.Cast
+Bot1.Pass
+Bot1.Pass
+! Bot1.Target
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Sapphire; Mox Jet; Mox Ruby; Tishana's Tidebinder
+Stack.Count = 0

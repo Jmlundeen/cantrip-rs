@@ -1,0 +1,52 @@
+# "Choose one" (CR 700.2): both modes at once, 1 and 2, are refused (Bot2's Ornithopter and Concealing Curtains give both modes a
+# target) and mode 1 is chosen. Suplex's 3 damage does not kill the 0/4 Concealing Curtains, but "if that creature would die
+# this turn, exile it instead" applies to the whole turn (CR 611.2c, 614.1a): Bot1's Lightning Bolt after it finishes the
+# Curtains and it is exiled, not put into Bot2's graveyard.
+
+[Bot1 Deck]
+Mox Ruby
+Mountain
+Mountain
+Suplex
+Lightning Bolt
+Mountain x2
+Mountain x10
+
+[Bot2 Deck]
+Swamp
+Concealing Curtains
+Ornithopter
+Swamp x4
+Swamp x10
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Concealing Curtains.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Suplex.Cast
+! Bot1.Modes(1; 2)
+Bot1.Modes(1)
+Bot1.Target(Concealing Curtains)
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot2.Battlefield.Concealing Curtains.Damage = 3
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Concealing Curtains)
+Bot1.Pass
+[T3 Bot1.End]
+
+[Expect]
+Exile = Concealing Curtains
+Bot2.Graveyard.Count = 0
+Bot2.Battlefield = Swamp; Ornithopter

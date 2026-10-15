@@ -1,0 +1,49 @@
+# Overlord of the Mistmoors, cast for impending: "isn't a creature until the last [time counter] is removed" (CR 702.176a).
+# On turn 2 Bot2's Swords to Plowshares cannot target it (refused, beside the Insect token that it can: the positive
+# control, exiled for 2 life), and Wrath of God destroys the other Insect token but leaves the enchantment on the battlefield
+# with its time counters (three: one came off at the end of Bot1's turn 1); the exiled token ceased to exist.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Overlord of the Mistmoors
+Plains x15
+
+[Bot2 Deck]
+Plains
+Black Lotus
+Mox Pearl
+Swords to Plowshares
+Wrath of God
+Plains x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Overlord of the Mistmoors.Cast(Ability: Impending)
+Bot1.Battlefield.Plains.Activate
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+! Bot2.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Overlord of the Mistmoors)
+Bot2.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Insect)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Wrath of God.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Pass
+Bot1.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 22
+Exile.Count = 0
+Bot1.Battlefield.Overlord of the Mistmoors.Counters.Time = 3
+Bot1.Battlefield.Overlord of the Mistmoors.Types = Enchantment
+Bot1.Battlefield = Plains; Overlord of the Mistmoors

@@ -1,0 +1,36 @@
+# Vindicate is white and black. Bot2's Mother of Runes, no longer summoning sick, answers a Vindicate cast on turn five by giving
+# herself protection from black: the target is illegal on resolution (CR 608.2b, 702.16b), the Vindicate is countered, and the
+# Mother survives. (Cast on turn five because the Mother, cast on turn two, may be activated from turn four.)
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Vindicate
+Plains x12
+
+[Bot2 Deck]
+Mox Pearl
+Mother of Runes
+Plains x13
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Mother of Runes.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Vindicate.Cast(Bot2.Battlefield.Mother of Runes)
+Bot2.Battlefield.Mother of Runes.Activate(Mother of Runes)
+Bot2.Colors(Black)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Mox Pearl; Mother of Runes
+Bot1.Graveyard = Vindicate

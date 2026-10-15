@@ -1,0 +1,24 @@
+# Bot1 destroys Bot2's Ornithopter and keeps all 20 life.
+
+[Bot1 Deck]
+Black Lotus
+Shredder's Technique
+Swamp x18
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Shredder's Technique.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Battlefield.Count = 0
+Bot2.Graveyard = Ornithopter

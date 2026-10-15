@@ -1,0 +1,40 @@
+# Prismatic Ending: converge. Cast with X = 1 for white and blue mana, two colors are spent, so it exiles Bot2's Dark
+# Confidant, whose mana value is 2.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Prismatic Ending
+Plains x17
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Dark Confidant
+Swamp x17
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Dark Confidant.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Prismatic Ending.Cast(Bot2.Battlefield.Dark Confidant; X: 1)
+[Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Exile = Dark Confidant
+Bot2.Battlefield = Mox Jet; Swamp
+Bot1.Graveyard = Prismatic Ending

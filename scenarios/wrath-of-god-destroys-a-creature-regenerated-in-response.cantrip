@@ -1,0 +1,47 @@
+# They can't be regenerated: a regeneration shield made in response to Wrath of God does not save the creature (CR 701.19c).
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Plains x5
+Wrath of God
+Plains x14
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Yavimaya Hollow
+Forest x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Forest.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+[T4 Bot2.Main1]
+Bot2.Hand.Yavimaya Hollow.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Wrath of God.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Forest.Activate
+Bot2.Battlefield.Yavimaya Hollow.Activate(Bot2.Battlefield.Llanowar Elves; Ability: Regenerate)
+Bot2.Battlefield.Forest.Activate
+[T7 Bot1.Main2]
+
+[Expect]
+Turn = 7
+Bot1.Graveyard = Wrath of God; Llanowar Elves
+Bot2.Battlefield = Forest; Yavimaya Hollow
+Bot2.Battlefield.Yavimaya Hollow.Tapped = true
+Bot2.Graveyard = Llanowar Elves
+Stack.Count = 0

@@ -1,0 +1,40 @@
+# Channel exiles a token Bot2 made with Pest Infestation (X = 1): a token that leaves the battlefield ceases to exist (CR 111.7), so
+# when the delayed ability looks for what was exiled at the beginning of the next end step there is nothing, and the token does not
+# come back. Bot2's other Pest, left alone, stays.
+
+[Bot1 Deck]
+Black Lotus
+Touch the Spirit Realm
+Plains x3
+Plains x13
+
+[Bot2 Deck]
+Forest
+Forest
+Forest
+Pest Infestation
+Forest x16
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest#1.Activate
+Bot2.Battlefield.Forest#2.Activate
+Bot2.Battlefield.Forest#3.Activate
+Bot2.Hand.Pest Infestation.Cast(X: 1)
+[T7 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Touch the Spirit Realm.Activate(Bot2.Battlefield.Pest#1)
+[T7 Bot1.Main2]
+? Bot2.Battlefield.Count = 4
+[T8 Bot2.Main1]
+
+[Expect]
+Bot2.Battlefield.Count = 4
+Exile.Count = 0
+Bot1.Graveyard = Touch the Spirit Realm; Black Lotus; Plains

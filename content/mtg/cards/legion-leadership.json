@@ -1,0 +1,12 @@
+{
+  "name": "Legion Leadership",
+  "manaCost": "{1}{R/W}",
+  "type": "Instant",
+  "oracleText": "Until end of turn, double target creature's power and it gains first strike.",
+  "backFacePlayableAsLand": true,
+  "backFace": {
+    "name": "Legion Stronghold",
+    "type": "Land",
+    "oracleText": "This land enters tapped.\n{T}: Add {R} or {W}."
+  }
+}

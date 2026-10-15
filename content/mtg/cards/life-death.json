@@ -1,0 +1,18 @@
+{
+  "name": "Life // Death",
+  "oracleText": "",
+  "halves": [
+    {
+      "name": "Life",
+      "manaCost": "{G}",
+      "type": "Sorcery",
+      "oracleText": "All lands you control become 1/1 creatures until end of turn. They're still lands."
+    },
+    {
+      "name": "Death",
+      "manaCost": "{1}{B}",
+      "type": "Sorcery",
+      "oracleText": "Return target creature card from your graveyard to the battlefield. You lose life equal to its mana value."
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Cantrip.Core\Cantrip.Core.csproj" />
+    <ProjectReference Include="..\Cantrip.Protocol\Cantrip.Protocol.csproj" />
+  </ItemGroup>
+
+  <!-- The weights the tactical seat plays from (Tactics\TacticalModel), fitted by tools\bot-train.cmd and carried in the
+       assembly so that the seat is the same seat wherever a client runs, a browser included. -->
+  <ItemGroup>
+    <EmbeddedResource Include="Tactics\tactical-model.txt" LogicalName="tactical-model.txt" />
+  </ItemGroup>
+
+  <!-- Protocol and Core only. No engine, no projection, no server: if the client could reach rules code it
+       would eventually use it, and a client that decides anything is no longer a thin client. Keeping this
+       assembly free of any UI as well means the client's logic is testable without a browser or a window. -->
+
+</Project>

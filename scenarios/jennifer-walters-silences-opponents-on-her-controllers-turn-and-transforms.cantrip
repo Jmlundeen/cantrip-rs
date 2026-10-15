@@ -1,0 +1,61 @@
+# Jennifer Walters: "Your opponents can't cast spells during your turn." (CR 101.2) Bot2 casts a Lightning Bolt on its own
+# turn 4 (the control: the ban is about whose turn it is), and cannot cast the second on turn 5, Bot1's, while
+# Jennifer is out. On turn 13, with seven lands, "{3}{G}{W}{W}: Transform Jennifer Walters" (sorcery speed) turns her into
+# The Sensational She-Hulk, a 6/6 with reach and trample.
+
+[Bot1 Deck]
+Plains
+Plains
+Jennifer Walters
+Plains x4
+Forest x3
+Plains x10
+
+[Bot2 Deck]
+Mountain
+Mountain
+Lightning Bolt
+Lightning Bolt
+Mountain x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Jennifer Walters.Cast
+Bot1.Pass
+Bot2.Hand.Mountain.Play
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T5 Bot1.Upkeep]
+Bot1.Pass
+! Bot2.Hand.Lightning Bolt.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T11 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T13 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Jennifer Walters.Activate
+[T13 Bot1.Main2]
+
+[Expect]
+Turn = 13
+Bot2.Life = 20
+Bot1.Life = 17
+Bot1.Battlefield.The Sensational She-Hulk.Power = 6

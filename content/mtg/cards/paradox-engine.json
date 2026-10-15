@@ -1,0 +1,6 @@
+{
+  "name": "Paradox Engine",
+  "manaCost": "{5}",
+  "type": "Legendary Artifact",
+  "oracleText": "Whenever you cast a spell, untap all nonland permanents you control."
+}

@@ -1,0 +1,51 @@
+# A unearthed Phyrexian Dragon Engine that would leave the battlefield is exiled instead (CR 702.84a, 614.1): Bot2
+# answers the returned Engine with Lightning Bolt, and it ends in exile and not in the graveyard. Its enters trigger,
+# already on the stack beneath the Bolt, still resolves and Bot1 still discards the hand and draws three.
+
+[Bot1 Deck]
+Phyrexian Dragon Engine
+Faithless Looting
+Mountain x5
+Mountain x14
+
+[Bot2 Deck]
+Lightning Bolt
+Mountain x6
+Island x13
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Phyrexian Dragon Engine; Mountain)
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Graveyard.Phyrexian Dragon Engine.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Phyrexian Dragon Engine)
+Bot1.Pass
+Bot2.Pass
+? Exile = Phyrexian Dragon Engine
+? Bot1.Graveyard = Faithless Looting; Mountain
+Bot1.Accept
+? Bot1.Hand.Count = 3
+
+[Expect]
+Turn = 9
+Exile = Phyrexian Dragon Engine
+Bot1.Hand.Count = 3

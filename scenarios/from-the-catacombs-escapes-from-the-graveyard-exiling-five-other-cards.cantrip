@@ -1,0 +1,48 @@
+# From the Catacombs, Escape - {3}{B}{B}, exile five other cards from your graveyard. Turn 1: Faithless Looting discards
+# From the Catacombs and an Ornithopter; four Dark Rituals chained off a Swamp leave nine {B} and six other cards in the
+# graveyard. Bot1 casts the Catacombs from the graveyard for its escape cost, exiling five of them (not the Ornithopter),
+# and returns the Ornithopter with a corpse counter; the initiative is taken. The Catacombs, a spell that resolved, goes
+# back to the graveyard.
+
+[Bot1 Deck]
+Swamp
+Mox Ruby
+Faithless Looting
+From the Catacombs
+Ornithopter
+Dark Ritual
+Dark Ritual
+Dark Ritual
+Dark Ritual
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(From the Catacombs; Ornithopter)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot1.Graveyard.From the Catacombs.Cast(Bot1.Graveyard.Ornithopter; Ability: Escape)
+Bot1.Choose(Dark Ritual; Dark Ritual; Dark Ritual; Dark Ritual; Faithless Looting)
+Bot1.Pass
+
+[Expect]
+Turn = 1
+Initiative = Bot1
+Bot1.Battlefield.Ornithopter.Counters.Corpse = 1
+Exile.Count = 5
+Bot1.Graveyard.Count = 1

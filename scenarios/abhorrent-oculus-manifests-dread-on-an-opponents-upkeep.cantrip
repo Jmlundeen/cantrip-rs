@@ -1,0 +1,46 @@
+# Bot1 fills its graveyard with a Wheel of Fortune off a Black Lotus, then casts Abhorrent Oculus by exiling six of
+# those cards (CR 118.3). On Bot2's upkeep the Oculus manifests dread (CR 701.62a): of Guerrilla Gorilla and Lightning
+# Bolt, the Gorilla goes onto the battlefield face down as a nameless 2/2 and the Bolt into the graveyard.
+#
+# It stops as Bot1 declares attackers on its next turn, with the face-down Gorilla on the board, to
+# picture a face-down permanent.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Wheel of Fortune
+Island x4
+Mox Sapphire
+Sol Ring
+Abhorrent Oculus
+Island x4
+Guerrilla Gorilla
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Wheel of Fortune.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Abhorrent Oculus.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Choose(Island; Island; Island; Island; Black Lotus; Wheel of Fortune)
+? Exile.Count = 6
+[T2 Bot2.Upkeep]
+Bot1.Arrange(Guerrilla Gorilla | Lightning Bolt)
+? Bot1.Graveyard = Lightning Bolt
+[Handover Bot1.Attack]
+
+[Expect]
+Turn = 3
+Exile.Count = 6
+Bot1.Graveyard = Lightning Bolt
+Bot1.Battlefield.Abhorrent Oculus.Power = 5

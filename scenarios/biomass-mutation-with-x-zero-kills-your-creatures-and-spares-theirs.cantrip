@@ -1,0 +1,38 @@
+# X = 0: "base power and toughness 0/0" (CR 613.4b) leaves Bot1's Elvish Mystic and Ornithopter at 0 toughness, and the
+# state-based actions put them into the graveyard (CR 704.5f), while Bot2's Llanowar Elves is not "a creature you
+# control" and lives. The {G/U}{G/U} are paid with one Forest and one Island: a hybrid symbol takes either colour.
+
+[Bot1 Deck]
+Forest
+Island
+Elvish Mystic
+Ornithopter
+Biomass Mutation
+Forest x3
+Island x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Biomass Mutation.Cast(X: 0)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Ornithopter; Elvish Mystic; Biomass Mutation
+Bot1.Battlefield = Forest; Island
+Bot2.Battlefield.Llanowar Elves.Power = 1

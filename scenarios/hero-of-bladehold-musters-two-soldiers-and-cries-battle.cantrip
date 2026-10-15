@@ -1,0 +1,49 @@
+# Hero of Bladehold is cast on turn 7 and attacks alone on turn 9. Both of its abilities trigger on that one attack and
+# Bot1 orders them (CR 603.3b; either order is legal, the script names it) with the Soldiers' trigger put on the stack last, so the Soldiers are made first: two 1/1 white tokens, tapped
+# and attacking the player Hero is attacking (CR 508.4). Battle cry then resolves, and by that point the Soldiers are
+# other attacking creatures, so they are 2/1 each — Hero, being itself, is not pumped. Bot2 takes 3 + 2 + 2.
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Plains
+Hero of Bladehold
+Plains
+Plains
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Hero of Bladehold.Cast
+[T9 Bot1.Main1]
+Bot1.Attack(Hero of Bladehold > Bot2)
+Bot1.Triggers(battle cry; Soldier)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Combat.Attackers = Hero of Bladehold > Bot2; Soldier > Bot2; Soldier > Bot2
+? Bot1.Battlefield.Soldier#1.Tapped = true
+? Bot1.Battlefield.Soldier#1.Power = 2
+? Bot1.Battlefield.Soldier#1.Toughness = 1
+? Bot1.Battlefield.Soldier#2.Power = 2
+? Bot1.Battlefield.Hero of Bladehold.Power = 3
+[T9 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 13
+Bot1.Battlefield = Hero of Bladehold; Plains; Plains; Plains; Plains; Soldier; Soldier

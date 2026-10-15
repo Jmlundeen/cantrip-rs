@@ -1,0 +1,48 @@
+# "A spell or ability" — anyone's, its own controller's included: Bot1's own Mother of Runes aims her ability at Bot1's
+# Phantasmal Image (a copy of Bot2's Guerrilla Gorilla). The sacrifice trigger goes on the stack above the ability
+# (CR 603.3) and the Image is gone before it resolves; the ability is then removed for want of a target (CR 608.2b).
+
+[Bot1 Deck]
+Plains
+Mother of Runes
+Island
+Island
+Phantasmal Image
+Island
+Island x10
+
+[Bot2 Deck]
+Forest
+Forest
+Guerrilla Gorilla
+Forest x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Mother of Runes.Cast
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Phantasmal Image.Cast
+Bot1.Accept
+Bot1.Target(Bot2.Battlefield.Guerrilla Gorilla)
+? Bot1.Battlefield.Guerrilla Gorilla.Subtypes = Ape; Hero; Illusion; Soldier
+Bot1.Battlefield.Mother of Runes.Activate(Bot1.Battlefield.Guerrilla Gorilla)
+? Stack.Count = 2
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Graveyard = Phantasmal Image
+Bot1.Battlefield.Mother of Runes.Tapped = true
+Bot2.Battlefield.Guerrilla Gorilla.Subtypes = Ape; Hero; Soldier

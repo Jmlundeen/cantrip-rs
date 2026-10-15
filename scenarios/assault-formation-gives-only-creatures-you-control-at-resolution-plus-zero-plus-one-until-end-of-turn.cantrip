@@ -1,0 +1,54 @@
+# Assault Formation: "{2}{G}: Creatures you control get +0/+1 until end of turn." The effect affects the creatures its
+# controller has as it resolves and no others (CR 611.2c): on turn 3 Bot1 pays it with one Llanowar Elves on the
+# battlefield, then casts a second Elves. The first is a 1/2 until end of turn, the second a 1/1 that was not there to be
+# affected, and Bot2's Elves is untouched. On Bot2's turn the first Elves is a 1/1 again.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Assault Formation
+Llanowar Elves
+Llanowar Elves
+Forest
+Forest x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Assault Formation.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Assault Formation.Activate(Ability: +0/+1)
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Llanowar Elves#1.Toughness = 2
+? Bot1.Battlefield.Llanowar Elves#2.Toughness = 1
+? Bot2.Battlefield.Llanowar Elves.Toughness = 1
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves#1.Power = 1
+Bot1.Battlefield.Llanowar Elves#1.Toughness = 1

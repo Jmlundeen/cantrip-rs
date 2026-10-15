@@ -1,0 +1,38 @@
+# "Return this card from your graveyard": Bot2 exiles Bot1's graveyard with Soul-Guide Lantern while the trigger waits,
+# so the card in exile is a new object and nothing is asked or returned (CR 400.7).
+[Bot1 Deck]
+Vengevine
+Faithless Looting
+Llanowar Elves
+Ignoble Hierarch
+Mox Ruby
+Black Lotus
+Birds of Paradise
+Forest x13
+
+[Bot2 Deck]
+Island
+Soul-Guide Lantern
+Island x18
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Soul-Guide Lantern.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Choose(Vengevine; Forest)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Ignoble Hierarch.Cast
+Bot2.Battlefield.Soul-Guide Lantern.Activate(Ability: Exile each)
+? Stack.Count = 3
+
+[Expect]
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield = Mox Ruby; Llanowar Elves; Ignoble Hierarch
+Exile = Vengevine; Faithless Looting; Forest; Black Lotus

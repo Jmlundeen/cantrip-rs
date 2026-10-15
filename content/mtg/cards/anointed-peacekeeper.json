@@ -1,0 +1,11 @@
+{
+  "name": "Anointed Peacekeeper",
+  "manaCost": "{2}{W}",
+  "type": "Creature — Human Cleric",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Vigilance\nAs this creature enters, look at an opponent's hand, then choose any card name.\nSpells your opponents cast with the chosen name cost {2} more to cast.\nActivated abilities of sources with the chosen name cost {2} more to activate unless they're mana abilities.",
+  "keywords": [
+    "Vigilance"
+  ]
+}

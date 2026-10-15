@@ -1,0 +1,53 @@
+# Revitalizing Repast: "Put a +1/+1 counter on target creature. It gains indestructible until end of turn." On turn 2 Bot2
+# Lightning Bolts Bot1's Llanowar Elves and Bot1 responds with the Repast: the Elves become a 2/2 and indestructible, so the
+# Bolt's 3 damage (more than lethal) does not destroy them; they sit in play with 3 damage marked. The indestructibility
+# lasts only until end of turn, the counter stays: on turn 4 a second Bolt kills the 2/2 Elves.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Llanowar Elves
+Revitalizing Repast
+Island x15
+
+[Bot2 Deck]
+Mox Ruby
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Llanowar Elves)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Revitalizing Repast.Cast(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main2]
+? Bot1.Battlefield.Llanowar Elves.Power = 2
+? Bot1.Battlefield.Llanowar Elves.Damage = 3
+? Bot1.Battlefield.Llanowar Elves.Keywords = Indestructible
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Llanowar Elves.Keywords = (absent)
+? Bot1.Battlefield.Llanowar Elves.Damage = 0
+Bot2.Battlefield.Mox Ruby#2.Activate
+Bot2.Hand.Lightning Bolt.Cast(Llanowar Elves)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Llanowar Elves; Revitalizing Repast

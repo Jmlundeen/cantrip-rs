@@ -1,0 +1,28 @@
+# Sunfall with no creature anywhere: X is 0 and the Incubator is made all the same (CR 701.53a), with no +1/+1 counter on it.
+# Nothing is exiled.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Jet
+Sunfall
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Sunfall.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Mox Pearl; Mox Jet; Incubator Token
+Bot1.Battlefield.Incubator Token.Counters.PlusOnePlusOne = (absent)
+Exile.Count = 0

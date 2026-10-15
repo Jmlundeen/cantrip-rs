@@ -1,0 +1,44 @@
+# Meeting of Minds: "Convoke. Draw two cards." Each creature tapped pays {1} or one mana of its color (CR 702.51a). On
+# turn 1 Bot1 has four colorless Ornithopters - enough bodies for the whole {3}{U} - but none of them can pay for the {U},
+# and no blue mana is available, so the cast is not offered. On turn 3 a Baleful Strix (blue and black), cast with a Mox
+# Sapphire and a Mox Jet that are then tapped, is the blue creature: it pays the {U} and three Ornithopters the {3}, the
+# fourth stays untapped, and two cards are drawn. Hand: 3 after the Ornithopters, +1 Strix draw, -3 Moxen and Strix, +1 as
+# the Strix enters, -1 Meeting, +2 = 3.
+
+[Bot1 Deck]
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Meeting of Minds
+Mox Sapphire
+Mox Jet
+Baleful Strix
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+! Bot1.Hand.Meeting of Minds.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Baleful Strix.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Meeting of Minds.Cast(Convoke: Baleful Strix, Ornithopter, Ornithopter, Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 3
+Bot1.Battlefield.Baleful Strix.Tapped = true
+Bot1.Battlefield.Ornithopter#4.Tapped = false

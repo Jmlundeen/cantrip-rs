@@ -1,0 +1,37 @@
+# Witherbloom Apprentice's magecraft triggers for casting Chain Lightning and again for the copy Bot1 makes of it
+# (CR 707.10): Bot1 aims the original at itself, pays {R}{R} to copy it (the copy is not cast, CR 707.10a) and sends the
+# copy at Bot2. Bot1: 20 + 1 - 3 + 1 = 19. Bot2: 20 - 1 - 1 - 3 = 15.
+[Bot1 Deck]
+Mountain
+Mox Jet
+Mox Emerald
+Mox Ruby
+Witherbloom Apprentice
+Chain Lightning
+Mountain
+Mountain x15
+[Bot2 Deck]
+Mountain x20
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Witherbloom Apprentice.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Chain Lightning.Cast(Bot1)
+Bot1.Pass
+Bot1.PayCost
+Bot1.Target(Bot2)
+[T3 Bot1.Main2]
+[Expect]
+Bot1.Life = 19
+Bot2.Life = 15
+Stack.Count = 0
+Bot1.Graveyard = Chain Lightning

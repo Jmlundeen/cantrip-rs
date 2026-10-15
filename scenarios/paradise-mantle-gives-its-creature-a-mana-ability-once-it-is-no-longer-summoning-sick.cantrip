@@ -1,0 +1,32 @@
+# Paradise Mantle: equipped creature has "{T}: Add one mana of any color." Bot1 equips its Ornithopter on turn one with
+# an Island's mana. The new mana ability is the creature's own {T}, so it is refused while the Ornithopter is
+# summoning sick (the refusal) and taps for blue on turn three (the positive control).
+
+[Bot1 Deck]
+Island
+Paradise Mantle
+Ornithopter
+Island x4
+Island x10
+
+[Bot2 Deck]
+Swamp x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Paradise Mantle.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Paradise Mantle.Activate(Ornithopter; Ability: Equip)
+Bot1.Pass
+! Bot1.Battlefield.Ornithopter.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Ornithopter.Activate(Color: Blue)
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Paradise Mantle.AttachedTo = Ornithopter
+Bot1.Battlefield.Ornithopter.Tapped = true
+Bot1.Mana = {U}

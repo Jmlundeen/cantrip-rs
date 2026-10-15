@@ -1,0 +1,49 @@
+# "You may cast artifact spells and colorless spells from the top of your library": Karn, Scion of Urza is colorless but no artifact, and
+# a legal cast from the top - but not while an Island is on top (the refusal for Karn, second from the top; a land is not a spell and
+# is never offered to be played from the library, the refusal for the Island). The Forge's {T}, pay 1 life exiles the Island (Bot1 at 19),
+# and with Karn now on top the same cast is offered and made with four Moxen: the positive control. Sol Ring below it is next.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Mox Sapphire
+Mystic Forge
+Island
+Karn, Scion of Urza
+Sol Ring
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Mystic Forge.Cast
+Bot1.Pass
+! Bot1.Library.Island.Play
+! Bot1.Library.Karn, Scion of Urza.Cast
+Bot1.Battlefield.Mystic Forge.Activate
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Library.Karn, Scion of Urza.Cast
+Bot1.Pass
+[Bot1.Main1]
+
+[Expect]
+Bot1.Life = 19
+Exile = Island
+Bot1.Battlefield.Karn, Scion of Urza.Types = Planeswalker

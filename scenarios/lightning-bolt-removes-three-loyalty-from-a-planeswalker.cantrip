@@ -1,0 +1,36 @@
+# "Any target" includes a planeswalker: damage dealt to one removes that many loyalty counters instead of marking damage
+# (CR 120.3c). Bot2's Karn, Scion of Urza (loyalty 5, cast with Sol Ring and two Moxen) is Bolted down to 2 loyalty counters and
+# stays on the battlefield (not dead: it still has loyalty). Bot2's life is untouched.
+
+[Bot1 Deck]
+Mox Ruby
+Lightning Bolt
+Island x18
+
+[Bot2 Deck]
+Sol Ring
+Mox Jet
+Mox Pearl
+Mox Ruby
+Karn, Scion of Urza
+Island x15
+
+[Actions]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Karn, Scion of Urza.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Karn, Scion of Urza)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot2.Battlefield.Karn, Scion of Urza.Counters.Loyalty = 2

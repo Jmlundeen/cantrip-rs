@@ -1,0 +1,38 @@
+# Cori-Steel Cutter: "You may attach this Equipment to it." Declining the offer leaves the Equipment unattached and the Monk a
+# plain 1/1 with no haste (summoning sick), which still arrived: the token is not part of the choice. Lightning Bolt is
+# the first spell of turn 3 and Mox Jet the second.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Cori-Steel Cutter
+Lightning Bolt
+Mox Jet
+Mountain x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Cori-Steel Cutter.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Decline
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mountain; Mountain; Mox Ruby; Mox Jet; Cori-Steel Cutter; Monk
+Bot1.Battlefield.Monk.Power = 1
+Bot1.Battlefield.Monk.Keywords = (absent)
+Bot1.Battlefield.Monk.SummoningSick = true
+Bot1.Battlefield.Cori-Steel Cutter.AttachedTo = (absent)

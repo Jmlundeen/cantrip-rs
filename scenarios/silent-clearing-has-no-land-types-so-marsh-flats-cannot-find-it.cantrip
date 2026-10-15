@@ -1,0 +1,20 @@
+# Silent Clearing is a plain nonbasic land without Plains or Swamp: the fetch refuses it (beside the Swamp it finds).
+
+[Bot1 Deck]
+Marsh Flats
+Island x6
+Silent Clearing
+Swamp
+Island x8
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Marsh Flats.Play
+Bot1.Battlefield.Marsh Flats.Activate
+! Bot1.Search(Silent Clearing)
+Bot1.Search(Swamp)
+
+[Expect]
+Bot1.Battlefield = Swamp

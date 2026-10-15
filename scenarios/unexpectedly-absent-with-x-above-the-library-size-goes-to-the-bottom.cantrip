@@ -1,0 +1,44 @@
+# Unexpectedly Absent: "just beneath the top X cards of that library" with fewer than X cards in it: there is no card to go
+# beneath, so it is the last card of the library. Bot2's library holds two cards when Bot1
+# casts it with X = 5 (Black Lotus and four Moxen pay {5}{W}{W}), so Bot2's Ornithopter becomes the third and last card, under both.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Black Lotus
+Unexpectedly Absent
+Island
+Island x14
+
+[Bot2 Deck]
+Island
+Ornithopter
+Island x5
+Mountain
+Swamp
+Forest
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Unexpectedly Absent.Cast(Bot2.Battlefield.Ornithopter; X: 5)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Library = Swamp; Forest; Ornithopter
+Bot2.Battlefield = Island

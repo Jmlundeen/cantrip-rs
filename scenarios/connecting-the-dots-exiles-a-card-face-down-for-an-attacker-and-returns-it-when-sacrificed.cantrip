@@ -1,0 +1,50 @@
+# CR 508.3a, 603.2c, 406.3, 607.2a. Connecting the Dots exiles the top card of its controller's library face down for each
+# creature that attacks, and sacrificing it (with its hand discarded) puts every card exiled with it into its owner's hand.
+#
+# Turn 1: Mox Pearl pays for Mother of Runes. Turn 3: Connecting the Dots is cast, and Mother of Runes attacks, so Ancestral
+# Recall, the top card of the library after the turn's draw, goes into exile face down: the dump lists it as "(face down)"
+# and Exile.FaceDown, the omniscient view, says what it is. Turn 5: the enchantment is sacrificed for {1}{R} and the hand
+# (three Islands and the Lightning Bolt drawn on turn 3) is discarded; Ancestral Recall comes back into the hand.
+
+[Bot1 Deck]
+Mountain
+Mox Pearl
+Mother of Runes
+Mountain
+Connecting the Dots
+Island
+Island
+Lightning Bolt
+Ancestral Recall
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mother of Runes.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Connecting the Dots.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Attack(Mother of Runes)
+[T3 Bot1.Damage]
+? Exile.Count = 1
+? Exile = (face down)
+? Exile.FaceDown = Ancestral Recall
+[T5 Bot1.Main1]
+Bot1.Battlefield.Connecting the Dots.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+[Handover Bot1.Attack]
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Exile.Count = 0
+Bot1.Hand = Ancestral Recall
+Bot1.Graveyard = Connecting the Dots; Island; Lightning Bolt; Island; Island

@@ -1,0 +1,27 @@
+# With three other lands (more than two) Inspiring Vantage enters tapped: it cannot be tapped on the turn it is played
+# (refusal); on Bot1's next turn it has untapped, and taps for {R}, the other color of its either-or ability (the
+# third-land scenario taps it for white).
+
+[Bot1 Deck]
+Plains x3
+Inspiring Vantage
+Island x13
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Inspiring Vantage.Play
+? Bot1.Battlefield.Inspiring Vantage.Tapped = True
+! Bot1.Battlefield.Inspiring Vantage.Activate
+[T9 Bot1.Main1]
+Bot1.Battlefield.Inspiring Vantage.Activate(Color: Red)
+
+[Expect]
+Bot1.Mana = {R}

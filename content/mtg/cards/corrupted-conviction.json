@@ -1,0 +1,6 @@
+{
+  "name": "Corrupted Conviction",
+  "manaCost": "{B}",
+  "type": "Instant",
+  "oracleText": "As an additional cost to cast this spell, sacrifice a creature.\nDraw two cards."
+}

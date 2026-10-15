@@ -1,0 +1,22 @@
+# "You lose 2 life" does not depend on finding a card (CR 608.2c): with an empty library the search finds nothing and Bot1 still
+# goes to 18 without losing the game. Bot1's deck is exactly its opening hand.
+
+[Bot1 Deck]
+Swamp
+Vampiric Tutor
+Swamp x5
+
+[Bot2 Deck]
+Swamp x15
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Vampiric Tutor.Cast
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Result = InProgress
+Bot1.Life = 18
+Bot1.Graveyard = Vampiric Tutor

@@ -1,0 +1,28 @@
+# Its ability is a mana ability (CR 605.1a), so a charge counter can pay for a spell mid-cast: Prism (two counters from a
+# red and a white mana) makes the {U} for Ancestral Recall, which resolves and draws three, leaving the Prism one counter.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Pentad Prism
+Ancestral Recall
+Island x3
+Island x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Pentad Prism.Cast
+Bot1.Pass
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Battlefield.Pentad Prism.Activate(Color: Blue)
+
+[Expect]
+Bot1.Battlefield.Pentad Prism.Counters.Charge = 1
+Bot1.Hand.Count = 6
+Bot1.Graveyard = Ancestral Recall

@@ -1,0 +1,19 @@
+# Temple Garden: paying 2 life as it enters leaves it untapped, and as a Forest Plains it taps for green (its Forest
+# ability) as well as white.
+
+[Bot1 Deck]
+Temple Garden
+Plains x19
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Temple Garden.Play
+Bot1.Accept
+Bot1.Battlefield.Temple Garden.Activate(Ability: {G})
+
+[Expect]
+Bot1.Life = 18
+Bot1.Battlefield.Temple Garden.Tapped = true
+Bot1.Mana = {G}

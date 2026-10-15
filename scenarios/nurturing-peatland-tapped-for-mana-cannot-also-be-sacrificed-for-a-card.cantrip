@@ -1,0 +1,21 @@
+# Both abilities cost {T}: once the Peatland is tapped for mana the draw ability is refused, though an Island could pay its
+# {1}. The positive control is the untapped Peatland of nurturing-peatland-sacrifices-itself-with-an-island-to-draw-a-card.
+
+[Bot1 Deck]
+Nurturing Peatland
+Island
+Island x18
+
+[Bot2 Deck]
+Swamp x15
+
+[Actions]
+Bot1.Hand.Nurturing Peatland.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Nurturing Peatland.Activate(Ability: Add; Color: Green)
+Bot1.Battlefield.Island.Activate
+! Bot1.Battlefield.Nurturing Peatland.Activate(Ability: Sacrifice)
+
+[Expect]
+Bot1.Battlefield = Nurturing Peatland; Island

@@ -1,0 +1,46 @@
+# Discarding your hand is a discard (CR 701.9): when Phyrexian Dragon Engine's enters trigger is accepted, every card
+# in the hand is discarded together and a "whenever you discard one or more cards" ability sees it. Marauding Mako gets
+# two counters from Faithless Looting, then one for each of the cards discarded from the hand.
+
+[Bot1 Deck]
+Phyrexian Dragon Engine
+Faithless Looting
+Marauding Mako
+Mountain x4
+Mountain x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Marauding Mako.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Phyrexian Dragon Engine; Mountain)
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Graveyard.Phyrexian Dragon Engine.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+? Bot1.Battlefield.Phyrexian Dragon Engine.Keywords = DoubleStrike; Haste
+
+[Expect]
+Turn = 9
+Bot1.Hand.Count = 3
+Bot1.Battlefield.Phyrexian Dragon Engine.SummoningSick = False
+Bot1.Battlefield.Marauding Mako.Counters.PlusOnePlusOne = 6

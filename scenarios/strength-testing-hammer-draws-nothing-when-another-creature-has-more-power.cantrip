@@ -1,0 +1,55 @@
+# "Then if it has the greatest power or is tied for greatest power among creatures on the battlefield, draw a card." The equipped Ornithopter gets at most +6/+0 (a
+# six-sided die), so against Bot2's Raph & Mikey, a 7/7, it can never have the greatest power and Bot1 draws nothing (its hand is the two Plains it had).
+# The random die makes the damage unassertable, but the comparison cannot go either way. Positive control: the existing scenario, with Bot2 creatureless.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Strength-Testing Hammer
+Ornithopter
+Plains
+Plains x14
+
+[Bot2 Deck]
+Black Lotus
+Mox Ruby
+Mox Emerald
+Gleemox
+Mox Jet
+Raph & Mikey, Troublemakers
+Plains
+Plains x12
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Strength-Testing Hammer.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Gleemox.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Gleemox.Activate(Color: Red)
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Raph & Mikey, Troublemakers.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Strength-Testing Hammer.Activate(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot1.Attack(Ornithopter > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 2

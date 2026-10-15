@@ -1,0 +1,6 @@
+{
+  "name": "Battlefield Improvisation",
+  "manaCost": "{1}{W}",
+  "type": "Instant",
+  "oracleText": "Target creature gets +2/+2 until end of turn. If that creature is attacking, you may attach any number of Equipment you control to it."
+}

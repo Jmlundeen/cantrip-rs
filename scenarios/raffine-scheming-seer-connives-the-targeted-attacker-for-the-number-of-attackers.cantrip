@@ -1,0 +1,48 @@
+# Raffine, Scheming Seer: whenever you attack, target attacking creature connives X, where X is the number of attacking
+# creatures. Raffine and Thraben Inspector attack, so the Inspector connives 2: it draws Lightning Bolt and an Island and
+# discards the Bolt and an Island, and one nonland card discarded puts one +1/+1 counter on it.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Raffine, Scheming Seer
+Plains
+Thraben Inspector
+Island
+Island
+Lightning Bolt
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Raffine, Scheming Seer.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Thraben Inspector.Cast
+Bot1.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Raffine, Scheming Seer; Thraben Inspector > Bot2)
+Bot1.Target(Thraben Inspector)
+Bot1.Choose(Lightning Bolt; Island)
+[Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Graveyard = Island; Lightning Bolt
+Bot1.Battlefield.Thraben Inspector.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Raffine, Scheming Seer.Counters.PlusOnePlusOne = (absent)

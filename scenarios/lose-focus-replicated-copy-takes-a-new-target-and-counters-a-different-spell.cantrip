@@ -1,0 +1,44 @@
+# Lose Focus replicated once (CR 702.56a): "You may choose new targets for the copies" (CR 707.10c). Bot1 casts an Ornithopter
+# and, in response, a Lightning Bolt at Bot2. Bot2's Lose Focus targets the Bolt and its copy is aimed at the Ornithopter
+# instead - a different spell. Bot1 is tapped out and pays neither: both spells are countered, the Bolt does no damage, and
+# the Ornithopter never enters. The copy is not a card: only the original Lose Focus goes to the graveyard.
+
+[Bot1 Deck]
+Mountain
+Ornithopter
+Lightning Bolt
+Mountain x14
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Sapphire
+Lose Focus
+Island x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Sapphire#2.Activate
+Bot2.Hand.Lose Focus.Cast(Stack.Lightning Bolt; Kicked: 1)
+Bot2.Target(Stack.Ornithopter)
+Bot1.Pass
+Bot1.Decline
+Bot1.Decline
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot1.Battlefield = Mountain
+Bot1.Graveyard = Lightning Bolt; Ornithopter
+Bot2.Graveyard = Lose Focus
+Stack.Count = 0

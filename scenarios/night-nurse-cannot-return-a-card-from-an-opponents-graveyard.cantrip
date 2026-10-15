@@ -1,0 +1,41 @@
+# "Your graveyard": on turn 5 Bot1 bolts Bot2's Giver of Runes and then casts Night Nurse. The Giver was put into a
+# graveyard this turn, but into Bot2's, so it is not a legal target, the trigger has none, and the Giver stays in
+# Bot2's graveyard.
+
+[Bot1 Deck]
+Mountain
+Plains
+Lightning Bolt
+Night Nurse, Healer of Heroes
+Plains x3
+Plains x10
+
+[Bot2 Deck]
+Plains
+Giver of Runes
+Plains x5
+Plains x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Giver of Runes.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Giver of Runes)
+[T5 Bot1.Main2]
+? Bot2.Graveyard = Giver of Runes
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Night Nurse, Healer of Heroes.Cast
+
+[Expect]
+Bot2.Graveyard = Giver of Runes
+Bot1.Graveyard = Lightning Bolt
+Bot1.Hand = Plains; Plains; Plains; Plains
+Bot1.Battlefield = Mountain; Night Nurse, Healer of Heroes; Plains; Plains

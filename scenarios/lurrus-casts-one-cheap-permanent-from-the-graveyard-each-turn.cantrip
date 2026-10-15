@@ -1,0 +1,38 @@
+# Lurrus of the Dream-Den: "Once during each of your turns, you may cast a permanent spell with mana value 2 or less from
+# your graveyard." Bot1 casts it with Black Lotus on turn 1. On turn 3 Faithless Looting discards Ornithopter and Mox Ruby;
+# Bot1 casts Ornithopter from the graveyard, and is not offered Mox Ruby as well. On turn 5 it casts the Mox from there.
+
+[Bot1 Deck]
+Black Lotus
+Lurrus of the Dream-Den
+Faithless Looting
+Mox Ruby
+Ornithopter
+Mountain
+Mountain
+Island x20
+
+[Bot2 Deck]
+Island x13
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Lurrus of the Dream-Den.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Ornithopter; Mox Ruby)
+Bot1.Graveyard.Ornithopter.Cast(Ability: Once during each of your turns)
+Bot1.Pass
+! Bot1.Graveyard.Mox Ruby.Cast
+[T5 Bot1.Main1]
+Bot1.Graveyard.Mox Ruby.Cast(Ability: Once during each of your turns)
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield = Lurrus of the Dream-Den; Mountain; Mox Ruby; Ornithopter
+Bot1.Graveyard = Faithless Looting; Black Lotus

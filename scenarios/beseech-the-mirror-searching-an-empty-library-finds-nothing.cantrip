@@ -1,0 +1,32 @@
+# CR 701.23b, 401.3. With no cards in the library the search finds nothing: nothing is exiled, nothing is put into the
+# hand and no free-cast question is asked, even though the spell was bargained.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Black Lotus
+Beseech the Mirror
+Island x3
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Beseech the Mirror.Cast
+Bot1.Modes(Bargain:)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Choose(Mox Jet)
+! Bot1.Accept
+[T2 Bot2.Upkeep]
+
+[Expect]
+Exile.Count = 0
+Stack.Count = 0
+Bot1.Library.Count = 0
+Bot1.Battlefield = Swamp
+Bot1.Hand = Island; Island; Island
+Bot1.Graveyard = Beseech the Mirror; Mox Jet; Black Lotus

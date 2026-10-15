@@ -1,0 +1,43 @@
+# Badgermole Cub: with no land in play its earthbend trigger has no target and is not put on the stack (CR 603.3d); the
+# Cub stays a 2/2. "Whenever you tap a creature for mana, add an additional {G}": a Forest that is not a creature taps
+# for {G} alone on turn 3 (the control for the earlier scenarios where the earthbent Forest, a creature, adds two), and
+# Bot2's Noble Hierarch tapped on turn 4 adds Bot2 only its own {G}: "you" is the Cub's controller (Bot1's pool stays
+# empty).
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Badgermole Cub
+Forest x17
+
+[Bot2 Deck]
+Forest
+Noble Hierarch
+Forest x18
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Badgermole Cub.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Pass
+Bot1.Pass
+? Stack.Count = 0
+[T1 Bot1.Main2]
+? Bot1.Battlefield = Badgermole Cub
+? Bot1.Battlefield.Badgermole Cub.Power = 2
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Noble Hierarch.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+? Bot1.Mana = {G}
+[T4 Bot2.Main1]
+Bot2.Battlefield.Noble Hierarch.Activate(Color: Green)
+? Bot2.Mana = {G}
+? Bot1.Mana =
+
+[Expect]
+Turn = 4
+Bot1.Battlefield.Forest.Types = Land

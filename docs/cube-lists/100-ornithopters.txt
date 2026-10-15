@@ -1,0 +1,361 @@
+# mainboard of https://cubecobra.com/cube/list/100-ornithopters, by tools/maintenance/cubecobra-sync.py
+Enlightened Tutor
+Battlefield Improvisation
+Dawn's Truce
+Disenchant
+Leave // Chance
+Second Sunrise
+Faith's Reward
+Requisition Raid
+Open the Armory
+Practiced Offense
+Sevinne's Reclamation
+Deconstruction Hammer
+Collector's Cage
+Stormbeacon Blade
+Conclave Tribunal
+Shardmage's Rescue
+Sigarda's Aid
+All That Glitters
+Dawn of a New Age
+Sheltered by Ghosts
+Forge Anew
+Tempered Steel
+Tempest Technique
+Invasion of Gobakhan
+Abandoned Air Temple
+Windbrisk Heights
+Force of Will
+Annul
+Banishing Knack
+Meeting of Minds
+Metallic Rebuke
+Mystical Tutor
+Repeal
+Retraction Helix
+Stubborn Denial
+Twisted Image
+Echoing Truth
+Familiar's Ruse
+Harmonized Crescendo
+Hurkyl's Recall
+Lofty Denial
+Negate
+Override
+Rebuild
+Winged Portent
+Paradoxical Outcome
+Sudden Substitution
+Thoughtcast
+Reverse Engineer
+Spirit Water Revival
+Tinker
+Mind's Desire
+Military Intelligence
+Proft's Eidetic Memory
+Intruder Alarm
+Corrupted Conviction
+Culling the Weak
+Village Rites
+Deadly Dispute
+Eviscerator's Insight
+Fanatical Offering
+Plumb the Forbidden
+Ad Nauseam
+Duress
+Echoing Return
+Organ Harvest
+Bankrupt in Blood
+Diabolic Intent
+Forever Young
+Drill Bit
+Pitiless Carnage
+Reckoner Shakedown
+Shredder's Technique
+Yawgmoth's Will
+Beseech the Mirror
+Gix's Command
+Transmogrant's Crown
+No Rest for the Wicked
+The Meathook Massacre
+Decaying Soil
+Grave Pact
+Grave Venerations
+Jaws of Defeat
+Castle Locthwain
+Spymaster's Vault
+Volrath's Stronghold
+Daretti, Scrap Savant
+Dreadmaw's Ire
+Fists of Flame
+Untimely Malfunction
+Kazuul's Fury
+Valakut Awakening
+Impolite Entrance
+Meltdown
+Vandalblast
+Echoing Ruin
+Haze of Rage
+Chainsaw
+Dowsing Device
+Embercleave
+Curse of Opulence
+Footfall Crater
+Weaponize the Monsters
+Bitter Reunion
+Connecting the Dots
+Goblin Bombardment
+Impact Tremors
+Pia's Revolution
+Shared Animosity
+Kyren Negotiations
+Berserk
+Snakeskin Veil
+Trash the Town
+Sundering Vitae
+Ruinous Intrusion
+Glimpse of Nature
+Scale Up
+Cathartic Parting
+Germination Practicum
+Ozolith, the Shattered Spire
+Bone Sabres
+Bow of Nylea
+The Great Henge
+Rancor
+Assault Formation
+Earthcraft
+Innkeeper's Talent
+Song of Freyalise
+Court of Garenbrig
+Curse of Predation
+Fecundity
+Terrasymbiosis
+The Aesir Escape Valhalla
+Bala Ged Recovery
+Yavimaya Hollow
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+The Aetherspark
+Tezzeret's Gambit
+Engineered Explosives
+Lotus Bloom
+Mox Opal
+Paradise Mantle
+Welding Jar
+Bloodforged Battle-Axe
+Colossus Hammer
+Heirloom Epic
+Sensei's Divining Top
+Skullclamp
+Springleaf Drum
+Strength-Testing Hammer
+Adaptive Omnitool
+Andúril, Narsil Reforged
+Cranial Plating
+Wrecking Ball Arm
+Ashnod's Altar
+Blasting Station
+Bontu's Monument
+Grafted Wargear
+Heirloom Blade
+Loxodon Warhammer
+Orcrist, Goblin-cleaver
+Phyrexian Altar
+Door of Destinies
+Hammer of Nazahn
+Krark-Clan Ironworks
+Mystic Forge
+Banner of Kinship
+Paradox Engine
+Thrumming Stone
+Argentum Armor
+Chronicle of Victory
+Coveted Jewel
+Obelisk of Urd
+Hindering Light
+Time Sieve
+Warhost's Frenzy
+Kessig Wolf Run
+Gavony Township
+Rite of Harmony
+Aura Shards
+Humiliate
+Rite of Oblivion
+Quicksilver Dagger
+Immoral Bargain
+Bloodbond March
+Vraska, Golgari Queen
+Angelfire Ignition
+Sunforger
+Warleader's Call
+Showdown of the Skalds
+Repulsive Mutation
+Tamiyo, Collector of Tales
+Thunder of Unity
+Jeskai Ascendancy
+Flooded Strand
+Polluted Delta
+Waterlogged Teachings
+Bloodstained Mire
+Wooded Foothills
+Horizon Canopy
+Strength of the Harvest
+Windswept Heath
+Marsh Flats
+Silent Clearing
+Fiery Islet
+Scalding Tarn
+Nurturing Peatland
+Revitalizing Repast
+Verdant Catacombs
+Arid Mesa
+Legion Leadership
+Sunbaked Canyon
+Misty Rainforest
+Waterlogged Grove
+Biomass Mutation
+Spara's Headquarters
+Raffine's Tower
+Xander's Lounge
+Ziatora's Proving Ground
+Jetmir's Garden
+Savai Triome
+Ketria Triome
+Indatha Triome
+Raugrin Triome
+Zagoth Triome
+Azorius Chancery
+Hallowed Fountain
+Meticulous Archive
+Dimir Aqueduct
+Undercity Sewers
+Watery Grave
+Blood Crypt
+Rakdos Carnarium
+Raucous Theater
+Commercial District
+Gruul Turf
+Stomping Ground
+Lush Portico
+Temple Garden
+Godless Shrine
+Orzhov Basilica
+Shadowy Backstreet
+Steam Vents
+Thundering Falls
+Overgrown Tomb
+Underground Mortuary
+Boros Garrison
+Elegant Parlor
+Sacred Foundry
+Breeding Pool
+Hedge Maze
+Ancient Tomb
+Drannith Ruins
+Escape Tunnel
+Fomori Vault
+Gaea's Cradle
+Ghost Quarter
+Inventors' Fair
+Phyrexian Tower
+Three Tree City
+Tolarian Academy

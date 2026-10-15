@@ -1,0 +1,40 @@
+# "...put there from the battlefield this turn": Bot1's Llanowar Elves is killed by its own Lightning Bolt on turn 1 and stays in the graveyard when Faith's Reward is
+# cast on turn 3; nothing died on turn 3, so nothing returns. (The existing scenario faiths-reward-returns-only-the-permanents-that-died-this-turn is the
+# positive control: the same cards in one turn.)
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Llanowar Elves
+Lightning Bolt
+Mox Pearl
+Mox Sapphire
+Plains
+Faith's Reward
+Plains x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Faith's Reward.Cast
+[Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Faith's Reward; Llanowar Elves; Lightning Bolt
+Bot1.Battlefield.Count = 5

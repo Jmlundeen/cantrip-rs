@@ -1,0 +1,8 @@
+{
+  "name": "Avacyn's Pilgrim",
+  "manaCost": "{G}",
+  "type": "Creature — Human Monk",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "{T}: Add {W}."
+}

@@ -1,0 +1,53 @@
+# "Equipped creature has haste and shroud" follows the Greaves. Turn one: Mother of Runes is cast, equipped for {0} and attacks at
+# once (haste): Bot2 is at 19. On turn two Bot2's Lightning Bolt cannot target the shrouded Mother (the refusal, with Bot2's Mountain
+# untapped) and Equip {0} is not offered to Bot1 in Bot2's upkeep (sorcery speed, CR 702.6a - the refusal beside the equip Bot1 does
+# in its main phase on turn three, moving the Greaves to the Ornithopter). On turn four the Mother has lost shroud and the Bolt kills
+# her (the positive control), while the Ornithopter now wearing the Greaves is refused.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mother of Runes
+Lightning Greaves
+Ornithopter
+Island x12
+
+[Bot2 Deck]
+Mountain
+Mountain
+Lightning Bolt
+Mountain x13
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Mother of Runes.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Greaves.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Lightning Greaves.Activate(Mother of Runes)
+Bot1.Attack(Mother of Runes > Bot2)
+[T2 Bot2.Upkeep]
+? Bot2.Life = 19
+! Bot1.Battlefield.Lightning Greaves.Activate(Ornithopter)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+! Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Mother of Runes)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Lightning Greaves.Activate(Ornithopter)
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain#1.Activate
+! Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Mother of Runes)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Mother of Runes
+Bot1.Battlefield.Ornithopter.Keywords = Flying; Haste; Shroud
+Bot1.Battlefield.Lightning Greaves.AttachedTo = Ornithopter

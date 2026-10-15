@@ -1,0 +1,57 @@
+# Parallax Wave: "When this enchantment leaves the battlefield, each player returns to the battlefield all cards they
+# own exiled with it." Bot1 exiles Bot2's Llanowar Elves with the Wave on turn three, then bounces the Wave itself with
+# Paradoxical Outcome (Mox Sapphire, Sol Ring and Mox Ruby paying), and the Elves come back under Bot2's control.
+
+[Bot1 Deck]
+Plains
+Mox Ruby
+Mox Pearl
+Sol Ring
+Parallax Wave
+Mox Sapphire
+Paradoxical Outcome
+Plains x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Parallax Wave.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Parallax Wave.Activate(Llanowar Elves)
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Paradoxical Outcome.Cast
+Bot1.Target(Parallax Wave)
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Exile.Count = 0
+Bot1.Hand.Count = 3
+Bot2.Battlefield = Forest; Llanowar Elves

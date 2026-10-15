@@ -1,0 +1,49 @@
+# "Until this enchantment leaves the battlefield" (CR 610.3): Bot1 flashes in Leyline Binding on turn 4 (Tundra and Bayou pay its
+# {1}{W}) exiling Bot2's Ornithopter. On turn 6 Bot2 casts Disenchant on the Binding and the Ornithopter comes back
+# to the battlefield at once, under its owner's control.
+
+[Bot1 Deck]
+Tundra
+Bayou
+Leyline Binding
+Swamp
+Tundra x2
+Swamp x12
+
+[Bot2 Deck]
+Plains
+Plains
+Ornithopter
+Disenchant
+Plains x16
+
+[Actions]
+Bot1.Hand.Tundra.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Bayou.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+Bot1.Battlefield.Tundra.Activate(Ability: {W})
+Bot1.Battlefield.Bayou.Activate(Ability: {B})
+Bot1.Hand.Leyline Binding.Cast
+Bot1.Pass
+Bot1.Pass
+[T4 Bot2.Main2]
+? Exile = Ornithopter
+[T6 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains#1.Activate
+Bot2.Battlefield.Plains#2.Activate
+Bot2.Hand.Disenchant.Cast(Leyline Binding)
+Bot2.Pass
+[T6 Bot2.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot1.Graveyard = Leyline Binding
+Bot2.Battlefield = Plains; Plains; Plains; Ornithopter

@@ -1,0 +1,62 @@
+use cantrip_api::*;
+use cantrip_mechanics::history::entered_this_turn;
+use cantrip_mechanics::tokens;
+use cantrip_mechanics::triggers;
+use cantrip_oracle as oracle;
+
+/// The 1/1 white Cat creature token it makes.
+pub static CAT: CardDef = CardDef {
+    name: "Cat",
+    has_cost: false,
+    colors: Some(ColorSet::of(Color::White)),
+    types: TypeSet::of(&[CardType::Creature]),
+    subtypes: SubtypeSet::of(&[Subtype::Cat]),
+    power: Some(1),
+    toughness: Some(1),
+    shares_name: true,
+    ..CardDef::BLANK
+};
+
+/// "If you gained life this turn" (CR 603.4): asked as it would trigger and again as it resolves, of the history, not of a
+/// comparison of life totals.
+fn gained_life_this_turn(q: &dyn Query, asker: &Asker) -> bool {
+    q.history().life_gained(asker.controller) > 0
+}
+
+/// Create a 1/1 white Cat creature token. Then, if you have the city's blessing, for each token you control that entered this
+/// turn, create a token that's a copy of it: the board is read once, after the Cat has arrived, so the Cat is copied and the
+/// copies are not; every copy enters at once (CR 101.4).
+fn cats(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let you = item.controller;
+    tokens::create(g, you, &CAT, 1)?;
+    if !g.state().player(you).citys_blessing {
+        return Ok(());
+    }
+    let tokens: Vec<ObjectId> =
+        g.permanents_of(you).into_iter().filter(|&t| g.obj(t).token && entered_this_turn(g, t)).collect();
+    if tokens.iter().all(|&t| g.obj(t).copy.is_none()) {
+        let copies: Vec<(CardId, PlayerId)> = tokens.iter().map(|&t| (g.obj(t).card, you)).collect();
+        g.create_tokens_together(&copies)?;
+    } else {
+        for t in tokens {
+            let values = g.copiable_values(t);
+            g.create_token_copies_of(values, you, 1)?;
+        }
+    }
+    Ok(())
+}
+
+pub static CARD: CardDef = CardDef {
+    ascend: true,
+    abilities: &[AbilityDef::Triggered(TriggeredDef {
+        text: "At the beginning of your end step, if you gained life this turn, create a 1/1 white Cat creature token. Then if you have the city's blessing, for each token you control that entered this turn, create a token that's a copy of it.",
+        listens: EventMask::STEP_BEGAN,
+        matches: triggers::your_end_step,
+        effect: cats,
+        condition: Some(gained_life_this_turn),
+        ..TriggeredDef::BLANK
+    })],
+    ..oracle::OCELOT_PRIDE
+};
+
+pub static EXTRA: &[&CardDef] = &[&CAT];

@@ -1,0 +1,25 @@
+# Jace, Wielder of Mysteries: "If you would draw a card while your library has no cards in it, you win the game
+# instead." Bot1 has a nine-card deck: seven in hand, one drawn on turn 1, one left. Jace comes down with Black Lotus and
+# an Island; his +1 targets Bot1, milling the last card, and the draw that follows is replaced: Bot1 wins.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Jace, Wielder of Mysteries
+Island x6
+
+[Bot2 Deck]
+Island x13
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Jace, Wielder of Mysteries.Cast
+Bot1.Pass
+Bot1.Battlefield.Jace, Wielder of Mysteries.Activate(Bot1; Ability: Target player mills)
+
+[Expect]
+Result = Bot1 won

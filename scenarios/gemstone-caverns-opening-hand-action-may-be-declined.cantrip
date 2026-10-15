@@ -1,0 +1,31 @@
+# Gemstone Caverns: "you may begin the game with Gemstone Caverns on the battlefield". Bot2 is not the starting player and
+# declines: nothing is exiled, the Caverns stay in its hand, and on turn 2 it plays them as an ordinary land. Without a
+# luck counter they add {C}.
+
+[Bot1 Deck]
+Forest x20
+
+[Bot2 Deck]
+Gemstone Caverns
+Plains
+Plains
+Plains
+Plains
+Plains
+Plains
+Plains x10
+
+[Actions]
+Bot2.Decline
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+? Bot2.Battlefield.Count = 0
+? Exile.Count = 0
+Bot2.Hand.Gemstone Caverns.Play
+Bot2.Battlefield.Gemstone Caverns.Activate
+? Bot2.Mana = {C}
+[T2 Bot2.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot2.Battlefield.Gemstone Caverns.Tapped = true

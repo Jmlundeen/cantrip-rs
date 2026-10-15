@@ -1,0 +1,26 @@
+# Flash cast with no creature card in hand (only lands): "you may put a creature card from your hand onto the battlefield" has
+# nothing to offer, so nothing is asked and nothing happens; Flash goes to the graveyard.
+
+[Bot1 Deck]
+Island
+Island
+Flash
+Island x4
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Flash.Cast
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Graveyard = Flash
+Bot1.Battlefield.Count = 2

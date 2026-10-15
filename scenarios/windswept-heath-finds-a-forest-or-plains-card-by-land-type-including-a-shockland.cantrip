@@ -1,0 +1,34 @@
+# Windswept Heath: "{T}, Pay 1 life, Sacrifice this land: Search your library for a Forest or Plains card, put it onto the
+# battlefield, then shuffle." The search is for a card with a land type (CR 205.3i, 305.6), so it may find a nonbasic land
+# with that type - Hallowed Fountain, a Plains Island - and a shockland found this way still asks its controller to pay
+# 2 life (CR 614.12a). It may not find an Island, a Swamp, or Blooming Marsh (a land with no basic land type), each refused
+# beside the Hallowed Fountain it may find (the positive control). The Heath is sacrificed and the 1 life paid.
+
+[Bot1 Deck]
+Windswept Heath
+Plains x6
+Island
+Swamp
+Blooming Marsh
+Hallowed Fountain
+Forest
+Plains x10
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Windswept Heath.Play
+Bot1.Battlefield.Windswept Heath.Activate
+! Bot1.Search(Island)
+! Bot1.Search(Swamp)
+! Bot1.Search(Blooming Marsh)
+Bot1.Search(Hallowed Fountain)
+Bot1.Accept
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 17
+Bot1.Graveyard = Windswept Heath
+Bot1.Battlefield = Hallowed Fountain
+Bot1.Battlefield.Hallowed Fountain.Tapped = false

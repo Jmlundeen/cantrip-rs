@@ -1,0 +1,32 @@
+# Orzhov Basilica's "return a land you control to its owner's hand" is not optional and the land itself may be the one: played as
+# Bot1's first land (CR 603.6a, the trigger is put on the stack after it enters), it has no other land to return and goes back
+# to the hand, and the land drop of the turn is used. Played again on turn 3, it can then be kept: the Plains played in
+# between returns.
+
+[Bot1 Deck]
+Orzhov Basilica
+Plains
+Plains x5
+Plains x10
+
+[Bot2 Deck]
+Swamp x15
+
+[Actions]
+Bot1.Hand.Orzhov Basilica.Play
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Count = 0
+? Bot1.LandsPlayed = 1
+? Bot1.Hand.Count = 7
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Orzhov Basilica.Play
+Bot1.Choose(Plains)
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Orzhov Basilica
+Bot1.Battlefield.Orzhov Basilica.Tapped = true

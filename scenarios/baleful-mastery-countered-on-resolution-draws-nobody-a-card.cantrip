@@ -1,0 +1,39 @@
+# Baleful Mastery's single target is gone when it resolves (Bot2 Swords its own Llanowar Elves in response), so the spell
+# does not resolve at all (CR 608.2b): the {1}{B} cost was paid, but "an opponent draws a card" is part of the spell's
+# effect, which never happens.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Baleful Mastery
+Swamp x10
+
+[Bot2 Deck]
+Forest
+Mox Pearl
+Llanowar Elves
+Swords to Plowshares
+Forest x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Baleful Mastery.Cast(Bot2.Battlefield.Llanowar Elves; Ability: {1}{B})
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Llanowar Elves
+Bot1.Graveyard = Baleful Mastery
+Bot2.Hand.Count = 4

@@ -1,0 +1,22 @@
+# Evoke needs a black card in hand to exile besides Grief itself: Bot1's hand is Grief and Swamps, so the evoke cast is refused;
+# the positive control, in grief-evoked-takes-a-nonland-card-and-is-sacrificed, has a Dark Ritual to exile. The hard cast with Black Lotus and Mox Jet then still works.
+
+[Bot1 Deck]
+Grief
+Black Lotus
+Mox Jet
+Swamp x17
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+! Bot1.Hand.Grief.Cast(Ability: Evoke)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Grief.Cast
+
+[Expect]
+Bot1.Battlefield = Mox Jet; Grief

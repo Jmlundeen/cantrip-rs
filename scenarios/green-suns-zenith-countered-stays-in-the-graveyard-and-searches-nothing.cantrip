@@ -1,0 +1,38 @@
+# Green Sun's Zenith shuffles itself into the library only when it resolves: Bot2 counters it with Counterspell, so it goes to
+# the graveyard (CR 701.5a), no search is made (the Llanowar Elves stays in the library, which keeps its size), and no
+# creature enters.
+
+[Bot1 Deck]
+Forest
+Forest
+Green Sun's Zenith
+Forest x5
+Llanowar Elves
+Forest x10
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Island x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Green Sun's Zenith.Cast(X: 1)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Green Sun's Zenith)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Green Sun's Zenith
+Bot1.Battlefield = Forest; Forest
+Bot1.Library.Count = 11

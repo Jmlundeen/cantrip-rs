@@ -1,0 +1,43 @@
+# Palace Jailer makes Bot1 the monarch and exiles an Ornithopter until an opponent becomes the monarch (CR 610.3); Bot2's Llanowar Elves then hit Bot1 for combat damage, taking the crown (CR 725.2), and the Ornithopter comes back.
+
+[Bot1 Deck]
+Sol Ring
+Palace Jailer
+Plains
+Plains
+Plains x15
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Ornithopter
+Ornithopter
+Forest x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Plains.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Palace Jailer.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+[T3 Bot1.Main2]
+[T4 Bot2.Main1]
+Bot2.Attack(Llanowar Elves)
+[T4 Bot2.Main2]
+
+[Expect]
+Turn = 4
+Monarch = Bot2
+Exile.Count = 0
+Bot2.Battlefield = Forest; Llanowar Elves; Ornithopter; Ornithopter

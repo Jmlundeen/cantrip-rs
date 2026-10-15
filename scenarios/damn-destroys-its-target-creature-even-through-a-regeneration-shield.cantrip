@@ -1,0 +1,31 @@
+# Damn cast for {B}{B} destroys its target creature, and "can't be regenerated" (CR 701.19c) means Welding Jar's shield does not save it.
+
+[Bot1 Deck]
+Damn
+Swamp x20
+
+[Bot2 Deck]
+Welding Jar
+Ornithopter
+Island x18
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Welding Jar.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Damn.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot2.Battlefield.Welding Jar.Activate(Bot2.Battlefield.Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Damn
+Bot2.Battlefield = Island
+Bot2.Graveyard = Ornithopter; Welding Jar
+Stack.Count = 0

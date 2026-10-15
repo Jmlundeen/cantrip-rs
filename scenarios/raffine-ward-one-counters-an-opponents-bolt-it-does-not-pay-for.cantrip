@@ -1,0 +1,51 @@
+# Raffine's ward {1}: Bot2 aims Lightning Bolt at Raffine and declines to pay the {1} when the ward trigger asks, so the Bolt is
+# countered and Raffine takes no damage.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Raffine, Scheming Seer
+Plains
+Thraben Inspector
+Island
+Island
+Lightning Bolt
+Island
+Island x10
+
+[Bot2 Deck]
+Mountain
+Mox Jet
+Lightning Bolt
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Raffine, Scheming Seer.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Thraben Inspector.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Raffine, Scheming Seer)
+Bot2.Decline
+Bot1.Pass
+[T3 Bot1.Main1]
+
+[Expect]
+Bot2.Graveyard = Lightning Bolt
+Bot1.Battlefield.Raffine, Scheming Seer.Damage = 0

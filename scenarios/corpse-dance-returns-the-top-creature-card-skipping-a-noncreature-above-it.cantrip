@@ -1,0 +1,58 @@
+# "Return the top creature card of your graveyard to the battlefield. That creature gains haste until end of turn. Exile it at
+# the beginning of the next end step." Bot1's graveyard, top first when Corpse Dance is cast on turn 5: Lightning Bolt (not a
+# creature, so skipped), Dark Confidant (Bot2's Bolt killed it on turn 2), Ornithopter, Lightning Bolt. The Confidant, the top creature
+# card, comes back and attacks at once (haste) for 2; the Ornithopter below stays; at the end step the Confidant is exiled.
+# No buyback: Corpse Dance goes to the graveyard.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Ornithopter
+Dark Confidant
+Lightning Bolt
+Lightning Bolt
+Swamp
+Corpse Dance
+Island x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dark Confidant.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Dark Confidant)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Corpse Dance.Cast
+Bot1.Pass
+Bot1.Attack(Dark Confidant > Bot2)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Dark Confidant.Keywords = Haste
+[T6 Bot2.Main1]
+
+[Expect]
+Exile = Dark Confidant
+Bot1.Graveyard = Corpse Dance; Lightning Bolt; Ornithopter; Lightning Bolt
+Bot2.Life = 15

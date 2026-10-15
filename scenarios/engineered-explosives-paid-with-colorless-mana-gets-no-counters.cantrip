@@ -1,0 +1,26 @@
+# Colorless is not a color (CR 105.1, 702.44a): Sol Ring's {C}{C} pays for X = 2, so the Explosives enters with no charge
+# counters. Sacrificed on turn 3 it destroys mana value 0: Mox Jet goes, Sol Ring (mana value 1) stays.
+
+[Bot1 Deck]
+Mox Jet
+Sol Ring
+Engineered Explosives
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Engineered Explosives.Cast(X: 2)
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Engineered Explosives.Counters.Charge = (absent)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Engineered Explosives.Activate
+
+[Expect]
+Bot1.Battlefield = Sol Ring
+Bot1.Graveyard = Mox Jet; Engineered Explosives

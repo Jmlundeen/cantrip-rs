@@ -1,0 +1,36 @@
+# "As an additional cost to cast this spell, sacrifice a nonland permanent": with only lands on Bot1's side the Rite cannot be cast, even
+# with the {W}{B} to pay (the refusal, naming Bot2's Mox Jet). A land is also not a legal target (the refusal naming Bot2's Island). Bot1
+# then casts a Mox Pearl, sacrifices it to the Rite (untapped, a cost of its own), and the Rite exiles the Mox Jet.
+
+[Bot1 Deck]
+Plains
+Swamp
+Mox Pearl
+Rite of Oblivion
+Plains x13
+
+[Bot2 Deck]
+Island
+Mox Jet
+Island x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Swamp.Activate
+! Bot1.Hand.Rite of Oblivion.Cast(Bot2.Battlefield.Mox Jet)
+Bot1.Hand.Mox Pearl.Cast
+! Bot1.Hand.Rite of Oblivion.Cast(Bot2.Battlefield.Island)
+Bot1.Hand.Rite of Oblivion.Cast(Bot2.Battlefield.Mox Jet)
+Bot1.Choose(Mox Pearl)
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Mox Jet
+Bot1.Graveyard = Rite of Oblivion; Mox Pearl
+Bot2.Battlefield = Island

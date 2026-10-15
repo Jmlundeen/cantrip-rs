@@ -1,0 +1,58 @@
+# Targeting versus "each" (CR 702.96a): Bot2's True-Name Nemesis has protection from Bot1, so a Damn naming it as its target is
+# refused (the refusal, beside the same Damn cast on the Ornithopter, the positive control). Overloaded, Damn has no target,
+# and protection does not stop destruction (CR 702.16: damage, enchanting and equipping, blocking and targeting only), so the second
+# Damn, overloaded, destroys the Nemesis. Bot1 pays for both with four Moxen and two Plains on turn three.
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Pearl
+Mox Pearl
+Damn
+Damn
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Sapphire
+Mox Sapphire
+True-Name Nemesis
+Ornithopter
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Sapphire#1.Activate
+Bot2.Battlefield.Mox Sapphire#2.Activate
+Bot2.Battlefield.Mox Sapphire#3.Activate
+Bot2.Hand.True-Name Nemesis.Cast
+Bot2.ChoosePlayer(Bot1)
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+! Bot1.Hand.Damn.Cast(Bot2.Battlefield.True-Name Nemesis)
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Damn.Cast(Bot2.Battlefield.Ornithopter)
+[T3 Bot1.Main2]
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Damn.Cast(Ability: Overload)
+[T3 Bot1.End]
+
+[Expect]
+Bot2.Graveyard = True-Name Nemesis; Ornithopter
+Bot2.Battlefield.Count = 3
+Bot1.Graveyard = Damn; Damn

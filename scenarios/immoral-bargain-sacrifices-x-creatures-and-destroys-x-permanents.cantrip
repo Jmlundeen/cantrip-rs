@@ -1,0 +1,53 @@
+# Immoral Bargain: X is announced as an additional cost though the mana cost has no {X}. Bot1 announces X = 2, sacrifices
+# Ragavan and Cecil, and destroys two of Bot2's nonland permanents (Mox Pearl and Mox Sapphire).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Emerald
+Ragavan, Nimble Pilferer
+Cecil, Dark Knight
+Immoral Bargain
+Island x14
+
+[Bot2 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ragavan, Nimble Pilferer.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cecil, Dark Knight.Cast
+Bot1.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Immoral Bargain.Cast(X: 2)
+Bot1.Target(Bot2.Battlefield.Mox Pearl; Bot2.Battlefield.Mox Sapphire)
+Bot1.Choose(Ragavan, Nimble Pilferer; Cecil, Dark Knight)
+Bot1.Pass
+[Bot1.Main1]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Graveyard = Immoral Bargain; Cecil, Dark Knight; Ragavan, Nimble Pilferer
+Bot2.Graveyard = Mox Sapphire; Mox Pearl
+Bot2.Battlefield = Mox Ruby

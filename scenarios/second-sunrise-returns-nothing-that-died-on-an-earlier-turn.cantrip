@@ -1,0 +1,37 @@
+# "... that were put there from the battlefield this turn": Bot1's Ornithopter died to its own Lightning Bolt on turn 1. On turn 3 Second Sunrise
+# finds no card put into a graveyard from the battlefield this turn (the Ornithopter is a turn old, the Bolt an instant that never was a permanent), so
+# nothing returns and the spell resolves without effect.
+
+[Bot1 Deck]
+Ornithopter
+Mox Ruby
+Lightning Bolt
+Mox Pearl
+Mox Jet
+Gleemox
+Second Sunrise
+Island x10
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: White)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Second Sunrise.Cast
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Second Sunrise; Ornithopter; Lightning Bolt
+Bot1.Battlefield.Count = 4

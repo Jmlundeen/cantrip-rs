@@ -1,0 +1,47 @@
+# The Great Henge costs {X} less where X is the greatest power among creatures you control: with only Llanowar Elves (power
+# 1) its {7}{G}{G} is {6}{G}{G}, paid on turn 3 with a Forest, four Moxen and Black Lotus. On turn 5 an Ornithopter
+# entering draws a card and gets a +1/+1 counter, and the Henge taps for {G}{G} and 2 life.
+
+[Bot1 Deck]
+Forest
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Mox Emerald
+Llanowar Elves
+Black Lotus
+The Great Henge
+Ornithopter
+Forest x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.The Great Henge.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.The Great Henge.Activate(Ability: Add {G}{G})
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.The Great Henge.Tapped = true
+Bot1.Mana = {G}{G}
+Bot1.Life = 22

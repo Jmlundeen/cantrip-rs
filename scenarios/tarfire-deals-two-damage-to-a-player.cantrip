@@ -1,0 +1,20 @@
+# Tarfire: "Tarfire deals 2 damage to any target." A Kindred Instant — Goblin cast for {R} at a player goes to the graveyard.
+
+[Bot1 Deck]
+Tarfire
+Mountain x6
+Mountain x20
+
+[Bot2 Deck]
+Island x27
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Tarfire.Cast(Bot2)
+[T2 Bot2.Main1]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Graveyard = Tarfire
+Stack.Count = 0

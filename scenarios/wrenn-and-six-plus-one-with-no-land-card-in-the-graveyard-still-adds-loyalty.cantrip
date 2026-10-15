@@ -1,0 +1,27 @@
+# "Return up to one target land card from your graveyard": with none there, the +1 has no target and still goes on the stack, and its loyalty
+# cost is paid: Wrenn and Six goes from 3 to 4 and nothing else happens.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Wrenn and Six
+Island x4
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Wrenn and Six.Cast
+Bot1.Pass
+Bot1.Battlefield.Wrenn and Six.Activate(Ability: Return up to one)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Wrenn and Six.Counters.Loyalty = 4
+Bot1.Graveyard.Count = 0
+Stack.Count = 0

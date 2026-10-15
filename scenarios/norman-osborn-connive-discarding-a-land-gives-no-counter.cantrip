@@ -1,0 +1,31 @@
+# The same connive, but Bot1 discards an Island instead of the Lightning Bolt it drew: a land discarded means no +1/+1 counter, and
+# the Bolt stays in hand.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Norman Osborn
+Island x4
+Island
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Norman Osborn.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Norman Osborn > Bot2)
+Bot1.Choose(Island)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 19
+Bot1.Battlefield.Norman Osborn.Power = 1
+Bot1.Graveyard = Island

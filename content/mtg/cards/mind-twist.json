@@ -1,0 +1,6 @@
+{
+  "name": "Mind Twist",
+  "manaCost": "{X}{B}",
+  "type": "Sorcery",
+  "oracleText": "Target player discards X cards at random."
+}

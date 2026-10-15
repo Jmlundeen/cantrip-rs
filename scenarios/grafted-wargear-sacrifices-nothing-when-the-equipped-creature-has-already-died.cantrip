@@ -1,0 +1,53 @@
+# Grafted Wargear: "sacrifice that permanent" is the permanent it became unattached from, not any creature. Bot2's Lightning
+# Bolt kills the equipped Llanowar Elves (4/3), which unattaches the Wargear as a state-based action (CR 704.5n); the
+# ability finds that permanent already gone and Bot1's second Elves, unequipped, is left alone.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Sapphire
+Mox Pearl
+Grafted Wargear
+Llanowar Elves
+Llanowar Elves
+Plains x13
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Grafted Wargear.Cast
+Bot1.Pass
+Bot1.Battlefield.Grafted Wargear.Activate(Llanowar Elves)
+Bot1.Pass
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Llanowar Elves)
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Llanowar Elves
+Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot1.Battlefield.Grafted Wargear.AttachedTo = (absent)
+Stack.Count = 0

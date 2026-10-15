@@ -1,0 +1,45 @@
+# Mutagen Man, Living Ooze: "Activated abilities of artifact tokens you control cost {1} less to activate" (CR 601.2f,
+# 118.7). Cast with X = 0 on turn 1 beside Ivora's Blood token. On turn 3, with Mox Ruby and Mox Jet untapped, the Blood
+# token's {1}, {T}, discard, sacrifice ability costs {0} and taps neither Mox (the discard is Bot1's drawn Island); a
+# Mind Stone, an artifact that is not a token, still pays its full {1} for "{1}, {T}, Sacrifice: Draw a card" and taps the Jet.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Mox Jet
+Ivora, Insatiable Heir
+Mutagen Man, Living Ooze
+Mind Stone
+Island
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ivora, Insatiable Heir.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Mutagen Man, Living Ooze.Cast(X: 0)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Mind Stone.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Blood Token.Activate
+Bot1.Choose(Island)
+? Bot1.Battlefield.Mox Ruby.Tapped = false
+? Bot1.Battlefield.Mox Jet.Tapped = false
+Bot1.Battlefield.Mind Stone.Activate(Ability: Draw)
+Bot1.Battlefield.Mox Jet.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Mox Jet.Tapped = true
+Bot1.Battlefield.Mox Ruby.Tapped = false

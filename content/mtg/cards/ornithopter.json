@@ -1,0 +1,11 @@
+{
+  "name": "Ornithopter",
+  "manaCost": "{0}",
+  "type": "Artifact Creature — Thopter",
+  "power": 0,
+  "toughness": 2,
+  "oracleText": "Flying",
+  "keywords": [
+    "Flying"
+  ]
+}

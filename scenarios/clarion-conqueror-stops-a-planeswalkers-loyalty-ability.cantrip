@@ -1,0 +1,42 @@
+# Clarion Conqueror: a planeswalker's loyalty abilities are activated abilities too. Bot1 casts Liliana of the Veil with Black
+# Lotus on turn 1 and uses her +1 (the control: each player discards a card). On turn 3 Mox Pearl, Mox Jet and a Plains pay
+# for Clarion Conqueror; her abilities are then not offered, though she has not been used this turn.
+
+[Bot1 Deck]
+Black Lotus
+Liliana of the Veil
+Mox Pearl
+Mox Jet
+Clarion Conqueror
+Plains
+Plains
+Plains x20
+
+[Bot2 Deck]
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Liliana of the Veil.Cast
+Bot1.Pass
+Bot1.Battlefield.Liliana of the Veil.Activate(Ability: Each player discards)
+Bot1.Choose(Plains)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Clarion Conqueror.Cast
+Bot1.Pass
+[T3 Bot1.Main2]
+! Bot1.Battlefield.Liliana of the Veil.Activate
+
+[Expect]
+Bot1.Battlefield = Clarion Conqueror; Liliana of the Veil; Mox Jet; Mox Pearl; Plains

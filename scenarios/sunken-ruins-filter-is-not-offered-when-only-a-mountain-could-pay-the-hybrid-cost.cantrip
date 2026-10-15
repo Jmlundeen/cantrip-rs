@@ -1,0 +1,30 @@
+# Sunken Ruins: "{U/B}, {T}: Add {U}{U}, {U}{B}, or {B}{B}." The {U/B} must be paid with blue or black mana. Turn 3 the
+# Ruins and a Mountain are all Bot1 has: the filter ability is not offered (a Mountain makes {R}, which pays neither half).
+# Turn 5, with an Island played, the same ability is offered and an Island pays it.
+
+[Bot1 Deck]
+Mountain
+Sunken Ruins
+Island
+Swamp
+Swamp x4
+Swamp x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Sunken Ruins.Play
+! Bot1.Battlefield.Sunken Ruins.Activate(Ability: {U/B})
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Sunken Ruins.Activate(Ability: {U/B}, {T})
+Bot1.Colors(Blue; Black)
+? Bot1.Mana = {U}{B}
+
+[Expect]
+Bot1.Life = 20

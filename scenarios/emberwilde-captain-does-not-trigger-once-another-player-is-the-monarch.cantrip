@@ -1,0 +1,52 @@
+# Bot2's Elvish Mystic attacks on turn 4 and is not blocked: the Captain (Bot1 is the monarch) deals Bot2 damage equal
+# to the six cards in its hand, then the Mystic's combat damage makes Bot2 the monarch (CR 725.2). On turn 6 it attacks
+# again while Bot1 is no longer the monarch: "while you're the monarch" is false, the ability does not trigger (CR 603.4),
+# and Bot2's life is unchanged by the Captain. (The first attack is the positive control.)
+
+[Bot1 Deck]
+Mountain
+Mountain
+Sol Ring
+Emberwilde Captain
+Mountain
+Mountain
+Mountain
+Mountain x12
+
+[Bot2 Deck]
+Forest
+Elvish Mystic
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Emberwilde Captain.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Attack(Elvish Mystic > Bot1)
+[T4 Bot2.Main2]
+? Monarch = Bot2
+? Bot2.Life = 14
+[T6 Bot2.Main1]
+Bot2.Attack(Elvish Mystic > Bot1)
+[T6 Bot2.Main2]
+
+[Expect]
+Monarch = Bot2
+Bot2.Life = 14
+Bot1.Life = 18

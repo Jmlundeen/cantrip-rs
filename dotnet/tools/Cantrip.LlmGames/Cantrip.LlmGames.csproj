@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>cantrip-llm</AssemblyName>
+  </PropertyGroup>
+
+  <!-- No server garbage collector here, unlike cantrip-playtest: that one plays a game per core and this one waits
+       on a model, so a game costs a network round trip rather than an allocation. -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Cantrip.Client\Cantrip.Client.csproj" />
+    <ProjectReference Include="..\..\src\Cantrip.Client.Embedded\Cantrip.Client.Embedded.csproj" />
+    <ProjectReference Include="..\..\src\Cantrip.Client.Llm\Cantrip.Client.Llm.csproj" />
+    <ProjectReference Include="..\..\src\Cantrip.Server\Cantrip.Server.csproj" />
+  </ItemGroup>
+
+</Project>

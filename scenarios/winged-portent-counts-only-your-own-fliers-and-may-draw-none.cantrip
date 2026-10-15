@@ -1,0 +1,36 @@
+# "Draw a card for each creature you control with flying": Bot2's Ornithopter (a flier) is not one Bot1 controls, and Bot1's only
+# creature, an Elvish Mystic, has no flying, so cast for {1}{U}{U} (Black Lotus' three blue) Winged Portent counts zero and draws nothing
+# (CR 121.2: drawing zero cards is no draw). Bot1's hand is the 7 - 2 - 1 = 4 cards left after the Lotus, the Mystic and the Portent
+# are cast.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Elvish Mystic
+Winged Portent
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Elvish Mystic.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Winged Portent.Cast
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Winged Portent; Black Lotus
+Bot1.Hand.Count = 4

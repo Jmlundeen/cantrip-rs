@@ -1,0 +1,43 @@
+# "Whenever this creature attacks, create a number of 1/1 white Rabbit creature tokens equal to this creature's power": cast with X = 1 it
+# is a 2/3 (ravenous); on turn 3 Bot1 gives it -2/-2 with Collective Brutality before combat, so it attacks as a 0/1 and makes no
+# Rabbits (zero tokens, not a negative number). Bot2 takes no damage.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Mox Emerald
+Jacked Rabbit
+Collective Brutality
+Island x10
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Jacked Rabbit.Cast(X: 1)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Collective Brutality.Cast
+Bot1.Modes(2)
+Bot1.Target(Jacked Rabbit)
+Bot1.Pass
+Bot1.Attack(Jacked Rabbit > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot1.Battlefield.Jacked Rabbit.Power = 0
+Bot1.Battlefield.Jacked Rabbit.Toughness = 1
+Bot1.Battlefield.Count = 6

@@ -1,0 +1,6 @@
+{
+  "name": "Frantic Search",
+  "manaCost": "{2}{U}",
+  "type": "Instant",
+  "oracleText": "Draw two cards, then discard two cards. Untap up to three lands."
+}

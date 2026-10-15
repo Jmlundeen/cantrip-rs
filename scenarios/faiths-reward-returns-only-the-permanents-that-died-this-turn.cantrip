@@ -1,0 +1,34 @@
+# Faith's Reward returns to the battlefield the permanent cards put into your graveyard from the battlefield this turn:
+# Llanowar Elves, killed by Bot1's own Lightning Bolt, comes back, while the Bolt (an instant never on the battlefield)
+# stays in the graveyard. Black Lotus pays for it, and is itself sacrificed this turn, so it comes back too.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Llanowar Elves
+Lightning Bolt
+Faith's Reward
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Faith's Reward.Cast
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Black Lotus; Llanowar Elves; Mox Emerald; Mox Pearl; Mox Ruby
+Bot1.Graveyard = Faith's Reward; Lightning Bolt

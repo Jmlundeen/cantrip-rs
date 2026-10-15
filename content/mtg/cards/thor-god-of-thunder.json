@@ -1,0 +1,11 @@
+{
+  "name": "Thor, God of Thunder",
+  "manaCost": "{3}{R}{R}",
+  "type": "Legendary Creature — God Warrior Hero",
+  "power": 5,
+  "toughness": 5,
+  "oracleText": "Flying\nWhen Thor enters, exile target Equipment, instant, or sorcery card from your graveyard. Until the end of your next turn, you may play that card.\nWhenever you cast a noncreature spell, Thor deals damage equal to that spell's mana value to any target.",
+  "keywords": [
+    "Flying"
+  ]
+}

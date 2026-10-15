@@ -1,0 +1,48 @@
+# Cloak and Dagger enters off a Plains, a Mox Pearl and a Mox Jet, targets Bot2 and their Llanowar Elves, and takes
+# the Elves rather than either nonland card of the hand it reveals. A Lightning Bolt on Cloak and Dagger ends the
+# exile and the Elves come back to the battlefield (CR 610.3).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Cloak and Dagger, Entwined
+Plains x11
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Mountain
+Lightning Bolt
+Forest x11
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cloak and Dagger, Entwined.Cast
+Bot1.Target(Bot2)
+Bot1.Target(Llanowar Elves)
+Bot1.Choose(Llanowar Elves)
+? Exile = Llanowar Elves
+? Bot2.Battlefield = Forest
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Cloak and Dagger, Entwined)
+
+[Expect]
+Turn = 4
+Exile.Count = 0
+Bot1.Battlefield = Plains; Mox Pearl; Mox Jet
+Bot1.Graveyard = Cloak and Dagger, Entwined
+Bot2.Battlefield = Forest; Mountain; Llanowar Elves
+Bot2.Battlefield.Llanowar Elves.SummoningSick = true

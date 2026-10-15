@@ -1,0 +1,6 @@
+{
+  "name": "Impractical Joke",
+  "manaCost": "{R}",
+  "type": "Sorcery",
+  "oracleText": "Damage can't be prevented this turn. Impractical Joke deals 3 damage to up to one target creature or planeswalker."
+}

@@ -1,0 +1,68 @@
+# Emrakul is cast, not put onto the battlefield, so "When you cast this spell, take an extra turn after this one" triggers. Collector's
+# Cage hides it (hideaway 5) and on turn 5 its counter makes three different powers: Bot1 plays Emrakul for free. Bot2 has
+# two Islands and a Counterspell, and casts it on the Emrakul spell: it resolves anyway ("can't be countered"). The cast
+# trigger resolves first (it is above the spell on the stack), so Bot1 also takes turn 6 (the extra turn), and Bot2 only
+# gets turn 7.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Ornithopter
+Plains
+Llanowar Elves
+Collector's Cage
+Forest
+Forest
+Forest
+Forest
+Emrakul, the Aeons Torn
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest x8
+
+[Bot2 Deck]
+Island
+Island
+Counterspell
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Collector's Cage.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Llanowar Elves#1.Activate
+Bot1.Arrange(Emrakul, the Aeons Torn | Forest; Forest; Forest; Forest)
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Collector's Cage.Activate(Bot1.Battlefield.Llanowar Elves#2)
+Bot1.Battlefield.Forest.Activate
+Bot1.Accept
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Island#2.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Emrakul, the Aeons Torn)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Emrakul, the Aeons Torn.Power = 15
+? Bot2.Graveyard = Counterspell
+[T6 Bot1.Main1]
+? ActivePlayer = Bot1
+[T7 Bot2.Main1]
+
+[Expect]
+Turn = 7
+ActivePlayer = Bot2
+Bot1.Battlefield.Emrakul, the Aeons Torn.Power = 15

@@ -1,0 +1,29 @@
+# Cast Tersa on turn three, choose one card to discard, and draw exactly one.
+[Bot1 Deck]
+Tersa Lightshatter
+Mountain x3
+Forest x2
+Island
+Swamp x20
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Tersa Lightshatter.Cast
+Bot1.Choose(Forest)
+
+[Expect]
+Bot1.Battlefield.Tersa Lightshatter.Power = 3
+Bot1.Battlefield.Tersa Lightshatter.Keywords = Haste
+Bot1.Graveyard = Forest
+Bot1.Hand = Forest; Island; Swamp; Swamp; Swamp
+Bot1.Library.Count = 17

@@ -1,0 +1,30 @@
+# Valakut Awakening ({2}{R}: Black Lotus's three red mana): Bot1 puts Island and Plains from its hand on the bottom of
+# its library, ordering them Plains then Island, and draws that many plus one, three cards: the top three of the library.
+
+[Bot1 Deck]
+Black Lotus
+Valakut Awakening
+Island
+Plains
+Swamp
+Forest
+Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Valakut Awakening.Cast
+Bot1.Choose(Island; Plains)
+Bot1.Arrange(Plains; Island)
+
+[Expect]
+Bot1.Hand = Swamp; Forest; Mountain; Mox Ruby; Mox Jet; Mox Pearl
+Bot1.Library = Mox Sapphire; Plains; Island
+Bot1.Graveyard = Valakut Awakening; Black Lotus

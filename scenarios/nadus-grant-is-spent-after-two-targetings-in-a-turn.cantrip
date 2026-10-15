@@ -1,0 +1,59 @@
+# Nadu, Winged Wisdom gives Sheoldred, the Apocalypse "whenever this creature becomes the target ... This ability triggers
+# only twice each turn." (CR 603.2h). Two Unholy Heats aimed at Sheoldred in one turn trigger it twice, and the count is
+# Sheoldred's own: Nadu's copy of the ability is untouched.
+#
+# Handed over at the second main phase with both Heats resolved, so the client can be pictured with the granted line on
+# Sheoldred's face and in its tooltip, greyed out because it has triggered all it may this turn.
+
+[Bot1 Deck]
+Forest
+Island
+Swamp
+Badlands
+Nadu, Winged Wisdom
+Sheoldred, the Apocalypse
+Unholy Heat
+Unholy Heat
+Mountain
+Island x12
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Nadu, Winged Wisdom.Cast
+[T7 Bot1.Main1]
+Bot1.Hand.Badlands.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Badlands.Activate(Ability: {B})
+Bot1.Hand.Sheoldred, the Apocalypse.Cast
+[T9 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Unholy Heat.Cast(Sheoldred, the Apocalypse)
+Bot1.Battlefield.Badlands.Activate(Ability: {R})
+Bot1.Hand.Unholy Heat.Cast(Sheoldred, the Apocalypse)
+[T9 Bot1.Main2]
+[Handover Bot1.Pass]
+
+[Expect]
+Step = Main2
+ActivePlayer = Bot1
+PriorityPlayer = Bot1
+Stack =
+# Each Heat triggered Sheoldred's granted ability once, and each revealed an Island onto the battlefield: one played, two
+# revealed.
+Bot1.Battlefield = Forest; Swamp; Badlands; Island; Island; Island; Sheoldred, the Apocalypse; Mountain; Nadu, Winged Wisdom
+Bot1.Battlefield.Sheoldred, the Apocalypse.Damage = 4
+Bot1.Battlefield.Sheoldred, the Apocalypse.Toughness = 5
+Bot1.Graveyard = Unholy Heat; Unholy Heat

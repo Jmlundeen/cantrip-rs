@@ -1,0 +1,53 @@
+# Adaptive Omnitool: "+1/+1 for each artifact you control" counts only its controller's artifacts (Bot2's Mox Ruby does
+# not), and "whenever equipped creature attacks" digs only for the equipped creature: Bot1 attacks first with the
+# unequipped Ornithopter (no look at the library, ! Bot1.Arrange as the control for the later attack), and equip is
+# sorcery speed, refused on Bot2's turn with the mana to pay. On turn 5 the equipped one attacks and the look happens.
+
+[Bot1 Deck]
+Plains
+Mox Jet
+Mox Pearl
+Adaptive Omnitool
+Ornithopter
+Ornithopter
+Plains
+Plains
+Plains
+Sol Ring
+Island x20
+
+[Bot2 Deck]
+Mox Ruby
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Adaptive Omnitool.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Adaptive Omnitool.Activate(Ornithopter)
+! Bot1.Arrange
+Bot1.Attack(Ornithopter#2 > Bot2)
+? Bot1.Battlefield.Ornithopter#1.Power = 5
+? Bot1.Battlefield.Ornithopter#2.Power = 0
+[T4 Bot2.Main1]
+! Bot1.Battlefield.Adaptive Omnitool.Activate(Ornithopter#2)
+[T5 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+Bot1.Arrange(Sol Ring | Island; Island; Island; Island; Island)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Hand = Plains; Plains; Sol Ring

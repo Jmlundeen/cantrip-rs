@@ -1,0 +1,40 @@
+# "This mana can't be spent to cast nonartifact spells" (CR 106.6): with {C}{C} from The Mightstone and Weakstone and {B} from Mox Jet in the pool, Demonic Tutor ({1}{B}) cannot be cast (refusal), because the {1} would have to come from the restricted mana.
+# Once a Mox Emerald adds unrestricted {G}, the same cast is offered and made (the positive control).
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Ruby
+The Mightstone and Weakstone
+Mox Jet
+Mox Emerald
+Demonic Tutor
+Island x12
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.The Mightstone and Weakstone.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.The Mightstone and Weakstone.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Demonic Tutor.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Demonic Tutor.Cast
+Bot1.Search(Island)
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Demonic Tutor; Black Lotus

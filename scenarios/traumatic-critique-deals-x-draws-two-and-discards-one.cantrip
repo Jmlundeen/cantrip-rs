@@ -1,0 +1,31 @@
+# Traumatic Critique with X = 3 ({3}{U}{R}: Black Lotus for three, Mox Ruby, Mox Sapphire) deals 3 to Bot2, then Bot1
+# draws two cards and discards one of its choosing: a Mountain from the hand it holds.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Sapphire
+Black Lotus
+Traumatic Critique
+Mountain
+Island
+Island
+Mountain
+Island x10
+
+[Bot2 Deck]
+Swamp x17
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Traumatic Critique.Cast(Bot2; X: 3)
+Bot1.Choose(Mountain)
+
+[Expect]
+Bot2.Life = 17
+Bot1.Graveyard = Traumatic Critique; Mountain; Black Lotus
+Bot1.Hand.Count = 4

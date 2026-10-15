@@ -1,0 +1,9 @@
+{
+  "name": "Kaldra Compleat",
+  "manaCost": "{7}",
+  "type": "Legendary Artifact — Equipment",
+  "oracleText": "Living weapon (When this Equipment enters, create a 0/0 black Phyrexian Germ creature token, then attach this to it.)\nIndestructible\nEquipped creature gets +5/+5 and has first strike, trample, indestructible, haste, and \"Whenever this creature deals combat damage to a creature, exile that creature.\"\nEquip {7}",
+  "keywords": [
+    "Indestructible"
+  ]
+}

@@ -1,0 +1,15 @@
+# RG for the native engine spike's benchmark: forty cards made only of the spike's first nineteen ported cards,
+# kept fixed so benchmark numbers compare across commits. Not a deck anyone would build.
+
+4 Lightning Bolt
+4 Firebolt
+2 Fireblast
+4 Guerrilla Gorilla
+4 Llanowar Elves
+2 Ornithopter
+2 Faithless Looting
+1 Black Lotus
+1 Pyrite Spellbomb
+2 Deathrite Shaman
+8 Mountain
+6 Forest

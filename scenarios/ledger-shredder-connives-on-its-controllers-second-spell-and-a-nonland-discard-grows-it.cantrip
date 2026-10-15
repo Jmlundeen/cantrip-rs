@@ -1,0 +1,44 @@
+# Ledger Shredder, played for real. Turn 3 Bot1 casts it. Turn 5 Bot1 casts two Pyrite Spellbombs: the second is the
+# second spell of the turn, so the Shredder connives -- draws a third Spellbomb and discards it, a nonland card, so it
+# gets a +1/+1 counter and is a 2/4.
+
+[Bot1 Deck]
+Island
+Ledger Shredder
+Island
+Pyrite Spellbomb
+Pyrite Spellbomb
+Island
+Island
+Island
+Island
+Pyrite Spellbomb
+Island x10
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Ledger Shredder.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Pyrite Spellbomb.Cast
+? Bot1.Battlefield.Ledger Shredder.Power = 1
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Pyrite Spellbomb.Cast
+Bot1.Choose(Pyrite Spellbomb)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Ledger Shredder.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ledger Shredder.Power = 2
+Bot1.Battlefield.Ledger Shredder.Toughness = 4
+Bot1.Graveyard.Count = 1
+Stack.Count = 0

@@ -1,0 +1,39 @@
+# Improvise (CR 702.126a) on an instant: Bot1 answers Bot2's Lightning Bolt with Metallic Rebuke ({2}{U}), paying {U}
+# with an Island and {2} by tapping two Ornithopters, artifacts that were not mana sources. Bot2 has nothing for the
+# ransom of {3}, so the Bolt is countered.
+
+[Bot1 Deck]
+Island
+Ornithopter
+Ornithopter
+Metallic Rebuke
+Island x3
+Island x14
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x5
+Mountain x13
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot2.Hand.Mountain.Play
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Metallic Rebuke.Cast(Lightning Bolt; Convoke: Ornithopter, Ornithopter)
+Bot2.Pass
+Bot2.Decline
+[T4 Bot2.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 20
+Bot1.Graveyard = Metallic Rebuke
+Bot2.Graveyard = Lightning Bolt
+Bot1.Battlefield.Ornithopter#1.Tapped = true
+Bot1.Battlefield.Ornithopter#2.Tapped = true

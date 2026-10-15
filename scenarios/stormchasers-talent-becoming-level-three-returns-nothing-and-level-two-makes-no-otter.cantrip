@@ -1,0 +1,51 @@
+# The return is "when this Class becomes level 2", so becoming level 3 with a Bolt in the graveyard returns nothing.
+# The Otter-on-cast ability is level 3's alone: a Bolt cast at level 2 makes no Otter. (The one Otter ends 3/3 from
+# prowess on the two Lotuses cast on turn 3.)
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Stormchaser's Talent
+Black Lotus
+Black Lotus
+Mox Ruby
+Lightning Bolt
+Black Lotus
+Island x10
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Stormchaser's Talent.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Stormchaser's Talent.Activate(Ability: Level 2)
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Stormchaser's Talent.Activate(Ability: Level 3)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Stormchaser's Talent.ClassLevel = 3
+Bot1.Battlefield = Island; Mox Sapphire; Mox Ruby; Stormchaser's Talent; Otter
+Bot1.Battlefield.Otter.Power = 3
+Bot1.Graveyard = Black Lotus; Black Lotus; Lightning Bolt; Black Lotus
+Bot1.Hand.Count = 0
+Bot2.Life = 17
+Stack.Count = 0

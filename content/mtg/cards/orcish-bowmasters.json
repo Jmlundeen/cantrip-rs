@@ -1,0 +1,11 @@
+{
+  "name": "Orcish Bowmasters",
+  "manaCost": "{1}{B}",
+  "type": "Creature — Orc Archer",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "Flash\nWhen this creature enters and whenever an opponent draws a card except the first one they draw in each of their draw steps, this creature deals 1 damage to any target. Then amass Orcs 1.",
+  "keywords": [
+    "Flash"
+  ]
+}

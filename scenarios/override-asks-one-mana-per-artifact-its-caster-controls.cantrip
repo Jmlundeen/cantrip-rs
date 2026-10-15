@@ -1,0 +1,44 @@
+# Bot2 counters Guerrilla Gorilla with Override while controlling two Mishra's Baubles; Bot1's own Bauble does not count, so
+# the price is exactly {2}: Bot1 taps its two spare Forests, pays, and has nothing left floating.
+
+[Bot1 Deck]
+Guerrilla Gorilla
+Mishra's Bauble
+Forest x5
+Forest x10
+
+[Bot2 Deck]
+Override
+Mishra's Bauble x2
+Island x4
+Island x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mishra's Bauble.Cast
+Bot2.Hand.Island.Play
+Bot2.Hand.Mishra's Bauble.Cast
+Bot2.Pass
+Bot2.Hand.Mishra's Bauble.Cast
+Bot1.Hand.Forest.Play
+Bot2.Hand.Island.Play
+Bot1.Hand.Forest.Play
+Bot2.Hand.Island.Play
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Override.Cast(Guerrilla Gorilla)
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.PayCost
+
+[Expect]
+Turn = 7
+Bot1.Battlefield = Forest; Forest; Forest; Forest; Mishra's Bauble; Guerrilla Gorilla
+Bot1.Mana =
+Bot2.Graveyard = Override

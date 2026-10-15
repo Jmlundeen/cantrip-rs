@@ -1,0 +1,8 @@
+{
+  "name": "Simian Spirit Guide",
+  "manaCost": "{2}{R}",
+  "type": "Creature — Ape Spirit",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Exile this card from your hand: Add {R}."
+}

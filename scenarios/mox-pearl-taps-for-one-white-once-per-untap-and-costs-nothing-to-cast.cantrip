@@ -1,0 +1,27 @@
+# Mox Pearl: {0} to cast, an artifact (not a creature, so it taps the turn it arrives, CR 302.6), and "{T}: Add {W}" - one white, once
+# until it untaps. Cast and tapped on turn one for {W}, it is not offered again that turn (the refusal), and on turn three, untapped, it
+# is (the positive control) and pays for Mother of Runes.
+
+[Bot1 Deck]
+Mox Pearl
+Mother of Runes
+Island x14
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+? Bot1.Mana = {W}
+? Bot1.Battlefield.Mox Pearl.Tapped = true
+! Bot1.Battlefield.Mox Pearl.Activate
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Mox Pearl.Tapped = false
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Mother of Runes.Cast
+
+[Expect]
+Bot1.Battlefield = Mox Pearl; Mother of Runes
+Bot1.Battlefield.Mox Pearl.Types = Artifact
+Bot1.Mana =

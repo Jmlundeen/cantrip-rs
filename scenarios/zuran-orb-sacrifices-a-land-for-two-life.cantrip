@@ -1,0 +1,26 @@
+# Zuran Orb: "Sacrifice a land: You gain 2 life." Bot1 casts it for free and plays an Island, then a Plains on its next
+# turn. With two lands to choose from it sacrifices the Plains, keeping the Island, and gains 2 life.
+
+[Bot1 Deck]
+Zuran Orb
+Island
+Plains
+Island x4
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Zuran Orb.Cast
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Zuran Orb.Activate
+Bot1.Choose(Plains)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot1.Battlefield = Zuran Orb; Island
+Bot1.Graveyard = Plains

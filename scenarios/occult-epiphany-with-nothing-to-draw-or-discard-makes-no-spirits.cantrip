@@ -1,0 +1,36 @@
+# Occult Epiphany with X = 2 when the library and hand are both empty: nothing is drawn, nothing discarded, no card type
+# among no cards, no Spirit. (Bot1 loses at the next state-based check for having tried to draw from an empty library.)
+
+[Bot1 Deck]
+Black Lotus
+Occult Epiphany
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+
+[Bot2 Deck]
+Swamp x15
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Occult Epiphany.Cast(X: 2)
+Bot1.Pass
+
+[Expect]
+Result = Bot2 won
+Bot1.Hand.Count = 0
+Bot1.Battlefield.Count = 5

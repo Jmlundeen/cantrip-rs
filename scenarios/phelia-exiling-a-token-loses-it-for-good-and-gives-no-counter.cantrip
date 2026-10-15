@@ -1,0 +1,52 @@
+# Phelia, Exuberant Shepherd: "return that card to the battlefield" -- a token that is exiled ceases to exist (CR 111.7,
+# 704.5d), so there is no card to return. Bot1's Malevolent Rumble makes an Eldrazi Spawn on turn 1; on turn 3 Phelia attacks and
+# exiles it. At the end step it does not come back, and since nothing entered under Bot1's control Phelia gets no counter.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Pearl
+Mox Ruby
+Malevolent Rumble
+Phelia, Exuberant Shepherd
+Plains
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Malevolent Rumble.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Phelia, Exuberant Shepherd.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Phelia, Exuberant Shepherd > Bot2)
+Bot1.Target(Eldrazi Spawn)
+[T3 Bot1.Main2]
+? Exile.Count = 0
+? Bot1.Battlefield.Count = 5
+[T4 Bot2.Main1]
+
+[Expect]
+Exile.Count = 0
+Bot1.Battlefield.Count = 5
+Bot1.Battlefield.Phelia, Exuberant Shepherd.Counters.PlusOnePlusOne = (absent)

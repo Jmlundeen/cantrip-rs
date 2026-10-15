@@ -1,0 +1,22 @@
+# A fetch land puts it onto the battlefield, but "as this land enters, you may pay 2 life" still applies: it is a Plains card,
+# so Marsh Flats finds it; Bot1 pays (20 - 1 for the Flats - 2) and it enters untapped.
+
+[Bot1 Deck]
+Marsh Flats
+Plains x6
+Sacred Foundry
+Plains x8
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Marsh Flats.Play
+Bot1.Battlefield.Marsh Flats.Activate
+Bot1.Search(Sacred Foundry)
+Bot1.Accept
+
+[Expect]
+Bot1.Life = 17
+Bot1.Battlefield = Sacred Foundry
+Bot1.Battlefield.Sacred Foundry.Tapped = false

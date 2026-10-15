@@ -1,0 +1,26 @@
+# Magda, Brazen Outlaw: "Whenever a Dwarf you control becomes tapped, create a Treasure token." Magda is a Dwarf herself. Bot1
+# casts her on turn 1 with a Mountain and Mox Ruby; on turn 3 she attacks, and tapping to attack makes a Treasure token
+# before combat damage: Bot2 takes 2.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Magda, Brazen Outlaw
+Mountain x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Magda, Brazen Outlaw.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Magda, Brazen Outlaw > Bot2)
+[T3 Bot1.Main2]
+? Bot1.Battlefield = Magda, Brazen Outlaw; Mountain; Mox Ruby; Treasure Token
+
+[Expect]
+Bot2.Life = 18

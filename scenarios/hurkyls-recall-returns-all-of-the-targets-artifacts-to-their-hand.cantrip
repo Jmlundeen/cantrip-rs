@@ -1,0 +1,34 @@
+# Hurkyl's Recall: Bot1 returns every artifact Bot2 owns (a Mox Ruby and an Ornithopter) to Bot2's hand; its own
+# artifact and Bot2's lands stay.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Hurkyl's Recall
+Island x4
+Island x10
+
+[Bot2 Deck]
+Mox Ruby
+Ornithopter
+Mountain
+Mountain x4
+Mountain x9
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Hurkyl's Recall.Cast(Bot2)
+
+[Expect]
+Stack.Count = 0
+Bot2.Battlefield = Mountain
+Bot2.Hand.Count = 7
+Bot1.Battlefield = Mox Jet; Mox Sapphire
+Bot1.Graveyard = Hurkyl's Recall

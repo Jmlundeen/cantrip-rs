@@ -1,0 +1,62 @@
+# Torsten (cast on turn 3 off a Forest, five Moxen and Sol Ring) reveals the top seven cards: Bot1 takes Llanowar
+# Elves, Elvish Mystic and a Forest into hand, leaving the two Islands, Lightning Bolt and Duress on the bottom. When
+# Bot2 destroys it with Infernal Grasp on turn 4, seven 1/1 white Soldiers take its place.
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Mox Emerald
+Mox Pearl
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Torsten, Founder of Benalia
+Llanowar Elves
+Island
+Lightning Bolt
+Duress
+Elvish Mystic
+Forest
+Island
+Forest x5
+
+[Bot2 Deck]
+Swamp
+Swamp
+Infernal Grasp
+Swamp x4
+Swamp x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Torsten, Founder of Benalia.Cast
+Bot1.Arrange(Llanowar Elves; Elvish Mystic; Forest | Island; Lightning Bolt; Duress; Island)
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Infernal Grasp.Cast(Bot1.Battlefield.Torsten, Founder of Benalia)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Torsten, Founder of Benalia
+Bot1.Hand = Llanowar Elves; Elvish Mystic; Forest
+Bot2.Life = 18
+Bot1.Battlefield.Soldier#7.Power = 1

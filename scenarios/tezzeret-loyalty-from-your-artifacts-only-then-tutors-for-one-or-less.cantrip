@@ -1,0 +1,55 @@
+# Tezzeret, Cruel Captain: "Whenever an artifact you control enters, put a loyalty counter on Tezzeret" - your artifacts only.
+# Cast with three Moxen (the Moxen entered before him), he starts at 4; his own Mox Sapphire and an Ornithopter (an artifact
+# creature) each add one (6); Bot2's Mox Pearl on turn 2 and Bot1's own Lightning Bolt (not an artifact) on turn 3 add none.
+# His -3 then searches for an artifact with mana value 1 or less: Mind Stone (2) is refused beside Sol Ring (1), the one
+# taken, and Tezzeret is at 3. 
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Tezzeret, Cruel Captain
+Mox Sapphire
+Ornithopter
+Lightning Bolt
+Island
+Mind Stone
+Sol Ring
+Island x12
+
+[Bot2 Deck]
+Mox Pearl
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tezzeret, Cruel Captain.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Tezzeret, Cruel Captain.Counters.Loyalty = 6
+Bot1.Battlefield.Tezzeret, Cruel Captain.Activate(Ability: Search)
+! Bot1.Search(Mind Stone)
+Bot1.Search(Sol Ring)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Tezzeret, Cruel Captain.Counters.Loyalty = 3
+Bot1.Hand = Sol Ring; Island

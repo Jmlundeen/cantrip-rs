@@ -1,0 +1,27 @@
+# Bot1 reaches two Mountains on its second turn and casts Fireblast for its alternative cost with no mana spent:
+# both Mountains are sacrificed and Bot2 takes 4.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Fireblast
+Mountain x4
+Mountain x10
+
+[Bot2 Deck]
+Forest
+Forest x6
+Forest x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Forest.Play
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Fireblast.Cast(Bot2; Ability: Sacrifice)
+Bot1.Choose(Mountain; Mountain)
+
+[Expect]
+Bot2.Life = 16
+Bot1.Graveyard = Fireblast; Mountain; Mountain
+Bot1.Battlefield.Count = 0
+Stack.Count = 0

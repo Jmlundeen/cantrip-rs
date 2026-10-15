@@ -1,0 +1,35 @@
+# Scale Up sets base power and toughness (CR 613.4b, layer 7b); a +2/+2 from Battlefield Improvisation cast before it is a
+# modification (layer 7c) and still counts on top whatever the order they were made in: the Ornithopter is 8/6.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Ornithopter
+Battlefield Improvisation
+Scale Up
+Forest x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Battlefield Improvisation.Cast(Ornithopter)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Scale Up.Cast(Ornithopter)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Power = 8
+Bot1.Battlefield.Ornithopter.Toughness = 6
+Bot1.Battlefield.Ornithopter.Subtypes = Wurm

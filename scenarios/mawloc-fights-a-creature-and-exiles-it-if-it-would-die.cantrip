@@ -1,0 +1,39 @@
+# Mawloc cast for X = 2 enters as a 4/4 (ravenous) and fights Llanowar Elves; the Elves would die, and the ability's replacement effect (CR 614.1a, 611.2c) exiles them instead.
+
+[Bot1 Deck]
+Sol Ring
+Mawloc
+Mountain
+Forest
+Mountain x3
+Mountain x20
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x19
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mountain.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mawloc.Cast(X: 2)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Target(Llanowar Elves)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Mawloc.Power = 4
+Bot1.Battlefield.Mawloc.Damage = 1
+Bot2.Graveyard.Count = 0
+Exile = Llanowar Elves
+Stack.Count = 0

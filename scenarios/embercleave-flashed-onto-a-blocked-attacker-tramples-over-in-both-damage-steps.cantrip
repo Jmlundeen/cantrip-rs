@@ -1,0 +1,43 @@
+# Elvish Mystic (1/1) is blocked by Llanowar Elves; after blockers Bot1 flashes in Embercleave on it (one attacker, so {3}{R}{R}).
+# The 2/2 with double strike and trample deals 2 in the first-strike step - 1 lethal to the Elves, 1 trampling through (CR
+# 702.19b) - and in the regular step the blocker is gone, so all 2 go to the player (CR 702.19e): 3 damage, the Elves dead.
+
+[Bot1 Deck]
+Forest
+Elvish Mystic
+Black Lotus
+Mox Ruby
+Embercleave
+Forest
+Forest
+Forest x12
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Elvish Mystic.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Attack(Elvish Mystic)
+Bot2.Block(Llanowar Elves > Elvish Mystic)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Embercleave.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot2.Graveyard = Llanowar Elves
+Bot1.Battlefield.Elvish Mystic.Damage = 0
+Bot1.Battlefield.Embercleave.AttachedTo = Elvish Mystic

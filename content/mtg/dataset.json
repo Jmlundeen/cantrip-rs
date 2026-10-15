@@ -1,0 +1,10 @@
+{
+  // Real Magic: The Gathering cards. One card per file in cards/, named for the card: its characteristics. What a
+  // card does is its Rust file in crates/cantrip-cards (docs/adding-cards.md).
+  "id": "mtg",
+  "name": "Magic: The Gathering",
+  "version": "1.0.0",
+
+  // The card file format the dataset is written in. The loader refuses a dataset written for another.
+  "cardApi": 143
+}

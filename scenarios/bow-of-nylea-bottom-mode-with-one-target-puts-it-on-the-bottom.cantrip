@@ -1,0 +1,46 @@
+# Bow of Nylea's fourth mode with a single target: Lightning Bolt, cast on turn 1, is the only card in the graveyard. It goes
+# to the bottom of the library with no question about order (one card has only one order), under the three Forests
+# left. Bow is cast on turn 1 with the Forest and two Mox Emeralds; Mox Ruby pays the Bolt.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Emerald
+Mox Ruby
+Lightning Bolt
+Bow of Nylea
+Forest
+Forest x4
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Bow of Nylea.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Bow of Nylea.Activate
+Bot1.Modes(Put up to four)
+Bot1.Target(Lightning Bolt)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard.Count = 0
+Bot1.Library = Forest; Forest; Forest; Lightning Bolt
+Bot2.Life = 17

@@ -1,0 +1,32 @@
+# "Enchant land": the Aura cannot be cast on a creature (the refusal), but can on any land, an opponent's included (the positive
+# control). Enchanted land has the ability, so the land's controller - Bot2 - taps its Island for it: the Aura belongs to Bot1,
+# the ability to whoever controls the land (CR 303.4e), and Bot2's Ornithopter gains trample and haste.
+
+[Bot1 Deck]
+Mox Ruby
+Footfall Crater
+Mountain x13
+
+[Bot2 Deck]
+Island
+Ornithopter
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Hand.Footfall Crater.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Hand.Footfall Crater.Cast(Bot2.Battlefield.Island)
+[T4 Bot2.Main1]
+? Bot2.Battlefield.Ornithopter.Keywords = Flying
+Bot2.Battlefield.Island.Activate(Ornithopter; Ability: trample)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Footfall Crater.AttachedTo = Island
+Bot2.Battlefield.Island.Tapped = true
+Bot2.Battlefield.Ornithopter.Keywords = Flying; Haste; Trample

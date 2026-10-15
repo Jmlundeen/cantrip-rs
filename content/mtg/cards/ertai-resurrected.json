@@ -1,0 +1,11 @@
+{
+  "name": "Ertai Resurrected",
+  "manaCost": "{2}{U}{B}",
+  "type": "Legendary Creature — Phyrexian Human Wizard",
+  "power": 3,
+  "toughness": 2,
+  "oracleText": "Flash\nWhen Ertai Resurrected enters, choose up to one —\n• Counter target spell, activated ability, or triggered ability. Its controller draws a card.\n• Destroy another target creature or planeswalker. Its controller draws a card.",
+  "keywords": [
+    "Flash"
+  ]
+}

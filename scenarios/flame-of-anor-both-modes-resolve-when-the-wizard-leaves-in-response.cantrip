@@ -1,0 +1,49 @@
+# The number of modes is fixed as the spell is cast (CR 700.2, 601.2b): Bot1 controls Snapcaster Mage (a Wizard) as it casts Flame of Anor on Bot2's turn, choosing "draws two cards"
+# (the refusal: not all three) and "5 damage to target creature" (Bot2's Ornithopter). Bot2 answers by killing the Snapcaster Mage with Lightning Bolt; with the Wizard gone Flame still does both:
+# Bot1 draws two and the Ornithopter dies.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Black Lotus
+Snapcaster Mage
+Flame of Anor
+Island x14
+
+[Bot2 Deck]
+Mountain
+Ornithopter
+Lightning Bolt
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Snapcaster Mage.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Flame of Anor.Cast
+! Bot1.Modes(1; 2; 3)
+Bot1.Modes(1; 3)
+Bot1.Target(Bot1)
+Bot1.Target(Ornithopter)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Snapcaster Mage)
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Bot2.Graveyard = Ornithopter; Lightning Bolt
+Bot1.Graveyard = Flame of Anor; Snapcaster Mage; Black Lotus
+Bot1.Hand.Count = 3

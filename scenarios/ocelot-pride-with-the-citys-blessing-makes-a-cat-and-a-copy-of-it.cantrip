@@ -1,0 +1,40 @@
+# Ascend (CR 702.131): Bot1 reaches ten permanents on turn seven and gets the city's blessing. Ocelot Pride's lifelink gains life that turn, so at the beginning of the end step it makes a 1/1 Cat and, with the blessing, a copy of every token that entered this turn: the Cat, twice over.
+
+[Bot1 Deck]
+Plains
+Ocelot Pride
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Ornithopter
+Ornithopter
+Ornithopter
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ocelot Pride.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+[T7 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Attack(Ocelot Pride)
+[T9 Bot1.Main1]
+
+[Expect]
+Turn = 9
+Bot1.Life = 21
+Bot1.Battlefield = Plains; Ocelot Pride; Mox Pearl; Mox Sapphire; Mox Jet; Mox Ruby; Mox Emerald; Ornithopter; Ornithopter; Ornithopter; Cat; Cat

@@ -1,0 +1,27 @@
+# Urborg, Tomb of Yawgmoth: its ability works only while it is on the battlefield. Bot2 destroys it with Wasteland
+# (a nonbasic land), and Bot1's Plains is no longer a Swamp.
+
+[Bot1 Deck]
+Urborg, Tomb of Yawgmoth
+Plains
+Plains x18
+
+[Bot2 Deck]
+Wasteland
+Wasteland x19
+
+[Actions]
+Bot1.Hand.Urborg, Tomb of Yawgmoth.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Wasteland.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+? Bot1.Battlefield.Plains.Subtypes = Plains; Swamp
+[T4 Bot2.Main1]
+Bot2.Battlefield.Wasteland.Activate(Urborg, Tomb of Yawgmoth; Ability: Destroy)
+
+[Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Urborg, Tomb of Yawgmoth
+Bot1.Battlefield.Plains.Subtypes = Plains

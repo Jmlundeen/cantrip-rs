@@ -1,0 +1,32 @@
+# Black Lotus is an artifact only until it is sacrificed for its mana: paying {3} with it leaves Bot1 controlling no artifacts,
+# so X = 0, nothing is looked at and no arrangement is asked, though the cost (tap, the discard of a Plains) was paid. Nothing
+# is added to the hand.
+
+[Bot1 Deck]
+Fomori Vault
+Black Lotus
+Plains
+Plains
+Plains
+Plains
+Plains
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Fomori Vault.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Fomori Vault.Activate(Ability: Look)
+Bot1.Choose(Plains)
+! Bot1.Arrange
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Plains; Black Lotus
+Bot1.Hand.Count = 4
+Bot1.Library.Count = 10

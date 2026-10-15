@@ -1,0 +1,24 @@
+# Corrupted Conviction: "As an additional cost to cast this spell, sacrifice a creature. Draw two cards." Bot1 casts it
+# off a Mox Jet and sacrifices its only creature, an Ornithopter, then draws two: seven cards in hand, three played
+# or cast, two drawn.
+
+[Bot1 Deck]
+Mox Jet
+Ornithopter
+Corrupted Conviction
+Island x14
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Corrupted Conviction.Cast
+[T2 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield = Mox Jet
+Bot1.Graveyard = Corrupted Conviction; Ornithopter
+Bot1.Hand.Count = 6

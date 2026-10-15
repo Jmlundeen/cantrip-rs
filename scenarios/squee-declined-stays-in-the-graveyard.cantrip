@@ -1,0 +1,28 @@
+# The upkeep trigger is a "may": declining leaves Squee in the graveyard.
+
+[Bot1 Deck]
+Black Lotus
+Squee, Goblin Nabob
+Mountain x5
+Mountain x15
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x5
+Mountain x15
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Squee, Goblin Nabob.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Squee, Goblin Nabob)
+[T3 Bot1.Upkeep]
+Bot1.Decline
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Graveyard = Squee, Goblin Nabob; Black Lotus

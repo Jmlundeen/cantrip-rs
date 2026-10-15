@@ -1,0 +1,38 @@
+# Tamiyo, Inquisitive Student: the draw step's card, Ponder's and Brainstorm's first make her third draw in the turn, so
+# she is exiled and returns transformed. Her +2 then weakens each creature attacking Bot1 by -1/-0 until Bot1's next
+# turn (CR 603.7b): Bot2's Llanowar Elves deal no damage on turn 4, and one again on turn 6.
+[Bot1 Deck]
+Island x3
+Tamiyo, Inquisitive Student
+Ponder
+Brainstorm
+Island x20
+[Bot2 Deck]
+Forest x2
+Llanowar Elves
+Forest x20
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Tamiyo, Inquisitive Student.Cast
+[Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Ponder.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Brainstorm.Cast
+Bot1.Battlefield.Tamiyo, Seasoned Scholar.Activate(Ability: Until your next turn)
+? Bot1.Battlefield.Tamiyo, Seasoned Scholar.Counters.Loyalty = 4
+[T4 Bot2.Main1]
+Bot2.Attack(Llanowar Elves > Bot1)
+[T4 Bot2.Main2]
+? Bot1.Life = 20
+[T6 Bot2.Main1]
+Bot2.Attack(Llanowar Elves > Bot1)
+[T6 Bot2.Main2]
+[Expect]
+Bot1.Life = 19

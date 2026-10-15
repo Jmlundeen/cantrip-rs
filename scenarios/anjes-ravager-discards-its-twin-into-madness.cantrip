@@ -1,0 +1,44 @@
+# Anje's Ravager is cast on turn 5; on turn 7 it attacks with no Attack line at all - the default declares no attackers,
+# so only "attacks each combat if able" sends it in - and "discard your hand, then draw
+# three cards" discards the second Ravager from Bot1's hand. Madness (CR 702.35a) exiles it instead of putting it into the
+# graveyard, and its linked ability lets Bot1 cast it for {1}{R}. The discarded Mountains go to the graveyard as usual,
+# the draw of three still happens, and the twin ends on the battlefield.
+
+[Bot1 Deck]
+Anje's Ravager
+Anje's Ravager
+Mountain x5
+Mountain x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Anje's Ravager.Cast
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T7 Bot1.DeclareAttackers]
+Bot1.Pass
+Bot2.Pass
+? Combat.Attackers = Anje's Ravager > Bot2
+? Exile.Count = 1
+? Bot1.Graveyard.Count = 4
+Bot1.Accept
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot1.Battlefield = Mountain; Mountain; Mountain; Mountain; Anje's Ravager; Anje's Ravager
+Bot1.Hand.Count = 3

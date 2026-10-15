@@ -1,0 +1,28 @@
+# Disenchant targets an artifact or enchantment: Bot2's Mox Ruby is destroyed on Bot1's second turn, and the two
+# Plains that paid for it are tapped.
+
+[Bot1 Deck]
+Plains
+Plains
+Disenchant
+Plains x30
+
+[Bot2 Deck]
+Mox Ruby
+Island x30
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Disenchant.Cast(Bot2.Battlefield.Mox Ruby)
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Graveyard = Disenchant
+Bot2.Graveyard = Mox Ruby
+Bot2.Battlefield.Count = 0

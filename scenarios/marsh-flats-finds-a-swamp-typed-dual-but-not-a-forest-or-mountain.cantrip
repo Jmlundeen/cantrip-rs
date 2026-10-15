@@ -1,0 +1,25 @@
+# "A Plains or Swamp card" is by subtype: Bayou (Swamp Forest) is offered; a Forest and a Mountain are not.
+
+[Bot1 Deck]
+Marsh Flats
+Island x6
+Forest
+Mountain
+Bayou
+Plains
+Island x8
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Marsh Flats.Play
+Bot1.Battlefield.Marsh Flats.Activate
+! Bot1.Search(Forest)
+! Bot1.Search(Mountain)
+Bot1.Search(Bayou)
+
+[Expect]
+Bot1.Life = 19
+Bot1.Battlefield = Bayou
+Bot1.Battlefield.Bayou.Tapped = false

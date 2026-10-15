@@ -1,0 +1,36 @@
+# "Any target" includes a planeswalker, and damage dealt to one removes that many loyalty counters (CR 120.3c): Fireblast
+# for its alternative cost kills Bot2's Dack Fayden (loyalty 3), and Bot2's life total is untouched.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Fireblast
+Mountain x4
+Mountain x10
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Dack Fayden
+Island x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Dack Fayden.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Fireblast.Cast(Bot2.Battlefield.Dack Fayden; Ability: Sacrifice)
+Bot1.Choose(Mountain; Mountain)
+
+[Expect]
+Bot2.Graveyard = Dack Fayden
+Bot2.Life = 20
+Bot1.Battlefield.Count = 0

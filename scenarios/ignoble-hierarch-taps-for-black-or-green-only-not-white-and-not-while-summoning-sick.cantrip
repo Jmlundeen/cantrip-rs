@@ -1,0 +1,30 @@
+# Ignoble Hierarch's "{T}: Add {B}, {R}, or {G}": it cannot tap the turn it comes under Bot1's control (summoning sickness,
+# CR 302.6; the refusal on turn 1, with the control on turn 3), and white and blue are not among its colors (refusals on
+# turn 3, beside the {B} it does make). On turn 5 it makes {G}; the red case is the other scenario.
+
+[Bot1 Deck]
+Forest
+Ignoble Hierarch
+Forest x5
+Forest x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Ignoble Hierarch.Cast
+! Bot1.Battlefield.Ignoble Hierarch.Activate
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Ignoble Hierarch.Activate(Color: White)
+! Bot1.Battlefield.Ignoble Hierarch.Activate(Color: Blue)
+Bot1.Battlefield.Ignoble Hierarch.Activate(Color: Black)
+? Bot1.Mana = {B}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Ignoble Hierarch.Activate(Color: Green)
+? Bot1.Mana = {G}
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Ignoble Hierarch.Tapped = true

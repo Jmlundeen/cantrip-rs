@@ -1,0 +1,53 @@
+# Phantasmal Image enters as a copy (CR 707.9, 614.1c) of Flametongue Kavu, so it has the Kavu's "when this creature
+# enters" ability and that triggers (CR 603.6a): the Image's 4 damage kills Bot2's second Ornithopter, the first having
+# died to the real Kavu a moment before. The Image does not target itself, so its "sacrifice when targeted" never fires and it
+# stays on the battlefield as a 4/2 Illusion Kavu.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Flametongue Kavu
+Phantasmal Image
+Mox Sapphire
+Mox Jet
+Mountain
+Mountain x12
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Island x14
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Flametongue Kavu.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Phantasmal Image.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Target(Flametongue Kavu)
+Bot1.Target(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Count = 0
+Bot2.Graveyard = Ornithopter; Ornithopter
+Bot1.Battlefield.Flametongue Kavu#2.Subtypes = Illusion; Kavu
+Bot1.Battlefield.Flametongue Kavu#1.Subtypes = Kavu

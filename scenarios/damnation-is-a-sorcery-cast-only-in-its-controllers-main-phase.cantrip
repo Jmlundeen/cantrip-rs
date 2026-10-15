@@ -1,0 +1,34 @@
+# Damnation is a sorcery (CR 307.1, 117.1a): Bot2 holding it is never offered it in Bot1's turn, nor in its own upkeep,
+# and is offered it in its own main phase with the stack empty, where it destroys Bot1's Ornithopter.
+
+[Bot1 Deck]
+Ornithopter
+Island x6
+Island x10
+
+[Bot2 Deck]
+Black Lotus
+Mox Pearl
+Damnation
+Swamp x4
+Swamp x10
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+! Bot2.Hand.Damnation.Cast
+[T2 Bot2.Upkeep]
+! Bot2.Hand.Damnation.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Damnation.Cast
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Ornithopter
+Bot2.Graveyard = Damnation; Black Lotus

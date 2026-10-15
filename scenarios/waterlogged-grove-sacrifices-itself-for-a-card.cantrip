@@ -1,0 +1,23 @@
+# Waterlogged Grove: {1}, {T}, sacrifice it: draw a card. A Mox Ruby pays the {1}.
+
+[Bot1 Deck]
+Waterlogged Grove
+Mox Ruby
+Island x5
+Island x10
+
+[Bot2 Deck]
+Swamp x15
+
+[Actions]
+Bot1.Hand.Waterlogged Grove.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Waterlogged Grove.Activate(Ability: Draw)
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Life = 20
+Bot1.Graveyard = Waterlogged Grove
+Bot1.Hand.Count = 6

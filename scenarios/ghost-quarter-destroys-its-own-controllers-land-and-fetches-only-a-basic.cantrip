@@ -1,0 +1,29 @@
+# Ghost Quarter: "target land" is any land, so Bot1 may destroy its own nonbasic Tundra; its controller (Bot1) then
+# fetches. The search is for "a basic land card": a Plains is found, while the Tundra still in the library (a nonbasic
+# land with basic land types) may not be (`! Bot1.Search(Tundra)`). The new land enters untapped.
+
+[Bot1 Deck]
+Ghost Quarter
+Tundra
+Island x5
+Island x2
+Tundra
+Plains
+Island x10
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Ghost Quarter.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Tundra.Play
+Bot1.Battlefield.Ghost Quarter.Activate(Ability: Destroy; Bot1.Battlefield.Tundra)
+Bot1.Accept
+! Bot1.Search(Tundra)
+Bot1.Search(Plains)
+
+[Expect]
+Bot1.Graveyard = Tundra; Ghost Quarter
+Bot1.Battlefield = Plains
+Bot1.Battlefield.Plains.Tapped = false

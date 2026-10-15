@@ -1,0 +1,8 @@
+{
+  "name": "Squee, Goblin Nabob",
+  "manaCost": "{2}{R}",
+  "type": "Legendary Creature — Goblin",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "At the beginning of your upkeep, you may return this card from your graveyard to your hand."
+}

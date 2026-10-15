@@ -1,0 +1,26 @@
+# "Search your library for an Island card": the type, not the name (CR 205.3i). Tropical Island (Forest Island) qualifies and
+# the library's Plains does not (refusal); the positive control is taking the Tropical Island in the same search.
+
+[Bot1 Deck]
+Plains
+Lórien Revealed
+Plains x5
+Plains
+Tropical Island
+Island
+Plains x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Lórien Revealed.Activate(Ability: Islandcycling)
+! Bot1.Search(Plains)
+Bot1.Search(Tropical Island)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Lórien Revealed
+Bot1.Hand = Plains; Plains; Plains; Plains; Plains; Tropical Island

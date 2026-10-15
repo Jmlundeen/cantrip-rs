@@ -1,0 +1,35 @@
+# The chosen player is chosen freely: Bot1 chooses itself, so it is Bot1 who has no way to target its Nemesis, and Bot2's Bolt
+# does target and kill the 1/1 Nemesis (it has protection from Bot1 only).
+
+[Bot1 Deck]
+Island
+Black Lotus
+True-Name Nemesis
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.True-Name Nemesis.Cast
+Bot1.Pass
+Bot1.ChoosePlayer(Bot1)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.True-Name Nemesis)
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = True-Name Nemesis; Black Lotus

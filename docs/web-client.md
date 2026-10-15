@@ -1,0 +1,297 @@
+# Web client
+
+The client, in `dotnet/src/Cantrip.Client.Web`: Uno Platform on WebAssembly, drawing with Skia, in the browser. It plays
+through `Cantrip.Client` and `Cantrip.Protocol` against `Cantrip.Server.Host` over WebSocket, and takes what a card
+offers, when to pass, how the log is set out and the canned prompt positions from `Cantrip.Client.Presentation`. None
+of the three can reach the rules, a dataset or the server; `PresentationBoundaryTests` and `DependencyClosureTests`
+hold them to it.
+
+## Running it
+
+`tools\play-game.cmd` is the quickest way to play: a server, the web client, a browser tab per person
+(`?seat=N&name=...`) and a bot or a language model for each other seat (`dotnet\tools\Cantrip.Bot`). By hand:
+
+```
+dotnet run --project dotnet\src\Cantrip.Server.Host -- --port 7777 --players 2 --auto-start --deck demo/3-green-red --deck demo/4-red-black
+dotnet run --project dotnet\src\Cantrip.Client.Web -f net10.0-browserwasm
+```
+
+Then open the app URL it prints. The page takes `?server=ws://host:port/game`; without it, the page's own host and
+port 7777. Where card art is, the table says (`TableMessage.Art`, from `GameServerOptions.Art`), so a page finds it
+however it got to the table - a link, a move to another table, a ticket opened on another computer. Only when the table
+says nothing - a prompt fixture, a host not told - does the page go by its own `?art=...`, and failing that the art
+service on the port after the table's. It is in `Cantrip.sln` and builds with it;
+the first WebAssembly build downloads Emscripten through the Uno SDK.
+
+A reload resumes the tab's seat: the membership proof is kept in `sessionStorage` and sent back with `Resume`. A
+connection lost mid-game is resumed with five tries, two seconds apart, said in a line over the board. Either way the
+server sends the whole game log again (see the log below), so nothing that happened while the page was away is missing
+from it.
+
+A seat ticket from a host such as the Discord bot comes after the hash, `#ticket=...`, where no request and no log
+ever holds it, or in the query as `?ticket=...`. It is a bearer credential, so `Ticket.js` takes it out of the address
+bar as the page loads, and a reload resumes from the membership it bought.
+
+## The shipping build
+
+`tools\play-release-build.cmd` plays a game in the Release build - compiled ahead of time to WebAssembly, which starts the
+table about ten times sooner than the interpreted dev build. It publishes the build when it is out of date, serves it
+on `http://localhost:5100` with its compressed files through `dotnet\tools\Cantrip.WebHost`, starts a server with the
+playtest deck (`demo/card-test`) for both seats and a bot in seat 2, and opens seat 1 in the browser. It needs the
+`wasm-tools` workload. The publish is incremental: the ahead-of-time compiler recompiles only the assemblies that
+changed and keeps the rest in `obj\Release`, but the app is linked again every time, so a change to the client costs
+about four minutes and an unchanged tree seconds. `-Fast` publishes without ahead-of-time compiling, to its own
+folder, for a quick look at a UI change in a Release build; `-NoBuild` plays on the last publish. It compresses with
+gzip only: brotli is a quarter smaller but took two minutes of every publish.
+
+Measured on an 887-card library search: the table is drawn two seconds after the page opens, and no stall is longer
+than about 80 ms. The download is about 114 MB as published, most of it the ahead-of-time runtime (67 MB, 11 MB
+with brotli). `WebClientFiles` (in `Cantrip.Server.Host`) sends the compressed copies to any browser that takes them;
+it is what the Discord bot serves its players with, and `Cantrip.WebHost` too.
+
+## Card art
+
+`Cantrip.Server.Host` serves art beside the table (`--art-port`, default the table's port plus one; `0` serves none)
+at `/art/{size}/{slug}.webp`, `size` one of 128, 256, 512, 1024 on the longest side. `dotnet/src/Cantrip.Art` finds the
+source in `content/*/images` by slug, resizes it once, and keeps it on disk (`--art-cache`, default
+`%LOCALAPPDATA%\Cantrip\art-cache`) laid out as `{size}/{slug}.webp`. Answers carry `Cache-Control` (a week), an
+`ETag`, and `Access-Control-Allow-Origin: *`. `--art-log` prints one line per request.
+
+Who illustrated each picture is `content/<dataset>/artists.json`, slug to artist (`tools/maintenance/art-credits.py`
+fills in the original printing's artist for art that has none). The art service merges the datasets' into the cache
+folder as `artists.json`, beside the sizes, and serves it at `/art/artists.json`; the client fetches it once and prints
+the credit, after the Mana font's artist's brush, at the foot of the card. The credit goes with the art, not the card,
+so a copy credits the art it shows; a status word (MONSTROUS and the like) takes its place while there is one.
+
+A creature that arrived this turn wears the Mana font's summoning sickness mark over its art, and its tooltip says
+"Entered this turn." The mark is not on the face, which is the same before and after: each battlefield row has a layer
+of its own laid over it (`ArrivalsElement`), between the row and its piles' counts, that draws only the marks - rising
+and falling slowly with Animate cards on, still without it - each cut away where another card stands over its own. So
+the marks move every frame and the row, and every face on it, is drawn only when it changes.
+
+The client asks for the smallest size covering the pixels it draws, holds decoded pictures for the session, fetches
+each card once however many copies are on screen, and leaves repeat loads to the browser's HTTP cache.
+
+To move art to a CDN or a static bucket, copy the cache folder (or put the CDN in front of the art service as its
+origin) and tell the tables, which tell their clients: `--art https://cdn.example/art/{size}/{slug}.webp` for the
+Discord bot, `GameServerOptions.Art` for any other host.
+
+## Looking at a position, and testing
+
+`?prompt=NAME` in the page shows one canned prompt dock instead of a game (`PromptFixtures`), and the address's
+fragment changes it without a reload.
+
+A scenario that stops at `[Handover BotN.Verb]` used to be servable to the web client to look at, played by the C#
+engine; that went with the engine. The scenarios are the engine's corpus (`scenarios/`, run by `cantrip-script`);
+serving one to the browser from the Rust engine is not built yet.
+
+The table is drawn on canvases, so there is no DOM to find a card or a button in. `&test` in the page's query makes it
+publish its state as JSON on `globalThis.cantripTest`, ten times a second (`MainPage.Test.cs`):
+
+- `ready`, `busy` and `doing` - whether the table is up, and whether it is still settling: `art` on its way, `faces`
+  being made, `flights` of cards in the air, `slides` of cards along a row or turning as they tap, a `redraw` pending.
+- `flown` - how many cards have flown since the page opened, for a test to see that a move was animated.
+- `effects` - the latest abilities shown resolving, newest last: the `feeling` of each (`Good`, `Bad` or `Neutral`),
+  whether its source was `lit`, and each of its `arrows` by what it points `to` (a card's name, or `player N`) and its
+  own `feeling`. `doing` says `effects` while one is being shown.
+- `log` - `lines`, how many lines the game log has, and `shown`, how many of them are made as controls: only the
+  lines in and around view are, however long the game.
+- `over`, `outcome`, `prompt` (the question's message type), `fixture` (the prompt dock shown, under `?prompt`) and
+  `answered` (the last answer that dock sent, which nothing receives: its kind and any modes chosen).
+- `cards` - every card drawn, by `name` (empty for one this seat may not see), whether it is `visible` in its row, the
+  middle `x`, `y` and size `w`, `h` of its box on the page, and for a card wearing a share of a division - combat damage, or a divided spell's damage or counters - the `lower`
+  and `raise` steps beside it.
+- `controls` - every `button`, `toggle`, `dropdown` (by its caption), `textbox` (by its placeholder) and `item` (a row
+  of an open menu or list), by its `label`, with its box.
+
+So Playwright can picture the page and click by name with real mouse events, going through the same hit testing a
+person's clicks do. `&auto` makes the page play its own seat, the one deterministic way or at random from
+`&bot-seed=N`, for watching a whole game; `&bot=tactical` plays it as the tactical bot does.
+
+`&bots=2` makes the page play another seat as well as its own - `&bots=2,3,4` several, `&bot-tickets=a,b` seats
+claimed by ticket - each over a connection of its own and answered in the browser by the tactical bot
+(`MainPage.Bots.cs`, `docs/tactical-bot.md`). This one is a player feature: it is how an opponent is played on the
+machine of whoever wanted one. `tools\play-vs-bot.cmd` opens such a page.
+
+The web client's tests are Playwright, in `dotnet\tests\Cantrip.Client.Web.Tests`. They run on the wall clock, so plain
+`tools\test.cmd` leaves them out: `test.cmd /all` runs them with everything else, or `/filter` just them. They serve the client's Debug build, launch the installed Chrome or Edge (Playwright's own
+Chromium otherwise), and host the server or scenario in the test process. `TablePage` is the driver: settled, card by
+name, damage steps, holding a card up, controls, drop-downs, pictures. Between them they play one whole game and another against a bot the page plays itself, draw
+every prompt dock, open every scenario that hands over a position, take a seat by a Discord-style ticket, and work a
+few positions by hand. Pictures go under `TestResults\web`, one folder per test class. `CANTRIP_WEB_HEADED=1` shows
+the browser, to watch them.
+
+## Drafts and deck building
+
+A table formed from a queue is a page of its own before the draft (`LobbyPanel`): each seat, taken or "Waiting for a
+player...", **Leave Table**, and once every seat is taken **Ready!** with the seconds left to press it and who is
+ready. A seat given up - left, or not ready in time - says so and is forgotten, so a reload does not try to take it
+back; a seat moved to another table loads that table with its new ticket (`TableMove`, `Ticket.js`). The test state's
+`phase` is `Forming` and `Released` for these.
+
+An event's table shows a screen of its own before the cards are dealt (`MainPage.Event.cs`), over the table and under
+a card held up to read, so every card on it is read as one on the table is. While players take their seats the lobby
+says who is here. The draft shows the piles face down with their sizes and the stack, the pile being looked at lit,
+and what each player has done, and on this seat's turn the pile face up with **Take pile N** and **Pass**.
+
+Below it, and as the whole of deck building, is the pool in columns (`MainPage.Pool.cs`): lands, then mana value 0, 1,
+2 and so on to 7+, with a sideboard that pulls out on the left ("Show sideboard" / "Hide sideboard"). Cards are dragged
+between columns and into or out of the sideboard - which takes a drop while tucked away, lit as the card is held over
+it - and a double-click moves a card between main deck and sideboard. A card carried off is gone from its column
+until it is put down, goes in among the others by its own top edge against theirs (where it is seen to be, not where
+the pointer is), and flies from where it was let go. The heading counts the pool, or the deck, as
+"Your pool: 41 cards (7 Land, 34 Non-land, 19 Creatures)", with a card-size slider beside it, kept in localStorage.
+Which column a card is in is the page's alone and starts again on a reload; what is in the sideboard is sent as it
+changes once decks are built, and a sideboard made during the draft becomes the deck's starting one. Each card keeps
+one handle from the pile it is drafted from to its column, so a pile taken flies into place, a card taken blind flies
+from the stack, and a card moved along the columns slides. While building, every basic land added is a card of its own at the foot of
+the lands column; each has a minus and a plus beside the columns (published to tests as "Remove Forest" and "Add Forest"),
+and **Submit deck** is enabled at the event's minimum. `?auto` drafts and builds too (`DraftPlay`), and the test
+state's `phase` says which screen is up. `DraftTests` plays a draft through to the deal against a bot, pictured.
+
+A booster draft (`format` "booster") shows the table from above instead of the piles (`DraftTableElement`): an oval
+with every player in their seat - this one at the bottom, so passing left goes off to its left - the packs waiting in
+front of each as a little stack with the count on it, amber once three or more pile up, and arrows round the table the
+way packs are going, which turns for pack 2. The pack in front of this seat is laid out in rows below it: a click
+chooses a card (lit) and **Pick _name_** takes it, or a double-click takes it at once; a pack's last card is shown
+on its two-second clock and then flies into the pool. The clock on the pick counts down beside the status ("0:42 to pick"), red in its last ten seconds, and the
+seat's own picks so far are listed. Deck building after a booster draft, and sideboarding between the games of a match
+(titled "Sideboarding for game 2: you lead 1-0"), are the same columns with the clock under **Submit deck**: the deck as
+it stands is submitted when it runs out.
+
+A grid draft (`format` "grid") shows its grid face up to both seats (`MainPage.Event.cs`), the cards at the pack
+slider's size, a place already taken left empty. A button over each column and beside each row - named "Column 2",
+"Row 1" for a test - chooses that line on this seat's pick, lighting its cards, and **Take row 1 (3 cards)** takes it;
+only Take takes. A line with nothing left in it cannot be chosen. Everything said about the draft is in one column
+beside the grid, so the grid has the window's height: the event and which grid, what each seat has drafted, whose pick
+it is and its clock, Take, what each player took ("Bot took column 2 of grid 1: ...") and the card size slider. The
+taken cards fly into the pool. The other player's pick is shown being made: for a moment the grid it was taken from
+stays up with that line lit ("Bot takes column 2."), from `DraftMessage.LastLine`, before the grid as it now is. The
+test state names the grid's cards' row "grid". `DraftTests` drafts a grid draft of three grids against a bot through the page's buttons.
+
+In a match's games each player's box shows their match clock large in the room beside their name and life ("24:13"),
+counted down here between the server's word on it (`ClockMessage`): lit while it runs - the game is waiting on that
+player. In its last five minutes it is red, and the PRIORITY badge with it: a medium red, pulsing from dark red to pure
+red once a second while the clock runs.
+
+Between rounds the event's table shows the pairings (`MainPage.Pairings.cs`, phase `Pairings`): every match of the
+round with its table, both players, the games each has won and how it stands ("Game 2 is being played", "Ann won
+2-1"), this seat's lit; "Round 2 begins in 0:42" once the round's last match is over; and the standings with points,
+record and the three tiebreakers. A player comes back here after their match and watches the rest finish; at the end it
+is the final standings. **Drop**, in the header's corner, asks again before it sends `DropMessage`; it is gone once the
+seat has dropped or the event is over. Every move between the pod's table and a game's table is a `TableMove`, so each game is a fresh
+page. The test state has `pairings` (round, final, starts-in, each match in words). `BoosterDraftTests` drafts seat 1
+against seven bots - pick, deck building, pairings - and pictures a pod played out by bots at its final standings.
+
+## An ability resolving
+
+When an activated or triggered ability resolves (`ResolutionEffectsElement`, `MainPage.Resolutions.cs`), its source
+lights up for a moment - a border that flares in with a light running once round it and a ring going out, as a picked
+card's does - and an arrow, drawn as the stack's target arrows are, grows from it to each other card or player it
+touched, strikes it with a flash, and draws itself in. Red is harm (damage, life lost, -1/-1 counters, power or
+toughness lowered, a permanent destroyed, exiled or sacrificed), green is help (life gained, +1/+1 counters, power or
+toughness raised, a token made), and gold is anything else, or both. The source takes the colour of everything it
+did together. What it did is read from the events the server says it made: `AbilityResolvedEvent` names the first
+of them, and carries its targets and the creatures whose power or toughness it changed, since an effect that lasts is
+no event of its own. A token made points at the token, so a targeted player who was only given tokens - Generous
+Plunderer's opponent - is pointed at through them. Nothing in the client knows a card.
+
+The table is held as it was until the arrows have struck, so a creature the ability kills is struck and then dies,
+rather than leaving before the arrow reaches it. Abilities resolving together are shown one after another. A source
+gone from the table - a creature whose dying it was - is not lit, and its arrows set off from where the ability was on
+the stack. A reload's whole log again shows nothing, and the Animate cards setting turns it off.
+
+## Declaring attackers and blockers
+
+Creatures are declared by picking them up and then clicking what they go at (`MainPage.Selection.cs`,
+`PromptSelection.Pending`). Where a creature has only one thing to attack - one opponent, no planeswalker or battle - a
+click on it attacks and a second takes it back, as ever. Where some creature has a choice, a click on one picks it up
+(lit, as a chosen card is), more clicks add to them, and the things they may attack light green: the opposing player's box,
+each planeswalker and battle. A click on one declares every creature picked up that may attack it, so the dock's "Attack
+with N" counts them; a creature already declared comes back with a click. Blockers work the same way against the attackers.
+Pairs the server would refuse (a flier against a creature without reach) are left out of what is sent and the attacker is
+dimmed when none of the creatures picked up may block it.
+
+A press on an empty part of a battlefield row and a drag draws a rectangle (`SelectionOverlayElement`), and letting go
+picks up every creature that may be declared whose card it touches - sent at once where there is only one thing to
+attack. A press that lands on anything else on the battlefield or in the hand puts everything down, as the dock's
+**Cancel** (shown while any creature is picked up) and its hotkey do. A red arrow runs from each creature picked up to the
+pointer; once they are sent, the arrows run on to the edge of what they were sent at and draw themselves in. The test
+state's `selected` is how many creatures are picked up, and `arrows` is in `doing` while those are being drawn in.
+`CombatSelectionTests` works both through the prompt fixtures.
+
+## How faces reach the screen
+
+A face is recorded, not rasterized (`Faces.cs`). `CardFace.Draw` is played into an `SKPicture`, which keeps the
+operations - the art, the frame, each run of text where the layout put it - and not their pixels. Laying a face out
+(fitting the name, wrapping the rules) is what costs, and it is done once per look and size and kept (`FaceCache`);
+the pixels are the GPU's. Uno records every `SKCanvasElement` into a picture of its own and plays that onto a WebGL
+surface each frame, so a face drawn with `DrawPicture` is rasterized there, at the size and angle it is shown: sharp
+tapped, scaled or held up, with nothing to make again for a new size. Frames are the full 1005 by 1407 bitmaps,
+mipmapped once by the GPU, and a two-colour blend is a shader on the second frame rather than a layer.
+
+Only under Uno's software renderer - a browser with no WebGL - is a recording rasterized once, at twice its size, and
+kept as that image, since replaying every face's operations on the CPU each frame would cost more than the layout.
+
+Measured in the Release build against the image-per-face drawing it replaced, on `mystical-tutor-hands-over-a-search-of-a-long-library`:
+a face takes 1.7 ms to make rather than 11.4, and the faces kept take 138 KB rather than 30 MB. Hovering over a
+crowded board is as smooth as before, and tapping seven permanents in a row no longer stalls a frame past 33 ms.
+
+Card faces are laid out from `content/res/templates/retro.json` at the card's own width, with its rounding and
+smallest sizes, so thumbnails clip and drop lines rather than shrink their text past reading. Abilities stand
+`paragraphGap` line heights further apart than lines do. Rules text keeps the regular `rulesInset` margin unless that
+would cost it a size, and then takes the `tightRulesInset` one, as a crowded printed text box does.
+
+A planeswalker's loyalty abilities carry their cost on the mana font's loyalty shields (up, down and zero), centred on
+the text box's left edge (`loyaltyCentreX`, `loyaltyWidth`) and on the ability's lines, nudged a little towards the
+point so the square body is what centres; the abilities share the box out evenly with a separator between them, and
+the loyalty the planeswalker has is on the start shield. The tooltip draws the same shields, light on its dark panel.
+
+A split card is drawn as it is printed: its halves (`ObjectView.Halves`, sent everywhere but the stack) stand side by
+side along its length, turned a quarter turn, and a close look turns it back to read them upright. Each half is a card
+as tall as the card is wide, cut down from the template rather than shrunk (`splitHalf` in the template): bands are
+taken out of the frame's middle and the seams cross-faded, so the border, the name and the mana cost are the size a
+whole card's are at that size, and the halves overlap by one outer border. Each half's art is its own, under its own
+name (`leave`, `chance`). On the stack the card is the half that was cast and is drawn as a whole card of its own.
+
+A token of its own - a Food, a Clue, a Treasure, a 2/2 Goblin Shaman - is kitbashed the same way (`token` in the
+template): the frame's rows are laid down again as stretches, a stretch of the art box's twice and a stretch of the rules
+box's not at all, so the rules box is half as tall and the art box takes the room. A token that copies a card reads as
+the card does, frame and all (`named-tokens-hand-over-beside-token-copies` shows both).
+
+A Saga (a card with the subtype) is drawn from the template's `saga` section, on its own frames (`saga_<color>`,
+`saga_gold`, `saga_land`, and two colours blended as any card's are): the chapters down a panel on the left beside a
+tall illustration, the type line at the foot. Its reminder text is the one a face prints, in italics at the top of the
+chapter list, since the chapters do not read without it; each chapter follows beside its badges on the ribbon
+(`content/res/icons/saga_chapter.png`, one for each number, so "II, III" carries two), with
+`content/res/icons/separator.png` under the reminder and between chapters. A Saga whose colour has no saga frame is
+drawn as any other card. `four-sagas-hand-over-with-their-chapters-under-way` is a board of them to look at.
+
+A Class is drawn from the template's `class` section the same way, on the Saga frames turned over left to right
+(`mirrored`), so its levels run down the right beside the art. Each level is a section headed by the cost to gain it
+("{1}{U}: Level 2", in the title face), which is all that marks it - a level has no badge on the ribbon; the abilities
+before the first level line are level 1. On the battlefield the levels above the one the Class has (level 1 when it has none, CR 716.2d) are drawn
+spent. `two-classes-hand-over-one-of-them-at-level-two` is a board of two.
+
+## The game log
+
+The log is the server's, not the client's. `PlayerLog` (in `Cantrip.Server`) keeps one list of lines for the whole
+table, each tagged with the seats that read it, and `LogWriter` (in `Cantrip.Projection`) words each event for each
+seat from the view and events that seat is sent, as they are sent: "You draw [Island]." to one seat, "Bot 1 draws a
+card." to the other. A line both seats read the same way is one line. New lines go out in a `LogMessage` as they are
+written; a seat that joins, reloads or reconnects is sent the whole log again, so it is complete however long the
+client was away. Each line carries the event sequence it came from, the turn, whose turn and the step, and a reference
+to each object it names, by the handle that seat's view gave it, for pointing at the thing while it is still on the
+table. A retraction - a mana ability taken back - removes lines by number. Clients only set the lines out under turn
+and step headings (`GameJournal`); the game-over panel reads its "why" from the log's loss lines.
+
+The log is the first of the side panel's tabs (`SidePanel`): **Game log**, **Settings**, and **Menu**
+(`GameMenuPanel`), which holds **Concede**. Conceding asks again before it sends `ConcedeMessage`, and is only offered
+when it would end the game - every other player still in is of one team - since a multiplayer game going on without the
+player (CR 800.4a) is not supported yet (`GameEngine.CanConcede`). The test state names each tab as a control of kind
+`tab`.
+
+## Open
+
+- The emblem pile beside a player's graveyard.
+- Concede, rematch, spectating, sound, and more than one opponent drawn.

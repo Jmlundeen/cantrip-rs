@@ -1,0 +1,42 @@
+# Choose one or more (CR 700.2): all three modes, so the escalate cost, discard a card, is paid twice (CR 702.120a). Bot1 discards
+# Demonic Tutor and Mountain as it casts, then: Bot2 reveals its hand and Bot1 takes the Lightning Bolt from it, Bot2's
+# Llanowar Elves gets -2/-2 and dies, and Bot2 loses 2 life while Bot1 gains 2. Bot2's Forest is the only card left in its hand.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Collective Brutality
+Demonic Tutor
+Mountain
+Swamp x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Lightning Bolt
+Forest x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Collective Brutality.Cast
+Bot1.Modes(1; 2; 3)
+Bot1.Target(Bot2)
+Bot1.Target(Llanowar Elves)
+Bot1.Target(Bot2)
+Bot1.Choose(Demonic Tutor; Mountain)
+Bot1.Choose(Lightning Bolt)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Collective Brutality; Mountain; Demonic Tutor
+Bot1.Life = 22
+Bot2.Life = 18
+Bot2.Graveyard = Llanowar Elves; Lightning Bolt

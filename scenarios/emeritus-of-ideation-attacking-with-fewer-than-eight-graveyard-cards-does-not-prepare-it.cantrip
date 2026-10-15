@@ -1,0 +1,46 @@
+# Emeritus of Ideation: "you may exile eight cards from your graveyard" can only be done with eight to exile. Bot1 casts a Brain Freeze on itself (milling three, storm zero) and then the
+# prepared Ancestral Recall copy, so its graveyard holds five cards (the
+# Black Lotus, the Brain Freeze and the three milled); attacking offers nothing, and the Emeritus stays unprepared with
+# nothing exiled. The positive control is the neighbouring scenario, which attacks with twelve cards.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Black Lotus
+Mox Emerald
+Emeritus of Ideation
+Brain Freeze
+Island x30
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Emeritus of Ideation.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Brain Freeze.Cast(Bot1)
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Exile.Ancestral Recall.Cast(Bot1)
+Bot1.Pass
+Bot1.Attack(Emeritus of Ideation > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Emeritus of Ideation.Prepared = (absent)
+Exile.Count = 0
+Bot1.Graveyard.Count = 5

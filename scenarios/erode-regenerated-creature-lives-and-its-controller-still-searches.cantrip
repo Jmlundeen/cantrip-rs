@@ -1,0 +1,43 @@
+# Erode: the search is not conditional on the destruction ("Destroy target creature or planeswalker. Its controller may
+# search..."). Bot2 regenerates its Llanowar Elves with Yavimaya Hollow in response: the Elves are tapped and stay, and
+# Bot2 is still asked and fetches a Swamp, tapped.
+
+[Bot1 Deck]
+Plains
+Erode
+Plains x5
+Plains x13
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Yavimaya Hollow
+Forest x4
+Forest x3
+Swamp
+Forest x9
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Yavimaya Hollow.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Erode.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Yavimaya Hollow.Activate(Bot2.Battlefield.Llanowar Elves; Ability: Regenerate)
+Bot2.Accept
+Bot2.Search(Swamp)
+
+[Expect]
+Turn = 5
+Bot1.Graveyard = Erode
+Bot2.Battlefield = Forest; Llanowar Elves; Yavimaya Hollow; Swamp
+Bot2.Battlefield.Llanowar Elves.Tapped = true
+Bot2.Battlefield.Swamp.Tapped = true
+Bot2.Graveyard.Count = 0

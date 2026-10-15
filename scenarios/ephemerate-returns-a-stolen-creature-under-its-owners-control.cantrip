@@ -1,0 +1,30 @@
+# "Return it to the battlefield under its owner's control": Bot1 steals Bot2's Ornithopter with a kicked Thieving Skydiver (X = 1, mana value 0 or less)
+# and blinks it with Ephemerate. The Ornithopter comes back as a new object (CR 400.7) under Bot2's control, its owner's, and the steal is over.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Thieving Skydiver
+Ephemerate
+Plains x3
+Plains x12
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Thieving Skydiver.Cast(Kicked: 1)
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Ephemerate.Cast(Bot1.Battlefield.Ornithopter)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Ornithopter
+Bot1.Battlefield = Plains; Thieving Skydiver

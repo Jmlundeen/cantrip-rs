@@ -1,0 +1,24 @@
+# "If ONE OR MORE +1/+1 counters would be put": Walking Ballista cast for X=0 would enter with no counters, so there
+# is nothing to replace, it stays a 0/0 and is put into the graveyard as a state-based action (CR 704.5f).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Michelangelo, Weirdness to 11
+Walking Ballista
+Forest
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Forest x17
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Michelangelo, Weirdness to 11.Cast
+Bot1.Hand.Walking Ballista.Cast(X: 0)
+
+[Expect]
+Bot1.Graveyard = Walking Ballista; Black Lotus

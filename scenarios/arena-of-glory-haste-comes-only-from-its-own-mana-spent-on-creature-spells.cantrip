@@ -1,0 +1,37 @@
+# "If that mana is spent on a creature spell, it gains haste until end of turn" (CR 106.6). The Arena's {R}{R} pays
+# a Lightning Bolt for one (a noncreature spell: nothing to gain), then one Orcish Lumberjack is cast with a Mountain's plain
+# {R} (`Spend: R`) and a second with the Arena's remaining hasty {R}. Only the second has haste: the plain mana grants
+# none, and the Bolt's use of the Arena's mana did not either.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Arena of Glory
+Lightning Bolt
+Orcish Lumberjack
+Orcish Lumberjack
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Arena of Glory.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Arena of Glory.Activate(Ability: Exert)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Orcish Lumberjack.Cast(Spend: R)
+Bot1.Hand.Orcish Lumberjack.Cast
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot2.Life = 17
+Bot1.Battlefield.Orcish Lumberjack#1.SummoningSick = true
+Bot1.Battlefield.Orcish Lumberjack#2.SummoningSick = false

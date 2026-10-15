@@ -1,0 +1,44 @@
+# Boseiju, Who Endures, channel: "target artifact, enchantment, or nonbasic land an opponent controls". Refusals, each
+# beside the positive control that closes the scenario: with only Bot1's own Mox Ruby and Mox Emerald out the ability is
+# not offered (nothing of an opponent's); with Bot2's basic Island added it is still not offered (a basic land is not a
+# legal target); once Bot2 has a Mox Jet it is offered and destroys it.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Boseiju, Who Endures
+Island x4
+Island x10
+
+[Bot2 Deck]
+Island
+Mox Jet
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+! Bot1.Hand.Boseiju, Who Endures.Activate
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+! Bot1.Hand.Boseiju, Who Endures.Activate
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Boseiju, Who Endures.Activate(Bot2.Battlefield.Mox Jet)
+Bot1.Pass
+Bot2.Decline
+[Bot1.Main1]
+
+[Expect]
+Turn = 5
+Bot1.Graveyard = Boseiju, Who Endures
+Bot2.Graveyard = Mox Jet
+Bot2.Battlefield = Island
+Bot1.Battlefield = Mox Ruby; Mox Emerald

@@ -1,0 +1,23 @@
+# Bot1 casts Thought Scour on itself with two cards left in its library: both are milled, then the draw is still
+# attempted from the empty library, and Bot1 loses the next time state-based actions are checked (CR 704.5b).
+
+[Bot1 Deck]
+Island
+Thought Scour
+Swamp x5
+Forest
+Mountain
+
+[Bot2 Deck]
+Mountain x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Thought Scour.Cast(Bot1)
+
+[Expect]
+Bot1.Graveyard = Thought Scour; Mountain; Forest
+Bot1.Library.Count = 0
+Bot1.Hand.Count = 5
+Result = Bot2 won

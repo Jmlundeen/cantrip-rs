@@ -1,0 +1,64 @@
+# Arwen, Mortal Queen enters with an indestructible counter (CR 122.1b), so Bot2's Lightning Bolt on turn 2 leaves her
+# on the battlefield with 3 damage marked. On turn 3 Bot1 removes that counter to pay for her ability, targeting the
+# Mother of Runes cast that turn: the Mother gains indestructible until end of turn and gets a +1/+1 counter and a
+# lifelink counter, and so does Arwen. Bot2 holds its second Bolt until the ability has resolved, and the Mother
+# survives it. Arwen, no longer indestructible but now lifelinked, attacks for 3: Bot1 gains 3.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Emerald
+Arwen, Mortal Queen
+Mother of Runes
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Island x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Arwen, Mortal Queen.Cast
+Bot2.Hand.Mountain.Play
+? Bot1.Battlefield.Arwen, Mortal Queen.Counters.Indestructible = 1
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Arwen, Mortal Queen)
+[T2 Bot2.Main2]
+? Bot1.Battlefield.Arwen, Mortal Queen.Damage = 3
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Mother of Runes.Cast
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Arwen, Mortal Queen.Activate(Mother of Runes)
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Mother of Runes)
+Bot1.Attack(Arwen, Mortal Queen > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Life = 23
+Bot2.Life = 17
+Bot2.Graveyard = Lightning Bolt; Lightning Bolt
+Bot1.Battlefield = Plains; Plains; Mox Pearl; Mox Emerald; Arwen, Mortal Queen; Mother of Runes
+Bot1.Battlefield.Arwen, Mortal Queen.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Arwen, Mortal Queen.Counters.Lifelink = 1
+Bot1.Battlefield.Arwen, Mortal Queen.Keywords = Lifelink
+Bot1.Battlefield.Arwen, Mortal Queen.Power = 3
+Bot1.Battlefield.Mother of Runes.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Mother of Runes.Counters.Lifelink = 1
+Bot1.Battlefield.Mother of Runes.Keywords = Indestructible; Lifelink
+Bot1.Battlefield.Mother of Runes.Damage = 3
+Bot1.Battlefield.Mother of Runes.Power = 2

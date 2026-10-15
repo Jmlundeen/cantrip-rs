@@ -1,0 +1,43 @@
+# Bot1 casts Guerrilla Gorilla into an untapped Mana Leak with three more Forests up, and pays for the Leak by tapping them
+# while it resolves.
+
+[Bot1 Deck]
+Guerrilla Gorilla
+Forest x6
+Forest x10
+
+[Bot2 Deck]
+Mana Leak
+Island x6
+Island x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot2.Hand.Island.Play
+Bot1.Hand.Forest.Play
+Bot2.Hand.Island.Play
+Bot1.Hand.Forest.Play
+Bot2.Hand.Island.Play
+Bot1.Hand.Forest.Play
+Bot2.Hand.Island.Play
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Mana Leak.Cast(Guerrilla Gorilla)
+# Without this pass Bot1 would tap the Forests as soon as it had priority, before Mana Leak resolved.
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.PayCost
+
+[Expect]
+Turn = 9
+Bot1.Battlefield = Forest; Forest; Forest; Forest; Forest; Guerrilla Gorilla
+Bot1.Battlefield.Guerrilla Gorilla.SummoningSick = true
+Bot1.Battlefield.Forest#5.Tapped = true
+Bot1.Mana =
+Bot2.Graveyard = Mana Leak

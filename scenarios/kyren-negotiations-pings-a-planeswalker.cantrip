@@ -1,0 +1,37 @@
+# Kyren Negotiations: "target player or planeswalker" - Bot1 pings Bot2's Narset, Parter of Veils instead of Bot2: Narset
+# goes from 5 loyalty to 4 and Bot2 stays at 20 life.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Black Lotus
+Ornithopter
+Kyren Negotiations
+Forest x10
+
+[Bot2 Deck]
+Black Lotus
+Narset, Parter of Veils
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Narset, Parter of Veils.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Kyren Negotiations.Cast
+Bot1.Battlefield.Kyren Negotiations.Activate(Narset, Parter of Veils)
+Bot1.Choose(Ornithopter)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot2.Battlefield.Narset, Parter of Veils.Counters.Loyalty = 4

@@ -1,0 +1,12 @@
+{
+  "name": "Night Nurse, Healer of Heroes",
+  "manaCost": "{1}{W}",
+  "type": "Legendary Creature — Human Doctor Hero",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "Flash\nLifelink\nWhen Night Nurse enters, choose target permanent card in your graveyard that was put there from anywhere this turn. Return it to your hand.",
+  "keywords": [
+    "Flash",
+    "Lifelink"
+  ]
+}

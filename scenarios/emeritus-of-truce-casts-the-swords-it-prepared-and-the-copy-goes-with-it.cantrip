@@ -1,0 +1,41 @@
+# Emeritus of Truce prepared by an opponent's lead; casting its Swords to Plowshares from exile unprepares it, and Swords exiles the Emeritus (3 life for its controller).
+# Emeritus of Truce is Bot1's only creature, against Bot2's three Ornithopters (Inkling or not).
+
+[Bot1 Deck]
+Plains x3
+Emeritus of Truce
+Plains x16
+
+[Bot2 Deck]
+Ornithopter x3
+Mountain x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Emeritus of Truce.Cast
+Bot1.Target(Bot1)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Emeritus of Truce.Prepared = true
+? Exile = Swords to Plowshares
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Exile.Swords to Plowshares.Cast(Bot1.Battlefield.Emeritus of Truce)
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 23
+Bot1.Battlefield = Plains; Plains; Plains; Plains; Inkling
+Exile = Emeritus of Truce
+Bot1.Graveyard.Count = 0

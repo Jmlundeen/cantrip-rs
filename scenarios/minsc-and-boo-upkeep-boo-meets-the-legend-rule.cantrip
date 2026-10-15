@@ -1,0 +1,37 @@
+# Minsc & Boo: "at the beginning of your upkeep, you may create Boo", a legendary token. With Boo already on the battlefield, a
+# second one is created at the turn-3 upkeep and the legend rule (CR 704.5j) has Bot1 choose one and put the other into the
+# graveyard, where a token ceases to exist: one Boo remains.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Mox Jet
+Mox Pearl
+Minsc & Boo, Timeless Heroes
+Mountain
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Minsc & Boo, Timeless Heroes.Cast
+Bot1.Accept
+[T3 Bot1.Upkeep]
+Bot1.Accept
+Bot1.Choose(Boo)
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Boo.Power = 1
+Bot1.Battlefield.Count = 6

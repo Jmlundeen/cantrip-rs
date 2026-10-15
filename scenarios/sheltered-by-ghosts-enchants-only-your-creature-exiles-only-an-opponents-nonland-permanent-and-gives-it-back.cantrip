@@ -1,0 +1,54 @@
+# "Enchant creature you control" (the Aura is refused at Bot2's Ornithopter) and "exile target nonland permanent an opponent
+# controls" (not Bot2's Plains, not Bot1's own Mox Pearl). Bot1 exiles Bot2's Ornithopter. On turn 4 Bot2's Wrath of God
+# destroys the enchanted Ornithopter, the Aura goes to the graveyard, and the exiled Ornithopter comes back
+# (CR 610.3): it was exiled before the Wrath, so it survives it, and is a new object.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Ornithopter
+Sheltered by Ghosts
+Plains x3
+Plains x10
+
+[Bot2 Deck]
+Plains
+Plains
+Mox Pearl
+Mox Jet
+Ornithopter
+Wrath of God
+Plains x10
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Sheltered by Ghosts.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Hand.Sheltered by Ghosts.Cast(Bot1.Battlefield.Ornithopter)
+! Bot1.Target(Bot2.Battlefield.Plains)
+! Bot1.Target(Bot1.Battlefield.Mox Pearl)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+[T3 Bot1.Main2]
+? Exile = Ornithopter
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains#1.Activate
+Bot2.Battlefield.Plains#2.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Wrath of God.Cast
+[T4 Bot2.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot2.Battlefield = Plains; Plains; Mox Pearl; Mox Jet; Ornithopter
+Bot1.Graveyard = Sheltered by Ghosts; Ornithopter

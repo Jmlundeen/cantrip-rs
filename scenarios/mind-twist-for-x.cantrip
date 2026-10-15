@@ -1,0 +1,30 @@
+# X comes from the line: Mind Twist is paid with the Swamps tapped in advance plus one tapped while paying, and X is
+# raised to what the line asks for rather than to whatever the mana could cover.
+
+[Bot1 Deck]
+Mind Twist
+Swamp x6
+Swamp x10
+
+[Bot2 Deck]
+Island x7
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Swamp.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Mind Twist.Cast(Bot2; X: 2)
+Bot1.Battlefield.Swamp.Activate
+
+[Expect]
+Turn = 7
+Bot1.Graveyard = Mind Twist
+Bot1.Battlefield.Swamp#4.Tapped = false
+# Three Islands discarded to hand size on Bot2's turns, and two to Mind Twist.
+Bot2.Hand.Count = 5
+Bot2.Graveyard.Count = 5

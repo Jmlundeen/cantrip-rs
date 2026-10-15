@@ -1,0 +1,26 @@
+# Sheoldred, the Apocalypse comes down on turn 1 (Swamp and Black Lotus). Bot2's draw on turn 2 costs it 2 life (18);
+# Bot1's own draw on turn 3 gains it 2 (22).
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Sheoldred, the Apocalypse
+Swamp x13
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Sheoldred, the Apocalypse.Cast
+[T2 Bot2.Main1]
+? Bot2.Life = 18
+? Bot1.Life = 20
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Life = 22
+Bot2.Life = 18

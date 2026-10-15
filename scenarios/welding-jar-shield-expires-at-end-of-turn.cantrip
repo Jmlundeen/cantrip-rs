@@ -1,0 +1,34 @@
+# A regeneration shield lasts until end of turn (CR 701.19a, 514.2): Bot2 sacrifices the Jar on its own turn two for a shield on its Sol Ring,
+# but nothing destroys the Sol Ring that turn, so on turn three Bot1's Disenchant destroys it with no shield left.
+
+[Bot1 Deck]
+Plains
+Plains
+Mox Pearl
+Disenchant
+Plains x12
+
+[Bot2 Deck]
+Plains
+Welding Jar
+Sol Ring
+Plains x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Welding Jar.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Pass
+Bot2.Battlefield.Welding Jar.Activate(Bot2.Battlefield.Sol Ring)
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Disenchant.Cast(Bot2.Battlefield.Sol Ring)
+
+[Expect]
+Bot2.Graveyard = Sol Ring; Welding Jar

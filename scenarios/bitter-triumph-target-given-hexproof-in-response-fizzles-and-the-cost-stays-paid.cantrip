@@ -1,0 +1,51 @@
+# Bitter Triumph targets Bot2's Basking Rootwalla; Bot2 responds with Snakeskin Veil, which gives it hexproof, so the
+# target is illegal on resolution (CR 608.2b) and the spell does nothing: it is countered on resolution and goes to the
+# graveyard, the Rootwalla survives as a 2/2 with its counter, and the additional cost (here the discard of the Island)
+# is not refunded (CR 601.2h).
+
+[Bot1 Deck]
+Swamp
+Swamp
+Swamp
+Bitter Triumph
+Island
+Swamp x3
+Island x12
+
+[Bot2 Deck]
+Forest
+Forest
+Basking Rootwalla
+Snakeskin Veil
+Forest x3
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Basking Rootwalla.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Bitter Triumph.Cast(Bot2.Battlefield.Basking Rootwalla)
+Bot1.Modes(Discard a card)
+Bot1.Choose(Island)
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Snakeskin Veil.Cast(Bot2.Battlefield.Basking Rootwalla)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Bitter Triumph; Island
+Bot2.Battlefield.Basking Rootwalla.Power = 2
+Bot2.Battlefield.Basking Rootwalla.Keywords = Hexproof
+Bot2.Graveyard = Snakeskin Veil

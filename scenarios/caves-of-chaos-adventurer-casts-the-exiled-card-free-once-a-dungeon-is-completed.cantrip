@@ -1,0 +1,64 @@
+# "If you've completed a dungeon, you may play that card this turn without paying its mana cost." Bot1 walks the Undercity as in
+# undermountain-adventurer-adds-six-green-once-its-controller-completes-the-undercity (initiative on turn 1, at the turn-3 upkeep and as White Plume and
+# Caves of Chaos Adventurer enter, completing it at the turn-5 upkeep). On turn 5 Caves of Chaos Adventurer attacks and exiles a Jace, the Mind Sculptor
+# (the whole library is Jaces once Secret Entrance has fetched the Plains, so the Throne's milled ten and the exile are fixed); Bot1 casts it in the second
+# main phase paying nothing -- it has no payment line, and an unpaid cost would fail the script.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Mox Ruby
+Undermountain Adventurer
+White Plume Adventurer
+Caves of Chaos Adventurer
+Plains
+Jace, the Mind Sculptor x16
+
+[Bot2 Deck]
+Forest x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Undermountain Adventurer.Cast
+Bot1.Search(Plains)
+? Bot1.Dungeon = Undercity: Secret Entrance
+[T3 Bot1.Upkeep]
+Bot1.Modes(Lost Well)
+[T3 Bot1.Main1]
+? Bot1.Dungeon = Undercity: Lost Well
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.White Plume Adventurer.Cast
+Bot1.Modes(Stash)
+[T3 Bot1.Main1]
+? Bot1.Dungeon = Undercity: Stash
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Undermountain Adventurer.Activate
+? Bot1.Mana = {W}{R}{G}{G}
+Bot1.Hand.Caves of Chaos Adventurer.Cast
+[T3 Bot1.Main2]
+? Bot1.Dungeon = Undercity: Catacombs
+[T5 Bot1.Main1]
+? Bot1.DungeonsCompleted = 1
+Bot1.Attack(Caves of Chaos Adventurer)
+[T5 Bot1.Main2]
+Bot1.Exile.Jace, the Mind Sculptor.Cast
+[Bot1.End]
+
+[Expect]
+Turn = 5
+Exile.Count = 0
+Bot1.Battlefield.Jace, the Mind Sculptor.Counters.Loyalty = 3
+Bot1.Mana = 
+Bot2.Life = 15

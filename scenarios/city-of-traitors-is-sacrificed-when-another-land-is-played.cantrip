@@ -1,0 +1,20 @@
+# City of Traitors taps for two colorless mana, but "when you play another land, sacrifice this land": playing the
+# Island on the next turn sends it to the graveyard.
+
+[Bot1 Deck]
+City of Traitors
+Island x16
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.City of Traitors.Play
+[T3 Bot1.Main1]
+? Bot1.Battlefield = City of Traitors
+Bot1.Hand.Island.Play
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Island
+Bot1.Graveyard = City of Traitors

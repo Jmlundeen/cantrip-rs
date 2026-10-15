@@ -1,0 +1,34 @@
+# Three Moxen mean X = 3 but the library holds two cards: only those two are looked at (CR 609.3), one goes to the hand and the
+# other to the bottom (the only card there). The discard is a Plains.
+
+[Bot1 Deck]
+Fomori Vault
+Mox Ruby
+Mox Jet
+Mox Pearl
+Plains
+Plains
+Plains
+Lightning Bolt
+Island
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Fomori Vault.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Fomori Vault.Activate(Ability: Look)
+Bot1.Choose(Plains)
+Bot1.Arrange(Lightning Bolt | Island)
+
+[Expect]
+Bot1.Hand = Plains; Plains; Lightning Bolt
+Bot1.Library = Island
+Bot1.Graveyard = Plains

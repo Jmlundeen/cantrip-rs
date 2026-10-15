@@ -1,0 +1,46 @@
+# Brightglass Gearhulk: "When this creature enters, you may search your library for up to two artifact, creature, and/or enchantment
+# cards with mana value 1 or less, reveal them, put them into your hand, then shuffle." (CR 701.23, 701.20)
+# On turn 7 it enters and Bot1 takes Sol Ring and Fastbond; the Elves are left (up to two), and Guerrilla Gorilla (mana value 2),
+# Wrath of God and Lightning Bolt were never eligible.
+
+[Bot1 Deck]
+Forest
+Forest
+Plains
+Plains
+Brightglass Gearhulk
+Island
+Island
+Island x3
+Sol Ring
+Llanowar Elves
+Fastbond
+Guerrilla Gorilla
+Wrath of God
+Lightning Bolt
+Island x20
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Brightglass Gearhulk.Cast
+Bot1.Accept
+Bot1.Search(Sol Ring; Fastbond)
+
+[Expect]
+Turn = 7
+Bot1.Battlefield.Brightglass Gearhulk.Power = 4
+Bot1.Hand = Island; Island; Island; Island; Island; Sol Ring; Fastbond
+Bot1.Library.Count = 24

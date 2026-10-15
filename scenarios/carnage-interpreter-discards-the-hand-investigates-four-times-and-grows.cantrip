@@ -1,0 +1,33 @@
+# Carnage Interpreter: entering, it discards your whole hand (three Plains here) and investigates four times, and with
+# no cards in hand it is a 5/5 with menace.
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Pearl
+Carnage Interpreter
+Plains
+Plains
+Plains
+Plains x13
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Carnage Interpreter.Cast
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 0
+Bot1.Graveyard.Count = 3
+Bot1.Battlefield.Count = 8
+Bot1.Battlefield.Carnage Interpreter.Power = 5
+Bot1.Battlefield.Carnage Interpreter.Toughness = 5
+Bot1.Battlefield.Carnage Interpreter.Keywords = Menace

@@ -1,0 +1,23 @@
+# Witch Enchanter played as its back face, Witch-Blessed Meadow: "As this land enters, you may pay 3 life. If you don't, it enters
+# tapped" - Bot1 declines (the other half of the scenario that pays): the life stays 20, the land is tapped and offers no mana
+# (! Activate), and on turn 3 it untaps and taps for {W}. It is a land, not the creature: no enters trigger asks for a target.
+
+[Bot1 Deck]
+Witch Enchanter
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Witch Enchanter.Play
+Bot1.Decline
+? Bot1.Life = 20
+? Bot1.Battlefield.Witch-Blessed Meadow.Tapped = true
+! Bot1.Battlefield.Witch-Blessed Meadow.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Witch-Blessed Meadow.Activate
+? Bot1.Mana = {W}
+
+[Expect]
+Bot1.Battlefield.Witch-Blessed Meadow.Types = Land

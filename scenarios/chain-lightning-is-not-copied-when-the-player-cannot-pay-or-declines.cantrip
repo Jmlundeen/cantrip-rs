@@ -1,0 +1,37 @@
+# The chain is optional and costs {R}{R}. Turn 1: Bot1 hits Bot2, who controls nothing and cannot pay, so nothing is copied
+# (Bot2 17). Turn 3: Bot2 now has two red sources untapped (Mox Ruby and Gleemox) and is offered the chain by the second Chain
+# Lightning, and declines: Bot2 takes 3 more (14), the stack is empty, and both Bot1's Chain Lightnings are in its graveyard.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Chain Lightning
+Chain Lightning
+Mountain x12
+
+[Bot2 Deck]
+Mox Ruby
+Gleemox
+Forest x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Chain Lightning.Cast(Bot2)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Gleemox.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Chain Lightning.Cast(Bot2)
+Bot1.Pass
+Bot2.Decline
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Bot1.Life = 20
+Bot1.Graveyard = Chain Lightning; Chain Lightning
+Stack.Count = 0

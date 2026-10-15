@@ -1,0 +1,6 @@
+{
+  "name": "Thrumming Stone",
+  "manaCost": "{5}",
+  "type": "Legendary Artifact",
+  "oracleText": "Spells you cast have ripple 4. (Whenever you cast a spell, you may reveal the top four cards of your library. You may cast spells with the same name as that spell from among the revealed cards without paying their mana costs. Put the rest on the bottom of your library.)"
+}

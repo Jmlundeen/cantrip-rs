@@ -1,0 +1,67 @@
+# "Equip legendary creature {3}" needs a legendary creature: with only an Elvish Mystic Bot1 controls, it is not offered on turn 3 (the
+# refusal), and "Equip {7}" puts the Arm on the Mystic - a 7/7 (CR 613.4b). "Can't be blocked by creatures with power 2 or less" is
+# a boundary: Bot2's Elvish Mystic (power 1) may not block it (refusal) while its Cogwork Librarian (power 3) may (the positive control)
+# and dies to 7 damage; the Mystic takes 3.
+
+[Bot1 Deck]
+Black Lotus
+Sol Ring
+Mox Emerald
+Mox Pearl
+Mox Jet
+Wrecking Ball Arm
+Elvish Mystic
+Island x12
+
+[Bot2 Deck]
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Cogwork Librarian
+Elvish Mystic
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Wrecking Ball Arm.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Cogwork Librarian.Cast
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Wrecking Ball Arm.Activate(Ability: Equip legendary creature)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Wrecking Ball Arm.Activate(Bot1.Battlefield.Elvish Mystic; Ability: Equip {7})
+Bot1.Pass
+Bot1.Attack(Elvish Mystic > Bot2)
+! Bot2.Block(Bot2.Battlefield.Elvish Mystic > Bot1.Battlefield.Elvish Mystic)
+Bot2.Block(Cogwork Librarian > Bot1.Battlefield.Elvish Mystic)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Cogwork Librarian
+Bot1.Battlefield.Elvish Mystic.Power = 7
+Bot1.Battlefield.Elvish Mystic.Damage = 3

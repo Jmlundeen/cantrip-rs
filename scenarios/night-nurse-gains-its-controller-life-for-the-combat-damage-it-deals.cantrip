@@ -1,0 +1,28 @@
+# Lifelink: Night Nurse attacks unblocked on turn 5 and deals 2 combat damage to Bot2, so Bot1 gains 2 life
+# (CR 702.15b). Its enters trigger had no permanent card put into the graveyard this turn to target, and did nothing.
+
+[Bot1 Deck]
+Plains
+Plains
+Night Nurse, Healer of Heroes
+Plains x4
+Plains x10
+
+[Bot2 Deck]
+Mountain x7
+Mountain x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Night Nurse, Healer of Heroes.Cast
+[T5 Bot1.Main1]
+Bot1.Attack(Night Nurse, Healer of Heroes)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot2.Life = 18

@@ -1,0 +1,37 @@
+# Blazing Rootwalla: "{R}: This creature gets +2/+0 until end of turn." Used in the declare blockers step, after Bot2's
+# Ornithopter (0/2) has blocked, the 1/1 attacker becomes a 3/1 and kills the blocker (CR 509.1, 510.1) - a 1/1 would have
+# bounced off it.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Blazing Rootwalla
+Mountain x12
+
+[Bot2 Deck]
+Island
+Ornithopter
+Island x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Blazing Rootwalla.Cast
+Bot1.Battlefield.Mountain.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Attack(Blazing Rootwalla > Bot2)
+Bot2.Block(Ornithopter > Blazing Rootwalla)
+[T3 Bot1.Blockers]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Blazing Rootwalla.Activate
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Upkeep]
+
+[Expect]
+Bot2.Graveyard = Ornithopter
+Bot2.Life = 20
+Bot1.Battlefield.Blazing Rootwalla.Power = 1

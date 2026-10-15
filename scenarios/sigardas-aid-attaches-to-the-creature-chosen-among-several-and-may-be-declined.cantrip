@@ -1,0 +1,47 @@
+# Sigarda's Aid: "Whenever an Equipment you control enters, you may attach it to target creature you control." The target
+# is chosen as the ability goes on the stack (CR 603.3d) and the attaching is a "may" made on resolution (CR 603.5).
+# With an Ornithopter and Llanowar Elves Bot1 aims Lightning Greaves at the Elves and accepts. Lavaspur Boots then has one
+# creature to aim at, the Ornithopter (the Elves have shroud from the Greaves, CR 702.18), so it is chosen without asking;
+# Bot1 declines, and the Boots stay unattached.
+
+[Bot1 Deck]
+Mox Pearl
+Sigarda's Aid
+Mox Emerald
+Llanowar Elves
+Mox Jet
+Mox Ruby
+Ornithopter
+Lightning Greaves
+Lavaspur Boots
+Swamp x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Sigarda's Aid.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Lightning Greaves.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Target(Llanowar Elves)
+Bot1.Accept
+[T5 Bot1.Main1]
+Bot1.Hand.Lavaspur Boots.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Decline
+[T5 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Lightning Greaves.AttachedTo = Llanowar Elves
+Bot1.Battlefield.Lavaspur Boots.AttachedTo = (absent)

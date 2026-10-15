@@ -1,0 +1,43 @@
+# Germination Practicum: "Put two +1/+1 counters on each creature you control." Both of Bot1's creatures - Llanowar Elves and
+# an Ornithopter (an artifact creature) - get two counters; an opponent's Ornithopter and Bot1's own Mox Jet (an artifact
+# that is not a creature) get none. Cast on turn 3 with a Black Lotus and two Forests.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Mox Jet
+Ornithopter
+Germination Practicum
+Forest
+Black Lotus
+Forest x12
+
+[Bot2 Deck]
+Ornithopter
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Germination Practicum.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Mox Jet.Counters.PlusOnePlusOne = (absent)
+Bot2.Battlefield.Ornithopter.Counters.PlusOnePlusOne = (absent)

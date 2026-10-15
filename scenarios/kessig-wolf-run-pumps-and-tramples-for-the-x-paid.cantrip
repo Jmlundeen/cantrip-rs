@@ -1,0 +1,37 @@
+# Kessig Wolf Run: {X}{R}{G}, {T} with X = 1 (paid from Mox Ruby, Mox Emerald and Mox Sapphire) gives Bot1's Ornithopter
+# +1/+0 and trample until end of turn.
+
+[Bot1 Deck]
+Kessig Wolf Run
+Ornithopter
+Mox Ruby
+Mox Emerald
+Mox Sapphire
+Island x2
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Kessig Wolf Run.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Kessig Wolf Run.Activate(X: 1; Ability: gains trample; Ornithopter)
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Battlefield.Kessig Wolf Run.Tapped = true
+Bot1.Battlefield.Ornithopter.Power = 1
+Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot1.Battlefield.Ornithopter.Keywords = Flying; Trample

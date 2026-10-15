@@ -1,0 +1,27 @@
+# "This land enters tapped." and the bounced Plains does not give a second land drop (CR 305.2): on turn 3, after the Chancery returns the Plains, the Chancery cannot be tapped for mana
+# (it is tapped) and the Plains cannot be played again (refusals). On turn 5 the same two actions are fine (the positive controls): the Plains is played and the Chancery taps for {W}{U}.
+
+[Bot1 Deck]
+Plains
+Azorius Chancery
+Plains x13
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Azorius Chancery.Play
+Bot1.Choose(Plains)
+[T3 Bot1.Main2]
+! Bot1.Battlefield.Azorius Chancery.Activate
+! Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Azorius Chancery.Activate
+? Bot1.Mana = {W}{U}
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Azorius Chancery; Plains

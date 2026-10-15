@@ -1,0 +1,6 @@
+{
+  "name": "Wheel of Fortune",
+  "manaCost": "{2}{R}",
+  "type": "Sorcery",
+  "oracleText": "Each player discards their hand, then draws seven cards."
+}

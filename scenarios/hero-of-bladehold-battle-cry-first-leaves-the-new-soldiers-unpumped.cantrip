@@ -1,0 +1,43 @@
+# The same attack as the other Hero scenario, but Bot1 orders battle cry to resolve first (the Soldiers trigger is put on the
+# stack first and resolves second): battle cry then affects only the creatures attacking at that moment, so the Soldiers
+# made afterwards stay 1/1 (CR 603.3b, 702.91a). Bot2 takes 3 + 1 + 1.
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Plains
+Hero of Bladehold
+Plains
+Plains
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Hero of Bladehold.Cast
+[T9 Bot1.Main1]
+Bot1.Attack(Hero of Bladehold > Bot2)
+Bot1.Triggers(Soldier; battle cry)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Soldier#1.Power = 1
+? Bot1.Battlefield.Soldier#2.Power = 1
+[T9 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 15

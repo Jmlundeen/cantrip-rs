@@ -1,0 +1,49 @@
+# "At the beginning of each opponent's upkeep" (CR 603.2b): in a three-player game the Oculus manifests dread on Bot2's
+# upkeep (turn 2) and on Bot3's (turn 3), and does nothing on its controller's own upkeep (turn 4). Each manifest looks at
+# the top two cards, so the library goes down by two each time (the face-down card and the one to the graveyard) and
+# (Bot1 draws on turn 1, as the first player of three, so a spare Island is discarded too.) It stays put on turn 4.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Wheel of Fortune
+Island x5
+Mox Sapphire
+Sol Ring
+Abhorrent Oculus
+Island x4
+Forest x2
+Plains x2
+Island x6
+
+[Bot2 Deck]
+Swamp x20
+
+[Bot3 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Wheel of Fortune.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Abhorrent Oculus.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Choose(Island; Island; Island; Island; Black Lotus; Wheel of Fortune)
+[T2 Bot2.Upkeep]
+? Bot1.Library.Count = 10
+Bot1.Arrange(Forest | Forest)
+[T3 Bot3.Upkeep]
+Bot1.Arrange(Plains | Plains)
+[T4 Bot1.Upkeep]
+? Bot1.Library.Count = 6
+[T4 Bot1.Main1]
+
+[Expect]
+Bot1.Library.Count = 5
+Bot1.Graveyard.Count = 3
+Bot1.Battlefield.Count = 6

@@ -1,0 +1,30 @@
+# Bot2 casts Duress with its only Swamp; Bot1 answers with Miscalculation. Bot2 has nothing left to pay {2}.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Miscalculation
+4 Island
+10 Island
+
+[Bot2 Deck]
+Swamp
+Duress
+5 Swamp
+10 Swamp
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Duress.Cast(Bot1)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Miscalculation.Cast(Duress)
+? Stack = Miscalculation; Duress
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Miscalculation
+Bot2.Graveyard = Duress

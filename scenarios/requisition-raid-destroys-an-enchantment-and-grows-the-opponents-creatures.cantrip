@@ -1,0 +1,58 @@
+# Requisition Raid, modes 2 and 3: destroy target enchantment (Bot2's Pia's Revolution) and put a +1/+1 counter on each
+# creature target player (Bot2) controls - its Ornithopter. Cost {W} plus {1} for each of the two modes.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Emerald
+Requisition Raid
+Island x4
+Island x10
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Pia's Revolution
+Ornithopter
+Island x2
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Pia's Revolution.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Requisition Raid.Cast
+Bot1.Modes(2; 3)
+Bot1.Target(Bot2.Battlefield.Pia's Revolution)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Graveyard = Pia's Revolution
+Bot2.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot2.Battlefield.Ornithopter.Power = 1

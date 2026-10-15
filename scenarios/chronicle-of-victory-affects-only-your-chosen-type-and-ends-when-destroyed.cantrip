@@ -1,0 +1,76 @@
+# Chronicle of Victory (Elf chosen) pumps "creatures you control of the chosen type" (CR 205.3m) the moment it arrives,
+# one already on the battlefield; an Ornithopter of Bot1's (a Thopter) and Bot2's own Elvish Mystic are untouched, and
+# neither Bot1's Ornithopter nor Bot2's Elvish Mystic draws Bot1 a card: the trigger is "you cast a spell of the chosen
+# type". Bot2's Disenchant then destroys the Chronicle and the Mystic is a 1/1 without first strike or trample again.
+
+[Bot1 Deck]
+Forest
+Elvish Mystic
+Sol Ring
+Mox Emerald
+Mox Pearl
+Black Lotus
+Chronicle of Victory
+Ornithopter
+Forest x12
+
+[Bot2 Deck]
+Forest
+Elvish Mystic
+Plains
+Disenchant
+Forest x3
+Forest x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Chronicle of Victory.Cast
+Bot1.Modes(Elf)
+Bot1.Pass
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Elvish Mystic.Power = 3
+? Bot1.Battlefield.Elvish Mystic.Keywords = FirstStrike; Trample
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Pass
+[T2 Bot2.Main2]
+? Bot2.Battlefield.Elvish Mystic.Power = 1
+? Bot2.Battlefield.Elvish Mystic.Keywords = (absent)
+? Bot1.Hand.Count = 0
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Hand.Count = 0
+? Bot1.Battlefield.Ornithopter.Power = 0
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Disenchant.Cast(Chronicle of Victory)
+Bot2.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot2.Graveyard = Disenchant
+Bot1.Graveyard = Chronicle of Victory; Black Lotus
+Bot1.Battlefield.Elvish Mystic.Power = 1
+Bot1.Battlefield.Elvish Mystic.Toughness = 1
+Bot1.Battlefield.Elvish Mystic.Keywords = (absent)

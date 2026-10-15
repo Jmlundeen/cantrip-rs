@@ -1,0 +1,39 @@
+# Flying and deathtouch. Strix is cast on turn one off two Moxen (and draws). On turn two Bot2 casts a Llanowar Elves
+# and an Ornithopter. On turn three Strix attacks: the Elves, a creature without flying or reach, cannot block it (the
+# refusal), while the Ornithopter, a flyer, can (the positive control: the same attacker, the same defender). Strix deals
+# one damage to the 0/2 Ornithopter, which dies of deathtouch (CR 702.2b); the Ornithopter deals none back.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Baleful Strix
+Island x13
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Ornithopter
+Forest x12
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Baleful Strix.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Baleful Strix)
+! Bot2.Block(Llanowar Elves > Baleful Strix)
+Bot2.Block(Ornithopter > Baleful Strix)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Ornithopter
+Bot2.Battlefield.Llanowar Elves.Damage = 0
+Bot1.Battlefield.Baleful Strix.Damage = 0
+Bot1.Hand.Count = 6

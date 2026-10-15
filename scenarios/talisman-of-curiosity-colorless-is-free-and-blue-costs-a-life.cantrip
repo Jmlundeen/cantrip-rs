@@ -1,0 +1,29 @@
+# Two separate mana abilities: "{T}: Add {C}" hurts nothing (life stays 20), "{T}: Add {G} or {U}" deals 1 damage to you - here
+# blue, on a later turn. Cast on turn one off two Moxen, the Talisman taps for {C} on turn three (no damage), and on turn five
+# for {U} (19).
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Talisman of Curiosity
+Plains x14
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Talisman of Curiosity.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Talisman of Curiosity.Activate(Ability: {C})
+? Bot1.Mana = {C}
+? Bot1.Life = 20
+[T5 Bot1.Main1]
+Bot1.Battlefield.Talisman of Curiosity.Activate(Ability: {G} or {U}; Color: Blue)
+? Bot1.Mana = {U}
+
+[Expect]
+Bot1.Life = 19

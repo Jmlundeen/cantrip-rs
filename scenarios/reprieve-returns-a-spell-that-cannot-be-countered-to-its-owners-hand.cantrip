@@ -1,0 +1,36 @@
+# Reprieve returns a spell to its owner's hand without countering it: Bot2's Abrupt Decay (it can't be countered) goes
+# back to Bot2's hand, and Bot1 draws a card.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Reprieve
+Plains x12
+
+[Bot2 Deck]
+Swamp
+Mox Emerald
+Abrupt Decay
+Swamp x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Abrupt Decay.Cast(Bot1.Battlefield.Mox Pearl)
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Reprieve.Cast(Abrupt Decay)
+? Stack = Reprieve; Abrupt Decay
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Reprieve
+Bot1.Hand.Count = 5
+Bot2.Graveyard.Count = 0
+Bot2.Hand.Count = 6

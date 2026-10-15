@@ -1,0 +1,37 @@
+# Stormchaser's Talent entering makes a 1/1 blue and red Otter with prowess (a triggered ability, CR 702.108a); a
+# noncreature spell cast afterwards - a Bolt - pumps it to 2/2 until end of turn. At level 1 the Talent's own cast
+# trigger is not there, so the Bolt makes no second Otter.
+
+[Bot1 Deck]
+Island
+Mox Ruby
+Lightning Bolt
+Stormchaser's Talent
+Island
+Island
+Island
+Island x11
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Stormchaser's Talent.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Battlefield = Island; Mox Ruby; Stormchaser's Talent; Otter
+Bot1.Battlefield.Otter.Power = 2
+Bot1.Battlefield.Otter.Toughness = 2
+Bot1.Battlefield.Otter.Subtypes = Otter
+Bot1.Battlefield.Otter.Types = Creature
+Bot2.Life = 17
+Stack.Count = 0

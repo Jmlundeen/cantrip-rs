@@ -1,0 +1,20 @@
+# "This land enters tapped unless you control a Swamp." Bot1 controls only a Plains on turn 3, so Castle Locthwain enters tapped.
+# (castle-locthwain-enters-untapped-with-a-swamp-typed-land is the positive control.)
+
+[Bot1 Deck]
+Plains
+Plains
+Castle Locthwain
+Plains x17
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Castle Locthwain.Play
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Castle Locthwain.Tapped = true

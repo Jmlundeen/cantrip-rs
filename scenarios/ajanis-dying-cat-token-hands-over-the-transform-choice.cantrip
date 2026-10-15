@@ -1,0 +1,32 @@
+# The "you may exile Ajani, then return him transformed" choice, handed over so the dock that asks it can be
+# pictured. The paraphrase the dock builds from the verb is the same one a flicker gets, so the hint under it
+# quotes the ability instead -- without the word "transformed" there, declining looks like the safe answer.
+#
+# That the transform actually happens is ajani-transforms-when-his-blocking-cat-token-dies.
+
+[Bot1 Deck]
+Plains x4
+Ajani, Nacatl Pariah
+Plains x16
+
+[Bot2 Deck]
+Mountain x4
+Lightning Bolt
+Island x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Ajani, Nacatl Pariah.Cast
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Cat Warrior)
+[Handover Bot1.Accept]
+
+[Expect]
+Bot1.Battlefield = Plains; Plains; Ajani, Nacatl Pariah
+Bot1.Graveyard.Count = 0

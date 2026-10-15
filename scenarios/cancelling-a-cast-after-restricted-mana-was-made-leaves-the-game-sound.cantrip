@@ -1,0 +1,32 @@
+# Cancelling the cast must leave the game sound under CANTRIP_VERIFY (Game::goto once panicked here).
+# Delighted Halfling's restricted mana ("spend this mana only to cast a legendary spell") is in Bot1's pool, so a Lightning Bolt
+# cannot be paid with it; Bot1 names the Bolt's target, then cancels (CR 601.2, 733.1: an illegal or abandoned cast is undone as if
+# it never happened). The game goes on: the Bolt is still in hand and the pool still holds the mana until the step ends.
+
+[Bot1 Deck]
+Forest
+Delighted Halfling
+Lightning Bolt
+Mountain
+Forest x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Delighted Halfling.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Delighted Halfling.Activate(Color: Black; Ability: any color)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Cancel
+
+[Expect]
+Bot1.Hand = Forest; Forest; Forest; Forest; Lightning Bolt
+Bot1.Mana = {B} (LegendarySpells, CantBeCountered)
+Step = Main1
+Stack.Count = 0
+Bot2.Life = 20

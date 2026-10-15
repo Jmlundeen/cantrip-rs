@@ -1,0 +1,29 @@
+# Bot1 casts three Moxen, then Emry, Lurker of the Loch for just {U}: affinity for artifacts (CR 702.41a) takes {1} off
+# for each of the three artifacts, the generic {2} of {2}{U} and no more. Only Mox Sapphire is tapped, and Emry's enters
+# ability mills four cards.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Emry, Lurker of the Loch
+Island x14
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Emry, Lurker of the Loch.Cast
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Battlefield = Mox Sapphire; Mox Ruby; Mox Pearl; Emry, Lurker of the Loch
+Bot1.Battlefield.Mox Sapphire.Tapped = true
+Bot1.Battlefield.Mox Ruby.Tapped = false
+Bot1.Battlefield.Mox Pearl.Tapped = false
+Bot1.Graveyard.Count = 4

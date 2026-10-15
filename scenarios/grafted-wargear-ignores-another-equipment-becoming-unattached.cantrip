@@ -1,0 +1,57 @@
+# Grafted Wargear: "Whenever this Equipment becomes unattached from a permanent, sacrifice that permanent." Only the Wargear's
+# own unattaching counts. Bot1 equips the Wargear to the first Llanowar Elves on turn 1. On turn 3 it equips a Lavaspur Boots
+# to a second Elves and then moves the Boots to the first one, so the Boots becomes unattached from the second Elves, which
+# is not sacrificed. Both Elves survive.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Sapphire
+Mox Pearl
+Grafted Wargear
+Llanowar Elves
+Lavaspur Boots
+Llanowar Elves
+Plains x12
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Grafted Wargear.Cast
+Bot1.Pass
+Bot1.Battlefield.Grafted Wargear.Activate(Llanowar Elves)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Lavaspur Boots.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Lavaspur Boots.Activate(Llanowar Elves#2)
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Lavaspur Boots.Activate(Llanowar Elves#1)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Lavaspur Boots.AttachedTo = Llanowar Elves
+Bot1.Battlefield.Grafted Wargear.AttachedTo = Llanowar Elves

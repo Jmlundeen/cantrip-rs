@@ -1,0 +1,46 @@
+# "As long as you have one or fewer cards in hand": the threshold is checked continuously (CR 611.3a), one card in hand still
+# counts. Cast on turn one with an emptied hand, the Interpreter is a 5/5 with menace. On turn three Bot1 draws one card:
+# still 5/5 with menace (one card). Cracking a Clue draws a second: 3/3 without menace (two cards). Playing the land
+# leaves one card again: back to 5/5 with menace.
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Pearl
+Carnage Interpreter
+Plains
+Plains
+Plains
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Carnage Interpreter.Cast
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 1
+? Bot1.Battlefield.Carnage Interpreter.Power = 5
+? Bot1.Battlefield.Carnage Interpreter.Keywords = Menace
+Bot1.Battlefield.Clue Token.Activate
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+[T3 Bot1.Main2]
+? Bot1.Hand.Count = 2
+? Bot1.Battlefield.Carnage Interpreter.Power = 3
+? Bot1.Battlefield.Carnage Interpreter.Toughness = 3
+? Bot1.Battlefield.Carnage Interpreter.Keywords = (absent)
+Bot1.Hand.Plains.Play
+
+[Expect]
+Bot1.Hand.Count = 1
+Bot1.Battlefield.Carnage Interpreter.Power = 5
+Bot1.Battlefield.Carnage Interpreter.Keywords = Menace

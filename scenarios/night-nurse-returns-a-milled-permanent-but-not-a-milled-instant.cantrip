@@ -1,0 +1,46 @@
+# "Put there from anywhere this turn": cards milled from the library count (CR 400.7, 701.17a). Bot1 mills itself for three
+# with Brain Freeze (a Mountain, a Lightning Bolt, an Ornithopter) and flashes in Night Nurse: the Lightning Bolt, an
+# instant, is not a permanent card and is refused, and the Ornithopter is chosen and returned to hand.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Pearl
+Brain Freeze
+Night Nurse, Healer of Heroes
+Plains
+Plains
+Swamp
+Mountain
+Lightning Bolt
+Ornithopter
+Swamp x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Brain Freeze.Cast(Bot1)
+Bot1.Pass
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Night Nurse, Healer of Heroes.Cast
+Bot1.Pass
+! Bot1.Target(Lightning Bolt; Brain Freeze)
+Bot1.Target(Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Ornithopter; Plains; Swamp
+Bot1.Graveyard = Brain Freeze; Lightning Bolt; Mountain
+Bot1.Battlefield.Night Nurse, Healer of Heroes.Power = 2

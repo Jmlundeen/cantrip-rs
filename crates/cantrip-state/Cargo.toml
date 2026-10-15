@@ -1,0 +1,8 @@
+[package]
+name = "cantrip-state"
+description = "The game state: plain data in a few contiguous buffers, every write journalled. No behavior."
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+[dependencies]

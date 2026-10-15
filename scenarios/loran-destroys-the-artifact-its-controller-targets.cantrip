@@ -1,0 +1,33 @@
+# Loran of the Third Path enters and its trigger goes on the stack asking for "up to one" target; Bot1 names Bot2's Sol
+# Ring over its own Mox Pearl, and only the Sol Ring is destroyed.
+
+[Bot1 Deck]
+Plains
+Plains
+Mox Pearl
+Loran of the Third Path
+Plains x10
+
+[Bot2 Deck]
+Island
+Sol Ring
+Island x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Loran of the Third Path.Cast
+Bot1.Target(Sol Ring)
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Plains; Plains; Mox Pearl; Loran of the Third Path
+Bot2.Battlefield = Island
+Bot2.Graveyard = Sol Ring

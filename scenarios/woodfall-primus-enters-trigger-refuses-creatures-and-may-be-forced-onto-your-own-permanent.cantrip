@@ -1,0 +1,45 @@
+# "Destroy target noncreature permanent" is mandatory and does not care whose it is (CR 115.1, 603.3d): on turn 1 Bot2 has
+# nothing, so Bot1, who has just spent Black Lotus and five Moxen, has to choose among its own five Moxen and destroys
+# Mox Jet. The Primus is a creature and is not a candidate (refused beside the Moxen). Persist is the existing scenario's.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Woodfall Primus
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Woodfall Primus.Cast
+Bot1.Pass
+! Bot1.Target(Woodfall Primus)
+Bot1.Target(Mox Jet)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Mox Jet; Black Lotus
+Bot1.Battlefield.Woodfall Primus.Power = 6

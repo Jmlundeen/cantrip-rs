@@ -1,0 +1,40 @@
+# Bot1 casts Sowing Mycospawn kicked (CR 702.33) for {4}{G}{C}: a Forest and four Moxen, one of them spent on a Sol
+# Ring, whose {C}{C} is the only mana that can pay the kicker's {C} (CR 107.4c). Both cast triggers go on the stack: the
+# kicked one exiles Bot1's own Forest -- the only land on the battlefield as it goes on the stack, so it is aimed
+# without asking -- and the other searches out the Island. The Mycospawn itself is colorless (Devoid, CR 702.114a), which the dump does not show.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Mox Jet
+Mox Pearl
+Sol Ring
+Sowing Mycospawn
+Island
+Swamp x5
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Sowing Mycospawn.Cast(Kicked: 1)
+Bot1.Search(Island)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Emerald; Mox Ruby; Mox Jet; Mox Pearl; Sol Ring; Island; Sowing Mycospawn
+Exile = Forest
+Bot1.Mana =

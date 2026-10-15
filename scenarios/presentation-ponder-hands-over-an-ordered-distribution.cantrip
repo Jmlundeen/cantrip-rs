@@ -1,0 +1,25 @@
+# A real suspended distribution: three ordered library cards and an explicit shuffle alternative.
+[Bot1 Deck]
+Island
+Ponder
+Island x5
+Counterspell
+Lightning Bolt
+Guerrilla Gorilla
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Ponder.Cast
+[Handover Bot1.Arrange]
+
+[Expect]
+Turn = 1
+Stack = Ponder
+Bot1.Hand.Count = 5
+Bot1.Graveyard.Count = 0
+Bot1.Library.Count = 13

@@ -1,0 +1,40 @@
+# Transmute Artifact finds Blightsteel Colossus by sacrificing a Mox Sapphire: the Colossus costs twelve more than the
+# Mox, so Bot1 "may pay {X}, where X is the difference" before the card goes anywhere. The question is about a card
+# that is still in the library the search found it in, and the search is over, so nobody is looking at that library
+# any more.
+#
+# Handed over at that payment rather than answered, so a session can be dealt it: a served game used to stop here
+# with "Seat 1 was prompted about ... (Blightsteel Colossus, a Card in player:1.Library owned by seat 1), which is not
+# in their view". See ScriptedPositionsThroughTransportTests.
+#
+# Turn 1: the Island and the Mox pay {U}{U}, and the tapped Mox is the artifact sacrificed.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Transmute Artifact
+Island x4
+Island x3
+Blightsteel Colossus
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Transmute Artifact.Cast
+Bot1.Choose(Mox Sapphire)
+Bot1.Search(Blightsteel Colossus)
+[Handover Bot1.Decline]
+
+[Expect]
+Turn = 1
+Step = Main1
+Stack = Transmute Artifact
+Bot1.Battlefield = Island
+Bot1.Graveyard = Mox Sapphire
+Bot1.Library = Island; Island; Island; Blightsteel Colossus; Island; Island; Island; Island; Island; Island; Island; Island; Island; Island

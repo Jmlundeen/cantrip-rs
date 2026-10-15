@@ -1,0 +1,29 @@
+# Bot1 casts Demonic Consultation and names Black Lotus. The top six cards are exiled, then the next three are revealed
+# until the Lotus: the two Forests go to exile with the six Islands, the Lotus to Bot1's hand. Nothing is shuffled.
+
+[Bot1 Deck]
+Swamp
+Demonic Consultation
+Island x5
+Island x6
+Forest
+Forest
+Black Lotus
+Forest x3
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Demonic Consultation.Cast
+Bot1.Name(Black Lotus)
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Hand = Island; Island; Island; Island; Island; Black Lotus
+Exile.Count = 8
+Bot1.Library = Forest; Forest; Forest
+Bot1.Graveyard = Demonic Consultation

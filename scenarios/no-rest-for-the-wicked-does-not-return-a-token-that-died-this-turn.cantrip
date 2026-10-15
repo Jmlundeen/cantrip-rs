@@ -1,0 +1,54 @@
+# No Rest for the Wicked returns creature CARDS put into your graveyard from the battlefield this turn; a token that
+# left the battlefield ceased to exist and is not a card in the graveyard (CR 111.7, 704.5d). Bot1 enchants with No Rest
+# on turn 1, makes a Goblin Shaman token with Fable of the Mirror-Breaker on turn 5, Bot2 Lightning Bolts it at Bot1's
+# end step, and sacrificing No Rest puts nothing in hand: the hand is as it was. (Bot2 discarded an Island to hand size
+# on turn 4.)
+
+[Bot1 Deck]
+Plains
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Fable of the Mirror-Breaker
+No Rest for the Wicked
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x5
+Island x13
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.No Rest for the Wicked.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Plains.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Fable of the Mirror-Breaker.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains#2.Activate
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Goblin Shaman.Types = Creature
+[T5 Bot1.End]
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Goblin Shaman)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Pass
+Bot1.Pass
+Bot1.Battlefield.No Rest for the Wicked.Activate
+
+[Expect]
+Bot1.Hand = Plains
+Bot1.Graveyard = No Rest for the Wicked
+Bot2.Graveyard = Lightning Bolt; Island

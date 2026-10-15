@@ -1,0 +1,39 @@
+# "Costs {1} less for each artifact you control": Bot2's three Moxen are not Bot1's, so with only its own Mox Sapphire out Thoughtcast
+# costs {3}{U} (CR 702.41a), which the Sapphire and three Islands pay exactly - no mana is left over, as there would be if the opponent's
+# artifacts had reduced the cost.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Thoughtcast
+Island
+Island
+Island x12
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Island x16
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Thoughtcast.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Island#3.Activate
+? Bot1.Mana =
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Thoughtcast

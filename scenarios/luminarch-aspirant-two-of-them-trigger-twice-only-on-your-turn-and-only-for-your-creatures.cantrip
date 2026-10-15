@@ -1,0 +1,45 @@
+# Luminarch Aspirant: "At the beginning of combat on your turn, put a +1/+1 counter on target creature you control." Two of
+# them give two triggers at the same combat (CR 603.3b): turn 3, the second cast just before combat, both put a counter
+# on the first Aspirant, which already had one from turn 1's combat (a 4/4). Bot2's Ornithopter, a creature, is refused as a target ("you control"), beside Bot1's own.
+# On Bot2's turn 4 the beginning of combat is not "your turn": no trigger, the counters stay at 3.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Luminarch Aspirant
+Luminarch Aspirant
+Plains
+Plains
+Plains
+Plains x12
+
+[Bot2 Deck]
+Ornithopter
+Island x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Luminarch Aspirant.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Luminarch Aspirant.Cast
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Target(Bot1.Battlefield.Luminarch Aspirant#1)
+Bot1.Target(Bot1.Battlefield.Luminarch Aspirant#1)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Luminarch Aspirant#1.Counters.PlusOnePlusOne = 3
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Luminarch Aspirant#1.Counters.PlusOnePlusOne = 3
+
+[Expect]
+Bot1.Battlefield.Luminarch Aspirant#1.Power = 4
+Bot2.Battlefield.Ornithopter.Counters.PlusOnePlusOne = (absent)

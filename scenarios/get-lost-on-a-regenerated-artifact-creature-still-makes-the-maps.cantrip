@@ -1,0 +1,31 @@
+# Welding Jar's regeneration shield (CR 701.19a) replaces the destruction: the Ornithopter stays, tapped, and Bot2 still gets the
+# two Map tokens.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Get Lost
+Plains x14
+
+[Bot2 Deck]
+Welding Jar
+Ornithopter
+Island x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Welding Jar.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Get Lost.Cast(Bot2.Battlefield.Ornithopter)
+Bot2.Battlefield.Welding Jar.Activate(Bot2.Battlefield.Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Ornithopter; Map Token; Map Token
+Bot2.Battlefield.Ornithopter.Tapped = true
+Bot2.Graveyard = Welding Jar

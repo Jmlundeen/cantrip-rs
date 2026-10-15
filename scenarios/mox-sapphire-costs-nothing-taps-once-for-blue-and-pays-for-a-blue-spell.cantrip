@@ -1,0 +1,23 @@
+# {0} to cast, no summoning sickness: Bot1 casts the Mox and taps it on turn 1 for exactly {U}, which pays for Ancestral
+# Recall (so three cards are drawn); a second tap is refused while it is tapped.
+
+[Bot1 Deck]
+Mox Sapphire
+Ancestral Recall
+Island x16
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+? Bot1.Mana = {U}
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Pass
+! Bot1.Battlefield.Mox Sapphire.Activate
+
+[Expect]
+Bot1.Hand.Count = 8
+Bot1.Battlefield.Mox Sapphire.Tapped = true

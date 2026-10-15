@@ -1,0 +1,44 @@
+# Keen-Eyed Curator exiles one card from a graveyard on each of three turns: a land, an artifact creature and an
+# instant, which are four card types among the cards exiled with it. It stays a 3/3 until then and becomes a 7/7
+# trampler (CR 610.3). Bot2's discards to hand size supply the graveyard.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Keen-Eyed Curator
+Forest x17
+
+[Bot2 Deck]
+Island x7
+Island
+Ornithopter
+Lightning Bolt
+Island x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Keen-Eyed Curator.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Keen-Eyed Curator.Activate(Bot2.Graveyard.Island)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Keen-Eyed Curator.Activate(Bot2.Graveyard.Ornithopter)
+? Bot1.Battlefield.Keen-Eyed Curator.Power = 3
+[T7 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Keen-Eyed Curator.Activate(Bot2.Graveyard.Lightning Bolt)
+Bot1.Pass
+
+[Expect]
+Turn = 7
+Stack.Count = 0
+Bot1.Battlefield.Keen-Eyed Curator.Power = 7
+Bot1.Battlefield.Keen-Eyed Curator.Toughness = 7
+Bot1.Battlefield.Keen-Eyed Curator.Keywords = Trample
+Exile.Count = 3

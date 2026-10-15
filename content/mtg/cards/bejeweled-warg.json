@@ -1,0 +1,11 @@
+{
+  "name": "Bejeweled Warg",
+  "manaCost": "{1}{G}",
+  "type": "Creature — Wolf",
+  "power": 3,
+  "toughness": 2,
+  "oracleText": "Trample\nWhenever this creature deals combat damage to a player, choose one —\n• Put a +1/+1 counter on target Wolf you control.\n• Create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")",
+  "keywords": [
+    "Trample"
+  ]
+}

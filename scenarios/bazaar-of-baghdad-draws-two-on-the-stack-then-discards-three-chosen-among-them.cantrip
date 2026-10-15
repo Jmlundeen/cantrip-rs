@@ -1,0 +1,36 @@
+# Bazaar of Baghdad: "{T}: Draw two cards, then discard three cards." Not a mana ability, so it goes on the stack
+# (CR 605.1a): the land is tapped as a cost and the ability waits there with priority. On resolution the two cards come
+# off the top (Lightning Bolt, Counterspell) before the three are chosen, so a card just drawn can be one of them, and
+# the tapped land cannot be activated again this turn.
+
+[Bot1 Deck]
+Bazaar of Baghdad
+Swamp
+Forest
+Plains
+Mountain
+Island
+Mox Jet
+Lightning Bolt
+Counterspell
+Island x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Bazaar of Baghdad.Play
+Bot1.Battlefield.Bazaar of Baghdad.Activate
+? Stack.Count = 1
+Bot1.Choose(Counterspell; Swamp; Forest)
+? Bot1.Battlefield.Bazaar of Baghdad.Tapped = true
+! Bot1.Battlefield.Bazaar of Baghdad.Activate
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Hand = Plains; Mountain; Island; Mox Jet; Lightning Bolt
+Bot1.Graveyard.Count = 3
+Bot1.Library.Count = 10
+Bot1.Battlefield = Bazaar of Baghdad
+Bot1.Battlefield.Bazaar of Baghdad.Tapped = true

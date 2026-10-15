@@ -1,0 +1,21 @@
+# Boundary, a positive control for the next case: a library of exactly three cards gives all three and the player
+# survives with an empty library (the loss is for a draw from an empty library, CR 704.5b, not for emptying it).
+
+[Bot1 Deck]
+Island
+Ancestral Recall
+Island x18
+
+[Bot2 Deck]
+Island x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot2)
+[Bot1.Main2]
+
+[Expect]
+Result = InProgress
+Bot2.Hand.Count = 10
+Bot2.Library.Count = 0

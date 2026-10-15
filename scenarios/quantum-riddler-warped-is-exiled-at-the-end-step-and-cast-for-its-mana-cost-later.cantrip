@@ -1,0 +1,42 @@
+# Warp (CR 702.185a) on Quantum Riddler: cast for its warp cost {1}{U} on turn 1 (an Island and a Mox Sapphire), it draws
+# a card as it enters, and at the beginning of the end step it is exiled. A turn later its owner casts it from exile for
+# its real {3}{U}{U} (Black Lotus and two Islands), not for the warp cost again.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Quantum Riddler
+Black Lotus
+Island
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Forest x22
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Quantum Riddler.Cast(Ability: Warp)
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Count = 3
+? Exile.Count = 0
+[T2 Bot2.Main1]
+? Exile = Quantum Riddler
+? Bot1.Battlefield.Count = 2
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Exile.Quantum Riddler.Cast
+[Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Exile.Count = 0
+Bot1.Battlefield = Island; Island; Mox Sapphire; Quantum Riddler

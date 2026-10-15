@@ -1,0 +1,29 @@
+# "When this creature enters, investigate": Bot1 gets a Clue token (an artifact); on turn 3 {2} and sacrificing it draws a card, and the token ceases to exist (it is not in the graveyard).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Thraben Inspector
+Plains x13
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Thraben Inspector.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Clue Token.Activate
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Count = 4
+Bot1.Graveyard.Count = 0
+Bot1.Hand.Count = 5

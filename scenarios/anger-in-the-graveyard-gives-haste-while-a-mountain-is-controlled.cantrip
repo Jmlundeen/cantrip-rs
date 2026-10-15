@@ -1,0 +1,58 @@
+# Anger on the battlefield has haste itself but gives nothing to Bot1's other creatures, though Bot1 controls
+# Mountains: the grant functions only while the card is in the graveyard. Once it is bolted on turn 8, Bot1's
+# creatures have haste - the Welder already there, and the Embereth Shieldbreaker cast on turn 9, which attacks at once.
+# Bot2's own Welder never gets it: Bot2 controls Mountains too, but "creatures you control" are Anger's owner's.
+
+[Bot1 Deck]
+Mountain x4
+Anger
+Embereth Shieldbreaker
+Goblin Welder
+Mountain x12
+
+[Bot2 Deck]
+Mountain x2
+Lightning Bolt
+Goblin Welder
+Mountain x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Goblin Welder.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Goblin Welder.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Battlefield.Mountain#4.Activate
+Bot1.Hand.Anger.Cast
+[T7 Bot1.Main2]
+? Bot1.Battlefield.Anger.Keywords = Haste
+? Bot1.Battlefield.Goblin Welder.Keywords = (absent)
+[T8 Bot2.Main1]
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Anger)
+[T9 Bot1.Main1]
+? Bot1.Graveyard = Anger
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Embereth Shieldbreaker.Cast
+Bot1.Attack(Embereth Shieldbreaker)
+[T10 Bot2.Main1]
+? Bot1.Battlefield.Embereth Shieldbreaker.Keywords = Haste
+? Bot1.Battlefield.Goblin Welder.Keywords = Haste
+? Bot2.Battlefield.Goblin Welder.Keywords = (absent)
+
+[Expect]
+Bot2.Life = 18

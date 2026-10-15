@@ -1,0 +1,6 @@
+{
+  "name": "Unearth",
+  "manaCost": "{B}",
+  "type": "Sorcery",
+  "oracleText": "Return target creature card with mana value 3 or less from your graveyard to the battlefield.\nCycling {2} ({2}, Discard this card: Draw a card.)"
+}

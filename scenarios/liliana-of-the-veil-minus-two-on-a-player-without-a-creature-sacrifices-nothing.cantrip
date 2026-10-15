@@ -1,0 +1,32 @@
+# Liliana of the Veil's −2: "Target player sacrifices a creature." A player with no creature is still a legal target;
+# the ability resolves, Bot2 sacrifices nothing (its lands are not creatures), and Liliana still drops to 1.
+
+[Bot1 Deck]
+Swamp x3
+Liliana of the Veil
+Island x20
+
+[Bot2 Deck]
+Forest x22
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Swamp#3.Activate
+Bot1.Hand.Liliana of the Veil.Cast
+Bot1.Battlefield.Liliana of the Veil.Activate(Bot2; Ability: sacrifices a creature)
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield.Liliana of the Veil.Counters.Loyalty = 1
+Bot2.Graveyard.Count = 0
+Bot2.Battlefield = Forest; Forest

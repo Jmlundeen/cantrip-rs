@@ -1,0 +1,34 @@
+# The sacrifice is a cost (CR 118.8): paid as the spell is cast, so when Bot2 counters Corrupted Conviction the Ornithopter is still gone and Bot1 draws nothing.
+
+[Bot1 Deck]
+Mox Jet
+Ornithopter
+Corrupted Conviction
+Island x12
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Corrupted Conviction.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Corrupted Conviction)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Mox Jet
+Bot1.Graveyard = Corrupted Conviction; Ornithopter
+Bot2.Graveyard = Counterspell

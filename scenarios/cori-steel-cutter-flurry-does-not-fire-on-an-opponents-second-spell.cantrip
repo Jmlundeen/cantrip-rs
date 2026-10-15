@@ -1,0 +1,33 @@
+# Cori-Steel Cutter: "Whenever you cast your second spell each turn" counts only its controller's spells. Bot2 casts two
+# Ornithopters on turn 2 while Bot1 controls the Cutter: no Monk arrives for Bot1. The positive control, Bot1's own second
+# spell making the Monk, is cori-steel-cutter-flurry-fires-on-the-second-spell-only-and-the-monk-attacks-at-once.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Cori-Steel Cutter
+Mountain x17
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Island x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Cori-Steel Cutter.Cast
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Upkeep]
+
+[Expect]
+Bot2.Battlefield = Ornithopter; Ornithopter
+Bot1.Battlefield = Mountain; Mox Ruby; Cori-Steel Cutter
+Stack.Count = 0

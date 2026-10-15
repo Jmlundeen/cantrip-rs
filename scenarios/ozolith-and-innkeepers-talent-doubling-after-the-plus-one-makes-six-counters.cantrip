@@ -1,0 +1,53 @@
+# One +1/+1 counter put on Bot1's Ornithopter (Ozolith's {1}{G}, {T} ability, turn 3) meets two replacement effects at once: Ozolith's "that many plus one" and Innkeeper's Talent's level 3 "twice that many". Bot1, the player whose
+# counters they are, chooses the order (CR 616.1): Ozolith first, so one becomes two and the Talent doubles that to four. The Ornithopter already has two counters from the Talent's first combat trigger on turn 1 (one doubled), so it ends with 6.
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Black Lotus
+Innkeeper's Talent
+Mox Emerald
+Mox Ruby
+Ornithopter
+Ozolith, the Shattered Spire
+Forest x12
+
+[Bot2 Deck]
+Island x13
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Innkeeper's Talent.Cast
+Bot1.Pass
+Bot1.Battlefield.Innkeeper's Talent.Activate(Ability: Level 2)
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Innkeeper's Talent.Activate(Ability: Level 3)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ozolith, the Shattered Spire.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Ozolith, the Shattered Spire.Activate(Ornithopter; Ability: Put a +1/+1)
+Bot1.Replace(Ozolith, the Shattered Spire)
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 6

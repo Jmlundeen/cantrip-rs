@@ -1,0 +1,40 @@
+# Bitter Triumph: "discard a card or pay 3 life" as an additional cost (CR 601.2b), the discard branch (the pay-life branch
+# is the other scenario): the caster chooses the Island to discard, and keeps their life at 20. "Destroy target creature
+# or planeswalker": Bot2's Mox Jet, an artifact, is not a legal target (the refusal beside the Dark Confidant, the
+# positive control, which is destroyed).
+
+[Bot1 Deck]
+Swamp
+Swamp
+Bitter Triumph
+Island
+Island x12
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Dark Confidant
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Dark Confidant.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+! Bot1.Hand.Bitter Triumph.Cast(Bot2.Battlefield.Mox Jet)
+Bot1.Hand.Bitter Triumph.Cast(Bot2.Battlefield.Dark Confidant)
+Bot1.Modes(Discard a card)
+Bot1.Choose(Island)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Graveyard = Bitter Triumph; Island
+Bot2.Graveyard = Dark Confidant
+Bot2.Battlefield = Swamp; Mox Jet

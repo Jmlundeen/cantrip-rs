@@ -1,0 +1,43 @@
+# The bonus is a static ability of the Obelisk: Bot2's Disenchant destroys it on turn two and Mother of Runes, a 3/3 Human while it
+# lived, is a 1/1 again.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Black Lotus
+Mother of Runes
+Obelisk of Urd
+Plains x13
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Disenchant
+Plains x12
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Mother of Runes.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Obelisk of Urd.Cast(Convoke: Mother of Runes)
+Bot1.Modes(Human)
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Mother of Runes.Power = 3
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Disenchant.Cast(Obelisk of Urd)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Obelisk of Urd; Black Lotus
+Bot1.Battlefield.Mother of Runes.Power = 1
+Bot1.Battlefield.Mother of Runes.Toughness = 1

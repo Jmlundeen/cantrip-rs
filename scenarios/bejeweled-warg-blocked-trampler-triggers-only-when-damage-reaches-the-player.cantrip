@@ -1,0 +1,43 @@
+# Trample (CR 702.19b) and "deals combat damage to a player": on turn 3 Bot1 puts all 3 of the Warg's damage on its
+# blocker (allowed, lethal is at least 2), nothing reaches Bot2 and no trigger is asked for; on turn 5 the default
+# division gives the second Ornithopter lethal 2 and tramples 1 over, which triggers it, and a Treasure appears.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Bejeweled Warg
+Forest x10
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Forest x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Bejeweled Warg.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Bejeweled Warg)
+Bot2.Block(Ornithopter > Bejeweled Warg)
+Bot1.AssignDamage(Bejeweled Warg > Ornithopter: 3)
+! Bot1.Modes
+[T3 Bot1.Main2]
+? Bot2.Life = 20
+? Bot2.Battlefield.Count = 1
+? Bot1.Battlefield.Count = 3
+[T5 Bot1.Main1]
+Bot1.Attack(Bejeweled Warg)
+Bot2.Block(Ornithopter > Bejeweled Warg)
+Bot1.Modes(Create a Treasure token)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 19
+Bot2.Battlefield.Count = 0
+Bot1.Battlefield = Forest; Mox Emerald; Bejeweled Warg; Treasure Token

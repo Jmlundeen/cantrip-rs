@@ -1,0 +1,34 @@
+# One target card has no order to choose, so none is asked: the Ornithopter goes on top of the library and the draw takes it right back, while the Elvish Mystic stays in the graveyard.
+
+[Bot1 Deck]
+Forever Young
+Faithless Looting
+Mox Jet
+Mox Ruby
+Ornithopter
+Elvish Mystic
+Island
+Island x7
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Ornithopter; Elvish Mystic)
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Forever Young.Cast
+Bot1.Target(Ornithopter)
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Forever Young; Faithless Looting; Elvish Mystic
+Bot1.Hand = Island; Island; Ornithopter

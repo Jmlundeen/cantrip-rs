@@ -1,0 +1,46 @@
+# Bilbo, Thief in the Night: "Whenever Bilbo attacks, you may cast an artifact, instant, or sorcery spell from your
+# graveyard. If an instant or sorcery spell cast this way would be put into your graveyard, exile it instead." Faithless
+# Looting on turn 1 draws Sol Ring and Llanowar Elves and discards both. On turn 5 Bilbo attacks and Bot1 casts the Sol
+# Ring from the graveyard: it costs {1} less than {1}, so nothing is paid (CR 118.7c: the reduction is of the generic
+# part only), and being an artifact it resolves onto the battlefield, not into exile. Faithless Looting (a sorcery that
+# is eligible) and the Elves (a creature, which is not) stay in the graveyard.
+
+[Bot1 Deck]
+Volcanic Island
+Faithless Looting
+Bilbo, Thief in the Night
+Mountain
+Island
+Island
+Island
+Sol Ring
+Llanowar Elves
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Volcanic Island.Play
+Bot1.Battlefield.Volcanic Island.Activate(Ability: {R})
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Sol Ring; Llanowar Elves)
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Volcanic Island.Activate(Ability: {U})
+Bot1.Hand.Bilbo, Thief in the Night.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Attack(Bilbo, Thief in the Night)
+Bot1.Choose(Sol Ring)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Sol Ring.Tapped = false
+Bot1.Graveyard = Faithless Looting; Llanowar Elves
+Bot1.Mana =
+Exile.Count = 0
+Bot1.Battlefield.Volcanic Island.Tapped = false
+Bot1.Battlefield.Mountain.Tapped = false

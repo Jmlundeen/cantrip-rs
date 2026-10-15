@@ -1,0 +1,36 @@
+# Cathar Commando has flash: Bot1 casts it in Bot2's end step, which a creature without flash could not do. On its own
+# turn Bot1 pays {1} and sacrifices it to destroy Bot2's Sol Ring.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Cathar Commando
+Plains x12
+
+[Bot2 Deck]
+Island
+Sol Ring
+Island x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Sol Ring.Cast
+[T2 Bot2.End]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Cathar Commando.Cast
+? Stack = Cathar Commando
+? Step = End
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Cathar Commando.Activate(Sol Ring)
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Plains; Mox Pearl
+Bot1.Graveyard = Cathar Commando
+Bot2.Battlefield = Island
+Bot2.Graveyard = Sol Ring

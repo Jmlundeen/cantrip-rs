@@ -1,0 +1,55 @@
+# Archon of Cruelty: "sacrifices a creature or planeswalker of their choice" - the opponent chooses, and a planeswalker is
+# as good as a creature. Bot2 controls Ornithopter and Jace, the Mind Sculptor (and an Island, which is neither, so it
+# is not on offer), and sacrifices Jace to the attack trigger on turn 3 while the Ornithopter stays. Bot1 casts Archon
+# on turn 1 off the same Black Lotus, Sol Ring and three Moxen as the neighbouring scenarios.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Sol Ring
+Mox Jet
+Mox Ruby
+Mox Pearl
+Archon of Cruelty
+Swamp x10
+
+[Bot2 Deck]
+Island
+Black Lotus
+Jace, the Mind Sculptor
+Ornithopter
+Island x3
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Archon of Cruelty.Cast
+Bot2.Choose(Island)
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Jace, the Mind Sculptor.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Archon of Cruelty > Bot2)
+Bot2.Choose(Jace, the Mind Sculptor)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 8
+Bot2.Battlefield = Island; Ornithopter
+Bot2.Graveyard.Count = 4

@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>cantrip-server</AssemblyName>
+    <RootNamespace>Cantrip.Server.Host</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <!-- The host's connection bookkeeping is tested directly: the states that matter are ones a client cannot ask
+       for over a socket, only ones the request lifecycle passes through. -->
+  <ItemGroup>
+    <InternalsVisibleTo Include="Cantrip.Server.Tests" />
+  </ItemGroup>
+
+  <!-- The status page (StatusSite), one file of HTML, CSS and script, served from the assembly. -->
+  <ItemGroup>
+    <EmbeddedResource Include="status.html" LogicalName="Cantrip.Server.Host.status.html" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MessagePack" />
+    <ProjectReference Include="..\Cantrip.Art\Cantrip.Art.csproj" />
+    <ProjectReference Include="..\Cantrip.Server\Cantrip.Server.csproj" />
+    <ProjectReference Include="..\Cantrip.Protocol\Cantrip.Protocol.csproj" />
+  </ItemGroup>
+
+</Project>

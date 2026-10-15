@@ -1,0 +1,43 @@
+# Sowing Mycospawn kicked: "exile target land" is a choice of any land: with Bot1's own Forest and Bot2's Swamp on the battlefield
+# Bot1 targets the opponent's Swamp, which is exiled while the Forest stays; a Mox (not a land) is refused as the target (! Target).
+# The Sol Ring's {C}{C} pays the kicker's {C} (CR 107.4c). The search trigger also resolves: a second Swamp enters.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Mox Jet
+Mox Pearl
+Sol Ring
+Sowing Mycospawn
+Swamp
+Swamp x5
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot2.Hand.Swamp.Play
+Bot1.Hand.Mox Emerald.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Sowing Mycospawn.Cast(Kicked: 1)
+! Bot1.Target(Bot1.Battlefield.Mox Ruby)
+Bot1.Target(Bot2.Battlefield.Swamp)
+Bot1.Search(Swamp)
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Swamp
+Bot2.Battlefield.Count = 0
+Bot1.Battlefield = Forest; Swamp; Mox Emerald; Mox Ruby; Mox Jet; Mox Pearl; Sol Ring; Sowing Mycospawn

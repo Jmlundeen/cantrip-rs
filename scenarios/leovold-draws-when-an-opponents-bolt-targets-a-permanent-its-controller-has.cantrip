@@ -1,0 +1,37 @@
+# Leovold, Emissary of Trest: "Whenever you or a permanent you control becomes the target of a spell or ability an
+# opponent controls" - a permanent counts, not only the player. Bot2's Lightning Bolt names Bot1's Ornithopter, and Bot1
+# accepts the draw.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Sapphire
+Leovold, Emissary of Trest
+Ornithopter
+Island x16
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x16
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Leovold, Emissary of Trest.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Ornithopter)
+Bot1.Accept
+[Bot2.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Ornithopter
+Bot1.Hand.Count = 3

@@ -1,0 +1,28 @@
+# The two mana abilities differ: {C} costs nothing (turn 1, life 20) and {B} deals 1 damage to its controller (turn 3, life 19).
+
+[Bot1 Deck]
+Island
+Mox Pearl
+Talisman of Indulgence
+Island x4
+Island x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Talisman of Indulgence.Cast
+Bot1.Pass
+Bot1.Battlefield.Talisman of Indulgence.Activate(Ability: {C})
+? Bot1.Mana = {C}
+? Bot1.Life = 20
+[T3 Bot1.Main1]
+Bot1.Battlefield.Talisman of Indulgence.Activate(Ability: {B} or {R}; Color: Black)
+
+[Expect]
+Bot1.Mana = {B}
+Bot1.Life = 19

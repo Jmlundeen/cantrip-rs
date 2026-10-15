@@ -1,0 +1,50 @@
+# Spider-Woman, Stunning Savior's Venom Blast: "Artifacts and creatures your opponents control enter tapped"
+# (CR 614.1c, 614.12). Bot1 casts Spider-Woman on turn 1. On turn 2 Bot2's Forest enters untapped (a land is neither
+# artifact nor creature), and Bot2's Mox Emerald and Sol Ring, cast off it, enter tapped - still tapped on turn 3,
+# when Bot1's own second Mox Pearl enters untapped (only opponents' permanents are affected). On turn 4, after Bot2's
+# untap step, its Guerrilla Gorilla enters tapped.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Spider-Woman, Stunning Savior
+Mox Pearl
+Plains x16
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Sol Ring
+Guerrilla Gorilla
+Forest x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Spider-Woman, Stunning Savior.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+? Bot2.Battlefield.Forest.Tapped = false
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Forest.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+[T3 Bot1.Main2]
+? Bot2.Battlefield.Mox Emerald.Tapped = true
+? Bot2.Battlefield.Sol Ring.Tapped = true
+? Bot1.Battlefield.Mox Pearl#2.Tapped = false
+[T4 Bot2.Main1]
+Bot2.Hand.Guerrilla Gorilla.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+
+[Expect]
+Turn = 4
+Stack.Count = 0
+Bot2.Battlefield = Forest; Mox Emerald; Sol Ring; Guerrilla Gorilla
+Bot2.Battlefield.Sol Ring.Tapped = false
+Bot2.Battlefield.Guerrilla Gorilla.Tapped = true
+Bot1.Battlefield.Spider-Woman, Stunning Savior.Tapped = false

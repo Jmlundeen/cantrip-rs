@@ -1,0 +1,39 @@
+# Faerie Mastermind: "{3}{U}: Each player draws a card." A player with no card in their library who is made to draw loses
+# the game (CR 121.4, 704.5b). Bot2's deck is eight Islands, so its turn-2 draw takes the last card; Bot1 then flashes in the
+# Mastermind and activates it: Bot2 draws from the empty library (no card is drawn, so the Mastermind's second-draw ability
+# does not trigger: Bot1 draws only from the ability) and loses. Mana: a Mox Sapphire, Sol Ring and a Black Lotus held up.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Sol Ring
+Black Lotus
+Faerie Mastermind
+Island x2
+Island x16
+
+[Bot2 Deck]
+Island x8
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Faerie Mastermind.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Faerie Mastermind.Activate
+Bot1.Pass
+
+[Expect]
+Result = Bot1 won
+Bot1.Hand.Count = 3
+Bot2.Library.Count = 0

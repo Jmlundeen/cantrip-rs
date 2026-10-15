@@ -1,0 +1,6 @@
+{
+  "name": "Chromatic Star",
+  "manaCost": "{1}",
+  "type": "Artifact",
+  "oracleText": "{1}, {T}, Sacrifice this artifact: Add one mana of any color.\nWhen this artifact is put into a graveyard from the battlefield, draw a card."
+}

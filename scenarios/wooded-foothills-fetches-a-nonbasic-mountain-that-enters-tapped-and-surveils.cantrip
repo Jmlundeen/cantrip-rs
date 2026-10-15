@@ -1,0 +1,25 @@
+# "A Mountain or Forest card" is by subtype: a Plains is not offered (the refusal), Elegant Parlor (a Mountain Plains) is, and it enters
+# tapped and surveils 1 even though the fetch puts it onto the battlefield. One life is paid (19) and the Foothills are sacrificed.
+
+[Bot1 Deck]
+Wooded Foothills
+Island x6
+Plains
+Elegant Parlor
+Island x10
+
+[Bot2 Deck]
+Swamp x15
+
+[Actions]
+Bot1.Hand.Wooded Foothills.Play
+Bot1.Battlefield.Wooded Foothills.Activate
+! Bot1.Search(Plains)
+Bot1.Search(Elegant Parlor)
+Bot1.Arrange(| Island)
+
+[Expect]
+Bot1.Life = 19
+Bot1.Battlefield = Elegant Parlor
+Bot1.Battlefield.Elegant Parlor.Tapped = true
+Bot1.Graveyard = Island; Wooded Foothills

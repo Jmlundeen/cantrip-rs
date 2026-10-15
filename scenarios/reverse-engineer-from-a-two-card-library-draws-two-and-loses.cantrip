@@ -1,0 +1,32 @@
+# Reverse Engineer: "Draw three cards" with only two cards left in the library. Bot1 draws both and then tries to draw from an
+# empty library, so the next time state-based actions are checked it loses the game (CR 704.5b, 121.4). Bot2 wins. The two
+# Mox Sapphires pay {U}{U}, the three Ornithopters improvise the {3}.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Ornithopter
+Ornithopter
+Ornithopter
+Reverse Engineer
+Island
+Island
+Island
+
+[Bot2 Deck]
+Forest x22
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Reverse Engineer.Cast(Convoke: Ornithopter, Ornithopter, Ornithopter)
+
+[Expect]
+Result = Bot2 won
+Bot1.Library.Count = 0
+Bot1.Hand.Count = 3

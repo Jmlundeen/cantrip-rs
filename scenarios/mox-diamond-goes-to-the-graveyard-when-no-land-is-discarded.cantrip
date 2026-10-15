@@ -1,0 +1,22 @@
+# Mox Diamond: declining to discard a land (CR 614.12a) puts it into its owner's graveyard instead of the battlefield, and the land stays in hand.
+
+[Bot1 Deck]
+Mox Diamond
+Island
+Forest
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Diamond.Cast
+Bot1.Decline
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Battlefield = Island
+Bot1.Graveyard = Mox Diamond
+Bot1.Hand.Count = 5

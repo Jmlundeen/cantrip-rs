@@ -1,0 +1,39 @@
+# CR 608.2b: Bill's landfall trigger targets Bot2's Llanowar Elves and Bot1 Lightning Bolts the Elves in response. The trigger's only target is gone when it resolves, so the +1/+1 counter lands nowhere (Bill stays without one).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Ruby
+Bristly Bill, Spine Sower
+Lightning Bolt
+Forest
+Plains x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x15
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Bristly Bill, Spine Sower.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Llanowar Elves)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot2.Graveyard = Llanowar Elves
+Bot1.Battlefield.Bristly Bill, Spine Sower.Counters.PlusOnePlusOne = (absent)

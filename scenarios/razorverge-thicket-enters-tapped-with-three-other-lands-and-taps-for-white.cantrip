@@ -1,0 +1,29 @@
+# One land more than "two or fewer other lands": the Thicket enters tapped on turn 7 as the fourth land (the existing scenario has it
+# untapped as the third). On turn 9 it taps for {W}, the other colour of "{G} or {W}".
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Razorverge Thicket
+Plains x14
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Razorverge Thicket.Play
+? Bot1.Battlefield.Razorverge Thicket.Tapped = true
+[T9 Bot1.Main1]
+Bot1.Battlefield.Razorverge Thicket.Activate(Color: White)
+? Bot1.Mana = {W}
+
+[Expect]
+Turn = 9
+Bot1.Mana = {W}

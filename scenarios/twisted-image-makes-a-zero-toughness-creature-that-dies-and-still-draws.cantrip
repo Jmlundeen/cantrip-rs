@@ -1,0 +1,23 @@
+# Switching Ornithopter's 0/2 makes it 2/0, which state-based actions put into the graveyard (CR 704.5f); Twisted Image has already resolved, so Bot1 still draws its card.
+
+[Bot1 Deck]
+Mox Sapphire
+Ornithopter
+Twisted Image
+Island x14
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Twisted Image.Cast(Ornithopter)
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Ornithopter; Twisted Image
+Bot1.Hand.Count = 5

@@ -1,0 +1,45 @@
+# Biomass Mutation X = 1 (CR 613.4b-c, 611.2c). Ornithopter (0/2) wears Rancor (+2/+0): the set to 1/1 is the base, the
+# Aura's bonus still applies on top, so it is a 3/1 whichever was first. A Snapcaster Mage cast after the spell has
+# resolved is not "a creature you control" at that time and stays 2/1 - the effect fixes its set of creatures as it
+# resolves. At the next turn the base is back: the Ornithopter is a 2/2 (0/2 and Rancor).
+
+[Bot1 Deck]
+Forest
+Ornithopter
+Mox Sapphire
+Mox Emerald
+Black Lotus
+Biomass Mutation
+Rancor
+Snapcaster Mage
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Rancor.Cast(Ornithopter)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Biomass Mutation.Cast(X: 1)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Pass
+Bot1.Hand.Snapcaster Mage.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Forest.Activate
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Ornithopter.Power = 3
+? Bot1.Battlefield.Ornithopter.Toughness = 1
+? Bot1.Battlefield.Snapcaster Mage.Power = 2
+? Bot1.Battlefield.Snapcaster Mage.Toughness = 1
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Ornithopter.Toughness = 2

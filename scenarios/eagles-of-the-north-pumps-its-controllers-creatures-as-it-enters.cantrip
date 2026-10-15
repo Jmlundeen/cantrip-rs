@@ -1,0 +1,38 @@
+# Bot1 pays {5}{W} for Eagles of the North with a Plains and five Moxen on the first turn. As it enters, creatures
+# Bot1 controls get +1/+0 and first strike until end of turn, Eagles itself among them: a 4/3 flyer with first strike.
+
+[Bot1 Deck]
+Plains
+Mox Emerald
+Mox Jet
+Mox Pearl
+Mox Ruby
+Mox Sapphire
+Eagles of the North
+Plains x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Eagles of the North.Cast
+[Bot1.Main2]
+? Bot1.Battlefield.Eagles of the North.Power = 4
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Eagles of the North.Power = 4
+Bot1.Battlefield.Eagles of the North.Toughness = 3
+Bot1.Battlefield.Eagles of the North.Keywords = FirstStrike; Flying

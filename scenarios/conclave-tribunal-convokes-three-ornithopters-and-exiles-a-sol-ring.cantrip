@@ -1,0 +1,36 @@
+# Conclave Tribunal costs {3}{W}: three Ornithopters tapped by convoke pay the {3} and a Plains pays the {W}. Its enters
+# trigger exiles the opponent's Sol Ring until the Tribunal leaves the battlefield.
+
+[Bot1 Deck]
+Ornithopter
+Ornithopter
+Ornithopter
+Conclave Tribunal
+Plains
+Plains
+Plains
+Plains x13
+
+[Bot2 Deck]
+Island
+Sol Ring
+Island x17
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Plains.Play
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Conclave Tribunal.Cast(Convoke: Ornithopter, Ornithopter, Ornithopter)
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Island
+Exile = Sol Ring
+Bot1.Battlefield.Ornithopter#1.Tapped = true

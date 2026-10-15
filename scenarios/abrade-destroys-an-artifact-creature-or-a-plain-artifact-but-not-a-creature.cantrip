@@ -1,0 +1,69 @@
+# Abrade, second mode: "Destroy target artifact." Bot2 has a Guerrilla Gorilla (a creature, not an artifact), an
+# Ornithopter (an artifact creature) and a Sol Ring (an artifact). On turn 5 Bot1's first Abrade refuses the Gorilla and
+# destroys the Ornithopter -- an artifact creature is an artifact; its second Abrade destroys the Sol Ring. The
+# Gorilla is untouched throughout: the damage mode is the only one that hits creatures as creatures.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+Abrade
+Abrade
+Island
+Island x20
+
+[Bot2 Deck]
+Forest
+Mox Jet
+Mox Sapphire
+Guerrilla Gorilla
+Ornithopter
+Sol Ring
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Abrade.Cast
+Bot1.Modes(Destroy target artifact)
+! Bot1.Target(Bot2.Battlefield.Guerrilla Gorilla)
+Bot1.Target(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Graveyard = Ornithopter
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Abrade.Cast
+Bot1.Modes(Destroy target artifact)
+Bot1.Target(Sol Ring)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Sol Ring; Ornithopter
+Bot2.Battlefield.Guerrilla Gorilla.Damage = 0
+Bot1.Graveyard = Abrade; Abrade

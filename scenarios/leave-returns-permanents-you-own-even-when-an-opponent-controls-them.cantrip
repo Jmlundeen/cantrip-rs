@@ -1,0 +1,51 @@
+# Leave: "Return any number of target permanents you own to your hand." Ownership, not control (CR 108.3): Bot1's Coveted Jewel, stolen
+# by Bot2's unblocked Llanowar Elves on turn 4, can be targeted and returned to Bot1's hand on turn 5, together with Bot1's own Mox
+# Sapphire; Bot2's own permanents are not Bot1's to target. The Jewel is back in the hand it was cast from.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Coveted Jewel
+Leave // Chance
+Plains
+Plains
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x12
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Coveted Jewel.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T4 Bot2.Main1]
+Bot2.Attack(Llanowar Elves > Bot1)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Leave // Chance.Cast(Ability: Leave)
+Bot1.Target(Bot2.Battlefield.Coveted Jewel; Mox Sapphire)
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Forest; Llanowar Elves
+Bot1.Battlefield = Mox Jet; Mox Pearl
+Bot1.Hand = Coveted Jewel; Mox Sapphire; Plains; Plains; Plains; Plains; Plains; Plains

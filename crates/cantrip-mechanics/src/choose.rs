@@ -1,0 +1,69 @@
+//! A player choosing as an effect resolves (CR 608.2d): a card, some cards, or a player, asked as the core's question and
+//! answered as the thing chosen. The core checks every answer against its question before it is taken (a card that was
+//! not offered, or the wrong number of them, is refused and asked again), so a card's file reads the choice and nothing
+//! else; what it does with "nothing to choose" is its own.
+
+use cantrip_api::*;
+
+/// `count` of `eligible` (or up to `count` with `up_to`), chosen from among `shown`, every one of which the player sees:
+/// Aesir Escape Valhalla shows the whole graveyard and lets only its permanent cards be chosen. Nothing is asked when
+/// nothing is eligible. Fewer than `count` come back only when fewer were eligible, or when the choice is a discard or
+/// sacrifice the player can't be made to make (CR 101.2).
+pub fn cards_from(
+    g: &mut dyn Game,
+    player: PlayerId,
+    source: ObjectId,
+    purpose: Purpose,
+    shown: Vec<ObjectId>,
+    eligible: Vec<ObjectId>,
+    count: u8,
+    up_to: bool,
+) -> Result<Vec<ObjectId>, Suspend> {
+    if eligible.is_empty() || count == 0 {
+        return Ok(Vec::new());
+    }
+    let count = count.min(eligible.len().min(u8::MAX as usize) as u8);
+    match g.ask(player, RequestKind::ChooseCards { source, purpose, cards: shown, eligible, count, up_to })? {
+        Answer::Cards(chosen) => Ok(chosen),
+        _ => Ok(Vec::new()),
+    }
+}
+
+/// `count` of `among` (or up to `count` with `up_to`), all of them shown: `cards_from` with nothing shown but what may be
+/// chosen.
+pub fn cards(g: &mut dyn Game, player: PlayerId, source: ObjectId, purpose: Purpose, among: Vec<ObjectId>, count: u8, up_to: bool) -> Result<Vec<ObjectId>, Suspend> {
+    cards_from(g, player, source, purpose, among.clone(), among, count, up_to)
+}
+
+/// One of `among`, asked even when the choice is forced: none only when `among` is empty, or when the choice is a discard
+/// or sacrifice the player can't be made to make (CR 101.2).
+pub fn card(g: &mut dyn Game, player: PlayerId, source: ObjectId, purpose: Purpose, among: Vec<ObjectId>) -> Result<Option<ObjectId>, Suspend> {
+    Ok(cards(g, player, source, purpose, among, 1, false)?.first().copied())
+}
+
+/// One of `eligible`, chosen from among `shown`: `card` for a choice made in view of cards that may not be chosen.
+pub fn card_from(g: &mut dyn Game, player: PlayerId, source: ObjectId, purpose: Purpose, shown: Vec<ObjectId>, eligible: Vec<ObjectId>) -> Result<Option<ObjectId>, Suspend> {
+    Ok(cards_from(g, player, source, purpose, shown, eligible, 1, false)?.first().copied())
+}
+
+/// A player of `candidates`, chosen without targeting (CR 608.2d, 614.12a), asked even when the choice is forced; none
+/// only when there are no candidates. `verb` and `amount` say what the chosen player will do, as hint text.
+pub fn player(g: &mut dyn Game, chooser: PlayerId, source: ObjectId, candidates: Vec<PlayerId>, verb: &'static str, amount: u16) -> Result<Option<PlayerId>, Suspend> {
+    if candidates.is_empty() {
+        return Ok(None);
+    }
+    match g.ask(chooser, RequestKind::ChoosePlayer { source, candidates, verb, amount })? {
+        Answer::Player(p) => Ok(Some(p)),
+        _ => Ok(None),
+    }
+}
+
+/// One of the labelled options `modes`, by index (a pile, a mode, "tap or untap"), asked even when the choice is forced.
+pub fn one_of(g: &mut dyn Game, player: PlayerId, source: ObjectId, modes: Vec<Label>) -> Result<u8, Suspend> {
+    let eligible = (0..modes.len() as u8).collect();
+    let ask = RequestKind::ChooseModes { source, modes, eligible, count: 1, at_most: 0, affordable: Vec::new(), additional_cost: false, repeat: false };
+    match g.ask(player, ask)? {
+        Answer::Modes(chosen) => Ok(chosen.first().copied().unwrap_or(0)),
+        _ => Ok(0),
+    }
+}

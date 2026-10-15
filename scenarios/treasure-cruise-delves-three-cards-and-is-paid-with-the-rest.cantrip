@@ -1,0 +1,33 @@
+# Delve (CR 702.66a): five sacrificed Lotus Petals leave five cards in Bot1's graveyard and five blue mana floating.
+# Treasure Cruise costs {7}{U}; exiling three of those cards pays {3} of it, and the floating mana pays the other five.
+# Two Petals stay in the graveyard with the Cruise itself, and the Cruise draws three.
+
+[Bot1 Deck]
+Lotus Petal x5
+Treasure Cruise
+Island
+Island x14
+
+[Bot2 Deck]
+Forest x22
+
+[Actions]
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Battlefield.Lotus Petal.Activate(Color: Blue)
+Bot1.Battlefield.Lotus Petal.Activate(Color: Blue)
+Bot1.Battlefield.Lotus Petal.Activate(Color: Blue)
+Bot1.Battlefield.Lotus Petal.Activate(Color: Blue)
+Bot1.Battlefield.Lotus Petal.Activate(Color: Blue)
+Bot1.Hand.Treasure Cruise.Cast(Delve: 3)
+[Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Hand.Count = 4
+Bot1.Graveyard.Count = 3
+Exile.Count = 3
+Bot1.Mana =

@@ -1,0 +1,46 @@
+# "Any target" includes a planeswalker: X = 2 takes Jace, the Mind Sculptor from 3 loyalty to 1; Bot2's life is unchanged.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Mox Pearl
+Traumatic Critique
+Island x2
+Island x10
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Jace, the Mind Sculptor
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Jace, the Mind Sculptor.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Traumatic Critique.Cast(Bot2.Battlefield.Jace, the Mind Sculptor; X: 2)
+Bot1.Choose(Island)
+
+[Expect]
+Bot2.Life = 20
+Bot2.Battlefield.Jace, the Mind Sculptor.Counters.Loyalty = 1

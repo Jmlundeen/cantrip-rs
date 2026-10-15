@@ -1,0 +1,35 @@
+# "Permanent cards ... from anywhere": Mox Jet sacrificed to Deadly Dispute goes to the graveyard from the battlefield
+# and takes a counter off; the Treasure the Dispute makes is sacrificed for mana into the same graveyard, but a token
+# is not a card (CR 111.1), so nothing triggers and the stack stays empty.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Moonshadow
+Swamp
+Deadly Dispute
+Island x30
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Moonshadow.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Deadly Dispute.Cast
+Bot1.Choose(Mox Jet)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Moonshadow.Counters.MinusOneMinusOne = 5
+Bot1.Battlefield.Treasure Token.Activate(Color: Black)
+? Stack.Count = 0
+
+[Expect]
+Bot1.Battlefield.Moonshadow.Counters.MinusOneMinusOne = 5
+Bot1.Battlefield.Moonshadow.Power = 2
+Bot1.Graveyard = Deadly Dispute; Mox Jet

@@ -1,0 +1,55 @@
+# Pyroblast, first mode: "Counter target spell if it's blue." On turn 2 Bot2 casts a green Llanowar Elves and Bot1 aims a Pyroblast
+# at it: the Elves resolve (the spell is not blue, so it is not countered). Bot2 then casts Third Path Iconoclast, a blue and red
+# card, and the second Pyroblast counters it: a multicolored spell is blue if one of its colors is blue.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Pyroblast
+Pyroblast
+Island x15
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Emerald
+Mox Ruby
+Llanowar Elves
+Third Path Iconoclast
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Pyroblast.Cast
+Bot1.Modes(1)
+Bot1.Target(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Llanowar Elves.Power = 1
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Third Path Iconoclast.Cast
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Pyroblast.Cast
+Bot1.Modes(1)
+Bot1.Target(Third Path Iconoclast)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Third Path Iconoclast
+Bot2.Battlefield.Llanowar Elves.Power = 1
+Bot1.Graveyard = Pyroblast; Pyroblast

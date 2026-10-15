@@ -1,0 +1,12 @@
+{
+  "name": "Brightglass Gearhulk",
+  "manaCost": "{G}{G}{W}{W}",
+  "type": "Artifact Creature — Construct",
+  "power": 4,
+  "toughness": 4,
+  "oracleText": "First strike, trample\nWhen this creature enters, you may search your library for up to two artifact, creature, and/or enchantment cards with mana value 1 or less, reveal them, put them into your hand, then shuffle.",
+  "keywords": [
+    "FirstStrike",
+    "Trample"
+  ]
+}

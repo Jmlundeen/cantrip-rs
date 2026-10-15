@@ -1,0 +1,8 @@
+{
+  "name": "Bilbo, Thief in the Night",
+  "manaCost": "{1}{U}",
+  "type": "Legendary Creature — Halfling Rogue",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Spells you cast from anywhere other than your hand cost {1} less to cast.\nWhenever Bilbo attacks, you may cast an artifact, instant, or sorcery spell from your graveyard. If an instant or sorcery spell cast this way would be put into your graveyard, exile it instead."
+}

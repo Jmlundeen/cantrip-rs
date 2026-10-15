@@ -1,0 +1,45 @@
+# Kicker is announced before Tear Asunder chooses its target: kicked exiles a creature, then unkicked exiles an artifact.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Mox Pearl
+Tear Asunder
+Tear Asunder
+Island
+Island x10
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Dark Confidant
+Island x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Dark Confidant.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Tear Asunder.Cast(Kicked: 1)
+Bot1.Target(Bot2.Battlefield.Dark Confidant)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Tear Asunder.Cast
+Bot1.Target(Bot2.Battlefield.Mox Jet)
+[T5 Bot1.Main2]
+
+[Expect]
+Exile = Dark Confidant; Mox Jet
+Bot1.Graveyard = Tear Asunder; Tear Asunder

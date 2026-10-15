@@ -1,0 +1,24 @@
+# Yavimaya, Cradle of Growth: "Each land is a Forest in addition to its other land types."
+#
+# The Plains keeps its own type and gains Forest (CR 305.7: a land that gains a land type in addition to its own keeps
+# its types and rules text), and the {T}: Add {G} comes from the Forest subtype (CR 305.6) rather than from anything
+# Yavimaya prints.
+
+[Bot1 Deck]
+Plains
+Yavimaya, Cradle of Growth
+Plains x13
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+? Bot1.Battlefield.Plains.Subtypes = Plains
+[T3 Bot1.Main1]
+Bot1.Hand.Yavimaya, Cradle of Growth.Play
+Bot1.Battlefield.Plains.Activate(Ability: {T}: Add {G}.)
+
+[Expect]
+Bot1.Battlefield.Plains.Subtypes = Forest; Plains
+Bot1.Mana = {G}

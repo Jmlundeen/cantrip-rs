@@ -1,0 +1,23 @@
+# Darkslick Shores enters tapped when you control three other lands: as the fourth land it is on the battlefield
+# tapped, where it would have been untapped as the third.
+
+[Bot1 Deck]
+Island x3
+Darkslick Shores
+Island x13
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Darkslick Shores.Play
+
+[Expect]
+Turn = 7
+Bot1.Battlefield.Darkslick Shores.Tapped = true

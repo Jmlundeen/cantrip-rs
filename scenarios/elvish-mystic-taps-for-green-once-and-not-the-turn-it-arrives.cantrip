@@ -1,0 +1,24 @@
+# {T}: Add {G}: summoning sickness keeps the Mystic from tapping on turn 1 (refusal), on turn 3 it makes one {G}, and it
+# is tapped, so a second activation is refused until it untaps.
+
+[Bot1 Deck]
+Forest
+Elvish Mystic
+Forest x12
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Elvish Mystic.Cast
+! Bot1.Battlefield.Elvish Mystic.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Elvish Mystic.Activate
+? Bot1.Mana = {G}
+! Bot1.Battlefield.Elvish Mystic.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Elvish Mystic.Tapped = true

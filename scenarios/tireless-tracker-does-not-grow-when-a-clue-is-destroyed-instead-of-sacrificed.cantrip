@@ -1,0 +1,43 @@
+# Tireless Tracker: "Whenever you sacrifice a Clue, put a +1/+1 counter" - sacrificing (CR 701.21) is not being destroyed.
+# Bot1's land on turn 3 investigates; Bot2's Disenchant destroys that Clue on turn 4 and the Tracker gets no counter: it is
+# still a 3/2. The sacrificing cases (a Clue's own ability, another cost) are in the sibling scenarios.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Mox Jet
+Tireless Tracker
+Forest
+Forest x14
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Disenchant
+Plains x15
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tireless Tracker.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Clue Token)
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Tireless Tracker.Power = 3
+Bot1.Battlefield.Tireless Tracker.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield = Mox Emerald; Mox Pearl; Mox Jet; Tireless Tracker; Forest

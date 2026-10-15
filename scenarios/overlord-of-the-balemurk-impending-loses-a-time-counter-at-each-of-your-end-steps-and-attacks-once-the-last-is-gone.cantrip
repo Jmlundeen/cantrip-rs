@@ -1,0 +1,56 @@
+# Overlord of the Balemurk cast for impending 5 on turn 3 loses one time counter at the beginning of each of Bot1's end
+# steps (turns 3, 5, 7, 9, 11) and none at Bot2's (CR 702.176a): 4 on turn 5, down to 1 on turn 11. It stays a noncreature
+# Enchantment with no creature types while it has one. When the fifth is removed it is a 5/5 Avatar Horror enchantment
+# creature (CR 613.1d), so on turn 13 it attacks, and "whenever this permanent attacks" mills four more. Only Swamps are
+# milled, so neither resolution has a card to offer back. The library: 43 less a 7-card hand, six draws (turns 3 to
+# 13) and eight milled is 22 (the graveyard also holds Swamps discarded to hand size).
+
+[Bot1 Deck]
+Swamp
+Swamp
+Overlord of the Balemurk
+Swamp x40
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Overlord of the Balemurk.Cast(Ability: Impending)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Overlord of the Balemurk.Counters.Time = 5
+? Bot1.Graveyard.Count = 4
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Overlord of the Balemurk.Counters.Time = 4
+? Bot1.Battlefield.Overlord of the Balemurk.Types = Enchantment
+? Bot1.Battlefield.Overlord of the Balemurk.Subtypes = (absent)
+[T7 Bot1.Main1]
+? Bot1.Battlefield.Overlord of the Balemurk.Counters.Time = 3
+[T9 Bot1.Main1]
+? Bot1.Battlefield.Overlord of the Balemurk.Counters.Time = 2
+[T11 Bot1.Main1]
+? Bot1.Battlefield.Overlord of the Balemurk.Counters.Time = 1
+? Bot1.Battlefield.Overlord of the Balemurk.Types = Enchantment
+[T13 Bot1.Main1]
+? Bot1.Battlefield.Overlord of the Balemurk.Counters.Time = (absent)
+? Bot1.Battlefield.Overlord of the Balemurk.Types = Enchantment; Creature
+? Bot1.Battlefield.Overlord of the Balemurk.Subtypes = Avatar; Horror
+? Bot1.Battlefield.Overlord of the Balemurk.Power = 5
+Bot1.Attack(Overlord of the Balemurk > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T13 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 15
+Bot1.Library.Count = 22
+Bot1.Battlefield.Overlord of the Balemurk.Types = Enchantment; Creature

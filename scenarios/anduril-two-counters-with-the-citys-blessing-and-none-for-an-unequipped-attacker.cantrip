@@ -1,0 +1,60 @@
+# Andúril triggers only when the *equipped* creature attacks (turn 5: the unequipped Ornithopter attacks alone, no counter),
+# and with the city's blessing (Ascend, CR 702.131) puts two counters on each creature its controller controls instead of
+# one: on turn 7 Bot1's Mountain is its tenth permanent and the equipped Ornithopter's attack gives both Bot1 Ornithopters
+# two counters. Counters go on creatures only (Sol Ring, Andúril and the Moxen get none) and on Bot1's alone (Bot2's
+# Ornithopter gets none). On turn 5 Bot1 controls nine permanents, one short, so the blessing is not yet had.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Sol Ring
+Ornithopter
+Ornithopter
+Andúril, Narsil Reforged
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Andúril, Narsil Reforged.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Andúril, Narsil Reforged.Activate(Bot1.Battlefield.Ornithopter; Ability: Equip)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Attack(Ornithopter#2)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Ornithopter#1.Counters.PlusOnePlusOne = (absent)
+? Bot1.Battlefield.Ornithopter#2.Counters.PlusOnePlusOne = (absent)
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Attack(Ornithopter#1)
+[T7 Bot1.Main2]
+
+[Expect]
+Turn = 7
+Bot1.Battlefield.Count = 10
+Bot1.Battlefield.Ornithopter#1.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Ornithopter#2.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Sol Ring.Types = Artifact
+Bot1.Battlefield.Andúril, Narsil Reforged.AttachedTo = Ornithopter
+Bot2.Battlefield.Ornithopter.Counters.PlusOnePlusOne = (absent)

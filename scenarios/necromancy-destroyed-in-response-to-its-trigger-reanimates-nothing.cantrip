@@ -1,0 +1,59 @@
+# Necromancy: "When this enchantment enters, if it's on the battlefield, it becomes an Aura ... Put target creature card
+# from a graveyard onto the battlefield". The "if it's on the battlefield" is an intervening if (CR 603.4): with the trigger
+# on the stack, Bot2 pays {1}{W} for Disenchant on the Necromancy; when the trigger would resolve the Necromancy is gone,
+# so it does nothing and the Ornithopter that Bot1's Bolt killed stays in Bot2's graveyard.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Mox Emerald
+Lightning Bolt
+Necromancy
+Island x15
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Ornithopter
+Disenchant
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Graveyard = Ornithopter
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Necromancy.Cast
+Bot1.Pass
+Bot2.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Disenchant.Cast(Necromancy)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Disenchant; Ornithopter
+Bot1.Graveyard = Necromancy; Lightning Bolt
+Bot1.Battlefield.Count = 4
+Stack.Count = 0

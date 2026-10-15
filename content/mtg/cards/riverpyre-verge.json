@@ -1,0 +1,5 @@
+{
+  "name": "Riverpyre Verge",
+  "type": "Land",
+  "oracleText": "{T}: Add {R}.\n{T}: Add {U}. Activate only if you control an Island or a Mountain."
+}

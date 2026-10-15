@@ -1,0 +1,32 @@
+# "Search your library for a basic land card": a Tundra in the library is a land with basic land types but not a basic land card
+# (CR 205.4a), so it may not be found (a refusal), while the Plains beside it may - the positive control. Bot1 sacrifices Fabled
+# Passage with only two other lands, so the Plains comes in tapped.
+
+[Bot1 Deck]
+Forest
+Forest
+Fabled Passage
+Island x4
+Island
+Island
+Tundra
+Plains
+Island x6
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Fabled Passage.Play
+Bot1.Battlefield.Fabled Passage.Activate
+! Bot1.Search(Tundra)
+Bot1.Search(Plains)
+
+[Expect]
+Bot1.Battlefield = Forest; Forest; Plains
+Bot1.Battlefield.Plains.Tapped = true
+Bot1.Graveyard = Fabled Passage

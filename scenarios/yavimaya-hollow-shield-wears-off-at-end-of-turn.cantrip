@@ -1,0 +1,35 @@
+# "Until end of turn" through cleanup: Bot2 makes a regeneration shield for the Elves in Bot1's turn 5 (nothing threatens them), and it
+# is gone by turn 7, when Bot1's Lightning Bolt destroys them: Bot2 makes no new shield (the Hollow is untapped but nothing activates it),
+# and the old one did not carry over.
+
+[Bot1 Deck]
+Lightning Bolt
+Mountain x20
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Yavimaya Hollow
+Forest x17
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Forest.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Yavimaya Hollow.Play
+[T5 Bot1.Main1]
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Yavimaya Hollow.Activate(Bot2.Battlefield.Llanowar Elves; Ability: Regenerate)
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Battlefield.Mountain.Activate
+[T7 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Llanowar Elves

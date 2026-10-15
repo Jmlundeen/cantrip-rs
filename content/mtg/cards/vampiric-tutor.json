@@ -1,0 +1,6 @@
+{
+  "name": "Vampiric Tutor",
+  "manaCost": "{B}",
+  "type": "Instant",
+  "oracleText": "Search your library for a card, then shuffle and put that card on top. You lose 2 life."
+}

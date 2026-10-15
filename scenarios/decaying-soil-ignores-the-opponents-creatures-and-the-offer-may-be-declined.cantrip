@@ -1,0 +1,103 @@
+# Decaying Soil with threshold (Brain Freeze with storm 6 on Bot1 on turn 1: 22 cards in the graveyard).
+# "Whenever a nontoken creature is put into your graveyard from the battlefield": a creature goes to its owner's
+# graveyard, so on turn 4 Bot2 bolting its own Ornithopter puts it into Bot2's graveyard, not Bot1's, and nothing
+# triggers. Bot2 then bolts Bot1's Ornithopter: the trigger goes on the stack, and Bot1 declines to pay {1} ("you may"),
+# so the Ornithopter stays in the graveyard and Bot1 keeps its untapped Mox Ruby. On turn 6 Bot2's Chain of Smog makes
+# Bot1 discard the second Ornithopter from its hand: a creature put into the graveyard, but not from the battlefield,
+# so again nothing triggers.
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Ruby
+Decaying Soil
+Mox Sapphire
+Mox Emerald
+Brain Freeze
+Island x21
+Ornithopter
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mox Jet
+Lightning Bolt
+Lightning Bolt
+Chain of Smog
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Decaying Soil.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Brain Freeze.Cast(Bot1)
+Bot1.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Upkeep]
+Bot1.Choose(Island)
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Ruby#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 0
+? Bot2.Graveyard.Count = 2
+? Bot1.Graveyard.Count = 21
+Bot2.Battlefield.Mox Ruby#2.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 1
+Bot1.Decline
+? Stack.Count = 0
+? Bot1.Graveyard.Count = 22
+[T5 Bot1.Upkeep]
+Bot1.Choose(Island)
+[T6 Bot2.Main1]
+? Bot1.Hand = Ornithopter
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby#3.Activate
+Bot2.Hand.Chain of Smog.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+Bot1.Choose(Ornithopter)
+Bot1.Decline
+? Stack.Count = 0
+? Bot1.Graveyard.Count = 22
+[T6 Bot2.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand.Count = 0
+Bot1.Battlefield.Mox Ruby.Tapped = false

@@ -1,0 +1,45 @@
+# Teferi, Hero of Dominaria, cast on turn 1 and raised by four +1s to 8 loyalty, uses his -8 on turn 9: the emblem exiles
+# a permanent of Bot2's each time Bot1 draws, here Bot2's Ornithopter for the draw step of turn 11.
+
+[Bot1 Deck]
+Plains
+Mox Sapphire
+Black Lotus
+Teferi, Hero of Dominaria
+Plains x30
+
+[Bot2 Deck]
+Island
+Ornithopter
+Island x30
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Teferi, Hero of Dominaria.Cast
+Bot1.Battlefield.Teferi, Hero of Dominaria.Activate(Ability: Draw a card)
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Teferi, Hero of Dominaria.Activate(Ability: Draw a card)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Teferi, Hero of Dominaria.Activate(Ability: Draw a card)
+[T7 Bot1.Main1]
+Bot1.Battlefield.Teferi, Hero of Dominaria.Activate(Ability: Draw a card)
+[T9 Bot1.Main1]
+? Bot1.Battlefield.Teferi, Hero of Dominaria.Counters.Loyalty = 8
+Bot1.Battlefield.Teferi, Hero of Dominaria.Activate(Ability: emblem)
+[T11 Bot1.Upkeep]
+Bot1.Pass
+Bot1.Target(Ornithopter)
+
+[Expect]
+Turn = 11
+Bot1.Emblems.Count = 1
+Bot2.Battlefield = Island
+Exile = Ornithopter

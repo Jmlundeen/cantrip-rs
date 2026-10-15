@@ -1,0 +1,6 @@
+{
+  "name": "Quicksilver Dagger",
+  "manaCost": "{1}{U}{R}",
+  "type": "Enchantment — Aura",
+  "oracleText": "Enchant creature\nEnchanted creature has \"{T}: This creature deals 1 damage to target player or planeswalker. You draw a card.\""
+}

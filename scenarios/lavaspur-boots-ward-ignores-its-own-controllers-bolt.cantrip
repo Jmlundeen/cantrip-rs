@@ -1,0 +1,38 @@
+# Ward only answers an opponent: Bot1 bolting its own equipped creature is not countered, and nothing is asked.
+
+[Bot1 Deck]
+Forest
+Forest
+Basking Rootwalla
+Lavaspur Boots
+Forest
+Lightning Bolt
+Mountain
+Forest x13
+
+[Bot2 Deck]
+Mountain
+Mountain
+Lightning Bolt
+Mountain x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Lavaspur Boots.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Basking Rootwalla.Cast
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Lavaspur Boots.Activate(Basking Rootwalla)
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Basking Rootwalla)
+
+[Expect]
+Bot1.Graveyard = Basking Rootwalla; Lightning Bolt
+Stack.Count = 0

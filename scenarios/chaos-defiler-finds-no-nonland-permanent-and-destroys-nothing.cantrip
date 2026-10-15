@@ -1,0 +1,29 @@
+# Chaos Defiler enters on turn 1 (Black Lotus for {R}{R}{R}, Mox Jet for {B}, Mox Ruby for {R}). Bot2 controls
+# no permanents at all, so there is nothing to choose: no question is asked and
+# nothing is destroyed.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Pearl
+Chaos Defiler
+Swamp x15
+
+[Bot2 Deck]
+Plains x16
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Chaos Defiler.Cast
+! Bot1.Choose
+[T2 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield = Mox Jet; Mox Ruby; Chaos Defiler
+Bot2.Graveyard.Count = 0

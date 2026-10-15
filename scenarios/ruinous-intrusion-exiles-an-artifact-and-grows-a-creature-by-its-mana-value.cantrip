@@ -1,0 +1,46 @@
+# Ruinous Intrusion exiles Bot2's Mind Stone (mana value 2) and puts that many +1/+1 counters on Bot1's Elvish Mystic.
+# Cast on turn 2, once the Mind Stone has resolved, off four Moxen that stayed untapped.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Mox Jet
+Mox Ruby
+Elvish Mystic
+Ruinous Intrusion
+Forest x13
+
+[Bot2 Deck]
+Island
+Mox Ruby
+Mind Stone
+Island x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Mind Stone.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ruinous Intrusion.Cast
+Bot1.Target(Bot2.Battlefield.Mind Stone)
+Bot1.Target(Bot1.Battlefield.Elvish Mystic)
+
+[Expect]
+Exile.Count = 1
+Bot2.Battlefield = Island; Mox Ruby
+Bot1.Battlefield.Elvish Mystic.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Elvish Mystic.Power = 3

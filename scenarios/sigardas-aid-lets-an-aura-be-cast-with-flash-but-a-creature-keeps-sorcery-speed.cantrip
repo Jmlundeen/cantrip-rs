@@ -1,0 +1,35 @@
+# Sigarda's Aid: "You may cast Aura and Equipment spells as though they had flash" (CR 307.5, 702.8). In Bot2's main phase
+# Bot1 may cast Rancor, an Aura, onto its Ornithopter, but a second Ornithopter, a creature spell, is not offered: the
+# permission covers Auras and Equipment and nothing else.
+
+[Bot1 Deck]
+Mox Pearl
+Sigarda's Aid
+Mox Emerald
+Ornithopter
+Ornithopter
+Rancor
+Forest x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Sigarda's Aid.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+! Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Rancor.Cast(Ornithopter)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Bot1.Battlefield.Rancor.AttachedTo = Ornithopter
+Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Ornithopter.Keywords = Flying; Trample

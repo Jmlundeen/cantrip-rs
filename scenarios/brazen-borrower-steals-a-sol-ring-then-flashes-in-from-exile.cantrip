@@ -1,0 +1,44 @@
+# Brazen Borrower goes on an Adventure (CR 715): on turn 3 Bot1 casts it as Petty Theft for {1}{U}, returning Bot2's Sol
+# Ring to Bot2's hand. While it is on the stack it is Petty Theft, and as it resolves it is exiled rather than put into
+# the graveyard. With a third Island down, in Bot2's end step on turn 6 Bot1 casts the Borrower itself from exile, with flash, for {1}{U}{U}.
+
+[Bot1 Deck]
+Island
+Island
+Brazen Borrower
+Island x12
+
+[Bot2 Deck]
+Island
+Sol Ring
+Island x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Brazen Borrower.Cast(Sol Ring; Ability: Adventure)
+? Stack = Petty Theft
+[T3 Bot1.Main2]
+? Exile = Brazen Borrower
+? Bot2.Battlefield = Island
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T6 Bot2.End]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Island#3.Activate
+Bot1.Exile.Brazen Borrower.Cast
+
+[Expect]
+Turn = 6
+Exile.Count = 0
+Bot1.Battlefield = Island; Island; Island; Brazen Borrower
+Bot1.Graveyard.Count = 0
+Bot2.Battlefield = Island
+Bot2.Hand.Count = 8

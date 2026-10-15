@@ -1,0 +1,32 @@
+# Shallow Grave: Bot1 bolts its own Ornithopter on turn 1; on turn 3 Shallow Grave returns the top creature card of the
+# graveyard to the battlefield with haste (so it can attack), and at the beginning of the end step it is exiled.
+
+[Bot1 Deck]
+Mountain
+Ornithopter
+Lightning Bolt
+Shallow Grave
+Mox Jet
+Island x9
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter)
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Shallow Grave.Cast
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Ornithopter.Keywords = Flying; Haste
+? Bot1.Graveyard = Shallow Grave; Lightning Bolt
+[T4 Bot2.Main1]
+
+[Expect]
+Exile = Ornithopter
+Bot1.Graveyard = Shallow Grave; Lightning Bolt

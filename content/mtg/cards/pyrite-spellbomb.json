@@ -1,0 +1,6 @@
+{
+  "name": "Pyrite Spellbomb",
+  "manaCost": "{1}",
+  "type": "Artifact",
+  "oracleText": "{R}, Sacrifice this artifact: It deals 2 damage to any target.\n{1}, Sacrifice this artifact: Draw a card."
+}

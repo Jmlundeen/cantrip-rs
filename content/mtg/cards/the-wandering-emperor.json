@@ -1,0 +1,10 @@
+{
+  "name": "The Wandering Emperor",
+  "manaCost": "{2}{W}{W}",
+  "type": "Legendary Planeswalker",
+  "loyalty": 3,
+  "oracleText": "Flash\nAs long as The Wandering Emperor entered this turn, you may activate her loyalty abilities any time you could cast an instant.\n+1: Put a +1/+1 counter on up to one target creature. It gains first strike until end of turn.\n−1: Create a 2/2 white Samurai creature token with vigilance.\n−2: Exile target tapped creature. You gain 2 life.",
+  "keywords": [
+    "Flash"
+  ]
+}

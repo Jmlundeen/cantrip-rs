@@ -1,0 +1,42 @@
+# Landfall is checked as the trigger resolves: Bot1's bestowed Nantuko on its Llanowar Elves triggers on Bot1's Forest on turn 3, and Bot2 answers with Lightning Bolt on the Elves (2/2 with the Nantuko). The Nantuko falls off and is a creature
+# again, attached to nothing when the trigger resolves, so no payment is asked and an Insect is made. The Forest stays untapped.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Forest
+Llanowar Elves
+Springheart Nantuko
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Springheart Nantuko.Cast(Bot1.Battlefield.Llanowar Elves; Ability: Bestow)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Llanowar Elves
+Bot1.Battlefield.Insect.Power = 1
+Bot1.Battlefield.Springheart Nantuko.Types = Enchantment; Creature
+Bot1.Battlefield.Forest#2.Tapped = false

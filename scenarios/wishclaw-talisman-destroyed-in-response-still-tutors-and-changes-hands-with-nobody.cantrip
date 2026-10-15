@@ -1,0 +1,52 @@
+# Wishclaw Talisman: "Search your library for a card, put it into your hand, then shuffle. An opponent gains control of this
+# artifact." Bot1 activates it (paying {1}, tapping it and removing a wish counter) and, with the ability on the stack,
+# destroys it with Abrade: the search still happens, and with the artifact gone nobody gains control of anything.
+
+[Bot1 Deck]
+Island
+Mountain
+Mox Jet
+Mox Ruby
+Mox Pearl
+Wishclaw Talisman
+Abrade
+Island
+Sol Ring
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Wishclaw Talisman.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Wishclaw Talisman.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Abrade.Cast
+Bot1.Modes(Destroy target artifact)
+Bot1.Target(Wishclaw Talisman)
+Bot1.Pass
+Bot2.Pass
+Bot1.Search(Sol Ring)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Hand.Count = 3
+Bot1.Graveyard = Abrade; Wishclaw Talisman
+Bot2.Battlefield.Count = 0

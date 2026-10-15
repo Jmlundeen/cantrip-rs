@@ -1,0 +1,52 @@
+# Coveted Jewel: "Whenever one or more creatures an opponent controls attack you and aren't blocked, that player draws three cards and
+# gains control of this artifact. Untap it." Bot1 casts the Jewel on turn 1 (Black Lotus and three Moxen) and Bot2's Llanowar Elves
+# attacks unblocked on turn 4. With the trigger on the stack Bot1 taps the Jewel for {W}{W}{W} and Disenchants it. The trigger still resolves:
+# Bot2 draws its three cards, but there is no Jewel left to gain control of or untap (CR 608.2b, 608.2h).
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Coveted Jewel
+Disenchant
+Plains
+Plains
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Forest x12
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Coveted Jewel.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T4 Bot2.Main1]
+Bot2.Attack(Llanowar Elves > Bot1)
+[T4 Bot2.Blockers]
+Bot2.Pass
+Bot1.Battlefield.Coveted Jewel.Activate(Color: White)
+Bot1.Hand.Disenchant.Cast(Bot1.Battlefield.Coveted Jewel)
+Bot1.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Disenchant; Coveted Jewel; Black Lotus
+Bot2.Battlefield = Forest; Llanowar Elves
+Bot2.Hand.Count = 10

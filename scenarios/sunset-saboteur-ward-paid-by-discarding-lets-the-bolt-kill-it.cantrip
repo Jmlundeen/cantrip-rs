@@ -1,0 +1,29 @@
+# The other branch of Ward--Discard a card: Bot2 accepts the discard of an Island, so the Bolt is not countered and kills the 4/1 Saboteur.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Sunset Saboteur
+Swamp x13
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x14
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sunset Saboteur.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Sunset Saboteur)
+Bot2.Accept
+Bot2.Choose(Island)
+
+[Expect]
+Bot1.Graveyard = Sunset Saboteur
+Bot2.Graveyard = Lightning Bolt; Island

@@ -1,0 +1,11 @@
+{
+  "name": "Ursine Monstrosity",
+  "manaCost": "{2}{G}",
+  "type": "Creature — Bear Mutant",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Trample\nAt the beginning of combat on your turn, mill a card and choose an opponent at random. This creature attacks that player this combat if able. Until end of turn, this creature gains indestructible and gets +1/+1 for each card type among cards in your graveyard.",
+  "keywords": [
+    "Trample"
+  ]
+}

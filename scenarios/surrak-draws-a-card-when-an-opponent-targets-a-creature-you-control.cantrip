@@ -1,0 +1,34 @@
+# Surrak, Elusive Hunter draws its controller a card when an opponent's spell targets a creature they control: Bot2's
+# Lightning Bolt on Surrak itself triggers it, the card is drawn first, then the Bolt kills the 4/3.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Surrak, Elusive Hunter
+Forest x12
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Surrak, Elusive Hunter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Surrak, Elusive Hunter)
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot1.Hand.Count = 4
+Bot1.Graveyard = Surrak, Elusive Hunter
+Bot2.Graveyard = Lightning Bolt

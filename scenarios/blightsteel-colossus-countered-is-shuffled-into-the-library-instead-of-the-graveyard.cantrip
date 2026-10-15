@@ -1,0 +1,57 @@
+# From the stack: Bot1 casts Blightsteel Colossus ({12}: three Ancient Tombs, four Moxen and Black Lotus) on turn 5 and Bot2 counters it with Counterspell. A countered spell is put into the graveyard (CR 701.6a),
+# so the Colossus is revealed and shuffled into its owner's library instead; only the Counterspell is in a graveyard.
+
+[Bot1 Deck]
+Ancient Tomb
+Ancient Tomb
+Ancient Tomb
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Blightsteel Colossus
+Black Lotus
+Island x10
+
+[Bot2 Deck]
+Island
+Island
+Counterspell
+Island x12
+
+[Actions]
+Bot1.Hand.Ancient Tomb.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Ancient Tomb.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Ancient Tomb.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Ancient Tomb.Activate
+Bot1.Battlefield.Ancient Tomb#2.Activate
+Bot1.Battlefield.Ancient Tomb#3.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Blightsteel Colossus.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Island#2.Activate
+Bot2.Hand.Counterspell.Cast(Blightsteel Colossus)
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Library.Count = 11
+Bot1.Hand.Count = 0
+Bot1.Graveyard = Black Lotus
+Bot2.Graveyard = Counterspell

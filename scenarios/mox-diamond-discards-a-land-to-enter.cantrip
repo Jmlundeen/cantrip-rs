@@ -1,0 +1,22 @@
+# Mox Diamond cast for {0}: its replacement (CR 614.12a) lets Bot1 discard a land card instead of letting it enter, and if they do it is put onto the battlefield, where it taps for any color.
+
+[Bot1 Deck]
+Mox Diamond
+Island
+Forest
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Diamond.Cast
+Bot1.Accept
+Bot1.Choose(Forest)
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Battlefield = Island; Mox Diamond
+Bot1.Graveyard = Forest

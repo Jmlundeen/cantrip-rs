@@ -1,0 +1,42 @@
+# The eternalized token is itself a creature with power 4, so on the next turn it satisfies its own ferocious condition: with no
+# other creature on the battlefield it taps for {G}{G}{G}{G} (it was summoning sick on the turn it was created, so this
+# is the first turn it may tap). Same position as the eternalize scenario, one turn on.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Mox Emerald
+Sol Ring
+Faithless Looting
+Fanatic of Rhonas
+Mox Ruby
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Fanatic of Rhonas; Forest)
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Graveyard.Fanatic of Rhonas.Activate(Ability: Eternalize)
+
+[T3 Bot1.Main1]
+Bot1.Battlefield.Fanatic of Rhonas.Activate(Ability: Ferocious)
+? Bot1.Mana = {G}{G}{G}{G}
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Fanatic of Rhonas.Tapped = true
+Bot1.Battlefield.Fanatic of Rhonas.Power = 4

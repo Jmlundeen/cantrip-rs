@@ -1,0 +1,37 @@
+# Containment Priest exiles a nontoken creature that would enter without being cast. Jacked Rabbit was cast, so it
+# enters; the Rabbit tokens its attack trigger makes are tokens, so they enter too. The Priest itself was cast.
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Jacked Rabbit
+Plains x10
+
+[Bot2 Deck]
+Plains
+Plains
+Containment Priest
+Island x11
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot2.Hand.Plains.Play
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains#1.Activate
+Bot2.Battlefield.Plains#2.Activate
+Bot2.Hand.Containment Priest.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Hand.Jacked Rabbit.Cast(X: 1)
+Bot1.Attack(Jacked Rabbit)
+
+[Expect]
+Step = Attackers
+Bot2.Battlefield = Plains; Plains; Containment Priest
+Bot1.Battlefield = Plains; Plains; Plains; Jacked Rabbit; Rabbit; Rabbit
+Exile.Count = 0

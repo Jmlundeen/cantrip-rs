@@ -1,0 +1,28 @@
+{
+  "name": "Norman Osborn",
+  "manaCost": "{1}{U}",
+  "type": "Legendary Creature — Human Scientist Villain",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "Norman Osborn can't be blocked.\nWhenever Norman Osborn deals combat damage to a player, he connives. (Draw a card, then discard a card. If you discarded a nonland card, put a +1/+1 counter on this creature.)\n{1}{U}{B}{R}: Transform Norman Osborn. Activate only as a sorcery.",
+  "keywords": [
+    "CantBeBlocked"
+  ],
+  "backFace": {
+    "name": "Green Goblin",
+    "manaCost": "{1}{U}{B}{R}",
+    "colorIndicator": [
+      "Blue",
+      "Black",
+      "Red"
+    ],
+    "type": "Legendary Creature — Goblin Human Villain",
+    "power": 3,
+    "toughness": 3,
+    "oracleText": "Flying, menace\nSpells you cast from your graveyard cost {2} less to cast.\nGoblin Formula — Each nonland card in your graveyard has mayhem. The mayhem cost is equal to its mana cost. (You may cast a card from your graveyard for its mayhem cost if you discarded it this turn. Timing rules still apply.)",
+    "keywords": [
+      "Flying",
+      "Menace"
+    ]
+  }
+}

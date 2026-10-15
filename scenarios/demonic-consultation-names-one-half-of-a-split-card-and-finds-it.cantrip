@@ -1,0 +1,30 @@
+# A player choosing the name of a split card chooses the name of one of its halves (CR 201.4b), and a card with that
+# name in common has the same name (CR 201.2a). Bot1 names Death; Life // Death is the next card after the six
+# exiled ones, so it goes to hand and the cards revealed above it are exiled with the six.
+
+[Bot1 Deck]
+Swamp
+Demonic Consultation
+Island x5
+Island x6
+Forest
+Forest
+Life // Death
+Forest x3
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Demonic Consultation.Cast
+Bot1.Name(Death)
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Hand = Island; Island; Island; Island; Island; Life // Death
+Exile.Count = 8
+Bot1.Library = Forest; Forest; Forest
+Bot1.Graveyard = Demonic Consultation

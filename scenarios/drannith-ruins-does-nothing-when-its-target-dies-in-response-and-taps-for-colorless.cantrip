@@ -1,0 +1,34 @@
+# On turn 3 Bot1 casts Ornithopter and pays for the Ruins' second ability with two Moxen, targeting it; Bot2 kills the
+# Ornithopter in response with Lightning Bolt, the only target, so the ability does not resolve (CR 608.2b) and no counter is
+# placed. Separately the Ruins' first ability taps it for {C}: checked in the pool in a later main phase.
+
+[Bot1 Deck]
+Drannith Ruins
+Ornithopter
+Mox Jet
+Mox Ruby
+Island x20
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Drannith Ruins.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Drannith Ruins.Activate(Ability: Put two; Ornithopter)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Drannith Ruins.Activate(Ability: Add)
+
+[Expect]
+Bot1.Graveyard = Ornithopter
+Bot1.Mana = {C}

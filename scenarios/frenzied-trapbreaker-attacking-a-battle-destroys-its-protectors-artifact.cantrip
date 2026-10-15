@@ -1,0 +1,52 @@
+# Frenzied Trapbreaker: "Whenever this creature attacks, destroy target artifact or enchantment defending player controls."
+# When a creature attacks a battle, the defending player is the battle's protector (CR 508.5, 310.9d). Turn 5 (night) Bot1
+# casts Invasion of Gobakhan, which Bot2 protects, and attacks it with the Trapbreaker: Bot2's Mox Jet and Mox Emerald are
+# candidates (two, so the choice is asked) and Bot1's own Mox Ruby is not (the refusal). The Jet is destroyed.
+
+[Bot1 Deck]
+Forest
+Forest
+Mox Ruby
+Mox Pearl
+Outland Liberator
+Invasion of Gobakhan
+Forest
+Forest x13
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Emerald
+Swamp x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Outland Liberator.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Invasion of Gobakhan.Cast
+Bot1.Pass
+Bot1.Attack(Frenzied Trapbreaker > Bot1.Battlefield.Invasion of Gobakhan)
+! Bot1.Target(Bot1.Battlefield.Mox Ruby)
+Bot1.Target(Bot2.Battlefield.Mox Jet)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Mox Jet
+Bot2.Battlefield = Mox Emerald
+Bot1.Battlefield.Mox Ruby.Tapped = true

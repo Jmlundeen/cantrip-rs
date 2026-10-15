@@ -1,0 +1,42 @@
+# Pyrokinesis exiles a red card from the hand (CR 118.9) and divides 4 damage as it is cast (CR 601.2d): 1 to Llanowar
+# Elves and 3 to Ornithopter, each target getting at least one. Guerrilla Gorilla is not a target and survives.
+
+[Bot1 Deck]
+Mountain
+Pyrokinesis
+Lightning Bolt
+Mountain x5
+Mountain x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Ornithopter
+Forest
+Guerrilla Gorilla
+Forest x4
+Forest x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Ornithopter.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Forest#2.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Pyrokinesis.Cast(Ability: Exile)
+Bot1.Divide(Llanowar Elves: 1; Ornithopter: 3)
+Bot1.Choose(Lightning Bolt)
+[Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Exile = Lightning Bolt
+Bot1.Graveyard = Pyrokinesis
+Bot2.Graveyard.Count = 2
+Bot2.Battlefield = Forest; Forest; Guerrilla Gorilla

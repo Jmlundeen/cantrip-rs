@@ -1,0 +1,31 @@
+# "Target opponent reveals their hand. You choose an instant or sorcery card from it": when the hand holds only lands and a
+# creature there is nothing eligible to choose, so nothing is discarded (CR 701.20b-c, the hand is still revealed), and
+# Bot2 keeps all of its cards (the Forest in its graveyard is its turn-2 discard to hand size).
+
+[Bot1 Deck]
+Swamp
+Swamp
+Collective Brutality
+Swamp x10
+
+[Bot2 Deck]
+Forest
+Forest
+Llanowar Elves
+Forest x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Collective Brutality.Cast
+Bot1.Modes(1)
+Bot1.Target(Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Forest
+Bot2.Hand.Count = 7
+Bot1.Graveyard = Collective Brutality

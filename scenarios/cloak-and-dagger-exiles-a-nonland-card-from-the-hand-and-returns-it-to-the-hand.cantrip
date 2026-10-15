@@ -1,0 +1,45 @@
+# Cloak and Dagger, Entwined: "You may exile a nonland card from their hand or the chosen creature" - here no creature is
+# chosen (the second target is "up to one", and Bot2 has no creature to offer) and Bot1 exiles one of Bot2's two Lightning Bolts (CR
+# 610.3 until Cloak and Dagger leaves the battlefield); the lands in the hand are not on offer. Bot2's other Bolt kills
+# Cloak and Dagger on turn 4 and the exiled one comes back to its owner's hand at once, not to the stack.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Cloak and Dagger, Entwined
+Plains x11
+
+[Bot2 Deck]
+Mountain
+Forest
+Lightning Bolt
+Lightning Bolt
+Forest x3
+Forest x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cloak and Dagger, Entwined.Cast
+Bot1.Target(Bot2)
+Bot1.Choose(Lightning Bolt)
+? Exile = Lightning Bolt
+? Bot2.Hand.Count = 6
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Cloak and Dagger, Entwined)
+
+[Expect]
+Turn = 4
+Exile.Count = 0
+Bot1.Graveyard = Cloak and Dagger, Entwined
+Bot2.Graveyard = Lightning Bolt
+Bot2.Hand = Forest; Forest; Forest; Forest; Forest; Forest; Lightning Bolt

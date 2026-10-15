@@ -1,0 +1,33 @@
+# "Draw two cards, then discard two cards": the draw comes first, so with an empty hand (everything else was a free artifact
+# already cast) the two cards just drawn are the ones discarded. Black Lotus pays for {R}.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Faithless Looting
+Island
+Mountain
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+? Bot1.Hand.Count = 1
+Bot1.Hand.Faithless Looting.Cast
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 0
+Bot1.Graveyard = Faithless Looting; Mountain; Island; Black Lotus

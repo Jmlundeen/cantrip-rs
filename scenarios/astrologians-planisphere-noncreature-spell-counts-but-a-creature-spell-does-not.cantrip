@@ -1,0 +1,40 @@
+# Turn 5: Bot1 casts Aether Spellbomb (noncreature) and the equipped Hero grows a +1/+1 counter; then Thieving Skydiver
+# (a creature spell) and it does not grow again. The Hero is 2/2 with exactly one counter.
+
+[Bot1 Deck]
+Island
+Island
+Astrologian's Planisphere
+Island
+Aether Spellbomb
+Thieving Skydiver
+Island
+Island x12
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Astrologian's Planisphere.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Aether Spellbomb.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Island#3.Activate
+Bot1.Hand.Thieving Skydiver.Cast
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Hero.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Hero.Power = 2
+Bot1.Battlefield.Hero.Toughness = 2
+Bot1.Battlefield.Thieving Skydiver.Subtypes = Merfolk; Rogue
+Stack.Count = 0

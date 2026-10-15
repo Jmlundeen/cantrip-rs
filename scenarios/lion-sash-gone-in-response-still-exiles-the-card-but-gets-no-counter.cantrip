@@ -1,0 +1,38 @@
+# The counter goes on "this permanent": when Bot2's Lightning Bolt kills the Lion Sash with its ability on the stack, the ability
+# still resolves, exiling Bot2's discarded Llanowar Elves (a permanent card), and puts no counter anywhere (the Sash is a
+# new object in the graveyard, CR 400.7).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Lion Sash
+Plains x20
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Llanowar Elves
+Mountain x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Lion Sash.Cast
+Bot1.Pass
+Bot2.Discard(Llanowar Elves)
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Lion Sash.Activate(Bot2.Graveyard.Llanowar Elves)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Lion Sash)
+[T5 Bot1.Main2]
+
+[Expect]
+Exile = Llanowar Elves
+Bot1.Graveyard = Lion Sash

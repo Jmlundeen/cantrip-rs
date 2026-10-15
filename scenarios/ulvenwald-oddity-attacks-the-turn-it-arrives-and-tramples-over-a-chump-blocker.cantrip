@@ -1,0 +1,33 @@
+# Ulvenwald Oddity has haste and trample: cast on turn 1 with a Black Lotus and a Forest it attacks at once and hits for 4 (20 to
+# 16); on turn 3 Bot2's Ornithopter (0/2) blocks it, takes the 2 lethal damage, and the other 2 trample over to Bot2 (16 to 14).
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Ulvenwald Oddity
+Forest x14
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Ulvenwald Oddity.Cast
+Bot1.Pass
+Bot1.Attack(Ulvenwald Oddity > Bot2)
+[T1 Bot1.Main2]
+? Bot2.Life = 16
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Ulvenwald Oddity > Bot2)
+Bot2.Block(Ornithopter > Ulvenwald Oddity)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Bot2.Graveyard = Ornithopter

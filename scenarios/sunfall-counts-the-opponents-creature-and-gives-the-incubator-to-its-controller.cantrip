@@ -1,0 +1,36 @@
+# Sunfall: "Exile all creatures. Incubate X, where X is the number of creatures exiled this way": Bot1's Ornithopter and Bot2's
+# Ornithopter both go, so X = 2 and the Incubator, made by Sunfall's controller Bot1, enters with two counters while Bot2 gets
+# nothing. The Moxen, artifacts and not creatures, stay.
+
+[Bot1 Deck]
+Ornithopter
+Black Lotus
+Mox Pearl
+Mox Jet
+Sunfall
+Island x12
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Sunfall.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Mox Pearl; Mox Jet; Incubator Token
+Bot1.Battlefield.Incubator Token.Counters.PlusOnePlusOne = 2
+Bot2.Battlefield.Count = 0
+Exile.Count = 2

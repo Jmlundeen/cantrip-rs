@@ -1,0 +1,8 @@
+{
+  "name": "Gau, Feral Youth",
+  "manaCost": "{1}{R}",
+  "type": "Legendary Creature — Human Berserker",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Rage — Whenever Gau attacks, put a +1/+1 counter on it.\nAt the beginning of each end step, if a card left your graveyard this turn, Gau deals damage equal to its power to each opponent."
+}

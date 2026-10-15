@@ -1,0 +1,6 @@
+{
+  "name": "From the Catacombs",
+  "manaCost": "{3}{B}{B}",
+  "type": "Sorcery",
+  "oracleText": "Put target creature card from a graveyard onto the battlefield under your control with a corpse counter on it. You take the initiative. If that creature would leave the battlefield, exile it instead of putting it anywhere else.\nEscape—{3}{B}{B}, Exile five other cards from your graveyard. (You may cast this card from your graveyard for its escape cost.)"
+}

@@ -1,0 +1,25 @@
+# Blood Crypt: "As this land enters, you may pay 2 life. If you don't, it enters tapped." Bot1 declines: the land is
+# tapped, life stays 20, and neither of its mana abilities is offered (! Activate) while it is tapped; the paid land
+# of the other scenario is the positive control. After untapping on turn 3 it taps for {B} as well as {R}, and it is
+# a Swamp Mountain (CR 305.6: the intrinsic mana abilities come from the land types).
+
+[Bot1 Deck]
+Blood Crypt
+Plains x19
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Blood Crypt.Play
+Bot1.Decline
+? Bot1.Life = 20
+? Bot1.Battlefield.Blood Crypt.Tapped = true
+? Bot1.Battlefield.Blood Crypt.Subtypes = Mountain; Swamp
+! Bot1.Battlefield.Blood Crypt.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Blood Crypt.Activate(Ability: {B})
+
+[Expect]
+Bot1.Life = 20
+Bot1.Mana = {B}

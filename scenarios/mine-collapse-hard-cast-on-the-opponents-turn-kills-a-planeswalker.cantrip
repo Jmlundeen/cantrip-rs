@@ -1,0 +1,42 @@
+# "Deals 5 damage to target creature or planeswalker": on Bot2's turn the alternative cost is out, and Bot1 pays the full {3}{R} with four Moxen
+# for the instant; the 5 damage removes all 3 loyalty from Bot2's freshly cast Liliana of the Veil (CR 306.8, 704.5i).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Mox Jet
+Mox Pearl
+Mine Collapse
+Mountain x12
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Liliana of the Veil
+Swamp x12
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Liliana of the Veil.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Pass
+Bot1.Hand.Mine Collapse.Cast(Bot2.Battlefield.Liliana of the Veil)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+[T2 Bot2.Main2]
+
+[Expect]
+Bot2.Graveyard = Liliana of the Veil
+Bot1.Graveyard = Mine Collapse

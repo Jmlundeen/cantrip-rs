@@ -1,0 +1,61 @@
+# The Sensational She-Hulk: "Whenever a creature you control is dealt damage, you may have The Sensational She-Hulk deal
+# that much damage to any target. Do this only once each turn." (CR 120.3, 603.2h) Bot1 casts her as the back face on
+# turn 11. On turn 12 Bot2 bolts her: she is dealt 3, Bot1 aims it at Bot2 and says yes, so Bot2 is at 17. Bot2's second
+# Bolt, at her again, kills her (6 damage) but triggers nothing: the doing was spent for the turn, so Bot2 stays at 17.
+# On turn 11 itself Bot2 could not cast either (the ban), the same Bolt waiting in its hand.
+
+[Bot1 Deck]
+Plains x3
+Forest x3
+Jennifer Walters
+Plains x14
+
+[Bot2 Deck]
+Mountain
+Mountain
+Lightning Bolt
+Lightning Bolt
+Mountain x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot2.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T11 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Jennifer Walters.Cast(Ability: back face)
+Bot1.Pass
+[T11 Bot1.Main2]
+Bot1.Pass
+! Bot2.Hand.Lightning Bolt.Cast
+[T12 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.The Sensational She-Hulk)
+Bot2.Pass
+Bot1.Target(Bot2)
+Bot2.Pass
+Bot1.Accept
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.The Sensational She-Hulk)
+Bot2.Pass
+[T12 Bot2.Main2]
+
+[Expect]
+Turn = 12
+Bot2.Life = 17
+Bot1.Battlefield = Plains; Plains; Plains; Forest; Forest; Forest
+Bot1.Graveyard = Jennifer Walters

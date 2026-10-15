@@ -1,0 +1,34 @@
+# The blinked creature is a new object (CR 400.7): Bot2's Lightning Bolt on Bot1's Llanowar Elves has no legal target when it resolves and does nothing (CR 608.2b),
+# so the Elves, back on the battlefield, take no damage and are still alive; the Bolt goes to the graveyard and Ephemerate waits in exile to rebound.
+
+[Bot1 Deck]
+Plains
+Mox Emerald
+Llanowar Elves
+Ephemerate
+Plains x16
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Ephemerate.Cast(Llanowar Elves)
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Bot1.Battlefield = Plains; Mox Emerald; Llanowar Elves
+Bot1.Battlefield.Llanowar Elves.Damage = 0
+Bot2.Graveyard = Lightning Bolt
+Exile = Ephemerate

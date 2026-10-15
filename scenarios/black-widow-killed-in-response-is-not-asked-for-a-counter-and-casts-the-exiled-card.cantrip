@@ -1,0 +1,51 @@
+# Black Widow connects on turn 5; with her trigger on the stack Bot2 Bolts her. As the trigger resolves she cannot take a
+# counter, so Bot1 is not asked (the choice is impossible, CR 608.2d), "if you don't" holds, and Bot1 casts the exiled
+# Lightning Bolt (a Swamp pays the {R}: any type of mana) at Bot2. Bot2 exiled an Island on the way.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Black Widow, Super Spy
+Swamp x12
+
+[Bot2 Deck]
+Mountain
+Mountain
+Lightning Bolt
+Island x4
+Island
+Island
+Island
+Lightning Bolt
+Island x5
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Black Widow, Super Spy.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Attack(Black Widow, Super Spy)
+[T5 Bot1.Damage]
+? Stack.Count = 1
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Black Widow, Super Spy)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+! Bot1.Accept
+[T5 Bot1.Main2]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+
+[Expect]
+Bot2.Life = 15
+Bot1.Graveyard = Black Widow, Super Spy
+Exile = Island

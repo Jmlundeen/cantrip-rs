@@ -1,0 +1,58 @@
+# The creature with power 4 or more is checked as the spell resolves (CR 608.2c): Bot1 has Aragorn (4/4) when it casts the
+# Denial, but Bot2 kills it with Dismember in response, so the Denial is only "unless pays {1}" and Bot2, with Mox
+# Emerald still open, pays and its Duress resolves.
+
+[Bot1 Deck]
+Island
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Aragorn, King of Gondor
+Stubborn Denial
+Island x10
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Mox Emerald
+Duress
+Dismember
+Swamp x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Aragorn, King of Gondor.Cast
+Bot1.Pass
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Duress.Cast(Bot1)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Stubborn Denial.Cast(Duress)
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Dismember.Cast(Aragorn, King of Gondor)
+Bot2.Modes(1)
+Bot2.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.PayCost
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Stubborn Denial; Aragorn, King of Gondor
+Bot2.Graveyard = Duress; Dismember
+Bot2.Life = 18

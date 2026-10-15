@@ -1,0 +1,34 @@
+# Fury (evoked, exiling a Lightning Bolt) divides 4 damage as 1 to one Ornithopter and 3 to the other; in response Bot2 Bolts the
+# second one, its own, away. The trigger resolves for the target that is left (CR 608.2b): that Ornithopter has exactly 1 damage
+# marked - its own share, not the missing creature's - and Fury is then sacrificed by the evoke trigger.
+
+[Bot1 Deck]
+Fury
+Lightning Bolt
+Mountain x18
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Ornithopter
+Ornithopter
+Mountain x10
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Fury.Cast(Ability: Evoke)
+Bot1.Choose(Lightning Bolt)
+Bot1.Divide(Bot2.Battlefield.Ornithopter#1: 1; Bot2.Battlefield.Ornithopter#2: 3)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter#2)
+[T3 Bot1.Main2]
+? Bot2.Battlefield.Ornithopter.Damage = 1
+? Bot1.Graveyard = Fury
+
+[Expect]
+Bot2.Graveyard = Ornithopter; Lightning Bolt
+Bot2.Battlefield.Ornithopter.Damage = 1

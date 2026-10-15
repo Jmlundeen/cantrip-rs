@@ -1,0 +1,31 @@
+# Earthcraft: "Tap an untapped creature you control: Untap target basic land." Llanowar Elves, cast this turn and so
+# summoning sick, are tapped as the cost (it is Earthcraft's ability, not the Elves' own {T}, CR 302.6), and the tapped
+# Forest untaps.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Llanowar Elves
+Earthcraft
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Earthcraft.Cast
+Bot1.Battlefield.Earthcraft.Activate(Bot1.Battlefield.Forest)
+Bot1.Choose(Llanowar Elves)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Forest.Tapped = false
+Bot1.Battlefield.Llanowar Elves.Tapped = true

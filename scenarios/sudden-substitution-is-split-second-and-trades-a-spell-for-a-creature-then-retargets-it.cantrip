@@ -1,0 +1,50 @@
+# Sudden Substitution (split second): "Exchange control of target noncreature spell and target creature. Then the spell's
+# controller may choose new targets for it." Bot2's Lightning Bolt aims at Bot1; Bot1 trades it for its own Llanowar
+# Elves (CR 112.2, 701.12), and as the Bolt's new controller aims it at Bot2. Split second (CR 702.61a): while the spell is
+# on the stack Bot2 is offered no second Bolt, though it has the mana (refused); once it has resolved, Bot2 can cast one
+# (the control). Bolt's 3 damage goes to Bot2 (17), and Bot2's second Bolt takes Bot1 to 17. The Elves are Bot2's.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Llanowar Elves
+Sudden Substitution
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Mountain x3
+Mountain x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Island.Play
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sudden Substitution.Cast
+Bot1.Target(Stack.Lightning Bolt)
+Bot1.Target(Bot1.Battlefield.Llanowar Elves)
+! Bot2.Hand.Lightning Bolt.Cast
+Bot1.Target(Bot2)
+[T2 Bot2.Main2]
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T3 Bot1.Upkeep]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Life = 17
+Bot2.Battlefield = Llanowar Elves; Mountain; Mox Ruby

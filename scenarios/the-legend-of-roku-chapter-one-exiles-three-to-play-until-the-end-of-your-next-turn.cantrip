@@ -1,0 +1,46 @@
+# The Legend of Roku, chapter I: "Exile the top three cards of your library. Until the end of your next turn, you may
+# play those cards." Cast on turn 1 off Mox Ruby and Black Lotus (the land drop is still unused), the top three are
+# Island, Lightning Bolt and Forest, and the Mountain under them stays in the library.
+#
+# This turn the exiled Island is the turn's land. Bot1's next turn (T3) is still within "until the end of your next
+# turn": the exiled Lightning Bolt is cast then. By T5 the permission has ended with T3's cleanup, so the Forest, which
+# was never played, cannot be (the refusal is paired with the Island and the Bolt having been played from the same exile).
+
+[Bot1 Deck]
+Mox Ruby
+Black Lotus
+The Legend of Roku
+Mountain x4
+Island
+Lightning Bolt
+Forest
+Mountain x12
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.The Legend of Roku.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Exile.Island.Play
+? Exile.Count = 2
+? Bot1.Library.Count = 12
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+[T5 Bot1.Main1]
+! Bot1.Exile.Forest.Play
+
+[Expect]
+Bot1.Battlefield.Island.Tapped = false
+Exile = Forest
+Bot1.Graveyard = Lightning Bolt; Black Lotus
+Bot2.Life = 17

@@ -1,0 +1,32 @@
+# "Search your library for an Island or Swamp card" is a search by land type (CR 205.3i): Volcanic Island is an Island and Mountain, so
+# it is found (the Island branch the existing scenario does not take) while a plain Mountain and a Forest are not (refusals). The
+# second Delta in hand on turn 3 is then activated and the search is answered with nothing (a quality search may find nothing, CR
+# 701.23b): the land is still sacrificed and the life still paid.
+
+[Bot1 Deck]
+Polluted Delta
+Polluted Delta
+Mountain x5
+Volcanic Island
+Mountain
+Forest
+Island x10
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Polluted Delta.Play
+Bot1.Battlefield.Polluted Delta.Activate
+! Bot1.Search(Mountain)
+! Bot1.Search(Forest)
+Bot1.Search(Volcanic Island)
+[T3 Bot1.Main1]
+Bot1.Hand.Polluted Delta.Play
+Bot1.Battlefield.Polluted Delta.Activate
+Bot1.Search()
+
+[Expect]
+Bot1.Life = 18
+Bot1.Graveyard = Polluted Delta; Polluted Delta
+Bot1.Battlefield = Volcanic Island

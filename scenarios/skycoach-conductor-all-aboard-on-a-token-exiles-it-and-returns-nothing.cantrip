@@ -1,0 +1,41 @@
+# All Aboard returns "that card": a token exiled by it ceases to exist (CR 111.7, 704.5d) and there is no card to
+# return. Bot1's Inkling, from Emeritus of Truce aimed at Bot1, is exiled and does not come back; the copy is spent.
+
+[Bot1 Deck]
+Tundra x3
+Emeritus of Truce
+Tundra
+Skycoach Conductor
+Island x14
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Tundra.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Tundra.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Tundra.Play
+Bot1.Battlefield.Tundra.Activate(Ability: {W})
+Bot1.Battlefield.Tundra.Activate(Ability: {W})
+Bot1.Battlefield.Tundra.Activate(Ability: {W})
+Bot1.Hand.Emeritus of Truce.Cast
+Bot1.Target(Bot1)
+[T7 Bot1.Main1]
+? Bot1.Battlefield.Inkling.Types = Creature
+Bot1.Hand.Tundra.Play
+Bot1.Battlefield.Tundra.Activate(Ability: {U})
+Bot1.Battlefield.Tundra.Activate(Ability: {U})
+Bot1.Battlefield.Tundra.Activate(Ability: {U})
+Bot1.Hand.Skycoach Conductor.Cast
+[T7 Bot1.Main2]
+Bot1.Battlefield.Tundra.Activate(Ability: {U})
+Bot1.Exile.All Aboard.Cast(Bot1.Battlefield.Inkling)
+[T7 Bot1.End]
+
+[Expect]
+Turn = 7
+Exile.Count = 0
+Bot1.Battlefield = Tundra; Tundra; Tundra; Tundra; Emeritus of Truce; Skycoach Conductor
+Bot1.Graveyard.Count = 0

@@ -1,0 +1,25 @@
+# With no artifact to sacrifice (two Islands pay for it, and there is no Mox or Lotus) Transmute Artifact does nothing but shuffle: nothing is
+# asked and no artifact is searched for.
+
+[Bot1 Deck]
+Island
+Island
+Transmute Artifact
+Island x4
+Mox Jet
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Transmute Artifact.Cast
+
+[Expect]
+Bot1.Graveyard = Transmute Artifact
+Bot1.Battlefield.Count = 2

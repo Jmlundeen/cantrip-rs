@@ -1,0 +1,28 @@
+# Fabled Passage with only two other lands: the fetched Plains makes three, because the sacrificed Fabled Passage is no
+# longer counted, so the Plains stays tapped. Bot2's lands do not count toward Bot1's four.
+
+[Bot1 Deck]
+Forest
+Forest
+Fabled Passage
+Plains x14
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Forest#1.Play
+Bot2.Hand.Island#1.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Fabled Passage.Play
+Bot1.Battlefield.Fabled Passage.Activate
+Bot1.Search(Plains)
+
+[Expect]
+Turn = 5
+Bot1.Graveyard = Fabled Passage
+Bot1.Battlefield = Forest; Forest; Plains
+Bot1.Battlefield.Plains.Tapped = true

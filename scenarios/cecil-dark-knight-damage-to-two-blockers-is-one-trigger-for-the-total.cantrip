@@ -1,0 +1,37 @@
+# Cecil, Dark Knight: "Whenever Cecil deals damage, you lose that much life." Combat damage to two blockers is dealt
+# at once (CR 510.2), so Cecil deals damage once, not twice: one trigger waits on the stack and Bot1 loses the total, 2
+# (1 deathtouch damage to each of two Ornithopters, lethal to both), not two separate 1s. Bot1 stays at 18, above half
+# of 20, so Cecil does not transform.
+
+[Bot1 Deck]
+Swamp
+Cecil, Dark Knight
+Swamp x5
+Swamp x12
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Plains x5
+Plains x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Cecil, Dark Knight.Cast
+Bot1.Battlefield.Swamp.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Cecil, Dark Knight)
+Bot2.Block(Ornithopter > Cecil, Dark Knight; Ornithopter > Cecil, Dark Knight)
+Bot1.AssignDamage(Cecil, Dark Knight > Ornithopter#1: 1; Cecil, Dark Knight > Ornithopter#2: 1)
+? Stack.Count = 1
+? Bot2.Graveyard.Count = 2
+[T3 Bot1.Main2]
+? Bot1.Life = 18
+
+[Expect]
+Bot1.Life = 18
+Bot2.Graveyard = Ornithopter; Ornithopter
+Bot1.Battlefield.Cecil, Dark Knight.Tapped = true

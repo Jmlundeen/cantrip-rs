@@ -1,0 +1,65 @@
+# Figure of Destiny's second and third abilities begin "If this creature is a Spirit / a Warrior", checked as they resolve
+# (CR 608.2c). Turn 1: the six hybrid symbols of the third ability are paid with {W}{W}{W} from one Black Lotus and
+# {R}{R}{R} from another (hybrid {R/W} takes either color), but the Figure is only a Kithkin, not a Warrior, so it stays a
+# 1/1. Turn 3: the first ability makes it a 2/2 Kithkin Spirit; turn 5: the second, a 4/4 Kithkin Spirit Warrior (the
+# positive control); turn 7: the first ability again sets it back to a 2/2 Kithkin Spirit, the later timestamp winning
+# (CR 613.7) and the Warrior type gone with it.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Black Lotus
+Figure of Destiny
+Plains
+Plains
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Figure of Destiny.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Figure of Destiny.Activate(Ability: Avatar with)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Figure of Destiny.Power = 1
+? Bot1.Battlefield.Figure of Destiny.Subtypes = Kithkin
+? Bot1.Battlefield.Figure of Destiny.Keywords = (absent)
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Figure of Destiny.Activate(Ability: Kithkin Spirit with)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Figure of Destiny.Power = 2
+? Bot1.Battlefield.Figure of Destiny.Subtypes = Kithkin; Spirit
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Battlefield.Figure of Destiny.Activate(Ability: Warrior with)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Figure of Destiny.Power = 4
+? Bot1.Battlefield.Figure of Destiny.Subtypes = Kithkin; Spirit; Warrior
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Figure of Destiny.Activate(Ability: Kithkin Spirit with)
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Figure of Destiny.Power = 2
+Bot1.Battlefield.Figure of Destiny.Toughness = 2
+Bot1.Battlefield.Figure of Destiny.Subtypes = Kithkin; Spirit

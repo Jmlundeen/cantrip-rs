@@ -1,0 +1,20 @@
+# Strength of the Harvest is a modal double-faced card (CR 712.4): played as its back face it is the land Haven of the Harvest, which
+# enters tapped (so it taps for nothing the turn it arrives) and on the next turn taps for green or white.
+
+[Bot1 Deck]
+Strength of the Harvest
+Plains x13
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Strength of the Harvest.Play
+? Bot1.Battlefield.Haven of the Harvest.Tapped = true
+[T3 Bot1.Main1]
+Bot1.Battlefield.Haven of the Harvest.Activate(Color: White)
+? Bot1.Mana = {W}
+
+[Expect]
+Bot1.Battlefield = Haven of the Harvest
+Bot1.Battlefield.Haven of the Harvest.Types = Land

@@ -1,0 +1,53 @@
+# Daretti, Scrap Savant goes up by 2 on each of Bot1's turns (3, 5, 7, 9, 11) by discarding an Island and drawing one, and
+# on turn 9 his -10 gives Bot1 an emblem. Bot1 then casts a Lotus Petal and sacrifices it for mana: the emblem returns it
+# to the battlefield from the graveyard at the beginning of the next end step.
+
+[Bot1 Deck]
+Daretti, Scrap Savant
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Mox Pearl
+Lotus Petal
+Island
+Island x20
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Daretti, Scrap Savant.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Daretti, Scrap Savant.Activate(Ability: Discard up to two)
+Bot1.Choose(Island)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Daretti, Scrap Savant.Activate(Ability: Discard up to two)
+Bot1.Choose(Island)
+[T7 Bot1.Main1]
+Bot1.Battlefield.Daretti, Scrap Savant.Activate(Ability: Discard up to two)
+Bot1.Choose(Island)
+[T9 Bot1.Main1]
+? Bot1.Battlefield.Daretti, Scrap Savant.Counters.Loyalty = 9
+Bot1.Battlefield.Daretti, Scrap Savant.Activate(Ability: Discard up to two)
+Bot1.Choose(Island)
+[T11 Bot1.Main1]
+? Bot1.Battlefield.Daretti, Scrap Savant.Counters.Loyalty = 11
+Bot1.Battlefield.Daretti, Scrap Savant.Activate(Ability: You get an emblem)
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Battlefield.Lotus Petal.Activate(Color: Red)
+[T11 Bot1.Main2]
+? Bot1.Graveyard = Lotus Petal; Island; Island; Island; Island
+[T12 Bot2.Main1]
+
+[Expect]
+Bot1.Emblems.Count = 1
+Bot1.Battlefield.Lotus Petal.Tapped = False
+Bot1.Battlefield.Daretti, Scrap Savant.Counters.Loyalty = 1

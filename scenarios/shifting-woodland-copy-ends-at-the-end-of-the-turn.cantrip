@@ -1,0 +1,39 @@
+# The copy lasts "until end of turn" (CR 611.2c, 514.2): on turn 5 the Woodland is a plain Land named Shifting Woodland again, and not an
+# Ornithopter. (The turn 3 sequence is the existing scenario's: Wheel of Fortune fills the graveyard with a sorcery, an artifact, a creature and a land (delirium, CR 207.2c), so its {2}{G}{G} ability may be activated; it becomes a copy of the Ornithopter card in the graveyard until end of turn (CR 707.2), an Ornithopter named so.)
+
+[Bot1 Deck]
+Sol Ring
+Mountain
+Shifting Woodland
+Wheel of Fortune
+Ornithopter
+Black Lotus
+Mox Emerald
+Forest
+Mountain x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mountain.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Shifting Woodland.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+! Bot1.Battlefield.Shifting Woodland.Activate(Ability: Delirium)
+Bot1.Hand.Wheel of Fortune.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Pass
+Bot1.Battlefield.Shifting Woodland.Activate(Bot1.Graveyard.Ornithopter; Ability: Delirium)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+[T3 Bot1.Main2]
+[T5 Bot1.Main1]
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Shifting Woodland.Types = Land

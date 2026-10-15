@@ -1,0 +1,23 @@
+# Forestcycling {1} (CR 702.29e): Generous Ent is discarded from the hand and its owner searches for a Forest card and
+# puts it into their hand. The Forest comes from deep in the library.
+
+[Bot1 Deck]
+Generous Ent
+Island x6
+Forest
+Island x10
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Generous Ent.Activate(Ability: Forestcycling)
+Bot1.Search(Forest)
+
+[Expect]
+Bot1.Graveyard = Generous Ent
+Bot1.Battlefield = Island
+Bot1.Hand = Island; Island; Island; Island; Island; Forest
+Bot1.Library.Count = 10

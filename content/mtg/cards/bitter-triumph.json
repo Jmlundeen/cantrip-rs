@@ -1,0 +1,6 @@
+{
+  "name": "Bitter Triumph",
+  "manaCost": "{1}{B}",
+  "type": "Instant",
+  "oracleText": "As an additional cost to cast this spell, discard a card or pay 3 life.\nDestroy target creature or planeswalker."
+}

@@ -1,0 +1,27 @@
+# Ancient Tomb's ability costs {T} (CR 602.2, 605.1a): used once, a tapped Tomb offers no second activation, so the
+# 2 damage is dealt once per untap. The first activation is the positive control for the refusal; two Tombs hurt 4.
+
+[Bot1 Deck]
+Ancient Tomb
+Ancient Tomb
+Plains x13
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Ancient Tomb.Play
+Bot1.Battlefield.Ancient Tomb.Activate
+? Bot1.Mana = {C}{C}
+? Bot1.Life = 18
+! Bot1.Battlefield.Ancient Tomb.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Ancient Tomb.Play
+Bot1.Battlefield.Ancient Tomb#1.Activate
+Bot1.Battlefield.Ancient Tomb#2.Activate
+? Bot1.Life = 14
+
+[Expect]
+Bot1.Life = 14
+Bot1.Battlefield.Ancient Tomb#1.Tapped = true
+Bot1.Battlefield.Ancient Tomb#2.Tapped = true

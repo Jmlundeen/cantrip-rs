@@ -1,0 +1,32 @@
+# Swampcycling searches for a "Swamp card" - by land type (CR 205.3i, 702.29e): Bayou is a Swamp Forest, so it can be found (the
+# existing scenario finds a basic Swamp), while an Island and a Forest cannot (the refusals). Then a second Troll is swampcycled on
+# turn 3 and the search is answered with nothing (a quality search may find nothing, CR 701.23b): it is still discarded for {1}.
+
+[Bot1 Deck]
+Island
+Troll of Khazad-dûm
+Troll of Khazad-dûm
+Island x4
+Bayou
+Forest
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Troll of Khazad-dûm.Activate
+! Bot1.Search(Island)
+! Bot1.Search(Forest)
+Bot1.Search(Bayou)
+[T3 Bot1.Main1]
+Bot1.Hand.Bayou.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Troll of Khazad-dûm.Activate
+Bot1.Search()
+
+[Expect]
+Bot1.Graveyard = Troll of Khazad-dûm; Troll of Khazad-dûm
+Bot1.Battlefield = Island; Bayou

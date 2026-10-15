@@ -1,0 +1,40 @@
+# Urza, Lord High Artificer beside Sol Ring and his Construct while Brainstorm waits for {U}. Handed over at the
+# payment, because that is where auto-mana answers a card's menu for the player: clicking Urza must still ask which
+# artifact to tap, on the board the way a target is picked, rather than tapping one of them unasked.
+#
+# then click Urza, Lord High Artificer, then Sol Ring. The first click lights Sol Ring and the Construct and says
+# what the pick is for; the second taps Sol Ring for {U}, which pays for Brainstorm.
+
+[Bot1 Deck]
+Island
+Sol Ring
+Island
+Urza, Lord High Artificer
+Brainstorm
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Island.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Urza, Lord High Artificer.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+[T5 Bot1.Main1]
+Bot1.Hand.Brainstorm.Cast
+[Handover Bot1.PayCost]
+
+[Expect]
+Turn = 5
+# Brainstorm is on the stack while it is paid for (CR 601.2a, 601.2h).
+Stack.Count = 1
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Sol Ring.Tapped = false
+Bot1.Battlefield.Construct.Tapped = false
+Bot1.Battlefield.Urza, Lord High Artificer.Tapped = false

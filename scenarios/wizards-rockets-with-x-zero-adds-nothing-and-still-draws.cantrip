@@ -1,0 +1,29 @@
+# "{X}, {T}, Sacrifice this artifact: Add X mana in any combination of colors": X = 0 is legal (CR 107.3), asks for no colours and adds no mana, but the Rockets is
+# still sacrificed as a cost and so "put into a graveyard from the battlefield": Bot1 draws a card. It entered tapped on turn 1 and untapped for turn 3.
+
+[Bot1 Deck]
+Mox Pearl
+Wizard's Rockets
+Island
+Island
+Island x12
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Wizard's Rockets.Cast
+Bot1.Pass
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Wizard's Rockets.Tapped = true
+[T3 Bot1.Main1]
+Bot1.Battlefield.Wizard's Rockets.Activate(X: 0)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Wizard's Rockets
+Bot1.Mana =
+Bot1.Hand.Count = 7

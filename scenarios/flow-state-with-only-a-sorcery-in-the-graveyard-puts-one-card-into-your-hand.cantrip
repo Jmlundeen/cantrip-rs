@@ -1,0 +1,38 @@
+# A sorcery card alone in the graveyard is not an instant and a sorcery: Flow State puts one card into the hand.
+
+[Bot1 Deck]
+Mountain
+Island
+Mountain
+Chain Lightning
+Chain Lightning
+Flow State
+Swamp
+Swamp
+Swamp
+Counterspell
+Ancestral Recall
+Brainstorm
+Island x3
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Chain Lightning.Cast(Bot2)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Chain Lightning.Cast(Bot2)
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Hand.Flow State.Cast
+Bot1.Arrange(Counterspell | Ancestral Recall; Brainstorm)
+
+[Expect]
+Bot1.Hand = Swamp; Swamp; Swamp; Counterspell
+Bot1.Library = Island; Island; Island; Ancestral Recall; Brainstorm

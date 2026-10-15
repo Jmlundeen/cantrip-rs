@@ -1,0 +1,46 @@
+# Shatterskull Smashing with X = 6 deals twice X, 12 damage, divided as its caster chooses among up to two creatures
+# (CR 601.2d): the division is only accepted if it adds up to 12, and each of Bot2's creatures takes 6. Eight mana comes
+# from Black Lotus, four Moxen and Sol Ring (cast with a Mox).
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Mox Jet
+Sol Ring
+Shatterskull Smashing
+Forest x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Ornithopter
+Forest x17
+
+[Actions]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Shatterskull Smashing.Cast(X: 6)
+Bot1.Divide(Bot2.Battlefield.Llanowar Elves: 6; Bot2.Battlefield.Ornithopter: 6)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Count = 1
+Bot2.Graveyard.Count = 2
+Bot1.Graveyard.Count = 2

@@ -1,0 +1,30 @@
+# X = 2: two Mutagen tokens, each free to activate while Mutagen Man is out ({1} less, down to {0}, CR 601.2f). One
+# is sacrificed for a counter on Mutagen Man at sorcery speed; during Bot2's turn the other is not offered.
+
+[Bot1 Deck]
+Black Lotus
+Mutagen Man, Living Ooze
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Island x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Mutagen Man, Living Ooze.Cast(X: 2)
+Bot1.Battlefield.Mutagen Token.Activate(Bot1.Battlefield.Mutagen Man, Living Ooze)
+[T2 Bot2.Upkeep]
+! Bot1.Battlefield.Mutagen Token.Activate
+
+[Expect]
+Bot1.Battlefield.Count = 3
+Bot1.Battlefield.Mutagen Man, Living Ooze.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Mutagen Man, Living Ooze.Power = 3

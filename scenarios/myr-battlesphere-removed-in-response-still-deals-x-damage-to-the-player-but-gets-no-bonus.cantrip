@@ -1,0 +1,43 @@
+# Path to Exile answers the attack trigger. Bot1 still taps the Myr as the ability resolves (the Myr need not be the ones
+# the first ability made) and the damage is still dealt, 3 to Bot2, though Myr Battlesphere is gone and gets nothing.
+
+[Bot1 Deck]
+Plains
+Sol Ring
+Black Lotus
+Plains
+Myr Battlesphere
+Plains x20
+
+[Bot2 Deck]
+Plains
+Plains
+Path to Exile
+Plains x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Myr Battlesphere.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Attack(Myr Battlesphere > Bot2)
+Bot2.Hand.Path to Exile.Cast(Myr Battlesphere)
+Bot2.Battlefield.Plains.Activate
+Bot1.Choose(Myr#1; Myr#2; Myr#3)
+[Bot1.Main2]
+[Expect]
+Bot2.Life = 17
+Exile = Myr Battlesphere
+Bot1.Battlefield.Count = 7

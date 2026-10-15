@@ -1,0 +1,45 @@
+# Seasoned Dungeoneer: "When this creature enters, you take the initiative" (the venture fetches a Forest), and "Whenever you
+# attack, target attacking Cleric, Rogue, Warrior, or Wizard gains protection from creatures until end of turn. It
+# explores." On turn 3 Dungeoneer (a Human Warrior) and Llanowar Elves (a Druid, no target for it) attack: Bot2's Elves
+# may block Bot1's Elves but not the Dungeoneer, which has protection from creatures (CR 702.16), so Bot2 takes 3. The
+# explore reveals a Forest, a land, which goes to its hand.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Emerald
+Seasoned Dungeoneer
+Llanowar Elves
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x5
+Forest x10
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Seasoned Dungeoneer.Cast
+Bot1.Search(Forest)
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Seasoned Dungeoneer; Llanowar Elves)
+! Bot2.Block(Bot2.Battlefield.Llanowar Elves > Bot1.Battlefield.Seasoned Dungeoneer)
+Bot2.Block(Bot2.Battlefield.Llanowar Elves > Bot1.Battlefield.Llanowar Elves)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Hand.Count = 5
+Initiative = Bot1

@@ -1,0 +1,39 @@
+use cantrip_api::*;
+use cantrip_mechanics::tokens;
+use cantrip_mechanics::warp;
+use cantrip_oracle as oracle;
+
+/// The 1/1 colorless Drone artifact creature token with flying and "This token can block only creatures with flying."
+pub static DRONE: CardDef = CardDef {
+    name: "Drone",
+    has_cost: false,
+    types: TypeSet::of(&[CardType::Artifact, CardType::Creature]),
+    subtypes: SubtypeSet::of(&[Subtype::Drone]),
+    power: Some(1),
+    toughness: Some(1),
+    keywords: Keywords::of(&[Keyword::Flying, Keyword::CanBlockOnlyCreaturesWithFlying]),
+    text: "Flying\nThis token can block only creatures with flying.",
+    ..CardDef::BLANK
+};
+
+/// Create a 1/1 colorless Drone artifact creature token with flying and "This token can block only creatures with flying."
+fn drone(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    tokens::create(g, item.controller, &DRONE, 1)?;
+    Ok(())
+}
+
+pub static CARD: CardDef = CardDef {
+    abilities: &[AbilityDef::Triggered(TriggeredDef {
+        text: "Whenever you cast an artifact spell, create a 1/1 colorless Drone artifact creature token with flying and \"This token can block only creatures with flying.\"",
+        listens: EventMask::SPELL_CAST,
+        matches: cantrip_mechanics::triggers::artifact_spell_you_cast,
+        effect: drone,
+        ..TriggeredDef::BLANK
+    })],
+    ways: &[warp::way(hybrid(Mana::U, Mana::R), "Warp {U/R}")],
+    end_step_riders: warp::RIDERS,
+    delayed: &[warp::EXILE],
+    ..oracle::PINNACLE_EMISSARY
+};
+
+pub static EXTRA: &[&CardDef] = &[&DRONE];

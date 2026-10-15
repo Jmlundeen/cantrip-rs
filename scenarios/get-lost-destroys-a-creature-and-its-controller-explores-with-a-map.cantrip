@@ -1,0 +1,51 @@
+# Get Lost destroys target creature and its controller gets two Map tokens (CR 111.10s). Bot1 destroys one of Bot2's two
+# Ornithopters on turn 3; on turn 4 Bot2 spends a Map to make the other explore: the revealed card is a Lightning Bolt,
+# not a land, so the Ornithopter gets a +1/+1 counter and Bot2 puts the Bolt into the graveyard.
+
+[Bot1 Deck]
+Get Lost
+Mox Pearl
+Gleemox
+Island x15
+
+[Bot2 Deck]
+Mox Ruby
+Ornithopter
+Ornithopter
+Island
+Island
+Island
+Island
+Island
+Island
+Lightning Bolt
+Island x6
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Blue)
+Bot1.Hand.Get Lost.Cast(Bot2.Battlefield.Ornithopter#1)
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Map Token.Activate(Bot2.Battlefield.Ornithopter)
+Bot2.Pass
+Bot2.Accept
+
+[Expect]
+Bot1.Graveyard = Get Lost
+Bot2.Graveyard = Lightning Bolt; Ornithopter
+Bot2.Battlefield = Mox Ruby; Ornithopter; Map Token
+Bot2.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot2.Battlefield.Ornithopter.Power = 1

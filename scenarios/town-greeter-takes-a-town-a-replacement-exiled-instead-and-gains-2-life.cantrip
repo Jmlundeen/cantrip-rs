@@ -1,0 +1,41 @@
+# Town Greeter: "mill four cards. You may put a land card from among them into your hand." Bot2's Dauthi Voidwalker
+# exiles each card that would go to Bot1's graveyard, but a milled card is found in the public zone it went to
+# (CR 701.17c): the exiled Starting Town is still among them, Bot1 takes it, and a Town card put into hand gains 2 life.
+
+[Bot1 Deck]
+Forest x3
+Town Greeter
+Forest x5
+Starting Town
+Forest
+Island
+Swamp
+Forest x6
+
+[Bot2 Deck]
+Swamp
+Dauthi Voidwalker
+Swamp x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot2.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp#1.Activate
+Bot2.Battlefield.Swamp#2.Activate
+Bot2.Hand.Dauthi Voidwalker.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Town Greeter.Cast
+Bot1.Choose(Starting Town)
+
+[Expect]
+Bot1.Life = 22
+Bot1.Hand = Forest; Forest; Forest; Forest; Forest; Forest; Starting Town
+Bot1.Graveyard.Count = 0
+Exile = Swamp; Island; Forest
+Bot1.Library.Count = 6

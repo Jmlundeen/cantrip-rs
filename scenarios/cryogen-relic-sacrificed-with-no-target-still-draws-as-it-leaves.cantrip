@@ -1,0 +1,35 @@
+# Cryogen Relic: "up to one target tapped creature" may be no target at all (CR 601.2c), and the sacrifice is a cost
+# (CR 602.2), so the Relic leaves the battlefield and its leaves-the-battlefield trigger draws a card even though the
+# ability, with no target, puts a stun counter on nothing. Bot2 has no creature. Bot1: 7 cards, -3 played, +1 as the Relic
+# enters (5), +1 for turn 3's draw, -1 for the Island, +1 as it leaves = 6.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Cryogen Relic
+Island x3
+Island x3
+Island x14
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Cryogen Relic.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Cryogen Relic.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Cryogen Relic
+Bot1.Hand.Count = 6

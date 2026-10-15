@@ -1,0 +1,39 @@
+# Ursine Monstrosity: "+1/+1 for each card type among cards in your graveyard". Three combats mill an Ornithopter (artifact
+# and creature: two types, so 3 + 2 = 5 power; Bot2's Island in its own graveyard adds nothing), a Lightning Bolt (instant:
+# three types, 6) and a Forest (land: four types, 7). The Monstrosity attacks each turn as the ability makes it.
+
+[Bot1 Deck]
+Sol Ring
+Ursine Monstrosity
+Forest
+Forest x4
+Forest
+Ornithopter
+Forest
+Lightning Bolt
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Forest.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Ursine Monstrosity.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Sol Ring.Activate
+[T3 Bot1.DeclareAttackers]
+? Bot1.Battlefield.Ursine Monstrosity.Power = 5
+[T5 Bot1.DeclareAttackers]
+? Bot1.Battlefield.Ursine Monstrosity.Power = 6
+[T7 Bot1.DeclareAttackers]
+? Bot1.Battlefield.Ursine Monstrosity.Power = 7
+[T7 Bot1.Main2]
+
+[Expect]
+Turn = 7

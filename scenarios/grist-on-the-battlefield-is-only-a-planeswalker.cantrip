@@ -1,0 +1,27 @@
+# Grist, the Hunger Tide: "As long as Grist isn't on the battlefield, it's a 1/1 Insect creature in addition to its
+# other types." Once it enters it is just a planeswalker with no power or toughness (it is not a creature there).
+
+[Bot1 Deck]
+Bayou x3
+Grist, the Hunger Tide
+Forest x17
+
+[Bot2 Deck]
+Forest x22
+
+[Actions]
+Bot1.Hand.Bayou.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Bayou.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Bayou.Play
+Bot1.Battlefield.Bayou#1.Activate(Ability: Add {B})
+Bot1.Battlefield.Bayou#2.Activate(Ability: Add {G})
+Bot1.Battlefield.Bayou#3.Activate(Ability: Add {G})
+Bot1.Hand.Grist, the Hunger Tide.Cast
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Grist, the Hunger Tide.Types = Planeswalker
+Bot1.Battlefield.Grist, the Hunger Tide.Subtypes = Grist
+Bot1.Battlefield.Grist, the Hunger Tide.Counters.Loyalty = 3

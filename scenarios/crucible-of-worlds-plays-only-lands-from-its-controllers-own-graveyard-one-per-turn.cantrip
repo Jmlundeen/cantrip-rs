@@ -1,0 +1,51 @@
+# "You may play lands from your graveyard" uses the turn's land play (CR 305.2) and offers nothing but lands, and only
+# the Crucible's controller's. Bot1 bolts Bot2 (Lightning Bolt in the graveyard is not castable), cracks Marsh Flats
+# and casts Crucible with Black Lotus. On turn 3 it plays an Island from hand and so may not replay the Flats from the
+# graveyard; on turn 5 it does. Bot2 has no Crucible and may not play its own cracked Marsh Flats from its graveyard.
+
+[Bot1 Deck]
+Marsh Flats
+Black Lotus
+Crucible of Worlds
+Mox Ruby
+Lightning Bolt
+Island
+Island
+Swamp
+Island x10
+
+[Bot2 Deck]
+Marsh Flats
+Island x7
+Swamp
+Island x6
+
+[Actions]
+Bot1.Hand.Marsh Flats.Play
+Bot1.Battlefield.Marsh Flats.Activate
+Bot1.Search(Swamp)
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Crucible of Worlds.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Marsh Flats.Play
+Bot2.Battlefield.Marsh Flats.Activate
+Bot2.Search(Swamp)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+! Bot1.Graveyard.Marsh Flats.Play
+! Bot1.Graveyard.Lightning Bolt.Cast(Bot2)
+[T4 Bot2.Main1]
+! Bot2.Graveyard.Marsh Flats.Play
+[T5 Bot1.Main1]
+Bot1.Graveyard.Marsh Flats.Play
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.LandsPlayed = 1
+Bot1.Battlefield = Swamp; Island; Marsh Flats; Mox Ruby; Crucible of Worlds
+Bot1.Graveyard = Black Lotus; Lightning Bolt
+Bot2.Graveyard = Island; Marsh Flats

@@ -1,0 +1,38 @@
+# Ad Nauseam: the life is lost, not paid (CR 119.4 does not apply), so nothing stops the repeating at zero or below;
+# the player loses only when state-based actions are checked after the spell has resolved (CR 704.5a). Emrakul (15) and
+# Blightsteel Colossus (12) take Bot1 to -7, and it still accepts a third reveal (Sol Ring, 1) before declining a fourth.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Mox Jet
+Ad Nauseam
+Swamp
+Swamp
+Swamp
+Emrakul, the Aeons Torn
+Blightsteel Colossus
+Sol Ring
+Mox Pearl
+Swamp x6
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ad Nauseam.Cast
+Bot1.Accept
+Bot1.Accept
+Bot1.Accept
+Bot1.Decline
+
+[Expect]
+Result = Bot2 won
+Bot1.Life = -8
+Bot1.Hand.Count = 7

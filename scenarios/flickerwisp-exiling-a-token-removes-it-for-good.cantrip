@@ -1,0 +1,43 @@
+# Flickerwisp exiles Bot1's Blood token on turn 5. A token that has left the battlefield ceases to exist (CR 111.7, 704.5d), so it
+# is not in exile and nothing returns at the beginning of the end step: "return that card" has no card to return.
+
+[Bot1 Deck]
+Swamp
+Mox Pearl
+Bloodtithe Harvester
+Mountain
+Plains
+Flickerwisp
+Plains x2
+Plains x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Bloodtithe Harvester.Cast
+Bot1.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Flickerwisp.Cast
+Bot1.Pass
+Bot1.Target(Blood Token)
+[T5 Bot1.Main2]
+? Exile.Count = 0
+[T6 Bot2.Main1]
+
+[Expect]
+Turn = 6
+Exile.Count = 0
+Bot1.Battlefield = Swamp; Mountain; Plains; Mox Pearl; Bloodtithe Harvester; Flickerwisp

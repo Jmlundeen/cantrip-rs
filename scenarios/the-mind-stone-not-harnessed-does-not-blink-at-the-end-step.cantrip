@@ -1,0 +1,31 @@
+# The infinity ability is only active once harnessed (CR 701.64): an unharnessed Mind Stone does nothing at the end step. Sicarian Infiltrator, which would draw again if blinked, draws only the card from entering.
+
+[Bot1 Deck]
+The Mind Stone
+Sicarian Infiltrator
+Black Lotus x3
+Mox Sapphire
+Sol Ring
+Plains
+Island
+Plains x17
+
+[Bot2 Deck]
+Island x22
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.The Mind Stone.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Sicarian Infiltrator.Cast
+[T1 Bot1.End]
+
+[Expect]
+Turn = 1
+Step = End
+Stack.Count = 0
+Bot1.Hand = Black Lotus; Mox Sapphire; Plains
+Bot1.Battlefield = The Mind Stone; Sol Ring; Sicarian Infiltrator

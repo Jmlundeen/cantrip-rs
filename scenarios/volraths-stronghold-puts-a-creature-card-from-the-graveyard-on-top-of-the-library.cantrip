@@ -1,0 +1,38 @@
+# Volrath's Stronghold's second ability ({1}{B}, {T}) puts target creature card from your graveyard on top of your
+# library: Bot1 sacrifices an Ornithopter to Village Rites on turn 1 and puts it back on top on turn 3.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Ornithopter
+Village Rites
+Volrath's Stronghold
+Swamp
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Village Rites.Cast
+Bot1.Choose(Ornithopter)
+[T3 Bot1.Main1]
+Bot1.Hand.Volrath's Stronghold.Play
+? Bot1.Graveyard = Village Rites; Ornithopter
+Bot1.Battlefield.Volrath's Stronghold.Activate(Ability: Put target; Bot1.Graveyard.Ornithopter)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield = Swamp; Mox Jet; Volrath's Stronghold
+Bot1.Battlefield.Volrath's Stronghold.Tapped = true
+Bot1.Graveyard = Village Rites
+Bot1.Library.Count = 8
+Bot1.Library = Ornithopter; Swamp; Swamp; Swamp; Swamp; Swamp; Swamp; Swamp

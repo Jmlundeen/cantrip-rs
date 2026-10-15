@@ -1,0 +1,47 @@
+# Emperor of Bones: at the beginning of combat on its controller's turn it exiles up to one target card from a graveyard
+# (here the Llanowar Elves Bot1's own Bolt killed); "{1}{B}: Adapt 2" puts two +1/+1 counters on it, and "whenever one or more
+# +1/+1 counters are put on this creature" it puts a creature card exiled with it onto the battlefield with a finality
+# counter and haste, to be sacrificed at the beginning of the next end step, where the finality counter exiles it instead
+# of letting it reach the graveyard (CR 122.1h).
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Emerald
+Mox Ruby
+Emperor of Bones
+Llanowar Elves
+Lightning Bolt
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Emperor of Bones.Cast
+[T3 Bot1.Main1]
+Bot1.Target(Bot1.Graveyard.Llanowar Elves)
+[T3 Bot1.BeginCombat]
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Emperor of Bones.Activate(Ability: Adapt)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Llanowar Elves.Counters.Finality = 1
+? Bot1.Battlefield.Llanowar Elves.Keywords = Haste
+[T4 Bot2.Upkeep]
+
+[Expect]
+Exile = Llanowar Elves
+Bot1.Graveyard = Lightning Bolt
+Bot1.Battlefield.Emperor of Bones.Counters.PlusOnePlusOne = 2

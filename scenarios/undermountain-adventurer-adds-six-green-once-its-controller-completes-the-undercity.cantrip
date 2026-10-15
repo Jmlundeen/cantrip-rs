@@ -1,0 +1,66 @@
+# Undermountain Adventurer's "{T}: Add {G}{G}. If you've completed a dungeon, add six {G} instead." played for real:
+# Bot1 walks all five rooms of the Undercity and then taps the Adventurer for six green.
+#
+# Turn 1: a Forest and three Moxen cast the Adventurer; taking the initiative ventures into Secret Entrance, which
+# fetches a Plains. Turn 3: the initiative ventures at upkeep (Lost Well), and White Plume Adventurer and Caves of
+# Chaos Adventurer each take the initiative again as they enter (Stash, then Catacombs). The Adventurer itself taps
+# for two green towards Caves on turn 3, before the dungeon is done. Turn 5's upkeep reaches Throne of the Dead Three
+# and completes the dungeon; nothing among Bot1's top ten is a creature, so the Throne puts nothing onto the
+# battlefield. In the main phase the same printed ability now adds six green.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Mox Ruby
+Undermountain Adventurer
+White Plume Adventurer
+Caves of Chaos Adventurer
+Plains
+Forest x20
+
+[Bot2 Deck]
+Forest x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Undermountain Adventurer.Cast
+Bot1.Search(Plains)
+? Bot1.Dungeon = Undercity: Secret Entrance
+[T3 Bot1.Upkeep]
+Bot1.Modes(Lost Well)
+[T3 Bot1.Main1]
+? Bot1.Dungeon = Undercity: Lost Well
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.White Plume Adventurer.Cast
+Bot1.Modes(Stash)
+[T3 Bot1.Main1]
+? Bot1.Dungeon = Undercity: Stash
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Undermountain Adventurer.Activate
+? Bot1.Mana = {W}{R}{G}{G}
+Bot1.Hand.Caves of Chaos Adventurer.Cast
+[T3 Bot1.Main2]
+? Bot1.Dungeon = Undercity: Catacombs
+[T5 Bot1.Main1]
+? Bot1.DungeonsCompleted = 1
+Bot1.Battlefield.Undermountain Adventurer.Activate
+? Bot1.Mana = {G}{G}{G}{G}{G}{G}
+
+[Expect]
+Turn = 5
+Initiative = Bot1
+Bot1.DungeonsCompleted = 1
+Bot1.Mana = {G}{G}{G}{G}{G}{G}
+Bot1.Battlefield.Undermountain Adventurer.Tapped = true

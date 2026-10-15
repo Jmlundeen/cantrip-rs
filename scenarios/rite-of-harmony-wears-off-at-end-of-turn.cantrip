@@ -1,0 +1,30 @@
+# "Whenever a creature ... enters this turn": the delayed trigger lasts for the turn the Rite resolved in (CR 603.7b). On turn 1
+# an Ornithopter entering draws a card; on turn 3 a second Ornithopter entering draws none. Hand counts: 7 - four
+# cast = 3, +1 draw = 4; turn 3's own draw makes 5 and casting the second Ornithopter leaves 4: no draw.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Rite of Harmony
+Ornithopter
+Ornithopter
+Island
+Island x14
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Rite of Harmony.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 5
+Bot1.Hand.Ornithopter.Cast
+
+[Expect]
+Bot1.Hand.Count = 4
+Bot1.Battlefield.Count = 4

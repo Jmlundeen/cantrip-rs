@@ -1,0 +1,26 @@
+# As the fourth land (three other lands) the Courtyard enters tapped: it cannot be tapped for mana the turn it is played
+# (refusal), and untaps in Bot1's next turn, where it taps for {W} (the positive control for the refusal).
+
+[Bot1 Deck]
+Plains x3
+Concealed Courtyard
+Island x13
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Concealed Courtyard.Play
+! Bot1.Battlefield.Concealed Courtyard.Activate
+[T9 Bot1.Main1]
+Bot1.Battlefield.Concealed Courtyard.Activate(Color: White)
+
+[Expect]
+Bot1.Mana = {W}
+Bot1.Battlefield.Concealed Courtyard.Tapped = True

@@ -1,0 +1,73 @@
+# Ulvenwald Behemoth's "other creatures YOU control get +1/+1 and have trample and haste": Bot2's own Llanowar Elves (cast on
+# turn 4) stays a 1/1 while Bot1's Elves, cast on turn 5, is a 2/2 with trample and haste. The Behemoth has no transform ability of
+# its own (! Activate on turn 3 once turned over), and when Bot2's Boomerang Basics returns it to Bot1's hand on turn 6 the Elves
+# are a plain 1/1 again, without trample or haste: the bonus lasts only while it is on the battlefield.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Ulvenwald Oddity
+Mox Jet
+Mox Sapphire
+Sol Ring
+Llanowar Elves
+Forest x8
+
+[Bot2 Deck]
+Forest
+Boomerang Basics
+Llanowar Elves
+Mox Sapphire
+Island x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ulvenwald Oddity.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Ulvenwald Oddity.Activate
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Ulvenwald Behemoth.Power = 8
+! Bot1.Battlefield.Ulvenwald Behemoth.Activate
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Forest.Activate
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+? Bot2.Battlefield.Llanowar Elves.Power = 1
+[T6 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Boomerang Basics.Cast(Bot1.Battlefield.Ulvenwald Behemoth)
+Bot2.Pass
+Bot1.Pass
+[T6 Bot2.Main2]
+
+[Expect]
+Bot1.Hand = Ulvenwald Oddity
+Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot1.Battlefield.Llanowar Elves.Keywords = (absent)
+Bot2.Battlefield.Llanowar Elves.Power = 1

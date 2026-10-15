@@ -1,0 +1,23 @@
+# An activation the player cannot pay for is not offered: with one Mountain, Seasoned Pyromancer in the graveyard is
+# not asked for its {3}{R}{R}. A seat handed it would cancel at the payment and be handed it again (the server stalled).
+
+[Bot1 Deck]
+Mountain
+Faithless Looting
+Seasoned Pyromancer
+Island
+Island x3
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Choose(Seasoned Pyromancer; Island)
+! Bot1.Graveyard.Seasoned Pyromancer.Activate
+
+[Expect]
+Bot1.Graveyard = Faithless Looting; Island; Seasoned Pyromancer

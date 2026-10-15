@@ -1,0 +1,28 @@
+# The Mountains are sacrificed as a cost (CR 118.9, 601.2h), and a tapped Mountain can be sacrificed: Bot1 taps both for
+# {R}{R} first, then casts Fireblast for its alternative cost. The mana made stays in the pool (it is not spent, the
+# alternative cost has no mana), so both Mountains are gone, Bot2 takes four, and {R}{R} is still there to use.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Fireblast
+Mountain x4
+Mountain x10
+
+[Bot2 Deck]
+Forest x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Fireblast.Cast(Bot2; Ability: Sacrifice)
+Bot1.Choose(Mountain; Mountain)
+? Bot1.Mana = {R}{R}
+
+[Expect]
+Bot2.Life = 16
+Bot1.Graveyard = Fireblast; Mountain; Mountain
+Bot1.Battlefield.Count = 0

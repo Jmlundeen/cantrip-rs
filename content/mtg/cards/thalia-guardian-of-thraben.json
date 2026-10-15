@@ -1,0 +1,11 @@
+{
+  "name": "Thalia, Guardian of Thraben",
+  "manaCost": "{1}{W}",
+  "type": "Legendary Creature — Human Soldier",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "First strike\nNoncreature spells cost {1} more to cast.",
+  "keywords": [
+    "FirstStrike"
+  ]
+}

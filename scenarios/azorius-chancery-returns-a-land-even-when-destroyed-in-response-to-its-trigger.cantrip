@@ -1,0 +1,27 @@
+# The trigger is independent of its source (CR 113.7a, 608.2): Bot2 answers the Chancery's trigger by sacrificing Wasteland to destroy it. When the trigger resolves, Bot1 still returns a land
+# it controls - the Plains, the only one left - so the Chancery ends in the graveyard and the Plains in hand.
+
+[Bot1 Deck]
+Plains
+Azorius Chancery
+Plains x13
+
+[Bot2 Deck]
+Wasteland
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Wasteland.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Azorius Chancery.Play
+Bot2.Battlefield.Wasteland.Activate(Ability: Destroy; Azorius Chancery)
+Bot1.Choose(Plains)
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Count = 0
+Bot1.Graveyard = Azorius Chancery
+Bot2.Graveyard = Wasteland

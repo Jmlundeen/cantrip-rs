@@ -1,0 +1,11 @@
+{
+  "name": "Sunset Saboteur",
+  "manaCost": "{1}{B}",
+  "type": "Creature — Human Rogue",
+  "power": 4,
+  "toughness": 1,
+  "oracleText": "Menace\nWard—Discard a card.\nWhenever this creature attacks, put a +1/+1 counter on target creature an opponent controls.",
+  "keywords": [
+    "Menace"
+  ]
+}

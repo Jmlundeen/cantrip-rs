@@ -1,0 +1,47 @@
+# Emberwilde Captain makes its controller the monarch as it enters; when Bot2 then attacks Bot1 with an Elvish Mystic (which the Captain then blocks and kills, so the crown stays),
+# the Captain deals Bot2 damage equal to the six cards in Bot2's hand.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Sol Ring
+Emberwilde Captain
+Mountain
+Mountain
+Mountain
+Mountain x12
+
+[Bot2 Deck]
+Forest
+Elvish Mystic
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Emberwilde Captain.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Attack(Elvish Mystic > Bot1)
+Bot1.Block(Emberwilde Captain > Elvish Mystic)
+[Bot2.Main2]
+
+[Expect]
+Monarch = Bot1
+Bot2.Life = 14
+Bot1.Life = 20
+Bot2.Graveyard = Elvish Mystic

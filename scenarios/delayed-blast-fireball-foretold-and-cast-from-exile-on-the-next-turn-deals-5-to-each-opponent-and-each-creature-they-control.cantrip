@@ -1,0 +1,66 @@
+# Bot1 foretells Delayed Blast Fireball on turn three for {2} (a Sol Ring's), and casts it from exile in Bot2's turn
+# four for its foretell cost {4}{R}{R}: two Mountains and four Moxen. Cast from exile it deals 5, not 2: Bot2 and its
+# Sylvan Caryatid (0/3) and Basking Rootwalla are all hit, and Bot1 is not.
+
+[Bot1 Deck]
+Mountain
+Sol Ring
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Delayed Blast Fireball
+Mountain
+Basking Rootwalla
+Island x10
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Basking Rootwalla
+Sylvan Caryatid
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Basking Rootwalla.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Sylvan Caryatid.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Delayed Blast Fireball.Foretell
+! Bot1.Exile.Delayed Blast Fireball.Cast
+[T4 Bot2.Main1]
+? Exile.Count = 1
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Exile.Delayed Blast Fireball.Cast
+[T4 Bot2.Main2]
+
+[Expect]
+Turn = 4
+Step = Main2
+Exile.Count = 0
+Bot2.Life = 15
+Bot1.Life = 20
+Bot2.Graveyard = Sylvan Caryatid; Basking Rootwalla
+Bot1.Graveyard = Delayed Blast Fireball

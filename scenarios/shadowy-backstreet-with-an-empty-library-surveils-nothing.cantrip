@@ -1,0 +1,19 @@
+# Surveil 1 with no library looks at nothing: no arrangement is asked and nothing changes (the 7-card deck is all in hand,
+# since the first player skips the opening draw).
+
+[Bot1 Deck]
+Shadowy Backstreet
+Mountain x6
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Shadowy Backstreet.Play
+! Bot1.Arrange
+[Bot1.Main2]
+
+[Expect]
+Bot1.Library.Count = 0
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Shadowy Backstreet.Tapped = True

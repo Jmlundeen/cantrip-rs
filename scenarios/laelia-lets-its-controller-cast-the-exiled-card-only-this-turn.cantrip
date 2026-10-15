@@ -1,0 +1,37 @@
+# "You may play that card this turn": on turn one Laelia attacks and exiles the top card, a Lightning Bolt, which Bot1 casts from
+# exile (a spell, not only a land) the same turn: Laelia has grown to 3/3, so Bot2 takes 3 + 3 (14); on turn three she is a 4/4 (10). On turn three she exiles a Dark Ritual
+# that Bot1 does not cast; on turn five, with a Mox Jet untapped to pay for it, the Ritual in exile is no longer castable
+# (the refusal, beside the Bolt cast the turn it was exiled).
+
+[Bot1 Deck]
+Black Lotus
+Laelia, the Blade Reforged
+Mox Ruby
+Mox Jet
+Island x3
+Lightning Bolt
+Island
+Dark Ritual
+Island x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Laelia, the Blade Reforged.Cast
+Bot1.Attack(Laelia, the Blade Reforged > Bot2)
+[T1 Bot1.Blockers]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+[T3 Bot1.Main1]
+Bot1.Attack(Laelia, the Blade Reforged > Bot2)
+[T5 Bot1.Main1]
+? Bot2.Life = 10
+! Bot1.Exile.Dark Ritual.Cast
+
+[Expect]
+Exile = Dark Ritual

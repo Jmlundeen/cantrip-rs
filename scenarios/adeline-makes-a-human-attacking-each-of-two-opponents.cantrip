@@ -1,0 +1,33 @@
+# Three players: Adeline's "for each opponent" makes one Human per opponent (CR 508.4), each tapped and attacking that
+# opponent. Black Lotus pays for Adeline on turn 1 so she can attack on Bot1's second turn (T4). Adeline attacks only
+# Bot2 as declared; the Humans were put onto the battlefield attacking Bot2 and Bot3 respectively, so Bot3 takes 1 and
+# Bot2 takes Adeline's power (3 creatures: herself and two Humans) plus 1.
+
+[Bot1 Deck]
+Black Lotus
+Adeline, Resplendent Cathar
+Plains x18
+
+[Bot2 Deck]
+Island x20
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Adeline, Resplendent Cathar.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+[T4 Bot1.Main1]
+Bot1.Attack(Adeline, Resplendent Cathar > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+? Combat.Attackers = Adeline, Resplendent Cathar > Bot2; Human > Bot2; Human > Bot3
+? Bot1.Battlefield.Adeline, Resplendent Cathar.Power = 3
+[T4 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot3.Life = 19
+Bot1.Battlefield = Adeline, Resplendent Cathar; Human; Human

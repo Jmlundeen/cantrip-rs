@@ -1,0 +1,19 @@
+# Spymaster's Vault: "This land enters tapped unless you control a Swamp." Bot1 controls only a Forest on turn 3, so the Vault enters
+# tapped. (With a Swamp it enters untapped: spymasters-vault-connives-for-the-creatures-that-died-this-turn.)
+
+[Bot1 Deck]
+Forest
+Spymaster's Vault
+Forest x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Spymaster's Vault.Play
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Spymaster's Vault.Tapped = true

@@ -1,0 +1,64 @@
+# Coalition Relic: "At the beginning of your precombat main phase, remove all charge counters from this artifact. Add one
+# mana of any color for each charge counter removed this way." Voltaic Key untaps the Relic so it stores two counters in a
+# turn. Turn 3's main phase finds none (the Relic was never tapped for one): nothing is asked and nothing is added. Turn 5
+# takes both counters and Bot1 picks two different colors, turn 7 takes two more and picks the same color twice.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Coalition Relic
+Voltaic Key
+Mountain
+Mountain
+Mountain
+Mountain x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Coalition Relic.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Voltaic Key.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot1.Mana =
+? Bot1.Battlefield.Coalition Relic.Counters.Charge = (absent)
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Coalition Relic.Activate(Ability: charge counter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Voltaic Key.Activate(Bot1.Battlefield.Coalition Relic)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Coalition Relic.Activate(Ability: charge counter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Coalition Relic.Counters.Charge = 2
+[T5 Bot1.Main1]
+Bot1.Colors(Red; Blue)
+? Bot1.Mana = {U}{R}
+? Bot1.Battlefield.Coalition Relic.Counters.Charge = (absent)
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Coalition Relic.Activate(Ability: charge counter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Voltaic Key.Activate(Bot1.Battlefield.Coalition Relic)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Coalition Relic.Activate(Ability: charge counter)
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main1]
+Bot1.Colors(Green; Green)
+? Bot1.Mana = {G}{G}
+
+[Expect]
+Turn = 7
+Bot1.Battlefield.Coalition Relic.Counters.Charge = (absent)

@@ -1,0 +1,52 @@
+# Dragon's Rage Channeler: "Whenever you cast a noncreature spell, surveil 1". Casting an Ornithopter (a creature spell) asks
+# nothing (! Bot1.Arrange) and neither does Bot2's Lightning Bolt (not Bot1's spell); Bot1's own Chain Lightning does, and
+# Bot1 keeps the Mountain on top (the other branch of "you may put it into your graveyard"), then lets a second Mountain
+# go. Delirium needs four types: with an instant, a sorcery and a land in the graveyard (three) the Channeler is still a 1/1
+# without flying.
+
+[Bot1 Deck]
+Mountain
+Dragon's Rage Channeler
+Mountain
+Ornithopter
+Chain Lightning
+Lightning Bolt
+Mountain
+Mountain
+Mountain
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Dragon's Rage Channeler.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ornithopter.Cast
+! Bot1.Arrange
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Hand.Chain Lightning.Cast(Bot2)
+Bot1.Arrange(Mountain |)
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+! Bot1.Arrange
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Arrange(| Mountain)
+[T5 Bot1.Main2]
+? Bot1.Graveyard = Lightning Bolt; Mountain; Chain Lightning
+? Bot1.Battlefield.Dragon's Rage Channeler.Power = 1
+? Bot1.Battlefield.Dragon's Rage Channeler.Keywords = (absent)
+
+[Expect]
+Bot1.Battlefield.Dragon's Rage Channeler.Toughness = 1

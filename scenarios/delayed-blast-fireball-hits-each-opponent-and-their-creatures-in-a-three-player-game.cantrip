@@ -1,0 +1,60 @@
+# "Each opponent and each creature they control": with three players Bot2 and Bot3 each take 2 and their creatures take 2
+# (Bot2's Basking Rootwalla dies, Bot3's Sylvan Caryatid survives), while Bot1's own Rootwalla and Bot1 are untouched.
+
+[Bot1 Deck]
+Mountain
+Mox Emerald
+Mox Ruby
+Basking Rootwalla
+Delayed Blast Fireball
+Mountain
+Island
+Island x10
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Basking Rootwalla
+Island x12
+
+[Bot3 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Sylvan Caryatid
+Island x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Basking Rootwalla.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Basking Rootwalla.Cast
+[T3 Bot3.Main1]
+Bot3.Hand.Forest.Play
+Bot3.Hand.Mox Emerald.Cast
+Bot3.Hand.Mox Pearl.Cast
+Bot3.Battlefield.Mox Emerald.Activate
+Bot3.Battlefield.Forest.Activate
+Bot3.Battlefield.Mox Pearl.Activate
+Bot3.Hand.Sylvan Caryatid.Cast
+[T4 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Delayed Blast Fireball.Cast
+[T4 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 18
+Bot3.Life = 18
+Bot2.Graveyard = Basking Rootwalla
+Bot3.Battlefield.Sylvan Caryatid.Damage = 2
+Bot1.Battlefield.Basking Rootwalla.Damage = 0

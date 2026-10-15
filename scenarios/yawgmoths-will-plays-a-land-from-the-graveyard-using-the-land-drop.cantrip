@@ -1,0 +1,40 @@
+# "You may play lands ... from your graveyard": Bot1 puts a Mountain into its graveyard with Entomb, casts Yawgmoth's Will, and plays the
+# Mountain from the graveyard as its land play for the turn (so a Swamp from the hand is then refused). The Mountain taps for {R}. Entomb,
+# put into the graveyard before the Will, stays there; the Will itself is exiled.
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Ruby
+Mox Pearl
+Entomb
+Yawgmoth's Will
+Swamp
+Mountain
+Swamp x12
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Mountain)
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Yawgmoth's Will.Cast
+Bot1.Pass
+Bot1.Graveyard.Mountain.Play
+! Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mountain.Activate
+? Bot1.Mana = {R}
+
+[Expect]
+Bot1.Battlefield.Mountain.Tapped = true
+Bot1.Graveyard = Entomb
+Exile = Yawgmoth's Will

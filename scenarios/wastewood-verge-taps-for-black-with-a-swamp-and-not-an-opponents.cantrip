@@ -1,0 +1,27 @@
+# "You control a Swamp or a Forest": a Swamp of its own enables {B}, the opponent's Swamp and Forest do not.
+
+[Bot1 Deck]
+Wastewood Verge
+Swamp
+Plains x14
+
+[Bot2 Deck]
+Swamp
+Forest
+Plains x14
+
+[Actions]
+Bot1.Hand.Wastewood Verge.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Wastewood Verge.Activate(Ability: {B})
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T5 Bot1.Main1]
+! Bot1.Battlefield.Wastewood Verge.Activate(Ability: {B})
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Wastewood Verge.Activate(Ability: {B})
+
+[Expect]
+Bot1.Mana = {B}

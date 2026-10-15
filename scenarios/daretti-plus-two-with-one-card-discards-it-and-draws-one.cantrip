@@ -1,0 +1,38 @@
+# "Up to two" is fewer when the hand is: with a single Island left in hand Bot1 discards it (one card, together) and draws
+# that many, one: the Mountain on top of the library.
+
+[Bot1 Deck]
+Daretti, Scrap Savant
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Mox Pearl
+Island
+Mox Emerald
+Mountain
+Forest x19
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Daretti, Scrap Savant.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Daretti, Scrap Savant.Activate(Ability: Discard up to two)
+Bot1.Choose(Island)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Mountain
+Bot1.Graveyard = Island
+Bot1.Library.Count = 19
+Bot1.Battlefield.Daretti, Scrap Savant.Counters.Loyalty = 5

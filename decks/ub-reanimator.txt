@@ -1,0 +1,54 @@
+# UB Reanimator: put something enormous into the graveyard on turn one, and put it onto the battlefield on turn two.
+#
+# Forty cards, singleton but for the basics, so a game of it draws a different part of the plan every time. Entomb and
+# the Troll's swampcycling bury a threat on purpose; the Frog, Jace and Frantic Search do it while digging; Collective
+# Brutality makes a discard out of a spell worth casting anyway. Six ways to bring one back, of which Goryo's Vengeance
+# and Shallow Grave do it at instant speed and only until end of turn.
+#
+#   tools\bots-deck-duel.cmd -Deck1 ub-reanimator -Deck2 rw-aggro -Games 400
+
+# The reason to have a graveyard
+1 Griselbrand
+1 Archon of Cruelty
+1 Kokusho, the Evening Star
+1 Troll of Khazad-dûm
+1 Sheoldred, the Apocalypse
+
+# Bringing one back
+1 Reanimate
+1 Animate Dead
+1 Exhume
+1 Necromancy
+1 Shallow Grave
+1 Goryo's Vengeance
+
+# Getting one there
+1 Entomb
+1 Frantic Search
+1 Collective Brutality
+1 Psychic Frog
+1 Jace, Vryn's Prodigy
+
+# Finding the pieces
+1 Brainstorm
+1 Ponder
+1 Preordain
+1 Consider
+1 Demonic Tutor
+
+# Holding the door
+1 Force of Will
+1 Fatal Push
+
+# Lands
+1 Underground Sea
+1 Watery Grave
+1 Undercity Sewers
+1 Creeping Tar Pit
+1 Darkslick Shores
+1 Polluted Delta
+1 Misty Rainforest
+1 Verdant Catacombs
+1 Otawara, Soaring City
+4 Island
+4 Swamp

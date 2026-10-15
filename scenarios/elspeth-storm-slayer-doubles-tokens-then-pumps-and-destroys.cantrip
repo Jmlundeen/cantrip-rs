@@ -1,0 +1,47 @@
+# Elspeth, Storm Slayer: "If one or more tokens would be created under your control, twice that many of those tokens are
+# created instead" (CR 614.1a), so her +1 makes two 1/1 Soldiers (turn 1, on Black Lotus's white mana and two Moxen). Her 0 puts
+# a +1/+1 counter on each creature and gives flying until her controller's next turn (turn 3); her -3 destroys Bot2's
+# Tireless Tracker, a creature with mana value 3 (turn 5). Loyalty: 5 +1 = 6, 6 +0 = 6, 6 - 3 = 3.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Jet
+Elspeth, Storm Slayer
+Forest
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Black Lotus
+Tireless Tracker
+Forest x5
+Forest x13
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Elspeth, Storm Slayer.Cast
+Bot1.Battlefield.Elspeth, Storm Slayer.Activate(Ability: #1)
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Tireless Tracker.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Elspeth, Storm Slayer.Activate(Ability: #2)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Soldier#1.Power = 2
+? Bot1.Battlefield.Soldier#1.Keywords = Flying
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Soldier#1.Keywords = (absent)
+Bot1.Battlefield.Elspeth, Storm Slayer.Activate(Ability: #3; Bot2.Battlefield.Tireless Tracker)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Tireless Tracker; Black Lotus
+Bot1.Battlefield.Elspeth, Storm Slayer.Counters.Loyalty = 3
+Bot1.Battlefield.Soldier#1.Power = 2

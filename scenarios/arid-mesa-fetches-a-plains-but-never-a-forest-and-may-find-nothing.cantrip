@@ -1,0 +1,34 @@
+# Arid Mesa: "Search your library for a Mountain or Plains card". The Forests (and the Island) are not among the cards it
+# may find (! Bot1.Search), the Plains is, and so is the Mountain (the positive control, in the first search). The
+# second Mesa on turn 3 is cracked and finds nothing, as CR 701.23b allows: it is still sacrificed and the life is paid.
+
+[Bot1 Deck]
+Arid Mesa
+Arid Mesa
+Forest x5
+Forest x3
+Island
+Plains x2
+Mountain x2
+Forest x8
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Arid Mesa.Play
+Bot1.Battlefield.Arid Mesa.Activate
+! Bot1.Search(Forest)
+! Bot1.Search(Island)
+Bot1.Search(Plains)
+[T3 Bot1.Main1]
+Bot1.Hand.Arid Mesa.Play
+Bot1.Battlefield.Arid Mesa.Activate
+Bot1.Search()
+
+[Expect]
+Turn = 3
+Bot1.Life = 18
+Bot1.Graveyard = Arid Mesa; Arid Mesa
+Bot1.Battlefield = Plains
+Bot1.Battlefield.Plains.Tapped = false

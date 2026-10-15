@@ -1,0 +1,30 @@
+# "Destroy target artifact that player controls": with Bot2 controlling no artifact the trigger has no legal target and is
+# removed from the stack (CR 603.3d) - no target question (`! Bot1.Target`). The unblocked Mother of Runes is a 3/3 and
+# hits for three; the Ire still gave +2/+2 and trample.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Mother of Runes
+Dreadmaw's Ire
+Plains x12
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Mother of Runes.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Mother of Runes > Bot2)
+[T3 Bot1.Blockers]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Dreadmaw's Ire.Cast(Mother of Runes)
+! Bot1.Target
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Mother of Runes.Keywords = Trample

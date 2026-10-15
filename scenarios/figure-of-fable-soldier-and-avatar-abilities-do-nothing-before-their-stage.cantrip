@@ -1,0 +1,54 @@
+# "If this creature is a Scout" and "if this creature is a Soldier" are checked as the abilities resolve, not when they are
+# activated: paying for the Soldier ability while Figure of Fable is only a 1/1 Kithkin (turn 3), and for the Avatar ability
+# while it is still not a Soldier (turn 5), changes nothing: no new subtypes, no base power and toughness, no protection.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Figure of Fable
+Plains
+Plains
+Plains x12
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Figure of Fable.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Figure of Fable.Activate(Ability: Kithkin Soldier)
+Bot1.Pass
+? Bot1.Battlefield.Figure of Fable.Power = 1
+? Bot1.Battlefield.Figure of Fable.Subtypes = Kithkin
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Figure of Fable.Activate(Ability: Kithkin Avatar)
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Figure of Fable.Power = 1
+Bot1.Battlefield.Figure of Fable.Toughness = 1
+Bot1.Battlefield.Figure of Fable.Subtypes = Kithkin
+Bot1.Battlefield.Figure of Fable.Types = Creature

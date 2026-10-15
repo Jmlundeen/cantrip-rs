@@ -1,0 +1,66 @@
+# Does Machines, all three levels. Entering: mill a Sol Ring and a Mox Jet, draw a Mox Emerald and a Black Lotus, then
+# discard an Island and a Mox Pearl. Level 2 returns the Sol Ring and the Mox Jet to hand. Level 3, on turn 3, puts three
+# +1/+1 counters on a Mox Ruby at the beginning of combat, which makes it a 0/0 Robot creature in addition to its other
+# types: a 3/3 artifact creature.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Mox Ruby
+Does Machines
+Island
+Island
+Mox Pearl
+Sol Ring
+Mox Jet
+Mox Emerald
+Black Lotus
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Does Machines.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Choose(Island; Mox Pearl)
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Does Machines.Activate
+Bot1.Pass
+Bot1.Target(Sol Ring; Mox Jet)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Does Machines.Activate
+Bot1.Pass
+Bot1.Pass
+Bot1.Target(Mox Ruby)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Hand = Black Lotus; Sol Ring; Mox Jet; Island
+Bot1.Graveyard = Mox Pearl; Island
+Bot1.Battlefield.Does Machines.ClassLevel = 3
+Bot1.Battlefield.Mox Ruby.Types = Artifact; Creature
+Bot1.Battlefield.Mox Ruby.Subtypes = Robot
+Bot1.Battlefield.Mox Ruby.Counters.PlusOnePlusOne = 3
+Bot1.Battlefield.Mox Ruby.Power = 3

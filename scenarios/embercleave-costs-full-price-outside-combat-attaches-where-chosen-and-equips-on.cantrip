@@ -1,0 +1,58 @@
+# With no attacking creature Embercleave costs its full {4}{R}{R} (CR 601.2f): Black Lotus, Mox Ruby and three Mountains make
+# seven red mana, six are spent and exactly one {R} is left floating. Its enters trigger attaches it to the creature Bot1
+# targets - the second Ornithopter, not the first - which becomes a 1/3 with double strike and trample (CR 702.4, 702.19). On
+# turn 7 Equip {3} (sorcery speed) moves it to the other Ornithopter, and the first has nothing again.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mox Ruby
+Embercleave
+Ornithopter
+Ornithopter
+Mountain
+Mountain
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Hand.Embercleave.Cast
+Bot1.Target(Ornithopter#2)
+? Bot1.Mana = {R}
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Embercleave.AttachedTo = Ornithopter
+? Bot1.Battlefield.Ornithopter#2.Keywords = DoubleStrike; Flying; Trample
+? Bot1.Battlefield.Ornithopter#2.Power = 1
+? Bot1.Battlefield.Ornithopter#2.Toughness = 3
+? Bot1.Battlefield.Ornithopter#1.Keywords = Flying
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Embercleave.Activate(Bot1.Battlefield.Ornithopter#1; Ability: Equip)
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+[T7 Bot1.Main2]
+
+[Expect]
+Turn = 7
+Bot1.Battlefield.Ornithopter#1.Keywords = DoubleStrike; Flying; Trample
+Bot1.Battlefield.Ornithopter#2.Keywords = Flying
+Bot1.Battlefield.Ornithopter#2.Power = 0

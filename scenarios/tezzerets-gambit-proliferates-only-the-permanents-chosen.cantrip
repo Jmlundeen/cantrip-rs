@@ -1,0 +1,46 @@
+# Proliferate: Bot1 chooses only its own Everflowing Chalice (the prompt takes any number of permanents, CR 701.34a): it gets a second charge
+# counter, while Bot2's Chalice, also eligible, is left with one. Each Chalice was kicked once; Black Lotus and a Mox Sapphire pay Tezzeret's
+# Gambit's {3}{U/P}.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Everflowing Chalice
+Black Lotus
+Mox Sapphire
+Tezzeret's Gambit
+Island
+Island x12
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Everflowing Chalice
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Everflowing Chalice.Cast(Kicked: 1)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Everflowing Chalice.Cast(Kicked: 1)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Tezzeret's Gambit.Cast
+Bot1.Pass
+Bot1.Target(Bot1.Battlefield.Everflowing Chalice)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Everflowing Chalice.Counters.Charge = 2
+Bot2.Battlefield.Everflowing Chalice.Counters.Charge = 1

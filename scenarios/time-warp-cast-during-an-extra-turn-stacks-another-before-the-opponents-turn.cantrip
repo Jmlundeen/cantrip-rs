@@ -1,0 +1,44 @@
+# Extra turns are taken one after another (CR 500.7): Bot1's Time Warp on turn one gives it turn two, and a second cast during turn two gives
+# it turn three, both before Bot2's first turn, which is turn four. Bot1 draws and plays a land in each of its turns.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Time Warp
+Time Warp
+Island x4
+Island x8
+
+[Bot2 Deck]
+Swamp x17
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Time Warp.Cast(Bot1)
+[T2 Bot1.Main1]
+? ActivePlayer = Bot1
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Time Warp.Cast(Bot1)
+[T3 Bot1.Main1]
+? ActivePlayer = Bot1
+[T4 Bot2.Main1]
+
+[Expect]
+Turn = 4
+ActivePlayer = Bot2
+Bot1.Graveyard.Count = 3

@@ -1,0 +1,43 @@
+# Raph & Mikey, Troublemakers has haste and trample: attacking on the turn it is cast, its trigger reveals Bot1's
+# library down to the first creature card (Llanowar Elves, under two Forests), which enters tapped and attacking Bot2
+# (the only choice, so nobody is asked), and the two revealed Forests go to the bottom of the library.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Emerald
+Black Lotus
+Sol Ring
+Raph & Mikey, Troublemakers
+Forest
+Forest
+Forest
+Llanowar Elves
+Mountain
+Plains
+
+[Bot2 Deck]
+Forest x14
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Raph & Mikey, Troublemakers.Cast
+Bot1.Pass
+Bot2.Pass
+[Bot1.DeclareAttackers]
+Bot1.Attack(Raph & Mikey, Troublemakers)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 12
+Bot1.Battlefield.Llanowar Elves.Tapped = true
+Bot1.Library = Mountain; Plains; Forest; Forest

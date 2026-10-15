@@ -1,0 +1,51 @@
+# Bot1 casts Bloodbraid Challenger off a Forest and four Moxen on turn three. Cascade (CR 702.85a) exiles Tear
+# Asunder from the top of the library and Bot1 casts it without paying its mana cost as the trigger resolves.
+#
+# Tear Asunder's kicker changes what it may target ("exile target artifact or enchantment", or any nonland permanent
+# if kicked), so its target is chosen after the kicker is announced (CR 601.2b-c) — by the cast itself, not ahead of
+# it. A cast made during a resolution used to aim every one-target spell first and then had that target refused.
+# The same rule as Etali's We Say Thee Nay!, reached through another card and another effect that casts.
+#
+# Nothing is left to pay a kicker with, so it is cast unkicked, at the Mox Jet Bot2 played on turn two.
+
+[Bot1 Deck]
+Forest
+Mox Ruby
+Mox Emerald
+Mox Sapphire
+Mox Pearl
+Bloodbraid Challenger
+Island
+Island
+Tear Asunder
+Island x8
+
+[Bot2 Deck]
+Mox Jet
+Swamp x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Bloodbraid Challenger.Cast
+Bot1.Accept
+Bot1.Target(Bot2.Battlefield.Mox Jet)
+? Stack = Tear Asunder; Bloodbraid Challenger
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Exile = Mox Jet
+Bot2.Battlefield =
+Bot1.Graveyard = Tear Asunder
+Bot1.Battlefield = Forest; Mox Ruby; Mox Emerald; Mox Sapphire; Mox Pearl; Bloodbraid Challenger

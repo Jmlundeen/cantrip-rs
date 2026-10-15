@@ -1,0 +1,39 @@
+# Chapter I: "Exile a permanent card from your graveyard": the graveyard holds only a Lightning Bolt (an instant, not a permanent card), so nothing is exiled and no life is gained.
+# Chapter II then has no exiled card (0 counters on the Ornithopter) and chapter III returns just the Saga (CR 608.2).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Mox Jet
+Mox Pearl
+Lightning Bolt
+The Aesir Escape Valhalla
+Ornithopter
+Forest x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.The Aesir Escape Valhalla.Cast
+[T1 Bot1.Main2]
+? Bot1.Life = 20
+? Exile.Count = 0
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = (absent)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Hand = Forest; Forest; The Aesir Escape Valhalla
+Bot1.Battlefield.Ornithopter.Power = 0

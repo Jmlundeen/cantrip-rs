@@ -1,0 +1,8 @@
+{
+  "name": "Leovold, Emissary of Trest",
+  "manaCost": "{B}{G}{U}",
+  "type": "Legendary Creature — Elf Advisor",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Each opponent can't draw more than one card each turn.\nWhenever you or a permanent you control becomes the target of a spell or ability an opponent controls, you may draw a card."
+}

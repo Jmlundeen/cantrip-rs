@@ -1,0 +1,42 @@
+# "You have no maximum hand size": Ancestral Recall twice on turn 3 (after Proft's has entered on turn 1) leaves Bot1 with nine
+# cards at cleanup and it is not asked to discard (the bare refusal, placed after the end step's own priority). Bot2, with
+# no such permanent, is made to discard its eighth card in each of its own turns (the default seen in every duel here).
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Pearl
+Proft's Eidetic Memory
+Ancestral Recall
+Ancestral Recall
+Island
+Island x4
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Proft's Eidetic Memory.Cast
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Pass
+[T3 Bot1.End]
+Bot1.Pass
+! Bot1.Discard
+[T5 Bot1.Upkeep]
+
+[Expect]
+Bot1.Hand.Count = 9
+Bot1.Graveyard.Count = 2

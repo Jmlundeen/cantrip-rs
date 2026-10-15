@@ -1,0 +1,35 @@
+# One activation per creature sacrificed, each its own cost: Elvish Mystic and Ornithopter are both sacrificed on turn 1,
+# one at Bot2 and one at Bot2 again, and the two abilities deal 2 damage in all.
+
+[Bot1 Deck]
+Mountain
+Mox Jet
+Mox Emerald
+Goblin Bombardment
+Elvish Mystic
+Ornithopter
+Island x12
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Goblin Bombardment.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Goblin Bombardment.Activate(Bot2; Sacrifice: Elvish Mystic)
+Bot1.Battlefield.Goblin Bombardment.Activate(Bot2; Sacrifice: Ornithopter)
+Bot1.Pass
+
+[Expect]
+Bot2.Life = 18
+Bot1.Graveyard = Ornithopter; Elvish Mystic

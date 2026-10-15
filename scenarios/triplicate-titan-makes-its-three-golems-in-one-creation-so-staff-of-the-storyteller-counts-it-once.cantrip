@@ -1,0 +1,45 @@
+# Triplicate Titan's three Golems are one "create" instruction, so they are created together (CR 101.4, 111.1): Staff
+# of the Storyteller's "whenever you create one or more creature tokens" sees one creation and puts one story counter
+# on it (CR 603.2c), not one per Golem. Its own Spirit made the first counter.
+
+[Bot1 Deck]
+Swamp
+Dark Ritual
+Entomb
+Reanimate
+Plains
+Staff of the Storyteller
+Phyrexian Altar
+Triplicate Titan
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Triplicate Titan)
+Bot1.Hand.Reanimate.Cast(Bot1.Graveyard.Triplicate Titan)
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Staff of the Storyteller.Cast
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Staff of the Storyteller.Counters.Story = 1
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Phyrexian Altar.Cast
+Bot1.Battlefield.Phyrexian Altar.Activate(Sacrifice: Triplicate Titan; Color: Black)
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield = Swamp; Swamp; Plains; Staff of the Storyteller; Spirit; Phyrexian Altar; Golem; Golem; Golem
+Bot1.Battlefield.Staff of the Storyteller.Counters.Story = 2

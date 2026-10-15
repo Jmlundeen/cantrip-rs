@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Cantrip.Core\Cantrip.Core.csproj" />
+    <ProjectReference Include="..\Cantrip.Cards\Cantrip.Cards.csproj" />
+    <ProjectReference Include="..\Cantrip.Cards.Model\Cantrip.Cards.Model.csproj" />
+  </ItemGroup>
+
+  <!-- Reads dataset folders for what drafting and deck building need: each card as it is printed, and the set lists. The
+       rules of a card are the native engine's, which reads the card files itself. Nothing here compiles a script. -->
+
+</Project>

@@ -1,0 +1,19 @@
+# Everflowing Chalice cast without kicking it for {0} enters with no charge counter, and tapping it adds nothing.
+
+[Bot1 Deck]
+Everflowing Chalice
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Everflowing Chalice.Cast
+[Bot1.Main2]
+Bot1.Battlefield.Everflowing Chalice.Activate(Ability: charge counter)
+? Bot1.Mana = 
+? Bot1.Battlefield.Everflowing Chalice.Tapped = true
+
+[Expect]
+Bot1.Battlefield = Everflowing Chalice
+Stack.Count = 0

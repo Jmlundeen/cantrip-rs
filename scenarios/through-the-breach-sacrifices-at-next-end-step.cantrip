@@ -1,0 +1,29 @@
+# Cast Through the Breach from hand on the fifth turn; its creature has haste and is sacrificed at the next end step.
+[Bot1 Deck]
+Through the Breach
+Griselbrand
+5 Mountain
+10 Mountain
+
+[Bot2 Deck]
+20 Island
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Through the Breach.Cast
+Bot1.Choose(Griselbrand)
+? Bot1.Battlefield.Griselbrand.Keywords = Flying; Haste; Lifelink
+[T10 Bot2.Main1]
+
+[Expect]
+Bot1.Graveyard = Griselbrand; Through the Breach
+Bot1.Battlefield.Count = 5

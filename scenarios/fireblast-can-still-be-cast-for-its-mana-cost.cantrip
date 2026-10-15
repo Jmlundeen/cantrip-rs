@@ -1,0 +1,35 @@
+# The alternative cost is optional: with two Mountains on the battlefield Fireblast is still cast for {4}{R}{R}, paid
+# by three Mountains and Black Lotus, and every Mountain stays.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Fireblast
+Mountain
+Mountain
+Mountain x2
+Mountain x10
+
+[Bot2 Deck]
+Forest
+Forest x6
+Forest x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot2.Hand.Forest.Play
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Forest.Play
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Fireblast.Cast(Bot2)
+
+[Expect]
+Bot2.Life = 16
+Bot1.Battlefield = Mountain; Mountain; Mountain
+Bot1.Graveyard = Fireblast; Black Lotus
+Stack.Count = 0

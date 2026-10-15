@@ -1,0 +1,49 @@
+# Shadow (CR 702.28b): "This creature can block or be blocked by only creatures with shadow." Dauthi Voidwalker and
+# Llanowar Elves attack together into Guerrilla Gorilla. The Gorilla could block the Elves, so the defender is asked
+# for blockers at all, but a block on Dauthi Voidwalker is not allowed: it has shadow and the Gorilla has not. The
+# Gorilla blocks and kills the Elves, and Dauthi Voidwalker is unblocked for 3.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Dauthi Voidwalker
+Forest
+Llanowar Elves
+Swamp x15
+
+[Bot2 Deck]
+Forest
+Forest
+Guerrilla Gorilla
+Forest x15
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dauthi Voidwalker.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest#1.Activate
+Bot2.Battlefield.Forest#2.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+[T5 Bot1.Main1]
+Bot1.Attack(Dauthi Voidwalker; Llanowar Elves > Bot2)
+! Bot2.Block(Guerrilla Gorilla > Dauthi Voidwalker)
+Bot2.Block(Guerrilla Gorilla > Llanowar Elves)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Step = Main2
+Bot2.Life = 17
+Bot1.Battlefield = Swamp; Mox Jet; Dauthi Voidwalker; Forest
+Bot1.Graveyard = Llanowar Elves
+Bot2.Battlefield = Forest; Forest; Guerrilla Gorilla

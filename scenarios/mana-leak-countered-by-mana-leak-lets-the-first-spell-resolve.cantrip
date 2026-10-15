@@ -1,0 +1,41 @@
+# A Mana Leak can target another spell, itself a Mana Leak: Bot1's Guerrilla Gorilla is leaked by Bot2, and Bot1 leaks that
+# Leak. Bot2 has nothing left to pay {3} with, so the first Leak is countered (CR 118.12) and the Gorilla resolves.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Guerrilla Gorilla
+Mana Leak
+Island x14
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mana Leak
+Island x17
+
+[Actions]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Mana Leak.Cast(Guerrilla Gorilla)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Mana Leak.Cast(Stack.Mana Leak)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Guerrilla Gorilla.Power = 2
+Bot2.Graveyard = Mana Leak
+Bot1.Graveyard = Mana Leak

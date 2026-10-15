@@ -1,0 +1,6 @@
+{
+  "name": "Jaws of Defeat",
+  "manaCost": "{3}{B}",
+  "type": "Enchantment",
+  "oracleText": "Whenever a creature you control enters, target opponent loses life equal to the difference between that creature's power and its toughness."
+}

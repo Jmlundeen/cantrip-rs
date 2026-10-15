@@ -1,0 +1,25 @@
+# Humiliate against a hand of only lands: there is no nonland card to choose, so nothing is discarded; and Bot1
+# controls no creature, so the +1/+1 counter has nowhere to go and no creature is asked for.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Humiliate
+Island x4
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Humiliate.Cast(Bot2)
+
+[Expect]
+Stack.Count = 0
+Bot2.Hand.Count = 7
+Bot2.Graveyard.Count = 0
+Bot1.Graveyard = Humiliate

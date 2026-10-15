@@ -1,0 +1,35 @@
+# Tapping none of the Myr is a legal choice of X: Myr Battlesphere stays 4/7 and deals only its combat damage.
+
+
+[Bot1 Deck]
+Plains
+Sol Ring
+Black Lotus
+Plains
+Myr Battlesphere
+Plains x20
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Myr Battlesphere.Cast
+[T5 Bot1.Main1]
+Bot1.Attack(Myr Battlesphere > Bot2)
+Bot1.Choose()
+[Bot1.Main2]
+[Expect]
+Bot2.Life = 16
+Bot1.Battlefield.Myr Battlesphere.Power = 4
+Bot1.Battlefield.Myr#1.Tapped = false
+Bot1.Battlefield.Myr#4.Tapped = false

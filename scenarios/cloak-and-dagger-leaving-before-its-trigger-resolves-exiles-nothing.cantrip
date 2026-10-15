@@ -1,0 +1,45 @@
+# Cloak and Dagger, Entwined: "until Cloak and Dagger leave the battlefield" - if it has already left when the trigger
+# resolves, nothing is exiled at all (CR 610.3b). Bot2 answers the enter trigger with Lightning Bolt on Cloak and
+# Dagger, and the Llanowar Elves it was going to take, and the nonland card Bot1 would otherwise have chosen, stay
+# where they are. The default answer to the exile question is the first card offered, so a card gone from the hand or the
+# battlefield would show it.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Cloak and Dagger, Entwined
+Plains x11
+
+[Bot2 Deck]
+Forest
+Mox Ruby
+Llanowar Elves
+Lightning Bolt
+Forest x3
+Forest x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cloak and Dagger, Entwined.Cast
+Bot1.Target(Bot2)
+Bot1.Target(Llanowar Elves)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Cloak and Dagger, Entwined)
+
+[Expect]
+Turn = 3
+Exile.Count = 0
+Bot1.Graveyard = Cloak and Dagger, Entwined
+Bot2.Battlefield = Forest; Llanowar Elves; Mox Ruby

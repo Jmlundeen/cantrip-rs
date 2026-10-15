@@ -1,0 +1,49 @@
+# "Target creature card and all other cards with the same name from your graveyard": Bot1's graveyard holds two Ornithopters, a Haywire Mite and noncreature cards; Bot2's holds an Ornithopter. Only a creature card of
+# Bot1's graveyard can be targeted (refusals for Faithless Looting, Entomb and Bot2's Ornithopter), and targeting an Ornithopter returns both of Bot1's and leaves the Mite and Bot2's Ornithopter where they are.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Faithless Looting
+Entomb
+Echoing Return
+Ornithopter
+Ornithopter
+Mox Jet
+Island
+Island x4
+Haywire Mite
+Island x4
+
+[Bot2 Deck]
+Island x7
+Ornithopter
+Island x6
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Ornithopter; Ornithopter)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Haywire Mite)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet#2.Activate
+! Bot1.Hand.Echoing Return.Cast(Bot1.Graveyard.Faithless Looting)
+! Bot1.Hand.Echoing Return.Cast(Bot1.Graveyard.Entomb)
+! Bot1.Hand.Echoing Return.Cast(Bot2.Graveyard.Ornithopter)
+Bot1.Hand.Echoing Return.Cast(Bot1.Graveyard.Ornithopter)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Echoing Return; Entomb; Haywire Mite; Faithless Looting
+Bot2.Graveyard = Ornithopter
+Bot1.Hand = Island; Island; Ornithopter; Ornithopter

@@ -1,0 +1,27 @@
+# Scry 2 with one card left (CR 701.22a: as many as there are): only the Lightning Bolt is looked at, left on top, and then
+# drawn: the library is empty afterwards, without the player losing (the draw was of a card that was there).
+
+[Bot1 Deck]
+Island
+Preordain
+Island
+Island
+Island
+Island
+Island
+Lightning Bolt
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Preordain.Cast
+Bot1.Arrange(Lightning Bolt | )
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Island; Island; Island; Island; Island; Lightning Bolt
+Bot1.Library.Count = 0
+Result = InProgress

@@ -1,0 +1,53 @@
+use cantrip_api::*;
+use cantrip_mechanics::targets;
+use cantrip_oracle as oracle;
+
+/// "This creature enters with six -1/-1 counters on it" (CR 614.1c).
+fn enters_with_counters(_: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
+    entering.counters[CounterKind::MinusOne as usize] += 6;
+    Ok(())
+}
+
+/// "Whenever one or more permanent cards are put into your graveyard from anywhere while this creature has a -1/-1
+/// counter on it" (CR 603.2c): asked of each card that arrives, and one trigger for the cards that arrive together. A
+/// permanent card is a nontoken card of a permanent type. The counters are the ones it has as the cards arrive.
+fn permanent_card_to_your_graveyard(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    let Event::ZoneChange { new, to, .. } = event else { return None };
+    if *to != Zone::graveyard(q.controller(source)) || q.obj(*new).token || q.obj(source).counters(CounterKind::MinusOne) <= 0 {
+        return None;
+    }
+    let types = q.chars(*new).types;
+    let permanent = [
+        CardType::Artifact,
+        CardType::Battle,
+        CardType::Creature,
+        CardType::Enchantment,
+        CardType::Land,
+        CardType::Planeswalker,
+    ]
+    .into_iter()
+    .any(|t| types.has(t));
+    if permanent { Fired::about(Target::Object(*new)) } else { None }
+}
+
+/// "Remove a -1/-1 counter from this creature": nothing from one that has left or has none by now.
+fn remove_a_counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let source = item.object;
+    if targets::permanent(g, source) && g.obj(source).counters(CounterKind::MinusOne) > 0 {
+        g.add_counters(source, CounterKind::MinusOne, -1);
+    }
+    Ok(())
+}
+
+pub static CARD: CardDef = CardDef {
+    enters: Some(enters_with_counters),
+    abilities: &[AbilityDef::Triggered(TriggeredDef {
+        text: "Whenever one or more permanent cards are put into your graveyard from anywhere while this creature has a -1/-1 counter on it, remove a -1/-1 counter from this creature.",
+        listens: EventMask::ZONE_CHANGE,
+        matches: permanent_card_to_your_graveyard,
+        effect: remove_a_counter,
+        once_per_batch: true,
+        ..TriggeredDef::BLANK
+    })],
+    ..oracle::MOONSHADOW
+};

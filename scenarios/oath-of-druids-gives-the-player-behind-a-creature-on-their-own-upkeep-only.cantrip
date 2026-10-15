@@ -1,0 +1,55 @@
+# Oath of Druids triggers at "each player's upkeep", comparing creature counts with the player whose upkeep it is, not
+# with the Oath's controller. Bot1 casts the Oath and a Llanowar Elves on turn 1. At Bot2's upkeep on turn 2 Bot2 controls
+# fewer creatures than its opponent, so it is the one to reveal: two Forests go to its graveyard and an Elvish Mystic onto its
+# battlefield. At Bot1's upkeep on turn 3 each player controls one creature, so the target (a player who controls MORE) does
+# not exist and nothing triggers (the stack is empty and Bot1's library is untouched).
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Oath of Druids
+Llanowar Elves
+Swamp
+Swamp
+Island x3
+Swamp x10
+
+[Bot2 Deck]
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Forest
+Forest
+Elvish Mystic
+Swamp x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Oath of Druids.Cast
+Bot1.Pass
+[T2 Bot2.Upkeep]
+Bot2.Accept
+[T2 Bot2.Main1]
+? Bot2.Battlefield.Elvish Mystic.Power = 1
+? Bot2.Graveyard = Forest; Forest
+[T3 Bot1.Main1]
+? Stack.Count = 0
+? Bot1.Library.Count = 12
+
+[Expect]
+Turn = 3
+Bot2.Battlefield.Count = 1

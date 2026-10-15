@@ -1,0 +1,30 @@
+# With no land card among the four revealed there is nothing to choose: all four go to the graveyard unasked.
+
+[Bot1 Deck]
+Forest
+Forest
+Satyr Wayfinder
+Island x5
+Guerrilla Gorilla
+Lightning Bolt
+Ponder
+Counterspell
+Island x8
+
+[Bot2 Deck]
+Swamp x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Satyr Wayfinder.Cast
+
+[Expect]
+Turn = 3
+Bot1.Hand = Island; Island; Island; Island; Island
+Bot1.Graveyard = Counterspell; Ponder; Lightning Bolt; Guerrilla Gorilla
+Bot1.Battlefield = Satyr Wayfinder; Forest; Forest
+Bot1.Library.Count = 8

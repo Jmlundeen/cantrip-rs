@@ -1,0 +1,25 @@
+# Chromatic Star's {1} comes out of the mana it makes: two Plains and the Star are two mana, not three, so Monastery Mentor
+# ({2}{W}) is not offered. A seat handed it paid two, found the Star needed a third, cancelled and was handed it
+# again, forever (the server stalled).
+
+[Bot1 Deck]
+Plains
+Plains
+Chromatic Star
+Monastery Mentor
+Plains x4
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Chromatic Star.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+! Bot1.Hand.Monastery Mentor.Cast
+
+[Expect]
+Turn = 3

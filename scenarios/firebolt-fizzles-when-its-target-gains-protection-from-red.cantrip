@@ -1,0 +1,47 @@
+# A spell whose only target has become illegal does not resolve (CR 608.2b): Bot2's Giver of Runes, no longer summoning
+# sick on turn 5, gives its Ornithopter protection from red in response to Firebolt, so the 2 damage that would have killed
+# the 0/2 is never dealt. The fizzled Firebolt is put into the graveyard (CR 608.2b), not exiled.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Mountain
+Mountain
+Mountain
+Firebolt
+Mountain
+Mountain x12
+
+[Bot2 Deck]
+Plains
+Giver of Runes
+Ornithopter
+Plains x4
+Plains x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Giver of Runes.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Firebolt.Cast(Bot2.Battlefield.Ornithopter)
+Bot2.Battlefield.Giver of Runes.Activate(Ornithopter)
+Bot2.Decline
+Bot2.Colors(Red)
+Bot1.Pass
+[T5 Bot1.Main2]
+? Bot2.Battlefield.Ornithopter.Damage = 0
+
+[Expect]
+Bot1.Graveyard = Firebolt
+Exile.Count = 0
+Bot2.Battlefield.Ornithopter.Damage = 0

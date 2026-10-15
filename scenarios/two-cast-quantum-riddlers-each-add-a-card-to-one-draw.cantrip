@@ -1,0 +1,66 @@
+# CR 616.1 and 616.1f on an instruction to draw (CR 121.2a), with two Quantum Riddler cards rather than a card and a
+# token copy of it. The second Riddler's "When this creature enters, draw a card" resolves with Bot1's hand empty and
+# both Riddlers on the battlefield: both "you draw that many cards plus one instead" apply, Bot1 — the player who
+# would draw — is asked which applies first, the other applies after it, and one card becomes three.
+#
+# The first Riddler's own trigger is the control: one Riddler, one effect, nothing to order and nobody asked — the
+# instruction for one card draws two, and the `Replace` line would be taken there if a question were put.
+#
+# All on turn 1 so the hand is small enough for the condition ("one or fewer cards in hand"): an Island, three Black
+# Lotuses and a Mox leave the two Riddlers; the first is cast with one card left in hand and draws the two Moxen,
+# which are cast so that the second Riddler is cast from a hand of one and its trigger resolves with a hand of none.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Black Lotus
+Black Lotus
+Mox Sapphire
+Quantum Riddler
+Quantum Riddler
+Mox Jet
+Mox Ruby
+Mountain
+Forest
+Swamp
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Quantum Riddler.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+? Bot1.Hand = Quantum Riddler
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand = Quantum Riddler; Mox Jet; Mox Ruby
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Quantum Riddler.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+? Bot1.Hand.Count = 0
+Bot1.Pass
+Bot2.Pass
+Bot1.Replace(Quantum Riddler)
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Hand = Mountain; Forest; Swamp
+Bot1.Library.Count = 10
+Bot1.Battlefield = Island; Mox Sapphire; Mox Jet; Mox Ruby; Quantum Riddler; Quantum Riddler

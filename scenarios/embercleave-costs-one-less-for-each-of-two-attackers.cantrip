@@ -1,0 +1,38 @@
+# "Costs {1} less to cast for each attacking creature you control": with two Ornithopters attacking Embercleave costs {2}{R}{R}.
+# Black Lotus, Mox Ruby and two Mountains float six red mana before the cast, and exactly {R}{R} is left over after it (CR 601.2f).
+# It attaches to the first Ornithopter, a 1/3 flier with double strike that deals 2 to Bot2.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mox Ruby
+Embercleave
+Ornithopter
+Ornithopter
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Attack(Ornithopter#1; Ornithopter#2)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Embercleave.Cast
+Bot1.Target(Ornithopter#1)
+? Bot1.Mana = {R}{R}
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Embercleave.AttachedTo = Ornithopter
+Bot2.Life = 18

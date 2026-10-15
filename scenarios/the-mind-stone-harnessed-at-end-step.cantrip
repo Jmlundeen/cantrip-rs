@@ -1,0 +1,27 @@
+# Three Black Lotuses pay to cast and harness The Mind Stone, leaving only it and Zuran Orb on
+# the battlefield. Its infinity ability offers an end-step target on a compact client board.
+
+[Bot1 Deck]
+The Mind Stone
+Zuran Orb
+Black Lotus x3
+Plains x17
+
+[Bot2 Deck]
+Island x22
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.The Mind Stone.Cast
+Bot1.Hand.Zuran Orb.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.The Mind Stone.Activate(Ability: Harness)
+[Handover Bot1.Target]
+
+[Expect]
+Bot1.Battlefield = The Mind Stone; Zuran Orb
+Bot1.Graveyard = Black Lotus; Black Lotus; Black Lotus

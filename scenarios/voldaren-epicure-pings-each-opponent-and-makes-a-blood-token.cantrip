@@ -1,0 +1,24 @@
+# Voldaren Epicure's enters trigger deals 1 damage to each opponent (not its controller) and creates a Blood token
+# under its controller's control, not the opponent's.
+
+[Bot1 Deck]
+Mountain
+Voldaren Epicure
+Mountain x12
+
+[Bot2 Deck]
+Island x13
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Voldaren Epicure.Cast
+[T1 Bot1.Main2]
+? Bot1.Battlefield = Mountain; Voldaren Epicure; Blood Token
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 19
+Bot1.Battlefield = Mountain; Voldaren Epicure; Blood Token
+Bot2.Battlefield.Count = 0
+Stack.Count = 0

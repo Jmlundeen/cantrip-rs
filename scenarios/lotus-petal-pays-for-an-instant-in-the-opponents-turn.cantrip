@@ -1,0 +1,27 @@
+# A mana ability can be activated whenever its controller has priority (CR 605.3a, 117.1): in Bot2's upkeep Bot1 sacrifices a
+# Lotus Petal for red mana and casts Lightning Bolt with it, in a turn that is not its own. The sacrificed Petal stays in
+# the graveyard and the mana is used up (CR 106.4); the Petal cannot be used again.
+
+[Bot1 Deck]
+Lotus Petal
+Lightning Bolt
+Island x5
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Pass
+[T2 Bot2.Upkeep]
+Bot1.Battlefield.Lotus Petal.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+[T2 Bot2.Main1]
+! Bot1.Battlefield.Lotus Petal.Activate
+
+[Expect]
+Bot2.Life = 17
+Bot1.Graveyard = Lightning Bolt; Lotus Petal
+Bot1.Battlefield.Count = 0

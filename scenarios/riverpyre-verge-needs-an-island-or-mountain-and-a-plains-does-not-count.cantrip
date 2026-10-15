@@ -1,0 +1,27 @@
+# "Activate only if you control an Island or a Mountain" (CR 602.5b): a Plains alongside the Verge does not unlock the {U}
+# ability (refused), though the {R} one never needs anything. An Island does (the control; the existing scenario uses a
+# Mountain), and the Verge itself, which has no basic land types, is not one.
+
+[Bot1 Deck]
+Riverpyre Verge
+Plains
+Island
+Plains x17
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Riverpyre Verge.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+! Bot1.Battlefield.Riverpyre Verge.Activate(Ability: {U})
+Bot1.Battlefield.Riverpyre Verge.Activate(Ability: {R})
+? Bot1.Mana = {R}
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Riverpyre Verge.Activate(Ability: {U})
+? Bot1.Mana = {U}
+
+[Expect]
+Bot1.Battlefield.Riverpyre Verge.Tapped = true

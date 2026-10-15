@@ -1,0 +1,43 @@
+# Mana Drain: "Counter target spell. At the beginning of your next main phase, add ..." - Abrupt Decay (mana value 2) can't
+# be countered, so the counter does nothing and the Decay resolves (destroying Bot1's Mox Ruby), but the delayed mana is
+# still added: {C}{C} in Bot1's next main phase.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Mana Drain
+Mox Ruby
+Island x17
+
+[Bot2 Deck]
+Mox Jet
+Mox Emerald
+Abrupt Decay
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Abrupt Decay.Cast(Bot1.Battlefield.Mox Ruby)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Mana Drain.Cast(Abrupt Decay)
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {C}{C}
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Mox Ruby; Mana Drain

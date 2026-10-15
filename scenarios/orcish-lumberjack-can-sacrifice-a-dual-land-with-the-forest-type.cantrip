@@ -1,0 +1,25 @@
+# Bayou is a Swamp Forest (CR 305.6), so it is a Forest to sacrifice: Bot1 gets three red mana, all of one color as the
+# "any combination" allows.
+
+[Bot1 Deck]
+Mountain
+Orcish Lumberjack
+Bayou
+Mountain x4
+Mountain x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Orcish Lumberjack.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Bayou.Play
+Bot1.Battlefield.Orcish Lumberjack.Activate(Sacrifice: Bayou; Colors: R,R,R)
+
+[Expect]
+Bot1.Mana = {R}{R}{R}
+Bot1.Graveyard = Bayou

@@ -1,0 +1,76 @@
+# Exile is one zone shared by every player (CR 400.2), but the cards in it belong to whoever owns them, and that is
+# who they would go back to. Both players answer each other's creatures with Swords to Plowshares until exile holds
+# three cards with two different owners: two of Bot2's Gorillas and one of Bot1's.
+#
+# It stops with Bot1 holding priority in its fifth main phase, to
+# picture a board where each rail shows that
+# player's own share of exile over their piles, one card for Bot1 and two for Bot2.
+
+[Bot1 Deck]
+Forest
+Forest
+Plains
+Guerrilla Gorilla
+Swords to Plowshares
+Swords to Plowshares
+Plains
+Forest x12
+
+[Bot2 Deck]
+Forest
+Forest
+Plains
+Guerrilla Gorilla
+Guerrilla Gorilla
+Forest
+Swords to Plowshares
+Forest x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Swords to Plowshares.Cast(Bot2.Battlefield.Guerrilla Gorilla)
+[T6 Bot2.Main1]
+? Exile.Count = 1
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Swords to Plowshares.Cast(Bot2.Battlefield.Guerrilla Gorilla)
+[T8 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Guerrilla Gorilla)
+[T9 Bot1.Main1]
+[Handover Bot1.Pass]
+
+[Expect]
+Turn = 9
+Step = Main1
+ActivePlayer = Bot1
+# One zone, three cards, two owners: the client splits it by owner and shows each share in that player's own rail.
+Exile = Guerrilla Gorilla; Guerrilla Gorilla; Guerrilla Gorilla
+Bot1.Battlefield.Count = 4
+Bot2.Battlefield.Count = 4
+Bot1.Graveyard = Swords to Plowshares; Swords to Plowshares
+Bot2.Graveyard = Swords to Plowshares
+# Swords to Plowshares gives the life to the exiled creature's controller (CR 608.2h), not to its caster.
+Bot1.Life = 22
+Bot2.Life = 24

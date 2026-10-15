@@ -1,0 +1,41 @@
+# Wrecking Ball Arm's "equip legendary creature {3}" puts it on Tamiyo, Inquisitive Student (a legendary 0/3 flier): base
+# power and toughness 7/7, and she can't be blocked by creatures with power 2 or less (CR 509.1b). Bot2's Ornithopter,
+# power 0, may block Bot1's Ornithopter but not Tamiyo, who hits for 7.
+[Bot1 Deck]
+Island x3
+Tamiyo, Inquisitive Student
+Ornithopter
+Wrecking Ball Arm
+Island
+Island x20
+[Bot2 Deck]
+Ornithopter
+Island x20
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Tamiyo, Inquisitive Student.Cast
+Bot1.Hand.Ornithopter.Cast
+[Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Wrecking Ball Arm.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Wrecking Ball Arm.Activate(Ability: Equip legendary creature; Tamiyo, Inquisitive Student)
+Bot1.Pass
+Bot1.Attack(Tamiyo, Inquisitive Student > Bot2; Ornithopter > Bot2)
+! Bot2.Block(Ornithopter > Tamiyo, Inquisitive Student)
+Bot2.Block(Ornithopter > Ornithopter)
+[Bot1.Main2]
+[Expect]
+Bot2.Life = 13
+Bot1.Battlefield.Tamiyo, Inquisitive Student.Power = 7
+Bot1.Battlefield.Tamiyo, Inquisitive Student.Toughness = 7

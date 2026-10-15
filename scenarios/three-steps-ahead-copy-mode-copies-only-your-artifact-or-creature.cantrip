@@ -1,0 +1,41 @@
+# Three Steps Ahead, spree: "+ {3} - Create a token that's a copy of target artifact or creature you control." Bot2's Ornithopter is not a legal
+# target (the refusal, naming it), Bot1's own is (the positive control): the token copy arrives, two Ornithopters on Bot1's side. {U}{U}+{3} are paid
+# on turn 3 with a Black Lotus, a Mox Sapphire and two Islands.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Black Lotus
+Three Steps Ahead
+Ornithopter
+Island
+Island x14
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Three Steps Ahead.Cast
+Bot1.Modes(Create a token)
+! Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter#1.Power = 0
+Bot1.Battlefield = Island; Island; Mox Sapphire; Ornithopter; Ornithopter

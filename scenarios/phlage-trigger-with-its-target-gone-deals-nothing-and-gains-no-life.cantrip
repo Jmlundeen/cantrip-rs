@@ -1,0 +1,42 @@
+# "It deals 3 damage to any target and you gain 3 life" (CR 608.2b): Bot2 Bolts its own Ornithopter in response to the enters trigger
+# aimed at it, so the only target is illegal on resolution and the whole ability does nothing - Bot1 gains no life (the gain is part
+# of the same instruction as the damage on a legal target, as the trigger is fizzled, not partly resolved). The sacrifice trigger still
+# takes Phlage away.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Phlage, Titan of Fire's Fury
+Lotus Petal
+Mountain x12
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Ornithopter
+Mountain x12
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Lotus Petal.Activate(Color: Red)
+Bot1.Hand.Phlage, Titan of Fire's Fury.Cast
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Graveyard = Ornithopter; Lightning Bolt
+Bot1.Graveyard.Count = 2

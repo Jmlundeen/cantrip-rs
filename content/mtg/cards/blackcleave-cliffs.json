@@ -1,0 +1,5 @@
+{
+  "name": "Blackcleave Cliffs",
+  "type": "Land",
+  "oracleText": "This land enters tapped unless you control two or fewer other lands.\n{T}: Add {B} or {R}."
+}

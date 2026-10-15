@@ -1,0 +1,39 @@
+# Tinker finds Painter's Servant, whose "as this creature enters, choose a color" is asked while the card is still in
+# the library it was found in (CR 614.12a): an entry replacement applies before the card moves.
+#
+# Handed over at that choice rather than answered, so a session can be dealt the position and show that the seat
+# being asked can see the card it is being asked about — a library is hidden from everybody, its owner included.
+# See ScriptedPromptVisibilityTests.
+#
+# Black Lotus pays for Tinker and Mox Sapphire is the artifact sacrificed, so the whole thing happens on turn one.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Tinker
+Island x3
+Island x3
+Painter's Servant
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Tinker.Cast
+Bot1.Choose(Mox Sapphire)
+Bot1.Search(Painter's Servant)
+[Handover Bot1.Colors]
+
+[Expect]
+Turn = 1
+Step = Main1
+Stack = Tinker
+Bot1.Battlefield = Island
+Bot1.Graveyard = Mox Sapphire; Black Lotus
+Bot1.Library = Island; Island; Island; Painter's Servant; Island; Island; Island; Island; Island; Island; Island; Island; Island; Island

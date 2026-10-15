@@ -1,0 +1,43 @@
+# Embereth Shieldbreaker // Battle Display (CR 715): on turn 3 Bot1 casts the Adventure for {R}, destroying Bot2's Sol Ring;
+# as it resolves the card is exiled rather than put into the graveyard, and on turn 5 Bot1 casts the creature from exile
+# for {1}{R}. While on the stack it is Battle Display, not the creature. (Bot1's other way to cast the card, from the
+# hand as the creature, is in the neighbouring handover scenario.)
+
+[Bot1 Deck]
+Mountain
+Mountain
+Embereth Shieldbreaker
+Mountain x12
+
+[Bot2 Deck]
+Mountain
+Sol Ring
+Mountain x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Embereth Shieldbreaker.Cast(Sol Ring; Ability: Adventure)
+? Stack = Battle Display
+[T3 Bot1.Main2]
+? Exile = Embereth Shieldbreaker
+? Bot2.Graveyard = Sol Ring
+? Bot2.Battlefield = Mountain
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Exile.Embereth Shieldbreaker.Cast
+
+[Expect]
+Turn = 5
+Exile.Count = 0
+Bot1.Battlefield = Mountain; Mountain; Mountain; Embereth Shieldbreaker
+Bot1.Battlefield.Embereth Shieldbreaker.Power = 2
+Bot1.Battlefield.Embereth Shieldbreaker.Toughness = 1
+Bot1.Graveyard.Count = 0

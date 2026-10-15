@@ -1,0 +1,33 @@
+# Remand's "if that spell is countered this way" is conditional, "draw a card" is not: Abrupt Decay can't be countered (CR 101.2), so
+# it resolves and destroys Bot1's Mox Sapphire, is not returned to hand (it goes to Bot2's graveyard), and Bot1 still draws.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Remand
+Island x12
+
+[Bot2 Deck]
+Swamp
+Mox Emerald
+Abrupt Decay
+Swamp x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Abrupt Decay.Cast(Bot1.Battlefield.Mox Sapphire)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Remand.Cast(Abrupt Decay)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot2.Graveyard = Abrupt Decay
+Bot1.Graveyard = Mox Sapphire; Remand
+Bot1.Hand.Count = 5

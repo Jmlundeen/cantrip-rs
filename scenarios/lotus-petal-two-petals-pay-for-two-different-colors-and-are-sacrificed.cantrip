@@ -1,0 +1,31 @@
+# "{T}, Sacrifice Lotus Petal: Add one mana of any color" (CR 605.1a, 106.1b): each Petal gives one mana of the color its
+# controller names, so a blue one and a black one pay {U}{B} for Baleful Strix on turn 1, and both are sacrificed as the
+# cost of their mana abilities, leaving them in the graveyard. Baleful Strix draws a card on entering.
+
+[Bot1 Deck]
+Lotus Petal
+Lotus Petal
+Baleful Strix
+Island x4
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Pass
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Pass
+Bot1.Battlefield.Lotus Petal.Activate(Color: Blue)
+? Bot1.Mana = {U}
+Bot1.Battlefield.Lotus Petal.Activate(Color: Black)
+? Bot1.Mana = {U}{B}
+Bot1.Hand.Baleful Strix.Cast
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Lotus Petal; Lotus Petal
+Bot1.Battlefield = Baleful Strix
+Bot1.Hand.Count = 5

@@ -1,0 +1,98 @@
+# The Avatar stage's protection from each of the controller's opponents: Bot2's Lightning Bolt cannot target it (the refused
+# Cast, with a Bolt to Bot1's face as the control), and Bot2's Ornithopter cannot block it on turn 7 though it blocks Bot1's
+# Ornithopter, so seven damage goes through. The Scout ability on turn 7 afterwards makes it a 2/3 Kithkin Scout (the later
+# effect replaces the Avatar's subtypes and base power and toughness) but the protection, granted by the Avatar ability,
+# stays: on turn 8 the second Bolt cannot target it either.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Figure of Fable
+Ornithopter
+Plains
+Plains
+Plains
+Plains x12
+
+[Bot2 Deck]
+Mountain
+Ornithopter
+Lightning Bolt
+Lightning Bolt
+Mountain
+Mountain
+Mountain
+Mountain x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Figure of Fable.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Figure of Fable.Activate(Ability: Kithkin Scout)
+Bot1.Pass
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Figure of Fable.Activate(Ability: Kithkin Soldier)
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Figure of Fable.Activate(Ability: Kithkin Avatar)
+Bot1.Pass
+[T6 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Battlefield.Mountain#2.Activate
+! Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Figure of Fable)
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+[T7 Bot1.Main1]
+Bot1.Attack(Figure of Fable; Ornithopter > Bot2)
+! Bot2.Block(Ornithopter > Bot1.Battlefield.Figure of Fable)
+Bot2.Block(Ornithopter > Bot1.Battlefield.Ornithopter)
+[T7 Bot1.Main2]
+? Bot2.Life = 13
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Figure of Fable.Activate(Ability: Kithkin Scout)
+Bot1.Pass
+[T8 Bot2.Main1]
+? Bot1.Battlefield.Figure of Fable.Power = 2
+? Bot1.Battlefield.Figure of Fable.Subtypes = Kithkin; Scout
+Bot2.Battlefield.Mountain#3.Activate
+! Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Figure of Fable)
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T8 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 14
+Bot2.Life = 13
+Bot1.Battlefield.Figure of Fable.Power = 2
+Bot1.Battlefield.Figure of Fable.Toughness = 3

@@ -1,0 +1,49 @@
+# Plumb the Forbidden: Bot1 sacrifices two creatures (Ragavan, then Cecil) as the optional additional cost. When Bot1
+# does, the spell is copied for each creature sacrificed this way, so the spell and two copies each draw a card and
+# lose 1 life: Bot1 draws three and goes to 17.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Swamp
+Ragavan, Nimble Pilferer
+Cecil, Dark Knight
+Plumb the Forbidden
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ragavan, Nimble Pilferer.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cecil, Dark Knight.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Plumb the Forbidden.Cast
+Bot1.Modes(2)
+Bot1.Choose(Ragavan, Nimble Pilferer)
+Bot1.Choose(Cecil, Dark Knight)
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+[Bot1.Main1]
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Life = 17
+Bot1.Hand.Count = 3
+Bot1.Graveyard = Plumb the Forbidden; Cecil, Dark Knight; Ragavan, Nimble Pilferer

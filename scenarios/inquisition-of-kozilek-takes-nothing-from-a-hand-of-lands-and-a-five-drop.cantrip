@@ -1,0 +1,23 @@
+# Inquisition of Kozilek: "a nonland card from it with mana value 3 or less". Bot2's hand holds only Islands and a Sunfall
+# (mana value 5), so nothing in it is eligible: the question is asked of Bot1 with no card to take (looking at the hand is
+# part of the spell) and the unscripted answer takes nothing; the Sunfall stays in Bot2's hand and the graveyard is empty.
+
+[Bot1 Deck]
+Swamp
+Inquisition of Kozilek
+Swamp x10
+
+[Bot2 Deck]
+Sunfall
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Inquisition of Kozilek.Cast(Bot2)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Inquisition of Kozilek
+Bot2.Graveyard.Count = 0
+Bot2.Hand.Count = 7

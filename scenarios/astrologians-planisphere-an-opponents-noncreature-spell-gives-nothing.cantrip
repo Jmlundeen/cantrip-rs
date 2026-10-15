@@ -1,0 +1,33 @@
+# "Whenever you cast": the Hero's controller is Bot1, so Bot2's Aether Spellbomb on turn 4 puts no counter on it.
+
+[Bot1 Deck]
+Island
+Island
+Astrologian's Planisphere
+Island x12
+
+[Bot2 Deck]
+Island
+Island
+Aether Spellbomb
+Island x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Astrologian's Planisphere.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Aether Spellbomb.Cast
+[T4 Bot2.Main2]
+
+[Expect]
+Turn = 4
+Bot2.Battlefield = Island; Island; Aether Spellbomb
+Bot1.Battlefield.Hero.Power = 1
+Stack.Count = 0

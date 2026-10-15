@@ -1,0 +1,33 @@
+# Sunfall exiles every creature, whoever controls it, and incubates X for the number exiled: two Ornithopters make an
+# Incubator token that enters with two +1/+1 counters. Bot1 pays {3}{W}{W} with Black Lotus, Mox Pearl and Mox Jet.
+
+[Bot1 Deck]
+Ornithopter
+Ornithopter
+Black Lotus
+Mox Pearl
+Mox Jet
+Sunfall
+Island x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Sunfall.Cast
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Graveyard = Sunfall; Black Lotus
+Bot1.Battlefield = Mox Pearl; Mox Jet; Incubator Token
+Bot1.Battlefield.Incubator Token.Counters.PlusOnePlusOne = 2
+Exile.Count = 2

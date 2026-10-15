@@ -1,0 +1,17 @@
+# Sacred Foundry: as it enters you may pay 2 life; paying keeps it untapped (and it taps for {W}).
+
+[Bot1 Deck]
+Sacred Foundry
+Plains x19
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Sacred Foundry.Play
+Bot1.Accept
+Bot1.Battlefield.Sacred Foundry.Activate(Ability: {W})
+
+[Expect]
+Bot1.Life = 18
+Bot1.Mana = {W}

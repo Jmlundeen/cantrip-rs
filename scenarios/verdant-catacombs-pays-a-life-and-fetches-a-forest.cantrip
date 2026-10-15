@@ -1,0 +1,23 @@
+# Verdant Catacombs: {T}, pay 1 life, sacrifice it: search for a Swamp or Forest and put it onto the battlefield
+# untapped. A Plains in the library is not offered.
+
+[Bot1 Deck]
+Verdant Catacombs
+Plains x10
+Forest
+Plains x8
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Verdant Catacombs.Play
+Bot1.Battlefield.Verdant Catacombs.Activate
+! Bot1.Search(Plains)
+Bot1.Search(Forest)
+
+[Expect]
+Bot1.Life = 19
+Bot1.Graveyard = Verdant Catacombs
+Bot1.Battlefield = Forest
+Bot1.Battlefield.Forest.Tapped = false

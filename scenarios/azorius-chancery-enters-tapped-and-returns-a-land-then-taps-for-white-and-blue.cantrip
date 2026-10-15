@@ -1,0 +1,25 @@
+# Azorius Chancery enters tapped and, when it enters, returns a land its controller chooses (not a target) to hand. Bot1
+# returns the Plains; the Chancery stays, and on the next turn taps for {W}{U}.
+
+[Bot1 Deck]
+Plains
+Azorius Chancery
+Plains x13
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Azorius Chancery.Play
+Bot1.Choose(Plains)
+? Bot1.Battlefield = Azorius Chancery
+[T5 Bot1.Main1]
+Bot1.Battlefield.Azorius Chancery.Activate
+? Bot1.Mana = {W}{U}
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Azorius Chancery
+Bot1.Battlefield.Azorius Chancery.Tapped = true

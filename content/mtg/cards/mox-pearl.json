@@ -1,0 +1,6 @@
+{
+  "name": "Mox Pearl",
+  "manaCost": "{0}",
+  "type": "Artifact",
+  "oracleText": "{T}: Add {W}."
+}

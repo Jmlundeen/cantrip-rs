@@ -1,0 +1,36 @@
+# Brain Freeze: "Target player mills three cards", the top three cards of that library into its graveyard one after
+# another (CR 701.17a). Cast on turn 3 with no spell cast before it this turn (the lands are not spells), storm copies
+# it zero times (CR 702.40a): one mill, Bot2's library 13 - 3 = 10 and Bot1's own untouched.
+
+[Bot1 Deck]
+Island
+Island
+Island
+Brain Freeze
+Island x3
+Island x10
+
+[Bot2 Deck]
+Island x8
+Mountain
+Swamp
+Forest
+Plains x9
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Brain Freeze.Cast(Bot2)
+? Stack.Count = 2
+Bot1.Pass
+[T3 Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot2.Graveyard = Forest; Swamp; Mountain; Island
+Bot2.Library.Count = 9
+Bot1.Library.Count = 9
+Bot1.Graveyard = Brain Freeze

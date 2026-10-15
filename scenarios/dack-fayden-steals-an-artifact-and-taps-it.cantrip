@@ -1,0 +1,42 @@
+# Dack Fayden's "−2: Gain control of target artifact" (CR 108.4), played for real: Bot2's Sol Ring changes hands and
+# answers to Bot1 at once — control of it being new stops a creature attacking or paying {T} (CR 302.6), and Sol Ring
+# is not a creature.
+
+[Bot1 Deck]
+Volcanic Island
+Volcanic Island
+Volcanic Island
+Dack Fayden
+Island x16
+
+[Bot2 Deck]
+Island
+Sol Ring
+Island x18
+
+[Actions]
+Bot1.Hand.Volcanic Island.Play
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Volcanic Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Volcanic Island.Play
+Bot1.Battlefield.Volcanic Island#1.Activate(Ability: Add {U})
+Bot1.Battlefield.Volcanic Island#2.Activate(Ability: Add {R})
+Bot1.Battlefield.Volcanic Island#3.Activate(Ability: Add {U})
+Bot1.Hand.Dack Fayden.Cast
+[T5 Bot1.Main2]
+Bot1.Battlefield.Dack Fayden.Activate(Bot2.Battlefield.Sol Ring; Ability: Gain control)
+[T5 Bot1.End]
+Bot1.Battlefield.Sol Ring.Activate
+? Bot1.Mana = {C}{C}
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Volcanic Island; Volcanic Island; Volcanic Island; Dack Fayden; Sol Ring
+Bot1.Battlefield.Dack Fayden.Counters.Loyalty = 1
+Bot1.Battlefield.Sol Ring.Tapped = true
+Bot2.Battlefield = Island
+Stack.Count = 0

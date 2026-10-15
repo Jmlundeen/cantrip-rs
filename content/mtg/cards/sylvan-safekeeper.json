@@ -1,0 +1,8 @@
+{
+  "name": "Sylvan Safekeeper",
+  "manaCost": "{G}",
+  "type": "Creature — Human Wizard",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "Sacrifice a land: Target creature you control gains shroud until end of turn. (It can't be the target of spells or abilities.)"
+}

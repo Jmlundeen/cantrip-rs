@@ -1,0 +1,40 @@
+# Necromancy cast in Bot1's main phase returns the Ornithopter Damn put into Bot2's graveyard, under Bot1's control, and becomes an Aura (CR 613.1d) enchanting it ("enchant creature put onto the battlefield with Necromancy"); cast at sorcery speed it stays.
+
+[Bot1 Deck]
+Sol Ring
+Damn
+Necromancy
+Swamp
+Swamp
+Swamp
+Swamp x14
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Swamp.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Damn.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Necromancy.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Sol Ring.Activate
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot2.Graveyard.Count = 0
+Bot1.Battlefield = Swamp; Swamp; Swamp; Sol Ring; Necromancy; Ornithopter
+Bot1.Battlefield.Necromancy.Subtypes = Aura
+Bot1.Battlefield.Necromancy.AttachedTo = Ornithopter

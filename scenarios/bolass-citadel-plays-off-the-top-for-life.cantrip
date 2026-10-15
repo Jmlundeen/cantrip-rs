@@ -1,0 +1,45 @@
+# Bot1 makes six mana on turn one and casts Bolas's Citadel. It then casts Lightning Bolt off the top of its library for
+# 1 life rather than {R}, and Mox Sapphire, now on top, for no life at all. Island is on top next, but the turn's land
+# has been played. On turn three Bot1 draws that Island and plays Tundra, the new top card, from its library.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Mox Jet
+Sol Ring
+Bolas's Citadel
+Swamp
+Swamp
+Lightning Bolt
+Mox Sapphire
+Island
+Tundra
+Swamp x5
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Bolas's Citadel.Cast
+Bot1.Library.Lightning Bolt.Cast(Bot2)
+Bot1.Library.Mox Sapphire.Cast
+? Bot1.Library.Count = 7
+[T3 Bot1.Main1]
+Bot1.Library.Tundra.Play
+
+[Expect]
+Turn = 3
+Bot1.Life = 19
+Bot2.Life = 17
+Bot1.Graveyard = Lightning Bolt; Black Lotus
+Bot1.Battlefield = Swamp; Mox Jet; Sol Ring; Bolas's Citadel; Mox Sapphire; Tundra
+Bot1.Hand = Island; Swamp; Swamp
+Bot1.Library.Count = 5

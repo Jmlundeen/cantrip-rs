@@ -1,0 +1,16 @@
+# Breeding Pool: declining to pay 2 life as it enters means it enters tapped, and no life is lost.
+
+[Bot1 Deck]
+Breeding Pool
+Plains x19
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Breeding Pool.Play
+Bot1.Decline
+
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield.Breeding Pool.Tapped = true

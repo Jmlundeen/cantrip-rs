@@ -1,0 +1,26 @@
+# "As this land enters, you may pay 2 life. If you don't, it enters tapped" (CR 614.1c): Bot1 declines, so the Tomb
+# enters tapped with its life untouched, and cannot be tapped for mana that turn. It is a Swamp Forest (CR 205.3i) with
+# both basic land mana abilities: next turn it adds {B}, the other color it can make, the control for the {G} the
+# paying scenario takes.
+
+[Bot1 Deck]
+Overgrown Tomb
+Plains x19
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Overgrown Tomb.Play
+Bot1.Decline
+? Bot1.Life = 20
+? Bot1.Battlefield.Overgrown Tomb.Tapped = true
+? Bot1.Battlefield.Overgrown Tomb.Subtypes = Forest; Swamp
+! Bot1.Battlefield.Overgrown Tomb.Activate(Ability: {B})
+[T3 Bot1.Main1]
+Bot1.Battlefield.Overgrown Tomb.Activate(Ability: {B})
+? Bot1.Mana = {B}
+
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield.Overgrown Tomb.Tapped = true

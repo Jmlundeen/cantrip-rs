@@ -1,0 +1,51 @@
+# Hullbreacher replaces all three of Brainstorm's draws (CR 614.1), and Bot2's hand holds nothing else: all its other cards
+# were cast first. Brainstorm still resolves, but there is no card in hand to put on top of the library (CR 608.2c:
+# as much as possible is done), so it asks nothing, the hand stays empty and the library does not grow.
+
+[Bot1 Deck]
+Island
+Sol Ring
+Black Lotus
+Hullbreacher
+Island x20
+
+[Bot2 Deck]
+Island
+Brainstorm
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Emerald
+Black Lotus
+Island x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Hullbreacher.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Black Lotus.Cast
+? Bot2.Hand = Brainstorm
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Brainstorm.Cast
+[T2 Bot2.Main2]
+
+[Expect]
+Bot2.Hand.Count = 0
+Bot2.Library.Count = 12
+Bot2.Graveyard = Brainstorm
+Bot1.Battlefield = Hullbreacher; Island; Sol Ring; Treasure Token; Treasure Token; Treasure Token
+Bot2.Life = 20

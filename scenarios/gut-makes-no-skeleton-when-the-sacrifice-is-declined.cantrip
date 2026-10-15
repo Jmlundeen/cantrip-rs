@@ -1,0 +1,40 @@
+# Gut, True Soul Zealot: the control for the sacrifice that pays. On turn 7 Gut attacks beside a Mind Stone and the
+# optional sacrifice is declined (the empty answer to an up-to-one choice): no Skeleton, the Mind Stone stays, and Gut
+# alone deals 2.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Mountain
+Mind Stone
+Gut, True Soul Zealot
+Mountain x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Mind Stone.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Gut, True Soul Zealot.Cast
+[T7 Bot1.Main1]
+Bot1.Attack(Gut, True Soul Zealot > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose()
+? Combat.Attackers = Gut, True Soul Zealot > Bot2
+[T7 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield = Mountain; Mountain; Mountain; Mind Stone; Gut, True Soul Zealot
+Bot1.Graveyard.Count = 0

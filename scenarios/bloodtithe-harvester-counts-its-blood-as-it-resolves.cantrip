@@ -1,0 +1,55 @@
+# Bloodtithe Harvester counts its Blood as the ability resolves, not as it is activated. Bot1 has two Blood tokens
+# when it sacrifices the first Harvester at Adeline, then cracks one in response: X is twice the one left, and Adeline
+# survives the -2/-2 with toughness 2.
+
+[Bot1 Deck]
+Swamp
+Mountain
+Bloodtithe Harvester
+Bloodtithe Harvester
+Swamp
+Lightning Bolt
+Swamp
+Swamp
+Swamp
+Mox Jet
+Swamp x5
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Adeline, Resplendent Cathar
+Plains
+Plains x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Bloodtithe Harvester.Cast
+[T3 Bot1.Main2]
+? Bot1.Battlefield = Swamp; Mountain; Bloodtithe Harvester; Blood Token
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Adeline, Resplendent Cathar.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Bloodtithe Harvester.Cast
+Bot1.Battlefield.Bloodtithe Harvester.Activate(Adeline, Resplendent Cathar)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Blood Token.Activate
+Bot1.Choose(Lightning Bolt)
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Graveyard = Lightning Bolt; Bloodtithe Harvester
+Bot2.Battlefield.Adeline, Resplendent Cathar.Toughness = 2
+Bot2.Graveyard.Count = 0

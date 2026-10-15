@@ -1,0 +1,52 @@
+# Six: "During your turn, nonland permanent cards in your graveyard have retrace." Six attacks on turn 3 and mills Faerie
+# Mastermind (a flash creature), Lightning Bolt and a Forest; Bot1 takes the Forest into hand to discard later. On Bot2's
+# turn 4 Mastermind cannot be retraced although it has flash and the mana is there (refused); on turn 5 it can (the
+# positive control), discarding the Forest. Lightning Bolt, an instant, is never offered, even on Bot1's own turn.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Six
+Forest
+Mox Sapphire
+Mox Ruby
+Forest
+Forest
+Faerie Mastermind
+Lightning Bolt
+Forest
+Forest x10
+
+[Bot2 Deck]
+Island x22
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Six.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Six)
+Bot1.Choose(Forest)
+[T4 Bot2.Main1]
+! Bot1.Graveyard.Faerie Mastermind.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Forest.Activate
+! Bot1.Graveyard.Lightning Bolt.Cast
+Bot1.Graveyard.Faerie Mastermind.Cast
+Bot1.Choose(Forest)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Faerie Mastermind.Types = Creature
+Bot1.Graveyard.Count = 3

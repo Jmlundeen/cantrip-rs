@@ -1,0 +1,58 @@
+# Pyrogoyf: whenever it or another Lhurgoyf creature you control enters, that creature deals damage equal to its power to
+# any target. Cast into empty graveyards on turn one it is a 0/1 and deals nothing. On turn three, with a Lightning Bolt
+# and the Island Bot2 discarded to hand size in graveyards (two types), a Barrowgoyf (power 2, lifelink) enters and it is the Barrowgoyf that deals the damage, so Bot1
+# gains the life.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Pyrogoyf
+Lightning Bolt
+Swamp
+Barrowgoyf
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Pyrogoyf.Cast
+Bot1.Pass
+Bot1.Target(Bot2)
+[Bot1.Main2]
+? Bot2.Life = 20
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Barrowgoyf.Cast
+Bot1.Pass
+Bot1.Target(Bot2)
+[Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot2.Life = 15
+Bot1.Life = 22
+Bot1.Graveyard = Lightning Bolt
+Bot1.Battlefield.Pyrogoyf.Power = 2

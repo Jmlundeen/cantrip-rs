@@ -1,0 +1,34 @@
+# Echoing Return targets a creature card in its caster's graveyard and returns it with every other card of the same
+# name there. Faithless Looting discards both Ornithopters, then Echoing Return brings both back to the hand.
+
+[Bot1 Deck]
+Badlands
+Mox Ruby
+Mox Jet
+Faithless Looting
+Ornithopter
+Ornithopter
+Echoing Return
+Swamp
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Badlands.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Badlands.Activate(Ability: {B})
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Ornithopter; Ornithopter)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Echoing Return.Cast(Bot1.Graveyard.Ornithopter)
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Graveyard = Echoing Return; Faithless Looting
+Bot1.Hand = Ornithopter; Ornithopter; Swamp; Swamp

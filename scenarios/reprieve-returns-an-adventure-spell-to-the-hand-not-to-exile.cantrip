@@ -1,0 +1,37 @@
+# The spell goes to its owner's hand (CR 400.3 / 608.2), not on its Adventure: Bot2's Petty Theft (Brazen Borrower's
+# Adventure) is returned and the Borrower is back in Bot2's hand, nothing in exile, Bot1's Mox Pearl still in play, and
+# Bot1 draws the card.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Reprieve
+Plains x12
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Brazen Borrower
+Island x13
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Brazen Borrower.Cast(Bot1.Battlefield.Mox Pearl; Ability: Adventure)
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Reprieve.Cast(Petty Theft)
+[T2 Bot2.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot1.Battlefield = Plains; Mox Pearl; Mox Jet
+Bot1.Hand.Count = 4
+Bot2.Hand.Count = 6

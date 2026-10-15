@@ -1,0 +1,32 @@
+# "{1}{B}{B}, {T}: Draw a card, then you lose life equal to the number of cards in your hand." The count is taken after the draw (CR 608.2c,
+# in order). On turn 3 Bot1 has four Islands in hand after playing Castle Locthwain, pays with Mox Jet, the Swamp and Mox Ruby, draws a fifth
+# card and loses 5 life (20 -> 15). Castle Locthwain's own tap is part of the cost.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Castle Locthwain
+Island x3
+Island x14
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Castle Locthwain.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Castle Locthwain.Activate(Ability: Draw a card)
+? Bot1.Mana = 
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 5
+Bot1.Life = 15
+Bot1.Battlefield.Castle Locthwain.Tapped = true

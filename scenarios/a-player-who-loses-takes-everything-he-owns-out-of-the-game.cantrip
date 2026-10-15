@@ -1,0 +1,57 @@
+# CR 800.4a: when a player leaves a game that goes on, every object they own leaves with them. In a game of three, Bot2
+# pays all 20 life with Channel and loses with a Forest, a Mox Emerald and an Ornithopter on the battlefield: none of
+# them is left, nor Bot2's hand or graveyard, and the game goes on between Bot1 and Bot3.
+
+[Bot1 Deck]
+Island x20
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Channel
+Ornithopter
+Island x3
+Island x12
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Channel.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+
+[Expect]
+Result = InProgress
+Bot2.Status = Lost
+Bot2.Life = 0
+Bot2.Battlefield.Count = 0
+Bot2.Hand.Count = 0
+Bot2.Graveyard.Count = 0
+Bot2.Library.Count = 0

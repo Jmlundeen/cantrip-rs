@@ -1,0 +1,43 @@
+# Military Intelligence: "Whenever you attack with two or more creatures, draw a card." Bot1 attacks on turn 3 with
+# Llanowar Elves alone, which draws nothing, and on turn 5 with the Elves and Birds of Paradise together, which draws
+# one card.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Island
+Military Intelligence
+Birds of Paradise
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+
+[Bot2 Deck]
+Swamp x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Military Intelligence.Cast
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Hand.Birds of Paradise.Cast
+[T5 Bot1.Main1]
+? Bot1.Hand.Count = 4
+Bot1.Attack(Llanowar Elves; Birds of Paradise > Bot2)
+
+[Expect]
+Turn = 5
+Bot1.Hand.Count = 5

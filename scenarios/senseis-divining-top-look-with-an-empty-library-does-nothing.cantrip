@@ -1,0 +1,26 @@
+# "Look at the top three cards of your library, then put them back": with an empty library there is nothing to look at and nothing is asked. Bot1's deck is exactly its opening hand, so the
+# library is empty on turn 1 when the {1} ability resolves; the game goes on (nobody has drawn from it).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Sensei's Divining Top
+Plains x4
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sensei's Divining Top.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Sensei's Divining Top.Activate(Ability: Look)
+[Bot1.Main2]
+
+[Expect]
+Result = InProgress
+Stack.Count = 0
+Bot1.Library.Count = 0
+Bot1.Hand.Count = 4

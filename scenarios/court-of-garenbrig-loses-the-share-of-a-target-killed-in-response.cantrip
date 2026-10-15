@@ -1,0 +1,36 @@
+# The upkeep trigger divides one counter to Bot1's Ornithopter and one to Bot2's Llanowar Elves. Bot2 kills its own Elves in
+# response with Lightning Bolt (Mox Ruby, still untapped), so the Elves' share is lost (CR 608.2b) while the Ornithopter still
+# gets its counter. Bot1 is the monarch, so the Ornithopter's one counter is then doubled to two.
+
+[Bot1 Deck]
+Black Lotus
+Court of Garenbrig
+Ornithopter
+Forest x17
+
+[Bot2 Deck]
+Forest
+Mox Ruby
+Llanowar Elves
+Lightning Bolt
+Forest x16
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Court of Garenbrig.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Upkeep]
+Bot1.Divide(Ornithopter: 1; Llanowar Elves: 1)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Llanowar Elves)
+[T3 Bot1.Main1]
+
+[Expect]
+Bot2.Graveyard = Llanowar Elves; Lightning Bolt
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 2

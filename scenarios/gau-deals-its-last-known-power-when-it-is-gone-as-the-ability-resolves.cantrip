@@ -1,0 +1,43 @@
+# The ruling: "If Gau is no longer on the battlefield when its last ability resolves, use its power as it last existed
+# on the battlefield" (CR 608.2h). Gau attacked on turn 3 (a 3/3 with its Rage counter) and Faithless Looting was
+# flashed back; with the end-step ability on the stack Bot1 bolts its own Gau, and the ability still deals 3.
+
+[Bot1 Deck]
+Mountain
+Sol Ring
+Black Lotus
+Gau, Feral Youth
+Faithless Looting
+Lightning Bolt
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Gau, Feral Youth.Cast
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Mountain; Mountain)
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Attack(Gau, Feral Youth)
+[T3 Bot1.Main2]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Graveyard.Faithless Looting.Cast(Ability: Flashback)
+Bot1.Choose(Mountain; Mountain)
+[T3 Bot1.End]
+? Stack.Count = 1
+Bot1.Hand.Lightning Bolt.Cast(Gau, Feral Youth)
+Bot1.Battlefield.Mountain.Activate
+[T4 Bot2.Upkeep]
+
+[Expect]
+Bot1.Battlefield.Count = 3
+Bot2.Life = 14

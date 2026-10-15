@@ -1,0 +1,49 @@
+# Creeping Tar Pit is played on turn 1 (it enters tapped) with three Moxen, and on turn 3 Bot1 animates it with them: it is
+# a 3/2 blue and black Elemental creature that is still a land, and it can't be blocked, so Bot2's Llanowar Elves may
+# not block it and it deals 3 (another attacker is there so that Bot2 is asked to block at all). The effect ends in the cleanup step, leaving a plain Land.
+
+[Bot1 Deck]
+Creeping Tar Pit
+Mox Jet
+Mox Sapphire
+Mox Pearl
+Mox Emerald
+Llanowar Elves
+Island
+Island x15
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest
+Forest x17
+
+[Actions]
+Bot1.Hand.Creeping Tar Pit.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Creeping Tar Pit.Activate(Ability: Until end of turn)
+Bot1.Attack(Creeping Tar Pit > Bot2; Llanowar Elves > Bot2)
+! Bot2.Block(Llanowar Elves > Creeping Tar Pit)
+? Bot1.Battlefield.Creeping Tar Pit.Types = Land; Creature
+? Bot1.Battlefield.Creeping Tar Pit.Power = 3
+[T3 Bot1.Main2]
+? Bot2.Life = 16
+[T4 Bot2.Main1]
+
+[Expect]
+Turn = 4
+Bot2.Life = 16
+Bot1.Battlefield.Creeping Tar Pit.Types = Land

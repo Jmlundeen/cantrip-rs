@@ -1,0 +1,32 @@
+# "You may put a land card from among them into your hand": one, however many are revealed. With a Swamp and a
+# Forest among the four, Bot1 keeps the Forest and the Swamp goes to the graveyard with the rest.
+
+[Bot1 Deck]
+Forest
+Forest
+Satyr Wayfinder
+Island x5
+Swamp
+Lightning Bolt
+Ponder
+Forest
+Island x8
+
+[Bot2 Deck]
+Swamp x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Satyr Wayfinder.Cast
+Bot1.Arrange(Forest | Swamp; Lightning Bolt; Ponder)
+
+[Expect]
+Turn = 3
+Bot1.Hand = Island; Island; Island; Island; Island; Forest
+Bot1.Graveyard = Ponder; Lightning Bolt; Swamp
+Bot1.Battlefield = Satyr Wayfinder; Forest; Forest
+Bot1.Library.Count = 8

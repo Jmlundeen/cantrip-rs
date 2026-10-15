@@ -1,0 +1,53 @@
+# Leatherhead, Swamp Stalker: "...you may remove a counter from her. When you do, destroy target artifact or enchantment that
+# player controls." Turn 3 she connects with Bot2, who controls a Forest, a Llanowar Elves, a Mox Pearl and a Sol Ring; Bot1
+# controls a Mox Ruby. The Forest, the Elves and Bot1's own Mox are not candidates (the refusals); the Sol Ring is, and is
+# destroyed. Turn 5 she connects again with no counter left: nothing is asked (! Bot1.Accept) and the Mox Pearl survives.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Mox Jet
+Leatherhead, Swamp Stalker
+Forest x15
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Mox Pearl
+Sol Ring
+Forest x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Leatherhead, Swamp Stalker.Cast
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Leatherhead, Swamp Stalker > Bot2)
+Bot1.Accept
+! Bot1.Target(Bot2.Battlefield.Forest; Llanowar Elves; Bot1.Battlefield.Mox Ruby)
+Bot1.Target(Sol Ring)
+[T5 Bot1.Main1]
+Bot1.Attack(Leatherhead, Swamp Stalker > Bot2)
+! Bot1.Accept
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Sol Ring
+Bot2.Battlefield = Forest; Llanowar Elves; Mox Pearl
+Bot2.Life = 10

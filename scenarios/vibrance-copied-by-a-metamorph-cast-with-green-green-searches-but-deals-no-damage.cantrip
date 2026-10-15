@@ -1,0 +1,54 @@
+# Vibrance cast for Black Lotus's {R}{R}{R}, a Forest and Mox Emerald: both {R}{R} and {G}{G} were spent, so both
+# abilities trigger — 3 damage to Bot2, a land and 2 life. On turn 5 Bot1 casts Phyrexian Metamorph for a Forest, Mox
+# Emerald and two Islands and has it enter as a copy of Vibrance. The copy has both abilities, and "it" is the
+# Metamorph, which was cast with {G}{G} and not {R}{R} (copiable values carry no payment, CR 707.2): it searches and
+# gains 2 life, and deals no damage.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Black Lotus
+Vibrance
+Phyrexian Metamorph
+Island
+Island
+Plains x6
+Island x6
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Vibrance.Cast
+Bot1.Triggers(damage; search)
+Bot1.Target(Bot2)
+Bot1.Search(Plains)
+[T1 Bot1.Main2]
+? Bot2.Life = 17
+? Bot1.Life = 22
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Phyrexian Metamorph.Cast
+Bot1.Accept
+Bot1.Target(Vibrance)
+Bot1.Search(Plains)
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Life = 24
+Bot2.Life = 17
+Bot1.Battlefield = Forest; Mox Emerald; Island; Island; Vibrance; Vibrance
+Bot1.Hand.Count = 4

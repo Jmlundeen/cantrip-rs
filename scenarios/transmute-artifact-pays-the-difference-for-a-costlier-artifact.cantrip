@@ -1,0 +1,36 @@
+# Transmute Artifact, the difference paid: a Mox Sapphire (mana value 0) is sacrificed, Sol Ring (mana value 1) is
+# found, and Bot1 pays the {1} between them, so the Sol Ring is put onto the battlefield.
+#
+# Turn 1: a Black Lotus makes {U}{U}{U}; two pay for Transmute Artifact and the third is still floating when the
+# payment is asked for as the spell resolves.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Transmute Artifact
+Island x3
+Island x3
+Sol Ring
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Transmute Artifact.Cast
+Bot1.Choose(Mox Sapphire)
+Bot1.Search(Sol Ring)
+Bot1.PayCost
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Mana =
+Bot1.Battlefield = Island; Sol Ring
+Bot1.Graveyard = Transmute Artifact; Mox Sapphire; Black Lotus
+Bot1.Library.Count = 13

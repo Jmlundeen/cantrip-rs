@@ -1,0 +1,39 @@
+# Endurance has flash and its enters trigger takes "up to one target player", here the opponent: Bot2 casts Lightning Bolt
+# on its own turn 2, and with the Bolt in its graveyard Bot1 flashes Endurance in (three Moxen) during Bot2's second main
+# phase and chooses Bot2. Bot2's graveyard goes to the bottom of its library: the graveyard is empty and the library one
+# card bigger. Bot1's own graveyard is untouched.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Emerald
+Mox Ruby
+Endurance
+Forest x14
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T2 Bot2.Main2]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Endurance.Cast
+Bot1.Pass
+Bot1.Target(Bot2)
+Bot1.Pass
+
+[Expect]
+Bot2.Graveyard.Count = 0
+Bot2.Library.Count = 13
+Bot1.Battlefield.Endurance.Power = 3
+Bot1.Life = 17

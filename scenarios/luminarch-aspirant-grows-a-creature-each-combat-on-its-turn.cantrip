@@ -1,0 +1,37 @@
+# Luminarch Aspirant cast on turn 1 triggers as that combat begins and puts a +1/+1 counter on itself: its only legal
+# target, so Bot1 is not asked. It does not trigger on Bot2's turn. On turn 3 it triggers again, and Bot1 targets the Mother of Runes cast that turn instead, so each
+# creature ends with one counter. The trailing wait lets the second trigger resolve before the state is checked.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Luminarch Aspirant
+Mother of Runes
+Plains
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Luminarch Aspirant.Cast
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Mother of Runes.Cast
+Bot1.Target(Mother of Runes)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Plains; Plains; Mox Pearl; Luminarch Aspirant; Mother of Runes
+Bot1.Battlefield.Luminarch Aspirant.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Luminarch Aspirant.Power = 2
+Bot1.Battlefield.Mother of Runes.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Mother of Runes.Power = 2
+Bot1.Battlefield.Mother of Runes.Toughness = 2

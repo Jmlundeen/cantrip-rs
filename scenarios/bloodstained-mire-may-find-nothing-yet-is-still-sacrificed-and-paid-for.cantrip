@@ -1,0 +1,22 @@
+# Searching for a quality may always find nothing (CR 701.23b), but the cost is already paid (CR 602.2b): the Mire is
+# sacrificed and the life lost even when the player takes no card, though a Mountain was in the library to be found.
+
+[Bot1 Deck]
+Bloodstained Mire
+Plains x6
+Mountain
+Plains x9
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Bloodstained Mire.Play
+Bot1.Battlefield.Bloodstained Mire.Activate
+Bot1.Search()
+
+[Expect]
+Bot1.Life = 19
+Bot1.Graveyard = Bloodstained Mire
+Bot1.Battlefield.Count = 0
+Bot1.Library.Count = 10

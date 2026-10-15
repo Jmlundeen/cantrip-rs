@@ -1,0 +1,45 @@
+# "Destroy each artifact with mana value X or less" (CR 202.3): Bot2's Cogwork Librarian is an artifact creature of mana value 4, so
+# Meltdown with X = 3 survives it - one below its mana value it is spared, at X = 4 it goes (the equal case; the other scenario is the
+# other side of the boundary). Bot2's four Moxen (mana value 0) go in both, and only artifacts: Bot1's Mountain stays.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mox Ruby
+Mox Emerald
+Meltdown
+Mountain x12
+
+[Bot2 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Cogwork Librarian
+Island x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Cogwork Librarian.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Meltdown.Cast(X: 3)
+Bot1.Battlefield.Mox Ruby.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Cogwork Librarian
+Bot1.Battlefield.Mountain.Tapped = false

@@ -1,0 +1,29 @@
+# Chrome Mox costs nothing, so Bot1 plays it on turn one, imprints the Counterspell out of its hand, and taps the Mox
+# for the one color that card is. No land is played at all: the blue mana pays for Ancestral Recall.
+
+[Bot1 Deck]
+Chrome Mox
+Counterspell
+Ancestral Recall
+Island x13
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Chrome Mox.Cast
+Bot1.Choose(Counterspell)
+? Exile = Counterspell
+Bot1.Battlefield.Chrome Mox.Activate(Color: Blue)
+? Bot1.Mana = {U}
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+[Bot1.Main2]
+
+[Expect]
+Turn = 1
+Exile = Counterspell
+Bot1.LandsPlayed = 0
+Bot1.Battlefield = Chrome Mox
+Bot1.Battlefield.Chrome Mox.Tapped = True
+Bot1.Graveyard = Ancestral Recall
+Bot1.Hand.Count = 7

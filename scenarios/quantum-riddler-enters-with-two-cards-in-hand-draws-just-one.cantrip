@@ -1,0 +1,34 @@
+# Quantum Riddler's replacement applies "as long as you have one or fewer cards in hand": entering with two Islands left in hand (Bot1 played a third)
+# its own enters trigger draws a single card (CR 121.2a, 614.1a) - the library goes from 12 to 11.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Jet
+Quantum Riddler
+Island
+Island
+Island
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Quantum Riddler.Cast
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 3
+Bot1.Library.Count = 11

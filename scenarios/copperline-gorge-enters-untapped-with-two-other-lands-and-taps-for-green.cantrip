@@ -1,0 +1,24 @@
+# Copperline Gorge enters untapped when you control two or fewer other lands, and taps for either {R} or {G}: the
+# third land taps for {G} the turn it arrives.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Copperline Gorge
+Island x14
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Copperline Gorge.Play
+Bot1.Battlefield.Copperline Gorge.Activate(Color: Green)
+? Bot1.Mana = {G}
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Copperline Gorge.Tapped = true

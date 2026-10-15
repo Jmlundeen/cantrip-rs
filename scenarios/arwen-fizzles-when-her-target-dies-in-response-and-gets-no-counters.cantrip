@@ -1,0 +1,43 @@
+# Ornithopter is the only target. Bot2's Lightning Bolt kills it in response (it is not indestructible yet), so the
+# ability's only target is illegal and it does not resolve (CR 608.2b): Arwen gets no counters either. The indestructible
+# counter was a cost and is spent.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Emerald
+Arwen, Mortal Queen
+Ornithopter
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Arwen, Mortal Queen.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Arwen, Mortal Queen.Activate(Ornithopter)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Ornithopter
+Bot1.Battlefield.Arwen, Mortal Queen.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Arwen, Mortal Queen.Counters.Lifelink = (absent)
+Bot1.Battlefield.Arwen, Mortal Queen.Counters.Indestructible = (absent)
+Bot1.Battlefield.Arwen, Mortal Queen.Keywords = (absent)

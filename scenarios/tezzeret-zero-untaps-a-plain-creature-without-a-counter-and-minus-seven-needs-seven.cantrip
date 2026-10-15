@@ -1,0 +1,42 @@
+# Tezzeret, Cruel Captain, 0: "Untap target artifact or creature. If it's an artifact creature, put a +1/+1 counter on it."
+# Llanowar Elves, a creature but not an artifact, attacks on turn 3 and is untapped by the 0 in the second main phase with
+# no counter (the artifact creature that gets one is in the existing scenario); the 0 leaves Tezzeret at 4. His -7 is refused
+# at 4 loyalty (a loyalty cost cannot be paid with too few counters, CR 606.4), beside the 0 that is allowed.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Tezzeret, Cruel Captain
+Mox Emerald
+Llanowar Elves
+Island
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tezzeret, Cruel Captain.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Llanowar Elves > Bot2)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Llanowar Elves.Tapped = true
+! Bot1.Battlefield.Tezzeret, Cruel Captain.Activate(Ability: emblem)
+Bot1.Battlefield.Tezzeret, Cruel Captain.Activate(Bot1.Battlefield.Llanowar Elves; Ability: Untap)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Tapped = false
+Bot1.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Tezzeret, Cruel Captain.Counters.Loyalty = 4

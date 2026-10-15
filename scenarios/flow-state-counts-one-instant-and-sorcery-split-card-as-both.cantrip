@@ -1,0 +1,41 @@
+# Leave // Chance, an instant half and a sorcery half, is both an instant card and a sorcery card in the graveyard
+# (CR 709.4), and one card may be both: "there is an instant card and a sorcery card" asks what types are there, as
+# "the artifact and the enchantment may be the same permanent" rules for When We Were Young. With it alone in the
+# graveyard, Flow State puts two of the top three into the hand.
+
+[Bot1 Deck]
+Plains
+Island
+Island
+Leave // Chance
+Swamp
+Flow State
+Swamp
+Swamp
+Swamp
+Counterspell
+Ancestral Recall
+Brainstorm
+Island x3
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Leave // Chance.Cast(Ability: Leave)
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Flow State.Cast
+Bot1.Arrange(Ancestral Recall; Counterspell | Brainstorm)
+
+[Expect]
+Bot1.Graveyard = Flow State; Leave // Chance
+Bot1.Hand = Swamp; Swamp; Swamp; Swamp; Ancestral Recall; Counterspell
+Bot1.Library = Island; Island; Island; Brainstorm

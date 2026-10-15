@@ -1,0 +1,29 @@
+# Only the second creature spell triggers: after declining it, the third gives no further chance.
+[Bot1 Deck]
+Vengevine
+Faithless Looting
+Llanowar Elves
+Ignoble Hierarch
+Mox Ruby
+Black Lotus
+Birds of Paradise
+Forest x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Choose(Vengevine; Forest)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Ignoble Hierarch.Cast
+Bot1.Decline
+Bot1.Hand.Birds of Paradise.Cast
+? Stack = Birds of Paradise
+
+[Expect]
+Bot1.Graveyard = Black Lotus; Faithless Looting; Forest; Vengevine

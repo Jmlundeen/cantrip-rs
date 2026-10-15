@@ -1,0 +1,28 @@
+# Flash lets Bot1 cast the Emperor during Bot2's combat. Her static ability then permits a loyalty activation
+# in that same combat step, while the ordinary once-per-turn loyalty cost still applies.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+The Wandering Emperor
+Island x12
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.BeginCombat]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.The Wandering Emperor.Cast
+Bot1.Battlefield.The Wandering Emperor.Activate(Ability: Create a 2/2)
+
+[Expect]
+Turn = 2
+Step = BeginCombat
+Bot1.Battlefield.The Wandering Emperor.Counters.Loyalty = 2
+Bot1.Battlefield.Samurai.Power = 2
+Bot1.Battlefield.Samurai.Toughness = 2
+Bot1.Battlefield.Samurai.Keywords = Vigilance

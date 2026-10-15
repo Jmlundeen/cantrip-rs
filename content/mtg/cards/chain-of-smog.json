@@ -1,0 +1,6 @@
+{
+  "name": "Chain of Smog",
+  "manaCost": "{1}{B}",
+  "type": "Sorcery",
+  "oracleText": "Target player discards two cards. That player may copy this spell and may choose a new target for that copy."
+}

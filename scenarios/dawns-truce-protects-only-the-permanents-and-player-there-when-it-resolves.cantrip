@@ -1,0 +1,43 @@
+# CR 611.2c: "permanents you control" are those there as Dawn's Truce resolves. On turn 3 Bot1 resolves it (no gift) and then casts Haywire Mite. Bot2's Lightning Bolt cannot target Bot1 or its
+# Ornithopter (refusals: hexproof) but can target the Mite, which entered afterwards (the positive control) and dies.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Ornithopter
+Dawn's Truce
+Haywire Mite
+Plains x14
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Dawn's Truce.Cast
+Bot1.Decline
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Haywire Mite.Cast
+Bot1.Pass
+! Bot2.Hand.Lightning Bolt.Cast(Bot1)
+! Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Haywire Mite)
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot1.Battlefield.Ornithopter.Keywords = Flying; Hexproof
+Bot1.Graveyard = Haywire Mite; Dawn's Truce

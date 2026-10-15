@@ -1,0 +1,72 @@
+# Auriok Salvagers: "{1}{W}: Return target artifact card with mana value 1 or less from your graveyard to your hand."
+# The limits, each refused while the card sits in a graveyard where the other qualities hold:
+#   - mana value 2 (Mind Stone, sacrificed on turn 3) - the boundary is "1 or less";
+#   - not an artifact (Lightning Bolt, cast on turn 5), mana value 1;
+#   - not your graveyard (Bot2's Black Lotus, mana value 0), the same name as the one Bot1 owns.
+# Turn 2: Bot2 casts Duress off its own Black Lotus and takes Sol Ring from Bot1's hand, putting a mana value 1
+# artifact card in Bot1's graveyard. The positive control, on turn 5: that Sol Ring comes back to hand.
+
+[Bot1 Deck]
+Plains
+Plains
+Black Lotus
+Mox Ruby
+Auriok Salvagers
+Sol Ring
+Mind Stone
+Lightning Bolt
+Plains
+Plains x10
+
+[Bot2 Deck]
+Swamp
+Black Lotus
+Duress
+Swamp x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Auriok Salvagers.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Duress.Cast(Bot1)
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Choose(Sol Ring)
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mind Stone.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mind Stone.Activate(Ability: Draw)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Mind Stone; Sol Ring; Black Lotus
+! Bot1.Battlefield.Auriok Salvagers.Activate(Bot1.Graveyard.Mind Stone)
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Lightning Bolt; Mind Stone; Sol Ring; Black Lotus
+! Bot1.Battlefield.Auriok Salvagers.Activate(Bot1.Graveyard.Lightning Bolt)
+! Bot1.Battlefield.Auriok Salvagers.Activate(Bot2.Graveyard.Black Lotus)
+Bot1.Battlefield.Auriok Salvagers.Activate(Bot1.Graveyard.Sol Ring)
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Plains; Sol Ring
+Bot1.Graveyard = Lightning Bolt; Mind Stone; Black Lotus
+Bot2.Graveyard = Duress; Black Lotus

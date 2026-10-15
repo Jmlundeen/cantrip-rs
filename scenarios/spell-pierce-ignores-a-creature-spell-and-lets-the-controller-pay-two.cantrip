@@ -1,0 +1,40 @@
+# "Counter target noncreature spell unless its controller pays {2}": Bot1's Ornithopter, a creature spell, is not a legal target
+# (the refusal) and resolves. Bot1's Lightning Bolt is, but Bot1 pays the {2} with a Mox Jet and a Mox Pearl, so it is not countered
+# and Bot2 takes 3 (the positive control for the counter in the neighbouring scenario).
+
+[Bot1 Deck]
+Mountain
+Mox Jet
+Mox Pearl
+Ornithopter
+Lightning Bolt
+Mountain x13
+
+[Bot2 Deck]
+Island
+Spell Pierce
+Island x13
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+! Bot2.Hand.Spell Pierce.Cast(Stack.Ornithopter)
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Spell Pierce.Cast(Stack.Lightning Bolt)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.PayCost
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot2.Graveyard = Spell Pierce
+Bot1.Graveyard = Lightning Bolt

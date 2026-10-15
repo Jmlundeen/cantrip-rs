@@ -1,0 +1,40 @@
+# Bot1 casts Daze on turn 2 against Duress (returning its Island), then on turn 3 casts Yawgmoth's Will with Black Lotus and a Mox Sapphire,
+# and counters its own Mox Sapphire with Daze from the graveyard for its alternative cost. Bot2 cannot pay {1}; the Mox is exiled and never enters.
+
+[Bot1 Deck]
+Island
+Daze
+Black Lotus
+Yawgmoth's Will
+Mox Sapphire
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Swamp
+Duress
+Swamp x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Duress.Cast(Bot1)
+Bot1.Hand.Daze.Cast(Duress; Ability: Return an Island)
+Bot1.Choose(Island)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Yawgmoth's Will.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Graveyard.Daze.Cast(Mox Sapphire; Ability: Return an Island)
+Bot1.Choose(Island)
+[T3 Bot1.End]
+
+[Expect]
+Bot1.Battlefield.Count = 0
+Stack.Count = 0
+Exile = Daze; Mox Sapphire; Yawgmoth's Will
+Bot1.Graveyard = Black Lotus

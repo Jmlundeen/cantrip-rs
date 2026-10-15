@@ -1,0 +1,25 @@
+# "{4}: Untap Grim Monolith" can be paid with the Monolith's own mana (a mana ability, CR 605.3b), so tapping it for {C}{C}{C},
+# then activating the untap with those three and the Lotus mana left over, nets the Monolith untapped again, ready to tap once more for
+# {C}{C}{C}: the floating mana ends as {C}{C}{C} and the Monolith is tapped.
+
+[Bot1 Deck]
+Black Lotus
+Grim Monolith
+Island x12
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Grim Monolith.Cast
+Bot1.Battlefield.Grim Monolith.Activate(Ability: Add)
+Bot1.Battlefield.Grim Monolith.Activate(Ability: Untap)
+[Bot1.Main2]
+? Bot1.Battlefield.Grim Monolith.Tapped = false
+Bot1.Battlefield.Grim Monolith.Activate(Ability: Add)
+? Bot1.Mana = {C}{C}{C}
+
+[Expect]
+Bot1.Battlefield.Grim Monolith.Tapped = true

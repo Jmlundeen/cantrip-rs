@@ -1,0 +1,50 @@
+# Mode three deals exactly 5 damage to target creature: Bot2's Myr Battlesphere (4/7, cast on turn 2 with Black Lotus and four Moxen) survives with 5 damage marked.
+# Bot1 has no Wizard, so it chooses one mode.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Flame of Anor
+Island x15
+
+[Bot2 Deck]
+Black Lotus
+Mox Pearl
+Mox Emerald
+Mox Jet
+Mox Ruby
+Myr Battlesphere
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Myr Battlesphere.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Flame of Anor.Cast
+Bot1.Modes(3)
+Bot1.Target(Myr Battlesphere)
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Battlefield.Myr Battlesphere.Damage = 5
+Bot1.Graveyard = Flame of Anor

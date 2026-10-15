@@ -1,0 +1,33 @@
+# Sylvan Caryatid has hexproof: Bot1 cannot target it with Lightning Bolt (refusal naming it), while the same Bolt aimed at
+# Bot2's Ornithopter, cast on the same turn, is the positive control and kills it. The Caryatid is unharmed.
+
+[Bot1 Deck]
+Mox Ruby
+Lightning Bolt
+Island x18
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Sylvan Caryatid
+Ornithopter
+Forest x16
+
+[Actions]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Sylvan Caryatid.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Sylvan Caryatid)
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Ornithopter
+Bot2.Battlefield = Forest; Mox Emerald; Sylvan Caryatid
+Bot2.Battlefield.Sylvan Caryatid.Damage = 0

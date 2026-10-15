@@ -1,0 +1,6 @@
+{
+  "name": "Haze of Rage",
+  "manaCost": "{1}{R}",
+  "type": "Sorcery",
+  "oracleText": "Buyback {2} (You may pay an additional {2} as you cast this spell. If you do, put this card into your hand as it resolves.)\nCreatures you control get +1/+0 until end of turn.\nStorm (When you cast this spell, copy it for each spell cast before it this turn.)"
+}

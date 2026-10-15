@@ -1,0 +1,41 @@
+# Otawara's channel ability ({3}{U}, discard it, from the hand) costs {1} less for each legendary creature Bot1 controls.
+# With Ragavan, Nimble Pilferer out it costs {2}{U}: three Moxen pay it, and it returns Mox Ruby to Bot1's hand.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Ragavan, Nimble Pilferer
+Otawara, Soaring City
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ragavan, Nimble Pilferer.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Otawara, Soaring City.Activate(Bot1.Battlefield.Mox Ruby)
+Bot1.Pass
+[Bot1.Main1]
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Hand = Island; Mox Ruby
+Bot1.Graveyard = Otawara, Soaring City
+Bot1.Mana =

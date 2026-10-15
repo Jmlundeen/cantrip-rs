@@ -1,0 +1,42 @@
+# "Destroy target artifact or enchantment" (CR 115.1): in Bot2's end step, an instant-speed cast on its turn (CR 304.1),
+# Disenchant is refused a creature (Elvish Mystic) and a land (Forest) as targets, and the Fastbond enchantment is the
+# legal control that is destroyed.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Disenchant
+Plains x4
+Plains x10
+
+[Bot2 Deck]
+Forest
+Elvish Mystic
+Fastbond
+Forest x4
+Forest x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Fastbond.Cast
+[T4 Bot2.End]
+! Bot1.Hand.Disenchant.Cast(Bot2.Battlefield.Elvish Mystic)
+! Bot1.Hand.Disenchant.Cast(Bot2.Battlefield.Forest)
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Disenchant.Cast(Fastbond)
+
+[Expect]
+Step = End
+Bot2.Graveyard = Fastbond
+Bot2.Battlefield = Forest; Forest; Elvish Mystic
+Bot1.Graveyard = Disenchant

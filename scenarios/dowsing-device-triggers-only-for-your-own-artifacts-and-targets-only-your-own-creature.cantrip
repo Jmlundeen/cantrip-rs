@@ -1,0 +1,50 @@
+# "Whenever this artifact or another artifact you control enters": Bot2's Mox Emerald entering does not trigger it and neither does Bot1's own Mountain (a land, not an artifact) - the stack is empty each time.
+# Bot1's Haywire Mite, an artifact creature, does: the target must be a creature Bot1 controls (Bot2's Elvish Mystic is refused, the Mite itself chosen), so the freshly cast Mite gets +1/+0 and haste and
+# attacks for 2 on the turn it came in. It is the fourth artifact (with the two Moxen and the Device), so the Device also transforms into Geode Grotto.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Dowsing Device
+Haywire Mite
+Mountain
+Mountain x12
+
+[Bot2 Deck]
+Mox Emerald
+Elvish Mystic
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dowsing Device.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Dowsing Device.Types = Artifact
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Pass
+Bot2.Pass
+? Stack.Count = 0
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+? Stack.Count = 0
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Haywire Mite.Cast
+Bot1.Pass
+! Bot1.Target(Bot2.Battlefield.Elvish Mystic)
+Bot1.Target(Haywire Mite)
+Bot1.Pass
+Bot1.Attack(Haywire Mite > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield.Geode Grotto.Types = Land
+Bot1.Battlefield.Count = 5

@@ -1,0 +1,41 @@
+# Spymaster's Vault enters untapped when its controller has a Swamp, and "{B}, {T}: Target creature you control connives
+# X, where X is the number of creatures that died this turn." Bot2's Ornithopter dies to a Lightning Bolt, so X is 1:
+# Llanowar Elves draws a card, discards the nonland Mox Jet and gets a +1/+1 counter.
+
+[Bot1 Deck]
+Swamp
+Spymaster's Vault
+Llanowar Elves
+Mox Emerald
+Mox Ruby
+Lightning Bolt
+Forest
+Forest
+Mox Jet
+Forest x10
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Spymaster's Vault.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Spymaster's Vault.Activate(Ability: connives; Bot1.Battlefield.Llanowar Elves)
+Bot1.Choose(Mox Jet)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Spymaster's Vault.Tapped = true
+Bot1.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = 1
+Bot1.Graveyard = Mox Jet; Lightning Bolt

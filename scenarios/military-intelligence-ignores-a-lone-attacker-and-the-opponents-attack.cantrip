@@ -1,0 +1,45 @@
+# Military Intelligence: "Whenever you attack with two or more creatures, draw a card." Turn 3 Bot1 attacks with one Ornithopter
+# only: no card. Turn 4 Bot2 attacks with two Ornithopters of its own: no card for Bot1 ("you attack"). Bot1's hand is
+# then just its normal draws (the positive control, two attackers, is military-intelligence-draws-a-card-when-two-creatures-attack).
+
+[Bot1 Deck]
+Island
+Mox Jet
+Military Intelligence
+Ornithopter
+Ornithopter
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Island x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Military Intelligence.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+[T3 Bot1.Main2]
+? Bot1.Hand.Count = 3
+[T4 Bot2.Main1]
+Bot2.Attack(Ornithopter; Ornithopter#2 > Bot1)
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Hand.Count = 4

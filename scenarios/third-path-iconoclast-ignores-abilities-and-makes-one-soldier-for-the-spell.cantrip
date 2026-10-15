@@ -1,0 +1,29 @@
+# "Whenever you cast a noncreature spell": casting a Chromatic Star is casting a noncreature (artifact) spell and makes one Soldier;
+# sacrificing it for mana is activating an ability, not casting a spell, and makes no more.
+
+[Bot1 Deck]
+Third Path Iconoclast
+Mox Sapphire
+Mox Ruby
+Chromatic Star
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Third Path Iconoclast.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Chromatic Star.Cast
+[T3 Bot1.Main2]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Chromatic Star.Activate(Color: Red)
+
+[Expect]
+Bot1.Battlefield = Mox Sapphire; Mox Ruby; Third Path Iconoclast; Soldier
+Bot1.Graveyard = Chromatic Star

@@ -1,0 +1,40 @@
+# Boseiju's channel ability ({1}{G}, discard it) costs {1} less with Ragavan, Nimble Pilferer out, so Mox Emerald alone
+# pays it. It destroys Bot2's Mox Jet, and Bot2 may search for a land with a basic land type and puts it onto the
+# battlefield untapped.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Ragavan, Nimble Pilferer
+Boseiju, Who Endures
+Island x16
+
+[Bot2 Deck]
+Mox Jet
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ragavan, Nimble Pilferer.Cast
+Bot1.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Boseiju, Who Endures.Activate(Bot2.Battlefield.Mox Jet)
+Bot1.Pass
+Bot2.Accept
+Bot2.Search(Island)
+[Bot1.Main1]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Graveyard = Boseiju, Who Endures
+Bot2.Graveyard = Mox Jet
+Bot2.Battlefield = Island
+Bot2.Battlefield.Island.Tapped = false

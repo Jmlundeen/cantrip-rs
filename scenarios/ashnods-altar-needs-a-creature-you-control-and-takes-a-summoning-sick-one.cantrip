@@ -1,0 +1,38 @@
+# "Sacrifice a creature": a creature you control, not any creature. Turn one: Altar off a Forest and two Moxen. Turn
+# two: Bot2 casts an Ornithopter. Turn three: Bot1 controls no creature, so the Altar offers nothing (the refusal) even
+# with Bot2's Ornithopter on the battlefield. Bot1 then casts its own Ornithopter - summoning sick, which does not matter
+# for a cost that does not tap it - and the Altar, now offered, sacrifices it for {C}{C}. Bot2's Ornithopter stays.
+
+[Bot1 Deck]
+Forest
+Mox Pearl
+Mox Ruby
+Ashnod's Altar
+Ornithopter
+Forest x10
+
+[Bot2 Deck]
+Ornithopter
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ashnod's Altar.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Ashnod's Altar.Activate
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main2]
+Bot1.Battlefield.Ashnod's Altar.Activate
+? Bot1.Mana = {C}{C}
+
+[Expect]
+Bot1.Graveyard = Ornithopter
+Bot2.Battlefield = Ornithopter
+Bot1.Battlefield = Forest; Mox Pearl; Mox Ruby; Ashnod's Altar

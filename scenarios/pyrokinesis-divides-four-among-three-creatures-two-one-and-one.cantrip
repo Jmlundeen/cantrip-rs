@@ -1,0 +1,35 @@
+# Pyrokinesis: "4 damage divided as you choose among any number of target creatures" (CR 601.2d): three Ornithopters (0/2) of
+# Bot2 as targets with shares 2, 1 and 1 that add up to 4 - the first dies, the other two survive with 1 damage each. The
+# Lightning Bolt in hand is the red card exiled for the alternative cost.
+
+[Bot1 Deck]
+Pyrokinesis
+Lightning Bolt
+Mountain x5
+Mountain x10
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Ornithopter
+Island x14
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Pyrokinesis.Cast(Ability: Exile)
+Bot1.Divide(Ornithopter#1: 2; Ornithopter#2: 1; Ornithopter#3: 1)
+Bot1.Choose(Lightning Bolt)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Ornithopter
+Bot2.Battlefield = Ornithopter; Ornithopter
+Bot2.Battlefield.Ornithopter#1.Damage = 1
+Bot2.Battlefield.Ornithopter#2.Damage = 1
+Exile = Lightning Bolt

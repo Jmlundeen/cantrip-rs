@@ -1,0 +1,38 @@
+# Returning permanents to their owners' hands (CR 400.3): a token that leaves the battlefield ceases to exist
+# (CR 111.7, 704.5d). Echoing Truth names one of Bot2's two Spirit tokens and takes both, and neither reaches the hand.
+
+[Bot1 Deck]
+Island
+Island
+Echoing Truth
+Island x30
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Lingering Souls
+Island x30
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Lingering Souls.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Echoing Truth.Cast(Bot2.Battlefield.Spirit)
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Graveyard = Echoing Truth
+Bot2.Battlefield = Mox Pearl; Mox Jet; Mox Ruby
+Bot2.Hand.Count = 4
+Bot2.Graveyard = Lingering Souls

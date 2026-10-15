@@ -1,0 +1,53 @@
+# Norman Osborn transforms into Green Goblin ({1}{U}{B}{R}). Green Goblin gives each nonland card in the graveyard mayhem:
+# a card discarded this turn may be cast from the graveyard for its mana cost, and spells cast from the graveyard cost {2}
+# less. Wheel of Fortune discards Mind Stone, which is cast from the graveyard for {2} less: nothing, though only Mox Jet's one mana is left. The Wheel itself
+# was not discarded, so it has no mayhem (the refusal).
+
+[Bot1 Deck]
+Norman Osborn
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Wheel of Fortune
+Mind Stone
+Island
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Norman Osborn.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Norman Osborn.Activate(Ability: Transform)
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Wheel of Fortune.Cast
+Bot1.Pass
+! Bot1.Graveyard.Wheel of Fortune.Cast(Ability: Mayhem)
+Bot1.Graveyard.Mind Stone.Cast(Ability: Mayhem)
+Bot1.Pass
+[Bot1.Main1]
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield.Mind Stone.Types = Artifact
+Bot1.Graveyard = Wheel of Fortune; Island; Island

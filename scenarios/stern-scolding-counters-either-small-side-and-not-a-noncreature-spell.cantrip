@@ -1,0 +1,61 @@
+# Stern Scolding: "Counter target creature spell with power or toughness 2 or less" - either one is enough, at the boundary.
+# Bot2 casts Flametongue Kavu (4/2: power too big, toughness exactly 2) and Six (2/4: power exactly 2, toughness too big) on
+# turn 2 and Bot1 counters both with two Scoldings (an Island and a Mox Sapphire). On turn 4 Bot2's Lightning Bolt is not a
+# creature spell: the third Scolding, with an Island untapped, is refused against it.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Stern Scolding
+Stern Scolding
+Stern Scolding
+Island
+Island x12
+
+[Bot2 Deck]
+Mountain
+Black Lotus
+Mox Emerald
+Mox Pearl
+Mox Jet
+Flametongue Kavu
+Six
+Mountain
+Lightning Bolt
+Mountain x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Flametongue Kavu.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Stern Scolding.Cast(Flametongue Kavu)
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Six.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Stern Scolding.Cast(Six)
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+! Bot1.Hand.Stern Scolding.Cast(Stack.Lightning Bolt)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot2.Graveyard = Lightning Bolt; Six; Flametongue Kavu; Black Lotus
+Bot1.Life = 17

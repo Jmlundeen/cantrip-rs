@@ -1,0 +1,56 @@
+# Bilbo, Thief in the Night: "Spells you cast from anywhere other than your hand cost {1} less to cast." On turn 3,
+# with Bilbo on the battlefield, Bot1 casts Bonecrusher Giant's Adventure, Stomp ({1}{R}), from its hand and pays the
+# whole {1}{R} with a Mountain and a Mox. Stomp's 2 damage goes to Bot2, and the Giant waits in exile on an adventure.
+# Casting the Giant from exile then costs {1}{R} instead of {2}{R}: the Volcanic Island and the other Mox are all that
+# is left, so it is paid exactly (a full price could not be paid at all), and nothing is left floating, so Stomp
+# cost its full {1}{R} too.
+
+[Bot1 Deck]
+Volcanic Island
+Mox Sapphire
+Mox Ruby
+Bilbo, Thief in the Night
+Bonecrusher Giant
+Mountain
+Island
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Volcanic Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Bilbo, Thief in the Night.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Bonecrusher Giant.Cast(Bot2; Ability: Adventure)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 18
+? Bot1.Mana =
+Bot1.Battlefield.Volcanic Island.Activate(Ability: {R})
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Exile.Bonecrusher Giant.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Bonecrusher Giant.Power = 4
+? Bot1.Mana = 
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Mana =
+Bot1.Battlefield.Bonecrusher Giant.Power = 4
+Bot1.Battlefield.Mountain.Tapped = true
+Bot1.Battlefield.Volcanic Island.Tapped = true
+Bot1.Battlefield.Mox Ruby.Tapped = true
+Bot1.Battlefield.Mox Sapphire.Tapped = true
+Exile.Count = 0

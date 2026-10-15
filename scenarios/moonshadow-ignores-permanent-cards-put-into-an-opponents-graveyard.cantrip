@@ -1,0 +1,26 @@
+# "Into your graveyard": Hymn to Tourach makes Bot2 discard two Islands into Bot2's graveyard, which is not Bot1's. (Bot2 also discarded one to hand size at cleanup, hence three.)
+
+[Bot1 Deck]
+Swamp
+Swamp
+Moonshadow
+Hymn to Tourach
+Island x30
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Moonshadow.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Hymn to Tourach.Cast(Bot2)
+[T4 Bot2.Upkeep]
+
+[Expect]
+Bot2.Graveyard.Count = 3
+Bot1.Battlefield.Moonshadow.Counters.MinusOneMinusOne = 6

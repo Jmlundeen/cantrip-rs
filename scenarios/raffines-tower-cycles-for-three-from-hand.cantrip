@@ -1,0 +1,35 @@
+# Raffine's Tower: Cycling {3} from hand. Bot1 taps three Moxen, discards the Tower and draws the Lightning Bolt on top
+# of the library.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Raffine's Tower
+Island
+Island
+Island
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Raffine's Tower.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Graveyard.Raffine's Tower.Activate
+
+[Expect]
+Turn = 1
+Bot1.Graveyard = Raffine's Tower
+Bot1.Hand = Island; Island; Island; Lightning Bolt
+Bot1.Library.Count = 10

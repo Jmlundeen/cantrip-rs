@@ -1,0 +1,6 @@
+{
+  "name": "Blasting Station",
+  "manaCost": "{3}",
+  "type": "Artifact",
+  "oracleText": "{T}, Sacrifice a creature: This artifact deals 1 damage to any target.\nWhenever a creature enters, you may untap this artifact."
+}

@@ -1,0 +1,21 @@
+# Ancestral Recall says "Target player", not "you": Bot1 casts it at Bot2, who draws the three cards; Bot1 draws none.
+
+[Bot1 Deck]
+Island
+Ancestral Recall
+Island x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot2)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Ancestral Recall
+Bot1.Hand.Count = 5
+Bot2.Hand.Count = 10
+Bot2.Library.Count = 10

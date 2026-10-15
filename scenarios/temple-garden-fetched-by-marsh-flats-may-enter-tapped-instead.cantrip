@@ -1,0 +1,22 @@
+# Temple Garden is a Forest Plains, so Marsh Flats finds it as a Plains card; Bot1 declines the 2 life and it enters tapped
+# (so only the 1 life of the Flats is lost).
+
+[Bot1 Deck]
+Marsh Flats
+Plains x6
+Temple Garden
+Plains x8
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Marsh Flats.Play
+Bot1.Battlefield.Marsh Flats.Activate
+Bot1.Search(Temple Garden)
+Bot1.Decline
+
+[Expect]
+Bot1.Life = 19
+Bot1.Battlefield = Temple Garden
+Bot1.Battlefield.Temple Garden.Tapped = true

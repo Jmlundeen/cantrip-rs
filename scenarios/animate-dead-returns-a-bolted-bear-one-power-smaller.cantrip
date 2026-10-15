@@ -1,0 +1,46 @@
+# Bot1 bolts Bot2's Guerrilla Gorilla, then casts Animate Dead on it in Bot2's graveyard: the Aura enters attached to the
+# card, its trigger returns the Gorilla under Bot1's control and attaches the Aura to it, and the Gorilla is a 1/2. Two turns
+# later Bot1 is about to attack with it. The position the client's "On Guerrilla Gorilla" Aura is pictured from:
+
+[Bot1 Deck]
+Mountain
+Swamp
+Swamp
+Lightning Bolt
+Animate Dead
+Swamp
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Forest
+Forest
+Guerrilla Gorilla
+Forest x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Guerrilla Gorilla)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Animate Dead.Cast(Guerrilla Gorilla)
+[T7 Bot1.Main1]
+[Handover Bot1.Attack]
+
+[Expect]
+Turn = 7
+Bot1.Battlefield = Mountain; Swamp; Swamp; Animate Dead; Guerrilla Gorilla
+Bot1.Battlefield.Guerrilla Gorilla.Power = 1
+Bot1.Battlefield.Guerrilla Gorilla.Toughness = 2
+Bot2.Graveyard.Count = 0

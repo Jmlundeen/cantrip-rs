@@ -1,0 +1,26 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageVersion Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="3.3.4" />
+    <!-- The Discord bot's gateway and REST client. Only Cantrip.Discord references it. -->
+    <PackageVersion Include="Discord.Net.WebSocket" Version="3.20.1" />
+    <PackageVersion Include="MessagePack" Version="3.1.8" />
+    <!-- Resizing and encoding card art to serve. Only Cantrip.Art references it; the version matches the one the
+         browser client decodes with, through Uno. -->
+    <PackageVersion Include="SkiaSharp" Version="3.119.2" />
+    <PackageVersion Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="3.119.2" />
+  </ItemGroup>
+
+  <!-- Test-only -->
+  <ItemGroup>
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageVersion Include="xunit" Version="2.9.2" />
+    <!-- Drives a real browser against the web client in Cantrip.Client.Web.Tests. -->
+    <PackageVersion Include="Microsoft.Playwright" Version="1.63.0" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.2" />
+  </ItemGroup>
+</Project>

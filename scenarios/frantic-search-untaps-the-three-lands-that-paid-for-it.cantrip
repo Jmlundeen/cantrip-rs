@@ -1,0 +1,42 @@
+# Bot1 taps three Islands for Frantic Search on its third turn, draws two, discards two, and chooses the three Islands to
+# untap: they are untapped when it resolves.
+
+[Bot1 Deck]
+Island
+Island
+Island
+Frantic Search
+Sol Ring
+Guerrilla Gorilla
+Lightning Bolt
+Counterspell
+Ponder
+Brainstorm
+Mana Leak
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Frantic Search.Cast
+Bot1.Choose(Guerrilla Gorilla; Lightning Bolt)
+Bot1.Choose(Island; Island; Island)
+Bot1.Pass
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Graveyard = Frantic Search; Lightning Bolt; Guerrilla Gorilla
+Bot1.Battlefield = Island; Island; Island
+Bot1.Battlefield.Island#1.Tapped = false
+Bot1.Battlefield.Island#2.Tapped = false
+Bot1.Battlefield.Island#3.Tapped = false

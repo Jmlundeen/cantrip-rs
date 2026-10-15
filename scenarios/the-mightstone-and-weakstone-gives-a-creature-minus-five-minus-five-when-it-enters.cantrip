@@ -1,0 +1,43 @@
+# On turn 5 Bot1 casts The Mightstone and Weakstone and chooses its second mode, aiming -5/-5 at Bot2's Llanowar Elves, which dies.
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Forest
+Forest
+The Mightstone and Weakstone
+Mind Stone
+Badgermole Cub
+Forest x12
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Island
+Island x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.The Mightstone and Weakstone.Cast
+Bot1.Modes(2)
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield = Forest; Forest; Forest; Sol Ring; The Mightstone and Weakstone
+Bot1.Hand.Count = 4
+Bot2.Battlefield = Forest
+Bot2.Graveyard = Llanowar Elves

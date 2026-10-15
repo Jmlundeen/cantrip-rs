@@ -1,0 +1,62 @@
+# Hexdrinker at level 8 (CR 711.2): a 6/6 with protection from everything (CR 702.16e), so nothing can block it. On turn 3,
+# a 4/4 at level 3, it is blocked by an Ornithopter (the control) and kills it; the five level ups after combat make it
+# level 8, and on turn 5 Bot2's other Ornithopter may not block it (it blocks Bot1's Ornithopter instead, the control):
+# 6 damage, so Bot2 is on 14.
+
+[Bot1 Deck]
+Forest
+Hexdrinker
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Emerald
+Ornithopter
+Forest x10
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Hexdrinker.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Hexdrinker.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Hexdrinker.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Hexdrinker.Activate
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Hexdrinker)
+Bot2.Block(Bot2.Battlefield.Ornithopter > Bot1.Battlefield.Hexdrinker)
+[T3 Bot1.Main2]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Hexdrinker.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Hexdrinker.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Hexdrinker.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Hexdrinker.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Hexdrinker.Activate
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Hexdrinker; Ornithopter)
+! Bot2.Block(Bot2.Battlefield.Ornithopter > Bot1.Battlefield.Hexdrinker)
+Bot2.Block(Bot2.Battlefield.Ornithopter > Bot1.Battlefield.Ornithopter)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Hexdrinker.Power = 6
+Bot1.Battlefield.Hexdrinker.Counters.Level = 8
+Bot2.Life = 14
+Bot2.Battlefield = Ornithopter

@@ -1,0 +1,57 @@
+# Banner of Kinship (CR 614.12a, 613.4c). Bot1 controls two Elves and Bot2 one: the Banner enters with two fellowship
+# counters, one for each of Bot1's Elves, because only creatures "you control" are counted. The Elves are 3/3, Bot2's Elf stays
+# a 1/1 (the +1/+1 is for creatures you control of the chosen type), the Ornithopter is not an Elf, and a third Elf cast
+# two turns later is a 3/3 at once: the static ability reads the counters, it does not remember who was counted.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Elvish Mystic
+Elvish Mystic
+Black Lotus
+Banner of Kinship
+Ornithopter
+Forest
+Elvish Mystic
+Forest x10
+
+[Bot2 Deck]
+Forest
+Elvish Mystic
+Island x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Banner of Kinship.Cast
+Bot1.Modes(Elf)
+? Bot1.Battlefield.Banner of Kinship.Counters.Fellowship = 2
+[T5 Bot1.Main1]
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Elvish Mystic#1.Power = 3
+Bot1.Battlefield.Elvish Mystic#2.Power = 3
+Bot1.Battlefield.Elvish Mystic#3.Power = 3
+Bot1.Battlefield.Elvish Mystic#3.Toughness = 3
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot2.Battlefield.Elvish Mystic.Power = 1
+Bot2.Battlefield.Elvish Mystic.Toughness = 1

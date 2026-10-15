@@ -1,0 +1,32 @@
+# Mox Amber: "{T}: Add one mana of any color among legendary creatures and planeswalkers you control." Minsc & Boo
+# is a red and green legendary planeswalker, so once it is in play the Mox adds green.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Mox Jet
+Mox Pearl
+Minsc & Boo, Timeless Heroes
+Mox Amber
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Amber.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Minsc & Boo, Timeless Heroes.Cast
+Bot1.Decline
+Bot1.Battlefield.Mox Amber.Activate(Color: Green)
+
+[Expect]
+Bot1.Mana = {G}

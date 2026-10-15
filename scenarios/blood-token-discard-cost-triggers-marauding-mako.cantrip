@@ -1,0 +1,36 @@
+# Discarding a card to pay a cost is a discard (CR 701.9): Bot1 cracks the Blood token Voldaren Epicure made ({1}, {T},
+# discard a card, sacrifice it), discarding Lightning Bolt, and Marauding Mako's "whenever you discard one or more
+# cards" trigger puts a +1/+1 counter on it.
+
+[Bot1 Deck]
+Mountain
+Voldaren Epicure
+Marauding Mako
+Mountain
+Mountain
+Mountain
+Mountain
+Lightning Bolt
+Mox Jet
+Mountain x6
+
+[Bot2 Deck]
+Island x13
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Voldaren Epicure.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Marauding Mako.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Blood Token.Activate
+Bot1.Choose(Lightning Bolt)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Lightning Bolt
+Bot1.Battlefield.Marauding Mako.Counters.PlusOnePlusOne = 1

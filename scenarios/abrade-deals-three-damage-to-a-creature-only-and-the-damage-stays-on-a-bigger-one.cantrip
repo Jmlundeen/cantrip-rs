@@ -1,0 +1,80 @@
+# Abrade, first mode: "Abrade deals 3 damage to target creature." On turn 5 Bot1 casts it twice, with the Mountain and
+# three Moxen paying. Its target question refuses Bot2's Sol Ring (an artifact, not a creature)
+# and Bot2 as a player, and takes the Guerrilla Gorilla (2/2), which dies. The second Abrade takes Fanatic of Rhonas
+# (1/4), which survives with 3 damage marked, because 3 damage is not lethal to a toughness of 4.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+Abrade
+Abrade
+Island
+Island x20
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Mox Sapphire
+Fanatic of Rhonas
+Guerrilla Gorilla
+Sol Ring
+Mox Ruby
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Fanatic of Rhonas.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Abrade.Cast
+Bot1.Modes(Abrade deals 3 damage)
+! Bot1.Target(Bot2.Battlefield.Sol Ring)
+! Bot1.Target(Bot2)
+Bot1.Target(Guerrilla Gorilla)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Graveyard = Guerrilla Gorilla
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Abrade.Cast
+Bot1.Modes(Abrade deals 3 damage)
+Bot1.Target(Fanatic of Rhonas)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Guerrilla Gorilla
+Bot2.Battlefield.Fanatic of Rhonas.Damage = 3
+Bot2.Battlefield.Sol Ring.Types = Artifact
+Bot1.Graveyard = Abrade; Abrade

@@ -1,0 +1,35 @@
+# Two creatures may block a menace creature together. Bot2's two Ornithopters both block the Saboteur; its attack trigger had put a
+# +1/+1 counter on one of them (a 1/3), which deals the 1 damage that kills the 4/1 Saboteur: it dies, and the damage it
+# dealt in the same step took out the 0/2 Ornithopter (4 damage assigned lethal to each in turn).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Sunset Saboteur
+Swamp x14
+
+[Bot2 Deck]
+Island
+Ornithopter
+Ornithopter
+Island x14
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sunset Saboteur.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Sunset Saboteur > Bot2)
+Bot1.Target(Bot2.Battlefield.Ornithopter#1)
+Bot2.Block(Ornithopter#1 > Sunset Saboteur; Ornithopter#2 > Sunset Saboteur)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Sunset Saboteur
+Bot2.Life = 20

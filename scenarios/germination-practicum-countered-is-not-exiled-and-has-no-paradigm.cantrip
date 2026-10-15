@@ -1,0 +1,50 @@
+# Germination Practicum: "Paradigm (Then exile this spell...)" is part of the spell's resolution (CR 702.170a), so a
+# countered Practicum goes to the graveyard, not exile, and no copy is offered on later turns. Bot2 counters it with
+# Counterspell (an Island and Mox Sapphire); on turn 5 Bot1 is not asked to cast a copy. Compare the existing scenario,
+# where the resolved spell stays in exile and offers a copy each turn.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Germination Practicum
+Forest
+Black Lotus
+Forest
+Forest
+Forest x12
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Island x4
+Island x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Germination Practicum.Cast
+Bot1.Pass
+Bot2.Hand.Counterspell.Cast(Stack.Germination Practicum)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+! Bot1.Accept
+[T5 Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot1.Graveyard = Germination Practicum; Black Lotus
+Bot1.Battlefield.Llanowar Elves.Power = 1

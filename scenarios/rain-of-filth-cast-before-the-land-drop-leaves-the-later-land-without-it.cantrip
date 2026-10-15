@@ -1,0 +1,29 @@
+# "Lands you control" is fixed as the spell resolves (CR 611.2c): Rain of Filth is cast and resolves with the Island already on
+# the battlefield, then a second Island is played; that new land never gains the sacrifice ability (refusal), while the first Island does
+# (the positive control, sacrificed for {B}).
+
+[Bot1 Deck]
+Mox Jet
+Island
+Island
+Rain of Filth
+Island x16
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Rain of Filth.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Island.Play
+! Bot1.Battlefield.Island#2.Activate(Ability: Sacrifice)
+Bot1.Battlefield.Island.Activate(Ability: Sacrifice)
+
+[Expect]
+Bot1.Battlefield = Mox Jet; Island
+Bot1.Mana = {B}

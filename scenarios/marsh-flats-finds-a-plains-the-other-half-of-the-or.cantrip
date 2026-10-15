@@ -1,0 +1,23 @@
+# The Plains half of "Plains or Swamp": with a Mountain beside it in the library (refused), the Plains is found and enters
+# untapped.
+
+[Bot1 Deck]
+Marsh Flats
+Island x6
+Mountain
+Plains
+Island x8
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Marsh Flats.Play
+Bot1.Battlefield.Marsh Flats.Activate
+! Bot1.Search(Mountain)
+Bot1.Search(Plains)
+
+[Expect]
+Bot1.Life = 19
+Bot1.Battlefield = Plains
+Bot1.Battlefield.Plains.Tapped = false

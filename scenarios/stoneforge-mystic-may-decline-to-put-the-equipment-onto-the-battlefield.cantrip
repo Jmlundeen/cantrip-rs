@@ -1,0 +1,33 @@
+# "You may put an Equipment card from your hand onto the battlefield": Bot1 finds Bone Sabres with the enters trigger, then on turn 3
+# declines to put it in (a choice of no card), so it stays in the hand and the Mystic is tapped all the same.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Stoneforge Mystic
+Plains x4
+Bone Sabres
+Plains x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Stoneforge Mystic.Cast
+Bot1.Pass
+Bot1.Search(Bone Sabres)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Stoneforge Mystic.Activate
+Bot1.Choose()
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Pearl; Mox Ruby; Stoneforge Mystic
+Bot1.Battlefield.Stoneforge Mystic.Tapped = true

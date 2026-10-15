@@ -1,0 +1,30 @@
+# Lightning Greaves enters and is attached to the Ornithopter without paying its equip cost.
+
+[Bot1 Deck]
+Mox Pearl
+Sigarda's Aid
+Mox Jet
+Ornithopter
+Sol Ring
+Lightning Greaves
+Swamp x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Sigarda's Aid.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Lightning Greaves.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Accept
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Lightning Greaves.AttachedTo = Ornithopter
+Bot1.Battlefield.Ornithopter.Keywords = Flying; Haste; Shroud

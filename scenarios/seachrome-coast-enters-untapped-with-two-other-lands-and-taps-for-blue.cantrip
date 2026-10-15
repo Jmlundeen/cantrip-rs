@@ -1,0 +1,22 @@
+# Seachrome Coast: with two other lands it enters untapped (CR 614.1c) and taps for either white or blue.
+
+[Bot1 Deck]
+Plains
+Plains
+Seachrome Coast
+Mountain x17
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Seachrome Coast.Play
+Bot1.Battlefield.Seachrome Coast.Activate(Color: Blue)
+
+[Expect]
+Bot1.Battlefield.Seachrome Coast.Tapped = true
+Bot1.Mana = {U}

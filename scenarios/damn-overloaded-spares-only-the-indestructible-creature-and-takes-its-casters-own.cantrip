@@ -1,0 +1,44 @@
+# Overloaded Damn destroys each creature at once (CR 702.96a, 701.8), skipping any that are indestructible. On turn three
+# Bot1 overloads it with a Sol Ring and two Plains, with its own Ornithopter in play beside Bot2's two. Bot2 answers by
+# giving one of its Ornithopters indestructible with Revitalizing Repast: that one lives, and the other two die. Damn
+# never targets, so the shielded creature's being a legal target in response is irrelevant here.
+
+[Bot1 Deck]
+Plains
+Sol Ring
+Ornithopter
+Damn
+Plains
+Plains x10
+
+[Bot2 Deck]
+Mox Jet
+Ornithopter
+Ornithopter
+Revitalizing Repast
+Swamp x11
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Damn.Cast(Ability: Overload)
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Revitalizing Repast.Cast(Bot2.Battlefield.Ornithopter#1)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Damn; Ornithopter
+Bot2.Graveyard = Ornithopter; Revitalizing Repast
+Bot2.Battlefield = Mox Jet; Ornithopter
+Bot2.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1

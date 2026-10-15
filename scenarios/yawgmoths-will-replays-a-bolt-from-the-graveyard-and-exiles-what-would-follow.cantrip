@@ -1,0 +1,37 @@
+# Yawgmoth's Will lets its caster cast Lightning Bolt from the graveyard (CR 601.3); from then on every card that would be put into their graveyard is exiled instead, the Bolt and the Will itself included.
+
+[Bot1 Deck]
+Lightning Bolt
+Yawgmoth's Will
+Sol Ring
+Mountain x3
+Swamp
+Mountain x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mountain.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Mountain.Activate
+[T5 Bot1.Main2]
+Bot1.Hand.Yawgmoth's Will.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Graveyard.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Mountain.Activate
+[T5 Bot1.End]
+
+[Expect]
+Turn = 5
+Bot2.Life = 14
+Bot1.Graveyard.Count = 0
+Exile = Lightning Bolt; Yawgmoth's Will
+Stack.Count = 0

@@ -1,0 +1,30 @@
+# "This land enters tapped unless you control a Mountain" (CR 614.12a, 305.7): it is read for the subtype, not the name.
+# Beside only an Island the Arena enters tapped (turn 3); once Volcanic Island - a Mountain by type though not a basic
+# Mountain - is out, the second Arena enters untapped (turn 7), the positive control for the first.
+
+[Bot1 Deck]
+Island
+Arena of Glory
+Volcanic Island
+Arena of Glory
+Island x3
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Arena of Glory.Play
+? Bot1.Battlefield.Arena of Glory.Tapped = true
+[T5 Bot1.Main1]
+Bot1.Hand.Volcanic Island.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Arena of Glory.Play
+? Bot1.Battlefield.Arena of Glory#2.Tapped = false
+
+[Expect]
+Turn = 7
+Bot1.Battlefield.Arena of Glory#1.Tapped = false
+Bot1.Battlefield.Arena of Glory#2.Tapped = false

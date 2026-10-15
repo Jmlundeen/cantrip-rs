@@ -1,0 +1,47 @@
+# Robber of the Rich attacks into a player with more cards in hand and exiles the top card of their library (Lightning
+# Bolt). The card can be cast only during a turn Bot1 attacked with a Rogue: not at the start of the next turn (the
+# refusal), but once Robber has attacked again (the control), when Bot1 casts it with Mox Pearl's white mana, spent as though it were red.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Robber of the Rich
+Island x16
+
+[Bot2 Deck]
+Mountain
+Mountain
+Mountain
+Mountain
+Mountain
+Mountain
+Mountain
+Lightning Bolt
+Mountain x12
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Robber of the Rich.Cast
+Bot1.Pass
+Bot1.Attack(Robber of the Rich)
+[T3 Bot1.Main1]
+! Bot1.Exile.Lightning Bolt.Cast
+Bot1.Pass
+Bot1.Attack(Robber of the Rich)
+[T3 Bot1.Main2]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot2.Graveyard = Lightning Bolt; Mountain

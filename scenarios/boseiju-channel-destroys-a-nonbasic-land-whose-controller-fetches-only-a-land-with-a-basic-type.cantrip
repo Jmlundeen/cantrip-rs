@@ -1,0 +1,41 @@
+# Boseiju, Who Endures, channel: a nonbasic land is a legal target (Bot2's Volcanic Island), and the search it grants is
+# for "a land card with a basic land type" - Tundra is one (Plains Island), Strip Mine has none. The refusal
+# `! Bot2.Search(Strip Mine)` is checked at that search with the Strip Mine in the library, beside the positive control
+# that Bot2 then finds the Tundra, which enters untapped (it is put onto the battlefield, not played).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Boseiju, Who Endures
+Island x4
+Island x10
+
+[Bot2 Deck]
+Volcanic Island
+Island x6
+Island
+Strip Mine
+Tundra
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Hand.Volcanic Island.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Boseiju, Who Endures.Activate(Bot2.Battlefield.Volcanic Island)
+Bot1.Pass
+Bot2.Accept
+! Bot2.Search(Strip Mine)
+Bot2.Search(Tundra)
+[Bot1.Main1]
+
+[Expect]
+Turn = 3
+Bot2.Graveyard = Volcanic Island
+Bot2.Battlefield = Tundra
+Bot2.Battlefield.Tundra.Tapped = false

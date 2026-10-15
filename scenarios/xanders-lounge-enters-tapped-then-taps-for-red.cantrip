@@ -1,0 +1,20 @@
+# Xander's Lounge enters tapped (CR 614.1c); its Island Swamp Mountain types give it three mana abilities (CR 305.6), so on
+# the next turn it taps for {R}.
+
+[Bot1 Deck]
+Xander's Lounge
+Island x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Xander's Lounge.Play
+? Bot1.Battlefield.Xander's Lounge.Tapped = true
+[T3 Bot1.Main1]
+Bot1.Battlefield.Xander's Lounge.Activate(Ability: {R})
+? Bot1.Mana = {R}
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Xander's Lounge.Tapped = true

@@ -1,0 +1,33 @@
+# Faithless Looting cast for {R} (Mox Ruby) goes to the graveyard. On turn 3 it is flashed back for {2}{R} (Mox Ruby, Mox Jet
+# and a Mountain): "then exile it" (CR 702.34a), so it ends in exile and a second flashback is refused (nothing in the
+# graveyard to cast). The refusal's positive control is the flashback just taken.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Faithless Looting
+Mountain
+Mountain
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Island; Island)
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Graveyard.Faithless Looting.Cast(Ability: Flashback)
+! Bot1.Graveyard.Faithless Looting.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Faithless Looting
+Bot1.Battlefield = Mox Ruby; Mox Jet; Mountain

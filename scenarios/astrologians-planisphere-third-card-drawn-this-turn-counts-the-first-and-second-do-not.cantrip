@@ -1,0 +1,35 @@
+# Turn 5: the draw step is Bot1's first draw of the turn. Brainstorm is a noncreature spell (one counter on cast) and
+# draws three more, the first of which is the second card of the turn and the second of which is the third: exactly one
+# more counter. The fourth card drawn does not add a third.
+
+[Bot1 Deck]
+Island
+Island
+Astrologian's Planisphere
+Island
+Brainstorm
+Island
+Island
+Island x12
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Astrologian's Planisphere.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Brainstorm.Cast
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Hero.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Hero.Power = 3
+Stack.Count = 0

@@ -1,0 +1,53 @@
+# Leave // Chance, a split card (CR 709), pictured from both sides at once: Bot2 has just cast one as Leave, which waits
+# on the stack, and Bot1 - the seat handed over - holds another and may answer with it.
+#
+# What the client has to draw: in hand, the whole card as it is printed (CR 709.1) - its two halves side by side along
+# its length, each with its own name, cost, art and text, turned a quarter turn so the card reads turned clockwise, and
+# held up turned that way. On the stack, only the half that was cast, as a whole card of its own (CR 709.3a): Leave,
+# white, {1}{W}, and nothing of Chance.
+#
+# Bot2 casts it, not Bot1: a client passes its own priority after casting unless it is holding priority, so a spell of
+# the handed-over seat's would be resolved before the page is looked at.
+
+[Bot1 Deck]
+Plains
+Plains
+Leave // Chance
+Plains
+Plains
+Plains
+Plains
+Plains x12
+
+[Bot2 Deck]
+Plains
+Plains
+Leave // Chance
+Plains
+Plains
+Plains
+Plains
+Plains x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot2.Hand.Plains.Play
+Bot1.Hand.Plains.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains#1.Activate
+Bot2.Battlefield.Plains#2.Activate
+Bot2.Hand.Leave // Chance.Cast(Ability: Leave)
+Bot2.Pass
+[Handover Bot1.Pass]
+
+[Expect]
+Turn = 4
+Step = Main1
+ActivePlayer = Bot2
+PriorityPlayer = Bot1
+# On the stack it is the half that was cast, and only that (CR 709.3a).
+Stack.Count = 1
+Stack = Leave
+Bot1.Hand = Leave // Chance; Plains; Plains; Plains; Plains; Plains
+Bot1.Battlefield.Count = 2

@@ -1,0 +1,43 @@
+# Questing Beast can't be blocked by creatures with power 2 or less (CR 509.1b): Bot2's Llanowar Elves, power 1, may block
+# the Llanowar Elves that attack beside it but not the Beast. The Beast's 4 combat damage to Bot2 is dealt again to the
+# planeswalker that player controls (Liliana of the Veil, loyalty 3, which dies).
+[Bot1 Deck]
+Forest x2
+Black Lotus
+Questing Beast
+Llanowar Elves
+Forest x2
+Forest x20
+[Bot2 Deck]
+Forest
+Black Lotus
+Llanowar Elves
+Liliana of the Veil
+Swamp x3
+Swamp x20
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Black Lotus.Cast
+[Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Liliana of the Veil.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Questing Beast.Cast
+Bot1.Attack(Questing Beast > Bot2; Llanowar Elves > Bot2)
+! Bot2.Block(Llanowar Elves > Questing Beast)
+Bot2.Block(Llanowar Elves > Llanowar Elves)
+[Bot1.Main2]
+[Expect]
+Bot2.Life = 16
+Bot2.Battlefield.Count = 1
+Bot2.Graveyard = Liliana of the Veil; Llanowar Elves; Black Lotus

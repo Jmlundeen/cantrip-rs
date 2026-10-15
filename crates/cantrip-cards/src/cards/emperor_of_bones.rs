@@ -1,0 +1,75 @@
+use cantrip_api::*;
+use cantrip_mechanics::{choose, targets};
+use cantrip_mechanics::adapt;
+use cantrip_oracle as oracle;
+
+/// Exile up to one target card from a graveyard: it is exiled with this creature (CR 607.2a), for its other ability.
+fn exile_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if let Some(card) = targets::object(g, item, 0) {
+        g.exile_with(&[card], item.object, false);
+    }
+    Ok(())
+}
+
+/// Adapt 2 (CR 701.46a).
+fn adapt(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    adapt::adapt(g, item.object, 2);
+    Ok(())
+}
+
+/// "Whenever one or more +1/+1 counters are put on this creature" (CR 121.1, 603.2c).
+fn plus_one_counters_put(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::CountersPut { object, kind: CounterKind::PlusOne, amount, .. } if *object == source && *amount > 0 => Fired::PLAIN,
+        _ => None,
+    }
+}
+
+/// Put a creature card exiled with this creature onto the battlefield under your control with a finality counter on it. It
+/// gains haste. Sacrifice it at the beginning of the next end step. A lone card is no choice; several are asked.
+fn reanimate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let eligible: Vec<ObjectId> =
+        g.exiled_with(item.object).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
+    let chosen = if eligible.len() == 1 {
+        eligible.first().copied()
+    } else {
+        choose::card(g, item.controller, item.object, Purpose::PutOntoBattlefield, eligible)?
+    };
+    let Some(chosen) = chosen else { return Ok(()) };
+    let returned = g.put_onto_battlefield(chosen, item.controller, false)?;
+    if !targets::permanent(g, returned) {
+        return Ok(());
+    }
+    g.add_counters(returned, CounterKind::Finality, 1);
+    g.add_effect(item.object, returned, EffectKind::AddKeywords(Keywords::of(&[Keyword::Haste])), Duration::Indefinite);
+    cantrip_mechanics::delayed::at_next_end_step(g, item, 0, Target::Object(returned));
+    Ok(())
+}
+
+pub static CARD: CardDef = CardDef {
+    abilities: &[
+        AbilityDef::Triggered(TriggeredDef {
+            text: "At the beginning of combat on your turn, exile up to one target card from a graveyard.",
+            listens: EventMask::STEP_BEGAN,
+            matches: cantrip_mechanics::triggers::beginning_of_your_combat,
+            targets: &[TargetSpec { min: 0, ..cantrip_mechanics::targets::CARD_IN_A_GRAVEYARD }],
+            effect: exile_it,
+            ..TriggeredDef::BLANK
+        }),
+        AbilityDef::Activated(ActivatedDef {
+            text: "{1}{B}: Adapt 2.",
+            cost: Cost { mana: mana(1, 0, 0, 1, 0, 0), ..Cost::NONE },
+            effect: adapt,
+            ..ActivatedDef::BLANK
+        }),
+        AbilityDef::Triggered(TriggeredDef {
+            text: "Whenever one or more +1/+1 counters are put on this creature, put a creature card exiled with this creature onto the battlefield under your control with a finality counter on it. It gains haste. Sacrifice it at the beginning of the next end step.",
+            listens: EventMask::COUNTERS,
+            matches: plus_one_counters_put,
+            effect: reanimate,
+            ..TriggeredDef::BLANK
+        }),
+    ],
+    delayed: &[cantrip_mechanics::delayed::ability("Sacrifice it.", cantrip_mechanics::delayed::sacrifice_subject)],
+    ..oracle::EMPEROR_OF_BONES
+};

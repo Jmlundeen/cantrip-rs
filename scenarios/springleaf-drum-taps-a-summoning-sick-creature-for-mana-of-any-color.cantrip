@@ -1,0 +1,33 @@
+# Springleaf Drum: "{T}, Tap an untapped creature you control: Add one mana of any color", a mana ability whose creature
+# is chosen with the activation. The Llanowar Elves it taps were cast this turn: tapping them is the Drum's cost, not the
+# Elves' own {T} (CR 302.6). The red mana casts a Lightning Bolt.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Llanowar Elves
+Springleaf Drum
+Lightning Bolt
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Springleaf Drum.Cast
+Bot1.Battlefield.Springleaf Drum.Activate(Tap: Llanowar Elves; Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Llanowar Elves.Tapped = true
+Bot1.Battlefield.Llanowar Elves.SummoningSick = true
+Bot1.Battlefield.Springleaf Drum.Tapped = true

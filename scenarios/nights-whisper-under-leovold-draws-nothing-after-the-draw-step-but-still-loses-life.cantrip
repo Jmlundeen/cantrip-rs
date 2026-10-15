@@ -1,0 +1,36 @@
+# "You draw two cards and lose 2 life" are separate instructions: Bot2's Leovold stops Bot1 drawing more than one card
+# each turn, Bot1 has drawn its turn-3 card, so the Whisper draws none (hand 5, not 7) and the 2 life are lost all the same.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Night's Whisper
+Island x4
+Island x10
+
+[Bot2 Deck]
+Mox Jet
+Mox Emerald
+Mox Sapphire
+Leovold, Emissary of Trest
+Island x14
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Leovold, Emissary of Trest.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Night's Whisper.Cast
+
+[Expect]
+Bot1.Life = 18
+Bot1.Hand.Count = 5

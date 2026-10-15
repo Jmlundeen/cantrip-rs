@@ -1,0 +1,41 @@
+# Invert Polarity: "Choose target spell, then flip a coin. If you win the flip, gain control of that spell and you may choose
+# new targets for it. If you lose the flip, counter that spell." Bot2's Lightning Bolt aims at Bot1 and Bot1 answers it
+# with Invert Polarity. The flip is a two-sided die, which a scenario's [Dice] fixes; here it is lost (the second face), so the Bolt is
+# countered and goes to Bot2's graveyard without touching Bot1.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Island
+Invert Polarity
+Island x14
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt
+Mountain x3
+Mountain x12
+
+[Dice]
+2
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Island.Play
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Invert Polarity.Cast(Lightning Bolt)
+[T3 Bot1.Upkeep]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 20
+Bot1.Graveyard = Invert Polarity
+Bot2.Graveyard = Lightning Bolt

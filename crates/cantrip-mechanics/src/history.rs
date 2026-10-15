@@ -1,0 +1,81 @@
+//! The questions about the past that several printed cards ask in the same words, written once over the event
+//! history (`cantrip_api::history`). A trigger matching an event and a replacement deciding about one both see the
+//! history as it was just before it, so each of these reads the same from either.
+
+use cantrip_api::*;
+
+/// Whether a draw `player` is about to make (or is making, from a trigger on it) is the first card they draw in their
+/// own draw step this turn: the draw that "except the first one they draw in each of their draw steps" exempts. Orcish
+/// Bowmasters (a trigger) and Hullbreacher (a replacement) print it.
+pub fn first_draw_in_own_draw_step(q: &dyn Query, player: PlayerId) -> bool {
+    let turn = q.state().turn;
+    turn.active == player
+        && turn.step() == Step::Draw
+        && !q.history().any(EventQuery::kind(EventMask::DREW).player(player).this_turn().step(Step::Draw))
+}
+
+/// Cards `player` has drawn this turn, before the draw being asked about (Faerie Mastermind's "second card", Leovold's
+/// and Narset's "more than one card each turn").
+pub fn drawn_this_turn(q: &dyn Query, player: PlayerId) -> usize {
+    q.history().drawn(player)
+}
+
+/// Spells cast this turn by every player (storm, CR 702.40a, counts those cast before the storm spell: subtract it).
+pub fn spells_cast_this_turn(q: &dyn Query) -> usize {
+    q.history().casts().count()
+}
+
+/// Revolt (CR 207.2c): whether a permanent `player` controlled left the battlefield this turn. The leaving object's
+/// row is as it was when it left, so its controller then is read from it.
+pub fn permanent_left_battlefield_this_turn(q: &dyn Query, player: PlayerId) -> bool {
+    q.history()
+        .select(EventQuery::kind(EventMask::ZONE_CHANGE).from(ZoneKind::Battlefield).this_turn())
+        .any(|r| matches!(r.event, Event::ZoneChange { old, .. } if q.obj(old).controller == player))
+}
+
+/// Cards (not tokens) that left `player`'s graveyard this turn (Gau, Feral Youth).
+pub fn cards_left_graveyard_this_turn(q: &dyn Query, player: PlayerId) -> usize {
+    q.history()
+        .select(EventQuery::kind(EventMask::ZONE_CHANGE).from(ZoneKind::Graveyard).this_turn())
+        .filter(|r| matches!(r.event, Event::ZoneChange { old, from, .. } if from == Zone::graveyard(player) && !q.obj(old).token))
+        .count()
+}
+
+/// The cards put into `owner`'s graveyard from the battlefield this turn that are still there (Faith's Reward, Second
+/// Sunrise, No Rest for the Wicked): the graveyard objects those moves made, in the order they arrived.
+pub fn put_into_graveyard_from_battlefield_this_turn(q: &dyn Query, owner: PlayerId) -> Vec<ObjectId> {
+    q.history()
+        .select(EventQuery::kind(EventMask::ZONE_CHANGE).from(ZoneKind::Battlefield).to(ZoneKind::Graveyard).this_turn())
+        .filter_map(|r| match r.event {
+            // A token that left the battlefield is not a card in the graveyard (CR 111.7, 704.5d).
+            Event::ZoneChange { old, new, to, .. }
+                if to == Zone::graveyard(owner) && q.obj(new).became.is_none() && !q.obj(old).token =>
+            {
+                Some(new)
+            }
+            _ => None,
+        })
+        .collect()
+}
+
+/// Whether `permanent` entered the battlefield this turn (CR 400.7: it is the object that move made).
+pub fn entered_this_turn(q: &dyn Query, permanent: ObjectId) -> bool {
+    q.history()
+        .select(EventQuery::kind(EventMask::ZONE_CHANGE).to(ZoneKind::Battlefield).this_turn())
+        .any(|r| matches!(r.event, Event::ZoneChange { new, .. } if new == permanent))
+}
+
+/// How many of `player`'s opponents have lost life this turn (spectacle's "an opponent lost life this turn", Drill
+/// Bit; Kaito, Bane of Nightmares counts them).
+pub fn opponents_who_lost_life_this_turn(q: &dyn Query, player: PlayerId) -> usize {
+    let h = q.history();
+    q.state().opponents(player).filter(|&p| h.life_lost(p) > 0).count()
+}
+
+/// Whether `object` arrived where it is this turn (CR 400.7: it is the object a move this turn made), in whatever zone:
+/// Night Nurse's "put there from anywhere this turn", and, on the battlefield, `entered_this_turn`.
+pub fn arrived_this_turn(q: &dyn Query, object: ObjectId) -> bool {
+    q.history()
+        .select(EventQuery::kind(EventMask::ZONE_CHANGE).this_turn())
+        .any(|r| matches!(r.event, Event::ZoneChange { new, .. } if new == object))
+}

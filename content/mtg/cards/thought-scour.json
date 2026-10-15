@@ -1,0 +1,6 @@
+{
+  "name": "Thought Scour",
+  "manaCost": "{U}",
+  "type": "Instant",
+  "oracleText": "Target player mills two cards.\nDraw a card."
+}

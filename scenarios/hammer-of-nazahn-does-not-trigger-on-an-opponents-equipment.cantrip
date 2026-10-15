@@ -1,0 +1,35 @@
+# "Another Equipment you control": Bot2's Lavaspur Boots entering doesn't trigger Bot1's Hammer of Nazahn, so no trigger is on the stack once the Boots resolve.
+
+[Bot1 Deck]
+Ornithopter
+Black Lotus
+Mox Jet
+Hammer of Nazahn
+Swamp x13
+
+[Bot2 Deck]
+Mountain
+Lavaspur Boots
+Island x16
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Hammer of Nazahn.Cast
+Bot1.Accept
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lavaspur Boots.Cast
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 0
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Bot2.Battlefield.Lavaspur Boots.AttachedTo = (absent)
+Bot1.Battlefield.Hammer of Nazahn.AttachedTo = Ornithopter

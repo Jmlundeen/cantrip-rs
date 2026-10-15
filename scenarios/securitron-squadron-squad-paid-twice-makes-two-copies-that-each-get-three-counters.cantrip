@@ -1,0 +1,42 @@
+# Securitron Squadron ({1}{W}, 2/2; Squad {3}; vigilance; "Whenever a creature token you control enters, put a +1/+1
+# counter on it.") cast on turn 1 with its squad cost paid twice (eight mana: Black Lotus, Sol Ring, Mox Sapphire,
+# Mox Jet and a Plains). Two token copies enter together (CR 702.157a). Each token's own ability triggers for both
+# tokens and the original's triggers for both, so each token gets 2 + 1 = 3 counters (the card's ruling); the
+# original is not a token and gets none. The tokens are 5/5, the original stays 2/2.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Sol Ring
+Black Lotus
+Securitron Squadron
+Island x12
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Securitron Squadron.Cast(Kicked: 2)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Plains.Activate
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Plains; Mox Pearl; Mox Sapphire; Mox Jet; Sol Ring; Securitron Squadron; Securitron Squadron; Securitron Squadron
+Bot1.Battlefield.Securitron Squadron#1.Power = 2
+Bot1.Battlefield.Securitron Squadron#2.Power = 5
+Bot1.Battlefield.Securitron Squadron#3.Power = 5
+Bot1.Battlefield.Securitron Squadron#2.Counters.PlusOnePlusOne = 3
+Bot1.Battlefield.Securitron Squadron#3.Counters.PlusOnePlusOne = 3

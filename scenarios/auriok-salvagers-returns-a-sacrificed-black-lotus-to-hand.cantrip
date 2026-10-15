@@ -1,0 +1,33 @@
+# Auriok Salvagers: {1}{W}, return target artifact card with mana value 1 or less from your graveyard to your hand.
+# Black Lotus, sacrificed to cast the Salvagers, is the card it gets back.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Mox Pearl
+Mox Jet
+Auriok Salvagers
+Plains x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Auriok Salvagers.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Auriok Salvagers.Activate(Bot1.Graveyard.Black Lotus)
+[T1 Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Turn = 1
+Bot1.Hand = Black Lotus; Plains; Plains
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield = Plains; Mox Pearl; Mox Jet; Auriok Salvagers

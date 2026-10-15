@@ -1,0 +1,32 @@
+# Strength of the Harvest enchants Llanowar Elves and gives it +1/+1 for each creature and/or enchantment its
+# controller controls: the Elves and the Aura itself, so +2/+2 and a 3/3.
+
+[Bot1 Deck]
+Forest
+Forest
+Llanowar Elves
+Strength of the Harvest
+Forest
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Hand.Strength of the Harvest.Cast(Bot1.Battlefield.Llanowar Elves)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Power = 3
+Bot1.Battlefield.Llanowar Elves.Toughness = 3
+Bot1.Battlefield.Strength of the Harvest.AttachedTo = Llanowar Elves

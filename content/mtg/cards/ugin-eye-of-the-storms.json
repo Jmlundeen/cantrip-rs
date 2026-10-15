@@ -1,0 +1,7 @@
+{
+  "name": "Ugin, Eye of the Storms",
+  "manaCost": "{7}",
+  "type": "Legendary Planeswalker — Ugin",
+  "loyalty": 7,
+  "oracleText": "When you cast this spell, exile up to one target permanent that's one or more colors.\nWhenever you cast a colorless spell, exile up to one target permanent that's one or more colors.\n+2: You gain 3 life and draw a card.\n0: Add {C}{C}{C}.\n−11: Search your library for any number of colorless nonland cards, exile them, then shuffle. Until end of turn, you may cast those cards without paying their mana costs."
+}

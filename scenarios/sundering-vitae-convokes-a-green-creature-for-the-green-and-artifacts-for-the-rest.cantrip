@@ -1,0 +1,33 @@
+# Convoke (CR 702.51a) pays colored mana too: Sundering Vitae costs {2}{G}, and tapping Llanowar Elves, a green creature,
+# pays the {G}; the two colorless Ornithopters pay {1} each. No land is tapped for it. It destroys Bot2's Mox Jet.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Ornithopter
+Ornithopter
+Sundering Vitae
+Forest
+Forest
+Forest x13
+
+[Bot2 Deck]
+Mox Jet
+Swamp x21
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Sundering Vitae.Cast(Mox Jet; Convoke: Llanowar Elves, Ornithopter, Ornithopter)
+[Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot2.Battlefield.Count = 0
+Bot2.Graveyard = Mox Jet
+Bot1.Battlefield.Llanowar Elves.Tapped = true

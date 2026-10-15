@@ -1,0 +1,5 @@
+{
+  "name": "Wasteland",
+  "type": "Land",
+  "oracleText": "{T}: Add {C}.\n{T}, Sacrifice Wasteland: Destroy target nonbasic land."
+}

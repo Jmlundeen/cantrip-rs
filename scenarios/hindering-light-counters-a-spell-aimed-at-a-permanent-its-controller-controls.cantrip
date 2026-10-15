@@ -1,0 +1,42 @@
+# Hindering Light: "Counter target spell that targets you or a permanent you control. Draw a card." Bot2's Lightning Bolt
+# is aimed at Bot1's Llanowar Elves, a permanent Bot1 controls: Bot1 counters it with a Mox Pearl and a Mox Sapphire held up
+# since turn 1, draws a card, and the Elves lives.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Hindering Light
+Llanowar Elves
+Plains x15
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Llanowar Elves)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Hindering Light.Cast(Stack.Lightning Bolt)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot2.Graveyard = Lightning Bolt
+Bot1.Graveyard = Hindering Light
+Bot1.Battlefield.Llanowar Elves.Damage = 0
+Bot1.Hand.Count = 3

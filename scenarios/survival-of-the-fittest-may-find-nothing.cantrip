@@ -1,0 +1,33 @@
+# Survival of the Fittest: "you don't have to find the card if you don't want to" - the search may come up empty, and still shuffles.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Survival of the Fittest
+Birds of Paradise
+Lightning Bolt
+Forest
+Forest
+Elvish Mystic
+Lightning Bolt
+Noble Hierarch
+Forest x8
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Survival of the Fittest.Cast
+Bot1.Battlefield.Survival of the Fittest.Activate
+Bot1.Choose(Birds of Paradise)
+Bot1.Search()
+[Bot1.Main1]
+
+[Expect]
+Turn = 1
+Bot1.Graveyard = Birds of Paradise; Black Lotus
+Bot1.Hand = Lightning Bolt; Forest; Forest
+Bot1.Library.Count = 11

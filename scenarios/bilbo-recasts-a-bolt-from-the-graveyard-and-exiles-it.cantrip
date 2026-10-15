@@ -1,0 +1,41 @@
+# Bot1 bolts Bot2 on turn one and casts Bilbo. On turn three Bilbo attacks, and as its trigger resolves Bot1 casts the
+# Bolt again out of its graveyard, paid with the Mountain tapped while the trigger was on the stack. Cast that way, the
+# instant is exiled rather than put back into the graveyard.
+
+[Bot1 Deck]
+Volcanic Island
+Mox Ruby
+Mox Sapphire
+Lightning Bolt
+Bilbo, Thief in the Night
+Mountain
+Island
+Island x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Volcanic Island.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Volcanic Island.Activate(Ability: {U})
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Bilbo, Thief in the Night.Cast
+[T3 Bot1.Main1]
+? Bot1.Graveyard = Lightning Bolt
+Bot1.Hand.Mountain.Play
+Bot1.Attack(Bilbo, Thief in the Night)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Choose(Lightning Bolt)
+Bot1.Target(Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 12
+Exile = Lightning Bolt
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield = Volcanic Island; Mox Ruby; Mox Sapphire; Bilbo, Thief in the Night; Mountain

@@ -1,0 +1,26 @@
+# Lotus Bloom has no mana cost, so suspend is the only way to put it on the stack (CR 702.62a, 118.6): on turn 1 Bot1 pays
+# {0} and exiles it with three time counters. It loses one at each of Bot1's next three upkeeps (turns 3, 5 and 7); when
+# the last is removed Bot1 casts it for free. It stays in exile until then, and the Bloom, once on the battlefield, taps
+# and is sacrificed for three red mana.
+
+[Bot1 Deck]
+Lotus Bloom
+Island x20
+
+[Bot2 Deck]
+Island x13
+
+[Actions]
+Bot1.Hand.Lotus Bloom.Suspend
+? Exile.Count = 1
+[T5 Bot1.Main1]
+? Exile.Count = 1
+[T7 Bot1.Upkeep]
+Bot1.Accept
+[T7 Bot1.Main1]
+? Exile.Count = 0
+Bot1.Battlefield.Lotus Bloom.Activate(Color: Red)
+
+[Expect]
+Bot1.Mana = {R}{R}{R}
+Bot1.Battlefield.Count = 0

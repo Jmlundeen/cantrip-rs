@@ -1,0 +1,8 @@
+{
+  "name": "Titania, Protector of Argoth",
+  "manaCost": "{3}{G}{G}",
+  "type": "Legendary Creature — Elemental",
+  "power": 5,
+  "toughness": 3,
+  "oracleText": "When Titania, Protector of Argoth enters, return target land card from your graveyard to the battlefield.\nWhenever a land you control is put into a graveyard from the battlefield, create a 5/3 green Elemental creature token."
+}

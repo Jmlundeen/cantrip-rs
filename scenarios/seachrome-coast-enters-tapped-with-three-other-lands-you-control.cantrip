@@ -1,0 +1,28 @@
+# "Enters tapped unless you control two or fewer other lands" (CR 614.1c): on turn 7 Bot1 plays the Coast with three Plains
+# already in play, so it enters tapped and cannot be tapped for mana (refused). The existing scenario has it untapped with
+# two other lands, and the scenario beside this one with none of Bot1's own while Bot2 has three.
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Seachrome Coast
+Plains x16
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Seachrome Coast.Play
+! Bot1.Battlefield.Seachrome Coast.Activate
+? Bot1.Battlefield.Seachrome Coast.Tapped = true
+
+[Expect]
+Turn = 7
+Bot1.Battlefield.Seachrome Coast.Tapped = true

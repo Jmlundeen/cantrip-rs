@@ -1,0 +1,28 @@
+# X of 0 is a legal announcement: no land is targeted (no target question is asked), the ability untaps nothing, and the
+# Candelabra is tapped all the same as the cost. The tapped Island stays tapped.
+
+[Bot1 Deck]
+Candelabra of Tawnos
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Candelabra of Tawnos.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Candelabra of Tawnos.Activate(X: 0)
+! Bot1.Target
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Candelabra of Tawnos.Tapped = True
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Island#1.Tapped = True

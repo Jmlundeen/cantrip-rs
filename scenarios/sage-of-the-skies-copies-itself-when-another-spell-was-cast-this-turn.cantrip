@@ -1,0 +1,29 @@
+# Sage of the Skies: "When you cast this spell, if you've cast another spell this turn, copy this spell. (The copy
+# becomes a token.)" Bot1 casts two Moxen and then the Sage; the intervening "if" (CR 603.4) holds, the trigger copies the
+# creature spell, and the copy becomes a token as it resolves (CR 707.10f): two Sages, both with flying and lifelink.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Sage of the Skies
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Sage of the Skies.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+[Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Plains; Mox Pearl; Mox Jet; Sage of the Skies; Sage of the Skies
+Bot1.Battlefield.Sage of the Skies#1.Keywords = Flying; Lifelink
+Bot1.Battlefield.Sage of the Skies#2.Keywords = Flying; Lifelink

@@ -1,0 +1,32 @@
+# A double-faced card sitting on the battlefield with its front face up, handed over at its controller's main phase.
+#
+# Both faces of a double-faced card are printed on it and both are public (CR 712.2), so a player may read the one
+# facing away whenever they may read the card at all. What the Wall becomes is the entire reason to play it, and a
+# client that holds only the face that is up is asking the player to already know. Served with:
+#
+# then hold the right mouse button down on Concealing Curtains to hold it up and read both faces.
+
+[Bot1 Deck]
+Swamp
+Concealing Curtains
+Swamp x16
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Concealing Curtains.Cast
+[T3 Bot1.Main1]
+[Handover Bot1.Pass]
+
+[Expect]
+Turn = 3
+Step = Main1
+ActivePlayer = Bot1
+PriorityPlayer = Bot1
+Stack.Count = 0
+# The front face is the one up, so the card is named and sized as Concealing Curtains and not as Revealing Eye.
+Bot1.Battlefield.Concealing Curtains.Power = 0
+Bot1.Battlefield.Concealing Curtains.Toughness = 4

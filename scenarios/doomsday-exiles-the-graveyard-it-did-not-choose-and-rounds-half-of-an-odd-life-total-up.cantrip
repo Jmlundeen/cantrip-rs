@@ -1,0 +1,35 @@
+# Doomsday at 17 life loses half rounded up, 9, and leaves 8. Every card of the graveyard that is not among the five
+# is exiled with the rest of the library: the Lightning Bolt that took the life total to 17 and the spent Black Lotus.
+
+[Bot1 Deck]
+Doomsday
+Black Lotus
+Mox Ruby
+Lightning Bolt
+Swamp x3
+Counterspell
+Mana Leak
+Ancestral Recall
+Time Walk
+Sol Ring
+Island
+Island
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Doomsday.Cast
+Bot1.Choose(Counterspell; Mana Leak; Sol Ring; Time Walk; Ancestral Recall)
+
+[Expect]
+Bot1.Library = Ancestral Recall; Time Walk; Sol Ring; Mana Leak; Counterspell
+Bot1.Graveyard = Doomsday
+Exile = Lightning Bolt; Black Lotus; Island; Island
+Bot1.Life = 8

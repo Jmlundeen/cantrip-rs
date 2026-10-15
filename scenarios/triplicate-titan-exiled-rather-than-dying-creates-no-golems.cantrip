@@ -1,0 +1,36 @@
+# Triplicate Titan's trigger is "when this creature dies" (CR 700.4): exiled by Swords to Plowshares it goes from the
+# battlefield to exile, not to a graveyard, so no Golem is made. Bot1 gains 9 life for its power.
+
+[Bot1 Deck]
+Swamp
+Dark Ritual
+Entomb
+Reanimate
+Black Lotus
+Swords to Plowshares
+Swamp
+Triplicate Titan
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Triplicate Titan)
+Bot1.Hand.Reanimate.Cast(Bot1.Graveyard.Triplicate Titan)
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Triplicate Titan)
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Life = 20
+Bot1.Battlefield = Swamp
+Exile = Triplicate Titan

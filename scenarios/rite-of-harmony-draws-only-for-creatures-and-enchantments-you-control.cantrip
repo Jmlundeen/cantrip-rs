@@ -1,0 +1,47 @@
+# The trigger is "a creature or enchantment you control enters": Sol Ring (an artifact) and an Island (a land) entering draw
+# nothing; Bot2's Snapcaster Mage, flashed in after the Rite resolved, is not under Bot1's control, so it draws nothing for
+# Bot1; and Oath of Druids (an enchantment) and Ornithopter (a creature) each draw a card. Hand counts are checked after each
+# step: the Oath's and Ornithopter's draws replace the card cast, so the hand stays at 2.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Rite of Harmony
+Black Lotus
+Sol Ring
+Oath of Druids
+Ornithopter
+Island x14
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Snapcaster Mage
+Island x17
+
+[Actions]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Rite of Harmony.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Sol Ring.Cast
+? Bot1.Hand.Count = 3
+Bot1.Hand.Island.Play
+? Bot1.Hand.Count = 2
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Snapcaster Mage.Cast
+? Bot1.Hand.Count = 2
+Bot1.Hand.Oath of Druids.Cast
+? Bot1.Hand.Count = 1
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 2

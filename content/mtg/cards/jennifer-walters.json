@@ -1,0 +1,24 @@
+{
+  "name": "Jennifer Walters",
+  "manaCost": "{1}{W}",
+  "type": "Legendary Creature — Human Advisor Hero",
+  "power": 2,
+  "toughness": 3,
+  "oracleText": "Your opponents can't cast spells during your turn.\n{3}{G}{W}{W}: Transform Jennifer Walters. Activate only as a sorcery.",
+  "backFace": {
+    "name": "The Sensational She-Hulk",
+    "manaCost": "{3}{G}{W}{W}",
+    "colorIndicator": [
+      "Green",
+      "White"
+    ],
+    "type": "Legendary Creature — Gamma Hero",
+    "power": 6,
+    "toughness": 6,
+    "oracleText": "Reach, trample\nYour opponents can't cast spells during your turn.\nWhenever a creature you control is dealt damage, you may have The Sensational She-Hulk deal that much damage to any target. Do this only once each turn.",
+    "keywords": [
+      "Reach",
+      "Trample"
+    ]
+  }
+}

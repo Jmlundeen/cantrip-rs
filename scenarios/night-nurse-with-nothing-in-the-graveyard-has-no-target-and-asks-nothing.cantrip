@@ -1,0 +1,29 @@
+# "Choose target permanent card in your graveyard that was put there from anywhere this turn": with an empty graveyard
+# there is no legal target, so the enters trigger is removed from the stack (CR 603.3d) and Bot1 is never asked for a
+# target; the control, with a milled Ornithopter to choose, is the scenario beside this one. Night Nurse stays a 2/1 lifelinker.
+
+[Bot1 Deck]
+Plains
+Plains
+Night Nurse, Healer of Heroes
+Plains x4
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Night Nurse, Healer of Heroes.Cast
+Bot1.Pass
+! Bot1.Target
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Night Nurse, Healer of Heroes.Keywords = Flash; Lifelink

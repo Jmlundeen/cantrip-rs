@@ -1,0 +1,50 @@
+# Ertai Resurrected, second mode: "Destroy another target creature or planeswalker. Its controller draws a card." Bot2
+# answers the trigger by discarding a Plains to make its Iron-Shield Elf indestructible until end of turn: the destroy does
+# nothing (CR 702.12b) and the Elf stays (tapped, by its own ability), but the draw is a separate instruction and still
+# happens. Bot2's hand: it discarded one card and drew one.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Ertai Resurrected
+Island x4
+Island x10
+
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Iron-Shield Elf
+Plains x4
+Plains x12
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Iron-Shield Elf.Cast
+Bot2.Pass
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ertai Resurrected.Cast
+Bot1.Modes(2)
+Bot2.Battlefield.Iron-Shield Elf.Activate
+Bot2.Choose(Plains)
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot2.Battlefield = Mox Jet; Mox Ruby; Iron-Shield Elf
+Bot2.Battlefield.Iron-Shield Elf.Tapped = true
+Bot2.Graveyard = Plains
+Bot2.Hand.Count = 5
+Bot1.Battlefield = Mox Sapphire; Ertai Resurrected

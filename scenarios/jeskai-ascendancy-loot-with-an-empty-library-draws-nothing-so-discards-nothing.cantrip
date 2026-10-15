@@ -1,0 +1,39 @@
+# "You may draw a card. If you do, discard a card": the discard follows a card actually drawn (CR 608.2c). Bot1's deck is its opening hand plus one Island, drawn on turn 3, so
+# its library is empty when Mox Jet triggers the loot. Bot1 accepts, the draw does nothing, and no discard is asked or made (nothing in the graveyard); Bot1 then loses
+# the game as state-based actions find the failed draw (CR 704.5b).
+
+[Bot1 Deck]
+Ornithopter
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Jeskai Ascendancy
+Mox Jet
+Island
+Island
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Jeskai Ascendancy.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Accept
+
+[Expect]
+Result = Bot2 won
+Bot1.Graveyard.Count = 0

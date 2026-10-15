@@ -1,0 +1,46 @@
+# The native rules engine (docs/engine-design.md). A workspace so that the build parallelises and an edit to
+# one card does not rebuild the engine. Card crates depend on cantrip-api alone: the compiler is the boundary.
+[workspace]
+resolver = "3"
+members = [
+    "crates/cantrip-state",
+    "crates/cantrip-api",
+    "crates/cantrip-rules",
+    "crates/cantrip-oracle",
+    "crates/cantrip-mechanics",
+    "crates/cantrip-cards",
+    "crates/cantrip-engine",
+    "crates/cantrip-script",
+    "crates/cantrip-bench",
+    "crates/cantrip-host",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[workspace.dependencies]
+cantrip-state = { path = "crates/cantrip-state" }
+cantrip-api = { path = "crates/cantrip-api" }
+cantrip-rules = { path = "crates/cantrip-rules" }
+cantrip-oracle = { path = "crates/cantrip-oracle" }
+cantrip-mechanics = { path = "crates/cantrip-mechanics" }
+cantrip-cards = { path = "crates/cantrip-cards" }
+cantrip-engine = { path = "crates/cantrip-engine" }
+cantrip-script = { path = "crates/cantrip-script" }
+cantrip-host = { path = "crates/cantrip-host" }
+
+[profile.release]
+opt-level = 3
+debug = "line-tables-only"
+codegen-units = 16
+
+[profile.bench]
+inherits = "release"
+
+# The card loop: release speed, with incremental compilation, so an edit to one card recompiles little more than it.
+[profile.cards]
+inherits = "release"
+incremental = true
+codegen-units = 256

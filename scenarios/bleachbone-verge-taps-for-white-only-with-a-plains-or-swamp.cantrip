@@ -1,0 +1,21 @@
+# Bleachbone Verge: its {W} ability is offered only while you control a Plains or a Swamp (CR 602.5b). Alone it
+# makes {B}; once a Plains is in play it makes {W}.
+
+[Bot1 Deck]
+Bleachbone Verge
+Plains
+Island x18
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Bleachbone Verge.Play
+! Bot1.Battlefield.Bleachbone Verge.Activate(Ability: {W})
+Bot1.Battlefield.Bleachbone Verge.Activate(Ability: {B})
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Bleachbone Verge.Activate(Ability: {W})
+
+[Expect]
+Bot1.Mana = {W}

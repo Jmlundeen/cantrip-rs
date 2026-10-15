@@ -1,0 +1,36 @@
+# Hindering Light: Bot2's Lightning Bolt at Bot1 targets a player Bot1 is, so Bot1 counters it and draws a card.
+
+[Bot1 Deck]
+Plains
+Mox Sapphire
+Mox Pearl
+Hindering Light
+Plains x4
+Island x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x5
+Mountain x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+? Stack = Lightning Bolt
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Hindering Light.Cast(Lightning Bolt)
+? Stack = Hindering Light; Lightning Bolt
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot1.Life = 20
+Bot1.Graveyard = Hindering Light
+Bot2.Graveyard = Lightning Bolt
+Bot1.Hand.Count = 4

@@ -1,0 +1,60 @@
+# The trigger needs creatures that attack YOU and are NOT blocked (CR 509.1h). Bot1 casts the Jewel and a Wrenn and Six (it comes from
+# the Jewel's own draws) on turn 1. Turn 4: Bot2's two Llanowar Elves attack, one at Bot1's planeswalker (not "you") and
+# one at Bot1, which Bot1's Ornithopter blocks (blocked, not "aren't blocked"). Nothing triggers: the Jewel stays Bot1's and Bot2 draws
+# nothing but its turn-4 card. Positive control: the existing scenario of the Jewel changing hands to an unblocked attacker.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Coveted Jewel
+Mox Ruby
+Mox Emerald
+Wrenn and Six
+Ornithopter
+Plains
+Plains x10
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Llanowar Elves
+Forest x12
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Coveted Jewel.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Wrenn and Six.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Llanowar Elves.Cast
+[T4 Bot2.Main1]
+Bot2.Attack(Llanowar Elves > Bot1.Battlefield.Wrenn and Six; Llanowar Elves#2 > Bot1)
+Bot1.Block(Ornithopter > Llanowar Elves#2)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Coveted Jewel.Tapped = false
+Bot2.Battlefield.Count = 4
+Bot1.Hand.Count = 2
+Bot2.Hand.Count = 5

@@ -1,0 +1,35 @@
+# Andúril, Narsil Reforged, equipped to an Ornithopter, puts a +1/+1 counter on each creature Bot1 controls when it attacks; Bot1 has no city's blessing, so one counter and not two.
+
+[Bot1 Deck]
+Mountain
+Sol Ring
+Black Lotus
+Andúril, Narsil Reforged
+Ornithopter
+Ornithopter
+Mountain
+Mountain x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Andúril, Narsil Reforged.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Andúril, Narsil Reforged.Activate(Bot1.Battlefield.Ornithopter#1; Ability: Equip)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter#1)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Ornithopter#1.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter#2.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Andúril, Narsil Reforged.AttachedTo = Ornithopter

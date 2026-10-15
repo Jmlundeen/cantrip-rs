@@ -1,0 +1,33 @@
+# Once Upon a Time: "If this spell is the first spell you've cast this game" - only spells Bot1 has cast count. Bot2's
+# Lightning Bolt on turn 2 is not one of them, so Bot1 casts Once Upon a Time without paying its cost in response (no
+# mana at all; the Bolt still resolves for 3). The top five cards of the library are Lightning Bolts: no creature or land
+# card among them, so nothing is revealed, nothing is asked and all five go to the bottom, leaving the hand as it was.
+
+[Bot1 Deck]
+Once Upon a Time
+Island x6
+Lightning Bolt x5
+Island x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x14
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot1.Hand.Once Upon a Time.Cast(Ability: Without)
+! Bot1.Arrange
+! Bot1.Choose
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 17
+Bot1.Graveyard = Once Upon a Time
+Bot1.Hand.Count = 6
+Bot1.Library.Count = 15

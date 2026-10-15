@@ -1,0 +1,46 @@
+# An empty hand: Bot1 casts three Ornithopters and then the Interpreter, so its hand is empty when "discard your hand"
+# resolves; nothing is discarded (the graveyard stays empty) and it still investigates four times. On turn three it
+# attacks as a 5/5 with menace (one card in hand after the draw) beside an Ornithopter. Bot2's lone Ornithopter cannot
+# block the Interpreter (menace, CR 702.110b - the refusal) but can block Bot1's Ornithopter (the positive control: the
+# same blocker on another attacker). The Interpreter connects for five.
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Pearl
+Ornithopter
+Ornithopter
+Ornithopter
+Carnage Interpreter
+Plains x13
+
+[Bot2 Deck]
+Ornithopter
+Plains x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Carnage Interpreter.Cast
+[Bot1.Main2]
+? Bot1.Graveyard.Count = 0
+? Bot1.Battlefield.Count = 11
+? Bot1.Battlefield.Carnage Interpreter.Keywords = Menace
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Carnage Interpreter; Ornithopter > Bot2)
+! Bot2.Block(Ornithopter > Carnage Interpreter)
+Bot2.Block(Ornithopter > Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 15
+Bot2.Battlefield.Ornithopter.Damage = 0

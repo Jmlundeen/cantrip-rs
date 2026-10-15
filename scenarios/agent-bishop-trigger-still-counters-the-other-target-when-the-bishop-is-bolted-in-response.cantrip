@@ -1,0 +1,39 @@
+# One of two targets becoming illegal (CR 608.2b) and the source leaving (CR 113.7a): on turn three the combat trigger
+# targets Bishop and Bot2's Ornithopter, and Bot2 answers with Lightning Bolt on Bishop. Bishop dies; the trigger is
+# independent of its source, so it still resolves and Ornithopter, still a legal target, gets its counter.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Pearl
+Agent Bishop, Man in Black
+Plains x10
+
+[Bot2 Deck]
+Ornithopter
+Mountain
+Lightning Bolt
+Mountain x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Hand.Agent Bishop, Man in Black.Cast
+Bot1.Target(Agent Bishop, Man in Black; Ornithopter)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Agent Bishop, Man in Black)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Agent Bishop, Man in Black
+Bot2.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot2.Graveyard = Lightning Bolt

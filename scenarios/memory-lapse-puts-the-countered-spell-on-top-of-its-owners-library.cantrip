@@ -1,0 +1,36 @@
+# Bot1 casts Lightning Bolt at Bot2. Bot2 counters it with Memory Lapse: the Bolt goes on top of Bot1's library, not into
+# the graveyard, and Bot2 takes no damage.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt
+Mountain x12
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Memory Lapse
+Island x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Stack = Lightning Bolt
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Memory Lapse.Cast(Lightning Bolt)
+? Stack = Memory Lapse; Lightning Bolt
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Graveyard.Count = 0
+Bot1.Library = Lightning Bolt; Mountain; Mountain; Mountain; Mountain; Mountain; Mountain; Mountain
+Bot2.Life = 20
+Bot2.Graveyard = Memory Lapse

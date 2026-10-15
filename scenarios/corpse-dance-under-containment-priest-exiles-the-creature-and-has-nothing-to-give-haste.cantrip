@@ -1,0 +1,49 @@
+# Containment Priest: "If a nontoken creature would enter and it wasn't cast, exile it instead." Corpse Dance does not cast the
+# creature, so Bot2's Priest exiles Bot1's Ornithopter as it would enter (CR 614.1a). The creature never reaches the battlefield, so
+# it gains no haste and nothing is waiting to exile it at the end step; Corpse Dance goes to the graveyard (no buyback).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Ornithopter
+Lightning Bolt
+Swamp
+Corpse Dance
+Swamp
+Island x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Containment Priest
+Plains x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Containment Priest.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Corpse Dance.Cast
+Bot1.Pass
+[T3 Bot1.End]
+? Stack.Count = 0
+[T4 Bot2.Main1]
+
+[Expect]
+Exile = Ornithopter
+Bot1.Battlefield = Swamp; Mox Jet; Mox Ruby
+Bot1.Graveyard = Corpse Dance; Lightning Bolt

@@ -1,0 +1,26 @@
+# The existing scenario fetches the Mountain; this takes the other type, an Island, with a Swamp refused (neither type), at
+# instant speed in Bot2's upkeep. The land enters untapped and Bot1 is at 19.
+
+[Bot1 Deck]
+Scalding Tarn
+Plains x6
+Swamp
+Island
+Mountain
+Plains x10
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Scalding Tarn.Play
+[T2 Bot2.Upkeep]
+Bot1.Battlefield.Scalding Tarn.Activate
+! Bot1.Search(Swamp)
+Bot1.Search(Island)
+[T2 Bot2.Main1]
+
+[Expect]
+Bot1.Life = 19
+Bot1.Battlefield = Island
+Bot1.Battlefield.Island.Tapped = False

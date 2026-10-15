@@ -1,0 +1,50 @@
+# "If a nontoken creature would enter and it wasn't cast, exile it instead." (CR 614.1a.) Containment Priest is cast
+# first - a cast creature enters, and it does not replace its own entry anyway - and then Bot1 reanimates Bot2's
+# Phyrexian Dragon Engine, discarded to Faithless Looting. The Dragon Engine would enter, was not cast, and is exiled
+# instead; Reanimate's life loss still happens, three for its mana value.
+
+[Bot1 Deck]
+Reanimate
+Swamp
+Swamp
+Mox Pearl
+Containment Priest
+Island x2
+Island x13
+
+[Bot2 Deck]
+Phyrexian Dragon Engine
+Faithless Looting
+Mountain x5
+Mountain x14
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Containment Priest.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield = Swamp; Mox Pearl; Containment Priest
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Faithless Looting.Cast
+Bot2.Choose(Phyrexian Dragon Engine; Mountain)
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Reanimate.Cast(Bot2.Graveyard.Phyrexian Dragon Engine)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Life = 17
+Bot1.Battlefield = Swamp; Swamp; Mox Pearl; Containment Priest
+Exile = Phyrexian Dragon Engine
+Bot2.Graveyard = Faithless Looting; Mountain

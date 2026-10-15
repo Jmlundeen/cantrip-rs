@@ -1,0 +1,23 @@
+# "Your upkeep" and "your draw step": Bot1's Mana Vault, left tapped, does not offer Bot1 the {4} payment or burn it in Bot2's turn-2 upkeep and draw step: Bot1 stays at 20 life
+# through Bot2's main phase.
+
+[Bot1 Deck]
+Mox Pearl
+Mana Vault
+Plains x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Mana Vault.Cast
+Bot1.Battlefield.Mana Vault.Activate
+[T2 Bot2.Main1]
+? Bot1.Life = 20
+? Bot1.Battlefield.Mana Vault.Tapped = true
+
+[Expect]
+Turn = 2
+Bot1.Life = 20

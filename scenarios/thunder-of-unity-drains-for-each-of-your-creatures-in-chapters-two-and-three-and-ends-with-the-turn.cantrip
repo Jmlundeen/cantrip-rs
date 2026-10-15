@@ -1,0 +1,61 @@
+# Chapter II (turn three) and chapter III (turn five) each make a delayed trigger lasting that turn (CR 603.7b): each creature that enters
+# under Bot1's control drains 1. Turn three: two Ornithopters drain twice (Bot1 18 -> 20, Bot2 -> 18), while Bot2's Sicarian Infiltrator,
+# flashed in during that turn, is not "a creature you control" and does not. Turn five: chapter III drains for a third Ornithopter, cast
+# after the Saga has been sacrificed (it leaves after III, CR 714.4), so the delayed trigger outlives the Saga. Turn seven: nothing is left.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Thunder of Unity
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter x8
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Sicarian Infiltrator
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Thunder of Unity.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Sicarian Infiltrator.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main2]
+? Bot1.Life = 20
+? Bot2.Life = 18
+[T5 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+[T5 Bot1.Main2]
+? Bot1.Graveyard = Thunder of Unity
+? Bot2.Life = 17
+[T7 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+[T7 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Life = 21
+Bot1.Graveyard = Thunder of Unity

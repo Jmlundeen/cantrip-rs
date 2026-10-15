@@ -1,0 +1,35 @@
+# Dismember's {1}{B/P}{B/P}: each Phyrexian symbol is paid with {B} or 2 life (CR 107.4f), announced before the target.
+# With only a Mox Jet and no other mana, the caster pays one symbol with the {B} and the other with 2 life, and
+# a Mox Ruby pays the {1}: 20 down to 18, and the Dark Confidant (2/1) gets -5/-5 and dies.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Dismember
+Island x12
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Dark Confidant
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Dark Confidant.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Dismember.Cast(Bot2.Battlefield.Dark Confidant)
+Bot1.Modes(1)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 18
+Bot2.Graveyard = Dark Confidant
+Bot1.Graveyard = Dismember

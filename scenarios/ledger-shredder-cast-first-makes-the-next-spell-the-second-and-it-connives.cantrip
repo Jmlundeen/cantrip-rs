@@ -1,0 +1,44 @@
+# Ledger Shredder, played for real. The ruling's other half: "If Ledger Shredder was the first spell you cast this
+# turn, the next spell you cast this turn is your second spell." Turn 5 Bot1 casts the Shredder first and a Pyrite
+# Spellbomb second; the Shredder is on the battlefield by then, so it connives - draws the third Spellbomb, discards
+# it, and is a 2/4 flier.
+
+[Bot1 Deck]
+Island
+Island
+Island
+Pyrite Spellbomb
+Ledger Shredder
+Island
+Island
+Island
+Island
+Pyrite Spellbomb
+Island x10
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Ledger Shredder.Cast
+Bot1.Battlefield.Island#3.Activate
+Bot1.Hand.Pyrite Spellbomb.Cast
+Bot1.Choose(Pyrite Spellbomb)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Ledger Shredder.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ledger Shredder.Power = 2
+Bot1.Battlefield.Ledger Shredder.Toughness = 4
+Bot1.Battlefield.Ledger Shredder.Keywords = Flying
+Bot1.Graveyard = Pyrite Spellbomb
+Bot1.Hand.Count = 4
+Stack.Count = 0

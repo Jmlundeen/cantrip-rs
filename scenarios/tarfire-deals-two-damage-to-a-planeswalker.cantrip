@@ -1,0 +1,40 @@
+# Tarfire at a planeswalker: "any target" includes planeswalkers; damage removes that many loyalty counters (CR 120.3c).
+# Bot2's Chandra, Torch of Defiance enters with 4 loyalty and is left with 2.
+
+[Bot1 Deck]
+Mountain x4
+Tarfire
+Mountain x25
+
+[Bot2 Deck]
+Mountain x4
+Chandra, Torch of Defiance
+Mountain x25
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T8 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mountain#2.Activate
+Bot2.Battlefield.Mountain#3.Activate
+Bot2.Battlefield.Mountain#4.Activate
+Bot2.Hand.Chandra, Torch of Defiance.Cast
+[T9 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Tarfire.Cast(Bot2.Battlefield.Chandra, Torch of Defiance)
+[T9 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Tarfire
+Bot2.Battlefield.Chandra, Torch of Defiance.Counters.Loyalty = 2

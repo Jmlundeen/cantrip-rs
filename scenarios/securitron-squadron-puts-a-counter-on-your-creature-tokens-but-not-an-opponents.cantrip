@@ -1,0 +1,58 @@
+# Securitron Squadron on the battlefield (turn 1, squad unpaid). On turn 2 Bot2 casts Lingering Souls: its two 1/1
+# Spirit tokens are creature tokens Bot1 does not control, so Bot1's Squadron puts nothing on them. On turn 3 Bot1
+# casts its own Lingering Souls: its two Spirits are creature tokens it controls, and each gets a +1/+1 counter as
+# it enters, becoming 2/2 fliers (CR 603.2, 603.6a).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Sol Ring
+Securitron Squadron
+Lingering Souls
+Plains
+Plains
+Island x12
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Sol Ring
+Lingering Souls
+Plains
+Plains
+Plains
+Mountain x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Securitron Squadron.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Lingering Souls.Cast
+[T2 Bot2.End]
+? Bot1.Battlefield.Count = 4
+? Bot2.Battlefield.Spirit#1.Power = 1
+? Bot2.Battlefield.Spirit#2.Power = 1
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Lingering Souls.Cast
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Spirit#1.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Spirit#2.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Spirit#1.Power = 2
+Bot2.Battlefield.Spirit#1.Power = 1
+Bot2.Battlefield.Spirit#2.Power = 1
+Bot2.Battlefield.Spirit#1.Counters.PlusOnePlusOne = (absent)

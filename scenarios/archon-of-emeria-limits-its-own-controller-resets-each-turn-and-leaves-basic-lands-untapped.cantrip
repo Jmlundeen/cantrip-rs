@@ -1,0 +1,57 @@
+# Archon of Emeria: "Each player can't cast more than one spell each turn" binds its own controller too (CR 101.2), the count
+# starts over every turn, and "Nonbasic lands your opponents control enter tapped" leaves a basic land untapped.
+# Turn 2: Bot2 casts Sol Ring and then Archon (three spells in a turn, all before the Archon is out: no limit yet).
+# Turn 3: Bot1's basic Plains enters untapped (the nonbasic land entering tapped is in the existing scenarios), and Bot1's
+# second spell is refused beside its first, allowed. Turn 4: Bot2 may cast one Mox, and the second is refused. Turn 6:
+# the count is fresh and Bot2 casts the second Mox.
+
+[Bot1 Deck]
+Plains
+Mox Jet
+Mox Ruby
+Plains x4
+Plains x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Sol Ring
+Archon of Emeria
+Mox Sapphire
+Mox Emerald
+Plains x3
+Plains x8
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Archon of Emeria.Cast
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield = Plains; Mox Pearl; Sol Ring; Archon of Emeria
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+? Bot1.Battlefield.Plains.Tapped = false
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mox Jet.Tapped = false
+! Bot1.Hand.Mox Ruby.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot1.Pass
+! Bot2.Hand.Mox Emerald.Cast
+[T6 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot2.Battlefield.Mox Emerald.Tapped = false
+Bot2.Battlefield.Mox Sapphire.Tapped = false

@@ -1,0 +1,6 @@
+{
+  "name": "Expedition Map",
+  "manaCost": "{1}",
+  "type": "Artifact",
+  "oracleText": "{2}, {T}, Sacrifice this artifact: Search your library for a land card, reveal it, put it into your hand, then shuffle."
+}

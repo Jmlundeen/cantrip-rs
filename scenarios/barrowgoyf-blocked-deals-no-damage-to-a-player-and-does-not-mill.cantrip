@@ -1,0 +1,54 @@
+# Same game as barrowgoyf-mills-that-many-and-keeps-a-creature, but Bot2 casts a free Ornithopter on turn 2 (so no
+# Mountain is discarded to hand size and Barrowgoyf is a 2/3: instant and sorcery). On turn 7 Bot2 blocks with an Ornithopter: Barrowgoyf deals its combat damage to a creature, not a player, so no trigger goes
+# on the stack (checked once the damage is dealt) and Bot1 is not asked. The unblocked attacks of the other scenarios are the positive controls.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Swamp
+Duress
+Barrowgoyf
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Island
+Guerrilla Gorilla
+Swamp x3
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Ornithopter
+Mountain x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Duress.Cast(Bot2)
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Swamp#3.Activate
+Bot1.Hand.Barrowgoyf.Cast
+[T7 Bot1.Main1]
+Bot1.Attack(Barrowgoyf)
+Bot2.Block(Ornithopter > Barrowgoyf)
+[T7 Bot1.Damage]
+? Stack.Count = 0
+[T7 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot1.Library.Count = 5
+Bot1.Graveyard = Duress
+Bot2.Graveyard.Count = 2
+Bot2.Battlefield.Count = 1

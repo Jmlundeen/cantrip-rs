@@ -1,0 +1,45 @@
+# Shredder sees the other permanents leave as they were (CR 603.10a), but it leaves with them: an overloaded Damn from Bot2 on turn two
+# destroys Shredder and Bot1's and Bot2's Ornithopters at the same time, the trigger finds Shredder gone, and nothing is put on a
+# permanent that no longer exists. Each graveyard holds two cards (Shredder and an Ornithopter for Bot1, the Damn and an Ornithopter for Bot2).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Super Shredder
+Ornithopter
+Island x13
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Damn
+Ornithopter
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Super Shredder.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl#1.Activate
+Bot2.Battlefield.Mox Pearl#2.Activate
+Bot2.Battlefield.Mox Pearl#3.Activate
+Bot2.Hand.Damn.Cast(Ability: Overload)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard.Count = 2
+Bot2.Graveyard.Count = 2
+Bot1.Battlefield.Count = 2

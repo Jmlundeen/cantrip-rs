@@ -1,0 +1,32 @@
+# Ornithopter is a 0/2 artifact creature with flying: It attacks on turn 3 for no damage (power 0): Bot2 stays at 20. On Bot2's turn 6 it blocks the Mystic, takes 1 damage and survives,
+# and the Mystic takes none.
+
+[Bot1 Deck]
+Ornithopter
+Forest x14
+
+[Bot2 Deck]
+Forest
+Elvish Mystic
+Forest x12
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+[T6 Bot2.Main1]
+Bot2.Attack(Elvish Mystic > Bot1)
+Bot1.Block(Ornithopter > Elvish Mystic)
+[T6 Bot2.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot1.Life = 20
+Bot1.Battlefield.Ornithopter.Damage = 1
+Bot2.Battlefield.Elvish Mystic.Damage = 0

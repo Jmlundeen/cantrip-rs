@@ -1,0 +1,53 @@
+# Bot2's Pest Infestation (X = 1) makes two Pest tokens ("when this token dies, you gain 1 life") and is exiled with a void
+# counter as it resolves, being a card. On turn 7 Bot1's Infernal Grasp destroys a Pest: a token is not a card (CR 108.2), so
+# Dauthi Voidwalker does not replace it - it goes to the graveyard, dies, and Bot2 gains the life.
+# (The Haywire Mite scenario is the positive control: a creature card never dies there.)
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Dauthi Voidwalker
+Swamp
+Infernal Grasp
+Swamp x15
+
+[Bot2 Deck]
+Forest
+Forest
+Forest
+Pest Infestation
+Forest x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dauthi Voidwalker.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Forest#2.Activate
+Bot2.Battlefield.Forest#3.Activate
+Bot2.Hand.Pest Infestation.Cast(X: 1)
+[T7 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Infernal Grasp.Cast(Bot2.Battlefield.Pest)
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main2]
+
+[Expect]
+Turn = 7
+Bot2.Life = 21
+Bot1.Life = 18
+Exile = Pest Infestation
+Bot2.Battlefield.Count = 4

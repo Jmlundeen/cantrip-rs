@@ -1,0 +1,46 @@
+# Dark Confidant's upkeep puts Time Walk into hand and loses two life. Opposing Sheoldred sees only the
+# ordinary draw on turns 3 and 5, not the upkeep move: final life is 20 - 2 - 2 - 2 = 14.
+# Ordered decks put exactly the two-mana card on top for the upkeep; no shuffle or seed search.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Dark Confidant
+Brainstorm
+Island
+Guerrilla Gorilla
+Lightning Bolt
+Mountain
+Time Walk
+Plains
+Island x10
+
+[Bot2 Deck]
+Swamp
+Black Lotus
+Sheoldred, the Apocalypse
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Sheoldred, the Apocalypse.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Dark Confidant.Cast
+[T5 Bot1.Main1]
+
+[Expect]
+Turn = 5
+Step = Main1
+Bot1.Life = 14
+Bot1.Hand = Brainstorm; Island; Guerrilla Gorilla; Lightning Bolt; Mountain; Time Walk; Plains
+Bot1.Battlefield = Swamp; Swamp; Dark Confidant
+Bot2.Battlefield = Swamp; Sheoldred, the Apocalypse
+Stack.Count = 0

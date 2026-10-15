@@ -1,0 +1,36 @@
+# With its only target gone (Fatal Push in response), Infernal Grasp does not resolve (CR 608.2b), so no life is lost.
+
+[Bot1 Deck]
+Swamp
+Infernal Grasp
+Island x15
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Jet
+Dark Confidant
+Fatal Push
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet#1.Activate
+Bot2.Battlefield.Mox Jet#2.Activate
+Bot2.Hand.Dark Confidant.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Infernal Grasp.Cast(Bot2.Battlefield.Dark Confidant)
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Fatal Push.Cast(Bot2.Battlefield.Dark Confidant)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Fatal Push; Dark Confidant
+Bot1.Graveyard = Infernal Grasp
+Bot1.Life = 20

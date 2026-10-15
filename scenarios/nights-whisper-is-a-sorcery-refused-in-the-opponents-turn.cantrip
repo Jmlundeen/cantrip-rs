@@ -1,0 +1,26 @@
+# A sorcery (CR 307.1): with Swamp and Mox Jet untapped it is not offered in Bot2's turn 2, and is cast in Bot1's own main
+# phase on turn 3 (the positive control): two cards drawn on top of the turn's draw, 2 life lost.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Night's Whisper
+Island x4
+Island x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+! Bot1.Hand.Night's Whisper.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Night's Whisper.Cast
+
+[Expect]
+Bot1.Life = 18
+Bot1.Hand.Count = 7

@@ -1,0 +1,31 @@
+# The Aetherspark's restriction lasts only while it is attached to a creature (CR 508.1c): unattached, the opponent's
+# Llanowar Elves attack it and take a loyalty counter off.
+[Bot1 Deck]
+Forest x3
+Black Lotus
+Llanowar Elves
+The Aetherspark
+Forest x20
+[Bot2 Deck]
+Forest x2
+Llanowar Elves
+Forest x20
+[Actions]
+Bot1.Hand.Forest.Play
+[Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.The Aetherspark.Cast
+[T4 Bot2.Main1]
+Bot2.Attack(Llanowar Elves > Bot1.Battlefield.The Aetherspark)
+[Bot2.Main2]
+? Bot1.Battlefield.The Aetherspark.Counters.Loyalty = 3
+[Expect]
+Bot1.Life = 20

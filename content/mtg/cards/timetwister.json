@@ -1,0 +1,6 @@
+{
+  "name": "Timetwister",
+  "manaCost": "{2}{U}",
+  "type": "Sorcery",
+  "oracleText": "Each player shuffles their hand and graveyard into their library, then draws seven cards. (Then put Timetwister into its owner's graveyard.)"
+}

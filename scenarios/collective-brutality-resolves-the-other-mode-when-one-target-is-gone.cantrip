@@ -1,0 +1,44 @@
+# A modal spell with two targets resolves while at least one is legal, and each mode acts on its own (CR 608.2b): Bot1 casts
+# Collective Brutality choosing the -2/-2 mode on Bot2's Llanowar Elves and the drain on Bot2, and Bot2 Swords its own Elves in
+# response. The Elves is gone, the -2/-2 mode does nothing, but the drain still happens: Bot2 loses 2 and Bot1 gains 2 (Bot2 is at 19: it gained 1 from the Swords, the Elves' power).
+
+[Bot1 Deck]
+Swamp
+Swamp
+Collective Brutality
+Demonic Tutor
+Swamp x10
+
+[Bot2 Deck]
+Forest
+Mox Pearl
+Llanowar Elves
+Swords to Plowshares
+Forest x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Collective Brutality.Cast
+Bot1.Modes(2; 3)
+Bot1.Target(Llanowar Elves)
+Bot1.Target(Bot2)
+Bot1.Choose(Demonic Tutor)
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot2.Life = 19
+Exile = Llanowar Elves

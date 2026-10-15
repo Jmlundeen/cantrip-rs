@@ -1,0 +1,35 @@
+# CR 702.166a, 406.3, 118.9. Bargained, Beseech the Mirror exiles the card it finds face down (Bot1 may look at it) and may
+# cast it without paying its mana cost if its mana value is 4 or less: Black Lotus, mana value 0, comes down from exile and is
+# not put into the hand. Bargain's sacrifice is Mox Jet, tapped for {B} first to help pay for the spell.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Black Lotus
+Beseech the Mirror
+Island x3
+Black Lotus
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Beseech the Mirror.Cast
+Bot1.Modes(Bargain:)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Choose(Mox Jet)
+Bot1.Search(Black Lotus)
+Bot1.Accept
+[T2 Bot2.Upkeep]
+
+[Expect]
+Exile.Count = 0
+Stack.Count = 0
+Bot1.Battlefield = Black Lotus; Swamp
+Bot1.Hand.Count = 3
+Bot1.Graveyard = Beseech the Mirror; Mox Jet; Black Lotus

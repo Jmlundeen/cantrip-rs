@@ -1,0 +1,32 @@
+# Deathrite Shaman, T: exile target land card from a graveyard, then add one mana of any color (here chosen red).
+
+[Bot1 Deck]
+Swamp
+Deathrite Shaman
+Forest
+Swamp
+Forest
+Swamp
+Forest
+Swamp x10
+
+[Bot2 Deck]
+Mountain x7
+Forest
+Mountain x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Deathrite Shaman.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Deathrite Shaman.Activate(Bot2.Graveyard.Forest; Ability: land)
+Bot1.Colors(Red)
+Bot1.Pass
+? Bot1.Mana = {R}
+? Bot2.Graveyard.Count = 0
+? Exile.Count = 1
+
+[Expect]
+Bot1.Battlefield.Deathrite Shaman.Tapped = true

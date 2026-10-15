@@ -1,0 +1,43 @@
+# Loot has haste, vigilance and double strike (CR 702.10, 702.20, 702.4): cast on turn 1 it attacks at once for 2 + 2 = 4 and, with
+# vigilance, is still untapped afterwards - so its {T} exhaust ability can be paid in the second main phase: Black Lotus gives
+# {U}{U}{U}, one pays "{U}, {T}: Draw three cards", and Loot is tapped then.
+
+[Bot1 Deck]
+Mountain
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Sol Ring
+Loot, the Pathfinder
+Black Lotus
+Island x10
+
+[Bot2 Deck]
+Island x13
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Loot, the Pathfinder.Cast
+Bot1.Pass
+Bot1.Attack(Loot, the Pathfinder > Bot2)
+[T1 Bot1.Main2]
+? Bot2.Life = 16
+? Bot1.Battlefield.Loot, the Pathfinder.Tapped = false
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Loot, the Pathfinder.Activate(Ability: Draw three cards)
+Bot1.Pass
+
+[Expect]
+Bot1.Hand.Count = 3
+Bot1.Battlefield.Loot, the Pathfinder.Tapped = true

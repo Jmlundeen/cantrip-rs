@@ -1,0 +1,19 @@
+{
+  "name": "Leave // Chance",
+  "oracleText": "",
+  "halves": [
+    {
+      "name": "Leave",
+      "manaCost": "{1}{W}",
+      "type": "Instant",
+      "oracleText": "Return any number of target permanents you own to your hand."
+    },
+    {
+      "name": "Chance",
+      "manaCost": "{3}{R}",
+      "type": "Sorcery",
+      "oracleText": "Aftermath (Cast this spell only from your graveyard. Then exile it.)\nDiscard any number of cards, then draw that many cards.",
+      "aftermath": true
+    }
+  ]
+}

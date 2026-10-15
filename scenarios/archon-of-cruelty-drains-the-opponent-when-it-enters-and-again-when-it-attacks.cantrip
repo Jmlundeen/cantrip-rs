@@ -1,0 +1,55 @@
+# Archon of Cruelty, cast on turn 1 off a Black Lotus, Sol Ring and three Moxen: when it enters, Bot2 (no creature to
+# sacrifice) discards a card and loses 3 life, and Bot1 draws and gains 3. On turn 3 it attacks: the trigger makes Bot2
+# sacrifice its Ornithopter, discard again and lose 3 more before Archon's 6 flying damage lands.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Sol Ring
+Mox Jet
+Mox Ruby
+Mox Pearl
+Archon of Cruelty
+Swamp x10
+
+[Bot2 Deck]
+Island
+Ornithopter
+Island x13
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Archon of Cruelty.Cast
+Bot2.Choose(Island)
+[T1 Bot1.Main2]
+? Stack.Count = 0
+? Bot1.Life = 23
+? Bot2.Life = 17
+? Bot2.Hand.Count = 6
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Archon of Cruelty > Bot2)
+Bot2.Choose(Island)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Life = 26
+Bot2.Life = 8
+Bot1.Hand.Count = 3
+Bot2.Hand.Count = 4
+Bot2.Battlefield = Island
+Bot2.Graveyard = Island; Ornithopter; Island

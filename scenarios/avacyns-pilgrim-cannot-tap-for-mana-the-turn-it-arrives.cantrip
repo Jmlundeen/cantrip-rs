@@ -1,0 +1,24 @@
+# "{T}: Add {W}" on a creature needs it not to be summoning sick (CR 302.6): the turn Avacyn's Pilgrim is cast it
+# is not offered (turn 1, main phase 2, with a Forest untapped and no stack), and the next turn it is - the positive control.
+
+[Bot1 Deck]
+Forest
+Avacyn's Pilgrim
+Forest x13
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Avacyn's Pilgrim.Cast
+[T1 Bot1.Main2]
+! Bot1.Battlefield.Avacyn's Pilgrim.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Avacyn's Pilgrim.Activate
+? Bot1.Mana = {W}
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Avacyn's Pilgrim.Tapped = true

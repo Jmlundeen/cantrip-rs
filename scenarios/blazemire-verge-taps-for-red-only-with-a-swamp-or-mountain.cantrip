@@ -1,0 +1,21 @@
+# Blazemire Verge: its {R} ability is offered only while you control a Swamp or a Mountain (CR 602.5b). Alone it
+# makes {B}; once a Swamp is in play (a Mountain would do as well) it makes {R}.
+
+[Bot1 Deck]
+Blazemire Verge
+Swamp
+Plains x18
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Blazemire Verge.Play
+! Bot1.Battlefield.Blazemire Verge.Activate(Ability: {R})
+Bot1.Battlefield.Blazemire Verge.Activate(Ability: {B})
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Blazemire Verge.Activate(Ability: {R})
+
+[Expect]
+Bot1.Mana = {R}

@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- Core holds the determinism primitives, so it holds itself to the banned-API list. -->
+    <EnforceDeterminism>true</EnforceDeterminism>
+  </PropertyGroup>
+
+</Project>

@@ -1,0 +1,25 @@
+# X = 0: "up to 0 targets" and twice 0 Pests. Pest Infestation costs just {G} and does nothing visible: Bot2's Mox Pearl survives and no token appears.
+
+[Bot1 Deck]
+Mox Emerald
+Pest Infestation
+Swamp x16
+
+[Bot2 Deck]
+Mox Pearl
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Pest Infestation.Cast(X: 0)
+[Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Battlefield = Mox Pearl
+Bot1.Battlefield = Mox Emerald
+Bot1.Graveyard = Pest Infestation

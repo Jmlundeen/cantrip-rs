@@ -1,0 +1,34 @@
+# A player who has lost has left the game (CR 800.4a), so he is no opponent. Bot3 has a seven-card library and draws from
+# the empty one on turn 3, losing. On turn 4 Bot1 casts Baleful Mastery for {1}{B} at his own Ornithopter: Bot2 is the only
+# opponent left, so nobody is asked and Bot2 draws, with the Ornithopter exiled.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Ornithopter
+Baleful Mastery
+Swamp x10
+
+[Bot2 Deck]
+Island x10
+
+[Bot3 Deck]
+Island x7
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+[T4 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Baleful Mastery.Cast(Ornithopter; Ability: {1}{B})
+Bot1.Pass
+! Bot1.ChoosePlayer
+[T4 Bot1.Main2]
+
+[Expect]
+Turn = 4
+Bot3.Status = Lost
+Exile = Ornithopter
+Bot2.Hand.Count = 8

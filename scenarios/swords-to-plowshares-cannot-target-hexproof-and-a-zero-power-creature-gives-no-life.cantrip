@@ -1,0 +1,36 @@
+# Swords to Plowshares: "target creature" means a creature that can be targeted (CR 115.1, 702.11): Bot2's Sylvan Caryatid has
+# hexproof and is refused beside the Ornithopter that is legal. The Ornithopter has power 0, so its controller gains 0 life
+# (CR 119.3: a total of zero or less is no life gained at all) and the exiled card is in exile.
+
+[Bot1 Deck]
+Plains
+Swords to Plowshares
+Plains x14
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Sylvan Caryatid
+Ornithopter
+Forest x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Sylvan Caryatid.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+! Bot1.Hand.Swords to Plowshares.Cast(Bot2.Battlefield.Sylvan Caryatid)
+Bot1.Hand.Swords to Plowshares.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Plains.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 20
+Exile = Ornithopter
+Bot2.Battlefield = Forest; Mox Emerald; Sylvan Caryatid

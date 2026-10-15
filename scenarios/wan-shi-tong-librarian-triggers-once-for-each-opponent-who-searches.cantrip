@@ -1,0 +1,48 @@
+# Wan Shi Tong, Librarian: "Whenever AN opponent searches their library" - in a three-player game both of Bot1's opponents count. Bot2 cracks
+# an Arid Mesa on turn 2 and Bot3 on turn 3, each finding a Plains: Wan Shi Tong gets a counter and Bot1 draws a card for each,
+# two in all (a 3/3 and two more cards; Bot1 drew on turn 1 as the first player of a three-player game, CR 103.8a).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Wan Shi Tong, Librarian
+Island x17
+
+[Bot2 Deck]
+Arid Mesa
+Plains x6
+Mountain
+Plains x10
+
+[Bot3 Deck]
+Arid Mesa
+Plains x6
+Mountain
+Plains x10
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Wan Shi Tong, Librarian.Cast(X: 0)
+[T2 Bot2.Main1]
+Bot2.Hand.Arid Mesa.Play
+Bot2.Battlefield.Arid Mesa.Activate
+Bot2.Search(Plains)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Wan Shi Tong, Librarian.Counters.PlusOnePlusOne = 1
+[T3 Bot3.Main1]
+Bot3.Hand.Arid Mesa.Play
+Bot3.Battlefield.Arid Mesa.Activate
+Bot3.Search(Plains)
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+[T3 Bot3.Main2]
+
+[Expect]
+Bot1.Battlefield.Wan Shi Tong, Librarian.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Wan Shi Tong, Librarian.Power = 3
+Bot1.Hand.Count = 7

@@ -1,0 +1,46 @@
+# Comet, Stellar Pup: "0: Roll a six-sided die." The [Dice] section fixes the faces: a 6 is [+1] and two more loyalty
+# activations this turn (CR 606.3); the second roll, a 1, is [+2] and two hasty 1/1 Squirrels; the third, a 3, is [-1]
+# and returns nothing (no card with mana value 2 or less is in the graveyard). A fourth activation is not offered.
+# Loyalty 5 + 1 + 2 - 1 = 7.
+
+[Dice]
+6; 1; 3
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Sol Ring
+Comet, Stellar Pup
+Island x20
+
+[Bot2 Deck]
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Comet, Stellar Pup.Cast
+Bot1.Pass
+Bot1.Battlefield.Comet, Stellar Pup.Activate
+Bot1.Pass
+Bot1.Battlefield.Comet, Stellar Pup.Activate
+Bot1.Pass
+Bot1.Battlefield.Comet, Stellar Pup.Activate
+Bot1.Pass
+! Bot1.Battlefield.Comet, Stellar Pup.Activate
+
+[Expect]
+Bot1.Battlefield.Comet, Stellar Pup.Counters.Loyalty = 7
+Bot1.Battlefield.Squirrel#1.Power = 1
+Bot1.Battlefield.Squirrel#2.SummoningSick = false

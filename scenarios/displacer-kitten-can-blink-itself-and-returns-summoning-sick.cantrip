@@ -1,0 +1,37 @@
+# Displacer Kitten: "nonland permanent you control" includes the Kitten itself. On turn 3 its trigger from casting Mox
+# Emerald targets the Kitten; it is exiled and returns as a new object (CR 400.7), summoning sick on a turn on which the
+# one that stayed would not be.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Displacer Kitten
+Plains x4
+Mox Emerald
+Plains x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Displacer Kitten.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Displacer Kitten.SummoningSick = false
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Target(Displacer Kitten)
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield = Mox Ruby; Mox Emerald; Displacer Kitten
+Bot1.Battlefield.Displacer Kitten.SummoningSick = true
+Exile.Count = 0

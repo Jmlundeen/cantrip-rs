@@ -1,0 +1,41 @@
+# The trigger is on casting (CR 601.2i, 603.2), not on the spell resolving: Bot2's Counterspell counters Bot1's Elvish
+# Mystic and the Door of Destinies still gets its charge counter (the trigger resolves after the counterspell).
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Emerald
+Door of Destinies
+Elvish Mystic
+Forest x12
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Island x12
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Door of Destinies.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Modes(Elf)
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Elvish Mystic)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Door of Destinies.Counters.Charge = 1
+Bot1.Graveyard = Elvish Mystic; Black Lotus
+Bot2.Graveyard = Counterspell

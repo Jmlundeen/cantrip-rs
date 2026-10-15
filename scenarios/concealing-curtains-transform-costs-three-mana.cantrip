@@ -1,0 +1,43 @@
+# Concealing Curtains: "{2}{B}: Transform this creature." Turn 3 Bot1 has Swamp, Swamp and Mox Jet; Mox Jet pays for a
+# second Curtains, which leaves two mana: the transformation, which costs three, is not offered (a refusal; unaffordable
+# activations are not offered). Turn 5 it has the third mana back and pays it with all three: the positive control.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Concealing Curtains
+Concealing Curtains
+Swamp
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Lightning Bolt
+Island x13
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Concealing Curtains.Cast
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Concealing Curtains.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Concealing Curtains.Activate
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Concealing Curtains.Activate
+Bot1.Choose(Lightning Bolt)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Revealing Eye.Types = Creature
+Bot2.Graveyard = Lightning Bolt; Island

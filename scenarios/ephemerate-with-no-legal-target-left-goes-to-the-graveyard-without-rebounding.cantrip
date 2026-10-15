@@ -1,0 +1,39 @@
+# Same ruling, the other way a spell doesn't resolve: its only target becomes illegal (CR 608.2b). Bot2 shoots Thraben
+# Inspector in response to Ephemerate, so Ephemerate does nothing, is put into the graveyard above the Inspector, and does
+# not rebound.
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Thraben Inspector
+Ephemerate
+Plains
+Plains
+Plains x13
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Thraben Inspector.Cast
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Ephemerate.Cast(Thraben Inspector)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Thraben Inspector)
+[T5 Bot1.Upkeep]
+? Exile.Count = 0
+
+[Expect]
+Turn = 5
+Exile.Count = 0
+Bot1.Graveyard = Ephemerate; Thraben Inspector
+Bot1.Battlefield = Plains; Plains; Clue Token
+Bot2.Graveyard = Lightning Bolt

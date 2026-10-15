@@ -1,0 +1,38 @@
+# Ajani entered before his Cat token, so a sequential destruction loop used to remove the observer first.
+# The simultaneous event must still offer Ajani's dies-trigger choice. Accepting cannot return him:
+# the trigger refers to the old battlefield existence, not the new card in the graveyard.
+
+[Bot1 Deck]
+Plains x4
+Ajani, Nacatl Pariah
+Wrath of God
+Plains x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Ajani, Nacatl Pariah.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Wrath of God.Cast
+Bot1.Accept
+
+[Expect]
+Turn = 7
+Bot1.Battlefield = Plains; Plains; Plains; Plains
+Bot1.Graveyard = Wrath of God; Ajani, Nacatl Pariah
+Bot1.Life = 20
+Bot2.Life = 20
+Stack.Count = 0

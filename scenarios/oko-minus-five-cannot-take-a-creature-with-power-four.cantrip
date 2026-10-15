@@ -1,0 +1,66 @@
+# Oko, Thief of Crowns' -5 takes "target creature an opponent controls with power 3 or less". Turn 3: Bot2's only creature
+# is a 4/4 Questing Beast, so there is no legal second target and the ability is not offered (Oko has the loyalty: 6).
+# Turn 5, with a Llanowar Elves beside it, the same ability is offered and exchanges the Mox for the Elves.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Sapphire
+Oko, Thief of Crowns
+Forest x3
+Forest x10
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Mox Ruby
+Questing Beast
+Llanowar Elves
+Forest x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Oko, Thief of Crowns.Cast
+Bot1.Pass
+Bot1.Battlefield.Oko, Thief of Crowns.Activate(Ability: Food)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Questing Beast.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Oko, Thief of Crowns.Activate(Ability: Exchange)
+Bot1.Battlefield.Oko, Thief of Crowns.Activate(Ability: Food)
+[T4 Bot2.Main1]
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Oko, Thief of Crowns.Activate(Ability: Exchange)
+Bot1.Target(Mox Sapphire)
+Bot1.Target(Llanowar Elves)
+Bot1.Pass
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Llanowar Elves.Types = Creature
+Bot2.Battlefield.Mox Sapphire.Types = Artifact
+Bot1.Battlefield.Oko, Thief of Crowns.Counters.Loyalty = 3

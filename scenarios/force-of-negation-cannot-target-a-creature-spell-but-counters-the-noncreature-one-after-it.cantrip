@@ -1,0 +1,33 @@
+# "Counter target noncreature spell": Bot2's Ornithopter, a creature spell, is not a legal target (CR 115.1) so Force of
+# Negation is refused against it, with a Brainstorm in Bot1's hand to pay the alternative cost. It resolves; Bot2's
+# Lightning Bolt cast next is the control, and Force of Negation counters and exiles it.
+
+[Bot1 Deck]
+Force of Negation
+Brainstorm
+Island x5
+Island x10
+
+[Bot2 Deck]
+Mountain
+Ornithopter
+Lightning Bolt
+Mountain x4
+Mountain x10
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Ornithopter.Cast
+! Bot1.Hand.Force of Negation.Cast(Stack.Ornithopter; Ability: exile a blue card)
+Bot1.Pass
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Hand.Force of Negation.Cast(Stack.Lightning Bolt; Ability: exile a blue card)
+Bot1.Choose(Brainstorm)
+Bot1.Pass
+
+[Expect]
+Exile = Brainstorm; Lightning Bolt
+Bot2.Battlefield.Ornithopter.Power = 0
+Bot1.Life = 20

@@ -1,0 +1,31 @@
+# Casting Lightning Bolt with Third Path Iconoclast out makes a 1/1 colorless Soldier artifact creature token.
+[Bot1 Deck]
+Third Path Iconoclast
+Mox Sapphire
+Mox Ruby
+Black Lotus
+Lightning Bolt
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Third Path Iconoclast.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Soldier#1.Types = Artifact; Creature
+Bot1.Battlefield.Soldier#1.Subtypes = Soldier
+Bot1.Battlefield.Soldier#1.Power = 1
+Bot1.Battlefield.Soldier#1.Toughness = 1
+Bot1.Battlefield.Soldier#2.Types = Artifact; Creature
+Bot1.Battlefield.Soldier#2.Power = 1
+Bot2.Life = 17

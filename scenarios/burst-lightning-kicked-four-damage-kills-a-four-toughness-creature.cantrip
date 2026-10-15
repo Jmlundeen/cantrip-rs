@@ -1,0 +1,42 @@
+# Burst Lightning kicked (CR 702.33) deals 4 damage instead of 2 to a creature: exactly lethal to Bot2's Ulvenwald Oddity
+# (4/4), which dies, where the unkicked scenario leaves it alive. Kicker {4} is paid with the Moxen; Bot1 chooses to kick.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Emerald
+Burst Lightning
+Island x12
+
+[Bot2 Deck]
+Forest
+Black Lotus
+Ulvenwald Oddity
+Forest x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot2.Hand.Forest.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Ulvenwald Oddity.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Forest.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Burst Lightning.Cast(Bot2.Battlefield.Ulvenwald Oddity; Kicked: 1)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Ulvenwald Oddity; Black Lotus
+Bot2.Battlefield = Forest
+Bot1.Graveyard = Burst Lightning

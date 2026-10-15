@@ -1,0 +1,51 @@
+# Ertai Resurrected, first mode, against an activated ability: Bot2 activates its Currency Converter ({2}, {T}: Draw a card,
+# then discard a card) and Bot1 flashes in Ertai in response (paid with a Black Lotus and a Mox Sapphire), countering the
+# ability. The cost stays paid (CR 602.2), the loot does not happen, and Ertai's draw goes to Bot2, the controller of the
+# ability: its hand ends a card larger than the loot would have left it (a loot draws and discards; Ertai only draws).
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Ertai Resurrected
+Island x4
+Island x10
+
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Currency Converter
+Plains x3
+Plains x12
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Currency Converter.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Currency Converter.Activate(Ability: Draw a card)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ertai Resurrected.Cast
+Bot1.Modes(1)
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot2.Battlefield.Currency Converter.Tapped = true
+Bot2.Hand.Count = 5
+Bot2.Graveyard.Count = 0
+Bot1.Battlefield = Mox Sapphire; Ertai Resurrected

@@ -1,0 +1,55 @@
+# The Great Henge rewards "a nontoken creature you control": after it is cast as in the cost-reduction scenario, the two Pest tokens of a
+# Pest Infestation (X = 1, paid by the Henge's {G}{G} and a Mox Emerald) draw nothing, Bot2's own Ornithopter draws nothing for Bot1, and
+# Bot1's Ornithopter does draw.
+[Bot1 Deck]
+Forest
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Mox Emerald
+Llanowar Elves
+Black Lotus
+The Great Henge
+Pest Infestation
+Ornithopter
+Forest x12
+
+[Bot2 Deck]
+Island
+Plains
+Ornithopter
+Island x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.The Great Henge.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T5 Bot1.Main1]
+? Bot1.Library.Count = 13
+Bot1.Battlefield.The Great Henge.Activate(Ability: Add {G}{G})
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Pest Infestation.Cast(X: 1)
+Bot1.Pass
+[T5 Bot1.Main2]
+? Bot1.Library.Count = 13
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+? Bot1.Library.Count = 12
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1

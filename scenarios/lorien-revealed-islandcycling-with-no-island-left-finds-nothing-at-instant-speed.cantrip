@@ -1,0 +1,23 @@
+# Cycling is an activated ability, usable whenever Bot1 has priority: here in Bot2's upkeep on turn 2, with Plains for the
+# {1}. The library holds no Island card, so the search finds nothing (CR 701.23b) and the Lórien still ends in the graveyard,
+# its cost paid; the hand gains nothing.
+
+[Bot1 Deck]
+Plains
+Lórien Revealed
+Plains x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Upkeep]
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Lórien Revealed.Activate(Ability: Islandcycling)
+Bot1.Search()
+[T2 Bot2.Main1]
+
+[Expect]
+Bot1.Graveyard = Lórien Revealed
+Bot1.Hand.Count = 5

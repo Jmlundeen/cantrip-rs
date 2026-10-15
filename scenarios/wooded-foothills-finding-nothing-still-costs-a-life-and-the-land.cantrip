@@ -1,0 +1,24 @@
+# The life and the sacrifice are costs, paid before the search (CR 602.2b): with no Mountain or Forest card in the library the search finds
+# nothing (CR 701.23b), yet Bot1 is at 19 and the Foothills are in the graveyard.
+
+[Bot1 Deck]
+Wooded Foothills
+Island x6
+Plains
+Swamp
+Island x10
+
+[Bot2 Deck]
+Swamp x15
+
+[Actions]
+Bot1.Hand.Wooded Foothills.Play
+Bot1.Battlefield.Wooded Foothills.Activate
+! Bot1.Search(Plains)
+! Bot1.Search(Swamp)
+Bot1.Search()
+
+[Expect]
+Bot1.Life = 19
+Bot1.Battlefield.Count = 0
+Bot1.Graveyard = Wooded Foothills

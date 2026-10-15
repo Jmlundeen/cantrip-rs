@@ -1,0 +1,42 @@
+# Smuggler's Copter: "you may draw a card. If you do, discard a card." Bot1 attacks with the crewed Copter on turn 3 and
+# declines: no card is drawn or discarded (hand and library unchanged), though it still hits for 3 in the air. The control, where
+# the loot happens, is smugglers-copter-attacks-and-loots.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Sol Ring
+Llanowar Elves
+Smuggler's Copter
+Forest
+Forest
+Forest
+Island
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Smuggler's Copter.Cast
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 3
+? Bot1.Library.Count = 11
+Bot1.Battlefield.Smuggler's Copter.Activate(Ability: Crew)
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Smuggler's Copter)
+Bot1.Decline
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Graveyard.Count = 0
+Bot1.Hand.Count = 3
+Bot1.Library.Count = 11

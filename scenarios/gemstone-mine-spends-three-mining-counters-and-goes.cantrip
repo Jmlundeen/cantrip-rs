@@ -1,0 +1,42 @@
+# Gemstone Mine enters with three mining counters -- its own kind, since a counter is its name (CR 122.1) -- and
+# taps for one mana of any color, spending a counter each time. Bot1 spends the first two on Lightning Bolts in two
+# colors' worth of turns, and the third one sacrifices the Mine as the mana ability resolves — the mana is still
+# there, so the third Bolt is cast off a land that is already in the graveyard.
+
+[Bot1 Deck]
+Gemstone Mine
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Island x13
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Gemstone Mine.Play
+? Bot1.Battlefield.Gemstone Mine.Counters.Mining = 3
+? Bot1.Battlefield.Gemstone Mine.Tapped = false
+Bot1.Battlefield.Gemstone Mine.Activate(Color: Red)
+? Bot1.Mana = {R}
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Bot1.Battlefield.Gemstone Mine.Counters.Mining = 2
+
+[T3 Bot1.Main1]
+Bot1.Battlefield.Gemstone Mine.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Bot1.Battlefield.Gemstone Mine.Counters.Mining = 1
+
+[T5 Bot1.Main1]
+Bot1.Battlefield.Gemstone Mine.Activate(Color: Red)
+? Bot1.Mana = {R}
+? Bot1.Graveyard = Gemstone Mine; Lightning Bolt; Lightning Bolt
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+
+[T6 Bot2.Main1]
+
+[Expect]
+Turn = 6
+Bot2.Life = 11
+Bot1.Battlefield =
+Bot1.Graveyard = Lightning Bolt; Gemstone Mine; Lightning Bolt; Lightning Bolt

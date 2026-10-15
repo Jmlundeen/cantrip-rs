@@ -1,0 +1,35 @@
+# The Blood token Voldaren Epicure makes works as printed: on turn 3 Bot1 pays {1}, taps it, discards a card and
+# sacrifices it to draw a card: the Bolt goes to the graveyard, the token is gone, and the next card, Mox Jet, is drawn.
+
+[Bot1 Deck]
+Mountain
+Voldaren Epicure
+Mountain
+Mountain
+Mountain
+Mountain
+Mountain
+Lightning Bolt
+Mox Jet
+Mountain x6
+
+[Bot2 Deck]
+Island x13
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Voldaren Epicure.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Blood Token.Activate
+Bot1.Choose(Lightning Bolt)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mountain; Mountain; Voldaren Epicure
+Bot1.Graveyard = Lightning Bolt
+Bot1.Hand = Mountain; Mountain; Mountain; Mountain; Mox Jet
+Bot1.Library.Count = 6
+Bot2.Life = 19

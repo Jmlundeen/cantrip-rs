@@ -1,0 +1,34 @@
+# Two Deadly Disputes in a row: the first sacrifices Mox Jet and makes a Treasure; the second pays its additional cost by
+# sacrificing that Treasure token (an artifact, CR 111.10a), which ceases to exist, and makes a new one. Only one Treasure is
+# left, four cards were drawn in all, and Mox Jet is in the graveyard (a token goes to no graveyard that stays).
+
+[Bot1 Deck]
+Mox Jet
+Swamp
+Swamp
+Deadly Dispute
+Deadly Dispute
+Swamp x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Deadly Dispute.Cast
+Bot1.Choose(Mox Jet)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Deadly Dispute.Cast
+Bot1.Choose(Treasure Token)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Deadly Dispute; Deadly Dispute; Mox Jet
+Bot1.Battlefield = Swamp; Swamp; Treasure Token
+Bot1.Hand.Count = 7

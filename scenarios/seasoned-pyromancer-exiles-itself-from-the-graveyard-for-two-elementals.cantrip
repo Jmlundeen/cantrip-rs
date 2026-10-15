@@ -1,0 +1,33 @@
+# Seasoned Pyromancer: Bot1 discards it to Faithless Looting, then pays {3}{R}{R} and exiles it from the graveyard for
+# two 1/1 red Elemental tokens.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Black Lotus
+Faithless Looting
+Seasoned Pyromancer
+Island
+Island x3
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Seasoned Pyromancer; Island)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Graveyard.Seasoned Pyromancer.Activate
+
+[Expect]
+Exile = Seasoned Pyromancer
+Bot1.Battlefield = Mountain; Mox Ruby; Mox Jet; Elemental; Elemental

@@ -1,0 +1,11 @@
+{
+  "name": "Headliner Scarlett",
+  "manaCost": "{3}{R}",
+  "type": "Legendary Creature — Human Warlock",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Haste\nWhen Headliner Scarlett enters, creatures target player controls can't block this turn.\nAt the beginning of your upkeep, exile the top card of your library face down. You may look at and play that card this turn.",
+  "keywords": [
+    "Haste"
+  ]
+}

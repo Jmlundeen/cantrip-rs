@@ -1,0 +1,55 @@
+# Tendrils of Agony: Storm is a triggered ability that goes on the stack above the spell (CR 702.40a). On turn 3 Bot1 casts
+# Mox Jet, Mox Ruby and Black Lotus (storm count 3), then Tendrils of Agony. Bot2 counters Tendrils with Counterspell (an
+# Island and a Mox Sapphire) while the storm trigger is still on the stack. The trigger resolves and makes three copies, each
+# targeting Bot2 again: Bot2 loses 2 life three times and Bot1 gains 6. The countered original does nothing.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Black Lotus
+Tendrils of Agony
+Swamp
+Swamp
+Swamp x12
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Island x4
+Island x12
+
+[Actions]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Tendrils of Agony.Cast(Bot2)
+Bot1.Pass
+Bot2.Hand.Counterspell.Cast(Stack.Tendrils of Agony)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2)
+Bot1.Target(Bot2)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Counterspell
+Bot2.Life = 14
+Bot1.Life = 26

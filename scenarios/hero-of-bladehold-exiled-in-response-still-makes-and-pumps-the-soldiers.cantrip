@@ -1,0 +1,53 @@
+# Both triggers are on the stack when Bot2 exiles Hero of Bladehold with Swords to Plowshares (Bot1 gains its 3 power as life).
+# The abilities exist independently of their source (CR 113.7a): the Soldiers are still created tapped and attacking, and
+# battle cry still resolves and gives them +1/+0, so Bot2 takes 2 + 2.
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Plains
+Hero of Bladehold
+Plains
+Plains
+Plains x13
+
+[Bot2 Deck]
+Plains
+Swords to Plowshares
+Plains x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Hero of Bladehold.Cast
+[T9 Bot1.Main1]
+Bot1.Attack(Hero of Bladehold > Bot2)
+Bot1.Triggers(battle cry; Soldier)
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Hero of Bladehold)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Soldier#1.Power = 2
+? Bot1.Battlefield.Soldier#2.Power = 2
+[T9 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot1.Life = 23
+Exile = Hero of Bladehold

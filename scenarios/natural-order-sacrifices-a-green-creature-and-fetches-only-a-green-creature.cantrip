@@ -1,0 +1,41 @@
+# Natural Order: "As an additional cost to cast this spell, sacrifice a green creature. Search your library for a green creature
+# card, put it onto the battlefield, then shuffle." Bot1 sacrifices a Llanowar Elves and may then find Questing Beast, but not a
+# colorless Ornithopter, a black Sheoldred, the Apocalypse (creature cards that are not green) or a Mountain (not a creature):
+# the refusals. Questing Beast comes onto the battlefield; the Elves are in the graveyard.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Black Lotus
+Llanowar Elves
+Natural Order
+Island x2
+Questing Beast
+Ornithopter
+Sheoldred, the Apocalypse
+Mountain
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Natural Order.Cast
+Bot1.Choose(Llanowar Elves)
+! Bot1.Search(Ornithopter)
+! Bot1.Search(Sheoldred, the Apocalypse)
+! Bot1.Search(Mountain)
+Bot1.Search(Questing Beast)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Emerald; Mox Ruby; Questing Beast
+Bot1.Graveyard = Natural Order; Llanowar Elves; Black Lotus

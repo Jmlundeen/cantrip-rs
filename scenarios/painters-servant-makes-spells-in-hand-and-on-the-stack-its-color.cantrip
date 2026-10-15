@@ -1,0 +1,44 @@
+# "All cards that aren't on the battlefield, spells, and permanents are the chosen color in addition to their other colors": Bot1's Painter's Servant chooses black, so Walking Ballista
+# (colorless) is a black creature spell in hand and on the stack, and Bontu's Monument ("black creature spells you cast cost {1} less") takes {1} off its {1}{1} for X = 1: Bot1 pays
+# with a single Mox (the script gives one payment, so a full-price cast would fail the script). Turn 1: Servant and the Moxen; turn 3: the Monument, then the Ballista.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Painter's Servant
+Bontu's Monument
+Walking Ballista
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Painter's Servant.Cast
+Bot1.Colors(Black)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Bontu's Monument.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Walking Ballista.Cast(X: 1)
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Painter's Servant.ChosenColor = Black
+Bot1.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 1
+Bot1.Mana = 

@@ -1,0 +1,48 @@
+# CR 702.103f: a bestowed Phoenix stops being an Aura when the creature it enchants leaves, and stays as a creature. Bot1 bestows it on the Ornithopter (a 2/4 flyer, evidence: Griselbrand), then Bot2 exiles the Ornithopter
+# with Swords to Plowshares: Bot1 gains 2 life (the Ornithopter's power with the Phoenix) and the Phoenix is an unattached 2/2 creature.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Ornithopter
+Faithless Looting
+Detective's Phoenix
+Griselbrand
+Mountain
+Mountain x12
+
+[Bot2 Deck]
+Plains
+Swords to Plowshares
+Plains x13
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Griselbrand; Mountain)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Detective's Phoenix.Cast(Bot1.Battlefield.Ornithopter; Ability: Bestow)
+Bot1.Choose(Griselbrand)
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Ornithopter.Power = 2
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Exile.Count = 2
+Bot1.Life = 22
+Bot1.Battlefield.Detective's Phoenix.AttachedTo = (absent)
+Bot1.Battlefield.Detective's Phoenix.Types = Enchantment; Creature
+Bot1.Battlefield.Detective's Phoenix.Power = 2

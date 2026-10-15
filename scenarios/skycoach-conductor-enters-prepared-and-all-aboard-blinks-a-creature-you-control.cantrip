@@ -1,0 +1,39 @@
+# Skycoach Conductor enters prepared (CR 722.3a), so a copy of All Aboard waits in exile. Casting that copy exiles
+# Bot1's Ornithopter and returns it under its owner's control (CR 610.3): it is a new object, so it is summoning-sick
+# again, and casting the copy unprepares the Conductor and takes the copy with it.
+
+[Bot1 Deck]
+Ornithopter
+Island x5
+Skycoach Conductor
+Island x13
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Skycoach Conductor.Cast
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Skycoach Conductor.Prepared = true
+? Exile = All Aboard
+? Bot1.Battlefield.Ornithopter.SummoningSick = false
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Exile.All Aboard.Cast(Bot1.Battlefield.Ornithopter)
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.SummoningSick = true
+Bot1.Battlefield.Skycoach Conductor.Prepared = (absent)
+Exile.Count = 0
+Bot1.Battlefield = Island; Island; Island; Island; Ornithopter; Skycoach Conductor

@@ -1,0 +1,39 @@
+# Legion Extruder: its enters trigger deals 2 damage to any target, and {2}, {T}, Sacrifice another artifact makes a
+# 3/3 Golem artifact creature token. A Mox Ruby and a Mountain pay for it; the Mox is sacrificed on the next turn.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Legion Extruder
+Mountain
+Mountain
+Mountain
+Mountain
+Mountain x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Legion Extruder.Cast
+Bot1.Target(Bot2)
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Legion Extruder.Activate
+[Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot2.Life = 18
+Bot1.Graveyard = Mox Ruby
+Bot1.Battlefield.Golem.Power = 3
+Bot1.Battlefield.Golem.Toughness = 3
+Bot1.Battlefield.Golem.Types = Artifact; Creature
+Bot1.Battlefield.Golem.Subtypes = Golem
+Bot1.Battlefield.Legion Extruder.Tapped = true

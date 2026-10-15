@@ -1,0 +1,45 @@
+# Forensic Gadgeteer: "Activated abilities of artifacts you control cost {1} less to activate." A Basking Rootwalla is not an
+# artifact: its {1}{G} ability costs the full two mana, paid with two Forests, and nothing is left in the pool
+# (a discounted cost would leave a mana floating). The Rootwalla becomes a 3/3.
+
+[Bot1 Deck]
+Forest
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Forensic Gadgeteer
+Basking Rootwalla
+Forest
+Forest x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Forensic Gadgeteer.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Basking Rootwalla.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Basking Rootwalla.Activate
+? Bot1.Mana =
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Basking Rootwalla.Power = 3
+Bot1.Battlefield.Basking Rootwalla.Toughness = 3

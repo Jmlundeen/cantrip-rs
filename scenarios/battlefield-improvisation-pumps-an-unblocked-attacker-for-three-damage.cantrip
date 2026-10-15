@@ -1,0 +1,30 @@
+# The pump is real for combat: Mother of Runes (1/1), cast on turn one, attacks on turn three and is unblocked; after
+# attackers are declared Battlefield Improvisation makes it 3/3, so Bot2 takes three, not one. (The Equipment clause for
+# an attacking creature is not implemented by the card yet, so no scenario here has an Equipment.)
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mother of Runes
+Battlefield Improvisation
+Plains x11
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Mother of Runes.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Attack(Mother of Runes)
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Battlefield Improvisation.Cast(Mother of Runes)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Mother of Runes.Power = 3

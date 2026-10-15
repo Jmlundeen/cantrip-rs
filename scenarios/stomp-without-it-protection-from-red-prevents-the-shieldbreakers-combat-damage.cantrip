@@ -1,0 +1,43 @@
+# The control for "damage can't be prevented": the same turn 5 without Stomp. Giver of Runes gives the blocking Ornithopter protection from red and the red Embereth Shieldbreaker's damage is prevented, so the 0/2 Ornithopter survives.
+
+[Bot1 Deck]
+Mountain
+Embereth Shieldbreaker
+Mountain
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Plains
+Giver of Runes
+Plains
+Ornithopter
+Plains x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Giver of Runes.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Embereth Shieldbreaker.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Ornithopter.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Attack(Embereth Shieldbreaker > Bot2)
+Bot2.Block(Ornithopter > Embereth Shieldbreaker)
+Bot2.Battlefield.Giver of Runes.Activate(Ornithopter)
+Bot2.Decline
+Bot2.Colors(Red)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot2.Graveyard.Count = 0
+Bot2.Battlefield.Ornithopter.Damage = 0

@@ -1,0 +1,21 @@
+# Firebolt: "Firebolt deals 2 damage to any target." Cast from hand for {R} at a player, it resolves and, having not
+# been flashed back, goes to its owner's graveyard rather than exile (CR 608.2n).
+
+[Bot1 Deck]
+Firebolt
+Mountain x6
+Mountain x20
+
+[Bot2 Deck]
+Island x27
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Firebolt.Cast(Bot2)
+[T2 Bot2.Main1]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Graveyard = Firebolt
+Exile.Count = 0

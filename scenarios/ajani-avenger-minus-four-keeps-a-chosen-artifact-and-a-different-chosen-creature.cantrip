@@ -1,0 +1,58 @@
+# Ajani, Nacatl Avenger's -4: each opponent chooses an artifact, a creature, an enchantment and a planeswalker from among
+# their nonland permanents and sacrifices the rest. Bot2 has two Ornithopters (artifact creatures), Llanowar Elves and
+# Fastbond. It chooses an Ornithopter as the artifact and a different creature, the Elves, as the creature: both are kept
+# and only the second Ornithopter is sacrificed. Fastbond, its only enchantment, is kept without a question, no
+# planeswalker exists to ask about, and its lands are never touched. Setup: Cat Bolted on turn 4, transform, +2 on turn 5 (loyalty 5), -4 on turn 7.
+
+[Bot1 Deck]
+Plains x2
+Ajani, Nacatl Pariah
+Plains x4
+Plains x12
+
+[Bot2 Deck]
+Mountain
+Forest
+Forest
+Lightning Bolt
+Ornithopter
+Ornithopter
+Llanowar Elves
+Fastbond
+Forest x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Ajani, Nacatl Pariah.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Cat Warrior)
+Bot1.Accept
+[T5 Bot1.Main1]
+Bot1.Battlefield.Ajani, Nacatl Avenger.Activate(Ability: +2)
+[T6 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Fastbond.Cast
+[T7 Bot1.Main1]
+Bot1.Battlefield.Ajani, Nacatl Avenger.Activate(Ability: Each opponent chooses)
+Bot2.Choose(Ornithopter)
+Bot2.Choose(Llanowar Elves)
+[Bot1.Main2]
+
+[Expect]
+Turn = 7
+Bot2.Battlefield = Mountain; Forest; Forest; Ornithopter; Llanowar Elves; Fastbond
+Bot2.Graveyard = Ornithopter; Lightning Bolt
+Bot1.Battlefield.Ajani, Nacatl Avenger.Counters.Loyalty = 1
+Stack.Count = 0

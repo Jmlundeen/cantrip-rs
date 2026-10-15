@@ -1,0 +1,35 @@
+# Cast for {3}{B}{B} it is not impending: an Enchantment Creature - Avatar Horror with no time counters (Black Lotus, a
+# Swamp and Mox Jet pay for it). Its enters ability mills four, and the top four are the second Overlord (an Avatar) and
+# three Islands - nothing to return, so no question is asked (the bare refusal): "non-Avatar" excludes the creature card.
+
+[Bot1 Deck]
+Black Lotus
+Swamp
+Mox Jet
+Overlord of the Balemurk
+Island x3
+Overlord of the Balemurk
+Island x3
+Island x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Overlord of the Balemurk.Cast
+Bot1.Pass
+! Bot1.Choose
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Overlord of the Balemurk.Types = Enchantment; Creature
+Bot1.Battlefield.Overlord of the Balemurk.Counters.Time = (absent)
+Bot1.Battlefield.Overlord of the Balemurk.Power = 5
+Bot1.Library.Count = 10
+Bot1.Graveyard.Count = 5

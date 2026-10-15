@@ -1,0 +1,30 @@
+# Sensei's Divining Top: {1} looks at the top three (Island, Mountain, Forest) and puts them back as Forest, Mountain,
+# Island; {T} then draws the Forest and puts the Top itself on top of the library, over the Mountain.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Sensei's Divining Top
+Plains x4
+Island
+Mountain
+Forest
+Plains x4
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sensei's Divining Top.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Sensei's Divining Top.Activate(Ability: Look)
+Bot1.Arrange(Forest; Mountain; Island)
+Bot1.Battlefield.Sensei's Divining Top.Activate(Ability: Draw)
+
+[Expect]
+Bot1.Hand.Count = 5
+Bot1.Hand = Plains; Plains; Plains; Plains; Forest
+Bot1.Library = Sensei's Divining Top; Mountain; Island; Plains; Plains; Plains; Plains

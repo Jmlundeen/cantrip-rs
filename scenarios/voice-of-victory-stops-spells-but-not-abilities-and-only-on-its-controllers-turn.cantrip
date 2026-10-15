@@ -1,0 +1,42 @@
+# "Your opponents can't cast spells during your turn" (CR 101.2, 601.2): in Bot1's turn 3 Bot2's Lightning Bolt is refused
+# (Mountain untapped), but its Mishra's Bauble, an activated ability and not a spell, still works. In Bot2's own turn 4 the
+# Bolt is cast: the control, since the rule names Bot1's turn only.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Voice of Victory
+Plains x4
+Plains x10
+
+[Bot2 Deck]
+Mountain
+Mishra's Bauble
+Lightning Bolt
+Mountain x4
+Mountain x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Voice of Victory.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mishra's Bauble.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+! Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Battlefield.Mishra's Bauble.Activate(Bot2)
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 17
+Bot2.Graveyard = Lightning Bolt; Mishra's Bauble

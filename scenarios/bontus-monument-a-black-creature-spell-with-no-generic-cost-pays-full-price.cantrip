@@ -1,0 +1,36 @@
+# "Cost {1} less" reduces only the generic part of a cost (CR 118.7c): Dauthi Voidwalker ({B}{B}) is black but has nothing generic to
+# reduce, so both black mana are spent (Swamp and Mox Jet, nothing left floating) and the drain still happens.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Bontu's Monument
+Mox Jet
+Swamp
+Dauthi Voidwalker
+Plains x13
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Bontu's Monument.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Dauthi Voidwalker.Cast
+? Bot1.Mana = 
+[Bot1.Main2]
+
+[Expect]
+Bot1.Life = 21
+Bot2.Life = 19
+Bot1.Battlefield.Dauthi Voidwalker.Types = Creature

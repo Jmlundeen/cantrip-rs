@@ -1,0 +1,36 @@
+# Transmute Artifact, the difference not paid: "If you don't, put it into its owner's graveyard. Then shuffle." The
+# card found is Blightsteel Colossus, which is put into a graveyard from anywhere by being revealed and shuffled into
+# its owner's library instead (CR 614.1a) - so it goes from the library to the library, and the graveyard holds only
+# the sacrificed Mox and the Transmute Artifact.
+#
+# Turn 1: the Island and the Mox pay {U}{U}, the tapped Mox is sacrificed, and with nothing left to pay {12} with Bot1
+# declines.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Transmute Artifact
+Island x4
+Island x3
+Blightsteel Colossus
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Transmute Artifact.Cast
+Bot1.Choose(Mox Sapphire)
+Bot1.Search(Blightsteel Colossus)
+Bot1.Decline
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Battlefield = Island
+Bot1.Graveyard = Transmute Artifact; Mox Sapphire
+Bot1.Library.Count = 14

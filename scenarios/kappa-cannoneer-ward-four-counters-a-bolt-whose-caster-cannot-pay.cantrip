@@ -1,0 +1,38 @@
+# Kappa Cannoneer's ward {4}: Bot2 aims a Lightning Bolt at it with only a Mountain, cannot pay the {4}, and the Bolt is
+# countered (the Cannoneer, a 5/5 with its own counter, takes no damage). Improvise pays for it: Lotus makes {U}{U}{U} and
+# three Moxen are tapped for the other three after the mana is made.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Black Lotus
+Kappa Cannoneer
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Kappa Cannoneer.Cast(Convoke: Mox Ruby, Mox Jet, Mox Pearl)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Kappa Cannoneer)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Kappa Cannoneer.Damage = 0
+Bot1.Battlefield.Kappa Cannoneer.Power = 5
+Bot2.Graveyard = Lightning Bolt

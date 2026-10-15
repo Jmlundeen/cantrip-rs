@@ -1,0 +1,6 @@
+{
+  "name": "Reprieve",
+  "manaCost": "{1}{W}",
+  "type": "Instant",
+  "oracleText": "Return target spell to its owner's hand.\nDraw a card."
+}

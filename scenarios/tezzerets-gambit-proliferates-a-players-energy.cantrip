@@ -1,0 +1,37 @@
+# Proliferate (CR 701.34a) reaches players as well as permanents: Galvanic Discharge's {E}{E}{E} are kept (Bot1 declines to
+# pay any), and Tezzeret's Gambit's proliferate offers Bot1, the only one with a counter, who is chosen, so the energy
+# becomes four. The {U/P} is paid with blue mana, not life.
+
+[Bot1 Deck]
+Mountain
+Ornithopter
+Galvanic Discharge
+Black Lotus
+Mox Sapphire
+Tezzeret's Gambit
+Island
+Island x14
+
+[Bot2 Deck]
+Forest x22
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Galvanic Discharge.Cast(Ornithopter)
+Bot1.Decline
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Tezzeret's Gambit.Cast
+Bot1.Target(Bot1)
+[Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Energy = 4
+Bot1.Life = 20
+Bot1.Hand.Count = 3
+Bot1.Battlefield = Mountain; Ornithopter; Mox Sapphire

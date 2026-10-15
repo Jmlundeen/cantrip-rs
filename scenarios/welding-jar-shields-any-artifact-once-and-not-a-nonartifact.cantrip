@@ -1,0 +1,49 @@
+# "Regenerate target artifact": the target is an artifact, a noncreature one too - Mother of Runes, not an artifact, is refused (the
+# refusal), and the Sol Ring is chosen (the positive control). Bot1's first Disenchant on the Sol Ring is replaced by the regeneration
+# (CR 701.19a): it stays, tapped. The shield is used up, so a second Disenchant destroys it.
+
+[Bot1 Deck]
+Plains
+Plains
+Mox Pearl
+Mox Pearl
+Disenchant
+Disenchant
+Plains x11
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Welding Jar
+Sol Ring
+Mother of Runes
+Plains x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Welding Jar.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Mother of Runes.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Disenchant.Cast(Bot2.Battlefield.Sol Ring)
+! Bot2.Battlefield.Welding Jar.Activate(Bot2.Battlefield.Mother of Runes)
+Bot2.Battlefield.Welding Jar.Activate(Bot2.Battlefield.Sol Ring)
+[T3 Bot1.Main2]
+? Bot2.Battlefield.Sol Ring.Tapped = true
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Hand.Disenchant.Cast(Bot2.Battlefield.Sol Ring)
+
+[Expect]
+Bot2.Graveyard = Sol Ring; Welding Jar
+Bot1.Graveyard = Disenchant; Disenchant

@@ -1,0 +1,49 @@
+# Hard-cast (Black Lotus and two Mountains on turn 3) Fury is not sacrificed. Its enters trigger divides 4 damage as Bot1 chooses
+# between Bot2's Liliana of the Veil (3 loyalty: 3 damage kills it, CR 704.5i) and Bot2's Ornithopter (1 damage: it
+# survives, marked). On turn 5 the 3/3 double striker attacks into the empty board and deals 3 twice (CR 702.4).
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Fury
+Mountain
+Mountain x12
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Liliana of the Veil
+Ornithopter
+Swamp x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Liliana of the Veil.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Fury.Cast
+Bot1.Divide(Bot2.Battlefield.Liliana of the Veil: 3; Bot2.Battlefield.Ornithopter: 1)
+[T3 Bot1.Main2]
+? Bot2.Battlefield.Ornithopter.Damage = 1
+? Bot2.Graveyard = Liliana of the Veil
+[T5 Bot1.Main1]
+Bot1.Attack(Fury)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Bot1.Battlefield.Fury.Power = 3

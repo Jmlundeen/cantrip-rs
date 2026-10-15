@@ -1,0 +1,35 @@
+# The entering trigger targets a creature you control; Bot2 answers it with Lightning Bolt on the Ornithopter. The target is illegal as the trigger resolves (CR 608.2b), so Bot1
+# isn't even asked and the Hammer stays unattached.
+
+[Bot1 Deck]
+Ornithopter
+Black Lotus
+Mox Jet
+Hammer of Nazahn
+Swamp x13
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x16
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Hammer of Nazahn.Cast
+Bot1.Pass
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Ornithopter)
+[Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Hammer of Nazahn.AttachedTo = (absent)
+Bot2.Graveyard = Lightning Bolt
+Bot1.Graveyard = Ornithopter; Black Lotus

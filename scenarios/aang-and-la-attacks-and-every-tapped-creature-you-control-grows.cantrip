@@ -1,0 +1,78 @@
+# Aang and La, Ocean's Fury: "Whenever Aang and La attack, put a +1/+1 counter on each tapped creature you control."
+# Bot1 transforms Aang on turn 5 by waterbend (seven mana and one tapped Ornithopter, CR 701.67a), so one of Bot1's
+# creatures is tapped without attacking, a second Ornithopter stays untapped, and Bot2's Llanowar Elves, tapped since it
+# attacked on turn 4, is a tapped creature Bot1 does not control. Aang and La attacks: it is itself tapped by attacking
+# and gets a counter (5/5 -> 6/6), as does the waterbend Ornithopter, but the untapped Ornithopter and Bot2's tapped
+# Elves get none.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Aang, Swift Savior
+Sol Ring
+Ornithopter
+Plains
+Ornithopter
+Plains x20
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Aang, Swift Savior.Cast
+Bot1.Pass
+Bot1.Pass
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T4 Bot2.Main1]
+Bot2.Attack(Llanowar Elves > Bot1)
+[T5 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Aang, Swift Savior.Activate(Ability: Waterbend; Convoke: Ornithopter)
+Bot1.Pass
+Bot1.Attack(Aang and La, Ocean's Fury > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Aang and La, Ocean's Fury.Power = 6
+Bot1.Battlefield.Aang and La, Ocean's Fury.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter#1.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter#1.Tapped = true
+Bot1.Battlefield.Ornithopter#2.Tapped = false
+Bot1.Battlefield.Ornithopter#2.Counters.PlusOnePlusOne = (absent)
+
+Bot2.Battlefield.Llanowar Elves.Tapped = true
+Bot2.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Sol Ring.Tapped = true
+Bot1.Battlefield.Sol Ring.Counters.PlusOnePlusOne = (absent)

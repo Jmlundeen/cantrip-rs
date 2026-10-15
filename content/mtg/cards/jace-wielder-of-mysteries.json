@@ -1,0 +1,7 @@
+{
+  "name": "Jace, Wielder of Mysteries",
+  "manaCost": "{1}{U}{U}{U}",
+  "type": "Legendary Planeswalker — Jace",
+  "loyalty": 4,
+  "oracleText": "If you would draw a card while your library has no cards in it, you win the game instead.\n+1: Target player mills two cards. Draw a card.\n−8: Draw seven cards. Then if your library has no cards in it, you win the game."
+}

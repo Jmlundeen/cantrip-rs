@@ -1,0 +1,51 @@
+# Through the Breach with Bot2's Containment Priest out: the Griselbrand is put onto the battlefield without being cast, so
+# the Priest exiles it instead (CR 614), and there is neither haste nor an end-step sacrifice for a creature that never
+# arrived: Griselbrand sits in exile.
+
+[Bot1 Deck]
+Through the Breach
+Griselbrand
+5 Mountain
+10 Mountain
+
+[Bot2 Deck]
+Plains
+Mox Jet
+Containment Priest
+Island x4
+Island x14
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Containment Priest.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Battlefield.Mountain#4.Activate
+Bot1.Battlefield.Mountain#5.Activate
+Bot1.Hand.Through the Breach.Cast
+Bot1.Choose(Griselbrand)
+Bot1.Pass
+[T9 Bot1.Main2]
+
+[Expect]
+Turn = 9
+Stack.Count = 0
+Exile = Griselbrand
+Bot1.Graveyard = Through the Breach
+Bot1.Battlefield.Count = 5

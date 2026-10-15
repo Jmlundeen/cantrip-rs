@@ -1,0 +1,29 @@
+# "Each one ... will increase the number of +1/+1 counters": two independent "that many plus one" replacements, here
+# Michelangelo's and Ozolith's, both apply to one counter placement, whichever order Bot1 picks (CR 616.1): one
+# counter becomes three on Michelangelo.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Michelangelo, Weirdness to 11
+Ozolith, the Shattered Spire
+Forest
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Forest x17
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Ozolith, the Shattered Spire.Cast
+Bot1.Hand.Michelangelo, Weirdness to 11.Cast
+Bot1.Battlefield.Mutagen Token.Activate(Bot1.Battlefield.Michelangelo, Weirdness to 11)
+
+[Expect]
+Bot1.Battlefield.Michelangelo, Weirdness to 11.Counters.PlusOnePlusOne = 3
+Bot1.Battlefield.Michelangelo, Weirdness to 11.Power = 4

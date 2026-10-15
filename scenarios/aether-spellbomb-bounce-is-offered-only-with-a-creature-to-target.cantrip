@@ -1,0 +1,34 @@
+# The bounce ability needs a creature to target (CR 601.2c): on turn 3 no creature is on the battlefield and the
+# ability is not offered. Bot2's Ornithopter arrives on turn 4 and the same ability, activated on turn 5, is the
+# positive control: the Ornithopter returns to Bot2's hand.
+
+[Bot1 Deck]
+Island
+Aether Spellbomb
+Island x12
+
+[Bot2 Deck]
+Ornithopter
+Island x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Aether Spellbomb.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+! Bot1.Battlefield.Aether Spellbomb.Activate(Ability: Return target creature)
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Aether Spellbomb.Activate(Bot2.Battlefield.Ornithopter; Ability: Return target creature)
+Bot1.Battlefield.Island.Activate
+[Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Graveyard = Aether Spellbomb
+Bot2.Battlefield.Count = 0
+Stack.Count = 0

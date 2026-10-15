@@ -1,0 +1,44 @@
+# Oko, Thief of Crowns' +1: "Target artifact or creature loses all abilities and becomes a green Elk creature with base
+# power and toughness 3/3." A new creature type replaces the old ones (CR 205.1b; Oko's ruling: it loses all other card
+# types and creature types), and the abilities go in layer 6 (CR 613.1f). Bot1's Llanowar Elves, a Creature - Elf Druid,
+# is cast on turn 1. On turn 3 it taps for {G} - the positive control: its mana ability works - and that {G} with Mox
+# Sapphire's {U} and Mox Pearl's {W} casts Oko, whose +1 makes the Elves an Elk. On turn 5 the Elk is untapped and long
+# past summoning sickness, and its "{T}: Add {G}" is no longer offered: it has no abilities. It is a green 3/3 Creature -
+# Elk, not an Elf, not a Druid.
+
+[Bot1 Deck]
+Forest
+Mox Sapphire
+Mox Pearl
+Llanowar Elves
+Oko, Thief of Crowns
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Oko, Thief of Crowns.Cast
+Bot1.Pass
+Bot1.Battlefield.Oko, Thief of Crowns.Activate(Llanowar Elves; Ability: Elk)
+Bot1.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Llanowar Elves.Tapped = false
+! Bot1.Battlefield.Llanowar Elves.Activate
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Types = Creature
+Bot1.Battlefield.Llanowar Elves.Subtypes = Elk
+Bot1.Battlefield.Llanowar Elves.Colors = Green
+Bot1.Battlefield.Llanowar Elves.Power = 3
+Bot1.Battlefield.Llanowar Elves.Toughness = 3

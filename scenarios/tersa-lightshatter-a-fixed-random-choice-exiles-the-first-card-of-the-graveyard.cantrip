@@ -1,0 +1,43 @@
+# Tersa Lightshatter: the card exiled at random is a recorded random choice (CR 701.9c), which a scenario fixes like a die
+# of as many sides as there are choices. Seven cards in the graveyard, the die shows 1: the first card of the graveyard
+# goes to exile, Black Lotus, sacrificed to cast Wheel of Fortune before anything else reached the graveyard.
+
+[Dice]
+1
+
+[Bot1 Deck]
+Black Lotus
+Wheel of Fortune
+Mountain
+Mox Ruby
+Island x3
+Tersa Lightshatter
+Mountain
+Island x5
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Wheel of Fortune.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Tersa Lightshatter.Cast
+Bot1.Choose(Island; Island)
+? Bot1.Graveyard.Count = 7
+Bot1.Attack(Tersa Lightshatter > Bot2)
+[Bot1.Main2]
+
+[Expect]
+Turn = 3
+Exile = Black Lotus
+Bot1.Graveyard.Count = 6
+Bot2.Life = 17

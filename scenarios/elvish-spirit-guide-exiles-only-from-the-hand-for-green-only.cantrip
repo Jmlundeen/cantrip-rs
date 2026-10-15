@@ -1,0 +1,34 @@
+# Elvish Spirit Guide: "Exile this card from your hand: Add {G}" (CR 113.6, 605): it works only from the hand - one that
+# Faithless Looting discarded into the graveyard offers nothing (refused), beside the one still in hand (the positive
+# control) - and it adds {G} and nothing else (red refused). The {G} pays for Llanowar Elves, the guide stays exiled.
+
+[Bot1 Deck]
+Mox Ruby
+Faithless Looting
+Elvish Spirit Guide
+Elvish Spirit Guide
+Llanowar Elves
+Island
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Elvish Spirit Guide; Island)
+! Bot1.Graveyard.Elvish Spirit Guide.Activate
+! Bot1.Hand.Elvish Spirit Guide.Activate(Color: Red)
+Bot1.Hand.Elvish Spirit Guide.Activate
+? Bot1.Mana = {G}
+Bot1.Hand.Llanowar Elves.Cast
+
+[Expect]
+Exile = Elvish Spirit Guide
+Bot1.Graveyard = Faithless Looting; Island; Elvish Spirit Guide
+Bot1.Battlefield = Mox Ruby; Llanowar Elves

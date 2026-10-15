@@ -1,0 +1,22 @@
+# Valakut Awakening is a modal double-faced card (CR 712.4): played as its back face it is Valakut Stoneforge, a land that
+# enters tapped, and on the next turn it taps for {R}, paying for a Lightning Bolt to Bot2.
+
+[Bot1 Deck]
+Valakut Awakening
+Lightning Bolt
+Island x5
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Valakut Awakening.Play
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Valakut Stoneforge.Tapped = true
+[T3 Bot1.Main1]
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Valakut Stoneforge.Activate
+
+[Expect]
+Bot2.Life = 17

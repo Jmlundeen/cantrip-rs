@@ -1,0 +1,15 @@
+{
+  "name": "Hogaak, Arisen Necropolis",
+  "manaCost": "{5}{B/G}{B/G}",
+  "type": "Legendary Creature — Avatar",
+  "power": 8,
+  "toughness": 8,
+  "oracleText": "You can't spend mana to cast this spell.\nConvoke, delve (Each creature you tap while casting this spell pays for {1} or one mana of that creature's color. Each card you exile from your graveyard pays for {1}.)\nYou may cast this card from your graveyard.\nTrample",
+  "keywords": [
+    "CantSpendManaToCast",
+    "CastFromYourGraveyard",
+    "Trample"
+  ],
+  "convoke": true,
+  "delve": true
+}

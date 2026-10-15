@@ -1,0 +1,6 @@
+{
+  "name": "Glimpse of Nature",
+  "manaCost": "{G}",
+  "type": "Sorcery",
+  "oracleText": "Whenever you cast a creature spell this turn, draw a card."
+}

@@ -1,0 +1,41 @@
+# Menace (CR 702.110): Black Widow can't be blocked except by two or more creatures. Bot2 has one Ornithopter, so it can't
+# block her (the refusal) while it can block Bot1's own Ornithopter attacking beside her (the positive control: the same
+# blocker on another attacker). The Widow connects, the trigger exiles the Island and then Lightning Bolt from Bot2's
+# library, and Bot1 declines the counter and the cast.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Black Widow, Super Spy
+Ornithopter
+Swamp x12
+
+[Bot2 Deck]
+Ornithopter
+Island x8
+Island
+Lightning Bolt
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Black Widow, Super Spy.Cast
+Bot1.Hand.Ornithopter.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Black Widow, Super Spy; Ornithopter > Bot2)
+! Bot2.Block(Ornithopter > Black Widow, Super Spy)
+Bot2.Block(Ornithopter > Ornithopter)
+Bot1.Decline
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot2.Battlefield.Ornithopter.Damage = 0
+Exile = Island; Lightning Bolt
+Bot1.Battlefield.Black Widow, Super Spy.Power = 2

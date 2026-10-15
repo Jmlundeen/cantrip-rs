@@ -1,0 +1,20 @@
+# Ziatora's Proving Ground enters tapped (CR 614.1c); its Swamp Mountain Forest types give it three mana abilities (CR 305.6), so on
+# the next turn it taps for {G}.
+
+[Bot1 Deck]
+Ziatora's Proving Ground
+Island x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Ziatora's Proving Ground.Play
+? Bot1.Battlefield.Ziatora's Proving Ground.Tapped = true
+[T3 Bot1.Main1]
+Bot1.Battlefield.Ziatora's Proving Ground.Activate(Ability: {G})
+? Bot1.Mana = {G}
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Ziatora's Proving Ground.Tapped = true

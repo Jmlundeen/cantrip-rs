@@ -1,0 +1,45 @@
+# Bot1's Lightning Bolt kills Bot2's Sunset Saboteur (4/1) on turn 5. The card now in Bot2's graveyard still has power 4, but
+# it is not a permanent: Exorcise has nothing to target on turn 7 and is not offered (CR 115.2: an artifact, enchantment or
+# creature target is on the battlefield). The turn-7 Exorcise on a battlefield creature in the other scenarios is the control.
+
+[Bot1 Deck]
+Plains
+Mountain
+Exorcise
+Lightning Bolt
+Plains
+Plains
+Plains
+Plains x13
+
+[Bot2 Deck]
+Swamp
+Swamp
+Sunset Saboteur
+Swamp x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp#1.Activate
+Bot2.Battlefield.Swamp#2.Activate
+Bot2.Hand.Sunset Saboteur.Cast
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Sunset Saboteur)
+Bot1.Accept
+Bot1.Choose(Plains)
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+! Bot1.Hand.Exorcise.Cast
+
+[Expect]
+Turn = 7
+Bot2.Graveyard = Sunset Saboteur
+Exile.Count = 0

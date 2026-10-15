@@ -1,0 +1,40 @@
+# Grist's −2 after Grist has left the battlefield (the ruling): Bot2 bolts her (loyalty 1) in response, and as the
+# ability resolves Bot1 still may sacrifice a creature, and when it does the reflexive trigger destroys a target
+# creature: here Bot1's other Llanowar Elves, since Bot2 has none.
+
+[Bot1 Deck]
+Bayou x3
+Grist, the Hunger Tide
+Llanowar Elves x2
+Forest x16
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x20
+
+[Actions]
+Bot1.Hand.Bayou.Play
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Bayou.Play
+Bot1.Battlefield.Bayou#1.Activate(Ability: Add {G})
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Bayou#2.Activate(Ability: Add {G})
+Bot1.Hand.Llanowar Elves.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Bayou.Play
+Bot1.Battlefield.Bayou#1.Activate(Ability: Add {B})
+Bot1.Battlefield.Bayou#2.Activate(Ability: Add {G})
+Bot1.Battlefield.Bayou#3.Activate(Ability: Add {G})
+Bot1.Hand.Grist, the Hunger Tide.Cast
+[T5 Bot1.Main2]
+Bot1.Battlefield.Grist, the Hunger Tide.Activate(Ability: sacrifice)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Grist, the Hunger Tide)
+Bot1.Choose(Llanowar Elves#1)
+[T5 Bot1.End]
+
+[Expect]
+Bot1.Graveyard = Llanowar Elves; Llanowar Elves; Grist, the Hunger Tide
+Bot1.Battlefield = Bayou; Bayou; Bayou

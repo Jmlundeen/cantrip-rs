@@ -1,0 +1,65 @@
+# "Whenever you cast a spell from exile": Bot1's Appa sits on the battlefield while Bot2 casts Giver of Runes from
+# exile (airbended by Bot2's own Appa). Bot1 makes no Ally; Bot2's Appa, whose controller cast it, makes one.
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Appa, Steadfast Guardian
+Plains
+Plains
+Plains
+Plains x11
+
+[Bot2 Deck]
+Plains
+Giver of Runes
+Plains
+Appa, Steadfast Guardian
+Plains
+Plains
+Plains
+Plains x11
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Giver of Runes.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Battlefield.Plains#4.Activate
+Bot1.Hand.Appa, Steadfast Guardian.Cast
+[T8 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Plains#2.Activate
+Bot2.Battlefield.Plains#3.Activate
+Bot2.Battlefield.Plains#4.Activate
+Bot2.Hand.Appa, Steadfast Guardian.Cast
+Bot2.Target(Giver of Runes)
+[T10 Bot2.Main1]
+? Exile = Giver of Runes
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Plains#2.Activate
+Bot2.Exile.Giver of Runes.Cast
+
+[Expect]
+Turn = 10
+Bot1.Battlefield = Plains; Plains; Plains; Plains; Appa, Steadfast Guardian
+Bot2.Battlefield = Plains; Plains; Plains; Plains; Plains; Appa, Steadfast Guardian; Giver of Runes; Ally
+Exile.Count = 0
+Stack.Count = 0

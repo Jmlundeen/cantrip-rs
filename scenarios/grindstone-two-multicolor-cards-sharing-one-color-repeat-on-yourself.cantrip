@@ -1,0 +1,29 @@
+# Target player may be the Grindstone's controller. Bot1 mills its own Flame of Anor (blue-red) and Counterspell (blue): they share blue, so it repeats and mills two Islands, which do not, and stops.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+Grindstone
+Swamp x3
+Flame of Anor
+Counterspell
+Island x6
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Grindstone.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Grindstone.Activate(Bot1)
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Island; Island; Counterspell; Flame of Anor; Black Lotus
+Bot1.Library.Count = 4

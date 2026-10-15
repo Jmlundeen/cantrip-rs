@@ -1,0 +1,84 @@
+# Portal to Phyrexia: cast on turn three for {9} (Black Lotus, four Moxen, a Mountain and a Lotus Petal), its enters
+# trigger has Bot2 sacrifice three of their four Llanowar Elves of their choice. At Bot1's next upkeep the second
+# ability puts an Elf from Bot2's graveyard onto the battlefield under Bot1's control, and it is a Phyrexian in
+# addition to its other types.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Mountain
+Portal to Phyrexia
+Lotus Petal
+Mountain x12
+
+[Bot2 Deck]
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Forest
+Llanowar Elves
+Llanowar Elves
+Llanowar Elves
+Llanowar Elves
+Forest x12
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Emerald#2.Activate
+Bot2.Battlefield.Mox Emerald#3.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Lotus Petal.Activate(Color: Red)
+Bot1.Hand.Portal to Phyrexia.Cast
+Bot1.Pass
+Bot1.Pass
+Bot2.Choose(Llanowar Elves; Llanowar Elves; Llanowar Elves)
+[T3 Bot1.Main2]
+? Bot2.Graveyard.Count = 3
+? Bot2.Battlefield.Llanowar Elves.Subtypes = Druid; Elf
+[T5 Bot1.Upkeep]
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Llanowar Elves.Subtypes = Druid; Elf; Phyrexian
+Bot2.Graveyard.Count = 2

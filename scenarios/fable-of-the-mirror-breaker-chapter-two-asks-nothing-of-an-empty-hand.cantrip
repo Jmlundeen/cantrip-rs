@@ -1,0 +1,39 @@
+# Fable of the Mirror-Breaker, chapter II with no card in hand: there is nothing to discard, so nothing is asked
+# (! Bot1.Choose) and nothing is drawn. Bot1 plays out its hand on turn 1 (three Ornithopters beside the Fable) and
+# casts the Lightning Bolt it draws in its draw step on turn 3, so its hand is empty when the lore counter is added.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Black Lotus
+Fable of the Mirror-Breaker
+Ornithopter
+Ornithopter
+Ornithopter
+Lightning Bolt
+Forest x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Fable of the Mirror-Breaker.Cast
+[T3 Bot1.Draw]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+! Bot1.Choose
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Hand.Count = 0
+Bot1.Library.Count = 12
+Bot1.Battlefield.Fable of the Mirror-Breaker.Counters.Lore = 2

@@ -1,0 +1,14 @@
+{
+  "name": "Atraxa, Grand Unifier",
+  "manaCost": "{3}{G}{W}{U}{B}",
+  "type": "Legendary Creature — Phyrexian Angel",
+  "power": 7,
+  "toughness": 7,
+  "oracleText": "Flying, vigilance, deathtouch, lifelink\nWhen Atraxa enters, reveal the top ten cards of your library. For each card type, you may put a card of that type from among the revealed cards into your hand. Put the rest on the bottom of your library in a random order. (Artifact, battle, creature, enchantment, instant, land, planeswalker, and sorcery are card types.)",
+  "keywords": [
+    "Flying",
+    "Vigilance",
+    "Deathtouch",
+    "Lifelink"
+  ]
+}

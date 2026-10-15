@@ -1,0 +1,39 @@
+# Boseiju, Who Endures, channel: "That player MAY search" - Bot2 declines after its Mox Jet is destroyed, so no land
+# enters and nothing is searched or shuffled (the library keeps all twelve cards left after its draw). The positive control is the existing
+# scenario, where the same offer is accepted. No legendary creature is out, so the full {1}{G} is paid with the Mox
+# Emerald and the Mox Ruby, and the pool is empty afterwards.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Boseiju, Who Endures
+Island x4
+Island x10
+
+[Bot2 Deck]
+Mox Jet
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Boseiju, Who Endures.Activate(Bot2.Battlefield.Mox Jet)
+Bot1.Pass
+Bot2.Decline
+[Bot1.Main1]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Mana =
+Bot1.Graveyard = Boseiju, Who Endures
+Bot2.Graveyard = Mox Jet
+Bot2.Battlefield.Count = 0
+Bot2.Library.Count = 12

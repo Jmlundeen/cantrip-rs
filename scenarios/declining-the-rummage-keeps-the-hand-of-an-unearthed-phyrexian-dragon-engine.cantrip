@@ -1,0 +1,43 @@
+# Declining the "you may" (CR 608.2d): Phyrexian Dragon Engine is unearthed from the graveyard and its enters trigger resolves
+# with the hand untouched, so nothing is discarded and nothing is drawn. Unearth still works: it is on the battlefield
+# with haste until the end step.
+
+[Bot1 Deck]
+Phyrexian Dragon Engine
+Faithless Looting
+Mountain x5
+Mountain x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Phyrexian Dragon Engine; Mountain)
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Graveyard.Phyrexian Dragon Engine.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+? Bot1.Hand.Count = 5
+? Bot1.Battlefield.Phyrexian Dragon Engine.Keywords = DoubleStrike; Haste
+
+[Expect]
+Turn = 9
+Bot1.Hand.Count = 5
+Bot1.Battlefield.Phyrexian Dragon Engine.SummoningSick = False

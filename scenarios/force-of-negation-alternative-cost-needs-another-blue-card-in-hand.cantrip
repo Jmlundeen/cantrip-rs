@@ -1,0 +1,41 @@
+# The alternative cost exiles "a blue card from your hand" (CR 118.9, 601.2b): Force of Negation cannot exile itself, so
+# with only lands and itself in hand it is refused against Bot2's first Lightning Bolt (Bot1 takes 3). On turn 4 Bot1 has
+# drawn a Brainstorm, a blue card, and exiles it to counter the second Bolt, which is exiled too: the control.
+
+[Bot1 Deck]
+Force of Negation
+Island x6
+Brainstorm
+Island x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Lightning Bolt
+Mountain x4
+Mountain x10
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+! Bot1.Hand.Force of Negation.Cast(Stack.Lightning Bolt; Ability: exile a blue card)
+Bot1.Pass
+? Bot1.Life = 17
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Hand.Force of Negation.Cast(Stack.Lightning Bolt; Ability: exile a blue card)
+Bot1.Choose(Brainstorm)
+Bot1.Pass
+
+[Expect]
+Bot1.Life = 17
+Exile = Brainstorm; Lightning Bolt
+Bot2.Graveyard = Lightning Bolt
+Bot1.Graveyard = Force of Negation

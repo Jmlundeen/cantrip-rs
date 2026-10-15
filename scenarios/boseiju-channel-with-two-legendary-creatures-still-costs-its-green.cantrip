@@ -1,0 +1,51 @@
+# Boseiju, Who Endures, channel: "This ability costs {1} less to activate for each legendary creature you control" - a
+# cost reduction takes away generic mana only (CR 601.2f), so with two legendary creatures (Ragavan and Ajani, Nacatl
+# Pariah) {1}{G} becomes {G}, not nothing: the Mox Emerald alone pays and the pool is empty afterwards. A cost reduced
+# below its coloured part would leave the mana in the pool. (The one-legend case is the existing scenario, and no legend is
+# the decline scenario: the full {1}{G}.)
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Mox Pearl
+Mox Jet
+Ragavan, Nimble Pilferer
+Ajani, Nacatl Pariah
+Boseiju, Who Endures
+Island x10
+
+[Bot2 Deck]
+Mox Jet
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ragavan, Nimble Pilferer.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ajani, Nacatl Pariah.Cast
+Bot1.Pass
+Bot1.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Boseiju, Who Endures.Activate(Bot2.Battlefield.Mox Jet)
+Bot1.Pass
+Bot2.Decline
+[Bot1.Main1]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Mana =
+Bot2.Graveyard = Mox Jet

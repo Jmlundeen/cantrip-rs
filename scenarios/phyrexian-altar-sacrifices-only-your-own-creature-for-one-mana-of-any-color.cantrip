@@ -1,0 +1,52 @@
+# "Sacrifice a creature: Add one mana of any color": with only Moxen (artifacts, not creatures) on the battlefield it is not offered (refusal on turn 1); with an Ornithopter it is, and sacrificing it adds {R}, which casts Lightning Bolt. On turn 3,
+# with only Bot2's Elvish Mystic around (not a creature Bot1 can sacrifice) it is refused again; Haywire Mite, cast then, can be sacrificed for {W} (lost) and its death trigger gains 2 life.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Phyrexian Altar
+Lightning Bolt
+Ornithopter
+Haywire Mite
+Forest x13
+
+[Bot2 Deck]
+Forest
+Elvish Mystic
+Forest x13
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Phyrexian Altar.Cast
+Bot1.Pass
+! Bot1.Battlefield.Phyrexian Altar.Activate
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Phyrexian Altar.Activate(Sacrifice: Ornithopter; Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Battlefield.Phyrexian Altar.Activate
+Bot1.Hand.Haywire Mite.Cast
+Bot1.Pass
+Bot1.Battlefield.Phyrexian Altar.Activate(Sacrifice: Haywire Mite; Color: White)
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Life = 17
+Bot1.Life = 22
+Bot1.Graveyard = Haywire Mite; Lightning Bolt; Ornithopter

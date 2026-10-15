@@ -1,0 +1,22 @@
+//! Channel (CR 207.2c ability word): an ability activated from a hand by discarding the card. Otawara, Soaring City and
+//! Boseiju, Who Endures print its reduction.
+
+use cantrip_api::*;
+
+/// "This ability costs {1} less to activate for each legendary creature you control" (CR 601.2f): the card's own change
+/// to the cost of its channel ability, which functions only from the hand.
+pub fn cheaper_per_legendary_creature(q: &dyn Query, _: ObjectId, player: PlayerId, costed: Costed) -> i8 {
+    let Costed::Ability(card, _) = costed else { return 0 };
+    if !q.obj(card).zone.is(ZoneKind::Hand) {
+        return 0;
+    }
+    let legends = q
+        .permanents_of(player)
+        .into_iter()
+        .filter(|&id| {
+            let chars = q.chars(id);
+            chars.is(CardType::Creature) && chars.supertypes.legendary
+        })
+        .count();
+    -(legends.min(127) as i8)
+}

@@ -1,0 +1,37 @@
+# Black Lotus pays for Laelia; with Black Lotus and three Lotus Petals in the graveyard, Treasure Cruise delves all four: one +1/+1 counter, not four.
+
+[Bot1 Deck]
+Black Lotus
+Laelia, the Blade Reforged
+Lotus Petal
+Lotus Petal
+Lotus Petal
+Mox Sapphire
+Treasure Cruise
+Island x13
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Laelia, the Blade Reforged.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Lotus Petal.Activate(Color: Blue)
+Bot1.Battlefield.Lotus Petal.Activate(Color: Blue)
+Bot1.Battlefield.Lotus Petal.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Treasure Cruise.Cast(Delve: 4)
+Bot1.Pass
+Bot1.Pass
+[T1 Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Exile.Count = 4
+Bot1.Battlefield.Laelia, the Blade Reforged.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Laelia, the Blade Reforged.Power = 3

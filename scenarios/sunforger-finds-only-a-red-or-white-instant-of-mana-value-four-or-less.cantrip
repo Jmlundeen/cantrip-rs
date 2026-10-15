@@ -1,0 +1,48 @@
+# The search quality: Fireblast is a red instant but mana value 6, Counterspell an instant of the wrong colors, Flame Slash a red sorcery. None can be found (the refusals); Lightning Bolt, red, instant and mana value 1, can.
+
+[Bot1 Deck]
+Mountain
+Sol Ring
+Ornithopter
+Plains
+Sunforger
+Mountain
+Mountain
+Plains x3
+Lightning Bolt
+Fireblast
+Counterspell
+Flame Slash
+Plains x17
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sunforger.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Sunforger.Activate(Ability: Equip; Ornithopter)
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+? Bot1.Battlefield.Ornithopter.Power = 4
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Sunforger.Activate(Ability: Unattach)
+! Bot1.Search(Fireblast)
+! Bot1.Search(Counterspell)
+! Bot1.Search(Flame Slash)
+Bot1.Search(Lightning Bolt)
+Bot1.Target(Bot2)
+[Bot1.Main2]
+[Expect]
+Bot2.Life = 17
+Bot1.Graveyard = Lightning Bolt
+Bot1.Battlefield.Sunforger.AttachedTo = (absent)

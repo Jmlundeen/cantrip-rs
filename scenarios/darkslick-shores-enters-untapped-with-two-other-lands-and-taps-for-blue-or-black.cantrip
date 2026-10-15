@@ -1,0 +1,28 @@
+# "Enters tapped unless you control two or fewer other lands": the third land is untapped (the existing scenario has the fourth
+# tapped), so it taps for {U} at once on turn 5, and for {B}, the other colour of "{U} or {B}", on turn 7.
+
+[Bot1 Deck]
+Island
+Island
+Darkslick Shores
+Island x14
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Darkslick Shores.Play
+? Bot1.Battlefield.Darkslick Shores.Tapped = false
+Bot1.Battlefield.Darkslick Shores.Activate(Color: Blue)
+? Bot1.Mana = {U}
+[T7 Bot1.Main1]
+Bot1.Battlefield.Darkslick Shores.Activate(Color: Black)
+? Bot1.Mana = {B}
+
+[Expect]
+Turn = 7
+Bot1.Mana = {B}

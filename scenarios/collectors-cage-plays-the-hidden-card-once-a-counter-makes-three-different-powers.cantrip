@@ -1,0 +1,46 @@
+# Collector's Cage hides Mox Ruby (hideaway 5); its {1},{T} puts a +1/+1 counter on a Llanowar Elves, which makes the powers 0, 1 and 2 (judged after the counter, CR 608.2c), so Bot1 may play the exiled card for free.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Ornithopter
+Plains
+Llanowar Elves
+Collector's Cage
+Forest
+Forest
+Forest
+Mox Ruby
+Forest
+Forest
+Forest
+Forest x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Collector's Cage.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Llanowar Elves#1.Activate
+Bot1.Arrange(Mox Ruby | Forest; Forest; Forest; Forest)
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Collector's Cage.Activate(Bot1.Battlefield.Llanowar Elves#2)
+Bot1.Battlefield.Forest.Activate
+Bot1.Accept
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Exile.Count = 0
+Bot1.Battlefield.Mox Ruby.Types = Artifact
+Bot1.Battlefield.Llanowar Elves#2.Power = 2

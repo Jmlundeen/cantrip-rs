@@ -1,0 +1,27 @@
+# "Search your library for a land card, put that card onto the battlefield, then shuffle." Any land card will do, not only a basic: Bot1 sacrifices its
+# Forest (tapped for the {G} first) and fetches Tundra, which enters untapped, so Bot1 can tap it at once for {W}. The Forest is in the graveyard.
+
+[Bot1 Deck]
+Forest
+Crop Rotation
+Plains x5
+Tundra
+Plains x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Crop Rotation.Cast
+Bot1.Search(Tundra)
+Bot1.Battlefield.Tundra.Activate(Ability: {W})
+? Bot1.Mana = {W}
+
+[Expect]
+Turn = 1
+Bot1.Battlefield = Tundra
+Bot1.Battlefield.Tundra.Tapped = true
+Bot1.Graveyard = Crop Rotation; Forest
+Bot1.Library.Count = 10

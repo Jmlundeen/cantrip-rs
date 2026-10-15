@@ -1,0 +1,6 @@
+{
+  "name": "Dark Ritual",
+  "manaCost": "{B}",
+  "type": "Instant",
+  "oracleText": "Add {B}{B}{B}."
+}

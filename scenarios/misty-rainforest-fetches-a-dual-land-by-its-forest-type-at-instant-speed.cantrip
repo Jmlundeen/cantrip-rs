@@ -1,0 +1,26 @@
+# The fetch looks for a Forest OR Island *card* (CR 205.3i): Tropical Island (Forest Island) qualifies by either type, and a
+# Plains does not (refusal). It is activated at instant speed, in Bot2's upkeep, and the land that enters is untapped.
+
+[Bot1 Deck]
+Misty Rainforest
+Plains x6
+Plains
+Tropical Island
+Plains x10
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Misty Rainforest.Play
+[T2 Bot2.Upkeep]
+Bot1.Battlefield.Misty Rainforest.Activate
+! Bot1.Search(Plains)
+Bot1.Search(Tropical Island)
+[T2 Bot2.Main1]
+
+[Expect]
+Bot1.Life = 19
+Bot1.Battlefield = Tropical Island
+Bot1.Battlefield.Tropical Island.Tapped = False
+Bot1.Graveyard = Misty Rainforest

@@ -1,0 +1,39 @@
+# With {G}{G} spent but nothing for the target (Bot2 controls only a Forest, a land), the exile trigger has no legal target and is removed from the stack: Wistfulness stays as a 6/5 and nothing is exiled or asked.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Emerald
+Mox Ruby
+Mox Jet
+Mox Pearl
+Wistfulness
+Forest
+Forest x12
+
+[Bot2 Deck]
+Forest
+Forest x14
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Wistfulness.Cast
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Exile.Count = 0
+Bot2.Battlefield = Forest
+Bot1.Battlefield.Wistfulness.Toughness = 5

@@ -1,0 +1,8 @@
+{
+  "name": "Monastery Mentor",
+  "manaCost": "{2}{W}",
+  "type": "Creature — Human Monk",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Prowess (Whenever you cast a noncreature spell, this creature gets +1/+1 until end of turn.)\nWhenever you cast a noncreature spell, create a 1/1 white Monk creature token with prowess."
+}

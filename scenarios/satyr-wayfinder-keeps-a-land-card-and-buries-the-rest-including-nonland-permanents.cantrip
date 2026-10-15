@@ -1,0 +1,32 @@
+# Satyr Wayfinder reveals the top four when it enters and offers the hand only the land cards among them. Bot1 keeps
+# the Forest; the Guerrilla Gorilla is a permanent card but not a land, so it goes to the graveyard with the Bolt and Ponder.
+
+[Bot1 Deck]
+Forest
+Forest
+Satyr Wayfinder
+Island x5
+Guerrilla Gorilla
+Lightning Bolt
+Ponder
+Forest
+Island x8
+
+[Bot2 Deck]
+Swamp x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Satyr Wayfinder.Cast
+Bot1.Arrange(Forest | Guerrilla Gorilla; Lightning Bolt; Ponder)
+
+[Expect]
+Turn = 3
+Bot1.Hand = Island; Island; Island; Island; Island; Forest
+Bot1.Graveyard = Ponder; Lightning Bolt; Guerrilla Gorilla
+Bot1.Battlefield = Satyr Wayfinder; Forest; Forest
+Bot1.Library.Count = 8

@@ -1,0 +1,34 @@
+# Tarfire is a Kindred Instant — Goblin: kindred is a card type (CR 308.1, the ruling "will be counted by effects
+# that refer to the number of card types among cards in a zone"), so once it resolves the only card in any graveyard
+# carries two card types and Bot2's Tarmogoyf is 2/3, not 1/2. Aimed at Bot2, who takes the 2.
+
+[Bot1 Deck]
+Mountain
+Tarfire
+Mountain x25
+
+[Bot2 Deck]
+Forest
+Tarmogoyf
+Forest x25
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Forest#2.Activate
+Bot2.Hand.Tarmogoyf.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Tarfire.Cast(Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Tarfire
+Bot2.Graveyard.Count = 0
+Bot2.Life = 18
+Bot2.Battlefield.Tarmogoyf.Power = 2
+Bot2.Battlefield.Tarmogoyf.Toughness = 3

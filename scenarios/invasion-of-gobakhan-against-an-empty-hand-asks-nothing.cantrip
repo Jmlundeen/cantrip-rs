@@ -1,0 +1,53 @@
+# Look at target opponent's hand: Bot2's whole eight-card deck is on the battlefield by turn 3 and its hand is empty, so there is
+# nothing to look at or exile and Bot1 is asked nothing (the refused Choose).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Invasion of Gobakhan
+Plains x20
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Pearl
+Mox Emerald
+Mox Ruby
+Mox Jet
+Lotus Petal
+Black Lotus
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Lotus Petal.Cast
+Bot2.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Invasion of Gobakhan.Cast
+Bot1.Pass
+Bot1.Pass
+! Bot1.Choose
+[T3 Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot2.Hand.Count = 0
+Bot1.Battlefield.Invasion of Gobakhan.Counters.Defense = 3

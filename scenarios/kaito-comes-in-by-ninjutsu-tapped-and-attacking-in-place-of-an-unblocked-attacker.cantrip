@@ -1,0 +1,51 @@
+# Ninjutsu (CR 702.49a): Bot1 attacks Bot2 with Guerrilla Gorilla on turn 3 and nobody blocks. In the declare blockers
+# step Bot1 pays {1}{U}{B} from three Moxen and returns the Gorilla to hand: Kaito, Bane of Nightmares is put onto the
+# battlefield from hand tapped and attacking the same player (CR 508.4), so he is not declared as an attacker. On his
+# controller's turn, with four loyalty counters, he is a 3/4 Ninja creature, and deals 3 combat damage: Bot2 is at 17,
+# not 18 (the Gorilla was returned before it could deal its 2).
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Guerrilla Gorilla
+Mox Sapphire
+Mox Jet
+Kaito, Bane of Nightmares
+Forest x2
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Guerrilla Gorilla)
+[T3 Bot1.Blockers]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Kaito, Bane of Nightmares.Activate(Ability: Ninjutsu)
+Bot1.Choose(Guerrilla Gorilla)
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Kaito, Bane of Nightmares.Tapped = true
+? Bot1.Battlefield.Kaito, Bane of Nightmares.Types = Creature
+? Bot1.Battlefield.Kaito, Bane of Nightmares.Power = 3
+
+[Expect]
+Turn = 3
+Bot2.Life = 17
+Bot1.Hand = Guerrilla Gorilla; Forest; Forest
+Bot1.Battlefield = Forest; Mox Emerald; Mox Sapphire; Mox Jet; Kaito, Bane of Nightmares

@@ -1,0 +1,17 @@
+# Its Forest and Plains types give it {G} and {W} as well as {U} (CR 305.6): on turn 3, untapped, it taps for green.
+
+[Bot1 Deck]
+Spara's Headquarters
+Plains x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Spara's Headquarters.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Spara's Headquarters.Activate(Ability: {G})
+? Bot1.Mana = {G}
+
+[Expect]
+Bot1.Battlefield.Spara's Headquarters.Tapped = True

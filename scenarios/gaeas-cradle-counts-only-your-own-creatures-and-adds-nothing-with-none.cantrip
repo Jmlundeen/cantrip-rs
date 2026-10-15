@@ -1,0 +1,42 @@
+# "Add {G} for each creature you control": turn 1 Bot1 has no creature, so tapping Gaea's Cradle adds nothing (it is still tapped, and the empty pool is the result). On turn 3 Bot1 controls Elvish Mystic and Ornithopter (two creatures; Mox Jet,
+# a noncreature artifact, does not count) while Bot2 controls two Llanowar Elves (not counted): the Cradle adds exactly {G}{G}.
+
+[Bot1 Deck]
+Gaea's Cradle
+Forest
+Elvish Mystic
+Ornithopter
+Mox Jet
+Forest x13
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Llanowar Elves
+Mox Emerald
+Forest x12
+
+[Actions]
+Bot1.Hand.Gaea's Cradle.Play
+Bot1.Battlefield.Gaea's Cradle.Activate
+? Bot1.Mana =
+? Bot1.Battlefield.Gaea's Cradle.Tapped = true
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Gaea's Cradle.Activate
+? Bot1.Mana = {G}{G}
+
+[Expect]
+Bot1.Battlefield.Gaea's Cradle.Tapped = true

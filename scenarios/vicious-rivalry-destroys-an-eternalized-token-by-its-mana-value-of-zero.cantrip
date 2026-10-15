@@ -1,0 +1,48 @@
+# A token copy made "except it has no mana cost" (eternalize, CR 702.129a, 707.9b) has mana value 0 (CR 202.3), not the
+# printed {1}{G} of the card it copies. Vicious Rivalry with X = 1 destroys each artifact and creature with mana value 1 or
+# less, so it destroys the eternalized Fanatic of Rhonas along with the Moxen and Sol Ring.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Sol Ring
+Faithless Looting
+Fanatic of Rhonas
+Mox Ruby
+Mox Jet
+Forest
+Swamp
+Vicious Rivalry
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Choose(Fanatic of Rhonas; Forest)
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Graveyard.Fanatic of Rhonas.Activate(Ability: Eternalize)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Vicious Rivalry.Cast(X: 1)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Sol Ring.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield = Forest; Swamp
+Bot1.Life = 19

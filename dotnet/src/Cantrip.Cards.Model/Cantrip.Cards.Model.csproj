@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- Token characteristics (CR 111.2) are defined by the effect that created them, so a
+         synthetic definition is materialised into game state. That makes these types state, and
+         they are held to the same determinism rules. -->
+    <EnforceDeterminism>true</EnforceDeterminism>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Cantrip.Core\Cantrip.Core.csproj" />
+  </ItemGroup>
+
+</Project>

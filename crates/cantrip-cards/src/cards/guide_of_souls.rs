@@ -1,0 +1,82 @@
+use cantrip_api::*;
+use cantrip_mechanics::targets;
+use cantrip_oracle as oracle;
+
+/// "Whenever another creature you control enters" (CR 603.6a).
+fn another_creature_enters(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::ZoneChange { new, to, .. }
+            if *new != source
+                && to.is(ZoneKind::Battlefield)
+                && q.controller(*new) == q.controller(source)
+                && q.chars(*new).is(CardType::Creature) =>
+        {
+            Fired::PLAIN
+        }
+        _ => None,
+    }
+}
+
+/// You gain 1 life and get {E} (an energy counter).
+fn bank(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    g.gain_life(item.controller, 1);
+    g.change_energy(item.controller, 1);
+    Ok(())
+}
+
+/// You may pay {E}{E}{E}. When you do (CR 603.12), the reflexive trigger follows. The payment is made as the ability
+/// resolves, so it is an optional payment in the effect, and a player without all three is not asked.
+fn pay_energy(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let you = item.controller;
+    if g.state().player(you).energy < 3 {
+        return Ok(());
+    }
+    if !cantrip_mechanics::effects::ask_may(g, you, item.object, Purpose::Optional)? {
+        return Ok(());
+    }
+    g.change_energy(you, -3);
+    let this = g.card_id(&CARD);
+    g.reflexive_trigger(item.object, you, AbilityRef::delayed(this, 0), Target::None);
+    Ok(())
+}
+
+/// "Target attacking creature" (CR 115.1, 506.4): declared as an attacker and still attacking.
+fn attacking_creature(q: &dyn Query, _: &Asker, t: Target) -> bool {
+    matches!(t, Target::Object(id) if targets::permanent(q, id) && q.state().attackers.iter().any(|a| a.id == id))
+}
+
+/// Put two +1/+1 counters and a flying counter on target attacking creature. It becomes an Angel in addition to its
+/// other types, with no duration (CR 205.1b, 611.2a).
+fn empower(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
+    g.add_counters(creature, CounterKind::PlusOne, 2);
+    g.add_counters(creature, CounterKind::Flying, 1);
+    g.add_effect(item.object, creature, EffectKind::AddSubtype(Subtype::Angel), Duration::Indefinite);
+    Ok(())
+}
+
+pub static CARD: CardDef = CardDef {
+    abilities: &[
+        AbilityDef::Triggered(TriggeredDef {
+            text: "Whenever another creature you control enters, you gain 1 life and get {E} (an energy counter).",
+            listens: EventMask::ZONE_CHANGE,
+            matches: another_creature_enters,
+            effect: bank,
+            ..TriggeredDef::BLANK
+        }),
+        AbilityDef::Triggered(TriggeredDef {
+            text: "Whenever you attack, you may pay {E}{E}{E}. When you do, put two +1/+1 counters and a flying counter on target attacking creature. It becomes an Angel in addition to its other types.",
+            listens: EventMask::ATTACKERS_DECLARED,
+            matches: cantrip_mechanics::triggers::you_attack,
+            effect: pay_energy,
+            ..TriggeredDef::BLANK
+        }),
+    ],
+    delayed: &[AbilityDef::Triggered(TriggeredDef {
+        text: "When you do, put two +1/+1 counters and a flying counter on target attacking creature. It becomes an Angel in addition to its other types.",
+        targets: &[TargetSpec { min: 1, max: 1, filter: attacking_creature }],
+        effect: empower,
+        ..TriggeredDef::BLANK
+    })],
+    ..oracle::GUIDE_OF_SOULS
+};

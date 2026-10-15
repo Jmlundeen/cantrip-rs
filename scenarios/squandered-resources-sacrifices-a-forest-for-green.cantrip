@@ -1,0 +1,28 @@
+# Squandered Resources: sacrificing a Forest adds one mana of a type the Forest could produce, green. The Swamp beside it
+# could not, so the line names which land goes.
+
+[Bot1 Deck]
+Swamp
+Forest
+Squandered Resources
+Swamp x10
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Squandered Resources.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Squandered Resources.Activate(Sacrifice: Forest; Color: Green)
+? Bot1.Mana = {G}
+? Bot1.Graveyard = Forest
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Swamp; Squandered Resources
+Bot1.Graveyard = Forest

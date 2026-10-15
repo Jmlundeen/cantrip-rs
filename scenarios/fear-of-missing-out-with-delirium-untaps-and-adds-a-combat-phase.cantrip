@@ -1,0 +1,33 @@
+# Fear of Missing Out: "Delirium - Whenever this creature attacks for the first time each turn, if there are four or more
+# card types among cards in your graveyard, untap target creature. After this phase, there is an additional combat phase"
+# (CR 500.8). The graveyard holds an Ornithopter (artifact creature), a Lightning Bolt (instant) and a Forest the creature's
+# own "discard a card" put there (land): four types. On turn 3 it attacks, untaps itself, and attacks again in the
+# additional combat phase: 2 and 2, so Bot2 is on 16.
+
+[Bot1 Deck]
+Ornithopter
+Black Lotus
+Lightning Bolt
+Fear of Missing Out
+Forest
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Hand.Fear of Missing Out.Cast
+Bot1.Choose(Forest)
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Fear of Missing Out)
+Bot1.Attack(Fear of Missing Out)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16

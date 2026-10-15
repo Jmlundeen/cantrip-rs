@@ -1,0 +1,52 @@
+# Converge on a copy: no mana was spent to cast a copy (CR 707.10), so its X is zero and the number of colors spent on
+# the original is not copied. Together as One is paid with white, black, green, red and two colorless - X is four -
+# and Lutri, flashed in over it, copies it, the copy's targets moved to Bot1. The copy resolves first and does
+# nothing: Bot1 draws none, takes no damage and gains nothing. Then the original draws Bot2 four, deals Bot2 four and
+# gains Bot1 four.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Jet
+Mox Emerald
+Sol Ring
+Together as One
+Lutri, the Spellchaser
+Volcanic Island
+Island x6
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Volcanic Island.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Volcanic Island.Activate(Ability: {R})
+? Bot1.Mana = {W}{B}{R}{G}{C}{C}
+Bot1.Hand.Together as One.Cast
+Bot1.Target(Bot2)
+Bot1.Target(Bot2)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Lutri, the Spellchaser.Cast
+? Stack.Count = 2
+Bot1.Target(Bot1)
+Bot1.Target(Bot1)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Hand.Count = 11
+Bot2.Life = 16
+Bot1.Life = 24
+Bot1.Battlefield = Mox Pearl; Mox Jet; Mox Emerald; Sol Ring; Volcanic Island; Lutri, the Spellchaser
+Bot1.Library.Count = 6
+Bot1.Graveyard = Together as One; Black Lotus

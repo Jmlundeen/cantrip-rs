@@ -1,0 +1,47 @@
+# Bot1 casts Memory Jar with five Moxen and sacrifices it: both hands are exiled and replaced by seven new cards. At the
+# end step each player discards the new hand and gets the exiled cards back.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Mox Pearl
+Mox Emerald
+Memory Jar
+Mountain
+Swamp x7
+
+[Bot2 Deck]
+Island x7
+Forest x7
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Memory Jar.Cast
+Bot1.Pass
+Bot1.Battlefield.Memory Jar.Activate
+Bot1.Pass
+Bot1.Pass
+? Bot1.Hand = Swamp; Swamp; Swamp; Swamp; Swamp; Swamp; Swamp
+? Bot1.Library.Count = 0
+? Bot2.Hand = Forest; Forest; Forest; Forest; Forest; Forest; Forest
+? Exile.Count = 8
+[Bot1.End]
+
+[Expect]
+Turn = 1
+Step = End
+Exile.Count = 0
+Bot1.Hand = Mountain
+Bot1.Graveyard.Count = 8
+Bot2.Hand = Island; Island; Island; Island; Island; Island; Island
+Bot2.Graveyard.Count = 7

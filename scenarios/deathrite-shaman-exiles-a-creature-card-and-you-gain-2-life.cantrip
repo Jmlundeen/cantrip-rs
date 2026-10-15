@@ -1,0 +1,32 @@
+# Deathrite Shaman, G+T: exile target creature card from a graveyard; you gain 2 life.
+
+[Bot1 Deck]
+Swamp
+Deathrite Shaman
+Forest
+Swamp
+Forest
+Swamp
+Forest
+Swamp x10
+
+[Bot2 Deck]
+Mountain x7
+Llanowar Elves
+Mountain x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Deathrite Shaman.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Deathrite Shaman.Activate(Bot2.Graveyard.Llanowar Elves; Ability: creature)
+Bot1.Pass
+
+[Expect]
+Bot2.Graveyard.Count = 0
+Exile.Count = 1
+Bot1.Life = 22
+Bot2.Life = 20

@@ -1,0 +1,30 @@
+# Night's Whisper: its caster draws two cards and loses 2 life; the opponent is untouched.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Night's Whisper
+Island x4
+Island x13
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Night's Whisper.Cast
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Night's Whisper
+Bot1.Hand.Count = 7
+Bot1.Library.Count = 10
+Bot1.Life = 18
+Bot2.Life = 20
+Bot2.Hand.Count = 7

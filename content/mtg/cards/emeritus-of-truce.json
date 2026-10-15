@@ -1,0 +1,14 @@
+{
+  "name": "Emeritus of Truce",
+  "manaCost": "{1}{W}{W}",
+  "type": "Creature — Cat Cleric",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "When this creature enters, target player creates a 1/1 white and black Inkling creature token with flying. Then if an opponent controls more creatures than you, this creature becomes prepared. (While it's prepared, you may cast a copy of its spell. Doing so unprepares it.)",
+  "prepare": {
+    "name": "Swords to Plowshares",
+    "manaCost": "{W}",
+    "type": "Instant",
+    "oracleText": "Exile target creature. Its controller gains life equal to its power."
+  }
+}

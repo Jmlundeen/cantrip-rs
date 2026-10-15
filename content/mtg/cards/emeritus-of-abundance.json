@@ -1,0 +1,17 @@
+{
+  "name": "Emeritus of Abundance",
+  "manaCost": "{2}{G}",
+  "type": "Creature — Elf Druid",
+  "power": 3,
+  "toughness": 4,
+  "oracleText": "Vigilance\nThis creature enters prepared.\nWhenever this creature attacks, if you control eight or more lands, this creature becomes prepared.",
+  "keywords": [
+    "Vigilance"
+  ],
+  "prepare": {
+    "name": "Regrowth",
+    "manaCost": "{1}{G}",
+    "type": "Sorcery",
+    "oracleText": "Return target card from your graveyard to your hand."
+  }
+}

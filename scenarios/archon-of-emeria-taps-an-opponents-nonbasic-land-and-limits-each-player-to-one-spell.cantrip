@@ -1,0 +1,47 @@
+# Archon of Emeria: "Nonbasic lands your opponents control enter tapped" (CR 614.1c) and "Each player can't cast more
+# than one spell each turn" (CR 101.2). Bot2 casts the Archon on turn 2 with Black Lotus. On turn 3 Bot1's Strip Mine,
+# a nonbasic land, enters tapped, and after one spell - Dark Ritual - Bot1 may not cast Duress with the mana still in
+# the pool. On turn 4 Bot2's own Strip Mine enters untapped: the Archon taxes only its controller's opponents.
+
+[Bot1 Deck]
+Swamp
+Strip Mine
+Dark Ritual
+Duress
+Swamp x3
+Swamp x13
+
+[Bot2 Deck]
+Plains
+Black Lotus
+Archon of Emeria
+Strip Mine
+Plains x3
+Plains x13
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Archon of Emeria.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield = Plains; Archon of Emeria
+[T3 Bot1.Main1]
+Bot1.Hand.Strip Mine.Play
+? Bot1.Battlefield.Strip Mine.Tapped = true
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {B}{B}{B}
+! Bot1.Hand.Duress.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Strip Mine.Play
+
+[Expect]
+Turn = 4
+Bot2.Battlefield.Strip Mine.Tapped = false
+Bot1.Hand.Count = 5

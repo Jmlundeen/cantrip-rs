@@ -1,0 +1,44 @@
+# Only the second resolution of the Cub's ability each turn doubles. With an Icetill Explorer out (an additional land drop) Bot1 gets
+# three landfalls on turn 1: a Mountain (one counter), Scalding Tarn (second resolution: the counters double, 1 to 2), and the
+# Mountain the Tarn fetches (third: a single counter again, 3, where doubling would make 4). Each trigger targets the Cub.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Black Lotus
+Scythecat Cub
+Icetill Explorer
+Scalding Tarn
+Mountain
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Scythecat Cub.Cast
+Bot1.Pass
+Bot1.Hand.Mountain.Play
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Icetill Explorer.Cast
+Bot1.Pass
+Bot1.Hand.Scalding Tarn.Play
+Bot1.Target(Scythecat Cub)
+Bot1.Pass
+Bot1.Battlefield.Scalding Tarn.Activate
+Bot1.Search(Mountain)
+Bot1.Target(Scythecat Cub)
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Scythecat Cub.Counters.PlusOnePlusOne = 3
+Bot1.Battlefield.Scythecat Cub.Power = 5

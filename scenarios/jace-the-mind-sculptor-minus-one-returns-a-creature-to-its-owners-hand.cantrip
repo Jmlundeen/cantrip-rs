@@ -1,0 +1,36 @@
+# Jace, the Mind Sculptor, "-1: Return target creature to its owner's hand": on turn 3 Bot1 bounces Bot2's Ornithopter
+# with it; Jace goes from 3 loyalty to 2 and the Ornithopter is back in Bot2's hand.
+
+[Bot1 Deck]
+Mox Sapphire
+Black Lotus
+Jace, the Mind Sculptor
+Island x4
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Island x6
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Jace, the Mind Sculptor.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Jace, the Mind Sculptor.Activate(Ability: Return; Bot2.Battlefield.Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield.Jace, the Mind Sculptor.Counters.Loyalty = 2
+Bot2.Battlefield.Count = 0
+Bot2.Hand.Count = 8

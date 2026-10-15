@@ -1,0 +1,44 @@
+# Bot2's Containment Priest says a nontoken creature that would enter without being cast is exiled instead. Flash on turn 5
+# puts Dark Confidant "onto the battlefield" and it is exiled instead (CR 614): it is not on the battlefield to be sacrificed
+# or paid for, so the spell asks nothing more (the refusal: Bot1 is not offered the unless-cost).
+
+[Bot1 Deck]
+Island
+Island
+Island
+Flash
+Dark Confidant
+Island x2
+Island x16
+
+[Bot2 Deck]
+Plains
+Plains
+Containment Priest
+Plains x17
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains#1.Activate
+Bot2.Battlefield.Plains#2.Activate
+Bot2.Hand.Containment Priest.Cast
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Flash.Cast
+Bot1.Choose(Dark Confidant)
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Exile = Dark Confidant
+Bot1.Graveyard = Flash
+Bot1.Battlefield.Count = 3

@@ -1,0 +1,22 @@
+# Cut Down: "Destroy target creature with total power and toughness 5 or less." Bot2's 0/2 Ornithopter (total 2) is a
+# legal target and Cut Down destroys it.
+
+[Bot1 Deck]
+Mox Jet
+Cut Down
+Island x15
+
+[Bot2 Deck]
+Ornithopter
+Island x15
+
+[Actions]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cut Down.Cast(Ornithopter)
+
+[Expect]
+Bot1.Graveyard = Cut Down
+Bot2.Graveyard = Ornithopter

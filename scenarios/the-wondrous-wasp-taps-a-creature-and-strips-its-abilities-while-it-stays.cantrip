@@ -1,0 +1,42 @@
+# The Wondrous Wasp's enters ability taps Bot2's Llanowar Elves, which lose all abilities for as long as the Wasp
+# remains on the battlefield: on Bot2's turn the untapped Elves cannot be tapped for mana. Once Bot2 bolts the Wasp,
+# the Elves have their mana ability back and make {G}.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+The Wondrous Wasp
+Island x14
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Mountain
+Lightning Bolt
+Forest x3
+Forest x10
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.The Wondrous Wasp.Cast
+Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+[T3 Bot1.Main2]
+? Bot2.Battlefield.Llanowar Elves.Tapped = true
+[T4 Bot2.Main1]
+! Bot2.Battlefield.Llanowar Elves.Activate
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.The Wondrous Wasp)
+Bot2.Battlefield.Llanowar Elves.Activate
+
+[Expect]
+Bot1.Graveyard = The Wondrous Wasp
+Bot2.Mana = {G}

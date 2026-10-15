@@ -1,0 +1,23 @@
+# Concealed Courtyard enters tapped when you control three other lands: it is the fourth land Bot1 plays, and it
+# stays tapped so it cannot be activated until the next turn.
+
+[Bot1 Deck]
+Plains x3
+Concealed Courtyard
+Island x13
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Concealed Courtyard.Play
+
+[Expect]
+Turn = 7
+Bot1.Battlefield.Concealed Courtyard.Tapped = true

@@ -1,0 +1,37 @@
+# Mana Drain: "Counter target spell. At the beginning of your next main phase, add an amount of {C} equal to that
+# spell's mana value." Mind Twist cast for X=2 ({X}{B}) has mana value 3 while it is on the stack, and Mana Drain uses
+# that value as the spell was when it was countered (CR 608.2h; CR 202.3e: X is as chosen on the stack). Bot2 casts
+# it on turn 2 with Black Lotus; Bot1 counters it, and in its precombat main phase of turn 3 has {C}{C}{C}, not {C}.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mana Drain
+Island x17
+
+[Bot2 Deck]
+Black Lotus
+Mind Twist
+Swamp x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Mind Twist.Cast(Bot1; X: 2)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Mana Drain.Cast(Mind Twist)
+[T3 Bot1.Main1]
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {C}{C}{C}
+
+[Expect]
+Turn = 3
+Bot2.Graveyard = Mind Twist; Black Lotus
+Bot1.Graveyard = Mana Drain
+Bot1.Mana = {C}{C}{C}

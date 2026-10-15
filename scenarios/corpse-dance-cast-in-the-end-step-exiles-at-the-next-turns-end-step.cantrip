@@ -1,0 +1,40 @@
+# "Exile it at the beginning of the next end step": cast during the end step of turn 3 the beginning of that step is already
+# past, so the next end step is the one of turn 4 (CR 603.7, 513). The Ornithopter returned in Bot1's end step is still on the
+# battlefield during Bot2's turn 4 (a blocker there) and is exiled only at Bot2's end step.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Ornithopter
+Lightning Bolt
+Corpse Dance
+Swamp
+Island x10
+
+[Bot2 Deck]
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter)
+Bot1.Pass
+[T3 Bot1.End]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Corpse Dance.Cast
+Bot1.Pass
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Ornithopter.Types = Artifact; Creature
+[T4 Bot2.End]
+Bot2.Pass
+[T4 Bot2.Cleanup]
+
+[Expect]
+Exile = Ornithopter
+Bot1.Graveyard = Corpse Dance; Lightning Bolt

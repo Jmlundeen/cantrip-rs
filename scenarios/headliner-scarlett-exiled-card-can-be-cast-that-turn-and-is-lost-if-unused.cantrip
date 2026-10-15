@@ -1,0 +1,40 @@
+# The upkeep ability exiles the top card face down and lets Bot1 look at and play it THIS turn. Turn 3's card is Lightning Bolt,
+# cast from exile (a spell, not only a land) with Mox Ruby at Bot2: 17. Turn 5's card is a Plains that Bot1 does not play;
+# the permission ended with that turn, so on turn 7 the Plains cannot be played (refusal) while turn 7's own exiled Island,
+# the positive control, can.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Headliner Scarlett
+Swamp x4
+Lightning Bolt
+Swamp
+Plains
+Swamp
+Island
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Headliner Scarlett.Cast
+Bot1.Target(Bot2)
+[T3 Bot1.Main1]
+? Exile.Count = 1
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+[T5 Bot1.Main1]
+? Exile.Count = 1
+[T7 Bot1.Main1]
+Bot1.Exile.Island.Play
+! Bot1.Exile.Plains.Play
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Island.Tapped = False

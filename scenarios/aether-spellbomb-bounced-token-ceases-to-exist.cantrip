@@ -1,0 +1,44 @@
+# A token returned to its owner's hand ceases to exist (CR 111.7, 704.5d). Bot2 casts Lingering Souls on turn 6, making
+# two Spirit tokens; on turn 7 Bot1 bounces one with Aether Spellbomb. It is not in Bot2's hand: the hand holds only the
+# cards drawn and nothing else new, and one Spirit is left on the battlefield.
+
+[Bot1 Deck]
+Island
+Aether Spellbomb
+Island x14
+
+[Bot2 Deck]
+Plains
+Plains
+Plains
+Lingering Souls
+Plains x14
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Aether Spellbomb.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Plains#2.Activate
+Bot2.Battlefield.Plains#3.Activate
+Bot2.Hand.Lingering Souls.Cast
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Aether Spellbomb.Activate(Bot2.Battlefield.Spirit; Ability: Return target creature)
+Bot1.Battlefield.Island.Activate
+[Bot1.Main2]
+
+[Expect]
+Turn = 7
+Bot1.Graveyard = Aether Spellbomb
+Bot2.Battlefield.Spirit.Types = Creature
+Bot2.Hand.Count = 6
+Bot2.Battlefield.Count = 4
+Bot2.Graveyard = Lingering Souls
+Stack.Count = 0

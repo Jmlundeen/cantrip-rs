@@ -1,0 +1,21 @@
+# Urborg, Tomb of Yawgmoth makes itself a Swamp, so "you control a Swamp" holds with Urborg as the only other land:
+# Castle Locthwain enters untapped.
+
+[Bot1 Deck]
+Urborg, Tomb of Yawgmoth
+Plains
+Castle Locthwain
+Plains x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Urborg, Tomb of Yawgmoth.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Castle Locthwain.Play
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Castle Locthwain.Tapped = false
+Bot1.Battlefield.Castle Locthwain.Subtypes = Swamp

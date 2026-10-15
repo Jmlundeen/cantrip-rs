@@ -1,0 +1,38 @@
+# With several permanent cards in the graveyard (Black Lotus, a Plains and a Dark Confidant; the Faithless Looting is a sorcery and not among them) Bot1 chooses which to exile: the Dark Confidant, for
+# 2 life; chapter II puts 2 counters on the Ornithopter and chapter III returns the Saga and the Confidant. Lands and creatures and artifacts all count as permanent cards.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Faithless Looting
+Dark Confidant
+Plains
+The Aesir Escape Valhalla
+Island
+Ornithopter
+Island
+Forest x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Plains; Dark Confidant)
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.The Aesir Escape Valhalla.Cast
+Bot1.Choose(Dark Confidant)
+[T1 Bot1.Main2]
+? Bot1.Life = 22
+? Exile = Dark Confidant
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 2
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Graveyard = Black Lotus; Faithless Looting; Plains

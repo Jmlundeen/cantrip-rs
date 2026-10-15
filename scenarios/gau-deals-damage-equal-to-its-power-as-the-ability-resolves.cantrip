@@ -1,0 +1,46 @@
+# "Gau deals damage equal to its power" is read as the ability resolves, not as it triggers. On turn 5 Faithless
+# Looting is flashed back, so Gau's ability triggers at Bot1's end step with Gau a 2/2; in response Bot1 casts
+# Battlefield Improvisation on it, and the ability resolves for 4.
+
+[Bot1 Deck]
+Mountain
+Sol Ring
+Gau, Feral Youth
+Faithless Looting
+Battlefield Improvisation
+Plains
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Gau, Feral Youth.Cast
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Mountain; Mountain)
+[T3 Bot1.End]
+? Stack.Count = 0
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Graveyard.Faithless Looting.Cast(Ability: Flashback)
+Bot1.Choose(Mountain; Mountain)
+[T5 Bot1.End]
+? Stack.Count = 1
+Bot1.Hand.Battlefield Improvisation.Cast(Gau, Feral Youth)
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mountain.Activate
+[T6 Bot2.Upkeep]
+
+[Expect]
+Bot2.Life = 16

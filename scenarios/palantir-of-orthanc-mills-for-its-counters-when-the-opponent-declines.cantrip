@@ -1,0 +1,36 @@
+# Palantír of Orthanc: at the beginning of its controller's end step it gets an influence counter, they scry 2, and the
+# target opponent may have them draw a card. Bot2 declines, so Bot1 mills one card (one counter): Lightning Bolt, mana
+# value 1, and Bot2 loses 1 life.
+
+[Bot1 Deck]
+Island
+Sol Ring
+Mox Pearl
+Palantír of Orthanc
+Island x3
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Swamp x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Palantír of Orthanc.Cast
+Bot1.Pass
+[Bot1.Main2]
+Bot1.Arrange(Lightning Bolt; Island | )
+Bot2.Decline
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Palantír of Orthanc.Counters.Influence = 1
+Bot1.Graveyard = Lightning Bolt
+Bot2.Life = 19

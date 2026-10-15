@@ -1,0 +1,42 @@
+# Treasure Cruise: "Delve (Each card you exile from your graveyard while casting this spell pays for {1})" (CR 702.66a) - only
+# the generic part of {7}{U}. Three Thought Scours on Bot1 itself (with a Black Lotus's {U}{U}{U}) leave ten cards in its
+# graveyard (the Lotus, three Scours and six milled cards) and no blue mana: the cast is not offered, however many cards could be
+# exiled (the refusal). Playing an Island is the positive control: seven cards delved pay the {7}, the Island the {U}, and
+# three cards are drawn.
+
+[Bot1 Deck]
+Black Lotus
+Thought Scour
+Thought Scour
+Thought Scour
+Treasure Cruise
+Island
+Plains
+Plains x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Thought Scour.Cast(Bot1)
+Bot1.Hand.Thought Scour.Cast(Bot1)
+Bot1.Hand.Thought Scour.Cast(Bot1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard.Count = 10
+! Bot1.Hand.Treasure Cruise.Cast
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Treasure Cruise.Cast(Delve: 7)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard.Count = 4
+Exile.Count = 7
+Bot1.Hand.Count = 7

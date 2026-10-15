@@ -1,0 +1,39 @@
+# Bot1 casts Chandra, Torch of Defiance on turn one and +1s her twice, once a turn, so she stands at six loyalty on
+# turn three with Bot1 to act. A board about how the client draws a planeswalker's loyalty: on a badge of its own over
+# the card, drawn fresh as it changes while the rest of the face is kept.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mox Ruby
+Chandra, Torch of Defiance
+Island
+Island
+Island
+Lightning Bolt
+Island x5
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Chandra, Torch of Defiance.Cast
+Bot1.Battlefield.Chandra, Torch of Defiance.Activate(Ability: Exile the top)
+Bot1.Accept
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Mox Ruby.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Chandra, Torch of Defiance.Activate(Ability: Add)
+[Handover Bot1.Pass]
+
+[Expect]
+Turn = 3
+Step = Main1
+Bot2.Life = 17
+Bot1.Battlefield.Count = 4

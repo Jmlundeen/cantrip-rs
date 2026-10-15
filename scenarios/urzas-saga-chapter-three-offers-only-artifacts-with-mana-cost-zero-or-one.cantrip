@@ -1,0 +1,30 @@
+# Chapter III: "an artifact card with mana cost {0} or {1}". The library holds a Mind Stone (cost {2}), a Lightning Bolt (not an
+# artifact), a Walking Ballista (cost {X}{X}, not {0}) and a Sol Ring ({1}): only the Sol Ring is offered (the refusals, then the
+# Sol Ring found), and it enters the battlefield. The Saga, a land with its chapters done, is sacrificed after chapter III.
+
+[Bot1 Deck]
+Urza's Saga
+Forest x6
+Forest
+Forest
+Mind Stone
+Lightning Bolt
+Walking Ballista
+Sol Ring
+Forest x6
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Urza's Saga.Play
+[T5 Bot1.Main1]
+! Bot1.Search(Mind Stone)
+! Bot1.Search(Lightning Bolt)
+! Bot1.Search(Walking Ballista)
+Bot1.Search(Sol Ring)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Sol Ring
+Bot1.Graveyard = Urza's Saga

@@ -1,0 +1,45 @@
+# Forensic Gadgeteer: "Activated abilities of artifacts you control cost {1} less to activate." Retrofitter Foundry's
+# "{3}: Untap this artifact" costs {2}: two tapped Moxen pay it with nothing left in the pool, so the reduction is exactly one (a
+# larger reduction would leave a mana floating, none would leave the cost owed). The Gadgeteer is cast on turn 1 with
+# three Moxen; the Foundry is an artifact spell cast after it, so it investigates.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Forensic Gadgeteer
+Retrofitter Foundry
+Mountain
+Island
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Forensic Gadgeteer.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Retrofitter Foundry.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Retrofitter Foundry.Activate(Ability: Untap)
+? Bot1.Mana =
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Mox Jet.Tapped = true
+Bot1.Battlefield.Mox Ruby.Tapped = true

@@ -1,0 +1,24 @@
+# Fail to find (CR 701.23b): the library holds only an Island and a Mountain, so nothing may be found, but the life
+# is paid and the Flats sacrificed all the same.
+
+[Bot1 Deck]
+Marsh Flats
+Island x6
+Island
+Mountain
+Island x8
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Marsh Flats.Play
+Bot1.Battlefield.Marsh Flats.Activate
+! Bot1.Search(Island)
+! Bot1.Search(Mountain)
+Bot1.Search()
+
+[Expect]
+Bot1.Life = 19
+Bot1.Graveyard = Marsh Flats
+Bot1.Battlefield.Count = 0

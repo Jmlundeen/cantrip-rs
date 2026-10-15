@@ -1,0 +1,32 @@
+# "Counter target spell": with only Marsh Flats' ability on the stack there is no target, so the Force is not offered
+# even though its alternative cost is payable (Brainstorm in hand, life to pay); with Duress, a spell, on the stack
+# in the same turn, it is offered and counters it.
+
+[Bot1 Deck]
+Force of Will
+Brainstorm
+Island x5
+Island x10
+
+[Bot2 Deck]
+Marsh Flats
+Duress
+Swamp
+Swamp x12
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Marsh Flats.Play
+Bot2.Battlefield.Marsh Flats.Activate
+! Bot1.Hand.Force of Will.Cast
+Bot1.Pass
+Bot2.Search(Swamp)
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Duress.Cast(Bot1)
+Bot1.Hand.Force of Will.Cast(Duress; Ability: exile a blue card)
+Bot1.Choose(Brainstorm)
+
+[Expect]
+Bot1.Life = 19
+Exile = Brainstorm
+Bot2.Graveyard = Duress; Marsh Flats

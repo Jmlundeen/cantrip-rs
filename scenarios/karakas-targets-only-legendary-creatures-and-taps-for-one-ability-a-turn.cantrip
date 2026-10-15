@@ -1,0 +1,35 @@
+# "Target legendary creature": Bot2's Ornithopter (not legendary) and Karakas itself (a legendary land, not a creature) are
+# refused as targets, while Bot2's Cecil, Dark Knight (a legendary creature, the positive control) is bounced to its owner's
+# hand. Both abilities cost {T}, so after the bounce Karakas is tapped and cannot also add {W} (refusal); the mana ability
+# works on its own on turn 5.
+
+[Bot1 Deck]
+Karakas
+Island x19
+
+[Bot2 Deck]
+Swamp
+Cecil, Dark Knight
+Ornithopter
+Swamp x17
+
+[Actions]
+Bot1.Hand.Karakas.Play
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Cecil, Dark Knight.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Karakas.Activate(Ability: Return; Ornithopter)
+! Bot1.Battlefield.Karakas.Activate(Ability: Return; Karakas)
+Bot1.Battlefield.Karakas.Activate(Ability: Return; Cecil, Dark Knight)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Hand.Count = 6
+! Bot1.Battlefield.Karakas.Activate(Ability: Add)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Karakas.Activate(Ability: Add)
+
+[Expect]
+Bot1.Mana = {W}
+Bot2.Battlefield = Swamp; Ornithopter

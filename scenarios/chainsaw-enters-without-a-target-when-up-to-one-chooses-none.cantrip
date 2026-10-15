@@ -1,0 +1,32 @@
+# "Up to one target creature": Bot2 has a Llanowar Elves, but Bot1 chooses no target for Chainsaw's enters trigger (Target() with nothing named). The Elves takes no damage and nothing dies, so no rev counter.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Chainsaw
+Plains x14
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x15
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Chainsaw.Cast
+Bot1.Target()
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot2.Battlefield.Llanowar Elves.Damage = 0
+Bot1.Battlefield.Chainsaw.Counters.Rev = (absent)

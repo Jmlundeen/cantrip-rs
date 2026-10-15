@@ -1,0 +1,30 @@
+# Super Shredder (cast on turn 1 off a Swamp and Mox Jet) gets a +1/+1 counter whenever another permanent leaves the
+# battlefield: Black Lotus, sacrificed for its mana, makes it a 2/2.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Black Lotus
+Super Shredder
+Swamp x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Super Shredder.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Battlefield.Super Shredder.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Super Shredder.Power = 2
+Bot1.Battlefield.Super Shredder.Toughness = 2
+Bot1.Graveyard = Black Lotus

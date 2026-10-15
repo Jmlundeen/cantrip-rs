@@ -1,0 +1,46 @@
+# Ledger Shredder, played for real. Turn 5 Bot1 has three lands and casts three Pyrite Spellbombs. Only the second
+# is the second spell of the turn, so the Shredder connives exactly once: one counter (a nonland discard), and the
+# first and third spells do nothing.
+
+[Bot1 Deck]
+Island
+Ledger Shredder
+Island
+Pyrite Spellbomb
+Pyrite Spellbomb
+Pyrite Spellbomb
+Island
+Island
+Island
+Pyrite Spellbomb
+Island x10
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Ledger Shredder.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Pyrite Spellbomb.Cast
+? Bot1.Hand.Count = 4
+? Bot1.Battlefield.Ledger Shredder.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Pyrite Spellbomb.Cast
+Bot1.Choose(Pyrite Spellbomb)
+Bot1.Battlefield.Island#3.Activate
+Bot1.Hand.Pyrite Spellbomb.Cast
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Ledger Shredder.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Count = 7
+Bot1.Hand.Count = 2
+Stack.Count = 0

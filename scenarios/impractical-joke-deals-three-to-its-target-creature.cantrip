@@ -1,0 +1,30 @@
+# Impractical Joke (R sorcery) cast on turn 3 at Bot2's Llanowar Elves, which takes 3 damage and dies.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Impractical Joke
+Mountain x11
+
+[Bot2 Deck]
+Forest
+Forest
+Llanowar Elves
+Forest x11
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Impractical Joke.Cast(Bot2.Battlefield.Llanowar Elves)
+[T3 Bot1.Main2]
+? Bot2.Graveyard = Llanowar Elves
+? Bot1.Graveyard = Impractical Joke
+
+[Expect]
+Bot2.Battlefield.Count = 1

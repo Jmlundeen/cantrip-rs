@@ -1,0 +1,45 @@
+# All Aboard returns the card "under its owner's control" (CR 610.3c, 108.3): Bot1 has taken Bot2's Ornithopter with
+# Dack Fayden's -2, so it is a creature Bot1 controls and a legal target, and it comes back on Bot2's side.
+
+[Bot1 Deck]
+Volcanic Island x3
+Dack Fayden
+Volcanic Island
+Skycoach Conductor
+Island x14
+
+[Bot2 Deck]
+Ornithopter
+Mountain x19
+
+[Actions]
+Bot1.Hand.Volcanic Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Volcanic Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Volcanic Island.Play
+Bot1.Battlefield.Volcanic Island#1.Activate(Ability: Add {U})
+Bot1.Battlefield.Volcanic Island#2.Activate(Ability: Add {R})
+Bot1.Battlefield.Volcanic Island#3.Activate(Ability: Add {U})
+Bot1.Hand.Dack Fayden.Cast
+[T5 Bot1.Main2]
+Bot1.Battlefield.Dack Fayden.Activate(Bot2.Battlefield.Ornithopter; Ability: Gain control)
+[T7 Bot1.Main1]
+? Bot1.Battlefield.Ornithopter.Types = Artifact; Creature
+Bot1.Hand.Volcanic Island.Play
+Bot1.Battlefield.Volcanic Island#1.Activate(Ability: Add {U})
+Bot1.Battlefield.Volcanic Island#2.Activate(Ability: Add {U})
+Bot1.Battlefield.Volcanic Island#3.Activate(Ability: Add {U})
+Bot1.Hand.Skycoach Conductor.Cast
+[T7 Bot1.Main2]
+Bot1.Battlefield.Volcanic Island#4.Activate(Ability: Add {U})
+Bot1.Exile.All Aboard.Cast(Bot1.Battlefield.Ornithopter)
+[T7 Bot1.End]
+
+[Expect]
+Turn = 7
+Exile.Count = 0
+Bot1.Battlefield = Volcanic Island; Volcanic Island; Volcanic Island; Volcanic Island; Dack Fayden; Skycoach Conductor
+Bot2.Battlefield = Ornithopter

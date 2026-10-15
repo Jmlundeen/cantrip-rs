@@ -1,0 +1,33 @@
+# Hexdrinker's levels (CR 702.87, 711.2): at level 2 it has no level symbol yet, so it is a plain 2/1 with no protection,
+# and Bot2's Fatal Push kills it (the control for the level 3 scenario, where the same Push is not even offered).
+
+[Bot1 Deck]
+Forest
+Hexdrinker
+Mox Ruby
+Mox Jet
+Forest x10
+
+[Bot2 Deck]
+Swamp
+Fatal Push
+Swamp x5
+Swamp x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Hexdrinker.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Hexdrinker.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Hexdrinker.Activate
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Fatal Push.Cast(Bot1.Battlefield.Hexdrinker)
+[T3 Bot1.Upkeep]
+
+[Expect]
+Bot1.Graveyard = Hexdrinker

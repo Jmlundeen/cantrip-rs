@@ -1,0 +1,49 @@
+# Same turns as the Blood-token scenario, but Bombardiers sacrifices the Bloodtithe Harvester (mana value 2) for 2 + 2 = 4
+# damage, and Bot2 responds by Lightning Bolting the Bombardiers. The ability is already on the stack, so it resolves
+# without its source: it still deals 4 to Bot2, which was counted from the mana value the Harvester had as it was
+# sacrificed (CR 608.2h, last-known information) - and the Bombardiers dealt no combat damage.
+
+[Bot1 Deck]
+Swamp
+Mountain
+Bloodtithe Harvester
+Broadside Bombardiers
+Mountain
+Mountain x3
+Mountain x6
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Bloodtithe Harvester.Cast
+Bot1.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Broadside Bombardiers.Cast
+Bot1.Pass
+Bot1.Attack(Broadside Bombardiers > Bot2)
+Bot1.Battlefield.Broadside Bombardiers.Activate(Bot2)
+Bot1.Choose(Bloodtithe Harvester)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Broadside Bombardiers)
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot1.Graveyard = Broadside Bombardiers; Bloodtithe Harvester
+Bot2.Graveyard = Lightning Bolt; Island

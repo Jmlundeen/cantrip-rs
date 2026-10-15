@@ -1,0 +1,46 @@
+# Skyclave Apparition: entering, it exiles Mind Stone (mana value 2); Lightning Bolt kills it, and Mind Stone's
+# owner (Bot2) creates a 2/2 blue Illusion.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Skyclave Apparition
+Plains x16
+
+[Bot2 Deck]
+Mox Ruby
+Mox Emerald
+Mind Stone
+Lightning Bolt
+Plains x16
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Mind Stone.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Skyclave Apparition.Cast
+Bot1.Target(Bot2.Battlefield.Mind Stone)
+Bot1.Pass
+[Bot1.Main2]
+? Exile = Mind Stone
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Skyclave Apparition)
+Bot2.Pass
+[Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Skyclave Apparition
+Bot2.Battlefield.Illusion.Power = 2
+Bot2.Battlefield.Illusion.Toughness = 2
+Bot2.Battlefield.Illusion.Subtypes = Illusion

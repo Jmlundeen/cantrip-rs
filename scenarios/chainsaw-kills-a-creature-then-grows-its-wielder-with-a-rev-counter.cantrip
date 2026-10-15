@@ -1,0 +1,46 @@
+# Chainsaw: entering, it deals 3 damage to a creature (Bot2's Llanowar Elves), and the creature dying puts a rev
+# counter on the Equipment, so an Ornithopter equipped with it is a 1/2.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Chainsaw
+Ornithopter
+Plains x13
+
+[Bot2 Deck]
+Mox Emerald
+Llanowar Elves
+Plains x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Chainsaw.Cast
+Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Chainsaw.Activate(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Llanowar Elves
+Bot1.Battlefield.Chainsaw.Counters.Rev = 1
+Bot1.Battlefield.Chainsaw.AttachedTo = Ornithopter
+Bot1.Battlefield.Ornithopter.Power = 1

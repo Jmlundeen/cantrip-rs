@@ -1,0 +1,37 @@
+# Bazaar of Baghdad: "{T}: Draw two cards, then discard three cards." With nothing else in hand, the two cards it draws
+# are all there is to discard, and a player discards as many as they can (CR 701.9b): both go, and nothing else is lost.
+
+[Bot1 Deck]
+Bazaar of Baghdad
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Lotus Petal
+Lightning Bolt
+Counterspell
+Island x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Bazaar of Baghdad.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Lotus Petal.Cast
+? Bot1.Hand.Count = 0
+Bot1.Battlefield.Bazaar of Baghdad.Activate
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Hand.Count = 0
+Bot1.Graveyard.Count = 2
+Bot1.Library.Count = 10
+Bot1.Battlefield.Count = 7
+Bot1.Battlefield.Bazaar of Baghdad.Tapped = true

@@ -1,0 +1,33 @@
+# Galvanic Discharge: "you may pay any amount of {E}" includes none. Bot1 gets {E}{E}{E} and declines the first counter: no
+# damage is dealt to Bot2's Llanowar Elves, which lives, and all three energy counters stay with Bot1 (CR 122.1).
+
+[Bot1 Deck]
+Mountain
+Mountain
+Galvanic Discharge
+Mountain x4
+Mountain x14
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x5
+Forest x13
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Galvanic Discharge.Cast(Llanowar Elves)
+Bot1.Decline
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Energy = 3
+Bot2.Battlefield = Forest; Llanowar Elves
+Bot2.Battlefield.Llanowar Elves.Damage = 0
+Bot1.Graveyard = Galvanic Discharge

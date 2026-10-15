@@ -1,0 +1,29 @@
+# "Return to the battlefield all permanent cards in your graveyard that were put there from the battlefield this turn": with none, nothing happens. Bot1
+# pays {3}{W} with four Moxen (so no mana source is itself sacrificed and put into the graveyard), and the graveyard holds only Faith's Reward.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Emerald
+Mox Ruby
+Mox Sapphire
+Faith's Reward
+Plains x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Faith's Reward.Cast
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Pearl; Mox Emerald; Mox Ruby; Mox Sapphire
+Bot1.Graveyard = Faith's Reward

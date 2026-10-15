@@ -1,0 +1,28 @@
+# "You may have this creature enter as a copy": Bot1 declines, so it enters as its own printed 0/0 artifact creature and is
+# put into the graveyard as a state-based action (CR 704.5f). Its mana was Black Lotus and Mox Sapphire ({U}), no life; the
+# Ornithopter it could have copied stays alone.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Ornithopter
+Phyrexian Metamorph
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Phyrexian Metamorph.Cast
+Bot1.Decline
+[Bot1.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield = Mox Sapphire; Ornithopter
+Bot1.Graveyard = Phyrexian Metamorph; Black Lotus

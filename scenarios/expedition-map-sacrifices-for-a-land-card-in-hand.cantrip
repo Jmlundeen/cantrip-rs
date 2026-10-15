@@ -1,0 +1,36 @@
+# Expedition Map: {2}, {T}, sacrifice it to search the library for any land card (here a
+# Mountain among Islands), reveal it and put it into the hand, then shuffle.
+
+[Bot1 Deck]
+Island
+Island
+Expedition Map
+Island
+Island
+Island
+Island
+Island
+Island
+Mountain
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Expedition Map.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Expedition Map.Activate
+Bot1.Search(Mountain)
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Graveyard = Expedition Map
+Bot1.Battlefield = Island; Island
+Bot1.Hand = Island; Island; Island; Island; Island; Mountain

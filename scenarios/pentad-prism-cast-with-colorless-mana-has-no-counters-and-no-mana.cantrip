@@ -1,0 +1,26 @@
+# Sunburst counts colors of mana spent (CR 702.44a): Sol Ring's {C}{C} is colorless, so the Prism enters with no charge
+# counters and its ability, which removes one, is refused.
+
+[Bot1 Deck]
+Mox Ruby
+Sol Ring
+Pentad Prism
+Island x4
+Island x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Pentad Prism.Cast
+Bot1.Pass
+! Bot1.Battlefield.Pentad Prism.Activate(Color: Blue)
+
+[Expect]
+Bot1.Battlefield.Pentad Prism.Counters.Charge = (absent)
+Bot1.Battlefield.Pentad Prism.Types = Artifact

@@ -1,0 +1,74 @@
+# Woodfall Primus destroys a noncreature permanent as it enters, and persist (CR 702.79a) returns it once with a -1/-1
+# counter, destroying another; with the counter on it, its second death is final.
+[Bot1 Deck]
+Forest x7
+Woodfall Primus
+Forest x12
+[Bot2 Deck]
+Vindicate
+Vindicate
+Sol Ring
+Plains x2
+Swamp x2
+Plains x12
+[Actions]
+Bot1.Hand.Forest.Play
+[Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T8 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T10 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T11 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T13 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T15 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Woodfall Primus.Cast
+Bot1.Target(Bot2.Battlefield.Sol Ring)
+[Bot1.Main2]
+? Bot2.Graveyard = Sol Ring; Plains
+? Bot1.Battlefield.Woodfall Primus.Counters.MinusOneMinusOne = (absent)
+[T16 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Vindicate.Cast(Bot1.Battlefield.Woodfall Primus)
+Bot1.Target(Bot2.Battlefield.Plains)
+[Bot2.Main2]
+? Bot1.Battlefield.Woodfall Primus.Counters.MinusOneMinusOne = 1
+? Bot1.Graveyard.Count = 0
+? Bot2.Battlefield.Count = 5
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Vindicate.Cast(Bot1.Battlefield.Woodfall Primus)
+[Bot2.End]
+[Expect]
+Turn = 16
+Bot1.Battlefield.Count = 8
+Bot1.Graveyard = Woodfall Primus

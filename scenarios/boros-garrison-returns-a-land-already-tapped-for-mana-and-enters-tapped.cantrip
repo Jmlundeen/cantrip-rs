@@ -1,0 +1,28 @@
+# The classic play: Bot1 taps the Mountain for {R} first, then plays Boros Garrison and returns the tapped Mountain. The {R}
+# stays in the pool for the rest of the main phase (mana is not tied to its source), the Garrison entered tapped so it
+# cannot be tapped this turn (refusal), and it can be on turn 5 (positive control for the refusal).
+
+[Bot1 Deck]
+Mountain
+Boros Garrison
+Plains x18
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Boros Garrison.Play
+? Bot1.Mana = {R}
+Bot1.Choose(Mountain)
+? Bot1.Mana = {R}
+? Bot1.Battlefield.Boros Garrison.Tapped = True
+! Bot1.Battlefield.Boros Garrison.Activate
+[T5 Bot1.Main1]
+Bot1.Battlefield.Boros Garrison.Activate
+
+[Expect]
+Bot1.Mana = {W}{R}
+Bot1.Battlefield = Boros Garrison

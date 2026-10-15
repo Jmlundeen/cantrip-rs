@@ -1,0 +1,52 @@
+# Bot2 casts Deep-Cavern Bat on turn four. With its enters trigger on the stack (Bot1 passes once, so the Bat
+# resolves first), Bot1 flashes in Tishana's Tidebinder off a Black Lotus and counters that triggered ability. The
+# Bat is a creature, so it loses all abilities for as long as the Tidebinder remains: no flying or lifelink, and the
+# Lightning Bolt in Bot1's hand is never looked at or exiled. That still holds a turn later.
+#
+# On turn five Bot1 bolts its own Tidebinder. Once it has left the battlefield the Bat has its abilities back.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Tishana's Tidebinder
+Mountain
+Lightning Bolt
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Swamp
+Swamp
+Deep-Cavern Bat
+Swamp x14
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot2.Hand.Swamp.Play
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp#1.Activate
+Bot2.Battlefield.Swamp#2.Activate
+Bot2.Hand.Deep-Cavern Bat.Cast
+Bot1.Pass
+? Stack.Count = 1
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Tishana's Tidebinder.Cast
+Bot1.Target(Stack.Deep-Cavern Bat)
+[T4 Bot2.Main2]
+? Bot1.Hand = Lightning Bolt; Island; Island; Island
+? Exile.Count = 0
+? Bot2.Battlefield.Deep-Cavern Bat.Keywords = (absent)
+[T5 Bot1.Main1]
+? Bot2.Battlefield.Deep-Cavern Bat.Keywords = (absent)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Tishana's Tidebinder)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Graveyard = Tishana's Tidebinder; Lightning Bolt; Black Lotus
+Bot2.Battlefield.Deep-Cavern Bat.Keywords = Flying; Lifelink
+Exile.Count = 0

@@ -1,0 +1,30 @@
+# Bot2 casts Duress on its first turn; Bot1 casts Force of Will for its alternative cost, paying 1 life and exiling the
+# Brainstorm from its hand (a blue card; Mox Sapphire is colorless), with no mana, and counters it.
+
+[Bot1 Deck]
+Force of Will
+Brainstorm
+Mox Sapphire
+Island x17
+
+[Bot2 Deck]
+Swamp
+Duress
+Swamp x18
+
+[Actions]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Duress.Cast(Bot1)
+? Stack = Duress
+Bot1.Hand.Force of Will.Cast(Duress; Ability: exile a blue card)
+Bot1.Choose(Brainstorm)
+? Stack = Force of Will; Duress
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot1.Life = 19
+Exile = Brainstorm
+Bot1.Graveyard = Force of Will
+Bot2.Graveyard = Duress

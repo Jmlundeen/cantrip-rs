@@ -1,0 +1,61 @@
+# Necromancy: "When this enchantment leaves the battlefield, that creature's controller sacrifices it." Bot1 Lightning Bolts
+# Bot2's Ornithopter on turn 3 and reanimates it with Necromancy at sorcery speed, so it stays. On turn 4 Bot2 Disenchants the
+# Necromancy: Bot1 sacrifices the Ornithopter, which goes to its owner's graveyard (Bot2's), not the controller's.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Mox Emerald
+Lightning Bolt
+Necromancy
+Island x15
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Ornithopter
+Disenchant
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Graveyard = Ornithopter
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Necromancy.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Power = 0
+? Bot1.Battlefield.Necromancy.AttachedTo = Ornithopter
+[T4 Bot2.Main1]
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Disenchant.Cast(Necromancy)
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot2.Graveyard = Ornithopter; Disenchant
+Bot1.Graveyard = Necromancy; Lightning Bolt

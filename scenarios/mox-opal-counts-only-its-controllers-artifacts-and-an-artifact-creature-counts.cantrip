@@ -1,0 +1,28 @@
+# "If you control three or more artifacts": Bot2's three Moxen do not count for Bot1, so with Mox Opal and Mox Ruby it is still
+# refused. An Ornithopter, an artifact creature, is the third artifact (the positive control): the Opal then adds green.
+
+[Bot1 Deck]
+Mox Opal
+Mox Ruby
+Ornithopter
+Island x17
+
+[Bot2 Deck]
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Island x17
+
+[Actions]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Opal.Cast
+Bot1.Hand.Mox Ruby.Cast
+! Bot1.Battlefield.Mox Opal.Activate
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Opal.Activate(Color: Green)
+
+[Expect]
+Bot1.Mana = {G}

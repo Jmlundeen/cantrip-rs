@@ -1,0 +1,43 @@
+# Survival of the Fittest: an activated ability with no timing restriction, so it is played on the opponent's turn and
+# again in response to itself; each discard is a cost paid as it is activated, and the later activation resolves first.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Black Lotus
+Survival of the Fittest
+Birds of Paradise
+Elvish Mystic
+Forest
+Noble Hierarch
+Llanowar Elves
+Forest x8
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Survival of the Fittest.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Survival of the Fittest.Activate
+Bot1.Choose(Birds of Paradise)
+? Stack.Count = 1
+? Bot1.Hand = Elvish Mystic; Forest
+Bot1.Battlefield.Survival of the Fittest.Activate
+Bot1.Choose(Elvish Mystic)
+? Stack.Count = 2
+Bot1.Search(Llanowar Elves)
+? Bot1.Hand = Forest; Llanowar Elves
+Bot1.Search(Noble Hierarch)
+
+[Expect]
+Turn = 2
+ActivePlayer = Bot2
+Bot1.Hand = Forest; Llanowar Elves; Noble Hierarch
+Bot1.Graveyard = Elvish Mystic; Birds of Paradise; Black Lotus; Black Lotus
+Bot1.Library.Count = 8

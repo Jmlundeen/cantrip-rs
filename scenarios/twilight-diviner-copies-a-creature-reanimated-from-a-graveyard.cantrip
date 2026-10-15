@@ -1,0 +1,44 @@
+# Twilight Diviner's surveil puts a Guerrilla Gorilla into Bot1's graveyard. Next turn Reanimate returns it, the Gorilla
+# enters from a graveyard under Bot1's control, and the Diviner's second ability creates a token that's a copy of it.
+# The lone creature is "one of them" and needs no choice.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Swamp
+Twilight Diviner
+Reanimate
+Swamp
+Swamp
+Swamp
+Swamp
+Guerrilla Gorilla
+Elvish Mystic
+Swamp x10
+
+[Bot2 Deck]
+Forest x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Twilight Diviner.Cast
+Bot1.Arrange( | Guerrilla Gorilla; Elvish Mystic)
+[T7 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Reanimate.Cast(Guerrilla Gorilla)
+
+[Expect]
+Turn = 7
+Stack.Count = 0
+Bot1.Life = 18
+Bot1.Graveyard = Reanimate; Elvish Mystic
+Bot1.Battlefield = Swamp; Swamp; Swamp; Swamp; Twilight Diviner; Guerrilla Gorilla; Guerrilla Gorilla

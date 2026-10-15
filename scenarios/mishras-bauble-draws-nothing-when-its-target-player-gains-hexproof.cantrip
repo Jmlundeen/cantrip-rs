@@ -1,0 +1,40 @@
+# Mishra's Bauble targets a player. Bot2 answers with Dawn's Truce and gains hexproof: the target is illegal, the ability
+# does not resolve (CR 608.2b), and no card is drawn at the next upkeep - though the Bauble was already sacrificed as a cost.
+
+[Bot1 Deck]
+Mishra's Bauble
+Island x7
+Island x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Dawn's Truce
+Plains x4
+Plains x10
+
+[Actions]
+Bot1.Hand.Mishra's Bauble.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mishra's Bauble.Activate(Bot2)
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Dawn's Truce.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Graveyard = Mishra's Bauble
+[T4 Bot2.Main1]
+? Bot1.Hand.Count = 7
+
+[Expect]
+Turn = 4

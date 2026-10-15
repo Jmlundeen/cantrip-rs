@@ -1,0 +1,32 @@
+# Mawloc: "fights up to one target creature an opponent controls" - with Bot2 controlling no creature the ability has no
+# target and does nothing. Cast for X = 1 off a Mountain, a Forest and a Sol Ring, Mawloc is a 3/3 and is undamaged. (The
+# neighbouring scenario is the fight.)
+
+[Bot1 Deck]
+Mountain
+Forest
+Sol Ring
+Mawloc
+Mountain x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mountain.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mawloc.Cast(X: 1)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Sol Ring.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield.Mawloc.Power = 3
+Bot1.Battlefield.Mawloc.Damage = 0
+Exile.Count = 0

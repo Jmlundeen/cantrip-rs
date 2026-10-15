@@ -1,0 +1,6 @@
+{
+  "name": "Welding Jar",
+  "manaCost": "{0}",
+  "type": "Artifact",
+  "oracleText": "Sacrifice this artifact: Regenerate target artifact."
+}

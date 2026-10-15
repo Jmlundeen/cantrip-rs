@@ -1,0 +1,52 @@
+# Aragorn's "creatures can't block this turn" is a rule-changing effect, not a change of characteristics, so it covers
+# creatures that did not exist when it resolved (CR 611.2c applies only to the latter). Bot2 passes with the trigger on
+# the stack, lets it resolve, and only then flashes in Cathar Commando; Bot2 is still never asked to declare blockers.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Mox Emerald
+Aragorn, King of Gondor
+Elvish Mystic
+Plains x12
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Cathar Commando
+Plains x12
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Aragorn, King of Gondor.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Elvish Mystic.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Aragorn, King of Gondor; Elvish Mystic)
+Bot1.Target()
+Bot1.Pass
+Bot2.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Cathar Commando.Cast
+[T3 Bot1.DeclareBlockers]
+? Bot2.Battlefield.Cathar Commando.Types = Creature
+! Bot2.Block
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 15
+Bot2.Battlefield.Cathar Commando.Damage = 0

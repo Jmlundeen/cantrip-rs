@@ -1,0 +1,67 @@
+use cantrip_api::*;
+use cantrip_mechanics::effects;
+use cantrip_mechanics::{targets, triggers};
+use cantrip_oracle as oracle;
+
+/// "Put a +1/+1 counter on target creature. Whenever that creature attacks the monarch this turn, it gains double
+/// strike and trample until end of turn": the delayed ability (CR 603.7b) is fixed on that creature, which is its
+/// source, so its trigger asks only whether that creature attacked the monarch.
+fn vigil(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
+    g.add_counters(creature, CounterKind::PlusOne, 1);
+    let this = g.card_id(&CARD);
+    g.delayed_trigger(DelayedWhen::ThisTurn, creature, item.controller, AbilityRef::delayed(this, 0), Target::None);
+    Ok(())
+}
+
+/// "Whenever that creature attacks the monarch": the defending player is the monarch (CR 725.1); a planeswalker the
+/// monarch controls is not the monarch.
+fn attacks_the_monarch(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::Attacks { attacker, defender: Target::Player(p) } if *attacker == source && q.state().player(*p).monarch => {
+            Fired::PLAIN
+        }
+        _ => None,
+    }
+}
+
+fn rally(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let creature = item.object;
+    if targets::permanent(g, creature) {
+        g.add_effect(
+            item.object,
+            creature,
+            EffectKind::AddKeywords(Keywords::of(&[Keyword::DoubleStrike, Keyword::Trample])),
+            Duration::EndOfTurn,
+        );
+    }
+    Ok(())
+}
+
+pub static CARD: CardDef = CardDef {
+    abilities: &[
+        AbilityDef::Triggered(TriggeredDef {
+            text: "When Okoye enters, you become the monarch.",
+            listens: EventMask::ZONE_CHANGE,
+            matches: triggers::this_enters,
+            effect: effects::become_monarch,
+            ..TriggeredDef::BLANK
+        }),
+        AbilityDef::Triggered(TriggeredDef {
+            text: "At the beginning of combat on your turn, put a +1/+1 counter on target creature. Whenever that creature attacks the monarch this turn, it gains double strike and trample until end of turn.",
+            listens: EventMask::STEP_BEGAN,
+            matches: triggers::beginning_of_your_combat,
+            targets: &[targets::CREATURE],
+            effect: vigil,
+            ..TriggeredDef::BLANK
+        }),
+    ],
+    delayed: &[AbilityDef::Triggered(TriggeredDef {
+        text: "Whenever that creature attacks the monarch this turn, it gains double strike and trample until end of turn.",
+        listens: EventMask::ATTACKS,
+        matches: attacks_the_monarch,
+        effect: rally,
+        ..TriggeredDef::BLANK
+    })],
+    ..oracle::OKOYE_MIGHTY_AND_ADORED
+};

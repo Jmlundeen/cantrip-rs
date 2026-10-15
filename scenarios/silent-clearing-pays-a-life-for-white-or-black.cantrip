@@ -1,0 +1,19 @@
+# Silent Clearing: {T}, pay 1 life: add {W} or {B}. Bot1 taps it for black and is down to 19 life.
+
+[Bot1 Deck]
+Silent Clearing
+Island x6
+Island x10
+
+[Bot2 Deck]
+Swamp x15
+
+[Actions]
+Bot1.Hand.Silent Clearing.Play
+Bot1.Battlefield.Silent Clearing.Activate(Ability: Add; Color: Black)
+
+[Expect]
+Turn = 1
+Bot1.Life = 19
+Bot1.Mana = {B}
+Bot1.Battlefield.Silent Clearing.Tapped = true

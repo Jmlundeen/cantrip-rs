@@ -1,0 +1,21 @@
+# The cost is paid up front (tap, 1 life, sacrifice): with only Plains in the library the search finds nothing (CR 701.23b)
+# and the Misty Rainforest is gone, the life lost, and nothing enters the battlefield.
+
+[Bot1 Deck]
+Misty Rainforest
+Plains x19
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Misty Rainforest.Play
+Bot1.Battlefield.Misty Rainforest.Activate
+! Bot1.Search(Plains)
+Bot1.Search()
+[Bot1.Main2]
+
+[Expect]
+Bot1.Life = 19
+Bot1.Battlefield.Count = 0
+Bot1.Graveyard = Misty Rainforest

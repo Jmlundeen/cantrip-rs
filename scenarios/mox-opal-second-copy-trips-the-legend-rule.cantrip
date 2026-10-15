@@ -1,0 +1,20 @@
+# Mox Opal is legendary: the second one Bot1 casts leaves two under its control, so one is put into the graveyard as a
+# state-based action (CR 704.5j) - Bot1 chooses which; the other stays. The result is one Opal on the battlefield and one in
+# the graveyard.
+
+[Bot1 Deck]
+Mox Opal
+Mox Opal
+Island x18
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Opal.Cast
+Bot1.Hand.Mox Opal.Cast
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Opal
+Bot1.Graveyard = Mox Opal

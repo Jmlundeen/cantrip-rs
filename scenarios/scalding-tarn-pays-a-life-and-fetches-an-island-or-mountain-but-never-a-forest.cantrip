@@ -1,0 +1,26 @@
+# Scalding Tarn: {T}, pay 1 life, sacrifice it - search for an Island or Mountain card and put it onto the battlefield
+# untapped. A Forest is in the library but is neither, so it is not offered (the refusal), while the Mountain is found.
+
+[Bot1 Deck]
+Scalding Tarn
+Plains x6
+Forest
+Mountain
+Island
+Plains x10
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Scalding Tarn.Play
+Bot1.Battlefield.Scalding Tarn.Activate
+! Bot1.Search(Forest)
+Bot1.Search(Mountain)
+
+[Expect]
+Bot1.Life = 19
+Bot1.Graveyard = Scalding Tarn
+Bot1.Battlefield = Mountain
+Bot1.Battlefield.Mountain.Tapped = false
+Bot1.Library.Count = 12

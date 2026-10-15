@@ -1,0 +1,81 @@
+# Level 7 (CR 711.2a) is still the 3-7 band, a 4/4 with protection from instants only, so Bot2's Goblin Bombardment (an
+# ability) can ping it on turn 4; level up is "only as a sorcery", refused then, with the Bombardment's ability on the
+# stack. One level later, on turn 5, the 8+ band gives protection from everything and the same ping is refused (beside
+# the ping at Bot1 itself, the positive control).
+
+[Bot1 Deck]
+Forest
+Hexdrinker
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Emerald
+Mox Sapphire
+Forest
+Forest
+Forest x8
+
+[Bot2 Deck]
+Mountain
+Mox Jet
+Goblin Bombardment
+Ornithopter
+Ornithopter
+Island x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Hexdrinker.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Hexdrinker.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Hexdrinker.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Hexdrinker.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Hexdrinker.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Hexdrinker.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Goblin Bombardment.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Hexdrinker.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Hexdrinker.Activate
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Hexdrinker.Counters.Level = 7
+? Bot1.Battlefield.Hexdrinker.Power = 4
+[T4 Bot2.Main1]
+Bot2.Battlefield.Goblin Bombardment.Activate(Bot1.Battlefield.Hexdrinker; Sacrifice: Ornithopter)
+! Bot1.Battlefield.Hexdrinker.Activate
+Bot1.Pass
+[T4 Bot2.Main2]
+? Bot1.Battlefield.Hexdrinker.Damage = 1
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Hexdrinker.Activate
+[T6 Bot2.Main1]
+! Bot2.Battlefield.Goblin Bombardment.Activate(Bot1.Battlefield.Hexdrinker)
+Bot2.Battlefield.Goblin Bombardment.Activate(Bot1)
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Hexdrinker.Counters.Level = 8
+Bot1.Battlefield.Hexdrinker.Power = 6
+Bot1.Battlefield.Hexdrinker.Damage = 0
+Bot1.Life = 19

@@ -1,0 +1,54 @@
+# Sandstorm Salvager: "{2}, {T}: Put a +1/+1 counter on each creature token you control. They gain trample until end
+# of turn." The set is each creature token Bot1 controls as the ability resolves (CR 608.2c, 611.2c): the Golem gets
+# a counter each activation, the Clue is a token that is not a creature and Thraben Inspector a creature that is not
+# a token, and the second Salvager's Golem, made after the activation resolved this turn, gets neither.
+
+[Bot1 Deck]
+Plains
+Thraben Inspector
+Sandstorm Salvager x2
+Forest x16
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Thraben Inspector.Cast
+Bot1.Battlefield.Plains.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Sandstorm Salvager.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+[T7 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Sandstorm Salvager.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Forest#1.Activate
+[T9 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Sandstorm Salvager.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Hand.Sandstorm Salvager.Cast
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Forest#3.Activate
+Bot1.Battlefield.Forest#4.Activate
+
+[Expect]
+Bot1.Battlefield.Golem#1.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Golem#1.Power = 5
+Bot1.Battlefield.Golem#1.Toughness = 5
+Bot1.Battlefield.Golem#1.Keywords = Trample
+Bot1.Battlefield.Golem#2.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Golem#2.Power = 3
+Bot1.Battlefield.Golem#2.Keywords = (absent)
+Bot1.Battlefield.Clue Token.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Clue Token.Keywords = (absent)
+Bot1.Battlefield.Thraben Inspector.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Thraben Inspector.Keywords = (absent)
+Bot1.Battlefield.Thraben Inspector.Power = 1

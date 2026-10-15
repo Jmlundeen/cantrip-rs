@@ -1,0 +1,89 @@
+# Fecundity: "Whenever a creature dies, that creature's controller may draw a card." A player who has lost the game has left
+# it (CR 800.4a) and is asked nothing. In a game of three, Bot2 pays 18 life with Channel (2 left) and has an Ornithopter;
+# on turn 4 Bot1's two Cathar Commandos attack Bot2, who blocks one with the Ornithopter. The Ornithopter dies in the
+# same combat damage that takes Bot2's last life, so Bot2 loses as the Fecundity trigger for its Ornithopter goes on the
+# stack, and is not asked whether to draw. The game goes on between Bot1 and Bot3.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Pearl
+Sol Ring
+Cathar Commando
+Cathar Commando
+Fecundity
+Mox Emerald
+Plains x12
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Channel
+Ornithopter
+Island x3
+Island x12
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Cathar Commando.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Hand.Cathar Commando.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Channel.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+Bot2.Channel.Activate
+[T4 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Fecundity.Cast
+Bot1.Pass
+Bot1.Attack(Cathar Commando > Bot2; Cathar Commando#2 > Bot2)
+Bot2.Block(Ornithopter > Cathar Commando)
+Bot3.Pass
+Bot1.Pass
+Bot3.Pass
+! Bot2.Accept
+[T4 Bot1.Main2]
+
+[Expect]
+Turn = 4
+Result = InProgress
+Bot2.Status = Lost
+Bot2.Life = -1
+Bot1.Battlefield.Cathar Commando#1.Tapped = true

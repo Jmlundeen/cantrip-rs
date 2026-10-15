@@ -1,0 +1,44 @@
+# CR 608.2b: Bot1's Reanimate targets its own Ornithopter in the graveyard and Bot2 exiles it with Lion Sash in response. The only target is gone, so Reanimate does nothing - nothing enters the battlefield and no life is lost.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Faithless Looting
+Reanimate
+Ornithopter
+Island
+Island x12
+
+[Bot2 Deck]
+Plains
+Mox Sapphire
+Mox Pearl
+Lion Sash
+Island x11
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Ornithopter; Island)
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Lion Sash.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Reanimate.Cast(Ornithopter)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Lion Sash.Activate(Bot1.Graveyard.Ornithopter)
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Exile = Ornithopter
+Bot1.Life = 20
+Bot1.Battlefield.Count = 2

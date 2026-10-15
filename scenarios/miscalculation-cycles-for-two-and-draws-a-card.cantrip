@@ -1,0 +1,32 @@
+# Cycling {2} from hand: Bot1 taps an Island and a Mox Sapphire, discards Miscalculation and draws. Cycling works only
+# from the hand, so the discarded card offers no second cycle from the graveyard.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Miscalculation
+Memory Jar
+4 Island
+10 Island
+
+[Bot2 Deck]
+Swamp
+5 Swamp
+10 Swamp
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+? Stack = Mox Sapphire
+Bot1.Pass
+Bot1.Hand.Miscalculation.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Graveyard.Miscalculation.Activate
+
+[Expect]
+Bot1.Graveyard = Miscalculation
+Bot1.Battlefield.Island.Tapped = true
+Bot1.Battlefield.Mox Sapphire.Tapped = true
+Bot1.Hand.Count = 5
+Bot1.Library.Count = 10

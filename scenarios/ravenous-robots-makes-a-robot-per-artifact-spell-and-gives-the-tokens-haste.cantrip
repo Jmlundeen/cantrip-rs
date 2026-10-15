@@ -1,0 +1,46 @@
+# Ravenous Robots: whenever you cast an artifact spell, create a 1/1 Robot token; "{R}, {T}: Creature tokens you control
+# gain haste until end of turn" reaches the tokens that exist as it resolves. On turn three Bot1 casts Mox Jet (a Robot),
+# gives it haste, then casts Mox Sapphire (a second Robot, which does not have haste). Only the first Robot can attack.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Ravenous Robots
+Mox Jet
+Mox Sapphire
+Mountain
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ravenous Robots.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Ravenous Robots.Activate
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Robot#1.Keywords = Haste
+? Bot1.Battlefield.Robot#2.Keywords = (absent)
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Robot#1 > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 19
+Bot1.Battlefield.Robot#1.Power = 1

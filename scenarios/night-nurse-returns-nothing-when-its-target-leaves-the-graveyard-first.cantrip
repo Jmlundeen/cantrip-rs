@@ -1,0 +1,49 @@
+# "Return it to your hand", asked again on resolution (CR 608.2b): Bot2 bolts Bot1's Giver of Runes on turn 4 and
+# Bot1 flashes in Night Nurse, whose trigger targets the Giver. With the trigger on the stack Bot2 sacrifices
+# Soul-Guide Lantern to exile Bot1's graveyard, so the target is gone, the trigger does nothing, and the Giver stays
+# in exile.
+
+[Bot1 Deck]
+Plains
+Plains
+Giver of Runes
+Night Nurse, Healer of Heroes
+Plains x3
+Plains x10
+
+[Bot2 Deck]
+Mountain
+Mountain
+Lightning Bolt
+Soul-Guide Lantern
+Mountain x3
+Mountain x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Giver of Runes.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Soul-Guide Lantern.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Giver of Runes)
+[T4 Bot2.Main2]
+? Bot1.Graveyard = Giver of Runes
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Night Nurse, Healer of Heroes.Cast
+Bot2.Pass
+Bot2.Battlefield.Soul-Guide Lantern.Activate(Ability: Exile each)
+? Stack.Count = 2
+
+[Expect]
+Bot1.Hand = Plains; Plains; Plains; Plains
+Bot1.Graveyard = 
+Exile = Giver of Runes
+Bot1.Battlefield = Night Nurse, Healer of Heroes; Plains; Plains

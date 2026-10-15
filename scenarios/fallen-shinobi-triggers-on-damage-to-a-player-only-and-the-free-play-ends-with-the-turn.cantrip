@@ -1,0 +1,66 @@
+# Fallen Shinobi: "Whenever this creature deals combat damage to a player ... Until end of turn, you may play those cards
+# without paying their mana costs." Turn 3 Bot2's Ornithopter blocks it: the damage goes to a creature, so nothing is
+# exiled. Turn 5 it is unblocked: Bot2 exiles its top two cards, two Lightning Bolts, and Bot1 casts one for free. Turn 7
+# the other is still in exile but no longer playable: the permission lasted only until end of turn (a refusal).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Fallen Shinobi
+Island
+Island x14
+
+[Bot2 Deck]
+Ornithopter
+Island x6
+Island
+Island
+Lightning Bolt
+Lightning Bolt
+Island x8
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Fallen Shinobi.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Fallen Shinobi)
+Bot2.Block(Ornithopter > Fallen Shinobi)
+[T3 Bot1.Main2]
+? Exile.Count = 0
+[T5 Bot1.Main1]
+Bot1.Attack(Fallen Shinobi)
+[T5 Bot1.Main2]
+? Exile.Count = 2
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main1]
+! Bot1.Exile.Lightning Bolt.Cast
+Bot1.Pass
+
+[Expect]
+Turn = 7
+Bot2.Life = 12
+Exile = Lightning Bolt

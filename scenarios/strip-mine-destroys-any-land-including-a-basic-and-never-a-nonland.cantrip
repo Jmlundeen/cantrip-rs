@@ -1,0 +1,36 @@
+# "Destroy target land" (CR 115.1, 701.8): any land, a basic one among them (unlike Wasteland), but nothing else. Bot2's Mox
+# Pearl is refused as a target and its Island, the control, is destroyed; Strip Mine's own controller pays by tapping and
+# sacrificing it (CR 602.2b). Taps for {C} on turn 1 first.
+
+[Bot1 Deck]
+Strip Mine
+Forest
+Forest x5
+Forest x10
+
+[Bot2 Deck]
+Island
+Mox Pearl
+Island x5
+Island x10
+
+[Actions]
+Bot1.Hand.Strip Mine.Play
+Bot1.Battlefield.Strip Mine.Activate(Ability: {T}: Add)
+? Bot1.Mana = {C}
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+! Bot1.Battlefield.Strip Mine.Activate(Ability: Destroy; Bot2.Battlefield.Mox Pearl)
+Bot1.Battlefield.Strip Mine.Activate(Ability: Destroy; Bot2.Battlefield.Island)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Island
+Bot2.Battlefield = Mox Pearl
+Bot1.Graveyard = Strip Mine
+Bot1.Battlefield = Forest

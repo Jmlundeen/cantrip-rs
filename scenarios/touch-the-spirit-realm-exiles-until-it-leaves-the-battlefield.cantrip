@@ -1,0 +1,47 @@
+# Touch the Spirit Realm's enters ability exiles Bot2's Llanowar Elves until it leaves the battlefield (CR 610.3). Bot1
+# then destroys it with Disenchant, and the Elves return to Bot2's battlefield as soon as it is gone.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Touch the Spirit Realm
+Plains
+Disenchant
+Plains x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x5
+Forest x10
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Touch the Spirit Realm.Cast
+Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+[T3 Bot1.Main2]
+? Exile = Llanowar Elves
+? Bot2.Battlefield = Forest
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Disenchant.Cast(Bot1.Battlefield.Touch the Spirit Realm)
+[T3 Bot1.End]
+
+[Expect]
+Exile.Count = 0
+Bot2.Battlefield = Forest; Llanowar Elves
+Bot1.Graveyard = Disenchant; Touch the Spirit Realm

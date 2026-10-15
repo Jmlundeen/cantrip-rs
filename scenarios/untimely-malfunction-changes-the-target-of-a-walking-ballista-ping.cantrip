@@ -1,0 +1,45 @@
+# "Change the target of target spell or ability with a single target": Bot1 sacrifices the Ballista's last counter to
+# ping Bot2. In response Bot2 casts Untimely Malfunction on that ability and, as its caster, chooses the new target:
+# Bot1. The ping resolves there (Bot1 19, Bot2 20) even though the Ballista has already died as a 0/0.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Walking Ballista
+Mountain x15
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Untimely Malfunction
+Mountain x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Walking Ballista.Cast(X: 1)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Walking Ballista.Activate(Bot2; Ability: Remove)
+Bot1.Pass
+Bot2.Hand.Untimely Malfunction.Cast
+Bot2.Modes(2)
+Bot2.Target(Stack.Walking Ballista)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Life = 19
+Bot2.Life = 20
+Bot2.Graveyard = Untimely Malfunction
+Bot1.Graveyard = Walking Ballista
+Stack.Count = 0

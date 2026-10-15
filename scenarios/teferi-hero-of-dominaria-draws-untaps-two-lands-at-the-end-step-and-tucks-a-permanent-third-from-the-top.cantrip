@@ -1,0 +1,41 @@
+# Teferi, Hero of Dominaria, cast on turn 1 off a Plains, Mox Sapphire and Black Lotus: his +1 draws a card and, at the
+# beginning of the next end step, untaps up to two lands (the Plains, here). On turn 3 his -3 puts Bot2's Ornithopter
+# into Bot2's library third from the top.
+
+[Bot1 Deck]
+Plains
+Mox Sapphire
+Black Lotus
+Teferi, Hero of Dominaria
+Plains x13
+
+[Bot2 Deck]
+Island x6
+Ornithopter
+Island x9
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Teferi, Hero of Dominaria.Cast
+Bot1.Battlefield.Teferi, Hero of Dominaria.Activate(Ability: Draw a card)
+[T1 Bot1.End]
+Bot1.Choose(Plains)
+? Bot1.Battlefield.Plains.Tapped = false
+? Bot1.Hand.Count = 4
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Teferi, Hero of Dominaria.Activate(Ornithopter; Ability: library third from the top)
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield.Teferi, Hero of Dominaria.Counters.Loyalty = 2
+Bot2.Battlefield = Island
+Bot2.Library = Island; Island; Ornithopter; Island; Island; Island; Island; Island; Island

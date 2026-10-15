@@ -1,0 +1,36 @@
+# Mother of Runes attacks with Lightning Greaves unattached on the battlefield; the instant pumps it and attaches the Greaves.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mother of Runes
+Sol Ring
+Lightning Greaves
+Battlefield Improvisation
+Plains
+Plains x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Mother of Runes.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Lightning Greaves.Cast
+Bot1.Battlefield.Sol Ring.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Attack(Mother of Runes)
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Battlefield Improvisation.Cast(Mother of Runes)
+Bot1.Choose(Lightning Greaves)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Mother of Runes.Power = 3
+Bot1.Battlefield.Lightning Greaves.AttachedTo = Mother of Runes

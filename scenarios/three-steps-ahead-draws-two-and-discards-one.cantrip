@@ -1,0 +1,27 @@
+# Three Steps Ahead, spree: "+ {2} - Draw two cards, then discard a card." With {U}{U}+{2} paid by a Black Lotus and a Mox Sapphire on turn 1, Bot1 draws two
+# and discards one: the hand grows by one.
+
+[Bot1 Deck]
+Mox Sapphire
+Black Lotus
+Three Steps Ahead
+Island x4
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Three Steps Ahead.Cast
+Bot1.Modes(Draw two)
+Bot1.Choose(Island)
+
+[Expect]
+Bot1.Hand.Count = 5
+Bot1.Graveyard = Three Steps Ahead; Island; Black Lotus

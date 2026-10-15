@@ -1,0 +1,29 @@
+# Candelabra of Tawnos is "{X}, {T}: Untap X target lands". X is announced first (CR 601.2b), then the targets
+# (CR 601.2c), and only then are mana abilities activated and the cost paid (CR 601.2g-h, via 602.2b). So the two
+# untapped Islands can be the targets and then be tapped to pay the {X} of 2 — and they untap as the ability resolves.
+
+[Bot1 Deck]
+Candelabra of Tawnos
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Candelabra of Tawnos.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Candelabra of Tawnos.Activate(X: 2)
+Bot1.Target(Bot1.Battlefield.Island; Bot1.Battlefield.Island#2)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Candelabra of Tawnos.Tapped = true
+Bot1.Battlefield.Island#1.Tapped = false
+Bot1.Battlefield.Island#2.Tapped = false

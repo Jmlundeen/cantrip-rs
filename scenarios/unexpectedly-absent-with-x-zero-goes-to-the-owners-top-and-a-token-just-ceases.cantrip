@@ -1,0 +1,52 @@
+# Unexpectedly Absent: "Put target nonland permanent into its owner's library just beneath the top X cards of that library."
+# With X = 0 Bot2's Ornithopter goes on top of its owner's library (not Bot1's) and is Bot2's next draw; Bot1's Blood token, put
+# the same way, ceases to exist (CR 111.7) and is in no library. A land is not a legal target (refused beside the Ornithopter that
+# is). Cast on turn 3 with a Mox Pearl and a Black Lotus for {W}{W} each and Ivora's Blood token made with Mox Ruby and Mox Jet.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Mox Jet
+Black Lotus
+Unexpectedly Absent
+Unexpectedly Absent
+Ivora, Insatiable Heir
+Island x14
+
+[Bot2 Deck]
+Island
+Ornithopter
+Island x12
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ivora, Insatiable Heir.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+! Bot1.Hand.Unexpectedly Absent.Cast(Bot2.Battlefield.Island; X: 0)
+Bot1.Hand.Unexpectedly Absent.Cast(Bot2.Battlefield.Ornithopter; X: 0)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Unexpectedly Absent.Cast(Bot1.Battlefield.Blood Token; X: 0)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Library.Count = 7
+Bot2.Hand.Count = 6
+Bot2.Battlefield = Island
+Bot1.Battlefield = Mox Pearl; Mox Ruby; Mox Jet; Ivora, Insatiable Heir
+Bot2.Library = Ornithopter; Island; Island; Island; Island; Island; Island

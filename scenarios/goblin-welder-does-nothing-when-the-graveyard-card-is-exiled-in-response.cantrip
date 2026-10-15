@@ -1,0 +1,42 @@
+# Goblin Welder: "If both targets are still legal as this ability resolves" - when Bot2 answers the Welder's ability by
+# exiling the Welding Jar from Bot1's graveyard with a Ghost Vacuum, the second target is illegal and nothing happens
+# (CR 608.2b): the Ornithopter is not sacrificed. The positive control is the neighbouring scenario, where both stay legal.
+
+[Bot1 Deck]
+Mountain
+Goblin Welder
+Welding Jar
+Ornithopter
+Mountain
+Mountain x15
+
+[Bot2 Deck]
+Island
+Ghost Vacuum
+Island x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Goblin Welder.Cast
+Bot1.Hand.Welding Jar.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Welding Jar.Activate(Bot1.Battlefield.Ornithopter)
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Ghost Vacuum.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Goblin Welder.Activate
+Bot1.Target(Ornithopter)
+Bot1.Target(Welding Jar)
+Bot2.Battlefield.Ghost Vacuum.Activate(Bot1.Graveyard.Welding Jar)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Exile = Welding Jar
+Bot1.Battlefield = Mountain; Goblin Welder; Ornithopter
+Bot1.Battlefield.Goblin Welder.Tapped = true
+Bot1.Graveyard.Count = 0

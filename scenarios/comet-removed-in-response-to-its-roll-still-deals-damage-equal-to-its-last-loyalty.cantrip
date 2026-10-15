@@ -1,0 +1,57 @@
+# Comet, Stellar Pup rolls a 5: "Comet deals damage equal to the number of loyalty counters on him to a creature or player,
+# then [-2]." Bot2 destroys Comet with Bitter Triumph (paying 3 life) in response to the ability, so by the time it resolves Comet has left the battlefield: the ability
+# still resolves (CR 113.7a) and uses Comet's last known information (CR 608.2h), five loyalty counters, so the player
+# Bot1 picks, Bot2, takes 5 (20 - 3 life paid for Bitter Triumph - 5 = 12). The [-2] has nothing to act on.
+
+[Dice]
+5
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Sol Ring
+Comet, Stellar Pup
+Island x20
+
+[Bot2 Deck]
+Forest
+Mox Jet
+Mox Ruby
+Llanowar Elves
+Bitter Triumph
+Forest x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Comet, Stellar Pup.Cast
+Bot1.Pass
+Bot1.Battlefield.Comet, Stellar Pup.Activate
+Bot1.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Bitter Triumph.Cast(Bot1.Battlefield.Comet, Stellar Pup)
+Bot2.Modes(Pay 3 life)
+Bot2.Pass
+Bot1.Target(Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Comet, Stellar Pup
+Bot2.Graveyard = Bitter Triumph
+Bot2.Life = 12

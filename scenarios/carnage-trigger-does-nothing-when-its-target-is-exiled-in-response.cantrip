@@ -1,0 +1,60 @@
+# Carnage, Crimson Chaos: if the creature card targeted is gone when the enters ability resolves, the ability's only
+# target is illegal and it does nothing (CR 608.2b). Bot2 holds a Mox Pearl up on its turn 2 and answers the ability on
+# turn 3 with Lion Sash ({W}: exile target card from a graveyard), exiling the Llanowar Elves, which stays in exile.
+# Faithless Looting discards the Elves and an Island on turn 1.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Faithless Looting
+Carnage, Crimson Chaos
+Mountain
+Island
+Llanowar Elves
+Island
+Mountain x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mox Pearl
+Lion Sash
+Plains x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Llanowar Elves; Island)
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Lion Sash.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Carnage, Crimson Chaos.Cast
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Lion Sash.Activate(Ability: Exile; Bot1.Graveyard.Llanowar Elves)
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Swamp; Mox Jet; Mox Ruby; Mountain; Carnage, Crimson Chaos
+Exile = Llanowar Elves
+Bot1.Graveyard = Faithless Looting; Island
+Stack.Count = 0

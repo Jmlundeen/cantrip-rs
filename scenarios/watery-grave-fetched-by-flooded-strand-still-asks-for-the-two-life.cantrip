@@ -1,0 +1,27 @@
+# "As this land enters, you may pay 2 life" applies to a land put onto the battlefield by an effect, not only one played (CR 614.12a): Flooded Strand (1 life) fetches Watery Grave (an Island Swamp), Bot1 pays 2 more life (17) and it enters untapped, tapping for {B} at once.
+
+[Bot1 Deck]
+Flooded Strand
+Island
+Island
+Island
+Island
+Island
+Island
+Watery Grave
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Flooded Strand.Play
+Bot1.Battlefield.Flooded Strand.Activate
+Bot1.Search(Watery Grave)
+Bot1.Accept
+Bot1.Battlefield.Watery Grave.Activate(Ability: {B})
+? Bot1.Mana = {B}
+
+[Expect]
+Bot1.Life = 17
+Bot1.Battlefield.Watery Grave.Tapped = true

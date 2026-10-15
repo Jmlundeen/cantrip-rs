@@ -1,0 +1,48 @@
+# Ivora, Insatiable Heir: "Whenever you discard a card, put a +1/+1 counter on Ivora" - one trigger per card (CR 701.9a)
+# and only for the cards its controller discards. Bot1's Wheel of Fortune (turn 3) has Bot1 discard its 3 remaining
+# cards and Bot2 its 7: Ivora gets 3 counters, not 10. It is then a 4/4 trampler; Bot2's Ornithopter (0/2) blocks it, 2
+# damage is assigned to the blocker and 2 tramples over to Bot2 (CR 702.19b), and "deals combat damage to a player"
+# makes a second Blood token (the first came as it entered).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Ivora, Insatiable Heir
+Wheel of Fortune
+Mountain
+Mountain
+Mountain
+Mountain
+Mountain x12
+
+[Bot2 Deck]
+Ornithopter
+Island x6
+Island x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ivora, Insatiable Heir.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Wheel of Fortune.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Ivora, Insatiable Heir > Bot2)
+Bot2.Block(Ornithopter > Ivora, Insatiable Heir)
+Bot1.AssignDamage(Ivora, Insatiable Heir > Ornithopter: 2; Ivora, Insatiable Heir > Bot2: 2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Ivora, Insatiable Heir.Counters.PlusOnePlusOne = 3
+Bot2.Life = 18
+Bot2.Graveyard.Count = 8
+Bot1.Battlefield = Blood Token; Blood Token; Ivora, Insatiable Heir; Mountain; Mountain; Mox Ruby

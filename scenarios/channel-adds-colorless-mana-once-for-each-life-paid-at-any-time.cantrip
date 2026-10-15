@@ -1,0 +1,31 @@
+# Channel: the ability can be activated as often as the player can pay, any time they could activate a mana ability,
+# so with priority in the main phase three activations pay 3 life and add {C}{C}{C}.
+
+[Bot1 Deck]
+Channel
+Forest
+Forest
+Sol Ring
+Mind Stone
+Forest
+Forest
+Forest x12
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Channel.Cast
+Bot1.Pass
+Bot1.Channel.Activate
+Bot1.Channel.Activate
+Bot1.Channel.Activate
+
+[Expect]
+Bot1.Life = 17
+Bot1.Mana = {C}{C}{C}

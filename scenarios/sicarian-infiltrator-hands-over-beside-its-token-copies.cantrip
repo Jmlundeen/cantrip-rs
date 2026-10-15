@@ -1,0 +1,42 @@
+# Sicarian Infiltrator flashed in on Bot2's upkeep with squad paid twice makes two token copies of itself (CR 702.157a,
+# 707.2), and the position is handed to Bot1 in its next main phase. The tokens read exactly as the card does, so each
+# wears "Token" on its art, and none of them piles with the card.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Pearl
+Sol Ring
+Black Lotus
+Sicarian Infiltrator
+Plains
+Swamp
+Swamp
+Swamp
+Island x10
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Upkeep]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Sicarian Infiltrator.Cast(Kicked: 2)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+[T3 Bot1.Main1]
+[Handover Bot1.Pass]
+
+[Expect]
+Turn = 3
+Step = Main1
+Stack.Count = 0
+Bot1.Battlefield = Island; Mox Sapphire; Mox Pearl; Sol Ring; Sicarian Infiltrator; Sicarian Infiltrator; Sicarian Infiltrator
+Bot1.Hand.Count = 5

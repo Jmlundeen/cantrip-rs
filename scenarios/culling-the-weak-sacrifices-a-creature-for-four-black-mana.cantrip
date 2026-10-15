@@ -1,0 +1,26 @@
+# Culling the Weak: "As an additional cost to cast this spell, sacrifice a creature. Add {B}{B}{B}{B}." Bot1 pays {B}
+# from a Mox Jet, sacrifices its only creature, an Ornithopter, and spends one of the four black mana on a Dark
+# Ritual, which adds three: six black mana floating at the end.
+
+[Bot1 Deck]
+Mox Jet
+Ornithopter
+Culling the Weak
+Dark Ritual
+Island x13
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Culling the Weak.Cast
+Bot1.Pass
+Bot1.Hand.Dark Ritual.Cast
+
+[Expect]
+Bot1.Battlefield = Mox Jet
+Bot1.Graveyard = Dark Ritual; Culling the Weak; Ornithopter
+Bot1.Mana = {B}{B}{B}{B}{B}{B}

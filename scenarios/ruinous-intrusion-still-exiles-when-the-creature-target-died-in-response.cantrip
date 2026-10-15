@@ -1,0 +1,47 @@
+# Ruinous Intrusion: with one target of two illegal, the spell does what it still can (CR 608.2b): Bot2 bolts the
+# Ornithopter in response, and the Mind Stone is exiled all the same, with no counters to give.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Mox Jet
+Mox Ruby
+Ornithopter
+Ruinous Intrusion
+Forest x13
+
+[Bot2 Deck]
+Mox Ruby
+Mox Sapphire
+Mind Stone
+Lightning Bolt
+Island x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Mind Stone.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ruinous Intrusion.Cast
+Bot1.Target(Bot2.Battlefield.Mind Stone)
+Bot1.Target(Ornithopter)
+Bot2.Hand.Lightning Bolt.Cast(Ornithopter)
+Bot2.Battlefield.Mox Ruby.Activate
+
+[Expect]
+Exile = Mind Stone
+Bot1.Graveyard = Ruinous Intrusion; Ornithopter

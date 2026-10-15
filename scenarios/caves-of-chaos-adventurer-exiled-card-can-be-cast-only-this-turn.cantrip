@@ -1,0 +1,42 @@
+# "Otherwise, you may play that card this turn": without a completed dungeon the exiled Lightning Bolt must be paid for, and only until end of turn.
+# (The library is all Lightning Bolts after Secret Entrance's search shuffles it, so what is drawn and exiled is fixed.)
+# Bot1's Adventurer attacks on turn 3 and exiles the Bolt. Bot1 does not cast it that turn, and on turn 5 it can't (the refusal). The same card is cast
+# for {R} in the other scenario (caves-of-chaos-adventurer-pays-the-mana-cost-of-the-spell-it-exiles).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Caves of Chaos Adventurer
+Island
+Island
+Forest
+Lightning Bolt x10
+
+[Bot2 Deck]
+Forest x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Caves of Chaos Adventurer.Cast
+Bot1.Search(Forest)
+[T3 Bot1.Upkeep]
+Bot1.Modes(Lost Well)
+[T3 Bot1.Main1]
+Bot1.Attack(Caves of Chaos Adventurer)
+[T3 Bot1.Main2]
+? Exile = Lightning Bolt
+[T5 Bot1.Main1]
+! Bot1.Exile.Lightning Bolt.Cast
+
+[Expect]
+Turn = 5
+Exile = Lightning Bolt

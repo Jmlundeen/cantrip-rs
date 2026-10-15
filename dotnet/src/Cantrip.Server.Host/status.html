@@ -1,0 +1,727 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cantrip - Server Status</title>
+<link rel="icon" href="data:,">
+<style>
+:root {
+  --window: #111318;
+  --bar: #191c22;
+  --panel: #1d2127;
+  --panel-hi: #242930;
+  --line: #2c313a;
+  --control: #2a303a;
+  --control-hover: #353c48;
+  --control-border: #3a4250;
+  --fg: #e8eaee;
+  --fg-soft: #a6adb8;
+  --fg-muted: #6c7482;
+  --on-accent: #17130a;
+  --accent: #f1b44c;
+  --ready: #6fcf8f;
+  --danger: #e5534b;
+  --hover: #8ec9ff;
+  --mine: #5fae75;
+  --theirs: #c9834f;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--window);
+  color: var(--fg);
+  font: 14px/1.45 "Segoe UI", -apple-system, BlinkMacSystemFont, Inter, Roboto, "Helvetica Neue", sans-serif;
+  min-height: 100vh;
+}
+button, input, select { font: inherit; color: inherit; }
+.num { font-variant-numeric: tabular-nums; }
+
+header.top {
+  position: sticky; top: 0; z-index: 5;
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  padding: 12px 24px; background: var(--bar); border-bottom: 1px solid var(--line);
+}
+header.top h1 { margin: 0; font-size: 20px; font-weight: 600; letter-spacing: .2px; }
+header.top h1 span { color: var(--accent); }
+header.top .live { margin-left: auto; color: var(--fg-muted); font-size: 13px; display: flex; align-items: center; gap: 8px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ready); display: inline-block; }
+.dot.stale { background: var(--danger); }
+
+main { max-width: 1280px; margin: 0 auto; padding: 20px 24px 60px; }
+section.block { margin-bottom: 32px; }
+section.block > h2 {
+  font-size: 18px; font-weight: 600; margin: 0 0 12px;
+  display: flex; align-items: baseline; gap: 10px;
+}
+section.block > h2 .count { color: var(--fg-muted); font-size: 14px; font-weight: 400; }
+
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 28px; }
+.tile { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; }
+.tile .v { font-size: 26px; font-weight: 600; }
+.tile .k { color: var(--fg-soft); font-size: 13px; }
+
+.group { margin-bottom: 20px; }
+.group h3 {
+  margin: 0 0 8px; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .6px; color: var(--fg-soft);
+}
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px; }
+.event {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px;
+  cursor: pointer; text-align: left; width: 100%; display: block;
+  transition: border-color .12s, background .12s;
+}
+.event:hover, .event:focus-visible { border-color: var(--control-border); background: var(--panel-hi); outline: none; }
+.event.selected { border-color: var(--accent); }
+.event.static { cursor: default; }
+.event.static:hover { border-color: var(--line); background: var(--panel); }
+.event .head { display: flex; align-items: baseline; gap: 8px; }
+.event .name { font-weight: 600; font-size: 15px; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.event .meta { color: var(--fg-soft); font-size: 13px; margin-top: 2px; }
+.event .progress { margin-top: 8px; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.event .progress .what { color: var(--accent); font-weight: 600; }
+.event .players { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 4px; }
+.players { display: flex; flex-wrap: wrap; gap: 4px; }
+.chip {
+  display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 12px;
+  background: var(--control); border: 1px solid var(--control-border); color: var(--fg); white-space: nowrap;
+}
+.chip.muted { color: var(--fg-muted); border-color: var(--line); background: transparent; }
+.chip.dropped { color: var(--fg-muted); text-decoration: line-through; }
+.chip.ok { border-color: var(--ready); color: var(--ready); background: transparent; }
+.badge {
+  display: inline-block; padding: 1px 7px; border-radius: 4px; font-size: 11px; font-weight: 600; letter-spacing: .4px;
+  text-transform: uppercase; background: var(--control); color: var(--fg-soft); white-space: nowrap;
+}
+.badge.Drafting { background: rgba(241,180,76,.16); color: var(--accent); }
+.badge.DeckBuilding { background: rgba(142,201,255,.14); color: var(--hover); }
+.badge.Playing { background: rgba(111,207,143,.14); color: var(--ready); }
+.badge.Seating, .badge.forming, .badge.Open, .badge.Seated { background: rgba(166,173,184,.14); color: var(--fg-soft); }
+.badge.Complete { background: rgba(111,207,143,.10); color: var(--mine); }
+.badge.Cancelled { background: rgba(229,83,75,.14); color: var(--danger); }
+.badge.Unfinished { background: rgba(108,116,130,.18); color: var(--fg-muted); }
+.clock { color: var(--fg); font-weight: 600; }
+.clock.soon { color: var(--danger); }
+.empty { color: var(--fg-muted); padding: 14px 0; }
+
+.filters {
+  display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; margin-bottom: 12px;
+}
+.filters label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--fg-soft); }
+.filters select, .filters input {
+  background: var(--control); border: 1px solid var(--control-border); border-radius: 4px; padding: 6px 8px; min-width: 130px;
+}
+.filters select:focus, .filters input:focus { outline: 1px solid var(--accent); border-color: var(--accent); }
+.filters .custom { display: none; gap: 10px; }
+.filters .custom.on { display: flex; }
+button.plain {
+  background: var(--control); border: 1px solid var(--control-border); border-radius: 4px; padding: 6px 12px; cursor: pointer;
+}
+button.plain:hover { background: var(--control-hover); }
+
+table { border-collapse: collapse; width: 100%; }
+th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { color: var(--fg-soft); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .4px; white-space: nowrap; }
+td.r, th.r { text-align: right; }
+.table-wrap { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; overflow-x: auto; }
+.history tbody tr { cursor: pointer; }
+.history tbody tr:hover { background: var(--panel-hi); }
+.history tbody tr.selected { background: var(--panel-hi); box-shadow: inset 3px 0 0 var(--accent); }
+.more { color: var(--fg-muted); font-size: 13px; padding: 10px 2px; }
+
+/* The event opened: a drawer from the right, the whole window on a phone. */
+.scrim { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 9; display: none; }
+.scrim.on { display: block; }
+aside.drawer {
+  position: fixed; top: 0; right: 0; bottom: 0; width: min(760px, 100vw); z-index: 10;
+  background: var(--window); border-left: 1px solid var(--line); overflow-y: auto;
+  transform: translateX(100%); transition: transform .18s ease-out;
+}
+aside.drawer.on { transform: none; }
+.drawer .bar {
+  position: sticky; top: 0; z-index: 1; background: var(--bar); border-bottom: 1px solid var(--line);
+  padding: 14px 20px; display: flex; gap: 12px; align-items: flex-start;
+}
+.drawer .bar h2 { margin: 0; font-size: 19px; font-weight: 600; }
+.drawer .bar .sub { color: var(--fg-soft); font-size: 13px; margin-top: 2px; }
+.drawer .bar .close { margin-left: auto; }
+.drawer .body { padding: 16px 20px 40px; }
+.drawer h3 { font-size: 15px; font-weight: 600; margin: 22px 0 10px; }
+.drawer h3:first-child { margin-top: 0; }
+.status-line { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 10px 14px; display: flex; gap: 14px; flex-wrap: wrap; align-items: baseline; }
+.status-line .detail { color: var(--fg); }
+.facts { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.fact { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 8px 12px; }
+.fact .k { color: var(--fg-muted); font-size: 12px; }
+.fact .v { font-weight: 600; }
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.tabs button {
+  background: var(--control); border: 1px solid var(--control-border); border-radius: 4px; padding: 4px 12px; cursor: pointer;
+}
+.tabs button.on { background: var(--accent); border-color: var(--accent); color: var(--on-accent); font-weight: 600; }
+.score { font-weight: 600; white-space: nowrap; }
+.won { color: var(--ready); font-weight: 600; }
+.lost { color: var(--fg-soft); }
+.small { font-size: 12px; color: var(--fg-muted); }
+.piles { display: flex; gap: 10px; flex-wrap: wrap; }
+.pile { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 8px 14px; text-align: center; min-width: 84px; }
+.pile.lit { border-color: var(--accent); }
+.pile .v { font-size: 20px; font-weight: 600; }
+.pile .k { font-size: 12px; color: var(--fg-soft); }
+.bar-track { height: 6px; border-radius: 3px; background: var(--control); overflow: hidden; margin-top: 4px; }
+.bar-fill { height: 100%; background: var(--accent); }
+
+@media (max-width: 640px) {
+  header.top, main { padding-left: 16px; padding-right: 16px; }
+  .cards { grid-template-columns: 1fr; }
+  .tiles { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .tile { padding: 8px 10px; }
+  .tile .v { font-size: 20px; }
+  .tile .k { font-size: 12px; }
+  .drawer .bar, .drawer .body { padding-left: 16px; padding-right: 16px; }
+  .history .wide { display: none; }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <h1><span>Cantrip</span> Server Status</h1>
+  <div class="live" id="live"><span class="dot" id="live-dot"></span><span id="live-text">Connecting...</span></div>
+</header>
+
+<main>
+  <div class="tiles" id="tiles"></div>
+
+  <section class="block" id="active-block">
+    <h2>Active events <span class="count" id="active-count"></span></h2>
+    <div id="active"></div>
+  </section>
+
+  <section class="block" id="history-block">
+    <h2>Completed events <span class="count" id="history-count"></span></h2>
+    <form class="filters" id="filters" autocomplete="off">
+      <label>Finished
+        <select id="f-span">
+          <option value="24h" selected>Last 24 hours</option>
+          <option value="7d">Last 7 days</option>
+          <option value="30d">Last 30 days</option>
+          <option value="all">Any time</option>
+          <option value="custom">Between dates...</option>
+        </select>
+      </label>
+      <span class="custom" id="f-custom">
+        <label>From <input type="date" id="f-from"></label>
+        <label>To <input type="date" id="f-to"></label>
+      </span>
+      <label>Type
+        <select id="f-kind">
+          <option value="">All types</option>
+          <option value="booster-draft">Booster draft</option>
+          <option value="grid-draft">Grid draft</option>
+          <option value="winston-draft">Winston draft</option>
+        </select>
+      </label>
+      <label>Cube
+        <select id="f-cube"><option value="">All cubes</option></select>
+      </label>
+      <label>Player
+        <input type="search" id="f-player" list="f-players" placeholder="Any player">
+        <datalist id="f-players"></datalist>
+      </label>
+      <label>Outcome
+        <select id="f-outcome">
+          <option value="">Any</option>
+          <option value="Complete">Finished</option>
+          <option value="Cancelled">Called off</option>
+          <option value="Unfinished">Not finished</option>
+        </select>
+      </label>
+      <button type="button" class="plain" id="f-reset">Reset</button>
+    </form>
+    <div id="history"></div>
+  </section>
+</main>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-hidden="true">
+  <div class="bar">
+    <div>
+      <h2 id="d-title"></h2>
+      <div class="sub" id="d-sub"></div>
+    </div>
+    <button class="plain close" id="d-close" aria-label="Close">Close</button>
+  </div>
+  <div class="body" id="d-body"></div>
+</aside>
+
+<script>
+"use strict";
+(() => {
+  const api = location.pathname.replace(/\/+$/, "") + "/api";
+  const KINDS = {
+    "booster-draft": "Booster drafts",
+    "grid-draft": "Grid drafts",
+    "winston-draft": "Winston drafts",
+  };
+  const KIND_ONE = { "booster-draft": "Booster draft", "grid-draft": "Grid draft", "winston-draft": "Winston draft" };
+  const STAGES = {
+    NotActive: "Not started", Seating: "Seating", Drafting: "Drafting", DeckBuilding: "Deck building",
+    Playing: "Playing", Complete: "Finished", Cancelled: "Called off",
+  };
+  const FORMATS = { booster: "Booster", grid: "Grid", winston: "Winston" };
+
+  let skew = 0;                // server time minus this machine's
+  let active = null;
+  let past = null;
+  let selected = null;          // the id of the event opened
+  let detail = null;
+  let roundShown = null;
+  let lastOk = 0;
+
+  const $ = id => document.getElementById(id);
+
+  // Everything a player can name - their name above all - goes onto the page as text, never as markup.
+  const esc = value => String(value ?? "").replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
+
+  const now = () => Date.now() + skew;
+  const plural = (n, one, many) => `${n} ${n === 1 ? one : (many ?? one + "s")}`;
+
+  function left(ms) {
+    if (ms <= 0) return "0:00";
+    const s = Math.floor(ms / 1000);
+    const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), r = s % 60;
+    return h > 0 ? `${h}:${String(m).padStart(2, "0")}:${String(r).padStart(2, "0")}` : `${m}:${String(r).padStart(2, "0")}`;
+  }
+
+  // A clock counting down to a time: drawn as a span the ticker brings up to date.
+  const countdown = (iso, suffix = "") =>
+    iso ? `<span class="clock num" data-until="${esc(iso)}" data-suffix="${esc(suffix)}"></span>` : "";
+
+  function ago(iso) {
+    const ms = now() - Date.parse(iso);
+    const m = Math.round(ms / 60000);
+    if (m < 1) return "just now";
+    if (m < 60) return `${m} min ago`;
+    const h = Math.round(m / 60);
+    if (h < 24) return `${h} h ago`;
+    return `${Math.round(h / 24)} d ago`;
+  }
+
+  const when = iso => new Date(iso).toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+
+  function duration(from, to) {
+    const m = Math.max(0, Math.round((Date.parse(to) - Date.parse(from)) / 60000));
+    return m < 60 ? `${m} min` : `${Math.floor(m / 60)} h ${m % 60} min`;
+  }
+
+  async function get(path) {
+    const response = await fetch(api + path, { cache: "no-store" });
+    if (!response.ok) throw new Error(response.status);
+    const body = await response.json();
+    skew = Date.parse(body.now) - Date.now();
+    lastOk = Date.now();
+    return body.value;
+  }
+
+  // ---- Active events ----
+
+  function players(list, building) {
+    return list.map(p => {
+      const cls = p.dropped ? "chip dropped" : building && p.submitted ? "chip ok" : "chip";
+      const title = p.dropped ? "Dropped" : building ? (p.submitted ? "Deck submitted" : "Building") : "";
+      return `<span class="${cls}" title="${esc(title)}">${esc(p.name)}</span>`;
+    }).join("");
+  }
+
+  function eventCard(e) {
+    const clock = e.deadline ? countdown(e.deadline, e.stage === "DeckBuilding" ? " to build" : e.stage === "Playing" ? " to start" : e.stage === "Seating" ? " to sit" : "") : "";
+    const meta = [FORMATS[e.format] ? `${FORMATS[e.format]} draft` : e.kind, e.cube, plural(e.players.length, "player")].filter(Boolean);
+    return `<button class="event${selected === e.id ? " selected" : ""}" data-id="${esc(e.id)}">
+      <div class="head"><span class="name">${esc(e.name || e.id)}</span><span class="badge ${esc(e.stage)}">${esc(STAGES[e.stage] ?? e.stage)}</span></div>
+      <div class="meta">${meta.map(esc).join(" · ")}</div>
+      <div class="progress"><span class="what">${esc(e.progress)}</span>${clock}</div>
+      <div class="players">${players(e.players, e.stage === "DeckBuilding")}</div>
+    </button>`;
+  }
+
+  function tableCard(t) {
+    const title = t.kind === "forming" ? `${FORMATS[t.format] ?? t.format} draft table` : "Casual game";
+    const stage = t.kind === "forming" ? "forming" : t.stage;
+    const stageText = t.kind === "forming" ? "Forming" : ({ Open: "Open", Seated: "Seating", Playing: "Playing" }[t.stage] ?? t.stage);
+    const seats = t.seats - t.bots;
+    const names = t.players.map(name => `<span class="chip">${esc(name)}</span>`).join("")
+      + Array.from({ length: Math.max(0, seats - t.players.length) }, () => `<span class="chip muted">open seat</span>`).join("")
+      + (t.bots > 0 ? `<span class="chip muted">${esc(plural(t.bots, "bot"))}</span>` : "");
+    return `<div class="event static">
+      <div class="head"><span class="name">${esc(title)}</span><span class="badge ${esc(stage)}">${esc(stageText)}</span></div>
+      <div class="meta">${[t.cube, `opened ${ago(t.created)}`].filter(Boolean).map(esc).join(" · ")}</div>
+      ${t.detail ? `<div class="progress"><span class="what">${esc(t.detail)}</span></div>` : ""}
+      <div class="players">${names}</div>
+    </div>`;
+  }
+
+  function renderActive() {
+    if (!active) return;
+    const events = active.events, tables = active.tables;
+    const playing = new Set();
+    events.forEach(e => e.players.filter(p => !p.dropped).forEach(p => playing.add(p.name)));
+    tables.forEach(t => t.players.forEach(name => playing.add(name)));
+    const drafting = events.filter(e => e.stage === "Drafting").length;
+    const inRounds = events.filter(e => e.stage === "Playing" || e.stage === "DeckBuilding").length;
+    $("tiles").innerHTML = [
+      [events.length, "Events running"],
+      [drafting, "Drafting now"],
+      [inRounds, "Building or playing"],
+      [tables.filter(t => t.kind === "forming").length, "Tables forming"],
+      [tables.filter(t => t.kind === "game").length, "Casual games"],
+      [playing.size, "Players"],
+    ].map(([v, k]) => `<div class="tile"><div class="v num">${v}</div><div class="k">${esc(k)}</div></div>`).join("");
+
+    $("active-count").textContent = events.length + tables.length ? `${events.length + tables.length}` : "";
+    const groups = [];
+    for (const kind of Object.keys(KINDS)) {
+      const list = events.filter(e => e.kind === kind);
+      if (list.length) groups.push([KINDS[kind], list.map(eventCard)]);
+    }
+    const other = events.filter(e => !KINDS[e.kind]);
+    if (other.length) groups.push(["Other events", other.map(eventCard)]);
+    const forming = tables.filter(t => t.kind === "forming");
+    if (forming.length) groups.push(["Tables forming", forming.map(tableCard)]);
+    const games = tables.filter(t => t.kind === "game");
+    if (games.length) groups.push(["Casual games", games.map(tableCard)]);
+
+    $("active").innerHTML = groups.length
+      ? groups.map(([title, cards]) => `<div class="group"><h3>${esc(title)} · ${cards.length}</h3><div class="cards">${cards.join("")}</div></div>`).join("")
+      : `<div class="empty">Nothing is being played right now.</div>`;
+    tick();
+  }
+
+  // ---- Completed events ----
+
+  function query() {
+    const p = new URLSearchParams();
+    const span = $("f-span").value;
+    const t = now();
+    if (span === "24h") p.set("from", new Date(t - 864e5).toISOString());
+    if (span === "7d") p.set("from", new Date(t - 7 * 864e5).toISOString());
+    if (span === "30d") p.set("from", new Date(t - 30 * 864e5).toISOString());
+    if (span === "custom") {
+      if ($("f-from").value) p.set("from", new Date($("f-from").value + "T00:00:00").toISOString());
+      if ($("f-to").value) p.set("to", new Date($("f-to").value + "T23:59:59").toISOString());
+    }
+    for (const [key, id] of [["kind", "f-kind"], ["cube", "f-cube"], ["player", "f-player"], ["outcome", "f-outcome"]]) {
+      if ($(id).value.trim()) p.set(key, $(id).value.trim());
+    }
+    return p.toString();
+  }
+
+  function fill(select, values, label) {
+    const keep = select.value;
+    select.innerHTML = `<option value="">${esc(label)}</option>` + values.map(v => `<option>${esc(v)}</option>`).join("");
+    select.value = values.includes(keep) ? keep : "";
+  }
+
+  function renderHistory() {
+    if (!past) return;
+    fill($("f-cube"), past.cubes, "All cubes");
+    $("f-players").innerHTML = past.players.map(name => `<option value="${esc(name)}">`).join("");
+    $("history-count").textContent = `${past.total}`;
+    if (!past.events.length) {
+      $("history").innerHTML = `<div class="empty">No events finished in this time.</div>`;
+      return;
+    }
+
+    const rows = past.events.map(e => {
+      const outcome = e.stage === "Cancelled"
+        ? `<span class="badge Cancelled">Called off</span>`
+        : e.stage !== "Complete"
+          ? `<span class="badge Unfinished" title="Stopped while ${esc((STAGES[e.stage] ?? e.stage).toLowerCase())}">Not finished</span>`
+          : e.winner ? `<span class="won">${esc(e.winner)}</span>` : `<span class="lost">No winner</span>`;
+      return `<tr data-id="${esc(e.id)}"${selected === e.id ? ` class="selected"` : ""}>
+        <td class="num" title="${esc(new Date(e.updated).toLocaleString())}">${esc(when(e.updated))}</td>
+        <td>${esc(e.name || e.id)}</td>
+        <td class="wide">${esc(KIND_ONE[e.kind] ?? e.kind)}</td>
+        <td class="wide">${esc(e.cube)}</td>
+        <td><div class="players">${players(e.players, false)}</div></td>
+        <td>${outcome}</td>
+        <td class="wide num small">${esc(duration(e.created, e.updated))}</td>
+      </tr>`;
+    }).join("");
+    $("history").innerHTML = `<div class="table-wrap"><table class="history">
+      <thead><tr><th>Finished</th><th>Event</th><th class="wide">Type</th><th class="wide">Cube</th><th>Players</th><th>Result</th><th class="wide">Length</th></tr></thead>
+      <tbody>${rows}</tbody></table></div>`
+      + (past.total > past.events.length ? `<div class="more">Showing the latest ${past.events.length} of ${past.total}. Narrow the filters to see others.</div>` : "");
+  }
+
+  // ---- One event ----
+
+  function standingsTable(standings) {
+    const pct = v => `${(v * 100).toFixed(1)}%`;
+    return `<div class="table-wrap"><table>
+      <thead><tr><th class="r">#</th><th>Player</th><th class="r">Points</th><th class="r">Matches</th><th class="r">Games</th>
+      <th class="r" title="Opponents' match-win percentage">OMW</th><th class="r" title="Game-win percentage">GW</th><th class="r" title="Opponents' game-win percentage">OGW</th></tr></thead>
+      <tbody>${standings.map(s => `<tr>
+        <td class="r num">${s.dropped ? "-" : s.rank}</td>
+        <td>${esc(s.name)}${s.dropped ? ` <span class="small">dropped</span>` : ""}</td>
+        <td class="r num score">${s.points}</td>
+        <td class="r num">${s.wins}-${s.losses}${s.draws ? `-${s.draws}` : ""}</td>
+        <td class="r num">${s.gameWins}-${s.gameLosses}${s.gameDraws ? `-${s.gameDraws}` : ""}</td>
+        <td class="r num">${pct(s.opponentMatchWin)}</td><td class="r num">${pct(s.gameWin)}</td><td class="r num">${pct(s.opponentGameWin)}</td>
+      </tr>`).join("")}</tbody></table></div>`;
+  }
+
+  function matchRow(m, live, swiss) {
+    if (m.bye) {
+      return `<tr><td class="num">${m.table || ""}</td><td><span class="won">${esc(m.players[0]?.name)}</span></td><td class="score">bye</td><td></td><td class="small">2-0</td></tr>`;
+    }
+    const [a, b] = m.players;
+    const name = p => {
+      if (!p) return "";
+      const cls = m.complete ? (m.winner && m.winner.split(" and ").includes(p.name) ? "won" : "lost") : "";
+      const clock = live && !m.complete && p.clockMs != null ? ` <span class="small num" title="Match clock left">${left(p.clockMs)}</span>` : "";
+      return `<span class="${cls}">${esc(p.name)}</span>${clock}`;
+    };
+    const status = m.timedOut ? `${esc(m.timedOut)} ran out of time`
+      : m.forfeit ? "Forfeit"
+      : m.complete ? (m.winner ? "Finished" : "Draw")
+      : esc(m.detail || "In progress");
+    const games = m.games.map(g => {
+      const what = g.ending === "" ? "playing" : g.ending === "won" ? `${esc(g.winner)} won` : esc(g.ending);
+      return `<div class="small">Game ${g.number}: ${what}${g.ended ? ` · ${esc(duration(g.started, g.ended))}` : ""}</div>`;
+    }).join("");
+    return `<tr>
+      <td class="num">${swiss ? (m.table || "") : ""}</td>
+      <td>${name(a)}<br>${name(b)}</td>
+      <td class="score num">${a ? a.wins : 0}-${b ? b.wins : 0}</td>
+      <td>${status}${m.gamesToWin > 1 ? `<div class="small">best of ${m.gamesToWin * 2 - 1}</div>` : ""}</td>
+      <td>${games}</td>
+    </tr>`;
+  }
+
+  function roundsBlock(d) {
+    const rounds = d.rounds;
+    if (!rounds.length) return "";
+    const swiss = d.event.rounds > 0;
+    if (roundShown == null || !rounds.some(r => r.round === roundShown)) roundShown = rounds[rounds.length - 1].round;
+    const r = rounds.find(x => x.round === roundShown);
+    const tabs = rounds.length > 1 || swiss
+      ? `<div class="tabs">${rounds.map(x => `<button data-round="${x.round}" class="${x.round === roundShown ? "on" : ""}">Round ${x.round}</button>`).join("")}</div>`
+      : "";
+    const done = r.matches.filter(m => m.complete).length;
+    return `<h3>${swiss ? "Pairings and results" : "The game"}</h3>${tabs}
+      ${swiss ? `<div class="small" style="margin-bottom:6px">${done} of ${r.matches.length} matches finished</div>` : ""}
+      <div class="table-wrap"><table>
+        <thead><tr><th>${swiss ? "Table" : ""}</th><th>Players</th><th>Score</th><th>Status</th><th>Games</th></tr></thead>
+        <tbody>${r.matches.map(m => matchRow(m, d.event.live, swiss)).join("")}</tbody>
+      </table></div>`;
+  }
+
+  function draftBlock(d) {
+    const draft = d.draft, e = d.event;
+    if (!draft) return "";
+    const total = draft.cards;
+    const drafted = draft.seats.reduce((sum, s) => sum + s.drafted, 0);
+    const over = !e.live || (e.stage !== "Drafting" && e.stage !== "Seating");
+    const ended = !e.live && (e.stage === "Drafting" || e.stage === "Seating") ? "The draft was not finished." : "The draft is over.";
+    let head = "";
+    if (draft.format === "booster") {
+      head = over ? ended
+        : `Pack <b>${draft.pack}</b> of ${draft.packs}, passing ${draft.direction > 0 ? "left" : "right"}`;
+    } else if (draft.format === "grid") {
+      head = over ? ended
+        : `Grid <b>${draft.pack}</b> of ${draft.packs}, ${draft.pickOfPack === 1 ? "first" : "second"} pick`;
+    } else {
+      head = over ? ended : `${plural(draft.stack, "card")} left in the stack`;
+    }
+    const share = total > 0 ? Math.round(100 * (drafted + draft.discarded) / total) : 0;
+
+    let piles = "";
+    if (draft.format === "winston" && !over) {
+      piles = `<div class="piles" style="margin:10px 0">${draft.piles.map((n, i) =>
+        `<div class="pile${i === draft.looking ? " lit" : ""}"><div class="v num">${n}</div><div class="k">Pile ${i + 1}${i === draft.looking ? " · looking" : ""}</div></div>`).join("")}
+        <div class="pile"><div class="v num">${draft.stack}</div><div class="k">Stack</div></div></div>`;
+    }
+
+    const booster = draft.format === "booster";
+    const seats = `<div class="table-wrap"><table>
+      <thead><tr><th class="r">Seat</th><th>Player</th><th class="r">Cards drafted</th>${booster && !over ? `<th class="r">Packs waiting</th><th>Pick clock</th>` : ""}${!booster && !over ? "<th></th>" : ""}</tr></thead>
+      <tbody>${draft.seats.map(s => `<tr>
+        <td class="r num">${s.seat}</td><td>${esc(s.name)}</td><td class="r num">${s.drafted}</td>
+        ${booster && !over ? `<td class="r num">${s.queued}</td><td>${s.queued > 0 ? countdown(s.pickBy) : `<span class="small">waiting</span>`}</td>` : ""}
+        ${!booster && !over ? `<td>${s.active ? `<span class="badge Drafting">picking</span>` : ""}</td>` : ""}
+      </tr>`).join("")}</tbody></table></div>`;
+
+    return `<h3>Draft</h3>
+      <div class="status-line"><span>${head}</span><span class="small">${drafted} of ${total} cards drafted${draft.discarded ? `, ${draft.discarded} discarded` : ""}</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${share}%"></div></div>
+      ${piles}<div style="height:10px"></div>${seats}`;
+  }
+
+  function deckBlock(d) {
+    const e = d.event;
+    if (!e.live || e.stage !== "DeckBuilding") return "";
+    const done = e.players.filter(p => p.submitted).length;
+    return `<h3>Deck building</h3>
+      <div class="status-line"><span>${done} of ${e.players.length} decks submitted</span>${e.deadline ? `<span>${countdown(e.deadline, " left")}</span>` : ""}</div>
+      <div class="players" style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px">${players(e.players, true)}</div>`;
+  }
+
+  function renderDetail() {
+    if (!detail) return;
+    const d = detail, e = d.event, s = d.settings;
+    $("d-title").textContent = e.name || e.id;
+    const unfinished = !e.live && e.stage !== "Complete" && e.stage !== "Cancelled";
+    $("d-sub").innerHTML = [KIND_ONE[e.kind] ?? e.kind, e.cube].filter(Boolean).map(esc).join(" · ")
+      + (unfinished ? ` <span class="badge Unfinished">Not finished</span>` : ` <span class="badge ${esc(e.stage)}">${esc(STAGES[e.stage] ?? e.stage)}</span>`);
+
+    const facts = [
+      ["Players", e.players.length],
+      e.rounds > 0 ? ["Rounds", e.stage === "Playing" ? `${e.round} of ${e.rounds}` : e.rounds] : null,
+      s && s.format === "booster" ? ["Packs", `${s.packs} × ${s.packSize}`] : null,
+      s && s.format === "grid" ? ["Grids", s.packs] : null,
+      s && s.format === "winston" ? ["Cards · piles", `${s.cards} · ${s.piles}`] : null,
+      s ? ["Minimum deck", s.minimumDeck] : null,
+      ["Started", when(e.created)],
+      e.live ? ["Running for", duration(e.created, new Date(now()).toISOString())] : [unfinished ? "Last activity" : "Finished", when(e.updated)],
+      !e.live && e.winner ? ["Winner", e.winner] : null,
+    ].filter(Boolean);
+
+    const statusLine = `<div class="status-line">
+      <span class="detail">${unfinished ? `No longer being played: it stopped while ${esc((STAGES[e.stage] ?? e.stage).toLowerCase())}.` : esc(e.detail || e.progress)}</span>
+      ${e.live && e.deadline ? `<span>${countdown(e.deadline, e.stage === "Playing" ? " until the round begins" : e.stage === "DeckBuilding" ? " to build" : e.stage === "Seating" ? " to take seats" : "")}</span>` : ""}
+    </div>`;
+
+    const seatList = `<h3>Players</h3><div class="players" style="display:flex;flex-wrap:wrap;gap:4px">${players(e.players, e.stage === "DeckBuilding")}</div>`;
+
+    $("d-body").innerHTML = `<h3>Now</h3>${statusLine}
+      <div style="height:12px"></div>
+      <div class="facts">${facts.map(([k, v]) => `<div class="fact"><div class="k">${esc(k)}</div><div class="v">${esc(v)}</div></div>`).join("")}</div>
+      ${d.standings.length ? `<h3>${e.live ? "Standings" : "Final standings"}</h3>${standingsTable(d.standings)}` : ""}
+      ${roundsBlock(d)}
+      ${deckBlock(d)}
+      ${draftBlock(d)}
+      ${d.standings.length || d.draft ? "" : seatList}`;
+    tick();
+  }
+
+  async function open(id, push = true) {
+    if (selected !== id) roundShown = null;
+    selected = id;
+    if (push) history_set(id);
+    $("drawer").classList.add("on");
+    $("drawer").setAttribute("aria-hidden", "false");
+    $("scrim").classList.add("on");
+    markSelected();
+    try {
+      detail = await get(`/events/${encodeURIComponent(id)}`);
+      if (selected === id) renderDetail();
+    } catch {
+      if (selected === id) {
+        $("d-title").textContent = "Event not found";
+        $("d-sub").textContent = "";
+        $("d-body").innerHTML = `<div class="empty">There is no event here by that name.</div>`;
+      }
+    }
+  }
+
+  function close(push = true) {
+    selected = null;
+    detail = null;
+    $("drawer").classList.remove("on");
+    $("drawer").setAttribute("aria-hidden", "true");
+    $("scrim").classList.remove("on");
+    if (push) history_set(null);
+    markSelected();
+  }
+
+  function markSelected() {
+    document.querySelectorAll("[data-id]").forEach(el => el.classList.toggle("selected", el.dataset.id === selected));
+  }
+
+  // The event opened is in the address, so a link to it opens it.
+  function history_set(id) {
+    const url = id ? `#event=${encodeURIComponent(id)}` : location.pathname + location.search;
+    window.history.pushState(null, "", url);
+  }
+
+  function fromHash() {
+    const match = /event=([^&]+)/.exec(location.hash);
+    if (match) open(decodeURIComponent(match[1]), false); else if (selected) close(false);
+  }
+
+  // ---- Clocks and refreshing ----
+
+  function tick() {
+    document.querySelectorAll("[data-until]").forEach(el => {
+      const ms = Date.parse(el.dataset.until) - now();
+      el.textContent = left(ms) + (el.dataset.suffix || "");
+      el.classList.toggle("soon", ms < 10000);
+    });
+    const stale = Date.now() - lastOk > 20000;
+    $("live-dot").classList.toggle("stale", stale);
+    $("live-text").textContent = lastOk === 0 ? "Connecting..." : stale ? "Can't reach the server" : "Live";
+  }
+
+  async function refreshActive() {
+    try { active = await get("/active"); renderActive(); } catch { tick(); }
+  }
+
+  let historyAsked = 0;
+  async function refreshHistory() {
+    const asked = ++historyAsked;
+    try {
+      const value = await get(`/history?${query()}`);
+      if (asked === historyAsked) { past = value; renderHistory(); }
+    } catch { tick(); }
+  }
+
+  async function refreshDetail() {
+    if (!selected) return;
+    const id = selected;
+    try {
+      const value = await get(`/events/${encodeURIComponent(id)}`);
+      if (selected === id) { detail = value; renderDetail(); }
+    } catch { /* kept as it was */ }
+  }
+
+  // ---- Wiring ----
+
+  document.addEventListener("click", event => {
+    const round = event.target.closest("[data-round]");
+    if (round) { roundShown = Number(round.dataset.round); renderDetail(); return; }
+    const item = event.target.closest("[data-id]");
+    if (item && !item.closest("aside")) open(item.dataset.id);
+  });
+  $("d-close").addEventListener("click", () => close());
+  $("scrim").addEventListener("click", () => close());
+  document.addEventListener("keydown", event => { if (event.key === "Escape" && selected) close(); });
+  window.addEventListener("popstate", fromHash);
+
+  $("f-span").addEventListener("change", () => {
+    $("f-custom").classList.toggle("on", $("f-span").value === "custom");
+    refreshHistory();
+  });
+  for (const id of ["f-from", "f-to", "f-kind", "f-cube", "f-outcome"]) $(id).addEventListener("change", refreshHistory);
+  let typing = 0;
+  $("f-player").addEventListener("input", () => { clearTimeout(typing); typing = setTimeout(refreshHistory, 250); });
+  $("filters").addEventListener("submit", event => event.preventDefault());
+  $("f-reset").addEventListener("click", () => {
+    $("f-span").value = "24h";
+    $("f-custom").classList.remove("on");
+    for (const id of ["f-from", "f-to", "f-kind", "f-cube", "f-player", "f-outcome"]) $(id).value = "";
+    refreshHistory();
+  });
+
+  refreshActive();
+  refreshHistory();
+  fromHash();
+  setInterval(tick, 500);
+  setInterval(refreshActive, 5000);
+  setInterval(refreshDetail, 5000);
+  setInterval(refreshHistory, 30000);
+})();
+</script>
+</body>
+</html>

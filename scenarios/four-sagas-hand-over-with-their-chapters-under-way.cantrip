@@ -1,0 +1,65 @@
+# Four Sagas on one board, handed over with Bot1 holding priority in its second turn's main phase: a green one, a red
+# one, a red and white one and a land. It is how the client draws a Saga that this position exists to picture - the
+# Saga frames, the chapters down the left beside a tall illustration, each chapter's badge on the ribbon, and the
+# reminder text in italics at the top of the chapter list, the one reminder a face prints:
+#
+# Urza's Saga, Song of Freyalise and Fable of the Mirror-Breaker come on the first turn and are on their second
+# chapters; Showdown of the Skalds, cast on the second turn, is on its first.
+
+[Bot1 Deck]
+Urza's Saga
+Mox Ruby
+Mox Emerald
+Black Lotus
+Song of Freyalise
+Fable of the Mirror-Breaker
+Showdown of the Skalds
+Plateau
+Mountain x10
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Urza's Saga.Play
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Urza's Saga.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Song of Freyalise.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Fable of the Mirror-Breaker.Cast
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+# Fable's chapter II discards nothing, so Showdown and the Plateau stay in hand.
+Bot1.Choose()
+Bot1.Hand.Plateau.Play
+Bot1.Battlefield.Plateau.Activate(Ability: {W})
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Urza's Saga.Activate(Ability: Add {C})
+Bot1.Hand.Showdown of the Skalds.Cast
+Bot1.Pass
+Bot1.Pass
+[Handover Bot1.Pass]
+
+[Expect]
+Turn = 3
+Step = Main1
+ActivePlayer = Bot1
+PriorityPlayer = Bot1
+Stack.Count = 0
+Bot1.Battlefield.Count = 8
+Bot1.Battlefield.Urza's Saga.Counters.Lore = 2
+Bot1.Battlefield.Song of Freyalise.Counters.Lore = 2
+Bot1.Battlefield.Fable of the Mirror-Breaker.Counters.Lore = 2
+Bot1.Battlefield.Showdown of the Skalds.Counters.Lore = 1

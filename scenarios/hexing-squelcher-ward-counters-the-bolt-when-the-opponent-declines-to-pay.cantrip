@@ -1,0 +1,38 @@
+# The same Bolt at the Ornithopter, but Bot2 declines the ward cost: the Bolt is countered (CR 702.21a), Bot2 keeps its 20
+# life and Bot1's Ornithopter survives.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Hexing Squelcher
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Hexing Squelcher.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Decline
+Bot1.Pass
+[T3 Bot1.Main1]
+
+[Expect]
+Bot2.Life = 20
+Bot2.Graveyard = Lightning Bolt
+Bot1.Battlefield = Mox Ruby; Mox Jet; Hexing Squelcher; Ornithopter

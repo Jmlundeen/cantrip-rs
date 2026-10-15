@@ -1,0 +1,6 @@
+{
+  "name": "Wizard's Rockets",
+  "manaCost": "{1}",
+  "type": "Artifact",
+  "oracleText": "This artifact enters tapped.\n{X}, {T}, Sacrifice this artifact: Add X mana in any combination of colors.\nWhen this artifact is put into a graveyard from the battlefield, draw a card."
+}

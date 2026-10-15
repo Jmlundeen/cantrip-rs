@@ -1,0 +1,12 @@
+{
+  "name": "Baleful Strix",
+  "manaCost": "{U}{B}",
+  "type": "Artifact Creature — Bird",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "Flying, deathtouch\nWhen this creature enters, draw a card.",
+  "keywords": [
+    "Flying",
+    "Deathtouch"
+  ]
+}

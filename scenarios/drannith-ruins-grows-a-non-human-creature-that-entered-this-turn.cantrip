@@ -1,0 +1,32 @@
+# Drannith Ruins puts two +1/+1 counters on a non-Human creature that entered this turn. On turn 1 Bot1 casts an
+# Ornithopter, and pays {2} (two Moxen) and taps the Ruins to grow it into a 2/4. On turn 3 the Ornithopter entered
+# on an earlier turn, so it is no longer a legal target.
+
+[Bot1 Deck]
+Drannith Ruins
+Ornithopter
+Mox Jet
+Mox Ruby
+Drannith Ruins
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Drannith Ruins.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Drannith Ruins.Activate(Ability: Put two; Bot1.Battlefield.Ornithopter)
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Drannith Ruins.Activate(Ability: Put two)
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Ornithopter.Toughness = 4

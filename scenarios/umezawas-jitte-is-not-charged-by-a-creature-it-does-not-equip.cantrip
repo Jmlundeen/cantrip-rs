@@ -1,0 +1,39 @@
+# "Equipped creature" only: the Jitte sits on Llanowar Elves at home while an unequipped Rootwalla connects, and it
+# gets no charge counter.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Basking Rootwalla
+Llanowar Elves
+Umezawa's Jitte
+Forest
+Forest x13
+
+[Bot2 Deck]
+Island x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Basking Rootwalla.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Umezawa's Jitte.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Umezawa's Jitte.Activate(Ability: Equip; Llanowar Elves)
+Bot1.Attack(Basking Rootwalla > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 19
+Bot1.Battlefield.Umezawa's Jitte.AttachedTo = Llanowar Elves
+Bot1.Battlefield.Umezawa's Jitte.Counters.Charge = (absent)

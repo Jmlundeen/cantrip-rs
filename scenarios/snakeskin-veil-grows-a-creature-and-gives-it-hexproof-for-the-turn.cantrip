@@ -1,0 +1,25 @@
+# Snakeskin Veil: an Ornithopter gets a +1/+1 counter (a 1/3) and hexproof until end of turn.
+
+[Bot1 Deck]
+Mox Emerald
+Snakeskin Veil
+Ornithopter
+Plains x17
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Snakeskin Veil.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Snakeskin Veil
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter.Power = 1
+Bot1.Battlefield.Ornithopter.Toughness = 3
+Bot1.Battlefield.Ornithopter.Keywords = Flying; Hexproof

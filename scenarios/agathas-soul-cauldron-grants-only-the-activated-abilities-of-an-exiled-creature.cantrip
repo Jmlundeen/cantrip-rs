@@ -1,0 +1,49 @@
+# Agatha's Soul Cauldron: "Creatures you control with +1/+1 counters on them have all activated abilities of all
+# creature cards exiled with" it - the activated ones only. Haywire Mite has a dies trigger and "{G}, Sacrifice this
+# creature: Exile target noncreature artifact". Faithless Looting discards it on turn 3; the Cauldron exiles it and puts
+# a counter on Ornithopter, which can now pay {G} (Mox Emerald) and sacrifice itself to exile Mox Emerald. Ornithopter
+# dies without gaining Bot1 2 life: the Mite's triggered ability is not among the abilities it was given (CR 113.1).
+
+[Bot1 Deck]
+Mountain
+Mox Emerald
+Ornithopter
+Agatha's Soul Cauldron
+Faithless Looting
+Haywire Mite
+Mountain
+Mountain x14
+
+[Bot2 Deck]
+Island x13
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Agatha's Soul Cauldron.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Haywire Mite; Mountain)
+Bot1.Battlefield.Agatha's Soul Cauldron.Activate(Bot1.Graveyard.Haywire Mite)
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Ornithopter.Activate(Bot1.Battlefield.Mox Emerald)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Ornithopter; Faithless Looting; Mountain
+Bot1.Battlefield.Count = 3
+Exile = Haywire Mite; Mox Emerald
+Bot1.Life = 20

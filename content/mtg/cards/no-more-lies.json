@@ -1,0 +1,6 @@
+{
+  "name": "No More Lies",
+  "manaCost": "{W}{U}",
+  "type": "Instant",
+  "oracleText": "Counter target spell unless its controller pays {3}. If that spell is countered this way, exile it instead of putting it into its owner's graveyard."
+}

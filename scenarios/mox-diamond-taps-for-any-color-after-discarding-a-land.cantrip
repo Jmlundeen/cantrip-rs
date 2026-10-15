@@ -1,0 +1,22 @@
+# A Mox Diamond that entered by discarding a Forest (accepting, choosing it) taps for one mana of any colour (CR 106.1b): red here.
+
+[Bot1 Deck]
+Mox Diamond
+Island
+Forest
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Diamond.Cast
+Bot1.Accept
+Bot1.Choose(Forest)
+Bot1.Battlefield.Mox Diamond.Activate(Color: Red)
+? Bot1.Mana = {R}
+
+[Expect]
+Bot1.Mana = {R}
+Bot1.Graveyard = Forest

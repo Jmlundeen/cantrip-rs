@@ -1,0 +1,23 @@
+# Elegant Parlor enters tapped and, as it enters, surveils 1: Bot1 puts the Lightning Bolt on top of its library into
+# the graveyard.
+
+[Bot1 Deck]
+Elegant Parlor
+Island x6
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Swamp x15
+
+[Actions]
+Bot1.Hand.Elegant Parlor.Play
+Bot1.Arrange(| Lightning Bolt)
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Battlefield = Elegant Parlor
+Bot1.Battlefield.Elegant Parlor.Tapped = true
+Bot1.Graveyard = Lightning Bolt
+Bot1.Library.Count = 10

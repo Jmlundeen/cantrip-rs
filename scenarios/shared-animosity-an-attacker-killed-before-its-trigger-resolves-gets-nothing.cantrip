@@ -1,0 +1,40 @@
+# Both Ornithopters attack and each triggers Shared Animosity. Bot2 Bolts one in response; the dead Ornithopter's trigger does nothing (it left the battlefield, CR 400.7), and the
+# survivor's, counting the attacking creatures still attacking as it resolves (CR 608.2h), finds no other sharing a type, so it deals 0. Bot2 stays at 20.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Shared Animosity
+Ornithopter
+Ornithopter
+Plains
+Plains x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Shared Animosity.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter; Ornithopter > Bot2)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Ornithopter#1)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 20
+Bot2.Graveyard = Lightning Bolt
+Bot1.Graveyard = Ornithopter

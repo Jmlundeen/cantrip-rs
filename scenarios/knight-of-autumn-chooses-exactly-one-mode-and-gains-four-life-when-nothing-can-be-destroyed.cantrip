@@ -1,0 +1,34 @@
+# Knight of Autumn: "choose one" (CR 700.2): exactly one mode, so choosing the counters and the life together is
+# refused. With no artifact or enchantment on the battlefield the "destroy target artifact or enchantment" mode has no
+# legal target and is not offered (CR 700.2b), so it is refused too. The third mode, "You gain 4 life", is the one
+# chosen: Bot1 is at 24 and the Knight stays a 2/1. Bot1 pays with Plains, Forest and a Plains that are not artifacts.
+
+[Bot1 Deck]
+Plains
+Forest
+Plains
+Knight of Autumn
+Plains x14
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Knight of Autumn.Cast
+Bot1.Pass
+! Bot1.Modes(Destroy target artifact)
+! Bot1.Modes(1; 3)
+Bot1.Modes(You gain 4 life)
+
+[Expect]
+Bot1.Life = 24
+Bot1.Battlefield.Knight of Autumn.Power = 2
+Bot1.Battlefield.Knight of Autumn.Toughness = 1

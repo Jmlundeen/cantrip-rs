@@ -1,0 +1,38 @@
+# "For each attacking creature you control": Bot2's attacking Ornithopter on turn 4 is not one, and Bot1 has no attackers, so
+# Embercleave flashed in at Bot2's declare attackers step costs the full six: Black Lotus, Mox Ruby and two Mountains float six
+# red mana and none is left (had the opposing attacker counted, one would be).
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mox Ruby
+Embercleave
+Ornithopter
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T4 Bot2.Main1]
+Bot2.Attack(Ornithopter)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Embercleave.Cast
+? Bot1.Mana = 
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Embercleave.AttachedTo = Ornithopter

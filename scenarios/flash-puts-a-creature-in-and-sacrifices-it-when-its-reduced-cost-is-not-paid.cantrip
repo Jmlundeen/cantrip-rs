@@ -1,0 +1,28 @@
+# Flash puts Dark Confidant (cost {1}{B}) from the hand onto the battlefield; its cost reduced by {2} is {B}, which
+# Bot1 declines to pay, so Dark Confidant is sacrificed (CR 118.12).
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Flash
+Dark Confidant
+Island x3
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Flash.Cast
+Bot1.Choose(Dark Confidant)
+Bot1.Decline
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Graveyard = Flash; Dark Confidant
+Bot1.Battlefield = Island; Mox Sapphire

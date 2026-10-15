@@ -1,0 +1,31 @@
+# Chromatic Star's {1} is a mana ability's own mana cost, and which pool mana pays it is the player's choice
+# (CR 602.2b via 601.2h). With {U}{B} floating either pays it, so the engine asks; Spend: B answers with the black,
+# and the blue is kept beside the red the Star makes. The fixed rule would always have spent the blue.
+
+[Bot1 Deck]
+Island
+Swamp
+Chromatic Star
+Island x4
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Chromatic Star.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Swamp.Activate
+? Bot1.Mana = {U}{B}
+Bot1.Battlefield.Chromatic Star.Activate(Color: Red; Spend: B)
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Island; Swamp
+Bot1.Graveyard = Chromatic Star
+Bot1.Mana = {U}{R}

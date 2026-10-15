@@ -1,0 +1,40 @@
+# Passageway Seer: "When this creature enters, you take the initiative" (which ventures into Undercity: Secret Entrance
+# fetches a Forest), and "At the beginning of your end step, if you have the initiative, put a +1/+1 counter on this
+# creature." Cast on turn one off a Swamp and three Moxen, it ends the turn a 3/3 lifelinker.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Mox Pearl
+Passageway Seer
+Island x2
+Forest
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Passageway Seer.Cast
+Bot1.Pass
+Bot1.Search(Forest)
+[T2 Bot2.Upkeep]
+
+[Expect]
+Turn = 2
+Initiative = Bot1
+Bot1.Battlefield.Passageway Seer.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Passageway Seer.Power = 3
+Bot1.Battlefield.Passageway Seer.Keywords = Lifelink

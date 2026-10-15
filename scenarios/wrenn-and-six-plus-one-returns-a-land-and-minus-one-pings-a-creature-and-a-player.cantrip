@@ -1,0 +1,49 @@
+# Wrenn and Six ({R}{G}) comes down on turn 1 off Mox Ruby and Mox Emerald; Faithless Looting (Black Lotus) discards a Forest and an Island, and
+# the +1 returns the Forest to hand (loyalty 4). On turn 3 the -1 shoots Bot2's Llanowar Elves (1 damage kills it; loyalty 3) and on turn 5
+# the -1 again hits Bot2 for 1 (loyalty 2).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Wrenn and Six
+Black Lotus
+Faithless Looting
+Forest
+Island
+Island x4
+Island x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Wrenn and Six.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Forest; Island)
+Bot1.Pass
+Bot1.Battlefield.Wrenn and Six.Activate(Bot1.Graveyard.Forest; Ability: Return up to one)
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Wrenn and Six.Activate(Bot2.Battlefield.Llanowar Elves; Ability: deals 1 damage)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Wrenn and Six.Activate(Bot2; Ability: deals 1 damage)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Forest
+Bot2.Graveyard = Llanowar Elves
+Bot2.Life = 19
+Bot1.Battlefield.Wrenn and Six.Counters.Loyalty = 2
+Bot1.Graveyard = Faithless Looting; Island; Black Lotus

@@ -1,0 +1,6 @@
+{
+  "name": "Time Walk",
+  "manaCost": "{1}{U}",
+  "type": "Sorcery",
+  "oracleText": "Take an extra turn after this one."
+}

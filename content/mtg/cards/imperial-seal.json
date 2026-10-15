@@ -1,0 +1,6 @@
+{
+  "name": "Imperial Seal",
+  "manaCost": "{B}",
+  "type": "Sorcery",
+  "oracleText": "Search your library for a card, then shuffle and put that card on top. You lose 2 life."
+}

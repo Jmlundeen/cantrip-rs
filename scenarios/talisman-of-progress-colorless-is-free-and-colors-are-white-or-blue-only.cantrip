@@ -1,0 +1,37 @@
+# Talisman of Progress: "{T}: Add {C}." costs nothing, while "{T}: Add {W} or {U}. This artifact deals 1 damage to you."
+# hurts its controller (a mana ability: the damage is dealt at once, CR 605.4a). On turn 3 the colorless ability leaves
+# Bot1 at 20; on turn 5 blue costs 1 life. The colored ability refuses black, red, green and colorless beside the blue it
+# does add (the positive control); the colorless ability refuses every color.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Talisman of Progress
+Swamp x17
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Talisman of Progress.Cast
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Talisman of Progress.Activate(Ability: {W} or {U}; Color: Black)
+! Bot1.Battlefield.Talisman of Progress.Activate(Ability: {W} or {U}; Color: Red)
+! Bot1.Battlefield.Talisman of Progress.Activate(Ability: {W} or {U}; Color: Green)
+! Bot1.Battlefield.Talisman of Progress.Activate(Ability: {W} or {U}; Color: Colorless)
+! Bot1.Battlefield.Talisman of Progress.Activate(Ability: {T}: Add {C}; Color: White)
+Bot1.Battlefield.Talisman of Progress.Activate(Ability: {T}: Add {C})
+? Bot1.Mana = {C}
+? Bot1.Life = 20
+[T5 Bot1.Main1]
+Bot1.Battlefield.Talisman of Progress.Activate(Ability: {W} or {U}; Color: Blue)
+? Bot1.Mana = {U}
+? Bot1.Life = 19
+
+[Expect]
+Bot1.Life = 19
+Bot1.Battlefield.Talisman of Progress.Tapped = true

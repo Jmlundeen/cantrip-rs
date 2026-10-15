@@ -1,0 +1,30 @@
+# Two Ornithopters give two energy: the attack trigger has nothing to pay with, so Bot1 is not asked (the refusal) and keeps its two.
+
+[Bot1 Deck]
+Mox Pearl
+Guide of Souls
+Ornithopter
+Ornithopter
+Ornithopter
+Island x2
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Guide of Souls.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+? Bot1.Energy = 2
+Bot1.Attack(Ornithopter)
+! Bot1.Accept
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Energy = 2
+Bot1.Life = 22

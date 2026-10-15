@@ -1,0 +1,38 @@
+# Liliana of the Veil's +1: "Each player discards a card." Each player chooses their own card, the player whose turn it
+# is first (ruling 2022-09-09): Bot1 picks its Mountain over its Islands and Forest, Bot2 discards one of its own, and
+# Liliana goes from 3 loyalty to 4.
+
+[Bot1 Deck]
+Swamp x3
+Liliana of the Veil
+Island
+Mountain
+Forest
+Island x20
+
+[Bot2 Deck]
+Plains x22
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Swamp#3.Activate
+Bot1.Hand.Liliana of the Veil.Cast
+Bot1.Battlefield.Liliana of the Veil.Activate(Ability: Each player)
+Bot1.Choose(Mountain)
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Liliana of the Veil.Counters.Loyalty = 4
+Bot1.Graveyard = Mountain
+Bot1.Hand = Island; Forest; Island; Island
+Bot2.Graveyard = Plains
+Bot2.Hand.Count = 6

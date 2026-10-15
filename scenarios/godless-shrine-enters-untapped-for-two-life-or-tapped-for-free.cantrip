@@ -1,0 +1,26 @@
+# Godless Shrine: "As this land enters, you may pay 2 life. If you don't, it enters tapped." Bot1 pays on turn 1 (life 18,
+# the land untapped and able to tap for {W} or {B} as a Plains Swamp) and declines on turn 3 (the second one enters tapped
+# and costs nothing).
+
+[Bot1 Deck]
+Godless Shrine
+Godless Shrine
+Island x16
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Godless Shrine.Play
+Bot1.Accept
+? Bot1.Life = 18
+[T3 Bot1.Main1]
+Bot1.Hand.Godless Shrine.Play
+Bot1.Decline
+
+[Expect]
+Bot1.Life = 18
+Bot1.Battlefield = Godless Shrine; Godless Shrine
+Bot1.Battlefield.Godless Shrine#1.Tapped = false
+Bot1.Battlefield.Godless Shrine#2.Tapped = true
+Bot1.Battlefield.Godless Shrine#1.Subtypes = Plains; Swamp

@@ -1,0 +1,48 @@
+# Bot1 casts Phyrexian Metamorph with a Mox Sapphire and three Islands, and has it enter as a copy of Bot2's Thicket
+# Gorilla rather than as its own printed 0/0 — which would have died to CR 704.5f the moment it arrived. Two things are on
+# offer, its own artifact and the opponent's creature, and neither is targeted (CR 608.2d). The copy is an artifact in
+# addition to its other types (CR 707.9b), so Bot1's new Gorilla reads Artifact; Creature where Bot2's reads Creature.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Island
+Island
+Phyrexian Metamorph
+Island x9
+
+[Bot2 Deck]
+Forest
+Forest
+Guerrilla Gorilla
+Forest x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Phyrexian Metamorph.Cast
+Bot1.Accept
+Bot1.Target(Guerrilla Gorilla)
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield = Island; Island; Island; Mox Sapphire; Guerrilla Gorilla
+Bot1.Battlefield.Guerrilla Gorilla.Types = Creature; Artifact
+Bot1.Graveyard.Count = 0
+Bot2.Battlefield = Forest; Forest; Guerrilla Gorilla
+Bot2.Battlefield.Guerrilla Gorilla.Types = Creature

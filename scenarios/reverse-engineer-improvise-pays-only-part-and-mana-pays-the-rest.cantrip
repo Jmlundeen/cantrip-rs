@@ -1,0 +1,36 @@
+# Improvise is a way to pay generic mana, as many artifacts as the player taps and no more: Reverse Engineer {3}{U}{U} cast with
+# one improvised Ornithopter ({1}), two Mox Sapphires ({U}{U}) and a Mox Jet and a Mox Pearl ({2}) - the Moxen that made mana
+# are tapped for it, the Ornithopter for improvise, and nothing is left over. Three cards are drawn.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Ornithopter
+Reverse Engineer
+Island
+Island x12
+
+[Bot2 Deck]
+Forest x22
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Reverse Engineer.Cast(Convoke: Ornithopter)
+[Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Hand.Count = 4
+Bot1.Battlefield.Ornithopter.Tapped = true
+Bot1.Battlefield.Mox Pearl.Tapped = true
+Bot1.Mana =

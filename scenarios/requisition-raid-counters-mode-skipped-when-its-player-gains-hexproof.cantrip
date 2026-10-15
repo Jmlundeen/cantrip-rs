@@ -1,0 +1,56 @@
+# Requisition Raid, modes 1 and 3: destroy Bot1's own Mox Emerald and put counters on Bot2's creatures. Bot2 answers with
+# Dawn's Truce and gains hexproof (its permanents too): the player target is illegal, so the counters mode does nothing,
+# while the artifact mode, whose target is still legal, destroys the Mox (CR 608.2b).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Emerald
+Requisition Raid
+Island x4
+Island x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Dawn's Truce
+Ornithopter
+Plains x3
+Plains x11
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Requisition Raid.Cast
+Bot1.Modes(1; 3)
+Bot1.Target(Bot1.Battlefield.Mox Emerald)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Dawn's Truce.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Requisition Raid; Mox Emerald
+Bot2.Battlefield.Ornithopter.Counters.PlusOnePlusOne = (absent)
+Bot2.Battlefield.Ornithopter.Power = 0

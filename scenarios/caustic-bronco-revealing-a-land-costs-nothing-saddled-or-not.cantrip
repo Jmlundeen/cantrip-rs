@@ -1,0 +1,32 @@
+# The life lost or gained is the mana value of the card: a land is 0, so revealing one into the hand changes no life
+# total. Turn 3 reveals Swamp unsaddled (Bot1 loses 0); the cost of a spell is shown by the other scenarios.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Emerald
+Caustic Bronco
+Swamp
+Swamp
+Swamp
+Swamp x4
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Caustic Bronco.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Caustic Bronco > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 18
+Bot1.Hand.Count = 5
+Bot1.Library.Count = 2

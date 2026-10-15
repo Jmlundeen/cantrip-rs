@@ -1,0 +1,14 @@
+{
+  "name": "Bonecrusher Giant",
+  "manaCost": "{2}{R}",
+  "type": "Creature — Giant",
+  "power": 4,
+  "toughness": 3,
+  "oracleText": "Whenever this creature becomes the target of a spell, this creature deals 2 damage to that spell's controller.",
+  "adventure": {
+    "name": "Stomp",
+    "manaCost": "{1}{R}",
+    "type": "Instant — Adventure",
+    "oracleText": "Damage can't be prevented this turn. Stomp deals 2 damage to any target. (Then exile this card. You may cast the creature later from exile.)"
+  }
+}

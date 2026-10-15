@@ -1,0 +1,36 @@
+# Frenzied Trapbreaker, the night face of Outland Liberator: "Whenever this creature attacks, destroy target artifact or
+# enchantment defending player controls." Bot2 casts a Mox Jet on turn 2, so turn 3 stays day; it casts nothing on turn 4,
+# so turn 5 is night and the Liberator is a Trapbreaker. It attacks, and Bot1's own Mox Emerald is not a candidate:
+# the trigger takes Bot2's Mox Jet (CR 506.2), and the 3/3 is unblocked.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Outland Liberator
+Forest x4
+Forest x10
+
+[Bot2 Deck]
+Mox Jet
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Outland Liberator.Cast
+Bot1.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Attack(Frenzied Trapbreaker)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+DayNight = Night
+Bot2.Life = 17
+Bot2.Battlefield.Count = 0
+Bot1.Battlefield = Forest; Mox Emerald; Frenzied Trapbreaker

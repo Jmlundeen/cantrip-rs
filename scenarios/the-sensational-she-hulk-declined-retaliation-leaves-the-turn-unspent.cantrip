@@ -1,0 +1,58 @@
+# The Sensational She-Hulk comes down on turn 1 as the back face (Black Lotus, Mox Emerald and a Sol Ring pay the {3}{G}{W}{W}).
+# On turn 2 Bot2 bolts her twice, with a Mountain and a Mox Ruby. The first time Bot1 aims the retaliation at Bot2 and declines
+# the "you may": nothing is dealt, and "do this only once each turn" is spent by the doing (CR 603.2h), not by the triggering,
+# so the second Bolt triggers her again and that time Bot1 accepts: Bot2 is at 17, and she dies to the 6 damage with the
+# trigger already on the stack.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Emerald
+Sol Ring
+Black Lotus
+Jennifer Walters
+Island x3
+Island x14
+
+[Bot2 Deck]
+Mox Ruby
+Mountain
+Lightning Bolt
+Lightning Bolt
+Island x4
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Jennifer Walters.Cast(Ability: back face)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.The Sensational She-Hulk)
+Bot2.Pass
+Bot1.Target(Bot2)
+Bot2.Pass
+Bot1.Decline
+? Bot2.Life = 20
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.The Sensational She-Hulk)
+Bot2.Pass
+Bot1.Target(Bot2)
+Bot2.Pass
+Bot1.Accept
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Bot2.Life = 17
+Bot1.Graveyard.Count = 2

@@ -1,0 +1,52 @@
+# Teferi, Time Raveler: "Each opponent can cast spells only any time they could cast a sorcery." Bot2 holds two
+# Lightning Bolts:
+#   - turn 3, before Teferi: Bot2 casts the first Bolt at Bot1 in response to Bot1's Mox Jet, an instant on Bot1's
+#     turn (CR 117.1a). This is the positive control for the refusal below.
+#   - turn 3, after Teferi resolves: in Bot1's postcombat main phase, with the stack empty, the second Bolt is not
+#     offered at all (not merely unaffordable, which would still count as offered).
+#   - turn 4, Bot2's own main phase with an empty stack is sorcery timing (CR 307.1): Bot2 casts the second Bolt.
+
+[Bot1 Deck]
+Tundra
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Teferi, Time Raveler
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Lightning Bolt
+Lightning Bolt
+Mountain x20
+
+[Actions]
+Bot1.Hand.Tundra.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+? Stack.Count = 2
+Bot1.Hand.Teferi, Time Raveler.Cast
+Bot1.Battlefield.Tundra.Activate(Ability: {U})
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Teferi, Time Raveler.Counters.Loyalty = 4
+! Bot2.Hand.Lightning Bolt.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+
+[Expect]
+Turn = 4
+Stack.Count = 0
+Bot1.Life = 14
+Bot1.Battlefield = Tundra; Mox Pearl; Mox Sapphire; Mox Jet; Teferi, Time Raveler
+Bot2.Graveyard = Lightning Bolt; Lightning Bolt

@@ -1,0 +1,8 @@
+{
+  "name": "Ouroboroid",
+  "manaCost": "{2}{G}{G}",
+  "type": "Creature — Plant Wurm",
+  "power": 1,
+  "toughness": 3,
+  "oracleText": "At the beginning of combat on your turn, put X +1/+1 counters on each creature you control, where X is this creature's power."
+}

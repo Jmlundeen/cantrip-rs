@@ -1,0 +1,6 @@
+{
+  "name": "Decaying Soil",
+  "manaCost": "{1}{B}{B}",
+  "type": "Enchantment",
+  "oracleText": "At the beginning of your upkeep, exile a card from your graveyard.\nThreshold — As long as there are seven or more cards in your graveyard, this enchantment has \"Whenever a nontoken creature is put into your graveyard from the battlefield, you may pay {1}. If you do, return that card to your hand.\""
+}

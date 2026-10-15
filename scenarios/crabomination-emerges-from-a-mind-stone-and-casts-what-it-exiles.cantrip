@@ -1,0 +1,51 @@
+# Bot1 builds three Swamps, two Moxen and a Mind Stone, then casts Crabomination for its emerge cost: {5}{B}{B} reduced
+# by the mana value of the artifact sacrificed, which is the Mind Stone's 2, so five mana rather than seven. The two
+# Moxen are artifacts too and could have paid the sacrifice — for nothing off the cost, which is why the choice matters.
+# As Crabomination enters it exiles the top of Bot2's library, a card at random from the Islands in Bot2's graveyard and
+# a card at random from Bot2's hand, which is a Guerrilla Gorilla whichever one is drawn. Bot1 casts that Gorilla without paying
+# its mana cost, so it enters under Bot1's control and the two Islands are all that is left in exile.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Swamp
+Mind Stone
+Swamp
+Crabomination
+Swamp x13
+
+[Bot2 Deck]
+Guerrilla Gorilla x7
+Island x13
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Mind Stone.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Crabomination.Cast(Ability: Emerge)
+Bot1.Choose(Mind Stone)
+Bot1.Choose(Exile.Guerrilla Gorilla)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Graveyard = Mind Stone
+Bot1.Battlefield = Swamp; Swamp; Swamp; Mox Jet; Mox Ruby; Crabomination; Guerrilla Gorilla
+Bot1.Mana =
+Bot2.Hand.Count = 6
+Bot2.Graveyard.Count = 1
+Exile.Count = 2
+Stack.Count = 0

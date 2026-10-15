@@ -1,0 +1,49 @@
+# Splice onto Arcane (CR 702.47): Through the Breach's text is added to We Say Thee Nay!, cast on Bot2's turn against its
+# Lightning Bolt. The Bolt is countered (Bot2 cannot pay {2}), the Ornithopter is put onto the battlefield from Bot1's
+# hand with haste, and it is sacrificed at the beginning of turn 2's end step, the next end step. The Breach card itself
+# stays in Bot1's hand (it was only revealed).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Ruby
+Black Lotus
+We Say Thee Nay!
+Through the Breach
+Ornithopter
+Island x12
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Battlefield.Mountain.Activate
+Bot1.Hand.We Say Thee Nay!.Cast
+Bot1.Modes(Cast without teamwork)
+Bot1.Choose(Through the Breach)
+Bot1.Target(Stack.Lightning Bolt)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Choose(Ornithopter)
+? Bot1.Battlefield.Ornithopter.Keywords = Flying; Haste
+[T2 Bot2.Main2]
+? Bot1.Battlefield.Count = 4
+[T3 Bot1.Main1]
+
+[Expect]
+Turn = 3
+Bot1.Life = 20
+Bot2.Graveyard = Lightning Bolt
+Bot1.Graveyard = Ornithopter; We Say Thee Nay!; Black Lotus
+Bot1.Hand.Count = 2

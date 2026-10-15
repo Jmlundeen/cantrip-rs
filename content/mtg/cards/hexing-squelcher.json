@@ -1,0 +1,11 @@
+{
+  "name": "Hexing Squelcher",
+  "manaCost": "{1}{R}",
+  "type": "Creature — Goblin Sorcerer",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "This spell can't be countered.\nWard—Pay 2 life.\nSpells you control can't be countered.\nOther creatures you control have \"Ward—Pay 2 life.\"",
+  "keywords": [
+    "CantBeCountered"
+  ]
+}

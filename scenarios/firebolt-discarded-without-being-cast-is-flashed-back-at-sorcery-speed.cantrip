@@ -1,0 +1,42 @@
+# Firebolt put into the graveyard without being cast - discarded to Faithless Looting - can still be flashed back
+# (ruling 2021-03-19; CR 702.34a asks only that the card be in its owner's graveyard). It is a sorcery, so flashback
+# keeps sorcery timing (CR 307.1): not offered on Bot2's turn, then cast on Bot1's own main phase for {4}{R}, dealing
+# 2 damage and exiled. The Mountain discarded beside it and the Looting stay in the graveyard.
+
+[Bot1 Deck]
+Mountain
+Faithless Looting
+Firebolt
+Mountain x4
+Mountain x20
+
+[Bot2 Deck]
+Island x27
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Firebolt; Mountain)
+? Bot1.Graveyard.Count = 3
+[T2 Bot2.Main1]
+! Bot1.Graveyard.Firebolt.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Graveyard.Firebolt.Cast(Bot2; Ability: Flashback)
+
+[Expect]
+Bot2.Life = 18
+Exile = Firebolt
+Bot1.Graveyard = Faithless Looting; Mountain

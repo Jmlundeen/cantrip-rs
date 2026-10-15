@@ -1,0 +1,36 @@
+# Dack Fayden +1: "Target player draws two cards, then discards two cards." The target player chooses what to discard,
+# not Dack's controller. Turn 1 Bot1 casts Dack off Black Lotus and a Volcanic Island and targets Bot2: it draws two
+# Islands and keeps its Lightning Bolt and Counterspell out of the graveyard by its own choice. Dack ends at 4 loyalty.
+
+[Bot1 Deck]
+Volcanic Island
+Black Lotus
+Dack Fayden
+Island x4
+Island x14
+
+[Bot2 Deck]
+Lightning Bolt
+Counterspell
+Island x5
+Island x13
+
+[Actions]
+Bot1.Hand.Volcanic Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Volcanic Island.Activate(Ability: Add {U})
+Bot1.Hand.Dack Fayden.Cast
+Bot1.Pass
+Bot1.Battlefield.Dack Fayden.Activate(Bot2; Ability: draws two)
+Bot2.Choose(Island; Island)
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Dack Fayden.Counters.Loyalty = 4
+Bot2.Hand = Lightning Bolt; Counterspell; Island; Island; Island; Island; Island
+Bot2.Graveyard = Island; Island
+Bot2.Library.Count = 11
+Bot1.Hand.Count = 4

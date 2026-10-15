@@ -1,0 +1,45 @@
+# Mystic Forge lets Bot1 cast artifact and colorless spells from the top of the library for their mana cost: Mox Emerald
+# is cast off the top, but Lightning Bolt (red) under it is not offered. Forge's {T}, pay 1 life ability exiles the Bolt,
+# and Sol Ring, now on top, is cast with Mox Emerald's mana.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mystic Forge
+Island
+Island
+Island
+Island
+Mox Emerald
+Lightning Bolt
+Sol Ring
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Mystic Forge.Cast
+Bot1.Pass
+Bot1.Library.Mox Emerald.Cast
+Bot1.Pass
+! Bot1.Library.Lightning Bolt.Cast
+Bot1.Battlefield.Mystic Forge.Activate
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Library.Sol Ring.Cast
+Bot1.Pass
+[Bot1.Main1]
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Life = 19
+Exile = Lightning Bolt
+Bot1.Battlefield = Mox Emerald; Mox Jet; Mystic Forge; Sol Ring

@@ -1,0 +1,35 @@
+# Black Lotus pays for Anje's Ravager on turn 1; it is summoning sick then, so it does not attack that turn. On turn 3 the
+# forced attack discards the hand (a second Ravager, which has madness) and Bot1 declines to cast it (CR 702.35a: it goes
+# to the graveyard instead). Bot2 takes 3. The positive control for the accept branch is anjes-ravager-discards-its-twin-into-madness.
+
+[Bot1 Deck]
+Black Lotus
+Anje's Ravager
+Anje's Ravager
+Mountain x4
+Mountain x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Anje's Ravager.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+[T2 Bot2.Main1]
+? Bot2.Life = 20
+[T3 Bot1.DeclareAttackers]
+Bot1.Pass
+Bot2.Pass
+? Combat.Attackers = Anje's Ravager > Bot2
+Bot1.Decline
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot2.Life = 17
+Bot1.Graveyard = Anje's Ravager; Mountain; Mountain; Mountain; Mountain; Mountain; Black Lotus
+Bot1.Battlefield = Anje's Ravager
+Bot1.Hand.Count = 3

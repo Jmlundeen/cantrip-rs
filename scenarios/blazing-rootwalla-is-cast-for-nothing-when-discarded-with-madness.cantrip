@@ -1,0 +1,24 @@
+# Blazing Rootwalla has madness {0} (CR 702.35): discarded to Faithless Looting it goes to exile instead of the
+# graveyard, and its linked trigger lets Bot1 cast it for {0} with no mana left. It ends on the battlefield, not in the
+# graveyard.
+
+[Bot1 Deck]
+Mountain
+Blazing Rootwalla
+Faithless Looting
+Mountain x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Blazing Rootwalla; Mountain)
+Bot1.Accept
+
+[Expect]
+Bot1.Battlefield = Mountain; Blazing Rootwalla
+Exile.Count = 0

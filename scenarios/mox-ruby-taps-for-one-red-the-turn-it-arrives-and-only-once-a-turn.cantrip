@@ -1,0 +1,25 @@
+# "{T}: Add {R}." (CR 605.1a): an artifact is not a creature, so Mox Ruby needs no waiting out of summoning sickness
+# (CR 302.6) and adds exactly one red mana the turn it is cast. Tapped, it is refused a second activation that turn
+# and offered again on turn 3, the control.
+
+[Bot1 Deck]
+Mox Ruby
+Island x6
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+? Bot1.Mana = {R}
+! Bot1.Battlefield.Mox Ruby.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+? Bot1.Mana = {R}
+
+[Expect]
+Bot1.Battlefield.Mox Ruby.Tapped = true
+Bot1.Battlefield.Mox Ruby.Types = Artifact

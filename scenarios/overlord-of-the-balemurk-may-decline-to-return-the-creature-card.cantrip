@@ -1,0 +1,28 @@
+# The return is optional: with Elvish Mystic milled, Bot1 chooses nothing and the Mystic stays in the graveyard.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Overlord of the Balemurk
+Island x4
+Island
+Elvish Mystic
+Island x2
+Island x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Overlord of the Balemurk.Cast(Ability: Impending)
+Bot1.Choose()
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard.Count = 4
+Bot1.Hand.Count = 5

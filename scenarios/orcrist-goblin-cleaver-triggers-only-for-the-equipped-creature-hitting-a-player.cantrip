@@ -1,0 +1,60 @@
+# "Whenever equipped creature deals combat damage to a player": on turn 3 Bot1's equipped Ornithopter (2/4 flying, trample)
+# is blocked by Bot2's Ornithopter and deals its damage to that creature (which dies), and an unequipped Mother of Runes hits Bot2: no
+# trigger for either, no Treasure and no question. On turn 5 the equipped Ornithopter, now unblocked, hits Bot2 and
+# makes a Treasure (the positive control).
+
+[Bot1 Deck]
+Island
+Sol Ring
+Mox Ruby
+Mox Pearl
+Orcrist, Goblin-cleaver
+Ornithopter
+Mother of Runes
+Island x10
+
+[Bot2 Deck]
+Island
+Ornithopter
+Island x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Mother of Runes.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Orcrist, Goblin-cleaver.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Orcrist, Goblin-cleaver.Activate(Ornithopter; Ability: Equip)
+Bot1.Pass
+Bot1.Attack(Ornithopter; Mother of Runes > Bot2)
+Bot2.Block(Ornithopter > Bot1.Battlefield.Ornithopter)
+! Bot1.Modes
+[T3 Bot1.Main2]
+? Bot2.Life = 19
+? Bot2.Battlefield.Count = 0
+[T5 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+Bot1.Modes(Thopter)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Treasure Token.Types = Artifact

@@ -1,0 +1,27 @@
+# "{T}, Pay 1 life: Add {G} or {W}" - green, the colour the existing scenario does not take, for 1 life (turn 1). The
+# second ability also needs {T} (CR 602.2), so a tapped Canopy cannot be sacrificed to draw even with {G} floating to pay for the
+# {1}: the refusal. On turn 3 the untapped Canopy is sacrificed with a Mox Ruby's mana (the positive control) and Bot1 draws.
+
+[Bot1 Deck]
+Horizon Canopy
+Mox Ruby
+Island x14
+
+[Bot2 Deck]
+Swamp x15
+
+[Actions]
+Bot1.Hand.Horizon Canopy.Play
+Bot1.Battlefield.Horizon Canopy.Activate(Ability: Add; Color: Green)
+? Bot1.Mana = {G}
+? Bot1.Life = 19
+! Bot1.Battlefield.Horizon Canopy.Activate(Ability: Draw)
+Bot1.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Horizon Canopy.Activate(Ability: Draw)
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Horizon Canopy
+Bot1.Life = 19

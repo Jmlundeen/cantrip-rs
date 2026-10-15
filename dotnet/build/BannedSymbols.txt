@@ -1,0 +1,27 @@
+; Determinism guard for Cantrip.Core and Cantrip.Cards.Model (EnforceDeterminism=true): the shared game vocabulary
+; the server, the bots and replays all read.
+; Every entry here is something that would make a replay diverge between two machines,
+; two processes, or two runs. Format: <DocumentationCommentId>;<message>
+
+; --- Wall clock ---
+P:System.DateTime.Now;Wall clock destroys replay. Timeouts are decided by the host and submitted as a logged AutoDecision.
+P:System.DateTime.UtcNow;Wall clock destroys replay. Timeouts are decided by the host and submitted as a logged AutoDecision.
+P:System.DateTime.Today;Wall clock destroys replay.
+P:System.DateTimeOffset.Now;Wall clock destroys replay.
+P:System.DateTimeOffset.UtcNow;Wall clock destroys replay.
+T:System.Diagnostics.Stopwatch;Elapsed time must never influence game behaviour.
+P:System.Environment.TickCount;Wall clock destroys replay.
+P:System.Environment.TickCount64;Wall clock destroys replay.
+
+; --- Nondeterministic identity ---
+M:System.Guid.NewGuid;Object ids are numbered by the rules engine.
+M:System.String.GetHashCode;String hashing is randomized per process. Hash a stable encoding instead.
+
+; --- Unseeded randomness ---
+T:System.Random;Use Cantrip.Core.Random.IRandom, seeded from the game seed.
+
+; --- Concurrency ---
+T:System.Threading.Tasks.Task;These types stay single-threaded; the host owns all concurrency.
+T:System.Threading.Tasks.Task`1;These types stay single-threaded; the host owns all concurrency.
+T:System.Threading.Thread;These types stay single-threaded; the host owns all concurrency.
+T:System.Threading.ThreadPool;These types stay single-threaded; the host owns all concurrency.

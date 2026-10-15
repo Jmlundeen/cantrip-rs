@@ -1,0 +1,35 @@
+# Sheoldred's Edict, third mode: "Each opponent sacrifices a planeswalker of their choice." Bot2 controls Narset, Parter of
+# Veils and an Ornithopter; Narset is sacrificed and the creature is not.
+
+[Bot1 Deck]
+Swamp
+Sheoldred's Edict
+Swamp x13
+
+[Bot2 Deck]
+Black Lotus
+Narset, Parter of Veils
+Ornithopter
+Island x4
+Island x14
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Narset, Parter of Veils.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Sheoldred's Edict.Cast
+Bot1.Modes(3)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Ornithopter
+Bot2.Graveyard = Narset, Parter of Veils; Black Lotus

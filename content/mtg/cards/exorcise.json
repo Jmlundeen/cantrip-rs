@@ -1,0 +1,6 @@
+{
+  "name": "Exorcise",
+  "manaCost": "{1}{W}",
+  "type": "Sorcery",
+  "oracleText": "Exile target artifact, enchantment, or creature with power 4 or greater."
+}

@@ -1,0 +1,49 @@
+# The grant follows the Equipment: once the Boots are moved to Ornithopter, the Rootwalla has no ward, so Bot2's
+# Bolt (which would decline to pay ward by default) kills it, while Ornithopter is now the 1/2 with haste.
+
+[Bot1 Deck]
+Forest
+Forest
+Basking Rootwalla
+Lavaspur Boots
+Ornithopter
+Forest
+Mountain
+Forest x13
+
+[Bot2 Deck]
+Mountain
+Mountain
+Lightning Bolt
+Mountain x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Lavaspur Boots.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Basking Rootwalla.Cast
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Lavaspur Boots.Activate(Basking Rootwalla)
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Lavaspur Boots.Activate(Ornithopter)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Lavaspur Boots.AttachedTo = Ornithopter
+? Bot1.Battlefield.Basking Rootwalla.Power = 1
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Basking Rootwalla)
+
+[Expect]
+Bot1.Graveyard = Basking Rootwalla
+Bot2.Graveyard = Lightning Bolt
+Bot1.Battlefield.Ornithopter.Power = 1
+Bot1.Battlefield.Ornithopter.Keywords = Flying; Haste
+Stack.Count = 0

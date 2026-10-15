@@ -1,0 +1,64 @@
+# Dack Fayden: +1 (target player draws two cards, then discards two) on turns 5, 7 and 9 takes him from 3 to 6 loyalty;
+# on turn 11 his -6 gives Bot1 the emblem "Whenever you cast a spell that targets one or more permanents, gain control
+# of those permanents", and he dies. Bot1 then casts All That Glitters, an Aura, on Bot2's Guerrilla Gorilla: the
+# emblem's ability goes above the spell, so Bot1 controls the Gorilla before the Aura resolves, and it enters
+# attached to a creature Bot1 owns for the rest of the game (CR 108.4: no duration).
+
+[Bot1 Deck]
+Volcanic Island
+Volcanic Island
+Volcanic Island
+Dack Fayden
+Plains
+Plains
+All That Glitters
+Island x20
+
+[Bot2 Deck]
+Forest
+Forest
+Guerrilla Gorilla
+Forest x20
+
+[Actions]
+Bot1.Hand.Volcanic Island.Play
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Volcanic Island.Play
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Volcanic Island.Play
+Bot1.Battlefield.Volcanic Island#1.Activate(Ability: Add {U})
+Bot1.Battlefield.Volcanic Island#2.Activate(Ability: Add {R})
+Bot1.Battlefield.Volcanic Island#3.Activate(Ability: Add {U})
+Bot1.Hand.Dack Fayden.Cast
+[T5 Bot1.Main2]
+Bot1.Battlefield.Dack Fayden.Activate(Bot1; Ability: draws two)
+Bot1.Choose(Island; Island)
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Dack Fayden.Activate(Bot1; Ability: draws two)
+Bot1.Choose(Island; Island)
+[T9 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Dack Fayden.Activate(Bot1; Ability: draws two)
+Bot1.Choose(Island; Island)
+[T11 Bot1.Main1]
+? Bot1.Battlefield.Dack Fayden.Counters.Loyalty = 6
+Bot1.Battlefield.Dack Fayden.Activate(Ability: emblem)
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.All That Glitters.Cast(Bot2.Battlefield.Guerrilla Gorilla)
+Bot1.Pass
+Bot1.Pass
+[T11 Bot1.Main2]
+
+[Expect]
+Turn = 11
+Bot1.Emblems.Count = 1
+Bot1.Battlefield.Guerrilla Gorilla.Power = 3
+Bot1.Battlefield.All That Glitters.AttachedTo = Guerrilla Gorilla
+Bot2.Battlefield = Forest; Forest

@@ -1,0 +1,37 @@
+# "Target creature you control": Bot2's Ornithopter is refused (the refusal) beside Bot1's own (the positive control). In response to
+# Bot2's Lightning Bolt, the Veil gives Bot1's Ornithopter hexproof (CR 702.11b), so the Bolt has no legal target on resolution and
+# is countered (CR 608.2b); the Ornithopter keeps its +1/+1 counter, and on turn three the hexproof is gone.
+
+[Bot1 Deck]
+Mox Emerald
+Snakeskin Veil
+Ornithopter
+Plains x17
+
+[Bot2 Deck]
+Mountain
+Ornithopter
+Lightning Bolt
+Mountain x17
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Battlefield.Mox Emerald.Activate
+! Bot1.Hand.Snakeskin Veil.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Hand.Snakeskin Veil.Cast(Bot1.Battlefield.Ornithopter)
+[T2 Bot2.Main2]
+? Bot1.Battlefield.Ornithopter.Keywords = Flying; Hexproof
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Keywords = Flying
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot2.Graveyard = Lightning Bolt
+Bot2.Battlefield.Ornithopter.Counters.PlusOnePlusOne = (absent)

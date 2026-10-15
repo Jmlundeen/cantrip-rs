@@ -1,0 +1,39 @@
+# Delighted Halfling: "{T}: Add one mana of any color. Spend this mana only to cast a legendary spell" (CR 106.6). On
+# turn 3 its restricted {R} is not spent on a Lightning Bolt (the Bolt is paid with a Mox Ruby and the restricted {R} stays in the
+# pool) but casts Ragavan, a legendary creature (the positive control). Its other ability, "{T}: Add {C}", has no restriction: on turn 5 the {C} pays for a Sol Ring.
+
+[Bot1 Deck]
+Forest
+Delighted Halfling
+Lightning Bolt
+Ragavan, Nimble Pilferer
+Sol Ring
+Mox Ruby
+Forest
+Forest x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Delighted Halfling.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Delighted Halfling.Activate(Ability: any color; Color: Red)
+? Bot1.Mana = {R} (LegendarySpells, CantBeCountered)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 17
+? Bot1.Mana = {R} (LegendarySpells, CantBeCountered)
+Bot1.Hand.Ragavan, Nimble Pilferer.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Delighted Halfling.Activate(Ability: {T}: Add {C})
+Bot1.Hand.Sol Ring.Cast
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield = Forest; Delighted Halfling; Mox Ruby; Ragavan, Nimble Pilferer; Sol Ring

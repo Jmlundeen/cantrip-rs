@@ -1,0 +1,23 @@
+# Undercity Sewers enters tapped and, as it enters, surveils 1: Bot1 puts the Lightning Bolt on top of its library
+# into the graveyard.
+
+[Bot1 Deck]
+Undercity Sewers
+Island x6
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Swamp x15
+
+[Actions]
+Bot1.Hand.Undercity Sewers.Play
+Bot1.Arrange(| Lightning Bolt)
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Battlefield = Undercity Sewers
+Bot1.Battlefield.Undercity Sewers.Tapped = true
+Bot1.Graveyard = Lightning Bolt
+Bot1.Library.Count = 10

@@ -1,0 +1,33 @@
+# Drill Bit's spectacle {B} is offered only after an opponent lost life this turn: refused before Lightning Bolt
+# resolves, taken after it, and the revealed hand gives up its nonland card.
+
+[Bot1 Deck]
+Swamp
+Mountain
+Lightning Bolt
+Drill Bit
+Swamp
+Mountain
+Swamp
+Swamp x12
+
+[Bot2 Deck]
+Counterspell
+Island x6
+Island x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+! Bot1.Hand.Drill Bit.Cast(Ability: Spectacle)
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+[Bot1.Main2]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Drill Bit.Cast(Bot2; Ability: Spectacle)
+Bot1.Choose(Counterspell)
+
+[Expect]
+Bot2.Graveyard = Counterspell; Island

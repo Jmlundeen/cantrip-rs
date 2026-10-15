@@ -1,0 +1,20 @@
+# Spara's Headquarters enters tapped (CR 614.1c); its Forest Plains Island types give it three mana abilities (CR 305.6),
+# so on the next turn it taps for {U}.
+
+[Bot1 Deck]
+Spara's Headquarters
+Plains x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Spara's Headquarters.Play
+? Bot1.Battlefield.Spara's Headquarters.Tapped = true
+[T3 Bot1.Main1]
+Bot1.Battlefield.Spara's Headquarters.Activate(Ability: {U})
+? Bot1.Mana = {U}
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Spara's Headquarters.Tapped = true

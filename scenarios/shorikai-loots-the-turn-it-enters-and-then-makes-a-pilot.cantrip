@@ -1,0 +1,54 @@
+# Shorikai, Genesis Engine is not a creature until crewed, so its "{1}, {T}" can be activated the turn it enters
+# (CR 302.6 is about creatures). "Draw two cards, then discard a card": Bot1 draws Plains and Containment Priest and
+# throws away the Island it already held. Then "create a 1/1 colorless Pilot creature token with 'This token crews
+# Vehicles as though its power were 2 greater'". The {T} in the cost leaves Shorikai tapped, and no second loot is
+# offered afterwards.
+
+[Bot1 Deck]
+Tundra
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Sol Ring
+Shorikai, Genesis Engine
+Island
+Plains
+Containment Priest
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Tundra.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Tundra.Activate(Ability: {W})
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Shorikai, Genesis Engine.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Shorikai, Genesis Engine.Activate(Ability: Draw two cards)
+Bot1.Choose(Island)
+Bot1.Pass
+! Bot1.Battlefield.Shorikai, Genesis Engine.Activate(Ability: Draw two cards)
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Hand = Plains; Containment Priest
+Bot1.Graveyard = Island
+Bot1.Library.Count = 10
+Bot1.Battlefield = Tundra; Mox Pearl; Mox Sapphire; Mox Jet; Sol Ring; Shorikai, Genesis Engine; Pilot
+Bot1.Battlefield.Shorikai, Genesis Engine.Tapped = true
+Bot1.Battlefield.Shorikai, Genesis Engine.Types = Artifact
+Bot1.Battlefield.Pilot.Types = Creature
+Bot1.Battlefield.Pilot.Subtypes = Pilot
+Bot1.Battlefield.Pilot.Power = 1
+Bot1.Battlefield.Pilot.Toughness = 1
+# What the Pilot's ability does (it crews as though its power were 2 greater, CR 702.122b) is proven in
+# shorikai-is-crewed-for-eight-by-two-pilots-and-a-two-power-creature-but-not-by-the-pilots-alone.
+Bot1.Battlefield.Pilot.Tapped = false

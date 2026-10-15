@@ -1,0 +1,40 @@
+# Serra Paragon: only a permanent spell with mana value 3 or less may be cast from the graveyard. Faithless Looting discards
+# a second Serra Paragon (mana value 4) and an Ornithopter. The first Paragon is cast on turn 1; the second is not offered
+# from the graveyard, while the Ornithopter is (the control).
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Ruby
+Faithless Looting
+Serra Paragon
+Serra Paragon
+Plains
+Ornithopter
+Plains x20
+
+[Bot2 Deck]
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Serra Paragon; Ornithopter)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Serra Paragon.Cast
+Bot1.Pass
+! Bot1.Graveyard.Serra Paragon.Cast
+Bot1.Graveyard.Ornithopter.Cast(Ability: Once during each of your turns)
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield = Mox Pearl; Mox Ruby; Ornithopter; Serra Paragon
+Bot1.Graveyard = Black Lotus; Faithless Looting; Serra Paragon

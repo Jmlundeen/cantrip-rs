@@ -1,0 +1,52 @@
+# Wolverine, Fierce Fighter: "If damage would be dealt to Wolverine, instead that damage is dealt, but all other damage
+# already dealt to him is healed." He fights Bot2's Guerrilla Gorilla as he enters and is left with 2 damage; Bot2 then
+# bolts him for 3, which on a 3/5 would be lethal on top of the 2. Instead the 2 is healed and he carries only the 3
+# just dealt, and lives.
+
+[Bot1 Deck]
+Mountain
+Forest
+Island
+Mountain
+Wolverine, Fierce Fighter
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Forest
+Guerrilla Gorilla
+Forest
+Mountain
+Lightning Bolt
+Forest x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Forest.Play
+Bot1.Hand.Forest.Play
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+Bot1.Hand.Island.Play
+Bot2.Hand.Mountain.Play
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Wolverine, Fierce Fighter.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Target(Guerrilla Gorilla)
+
+[T7 Bot1.Main2]
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Wolverine, Fierce Fighter)
+Bot2.Pass
+
+[Expect]
+Turn = 7
+Bot1.Battlefield.Wolverine, Fierce Fighter.Damage = 3
+Bot2.Battlefield = Forest; Forest; Mountain
+Bot2.Graveyard = Lightning Bolt; Guerrilla Gorilla

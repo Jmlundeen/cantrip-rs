@@ -1,0 +1,46 @@
+# Earthcraft: "Tap an untapped creature you control: Untap target basic land." The cost needs an untapped creature
+# you control (CR 602.2): on turn 3 Bot1's only creature, Llanowar Elves, is tapped for mana, so the ability is refused even
+# though Bot2 has an untapped Ornithopter (not Bot1's); on turn 5 with the Elves untapped (the positive control) the
+# target must be a basic land: Strip Mine, a nonbasic land, is refused, and Bot2's tapped Island - a basic land of
+# either player's - is accepted and untaps.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Llanowar Elves
+Earthcraft
+Strip Mine
+Forest
+Forest x14
+
+[Bot2 Deck]
+Island
+Ornithopter
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Earthcraft.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Island.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Strip Mine.Play
+Bot1.Battlefield.Llanowar Elves.Activate
+! Bot1.Battlefield.Earthcraft.Activate(Bot1.Battlefield.Forest)
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+! Bot1.Battlefield.Earthcraft.Activate(Bot1.Battlefield.Strip Mine)
+Bot1.Battlefield.Earthcraft.Activate(Bot2.Battlefield.Island)
+
+[Expect]
+Bot2.Battlefield.Island.Tapped = false
+Bot1.Battlefield.Llanowar Elves.Tapped = true

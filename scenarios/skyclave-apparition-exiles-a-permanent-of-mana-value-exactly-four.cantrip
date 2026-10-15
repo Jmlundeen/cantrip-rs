@@ -1,0 +1,37 @@
+# Skyclave Apparition: "mana value 4 or less" includes 4. Bot2's Ulvenwald Oddity (mana value 4) is exiled, the boundary
+# of the limit (the five-drop is refused in the neighbouring scenario).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Skyclave Apparition
+Plains x16
+
+[Bot2 Deck]
+Forest
+Black Lotus
+Ulvenwald Oddity
+Forest x16
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot2.Hand.Forest.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Ulvenwald Oddity.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Forest.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Pearl#3.Activate
+Bot1.Hand.Skyclave Apparition.Cast
+Bot1.Target(Bot2.Battlefield.Ulvenwald Oddity)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Ulvenwald Oddity
+Bot2.Battlefield = Forest

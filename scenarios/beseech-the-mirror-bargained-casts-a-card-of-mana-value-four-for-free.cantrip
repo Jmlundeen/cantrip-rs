@@ -1,0 +1,35 @@
+# CR 702.166a, 406.3, 118.9. The free cast is allowed up to and including mana value 4: Cogwork Librarian (mana value 4) is
+# found, exiled face down, and cast from exile without paying its mana cost; it is not put into the hand. Bargain's
+# sacrifice is Mox Jet, tapped for {B} first to help pay for the spell.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Black Lotus
+Beseech the Mirror
+Island x3
+Cogwork Librarian
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Beseech the Mirror.Cast
+Bot1.Modes(Bargain:)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Choose(Mox Jet)
+Bot1.Search(Cogwork Librarian)
+Bot1.Accept
+[T2 Bot2.Upkeep]
+
+[Expect]
+Exile.Count = 0
+Stack.Count = 0
+Bot1.Battlefield = Cogwork Librarian; Swamp
+Bot1.Hand.Count = 3
+Bot1.Graveyard = Beseech the Mirror; Mox Jet; Black Lotus

@@ -1,0 +1,31 @@
+# Waterlogged Teachings ({3}{U/B}: Black Lotus for three blue, Mox Jet) searches for an instant card or a card with flash:
+# Lightning Bolt and Snapcaster Mage qualify, a Sol Ring does not. Bot1 takes the Snapcaster Mage, and it ends in hand.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Waterlogged Teachings
+Island
+Island
+Island
+Island
+Lightning Bolt
+Sol Ring
+Snapcaster Mage
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Waterlogged Teachings.Cast
+! Bot1.Search(Sol Ring)
+Bot1.Search(Snapcaster Mage)
+
+[Expect]
+Bot1.Hand = Island; Island; Island; Island; Snapcaster Mage
+Bot1.Graveyard = Waterlogged Teachings; Black Lotus

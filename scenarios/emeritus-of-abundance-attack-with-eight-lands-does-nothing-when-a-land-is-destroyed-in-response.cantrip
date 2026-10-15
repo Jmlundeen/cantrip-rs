@@ -1,0 +1,59 @@
+# CR 603.4: "if you control eight or more lands" is checked again as the trigger resolves. Regrowth (cast on turn 5) unprepared the Emeritus; on turn 15 Bot1 attacks with eight lands, the trigger goes on the stack, and
+# Bot2 sacrifices Strip Mine to destroy one of them in response. With seven lands the trigger does nothing: the Emeritus stays unprepared and no Regrowth copy is exiled. (Turn 13, seven lands, did not trigger either.)
+
+[Bot1 Deck]
+Forest
+Mox Ruby
+Lightning Bolt
+Emeritus of Abundance
+Forest
+Forest
+Forest
+Forest x13
+
+[Bot2 Deck]
+Strip Mine
+Island x19
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Strip Mine.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Emeritus of Abundance.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Exile.Regrowth.Cast(Lightning Bolt)
+Bot1.Pass
+[T7 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T11 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T13 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T15 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Attack(Emeritus of Abundance > Bot2)
+Bot2.Battlefield.Strip Mine.Activate(Bot1.Battlefield.Forest; Ability: Destroy)
+Bot1.Pass
+[T15 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Exile.Count = 0
+Bot1.Battlefield.Emeritus of Abundance.Prepared = (absent)
+Bot1.Graveyard = Forest

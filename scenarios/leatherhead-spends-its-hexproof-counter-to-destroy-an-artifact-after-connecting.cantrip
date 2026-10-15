@@ -1,0 +1,40 @@
+# Leatherhead, Swamp Stalker enters with a hexproof counter and tramples. On turn 3 she connects with Bot2, a 5/4 dealing 5,
+# and Bot1 accepts removing a counter from her: the reflexive trigger then destroys the Sol Ring Bot2 controls, and with the
+# hexproof counter gone she has none left.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Mox Jet
+Leatherhead, Swamp Stalker
+Forest x15
+
+[Bot2 Deck]
+Island
+Sol Ring
+Island x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Leatherhead, Swamp Stalker.Cast
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Leatherhead, Swamp Stalker.Counters.Hexproof = 1
+Bot1.Attack(Leatherhead, Swamp Stalker > Bot2)
+Bot1.Accept
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 15
+Bot2.Graveyard = Sol Ring
+Bot1.Battlefield.Leatherhead, Swamp Stalker.Keywords = Trample

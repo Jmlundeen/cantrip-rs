@@ -1,0 +1,41 @@
+# Jennifer Walters is a modal double-faced card (CR 712.2): its back face, The Sensational She-Hulk, has a mana cost
+# of its own and so is a second way to cast the card from hand, offered beside the front face. A card cast as its
+# back face is put onto the battlefield back face up (CR 712.8b) -- a 6/6 with reach and trample, not the 2/3, and
+# with no transform ability having been paid for.
+
+[Bot1 Deck]
+Plains x3
+Forest x3
+Jennifer Walters
+Plains x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T11 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Jennifer Walters.Cast(Ability: back face)
+[T11 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Plains; Plains; Plains; Forest; Forest; Forest; The Sensational She-Hulk
+Bot1.Battlefield.The Sensational She-Hulk.Power = 6
+Bot1.Battlefield.The Sensational She-Hulk.Toughness = 6
+Bot1.Battlefield.The Sensational She-Hulk.Keywords = Reach; Trample
+Bot1.Graveyard.Count = 0

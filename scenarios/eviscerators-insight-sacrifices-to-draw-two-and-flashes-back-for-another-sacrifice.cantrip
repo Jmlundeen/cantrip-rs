@@ -1,0 +1,47 @@
+# Eviscerator's Insight needs a sacrifice of an artifact or creature as an additional cost (CR 118.8): Mox Jet pays
+# for the first cast after its mana is spent, and the spell draws two. Flashed back from the graveyard for {4}{B} it
+# asks for a sacrifice again (Ornithopter) and is exiled.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Eviscerator's Insight
+Ornithopter
+Swamp
+Swamp
+Swamp
+Swamp x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Eviscerator's Insight.Cast
+Bot1.Choose(Mox Jet)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Ornithopter.Cast
+[T7 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Graveyard.Eviscerator's Insight.Cast(Ability: Flashback)
+Bot1.Choose(Ornithopter)
+
+[Expect]
+Turn = 9
+Stack.Count = 0
+Exile = Eviscerator's Insight
+Bot1.Graveyard = Ornithopter; Mox Jet
+Bot1.Battlefield.Count = 5

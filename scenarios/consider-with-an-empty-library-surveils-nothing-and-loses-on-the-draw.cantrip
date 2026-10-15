@@ -1,0 +1,21 @@
+# Surveil 1 with no card to look at does nothing and asks nothing (CR 701.46a, 701.46b), so Bot1 is never offered a
+# placement (the control, with a card in the library, is the scenario beside this one); Consider's draw is then from an
+# empty library and Bot1 loses (CR 704.5b).
+
+[Bot1 Deck]
+Island
+Consider
+Island x5
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Consider.Cast
+! Bot1.Arrange
+
+[Expect]
+Result = Bot2 won
+Bot1.Graveyard = Consider

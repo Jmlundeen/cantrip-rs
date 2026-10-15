@@ -1,0 +1,6 @@
+{
+  "name": "Argentum Armor",
+  "manaCost": "{6}",
+  "type": "Artifact — Equipment",
+  "oracleText": "Equipped creature gets +6/+6.\nWhenever equipped creature attacks, destroy target permanent.\nEquip {6}"
+}

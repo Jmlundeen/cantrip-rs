@@ -1,0 +1,39 @@
+# "You lose 2 life" does not depend on the destruction: Infernal Grasp resolves against Arwen, Mortal Queen, whose
+# indestructible counter keeps her on the battlefield (CR 702.12b), and its caster still loses 2 life (CR 608.2c).
+
+[Bot1 Deck]
+Swamp
+Infernal Grasp
+Island x15
+
+[Bot2 Deck]
+Forest
+Mox Pearl
+Mox Emerald
+Arwen, Mortal Queen
+Forest x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Arwen, Mortal Queen.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Infernal Grasp.Cast(Bot2.Battlefield.Arwen, Mortal Queen)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Battlefield = Forest; Mox Pearl; Mox Emerald; Arwen, Mortal Queen
+Bot2.Graveyard.Count = 0
+Bot1.Graveyard = Infernal Grasp
+Bot1.Life = 18
+Bot2.Life = 20
+Stack.Count = 0

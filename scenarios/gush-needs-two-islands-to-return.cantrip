@@ -1,0 +1,29 @@
+# The alternative cost is two Islands you control: one Island, or an Island and another land, is not enough, and with
+# no mana for {4}{U} the spell is not offered at all. Control: with two Islands in play on turn 3 it is offered.
+
+[Bot1 Deck]
+Island
+Mountain
+Island
+Gush
+Island x3
+Island x10
+
+[Bot2 Deck]
+Swamp x18
+
+[Actions]
+Bot1.Hand.Island.Play
+! Bot1.Hand.Gush.Cast(Ability: Return)
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+! Bot1.Hand.Gush.Cast(Ability: Return)
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Gush.Cast(Ability: Return)
+Bot1.Choose(Island; Island)
+
+[Expect]
+Bot1.Hand.Count = 9
+Bot1.Battlefield = Mountain
+Bot1.Graveyard = Gush

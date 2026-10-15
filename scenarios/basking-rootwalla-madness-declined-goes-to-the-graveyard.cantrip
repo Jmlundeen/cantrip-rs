@@ -1,0 +1,25 @@
+# Basking Rootwalla's madness (CR 702.35a-b): discarded to Faithless Looting it is exiled and its trigger offers the
+# cast for {0}; Bot1 declines, and the card is put into its owner's graveyard instead (the other branch of the question
+# the cast scenario answers with Accept). Nothing is on the battlefield but the Mountain.
+
+[Bot1 Deck]
+Mountain
+Basking Rootwalla
+Faithless Looting
+Mountain x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Basking Rootwalla; Mountain)
+Bot1.Decline
+
+[Expect]
+Bot1.Battlefield = Mountain
+Bot1.Graveyard = Basking Rootwalla; Faithless Looting; Mountain
+Exile.Count = 0

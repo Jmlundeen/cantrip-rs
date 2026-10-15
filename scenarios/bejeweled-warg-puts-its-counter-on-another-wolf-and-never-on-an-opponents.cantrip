@@ -1,0 +1,49 @@
+# "Target Wolf you control": with two Wargs the counter mode asks which one, and Bot2's Warg is not a candidate
+# (the refusal sits beside the legal pick, Bot1's second Warg). Both Wargs connect on turn 5, so there are two
+# triggers: the first puts its counter on the second Warg, the second makes a Treasure.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Bejeweled Warg
+Bejeweled Warg
+Forest
+Forest
+Forest x8
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Bejeweled Warg
+Forest x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Bejeweled Warg.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Bejeweled Warg.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Bejeweled Warg.Cast
+[T5 Bot1.Main1]
+Bot1.Attack(Bejeweled Warg#1; Bejeweled Warg#2)
+Bot1.Modes(Put a +1/+1 counter)
+! Bot1.Target(Bot2.Battlefield.Bejeweled Warg)
+Bot1.Target(Bot1.Battlefield.Bejeweled Warg#2)
+Bot1.Modes(Create a Treasure token)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Bot1.Battlefield.Bejeweled Warg#2.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Bejeweled Warg#1.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield = Forest; Forest; Mox Emerald; Bejeweled Warg; Bejeweled Warg; Treasure Token

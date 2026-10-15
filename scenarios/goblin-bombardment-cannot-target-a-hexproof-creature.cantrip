@@ -1,0 +1,42 @@
+# "Any target" still respects hexproof: Bot2's Sylvan Caryatid cannot be pinged (the refusal names it) but Bot2 can (the
+# positive control).
+
+[Bot1 Deck]
+Mountain
+Mox Jet
+Mox Emerald
+Goblin Bombardment
+Elvish Mystic
+Island x12
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Sylvan Caryatid
+Island x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Goblin Bombardment.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Sylvan Caryatid.Cast
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Goblin Bombardment.Activate(Bot2.Battlefield.Sylvan Caryatid)
+Bot1.Battlefield.Goblin Bombardment.Activate(Bot2)
+Bot1.Pass
+
+[Expect]
+Bot2.Life = 19
+Bot2.Battlefield.Sylvan Caryatid.Damage = 0

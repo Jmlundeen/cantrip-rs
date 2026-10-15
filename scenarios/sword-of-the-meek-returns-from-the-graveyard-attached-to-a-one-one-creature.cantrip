@@ -1,0 +1,39 @@
+# Sword of the Meek, destroyed by Bot1's own Disenchant, watches from the graveyard: when Bot1 casts Llanowar Elves (a 1/1)
+# on turn 3, the trigger lets Bot1 return the Sword to the battlefield attached to it, making the Elves a 2/3.
+
+[Bot1 Deck]
+Forest
+Mox Pearl
+Mox Emerald
+Mox Jet
+Sword of the Meek
+Disenchant
+Llanowar Elves
+Forest x9
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sword of the Meek.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Disenchant.Cast(Sword of the Meek)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Accept
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Graveyard = Disenchant
+Bot1.Battlefield.Sword of the Meek.AttachedTo = Llanowar Elves
+Bot1.Battlefield.Llanowar Elves.Power = 2
+Bot1.Battlefield.Llanowar Elves.Toughness = 3

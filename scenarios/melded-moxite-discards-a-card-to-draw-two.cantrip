@@ -1,0 +1,32 @@
+# Melded Moxite: "When this artifact enters, you may discard a card. If you do, draw two cards." Bot1 discards the
+# Island and draws the two cards beneath the hand.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Melded Moxite
+Island
+Plains
+Plains
+Plains
+Swamp
+Forest
+Plains x11
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Melded Moxite.Cast
+Bot1.Choose(Island)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Island
+Bot1.Hand.Count = 5
+Bot1.Library.Count = 11
+Bot1.Battlefield.Melded Moxite.Tapped = false

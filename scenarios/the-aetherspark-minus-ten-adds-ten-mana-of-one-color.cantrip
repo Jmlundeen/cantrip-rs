@@ -1,0 +1,51 @@
+# The Aetherspark, loyalty 4. Turn 1: Raph & Mikey are cast (Black Lotus and four Moxen). Turn 3: The Aetherspark (the four Moxen) is cast, its +1 attaches it to
+# Raph & Mikey and puts a +1/+1 counter on them (8/8, loyalty 5), and the attack deals 8 combat damage during Bot1's turn, adding 8 loyalty counters: 13.
+# Turn 5: the -10 is a loyalty ability, not a mana ability (CR 605.1a): it goes on the stack and, as it resolves, Bot1 chooses one color and gets ten mana of it.
+
+[Bot1 Deck]
+Raph & Mikey, Troublemakers
+Black Lotus
+Mox Ruby
+Mox Emerald
+Gleemox
+Mox Jet
+The Aetherspark
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Red)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Raph & Mikey, Troublemakers.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Red)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.The Aetherspark.Cast
+Bot1.Pass
+Bot1.Battlefield.The Aetherspark.Activate(Ability: Attach; Bot1.Battlefield.Raph & Mikey, Troublemakers)
+Bot1.Pass
+Bot1.Attack(Raph & Mikey, Troublemakers > Bot2)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.The Aetherspark.Counters.Loyalty = 13
+[T5 Bot1.Main1]
+Bot1.Battlefield.The Aetherspark.Activate(Ability: ten mana)
+Bot1.Colors(Red)
+Bot1.Pass
+
+[Expect]
+Bot1.Mana = {R}{R}{R}{R}{R}{R}{R}{R}{R}{R}
+Bot1.Battlefield.The Aetherspark.Counters.Loyalty = 3
+Bot2.Life = 12

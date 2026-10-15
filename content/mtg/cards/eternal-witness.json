@@ -1,0 +1,8 @@
+{
+  "name": "Eternal Witness",
+  "manaCost": "{1}{G}{G}",
+  "type": "Creature — Human Shaman",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "When this creature enters, you may return target card from your graveyard to your hand."
+}

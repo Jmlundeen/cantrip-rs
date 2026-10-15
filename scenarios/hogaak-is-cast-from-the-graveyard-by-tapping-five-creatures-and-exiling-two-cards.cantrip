@@ -1,0 +1,42 @@
+# "You may cast this card from your graveyard" for its ordinary cost, which "You can't spend mana to cast this spell"
+# leaves to convoke and delve: Faithless Looting discards Hogaak, then Elves and Birds (green) pay the {B/G}{B/G}, three
+# Ornithopters pay {3} and two exiled graveyard cards the other {2}. Nothing in the graveyard but Hogaak itself and
+# the cards exiled is touched.
+[Bot1 Deck]
+Mountain
+Forest
+Faithless Looting
+Hogaak, Arisen Necropolis
+Llanowar Elves
+Birds of Paradise
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Forest x15
+
+[Bot2 Deck]
+Forest x22
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Choose(Hogaak, Arisen Necropolis; Ornithopter)
+Bot1.Hand.Birds of Paradise.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Graveyard.Hogaak, Arisen Necropolis.Cast(Convoke: Llanowar Elves, Birds of Paradise, Ornithopter, Ornithopter, Ornithopter; Delve: 2)
+[Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Battlefield.Hogaak, Arisen Necropolis.Power = 8
+Bot1.Graveyard.Count = 0
+Exile.Count = 2

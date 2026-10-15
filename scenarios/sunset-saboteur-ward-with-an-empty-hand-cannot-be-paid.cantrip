@@ -1,0 +1,44 @@
+# Ward--Discard a card cannot be paid with no card to discard: Bot2 plays and casts everything it holds (five Moxen, an
+# Island, Black Lotus drawn on turn 2) but the Lightning Bolt, so its hand is empty when the ward trigger resolves. The Bolt is countered (no question asked, nothing to pay with) and
+# the Saboteur lives.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Sunset Saboteur
+Swamp x13
+
+[Bot2 Deck]
+Lightning Bolt
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Island
+Black Lotus
+Island x13
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sunset Saboteur.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Sunset Saboteur)
+! Bot2.Accept
+! Bot2.Choose
+
+[Expect]
+Bot1.Battlefield.Sunset Saboteur.Damage = 0
+Bot2.Hand.Count = 0
+Bot2.Graveyard = Lightning Bolt

@@ -1,0 +1,24 @@
+# With no creature card put into the graveyard from the battlefield this turn, sacrificing No Rest for the Wicked only sacrifices it: nothing returns to hand and it is in the graveyard.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+No Rest for the Wicked
+Forest x13
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.No Rest for the Wicked.Cast
+Bot1.Pass
+Bot1.Battlefield.No Rest for the Wicked.Activate
+Bot1.Pass
+
+[Expect]
+Bot1.Hand.Count = 4
+Bot1.Graveyard = No Rest for the Wicked

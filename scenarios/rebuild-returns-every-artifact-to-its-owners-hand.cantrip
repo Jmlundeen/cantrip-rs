@@ -1,0 +1,31 @@
+# Rebuild: all artifacts, whoever controls them, go back to their owners' hands together. Bot1 casts it on turn 2,
+# once Bot2's Mox Pearl has resolved, with a Mox Sapphire and a Mox Jet of its own on the table.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Rebuild
+Island x16
+
+[Bot2 Deck]
+Mox Pearl
+Island x19
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Rebuild.Cast
+
+[Expect]
+Bot1.Graveyard = Rebuild
+Bot1.Battlefield = Island
+Bot1.Hand.Count = 5
+Bot2.Battlefield.Count = 0
+Bot2.Hand.Count = 8

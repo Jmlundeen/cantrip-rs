@@ -1,0 +1,29 @@
+# Cycling {3} (CR 702.29a) is a hand-only activated ability: Bot1 pays {3} with three Moxen, discards the Headquarters and draws a
+# card. A second Headquarters played as a land cannot cycle (refusal beside the cycle from hand, the positive control).
+
+[Bot1 Deck]
+Spara's Headquarters
+Spara's Headquarters
+Mox Ruby
+Mox Jet
+Mox Pearl
+Plains x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Spara's Headquarters.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Spara's Headquarters.Activate(Ability: Cycling)
+! Bot1.Battlefield.Spara's Headquarters.Activate(Ability: Cycling)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Spara's Headquarters
+Bot1.Hand.Count = 3

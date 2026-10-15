@@ -1,0 +1,40 @@
+# Necromancy may be cast as though it had flash. Bot1 casts it in Bot2's main phase, a time a sorcery couldn't have been cast, so it is sacrificed at the beginning of that turn's cleanup step (CR 514.1) and its creature, the Ornithopter, is sacrificed with it and goes back to Bot2's graveyard.
+
+[Bot1 Deck]
+Mox Jet
+Sol Ring
+Damn
+Necromancy
+Swamp
+Swamp
+Swamp
+Swamp x14
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Swamp.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Damn.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+[T4 Bot2.Main1]
+Bot1.Hand.Necromancy.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Sol Ring.Activate
+[T5 Bot1.Main1]
+
+[Expect]
+Turn = 5
+Bot1.Graveyard = Necromancy; Damn
+Bot2.Graveyard = Ornithopter
+Bot1.Battlefield = Swamp; Swamp; Mox Jet; Sol Ring

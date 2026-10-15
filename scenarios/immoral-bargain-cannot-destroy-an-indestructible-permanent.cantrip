@@ -1,0 +1,44 @@
+# X = 1: Bot1 sacrifices Ornithopter (the cost, paid regardless) and targets Bot2's Arwen, Mortal Queen, which entered with an
+# indestructible counter. The sorcery resolves but "destroy" does nothing to an indestructible permanent (CR 702.12b): Arwen
+# stays, Bot2's graveyard is empty.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Ruby
+Ornithopter
+Immoral Bargain
+Island x15
+
+[Bot2 Deck]
+Mox Pearl
+Mox Emerald
+Mox Sapphire
+Arwen, Mortal Queen
+Island x16
+
+[Actions]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Arwen, Mortal Queen.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Immoral Bargain.Cast(X: 1)
+Bot1.Target(Bot2.Battlefield.Arwen, Mortal Queen)
+Bot1.Choose(Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Immoral Bargain; Ornithopter
+Bot2.Graveyard.Count = 0
+Bot2.Battlefield.Arwen, Mortal Queen.Counters.Indestructible = 1

@@ -1,0 +1,59 @@
+# "Equipped creature gets +X/+0, where X is the number of rev counters": the Chainsaw is equipped to the Ornithopter first (0 power), then each Lightning Bolt that kills one of Bot2's creatures is its own death
+# event and adds a rev counter, raising the Ornithopter's power at once: 1 after the first, 2 after the second.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Pearl
+Black Lotus
+Chainsaw
+Ornithopter
+Lightning Bolt
+Lightning Bolt
+Plains x10
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Elvish Mystic
+Forest x12
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Chainsaw.Cast
+Bot1.Target()
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Chainsaw.Activate(Ornithopter)
+Bot1.Pass
+? Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Llanowar Elves)
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Ornithopter.Power = 1
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Lightning Bolt.Cast(Elvish Mystic)
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Chainsaw.Counters.Rev = 2
+Bot1.Battlefield.Ornithopter.Power = 2

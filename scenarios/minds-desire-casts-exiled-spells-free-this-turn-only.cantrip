@@ -1,0 +1,43 @@
+# Mind's Desire: "Until end of turn, you may play that card without paying its mana cost" (CR 118.9, 601.3). With
+# three Moxen and a Black Lotus cast before it there are four copies, and every card of this all-Lightning-Bolt library
+# (so the shuffle cannot matter) is exiled and may be cast: two Bolts are cast for nothing at Bot2 (20 -> 14), and no
+# mana is spent. The permission ends with the turn: on turn 3 a third exiled Bolt is no longer castable (the refusal; the
+# turn-1 casts are its positive control).
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mind's Desire
+Island
+Island
+Lightning Bolt x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Mind's Desire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 14
+? Bot1.Mana =
+[T3 Bot1.Main1]
+! Bot1.Exile.Lightning Bolt.Cast(Bot2)
+
+[Expect]
+Bot2.Life = 14
+Exile.Count = 3

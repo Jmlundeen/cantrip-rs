@@ -1,0 +1,32 @@
+# Wistfulness evoked for {G/U}{G/U} paid with two Forests: {G}{G} was spent, so the first enters ability exiles the
+# opponent's Sol Ring; evoke's own trigger then sacrifices the creature. {U}{U} was not spent, so nothing is drawn.
+
+[Bot1 Deck]
+Wistfulness
+Forest x6
+Forest x10
+
+[Bot2 Deck]
+Sol Ring
+Forest x6
+Forest x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Wistfulness.Cast(Ability: Evoke)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Sol Ring
+Bot2.Battlefield = Forest
+Bot1.Graveyard = Wistfulness
+Bot1.Battlefield = Forest; Forest
+Bot1.Hand.Count = 5

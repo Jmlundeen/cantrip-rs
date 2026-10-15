@@ -1,0 +1,44 @@
+# Mana Vault: it doesn't untap on its own, "you may pay {4}. If you do, untap" in the upkeep, and "at the beginning of
+# your draw step, if this artifact is tapped, it deals 1 damage to you." Four Moxen pay the {4} on turn 3, so the Vault
+# is untapped in the draw step and deals nothing; tapped again, it is left tapped on turn 5 and deals 1.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Mana Vault
+Plains x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Mana Vault.Cast
+Bot1.Battlefield.Mana Vault.Activate
+[T3 Bot1.Upkeep]
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.PayCost
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Mana Vault.Tapped = false
+? Bot1.Life = 20
+Bot1.Battlefield.Mana Vault.Activate
+[T5 Bot1.Upkeep]
+Bot1.Pass
+Bot1.Decline
+[T5 Bot1.Main1]
+? Bot1.Life = 19
+
+[Expect]
+Turn = 5
+Bot1.Life = 19
+Bot1.Battlefield.Mana Vault.Tapped = true

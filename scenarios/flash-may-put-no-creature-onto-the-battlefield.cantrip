@@ -1,0 +1,31 @@
+# "You may put a creature card from your hand onto the battlefield": Bot1 has Dark Confidant in hand and chooses none. It stays in
+# hand, nothing is sacrificed and nothing is paid.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Flash
+Dark Confidant
+Island x2
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Flash.Cast
+Bot1.Choose()
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Graveyard = Flash
+Bot1.Hand = Dark Confidant; Island; Island
+Bot1.Battlefield = Island; Mox Sapphire; Mox Jet

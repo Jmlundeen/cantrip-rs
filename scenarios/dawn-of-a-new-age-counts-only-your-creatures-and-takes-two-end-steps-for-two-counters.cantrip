@@ -1,0 +1,43 @@
+# Dawn of a New Age: "enters with a hope counter on it for each creature you control" - Bot1's two Ornithopters, not
+# Bot2's one: two counters. Turn 3's end step removes one and draws a card, the enchantment stays (two counters becoming
+# one); turn 5's end step removes the last, draws again, then it has none: sacrificed, and Bot1 gains 4 life.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Ornithopter
+Ornithopter
+Dawn of a New Age
+Island x3
+Island x15
+
+[Bot2 Deck]
+Ornithopter
+Island x6
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dawn of a New Age.Cast
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Dawn of a New Age.Counters.Hope = 2
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Dawn of a New Age.Counters.Hope = 1
+? Bot1.Hand.Count = 4
+? Bot1.Life = 20
+[T5 Bot1.Main2]
+[T6 Bot2.Main1]
+
+[Expect]
+Bot1.Life = 24
+Bot1.Hand.Count = 6
+Bot1.Graveyard = Dawn of a New Age

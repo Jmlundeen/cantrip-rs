@@ -1,0 +1,35 @@
+# Seasoned Pyromancer: "For each nonland card discarded this way, create a 1/1 red Elemental creature token." Bot1 discards a Plains and
+# an Island: no nonland card, so no Elemental, but it still draws two cards.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Black Lotus
+Seasoned Pyromancer
+Plains
+Island
+Island
+Plains
+Plains
+
+Plains x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Seasoned Pyromancer.Cast
+Bot1.Choose(Plains; Island)
+[T3 Bot1.Upkeep]
+
+[Expect]
+Bot1.Battlefield = Mountain; Mox Ruby; Seasoned Pyromancer
+Bot1.Hand.Count = 3
+Bot1.Graveyard.Count = 3

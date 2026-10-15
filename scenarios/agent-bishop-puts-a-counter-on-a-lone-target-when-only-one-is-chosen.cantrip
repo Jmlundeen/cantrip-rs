@@ -1,0 +1,28 @@
+# "Up to two target creatures" (CR 601.2c) takes fewer than two: Bishop, cast turn one off two Mox Pearls, names only
+# itself, and only it gets a counter.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Pearl
+Agent Bishop, Man in Black
+Plains x10
+
+[Bot2 Deck]
+Ornithopter
+Island x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Hand.Agent Bishop, Man in Black.Cast
+Bot1.Target(Agent Bishop, Man in Black)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Agent Bishop, Man in Black.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Agent Bishop, Man in Black.Power = 2

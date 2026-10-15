@@ -1,0 +1,36 @@
+# Vraska, Golgari Queen's -3 destroys Sol Ring (mana value 1): a nonland permanent with mana value 3 or less.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Vraska, Golgari Queen
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Sol Ring
+Island x16
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Vraska, Golgari Queen.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Vraska, Golgari Queen.Activate(Ability: sacrifice)
+Bot1.Choose()
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Vraska, Golgari Queen.Activate(Bot2.Battlefield.Sol Ring; Ability: Destroy target)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Graveyard = Sol Ring
+Bot1.Battlefield.Vraska, Golgari Queen.Counters.Loyalty = 3

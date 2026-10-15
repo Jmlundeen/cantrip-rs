@@ -1,0 +1,54 @@
+# Two Bats, each with its own "until this creature leaves the battlefield" (CR 610.3): the first exiles Counterspell, the
+# second Brainstorm. When Bot2's Bolt kills the second Bat only the Brainstorm comes back; the Counterspell stays exiled.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Swamp
+Deep-Cavern Bat
+Deep-Cavern Bat
+Island
+Island x20
+
+[Bot2 Deck]
+Island
+Lightning Bolt
+Counterspell
+Brainstorm
+Mountain
+Island
+Island
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Deep-Cavern Bat.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Choose(Counterspell)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Deep-Cavern Bat.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Choose(Brainstorm)
+? Exile = Brainstorm; Counterspell
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Deep-Cavern Bat#2)
+[T2 Bot2.Main2]
+
+[Expect]
+Exile = Counterspell
+Bot1.Battlefield.Count = 5
+Bot2.Hand = Brainstorm; Island; Island; Island; Island

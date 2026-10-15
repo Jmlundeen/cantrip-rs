@@ -1,0 +1,40 @@
+# Fire Covenant: the additional cost is X life (here 3), and X damage is divided among the targets as it is cast
+# (CR 601.2d): 1 to Llanowar Elves and 2 to Ornithopter, which both die. Bot1 pays 3 life.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Fire Covenant
+Swamp
+Swamp x14
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Ornithopter
+Forest
+Forest x14
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Fire Covenant.Cast(X: 3)
+Bot1.Divide(Llanowar Elves: 1; Ornithopter: 2)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Life = 17
+Bot2.Graveyard = Ornithopter; Llanowar Elves
+Bot2.Battlefield = Forest

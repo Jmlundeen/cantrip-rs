@@ -1,0 +1,27 @@
+# Two red mana are one color: the Prism gets one charge counter, spends it for {U}, and a second activation is refused.
+
+[Bot1 Deck]
+Mox Ruby
+Mountain
+Pentad Prism
+Island x4
+Island x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Pentad Prism.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Pentad Prism.Counters.Charge = 1
+Bot1.Battlefield.Pentad Prism.Activate(Color: Blue)
+! Bot1.Battlefield.Pentad Prism.Activate(Color: Green)
+
+[Expect]
+Bot1.Mana = {U}
+Bot1.Battlefield.Pentad Prism.Counters.Charge = (absent)

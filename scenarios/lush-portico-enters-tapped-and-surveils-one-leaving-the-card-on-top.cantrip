@@ -1,0 +1,23 @@
+# Lush Portico (Forest Plains) enters tapped and its enters trigger surveils 1; the Mountain on top of the library is
+# kept there, so the library is untouched, and the tapped Portico taps for {G} or {W} the turn after.
+
+[Bot1 Deck]
+Lush Portico
+Island x6
+Mountain
+Island x9
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Lush Portico.Play
+Bot1.Arrange(Mountain | )
+[T3 Bot1.Main1]
+Bot1.Battlefield.Lush Portico.Activate(Ability: {W})
+? Bot1.Mana = {W}
+
+[Expect]
+Bot1.Battlefield.Lush Portico.Types = Land
+Bot1.Battlefield.Lush Portico.Subtypes = Forest; Plains
+Bot1.Graveyard.Count = 0

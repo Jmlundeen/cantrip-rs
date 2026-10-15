@@ -1,0 +1,44 @@
+# Carnage, Crimson Chaos: mayhem is "if you discarded it this turn" (CR 702.187b). Looting discards one Carnage on
+# turn 5 and she is left in the graveyard. On turn 7, with lands to spare, she is not offered at all. A second Looting
+# then discards the other Carnage, and that one - discarded this turn - is cast from the same graveyard for {B}{R},
+# while the first stays where she is.
+
+[Bot1 Deck]
+Mountain
+Swamp
+Mountain
+Faithless Looting
+Faithless Looting
+Carnage, Crimson Chaos
+Carnage, Crimson Chaos
+Mountain
+Mountain x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Carnage, Crimson Chaos; Mountain)
+[T7 Bot1.Main1]
+! Bot1.Graveyard.Carnage, Crimson Chaos.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Carnage, Crimson Chaos; Mountain)
+? Bot1.Graveyard.Count = 6
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Graveyard.Carnage, Crimson Chaos.Cast(Ability: Mayhem)
+[T7 Bot1.Main2]
+
+[Expect]
+Turn = 7
+Bot1.Battlefield = Mountain; Swamp; Mountain; Mountain; Carnage, Crimson Chaos
+Bot1.Graveyard.Count = 5

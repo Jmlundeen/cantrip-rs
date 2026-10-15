@@ -1,0 +1,54 @@
+# Lightning Greaves is cast on turn 1 off a Sol Ring, and equipped (equip {0}) to the Bloodtithe Harvester on turn 3.
+# On turn 5 the Broadside Bombardiers attacks and boasts, sacrificing the equipped Harvester (mana value 2): the
+# Greaves are unattached as it leaves, a record in the history between the sacrifice and the activation, and the
+# damage is still 2 + 2 = 4 on top of 2 from combat.
+
+[Bot1 Deck]
+Swamp
+Sol Ring
+Lightning Greaves
+Mountain
+Bloodtithe Harvester
+Broadside Bombardiers
+Mountain
+Mountain x3
+Mountain x6
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Lightning Greaves.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Bloodtithe Harvester.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Battlefield.Lightning Greaves.Activate(Bot1.Battlefield.Bloodtithe Harvester)
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Lightning Greaves.AttachedTo = Bloodtithe Harvester
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Broadside Bombardiers.Cast
+Bot1.Pass
+Bot1.Attack(Broadside Bombardiers > Bot2)
+Bot1.Battlefield.Broadside Bombardiers.Activate(Bot2)
+Bot1.Choose(Bloodtithe Harvester)
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Bot1.Graveyard = Bloodtithe Harvester
+Bot1.Battlefield.Lightning Greaves.AttachedTo = (absent)

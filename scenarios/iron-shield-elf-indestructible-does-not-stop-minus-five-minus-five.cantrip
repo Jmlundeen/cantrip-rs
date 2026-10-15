@@ -1,0 +1,33 @@
+# The reminder text: "if its toughness is 0 or less, it still dies". Bot2's Dismember (paid with 4 life and a Mox Ruby)
+# targets the Elf; Bot1 discards an Island in response, making it indestructible and tapped, but -5/-5 kills it anyway.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Iron-Shield Elf
+Island x4
+Island x10
+
+[Bot2 Deck]
+Mox Ruby
+Dismember
+Island x14
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Iron-Shield Elf.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Dismember.Cast(Bot1.Battlefield.Iron-Shield Elf)
+Bot2.Modes(1; 2)
+Bot1.Battlefield.Iron-Shield Elf.Activate
+Bot1.Choose(Island)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot1.Graveyard = Iron-Shield Elf; Island

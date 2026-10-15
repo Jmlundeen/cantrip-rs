@@ -1,0 +1,45 @@
+# Fractured Identity: "Each player other than its controller creates a token that's a copy of it." In a three-player
+# game Bot2's Ornithopter is exiled and both Bot1 (the caster) and Bot3 get a token copy; Bot2, its controller, gets
+# none. Turn order is Bot1 (T1, T4), Bot2 (T2), Bot3 (T3); Bot1 casts it on turn 4 with five Moxen.
+
+[Bot1 Deck]
+Fractured Identity
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Island
+Island x11
+
+[Bot2 Deck]
+Ornithopter
+Island x17
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T4 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Fractured Identity.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+
+[Expect]
+Exile = Ornithopter
+Bot2.Battlefield.Count = 0
+Bot1.Battlefield.Ornithopter.Types = Artifact; Creature
+Bot3.Battlefield = Ornithopter

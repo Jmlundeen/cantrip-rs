@@ -1,0 +1,11 @@
+{
+  "name": "Tersa Lightshatter",
+  "manaCost": "{2}{R}",
+  "type": "Legendary Creature — Orc Wizard",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Haste\nWhen Tersa Lightshatter enters, discard up to two cards, then draw that many cards.\nWhenever Tersa Lightshatter attacks, if there are seven or more cards in your graveyard, exile a card at random from your graveyard. You may play that card this turn.",
+  "keywords": [
+    "Haste"
+  ]
+}

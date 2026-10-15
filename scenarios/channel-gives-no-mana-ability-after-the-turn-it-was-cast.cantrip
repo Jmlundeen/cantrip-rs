@@ -1,0 +1,31 @@
+# Channel lasts "until end of turn" (CR 611.2a, 514.2): on the turn it resolves the ability is offered (the positive
+# control, taken), and on Bot1's next turn it is gone, with Channel still in the graveyard.
+
+[Bot1 Deck]
+Channel
+Forest
+Forest
+Sol Ring
+Mind Stone
+Forest
+Forest
+Forest x12
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Channel.Cast
+Bot1.Pass
+Bot1.Channel.Activate
+[T5 Bot1.Main1]
+! Bot1.Channel.Activate
+
+[Expect]
+Bot1.Life = 19
+Bot1.Graveyard = Channel

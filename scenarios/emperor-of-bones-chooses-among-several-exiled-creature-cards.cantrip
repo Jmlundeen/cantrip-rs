@@ -1,0 +1,56 @@
+# Emperor of Bones: "put a creature card exiled with this creature onto the battlefield". On turn 3's combat it exiles
+# the Llanowar Elves Bot1's own Bolt killed; Bot2's Bolt then kills Bot1's Ornithopter, and on turn 5's combat the Emperor
+# exiles that too. Adapt 2 now has two creature cards to choose from and Bot1 picks the Ornithopter: it enters with a
+# finality counter and haste, the Elves stay in exile, and at the end step the Ornithopter is sacrificed and exiled
+# (finality counter, CR 122.1h).
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Emerald
+Mox Ruby
+Emperor of Bones
+Llanowar Elves
+Lightning Bolt
+Ornithopter
+Forest x10
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Emperor of Bones.Cast
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Target(Bot1.Graveyard.Llanowar Elves)
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+[T5 Bot1.BeginCombat]
+Bot1.Target(Bot1.Graveyard.Ornithopter)
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Emperor of Bones.Activate(Ability: Adapt)
+Bot1.Choose(Ornithopter)
+? Bot1.Battlefield.Ornithopter.Counters.Finality = 1
+? Bot1.Battlefield.Ornithopter.Keywords = Flying; Haste
+[T6 Bot2.Upkeep]
+
+[Expect]
+Exile = Llanowar Elves; Ornithopter
+Bot1.Battlefield.Emperor of Bones.Counters.PlusOnePlusOne = 2
+Bot1.Graveyard = Lightning Bolt

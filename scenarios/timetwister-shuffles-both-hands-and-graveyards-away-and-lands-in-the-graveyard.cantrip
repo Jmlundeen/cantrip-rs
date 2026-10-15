@@ -1,0 +1,24 @@
+# Timetwister: each player shuffles their hand and graveyard into their library and draws seven. Black Lotus, sacrificed
+# for its mana, is in Bot1's graveyard and goes back into the library; Timetwister, still on the stack, is put into the
+# graveyard afterwards (CR 608.2n) and stays there. Both players hold seven cards.
+
+[Bot1 Deck]
+Black Lotus
+Timetwister
+Island x5
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Timetwister.Cast
+
+[Expect]
+Bot1.Graveyard = Timetwister
+Bot1.Hand.Count = 7
+Bot2.Hand.Count = 7
+Bot1.Library.Count = 12
+Bot2.Library.Count = 13

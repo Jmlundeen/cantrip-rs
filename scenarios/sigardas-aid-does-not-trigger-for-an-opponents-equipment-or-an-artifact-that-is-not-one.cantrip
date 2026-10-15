@@ -1,0 +1,48 @@
+# Sigarda's Aid triggers for "an Equipment you control": not for Bot2's Lightning Greaves entering, and not for Bot1's own
+# Sol Ring, an artifact that is no Equipment. Neither asks Bot1 anything (the refusals), where Bot1's own Lightning Greaves
+# does (the positive control: Bot1 is asked and accepts, and it is attached to the Ornithopter).
+
+[Bot1 Deck]
+Mox Pearl
+Sigarda's Aid
+Mox Jet
+Ornithopter
+Sol Ring
+Lightning Greaves
+Forest x14
+
+[Bot2 Deck]
+Mox Ruby
+Mox Emerald
+Lightning Greaves
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Sigarda's Aid.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+! Bot1.Accept
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Lightning Greaves.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Pass
+! Bot1.Accept
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Lightning Greaves.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Accept
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Lightning Greaves.AttachedTo = Ornithopter
+Bot2.Battlefield.Lightning Greaves.AttachedTo = (absent)

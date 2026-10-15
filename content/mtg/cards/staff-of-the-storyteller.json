@@ -1,0 +1,6 @@
+{
+  "name": "Staff of the Storyteller",
+  "manaCost": "{1}{W}",
+  "type": "Artifact",
+  "oracleText": "When this artifact enters, create a 1/1 white Spirit creature token with flying.\nWhenever you create one or more creature tokens, put a story counter on this artifact.\n{W}, {T}, Remove a story counter from this artifact: Draw a card."
+}

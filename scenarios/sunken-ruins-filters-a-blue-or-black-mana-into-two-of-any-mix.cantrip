@@ -1,0 +1,21 @@
+# Sunken Ruins pays {U/B} (here from a Swamp) and taps to add two mana, each blue or black as Bot1 chooses: {U}{B}, a
+# mix the Swamp alone could never make.
+
+[Bot1 Deck]
+Swamp
+Sunken Ruins
+Swamp x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Sunken Ruins.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Sunken Ruins.Activate(Ability: {U/B}, {T}; Colors: Blue, Black)
+
+[Expect]
+Turn = 3
+Bot1.Mana = {U}{B}

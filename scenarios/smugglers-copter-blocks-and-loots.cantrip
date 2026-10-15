@@ -1,0 +1,40 @@
+# Smuggler's Copter's loot also triggers when it blocks (CR 509.1): Bot2's Ornithopter attacks on turn 4, Llanowar Elves
+# crews the Copter once the attack is declared, the Copter blocks it, and the loot draws an Island and discards it.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Sol Ring
+Llanowar Elves
+Smuggler's Copter
+Forest
+Forest
+Forest
+Island
+Forest x10
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Smuggler's Copter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Ornithopter)
+Bot1.Battlefield.Smuggler's Copter.Activate(Ability: Crew)
+Bot1.Block(Smuggler's Copter > Ornithopter)
+Bot1.Accept
+Bot1.Choose(Island)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Island
+Bot1.Life = 20

@@ -1,0 +1,31 @@
+# Squandered Resources: "Add one mana of any type the sacrificed land could produce" (CR 106.7). Bot1 sacrifices a
+# Strip Mine, which could produce only colorless, and answers {C} with Color: C — the one type no color can name
+# (CR 105.1). The Swamp and Forest beside it are candidates too, which is why the line names the sacrifice.
+
+[Bot1 Deck]
+Swamp
+Forest
+Squandered Resources
+Strip Mine
+Swamp x10
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Squandered Resources.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Strip Mine.Play
+Bot1.Battlefield.Squandered Resources.Activate(Sacrifice: Strip Mine; Color: C)
+? Bot1.Mana = {C}
+? Bot1.Graveyard = Strip Mine
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Swamp; Forest; Squandered Resources
+Bot1.Graveyard = Strip Mine

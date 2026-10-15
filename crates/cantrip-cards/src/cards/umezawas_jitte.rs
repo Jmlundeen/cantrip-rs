@@ -1,0 +1,76 @@
+use cantrip_api::*;
+use cantrip_mechanics::attach::equip;
+use cantrip_mechanics::{pump, targets};
+use cantrip_oracle as oracle;
+
+/// "Whenever equipped creature deals combat damage": a creature the Jitte is attached to dealing more than 0 combat
+/// damage. Damage dealt together is one event (CR 603.2c, 510.2), so the ability is `once_per_batch`: however many
+/// recipients, it triggers once.
+fn equipped_creature_deals_combat_damage(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::Damage { source: dealer, amount, combat: true, .. } if *amount > 0 && q.attached_to(source) == Some(*dealer) => {
+            Fired::PLAIN
+        }
+        _ => None,
+    }
+}
+
+fn two_charge_counters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    g.add_counters(item.object, CounterKind::Charge, 2);
+    Ok(())
+}
+
+/// Equipped creature gets +2/+2 until end of turn: whatever the Jitte is attached to as the ability resolves, or the
+/// one it was last attached to if it has left the battlefield (CR 608.2h).
+fn pump_equipped(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if let Some(creature) = g.obj(item.object).attached_to {
+        pump(g, item.object, creature, 2, 2);
+    }
+    Ok(())
+}
+
+/// Target creature gets -1/-1 until end of turn.
+fn shrink_target(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if let Some(creature) = targets::object(g, item, 0) {
+        pump(g, item.object, creature, -1, -1);
+    }
+    Ok(())
+}
+
+static MODAL: ModalDef = ModalDef {
+    modes: &[
+        ModeDef { text: "Equipped creature gets +2/+2 until end of turn.", targets: &[], effect: pump_equipped, cost: ManaCost::ZERO },
+        ModeDef {
+            text: "Target creature gets -1/-1 until end of turn.",
+            targets: &[targets::CREATURE],
+            effect: shrink_target,
+            cost: ManaCost::ZERO,
+        },
+        ModeDef { text: "You gain 2 life.", targets: &[], effect: cantrip_mechanics::effects::gain_life::<2>, cost: ManaCost::ZERO },
+    ],
+    min: 1,
+    max: 1,
+    escalate: None,
+    repeat: false, allowed: None,
+};
+
+pub static CARD: CardDef = CardDef {
+    abilities: &[
+        AbilityDef::Activated(ActivatedDef {
+            text: "Remove a charge counter from Umezawa's Jitte: Choose one — equipped creature gets +2/+2 until end of turn; target creature gets -1/-1 until end of turn; or you gain 2 life.",
+            cost: Cost { remove_counters: Some((CounterKind::Charge, 1)), ..Cost::NONE },
+            modal: Some(&MODAL),
+            ..ActivatedDef::BLANK
+        }),
+        equip(mana(2, 0, 0, 0, 0, 0), "Equip {2}"),
+        AbilityDef::Triggered(TriggeredDef {
+            text: "Whenever equipped creature deals combat damage, put two charge counters on Umezawa's Jitte.",
+            listens: EventMask::DAMAGE,
+            matches: equipped_creature_deals_combat_damage,
+            effect: two_charge_counters,
+            once_per_batch: true,
+            ..TriggeredDef::BLANK
+        }),
+    ],
+    ..oracle::UMEZAWAS_JITTE
+};

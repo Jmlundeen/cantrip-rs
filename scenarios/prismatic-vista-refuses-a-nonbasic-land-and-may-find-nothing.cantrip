@@ -1,0 +1,29 @@
+# "Search your library for a basic land card" (CR 205.4a): an Overgrown Tomb, a nonbasic land with basic land types, is not
+# offered while the Forest is. A search for a quality may find nothing (CR 701.23b): on turn 3 a second Vista is cracked for
+# no card at all, and is still sacrificed with its life paid. 20 - 1 - 1 = 18.
+
+[Bot1 Deck]
+Prismatic Vista
+Prismatic Vista
+Island x5
+Overgrown Tomb
+Forest
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Prismatic Vista.Play
+Bot1.Battlefield.Prismatic Vista.Activate
+! Bot1.Search(Overgrown Tomb)
+Bot1.Search(Forest)
+[T3 Bot1.Main1]
+Bot1.Hand.Prismatic Vista.Play
+Bot1.Battlefield.Prismatic Vista.Activate
+Bot1.Search()
+
+[Expect]
+Bot1.Life = 18
+Bot1.Graveyard = Prismatic Vista; Prismatic Vista
+Bot1.Battlefield = Forest

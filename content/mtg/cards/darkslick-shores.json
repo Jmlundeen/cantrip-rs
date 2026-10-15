@@ -1,0 +1,5 @@
+{
+  "name": "Darkslick Shores",
+  "type": "Land",
+  "oracleText": "This land enters tapped unless you control two or fewer other lands.\n{T}: Add {U} or {B}."
+}

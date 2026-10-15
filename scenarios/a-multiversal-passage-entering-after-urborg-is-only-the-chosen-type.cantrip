@@ -1,0 +1,28 @@
+# Urborg, Tomb of Yawgmoth with Multiversal Passage entering after it: both are layer-4 type effects with no
+# dependency between them (CR 613.8a: neither changes what the other applies to), so they apply in timestamp order
+# (CR 613.7). Urborg's older effect adds Swamp, then Passage's newer "This land is the chosen type" sets its subtypes
+# to Island alone (CR 305.7). Passage taps only for blue; Bot1's Plains is still a Swamp.
+
+[Bot1 Deck]
+Urborg, Tomb of Yawgmoth
+Plains
+Multiversal Passage
+Plains x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Urborg, Tomb of Yawgmoth.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Multiversal Passage.Play
+Bot1.Modes(Island)
+Bot1.Accept
+! Bot1.Battlefield.Multiversal Passage.Activate(Ability: Add {B})
+Bot1.Battlefield.Multiversal Passage.Activate
+
+[Expect]
+Turn = 3
+Bot1.Mana = {U}
+Bot1.Battlefield.Multiversal Passage.Subtypes = Island
+Bot1.Battlefield.Urborg, Tomb of Yawgmoth.Subtypes = Swamp

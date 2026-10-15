@@ -1,0 +1,33 @@
+# "Add {U} for each artifact you control": with no artifact the Academy adds nothing (and is tapped). On turn 3 Bot1 controls an Ornithopter (an artifact creature), Mox Pearl and a Clue token (an artifact token) and so taps it for {U}{U}{U}, while
+# Bot2's Mox Jet, Thraben Inspector (not an artifact) and the Academy itself (a land) do not count.
+
+[Bot1 Deck]
+Tolarian Academy
+Ornithopter
+Mox Pearl
+Thraben Inspector
+Island x16
+
+[Bot2 Deck]
+Mox Jet
+Island x16
+
+[Actions]
+Bot1.Hand.Tolarian Academy.Play
+Bot1.Battlefield.Tolarian Academy.Activate
+? Bot1.Mana =
+? Bot1.Battlefield.Tolarian Academy.Tapped = true
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Thraben Inspector.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Battlefield.Tolarian Academy.Activate
+? Bot1.Mana = {U}{U}{U}
+
+[Expect]
+Bot1.Battlefield.Tolarian Academy.Tapped = true
