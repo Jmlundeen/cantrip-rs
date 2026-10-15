@@ -1,0 +1,53 @@
+# An emblem's ability is the text of the ability that made it (CR 114.2, 612.4). Bot2 changes Kaito, Bane of Nightmares,
+# Ninja to Elf, while he is a spell (the change goes on to the permanent, CR 400.7a). On his controller's turn he is an
+# Elf creature, and the emblem his +1 makes says "Elves you control get +1/+1": he is a 4/5, where an emblem still
+# about Ninjas would leave him 3/4.
+
+[Bot1 Deck]
+Island
+Island
+Swamp
+Swamp
+Kaito, Bane of Nightmares
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island
+Artificial Evolution
+Island x14
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Kaito, Bane of Nightmares.Cast
+Bot1.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Artificial Evolution.Cast(Stack.Kaito, Bane of Nightmares)
+Bot2.Pass
+Bot1.Pass
+Bot2.Modes(Ninja)
+Bot2.Modes(Elf)
+[T7 Bot1.Main2]
+? Bot1.Battlefield.Kaito, Bane of Nightmares.Subtypes = Elf
+Bot1.Battlefield.Kaito, Bane of Nightmares.Activate(Ability: You get an emblem)
+[T9 Bot1.Main1]
+
+[Expect]
+Turn = 9
+Bot1.Emblems.Count = 1
+Bot1.Battlefield.Kaito, Bane of Nightmares.Subtypes = Elf
+Bot1.Battlefield.Kaito, Bane of Nightmares.Power = 4
+Bot1.Battlefield.Kaito, Bane of Nightmares.Toughness = 5

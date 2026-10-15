@@ -646,6 +646,12 @@ pub fn turn_over(cx: &mut Cx, id: ObjectId) {
 
 /// Creates an emblem (CR 114.2): an object in the command zone, owned by the player, that nothing moves.
 pub fn create_emblem(cx: &mut Cx, def: CardId, player: PlayerId) -> ObjectId {
+    // The emblem's abilities are the creating text's (CR 114.2, 612.4): words that text changed are changed in them.
+    let words = match cx.cause() {
+        Cause::Spell(source) | Cause::Ability { source, .. } => cantrip_api::words(cx.s(), source),
+        _ => Words::NONE,
+    };
+    let copy = (!words.is_printed()).then(|| Copiable { words, ..Copiable::of(def) });
     let turn = cx.s().turn.number;
     let timestamp = cx.st().timestamp();
     let id = cx.st().push_obj(Obj {
@@ -660,7 +666,7 @@ pub fn create_emblem(cx: &mut Cx, def: CardId, player: PlayerId) -> ObjectId {
         deathtouched: false,
         counters: [0; CounterKind::COUNT],
         timestamp,
-        copy: None,
+        copy,
         loyalty_turn: 0,
         became: None,
         exile_on_leave: false,
