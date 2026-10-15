@@ -9,7 +9,7 @@ fn black_creature_spells_cost_less(q: &dyn Query, source: ObjectId, player: Play
         return 0;
     }
     let chars = q.chars(spell);
-    if chars.is(CardType::Creature) && chars.colors.has(Color::Black) { -1 } else { 0 }
+    if chars.is(CardType::Creature) && chars.colors.has(q.words(source).color(Color::Black)) { -1 } else { 0 }
 }
 
 /// "Whenever you cast a creature spell": its controller's spells only, judged on the spell as it is on the stack.
