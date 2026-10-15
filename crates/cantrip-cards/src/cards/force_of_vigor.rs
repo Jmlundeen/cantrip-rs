@@ -2,8 +2,8 @@ use cantrip_api::*;
 use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
 
-fn green_card(q: &dyn Query, _: &Asker, id: ObjectId) -> bool {
-    q.chars(id).colors.has(Color::Green)
+fn green_card(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
+    q.chars(id).colors.has(q.words(asker.source).color(Color::Green))
 }
 
 /// "If it's not your turn" (CR 118.9): the alternative cost is offered only during another player's turn.
