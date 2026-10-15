@@ -4,8 +4,8 @@ use cantrip_mechanics::hand::discard_chosen_from_revealed_hand;
 use cantrip_mechanics::{targets, triggers::this_enters};
 use cantrip_oracle as oracle;
 
-fn black_card(q: &dyn Query, _: &Asker, id: ObjectId) -> bool {
-    q.chars(id).colors.has(Color::Black)
+fn black_card(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
+    q.chars(id).colors.has(q.words(asker.source).color(Color::Black))
 }
 
 /// Target opponent reveals their hand; you choose a nonland card from it; they discard it. Asked even when nothing in
