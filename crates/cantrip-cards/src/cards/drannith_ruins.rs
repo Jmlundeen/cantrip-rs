@@ -5,7 +5,7 @@ use cantrip_oracle as oracle;
 /// "Target non-Human creature that entered this turn" (CR 115.1, 400.7), asked of the event history.
 fn non_human_that_entered_this_turn(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     (targets::CREATURE.filter)(q, asker, t)
-        && matches!(t, Target::Object(id) if !q.chars(id).has_subtype(Subtype::Human) && cantrip_mechanics::history::entered_this_turn(q, id))
+        && matches!(t, Target::Object(id) if !q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Human)) && cantrip_mechanics::history::entered_this_turn(q, id))
 }
 
 /// Put two +1/+1 counters on the target.

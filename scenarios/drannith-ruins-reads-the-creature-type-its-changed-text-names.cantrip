@@ -1,0 +1,43 @@
+# Artificial Evolution replaces the creature type Human with Goblin in Drannith Ruins' text (CR 612.1, indefinitely):
+# "target non-Human creature that entered this turn" now means non-Goblin, so Batroc the Leaper, a Human Villain, is a
+# legal target and gets two +1/+1 counters; as printed, the Ruins would refuse him.
+
+[Bot1 Deck]
+Drannith Ruins
+Artificial Evolution
+Mox Sapphire
+Batroc the Leaper
+Mox Ruby
+Mox Jet
+Mox Pearl
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Drannith Ruins.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Drannith Ruins)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Human)
+Bot1.Modes(Goblin)
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Batroc the Leaper.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Drannith Ruins.Activate(Ability: Put two; Batroc the Leaper)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Batroc the Leaper.Counters.PlusOnePlusOne = 2
