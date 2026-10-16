@@ -1,6 +1,4 @@
 use cantrip_api::*;
-use cantrip_mechanics::effects;
-use cantrip_mechanics::library::{Find, search_to_battlefield};
 use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
 
@@ -12,14 +10,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
     let owner = g.controller(creature);
     g.exile(creature);
-    if !effects::ask_may(g, owner, item.object, Purpose::Ask(&cantrip_mechanics::lands::FETCH_BASIC_TAPPED))? {
-        return Ok(());
-    }
-    search_to_battlefield(g, owner, item.object, Find::ONE, true, |q, c| {
-        let chars = q.chars(c);
-        chars.is(CardType::Land) && chars.supertypes.basic
-    })?;
-    Ok(())
+    cantrip_mechanics::lands::may_fetch_basic(g, owner, item.object, true)
 }
 
 pub static CARD: CardDef = CardDef {
