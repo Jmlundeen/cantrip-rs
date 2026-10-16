@@ -1,0 +1,31 @@
+# Abandon Attachments: "You may discard a card. If you do, draw two cards." Bot1 casts it with Mox Ruby paying the red half
+# of {U/R} (CR 107.4e) and Mox Jet the {1}, then picks Island out of the four cards left in hand: it is discarded and two
+# cards are drawn. Hand 7 - Moxen(2) - spell(1) = 4; minus the discard 3; plus two 5. Library 13 - 2 = 11.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Abandon Attachments
+Island
+Plains
+Swamp
+Forest
+Plains x13
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Abandon Attachments.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Choose(Island)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Abandon Attachments; Island
+Bot1.Hand.Count = 5
+Bot1.Library.Count = 11
+Stack.Count = 0

@@ -1,0 +1,30 @@
+# Abandon Attachments: the {U/R} half of its cost is payable with blue as well as with red (CR 107.4e). Mox Sapphire pays
+# it and Mox Jet the {1}; the discard is declined (a "you may"), so nothing is drawn.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Abandon Attachments
+Island
+Plains
+Swamp
+Forest
+Plains x13
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Abandon Attachments.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Choose()
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Abandon Attachments
+Bot1.Hand.Count = 4
+Bot1.Library.Count = 13
+Stack.Count = 0

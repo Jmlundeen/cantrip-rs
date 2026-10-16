@@ -1,0 +1,33 @@
+# Abandon Attachments is an instant: Bot1 puts two Moxen out on its own turn and casts it in Bot2's upkeep (a sorcery
+# could not be). The Moxen stay untapped through
+# Bot1's own turn, so the mana is there. Hand 7 - Moxen(2) - spell(1) = 4; discard Plains: 3; draw two: 5.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Abandon Attachments
+Island
+Plains
+Swamp
+Forest
+Plains x13
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Upkeep]
+Bot1.Hand.Abandon Attachments.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Choose(Plains)
+[T2 Bot2.Main1]
+
+[Expect]
+Bot1.Graveyard = Abandon Attachments; Plains
+Bot1.Hand.Count = 5
+Bot1.Library.Count = 11
+Bot1.Battlefield.Mox Ruby.Tapped = true
+Turn = 2

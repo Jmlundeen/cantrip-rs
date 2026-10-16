@@ -1,0 +1,35 @@
+# Abandon Attachments cast with no other card in hand: nothing can be discarded, so "if you do" is not met and no card is
+# drawn (CR 608.2c), and the player is asked nothing (`! Bot1.Choose`). Bot1 plays out the whole opening hand for free
+# (a land and five Moxen; two Moxen pay for the spell) and casts it last.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Emerald
+Mox Sapphire
+Abandon Attachments
+Plains x13
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Abandon Attachments.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Choose
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 0
+Bot1.Graveyard = Abandon Attachments
+Bot1.Library.Count = 13
+Stack.Count = 0

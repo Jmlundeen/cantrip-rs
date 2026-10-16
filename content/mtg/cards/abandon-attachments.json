@@ -1,0 +1,6 @@
+{
+  "name": "Abandon Attachments",
+  "manaCost": "{1}{U/R}",
+  "type": "Instant — Lesson",
+  "oracleText": "You may discard a card. If you do, draw two cards."
+}
