@@ -1,0 +1,45 @@
+# Altar of the Wretched: with no creature to sacrifice, entering asks nothing (refused) and draws nothing. Destroyed by
+# Bot1's own Abrade, it is in the graveyard, where "{2}{B}: Return this card from your graveyard to your hand" works (CR
+# 113.6k): not at all while it is on the battlefield (refused), then returning it to the hand.
+
+[Bot1 Deck]
+Swamp
+Altar of the Wretched
+Mox Jet
+Mox Ruby
+Abrade
+Swamp
+Swamp
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Altar of the Wretched.Cast
+! Bot1.Choose
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+! Bot1.Battlefield.Altar of the Wretched.Activate(Ability: Return)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Abrade.Cast
+Bot1.Modes(Destroy target artifact)
+Bot1.Target(Altar of the Wretched)
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Graveyard.Altar of the Wretched.Activate
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Swamp#3.Activate
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Altar of the Wretched; Island; Island
+Bot1.Graveyard = Abrade

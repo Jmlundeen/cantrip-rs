@@ -1,0 +1,68 @@
+# Altar of the Wretched // Wretched Bonemass. As the Altar enters Bot1 may sacrifice a nontoken creature - not the Spirit
+# token (refused) - and sacrifices Healer's Hawk, power 1: it draws a card, then mills one. "Craft with one or more
+# creatures {2}{B}{B}" exiles Barrowgoyf from the battlefield, the Hawk card from the graveyard and the Spirit token. The
+# Bonemass's power and toughness are the total power of the exiled cards used to craft it (CR 702.167c, 604.3): the
+# Barrowgoyf's, its own characteristic-defining ability applying in exile (the card's ruling) - three card types among the
+# cards in all graveyards (land, artifact, instant), so 3 - and the Hawk's 1; the token ceased to exist and counts for
+# nothing. It has the exiled cards' deathtouch, lifelink and flying, but no first strike. Attacking, it deals 4 and gains
+# Bot1 4 life.
+
+[Bot1 Deck]
+Swamp
+Staff of the Storyteller
+Mox Pearl
+Mox Jet
+Healer's Hawk
+Barrowgoyf
+Altar of the Wretched
+Swamp
+Swamp
+Black Lotus
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Staff of the Storyteller.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Healer's Hawk.Cast
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Barrowgoyf.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Swamp#3.Activate
+Bot1.Hand.Altar of the Wretched.Cast
+! Bot1.Choose(Spirit)
+Bot1.Choose(Healer's Hawk)
+[T7 Bot1.Main1]
+? Bot1.Graveyard = Lightning Bolt; Healer's Hawk
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Altar of the Wretched.Activate(Ability: Craft)
+Bot1.Choose(Barrowgoyf; Graveyard.Healer's Hawk; Spirit)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+[T7 Bot1.Main2]
+? Bot1.Battlefield.Wretched Bonemass.Power = 4
+? Bot1.Battlefield.Wretched Bonemass.Toughness = 4
+? Bot1.Battlefield.Wretched Bonemass.Keywords = Deathtouch; Flying; Lifelink
+[T9 Bot1.DeclareAttackers]
+Bot1.Attack(Wretched Bonemass > Bot2)
+[T9 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot1.Life = 24
+Exile = Barrowgoyf; Healer's Hawk
