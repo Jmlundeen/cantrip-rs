@@ -2,7 +2,9 @@
 
 use cantrip_api::*;
 
-fn becomes_a_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+/// "This Vehicle becomes an artifact creature until end of turn" (CR 301.7b): crew's effect, and Bladewheel Chariot's other
+/// ability's, which taps two artifacts instead.
+pub fn becomes_a_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.add_effect(item.object, item.object, EffectKind::AddTypes(TypeSet::of(&[CardType::Creature])), Duration::EndOfTurn);
     Ok(())
 }
