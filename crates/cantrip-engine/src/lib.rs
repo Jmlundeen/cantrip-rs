@@ -88,6 +88,8 @@ pub fn label_text(label: &Label) -> &'static str {
         Label::PayLife(Color::Red) => "Pay 2 life for {R/P}",
         Label::PayLife(Color::Green) => "Pay 2 life for {G/P}",
         Label::Counter(kind) => kind.name(),
+        Label::Miracle(m) if m.is_own() => "Its own miracle",
+        Label::Miracle(m) => cards().get(m.granter).granted_miracles.get(m.index as usize).map_or("", |g| g.text),
     }
 }
 

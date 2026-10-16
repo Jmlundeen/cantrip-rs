@@ -126,6 +126,7 @@ What a `CardDef` can carry (see `crates/cantrip-api/src/card.rs`):
 | `cast_limit: N` | "each player can't cast more than N spells each turn" (CR 101.2), while it is on the battlefield |
 | `trigger_rules: &[..]` | "[permanents] entering don't cause abilities to trigger" (CR 603.2), while it is on the battlefield: `fn(q, asker, &Event, &Triggering) -> bool`, true stops that ability triggering on that event. `cantrip_mechanics::statics::creatures_entering_dont_trigger` is Torpor Orb's; `statics::entering(event)` is the permanent an event put onto the battlefield |
 | `cant_gain_life: &[..]` | "players can't gain life" (CR 119.7), while it is on the battlefield: `fn(q, asker, player) -> bool`, true stops that player gaining life. `cantrip_mechanics::statics::players_cant_gain_life` (Sunspine Lynx) and `opponents_cant_gain_life` (Knight of Dusk's Shadow) are shared; "damage can't be prevented" is `unpreventable_damage: &[statics::damage_cant_be_prevented]`. A life total that "becomes N" is `Game::set_life_total` (CR 119.5) |
+| `granted_miracles: &[GrantedMiracle { .. }]` | "each instant and sorcery card in your hand has miracle {2}" (CR 702.94a), while it is on the battlefield: `has(q, asker, card)` says which cards in a hand have it (`cantrip_mechanics::miracle::in_your_hand` and the card's own test), `cost(q, face)` its miracle cost for the card or the face of it being cast (none for one that can't be paid, CR 118.6), `text` what the choice between several miracle abilities calls it. Lorehold, the Historian, Molecule Man, Aminatou, Veil Piercer |
 | `additional_triggers: &[..]` | "that ability triggers an additional time" (CR 603.2d), while it is on the battlefield: the same `fn(q, asker, &Event, &Triggering) -> bool`, true makes that ability trigger once more on that event. `Triggering::of_a_permanent_controlled_by(asker.controller)` is "a triggered ability of a permanent you control"; `statics::permanent_entering_triggers_again` (Elesh Norn, Yarok), `creature_dying_triggers_again` (Teysa Karlov, Drivnod) and `creature_attacking_triggers_again` (Isshin) are shared |
 
 ## Card code
@@ -344,4 +345,7 @@ shapes have an example:
 - **Layers and rules**: `Layer::PtSwitch` / `EffectKind::SwitchPt` (CR 613.4d), `EffectKind::PlayerProtectionFromEverything`
   (CR 702.16j), `CardDef.unpreventable_damage` (CR 615.12), `CardDef.cause_rules` (what an opponent's spells and
   abilities can't make you discard or sacrifice, CR 101.2), `Query::event_subject` for a trigger's target filter, and
-  miracle (`CardDef.miracle`, CR 702.94).
+  miracle (`CardDef.miracle`, CR 702.94), and miracle a permanent gives cards in a hand (`CardDef.granted_miracles`): a card
+  with several miracle abilities is revealed with the one its player chooses (`Label::Miracle`), and only that one's linked
+  ability triggers, carrying which it was (`Miracle::data`, CR 607.5), so its cost still holds once the permanent has gone
+  (CR 113.7a).

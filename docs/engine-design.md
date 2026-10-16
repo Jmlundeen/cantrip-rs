@@ -280,6 +280,17 @@ so (Bonecrusher Giant's Stomp) or a `CardDef::unpreventable_damage` static (Ques
 player's protection from everything) is the only prevention effect the engine has today; a prevention shield or other
 prevention effect added later must ask the same function.
 
+### Miracle, printed and given
+
+Miracle (CR 702.94a) is the core's: as a card is drawn, if it is its player's first draw of the turn, `ops::draw` asks
+`cantrip_api::miracles` what miracle abilities it has - its own `CardDef::miracle`, then each one a permanent on the
+battlefield gives it (`CardDef::granted_miracles`, asked of the permanent with its controller as "you", and not while the
+permanent has lost its abilities). With one, the player is asked whether to reveal it; with several, whether and then which
+(`Label::Miracle`), since each miracle ability is linked only to its own triggered ability (CR 607.5). The linked ability
+(`MIRACLE_ABILITY`) carries which one it was in its data, so the cost it offers is that one's even once the permanent that gave
+it has left (CR 113.7a), and a granted cost is read for the face being cast (a Room's door, CR 709.3a). The battlefield is
+searched on every draw a player makes after the first turn begins, before the history is asked whether it is the first.
+
 ### Ending the turn and the cleanup step
 
 "End the turn" (CR 724.1) is `Game::end_the_turn`, called by a resolving spell or ability (`turn::end_the_turn`): the

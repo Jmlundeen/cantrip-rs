@@ -1262,27 +1262,62 @@ pub fn draw(cx: &mut Cx, player: PlayerId) {
     let card = move_to_for(cx, top, Zone::hand(player), ZoneReason::Draw);
     // Miracle (CR 702.94a): "you may reveal this card from your hand as you draw it" if it is the first card drawn this
     // turn, before anything else happens; only if it is revealed does the linked ability trigger. The window is the
-    // drawing player's alone, so nobody else learns of a "no".
-    if cx.s().turn.number > 0
-        && cx.card(cx.s().obj(card).card).miracle.is_some()
-        && cx.s().obj(card).zone == Zone::hand(player)
-        && cx.history().drawn(player) == 0
-        && matches!(cx.ask_core(player, RequestKind::May { source: card, purpose: Purpose::RevealForMiracle }, false), Ok(Answer::Yes))
-        && cx.s().obj(card).zone == Zone::hand(player)
-    {
-        cx.emit(Event::Revealed { player, card });
-        let ability = AbilityRef::miracle(cx.s().obj(card).card);
-        cx.st().trigger_push(PendingTrigger {
-            source: card,
-            ability,
-            controller: player,
-            subject: Target::None,
-            data: [0; 2],
-            members: cantrip_state::Span::default(),
-            count: None,
-        });
+    // drawing player's alone, so nobody else learns of a "no". The card has its own miracle and any a permanent gives
+    // cards in its controller's hand (Lorehold, the Historian); with more than one, the player says which it is revealed
+    // with, and only that one's linked ability triggers (CR 607.5).
+    if cx.s().turn.number > 0 && cx.s().obj(card).zone == Zone::hand(player) {
+        let miracles = cantrip_api::miracles(&*cx, card);
+        if let Some(&first) = miracles.first()
+            && cx.history().drawn(player) == 0
+            && matches!(cx.ask_core(player, RequestKind::May { source: card, purpose: Purpose::RevealForMiracle(only_miracle(cx, card, &miracles)) }, false), Ok(Answer::Yes))
+            && let Some(miracle) = which_miracle(cx, player, card, &miracles, first)
+            && cx.s().obj(card).zone == Zone::hand(player)
+        {
+            cx.emit(Event::Revealed { player, card });
+            let ability = AbilityRef::miracle(cx.s().obj(card).card);
+            cx.st().trigger_push(PendingTrigger {
+                source: card,
+                ability,
+                controller: player,
+                subject: Target::None,
+                data: miracle.data(),
+                members: cantrip_state::Span::default(),
+                count: None,
+            });
+        }
     }
     cx.emit(Event::Drew { player, card });
+}
+
+/// A card's miracle ability, named for the question whether to reveal it, when it has only one (CR 702.94a).
+fn only_miracle(cx: &Cx, card: ObjectId, miracles: &[cantrip_api::Miracle]) -> Option<MiracleOf> {
+    match miracles {
+        [one] => Some(one.of(cx.s().obj(card).card)),
+        _ => None,
+    }
+}
+
+/// The miracle ability a card being revealed as it is drawn is revealed with (CR 702.94a, 607.5): its only one, or the one
+/// its player chooses.
+fn which_miracle(cx: &mut Cx, player: PlayerId, card: ObjectId, miracles: &[cantrip_api::Miracle], first: cantrip_api::Miracle) -> Option<cantrip_api::Miracle> {
+    if miracles.len() == 1 {
+        return Some(first);
+    }
+    let own = cx.s().obj(card).card;
+    let ask = RequestKind::ChooseModes {
+        source: card,
+        modes: miracles.iter().map(|m| Label::Miracle(m.of(own))).collect(),
+        eligible: (0..miracles.len() as u8).collect(),
+        count: 1,
+        at_most: 0,
+        affordable: Vec::new(),
+        additional_cost: false,
+        repeat: false,
+    };
+    match cx.ask_core(player, ask, false) {
+        Ok(Answer::Modes(chosen)) => chosen.first().and_then(|&i| miracles.get(i as usize)).copied(),
+        _ => None,
+    }
 }
 
 /// An instruction to draw `count` cards (CR 121.2): effects that change how many apply first (CR 121.2a), before any

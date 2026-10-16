@@ -378,8 +378,8 @@ fn purpose_view(purpose: Purpose, opening: bool) -> CardChoicePurposeView {
         | Purpose::Optional
         | Purpose::Ask(_)
         | Purpose::EndTurn
-        | Purpose::RevealForMiracle
-        | Purpose::CastForMiracleCost
+        | Purpose::RevealForMiracle(_)
+        | Purpose::CastForMiracleCost(_)
         | Purpose::PromiseGift(_)
         | Purpose::CastTransformedFree
         | Purpose::CastForMadness
@@ -422,7 +422,7 @@ fn may_verb(purpose: Purpose) -> (String, i32) {
         Purpose::CastForMadness => "CastForMadnessCost",
         Purpose::CastFoundOrHand => "CastFoundOrPutIntoHand",
         Purpose::CastOrBottom => "CastWithoutPaying",
-        Purpose::CastForMiracleCost => "CastForMiracleCost",
+        Purpose::CastForMiracleCost(_) => "CastForMiracleCost",
         Purpose::PromiseGift(gift) => match gift {
             Gift::Food => "PromiseGiftFood",
             Gift::Card => "PromiseGiftCard",
@@ -472,6 +472,67 @@ fn modes_detail(game: &Game, modes: &[Label], faces: bool) -> (String, bool) {
         None if modes.iter().all(|l| matches!(l, Label::Card(..) | Label::Name(_) | Label::Pile { .. })) => ("Chosen, not targeted".into(), false),
         None => (String::new(), false),
     }
+}
+
+/// A miracle cost as words: its symbols, or that it can't be paid (CR 118.6).
+fn cost_words(cost: Option<ManaCost>) -> String {
+    cost.map_or_else(|| "(unpayable: it has no mana cost)".to_string(), |c| c.to_string())
+}
+
+/// What a miracle ability costs, in words, from the card table alone (the card being drawn is no object yet when it is
+/// asked about): a split card's for each half it may be cast as, since a granted cost may be read off the half (CR 709.3a).
+fn miracle_cost_words(game: &Game, miracle: MiracleOf) -> String {
+    match game.cards.get(miracle.card).split {
+        Some((left, right)) if !miracle.is_own() => [left, right]
+            .iter()
+            .map(|half| format!("{} {}", half.name, cost_words(miracle_cost(game, miracle, game.cards.id_of(half)))))
+            .collect::<Vec<_>>()
+            .join(" or "),
+        _ => cost_words(miracle_cost(game, miracle, miracle.card)),
+    }
+}
+
+/// One miracle ability of a card, for the choice of which to reveal it with (CR 702.94a, 607.5): its cost and whose it is.
+fn miracle_label(game: &Game, miracle: MiracleOf) -> String {
+    let cost = miracle_cost_words(game, miracle);
+    if miracle.is_own() { format!("Miracle {cost}, its own") } else { format!("Miracle {cost}, from {}", game.cards.get(miracle.granter).name) }
+}
+
+/// A miracle ability as the questions about it word it: "miracle {2}", and who gave it, if not the card itself.
+fn miracle_words(game: &Game, miracle: MiracleOf) -> (String, String) {
+    let cost = format!("miracle {}", miracle_cost_words(game, miracle));
+    let from = if miracle.is_own() { String::new() } else { format!("{} gives it {cost}", game.cards.get(miracle.granter).name) };
+    (cost, from)
+}
+
+/// Miracle's two questions (CR 702.94a), worded with the cost: whether to reveal the card being drawn, and, as the linked
+/// ability resolves, whether to cast it for the cost of the miracle ability it was revealed with. A cost a permanent gave
+/// is not on the card's face, so the question says where it comes from.
+fn miracle_prompt(game: &Game, player: i32, handle: ViewHandle, purpose: Purpose) -> MayPrompt {
+    let seen = "Every player sees it from now on, even if you then decide not to cast it";
+    let (verb, question, detail, yes, no, no_default) = match purpose {
+        Purpose::RevealForMiracle(Some(one)) => {
+            let (cost, from) = miracle_words(game, one);
+            let detail = if from.is_empty() { seen.to_string() } else { format!("{from}  ·  {seen}") };
+            ("RevealForMiracle", format!("Reveal {{source}} for its {cost}?"), detail, "Reveal", "Keep it hidden", true)
+        }
+        Purpose::RevealForMiracle(None) => (
+            "RevealForMiracle",
+            "Reveal {source} for one of its miracle abilities?".to_string(),
+            format!("It has more than one: you choose which next  ·  {seen}"),
+            "Reveal",
+            "Keep it hidden",
+            true,
+        ),
+        Purpose::CastForMiracleCost(miracle) => {
+            let (cost, from) = miracle_words(game, miracle);
+            let pay = format!("You pay its {cost} instead of its mana cost");
+            let detail = if from.is_empty() { pay } else { format!("{pay}  ·  {from}") };
+            ("CastForMiracleCost", format!("Cast {{source}} for its {cost}?"), detail, "Cast", "Don't cast", false)
+        }
+        _ => unreachable!("only miracle's questions are worded here"),
+    };
+    MayPrompt { player, source: handle, verb: verb.into(), amount: 0, question, detail, yes: yes.into(), no: no.into(), no_default }
 }
 
 /// What a card of the request is cast as, for the face choice: its name and its cost.
@@ -629,6 +690,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                     .iter()
                     .map(|l| match l {
                         Label::Face(face) => face_text(game, *face),
+                        Label::Miracle(m) => miracle_label(game, *m),
                         other => label_text(other).to_string(),
                     })
                     .collect(),
@@ -636,7 +698,13 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 count: i32::from(*count),
                 may_repeat: *repeat,
                 additional_cost: *additional_cost,
-                heading: if faces { "Choose which face to cast".into() } else { String::new() },
+                heading: if faces {
+                    "Choose which face to cast".into()
+                } else if matches!(modes.first(), Some(Label::Miracle(..))) {
+                    "Choose which miracle to reveal it with".into()
+                } else {
+                    String::new()
+                },
                 at_most: i32::from(*at_most),
                 affordable: affordable.iter().map(|&m| i32::from(m)).collect(),
                 cost_kind: if *additional_cost { cost_kind(game, *source).into() } else { String::new() },
@@ -702,6 +770,9 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
             no: question.no.into(),
             no_default: !question.yes_is_default,
         }),
+        RequestKind::May { source, purpose: purpose @ (Purpose::RevealForMiracle(_) | Purpose::CastForMiracleCost(_)) } => {
+            PromptPayload::MayPromptMessage(miracle_prompt(game, player, source_handle(game, handles, *source), *purpose))
+        }
         RequestKind::May { source, purpose } => {
             let (verb, amount) = may_verb(*purpose);
             PromptPayload::MayPromptMessage(MayPrompt { player, source: source_handle(game, handles, *source), verb, amount, ..MayPrompt::default() })
@@ -925,5 +996,42 @@ mod tests {
         let (detail, costs) = modes_detail(&game, &[Label::Face(giant), Label::Face(giant)], true);
         assert!(detail.contains("Only the face you choose"), "{detail}");
         assert!(!costs);
+    }
+
+    /// Miracle's questions name the cost (CR 702.94a), and a choice between miracle abilities names each one's cost and
+    /// whose it is: the card's own, or the permanent's that gave it (CR 607.5), whose cost is not on the card's face. A
+    /// Room's granted cost is read off each door (CR 709.3a).
+    #[test]
+    fn miracle_questions_name_the_cost_and_who_gave_it() {
+        let (game, _) = game_with(&[]);
+        let fanatic = card("Metamorphosis Fanatic").expect("the card");
+        let hop = card("Hop to It").expect("the card");
+        let room = card("Unholy Annex // Ritual Chamber").expect("the card");
+        let lorehold = card("Lorehold, the Historian").expect("the card");
+        let aminatou = card("Aminatou, Veil Piercer").expect("the card");
+        let own = MiracleOf { card: fanatic, granter: fanatic, index: MiracleOf::OWN };
+        let given = MiracleOf { card: hop, granter: lorehold, index: 0 };
+
+        let reveal = miracle_prompt(&game, 1, ViewHandle(7), Purpose::RevealForMiracle(Some(own)));
+        assert_eq!((reveal.verb.as_str(), reveal.question.as_str()), ("RevealForMiracle", "Reveal {source} for its miracle {1}{B}?"));
+        assert!(reveal.no_default, "revealing is never the default");
+        let reveal = miracle_prompt(&game, 1, ViewHandle(7), Purpose::RevealForMiracle(Some(given)));
+        assert!(reveal.detail.starts_with("Lorehold, the Historian gives it miracle {2}"), "{}", reveal.detail);
+        let several = miracle_prompt(&game, 1, ViewHandle(7), Purpose::RevealForMiracle(None));
+        assert_eq!(several.question, "Reveal {source} for one of its miracle abilities?");
+
+        assert_eq!(miracle_label(&game, own), "Miracle {1}{B}, its own");
+        assert_eq!(miracle_label(&game, given), "Miracle {2}, from Lorehold, the Historian");
+        assert_eq!(miracle_label(&game, MiracleOf { card: hop, granter: aminatou, index: 0 }), "Miracle {W}, from Aminatou, Veil Piercer");
+        assert_eq!(
+            miracle_label(&game, MiracleOf { card: room, granter: aminatou, index: 0 }),
+            "Miracle Unholy Annex {B} or Ritual Chamber {B}{B}, from Aminatou, Veil Piercer"
+        );
+        assert_eq!(cost_words(None), "(unpayable: it has no mana cost)");
+
+        let cast = miracle_prompt(&game, 1, ViewHandle(7), Purpose::CastForMiracleCost(given));
+        assert_eq!((cast.verb.as_str(), cast.question.as_str()), ("CastForMiracleCost", "Cast {source} for its miracle {2}?"));
+        assert!(cast.detail.starts_with("You pay its miracle {2} instead of its mana cost"), "{}", cast.detail);
+        assert!(!cast.no_default);
     }
 }

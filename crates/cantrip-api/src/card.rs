@@ -5,7 +5,7 @@ use cantrip_state::*;
 
 use crate::chars::Chars;
 use crate::event::{Event, EventMask};
-use crate::game::{Game, Query, Suspend};
+use crate::game::{CastTerms, CastWay, Game, Query, Suspend};
 use crate::replace::{GrantedReplacementDef, ReplacementDef};
 
 /// A spell or ability's effect as it resolves (CR 608.2).
@@ -1054,6 +1054,101 @@ impl GrantedWay {
     pub const CAST: GrantedWay = GrantedWay { text: "", cost: |_, _, _, _| None, lands: false, gains: None };
 }
 
+/// A static ability of a permanent that gives cards in a hand miracle (CR 702.94a): "each instant and sorcery card in your
+/// hand has miracle {2}" (Lorehold, the Historian), "nonland cards in your hand have miracle {0}" (Molecule Man), "each
+/// enchantment card in your hand has miracle; its miracle cost is equal to its mana cost reduced by {4}" (Aminatou, Veil
+/// Piercer). It functions while the permanent is on the battlefield and has its abilities (CR 113.6, 613.1f); a card it
+/// gives miracle to has that miracle ability as long as it does, the revealing as it is drawn included, and the linked
+/// triggered ability, once it has triggered, is independent of the permanent (CR 113.7a, 607.5).
+#[derive(Clone, Copy)]
+pub struct GrantedMiracle {
+    /// What the choice between several miracle abilities calls this one (`Label::Miracle`), worded with the permanent's name.
+    pub text: &'static str,
+    /// Whether the card, in a hand, has this miracle ability: asked of the granting permanent (`Asker`, its controller
+    /// "you").
+    pub has: fn(&dyn Query, &Asker, ObjectId) -> bool,
+    /// Its miracle cost, for a card or the face of it being cast: the whole card as it is revealed, and the half, Adventure or
+    /// face being cast as the linked ability resolves (CR 709.3a, 715.3a, 712.8a: only that face is evaluated). None is a
+    /// cost based on the mana cost of a card that has none, which can't be paid (CR 118.6).
+    pub cost: fn(&dyn Query, CardId) -> Option<ManaCost>,
+}
+
+/// One miracle ability a card in a hand has (CR 702.94a): its own (`granter` none) or one a permanent gives it, named by the
+/// granting card and the grant's index in its `granted_miracles`, which is what the linked triggered ability carries
+/// (`StackItem::data`), since it is linked to that ability alone (CR 607.5).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Miracle {
+    pub granter: Option<(CardId, u8)>,
+    /// Its cost for the whole card, as it is revealed; none for a cost that can't be paid (CR 118.6).
+    pub cost: Option<ManaCost>,
+}
+
+impl Miracle {
+    /// The linked triggered ability's data: 0 for the card's own miracle, else the granting card's id plus one and the index.
+    pub fn data(&self) -> [u32; 2] {
+        self.granter.map_or([0; 2], |(card, i)| [card.0 as u32 + 1, i as u32])
+    }
+
+    /// The miracle ability a linked triggered ability's data names, for the card it was revealed with.
+    pub fn of_data(q: &dyn Query, card: ObjectId, data: [u32; 2]) -> Option<Miracle> {
+        if data[0] == 0 {
+            return q.card(q.obj(card).card).miracle.map(|cost| Miracle { granter: None, cost: Some(cost) });
+        }
+        let granter = CardId((data[0] - 1) as u16);
+        let grant = q.card(granter).granted_miracles.get(data[1] as usize)?;
+        Some(Miracle { granter: Some((granter, data[1] as u8)), cost: (grant.cost)(q, q.obj(card).card) })
+    }
+
+    /// Its cost for casting `face` of the card (CR 709.3a, 715.3a, 712.8a): the card's own miracle cost whatever face is
+    /// cast, a granted one as the grant reads that face.
+    pub fn cost_as(&self, q: &dyn Query, face: CardId) -> Option<ManaCost> {
+        match self.granter {
+            None => self.cost,
+            Some((granter, i)) => q.card(granter).granted_miracles.get(i as usize).and_then(|grant| (grant.cost)(q, face)),
+        }
+    }
+
+    /// The ability, named for a question about `card` (the card's id).
+    pub fn of(&self, card: CardId) -> MiracleOf {
+        match self.granter {
+            None => MiracleOf { card, granter: card, index: MiracleOf::OWN },
+            Some((granter, index)) => MiracleOf { card, granter, index },
+        }
+    }
+}
+
+/// The cost of a named miracle ability (CR 702.94a) for casting `face` of its card, read from the card table alone: the
+/// card's own miracle cost, or the granting card's grant read for that face. None for a cost that can't be paid (CR 118.6).
+pub fn miracle_cost(q: &dyn Query, miracle: MiracleOf, face: CardId) -> Option<ManaCost> {
+    if miracle.is_own() {
+        q.card(miracle.card).miracle
+    } else {
+        q.card(miracle.granter).granted_miracles.get(miracle.index as usize).and_then(|grant| (grant.cost)(q, face))
+    }
+}
+
+/// Every miracle ability a card in its owner's hand has (CR 702.94a): its own first, then those the permanents on the
+/// battlefield give it, in the battlefield's order.
+pub fn miracles(q: &dyn Query, card: ObjectId) -> Vec<Miracle> {
+    let mut all: Vec<Miracle> = q.card(q.obj(card).card).miracle.map(|cost| Miracle { granter: None, cost: Some(cost) }).into_iter().collect();
+    for &id in q.state().battlefield() {
+        let o = q.obj(id);
+        let granter = o.copy.map_or(o.card, |c| c.card);
+        let def = q.card(granter);
+        // A permanent that has lost all its abilities gives nothing (CR 613.1f).
+        if def.granted_miracles.is_empty() || q.state().lost_all_abilities(id) {
+            continue;
+        }
+        let asker = Asker { source: id, controller: o.controller };
+        for (i, grant) in def.granted_miracles.iter().enumerate() {
+            if (grant.has)(q, &asker, card) {
+                all.push(Miracle { granter: Some((granter, i as u8)), cost: (grant.cost)(q, q.obj(card).card) });
+            }
+        }
+    }
+    all
+}
+
 /// A static ability that says whether a player may cast spells right now from a kind of zone (CR 101.2, 601.3): false
 /// forbids it, for every spell cast from that zone, a cast an effect offers during resolution too. "Your opponents can't
 /// cast spells during your turn" (Voice of Victory) ignores the zone; "your opponents can't cast spells from anywhere other
@@ -1365,6 +1460,9 @@ pub struct CardDef {
     pub ability_alternatives: &'static [AbilityAlternative],
     /// Ways it gives cards in graveyards to be cast, while it is on the battlefield (CR 604, 118.9).
     pub granted_ways: &'static [GrantedWay],
+    /// Miracle it gives cards in its controller's hand, while it is on the battlefield (CR 702.94a, 113.6): Lorehold, the
+    /// Historian's "each instant and sorcery card in your hand has miracle {2}".
+    pub granted_miracles: &'static [GrantedMiracle],
     /// What it may do from an opening hand (CR 103.6a): begin the game on the battlefield.
     pub opening_hand: Option<OpeningHandAction>,
     /// Its back face (CR 711): the characteristics of the object when it is transformed. A double-faced card's
@@ -1505,6 +1603,7 @@ impl CardDef {
         ability_discounts: &[],
         ability_alternatives: &[],
         granted_ways: &[],
+        granted_miracles: &[],
         opening_hand: None,
         back: None,
         back_land: false,
@@ -1831,7 +1930,9 @@ fn madness_resolves(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 /// Miracle's linked triggered ability (CR 702.94a), the core's own: "you may cast it by paying [its miracle cost] rather
 /// than its mana cost." The card is the ability's source, still in the hand it was revealed from; nobody is asked about
-/// a card that could not be cast at all, and a "no", or a cast given up, leaves it where it is.
+/// a card that could not be cast at all, and a "no", or a cast given up, leaves it where it is. The cost is that of the
+/// miracle ability the card was revealed with (`Miracle::of_data`, CR 607.5): the card's own, or the one a permanent
+/// gave it, which still pays though that permanent has left since (CR 113.7a).
 pub static MIRACLE_ABILITY: AbilityDef = AbilityDef::Triggered(TriggeredDef {
     text: "Miracle: cast it by paying its miracle cost.",
     effect: miracle_resolves,
@@ -1840,12 +1941,37 @@ pub static MIRACLE_ABILITY: AbilityDef = AbilityDef::Triggered(TriggeredDef {
 
 fn miracle_resolves(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let card = item.object;
-    let Some(cost) = g.card(g.obj(card).card).miracle else { return Ok(()) };
-    if g.could_cast_during_resolution(card)
-        && matches!(g.ask(item.controller, RequestKind::May { source: card, purpose: Purpose::CastForMiracleCost })?, Answer::Yes)
-    {
-        g.cast_during_resolution(card, Some(cost))?;
+    let Some(miracle) = Miracle::of_data(g, card, item.data) else { return Ok(()) };
+    // Each face that could be cast, with its miracle cost; one whose cost can't be paid (CR 118.6) is not offered.
+    let ways: Vec<(CastWay, ManaCost)> = g
+        .cast_ways_during_resolution(card)
+        .into_iter()
+        .filter_map(|way| miracle.cost_as(g, way.face).map(|cost| (way, cost)))
+        .collect();
+    let named = miracle.of(g.obj(card).card);
+    if ways.is_empty() || !matches!(g.ask(item.controller, RequestKind::May { source: card, purpose: Purpose::CastForMiracleCost(named) })?, Answer::Yes) {
+        return Ok(());
     }
+    // Which face is cast is chosen as it is cast (CR 709.3, 715.3, 712.8a), asked as the core asks it.
+    let (way, cost) = if ways.len() == 1 {
+        ways[0]
+    } else {
+        let ask = RequestKind::ChooseModes {
+            source: card,
+            modes: ways.iter().map(|(w, _)| Label::Face(w.face)).collect(),
+            eligible: (0..ways.len() as u8).collect(),
+            count: 1,
+            at_most: 0,
+            affordable: Vec::new(),
+            additional_cost: false,
+            repeat: false,
+        };
+        match g.ask(item.controller, ask)? {
+            Answer::Modes(chosen) => ways[chosen.first().copied().unwrap_or(0) as usize % ways.len()],
+            _ => ways[0],
+        }
+    };
+    g.cast_during_resolution_as(card, CastTerms { instead: Some(cost), way: Some(way.way), ..CastTerms::default() })?;
     Ok(())
 }
 

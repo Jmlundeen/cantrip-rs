@@ -516,10 +516,12 @@ pub enum Purpose {
     Encode,
     /// Whether to promise a gift (CR 702.174a), and which gift it is.
     PromiseGift(Gift),
-    /// "You may reveal this card from your hand as you draw it" (CR 702.94a): miracle.
-    RevealForMiracle,
-    /// "You may cast it by paying its miracle cost" (CR 702.94a), as the linked ability resolves.
-    CastForMiracleCost,
+    /// "You may reveal this card from your hand as you draw it" (CR 702.94a): miracle, with the card's one miracle ability.
+    /// None for a card with more than one, which is then asked which it is revealed with (`Label::Miracle`).
+    RevealForMiracle(Option<MiracleOf>),
+    /// "You may cast it by paying its miracle cost" (CR 702.94a), as the linked ability resolves: the miracle ability it was
+    /// revealed with.
+    CastForMiracleCost(MiracleOf),
     /// Whether to pay another cost rather than an activated ability's (CR 118.9).
     AlternativeCost,
     /// What a cost beholds (CR 701.4a): a permanent chosen or a card revealed from the hand.
@@ -570,6 +572,26 @@ pub enum Label {
     Counter(CounterKind),
     /// One of the faces a card may be cast as (CR 709.3, 715.3, 712.8a), named by the face's name.
     Face(CardId),
+    /// One of a card's miracle abilities, to reveal it with (CR 702.94a, 607.5).
+    Miracle(MiracleOf),
+}
+
+/// One miracle ability of a card (CR 702.94a), named without the object, which a question asked as the card is drawn may not
+/// yet have: the card's own (`granter` the card itself, `index` `MiracleOf::OWN`), or the `index`th a permanent of the
+/// `granter` card gives it (`CardDef::granted_miracles`).
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub struct MiracleOf {
+    pub card: CardId,
+    pub granter: CardId,
+    pub index: u8,
+}
+
+impl MiracleOf {
+    pub const OWN: u8 = u8::MAX;
+
+    pub fn is_own(&self) -> bool {
+        self.index == Self::OWN
+    }
 }
 
 /// An answer to a request.
