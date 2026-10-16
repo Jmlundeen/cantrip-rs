@@ -1,0 +1,55 @@
+# "Whenever another creature you control enters, it gets +2/+0 and gains haste until end of turn." Bot1 casts Enduring Courage on turn 1: it is a 3/3 and
+# is not "another creature", so its own entering pumps nothing. Bot2's Ornithopter on turn 2 enters under the opponent's control and stays a 0/2 with no
+# haste (the control). On turn 3 Bot1's Ornithopter enters, becomes a 2/2 with haste and attacks the turn it was cast for 2; at the end of the turn the
+# pump and the haste are gone (CR 611.2, 514.2): on Bot2's turn 4 it is a 0/2 again.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+Enduring Courage
+Ornithopter
+Mountain
+Mountain x14
+
+[Bot2 Deck]
+Ornithopter
+Mountain x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Enduring Courage.Cast
+Bot1.Pass
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Enduring Courage.Power = 3
+? Bot1.Battlefield.Enduring Courage.Keywords = (absent)
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T2 Bot2.Main2]
+? Bot2.Battlefield.Ornithopter.Power = 0
+? Bot2.Battlefield.Ornithopter.Keywords = Flying
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Ornithopter > Bot2)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Ornithopter.Power = 2
+? Bot1.Battlefield.Ornithopter.Keywords = Flying; Haste
+? Bot2.Life = 18
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Ornithopter.Power = 0
+? Bot1.Battlefield.Ornithopter.Keywords = Flying
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield.Enduring Courage.Types = Enchantment; Creature

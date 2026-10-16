@@ -1,0 +1,68 @@
+# Enduring Courage's two abilities together. Bot2's Lightning Bolt kills it on turn 2 and it returns as an enchantment (it is no longer a creature, but
+# it still has its first ability). On turn 3 Bot1 casts Ornithopter and, with Courage's trigger on the stack, Bot2 Lightning Bolts the Ornithopter in
+# response (0/2 until the trigger resolves): the entering creature is a new object in the graveyard (CR 400.7), so the trigger does nothing, and neither
+# the pump nor the haste is applied to anything. Bot1's second Ornithopter is then pumped by the enchantment Courage (2/2, haste, flying) and hits for 2.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+Enduring Courage
+Ornithopter
+Ornithopter
+Mountain x14
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Mountain
+Mountain
+Mountain
+Mountain
+Mountain x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Enduring Courage.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Enduring Courage)
+Bot2.Pass
+[T2 Bot2.Main2]
+? Bot1.Battlefield.Enduring Courage.Types = Enchantment
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Ornithopter > Bot2)
+[T3 Bot1.Main2]
+? Bot1.Graveyard = Ornithopter
+? Stack.Count = 0
+? Bot1.Battlefield.Ornithopter.Power = 2
+? Bot1.Battlefield.Ornithopter.Keywords = Flying; Haste
+
+[Expect]
+Bot2.Life = 18
+Bot1.Graveyard = Ornithopter
+Bot2.Graveyard = Lightning Bolt; Lightning Bolt
+Bot1.Battlefield.Enduring Courage.Types = Enchantment
