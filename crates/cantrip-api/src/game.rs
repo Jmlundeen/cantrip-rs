@@ -527,9 +527,9 @@ pub trait Game: Query {
     /// to respond to; and if `by` has already left, nothing is exiled at all (CR 610.3b). The new objects.
     fn exile_with(&mut self, cards: &[ObjectId], by: ObjectId, until_leaves: bool) -> Vec<ObjectId>;
     /// Cards already in exile become linked to `by` as though exiled with it (CR 607.2a), for `exiled_with(by)` to find: the
-    /// exiled cards used to craft a permanent (CR 702.167c), which the cost of the craft ability exiled before the permanent
-    /// existed. Nothing returns them (CR 610.3 does not apply). A card no longer in exile, or no longer the object it was, is
-    /// left alone.
+    /// exiled cards used to craft a permanent (CR 702.167c), linked to the craft card in exile that is about to return as it.
+    /// Nothing returns them (CR 610.3 does not apply). A card no longer in exile, or no longer the object it was, is left
+    /// alone.
     fn link_exiled(&mut self, cards: &[ObjectId], by: ObjectId);
     /// Exiles a spell card encoded on a creature (CR 702.99a): linked to it as `exile_with` links, and marked encoded
     /// (`ExileLink::encoded`), which only cipher's encoding is. The card in exile, if it got there.

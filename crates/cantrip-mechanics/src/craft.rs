@@ -13,19 +13,18 @@ use cantrip_api::*;
 /// "Return this card to the battlefield transformed under its owner's control" (CR 702.167a, 712.14a): the card the
 /// cost exiled, found where the cost put it (CR 400.7). Nothing if it has left exile since, or was a token, which
 /// ceased to exist there (CR 111.7, 704.5d); a card that is not a double-faced card stays in exile (CR 712.14a), as one
-/// that was only a copy of a craft card does (the craft rulings, 2023-11-10). The permanent it becomes is linked to the
-/// cards exiled as the materials, which its abilities may refer to (CR 702.167c).
+/// that was only a copy of a craft card does (the craft rulings, 2023-11-10). Before it moves, the cards exiled as the
+/// materials are linked to it in exile, so the permanent it becomes has them from the moment it enters (CR 702.167c,
+/// `exiled_cards_used_to_craft`).
 fn return_transformed(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(card) = g.found_after_move(item.object) else { return Ok(()) };
     if !g.obj(card).zone.is(ZoneKind::Exile) || g.obj(card).token {
         return Ok(());
     }
     let materials = exiled_materials(g, item.object, item.ability);
+    g.link_exiled(&materials, card);
     let owner = g.obj(card).owner;
-    let crafted = g.put_onto_battlefield_transformed(card, owner)?;
-    if g.is_on_battlefield(crafted) && is_live(g, crafted) {
-        g.link_exiled(&materials, crafted);
-    }
+    g.put_onto_battlefield_transformed(card, owner)?;
     Ok(())
 }
 
@@ -93,11 +92,24 @@ pub const TWO_CREATURES: Materials = materials(2, false, creature, "creature");
 pub const ONE_OR_MORE_CREATURES: Materials = materials(1, true, creature, "creature");
 
 /// The exiled cards used to craft `permanent` (CR 702.167c): the cards exiled to pay the activation cost of the craft
-/// ability that put it onto the battlefield, as long as they remain in exile and it remains on the battlefield (the craft
-/// rulings, 2023-11-10), whoever controls it now. A token exiled that way is no card and ceased to exist, so it is none of
-/// them; a permanent that got onto the battlefield any other way, or left and came back, has none (CR 400.7). Asked of a
-/// permanent that has left (its enters trigger resolving after it is gone), they are the ones it had as it last existed
-/// (CR 608.2h). In exile order. Jade Seedstones's Jadeheart Attendant reads them.
+/// ability that put it onto the battlefield, as long as they remain in exile (the craft rulings, 2023-11-10), whoever
+/// controls it now. A token exiled that way is no card and ceased to exist, so it is none of them; a permanent that got
+/// onto the battlefield any other way, or left and came back, has none (CR 400.7). Asked of a permanent that has left (its
+/// enters trigger resolving after it is gone), they are the ones it had as it last existed (CR 608.2h). In exile order.
+/// Jade Seedstones's Jadeheart Attendant and Saheeli's Lattice's Mastercraft Raptor read them.
 pub fn exiled_cards_used_to_craft(q: &dyn Query, permanent: ObjectId) -> Vec<ObjectId> {
-    q.exiled_with(permanent)
+    used_to_craft(q.state(), permanent)
+}
+
+/// `exiled_cards_used_to_craft` from the state alone, for a characteristic-defining ability (CR 604.3), which reads the game
+/// through the layers: the materials are linked to the craft card as it waited in exile (`Game::link_exiled`), and that card
+/// became `permanent` as it returned.
+pub fn used_to_craft(s: &GameState, permanent: ObjectId) -> Vec<ObjectId> {
+    s.seats()
+        .flat_map(|p| s.zone(Zone::exile(p)).iter().copied())
+        .filter(|&id| {
+            let o = s.obj(id);
+            o.became.is_none() && !o.token && o.exiled.is_some_and(|link| s.obj(link.by).became == Some(permanent))
+        })
+        .collect()
 }
