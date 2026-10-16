@@ -1,0 +1,40 @@
+# Hydro-Man, Fluid Felon: at the beginning of Bot1's end step the untap-and-become-a-land trigger goes on the stack, and Bot1 kills him with
+# Lightning Bolt in response. The trigger resolves with nothing to untap or change (CR 400.7): the effect does not follow him to the graveyard
+# or onto a new object, and nothing else is on the battlefield changed.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Hydro-Man, Fluid Felon
+Mox Ruby
+Lightning Bolt
+Island x12
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Hydro-Man, Fluid Felon.Cast
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.End]
+? Stack.Count = 1
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Hydro-Man, Fluid Felon)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Hydro-Man, Fluid Felon; Lightning Bolt
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Hydro-Man, Fluid Felon; Lightning Bolt
+Bot1.Battlefield.Count = 3

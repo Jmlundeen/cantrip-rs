@@ -1,0 +1,53 @@
+# Hydro-Man, Fluid Felon: "Whenever you cast a blue spell, if Hydro-Man is a creature, he gets +1/+1 until end of turn." He is a creature
+# on the turn he is cast. Mox Ruby (a colorless spell) and Lightning Bolt (a red one) leave him a 2/2; Consider, a blue spell, makes him 3/3.
+# Each negative control sits beside the blue spell that proves the trigger can fire.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Sapphire
+Hydro-Man, Fluid Felon
+Mox Ruby
+Lightning Bolt
+Consider
+Island x10
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Hand.Hydro-Man, Fluid Felon.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Bot1.Battlefield.Hydro-Man, Fluid Felon.Power = 2
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Bot1.Battlefield.Hydro-Man, Fluid Felon.Power = 2
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Consider.Cast
+Bot1.Pass
+? Stack.Count = 2
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Hydro-Man, Fluid Felon.Power = 3
+? Bot1.Battlefield.Hydro-Man, Fluid Felon.Toughness = 3
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Hydro-Man, Fluid Felon.Power = 3
