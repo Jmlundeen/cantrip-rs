@@ -1,0 +1,37 @@
+# Fountainport's fourth ability. Turn 3: Island and Sol Ring give only three mana, so {4}, {T} is not offered; turn 5, with
+# a second Island, four mana pay for it (negative control, then the positive), and a Treasure token enters (CR 111.10a).
+# The mana ability is Fountainport's own {T}: Add {C}, which a tapped land cannot repeat (it taps for the Treasure instead).
+
+[Bot1 Deck]
+Island
+Sol Ring
+Fountainport
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Fountainport.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Sol Ring.Activate
+! Bot1.Battlefield.Fountainport.Activate(Ability: Treasure)
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Fountainport.Activate(Ability: Treasure)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Island; Island; Sol Ring; Fountainport; Treasure Token
+Bot1.Battlefield.Fountainport.Tapped = true
+Bot1.Life = 20
