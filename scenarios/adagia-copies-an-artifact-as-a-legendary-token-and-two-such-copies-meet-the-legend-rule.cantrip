@@ -1,0 +1,84 @@
+# Adagia, Windswept Bastion's 12+ ability (CR 721.2a): "Create a token that's a copy of target artifact or enchantment you
+# control, except it's legendary" (CR 707.2, 707.9b). Six counters from Lake-town Mariners on turn 1 are not enough: on turn 3
+# the ability is refused with Adagia untapped and four Moxes to pay {3}{W}; a second station makes twelve and it is there.
+# The token copies Mox Jet's printed values, not its tapped status (the Mox paid for the ability), and is legendary while
+# the Mox it copies is not (ruling: two permanents of the same name, only the token legendary, neither put into a graveyard).
+# In Bot1's upkeep on turn 5 the ability is refused - "activate only as a sorcery" - and in the main phase it copies Mox Jet
+# again: two legendary Mox Jet tokens, so the legend rule (CR 704.5j) puts one into the graveyard, where a token ceases to
+# exist (CR 704.5d), and the original Mox Jet stays.
+
+[Bot1 Deck]
+Adagia, Windswept Bastion
+Black Lotus
+Mox Sapphire
+Mox Emerald
+Mox Jet
+Mox Pearl
+Lake-town Mariners
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Adagia, Windswept Bastion.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Lake-town Mariners.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot1.Battlefield.Adagia, Windswept Bastion.Activate(Ability: Station)
+Bot1.Choose(Lake-town Mariners)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Adagia, Windswept Bastion.Counters.Charge = 6
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Adagia, Windswept Bastion.Activate(Ability: Create a token)
+Bot1.Battlefield.Adagia, Windswept Bastion.Activate(Ability: Station)
+Bot1.Choose(Lake-town Mariners)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Adagia, Windswept Bastion.Counters.Charge = 12
+Bot1.Battlefield.Adagia, Windswept Bastion.Activate(Mox Jet; Ability: Create a token)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mox Jet#2.Token = true
+? Bot1.Battlefield.Mox Jet#2.Supertypes = Legendary
+? Bot1.Battlefield.Mox Jet#2.Tapped = false
+? Bot1.Battlefield.Mox Jet#1.Supertypes = (absent)
+? Bot1.Battlefield.Mox Jet#1.Tapped = true
+[T5 Bot1.Upkeep]
+! Bot1.Battlefield.Adagia, Windswept Bastion.Activate(Ability: Create a token)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Adagia, Windswept Bastion.Activate(Mox Jet#1; Ability: Create a token)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Adagia, Windswept Bastion; Mox Sapphire; Mox Emerald; Mox Jet; Mox Jet; Mox Pearl; Lake-town Mariners
+Bot1.Battlefield.Mox Jet#1.Supertypes = (absent)
+Bot1.Battlefield.Mox Jet#2.Supertypes = Legendary
+Bot1.Battlefield.Mox Jet#2.Token = true
+Bot1.Battlefield.Adagia, Windswept Bastion.Counters.Charge = 12
+Bot1.Battlefield.Adagia, Windswept Bastion.Tapped = true
+Bot1.Graveyard = Black Lotus
+LeftBattlefield = Black Lotus (tapped); Mox Jet

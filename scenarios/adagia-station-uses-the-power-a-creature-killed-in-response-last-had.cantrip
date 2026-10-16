@@ -1,0 +1,50 @@
+# Adagia, Windswept Bastion's station (CR 702.184a) with the tapped creature gone before it resolves: "If that creature isn't
+# on the battlefield at that time, use its power as it last existed on the battlefield" (ruling 2025-07-25; CR 608.2h). Llanowar
+# Elves (printed 1/1) pays the cost, Berserk in response makes it 2/1, and Bot2's Lightning Bolt then kills it with the station
+# ability still on the stack: Adagia gets two counters, the power the Elves had as they died, not their printed one.
+
+[Bot1 Deck]
+Adagia, Windswept Bastion
+Mox Emerald
+Llanowar Elves
+Berserk
+Island x16
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Adagia, Windswept Bastion.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Adagia, Windswept Bastion.Activate(Ability: Station)
+Bot1.Choose(Llanowar Elves)
+Bot1.Hand.Berserk.Cast(Llanowar Elves)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves.Power = 2
+? Stack = Adagia, Windswept Bastion
+Bot1.Pass
+Bot2.Hand.Lightning Bolt.Cast(Llanowar Elves)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Llanowar Elves; Berserk
+? Stack = Adagia, Windswept Bastion
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Adagia, Windswept Bastion; Mox Emerald
+Bot1.Battlefield.Adagia, Windswept Bastion.Counters.Charge = 2
+Bot1.Graveyard = Llanowar Elves; Berserk
+Bot2.Graveyard = Lightning Bolt
