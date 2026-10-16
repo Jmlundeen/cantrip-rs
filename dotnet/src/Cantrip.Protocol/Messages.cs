@@ -158,6 +158,8 @@ public sealed class EventsMessage : ServerMessage
 [Union(27, typeof(CoinFlippedEvent))]
 [Union(28, typeof(TurnEndedEvent))]
 [Union(29, typeof(CardsLookedAtEvent))]
+[Union(30, typeof(ScriedEvent))]
+[Union(31, typeof(SurveilledEvent))]
 public abstract class GameEventView;
 
 /// <summary>The seat chosen at random decided who takes the first turn (CR 103.1).</summary>
@@ -207,6 +209,34 @@ public sealed class TurnEndedEvent : GameEventView
 {
     [Key(0)]
     public int Player { get; set; }
+}
+
+/// <summary>
+/// <see cref="Player"/> scried <see cref="Count"/> (CR 701.22): public; which cards went where is known to the scrier
+/// alone.
+/// </summary>
+[MessagePackObject]
+public sealed class ScriedEvent : GameEventView
+{
+    [Key(0)]
+    public int Player { get; set; }
+
+    [Key(1)]
+    public int Count { get; set; }
+}
+
+/// <summary>
+/// <see cref="Player"/> surveilled <see cref="Count"/> (CR 701.25): public; the cards put into the graveyard arrive as
+/// moves.
+/// </summary>
+[MessagePackObject]
+public sealed class SurveilledEvent : GameEventView
+{
+    [Key(0)]
+    public int Player { get; set; }
+
+    [Key(1)]
+    public int Count { get; set; }
 }
 
 /// <summary>A seat kept its opening hand (CR 103.5), of this many cards.</summary>

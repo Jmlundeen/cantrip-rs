@@ -343,9 +343,68 @@ public sealed class ScenarioPlayer
                 return;
             }
 
+            case CardsDistributedAnswer distributed:
+                await DistributeAsync(distributed, state);
+                return;
+
             default:
                 throw new NotDrivenException(expected.Answer?.GetType().Name ?? "nothing", state);
         }
+    }
+
+    /// <summary>
+    /// Cards looked at and placed (scry, surveil, Ponder): each card still to place is shown with a button per pile that takes
+    /// it, in the piles' order ("Top", "Bottom", "Graveyard"). "Top" puts the card on top of those already there, so that pile
+    /// is clicked from its lowest card up; every other pile adds at its end, so in order. Then Done.
+    /// </summary>
+    private async Task DistributeAsync(CardsDistributedAnswer distributed, TableState state)
+    {
+        if (distributed.Shuffle)
+        {
+            await ClickButtonStartingAsync("Shuffle instead");
+            return;
+        }
+
+        // The piles' buttons, in order, as the first card still to place offers them.
+        int first = distributed.Placements.SelectMany(pile => pile).Select(card => card.Value).FirstOrDefault();
+        List<string> piles = first == 0 ? [] : [.. ButtonsUnder(state, first).Select(button => button.Label)];
+        if (distributed.Placements.Any(pile => pile.Count > 0) && piles.Count != distributed.Placements.Count)
+        {
+            throw new NotDrivenException($"a placement into {distributed.Placements.Count} piles, under a card offering {piles.Count}", state);
+        }
+
+        for (int i = 0; i < distributed.Placements.Count; i++)
+        {
+            IEnumerable<ViewHandle> order = piles[i] == "Top" ? Enumerable.Reverse(distributed.Placements[i]) : distributed.Placements[i];
+            foreach (ViewHandle card in order)
+            {
+                TableState now = await _page.SettledAsync();
+                ControlState button = ButtonsUnder(now, card.Value).FirstOrDefault(b => b.Label == piles[i])
+                    ?? throw new NotDrivenException($"a \"{piles[i]}\" button under card #{card.Value}", now);
+                await _page.Page.Mouse.ClickAsync(button.X, button.Y);
+            }
+        }
+
+        await _page.SettledAsync();
+        await ClickButtonStartingAsync("Done");
+    }
+
+    /// <summary>
+    /// The buttons beneath a card still to place, left to right: those just below the row of cards to place that are nearer
+    /// its middle than any other card's of the row.
+    /// </summary>
+    private static List<ControlState> ButtonsUnder(TableState state, int handle)
+    {
+        CardState card = state.Cards.Where(c => c.Visible && c.Handle == handle).MaxBy(c => c.Y)
+            ?? throw new NotDrivenException($"card #{handle} to place, which is not in view", state);
+        List<CardState> row = [.. state.Cards.Where(c => c.Visible && Math.Abs(c.Y - card.Y) < 1f && Math.Abs(c.H - card.H) < 1f)];
+        return
+        [
+            .. state.Controls
+                .Where(c => c.Kind == "button" && c.Y > card.Y + (card.H / 2) && c.Y < card.Y + card.H)
+                .Where(c => row.MinBy(other => Math.Abs(other.X - c.X))?.Handle == handle)
+                .OrderBy(c => c.X),
+        ];
     }
 
     private async Task TakeAsync(TakeActionAnswer action, TableState state, string? line)

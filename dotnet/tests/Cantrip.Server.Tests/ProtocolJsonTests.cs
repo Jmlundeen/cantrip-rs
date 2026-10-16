@@ -95,6 +95,8 @@ public sealed class ProtocolJsonTests
         """{"$type":"HandKeptEvent","Player":1,"Cards":6}""",
         """{"$type":"CoinFlippedEvent","Player":2,"Won":false}""",
         """{"$type":"TurnEndedEvent","Player":1}""",
+        """{"$type":"ScriedEvent","Player":1,"Count":2}""",
+        """{"$type":"SurveilledEvent","Player":2,"Count":1}""",
         """{"$type":"AbilityResolvedEvent","Ability":8,"Source":3,"Controller":1,"First":40,"Targets":[{"Player":0,"Object":5}],"PowerToughness":[{"Object":5,"Power":2,"Toughness":2}]}""",
     ];
 

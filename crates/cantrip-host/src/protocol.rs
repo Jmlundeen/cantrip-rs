@@ -1390,7 +1390,7 @@ fn greedy_distribution(prompt: &DistributeCardsPrompt) -> Vec<Vec<ViewHandle>> {
 
 // --- Events (Messages.cs, GameEventView) ---
 
-/// Something that happened, as a viewer may be told it: one of 29 kinds, each the C# class of the
+/// Something that happened, as a viewer may be told it: one of 32 kinds, each the C# class of the
 /// same name.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(tag = "$type")]
@@ -1425,6 +1425,8 @@ pub enum GameEventView {
     CoinFlippedEvent(CoinFlippedEvent),
     TurnEndedEvent(TurnEndedEvent),
     CardsLookedAtEvent(CardsLookedAtEvent),
+    ScriedEvent(ScriedEvent),
+    SurveilledEvent(SurveilledEvent),
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -1614,6 +1616,22 @@ pub struct DieRolledEvent {
 #[serde(rename_all = "PascalCase")]
 pub struct TurnEndedEvent {
     pub player: i32,
+}
+
+/// `player` scried `count` (CR 701.22): told to every seat, the cards and where they went to nobody but the scrier.
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(rename_all = "PascalCase")]
+pub struct ScriedEvent {
+    pub player: i32,
+    pub count: i32,
+}
+
+/// `player` surveilled `count` (CR 701.25): the cards put into the graveyard arrive as moves.
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(rename_all = "PascalCase")]
+pub struct SurveilledEvent {
+    pub player: i32,
+    pub count: i32,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

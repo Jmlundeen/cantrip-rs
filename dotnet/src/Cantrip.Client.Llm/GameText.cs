@@ -348,6 +348,10 @@ public static class GameText
 
             DieRolledEvent die => $"{Seat(client, die.Player)} rolled a {die.Result} on a d{die.Sides}.",
 
+            ScriedEvent scried => $"{Seat(client, scried.Player)} scried {scried.Count}.",
+
+            SurveilledEvent surveilled => $"{Seat(client, surveilled.Player)} surveilled {surveilled.Count}.",
+
             CoinFlippedEvent flip => $"{Seat(client, flip.Player)} flipped a coin and {(flip.Won ? "won" : "lost")} the flip.",
 
             TurnEndedEvent ended => (ended.Player == client.Seat ? "Your" : $"{Seat(client, ended.Player)}'s")

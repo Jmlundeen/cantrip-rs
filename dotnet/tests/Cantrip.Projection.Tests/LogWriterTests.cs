@@ -59,6 +59,19 @@ public sealed class LogWriterTests
     }
 
     [Fact]
+    public void A_scry_and_a_surveil_are_read_out_with_their_number()
+    {
+        // CR 701.22, 701.25: the number the player was told to scry or surveil, whoever's it was.
+        Assert.Equal(
+            ["You scry 2.", "Bot 2 scries 1.", "You surveil 1.", "Bot 2 surveils 2."],
+            Lines(
+                new ScriedEvent { Player = Me, Count = 2 },
+                new ScriedEvent { Player = Rival, Count = 1 },
+                new SurveilledEvent { Player = Me, Count = 1 },
+                new SurveilledEvent { Player = Rival, Count = 2 }));
+    }
+
+    [Fact]
     public void A_turn_ended_by_an_effect_is_read_out_as_whose_turn_it_was()
     {
         // CR 724.1: Time Stop, Ultima and the like end the turn of the player whose turn it is, whoever cast them.

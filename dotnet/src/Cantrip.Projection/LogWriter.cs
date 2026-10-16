@@ -104,6 +104,11 @@ public static class LogWriter
             // CR 724.1: the stack is exiled (the lines after this one) and the turn goes straight to its cleanup step.
             TurnEndedEvent ended => $"{(ended.Player == seat ? "Your" : $"{NameOf(ended.Player)}'s")} turn ends.",
 
+            // CR 701.22, 701.25: told once the scry or surveil is done, so it follows the cards a surveil put away.
+            ScriedEvent scried => $"{Does(scried.Player, "scry", "scries")} {scried.Count}.",
+
+            SurveilledEvent surveilled => $"{Does(surveilled.Player, "surveil", "surveils")} {surveilled.Count}.",
+
             RandomPlayerChosenEvent chosen =>
                 $"{Does(chosen.Controller, "choose", "chooses")} {(chosen.SelectedPlayer == seat ? "you" : NameOf(chosen.SelectedPlayer))} at random" +
                 (chosen.Source.IsNone ? "." : $" for {Card(chosen.Source)}."),

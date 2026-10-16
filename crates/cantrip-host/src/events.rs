@@ -27,10 +27,11 @@
 //! | `DieRolled` (the result, modifiers applied)        | `DieRolledEvent`                                    |
 //! | `CoinFlipped`                                     | `CoinFlippedEvent`                                  |
 //! | `TurnEnded` (an effect ended the turn, CR 724.1)   | `TurnEndedEvent`                                    |
+//! | `Scried`, `Surveilled` (CR 701.22, 701.25)        | `ScriedEvent`, `SurveilledEvent` (the number)       |
 //! | the answers to the opening's questions            | `StartingPlayerChosenEvent`, `MulliganTakenEvent`, `HandKeptEvent` |
 //!
-//! Not told, because the engine has no event or state for it: untaps, shuffles (`LibraryShuffledEvent`), scry and
-//! surveil (`LibraryArrangedEvent`), cycling and discard-as-cost as such (they arrive as moves), extra phases,
+//! Not told, because the engine has no event or state for it: untaps, shuffles (`LibraryShuffledEvent`), where a scry
+//! put the cards (`LibraryArrangedEvent`; a surveil's arrive as moves), cycling and discard-as-cost as such (they arrive as moves), extra phases,
 //! day and night, a random player chosen (`ChosenAtRandom` is a bare index; the effect that chose says what), fizzling (`SpellFizzledEvent`), retractions (a cast given up is never
 //! published), counters other than lore, damage to players as such (life covers it), mana abilities, combat
 //! declarations as log lines (combat is in the view).
@@ -75,6 +76,10 @@ pub enum Proto {
     Coin { player: PlayerId, won: bool },
     /// An effect ended the turn of `player` (CR 724.1).
     TurnEnded { player: PlayerId },
+    /// `player` scried `count` (CR 701.22).
+    Scried { player: PlayerId, count: i32 },
+    /// `player` surveilled `count` (CR 701.25).
+    Surveilled { player: PlayerId, count: i32 },
 }
 
 /// The ability a stack item was put on the stack as, kept until it leaves.
@@ -199,6 +204,8 @@ impl Tracker {
             }
             Event::CoinFlipped { player, won } => out.push(Proto::Coin { player, won }),
             Event::TurnEnded { player } => out.push(Proto::TurnEnded { player }),
+            Event::Scried { player, count, .. } => out.push(Proto::Scried { player, count: i32::from(count) }),
+            Event::Surveilled { player, count, .. } => out.push(Proto::Surveilled { player, count: i32::from(count) }),
             _ => {}
         }
     }
@@ -502,6 +509,10 @@ impl Teller<'_> {
             Proto::Coin { player, won } => Some(GameEventView::CoinFlippedEvent(CoinFlippedEvent { player: seat(*player), won: *won })),
             Proto::Kept { player, cards } => Some(GameEventView::HandKeptEvent(HandKeptEvent { player: seat(*player), cards: *cards })),
             Proto::TurnEnded { player } => Some(GameEventView::TurnEndedEvent(TurnEndedEvent { player: seat(*player) })),
+            Proto::Scried { player, count } => Some(GameEventView::ScriedEvent(ScriedEvent { player: seat(*player), count: *count })),
+            Proto::Surveilled { player, count } => {
+                Some(GameEventView::SurveilledEvent(SurveilledEvent { player: seat(*player), count: *count }))
+            }
         }
     }
 }
