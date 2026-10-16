@@ -1,0 +1,37 @@
+# Bot1 casts Song of Totentanz with X = 1 and, with it on the stack, flashes in Lutri, the Spellchaser, whose enters trigger copies
+# it (CR 707.10). The copy keeps X = 1 (CR 707.2): it makes a Rat, and the original makes a second, so two Rats in all. Both
+# resolutions give haste to the creatures Bot1 controls as each resolves: Lutri, summoning sick, and the Rats.
+
+[Bot1 Deck]
+Mox Ruby
+Sol Ring
+Black Lotus
+Song of Totentanz
+Lutri, the Spellchaser
+Mountain x3
+Mountain x12
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Song of Totentanz.Cast(X: 1)
+Bot1.Hand.Lutri, the Spellchaser.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Rat#1.Keywords = CantBlock; Haste
+? Bot1.Battlefield.Rat#2.Keywords = CantBlock; Haste
+? Bot1.Battlefield.Lutri, the Spellchaser.Keywords = Flash; Haste
+
+[Expect]
+Turn = 1
+Bot1.Graveyard = Song of Totentanz; Black Lotus
+Bot1.Battlefield = Mox Ruby; Sol Ring; Lutri, the Spellchaser; Rat; Rat
