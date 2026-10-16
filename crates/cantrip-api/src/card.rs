@@ -1569,9 +1569,8 @@ pub struct CardTable {
     /// Which cards have a triggered ability that functions outside the battlefield, so the rest are never looked at
     /// there.
     pub anywhere: Vec<bool>,
-    /// Which cards have static abilities, and whether any does: the layers look for sources only when one might be.
+    /// Which cards have static abilities: the layers look for sources only among them.
     pub statics: Vec<bool>,
-    pub any_statics: bool,
     /// Whether any card has a static ability that functions from a graveyard, so graveyards are looked in at all.
     pub graveyard_statics: bool,
     /// Whether any card has a static ability that functions from exile (cipher's, CR 702.99a), so exile is looked in.
@@ -1643,7 +1642,6 @@ impl CardTable {
             .map(|c| c.abilities.iter().any(|a| matches!(a, AbilityDef::Triggered(t) if t.anywhere)))
             .collect();
         let statics: Vec<bool> = cards.iter().map(|c| c.statics.iter().any(|s| !s.own)).collect();
-        let any_statics = statics.iter().any(|&s| s);
         let graveyard_statics = cards.iter().any(|c| c.statics.iter().any(|s| s.from == ZoneKind::Graveyard));
         let exile_statics = cards.iter().any(|c| c.statics.iter().any(|s| s.from == ZoneKind::Exile));
         let play_rules: Vec<bool> = cards.iter().map(|c| !c.play_rules.is_empty()).collect();
@@ -1669,7 +1667,6 @@ impl CardTable {
             cards,
             anywhere,
             statics,
-            any_statics,
             graveyard_statics,
             exile_statics,
             play_rules,

@@ -930,11 +930,12 @@ pub fn create_tokens_worded(
             o.attached_to = entering.attach;
             o.attached_player = entering.attach_player;
         });
-        note_statics(cx, id);
         // A token copy of a planeswalker or a Saga enters with its loyalty or lore counter too.
         let mut with = *cx.s().obj(id);
         enters_with_intrinsic_counters(cx.cards(), &mut with);
         cx.st().update_obj(id, |o| o.counters = with.counters);
+        // Once every counter it enters with is on it, a hone counter among them (CR 122.1j).
+        note_statics(cx, id);
         cx.st().zone_push(Zone::BATTLEFIELD, id);
         events.push(match spell {
             Some(spell) => Event::ZoneChange { old: spell.object, new: id, from: Zone::STACK, to: Zone::BATTLEFIELD, reason: ZoneReason::Resolve },
