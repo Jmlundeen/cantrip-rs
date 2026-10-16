@@ -1,0 +1,59 @@
+# "Three or more Lesson cards in YOUR graveyard": Bot2's graveyard holds three Lessons (two Boomerang Basics discarded to
+# Faithless Looting, and Abandon Attachments) but Bot1's holds none, so Bot1's Accumulate Wisdom puts only one card of
+# the top three into its hand and the other two on the bottom.
+# Bot2 (turn 2): Moxen, Faithless Looting (draws Plains, Plains; discards both Boomerang Basics), Abandon Attachments
+# (discards Plains, draws Plains, Plains). Bot1 (turn 3): draws Forest, casts Accumulate Wisdom with two Islands.
+
+[Bot1 Deck]
+Island
+Island
+Accumulate Wisdom
+Plains
+Plains
+Plains
+Plains
+Forest
+Brainstorm
+Ancestral Recall
+Counterspell
+Swamp x9
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Faithless Looting
+Boomerang Basics
+Boomerang Basics
+Abandon Attachments
+Plains x13
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Faithless Looting.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Choose(Boomerang Basics; Boomerang Basics)
+Bot2.Hand.Abandon Attachments.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Choose(Plains)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Accumulate Wisdom.Cast
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Arrange(Brainstorm | Ancestral Recall; Counterspell)
+
+[Expect]
+Bot2.Graveyard = Abandon Attachments; Plains; Faithless Looting; Boomerang Basics; Boomerang Basics
+Bot1.Graveyard = Accumulate Wisdom
+Bot1.Hand = Plains; Plains; Plains; Plains; Forest; Brainstorm
+Bot1.Library = Swamp; Swamp; Swamp; Swamp; Swamp; Swamp; Swamp; Swamp; Swamp; Ancestral Recall; Counterspell
+Stack.Count = 0

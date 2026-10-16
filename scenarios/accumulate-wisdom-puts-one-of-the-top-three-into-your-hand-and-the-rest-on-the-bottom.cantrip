@@ -1,0 +1,35 @@
+# Accumulate Wisdom with no Lesson in the graveyard: look at the top three cards (Brainstorm, Ancestral Recall,
+# Counterspell), put one (Brainstorm) into the hand and the other two on the bottom of the library in the order the player
+# chooses (put on the bottom one after another in the order named, so Counterspell ends lowest). Cast on Bot1's second turn with two Islands, after drawing Forest, so the top three are the 9th-11th cards.
+
+[Bot1 Deck]
+Island
+Island
+Accumulate Wisdom
+Plains
+Plains
+Plains
+Plains
+Forest
+Brainstorm
+Ancestral Recall
+Counterspell
+Swamp x9
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Accumulate Wisdom.Cast
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Arrange(Brainstorm | Ancestral Recall; Counterspell)
+
+[Expect]
+Bot1.Graveyard = Accumulate Wisdom
+Bot1.Hand = Plains; Plains; Plains; Plains; Forest; Brainstorm
+Bot1.Library = Swamp; Swamp; Swamp; Swamp; Swamp; Swamp; Swamp; Swamp; Swamp; Ancestral Recall; Counterspell
+Stack.Count = 0

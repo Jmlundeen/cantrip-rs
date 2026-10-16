@@ -1,0 +1,44 @@
+# Two Lesson cards are in the graveyard (Abandon Attachments, which is itself a Lesson, and the Boomerang Basics it
+# discarded) while Accumulate Wisdom is on the stack: the graveyard is read as it resolves and the spell is still on the
+# stack, so it is not the third Lesson (CR 608.2c) and only ONE of the top three goes to the hand.
+# Abandon is paid with Mox Sapphire ({U/R}) and Mox Jet ({1}); Accumulate Wisdom with Island ({U}) and Mox Ruby ({1}).
+# Abandon draws Plains, Plains; Accumulate Wisdom then looks at Brainstorm, Ancestral Recall, Counterspell.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Abandon Attachments
+Boomerang Basics
+Accumulate Wisdom
+Plains
+Plains
+Brainstorm
+Ancestral Recall
+Counterspell
+Swamp x8
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Abandon Attachments.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Choose(Boomerang Basics)
+Bot1.Hand.Accumulate Wisdom.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Arrange(Brainstorm | Ancestral Recall; Counterspell)
+
+[Expect]
+Bot1.Graveyard = Accumulate Wisdom; Abandon Attachments; Boomerang Basics
+Bot1.Hand = Plains; Plains; Brainstorm
+Bot1.Library = Swamp; Swamp; Swamp; Swamp; Swamp; Swamp; Swamp; Swamp; Ancestral Recall; Counterspell
+Stack.Count = 0

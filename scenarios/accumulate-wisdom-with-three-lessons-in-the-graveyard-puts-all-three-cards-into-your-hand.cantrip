@@ -1,0 +1,55 @@
+# Three Lesson cards are in the graveyard (Accumulate Wisdom, Abandon Attachments and Boomerang Basics): "Put each of those
+# cards into your hand instead", so all three of the top three go to the hand and nothing goes to the bottom, and the
+# player is asked no question about it (`! Bot1.Arrange`).
+# Turn 1: Accumulate Wisdom (graveyard has no Lesson) takes the second Accumulate Wisdom, the Plains go to the bottom.
+# Abandon Attachments discards Boomerang Basics and draws Brainstorm and Ancestral Recall. Turn 3 (Bot1's second): draw
+# Forest, then the second Accumulate Wisdom with the Moxen's mana looks at Counterspell, Lightning Bolt, Dark Ritual.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Accumulate Wisdom
+Abandon Attachments
+Boomerang Basics
+Accumulate Wisdom
+Plains
+Plains
+Brainstorm
+Ancestral Recall
+Forest
+Counterspell
+Lightning Bolt
+Dark Ritual
+Swamp x4
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Accumulate Wisdom.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Arrange(Accumulate Wisdom | Plains; Plains)
+Bot1.Hand.Abandon Attachments.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Choose(Boomerang Basics)
+[T3 Bot1.Main1]
+Bot1.Hand.Accumulate Wisdom.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Arrange
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Accumulate Wisdom; Abandon Attachments; Boomerang Basics; Accumulate Wisdom
+Bot1.Hand = Brainstorm; Ancestral Recall; Forest; Counterspell; Lightning Bolt; Dark Ritual
+Bot1.Library = Swamp; Swamp; Swamp; Swamp; Plains; Plains
+Stack.Count = 0

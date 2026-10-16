@@ -1,0 +1,32 @@
+# A library of fewer than three cards: look at as many as there are (CR 609.3), put one into the hand and the other on the
+# bottom of the (now one-card) library. Bot1's library holds only Brainstorm and Ancestral Recall when it casts Accumulate
+# Wisdom on turn 1 (Island and Mox Ruby pay); Brainstorm is taken.
+
+[Bot1 Deck]
+Island
+Mox Ruby
+Accumulate Wisdom
+Plains
+Plains
+Plains
+Plains
+Brainstorm
+Ancestral Recall
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Accumulate Wisdom.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Arrange(Brainstorm | Ancestral Recall)
+
+[Expect]
+Bot1.Graveyard = Accumulate Wisdom
+Bot1.Hand = Plains; Plains; Plains; Plains; Brainstorm
+Bot1.Library = Ancestral Recall
+Stack.Count = 0
