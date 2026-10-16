@@ -1,0 +1,52 @@
+# Known bug: keyword counters are applied before every effect in layer 6 (layers.rs), so "loses all abilities" wipes a
+# lifelink counter put on the permanent afterwards. Each counter has its own timestamp (CR 613.7c) and layer 6 applies in
+# timestamp order (CR 613.7), so a counter put on after the effect gives its keyword (the Abigale, Eloquent First-Year
+# ruling: "If the affected creature gains an ability after Abigale's last ability resolves, it will keep that ability").
+# Oko's +1 turns Bot1's Mox Ruby into a 3/3 Elk creature that loses all abilities; afterwards Arwen's ability puts a +1/+1
+# counter and a lifelink counter on it and it gains indestructible until end of turn (a later effect, so it also stays).
+# Bot1 turn 1: Black Lotus (GGG), Mox Emerald, Mox Sapphire, Mox Ruby and Mox Pearl pay Arwen {1}{G}{W}, Oko {1}{G}{U}
+# and Arwen's {1}.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Oko, Thief of Crowns
+Arwen, Mortal Queen
+Forest x13
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Arwen, Mortal Queen.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot1.Hand.Oko, Thief of Crowns.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot1.Battlefield.Oko, Thief of Crowns.Activate(Ability: Elk; Mox Ruby)
+Bot1.Pass
+Bot1.Battlefield.Arwen, Mortal Queen.Activate(Mox Ruby)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Mox Ruby.Types = Creature
+Bot1.Battlefield.Mox Ruby.Counters.Lifelink = 1
+Bot1.Battlefield.Mox Ruby.Keywords = Indestructible; Lifelink

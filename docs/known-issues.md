@@ -41,6 +41,8 @@ keeps it).
 | [KI-4](#ki-4-scenarios-waiting-on-cards) | Scenarios waiting on cards the engine does not have | Low | Open |
 | [KI-5](#ki-5-a-spell-that-has-left-the-stack-is-judged-by-its-printed-keywords) | A spell that has left the stack is judged by its printed characteristics | Low | Suspected |
 | [KI-9](#ki-9-a-copy-of-a-modal-spell-cannot-be-given-new-targets) | A copy of a modal spell cannot be given new targets | Medium | Open |
+| [KI-21](#ki-21-a-keyword-counter-put-on-after-an-effect-took-its-abilities-away-gives-nothing) | A keyword counter put on after "loses all abilities" gives nothing | Medium | Open |
+| [KI-22](#ki-22-an-ability-that-transforms-its-source-ignores-whether-it-has-transformed-since) | An ability that transforms its source ignores a transform since it was put on the stack | Low | Open |
 
 ## Issues
 
@@ -174,3 +176,38 @@ caption, or the cost on each candidate as it is pointed at.
 
 **Scenarios.**
 - [`scenarios/dragonfire-blade-equip-shows-its-reduced-cost-and-the-granted-hexproof-in-the-browser.cantrip`](../scenarios/dragonfire-blade-equip-shows-its-reduced-cost-and-the-granted-hexproof-in-the-browser.cantrip) - the menu row of a two-action card (Shadowspear) and the payment of a one-action card (the Blade).
+
+### KI-21: A keyword counter put on after an effect took its abilities away gives nothing
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Medium | Open | engine | 2026-10-16, reading the layers for Abigale, Eloquent First-Year |
+
+**Notes.** A keyword counter on a permanent gives it the keyword in layer 6 (CR 122.1b, 613.1f), and each counter has its own
+timestamp (CR 613.7c), so an effect that makes the permanent lose all abilities removes the keyword of a counter put on before
+it and not of one put on after. `counters` in `crates/cantrip-rules/src/layers.rs` applies every keyword counter first, "since
+before any effect that took its abilities away", so a counter put on later (Abigale's flying, first strike and lifelink counters
+on the creature that just lost all abilities; Arwen's lifelink counter on an Oko Elk) is wiped. A fix gives counters a timestamp
+(`Obj` keeps none per kind: see `counters`) and applies them in layer 6 in timestamp order with the effects. Abigale also needs
+first strike counters (`CounterKind::KEYWORDS` has flying, lifelink, indestructible and hexproof only; CR 122.1b lists fifteen).
+
+**Scenarios.**
+- [`scenarios/a-lifelink-counter-put-after-loses-all-abilities-keeps-lifelink.cantrip`](../scenarios/a-lifelink-counter-put-after-loses-all-abilities-keeps-lifelink.cantrip) - an Oko Elk with a lifelink counter put on afterwards has no lifelink (marked `# Known bug`).
+
+### KI-22: An ability that transforms its source ignores whether it has transformed since
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Open | engine | 2026-10-16, Aang, at the Crossroads and Temple of the Dead |
+
+**Notes.** "If an activated or triggered ability of a permanent ... tries to transform it, the permanent does so only if it
+hasn't transformed or converted since the ability was put onto the stack. If a delayed triggered ability ... tries to transform
+that permanent, the permanent does so only if it hasn't transformed or converted since that delayed triggered ability was
+created" (CR 701.27f, 701.28e). `ops::transform` (`crates/cantrip-rules/src/ops.rs`) turns the permanent over whenever it is
+asked, and neither a stack item nor a `Delayed` record keeps the point in the history it was made at. Aang, at the Crossroads
+(its delayed "transform Aang at the beginning of the next upkeep", ruling 2025-10-02: it won't transform back if it already
+transformed) waits on this and was not added; Norman Osborn, Temple of the Dead and Aang, Swift Savior transform through
+`effects::transform_self` and are exact except when something else transforms the permanent in response. A fix stores the history
+head in the stack item and in `Delayed` and makes `Game::transform` take it.
+
+**Scenarios.** None yet: no implemented card can transform another permanent in response to one of these abilities.
