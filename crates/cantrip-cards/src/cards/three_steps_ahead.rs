@@ -3,14 +3,6 @@ use cantrip_mechanics::spree;
 use cantrip_mechanics::{counter_target, discard_chosen, targets};
 use cantrip_oracle as oracle;
 
-fn artifact_or_creature_you_control(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    (targets::PERMANENT.filter)(q, asker, t)
-        && matches!(t, Target::Object(id) if q.controller(id) == asker.controller && {
-            let chars = q.chars(id);
-            chars.is(CardType::Artifact) || chars.is(CardType::Creature)
-        })
-}
-
 /// Counter target spell.
 fn counter_spell(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     counter_target(g, item, 0);
@@ -29,7 +21,7 @@ const MODES: &[ModeDef] = &[
         .targets(&[targets::SPELL])
         .cost(mana("{1}{U}")),
     mode(cantrip_mechanics::copy::create_token_copy_of_target, "+ {3} — Create a token that's a copy of target artifact or creature you control.")
-        .targets(&[target(artifact_or_creature_you_control)])
+        .targets(&[targets::ARTIFACT_OR_CREATURE_YOU_CONTROL])
         .cost(mana("{3}")),
     mode(loot, "+ {2} — Draw two cards, then discard a card.")
         .cost(mana("{2}")),

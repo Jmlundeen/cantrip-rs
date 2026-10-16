@@ -29,10 +29,6 @@ fn elk(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-fn artifact_or_creature_you_control(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    artifact_or_creature(q, asker, t) && matches!(t, Target::Object(id) if q.controller(id) == asker.controller)
-}
-
 fn small_creature_an_opponent_controls(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     (targets::CREATURE_AN_OPPONENT_CONTROLS.filter)(q, asker, t)
         && matches!(t, Target::Object(id) if q.chars(id).power.unwrap_or(0) <= 3)
@@ -57,7 +53,7 @@ pub static CARD: CardDef = CardDef {
             .targets(&[target(artifact_or_creature)]),
         ability(loyalty(-5), exchange, "\u{2212}5: Exchange control of target artifact or creature you control and target creature an opponent controls with power 3 or less.")
             .targets(&[
-                target(artifact_or_creature_you_control),
+                targets::ARTIFACT_OR_CREATURE_YOU_CONTROL,
                 target(small_creature_an_opponent_controls),
             ]),
     ],

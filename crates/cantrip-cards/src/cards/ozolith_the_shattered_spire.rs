@@ -14,13 +14,6 @@ fn apply(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
     plus_one_counters_apply(proposal);
 }
 
-fn artifact_or_creature_you_control(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    matches!(t, Target::Object(id) if targets::permanent(q, id) && q.controller(id) == asker.controller && {
-        let c = q.chars(id);
-        c.is(CardType::Artifact) || c.is(CardType::Creature)
-    })
-}
-
 fn put_counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(Target::Object(permanent)) = item.targets().first().copied() {
         g.add_counters(permanent, CounterKind::PlusOne, 1);
@@ -32,7 +25,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         ability(cost("{1}{G}, {T}"), put_counter, "{1}{G}, {T}: Put a +1/+1 counter on target artifact or creature you control. Activate only as a sorcery.")
             .sorcery_speed()
-            .targets(&[target(artifact_or_creature_you_control)]),
+            .targets(&[targets::ARTIFACT_OR_CREATURE_YOU_CONTROL]),
         cycling(mana("{2}"), "Cycling {2} ({2}, Discard this card: Draw a card.)"),
     ],
     replacements: &[replacement(ReplacementKind::Counters, applies, apply, "puts one more +1/+1 counter")],

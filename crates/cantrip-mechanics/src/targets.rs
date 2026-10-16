@@ -200,8 +200,18 @@ fn noncreature_spell_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     spell_filter(q, asker, t) && matches!(t, Target::Object(id) if !q.chars(id).is(CardType::Creature))
 }
 
+fn artifact_or_creature_you_control_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    matches!(t, Target::Object(id) if on_battlefield(q, id) && q.controller(id) == asker.controller && {
+        let c = q.chars(id);
+        c.is(CardType::Artifact) || c.is(CardType::Creature)
+    })
+}
+
 /// "Target artifact" (CR 115.1). Abrade and Embereth Shieldbreaker print it.
 pub const ARTIFACT: TargetSpec = target(artifact_filter);
+/// "Target artifact or creature you control" (CR 115.1, 205.2a). Concerted Care, Oko, Thief of Crowns (the permanent it exchanges),
+/// Ozolith, the Shattered Spire and Three Steps Ahead print it.
+pub const ARTIFACT_OR_CREATURE_YOU_CONTROL: TargetSpec = target(artifact_or_creature_you_control_filter);
 /// "Target artifact or enchantment". Disenchant and Cathar Commando print it.
 pub const ARTIFACT_OR_ENCHANTMENT: TargetSpec = target(artifact_or_enchantment_filter);
 /// "Target permanent". Alpha Deathclaw and Argentum Armor print it.
