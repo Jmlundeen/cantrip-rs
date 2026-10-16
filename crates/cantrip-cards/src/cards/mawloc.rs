@@ -7,7 +7,7 @@ use cantrip_oracle as oracle;
 
 /// It fights up to one target creature an opponent controls. If that creature would die this turn, exile it instead. The
 /// replacement is the ability's own effect on that creature, made whether or not the fight happens; with Mawloc no longer
-/// a creature on the battlefield, neither fights (CR 701.12b).
+/// a creature on the battlefield, neither fights (CR 701.14b).
 fn terror_from_the_deep(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if item.target_count == 0 || !g.target_legal(item, 0) {
         return Ok(());

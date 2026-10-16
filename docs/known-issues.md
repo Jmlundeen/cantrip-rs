@@ -213,3 +213,17 @@ transformed) waits on this and was not added; Norman Osborn, Temple of the Dead 
 head in the stack item and in `Delayed` and makes `Game::transform` take it.
 
 **Scenarios.** None yet: no implemented card can transform another permanent in response to one of these abilities.
+
+### KI-23: A creature fighting itself (CR 701.14c) is implemented but no scenario can reach it
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Unexercised | engine | 2026-10-16, review of Bushwhack |
+
+**Notes.** `ops::fight` makes a creature that fights itself deal damage to itself equal to twice its power (CR 701.14c), and
+the two damages of an ordinary fight are one simultaneous `damage_together`. No card in the engine can name one creature for
+both fighters (Bushwhack's targets are a creature you control and a creature you don't; Mawloc and Wolverine say "other"), so
+only the simultaneous damage is covered, by the fight scenarios. The day a card can fight itself it needs a scenario, and this
+entry is deleted.
+
+**Scenarios.** none yet.

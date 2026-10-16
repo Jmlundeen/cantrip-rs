@@ -1928,21 +1928,25 @@ pub fn saddle(cx: &mut Cx, id: ObjectId) {
     cx.st().update_obj(id, |o| o.marks.saddled_turn = turn);
 }
 
-/// Two creatures fight (CR 701.12a): each deals damage equal to its power to the other, at once. A creature does not
-/// fight itself (CR 701.12c), and nothing happens unless both are creatures on the battlefield (CR 701.12b).
+/// Two creatures fight (CR 701.14a): each deals damage equal to its power to the other, at once, as one event (CR 120.2;
+/// not combat damage, CR 701.14d). A creature that fights itself deals damage to itself equal to twice its power (CR
+/// 701.14c). Nothing happens unless both are creatures on the battlefield (CR 701.14b).
 pub fn fight(cx: &mut Cx, first: ObjectId, second: ObjectId) {
     let fights = |cx: &Cx, id: ObjectId| {
         live(cx.s(), id)
             && cx.s().obj(id).zone.is(ZoneKind::Battlefield)
             && layers::chars(cx.cards(), cx.s(), id).is(CardType::Creature)
     };
-    if first == second || !fights(cx, first) || !fights(cx, second) {
+    if !fights(cx, first) || !fights(cx, second) {
         return;
     }
     let power = |cx: &Cx, id: ObjectId| layers::chars(cx.cards(), cx.s(), id).power.unwrap_or(0).max(0) as u16;
     let (a, b) = (power(cx, first), power(cx, second));
-    damage(cx, first, Target::Object(second), a, false);
-    damage(cx, second, Target::Object(first), b, false);
+    if first == second {
+        damage(cx, first, Target::Object(first), a.saturating_mul(2), false);
+        return;
+    }
+    damage_together(cx, &[(first, Target::Object(second), a), (second, Target::Object(first), b)]);
 }
 
 /// Creates tokens tapped and attacking (CR 508.4): they enter together, then are attacking `defender` without having

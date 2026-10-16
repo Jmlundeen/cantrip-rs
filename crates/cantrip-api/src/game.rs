@@ -511,8 +511,9 @@ pub trait Game: Query {
     fn monstrosity(&mut self, permanent: ObjectId, counters: i16);
     /// A creature becomes saddled until end of turn (CR 702.171b).
     fn become_saddled(&mut self, permanent: ObjectId);
-    /// Two creatures fight (CR 701.12a): each deals damage equal to its power to the other. Nothing happens unless both
-    /// are creatures on the battlefield (CR 701.12b).
+    /// Two creatures fight (CR 701.14a): each deals damage equal to its power to the other, at once; one that fights
+    /// itself deals twice its power to itself (CR 701.14c). Nothing happens unless both are creatures on the battlefield
+    /// (CR 701.14b).
     fn fight(&mut self, first: ObjectId, second: ObjectId);
     /// Creates tokens that enter tapped and attacking `defender` (CR 508.4): attacking, but never declared as
     /// attackers, so nothing that watches attackers being declared sees them. They are put onto the battlefield

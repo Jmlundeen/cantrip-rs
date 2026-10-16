@@ -7,7 +7,7 @@ fn other_creature(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     matches!(t, Target::Object(id) if id != asker.source) && (targets::CREATURE.filter)(q, asker, t)
 }
 
-/// "He fights up to one other target creature" (CR 701.12). A Wolverine that left and came back is a new object, not
+/// "He fights up to one other target creature" (CR 701.14). A Wolverine that left and came back is a new object, not
 /// "he" (CR 400.7), and fights nothing: `fight` checks that both are still creatures on the battlefield.
 fn fight(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(other) = targets::object(g, item, 0) {
