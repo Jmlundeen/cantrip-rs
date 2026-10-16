@@ -3,15 +3,6 @@ use cantrip_mechanics::targets;
 use cantrip_mechanics::triggers;
 use cantrip_oracle as oracle;
 
-/// "At the beginning of your draw step, if this artifact is tapped" (CR 603.4): checked as the step begins and again as
-/// the ability resolves.
-fn your_draw_step(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
-    match event {
-        Event::StepBegan { step: Step::Draw } if q.state().turn.active == q.controller(source) => Fired::PLAIN,
-        _ => None,
-    }
-}
-
 fn is_tapped(q: &dyn Query, asker: &Asker) -> bool {
     q.obj(asker.source).tapped
 }
@@ -40,7 +31,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         mana_ability(TAP, add_n(Mana::C, 3), "{T}: Add {C}{C}{C}."),
         triggered(triggers::YOUR_UPKEEP, pay_to_untap, "At the beginning of your upkeep, you may pay {4}. If you do, untap this artifact."),
-        triggered(when(EventMask::STEP_BEGAN, your_draw_step), burn, "At the beginning of your draw step, if this artifact is tapped, it deals 1 damage to you.")
+        triggered(triggers::YOUR_DRAW_STEP, burn, "At the beginning of your draw step, if this artifact is tapped, it deals 1 damage to you.")
             .condition(is_tapped),
     ],
     ..oracle::MANA_VAULT
