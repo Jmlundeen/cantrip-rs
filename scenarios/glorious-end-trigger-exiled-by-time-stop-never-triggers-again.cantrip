@@ -1,0 +1,54 @@
+# Glorious End cast on Bot1's own turn 1 ends it, and its "at the beginning of your next end step, you lose the game" waits
+# for Bot1's next end step: not turn 1's, which is skipped (CR 724.1e), but turn 3's. There the ability triggers and is put
+# on the stack, and Bot1 answers it with Time Stop, which exiles it with everything else on the stack (CR 724.1b). A
+# delayed ability triggers only once (CR 603.7c): Bot1 does not lose then, nor at its end step on turn 5.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Sol Ring
+Glorious End
+Time Stop
+Island
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Glorious End.Cast
+[T2 Bot2.Upkeep]
+? Exile = Glorious End
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T3 Bot1.End]
+? Stack.Count = 1
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Time Stop.Cast
+[T4 Bot2.Upkeep]
+? Result = InProgress
+[T5 Bot1.Main2]
+[T6 Bot2.Upkeep]
+
+[Expect]
+Turn = 6
+Result = InProgress
+Bot1.Life = 20
+Exile = Glorious End; Time Stop

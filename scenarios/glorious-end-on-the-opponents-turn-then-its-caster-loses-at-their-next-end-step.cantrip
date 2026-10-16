@@ -1,0 +1,39 @@
+# Glorious End answers Bot2's Lightning Bolt on Bot2's turn 2: the turn ends (CR 724.1), the Bolt is exiled with Glorious
+# End (724.1b), and Bot1 stays at 20. The spell's next instruction still happens after it has left the stack: "at the
+# beginning of your next end step, you lose the game" is set up for Bot1, whose next end step is on its own turn 3. Bot1
+# is still in the game in that turn's second main phase, and loses as its end step begins (CR 603.7, 104.3e).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Glorious End
+Mountain x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Glorious End.Cast
+[T3 Bot1.Main2]
+? Result = InProgress
+? Bot1.Life = 20
+? Exile = Lightning Bolt; Glorious End
+[T3 Bot1.End]
+
+[Expect]
+Turn = 3
+Result = Bot2 won
+Bot1.Status = Lost

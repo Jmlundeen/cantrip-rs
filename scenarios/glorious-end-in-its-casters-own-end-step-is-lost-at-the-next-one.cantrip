@@ -1,0 +1,34 @@
+# Glorious End cast in Bot1's own end step: that end step has already begun, so "your next end step" is the one of Bot1's
+# next turn (CR 603.7, 513). The turn ends at once (CR 724.1); Bot1 is still in the game through turn 2 and turn 3's second
+# main phase, and loses as turn 3's end step begins.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Glorious End
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+[T1 Bot1.End]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Glorious End.Cast
+[T2 Bot2.Upkeep]
+? Result = InProgress
+? Exile = Glorious End
+[T3 Bot1.Main2]
+? Result = InProgress
+[T3 Bot1.End]
+
+[Expect]
+Turn = 3
+Result = Bot2 won
+Bot1.Status = Lost
