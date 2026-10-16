@@ -1,0 +1,61 @@
+# Fervent Champion: "Equip abilities you activate that target this creature cost {3} less to activate" - Colossus
+# Hammer's Equip {8} targeting it costs {5}, paid exactly from the pool (CR 601.2c, 601.2f, 602.2b). "Whenever this
+# creature attacks, another target attacking Knight you control gets +1/+0 until end of turn": attacking with the
+# Champion, two Knights of Grace and Ornithopter, neither the Champion itself ("another") nor the Ornithopter (no
+# Knight) is a candidate; a Knight of Grace is, and deals 3. The Champion, 11/11 with the Hammer, has haste and first
+# strike: 11 + 3 + 2 + 0 damage.
+
+[Bot1 Deck]
+Mountain
+Sol Ring
+Colossus Hammer
+Ornithopter
+Mox Pearl
+Knight of Grace
+Black Lotus
+Knight of Grace
+Fervent Champion
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Colossus Hammer.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Knight of Grace.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Knight of Grace.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Fervent Champion.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+? Bot1.Mana = {U}{U}{U}{C}{C}
+Bot1.Battlefield.Colossus Hammer.Activate(Fervent Champion)
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Attack(Fervent Champion > Bot2; Knight of Grace#1 > Bot2; Knight of Grace#2 > Bot2; Ornithopter > Bot2)
+! Bot1.Target(Fervent Champion)
+! Bot1.Target(Ornithopter)
+Bot1.Target(Knight of Grace#1)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Colossus Hammer.AttachedTo = Fervent Champion
+Bot1.Battlefield.Fervent Champion.Power = 11
+Bot1.Battlefield.Fervent Champion.Keywords = FirstStrike; Haste
+Bot1.Battlefield.Mox Pearl.Tapped = false
+Bot2.Life = 4

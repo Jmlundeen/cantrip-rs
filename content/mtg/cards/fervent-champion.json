@@ -1,0 +1,12 @@
+{
+  "name": "Fervent Champion",
+  "manaCost": "{R}",
+  "type": "Creature — Human Knight",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "First strike, haste\nWhenever this creature attacks, another target attacking Knight you control gets +1/+0 until end of turn.\nEquip abilities you activate that target this creature cost {3} less to activate.",
+  "keywords": [
+    "FirstStrike",
+    "Haste"
+  ]
+}

@@ -1,0 +1,52 @@
+# Helitrooper, Fervent Champion and Knight of Grace attack. Helitrooper's trigger targets the Knight ("another target
+# attacking creature"; the Champion was the other candidate), and so does the Champion's ("another target attacking
+# Knight you control", the Knight its only candidate). Bot2 bolts the Knight in response: both triggers find their only
+# target gone and do nothing (CR 608.2b). The Champion (1/1, first strike) and Helitrooper (1/2, flying) deal 2.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Ruby
+Mox Jet
+Sol Ring
+Knight of Grace
+Helitrooper
+Fervent Champion
+Island x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Knight of Grace.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Helitrooper.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Fervent Champion.Cast
+Bot1.Pass
+Bot1.Attack(Helitrooper > Bot2; Fervent Champion > Bot2; Knight of Grace > Bot2)
+Bot1.Target(Knight of Grace)
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Knight of Grace)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Knight of Grace
+Bot1.Battlefield.Fervent Champion.Power = 1
+Bot1.Battlefield.Fervent Champion.Keywords = FirstStrike; Haste
+Bot2.Life = 18
