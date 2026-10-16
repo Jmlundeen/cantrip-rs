@@ -1,0 +1,85 @@
+# "Players can't cast spells from graveyards or activate abilities of cards in graveyards" (CR 101.2, 601.3, 602.5): every
+# player, its controller too. Bot1 casts Ashes of the Abhorrent turn 1.
+# - Turn 2: Bot2 casts Faithless Looting from its hand, discarding Seasoned Pyromancer; with six mana open it is refused the
+#   Looting's flashback and the Pyromancer's "{3}{R}{R}, Exile this card from your graveyard" ability.
+# - Turn 3: Bot1, Ashes' controller, casts its own Looting from the hand and is refused its flashback, Black Lotus open.
+# - Turn 4: Bot2 Disenchants Ashes and then activates the Pyromancer from its graveyard: two Elementals, the control.
+# - Turns 5 and 6: Bot1 and Bot2 flash back their Lootings, the controls for the flashbacks.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Ashes of the Abhorrent
+Mountain
+Faithless Looting
+Black Lotus
+Plains
+Plains x10
+
+[Bot2 Deck]
+Mountain
+Black Lotus
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Mox Pearl
+Faithless Looting
+Disenchant
+Seasoned Pyromancer
+Island
+Mountain
+Island x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ashes of the Abhorrent.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Faithless Looting.Cast
+Bot2.Choose(Seasoned Pyromancer; Island)
+! Bot2.Graveyard.Faithless Looting.Cast
+! Bot2.Graveyard.Seasoned Pyromancer.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Plains; Plains)
+Bot1.Hand.Black Lotus.Cast
+[T3 Bot1.Main2]
+! Bot1.Graveyard.Faithless Looting.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Disenchant.Cast(Ashes of the Abhorrent)
+[T4 Bot2.Main2]
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Graveyard.Seasoned Pyromancer.Activate
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Graveyard.Faithless Looting.Cast(Ability: Flashback)
+Bot1.Choose(Plains; Plains)
+[T6 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mountain#2.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Graveyard.Faithless Looting.Cast(Ability: Flashback)
+
+[Expect]
+Turn = 6
+Exile = Seasoned Pyromancer; Faithless Looting; Faithless Looting
+Bot2.Battlefield.Elemental#2.Power = 1
+Bot1.Life = 20
+Bot2.Life = 20

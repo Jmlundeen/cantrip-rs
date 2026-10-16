@@ -1,0 +1,63 @@
+# "Whenever a creature dies, you gain 1 life" - any creature, anyone's (CR 700.4). Bot1 casts Ashes of the Abhorrent and
+# Giver of Runes turn 1. Turn 2, Bot2 Lightning Bolts the Giver: Bot1 gains 1 (21). Turn 3, Bot1's Engineered Explosives
+# with two charge counters destroys each nonland permanent with mana value 2: Ashes itself and Bot2's Snapcaster Mage, at
+# once. Ashes' ability is a leaves-the-battlefield ability that looks back (CR 603.10a; its ruling), so the Snapcaster dying
+# with it still gains Bot1 1 life (22).
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Ashes of the Abhorrent
+Giver of Runes
+Mountain
+Engineered Explosives
+Mox Pearl
+Mox Ruby
+Plains x10
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Ruby
+Snapcaster Mage
+Lightning Bolt
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Ashes of the Abhorrent.Cast
+Bot1.Hand.Giver of Runes.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Snapcaster Mage.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Giver of Runes)
+[T2 Bot2.Main2]
+? Bot1.Life = 21
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Engineered Explosives.Cast(X: 2)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Engineered Explosives.Counters.Charge = 2
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Engineered Explosives.Activate
+
+[Expect]
+Turn = 3
+Bot1.Life = 22
+Bot2.Life = 20
+Bot1.Graveyard = Ashes of the Abhorrent; Engineered Explosives; Giver of Runes; Black Lotus
+Bot2.Graveyard = Snapcaster Mage; Lightning Bolt
