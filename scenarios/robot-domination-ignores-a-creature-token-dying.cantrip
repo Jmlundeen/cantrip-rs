@@ -1,0 +1,53 @@
+# Robot Domination counts creature cards put into your graveyard, and a token is not a card (CR 111.1): Bot1 makes two
+# Spirit tokens with Lingering Souls and Lightning Bolts one of them. It dies - it goes to the graveyard and then ceases to
+# exist (CR 111.7, 704.5d) - and Robot Domination does not trigger: no card drawn, no life lost, no plan counter.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Robot Domination
+Mox Pearl
+Mox Emerald
+Mox Sapphire
+Lingering Souls
+Mox Ruby
+Lightning Bolt
+Island x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Robot Domination.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Lingering Souls.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Spirit#1)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield.Robot Domination.Counters.Plan = (absent)
+Bot1.Battlefield = Mox Jet; Robot Domination; Mox Pearl; Mox Emerald; Mox Sapphire; Mox Ruby; Spirit
+Bot1.Battlefield.Spirit.Token = true
+Bot1.Library.Count = 11

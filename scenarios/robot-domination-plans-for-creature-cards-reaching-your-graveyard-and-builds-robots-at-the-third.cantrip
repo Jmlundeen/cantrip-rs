@@ -1,0 +1,84 @@
+# Robot Domination: "Whenever one or more creature cards are put into your graveyard from anywhere, you draw a card, lose 1
+# life, and put a plan counter on this enchantment. When the third plan counter is put on this enchantment, sacrifice it and
+# create three 2/2 colorless Robot Villain artifact creature tokens." Bot1's first Thought Scour mills two Ornithopters into
+# Bot2's graveyard - not Bot1's: nothing. Its second mills an Ornithopter and an Island from its own library: one trigger
+# (CR 603.2c) - a card, 19 life, a plan counter. On turn 3 Bot1 Lightning Bolts its own Ornithopter, a creature card going
+# to its graveyard from the battlefield: the second. Its third Thought Scour mills two Ornithopters at once: the third
+# trigger, the third plan counter, and the enchantment is sacrificed for three Robot Villains.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Robot Domination
+Mox Sapphire
+Thought Scour
+Thought Scour
+Island
+Ornithopter
+Ornithopter
+Island
+Mountain
+Lightning Bolt
+Thought Scour
+Island
+Ornithopter
+Ornithopter
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x7
+Ornithopter
+Ornithopter
+Island x11
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Robot Domination.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Thought Scour.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Graveyard = Ornithopter; Ornithopter
+? Bot1.Life = 20
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Thought Scour.Cast(Bot1)
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Robot Domination.Counters.Plan = 1
+? Bot1.Life = 19
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Robot Domination.Counters.Plan = 2
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Thought Scour.Cast(Bot1)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 17
+Bot1.Graveyard = Robot Domination; Thought Scour; Ornithopter; Ornithopter; Ornithopter; Lightning Bolt; Thought Scour; Island; Ornithopter; Thought Scour; Black Lotus
+Bot1.Battlefield = Mox Jet; Mox Sapphire; Island; Mountain; Robot Villain; Robot Villain; Robot Villain
+Bot1.Battlefield.Robot Villain#1.Token = true
+Bot1.Battlefield.Robot Villain#1.Power = 2
+Bot1.Battlefield.Robot Villain#1.Toughness = 2
+Bot1.Battlefield.Robot Villain#1.Types = Artifact; Creature
+Bot1.Battlefield.Robot Villain#1.Subtypes = Robot; Villain
+Bot1.Battlefield.Robot Villain#1.Colors = (absent)
