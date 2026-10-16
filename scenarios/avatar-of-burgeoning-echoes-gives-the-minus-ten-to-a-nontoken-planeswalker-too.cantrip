@@ -1,0 +1,68 @@
+# "Planeswalkers you control have '[-10]: ...'" is not limited to the Jace token: Bot1's Ugin, Eye of the Storms, a nontoken
+# planeswalker cast on turn 3 (7 loyalty, +2 on turns 3 and 5 makes 11), is offered the -10 on turn 7, uses it on the Avatar, and
+# three lands are counted (Islands played on turns 3, 5 and 7): three +1/+1 counters, and Ugin is left with 1 loyalty.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Sol Ring
+Avatar of Burgeoning Echoes
+Ugin, Eye of the Storms
+Island
+Island
+Island
+Island
+Island x15
+
+[Bot2 Deck]
+Island x25
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Avatar of Burgeoning Echoes.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Ugin, Eye of the Storms.Cast
+Bot1.Target()
+Bot2.Pass
+Bot1.Battlefield.Ugin, Eye of the Storms.Activate(Ability: gain 3 life)
+Bot2.Pass
+Bot1.Hand.Island.Play
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Ugin, Eye of the Storms.Activate(Ability: gain 3 life)
+Bot2.Pass
+Bot1.Hand.Island.Play
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ugin, Eye of the Storms.Counters.Loyalty = 11
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Ugin, Eye of the Storms.Activate(Ability: Put a +1/+1 counter; Bot1.Battlefield.Avatar of Burgeoning Echoes)
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ugin, Eye of the Storms.Counters.Loyalty = 1
+Bot1.Battlefield.Avatar of Burgeoning Echoes.Counters.PlusOnePlusOne = 3
+Stack.Count = 0
