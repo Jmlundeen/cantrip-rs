@@ -103,6 +103,8 @@ the line goes.
 | Torch the Tower's replacement not made when its damage is prevented (`g.damage(..) > 0` false: a permanent "dealt damage by" the spell only if damage was dealt) | nothing | No implemented effect prevents damage and leaves the target legal: protection from red gained in response makes the target illegal, so the spell does not resolve (a different path), and Impractical Joke and Stomp stop prevention rather than cause it. A damage-prevention card (a Fog, a Circle of Protection) would reach it. |
 | Ward's life prompt for an amount above 60 (`triggers::ward_life_question`: the static `Question`s name the amount for 0 to 60 only, so a bigger one is asked as "Pay the life", without the number; the payment itself is exact) | Raubahn, Bull of Ala Mhigo's ward at 4 | No implemented creature reaches a power above 60. A `Question` with a runtime amount would remove the table. |
 
+| Discover dropping a face whose mana value is over N although the card's is not (`discover::discover`'s `ways` filter; CR 701.57a, "if the resulting spell's mana value is less than or equal to N") | Adventurers and split cards with both faces at or under N (Quintorius Kand's scenarios) | No implemented card has an Adventure or castable back face costing more than a front face of 4 or less. |
+
 **Scenarios.** None, by definition.
 
 ### KI-4: Scenarios waiting on cards

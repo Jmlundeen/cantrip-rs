@@ -39,5 +39,11 @@ Bot1.Cancel
 ? Exile.Count = 0
 
 [Expect]
+Turn = 4
+Stack.Count = 0
+Exile.Count = 0
+Bot2.Life = 20
+Bot1.Life = 20
+Bot1.Battlefield.Quintorius Kand.Counters.Loyalty = 1
 Bot1.Hand = Mountain; Island; Lightning Bolt
 Bot1.Graveyard.Count = 0

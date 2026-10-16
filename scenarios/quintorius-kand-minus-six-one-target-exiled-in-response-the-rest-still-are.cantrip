@@ -77,6 +77,11 @@ Bot1.Exile.Strip Mine.Play
 ! Bot1.Exile.Lightning Bolt.Cast(Bot2)
 
 [Expect]
+Turn = 9
+Stack.Count = 0
+Exile = Dark Ritual; Lightning Bolt
+Bot1.Mana = {R}{R}
+Bot1.Battlefield.Quintorius Kand.Counters.Loyalty = 1
 Bot1.Battlefield.Strip Mine.Tapped = false
 Bot1.Graveyard = Dark Ritual
 Bot2.Life = 17

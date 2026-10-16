@@ -1,0 +1,56 @@
+# Discover 4 finds Life // Death: a split card's mana value is the two halves added (1 + 2 = 3, CR 708.4b), so it is found,
+# and either half may be cast (each is 4 or less; Death has a target, the Ornithopter Bot2 Bolted into Bot1's graveyard): Bot1 is
+# asked which, chooses Death, and it returns the Ornithopter (mana value 0, no life lost). Only that half is cast (CR 701.57a,
+# 709.3). Quintorius triggers on the cast from exile.
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Quintorius Kand
+Ornithopter
+Island
+Life // Death
+Island x10
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Quintorius Kand.Cast
+Bot1.Battlefield.Quintorius Kand.Activate(Ability: Discover)
+Bot1.Accept
+Bot1.Modes(Death)
+[T4 Bot2.Main1]
+? Bot2.Life = 18
+
+[Expect]
+Turn = 4
+Stack.Count = 0
+Bot2.Life = 18
+Bot1.Life = 22
+Exile.Count = 0
+Bot1.Graveyard = Life // Death
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Quintorius Kand.Counters.Loyalty = 1
