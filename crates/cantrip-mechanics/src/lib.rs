@@ -60,6 +60,7 @@ pub mod persist;
 pub mod overload;
 pub mod paradigm;
 pub mod plot;
+pub mod power_up;
 pub mod ravenous;
 pub mod reconfigure;
 pub mod regenerate;
