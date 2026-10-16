@@ -1,0 +1,52 @@
+# "A hone counter on an Equipment" (CR 122.1j): only an Equipment's counters give the bonus. Paradise Mantle, with the hone counter
+# Dwalin's entering put on it, is equipped to Dwalin (3/1). On turn 6 Bot2's Oko, Thief of Crowns +1 makes the Mantle a green Elk
+# creature with no abilities: its types are set (CR 205.1a, 613.1d), so it is no longer an Equipment, and it becomes unattached
+# (CR 704.5n-p). Dwalin is 2/1 again; the Elk keeps its hone counter and is a plain 3/3 - the counter gives it nothing.
+
+[Bot1 Deck]
+Plains
+Mountain
+Paradise Mantle
+Dwalin, Weaponmaster
+Plains x16
+
+[Bot2 Deck]
+Forest
+Island
+Oko, Thief of Crowns
+Forest x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Paradise Mantle.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Dwalin, Weaponmaster.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Paradise Mantle.Activate(Dwalin, Weaponmaster; Ability: Equip)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Dwalin, Weaponmaster.Power = 3
+[T6 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest#1.Activate
+Bot2.Battlefield.Forest#2.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Oko, Thief of Crowns.Cast
+Bot2.Battlefield.Oko, Thief of Crowns.Activate(Bot1.Battlefield.Paradise Mantle; Ability: Elk)
+[T6 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Paradise Mantle.Types = Creature
+Bot1.Battlefield.Paradise Mantle.Subtypes = Elk
+Bot1.Battlefield.Paradise Mantle.Counters.Hone = 1
+Bot1.Battlefield.Paradise Mantle.AttachedTo = (absent)
+Bot1.Battlefield.Paradise Mantle.Power = 3
+Bot1.Battlefield.Dwalin, Weaponmaster.Power = 2

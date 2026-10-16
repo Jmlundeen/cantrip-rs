@@ -1,0 +1,52 @@
+# Bot2 sacrifices Vampire Hexmage targeting Bot1's Paradise Mantle, which carries the hone counter Dwalin's entering put on it and
+# is equipped to Dwalin (3/1). In response Bot1 destroys its own Mantle with Disenchant: the ability's only target is gone, so it
+# does nothing (CR 608.2b) and leaves the stack, its cost already paid - Hexmage stays in the graveyard, and Dwalin is 2/1 with
+# nothing attached.
+
+[Bot1 Deck]
+Plains
+Mountain
+Paradise Mantle
+Dwalin, Weaponmaster
+Disenchant
+Plains x15
+
+[Bot2 Deck]
+Swamp
+Swamp
+Vampire Hexmage
+Swamp x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Paradise Mantle.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Dwalin, Weaponmaster.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp#1.Activate
+Bot2.Battlefield.Swamp#2.Activate
+Bot2.Hand.Vampire Hexmage.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Paradise Mantle.Activate(Dwalin, Weaponmaster; Ability: Equip)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Dwalin, Weaponmaster.Power = 3
+[T6 Bot2.Main1]
+Bot2.Battlefield.Vampire Hexmage.Activate(Bot1.Battlefield.Paradise Mantle)
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Disenchant.Cast(Bot1.Battlefield.Paradise Mantle)
+[T6 Bot2.Main2]
+
+[Expect]
+Bot2.Graveyard = Vampire Hexmage
+Bot1.Graveyard = Disenchant; Paradise Mantle
+Bot1.Battlefield.Dwalin, Weaponmaster.Power = 2
+Stack.Count = 0

@@ -1,0 +1,34 @@
+# "Any permanent can be targeted by the second ability, not just one with counters on it" (the ruling): Bot1 sacrifices Vampire
+# Hexmage targeting Bot2's Ornithopter, which has no counters; the ability resolves and nothing changes on it.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Vampire Hexmage
+Swamp x17
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Vampire Hexmage.Cast
+Bot1.Pass
+Bot1.Battlefield.Vampire Hexmage.Activate(Bot2.Battlefield.Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Vampire Hexmage
+Bot1.Battlefield = Swamp; Swamp
+Bot2.Battlefield = Island; Ornithopter
+Bot2.Battlefield.Ornithopter.Power = 0
+Bot2.Battlefield.Ornithopter.Toughness = 2
+Stack.Count = 0

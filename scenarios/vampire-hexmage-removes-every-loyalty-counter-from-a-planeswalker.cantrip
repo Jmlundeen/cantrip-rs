@@ -41,3 +41,4 @@ Bot1.Battlefield.Vampire Hexmage.Activate(Bot2.Battlefield.Liliana of the Veil)
 [Expect]
 Bot1.Graveyard = Vampire Hexmage; Swamp
 Bot2.Graveyard = Liliana of the Veil; Swamp
+Bot2.Battlefield = Swamp; Swamp; Swamp
