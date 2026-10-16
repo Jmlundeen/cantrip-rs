@@ -95,6 +95,57 @@ pub(crate) enum Flow {
 }
 
 impl Game {
+    /// Rebase an embedding application's external mutation before a suspended run.
+    /// The caller supplies a journalled mutation of the baseline (a resource delta,
+    /// rather than a replacement of resources already spent by replayed answers).
+    /// All earlier answers of this frame are replayed against that new baseline.
+    /// The old search tree belongs to the pre-edit position and is discarded.
+    #[cfg(debug_assertions)]
+    pub fn edit_pending(
+        &mut self,
+        edit: impl FnOnce(&mut Game) -> Result<(), String>,
+    ) -> Result<(), String> {
+        let mut candidate = self.clone();
+        let at = candidate
+            .state
+            .agenda
+            .len()
+            .checked_sub(1)
+            .ok_or("no pending frame")?;
+        let frame = candidate.state.agenda[at].clone();
+        if frame.pending.is_none() {
+            return Err("no pending question".into());
+        }
+        if !frame.staged {
+            candidate.state.revert(Mark(frame.mark));
+            candidate.log.truncate(frame.log_mark as usize);
+        }
+        candidate.state.update_frame(at, |f| {
+            f.answers = frame.answers;
+            f.pending = None;
+        });
+        edit(&mut candidate)?;
+        candidate.tree = tree::Tree::new();
+        candidate.at = tree::NodeId::ROOT;
+        candidate.run();
+        *self = candidate;
+        Ok(())
+    }
+
+    /// Run a journalled primitive through the same operation/trigger API as cards.
+    #[cfg(debug_assertions)]
+    pub fn external_effect<T>(
+        &mut self,
+        effect: impl FnOnce(&mut dyn cantrip_api::Game) -> T,
+    ) -> T {
+        let frame = self.state.agenda.len().saturating_sub(1);
+        effect(&mut Cx {
+            g: self,
+            frame,
+            cursor: 0,
+        })
+    }
+
     pub fn new(cards: &'static CardTable, setup: &Setup) -> Game {
         let players = setup.decks.len();
         let mut state = GameState::new(players, setup.seed);

@@ -75,6 +75,7 @@ struct Scenario {
 
 /// What the host keeps beside a mana ability that can be taken back (`cantrip_engine::undo`): what was told of it, and
 /// the tracking and handles as they were before it.
+#[derive(Clone)]
 struct Told {
     tracker: Tracker,
     /// Each seat's handles: a sacrificed permanent's handle moved to the card in the graveyard, which taking it back
@@ -95,6 +96,106 @@ pub struct Deal {
 }
 
 impl Session {
+    /// A private checkpoint for an embedding host's database transaction.
+    /// Scripted sessions carry a separate runner and cannot be checkpointed here.
+    pub fn checkpoint(&self) -> Result<Self, Rejection> {
+        if self.scenario.is_some() {
+            return Err(Rejection::new(
+                "InvalidSetup",
+                "scripted sessions use their scenario runner's checkpoints",
+            ));
+        }
+        Ok(Self {
+            game: self.game.clone(),
+            names: self.names.clone(),
+            decklists: self.decklists.clone(),
+            handles: self.handles.clone(),
+            tracker: self.tracker.clone(),
+            published: self.published,
+            sequence: self.sequence,
+            conceded: self.conceded.clone(),
+            told: self.told.clone(),
+            extra: self.extra.clone(),
+            undoable: self.undoable.clone(),
+            scenario: None,
+        })
+    }
+
+    /// Trusted embedding code can observe engine identities. Never send them to a client.
+    pub fn inspect(&self) -> &Game {
+        &self.game
+    }
+
+    /// Resolve a visible handle for trusted metadata adapters, without minting identities.
+    pub fn object_for(&self, seat_number: i32, handle: ViewHandle) -> Option<ObjectId> {
+        let p = player_at(seat_number)?;
+        self.handles.get(p.index())?.object(handle)
+    }
+
+    /// Translate an answer from an additional authorized audience to the native seat space.
+    /// The returned payload is what must be stored in a native answer history.
+    pub fn answer_from(
+        &mut self,
+        request_id: u32,
+        seat_number: i32,
+        payload: &AnswerPayload,
+        audience: &HandleSpace,
+    ) -> Result<(AnswerPayload, Value), Rejection> {
+        let request = self
+            .pending()
+            .filter(|r| r.id == request_id && seat(r.player) == seat_number)
+            .ok_or_else(|| Rejection::new("StaleReply", "the request changed"))?;
+        let native = if matches!(
+            payload,
+            AnswerPayload::TakeActionAnswer(TakeActionAnswer {
+                kind: ActionKindView::UndoManaAbility,
+                ..
+            })
+        ) {
+            let AnswerPayload::TakeActionAnswer(action) = payload else {
+                unreachable!()
+            };
+            let id = audience
+                .object(action.source)
+                .ok_or_else(|| Rejection::new("UnknownHandle", "unknown source"))?;
+            let mut action = action.clone();
+            action.source = self.handles[request.player.index()].handle(id);
+            AnswerPayload::TakeActionAnswer(action)
+        } else {
+            let answer =
+                translate(payload, &request, audience, &self.game).map_err(|e| match e {
+                    Untranslatable::UnknownHandle(d) => Rejection::new("UnknownHandle", d),
+                    Untranslatable::Illegal(d) => Rejection::new("IllegalAnswer", d),
+                })?;
+            payload_of(
+                &answer,
+                &request,
+                &mut self.handles[request.player.index()],
+                &self.game,
+            )
+        };
+        let step = self.answer(request_id, seat_number, &native)?;
+        Ok((native, step))
+    }
+
+    /// Embedding-only edits. Policy and commands belong to the embedding application.
+    /// Rebase the pending run through the engine's extension boundary, then republish.
+    #[cfg(debug_assertions)]
+    pub fn edit(
+        &mut self,
+        edit: impl FnOnce(&mut cantrip_engine::Game) -> Result<(), String>,
+    ) -> Result<Value, Rejection> {
+        let mut candidate = self.checkpoint()?;
+        candidate
+            .game
+            .edit_pending(edit)
+            .map_err(|e| Rejection::new("IllegalAnswer", e))?;
+        candidate.undoable.clear();
+        let step = candidate.step();
+        *self = candidate;
+        Ok(step)
+    }
+
     pub fn new(deal: Deal) -> Result<Session, Rejection> {
         if deal.seats.len() < 2 {
             return Err(Rejection::new("InvalidSetup", "a game needs at least two seats"));

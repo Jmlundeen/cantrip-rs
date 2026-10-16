@@ -14,10 +14,12 @@ use cantrip_rules::tree::NodeId;
 
 /// The mana abilities that can still be taken back, latest last, each with what its keeper holds beside it (the host's
 /// told events and handles; nothing for the scenario runner).
+#[derive(Clone)]
 pub struct Undo<T> {
     entries: Vec<Entry<T>>,
 }
 
+#[derive(Clone)]
 struct Entry<T> {
     player: PlayerId,
     source: ObjectId,
