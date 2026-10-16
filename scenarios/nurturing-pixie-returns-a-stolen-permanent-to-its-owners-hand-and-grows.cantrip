@@ -1,0 +1,49 @@
+# Nurturing Pixie: "a ... permanent you control" is control, not ownership, and it goes "to its owner's hand" (CR 400.3).
+# Bot2 plays Mox Jet on turn 2; on turn 3 Bot1 casts Dack Fayden (Mox Sapphire, Mox Ruby, Plains) and takes the Mox
+# with his -2, then casts the Pixie, which returns that Mox to Bot2's hand. It was returned, so the Pixie is 2/2.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Plains
+Plains
+Dack Fayden
+Nurturing Pixie
+Plains x12
+
+[Bot2 Deck]
+Mox Jet
+Island x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Hand.Dack Fayden.Cast
+Bot1.Pass
+[T3 Bot1.Main2]
+Bot1.Battlefield.Dack Fayden.Activate(Bot2.Battlefield.Mox Jet; Ability: Gain control)
+Bot1.Pass
+Bot1.Hand.Nurturing Pixie.Cast
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Target(Mox Jet)
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot2.Hand.Count = 8
+Bot2.Battlefield.Count = 0
+Bot1.Battlefield = Plains; Plains; Mox Sapphire; Mox Ruby; Dack Fayden; Nurturing Pixie
+Bot1.Battlefield.Nurturing Pixie.Power = 2

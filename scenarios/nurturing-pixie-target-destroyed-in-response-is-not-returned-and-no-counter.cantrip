@@ -1,10 +1,12 @@
-# Nurturing Pixie: the target is Thraben Inspector; in response Bot2 kills it with Lightning Bolt (Mox Ruby, played on
-# turn 2). The only target is illegal when the trigger resolves, so it does nothing (CR 608.2b): the Inspector stays in
-# the graveyard, nothing was returned, and the Pixie gets no counter. Neighbouring scenarios are the positive controls.
+# Nurturing Pixie: the first Pixie targets Thraben Inspector; in response Bot2 kills it with Lightning Bolt (Mox Ruby,
+# played on turn 2). The only target is illegal when the trigger resolves, so it does nothing (CR 608.2b): the Inspector
+# stays in the graveyard, nothing was returned, and that Pixie gets no counter. Positive control, same turn: the second
+# Pixie targets the Clue (nothing is in response) and the Clue is returned, so that Pixie grows to 2/2.
 
 [Bot1 Deck]
 Plains
 Plains
+Nurturing Pixie
 Nurturing Pixie
 Thraben Inspector
 Plains x12
@@ -34,10 +36,17 @@ Bot1.Pass
 Bot2.Pass
 Bot1.Pass
 Bot2.Pass
+Bot1.Hand.Nurturing Pixie.Cast
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Target(Clue Token)
+Bot1.Pass
+Bot1.Pass
 
 [Expect]
 Turn = 3
 Stack.Count = 0
 Bot1.Graveyard = Thraben Inspector
-Bot1.Battlefield.Nurturing Pixie.Power = 1
-Bot1.Battlefield.Nurturing Pixie.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield = Plains; Plains; Nurturing Pixie; Nurturing Pixie
+Bot1.Battlefield.Nurturing Pixie#1.Power = 1
+Bot1.Battlefield.Nurturing Pixie#1.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Nurturing Pixie#2.Power = 2
