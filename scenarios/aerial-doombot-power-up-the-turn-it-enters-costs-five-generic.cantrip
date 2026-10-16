@@ -1,0 +1,44 @@
+# Aerial Doombot: "Power-up — {5}{U}: Put three +1/+1 counters on this creature." The turn it enters, its mana cost
+# {U} takes the {U} off (CR 702.193b, 118.7): {5} is left, which Sol Ring's {C}{C}, Mana Crypt's {C}{C} and Mox Ruby's
+# {R} pay with no blue at all, and all five are spent. It ends a 4/4 flier.
+
+[Bot1 Deck]
+Island
+Mox Jet
+Sol Ring
+Mana Crypt
+Mox Ruby
+Aerial Doombot
+Island
+Island x10
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mana Crypt.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Aerial Doombot.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Aerial Doombot.Activate
+? Bot1.Mana =
+Bot1.Pass
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Aerial Doombot.Counters.PlusOnePlusOne = 3
+Bot1.Battlefield.Aerial Doombot.Power = 4
+Bot1.Battlefield.Aerial Doombot.Toughness = 4
+Bot1.Battlefield.Aerial Doombot.Keywords = Flying
