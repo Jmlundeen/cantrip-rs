@@ -1,0 +1,94 @@
+# Being solved is not a copiable value (CR 719.3b; the rulings: "A permanent that becomes a copy of a solved Case is not
+# solved"). Bot1's Case of the Crimson Pulse is solved on turn 1 (an empty hand at its end step) and resets the hand at the
+# turn-3 upkeep. Bot1 then casts Fractured Identity on it: the Case is exiled and Bot2 creates a token copy. The token's enters
+# ability is Bot2's (discard a card - Bot2's hand is empty - then draw two). The token is not solved, so at Bot2's turn-4
+# upkeep nothing triggers. Its "To solve" is Bot2's ("At the beginning of your end step", CR 719.3a): Bot1's empty hand at
+# Bot1's turn-5 end step means nothing, but Bot2 empties its own hand on turn 4 and the token becomes solved at that end step;
+# at Bot2's turn-6 upkeep it discards Bot2's hand (empty) and draws two, then the draw step's card: three.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Case of the Crimson Pulse
+Ornithopter
+Ornithopter
+Ornithopter
+Fractured Identity
+Ornithopter
+Ornithopter
+Island x10
+
+[Bot2 Deck]
+Ornithopter x7
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Island x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Case of the Crimson Pulse.Cast
+Bot1.Choose(Ornithopter)
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T1 Bot1.End]
+? Bot1.Hand.Count = 0
+? Stack.Count = 1
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Case of the Crimson Pulse.Solved = true
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+? Bot1.Hand = Fractured Identity; Ornithopter; Ornithopter
+? Bot2.Hand.Count = 0
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Fractured Identity.Cast(Case of the Crimson Pulse)
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main2]
+? Bot2.Battlefield.Case of the Crimson Pulse.Token = true
+? Bot2.Battlefield.Case of the Crimson Pulse.Solved = (absent)
+? Bot2.Hand.Count = 2
+[T4 Bot2.Draw]
+? Bot2.Hand.Count = 3
+? Bot2.Graveyard.Count = 0
+[T4 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T4 Bot2.End]
+? Stack.Count = 1
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.End]
+? Bot1.Hand.Count = 0
+? Stack.Count = 0
+[T6 Bot2.Draw]
+? Bot2.Hand.Count = 3
+
+[Expect]
+Bot2.Battlefield.Case of the Crimson Pulse.Solved = true
+Bot2.Battlefield.Case of the Crimson Pulse.Token = true
+Exile = Case of the Crimson Pulse
+Bot1.Graveyard = Fractured Identity; Ornithopter

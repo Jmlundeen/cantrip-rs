@@ -1,0 +1,43 @@
+# Browser
+# What the page shows of a Case (CR 719.3): unsolved, its "Solved" line is greyed, since the ability may affect the game only
+# once the Case is solved (CR 719.3c), and nothing is written at its foot; once its "To solve" ability has made it solved, the
+# card says SOLVED and the "To solve" line, which can do nothing more (CR 719.3a), is the greyed one. Bot1 casts the Case on
+# turn 1 with four cards in hand at the end step (unsolved), and on turn 3 casts every Ornithopter it holds: solved.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Case of the Crimson Pulse
+Ornithopter x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Case of the Crimson Pulse.Cast
+Bot1.Choose(Ornithopter)
+[T2 Bot2.Upkeep]
+? Client.Bot1.Battlefield.Case of the Crimson Pulse.Status =
+? Client.Bot1.Battlefield.Case of the Crimson Pulse.Rules = When this Case enters, discard a card, then draw two cards. / To solve — You have no cards in hand. (If unsolved, solve at the beginning of your end step.) / (grey) Solved — At the beginning of your upkeep, discard your hand, then draw two cards.
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T4 Bot2.Upkeep]
+? Bot1.Battlefield.Case of the Crimson Pulse.Solved = true
+? Client.Bot1.Battlefield.Case of the Crimson Pulse.Status = SOLVED
+? Client.Bot1.Battlefield.Case of the Crimson Pulse.Rules = When this Case enters, discard a card, then draw two cards. / (grey) To solve — You have no cards in hand. (If unsolved, solve at the beginning of your end step.) / Solved — At the beginning of your upkeep, discard your hand, then draw two cards.
+
+[Expect]
+Bot1.Battlefield.Case of the Crimson Pulse.Solved = true
+Bot1.Hand.Count = 0
+Bot1.Graveyard = Ornithopter

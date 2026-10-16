@@ -1,0 +1,68 @@
+# A Case stays solved only until it leaves the battlefield (CR 719.3b): one that leaves and returns is a new object (CR 400.7)
+# with no designation. Bot1's Case of the Crimson Pulse is solved on turn 1 and resets the hand at the turn-3 upkeep (the
+# Flickerwisp and an Ornithopter drawn, then the draw step's Ornithopter). Flickerwisp exiles the Case; it returns at the
+# beginning of the turn-3 end step, too late for "At the beginning of your end step" (only the return is on the stack then,
+# though Bot1's hand is empty), and its enters ability draws two. It is not solved: at the turn-5 upkeep nothing is discarded,
+# and the hand is the two drawn and the draw step's card.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Pearl
+Case of the Crimson Pulse
+Ornithopter
+Ornithopter
+Ornithopter
+Flickerwisp
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Case of the Crimson Pulse.Cast
+Bot1.Choose(Ornithopter)
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T1 Bot1.End]
+? Stack.Count = 1
+[T3 Bot1.Main1]
+? Bot1.Hand = Flickerwisp; Ornithopter; Ornithopter
+? Bot1.Battlefield.Case of the Crimson Pulse.Solved = true
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Hand.Flickerwisp.Cast
+Bot1.Pass
+Bot1.Target(Case of the Crimson Pulse)
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.End]
+? Bot1.Hand.Count = 0
+? Stack.Count = 1
+[T4 Bot2.Upkeep]
+? Bot1.Battlefield.Case of the Crimson Pulse.Solved = (absent)
+? Bot1.Hand.Count = 2
+[T5 Bot1.Draw]
+? Bot1.Hand.Count = 3
+? Bot1.Graveyard = Ornithopter
+
+[Expect]
+Bot1.Battlefield.Case of the Crimson Pulse.Solved = (absent)
+Bot1.Battlefield = Case of the Crimson Pulse; Flickerwisp; Mountain; Mox Jet; Mox Pearl; Mox Pearl; Mox Ruby; Ornithopter; Ornithopter; Ornithopter; Ornithopter
+Bot1.Graveyard = Ornithopter

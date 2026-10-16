@@ -1,0 +1,62 @@
+# Two Cases of the Crimson Pulse, each its own object with its own "To solve" (CR 719.3a). Both enter on turn 1 (each discards
+# an Ornithopter and draws two) and Bot1 casts every Ornithopter it holds: at the beginning of the end step its hand is empty,
+# both abilities trigger and both Cases become solved. At the turn-3 upkeep both "Solved" abilities
+# trigger: the first discards the (empty) hand and draws two, the second discards those two and draws two more, then the
+# draw step's card: three in hand, and five cards in the graveyard (the two discarded as they entered, Black Lotus, two more).
+# Bot1 casts those three Ornithopters: with an empty hand at the turn-3 end step nothing triggers, the Cases being solved
+# already ("if ... this Case is not solved").
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Black Lotus
+Case of the Crimson Pulse
+Case of the Crimson Pulse
+Ornithopter
+Ornithopter x9
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Case of the Crimson Pulse.Cast
+Bot1.Choose(Ornithopter)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Case of the Crimson Pulse.Cast
+Bot1.Choose(Ornithopter)
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T1 Bot1.End]
+? Bot1.Hand.Count = 0
+[T2 Bot2.Upkeep]
+? Bot1.Battlefield.Case of the Crimson Pulse#1.Solved = true
+? Bot1.Battlefield.Case of the Crimson Pulse#2.Solved = true
+? Bot1.Graveyard.Count = 3
+[T3 Bot1.Draw]
+? Bot1.Hand.Count = 3
+? Bot1.Graveyard.Count = 5
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.End]
+? Bot1.Hand.Count = 0
+? Stack.Count = 0
+
+[Expect]
+Bot1.Battlefield.Case of the Crimson Pulse#1.Solved = true
+Bot1.Battlefield.Case of the Crimson Pulse#2.Solved = true
+Bot1.Hand.Count = 0
+Bot1.Graveyard.Count = 5
+Bot1.Battlefield.Count = 11
+Bot1.Library.Count = 10
