@@ -23,6 +23,10 @@ fn creature_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
     matches!(t, Target::Object(id) if on_battlefield(q, id) && q.chars(id).is(CardType::Creature))
 }
 
+fn tapped_creature_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    creature_filter(q, asker, t) && matches!(t, Target::Object(id) if q.obj(id).tapped)
+}
+
 fn creature_you_control_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     creature_filter(q, asker, t) && matches!(t, Target::Object(id) if q.controller(id) == asker.controller)
 }
@@ -49,6 +53,9 @@ fn spell_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
 /// Any target (CR 115.4): a creature, a player, a planeswalker or a battle.
 pub const ANY: TargetSpec = target(any_target_filter);
 pub const CREATURE: TargetSpec = target(creature_filter);
+/// "Target tapped creature" (CR 115.1, 608.2b): tapped when chosen and, legality being checked again on resolution, still
+/// tapped then. Ajani, Outland Chaperone, Cryogen Relic and The Wandering Emperor print it.
+pub const TAPPED_CREATURE: TargetSpec = target(tapped_creature_filter);
 pub const CREATURE_YOU_CONTROL: TargetSpec = target(creature_you_control_filter);
 /// "Target creature or planeswalker" (CR 115.1). Unholy Heat and Baleful Mastery print it.
 pub const CREATURE_OR_PLANESWALKER: TargetSpec = target(creature_or_planeswalker_filter);

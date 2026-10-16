@@ -42,10 +42,6 @@ fn minus_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-fn tapped_creature(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    (targets::CREATURE.filter)(q, asker, t) && matches!(t, Target::Object(id) if q.obj(id).tapped)
-}
-
 /// -2: exile target tapped creature. You gain 2 life.
 fn minus_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     exile_target(g, item, 0);
@@ -59,7 +55,7 @@ pub static CARD: CardDef = CardDef {
             .targets(&[targets::CREATURE.optional()]),
         ability(loyalty(-1), minus_one, "\u{2212}1: Create a 2/2 white Samurai creature token with vigilance."),
         ability(loyalty(-2), minus_two, "\u{2212}2: Exile target tapped creature. You gain 2 life.")
-            .targets(&[target(tapped_creature)]),
+            .targets(&[targets::TAPPED_CREATURE]),
     ],
     instant_activation: &[instant_loyalty],
     ..oracle::THE_WANDERING_EMPEROR
