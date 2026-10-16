@@ -1,0 +1,59 @@
+# Boros Charm's second mode: "Permanents you control gain indestructible until end of turn" affects the permanents Bot1 controls
+# as it resolves and no others (CR 611.2c, its ruling). Llanowar Elves and the Moxen get it (a Bolt's three damage does not
+# destroy the 1/1 Elves); an Ornithopter cast afterwards does not, and dies to a Bolt. The Elves' keywords and the
+# Ornithopter's show it.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Llanowar Elves
+Boros Charm
+Ornithopter
+Mountain
+Island x14
+
+[Bot2 Deck]
+Mox Ruby
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Boros Charm.Cast
+Bot1.Modes(Permanents you control gain indestructible)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves.Keywords = Indestructible
+? Bot1.Battlefield.Mox Ruby.Keywords = Indestructible
+? Bot1.Battlefield.Ornithopter.Keywords = Flying
+[T3 Bot1.DeclareAttackers]
+Bot2.Battlefield.Mox Ruby#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves.Damage = 3
+Bot2.Battlefield.Mox Ruby#2.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Mox Emerald; Mox Ruby; Mox Pearl; Llanowar Elves
+Bot1.Graveyard = Ornithopter; Boros Charm
+Bot2.Graveyard = Lightning Bolt; Lightning Bolt

@@ -1,0 +1,42 @@
+# Boros Charm's first mode may target a planeswalker (CR 120.3c): Bot2's Jace, the Mind Sculptor, with its starting loyalty of
+# 3, takes 4 damage, loses all its loyalty counters and is put into the graveyard as a state-based action (CR 704.5i). Bot2's
+# life total is untouched.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Boros Charm
+Island x20
+
+[Bot2 Deck]
+Island
+Black Lotus
+Jace, the Mind Sculptor
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot2.Hand.Jace, the Mind Sculptor.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Boros Charm.Cast
+Bot1.Modes(1)
+Bot1.Target(Bot2.Battlefield.Jace, the Mind Sculptor)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 20
+Bot2.Battlefield = Island
+Bot2.Graveyard = Jace, the Mind Sculptor; Black Lotus

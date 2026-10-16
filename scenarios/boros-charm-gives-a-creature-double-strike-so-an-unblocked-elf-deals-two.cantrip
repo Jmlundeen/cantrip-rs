@@ -1,0 +1,47 @@
+# Boros Charm's third mode: target creature gains double strike until end of turn. Bot1's Llanowar Elves, a 1/1, attacks with it
+# and deals first-strike and regular combat damage: 2 to Bot2. Bot1's Ornithopter and Bot2's, not targeted, have none, and
+# the keyword is gone by the next turn.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Llanowar Elves
+Boros Charm
+Ornithopter
+Mountain
+Island x14
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Boros Charm.Cast
+Bot1.Modes(Target creature gains double strike)
+Bot1.Target(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Llanowar Elves > Bot2)
+? Bot1.Battlefield.Llanowar Elves.Keywords = DoubleStrike
+? Bot1.Battlefield.Ornithopter.Keywords = Flying
+? Bot2.Battlefield.Ornithopter.Keywords = Flying
+[T3 Bot1.Main2]
+? Bot2.Life = 18
+[T4 Bot2.Upkeep]
+? Bot1.Battlefield.Llanowar Elves.Keywords = (absent)
+
+[Expect]
+Bot2.Life = 18

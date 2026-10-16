@@ -1,0 +1,44 @@
+# Boros Charm's third mode with Llanowar Elves as the target: Bot2 answers with Lightning Bolt and the Elves die, so the Charm's only
+# target is illegal as it would resolve and it does nothing (CR 608.2b) - it still goes to the graveyard, and nothing else gets
+# double strike (the Moxen that paid for it have no keywords).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Llanowar Elves
+Boros Charm
+Mountain
+Island x14
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Boros Charm.Cast
+Bot1.Modes(Target creature gains double strike)
+Bot1.Target(Llanowar Elves)
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Mox Emerald; Mox Ruby; Mox Pearl
+Bot1.Graveyard = Boros Charm; Llanowar Elves
+Bot1.Battlefield.Mox Ruby.Keywords = (absent)

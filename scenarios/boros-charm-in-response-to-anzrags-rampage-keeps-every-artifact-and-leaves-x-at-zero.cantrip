@@ -1,0 +1,60 @@
+# Bot2's Boros Charm (indestructible mode) in response to Anzrag's Rampage: Sol Ring, Mox Ruby and Mox Pearl (tapped to pay for the
+# Charm) are indestructible when the Rampage resolves, so none is destroyed and no artifact went to a graveyard this turn: X is
+# 0, nothing is exiled from Bot1's library and no creature is offered.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+Anzrag's Rampage
+Mountain
+Island
+Island
+Llanowar Elves
+Island x10
+
+[Bot2 Deck]
+Island
+Sol Ring
+Mox Ruby
+Mox Pearl
+Boros Charm
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Anzrag's Rampage.Cast
+Bot1.Pass
+Bot2.Hand.Boros Charm.Cast
+Bot2.Modes(Permanents you control gain indestructible)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose
+[T3 Bot1.Main2]
+? Exile.Count = 0
+? Bot2.Battlefield = Island; Sol Ring; Mox Ruby; Mox Pearl
+
+[Expect]
+Bot1.Library.Count = 11
+Bot2.Graveyard = Boros Charm
