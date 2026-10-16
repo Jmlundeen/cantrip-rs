@@ -217,7 +217,7 @@ pub trait Query {
 
     /// The object `left` became when it moved to a public zone, if that object is still where the move put it (CR 400.7e):
     /// "return it to the battlefield" from a "when this dies" ability finds the card in the graveyard it went to, and
-    /// nothing once that card has moved again (a new object, CR 400.7). Persist, earthbend and Enduring Innocence return it.
+    /// nothing once that card has moved again (a new object, CR 400.7). Persist, earthbend, Enduring Innocence and Enduring Curiosity return it.
     fn found_after_move(&self, left: ObjectId) -> Option<ObjectId> {
         self.obj(left).became.filter(|&new| self.obj(new).became.is_none() && !self.obj(new).zone.is(ZoneKind::Gone))
     }
