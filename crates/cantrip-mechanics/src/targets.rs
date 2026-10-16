@@ -31,6 +31,10 @@ fn creature_you_control_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool 
     creature_filter(q, asker, t) && matches!(t, Target::Object(id) if q.controller(id) == asker.controller)
 }
 
+fn creature_you_dont_control_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    creature_filter(q, asker, t) && matches!(t, Target::Object(id) if q.controller(id) != asker.controller)
+}
+
 fn player_or_planeswalker_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
     match t {
         Target::Player(_) => true,
@@ -72,6 +76,9 @@ fn attacking_creature_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
 /// still is as the ability resolves, or the target is illegal. Raffine, Scheming Seer and Raubahn, Bull of Ala Mhigo print it.
 pub const ATTACKING_CREATURE: TargetSpec = target(attacking_creature_filter);
 pub const CREATURE_YOU_CONTROL: TargetSpec = target(creature_you_control_filter);
+/// "Target creature you don't control" (CR 109.5): any other player's creature, a teammate's included. Winds of Abandon and
+/// Bushwhack print it.
+pub const CREATURE_YOU_DONT_CONTROL: TargetSpec = target(creature_you_dont_control_filter);
 /// "Target player or planeswalker" (CR 115.1, 115.4): any target narrowed to players and planeswalkers. Boros Charm, Kyren
 /// Negotiations and Quicksilver Dagger print it.
 pub const PLAYER_OR_PLANESWALKER: TargetSpec = target(player_or_planeswalker_filter);

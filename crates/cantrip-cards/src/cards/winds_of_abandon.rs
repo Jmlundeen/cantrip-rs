@@ -1,12 +1,6 @@
 use cantrip_api::*;
-use cantrip_mechanics::{overload, search_library};
+use cantrip_mechanics::{overload, search_library, targets};
 use cantrip_oracle as oracle;
-
-/// "Creature you don't control" (CR 109.5): another player's, including a teammate's.
-fn creature_you_dont_control(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    matches!(t, Target::Object(id) if is_live(q, id) && q.is_on_battlefield(id)
-        && q.chars(id).is(CardType::Creature) && q.controller(id) != asker.controller)
-}
 
 /// Exile target creature you don't control. For each creature exiled this way, its controller searches their library
 /// for a basic land card. Those players put those cards onto the battlefield tapped, then shuffle. Overloaded
@@ -36,7 +30,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: spell(&[target(creature_you_dont_control)], effect),
+    spell: spell(&[targets::CREATURE_YOU_DONT_CONTROL], effect),
     overload: Some(mana("{4}{W}{W}")),
     ..oracle::WINDS_OF_ABANDON
 };
