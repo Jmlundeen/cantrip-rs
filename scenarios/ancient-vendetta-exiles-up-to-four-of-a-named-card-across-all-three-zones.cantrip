@@ -1,0 +1,59 @@
+# Ancient Vendetta: "Choose a card name. Search target opponent's graveyard, hand, and library for up to four cards with that name
+# and exile them. Then that player shuffles." Bot2 holds six Ornithopters: one in its graveyard (discarded to hand size at the end
+# of turn 2), two in its hand, three in its library. Bot1 names Ornithopter as the spell resolves and finds, in the order the text
+# names the zones, the one in the graveyard, both in the hand and only one in the library - four in all, the limit - leaving two in
+# the library even though they were there to find (the ruling: "you may only search for up to four cards with the chosen name, even if
+# you find more of them"). The Islands in every zone are untouched.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Mox Pearl
+Ancient Vendetta
+Swamp
+Swamp
+Swamp x14
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Ornithopter
+Island
+Island
+Island
+Island
+Island
+Ornithopter
+Ornithopter
+Ornithopter
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T2 Bot2.Cleanup]
+Bot2.Discard(Ornithopter)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ancient Vendetta.Cast(Bot2)
+Bot1.Name(Ornithopter)
+Bot1.Choose(Ornithopter)
+Bot1.Choose(Ornithopter; Ornithopter)
+Bot1.Search(Ornithopter)
+[Bot1.Main2]
+
+[Expect]
+Exile = Ornithopter; Ornithopter; Ornithopter; Ornithopter
+Bot2.Graveyard.Count = 0
+Bot2.Hand = Island; Island; Island; Island; Island
+Bot2.Library.Count = 12
+Bot1.Graveyard = Ancient Vendetta

@@ -1,0 +1,47 @@
+# Ancient Vendetta: "The ability has no effect on permanents with the chosen name that are on the battlefield." Bot2 has an
+# Ornithopter on the battlefield and one in hand (and none in its graveyard or library). Bot1 names Ornithopter: only the card in
+# hand is found and exiled; the permanent stays. The library holds no card of that name, so there is nothing to find there.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Mox Pearl
+Ancient Vendetta
+Swamp
+Swamp
+Swamp x14
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Island x18
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ancient Vendetta.Cast(Bot2)
+Bot1.Name(Ornithopter)
+Bot1.Choose(Ornithopter)
+Bot1.Search()
+[Bot1.Main2]
+
+[Expect]
+Exile = Ornithopter
+Bot2.Battlefield = Ornithopter
+Bot2.Hand.Count = 6
+Bot2.Library.Count = 12

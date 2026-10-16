@@ -1,0 +1,47 @@
+# Ancient Vendetta: "Unlike similar cards, Ancient Vendetta allows you to choose the name of a basic land. Note that you may only
+# search for up to four cards with the chosen name, even if you find more of them" and "You don't have to exile each card you find
+# with that name. If you want to leave one in their graveyard, for example, you may." Bot1 names Island. Bot2 has an Island in its
+# graveyard (discarded to hand size on turn 2), seven in its hand and the rest of a library of Islands. Bot1 takes none from the
+# graveyard, four from the hand (the limit), so no library search is asked (nothing more can be found).
+# The Island stays in the graveyard, the hand keeps three, and the library, searched for nothing, is whole.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Mox Pearl
+Ancient Vendetta
+Swamp
+Swamp
+Swamp x14
+
+[Bot2 Deck]
+Island x8
+Island x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T2 Bot2.Cleanup]
+Bot2.Discard(Island)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ancient Vendetta.Cast(Bot2)
+Bot1.Name(Island)
+Bot1.Choose()
+Bot1.Choose(Island; Island; Island; Island)
+[Bot1.Main2]
+
+[Expect]
+Exile = Island; Island; Island; Island
+Bot2.Graveyard = Island
+Bot2.Hand = Island; Island; Island
+Bot2.Library.Count = 12
