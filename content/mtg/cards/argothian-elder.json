@@ -1,0 +1,8 @@
+{
+  "name": "Argothian Elder",
+  "manaCost": "{3}{G}",
+  "type": "Creature — Elf Druid",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "{T}: Untap two target lands."
+}
