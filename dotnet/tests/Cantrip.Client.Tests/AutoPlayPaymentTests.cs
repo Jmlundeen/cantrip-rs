@@ -265,6 +265,26 @@ public sealed class AutoPlayPaymentTests
         Assert.Equal(ActionKindView.CancelCasting, AutoPlay.Pay(Prompt(exile: false, tap: false)).Kind);
     }
 
+    /// <summary>
+    /// Mana a restriction keeps from paying this cost (CR 106.6) - Sunken Citadel's {U}{U} for abilities of land sources,
+    /// offered while a spell is paid for - is never made: it would only wait in the pool. The Citadel's own plain {U} is.
+    /// </summary>
+    [Fact]
+    public void Leaves_mana_that_would_pay_nothing_here_unmade()
+    {
+        var citadel = new ViewHandle(1);
+        ActionOptionMessage restricted = Taps(citadel, ColorView.Blue, ability: 1);
+        restricted.Produces = [ManaTypeView.Blue, ManaTypeView.Blue];
+        restricted.Filter = ManaSpendFilterView.LandAbilities;
+        restricted.PaysNothing = true;
+
+        TakeActionAnswer? answer = AutoPlay.Produce([restricted, Taps(citadel, ColorView.Blue)], [ColorView.Blue], owedGeneric: 1);
+
+        Assert.NotNull(answer);
+        Assert.Equal(0, answer.AbilityIndex);
+        Assert.Null(AutoPlay.Produce([restricted], [ColorView.Blue], owedGeneric: 0));
+    }
+
     private static ActionOptionMessage Taps(ViewHandle source, ColorView color, int ability = 0) => new()
     {
         Kind = ActionKindView.ActivateAbility,

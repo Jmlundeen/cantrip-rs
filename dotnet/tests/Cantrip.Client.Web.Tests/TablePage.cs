@@ -297,8 +297,11 @@ public sealed record PlayerState(
 /// <summary>A button over a player's piles (Exile, Companion): what it says and its tooltip, whether it is lit, and where it is.</summary>
 public sealed record ZoneButtonState(string Text, string Tooltip, bool Lit, bool Open, float X, float Y, float W, float H);
 
-/// <summary>A kind of mana in a pool, how much, whether a click spends one, and where it is.</summary>
-public sealed record ManaChipState(string Type, int Count, bool Clickable, float X, float Y, float W, float H);
+/// <summary>
+/// A kind of mana in a pool, how much, whether a click spends one, and where it is; its caption says what restricts it
+/// ("land abilities") and how much of it is spoken for.
+/// </summary>
+public sealed record ManaChipState(string Type, int Count, bool Clickable, float X, float Y, float W, float H, string Caption = "");
 
 /// <summary>An ability shown resolving: the way it cut, and each arrow's target and way.</summary>
 public sealed record EffectState(string Feeling, bool Lit, IReadOnlyList<ArrowState> Arrows);

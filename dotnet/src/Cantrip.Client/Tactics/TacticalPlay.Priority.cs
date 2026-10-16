@@ -1986,7 +1986,7 @@ public sealed partial class TacticalPlay
                 .Distinct()];
 
             ActionOptionMessage? cheapest = prompt.Options
-                .Where(option => option.Kind == ActionKindView.ActivateAbility
+                .Where(option => option.Kind == ActionKindView.ActivateAbility && !option.PaysNothing
                     && option.ProducesOfAnyOneColor == 0 && option.ProducesOfAnyColorEach == 0
                     && option.Produces.Count == 1 && option.SacrificeCandidates.Count == 0)
                 .OrderBy(option => option.LifeCost + option.DamageToController)

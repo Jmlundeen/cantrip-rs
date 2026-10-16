@@ -603,6 +603,10 @@ public sealed partial class MainPage
         (ManaSpendFilterView.ActivatedAbilities, _) => "abilities",
         (ManaSpendFilterView.LegendarySpells, _) => "legendary",
         (ManaSpendFilterView.NotNonartifactSpells, _) => "no nonartifact spells",
+        (ManaSpendFilterView.ArtifactSpells, _) => "artifacts",
+        (ManaSpendFilterView.PlaneswalkerSpells, _) => "planeswalkers",
+        (ManaSpendFilterView.LandAbilities, _) => "land abilities",
+        (ManaSpendFilterView.ArtifactAbilities, _) => "artifact abilities",
         (_, ManaSpendEffectView.GainsHaste) => "haste",
         (_, ManaSpendEffectView.CantBeCountered) => "uncounterable",
         _ => "restricted",
@@ -617,6 +621,10 @@ public sealed partial class MainPage
             ManaSpendFilterView.ActivatedAbilities => "Spend this mana only to activate abilities.",
             ManaSpendFilterView.LegendarySpells => "Spend this mana only to cast a legendary spell.",
             ManaSpendFilterView.NotNonartifactSpells => "This mana can't be spent to cast a nonartifact spell.",
+            ManaSpendFilterView.ArtifactSpells => "Spend this mana only to cast artifact spells.",
+            ManaSpendFilterView.PlaneswalkerSpells => "Spend this mana only to cast a planeswalker spell.",
+            ManaSpendFilterView.LandAbilities => "Spend this mana only to activate abilities of land sources.",
+            ManaSpendFilterView.ArtifactAbilities => "Spend this mana only to activate abilities of artifact sources.",
             _ => "This mana may only be spent on certain things.",
         };
 

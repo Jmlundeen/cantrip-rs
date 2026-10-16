@@ -671,8 +671,10 @@ public static class AutoPlay
         // an Elegant Parlor for the {R} a Mountain could have paid, and then owe {W} with nothing but Mountains
         // left — a cost the server rightly called affordable, given up on (CR 733.1), and offered again for ever.
         // Spending the narrow sources first keeps the flexible one for the pip only it can pay.
+        // A mana ability whose mana is restricted so that it can't pay this cost (CR 106.6: Sunken Citadel's two mana for a
+        // spell) is no source here: its mana would only wait in the pool.
         IEnumerable<ActionOptionMessage> activations = options
-            .Where(option => option.Kind == ActionKindView.ActivateAbility)
+            .Where(option => option.Kind == ActionKindView.ActivateAbility && !option.PaysNothing)
             .OrderBy(Hurts)
             .ThenBy(option => Flexibility(options, option, owedColors, owedHybrid));
 

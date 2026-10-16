@@ -358,6 +358,7 @@ public sealed partial class MainPage
                         json.WriteString("type", spec.Type.ToString());
                         json.WriteNumber("count", spec.Count);
                         json.WriteBoolean("clickable", spec.Click is not null);
+                        json.WriteString("caption", spec.Caption ?? string.Empty);
                         WriteBox(json, chip.TransformToVisual(Root).TransformBounds(new Rect(0, 0, chip.ActualWidth, chip.ActualHeight)));
                         json.WriteEndObject();
                     }

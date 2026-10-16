@@ -567,6 +567,9 @@ public sealed class CardActions
         ManaSpendFilterView.ArtifactSpells => "artifact spells",
         ManaSpendFilterView.LegendarySpells => "legendary spells",
         ManaSpendFilterView.NotNonartifactSpells => "anything but nonartifact spells",
+        ManaSpendFilterView.PlaneswalkerSpells => "planeswalker spells",
+        ManaSpendFilterView.LandAbilities => "abilities of land sources",
+        ManaSpendFilterView.ArtifactAbilities => "abilities of artifact sources",
         _ => "anything",
     };
 

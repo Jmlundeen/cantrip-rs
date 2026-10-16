@@ -305,6 +305,32 @@ public sealed class ScenarioPlayer
                 return;
             }
 
+            case ColorsChosenAnswer chosenColors:
+            {
+                // A choice of colors (CR 105.1, 202.2b): a button for each color, named by its mana symbol ("{U}"), clicked
+                // in the order chosen; more than one is sent with Done.
+                foreach (ColorView color in chosenColors.Colors)
+                {
+                    string symbol = color switch
+                    {
+                        ColorView.White => "{W}",
+                        ColorView.Blue => "{U}",
+                        ColorView.Black => "{B}",
+                        ColorView.Red => "{R}",
+                        _ => "{G}",
+                    };
+                    await ClickButtonNamedAsync(symbol);
+                }
+
+                TableState after = await _page.SettledAsync();
+                if (after.RequestId == state.RequestId && after.Controls.Any(c => c.Kind == "button" && c.Label.StartsWith("Done", StringComparison.Ordinal)))
+                {
+                    await ClickButtonStartingAsync("Done");
+                }
+
+                return;
+            }
+
             case CardNamedAnswer named:
             {
                 // A card name is typed into the dock's box, as a person names a card that is not in front of them, and sent
@@ -772,7 +798,7 @@ public sealed class ScenarioPlayer
     }
 
     private const string ClientKeys =
-        "Stack, Hand, Battlefield, OpponentBattlefield, OpponentHand (the cards known in it), each with .Count; <Row>.<Card>.TypeLine, .Rules, .Status, .Annotation or .Counters (the pills drawn on it, like 3 × incubation; rows Stack, Hand, Battlefield, OpponentBattlefield, Exile, Graveyard); Facts, OpponentFacts (beside the life total); Exile.Lit, .Caption, .Tooltip and OpponentExile.*; Graveyard.Lit, .Note; Button.<label> (shown or absent), Arrows (the latest resolution's targets), Over, Prompt.Title, Prompt.Detail, Prompt.Modes, Log.Has (a line of the game log, by its text), Confirm (the button the last choice of cards was confirmed with), Menu (the rows of the card menu last opened), Dock (the dock's buttons)";
+        "Stack, Hand, Battlefield, OpponentBattlefield, OpponentHand (the cards known in it), each with .Count; <Row>.<Card>.TypeLine, .Rules, .Status, .Annotation or .Counters (the pills drawn on it, like 3 × incubation; rows Stack, Hand, Battlefield, OpponentBattlefield, Exile, Graveyard); Facts, OpponentFacts (beside the life total); Mana (the pool's chips, like 2 Blue (land abilities)); Exile.Lit, .Caption, .Tooltip and OpponentExile.*; Graveyard.Lit, .Note; Button.<label> (shown or absent), Arrows (the latest resolution's targets), Over, Prompt.Title, Prompt.Detail, Prompt.Modes, Log.Has (a line of the game log, by its text), Confirm (the button the last choice of cards was confirmed with), Menu (the rows of the card menu last opened), Dock (the dock's buttons)";
 
     private string? Read(string what, TableState state)
     {
@@ -783,6 +809,8 @@ public sealed class ScenarioPlayer
         return what switch
         {
             "Facts" => string.Join("; ", me?.Facts ?? []),
+            // The pool's chips as drawn: "2 Blue (land abilities)" for restricted mana, its caption what it is for.
+            "Mana" => string.Join("; ", (me?.Mana ?? []).Select(m => m.Caption.Length == 0 ? $"{m.Count} {m.Type}" : $"{m.Count} {m.Type} ({m.Caption})")),
             "OpponentFacts" => string.Join("; ", them?.Facts ?? []),
             "Exile.Lit" => (Exile(me)?.Lit ?? false) ? "true" : "false",
             "Exile.Caption" => Exile(me)?.Text ?? string.Empty,
