@@ -3,15 +3,6 @@ use cantrip_mechanics::choose;
 use cantrip_mechanics::impending;
 use cantrip_oracle as oracle;
 
-/// "Whenever this permanent enters or attacks": one ability with two conditions (CR 603.2).
-fn enters_or_attacks(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
-    match event {
-        Event::ZoneChange { new, to, .. } if *new == source && to.is(ZoneKind::Battlefield) => Fired::PLAIN,
-        Event::Attacks { attacker, .. } if *attacker == source => Fired::PLAIN,
-        _ => None,
-    }
-}
-
 /// Mill four cards, then you may return a non-Avatar creature card or a planeswalker card from your graveyard to your hand:
 /// chosen from the whole graveyard as it stands after the mill, and "non-Avatar" qualifies the creature card alone.
 fn mill_then_return(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -38,7 +29,7 @@ pub static CARD: CardDef = CardDef {
     enters: Some(impending::enters::<5>),
     statics: &[impending::NOT_A_CREATURE],
     abilities: &[
-        triggered(when(EventMask(EventMask::ZONE_CHANGE.0 | EventMask::ATTACKS.0), enters_or_attacks), mill_then_return, "Whenever this permanent enters or attacks, mill four cards, then you may return a non-Avatar creature card or a planeswalker card from your graveyard to your hand."),
+        triggered(cantrip_mechanics::triggers::THIS_ENTERS_OR_ATTACKS, mill_then_return, "Whenever this permanent enters or attacks, mill four cards, then you may return a non-Avatar creature card or a planeswalker card from your graveyard to your hand."),
         impending::REMOVE_A_TIME_COUNTER,
     ],
     ..oracle::OVERLORD_OF_THE_BALEMURK

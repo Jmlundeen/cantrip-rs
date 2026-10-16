@@ -1,5 +1,4 @@
 use cantrip_api::*;
-use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_mechanics::{discard_chosen, sacrifice_chosen, targets, triggers};
 use cantrip_oracle as oracle;
 
@@ -21,9 +20,7 @@ fn drain(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(THIS_ENTERS, drain, "When Archon of Cruelty enters, target opponent sacrifices a creature or planeswalker of their choice, discards a card, and loses 3 life. You draw a card and gain 3 life.")
-            .targets(&[targets::OPPONENT]),
-        triggered(triggers::THIS_ATTACKS, drain, "Whenever Archon of Cruelty attacks, target opponent sacrifices a creature or planeswalker of their choice, discards a card, and loses 3 life. You draw a card and gain 3 life.")
+        triggered(triggers::THIS_ENTERS_OR_ATTACKS, drain, "Whenever this creature enters or attacks, target opponent sacrifices a creature or planeswalker of their choice, discards a card, and loses 3 life. You draw a card and gain 3 life.")
             .targets(&[targets::OPPONENT]),
     ],
     ..oracle::ARCHON_OF_CRUELTY

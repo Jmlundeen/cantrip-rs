@@ -170,6 +170,13 @@ pub fn this_attacks(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fi
     }
 }
 
+/// "Whenever this permanent enters or attacks" (CR 603.2, 603.6a): one triggered ability with two conditions, either its own entering the
+/// battlefield or its own attack. Overlord of the Balemurk, Overlord of the Mistmoors, Sentinel of the Nameless City, Archon of Cruelty
+/// and Dragonhawk, Fate's Tempest print it. The `listens` mask is `ZONE_CHANGE` and `ATTACKS`.
+pub fn this_enters_or_attacks(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    this_enters(q, source, event).or_else(|| this_attacks(q, source, event))
+}
+
 /// "Whenever this creature attacks" where the ability is about whom it attacks: the player attacked, or the
 /// planeswalker or battle (CR 508.5). The defender is the trigger's subject. Generous Plunderer and Otharri, Sun's
 /// Glory print it.
@@ -657,6 +664,7 @@ pub const YOU_DRAW_A_CARD: Trigger = when_asked(EventMask::DREW, you_draw_a_card
 pub const CAST_THIS_SPELL: Trigger = when(EventMask::SPELL_CAST, cast_this_spell);
 pub const MAGECRAFT: Trigger = when_asked(EventMask(EventMask::SPELL_CAST.0 | EventMask::COPIED.0), you_cast_or_copy_instant_or_sorcery);
 pub const THIS_ATTACKS: Trigger = when(EventMask::ATTACKS, this_attacks);
+pub const THIS_ENTERS_OR_ATTACKS: Trigger = when(EventMask(EventMask::ZONE_CHANGE.0 | EventMask::ATTACKS.0), this_enters_or_attacks);
 pub const THIS_ATTACKS_DEFENDER: Trigger = when(EventMask::ATTACKS, this_attacks_defender);
 pub const EQUIPPED_CREATURE_ATTACKS: Trigger = when(EventMask::ATTACKS, equipped_creature_attacks);
 pub const EQUIPPED_CREATURE_ATTACKS_SUBJECT: Trigger = when(EventMask::ATTACKS, equipped_creature_attacks_subject);

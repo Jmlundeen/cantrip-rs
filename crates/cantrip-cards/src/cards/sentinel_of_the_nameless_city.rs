@@ -9,8 +9,7 @@ fn map(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(triggers::THIS_ENTERS, map, "Whenever this creature enters, create a Map token."),
-        triggered(triggers::THIS_ATTACKS, map, "Whenever this creature attacks, create a Map token."),
+        triggered(triggers::THIS_ENTERS_OR_ATTACKS, map, "Whenever this creature enters or attacks, create a Map token."),
     ],
     ..oracle::SENTINEL_OF_THE_NAMELESS_CITY
 };
