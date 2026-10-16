@@ -95,8 +95,9 @@ pub const ONE_OR_MORE_CREATURES: Materials = materials(1, true, creature, "creat
 /// The exiled cards used to craft `permanent` (CR 702.167c): the cards exiled to pay the activation cost of the craft
 /// ability that put it onto the battlefield, as long as they remain in exile and it remains on the battlefield (the craft
 /// rulings, 2023-11-10), whoever controls it now. A token exiled that way is no card and ceased to exist, so it is none of
-/// them; a permanent that got onto the battlefield any other way, or left and came back, has none (CR 400.7). In exile
-/// order.
+/// them; a permanent that got onto the battlefield any other way, or left and came back, has none (CR 400.7). Asked of a
+/// permanent that has left (its enters trigger resolving after it is gone), they are the ones it had as it last existed
+/// (CR 608.2h). In exile order. Jade Seedstones's Jadeheart Attendant reads them.
 pub fn exiled_cards_used_to_craft(q: &dyn Query, permanent: ObjectId) -> Vec<ObjectId> {
     q.exiled_with(permanent)
 }
