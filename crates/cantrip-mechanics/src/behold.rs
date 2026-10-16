@@ -33,6 +33,12 @@ pub fn dragon(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
     q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Dragon))
 }
 
+/// A Jace, a permanent or a card in a hand: a planeswalker type is not a word a text-changing effect changes (CR 612.1,
+/// 205.3j). Theorist's Sanctum and Countersculpt behold one.
+pub fn jace(q: &dyn Query, _: &Asker, id: ObjectId) -> bool {
+    q.chars(id).has_subtype(Subtype::Jace)
+}
+
 /// "As this permanent enters, you may behold a [quality]" (CR 701.4a, 614.12a): the entering permanent's controller may
 /// choose a permanent they control or reveal a card in their hand that passes `filter`, the entering card apart. Whether
 /// they beheld. Nobody is asked when they have nothing to behold. Theorist's Sanctum prints it with a Jace.
