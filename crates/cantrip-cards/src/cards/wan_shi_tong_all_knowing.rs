@@ -5,6 +5,9 @@ use cantrip_oracle as oracle;
 /// "This token can't block or be blocked by non-Spirit creatures" (CR 509.1b): of any possible block it is in, the other
 /// creature must be a Spirit.
 fn spirit_blocking(q: &dyn Query, source: ObjectId, blocker: ObjectId, attacker: ObjectId) -> bool {
+    if source != blocker && source != attacker {
+        return true;
+    }
     let other = if source == blocker { attacker } else { blocker };
     q.chars(other).has_subtype(q.words(source).subtype(Subtype::Spirit))
 }

@@ -454,7 +454,7 @@ fn declare_attackers(cx: &mut Cx) -> R<()> {
 /// Whether `blocker` may block `attacker` (CR 509.1b): a creature that can't block, one that can block only creatures
 /// with flying, flying (CR 702.9b), shadow (CR 702.28b), protection (CR 702.16f). Menace (CR 702.110b) is about the
 /// whole declaration, not a pair.
-fn can_block(cx: &Cx, blocker: ObjectId, attacker: ObjectId) -> bool {
+fn can_block(cx: &Cx, blocker: ObjectId, attacker: ObjectId, rule_sources: &[ObjectId]) -> bool {
     let a = cx.chars(attacker);
     let b = cx.chars(blocker);
     if a.has(Keyword::CantBeBlocked) || b.has(Keyword::CantBlock) || (b.has(Keyword::CanBlockOnlyCreaturesWithFlying) && !a.has(Keyword::Flying)) {
@@ -470,14 +470,12 @@ fn can_block(cx: &Cx, blocker: ObjectId, attacker: ObjectId) -> bool {
     if a.has(Keyword::CantBeBlockedByPowerTwoOrLess) && b.power.is_none_or(|p| p <= 2) {
         return false;
     }
-    // CR 509.1b: a static ability that limits who may block whom, of the blocker or of the attacker.
-    for id in [blocker, attacker] {
+    // CR 509.1b: a static ability that limits who may block whom, of the blocker, of the attacker, or of another permanent
+    // ("creatures you control with power 2 or less can't be blocked by ...", Delney, Streetwise Lookout).
+    for &id in rule_sources {
         let obj = cx.s().obj(id);
         let card = obj.copy.map_or(obj.card, |c| c.card);
-        if cx.cards().block_rules[card.0 as usize]
-            && !cx.s().lost_all_abilities(id)
-            && !cx.card(card).block_rules.iter().all(|rule| rule(cx, id, blocker, attacker))
-        {
+        if !cx.card(card).block_rules.iter().all(|rule| rule(cx, id, blocker, attacker)) {
             return false;
         }
     }
@@ -510,10 +508,21 @@ fn declare_blockers(cx: &mut Cx) -> R<()> {
         .filter(|&id| cx.s().obj(id).controller == defender && cx.chars(id).is(CardType::Creature) && !cx.s().obj(id).tapped)
         .filter(|&id| !cant_block(cx, id))
         .collect();
+    // The permanents whose static abilities limit who may block whom (CR 509.1b), and which have not lost them (CR 613.1f).
+    let rule_sources: Vec<ObjectId> = cx
+        .s()
+        .battlefield()
+        .iter()
+        .copied()
+        .filter(|&id| {
+            let obj = cx.s().obj(id);
+            cx.cards().block_rules[obj.copy.map_or(obj.card, |c| c.card).0 as usize] && !cx.s().lost_all_abilities(id)
+        })
+        .collect();
     let mut allowed = Vec::new();
     for &b in &eligible {
         for &a in &attackers {
-            if can_block(cx, b, a) {
+            if can_block(cx, b, a, &rule_sources) {
                 allowed.push((b, a));
             }
         }

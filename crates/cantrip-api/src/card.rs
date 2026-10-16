@@ -991,9 +991,11 @@ impl GrantedWay {
 /// than their hands" (Drannith Magistrate) reads it.
 pub type CastRule = fn(&dyn Query, &Asker, PlayerId, ZoneKind) -> bool;
 
-/// A static ability that limits who may block whom (CR 509.1b): asked of the object that has it, with the blocker and the
-/// attacker of a possible block, either of which may be the object itself; false forbids the block. "This creature can't
-/// block or be blocked by non-Spirit creatures" (Wan Shi Tong's Spirits).
+/// A static ability that limits who may block whom (CR 509.1b): asked, while the object that has it is on the battlefield,
+/// of every possible block - the blocker and the attacker, either of which may be the object itself, or neither; false
+/// forbids the block. "This creature can't block or be blocked by non-Spirit creatures" (Wan Shi Tong's Spirits),
+/// "Creatures you control with power 2 or less can't be blocked by creatures with power 3 or greater" (Delney, Streetwise
+/// Lookout).
 pub type BlockRule = fn(&dyn Query, ObjectId, ObjectId, ObjectId) -> bool;
 
 /// What a [`TargetingRule`] changes about targeting.
