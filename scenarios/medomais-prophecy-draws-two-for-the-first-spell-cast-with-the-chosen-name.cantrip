@@ -1,0 +1,63 @@
+# Medomai's Prophecy: I scries 2 as it enters; II asks for a card name as it resolves and the Saga remembers it
+# (CR 607.2d); III sets up "when you cast a spell with the chosen name for the first time this turn, draw two cards"
+# (CR 603.7). Bot1's first Lightning Bolt that turn draws two cards and the second draws nothing. IV looks at the top
+# card of each library, and the Saga is sacrificed after it (CR 714.4).
+
+[Bot1 Deck]
+Island
+Island
+Medomai's Prophecy
+Mountain
+Mountain
+Lightning Bolt
+Lightning Bolt
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Medomai's Prophecy.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Island; Island |)
+[T5 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+Bot1.Name(Lightning Bolt)
+? Bot1.Battlefield.Medomai's Prophecy.ChosenName = Lightning Bolt
+Bot1.Hand.Mountain.Play
+[T7 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+? Bot1.Library.Count = 9
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Bot1.Library.Count = 9
+[T9 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Medomai's Prophecy; Lightning Bolt; Lightning Bolt
+
+[Expect]
+Turn = 9
+Bot2.Life = 14
+Bot1.Battlefield = Island; Island; Mountain; Mountain

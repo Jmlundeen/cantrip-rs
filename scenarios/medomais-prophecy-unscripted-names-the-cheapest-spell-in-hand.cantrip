@@ -1,0 +1,30 @@
+# An unscripted player's name for Medomai's Prophecy's chapter II is the cheapest spell in their hand, the one most
+# likely cast on chapter III's turn: Bot1 holds Counterspell and Lightning Bolt (and lands), and, given no Name line,
+# names Lightning Bolt.
+
+[Bot1 Deck]
+Island
+Island
+Medomai's Prophecy
+Counterspell
+Lightning Bolt
+Mountain
+Island
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Medomai's Prophecy.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Medomai's Prophecy.ChosenName = Lightning Bolt

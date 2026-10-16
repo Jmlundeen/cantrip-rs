@@ -1,0 +1,49 @@
+# "For the first time this turn" counts every spell with the chosen name cast this turn, those cast before chapter III's
+# delayed ability existed too: Bot1 casts a Lightning Bolt in response to chapter III, so the Bolt it casts after III
+# has resolved is the second this turn and nothing triggers (Stack.Count = 1).
+
+[Bot1 Deck]
+Island
+Island
+Medomai's Prophecy
+Mountain
+Mountain
+Lightning Bolt
+Lightning Bolt
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Medomai's Prophecy.Cast
+[T5 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+Bot1.Name(Lightning Bolt)
+Bot1.Hand.Mountain.Play
+[T7 Bot1.Main1]
+? Stack.Count = 1
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 7
+Bot2.Life = 14
+Bot1.Library.Count = 11

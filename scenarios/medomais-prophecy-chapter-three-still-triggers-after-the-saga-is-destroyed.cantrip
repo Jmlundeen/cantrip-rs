@@ -1,0 +1,58 @@
+# Chapter III's delayed ability outlives the Saga (CR 603.7): after it resolves, Bot2 channels Boseiju, Who Endures to
+# destroy Medomai's Prophecy, and Bot1's Lightning Bolt still draws two, the chosen name read from the Saga as it last
+# existed (CR 607.2d, 608.2h).
+
+[Bot1 Deck]
+Island
+Island
+Medomai's Prophecy
+Mountain
+Mountain
+Lightning Bolt
+Island x15
+
+[Bot2 Deck]
+Forest
+Forest
+Boseiju, Who Endures
+Island x17
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Medomai's Prophecy.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+Bot1.Name(Lightning Bolt)
+Bot1.Hand.Mountain.Play
+[T7 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Boseiju, Who Endures.Activate(Bot1.Battlefield.Medomai's Prophecy)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Medomai's Prophecy
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 7
+Bot2.Life = 17
+Bot1.Library.Count = 9
