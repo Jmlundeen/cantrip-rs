@@ -594,6 +594,20 @@ pub fn creature_you_control_deals_combat_damage_to_player(q: &dyn Query, me: &As
     }
 }
 
+/// "Whenever you commit a crime" (CR 700.13): the ability's controller cast a spell, activated an ability or put a
+/// triggered ability on the stack that targets an opponent, anything an opponent controls and/or a card in an opponent's
+/// graveyard - once for that spell or ability, however many such targets it has. Magda, the Hoardmaster, Raven of Fell
+/// Omens, Blood Hustler and Deepmuck Desperado print it.
+pub fn you_commit_a_crime(_: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::CrimeCommitted { player, .. } if *player == me.controller => Fired::PLAIN,
+        _ => None,
+    }
+}
+
+/// "Whenever you commit a crime" as a trigger condition: `triggered(YOU_COMMIT_A_CRIME, ..)`.
+pub const YOU_COMMIT_A_CRIME: Trigger = when_asked(EventMask::CRIME, you_commit_a_crime);
+
 /// "Whenever you flip a coin" (CR 705.1): any flip its controller makes, won or lost.
 pub fn you_flip_a_coin(_: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match event {

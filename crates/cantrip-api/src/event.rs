@@ -98,6 +98,13 @@ pub enum Event {
     Done { source: ObjectId, ability: AbilityRef, player: PlayerId },
     /// An effect ended the turn (CR 724.1) of `player`, the player whose turn it was: recorded as the stack is exiled.
     TurnEnded { player: PlayerId },
+    /// `player` committed a crime (CR 700.13): as they cast a spell, activated an ability or put a triggered ability on
+    /// the stack, it targeted at least one opponent; at least one permanent, spell or ability an opponent controls; and/or
+    /// at least one card in an opponent's graveyard. One event for the spell or ability however many of its targets are
+    /// crimes, so "whenever you commit a crime" triggers once for it. `by` is the spell, or the source of the ability. A
+    /// copy is neither cast nor activated (CR 707.10) and a new target chosen for a spell or ability already on the stack
+    /// (CR 115.7) is not choosing it as it is cast, activated or put on the stack: neither commits one.
+    CrimeCommitted { player: PlayerId, by: ObjectId },
 }
 
 impl Event {
@@ -122,7 +129,8 @@ impl Event {
             | Event::CoinFlipped { player, .. }
             | Event::DieRolled { player, .. }
             | Event::Done { player, .. }
-            | Event::TurnEnded { player } => Some(player),
+            | Event::TurnEnded { player }
+            | Event::CrimeCommitted { player, .. } => Some(player),
             Event::Cast(c) => Some(c.player),
             Event::BecameTarget { controller, .. } => Some(controller),
             Event::Damage { target: Target::Player(p), .. } => Some(p),
@@ -148,6 +156,7 @@ impl Event {
             | Event::Triggered { source, .. }
             | Event::ModesChosen { source, .. }
             | Event::Done { source, .. } => source == object,
+            Event::CrimeCommitted { by, .. } => by == object,
             Event::Attacks { attacker, .. } | Event::Unblocked { attacker, .. } => attacker == object,
             Event::Blocks { blocker, attacker } => blocker == object || attacker == object,
             Event::ClassLevel { object: o, .. }
@@ -206,6 +215,7 @@ impl EventMask {
     pub const DOOR_UNLOCKED: EventMask = EventMask(1 << 34);
     pub const GAVE_GIFT: EventMask = EventMask(1 << 35);
     pub const TURN_ENDED: EventMask = EventMask(1 << 36);
+    pub const CRIME: EventMask = EventMask(1 << 37);
 
     /// An event's kind as the history files it: every event has one. `of` is what triggers listen for, which leaves
     /// out the records no ability triggers on.
@@ -266,6 +276,7 @@ impl EventMask {
             Event::AbilityActivated { .. } => EventMask::ABILITY_ACTIVATED,
             Event::DoorUnlocked { .. } => EventMask::DOOR_UNLOCKED,
             Event::GaveGift { .. } => EventMask::GAVE_GIFT,
+            Event::CrimeCommitted { .. } => EventMask::CRIME,
             _ => EventMask(0),
         }
     }

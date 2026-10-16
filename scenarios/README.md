@@ -337,6 +337,8 @@ kind, place it where the action could otherwise be taken, with a wait or `BotN.P
   unlocked by `Bot1.Battlefield.Unholy Annex.Activate(Ability: right door)`, a special action paid with the mana abilities that follow.
 - `BotN.Revealed` (present once the player has revealed a card): the cards they revealed, in order, from the history; a beheld
   card (CR 701.4a) is revealed from a hand, a beheld permanent is not
+- `BotN.Crimes` (present once the player has committed a crime, CR 700.13): the spells, and the sources of the abilities,
+  by which they committed one, in order, from the history - one per spell or ability however many of its targets were crimes
 - `BotN.Battlefield.<Name>.Tapped` and `.Types` (computed card types, `Land; Creature` for an animated land); for
   creatures also `.Power`, `.Toughness`, `.Damage` and `.SummoningSick`
 - `BotN.Battlefield.<Name>.Token` (`true`) for a token, absent for a card

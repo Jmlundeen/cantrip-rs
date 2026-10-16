@@ -85,6 +85,10 @@ abilities: &[
   `triggers::activation` (the object, the activating player, the `ActivatedDef`: `is_loyalty_ability()`,
   `is_mana_ability()`, `from`); only abilities that use the stack are activations a trigger sees - a mana ability's is
   not emitted yet.
+  "Whenever you commit a crime" (CR 700.13) is `triggers::YOU_COMMIT_A_CRIME`, on `Event::CrimeCommitted`: the core
+  records one for each spell cast, ability activated or triggered ability put on the stack that targets an opponent,
+  anything an opponent controls or a card in an opponent's graveyard (never a copy, never a changed target); "if you've
+  committed a crime this turn" asks the history for one.
 - **The rest** is a method after the call: `.targets(..)`, `.sorcery_speed()`, `.once_each_turn()`, `.condition(..)`
   (an activation restriction, or a trigger's intervening "if"), `.modal(..)`, `.look_back()`, `.anywhere()`, and the
   others in `ability.rs`. A loyalty ability is already sorcery speed (CR 606.3).

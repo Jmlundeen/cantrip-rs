@@ -1,0 +1,35 @@
+# CR 700.13 and its ruling: "Only the initial targets chosen for that spell or ability are used to determine whether or
+# not its controller committed a crime." Bot1 casts Lightning Bolt at itself (no crime), then Untimely Malfunction's
+# second mode at its own Bolt (a spell Bot1 controls: no crime) changes the Bolt's target to Bot2, the only other legal
+# target (CR 115.7a). The Bolt deals 3 to Bot2, and Bot1 has committed no crime.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Lightning Bolt
+Untimely Malfunction
+Mountain x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Hand.Untimely Malfunction.Cast
+Bot1.Modes(2)
+Bot1.Target(Lightning Bolt)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Crimes = (absent)
+Bot2.Life = 17
+Bot1.Life = 20
+Bot1.Graveyard = Lightning Bolt; Untimely Malfunction

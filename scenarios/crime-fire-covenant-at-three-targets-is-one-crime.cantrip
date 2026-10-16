@@ -1,0 +1,43 @@
+# CR 700.13 and its ruling: "A player can commit only one crime per spell or ability they control." Bot1's Fire Covenant
+# (X = 3) divides 1 damage among Bot2's two Ornithopters and Bot1's own: two of its targets are crimes, and it is one
+# crime, recorded once.
+
+[Bot1 Deck]
+Swamp
+Mox Ruby
+Mox Jet
+Ornithopter
+Fire Covenant
+Swamp x15
+
+[Bot2 Deck]
+Island
+Ornithopter
+Ornithopter
+Island x17
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+Bot1.Hand.Fire Covenant.Cast(X: 3)
+Bot1.Divide(Bot2.Battlefield.Ornithopter#1: 1; Bot2.Battlefield.Ornithopter#2: 1; Bot1.Battlefield.Ornithopter: 1)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Crimes = Fire Covenant
+Bot1.Life = 17
+Bot1.Battlefield.Ornithopter.Damage = 1
+Bot2.Battlefield.Ornithopter#1.Damage = 1
+Bot2.Battlefield.Ornithopter#2.Damage = 1

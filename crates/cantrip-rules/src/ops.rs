@@ -7,6 +7,33 @@ use cantrip_state::PendingTrigger;
 use crate::layers::{self, live};
 use crate::{Cx, R, replace};
 
+/// A player commits a crime (CR 700.13) as they cast a spell, activate an ability or put a triggered ability on the stack
+/// that targets at least one opponent; at least one permanent, spell or ability an opponent controls; and/or at least one
+/// card in an opponent's graveyard: called by those three procedures, once each with the targets chosen, after their
+/// `BecameTarget` events. One crime is recorded however many targets qualify. Each target is judged as it is now, as the
+/// object becomes cast, activated or put on the stack; a permanent a cost took away is judged by its row as it left. A
+/// card in exile, a hand or a library is no crime, nor is anything of the player's own.
+pub(crate) fn commit_crime(cx: &mut Cx, player: PlayerId, by: ObjectId, targets: &[Target]) {
+    let s = cx.s();
+    let opponent = |p: PlayerId| p != player && s.opponents(player).any(|o| o == p);
+    let crime = targets.iter().any(|&t| match t {
+        Target::Player(p) => opponent(p),
+        Target::Object(id) => {
+            let o = s.obj(id);
+            match o.zone.kind() {
+                ZoneKind::Battlefield | ZoneKind::Stack => opponent(o.controller),
+                ZoneKind::Graveyard => opponent(o.zone.player),
+                _ => false,
+            }
+        }
+        Target::Ability(serial) => s.stack.iter().any(|i| i.serial == serial && i.kind != StackKind::Spell && opponent(i.controller)),
+        Target::None => false,
+    });
+    if crime {
+        cx.emit(Event::CrimeCommitted { player, by });
+    }
+}
+
 /// One object about to move, and how it arrives if it is entering the battlefield.
 #[derive(Clone, Copy)]
 pub struct Moving {

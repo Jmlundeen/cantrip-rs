@@ -245,6 +245,20 @@ impl StateDump {
             if !revealed.is_empty() {
                 d.list(&format!("{b}.Revealed"), revealed, false);
             }
+            // The crimes this player committed (CR 700.13), in order, from the history (`Event::CrimeCommitted`): each the
+            // spell, or the source of the ability, that was one.
+            let crimes: Vec<String> = game
+                .history()
+                .all()
+                .iter()
+                .filter_map(|r| match r.event {
+                    Event::CrimeCommitted { player, by } if player == p => Some(game.name(by).to_string()),
+                    _ => None,
+                })
+                .collect();
+            if !crimes.is_empty() {
+                d.list(&format!("{b}.Crimes"), crimes, true);
+            }
             d.list(&format!("{b}.Library"), names(s.zone(Zone::library(p))), true);
             let mut graveyard = names(s.zone(Zone::graveyard(p)));
             graveyard.reverse();

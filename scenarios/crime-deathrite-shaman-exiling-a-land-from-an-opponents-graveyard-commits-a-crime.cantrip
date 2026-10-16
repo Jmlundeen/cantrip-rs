@@ -1,0 +1,40 @@
+# CR 700.13: an activated ability, and "at least one card in an opponent's graveyard". On turn 3 Bot1's Deathrite
+# Shaman exiles Bot1's own Fabled Passage from Bot1's graveyard: no crime. On turn 5 it exiles the Forest Bot2 discarded
+# to hand size: that activation is a crime, and the only one.
+
+[Bot1 Deck]
+Swamp
+Deathrite Shaman
+Fabled Passage
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Mountain x7
+Forest
+Mountain x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Deathrite Shaman.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Fabled Passage.Play
+Bot1.Battlefield.Fabled Passage.Activate
+Bot1.Search(Swamp)
+Bot1.Battlefield.Deathrite Shaman.Activate(Bot1.Graveyard.Fabled Passage; Ability: land)
+Bot1.Colors(Black)
+Bot1.Pass
+? Bot1.Crimes = (absent)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Deathrite Shaman.Activate(Bot2.Graveyard.Forest; Ability: land)
+? Bot1.Crimes = Deathrite Shaman
+Bot1.Colors(Black)
+Bot1.Pass
+
+[Expect]
+Bot1.Crimes = Deathrite Shaman
+Exile = Fabled Passage; Forest

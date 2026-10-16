@@ -2628,6 +2628,7 @@ fn cast(
     for &t in targets.iter().filter(|&&t| t != Target::None) {
         cx.emit(Event::BecameTarget { target: t, by: spell, controller: player });
     }
+    ops::commit_crime(cx, player, spell, targets);
     Ok(())
 }
 
@@ -3312,6 +3313,7 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
     for &t in targets.iter().filter(|&&t| t != Target::None) {
         cx.emit(Event::BecameTarget { target: t, by: source, controller: player });
     }
+    ops::commit_crime(cx, player, source, &targets);
     Ok(())
 }
 

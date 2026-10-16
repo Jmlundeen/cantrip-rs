@@ -1,0 +1,48 @@
+# CR 700.13: "at least one ... ability an opponent controls". Bot2 activates Abandoned Air Temple's counter ability;
+# Bot1 flashes in Tishana's Tidebinder and its enters trigger targets that ability on the stack: Bot1 commits a crime
+# with the trigger. Bot2's activation targeted nothing and is no crime.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Tishana's Tidebinder
+Island
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Plains
+Mother of Runes
+Black Lotus
+Abandoned Air Temple
+Plains
+Plains
+Plains
+Plains x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Mother of Runes.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot1.Hand.Island.Play
+Bot2.Hand.Abandoned Air Temple.Play
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Abandoned Air Temple.Activate(Ability: +1/+1 counter)
+? Stack.Count = 1
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Tishana's Tidebinder.Cast
+? Bot1.Crimes = (absent)
+Bot1.Target(Stack.Abandoned Air Temple)
+? Bot1.Crimes = Tishana's Tidebinder
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Crimes = Tishana's Tidebinder
+Bot2.Crimes = (absent)
+Bot2.Battlefield.Mother of Runes.Counters.PlusOnePlusOne = (absent)

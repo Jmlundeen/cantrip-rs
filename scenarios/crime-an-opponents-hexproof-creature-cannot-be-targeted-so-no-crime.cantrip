@@ -1,0 +1,49 @@
+# CR 700.13 needs a target, and hexproof (CR 702.11b) keeps Bot2's Sylvan Caryatid out of Bot1's Lightning Bolt's
+# candidates: the Bolt at it is refused, and Bot1 aims it at its own Ornithopter instead - no crime. The positive control
+# of the refusal is the Bolt at Bot2's Ornithopter, a crime, in the same turn's second Bolt.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Ornithopter
+Lightning Bolt
+Lightning Bolt
+Mountain x15
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Sylvan Caryatid
+Ornithopter
+Forest x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Sylvan Caryatid.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+! Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Sylvan Caryatid)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+? Bot1.Crimes = (absent)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+? Bot1.Crimes = Lightning Bolt
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Crimes = Lightning Bolt
+Bot1.Graveyard = Lightning Bolt; Ornithopter; Lightning Bolt
+Bot2.Graveyard = Ornithopter
+Bot2.Battlefield = Forest; Mox Emerald; Sylvan Caryatid

@@ -252,6 +252,13 @@ A delayed triggered ability waits as a `Delayed` record in the state, on no obje
 (`DelayedWhen::Step`), at each such step for the rest of the game (`EachStep`: paradigm, CR 702.192a, which goes on whatever
 happens to the card it came from), or on events this turn, until an event or until a player's next turn.
 
+A crime (CR 700.13) is `Event::CrimeCommitted { player, by }`, emitted by `ops::commit_crime` from the three procedures that
+choose targets for a new object - casting a spell (CR 601.2i), activating an ability (CR 602.2) and putting a triggered
+ability on the stack (CR 603.3d), the trigger's controller the criminal - after their `BecameTarget` events, once for the
+object however many of its targets are an opponent, a permanent, spell or ability an opponent controls, or a card in an
+opponent's graveyard. A copy (CR 707.10) and a changed target (CR 115.7) choose no targets that way and commit none. It costs
+nothing where nothing targets an opponent's things. The scenario dump lists a player's crimes as `BotN.Crimes`.
+
 ### Life: gaining it, and damage that can't be prevented
 
 Every gain and loss of life goes through `ops::change_life` (CR 119.3): an effect's, a cost's (CR 119.4), damage (CR
