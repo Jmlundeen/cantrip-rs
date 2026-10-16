@@ -6,7 +6,7 @@ use cantrip_oracle as oracle;
 /// "As Gollum enters, choose odd or even" (CR 614.12a), kept on the permanent as the chosen quality. Zero is even.
 fn enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
     let card = g.obj(entering.object).card;
-    let odd = choose::one_of(g, entering.controller, entering.object, vec![Label::Card(card, 0), Label::Card(card, 1)])? == 0;
+    let odd = choose::odd_or_even(g, entering.controller, entering.object, card)?;
     entering.chosen_odd = Some(odd);
     Ok(())
 }
@@ -15,7 +15,7 @@ fn enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
 fn opponent_casts_a_matching_spell(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     let Event::SpellCast { spell, player, .. } = event else { return None };
     let odd = q.obj(source).marks.chosen_odd?;
-    if *player == q.controller(source) || (q.mana_value(*spell) % 2 == 1) != odd {
+    if *player == q.controller(source) || !choose::mana_value_of_quality(q, *spell, odd) {
         return None;
     }
     Fired::PLAIN
@@ -61,7 +61,7 @@ static RIDDLE: ModalDef = modes(&[
 
 pub static CARD: CardDef = CardDef {
     enters: Some(enters),
-    labels: &["Odd", "Even"],
+    labels: choose::ODD_OR_EVEN,
     abilities: &[modal_triggered(when(EventMask::SPELL_CAST, opponent_casts_a_matching_spell), &RIDDLE, "Whenever an opponent casts a spell with mana value of the chosen quality, choose one that hasn't been chosen \u{2014} put a +1/+1 counter on Gollum; or each opponent loses 2 life and you gain 2 life; or draw a card.")],
     ..oracle::GOLLUM_RIDDLE_MASTER
 };

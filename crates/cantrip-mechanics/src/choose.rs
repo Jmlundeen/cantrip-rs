@@ -114,3 +114,18 @@ pub fn cast_any_number_free(g: &mut dyn Game, player: PlayerId, source: ObjectId
         g.cast_during_resolution(card, Some(ManaCost::ZERO))?;
     }
 }
+
+/// The labels "choose odd or even" offers, odd first: a card that asks it lists them as its `labels`.
+pub const ODD_OR_EVEN: &[&str] = &["Odd", "Even"];
+
+/// "Choose odd or even" (Gollum, Riddle Master as it enters; Thanos, the Mad Titan's power-up): true for odd. `card` is the
+/// card whose `labels` are `ODD_OR_EVEN`.
+pub fn odd_or_even(g: &mut dyn Game, player: PlayerId, source: ObjectId, card: CardId) -> Result<bool, Suspend> {
+    Ok(one_of(g, player, source, vec![Label::Card(card, 0), Label::Card(card, 1)])? == 0)
+}
+
+/// Whether an object's mana value is of the chosen quality, odd or even: zero is even (Gollum, Riddle Master; Thanos, the
+/// Mad Titan).
+pub fn mana_value_of_quality(q: &dyn Query, id: ObjectId, odd: bool) -> bool {
+    (q.mana_value(id) % 2 == 1) == odd
+}
