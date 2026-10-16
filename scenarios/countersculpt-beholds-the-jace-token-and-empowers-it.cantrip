@@ -1,0 +1,49 @@
+# The Jace planeswalker token is a Jace, so Countersculpt may behold it (CR 701.4a) - and then empower Jace 1 puts its
+# counter on that same token, the only Jace token Bot1 controls. Fatehold Charm made it with 2 loyalty on turn 1; after
+# Countersculpt counters Bot2's Lightning Bolt it has 3, and no second token was made.
+
+[Bot1 Deck]
+Tundra
+Mox Pearl
+Mox Sapphire
+Mox Sapphire
+Fatehold Charm
+Countersculpt
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x5
+Mountain x13
+
+[Actions]
+Bot1.Hand.Tundra.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Tundra.Activate(Ability: {U})
+Bot1.Hand.Fatehold Charm.Cast
+Bot1.Modes(Draw a card)
+Bot2.Pass
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Jace.Counters.Loyalty = 2
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Countersculpt.Cast
+Bot1.Modes(Behold a Jace)
+Bot1.Target(Stack.Lightning Bolt)
+Bot1.Choose(Jace)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Graveyard = Lightning Bolt
+Bot1.Battlefield.Jace.Counters.Loyalty = 3
+Bot1.Battlefield.Count = 5

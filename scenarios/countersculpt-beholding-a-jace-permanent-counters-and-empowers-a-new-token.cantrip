@@ -1,0 +1,50 @@
+# Countersculpt: "As an additional cost to cast this spell, behold a Jace or pay {1}." Bot1 controls Jace, the Mind Sculptor
+# and beholds it (choosing a permanent reveals nothing), so the spell costs {U}{U} alone: two Mox Sapphires pay it and the pool
+# is empty. "Counter target spell. Empower Jace 1": Bot2's Lightning Bolt is countered, and since the nontoken Jace is never
+# empowered, a Jace token is made with one loyalty counter; Jace, the Mind Sculptor keeps its 3.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Jace, the Mind Sculptor
+Mox Sapphire
+Mox Sapphire
+Countersculpt
+Island
+Island x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x5
+Mountain x13
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Jace, the Mind Sculptor.Cast
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Countersculpt.Cast
+Bot1.Modes(Behold a Jace)
+Bot1.Target(Stack.Lightning Bolt)
+Bot1.Choose(Jace, the Mind Sculptor)
+? Bot1.Mana =
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Graveyard = Lightning Bolt
+Bot1.Graveyard = Countersculpt; Black Lotus
+Bot1.Battlefield.Jace.Counters.Loyalty = 1
+Bot1.Battlefield.Jace.Token = true
+Bot1.Battlefield.Jace, the Mind Sculptor.Counters.Loyalty = 3

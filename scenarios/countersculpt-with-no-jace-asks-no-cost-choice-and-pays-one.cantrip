@@ -1,0 +1,38 @@
+# With no Jace anywhere, beholding cannot be paid, so the only additional cost Countersculpt can take is {1}, taken without
+# asking (CR 601.2b: only payable costs are offered, and the engine takes a lone one). Bot1 floats {U}{U}{U}, all of which
+# goes to {U}{U}{1}, and the Lightning Bolt (the only spell, so the target taken) is countered; empower Jace 1 makes the token.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Sapphire
+Countersculpt
+Island x3
+Island x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x5
+Mountain x13
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Countersculpt.Cast
+! Bot1.Modes
+? Bot1.Mana =
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Graveyard = Lightning Bolt
+Bot1.Battlefield.Jace.Counters.Loyalty = 1

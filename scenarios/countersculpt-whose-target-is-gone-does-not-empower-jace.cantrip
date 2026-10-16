@@ -1,0 +1,42 @@
+# "If each target chosen is an illegal target as that spell or ability tries to resolve, it won't resolve. You won't empower
+# Jace" (the ruling; CR 608.2b). Bot1 casts Countersculpt at Bot2's Lightning Bolt, then Counterspell at it too; Counterspell
+# resolves first and counters the Bolt, so Countersculpt's only target is gone: it does nothing and no Jace token is made.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Mox Sapphire
+Countersculpt
+Counterspell
+Island
+Island x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x5
+Mountain x13
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Countersculpt.Cast
+Bot1.Target(Stack.Lightning Bolt)
+Bot1.Hand.Counterspell.Cast(Stack.Lightning Bolt)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Graveyard = Lightning Bolt
+Bot1.Graveyard = Countersculpt; Counterspell; Black Lotus
+Bot1.Battlefield = Island; Mox Sapphire; Mox Sapphire

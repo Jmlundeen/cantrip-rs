@@ -1,0 +1,32 @@
+# With no Jace to behold, Countersculpt's additional cost can only be paid as {1}, so it costs {U}{U}{1} (CR 601.2b, 601.2f):
+# Bot1, with only an Island and a Mox Sapphire, is not offered the cast against Bot2's Lightning Bolt, and takes the 3 damage.
+# The positive control is countersculpt-beholding-a-jace-card-in-hand-reveals-it-and-costs-only-two: the same mana and a Jace
+# card in hand, and the cast is offered.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Countersculpt
+Island x4
+Island x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x5
+Mountain x13
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+! Bot1.Hand.Countersculpt.Cast
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 17
+Bot2.Graveyard = Lightning Bolt
+Bot1.Hand.Count = 5

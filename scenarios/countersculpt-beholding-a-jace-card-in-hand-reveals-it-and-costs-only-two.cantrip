@@ -1,0 +1,44 @@
+# Browser
+# Countersculpt beholding a Jace card from the hand (CR 701.4a): Jace, the Mind Sculptor is revealed and stays in the hand.
+# Bot1 has only an Island and a Mox Sapphire, {U}{U}: with the behold paid instead of {1}, that is the whole cost. This is
+# also the positive control for countersculpt-with-no-jace-and-only-two-mana-cannot-be-cast, which has the same mana and no
+# Jace. In the browser the two additional costs are offered as buttons, and the behold is asked as one.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Jace, the Mind Sculptor
+Countersculpt
+Island x3
+Island x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x5
+Mountain x13
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Hand.Countersculpt.Cast
+? Client.Bot1.Prompt.Modes = Behold a Jace; Pay {1}
+Bot1.Modes(Behold a Jace)
+Bot1.Target(Stack.Lightning Bolt)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+? Client.Bot1.Prompt.Title = Countersculpt: choose a Jace you control or reveal a Jace card from your hand to behold
+Bot1.Choose(Jace, the Mind Sculptor)
+? Client.Bot1.Confirm = Behold it
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Revealed = Jace, the Mind Sculptor
+Bot1.Hand = Jace, the Mind Sculptor; Island; Island; Island
+Bot2.Graveyard = Lightning Bolt
+Bot1.Battlefield.Jace.Counters.Loyalty = 1

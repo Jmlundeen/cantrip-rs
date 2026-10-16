@@ -1,0 +1,45 @@
+# Countersculpt aimed at Abrupt Decay, which can't be countered: the target is still legal, so Countersculpt resolves and
+# does all it can (CR 101.3, 608.2b) - the counter does nothing, and empower Jace 1 still makes the Jace token. Abrupt
+# Decay then resolves and destroys Bot1's Mox Pearl.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Sapphire
+Mox Pearl
+Countersculpt
+Island x2
+Island x10
+
+[Bot2 Deck]
+Bayou
+Black Lotus
+Abrupt Decay
+Swamp x4
+Swamp x13
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Bayou.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Bayou.Activate(Ability: {B})
+Bot2.Hand.Abrupt Decay.Cast(Bot1.Battlefield.Mox Pearl)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Countersculpt.Cast
+Bot1.Target(Stack.Abrupt Decay)
+Bot2.Pass
+? Bot1.Battlefield.Jace.Counters.Loyalty = 1
+? Stack = Abrupt Decay
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Mox Pearl; Countersculpt
+Bot2.Graveyard = Abrupt Decay; Black Lotus
+Bot1.Battlefield.Jace.Counters.Loyalty = 1

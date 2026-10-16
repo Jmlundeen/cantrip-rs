@@ -1,0 +1,41 @@
+# Countersculpt's other additional cost: with a Jace card in hand Bot1 may still choose to pay {1} instead (CR 601.2b), and
+# then nothing is beheld or revealed. Bot1 floats exactly {U}{U}{W}, which pays {U}{U} and the {1}, and the pool is empty.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Pearl
+Jace, the Mind Sculptor
+Countersculpt
+Island x2
+Island x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x5
+Mountain x13
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Countersculpt.Cast
+Bot1.Modes(Pay {1})
+Bot1.Target(Stack.Lightning Bolt)
+! Bot1.Choose
+? Bot1.Mana =
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Hand = Jace, the Mind Sculptor; Island; Island
+Bot2.Graveyard = Lightning Bolt
+Bot1.Battlefield.Jace.Counters.Loyalty = 1
