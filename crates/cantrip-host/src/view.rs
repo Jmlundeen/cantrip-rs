@@ -608,13 +608,21 @@ impl<'a> Projector<'a> {
             }
         };
         let until = match duration {
-            Duration::EndOfTurn => " this turn".to_string(),
-            Duration::UntilNextTurnOf(q) if q == self.viewer => " until your next turn".to_string(),
-            Duration::UntilNextTurnOf(q) if q == p => format!(" until {whose} next turn"),
-            Duration::UntilNextTurnOf(q) => format!(" until {}'s next turn", self.names.get(q.index()).cloned().unwrap_or_default()),
-            _ => String::new(),
+            Duration::UntilNextTurnOf(q) if q == p && q != self.viewer => format!(" until {whose} next turn"),
+            _ => self.until_text(duration),
         };
         format!("{who} can't cast spells{from}{until}.")
+    }
+
+    /// How long an effect lasts, as `viewer` reads it: " this turn", " until your next turn", " until Bot1's next turn", or
+    /// nothing for one that lasts as long as its object.
+    fn until_text(&self, duration: Duration) -> String {
+        match duration {
+            Duration::EndOfTurn => " this turn".to_string(),
+            Duration::UntilNextTurnOf(q) if q == self.viewer => " until your next turn".to_string(),
+            Duration::UntilNextTurnOf(q) => format!(" until {}'s next turn", self.names.get(q.index()).cloned().unwrap_or_default()),
+            _ => String::new(),
+        }
     }
 
     fn zone_view(&self, kind: ZoneKind, owner: PlayerId, handles: &mut HandleSpace, visible: &HashSet<ObjectId>) -> ZoneView {
@@ -905,6 +913,18 @@ impl<'a> Projector<'a> {
         }
         if (on_battlefield || zone.is(ZoneKind::Stack)) && !obj.face_down {
             self.ability_changes(&mut view, &c, obj.copy);
+        }
+        // "Can't attack" and "can't block" from a resolved effect (CR 508.1c, 509.1b), with how long they last: no ability
+        // of the creature says so, so its face does.
+        if on_battlefield {
+            for e in s.effects.iter().filter(|e| e.affected == id) {
+                let what = match e.kind {
+                    EffectKind::CantAttack => "Can't attack",
+                    EffectKind::CantBlock => "Can't block",
+                    _ => continue,
+                };
+                view.granted_abilities.push(AbilityTextView { text: format!("{what}{}.", self.until_text(e.duration)), spent: false });
+            }
         }
 
         if obj.face_down {
