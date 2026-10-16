@@ -1,8 +1,6 @@
 use cantrip_api::*;
-use cantrip_mechanics::effects::ask_may_return_this_card;
+use cantrip_mechanics::effects::may_return_this_card_to_battlefield;
 use cantrip_oracle as oracle;
-
-const ASK: Question = Question::new("ReturnToBattlefield", "return it from your graveyard to the battlefield?", "", "Return it", "Leave it");
 
 /// "Whenever you cast a spell, if it's the second creature spell you cast this turn": this turn's history says how
 /// each spell was cast, this one included (CR 603.4: a fact about the past). It functions from its owner's graveyard
@@ -17,17 +15,8 @@ fn second_creature_spell(q: &dyn Query, source: ObjectId, event: &Event) -> Opti
     if creatures == 2 { Fired::PLAIN } else { None }
 }
 
-/// "You may return this card from your graveyard to the battlefield": nothing is asked once it is no longer the card that
-/// triggered (CR 400.7).
-fn return_to_battlefield(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if ask_may_return_this_card(g, item, Purpose::Ask(&ASK))? {
-        g.put_onto_battlefield(item.object, item.controller, false)?;
-    }
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
-    abilities: &[triggered(when(EventMask::SPELL_CAST, second_creature_spell), return_to_battlefield, "Whenever you cast a spell, if it's the second creature spell you cast this turn, you may return this card from your graveyard to the battlefield.")
+    abilities: &[triggered(when(EventMask::SPELL_CAST, second_creature_spell), may_return_this_card_to_battlefield, "Whenever you cast a spell, if it's the second creature spell you cast this turn, you may return this card from your graveyard to the battlefield.")
         .anywhere()],
     ..oracle::VENGEVINE
 };

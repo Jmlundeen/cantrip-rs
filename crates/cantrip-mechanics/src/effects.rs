@@ -192,6 +192,18 @@ pub fn ask_may_return_this_card(g: &mut dyn Game, item: &StackItem, purpose: Pur
     ask_may(g, item.controller, item.object, purpose)
 }
 
+const RETURN_TO_BATTLEFIELD: Question = Question::new("ReturnToBattlefield", "return it from your graveyard to the battlefield?", "", "Return it", "Leave it");
+
+/// "You may return this card from your graveyard to the battlefield" (CR 113.6k): `ask_may_return_this_card` with the
+/// question worded for the battlefield, and the card put onto the battlefield untapped under its controller on a yes.
+/// Nothing is asked once it is no longer the object that triggered (CR 400.7). Vengevine and Bloodghast print it.
+pub fn may_return_this_card_to_battlefield(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if ask_may_return_this_card(g, item, Purpose::Ask(&RETURN_TO_BATTLEFIELD))? {
+        g.put_onto_battlefield(item.object, item.controller, false)?;
+    }
+    Ok(())
+}
+
 /// "Return target spell or permanent to its owner's hand": a spell leaves the stack for its owner's hand without being
 /// countered (CR 400.3, so one that can't be countered goes too); a permanent is returned (CR 400.7: a token ceases to
 /// exist, CR 111.7). Which it is is read from the stack. Jeskai Revelation and Sink into Stupor print it.
