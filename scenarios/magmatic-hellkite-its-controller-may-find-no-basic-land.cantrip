@@ -1,0 +1,49 @@
+# Magmatic Hellkite: "searches their library for a basic land card" may find nothing (CR 701.23b). Bot2 has Forests in its
+# library and chooses none (a player may fail to find), so the Bazaar is destroyed, nothing enters, and the library is
+# still shuffled (CR 701.23). Bot2's library does not shrink.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Mox Jet
+Mox Sapphire
+Magmatic Hellkite
+Mountain
+Mountain
+Mountain x17
+
+[Bot2 Deck]
+Bazaar of Baghdad
+Forest x6
+Forest x10
+Forest
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Bazaar of Baghdad.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Magmatic Hellkite.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot2.Search()
+
+[Expect]
+Bot2.Graveyard = Bazaar of Baghdad; Forest
+Bot2.Battlefield.Count = 0
+Bot2.Library.Count = 9

@@ -1,0 +1,47 @@
+# Magmatic Hellkite: its trigger needs a nonbasic land an opponent controls. Bot2 has only a Forest and Bot1 controls a Bazaar
+# of Baghdad of its own, neither of which is a legal target, so the trigger is removed from the stack (CR 603.3d) and no
+# land is destroyed and nothing is searched: both battlefields and Bot2's library are as they were.
+
+[Bot1 Deck]
+Bazaar of Baghdad
+Mountain
+Mox Jet
+Mox Sapphire
+Magmatic Hellkite
+Mountain
+Mountain
+Mountain x17
+
+[Bot2 Deck]
+Forest x7
+Forest x10
+Forest
+
+[Actions]
+Bot1.Hand.Bazaar of Baghdad.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Magmatic Hellkite.Cast
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Bazaar of Baghdad.Tapped = false
+Bot2.Battlefield = Forest
+Bot2.Graveyard.Count = 1
+Bot2.Library.Count = 9

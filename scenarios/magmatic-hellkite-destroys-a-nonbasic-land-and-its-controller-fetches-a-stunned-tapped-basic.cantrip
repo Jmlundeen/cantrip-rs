@@ -1,0 +1,73 @@
+# Magmatic Hellkite: on entering it destroys Bot2's Bazaar of Baghdad. Only a nonbasic land an opponent controls is a legal
+# target: Bot1's own Bazaar and Bot2's Forest are refused, beside the positive choice of Bot2's Bazaar (Wasteland, the
+# other legal candidate, is left alone). Bot2, the land's
+# controller, then searches for a basic land card and puts it onto the battlefield tapped with a stun counter (CR 122.1d,
+# 614.1c). The counter replaces Bot2's next untap: on turn 8 the new Forest stays tapped and loses the counter while the
+# old Forest untaps; on turn 10 it untaps.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Magmatic Hellkite
+Bazaar of Baghdad
+Mountain
+Mountain x17
+
+[Bot2 Deck]
+Forest
+Bazaar of Baghdad
+Wasteland
+Forest x4
+Forest x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Bazaar of Baghdad.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Bazaar of Baghdad.Play
+[T5 Bot1.Main1]
+[T6 Bot2.Main1]
+Bot2.Hand.Wasteland.Play
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Magmatic Hellkite.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Bot1.Battlefield.Bazaar of Baghdad)
+! Bot1.Target(Bot2.Battlefield.Forest)
+Bot1.Target(Bot2.Battlefield.Bazaar of Baghdad)
+Bot1.Pass
+Bot2.Pass
+Bot2.Search(Forest)
+? Bot2.Graveyard = Bazaar of Baghdad
+? Bot2.Battlefield.Forest#2.Tapped = true
+? Bot2.Battlefield.Forest#2.Counters.Stun = 1
+[T8 Bot2.Main1]
+? Bot2.Battlefield.Forest#1.Tapped = false
+? Bot2.Battlefield.Forest#2.Tapped = true
+? Bot2.Battlefield.Forest#2.Counters.Stun = (absent)
+[T10 Bot2.Main1]
+? Bot2.Battlefield.Forest#2.Tapped = false
+
+[Expect]
+Bot2.Graveyard = Forest; Bazaar of Baghdad
+Bot2.Battlefield.Wasteland.Tapped = false
+Bot1.Battlefield.Bazaar of Baghdad.Tapped = false
+Bot1.Battlefield.Magmatic Hellkite.Tapped = false

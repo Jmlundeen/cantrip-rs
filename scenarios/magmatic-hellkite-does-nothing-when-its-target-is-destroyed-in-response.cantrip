@@ -1,0 +1,55 @@
+# Magmatic Hellkite: its trigger targets Bazaar of Baghdad (Bot2 also has Wasteland, so the choice is asked); in response
+# Bot2 sacrifices Wasteland to destroy that Bazaar. The target is illegal as the ability tries to resolve, so it does not
+# resolve (CR 608.2b, ruling 2022-10-14): no search is offered to anyone and Bot2's library is untouched.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Mox Jet
+Mox Sapphire
+Magmatic Hellkite
+Mountain
+Mountain
+Mountain x17
+
+[Bot2 Deck]
+Bazaar of Baghdad
+Wasteland
+Forest x5
+Forest x10
+Forest
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Bazaar of Baghdad.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Wasteland.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Magmatic Hellkite.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2.Battlefield.Bazaar of Baghdad)
+Bot1.Pass
+Bot2.Battlefield.Wasteland.Activate(Ability: Destroy; Bazaar of Baghdad)
+Bot2.Pass
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Bazaar of Baghdad; Wasteland
+Bot2.Battlefield.Count = 0
+Bot2.Library.Count = 9

@@ -1,0 +1,45 @@
+# Magmatic Hellkite: with no basic land card in Bot2's library, including nonbasic lands that are not basic, the search
+# finds nothing: the Bazaar is destroyed and no land arrives (Bazaar of Baghdad in the library is a nonbasic land and is
+# refused as the search's card).
+
+[Bot1 Deck]
+Mountain
+Mountain
+Mox Jet
+Mox Sapphire
+Magmatic Hellkite
+Mountain
+Mountain
+Mountain x17
+
+[Bot2 Deck]
+Bazaar of Baghdad x25
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Bazaar of Baghdad.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Magmatic Hellkite.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Bazaar of Baghdad; Bazaar of Baghdad
+Bot2.Battlefield.Count = 0
+Bot2.Library.Count = 16
