@@ -68,6 +68,12 @@ public sealed partial class TacticalPlay : IAutoPlayer
     /// <summary>Whether the spell being paid for is to be kicked.</summary>
     private bool _kick;
 
+    /// <summary>
+    /// Whether the spell being paid for is cast by web-slinging (CR 702.188a): the tapped creature it returns is chosen once
+    /// the mana is paid, so a creature tapped for that mana may be the one.
+    /// </summary>
+    private bool _webSlinging;
+
     /// <summary>The optional cost last decided, so one decision covers the whole payment.</summary>
     private ViewHandle _unless;
     private bool _paying;
@@ -254,6 +260,7 @@ public sealed partial class TacticalPlay : IAutoPlayer
         {
             _pending = null;
             _kick = false;
+            _webSlinging = false;
             return _wander.Decide(prompt);
         }
 
