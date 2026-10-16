@@ -2065,7 +2065,10 @@ fn cast(
     }
 
     // CR 601.2b: X, and how many times it is kicked, are announced, and the total cost follows (CR 601.2f).
-    let x_symbols = if way == 0 { def.cost.x } else { 0 };
+    // CR 107.3a, 601.2b: X is announced for a cost that includes it. A way that casts the face itself (an Adventure,
+    // CR 715.3b; a back face, CR 712.8a; one half of a split card, CR 709.3) pays that face's own mana cost, X included;
+    // an alternative cost is not that cost, so X is 0 (CR 107.3b).
+    let x_symbols = if way == 0 || matches!(way, WAY_ADVENTURE | WAY_BACK_FACE | WAY_SPLIT_LEFT | WAY_SPLIT_RIGHT) { def.cost.x } else { 0 };
     let sacrifices_x = matches!(extra.variable, Some(VariableCost::SacrificeX(_)));
     if x_symbols > 0 || def.kicker.is_some() || extra.pay_x_life || sacrifices_x {
         let base = cost.mana;
