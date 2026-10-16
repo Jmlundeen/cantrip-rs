@@ -1,0 +1,58 @@
+# "{7}, {T}, Sacrifice this artifact: Destroy target permanent." On turn 3 Bot1 taps the Boulder for its mana (paying its {1} with a Mountain): with six other mana sources and
+# the Boulder's mana in the pool, Bot1 holds seven mana, yet the destroy ability is refused because its {T} cost cannot be paid (CR 602.2). On turn 5, with the
+# Boulder untapped and seven mana paid, the same ability is the positive control: it sacrifices the Boulder as a cost and destroys Bot2's Island, a land - "target permanent",
+# not "nonland permanent". The seven mana was exactly seven (Mox Ruby, the eighth source, is untouched).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Giant's Boulder
+Mountain
+Mountain
+Mountain x12
+
+[Bot2 Deck]
+Island
+Island x19
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Giant's Boulder.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Giant's Boulder.Activate(Ability: Add one mana; Color: Blue)
+? Bot1.Mana = {U}
+! Bot1.Battlefield.Giant's Boulder.Activate(Ability: Destroy)
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Giant's Boulder.Activate(Ability: Destroy; Bot2.Battlefield.Island)
+Bot1.Pass
+[T5 Bot1.Main2]
+? Bot2.Battlefield.Count = 0
+? Bot1.Battlefield.Mox Ruby.Tapped = false
+
+[Expect]
+Bot2.Graveyard = Island; Island
+Bot1.Graveyard = Giant's Boulder
+Bot1.Battlefield = Mountain; Mountain; Mountain; Mox Ruby; Mox Jet; Mox Pearl; Mox Sapphire; Mox Emerald

@@ -1,0 +1,50 @@
+# CR 601.2c-h, 608.2b: targets are chosen before costs are paid, so "target permanent" may be the Boulder itself, which the sacrifice cost then removes: its one target is
+# gone when the ability resolves and it does nothing (Bot2's Black Lotus survives). Bot2's Black Lotus is the control that is left alone.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Giant's Boulder
+Mountain
+Mountain
+Mountain x12
+
+[Bot2 Deck]
+Black Lotus
+Island x19
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Giant's Boulder.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Giant's Boulder.Activate(Ability: Destroy; Bot1.Battlefield.Giant's Boulder)
+Bot1.Pass
+[T3 Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Graveyard = Giant's Boulder
+Bot2.Battlefield = Black Lotus
+Bot2.Graveyard.Count = 0

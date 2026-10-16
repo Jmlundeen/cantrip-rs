@@ -1,0 +1,40 @@
+# "{1}, {T}: Add one mana of any color." Bot1 pays the {1} with Mox Jet's black and the Boulder makes red (Color: Red), which pays for Lightning Bolt (Bot2 is at 17)
+# while Bot1's Mountain stays untapped: the Boulder's mana is the mana that was spent, and the Boulder is tapped (CR 605.3b, 602.2). Its mana ability costs {1}, so
+# the Boulder never makes mana for nothing: Mox Jet's black is gone and nothing is floating afterwards.
+
+[Bot1 Deck]
+Mountain
+Mox Jet
+Mox Pearl
+Giant's Boulder
+Lightning Bolt
+Mountain
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Giant's Boulder.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Giant's Boulder.Activate(Ability: Add one mana; Color: Red)
+? Bot1.Mana = {R}
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+[T1 Bot1.Main2]
+? Bot2.Life = 17
+? Bot1.Mana =
+? Bot1.Battlefield.Giant's Boulder.Tapped = true
+? Bot1.Battlefield.Mountain.Tapped = false
+? Bot1.Battlefield.Mox Jet.Tapped = true
+
+[Expect]
+Bot2.Life = 17
+Bot1.Graveyard = Lightning Bolt
+Bot1.Battlefield = Mountain; Mox Jet; Mox Pearl; Giant's Boulder

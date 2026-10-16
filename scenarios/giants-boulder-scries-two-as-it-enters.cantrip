@@ -1,0 +1,33 @@
+# "When this artifact enters, scry 2": Bot1 casts Giant's Boulder with Mox Pearl and looks at the top two cards, Lightning Bolt and Black Lotus. The Lotus stays on
+# top and the Bolt goes to the bottom (CR 701.22), so the library is Lotus, Counterspell, Mountain, Bolt. The scry is the trigger's: the Boulder is on the battlefield
+# and the stack is empty afterwards.
+
+[Bot1 Deck]
+Mox Pearl
+Giant's Boulder
+Island
+Island
+Island
+Island
+Island
+Lightning Bolt
+Black Lotus
+Counterspell
+Mountain
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Giant's Boulder.Cast
+Bot1.Pass
+Bot1.Arrange(Black Lotus | Lightning Bolt)
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Battlefield = Mox Pearl; Giant's Boulder
+Bot1.Library = Black Lotus; Counterspell; Mountain; Lightning Bolt
