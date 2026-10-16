@@ -3,6 +3,9 @@
 //! engine; Piercing Exhale and Osseous Exhale print it as an optional cost, and Caustic Exhale, Kinsbaile Aspirant and
 //! Silvergill Mentor print it as a choice with another cost.
 //!
+//! "As this land enters, you may behold a [quality]" (Theorist's Sanctum) is `as_enters`: the same choice made as a
+//! replacement effect applies (CR 614.12a), not as a cost.
+//!
 //! Choosing the permanent or revealing the card is the core's (`Cost::behold`, paid as the other costs are, CR 601.2h);
 //! nothing moves. A card with the optional kind gives `optional(filter)` as its `optional_cost`, and "if a Dragon was
 //! beheld" is `beheld` of the resolving spell: the cost is its only way to behold, so it was paid or not (CR 601.2b).
@@ -28,4 +31,20 @@ pub fn beheld(item: &StackItem) -> bool {
 /// A Dragon, read through the words of the card whose text says it (CR 612): a permanent or a card in a hand.
 pub fn dragon(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
     q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Dragon))
+}
+
+/// "As this permanent enters, you may behold a [quality]" (CR 701.4a, 614.12a): the entering permanent's controller may
+/// choose a permanent they control or reveal a card in their hand that passes `filter`, the entering card apart. Whether
+/// they beheld. Nobody is asked when they have nothing to behold. Theorist's Sanctum prints it with a Jace.
+pub fn as_enters(g: &mut dyn Game, entering: &Entering, filter: ObjectFilter, quality: &'static str) -> Result<bool, Suspend> {
+    let asker = Asker { source: entering.object, controller: entering.controller };
+    let mut eligible = g.permanents_of(entering.controller);
+    eligible.extend(g.state().zone(Zone::hand(entering.controller)).iter().copied());
+    eligible.retain(|&id| id != entering.object && filter(&*g, &asker, id));
+    let chosen = crate::choose::cards_from_kind(g, entering.controller, entering.object, Purpose::Behold, quality, eligible.clone(), eligible, 1, true)?;
+    let Some(&card) = chosen.first() else { return Ok(false) };
+    if g.obj(card).zone.is(ZoneKind::Hand) {
+        g.reveal(entering.controller, &[card]);
+    }
+    Ok(true)
 }

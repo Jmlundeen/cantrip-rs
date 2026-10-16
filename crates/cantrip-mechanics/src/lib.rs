@@ -37,6 +37,7 @@ pub mod crew;
 pub mod devoid;
 pub mod double;
 pub mod earthbend;
+pub mod empower;
 pub mod escalate;
 pub mod fading;
 pub mod escape;
