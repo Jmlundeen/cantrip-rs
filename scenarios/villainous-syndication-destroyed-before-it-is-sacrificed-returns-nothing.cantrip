@@ -1,0 +1,69 @@
+# "Sacrifice it. When you do, ..." (CR 603.12): with Villainous Syndication's fourth-plan-counter trigger on the stack,
+# Bot2 destroys it with Disenchant. The trigger resolves with nothing to sacrifice (CR 701.21a), so the reflexive ability
+# never triggers and the Llanowar Elves Bot1 milled stay in its graveyard.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Villainous Syndication
+Mox Emerald
+Serpent Specialist
+Mox Sapphire
+Aerial Doombot
+Llanowar Elves
+Island
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Disenchant
+Island x17
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Villainous Syndication.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Serpent Specialist.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Aerial Doombot.Cast
+Bot1.Pass
+Bot1.Battlefield.Villainous Syndication.Activate
+Bot1.Choose(Serpent Specialist)
+Bot1.Pass
+Bot1.Battlefield.Villainous Syndication.Activate
+Bot1.Choose(Aerial Doombot)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Villainous Syndication.Activate
+Bot1.Choose(Serpent Specialist)
+Bot1.Pass
+Bot1.Battlefield.Villainous Syndication.Activate
+Bot1.Choose(Aerial Doombot)
+Bot1.Pass
+Bot2.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Villainous Syndication)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Villainous Syndication; Island; Island; Island; Llanowar Elves
+Bot2.Graveyard = Disenchant
+Bot1.Battlefield = Swamp; Mox Jet; Mox Emerald; Serpent Specialist; Mox Sapphire; Aerial Doombot

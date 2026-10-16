@@ -1,0 +1,73 @@
+# Villainous Syndication: "Tap an untapped Villain you control: Mill a card. Put a plan counter on this enchantment.
+# Activate only as a sorcery. When the fourth plan counter is put on this enchantment, sacrifice it. When you do, return
+# target creature card from your graveyard to the battlefield." On turn 1 Bot1 taps its Serpent Specialist and its Aerial
+# Doombot, both cast this turn (tapping them for another permanent's cost is no {T} ability of theirs, CR 302.6): it mills
+# the Llanowar Elves and an Island and has two plan counters. In its turn-3 upkeep the ability is not offered (sorcery speed),
+# and its Ornithopter is no Villain to tap. In the main phase it taps both Villains again: the fourth plan counter
+# sacrifices it, and the reflexive ability returns the Elves from the graveyard to the battlefield.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Villainous Syndication
+Mox Emerald
+Serpent Specialist
+Mox Sapphire
+Aerial Doombot
+Llanowar Elves
+Island
+Ornithopter
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Villainous Syndication.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Serpent Specialist.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Aerial Doombot.Cast
+Bot1.Pass
+Bot1.Battlefield.Villainous Syndication.Activate
+Bot1.Choose(Serpent Specialist)
+Bot1.Pass
+Bot1.Battlefield.Villainous Syndication.Activate
+Bot1.Choose(Aerial Doombot)
+Bot1.Pass
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Villainous Syndication.Counters.Plan = 2
+? Bot1.Graveyard = Island; Llanowar Elves
+[T3 Bot1.Upkeep]
+! Bot1.Battlefield.Villainous Syndication.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Villainous Syndication.Activate
+! Bot1.Choose(Ornithopter)
+Bot1.Choose(Serpent Specialist)
+Bot1.Pass
+Bot1.Battlefield.Villainous Syndication.Activate
+Bot1.Choose(Aerial Doombot)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Swamp; Mox Jet; Mox Emerald; Serpent Specialist; Mox Sapphire; Aerial Doombot; Ornithopter; Llanowar Elves
+Bot1.Battlefield.Serpent Specialist.Tapped = true
+Bot1.Battlefield.Aerial Doombot.Tapped = true
+Bot1.Battlefield.Ornithopter.Tapped = false
+Bot1.Graveyard = Villainous Syndication; Island; Island; Island
