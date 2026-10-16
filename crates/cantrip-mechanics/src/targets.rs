@@ -129,6 +129,19 @@ fn artifact_or_enchantment_an_opponent_controls_filter(q: &dyn Query, asker: &As
     artifact_or_enchantment_filter(q, asker, t) && matches!(t, Target::Object(id) if q.controller(id) != asker.controller)
 }
 
+/// "A token you control" as an object filter (a cost's "sacrifice a token", CR 701.21): a token its controller controls,
+/// whatever it is. Fountainport sacrifices one.
+pub fn token_you_control(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
+    q.obj(id).token && q.controller(id) == asker.controller
+}
+
+fn token_you_control_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    matches!(t, Target::Object(id) if on_battlefield(q, id) && token_you_control(q, asker, id))
+}
+
+/// "Target token you control" (CR 115.1). Esika's Chariot prints it.
+pub const TOKEN_YOU_CONTROL: TargetSpec = target(token_you_control_filter);
+
 fn permanent_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
     matches!(t, Target::Object(id) if on_battlefield(q, id))
 }
