@@ -1,0 +1,51 @@
+# Fetch Quest ({5}{G}{G}, cast from Bramble Familiar as its Adventure on turn 1 with Black Lotus and four Moxen):
+# "Mill seven cards. Then put a creature, enchantment, or land card from among the milled cards onto the battlefield."
+# The seven milled are Lightning Bolt (an instant), Sol Ring (an artifact), Ornithopter, Forest, Mountain, Island and
+# Swamp. The instant and the artifact are not offered (refusals), Ornithopter is the creature card taken (the positive
+# control: the same question accepts it). Exactly one card enters; the rest stay in the graveyard (CR 701.17). Resolving
+# as an Adventure the card is exiled, not put into the graveyard (CR 715.4).
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Mox Jet
+Bramble Familiar
+Forest
+Lightning Bolt
+Sol Ring
+Ornithopter
+Forest
+Mountain
+Island
+Swamp
+Forest x5
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Bramble Familiar.Cast(Ability: Adventure)
+? Stack = Fetch Quest
+! Bot1.Choose(Lightning Bolt)
+! Bot1.Choose(Sol Ring)
+Bot1.Choose(Ornithopter)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Emerald; Mox Ruby; Mox Pearl; Mox Jet; Ornithopter
+Bot1.Graveyard = Swamp; Island; Mountain; Forest; Sol Ring; Lightning Bolt; Black Lotus
+Exile = Bramble Familiar
+Bot1.Hand = Forest
+Bot1.Library.Count = 5

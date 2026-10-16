@@ -1,0 +1,44 @@
+# Fetch Quest may put an enchantment card from among the milled cards onto the battlefield. Ghostly Prison is milled with
+# an instant, an artifact and a Forest; Bot1 takes the enchantment, and only it: the Forest stays in the graveyard.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Mox Jet
+Bramble Familiar
+Forest
+Lightning Bolt
+Sol Ring
+Ghostly Prison
+Forest
+Lightning Bolt
+Sol Ring
+Forest
+Forest x5
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Bramble Familiar.Cast(Ability: Adventure)
+? Stack = Fetch Quest
+Bot1.Choose(Ghostly Prison)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Emerald; Mox Ruby; Mox Pearl; Mox Jet; Ghostly Prison
+Bot1.Graveyard = Forest; Sol Ring; Lightning Bolt; Forest; Sol Ring; Lightning Bolt; Black Lotus
+Exile = Bramble Familiar
+Bot1.Library.Count = 5

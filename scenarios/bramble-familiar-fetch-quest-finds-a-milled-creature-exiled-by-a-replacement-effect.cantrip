@@ -1,0 +1,55 @@
+# Bot2's Dauthi Voidwalker exiles each card that would go to Bot1's graveyard. Fetch Quest's milled cards are found in the
+# zone they went to (CR 701.17c): the Ornithopter exiled by the mill is still "from among the milled cards" and is put onto
+# the battlefield from exile. The two Forests Bot1 draws on turns 3 and 5 are the top of the library, then the seven milled.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Mox Jet
+Bramble Familiar
+Forest
+Forest
+Forest
+Lightning Bolt
+Sol Ring
+Ornithopter
+Mountain
+Lightning Bolt
+Sol Ring
+Lightning Bolt
+Forest x5
+
+[Bot2 Deck]
+Swamp
+Dauthi Voidwalker
+Swamp x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot2.Hand.Swamp.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp#1.Activate
+Bot2.Battlefield.Swamp#2.Activate
+Bot2.Hand.Dauthi Voidwalker.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Bramble Familiar.Cast(Ability: Adventure)
+Bot1.Choose(Ornithopter)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Emerald; Mox Ruby; Mox Pearl; Mox Jet; Ornithopter
+Bot1.Graveyard.Count = 0
+Exile = Black Lotus; Lightning Bolt; Sol Ring; Mountain; Lightning Bolt; Sol Ring; Lightning Bolt; Bramble Familiar
+Bot1.Hand = Forest; Forest; Forest

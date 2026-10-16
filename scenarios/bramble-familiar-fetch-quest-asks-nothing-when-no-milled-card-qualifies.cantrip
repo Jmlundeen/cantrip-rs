@@ -1,0 +1,44 @@
+# Seven cards are milled, none of them a creature, enchantment or land card (instants and artifacts). Nothing is chosen and
+# nothing is asked (`! Bot1.Choose`): no card enters, all seven stay in the graveyard, and the spell is still exiled
+# as an Adventure.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Mox Jet
+Bramble Familiar
+Forest
+Lightning Bolt
+Sol Ring
+Lightning Bolt
+Sol Ring
+Lightning Bolt
+Sol Ring
+Lightning Bolt
+Forest x5
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Bramble Familiar.Cast(Ability: Adventure)
+! Bot1.Choose
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Emerald; Mox Ruby; Mox Pearl; Mox Jet
+Bot1.Graveyard = Lightning Bolt; Sol Ring; Lightning Bolt; Sol Ring; Lightning Bolt; Sol Ring; Lightning Bolt; Black Lotus
+Exile = Bramble Familiar
+Bot1.Library.Count = 5

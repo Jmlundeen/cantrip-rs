@@ -1,0 +1,37 @@
+# "{1}{G}, {T}, Discard a card: Return this creature to its owner's hand." On turn 5 Bot1 pays {1}{G} with two Forests,
+# taps the Familiar and discards an Island; the ability resolves and the Familiar is in its owner's hand, the Island in the
+# graveyard, the Forests and the Familiar tapped (costs, CR 602.2b). Nothing else is discarded.
+
+[Bot1 Deck]
+Forest
+Forest
+Forest
+Bramble Familiar
+Llanowar Elves
+Island
+Island
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Bramble Familiar.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Bramble Familiar.Activate(Ability: Return)
+Bot1.Choose(Island)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Forest; Forest; Forest; Llanowar Elves; Island; Bramble Familiar
+Bot1.Graveyard = Island
+Bot1.Battlefield = Forest; Forest
+Bot1.Battlefield.Forest#1.Tapped = true
+Bot1.Battlefield.Forest#2.Tapped = true

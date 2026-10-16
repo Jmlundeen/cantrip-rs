@@ -1,0 +1,38 @@
+# The cost includes "Discard a card", so with an empty hand the return ability is refused even though everything else is
+# there: untapped Moxen to pay {1}{G} and a Bramble Familiar that has been under control since the turn began. Bot1's
+# opening hand is the Familiar, five Moxen and a Forest, all played on turn 1; on turn 3 the drawn Forest is played too,
+# leaving nothing in hand. The control is bramble-familiar-discards-a-card-to-return-itself-to-hand, where a card is
+# in hand to discard.
+
+[Bot1 Deck]
+Bramble Familiar
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Forest
+Forest x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Bramble Familiar.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+? Bot1.Hand.Count = 0
+! Bot1.Battlefield.Bramble Familiar.Activate(Ability: Return)
+
+[Expect]
+Bot1.Hand.Count = 0
+Bot1.Battlefield.Bramble Familiar.Tapped = false
+Bot1.Battlefield.Mox Pearl.Tapped = false

@@ -1,0 +1,14 @@
+{
+  "name": "Bramble Familiar",
+  "manaCost": "{1}{G}",
+  "type": "Creature — Elemental Raccoon",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "{T}: Add {G}.\n{1}{G}, {T}, Discard a card: Return this creature to its owner's hand.",
+  "adventure": {
+    "name": "Fetch Quest",
+    "manaCost": "{5}{G}{G}",
+    "type": "Sorcery — Adventure",
+    "oracleText": "Mill seven cards. Then put a creature, enchantment, or land card from among the milled cards onto the battlefield. (Then exile this card. You may cast the creature later from exile.)"
+  }
+}

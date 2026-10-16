@@ -1,0 +1,40 @@
+# Bramble Familiar's "{T}: Add {G}": cast on turn 3 it is summoning sick (CR 302.6), so its mana ability is refused in
+# that turn's second main phase; on turn 5 (the positive control) it taps for {G} alone, which pays for Llanowar Elves
+# without tapping a land.
+
+[Bot1 Deck]
+Forest
+Forest
+Forest
+Bramble Familiar
+Llanowar Elves
+Island
+Island
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Bramble Familiar.Cast
+[T3 Bot1.Main2]
+! Bot1.Battlefield.Bramble Familiar.Activate(Ability: Add)
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Bramble Familiar.Activate(Ability: Add)
+Bot1.Hand.Llanowar Elves.Cast
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Forest; Forest; Forest; Bramble Familiar; Llanowar Elves
+Bot1.Battlefield.Bramble Familiar.Tapped = true
+Bot1.Battlefield.Forest#1.Tapped = false
+Bot1.Battlefield.Forest#2.Tapped = false
+Bot1.Battlefield.Forest#3.Tapped = false
+Bot1.Battlefield.Forest#3.Tapped = false
+Bot1.Mana =

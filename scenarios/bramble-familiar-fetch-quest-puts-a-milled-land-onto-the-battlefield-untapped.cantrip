@@ -1,0 +1,47 @@
+# A land card is among the three kinds Fetch Quest takes. Only a Mountain and instants/artifacts are milled, so the Mountain
+# is the one offered (the instant is refused, the Mountain is the control); it enters under Bot1's control, not tapped
+# (nothing says it enters tapped), and it is no land drop (it was put, not played, CR 305.1: Bot1 has played no land).
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Mox Jet
+Bramble Familiar
+Forest
+Lightning Bolt
+Sol Ring
+Lightning Bolt
+Mountain
+Sol Ring
+Lightning Bolt
+Sol Ring
+Forest x5
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Bramble Familiar.Cast(Ability: Adventure)
+! Bot1.Choose(Lightning Bolt)
+Bot1.Choose(Mountain)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Emerald; Mox Ruby; Mox Pearl; Mox Jet; Mountain
+Bot1.Battlefield.Mountain.Tapped = false
+Bot1.LandsPlayed = 0
+Bot1.Graveyard = Sol Ring; Lightning Bolt; Sol Ring; Lightning Bolt; Sol Ring; Lightning Bolt; Black Lotus
+Exile = Bramble Familiar
+Bot1.Hand = Forest

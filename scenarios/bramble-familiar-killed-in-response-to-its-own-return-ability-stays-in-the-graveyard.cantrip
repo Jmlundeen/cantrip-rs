@@ -1,0 +1,40 @@
+# The return ability is on the stack (its costs, the tap and the discarded Island, already paid) when Bot2 kills the
+# Familiar with Lightning Bolt. The Familiar is then a card in the graveyard, a new object (CR 400.7), so "return this
+# creature to its owner's hand" finds nothing to return: it stays in the graveyard and the Island stays discarded.
+
+[Bot1 Deck]
+Forest
+Forest
+Forest
+Bramble Familiar
+Llanowar Elves
+Island
+Island
+Forest x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Bramble Familiar.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Bramble Familiar.Activate(Ability: Return)
+Bot1.Choose(Island)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Bramble Familiar)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Forest; Forest; Forest; Llanowar Elves; Island
+Bot1.Graveyard = Bramble Familiar; Island
+Bot1.Battlefield = Forest; Forest
