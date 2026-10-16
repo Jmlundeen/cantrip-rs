@@ -69,6 +69,8 @@ Bot1.Target(Brazen Borrower)
 Bot1.Pass
 Bot1.Battlefield.Mox Jet.Activate
 ? Exile = Brazen Borrower
+# 8 = Mountain, Island, four Moxen (Ruby, Jet, Pearl, Sapphire), Smaug the Magnificent and the Treasure Smaug made at its
+# upkeep; the Borrower, the ninth, is in exile.
 ? Bot2.Battlefield.Count = 8
 Bot1.Battlefield.Solitary Cell.Activate
 ! Bot1.Choose(Mountain)

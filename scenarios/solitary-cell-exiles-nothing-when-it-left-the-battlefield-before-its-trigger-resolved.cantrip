@@ -1,4 +1,4 @@
-# CR 610.3c: "until this artifact leaves the battlefield" - if it has already left when the trigger resolves, the permanent is
+# CR 610.3b: "until this artifact leaves the battlefield" - if it has already left when the trigger resolves, the permanent is
 # not exiled at all. On turn 5 Solitary Cell's trigger targets Bot2's Elvish Mystic and in response Bot2 sacrifices
 # Haywire Mite (gaining 2 life) to exile the Cell: the Mystic stays on the battlefield and the Cell is the only card in exile.
 

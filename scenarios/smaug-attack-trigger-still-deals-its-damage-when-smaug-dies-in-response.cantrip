@@ -1,0 +1,48 @@
+# Smaug leaves the battlefield with its attack trigger on the stack: Bot2 Lightning Bolts the attacking Smaug (4/3) in
+# response. The trigger is independent of its source (CR 113.7a, 608.2h): it resolves using Smaug's last-known
+# information, "he" still deals the damage, and the Treasure Bot1 controls is still counted: Bot2 takes 1 (19). Smaug dealt
+# no combat damage, being dead.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mountain
+Smaug the Magnificent
+Mountain x2
+Mountain x10
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Smaug the Magnificent.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Smaug the Magnificent > Bot2)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Smaug the Magnificent)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 19
+Bot1.Graveyard = Smaug the Magnificent
+Bot2.Graveyard = Lightning Bolt

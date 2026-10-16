@@ -1,0 +1,88 @@
+# Chapter IV of Summon: Bahamut is on the stack when Bot2 sacrifices Cathar Commando to destroy the Saga (an enchantment
+# creature). The chapter ability is independent of its source (CR 113.7a, 608.2h): it resolves with the Saga's last-known
+# information as the damage source, and the total mana value of Bot1's OTHER permanents (Smaug 4 + Sol Ring 1; the
+# Moxen and the Treasure tokens 0) is still worked out and dealt to Bot2: 15.
+
+[Bot1 Deck]
+Black Lotus
+Sol Ring
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Summon: Bahamut
+Mountain
+Smaug the Magnificent
+Mountain x12
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Cathar Commando
+Plains x3
+Plains x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Cathar Commando.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Summon: Bahamut.Cast
+Bot1.Pass
+Bot1.Target()
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Summon: Bahamut.Counters.Lore = 1
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Summon: Bahamut.Counters.Lore = 2
+Bot1.Target()
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Smaug the Magnificent.Cast
+Bot1.Pass
+[T7 Bot1.Main1]
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Summon: Bahamut.Counters.Lore = 3
+? Bot1.Hand.Count = 3
+[T9 Bot1.Main1]
+Bot1.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Cathar Commando.Activate(Summon: Bahamut)
+[T9 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 15
+Bot2.Graveyard = Cathar Commando
+Bot1.Graveyard = Summon: Bahamut; Black Lotus
