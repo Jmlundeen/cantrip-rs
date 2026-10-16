@@ -1,0 +1,67 @@
+# A cast an effect offers during a resolution is barred too when the card is in a barred zone (CR 101.2, 608.2g, 601.2a).
+# Bot1 casts Avatar's Wrath turn 1. In turn 2 Bot2 casts Bloodbraid Challenger from its hand (allowed); its cascade
+# (CR 702.85a) exiles a Mountain and then Lightning Bolt, but Bot2 can't cast the Bolt from exile, so it is never offered
+# (`! Bot2.Accept`) and both go to the bottom of the library. In turn 4, the restriction over, a second Challenger's cascade
+# exiles the next Lightning Bolt and Bot2 casts it at Bot1: the control.
+
+[Bot1 Deck]
+Black Lotus
+Plains
+Avatar's Wrath
+Plains x4
+Plains x10
+
+[Bot2 Deck]
+Forest
+Mox Ruby
+Mox Emerald
+Mox Jet
+Mox Pearl
+Bloodbraid Challenger
+Bloodbraid Challenger
+Island
+Mountain
+Lightning Bolt
+Island
+Lightning Bolt
+Island x5
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Avatar's Wrath.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Bloodbraid Challenger.Cast
+Bot2.Pass
+! Bot2.Accept
+[T2 Bot2.Main2]
+? Bot1.Life = 20
+? Bot2.Library.Count = 9
+[T4 Bot2.Main1]
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Bloodbraid Challenger.Cast
+Bot2.Accept
+Bot2.Target(Bot1)
+
+[Expect]
+Turn = 4
+Bot1.Life = 17
+Bot2.Graveyard = Lightning Bolt
+Bot2.Battlefield.Bloodbraid Challenger#2.Power = 4
+Exile = Avatar's Wrath

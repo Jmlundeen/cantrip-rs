@@ -1,0 +1,53 @@
+# Avatar's Wrath bars casting from a library too ("anywhere other than their hands", CR 101.2, 601.3), over Bolas's
+# Citadel's permission. Bot1 casts it turn 1. Bot2, barred in turn 2, casts Bolas's Citadel from its hand; playing the Swamp
+# on top of its library is no cast and is allowed (CR 305.1); the Ornithopter then on top is refused, though its 0 life is
+# payable. Turn 4, the restriction over at Bot1's turn 3, Bot2 casts the next Ornithopter from the top for 0 life: the
+# control.
+
+[Bot1 Deck]
+Black Lotus
+Plains
+Avatar's Wrath
+Plains x4
+Plains x10
+
+[Bot2 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Bolas's Citadel
+Island
+Island
+Island
+Swamp
+Ornithopter
+Ornithopter
+Island x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Avatar's Wrath.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Bolas's Citadel.Cast
+Bot2.Library.Swamp.Play
+! Bot2.Library.Ornithopter.Cast
+[T4 Bot2.Main1]
+Bot2.Library.Ornithopter.Cast
+
+[Expect]
+Turn = 4
+Bot2.Life = 20
+Bot2.Battlefield = Mox Jet; Mox Ruby; Mox Sapphire; Bolas's Citadel; Swamp; Ornithopter
+Bot2.Hand = Island; Island; Island; Ornithopter

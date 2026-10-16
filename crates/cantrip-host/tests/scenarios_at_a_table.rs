@@ -74,6 +74,53 @@ fn a_face_down_changeling_in_exile_tells_the_opponent_nothing_of_what_it_is() {
     assert!(seen > 0, "the scenario never showed Bot1 a face-down card");
 }
 
+/// A restriction on casting is shown to the player it binds (CR 101.2): while Avatar's Wrath bars Bot2 from casting outside
+/// its hand, Bot2's view says so beside its life total and Bot1's says it of Bot2, and once Bot1's next turn has begun
+/// neither says it any more.
+#[test]
+fn a_bar_on_casting_outside_the_hand_is_shown_to_both_players_while_it_lasts() {
+    let name = "avatars-wrath-bars-its-opponent-casting-from-exile-and-graveyard-until-its-casters-next-turn";
+    let text = std::fs::read_to_string(scripts().join(format!("{name}.cantrip"))).unwrap();
+    let mut session = Session::scenario(&text, name, Vec::new(), &[1]).map_err(|r| r.detail).unwrap();
+    let mut step = session.step();
+    let (mut shown, mut gone_after) = (0, false);
+    for _ in 0..20_000 {
+        let own = session.view(2).map_err(|r| r.detail).unwrap();
+        let other = session.view(1).map_err(|r| r.detail).unwrap();
+        let facts = |view: &cantrip_host::protocol::PlayerView| view.players[1].pending_effects.clone();
+        let (own_facts, other_facts) = (facts(&own), facts(&other));
+        let bot1 = own.players[0].name.clone();
+        let barred = own_facts.contains(&format!("You can't cast spells from anywhere other than your hand until {bot1}'s next turn."));
+        assert_eq!(
+            barred,
+            other_facts.contains(&"They can't cast spells from anywhere other than their hand until your next turn.".to_string()),
+            "the two players are told different things: {own_facts:?} / {other_facts:?}"
+        );
+        if barred {
+            shown += 1;
+            assert!(!gone_after, "the restriction came back");
+        } else if shown > 0 {
+            gone_after = true;
+        }
+        let scenario = &step["Scenario"];
+        if scenario["Verdict"].is_object() {
+            assert_eq!(scenario["Verdict"]["Passed"], Value::Bool(true));
+            break;
+        }
+        let expected = &scenario["Expected"];
+        let answer: AnswerPayload = if expected["Undo"] == Value::Bool(true) {
+            AnswerPayload::TakeActionAnswer(TakeActionAnswer::new(ActionKindView::UndoManaAbility, ViewHandle::NONE))
+        } else {
+            serde_json::from_value(expected["Answer"].clone()).unwrap()
+        };
+        let id = expected["RequestId"].as_u64().unwrap() as u32;
+        let seat = expected["Seat"].as_i64().unwrap() as i32;
+        step = session.answer(id, seat, &answer).map_err(|r| r.detail).unwrap();
+    }
+    assert!(shown > 0, "Bot2 was never told it can't cast outside its hand");
+    assert!(gone_after, "the restriction was still shown after Bot1's next turn began");
+}
+
 #[test]
 fn every_scenario_passes_at_a_table_with_bot1_driven() {
     let mut entries: Vec<PathBuf> =

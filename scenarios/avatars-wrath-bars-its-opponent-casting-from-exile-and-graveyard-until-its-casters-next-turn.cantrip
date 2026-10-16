@@ -1,0 +1,86 @@
+# Avatar's Wrath, cast with no target, airbends every creature (CR 701.65a): Bot1's Giver of Runes, Bot2's Snapcaster Mage
+# and Bot2's two Spirit tokens, which cease to exist in exile (CR 111.7). The Wrath exiles itself as its last instruction.
+# "Until your next turn, your opponents can't cast spells from anywhere other than their hands" (CR 101.2, 611.2c):
+# - Bot1 is not an opponent of itself: it casts its own airbended Giver of Runes from exile for {2} at once.
+# - In Bot2's turn 8, with the mana for both, neither the airbended Snapcaster Mage (from exile, for {2}) nor Lingering
+#   Souls' flashback (from the graveyard) is offered, still not in its end step; Ornithopter from its hand is cast.
+# - The effect ends as Bot1's turn 9 begins (CR 611.2b): in Bot1's upkeep Bot2 casts the flash Snapcaster from exile for
+#   {2}, and in turn 10 flashes back Lingering Souls - the positive controls for both refusals.
+
+[Bot1 Deck]
+Plains
+Sol Ring
+Giver of Runes
+Avatar's Wrath
+Plains
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Island
+Island
+Plains
+Swamp
+Snapcaster Mage
+Lingering Souls
+Ornithopter
+Island x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Giver of Runes.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Island#2.Activate
+Bot2.Hand.Snapcaster Mage.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Island#2.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Lingering Souls.Cast
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Avatar's Wrath.Cast
+[T7 Bot1.Main2]
+? Exile = Giver of Runes; Snapcaster Mage; Avatar's Wrath
+? Bot2.Battlefield.Count = 3
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Battlefield.Plains#4.Activate
+Bot1.Exile.Giver of Runes.Cast
+[T8 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+! Bot2.Exile.Snapcaster Mage.Cast
+! Bot2.Graveyard.Lingering Souls.Cast
+Bot2.Hand.Ornithopter.Cast
+[T8 Bot2.End]
+! Bot2.Exile.Snapcaster Mage.Cast
+[T9 Bot1.Upkeep]
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Island#2.Activate
+Bot2.Exile.Snapcaster Mage.Cast
+[T10 Bot2.Main1]
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Graveyard.Lingering Souls.Cast(Ability: Flashback)
+
+[Expect]
+Turn = 10
+Exile = Avatar's Wrath; Lingering Souls
+Bot1.Battlefield = Plains; Plains; Plains; Plains; Sol Ring; Giver of Runes
+Bot2.Battlefield = Island; Island; Plains; Swamp; Ornithopter; Snapcaster Mage; Spirit; Spirit
+Bot2.Graveyard.Count = 0

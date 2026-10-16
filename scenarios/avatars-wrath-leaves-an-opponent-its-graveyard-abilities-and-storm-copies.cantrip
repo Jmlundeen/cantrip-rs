@@ -1,0 +1,61 @@
+# Avatar's Wrath stops casting spells, nothing else (CR 101.2, 602.1, 707.10). Bot1 casts it turn 1 with no creature on the
+# battlefield. In Bot2's turn 2, barred, it casts from its hand freely (four Moxen, Black Lotus, Faithless Looting) and
+# discards Seasoned Pyromancer to the Looting. With mana for it, Faithless Looting's flashback from the graveyard is refused;
+# Seasoned Pyromancer's ability, activated from the graveyard, is no spell and makes two Elementals; and Brain Freeze, cast
+# from the hand after six other spells, is copied six times by storm - copies put onto the stack, not cast - so Bot1 mills
+# seven times three cards.
+
+[Bot1 Deck]
+Black Lotus
+Plains
+Avatar's Wrath
+Plains x4
+Plains x30
+
+[Bot2 Deck]
+Mountain
+Black Lotus
+Mox Ruby
+Mox Sapphire
+Mox Jet
+Faithless Looting
+Brain Freeze
+Mox Emerald
+Seasoned Pyromancer
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Avatar's Wrath.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Faithless Looting.Cast
+Bot2.Choose(Seasoned Pyromancer; Island)
+! Bot2.Graveyard.Faithless Looting.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Graveyard.Seasoned Pyromancer.Activate
+[T2 Bot2.Main2]
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Brain Freeze.Cast(Bot1)
+
+[Expect]
+Turn = 2
+Exile = Avatar's Wrath; Seasoned Pyromancer
+Bot1.Library.Count = 9
+Bot1.Graveyard.Count = 22
+Bot2.Graveyard = Brain Freeze; Black Lotus; Faithless Looting; Island
+Bot2.Battlefield.Elemental#2.Power = 1
+Bot2.Battlefield.Count = 7

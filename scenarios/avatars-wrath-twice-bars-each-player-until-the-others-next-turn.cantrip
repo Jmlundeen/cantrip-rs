@@ -1,0 +1,73 @@
+# Two Avatar's Wraths, one from each player. Bot1's, turn 1, targets its own Giver of Runes, which is spared ("all other
+# creatures": there are none). Bot2, barred only from zones other than its hand, casts Snapcaster Mage and its own Wrath
+# from its hand in turn 2 with no target: that airbends Giver of Runes and Snapcaster Mage (CR 701.65a) and bars Bot1 until
+# Bot2's next turn (CR 611.2b, 611.2c), while Bot1's Wrath bars Bot2 only until Bot1's turn 3 begins.
+# Turn 3: Bot2's restriction has ended, so in Bot1's upkeep it casts the flash Snapcaster from exile for {2}; Bot1's has not,
+# so in its own main phase, with {2} open, its Giver of Runes is refused. Turn 5, Bot2's restriction on Bot1 over, Bot1 casts
+# Giver from exile for {2}: the control.
+
+[Bot1 Deck]
+Mox Pearl
+Plains
+Black Lotus
+Giver of Runes
+Avatar's Wrath
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Mox Emerald
+Snapcaster Mage
+Avatar's Wrath
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Giver of Runes.Cast
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Avatar's Wrath.Cast(Giver of Runes)
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Giver of Runes.Power = 1
+? Exile = Avatar's Wrath
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Snapcaster Mage.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Avatar's Wrath.Cast
+[T2 Bot2.Main2]
+? Exile = Avatar's Wrath; Avatar's Wrath; Giver of Runes; Snapcaster Mage
+[T3 Bot1.Upkeep]
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Exile.Snapcaster Mage.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+! Bot1.Exile.Giver of Runes.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Exile.Giver of Runes.Cast
+
+[Expect]
+Turn = 5
+Exile = Avatar's Wrath; Avatar's Wrath
+Bot1.Battlefield.Giver of Runes.Power = 1
+Bot2.Battlefield.Snapcaster Mage.Power = 2

@@ -1,0 +1,56 @@
+# "Your opponents" (CR 102.2, 611.2c): in a three-player game, Avatar's Wrath bars each of Bot1's opponents as it resolves
+# in turn 1, until Bot1's next turn, turn 4. Bot2 (turn 2) and Bot3 (turn 3) each cast Faithless Looting from the hand and,
+# with Black Lotus there to pay for it, are refused its flashback. After Bot1's turn 4 each flashes it back on its own
+# next turn (5 and 6): the controls.
+
+[Bot1 Deck]
+Black Lotus
+Plains
+Avatar's Wrath
+Plains x4
+Plains x10
+
+[Bot2 Deck]
+Mountain
+Black Lotus
+Faithless Looting
+Island x4
+Island x10
+
+[Bot3 Deck]
+Mountain
+Black Lotus
+Faithless Looting
+Island x4
+Island x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Avatar's Wrath.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Faithless Looting.Cast
+[T2 Bot2.Main2]
+! Bot2.Graveyard.Faithless Looting.Cast
+[T3 Bot3.Main1]
+Bot3.Hand.Mountain.Play
+Bot3.Hand.Black Lotus.Cast
+Bot3.Battlefield.Mountain.Activate
+Bot3.Hand.Faithless Looting.Cast
+[T3 Bot3.Main2]
+! Bot3.Graveyard.Faithless Looting.Cast
+[T5 Bot2.Main1]
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Graveyard.Faithless Looting.Cast(Ability: Flashback)
+[T6 Bot3.Main1]
+Bot3.Battlefield.Black Lotus.Activate(Color: Red)
+Bot3.Graveyard.Faithless Looting.Cast(Ability: Flashback)
+
+[Expect]
+Turn = 6
+Exile = Avatar's Wrath; Faithless Looting; Faithless Looting
