@@ -513,6 +513,19 @@ pub fn deals_combat_damage_to_player(_: &dyn Query, source: ObjectId, event: &Ev
     }
 }
 
+/// "Whenever a creature you control deals combat damage to a player" (CR 510.2, 603.2): one trigger for each creature and
+/// player, with "that player" fixed as the trigger's subject. Vraska, Golgari Queen's emblem and Enduring Curiosity print it.
+pub fn creature_you_control_deals_combat_damage_to_player(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::Damage { source: from, target: Target::Player(p), amount, combat: true }
+            if *amount > 0 && q.controller(*from) == q.controller(source) && q.chars(*from).is(CardType::Creature) =>
+        {
+            Fired::about(Target::Player(*p))
+        }
+        _ => None,
+    }
+}
+
 /// "Whenever you flip a coin" (CR 705.1): any flip its controller makes, won or lost.
 pub fn you_flip_a_coin(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {

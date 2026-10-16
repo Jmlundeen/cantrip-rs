@@ -33,19 +33,6 @@ fn emblem(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 // --- The emblem ---------------------------------------------------------------------------------------------------
 
-/// "Whenever a creature you control deals combat damage to a player" (CR 510.2): one trigger for each creature and player, and
-/// "that player" is fixed as it triggers.
-fn creature_you_control_hits_a_player(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
-    match event {
-        Event::Damage { source: from, target: Target::Player(p), amount, combat: true }
-            if *amount > 0 && q.controller(*from) == q.controller(source) && q.chars(*from).is(CardType::Creature) =>
-        {
-            Fired::about(Target::Player(*p))
-        }
-        _ => None,
-    }
-}
-
 fn that_player_loses(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Target::Player(p) = item.subject {
         g.lose_game(p);
@@ -56,7 +43,7 @@ fn that_player_loses(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> 
 pub static EMBLEM: CardDef = CardDef {
     name: "Vraska, Golgari Queen emblem",
     has_cost: false,
-    abilities: &[triggered(when(EventMask::DAMAGE, creature_you_control_hits_a_player), that_player_loses, "Whenever a creature you control deals combat damage to a player, that player loses the game.")],
+    abilities: &[triggered(when(EventMask::DAMAGE, cantrip_mechanics::triggers::creature_you_control_deals_combat_damage_to_player), that_player_loses, "Whenever a creature you control deals combat damage to a player, that player loses the game.")],
     text: "Whenever a creature you control deals combat damage to a player, that player loses the game.",
     ..CardDef::BLANK
 };
