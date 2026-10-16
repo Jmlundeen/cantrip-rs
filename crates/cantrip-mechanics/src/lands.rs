@@ -38,6 +38,20 @@ pub fn enters_tapped_unless_you_control<const TYPE: u16>(g: &mut dyn Game, enter
     Ok(())
 }
 
+/// "This land enters tapped unless you control a basic land" (CR 614.1c, 205.4a): the supertype, not a land type, read
+/// on the battlefield as it is while the land enters, so the land itself is not counted. Abandoned Air Temple and Agna
+/// Qel'a print it.
+pub fn enters_tapped_unless_you_control_basic_land(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
+    let controls_basic = g
+        .permanents_of(entering.controller)
+        .into_iter()
+        .any(|id| g.obj(id).became.is_none() && g.chars(id).is(CardType::Land) && g.chars(id).supertypes.basic);
+    if !controls_basic {
+        entering.tapped = true;
+    }
+    Ok(())
+}
+
 /// "This land enters tapped unless you control a [land type] or a [land type]" (CR 614.1c): as `enters_tapped_unless_you_control`
 /// with two land types, each read through the layers and the land's words (CR 612.2). Cori Mountain Monastery (Plains or
 /// Island) and Mistrise Village (Mountain or Forest) print it.
