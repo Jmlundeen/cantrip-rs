@@ -1,0 +1,46 @@
+# Lyna, Veil of Vengeance's ability targets Bot1's Cecil, Dark Knight; in response Ephemerate exiles Cecil and returns it, a
+# new object (CR 400.7), so the target is gone and no shadow counter is put on anything (CR 608.2b): the new Cecil has
+# deathtouch and no shadow.
+# Turn 1: Swamp, the three Moxes pay Lyna, the Swamp Cecil. Turn 3: Plains; the Moxes pay {3}, the Plains Ephemerate.
+
+[Bot1 Deck]
+Swamp
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Lyna, Veil of Vengeance
+Cecil, Dark Knight
+Plains
+Ephemerate
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Lyna, Veil of Vengeance.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Cecil, Dark Knight.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Lyna, Veil of Vengeance.Activate(Cecil, Dark Knight)
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Ephemerate.Cast(Cecil, Dark Knight)
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Cecil, Dark Knight.Keywords = Deathtouch
+Bot1.Battlefield.Cecil, Dark Knight.Counters.Shadow = (absent)
+Bot1.Battlefield.Lyna, Veil of Vengeance.Keywords = Shadow
+Exile = Ephemerate

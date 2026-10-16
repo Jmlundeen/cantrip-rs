@@ -1,0 +1,68 @@
+# Lyna, Veil of Vengeance: "Shadow. Whenever a creature you control with shadow deals combat damage to a player, draw a card.
+# {3}: Put a shadow counter on another target creature. Activate only as a sorcery."
+# On turn 3 Lyna's ability puts a shadow counter on Bot1's Cecil, Dark Knight, which has shadow by it (CR 122.1b). Lyna and
+# Cecil attack. Bot2's Embereth Shieldbreaker can't block Cecil (shadow, CR 702.28b); Bot2's Dauthi Voidwalker, with shadow,
+# may block, and blocks Lyna (the positive control). Cecil deals Bot2 2 and Bot1 draws a card for it; Darkness makes Bot1 lose
+# the 2 Cecil dealt. Lyna and the Voidwalker kill each other, and the Voidwalker exiles Lyna instead of letting it go to
+# Bot1's graveyard. Bot1 holds the Island it kept, the card it drew on turn 3 and the one Lyna drew: 3.
+
+[Bot1 Deck]
+Swamp
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Lyna, Veil of Vengeance
+Cecil, Dark Knight
+Island x14
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Dauthi Voidwalker
+Mox Ruby
+Mox Emerald
+Embereth Shieldbreaker
+Island x14
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Lyna, Veil of Vengeance.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Cecil, Dark Knight.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Dauthi Voidwalker.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Embereth Shieldbreaker.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Lyna, Veil of Vengeance.Activate(Bot1.Battlefield.Cecil, Dark Knight)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Cecil, Dark Knight.Keywords = Deathtouch; Shadow
+Bot1.Attack(Lyna, Veil of Vengeance; Cecil, Dark Knight > Bot2)
+! Bot2.Block(Embereth Shieldbreaker > Cecil, Dark Knight)
+Bot2.Block(Dauthi Voidwalker > Lyna, Veil of Vengeance)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Life = 18
+Bot1.Hand.Count = 3
+Bot1.Battlefield.Cecil, Dark Knight.Counters.Shadow = 1
+Exile = Lyna, Veil of Vengeance
+Bot2.Graveyard = Dauthi Voidwalker

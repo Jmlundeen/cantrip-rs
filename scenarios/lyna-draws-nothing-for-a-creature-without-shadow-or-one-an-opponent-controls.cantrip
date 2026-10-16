@@ -1,0 +1,51 @@
+# Lyna, Veil of Vengeance draws only for "a creature you control with shadow". On turn 3 Bot1's Cecil, Dark Knight, without
+# shadow, attacks alone and deals Bot2 2: no card (Darkness makes Bot1 lose 2). On turn 4 Bot2's Dauthi Voidwalker, with
+# shadow but Bot2's, deals Bot1 3: no card for Bot1. During Bot2's turn Lyna's ability is not offered, though Bot1 has the
+# mana: only as a sorcery (CR 602.5d). Bot1 holds the Island it kept and the card it drew on turn 3: 2.
+
+[Bot1 Deck]
+Swamp
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Lyna, Veil of Vengeance
+Cecil, Dark Knight
+Island x14
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Dauthi Voidwalker
+Island x17
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Lyna, Veil of Vengeance.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Cecil, Dark Knight.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Dauthi Voidwalker.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Cecil, Dark Knight > Bot2)
+[T3 Bot1.Main2]
+? Bot2.Life = 18
+? Bot1.Hand.Count = 2
+[T4 Bot2.Main1]
+! Bot1.Battlefield.Lyna, Veil of Vengeance.Activate(Bot1.Battlefield.Cecil, Dark Knight)
+Bot2.Attack(Dauthi Voidwalker > Bot1)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 15
+Bot2.Life = 18
+Bot1.Hand.Count = 2
