@@ -1,0 +1,52 @@
+# "If it was a creature" (CR 603.4) is judged on what it was on the battlefield: Bot2's Lightning Bolt kills the creature on turn 2 and it comes
+# back an enchantment; on turn 4 Bot2 Disenchants it and, no longer a creature when it goes to the graveyard, it stays there.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Mox Ruby
+Enduring Curiosity
+Island x14
+
+[Bot2 Deck]
+Mox Ruby
+Plains
+Mox Pearl
+Lightning Bolt
+Disenchant
+Plains x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Enduring Curiosity.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Enduring Curiosity)
+Bot2.Pass
+[T2 Bot2.Main2]
+? Bot1.Battlefield.Enduring Curiosity.Types = Enchantment
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Enduring Curiosity)
+Bot2.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Enduring Curiosity
+Bot1.Battlefield.Count = 5
+Bot2.Graveyard = Disenchant; Lightning Bolt

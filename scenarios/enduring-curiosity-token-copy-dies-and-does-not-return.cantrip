@@ -1,0 +1,55 @@
+# A token copy of Enduring Curiosity (Three Steps Ahead's {3} mode) has the dies ability, since the token was a creature, but the token ceases to
+# exist in the graveyard (CR 111.7), so there is nothing to return (ruling 2024-11-08). Bot2's Lightning Bolt kills the token on turn 4: Bot1 has only
+# the original Curiosity, still a creature (the positive control: the original is not touched), and no enchantment came back.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Mox Ruby
+Enduring Curiosity
+Three Steps Ahead
+Island x13
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x13
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Enduring Curiosity.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Three Steps Ahead.Cast
+Bot1.Modes(Create a token)
+Bot1.Target(Bot1.Battlefield.Enduring Curiosity)
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Enduring Curiosity#2.Token = true
+[T4 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Enduring Curiosity#2)
+Bot2.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield = Island; Island; Mox Sapphire; Mox Pearl; Mox Jet; Mox Ruby; Enduring Curiosity
+Bot1.Battlefield.Enduring Curiosity.Types = Enchantment; Creature
+Bot1.Graveyard = Three Steps Ahead
+Stack.Count = 0

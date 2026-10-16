@@ -1,0 +1,82 @@
+# Control, not ownership. Bot2 casts Enduring Curiosity on turn 2 and Bot1 wins the flip of Invert Polarity (the first coin face is a win), so
+# Bot1 controls it. On turn 3 Bot1's Misshapen Fiend hits Bot2 and Bot1 draws: "a creature you control" is read from the Curiosity's current
+# controller. On turn 4 Bot2, the owner, Lightning Bolts it. It dies; its "when this dies" ability, controlled by Bot1, returns it "under its
+# owner's control" (CR 400.3, 603.10a): the enchantment is Bot2's, not Bot1's. On turn 6 Bot2's Fiend hits Bot1 and now Bot2 draws, Bot1 not.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Ruby
+Invert Polarity
+Mox Jet
+Mox Pearl
+Misshapen Fiend
+Island x13
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Enduring Curiosity
+Lightning Bolt
+Misshapen Fiend
+Island x13
+
+[Dice]
+1
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Misshapen Fiend.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Enduring Curiosity.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Invert Polarity.Cast(Enduring Curiosity)
+[T2 Bot2.Main2]
+? Bot1.Battlefield.Enduring Curiosity.Types = Enchantment; Creature
+? Bot2.Battlefield = Island; Mox Sapphire; Mox Ruby; Mox Jet
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 1
+Bot1.Attack(Misshapen Fiend > Bot2)
+[T3 Bot1.Main2]
+? Bot1.Hand.Count = 2
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Enduring Curiosity)
+Bot2.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Misshapen Fiend.Cast
+Bot2.Pass
+[T4 Bot2.Main2]
+? Bot2.Battlefield.Enduring Curiosity.Types = Enchantment
+? Bot1.Battlefield = Island; Mox Sapphire; Mox Ruby; Mox Jet; Mox Pearl; Misshapen Fiend
+[T6 Bot2.Main1]
+? Bot2.Hand.Count = 2
+? Bot1.Hand.Count = 3
+Bot2.Attack(Misshapen Fiend > Bot1)
+[T6 Bot2.Main2]
+
+[Expect]
+Bot2.Hand.Count = 3
+Bot1.Hand.Count = 3
+Bot2.Battlefield.Enduring Curiosity.Types = Enchantment
