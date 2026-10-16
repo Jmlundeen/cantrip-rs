@@ -183,6 +183,12 @@ public static class AutoMana
         ManaOwed owed,
         HashSet<int> clicked)
     {
+        // Mana a restriction keeps from paying this cost (CR 106.6) pays none of it: the player is asked instead.
+        if (option.PaysNothing)
+        {
+            return null;
+        }
+
         (int Missing, int Slack, int Order)? fit = null;
 
         foreach (ColorView symbol in Adds(option, color))
