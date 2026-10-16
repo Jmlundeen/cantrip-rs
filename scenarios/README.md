@@ -254,7 +254,10 @@ legal, CR 702.110b), while naming two blockers for it, `! Bot2.Block(Bear#1 > Mo
 paid, and fails if that mana ability is offered then.
 An attack, `! Bot1.Attack(Sylvan Caryatid > Bot2)`, is checked at the next declaration of attackers and fails if that attacker may attack the
 target. The attacker must be one the question offers, or else one that only a restriction (Defender, "can't attack", summoning sickness) can have left
-out: the asked player's own, untapped, with another creature of theirs offered in the same question.
+out: the asked player's own, untapped, with another creature of theirs offered in the same question. A pair the question
+offers still holds as a refusal when no declaration can make it: the rules refuse that attack together with every other
+creature that must attack sent where attacking is free (a creature that must attack a certain player sent at their
+planeswalker while attacking the player costs nothing, CR 508.1d).
 
 A search, `! Bot1.Search(Plains)`, is checked at that player's next library search, and fails if a Plains is among
 the cards it may find. The card must be in the library searched, or the refusal fails as proving nothing. A search for

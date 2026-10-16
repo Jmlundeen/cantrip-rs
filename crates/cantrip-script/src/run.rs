@@ -1425,7 +1425,36 @@ impl<'s> Run<'s> {
                         }
                     };
                     if offered {
-                        return fail(format!("line {line} says {text} must not be allowed, but it is"));
+                        // Offered as a pair, the attack may still be one no declaration can hold: a creature that must attack a
+                        // certain player sent elsewhere while attacking that player is free (CR 508.1d). The declaration of this
+                        // attack, with every other creature that must attack at the first thing it may attack for nothing, is
+                        // asked of the rules; refused, the refusal holds.
+                        let attacker = self.objects(action, parts[0].trim(), eligible)?[0];
+                        let target = match bot_id(parts[1]) {
+                            Some(b) => Target::Player(player_of(b)),
+                            None => Target::Object(
+                                self.objects(action, parts[1].trim(), &on_battlefield)?
+                                    .into_iter()
+                                    .find(|f| planeswalkers.contains(f) || battles.contains(f))
+                                    .expect("offered"),
+                            ),
+                        };
+                        let mut attacks = vec![(attacker, target)];
+                        if let RequestKind::DeclareAttackers { requirements, costs, .. } = &request.kind {
+                            let targets: Vec<Target> = players
+                                .iter()
+                                .map(|&p| Target::Player(p))
+                                .chain(planeswalkers.iter().chain(battles).map(|&o| Target::Object(o)))
+                                .collect();
+                            for &r in requirements.iter().filter(|&&r| r != attacker) {
+                                if let Some(&t) = targets.iter().find(|&&t| AttackCost::free(costs, r, t)) {
+                                    attacks.push((r, t));
+                                }
+                            }
+                        }
+                        if check_answer(&self.game, request, &Answer::Attack(attacks)).is_ok() {
+                            return fail(format!("line {line} says {text} must not be allowed, but it is"));
+                        }
                     }
                 }
             }

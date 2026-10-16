@@ -1,0 +1,42 @@
+# The positive control for ursine-monstrosity-told-to-attack-a-taxed-player-attacks-their-planeswalker-instead: with no
+# Ghostly Prison, attacking Bot2 costs nothing, so "this creature attacks that player this combat if able" (CR 508.1d)
+# holds - sending Ursine Monstrosity at Bot2's Liliana of the Veil is refused - and it attacks Bot2 by default for 5 (a 3/3, plus 2 for the artifact and the land in Bot1's graveyard: the spent Black Lotus and the milled Forest).
+# Liliana keeps her 3 loyalty.
+
+[Bot1 Deck]
+Black Lotus
+Ursine Monstrosity
+Mox Ruby
+Mox Sapphire
+Forest
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Plains
+Black Lotus
+Mox Pearl
+Mox Jet
+Liliana of the Veil
+Plains
+Plains
+Plains x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Ursine Monstrosity.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Liliana of the Veil.Cast
+[T3 Bot1.Main1]
+! Bot1.Attack(Ursine Monstrosity > Liliana of the Veil)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 15
+Bot2.Battlefield.Liliana of the Veil.Counters.Loyalty = 3
+Bot1.Battlefield.Ursine Monstrosity.Tapped = true

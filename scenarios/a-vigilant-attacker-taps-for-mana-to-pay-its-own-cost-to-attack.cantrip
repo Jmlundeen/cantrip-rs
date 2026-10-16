@@ -1,0 +1,51 @@
+# Attacking taps a creature only if it lacks vigilance (CR 508.1f, 702.20b), and that happens before the cost to attack is
+# paid (CR 508.1h-j): Undermountain Adventurer, with vigilance, is still untapped when Bot2's Ghostly Prison asks {2} for it,
+# so its own "{T}: Add {G}{G}" pays it. It attacks, ends tapped by its mana ability, and deals 3; Bot1's Mox Ruby stays
+# untapped. (The attacker tapped by attacking cannot do this: an-attacker-tapped-by-attacking-cannot-pay-its-own-cost-to-attack.)
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Undermountain Adventurer
+Mox Ruby
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Plains
+Black Lotus
+Ghostly Prison
+Plains
+Plains
+Plains
+Plains
+Plains x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Undermountain Adventurer.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Ghostly Prison.Cast
+[T3 Bot1.Upkeep]
+Bot1.Modes(Lost Well)
+[T3 Bot1.Main1]
+Bot1.Attack(Undermountain Adventurer)
+? Combat.AttackCost = {2}
+? Bot1.Battlefield.Undermountain Adventurer.Tapped = false
+Bot1.Battlefield.Undermountain Adventurer.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 17
+Bot1.Battlefield.Undermountain Adventurer.Tapped = true
+Bot1.Battlefield.Mox Ruby.Tapped = false
+Bot1.Mana =

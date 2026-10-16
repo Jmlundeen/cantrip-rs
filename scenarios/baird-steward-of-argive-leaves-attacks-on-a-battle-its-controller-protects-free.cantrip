@@ -1,0 +1,61 @@
+# Baird, Steward of Argive taxes attacks on "you or planeswalkers you control" (CR 508.1d, 508.1h): a battle its controller
+# protects is neither (CR 310.9b), so attacking it costs nothing. Bot1 casts Invasion of Gobakhan, which Bot2 protects, and
+# on turn 3 attacks it with one Llanowar Elves and Bot2 with the other: the total is {1}, for the Elf attacking Bot2 alone,
+# paid with Mox Ruby; Mox Sapphire stays untapped. The Siege goes from 3 defense to 2, and Bot2 to 19.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Llanowar Elves
+Mox Ruby
+Mox Pearl
+Invasion of Gobakhan
+Mox Sapphire
+Island x10
+
+[Bot2 Deck]
+Black Lotus
+Mox Pearl
+Baird, Steward of Argive
+Plains
+Plains
+Plains
+Plains
+Plains x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Baird, Steward of Argive.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Invasion of Gobakhan.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Attack(Llanowar Elves > Invasion of Gobakhan; Llanowar Elves > Bot2)
+? Combat.AttackCost = {1}
+? Combat.AttackCost.Attackers = Llanowar Elves
+Bot1.Battlefield.Mox Ruby.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 19
+Bot1.Battlefield.Invasion of Gobakhan.Counters.Defense = 2
+Bot1.Battlefield.Mox Ruby.Tapped = true
+Bot1.Battlefield.Mox Sapphire.Tapped = false
+Bot1.Mana =

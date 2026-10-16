@@ -1,0 +1,77 @@
+# A goaded creature attacks a player other than its goader if able (CR 701.15b), and "if able" never means paying a cost
+# to attack (CR 508.1d). In a game of three, Bot2 takes the initiative with White Plume Adventurer and ventures through
+# Secret Entrance and Forge to the Arena, goading Bot1's Llanowar Elves on turn 8. Bot2 and Bot3 each have a Ghostly
+# Prison, so every attack open to the Elves costs {2}: it is not required to attack at all, and Bot1 may pay to send it at
+# its goader, Bot2 - a declaration refused while attacking Bot3 is free. Bot1 pays with Mox Ruby and Mox Sapphire; Bot2
+# takes 1 and Bot3 none.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Mox Ruby
+Mox Sapphire
+Island
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Plains
+Black Lotus
+White Plume Adventurer
+Mox Pearl
+Mox Jet
+Ghostly Prison
+Island
+Plains x20
+
+[Bot3 Deck]
+Black Lotus
+Ghostly Prison
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.White Plume Adventurer.Cast
+Bot2.Search(Plains)
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Ghostly Prison.Cast
+[T3 Bot3.Main1]
+Bot3.Hand.Black Lotus.Cast
+Bot3.Battlefield.Black Lotus.Activate(Color: White)
+Bot3.Hand.Ghostly Prison.Cast
+[T5 Bot2.Upkeep]
+Bot2.Modes(Forge)
+Bot2.Target(White Plume Adventurer)
+[T8 Bot2.Upkeep]
+Bot2.Modes(Arena)
+Bot2.Target(Llanowar Elves)
+[T10 Bot1.Main1]
+? Bot1.Battlefield.Llanowar Elves.GoadedBy = Bot2
+Bot1.Attack(Llanowar Elves > Bot2)
+? Combat.AttackCost = {2}
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+[T10 Bot1.Blockers]
+? Combat.Attackers = Llanowar Elves > Bot2
+[T10 Bot1.Main2]
+
+[Expect]
+Turn = 10
+Bot2.Life = 19
+Bot3.Life = 20
+Bot1.Battlefield.Mox Ruby.Tapped = true
+Bot1.Battlefield.Mox Sapphire.Tapped = true
+Bot1.Battlefield.Llanowar Elves.Tapped = true
