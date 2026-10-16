@@ -1,0 +1,50 @@
+# Dragonhawk, Fate's Tempest: X is worked out as the ability resolves (its ruling) and Dragonhawk counts only if it is still
+# a creature Bot1 controls. Bot2 Swords it in response to its enters trigger, so X = 0: no card is exiled (the Lightning Bolt
+# stays on top of the library) and nothing burns Bot2 at the end step.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Black Lotus
+Dragonhawk, Fate's Tempest
+Plains
+Plains
+Plains
+Plains
+Lightning Bolt
+Plains x6
+
+[Bot2 Deck]
+Mox Pearl
+Swords to Plowshares
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Dragonhawk, Fate's Tempest.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Dragonhawk, Fate's Tempest)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+? Exile = Dragonhawk, Fate's Tempest
+[T4 Bot2.Main1]
+
+[Expect]
+Bot2.Life = 20
+Exile = Dragonhawk, Fate's Tempest
+Bot1.Library.Count = 7
+Bot1.Library = Lightning Bolt; Plains; Plains; Plains; Plains; Plains; Plains

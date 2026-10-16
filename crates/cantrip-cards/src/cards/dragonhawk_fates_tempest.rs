@@ -1,0 +1,50 @@
+use cantrip_api::*;
+use cantrip_mechanics::library;
+use cantrip_mechanics::triggers::THIS_ENTERS_OR_ATTACKS;
+use cantrip_oracle as oracle;
+
+/// "Exile the top X cards of your library, where X is the number of creatures you control with power 4 or greater" (CR 107.3,
+/// 406): X is worked out once, as the ability resolves, with Dragonhawk counted if it is still there. "You may play those
+/// cards until your next end step": a permission to play, so a land may be the turn's land drop (CR 305.1), ending as the
+/// controller's next end step begins (CR 500.4). "At the beginning of your next end step, Dragonhawk deals 2 damage ... for
+/// each of those cards that are still exiled": the delayed ability (CR 603.7) is about exactly the cards this resolution
+/// exiled (CR 603.7c), and is set up even when there are none.
+fn exile_and_play(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let you = item.controller;
+    let x = g.permanents_of(you).into_iter().filter(|&id| g.chars(id).is(CardType::Creature) && g.chars(id).power.is_some_and(|p| p >= 4)).count();
+    let grant = PlayGrant { lands: true, expiry: Expiry::UntilYourNextEndStep, ..PlayGrant::CAST };
+    let exiled = library::exile_top_may_play(g, you, x, you, grant);
+    let o = *g.obj(item.object);
+    let card = o.copy.map(|c| c.card).unwrap_or(o.card);
+    g.delayed_trigger_about(
+        DelayedWhen::Step { step: Step::End, on_turn_of: Some(you) },
+        item.object,
+        you,
+        AbilityRef::delayed(card, 0),
+        &exiled,
+    );
+    Ok(())
+}
+
+/// Dragonhawk deals 2 damage to each opponent for each of the cards that is still the card it was and still in exile
+/// (CR 400.7): one source, one amount for each opponent, dealt together (CR 120.3).
+fn burn(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let still_exiled = g.event_objects(item).iter().filter(|&&id| is_live(g, id) && g.obj(id).zone.is(ZoneKind::Exile)).count();
+    if still_exiled == 0 {
+        return Ok(());
+    }
+    let amount = 2 * still_exiled as u16;
+    let hits: Vec<(ObjectId, Target, u16)> = g.state().opponents(item.controller).map(|p| (item.object, Target::Player(p), amount)).collect();
+    g.damage_together(&hits);
+    Ok(())
+}
+
+pub static CARD: CardDef = CardDef {
+    abilities: &[triggered(
+        THIS_ENTERS_OR_ATTACKS,
+        exile_and_play,
+        "Whenever Dragonhawk enters or attacks, exile the top X cards of your library, where X is the number of creatures you control with power 4 or greater. You may play those cards until your next end step. At the beginning of your next end step, Dragonhawk deals 2 damage to each opponent for each of those cards that are still exiled.",
+    )],
+    delayed: &[delayed_trigger(burn, "At the beginning of your next end step, Dragonhawk deals 2 damage to each opponent for each of those cards that are still exiled.")],
+    ..oracle::DRAGONHAWK_FATES_TEMPEST
+};

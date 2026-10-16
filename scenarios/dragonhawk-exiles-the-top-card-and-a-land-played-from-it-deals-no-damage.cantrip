@@ -1,0 +1,41 @@
+# Dragonhawk, Fate's Tempest: "Whenever Dragonhawk enters or attacks, exile the top X cards of your library, where X is the
+# number of creatures you control with power 4 or greater." Bot1 casts it on turn 1 ({3}{R}{R}: Black Lotus, Mox Ruby and
+# Mox Pearl); it is the only such creature, so X = 1 and the Mountain on top is exiled. "You may play those cards until your
+# next end step": Bot1 plays the Mountain from exile as its land drop, so at the beginning of the end step none of the
+# cards is still exiled and Dragonhawk deals no damage (Bot2 stays at 20).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Black Lotus
+Dragonhawk, Fate's Tempest
+Plains
+Plains
+Plains
+Mountain
+Lightning Bolt
+Plains x6
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Dragonhawk, Fate's Tempest.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+? Exile = Mountain
+Bot1.Exile.Mountain.Play
+[T2 Bot2.Main1]
+
+[Expect]
+Exile.Count = 0
+Bot1.Battlefield = Mox Ruby; Mox Pearl; Dragonhawk, Fate's Tempest; Mountain
+Bot1.Library.Count = 7
+Bot2.Life = 20

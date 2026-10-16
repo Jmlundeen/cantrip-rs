@@ -1,0 +1,65 @@
+# Dragonhawk, Fate's Tempest: a Quantum Riddler (power exactly 4, the boundary) and Dragonhawk itself make X = 2, so two
+# Lightning Bolts are exiled on turn 3. Bot1 casts one of them from exile with the spare Mountain (3 damage), which leaves
+# exile (a new object, CR 400.7); the other stays, so at the beginning of the end step Dragonhawk deals 2 damage (once
+# for the one card still exiled): Bot2 is at 20 - 3 - 2 = 15. On turn 5 the remaining Bolt can no longer be cast.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Mox Jet
+Quantum Riddler
+Dragonhawk, Fate's Tempest
+Mountain
+Mountain
+Plains
+Lightning Bolt
+Lightning Bolt
+Plains x6
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Quantum Riddler.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dragonhawk, Fate's Tempest.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Exile = Lightning Bolt; Lightning Bolt
+Bot1.Battlefield.Mountain.Activate
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 17
+? Exile = Lightning Bolt
+[T4 Bot2.Main1]
+? Bot2.Life = 15
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Exile.Lightning Bolt.Cast(Bot2)
+
+[Expect]
+Bot2.Life = 15
+Exile = Lightning Bolt
+Bot1.Graveyard = Lightning Bolt; Black Lotus

@@ -1,0 +1,51 @@
+# Dragonhawk, Fate's Tempest: the delayed ability is set up as the exile trigger resolves and no longer depends on Dragonhawk
+# staying in play (CR 603.7): Bot2 Swords it away after the trigger has resolved, and at the beginning of the end step the
+# damage is still dealt, with the source as it last existed (CR 608.2h): the Bolt left in exile burns Bot2 for 2 (18).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Black Lotus
+Dragonhawk, Fate's Tempest
+Plains
+Plains
+Plains
+Plains
+Lightning Bolt
+Plains x6
+
+[Bot2 Deck]
+Mox Pearl
+Swords to Plowshares
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Dragonhawk, Fate's Tempest.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Exile = Lightning Bolt
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Dragonhawk, Fate's Tempest)
+Bot2.Pass
+Bot1.Pass
+? Exile = Lightning Bolt; Dragonhawk, Fate's Tempest
+? Bot2.Life = 20
+[T4 Bot2.Main1]
+
+[Expect]
+Bot2.Life = 18
+Exile = Lightning Bolt; Dragonhawk, Fate's Tempest
+Bot1.Life = 25

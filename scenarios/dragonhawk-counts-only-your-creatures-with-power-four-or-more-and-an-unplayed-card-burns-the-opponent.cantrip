@@ -1,0 +1,68 @@
+# Dragonhawk, Fate's Tempest: X is "the number of creatures you control with power 4 or greater". Bot1 controls Hired Blade
+# (power 3, one under the boundary) and Bot2 controls Kokusho (power 5, but not Bot1's), so on turn 3 only Dragonhawk counts:
+# X = 1, and one Lightning Bolt is exiled (the second stays on top of the library). Bot1 does not play it, so at the
+# beginning of its end step Dragonhawk deals 2 damage to Bot2 (20 to 18). The permission ended with that end step: on
+# turn 5 the Bolt can no longer be cast from exile (and the unplayed card is not owed again).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Jet
+Mox Ruby
+Mountain
+Hired Blade
+Dragonhawk, Fate's Tempest
+Plains
+Lightning Bolt
+Lightning Bolt
+Plains x6
+
+[Bot2 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Kokusho, the Evening Star
+Island x12
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Hired Blade.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Kokusho, the Evening Star.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Dragonhawk, Fate's Tempest.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Exile = Lightning Bolt
+? Bot1.Library.Count = 7
+[T4 Bot2.Main1]
+? Bot2.Life = 18
+? Exile = Lightning Bolt
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Exile.Lightning Bolt.Cast(Bot2)
+
+[Expect]
+Bot2.Life = 18
+Exile = Lightning Bolt
+Bot1.Library.Count = 6
