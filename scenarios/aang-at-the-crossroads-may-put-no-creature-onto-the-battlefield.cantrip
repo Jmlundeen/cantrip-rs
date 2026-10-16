@@ -1,0 +1,42 @@
+# "You may put a creature card with mana value 4 or less from among them onto the battlefield": the choice is up to one.
+# Bot1 looks at Llanowar Elves, Argothian Elder and three lands and chooses none; every one of the five goes to the bottom
+# and nothing joins Aang on the battlefield. The card drawn on turn 3 is the sixth, an Island.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Aang, at the Crossroads
+Plains
+Llanowar Elves
+Swamp
+Argothian Elder
+Swamp
+Swamp
+Island x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Aang, at the Crossroads.Cast
+Bot1.Choose()
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield = Forest; Mox Emerald; Mox Pearl; Mox Sapphire; Mox Ruby; Aang, at the Crossroads
+Bot1.Looked = Llanowar Elves; Swamp; Argothian Elder; Swamp; Swamp
+Bot1.Hand = Plains; Island
+Bot1.Library.Count = 14

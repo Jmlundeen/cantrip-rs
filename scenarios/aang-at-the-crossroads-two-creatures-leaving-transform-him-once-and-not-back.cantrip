@@ -1,0 +1,72 @@
+# Aang, at the Crossroads's ruling (2025-10-02): "its delayed triggered ability won't cause it to transform back into Aang,
+# at the Crossroads if it has already transformed into Aang, Destined Savior, perhaps because several creatures left the
+# battlefield in one turn" (CR 701.27f: a delayed triggered ability transforms its permanent only if it hasn't transformed
+# since that ability was created). On turn 2 Bot2 bolts both of Bot1's Ornithopters, one after the other: Aang triggers
+# twice and two delayed abilities wait for the next upkeep, Bot1's on turn 3. Both trigger there; the first transforms Aang,
+# the second finds he has transformed since it was created and does nothing, so he is still Aang, Destined Savior.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Aang, at the Crossroads
+Ornithopter
+Ornithopter
+Island x15
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Island x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Aang, at the Crossroads.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Ornithopter#1)
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 1
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 0
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Ornithopter)
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 1
+Bot2.Pass
+Bot1.Pass
+[T2 Bot2.End]
+? Bot1.Battlefield.Aang, at the Crossroads.Power = 3
+[T3 Bot1.Upkeep]
+Bot1.Triggers(Aang, at the Crossroads; Aang, at the Crossroads)
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+? Bot1.Battlefield.Aang, Destined Savior.Power = 4
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Forest; Mox Pearl; Mox Sapphire; Aang, Destined Savior
+Bot1.Battlefield.Aang, Destined Savior.Power = 4
+Bot1.Battlefield.Aang, Destined Savior.Toughness = 4
+Bot1.Graveyard.Count = 3

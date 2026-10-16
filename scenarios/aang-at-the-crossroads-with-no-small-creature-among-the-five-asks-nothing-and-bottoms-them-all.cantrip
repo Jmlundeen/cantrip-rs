@@ -1,0 +1,48 @@
+# Aang, at the Crossroads enters and looks at five cards with no creature card of mana value 4 or less among them: Amazing
+# Spider-Girl is a creature of mana value 5, the rest are not creatures. Nothing can be put onto the battlefield, so Bot1 is
+# asked no choice of cards (the bare refusal); all five still go to the bottom, and the card drawn on turn 3 is the sixth,
+# an Island.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Aang, at the Crossroads
+Plains
+Amazing Spider-Girl
+Sol Ring
+Swamp
+Mox Jet
+Swamp
+Island x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Aang, at the Crossroads.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+Bot1.Pass
+! Bot1.Choose
+Bot2.Pass
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield = Forest; Mox Emerald; Mox Pearl; Mox Sapphire; Mox Ruby; Aang, at the Crossroads
+Bot1.Looked = Amazing Spider-Girl; Sol Ring; Swamp; Mox Jet; Swamp
+Bot1.Hand = Plains; Island
+Bot1.Library.Count = 14

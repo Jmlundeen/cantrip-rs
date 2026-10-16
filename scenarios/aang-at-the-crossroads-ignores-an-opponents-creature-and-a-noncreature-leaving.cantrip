@@ -1,0 +1,54 @@
+# "When another creature you control leaves the battlefield": neither an opponent's creature nor a noncreature permanent of
+# Bot1's leaving triggers it. On turn 3 Bot1 exiles Bot2's Ornithopter with Swords to Plowshares, and sacrifices its own
+# Black Lotus for mana: Aang triggers for neither (the stack stays empty), so nothing transforms him at Bot2's upkeep on turn
+# 4 and he is still Aang, at the Crossroads, a 3/3. Bot1's own Ornithopter exiled the same way transforms him
+# (`aang-at-the-crossroads-transforms-at-the-next-upkeep-and-earthbends-on-its-controllers-combat`).
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Aang, at the Crossroads
+Swords to Plowshares
+Island x5
+Black Lotus
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Island x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Aang, at the Crossroads.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Swords to Plowshares.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Exile = Ornithopter
+? Stack.Count = 0
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+? Bot1.Graveyard = Black Lotus; Swords to Plowshares
+? Stack.Count = 0
+[T4 Bot2.Main1]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Forest; Mox Emerald; Mox Pearl; Mox Sapphire; Mox Ruby; Aang, at the Crossroads
+Bot1.Battlefield.Aang, at the Crossroads.Power = 3
+Bot1.Battlefield.Aang, at the Crossroads.Toughness = 3

@@ -1,0 +1,62 @@
+# "When another creature you control leaves the battlefield, transform Aang at the beginning of the next upkeep." On turn 3
+# Bot1 exiles its own Ornithopter with Swords to Plowshares: it leaves the battlefield without dying, and the delayed ability
+# waits. It does nothing during the rest of Bot1's turn; it triggers at the next upkeep, which is Bot2's on turn 4, "regardless
+# of whose turn it is" (the 2025-10-02 ruling), and Aang becomes Aang, Destined Savior, a 4/4 flier. Bot2's combat on turn 4 is
+# not "combat on your turn" for Bot1, so nothing is earthbent then. At the beginning of combat on Bot1's turn 5 Aang earthbends
+# 2: the Forest becomes a 0/0 land creature with haste and two +1/+1 counters, and as a land creature Bot1 controls it has
+# vigilance, so it attacks beside Aang and stays untapped while Aang, no land, taps.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Aang, at the Crossroads
+Ornithopter
+Swords to Plowshares
+Island x15
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Aang, at the Crossroads.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Swords to Plowshares.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.End]
+? Bot1.Battlefield.Aang, at the Crossroads.Power = 3
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Aang, Destined Savior.Power = 4
+[T4 Bot2.End]
+? Bot1.Battlefield.Forest.Types = Land
+[T5 Bot1.BeginCombat]
+Bot1.Attack(Aang, Destined Savior; Forest)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Exile = Ornithopter
+Bot1.Battlefield.Aang, Destined Savior.Power = 4
+Bot1.Battlefield.Aang, Destined Savior.Toughness = 4
+Bot1.Battlefield.Aang, Destined Savior.Keywords = Flying
+Bot1.Battlefield.Aang, Destined Savior.Tapped = true
+Bot1.Battlefield.Aang, Destined Savior.Subtypes = Ally; Avatar
+Bot1.Battlefield.Forest.Types = Land; Creature
+Bot1.Battlefield.Forest.Power = 2
+Bot1.Battlefield.Forest.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Forest.Keywords = Haste; Vigilance
+Bot1.Battlefield.Forest.Tapped = false

@@ -1,0 +1,48 @@
+# Aang, at the Crossroads enters: "look at the top five cards of your library. You may put a creature card with mana value
+# 4 or less from among them onto the battlefield. Put the rest on the bottom of your library in a random order." The five are
+# Amazing Spider-Girl (a creature of mana value 5), Sol Ring (not a creature), Argothian Elder (a creature of mana value
+# exactly 4), Llanowar Elves and a Swamp. Spider-Girl and Sol Ring can't be chosen; the Elder can and is put onto the
+# battlefield. The other four go to the bottom, so the card Bot1 draws on turn 3 is the Island that was sixth.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Aang, at the Crossroads
+Plains
+Amazing Spider-Girl
+Sol Ring
+Argothian Elder
+Llanowar Elves
+Swamp
+Island x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Aang, at the Crossroads.Cast
+! Bot1.Choose(Amazing Spider-Girl)
+! Bot1.Choose(Sol Ring)
+Bot1.Choose(Argothian Elder)
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield = Forest; Mox Emerald; Mox Pearl; Mox Sapphire; Mox Ruby; Aang, at the Crossroads; Argothian Elder
+Bot1.Battlefield.Aang, at the Crossroads.Power = 3
+Bot1.Battlefield.Aang, at the Crossroads.Keywords = Flying
+Bot1.Looked = Amazing Spider-Girl; Sol Ring; Argothian Elder; Llanowar Elves; Swamp
+Bot1.Hand = Plains; Island
+Bot1.Library.Count = 13
