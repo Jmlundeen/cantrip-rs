@@ -1,0 +1,42 @@
+# The sneak tokens enter attacking and their controller chooses what each one attacks (CR 508.4; the ruling: each may attack
+# a different player, planeswalker or battle, not the one the returned creature attacked). Bot2 has Liliana of the Veil
+# (loyalty 3). Two tokens attack Liliana and one attacks Bot2: Liliana takes 2 and is left at 1, Bot2 takes 1 (19).
+
+[Bot1 Deck]
+Mox Pearl
+Ornithopter
+The Last Ronin's Technique
+Plains x17
+
+[Bot2 Deck]
+Black Lotus
+Liliana of the Veil
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Liliana of the Veil.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+[T3 Bot1.DeclareBlockers]
+Bot1.Hand.The Last Ronin's Technique.Cast(Ability: Sneak)
+Bot1.Choose(Ornithopter)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Target(Bot2.Battlefield.Liliana of the Veil)
+Bot1.Target(Bot2.Battlefield.Liliana of the Veil)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 19
+Bot2.Battlefield.Liliana of the Veil.Counters.Loyalty = 1

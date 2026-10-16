@@ -1,0 +1,36 @@
+# Tokens that enter attacking were never declared as attackers (CR 508.4), so "whenever a creature you control attacks"
+# does not trigger for them. Bot1 has Shared Animosity (a creature that attacks gets +1/+0 for each other attacking creature)
+# and attacks with the lone Ornithopter (no bonus); sneaking in The Last Ronin's Technique adds three tokens that are not
+# pumped: they deal 3, not more (Bot2 at 17).
+
+[Bot1 Deck]
+Black Lotus
+Shared Animosity
+Mox Pearl
+Ornithopter
+The Last Ronin's Technique
+Plains x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Plains.Play
+Bot1.Hand.Shared Animosity.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+[T3 Bot1.DeclareBlockers]
+Bot1.Hand.The Last Ronin's Technique.Cast(Ability: Sneak)
+Bot1.Choose(Ornithopter)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17

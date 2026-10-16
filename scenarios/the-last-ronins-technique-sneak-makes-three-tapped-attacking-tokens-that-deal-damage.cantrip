@@ -1,0 +1,44 @@
+# Sneak {1}{W} (CR 702.190a): Bot1's Ornithopter attacks unblocked; in the declare blockers step Bot1 casts The Last Ronin's
+# Technique for {1}{W} (Mox Pearl and a Plains), returning the Ornithopter to hand. Its sneak cost was paid, so the three
+# 1/1 white Ninja Turtle Spirit tokens enter tapped and attacking Bot2 (CR 508.4): never declared as attackers, but
+# unblocked attackers all the same, so they deal 3 combat damage (Bot2 at 17). The returned Ornithopter deals none.
+
+[Bot1 Deck]
+Mox Pearl
+Ornithopter
+The Last Ronin's Technique
+Plains x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+[T3 Bot1.DeclareBlockers]
+Bot1.Hand.The Last Ronin's Technique.Cast(Ability: Sneak)
+Bot1.Choose(Ornithopter)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Ninja Turtle Spirit#1.Tapped = true
+? Bot1.Battlefield.Ninja Turtle Spirit#1.Token = true
+? Bot1.Battlefield.Ninja Turtle Spirit#2.Tapped = true
+? Bot1.Battlefield.Ninja Turtle Spirit#2.Token = true
+? Bot1.Battlefield.Ninja Turtle Spirit#3.Tapped = true
+? Bot1.Battlefield.Ninja Turtle Spirit#3.Token = true
+? Bot1.Battlefield.Ninja Turtle Spirit#1.Subtypes = Ninja; Spirit; Turtle
+? Bot1.Battlefield.Ninja Turtle Spirit#1.Colors = White
+? Bot1.Battlefield.Ninja Turtle Spirit#1.Power = 1
+? Bot1.Battlefield.Ninja Turtle Spirit#1.Toughness = 1
+
+[Expect]
+Bot2.Life = 17
+Bot1.Hand = Ornithopter; Plains; Plains; Plains; Plains
+Bot1.Graveyard = The Last Ronin's Technique
+Bot1.Battlefield.Count = 5

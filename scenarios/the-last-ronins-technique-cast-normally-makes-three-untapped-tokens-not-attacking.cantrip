@@ -1,0 +1,30 @@
+# Cast for its mana cost {3}{W} (Black Lotus for three white, a Plains for the fourth) in Bot1's first main phase, the sneak
+# cost was not paid, so the three Ninja Turtle Spirit tokens enter untapped and not attacking (CR 111.1): nobody attacks
+# and Bot2 loses no life.
+
+[Bot1 Deck]
+Black Lotus
+The Last Ronin's Technique
+Plains x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Plains.Play
+Bot1.Hand.The Last Ronin's Technique.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains.Activate
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Ninja Turtle Spirit#1.Tapped = false
+? Bot1.Battlefield.Ninja Turtle Spirit#2.Tapped = false
+? Bot1.Battlefield.Ninja Turtle Spirit#3.Tapped = false
+? Bot1.Battlefield.Ninja Turtle Spirit#1.Token = true
+? Combat.Attackers.Count = 0
+
+[Expect]
+Bot2.Life = 20
+Bot1.Graveyard = The Last Ronin's Technique; Black Lotus
+Bot1.Battlefield.Count = 4
