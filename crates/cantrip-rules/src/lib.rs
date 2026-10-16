@@ -397,6 +397,11 @@ impl Game {
     pub fn name(&self, id: ObjectId) -> &'static str {
         self.chars(id).name
     }
+
+    /// Whether `player` can't gain life right now (CR 119.7): an effect or a static ability on the battlefield says so.
+    pub fn cant_gain_life(&self, player: PlayerId) -> bool {
+        static_rules::cant_gain_life(self, self.cards, player)
+    }
 }
 
 /// The view of the game a frame's run has: what card code is handed as `&mut dyn Game`.
@@ -967,6 +972,11 @@ impl cantrip_api::Game for Cx<'_> {
 
     fn lose_life(&mut self, player: PlayerId, amount: i32) {
         ops::change_life(self, player, -amount);
+    }
+
+    fn set_life_total(&mut self, player: PlayerId, total: i32) {
+        let life = self.g.state.player(player).life;
+        ops::change_life(self, player, total - life);
     }
 
     fn add_mana(&mut self, player: PlayerId, mana: Mana, amount: u8) {

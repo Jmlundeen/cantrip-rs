@@ -483,6 +483,11 @@ impl<'a> Projector<'a> {
                 summary.pending_effects.push(self.cant_cast_text(p, zones, e.duration));
             }
         }
+        // "Players can't gain life" (CR 119.7): from a permanent's static ability while it is on the battlefield, or a resolved
+        // effect about the player (Screaming Nemesis's "for the rest of the game"), as it applies now.
+        if game.cant_gain_life(p) {
+            summary.pending_effects.push(format!("{} can't gain life.", if p == self.viewer { "You" } else { "They" }));
+        }
         if player.room != 0
             && let Some(dungeon) = game.cards.undercity
         {

@@ -52,6 +52,25 @@ pub fn damage_cant_be_prevented(cx: &Cx, source: ObjectId, combat: bool) -> bool
     false
 }
 
+/// Whether `player` can't gain life (CR 119.7): a resolved effect about them says so (`EffectKind::CantGainLife`, Screaming
+/// Nemesis's "for the rest of the game"), or a static ability of a permanent on the battlefield does (`CardDef::cant_gain_life`,
+/// Sunspine Lynx's "Players can't gain life"), which stops when the permanent leaves or loses its abilities (CR 611.3a,
+/// 613.1f). Asked only when a player would gain life, so the battlefield is searched then.
+pub fn cant_gain_life(q: &dyn Query, cards: &'static CardTable, player: PlayerId) -> bool {
+    let s = q.state();
+    if s.effects.iter().any(|e| e.kind == EffectKind::CantGainLife(player)) {
+        return true;
+    }
+    s.battlefield().iter().any(|&id| {
+        let obj = s.obj(id);
+        let def = cards.get(cards.current(obj));
+        !def.cant_gain_life.is_empty() && !s.lost_all_abilities(id) && {
+            let asker = Asker { source: id, controller: obj.controller };
+            def.cant_gain_life.iter().any(|rule| rule(q, &asker, player))
+        }
+    })
+}
+
 /// Whether `player` may spend mana as though it were of any color to activate an ability of `source` (CR 609.4b).
 pub fn spend_any_color_for(cx: &Cx, player: PlayerId, source: ObjectId) -> bool {
     sources(cx, |d| !d.spend_any_color.is_empty()).any(|(id, controller, def)| {

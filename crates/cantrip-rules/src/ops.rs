@@ -1370,8 +1370,7 @@ pub fn deal_damage_with(
             // Protection from everything prevents all damage to the player (CR 702.16j, 702.16e), unless it can't be
             // prevented (CR 615.12).
             if cx.s().effects.iter().any(|e| e.kind == EffectKind::PlayerProtectionFromEverything && e.controller == p)
-                && cx.s().turn.no_prevention_turn != cx.s().turn.number
-                && !crate::static_rules::damage_cant_be_prevented(cx, source, combat)
+                && damage_can_be_prevented(cx, source, combat)
             {
                 return None;
             }
@@ -1393,13 +1392,9 @@ pub fn deal_damage_with(
                 return None;
             }
             let target_chars = layers::chars(cx.cards(), cx.s(), id);
-            // Protection prevents the damage (CR 702.16e) unless damage can't be prevented this turn (CR 615.12).
-            let turn = cx.s().turn;
+            // Protection prevents the damage (CR 702.16e) unless it can't be prevented (CR 615.12).
             let source_controller = cx.s().obj(source).controller;
-            if target_chars.protected_from_by(&source_chars, source_controller)
-                && turn.no_prevention_turn != turn.number
-                && !crate::static_rules::damage_cant_be_prevented(cx, source, combat)
-            {
+            if target_chars.protected_from_by(&source_chars, source_controller) && damage_can_be_prevented(cx, source, combat) {
                 return None;
             }
             let deathtouch = source_chars.has(Keyword::Deathtouch);
@@ -1441,6 +1436,15 @@ pub fn deal_damage_with(
     }
 }
 
+/// Whether a prevention effect may prevent the damage `source` is about to deal (CR 615.12): not in a turn an effect said
+/// damage can't be prevented this turn (Bonecrusher Giant's Stomp), nor while a static ability says this damage can't be
+/// (Sunspine Lynx's "Damage can't be prevented", Questing Beast's combat damage). Protection (CR 702.16e) is the only
+/// prevention effect the engine has; any other must ask this too.
+fn damage_can_be_prevented(cx: &Cx, source: ObjectId, combat: bool) -> bool {
+    let turn = cx.s().turn;
+    turn.no_prevention_turn != turn.number && !crate::static_rules::damage_cant_be_prevented(cx, source, combat)
+}
+
 /// Damage dealt by a source with lifelink also causes its controller to gain that much life (CR 702.15b), as part of
 /// the damage event, not a trigger.
 fn lifelink(cx: &mut Cx, source: ObjectId, chars: &Chars, amount: u16) {
@@ -1462,12 +1466,15 @@ pub fn each_opponent_loses_life(cx: &mut Cx, player: PlayerId, amount: i32) -> i
     total
 }
 
+/// `player`'s life total goes up or down by `delta` (CR 119.3). Every gain and loss of life comes here: an effect's, a
+/// cost's (CR 119.4), damage (CR 120.3a), lifelink (CR 702.15b) and a life total set to a number (CR 119.5).
 pub fn change_life(cx: &mut Cx, player: PlayerId, delta: i32) {
     if delta == 0 {
         return;
     }
-    // CR 119.7: a player who can't gain life gains none, and nothing happens.
-    if delta > 0 && cx.s().effects.iter().any(|e| e.kind == EffectKind::CantGainLife(player)) {
+    // CR 119.7: a player who can't gain life gains none, and nothing happens: no life gain event, so nothing that
+    // triggers on one (CR 119.9) triggers.
+    if delta > 0 && crate::static_rules::cant_gain_life(&*cx, cx.cards(), player) {
         return;
     }
     cx.st().update_player(player, |p| p.life += delta);

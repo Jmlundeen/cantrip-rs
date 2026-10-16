@@ -242,6 +242,27 @@ delayed triggered ability is no ability of the object (CR 603.2d, 603.7) and is 
 card in another zone or of an emblem (CR 114.4) is not "of a permanent". Triggered mana abilities (CR 605.1b) are asked too, each
 triggering resolving at once.
 
+### Life: gaining it, and damage that can't be prevented
+
+Every gain and loss of life goes through `ops::change_life` (CR 119.3): an effect's, a cost's (CR 119.4), damage (CR
+120.3a), lifelink (CR 702.15b), and a life total set to a number (`Game::set_life_total`, CR 119.5: the player gains or loses
+the difference). A gain does not happen while the player can't gain life (CR 119.7, `static_rules::cant_gain_life`): a
+resolved effect about the player says so (`EffectKind::CantGainLife`, Screaming Nemesis's "for the rest of the game"), or a
+static ability of a permanent on the battlefield does (`CardDef::cant_gain_life`, a `LifeGainRule` asked of the player:
+`cantrip_mechanics::statics::players_cant_gain_life` for Sunspine Lynx, Giant Cindermaw, Rampaging Ferocidon and Leyline of
+Punishment, `opponents_cant_gain_life` for Knight of Dusk's Shadow). The battlefield is searched only when a player would gain
+life, and a permanent that has lost all its abilities has none of these. No life gain event is recorded for a gain that did
+not happen, so "whenever you gain life" does not trigger (CR 119.9); paying life is a loss and is still allowed. The host shows
+"You can't gain life." / "They can't gain life." beside a player's total while it applies (`Game::cant_gain_life`). Not built,
+because no card in content has one: exchanges of life totals, costs that gain life and replacements of life gain (the rest of
+CR 119.7), and "can't lose life" (CR 119.8).
+
+"Damage can't be prevented" (CR 615.12) is asked by `ops::damage_can_be_prevented` before any prevention: a turn an effect said
+so (Bonecrusher Giant's Stomp) or a `CardDef::unpreventable_damage` static (Questing Beast's combat damage,
+`statics::damage_cant_be_prevented` for Sunspine Lynx and Leyline of Punishment). Protection (CR 702.16e, of a permanent or a
+player's protection from everything) is the only prevention effect the engine has today; a prevention shield or other
+prevention effect added later must ask the same function.
+
 ### Ending the turn and the cleanup step
 
 "End the turn" (CR 724.1) is `Game::end_the_turn`, called by a resolving spell or ability (`turn::end_the_turn`): the

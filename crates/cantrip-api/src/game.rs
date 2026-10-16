@@ -527,9 +527,13 @@ pub trait Game: Query {
         let owner = self.obj(object).owner;
         self.move_to(object, Zone::exile(owner))
     }
-    /// `player` gains life (CR 119.3): none, if an effect says they can't (CR 119.7, `EffectKind::CantGainLife`).
+    /// `player` gains life (CR 119.3): none, if an effect or a static ability says they can't (CR 119.7,
+    /// `EffectKind::CantGainLife`, `CardDef::cant_gain_life`).
     fn gain_life(&mut self, player: PlayerId, amount: i32);
     fn lose_life(&mut self, player: PlayerId, amount: i32);
+    /// "`player`'s life total becomes `total`" (CR 119.5): they gain or lose the difference, so a player who can't gain life
+    /// keeps a total lower than `total` (CR 119.7).
+    fn set_life_total(&mut self, player: PlayerId, total: i32);
     /// Each opponent of `player` who is still in the game loses `amount` life (CR 119.3), in turn order. The total they lost.
     fn each_opponent_loses_life(&mut self, player: PlayerId, amount: i32) -> i32;
     fn add_mana(&mut self, player: PlayerId, mana: Mana, amount: u8);

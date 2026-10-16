@@ -1133,6 +1133,10 @@ pub type CauseRule = fn(&dyn Query, &Asker, PlayerId, PlayerId, bool) -> bool;
 /// `combat` or not. "Combat damage that would be dealt by creatures you control can't be prevented."
 pub type UnpreventableRule = fn(&dyn Query, &Asker, ObjectId, bool) -> bool;
 
+/// A static ability that says a player can't gain life (CR 119.7): true for `player`. "Players can't gain life" (Sunspine
+/// Lynx), "Your opponents can't gain life" (Knight of Dusk's Shadow). `cantrip_mechanics::statics` has both.
+pub type LifeGainRule = fn(&dyn Query, &Asker, PlayerId) -> bool;
+
 /// Whether a static ability makes this creature assign combat damage equal to its toughness rather than its power
 /// (CR 510.1a): given the rule's own asker.
 pub type DamageByToughnessRule = fn(&dyn Query, &Asker, ObjectId) -> bool;
@@ -1369,6 +1373,9 @@ pub struct CardDef {
     pub targeting_rules: &'static [TargetingRule],
     /// Its static abilities that make some damage unpreventable (CR 615.12).
     pub unpreventable_damage: &'static [UnpreventableRule],
+    /// Its static abilities that stop players from gaining life (CR 119.7), while it is on the battlefield: the gain, the
+    /// part of an exchange or a new life total that would raise the total, does not happen (CR 119.5).
+    pub cant_gain_life: &'static [LifeGainRule],
     /// "Each creature you control assigns combat damage equal to its toughness rather than its power" (CR 510.1a):
     /// Assault Formation, Doran, the Siege Tower.
     pub damage_by_toughness: &'static [DamageByToughnessRule],
@@ -1477,6 +1484,7 @@ impl CardDef {
         block_rules: &[],
         targeting_rules: &[],
         unpreventable_damage: &[],
+        cant_gain_life: &[],
         damage_by_toughness: &[],
         spend_any_color: &[],
         cause_rules: &[],
