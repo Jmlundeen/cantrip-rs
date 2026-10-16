@@ -1,0 +1,67 @@
+# Planetarium of Wan Shi Tong's free cast may pay optional additional costs and chooses targets as any cast does (CR
+# 601.2b-c, 118.9; the ruling: "you may pay any optional additional costs (such as kicker)"). Bot1 puts the Planetarium out
+# on turn 1 (Sol Ring, Black Lotus, Mox Jet); Bot2 casts an Ornithopter on turn 2. On turn 3 Bot1 activates the
+# Planetarium with Mox Pearl and scries 2, keeping Torch the Tower on top. Cast free, Torch the Tower is bargained -
+# Bot1 sacrifices Mox Jet - and targets the Ornithopter: 3 damage, the Ornithopter is exiled instead of dying, and Bot1
+# scries 1. That scry does not trigger the Planetarium again: a card was cast with it this turn (CR 603.2h).
+
+[Bot1 Deck]
+Mox Sapphire
+Sol Ring
+Mox Jet
+Black Lotus
+Mox Pearl
+Planetarium of Wan Shi Tong
+Island
+Island
+Counterspell
+Torch the Tower
+Lightning Bolt
+Island x5
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Planetarium of Wan Shi Tong.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Planetarium of Wan Shi Tong.Activate
+Bot1.Pass
+Bot1.Arrange(Torch the Tower | Counterspell)
+Bot1.Pass
+Bot1.Accept
+Bot1.Modes(Bargain:)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Choose(Mox Jet)
+Bot1.Pass
+Bot1.Arrange(Lightning Bolt |)
+? Stack.Count = 0
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Looked = Torch the Tower
+Exile = Ornithopter
+Bot2.Battlefield.Count = 0
+Bot1.Battlefield = Mox Sapphire; Sol Ring; Mox Pearl; Planetarium of Wan Shi Tong
+Bot1.Graveyard = Torch the Tower; Mox Jet; Black Lotus
+Bot1.Library = Lightning Bolt; Island; Island; Island; Island; Island; Counterspell

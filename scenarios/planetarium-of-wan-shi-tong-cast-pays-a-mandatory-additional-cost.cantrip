@@ -1,0 +1,59 @@
+# Planetarium of Wan Shi Tong's free cast still pays mandatory additional costs (CR 118.9d, 601.2f; the ruling: "You must
+# pay any mandatory additional costs (such as sacrificing a creature)"). Bot1 puts the Planetarium and an Ornithopter out on
+# turn 1 (Sol Ring, Black Lotus, Mox Jet), activates the Planetarium with Mox Pearl and scries 2, keeping Village Rites
+# ("As an additional cost to cast this spell, sacrifice a creature. Draw two cards.") on top. Cast free, it sacrifices the
+# Ornithopter as it is cast and draws the two Islands beneath.
+
+[Bot1 Deck]
+Mox Sapphire
+Sol Ring
+Mox Jet
+Black Lotus
+Mox Pearl
+Planetarium of Wan Shi Tong
+Ornithopter
+Counterspell
+Village Rites
+Island
+Island
+Swamp x5
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Planetarium of Wan Shi Tong.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Planetarium of Wan Shi Tong.Activate
+Bot1.Pass
+Bot1.Arrange(Village Rites | Counterspell)
+Bot1.Pass
+Bot1.Accept
+Bot1.Choose(Ornithopter)
+Bot1.Pass
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Looked = Village Rites
+Bot1.Battlefield = Mox Sapphire; Sol Ring; Mox Jet; Mox Pearl; Planetarium of Wan Shi Tong
+Bot1.Graveyard = Village Rites; Ornithopter; Black Lotus
+Bot1.Hand = Island; Island
+Bot1.Library = Swamp; Swamp; Swamp; Swamp; Swamp; Counterspell

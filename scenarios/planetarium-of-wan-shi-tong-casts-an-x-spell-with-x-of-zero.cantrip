@@ -1,0 +1,53 @@
+# Planetarium of Wan Shi Tong casts the top card "without paying its mana cost": an {X} in that cost is 0 (CR 107.3b,
+# 118.9; the ruling: "if it has {X} in its mana cost, you must choose 0 as the value of {X}"). Bot1 puts the Planetarium
+# out on turn 1 (Sol Ring, Black Lotus, Mox Jet), activates it with Mox Pearl and scries 2, keeping Pest Infestation
+# ({X}{X}{G}: "Destroy up to X target artifacts and/or enchantments. Create twice X 1/1 ... Pest creature tokens") on
+# top. Cast free, its X is 0: it targets nothing, destroys none of the artifacts on the battlefield and creates no Pest.
+
+[Bot1 Deck]
+Mox Sapphire
+Sol Ring
+Mox Jet
+Black Lotus
+Mox Pearl
+Planetarium of Wan Shi Tong
+Island
+Counterspell
+Pest Infestation
+Island x5
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Planetarium of Wan Shi Tong.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Planetarium of Wan Shi Tong.Activate
+Bot1.Pass
+Bot1.Arrange(Pest Infestation | Counterspell)
+Bot1.Pass
+Bot1.Accept
+Bot1.Pass
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Looked = Pest Infestation
+Bot1.Battlefield = Mox Sapphire; Sol Ring; Mox Jet; Mox Pearl; Planetarium of Wan Shi Tong
+Bot1.Graveyard = Pest Infestation; Black Lotus
+Bot1.Library = Island; Island; Island; Island; Island; Counterspell
