@@ -1,0 +1,77 @@
+# A copy of a station permanent copies its printed abilities, the striations included, but not its counters: "The abilities
+# (and in some cases, types, power, and toughness) are determined based on the number of charge counters on the copy" (Wurmwall
+# Sweeper's rulings, 2025-07-25; CR 707.2). The Sweeper, stationed to four by Sunset Saboteur on turn 1, is a 2/2 flying
+# artifact creature; Phyrexian Metamorph entering as a copy of it on turn 3 has no counters and is only an artifact (its
+# copy surveils as it enters). The copy's own station ability, paid with the Saboteur, gives it four counters, and it is a
+# 2/2 flier too - summoning sick, having entered this turn (CR 302.6).
+
+[Bot1 Deck]
+Wurmwall Sweeper
+Sunset Saboteur
+Phyrexian Metamorph
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Mox Ruby
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Wurmwall Sweeper.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Island; Island |)
+Bot1.Hand.Sunset Saboteur.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot1.Battlefield.Wurmwall Sweeper.Activate(Ability: Station)
+Bot1.Choose(Sunset Saboteur)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Wurmwall Sweeper.Types = Artifact; Creature
+[T3 Bot1.Main1]
+Bot1.Hand.Phyrexian Metamorph.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Target(Wurmwall Sweeper)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Island; Island |)
+? Bot1.Battlefield.Wurmwall Sweeper#2.Types = Artifact
+? Bot1.Battlefield.Wurmwall Sweeper#2.Counters.Charge = (absent)
+? Bot1.Battlefield.Wurmwall Sweeper#2.Power = (absent)
+Bot1.Battlefield.Wurmwall Sweeper#2.Activate(Ability: Station)
+Bot1.Choose(Sunset Saboteur)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Wurmwall Sweeper; Wurmwall Sweeper; Sunset Saboteur; Mox Jet; Mox Sapphire; Mox Emerald; Mox Ruby
+Bot1.Battlefield.Wurmwall Sweeper#1.Counters.Charge = 4
+Bot1.Battlefield.Wurmwall Sweeper#2.Counters.Charge = 4
+Bot1.Battlefield.Wurmwall Sweeper#2.Types = Artifact; Creature
+Bot1.Battlefield.Wurmwall Sweeper#2.Power = 2
+Bot1.Battlefield.Wurmwall Sweeper#2.Toughness = 2
+Bot1.Battlefield.Wurmwall Sweeper#2.Keywords = Flying
+Bot1.Battlefield.Wurmwall Sweeper#2.SummoningSick = true
+Bot1.Battlefield.Wurmwall Sweeper#1.SummoningSick = false

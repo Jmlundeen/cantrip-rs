@@ -1,0 +1,65 @@
+# Station puts its counters on "this permanent" (CR 702.184a): when Wurmwall Sweeper is destroyed by Abrade in response to
+# its station ability, the ability resolves and puts no counters anywhere - the Sweeper card in the graveyard is a new object
+# (CR 400.7) and the station ability has no other permanent to put them on. Its cost was paid: Sunset Saboteur stays tapped.
+
+[Bot1 Deck]
+Wurmwall Sweeper
+Sunset Saboteur
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Mox Ruby
+Island x14
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Abrade
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Wurmwall Sweeper.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Island; Island |)
+Bot1.Hand.Sunset Saboteur.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Wurmwall Sweeper.Activate(Ability: Station)
+Bot1.Choose(Sunset Saboteur)
+Bot1.Pass
+Bot2.Hand.Abrade.Cast
+Bot2.Modes(Destroy target artifact)
+Bot2.Target(Wurmwall Sweeper)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Wurmwall Sweeper
+? Stack = Wurmwall Sweeper
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Sunset Saboteur; Mox Jet; Mox Sapphire; Mox Emerald; Mox Ruby
+Bot1.Battlefield.Sunset Saboteur.Tapped = true
+Bot1.Graveyard = Wurmwall Sweeper
+Bot2.Graveyard = Abrade
+Stack.Count = 0

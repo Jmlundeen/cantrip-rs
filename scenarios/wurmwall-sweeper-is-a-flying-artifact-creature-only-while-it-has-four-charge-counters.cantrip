@@ -1,0 +1,88 @@
+# Wurmwall Sweeper: "4+ | Flying" with its 2/2 box (CR 721.2b: "as long as this permanent has N or more charge counters on it,
+# it has [abilities] and is a creature with base power and toughness [P/T] in addition to its other types"). It enters, surveils
+# 2 (the Island to the graveyard, Vampire Hexmage kept on top), and is an artifact with no power or toughness (CR 721.2c, 208.3).
+# Sunset Saboteur (4 power, cast this turn) stations it to exactly four counters: it is a 2/2 flying artifact creature, and
+# summoning sick, having come under Bot1's control this turn (CR 302.6). On turn 3 it may attack: what matters is how long it
+# has been on the battlefield, not how long it has been a creature (ruling 2025-07-25). Station taps "another" creature: the
+# Sweeper, an untapped creature now, can't pay its own station cost. Then Vampire Hexmage removes all its counters: below
+# four it is no creature and has no flying (ruling: "if a permanent with station ... loses charge counters somehow, its
+# abilities change accordingly. The same is true for determining whether or not that permanent is a creature").
+
+[Bot1 Deck]
+Wurmwall Sweeper
+Sunset Saboteur
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Mox Ruby
+Black Lotus
+Vampire Hexmage
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Wurmwall Sweeper.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Vampire Hexmage | Island)
+? Bot1.Library.Count = 12
+? Bot1.Graveyard = Island
+? Bot1.Battlefield.Wurmwall Sweeper.Types = Artifact
+? Bot1.Battlefield.Wurmwall Sweeper.Power = (absent)
+Bot1.Hand.Sunset Saboteur.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot1.Battlefield.Wurmwall Sweeper.Activate(Ability: Station)
+Bot1.Choose(Sunset Saboteur)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Wurmwall Sweeper.Counters.Charge = 4
+? Bot1.Battlefield.Wurmwall Sweeper.Types = Artifact; Creature
+? Bot1.Battlefield.Wurmwall Sweeper.Power = 2
+? Bot1.Battlefield.Wurmwall Sweeper.Toughness = 2
+? Bot1.Battlefield.Wurmwall Sweeper.Keywords = Flying
+? Bot1.Battlefield.Wurmwall Sweeper.SummoningSick = true
+[T3 Bot1.Main1]
+Bot1.Battlefield.Wurmwall Sweeper.Activate(Ability: Station)
+! Bot1.Choose(Wurmwall Sweeper)
+Bot1.Choose(Sunset Saboteur)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Wurmwall Sweeper.Counters.Charge = 8
+Bot1.Attack(Wurmwall Sweeper > Bot2)
+[T3 Bot1.Main2]
+? Bot2.Life = 18
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Vampire Hexmage.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Vampire Hexmage.Activate(Wurmwall Sweeper)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Wurmwall Sweeper; Sunset Saboteur; Mox Jet; Mox Sapphire; Mox Emerald; Mox Ruby
+Bot1.Battlefield.Wurmwall Sweeper.Types = Artifact
+Bot1.Battlefield.Wurmwall Sweeper.Power = (absent)
+Bot1.Battlefield.Wurmwall Sweeper.Keywords = (absent)
+Bot1.Battlefield.Wurmwall Sweeper.Counters.Charge = (absent)
+Bot1.Battlefield.Wurmwall Sweeper.Tapped = true
+Bot1.Graveyard = Vampire Hexmage; Black Lotus; Island
+Bot2.Life = 18
