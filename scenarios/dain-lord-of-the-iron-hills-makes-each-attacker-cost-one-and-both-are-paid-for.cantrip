@@ -1,0 +1,64 @@
+# Dáin, Lord of the Iron Hills with an enduring story: "creatures can't attack you unless their controller pays {1} for
+# each of those creatures" (CR 508.1d, 508.1h-j). Bot2 casts Dáin from Mox Pearl and Mox Jet on turn 2, so it controls
+# three artifacts and/or legendaries (Dáin, two Moxen) and has an enduring story from then on (storied, CR 702.195a). On
+# turn 3 Bot1 declares both Llanowar Elves as attackers: the total cost to attack is {2}, which Bot1 pays by tapping Mox
+# Ruby and Mox Sapphire as it is asked for (CR 508.1i-j). Both Elves attack and connect: Bot2 goes to 18, and both Moxen
+# are tapped for it. Without the cost the Moxen would stay untapped; without the enduring story likewise.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Mox Sapphire
+Llanowar Elves
+Llanowar Elves
+Forest
+Forest x10
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Dáin, Lord of the Iron Hills
+Plains
+Plains
+Plains
+Plains
+Plains x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Dáin, Lord of the Iron Hills.Cast
+[T2 Bot2.Main2]
+? Bot2.EnduringStory = true
+[T3 Bot1.Main1]
+Bot1.Attack(Llanowar Elves; Llanowar Elves)
+? Combat.AttackCost = {2}
+? Combat.AttackCost.Attackers = Llanowar Elves; Llanowar Elves
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+[T3 Bot1.Blockers]
+? Combat.Attackers = Llanowar Elves > Bot2; Llanowar Elves > Bot2
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 18
+Bot2.EnduringStory = true
+Bot1.Battlefield.Mox Ruby.Tapped = true
+Bot1.Battlefield.Mox Sapphire.Tapped = true
+Bot1.Battlefield.Mox Emerald.Tapped = false
+Bot1.Battlefield.Llanowar Elves#1.Tapped = true
+Bot1.Battlefield.Llanowar Elves#2.Tapped = true
+Bot1.Mana =

@@ -1,0 +1,61 @@
+# Storied (CR 702.195a) is checked any time, and the enduring story it gives is kept for the rest of the game (CR
+# 702.195b): the rulings say a third legendary that the legend rule removes at once has still counted. Bot2 controls Dáin
+# and Mox Pearl (two) and casts a second Dáin on turn 4: for a moment it controls three, gets an enduring story, and then
+# keeps one Dáin (CR 704.5j). With two such permanents left the story stays, and Bot1's attack on turn 5 costs {1}, paid
+# with Mox Ruby; Mox Sapphire stays untapped.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Mox Ruby
+Mox Sapphire
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Dáin, Lord of the Iron Hills
+Dáin, Lord of the Iron Hills
+Plains
+Plains
+Plains
+Plains x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Dáin, Lord of the Iron Hills.Cast
+[T2 Bot2.Main2]
+? Bot2.EnduringStory = (absent)
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains#1.Activate
+Bot2.Battlefield.Plains#2.Activate
+Bot2.Hand.Dáin, Lord of the Iron Hills.Cast
+[T4 Bot2.Main2]
+? Bot2.Graveyard = Dáin, Lord of the Iron Hills
+? Bot2.EnduringStory = true
+[T5 Bot1.Main1]
+Bot1.Attack(Llanowar Elves)
+? Combat.AttackCost = {1}
+Bot1.Battlefield.Mox Ruby.Activate
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot2.Life = 19
+Bot2.EnduringStory = true
+Bot2.Battlefield.Count = 4
+Bot1.Battlefield.Mox Ruby.Tapped = true
+Bot1.Battlefield.Mox Sapphire.Tapped = false

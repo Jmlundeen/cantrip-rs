@@ -1,0 +1,66 @@
+# Dáin's cost to attack applies only "as long as you have an enduring story" (CR 702.195a-b), and storied counts each
+# permanent once whatever it is (the rulings: a legendary artifact is one of the three, not two). On turn 2 Bot2 controls
+# Dáin and Mox Amber, a legendary artifact: two permanents, so no enduring story, and on turn 3 Bot1's Llanowar Elves
+# attacks for nothing - Mox Ruby stays untapped and nothing is asked. On turn 4 Bot2 casts Mox Pearl, its third such
+# permanent, and has an enduring story from then on; on turn 5 the same attack costs {1}, which Bot1 pays with Mox Ruby.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Mox Ruby
+Mox Sapphire
+Forest
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Plains
+Lotus Petal
+Dáin, Lord of the Iron Hills
+Mox Amber
+Mox Pearl
+Plains
+Plains
+Plains x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Lotus Petal.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Lotus Petal.Activate(Color: White)
+Bot2.Hand.Dáin, Lord of the Iron Hills.Cast
+Bot2.Hand.Mox Amber.Cast
+[T2 Bot2.Main2]
+? Bot2.EnduringStory = (absent)
+[T3 Bot1.Main1]
+Bot1.Attack(Llanowar Elves)
+? Combat.Attackers = Llanowar Elves > Bot2
+[T3 Bot1.Main2]
+? Bot2.Life = 19
+? Bot1.Battlefield.Mox Ruby.Tapped = false
+? Bot1.Battlefield.Mox Sapphire.Tapped = false
+? Bot2.EnduringStory = (absent)
+[T4 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+[T4 Bot2.Main2]
+? Bot2.EnduringStory = true
+[T5 Bot1.Main1]
+Bot1.Attack(Llanowar Elves)
+? Combat.AttackCost = {1}
+Bot1.Battlefield.Mox Ruby.Activate
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot2.Life = 18
+Bot2.EnduringStory = true
+Bot1.Battlefield.Mox Ruby.Tapped = true
+Bot1.Battlefield.Mox Sapphire.Tapped = false
+Bot1.Battlefield.Llanowar Elves.Tapped = true
