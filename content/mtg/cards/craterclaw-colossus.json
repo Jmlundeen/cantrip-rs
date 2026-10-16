@@ -1,0 +1,11 @@
+{
+  "name": "Craterclaw Colossus",
+  "manaCost": "{4}{R}{R}{R}",
+  "type": "Artifact Creature — Beast Construct",
+  "power": 5,
+  "toughness": 5,
+  "oracleText": "Haste\nWhen this creature enters, creatures you control gain trample and get +X/+0 until end of turn, where X is the number of artifacts you control.",
+  "keywords": [
+    "Haste"
+  ]
+}

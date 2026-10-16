@@ -1,0 +1,63 @@
+# Boundary of the 2 damage: Bot2's Ornithopter (toughness 2) dies to the hard cast from Bot1's hand, and the card goes to the graveyard.
+# Then Bot1 casts it again from the graveyard with harmonize {5}{R}{R} (CR 702.180a), tapping Ragavan (power 2) to take {2} off the
+# generic part: {3}{R}{R} paid with two Mountains, Pearl, Jet and Sapphire (Ruby paid for the first cast) - seven mana would otherwise
+# be needed and Bot1 has only six. The target, Immolation Shaman
+# (toughness 3), survives with 2 damage marked, and the harmonize cast leaves the card in exile, not the graveyard.
+# Negative control for the cost: Ragavan is tapped as the cost is paid.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Ragavan, Nimble Pilferer
+Channeled Dragonfire
+Mountain x13
+
+[Bot2 Deck]
+Mox Ruby
+Mox Pearl
+Ornithopter
+Immolation Shaman
+Island x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Ragavan, Nimble Pilferer.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Immolation Shaman.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Channeled Dragonfire.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Graveyard.Channeled Dragonfire.Cast(Bot2.Battlefield.Immolation Shaman; Ability: Harmonize)
+Bot1.Choose(Ragavan, Nimble Pilferer)
+? Bot1.Mana =
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Channeled Dragonfire
+Bot2.Graveyard = Ornithopter
+Bot1.Graveyard.Count = 0
+Bot2.Battlefield.Immolation Shaman.Damage = 2
+Bot2.Battlefield.Immolation Shaman.Toughness = 3
+Bot1.Battlefield.Ragavan, Nimble Pilferer.Tapped = true
+Bot1.Battlefield.Mox Ruby.Tapped = true
+Stack.Count = 0

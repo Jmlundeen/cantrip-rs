@@ -1,0 +1,32 @@
+# The only target is gone in response (Bot2 Lightning Bolts its own Ornithopter), so on resolution the spell has no legal target and does
+# nothing (CR 608.2b): it does not redirect to a player (Bot2's life stays 20), and, cast for its mana cost, it goes to the graveyard.
+
+[Bot1 Deck]
+Mox Ruby
+Channeled Dragonfire
+Mountain x18
+
+[Bot2 Deck]
+Mox Ruby
+Ornithopter
+Lightning Bolt
+Island x17
+
+[Actions]
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Channeled Dragonfire.Cast(Bot2.Battlefield.Ornithopter)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot2.Graveyard = Ornithopter; Lightning Bolt
+Bot1.Graveyard = Channeled Dragonfire
+Stack.Count = 0

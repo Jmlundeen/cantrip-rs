@@ -1,0 +1,23 @@
+# Cast from the hand for {R}, Channeled Dragonfire deals exactly 2 damage to a player (any target) and, cast for its mana cost, goes to
+# the graveyard (only a harmonize cast is exiled, CR 702.180a). A second target, Bot1 itself, would be as legal; the damage is 2, not 3.
+
+[Bot1 Deck]
+Mox Ruby
+Channeled Dragonfire
+Mountain x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Channeled Dragonfire.Cast(Bot2)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Life = 20
+Bot1.Graveyard = Channeled Dragonfire
+Exile.Count = 0
+Stack.Count = 0
