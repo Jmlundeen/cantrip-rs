@@ -1,0 +1,61 @@
+# Death to Our Enemies: "Whenever you cast a noncreature spell, create a tapped Treasure token and put a plan counter on
+# this enchantment. When the fourth plan counter is put on this enchantment, sacrifice it. When you do, it deals 7 damage
+# divided as you choose among one or two targets." Bot1 casts it with Black Lotus's mana (the Lotus, cast before, is no
+# trigger), then Ornithopter (a creature spell: nothing) and three Moxes: three tapped Treasures and three plan counters.
+# Bot2's Mox Ruby on turn 2 is not Bot1's spell: nothing. Bot1's fourth noncreature spell, Mox Emerald on turn 3, makes a
+# fourth Treasure and puts the fourth plan counter on it: it is sacrificed, and the reflexive ability (CR 603.12) deals 5
+# to Bot2 and 2 to Bot2's Ornithopter, divided as it was put on the stack (CR 601.2d).
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Death to Our Enemies
+Ornithopter
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Island x12
+
+[Bot2 Deck]
+Ornithopter
+Mox Ruby
+Island x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Death to Our Enemies.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+? Bot1.Battlefield.Death to Our Enemies.Counters.Plan = (absent)
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Pass
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Death to Our Enemies.Counters.Plan = 3
+? Bot1.Battlefield = Death to Our Enemies; Mountain; Mox Jet; Mox Pearl; Mox Sapphire; Ornithopter; Treasure Token; Treasure Token; Treasure Token
+? Bot1.Battlefield.Treasure Token#3.Tapped = true
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+[T2 Bot2.Main2]
+? Bot1.Battlefield.Death to Our Enemies.Counters.Plan = 3
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Divide(Bot2: 5; Bot2.Battlefield.Ornithopter: 2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 15
+Bot2.Graveyard = Ornithopter
+Bot1.Graveyard = Death to Our Enemies; Black Lotus
+Bot1.Battlefield = Mountain; Ornithopter; Mox Pearl; Mox Sapphire; Mox Jet; Mox Emerald; Treasure Token; Treasure Token; Treasure Token; Treasure Token
+Bot1.Battlefield.Treasure Token#4.Tapped = true
+Bot1.Battlefield.Treasure Token#4.Token = true

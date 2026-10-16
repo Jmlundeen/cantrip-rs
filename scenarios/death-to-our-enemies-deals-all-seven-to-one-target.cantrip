@@ -1,0 +1,35 @@
+# Death to Our Enemies' reflexive ability takes "one or two targets": with one, all 7 damage goes to it (CR 601.2d). Bot1
+# casts it with Black Lotus's mana and then four Moxes on turn 1, each making a tapped Treasure and putting a plan counter on
+# it; the fourth sacrifices it, and Bot1 divides the 7 onto Bot2 alone.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Death to Our Enemies
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Death to Our Enemies.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Divide(Bot2: 7)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 13
+Bot1.Graveyard = Death to Our Enemies; Black Lotus
+Bot1.Battlefield = Mountain; Mox Pearl; Mox Sapphire; Mox Jet; Mox Emerald; Treasure Token; Treasure Token; Treasure Token; Treasure Token

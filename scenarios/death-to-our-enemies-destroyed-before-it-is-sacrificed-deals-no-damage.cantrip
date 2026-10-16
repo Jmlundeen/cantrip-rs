@@ -1,0 +1,52 @@
+# "Sacrifice it. When you do, it deals 7 damage ..." (CR 603.12): with Death to Our Enemies' fourth-plan-counter trigger
+# on the stack, Bot2 destroys it with Disenchant. The trigger resolves, but there is nothing to sacrifice (CR 701.21a), so
+# the reflexive ability never triggers and no damage is dealt; the enchantment is in the graveyard, destroyed. Its fourth
+# Treasure was made all the same.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Death to Our Enemies
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Island
+Mox Emerald
+Island x12
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Disenchant
+Island x17
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Death to Our Enemies.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Death to Our Enemies)
+? Stack.Count = 3
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot1.Life = 20
+Bot1.Graveyard = Death to Our Enemies; Black Lotus
+Bot2.Graveyard = Disenchant
+Bot1.Battlefield = Mountain; Mox Pearl; Mox Sapphire; Mox Jet; Mox Emerald; Treasure Token; Treasure Token; Treasure Token; Treasure Token
