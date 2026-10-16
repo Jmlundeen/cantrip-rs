@@ -1,0 +1,36 @@
+# Demolition Field: "nonbasic" is the supertype, not the land types. Bot2's Snow-Covered Plains is a basic land (CR 205.4a),
+# so it is refused as a target; Bot2's Tundra has basic land types but is not basic, so it is accepted and destroyed. Bot2 declines
+# its search and so does Bot1, so only the destruction shows.
+
+[Bot1 Deck]
+Island
+Island
+Demolition Field
+Island x17
+
+[Bot2 Deck]
+Snow-Covered Plains
+Tundra
+Island x18
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Snow-Covered Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Tundra.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Demolition Field.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+! Bot1.Battlefield.Demolition Field.Activate(Ability: Destroy; Bot2.Battlefield.Snow-Covered Plains)
+Bot1.Battlefield.Demolition Field.Activate(Ability: Destroy; Bot2.Battlefield.Tundra)
+Bot2.Decline
+Bot1.Decline
+
+[Expect]
+Bot1.Graveyard = Demolition Field
+Bot2.Graveyard = Tundra
+Bot2.Battlefield = Snow-Covered Plains

@@ -1,0 +1,60 @@
+# Demolition Field: the searches do not depend on the land having been destroyed (ruling 2022-10-14). In response to the ability
+# Bot2 animates Creeping Tar Pit and casts Revitalizing Repast on it (indestructible until end of turn); the target is still a
+# legal target (a land an opponent controls), so the ability resolves, the destroy does nothing, and Bot2 may still search for
+# a basic land (Forest), as may Bot1 (Plains).
+
+[Bot1 Deck]
+Island
+Island
+Demolition Field
+Island x16
+Plains
+
+[Bot2 Deck]
+Creeping Tar Pit
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Revitalizing Repast
+Island x14
+Island
+Forest
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Creeping Tar Pit.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Demolition Field.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Demolition Field.Activate(Ability: Destroy; Bot2.Battlefield.Creeping Tar Pit)
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Creeping Tar Pit.Activate(Ability: Until end of turn)
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Creeping Tar Pit.Activate(Ability: {T}: Add {U} or {B}; Color: Black)
+Bot2.Hand.Revitalizing Repast.Cast(Creeping Tar Pit)
+Bot2.Pass
+Bot1.Pass
+Bot2.Accept
+Bot2.Search(Forest)
+Bot1.Accept
+Bot1.Search(Plains)
+
+[Expect]
+Bot1.Graveyard = Demolition Field
+Bot1.Battlefield = Island; Island; Plains
+Bot2.Graveyard = Revitalizing Repast
+Bot2.Battlefield.Creeping Tar Pit.Tapped = true
+Bot2.Battlefield.Forest.Tapped = false
