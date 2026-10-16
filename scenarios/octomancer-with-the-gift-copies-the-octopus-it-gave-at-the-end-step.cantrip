@@ -1,0 +1,45 @@
+# Gift an Octopus promised (CR 702.174i): when Octomancer enters, Bot2 creates an 8/8 blue Octopus token (CR 702.174b). At the beginning of that turn's end step Octomancer's ability targets a creature token
+# that entered the battlefield this turn: Bot2's Octopus, the only one. Bot1 creates a token that is a copy of it, an untapped 8/8 blue Octopus Bot1 controls.
+
+[Bot1 Deck]
+Forest
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Mox Ruby
+Octomancer
+Plains x20
+
+[Bot2 Deck]
+Ornithopter
+Plains x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Octomancer.Cast
+Bot1.Accept
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Upkeep]
+? Bot2.Battlefield = Octopus
+? Bot1.Battlefield.Octopus.Power = 8
+? Bot1.Battlefield.Octopus.Token = true
+
+[Expect]
+Bot1.Battlefield = Forest; Mox Sapphire; Mox Pearl; Mox Jet; Mox Ruby; Octomancer; Octopus
+Bot1.Battlefield.Octopus.Power = 8
+Bot1.Battlefield.Octopus.Toughness = 8
+Bot1.Battlefield.Octopus.Colors = Blue
+Bot1.Battlefield.Octopus.Tapped = false
+Bot1.Battlefield.Octopus.Token = true
+Bot2.Battlefield = Octopus
+Bot2.Battlefield.Octopus.Token = true

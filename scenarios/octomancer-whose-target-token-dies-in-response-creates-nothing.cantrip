@@ -1,0 +1,62 @@
+# Octomancer's end step ability targets the tapped Fish (from Into the Flood Maw's gift) and Bot2 burns it in response: the token is gone, its only target illegal, so the ability
+# does nothing (CR 608.2b) and Bot1 gets no copy. Octomancer is cast without its gift, so the Fish is the only creature token that entered this turn.
+
+[Bot1 Deck]
+Forest
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Mox Ruby
+Island
+Octomancer
+Into the Flood Maw
+Plains x20
+
+[Bot2 Deck]
+Ornithopter
+Mountain
+Lightning Bolt
+Plains x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Into the Flood Maw.Cast
+Bot1.Accept
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Octomancer.Cast
+Bot1.Decline
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Fish)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Upkeep]
+
+[Expect]
+Bot1.Battlefield = Forest; Mox Sapphire; Mox Pearl; Mox Jet; Mox Ruby; Island; Octomancer
+Bot2.Battlefield = Mountain
+Bot2.Graveyard = Lightning Bolt

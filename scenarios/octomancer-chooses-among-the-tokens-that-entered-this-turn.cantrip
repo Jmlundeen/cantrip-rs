@@ -1,0 +1,58 @@
+# Two creature tokens entered this turn, both Bot2's: a tapped Fish from Into the Flood Maw's gift and the Octopus from Octomancer's. Octomancer's end step ability asks for its target and takes either token (here the Fish),
+# never a creature that is not a token that entered this turn: not Octomancer itself. The copy is a 1/1 blue Fish, untapped, under Bot1.
+
+[Bot1 Deck]
+Forest
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Mox Ruby
+Island
+Octomancer
+Into the Flood Maw
+Plains x20
+
+[Bot2 Deck]
+Ornithopter
+Plains x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Into the Flood Maw.Cast
+Bot1.Accept
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Octomancer.Cast
+Bot1.Accept
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Bot1.Battlefield.Octomancer)
+Bot1.Target(Bot2.Battlefield.Fish)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Fish.Tapped = true
+[T4 Bot2.Upkeep]
+
+[Expect]
+Bot1.Battlefield.Fish.Tapped = false
+Bot1.Battlefield.Fish.Token = true
+Bot1.Battlefield.Fish.Power = 1
+Bot2.Battlefield = Fish; Octopus

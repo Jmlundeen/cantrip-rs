@@ -1,0 +1,39 @@
+# Last turn's Octopus is not a target (CR 115.1): Octomancer copied the new Octopus at the end of turn 1 (Bot1 has one, Bot2 has one); at Bot2's end step, no creature token entered this turn,
+# so Octomancer's ability has no target and nothing is created: Bot1 still has the one Octopus.
+
+[Bot1 Deck]
+Forest
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Mox Ruby
+Octomancer
+Plains x20
+
+[Bot2 Deck]
+Ornithopter
+Plains x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Octomancer.Cast
+Bot1.Accept
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.End]
+! Bot1.Target
+Bot2.Pass
+[T3 Bot1.Upkeep]
+
+[Expect]
+Bot1.Battlefield = Forest; Mox Sapphire; Mox Pearl; Mox Jet; Mox Ruby; Octomancer; Octopus
+Bot2.Battlefield = Octopus
