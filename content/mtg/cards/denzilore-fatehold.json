@@ -1,0 +1,12 @@
+{
+  "name": "Denzilore Fatehold",
+  "manaCost": "{1}{W}{U}{U}",
+  "type": "Legendary Creature — Elder Sphinx",
+  "power": 3,
+  "toughness": 4,
+  "oracleText": "Flash\nFlying\nWhenever you scry or surveil, put a +1/+1 counter on each creature you control.",
+  "keywords": [
+    "Flash",
+    "Flying"
+  ]
+}

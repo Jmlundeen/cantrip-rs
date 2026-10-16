@@ -1,0 +1,62 @@
+# Denzilore Fatehold: "Whenever you scry or surveil, put a +1/+1 counter on each creature you control." Bot1 casts
+# Ornithopter and Denzilore on turn 1 (Black Lotus and Mox Pearl); Bot2 casts an Ornithopter of its own on turn 2. On
+# turn 3 Bot1 casts Preordain (a scry, CR 701.22) and then Consider (a surveil, CR 701.25): each triggers Denzilore once,
+# so Bot1's two creatures get two counters each - Denzilore a 5/6, Ornithopter a 2/4 - and Bot2's Ornithopter, a
+# creature Bot1 does not control, gets none.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Denzilore Fatehold
+Ornithopter
+Preordain
+Island
+Island
+Consider
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Denzilore Fatehold.Cast
+Bot1.Pass
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Hand.Preordain.Cast
+Bot1.Pass
+Bot1.Arrange(Island; Island |)
+? Stack.Count = 1
+Bot1.Pass
+Bot1.Battlefield.Island#2.Activate
+? Bot1.Battlefield.Denzilore Fatehold.Counters.PlusOnePlusOne = 1
+Bot1.Hand.Consider.Cast
+Bot1.Pass
+Bot1.Arrange( | Island)
+? Stack.Count = 1
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield.Denzilore Fatehold.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Denzilore Fatehold.Power = 5
+Bot1.Battlefield.Denzilore Fatehold.Toughness = 6
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Ornithopter.Toughness = 4
+Bot2.Battlefield.Ornithopter.Counters.PlusOnePlusOne = (absent)
+Bot2.Battlefield.Ornithopter.Power = 0
