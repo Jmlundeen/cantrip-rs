@@ -647,6 +647,20 @@ pub fn creature_you_control_enters(q: &dyn Query, me: &Asker, event: &Event) -> 
     }
 }
 
+/// "Whenever an artifact you control enters" (CR 603.6a): any artifact, this one included if it is one, under your control as
+/// it entered. Tezzeret, Cruel Captain and Chandra, Spark Hunter's emblem print it; Dowsing Device's "this artifact or another
+/// artifact you control enters" is the same event.
+pub fn artifact_you_control_enters(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::ZoneChange { new, to, .. }
+            if to.is(ZoneKind::Battlefield) && q.controller(*new) == me.controller && q.chars(*new).is(CardType::Artifact) =>
+        {
+            Fired::PLAIN
+        }
+        _ => None,
+    }
+}
+
 /// "Whenever another creature you control enters" (CR 603.6a): a creature other than this permanent, under your control
 /// as it entered. The entering creature is the trigger's subject. Aunt May and Guide of Souls print it.
 pub fn another_creature_you_control_enters(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
@@ -888,6 +902,7 @@ pub const BEGINNING_OF_YOUR_COMBAT: Trigger = when_asked(EventMask::STEP_BEGAN, 
 pub const YOUR_END_STEP: Trigger = when_asked(EventMask::STEP_BEGAN, your_end_step);
 pub const EACH_END_STEP: Trigger = when(EventMask::STEP_BEGAN, each_end_step);
 pub const CREATURE_YOU_CONTROL_ENTERS: Trigger = when_asked(EventMask::ZONE_CHANGE, creature_you_control_enters);
+pub const ARTIFACT_YOU_CONTROL_ENTERS: Trigger = when_asked(EventMask::ZONE_CHANGE, artifact_you_control_enters);
 pub const CREATURE_DIES: Trigger = when(EventMask::ZONE_CHANGE, creature_dies);
 pub const CREATURE_YOU_CONTROL_DIES: Trigger = when_asked(EventMask::ZONE_CHANGE, creature_you_control_dies);
 pub const ARTIFACT_SPELL_YOU_CAST: Trigger = when_asked(EventMask::SPELL_CAST, artifact_spell_you_cast);

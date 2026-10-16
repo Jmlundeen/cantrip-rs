@@ -1,22 +1,9 @@
 use cantrip_api::*;
-use cantrip_mechanics::{artifacts_you_control, haste_until_end_of_turn, pump, targets};
+use cantrip_mechanics::{artifacts_you_control, haste_until_end_of_turn, pump, targets, triggers};
 use cantrip_oracle as oracle;
 
 /// "up to one target creature you control".
 const UP_TO_ONE_CREATURE_YOU_CONTROL: TargetSpec = targets::CREATURE_YOU_CONTROL.between(0, 1);
-
-/// "Whenever this artifact or another artifact you control enters" (CR 603.6a): one ability for both, its own entry
-/// included.
-fn artifact_enters(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
-    match event {
-        Event::ZoneChange { new, to, .. }
-            if to.is(ZoneKind::Battlefield) && q.controller(*new) == q.controller(source) && q.chars(*new).is(CardType::Artifact) =>
-        {
-            Fired::PLAIN
-        }
-        _ => None,
-    }
-}
 
 /// The target gets +1/+0 and haste until end of turn; then the artifacts are counted as it resolves, and the
 /// Device transforms if there are four or more (CR 608.2c).
@@ -52,7 +39,7 @@ pub static BACK: CardDef = CardDef {
 };
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[triggered(when(EventMask::ZONE_CHANGE, artifact_enters), pump_then_transform, "Whenever this artifact or another artifact you control enters, up to one target creature you control gets +1/+0 and gains haste until end of turn. Then transform this artifact if you control four or more artifacts.")
+    abilities: &[triggered(triggers::ARTIFACT_YOU_CONTROL_ENTERS, pump_then_transform, "Whenever this artifact or another artifact you control enters, up to one target creature you control gets +1/+0 and gains haste until end of turn. Then transform this artifact if you control four or more artifacts.")
         .targets(&[UP_TO_ONE_CREATURE_YOU_CONTROL])],
     back: Some(&BACK),
     ..oracle::DOWSING_DEVICE

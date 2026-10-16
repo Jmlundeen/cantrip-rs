@@ -1,20 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::library::{Find, search_to_hand};
-use cantrip_mechanics::{targets, tokens};
+use cantrip_mechanics::{targets, tokens, triggers};
 use cantrip_oracle as oracle;
-
-/// "Whenever an artifact you control enters": Tezzeret himself would count if he were one, so this is not the usual
-/// "another permanent" trigger (CR 603.6a).
-fn artifact_enters(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
-    match event {
-        Event::ZoneChange { new, to, .. }
-            if to.is(ZoneKind::Battlefield) && q.controller(*new) == q.controller(source) && q.chars(*new).is(CardType::Artifact) =>
-        {
-            Fired::PLAIN
-        }
-        _ => None,
-    }
-}
 
 /// "Put a loyalty counter on Tezzeret", if he is still the permanent that triggered.
 fn add_loyalty(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -77,7 +64,7 @@ pub static EMBLEM: CardDef = CardDef {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(when(EventMask::ZONE_CHANGE, artifact_enters), add_loyalty, "Whenever an artifact you control enters, put a loyalty counter on Tezzeret."),
+        triggered(triggers::ARTIFACT_YOU_CONTROL_ENTERS, add_loyalty, "Whenever an artifact you control enters, put a loyalty counter on Tezzeret."),
         ability(loyalty(0), untap_and_grow, "0: Untap target artifact or creature. If it's an artifact creature, put a +1/+1 counter on it.")
             .targets(&[targets::ARTIFACT_OR_CREATURE]),
         ability(loyalty(-3), tutor, "\u{2212}3: Search your library for an artifact card with mana value 1 or less, reveal it, put it into your hand, then shuffle."),
