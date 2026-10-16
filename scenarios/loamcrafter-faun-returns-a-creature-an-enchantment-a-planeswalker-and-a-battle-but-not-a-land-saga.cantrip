@@ -1,0 +1,48 @@
+# Loamcrafter Faun: Wheel of Fortune puts a creature (Llanowar Elves), an enchantment (Authority of the Consuls), a
+# planeswalker (Chandra, Torch of Defiance), a battle (Invasion of Gobakhan) and Urza's Saga into Bot1's graveyard. Four
+# Islands discarded make up to four targets (CR 603.12). Every nonland permanent card type is a legal target
+# (CR 110.4b), but Urza's Saga, an Enchantment Land, is a land card and is refused; the four others return to hand.
+
+[Bot1 Deck]
+Mountain
+Forest
+Black Lotus
+Wheel of Fortune
+Llanowar Elves
+Authority of the Consuls
+Urza's Saga
+Chandra, Torch of Defiance
+Invasion of Gobakhan
+Loamcrafter Faun
+Forest
+Island
+Island
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Wheel of Fortune.Cast
+Bot1.Pass
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Loamcrafter Faun.Cast
+Bot1.Choose(Island; Island; Island; Island)
+! Bot1.Target(Urza's Saga)
+Bot1.Target(Llanowar Elves; Authority of the Consuls; Chandra, Torch of Defiance; Invasion of Gobakhan)
+
+[Expect]
+Bot1.Hand = Island; Llanowar Elves; Authority of the Consuls; Chandra, Torch of Defiance; Invasion of Gobakhan
+Bot1.Graveyard.Count = 7

@@ -1,0 +1,33 @@
+# Loamcrafter Faun: Bot1 holds two Islands and discards only one. "That many" is the one discarded, not the land cards
+# held (CR 603.12): with Black Lotus and Lotus Petal both in the graveyard, the answer returning both is refused, and
+# Lotus Petal alone comes back. The other Island stays in hand.
+
+[Bot1 Deck]
+Forest
+Lotus Petal
+Black Lotus
+Lightning Bolt
+Loamcrafter Faun
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Lotus Petal.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Loamcrafter Faun.Cast
+Bot1.Choose(Island)
+! Bot1.Target(Black Lotus; Lotus Petal)
+Bot1.Target(Lotus Petal)
+
+[Expect]
+Bot1.Hand = Island; Lotus Petal
+Bot1.Graveyard = Island; Lightning Bolt; Black Lotus
