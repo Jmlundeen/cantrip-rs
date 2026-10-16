@@ -2,23 +2,13 @@ use cantrip_api::*;
 use cantrip_mechanics::{choose, targets};
 use cantrip_oracle as oracle;
 
-fn is_permanent_card(g: &dyn Query, id: ObjectId) -> bool {
-    let c = g.chars(id);
-    c.is(CardType::Artifact)
-        || c.is(CardType::Battle)
-        || c.is(CardType::Creature)
-        || c.is(CardType::Enchantment)
-        || c.is(CardType::Land)
-        || c.is(CardType::Planeswalker)
-}
-
 /// Chapter I: "Exile a permanent card from your graveyard. You gain life equal to its mana value." Chosen as the chapter
 /// resolves, not targeted: a lone permanent card is simply that card, none does nothing. It is exiled with this Saga
 /// (CR 607.2a), and no life is gained for a mana value of zero.
 fn exile_a_permanent_card(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     let graveyard: Vec<ObjectId> = g.state().zone(Zone::graveyard(you)).to_vec();
-    let eligible: Vec<ObjectId> = graveyard.iter().copied().filter(|&c| is_permanent_card(g, c)).collect();
+    let eligible: Vec<ObjectId> = graveyard.iter().copied().filter(|&c| targets::is_permanent_card(&g.chars(c))).collect();
     let chosen = match eligible.len() {
         0 => return Ok(()),
         1 => eligible[0],

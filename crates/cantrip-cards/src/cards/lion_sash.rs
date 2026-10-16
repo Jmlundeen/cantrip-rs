@@ -7,13 +7,7 @@ use cantrip_oracle as oracle;
 /// "{W}: Exile target card from a graveyard. If it was a permanent card, put a +1/+1 counter on this permanent."
 fn exile_from_graveyard(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(card) = targets::object(g, item, 0) else { return Ok(()) };
-    let types = g.chars(card).types;
-    let permanent = types.has(CardType::Artifact)
-        || types.has(CardType::Creature)
-        || types.has(CardType::Enchantment)
-        || types.has(CardType::Land)
-        || types.has(CardType::Planeswalker)
-        || types.has(CardType::Battle);
+    let permanent = targets::is_permanent_card(&g.chars(card));
     g.exile(card);
     if permanent && targets::permanent(g, item.object) {
         g.add_counters(item.object, CounterKind::PlusOne, 1);

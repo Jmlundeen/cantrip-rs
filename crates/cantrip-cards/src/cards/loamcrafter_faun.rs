@@ -18,18 +18,6 @@ fn discard_lands(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// "Target nonland permanent card from your graveyard" (CR 115.1, 110.4b): an artifact, battle, creature, enchantment
-/// or planeswalker card that is not a land.
-fn nonland_permanent_card_in_your_graveyard(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    let Target::Object(id) = t else { return false };
-    if !targets::card_in_your_graveyard(q, asker, t, &[]) {
-        return false;
-    }
-    let c = q.chars(id);
-    !c.is(CardType::Land)
-        && [CardType::Artifact, CardType::Battle, CardType::Creature, CardType::Enchantment, CardType::Planeswalker].iter().any(|&ty| c.is(ty))
-}
-
 /// Return up to that many target nonland permanent cards from your graveyard to your hand, those still legal
 /// (CR 608.2b), together.
 fn return_cards(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -40,6 +28,6 @@ fn return_cards(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(THIS_ENTERS, discard_lands, "When this creature enters, you may discard one or more land cards. When you do, return up to that many target nonland permanent cards from your graveyard to your hand.")],
     delayed: &[delayed_trigger(return_cards, "When you do, return up to that many target nonland permanent cards from your graveyard to your hand.")
-        .targets(&[target(nonland_permanent_card_in_your_graveyard).between(0, TargetSpec::COUNTED)])],
+        .targets(&[targets::NONLAND_PERMANENT_CARD_IN_YOUR_GRAVEYARD.between(0, TargetSpec::COUNTED)])],
     ..oracle::LOAMCRAFTER_FAUN
 };

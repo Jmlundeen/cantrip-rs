@@ -15,19 +15,12 @@ pub static ELDRAZI_SPAWN: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
-/// A permanent card (CR 110.1): one of a type that can exist on the battlefield.
-fn permanent_card(chars: &Chars) -> bool {
-    [CardType::Artifact, CardType::Battle, CardType::Creature, CardType::Enchantment, CardType::Land, CardType::Planeswalker]
-        .into_iter()
-        .any(|t| chars.is(t))
-}
-
 /// Reveal the top four cards of your library; you may put a permanent card from among them into your hand; put the rest
 /// into your graveyard, in the order they were revealed. With no permanent card among them there is nothing to decide.
 /// Then create an Eldrazi Spawn.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let player = item.controller;
-    reveal_top_take_one_rest_to_graveyard(g, player, item.object, 4, permanent_card)?;
+    reveal_top_take_one_rest_to_graveyard(g, player, item.object, 4, cantrip_mechanics::targets::is_permanent_card)?;
     cantrip_mechanics::tokens::create(g, player, &ELDRAZI_SPAWN, 1)?;
     Ok(())
 }

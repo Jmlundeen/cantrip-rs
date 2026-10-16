@@ -16,18 +16,7 @@ fn permanent_card_to_your_graveyard(q: &dyn Query, source: ObjectId, event: &Eve
     if *to != Zone::graveyard(q.controller(source)) || q.obj(*new).token || q.obj(source).counters(CounterKind::MinusOne) <= 0 {
         return None;
     }
-    let types = q.chars(*new).types;
-    let permanent = [
-        CardType::Artifact,
-        CardType::Battle,
-        CardType::Creature,
-        CardType::Enchantment,
-        CardType::Land,
-        CardType::Planeswalker,
-    ]
-    .into_iter()
-    .any(|t| types.has(t));
-    if permanent { Fired::about(Target::Object(*new)) } else { None }
+    if targets::is_permanent_card(&q.chars(*new)) { Fired::about(Target::Object(*new)) } else { None }
 }
 
 /// "Remove a -1/-1 counter from this creature": nothing from one that has left or has none by now.

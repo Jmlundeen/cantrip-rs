@@ -12,17 +12,11 @@ fn backup(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// power of the creature whose ability this is (CR 113.7a), the Scalelord or the creature backup gave the trigger to.
 fn permanent_card_up_to_power(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     let Target::Object(id) = t else { return false };
-    if !cantrip_mechanics::targets::card_in_your_graveyard(q, asker, t, &[]) {
+    if !targets::nonland_permanent_card_in_your_graveyard(q, asker, t) {
         return false;
     }
-    let c = q.chars(id);
-    let permanent = c.is(CardType::Artifact)
-        || c.is(CardType::Battle)
-        || c.is(CardType::Creature)
-        || c.is(CardType::Enchantment)
-        || c.is(CardType::Planeswalker);
     let Some(power) = q.chars(asker.source).power else { return false };
-    permanent && !c.is(CardType::Land) && q.mana_value(id) as i32 <= power as i32
+    q.mana_value(id) as i32 <= power as i32
 }
 
 /// Return it to the battlefield.

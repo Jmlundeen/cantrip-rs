@@ -8,16 +8,6 @@ fn has_delirium(q: &dyn Query, asker: &Asker) -> bool {
     delirium(q, asker.controller)
 }
 
-/// "Target permanent card in your graveyard" (CR 115.1): an artifact, battle, creature, enchantment, land or planeswalker card.
-fn permanent_card_in_your_graveyard(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    targets::card_in_your_graveyard(
-        q,
-        asker,
-        t,
-        &[CardType::Artifact, CardType::Battle, CardType::Creature, CardType::Enchantment, CardType::Land, CardType::Planeswalker],
-    )
-}
-
 /// This land becomes a copy of target permanent card in your graveyard until end of turn (CR 707.2): still the same object, so
 /// it stays tapped or untapped.
 fn become_copy(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -33,7 +23,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         mana_ability(TAP, add(Mana::G), "{T}: Add {G}."),
         ability(cost("{2}{G}{G}"), become_copy, "Delirium \u{2014} {2}{G}{G}: This land becomes a copy of target permanent card in your graveyard until end of turn. Activate only if there are four or more card types among cards in your graveyard.")
-            .targets(&[target(permanent_card_in_your_graveyard)])
+            .targets(&[targets::PERMANENT_CARD_IN_YOUR_GRAVEYARD])
             .condition(has_delirium),
     ],
     ..oracle::SHIFTING_WOODLAND

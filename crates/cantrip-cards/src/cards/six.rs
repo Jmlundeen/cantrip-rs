@@ -20,10 +20,7 @@ fn your_nonland_permanent_cards(q: &dyn LayerQuery, source: ObjectId, affected: 
     let controller = q.state().obj(source).controller;
     q.state().turn.active == controller
         && q.state().obj(affected).zone == Zone::graveyard(controller)
-        && !so_far.is(CardType::Land)
-        && [CardType::Artifact, CardType::Battle, CardType::Creature, CardType::Enchantment, CardType::Planeswalker]
-            .into_iter()
-            .any(|t| so_far.is(t))
+        && cantrip_mechanics::targets::is_nonland_permanent_card(so_far)
 }
 
 pub static CARD: CardDef = CardDef {

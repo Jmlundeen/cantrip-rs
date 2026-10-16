@@ -10,7 +10,7 @@ fn permanent_card_in_your_graveyard(q: &dyn Query, asker: &Asker, t: Target) -> 
         q,
         asker,
         t,
-        &[CardType::Artifact, CardType::Creature, CardType::Enchantment, CardType::Land, CardType::Planeswalker, CardType::Battle],
+        &targets::PERMANENT_CARD_TYPES,
         3,
     )
 }
