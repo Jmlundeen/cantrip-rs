@@ -1,0 +1,31 @@
+# Cast during Bot1's own upkeep, The Eagles Are Coming! sets up its delayed trigger after that upkeep has begun, so "the
+# beginning of the next upkeep" is Bot2's on turn four, not the one already under way (CR 603.7, 503.1): there is no Bird in
+# Bot1's main phase, and there is one in Bot2's.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Ornithopter
+The Eagles Are Coming!
+Plains x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Upkeep]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.The Eagles Are Coming!.Cast
+Bot1.Target(Ornithopter)
+[T3 Bot1.Main1]
+? Bot1.Battlefield = Plains; Mox Pearl
+? Step = Main1
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield = Plains; Mox Pearl; Bird Soldier
+Bot1.Hand = Ornithopter; Plains; Plains; Plains; Plains

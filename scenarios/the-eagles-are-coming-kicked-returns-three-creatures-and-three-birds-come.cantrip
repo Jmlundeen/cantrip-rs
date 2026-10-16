@@ -1,0 +1,41 @@
+# Kicked, The Eagles Are Coming! chooses any number of target creatures you own (CR 702.33a, 601.2c): all three
+# Ornithopters go back to Bot1's hand, and at the beginning of the next upkeep, Bot2's on turn four, three 4/4 Bird Soldiers are created,
+# one for each creature returned this way. Black Lotus, Plains and two Moxen pay {1}{W} and the kicker {2}{W}{W}.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Ornithopter
+Ornithopter
+Ornithopter
+The Eagles Are Coming!
+Plains x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.The Eagles Are Coming!.Cast(Kicked: 1)
+Bot1.Target(Ornithopter#1; Ornithopter#2; Ornithopter#3)
+[T3 Bot1.End]
+? Bot1.Battlefield = Plains; Mox Pearl; Mox Sapphire
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield = Plains; Mox Pearl; Mox Sapphire; Bird Soldier; Bird Soldier; Bird Soldier
+Bot1.Hand = Ornithopter; Ornithopter; Ornithopter
+Bot1.Graveyard = The Eagles Are Coming!; Black Lotus

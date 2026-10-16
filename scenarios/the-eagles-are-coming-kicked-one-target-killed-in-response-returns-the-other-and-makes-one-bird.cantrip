@@ -1,0 +1,44 @@
+# Kicked, The Eagles Are Coming! chooses both of Bot1's Ornithopters; Bot2 bolts one in response. The other target is
+# still legal, so the spell resolves for it alone (CR 608.2b): one Ornithopter returns to Bot1's hand, the other is in the
+# graveyard, and the next upkeep makes one Bird Soldier, for the one creature returned this way.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Ornithopter
+Ornithopter
+The Eagles Are Coming!
+Plains x13
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.The Eagles Are Coming!.Cast(Kicked: 1)
+Bot1.Target(Ornithopter#1; Ornithopter#2)
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Hand = Ornithopter; Plains
+Bot1.Graveyard = The Eagles Are Coming!; Ornithopter; Black Lotus
+Bot1.Battlefield = Plains; Mox Pearl; Mox Sapphire; Bird Soldier

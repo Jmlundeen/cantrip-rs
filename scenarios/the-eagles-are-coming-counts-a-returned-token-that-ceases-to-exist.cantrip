@@ -1,0 +1,46 @@
+# Kicked, The Eagles Are Coming! returns Bot1's two Spirit tokens from Lingering Souls and an Ornithopter. A token put into a
+# hand ceases to exist (CR 111.8, 704.5d), so only the Ornithopter is in the hand afterwards, but each token was returned to
+# Bot1's hand this way and still counts (the card's ruling): three Bird Soldiers come at the next upkeep.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Lingering Souls
+Black Lotus
+The Eagles Are Coming!
+Ornithopter
+Plains x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Lingering Souls.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+[T3 Bot1.Main2]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.The Eagles Are Coming!.Cast(Kicked: 1)
+Bot1.Target(Spirit#1; Spirit#2; Ornithopter)
+[T3 Bot1.End]
+? Bot1.Battlefield = Plains; Mox Pearl; Mox Sapphire; Mox Ruby
+? Bot1.Hand = Ornithopter
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield = Plains; Mox Pearl; Mox Sapphire; Mox Ruby; Bird Soldier; Bird Soldier; Bird Soldier
+Bot1.Hand = Ornithopter
+Exile.Count = 0

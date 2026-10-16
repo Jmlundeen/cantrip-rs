@@ -1,0 +1,44 @@
+# The Eagles Are Coming! unkicked chooses exactly one target creature you own (CR 601.2c, 115.1): with two Ornithopters to
+# choose from, neither none nor both is a number the question takes (the refusals), and one is (the line after). The
+# Ornithopter goes back to Bot1's hand. The delayed trigger waits for the beginning of the next upkeep (CR 603.7), Bot2's
+# on turn two: at Bot1's end step there is no Bird yet, and in Bot2's main phase Bot1 has one 4/4 white Bird Soldier with
+# flying.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Ornithopter
+Ornithopter
+The Eagles Are Coming!
+Plains x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T1 Bot1.Main2]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.The Eagles Are Coming!.Cast
+! Bot1.Target(Count: 0)
+! Bot1.Target(Count: 2)
+Bot1.Target(Ornithopter)
+[T1 Bot1.End]
+? Bot1.Battlefield = Plains; Mox Pearl; Ornithopter
+? Bot1.Hand = Ornithopter; Plains; Plains
+[T2 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield = Plains; Mox Pearl; Ornithopter; Bird Soldier
+Bot1.Battlefield.Bird Soldier.Token = true
+Bot1.Battlefield.Bird Soldier.Power = 4
+Bot1.Battlefield.Bird Soldier.Toughness = 4
+Bot1.Battlefield.Bird Soldier.Colors = White
+Bot1.Battlefield.Bird Soldier.Subtypes = Bird; Soldier
+Bot1.Battlefield.Bird Soldier.Keywords = Flying
+Bot1.Hand = Ornithopter; Plains; Plains
+Bot1.Graveyard = The Eagles Are Coming!

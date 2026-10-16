@@ -1,0 +1,37 @@
+# With no creature Bot1 owns on the battlefield (Bot2's Ornithopter is not one), The Eagles Are Coming! is still cast:
+# kicked, it may choose no target at all (CR 601.2c, 702.33a), so no target is asked for (the bare refusal) and the spell
+# resolves and goes to the graveyard. Bot2's Ornithopter stays.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Mox Pearl
+Mox Sapphire
+The Eagles Are Coming!
+Plains x15
+
+[Bot2 Deck]
+Island
+Ornithopter
+Island x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.The Eagles Are Coming!.Cast(Kicked: 1)
+! Bot1.Target
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Graveyard = The Eagles Are Coming!; Black Lotus
+Bot1.Battlefield = Plains; Mox Pearl; Mox Sapphire
+Bot2.Battlefield = Island; Ornithopter

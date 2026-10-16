@@ -1,0 +1,35 @@
+# Kicked, "any number of target creatures you own" includes none (CR 601.2c, 115.1d): with an Ornithopter to choose, Bot1
+# chooses no target. A spell with no target chosen is not one whose targets all became illegal (CR 608.2b), so it resolves,
+# returns nothing, and the next upkeep's delayed trigger creates no Bird Soldier.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Ornithopter
+The Eagles Are Coming!
+Plains x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+[T1 Bot1.Main2]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.The Eagles Are Coming!.Cast(Kicked: 1)
+Bot1.Target()
+[T2 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield = Plains; Mox Pearl; Mox Sapphire; Ornithopter
+Bot1.Graveyard = The Eagles Are Coming!; Black Lotus
+Stack.Count = 0

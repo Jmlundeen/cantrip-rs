@@ -1,0 +1,53 @@
+# "Target creature you own" is about ownership, not control (CR 108.3, 108.4): Bot2's Thieving Skydiver has taken Bot1's
+# Ornithopter, and Bot1's has taken Bot2's. Bot1's Eagles may not choose the Ornithopter Bot1 controls but Bot2 owns (the
+# refusal), and may choose the one Bot2 controls but Bot1 owns; it goes to its owner's hand, Bot1's, and counts for a Bird.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Thieving Skydiver
+Ornithopter
+The Eagles Are Coming!
+Mox Sapphire
+Mox Pearl
+Plains x13
+
+[Bot2 Deck]
+Island
+Black Lotus
+Thieving Skydiver
+Ornithopter
+Island x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Thieving Skydiver.Cast(Kicked: 1)
+Bot2.Target(Bot1.Battlefield.Ornithopter)
+[T3 Bot1.Main1]
+? Bot2.Battlefield = Island; Ornithopter; Ornithopter; Thieving Skydiver
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Thieving Skydiver.Cast(Kicked: 1)
+Bot1.Target(Bot2.Battlefield.Ornithopter#2)
+[T3 Bot1.Main2]
+? Bot1.Battlefield = Plains; Mox Sapphire; Mox Pearl; Thieving Skydiver; Ornithopter
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.The Eagles Are Coming!.Cast
+! Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Hand = Ornithopter; Plains
+Bot1.Battlefield = Plains; Mox Sapphire; Mox Pearl; Thieving Skydiver; Ornithopter; Bird Soldier
+Bot2.Battlefield = Island; Thieving Skydiver
+Bot2.Graveyard = Black Lotus

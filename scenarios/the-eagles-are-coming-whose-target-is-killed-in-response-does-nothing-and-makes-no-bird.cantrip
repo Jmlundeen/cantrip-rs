@@ -1,0 +1,35 @@
+# Unkicked, The Eagles Are Coming!'s one target is bolted in response. Its only target is illegal, so the spell does nothing
+# as it resolves (CR 608.2b): no creature is returned and no delayed trigger is created, so no Bird Soldier comes at the next
+# upkeep.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Ornithopter
+The Eagles Are Coming!
+Plains x16
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.The Eagles Are Coming!.Cast
+Bot1.Target(Ornithopter)
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Graveyard = The Eagles Are Coming!; Ornithopter
+Bot1.Battlefield = Plains; Mox Pearl

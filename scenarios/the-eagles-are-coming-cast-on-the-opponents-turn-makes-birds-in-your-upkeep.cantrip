@@ -1,0 +1,30 @@
+# Cast in Bot2's main phase on turn two, The Eagles Are Coming!'s delayed trigger comes at the beginning of the next
+# upkeep, Bot1's own on turn three (CR 603.7): no Bird at Bot2's end step, one under Bot1's control in Bot1's main phase.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Ornithopter
+The Eagles Are Coming!
+Plains x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.The Eagles Are Coming!.Cast
+Bot1.Target(Ornithopter)
+[T2 Bot2.End]
+? Bot1.Battlefield = Plains; Mox Pearl
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield = Plains; Mox Pearl; Bird Soldier
+Bot2.Battlefield = Island
