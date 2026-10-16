@@ -1,0 +1,57 @@
+# The Starcage enters on turn 5 and exiles both Ornithopters (mana value 0). On turn 7 Bot1 casts Mox Emerald and
+# Haywire Mite, then sacrifices the Mite to exile the Starcage: both Ornithopters return to the battlefield at once
+# under their owners' control (CR 610.3), no stack involved. The Mite came after the Starcage's trigger, so it was never
+# exiled by it; a Plains stays throughout (a land is no artifact or creature).
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Ornithopter
+Pinnacle Starcage
+Haywire Mite
+Mox Emerald
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Swamp
+Ornithopter
+Swamp x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Pinnacle Starcage.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+? Exile = Ornithopter; Ornithopter
+? Bot1.Battlefield = Pinnacle Starcage; Plains; Plains; Plains
+? Bot2.Battlefield = Swamp
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Haywire Mite.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Haywire Mite.Activate(Pinnacle Starcage)
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Exile = Pinnacle Starcage
+Bot1.Graveyard = Haywire Mite
+Bot1.Battlefield = Mox Emerald; Ornithopter; Plains; Plains; Plains; Plains
+Bot2.Battlefield = Ornithopter; Swamp

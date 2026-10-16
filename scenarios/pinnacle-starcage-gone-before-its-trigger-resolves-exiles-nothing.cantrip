@@ -1,0 +1,50 @@
+# With the Pinnacle Starcage's enters trigger on the stack, Bot1 exiles the Starcage by sacrificing Haywire Mite. The trigger then
+# resolves with the Starcage already gone, so nothing at all is exiled (CR 610.3b; the ruling "if Pinnacle Starcage leaves
+# the battlefield before its first ability resolves, no artifacts or creatures will be exiled"): both Ornithopters
+# and the Mox Emerald (all mana value 0 artifacts) are still on the battlefield.
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Haywire Mite
+Mox Emerald
+Pinnacle Starcage
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Swamp
+Ornithopter
+Swamp x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Haywire Mite.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Pinnacle Starcage.Cast
+Bot1.Pass
+? Stack.Count = 1
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Haywire Mite.Activate(Pinnacle Starcage)
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Exile = Pinnacle Starcage
+Bot1.Graveyard = Haywire Mite
+Bot1.Battlefield = Mox Emerald; Plains; Plains; Plains
+Bot2.Battlefield = Ornithopter; Swamp

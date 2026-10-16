@@ -1,0 +1,53 @@
+# The Starcage enters on turn 5 with no artifact or creature in play, so it exiles nothing. On turn 7 Bot1 pays
+# {6}{W}{W} (four Plains and four Moxen, cast after it so they were never exiled): no card was exiled with it, so
+# no Robot is made, but "Sacrifice this artifact" still happens.
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Plains
+Pinnacle Starcage
+Mox Pearl
+Mox Emerald
+Mox Jet
+Mox Ruby
+Plains x10
+
+[Bot2 Deck]
+Swamp x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Pinnacle Starcage.Cast
+Bot1.Pass
+Bot1.Pass
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Pinnacle Starcage.Activate
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Exile =
+Bot1.Battlefield = Mox Emerald; Mox Jet; Mox Pearl; Mox Ruby; Plains; Plains; Plains; Plains
+Bot1.Graveyard = Pinnacle Starcage

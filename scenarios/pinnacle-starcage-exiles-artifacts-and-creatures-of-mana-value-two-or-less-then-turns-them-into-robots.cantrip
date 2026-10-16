@@ -1,0 +1,93 @@
+# Pinnacle Starcage enters on turn 7 and exiles, together, every artifact and creature with mana value 2 or less whoever
+# controls it: both players' Ornithopter (mana value 0) and Bot2's Dauthi Voidwalker (exactly 2). Barrowgoyf (exactly 3),
+# the Starcage itself (3) and the lands stay: the boundary is "2 or less". Bot1's Moxen come down only after, so they
+# are not exiled. On turn 9 {6}{W}{W} puts the three exiled cards into their owners' graveyards and makes one 2/2
+# colorless Robot artifact creature token for each (CR 607.2a), under Bot1, then sacrifices the Starcage.
+# CR 610.3 (until it leaves the battlefield), 202.3 (mana value), 111.1.
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Plains
+Pinnacle Starcage
+Ornithopter
+Mox Pearl
+Mox Emerald
+Mox Jet
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Swamp
+Swamp
+Swamp
+Dauthi Voidwalker
+Barrowgoyf
+Ornithopter
+Swamp
+Swamp x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Dauthi Voidwalker.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Barrowgoyf.Cast
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Pinnacle Starcage.Cast
+Bot1.Pass
+? Stack = Pinnacle Starcage
+? Bot1.Battlefield = Ornithopter; Plains; Plains; Plains; Plains
+? Bot2.Battlefield = Barrowgoyf; Dauthi Voidwalker; Ornithopter; Swamp; Swamp; Swamp
+Bot1.Pass
+Bot1.Pass
+? Exile = Dauthi Voidwalker; Ornithopter; Ornithopter
+? Bot1.Battlefield = Pinnacle Starcage; Plains; Plains; Plains; Plains
+? Bot2.Battlefield = Barrowgoyf; Swamp; Swamp; Swamp
+[T9 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Pinnacle Starcage.Activate
+Bot1.Pass
+
+[Expect]
+Exile = 
+Bot1.Battlefield = Mox Emerald; Mox Jet; Mox Pearl; Plains; Plains; Plains; Plains; Plains; Robot; Robot; Robot
+Bot1.Battlefield.Robot#1.Power = 2
+Bot1.Battlefield.Robot#1.Toughness = 2
+Bot1.Battlefield.Robot#1.Types = Artifact; Creature
+Bot1.Battlefield.Robot#1.Colors = (absent)
+Bot1.Graveyard = Pinnacle Starcage; Ornithopter
+Bot2.Battlefield = Barrowgoyf; Swamp; Swamp; Swamp
+Bot2.Graveyard = Dauthi Voidwalker; Ornithopter
