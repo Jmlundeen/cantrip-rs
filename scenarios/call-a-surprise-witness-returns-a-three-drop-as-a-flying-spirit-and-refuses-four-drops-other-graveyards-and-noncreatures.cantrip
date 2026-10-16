@@ -65,6 +65,7 @@ Turn = 5
 Bot1.Battlefield.Hired Blade.Power = 3
 Bot1.Battlefield.Hired Blade.Toughness = 2
 Bot1.Battlefield.Hired Blade.Counters.Flying = 1
+Bot1.Battlefield.Hired Blade.Keywords = Flash; Flying
 Bot1.Battlefield.Hired Blade.Subtypes = Assassin; Human; Spirit
 Bot1.Graveyard = Call a Surprise Witness; Wrath of God; Questing Beast; Black Lotus
 Bot2.Graveyard = Ornithopter

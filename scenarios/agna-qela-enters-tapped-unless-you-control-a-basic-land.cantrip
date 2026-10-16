@@ -1,5 +1,5 @@
 # Agna Qel'a: "This land enters tapped unless you control a basic land." Bot1's only other land is a Tundra (not basic,
-# CR 205.4a) so its Agna Qel'a enters tapped; Bot2's Agna Qel'a beside its own Island enters untapped (positive control).
+# CR 205.4a) so its Agna Qel'a enters tapped even though Bot2 controls a basic Island (an opponent's basic land does not count); Bot2's Agna Qel'a beside its own Island enters untapped (positive control).
 
 [Bot1 Deck]
 Tundra
