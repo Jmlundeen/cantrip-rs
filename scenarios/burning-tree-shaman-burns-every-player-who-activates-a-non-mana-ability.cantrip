@@ -1,0 +1,90 @@
+# Burning-Tree Shaman: "Whenever a player activates an ability that isn't a mana ability, this creature deals 1 damage to that
+# player." Any player, any object's ability, wherever it is: on turn 2 Bot2 activates Ajani Resolute's 0 (a loyalty ability): the
+# trigger is above the 0 (Stack.Count = 2) and resolves first, Bot2 at 19 before the life gain puts him back at 20. On turn 3
+# Bot1 activates his own Figure of Destiny: the Shaman's controller is a player too (Bot1 at 19). On turn 4 Bot2 forestcycles
+# Generous Ent from his hand (an ability of a card in a hand still counts): 19. Mana abilities - Moxen, lands - trigger nothing
+# (CR 605.1a): every land and Mox tapped here leaves the life totals alone.
+
+[Bot1 Deck]
+Mountain
+Mox Emerald
+Mox Ruby
+Burning-Tree Shaman
+Figure of Destiny
+Mountain x20
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Ajani Resolute
+Generous Ent
+Forest
+Island
+Island
+Forest x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Burning-Tree Shaman.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 20
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Ajani Resolute.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot2.Life = 20
+Bot2.Battlefield.Ajani Resolute.Activate(Ability: gain 1 life)
+? Stack.Count = 2
+Bot2.Pass
+Bot1.Pass
+? Bot2.Life = 19
+? Stack.Count = 1
+Bot2.Pass
+Bot1.Pass
+? Bot2.Life = 20
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Figure of Destiny.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 20
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Figure of Destiny.Activate
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 19
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Generous Ent.Activate(Ability: Forestcycling)
+? Stack.Count = 2
+Bot2.Pass
+Bot1.Pass
+? Bot2.Life = 19
+Bot2.Search(Forest)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 19
+Bot2.Life = 19
+Bot1.Battlefield.Figure of Destiny.Power = 2
+Bot2.Graveyard = Generous Ent
+Stack.Count = 0
