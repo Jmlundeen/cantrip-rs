@@ -1,0 +1,43 @@
+# Browser
+# Ms. Marvel's Embiggen Fist gives her a static ability until end of turn (CR 613.1f). The page shows it as a line of her rules
+# text after the printed ones, and only while she has it: not before the trigger resolves, not on Bot2's turn. Her power on the
+# card is the one the layers give (the hand, two cards, after the draw): the engine's own key says which number that is.
+
+[Bot1 Deck]
+Island
+Island
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Ms. Marvel, Kamala Khan
+Lightning Bolt
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ms. Marvel, Kamala Khan.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+? Client.Bot1.Battlefield.Ms. Marvel, Kamala Khan.Rules = Reach, vigilance / You have no maximum hand size. / Embiggen Fist — Whenever you cast a spell that targets a creature you control, draw a card. Until end of turn, Ms. Marvel gains "Ms. Marvel's base power is equal to the number of cards in your hand."
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ms. Marvel, Kamala Khan)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ms. Marvel, Kamala Khan.Power = 2
+? Client.Bot1.Battlefield.Ms. Marvel, Kamala Khan.Rules = Reach, vigilance / You have no maximum hand size. / Embiggen Fist — Whenever you cast a spell that targets a creature you control, draw a card. Until end of turn, Ms. Marvel gains "Ms. Marvel's base power is equal to the number of cards in your hand." / Ms. Marvel's base power is equal to the number of cards in your hand.
+[T4 Bot2.Main1]
+? Client.Bot1.Battlefield.Ms. Marvel, Kamala Khan.Rules = Reach, vigilance / You have no maximum hand size. / Embiggen Fist — Whenever you cast a spell that targets a creature you control, draw a card. Until end of turn, Ms. Marvel gains "Ms. Marvel's base power is equal to the number of cards in your hand."
+? Bot1.Battlefield.Ms. Marvel, Kamala Khan.Power = 1
+
+[Expect]
+Bot1.Hand.Count = 2

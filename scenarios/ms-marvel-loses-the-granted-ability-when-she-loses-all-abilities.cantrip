@@ -1,0 +1,55 @@
+# "Loses all abilities" (CR 613.1f) applied after the grant takes the granted static ability with the rest, and its effect stops:
+# on turn 3 Bot1 bolts Ms. Marvel (base power 3, the three cards in hand after the draw), then casts The Wondrous Wasp, whose
+# enters ability taps her and strips her of every ability for as long as the Wasp stays. With two cards in hand she is a plain
+# 1/4 with no reach or vigilance, not a 2/4: the hand no longer sets her power. (The Wasp's ability is not a spell, so it does not
+# trigger her either.)
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Ms. Marvel, Kamala Khan
+Lightning Bolt
+Mountain
+Mox Pearl
+The Wondrous Wasp
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ms. Marvel, Kamala Khan.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ms. Marvel, Kamala Khan)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ms. Marvel, Kamala Khan.Power = 3
+? Bot1.Battlefield.Ms. Marvel, Kamala Khan.Keywords = Reach; Vigilance
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.The Wondrous Wasp.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Ms. Marvel, Kamala Khan)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+
+[Expect]
+Bot1.Hand.Count = 2
+Bot1.Battlefield.Ms. Marvel, Kamala Khan.Power = 1
+Bot1.Battlefield.Ms. Marvel, Kamala Khan.Toughness = 4
+Bot1.Battlefield.Ms. Marvel, Kamala Khan.Keywords = (absent)
+Bot1.Battlefield.Ms. Marvel, Kamala Khan.Tapped = true

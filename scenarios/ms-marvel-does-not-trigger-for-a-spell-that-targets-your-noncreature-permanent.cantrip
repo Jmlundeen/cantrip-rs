@@ -1,0 +1,48 @@
+# "A creature you control" is a creature: Bot1's Abrade, destroying its own Mox Jet (an artifact that is not a creature), puts
+# only itself on the stack and Bot1 draws nothing. The same Abrade's damage mode at Ms. Marvel on turn 5 is the positive control:
+# the stack is Abrade and the trigger.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Ms. Marvel, Kamala Khan
+Abrade
+Abrade
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ms. Marvel, Kamala Khan.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Abrade.Cast
+Bot1.Modes(Destroy target artifact)
+Bot1.Target(Mox Jet)
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 2
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Abrade.Cast
+Bot1.Modes(Abrade deals 3 damage)
+Bot1.Target(Ms. Marvel, Kamala Khan)
+? Stack.Count = 2
+
+[Expect]
+Bot1.Graveyard.Count = 3
+Bot1.Hand.Count = 3

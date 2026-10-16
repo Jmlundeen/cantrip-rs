@@ -1,0 +1,45 @@
+# "Whenever you cast a spell that targets a creature you control" is not only about Ms. Marvel herself: Bot1 casts Snakeskin
+# Veil at its Ornithopter on turn 3. The Ornithopter gets the counter, but it is Ms. Marvel who draws (the controller does) and
+# who gains the static ability: her base power is the two cards left in Bot1's hand, not the Ornithopter's.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Ornithopter
+Ms. Marvel, Kamala Khan
+Mox Emerald
+Snakeskin Veil
+Island
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ms. Marvel, Kamala Khan.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Snakeskin Veil.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ms. Marvel, Kamala Khan.Power = 2
+? Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ms. Marvel, Kamala Khan.Power = 2
+? Bot1.Battlefield.Ornithopter.Power = 1
+
+[Expect]
+Bot1.Hand.Count = 2
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ms. Marvel, Kamala Khan.Counters.PlusOnePlusOne = (absent)

@@ -1,0 +1,50 @@
+# Ms. Marvel's trigger is on the stack above Bot1's Lightning Bolt when Bot2 exiles her with Path to Exile. The trigger still resolves
+# and Bot1 still draws (the draw does not depend on her), but "Ms. Marvel gains ..." has no object to gain it: she is gone (CR 608.2b,
+# 400.7) and the effect knows nothing of any new object. The Bolt, with its only target gone, does nothing.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Ms. Marvel, Kamala Khan
+Lightning Bolt
+Island
+Island x20
+
+[Bot2 Deck]
+Plains
+Path to Exile
+Plains x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ms. Marvel, Kamala Khan.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ms. Marvel, Kamala Khan)
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Path to Exile.Cast(Ms. Marvel, Kamala Khan)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+
+[Expect]
+Exile = Ms. Marvel, Kamala Khan
+Bot1.Battlefield = Island; Mox Sapphire; Mox Jet; Mox Ruby
+Bot1.Hand.Count = 3
+Bot1.Library.Count = 18
+Bot1.Graveyard = Lightning Bolt

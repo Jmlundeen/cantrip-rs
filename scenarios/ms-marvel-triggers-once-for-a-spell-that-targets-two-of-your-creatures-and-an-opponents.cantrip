@@ -1,0 +1,50 @@
+# Pyrokinesis divides its damage among three creatures: Ms. Marvel, Bot1's Ornithopter, and Bot2's Ornithopter. The trigger is
+# about the spell being cast (CR 603.2), so it triggers once however many creatures of Bot1's it targets, and an opponent's
+# creature among the targets does not matter: the stack is Pyrokinesis and one trigger, Bot1 draws one card (two in hand,
+# so Ms. Marvel's base power is 2), and the one grant is all there is. Pyrokinesis is cast by exiling Lightning Bolt from the hand.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Ornithopter
+Ms. Marvel, Kamala Khan
+Pyrokinesis
+Lightning Bolt
+Island
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ms. Marvel, Kamala Khan.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Pyrokinesis.Cast(Ability: Exile)
+Bot1.Divide(Ms. Marvel, Kamala Khan: 1; Bot1.Battlefield.Ornithopter: 1; Bot2.Battlefield.Ornithopter: 2)
+Bot1.Choose(Lightning Bolt)
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ms. Marvel, Kamala Khan.Power = 2
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand.Count = 2
+Bot1.Library.Count = 19
+Bot2.Graveyard = Ornithopter
+Exile = Lightning Bolt
+Bot1.Battlefield.Ms. Marvel, Kamala Khan.Damage = 1

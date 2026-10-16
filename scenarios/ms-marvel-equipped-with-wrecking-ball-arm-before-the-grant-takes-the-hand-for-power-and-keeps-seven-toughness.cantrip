@@ -1,0 +1,54 @@
+# Wrecking Ball Arm's "equipped creature has base power and toughness 7/7" is a static ability of the Equipment, a layer 7b
+# effect with the timestamp the Equipment got when it became attached (CR 613.7e). Bot1 equips it to Ms. Marvel on turn 3 (7/7),
+# then bolts her: her granted ability has the later timestamp (CR 613.7a), so her base power is the hand, one card after the
+# draw, while the Arm's toughness 7 stays. Equipping is an ability and not a spell, so it triggers nothing.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Mox Ruby
+Ms. Marvel, Kamala Khan
+Wrecking Ball Arm
+Lightning Bolt
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ms. Marvel, Kamala Khan.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Wrecking Ball Arm.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Wrecking Ball Arm.Activate(Ability: Equip legendary creature; Ms. Marvel, Kamala Khan)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Bot1.Battlefield.Ms. Marvel, Kamala Khan.Power = 7
+? Bot1.Battlefield.Ms. Marvel, Kamala Khan.Toughness = 7
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ms. Marvel, Kamala Khan)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ms. Marvel, Kamala Khan.Power = 1
+? Bot1.Battlefield.Ms. Marvel, Kamala Khan.Toughness = 7
+
+[Expect]
+Bot1.Hand.Count = 1
+Bot1.Battlefield.Wrecking Ball Arm.AttachedTo = Ms. Marvel, Kamala Khan

@@ -1,0 +1,57 @@
+# "Base power is equal to the number of cards in your hand" is a layer 7b effect (CR 613.4b); +N/+N effects and +1/+1 counters
+# are layer 7c (CR 613.4c) and apply after it whatever their timestamps. On turn 3 Bot1 casts Battlefield Improvisation at Ms.
+# Marvel (+2/+2 until end of turn; the trigger resolves first, so the pump is newer than the first grant) and then Snakeskin Veil
+# (a +1/+1 counter; its trigger's grant is newer than the pump). With two cards in hand each time her power is the hand plus the
+# pump (4), then plus the counter (5), and her toughness is her own 4 plus 2 and 1. On turn 4 the grant and the pump are over but
+# the counter stays: 2/5.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Pearl
+Mox Emerald
+Ms. Marvel, Kamala Khan
+Snakeskin Veil
+Battlefield Improvisation
+Island
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ms. Marvel, Kamala Khan.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Battlefield Improvisation.Cast(Ms. Marvel, Kamala Khan)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ms. Marvel, Kamala Khan.Power = 4
+? Bot1.Battlefield.Ms. Marvel, Kamala Khan.Toughness = 6
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Snakeskin Veil.Cast(Ms. Marvel, Kamala Khan)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ms. Marvel, Kamala Khan.Power = 5
+? Bot1.Battlefield.Ms. Marvel, Kamala Khan.Toughness = 7
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Ms. Marvel, Kamala Khan.Power = 2
+? Bot1.Battlefield.Ms. Marvel, Kamala Khan.Toughness = 5
+
+[Expect]
+Bot1.Hand.Count = 2
+Bot1.Battlefield.Ms. Marvel, Kamala Khan.Counters.PlusOnePlusOne = 1

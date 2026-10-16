@@ -1,0 +1,57 @@
+# Ms. Marvel, Kamala Khan: "Whenever you cast a spell that targets a creature you control, draw a card. Until end of turn,
+# Ms. Marvel gains 'Ms. Marvel's base power is equal to the number of cards in your hand.'" Bot1 bolts her own Ms. Marvel on
+# turn 3 (she is a 1/4 and lives): the trigger resolves above the Bolt, Bot1 draws (CR 603.3b), and the static ability she has
+# been given (CR 613.1f) sets her base power to Bot1's hand live (CR 611.3a, 613.4b): two cards after the draw, four after
+# Ancestral Recall has left the hand and drawn three, three once a Mox Pearl is cast for {0}. Toughness stays 4, and on
+# Bot2's turn the effect is over (CR 514.2): she is a 1/4 again.
+
+[Bot1 Deck]
+Island
+Island
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Ms. Marvel, Kamala Khan
+Lightning Bolt
+Ancestral Recall
+Island
+Mox Pearl
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ms. Marvel, Kamala Khan.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+? Bot1.Battlefield.Ms. Marvel, Kamala Khan.Power = 1
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ms. Marvel, Kamala Khan)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ms. Marvel, Kamala Khan.Power = 2
+? Bot1.Battlefield.Ms. Marvel, Kamala Khan.Toughness = 4
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ms. Marvel, Kamala Khan.Power = 4
+Bot1.Hand.Mox Pearl.Cast
+? Bot1.Battlefield.Ms. Marvel, Kamala Khan.Power = 3
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Ms. Marvel, Kamala Khan.Power = 1
+
+[Expect]
+Bot1.Hand.Count = 3
+Bot1.Graveyard = Ancestral Recall; Lightning Bolt
+Bot1.Battlefield.Ms. Marvel, Kamala Khan.Toughness = 4

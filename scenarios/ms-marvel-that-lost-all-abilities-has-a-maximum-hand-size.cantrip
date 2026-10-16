@@ -1,0 +1,55 @@
+# Known bug: a permanent's play rules (no maximum hand size, extra land plays, ...) are read off its card whether or not it has lost all its abilities (CR 613.1f, 402.2); `no_maximum_hand_size` and `land_rules` in actions.rs never look at LoseAllAbilities.
+# Bot2's The Wondrous Wasp strips Ms. Marvel of every ability on turn 2, her "You have no maximum hand size" with them. On turn 3
+# Bot1 draws up to eight cards with two Ancestral Recalls and, having no such ability, must discard one at cleanup (CR 514.1).
+# (ms-marvel-gives-no-maximum-hand-size is the positive control: the same turn without the Wasp discards nothing.)
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Ms. Marvel, Kamala Khan
+Ancestral Recall
+Ancestral Recall
+Ancestral Recall
+Island x20
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+The Wondrous Wasp
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ms. Marvel, Kamala Khan.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.The Wondrous Wasp.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Target(Ms. Marvel, Kamala Khan)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Ms. Marvel, Kamala Khan.Keywords = (absent)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Pass
+[T3 Bot1.End]
+Bot1.Pass
+Bot1.Discard(Island)
+
+[Expect]
+Bot1.Hand.Count = 7

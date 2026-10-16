@@ -1,0 +1,48 @@
+# "You have no maximum hand size" (CR 402.2): with Ms. Marvel on the battlefield, three Ancestral Recalls on turn 3 leave Bot1 with
+# nine cards at cleanup and it is not asked to discard (the bare refusal, placed after the end step's own priority). Bot2, with
+# nothing like it, has seven cards after its own cleanup on turn 2: it drew its eighth and had to discard it (the positive control).
+
+[Bot1 Deck]
+Island
+Island
+Mox Sapphire
+Mox Jet
+Ms. Marvel, Kamala Khan
+Ancestral Recall
+Ancestral Recall
+Ancestral Recall
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ms. Marvel, Kamala Khan.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot2.Hand.Count = 7
+? Bot2.Graveyard.Count = 1
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Pass
+[T3 Bot1.End]
+Bot1.Pass
+! Bot1.Discard
+[T5 Bot1.Upkeep]
+
+[Expect]
+Bot1.Hand.Count = 9
+Bot1.Graveyard.Count = 3

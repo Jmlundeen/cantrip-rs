@@ -1,0 +1,56 @@
+# Two layer 7b effects set Ms. Marvel's base power, so the later timestamp wins (CR 613.4b, 613.7). Scale Up on turn 3 ("becomes a
+# green Wurm with base power and toughness 6/4"): its cast triggers Ms. Marvel, whose grant is made when the trigger resolves, and
+# Scale Up resolves after it, so she is a 6/4 although the hand holds two cards. Then Lightning Bolt at her (she survives, 4
+# toughness) triggers again: the new grant is later than Scale Up's effect (CR 613.7a), so her base power is the hand, two cards,
+# and the toughness Scale Up set stays 4.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Ms. Marvel, Kamala Khan
+Scale Up
+Lightning Bolt
+Forest
+Island
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ms. Marvel, Kamala Khan.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Scale Up.Cast(Ms. Marvel, Kamala Khan)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 2
+? Bot1.Battlefield.Ms. Marvel, Kamala Khan.Power = 6
+? Bot1.Battlefield.Ms. Marvel, Kamala Khan.Toughness = 4
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ms. Marvel, Kamala Khan)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ms. Marvel, Kamala Khan.Power = 2
+? Bot1.Battlefield.Ms. Marvel, Kamala Khan.Toughness = 4
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand.Count = 2
+Bot1.Battlefield.Ms. Marvel, Kamala Khan.Power = 2
+Bot1.Battlefield.Ms. Marvel, Kamala Khan.Damage = 3
+Bot1.Battlefield.Ms. Marvel, Kamala Khan.Subtypes = Wurm
