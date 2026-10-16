@@ -1,0 +1,45 @@
+# Blossoming Defense: in response to Bot2's Lightning Bolt at Bot1's Ornithopter (0/2), the Defense makes it a 2/4 with
+# hexproof until end of turn (CR 702.11b), so the Bolt has no legal target on resolution and is countered (CR 608.2b).
+# "Target creature you control": Bot2's Ornithopter is refused beside Bot1's own as the positive control. On turn 3 both
+# the +2/+2 and the hexproof are gone (CR 514.2).
+
+[Bot1 Deck]
+Mox Emerald
+Blossoming Defense
+Ornithopter
+Forest x17
+
+[Bot2 Deck]
+Mountain
+Ornithopter
+Lightning Bolt
+Mountain x17
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Battlefield.Mox Emerald.Activate
+! Bot1.Hand.Blossoming Defense.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Hand.Blossoming Defense.Cast(Bot1.Battlefield.Ornithopter)
+[T2 Bot2.Main2]
+? Bot1.Battlefield.Ornithopter.Keywords = Flying; Hexproof
+? Bot1.Battlefield.Ornithopter.Power = 2
+? Bot1.Battlefield.Ornithopter.Toughness = 4
+? Bot2.Battlefield.Ornithopter.Power = 0
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Keywords = Flying
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot1.Battlefield.Ornithopter.Damage = 0
+Bot2.Graveyard = Lightning Bolt
+Bot2.Battlefield.Ornithopter.Power = 0
+Bot2.Battlefield.Ornithopter.Keywords = Flying
+Bot1.Graveyard = Blossoming Defense

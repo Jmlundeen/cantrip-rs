@@ -1,0 +1,38 @@
+# Blossoming Defense on Bot1's Ornithopter (0/2); Bot2 responds with Lightning Bolt (the Defense has not resolved, so the
+# creature is still 0/2 and not hexproof). The Ornithopter dies, the Defense's only target is illegal and it does nothing
+# (CR 608.2b): it goes to the graveyard (it does not resolve), and no other creature is affected - Bot2's Ornithopter
+# stays 0/2 without hexproof and Bot1 has no creature left to pump.
+
+[Bot1 Deck]
+Mox Emerald
+Blossoming Defense
+Ornithopter
+Forest x17
+
+[Bot2 Deck]
+Mountain
+Ornithopter
+Lightning Bolt
+Mountain x17
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Blossoming Defense.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+[Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Blossoming Defense; Ornithopter
+Bot1.Battlefield.Count = 1
+Bot2.Graveyard = Lightning Bolt
+Bot2.Battlefield.Ornithopter.Power = 0
+Bot2.Battlefield.Ornithopter.Toughness = 2
+Bot2.Battlefield.Ornithopter.Keywords = Flying
