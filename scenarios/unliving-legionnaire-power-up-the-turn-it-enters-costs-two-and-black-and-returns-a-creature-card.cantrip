@@ -1,0 +1,50 @@
+# Unliving Legionnaire: "Power-up — {5}{B}{B}: Return up to one target creature card from your graveyard to your hand.
+# Put two +1/+1 counters on this creature." The turn it enters, its mana cost {3}{B} takes one {B} off the black and {3}
+# off the generic (CR 702.193b, 118.7): {2}{B} is left, Black Lotus's {B}{B}{B}, all spent. Bot1 targets the Ornithopter
+# Entomb put in the graveyard; it returns to Bot1's hand and the Legionnaire ends a 5/4.
+
+[Bot1 Deck]
+Swamp
+Entomb
+Mox Jet
+Sol Ring
+Mana Crypt
+Unliving Legionnaire
+Black Lotus
+Ornithopter
+Swamp x10
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Pass
+Bot1.Search(Ornithopter)
+Bot1.Hand.Mana Crypt.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Unliving Legionnaire.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Unliving Legionnaire.Activate(Ornithopter)
+? Bot1.Mana =
+Bot1.Pass
+
+[Expect]
+Turn = 1
+Bot1.Hand = Ornithopter
+Bot1.Graveyard = Black Lotus; Entomb
+Bot1.Battlefield.Unliving Legionnaire.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Unliving Legionnaire.Power = 5
+Bot1.Battlefield.Unliving Legionnaire.Toughness = 4

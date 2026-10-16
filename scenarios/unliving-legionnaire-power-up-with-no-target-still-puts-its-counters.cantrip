@@ -1,0 +1,46 @@
+# Unliving Legionnaire's power-up returns "up to one target creature card": Bot1 activates it choosing no target,
+# though an Ornithopter is in the graveyard. The Ornithopter stays there, and the counters are put on all the same
+# (CR 601.2c, 115.1).
+
+[Bot1 Deck]
+Swamp
+Entomb
+Mox Jet
+Sol Ring
+Mana Crypt
+Unliving Legionnaire
+Black Lotus
+Ornithopter
+Swamp x10
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Pass
+Bot1.Search(Ornithopter)
+Bot1.Hand.Mana Crypt.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Unliving Legionnaire.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Unliving Legionnaire.Activate
+Bot1.Pass
+
+[Expect]
+Turn = 1
+Bot1.Hand.Count = 0
+Bot1.Graveyard = Black Lotus; Entomb; Ornithopter
+Bot1.Battlefield.Unliving Legionnaire.Counters.PlusOnePlusOne = 2
