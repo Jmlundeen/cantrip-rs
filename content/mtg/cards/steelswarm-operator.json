@@ -1,0 +1,11 @@
+{
+  "name": "Steelswarm Operator",
+  "manaCost": "{1}{U}",
+  "type": "Artifact Creature — Robot Soldier",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "Flying\n{T}: Add {U}. Spend this mana only to cast an artifact spell.\n{T}: Add {U}{U}. Spend this mana only to activate abilities of artifact sources.",
+  "keywords": [
+    "Flying"
+  ]
+}

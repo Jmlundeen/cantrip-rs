@@ -1,0 +1,70 @@
+# Steelswarm Operator: "{T}: Add {U}. Spend this mana only to cast an artifact spell." and "{T}: Add {U}{U}. Spend this
+# mana only to activate abilities of artifact sources." (CR 106.6.) Two kinds of restricted mana, each paying only its own.
+# Turn 3: both Operators tapped for their {U}{U}; that mana can't cast Sol Ring, an artifact spell, but pays Aether
+# Spellbomb's {U}. Turn 5: both tapped for their {U} for artifact spells; that mana can't pay either of a second
+# Spellbomb's abilities, but casts Sol Ring.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Steelswarm Operator
+Steelswarm Operator
+Aether Spellbomb
+Aether Spellbomb
+Island
+Sol Ring
+Island x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x5
+Forest x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Steelswarm Operator.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Steelswarm Operator.Cast
+Bot1.Pass
+Bot2.Pass
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Aether Spellbomb.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Steelswarm Operator#1.Activate(Ability: {U}{U})
+Bot1.Battlefield.Steelswarm Operator#2.Activate(Ability: {U}{U})
+? Bot1.Mana = {U}{U}{U}{U} (ArtifactAbilities)
+! Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Aether Spellbomb.Activate(Ability: Return; Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {U}{U}{U} (ArtifactAbilities)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Aether Spellbomb.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Steelswarm Operator#1.Activate(Ability: Add {U}.)
+Bot1.Battlefield.Steelswarm Operator#2.Activate(Ability: Add {U}.)
+? Bot1.Mana = {U}{U} (ArtifactSpells)
+! Bot1.Battlefield.Aether Spellbomb.Activate(Ability: Return)
+! Bot1.Battlefield.Aether Spellbomb.Activate(Ability: Draw)
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Bot1.Mana = {U} (ArtifactSpells)
+Bot1.Battlefield.Sol Ring.Tapped = false
+Bot1.Battlefield.Steelswarm Operator#1.Keywords = Flying
+Bot2.Battlefield = Forest
