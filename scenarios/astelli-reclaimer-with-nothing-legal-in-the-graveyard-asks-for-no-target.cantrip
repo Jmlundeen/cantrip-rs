@@ -1,0 +1,30 @@
+# With an empty graveyard Astelli Reclaimer's enters trigger has no legal target and is removed from the game as it would
+# go on the stack (CR 603.3d): no target is asked and nothing is returned. It is cast for its warp cost, paid with a Plains
+# and two Moxen (tapped, not sacrificed), so the graveyard stays empty.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Astelli Reclaimer
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Astelli Reclaimer.Cast(Ability: Warp)
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Target
+Bot1.Pass
+[T1 Bot1.Main2]
+? Stack.Count = 0
+? Bot1.Battlefield = Plains; Mox Pearl; Mox Jet; Astelli Reclaimer
+
+[Expect]
+Bot1.Graveyard.Count = 0

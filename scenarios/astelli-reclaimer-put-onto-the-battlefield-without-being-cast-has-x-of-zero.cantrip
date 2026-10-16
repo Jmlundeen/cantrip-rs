@@ -1,0 +1,45 @@
+# Astelli Reclaimer put onto the battlefield by Sneak Attack was never cast, so no mana was spent to cast it and X is 0 (the
+# ruling for a copy or a free cast is the same): only a permanent card with mana value 0 may be returned. The graveyard holds
+# Black Lotus and Mishra's Bauble (mana value 0, both legal, so the target is asked) and Chromatic Star (mana value 1,
+# sacrificed for mana, not a legal target at X = 0).
+
+[Bot1 Deck]
+Mountain
+Chromatic Star
+Mishra's Bauble
+Black Lotus
+Sneak Attack
+Astelli Reclaimer
+Mountain
+Mountain
+Mountain x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Chromatic Star.Cast
+Bot1.Hand.Mishra's Bauble.Cast
+Bot1.Battlefield.Mishra's Bauble.Activate(Bot1)
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Hand.Sneak Attack.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Chromatic Star.Activate(Color: Red)
+Bot1.Battlefield.Sneak Attack.Activate
+Bot1.Choose(Astelli Reclaimer)
+! Bot1.Target(Chromatic Star)
+Bot1.Target(Black Lotus)
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield = Mountain; Mountain; Sneak Attack; Astelli Reclaimer; Black Lotus
+? Bot1.Graveyard = Chromatic Star; Mishra's Bauble
+
+[Expect]
+Bot1.Battlefield.Count = 5
