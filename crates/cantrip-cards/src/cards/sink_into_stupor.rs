@@ -34,7 +34,7 @@ pub static BACK: CardDef = CardDef {
 
 pub static CARD: CardDef = CardDef {
     spell: Some(SpellDef {
-        targets: &[TargetSpec { min: 1, max: 1, filter: spell_or_nonland_permanent_of_an_opponent }],
+        targets: &[TargetSpec { min: 1, max: 1, filter: spell_or_nonland_permanent_of_an_opponent, label: "" }],
         effect,
     }),
     back: Some(&BACK),

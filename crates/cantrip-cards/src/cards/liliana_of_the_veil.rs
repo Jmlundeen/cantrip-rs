@@ -28,7 +28,7 @@ fn minus_six(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     } else {
         let candidates: Vec<Target> = permanents.iter().map(|&id| Target::Object(id)).collect();
         let count = candidates.len() as u8;
-        let ask = RequestKind::ChooseTarget {
+        let ask = RequestKind::ChooseTarget { label: "", slot_player: None,
             source: item.object,
             purpose: Purpose::SeparatePiles,
             candidates,

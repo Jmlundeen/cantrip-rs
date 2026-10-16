@@ -39,8 +39,8 @@ pub static CARD: CardDef = CardDef {
         triggered(NONCREATURE_SPELL_YOU_CAST, make_servo, "Whenever you cast a noncreature spell, create a 1/1 colorless Servo artifact creature token."),
         ability(loyalty(-2), become_copy, "\u{2212}2: Target artifact you control becomes a copy of another target artifact or creature you control until end of turn, except it's an artifact in addition to its other types.")
             .targets(&[
-                TargetSpec { min: 1, max: 1, filter: artifact_you_control },
-                TargetSpec { min: 1, max: 1, filter: other_artifact_or_creature_you_control },
+                TargetSpec { min: 1, max: 1, filter: artifact_you_control, label: "" },
+                TargetSpec { min: 1, max: 1, filter: other_artifact_or_creature_you_control, label: "" },
             ]),
     ],
     ..oracle::SAHEELI_SUBLIME_ARTIFICER

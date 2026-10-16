@@ -53,7 +53,7 @@ fn spell_damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ENTERS, exile_and_play, "When Thor enters, exile target Equipment, instant, or sorcery card from your graveyard. Until the end of your next turn, you may play that card.")
-            .targets(&[TargetSpec { min: 1, max: 1, filter: equipment_instant_or_sorcery_in_your_graveyard }]),
+            .targets(&[TargetSpec { min: 1, max: 1, filter: equipment_instant_or_sorcery_in_your_graveyard, label: "" }]),
         triggered(when(EventMask::SPELL_CAST, you_cast_a_noncreature_spell), spell_damage, "Whenever you cast a noncreature spell, Thor deals damage equal to that spell's mana value to any target.")
             .targets(&[targets::ANY]),
     ],

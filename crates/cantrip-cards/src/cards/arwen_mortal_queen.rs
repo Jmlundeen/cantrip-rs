@@ -33,6 +33,6 @@ fn spend(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     enters: Some(enters),
     abilities: &[ability(cost("{1}").and(remove_counters(CounterKind::Indestructible, 1)), spend, "{1}, Remove an indestructible counter from Arwen: Another target creature gains indestructible until end of turn. Put a +1/+1 counter and a lifelink counter on that creature and a +1/+1 counter and a lifelink counter on Arwen.")
-        .targets(&[TargetSpec { min: 1, max: 1, filter: another_creature }])],
+        .targets(&[TargetSpec { min: 1, max: 1, filter: another_creature, label: "" }])],
     ..oracle::ARWEN_MORTAL_QUEEN
 };

@@ -300,8 +300,7 @@ fn state_based_actions(cx: &mut Cx) -> R<bool> {
                     cards: group.clone(),
                     eligible: group.clone(),
                     count: 1,
-                    up_to: false,
-                };
+                    up_to: false, kind: "" };
                 let keep = match cx.ask_core(p, ask, false)? {
                     Answer::Cards(cards) => cards.first().copied().unwrap_or(group[0]),
                     _ => group[0],
@@ -438,7 +437,7 @@ fn choose_trigger_targets(
                 break 'slot;
             }
             let count = (most as usize).min(candidates.len()) as u8;
-            let ask = RequestKind::ChooseTarget {
+            let ask = RequestKind::ChooseTarget { label: spec.label, slot_player: *slot_player,
                 source: trigger.source,
                 purpose: Purpose::Targets,
                 candidates,

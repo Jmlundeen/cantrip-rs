@@ -28,7 +28,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     spell: Some(SpellDef {
-        targets: &[targets::CREATURE_YOU_CONTROL, TargetSpec { min: 0, max: 1, filter: targets::SPELL.filter }],
+        targets: &[targets::CREATURE_YOU_CONTROL, TargetSpec { min: 0, max: 1, filter: targets::SPELL.filter, label: "" }],
         effect,
     }),
     ..oracle::REPULSIVE_MUTATION

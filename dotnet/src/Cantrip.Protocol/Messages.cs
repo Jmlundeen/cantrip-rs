@@ -908,6 +908,24 @@ public sealed class ChooseModesPromptMessage : PromptPayload
     public string CostKind { get; set; } = string.Empty;
 
     /// <summary>
+    /// What the question adds to the choice, in words: that each mode past the first has a cost (escalate, spree), or that the
+    /// modes are the faces a card may be cast as. Empty when there is nothing to add.
+    /// </summary>
+    [Key(11)]
+    public string Detail { get; set; } = string.Empty;
+
+    /// <summary>Whether choosing more modes than the fewest costs something extra (escalate, spree): a range of free modes is "one or both".</summary>
+    [Key(12)]
+    public bool ExtraModesCost { get; set; }
+
+    /// <summary>
+    /// The rules text of each mode, index for index, where a mode is a thing to weigh and not only to read: the faces a card may be
+    /// cast as (CR 709.3) are each a card's printed text. Empty for modes the question's own text says it all of.
+    /// </summary>
+    [Key(13)]
+    public List<string> Texts { get; set; } = [];
+
+    /// <summary>
     /// The eligible modes in the order worth trying them: those <see cref="Affordable"/> names first, then the rest, each
     /// group in printed order.
     /// </summary>
@@ -1121,6 +1139,13 @@ public sealed class ChooseCardsPromptMessage : PromptPayload
     public List<int> ManaValues { get; set; } = [];
 
     /// <summary>
+    /// The most a cast chosen here may be worth: the mana value of the spell cast must be at most this, as what is left of Uldaros
+    /// Theorix's "total mana value 6 or less". Zero when there is no limit.
+    /// </summary>
+    [Key(13)]
+    public int MaximumManaValue { get; set; }
+
+    /// <summary>
     /// The first eligible cards, never anything outside <see cref="Eligible"/>. A choice that must add up to a power is
     /// offered "up to" every candidate, so taking them all meets it whenever anything can.
     /// </summary>
@@ -1185,6 +1210,13 @@ public sealed class ChooseTargetPromptMessage : PromptPayload
     /// </summary>
     [Key(9)]
     public bool AnyNumber { get; set; }
+
+    /// <summary>
+    /// The opponent whose slot this is, when the ability has one slot for each opponent (The Theorist's "for each opponent, return
+    /// up to one target ..."): a seat, or zero. <see cref="Text"/> then names where it goes with "{player}".
+    /// </summary>
+    [Key(10)]
+    public int ForPlayer { get; set; }
 
     /// <summary>No target where that is allowed, and otherwise the first candidates the server offered.</summary>
     public override AnswerPayload Default() =>
@@ -2430,6 +2462,10 @@ public sealed class SearchLibraryPromptMessage : PromptPayload
     /// <summary>Where the chosen cards will go.</summary>
     [Key(5)]
     public SearchDestinationView Destination { get; set; }
+
+    /// <summary>Whose library is searched: the searcher's own, or another player's (Deadly Cover-Up).</summary>
+    [Key(6)]
+    public int Owner { get; set; }
 
     /// <summary>Finding nothing, which a search always allows (CR 701.19d).</summary>
     public override AnswerPayload Default() => new CardsChosenAnswer();

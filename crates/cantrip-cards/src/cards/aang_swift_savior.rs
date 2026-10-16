@@ -39,7 +39,7 @@ pub static BACK: CardDef = CardDef {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ENTERS, airbend_it, "When Aang enters, airbend up to one other target creature or spell.")
-            .targets(&[TargetSpec { min: 0, max: 1, filter: other_creature_or_spell }]),
+            .targets(&[TargetSpec { min: 0, max: 1, filter: other_creature_or_spell, label: "" }]),
         ability(cost("{8}"), cantrip_mechanics::effects::transform_self, "Waterbend {8}: Transform Aang. (While paying a waterbend cost, you can tap your artifacts and creatures to help. Each one pays for {1}.)")
             .waterbend(),
     ],

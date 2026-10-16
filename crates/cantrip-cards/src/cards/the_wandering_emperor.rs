@@ -59,7 +59,7 @@ pub static CARD: CardDef = CardDef {
             .targets(&[TargetSpec { min: 0, ..targets::CREATURE }]),
         ability(loyalty(-1), minus_one, "\u{2212}1: Create a 2/2 white Samurai creature token with vigilance."),
         ability(loyalty(-2), minus_two, "\u{2212}2: Exile target tapped creature. You gain 2 life.")
-            .targets(&[TargetSpec { min: 1, max: 1, filter: tapped_creature }]),
+            .targets(&[TargetSpec { min: 1, max: 1, filter: tapped_creature, label: "" }]),
     ],
     instant_activation: &[instant_loyalty],
     ..oracle::THE_WANDERING_EMPEROR

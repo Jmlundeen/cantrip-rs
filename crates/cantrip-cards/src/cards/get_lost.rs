@@ -23,7 +23,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     spell: Some(SpellDef {
-        targets: &[TargetSpec { min: 1, max: 1, filter: creature_enchantment_or_planeswalker }],
+        targets: &[TargetSpec { min: 1, max: 1, filter: creature_enchantment_or_planeswalker, label: "" }],
         effect,
     }),
     ..oracle::GET_LOST

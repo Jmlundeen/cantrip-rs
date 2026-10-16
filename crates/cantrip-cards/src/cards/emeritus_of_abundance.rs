@@ -20,7 +20,7 @@ pub static REGROWTH: CardDef = CardDef {
     name: "Regrowth",
     cost: mana(1, 0, 0, 0, 0, 1),
     types: TypeSet::of(&[CardType::Sorcery]),
-    spell: Some(SpellDef { targets: &[TargetSpec { min: 1, max: 1, filter: card_in_your_graveyard }], effect: regrowth }),
+    spell: Some(SpellDef { targets: &[TargetSpec { min: 1, max: 1, filter: card_in_your_graveyard, label: "" }], effect: regrowth }),
     text: "Return target card from your graveyard to your hand.",
     ..CardDef::BLANK
 };

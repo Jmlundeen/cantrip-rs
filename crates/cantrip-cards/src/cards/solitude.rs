@@ -32,7 +32,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         evoke::sacrifice_trigger("When Solitude enters, if its evoke cost was paid, its controller sacrifices it."),
         triggered(THIS_ENTERS, exile_and_compensate, "When Solitude enters, exile up to one other target creature. That creature's controller gains life equal to its power.")
-            .targets(&[TargetSpec { min: 0, max: 1, filter: other_creature }]),
+            .targets(&[TargetSpec { min: 0, max: 1, filter: other_creature, label: "" }]),
     ],
     // Evoke: exile a white card from your hand rather than pay this spell's mana cost (CR 118.9).
     ways: &[evoke::way(evoke::exile_from_hand(white_card), "Evoke - Exile a white card from your hand")],

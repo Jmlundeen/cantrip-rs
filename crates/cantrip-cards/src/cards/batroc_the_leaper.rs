@@ -17,6 +17,6 @@ pub static CARD: CardDef = CardDef {
     kicker: Some(Kicker { cost: mana(2, 0, 0, 0, 0, 0), multi: true, waterbend: false }),
     enters: Some(kicker::enters_with_counters::<{ CounterKind::PlusOne as usize }>),
     abilities: &[triggered(THIS_ENTERS, damage_each, "When Batroc enters, he deals damage equal to his power to each of up to X targets, where X is the number of times he was kicked.")
-        .targets(&[TargetSpec { min: 0, max: TargetSpec::COUNTED, filter: targets::ANY.filter }])],
+        .targets(&[TargetSpec { min: 0, max: TargetSpec::COUNTED, filter: targets::ANY.filter, label: "" }])],
     ..oracle::BATROC_THE_LEAPER
 };

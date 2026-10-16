@@ -7,12 +7,25 @@ use cantrip_api::*;
 /// ability's controller chooses one eligible card. The revealing is the looking; when nothing in the hand is eligible
 /// there is no choice to make, so none is asked (CR 608.2d), and nothing at all for an empty hand. The cards chosen are left for the
 /// caller to discard or exile. Duress, Thoughtseize and Inquisition of Kozilek print it (`purpose` is the question's: a
-/// discard, or `Purpose::TakeFromHand`).
+/// discard (`Purpose::TakeFromHand`) or an exile (`Purpose::Exile`): the question says which, to whoever is choosing).
 pub fn choose_from_revealed_hand(
     g: &mut dyn Game,
     item: &StackItem,
     player: PlayerId,
     purpose: Purpose,
+    eligible: fn(&dyn Query, ObjectId) -> bool,
+) -> Result<Vec<ObjectId>, Suspend> {
+    choose_from_revealed_hand_of_kind(g, item, player, purpose, "", eligible)
+}
+
+/// `choose_from_revealed_hand` for a card that says what it may take ("nonland", "artifact or creature"): `kind` is its own
+/// words, which the question says to the chooser. Intimidation Tactics, Thoughtseize and Grief print one.
+pub fn choose_from_revealed_hand_of_kind(
+    g: &mut dyn Game,
+    item: &StackItem,
+    player: PlayerId,
+    purpose: Purpose,
+    kind: &'static str,
     eligible: fn(&dyn Query, ObjectId) -> bool,
 ) -> Result<Vec<ObjectId>, Suspend> {
     let hand = g.state().zone(Zone::hand(player)).to_vec();
@@ -21,7 +34,7 @@ pub fn choose_from_revealed_hand(
     }
     g.reveal(player, &hand);
     let eligible: Vec<ObjectId> = hand.iter().copied().filter(|&c| eligible(&*g, c)).collect();
-    Ok(choose::card_from(g, item.controller, item.object, purpose, hand, eligible)?.into_iter().collect())
+    Ok(choose::cards_from_kind(g, item.controller, item.object, purpose, kind, hand, eligible, 1, false)?.into_iter().take(1).collect())
 }
 
 /// `choose_from_revealed_hand`, then the player discards what was chosen, together (CR 701.9a). The cards discarded.
@@ -32,7 +45,19 @@ pub fn discard_chosen_from_revealed_hand(
     purpose: Purpose,
     eligible: fn(&dyn Query, ObjectId) -> bool,
 ) -> Result<Vec<ObjectId>, Suspend> {
-    let chosen = choose_from_revealed_hand(g, item, player, purpose, eligible)?;
+    discard_chosen_from_revealed_hand_of_kind(g, item, player, purpose, "", eligible)
+}
+
+/// `discard_chosen_from_revealed_hand` for a card that says what may be taken ("nonland"): Thoughtseize, Grief and Humiliate.
+pub fn discard_chosen_from_revealed_hand_of_kind(
+    g: &mut dyn Game,
+    item: &StackItem,
+    player: PlayerId,
+    purpose: Purpose,
+    kind: &'static str,
+    eligible: fn(&dyn Query, ObjectId) -> bool,
+) -> Result<Vec<ObjectId>, Suspend> {
+    let chosen = choose_from_revealed_hand_of_kind(g, item, player, purpose, kind, eligible)?;
     g.discard_together(&chosen);
     Ok(chosen)
 }

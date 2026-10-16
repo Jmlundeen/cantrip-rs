@@ -23,7 +23,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         triggers::ward::<1>("Ward {1} (Whenever this creature becomes the target of a spell or ability an opponent controls, counter it unless that player pays {1}.)"),
         triggered(triggers::YOU_ATTACK, connive_x, "Whenever you attack, target attacking creature connives X, where X is the number of attacking creatures.")
-            .targets(&[TargetSpec { min: 1, max: 1, filter: attacking_creature }]),
+            .targets(&[TargetSpec { min: 1, max: 1, filter: attacking_creature, label: "" }]),
     ],
     ..oracle::RAFFINE_SCHEMING_SEER
 };

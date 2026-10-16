@@ -127,7 +127,12 @@ stops there (`?` carries the `Suspend` out). Once the question is answered, the 
 | may | `May { purpose }` | `Accept` / `Decline` |
 | unless a player pays | `g.unless_pays(...)` asks it | `PayCost` / `Decline` |
 | distribute cards | `DistributeCards { cards, destinations, may_shuffle }` | `Arrange(... \| ...)` |
-| search a library | `SearchLibrary` (use `mechanics::search_library`) | `Search(...)` |
+| search a library | `SearchLibrary` (use `mechanics::search_library`, which names where the cards found go: the question says it) | `Search(...)` |
+
+What a player is told about a question is part of the card (non-negotiable 5 of the `add-cards` skill): a `TargetSpec`
+with two slots says what each is for with `.labelled("Return target spell or permanent to its owner's hand")` (`{player}` stands
+for the opponent of an each-opponent slot), a cast during resolution asks with the `Purpose` that says what it costs (`CastFree`,
+`CastCopyFree`, `Cast` for one paid for), and a question is never asked with a `Purpose` that means something else.
 
 Their defaults (what the runner answers when no line applies) are in `crates/cantrip-script/src/run.rs`, `default`.
 

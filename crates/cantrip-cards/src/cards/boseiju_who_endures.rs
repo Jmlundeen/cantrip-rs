@@ -35,7 +35,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         mana_ability(TAP, add(Mana::G), "{T}: Add {G}."),
         ability(cost("{1}{G}").and(DISCARD_THIS), destroy_and_search, "Channel \u{2014} {1}{G}, Discard this card: Destroy target artifact, enchantment, or nonbasic land an opponent controls. That player may search their library for a land card with a basic land type, put it onto the battlefield, then shuffle. This ability costs {1} less to activate for each legendary creature you control.")
-            .targets(&[TargetSpec { min: 1, max: 1, filter: opponents_target }])
+            .targets(&[TargetSpec { min: 1, max: 1, filter: opponents_target, label: "" }])
             .from(ZoneKind::Hand),
     ],
     own_cost_changes: &[channel::cheaper_per_legendary_creature],

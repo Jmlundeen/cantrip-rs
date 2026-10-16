@@ -62,7 +62,7 @@ pub fn deal(decks: &[Vec<String>], seed: u64, shuffle: bool, opening_chooser: Op
 pub fn label_text(label: &Label) -> &'static str {
     match *label {
         Label::Card(card, i) => cards().get(card).labels.get(i as usize).copied().unwrap_or(""),
-        Label::Name(card) => cards().get(card).name,
+        Label::Name(card) | Label::Face(card) => cards().get(card).name,
         Label::Pile { first: true, empty: true } => "First pile: nothing",
         Label::Pile { first: true, empty: false } => "First pile",
         Label::Pile { first: false, empty: true } => "Second pile: nothing",

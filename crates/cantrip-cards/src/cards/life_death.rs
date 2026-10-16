@@ -29,7 +29,7 @@ fn death(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static LIFE: CardDef = CardDef { spell: Some(SpellDef { targets: &[], effect: life }), ..oracle::LIFE };
 
 pub static DEATH: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[TargetSpec { min: 1, max: 1, filter: creature_card_in_your_graveyard }], effect: death }),
+    spell: Some(SpellDef { targets: &[TargetSpec { min: 1, max: 1, filter: creature_card_in_your_graveyard, label: "" }], effect: death }),
     ..oracle::DEATH
 };
 

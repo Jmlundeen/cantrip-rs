@@ -34,7 +34,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[ability(TAP, weld, "{T}: Choose target artifact a player controls and target artifact card in that player's graveyard. If both targets are still legal as this ability resolves, that player simultaneously sacrifices the artifact and returns the artifact card to the battlefield.")
         .targets(&[
             targets::ARTIFACT,
-            TargetSpec { min: 1, max: 1, filter: artifact_card_in_that_players_graveyard },
+            TargetSpec { min: 1, max: 1, filter: artifact_card_in_that_players_graveyard, label: "" },
         ])],
     ..oracle::GOBLIN_WELDER
 };

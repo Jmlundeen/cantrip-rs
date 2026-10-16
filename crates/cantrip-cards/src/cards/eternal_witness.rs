@@ -19,6 +19,6 @@ fn return_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(THIS_ENTERS, return_it, "When this creature enters, you may return target card from your graveyard to your hand.")
-        .targets(&[TargetSpec { min: 1, max: 1, filter: card_in_your_graveyard }])],
+        .targets(&[TargetSpec { min: 1, max: 1, filter: card_in_your_graveyard, label: "" }])],
     ..oracle::ETERNAL_WITNESS
 };

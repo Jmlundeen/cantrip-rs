@@ -24,7 +24,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[TargetSpec { min: 1, max: 1, filter: creature_or_enchantment }], effect }),
+    spell: Some(SpellDef { targets: &[TargetSpec { min: 1, max: 1, filter: creature_or_enchantment, label: "" }], effect }),
     ways: &[sneak::way(mana(0, 0, 0, 1, 0, 0), "Sneak {B}")],
     ..oracle::SHREDDERS_TECHNIQUE
 };

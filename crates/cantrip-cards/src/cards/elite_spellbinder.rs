@@ -8,7 +8,7 @@ fn look_and_exile(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(opponent) = item.targets[0].player() else { return Ok(()) };
     let hand = g.state().zone(Zone::hand(opponent)).to_vec();
     let eligible: Vec<ObjectId> = hand.iter().copied().filter(|&c| !g.chars(c).is(CardType::Land)).collect();
-    if let Some(&card) = choose::cards_from(g, item.controller, item.object, Purpose::Exile, hand, eligible, 1, true)?.first() {
+    if let Some(&card) = choose::cards_from_kind(g, item.controller, item.object, Purpose::Exile, "nonland", hand, eligible, 1, true)?.first() {
         let owner = g.obj(card).owner;
         let exiled = g.exile(card);
         if g.obj(exiled).zone.is(ZoneKind::Exile) && !g.obj(exiled).token {

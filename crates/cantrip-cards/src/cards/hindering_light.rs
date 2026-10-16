@@ -25,6 +25,6 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[TargetSpec { min: 1, max: 1, filter: targets_you_or_yours }], effect }),
+    spell: Some(SpellDef { targets: &[TargetSpec { min: 1, max: 1, filter: targets_you_or_yours, label: "" }], effect }),
     ..oracle::HINDERING_LIGHT
 };

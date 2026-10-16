@@ -36,7 +36,7 @@ fn minus_one_power(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
 }
 
 pub static CARD: CardDef = CardDef {
-    enchant: Some(TargetSpec { min: 1, max: 1, filter: enchant_filter }),
+    enchant: Some(TargetSpec { min: 1, max: 1, filter: enchant_filter, label: "" }),
     abilities: &[
         triggered(THIS_ENTERS, return_enchanted, "When Animate Dead enters, if it's on the battlefield, it loses \"enchant creature card in a graveyard\" and gains \"enchant creature put onto the battlefield with Animate Dead.\" Return enchanted creature card to the battlefield under your control and attach Animate Dead to it.")
             .condition(cantrip_mechanics::triggers::this_is_on_the_battlefield),

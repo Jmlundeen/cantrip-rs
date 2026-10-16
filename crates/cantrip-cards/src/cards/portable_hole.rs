@@ -18,6 +18,6 @@ fn exile_until_it_leaves(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspe
 
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(THIS_ENTERS, exile_until_it_leaves, "When this artifact enters, exile target nonland permanent an opponent controls with mana value 2 or less until this artifact leaves the battlefield.")
-        .targets(&[TargetSpec { min: 1, max: 1, filter: nonland_opponent_permanent_mv2 }])],
+        .targets(&[TargetSpec { min: 1, max: 1, filter: nonland_opponent_permanent_mv2, label: "" }])],
     ..oracle::PORTABLE_HOLE
 };

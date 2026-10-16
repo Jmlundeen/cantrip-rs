@@ -34,7 +34,7 @@ const MODES: &[ModeDef] = &[
     },
     ModeDef {
         text: "+ {1} — Destroy target enchantment.",
-        targets: &[TargetSpec { min: 1, max: 1, filter: enchantment }],
+        targets: &[TargetSpec { min: 1, max: 1, filter: enchantment, label: "" }],
         effect: destroy_it,
         cost: mana(1, 0, 0, 0, 0, 0),
     },

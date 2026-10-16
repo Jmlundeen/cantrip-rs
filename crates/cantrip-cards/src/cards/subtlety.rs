@@ -30,7 +30,7 @@ fn put_into_library(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ENTERS, put_into_library, "When this creature enters, choose up to one target creature spell or planeswalker spell. Its owner puts it on their choice of the top or bottom of their library.")
-            .targets(&[TargetSpec { min: 0, max: 1, filter: creature_or_planeswalker_spell }]),
+            .targets(&[TargetSpec { min: 0, max: 1, filter: creature_or_planeswalker_spell, label: "" }]),
         evoke::sacrifice_trigger("When Subtlety enters, if its evoke cost was paid, its controller sacrifices it."),
     ],
     // Evoke: exile a blue card from your hand rather than pay this spell's mana cost (CR 118.9).

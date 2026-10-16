@@ -338,6 +338,8 @@ fn purpose_view(purpose: Purpose, opening: bool) -> CardChoicePurposeView {
         Purpose::Keep => V::Keep,
         Purpose::PutIntoHand => V::PutIntoHand,
         Purpose::Cast => V::Cast,
+        Purpose::CastFree => V::CastFree,
+        Purpose::CastCopyFree | Purpose::CastCopyFreeWithin(_) => V::CastCopyFree,
         Purpose::TapToPay => V::TapToPay,
         Purpose::OrderSimultaneous => V::OrderSimultaneous,
         Purpose::Destroy => V::Destroy,
@@ -360,6 +362,10 @@ fn purpose_view(purpose: Purpose, opening: bool) -> CardChoicePurposeView {
         | Purpose::RevealForMiracle
         | Purpose::CastForMiracleCost
         | Purpose::PromiseGift
+        | Purpose::CastTransformedFree
+        | Purpose::CastForMadness
+        | Purpose::CastFoundOrHand
+        | Purpose::CastOrBottom
         | Purpose::AlternativeCost => V::Keep,
     }
 }
@@ -387,14 +393,65 @@ fn beheld_quality(game: &Game, source: ObjectId) -> &'static str {
     costs_of(game, source).iter().find_map(|c| c.behold.map(|(_, _, quality)| quality)).unwrap_or("")
 }
 
-fn may_verb(purpose: Purpose) -> String {
-    match purpose {
-        Purpose::Cast => "CastDuringResolution".into(),
-        Purpose::CastForMiracleCost => "CastForMiracleCost".into(),
-        Purpose::PromiseGift => "PromiseGift".into(),
-        Purpose::CopyAsEnters => "CopyAsEnters".into(),
-        other => format!("{other:?}"),
+/// The verb of a "you may" and its amount (`CastDuringResolution` with an amount of 1 is a cast without paying).
+fn may_verb(purpose: Purpose) -> (String, i32) {
+    let verb = match purpose {
+        Purpose::Cast => "CastDuringResolution",
+        Purpose::CastFree => return ("CastDuringResolution".into(), 1),
+        Purpose::CastCopyFree | Purpose::CastCopyFreeWithin(_) => "CastCopyWithoutPaying",
+        Purpose::CastTransformedFree => "CastTransformed",
+        Purpose::CastForMadness => "CastForMadnessCost",
+        Purpose::CastFoundOrHand => "CastFoundOrPutIntoHand",
+        Purpose::CastOrBottom => "CastWithoutPaying",
+        Purpose::CastForMiracleCost => "CastForMiracleCost",
+        Purpose::PromiseGift => "PromiseGift",
+        Purpose::CopyAsEnters => "CopyAsEnters",
+        other => return (format!("{other:?}"), 0),
+    };
+    (verb.into(), 0)
+}
+
+/// The modal spell or ability whose modes `modes` are the labels of.
+fn modal_of(game: &Game, modes: &[Label]) -> Option<&'static ModalDef> {
+    let Some(Label::Mode(ability, _)) = modes.first() else { return None };
+    let def = game.cards.get(ability.card);
+    if ability.index == u8::MAX {
+        def.modal
+    } else {
+        match def.abilities.get(ability.index as usize) {
+            Some(AbilityDef::Activated(a)) => a.modal,
+            Some(AbilityDef::Triggered(t)) => t.modal,
+            _ => None,
+        }
     }
+}
+
+/// What a choice of modes says beyond its heading, and whether choosing more of them than the fewest costs something: a
+/// modal's extra modes cost their escalate cost or their own cost (spree, CR 702.172a), the faces of a card are not modes
+/// at all, and the labels of a pile or a plain choice are chosen without a target.
+fn modes_detail(game: &Game, modes: &[Label], faces: bool) -> (String, bool) {
+    if faces {
+        return ("Only the face you choose is cast, with its own cost and mana value".into(), false);
+    }
+    match modal_of(game, modes) {
+        Some(modal) => {
+            if let Some(escalate) = modal.escalate {
+                (format!("Each mode past the first costs {}", cost_text_of(&escalate, "")), true)
+            } else if modal.modes.iter().any(|m| m.cost.mana_value() > 0) {
+                ("Each mode adds the cost shown with it".into(), true)
+            } else {
+                (String::new(), false)
+            }
+        }
+        None if modes.iter().all(|l| matches!(l, Label::Card(..) | Label::Name(_) | Label::Pile { .. })) => ("Chosen, not targeted".into(), false),
+        None => (String::new(), false),
+    }
+}
+
+/// What a card of the request is cast as, for the face choice: its name and its cost.
+fn face_text(game: &Game, face: CardId) -> String {
+    let def = game.cards.get(face);
+    if def.has_cost { format!("{} {}", def.name, def.cost) } else { def.name.to_string() }
 }
 
 fn handles_of(handles: &mut HandleSpace, ids: &[ObjectId]) -> Vec<ViewHandle> {
@@ -446,7 +503,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
             options: options_messages(game, handles, options),
             verb: "pay".into(),
         }),
-        RequestKind::ChooseCards { source, purpose, cards, eligible, count, up_to } => {
+        RequestKind::ChooseCards { source, purpose, cards, eligible, count, up_to, kind } => {
             let owner = if *purpose == Purpose::TakeFromHand {
                 cards.first().map_or(request.player, |c| game.state.obj(*c).owner)
             } else {
@@ -462,11 +519,15 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 count: i32::from(*count),
                 up_to: *up_to,
                 // Blight (CR 701.68a) is a creature you control; behold (CR 701.4a) names its quality ("Dragon"): the
-                // client says so in its caption.
+                // client says so in its caption. Any other choice is worded as the asking card words it ("nonland"), if it does.
                 kind: match purpose {
                     Purpose::Blight => "creature".into(),
                     Purpose::Behold => beheld_quality(game, *source).into(),
-                    _ => String::new(),
+                    _ => (*kind).to_string(),
+                },
+                maximum_mana_value: match purpose {
+                    Purpose::CastCopyFreeWithin(left) => i32::from(*left),
+                    _ => 0,
                 },
                 ..Default::default()
             })
@@ -502,34 +563,53 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 ..Default::default()
             })
         }
-        RequestKind::ChooseTarget { source, purpose, candidates, optional, count, any_number } => {
+        RequestKind::ChooseTarget { source, purpose, candidates, optional, count, any_number, label, slot_player } => {
             let source_handle = source_handle(game, handles, *source);
             PromptPayload::ChooseTargetPromptMessage(ChooseTargetPrompt {
                 player,
                 ability: source_handle,
                 source: source_handle,
-                text: String::new(),
+                text: (*label).to_string(),
                 candidates: candidates.iter().filter_map(|t| target_message(handles, *t)).collect(),
                 optional: *optional,
                 count: i32::from(*count),
                 targeted: *purpose == Purpose::Targets,
                 minimum: if *optional { 0 } else { i32::from(*count) },
                 any_number: *any_number,
+                for_player: slot_player.map_or(0, seat),
             })
         }
         RequestKind::ChooseModes { source, modes, eligible, count, at_most, affordable, additional_cost, repeat } => {
+            // The faces a card may be cast as (CR 709.3): not modes, so each is its name and its cost, and the question says so.
+            let faces = !modes.is_empty() && modes.iter().all(|l| matches!(l, Label::Face(_)));
+            let (detail, extra_modes_cost) = modes_detail(game, modes, faces);
             PromptPayload::ChooseModesPromptMessage(ChooseModesPrompt {
                 player,
                 source: source_handle(game, handles, *source),
-                modes: modes.iter().map(|l| label_text(l).to_string()).collect(),
+                modes: modes
+                    .iter()
+                    .map(|l| match l {
+                        Label::Face(face) => face_text(game, *face),
+                        other => label_text(other).to_string(),
+                    })
+                    .collect(),
                 eligible: eligible.iter().map(|&m| i32::from(m)).collect(),
                 count: i32::from(*count),
                 may_repeat: *repeat,
                 additional_cost: *additional_cost,
-                heading: String::new(),
+                heading: if faces { "Choose which face to cast".into() } else { String::new() },
                 at_most: i32::from(*at_most),
                 affordable: affordable.iter().map(|&m| i32::from(m)).collect(),
                 cost_kind: if *additional_cost { cost_kind(game, *source).into() } else { String::new() },
+                detail,
+                extra_modes_cost,
+                texts: modes
+                    .iter()
+                    .filter_map(|l| match l {
+                        Label::Face(face) => Some(game.cards.get(*face).text.to_string()),
+                        _ => None,
+                    })
+                    .collect(),
             })
         }
         RequestKind::ChooseSubtype { source, choices } => PromptPayload::ChooseModesPromptMessage(ChooseModesPrompt {
@@ -571,12 +651,10 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 names,
             })
         }
-        RequestKind::May { source, purpose } => PromptPayload::MayPromptMessage(MayPrompt {
-            player,
-            source: source_handle(game, handles, *source),
-            verb: may_verb(*purpose),
-            amount: 0,
-        }),
+        RequestKind::May { source, purpose } => {
+            let (verb, amount) = may_verb(*purpose);
+            PromptPayload::MayPromptMessage(MayPrompt { player, source: source_handle(game, handles, *source), verb, amount })
+        }
         RequestKind::ChoosePlayer { source, candidates, verb, amount } => PromptPayload::ChoosePlayerPromptMessage(ChoosePlayerPrompt {
             player,
             source: source_handle(game, handles, *source),
@@ -691,15 +769,29 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 may_shuffle: *may_shuffle,
             })
         }
-        RequestKind::SearchLibrary { source, library, eligible, count, optional } => {
+        RequestKind::SearchLibrary { source, library, eligible, count, optional, destination } => {
             let _ = source;
+            // Whose library it is: the cards in it are all its owner's.
+            let owner = library.first().map_or(request.player, |c| game.state.obj(*c).owner);
             PromptPayload::SearchLibraryPromptMessage(SearchLibraryPrompt {
                 player,
                 count: i32::from(*count),
                 optional: *optional,
                 library: handles_of(handles, library),
                 eligible: handles_of(handles, eligible),
-                destination: SearchDestinationView::Hand,
+                destination: match destination {
+                    SearchDestination::Hand => SearchDestinationView::Hand,
+                    SearchDestination::TopOfLibrary => SearchDestinationView::TopOfLibrary,
+                    SearchDestination::Graveyard => SearchDestinationView::Graveyard,
+                    SearchDestination::Battlefield => SearchDestinationView::Battlefield,
+                    SearchDestination::Exile => SearchDestinationView::Exile,
+                    SearchDestination::ExileFaceDown => SearchDestinationView::ExileFaceDown,
+                    SearchDestination::Cast => SearchDestinationView::Cast,
+                    SearchDestination::Found => SearchDestinationView::Found,
+                    SearchDestination::BattlefieldTapped => SearchDestinationView::BattlefieldTapped,
+                    SearchDestination::CastFree => SearchDestinationView::CastFree,
+                },
+                owner: seat(owner),
             })
         }
         RequestKind::ChooseReplacement { subject, sources, hints } => {
@@ -713,4 +805,74 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
         }
     };
     Ok((payload, request.may_cancel))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// A game dealt these two decks, top of the library first, and the objects of the first seat's opening hand.
+    fn game_with(first: &[&str]) -> (Game, Vec<ObjectId>) {
+        let deck = |top: &[&str]| top.iter().map(|c| c.to_string()).chain(std::iter::repeat_n("Forest".to_string(), 20)).collect::<Vec<_>>();
+        let game = deal(&[deck(first), deck(&[])], 1, false, None).expect("a game");
+        let seat = game.state.seats().next().expect("a seat");
+        let hand = game.state.zone(Zone::hand(seat)).to_vec();
+        (game, hand)
+    }
+
+    /// A choice is worded as its card words it, not as the cards that happen to be eligible: a hand with only creatures left is
+    /// still a choice of "a nonland card" when that is what the card says, and a card that says nothing says "card".
+    #[test]
+    fn a_choice_says_the_kind_its_card_gave_and_infers_none() {
+        let (game, hand) = game_with(&["Llanowar Elves", "Ornithopter", "Forest"]);
+        let creatures: Vec<ObjectId> = hand.iter().copied().filter(|&c| game.chars(c).is(CardType::Creature)).collect();
+        assert_eq!(creatures.len(), 2, "the Elves and the Ornithopter");
+        let seat = game.state.seats().next().expect("a seat");
+        let kind_of = |kind: &'static str| {
+            let request = Request {
+                id: 1,
+                player: seat,
+                kind: RequestKind::ChooseCards {
+                    source: hand[0],
+                    purpose: Purpose::Exile,
+                    cards: hand.clone(),
+                    eligible: creatures.clone(),
+                    count: 1,
+                    up_to: false,
+                    kind,
+                },
+                may_cancel: false,
+            };
+            match prompt(&game, &request, &mut HandleSpace::new()).expect("a prompt").0 {
+                PromptPayload::ChooseCardsPromptMessage(p) => p.kind,
+                other => panic!("{other:?}"),
+            }
+        };
+        assert_eq!(kind_of("nonland"), "nonland");
+        assert_eq!(kind_of("artifact or creature"), "artifact or creature");
+        // Only creatures were eligible, and nothing was said: nothing is claimed.
+        assert_eq!(kind_of(""), "");
+    }
+
+    #[test]
+    fn casts_during_resolution_are_asked_in_the_words_of_what_they_cost() {
+        assert_eq!(may_verb(Purpose::CastFree), ("CastDuringResolution".to_string(), 1));
+        assert_eq!(may_verb(Purpose::Cast), ("CastDuringResolution".to_string(), 0));
+        assert_eq!(may_verb(Purpose::CastCopyFree).0, "CastCopyWithoutPaying");
+        assert_eq!(may_verb(Purpose::CastForMadness).0, "CastForMadnessCost");
+        assert_eq!(may_verb(Purpose::CastTransformedFree).0, "CastTransformed");
+        assert_eq!(may_verb(Purpose::CastOrBottom).0, "CastWithoutPaying");
+        assert_eq!(may_verb(Purpose::CastFoundOrHand).0, "CastFoundOrPutIntoHand");
+    }
+
+    #[test]
+    fn the_faces_of_a_card_are_named_with_their_costs_and_say_so() {
+        let (game, _) = game_with(&["Bonecrusher Giant"]);
+        let giant = card("Bonecrusher Giant").expect("the card");
+        assert_eq!(face_text(&game, giant), "Bonecrusher Giant {2}{R}");
+
+        let (detail, costs) = modes_detail(&game, &[Label::Face(giant), Label::Face(giant)], true);
+        assert!(detail.contains("Only the face you choose"), "{detail}");
+        assert!(!costs);
+    }
 }

@@ -230,7 +230,7 @@ public enum CardChoicePurposeView
     /// <summary>The chosen permanent is sacrificed to pay the source's activation cost, or its alternative cost (CR 701.21).</summary>
     Sacrifice = 3,
 
-    /// <summary>The chosen cards are exiled by an effect as it resolves, from the hand named by <c>Owner</c>.</summary>
+    /// <summary>The chosen cards are exiled by an effect as it resolves, from wherever the prompt's cards are: a hand, graveyards, the battlefield.</summary>
     Exile = 4,
 
     /// <summary>The chosen permanent is returned to its owner's hand to pay the alternative cost of the spell being cast.</summary>
@@ -250,7 +250,7 @@ public enum CardChoicePurposeView
 
     /// <summary>The chosen card is put into the chooser's hand from among cards an effect just moved, as Barrowgoyf's milled cards; choosing nothing declines.</summary>
     PutIntoHand = 10,
-    /// <summary>The chosen card is cast as the effect resolves, from the chooser's graveyard; choosing nothing declines.</summary>
+    /// <summary>The chosen card is cast as the effect resolves, the chooser paying its costs (Bilbo, from the graveyard); choosing nothing declines.</summary>
     Cast = 11,
 
     /// <summary>The chosen creatures are tapped to pay a cost, their power adding up to the prompt's <c>MinimumPower</c> (saddle, CR 702.171a).</summary>
@@ -287,6 +287,12 @@ public enum CardChoicePurposeView
 
     /// <summary>Choose the creature you control that gets the -1/-1 counters a cost puts on a creature (CR 701.68a).</summary>
     Blight = 23,
+
+    /// <summary>The chosen card is cast as the effect resolves without paying its mana cost; choosing nothing declines (Etali, Improvisation Capstone, ripple).</summary>
+    CastFree = 24,
+
+    /// <summary>A copy of the chosen card is cast as the effect resolves without paying its mana cost (CR 707.12); choosing nothing declines (Uldaros Theorix).</summary>
+    CastCopyFree = 25,
 }
 
 /// <summary>Where cards found by a library search go (CR 701.23).</summary>
@@ -299,6 +305,15 @@ public enum SearchDestinationView
     Exile = 4,
     ExileFaceDown = 5,
     Cast = 6,
+
+    /// Onto the battlefield tapped (Nissa, Winds of Abandon).
+    BattlefieldTapped = 7,
+
+    /// Cast without paying its mana cost (Sunforger).
+    CastFree = 8,
+
+    /// What becomes of the card depends on which is found (Transmute Artifact): the search says only what it looks for.
+    Found = 9,
 }
 
 /// <summary>One of the places a card may be sent by a distribution: scry's bottom, surveil's graveyard, Stock Up's hand.</summary>

@@ -23,7 +23,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         ravenous::draw_trigger("When Mawloc enters, if X is 5 or more, draw a card."),
         triggered(THIS_ENTERS, terror_from_the_deep, "Terror from the Deep \u{2014} When Mawloc enters, it fights up to one target creature an opponent controls. If that creature would die this turn, exile it instead.")
-            .targets(&[TargetSpec { min: 0, max: 1, filter: targets::CREATURE_AN_OPPONENT_CONTROLS.filter }]),
+            .targets(&[TargetSpec { min: 0, max: 1, filter: targets::CREATURE_AN_OPPONENT_CONTROLS.filter, label: "" }]),
     ],
     granted_replacements: &[EXILE_INSTEAD_OF_DYING],
     ..oracle::MAWLOC

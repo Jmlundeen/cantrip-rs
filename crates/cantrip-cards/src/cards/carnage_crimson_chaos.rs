@@ -29,7 +29,7 @@ fn reanimate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(THIS_ENTERS, reanimate, "When Carnage enters, return target creature card with mana value 3 or less from your graveyard to the battlefield. It gains \"This creature attacks each combat if able\" and \"When this creature deals combat damage to a player, sacrifice it.\"")
-        .targets(&[TargetSpec { min: 1, max: 1, filter: cheap_creature_card }])],
+        .targets(&[TargetSpec { min: 1, max: 1, filter: cheap_creature_card, label: "" }])],
     ways: &[mayhem::way(mana(0, 0, 0, 1, 1, 0), "Mayhem {B}{R}")],
     delayed: &[triggered(cantrip_mechanics::triggers::DEALS_COMBAT_DAMAGE_TO_PLAYER, cantrip_mechanics::effects::sacrifice_self, "When this creature deals combat damage to a player, sacrifice it.")],
     ..oracle::CARNAGE_CRIMSON_CHAOS

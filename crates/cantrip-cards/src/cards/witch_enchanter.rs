@@ -24,7 +24,7 @@ pub static BACK: CardDef = CardDef {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(THIS_ENTERS, destroy, "When this creature enters, destroy target artifact or enchantment an opponent controls.")
-        .targets(&[TargetSpec { min: 1, max: 1, filter: opponents_artifact_or_enchantment }])],
+        .targets(&[TargetSpec { min: 1, max: 1, filter: opponents_artifact_or_enchantment, label: "" }])],
     back: Some(&BACK),
     ..oracle::WITCH_ENCHANTER
 };

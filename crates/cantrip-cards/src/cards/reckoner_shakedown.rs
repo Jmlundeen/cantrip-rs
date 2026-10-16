@@ -19,8 +19,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
             cards: hand,
             eligible,
             count,
-            up_to: true,
-        };
+            up_to: true, kind: "" };
         if let Answer::Cards(cards) = g.ask(item.controller, ask)? {
             chosen = cards;
         }
@@ -41,7 +40,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         0 => None,
         1 => Some(candidates[0]),
         _ => {
-            let ask = RequestKind::ChooseTarget {
+            let ask = RequestKind::ChooseTarget { label: "", slot_player: None,
                 source: item.object,
                 purpose: Purpose::Targets,
                 candidates: candidates.iter().map(|&id| Target::Object(id)).collect(),

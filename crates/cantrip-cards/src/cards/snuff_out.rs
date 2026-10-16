@@ -22,7 +22,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[TargetSpec { min: 1, max: 1, filter: nonblack_creature }], effect }),
+    spell: Some(SpellDef { targets: &[TargetSpec { min: 1, max: 1, filter: nonblack_creature, label: "" }], effect }),
     ways: &[WayDef {
         text: "Pay 4 life",
         cost: Cost { life: 4, ..Cost::NONE },

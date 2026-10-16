@@ -19,7 +19,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         mana_ability(TAP, add(Mana::C), "{T}: Add {C}."),
         ability(TAP.and(SACRIFICE_THIS), destroy_land, "{T}, Sacrifice Wasteland: Destroy target nonbasic land.")
-            .targets(&[TargetSpec { min: 1, max: 1, filter: nonbasic_land }]),
+            .targets(&[TargetSpec { min: 1, max: 1, filter: nonbasic_land, label: "" }]),
     ],
     ..oracle::WASTELAND
 };

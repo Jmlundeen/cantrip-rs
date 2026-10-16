@@ -97,7 +97,7 @@ fn cascade_resolves(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     // cast is the spell, so only a face under the limit may be (CR 702.85a, 709.3b, 715.3b).
     if let Some(card) = hit {
         let ways: Vec<CastWay> = g.cast_ways_during_resolution(card).into_iter().filter(|w| u32::from(w.mana_value) < limit).collect();
-        if !ways.is_empty() && matches!(g.ask(player, RequestKind::May { source: card, purpose: Purpose::Cast })?, Answer::Yes)
+        if !ways.is_empty() && matches!(g.ask(player, RequestKind::May { source: card, purpose: Purpose::CastOrBottom })?, Answer::Yes)
             && let Some(way) = crate::choose::cast_way(g, player, card, ways)?
         {
             g.cast_during_resolution_as(card, CastTerms { instead: Some(ManaCost::ZERO), way: Some(way.way), ..CastTerms::default() })?;

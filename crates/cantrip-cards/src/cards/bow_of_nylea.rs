@@ -27,7 +27,7 @@ fn card_in_your_graveyard(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     targets::card_in_your_graveyard(q, asker, t, &[]) && !q.chosen_targets().contains(&t)
 }
 
-const UP_TO_ONE_CARD: TargetSpec = TargetSpec { min: 0, max: 1, filter: card_in_your_graveyard };
+const UP_TO_ONE_CARD: TargetSpec = TargetSpec { min: 0, max: 1, filter: card_in_your_graveyard, label: "" };
 
 /// Put a +1/+1 counter on target creature.
 fn counter_on_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -62,7 +62,7 @@ static MODAL: ModalDef = ModalDef {
         ModeDef { text: "Put a +1/+1 counter on target creature.", targets: &[targets::CREATURE], effect: counter_on_creature, cost: ManaCost::ZERO },
         ModeDef {
             text: "Bow of Nylea deals 2 damage to target creature with flying.",
-            targets: &[TargetSpec { min: 1, max: 1, filter: creature_with_flying }],
+            targets: &[TargetSpec { min: 1, max: 1, filter: creature_with_flying, label: "" }],
             effect: two_damage,
             cost: ManaCost::ZERO,
         },

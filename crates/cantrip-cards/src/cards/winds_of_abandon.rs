@@ -22,7 +22,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let mut lands: Vec<(ObjectId, PlayerId, bool)> = Vec::new();
     for &player in &order {
         let count = controllers.iter().filter(|&&p| p == player).count() as u8;
-        let found = search_library(g, player, player, item.object, count, true, |q, c| {
+        let found = search_library(g, player, player, item.object, SearchDestination::BattlefieldTapped, count, true, |q, c| {
             let chars = q.chars(c);
             chars.is(CardType::Land) && chars.supertypes.basic
         })?;
@@ -36,7 +36,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[TargetSpec { min: 1, max: 1, filter: creature_you_dont_control }], effect }),
+    spell: Some(SpellDef { targets: &[TargetSpec { min: 1, max: 1, filter: creature_you_dont_control, label: "" }], effect }),
     overload: Some(mana(4, 2, 0, 0, 0, 0)),
     ..oracle::WINDS_OF_ABANDON
 };

@@ -18,8 +18,7 @@ fn look_and_exile(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         cards: hand,
         count: eligible.len().min(1) as u8,
         eligible,
-        up_to: true,
-    };
+        up_to: true, kind: "" };
     if let Answer::Cards(cards) = g.ask(item.controller, ask)? {
         g.exile_with(&cards, item.object, true);
     }

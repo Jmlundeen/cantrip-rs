@@ -34,7 +34,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ENTERS, search_artifact, "When this creature enters, you may search your library for an artifact card, put it into your graveyard, then shuffle."),
         ability(cost("{R}, {T}").and(sacrifice(1, targets::filters::artifact)), reanimate_artifact, "{R}, {T}, Sacrifice an artifact: Return target artifact card with mana value 3 or less from your graveyard to the battlefield.")
-            .targets(&[TargetSpec { min: 1, max: 1, filter: cheap_artifact_in_your_graveyard }]),
+            .targets(&[TargetSpec { min: 1, max: 1, filter: cheap_artifact_in_your_graveyard, label: "" }]),
     ],
     ..oracle::GOBLIN_ENGINEER
 };

@@ -12,7 +12,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     spell: Some(SpellDef {
-        targets: &[TargetSpec { min: 1, max: TargetSpec::COUNTED, filter: targets::CREATURE.filter }],
+        targets: &[TargetSpec { min: 1, max: TargetSpec::COUNTED, filter: targets::CREATURE.filter, label: "" }],
         effect,
     }),
     divide: Some(Divide { total: TargetSpec::COUNTED, of_x: None }),

@@ -20,6 +20,6 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[TargetSpec { min: 1, max: 1, filter: target_filter }], effect }),
+    spell: Some(SpellDef { targets: &[TargetSpec { min: 1, max: 1, filter: target_filter, label: "" }], effect }),
     ..oracle::EXORCISE
 };

@@ -22,6 +22,6 @@ fn ping(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[ability(TAP_AN_UNTAPPED_CREATURE, ping, "Tap an untapped creature you control: This enchantment deals 1 damage to target player or planeswalker.")
-        .targets(&[TargetSpec { min: 1, max: 1, filter: player_or_planeswalker }])],
+        .targets(&[TargetSpec { min: 1, max: 1, filter: player_or_planeswalker, label: "" }])],
     ..oracle::KYREN_NEGOTIATIONS
 };

@@ -26,7 +26,7 @@ fn mind_swap(g: &mut dyn Game, entry: &mut Entering) -> Result<(), Suspend> {
     if g.ask(controller, RequestKind::May { source: entering, purpose: Purpose::CopyAsEnters })? != Answer::Yes {
         return Ok(());
     }
-    let ask = RequestKind::ChooseTarget {
+    let ask = RequestKind::ChooseTarget { label: "", slot_player: None,
         source: entering,
         purpose: Purpose::CopyWhich,
         candidates: cards.iter().map(|&id| Target::Object(id)).collect(),

@@ -35,7 +35,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     spell: Some(SpellDef {
-        targets: &[TargetSpec { min: 0, max: 254, filter: creature_card_in_your_graveyard }],
+        targets: &[TargetSpec { min: 0, max: 254, filter: creature_card_in_your_graveyard, label: "" }],
         effect,
     }),
     ..oracle::FOREVER_YOUNG

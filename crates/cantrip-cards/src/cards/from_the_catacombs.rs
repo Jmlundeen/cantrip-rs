@@ -24,7 +24,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[TargetSpec { min: 1, max: 1, filter: creature_card_in_a_graveyard }], effect }),
+    spell: Some(SpellDef { targets: &[TargetSpec { min: 1, max: 1, filter: creature_card_in_a_graveyard, label: "" }], effect }),
     ways: &[escape::way(mana(3, 0, 0, 2, 0, 0), 5, "Escape\u{2014}{3}{B}{B}, Exile five other cards from your graveyard")],
     ..oracle::FROM_THE_CATACOMBS
 };

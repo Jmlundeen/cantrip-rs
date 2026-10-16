@@ -27,7 +27,7 @@ static MODAL: ModalDef = ModalDef {
     modes: &[
         ModeDef {
             text: "Put a +1/+1 counter on target Wolf you control.",
-            targets: &[TargetSpec { min: 1, max: 1, filter: wolf_you_control }],
+            targets: &[TargetSpec { min: 1, max: 1, filter: wolf_you_control, label: "" }],
             effect: counter,
             cost: ManaCost::ZERO,
         },

@@ -1049,7 +1049,7 @@ fn retarget(cx: &mut Cx, top: usize, object: ObjectId, asked_about: ObjectId, ch
         if candidates.len() <= current.len() && candidates.iter().all(|c| current.contains(c)) {
             continue;
         }
-        let ask = RequestKind::ChooseTarget {
+        let ask = RequestKind::ChooseTarget { label: "", slot_player: None,
             source: asked_about,
             purpose: Purpose::Targets,
             candidates: candidates.clone(),
@@ -1126,7 +1126,7 @@ pub fn change_target(cx: &mut Cx, of: Target, chooser: PlayerId) -> R<()> {
         changed.targets[slot] = if others.len() == 1 {
             others[0]
         } else {
-            let ask = RequestKind::ChooseTarget {
+            let ask = RequestKind::ChooseTarget { label: "", slot_player: None,
                 source: item.object,
                 purpose: Purpose::Targets,
                 candidates: others.clone(),
@@ -1698,7 +1698,7 @@ pub fn proliferate(cx: &mut Cx, player: PlayerId, source: ObjectId) -> R<()> {
     if candidates.is_empty() {
         return Ok(());
     }
-    let ask = RequestKind::ChooseTarget {
+    let ask = RequestKind::ChooseTarget { label: "", slot_player: None,
         source,
         purpose: Purpose::Targets,
         count: candidates.len().min(255) as u8,

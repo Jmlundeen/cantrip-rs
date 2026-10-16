@@ -32,7 +32,7 @@ pub static CARD: CardDef = CardDef {
         ),
     ],
     delayed: &[triggered(cantrip_mechanics::triggers::YOUR_END_STEP, blink, "At the beginning of your end step, exile up to one other target nonland permanent you control, then return that card to the battlefield under its owner's control.")
-        .targets(&[TargetSpec { min: 0, max: 1, filter: other_nonland_permanent_you_control }])],
+        .targets(&[TargetSpec { min: 0, max: 1, filter: other_nonland_permanent_you_control, label: "" }])],
     statics: &[harness::infinity(
         "\u{221e} \u{2014} At the beginning of your end step, exile up to one other target nonland permanent you control, then return that card to the battlefield under its owner's control.",
     )],

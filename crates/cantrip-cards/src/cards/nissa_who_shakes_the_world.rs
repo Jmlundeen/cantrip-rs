@@ -50,9 +50,8 @@ fn animate_land(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 fn emblem_and_forests(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     tokens::create_emblem(g, item.controller, &EMBLEM);
     let you = item.controller;
-    let forests = g.state().zone(Zone::library(you)).len().min(255) as u8;
     let forest = g.words(item.object).subtype(Subtype::Forest);
-    let found = search_library(g, you, you, item.object, forests, true, |q, c| q.chars(c).has_subtype(forest))?;
+    let found = search_library(g, you, you, item.object, SearchDestination::BattlefieldTapped, u8::MAX, true, |q, c| q.chars(c).has_subtype(forest))?;
     let lands: Vec<(ObjectId, PlayerId, bool)> = found.into_iter().map(|c| (c, you, true)).collect();
     g.put_all_onto_battlefield_as(&lands)?;
     g.shuffle(you);
@@ -88,7 +87,7 @@ pub static CARD: CardDef = CardDef {
         triggered(when(EventMask::TAPPED, forest_tapped_for_mana), add_green, "Whenever you tap a Forest for mana, add an additional {G}.")
             .mana_ability(),
         ability(loyalty(1), animate_land, "+1: Put three +1/+1 counters on up to one target noncreature land you control. Untap it. It becomes a 0/0 Elemental creature with vigilance and haste that's still a land.")
-            .targets(&[TargetSpec { min: 0, max: 1, filter: noncreature_land_you_control }]),
+            .targets(&[TargetSpec { min: 0, max: 1, filter: noncreature_land_you_control, label: "" }]),
         ability(loyalty(-8), emblem_and_forests, "\u{2212}8: You get an emblem with \"Lands you control have indestructible.\" Search your library for any number of Forest cards, put them onto the battlefield tapped, then shuffle."),
     ],
     ..oracle::NISSA_WHO_SHAKES_THE_WORLD

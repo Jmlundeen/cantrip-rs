@@ -15,7 +15,7 @@ fn destroy_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ENTERS, destroy_it, "When this creature enters, destroy target noncreature permanent.")
-            .targets(&[TargetSpec { min: 1, max: 1, filter: noncreature_permanent }]),
+            .targets(&[TargetSpec { min: 1, max: 1, filter: noncreature_permanent, label: "" }]),
         persist::trigger("Persist (When this creature dies, if it had no -1/-1 counters on it, return it to the battlefield under its owner's control with a -1/-1 counter on it.)"),
     ],
     ..oracle::WOODFALL_PRIMUS

@@ -100,7 +100,7 @@ fn suspend_cast(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if !crate::game::is_live(g, card) || !g.obj(card).zone.is(ZoneKind::Exile) || !g.could_cast_during_resolution(card) {
         return Ok(());
     }
-    if g.ask(item.controller, RequestKind::May { source: card, purpose: Purpose::Cast })? == Answer::Yes {
+    if g.ask(item.controller, RequestKind::May { source: card, purpose: Purpose::CastFree })? == Answer::Yes {
         g.cast_during_resolution(card, Some(ManaCost::ZERO))?;
     }
     Ok(())
@@ -117,7 +117,7 @@ fn siege_defeated(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if !g.obj(card).zone.is(ZoneKind::Exile) || !g.could_cast_transformed_during_resolution(card) {
         return Ok(());
     }
-    if g.ask(item.controller, RequestKind::May { source: card, purpose: Purpose::Cast })? == Answer::Yes {
+    if g.ask(item.controller, RequestKind::May { source: card, purpose: Purpose::CastTransformedFree })? == Answer::Yes {
         g.cast_transformed_during_resolution(card)?;
     }
     Ok(())

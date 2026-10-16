@@ -52,7 +52,7 @@ pub static EXTRA: &[&CardDef] = &[&ELEMENTAL];
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ENTERS, return_land, "When Titania, Protector of Argoth enters, return target land card from your graveyard to the battlefield.")
-            .targets(&[TargetSpec { min: 1, max: 1, filter: land_card_in_your_graveyard }]),
+            .targets(&[TargetSpec { min: 1, max: 1, filter: land_card_in_your_graveyard, label: "" }]),
         triggered(when(EventMask::ZONE_CHANGE, land_you_control_goes_to_graveyard), create_elemental, "Whenever a land you control is put into a graveyard from the battlefield, create a 5/3 green Elemental creature token.")
             .look_back(),
     ],

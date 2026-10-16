@@ -12,7 +12,7 @@ fn take_a_card(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         return Ok(());
     }
     let eligible: Vec<ObjectId> = hand.iter().copied().filter(|&c| !g.chars(c).is(CardType::Land)).collect();
-    let ask = RequestKind::ChooseCards { source: item.object, purpose: Purpose::Exile, cards: hand, eligible, count: 1, up_to: true };
+    let ask = RequestKind::ChooseCards { source: item.object, purpose: Purpose::Exile, cards: hand, eligible, count: 1, up_to: true, kind: "" };
     let Answer::Cards(chosen) = g.ask(item.controller, ask)? else { return Ok(()) };
     let Some(&card) = chosen.first() else { return Ok(()) };
     let exiled = g.exile(card);

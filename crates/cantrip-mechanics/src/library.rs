@@ -28,8 +28,8 @@ impl Find {
     }
 }
 
-fn find(g: &mut dyn Game, player: PlayerId, source: ObjectId, find: Find, eligible: impl Fn(&dyn Query, ObjectId) -> bool) -> Result<Vec<ObjectId>, Suspend> {
-    let found = search_library(g, player, player, source, find.count, find.optional, eligible)?;
+fn find(g: &mut dyn Game, player: PlayerId, source: ObjectId, destination: SearchDestination, find: Find, eligible: impl Fn(&dyn Query, ObjectId) -> bool) -> Result<Vec<ObjectId>, Suspend> {
+    let found = search_library(g, player, player, source, destination, find.count, find.optional, eligible)?;
     if find.reveal {
         g.reveal(player, &found);
     }
@@ -54,7 +54,7 @@ pub fn search_to_exile(
     also: &[ObjectId],
     eligible: impl Fn(&dyn Query, ObjectId) -> bool,
 ) -> Result<Vec<ObjectId>, Suspend> {
-    let found = search_library(g, searcher, owner, source, how.count, how.optional, eligible)?;
+    let found = search_library(g, searcher, owner, source, SearchDestination::Exile, how.count, how.optional, eligible)?;
     if how.reveal {
         g.reveal(searcher, &found);
     }
@@ -73,7 +73,7 @@ pub fn search_to_hand(
     how: Find,
     eligible: impl Fn(&dyn Query, ObjectId) -> bool,
 ) -> Result<Vec<ObjectId>, Suspend> {
-    let found = find(g, player, source, how, eligible)?;
+    let found = find(g, player, source, SearchDestination::Hand, how, eligible)?;
     let moves: Vec<(ObjectId, Zone)> = found.iter().map(|&c| (c, Zone::hand(player))).collect();
     let moved = g.move_together(&moves, ZoneReason::Search);
     g.shuffle(player);
@@ -89,7 +89,7 @@ pub fn search_to_graveyard(
     how: Find,
     eligible: impl Fn(&dyn Query, ObjectId) -> bool,
 ) -> Result<Vec<ObjectId>, Suspend> {
-    let found = find(g, player, source, how, eligible)?;
+    let found = find(g, player, source, SearchDestination::Graveyard, how, eligible)?;
     let moves: Vec<(ObjectId, Zone)> = found.iter().map(|&c| (c, Zone::graveyard(player))).collect();
     let moved = g.move_together(&moves, ZoneReason::Search);
     g.shuffle(player);
@@ -106,7 +106,7 @@ pub fn search_to_battlefield(
     tapped: bool,
     eligible: impl Fn(&dyn Query, ObjectId) -> bool,
 ) -> Result<Vec<ObjectId>, Suspend> {
-    let found = find(g, player, source, how, eligible)?;
+    let found = find(g, player, source, if tapped { SearchDestination::BattlefieldTapped } else { SearchDestination::Battlefield }, how, eligible)?;
     let mut arrived = Vec::new();
     for card in found {
         arrived.push(g.put_onto_battlefield(card, player, tapped)?);
@@ -124,7 +124,7 @@ pub fn search_to_top(
     how: Find,
     eligible: impl Fn(&dyn Query, ObjectId) -> bool,
 ) -> Result<Vec<ObjectId>, Suspend> {
-    let found = find(g, player, source, how, eligible)?;
+    let found = find(g, player, source, SearchDestination::TopOfLibrary, how, eligible)?;
     g.shuffle(player);
     if !found.is_empty() {
         g.arrange_library(player, &found, &[]);

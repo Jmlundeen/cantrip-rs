@@ -11,7 +11,7 @@ use cantrip_oracle as oracle;
 /// asked of the resulting spell, X being zero (CR 118.9, 202.3).
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
-    let found = search_library(g, you, you, item.object, 1, false, |_, _| true)?;
+    let found = search_library(g, you, you, item.object, SearchDestination::ExileFaceDown, 1, false, |_, _| true)?;
     let mut exiled = None;
     if let Some(&card) = found.first() {
         let new = g.exile_face_down(&[card], None);
@@ -24,7 +24,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         // "If that spell's mana value is 4 or less": the face it is cast as is the spell (CR 709.3b, 715.3b).
         let ways = g.cast_ways_during_resolution(card).into_iter().filter(|w| w.mana_value <= 4).collect::<Vec<_>>();
         if !ways.is_empty()
-            && effects::ask_may(g, you, card, Purpose::Cast)?
+            && effects::ask_may(g, you, card, Purpose::CastFoundOrHand)?
             && let Some(way) = choose::cast_way(g, you, card, ways)?
             && g.cast_during_resolution_as(card, CastTerms { instead: Some(ManaCost::ZERO), way: Some(way.way), ..CastTerms::default() })?
         {

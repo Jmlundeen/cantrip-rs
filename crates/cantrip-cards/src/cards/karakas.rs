@@ -19,7 +19,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         mana_ability(TAP, add(Mana::W), "{T}: Add {W}."),
         ability(TAP, bounce, "{T}: Return target legendary creature to its owner's hand.")
-            .targets(&[TargetSpec { min: 1, max: 1, filter: legendary_creature }]),
+            .targets(&[TargetSpec { min: 1, max: 1, filter: legendary_creature, label: "" }]),
     ],
     ..oracle::KARAKAS
 };

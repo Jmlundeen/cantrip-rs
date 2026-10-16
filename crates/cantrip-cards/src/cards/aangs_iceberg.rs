@@ -30,7 +30,7 @@ fn sacrifice_and_scry(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ENTERS, exile_until_it_leaves, "When this enchantment enters, exile up to one other target nonland permanent until this enchantment leaves the battlefield.")
-            .targets(&[TargetSpec { min: 0, max: 1, filter: other_nonland_permanent }]),
+            .targets(&[TargetSpec { min: 0, max: 1, filter: other_nonland_permanent, label: "" }]),
         ability(cost("{3}"), sacrifice_and_scry, "Waterbend {3}: Sacrifice this enchantment. If you do, scry 2. (While paying a waterbend cost, you can tap your artifacts and creatures to help. Each one pays for {1}.)")
             .waterbend(),
     ],

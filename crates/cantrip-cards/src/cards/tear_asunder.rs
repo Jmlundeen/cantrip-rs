@@ -24,7 +24,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[TargetSpec { min: 1, max: 1, filter: artifact_or_enchantment }], effect }),
+    spell: Some(SpellDef { targets: &[TargetSpec { min: 1, max: 1, filter: artifact_or_enchantment, label: "" }], effect }),
     kicker: Some(Kicker { cost: mana(1, 0, 0, 1, 0, 0), multi: false, waterbend: false }),
     late_targets: true,
     ..oracle::TEAR_ASUNDER

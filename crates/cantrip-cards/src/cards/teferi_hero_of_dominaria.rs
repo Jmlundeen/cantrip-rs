@@ -55,7 +55,7 @@ pub static EMBLEM: CardDef = CardDef {
     name: "Teferi, Hero of Dominaria emblem",
     has_cost: false,
     abilities: &[triggered(when(EventMask::DREW, you_draw), exile_it, "Whenever you draw a card, exile target permanent an opponent controls.")
-        .targets(&[TargetSpec { min: 1, max: 1, filter: opponents_permanent }])],
+        .targets(&[TargetSpec { min: 1, max: 1, filter: opponents_permanent, label: "" }])],
     text: "Whenever you draw a card, exile target permanent an opponent controls.",
     ..CardDef::BLANK
 };

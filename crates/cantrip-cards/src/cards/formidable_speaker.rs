@@ -33,7 +33,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ENTERS, discard_and_search, "When this creature enters, you may discard a card. If you do, search your library for a creature card, reveal it, put it into your hand, then shuffle."),
         ability(cost("{1}, {T}"), untap_target, "{1}, {T}: Untap another target permanent.")
-            .targets(&[TargetSpec { min: 1, max: 1, filter: other_permanent }]),
+            .targets(&[TargetSpec { min: 1, max: 1, filter: other_permanent, label: "" }]),
     ],
     ..oracle::FORMIDABLE_SPEAKER
 };

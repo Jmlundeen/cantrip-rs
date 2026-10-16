@@ -39,7 +39,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ENTERS, two_cats, "When Esika's Chariot enters, create two 2/2 green Cat creature tokens."),
         triggered(cantrip_mechanics::triggers::THIS_ATTACKS, copy_token, "Whenever Esika's Chariot attacks, create a token that's a copy of target token you control.")
-            .targets(&[TargetSpec { min: 1, max: 1, filter: token_you_control }]),
+            .targets(&[TargetSpec { min: 1, max: 1, filter: token_you_control, label: "" }]),
         crew(4, "Crew 4 (Tap any number of creatures you control with total power 4 or more: This Vehicle becomes an artifact creature until end of turn.)"),
     ],
     ..oracle::ESIKAS_CHARIOT

@@ -54,13 +54,13 @@ static MODAL: ModalDef = ModalDef {
     modes: &[
         ModeDef {
             text: "Counter target spell, activated ability, or triggered ability. Its controller draws a card.",
-            targets: &[TargetSpec { min: 1, max: 1, filter: spell_or_ability }],
+            targets: &[TargetSpec { min: 1, max: 1, filter: spell_or_ability, label: "" }],
             effect: counter_and_draw,
             cost: ManaCost::ZERO,
         },
         ModeDef {
             text: "Destroy another target creature or planeswalker. Its controller draws a card.",
-            targets: &[TargetSpec { min: 1, max: 1, filter: another_creature_or_planeswalker }],
+            targets: &[TargetSpec { min: 1, max: 1, filter: another_creature_or_planeswalker, label: "" }],
             effect: destroy_and_draw,
             cost: ManaCost::ZERO,
         },

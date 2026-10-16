@@ -153,7 +153,7 @@ fn behold_candidates(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cos
 fn choose_behold(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) -> R<Vec<ObjectId>> {
     let Some((n, _, _)) = cost.behold else { return Ok(Vec::new()) };
     let eligible = behold_candidates(cx, source, player, cost);
-    let ask = RequestKind::ChooseCards { source, purpose: Purpose::Behold, cards: eligible.clone(), eligible, count: n, up_to: false };
+    let ask = RequestKind::ChooseCards { source, purpose: Purpose::Behold, cards: eligible.clone(), eligible, count: n, up_to: false, kind: "" };
     match cx.ask_core(player, ask, true)? {
         Answer::Cards(cards) => Ok(cards),
         _ => Err(Stop::Cancel),
@@ -179,7 +179,7 @@ fn choose_blight(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) -
         return Ok(None);
     }
     let eligible = blight_candidates(cx, player);
-    let ask = RequestKind::ChooseCards { source, purpose: Purpose::Blight, cards: eligible.clone(), eligible, count: 1, up_to: false };
+    let ask = RequestKind::ChooseCards { source, purpose: Purpose::Blight, cards: eligible.clone(), eligible, count: 1, up_to: false, kind: "" };
     match cx.ask_core(player, ask, true)? {
         Answer::Cards(cards) => cards.first().copied().map(Some).ok_or(Stop::Cancel),
         _ => Err(Stop::Cancel),
@@ -284,7 +284,7 @@ fn choose_discards(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost)
     let asker = Asker { source, controller: player };
     let hand: Vec<ObjectId> = cx.s().zone(Zone::hand(player)).to_vec();
     let eligible: Vec<ObjectId> = hand.iter().copied().filter(|&c| c != source && filter(cx, &asker, c)).collect();
-    let ask = RequestKind::ChooseCards { source, purpose: Purpose::Discard, cards: hand, eligible, count: n, up_to: false };
+    let ask = RequestKind::ChooseCards { source, purpose: Purpose::Discard, cards: hand, eligible, count: n, up_to: false, kind: "" };
     match cx.ask_core(player, ask, true)? {
         Answer::Cards(cards) => Ok(cards),
         _ => Err(Stop::Cancel),
@@ -298,7 +298,7 @@ fn choose_hand_exiles(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Co
     let asker = Asker { source, controller: player };
     let hand: Vec<ObjectId> = cx.s().zone(Zone::hand(player)).to_vec();
     let eligible: Vec<ObjectId> = hand.iter().copied().filter(|&c| c != source && filter(cx, &asker, c)).collect();
-    let ask = RequestKind::ChooseCards { source, purpose: Purpose::ExileToPay, cards: hand, eligible, count: n, up_to: false };
+    let ask = RequestKind::ChooseCards { source, purpose: Purpose::ExileToPay, cards: hand, eligible, count: n, up_to: false, kind: "" };
     match cx.ask_core(player, ask, true)? {
         Answer::Cards(cards) => Ok(cards),
         _ => Err(Stop::Cancel),
@@ -332,8 +332,7 @@ fn choose_exiles(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) -
         cards: cards.clone(),
         eligible: cards,
         count: cost.exile_from_graveyard,
-        up_to: false,
-    };
+        up_to: false, kind: "" };
     match cx.ask_core(player, ask, true)? {
         Answer::Cards(cards) => Ok(cards),
         _ => Err(Stop::Cancel),
@@ -361,7 +360,7 @@ fn choose_permanents(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cos
     } else {
         Purpose::SacrificeCost
     };
-    let ask = RequestKind::ChooseCards { source, purpose, cards: eligible.clone(), eligible, count: p.count, up_to: false };
+    let ask = RequestKind::ChooseCards { source, purpose, cards: eligible.clone(), eligible, count: p.count, up_to: false, kind: "" };
     match cx.ask_core(player, ask, true)? {
         Answer::Cards(cards) => Ok(cards),
         _ => Err(Stop::Cancel),
@@ -452,7 +451,7 @@ fn variable_payable(cx: &Cx, source: ObjectId, player: PlayerId, variable: Varia
 }
 
 fn ask_cards(cx: &mut Cx, player: PlayerId, source: ObjectId, purpose: Purpose, cards: Vec<ObjectId>, count: usize, up_to: bool) -> R<Vec<ObjectId>> {
-    let ask = RequestKind::ChooseCards { source, purpose, cards: cards.clone(), eligible: cards, count: count.min(255) as u8, up_to };
+    let ask = RequestKind::ChooseCards { source, purpose, cards: cards.clone(), eligible: cards, count: count.min(255) as u8, up_to, kind: "" };
     match cx.ask_core(player, ask, true)? {
         Answer::Cards(cards) => Ok(cards),
         _ => Err(Stop::Cancel),
@@ -1770,9 +1769,29 @@ fn covers_total(cx: &Cx, a: &Available, player: PlayerId, card: ObjectId, def: &
     if no_mana { cost.is_zero() } else { a.covers_spell(&cost, spell_kind(def)) }
 }
 
-/// The text an option is matched by: an alternative cost's or an ability's.
-pub fn describe(cards: &CardTable, state: &GameState, option: &ActionOption) -> &'static str {
-    let Some(source) = option.source else { return "" };
+/// The text an option is matched by and a menu row shows: an alternative cost's, a granted way's or an ability's. A cast a
+/// standing permission lets a card have (CR 601.3) says what the permission changes: "Flashback {2}{R}" for a flashback granted
+/// (Snapcaster Mage), "Cast without paying its mana cost", "Cast by paying {1}{U} instead".
+pub fn describe(cards: &CardTable, state: &GameState, option: &ActionOption) -> std::borrow::Cow<'static, str> {
+    let Some(source) = option.source else { return "".into() };
+    if option.kind == ActionKind::CastSpell
+        && option.index == 0
+        && let Some(grant) = state.permissions.iter().find(|p| p.card == source && (p.grant.instead.is_some() || p.grant.exile_after)).map(|p| p.grant)
+    {
+        // A flashback granted costs the card's own mana cost unless the grant names another.
+        let cost = grant.instead.unwrap_or_else(|| cards.get(state.obj(source).card).cost);
+        return if grant.exile_after {
+            format!("Flashback {cost}").into()
+        } else if cost == ManaCost::ZERO {
+            "Cast without paying its mana cost".into()
+        } else {
+            format!("Cast by paying {cost} instead").into()
+        };
+    }
+    describe_way(cards, state, option, source).into()
+}
+
+fn describe_way(cards: &CardTable, state: &GameState, option: &ActionOption, source: ObjectId) -> &'static str {
     match option.kind {
         ActionKind::CastSpell if option.index == WAY_ADVENTURE => {
             cards.get(state.obj(source).card).adventure.map_or("", |a| a.name)
@@ -2098,8 +2117,7 @@ fn cast(
                 cards: hand,
                 eligible: eligible.clone(),
                 count,
-                up_to: true,
-            };
+                up_to: true, kind: "" };
             let spliced = match cx.ask_core(player, ask, true)? {
                 Answer::Cards(cards) => cards,
                 _ => return Err(Stop::Cancel),
@@ -2396,7 +2414,7 @@ pub fn cast_during_resolution(cx: &mut Cx, card: ObjectId, terms: CastTerms) -> 
         (Some(_), _) => return Ok(false),
         (None, 1) => ways[0].way,
         (None, _) => {
-            let modes = ways.iter().map(|w| Label::Name(w.face)).collect();
+            let modes = ways.iter().map(|w| Label::Face(w.face)).collect();
             let ask = RequestKind::ChooseModes {
                 source: card,
                 modes,
@@ -2494,7 +2512,7 @@ fn choose_slots(cx: &mut Cx, player: PlayerId, source: ObjectId, specs: &[Target
                 break 'slot;
             }
             let count = (most as usize).min(candidates.len()) as u8;
-            let ask = RequestKind::ChooseTarget {
+            let ask = RequestKind::ChooseTarget { label: spec.label, slot_player: *slot_player,
                 source,
                 purpose: Purpose::Targets,
                 candidates,

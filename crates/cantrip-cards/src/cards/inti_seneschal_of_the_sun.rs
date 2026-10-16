@@ -51,6 +51,6 @@ pub static CARD: CardDef = CardDef {
             .once_per_batch(),
     ],
     delayed: &[delayed_trigger(empower, "When you do, put a +1/+1 counter on target attacking creature. It gains trample until end of turn.")
-        .targets(&[TargetSpec { min: 1, max: 1, filter: attacking_creature }])],
+        .targets(&[TargetSpec { min: 1, max: 1, filter: attacking_creature, label: "" }])],
     ..oracle::INTI_SENESCHAL_OF_THE_SUN
 };

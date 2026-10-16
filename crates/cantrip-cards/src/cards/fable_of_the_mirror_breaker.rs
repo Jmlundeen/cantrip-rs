@@ -75,7 +75,7 @@ fn copy_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static BACK: CardDef = CardDef {
     abilities: &[ability(cost("{1}, {T}"), copy_creature, "{1}, {T}: Create a token that's a copy of another target nonlegendary creature you control, except it has haste. Sacrifice it at the beginning of the next end step.")
-        .targets(&[TargetSpec { min: 1, max: 1, filter: another_nonlegendary_creature_you_control }])],
+        .targets(&[TargetSpec { min: 1, max: 1, filter: another_nonlegendary_creature_you_control, label: "" }])],
     delayed: &[delayed_trigger(cantrip_mechanics::delayed::sacrifice_subject, "Sacrifice it at the beginning of the next end step.")],
     ..oracle::REFLECTION_OF_KIKI_JIKI
 };

@@ -40,7 +40,7 @@ fn ripple<const N: usize>(g: &mut dyn Game, item: &StackItem) -> Result<(), Susp
         if castable.is_empty() {
             break;
         }
-        let Some(&card) = choose::cards_from(g, you, spell, Purpose::Cast, in_library, castable, 1, true)?.first() else { break };
+        let Some(&card) = choose::cards_from(g, you, spell, Purpose::CastFree, in_library, castable, 1, true)?.first() else { break };
         g.cast_during_resolution(card, Some(ManaCost::ZERO))?;
     }
 

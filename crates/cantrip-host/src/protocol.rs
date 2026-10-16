@@ -233,6 +233,8 @@ pub enum CardChoicePurposeView {
     Behold,
     /// The creature a cost puts -1/-1 counters on (CR 701.68a).
     Blight,
+    CastFree,
+    CastCopyFree,
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -245,6 +247,9 @@ pub enum SearchDestinationView {
     Exile,
     ExileFaceDown,
     Cast,
+    BattlefieldTapped,
+    CastFree,
+    Found,
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -807,6 +812,7 @@ pub struct SearchLibraryPrompt {
     pub library: Vec<ViewHandle>,
     pub eligible: Vec<ViewHandle>,
     pub destination: SearchDestinationView,
+    pub owner: i32,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
@@ -851,6 +857,7 @@ pub struct ChooseCardsPrompt {
     pub powers: Vec<i32>,
     pub minimum_mana_value: i32,
     pub mana_values: Vec<i32>,
+    pub maximum_mana_value: i32,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
@@ -892,6 +899,7 @@ pub struct ChooseTargetPrompt {
     pub targeted: bool,
     pub minimum: i32,
     pub any_number: bool,
+    pub for_player: i32,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
@@ -918,6 +926,9 @@ pub struct ChooseModesPrompt {
     pub affordable: Vec<i32>,
     /// For an optional additional cost that is a keyword action: "Behold" or "Blight"; empty otherwise.
     pub cost_kind: String,
+    pub detail: String,
+    pub extra_modes_cost: bool,
+    pub texts: Vec<String>,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]

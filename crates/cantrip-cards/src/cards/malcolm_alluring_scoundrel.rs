@@ -26,7 +26,7 @@ fn chorus(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if g.obj(malcolm).counters(CounterKind::Chorus) < 4 || !g.could_cast_during_resolution(moved) {
         return Ok(());
     }
-    if cantrip_mechanics::effects::ask_may(g, player, moved, Purpose::Cast)? {
+    if cantrip_mechanics::effects::ask_may(g, player, moved, Purpose::CastFree)? {
         g.cast_during_resolution(moved, Some(ManaCost::ZERO))?;
     }
     Ok(())

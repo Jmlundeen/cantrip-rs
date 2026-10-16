@@ -27,7 +27,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ENTERS, mill_four, "When Emry, Lurker of the Loch enters, mill four cards."),
         ability(TAP, allow_cast, "{T}: Choose target artifact card in your graveyard. You may cast that card this turn.")
-            .targets(&[TargetSpec { min: 1, max: 1, filter: artifact_card_in_your_graveyard }]),
+            .targets(&[TargetSpec { min: 1, max: 1, filter: artifact_card_in_your_graveyard, label: "" }]),
     ],
     ..oracle::EMRY_LURKER_OF_THE_LOCH
 };

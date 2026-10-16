@@ -36,7 +36,7 @@ const MODES: &[ModeDef] = &[
     ModeDef { text: "+ {1}{U} — Counter target spell.", targets: &[targets::SPELL], effect: counter_spell, cost: mana(1, 0, 1, 0, 0, 0) },
     ModeDef {
         text: "+ {3} — Create a token that's a copy of target artifact or creature you control.",
-        targets: &[TargetSpec { min: 1, max: 1, filter: artifact_or_creature_you_control }],
+        targets: &[TargetSpec { min: 1, max: 1, filter: artifact_or_creature_you_control, label: "" }],
         effect: copy_token,
         cost: mana(3, 0, 0, 0, 0, 0),
     },

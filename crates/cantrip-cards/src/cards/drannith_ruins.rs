@@ -20,7 +20,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         mana_ability(TAP, add(Mana::C), "{T}: Add {C}."),
         ability(cost("{2}, {T}"), counters, "{2}, {T}: Put two +1/+1 counters on target non-Human creature that entered this turn.")
-            .targets(&[TargetSpec { min: 1, max: 1, filter: non_human_that_entered_this_turn }]),
+            .targets(&[TargetSpec { min: 1, max: 1, filter: non_human_that_entered_this_turn, label: "" }]),
     ],
     ..oracle::DRANNITH_RUINS
 };

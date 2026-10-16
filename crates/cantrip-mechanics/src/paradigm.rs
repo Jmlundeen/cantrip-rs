@@ -50,7 +50,7 @@ fn cast_a_copy(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if !is_live(g, card) || !g.obj(card).zone.is(ZoneKind::Exile) || !g.could_cast_during_resolution(card) {
         return Ok(());
     }
-    if g.ask(item.controller, RequestKind::May { source: card, purpose: Purpose::Cast })? == Answer::Yes {
+    if g.ask(item.controller, RequestKind::May { source: card, purpose: Purpose::CastCopyFree })? == Answer::Yes {
         g.cast_during_resolution_as(card, CastTerms { instead: Some(ManaCost::ZERO), copy: true, ..CastTerms::default() })?;
     }
     Ok(())

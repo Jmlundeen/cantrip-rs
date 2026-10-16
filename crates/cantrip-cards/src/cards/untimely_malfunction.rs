@@ -47,7 +47,7 @@ static MODAL: ModalDef = ModalDef {
         },
         ModeDef {
             text: "Change the target of target spell or ability with a single target.",
-            targets: &[TargetSpec { min: 1, max: 1, filter: spell_or_ability_with_a_single_target }],
+            targets: &[TargetSpec { min: 1, max: 1, filter: spell_or_ability_with_a_single_target, label: "" }],
             effect: change_target,
             cost: ManaCost::ZERO,
         },

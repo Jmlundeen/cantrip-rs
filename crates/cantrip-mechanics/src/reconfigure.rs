@@ -18,7 +18,7 @@ fn other_creature_you_control(q: &dyn Query, asker: &Asker, t: Target) -> bool {
 pub const fn attach(cost: ManaCost, text: &'static str) -> AbilityDef {
     ability(Cost::mana(cost), attach_to_target, text)
         .sorcery_speed()
-        .targets(&[TargetSpec { min: 1, max: 1, filter: other_creature_you_control }])
+        .targets(&[TargetSpec { min: 1, max: 1, filter: other_creature_you_control, label: "" }])
 }
 
 fn unattach_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {

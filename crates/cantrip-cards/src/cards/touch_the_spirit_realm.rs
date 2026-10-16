@@ -43,9 +43,9 @@ fn return_exiled(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ENTERS, exile_until_leaves, "When this enchantment enters, exile up to one target artifact or creature until this enchantment leaves the battlefield.")
-            .targets(&[TargetSpec { min: 0, max: 1, filter: artifact_or_creature }]),
+            .targets(&[TargetSpec { min: 0, max: 1, filter: artifact_or_creature, label: "" }]),
         ability(cost("{1}{W}").and(DISCARD_THIS), channel, "Channel \u{2014} {1}{W}, Discard this card: Exile target artifact or creature. Return it to the battlefield under its owner's control at the beginning of the next end step.")
-            .targets(&[TargetSpec { min: 1, max: 1, filter: artifact_or_creature }])
+            .targets(&[TargetSpec { min: 1, max: 1, filter: artifact_or_creature, label: "" }])
             .from(ZoneKind::Hand),
     ],
     delayed: &[delayed_trigger(return_exiled, "Return it to the battlefield under its owner's control.")],

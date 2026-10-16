@@ -46,7 +46,7 @@ pub fn choose_among(g: &mut dyn Game, you: PlayerId, source: ObjectId, candidate
         0 => None,
         1 => Some(candidates[0]),
         _ => {
-            let ask = RequestKind::ChooseTarget {
+            let ask = RequestKind::ChooseTarget { label: "", slot_player: None,
                 source,
                 purpose: Purpose::Targets,
                 candidates: candidates.to_vec(),

@@ -99,7 +99,7 @@ pub fn choose_aura_hosts(cx: &mut Cx, moves: &mut Vec<ops::Moving>) -> R<()> {
             }
             1 => hosts[0],
             _ => {
-                let ask = RequestKind::ChooseTarget {
+                let ask = RequestKind::ChooseTarget { label: "", slot_player: None,
                     source: moves[i].id,
                     purpose: Purpose::Attach,
                     candidates: hosts,

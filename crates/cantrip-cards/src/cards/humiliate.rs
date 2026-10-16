@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{hand::discard_chosen_from_revealed_hand, targets};
+use cantrip_mechanics::{hand::discard_chosen_from_revealed_hand_of_kind, targets};
 use cantrip_oracle as oracle;
 
 /// Target opponent reveals their hand; you choose a nonland card from it; they discard it (Duress's shape). Then put a
@@ -7,7 +7,7 @@ use cantrip_oracle as oracle;
 /// creature is taken without asking, and with none the sentence does nothing.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(opponent) = item.targets[0].player() {
-        discard_chosen_from_revealed_hand(g, item, opponent, Purpose::Discard, |q, c| !q.chars(c).is(CardType::Land))?;
+        discard_chosen_from_revealed_hand_of_kind(g, item, opponent, Purpose::Discard, "nonland", |q, c| !q.chars(c).is(CardType::Land))?;
     }
     let creatures: Vec<ObjectId> =
         g.permanents_of(item.controller).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
@@ -15,7 +15,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         0 => None,
         1 => Some(creatures[0]),
         _ => {
-            let ask = RequestKind::ChooseTarget {
+            let ask = RequestKind::ChooseTarget { label: "", slot_player: None,
                 source: item.object,
                 purpose: Purpose::Targets,
                 candidates: creatures.iter().map(|&id| Target::Object(id)).collect(),

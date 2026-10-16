@@ -232,9 +232,17 @@ pub struct TargetSpec {
     pub min: u8,
     pub max: u8,
     pub filter: TargetFilter,
+    /// What the slot is for, said to the player choosing it: "Spell or permanent to return to its owner's hand". Empty when the card's one slot says
+    /// it all. "{player}" stands for the opponent whose slot it is (`EACH_OPPONENT`).
+    pub label: &'static str,
 }
 
 impl TargetSpec {
+    /// The same slot with `label` as what it is for.
+    pub const fn labelled(self, label: &'static str) -> TargetSpec {
+        TargetSpec { label, ..self }
+    }
+
     /// A bound of `COUNTED` is the X announced for the spell or ability, or else the number of times it was kicked:
     /// "X target lands" is `min` and `max` both `COUNTED`, "up to X targets" is `min` 0 and `max` `COUNTED`.
     pub const COUNTED: u8 = u8::MAX;
@@ -1542,7 +1550,7 @@ fn madness_resolves(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     // Nobody is asked about a card that could not be cast at all (a land, no legal target): it is simply not cast.
     if let Some(cost) = cost
         && g.could_cast_during_resolution(card)
-        && matches!(g.ask(item.controller, RequestKind::May { source: card, purpose: Purpose::Cast })?, Answer::Yes)
+        && matches!(g.ask(item.controller, RequestKind::May { source: card, purpose: Purpose::CastForMadness })?, Answer::Yes)
     {
         g.cast_during_resolution(card, Some(cost))?;
     }
@@ -1591,7 +1599,7 @@ fn rebound_resolves(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         return Ok(());
     }
     if g.could_cast_during_resolution(card)
-        && matches!(g.ask(item.controller, RequestKind::May { source: card, purpose: Purpose::Cast })?, Answer::Yes)
+        && matches!(g.ask(item.controller, RequestKind::May { source: card, purpose: Purpose::CastFree })?, Answer::Yes)
     {
         g.cast_during_resolution(card, Some(ManaCost::ZERO))?;
     }

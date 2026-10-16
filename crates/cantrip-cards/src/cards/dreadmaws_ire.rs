@@ -38,8 +38,8 @@ fn destroy_artifact(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[TargetSpec { min: 1, max: 1, filter: attacking_creature }], effect: grant }),
+    spell: Some(SpellDef { targets: &[TargetSpec { min: 1, max: 1, filter: attacking_creature, label: "" }], effect: grant }),
     delayed: &[triggered(triggers::DEALS_COMBAT_DAMAGE_TO_PLAYER_SUBJECT, destroy_artifact, "Whenever this creature deals combat damage to a player, destroy target artifact that player controls.")
-        .targets(&[TargetSpec { min: 1, max: 1, filter: artifact_the_attacked_player_controls }])],
+        .targets(&[TargetSpec { min: 1, max: 1, filter: artifact_the_attacked_player_controls, label: "" }])],
     ..oracle::DREADMAWS_IRE
 };

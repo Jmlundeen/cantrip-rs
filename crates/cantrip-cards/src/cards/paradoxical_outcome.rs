@@ -24,7 +24,7 @@ fn return_and_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     spell: Some(SpellDef {
-        targets: &[TargetSpec { min: 0, max: 16, filter: nonland_nontoken_permanent_you_control }],
+        targets: &[TargetSpec { min: 0, max: 16, filter: nonland_nontoken_permanent_you_control, label: "" }],
         effect: return_and_draw,
     }),
     ..oracle::PARADOXICAL_OUTCOME

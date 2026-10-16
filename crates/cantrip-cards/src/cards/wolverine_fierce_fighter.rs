@@ -30,7 +30,7 @@ fn heal_the_rest(_: &dyn Query, _: &Asker, p: &mut Proposal) {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(THIS_ENTERS, fight, "When Wolverine enters, he fights up to one other target creature.")
-        .targets(&[TargetSpec { min: 0, max: 1, filter: other_creature }])],
+        .targets(&[TargetSpec { min: 0, max: 1, filter: other_creature, label: "" }])],
     replacements: &[ReplacementDef {
         hint: "heal damage already dealt to Wolverine",
         kind: ReplacementKind::Damage,

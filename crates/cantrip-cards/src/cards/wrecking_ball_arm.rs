@@ -29,7 +29,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         ability(cost("{3}"), attach_to_target, "Equip legendary creature {3}")
             .sorcery_speed()
-            .targets(&[TargetSpec { min: 1, max: 1, filter: legendary_creature_you_control }]),
+            .targets(&[TargetSpec { min: 1, max: 1, filter: legendary_creature_you_control, label: "" }]),
         equip(mana(7, 0, 0, 0, 0, 0), "Equip {7}"),
     ],
     statics: &[

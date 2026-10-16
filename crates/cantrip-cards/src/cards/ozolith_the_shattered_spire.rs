@@ -32,7 +32,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         ability(cost("{1}{G}, {T}"), put_counter, "{1}{G}, {T}: Put a +1/+1 counter on target artifact or creature you control. Activate only as a sorcery.")
             .sorcery_speed()
-            .targets(&[TargetSpec { min: 1, max: 1, filter: artifact_or_creature_you_control }]),
+            .targets(&[TargetSpec { min: 1, max: 1, filter: artifact_or_creature_you_control, label: "" }]),
         cycling(mana(2, 0, 0, 0, 0, 0), "Cycling {2} ({2}, Discard this card: Draw a card.)"),
     ],
     replacements: &[ReplacementDef {

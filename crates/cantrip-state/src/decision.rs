@@ -227,9 +227,13 @@ pub enum RequestKind {
     /// "Unless [a player] pays" (CR 118.12): activate mana abilities, pay once the pool covers it, or decline.
     UnlessPays { source: ObjectId, subject: ObjectId, total: ManaCost, options: Vec<ActionOption> },
     /// Choose `count` (or up to `count`) of `eligible`, from among `cards` (all of which the player sees).
-    ChooseCards { source: ObjectId, purpose: Purpose, cards: Vec<ObjectId>, eligible: Vec<ObjectId>, count: u8, up_to: bool },
+    /// `kind` is what the asking card calls what may be chosen when it says more than "card" ("artifact or creature",
+    /// "nonland"), empty otherwise: the dock words the choice as the card does.
+    ChooseCards { source: ObjectId, purpose: Purpose, cards: Vec<ObjectId>, eligible: Vec<ObjectId>, count: u8, up_to: bool, kind: &'static str },
     /// Targets for an ability as it goes on the stack, or any other "choose a [thing]" the C# engine asks as targets.
-    ChooseTarget { source: ObjectId, purpose: Purpose, candidates: Vec<Target>, optional: bool, count: u8, any_number: bool },
+    /// `label` is what the slot is for as its card words it (`TargetSpec::label`, empty when it has nothing to add), and
+    /// `slot_player` the opponent whose slot it is when the ability has one for each opponent.
+    ChooseTarget { source: ObjectId, purpose: Purpose, candidates: Vec<Target>, optional: bool, count: u8, any_number: bool, label: &'static str, slot_player: Option<PlayerId> },
     /// One or more of these labelled options (a pile, a mode), by index.
     /// `count` to `at_most` of them when `at_most` is more than `count` (zero `count` is "up to"). `affordable` is
     /// the eligible modes whose own cost the chooser could pay as well, advice for a default; `additional_cost`
@@ -282,11 +286,32 @@ pub enum RequestKind {
     DistributeCards { source: ObjectId, cards: Vec<ObjectId>, destinations: Vec<Destination>, may_shuffle: bool },
     /// Search a library (CR 701.23): `library` is the whole library, `eligible` what the search may find; with
     /// `optional`, finding nothing is allowed (CR 701.23b).
-    SearchLibrary { source: ObjectId, library: Vec<ObjectId>, eligible: Vec<ObjectId>, count: u8, optional: bool },
+    /// `destination` is where the searcher is told the cards found are going; whose library it is, is the owner of the
+    /// cards in `library`.
+    SearchLibrary { source: ObjectId, library: Vec<ObjectId>, eligible: Vec<ObjectId>, count: u8, optional: bool, destination: SearchDestination },
     /// Which of several replacement effects applies to an event first (CR 616.1), asked of the affected player:
     /// `sources` are the objects whose effects apply and `hints` say what each does, in the order they are offered.
     /// `subject` is the object the event is about, if it is about one.
     ChooseReplacement { subject: Option<ObjectId>, sources: Vec<ObjectId>, hints: Vec<&'static str> },
+}
+
+/// Where the cards a library search finds are going (CR 701.23), as the searcher is told.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum SearchDestination {
+    Hand,
+    TopOfLibrary,
+    Graveyard,
+    Battlefield,
+    Exile,
+    ExileFaceDown,
+    /// Cast by the searcher as the effect resolves.
+    Cast,
+    /// Where it goes depends on the card found (Transmute Artifact): the search says only what it looks for.
+    /// Onto the battlefield tapped (Nissa, Winds of Abandon).
+    BattlefieldTapped,
+    /// Cast by the searcher without paying its mana cost (Sunforger).
+    CastFree,
+    Found,
 }
 
 /// One creature's combat damage to divide among the creatures it is blocked by (and, with trample, the player or
@@ -404,6 +429,22 @@ pub enum Purpose {
     Behold,
     /// The creature a cost blights (CR 701.68a).
     Blight,
+    /// "You may cast it without paying its mana cost" as an effect resolves (CR 118.9, 608.2g), the card staying where it is
+    /// if not: suspend, rebound, hideaway, Malcolm.
+    CastFree,
+    /// "You may cast a copy of it without paying its mana cost" (CR 707.12): paradigm, cipher.
+    CastCopyFree,
+    /// "You may cast it transformed without paying its mana cost" (CR 310.12b): a Siege defeated.
+    CastTransformedFree,
+    /// "You may cast it by paying its madness cost" (CR 702.35a).
+    CastForMadness,
+    /// "You may cast it without paying its mana cost. Put it into your hand if you don't" (Beseech the Mirror).
+    CastFoundOrHand,
+    /// "You may cast it without paying its mana cost. If you don't, it goes on the bottom of your library" (cascade).
+    CastOrBottom,
+    /// "You may cast any number of copies without paying their mana costs" within a budget (Uldaros Theorix): a copy chosen to be
+    /// cast, with this much mana value left to spend in all.
+    CastCopyFreeWithin(u8),
 }
 
 /// The text of one option, as an index, so no string is built at runtime.
@@ -423,6 +464,8 @@ pub enum Label {
     PayLife(Color),
     /// A kind of counter, to remove one of as a cost (CR 118.3).
     Counter(CounterKind),
+    /// One of the faces a card may be cast as (CR 709.3, 715.3, 712.8a), named by the face's name.
+    Face(CardId),
 }
 
 /// An answer to a request.

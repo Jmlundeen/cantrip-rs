@@ -13,7 +13,7 @@ macro_rules! search_for {
     ($name:ident, $subtype:expr) => {
         fn $name(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
             let player = item.controller;
-            let found = search_library(g, player, player, item.object, 1, true, |q, c| q.chars(c).has_subtype($subtype))?;
+            let found = search_library(g, player, player, item.object, SearchDestination::Hand, 1, true, |q, c| q.chars(c).has_subtype($subtype))?;
             g.reveal(player, &found);
             let moves: Vec<(ObjectId, Zone)> = found.iter().map(|&c| (c, Zone::hand(player))).collect();
             g.move_together(&moves, ZoneReason::Search);

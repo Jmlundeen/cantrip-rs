@@ -13,7 +13,7 @@ pub fn play_exiled_card(g: &mut dyn Game, source: ObjectId, you: PlayerId) -> Re
             g.play_land_during_resolution(card)?;
         }
     } else if g.could_cast_during_resolution(card)
-        && g.ask(you, RequestKind::May { source: card, purpose: Purpose::Cast })? == Answer::Yes
+        && g.ask(you, RequestKind::May { source: card, purpose: Purpose::CastFree })? == Answer::Yes
     {
         g.cast_during_resolution(card, Some(ManaCost::ZERO))?;
     }
