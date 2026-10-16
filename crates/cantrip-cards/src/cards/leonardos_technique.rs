@@ -12,7 +12,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: spell(&[targets::SMALL_CREATURE_CARD_IN_YOUR_GRAVEYARD.between(1, 2)], effect),
+    spell: spell(&[targets::CREATURE_CARD_WITH_MANA_VALUE_3_OR_LESS_IN_YOUR_GRAVEYARD.between(1, 2)], effect),
     ways: &[sneak::way(mana("{1}{W}"), "Sneak {1}{W}")],
     ..oracle::LEONARDOS_TECHNIQUE
 };
