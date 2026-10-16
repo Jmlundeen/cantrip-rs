@@ -1,0 +1,12 @@
+{
+  "name": "Amazing Spider-Girl",
+  "manaCost": "{3}{W}{W}",
+  "type": "Legendary Creature — Spider Human Hero",
+  "power": 5,
+  "toughness": 4,
+  "oracleText": "Web-slinging {2}{W} (You may cast this spell for {2}{W} if you also return a tapped creature you control to its owner's hand.)\nFlying, vigilance",
+  "keywords": [
+    "Flying",
+    "Vigilance"
+  ]
+}
