@@ -1,0 +1,11 @@
+{
+  "name": "Thorin Oakenshield",
+  "manaCost": "{R}{W}",
+  "type": "Legendary Creature — Dwarf Noble",
+  "power": 3,
+  "toughness": 2,
+  "oracleText": "Trample\nStoried (If you control three or more artifacts, legendaries, and/or Sagas, you have an enduring story for the rest of the game.)\nAs long as you have an enduring story, artifacts and creatures you control have ward {1}.",
+  "keywords": [
+    "Trample"
+  ]
+}

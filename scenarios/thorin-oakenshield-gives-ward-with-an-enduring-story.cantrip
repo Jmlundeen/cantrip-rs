@@ -1,0 +1,40 @@
+# Thorin Oakenshield (CR 702.195b, 702.21a): "As long as you have an enduring story, artifacts and creatures you control have
+# ward {1}." Thorin and Mox Ruby are two; Mox Jet is the third, and Bot1 has the story. Bot2's Lightning Bolt at Thorin
+# triggers ward, and Bot2, its only Mountain tapped for the Bolt, can't pay {1}: the Bolt is countered and Thorin lives.
+# The control is thorin-oakenshield-without-an-enduring-story-dies-to-a-bolt.
+
+[Bot1 Deck]
+Plains
+Mox Ruby
+Thorin Oakenshield
+Mox Jet
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Thorin Oakenshield.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+[T1 Bot1.Main2]
+? Bot1.EnduringStory = true
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Thorin Oakenshield)
+Bot2.Battlefield.Mountain.Activate
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield = Plains; Mox Ruby; Mox Jet; Thorin Oakenshield
+Bot1.Battlefield.Thorin Oakenshield.Damage = 0
+Bot2.Graveyard = Lightning Bolt
