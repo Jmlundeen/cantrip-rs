@@ -43,6 +43,7 @@ keeps it).
 | [KI-9](#ki-9-a-copy-of-a-modal-spell-cannot-be-given-new-targets) | A copy of a modal spell cannot be given new targets | Medium | Open |
 | [KI-21](#ki-21-a-keyword-counter-put-on-after-an-effect-took-its-abilities-away-gives-nothing) | A keyword counter put on after "loses all abilities" gives nothing | Medium | Open |
 | [KI-22](#ki-22-an-ability-that-transforms-its-source-ignores-whether-it-has-transformed-since) | An ability that transforms its source ignores a transform since it was put on the stack | Low | Open |
+| [KI-24](#ki-24-under-bolass-citadel-the-top-of-a-library-is-cast-only-for-life) | Under Bolas's Citadel the top of a library is cast only for life | Medium | Open |
 
 ## Issues
 
@@ -231,3 +232,18 @@ only the simultaneous damage is covered, by the fight scenarios. The day a card 
 entry is deleted.
 
 **Scenarios.** none yet.
+
+### KI-24: Under Bolas's Citadel the top of a library is cast only for life
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Medium | Open | engine | 2026-10-16, review of the Cases |
+
+**Notes.** A player who controls Bolas's Citadel (`PlayRule::LibraryTop`) and also Mystic Forge or a solved Case of the Locked
+Hothouse (`PlayRule::LibraryTopSpells`) may cast the top card either way: for life by the Citadel, or for its mana cost by the
+other permission (CR 601.3, 118.9; the Citadel's life payment is only for a spell cast "this way"). `castable` in
+`crates/cantrip-rules/src/actions.rs` offers the mana-cost cast only when no permanent gives `LibraryTop`, and the cast decides
+life or mana from `land_rules(..).top_for_life` alone, so only the life cast is offered. A fix offers both, each as its own way,
+and has the cast pay what that way says.
+
+**Scenarios.** None yet: Bolas's Citadel with Mystic Forge, or with a solved Case of the Locked Hothouse, and a creature on top.

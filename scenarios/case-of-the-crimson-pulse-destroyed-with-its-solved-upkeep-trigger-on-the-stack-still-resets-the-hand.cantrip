@@ -1,0 +1,65 @@
+# "Solved - [triggered ability]" means "This ability triggers only if this Case is solved" (CR 702.169c): asked as it
+# triggers and never again. Bot1's Case of the Crimson Pulse is solved on turn 1 (an empty hand at its end step). At the
+# turn-3 upkeep its Solved ability triggers; with it on the stack Bot2 flashes in Cathar Commando and sacrifices it to destroy
+# the Case. The ability still resolves: the (empty) hand is discarded and two cards drawn, then the draw step's card: three.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Case of the Crimson Pulse
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter x12
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Cathar Commando
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Case of the Crimson Pulse.Cast
+Bot1.Choose(Ornithopter)
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T1 Bot1.End]
+? Bot1.Hand.Count = 0
+? Stack.Count = 1
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Upkeep]
+? Stack.Count = 1
+? Bot1.Battlefield.Case of the Crimson Pulse.Solved = true
+Bot1.Pass
+Bot2.Hand.Cathar Commando.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Cathar Commando.Activate(Bot1.Battlefield.Case of the Crimson Pulse)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Case of the Crimson Pulse; Ornithopter
+? Stack.Count = 1
+[T3 Bot1.Draw]
+? Bot1.Hand.Count = 3
+
+[Expect]
+Bot1.Graveyard = Case of the Crimson Pulse; Ornithopter
+Bot2.Graveyard = Cathar Commando
+Bot1.Hand.Count = 3
+Bot1.Library.Count = 7
