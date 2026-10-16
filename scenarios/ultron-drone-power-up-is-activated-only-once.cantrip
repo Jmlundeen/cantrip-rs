@@ -1,0 +1,51 @@
+# Ultron Drone's power-up is activated only once (CR 702.193a). It enters on turn 3 and its power-up, {6} less its mana
+# cost {3}, costs {3} (CR 702.193b, 118.7); once that has resolved, an Ancient Tomb, Sol Ring, Mana Crypt and Mox Ruby are still untapped,
+# enough for {3} again, and the ability is not offered a second time.
+
+[Bot1 Deck]
+Ancient Tomb
+Mana Crypt
+Sol Ring
+Mox Jet
+Mox Ruby
+Ultron Drone
+Black Lotus
+Ancient Tomb
+Ancient Tomb x10
+
+[Bot2 Deck]
+Island x14
+
+[Dice]
+1
+
+[Actions]
+Bot1.Hand.Ancient Tomb.Play
+Bot1.Hand.Mana Crypt.Cast
+Bot1.Pass
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Ancient Tomb.Play
+Bot1.Battlefield.Ancient Tomb#1.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ultron Drone.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Ultron Drone.Activate
+? Bot1.Mana =
+Bot1.Pass
+! Bot1.Battlefield.Ultron Drone.Activate
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Ultron Drone.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Robot Villain.Power = 2
+Bot1.Battlefield.Mana Crypt.Tapped = false
