@@ -1,0 +1,49 @@
+# Precise Redaction aimed at Bot1's Dark Ritual, with Bot2's own Counterspell stacked above it on the same Dark Ritual
+# (CR 608.2b): Counterspell resolves first and counters it, so when Precise Redaction resolves its target is gone and it
+# does nothing - it is not countered itself, and goes to the graveyard after Counterspell. Bot1's Dark Ritual made no mana.
+
+[Bot1 Deck]
+Mox Jet
+Dark Ritual
+Island x12
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Sapphire
+Mox Sapphire
+Precise Redaction
+Counterspell
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Precise Redaction.Cast(Stack.Dark Ritual)
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Dark Ritual)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Dark Ritual
+Bot1.Mana =
+Bot2.Graveyard = Precise Redaction; Counterspell

@@ -1,0 +1,64 @@
+# Precise Redaction: "Counter target white or black spell." On turn 3 Bot1 casts Brainstorm (blue) and Lightning Bolt (red):
+# neither can be targeted (the refusals). Vindicate, white and black at once, can: a spell is "white or black" if it is
+# either color or both, so it is countered, and Bot2 loses no permanent. The Bolt still resolves for 3.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Emerald
+Brainstorm
+Lightning Bolt
+Vindicate
+Island x10
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Precise Redaction
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Brainstorm.Cast
+Bot1.Pass
+! Bot2.Hand.Precise Redaction.Cast(Stack.Brainstorm)
+Bot2.Pass
+Bot1.Choose(Island; Island)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+! Bot2.Hand.Precise Redaction.Cast(Stack.Lightning Bolt)
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Vindicate.Cast(Bot2.Battlefield.Island)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Precise Redaction.Cast(Stack.Vindicate)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Life = 17
+Bot2.Battlefield = Island; Mox Sapphire
+Bot2.Graveyard = Precise Redaction
+Bot1.Graveyard = Vindicate; Lightning Bolt; Brainstorm

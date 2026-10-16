@@ -1,0 +1,6 @@
+{
+  "name": "Precise Redaction",
+  "manaCost": "{1}{U}",
+  "type": "Instant",
+  "oracleText": "Counter target white or black spell."
+}

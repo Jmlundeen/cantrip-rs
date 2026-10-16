@@ -1,0 +1,62 @@
+# Precise Redaction: "Counter target white or black spell." On turn 3 Bot1 casts Ornithopter, a colorless artifact spell:
+# Precise Redaction cannot target it (the refusal). Then Bot1's black Dark Ritual and white Enlightened Tutor are each
+# countered by one - the black half and the white half of the target - so neither resolves (no mana, no search) and both,
+# with the Redactions, end in the graveyards.
+
+[Bot1 Deck]
+Plains
+Mox Jet
+Dark Ritual
+Enlightened Tutor
+Ornithopter
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Sapphire
+Mox Sapphire
+Precise Redaction
+Precise Redaction
+Island x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+! Bot2.Hand.Precise Redaction.Cast(Stack.Ornithopter)
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Precise Redaction.Cast(Stack.Dark Ritual)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Enlightened Tutor.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Precise Redaction.Cast(Stack.Enlightened Tutor)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Enlightened Tutor; Dark Ritual
+Bot1.Battlefield = Mox Jet; Ornithopter; Plains
+Bot1.Mana =
+Bot2.Graveyard = Precise Redaction; Precise Redaction
