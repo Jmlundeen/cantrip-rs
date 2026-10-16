@@ -1,0 +1,58 @@
+# "Whenever an opponent discards a land card, create a 1/1 black Bat": the trigger is per land card and only for
+# opponents of Aclazotz's controller. On turn 2 Bot2's Faithless Looting discards two land cards (Mountain, Island) at once:
+# two triggers, two Bats for Bot1. On turn 3 Bot1's own Faithless Looting discards two Swamps: Bot1 is not an opponent, so no
+# more Bats. Bot1 battlefield: Mox Ruby, Mox Pearl, Swamp, Aclazotz, two Bats = 6.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Aclazotz, Deepest Betrayal
+Swamp
+Swamp
+Faithless Looting
+Swamp x13
+
+[Bot2 Deck]
+Faithless Looting
+Mox Ruby
+Mountain
+Island
+Plains
+Plains
+Plains
+Plains x13
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Aclazotz, Deepest Betrayal.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Faithless Looting.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Choose(Mountain; Island)
+[T2 Bot2.Main2]
+? Bot1.Battlefield.Count = 6
+[T3 Bot1.Main1]
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Choose(Swamp; Swamp)
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Count = 6
+Bot1.Graveyard = Faithless Looting; Swamp; Swamp; Black Lotus
+Bot2.Graveyard = Faithless Looting; Island; Mountain
+Stack.Count = 0

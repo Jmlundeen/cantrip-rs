@@ -1,0 +1,61 @@
+# Ruling 2023-11-10: "If a card that isn't a transforming double-faced card is a copy of Aclazotz, Deepest Betrayal, it
+# won't return to the battlefield when it dies." Bot2's Phantasmal Image copies Bot1's Aclazotz on turn 2 and has Aclazotz's
+# dies ability; Bot2's Lightning Bolt targets the Image, whose own ability sacrifices it. The copy's trigger finds the card in
+# the graveyard but Phantasmal Image has no back face, so it stays there (CR 712.14a). Bot1's own Aclazotz is untouched.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Aclazotz, Deepest Betrayal
+Swamp
+Swamp
+Swamp
+Swamp x13
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Phantasmal Image
+Lightning Bolt
+Island
+Island
+Island x13
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Aclazotz, Deepest Betrayal.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Phantasmal Image.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Accept
+? Bot2.Battlefield.Aclazotz, Deepest Betrayal.Power = 4
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Aclazotz, Deepest Betrayal)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot2.Graveyard = Lightning Bolt; Phantasmal Image
+Bot2.Battlefield.Count = 3
+Bot1.Battlefield.Aclazotz, Deepest Betrayal.Tapped = false
+Bot1.Battlefield.Count = 4
+Stack.Count = 0

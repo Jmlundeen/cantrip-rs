@@ -1,0 +1,74 @@
+# Temple of the Dead: "{2}{B}, {T}: Transform this land. Activate only if a player has one or fewer cards in hand and
+# only as a sorcery." Bot1 has an empty hand until its turn-3 draw (one card, Swamp, which it keeps), so the condition
+# holds; Bot2's hand is large. Aclazotz died on Bot2's turn 2 (two Lightning Bolts) and came back tapped as the Temple.
+# Sorcery timing: in Bot1's upkeep the condition already holds (empty hand) but the ability is not offered; in its main
+# phase with an empty stack, it is. The Temple taps as a cost (CR 602.2) and the Swamp, Mox Ruby and Mox Pearl pay {2}{B};
+# the land turns over into Aclazotz, a 4/4 flying lifelink creature, tapped. It has been under Bot1's control since before the
+# turn began (it re-entered on turn 2), so it is not summoning sick.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Aclazotz, Deepest Betrayal
+Swamp
+Mox Jet
+Mox Emerald
+Swamp x13
+
+[Bot2 Deck]
+Lightning Bolt
+Lightning Bolt
+Mountain
+Mox Ruby
+Plains
+Plains
+Plains
+Plains x13
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Aclazotz, Deepest Betrayal.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Lightning Bolt.Cast(Aclazotz, Deepest Betrayal)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Pass
+Bot2.Hand.Lightning Bolt.Cast(Aclazotz, Deepest Betrayal)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Pass
+[T3 Bot1.Upkeep]
+! Bot1.Battlefield.Temple of the Dead.Activate(Ability: Transform)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Temple of the Dead.Activate(Ability: Transform)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Aclazotz, Deepest Betrayal.Types = Creature
+Bot1.Battlefield.Aclazotz, Deepest Betrayal.Power = 4
+Bot1.Battlefield.Aclazotz, Deepest Betrayal.Toughness = 4
+Bot1.Battlefield.Aclazotz, Deepest Betrayal.Keywords = Flying; Lifelink
+Bot1.Battlefield.Aclazotz, Deepest Betrayal.Tapped = true
+Bot1.Battlefield.Aclazotz, Deepest Betrayal.SummoningSick = false
+Bot1.Hand = Swamp
+Stack.Count = 0

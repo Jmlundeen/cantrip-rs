@@ -1,0 +1,60 @@
+# "Whenever an opponent discards a land card, create a 1/1 black Bat creature token with flying." Aclazotz's own attack
+# makes Bot2 discard; Bot2 chooses Mountain, a land card, so Bot1 (the Bat's controller) gets a Bat. Bot2's hand has
+# Lightning Bolt too, so the choice was free, and no opponent can't discard, so Bot1 draws nothing from the attack.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Aclazotz, Deepest Betrayal
+Swamp
+Swamp
+Swamp
+Swamp x13
+
+[Bot2 Deck]
+Lightning Bolt
+Mountain
+Mountain
+Island
+Plains
+Plains
+Plains
+Swamp x13
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Aclazotz, Deepest Betrayal.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Aclazotz, Deepest Betrayal > Bot2)
+Bot2.Choose(Mountain)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Mountain
+Bot2.Hand.Count = 6
+Bot2.Life = 16
+Bot1.Life = 24
+Bot1.Hand.Count = 3
+Bot1.Battlefield.Aclazotz, Deepest Betrayal.Tapped = true
+Bot1.Battlefield.Count = 5
+Bot1.Battlefield.Bat.Token = true
+Bot1.Battlefield.Bat.Power = 1
+Bot1.Battlefield.Bat.Toughness = 1
+Bot1.Battlefield.Bat.Colors = Black
+Bot1.Battlefield.Bat.Keywords = Flying
+Bot1.Battlefield.Bat.Tapped = false
+Bot2.Battlefield.Count = 1
+Stack.Count = 0

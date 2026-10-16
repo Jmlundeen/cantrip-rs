@@ -1,0 +1,59 @@
+# Temple of the Dead cannot be activated while every player has two or more cards in hand ("only if a player has one or
+# fewer cards in hand"). Aclazotz died on Bot2's turn 2 (two Lightning Bolts) and came back tapped as the Temple. On
+# Bot1's turn 3 Bot1 holds Swamp, Swamp and its draw (3 cards), Bot2 four cards; the transform is refused in the main
+# phase though sorcery timing, the mana ({2}{B}: Swamp, Mox Ruby, Mox Pearl) and the untapped Temple are all there. The
+# same activation succeeds in the scenario where a player has one or fewer cards, so the hands are what refuse it.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Aclazotz, Deepest Betrayal
+Swamp
+Swamp
+Swamp
+Swamp x13
+
+[Bot2 Deck]
+Lightning Bolt
+Lightning Bolt
+Mountain
+Mox Ruby
+Plains
+Plains
+Plains
+Plains x13
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Aclazotz, Deepest Betrayal.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Lightning Bolt.Cast(Aclazotz, Deepest Betrayal)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Pass
+Bot2.Hand.Lightning Bolt.Cast(Aclazotz, Deepest Betrayal)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Pass
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Temple of the Dead.Activate(Ability: Transform)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Temple of the Dead.Tapped = false
+Bot1.Battlefield.Temple of the Dead.Types = Land
+Bot1.Hand.Count = 3
+Bot2.Hand.Count = 4
+Stack.Count = 0

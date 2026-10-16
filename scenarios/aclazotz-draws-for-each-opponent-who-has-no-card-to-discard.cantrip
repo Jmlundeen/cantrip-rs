@@ -1,0 +1,69 @@
+# "For each opponent who can't [discard], you draw a card": Bot2 has no cards in hand when Aclazotz attacks, so nothing is
+# asked of it and Bot1 draws one card. Bot2 empties its hand on its turn 2 (a land and seven free artifacts, drawn card
+# included). Bot1's hand: 2 Swamps + the turn-3 draw + the Aclazotz draw = 4; its library 13 - 2 = 11.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Aclazotz, Deepest Betrayal
+Swamp
+Swamp
+Swamp
+Swamp x13
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Emerald
+Mox Sapphire
+Lotus Petal
+Black Lotus
+Plains x12
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Aclazotz, Deepest Betrayal.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Lotus Petal.Cast
+Bot2.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Aclazotz, Deepest Betrayal > Bot2)
+! Bot2.Choose
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard.Count = 0
+Bot2.Hand.Count = 0
+Bot2.Life = 16
+Bot1.Life = 24
+Bot1.Hand.Count = 4
+Bot1.Library.Count = 11
+Bot1.Battlefield.Aclazotz, Deepest Betrayal.Tapped = true
+Bot1.Battlefield.Count = 4
+Stack.Count = 0

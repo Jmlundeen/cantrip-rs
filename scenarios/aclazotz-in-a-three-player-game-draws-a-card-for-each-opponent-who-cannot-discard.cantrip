@@ -1,0 +1,95 @@
+# "For each opponent who can't, you draw a card": with two opponents who both have empty hands (Bot2 on turn 2, Bot3 on
+# turn 3, each a land and seven free artifacts, drawn card included), Bot1 draws two cards, one for each, and no Bat is made.
+# Bot1's hand: 3 Swamps after turn 1, +1 turn-4 draw, +2 from Aclazotz = 6; its library 13 - 4 draws = 9.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Aclazotz, Deepest Betrayal
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp x12
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Emerald
+Mox Sapphire
+Lotus Petal
+Black Lotus
+Plains x12
+
+[Bot3 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Emerald
+Mox Sapphire
+Lotus Petal
+Black Lotus
+Plains x12
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Aclazotz, Deepest Betrayal.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Lotus Petal.Cast
+Bot2.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+[T3 Bot3.Main1]
+Bot3.Hand.Mountain.Play
+Bot3.Hand.Mox Ruby.Cast
+Bot3.Pass
+Bot3.Hand.Mox Jet.Cast
+Bot3.Pass
+Bot3.Hand.Mox Pearl.Cast
+Bot3.Pass
+Bot3.Hand.Mox Emerald.Cast
+Bot3.Pass
+Bot3.Hand.Mox Sapphire.Cast
+Bot3.Pass
+Bot3.Hand.Lotus Petal.Cast
+Bot3.Pass
+Bot3.Hand.Black Lotus.Cast
+Bot3.Pass
+[T4 Bot1.DeclareAttackers]
+Bot1.Attack(Aclazotz, Deepest Betrayal > Bot3)
+! Bot3.Choose
+[T4 Bot1.Main2]
+
+[Expect]
+Bot2.Hand.Count = 0
+Bot3.Hand.Count = 0
+Bot3.Graveyard.Count = 0
+Bot1.Hand.Count = 6
+Bot1.Library.Count = 9
+Bot1.Battlefield.Count = 4
+Stack.Count = 0

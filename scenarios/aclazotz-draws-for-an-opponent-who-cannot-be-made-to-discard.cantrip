@@ -1,0 +1,70 @@
+# "For each opponent who can't": Bot2 has cards in hand but controls Tamiyo, Collector of Tales, so spells and abilities
+# Bot1 controls can't make it discard (CR 101.2). Nothing is asked of Bot2 and nothing is discarded, so no Bat is made
+# (it discarded no land), and Bot1 draws one card. Bot2 keeps Lightning Bolt, Island and the drawn Plains.
+# Bot1's hand: 2 Swamps + the turn-3 draw + the Aclazotz draw = 4.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Aclazotz, Deepest Betrayal
+Swamp
+Swamp
+Swamp
+Swamp x13
+
+[Bot2 Deck]
+Tamiyo, Collector of Tales
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Lightning Bolt
+Island
+Plains
+Plains x12
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Aclazotz, Deepest Betrayal.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Tamiyo, Collector of Tales.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Aclazotz, Deepest Betrayal > Bot2)
+! Bot2.Choose
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard.Count = 0
+Bot2.Hand = Lightning Bolt; Island; Plains
+Bot2.Battlefield.Tamiyo, Collector of Tales.Tapped = false
+Bot2.Life = 16
+Bot1.Life = 24
+Bot1.Hand.Count = 4
+Bot1.Library.Count = 11
+Bot1.Battlefield.Aclazotz, Deepest Betrayal.Tapped = true
+Bot1.Battlefield.Count = 4
+Stack.Count = 0

@@ -1,0 +1,76 @@
+# "Activate only if a player has one or fewer cards in hand": any player, an opponent included. Bot1 holds three cards on
+# turn 3 (Swamp, Swamp and its draw) but Bot2 emptied its hand on turn 2 (a land, the Bolts that killed Aclazotz and free
+# artifacts, its drawn card included), so the Temple of the Dead can be activated and turns into Aclazotz. The refusal in the previous
+# scenario (every hand two or more) is the negative control for the same activation.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Aclazotz, Deepest Betrayal
+Swamp
+Swamp
+Swamp
+Swamp x13
+
+[Bot2 Deck]
+Lightning Bolt
+Lightning Bolt
+Mountain
+Mox Ruby
+Lotus Petal
+Mox Jet
+Black Lotus
+Mox Pearl
+Plains x12
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Aclazotz, Deepest Betrayal.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Lightning Bolt.Cast(Aclazotz, Deepest Betrayal)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Pass
+Bot2.Hand.Lightning Bolt.Cast(Aclazotz, Deepest Betrayal)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Pass
+Bot2.Hand.Lotus Petal.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Temple of the Dead.Activate(Ability: Transform)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Aclazotz, Deepest Betrayal.Types = Creature
+Bot1.Battlefield.Aclazotz, Deepest Betrayal.Power = 4
+Bot1.Battlefield.Aclazotz, Deepest Betrayal.Toughness = 4
+Bot1.Battlefield.Aclazotz, Deepest Betrayal.Keywords = Flying; Lifelink
+Bot1.Battlefield.Aclazotz, Deepest Betrayal.Tapped = true
+Bot1.Battlefield.Aclazotz, Deepest Betrayal.SummoningSick = false
+Bot1.Hand.Count = 3
+Bot1.Battlefield.Aclazotz, Deepest Betrayal.Types = Creature
+Bot2.Hand.Count = 0
+Stack.Count = 0

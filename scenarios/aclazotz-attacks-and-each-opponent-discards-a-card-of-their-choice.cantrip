@@ -1,0 +1,55 @@
+# Aclazotz: "Whenever Aclazotz attacks, each opponent discards a card. For each opponent who can't, you draw a card."
+# Bot2 holds a card to discard, so it chooses (Lightning Bolt, a nonland card) and discards it; no opponent can't, so
+# Bot1 draws nothing, and a nonland discard makes no Bat. Aclazotz (flying, lifelink) is unblocked: 4 damage, 4 life.
+# Bot1 turn 1: Black Lotus (BBB), Mox Ruby and Mox Pearl pay {3}{B}{B}; turn 3: it attacks. Bot1's hand: 7 - Lotus, Moxen (2),
+# Aclazotz, Swamp = 2 Swamps, plus the turn-3 draw = 3. Bot2: 7 + draw - Mountain = 7, minus the discard = 6.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Aclazotz, Deepest Betrayal
+Swamp
+Swamp
+Swamp
+Swamp x13
+
+[Bot2 Deck]
+Lightning Bolt
+Mountain
+Mountain
+Island
+Plains
+Plains
+Plains
+Swamp x13
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Aclazotz, Deepest Betrayal.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Aclazotz, Deepest Betrayal > Bot2)
+Bot2.Choose(Lightning Bolt)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Lightning Bolt
+Bot2.Hand.Count = 6
+Bot2.Life = 16
+Bot1.Life = 24
+Bot1.Hand.Count = 3
+Bot1.Battlefield.Aclazotz, Deepest Betrayal.Tapped = true
+Bot1.Battlefield.Count = 4
+Stack.Count = 0

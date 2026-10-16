@@ -1,0 +1,58 @@
+# "When Aclazotz dies, return it to the battlefield tapped and transformed under its owner's control." Bot2 kills it on its
+# turn 2 with two Lightning Bolts (Mountain and Mox Ruby; 3 + 3 damage on a 4/4 that Bot1 cast on turn 1 as in the other
+# Aclazotz scenarios). The trigger returns the card from the graveyard as a new object (CR 400.7): its back face, Temple of
+# the Dead, a land and no longer a creature, tapped (CR 110.5b). Bot1 graveyard holds only the Black Lotus (no Aclazotz card); Bot2's holds the
+# Bolts. Bot1 battlefield: 2 Moxen, Swamp and the Temple.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Aclazotz, Deepest Betrayal
+Swamp
+Swamp
+Swamp
+Swamp x13
+
+[Bot2 Deck]
+Lightning Bolt
+Lightning Bolt
+Mountain
+Mox Ruby
+Plains
+Plains
+Plains
+Plains x13
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Aclazotz, Deepest Betrayal.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Lightning Bolt.Cast(Aclazotz, Deepest Betrayal)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Pass
+Bot2.Hand.Lightning Bolt.Cast(Aclazotz, Deepest Betrayal)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Temple of the Dead.Tapped = true
+Bot1.Battlefield.Temple of the Dead.Types = Land
+Bot1.Battlefield.Count = 4
+Bot1.Graveyard = Black Lotus
+Bot2.Graveyard = Lightning Bolt; Lightning Bolt
+Stack.Count = 0

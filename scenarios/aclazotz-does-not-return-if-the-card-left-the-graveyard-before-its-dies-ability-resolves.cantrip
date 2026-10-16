@@ -1,0 +1,64 @@
+# "When Aclazotz dies, return it to the battlefield": the ability returns the card from the graveyard, and a card that has left
+# the graveyard in response is a new object it can no longer find (CR 400.7). Bot2 kills Aclazotz with two Lightning Bolts, then
+# sacrifices Soul-Guide Lantern with the dies trigger on the stack: "Exile each opponent's graveyard" exiles Aclazotz, so
+# nothing returns. Bot1's graveyard is empty, Aclazotz is in exile and no Temple of the Dead is on the battlefield.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Aclazotz, Deepest Betrayal
+Swamp
+Swamp
+Swamp
+Swamp x13
+
+[Bot2 Deck]
+Lightning Bolt
+Lightning Bolt
+Mountain
+Mox Ruby
+Mox Jet
+Soul-Guide Lantern
+Plains
+Plains x13
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Aclazotz, Deepest Betrayal.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Soul-Guide Lantern.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Pass
+Bot2.Pass
+Bot2.Hand.Lightning Bolt.Cast(Aclazotz, Deepest Betrayal)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Pass
+Bot2.Hand.Lightning Bolt.Cast(Aclazotz, Deepest Betrayal)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Pass
+Bot2.Battlefield.Soul-Guide Lantern.Activate(Ability: Exile each opponent's graveyard)
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Count = 3
+Exile.Count = 2
+Bot2.Graveyard = Soul-Guide Lantern; Lightning Bolt; Lightning Bolt
+Stack.Count = 0
