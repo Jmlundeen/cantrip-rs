@@ -1,0 +1,50 @@
+# Both of Symbiosis's targets are illegal as it resolves, so it does not resolve at all (CR 608.2b): Bot1 Bolts each Ornithopter in
+# response, and Symbiosis goes to the graveyard having done nothing.
+
+[Bot1 Deck]
+Forest
+Mox Jet
+Mox Ruby
+Mox Ruby
+Symbiosis
+Lightning Bolt
+Island
+Lightning Bolt
+Island x15
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Symbiosis.Cast
+Bot1.Target(Ornithopter#1; Ornithopter#2)
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter#1)
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter#2)
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot2.Battlefield.Count = 1
+Bot2.Graveyard = Ornithopter; Ornithopter
+Bot1.Graveyard = Symbiosis; Lightning Bolt; Lightning Bolt

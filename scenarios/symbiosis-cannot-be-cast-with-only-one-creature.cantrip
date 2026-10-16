@@ -1,0 +1,27 @@
+# "Two target creatures" needs two legal targets (CR 601.2c): with Llanowar Elves the only creature in the game, Symbiosis is not
+# offered although Bot1 can pay for it. The control is symbiosis-gives-two-target-creatures-plus-two-plus-two, the same position
+# with a second creature.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Mountain
+Symbiosis
+Mountain x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+! Bot1.Hand.Symbiosis.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Graveyard.Count = 0
+Stack.Count = 0

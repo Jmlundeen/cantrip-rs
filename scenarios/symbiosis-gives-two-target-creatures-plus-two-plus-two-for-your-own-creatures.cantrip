@@ -1,0 +1,33 @@
+# Both targets of Symbiosis may be the caster's own creatures (CR 115.3): Llanowar Elves and an Ornithopter become 3/3 and 2/4.
+
+[Bot1 Deck]
+Forest
+Ornithopter
+Llanowar Elves
+Mountain
+Symbiosis
+Mountain x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Symbiosis.Cast
+Bot1.Target(Llanowar Elves; Ornithopter)
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield.Llanowar Elves.Power = 3
+Bot1.Battlefield.Llanowar Elves.Toughness = 3
+Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Ornithopter.Toughness = 4

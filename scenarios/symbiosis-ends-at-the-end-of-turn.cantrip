@@ -1,0 +1,39 @@
+# Symbiosis gives +2/+2 "until end of turn": the Ornithopters are 2/4 for Bot1's turn and 0/2 again in the next turn's main phase.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Mountain
+Symbiosis
+Mountain x20
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Symbiosis.Cast
+Bot1.Target(Ornithopter#1; Ornithopter#2)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Ornithopter#1.Power = 2
+[T4 Bot2.Main1]
+
+[Expect]
+Turn = 4
+Bot2.Battlefield.Ornithopter#1.Power = 0
+Bot2.Battlefield.Ornithopter#1.Toughness = 2
+Bot2.Battlefield.Ornithopter#2.Power = 0
+Bot2.Battlefield.Ornithopter#2.Toughness = 2

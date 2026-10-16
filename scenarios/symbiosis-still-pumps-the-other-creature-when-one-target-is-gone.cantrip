@@ -1,0 +1,39 @@
+# One of Symbiosis's two targets becoming illegal does not stop the other (CR 608.2b): Bot1 answers its own Symbiosis by Bolting
+# its Llanowar Elves, and the Ornithopter still gets +2/+2.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Mountain
+Symbiosis
+Lightning Bolt
+Mountain x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Hand.Symbiosis.Cast
+Bot1.Target(Llanowar Elves; Ornithopter)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Llanowar Elves)
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Graveyard = Symbiosis; Llanowar Elves; Lightning Bolt
+Bot2.Battlefield.Ornithopter.Power = 2
+Bot2.Battlefield.Ornithopter.Toughness = 4

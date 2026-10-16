@@ -1,0 +1,37 @@
+# Hexproof keeps an opponent's Sylvan Caryatid from being a target (CR 702.11b), so it cannot be Symbiosis's second target:
+# Bot1's Ornithopter and the Caryatid are the only creatures, yet "two target creatures" has only one legal target and Symbiosis is
+# not offered. The control is symbiosis-gives-two-target-creatures-plus-two-plus-two-for-your-own-creatures.
+
+[Bot1 Deck]
+Forest
+Ornithopter
+Mountain
+Symbiosis
+Mountain x20
+
+[Bot2 Deck]
+Forest
+Forest
+Sylvan Caryatid
+Forest x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest#1.Activate
+Bot2.Battlefield.Forest#2.Activate
+Bot2.Hand.Sylvan Caryatid.Cast
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+! Bot1.Hand.Symbiosis.Cast
+
+[Expect]
+Turn = 5
+Stack.Count = 0
