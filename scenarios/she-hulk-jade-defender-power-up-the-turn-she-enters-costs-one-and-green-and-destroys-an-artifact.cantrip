@@ -1,0 +1,49 @@
+# She-Hulk, Jade Defender: "Power-up — {4}{G}{G}: Destroy up to one target artifact or enchantment. Put a +1/+1 counter
+# on She-Hulk." The turn she enters, her mana cost {3}{G} takes one {G} off the green and {3} off the generic (CR
+# 702.193b, 118.7): {1}{G} is left, Mox Emerald's {G} and Mox Pearl's {W}. She destroys Bot2's Mox Sapphire and ends a
+# 5/5.
+
+[Bot1 Deck]
+Forest
+Mox Jet
+Sol Ring
+She-Hulk, Jade Defender
+Mox Emerald
+Mox Pearl
+Forest
+Forest x10
+
+[Bot2 Deck]
+Mox Sapphire
+Island x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.She-Hulk, Jade Defender.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.She-Hulk, Jade Defender.Activate(Mox Sapphire)
+? Bot1.Mana =
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Bot2.Graveyard = Mox Sapphire
+Bot1.Battlefield.She-Hulk, Jade Defender.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.She-Hulk, Jade Defender.Power = 5
