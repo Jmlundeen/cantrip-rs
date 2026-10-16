@@ -25,6 +25,7 @@
 //! | monarch, extra turns                              | `MonarchBecameEvent`, `ExtraTurnAddedEvent`         |
 //! | `DieRolled` (the result, modifiers applied)        | `DieRolledEvent`                                    |
 //! | `CoinFlipped`                                     | `CoinFlippedEvent`                                  |
+//! | `TurnEnded` (an effect ended the turn, CR 724.1)   | `TurnEndedEvent`                                    |
 //! | the answers to the opening's questions            | `StartingPlayerChosenEvent`, `MulliganTakenEvent`, `HandKeptEvent` |
 //!
 //! Not told, because the engine has no event or state for it: untaps, shuffles (`LibraryShuffledEvent`), scry and
@@ -69,6 +70,8 @@ pub enum Proto {
     Kept { player: PlayerId, cards: i32 },
     Die { player: PlayerId, sides: i32, result: i32 },
     Coin { player: PlayerId, won: bool },
+    /// An effect ended the turn of `player` (CR 724.1).
+    TurnEnded { player: PlayerId },
 }
 
 /// The ability a stack item was put on the stack as, kept until it leaves.
@@ -85,6 +88,8 @@ struct Seen {
 pub struct Tracker {
     turn: i32,
     last_step: Option<Step>,
+    /// The turn and its player of the last step told.
+    last_turn: (i32, PlayerId),
     active: PlayerId,
     life: Vec<i32>,
     stack: HashMap<u32, Seen>,
@@ -129,18 +134,21 @@ impl Tracker {
 
     /// The one place a native event becomes something to tell. Everything else a seat hears is a comparison of
     /// positions (`collect`).
-    fn proto_of(&mut self, game: &Game, event: &Event, out: &mut Vec<Proto>) {
-        match *event {
+    fn proto_of(&mut self, game: &Game, record: &Record, out: &mut Vec<Proto>) {
+        match record.event {
             Event::StepBegan { step } => {
-                let wrapped = self.last_step.is_none_or(|last| step <= last);
+                // A new turn, which begins with its untap step (no step event of its own): one whose number or player is not
+                // the last step's. A step begun again in the same turn is not one - a second combat damage step (CR 510.4),
+                // an additional combat phase (CR 500.8), another cleanup step (CR 514.3a, 724.1d).
+                let turn = (record.turn as i32, record.active);
+                let wrapped = self.last_step.is_none() || self.last_turn != turn;
                 if wrapped {
-                    self.turn += 1;
-                    let state = &game.state;
-                    self.active = if self.turn == state.turn.number as i32 { state.turn.active } else { state.next_player(self.active) };
+                    (self.turn, self.active) = turn;
                     out.push(Proto::Step { turn: self.turn, step: Step::Untap, active: self.active });
                 }
                 self.last_step = Some(step);
-                out.push(Proto::Step { turn: self.turn, step, active: self.active });
+                self.last_turn = turn;
+                out.push(Proto::Step { turn: turn.0, step, active: turn.1 });
             }
             Event::ZoneChange { old, new, from, to, reason } => {
                 if to.is(ZoneKind::Gone) {
@@ -183,6 +191,7 @@ impl Tracker {
                 out.push(Proto::Die { player, sides: i32::from(sides), result: i32::from(result) });
             }
             Event::CoinFlipped { player, won } => out.push(Proto::Coin { player, won }),
+            Event::TurnEnded { player } => out.push(Proto::TurnEnded { player }),
             _ => {}
         }
     }
@@ -216,7 +225,7 @@ impl Tracker {
                 }
                 continue;
             }
-            self.proto_of(game, &record.event, &mut out);
+            self.proto_of(game, record, &mut out);
         }
         self.turn = state.turn.number as i32;
         self.active = state.turn.active;
@@ -481,6 +490,53 @@ impl Teller<'_> {
             }
             Proto::Coin { player, won } => Some(GameEventView::CoinFlippedEvent(CoinFlippedEvent { player: seat(*player), won: *won })),
             Proto::Kept { player, cards } => Some(GameEventView::HandKeptEvent(HandKeptEvent { player: seat(*player), cards: *cards })),
+            Proto::TurnEnded { player } => Some(GameEventView::TurnEndedEvent(TurnEndedEvent { player: seat(*player) })),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn began(serial: u32, turn: u32, active: PlayerId, step: Step) -> Record {
+        Record { serial, turn, step, active, cause: Cause::Turn, event: Event::StepBegan { step } }
+    }
+
+    /// A step begun again within one turn is no new turn: another cleanup step (CR 514.3a, 724.1d), a second combat
+    /// damage step (CR 510.4). Only a step of another turn starts one, with its untap step.
+    #[test]
+    fn a_step_begun_again_in_the_same_turn_is_not_a_new_turn() {
+        let deck = vec!["Forest".to_string(); 20];
+        let game = deal(&[deck.clone(), deck], 1, false, None).expect("a game");
+        let (p1, p2) = (PlayerId(0), PlayerId(1));
+        let mut tracker = Tracker::new(&game);
+        let records = [
+            began(0, 3, p1, Step::CombatDamage),
+            began(1, 3, p1, Step::CombatDamage),
+            began(2, 3, p1, Step::Cleanup),
+            began(3, 3, p1, Step::Cleanup),
+            began(4, 4, p2, Step::Upkeep),
+        ];
+        let steps: Vec<(i32, Step)> = tracker
+            .collect(&game, &records, 0)
+            .into_iter()
+            .filter_map(|p| match p {
+                Proto::Step { turn, step, .. } => Some((turn, step)),
+                _ => None,
+            })
+            .collect();
+        assert_eq!(
+            steps,
+            vec![
+                (3, Step::Untap),
+                (3, Step::CombatDamage),
+                (3, Step::CombatDamage),
+                (3, Step::Cleanup),
+                (3, Step::Cleanup),
+                (4, Step::Untap),
+                (4, Step::Upkeep),
+            ]
+        );
     }
 }

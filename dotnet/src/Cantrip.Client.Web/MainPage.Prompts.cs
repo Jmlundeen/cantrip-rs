@@ -1527,6 +1527,17 @@ public sealed partial class MainPage
                     yesIsPrimary: false);
                 return;
 
+            // Obeka (CR 724.1): asked of the player whose turn it is, whoever tapped it. Neither button is primary, so
+            // passing through prompts never ends a turn by accident.
+            case "EndTurn":
+                Ask(
+                    $"{source}: end the turn?",
+                    "Every spell and ability on the stack is exiled  ·  the rest of the turn is skipped, straight to cleanup",
+                    "End the turn",
+                    "Don't end it",
+                    yesIsPrimary: false);
+                return;
+
             // Ripple (CR 702.60a): Amount is how many cards would be revealed, four or the whole of a shorter library.
             case "RevealForRipple":
                 Ask(

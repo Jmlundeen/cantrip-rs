@@ -59,6 +59,15 @@ public sealed class LogWriterTests
     }
 
     [Fact]
+    public void A_turn_ended_by_an_effect_is_read_out_as_whose_turn_it_was()
+    {
+        // CR 724.1: Time Stop, Ultima and the like end the turn of the player whose turn it is, whoever cast them.
+        Assert.Equal(
+            ["Your turn ends.", "Bot 2's turn ends."],
+            Lines(new TurnEndedEvent { Player = Me }, new TurnEndedEvent { Player = Rival }));
+    }
+
+    [Fact]
     public void Becoming_the_monarch_is_read_out_for_the_player_it_happened_to()
     {
         // The designation belongs to a player (CR 725.1), so unlike day and night the line names one, and names the

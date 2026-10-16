@@ -101,6 +101,9 @@ public static class LogWriter
 
             CoinFlippedEvent flipped => $"{Does(flipped.Player, "flip", "flips")} a coin: {(flipped.Won ? "won" : "lost")} the flip.",
 
+            // CR 724.1: the stack is exiled (the lines after this one) and the turn goes straight to its cleanup step.
+            TurnEndedEvent ended => $"{(ended.Player == seat ? "Your" : $"{NameOf(ended.Player)}'s")} turn ends.",
+
             RandomPlayerChosenEvent chosen =>
                 $"{Does(chosen.Controller, "choose", "chooses")} {(chosen.SelectedPlayer == seat ? "you" : NameOf(chosen.SelectedPlayer))} at random" +
                 (chosen.Source.IsNone ? "." : $" for {Card(chosen.Source)}."),

@@ -1395,6 +1395,7 @@ pub enum GameEventView {
     HandKeptEvent(HandKeptEvent),
     AbilityResolvedEvent(AbilityResolvedEvent),
     CoinFlippedEvent(CoinFlippedEvent),
+    TurnEndedEvent(TurnEndedEvent),
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -1569,6 +1570,13 @@ pub struct DieRolledEvent {
     pub player: i32,
     pub sides: i32,
     pub result: i32,
+}
+
+/// An effect ended the turn of `player` (CR 724.1): the stack is exiled and the turn goes straight to its cleanup step.
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(rename_all = "PascalCase")]
+pub struct TurnEndedEvent {
+    pub player: i32,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

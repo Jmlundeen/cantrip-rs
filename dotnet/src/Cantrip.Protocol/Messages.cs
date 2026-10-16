@@ -156,6 +156,7 @@ public sealed class EventsMessage : ServerMessage
 [Union(25, typeof(HandKeptEvent))]
 [Union(26, typeof(AbilityResolvedEvent))]
 [Union(27, typeof(CoinFlippedEvent))]
+[Union(28, typeof(TurnEndedEvent))]
 public abstract class GameEventView;
 
 /// <summary>The seat chosen at random decided who takes the first turn (CR 103.1).</summary>
@@ -194,6 +195,17 @@ public sealed class CoinFlippedEvent : GameEventView
 
     [Key(1)]
     public bool Won { get; set; }
+}
+
+/// <summary>
+/// An effect ended <see cref="Player"/>'s turn (CR 724.1): every spell and ability on the stack is exiled and the turn goes
+/// straight to its cleanup step. Public.
+/// </summary>
+[MessagePackObject]
+public sealed class TurnEndedEvent : GameEventView
+{
+    [Key(0)]
+    public int Player { get; set; }
 }
 
 /// <summary>A seat kept its opening hand (CR 103.5), of this many cards.</summary>

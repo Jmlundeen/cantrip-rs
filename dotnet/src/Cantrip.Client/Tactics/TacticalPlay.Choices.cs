@@ -603,6 +603,12 @@ public sealed partial class TacticalPlay
                 && Pick(client, view, copy, Guess(client, view, CardReading.Text(copied).Split('.')[0]), 1, optional: true).Worth > Policy("margin")
                 && ++_copies > 0,
 
+            // Obeka (CR 724.1): asked of the player whose turn it is, so ending it gives up the rest of this seat's own turn.
+            // Worth it only to stop an opponent's spell or ability waiting beneath the resolving one, when none of this
+            // seat's own would be exiled with it.
+            "EndTurn" => client.Zone(ZoneKindView.Stack, 0) is { Count: > 1 } stack
+                && stack.Take(stack.Count - 1).All(item => !Mine(client, item)),
+
             // Everything else a card says its controller "may" do is something a card's controller wants done: a
             // search, a draw, a free spell, an untap.
             _ => true,

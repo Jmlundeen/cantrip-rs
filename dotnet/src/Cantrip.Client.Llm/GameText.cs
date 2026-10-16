@@ -340,6 +340,9 @@ public static class GameText
 
             CoinFlippedEvent flip => $"{Seat(client, flip.Player)} flipped a coin and {(flip.Won ? "won" : "lost")} the flip.",
 
+            TurnEndedEvent ended => (ended.Player == client.Seat ? "Your" : $"{Seat(client, ended.Player)}'s")
+                + " turn was ended: the stack was exiled and the turn went straight to its cleanup step.",
+
             ExtraTurnAddedEvent extra => $"{Seat(client, extra.Player)} takes {extra.Count} extra turn(s).",
 
             PlayerLostEvent lost => $"{Seat(client, lost.Player)} lost the game ({Loss(lost.Reason)}).",

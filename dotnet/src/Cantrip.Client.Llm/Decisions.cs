@@ -1470,6 +1470,16 @@ public sealed class Decisions
             };
         }
 
+        // CR 724.1: asked of the player whose turn it is, whoever controls the source.
+        if (prompt.Verb == "EndTurn")
+        {
+            return new MayChosenAnswer
+            {
+                Accept = Yes($"{source} lets you, as the player whose turn it is, end the turn: every spell and ability on the stack "
+                    + "is exiled without resolving, the rest of the turn is skipped, and its cleanup step follows. Do you end the turn?"),
+            };
+        }
+
         return new MayChosenAnswer
         {
             Accept = Yes($"{source} says you may {Verb(prompt.Verb)}{amount}. Do you?"),
