@@ -1,0 +1,59 @@
+# Torpor Orb stops only creatures entering from causing triggers, whatever the trigger asks for (the rulings' Captain
+# Storm / Contraband Kingpin): Tezzeret, Cruel Captain's "Whenever an artifact you control enters, put a loyalty counter"
+# does not trigger for Ornithopter, an artifact creature, but does for Mind Stone and for the Clue Tireless Tracker's
+# landfall makes, noncreature artifacts. Bot2's Orb stops Bot1's triggers as well as its own. Tezzeret enters with 4;
+# Mox Sapphire, cast on turn 1 before the Orb, adds one (5), Mind Stone one (6), the Clue one (7).
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Sol Ring
+Tezzeret, Cruel Captain
+Mox Sapphire
+Ornithopter
+Tireless Tracker
+Mind Stone
+Forest
+Forest x10
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Torpor Orb
+Island x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Tezzeret, Cruel Captain.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Tezzeret, Cruel Captain.Counters.Loyalty = 5
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Torpor Orb.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Mind Stone.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Tireless Tracker.Cast
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Tezzeret, Cruel Captain.Counters.Loyalty = 6
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T5 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Forest; Forest; Mox Emerald; Sol Ring; Tezzeret, Cruel Captain; Mox Sapphire; Ornithopter; Mind Stone; Tireless Tracker; Clue Token
+Bot1.Battlefield.Tezzeret, Cruel Captain.Counters.Loyalty = 7

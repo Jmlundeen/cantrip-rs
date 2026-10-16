@@ -1,0 +1,49 @@
+# Torpor Orb judges an entering permanent as it exists on the battlefield, copy effects applied (CR 603.6a, 707.2; the
+# rulings: "Look at the permanent as it exists on the battlefield, taking into account continuous effects"). Phyrexian
+# Metamorph is an artifact creature card, but it enters as a copy of Cryogen Relic, a noncreature artifact, so its copied
+# "When this artifact enters ..., draw a card" triggers under Bot2's Orb. Hand: 7 - Island, Mox Sapphire, Sol Ring, Relic
+# = 3, + 1 for the Relic = 4; turn 3 draws (5), casts the Metamorph (4) and draws for the copy (5).
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Sol Ring
+Cryogen Relic
+Phyrexian Metamorph
+Island x12
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Torpor Orb
+Island x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Cryogen Relic.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Torpor Orb.Cast
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 5
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Phyrexian Metamorph.Cast
+Bot1.Accept
+Bot1.Target(Cryogen Relic)
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand.Count = 5
+Bot1.Battlefield = Island; Mox Sapphire; Sol Ring; Cryogen Relic; Cryogen Relic
+Bot1.Battlefield.Cryogen Relic#2.Types = Artifact

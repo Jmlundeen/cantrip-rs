@@ -1,0 +1,42 @@
+# Torpor Orb stops triggered abilities only. "This creature enters with X +1/+1 counters" is a replacement effect and
+# "As this creature enters, choose a color" a static ability that works as it enters (CR 603.6d, 614.1c, 614.12): with
+# the Orb out, Walking Ballista cast for X = 1 still enters with its counter, and Painter's Servant still has its color
+# chosen (the rulings: "Replacement effects are unaffected ... Abilities that apply 'as [this creature] enters' ... are
+# unaffected").
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Sol Ring
+Torpor Orb
+Walking Ballista
+Painter's Servant
+Island x10
+
+[Bot2 Deck]
+Plains x14
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Torpor Orb.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Walking Ballista.Cast(X: 1)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Painter's Servant.Cast
+Bot1.Colors(Black)
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Walking Ballista.Power = 1
+Bot1.Battlefield.Painter's Servant.ChosenColor = Black
+Bot1.Battlefield.Torpor Orb.Colors = Black

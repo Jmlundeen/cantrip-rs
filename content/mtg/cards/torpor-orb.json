@@ -1,0 +1,6 @@
+{
+  "name": "Torpor Orb",
+  "manaCost": "{2}",
+  "type": "Artifact",
+  "oracleText": "Creatures entering don't cause abilities to trigger."
+}
