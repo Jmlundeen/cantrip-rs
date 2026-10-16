@@ -1,6 +1,7 @@
 //! Empower Jace N (the 2026 keyword action): "if you don't control a Jace planeswalker token, create a blue Jace
 //! planeswalker token with 0 loyalty, '[-1]: Surveil 1,' and '[-3]: Draw a card.' Choose a Jace planeswalker token you
-//! control. Put N loyalty counters on it." Nonland Jace planeswalkers are never chosen. Theorist's Sanctum prints it.
+//! control. Put N loyalty counters on it." Nonland Jace planeswalkers are never chosen. Theorist's Sanctum, Fatehold Charm,
+//! Countersculpt and Jace's Machinations print it.
 //! (It is not in the Comprehensive Rules this repository holds; the rulings on the card are the source.)
 
 use crate::{choose, effects, tokens};
@@ -39,7 +40,8 @@ fn jace_tokens(g: &dyn Game, controller: PlayerId) -> Vec<ObjectId> {
 }
 
 /// "Empower Jace N" for `controller`, `source` being the object whose ability does it. With several Jace planeswalker
-/// tokens (a token copy of a Jace keeps its printed loyalty) the player chooses which gets the counters.
+/// tokens (a token copy of a Jace keeps its printed loyalty) the player chooses which gets the counters, a choice that
+/// is not targeting (`Purpose::PutCounters`).
 pub fn jace(g: &mut dyn Game, controller: PlayerId, source: ObjectId, n: i16) -> Result<(), Suspend> {
     let mut owned = jace_tokens(g, controller);
     if owned.is_empty() {
@@ -49,7 +51,7 @@ pub fn jace(g: &mut dyn Game, controller: PlayerId, source: ObjectId, n: i16) ->
     let jace = match owned.as_slice() {
         [] => None,
         [only] => Some(*only),
-        _ => choose::cards_from_kind(g, controller, source, Purpose::Optional, "Jace planeswalker token", owned.clone(), owned, 1, false)?.first().copied(),
+        _ => choose::cards_from_kind(g, controller, source, Purpose::PutCounters(CounterKind::Loyalty, n.clamp(0, 255) as u8), "Jace planeswalker token", owned.clone(), owned, 1, false)?.first().copied(),
     };
     if let Some(jace) = jace {
         g.add_counters(jace, CounterKind::Loyalty, n);

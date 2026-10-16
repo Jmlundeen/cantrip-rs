@@ -36,8 +36,9 @@ pub fn amass(
     }
     let army = match candidates.as_slice() {
         [only] => *only,
-        _ => match choose::card(g, controller, source, Purpose::Keep, candidates)? {
-            Some(army) => army,
+        // Several Armies: which gets the counters is chosen, not targeted (CR 701.47a).
+        _ => match choose::cards_from_kind(g, controller, source, Purpose::PutCounters(CounterKind::PlusOne, n.clamp(0, 255) as u8), "Army", candidates.clone(), candidates, 1, false)?.first() {
+            Some(&army) => army,
             None => return Ok(()),
         },
     };

@@ -296,6 +296,9 @@ public enum CardChoicePurposeView
 
     /// <summary>Up to one untapped creature you control is tapped as part of casting, and its power (the prompt's <c>Powers</c>) comes off the generic mana of the total cost; choosing nothing pays the full cost (harmonize, CR 702.180).</summary>
     TapToReduce = 26,
+
+    /// <summary>The permanent that gets counters, chosen without targeting: the prompt's <c>Counter</c> and <c>CounterCount</c> say which kind and how many (empower Jace's loyalty counters on a Jace token, amass's +1/+1 counters on an Army).</summary>
+    PutCounters = 27,
 }
 
 /// <summary>Where cards found by a library search go (CR 701.23).</summary>

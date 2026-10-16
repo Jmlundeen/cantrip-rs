@@ -447,6 +447,10 @@ pub enum Purpose {
     Behold,
     /// The creature a cost blights (CR 701.68a).
     Blight,
+    /// The permanent that gets this many counters of this kind, chosen without targeting (CR 122.1, 608.2d): which Jace
+    /// planeswalker token empower Jace puts its loyalty counters on (Theorist's Sanctum, Fatehold Charm, Countersculpt),
+    /// which Army amass puts its +1/+1 counters on (CR 701.47a; Orcish Bowmasters).
+    PutCounters(CounterKind, u8),
     /// The creature harmonize taps, if any (CR 702.180a-b): up to one untapped creature, whose power comes off the generic
     /// mana of the total cost.
     TapToReduce,

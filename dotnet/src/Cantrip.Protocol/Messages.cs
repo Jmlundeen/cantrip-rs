@@ -1145,6 +1145,14 @@ public sealed class ChooseCardsPromptMessage : PromptPayload
     [Key(13)]
     public int MaximumManaValue { get; set; }
 
+    /// <summary>For <see cref="CardChoicePurposeView.PutCounters"/>, the kind of counter the chosen permanent gets, as Oracle text names it ("loyalty", "+1/+1"). Empty otherwise.</summary>
+    [Key(14)]
+    public string Counter { get; set; } = string.Empty;
+
+    /// <summary>For <see cref="CardChoicePurposeView.PutCounters"/>, how many counters the chosen permanent gets.</summary>
+    [Key(15)]
+    public int CounterCount { get; set; }
+
     /// <summary>
     /// The first eligible cards, never anything outside <see cref="Eligible"/>. A choice that must add up to a power is
     /// offered "up to" every candidate, so taking them all meets it whenever anything can.

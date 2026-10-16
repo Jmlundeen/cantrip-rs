@@ -893,6 +893,17 @@ fn least_cost(cx: &Cx, available: &Available, player: PlayerId, card: ObjectId, 
     if let Some(extra) = def.additional_cost {
         cost = add_cost(cost, extra.mana);
     }
+    // CR 601.2b: an additional cost that is one of several ("behold a Jace or pay {1}") costs at least the mana of the
+    // cheapest of them that can be paid otherwise.
+    if let Some(cheapest) = def
+        .additional_choice
+        .iter()
+        .filter(|c| can_pay_other(cx, card, player, &c.cost))
+        .map(|c| c.cost.mana)
+        .min_by_key(|m| m.mana_value())
+    {
+        cost = add_cost(cost, cheapest);
+    }
     if let Some(modal) = def.modal {
         let mut costs: Vec<ManaCost> = modal.modes.iter().map(|m| m.cost).collect();
         costs.sort_by_key(|c| c.mana_value());

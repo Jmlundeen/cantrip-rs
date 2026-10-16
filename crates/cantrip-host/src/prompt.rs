@@ -366,6 +366,7 @@ fn purpose_view(purpose: Purpose, opening: bool) -> CardChoicePurposeView {
         Purpose::Behold => V::Behold,
         Purpose::Blight => V::Blight,
         Purpose::TapToReduce => V::TapToReduce,
+        Purpose::PutCounters(..) => V::PutCounters,
         Purpose::SeparatePiles
         | Purpose::ChoosePile
         | Purpose::CopyAsEnters
@@ -549,6 +550,15 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 },
                 maximum_mana_value: match purpose {
                     Purpose::CastCopyFreeWithin(left) => i32::from(*left),
+                    _ => 0,
+                },
+                // The counters the chosen permanent gets, for the caption ("put 2 loyalty counters on").
+                counter: match purpose {
+                    Purpose::PutCounters(counter, _) => counter.name().into(),
+                    _ => String::new(),
+                },
+                counter_count: match purpose {
+                    Purpose::PutCounters(_, n) => i32::from(*n),
                     _ => 0,
                 },
                 ..Default::default()

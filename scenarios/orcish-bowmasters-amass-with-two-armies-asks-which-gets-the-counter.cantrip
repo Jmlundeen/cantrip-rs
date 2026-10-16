@@ -1,0 +1,57 @@
+# Amass with more than one Army (CR 701.47a, "put N +1/+1 counters on an Army you control"): which Army gets the counter is
+# chosen, not targeted. Bot1's first Orcish Bowmasters makes an Orc Army token with one counter on turn 1, beside a Firdoch
+# Core. On turn 3 the Core becomes a 4/4 artifact creature - a changeling, so an Army too - and the second Bowmasters' amass
+# asks which Army; Bot1 picks the Core, which gets the +1/+1 counter, and the token stays at one.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Sol Ring
+Orcish Bowmasters
+Firdoch Core
+Orcish Bowmasters
+Swamp x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Orcish Bowmasters.Cast
+Bot2.Pass
+Bot1.Target(Bot2)
+Bot2.Pass
+? Bot1.Battlefield.Orc Army.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Firdoch Core.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Firdoch Core.Activate(Ability: becomes)
+Bot2.Pass
+? Bot1.Battlefield.Firdoch Core.Power = 4
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Orcish Bowmasters.Cast
+Bot2.Pass
+Bot1.Target(Bot2)
+Bot2.Pass
+Bot1.Choose(Firdoch Core)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield.Firdoch Core.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Firdoch Core.Power = 5
+Bot1.Battlefield.Orc Army.Counters.PlusOnePlusOne = 1

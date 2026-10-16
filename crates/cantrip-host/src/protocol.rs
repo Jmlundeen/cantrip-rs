@@ -237,6 +237,9 @@ pub enum CardChoicePurposeView {
     CastCopyFree,
     /// Up to one untapped creature tapped as a cost, its power coming off the generic mana of the total cost (harmonize, CR 702.180).
     TapToReduce,
+    /// The permanent that gets counters, chosen without targeting: `Counter` and `CounterCount` say which and how many
+    /// (empower Jace's loyalty counters, amass's +1/+1 counters).
+    PutCounters,
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -860,6 +863,10 @@ pub struct ChooseCardsPrompt {
     pub minimum_mana_value: i32,
     pub mana_values: Vec<i32>,
     pub maximum_mana_value: i32,
+    /// For `PutCounters`, the kind of counter as Oracle text names it ("loyalty", "+1/+1"); empty otherwise.
+    pub counter: String,
+    /// For `PutCounters`, how many counters the chosen permanent gets.
+    pub counter_count: i32,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
