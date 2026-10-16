@@ -1,0 +1,55 @@
+# Browser
+# CR 724.1. What a player sees of a turn ended by an effect: Obeka's question is put to the player whose turn it is in its
+# own words - end the turn, what that does to the stack - with neither button the default, and once it is answered the
+# game log says whose turn ended and that Bot2's Lightning Bolt was exiled, the stack row is empty, and the next turn is
+# Bot2's.
+#
+# Turn 1: Obeka is cast. Turn 3: Bot2 casts Lightning Bolt at Bot1 in Bot1's main phase; Bot1 taps Obeka in response and,
+# asked as the player whose turn it is, ends the turn. The Bolt is exiled and Bot1 stays at 20.
+
+[Bot1 Deck]
+Island
+Mox Jet
+Mox Ruby
+Mox Pearl
+Obeka, Brute Chronologist
+Island x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Obeka, Brute Chronologist.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Obeka, Brute Chronologist.Activate
+Bot1.Pass
+Bot2.Pass
+? Client.Bot1.Prompt.Title = Obeka, Brute Chronologist: end the turn?
+? Client.Bot1.Prompt.Detail = Every spell and ability on the stack is exiled  ·  the rest of the turn is skipped, straight to cleanup
+? Client.Bot1.Dock = End the turn; Don't end it
+Bot1.Accept
+[T4 Bot2.Upkeep]
+? Client.Bot1.Log.Has = Your turn ends.
+? Client.Bot1.Log.Has = [Lightning Bolt] is exiled.
+? Client.Bot1.Stack.Count = 0
+
+[Expect]
+Turn = 4
+Bot1.Life = 20
+Exile = Lightning Bolt
+Bot1.Battlefield.Obeka, Brute Chronologist.Tapped = true
