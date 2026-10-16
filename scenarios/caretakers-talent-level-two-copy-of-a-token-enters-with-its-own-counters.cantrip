@@ -1,0 +1,60 @@
+# Caretaker's Talent, level 2: the token it creates is a copy of the target (CR 707.2) and enters the battlefield as a new
+# object, so the target's "this creature enters with six -1/-1 counters on it" applies to it (CR 614.1c, 707.9). In turn 3
+# Uldaros Theorix casts a copy of Moonshadow (Bot2's Lightning Bolt killed it in turn 2): a 7/7 with six -1/-1 counters,
+# a 1/1 token. In turn 5 Level 2 copies that token: the copy is a 1/1 with its own six counters, not a 7/7.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Caretaker's Talent
+Moonshadow
+Black Lotus
+Uldaros Theorix
+Plains x12
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Caretaker's Talent.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Moonshadow.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Moonshadow)
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Uldaros Theorix.Cast
+Bot1.Target(Moonshadow)
+Bot1.Choose(Moonshadow)
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Moonshadow.Power = 1
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Caretaker's Talent.Activate(Ability: Level 2)
+[T5 Bot1.End]
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield.Moonshadow#1.Token = true
+Bot1.Battlefield.Moonshadow#1.Power = 1
+Bot1.Battlefield.Moonshadow#1.Toughness = 1
+Bot1.Battlefield.Moonshadow#2.Token = true
+Bot1.Battlefield.Moonshadow#2.Power = 1
+Bot1.Battlefield.Moonshadow#2.Toughness = 1

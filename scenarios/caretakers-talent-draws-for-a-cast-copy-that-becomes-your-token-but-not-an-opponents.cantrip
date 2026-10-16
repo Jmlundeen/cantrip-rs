@@ -1,0 +1,67 @@
+# Caretaker's Talent: a copy of a permanent spell becomes a token as it resolves (CR 707.10f, 111.13); it enters under its
+# caster's control, so it is "a token you control" for the Talent's controller only when he cast it. In turn 2 Bot2's
+# Uldaros Theorix casts a copy of its sacrificed Black Lotus: a Black Lotus token enters under Bot2 and Bot1 draws
+# nothing (hand: 2 after turn 1, 3 with the turn-3 draw). In turn 3 Bot1's own Uldaros Theorix does the same and the
+# Lotus token that enters under Bot1 draws a card: Lotus 2, Uldaros 1, Talent's card 2.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Caretaker's Talent
+Black Lotus
+Uldaros Theorix
+Plains x12
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Black Lotus
+Uldaros Theorix
+Plains
+Plains x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Caretaker's Talent.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Uldaros Theorix.Cast
+Bot2.Target(Black Lotus)
+Bot2.Choose(Black Lotus)
+[T3 Bot1.Main1]
+? Bot2.Battlefield.Black Lotus.Token = true
+? Bot1.Hand.Count = 3
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Uldaros Theorix.Cast
+Bot1.Target(Black Lotus)
+Bot1.Choose(Black Lotus)
+[Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Hand.Count = 2
+Bot1.Battlefield.Black Lotus.Token = true
+Bot2.Battlefield.Black Lotus.Token = true
