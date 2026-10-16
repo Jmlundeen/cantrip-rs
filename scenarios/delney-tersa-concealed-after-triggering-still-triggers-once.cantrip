@@ -1,0 +1,51 @@
+# Delney, Streetwise Lookout judges the creature as its ability triggers (CR 603.2d; the rulings: "Once an ability of a
+# creature you control has triggered, reducing its power to 2 or less won't cause that ability to trigger an additional
+# time"). Tersa Lightshatter (3/3) enters and its "discard up to two cards, then draw that many cards" triggers once; with
+# it on the stack Secret Identity (Conceal) makes Tersa a 1/1, and still one ability is on the stack and resolves (an
+# empty hand: nothing to discard or draw).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Delney, Streetwise Lookout
+Mox Ruby
+Tersa Lightshatter
+Secret Identity
+Mox Sapphire
+Island x15
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Delney, Streetwise Lookout.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Tersa Lightshatter.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Secret Identity.Cast
+Bot1.Modes(Conceal)
+Bot1.Target(Tersa Lightshatter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Tersa Lightshatter.Power = 1
+? Stack.Count = 1
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Secret Identity

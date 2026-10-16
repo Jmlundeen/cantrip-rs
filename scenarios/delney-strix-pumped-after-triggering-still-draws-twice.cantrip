@@ -1,0 +1,47 @@
+# Delney, Streetwise Lookout judges the creature as its ability triggers (CR 603.2d; the rulings: "once an ability of a
+# creature you control with power 2 or less has triggered an additional time ..., increasing its power to 3 or greater won't
+# remove that additional triggered ability from the stack"). Bot1's Baleful Strix (1/1) enters and its draw triggers twice;
+# with both on the stack Full Bore makes it 4/3, and both still resolve: two cards.
+# Hand: 7 - 5 played on turn 1 = 2 (the Strix, Full Bore); turn 3 draws the Ruby (3), casts all three (0), draws two = 2.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Delney, Streetwise Lookout
+Mox Sapphire
+Baleful Strix
+Full Bore
+Mox Ruby
+Island x15
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Delney, Streetwise Lookout.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Baleful Strix.Cast
+Bot1.Pass
+Bot1.Triggers(Baleful Strix; Baleful Strix)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Full Bore.Cast(Baleful Strix)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 2
+? Bot1.Battlefield.Baleful Strix.Power = 4
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand.Count = 2

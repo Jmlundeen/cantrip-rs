@@ -1,0 +1,54 @@
+# Delney, Streetwise Lookout: "If a triggered ability of a creature you control with power 2 or less triggers, that ability
+# triggers an additional time" (CR 603.2d). Power exactly 2 is in: Sanguine Evangelist (2/1) entering triggers "When this
+# creature enters or dies, create a 1/1 black Bat creature token with flying" twice, two Bats. A noncreature permanent is
+# not a creature: Cryogen Relic's "When this artifact enters or leaves the battlefield, draw a card" triggers once.
+# Hand: 7 - 6 played on turn 1 = 1 (the Evangelist); turn 3 draws the Relic (2), casts both (0), draws one = 1.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Delney, Streetwise Lookout
+Mox Sapphire
+Mox Ruby
+Sanguine Evangelist
+Cryogen Relic
+Island x15
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Delney, Streetwise Lookout.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sanguine Evangelist.Cast
+Bot1.Pass
+Bot1.Triggers(Sanguine Evangelist; Sanguine Evangelist)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Cryogen Relic.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand.Count = 1
+Bot1.Battlefield = Plains; Mox Pearl; Mox Jet; Mox Sapphire; Mox Ruby; Delney, Streetwise Lookout; Sanguine Evangelist; Bat; Bat; Cryogen Relic

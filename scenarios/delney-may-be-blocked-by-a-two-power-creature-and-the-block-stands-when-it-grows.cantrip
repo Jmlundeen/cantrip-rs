@@ -1,0 +1,51 @@
+# Delney, Streetwise Lookout: "Creatures you control with power 2 or less can't be blocked by creatures with power 3 or
+# greater" (CR 509.1b). Power exactly 2 may block: Bot2's Sanguine Evangelist (2/1) blocks the attacking Delney (2/2).
+# Once blocks are declared the restriction has done its work (the rulings: "increasing the power of the creature blocking
+# it to 3 or greater won't cause it to become unblocked"): Bot2 casts Full Bore on the Evangelist (+3/+2, 5/3), the block
+# stands, Delney dies to 5 damage and the Evangelist survives 2.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Delney, Streetwise Lookout
+Island x15
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Sanguine Evangelist
+Full Bore
+Plains x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Delney, Streetwise Lookout.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Sanguine Evangelist.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Delney, Streetwise Lookout > Bot2)
+Bot2.Block(Sanguine Evangelist > Delney, Streetwise Lookout)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Full Bore.Cast(Sanguine Evangelist)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot1.Graveyard = Delney, Streetwise Lookout
+Bot2.Battlefield.Sanguine Evangelist.Damage = 2
+Bot2.Battlefield.Sanguine Evangelist.Power = 5
