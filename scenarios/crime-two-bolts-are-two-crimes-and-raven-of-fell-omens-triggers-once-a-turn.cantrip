@@ -1,0 +1,52 @@
+# CR 700.13: each spell is a crime of its own, so two Lightning Bolts at Bot2 are two crimes. Raven of Fell Omens
+# "triggers only once each turn": the first crime drains, the second does not (Bot2 at 20 - 1 - 3 - 3 = 13). On Bot2's
+# turn, a new turn, Bot1's third Bolt at Bot2 is a third crime, and the Raven triggers again (Bot2 at 9, Bot1 at 22).
+
+[Bot1 Deck]
+Swamp
+Mountain
+Raven of Fell Omens
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Mox Ruby
+Black Lotus
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Raven of Fell Omens.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 13
+[T6 Bot2.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Stack.Count = 2
+[T6 Bot2.Main2]
+
+[Expect]
+Bot1.Crimes = Lightning Bolt; Lightning Bolt; Lightning Bolt
+Bot2.Life = 9
+Bot1.Life = 22

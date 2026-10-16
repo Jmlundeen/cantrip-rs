@@ -1,0 +1,48 @@
+# CR 700.13 and its ruling: "The spell or ability that constituted a crime doesn't have to have resolved yet or at all."
+# Bot1 aims Lightning Bolt at Bot2's Llanowar Elves: a crime, and Raven of Fell Omens triggers. Bot2 answers with
+# Snakeskin Veil, and the Bolt's only target is illegal as it tries to resolve, so it does not resolve (CR 608.2b). The
+# crime was committed all the same: the Raven's drain happened (Bot2 at 19, Bot1 at 21) and Bot1's crime is recorded.
+
+[Bot1 Deck]
+Swamp
+Mountain
+Raven of Fell Omens
+Lightning Bolt
+Swamp x16
+
+[Bot2 Deck]
+Forest
+Forest
+Llanowar Elves
+Snakeskin Veil
+Forest x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Raven of Fell Omens.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Battlefield.Forest#1.Activate
+Bot2.Hand.Snakeskin Veil.Cast(Llanowar Elves)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Crimes = Lightning Bolt
+Bot2.Crimes = (absent)
+Bot2.Battlefield.Llanowar Elves.Damage = 0
+Bot2.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = 1
+Bot2.Life = 19
+Bot1.Life = 21
+Bot1.Graveyard = Lightning Bolt

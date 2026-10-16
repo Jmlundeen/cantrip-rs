@@ -1,0 +1,47 @@
+# CR 700.13 names only opponents, what they control and cards in their graveyards. Bot1 aims Lightning Bolt at
+# itself and a second one at its own Llanowar Elves: neither is a crime, so Raven of Fell Omens never triggers
+# (Bot2 stays at 20) and Bot1 has no crimes. The positive control is
+# crime-lightning-bolt-at-an-opponent-commits-a-crime, the same Bolt at Bot2.
+
+[Bot1 Deck]
+Swamp
+Mountain
+Forest
+Raven of Fell Omens
+Llanowar Elves
+Lightning Bolt
+Lightning Bolt
+Mox Ruby
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Raven of Fell Omens.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1)
+? Stack.Count = 1
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Llanowar Elves)
+? Stack.Count = 1
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Crimes = (absent)
+Bot2.Life = 20
+Bot1.Life = 17
+Bot1.Graveyard = Llanowar Elves; Lightning Bolt; Lightning Bolt

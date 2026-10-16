@@ -1,0 +1,54 @@
+# CR 700.13 and CR 707.10: a copy of a spell is not cast, so it commits no crime even when its new target is an
+# opponent's creature. Bot1's Lightning Bolt targets only Bot1's own Llanowar Elves (no crime); Leyline of Resonance
+# copies it and Bot1 aims the copy at Bot2's Llanowar Elves. Bot2's Elves dies, and Bot1 has committed no crime:
+# Raven of Fell Omens never triggers (Bot2 at 20).
+
+[Bot1 Deck]
+Leyline of Resonance
+Forest
+Mountain
+Swamp
+Llanowar Elves
+Lightning Bolt
+Raven of Fell Omens
+Mox Jet
+Forest x12
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x18
+
+[Actions]
+Bot1.Accept
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Raven of Fell Omens.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+? Stack.Count = 2
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Crimes = (absent)
+Bot2.Graveyard = Llanowar Elves
+Bot1.Graveyard = Llanowar Elves; Lightning Bolt
+Bot2.Life = 20
+Bot1.Life = 20

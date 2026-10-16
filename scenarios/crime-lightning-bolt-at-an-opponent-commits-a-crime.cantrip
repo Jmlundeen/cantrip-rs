@@ -1,0 +1,40 @@
+# CR 700.13: Bot1 casts Lightning Bolt at Bot2, so Bot1 commits a crime as it is cast - before it resolves. Raven of
+# Fell Omens' "whenever you commit a crime" triggers and resolves first, above the Bolt (the Bolt is still on the stack
+# when the trigger is there): Bot2 loses 1 and Bot1 gains 1, then the Bolt deals 3.
+
+[Bot1 Deck]
+Swamp
+Mountain
+Raven of Fell Omens
+Lightning Bolt
+Swamp x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Raven of Fell Omens.Cast
+? Bot1.Crimes = (absent)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Stack.Count = 2
+? Bot1.Crimes = Lightning Bolt
+Bot1.Pass
+Bot2.Pass
+? Stack = Lightning Bolt
+? Bot2.Life = 19
+? Bot1.Life = 21
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Crimes = Lightning Bolt
+Bot2.Crimes = (absent)
+Bot2.Life = 16
+Bot1.Life = 21
+Bot1.Graveyard = Lightning Bolt

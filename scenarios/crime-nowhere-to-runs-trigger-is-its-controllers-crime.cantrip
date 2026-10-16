@@ -1,0 +1,44 @@
+# CR 700.13: a triggered ability put on the stack commits a crime for its controller. Bot2's Nowhere to Run enters
+# and its trigger targets Bot1's Raven of Fell Omens: the crime is Bot2's, from the trigger (the enchantment spell
+# itself targeted nothing). The Raven's "whenever you commit a crime" is about Bot1, so it does not trigger: no one
+# gains or loses life.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Raven of Fell Omens
+Swamp x17
+
+[Bot2 Deck]
+Swamp
+Swamp
+Nowhere to Run
+Swamp x17
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Raven of Fell Omens.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp#1.Activate
+Bot2.Battlefield.Swamp#2.Activate
+Bot2.Hand.Nowhere to Run.Cast
+? Bot2.Crimes = (absent)
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 1
+? Bot2.Crimes = Nowhere to Run
+[T4 Bot2.Main2]
+
+[Expect]
+Bot2.Crimes = Nowhere to Run
+Bot1.Crimes = (absent)
+Bot1.Graveyard = Raven of Fell Omens
+Bot1.Life = 20
+Bot2.Life = 20

@@ -1,0 +1,41 @@
+# CR 700.13: "at least one ... spell ... an opponent controls". On Bot2's turn Bot1 counters Bot2's Llanowar Elves with
+# Counterspell: Bot1 commits a crime, and Raven of Fell Omens' trigger resolves above the Counterspell (Bot2 at 19,
+# Bot1 at 21) - on Bot2's turn, since the crime is Bot1's whoever's turn it is. Bot2's Elves targets nothing.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Black Lotus
+Raven of Fell Omens
+Counterspell
+Island x15
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x18
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Raven of Fell Omens.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Counterspell.Cast(Stack.Llanowar Elves)
+? Stack.Count = 3
+? Bot1.Crimes = Counterspell
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Crimes = Counterspell
+Bot2.Crimes = (absent)
+Bot2.Graveyard = Llanowar Elves
+Bot1.Graveyard = Counterspell; Black Lotus
+Bot2.Life = 19
+Bot1.Life = 21

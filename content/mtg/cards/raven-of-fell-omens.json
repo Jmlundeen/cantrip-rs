@@ -1,0 +1,11 @@
+{
+  "name": "Raven of Fell Omens",
+  "manaCost": "{1}{B}",
+  "type": "Creature — Bird",
+  "power": 1,
+  "toughness": 2,
+  "oracleText": "Flying\nWhenever you commit a crime, each opponent loses 1 life and you gain 1 life. This ability triggers only once each turn. (Targeting opponents, anything they control, and/or cards in their graveyards is a crime.)",
+  "keywords": [
+    "Flying"
+  ]
+}
