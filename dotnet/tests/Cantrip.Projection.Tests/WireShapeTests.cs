@@ -28,7 +28,7 @@ public sealed class WireShapeTests
     /// The wire as it stands. Written as version and digest together so the two are updated in one edit rather than
     /// one of them being remembered — and so this line never names a version it has drifted away from.
     /// </summary>
-    private const string Recorded = "147:A19E350A3DFEBA45";
+    private const string Recorded = "147:D1A2645E7CD6248E";
 
     [Fact]
     public void The_wire_has_not_changed_without_the_protocol_version_moving()
@@ -84,6 +84,20 @@ public sealed class WireShapeTests
             foreach ((_, string line) in members)
             {
                 text.Append(line).Append(';');
+            }
+
+            text.Append("}\n");
+        }
+
+        // Every enum the messages carry, by member name and value: a member added to one (an action kind, a prompt kind) is
+        // as much a change to what the bytes mean as a key, and an older client cannot read it either.
+        foreach (Type enumeration in typeof(PlayerView).Assembly.GetTypes().Where(type => type.IsEnum).OrderBy(type => type.FullName, StringComparer.Ordinal))
+        {
+            text.Append(enumeration.FullName).Append('{');
+            foreach (object value in Enum.GetValues(enumeration))
+            {
+                text.Append(Enum.GetName(enumeration, value)).Append('=')
+                    .Append(Convert.ToInt64(value, CultureInfo.InvariantCulture).ToString(CultureInfo.InvariantCulture)).Append(';');
             }
 
             text.Append("}\n");

@@ -1,0 +1,25 @@
+# Browser
+# A split card (CR 709) that is not a Room, on the page: Life // Death in hand is drawn as its two halves (the host fills
+# `halves` for every split card), its cast offers a row for each half, and the half chosen, Life, is the one spell on the stack
+# (CR 709.3b), named so, while the card in hand keeps both names. Life makes every land a 1/1 creature until end of turn.
+
+[Bot1 Deck]
+Forest
+Life // Death
+Forest x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+? Client.Bot1.Hand.Count = 7
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Life // Death.Cast(Ability: Life)
+? Client.Bot1.Stack = Life
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Forest.Types = Land; Creature
+Bot1.Battlefield.Forest.Power = 1

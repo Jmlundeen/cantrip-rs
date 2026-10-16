@@ -209,6 +209,7 @@ public sealed partial class MainPage
                         json.WriteString("doors", card.UnlockedDoors.Count > 0 && card.UnlockedDoors.Count == card.Halves.Count
                             ? string.Join("; ", card.Halves.Select((half, i) => $"{half.Name}:{(card.UnlockedDoors[i] ? "unlocked" : "locked")}"))
                             : string.Empty);
+                        json.WriteString("halves", string.Join("; ", card.Halves.Select(half => half.Name)));
                         json.WriteString("actions", client is null
                             ? string.Empty
                             : string.Join(" | ", _actions.For(card.Handle).Select(option => CardActions.Describe(client, option))));

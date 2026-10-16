@@ -296,11 +296,7 @@ public sealed class ScenarioPlayer
         List<ControlState> rows = [.. state.Controls.Where(c => c.Kind == "item")];
         ControlState? row = action.Color is { } color
             ? rows.FirstOrDefault(r => r.Label.Contains($"{{{Symbol(color)}}}", StringComparison.Ordinal))
-            // A Room with both doors locked offers an unlock for each, the left's ability before the right's (CR 709.5e).
-            : action.Kind == ActionKindView.UnlockDoor && rows.Count == 2 ? rows[action.AbilityIndex == 0 ? 0 : 1]
-            // A split card's menu offers its halves in the order they are printed, the left's way before the right's (CR 709.3).
-            : action.Kind == ActionKindView.CastSpell && rows.Count == 2 && action.AbilityIndex is 238 or 239
-                ? rows[action.AbilityIndex == 239 ? 0 : 1]
+            : DoorOf(action, state) is { } door ? rows.FirstOrDefault(r => r.Label.Contains(door, StringComparison.Ordinal))
             : rows.Count == 1 ? rows[0] : null;
         if (row is null)
         {
@@ -308,6 +304,36 @@ public sealed class ScenarioPlayer
         }
 
         await _page.Page.Mouse.ClickAsync(row.X, row.Y);
+    }
+
+    /// <summary>
+    /// The words of the menu row for the door an action is about (" — Unholy Annex" ends a cast of that half, "Unlock Ritual Chamber" starts its unlock): the half of a split card that a cast is
+    /// of (the left way is the half printed first, CR 709.3), or the locked door of a Room that an unlock opens - the only
+    /// locked one, or, with both locked, the left's before the right's (CR 709.5e). Null for any other action.
+    /// </summary>
+    private static string? DoorOf(TakeActionAnswer action, TableState state)
+    {
+        CardState? card = state.Cards.FirstOrDefault(c => c.Visible && c.Handle == action.Source.Value);
+        if (card is null)
+        {
+            return null;
+        }
+
+        if (action.Kind == ActionKindView.CastSpell && action.AbilityIndex is 238 or 239)
+        {
+            string[] halves = card.Halves.Split("; ", StringSplitOptions.RemoveEmptyEntries);
+            return halves.Length == 2 ? " — " + halves[action.AbilityIndex == 239 ? 0 : 1] : null;
+        }
+
+        if (action.Kind == ActionKindView.UnlockDoor)
+        {
+            string[] locked = [.. card.Doors.Split("; ", StringSplitOptions.RemoveEmptyEntries)
+                .Where(door => door.EndsWith(":locked", StringComparison.Ordinal))
+                .Select(door => door[..^":locked".Length])];
+            return locked.Length switch { 0 => null, 1 => "Unlock " + locked[0], _ => "Unlock " + locked[action.AbilityIndex == 0 ? 0 : 1] };
+        }
+
+        return null;
     }
 
     private static char Symbol(ColorView color) => color switch
