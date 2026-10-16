@@ -22,7 +22,7 @@ pub const fn way(cost: ManaCost, text: &'static str) -> WayDef {
 /// granter's controller's graveyard that have a mana cost, cast by that controller, if discarded this turn.
 fn granted_cost(q: &dyn Query, asker: &Asker, card: ObjectId, caster: PlayerId) -> Option<Cost> {
     let obj = q.obj(card);
-    let def = q.card(obj.card);
+    let def = q.card(q.chars(card).card);
     if caster != asker.controller || obj.owner != asker.controller || def.is(CardType::Land) || !def.has_cost {
         return None;
     }

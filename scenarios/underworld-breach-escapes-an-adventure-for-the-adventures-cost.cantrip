@@ -1,0 +1,38 @@
+# Underworld Breach gives each nonland card in the graveyard escape for its mana cost (CR 702.138a, 113.6). A card with an Adventure is
+# cast as either face (CR 715.3), and a way a permanent grants is judged on the face being cast, so Bonecrusher Giant escapes as Stomp
+# for Stomp's {1}{R}, not the creature's {2}{R}. Faithless Looting discards Bonecrusher Giant and an Island; the Lotus, the Looting and the
+# Island are the three other cards the escape exiles. Bot2 takes Stomp's 2 damage (20 - 2 = 18) and Stomp, resolved, is exiled on an
+# adventure (CR 715.3d).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Black Lotus
+Faithless Looting
+Bonecrusher Giant
+Underworld Breach
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Underworld Breach.Cast
+Bot1.Pass
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Bonecrusher Giant; Island)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Graveyard.Bonecrusher Giant.Cast(Bot2; Ability: Stomp: Escape)
+Bot1.Choose(Black Lotus; Faithless Looting; Island)
+Bot1.Pass
+
+[Expect]
+Bot2.Life = 18
+Bot1.Graveyard.Count = 0
+Exile.Count = 4

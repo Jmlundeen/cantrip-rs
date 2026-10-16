@@ -247,7 +247,20 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
             if o.index == WAY_ADVENTURE {
                 m.spell_name = def.adventure.map_or(String::new(), |a| a.name.to_string());
             }
-            let cost = if o.index == 0 || o.index == WAY_ADVENTURE {
+            // A cast a permanent grants names the face it casts (a Room's door, an Adventure): its name and its cost.
+            let granted_face = granted_slot(o.index).and_then(|(_, face)| match face {
+                GRANTED_FACE_LEFT => def.split.map(|h| h.0),
+                GRANTED_FACE_RIGHT => def.split.map(|h| h.1),
+                GRANTED_FACE_ADVENTURE => def.adventure,
+                GRANTED_FACE_BACK => def.back,
+                _ => None,
+            });
+            if let Some(face) = granted_face {
+                m.spell_name = face.name.to_string();
+            }
+            let cost = if let Some(face) = granted_face {
+                face.cost
+            } else if o.index == 0 || o.index == WAY_ADVENTURE || granted_slot(o.index).is_some() {
                 def.cost
             } else {
                 def.ways.get(o.index as usize - 1).map_or(def.cost, |w| w.cost.mana)

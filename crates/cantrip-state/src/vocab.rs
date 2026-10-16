@@ -38,9 +38,44 @@ pub const WAY_BACK_FACE: u8 = 253;
 /// cost.
 pub const WAY_BESTOW: u8 = 251;
 
-/// How a card in a graveyard is cast by a way a permanent on the battlefield gives it (CR 113.6, 118.9): `WAY_GRANTED + k`
-/// for the kth way the battlefield grants, in the order the permanents and their rules are listed.
-pub const WAY_GRANTED: u8 = 240;
+/// How a card in a graveyard is cast by a way a permanent on the battlefield gives it (CR 113.6, 118.9), as a way number:
+/// `WAY_GRANTED + k * WAY_GRANTED_STRIDE + face` for the kth way the battlefield grants, in the order the permanents and
+/// their rules are listed, and the face of the card it is cast as (`GRANTED_FACE_*`): a way is judged on the face it
+/// casts, never on the card as a whole (CR 709.3, 715.3, 712.8a). The band lies below the special ways and above any a card
+/// prints; a cast decodes it and goes on as that face's way (0, a split half, the Adventure, the back face).
+pub const WAY_GRANTED: u8 = 128;
+/// How many ways a battlefield may grant at once, and how many numbers each takes.
+pub const WAY_GRANTED_SLOTS: u8 = 8;
+pub const WAY_GRANTED_STRIDE: u8 = 5;
+/// The faces a granted cast names: the card itself, a split card's left half and right half, the Adventure, the back face.
+pub const GRANTED_FACE_WHOLE: u8 = 0;
+pub const GRANTED_FACE_LEFT: u8 = 1;
+pub const GRANTED_FACE_RIGHT: u8 = 2;
+pub const GRANTED_FACE_ADVENTURE: u8 = 3;
+pub const GRANTED_FACE_BACK: u8 = 4;
+
+/// The way number of the kth granted way cast as `face`.
+pub fn granted_way(k: usize, face: u8) -> u8 {
+    WAY_GRANTED + k as u8 * WAY_GRANTED_STRIDE + face
+}
+
+/// The granted way (its index among them) and the face a way number names, or `None` for a way that is not granted.
+pub fn granted_slot(way: u8) -> Option<(usize, u8)> {
+    let n = way.checked_sub(WAY_GRANTED)?;
+    (n < WAY_GRANTED_SLOTS * WAY_GRANTED_STRIDE).then(|| ((n / WAY_GRANTED_STRIDE) as usize, n % WAY_GRANTED_STRIDE))
+}
+
+/// The way number a cast of a face goes on as once it has left its granted way behind.
+pub fn granted_face_way(face: u8) -> u8 {
+    match face {
+        GRANTED_FACE_LEFT => WAY_SPLIT_LEFT,
+        GRANTED_FACE_RIGHT => WAY_SPLIT_RIGHT,
+        GRANTED_FACE_ADVENTURE => WAY_ADVENTURE,
+        GRANTED_FACE_BACK => WAY_BACK_FACE,
+        _ => 0,
+    }
+}
+
 /// How a card with overload is cast overloaded (CR 702.96a), as a way number: for its overload cost, with "each" where it
 /// says "target", so with no targets at all.
 pub const WAY_OVERLOAD: u8 = 250;

@@ -9,7 +9,7 @@ fn escape_cost(q: &dyn Query, asker: &Asker, card: ObjectId, caster: PlayerId) -
     if caster != asker.controller || q.obj(card).owner != asker.controller {
         return None;
     }
-    let def = q.card(q.obj(card).card);
+    let def = q.card(q.chars(card).card);
     if def.is(CardType::Land) || !def.has_cost {
         return None;
     }

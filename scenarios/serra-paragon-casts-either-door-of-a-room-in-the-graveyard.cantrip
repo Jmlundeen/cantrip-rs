@@ -1,8 +1,7 @@
-# Known bug: a way a permanent grants to cast from the graveyard (CR 601.3, 118.9) is judged on the whole Room card, mana value 8
-# there (CR 709.4b), and never on a door, so Serra Paragon's "permanent spell with mana value 3 or less" cannot cast Unholy Annex from the graveyard.
-# CR 709.3 and its rulings: casting a Room is choosing a door to cast, only that door's characteristics are considered ("you could cast
-# Bottomless Pool this way, but not Locker Room"), and that door is the one unlocked as it enters (CR 709.5d). Unholy Annex ({2}{B}, mana value
-# 3) is castable; Ritual Chamber ({3}{B}{B}) is not. The engine offers neither and has no way to name the door of a granted cast.
+# A way a permanent grants to cast from the graveyard (CR 601.3, 118.9) is judged on the face being cast: casting a Room is choosing a door
+# (CR 709.3), only that door's characteristics are considered ("you could cast Bottomless Pool this way, but not Locker Room"), and that door
+# is the one unlocked as it enters (CR 709.5d). Serra Paragon casts Unholy Annex ({2}{B}, mana value 3), not Ritual Chamber ({3}{B}{B}); the
+# cast names the door: Cast(Ability: Unholy Annex: Once during each of your turns).
 # Bot1 casts Unholy Annex on turn 1, Serra Paragon the same turn, on turn 3 Disenchants its own Room, and on turn 5 casts Unholy Annex from the
 # graveyard with the Paragon's permission; it enters with Annex's door unlocked, exiled if it dies (the Paragon's gift).
 
@@ -50,7 +49,10 @@ Bot1.Hand.Swamp.Play
 Bot1.Battlefield.Mox Jet.Activate
 Bot1.Battlefield.Swamp#1.Activate
 Bot1.Battlefield.Swamp#2.Activate
-Bot1.Graveyard.Unholy Annex // Ritual Chamber.Cast(Ability: Once during each of your turns)
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+! Bot1.Graveyard.Unholy Annex // Ritual Chamber.Cast(Ability: Ritual Chamber)
+Bot1.Graveyard.Unholy Annex // Ritual Chamber.Cast(Ability: Unholy Annex: Once during each of your turns)
 Bot1.Pass
 [T5 Bot1.Main2]
 

@@ -1,0 +1,40 @@
+# Lurrus of the Dream-Den: "Once during each of your turns, you may cast a permanent spell with mana value 2 or less from your
+# graveyard." A card with an Adventure is cast as either face (CR 715.3) and the way is judged on the face being cast: Elusive Otter
+# (mana value 1) is offered as the creature, and its Adventure Grove's Bounty, a sorcery, is not, though Bot1 has {G} to cast it
+# with. Faithless Looting discards Elusive Otter and an Island on turn 3.
+
+[Bot1 Deck]
+Black Lotus
+Lurrus of the Dream-Den
+Faithless Looting
+Elusive Otter
+Mox Sapphire
+Mox Emerald
+Mountain
+Island x20
+
+[Bot2 Deck]
+Island x13
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Lurrus of the Dream-Den.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Elusive Otter; Island)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+! Bot1.Graveyard.Elusive Otter.Cast(Ability: Grove's Bounty)
+Bot1.Graveyard.Elusive Otter.Cast(Ability: Elusive Otter: Once during each of your turns)
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield = Elusive Otter; Lurrus of the Dream-Den; Mountain; Mox Emerald; Mox Sapphire
+Bot1.Graveyard = Faithless Looting; Island; Black Lotus

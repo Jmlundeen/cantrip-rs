@@ -1392,9 +1392,9 @@ fn land_plays(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOption>) {
             continue;
         }
         let ways = granted.get_or_insert_with(|| granted_ways_of(cx.cards(), cx.s()));
-        for (k, &(granter, controller, way)) in ways.iter().enumerate().take(8) {
+        for (k, &(granter, controller, way)) in ways.iter().enumerate().take(WAY_GRANTED_SLOTS as usize) {
             if way.lands && (way.cost)(cx, &Asker { source: granter, controller }, id, player).is_some() {
-                options.push(ActionOption::on(ActionKind::PlayLand, id, WAY_GRANTED + k as u8));
+                options.push(ActionOption::on(ActionKind::PlayLand, id, granted_way(k, GRANTED_FACE_WHOLE)));
             }
         }
     }
@@ -1429,6 +1429,24 @@ fn cast_limit(cx: &Cx) -> Option<u8> {
         })
         .filter(|&n| n > 0)
         .min()
+}
+
+/// The faces a card may be cast as (CR 709.3, 715.3, 712.8a), as the face number a granted way names and the face: a split
+/// card's two halves (the card itself is never cast), otherwise the card and its Adventure and its back face, if it has them.
+fn faces_to_cast(def: &'static CardDef) -> Vec<(u8, &'static CardDef)> {
+    if let Some((left, right)) = def.split {
+        return vec![(GRANTED_FACE_LEFT, left), (GRANTED_FACE_RIGHT, right)];
+    }
+    let mut faces = vec![(GRANTED_FACE_WHOLE, def)];
+    if let Some(adventure) = def.adventure {
+        faces.push((GRANTED_FACE_ADVENTURE, adventure));
+    }
+    if let Some(back) = def.back
+        && back.has_cost
+    {
+        faces.push((GRANTED_FACE_BACK, back));
+    }
+    faces
 }
 
 /// The ways the permanents on the battlefield give cards in graveyards to be cast (CR 604, 118.9): each with the permanent
@@ -1600,21 +1618,39 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
                     }
                 }
             }
-            // The ways a permanent gives a card in its owner's graveyard to be cast (CR 604, 118.9).
-            if instant == instants && zone.is(ZoneKind::Graveyard) && own {
-                for (k, &(granter, controller, way)) in granted.get_or_init(|| granted_ways_of(cx.cards(), cx.s())).iter().enumerate().take(8) {
-                    let Some(cost) = (way.cost)(cx, &Asker { source: granter, controller }, id, player) else { continue };
-                    if !can_pay_other(cx, id, player, &cost) || !extra_payable(cx, id, player, def) {
-                        continue;
-                    }
-                    let a = available.get_or_init(|| self::available(cx, player));
-                    let least = least_cost(cx, a, player, id, def, cost.mana);
-                    if !covers_total(cx, a, player, id, def, least, cost.exile_from_graveyard) {
-                        continue;
-                    }
-                    let mut option = ActionOption::on(ActionKind::CastSpell, id, WAY_GRANTED + k as u8);
-                    if offer_spell(cx, &asker, def, &mut option) {
-                        options.push(option);
+            // The ways a permanent gives a card in its owner's graveyard to be cast (CR 604, 118.9): each judged on the face
+            // that would be cast, the only spell it would be on the stack (CR 709.3, 715.4, 712.8a), so a Room's door is
+            // chosen here and a restriction on the spell ("mana value 3 or less") reads that door's characteristics.
+            if zone.is(ZoneKind::Graveyard) && own {
+                let ways = granted.get_or_init(|| granted_ways_of(cx.cards(), cx.s()));
+                if !ways.is_empty() {
+                    for (face_way, face_def) in faces_to_cast(def) {
+                        let face_instant = if face_way == GRANTED_FACE_WHOLE {
+                            instant
+                        } else {
+                            face_def.is(CardType::Instant) || face_def.keywords.has(Keyword::Flash) || face_def.types.0 & flash.0 != 0
+                        };
+                        if face_instant != instants {
+                            continue;
+                        }
+                        let face_id = cx.card_id(face_def);
+                        let view = AsFace { cx, spell: id, face: face_id };
+                        let q: &dyn Query = if face_way == GRANTED_FACE_WHOLE { cx } else { &view };
+                        for (k, &(granter, controller, way)) in ways.iter().enumerate().take(WAY_GRANTED_SLOTS as usize) {
+                            let Some(cost) = (way.cost)(q, &Asker { source: granter, controller }, id, player) else { continue };
+                            if !can_pay_other(cx, id, player, &cost) || !extra_payable(cx, id, player, face_def) {
+                                continue;
+                            }
+                            let a = available.get_or_init(|| self::available(cx, player));
+                            let least = least_cost(cx, a, player, id, face_def, cost.mana);
+                            if !covers_total(cx, a, player, id, face_def, least, cost.exile_from_graveyard) {
+                                continue;
+                            }
+                            let mut option = ActionOption::on(ActionKind::CastSpell, id, granted_way(k, face_way));
+                            if offer_spell(cx, &asker, face_def, &mut option) {
+                                options.push(option);
+                            }
+                        }
                     }
                 }
             }
@@ -1868,6 +1904,18 @@ pub fn describe(cards: &CardTable, state: &GameState, option: &ActionOption) -> 
             format!("Cast by paying {cost} instead").into()
         };
     }
+    // A granted cast of a card that can be cast as more than one face (a Room's doors) names the face: "Unholy Annex: Once
+    // during each of your turns, ...".
+    if option.kind == ActionKind::CastSpell
+        && let Some((_, face)) = granted_slot(option.index)
+    {
+        let def = cards.get(state.obj(source).card);
+        if let Some((_, face_def)) = faces_to_cast(def).into_iter().find(|&(f, _)| f == face)
+            && (face != GRANTED_FACE_WHOLE || def.adventure.is_some() || def.back.is_some_and(|b| b.has_cost))
+        {
+            return format!("{}: {}", face_def.name, describe_way(cards, state, option, source)).into();
+        }
+    }
     describe_way(cards, state, option, source).into()
 }
 
@@ -1878,12 +1926,13 @@ fn describe_way(cards: &CardTable, state: &GameState, option: &ActionOption, sou
         }
         _ if option.index == WAY_BACK_FACE => cards.get(state.obj(source).card).back.map_or("", |b| b.name),
         ActionKind::CastSpell if option.index == WAY_BESTOW => "Bestow",
-        ActionKind::CastSpell | ActionKind::PlayLand if (WAY_GRANTED..WAY_GRANTED + 8).contains(&option.index) => {
-            granted_ways_of(cards, state).get((option.index - WAY_GRANTED) as usize).map_or("", |&(_, _, way)| way.text)
+        ActionKind::CastSpell | ActionKind::PlayLand if granted_slot(option.index).is_some() => {
+            let (k, _) = granted_slot(option.index).expect("a granted way");
+            granted_ways_of(cards, state).get(k).map_or("", |&(_, _, way)| way.text)
         }
         ActionKind::CastSpell if option.index == WAY_SPLIT_LEFT => cards.get(state.obj(source).card).split.map_or("", |h| h.0.name),
         ActionKind::CastSpell if option.index == WAY_SPLIT_RIGHT => cards.get(state.obj(source).card).split.map_or("", |h| h.1.name),
-        ActionKind::CastSpell if option.index > 0 && option.index < WAY_SPLIT_RIGHT => cards.get(state.obj(source).card).ways[option.index as usize - 1].text,
+        ActionKind::CastSpell if option.index > 0 && option.index < WAY_GRANTED => cards.get(state.obj(source).card).ways[option.index as usize - 1].text,
         ActionKind::CastSpell if option.index == WAY_OVERLOAD => "Overload",
         ActionKind::ActivateAbility if option.index >= PLAYER_MANA_ABILITY => state
             .effects
@@ -1917,8 +1966,8 @@ pub fn act(cx: &mut Cx, player: PlayerId) -> R<Flow> {
             cx.st().update_player(player, |p| p.lands_played += 1);
             // A way a permanent gave is noted in the history against it (see the cast's note), and what it grants is the
             // land's from the moment it is on the battlefield.
-            let granted = (WAY_GRANTED..WAY_GRANTED + 8).contains(&action.index).then(|| {
-                let (granter, _, way) = granted_ways_of(cx.cards(), cx.s())[(action.index - WAY_GRANTED) as usize];
+            let granted = granted_slot(action.index).map(|(k, _)| {
+                let (granter, _, way) = granted_ways_of(cx.cards(), cx.s())[k];
                 (granter, way)
             });
             if let Some((granter, _)) = granted {
@@ -2029,6 +2078,9 @@ fn cast(
     resolving: bool,
 ) -> R<()> {
     let CastTerms { instead, any_type, exile_after, life, more, copy: _, way: _ } = terms;
+    // A way a permanent grants (CR 118.9) names the face cast as well: the cast goes on as that face's own.
+    let granted = granted_slot(way);
+    let way = granted.map_or(way, |(_, face)| granted_face_way(face));
     let printed = cx.s().obj(card).card;
     let whole = cx.card(printed);
     // Cast as its Adventure (CR 715.3), it is that spell and nothing else on the stack (CR 715.3b).
@@ -2036,6 +2088,7 @@ fn cast(
     // Retrace (CR 702.81a): cast from the graveyard for its ordinary cost by a card's say-so that is not its own, a land
     // card discarded in addition to paying its other costs.
     let retraced = way == 0
+        && granted.is_none()
         && instead.is_none()
         && cx.s().obj(card).zone.is(ZoneKind::Graveyard)
         && !whole.keywords.has(Keyword::CastFromYourGraveyard)
@@ -2056,12 +2109,17 @@ fn cast(
     let exile_after = exile_after || def.aftermath;
     let mut cost = match (way, instead) {
         (_, Some(instead)) => Cost::mana(instead),
+        _ if granted.is_some() => {
+            let (k, _) = granted.expect("a granted way");
+            let (granter, controller, rule) = granted_ways_of(cx.cards(), cx.s())[k];
+            let asker = Asker { source: granter, controller };
+            // Judged on the face being cast, as the offer was.
+            let view = AsFace { cx: &*cx, spell: card, face };
+            let q: &dyn Query = if way == 0 { &*cx } else { &view };
+            (rule.cost)(q, &asker, card, player).unwrap_or(Cost::mana(def.cost))
+        }
         (0, _) => Cost::mana(def.cost),
         (WAY_ADVENTURE | WAY_BACK_FACE | WAY_BESTOW | WAY_SPLIT_LEFT | WAY_SPLIT_RIGHT, _) => Cost::mana(def.cost),
-        (w, _) if (WAY_GRANTED..WAY_GRANTED + 8).contains(&w) => {
-            let (granter, controller, rule) = granted_ways_of(cx.cards(), cx.s())[(w - WAY_GRANTED) as usize];
-            (rule.cost)(cx, &Asker { source: granter, controller }, card, player).unwrap_or(Cost::mana(def.cost))
-        }
         (WAY_OVERLOAD, _) => Cost::mana(whole.overload.unwrap_or(def.cost)),
         _ => whole.ways[way as usize - 1].cost,
     };
@@ -2084,12 +2142,12 @@ fn cast(
     });
     // A way a permanent gave is noted in the history against it, for a permission "once during each of your turns"
     // (CR 601.3): an activation of `GRANTED_WAY_USED`, past any ability a card prints.
-    if (WAY_GRANTED..WAY_GRANTED + 8).contains(&way) {
-        let (granter, _, _) = granted_ways_of(cx.cards(), cx.s())[(way - WAY_GRANTED) as usize];
+    if let Some((k, _)) = granted {
+        let (granter, _, _) = granted_ways_of(cx.cards(), cx.s())[k];
         let ability = AbilityRef { card: cx.s().obj(granter).card, index: GRANTED_WAY_USED };
         cx.record(Event::AbilityActivated { source: granter, ability, player });
         // "If you do, it gains ...": the spell carries it to the permanent it becomes.
-        if let Some(n) = granted_ways_of(cx.cards(), cx.s())[(way - WAY_GRANTED) as usize].2.gains {
+        if let Some(n) = granted_ways_of(cx.cards(), cx.s())[k].2.gains {
             let ability = AbilityRef::delayed(cx.s().obj(granter).card, n);
             cx.st().update_obj(spell, |o| o.marks.gains = Some(ability));
         }
@@ -2152,7 +2210,7 @@ fn cast(
     // CR 715.3b; a back face, CR 712.8a; one half of a split card, CR 709.3) pays that face's own mana cost, X included;
     // an alternative cost is not that cost, so X is 0 (CR 107.3b).
     // Cast for another cost, or without paying its mana cost (`instead`, CR 118.9), X is 0 (CR 107.3b).
-    let x_symbols = if instead.is_none() && (way == 0 || matches!(way, WAY_ADVENTURE | WAY_BACK_FACE | WAY_SPLIT_LEFT | WAY_SPLIT_RIGHT)) { def.cost.x } else { 0 };
+    let x_symbols = if instead.is_none() && granted.is_none() && (way == 0 || matches!(way, WAY_ADVENTURE | WAY_BACK_FACE | WAY_SPLIT_LEFT | WAY_SPLIT_RIGHT)) { def.cost.x } else { 0 };
     let sacrifices_x = matches!(extra.variable, Some(VariableCost::SacrificeX(_)));
     if x_symbols > 0 || def.kicker.is_some() || extra.pay_x_life || sacrifices_x {
         let base = cost.mana;
