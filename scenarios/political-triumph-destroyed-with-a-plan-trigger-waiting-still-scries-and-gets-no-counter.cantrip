@@ -1,0 +1,52 @@
+# Political Triumph's enters trigger, with its source gone: Bot2 destroys the enchantment with Disenchant in response to
+# the trigger from Bot1's third Ornithopter. The trigger still resolves (CR 113.7a): Bot1 scries 1 (and bottoms the Swamp),
+# but the plan counter has nowhere to go - the enchantment in the graveyard is a new object (CR 400.7) - so nothing more
+# happens and Bot1 draws nothing.
+
+[Bot1 Deck]
+Plains
+Political Triumph
+Ornithopter
+Ornithopter
+Island
+Island
+Island
+Ornithopter
+Swamp
+Plains x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Disenchant
+Island x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Political Triumph.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Arrange(Ornithopter |)
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Arrange(Ornithopter |)
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Political Triumph)
+Bot1.Arrange(| Swamp)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Political Triumph
+Bot2.Graveyard = Disenchant
+Bot1.Hand = Island; Island; Island
+Bot1.Library = Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains; Swamp
+Bot1.Battlefield.Ornithopter#3.Counters.PlusOnePlusOne = (absent)

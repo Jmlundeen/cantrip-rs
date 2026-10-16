@@ -1,0 +1,61 @@
+# Political Triumph: "Whenever a creature you control enters, scry 1 and put a plan counter on this enchantment. When the
+# fourth plan counter is put on this enchantment, sacrifice it, draw a card, and put a +1/+1 counter on each creature you
+# control." Bot1 casts it and three Ornithopters on turn 1: each scries 1 (the first puts the Swamp on the bottom, the
+# others keep what they see on top) and adds a plan counter, and with three the enchantment is still there. Bot2's own
+# Ornithopter entering on turn 2 adds nothing ("a creature you control"). The fourth Ornithopter on turn 3 puts the fourth
+# plan counter on it (CR 122.6, 603.2): it is sacrificed, Bot1 draws the Mountain, and each of the four Ornithopters gets
+# a +1/+1 counter; Bot2's does not.
+
+[Bot1 Deck]
+Plains
+Political Triumph
+Ornithopter
+Ornithopter
+Ornithopter
+Island
+Island
+Swamp
+Ornithopter
+Mountain
+Plains x10
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Political Triumph.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Arrange(| Swamp)
+? Bot1.Battlefield.Political Triumph.Counters.Plan = 1
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Arrange(Ornithopter |)
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Arrange(Ornithopter |)
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Political Triumph.Counters.Plan = 3
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T2 Bot2.Main2]
+? Bot1.Battlefield.Political Triumph.Counters.Plan = 3
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Arrange(Mountain |)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Plains; Ornithopter; Ornithopter; Ornithopter; Ornithopter
+Bot1.Battlefield.Ornithopter#1.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter#2.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter#3.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter#4.Counters.PlusOnePlusOne = 1
+Bot2.Battlefield.Ornithopter.Counters.PlusOnePlusOne = (absent)
+Bot1.Graveyard = Political Triumph
+Bot1.Hand = Island; Island; Mountain

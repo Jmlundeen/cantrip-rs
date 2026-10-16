@@ -1,0 +1,59 @@
+# Political Triumph's fourth-plan-counter trigger exists apart from its source once it has triggered (CR 113.7a): Bot2
+# destroys the enchantment with Disenchant in response, and the trigger still resolves - there is nothing left to sacrifice
+# (CR 701.21a), but Bot1 draws a card (the Mountain) and puts a +1/+1 counter on each of its four Ornithopters. The
+# enchantment went to the graveyard by being destroyed, not sacrificed, before the trigger resolved.
+
+[Bot1 Deck]
+Plains
+Political Triumph
+Ornithopter
+Ornithopter
+Ornithopter
+Island
+Island
+Ornithopter
+Mountain
+Plains x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Disenchant
+Island x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Political Triumph.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Arrange(Ornithopter |)
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Arrange(Ornithopter |)
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Arrange(Ornithopter |)
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Pass
+Bot1.Arrange(Mountain |)
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Political Triumph)
+? Stack.Count = 2
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Political Triumph
+Bot2.Graveyard = Disenchant
+Bot1.Hand = Island; Island; Mountain
+Bot1.Battlefield.Ornithopter#1.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter#2.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter#3.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter#4.Counters.PlusOnePlusOne = 1

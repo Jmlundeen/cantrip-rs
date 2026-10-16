@@ -1,0 +1,70 @@
+# A copy of Political Triumph copies its abilities but not its counters (CR 707.2, 122.1): Bot2 casts Fractured Identity on
+# Bot1's enchantment, which has two plan counters. The original is exiled and Bot2 gets a token copy with none. The copy's
+# abilities are Bot2's now: Bot2's Ornithopter entering makes Bot2 scry 1 (keeping the Island) and puts the copy's first
+# plan counter on it, while Bot1's Ornithopter entering afterwards does nothing - Bot1 controls no Political Triumph.
+
+[Bot1 Deck]
+Plains
+Political Triumph
+Ornithopter
+Ornithopter
+Ornithopter
+Island
+Island
+Plains x13
+
+[Bot2 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Fractured Identity
+Ornithopter
+Island x13
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Political Triumph.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Arrange(Plains |)
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Arrange(Plains |)
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Political Triumph.Counters.Plan = 2
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Fractured Identity.Cast(Bot1.Battlefield.Political Triumph)
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Arrange(Island |)
+[T5 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+! Bot1.Arrange
+[T5 Bot1.Main2]
+
+[Expect]
+Exile = Political Triumph
+Bot2.Battlefield.Political Triumph.Token = true
+Bot2.Battlefield.Political Triumph.Counters.Plan = 1
+Bot1.Battlefield.Ornithopter#3.Counters.PlusOnePlusOne = (absent)

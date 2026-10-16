@@ -1,0 +1,65 @@
+# Political Triumph under Innkeeper's Talent at level 3 ("put twice that many of each of those kinds of counters instead",
+# CR 614.1a): the plan counters a trigger puts are two, put at once. Its first plan counter is put on turn 1 before the
+# Talent reaches level 3, so the count goes 1, then 3 on turn 3, then 5 on turn 5: the fourth counter is among the two put
+# by the third Ornithopter's trigger, so "when the fourth plan counter is put" triggers, and only once for that event
+# (CR 603.2c) - the fifth counter triggers nothing more. Bot1 draws one card (the Plains), and each Ornithopter gets two
+# +1/+1 counters from it (doubled too), beside those the Talent's level-1 combat trigger put on turns 1 and 3.
+
+[Bot1 Deck]
+Forest
+Mox Pearl
+Political Triumph
+Ornithopter
+Black Lotus
+Innkeeper's Talent
+Sol Ring
+Ornithopter
+Ornithopter
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Political Triumph.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Arrange(Ornithopter |)
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+? Bot1.Battlefield.Political Triumph.Counters.Plan = 1
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Innkeeper's Talent.Cast
+Bot1.Pass
+Bot1.Battlefield.Innkeeper's Talent.Activate(Ability: Level 2)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Innkeeper's Talent.Activate(Ability: Level 3)
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Arrange(Ornithopter |)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Political Triumph.Counters.Plan = 3
+[T5 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Arrange(Plains |)
+[T5 Bot1.BeginCombat]
+
+[Expect]
+Bot1.Graveyard = Political Triumph; Black Lotus
+Bot1.Hand = Plains
+Bot1.Library.Count = 9
+Bot1.Battlefield.Ornithopter#3.Counters.PlusOnePlusOne = 2

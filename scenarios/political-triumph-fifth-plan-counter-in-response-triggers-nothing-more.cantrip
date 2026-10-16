@@ -1,0 +1,57 @@
+# Political Triumph's "when the fourth plan counter is put on this enchantment" triggers for the fourth counter only, not
+# the fifth (CR 603.2). With its trigger on the stack after the fourth Ornithopter, Bot1 flashes in Cathar Commando: the
+# Commando's own enters trigger resolves first, scrying and putting a fifth plan counter on the enchantment, and nothing
+# new triggers - the stack holds the one trigger still. It then resolves once: the enchantment is sacrificed, Bot1 draws one
+# card (the Mountain), and every creature Bot1 controls, the Commando included, gets a +1/+1 counter.
+
+[Bot1 Deck]
+Plains
+Political Triumph
+Ornithopter
+Ornithopter
+Ornithopter
+Cathar Commando
+Plains
+Ornithopter
+Swamp
+Mountain
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Political Triumph.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Arrange(Ornithopter |)
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Arrange(Ornithopter |)
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Arrange(Ornithopter |)
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Arrange(Swamp |)
+? Stack.Count = 1
+? Bot1.Battlefield.Political Triumph.Counters.Plan = 4
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Cathar Commando.Cast
+Bot1.Pass
+Bot1.Arrange(| Swamp)
+? Bot1.Battlefield.Political Triumph.Counters.Plan = 5
+? Stack.Count = 1
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Political Triumph
+Bot1.Hand = Mountain
+Bot1.Battlefield.Cathar Commando.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter#4.Counters.PlusOnePlusOne = 1

@@ -1,0 +1,55 @@
+# The fourth plan counter need not come from Political Triumph's own trigger: any counter put on it counts (CR 122.6).
+# With three plan counters on it, Bot1 casts Tezzeret's Gambit on turn 3 and proliferates the enchantment (CR 701.34a):
+# its fourth plan counter is put, so it is sacrificed once the Gambit has resolved, and Bot1 draws a third card (the
+# Mountain, after the Gambit's Island and Swamp) and puts a +1/+1 counter on each of its three Ornithopters.
+
+[Bot1 Deck]
+Plains
+Political Triumph
+Ornithopter
+Ornithopter
+Ornithopter
+Black Lotus
+Mox Sapphire
+Tezzeret's Gambit
+Island
+Swamp
+Mountain
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Political Triumph.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Arrange(Tezzeret's Gambit |)
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Arrange(Tezzeret's Gambit |)
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Arrange(Tezzeret's Gambit |)
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Political Triumph.Counters.Plan = 3
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Tezzeret's Gambit.Cast
+Bot1.Pass
+Bot1.Target(Bot1.Battlefield.Political Triumph)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Political Triumph; Tezzeret's Gambit; Black Lotus
+Bot1.Hand = Island; Swamp; Mountain
+Bot1.Battlefield.Ornithopter#1.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter#2.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter#3.Counters.PlusOnePlusOne = 1
