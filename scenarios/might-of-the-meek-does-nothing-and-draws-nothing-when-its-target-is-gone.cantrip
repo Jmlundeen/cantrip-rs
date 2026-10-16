@@ -1,0 +1,38 @@
+# A spell whose only target has become illegal does nothing at all (CR 608.2b; ruling): Bot1 controls a Mouse (Firdoch Core),
+# casts Might of the Meek on its own Ornithopter and kills the Ornithopter in response with Lightning Bolt. Might does not
+# resolve: no trample, no pump, and no card is drawn - the hand ends empty (Swamp drawn on turn 3 was played).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Sol Ring
+Firdoch Core
+Ornithopter
+Might of the Meek
+Lightning Bolt
+Mountain
+Swamp x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Firdoch Core.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Might of the Meek.Cast(Ornithopter)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 0
+Bot1.Graveyard = Might of the Meek; Ornithopter; Lightning Bolt

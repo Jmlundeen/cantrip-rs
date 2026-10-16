@@ -1,0 +1,38 @@
+# "If you control a Mouse" (CR 608.2c): Bot2's Firdoch Core is a Mouse, but Bot1 controls none, so Might of the Meek only
+# gives trample (the control to the scenario beside it, where Bot1 controls the Core) and still draws.
+# Bot2 casts the Core on turn 2 with Sol Ring and Mox Ruby.
+
+[Bot1 Deck]
+Mox Ruby
+Ornithopter
+Might of the Meek
+Swamp x13
+
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Sol Ring
+Firdoch Core
+Island x12
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Firdoch Core.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Might of the Meek.Cast(Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Mox Jet; Mox Ruby; Sol Ring; Firdoch Core
+Bot1.Hand.Count = 6
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Ornithopter.Keywords = Flying; Trample

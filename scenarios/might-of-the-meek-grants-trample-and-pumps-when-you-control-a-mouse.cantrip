@@ -1,0 +1,38 @@
+# Might of the Meek: target creature gains trample, gets +1/+0 because Bot1 controls a Mouse (Firdoch Core is every creature
+# type, so it is a Mouse even though it is not a creature, CR 702.73a), and Bot1 draws a card. Bot1 casts the Core on turn 1
+# with Sol Ring and Mox Ruby; on turn 3 (draw: Swamp) Might is paid with Mox Ruby. Hand: Swamp, then Swamp drawn, then the
+# card drawn by the spell = 3.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Sol Ring
+Firdoch Core
+Ornithopter
+Might of the Meek
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Firdoch Core.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Might of the Meek.Cast(Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 3
+Bot1.Battlefield.Ornithopter.Power = 1
+Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot1.Battlefield.Ornithopter.Keywords = Flying; Trample
+Bot1.Graveyard = Might of the Meek

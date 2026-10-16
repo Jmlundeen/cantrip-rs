@@ -1,0 +1,37 @@
+# Words of the spell's text (CR 612): Bot1 controls a Goblin Welder and no Mouse. In response to Might of the Meek targeting
+# it, Bot1 casts Artificial Evolution on Might itself, changing Mouse to Goblin, so "if you control a Goblin" is true and
+# the Guide gets +1/+0 (1/1...  and trample - it would not without the text change.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Sapphire
+Mountain
+Goblin Welder
+Might of the Meek
+Artificial Evolution
+Island
+Swamp x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Goblin Welder.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Might of the Meek.Cast(Goblin Welder)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Stack.Might of the Meek)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Mouse)
+Bot1.Modes(Goblin)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Goblin Welder.Power = 2
+Bot1.Battlefield.Goblin Welder.Keywords = Trample
