@@ -1,0 +1,57 @@
+# Harmonic Prodigy doubles only the abilities of Wizards its controller controls (CR 603.2d). Bot2's Tersa Lightshatter
+# (an Orc Wizard) enters on turn 2: its "discard up to two cards, then draw that many" triggers once - one Island
+# discarded. Bot1's own Tersa enters on turn 3 and the ability triggers twice: one Island, then two more.
+# Bot1: turn 1 the Prodigy (Mountain, Mox Ruby), with Mox Jet and Mox Pearl cast; turn 3 Tersa (Ruby, Jet, Pearl). Its hand
+# then holds two Islands; each copy discards and draws as many, so the hand stays two and the graveyard holds three.
+# Bot2: turn 2 Tersa (Mountain, Mox Ruby, Mox Jet), four Islands in hand, one discarded.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+Harmonic Prodigy
+Tersa Lightshatter
+Island
+Island x15
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Tersa Lightshatter
+Island x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Harmonic Prodigy.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Tersa Lightshatter.Cast
+Bot2.Choose(Island)
+[T2 Bot2.Main2]
+? Bot2.Graveyard.Count = 1
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Tersa Lightshatter.Cast
+Bot1.Triggers(Tersa Lightshatter; Tersa Lightshatter)
+Bot1.Choose(Island)
+Bot1.Choose(Island; Island)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard.Count = 3
+Bot1.Hand.Count = 2
+Bot2.Graveyard.Count = 1

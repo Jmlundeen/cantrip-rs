@@ -1,0 +1,51 @@
+# Harmonic Prodigy: "If a triggered ability of a Shaman or another Wizard you control triggers, that ability triggers an
+# additional time" (CR 603.2d). Alone, its own prowess is not doubled (it is a Wizard, not a Shaman, and not "another"):
+# turn 1's Lightning Bolt makes it 2/4. On turn 3 a second Prodigy arrives and each doubles the other's prowess: one Bolt
+# triggers four prowess abilities, two of each Prodigy, and each is 3/5.
+# Turn 1: the first Prodigy (Mountain, Mox Ruby) and a Bolt (Black Lotus). Turn 3: the second Prodigy (Mountain, Ruby) and
+# a Bolt (the second Mountain). Bot2 takes 6.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Black Lotus
+Harmonic Prodigy
+Lightning Bolt
+Harmonic Prodigy
+Lightning Bolt
+Mountain
+Island x12
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Harmonic Prodigy.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Harmonic Prodigy.Power = 2
+? Bot1.Battlefield.Harmonic Prodigy.Toughness = 4
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Harmonic Prodigy.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Triggers(Harmonic Prodigy; Harmonic Prodigy; Harmonic Prodigy; Harmonic Prodigy)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Harmonic Prodigy#1.Power = 3
+? Bot1.Battlefield.Harmonic Prodigy#1.Toughness = 5
+? Bot1.Battlefield.Harmonic Prodigy#2.Power = 3
+? Bot1.Battlefield.Harmonic Prodigy#2.Toughness = 5
+
+[Expect]
+Bot2.Life = 14

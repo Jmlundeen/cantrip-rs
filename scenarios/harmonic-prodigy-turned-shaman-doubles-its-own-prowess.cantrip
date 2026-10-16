@@ -1,0 +1,47 @@
+# Harmonic Prodigy's "a Shaman or another Wizard" counts itself once it is a Shaman (CR 603.2d), and its creature types
+# are words of its text (CR 612): Artificial Evolution replacing Wizard with Shaman on it makes it a Human Shaman whose
+# rule reads "a Shaman or another Shaman". Casting the Evolution triggers its prowess once (it is still a Wizard then):
+# 2/4. After the change, a Lightning Bolt triggers its prowess twice: 4/6.
+# Turn 1: the Prodigy (Mountain, Mox Ruby), the Evolution (Mox Sapphire), the Bolt (Black Lotus).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Sapphire
+Black Lotus
+Harmonic Prodigy
+Artificial Evolution
+Lightning Bolt
+Island x15
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Harmonic Prodigy.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Harmonic Prodigy)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Wizard)
+Bot1.Modes(Shaman)
+? Bot1.Battlefield.Harmonic Prodigy.Power = 2
+? Bot1.Battlefield.Harmonic Prodigy.Subtypes = Human; Shaman
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Triggers(Harmonic Prodigy; Harmonic Prodigy)
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Harmonic Prodigy.Power = 4
+? Bot1.Battlefield.Harmonic Prodigy.Toughness = 6
+
+[Expect]
+Bot2.Life = 17
