@@ -258,7 +258,10 @@ shapes have an example:
   resolves (the core); a permanent lists `gift::trigger(text)`. Tokens a gift makes are listed in the card's `EXTRA`. **Player hexproof** is `EffectKind::PlayerHexproof`.
 - **Names and players**: `RequestKind::ChooseName` (a card name, answered `Answer::Name`) and `ChoosePlayer`; a name chosen as
   a permanent enters is `Entering.chosen_card`, kept in `Obj.marks.chosen_card`.
-- **Modal abilities** are `.modal(..)`; **playing from the top of a library for life** is
+- **Modal abilities** are `.modal(..)`. A modal spell whose number of modes is decided by its optional additional cost
+  or its kicker ("If this spell's additional cost was paid, choose both instead", Pyrrhic Strike) says so with
+  `ModalDef::when_paid(min, max)`: the core then announces the cost before the modes (CR 601.2b) and offers paying only
+  when that many modes could be chosen (CR 700.2a). **Playing from the top of a library for life** is
   `PlayRule::LibraryTop` (Bolas's Citadel).
 
 ## Rules bricks added with the second wave of cards

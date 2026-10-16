@@ -852,6 +852,13 @@ pub struct ModalDef {
     /// Riddle Master) reads the modes this object chose before from the event history (`Event::ModesChosen`). A
     /// triggered ability left with too few modes it may choose is removed as it would be put on the stack (CR 603.3c).
     pub allowed: Option<fn(&dyn Query, &Asker, u8) -> bool>,
+    /// How many modes a spell chooses, `(min, max)`, instead of `min` to `max` when its optional additional cost is paid or it
+    /// is kicked: "Choose one. If this spell's additional cost was paid, choose both instead" (Pyrrhic Strike), "If this
+    /// spell was kicked, choose any number instead" (Inscription of Abundance, Insight and Ruin). The intention to pay is
+    /// announced in the same step as the modes (CR 601.2b), and the number of modes is defined by it, so the cost is
+    /// announced first and the modes after it; paying is offered only when that many modes could be chosen (CR 700.2a).
+    /// A spell's own: a modal triggered ability (Depth Defiler's) does not read it.
+    pub when_paid: Option<(u8, u8)>,
 }
 
 impl ModalDef {

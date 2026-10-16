@@ -2187,16 +2187,15 @@ fn cast(
     }
     cost.mana = add_cost(cost.mana, extra.mana);
 
-    // CR 601.2b: a modal spell's modes are chosen first (CR 700.2), each adding its cost (spree, escalate).
+    // CR 601.2b: a modal spell's modes are chosen first (CR 700.2), each adding its cost (spree, escalate) - unless how
+    // many it chooses is defined by whether its optional additional cost is paid or it is kicked, which is announced in
+    // the same step: then that is announced first and the modes after it (below).
     let mut mask = 0u8;
-    if let Some(modal) = def.modal {
-        mask = choose_modes(cx, player, spell, item.ability, modal, cost.mana)?;
-        cost.mana = modal_cost(modal, mask, cost.mana);
-        item.modes = mask;
-        // CR 702.120a: the rest of the escalate cost (a discard) is an additional cost, chosen and paid with the others.
-        let mut escalate = escalate_cost(modal, mask);
-        escalate.mana = ManaCost::ZERO;
-        extra = extra.and(escalate);
+    let modes_after_costs = def.modal.is_some_and(|modal| modal.when_paid.is_some());
+    if let Some(modal) = def.modal
+        && !modes_after_costs
+    {
+        mask = cast_modes(cx, player, spell, &mut item, modal, (modal.min, modal.max), &mut cost, &mut extra)?;
     }
 
     // CR 601.2b: an additional cost that is one of several is chosen now, before X (as the C# engine asks it).
@@ -2259,6 +2258,14 @@ fn cast(
             item.x = n;
             cx.st().update_obj(spell, |o| o.x = n);
         }
+    }
+    // CR 601.2b, 700.2a: the modes of a spell that chooses "both instead" when its additional cost was paid (or "any
+    // number instead" when it was kicked), now that the intention to pay is announced.
+    if let Some(modal) = def.modal
+        && let Some(paid_range) = modal.when_paid
+    {
+        let range = if item.paid > 0 || item.kicked > 0 { paid_range } else { (modal.min, modal.max) };
+        mask = cast_modes(cx, player, spell, &mut item, modal, range, &mut cost, &mut extra)?;
     }
     // CR 702.47a-b: as an Arcane spell is cast, cards with splice onto Arcane may be revealed from the hand and their
     // cost paid; their spell abilities are added to this spell's, after its own, in the order chosen.
@@ -2803,10 +2810,34 @@ fn escalate_cost(modal: &ModalDef, mask: u8) -> Cost {
     }
 }
 
+/// A modal spell's modes as it is cast (CR 601.2b, 700.2): `range` of them chosen, each adding its cost (spree, escalate)
+/// to the total. Returns the chosen modes, which the stack item now holds.
+#[allow(clippy::too_many_arguments)]
+fn cast_modes(
+    cx: &mut Cx,
+    player: PlayerId,
+    spell: ObjectId,
+    item: &mut StackItem,
+    modal: &'static ModalDef,
+    range: (u8, u8),
+    cost: &mut Cost,
+    extra: &mut Cost,
+) -> R<u8> {
+    let mask = choose_modes(cx, player, spell, item.ability, modal, range, cost.mana)?;
+    cost.mana = modal_cost(modal, mask, cost.mana);
+    item.modes = mask;
+    // CR 702.120a: the rest of the escalate cost (a discard) is an additional cost, chosen and paid with the others.
+    let mut escalate = escalate_cost(modal, mask);
+    escalate.mana = ManaCost::ZERO;
+    *extra = extra.and(escalate);
+    Ok(mask)
+}
+
 /// Asks for a modal spell's or ability's modes (CR 601.2b, 602.2b, 700.2), as the C# engine's `ChooseModesPrompt`:
-/// `count` to `at_most` of the eligible modes, with the ones whose own cost could be paid beside `base` as advice.
+/// `range` (at least, at most) of the eligible modes, with the ones whose own cost could be paid beside `base` as advice.
 /// Returns the chosen modes as a bit for each.
-fn choose_modes(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef, modal: &ModalDef, base: ManaCost) -> R<u8> {
+fn choose_modes(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef, modal: &ModalDef, range: (u8, u8), base: ManaCost) -> R<u8> {
+    let (least, max) = range;
     let asker = Asker { source, controller: player };
     let eligible = eligible_modes(cx, &asker, modal);
     let costed = modal.modes.iter().any(|m| m.cost.mana_value() > 0);
@@ -2816,7 +2847,7 @@ fn choose_modes(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: Abilit
         Vec::new()
     };
     // An escalate cost the player cannot pay narrows the range to one they can.
-    let mut most = modal.max;
+    let mut most = max;
     // CR 700.2: the board as the spell is cast may allow more modes than it prints.
     if let Some(up_to) = cx.card(cx.s().obj(source).card).modes_up_to {
         most = most.max(up_to(cx, &asker));
@@ -2826,7 +2857,7 @@ fn choose_modes(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: Abilit
             let first_n = (1u16 << n).wrapping_sub(1) as u8;
             can_afford(cx, player, source, &modal_cost(modal, first_n, base)) && can_pay_other(cx, source, player, &escalate_cost(modal, first_n))
         };
-        while most > modal.min.max(1) && !payable(cx, most) {
+        while most > least.max(1) && !payable(cx, most) {
             most -= 1;
         }
     }
@@ -2834,8 +2865,8 @@ fn choose_modes(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: Abilit
         source,
         modes: (0..modal.modes.len() as u8).map(|i| Label::Mode(ability, i)).collect(),
         eligible,
-        count: modal.min,
-        at_most: if most > modal.min { most } else { 0 },
+        count: least,
+        at_most: if most > least { most } else { 0 },
         affordable,
         additional_cost: false,
         repeat: modal.repeat,
@@ -2933,7 +2964,13 @@ fn kicker_total(base: ManaCost, k: Kicker, n: u16) -> ManaCost {
 /// Announces whether an optional cost that is not mana is paid (CR 601.2b), as the C# engine asks it: a choice between
 /// casting without it and paying it, the second on offer only when it could be paid. Whether it was chosen.
 fn announce_optional(cx: &mut Cx, player: PlayerId, spell: ObjectId, face: CardId, def: &'static CardDef, optional: &OptionalCost) -> R<bool> {
-    let payable = can_pay_other(cx, spell, player, &optional.cost);
+    // A spell that must choose more modes when it is paid ("choose both instead") can be cast that way only when that
+    // many modes could be chosen (CR 700.2a, 601.2b): paying is not on offer otherwise.
+    let asker = Asker { source: spell, controller: player };
+    let modes_allow = def.modal.is_none_or(|modal| {
+        modal.when_paid.is_none_or(|(least, _)| eligible_modes(cx, &asker, modal).len() >= least.max(1) as usize)
+    });
+    let payable = modes_allow && can_pay_other(cx, spell, player, &optional.cost);
     let ask = RequestKind::ChooseModes {
         source: spell,
         modes: (0..def.labels.len().min(2) as u8).map(|i| Label::Card(face, i)).collect(),
@@ -3030,7 +3067,7 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
     // CR 602.2b, 601.2b: a modal ability's modes first, then X, then the Phyrexian symbols paid with life.
     let mut mask = 0u8;
     if let Some(modal) = def.modal {
-        mask = choose_modes(cx, player, source, ability, modal, mana)?;
+        mask = choose_modes(cx, player, source, ability, modal, (modal.min, modal.max), mana)?;
         item.modes = mask;
     }
     if mana.x > 0 {

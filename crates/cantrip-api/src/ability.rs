@@ -573,7 +573,7 @@ impl ModeDef {
 
 /// "Choose one —" (CR 700.2): the modes, in printed order.
 pub const fn modes(modes: &'static [ModeDef]) -> ModalDef {
-    ModalDef { modes, min: 1, max: 1, escalate: None, repeat: false, allowed: None }
+    ModalDef { modes, min: 1, max: 1, escalate: None, repeat: false, allowed: None, when_paid: None }
 }
 
 impl ModalDef {
@@ -595,6 +595,13 @@ impl ModalDef {
     /// Whether a mode may be chosen now, beyond its targets.
     pub const fn allowed(self, allowed: fn(&dyn crate::game::Query, &Asker, u8) -> bool) -> ModalDef {
         ModalDef { allowed: Some(allowed), ..self }
+    }
+
+    /// "If this spell's additional cost was paid, choose both instead", "if this spell was kicked, choose any number
+    /// instead": between `min` and `max` modes when the spell's optional additional cost is paid or it is kicked
+    /// (CR 601.2b, 700.2a). The cost is then announced before the modes.
+    pub const fn when_paid(self, min: u8, max: u8) -> ModalDef {
+        ModalDef { when_paid: Some((min, max)), ..self }
     }
 }
 
