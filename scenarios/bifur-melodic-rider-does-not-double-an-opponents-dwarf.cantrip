@@ -1,0 +1,53 @@
+# Bifur doubles the triggered abilities of Dwarves "you control" only (CR 603.2d): Bot1 has Bifur and an enduring story, and
+# on turn two Bot2's Fíli enters - its enters ability triggers once, and Bot2 gets one Dwarf token. The positive control is
+# bifur-melodic-rider-doubles-filis-enters-ability-for-two-dwarves.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Emerald
+Mox Sapphire
+Bifur, Melodic Rider
+Island x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Fíli the Pathfinder
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Bifur, Melodic Rider.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+[T2 Bot2.Main1]
+? Bot1.EnduringStory = true
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Fíli the Pathfinder.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+[T2 Bot2.Main2]
+
+[Expect]
+Bot2.Battlefield = Plains; Mox Pearl; Mox Jet; Mox Ruby; Fíli the Pathfinder; Dwarf

@@ -1,0 +1,59 @@
+# Thorin Oakenshield: "artifacts and creatures you control have ward {1}" (CR 702.21a, 702.195b). With the story (Thorin,
+# Mox Ruby, Mox Jet), Bot2's Abrade at Mox Jet, an artifact of Bot1's, triggers ward; Bot2's two sources went to the Abrade,
+# so the {1} can't be paid and the Abrade is countered. On turn three Bot1's own Abrade destroys Bot2's Mox Sapphire: an
+# opponent's artifact has no ward from Thorin (were there a ward trigger, the script's default would decline to pay it).
+
+[Bot1 Deck]
+Plains
+Mox Ruby
+Thorin Oakenshield
+Mox Jet
+Mountain
+Abrade
+Island
+Island x10
+
+[Bot2 Deck]
+Mountain
+Mox Sapphire
+Abrade
+Island
+Island
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Thorin Oakenshield.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+? Bot1.EnduringStory = true
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Abrade.Cast
+Bot2.Modes(Destroy target artifact)
+Bot2.Target(Mox Jet)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+[T2 Bot2.Main2]
+? Bot1.Battlefield = Plains; Mox Ruby; Thorin Oakenshield; Mox Jet
+? Bot2.Graveyard = Abrade
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Abrade.Cast
+Bot1.Modes(Destroy target artifact)
+Bot1.Target(Mox Sapphire)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Jet.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Plains; Mountain; Mox Ruby; Thorin Oakenshield; Mox Jet
+Bot2.Battlefield = Mountain
+Bot2.Graveyard = Mox Sapphire; Abrade

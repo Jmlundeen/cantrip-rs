@@ -1,0 +1,59 @@
+# Balin, Loremaster's "If you have an enduring story, Balin deals X damage to each opponent" is asked as the ability resolves
+# (CR 608.2c), not as it triggers. Balin enters on turn nine beside only Mox Ruby, two, so its ability triggers without the
+# story; in response Bot1 flashes in Sewer-veillance Cam, an artifact and the third, and has the story when the ability
+# resolves (the Cam's own enters ability, above it, taps or untaps Balin and changes nothing here): Bot1 discards three
+# Plains, draws three, and Balin deals 3 damage to Bot2.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mountain
+Mountain
+Island
+Island
+Balin, Loremaster
+Sewer-veillance Cam
+Plains
+Plains
+Plains
+Swamp
+Swamp
+Swamp
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Balin, Loremaster.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Pass
+? Stack = Balin, Loremaster
+? Bot1.EnduringStory = (absent)
+Bot1.Hand.Sewer-veillance Cam.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Pass
+? Bot1.Hand = Plains; Plains; Plains
+Bot1.Accept
+[T9 Bot1.Main2]
+
+[Expect]
+Bot1.EnduringStory = true
+Bot1.Battlefield = Mountain; Mountain; Mountain; Island; Island; Mox Ruby; Balin, Loremaster; Sewer-veillance Cam
+Bot1.Graveyard = Plains; Plains; Plains
+Bot1.Hand = Swamp; Swamp; Swamp
+Bot2.Life = 17
