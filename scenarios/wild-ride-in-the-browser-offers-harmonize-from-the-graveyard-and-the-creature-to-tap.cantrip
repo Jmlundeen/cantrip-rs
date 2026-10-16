@@ -1,6 +1,6 @@
 # Browser
-# Wild Ride is in Bot1's graveyard, and Bot1's page offers it there as one row of the card's menu that names its cost, "Harmonize
-# {4}{R}". Casting it asks for the creature to tap as part of the cost, before anything is paid: the dock says it is up to one, that the
+# Wild Ride is in Bot1's graveyard and a click on it casts it (a card with one thing to do has no menu), for harmonize {4}{R}.
+# Casting it asks for the creature to tap as part of the cost, before anything is paid: the dock says it is up to one, that the
 # creature's power comes off the generic mana, and with none chosen that the full cost is paid; choosing Ragavan (power 2) the button
 # says "Tap it (-2)" and the cost comes down to {2}{R}, which the Mountain, Mox Pearl and Mox Jet pay (CR 702.180a), leaving Mox Ruby
 # untapped. The card is exiled after it resolves.
@@ -29,12 +29,13 @@ Bot1.Hand.Ragavan, Nimble Pilferer.Cast
 Bot1.Battlefield.Mountain.Activate
 Bot1.Hand.Wild Ride.Cast(Ornithopter)
 Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
 [T3 Bot1.Main1]
 Bot1.Battlefield.Mountain.Activate
 Bot1.Battlefield.Mox Pearl.Activate
 Bot1.Battlefield.Mox Jet.Activate
 Bot1.Graveyard.Wild Ride.Cast(Bot1.Battlefield.Ornithopter; Ability: Harmonize)
-? Client.Bot1.Menu = Cast Wild Ride — Harmonize {4}{R}
 ? Client.Bot1.Prompt.Title = Wild Ride: tap up to one untapped creature you control to reduce the cost by generic mana equal to its power
 ? Client.Bot1.Prompt.Detail = None tapped: the full cost is paid  ·  click them on the battlefield
 Bot1.Choose(Ragavan, Nimble Pilferer)

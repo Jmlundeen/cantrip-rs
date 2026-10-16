@@ -149,7 +149,8 @@ public sealed class ScenarioPlayer
     }
 
     private string Failure(string message) =>
-        $"{message}\n\nBot1's last answers, clicked:\n  {string.Join("\n  ", _trace.TakeLast(15))}";
+        $"{message}\n\nBot1's last answers, clicked:\n  {string.Join("\n  ", _trace.TakeLast(15))}"
+        + (_page.Errors.Count > 0 ? "\n\nThe page threw: " + string.Join(" | ", _page.Errors) : string.Empty);
 
     private static string Describe(ScenarioExpected expected) => expected.Undo
         ? "Undo"
@@ -492,7 +493,7 @@ public sealed class ScenarioPlayer
         {
             await _page.Page.Mouse.ClickAsync(x, y);
             TableState open = await _page.SettledAsync();
-            if (open.Cards.FirstOrDefault(c => c.Visible && c.Handle == handle) is { } found)
+            if (open.Cards.Where(c => c.Visible && c.Handle == handle).MaxBy(c => c.W) is { } found)
             {
                 return (found, seat, graveyard);
             }
@@ -531,7 +532,15 @@ public sealed class ScenarioPlayer
     private async Task ClickHandleAsync(int handle)
     {
         TableState state = await _page.SettledAsync();
-        CardState? card = state.Cards.FirstOrDefault(c => c.Visible && c.Handle == handle);
+        // A card in a graveyard is drawn twice while the graveyards are open (the pile, and the list a player reads it in) and only
+        // as the pile's top card while they are shut: a click on the pile opens or shuts the list and acts on nothing, so the card
+        // is clicked in the list, which is opened as a person opens it.
+        CardState? card = state.Cards.Where(c => c.Visible && c.Handle == handle).MaxBy(c => c.W);
+        if (card is { Place: "" or "graveyard" or "opponent-graveyard", Row: "" } && !state.GraveyardsOpen)
+        {
+            card = null;
+        }
+
         (int Seat, bool Graveyard)? opened = null;
         if (card is null && await OpenZoneHoldingAsync(handle) is { } inZone)
         {
@@ -689,7 +698,7 @@ public sealed class ScenarioPlayer
     }
 
     private static readonly Regex CardKey = new(
-        @"^(?<row>Stack|Hand|Battlefield|OpponentBattlefield|Exile|OpponentExile|Graveyard)\.(?<card>.+)\.(?<attr>TypeLine|Rules|Status|Annotation|Counters)$",
+        @"^(?<row>Stack|Hand|Battlefield|OpponentBattlefield|Exile|OpponentExile|Graveyard)\.(?<card>.+)\.(?<attr>TypeLine|Rules|Status|Annotation)$",
         RegexOptions.CultureInvariant);
 
     /// <summary>One thing a card's face says, with its lines on one line.</summary>
@@ -698,7 +707,6 @@ public sealed class ScenarioPlayer
         "TypeLine" => card.TypeLine,
         "Rules" => card.Rules,
         "Status" => card.Status,
-        "Counters" => card.Counters,
         _ => card.Annotation.ReplaceLineEndings(" / "),
     };
 
@@ -750,7 +758,7 @@ public sealed class ScenarioPlayer
     }
 
     private const string ClientKeys =
-        "Stack, Hand, Battlefield, OpponentBattlefield, OpponentHand (the cards known in it), each with .Count; <Row>.<Card>.TypeLine, .Rules, .Status, .Annotation or .Counters (the pills drawn on it, like 3 × incubation; rows Stack, Hand, Battlefield, OpponentBattlefield, Exile, Graveyard); Facts, OpponentFacts (beside the life total); Exile.Lit, .Caption, .Tooltip and OpponentExile.*; Graveyard.Lit, .Note; Button.<label> (shown or absent), Arrows (the latest resolution's targets), Over, Prompt.Title, Prompt.Detail, Prompt.Modes, Log.Has (a line of the game log, by its text), Confirm (the button the last choice of cards was confirmed with), Menu (the rows of the card menu last opened), Dock (the dock's buttons)";
+        "Stack, Hand, Battlefield, OpponentBattlefield, OpponentHand (the cards known in it), each with .Count; <Row>.<Card>.TypeLine, .Rules, .Status or .Annotation (rows Stack, Hand, Battlefield, OpponentBattlefield, Exile, Graveyard); Facts, OpponentFacts (beside the life total); Exile.Lit, .Caption, .Tooltip and OpponentExile.*; Graveyard.Lit, .Note; Button.<label> (shown or absent), Arrows (the latest resolution's targets), Over, Prompt.Title, Prompt.Detail, Prompt.Modes, Log.Has (a line of the game log, by its text), Confirm (the button the last choice of cards was confirmed with), Menu (the rows of the card menu last opened), Dock (the dock's buttons)";
 
     private string? Read(string what, TableState state)
     {
