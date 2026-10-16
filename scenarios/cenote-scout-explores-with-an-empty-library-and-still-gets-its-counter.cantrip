@@ -1,0 +1,36 @@
+# Cenote Scout's ruling: "If no card is revealed, most likely because that player's library is empty, the exploring creature
+# receives a +1/+1 counter." (CR 701.44a: if a land card is not revealed, the permanent gets the counter; CR 701.44b: it
+# explores even though part of the process was impossible.) Bot1's whole deck is the seven cards of its hand, so its library is
+# empty: the Scout is a 2/2, nothing is asked, nothing is revealed, and Bot1 has not lost (no draw has been tried).
+
+[Bot1 Deck]
+Forest
+Cenote Scout
+Island
+Island
+Island
+Island
+Island
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Cenote Scout.Cast
+! Bot1.Accept
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Cenote Scout.Power = 2
+Bot1.Battlefield.Cenote Scout.Toughness = 2
+Bot1.Battlefield.Cenote Scout.Counters.PlusOnePlusOne = 1
+Bot1.Library.Count = 0
+Bot1.Revealed = (absent)
+Bot1.Graveyard.Count = 0
+Bot1.Hand.Count = 5
+Result = InProgress
+Stack.Count = 0

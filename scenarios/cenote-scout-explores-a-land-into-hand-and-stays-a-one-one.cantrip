@@ -1,0 +1,35 @@
+# Cenote Scout: "When this creature enters, it explores." (CR 701.44a) The top card of Bot1's library, a Mountain, is revealed;
+# a land card goes into the hand, and the Scout gets no +1/+1 counter: it stays a 1/1 and no question about the card is asked.
+
+[Bot1 Deck]
+Forest
+Cenote Scout
+Island
+Island
+Island
+Island
+Island
+Mountain
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Cenote Scout.Cast
+! Bot1.Accept
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Cenote Scout.Power = 1
+Bot1.Battlefield.Cenote Scout.Toughness = 1
+Bot1.Battlefield.Cenote Scout.Counters.PlusOnePlusOne = (absent)
+Bot1.Hand = Island; Island; Island; Island; Island; Mountain
+Bot1.Revealed = Mountain
+Bot1.Library.Count = 12
+Bot1.Graveyard.Count = 0
+Stack.Count = 0

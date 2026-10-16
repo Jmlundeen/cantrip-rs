@@ -1,0 +1,40 @@
+# Cenote Scout's ruling: "If a resolving spell or ability instructs a specific creature to explore but that creature has left the
+# battlefield, the creature still explores. If you reveal a nonland card this way, you won't put a +1/+1 counter on anything,
+# but you may put the revealed card into your graveyard." (CR 701.44c.) With the Scout's trigger on the stack Bot1 Bolts its
+# own Scout. The Scout dies first; the trigger then resolves: Mox Jet, a nonland card, is revealed from Bot1's library (the Scout's
+# controller as it last was) and Bot1 puts it into the graveyard. The graveyard holds the Scout, the Bolt and Mox Jet.
+
+[Bot1 Deck]
+Forest
+Cenote Scout
+Mox Ruby
+Lightning Bolt
+Island
+Island
+Island
+Mox Jet
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Cenote Scout.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Cenote Scout)
+? Stack.Count = 2
+Bot1.Accept
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Battlefield = Forest; Mox Ruby
+Bot1.Graveyard.Count = 3
+Bot1.Revealed = Mox Jet
+Bot1.Hand = Island; Island; Island
+Bot1.Library.Count = 12
+Stack.Count = 0
