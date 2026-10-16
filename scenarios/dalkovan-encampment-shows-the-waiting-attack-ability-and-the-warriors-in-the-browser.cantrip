@@ -1,6 +1,6 @@
 # Browser
 # As a person sees it: once {2}{W}, {T} has resolved, the delayed ability that waits for an attack sits on no card, so
-# the page says it beside Bot1's life total in the ability's own words (the opponent's page says it with Bot1's name, which
+# the page says it beside Bot1's life total named for the Encampment it came from (the opponent's page says it is Bot1's, which
 # the host's test judges), and Bot2 has nothing waiting. The attack makes the two Warriors, tapped Warrior tokens, and the
 # ability goes with the turn: nothing waits before the activation or on turn 4.
 
@@ -36,7 +36,7 @@ Bot1.Battlefield.Mox Ruby.Activate
 Bot1.Battlefield.Dalkovan Encampment.Activate(Ability: Whenever you attack)
 Bot1.Pass
 Bot2.Pass
-? Client.Bot1.Facts = Whenever you attack this turn, create two 1/1 red Warrior creature tokens that are tapped and attacking. Sacrifice them at the beginning of the next end step
+? Client.Bot1.Facts = Dalkovan Encampment: Whenever you attack this turn, create two 1/1 red Warrior creature tokens that are tapped and attacking. Sacrifice them at the beginning of the next end step
 ? Client.Bot1.OpponentFacts =
 Bot1.Attack(Ornithopter > Bot2)
 Bot1.Pass

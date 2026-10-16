@@ -164,6 +164,72 @@ fn players_cant_gain_life_is_shown_to_both_players_while_the_static_ability_appl
     assert!(gone_after, "the restriction was still shown after the Lynx left");
 }
 
+/// Plays the scenario `name` at a table and judges what each seat is told, beside Bot1's life total, of a delayed triggered
+/// ability that waits for its event (CR 603.7b) whose words contain `words`: nothing before it is set up, then Bot1's own view
+/// names its source and gives the words, Bot2's says it is Bot1's ("They have ..."), and once it has lapsed neither does.
+fn judge_waiting_delayed_ability(name: &str, words: &str, source: &str) {
+    let text = std::fs::read_to_string(scripts().join(format!("{name}.cantrip"))).unwrap();
+    let mut session = Session::scenario(&text, name, Vec::new(), &[1]).map_err(|r| r.detail).unwrap();
+    let mut step = session.step();
+    let (mut shown, mut gone_after, mut first) = (0, false, true);
+    for _ in 0..20_000 {
+        let mut facts = |seat: i32| session.view(seat).map_err(|r| r.detail).unwrap().players[0].pending_effects.clone();
+        let (own, other) = (facts(1), facts(2));
+        let own_line = own.iter().find(|f| f.contains(words));
+        let other_line = other.iter().find(|f| f.contains(words));
+        assert_eq!(own_line.is_some(), other_line.is_some(), "the two seats are told different things: {own:?} / {other:?}");
+        if first {
+            assert!(own_line.is_none(), "the ability was shown before anything set it up: {own:?}");
+            first = false;
+        }
+        if let (Some(mine), Some(theirs)) = (own_line, other_line) {
+            assert!(mine.starts_with(&format!("{source}: ")), "Bot1 is not told where it came from: {mine}");
+            assert!(theirs.starts_with(&format!("They have {source}'s delayed ability: ")), "Bot2 is told something else: {theirs}");
+            shown += 1;
+            assert!(!gone_after, "the waiting ability came back");
+        } else if shown > 0 {
+            gone_after = true;
+        }
+        let scenario = &step["Scenario"];
+        if scenario["Verdict"].is_object() {
+            assert_eq!(scenario["Verdict"]["Passed"], Value::Bool(true));
+            break;
+        }
+        let expected = &scenario["Expected"];
+        let answer: AnswerPayload = if expected["Undo"] == Value::Bool(true) {
+            AnswerPayload::TakeActionAnswer(TakeActionAnswer::new(ActionKindView::UndoManaAbility, ViewHandle::NONE))
+        } else {
+            serde_json::from_value(expected["Answer"].clone()).unwrap()
+        };
+        let id = expected["RequestId"].as_u64().unwrap() as u32;
+        let seat = expected["Seat"].as_i64().unwrap() as i32;
+        step = session.answer(id, seat, &answer).map_err(|r| r.detail).unwrap();
+    }
+    assert!(shown > 0, "the waiting ability was never shown");
+    assert!(gone_after, "the waiting ability was still shown after it lapsed");
+}
+
+/// "Whenever you attack this turn" (Dalkovan Encampment's activated ability) is shown from the moment it is set up until the
+/// turn ends.
+#[test]
+fn a_this_turn_delayed_ability_is_shown_until_the_turn_ends() {
+    judge_waiting_delayed_ability(
+        "dalkovan-encampment-shows-the-waiting-attack-ability-and-the-warriors-in-the-browser",
+        "Whenever you attack this turn",
+        "Dalkovan Encampment",
+    );
+}
+
+/// An "until your next turn" delayed ability (Tamiyo, Seasoned Scholar's +2) is shown until that turn begins.
+#[test]
+fn an_until_your_next_turn_delayed_ability_is_shown_until_that_turn_begins() {
+    judge_waiting_delayed_ability(
+        "tamiyo-seasoned-scholar-plus-two-weakens-creatures-attacking-her-too",
+        "Whenever a creature attacks you or a planeswalker you control",
+        "Tamiyo, Seasoned Scholar",
+    );
+}
+
 #[test]
 fn every_scenario_passes_at_a_table_with_bot1_driven() {
     let mut entries: Vec<PathBuf> =

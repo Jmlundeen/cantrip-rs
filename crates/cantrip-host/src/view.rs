@@ -462,10 +462,15 @@ impl<'a> Projector<'a> {
         }
         // "Whenever [event] this turn" / "until your next turn, whenever [event]" (CR 603.7b): a delayed triggered ability that
         // waits for its event, on no object, so the page says it beside its controller's life total, in the ability's own words
-        // for the controller and with the controller's name for everyone else.
+        // and named for the object it came from (the words may say "that creature"). The other seat is told whose it is.
         for d in s.delayed.iter().filter(|d| d.controller == p && matches!(d.when, DelayedWhen::ThisTurn | DelayedWhen::UntilNextTurnOf(_))) {
             let text = game.cards.ability(d.ability).text();
-            summary.pending_effects.push(if p == self.viewer { text.to_string() } else { format!("{}: {text}", summary.name) });
+            let from = game.cards.get(game.chars(d.source).card).name;
+            summary.pending_effects.push(if p == self.viewer {
+                format!("{from}: {text}")
+            } else {
+                format!("They have {from}'s delayed ability: {text}")
+            });
         }
         // "You may activate loyalty abilities of Jace planeswalkers you control ... any time you could cast an instant"
         // (CR 606.3, 611.2c): a permission about the player, on no object.
