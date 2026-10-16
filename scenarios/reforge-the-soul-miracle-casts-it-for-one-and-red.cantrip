@@ -1,0 +1,31 @@
+# Reforge the Soul: "Each player discards their hand, then draws seven cards. Miracle {1}{R}." Drawn first on Bot1's
+# turn 3, it is revealed and cast for {1}{R} out of {C}{C}{R} from Sol Ring and a Mountain, leaving {C} (CR 702.94a):
+# both players discard their hands and draw seven.
+[Bot1 Deck]
+Mountain
+Sol Ring
+Plains
+Plains
+Plains
+Plains
+Plains
+Reforge the Soul
+Plains x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+[T3 Bot1.Draw]
+Bot1.Accept
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Accept
+? Bot1.Mana = {C}
+[T3 Bot1.Main1]
+[Expect]
+Bot1.Graveyard.Count = 6
+Bot1.Hand.Count = 7
+Bot2.Graveyard.Count = 8
+Bot2.Hand.Count = 7
