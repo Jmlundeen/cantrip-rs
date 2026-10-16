@@ -1,0 +1,51 @@
+# Dragonfire Blade's equip ability costs {1} less for each color of the creature it targets: Sphinx of the Guildpact
+# is all five colors, so the {4} comes to {0} and no lower (CR 601.2f: a cost reduced to nothing is {0}; CR 118.7a:
+# generic mana only). The {B} in the pool is still there after the Blade is attached: nothing was paid, and nothing
+# was given back. With only that {B}, the colorless Ornithopter, whose equip costs the full {4}, is not offered as a
+# target (CR 601.2c, 602.2b: the cost is judged for the target it would be announced with), while the Sphinx is.
+
+[Bot1 Deck]
+Sol Ring
+Mox Pearl
+Mox Jet
+Mox Ruby
+Dragonfire Blade
+Ornithopter
+Black Lotus
+Sphinx of the Guildpact
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dragonfire Blade.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sphinx of the Guildpact.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+? Bot1.Mana = {B}
+! Bot1.Battlefield.Dragonfire Blade.Activate(Ornithopter)
+Bot1.Battlefield.Dragonfire Blade.Activate(Sphinx of the Guildpact)
+? Bot1.Mana = {B}
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Bot1.Mana = {B}
+Bot1.Battlefield.Dragonfire Blade.AttachedTo = Sphinx of the Guildpact
+Bot1.Battlefield.Sphinx of the Guildpact.Colors = Black; Blue; Green; Red; White
+Bot1.Battlefield.Sphinx of the Guildpact.Power = 7
+Bot1.Battlefield.Sphinx of the Guildpact.HexproofFrom = Monocolored

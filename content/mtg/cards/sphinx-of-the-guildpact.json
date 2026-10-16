@@ -1,0 +1,11 @@
+{
+  "name": "Sphinx of the Guildpact",
+  "manaCost": "{7}",
+  "type": "Artifact Creature — Sphinx",
+  "power": 5,
+  "toughness": 5,
+  "oracleText": "Sphinx of the Guildpact is all colors.\nFlying\nHexproof from monocolored (This creature can't be the target of monocolored spells or abilities your opponents control.)",
+  "keywords": [
+    "Flying"
+  ]
+}
