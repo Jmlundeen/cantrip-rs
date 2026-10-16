@@ -1,0 +1,45 @@
+# "You attacked": a creature Bot1 owns nothing of but controls counts. Dack Fayden's -2 takes Bot2's Ornithopter (an
+# artifact creature) on turn 3; on turn 5, with Bot1 controlling it since before the turn began, it attacks and Chart a
+# Course asks for no discard.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Dack Fayden
+Chart a Course
+Island
+Forest x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dack Fayden.Cast
+Bot1.Pass
+Bot1.Battlefield.Dack Fayden.Activate(Bot2.Battlefield.Ornithopter; Ability: Gain control)
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+[Bot1.Main2]
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Chart a Course.Cast
+! Bot1.Choose
+[Bot1.End]
+
+[Expect]
+Bot1.Graveyard = Chart a Course
+Bot1.Hand.Count = 4

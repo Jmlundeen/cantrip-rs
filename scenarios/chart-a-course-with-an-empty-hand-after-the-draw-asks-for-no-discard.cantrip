@@ -1,0 +1,32 @@
+# Chart a Course cast with nothing else in hand against an empty library: nothing is drawn (CR 121.4), and the discard
+# has nothing to take, so no discard question is asked (CR 701.9b). Bot1 then loses to the empty library at the next
+# state-based check (CR 704.5b).
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Chart a Course
+Mox Ruby
+Mox Pearl
+Mox Jet
+Gleemox
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Chart a Course.Cast
+! Bot1.Choose
+
+[Expect]
+Result = Bot2 won
+Bot1.Graveyard = Chart a Course
+Bot1.Hand.Count = 0

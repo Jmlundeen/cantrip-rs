@@ -1,0 +1,37 @@
+# "Unless you attacked this turn" is about the declaration, not about who is still attacking: the Ornithopter attacks on
+# turn 3 and is Lightning Bolted by its own controller before the second main phase, and Chart a Course still asks for
+# no discard (CR 508.1).
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Ruby
+Ornithopter
+Lightning Bolt
+Chart a Course
+Island
+Forest x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+[Bot1.Main2]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Chart a Course.Cast
+! Bot1.Choose
+[Bot1.End]
+
+[Expect]
+Bot1.Graveyard = Chart a Course; Ornithopter; Lightning Bolt
+Bot1.Hand.Count = 4

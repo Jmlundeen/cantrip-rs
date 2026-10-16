@@ -1,0 +1,47 @@
+# Attacking a planeswalker is attacking (CR 508.1, 506.2): Bot1's Ornithopter attacks Bot2's Liliana of the Veil on
+# turn 3, and Chart a Course afterwards asks for no discard.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Ornithopter
+Chart a Course
+Island
+Island
+Island
+Forest x20
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Liliana of the Veil
+Swamp x16
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Liliana of the Veil.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2.Battlefield.Liliana of the Veil)
+[Bot1.Main2]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Chart a Course.Cast
+! Bot1.Choose
+[Bot1.End]
+
+[Expect]
+Bot1.Graveyard = Chart a Course
+Bot1.Hand.Count = 6
+Bot2.Battlefield.Liliana of the Veil.Counters.Loyalty = 3

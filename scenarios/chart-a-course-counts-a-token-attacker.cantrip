@@ -1,0 +1,38 @@
+# A token declared as an attacker is an attacker: Glimmer Lens makes a Rebel token on turn 1 and it attacks on turn 3, so
+# Chart a Course asks for no discard (CR 508.1).
+
+[Bot1 Deck]
+Glimmer Lens
+Mox Pearl
+Gleemox
+Chart a Course
+Island
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Gleemox.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: White)
+Bot1.Hand.Glimmer Lens.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Attack(Rebel > Bot2)
+[Bot1.Main2]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Blue)
+Bot1.Hand.Chart a Course.Cast
+! Bot1.Choose
+[Bot1.End]
+
+[Expect]
+Bot1.Graveyard = Chart a Course
+Bot1.Hand.Count = 5
