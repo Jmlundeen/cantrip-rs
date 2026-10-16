@@ -1,0 +1,30 @@
+# "Put a hone counter on Sting for each creature target opponent controls": Bot2 controls none, so none is put. "Attach Sting to up
+# to one target creature you control": Bot1 chooses no creature though Ornithopter could be chosen, so Sting stays unattached and
+# Ornithopter 0/2.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Ornithopter
+Sting, Bilbo's Sword
+Plains x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sting, Bilbo's Sword.Cast
+Bot1.Target(Bot2)
+Bot1.Target()
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Sting, Bilbo's Sword.Counters.Hone = (absent)
+Bot1.Battlefield.Sting, Bilbo's Sword.AttachedTo = (absent)
+Bot1.Battlefield.Ornithopter.Power = 0

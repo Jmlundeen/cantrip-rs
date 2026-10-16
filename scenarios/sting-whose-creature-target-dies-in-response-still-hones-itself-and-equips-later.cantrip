@@ -1,0 +1,55 @@
+# Sting's trigger targets Bot2 and Bot1's first Ornithopter; Bot2 kills that Ornithopter with Lightning Bolt in response. The
+# ability still resolves for its legal target (CR 608.2b): Sting gets a hone counter for Bot2's one creature and attaches to
+# nothing. Turn 5: Equip {3} attaches it to the other Ornithopter, which the counter makes 1/2 (CR 122.1j).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Ornithopter
+Ornithopter
+Sting, Bilbo's Sword
+Plains
+Plains
+Plains x13
+
+[Bot2 Deck]
+Mountain
+Ornithopter
+Lightning Bolt
+Mountain x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sting, Bilbo's Sword.Cast
+Bot1.Target(Bot2)
+Bot1.Target(Bot1.Battlefield.Ornithopter#1)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter#1)
+[T3 Bot1.Main2]
+? Bot1.Graveyard = Ornithopter
+? Bot1.Battlefield.Sting, Bilbo's Sword.Counters.Hone = 1
+? Bot1.Battlefield.Sting, Bilbo's Sword.AttachedTo = (absent)
+? Bot1.Battlefield.Ornithopter.Power = 0
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sting, Bilbo's Sword.Activate(Bot1.Battlefield.Ornithopter; Ability: Equip)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Sting, Bilbo's Sword.AttachedTo = Ornithopter
+Bot1.Battlefield.Sting, Bilbo's Sword.Counters.Hone = 1
+Bot1.Battlefield.Ornithopter.Power = 1
+Bot1.Battlefield.Ornithopter.Toughness = 2
