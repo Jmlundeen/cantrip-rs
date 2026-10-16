@@ -1,0 +1,49 @@
+# Doubling is +X/+0 for the power the creature has as the spell resolves (CR 701.10b), not as it was cast. Bot1 casts Bulk Up
+# at Bot2's Llanowar Elves (power 1), then a second Bulk Up on top of it while the first is on the stack. The second resolves
+# first (1 -> 2), then the first (2 -> 4). At the next turn's start the effects have ended with the turn (CR 514.2) and the
+# Elves is a 1/1 again.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Pearl
+Mox Jet
+Bulk Up
+Bulk Up
+Mountain
+Mountain x8
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Bulk Up.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Bulk Up.Cast(Bot2.Battlefield.Llanowar Elves)
+? Stack.Count = 2
+? Bot2.Battlefield.Llanowar Elves.Power = 1
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+? Stack.Count = 0
+? Bot2.Battlefield.Llanowar Elves.Power = 4
+[T4 Bot2.Main1]
+
+[Expect]
+Bot2.Battlefield.Llanowar Elves.Power = 1
+Bot1.Graveyard = Bulk Up; Bulk Up

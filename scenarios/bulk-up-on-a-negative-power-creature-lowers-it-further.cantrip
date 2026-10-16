@@ -1,0 +1,45 @@
+# CR 701.10c: doubling a negative power gives -X/-0 where X is the distance from 0. Bot1's Ornithopter (0/2) is bolted by Cut Down
+# and returned with Animate Dead, which makes it a -1/2; Bulk Up then gives it -1/+0 more, a -2/2, rather than +(-1) read as a gain
+# or no change. (Zero-power case: bulk-up-on-a-power-zero-creature-changes-nothing.)
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Ornithopter
+Cut Down
+Animate Dead
+Bulk Up
+Mountain
+Swamp x8
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cut Down.Cast(Ornithopter)
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Animate Dead.Cast(Bot1.Graveyard.Ornithopter)
+Bot1.Pass
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Ornithopter.Power = -1
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Bulk Up.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Ornithopter.Power = -2
+Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot1.Graveyard = Bulk Up; Cut Down

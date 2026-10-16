@@ -1,0 +1,28 @@
+# Doubling 0 is +0/+0 (CR 701.10b): Bot1's Ornithopter (0/2) is still a 0/2 after Bulk Up resolves, and the spell is not
+# countered or refused for it - a creature with power 0 is a legal target and the spell goes to the graveyard.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Ornithopter
+Bulk Up
+Island x10
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Bulk Up.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot1.Graveyard = Bulk Up
