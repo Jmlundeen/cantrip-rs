@@ -1,0 +1,44 @@
+# Greatsword of Tyr's attack trigger taps "up to one" target creature defending player controls: Bot1 chooses none,
+# so Bot2's Ornithopter stays untapped. Bot2 answers the trigger by bolting the equipped Ornithopter: as the trigger
+# resolves, the creature it would put a +1/+1 counter on is in the graveyard (CR 400.7: a new object), so nothing
+# gets the counter, and the Greatsword stays on the battlefield unattached.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Greatsword of Tyr
+Ornithopter
+Island x13
+
+[Bot2 Deck]
+Ornithopter
+Mountain
+Lightning Bolt
+Island x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Greatsword of Tyr.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Greatsword of Tyr.Activate(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot1.Attack(Ornithopter > Bot2)
+Bot1.Target()
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Ornithopter
+Bot1.Battlefield.Greatsword of Tyr.AttachedTo = (absent)
+Bot2.Battlefield.Ornithopter.Tapped = false
