@@ -299,6 +299,13 @@ would shrink it.
 
 Known gaps:
 
+- Cost reductions by colored mana (`CostDelta::less_mana`, CR 118.7) take off the cost's plain symbols of that color and
+  then generic mana. A reduction by hybrid mana, which the payer splits as it is applied (CR 118.7e), is not built (no
+  card in content reduces by one: the power-up cards with a hybrid mana cost, She-Hulk, Attorney-at-Law, Brawn and
+  Abomination, wait on it), and nor is a colored reduction meeting a hybrid or Phyrexian symbol of its color in the cost.
+- Power-up abilities are not yet a class other cards can name ("power-up abilities of other creatures you control cost
+  {3} less", "whenever you activate a power-up ability", "can be activated an additional time"): Hulk, Gamma Goliath,
+  Marvel Boy, Wonder Man, Kang, Advancing the Spirit and Quinjet Technician wait on it.
 - The web client cannot yet send three answers the engine asks for: naming colorless mana (Squandered Resources),
   choosing which kind of counter to remove (`Label::Counter`, Glen Elendra Guardian), and turning a face-down
   permanent face up (`TurnFaceUp`).
