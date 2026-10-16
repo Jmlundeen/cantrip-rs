@@ -63,7 +63,14 @@ pub const fn ability(mana: ManaCost, materials: &'static Materials, text: &'stat
 
 /// Materials of a kind of one's own: `count` of them, or `count` or more, each passing `filter` (CR 702.167a-b).
 pub const fn materials(count: u8, or_more: bool, filter: ObjectFilter, quality: &'static str) -> Materials {
-    Materials { count, or_more, filter, quality }
+    Materials { count, or_more, filter, quality, parts: &[] }
+}
+
+/// Materials named one by one, "a Dinosaur, a Merfolk, a Pirate, and a Vampire" (Throne of the Grim Captain): each a separate
+/// object passing its part's filter, chosen in turn. `any` is what any of them takes, the filter the candidates are drawn
+/// with; `quality` says them all.
+pub const fn materials_each(parts: &'static [MaterialPart], any: ObjectFilter, quality: &'static str) -> Materials {
+    Materials { count: parts.len() as u8, or_more: false, filter: any, quality, parts }
 }
 
 /// A material named "artifact": a permanent of that type or a card of that type in the graveyard (CR 702.167b). The
