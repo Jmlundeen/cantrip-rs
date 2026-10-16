@@ -1,0 +1,40 @@
+# "from among the milled cards": Bot1's Brainstorm (an instant card) is already in the graveyard when Free the Fae resolves on turn 3. The four milled cards
+# (Swamp, Bonecrusher Giant, Ornithopter, Swamp) include no instant, sorcery or Faerie card, so nothing is offered or taken - the Brainstorm is not a milled card
+# (CR 701.17a, 701.17c). The positive controls are the other Free the Fae scenarios, where a milled card of the same kinds is offered.
+
+[Bot1 Deck]
+Picklock Prankster
+Island
+Island
+Mox Sapphire
+Brainstorm
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Bonecrusher Giant
+Ornithopter
+Swamp
+Swamp
+Island x6
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Brainstorm.Cast
+Bot1.Choose(Swamp; Swamp)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Picklock Prankster.Cast(Ability: Free the Fae)
+
+[Expect]
+Bot1.Graveyard.Count = 5
+Bot1.Hand = Swamp; Swamp; Swamp; Swamp

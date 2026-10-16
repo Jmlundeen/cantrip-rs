@@ -1,0 +1,31 @@
+# "Faerie card": Firdoch Core is a Kindred Artifact with changeling (CR 702.73a: every creature type), so it is a Faerie card although it is no creature card.
+# Bot1 mills it with Bonecrusher Giant, Ornithopter and a Swamp and takes it.
+
+[Bot1 Deck]
+Picklock Prankster
+Island
+Island
+Mox Sapphire
+Swamp
+Swamp
+Swamp
+Firdoch Core
+Bonecrusher Giant
+Ornithopter
+Swamp
+Island x9
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Picklock Prankster.Cast(Ability: Free the Fae)
+Bot1.Choose(Firdoch Core)
+
+[Expect]
+Bot1.Hand = Island; Swamp; Swamp; Swamp; Firdoch Core
+Bot1.Graveyard = Swamp; Ornithopter; Bonecrusher Giant

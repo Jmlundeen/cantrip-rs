@@ -1,0 +1,47 @@
+# Ruling 2026-01-27: a card in a graveyard with {X} in its mana cost has X = 0 (CR 202.3e). Bot1's Walking Ballista, cast for X=2 (printed {X}{X}, mana value 4 on
+# the stack) and destroyed by Bot2's Wrath of God, is mana value 0 in the graveyard, so Leonardo's Technique may target it and returns it. It enters with no counters, a 0/0, and dies to state-based actions
+# (CR 704.5f) after Leonardo's Technique has left the stack: it is on top of the graveyard above the spell, which a spell that never returned it could not show.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Jet
+Mox Pearl
+Gleemox
+Walking Ballista
+Swamp
+Leonardo's Technique
+Swamp x12
+
+[Bot2 Deck]
+Black Lotus
+Mox Pearl
+Wrath of God
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Walking Ballista.Cast(X: 2)
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Wrath of God.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Green)
+Bot1.Hand.Leonardo's Technique.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Gleemox; Mox Emerald; Mox Jet; Mox Pearl
+Bot1.Graveyard = Walking Ballista; Leonardo's Technique; Black Lotus
