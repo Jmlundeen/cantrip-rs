@@ -1,26 +1,12 @@
 use cantrip_api::*;
-use cantrip_mechanics::{connive_n, lands, targets};
+use cantrip_mechanics::{connive_n, history, lands, targets};
 use cantrip_oracle as oracle;
-
-/// The number of creatures that died this turn (CR 700.4): every move from the battlefield to a graveyard this turn of
-/// an object that was a creature as it left, by last known information, so a token that has since ceased to exist
-/// still counts.
-fn creatures_died_this_turn(q: &dyn Query) -> u8 {
-    q.history()
-        .select(EventQuery::kind(EventMask::ZONE_CHANGE).from(ZoneKind::Battlefield).to(ZoneKind::Graveyard).this_turn())
-        .filter(|r| {
-            matches!(r.event, Event::ZoneChange { old, .. }
-                if q.state().last_known(old).is_some_and(|l| l.types.has(CardType::Creature)))
-        })
-        .count()
-        .min(255) as u8
-}
 
 /// "Target creature you control connives X, where X is the number of creatures that died this turn": X is counted as
 /// the ability resolves, and connive 0 is no connive at all (CR 701.50e). A target that is no longer legal is not
 /// conniving.
 fn connive_x(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let x = creatures_died_this_turn(g);
+    let x = history::creatures_died_this_turn(g, None).min(255) as u8;
     if x == 0 {
         return Ok(());
     }

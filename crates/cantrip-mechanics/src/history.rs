@@ -79,3 +79,18 @@ pub fn arrived_this_turn(q: &dyn Query, object: ObjectId) -> bool {
         .select(EventQuery::kind(EventMask::ZONE_CHANGE).this_turn())
         .any(|r| matches!(r.event, Event::ZoneChange { new, .. } if new == object))
 }
+
+/// The creatures that died this turn (CR 700.4): every move from the battlefield to a graveyard this turn of an object
+/// that was a creature as it left, by last known information, so a token that has since ceased to exist still counts.
+/// With `under`, only those that player controlled as they died (Callous Sell-Sword's "under your control"; the leaving
+/// object's row is as it was when it left). Spymaster's Vault counts them all.
+pub fn creatures_died_this_turn(q: &dyn Query, under: Option<PlayerId>) -> usize {
+    q.history()
+        .select(EventQuery::kind(EventMask::ZONE_CHANGE).from(ZoneKind::Battlefield).to(ZoneKind::Graveyard).this_turn())
+        .filter(|r| {
+            matches!(r.event, Event::ZoneChange { old, .. }
+                if q.state().last_known(old).is_some_and(|l| l.types.has(CardType::Creature))
+                    && under.is_none_or(|p| q.obj(old).controller == p))
+        })
+        .count()
+}
