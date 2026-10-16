@@ -1,0 +1,43 @@
+# Authority of the Consuls: "Creatures your opponents control enter tapped" (CR 614.1c) and "Whenever a creature an
+# opponent controls enters, you gain 1 life" (CR 603.2). Bot1's own Ornithopter, cast after the enchantment, enters
+# untapped and gains nothing (the positive control: the enchantment does not touch its controller's creatures). Bot2's
+# Ornithopter on its own turn enters tapped and Bot1 gains 1 life.
+
+[Bot1 Deck]
+Plains
+Authority of the Consuls
+Ornithopter
+Plains x4
+Plains x13
+
+[Bot2 Deck]
+Ornithopter
+Plains x6
+Plains x13
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Authority of the Consuls.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Tapped = false
+? Bot1.Life = 20
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 1
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Ornithopter.Tapped = true
+? Bot1.Life = 21
+
+[Expect]
+Bot1.Life = 21
+Bot2.Life = 20
+Bot1.Battlefield = Plains; Authority of the Consuls; Ornithopter
+Bot2.Battlefield = Ornithopter
