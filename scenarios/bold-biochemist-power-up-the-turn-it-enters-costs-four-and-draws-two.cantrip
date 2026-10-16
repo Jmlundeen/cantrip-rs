@@ -1,0 +1,47 @@
+# Bold Biochemist: "Power-up — {5}{U}: Put a +1/+1 counter on this creature and draw two cards." The turn it enters,
+# its mana cost {1}{U} takes the {U} off the blue and {1} off the generic (CR 702.193b, 118.7): {4} is left, paid with
+# Sol Ring's {C}{C}, Mox Pearl's {W} and Mox Emerald's {G}, no blue. Bot1, with an empty hand, draws two.
+
+[Bot1 Deck]
+Island
+Mox Jet
+Mox Ruby
+Sol Ring
+Bold Biochemist
+Mox Pearl
+Mox Emerald
+Island x10
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Bold Biochemist.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Bold Biochemist.Activate
+? Bot1.Mana =
+Bot1.Pass
+
+[Expect]
+Turn = 1
+Bot1.Hand = Island; Island
+Bot1.Battlefield.Bold Biochemist.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Bold Biochemist.Power = 2
+Bot1.Battlefield.Bold Biochemist.Toughness = 4

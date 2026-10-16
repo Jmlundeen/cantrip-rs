@@ -1,0 +1,8 @@
+{
+  "name": "Bold Biochemist",
+  "manaCost": "{1}{U}",
+  "type": "Creature — Human Scientist",
+  "power": 1,
+  "toughness": 3,
+  "oracleText": "Power-up — {5}{U}: Put a +1/+1 counter on this creature and draw two cards. (Activate each power-up ability only once. Reduce the cost by its mana cost if it entered this turn.)"
+}
