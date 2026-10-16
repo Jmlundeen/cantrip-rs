@@ -1,0 +1,43 @@
+# Óin the Brave (CR 702.195a-b, 702.10): Óin and two Moxes are three, so Bot1 has an enduring story the moment Óin enters,
+# and Óin "gets +1/+0 and has haste": it attacks on turn one as a 2/3, Bot2 to 18. On turn three Bot1 pays {1}, taps Óin and
+# discards a Plains to draw a card.
+
+[Bot1 Deck]
+Mountain
+Mox Pearl
+Mox Jet
+Óin the Brave
+Plains
+Island
+Island
+Swamp
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Óin the Brave.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Attack(Óin the Brave)
+[T1 Bot1.Main2]
+? Bot1.EnduringStory = true
+? Bot2.Life = 18
+[T3 Bot1.Main1]
+? Bot1.Hand = Plains; Island; Island; Swamp
+Bot1.Battlefield.Óin the Brave.Activate
+Bot1.Choose(Plains)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Plains
+Bot1.Hand = Island; Island; Swamp; Island
+Bot1.Battlefield.Óin the Brave.Tapped = true
+Bot1.Battlefield.Óin the Brave.Power = 2
+Bot1.Battlefield.Óin the Brave.Keywords = Haste

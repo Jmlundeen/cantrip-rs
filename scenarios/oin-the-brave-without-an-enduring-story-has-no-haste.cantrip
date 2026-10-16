@@ -1,0 +1,42 @@
+# Óin without an enduring story (CR 702.195b): Óin and one Mox are two, so Óin is a 1/3 with no haste and can't attack the
+# turn it arrives (CR 302.6), while Stingcaster Mage, cast beside it, attacks by its own haste, Bot2 to 18. The positive control for Óin
+# is oin-the-brave-enters-as-the-third-and-attacks-at-once-with-haste.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Mountain
+Mox Pearl
+Óin the Brave
+Stingcaster Mage
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Óin the Brave.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot1.Hand.Stingcaster Mage.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Pass
+! Bot1.Attack(Óin the Brave > Bot2)
+Bot1.Attack(Stingcaster Mage)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.EnduringStory = (absent)
+Bot2.Life = 18
+Bot1.Battlefield.Óin the Brave.Power = 1
+Bot1.Battlefield.Óin the Brave.Keywords = (absent)
+Bot1.Battlefield.Óin the Brave.Tapped = false
