@@ -221,7 +221,7 @@ could match it. "Leaves the battlefield" look-back (CR 603.10) reads the frozen 
 A static ability that stops abilities from triggering (CR 603.2: Torpor Orb's "Creatures entering don't cause abilities
 to trigger", Doorkeeper Thrull, Hushbringer's "entering or dying") is a `CardDef::trigger_rules` entry, asked by
 `collect_batch` of each event and each triggered ability the event matched (`Triggering`: its source, controller and
-definition); true drops that triggering before it is put on the stack or counted (CR 603.2h). Which permanents' rules
+definition); true drops that triggering before it is put on the stack or counted against "triggers only N times each turn". Which permanents' rules
 are asked follows CR 603.10: those on the battlefield after the event for an ability that triggers then (so a rule
 entering with the permanent applies), those before it for a look-back ability (so one dying with the creature applies).
 The rule judges the event through `Query` - an entering permanent as it is on the battlefield, copy and other effects
@@ -236,10 +236,10 @@ permanents (CR 603.10) after the suppressing rules: a triggering they stop is ne
 one triggering (two Elesh Norns make three), so a "one or more" ability triggered once for a batch triggers once more for
 each such ability that applies to any of the batch's events. The triggerings are separate (`collect_batch` pushes the
 pending trigger that many times): each is ordered, gets its modes and targets as it goes on the stack, checks its
-intervening "if" again as it resolves (CR 603.4), and counts against "triggers only N times each turn" (CR 603.2h), so a
+intervening "if" again as it resolves (CR 603.4), and counts against "triggers only N times each turn" (no numbered rule covers that wording), so a
 once-each-turn ability under a doubler still triggers once. `Triggering::permanent` says the ability is a permanent's: a
 delayed triggered ability is no ability of the object (CR 603.2d, 603.7) and is never asked about, and an ability of a
-card in another zone or of an emblem is not "of a permanent". Triggered mana abilities (CR 605.1b) are asked too, each
+card in another zone or of an emblem (CR 114.4) is not "of a permanent". Triggered mana abilities (CR 605.1b) are asked too, each
 triggering resolving at once.
 
 ### Ending the turn and the cleanup step

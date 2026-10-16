@@ -83,7 +83,7 @@ pub enum Event {
     ChosenAtRandom { count: u16, index: u16 },
     /// An activated or triggered ability of this object finished resolving (CR 608.2m).
     Resolved { source: ObjectId, ability: AbilityRef },
-    /// A triggered ability of this object triggered and was put on the stack (CR 603.2h).
+    /// A triggered ability of this object triggered and was put on the stack: what "triggers only N times each turn" counts.
     Triggered { source: ObjectId, ability: AbilityRef },
     /// The modes of a modal spell or ability of this object were chosen (CR 601.2b, 602.2b, 603.3c, 700.2), as a
     /// `ModalDef` mask: what "choose one that hasn't been chosen" asks of the history.

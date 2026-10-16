@@ -596,7 +596,18 @@ pub(crate) type Again = Vec<(ObjectId, u8)>;
 
 type Found = Vec<(PendingTrigger, &'static TriggeredDef, Again)>;
 
-fn consider(cx: &Cx, source: ObjectId, look_back: bool, event: &Event, mask: EventMask, statics: &mut TriggerStatics, found: &mut Found) {
+/// `permanent`: the source is on the battlefield (or was, for a look-back ability); false for an emblem in the command zone,
+/// which is no permanent (CR 114.4), so "a triggered ability of a permanent" does not mean its abilities.
+fn consider(
+    cx: &Cx,
+    source: ObjectId,
+    look_back: bool,
+    permanent: bool,
+    event: &Event,
+    mask: EventMask,
+    statics: &mut TriggerStatics,
+    found: &mut Found,
+) {
     let chars = layers::chars(cx.cards(), cx.s(), source);
     let controller = cx.s().obj(source).controller;
     for ability in chars.abilities() {
@@ -613,7 +624,7 @@ fn consider(cx: &Cx, source: ObjectId, look_back: bool, event: &Event, mask: Eve
             if t.ward && layers::targeting_rule(cx.cards(), cx.s(), TargetingRuleKind::SuppressWard, source) {
                 continue;
             }
-            let triggering = Triggering { source, controller, def: t, permanent: true };
+            let triggering = Triggering { source, controller, def: t, permanent };
             if statics.stop(cx, event, &triggering) {
                 continue;
             }
@@ -707,7 +718,7 @@ pub fn collect_triggers(cx: &mut Cx, event: &Event, before: Option<&[ObjectId]>)
 /// Every triggered ability a batch of simultaneous events triggers (CR 603.2): leaves-the-battlefield abilities among
 /// the permanents that were on the battlefield before it (`before`), the rest among those there now, and abilities
 /// that function everywhere wherever they are. A "one or more" ability (CR 603.2c) triggers once for the batch, its
-/// members the subjects of the events it matched; a limited one (CR 603.2h) stops triggering once it has used up its
+/// members the subjects of the events it matched; a limited one ("triggers only N times each turn", no numbered rule; CR 603.2h is "do this only once each turn") stops triggering once it has used up its
 /// turn, a triggering that happens being noted in the history.
 pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<&[ObjectId]>) {
     let mut found: Found = Vec::new();
@@ -719,15 +730,15 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<&[ObjectId]>)
         }
         let now: Vec<ObjectId> = cx.s().battlefield().to_vec();
         for &id in before.unwrap_or(&now) {
-            consider(cx, id, true, event, mask, &mut statics, &mut found);
+            consider(cx, id, true, true, event, mask, &mut statics, &mut found);
         }
         for &id in &now {
-            consider(cx, id, false, event, mask, &mut statics, &mut found);
+            consider(cx, id, false, true, event, mask, &mut statics, &mut found);
         }
         // An emblem's triggered abilities function in the command zone (CR 114.4).
         if !cx.s().zone(Zone::COMMAND).is_empty() {
             for id in cx.s().zone(Zone::COMMAND).to_vec() {
-                consider(cx, id, false, event, mask, &mut statics, &mut found);
+                consider(cx, id, false, false, event, mask, &mut statics, &mut found);
             }
         }
         // Delayed abilities of "whenever [event] this turn" (CR 603.7b), each of which triggers on every match.
@@ -860,7 +871,7 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<&[ObjectId]>)
 
     for (mut trigger, def, members, again) in kept {
         // It triggers once, and once more for each static ability that says so (CR 603.2d): each a triggering of its own,
-        // counted against a limit on how often it triggers each turn (CR 603.2h).
+        // counted against "this ability triggers only N times each turn" (no numbered rule; CR 603.2h is "do this only once each turn").
         for n in 0..=again.len() {
             if def.triggers_each_turn > 0 {
                 if cx.history().triggerings(trigger.source, trigger.ability) >= def.triggers_each_turn as usize {

@@ -772,7 +772,7 @@ pub struct TriggeredDef {
     /// 603.2c): damage dealt to one creature at once is one event, however many sources dealt it. "Whenever a creature
     /// you control is dealt damage ... that much damage" (The Sensational She-Hulk, Screaming Nemesis).
     pub sums_per_subject: bool,
-    /// "This ability triggers only N times each turn" (CR 603.2h): 0 for no limit. A triggering that would exceed it
+    /// "This ability triggers only N times each turn" (no numbered rule; CR 603.2h is "do this only once each turn"): 0 for no limit. A triggering that would exceed it
     /// does not happen, and one that happens uses one up.
     pub triggers_each_turn: u8,
     /// A Saga's chapter ability (CR 714.2): it triggers when lore counters are put on its source and their number
@@ -1047,7 +1047,7 @@ impl Triggering<'_> {
 /// "Creatures entering or dying ..." (Hushbringer), "Permanents entering don't cause abilities of permanents your opponents
 /// control to trigger" (Elesh Norn, Mother of Machines). Asked, with the rule's own asker, of one event and one triggered
 /// ability that event matched; true stops that ability triggering on that event, and it is not put on the stack nor counted
-/// (CR 603.2h). Another event of the same batch still triggers it.
+/// against "triggers only N times each turn". Another event of the same batch still triggers it.
 ///
 /// Which rules are asked is the core's (CR 603.10): for an ability that triggers on the board as it is after the event (an
 /// enters ability, CR 603.6a), the permanents on the battlefield after it, so a rule entering with the permanent applies
@@ -1067,7 +1067,7 @@ pub type TriggerRule = fn(&dyn Query, &Asker, &Event, &Triggering) -> bool;
 /// static ability adds one: two Elesh Norns make three (the rulings), and a "one or more" ability that triggers once for a
 /// batch (CR 603.2c) triggers once more for each ability that applies to any of the batch's events. "That many times" is
 /// each a separate triggering (CR 603.2d): each is put on the stack with its own modes and targets, and each is counted
-/// against "triggers only N times each turn" (CR 603.2h). Which static abilities are asked follows CR 603.10 as for
+/// against "triggers only N times each turn" (no numbered rule; CR 603.2h is "do this only once each turn"). Which static abilities are asked follows CR 603.10 as for
 /// `TriggerRule` (one entering or dying with the event applies), and a delayed triggered ability is never asked about.
 pub type AdditionalTrigger = fn(&dyn Query, &Asker, &Event, &Triggering) -> bool;
 

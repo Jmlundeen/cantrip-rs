@@ -1,0 +1,54 @@
+# An emblem is no permanent (CR 114.4), so "a triggered ability of a permanent you control" (CR 603.2d) does not reach its
+# abilities. Bot1 plays Chandra, Torch of Defiance and Veyran, Voice of Duality on turn 1, takes Chandra to 7 loyalty and
+# on turn 7 gets her emblem ("Whenever you cast a spell, this emblem deals 5 damage to any target"). Then Bot1 casts
+# Lightning Bolt at Bot2: Veyran's magecraft, a permanent's ability, triggers twice (Veyran 4/4, the control), and the
+# emblem's ability once: Bot2 takes 3 + 5, not 3 + 10.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mox Ruby
+Mox Sapphire
+Chandra, Torch of Defiance
+Veyran, Voice of Duality
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Plains x14
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Chandra, Torch of Defiance.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Chandra, Torch of Defiance.Activate(Ability: Add {R}{R})
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Veyran, Voice of Duality.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Chandra, Torch of Defiance.Activate(Ability: Add {R}{R})
+[T5 Bot1.Main1]
+Bot1.Battlefield.Chandra, Torch of Defiance.Activate(Ability: Add {R}{R})
+[T7 Bot1.Main1]
+? Bot1.Battlefield.Chandra, Torch of Defiance.Counters.Loyalty = 7
+Bot1.Battlefield.Chandra, Torch of Defiance.Activate(Ability: emblem)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Emblems.Count = 1
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Triggers(Veyran gets; Veyran gets; this emblem deals 5)
+Bot1.Target(Bot2)
+? Stack.Count = 4
+[T7 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot2.Life = 12
+Bot1.Battlefield.Veyran, Voice of Duality.Power = 4
+Bot1.Battlefield.Veyran, Voice of Duality.Toughness = 4
