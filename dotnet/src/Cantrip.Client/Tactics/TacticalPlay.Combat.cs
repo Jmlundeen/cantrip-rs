@@ -492,7 +492,8 @@ public sealed partial class TacticalPlay
             int needed = attacker.Has(Keywords.Menace) ? 2 : 1;
             List<Unit> able = [.. free.Where(blocker => !blocker.Has(Keywords.CantBlock)
                 && !attacker.Has(Keywords.Unblockable)
-                && (!attacker.Has(Keywords.Flying) || blocker.Has(Keywords.Flying | Keywords.Reach))).Take(needed)];
+                && (!attacker.Has(Keywords.Flying) || blocker.Has(Keywords.Flying | Keywords.Reach))
+                && attacker.Has(Keywords.Shadow) == blocker.Has(Keywords.Shadow)).Take(needed)];
 
             if (able.Count < needed)
             {

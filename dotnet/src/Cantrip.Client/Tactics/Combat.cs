@@ -34,7 +34,8 @@ public sealed class Unit
         return !Tapped
             && !Has(Keywords.CantBlock)
             && !attacker.Has(Keywords.Unblockable)
-            && (!attacker.Has(Keywords.Flying) || Has(Keywords.Flying | Keywords.Reach));
+            && (!attacker.Has(Keywords.Flying) || Has(Keywords.Flying | Keywords.Reach))
+            && attacker.Has(Keywords.Shadow) == Has(Keywords.Shadow);
     }
 
     public static Unit From(ObjectView creature, TacticalModel model)

@@ -26,6 +26,9 @@ public enum Keywords
     Flash = 1 << 14,
     CantBlock = 1 << 15,
     Unblockable = 1 << 16,
+
+    /// <summary>Shadow (CR 702.28b): it blocks, and is blocked by, only creatures with shadow.</summary>
+    Shadow = 1 << 17,
 }
 
 /// <summary>What an effect does to the thing it is aimed at, as far as this seat can tell from its words.</summary>
@@ -126,6 +129,10 @@ public static partial class CardReading
         ("hexproof", Keywords.Hexproof),
         ("prowess", Keywords.Prowess),
         ("flash", Keywords.Flash),
+        ("shadow", Keywords.Shadow),
+
+        // Decayed (CR 702.147a): "this creature can't block", and it is sacrificed after it attacks.
+        ("decayed", Keywords.CantBlock),
     ];
 
     [GeneratedRegex(@"\([^)]*\)")]
@@ -247,8 +254,10 @@ public static partial class CardReading
     }
 
     /// <summary>
-    /// The keywords an object has: those on a line of its own in its text, those an effect has granted it, and those
-    /// it has a counter for (CR 122.1b).
+    /// The keywords an object has: those on a line of its own in its text, and those it has been given - by an effect or
+    /// by a keyword counter (CR 122.1b), which the server lists with the granted abilities only while the object has the
+    /// keyword: a counter put on before an effect took its abilities away gives nothing (CR 613.7c), so the counter itself
+    /// is not read.
     /// </summary>
     public static Keywords KeywordsOf(ObjectView card)
     {
@@ -264,14 +273,6 @@ public static partial class CardReading
         foreach (AbilityTextView granted in card.GrantedAbilities)
         {
             found |= Line(Plain(granted.Text));
-        }
-
-        foreach (CounterView counter in card.Counters)
-        {
-            if (counter.Count > 0)
-            {
-                found |= Word(counter.Name);
-            }
         }
 
         // What an effect has taken away (Day of Black Sun) is still in the printed text it reads above, and is not had: a

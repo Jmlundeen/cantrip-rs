@@ -32,6 +32,16 @@ public static class CounterNames
     public const string Lifelink = "lifelink";
     public const string Flying = "flying";
     public const string Hexproof = "hexproof";
+    public const string FirstStrike = "first strike";
+    public const string DoubleStrike = "double strike";
+    public const string Deathtouch = "deathtouch";
+    public const string Decayed = "decayed";
+    public const string Haste = "haste";
+    public const string Menace = "menace";
+    public const string Reach = "reach";
+    public const string Shadow = "shadow";
+    public const string Trample = "trample";
+    public const string Vigilance = "vigilance";
 
     /// <summary>CR 122.1d: "if a permanent with a stun counter would become untapped, remove one instead".</summary>
     public const string Stun = "stun";

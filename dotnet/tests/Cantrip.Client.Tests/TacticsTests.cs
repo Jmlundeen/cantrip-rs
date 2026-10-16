@@ -30,13 +30,34 @@ public sealed class CardReadingTests
     }
 
     [Fact]
-    public void Keywords_come_from_what_an_effect_granted_and_from_keyword_counters_too()
+    public void Keywords_come_from_what_an_effect_or_a_keyword_counter_granted()
     {
+        // The server lists a keyword counter's keyword with the granted abilities while the object has it (CR 122.1b).
         ObjectView creature = Creature(1, "Human", 1, 1);
         creature.GrantedAbilities.Add(new AbilityTextView { Text = "Trample" });
+        creature.GrantedAbilities.Add(new AbilityTextView { Text = "Flying" });
         creature.Counters.Add(new CounterView { Name = "flying", Count = 1 });
 
         Assert.Equal(Keywords.Trample | Keywords.Flying, CardReading.KeywordsOf(creature));
+    }
+
+    [Fact]
+    public void A_keyword_counter_whose_keyword_was_taken_away_gives_nothing()
+    {
+        // Put on before "loses all abilities" (CR 613.7c): the counter is there, the keyword is not, and the server grants none.
+        ObjectView elk = Creature(1, "Elk", 3, 3);
+        elk.Counters.Add(new CounterView { Name = "deathtouch", Count = 1 });
+
+        Assert.Equal(Keywords.None, CardReading.KeywordsOf(elk));
+    }
+
+    [Fact]
+    public void Shadow_is_read_and_decayed_cannot_block()
+    {
+        Assert.Equal(Keywords.Shadow, CardReading.KeywordsOf(Creature(1, "Soltari", 2, 3, text: "Shadow")));
+        Assert.Equal(
+            Keywords.Trample | Keywords.CantBlock,
+            CardReading.KeywordsOf(Creature(2, "Rakshasa", 5, 5, text: "Trample\nDecayed (This creature can't block. When it attacks, sacrifice it at end of combat.)")));
     }
 
     [Fact]

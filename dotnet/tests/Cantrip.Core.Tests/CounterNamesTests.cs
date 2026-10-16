@@ -46,6 +46,8 @@ public sealed class CounterNamesTests
         [
             CounterNames.PlusOnePlusOne, CounterNames.MinusOneMinusOne, CounterNames.Loyalty,
             CounterNames.Indestructible, CounterNames.Lifelink, CounterNames.Flying, CounterNames.Hexproof,
+            CounterNames.FirstStrike, CounterNames.DoubleStrike, CounterNames.Deathtouch, CounterNames.Decayed, CounterNames.Haste,
+            CounterNames.Menace, CounterNames.Reach, CounterNames.Shadow, CounterNames.Trample, CounterNames.Vigilance,
             CounterNames.Stun, CounterNames.Finality, CounterNames.Lore, CounterNames.Charge, CounterNames.Corpse,
         ];
 
