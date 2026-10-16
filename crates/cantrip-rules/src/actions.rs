@@ -703,10 +703,16 @@ pub fn targets_with_action(specs: &[TargetSpec]) -> bool {
     specs.len() == 1 && specs[0].max == 1
 }
 
+/// Whether every required slot has at least its minimum number of legal targets (CR 601.2c): fewer is no legal announcement, so the
+/// spell or ability is not offered.
+pub(crate) fn slots_satisfiable(cx: &Cx, asker: &Asker, specs: &[TargetSpec]) -> bool {
+    specs.iter().all(|spec| !spec.required() || target_candidates(cx, asker, spec).len() >= spec.min as usize)
+}
+
 /// Fills in an option's targets; false when a required slot has no candidate, so the option is not offered.
 fn with_targets(cx: &Cx, asker: &Asker, specs: &[TargetSpec], option: &mut ActionOption) -> bool {
     if !targets_with_action(specs) {
-        return specs.iter().all(|spec| !spec.required() || !target_candidates(cx, asker, spec).is_empty());
+        return slots_satisfiable(cx, asker, specs);
     }
     for spec in specs {
         let candidates = target_candidates(cx, asker, spec);
@@ -729,7 +735,7 @@ fn with_targets(cx: &Cx, asker: &Asker, specs: &[TargetSpec], option: &mut Actio
 pub(crate) fn eligible_modes(cx: &Cx, asker: &Asker, modal: &ModalDef) -> Vec<u8> {
     (0..modal.modes.len() as u8)
         .filter(|&i| {
-            modal.modes[i as usize].targets.iter().all(|spec| !spec.required() || !target_candidates(cx, asker, spec).is_empty())
+            slots_satisfiable(cx, asker, modal.modes[i as usize].targets)
                 && modal.allowed.is_none_or(|allowed| allowed(cx, asker, i))
         })
         .collect()
@@ -759,7 +765,8 @@ fn offer_spell(cx: &Cx, asker: &Asker, def: &'static CardDef, option: &mut Actio
     if def.late_targets || def.gift.is_some() || def.divide.is_some() {
         let met = |if_promised: bool| {
             specs.iter().all(|spec| {
-                !spec.required() || !(if if_promised { target_candidates_if_promised(cx, asker, spec) } else { target_candidates(cx, asker, spec) }).is_empty()
+                !spec.required()
+                    || (if if_promised { target_candidates_if_promised(cx, asker, spec) } else { target_candidates(cx, asker, spec) }).len() >= spec.min as usize
             })
         };
         return def.kicker.is_some() || met(false) || (def.gift.is_some() && met(true));
@@ -2434,7 +2441,7 @@ pub fn cast_ways_during_resolution(cx: &Cx, card: ObjectId) -> Vec<CastWay> {
     let asker = Asker { source: card, controller: player };
     let castable = |face: &'static CardDef| match face.modal {
         Some(modal) => modes_possible(cx, &asker, modal),
-        None => face.spell_targets().iter().all(|spec| !spec.required() || !target_candidates(cx, &asker, spec).is_empty()),
+        None => slots_satisfiable(cx, &asker, face.spell_targets()),
     };
     let mut ways = Vec::new();
     if let Some((left, right)) = def.split {
@@ -2552,7 +2559,7 @@ pub fn could_cast_transformed_during_resolution(cx: &Cx, card: ObjectId) -> bool
     if let Some(modal) = back.modal {
         return modes_possible(cx, &asker, modal);
     }
-    back.spell_targets().iter().all(|spec| !spec.required() || !target_candidates(cx, &asker, spec).is_empty())
+    slots_satisfiable(cx, &asker, back.spell_targets())
 }
 
 /// Casts `card` transformed as an effect resolves, for nothing (CR 608.2g, 712.11a, 118.9). A cast given up (CR 733.1)
