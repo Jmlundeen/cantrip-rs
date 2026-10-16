@@ -1,0 +1,51 @@
+# The Colossus's enters trigger is already on the stack when Bot2 exiles it with Swords to Plowshares (Bot1 gains 5, its power then). The
+# trigger still resolves (it is independent of its source, CR 113.7a): X is counted as it resolves, and the Colossus is no longer one of
+# the artifacts, so X = 5 (Mox Ruby, Gleemox, Mox Jet, Mox Sapphire, Sol Ring) and Ragavan is 7/1 with trample until end of turn.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Gleemox
+Mox Jet
+Mox Sapphire
+Ragavan, Nimble Pilferer
+Sol Ring
+Craterclaw Colossus
+Mountain x12
+
+[Bot2 Deck]
+Mox Pearl
+Swords to Plowshares
+Island x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Ragavan, Nimble Pilferer.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Red)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Craterclaw Colossus.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Craterclaw Colossus)
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Craterclaw Colossus
+Bot1.Life = 25
+Bot1.Battlefield.Ragavan, Nimble Pilferer.Power = 7
+Bot1.Battlefield.Ragavan, Nimble Pilferer.Keywords = Trample
+Stack.Count = 0

@@ -1,0 +1,59 @@
+# When Craterclaw Colossus enters, creatures you control gain trample and get +X/+0 until end of turn, X the number of artifacts you
+# control (CR 611.2, 608.2h). Bot1 controls Mox Ruby, Gleemox, Mox Jet, Mox Sapphire, Sol Ring and the Colossus itself (an artifact
+# creature): X = 6, so the Colossus is 11/5 and Ragavan (not an artifact) 8/1, both with trample (the Colossus has haste of its own).
+# Bot2's Ornithopter (an artifact creature it controls) is neither pumped nor trampling and is not counted in X (Power stays 0).
+# The effects end at cleanup: next turn the Colossus is back to 5/5 without trample (haste is printed, so it keeps it).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Gleemox
+Mox Jet
+Mox Sapphire
+Ragavan, Nimble Pilferer
+Sol Ring
+Craterclaw Colossus
+Mountain x12
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Ragavan, Nimble Pilferer.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Red)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Craterclaw Colossus.Cast
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Craterclaw Colossus.Power = 11
+? Bot1.Battlefield.Craterclaw Colossus.Toughness = 5
+? Bot1.Battlefield.Craterclaw Colossus.Keywords = Haste; Trample
+? Bot1.Battlefield.Ragavan, Nimble Pilferer.Power = 8
+? Bot1.Battlefield.Ragavan, Nimble Pilferer.Toughness = 1
+? Bot1.Battlefield.Ragavan, Nimble Pilferer.Keywords = Trample
+? Bot2.Battlefield.Ornithopter.Power = 0
+? Bot2.Battlefield.Ornithopter.Keywords = Flying
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Craterclaw Colossus.Power = 5
+Bot1.Battlefield.Craterclaw Colossus.Keywords = Haste
+Bot1.Battlefield.Ragavan, Nimble Pilferer.Power = 2
+Bot1.Battlefield.Ragavan, Nimble Pilferer.Keywords = (absent)
+Stack.Count = 0
