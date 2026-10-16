@@ -226,7 +226,7 @@ are asked follows CR 603.10: those on the battlefield after the event for an abi
 entering with the permanent applies), those before it for a look-back ability (so one dying with the creature applies).
 The rule judges the event through `Query` - an entering permanent as it is on the battlefield, copy and other effects
 applied; a dead one by its last-known characteristics. Replacement effects and "as [this] enters" are not triggers and
-are never asked about. A trigger whose event is a sacrifice rather than the zone change it makes is
+are never asked about, and neither is the end of an "until" exile (CR 610.3, a one-shot effect). A trigger whose event is a sacrifice rather than the zone change it makes is
 `TriggeredDef::on_sacrifice` (Hushbringer's ruling). The sources are found from the board, once per batch and only once
 something has matched.
 

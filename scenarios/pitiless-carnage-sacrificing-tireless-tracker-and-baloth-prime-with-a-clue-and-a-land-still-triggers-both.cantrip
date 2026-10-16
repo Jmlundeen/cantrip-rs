@@ -1,0 +1,48 @@
+# Abilities that trigger when a player sacrifices a permanent look back in time (CR 603.10a): they trigger from the board
+# as it was just before the event, so a permanent sacrificed together with what it watches still sees it. Bot1 casts
+# Pitiless Carnage and sacrifices Tireless Tracker with its Clue, and Baloth Prime with a Forest, all at once. Both
+# "Whenever you sacrifice a Clue" and "Whenever you sacrifice a land" trigger: Bot1 is asked to order the two, the stack then holds both, and
+# Baloth Prime's makes its tapped 4/4 Beast (the untap and the +1/+1 counter find nothing, their permanents gone).
+
+[Bot1 Deck]
+Tireless Tracker
+Baloth Prime
+Pitiless Carnage
+Black Lotus
+Mox Emerald
+Mox Jet
+Sol Ring
+Forest
+Island x12
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Tireless Tracker.Cast
+Bot1.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Baloth Prime.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Pitiless Carnage.Cast
+Bot1.Choose(Tireless Tracker; Clue Token; Baloth Prime; Forest)
+Bot1.Triggers(Tireless Tracker; Baloth Prime)
+? Stack.Count = 2
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Mox Emerald; Mox Jet; Sol Ring; Beast
+Bot1.Battlefield.Beast.Tapped = true

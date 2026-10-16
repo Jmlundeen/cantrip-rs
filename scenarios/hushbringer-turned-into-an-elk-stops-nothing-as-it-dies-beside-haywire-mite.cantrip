@@ -1,0 +1,55 @@
+# A Hushbringer that has lost all its abilities has no rule to stop anything (CR 613.1f), and that holds for the look-back
+# of a dies trigger too (CR 603.10a: the game looks at the board as it was just before the event, the Elk without abilities
+# on it). Bot2's Hushbringer is made an Elk by Bot1's Oko, Thief of Crowns; Bot1's Wrath of God then destroys the Elk and
+# Bot1's Haywire Mite together, and the Mite's "When this creature dies, you gain 2 life" triggers: 20 -> 22.
+
+[Bot1 Deck]
+Plains
+Sol Ring
+Black Lotus
+Mox Emerald
+Mox Sapphire
+Haywire Mite
+Oko, Thief of Crowns
+Wrath of God
+Plains x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Hushbringer
+Plains x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Haywire Mite.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Hushbringer.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Oko, Thief of Crowns.Cast
+Bot1.Battlefield.Oko, Thief of Crowns.Activate(Bot2.Battlefield.Hushbringer; Ability: Elk)
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+? Bot2.Battlefield.Hushbringer.Keywords = (absent)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Wrath of God.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 22
+Bot1.Graveyard = Wrath of God; Haywire Mite; Black Lotus
+Bot2.Graveyard = Hushbringer

@@ -686,7 +686,12 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<&[ObjectId]>)
                     && let AbilityDef::Triggered(t) = cx.cards().ability(d.ability)
                     && t.listens.intersects(mask)
                     && let Some(fired) = (t.matches)(cx, d.source, event)
-                    && !stoppers.stop(cx, event, &Triggering { source: d.source, controller: d.controller, def: t })
+                    // The end of an "until" exile is no triggered ability but the second one-shot effect the rules create
+                    // immediately after the event (CR 610.3), so nothing that stops abilities triggering stops it, and the
+                    // event that ends the wait always uses it up below. A "this turn" delayed ability is a triggered ability
+                    // (CR 603.7b) and is stopped like any other.
+                    && (d.when == DelayedWhen::UntilEvent
+                        || !stoppers.stop(cx, event, &Triggering { source: d.source, controller: d.controller, def: t }))
                 {
                     found.push((
                         PendingTrigger {

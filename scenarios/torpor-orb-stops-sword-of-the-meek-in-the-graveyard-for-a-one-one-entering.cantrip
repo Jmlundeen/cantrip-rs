@@ -1,0 +1,52 @@
+# Torpor Orb stops an ability that functions from the graveyard too (CR 603.2): Sword of the Meek's "Whenever a 1/1
+# creature you control enters, you may return this card from your graveyard to the battlefield". Bot1 puts the Sword in
+# its graveyard with its own Disenchant on turn 1; Bot2's Orb comes down on turn 2; Bot1's Llanowar Elves, a 1/1, enters
+# on turn 3 and Bot1 is asked nothing (! Bot1.Accept, after a second pass that would let a trigger resolve), the
+# Sword staying in the graveyard. Sword of the Meek's own game,
+# where the Elves bring it back, is the control.
+
+[Bot1 Deck]
+Forest
+Mox Pearl
+Mox Emerald
+Mox Jet
+Sword of the Meek
+Disenchant
+Llanowar Elves
+Forest x9
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Torpor Orb
+Island x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sword of the Meek.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Disenchant.Cast(Sword of the Meek)
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Torpor Orb.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot1.Pass
+! Bot1.Accept
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Disenchant; Sword of the Meek
+Bot1.Battlefield = Forest; Mox Pearl; Mox Emerald; Mox Jet; Llanowar Elves

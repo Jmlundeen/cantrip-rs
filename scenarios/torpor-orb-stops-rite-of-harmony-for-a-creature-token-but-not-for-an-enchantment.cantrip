@@ -1,0 +1,50 @@
+# Torpor Orb stops a delayed triggered ability too (CR 603.2, 603.7b), and a creature token entering is a creature entering.
+# Bot1 casts Rite of Harmony ("Whenever a creature or enchantment you control enters this turn, draw a card") under
+# Bot2's Orb, then Stormchaser's Talent: the Class is an enchantment and no creature, so the Rite draws, and the Talent's
+# own "When this Class enters, create a 1/1 Otter" triggers too. The Otter token and then Ornithopter are creatures: the
+# Rite draws for neither. Hand: 7 - three Moxen and an Island = 3; turn 3 draws (4), casts the Rite (3), the Talent (2)
+# and draws for it (3), then casts Ornithopter (2).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Island
+Rite of Harmony
+Stormchaser's Talent
+Ornithopter
+Island x10
+
+[Bot2 Deck]
+Island
+Mox Jet
+Torpor Orb
+Island x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Torpor Orb.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Rite of Harmony.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Stormchaser's Talent.Cast
+[T3 Bot1.Main2]
+? Bot1.Hand.Count = 3
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.End]
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand.Count = 2
+Bot1.Battlefield = Island; Mox Emerald; Mox Pearl; Mox Sapphire; Stormchaser's Talent; Otter; Ornithopter
+Bot1.Battlefield.Otter.Token = true
