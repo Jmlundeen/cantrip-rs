@@ -1,0 +1,56 @@
+# Kaslem's Stonetree // Kaslem's Strider. As the Stonetree enters Bot1 looks at the top six cards of its library and may put
+# a land card from among them onto the battlefield tapped - not the Ornithopter (refused), Sunken Citadel, a Cave, whose
+# color is chosen as it enters; the other five go to the bottom in a random order. On turn three "Craft with Cave {5}{G}"
+# (CR 702.167a-b) may not exile the Island Bot1 played (refused) and does exile the Citadel; the Stonetree returns as
+# Kaslem's Strider, a vanilla 5/5 green Golem artifact creature.
+
+[Bot1 Deck]
+Forest
+Kaslem's Stonetree
+Mox Emerald
+Black Lotus
+Mox Jet
+Mox Ruby
+Island
+Island
+Sunken Citadel
+Ornithopter
+Island
+Island
+Island
+Swamp x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Kaslem's Stonetree.Cast
+! Bot1.Choose(Ornithopter)
+Bot1.Choose(Sunken Citadel)
+Bot1.Colors(Green)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+? Bot1.Battlefield.Sunken Citadel.Tapped = true
+? Bot1.Library.Count = 15
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Kaslem's Stonetree.Activate(Ability: Craft)
+! Bot1.Choose(Island)
+Bot1.Choose(Sunken Citadel)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Kaslem's Strider.Power = 5
+Bot1.Battlefield.Kaslem's Strider.Types = Artifact; Creature
+Bot1.Battlefield.Kaslem's Strider.Subtypes = Golem
+Exile = Sunken Citadel

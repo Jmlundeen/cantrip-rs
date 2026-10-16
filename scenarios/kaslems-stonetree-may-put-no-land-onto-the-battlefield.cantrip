@@ -1,0 +1,37 @@
+# Kaslem's Stonetree: "You may put a land card from among them onto the battlefield tapped." Bot1 looks at its top six cards
+# and puts none (an empty choice): all six go to the bottom of its library in a random order, and nothing enters.
+
+[Bot1 Deck]
+Forest
+Kaslem's Stonetree
+Mox Emerald
+Mox Jet
+Island
+Island
+Island
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Kaslem's Stonetree.Cast
+Bot1.Choose()
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Forest; Mox Emerald; Mox Jet; Kaslem's Stonetree
+Bot1.Library.Count = 16
+Bot1.Library = Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains; Swamp; Swamp; Swamp; Swamp; Swamp; Swamp
