@@ -1,15 +1,19 @@
 # "Target artifact or land an opponent controls": with the mana in the pool, Bot1 cannot target its own Sol Ring or its own
-# Mountain, nor Bot2's Llanowar Elves (a creature that is neither artifact nor land). The positive control is Bot2's
-# Ornithopter: an artifact (creature) an opponent controls. It is destroyed; Bot2 declines the search, so its library
-# keeps its Forest, and Bot1 still draws.
+# Mountain, nor Bot2's Llanowar Elves (a creature that is neither artifact nor land). The positive controls follow with the same
+# mana: Bot2's Ornithopter (an artifact creature) and then Bot2's Forest (a land), each cast by the second of two Prices. Bot2
+# declines the first search and accepts the second, fetching a Forest tapped. Bot1 draws for each.
 
 [Bot1 Deck]
 Mountain
 Mountain
 Price of Freedom
+Price of Freedom
 Sol Ring
-Mountain x3
 Mountain
+Mountain
+Mountain
+Mountain
+Island
 Island
 Mountain x10
 
@@ -30,21 +34,27 @@ Bot2.Hand.Llanowar Elves.Cast
 Bot2.Hand.Ornithopter.Cast
 [T3 Bot1.Main1]
 Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
 Bot1.Battlefield.Mountain#1.Activate
 Bot1.Hand.Sol Ring.Cast
 Bot1.Battlefield.Sol Ring.Activate
 Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
 ! Bot1.Hand.Price of Freedom.Cast(Bot1.Battlefield.Sol Ring)
 ! Bot1.Hand.Price of Freedom.Cast(Bot1.Battlefield.Mountain#1)
 ! Bot1.Hand.Price of Freedom.Cast(Bot2.Battlefield.Llanowar Elves)
 Bot1.Hand.Price of Freedom.Cast(Bot2.Battlefield.Ornithopter)
 Bot2.Decline
+Bot1.Hand.Price of Freedom.Cast(Bot2.Battlefield.Forest)
+Bot2.Accept
+Bot2.Search(Forest)
 
 [Expect]
-Turn = 3
-Bot1.Graveyard = Price of Freedom
-Bot1.Battlefield = Mountain; Mountain; Sol Ring
-Bot1.Hand = Mountain; Mountain; Mountain; Mountain; Island
-Bot2.Graveyard = Ornithopter
-Bot2.Battlefield = Forest; Llanowar Elves
-Bot2.Library.Count = 10
+Turn = 5
+Bot1.Graveyard = Price of Freedom; Price of Freedom
+Bot1.Battlefield = Mountain; Mountain; Mountain; Sol Ring
+Bot1.Hand = Mountain; Mountain; Mountain; Island; Island
+Bot2.Graveyard = Forest; Ornithopter
+Bot2.Battlefield = Llanowar Elves; Forest
+Bot2.Battlefield.Forest.Tapped = true

@@ -1,0 +1,35 @@
+# Bot2's Plains is destroyed and Bot2 accepts the search, but its library holds no basic land, only Ornithopters (a search for a
+# quality may find nothing, CR 701.23b, and it is still a search). Nothing enters; Bot1 still draws.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Price of Freedom
+Mountain x4
+Mountain
+Island
+Mountain x10
+
+[Bot2 Deck]
+Plains x8
+Ornithopter x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Price of Freedom.Cast(Bot2.Battlefield.Plains)
+Bot2.Accept
+! Bot2.Search(Ornithopter)
+Bot2.Search()
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Price of Freedom
+Bot1.Hand = Mountain; Mountain; Mountain; Mountain; Mountain; Island
+Bot2.Graveyard = Plains
+Bot2.Battlefield.Count = 0
