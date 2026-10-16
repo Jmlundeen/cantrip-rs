@@ -1,0 +1,52 @@
+# Octopus Form on an attacking Ornithopter (a tapped 0/2 flier): the creature gets +1/+1 (1/3), gains hexproof and is untapped, so
+# it deals 1 damage as a 1/3. Bot2's Lightning Bolt cannot target it for the rest of the turn (the refusal, CR 702.11b), and on Bot2's own
+# turn, once "until end of turn" has ended, the same Bolt can (the positive control): the Ornithopter is a 0/2 again and dies.
+
+[Bot1 Deck]
+Island
+Island
+Ornithopter
+Octopus Form
+Island x16
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Ornithopter.Cast
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Attack(Ornithopter > Bot2)
+? Bot1.Battlefield.Ornithopter.Tapped = true
+? Bot1.Battlefield.Ornithopter.Power = 0
+? Bot1.Battlefield.Ornithopter.Keywords = Flying
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Octopus Form.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Tapped = false
+? Bot1.Battlefield.Ornithopter.Power = 1
+? Bot1.Battlefield.Ornithopter.Toughness = 3
+? Bot1.Battlefield.Ornithopter.Keywords = Flying; Hexproof
+! Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot2.Life = 19
+? Bot1.Graveyard = Octopus Form
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Ornithopter.Power = 0
+? Bot1.Battlefield.Ornithopter.Toughness = 2
+? Bot1.Battlefield.Ornithopter.Keywords = Flying
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Ornithopter; Octopus Form
+Bot2.Graveyard = Lightning Bolt
+Bot2.Life = 19

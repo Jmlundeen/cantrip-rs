@@ -1,0 +1,35 @@
+# Octopus Form targets Bot1's Ornithopter; Bot2 responds with Lightning Bolt, and the 0/2 dies before the Form resolves (it has not yet
+# given +1/+1 or hexproof). The target is illegal on resolution, so the Form is countered by the rules (CR 608.2b) and goes to the graveyard.
+
+[Bot1 Deck]
+Island
+Island
+Ornithopter
+Octopus Form
+Island x16
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Ornithopter.Cast
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Octopus Form.Cast(Ornithopter)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Octopus Form; Ornithopter
+Bot2.Graveyard = Lightning Bolt

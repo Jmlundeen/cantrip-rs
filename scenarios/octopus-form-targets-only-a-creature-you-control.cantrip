@@ -1,0 +1,35 @@
+# "Target creature you control": Bot2's Ornithopter is a creature but not Bot1's, so Octopus Form cannot be cast on it (the refusal); the same
+# spell on Bot1's own Ornithopter is offered (the positive control) and resolves, making it a 1/3. Octopus Form is also an instant: it is cast
+# on Bot2's turn. The pump ends at end of turn.
+
+[Bot1 Deck]
+Island
+Island
+Ornithopter
+Octopus Form
+Island x16
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot1.Pass
+Bot2.Pass
+Bot2.Pass
+! Bot1.Hand.Octopus Form.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Octopus Form.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Power = 1
+? Bot2.Battlefield.Ornithopter.Power = 0
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Ornithopter.Power = 0
+
+[Expect]
+Bot1.Graveyard = Octopus Form
