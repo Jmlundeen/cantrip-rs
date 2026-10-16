@@ -1,0 +1,73 @@
+# Cerebral Download counts X "only once, as Cerebral Download resolves" (the ruling): an artifact destroyed in response is
+# not counted. Bot1 casts Dimir Spybug on turn 1 with Mox Sapphire, Sol Ring and Mox Jet also out. On turn 3 Bot1 casts
+# Cerebral Download with three artifacts, and in response Bot2 casts Disenchant on Mox Sapphire. As the Download
+# resolves Bot1 controls two artifacts: it surveils 2, looking at Counterspell and Lightning Bolt only (every card looked
+# at must be placed, so Ponder beneath is not among them), puts both into the graveyard and draws Ponder and two Islands.
+# The Spybug gets its one counter.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Sol Ring
+Mox Jet
+Dimir Spybug
+Cerebral Download
+Swamp
+Island
+Counterspell
+Lightning Bolt
+Ponder
+Island
+Island
+Island
+Swamp x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Disenchant
+Plains x4
+Plains x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dimir Spybug.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Cerebral Download.Cast
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Mox Sapphire)
+Bot1.Pass
+Bot1.Arrange( | Counterspell; Lightning Bolt)
+? Stack.Count = 1
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield.Dimir Spybug.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Dimir Spybug.Power = 2
+Bot1.Battlefield.Dimir Spybug.Toughness = 2
+Bot1.Graveyard = Cerebral Download; Lightning Bolt; Counterspell; Mox Sapphire
+Bot2.Graveyard = Disenchant
+Bot1.Hand = Ponder; Island; Island; Island
+Bot1.Library = Island; Swamp; Swamp; Swamp; Swamp; Swamp; Swamp; Swamp; Swamp; Swamp; Swamp
