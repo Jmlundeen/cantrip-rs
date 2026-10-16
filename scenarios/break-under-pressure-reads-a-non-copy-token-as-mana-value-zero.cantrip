@@ -1,0 +1,50 @@
+# A token that is not a copy has no mana cost, so its mana value is 0 (CR 202.3b, 111.4): Bot2's Goblin Shaman token (a 2/2)
+# is out-ranked by the Elvish Mystic (mana value 1), which is the one sacrificed. The token stays.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Break Under Pressure
+Swamp
+Swamp
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Emerald
+Fable of the Mirror-Breaker
+Elvish Mystic
+Island
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Fable of the Mirror-Breaker.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Break Under Pressure.Cast(Bot2)
+! Bot2.Choose
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot2.Graveyard = Elvish Mystic
+Bot2.Battlefield.Goblin Shaman.Power = 2

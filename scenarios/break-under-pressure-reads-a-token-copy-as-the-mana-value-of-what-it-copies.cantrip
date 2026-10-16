@@ -1,0 +1,63 @@
+# A token that is a copy has the copied object's mana cost (CR 707.2, 202.3): Bot2's Fractured Identity exiles Bot1's Brazen
+# Borrower and Bot2 creates a token copy of it, mana value 3, against its Elvish Mystic (1). Bot1's Break Under Pressure
+# in Bot2's end step on turn 4 makes Bot2 sacrifice the token copy; the Mystic stays.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Brazen Borrower
+Break Under Pressure
+Swamp
+Swamp x13
+
+[Bot2 Deck]
+Island
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Fractured Identity
+Elvish Mystic
+Island
+Island
+Island x11
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Brazen Borrower.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Island#2.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Fractured Identity.Cast(Bot1.Battlefield.Brazen Borrower)
+[T4 Bot2.End]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Break Under Pressure.Cast(Bot2)
+! Bot2.Choose
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Life = 22
+Exile = Brazen Borrower
+Bot2.Battlefield = Island; Island; Mox Emerald; Mox Pearl; Mox Sapphire; Mox Ruby; Elvish Mystic

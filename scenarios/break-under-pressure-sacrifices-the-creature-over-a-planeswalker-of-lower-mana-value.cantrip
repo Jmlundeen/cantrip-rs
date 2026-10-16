@@ -51,5 +51,5 @@ Bot1.Hand.Break Under Pressure.Cast(Bot2)
 [Expect]
 Bot1.Life = 22
 Bot2.Graveyard = Sheoldred, the Apocalypse
-Bot2.Battlefield.Liliana of the Veil.Tapped = false
+Bot2.Battlefield = Swamp; Swamp; Mox Jet; Mox Ruby; Liliana of the Veil
 Bot1.Graveyard = Break Under Pressure

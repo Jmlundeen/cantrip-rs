@@ -1,0 +1,59 @@
+# A face-down permanent has no mana cost, so its mana value is 0 (CR 708.2a) whatever the card is: Bot2 manifests dread
+# from Turn Inside Out (the Elvish Mystic Bot1 bolts), putting Bringer of the Last Gift (mana value 8 face up) onto the
+# battlefield face down. Against the Llanowar Elves (mana value 1) the face-down 2/2 ranks lowest, so Break Under Pressure
+# makes Bot2 sacrifice the Elves, and the face-down creature stays.
+
+[Bot1 Deck]
+Mountain
+Mox Jet
+Mox Ruby
+Mox Pearl
+Lightning Bolt
+Break Under Pressure
+Swamp
+Swamp x13
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Elvish Mystic
+Llanowar Elves
+Turn Inside Out
+Island
+Island
+Bringer of the Last Gift
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Elvish Mystic)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Turn Inside Out.Cast(Bot2.Battlefield.Elvish Mystic)
+Bot2.Arrange(Bringer of the Last Gift | Island)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Break Under Pressure.Cast(Bot2)
+! Bot2.Choose
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot2.Battlefield..FaceDownName = Bringer of the Last Gift
+Bot2.Graveyard = Llanowar Elves; Island; Elvish Mystic; Turn Inside Out
