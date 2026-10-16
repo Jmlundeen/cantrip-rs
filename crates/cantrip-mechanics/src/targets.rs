@@ -333,6 +333,10 @@ pub mod filters {
     pub fn nontoken_artifact(q: &dyn Query, _: &Asker, id: ObjectId) -> bool {
         super::is_nontoken_artifact(q, id)
     }
+    /// A Treasure (CR 111.10a): Magda, Brazen Outlaw's and Magda, the Hoardmaster's "Sacrifice five/three Treasures".
+    pub fn treasure(q: &dyn Query, _: &Asker, id: ObjectId) -> bool {
+        q.chars(id).has_subtype(Subtype::Treasure)
+    }
     /// An artifact or a creature. Deadly Dispute, Eviscerator's Insight and Fanatical Offering sacrifice one.
     pub fn artifact_or_creature(q: &dyn Query, _: &Asker, id: ObjectId) -> bool {
         let c = q.chars(id);
