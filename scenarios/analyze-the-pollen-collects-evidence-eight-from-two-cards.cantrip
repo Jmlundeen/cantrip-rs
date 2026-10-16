@@ -1,0 +1,41 @@
+# Analyze the Pollen: evidence is "cards with total mana value 8 or greater" (CR 701.59a), from several cards if need be. Bot1's
+# graveyard holds two Heroes of Bladehold (4 + 4 = 8) and the cast Faithless Looting (1). The option is offered; Bot1 exiles the two Heroes, and the search is for a creature
+# or land card: the Llanowar Elves are found. Nothing but the two Heroes is exiled.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Faithless Looting
+Analyze the Pollen
+Hero of Bladehold
+Hero of Bladehold
+Swamp
+Swamp
+Swamp
+Overgrown Tomb
+Llanowar Elves
+Forest
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Hero of Bladehold; Hero of Bladehold)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Analyze the Pollen.Cast
+Bot1.Modes(Collect evidence)
+Bot1.Choose(Hero of Bladehold; Hero of Bladehold)
+Bot1.Search(Llanowar Elves)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Swamp; Swamp; Swamp; Llanowar Elves
+Bot1.Graveyard = Analyze the Pollen; Faithless Looting
+Exile = Hero of Bladehold; Hero of Bladehold
+Bot1.Revealed = Llanowar Elves

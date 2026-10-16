@@ -1,0 +1,43 @@
+# Analyze the Pollen cast WITH evidence collected: Bot1 exiles Griselbrand (mana value 8, exactly the 8 required) from its
+# graveyard as an additional cost (CR 701.59a), and the search is for "a creature or land card" instead of a basic land card:
+# the Lightning Bolt is refused (neither), the Llanowar Elves are found, revealed and put in hand. Griselbrand stays in exile.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Faithless Looting
+Analyze the Pollen
+Griselbrand
+Swamp
+Swamp
+Swamp
+Swamp
+Overgrown Tomb
+Llanowar Elves
+Lightning Bolt
+Forest
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Griselbrand; Swamp)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Analyze the Pollen.Cast
+Bot1.Modes(Collect evidence)
+Bot1.Choose(Griselbrand)
+! Bot1.Search(Lightning Bolt)
+Bot1.Search(Llanowar Elves)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Swamp; Swamp; Swamp; Llanowar Elves
+Bot1.Graveyard = Analyze the Pollen; Faithless Looting; Swamp
+Exile = Griselbrand
+Bot1.Revealed = Llanowar Elves

@@ -1,0 +1,41 @@
+# Analyze the Pollen cast without evidence: "Search your library for a basic land card". Bot1's library holds no basic land
+# (only an Overgrown Tomb, which is not basic, Llanowar Elves and a Lightning Bolt), so nothing may be found: all three are
+# refused, the search comes up empty (a search may find nothing, CR 701.23), nothing is put into hand and nothing is revealed.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Faithless Looting
+Analyze the Pollen
+Griselbrand
+Swamp
+Swamp
+Swamp
+Swamp
+Overgrown Tomb
+Llanowar Elves
+Lightning Bolt
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Griselbrand; Swamp)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Analyze the Pollen.Cast
+Bot1.Modes(Cast without)
+! Bot1.Search(Overgrown Tomb)
+! Bot1.Search(Llanowar Elves)
+! Bot1.Search(Lightning Bolt)
+Bot1.Search()
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Swamp; Swamp; Swamp
+Bot1.Library.Count = 3
+Exile.Count = 0

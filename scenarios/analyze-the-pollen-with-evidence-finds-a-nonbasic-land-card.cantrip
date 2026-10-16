@@ -1,0 +1,43 @@
+# Analyze the Pollen cast WITH evidence collected: "creature or land card" includes a land that is not basic (the official ruling:
+# "The collect evidence ability of Analyze the Pollen allows you to find a nonbasic land card"). Bot1 exiles Griselbrand as the
+# additional cost, refuses the Lightning Bolt, and takes the Overgrown Tomb, which a search without evidence would not allow.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Faithless Looting
+Analyze the Pollen
+Griselbrand
+Swamp
+Swamp
+Swamp
+Swamp
+Overgrown Tomb
+Llanowar Elves
+Lightning Bolt
+Forest
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Griselbrand; Swamp)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Analyze the Pollen.Cast
+Bot1.Modes(Collect evidence)
+Bot1.Choose(Griselbrand)
+! Bot1.Search(Lightning Bolt)
+Bot1.Search(Overgrown Tomb)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Swamp; Swamp; Swamp; Overgrown Tomb
+Bot1.Graveyard = Analyze the Pollen; Faithless Looting; Swamp
+Exile = Griselbrand
+Bot1.Revealed = Overgrown Tomb
