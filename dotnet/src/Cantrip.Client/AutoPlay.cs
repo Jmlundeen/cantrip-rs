@@ -561,6 +561,50 @@ public static class AutoPlay
     /// owing only that as paid — and, paying for X, raise X it cannot finish for ever. Shared with
     /// <see cref="RandomPlay"/> and the model seat.
     /// </summary>
+    /// <summary>
+    /// Whether a cast offered is by web-slinging (CR 702.188a): an alternative cost, the way's text the keyword's. Its tapped
+    /// creature is returned once the mana is paid, so the payment has to leave one tapped (<see cref="WebSlingingMana"/>).
+    /// </summary>
+    public static bool IsWebSlinging(ActionOptionMessage option)
+    {
+        ArgumentNullException.ThrowIfNull(option);
+        return option.Kind == ActionKindView.CastSpell && option.AbilityIndex > 0
+            && option.Description.StartsWith("Web-slinging", StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// For a web-slinging cast with none of this seat's creatures tapped, the mana ability of an untapped creature of its own:
+    /// one that adds mana the cost still owes, named for that mana, or else any, whose mana is then left over (CR 601.2g lets
+    /// a mana ability be activated whether or not its mana is needed) but whose creature is tapped. Null when a creature is
+    /// tapped already or none has a mana ability.
+    /// </summary>
+    public static TakeActionAnswer? WebSlingingMana(GameClient client, PayCostsPromptMessage prompt)
+    {
+        ArgumentNullException.ThrowIfNull(client);
+        ArgumentNullException.ThrowIfNull(prompt);
+
+        if (client.BattlefieldOf(client.Seat).Any(card => card.CardTypes.Contains(CardTypeView.Creature) && card.Tapped))
+        {
+            return null;
+        }
+
+        List<ActionOptionMessage> creatures = [.. prompt.Options.Where(option => option.Kind == ActionKindView.ActivateAbility
+            && client.Object(option.Source) is { } source && source.CardTypes.Contains(CardTypeView.Creature) && !source.Tapped && source.Controller == client.Seat)];
+
+        foreach (ActionOptionMessage option in creatures)
+        {
+            List<ColorView> makes = [.. option.Produces.Where(type => type != ManaTypeView.Colorless).Select(type => (ColorView)(int)type)
+                .Concat(option.ColorChoices)];
+            ColorView? owed = prompt.RemainingColored.Cast<ColorView?>().FirstOrDefault(color => makes.Contains(color!.Value));
+            if (owed is not null || prompt.RemainingGeneric > 0)
+            {
+                return Answer(option, owed);
+            }
+        }
+
+        return creatures.Count > 0 ? Answer(creatures[0]) : null;
+    }
+
     public static bool Owing(PayCostsPromptMessage prompt)
     {
         ArgumentNullException.ThrowIfNull(prompt);

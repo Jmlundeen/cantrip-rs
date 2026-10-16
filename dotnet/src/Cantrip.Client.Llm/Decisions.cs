@@ -59,6 +59,12 @@ public sealed class Decisions
     private readonly HashSet<ViewHandle> _abandoned = [];
 
     /// <summary>
+    /// Whether the spell being paid for is cast by web-slinging (CR 702.188a): its tapped creature is chosen once the mana is
+    /// paid, so the payment taps a creature for mana first (<see cref="AutoPlay.WebSlingingMana"/>).
+    /// </summary>
+    private bool _webSlinging;
+
+    /// <summary>
     /// The point this seat said to stop passing at, or none while it is answering every window.
     /// <para>
     /// Holding off is not only a saving, it closes a leak. A seat is asked at priority exactly when it has something
@@ -167,6 +173,7 @@ public sealed class Decisions
     private AnswerPayload Priority(GameClient client, PriorityPromptMessage prompt)
     {
         _targetX = Unchosen;
+        _webSlinging = false;
         Step(client);
 
         if (_asked >= MostQuestions)
@@ -223,6 +230,7 @@ public sealed class Decisions
         }
 
         ActionOptionMessage option = offered[pick];
+        _webSlinging = AutoPlay.IsWebSlinging(option);
 
         // The X this spell will be cast for, chosen here where the server has said how large it could be, and paid up
         // to over the prompts that follow.
@@ -339,7 +347,12 @@ public sealed class Decisions
             return option.AbilityIndex > 0 && option.SpellName.Length == 0 ? " by an alternative cost" : string.Empty;
         }
 
-        return option.AbilityIndex > 0 ? $" by an alternative cost ({option.Description})" : $" ({option.Description})";
+        // Web-slinging (CR 702.188a): the creature returned must be tapped once the mana is paid, or the cast is taken back.
+        string slinging = AutoPlay.IsWebSlinging(option)
+            ? "; you also return a tapped creature you control to its owner's hand, chosen after the mana is paid, so a creature"
+                + " you tap for this mana can be the one returned, and with no creature tapped by then the cast is taken back"
+            : string.Empty;
+        return option.AbilityIndex > 0 ? $" by an alternative cost ({option.Description}{slinging})" : $" ({option.Description})";
     }
 
     /// <summary>What an action costs besides mana, where the server says it costs something worth weighing.</summary>
@@ -426,6 +439,12 @@ public sealed class Decisions
             }
 
             return AutoPlay.Announce(prompt, _targetX);
+        }
+
+        // Web-slinging returns a creature tapped as the cost is paid: with none tapped, one of its own pays first.
+        if (_webSlinging && AutoPlay.WebSlingingMana(client, prompt) is { } creature)
+        {
+            return creature;
         }
 
         if (!prompt.HasX)
@@ -1110,7 +1129,9 @@ public sealed class Decisions
             CardChoicePurposeView.PutOntoBattlefield => $"{source}: put {many}{kind} card(s) onto the battlefield.",
             CardChoicePurposeView.PutIntoHand => $"{source}: put {many}{kind} card(s) into your hand.",
             CardChoicePurposeView.PutIntoGraveyard => $"{source}: put {many}{kind} card(s) into the graveyard.",
-            CardChoicePurposeView.ReturnToHand => $"{source}: return {many}{kind} permanent(s) to their owner's hand.",
+            CardChoicePurposeView.ReturnToHand => prompt.Kind.Length > 0
+                ? $"{source}: return {many}{kind}(s) you control to their owner's hand."
+                : $"{source}: return {many} permanent(s) to their owner's hand.",
             CardChoicePurposeView.Untap => $"{source}: untap {many}{kind} permanent(s).",
             CardChoicePurposeView.Attach => $"{source}: attach {many}{kind} permanent(s) you control to the creature.",
             CardChoicePurposeView.Encode => $"{source}: choose up to one creature you control to exile it encoded on (cipher).",

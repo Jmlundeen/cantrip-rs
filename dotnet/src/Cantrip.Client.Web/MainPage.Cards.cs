@@ -566,6 +566,12 @@ public sealed partial class MainPage
 
     private bool IsPickedTarget(TargetMessage candidate) => _pickedTargets.Any(picked => Same(picked, candidate));
 
+    /// <summary>
+    /// Whether the spell being paid for is cast by web-slinging (CR 702.188a): its tapped creature is chosen once the mana is
+    /// paid, so the payment's caption says to tap a creature for mana while none is tapped, or the cast is taken back.
+    /// </summary>
+    private bool _webSlinging;
+
     private static TakeActionAnswer AnswerFor(ActionOptionMessage option, TargetMessage? target = null) => new()
     {
         Kind = option.Kind,
@@ -583,6 +589,13 @@ public sealed partial class MainPage
         if (client.Prompt is null)
         {
             return;
+        }
+
+        // Whether the cast just chosen is by web-slinging (CR 702.188a), for the payment's caption to say what it needs.
+        if (client.Prompt.Prompt is PriorityPromptMessage priority)
+        {
+            _webSlinging = answer is TakeActionAnswer taken && priority.Options.Exists(option => AutoPlay.IsWebSlinging(option)
+                && option.Source == taken.Source && option.AbilityIndex == taken.AbilityIndex && option.Kind == taken.Kind);
         }
 
         client.Answer(answer);

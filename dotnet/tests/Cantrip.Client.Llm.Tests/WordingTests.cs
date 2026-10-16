@@ -113,6 +113,52 @@ public sealed class WordingTests
     }
 
     [Fact]
+    public void A_web_slinging_cast_says_the_creature_returned_must_be_tapped_once_the_mana_is_paid()
+    {
+        var chooser = new ScriptedChooser([0]);
+
+        new Decisions(chooser).Answer(
+            Seated(Card(2, "Spider-Sense", "{1}{U}", "Counter target instant spell, sorcery spell, or triggered ability.")),
+            new PriorityPromptMessage
+            {
+                Player = Me,
+                Options =
+                [
+                    new() { Kind = ActionKindView.CastSpell, Source = Handle(2), Affordable = true, AbilityIndex = 1, Description = "Web-slinging {U}" },
+                ],
+            });
+
+        string row = chooser.Asked[0].Choices[0];
+        Assert.Contains("by an alternative cost (Web-slinging {U}; you also return a tapped creature", row, StringComparison.Ordinal);
+        Assert.Contains("a creature you tap for this mana can be the one returned", row, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void A_tapped_creature_returned_for_web_slinging_is_called_a_tapped_creature()
+    {
+        var chooser = new ScriptedChooser([0]);
+        ObjectView bears = Creature(3, "Grizzly Bears", 2, 2, Me);
+        ObjectView elves = Creature(4, "Llanowar Elves", 1, 1, Me);
+        bears.Tapped = true;
+        elves.Tapped = true;
+
+        new Decisions(chooser).Answer(
+            Seated(bears, elves),
+            new ChooseCardsPromptMessage
+            {
+                Player = Me,
+                Source = Handle(9),
+                Purpose = CardChoicePurposeView.ReturnToHand,
+                Cards = [Handle(3), Handle(4)],
+                Eligible = [Handle(3), Handle(4)],
+                Count = 1,
+                Kind = "tapped creature",
+            });
+
+        Assert.Contains("return 1 tapped creature(s) you control to their owner's hand.", chooser.Asked[0].Heading, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void A_harmonize_tap_says_up_to_one_and_that_it_takes_generic_mana_off_the_cost()
     {
         var chooser = new ScriptedChooser([0]);

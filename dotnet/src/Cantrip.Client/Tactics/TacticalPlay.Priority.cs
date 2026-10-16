@@ -495,8 +495,7 @@ public sealed partial class TacticalPlay
         ActionOptionMessage option = candidate.Option;
 
         _kick = candidate.Kick;
-        _webSlinging = option.Kind == ActionKindView.CastSpell && option.AbilityIndex > 0
-            && option.Description.StartsWith("Web-slinging", StringComparison.Ordinal);
+        _webSlinging = AutoPlay.IsWebSlinging(option);
         _pending = ((option.Source.Value, option.Kind, option.AbilityIndex), Board(view));
 
         TakeActionAnswer answer = AutoPlay.Answer(option);
@@ -1960,7 +1959,7 @@ public sealed partial class TacticalPlay
         // Web-slinging returns a tapped creature, judged once the mana is paid (CR 702.188a, 601.2g-h): with no creature of
         // its own tapped yet, a creature's mana ability pays first, for mana the cost still owes, so that there is one to
         // return. A land tapped instead would leave the cost unpayable and the cast taken back.
-        if (_webSlinging && WebSlingingMana(client, prompt) is { } creature)
+        if (_webSlinging && AutoPlay.WebSlingingMana(client, prompt) is { } creature)
         {
             return creature;
         }
@@ -2002,36 +2001,6 @@ public sealed partial class TacticalPlay
         }
 
         return AutoPlay.Pay(prompt);
-    }
-
-    /// <summary>
-    /// For a web-slinging cast with none of this seat's creatures tapped, the mana ability of an untapped creature of its own:
-    /// one that adds mana the cost still owes, named for that mana, or else any, whose mana is then left over (CR 601.2g lets
-    /// a mana ability be activated whether or not its mana is needed) but whose creature is tapped. Null when a creature is
-    /// tapped already or none has a mana ability.
-    /// </summary>
-    private static TakeActionAnswer? WebSlingingMana(GameClient client, PayCostsPromptMessage prompt)
-    {
-        if (client.BattlefieldOf(client.Seat).Any(card => IsCreature(card) && card.Tapped))
-        {
-            return null;
-        }
-
-        List<ActionOptionMessage> creatures = [.. prompt.Options.Where(option => option.Kind == ActionKindView.ActivateAbility
-            && client.Object(option.Source) is { } source && IsCreature(source) && !source.Tapped && source.Controller == client.Seat)];
-
-        foreach (ActionOptionMessage option in creatures)
-        {
-            List<ColorView> makes = [.. option.Produces.Where(type => type != ManaTypeView.Colorless).Select(type => (ColorView)(int)type)
-                .Concat(option.ColorChoices)];
-            ColorView? owed = prompt.RemainingColored.Cast<ColorView?>().FirstOrDefault(color => makes.Contains(color!.Value));
-            if (owed is not null || prompt.RemainingGeneric > 0)
-            {
-                return AutoPlay.Answer(option, owed);
-            }
-        }
-
-        return creatures.Count > 0 ? AutoPlay.Answer(creatures[0]) : null;
     }
 
     /// <summary>
