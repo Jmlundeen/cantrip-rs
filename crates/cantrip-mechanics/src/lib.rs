@@ -317,6 +317,19 @@ pub fn airbend(g: &mut dyn Game, item: &StackItem) {
     }
 }
 
+/// "The cards in a player's hand" (CR 402.1). Beza, the Bounding Spring and Robber of the Rich compare it.
+pub fn cards_in_hand(q: &dyn Query, player: PlayerId) -> usize {
+    q.state().zone(Zone::hand(player)).len()
+}
+
+/// The zone a spell is cast from while its cost is worked out (CR 601.2f): the zone the card is in before it is cast,
+/// or the one it was cast from once it is on the stack. Bilbo, Thief in the Night, Norman Osborn and Aven Interrupter
+/// change what spells cast from certain zones cost.
+pub fn zone_cast_from(q: &dyn Query, spell: ObjectId) -> Option<ZoneKind> {
+    let obj = q.obj(spell);
+    if obj.zone.is(ZoneKind::Stack) { obj.cast_from } else { Some(obj.zone.kind()) }
+}
+
 /// "The number of creatures [player] controls": every creature on the battlefield they control, read through the layers.
 /// Ajani, Nacatl Pariah, Emeritus of Truce, Oath of Druids and Stadium Headliner count it exactly so.
 pub fn creatures_you_control(q: &dyn Query, player: PlayerId) -> usize {

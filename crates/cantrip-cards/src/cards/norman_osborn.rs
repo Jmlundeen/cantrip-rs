@@ -1,6 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::effects;
 use cantrip_mechanics::mayhem;
+use cantrip_mechanics::zone_cast_from;
 use cantrip_mechanics::triggers::DEALS_COMBAT_DAMAGE_TO_PLAYER;
 use cantrip_mechanics::connive;
 use cantrip_oracle as oracle;
@@ -13,8 +14,7 @@ fn connives(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// graveyard, or a card in one that would be.
 fn graveyard_spells_cost_two_less(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed) -> i8 {
     let Costed::Spell(spell) = costed else { return 0 };
-    let obj = q.obj(spell);
-    if player == q.controller(source) && (obj.cast_from == Some(ZoneKind::Graveyard) || obj.zone.is(ZoneKind::Graveyard)) {
+    if player == q.controller(source) && zone_cast_from(q, spell) == Some(ZoneKind::Graveyard) {
         -2
     } else {
         0

@@ -1,10 +1,7 @@
 use cantrip_api::*;
+use cantrip_mechanics::cards_in_hand as hand_size;
 use cantrip_mechanics::library::exile_top_may_play;
 use cantrip_oracle as oracle;
-
-fn hand_size(q: &dyn Query, player: PlayerId) -> usize {
-    q.state().zone(Zone::hand(player)).len()
-}
 
 /// "Whenever this creature attacks, if defending player has more cards in hand than you" (CR 508.3a, 603.4): checked
 /// as it triggers, and the defending player is carried to the resolution.
