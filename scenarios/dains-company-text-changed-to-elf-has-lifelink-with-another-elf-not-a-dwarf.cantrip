@@ -1,0 +1,40 @@
+# CR 612: with Llanowar Elves (an Elf, no Dwarf) beside the Company it has no lifelink. Artificial Evolution then changes "Dwarf" to
+# "Elf" in the Company's text (type line Elf Warrior): "as long as you control another Elf" is now true - the Elves - so it has
+# lifelink. The original text would still have looked for a Dwarf and found none.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Dáin's Company
+Llanowar Elves
+Artificial Evolution
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Dáin's Company.Cast
+Bot1.Arrange( | Island; Island; Island; Island)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+? Bot1.Battlefield.Dáin's Company.Keywords = (absent)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Dáin's Company)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Dwarf)
+Bot1.Modes(Elf)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Dáin's Company.Subtypes = Elf; Warrior
+Bot1.Battlefield.Dáin's Company.Keywords = Lifelink

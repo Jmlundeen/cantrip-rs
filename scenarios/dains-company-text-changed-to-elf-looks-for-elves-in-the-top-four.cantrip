@@ -1,0 +1,41 @@
+# CR 612: Artificial Evolution, cast in response to the Company spell, changes "Dwarf" to "Elf" in its text. Its enters trigger then
+# reads "reveal an Elf or Equipment card": of the top four, Llanowar Elves (an Elf) can be taken and Dain Ironfoot (a Dwarf) cannot
+# (refused beside the positive control). The changed type line stays on the battlefield: Elf Warrior.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Dáin's Company
+Artificial Evolution
+Island
+Island
+Dáin Ironfoot
+Llanowar Elves
+Island
+Island
+Island x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Dáin's Company.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Stack.Dáin's Company)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Dwarf)
+Bot1.Modes(Elf)
+! Bot1.Arrange(Dáin Ironfoot | Llanowar Elves; Island; Island)
+Bot1.Arrange(Llanowar Elves | Dáin Ironfoot; Island; Island)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Llanowar Elves; Island; Island
+Bot1.Battlefield.Dáin's Company.Subtypes = Elf; Warrior

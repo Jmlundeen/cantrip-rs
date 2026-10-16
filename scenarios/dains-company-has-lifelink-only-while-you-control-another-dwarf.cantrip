@@ -1,0 +1,48 @@
+# "This creature has lifelink as long as you control another Dwarf": Bot2 controls a Dwarf (its Dain Ironfoot), which is not "another
+# Dwarf you control", so Bot1's Company has no lifelink at the start of turn 3. Bot1 then casts its own Dain Ironfoot and the Company
+# has lifelink: attacking into Bot2's empty-handed board (no blocks) it deals 2, Bot1 gains 2 (22) and Bot2 is at 18.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Dáin's Company
+Dáin Ironfoot
+Island x15
+
+[Bot2 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Dáin Ironfoot
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Dáin's Company.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Dáin Ironfoot.Cast
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Dáin's Company.Keywords = (absent)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dáin Ironfoot.Cast
+Bot1.Target(Dáin Ironfoot)
+Bot1.Attack(Dáin's Company > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot2.Life = 18
+Bot1.Battlefield.Dáin's Company.Keywords = Lifelink

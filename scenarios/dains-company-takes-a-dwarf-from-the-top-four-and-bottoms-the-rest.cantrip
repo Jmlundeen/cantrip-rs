@@ -1,0 +1,36 @@
+# "Look at the top four cards ... You may reveal a Dwarf or Equipment card from among them and put it into your hand": the top four are
+# Island, Cranial Plating (Equipment), Dain Ironfoot (a Dwarf) and Ornithopter, and Bot1 takes the Dwarf. Only one card may be taken
+# (the two-card answer is refused beside the one-card control), the Plating, Island and Ornithopter go to the bottom of the 12-card
+# library, which keeps 11 cards. Alone, the Company has no lifelink.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Dáin's Company
+Island
+Island
+Island
+Island
+Island
+Cranial Plating
+Dáin Ironfoot
+Ornithopter
+Mountain x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Dáin's Company.Cast
+! Bot1.Arrange(Dáin Ironfoot; Cranial Plating | Island; Ornithopter)
+Bot1.Arrange(Dáin Ironfoot | Island; Cranial Plating; Ornithopter)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Dáin Ironfoot; Island; Island; Island; Island
+Bot1.Library.Count = 11
+Bot1.Battlefield.Dáin's Company.Keywords = (absent)

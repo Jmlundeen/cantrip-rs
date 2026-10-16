@@ -1,0 +1,46 @@
+# The Equipment half of "Dwarf or Equipment": with a Cranial Plating among the top four Bot1 takes it. Bot2, with its own Company, has no Dwarf or Equipment among the cards it looks at, and only one card left in its library after its draw: it is still shown
+# it (CR 609.3 for the short library), takes nothing, and puts it on the bottom.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Dáin's Company
+Island
+Island
+Island
+Island
+Island
+Cranial Plating
+Ornithopter
+Mountain x9
+
+[Bot2 Deck]
+Mox Ruby
+Mox Pearl
+Dáin's Company
+Island
+Island
+Island
+Island
+Island
+Island
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Dáin's Company.Cast
+Bot1.Arrange(Cranial Plating | Island; Ornithopter; Mountain)
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Dáin's Company.Cast
+Bot2.Arrange( | Island)
+
+[Expect]
+Bot1.Hand = Cranial Plating; Island; Island; Island; Island
+Bot2.Hand.Count = 5
+Bot2.Library.Count = 1

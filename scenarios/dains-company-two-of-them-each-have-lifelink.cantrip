@@ -1,0 +1,32 @@
+# Each Company is "another Dwarf" for the other (and the Company is a Dwarf Warrior itself): with one on the battlefield it has no
+# lifelink, and when a second enters both have it. Both looks at the library are answered by taking nothing (no Dwarf or Equipment).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Dáin's Company
+Dáin's Company
+Island x3
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Dáin's Company.Cast
+Bot1.Arrange( | Island; Island; Island; Island)
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Dáin's Company.Keywords = (absent)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Dáin's Company.Cast
+Bot1.Arrange( | Island; Island; Island; Island)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Dáin's Company#1.Keywords = Lifelink
+Bot1.Battlefield.Dáin's Company#2.Keywords = Lifelink
