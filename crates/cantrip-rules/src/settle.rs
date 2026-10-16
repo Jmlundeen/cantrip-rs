@@ -464,7 +464,9 @@ fn choose_trigger_targets(
             if most == 0 {
                 break 'slot;
             }
-            let count = (most as usize).min(candidates.len()) as u8;
+            // A stack item holds at most MAX_TARGETS targets: a count past what is left of them is cut to it (known-issues KI-3).
+            let room = cantrip_state::MAX_TARGETS.saturating_sub(targets.len());
+            let count = (most as usize).min(candidates.len()).min(room) as u8;
             let ask = RequestKind::ChooseTarget { label: spec.label, slot_player: *slot_player,
                 source: trigger.source,
                 purpose: Purpose::Targets,
