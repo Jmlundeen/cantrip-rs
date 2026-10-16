@@ -95,6 +95,24 @@ pub fn label_text(label: &Label) -> &'static str {
 mod tests {
     use super::*;
 
+    /// Activating an ability (CR 602.2) pays neither behold, nor blight, nor a cost of tapped permanents chosen once the mana
+    /// is paid (web-slinging's): those are built for spells only, so a card whose activated ability has one is refused here,
+    /// before any game reaches the assertion in `activate`.
+    #[test]
+    fn every_activated_ability_has_a_cost_activation_can_pay() {
+        for def in &cards().cards {
+            for ability in def.abilities.iter().chain(def.delayed.iter()) {
+                if let AbilityDef::Activated(a) = ability {
+                    assert!(
+                        a.cost.behold.is_none() && a.cost.blight == 0 && !a.cost.permanents.is_some_and(|p| p.tapped),
+                        "{}: an activated ability's behold, blight or cost of tapped permanents is not built",
+                        def.name
+                    );
+                }
+            }
+        }
+    }
+
     /// A creature whose power or toughness is printed as a star has it from a characteristic-defining ability (CR 208.2a), and
     /// once that is lost (CR 604.3, 613.1f) the star is worth 0 (CR 208.5): `StaticDef::lost_pt` says what it leaves, so the next
     /// card with a star cannot forget it.

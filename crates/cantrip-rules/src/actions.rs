@@ -3227,10 +3227,11 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
 
     // Behold and blight are paid when a spell is cast only (CR 701.4a, 701.68a): an activated ability that had them would
     // get the cost for free.
-    debug_assert!(def.cost.behold.is_none() && def.cost.blight == 0, "an activated ability's behold or blight is not built");
+    assert!(def.cost.behold.is_none() && def.cost.blight == 0, "an activated ability's behold or blight is not built");
     // A cost of tapped permanents is chosen once the mana is paid (CR 601.2g-h), which only a spell's does yet: no
     // activated ability has one.
-    debug_assert!(!permanents_after_mana(&def.cost), "an activated ability's cost of tapped permanents is not built");
+    // `every_activated_ability_has_a_cost_activation_can_pay` (cantrip-engine) refuses such a card before any game.
+    assert!(!permanents_after_mana(&def.cost), "an activated ability's cost of tapped permanents is not built");
     let chosen = choose_permanents(cx, player, source, &def.cost)?;
     // What an attacking creature the cost returns or sacrifices was attacking, for the effect to read (ninjutsu,
     // CR 702.49a: the ninja attacks the same player, planeswalker or battle).

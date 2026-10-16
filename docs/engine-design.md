@@ -261,12 +261,15 @@ Meditation, Discontinuity and Obeka, Brute Chronologist end the turn.
 ### Casting: when a cost's choices are made
 
 A spell's costs are chosen and paid in the order of CR 601.2b-h, as the C# engine asked them: the permanents a cost
-sacrifices or returns, its discards and exiles are chosen before the mana is paid, an additional cost's choices after it.
-A cost of tapped permanents (`PermanentCost::tapped`, web-slinging's "return a tapped creature you control", CR 702.188a)
-is chosen once the mana is paid, since mana abilities come first (CR 601.2g) and one of them may have tapped the creature
-(Spider-Sense's ruling): it is offered while a creature is tapped or a mana ability its controller could activate would
-tap one, its own {T} or Springleaf Drum's, and a payment that leaves none tapped can't be completed, so the cast is taken
-back (CR 601.2h). Only a spell's cost has one yet; an activated ability's is refused by a debug assertion.
+sacrifices or returns, its discards and exiles are chosen before the mana is paid, an additional cost's choices after
+it. A cost of tapped permanents (`PermanentCost::tapped`, web-slinging's "return a tapped creature you control", CR
+702.188a) is chosen once the mana is paid, since mana abilities come first (CR 601.2g) and one of them may have tapped
+the creature (Spider-Sense's ruling): it is offered while a creature is tapped or a mana ability its controller could
+activate would tap one, its own {T} or Springleaf Drum's, and a payment that leaves none tapped can't be completed, so
+the cast is taken back (CR 601.2h). Only a spell's cost has one yet; an activated ability with one is refused by a
+card-table test (`every_activated_ability_has_a_cost_activation_can_pay`) and an assertion in `activate`. The web
+client's payment caption for a web-slinging cast says to tap a creature for mana while none is tapped; the cast that
+leaves none is still taken back after it is paid.
 
 ### Legal moves as a first-class output
 
@@ -356,6 +359,11 @@ Known gaps:
   color, a subtype, a player, a name, odd or even, no card type) and a prompt for it; Peter Parker // Amazing
   Spider-Man's back face grants web-slinging to the legendary spells its controller casts, a way a permanent gives to
   cards in hand, which only exists for cards in graveyards (`granted_ways_of`).
+- `web_slinging::way` is a way from the hand (`ZoneKind::Hand`), like every printed alternative cost. Cast from
+  elsewhere at priority by a permission or the card's own say-so, a hand way is offered too (`castable`'s `elsewhere`;
+  Spider-Sense from the graveyard under Yawgmoth's Will is a scenario), but a cast made while an effect resolves
+  (`cast_ways_during_resolution`) is offered for the card's mana cost and faces only: an effect that lets a spell be cast
+  paying its costs ("cast it from exile this turn") as it resolves can't use web-slinging or any other alternative cost.
 - No scenario reaches Questing Beast's unpreventable damage, Emrakul's extra turn on cast, or Tamiyo's -7 emblem.
 - Suspend does not give a creature cast that way haste (no card in content needs it), and several creatures put onto
   the battlefield one after another by an effect (Ghost Vacuum) enter one at a time rather than together.
