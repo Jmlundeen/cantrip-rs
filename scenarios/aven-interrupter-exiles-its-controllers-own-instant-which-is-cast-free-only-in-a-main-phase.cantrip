@@ -1,0 +1,45 @@
+# Aven Interrupter can exile a spell its own controller cast. Bot1 Bolts Bot2 with a Mox Ruby, then flashes in Aven in
+# response and exiles its own Lightning Bolt: it becomes plotted and Bot2 takes nothing. The Bolt is an instant, but a
+# plotted card is cast only during its owner's main phase with the stack empty (ruling 2024-06-07): on turn 3 it is not
+# offered in the upkeep (the refusal, with a Mox Ruby untapped that could have paid for it) and is cast free in the main
+# phase. It is Bot1's own spell, so Aven's tax on an opponent's spells from exile does not apply: nothing is paid and
+# Bot2 takes 3.
+
+[Bot1 Deck]
+Mox Pearl x3
+Mox Ruby
+Aven Interrupter
+Lightning Bolt
+Island x12
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Aven Interrupter.Cast
+[Bot1.Main2]
+? Exile = Lightning Bolt
+? Bot2.Life = 20
+[T3 Bot1.Upkeep]
+! Bot1.Exile.Lightning Bolt.Cast
+[T3 Bot1.Main1]
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+? Bot1.Mana = 
+? Stack = Lightning Bolt
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Graveyard = Lightning Bolt
+Exile.Count = 0
+Bot1.Battlefield.Mox Ruby.Tapped = false

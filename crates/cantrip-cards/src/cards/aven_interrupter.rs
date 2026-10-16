@@ -1,7 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::plot::become_plotted;
 use cantrip_mechanics::triggers::THIS_ENTERS;
-use cantrip_mechanics::targets;
+use cantrip_mechanics::{targets, zone_cast_from};
 use cantrip_oracle as oracle;
 
 /// "When this creature enters, exile target spell. It becomes plotted." The spell leaves the stack without being
@@ -20,9 +20,7 @@ fn exile_and_plot(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// that was cast from one of those zones, or a card in one that would be.
 fn opponents_graveyard_and_exile_spells_cost_two_more(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed) -> i8 {
     let Costed::Spell(spell) = costed else { return 0 };
-    let obj = q.obj(spell);
-    let from = if obj.zone.is(ZoneKind::Stack) { obj.cast_from } else { Some(obj.zone.kind()) };
-    if player != q.controller(source) && matches!(from, Some(ZoneKind::Graveyard | ZoneKind::Exile)) { 2 } else { 0 }
+    if player != q.controller(source) && matches!(zone_cast_from(q, spell), Some(ZoneKind::Graveyard | ZoneKind::Exile)) { 2 } else { 0 }
 }
 
 pub static CARD: CardDef = CardDef {
