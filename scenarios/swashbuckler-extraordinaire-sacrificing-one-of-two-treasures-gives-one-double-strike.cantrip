@@ -1,0 +1,41 @@
+# Swashbuckler Extraordinaire: Bot1 has two Treasures and sacrifices only one as it attacks. "That many" is the one
+# sacrificed (CR 603.12): two targets are refused, the Swashbuckler alone gains double strike and deals its 2 twice,
+# and the other Treasure stays.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Swashbuckler Extraordinaire
+Ornithopter
+Ornithopter
+Swamp
+Deadly Dispute
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Swashbuckler Extraordinaire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Deadly Dispute.Cast
+Bot1.Choose(Ornithopter)
+[T3 Bot1.BeginCombat]
+Bot1.Attack(Swashbuckler Extraordinaire; Ornithopter > Bot2)
+Bot1.Choose(Treasure Token)
+! Bot1.Target(Swashbuckler Extraordinaire; Ornithopter)
+Bot1.Target(Swashbuckler Extraordinaire)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot1.Battlefield = Mountain; Swamp; Swashbuckler Extraordinaire; Ornithopter; Treasure Token
+Bot1.Battlefield.Ornithopter.Keywords = Flying
