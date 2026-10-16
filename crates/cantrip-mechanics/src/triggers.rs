@@ -399,6 +399,22 @@ pub fn creature_you_control_enters(q: &dyn Query, source: ObjectId, event: &Even
     }
 }
 
+/// "Whenever another creature you control enters" (CR 603.6a): a creature other than this permanent, under your control
+/// as it entered. The entering creature is the trigger's subject. Aunt May and Guide of Souls print it.
+pub fn another_creature_you_control_enters(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::ZoneChange { new, to, .. }
+            if *new != source
+                && to.is(ZoneKind::Battlefield)
+                && q.controller(*new) == q.controller(source)
+                && q.chars(*new).is(CardType::Creature) =>
+        {
+            Fired::about(Target::Object(*new))
+        }
+        _ => None,
+    }
+}
+
 /// "Whenever a creature you control dies" (CR 700.4, 603.10a), looked back on: the creature as it last was on the
 /// battlefield, under the controller it last had. Use with `look_back: true`. Grave Venerations and Warhost's Frenzy
 /// print it.

@@ -2,21 +2,6 @@ use cantrip_api::*;
 use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
 
-/// "Whenever another creature you control enters" (CR 603.6a).
-fn another_creature_enters(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
-    match event {
-        Event::ZoneChange { new, to, .. }
-            if *new != source
-                && to.is(ZoneKind::Battlefield)
-                && q.controller(*new) == q.controller(source)
-                && q.chars(*new).is(CardType::Creature) =>
-        {
-            Fired::PLAIN
-        }
-        _ => None,
-    }
-}
-
 /// You gain 1 life and get {E} (an energy counter).
 fn bank(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.gain_life(item.controller, 1);
@@ -57,7 +42,7 @@ fn empower(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(when(EventMask::ZONE_CHANGE, another_creature_enters), bank, "Whenever another creature you control enters, you gain 1 life and get {E} (an energy counter)."),
+        triggered(when(EventMask::ZONE_CHANGE, cantrip_mechanics::triggers::another_creature_you_control_enters), bank, "Whenever another creature you control enters, you gain 1 life and get {E} (an energy counter)."),
         triggered(cantrip_mechanics::triggers::YOU_ATTACK, pay_energy, "Whenever you attack, you may pay {E}{E}{E}. When you do, put two +1/+1 counters and a flying counter on target attacking creature. It becomes an Angel in addition to its other types."),
     ],
     delayed: &[delayed_trigger(empower, "When you do, put two +1/+1 counters and a flying counter on target attacking creature. It becomes an Angel in addition to its other types.")
