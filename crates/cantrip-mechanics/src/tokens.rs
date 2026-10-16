@@ -42,6 +42,12 @@ pub fn create_treasure(g: &mut dyn Game, controller: PlayerId) -> Result<(), Sus
     Ok(())
 }
 
+/// The Treasures `player` controls, token or not (CR 205.3g: Treasure is an artifact type), through the layers. Smaug the
+/// Magnificent counts them and Swashbuckler Extraordinaire sacrifices them.
+pub fn treasures_controlled(q: &dyn Query, player: PlayerId) -> Vec<ObjectId> {
+    q.permanents_of(player).into_iter().filter(|&id| q.chars(id).has_subtype(Subtype::Treasure)).collect()
+}
+
 /// Creates a tapped Treasure token (CR 111.10a) under `controller`. Generous Plunderer and Death to Our Enemies print it.
 pub fn create_tapped_treasure(g: &mut dyn Game, controller: PlayerId) -> Result<(), Suspend> {
     let treasure = g.card_id(&TREASURE);

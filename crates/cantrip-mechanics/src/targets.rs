@@ -134,6 +134,12 @@ pub fn legal_objects(g: &dyn Game, item: &StackItem) -> Vec<ObjectId> {
     (0..item.target_count as usize).filter_map(|slot| object(g, item, slot)).collect()
 }
 
+fn equipment_you_control_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    matches!(t, Target::Object(id) if permanent(q, id) && q.controller(id) == asker.controller && q.chars(id).has_subtype(Subtype::Equipment))
+}
+/// "Target Equipment you control" (CR 115.1, 301.5). Super-Soldier Serum and Thorin print it.
+pub const EQUIPMENT_YOU_CONTROL: TargetSpec = target(equipment_you_control_filter);
+
 /// A permanent that is still the object it was on the battlefield (CR 400.7): the start of every battlefield filter.
 pub fn permanent(q: &dyn Query, id: ObjectId) -> bool {
     on_battlefield(q, id)

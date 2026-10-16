@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::attach::equipment_controlled;
 use cantrip_mechanics::tokens;
 use cantrip_oracle as oracle;
 
@@ -14,16 +15,10 @@ pub static DWARF: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
-/// The number of Equipment `player` controls, as the layers have them (an Equipment is an artifact type, not a word a
-/// text-changing effect can change).
-fn equipment_controlled(q: &dyn Query, player: PlayerId) -> usize {
-    q.permanents_of(player).into_iter().filter(|&id| q.chars(id).has_subtype(Subtype::Equipment)).count()
-}
-
 /// "This land enters tapped unless you control an Equipment" (CR 614.1c): read on the battlefield as it is while the land
 /// enters.
 fn enters_tapped_unless_equipment(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
-    if equipment_controlled(g, entering.controller) == 0 {
+    if equipment_controlled(g, entering.controller).is_empty() {
         entering.tapped = true;
     }
     Ok(())
@@ -31,7 +26,7 @@ fn enters_tapped_unless_equipment(g: &mut dyn Game, entering: &mut Entering) -> 
 
 /// "This ability costs {1} less to activate for each Equipment you control" (CR 601.2f): generic mana only, never the {R}.
 fn cheaper_per_equipment(q: &dyn Query, _: ObjectId, player: PlayerId, _: Costed) -> CostDelta {
-    CostDelta::less(equipment_controlled(q, player).min(255) as u8)
+    CostDelta::less(equipment_controlled(q, player).len().min(255) as u8)
 }
 
 fn make_dwarf(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {

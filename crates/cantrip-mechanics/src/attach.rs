@@ -91,6 +91,12 @@ pub fn equipment_you_control_enters(q: &dyn Query, source: ObjectId, event: &Eve
     }
 }
 
+/// The Equipment `player` controls (CR 301.5), through the layers. The Lonely Mountain counts them, Battlefield
+/// Improvisation chooses among them and "target Equipment you control" (`targets::EQUIPMENT_YOU_CONTROL`) is judged by it.
+pub fn equipment_controlled(q: &dyn Query, player: PlayerId) -> Vec<ObjectId> {
+    q.permanents_of(player).into_iter().filter(|&id| q.chars(id).has_subtype(Subtype::Equipment)).collect()
+}
+
 /// A static ability's `affects` for "equipped creature" and "enchanted creature" (CR 301.5, 303.4): exactly the
 /// permanent the source is attached to.
 pub fn attached_object(view: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Chars) -> bool {

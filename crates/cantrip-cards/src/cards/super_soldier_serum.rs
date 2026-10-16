@@ -31,20 +31,11 @@ fn enchanted_creature_attacks_or_blocks(q: &dyn Query, source: ObjectId, event: 
     }
 }
 
-/// "Target Equipment you control" (CR 115.1).
-fn equipment_you_control(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    matches!(t, Target::Object(id)
-        if targets::permanent(q, id) && q.controller(id) == asker.controller && q.chars(id).has_subtype(Subtype::Equipment))
-}
-
 /// "Attach any number of target Equipment you control to it" (CR 701.3a): "it" is the creature that attacked or blocked,
-/// as it is now; with the creature gone, there is nothing to attach to. Each Equipment still a legal target is attached
+/// as it is now; attaching to a creature that has left the battlefield does nothing (CR 701.3b). Each Equipment still a legal target is attached
 /// in turn (CR 608.2b); one that cannot be attached to it (CR 701.3b) stays where it is.
 fn attach_equipment(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Target::Object(creature) = item.subject else { return Ok(()) };
-    if !targets::permanent(g, creature) {
-        return Ok(());
-    }
     for slot in 0..item.target_count as usize {
         if let Some(equipment) = targets::object(g, item, slot) {
             g.attach(equipment, creature);
@@ -60,7 +51,7 @@ pub static CARD: CardDef = CardDef {
         attach_equipment,
         "Whenever enchanted creature attacks or blocks, attach any number of target Equipment you control to it.",
     )
-    .targets(&[target(equipment_you_control).between(0, TargetSpec::ANY_NUMBER)])],
+    .targets(&[targets::EQUIPMENT_YOU_CONTROL.between(0, TargetSpec::ANY_NUMBER)])],
     statics: &[
         static_ability(Layer::Type, attached_object, legendary_soldier_too, "Enchanted creature is a legendary Soldier in addition to its other types."),
         static_ability(Layer::Ability, attached_object, first_strike_and_vigilance, "Enchanted creature has first strike and vigilance."),

@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::targets;
-use cantrip_mechanics::tokens::{create_treasure, TREASURE};
+use cantrip_mechanics::tokens::{create_treasure, treasures_controlled, TREASURE};
 use cantrip_mechanics::triggers;
 use cantrip_oracle as oracle;
 
@@ -8,7 +8,7 @@ use cantrip_oracle as oracle;
 /// the ability's controller (CR 608.2h); no Treasures is no damage (CR 120.8), and a target that has since become
 /// illegal is left alone (CR 608.2b).
 fn treasure_damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let treasures = g.permanents_of(item.controller).into_iter().filter(|&id| g.chars(id).has_subtype(Subtype::Treasure)).count();
+    let treasures = treasures_controlled(g, item.controller).len();
     if treasures > 0 && g.target_legal(item, 0) {
         g.damage(item.object, item.targets[0], treasures as u16);
     }

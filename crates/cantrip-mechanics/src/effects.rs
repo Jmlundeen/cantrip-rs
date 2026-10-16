@@ -149,7 +149,7 @@ pub fn sacrifice_self(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
 }
 
 /// "Destroy target [thing]" (CR 701.8): the ability's first target.
-fn destroy_first_target(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+pub fn destroy_first_target(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     crate::destroy_target(g, item, 0);
     Ok(())
 }

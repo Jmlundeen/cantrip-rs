@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::attach::equipment_controlled;
 use cantrip_mechanics::{choose, pump, targets};
 use cantrip_oracle as oracle;
 
@@ -15,8 +16,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if !g.is_attacking(creature) {
         return Ok(());
     }
-    let equipment: Vec<ObjectId> =
-        g.permanents_of(item.controller).into_iter().filter(|&id| g.chars(id).has_subtype(Subtype::Equipment)).collect();
+    let equipment = equipment_controlled(g, item.controller);
     for attachment in choose::cards(g, item.controller, item.object, Purpose::Attach, equipment, u8::MAX, true)? {
         g.attach(attachment, creature);
     }
