@@ -443,9 +443,18 @@ fn ward_sacrifice_question(n: u8) -> &'static Question {
     )
     .amount(3)
     .no_default();
+    const ANY: Question = Question::new(
+        "SacrificeUnlessCountered",
+        "Sacrifice the permanents, or {source} is countered?",
+        DETAIL,
+        "Sacrifice them",
+        "Let it be countered",
+    )
+    .no_default();
     match n {
         2 => &TWO,
-        _ => &THREE,
+        3 => &THREE,
+        _ => &ANY,
     }
 }
 
