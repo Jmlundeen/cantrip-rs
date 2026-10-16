@@ -20,7 +20,7 @@ fn enters_prepared(_: &mut dyn Game, entering: &mut Entering) -> Result<(), Susp
 
 /// "If you control eight or more lands" (CR 603.4): checked as it triggers and again as it resolves.
 fn eight_lands(q: &dyn Query, asker: &Asker) -> bool {
-    q.permanents_of(asker.controller).into_iter().filter(|&id| q.chars(id).is(CardType::Land)).count() >= 8
+    cantrip_mechanics::lands_you_control(q, asker.controller) >= 8
 }
 
 fn become_prepared(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {

@@ -11,7 +11,7 @@ fn search(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         chars.is(CardType::Land) && chars.supertypes.basic
     })?;
     let Some(&land) = arrived.first() else { return Ok(()) };
-    let lands = g.permanents_of(player).into_iter().filter(|&id| g.chars(id).is(CardType::Land)).count();
+    let lands = cantrip_mechanics::lands_you_control(g, player);
     if lands >= 4 {
         g.untap(land);
     }

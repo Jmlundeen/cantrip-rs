@@ -404,6 +404,12 @@ pub fn creatures_you_control(q: &dyn Query, player: PlayerId) -> usize {
     q.permanents_of(player).into_iter().filter(|&id| q.chars(id).is(CardType::Creature)).count()
 }
 
+/// "The number of lands [player] controls": every land on the battlefield they control, read through the layers. Beza, the
+/// Bounding Spring, Consult the Star Charts, Fabled Passage, Pillage the Bog and Emeritus of Abundance count it exactly so.
+pub fn lands_you_control(q: &dyn Query, player: PlayerId) -> usize {
+    q.permanents_of(player).into_iter().filter(|&id| q.chars(id).is(CardType::Land)).count()
+}
+
 /// Deals damage to the target in `slot`, if it is still legal.
 pub fn damage_target(g: &mut dyn Game, item: &StackItem, slot: usize, amount: u16) {
     if g.target_legal(item, slot) {

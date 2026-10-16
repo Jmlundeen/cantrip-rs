@@ -8,7 +8,7 @@ use cantrip_oracle as oracle;
 /// does nothing (CR 609.3).
 fn look(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let player = item.controller;
-    let lands = g.permanents_of(player).into_iter().filter(|&id| g.chars(id).is(CardType::Land)).count();
+    let lands = cantrip_mechanics::lands_you_control(g, player);
     look_at_top(g, player, item.object, lands * 2, (1, 1), false, |_| true, Rest::BottomRandom)?;
     Ok(())
 }

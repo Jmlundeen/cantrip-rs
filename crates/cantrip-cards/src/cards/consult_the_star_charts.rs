@@ -6,7 +6,7 @@ use cantrip_oracle as oracle;
 /// hand, or two if it was kicked, and the rest on the bottom of your library in a random order.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let player = item.controller;
-    let lands = g.permanents_of(player).into_iter().filter(|&id| g.chars(id).is(CardType::Land)).count();
+    let lands = cantrip_mechanics::lands_you_control(g, player);
     let taken: usize = if g.obj(item.object).kicked > 0 { 2 } else { 1 };
     let taken = top_of_library(g, player, lands).len().min(taken) as u8;
     look_at_top(g, player, item.object, lands, (taken, taken), false, |_| true, Rest::BottomRandom)?;
