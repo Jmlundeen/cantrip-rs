@@ -1067,13 +1067,14 @@ pub struct GrantedMiracle {
     /// Whether the card, in a hand, has this miracle ability: asked of the granting permanent (`Asker`, its controller
     /// "you").
     pub has: fn(&dyn Query, &Asker, ObjectId) -> bool,
-    /// Its miracle cost, for a card or the face of it being cast: the whole card as it is revealed, and the half, Adventure or
-    /// face being cast as the linked ability resolves (CR 709.3a, 715.3a, 712.8a: only that face is evaluated). None is a
-    /// cost based on the mana cost of a card that has none, which can't be paid (CR 118.6). An {X} in it is announced as the
-    /// card is cast (CR 107.3a).
+    /// Its miracle cost before `less`, for a card or the face of it being cast: the whole card as it is revealed, and the
+    /// half, Adventure or face being cast as the linked ability resolves (CR 709.3a, 715.3a, 712.8a: only that face is
+    /// evaluated). None is a cost based on the mana cost of a card that has none, which can't be paid (CR 118.6). An {X} in
+    /// it is announced as the card is cast (CR 107.3a).
     pub cost: fn(&dyn Query, CardId) -> Option<ManaCost>,
-    /// Generic mana the cost is reduced by as the total cost is determined (CR 601.2f, 118.7a): after X is announced and
-    /// after what increases it, so "its mana cost reduced by {4}" takes up to four off an X. 0 for none.
+    /// Generic mana the miracle cost is that cost reduced by ("its mana cost reduced by {4}"), 0 for none: part of what the
+    /// cost is, so before anything increases it (CR 601.2f); generic mana only, never below nothing, and what the cost's
+    /// own generic mana cannot take comes off X's once X is announced (CR 118.7a). See `reduced_by`.
     pub less: u8,
 }
 
@@ -1100,7 +1101,7 @@ impl Miracle {
         }
         let granter = CardId((data[0] - 1) as u16);
         let grant = q.card(granter).granted_miracles.get(data[1] as usize)?;
-        Some(Miracle { granter: Some((granter, data[1] as u8)), cost: (grant.cost)(q, q.obj(card).card) })
+        Some(Miracle { granter: Some((granter, data[1] as u8)), cost: (grant.cost)(q, q.obj(card).card).map(|c| reduced_by(c, grant.less).0) })
     }
 
     /// Its cost for casting `face` of the card (CR 709.3a, 715.3a, 712.8a): the card's own miracle cost whatever face is
@@ -1108,7 +1109,9 @@ impl Miracle {
     pub fn cost_as(&self, q: &dyn Query, face: CardId) -> Option<ManaCost> {
         match self.granter {
             None => self.cost,
-            Some((granter, i)) => q.card(granter).granted_miracles.get(i as usize).and_then(|grant| (grant.cost)(q, face)),
+            Some((granter, i)) => {
+                q.card(granter).granted_miracles.get(i as usize).and_then(|grant| (grant.cost)(q, face).map(|c| reduced_by(c, grant.less).0))
+            }
         }
     }
 
@@ -1121,19 +1124,29 @@ impl Miracle {
     }
 }
 
-/// The generic mana a named miracle ability's cost is reduced by as the total cost is determined (CR 601.2f, 118.7a).
-pub fn miracle_less(q: &dyn Query, miracle: MiracleOf) -> u8 {
-    if miracle.is_own() { 0 } else { q.card(miracle.granter).granted_miracles.get(miracle.index as usize).map_or(0, |grant| grant.less) }
+/// A cost reduced by `less` generic mana (CR 118.7a): its generic mana comes off first, never below nothing, and colored mana
+/// never; what is left of the reduction is taken off what an {X} in the cost adds once X is announced, and is 0 for a cost
+/// with no {X}. The mana value of the spell is not changed (CR 202.3).
+pub fn reduced_by(cost: ManaCost, less: u8) -> (ManaCost, u8) {
+    let off = less.min(cost.generic);
+    (ManaCost { generic: cost.generic - off, ..cost }, if cost.x > 0 { less - off } else { 0 })
 }
 
-/// The cost of a named miracle ability (CR 702.94a) for casting `face` of its card, read from the card table alone: the
-/// card's own miracle cost, or the granting card's grant read for that face. None for a cost that can't be paid (CR 118.6).
-pub fn miracle_cost(q: &dyn Query, miracle: MiracleOf, face: CardId) -> Option<ManaCost> {
+/// A named miracle ability's cost (CR 702.94a) for casting `face` of its card, reduced as its grant says, read from the card
+/// table alone: the card's own miracle cost, or the granting card's grant read for that face; with what is left of the
+/// reduction for X (`reduced_by`). None for a cost that can't be paid (CR 118.6).
+pub fn miracle_cost_and_x_less(q: &dyn Query, miracle: MiracleOf, face: CardId) -> Option<(ManaCost, u8)> {
     if miracle.is_own() {
-        q.card(miracle.card).miracle
+        q.card(miracle.card).miracle.map(|cost| (cost, 0))
     } else {
-        q.card(miracle.granter).granted_miracles.get(miracle.index as usize).and_then(|grant| (grant.cost)(q, face))
+        let grant = q.card(miracle.granter).granted_miracles.get(miracle.index as usize)?;
+        (grant.cost)(q, face).map(|cost| reduced_by(cost, grant.less))
     }
+}
+
+/// A named miracle ability's cost for casting `face` of its card, reduced as its grant says (`miracle_cost_and_x_less`).
+pub fn miracle_cost(q: &dyn Query, miracle: MiracleOf, face: CardId) -> Option<ManaCost> {
+    miracle_cost_and_x_less(q, miracle, face).map(|(cost, _)| cost)
 }
 
 /// Every miracle ability a card in its owner's hand has (CR 702.94a): its own first, then those the permanents on the
@@ -1151,7 +1164,7 @@ pub fn miracles(q: &dyn Query, card: ObjectId) -> Vec<Miracle> {
         let asker = Asker { source: id, controller: o.controller };
         for (i, grant) in def.granted_miracles.iter().enumerate() {
             if (grant.has)(q, &asker, card) {
-                all.push(Miracle { granter: Some((granter, i as u8)), cost: (grant.cost)(q, q.obj(card).card) });
+                all.push(Miracle { granter: Some((granter, i as u8)), cost: (grant.cost)(q, q.obj(card).card).map(|c| reduced_by(c, grant.less).0) });
             }
         }
     }
@@ -1951,18 +1964,19 @@ pub static MIRACLE_ABILITY: AbilityDef = AbilityDef::Triggered(TriggeredDef {
 fn miracle_resolves(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let card = item.object;
     let Some(miracle) = Miracle::of_data(g, card, item.data) else { return Ok(()) };
-    // Each face that could be cast, with its miracle cost; one whose cost can't be paid (CR 118.6) is not offered.
-    let ways: Vec<(CastWay, ManaCost)> = g
+    let named = miracle.of(g.obj(card).card);
+    // Each face that could be cast, with its miracle cost and what of its reduction is left for X; one whose cost can't be
+    // paid (CR 118.6) is not offered.
+    let ways: Vec<(CastWay, (ManaCost, u8))> = g
         .cast_ways_during_resolution(card)
         .into_iter()
-        .filter_map(|way| miracle.cost_as(g, way.face).map(|cost| (way, cost)))
+        .filter_map(|way| miracle_cost_and_x_less(g, named, way.face).map(|cost| (way, cost)))
         .collect();
-    let named = miracle.of(g.obj(card).card);
     if ways.is_empty() || !matches!(g.ask(item.controller, RequestKind::May { source: card, purpose: Purpose::CastForMiracleCost(named) })?, Answer::Yes) {
         return Ok(());
     }
     // Which face is cast is chosen as it is cast (CR 709.3, 715.3, 712.8a), asked as the core asks it.
-    let (way, cost) = if ways.len() == 1 {
+    let (way, (cost, less)) = if ways.len() == 1 {
         ways[0]
     } else {
         let ask = RequestKind::ChooseModes {
@@ -1980,7 +1994,6 @@ fn miracle_resolves(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
             _ => ways[0],
         }
     };
-    let less = miracle_less(g, named);
     g.cast_during_resolution_as(card, CastTerms { instead: Some(cost), less, way: Some(way.way), ..CastTerms::default() })?;
     Ok(())
 }

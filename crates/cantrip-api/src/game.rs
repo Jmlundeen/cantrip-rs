@@ -49,8 +49,9 @@ pub struct CastTerms {
     pub any_type: bool,
     /// Generic mana added to its cost (CR 601.2f).
     pub more: u8,
-    /// Generic mana its total cost is reduced by as it is determined, once X is announced and after what increases it
-    /// (CR 601.2f, 118.7a): Aminatou, Veil Piercer's "its mana cost reduced by {4}".
+    /// Generic mana taken off what an {X} in `instead` adds, as X is announced and before anything increases the cost, never
+    /// below nothing (CR 107.3a, 118.7a): what a reduction of a cost paid instead leaves for X once the cost's own generic
+    /// mana is gone (Aminatou, Veil Piercer's "its mana cost reduced by {4}" on The Meathook Massacre).
     pub less: u8,
     /// Life paid with its cost (CR 118.9, 119.4): Bolas's Citadel's mana value.
     pub life: u8,

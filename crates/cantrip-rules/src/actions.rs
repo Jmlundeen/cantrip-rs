@@ -2410,7 +2410,9 @@ fn cast(
                 cx.st().update_obj(spell, |o| o.kicked = n as u8);
             }
         } else {
-            cost.mana.generic += n as u8 * x_symbols;
+            // What a cost paid instead was reduced by that its own generic mana could not take, off X's (CR 118.7a).
+            let xs = (n as u32 * x_symbols as u32).min(255);
+            cost.mana.generic = cost.mana.generic.saturating_add((xs - xs.min(less as u32)) as u8);
             item.x = n;
             cx.st().update_obj(spell, |o| o.x = n);
         }
@@ -2461,10 +2463,6 @@ fn cast(
     let life = announce_life(cx, player, spell, &mut cost.mana)?;
     // CR 601.2f: the total cost, with what increases or reduces it.
     cost.mana = apply_cost_changes(cx, player, Costed::Spell(spell), cost.mana);
-    // A reduction the cast was made with (CR 601.2f, 118.7a), after the increases and with the reductions: generic mana only.
-    if less > 0 {
-        cost.mana = reduce(cost.mana, &ManaCost { generic: less, ..ManaCost::ZERO });
-    }
     // CR 702.180a, 601.2f: the total cost comes down by generic mana equal to the tapped creature's power, read as the total
     // cost is determined, after what raises it; colored mana never comes down.
     if let Some(creature) = reducer {

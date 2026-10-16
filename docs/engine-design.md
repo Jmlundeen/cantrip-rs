@@ -288,7 +288,10 @@ battlefield gives it (`CardDef::granted_miracles`, asked of the permanent with i
 permanent has lost its abilities). With one, the player is asked whether to reveal it; with several, whether and then which
 (`Label::Miracle`), since each miracle ability is linked only to its own triggered ability (CR 607.5). The linked ability
 (`MIRACLE_ABILITY`) carries which one it was in its data, so the cost it offers is that one's even once the permanent that gave
-it has left (CR 113.7a), and a granted cost is read for the face being cast (a Room's door, CR 709.3a). The battlefield is
+it has left (CR 113.7a), and a granted cost is read for the face being cast (a Room's door, CR 709.3a). A grant's
+`less` ("its mana cost reduced by {4}") is part of what the cost is (`reduced_by`): it takes the cost's generic mana, never
+colored, before anything increases it (CR 601.2f), and what is left of it comes off what an {X} adds once X is announced
+(`CastTerms::less`, CR 118.7a); the spell's mana value is unchanged. The battlefield is
 searched on every draw a player makes after the first turn begins, before the history is asked whether it is the first.
 
 ### Ending the turn and the cleanup step
