@@ -443,7 +443,7 @@ public sealed partial class MainPage
             : contents.Count == 0 && known.Count > 0
             ? $"You know {known.Count} card{(known.Count == 1 ? string.Empty : "s")} in this library. Click to look."
             : offers && !_graveyardsOpen
-            ? $"A card here can be {(plays ? "played" : activates ? "activated" : "cast")}{GraveyardWindows(client, contents)}. Click to look."
+            ? $"A card here can be {(plays ? "played" : activates ? "activated" : "cast")}{GraveyardWindows(client, contents, _actions)}. Click to look."
             : null;
 
         return new PlayerRail.PileSpec(count, top is null ? null : Standing(top, -900_000 - seat), click, lit, note);
@@ -453,9 +453,12 @@ public sealed partial class MainPage
     /// The permissions the viewer holds on cards in a graveyard (Stingcaster Mage's flashback), for the pile's note: " (Lightning
     /// Bolt: Castable this turn, then exiled)". Empty when it is no permission that lets them be cast.
     /// </summary>
-    private static string GraveyardWindows(GameClient client, IReadOnlyList<ObjectView> contents)
+    private static string GraveyardWindows(GameClient client, IReadOnlyList<ObjectView> contents, CardActions actions)
     {
-        string[] windows = [.. contents.SelectMany(card => card.PlayPermissions.Where(permission => permission.Seat == client.Seat).Select(permission => $"{card.Name}: {permission.Text}"))];
+        // A card's own way to be cast from here, printed on it (Wild Ride's "Harmonize {4}{R}", Faithless Looting's flashback), says what it costs.
+        string[] ways = [.. contents.Where(card => !card.PlayPermissions.Any(permission => permission.Seat == client.Seat))
+            .SelectMany(card => actions.For(card.Handle).Where(option => option.Kind == ActionKindView.CastSpell && option.Description.Length > 0).Select(option => $"{card.Name}: {option.Description}"))];
+        string[] windows = [.. ways, .. contents.SelectMany(card => card.PlayPermissions.Where(permission => permission.Seat == client.Seat).Select(permission => $"{card.Name}: {permission.Text}"))];
         return windows.Length == 0 ? string.Empty : $" ({string.Join("; ", windows)})";
     }
 
