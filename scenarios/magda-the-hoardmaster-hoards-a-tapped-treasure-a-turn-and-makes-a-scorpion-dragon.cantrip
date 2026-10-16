@@ -1,0 +1,70 @@
+# Magda, the Hoardmaster: "Whenever you commit a crime, create a tapped Treasure token. This ability triggers only once
+# each turn." Bot1's first Lightning Bolt at Bot2 on turn 1 makes a tapped Treasure; the second that turn is a crime too
+# but makes none. Bolts on turn 3 and on Bot2's turn 4 (each a new turn) make the second and third Treasures.
+# "Sacrifice three Treasures: ... Activate only as a sorcery": refused on Bot2's turn with three Treasures there; on turn
+# 5 it sacrifices all three (the only three, so none is asked for) and makes a 4/4 red Scorpion Dragon with flying and
+# haste, which attacks at once (Bot2 at 20 - 12 - 4 = 4).
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Magda, the Hoardmaster
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Magda, the Hoardmaster.Cast
+Bot1.Pass
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Treasure Token.Tapped = true
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Stack.Count = 1
+? Bot1.Crimes = Lightning Bolt; Lightning Bolt
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield = Mountain; Magda, the Hoardmaster; Treasure Token
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Stack.Count = 2
+[T4 Bot2.Upkeep]
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Stack.Count = 2
+[T4 Bot2.Main1]
+! Bot1.Battlefield.Magda, the Hoardmaster.Activate
+[T5 Bot1.Main1]
+? Bot1.Battlefield = Mountain; Mountain; Magda, the Hoardmaster; Treasure Token; Treasure Token; Treasure Token
+Bot1.Battlefield.Magda, the Hoardmaster.Activate
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Scorpion Dragon.Power = 4
+Bot1.Attack(Scorpion Dragon > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mountain; Mountain; Magda, the Hoardmaster; Scorpion Dragon
+Bot1.Battlefield.Scorpion Dragon.Token = true
+Bot1.Battlefield.Scorpion Dragon.Toughness = 4
+Bot1.Battlefield.Scorpion Dragon.Colors = Red
+Bot1.Battlefield.Scorpion Dragon.Subtypes = Dragon; Scorpion
+Bot1.Battlefield.Scorpion Dragon.Keywords = Flying; Haste
+Bot1.Battlefield.Scorpion Dragon.Tapped = true
+Bot2.Life = 4
