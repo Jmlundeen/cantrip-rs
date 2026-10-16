@@ -1,0 +1,32 @@
+# Gleaming Bastion: "{T}: Add {W} or {U}. Activate only if this land entered this turn or if you control a basic land."
+# Turn 1 it entered this turn, so {U} is offered with no other land at all. On turn 3 Bot1 controls only a Tundra
+# (Plains and Island types but not basic, CR 205.4a) and Bot2 controls a Plains (not Bot1's): {W} is refused (the
+# refusal) while {C} is still offered. On turn 5 a basic Island of Bot1's turns the ability back on (the positive
+# control: the same action, the same land, no longer entered this turn).
+
+[Bot1 Deck]
+Gleaming Bastion
+Tundra
+Island
+Swamp x20
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Gleaming Bastion.Play
+Bot1.Battlefield.Gleaming Bastion.Activate(Ability: or; Color: Blue)
+? Bot1.Mana = {U}
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Tundra.Play
+! Bot1.Battlefield.Gleaming Bastion.Activate(Ability: or; Color: White)
+Bot1.Battlefield.Gleaming Bastion.Activate(Ability: {C})
+? Bot1.Mana = {C}
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Gleaming Bastion.Activate(Ability: or; Color: White)
+
+[Expect]
+Bot1.Mana = {W}

@@ -1,0 +1,23 @@
+# Gleaming Bastion entered on turn 3 beside a basic Island played on turn 1: it taps for {W} that very turn. The
+# Island is basic and the Bastion is not, so the condition reads the other land. On turn 5 (no longer entered this turn,
+# the Island still there) it taps for {U}, the other half of "{W} or {U}".
+
+[Bot1 Deck]
+Island
+Gleaming Bastion
+Swamp x20
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Gleaming Bastion.Play
+Bot1.Battlefield.Gleaming Bastion.Activate(Ability: or; Color: White)
+? Bot1.Mana = {W}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Gleaming Bastion.Activate(Ability: or; Color: Blue)
+
+[Expect]
+Bot1.Mana = {U}
