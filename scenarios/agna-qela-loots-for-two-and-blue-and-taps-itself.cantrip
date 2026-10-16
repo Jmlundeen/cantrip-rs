@@ -1,0 +1,35 @@
+# Agna Qel'a: "{2}{U}, {T}: Draw a card, then discard a card." On turn 3 Bot1 has an Island and Agna Qel'a (untapped,
+# for it controls the basic Island) plus Mox Jet and Mox Pearl. With {2}{U} floating (Island, Mox Jet, Mox Pearl) it resolves: a card is drawn and the chosen Lightning Bolt
+# is discarded. Agna Qel'a taps as part of the cost, so it cannot be activated again.
+
+[Bot1 Deck]
+Island
+Agna Qel'a
+Mox Jet
+Mox Pearl
+Lightning Bolt
+Forest
+Forest
+Forest x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Agna Qel'a.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Agna Qel'a.Activate(Ability: Draw a card)
+Bot1.Choose(Lightning Bolt)
+? Bot1.Graveyard = Lightning Bolt
+! Bot1.Battlefield.Agna Qel'a.Activate(Ability: Draw a card)
+
+[Expect]
+Bot1.Graveyard = Lightning Bolt
+Bot1.Battlefield.Agna Qel'a.Tapped = true
+Stack.Count = 0

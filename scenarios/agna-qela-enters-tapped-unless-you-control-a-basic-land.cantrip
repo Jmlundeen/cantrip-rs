@@ -1,0 +1,24 @@
+# Agna Qel'a: "This land enters tapped unless you control a basic land." Bot1's only other land is a Tundra (not basic,
+# CR 205.4a) so its Agna Qel'a enters tapped; Bot2's Agna Qel'a beside its own Island enters untapped (positive control).
+
+[Bot1 Deck]
+Tundra
+Agna Qel'a
+Island x20
+
+[Bot2 Deck]
+Island
+Agna Qel'a
+Island x20
+
+[Actions]
+Bot1.Hand.Tundra.Play
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Agna Qel'a.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Agna Qel'a.Play
+
+[Expect]
+Bot1.Battlefield.Agna Qel'a.Tapped = true
+Bot2.Battlefield.Agna Qel'a.Tapped = false
