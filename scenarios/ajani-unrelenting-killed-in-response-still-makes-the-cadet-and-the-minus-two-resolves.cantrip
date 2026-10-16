@@ -1,0 +1,70 @@
+# Ajani Unrelenting: "Whenever you activate a loyalty ability, create a 2/2 colorless Wizard Soldier creature token named Cadet."
+# On turn 3 Bot1 activates the -2 (loyalty 5 to 3). With the trigger and the -2 on the stack, Bot2 Lightning Bolts Ajani: 3
+# damage removes his last 3 loyalty counters and he dies (CR 306.8, 704.5i). Both abilities are independent of their source once
+# on the stack (CR 113.7a): the trigger still makes its Cadet, and then the -2 discards Bot1's hand (three Plains) and draws one
+# card for the one creature he controls, the Cadet.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+Mox Pearl
+Ajani Unrelenting
+Plains
+Plains
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island
+Island
+Island
+Island
+Island
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ajani Unrelenting.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+? Bot1.Hand = Plains; Plains; Island
+Bot1.Battlefield.Ajani Unrelenting.Activate(Ability: Discard your hand)
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ajani Unrelenting)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Ajani Unrelenting; Black Lotus
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Cadet.Token = true
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Ruby; Mox Jet; Mox Pearl; Cadet
+Bot1.Graveyard = Island; Plains; Plains; Ajani Unrelenting; Black Lotus
+Bot1.Hand.Count = 1
+Stack.Count = 0

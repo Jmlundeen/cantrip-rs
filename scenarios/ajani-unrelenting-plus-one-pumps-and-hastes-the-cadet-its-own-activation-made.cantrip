@@ -1,0 +1,64 @@
+# Ajani Unrelenting: "Whenever you activate a loyalty ability, create a 2/2 colorless Wizard Soldier creature token named Cadet."
+# "+1: Creatures you control get +1/+0 and gain haste until end of turn." Casting him makes no Cadet (no ability was activated;
+# the battlefield count is checked before the +1). The +1 on turn 3 triggers the Cadet, which is on the battlefield before the +1
+# resolves (the ruling), so it is a 3/2 with haste, as is Bot1's Ornithopter; Bot2's Ornithopter, a creature of another controller,
+# is untouched (CR 611.2c, 608.2). The effect ends with the turn: on turn 5 the Cadet is a 2/2 without haste again.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+Mox Pearl
+Ajani Unrelenting
+Ornithopter
+Plains
+Plains x25
+
+[Bot2 Deck]
+Ornithopter
+Plains x25
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ajani Unrelenting.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 5
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Ajani Unrelenting.Activate(Ability: haste)
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Cadet.Power = 3
+? Bot1.Battlefield.Cadet.Keywords = Haste
+? Bot1.Battlefield.Cadet.SummoningSick = false
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Ajani Unrelenting.Counters.Loyalty = 6
+Bot1.Battlefield.Cadet.Power = 2
+Bot1.Battlefield.Cadet.Toughness = 2
+Bot1.Battlefield.Cadet.Keywords = (absent)
+Bot1.Battlefield.Cadet.Colors = (absent)
+Bot1.Battlefield.Cadet.Subtypes = Soldier; Wizard
+Bot1.Battlefield.Cadet.Token = true
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot2.Battlefield.Ornithopter.Power = 0
+Bot2.Battlefield.Ornithopter.Keywords = Flying

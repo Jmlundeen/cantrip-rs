@@ -1,0 +1,72 @@
+# Ajani Unrelenting: "Whenever you activate a loyalty ability, create a 2/2 colorless Wizard Soldier creature token named Cadet."
+# Comet, Stellar Pup's 0 rolls a 6 ([Dice]): [+1], and "you may activate Comet's loyalty ability two more times this turn". Being
+# allowed to activate is no activation (CR 602.2): the allowance the engine notes in the history triggers nothing, so only Comet's
+# two real activations make Cadets - one each, two in all, where four would mean the allowance had triggered too. The first
+# activation's trigger is above the 0 on the stack (CR 603.3), and so resolves first. The second roll, a 1, is [+2] and two
+# Squirrels. Comet's loyalty: 5 + 1 + 2 = 8.
+
+[Dice]
+6; 1
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+Mox Pearl
+Ajani Unrelenting
+Comet, Stellar Pup
+Mountain
+Plains x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ajani Unrelenting.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Comet, Stellar Pup.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 6
+Bot1.Battlefield.Comet, Stellar Pup.Activate
+? Stack = Ajani Unrelenting; Comet, Stellar Pup
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 7
+? Stack = Comet, Stellar Pup
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 7
+? Bot1.Battlefield.Comet, Stellar Pup.Counters.Loyalty = 6
+Bot1.Battlefield.Comet, Stellar Pup.Activate
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Ajani Unrelenting; Comet, Stellar Pup; Mox Ruby; Mox Jet; Mox Pearl; Mountain; Cadet; Cadet; Squirrel; Squirrel
+Bot1.Battlefield.Comet, Stellar Pup.Counters.Loyalty = 8
+Bot1.Battlefield.Ajani Unrelenting.Counters.Loyalty = 5
+Stack.Count = 0

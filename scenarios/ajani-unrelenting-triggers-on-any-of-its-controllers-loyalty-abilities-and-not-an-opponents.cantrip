@@ -1,0 +1,87 @@
+# Ajani Unrelenting: "Whenever you activate a loyalty ability, create a 2/2 colorless Wizard Soldier creature token named Cadet."
+# It is any planeswalker's loyalty ability, by its controller, and no other ability. On turn 2 Bot2 casts Ajani Resolute and
+# activates his 0: nothing happens for Bot1 (the battlefield stays four permanents: Ajani Unrelenting and three Moxen). On turn 3
+# Bot1 casts Figure of Destiny and activates its {R/W} ability, an activated ability that is not a loyalty ability: no Cadet. On
+# turn 5 Bot1 casts his own Ajani Resolute (casting a planeswalker is not activating it) and activates the 0, which is not one of
+# Unrelenting's abilities, and a Cadet appears (the positive control).
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+Mox Pearl
+Ajani Unrelenting
+Ajani Resolute
+Figure of Destiny
+Plains x25
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Ajani Resolute
+Plains
+Plains x25
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ajani Unrelenting.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Ajani Resolute.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Ajani Resolute.Activate(Ability: gain 1 life)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Life = 21
+? Bot1.Battlefield.Count = 4
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Figure of Destiny.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Figure of Destiny.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 5
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ajani Resolute.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 6
+Bot1.Battlefield.Ajani Resolute.Activate(Ability: gain 1 life)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Ajani Unrelenting; Ajani Resolute; Figure of Destiny; Mox Ruby; Mox Jet; Mox Pearl; Cadet
+Bot1.Battlefield.Ajani Unrelenting.Counters.Loyalty = 5
+Bot1.Battlefield.Cadet.Power = 2
+Bot1.Battlefield.Cadet.Token = true
+Bot1.Battlefield.Figure of Destiny.Subtypes = Kithkin; Spirit
+Bot1.Life = 21
+Stack.Count = 0
