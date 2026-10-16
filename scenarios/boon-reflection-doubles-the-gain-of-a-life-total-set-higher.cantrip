@@ -1,0 +1,60 @@
+# A life total set to a number is gained or lost to get there (CR 119.5), so Boon Reflection doubles the gain of a total
+# set higher (its 2020-08-07 ruling: from 3, "becomes 10" ends at 17). Bot2 Bolts Bot1 to 17; Bot1's Blessed Wind
+# ("Target player's life total becomes 20") then gains Bot1 3 life, doubled to 6: 23, not 20.
+
+[Bot1 Deck]
+Plains
+Sol Ring
+Sol Ring
+Black Lotus
+Boon Reflection
+Mox Pearl
+Mox Jet
+Blessed Wind
+Plains x12
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Boon Reflection.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Life = 17
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Blessed Wind.Cast(Bot1)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Bot1.Life = 23
+Bot1.Graveyard = Blessed Wind; Black Lotus

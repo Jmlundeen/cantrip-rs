@@ -1,0 +1,50 @@
+# The event history records the life a player actually gained, after replacement effects (CR 614.1a, 119.3). Bot1's
+# Enlightened Confidant attacks under Boon Reflection: its 2 lifelink life becomes 4 (20 -> 24). At the end step it
+# surveils Wrath of God (mana value 4) into the graveyard, and since Bot1 gained 4 life this turn, not 2, the Wrath goes
+# to Bot1's hand.
+
+[Bot1 Deck]
+Plains
+Sol Ring
+Mox Pearl
+Mox Jet
+Black Lotus
+Enlightened Confidant
+Boon Reflection
+Plains
+Wrath of God
+Plains x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Enlightened Confidant.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Boon Reflection.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot1.Attack(Enlightened Confidant)
+[T3 Bot1.End]
+Bot1.Arrange(| Wrath of God)
+[T4 Bot2.Upkeep]
+
+[Expect]
+Bot1.Life = 24
+Bot2.Life = 18
+Bot1.Hand = Plains; Wrath of God

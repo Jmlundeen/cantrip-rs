@@ -1,0 +1,6 @@
+{
+  "name": "Boon Reflection",
+  "manaCost": "{4}{W}",
+  "type": "Enchantment",
+  "oracleText": "If you would gain life, you gain twice that much life instead."
+}
