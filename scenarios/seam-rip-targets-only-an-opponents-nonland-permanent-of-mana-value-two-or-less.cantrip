@@ -1,0 +1,50 @@
+# "Exile target nonland permanent an opponent controls with mana value 2 or less": Bot2's Brazen Borrower (mana value 3), its Island (a land) and Bot1's own Mox Pearl are refused as targets; Bot2's Elvish Mystic (mana value 1) is exiled, the positive
+# control, and stays exiled while Seam Rip is on the battlefield.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Seam Rip
+Plains x14
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Sapphire
+Mox Emerald
+Brazen Borrower
+Elvish Mystic
+Island x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Sapphire#2.Activate
+Bot2.Hand.Brazen Borrower.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Seam Rip.Cast
+Bot1.Pass
+! Bot1.Target(Brazen Borrower)
+! Bot1.Target(Bot2.Battlefield.Island)
+! Bot1.Target(Mox Pearl)
+Bot1.Target(Elvish Mystic)
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Exile = Elvish Mystic
+Bot2.Battlefield.Brazen Borrower.Types = Creature

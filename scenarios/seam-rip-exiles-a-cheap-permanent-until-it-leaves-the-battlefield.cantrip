@@ -1,0 +1,41 @@
+# Seam Rip exiles target nonland permanent an opponent controls with mana value 2 or less (Bot2's Mox Jet) until it
+# leaves the battlefield (CR 610.3); when Bot1 destroys Seam Rip with Disenchant, the Mox comes back.
+
+[Bot1 Deck]
+Plains
+Plains
+Mox Pearl
+Seam Rip
+Disenchant
+Plains x15
+
+[Bot2 Deck]
+Mox Jet
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Seam Rip.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+? Exile = Mox Jet
+? Bot2.Battlefield.Count = 0
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Disenchant.Cast(Seam Rip)
+[Bot1.Main2]
+
+[Expect]
+Turn = 3
+Exile.Count = 0
+Stack.Count = 0
+Bot2.Battlefield = Mox Jet
+Bot1.Battlefield = Plains; Plains; Mox Pearl
+Bot1.Graveyard = Disenchant; Seam Rip

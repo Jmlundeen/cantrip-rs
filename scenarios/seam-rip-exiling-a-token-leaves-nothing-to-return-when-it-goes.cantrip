@@ -1,0 +1,49 @@
+# A token that is exiled ceases to exist (CR 111.7): on turn 5 Bot1's Seam Rip exiles the Gold token Bot2 made when its Ornithopter attacked under its own Curse of Opulence (mana value 0, a nonland permanent). When Bot1 then exiles the
+# Seam Rip itself with Haywire Mite, the Gold token does not come back; Bot2's battlefield is the Mountain, the Curse and the Ornithopter.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Emerald
+Haywire Mite
+Seam Rip
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Mountain
+Curse of Opulence
+Ornithopter
+Mountain x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Haywire Mite.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Curse of Opulence.Cast(Bot1)
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Attack(Ornithopter > Bot1)
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Seam Rip.Cast
+Bot1.Pass
+Bot1.Target(Gold Token)
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Haywire Mite.Activate(Seam Rip)
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Exile = Seam Rip
+Bot2.Battlefield = Mountain; Curse of Opulence; Ornithopter

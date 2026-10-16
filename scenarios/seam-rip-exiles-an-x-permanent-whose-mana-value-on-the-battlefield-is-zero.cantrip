@@ -1,0 +1,35 @@
+# Mana value off the stack: Bot2 casts Walking Ballista for X = 2 (mana value 4 on the stack), but on the battlefield X is 0 (CR 107.3m), so its mana value is 0 and
+# Seam Rip may target it. The Ballista had two counters; it is exiled all the same.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Seam Rip
+Plains x17
+
+[Bot2 Deck]
+Island
+Black Lotus
+Walking Ballista
+Island x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Walking Ballista.Cast(X: 2)
+Bot2.Battlefield.Island.Activate
+[T3 Bot1.Main1]
+? Bot2.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 2
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Seam Rip.Cast
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Exile = Walking Ballista
+Bot2.Battlefield = Island
