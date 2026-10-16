@@ -21,7 +21,8 @@ says there is nothing new, tell the user so and stop: no notes, nothing saved.
 
 ## 2. Write the three lists
 
-Plain Discord markdown: a bold heading per list, then one item per line starting with `- `. Nothing else - no
+Plain Discord markdown: each list's heading on its own line wrapped in `**` so Discord shows it bold (`**New cards**`,
+`**New mechanics**`, `**Bug fixes**` - never a `#` heading or plain text), then one item per line starting with `- `. Nothing else - no
 preamble, no commit hashes, no file paths, no rule numbers, no internal names (crates, `KI-` ids, protocol numbers,
 function names). Write for players: say what they can now play or what now works right.
 
