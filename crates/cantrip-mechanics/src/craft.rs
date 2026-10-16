@@ -24,7 +24,7 @@ fn return_transformed(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
     let materials = exiled_materials(g, item.object, item.ability);
     g.link_exiled(&materials, card);
     let owner = g.obj(card).owner;
-    g.put_onto_battlefield_transformed(card, owner)?;
+    g.put_onto_battlefield_transformed(card, owner, false)?;
     Ok(())
 }
 

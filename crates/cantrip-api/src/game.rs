@@ -379,8 +379,9 @@ pub trait Game: Query {
     /// Sacrifices permanents and puts cards onto the battlefield at the same moment (CR 101.4): Goblin Welder.
     fn sacrifice_and_return(&mut self, sacrificed: &[ObjectId], returned: &[(ObjectId, PlayerId)]) -> Result<(), Suspend>;
     /// Puts an object onto the battlefield transformed, its back face up (CR 712.14a): "exile it, then return it to
-    /// the battlefield transformed". A card with no back face stays where it is (CR 712.14a).
-    fn put_onto_battlefield_transformed(&mut self, object: ObjectId, controller: PlayerId) -> Result<ObjectId, Suspend>;
+    /// the battlefield transformed", or "tapped and transformed" with `tapped` (CR 110.5b). A card with no back face stays
+    /// where it is (CR 712.14a).
+    fn put_onto_battlefield_transformed(&mut self, object: ObjectId, controller: PlayerId, tapped: bool) -> Result<ObjectId, Suspend>;
     /// Transforms a permanent (CR 701.28): the other face is up. It stays the same object. Nothing if it is not a
     /// double-faced permanent on the battlefield.
     fn transform(&mut self, permanent: ObjectId);

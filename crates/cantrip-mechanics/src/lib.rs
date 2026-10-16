@@ -121,6 +121,18 @@ pub fn choose_from_hand(g: &mut dyn Game, player: PlayerId, source: ObjectId, co
     choose::cards(g, player, source, Purpose::Discard, hand, count, false)
 }
 
+/// "Each [of these players] discards a card" (CR 701.9, 101.4): in the order given (turn order from the active player,
+/// `apnap()`) each player with a card in hand chooses one (nothing is asked of an empty hand), then every chosen card is
+/// discarded together. The cards discarded. Liliana of the Veil (each player) and Aclazotz, Deepest Betrayal (each
+/// opponent) print it.
+pub fn each_discards_a_card(g: &mut dyn Game, players: &[PlayerId], source: ObjectId) -> Result<Vec<ObjectId>, Suspend> {
+    let mut chosen = Vec::new();
+    for &player in players {
+        chosen.extend(choose_from_hand(g, player, source, 1)?);
+    }
+    Ok(g.discard_together(&chosen))
+}
+
 /// "[Player] discards `count` cards at random" (CR 701.9b; Hymn to Tourach, Mind Twist): the hand put in a random order
 /// (Fisher-Yates, as the C# engine's `Randomize`) and the first `count` taken; a smaller hand is discarded whole. They
 /// leave together, as one discard (CR 701.9a).
@@ -242,7 +254,7 @@ pub fn exile_and_return_transformed(g: &mut dyn Game, permanent: ObjectId, under
     let token = g.obj(permanent).token;
     let exiled = g.exile(permanent);
     if !token && g.obj(exiled).zone.is(ZoneKind::Exile) {
-        g.put_onto_battlefield_transformed(exiled, under)?;
+        g.put_onto_battlefield_transformed(exiled, under, false)?;
     }
     Ok(())
 }

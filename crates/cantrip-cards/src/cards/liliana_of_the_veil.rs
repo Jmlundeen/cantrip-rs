@@ -1,14 +1,11 @@
 use cantrip_api::*;
 use cantrip_oracle as oracle;
-use cantrip_mechanics::{choose, choose_from_hand, targets};
+use cantrip_mechanics::{choose, each_discards_a_card, targets};
 
 /// +1: each player discards a card, chosen in turn order from the active player (CR 101.4), discarded together.
 fn plus_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let mut chosen = Vec::new();
-    for player in g.state().apnap().collect::<Vec<_>>() {
-        chosen.extend(choose_from_hand(g, player, item.object, 1)?);
-    }
-    g.discard_together(&chosen);
+    let players: Vec<PlayerId> = g.state().apnap().collect();
+    each_discards_a_card(g, &players, item.object)?;
     Ok(())
 }
 

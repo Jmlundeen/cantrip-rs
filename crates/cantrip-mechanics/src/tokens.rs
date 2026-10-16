@@ -460,3 +460,16 @@ pub static RABBIT: CardDef = CardDef {
     toughness: Some(1),
     ..CardDef::BLANK
 };
+
+/// A 1/1 black Bat creature token with flying. Sanguine Evangelist and Aclazotz, Deepest Betrayal make it.
+pub static BAT: CardDef = CardDef {
+    name: "Bat",
+    has_cost: false,
+    colors: Some(ColorSet::of(Color::Black)),
+    types: TypeSet::of(&[CardType::Creature]),
+    subtypes: SubtypeSet::of(&[Subtype::Bat]),
+    power: Some(1),
+    toughness: Some(1),
+    keywords: Keywords::of(&[Keyword::Flying]),
+    ..CardDef::BLANK
+};
