@@ -480,6 +480,9 @@ pub enum EffectKind {
     /// planeswalkers they control that have this planeswalker type (every planeswalker for `None`) whenever they have
     /// priority. Only the timing changes: one loyalty ability per permanent each turn still holds. A rule about the player,
     /// so it reaches planeswalkers that arrive later and outlives its `affected` object, which is only the source.
+    /// It is in the core, though one printed card has it as a resolved effect, because it must outlive the spell, belong to
+    /// the player and reach a planeswalker that does not exist yet, and only the core checks timing. The other cards that
+    /// grant this (Teferi, Master of Time; The Wandering Emperor; the Teferi emblems) are statics: `CardDef.instant_activation`.
     InstantLoyalty(Option<Subtype>),
     /// The effect's controller has no maximum hand size (CR 402.2) for as long as it lasts: Spirit Water Revival's "for the rest
     /// of the game" (`Duration::Indefinite`). About the player, so it outlives its `affected` object, which is only the source.
