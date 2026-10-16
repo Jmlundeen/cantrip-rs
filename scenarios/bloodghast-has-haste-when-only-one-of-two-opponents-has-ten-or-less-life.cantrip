@@ -1,0 +1,47 @@
+# "As long as AN opponent has 10 or less life": in a three-player game Bot3, the later seat, is taken from 20 to exactly 10
+# by two Lightning Bolts and a Fireblast on turn 4 while Bot2 stays at 20. One opponent at the line is enough: the
+# Bloodghast cast afterwards has haste and attacks Bot2 for 2 the turn it is cast.
+
+[Bot1 Deck]
+Mountain
+Mox Jet
+Black Lotus
+Lightning Bolt
+Lightning Bolt
+Fireblast
+Mountain
+Island
+Bloodghast
+Island x11
+
+[Bot2 Deck]
+Island x20
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+[T4 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot3)
+Bot1.Hand.Lightning Bolt.Cast(Bot3)
+Bot1.Hand.Fireblast.Cast(Bot3; Ability: Sacrifice)
+Bot1.Choose(Mountain; Mountain)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Bloodghast.Cast
+? Bot3.Life = 10
+? Bot2.Life = 20
+[T4 Bot1.DeclareAttackers]
+Bot1.Attack(Bloodghast > Bot2)
+[T4 Bot1.Main2]
+
+[Expect]
+Bot3.Life = 10
+Bot2.Life = 18
+Bot1.Battlefield.Bloodghast.Keywords = CantBlock; Haste

@@ -1,0 +1,42 @@
+# Bandit's Talent: "{B}: Level 2". On turn 1 both Moxen are tapped for the Class's {1}{B}, and with the stack empty
+# again (two passes: the spell, then its enters trigger) Level 2 is refused: nothing is left to pay its {B}, and it is
+# sorcery speed in Bot1's own main phase so only the cost can be what refuses it. On turn 3 the Moxen have untapped and the
+# same activation, paid by Mox Jet, is the positive control: the Class becomes level 2, shown by Bot2 (one card in hand
+# after the enters discard) losing 2 life at its turn-4 upkeep.
+
+[Opening]
+Chooser: Bot1
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Bandit's Talent
+Island x17
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.PlayFirst
+Bot2.Mulligan
+Bot2.Mulligan
+Bot2.Mulligan
+Bot2.Mulligan
+Bot2.Keep
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Bandit's Talent.Cast
+Bot1.Pass
+Bot1.Pass
+! Bot1.Battlefield.Bandit's Talent.Activate(Ability: Level 2)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Bandit's Talent.Activate(Ability: Level 2)
+[T4 Bot2.Main1]
+
+[Expect]
+Bot2.Life = 18

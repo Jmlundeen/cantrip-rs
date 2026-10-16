@@ -4,10 +4,10 @@ use cantrip_mechanics::{choose_discard_two_unless_discarding, class};
 use cantrip_oracle as oracle;
 
 /// "When this Class enters, each opponent discards two cards unless they discard a nonland card." Each opponent, in
-/// turn order (CR 101.4), chooses between one nonland card and two cards of any kind (CR 608.2d); then the cards leave
+/// turn order from the active player (CR 101.4, APNAP), chooses between one nonland card and two cards of any kind (CR 608.2d); then the cards leave
 /// the hands together (CR 701.9a).
 fn enters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let opponents: Vec<PlayerId> = g.state().opponents(item.controller).collect();
+    let opponents: Vec<PlayerId> = g.state().apnap().filter(|&p| p != item.controller).collect();
     let mut discarded = Vec::new();
     for opponent in opponents {
         discarded.extend(choose_discard_two_unless_discarding(g, opponent, item.object, |chars| !chars.is(CardType::Land))?);

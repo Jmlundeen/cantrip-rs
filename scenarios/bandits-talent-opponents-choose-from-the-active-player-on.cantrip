@@ -1,0 +1,36 @@
+# Bandit's Talent cast by Bot2 in a three-player game on turn 2: the opponents choose in APNAP order from the active
+# player (CR 101.4), Bot3 first and then Bot1, not in seat order. The script answers Bot3 first (lands only: two Forests)
+# and then Bot1, who takes the two-card discard although holding Lightning Bolt (not the default answer), so asking Bot1
+# first would use the wrong line. Bot1 discards two Islands and keeps the Bolt.
+
+[Bot1 Deck]
+Lightning Bolt
+Island x19
+
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Bandit's Talent
+Island x17
+
+[Bot3 Deck]
+Forest x20
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Bandit's Talent.Cast
+Bot3.Choose(Forest; Forest)
+Bot1.Modes(Discard two cards)
+Bot1.Choose(Island; Island)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot3.Graveyard = Forest; Forest
+Bot3.Hand.Count = 5
+# Bot1 drew on turn 1 (CR 103.8a), discarded an Island to hand size at its cleanup (8 - 1 = 7), then two more here.
+Bot1.Graveyard = Island; Island; Island
+Bot1.Hand.Count = 5

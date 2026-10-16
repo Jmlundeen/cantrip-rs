@@ -1,0 +1,52 @@
+# Bandit's Talent: "{3}{B}: Level 3" costs four mana. Black Lotus pays the Class and level 2 on turn 1. With Mox Jet, Mox
+# Ruby and Mox Pearl untapped, three mana with the {B} among it, Level 3 is refused (the stack is empty and it is Bot1's
+# own main phase, so only the cost refuses it). Mox Sapphire arrives for the fourth mana and the same activation is then
+# made (the positive control): at Bot1's turn-3 draw step an opponent holding one card gives it an additional card
+# (Bot1 holds 0 cards on turn 3's upkeep: 1 normal draw + 1 additional = 2).
+
+[Opening]
+Chooser: Bot1
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Bandit's Talent
+Island
+Island x13
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.PlayFirst
+Bot2.Mulligan
+Bot2.Mulligan
+Bot2.Mulligan
+Bot2.Mulligan
+Bot2.Keep
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Bandit's Talent.Cast
+Bot1.Battlefield.Bandit's Talent.Activate(Ability: Level 2)
+Bot1.Pass
+! Bot1.Battlefield.Bandit's Talent.Activate(Ability: Level 3)
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Bandit's Talent.Activate(Ability: Level 3)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Hand.Count = 2
+Bot2.Life = 18
