@@ -1,0 +1,46 @@
+# The Vehicle token Chandra, Spark Hunter's 0 makes has crew 1 (CR 702.122): Llanowar Elves, power 1 and summoning sick (crew taps
+# a creature but is not a {T} cost, CR 702.122a), is tapped to crew it, and the Vehicle becomes an artifact creature until end of
+# turn, before Chandra's trigger could (that is at the beginning of combat, later). The Vehicle is a colorless 3/2, a token.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Chandra, Spark Hunter
+Mox Emerald
+Llanowar Elves
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Chandra, Spark Hunter.Cast
+Bot1.Pass
+Bot1.Battlefield.Chandra, Spark Hunter.Activate(Ability: Create a 3/2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Vehicle.Types = Artifact
+Bot1.Battlefield.Vehicle.Activate(Ability: Crew)
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Vehicle.Types = Artifact; Creature
+Bot1.Battlefield.Vehicle.Power = 3
+Bot1.Battlefield.Vehicle.Toughness = 2
+Bot1.Battlefield.Vehicle.Token = true
+Bot1.Battlefield.Vehicle.Subtypes = Vehicle
+Bot1.Battlefield.Vehicle.Colors = (absent)
+Bot1.Battlefield.Vehicle.SummoningSick = true
+Bot1.Battlefield.Llanowar Elves.Tapped = true

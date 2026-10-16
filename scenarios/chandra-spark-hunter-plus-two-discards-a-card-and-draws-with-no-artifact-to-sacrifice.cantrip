@@ -1,0 +1,39 @@
+# Chandra, Spark Hunter's +2 with no artifact on Bot1's side (Black Lotus was sacrificed to cast her): the sacrifice is not offered,
+# only discarding a card or neither, so the first option offered (Modes(1)) is the discard; Bot1 discards Lightning Bolt and
+# draws a card. The control is the scenario in which Bot1 does control an artifact and sacrifices it as the option it names. The Bolt is in the graveyard with the Lotus, the hand has the three
+# Islands it held plus the one drawn, and her loyalty is 6.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Chandra, Spark Hunter
+Lightning Bolt
+Island
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Chandra, Spark Hunter.Cast
+Bot1.Pass
+Bot1.Battlefield.Chandra, Spark Hunter.Activate(Ability: +2)
+Bot1.Modes(1)
+Bot1.Choose(Lightning Bolt)
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Graveyard.Count = 2
+Bot1.Hand = Island; Island; Island; Island
+Bot1.Library.Count = 12
+Bot1.Battlefield = Chandra, Spark Hunter; Mountain
+Bot1.Battlefield.Chandra, Spark Hunter.Counters.Loyalty = 6
+Stack.Count = 0

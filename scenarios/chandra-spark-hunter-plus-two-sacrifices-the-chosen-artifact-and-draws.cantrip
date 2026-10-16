@@ -1,0 +1,41 @@
+# Chandra, Spark Hunter's +2: "You may sacrifice an artifact or discard a card. If you do, draw a card." Bot1 controls Mox Ruby and
+# Mox Jet and chooses to sacrifice, then names Mox Jet: Jet goes to the graveyard, Ruby stays, and the card is drawn (the next
+# card of the library, an Island). Her loyalty goes from 4 to 6 as the cost is paid. Black Lotus, spent to cast her, is in the
+# graveyard too; the hand held two Islands and now has three.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Chandra, Spark Hunter
+Mox Ruby
+Mox Jet
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Chandra, Spark Hunter.Cast
+Bot1.Pass
+Bot1.Battlefield.Chandra, Spark Hunter.Activate(Ability: +2)
+Bot1.Modes(Sacrifice an artifact)
+Bot1.Choose(Mox Jet)
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Battlefield = Chandra, Spark Hunter; Mountain; Mox Ruby
+Bot1.Graveyard.Count = 2
+Bot1.Hand = Island; Island; Island
+Bot1.Library.Count = 12
+Bot1.Battlefield.Chandra, Spark Hunter.Counters.Loyalty = 6
+Stack.Count = 0

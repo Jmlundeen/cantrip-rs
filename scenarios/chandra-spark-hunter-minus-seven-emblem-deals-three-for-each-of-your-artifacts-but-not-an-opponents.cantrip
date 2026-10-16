@@ -1,0 +1,63 @@
+# Chandra, Spark Hunter's -7: "You get an emblem with 'Whenever an artifact you control enters, this emblem deals 3 damage to any
+# target.'" Chandra is cast on turn 1 (4), raised by +2 on turns 1 and 3 (8), and uses -7 on turn 5, going to 1 loyalty and
+# staying on the battlefield. Bot1 then casts Mox Jet and Mox Emerald, one trigger each, and both hit Bot2 (20 to 17 to 14).
+# On Bot2's turn 6 Bot2 casts Mox Ruby: an artifact, but not one Bot1 controls, so the emblem does not trigger (no target is
+# asked of Bot1 and Bot1 loses nothing). The emblem is in the command zone, and the emblem's damage comes from it.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Chandra, Spark Hunter
+Mox Jet
+Mox Emerald
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Mox Ruby
+Island x19
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Chandra, Spark Hunter.Cast
+Bot1.Pass
+Bot1.Battlefield.Chandra, Spark Hunter.Activate(Ability: +2)
+Bot1.Modes(Neither)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Chandra, Spark Hunter.Activate(Ability: +2)
+Bot1.Modes(Neither)
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Chandra, Spark Hunter.Activate(Ability: emblem)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Emblems.Count = 1
+? Bot1.Battlefield.Chandra, Spark Hunter.Counters.Loyalty = 1
+Bot1.Hand.Mox Jet.Cast
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 14
+[T6 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+! Bot1.Target
+Bot2.Pass
+[T6 Bot2.Main2]
+
+[Expect]
+Turn = 6
+Bot2.Life = 14
+Bot1.Life = 20
+Bot1.Emblems.Count = 1
+Bot1.Battlefield = Chandra, Spark Hunter; Mountain; Mox Jet; Mox Emerald
+Bot1.Battlefield.Chandra, Spark Hunter.Counters.Loyalty = 1
+Bot2.Battlefield = Mox Ruby

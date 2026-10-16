@@ -1,0 +1,50 @@
+# Chandra, Spark Hunter, cast on turn 1 with Black Lotus and a Mountain. Her 0 makes a 3/2 colorless Vehicle artifact token (loyalty
+# stays 4). It is not a creature (CR 301.7), so on its own it could neither attack nor be blocked. At the beginning of combat on
+# Bot1's turn her trigger targets it: until end of turn it is an artifact creature with haste (the token came this turn, so haste
+# is what lets it attack), and it hits Bot2 for 3. On turn 3 it is back to a noncreature artifact (the effect ended at the end of
+# turn 1) until combat of turn 3 again.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Chandra, Spark Hunter
+Island
+Island
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Chandra, Spark Hunter.Cast
+Bot1.Pass
+Bot1.Battlefield.Chandra, Spark Hunter.Activate(Ability: Create a 3/2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Vehicle.Types = Artifact
+[T1 Bot1.BeginCombat]
+Bot1.Target(Vehicle)
+[T1 Bot1.DeclareAttackers]
+Bot1.Attack(Vehicle > Bot2)
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Vehicle.Types = Artifact; Creature
+? Bot1.Battlefield.Vehicle.Keywords = Haste
+? Bot1.Battlefield.Vehicle.Power = 3
+? Bot1.Battlefield.Vehicle.Toughness = 2
+[T3 Bot1.Main1]
+
+[Expect]
+Turn = 3
+Bot2.Life = 17
+Bot1.Battlefield.Chandra, Spark Hunter.Counters.Loyalty = 4
+Bot1.Battlefield.Vehicle.Types = Artifact
+Bot1.Battlefield.Vehicle.Token = true
+Bot1.Battlefield.Vehicle.Keywords = (absent)
+Bot1.Battlefield.Vehicle.Colors = (absent)
+Bot1.Battlefield = Chandra, Spark Hunter; Mountain; Vehicle

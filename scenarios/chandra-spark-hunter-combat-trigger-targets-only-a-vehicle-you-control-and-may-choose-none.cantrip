@@ -1,0 +1,56 @@
+# Chandra, Spark Hunter: "choose up to one target Vehicle you control". On turn 1 Bot1 chooses no target: the Vehicle token her 0 made stays
+# a noncreature artifact (Types = Artifact) and does not attack. On turn 3 the candidates are only Bot1's own Vehicle: Bot2's
+# Smuggler's Copter (a Vehicle, but not Bot1's) and Bot1's Mox Ruby (Bot1's, but not a Vehicle) are both refused, and the token,
+# chosen, becomes an artifact creature with haste and attacks for 3 (20 to 17).
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Chandra, Spark Hunter
+Mox Ruby
+Island
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Mox Ruby
+Mox Sapphire
+Smuggler's Copter
+Island x17
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Chandra, Spark Hunter.Cast
+Bot1.Pass
+Bot1.Battlefield.Chandra, Spark Hunter.Activate(Ability: Create a 3/2)
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.BeginCombat]
+Bot1.Target()
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Vehicle.Types = Artifact
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Smuggler's Copter.Cast
+[T3 Bot1.BeginCombat]
+! Bot1.Target(Bot2.Battlefield.Smuggler's Copter)
+! Bot1.Target(Mox Ruby)
+Bot1.Target(Vehicle)
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Vehicle > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 17
+Bot1.Battlefield.Vehicle.Types = Artifact; Creature
+Bot1.Battlefield.Vehicle.Keywords = Haste
+Bot2.Battlefield.Smuggler's Copter.Types = Artifact

@@ -1,0 +1,39 @@
+# Chandra, Spark Hunter's +2 is "you may": with Mox Ruby to sacrifice and Lightning Bolt to discard, three options are offered
+# (sacrifice, discard, neither - the third is Modes(3)), and Bot1 takes neither. Nothing is sacrificed or discarded, so "if you
+# do" fails and no card is drawn: the hand keeps the Bolt and the three Islands (four cards), the Ruby stays, the library is
+# untouched. The loyalty cost was paid regardless: 4 to 6.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Chandra, Spark Hunter
+Mox Ruby
+Lightning Bolt
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Chandra, Spark Hunter.Cast
+Bot1.Pass
+Bot1.Battlefield.Chandra, Spark Hunter.Activate(Ability: +2)
+Bot1.Modes(3)
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Battlefield = Chandra, Spark Hunter; Mountain; Mox Ruby
+Bot1.Graveyard.Count = 1
+Bot1.Hand = Lightning Bolt; Island; Island
+Bot1.Library.Count = 13
+Bot1.Battlefield.Chandra, Spark Hunter.Counters.Loyalty = 6
+Stack.Count = 0

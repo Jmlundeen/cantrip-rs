@@ -1,0 +1,58 @@
+# Chandra, Spark Hunter's +2 when there is nothing to do it with: Bot1 has no artifact (Black Lotus went to cast her, and each of
+# four Welding Jars sacrificed itself) and an empty hand. "You may sacrifice an artifact or discard a card" has no possible
+# action, so nothing is asked of Bot1 (a bare `! Bot1.Modes` refuses any such question) and no card is drawn: both Islands of
+# its library are still there and its hand is empty. The loyalty cost was paid regardless, 4 to 6.
+
+[Bot1 Deck]
+Black Lotus
+Chandra, Spark Hunter
+Welding Jar
+Welding Jar
+Welding Jar
+Welding Jar
+Mountain
+Island
+Island
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Welding Jar.Cast
+Bot1.Hand.Welding Jar.Cast
+Bot1.Hand.Welding Jar.Cast
+Bot1.Hand.Welding Jar.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Chandra, Spark Hunter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Welding Jar#1.Activate(Welding Jar#1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Welding Jar#1.Activate(Welding Jar#1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Welding Jar#1.Activate(Welding Jar#1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Welding Jar#1.Activate(Welding Jar#1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Chandra, Spark Hunter.Activate(Ability: +2)
+! Bot1.Modes
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Result = InProgress
+Bot1.Hand.Count = 0
+Bot1.Library.Count = 2
+Bot1.Battlefield = Chandra, Spark Hunter; Mountain
+Bot1.Graveyard.Count = 5
+Bot1.Battlefield.Chandra, Spark Hunter.Counters.Loyalty = 6
+Stack.Count = 0

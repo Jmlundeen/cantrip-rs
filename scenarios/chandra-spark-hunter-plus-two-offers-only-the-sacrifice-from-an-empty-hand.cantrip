@@ -1,0 +1,43 @@
+# Chandra, Spark Hunter's +2 with an empty hand but artifacts to spare: discarding a card is not an option, so the first option
+# offered (Modes(1)) is the sacrifice. Bot1 sacrifices Mox Pearl (of four Moxen) and draws the first Island of its library; the
+# other three Moxen stay.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Chandra, Spark Hunter
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Emerald
+Island
+Island
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Chandra, Spark Hunter.Cast
+Bot1.Pass
+Bot1.Battlefield.Chandra, Spark Hunter.Activate(Ability: +2)
+Bot1.Modes(1)
+Bot1.Choose(Mox Pearl)
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Battlefield = Chandra, Spark Hunter; Mountain; Mox Ruby; Mox Jet; Mox Emerald
+Bot1.Graveyard.Count = 2
+Bot1.Hand = Island
+Bot1.Library.Count = 1
+Bot1.Battlefield.Chandra, Spark Hunter.Counters.Loyalty = 6
+Stack.Count = 0
