@@ -1,0 +1,54 @@
+# Omen Hawker: "{T}: Add {C}{U}. Spend this mana only to activate abilities." (CR 106.6: an ability of any source.)
+# Turn 3, the Islands spent on two Aether Spellbombs, the Hawker's {C}{U} can't cast Sol Ring, but its {C} pays one
+# Spellbomb's "{1}, Sacrifice: Draw a card" and its {U} the other's "{U}, Sacrifice: Return target creature".
+
+[Bot1 Deck]
+Island
+Omen Hawker
+Island
+Aether Spellbomb
+Aether Spellbomb
+Sol Ring
+Island
+Island x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x5
+Forest x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Omen Hawker.Cast
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Hand.Aether Spellbomb.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Aether Spellbomb.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Omen Hawker.Activate
+? Bot1.Mana = {U} (Abilities) {C} (Abilities)
+! Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Aether Spellbomb#1.Activate(Ability: Draw; Spend: C Abilities)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {U} (Abilities)
+Bot1.Battlefield.Aether Spellbomb.Activate(Ability: Return; Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Bot1.Mana =
+Bot1.Graveyard = Aether Spellbomb; Aether Spellbomb
+Bot1.Hand.Count = 4
+Bot2.Battlefield = Forest

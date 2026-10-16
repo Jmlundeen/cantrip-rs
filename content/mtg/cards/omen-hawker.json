@@ -1,0 +1,8 @@
+{
+  "name": "Omen Hawker",
+  "manaCost": "{U}",
+  "type": "Creature — Octopus Advisor",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "{T}: Add {C}{U}. Spend this mana only to activate abilities."
+}

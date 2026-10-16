@@ -1,0 +1,52 @@
+# Unlocking a Room's door is a special action, not an activated ability (CR 116.2m, 709.5e), so mana spendable "only to
+# activate abilities" can't pay for it (CR 106.6). Turn 3, with Omen Hawker's {C}{U} in the pool and four other mana
+# (two Swamps, Mox Jet, Mox Sapphire), Ritual Chamber's {3}{B}{B} can't be paid and the unlock is not offered; once Mox
+# Pearl makes a fifth, it is, and the Hawker's mana is still in the pool after.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Unholy Annex // Ritual Chamber
+Mox Jet
+Mox Sapphire
+Omen Hawker
+Mox Pearl
+Swamp
+Swamp x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Omen Hawker.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Unholy Annex // Ritual Chamber.Cast(Ability: Unholy Annex)
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Omen Hawker.Activate
+? Bot1.Mana = {U} (Abilities) {C} (Abilities)
+! Bot1.Battlefield.Unholy Annex.Activate(Ability: right door)
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Unholy Annex.Activate(Ability: right door)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Bot1.Mana = {U} (Abilities) {C} (Abilities)
+Bot1.Battlefield.Unholy Annex // Ritual Chamber.Doors = Unholy Annex; Ritual Chamber

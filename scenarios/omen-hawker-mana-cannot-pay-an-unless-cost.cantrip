@@ -1,0 +1,57 @@
+# Mana spendable "only to activate abilities" can't pay the {1} of Daze's "counter target spell unless its controller pays
+# {1}" (CR 106.6, 118.12): paying an unless cost activates nothing. Turn 3, with Omen Hawker's {C}{U} in the pool and no
+# other mana, Bot1 is not offered to pay and Ponder is countered. Turn 5 the same, with an Island tapped as the unless
+# cost is asked: that {U} pays it, and the Hawker's mana is still in the pool.
+
+[Bot1 Deck]
+Island
+Omen Hawker
+Ponder
+Ponder
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island
+Daze
+Daze
+Island x4
+Island x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Omen Hawker.Cast
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Omen Hawker.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Ponder.Cast
+Bot1.Pass
+Bot2.Hand.Daze.Cast(Ponder; Ability: Return)
+Bot2.Pass
+Bot1.Pass
+! Bot1.PayCost
+Bot1.Decline
+? Bot1.Graveyard = Ponder
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Omen Hawker.Activate
+Bot1.Battlefield.Island#1.Activate
+Bot1.Hand.Ponder.Cast
+Bot1.Pass
+Bot2.Hand.Daze.Cast(Ponder; Ability: Return)
+Bot2.Pass
+Bot1.Pass
+Bot1.Battlefield.Island#2.Activate
+Bot1.PayCost
+? Bot1.Mana = {U} (Abilities) {C} (Abilities)
+
+[Expect]
+Turn = 5
+Bot1.Graveyard = Ponder; Ponder
+Bot2.Graveyard = Daze; Daze
