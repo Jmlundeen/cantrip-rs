@@ -1,0 +1,42 @@
+# Assassin's Trophy: "Destroy target permanent an opponent controls. Its controller may search their library for a basic land
+# card, put it onto the battlefield, then shuffle." Bot1 may not target its own Mox Jet (a refusal beside the positive
+# control, Bot2's Llanowar Elves). The Elves die; Bot2, their controller, accepts, may not take the nonbasic Tundra and takes
+# a Swamp, which enters untapped (the card says nothing of tapped).
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Assassin's Trophy
+Plains x25
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x6
+Tundra
+Swamp
+Forest x10
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+! Bot1.Hand.Assassin's Trophy.Cast(Bot1.Battlefield.Mox Jet)
+Bot1.Hand.Assassin's Trophy.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot2.Accept
+! Bot2.Search(Tundra)
+Bot2.Search(Swamp)
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Assassin's Trophy
+Bot2.Graveyard = Llanowar Elves
+Bot2.Battlefield = Forest; Swamp
+Bot2.Battlefield.Swamp.Tapped = false
+Bot1.Battlefield = Mox Jet; Mox Emerald

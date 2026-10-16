@@ -1,0 +1,44 @@
+# Bot1 targets Bot2's Mind Stone; in response Bot2 pays {1} and sacrifices it to draw a card. The spell's only target is
+# illegal, so it does not resolve (CR 608.2b): Bot2 is never asked about a search (nor shuffles: its library is the 25-card
+# deck less the opening seven, the draws of turns 2, 4 and 6 and the Mind Stone's draw) and Bot2's hand is seven cards, plus
+# those four draws, less three Forests and the Mind Stone.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Assassin's Trophy
+Plains x25
+
+[Bot2 Deck]
+Forest
+Forest
+Mind Stone
+Forest x22
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest#1.Activate
+Bot2.Battlefield.Forest#2.Activate
+Bot2.Hand.Mind Stone.Cast
+[T6 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Assassin's Trophy.Cast(Bot2.Battlefield.Mind Stone)
+Bot2.Battlefield.Forest#1.Activate
+Bot2.Battlefield.Mind Stone.Activate(Ability: Draw)
+! Bot2.Accept
+
+[Expect]
+Turn = 7
+Bot1.Graveyard = Assassin's Trophy
+Bot2.Graveyard = Mind Stone
+Bot2.Battlefield = Forest; Forest; Forest
+Bot2.Library.Count = 14
+Bot2.Hand.Count = 7

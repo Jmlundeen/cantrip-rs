@@ -1,0 +1,32 @@
+# Assassin's Trophy targets any permanent an opponent controls, a land included. Bot2's only Forest is destroyed; Bot2 is
+# asked whether to search and declines: nothing enters and nothing is shuffled, so the library keeps its 17 cards (a
+# 25-card deck less the opening seven and the turn-2 draw).
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Assassin's Trophy
+Plains x25
+
+[Bot2 Deck]
+Forest x7
+Swamp x18
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Assassin's Trophy.Cast(Bot2.Battlefield.Forest)
+Bot2.Decline
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Assassin's Trophy
+Bot2.Graveyard = Forest
+Bot2.Battlefield.Count = 0
+Bot2.Hand.Count = 7
+Bot2.Library.Count = 17

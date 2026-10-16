@@ -1,0 +1,44 @@
+# Assassin's Trophy: the search is not conditional on the destruction (ruling: "If the target permanent is a legal target but
+# isn't destroyed ... its controller may search their library"). Bot2 regenerates its Llanowar Elves with Yavimaya Hollow in
+# response (CR 701.19a): the Elves are tapped and stay, and Bot2 is still asked and fetches a Swamp, untapped.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Assassin's Trophy
+Plains x25
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Yavimaya Hollow
+Forest x4
+Forest x3
+Swamp
+Forest x9
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Yavimaya Hollow.Play
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Assassin's Trophy.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Yavimaya Hollow.Activate(Bot2.Battlefield.Llanowar Elves; Ability: Regenerate)
+Bot2.Accept
+Bot2.Search(Swamp)
+
+[Expect]
+Turn = 5
+Bot1.Graveyard = Assassin's Trophy
+Bot2.Battlefield = Forest; Llanowar Elves; Yavimaya Hollow; Swamp
+Bot2.Battlefield.Llanowar Elves.Tapped = true
+Bot2.Battlefield.Swamp.Tapped = false
+Bot2.Graveyard.Count = 0
