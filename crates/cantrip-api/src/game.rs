@@ -391,6 +391,11 @@ pub trait Game: Query {
     /// put on the stack, targets chosen, the next time a player would receive priority. `ability` is one of the
     /// source card's `delayed` abilities.
     fn reflexive_trigger(&mut self, source: ObjectId, controller: PlayerId, ability: AbilityRef, subject: Target);
+    /// `reflexive_trigger` for an ability that counts what the first part did (CR 603.12): "When you discard one or
+    /// more nonland cards this way, tap up to that many target creatures". `count` is that many: a
+    /// `TargetSpec::COUNTED` bound of the ability's target slots reads it as the ability is put on the stack, and its
+    /// stack item's `x` is it, for an effect that does "that many" of something (and for a copy of the ability).
+    fn reflexive_trigger_counted(&mut self, source: ObjectId, controller: PlayerId, ability: AbilityRef, subject: Target, count: u16);
     /// It becomes day (CR 731.1): every daybound or nightbound permanent whose face disagrees is turned over. Nothing if
     /// it already is day; a game that has had a designation always has one.
     fn become_day(&mut self);

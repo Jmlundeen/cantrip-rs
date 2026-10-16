@@ -281,7 +281,9 @@ impl TargetSpec {
     }
 
     /// A bound of `COUNTED` is the X announced for the spell or ability, or else the number of times it was kicked:
-    /// "X target lands" is `min` and `max` both `COUNTED`, "up to X targets" is `min` 0 and `max` `COUNTED`.
+    /// "X target lands" is `min` and `max` both `COUNTED`, "up to X targets" is `min` 0 and `max` `COUNTED`. For a
+    /// reflexive triggered ability given a count (`Game::reflexive_trigger_counted`), it is that count: "up to that
+    /// many target creatures" (CR 603.12).
     pub const COUNTED: u8 = u8::MAX;
 
     /// A `max` of this is "for each opponent, up to one target ...": the slot stands for one slot of its own for each

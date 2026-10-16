@@ -19,6 +19,7 @@ fn queue(cx: &mut Cx, card: CardId, index: u8, controller: PlayerId, subject: Ta
         subject,
         data: [0; 2],
         members: Span::default(),
+        count: None,
     });
 }
 

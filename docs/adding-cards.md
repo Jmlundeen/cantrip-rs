@@ -283,6 +283,10 @@ shapes have an example:
 - **Combat**: planeswalkers are attackable (`DeclareAttackers.planeswalkers`); `Keyword::CantBeAttacked` (CR 508.1c),
   `CantBeBlockedByPowerTwoOrLess`, `CantBeBlockedExceptByThreeOrMore` (`Chars::minimum_blockers`, menace's two too).
   A scenario refuses an attack or a block with `! Bot2.Attack(A > B)` / `! Bot2.Block(A > B)`.
+- **Reflexive triggers** (CR 603.12, "when you do"): `Game::reflexive_trigger`; one whose quantity is what the first part
+  did ("tap up to that many target creatures") is `Game::reflexive_trigger_counted(.., count)`, and its slot's
+  `TargetSpec::COUNTED` bound and its stack item's `x` are that count (Seasoned Cryomancer, Miasma Demon, Loamcrafter
+  Faun, Swashbuckler Extraordinaire).
 - **Counters**: `Event::CountersPut` carries `by` (CR 122.6a), the player who put them. **Costs**: `Cost.unattach_self`.
 - **Turns**: `DelayedWhen::UntilNextTurnOf(p)`; `CardDef.turn_begin` skips a turn (Time Vault, CR 614.10); "end the
   turn" is `g.end_the_turn()?` (CR 724.1, Time Stop), after which the rest of the effect still runs (Glorious End), and

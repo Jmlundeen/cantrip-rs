@@ -238,6 +238,7 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
                 subject: Target::None,
                 data: [0; 2],
                 members: cantrip_state::Span::default(),
+                count: None,
             });
         }
 
@@ -1256,6 +1257,7 @@ pub fn draw(cx: &mut Cx, player: PlayerId) {
             subject: Target::None,
             data: [0; 2],
             members: cantrip_state::Span::default(),
+            count: None,
         });
     }
     cx.emit(Event::Drew { player, card });
@@ -1682,6 +1684,7 @@ fn siege_defeat_triggers(cx: &mut Cx, id: ObjectId) {
         subject: Target::None,
         data: [0; 2],
         members: cantrip_state::Span::default(),
+        count: None,
     });
 }
 

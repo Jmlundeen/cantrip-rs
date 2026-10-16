@@ -92,6 +92,7 @@ pub fn name_problem(cards: &CardTable, kind: NameKind, card: CardId) -> Option<&
     None
 }
 
+/// Whether `answer` fits `request` (exported as `check_answer`, for a scenario that shows an answer is refused).
 pub fn check(game: &Game, request: &Request, answer: &Answer) -> Result<(), Rejected> {
     if *answer == Answer::Cancel {
         return if request.may_cancel { Ok(()) } else { no("this cannot be cancelled") };

@@ -596,7 +596,7 @@ impl<'s> Run<'s> {
                         return fail(format!("line {line} says {text} must not be offered, but it is"));
                     }
                 }
-                self.check_refused_declaration(action, *line, text, &request.kind)?;
+                self.check_refused_declaration(action, *line, text, &request)?;
                 self.next();
                 continue;
             }
@@ -1303,8 +1303,8 @@ impl<'s> Run<'s> {
     /// A refused block or attack (`! Bot2.Block(Bear > Ox)`, `! Bot1.Attack(Bear > Bot2.Battlefield.Karn)`): checked at the
     /// player's next declaration, failing if that pair is allowed. Both sides must be in the question, or the refusal
     /// proves nothing.
-    fn check_refused_declaration(&self, action: &ActionStep, line: usize, text: &str, kind: &RequestKind) -> R<()> {
-        match kind {
+    fn check_refused_declaration(&self, action: &ActionStep, line: usize, text: &str, request: &Request) -> R<()> {
+        match &request.kind {
             RequestKind::DeclareBlockers { eligible, attackers, allowed } => {
                 // The line names a whole declaration: an attacker that needs several blockers (menace, CR 702.110b) is not
                 // legally blocked by fewer of them than the line gives it, however each pair stands alone.
@@ -1414,6 +1414,25 @@ impl<'s> Run<'s> {
             }
             RequestKind::ChooseTarget { candidates, .. } => {
                 let everything: Vec<ObjectId> = (0..self.game.state.objects.len() as u32).map(ObjectId).collect();
+                // Several names that are all candidates are one answer, which the question must refuse: more targets than
+                // the slot takes (`! Bot1.Target(A; B; C)` for "up to two"), or the same object named twice,
+                // `! Bot1.Target(Grizzly Bears; Grizzly Bears)` (CR 115.3: one object is not chosen twice for one word
+                // "target"), which must then be as many as the slot takes, so that the repetition is what is refused.
+                let named: Vec<Option<Target>> = action.positional().map(|spec| self.target(action, spec.trim(), candidates)).collect::<R<_>>()?;
+                if named.len() > 1 && named.iter().all(Option::is_some) {
+                    let repeated = named.iter().enumerate().any(|(i, t)| named[..i].contains(t));
+                    if repeated
+                        && let RequestKind::ChooseTarget { least, count, .. } = &request.kind
+                        && (named.len() > *count as usize || named.len() < *least as usize)
+                    {
+                        return fail(format!("line {line}: {text} proves nothing: the question takes {least} to {count} targets"));
+                    }
+                    let answer = Answer::Targets(named.into_iter().flatten().collect());
+                    if check_answer(&self.game, request, &answer).is_ok() {
+                        return fail(format!("line {line} says {text} must not be an answer the question accepts, but it is"));
+                    }
+                    return Ok(());
+                }
                 for spec in action.positional() {
                     if bot_id(spec).is_none() && self.objects(action, spec.trim(), &everything)?.is_empty() {
                         return fail(format!("line {line}: {text} proves nothing: no such card is in the game"));

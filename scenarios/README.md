@@ -259,6 +259,10 @@ is still answered by the next line, `Bot1.Search()` or another card.
 A target, `! Bot1.Target(Lightning Bolt)`, is checked at that player's next target question and fails if the named object is among its
 candidates; it fails as proving nothing when no such card exists anywhere in the game. It shows a spell or ability cannot target something
 (a creature card, not an instant, in "target creature card in your graveyard"); pair it with the legal target named on the next line.
+Several names that are all among the candidates are instead one answer, which the question must refuse:
+`! Bot1.Target(Ornithopter#1; Ornithopter#2; Ornithopter#3)` for "up to two target creatures" (more than the slot takes), or one
+object named twice, `! Bot1.Target(Ornithopter#1; Ornithopter#1)`, as many as the slot takes, so that the repetition is what is
+refused (CR 115.3). The engine's own check of the answer decides (`check_answer`).
 
 A mode choice, `! Bot1.Modes(1; 2)`, is checked at that player's next modes question and fails if the question would accept exactly
 those modes (too many for "choose one", a mode that is not eligible): the way to show a spell offers fewer modes than another case

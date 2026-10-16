@@ -21,7 +21,7 @@ use cantrip_api::*;
 use cantrip_state::{Frame, FrameKind, Mark, Marks, Rng};
 
 pub use actions::describe;
-pub use validate::{distribution_problem, name_problem};
+pub use validate::{check as check_answer, distribution_problem, name_problem};
 pub use layers::{chars, live, summoning_sick};
 
 /// One game: the state, what has happened, and the card table it is played with.
@@ -440,6 +440,26 @@ impl<'a> Cx<'a> {
         Err(Stop::Suspend)
     }
 
+    /// A reflexive triggered ability triggers (CR 603.12): `count` is the number its "that many" counts, if it has one.
+    fn reflexive(&mut self, source: ObjectId, controller: PlayerId, ability: AbilityRef, subject: Target, count: Option<u16>) {
+        // A reflexive triggered ability is an ordinary one (CR 603.12): its intervening "if" must hold for it to trigger at all
+        // (CR 603.4), not only as it resolves.
+        if let AbilityDef::Triggered(TriggeredDef { condition: Some(condition), .. }) = self.g.cards.ability(ability)
+            && !condition(&*self, &Asker { source, controller })
+        {
+            return;
+        }
+        self.g.state.trigger_push(cantrip_state::PendingTrigger {
+            source,
+            ability,
+            controller,
+            subject,
+            data: [0; 2],
+            members: cantrip_state::Span::default(),
+            count,
+        });
+    }
+
     /// An event happened: the triggers it causes are found, then it is recorded (so a trigger or replacement
     /// deciding about it sees the history as it was just before it, `cantrip_api::history`).
     pub fn emit(&mut self, event: Event) {
@@ -776,21 +796,11 @@ impl cantrip_api::Game for Cx<'_> {
     }
 
     fn reflexive_trigger(&mut self, source: ObjectId, controller: PlayerId, ability: AbilityRef, subject: Target) {
-        // A reflexive triggered ability is an ordinary one (CR 603.12): its intervening "if" must hold for it to trigger at all
-        // (CR 603.4), not only as it resolves.
-        if let AbilityDef::Triggered(TriggeredDef { condition: Some(condition), .. }) = self.g.cards.ability(ability)
-            && !condition(&*self, &Asker { source, controller })
-        {
-            return;
-        }
-        self.g.state.trigger_push(cantrip_state::PendingTrigger {
-            source,
-            ability,
-            controller,
-            subject,
-            data: [0; 2],
-            members: cantrip_state::Span::default(),
-        });
+        self.reflexive(source, controller, ability, subject, None);
+    }
+
+    fn reflexive_trigger_counted(&mut self, source: ObjectId, controller: PlayerId, ability: AbilityRef, subject: Target, count: u16) {
+        self.reflexive(source, controller, ability, subject, Some(count));
     }
 
     fn exile_on_leave(&mut self, permanent: ObjectId) {

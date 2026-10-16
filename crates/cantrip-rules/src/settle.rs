@@ -436,9 +436,10 @@ fn choose_trigger_targets(
                 trigger.subject,
                 *slot_player,
             );
-            // A bound that is the number of times the source was kicked, or its X (CR 702.33d, 107.3m).
+            // A bound that is the "that many" of a reflexive ability (CR 603.12), or else the number of times the source
+            // was kicked, or its X (CR 702.33d, 107.3m).
             let source = cx.s().obj(trigger.source);
-            let counted = if source.x > 0 { source.x } else { source.kicked as u16 };
+            let counted = trigger.count.unwrap_or(if source.x > 0 { source.x } else { source.kicked as u16 });
             let (least, most) = spec.bounds(counted);
             if candidates.len() < least as usize {
                 // Fewer legal targets than the slot's minimum: it is removed from the stack (CR 603.3d, 601.2c).
@@ -541,7 +542,7 @@ fn put_trigger(cx: &mut Cx, trigger: PendingTrigger) -> R<()> {
         && let Some(spec) = def.targets.first()
     {
         // CR 601.2d, 603.3d: a divided slot's targets and shares are chosen as the ability goes on the stack.
-        let x = cx.s().obj(trigger.source).x;
+        let x = trigger.count.unwrap_or(cx.s().obj(trigger.source).x);
         let total = match divide.of_x {
             Some(of_x) => of_x(x),
             None if divide.total == TargetSpec::COUNTED => x,
@@ -565,7 +566,7 @@ fn put_trigger(cx: &mut Cx, trigger: PendingTrigger) -> R<()> {
         controller: trigger.controller,
         targets: [Target::None; cantrip_state::MAX_TARGETS],
         target_count: targets.len() as u8,
-        x: 0,
+        x: trigger.count.unwrap_or(0),
         kicked: 0,
         paid: 0,
         modes: mask,
@@ -631,7 +632,7 @@ fn consider(
             let mut again = Again::new();
             statics.additional(cx, event, &triggering, &mut again);
             found.push((
-                PendingTrigger { source, ability, controller, subject: fired.subject, data: fired.data, members: Span::default() },
+                PendingTrigger { source, ability, controller, subject: fired.subject, data: fired.data, members: Span::default(), count: None },
                 t,
                 again,
             ));
@@ -764,6 +765,7 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<&[ObjectId]>)
                             subject: if d.when == DelayedWhen::UntilEvent { d.subject } else { fired.subject },
                             data: fired.data,
                             members: Span::default(),
+                            count: None,
                         },
                         t,
                         Again::new(),
@@ -818,7 +820,7 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<&[ObjectId]>)
                     let mut again = Again::new();
                     statics.additional(cx, event, &triggering, &mut again);
                     found.push((
-                        PendingTrigger { source: id, ability, controller, subject: fired.subject, data: fired.data, members: Span::default() },
+                        PendingTrigger { source: id, ability, controller, subject: fired.subject, data: fired.data, members: Span::default(), count: None },
                         t,
                         again,
                     ));
@@ -915,7 +917,7 @@ pub fn step_began(cx: &mut Cx, step: Step) {
         };
         if due {
             cx.st().delayed_remove(at);
-            cx.st().trigger_push(PendingTrigger { source: d.source, ability: d.ability, controller: d.controller, subject: d.subject, data: [0; 2], members: d.members });
+            cx.st().trigger_push(PendingTrigger { source: d.source, ability: d.ability, controller: d.controller, subject: d.subject, data: [0; 2], members: d.members, count: None });
         } else {
             at += 1;
         }
@@ -946,6 +948,7 @@ fn suspended_cards(cx: &mut Cx, active: PlayerId) {
             subject: Target::None,
             data: [0; 2],
             members: Span::default(),
+            count: None,
         });
     }
 }

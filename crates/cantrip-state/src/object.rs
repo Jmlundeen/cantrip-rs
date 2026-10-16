@@ -359,6 +359,8 @@ pub struct StackItem {
     pub controller: PlayerId,
     pub targets: [Target; MAX_TARGETS],
     pub target_count: u8,
+    /// The X announced for it (CR 107.3); for a reflexive triggered ability, the number its "that many" counts
+    /// (CR 603.12, `PendingTrigger::count`).
     pub x: u16,
     /// How many times it was kicked (CR 702.33).
     pub kicked: u8,
@@ -640,6 +642,9 @@ pub struct PendingTrigger {
     pub data: [u32; 2],
     /// The batch it was triggered by, for a "one or more" ability (CR 603.2c).
     pub members: Span,
+    /// For a reflexive triggered ability whose effect counts what its first part did ("tap up to that many target
+    /// creatures", CR 603.12): that number. A `TargetSpec::COUNTED` bound reads it, and it is the stack item's `x`.
+    pub count: Option<u16>,
 }
 
 /// A run of `GameState::members`: the objects of one batch of simultaneous events, kept for the ability they
