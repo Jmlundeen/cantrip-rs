@@ -1,0 +1,45 @@
+# An enduring story is had for the rest of the game (CR 702.195a-b; the rulings: "even if you lose control of some or all of
+# your storied permanents"). Bot1 gets it with Fíli and two Moxes, and Bot2 then Bolts Fíli, a 3/3: Bot1 now controls only
+# two qualifying permanents and no storied one, and still has the story. Fíli's +1/+1 went with Fíli (CR 611.3a): its Dwarf
+# token is 2/2 again.
+
+[Bot1 Deck]
+Plains
+Plains
+Mox Pearl
+Mox Jet
+Fíli the Pathfinder
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Fíli the Pathfinder.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+[T3 Bot1.Main2]
+? Bot1.EnduringStory = true
+? Bot1.Battlefield.Dwarf.Power = 3
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Fíli the Pathfinder)
+Bot2.Battlefield.Mountain.Activate
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.EnduringStory = true
+Bot1.Graveyard = Fíli the Pathfinder
+Bot1.Battlefield = Plains; Plains; Mox Pearl; Mox Jet; Dwarf
+Bot1.Battlefield.Dwarf.Power = 2
+Bot1.Battlefield.Dwarf.Toughness = 2

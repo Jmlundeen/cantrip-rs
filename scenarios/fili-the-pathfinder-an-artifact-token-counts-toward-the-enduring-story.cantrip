@@ -1,0 +1,43 @@
+# A permanent is any object on the battlefield, tokens included (the rulings; CR 702.195a): Thraben Inspector's Clue, an
+# artifact token, Mox Pearl and Fíli are three, so Fíli arriving on turn five gives Bot1 an enduring story. Before Fíli the
+# Clue and the Mox are two with no storied permanent, and nothing happens. Fíli's static ability then pumps every creature
+# Bot1 controls: the Inspector is 2/3, and Fíli's Dwarf token 3/3.
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Mox Pearl
+Thraben Inspector
+Fíli the Pathfinder
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Thraben Inspector.Cast
+Bot1.Battlefield.Plains.Activate
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Clue Token.Token = true
+? Bot1.EnduringStory = (absent)
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Fíli the Pathfinder.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.EnduringStory = true
+Bot1.Battlefield = Plains; Plains; Plains; Mox Pearl; Thraben Inspector; Clue Token; Fíli the Pathfinder; Dwarf
+Bot1.Battlefield.Thraben Inspector.Power = 2
+Bot1.Battlefield.Thraben Inspector.Toughness = 3
+Bot1.Battlefield.Fíli the Pathfinder.Power = 3
+Bot1.Battlefield.Dwarf.Power = 3

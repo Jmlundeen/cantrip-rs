@@ -1,0 +1,48 @@
+# "You" in storied is the storied permanent's controller (CR 702.195a): Bot2 controls Fíli and Mox Sapphire, two, while
+# Bot1 controls three Moxes and no storied permanent, so neither has an enduring story, and Bot1's artifacts do not count
+# for Bot2. Then Bot2 casts Mox Emerald, its own third, and has the story; Bot1 still does not.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Island x20
+
+[Bot2 Deck]
+Plains
+Plains
+Plains
+Mox Sapphire
+Fíli the Pathfinder
+Island
+Island
+Mox Emerald
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Fíli the Pathfinder.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+[T6 Bot2.Main2]
+? Bot1.EnduringStory = (absent)
+? Bot2.EnduringStory = (absent)
+? Bot2.Battlefield.Fíli the Pathfinder.Power = 2
+Bot2.Hand.Mox Emerald.Cast
+[T7 Bot1.Main1]
+
+[Expect]
+Bot1.EnduringStory = (absent)
+Bot2.EnduringStory = true
+Bot2.Battlefield.Fíli the Pathfinder.Power = 3
+Bot2.Battlefield.Dwarf.Power = 3

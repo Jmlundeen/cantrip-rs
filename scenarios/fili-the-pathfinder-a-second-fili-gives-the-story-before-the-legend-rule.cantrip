@@ -1,0 +1,49 @@
+# The rulings: "If your third legendary, Saga, or artifact permanent enters the battlefield and then one of those permanents
+# leaves the battlefield immediately afterwards (most likely due to the 'legend rule' ...), you get an enduring story before
+# it leaves the battlefield" (CR 702.195a, 704.5j). Fíli and Mox Pearl are two; a second Fíli enters, the third, and the
+# legend rule then puts one of them into the graveyard. Bot1 has the story all the same, and the Fíli left is 3/3. The second
+# Fíli's own enters ability and the first one's "another nontoken Dwarf" both triggered as it entered, so with the first Fíli's
+# own there are three Dwarves.
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Plains
+Mox Pearl
+Fíli the Pathfinder
+Fíli the Pathfinder
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Fíli the Pathfinder.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+[T5 Bot1.Main2]
+? Bot1.EnduringStory = (absent)
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Fíli the Pathfinder.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.EnduringStory = true
+Bot1.Graveyard = Fíli the Pathfinder
+Bot1.Battlefield = Plains; Plains; Plains; Plains; Mox Pearl; Fíli the Pathfinder; Dwarf; Dwarf; Dwarf
+Bot1.Battlefield.Fíli the Pathfinder.Power = 3
+Bot1.Battlefield.Dwarf#1.Power = 3

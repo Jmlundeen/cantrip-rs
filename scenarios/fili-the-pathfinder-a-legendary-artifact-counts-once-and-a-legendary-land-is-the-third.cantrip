@@ -1,0 +1,42 @@
+# Storied counts permanents, each once however many of the three qualities it has (CR 702.195a; the rulings): Fíli and
+# Mox Amber, a legendary artifact, are two permanents, so on turn seven Bot1 has no enduring story and Fíli is 2/2. On
+# turn nine Bot1 plays Boseiju, Who Endures, a legendary land that is no artifact or Saga: the third, and the story is had.
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Plains
+Mox Amber
+Fíli the Pathfinder
+Boseiju, Who Endures
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Amber.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Fíli the Pathfinder.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+[T7 Bot1.Main2]
+? Bot1.EnduringStory = (absent)
+? Bot1.Battlefield.Fíli the Pathfinder.Power = 2
+[T9 Bot1.Main1]
+Bot1.Hand.Boseiju, Who Endures.Play
+[T9 Bot1.Main2]
+
+[Expect]
+Bot1.EnduringStory = true
+Bot1.Battlefield.Fíli the Pathfinder.Power = 3
+Bot1.Battlefield.Dwarf.Power = 3

@@ -1,0 +1,42 @@
+# Storied counts three (CR 702.195a): Fíli and one Mox are only two permanents that are artifacts, Sagas and/or legendary,
+# so on turn five Bot1 has no enduring story and Fíli's static ability does nothing - Fíli and its Dwarf are 2/2. On turn
+# seven Bot1 plays Urza's Saga, a Saga that is neither an artifact nor legendary: the third, and the story is had at once.
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Mox Pearl
+Fíli the Pathfinder
+Urza's Saga
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Fíli the Pathfinder.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+[T5 Bot1.Main2]
+? Bot1.EnduringStory = (absent)
+? Bot1.Battlefield.Fíli the Pathfinder.Power = 2
+? Bot1.Battlefield.Dwarf.Power = 2
+[T7 Bot1.Main1]
+Bot1.Hand.Urza's Saga.Play
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.EnduringStory = true
+Bot1.Battlefield.Fíli the Pathfinder.Power = 3
+Bot1.Battlefield.Fíli the Pathfinder.Toughness = 3
+Bot1.Battlefield.Dwarf.Power = 3

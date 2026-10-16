@@ -1,0 +1,41 @@
+# Storied (CR 702.195a): Fíli, a legendary permanent with storied, and two Moxes are three permanents that are artifacts
+# and/or legendary, so Bot1 has an enduring story the moment Fíli is on the battlefield. Fíli's static ability then gives
+# Bot1's creatures +1/+1 (CR 702.195b): Fíli and the Dwarf its own enters ability made are 3/3. The Moxes pay for Fíli and
+# stay on the battlefield, tapped, still artifacts.
+
+[Bot1 Deck]
+Plains
+Plains
+Mox Pearl
+Mox Jet
+Fíli the Pathfinder
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Fíli the Pathfinder.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.EnduringStory = true
+Bot2.EnduringStory = (absent)
+Bot1.Battlefield = Plains; Plains; Mox Pearl; Mox Jet; Fíli the Pathfinder; Dwarf
+Bot1.Battlefield.Fíli the Pathfinder.Power = 3
+Bot1.Battlefield.Fíli the Pathfinder.Toughness = 3
+Bot1.Battlefield.Dwarf.Power = 3
+Bot1.Battlefield.Dwarf.Toughness = 3
+Bot1.Battlefield.Dwarf.Token = true
+Bot1.Battlefield.Dwarf.Colors = Red
