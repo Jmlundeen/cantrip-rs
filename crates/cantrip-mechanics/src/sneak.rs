@@ -6,8 +6,9 @@
 //! attacker (a cost chosen with the other costs, CR 601.2b, h), offered from the hand in the declare blockers step of its
 //! controller's turn, at instant speed whatever the card's type (`WayDef::instant_speed`).
 //!
-//! CR 702.190b (a permanent spell cast for its sneak cost enters tapped and attacking what the returned creature attacked)
-//! is not built: no card that is a permanent has sneak yet.
+//! "If this spell's sneak cost was paid" is `paid` of the resolving spell (The Last Ronin's Technique, Shredder's
+//! Technique prints sneak). CR 702.190b (a permanent spell cast for its sneak cost enters tapped and attacking what the
+//! returned creature attacked) is not built: no card that is a permanent has sneak yet.
 
 use cantrip_api::*;
 
@@ -25,4 +26,10 @@ pub const fn way(cost: ManaCost, text: &'static str) -> WayDef {
     cantrip_api::way(Cost::mana(cost).and(return_to_hand(1, unblocked_attacker_you_control)), ZoneKind::Hand, text)
         .condition(your_declare_blockers_step)
         .instant_speed()
+}
+
+/// "If this spell's sneak cost was paid": it was cast for its first alternative cost, which a card with sneak lists first
+/// and, so far, alone.
+pub fn paid(item: &StackItem) -> bool {
+    item.way == 1
 }
