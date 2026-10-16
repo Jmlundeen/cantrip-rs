@@ -1,0 +1,62 @@
+# Thanos, the Mad Titan: "Power-up — {C}{W}{U}{B}{R}{G}: Put two +1/+1 counters on Thanos. Choose odd or even. Destroy
+# each other creature with mana value of the chosen quality." The turn he enters, his mana cost {R}{W}{B} takes one of
+# each of those colors off the cost (CR 702.193b, 118.7), leaving {C}{U}{G}: Sol Ring's {C}{C} (one left over), the
+# Island's {U} and Mox Emerald's {G}. Bot1 chooses odd: Bot2's Llanowar Elves (1) is destroyed; Bot2's Ornithopter (0, and
+# zero is even) is not, and nor is Thanos himself (3, but "other").
+
+[Bot1 Deck]
+Island
+Mox Ruby
+Mox Pearl
+Mox Jet
+Sol Ring
+Mox Emerald
+Thanos, the Mad Titan
+Island x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Ornithopter
+Forest x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Thanos, the Mad Titan.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Thanos, the Mad Titan.Activate
+? Bot1.Mana = {C}
+Bot1.Pass
+Bot1.Modes(Odd)
+
+[Expect]
+Turn = 3
+Bot2.Battlefield = Forest; Ornithopter
+Bot2.Graveyard = Llanowar Elves
+Bot1.Battlefield.Thanos, the Mad Titan.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Thanos, the Mad Titan.Power = 6
