@@ -1,0 +1,70 @@
+# The Starcage exiles both players' Ornithopter on turn 5. Bot1 then casts its own Dauthi Voidwalker, whose replacement
+# sends a card that would go to an opponent's graveyard to exile instead. On turn 9 the Starcage's second ability puts
+# each exiled card into its owner's graveyard: Bot1's Ornithopter goes to Bot1's graveyard (Bot1 is no opponent of the
+# Voidwalker's controller), Bot2's is exiled instead, so only one card was "put into a graveyard this way" and only
+# one Robot is made (CR 614.1a, 607.2a). The Swamp in exile is Bot2's turn-8 discard to hand size, which the
+# Voidwalker exiled too; the two Swamps in Bot2's graveyard are its earlier discards, before the Voidwalker came.
+
+[Bot1 Deck]
+Plains
+Plains
+Swamp
+Pinnacle Starcage
+Ornithopter
+Mox Pearl
+Mox Emerald
+Swamp
+Plains
+Dauthi Voidwalker
+Mox Jet
+Plains x10
+
+[Bot2 Deck]
+Ornithopter
+Swamp x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Pinnacle Starcage.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+? Exile = Ornithopter; Ornithopter
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T7 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Dauthi Voidwalker.Cast
+Bot1.Pass
+[T9 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Pinnacle Starcage.Activate
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Exile = Ornithopter; Swamp
+Bot1.Graveyard = Pinnacle Starcage; Ornithopter
+Bot2.Graveyard = Swamp; Swamp
+Bot1.Battlefield = Dauthi Voidwalker; Mox Emerald; Mox Jet; Mox Pearl; Plains; Plains; Plains; Robot; Swamp; Swamp

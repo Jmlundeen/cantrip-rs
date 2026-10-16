@@ -1,0 +1,69 @@
+# The Starcage exiles Bot2's Ornithopter on turn 5. On turn 9 Bot1 activates {6}{W}{W} and, with the ability on the stack,
+# sacrifices Haywire Mite to exile the Starcage: the Ornithopter comes back at once (CR 610.3). The ability then
+# resolves with nothing exiled with the Starcage any more and no Starcage to sacrifice: no Robot is made and the
+# Starcage stays in exile rather than going to the graveyard (it is no longer on the battlefield to be sacrificed,
+# CR 400.7). The ability exists independently of its source (CR 113.7a).
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Pinnacle Starcage
+Mox Pearl
+Mox Emerald
+Mox Jet
+Plains
+Plains
+Haywire Mite
+Mox Ruby
+Plains x10
+
+[Bot2 Deck]
+Ornithopter
+Swamp x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Pinnacle Starcage.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+? Exile = Ornithopter
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Haywire Mite.Cast
+[T9 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Pinnacle Starcage.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Haywire Mite.Activate(Pinnacle Starcage)
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Exile = Pinnacle Starcage
+Bot1.Graveyard = Haywire Mite
+Bot1.Battlefield = Mox Emerald; Mox Jet; Mox Pearl; Mox Ruby; Plains; Plains; Plains; Plains; Plains
+Bot2.Battlefield = Ornithopter

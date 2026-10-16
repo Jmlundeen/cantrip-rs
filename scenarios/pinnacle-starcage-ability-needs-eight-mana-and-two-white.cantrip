@@ -1,0 +1,70 @@
+# {6}{W}{W}: on turn 7 Bot1 has only seven mana (four lands and three Moxen), two of it white, and the ability is
+# refused. On turn 9 it has plenty of mana but, after a Plains is spent on Sol Ring, only one white source (the other Plains),
+# and it is refused again; casting Mox Pearl gives the second white and the same ability is then paid and resolves
+# (the positive control). The Moxen came after the Starcage so it never exiled them; nothing else was in play, so no Robot.
+
+[Bot1 Deck]
+Plains
+Plains
+Swamp
+Pinnacle Starcage
+Mox Emerald
+Mox Jet
+Mox Ruby
+Swamp
+Swamp
+Mox Pearl
+Sol Ring
+Plains x10
+
+[Bot2 Deck]
+Swamp x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Pinnacle Starcage.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T7 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+? Bot1.Mana = {W}{W}{B}{B}{B}{R}{G}
+! Bot1.Battlefield.Pinnacle Starcage.Activate
+[T9 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+! Bot1.Battlefield.Pinnacle Starcage.Activate
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Pinnacle Starcage.Activate
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Pinnacle Starcage

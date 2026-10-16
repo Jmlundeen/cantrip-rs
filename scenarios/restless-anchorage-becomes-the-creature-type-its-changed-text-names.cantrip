@@ -1,0 +1,43 @@
+# Artificial Evolution replaces the creature type Bird with Elf in Restless Anchorage's text for good (CR 612.1, 612.2).
+# Animated on turn 3 it becomes a white and blue Elf creature with flying and 2/3, not a Bird (CR 612.4): the word is read
+# through the words of its own text. Its mana symbols and numbers are not words and cost and give what they did.
+
+[Bot1 Deck]
+Restless Anchorage
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Artificial Evolution
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Restless Anchorage.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Restless Anchorage)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Bird)
+Bot1.Modes(Elf)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Restless Anchorage.Activate(Ability: Until end of turn)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Restless Anchorage.Types = Land; Creature
+
+[Expect]
+Bot1.Battlefield.Restless Anchorage.Subtypes = Elf
+Bot1.Battlefield.Restless Anchorage.Colors = Blue; White
+Bot1.Battlefield.Restless Anchorage.Keywords = Flying
+Bot1.Battlefield.Restless Anchorage.Power = 2
+Bot1.Battlefield.Restless Anchorage.Toughness = 3

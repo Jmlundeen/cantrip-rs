@@ -1,0 +1,76 @@
+# Bot2 builds a board on turn 2: four Moxen, Ravenous Robots, an Ornithopter and Engineered Explosives with X = 3 (so it
+# is mana value 3 on the stack but 0 on the battlefield, CR 202.3e), and the two artifact spells it cast after Ravenous
+# Robots made two 1/1 Robot tokens (mana value 0). The Starcage enters on turn 5 and exiles all of them, X permanent
+# and tokens included. A token that is exiled ceases to exist (CR 111.7), so only the cards are in exile. On turn 7 the
+# Starcage is exiled with Haywire Mite: the cards come back, the Explosives as a new object with no counters, and the
+# tokens do not.
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Pinnacle Starcage
+Haywire Mite
+Mox Emerald
+Plains
+Plains x10
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Mox Pearl
+Ravenous Robots
+Ornithopter
+Engineered Explosives
+Mountain x8
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Ravenous Robots.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Engineered Explosives.Cast(X: 3)
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+? Bot2.Battlefield = Engineered Explosives; Mountain; Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire; Ornithopter; Ravenous Robots; Robot; Robot
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Pinnacle Starcage.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+? Exile = Engineered Explosives; Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire; Ornithopter; Ravenous Robots
+? Bot2.Battlefield = Mountain
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Haywire Mite.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Haywire Mite.Activate(Pinnacle Starcage)
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Exile = Pinnacle Starcage
+Bot2.Battlefield = Engineered Explosives; Mountain; Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire; Ornithopter; Ravenous Robots
