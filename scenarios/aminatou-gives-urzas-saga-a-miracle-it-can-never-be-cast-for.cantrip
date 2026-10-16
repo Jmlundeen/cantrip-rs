@@ -1,0 +1,41 @@
+# Urza's Saga is an enchantment card, so Aminatou gives it miracle, but it has no mana cost: a cost based on it can't be
+# paid (CR 118.6), and a land is never cast anyway (CR 305.9). Bot1 may still reveal it as it is drawn first on turn 3;
+# the linked ability then offers no cast, and the Saga stays in Bot1's hand.
+[Bot1 Deck]
+Plains
+Sol Ring
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Aminatou, Veil Piercer
+Island
+Urza's Saga
+Swamp
+Island x15
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Aminatou, Veil Piercer.Cast
+
+[T3 Bot1.Upkeep]
+Bot1.Arrange(Urza's Saga; Swamp |)
+[T3 Bot1.Draw]
+Bot1.Accept
+? Stack.Count = 1
+Bot1.Pass
+! Bot1.Accept
+[T3 Bot1.Main1]
+[Expect]
+Bot1.Revealed = Urza's Saga
+Bot1.Hand = Island; Urza's Saga
+Stack.Count = 0

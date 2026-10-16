@@ -1,0 +1,45 @@
+# A Room is cast as one of its doors (CR 709.3a): only that door is evaluated, so Aminatou's "its mana cost reduced by {4}"
+# is the door's. Bot1 reveals Unholy Annex // Ritual Chamber, drawn first on turn 3, and casts it as Ritual Chamber
+# ({3}{B}{B}) for {B}{B} out of {B}{B}{C}{C}, leaving {C}{C} (the whole card's {5}{B}{B}{B} less four would not be paid
+# by that, and Unholy Annex's {B} would leave {B}{C}{C}). The door unlocks as it enters and makes its Demon (CR 709.5h).
+[Bot1 Deck]
+Swamp
+Sol Ring
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Aminatou, Veil Piercer
+Island
+Unholy Annex // Ritual Chamber
+Island
+Island x15
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Aminatou, Veil Piercer.Cast
+
+[T3 Bot1.Upkeep]
+Bot1.Arrange(Unholy Annex // Ritual Chamber; Island |)
+[T3 Bot1.Draw]
+Bot1.Accept
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Accept
+Bot1.Modes(Ritual Chamber)
+? Bot1.Mana = {C}{C}
+[T3 Bot1.Main1]
+[Expect]
+Bot1.Battlefield.Ritual Chamber.Doors = Ritual Chamber
+Bot1.Battlefield.Demon.Power = 6
+Bot1.Hand = Island

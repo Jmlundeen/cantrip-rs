@@ -1,0 +1,46 @@
+# Aminatou: "Each enchantment card in your hand has miracle. Its miracle cost is equal to its mana cost reduced by {4}."
+# Bot1 surveils Overlord of the Mistmoors ({5}{W}{W}) to the top and draws it first on turn 3; revealed (CR 702.94a), it is
+# cast for {1}{W}{W}, paid out of {W}{W}{C}{C} from a Plains, Mox Pearl and Sol Ring, leaving {C}. It enters and makes
+# its two Insects.
+[Bot1 Deck]
+Plains
+Sol Ring
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Aminatou, Veil Piercer
+Island
+Overlord of the Mistmoors
+Swamp
+Island x15
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Aminatou, Veil Piercer.Cast
+
+[T3 Bot1.Upkeep]
+Bot1.Arrange(Overlord of the Mistmoors | Swamp)
+[T3 Bot1.Draw]
+Bot1.Accept
+? Bot1.Revealed = Overlord of the Mistmoors
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Accept
+? Bot1.Mana = {C}
+[T3 Bot1.Main1]
+[Expect]
+Bot1.Battlefield.Overlord of the Mistmoors.Types = Enchantment; Creature
+Bot1.Battlefield.Insect#2.Token = true
+Bot1.Graveyard = Swamp
+Bot1.Hand = Island

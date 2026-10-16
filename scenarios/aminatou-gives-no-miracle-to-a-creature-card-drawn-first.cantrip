@@ -1,0 +1,37 @@
+# Aminatou gives miracle only to enchantment cards: Llanowar Elves, the first card Bot1 draws on turn 3, has none, so Bot1
+# is not asked to reveal it. The positive control is
+# aminatou-gives-an-enchantment-drawn-first-miracle-at-its-mana-cost-less-four.
+[Bot1 Deck]
+Plains
+Sol Ring
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Aminatou, Veil Piercer
+Island
+Llanowar Elves
+Swamp
+Island x15
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Aminatou, Veil Piercer.Cast
+
+[T3 Bot1.Upkeep]
+Bot1.Arrange(Llanowar Elves; Swamp |)
+Bot1.Pass
+! Bot1.Accept
+[T3 Bot1.Main1]
+[Expect]
+Stack.Count = 0
+Bot1.Hand = Island; Llanowar Elves
