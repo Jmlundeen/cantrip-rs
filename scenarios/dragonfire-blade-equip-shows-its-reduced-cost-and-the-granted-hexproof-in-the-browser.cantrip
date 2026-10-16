@@ -1,0 +1,37 @@
+# Browser
+# What the client shows of a cost that depends on the target and of a granted "hexproof from": Dragonfire Blade's
+# Equip {4} targeting the red Dwarven Mauler costs {4} - {1} (one color) - {2} (the Mauler's own ability) = {1}
+# (CR 601.2c, 601.2f, 602.2b). The equip's menu row reads as printed, and the payment asks for the total as it was
+# determined once the target was announced: {1}, paid with Mox Jet. Then the Mauler's face lists "Hexproof from
+# monocolored" after its own text, granted by the Blade (CR 702.11d).
+
+[Bot1 Deck]
+Mountain
+Dwarven Mauler
+Mox Jet
+Dragonfire Blade
+Island x13
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Dwarven Mauler.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dragonfire Blade.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Dragonfire Blade.Activate(Dwarven Mauler)
+? Client.Bot1.Prompt.Title = Pay for Dragonfire Blade
+? Client.Bot1.Prompt.Detail = {1} of {1} still to pay  ·  tap a land
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+[T3 Bot1.Main2]
+? Client.Bot1.Battlefield.Dwarven Mauler.Rules = Equip abilities you activate that target this creature cost {2} less to activate. / Hexproof from monocolored
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Dragonfire Blade.AttachedTo = Dwarven Mauler
+Bot1.Battlefield.Mountain.Tapped = false

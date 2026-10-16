@@ -1,0 +1,66 @@
+# Dragonfire Blade: "Equip {4}. This ability costs {1} less to activate for each color of the creature it targets"
+# (CR 601.2c, 601.2f, 602.2b: the total cost is determined once the target is announced). Each equip is paid from a
+# pool holding exactly what it should cost and leaves it empty: {4} for the colorless Ornithopter, {2} for the black
+# and red Bloodtithe Harvester, {3} for the white Mother of Runes. A cost less than that would leave mana floating; a
+# cost more could not be paid from the pool.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Sol Ring
+Ornithopter
+Dragonfire Blade
+Bloodtithe Harvester
+Mox Pearl
+Mother of Runes
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Dragonfire Blade.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Bloodtithe Harvester.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+? Bot1.Mana = {B}{R}{C}{C}
+Bot1.Battlefield.Dragonfire Blade.Activate(Ornithopter)
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+? Bot1.Battlefield.Dragonfire Blade.AttachedTo = Ornithopter
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Dragonfire Blade.Activate(Bloodtithe Harvester)
+? Bot1.Mana =
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+? Bot1.Battlefield.Dragonfire Blade.AttachedTo = Bloodtithe Harvester
+Bot1.Hand.Mother of Runes.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Dragonfire Blade.Activate(Mother of Runes)
+? Bot1.Mana =
+Bot1.Pass
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Dragonfire Blade.AttachedTo = Mother of Runes
+Bot1.Battlefield.Mother of Runes.Power = 3
+Bot1.Battlefield.Mother of Runes.Toughness = 3
+Bot1.Battlefield.Mother of Runes.HexproofFrom = Monocolored
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Bloodtithe Harvester.HexproofFrom = (absent)

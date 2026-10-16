@@ -1,0 +1,52 @@
+# The total cost of Dragonfire Blade's equip ability is determined from the target announced and then locked in (CR
+# 601.2f, 602.2b): what happens to the target afterwards changes nothing paid. Bot1 equips the black and red Bloodtithe
+# Harvester for {2} ({B}{R} from the pool); Bot2 answers with Lightning Bolt and the Harvester dies. The equip ability
+# finds its only target gone and does nothing (CR 608.2b), the Blade stays unattached, and the {B}{R} stays spent: no
+# mana comes back, and nothing more was asked (Sol Ring and Mox Pearl are still untapped).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Bloodtithe Harvester
+Mox Pearl
+Sol Ring
+Dragonfire Blade
+Island
+Island x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Bloodtithe Harvester.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Dragonfire Blade.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Dragonfire Blade.Activate(Bloodtithe Harvester)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Bloodtithe Harvester)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Mana =
+Bot1.Graveyard = Bloodtithe Harvester
+Bot1.Battlefield.Dragonfire Blade.AttachedTo = (absent)
+Bot1.Battlefield.Sol Ring.Tapped = false
+Bot1.Battlefield.Mox Pearl.Tapped = false
