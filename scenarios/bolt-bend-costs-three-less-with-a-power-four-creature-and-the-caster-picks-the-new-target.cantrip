@@ -1,0 +1,65 @@
+# Bolt Bend costs {3} less to cast if you control a creature with power 4 or greater: Bot1's Bloodthirsty Conqueror (5/5)
+# makes it cost {R}, so tapping Mox Ruby alone pays for it (Mox Emerald stays untapped). Bot2's Lightning Bolt at the
+# Conqueror is redirected; the Bolt can now go to Bot1 or Bot2 (not the Conqueror, its old target), so Bot1 is asked and
+# picks Bot2. Bot2 loses 3 (17) and the Conqueror's trigger gains Bot1 3 (23); the Conqueror takes no damage.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Sol Ring
+Bloodthirsty Conqueror
+Bolt Bend
+Swamp x12
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Bloodthirsty Conqueror.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Draw]
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Bloodthirsty Conqueror)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Bolt Bend.Cast(Stack.Lightning Bolt)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main1]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot2.Life = 17
+Bot1.Life = 23
+Bot1.Battlefield.Bloodthirsty Conqueror.Damage = 0
+Bot1.Battlefield.Mox Ruby.Tapped = true
+Bot1.Battlefield.Sol Ring.Tapped = false
+Bot1.Battlefield.Swamp.Tapped = false
+Bot1.Battlefield.Mox Jet.Tapped = false
+Bot1.Graveyard = Bolt Bend
+Bot2.Graveyard = Lightning Bolt

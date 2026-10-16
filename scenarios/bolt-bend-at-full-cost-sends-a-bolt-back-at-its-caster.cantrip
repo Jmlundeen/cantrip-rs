@@ -1,0 +1,53 @@
+# Bolt Bend (CR 115.7a): Bot1's Lightning Bolt at Bot2; Bot2 has no creature with power 4 or greater, so Bolt Bend costs its
+# full {3}{R} - all four of Bot2's Moxen are tapped for it. The Bolt's only other legal target is Bot1 (no creatures), so
+# that is the new target without a question, and Bot1 takes 3 (17) while Bot2 stays at 20.
+
+[Bot1 Deck]
+Mox Ruby
+Lightning Bolt
+Island x18
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Emerald
+Bolt Bend
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Bolt Bend.Cast(Stack.Lightning Bolt)
+Bot2.Pass
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Life = 17
+Bot2.Life = 20
+Bot2.Graveyard = Bolt Bend
+Bot1.Graveyard = Lightning Bolt
+Bot2.Battlefield.Mox Ruby.Tapped = true
+Bot2.Battlefield.Mox Jet.Tapped = true
+Bot2.Battlefield.Mox Pearl.Tapped = true
+Bot2.Battlefield.Mox Emerald.Tapped = true

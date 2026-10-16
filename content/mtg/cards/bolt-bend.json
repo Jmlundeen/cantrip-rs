@@ -1,0 +1,6 @@
+{
+  "name": "Bolt Bend",
+  "manaCost": "{3}{R}",
+  "type": "Instant",
+  "oracleText": "This spell costs {3} less to cast if you control a creature with power 4 or greater.\nChange the target of target spell or ability with a single target."
+}
