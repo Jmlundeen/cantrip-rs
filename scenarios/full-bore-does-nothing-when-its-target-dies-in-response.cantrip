@@ -1,0 +1,30 @@
+# Full Bore's only target is gone on resolution (CR 608.2b): Bot1 targets its Ornithopter and Bot2 answers with Lightning Bolt,
+# killing it (0/2 before the +3/+2). Full Bore is countered on resolution and does nothing, and both go to their graveyards.
+
+[Bot1 Deck]
+Mountain
+Ornithopter
+Full Bore
+Mountain x17
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Full Bore.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Full Bore; Ornithopter
+Bot2.Graveyard = Lightning Bolt
+Stack.Count = 0

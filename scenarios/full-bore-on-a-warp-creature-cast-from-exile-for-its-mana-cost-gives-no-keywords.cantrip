@@ -1,0 +1,38 @@
+# Full Bore asks how the creature was cast, not whether it has warp (CR 702.185a): Pinnacle Emissary was warped on turn 1 and
+# exiled, and on turn 3 Bot1 casts it from exile for its real {1}{U}{R}. It was not cast for its warp cost this time, so Full Bore
+# gives it only +3/+2: a 6/5 that is still summoning sick, with no trample or haste.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Sapphire
+Pinnacle Emissary
+Full Bore
+Island
+Mountain x15
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Pinnacle Emissary.Cast(Ability: Warp)
+Bot1.Battlefield.Mountain.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Exile.Pinnacle Emissary.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Full Bore.Cast(Bot1.Battlefield.Pinnacle Emissary)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Pinnacle Emissary.Keywords = (absent)
+
+[Expect]
+Bot1.Battlefield.Pinnacle Emissary.Power = 6
+Bot1.Battlefield.Pinnacle Emissary.Toughness = 5
+Bot1.Battlefield.Pinnacle Emissary.SummoningSick = true
+Bot1.Graveyard = Full Bore

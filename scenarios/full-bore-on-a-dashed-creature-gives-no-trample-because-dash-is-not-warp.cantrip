@@ -1,0 +1,31 @@
+# "Cast for its warp cost" is warp's cost and no other alternative cost (CR 702.185a, 118.9). Bot1 casts Ragavan for its dash cost
+# {1}{R} (Mox Jet and Mox Ruby): it has haste from dash (CR 702.109a) and is the first alternative way cast, as a warped creature
+# is. Full Bore (Mountain) gives it +3/+2 and no trample: a 5/3 with only haste.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Ragavan, Nimble Pilferer
+Full Bore
+Mountain x15
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ragavan, Nimble Pilferer.Cast(Ability: Dash)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Full Bore.Cast(Bot1.Battlefield.Ragavan, Nimble Pilferer)
+Bot1.Battlefield.Mountain.Activate
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Ragavan, Nimble Pilferer.Power = 5
+? Bot1.Battlefield.Ragavan, Nimble Pilferer.Toughness = 3
+
+[Expect]
+Bot1.Battlefield.Ragavan, Nimble Pilferer.Keywords = Haste
+Bot1.Graveyard = Full Bore

@@ -1,0 +1,34 @@
+# Full Bore (CR 702.185a): "If that creature was cast for its warp cost, it also gains trample and haste until end of turn."
+# Bot1 casts Pinnacle Emissary for its warp cost {U/R} (a Mountain) on turn 1 and Full Bore on it (Mox Ruby): it is a 6/5
+# with trample and haste, so it attacks the turn it came in and Bot2 takes 6. At the end step warp exiles it as usual.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Pinnacle Emissary
+Full Bore
+Mountain x16
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Pinnacle Emissary.Cast(Ability: Warp)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Full Bore.Cast(Bot1.Battlefield.Pinnacle Emissary)
+Bot1.Battlefield.Mox Ruby.Activate
+[T1 Bot1.DeclareAttackers]
+? Bot1.Battlefield.Pinnacle Emissary.Power = 6
+? Bot1.Battlefield.Pinnacle Emissary.Toughness = 5
+? Bot1.Battlefield.Pinnacle Emissary.Keywords = Haste; Trample
+Bot1.Attack(Pinnacle Emissary > Bot2)
+[T1 Bot1.Main2]
+? Bot2.Life = 14
+[T2 Bot2.Main1]
+? Exile = Pinnacle Emissary
+
+[Expect]
+Bot2.Life = 14
+Bot1.Graveyard = Full Bore

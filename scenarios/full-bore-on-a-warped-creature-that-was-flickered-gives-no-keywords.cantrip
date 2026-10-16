@@ -1,0 +1,37 @@
+# A creature that left the battlefield and came back is a new object (CR 400.7), and a new object was not cast at all, so it
+# was not cast for its warp cost. Bot1 warps Pinnacle Emissary (a Mountain), flickers it with Ephemerate (Mox Pearl) so it
+# returns as a new permanent, then Full Bore (Mox Ruby) gives it only +3/+2: a 6/5 with no trample or haste, still summoning sick.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Pearl
+Pinnacle Emissary
+Ephemerate
+Full Bore
+Mountain x15
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Pinnacle Emissary.Cast(Ability: Warp)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Ephemerate.Cast(Bot1.Battlefield.Pinnacle Emissary)
+Bot1.Battlefield.Mox Pearl.Activate
+[T1 Bot1.Main2]
+Bot1.Hand.Full Bore.Cast(Bot1.Battlefield.Pinnacle Emissary)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Bot1.Battlefield.Pinnacle Emissary.Power = 6
+? Bot1.Battlefield.Pinnacle Emissary.Toughness = 5
+? Bot1.Battlefield.Pinnacle Emissary.SummoningSick = true
+? Bot1.Battlefield.Pinnacle Emissary.Keywords = (absent)
+
+[Expect]
+Bot1.Graveyard = Full Bore
