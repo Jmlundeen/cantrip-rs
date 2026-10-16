@@ -1,0 +1,60 @@
+# "Whenever you attack this turn" (CR 603.7b, 508.1m): the delayed ability triggers only when its controller declares
+# attackers and only this turn. Bot1 activates the Encampment on turn 4, during Bot2's main phase, and Bot2 attacks with its
+# Ornithopter: Bot1 did not attack, so no Warriors. On turn 5 the ability is gone, and Bot1's own attack makes none either
+# (the positive control is the scenario in which the same attack follows the activation in the same turn). On turn 3
+# Bot1 had declared no attackers at all, which would not have triggered it.
+
+[Bot1 Deck]
+Mountain
+Dalkovan Encampment
+Mox Pearl
+Mox Jet
+Mox Ruby
+Ornithopter
+Plains
+Plains x14
+
+[Bot2 Deck]
+Ornithopter
+Mox Ruby
+Plains x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Dalkovan Encampment.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Dalkovan Encampment.Activate(Ability: Whenever you attack)
+Bot1.Pass
+Bot2.Pass
+Bot2.Attack(Ornithopter > Bot1)
+? Combat.Attackers.Count = 1
+[T4 Bot2.Main2]
+? Bot1.Battlefield = Mountain; Dalkovan Encampment; Mox Pearl; Mox Jet; Mox Ruby; Ornithopter
+[T5 Bot1.Main1]
+Bot1.Pass
+Bot1.Attack(Ornithopter > Bot2)
+? Combat.Attackers.Count = 1
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mountain; Dalkovan Encampment; Mox Pearl; Mox Jet; Mox Ruby; Ornithopter
+Bot2.Life = 20
+Bot1.Life = 20

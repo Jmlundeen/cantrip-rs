@@ -1,0 +1,61 @@
+# Each activation makes its own delayed triggered ability (CR 603.7): two Encampments activated on turn 5 (Black Lotus
+# and three Moxen pay the two {2}{W}) trigger separately when the Ornithopter is declared as an attacker, so four tapped
+# and attacking Warriors deal 4 combat damage (16), and all four are sacrificed together at the end step. Both
+# Encampments entered untapped beside the Mountain.
+
+[Bot1 Deck]
+Mountain
+Mox Pearl
+Mox Jet
+Mox Ruby
+Black Lotus
+Ornithopter
+Dalkovan Encampment
+Dalkovan Encampment
+Plains x14
+
+[Bot2 Deck]
+Plains x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Dalkovan Encampment.Play
+? Bot1.Battlefield.Dalkovan Encampment.Tapped = false
+[T5 Bot1.Main1]
+Bot1.Hand.Dalkovan Encampment.Play
+? Bot1.Battlefield.Dalkovan Encampment#2.Tapped = false
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Dalkovan Encampment.Activate(Ability: Whenever you attack)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Dalkovan Encampment#2.Activate(Ability: Whenever you attack)
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Ornithopter > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Warrior#4.Tapped = true
+? Bot1.Battlefield = Mountain; Dalkovan Encampment; Dalkovan Encampment; Mox Pearl; Mox Jet; Mox Ruby; Ornithopter; Warrior; Warrior; Warrior; Warrior
+[T5 Bot1.End]
+Bot1.Pass
+
+[Expect]
+Bot2.Life = 16
+Bot1.Battlefield = Mountain; Dalkovan Encampment; Dalkovan Encampment; Mox Pearl; Mox Jet; Mox Ruby; Ornithopter

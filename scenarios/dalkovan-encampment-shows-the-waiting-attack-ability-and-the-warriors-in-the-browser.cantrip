@@ -1,0 +1,52 @@
+# Browser
+# As a person sees it: once {2}{W}, {T} has resolved, the delayed ability that waits for an attack sits on no card, so
+# the page says it beside Bot1's life total in the ability's own words (the opponent's page says it with Bot1's name, which
+# the host's test judges), and Bot2 has nothing waiting. The attack makes the two Warriors, tapped Warrior tokens, and the
+# ability goes with the turn: nothing waits before the activation or on turn 4.
+
+[Bot1 Deck]
+Mountain
+Dalkovan Encampment
+Mox Pearl
+Mox Jet
+Mox Ruby
+Ornithopter
+Plains
+Plains x14
+
+[Bot2 Deck]
+Plains x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Dalkovan Encampment.Play
+? Client.Bot1.Facts =
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Dalkovan Encampment.Activate(Ability: Whenever you attack)
+Bot1.Pass
+Bot2.Pass
+? Client.Bot1.Facts = Whenever you attack this turn, create two 1/1 red Warrior creature tokens that are tapped and attacking. Sacrifice them at the beginning of the next end step
+? Client.Bot1.OpponentFacts =
+Bot1.Attack(Ornithopter > Bot2)
+Bot1.Pass
+Bot2.Pass
+? Client.Bot1.Battlefield.Warrior.TypeLine = Token Creature - Warrior
+[T3 Bot1.Main2]
+? Client.Bot1.Battlefield.Count = 8
+[T4 Bot2.Main1]
+? Client.Bot1.Facts =
+? Client.Bot1.OpponentFacts =
+
+[Expect]
+Bot2.Life = 18

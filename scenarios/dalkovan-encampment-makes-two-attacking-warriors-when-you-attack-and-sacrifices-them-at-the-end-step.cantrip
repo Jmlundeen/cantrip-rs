@@ -1,0 +1,59 @@
+# {2}{W}, {T}: "Whenever you attack this turn, create two 1/1 red Warrior creature tokens that are tapped and attacking.
+# Sacrifice them at the beginning of the next end step." Bot1 pays with three Moxen on turn 3 (the Encampment enters
+# untapped beside the Mountain), the ability resolves in main phase one and makes no Warriors yet. Declaring the 0/2
+# Ornithopter as an attacker triggers it: two tapped red Warriors, attacking Bot2 but never declared as attackers (so
+# nothing triggers again), deal 2 combat damage (18). At the beginning of the end step they are sacrificed together.
+
+[Bot1 Deck]
+Mountain
+Dalkovan Encampment
+Mox Pearl
+Mox Jet
+Mox Ruby
+Ornithopter
+Plains
+Plains x14
+
+[Bot2 Deck]
+Plains x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Dalkovan Encampment.Play
+? Bot1.Battlefield.Dalkovan Encampment.Tapped = false
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Dalkovan Encampment.Activate(Ability: Whenever you attack)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Dalkovan Encampment.Tapped = true
+? Bot1.Battlefield = Mountain; Dalkovan Encampment; Mox Pearl; Mox Jet; Mox Ruby; Ornithopter
+Bot1.Attack(Ornithopter > Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Warrior#1.Tapped = true
+? Bot1.Battlefield.Warrior#2.Tapped = true
+? Bot1.Battlefield.Warrior#1.Colors = Red
+? Bot1.Battlefield.Warrior#1.Subtypes = Warrior
+? Bot1.Battlefield.Warrior#1.Power = 1
+? Bot1.Battlefield.Warrior#2.Toughness = 1
+? Combat.Attackers.Count = 3
+[T3 Bot1.Main2]
+? Bot2.Life = 18
+? Bot1.Battlefield = Mountain; Dalkovan Encampment; Mox Pearl; Mox Jet; Mox Ruby; Ornithopter; Warrior; Warrior
+[T3 Bot1.End]
+Bot1.Pass
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield = Mountain; Dalkovan Encampment; Mox Pearl; Mox Jet; Mox Ruby; Ornithopter

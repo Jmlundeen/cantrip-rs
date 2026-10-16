@@ -1,0 +1,23 @@
+# "Unless you control a Swamp or a Mountain" asks for the land types, not the names: Underground Sea is an Island Swamp,
+# so beside it the Encampment enters untapped and taps for {W}. (Positive control for
+# dalkovan-encampment-enters-tapped-without-a-swamp-or-a-mountain.)
+
+[Bot1 Deck]
+Underground Sea
+Plains
+Dalkovan Encampment
+Plains x17
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Underground Sea.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Dalkovan Encampment.Play
+Bot1.Battlefield.Dalkovan Encampment.Activate(Ability: {T}: Add {W})
+? Bot1.Mana = {W}
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Dalkovan Encampment.Tapped = true

@@ -1,0 +1,23 @@
+# "This land enters tapped unless you control a Swamp or a Mountain" (CR 614.1c): Bot1 controls only a Plains on turn 3,
+# so the Encampment enters tapped and cannot tap for {W} (the refusal). The positive control for the Mountain is the
+# scenario where it enters beside one and activates the same turn; the control for the Swamp type is
+# dalkovan-encampment-enters-untapped-beside-a-swamp-by-type.
+
+[Bot1 Deck]
+Plains
+Plains
+Dalkovan Encampment
+Plains x17
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Dalkovan Encampment.Play
+! Bot1.Battlefield.Dalkovan Encampment.Activate(Ability: {T}: Add {W})
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Dalkovan Encampment.Tapped = true

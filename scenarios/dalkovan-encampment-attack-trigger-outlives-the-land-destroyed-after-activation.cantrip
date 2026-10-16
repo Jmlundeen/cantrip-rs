@@ -1,0 +1,51 @@
+# The ability makes a delayed triggered ability that exists apart from the land (CR 603.7, ruling 2025-04-04): after it
+# resolved Bot2 destroys Dalkovan Encampment with Wasteland, and Bot1's attack with the Ornithopter still makes two tapped
+# and attacking Warriors, for Bot1 (Bot2 takes 2 combat damage). The Encampment is in Bot1's graveyard.
+
+[Bot1 Deck]
+Mountain
+Dalkovan Encampment
+Mox Pearl
+Mox Jet
+Mox Ruby
+Ornithopter
+Plains
+Plains x14
+
+[Bot2 Deck]
+Wasteland
+Plains x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Wasteland.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Dalkovan Encampment.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Dalkovan Encampment.Activate(Ability: Whenever you attack)
+Bot1.Pass
+Bot2.Pass
+Bot2.Battlefield.Wasteland.Activate(Ability: Destroy; Dalkovan Encampment)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Dalkovan Encampment
+Bot1.Attack(Ornithopter > Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield = Mountain; Mox Pearl; Mox Jet; Mox Ruby; Ornithopter; Warrior; Warrior
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Graveyard = Dalkovan Encampment
