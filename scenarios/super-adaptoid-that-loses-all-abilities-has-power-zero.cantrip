@@ -1,0 +1,41 @@
+# Super-Adaptoid's power is defined by a characteristic-defining ability (CR 604.3): once Abigale, Eloquent First-Year's
+# trigger makes it lose all abilities, nothing defines its power and its * is 0 (CR 208.2a, 613.1f), so it is a 0/2 - though
+# Bot1 controls two legendary creatures - with the flying, first strike and lifelink of the counters put on it afterwards.
+# Turn 1: Mox Pearl and Mox Jet pay Super-Adaptoid (its trigger has no other creature to target). Turn 3: Swamp and Plains pay
+# Abigale, whose trigger targets Super-Adaptoid.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Super-Adaptoid
+Swamp
+Plains
+Abigale, Eloquent First-Year
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Super-Adaptoid.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Super-Adaptoid.Power = 1
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Abigale, Eloquent First-Year.Cast
+Bot1.Target(Super-Adaptoid)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Super-Adaptoid.Power = 0
+Bot1.Battlefield.Super-Adaptoid.Toughness = 2
+Bot1.Battlefield.Super-Adaptoid.Keywords = FirstStrike; Flying; Lifelink
+Bot1.Battlefield.Abigale, Eloquent First-Year.Keywords = FirstStrike; Flying; Lifelink

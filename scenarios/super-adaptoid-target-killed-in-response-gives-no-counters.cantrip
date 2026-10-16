@@ -1,0 +1,45 @@
+# Super-Adaptoid's enters trigger targets Bot2's Robber of the Rich (reach, haste); in response Bot1 Lightning Bolts the
+# Robber. The target is gone as the trigger resolves (CR 608.2b), so nothing is compared and Super-Adaptoid gets no haste or
+# reach counter.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Super-Adaptoid
+Lightning Bolt
+Island x15
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Robber of the Rich
+Island x17
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Robber of the Rich.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Super-Adaptoid.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield = Mox Pearl; Mox Jet; Mox Ruby; Super-Adaptoid
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Robber of the Rich)
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot2.Graveyard = Robber of the Rich
+Bot1.Battlefield.Super-Adaptoid.Counters.Haste = (absent)
+Bot1.Battlefield.Super-Adaptoid.Counters.Reach = (absent)
+Bot1.Battlefield.Super-Adaptoid.Keywords = (absent)

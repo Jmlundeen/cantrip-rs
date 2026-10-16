@@ -1,0 +1,61 @@
+# Super-Adaptoid enters targeting Bot2's Phyrexian Dragon Engine (double strike): a double strike counter. On turn 5 it attacks
+# and its trigger targets Bot2's Picklock Prankster (flying, vigilance): a flying and a vigilance counter. Unblocked, it deals
+# its 1 twice (CR 702.4b). Vigilance came after it was declared as an attacker and tapped (CR 508.1f, 702.20b), so it stays
+# tapped that turn; on turn 7 it attacks again with vigilance and stays untapped, and the trigger, targeting the Prankster
+# again, adds nothing: it has flying and vigilance. Bot2 takes 2 each time.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Super-Adaptoid
+Island x17
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Mox Ruby
+Picklock Prankster
+Phyrexian Dragon Engine
+Island x13
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Picklock Prankster.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Phyrexian Dragon Engine.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Super-Adaptoid.Cast
+Bot1.Target(Phyrexian Dragon Engine)
+[T5 Bot1.Main1]
+Bot1.Attack(Super-Adaptoid > Bot2)
+Bot1.Target(Picklock Prankster)
+[T5 Bot1.Main2]
+? Bot2.Life = 18
+? Bot1.Battlefield.Super-Adaptoid.Tapped = true
+? Bot1.Battlefield.Super-Adaptoid.Keywords = DoubleStrike; Flying; Vigilance
+[T7 Bot1.Main1]
+Bot1.Attack(Super-Adaptoid > Bot2)
+Bot1.Target(Picklock Prankster)
+[T7 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot1.Battlefield.Super-Adaptoid.Tapped = false
+Bot1.Battlefield.Super-Adaptoid.Counters.DoubleStrike = 1
+Bot1.Battlefield.Super-Adaptoid.Counters.Flying = 1
+Bot1.Battlefield.Super-Adaptoid.Counters.Vigilance = 1

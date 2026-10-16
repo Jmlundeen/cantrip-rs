@@ -1,0 +1,56 @@
+# Super-Adaptoid: "Super-Adaptoid's power is equal to the number of legendary creatures you control. Whenever Super-Adaptoid
+# enters or attacks, choose another target creature. If that creature has haste and Super-Adaptoid doesn't, put a haste
+# counter on Super-Adaptoid. Do the same for flying, first strike, ..."
+# It enters targeting Bot2's Robber of the Rich (reach, haste): a haste and a reach counter, whose keywords it has (CR 122.1b),
+# so it attacks the turn it came (CR 302.6). Its attack trigger targets the Robber again: it has haste and reach already, so
+# no more counters. Its power is 2: itself and Cecil, Dark Knight are legendary creatures Bot1 controls; the Ornithopter is
+# not legendary. Unblocked, it deals 2.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Cecil, Dark Knight
+Ornithopter
+Mox Ruby
+Mox Pearl
+Super-Adaptoid
+Island x13
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Robber of the Rich
+Island x17
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cecil, Dark Knight.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Robber of the Rich.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Super-Adaptoid.Cast
+Bot1.Target(Robber of the Rich)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Super-Adaptoid.Keywords = Haste; Reach
+Bot1.Attack(Super-Adaptoid > Bot2)
+Bot1.Target(Robber of the Rich)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield.Super-Adaptoid.Power = 2
+Bot1.Battlefield.Super-Adaptoid.Counters.Haste = 1
+Bot1.Battlefield.Super-Adaptoid.Counters.Reach = 1
+Bot1.Battlefield.Super-Adaptoid.Keywords = Haste; Reach

@@ -1,0 +1,59 @@
+# Super-Adaptoid enters targeting Bot2's Super Shredder (menace): a menace counter. On turn 5 it attacks and its trigger
+# targets Bot2's Ulvenwald Oddity (trample, haste): a haste and a trample counter. With menace it can't be blocked except by
+# two or more creatures (CR 702.110b): the Oddity alone may not block it, the Oddity and the Shredder together may (the
+# positive control). The 1/2 deals its 1 to the Oddity and dies; the Shredder gets a +1/+1 counter as it leaves.
+# Bot2 turn 2: Swamp and Mox Jet pay the Shredder; turn 4: Forest, the Mox Emeralds and the Swamp pay the Oddity.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Super-Adaptoid
+Island x17
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Super Shredder
+Forest
+Mox Emerald
+Mox Emerald
+Ulvenwald Oddity
+Island x13
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Super Shredder.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Super-Adaptoid.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald#1.Activate
+Bot2.Battlefield.Mox Emerald#2.Activate
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Ulvenwald Oddity.Cast
+[T5 Bot1.Main1]
+Bot1.Attack(Super-Adaptoid > Bot2)
+Bot1.Target(Ulvenwald Oddity)
+! Bot2.Block(Ulvenwald Oddity > Super-Adaptoid)
+Bot2.Block(Ulvenwald Oddity > Super-Adaptoid; Super Shredder > Super-Adaptoid)
+? Combat.Blocks.Count = 2
+? Bot1.Battlefield.Super-Adaptoid.Keywords = Haste; Menace; Trample
+Bot1.AssignDamage(Super-Adaptoid > Ulvenwald Oddity: 1)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot1.Graveyard = Super-Adaptoid
+Bot2.Battlefield.Ulvenwald Oddity.Damage = 1
+Bot2.Battlefield.Super Shredder.Counters.PlusOnePlusOne = 1

@@ -1,0 +1,7 @@
+{
+  "name": "Super-Adaptoid",
+  "manaCost": "{2}",
+  "type": "Legendary Artifact Creature — Robot Villain",
+  "toughness": 2,
+  "oracleText": "Super-Adaptoid's power is equal to the number of legendary creatures you control.\nWhenever Super-Adaptoid enters or attacks, choose another target creature. If that creature has haste and Super-Adaptoid doesn't, put a haste counter on Super-Adaptoid. Do the same for flying, first strike, double strike, deathtouch, indestructible, lifelink, menace, reach, trample, and vigilance."
+}
