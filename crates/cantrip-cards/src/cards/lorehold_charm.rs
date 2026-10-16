@@ -1,16 +1,11 @@
 use cantrip_api::*;
-use cantrip_mechanics::{each_opponent_sacrifices, pump_creatures_you_control, targets, trample_until_end_of_turn};
+use cantrip_mechanics::{each_opponent_sacrifices, effects, targets, trample_until_end_of_turn};
 use cantrip_oracle as oracle;
-
-/// "A nontoken artifact" (CR 111.1): an artifact permanent that is a card, not a token.
-fn nontoken_artifact(q: &dyn Query, id: ObjectId) -> bool {
-    !q.obj(id).token && q.chars(id).is(CardType::Artifact)
-}
 
 /// "Each opponent sacrifices a nontoken artifact of their choice" (CR 701.21a, 101.4): in turn order, an opponent with one
 /// sacrifices it without being asked, and one with none sacrifices nothing.
 fn sacrifice_an_artifact(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    each_opponent_sacrifices(g, item.controller, item.object, 1, nontoken_artifact)
+    each_opponent_sacrifices(g, item.controller, item.object, 1, targets::is_nontoken_artifact)
 }
 
 /// "Target artifact or creature card with mana value 2 or less from your graveyard" (CR 115.1, 202.3: X in a graveyard is
@@ -29,7 +24,7 @@ fn reanimate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 /// "Creatures you control get +1/+1 and gain trample until end of turn": the creatures there as it resolves (CR 611.2c).
 fn pump_and_trample(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    for creature in pump_creatures_you_control(g, item.object, item.controller, 1, 1) {
+    for creature in effects::pump_creatures_you_control(g, item, 1, 1) {
         trample_until_end_of_turn(g, item.object, creature);
     }
     Ok(())

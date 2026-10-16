@@ -1,0 +1,38 @@
+# Lorehold Charm, second mode: Mawloc ({X}{R}{G}) is in Bot1's graveyard, where X is 0 (CR 202.3e), so its mana value is 2 and it
+# is a legal target, beside Bot1's Misshapen Fiend. Bot2's own Misshapen Fiend, discarded to hand size, is a creature card with mana
+# value 2 too but in an opponent's graveyard: it is refused ("from your graveyard"). Mawloc returns to Bot1's battlefield
+# (with no counters: it was not cast, so ravenous's X is 0).
+
+[Bot1 Deck]
+Mox Ruby
+Faithless Looting
+Mawloc
+Misshapen Fiend
+Lorehold Charm
+Mox Pearl
+Mox Jet
+Island x20
+
+[Bot2 Deck]
+Misshapen Fiend x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Mawloc; Misshapen Fiend)
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Lorehold Charm.Cast
+Bot1.Modes(Return target artifact or creature card)
+! Bot1.Target(Bot2.Graveyard.Misshapen Fiend)
+Bot1.Target(Mawloc)
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Ruby; Mox Pearl; Mawloc
+Bot1.Graveyard = Lorehold Charm; Faithless Looting; Misshapen Fiend
+Bot2.Graveyard.Count = 1

@@ -1,0 +1,36 @@
+# Lorehold Charm, second mode: Crucible of Worlds, an artifact card with mana value 3, is in Bot1's graveyard beside Misshapen Fiend
+# (mana value 2). The Crucible is refused (mana value 3 is over the limit) and the Fiend, the positive control, is chosen and
+# returns; the Crucible stays in the graveyard.
+
+[Bot1 Deck]
+Mox Ruby
+Faithless Looting
+Crucible of Worlds
+Misshapen Fiend
+Lorehold Charm
+Mox Pearl
+Mox Jet
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Crucible of Worlds; Misshapen Fiend)
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Lorehold Charm.Cast
+Bot1.Modes(Return target artifact or creature card)
+! Bot1.Target(Crucible of Worlds)
+Bot1.Target(Misshapen Fiend)
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Ruby; Mox Pearl; Misshapen Fiend
+Bot1.Graveyard = Lorehold Charm; Faithless Looting; Crucible of Worlds
