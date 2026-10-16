@@ -165,6 +165,13 @@ public sealed partial class TacticalPlay
             return new ModesChosenAnswer { Modes = [1] };
         }
 
+        // Discarding one card instead of two (Steamcore Scholar): the cheaper discard, whenever it is offered.
+        if (!prompt.AdditionalCost && prompt.Count == 1 && prompt.Modes.Count == 2 && prompt.Eligible.Contains(0)
+            && prompt.Modes[0].StartsWith("Discard an instant or sorcery", StringComparison.Ordinal))
+        {
+            return new ModesChosenAnswer { Modes = [0] };
+        }
+
         if (prompt.Eligible.Count == 0 || prompt.AdditionalCost || prompt.Heading.Length > 0)
         {
             return prompt.Default();
