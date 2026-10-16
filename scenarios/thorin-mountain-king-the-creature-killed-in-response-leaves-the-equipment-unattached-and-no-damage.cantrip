@@ -40,8 +40,8 @@ Bot1.Battlefield.Mox Emerald.Activate
 Bot1.Battlefield.Llanowar Elves.Activate
 Bot1.Hand.Thorin, Mountain-king.Cast
 Bot1.Pass
-Bot1.Target(Llanowar Elves)
 Bot1.Target(Sword of the Meek)
+Bot1.Target(Llanowar Elves)
 Bot1.Pass
 Bot2.Battlefield.Mountain.Activate
 Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)

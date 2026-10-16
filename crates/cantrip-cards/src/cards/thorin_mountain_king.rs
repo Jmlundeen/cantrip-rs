@@ -7,16 +7,16 @@ use cantrip_oracle as oracle;
 /// Equipment become attached to that creature this way, that creature deals damage equal to its power to up to one target
 /// creature."
 ///
-/// The creature is the first target and the Equipment follow it: the core reads a variable number of targets in a slot as
-/// the last slot's. A creature that is no longer a legal target (CR 608.2b) has nothing for the Equipment to be attached
+/// The slots are in printed order, the Equipment first (any number, CR 115.1d) and the creature after them; each target
+/// records its slot (`StackItem::spec_targets`). A creature that is no longer a legal target (CR 608.2b) has nothing for the Equipment to be attached
 /// to; each Equipment that is not a legal target stays where it is. An Equipment already attached to the creature does not
 /// move and does not "become attached" (CR 701.3b), and one that can't be attached to it stays put. The second sentence is
 /// a reflexive triggered ability (CR 603.12) that triggers only if at least one Equipment really became attached, carrying
 /// the creature as its subject.
 fn attach_equipment(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
+    let Some(creature) = item.spec_targets(1).next().and_then(|slot| targets::object(g, item, slot)) else { return Ok(()) };
     let mut attached = false;
-    for slot in 1..item.target_count as usize {
+    for slot in item.spec_targets(0) {
         let Some(equipment) = targets::object(g, item, slot) else { continue };
         let before = g.attached_to(equipment);
         g.attach(equipment, creature);
@@ -48,8 +48,8 @@ pub static CARD: CardDef = CardDef {
         "When Thorin enters, attach any number of target Equipment you control to target creature you control. When one or more Equipment become attached to that creature this way, that creature deals damage equal to its power to up to one target creature.",
     )
     .targets(&[
-        targets::CREATURE_YOU_CONTROL.labelled("Creature you control to attach the Equipment to"),
         up_to(TargetSpec::ANY_NUMBER, targets::EQUIPMENT_YOU_CONTROL.filter).labelled("Equipment you control to attach (any number)"),
+        targets::CREATURE_YOU_CONTROL.labelled("Creature you control to attach the Equipment to"),
     ])],
     delayed: &[delayed_trigger(
         creature_deals_damage,

@@ -58,8 +58,8 @@ Bot1.Battlefield.Mox Emerald.Activate
 Bot1.Battlefield.Mox Jet.Activate
 Bot1.Hand.Thorin, Mountain-king.Cast
 Bot1.Pass
-Bot1.Target(Thorin, Mountain-king)
 Bot1.Target()
+Bot1.Target(Thorin, Mountain-king)
 Bot1.Pass
 Bot2.Pass
 ! Bot1.Target
