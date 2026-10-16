@@ -163,7 +163,7 @@ pub const SACRIFICE_TO_DESTROY_ARTIFACT_OR_ENCHANTMENT: AbilityDef = ability(
 )
 .targets(&[crate::targets::ARTIFACT_OR_ENCHANTMENT]);
 
-/// "Transform this [permanent]" (CR 701.28): the ability's source. Aang, Swift Savior and Concealing Curtains print it.
+/// "Transform this [permanent]" (CR 701.28): the ability's source. Aang, Swift Savior, Concealing Curtains, Norman Osborn and Temple of the Dead print it.
 pub fn transform_self(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.transform(item.object);
     Ok(())

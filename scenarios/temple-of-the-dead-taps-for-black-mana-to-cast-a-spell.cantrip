@@ -1,0 +1,58 @@
+# Temple of the Dead's "{T}: Add {B}": after Aclazotz died and returned tapped (Bot2's two Lightning Bolts, turn 2), the Temple
+# untaps on Bot1's turn 3 and is tapped for {B} to cast Dark Ritual ({B}), which adds {B}{B}{B}. The Temple is tapped, the
+# Ritual is in the graveyard, and the three black mana are in the pool. Black Lotus is in the graveyard too.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Aclazotz, Deepest Betrayal
+Swamp
+Dark Ritual
+Swamp
+Swamp x13
+
+[Bot2 Deck]
+Lightning Bolt
+Lightning Bolt
+Mountain
+Mox Ruby
+Plains
+Plains
+Plains
+Plains x13
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Aclazotz, Deepest Betrayal.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Lightning Bolt.Cast(Aclazotz, Deepest Betrayal)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Pass
+Bot2.Hand.Lightning Bolt.Cast(Aclazotz, Deepest Betrayal)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Battlefield.Temple of the Dead.Activate
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Temple of the Dead.Tapped = true
+Bot1.Graveyard = Dark Ritual; Black Lotus
+Bot1.Mana = {B}{B}{B}
+Bot1.Battlefield.Swamp.Tapped = false
+Stack.Count = 0

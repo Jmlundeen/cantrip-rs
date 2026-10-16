@@ -1,0 +1,69 @@
+# The boundary of "one or fewer cards in hand": with exactly two cards in every hand the Temple of the Dead is refused, and
+# after Bot1 plays a Swamp it has exactly one and the same activation works (so the refusal is the hand size, nothing else).
+# Aclazotz died on Bot2's turn 2 (two Lightning Bolts) and came back tapped as the Temple. Bot1's hand: the Swamp left after
+# turn 1 plus its turn-3 draw (the second Swamp) = 2; Bot2's is four cards.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Aclazotz, Deepest Betrayal
+Swamp
+Mox Jet
+Swamp
+Swamp x12
+
+[Bot2 Deck]
+Lightning Bolt
+Lightning Bolt
+Mountain
+Mox Ruby
+Plains
+Plains
+Plains
+Plains x13
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Aclazotz, Deepest Betrayal.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Lightning Bolt.Cast(Aclazotz, Deepest Betrayal)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Pass
+Bot2.Hand.Lightning Bolt.Cast(Aclazotz, Deepest Betrayal)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Pass
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Temple of the Dead.Activate(Ability: Transform)
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Temple of the Dead.Activate(Ability: Transform)
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Aclazotz, Deepest Betrayal.Types = Creature
+Bot1.Battlefield.Aclazotz, Deepest Betrayal.Power = 4
+Bot1.Battlefield.Aclazotz, Deepest Betrayal.Toughness = 4
+Bot1.Battlefield.Aclazotz, Deepest Betrayal.Keywords = Flying; Lifelink
+Bot1.Battlefield.Aclazotz, Deepest Betrayal.Tapped = true
+Bot1.Battlefield.Aclazotz, Deepest Betrayal.SummoningSick = false
+Bot1.Hand.Count = 1
+Stack.Count = 0

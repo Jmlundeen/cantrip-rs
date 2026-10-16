@@ -1,0 +1,67 @@
+# "Return it to the battlefield tapped and transformed under its owner's control": Aclazotz dies while Bot2 controls it, but
+# its owner is Bot1, so the Temple of the Dead comes back under Bot1's control. Bot2 casts a Lightning Bolt at Bot1, then
+# Sudden Substitution (split second) exchanging control of the Bolt and Aclazotz: Bot2 gets Aclazotz, Bot1 gets the Bolt and aims
+# it at Aclazotz (3 damage). A second Bolt from Bot2 finishes the 4/4 (6 damage). The dies trigger is Bot2's, the Temple is
+# Bot1's (tapped); Bot1 is not hit by the first Bolt (life stays 20).
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Aclazotz, Deepest Betrayal
+Swamp
+Swamp
+Swamp
+Swamp x13
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Black Lotus
+Mox Jet
+Lightning Bolt
+Lightning Bolt
+Sudden Substitution
+Plains x13
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Aclazotz, Deepest Betrayal.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Sudden Substitution.Cast
+Bot2.Target(Stack.Lightning Bolt)
+Bot2.Target(Bot1.Battlefield.Aclazotz, Deepest Betrayal)
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Battlefield.Mox Jet.Activate
+Bot1.Target(Bot2.Battlefield.Aclazotz, Deepest Betrayal)
+Bot2.Pass
+Bot2.Hand.Lightning Bolt.Cast(Aclazotz, Deepest Betrayal)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Temple of the Dead.Tapped = true
+Bot1.Battlefield.Temple of the Dead.Types = Land
+Bot2.Battlefield.Count = 3
+Bot1.Life = 20
+Stack.Count = 0
