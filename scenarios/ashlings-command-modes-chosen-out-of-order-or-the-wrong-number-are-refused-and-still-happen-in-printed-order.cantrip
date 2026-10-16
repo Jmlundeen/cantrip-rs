@@ -1,0 +1,47 @@
+# Ashling's Command, modes 3 and 1 chosen in that order (the answer's order must not matter) - and the choice itself refused when
+# it is one mode, three modes or the same mode twice ("Choose two", CR 700.2d, 700.2). Modes 1 and 3 (CR 700.2: the chosen modes are followed in the order printed). The copy is made first, then
+# the 2 damage goes to each creature Bot1 controls, the token included: Bot1's Volcanic Villain (3/2) and its token copy both
+# die, and the token ceases to exist (CR 111.7), so only the card is in the graveyard. Damage first would have left the token
+# alive.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Sol Ring
+Volcanic Villain
+Ashling's Command
+Plains x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot2.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Volcanic Villain.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Ashling's Command.Cast
+! Bot1.Modes(1)
+! Bot1.Modes(1; 2; 3)
+! Bot1.Modes(3; 3)
+Bot1.Modes(3; 1)
+Bot1.Target(Bot1.Battlefield.Volcanic Villain)
+Bot1.Target(Bot1)
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Mox Jet; Mox Ruby; Mox Sapphire; Sol Ring
+Bot1.Graveyard = Volcanic Villain; Ashling's Command
+Stack.Count = 0

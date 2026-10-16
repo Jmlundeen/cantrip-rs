@@ -1470,7 +1470,7 @@ impl<'s> Run<'s> {
                     }
                 }
             }
-            RequestKind::ChooseModes { modes, eligible, count, at_most, .. } => {
+            RequestKind::ChooseModes { modes, .. } => {
                 let mut chosen = Vec::new();
                 for spec in action.positional() {
                     let index = match spec.trim().parse::<usize>() {
@@ -1485,8 +1485,8 @@ impl<'s> Run<'s> {
                     }
                     chosen.push(index as u8);
                 }
-                let allowed = chosen.len() >= *count as usize && chosen.len() <= (*at_most).max(*count) as usize && chosen.iter().all(|m| eligible.contains(m));
-                if allowed {
+                // The rules' own check of the answer (a mode twice is refused unless the question lets a mode repeat).
+                if check_answer(&self.game, request, &Answer::Modes(chosen)).is_ok() {
                     return fail(format!("line {line} says {text} must not be a choice the question allows, but it is"));
                 }
             }
