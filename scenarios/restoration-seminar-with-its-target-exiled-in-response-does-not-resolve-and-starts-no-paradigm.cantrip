@@ -65,5 +65,10 @@ Bot2.Pass
 ! Bot1.Accept
 
 [Expect]
+Stack.Count = 0
+Bot1.Graveyard = Restoration Seminar; Black Lotus
+Bot2.Graveyard = Lightning Bolt
+Bot1.Battlefield = Mox Pearl; Mox Pearl; Mox Ruby; Mox Sapphire
+Bot2.Battlefield.Lion Sash.Counters.PlusOnePlusOne = 1
 Exile = Ornithopter
 Bot1.Battlefield.Count = 4

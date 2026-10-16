@@ -63,6 +63,10 @@ Bot1.Target(Ornithopter)
 ? Exile = Restoration Seminar
 
 [Expect]
+Bot1.Battlefield = Mox Pearl; Mox Pearl; Mox Ruby; Mox Sapphire; Ornithopter
+Bot2.Graveyard.Count = 3
+Bot2.Life = 20
+Bot1.Life = 20
 Stack.Count = 0
 Exile = Restoration Seminar
 Bot1.Graveyard = Black Lotus; Strip Mine

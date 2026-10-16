@@ -1,0 +1,67 @@
+# Restoration Seminar and paradigm over many turns (CR 702.192a, 707.12), with Black Lotus the card that keeps going to the
+# graveyard (sacrificed for mana as a cost) and being returned.
+# Turn 3: Seminar #1 returns the sacrificed Black Lotus, and is exiled. Turn 5: the copy's trigger finds no nonland permanent
+# card in the graveyard (the Lotus is on the battlefield), so no copy is offered (`! Bot1.Accept`). Bot1 casts Seminar #2 (the
+# Lotus pays for it again and is returned by it): it is exiled too, but only one delayed trigger exists, since only the first
+# spell of that name to resolve starts it. Turn 7: the Lotus is sacrificed in the upkeep; the copy is declined, so nothing
+# returns and the trigger is still there. Turn 9: the copy is accepted and returns the Lotus; a second copy is not offered
+# (`! Bot1.Accept`), though two Seminars are in exile.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Pearl
+Mox Ruby
+Mox Sapphire
+Black Lotus
+Restoration Seminar
+Restoration Seminar
+Island x13
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Restoration Seminar.Cast(Bot1.Graveyard.Black Lotus)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Black Lotus.Tapped = false
+? Exile = Restoration Seminar
+[T5 Bot1.Main1]
+! Bot1.Accept
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Restoration Seminar.Cast(Bot1.Graveyard.Black Lotus)
+[T5 Bot1.Main2]
+? Exile = Restoration Seminar; Restoration Seminar
+? Bot1.Graveyard.Count = 0
+[T7 Bot1.Upkeep]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+[T7 Bot1.Main1]
+Bot1.Decline
+[T7 Bot1.Main2]
+? Bot1.Graveyard = Black Lotus
+[T9 Bot1.Main1]
+Bot1.Accept
+! Bot1.Accept
+[T9 Bot1.Main2]
+? Bot1.Graveyard.Count = 0
+
+[Expect]
+Stack.Count = 0
+Exile = Restoration Seminar; Restoration Seminar
+Bot1.Battlefield = Mox Pearl; Mox Pearl; Mox Ruby; Mox Sapphire; Black Lotus
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Black Lotus.Tapped = false
