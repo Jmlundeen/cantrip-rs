@@ -1,0 +1,53 @@
+# Break Out on turn 3 looks at the top six: Lightning Bolt, Elvish Mystic, Brazen Borrower, then three Forests. Bot1 reveals
+# the Elvish Mystic (the Bolt, not a creature card, is refused; the Mystic is the control), mana value 1, and chooses to put
+# it onto the battlefield: it gains haste until end of turn, so it attacks at once for 1. It is not also put into the hand.
+# By turn 5 the haste has worn off (until end of turn, CR 514.2). The library began with 12 cards: two were drawn (turns 3
+# and 5) and the Mystic taken, so 9 remain, the five other looked-at cards among them (on the bottom).
+
+[Bot1 Deck]
+Break Out
+Mountain
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Lightning Bolt
+Elvish Mystic
+Brazen Borrower
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Break Out.Cast
+! Bot1.Choose(Lightning Bolt)
+Bot1.Choose(Elvish Mystic)
+Bot1.Accept
+? Bot1.Revealed = Elvish Mystic
+? Bot1.Battlefield.Elvish Mystic.Keywords = Haste
+Bot1.Attack(Elvish Mystic)
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Elvish Mystic.Keywords = (absent)
+
+[Expect]
+Bot2.Life = 19
+Bot1.Battlefield = Mountain; Forest; Elvish Mystic
+Bot1.Battlefield.Elvish Mystic.Keywords = (absent)
+Bot1.Hand = Forest; Forest; Forest; Forest; Forest; Forest
+Bot1.Graveyard = Break Out
+Bot1.Library.Count = 9

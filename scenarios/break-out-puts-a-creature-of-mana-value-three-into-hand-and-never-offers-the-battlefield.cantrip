@@ -1,0 +1,42 @@
+# "If that card has mana value 2 or less, you may put it onto the battlefield": Brazen Borrower (mana value 3) is revealed
+# and the battlefield is not offered (`! Bot1.Accept`); it goes into the hand. Its Adventure does not make its mana value
+# anything but 3 in the library (CR 715.4). The positive control, where the question is asked, is the first break-out scenario.
+
+[Bot1 Deck]
+Break Out
+Mountain
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Lightning Bolt
+Brazen Borrower
+Lightning Bolt
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Break Out.Cast
+Bot1.Choose(Brazen Borrower)
+! Bot1.Accept
+
+[Expect]
+Bot1.Battlefield = Mountain; Forest
+Bot1.Hand = Forest; Forest; Forest; Forest; Forest; Brazen Borrower
+Bot1.Library.Count = 10

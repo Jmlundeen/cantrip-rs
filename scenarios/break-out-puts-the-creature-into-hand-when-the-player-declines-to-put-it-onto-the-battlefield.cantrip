@@ -1,0 +1,41 @@
+# "You may put it onto the battlefield": a creature card of mana value 1 revealed, Bot1 declines, so "if you didn't put the
+# revealed card onto the battlefield this way, put it into your hand": the Elvish Mystic is in the hand and not in play.
+
+[Bot1 Deck]
+Break Out
+Mountain
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Lightning Bolt
+Elvish Mystic
+Lightning Bolt
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Break Out.Cast
+Bot1.Choose(Elvish Mystic)
+Bot1.Decline
+
+[Expect]
+Bot1.Battlefield = Mountain; Forest
+Bot1.Hand = Forest; Forest; Forest; Forest; Forest; Elvish Mystic
+Bot1.Library.Count = 10

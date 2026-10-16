@@ -1,0 +1,32 @@
+# A library of three cards (one drawn on turn 3) shows the two that remain (CR 609.3): the Elvish Mystic is revealed and
+# put onto the battlefield, and the Lightning Bolt goes to the bottom, which is all the library holds.
+
+[Bot1 Deck]
+Break Out
+Mountain
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Elvish Mystic
+Lightning Bolt
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Break Out.Cast
+Bot1.Choose(Elvish Mystic)
+Bot1.Accept
+
+[Expect]
+Bot1.Battlefield = Mountain; Forest; Elvish Mystic
+Bot1.Library = Lightning Bolt
+Bot1.Hand = Forest; Forest; Forest; Forest; Forest

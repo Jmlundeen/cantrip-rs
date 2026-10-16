@@ -1,0 +1,41 @@
+# The boundary of "mana value 2 or less": Sylvan Caryatid ({1}{G}, mana value 2) is revealed and may be put onto the
+# battlefield, which Bot1 does (the question is asked and accepted).
+
+[Bot1 Deck]
+Break Out
+Mountain
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Lightning Bolt
+Sylvan Caryatid
+Lightning Bolt
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Break Out.Cast
+Bot1.Choose(Sylvan Caryatid)
+Bot1.Accept
+
+[Expect]
+Bot1.Battlefield = Mountain; Forest; Sylvan Caryatid
+Bot1.Hand = Forest; Forest; Forest; Forest; Forest
+Bot1.Library.Count = 10

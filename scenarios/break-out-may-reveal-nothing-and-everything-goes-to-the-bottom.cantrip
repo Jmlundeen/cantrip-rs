@@ -1,0 +1,41 @@
+# "You may reveal a creature card": with an Elvish Mystic among the six Bot1 chooses none. Nothing is revealed, nothing is
+# put into the hand or onto the battlefield, and all six go to the bottom (the library keeps its size: 12 - 1 drawn).
+
+[Bot1 Deck]
+Break Out
+Mountain
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Lightning Bolt
+Elvish Mystic
+Lightning Bolt
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Break Out.Cast
+Bot1.Choose()
+? Bot1.Revealed = (absent)
+
+[Expect]
+Bot1.Battlefield = Mountain; Forest
+Bot1.Hand = Forest; Forest; Forest; Forest; Forest
+Bot1.Library.Count = 11

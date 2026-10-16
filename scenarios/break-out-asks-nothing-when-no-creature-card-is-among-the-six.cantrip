@@ -1,0 +1,40 @@
+# No creature card among the top six (instants and Forests): nobody is asked to reveal anything (`! Bot1.Choose`), nothing
+# is revealed, and the six go to the bottom.
+
+[Bot1 Deck]
+Break Out
+Mountain
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Lightning Bolt
+Forest
+Lightning Bolt
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Break Out.Cast
+! Bot1.Choose
+
+[Expect]
+Bot1.Battlefield = Mountain; Forest
+Bot1.Hand = Forest; Forest; Forest; Forest; Forest
+Bot1.Library.Count = 11
