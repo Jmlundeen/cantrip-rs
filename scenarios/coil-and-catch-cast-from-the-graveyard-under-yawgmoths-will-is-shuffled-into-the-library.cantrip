@@ -1,0 +1,63 @@
+# An omen card may be cast as its Omen wherever the card may be cast (CR 720.3, 601.3), not only from the hand. On turn 3
+# Bot1 casts Coil and Catch from the hand, draws three (another Marang River Regent among them) and discards that Regent.
+# On turn 5, with mana for {3}{U} open, nothing yet lets Bot1 cast from its graveyard, so the Regent there offers no cast at
+# all; then Yawgmoth's Will ("you may play lands and cast spells from your graveyard") does, and Bot1 casts Coil and Catch
+# from the graveyard. It resolves: Bot1 draws three and discards an Island, which Yawgmoth's Will exiles instead, and Coil
+# and Catch is shuffled into the library (CR 720.3d) - it was not going to the graveyard, so Yawgmoth's Will does not exile
+# it. Every count holds whatever the shuffles did: the library is 19 cards less 7, the two draws and the six cards the two
+# Omens drew, plus the two Regents shuffled back in, 6.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Sol Ring
+Marang River Regent
+Yawgmoth's Will
+Island
+Island
+Marang River Regent
+Island
+Island
+Island x8
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Jet.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Marang River Regent.Cast(Ability: Omen)
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Choose(Marang River Regent)
+? Bot1.Graveyard = Marang River Regent
+? Bot1.Library.Count = 9
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+! Bot1.Graveyard.Marang River Regent.Cast
+Bot1.Hand.Yawgmoth's Will.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Graveyard.Marang River Regent.Cast(Ability: Omen)
+Bot1.Battlefield.Island#3.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+? Stack = Coil and Catch
+Bot1.Choose(Island)
+[T5 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard.Count = 0
+Exile = Yawgmoth's Will; Island
+Bot1.Library.Count = 6
+Bot1.Hand.Count = 5
+Bot1.Battlefield = Island; Island; Island; Mox Sapphire; Mox Jet; Sol Ring

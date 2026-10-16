@@ -1,0 +1,44 @@
+# Marang River Regent's Omen, Coil and Catch, is an instant (CR 720.3a: only the Omen's characteristics are evaluated
+# to cast it), so Bot1 casts it from the hand in Bot2's upkeep for {3}{U}, though the Regent itself is a creature. On
+# the stack it is Coil and Catch. "Draw three cards, then discard a card": Bot1 draws the Plains, Swamp and Forest on top
+# of its library and discards the Swamp. Then it is shuffled into Bot1's library (CR 720.3d): eleven cards less three plus
+# one, nine.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Sol Ring
+Marang River Regent
+Island
+Island
+Plains
+Swamp
+Forest
+Island x8
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Jet.Activate
+[T2 Bot2.Upkeep]
+Bot1.Hand.Marang River Regent.Cast(Ability: Omen)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+? Stack = Coil and Catch
+Bot1.Choose(Swamp)
+[T2 Bot2.Main1]
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand = Island; Island; Plains; Forest
+Bot1.Graveyard = Swamp
+Bot1.Library.Count = 9
+Exile.Count = 0
+Bot1.Battlefield = Island; Mox Sapphire; Mox Jet; Sol Ring

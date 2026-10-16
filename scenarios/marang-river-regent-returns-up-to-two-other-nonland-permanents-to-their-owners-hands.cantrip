@@ -1,0 +1,58 @@
+# Marang River Regent cast as itself ({4}{U}{U}: Black Lotus for blue, Sol Ring and an Island) is a 6/7 flying Dragon.
+# "When this creature enters, return up to two other target nonland permanents to their owners' hands": the Regent itself
+# ("other") and a land ("nonland") are not among the choices; Bot2's Llanowar Elves and Mox Emerald are, and both go
+# back to Bot2's hand together. Bot2's Ornithopter, not chosen, stays.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Sol Ring
+Black Lotus
+Marang River Regent
+Island
+Island
+Island x8
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Ornithopter
+Forest
+Forest
+Forest
+Forest x8
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Marang River Regent.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Island#1.Activate
+! Bot1.Target(Bot1.Battlefield.Marang River Regent)
+! Bot1.Target(Bot2.Battlefield.Forest)
+Bot1.Target(Bot2.Battlefield.Llanowar Elves; Bot2.Battlefield.Mox Emerald)
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Island; Island; Mox Sapphire; Sol Ring; Marang River Regent
+Bot1.Battlefield.Marang River Regent.Keywords = Flying
+Bot1.Battlefield.Marang River Regent.Power = 6
+Bot1.Battlefield.Marang River Regent.Toughness = 7
+Bot1.Graveyard = Black Lotus
+Bot2.Battlefield = Forest; Ornithopter
+Bot2.Hand.Count = 6
+Bot2.Graveyard.Count = 0
