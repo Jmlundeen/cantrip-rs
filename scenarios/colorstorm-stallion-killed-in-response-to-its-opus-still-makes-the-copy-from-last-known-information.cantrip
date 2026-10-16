@@ -1,0 +1,62 @@
+# Colorstorm Stallion's opus trigger, from Bot1's Mind Twist for X = 4 (five mana), is on the stack when Bot2 Bolts the Stallion (paying
+# ward {1} with its Mox Ruby). The Stallion dies before the trigger resolves. The trigger still resolves (CR 608.2h, 113.7a): the +1/+1
+# has nothing to apply to, but five mana was spent on the spell, so a token that's a copy of the Stallion as it last existed is created
+# (CR 707.2). The Mind Twist then resolves: Bot2 discards 4. Bot1 ends with a 3/3 Stallion token and the original in the graveyard.
+
+[Bot1 Deck]
+Mountain
+Swamp
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Colorstorm Stallion
+Mind Twist
+Island x13
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt
+Island x17
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Colorstorm Stallion.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Mind Twist.Cast(Bot2; X: 4)
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Colorstorm Stallion)
+Bot2.PayCost
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Graveyard.Count = 2
+Bot1.Battlefield.Colorstorm Stallion.Token = true
+Bot1.Battlefield.Colorstorm Stallion.Power = 3
+Bot1.Battlefield.Count = 6
