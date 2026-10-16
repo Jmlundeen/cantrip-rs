@@ -1,0 +1,63 @@
+# "Planeswalkers you control have '[-10]: ...'" (CR 613.1f): Bot1's Avatar gives it to Bot1's planeswalkers only. Both players
+# have a Jace token with 10 loyalty (Bot1: Avatar's landfall 2 + Jace's Machinations 8; Bot2: Jace's Machinations 8 + Fatehold
+# Charm's empower Jace 2). Bot1's Jace offers the -10 and uses it (the positive control; one land, so one counter on the
+# Avatar, and the token is left with no loyalty and is put into the graveyard, ceasing to exist, CR 704.5i). On turn 2 Bot2's
+# Jace, though it has the loyalty, is refused the -10: it is not Bot1's.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Sapphire
+Avatar of Burgeoning Echoes
+Island
+Black Lotus
+Jace's Machinations
+Island x20
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Pearl
+Black Lotus
+Jace's Machinations
+Fatehold Charm
+Island
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Avatar of Burgeoning Echoes.Cast
+Bot2.Pass
+Bot1.Hand.Island.Play
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Jace's Machinations.Cast
+Bot2.Pass
+? Bot1.Battlefield.Jace.Counters.Loyalty = 10
+Bot1.Battlefield.Jace.Activate(Ability: Put a +1/+1 counter; Bot1.Battlefield.Avatar of Burgeoning Echoes)
+Bot2.Pass
+? Bot1.Battlefield.Avatar of Burgeoning Echoes.Counters.PlusOnePlusOne = 1
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Jace's Machinations.Cast
+Bot1.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Fatehold Charm.Cast
+Bot2.Modes(Draw a card)
+Bot1.Pass
+? Bot2.Battlefield.Jace.Counters.Loyalty = 10
+! Bot2.Battlefield.Jace.Activate(Ability: Put a +1/+1 counter)
+Bot2.Battlefield.Jace.Activate(Ability: Surveil)
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield = Mox Emerald; Mox Sapphire; Avatar of Burgeoning Echoes; Island
+Bot2.Battlefield.Jace.Counters.Loyalty = 9
+Bot1.Battlefield.Avatar of Burgeoning Echoes.Counters.PlusOnePlusOne = 1

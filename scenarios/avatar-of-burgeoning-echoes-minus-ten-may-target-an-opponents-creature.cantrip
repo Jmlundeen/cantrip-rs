@@ -1,0 +1,52 @@
+# The granted -10 says "target creature", not "you control": Bot1's Jace token (Avatar's landfall 2 and Jace's Machinations 8,
+# all on turn 1) targets Bot2's Ornithopter on turn 3 and puts a +1/+1 counter on it for each land Bot1 controls (the Island,
+# and a second one played on turn 3: two counters, "you" being the planeswalker's controller and not the creature's). The
+# Avatar gets none.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Sapphire
+Avatar of Burgeoning Echoes
+Island
+Black Lotus
+Jace's Machinations
+Island
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Island x25
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Avatar of Burgeoning Echoes.Cast
+Bot2.Pass
+Bot1.Hand.Island.Play
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Jace's Machinations.Cast
+Bot2.Pass
+? Bot1.Battlefield.Jace.Counters.Loyalty = 10
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Jace.Counters.Loyalty = 12
+Bot1.Battlefield.Jace.Activate(Ability: Put a +1/+1 counter; Bot2.Battlefield.Ornithopter)
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 2
+Bot2.Battlefield.Ornithopter.Power = 2
+Bot2.Battlefield.Ornithopter.Toughness = 4
+Bot1.Battlefield.Jace.Counters.Loyalty = 2
+Bot1.Battlefield.Avatar of Burgeoning Echoes.Power = 2
+Bot1.Battlefield.Avatar of Burgeoning Echoes.Toughness = 3
+Stack.Count = 0

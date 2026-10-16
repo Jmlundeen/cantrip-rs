@@ -1,0 +1,51 @@
+# The -10 is granted by the Avatar's static ability (CR 604.1, 613.1f), so a planeswalker has it only while the Avatar is on the
+# battlefield. On turn 1 Bot1 makes a Jace token with 10 loyalty without the Avatar (Jace's Machinations 8 and Fatehold Charm's
+# empower Jace 2): its -10 is refused. On turn 3 Bot1 draws and casts the Avatar: the same Jace, with the same 10 loyalty, is now
+# offered the -10 and uses it on the Avatar. One land (the Plains played on turn 1) is counted, so one +1/+1 counter, and the
+# token is left with no loyalty and is put into the graveyard, where it ceases to exist (CR 704.5i, 111.7).
+
+[Bot1 Deck]
+Plains
+Mox Sapphire
+Mox Sapphire
+Mox Emerald
+Black Lotus
+Jace's Machinations
+Fatehold Charm
+Avatar of Burgeoning Echoes
+Island x20
+
+[Bot2 Deck]
+Island x25
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Jace's Machinations.Cast
+Bot2.Pass
+? Bot1.Battlefield.Jace.Counters.Loyalty = 8
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Hand.Fatehold Charm.Cast
+Bot1.Modes(Draw a card)
+Bot2.Pass
+? Bot1.Battlefield.Jace.Counters.Loyalty = 10
+! Bot1.Battlefield.Jace.Activate(Ability: Put a +1/+1 counter)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Avatar of Burgeoning Echoes.Cast
+Bot2.Pass
+? Bot1.Battlefield.Jace.Counters.Loyalty = 10
+Bot1.Battlefield.Jace.Activate(Ability: Put a +1/+1 counter; Bot1.Battlefield.Avatar of Burgeoning Echoes)
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Plains; Mox Sapphire; Mox Sapphire; Mox Emerald; Avatar of Burgeoning Echoes
+Bot1.Battlefield.Avatar of Burgeoning Echoes.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Avatar of Burgeoning Echoes.Power = 3
+Stack.Count = 0
