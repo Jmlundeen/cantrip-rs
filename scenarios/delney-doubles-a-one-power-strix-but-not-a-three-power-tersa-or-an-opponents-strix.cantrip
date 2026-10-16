@@ -1,0 +1,62 @@
+# Delney, Streetwise Lookout: "If a triggered ability of a creature you control with power 2 or less triggers, that ability
+# triggers an additional time" (CR 603.2d). Bot1's Baleful Strix (1/1) enters and its draw triggers twice; Bot1's Tersa
+# Lightshatter (3/3) enters and its discard-and-draw triggers once (one Island discarded - a second copy would discard two
+# more by default); Bot2's Strix, not Bot1's, draws once.
+# Bot1: turn 1 Delney (Plains, Mox Pearl, Mox Jet) and Mox Sapphire; turn 3 Mox Ruby, the Strix (Sapphire, Jet) and Tersa
+# (Ruby, Plains, Pearl). Hand: 7 - 5 = 2; turn 3 draws the Ruby (3), casts it, the Strix and Tersa (0) and draws two (2),
+# then Tersa discards an Island and draws one (2).
+# Bot2: turn 2, 8 cards, casts two Moxen and the Strix (5) and draws one (6).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Delney, Streetwise Lookout
+Mox Sapphire
+Baleful Strix
+Tersa Lightshatter
+Mox Ruby
+Island x15
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Jet
+Baleful Strix
+Island x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Delney, Streetwise Lookout.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Baleful Strix.Cast
+[T2 Bot2.Main2]
+? Bot2.Hand.Count = 6
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Baleful Strix.Cast
+Bot1.Pass
+Bot1.Triggers(Baleful Strix; Baleful Strix)
+? Stack.Count = 2
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Tersa Lightshatter.Cast
+Bot1.Choose(Island)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 2
+Bot1.Graveyard = Island
+Bot2.Hand.Count = 6

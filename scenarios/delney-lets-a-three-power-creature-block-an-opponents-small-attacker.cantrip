@@ -1,0 +1,47 @@
+# Delney, Streetwise Lookout's evasion is for creatures its controller controls (CR 509.1b): Bot2's Elvish Mystic (1/1)
+# attacks Bot1, and Bot1's Tersa Lightshatter (3/3) may block it and kills it.
+# Bot1: turn 1 Delney (Plains, Mox Pearl, Mox Jet) and Mox Ruby; turn 3 Tersa (Ruby, Plains, Pearl), discarding nothing.
+# Bot2: turn 2 the Mystic (Forest); turn 4 it attacks.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Delney, Streetwise Lookout
+Tersa Lightshatter
+Island
+Island x15
+
+[Bot2 Deck]
+Forest
+Elvish Mystic
+Forest x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Delney, Streetwise Lookout.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Tersa Lightshatter.Cast
+Bot1.Choose()
+[T4 Bot2.Main1]
+Bot2.Attack(Elvish Mystic > Bot1)
+Bot1.Block(Tersa Lightshatter > Elvish Mystic)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Graveyard = Elvish Mystic

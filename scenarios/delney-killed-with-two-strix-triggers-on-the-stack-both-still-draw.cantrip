@@ -1,0 +1,53 @@
+# A triggered ability that has triggered an additional time stays triggered when the effect that doubled it ends (CR 603.2d,
+# 603.3): Delney, Streetwise Lookout makes Bot1's Baleful Strix draw trigger twice, and Bot2 Lightning Bolts Delney with
+# both on the stack. Both still resolve: two cards. A second Strix after Delney is gone draws one.
+# Bot1: turn 1 Delney (Plains, Mox Pearl, Mox Jet) and Mox Sapphire; turn 3 the first Strix (Sapphire, Jet); turn 5 the
+# second. Hand: 7 - 5 = 2 (two Strix); turn 3 draws (3), casts one (2), draws two (4); turn 5 draws (5), casts the other
+# (4), draws one (5).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Delney, Streetwise Lookout
+Mox Sapphire
+Baleful Strix
+Baleful Strix
+Island x15
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Delney, Streetwise Lookout.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Baleful Strix.Cast
+Bot1.Pass
+Bot1.Triggers(Baleful Strix; Baleful Strix)
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Delney, Streetwise Lookout)
+[T3 Bot1.Main2]
+? Bot1.Graveyard = Delney, Streetwise Lookout
+? Bot1.Hand.Count = 4
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Baleful Strix.Cast
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 5

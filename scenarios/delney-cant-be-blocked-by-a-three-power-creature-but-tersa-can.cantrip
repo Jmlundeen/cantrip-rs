@@ -1,0 +1,61 @@
+# Delney, Streetwise Lookout: "Creatures you control with power 2 or less can't be blocked by creatures with power 3 or
+# greater" (CR 509.1b). Delney (2/2) and Tersa Lightshatter (3/3) attack Bot2, who has Hero of Bladehold (3/4) and an
+# Elvish Mystic (1/1): the Hero may not block Delney, but may block Tersa (a 3-power attacker), and the Mystic may block
+# Delney. Tersa and the Hero trade 3 damage each - Tersa dies, the Hero lives - and Delney kills the Mystic.
+# Bot1: turn 1 Delney (Plains, Mox Pearl, Mox Jet) and Mox Ruby; turn 3 Tersa (Ruby, Plains, Pearl), discarding nothing,
+# and the attack. Bot2: turn 2 the Hero (Black Lotus WWW and a Plains) and the Mystic (Mox Emerald).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Delney, Streetwise Lookout
+Tersa Lightshatter
+Island
+Island x15
+
+[Bot2 Deck]
+Plains
+Black Lotus
+Hero of Bladehold
+Mox Emerald
+Elvish Mystic
+Plains x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Delney, Streetwise Lookout.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Hero of Bladehold.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Tersa Lightshatter.Cast
+Bot1.Choose()
+Bot1.Attack(Delney, Streetwise Lookout > Bot2; Tersa Lightshatter > Bot2)
+! Bot2.Block(Hero of Bladehold > Delney, Streetwise Lookout)
+Bot2.Block(Hero of Bladehold > Tersa Lightshatter; Elvish Mystic > Delney, Streetwise Lookout)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot1.Graveyard = Tersa Lightshatter
+Bot1.Battlefield = Plains; Mox Pearl; Mox Jet; Mox Ruby; Delney, Streetwise Lookout
+Bot2.Battlefield = Plains; Mox Emerald; Hero of Bladehold
+Bot2.Battlefield.Hero of Bladehold.Damage = 3
