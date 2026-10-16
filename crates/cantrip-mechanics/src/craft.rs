@@ -57,7 +57,7 @@ fn exiled_materials(q: &dyn Query, source: ObjectId, ability: AbilityRef) -> Vec
 
 /// Craft with `materials` `mana` (CR 702.167a): the mana, the exile of this permanent and of the materials, at sorcery
 /// speed. `text` is the printed line, "Craft with artifact {3}{R}{R}".
-pub const fn ability(mana: ManaCost, materials: Materials, text: &'static str) -> AbilityDef {
+pub const fn ability(mana: ManaCost, materials: &'static Materials, text: &'static str) -> AbilityDef {
     let cost = Cost { materials: Some(materials), ..Cost::mana(mana).and(EXILE_THIS) };
     cantrip_api::ability(cost, return_transformed, text).sorcery_speed()
 }

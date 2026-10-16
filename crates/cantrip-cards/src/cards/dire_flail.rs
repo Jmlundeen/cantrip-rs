@@ -107,7 +107,7 @@ pub static BACK: CardDef = CardDef {
 };
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[equip(mana("{1}"), "Equip {1}"), craft::ability(mana("{3}{R}{R}"), craft::ARTIFACT, "Craft with artifact {3}{R}{R}")],
+    abilities: &[equip(mana("{1}"), "Equip {1}"), craft::ability(mana("{3}{R}{R}"), &craft::ARTIFACT, "Craft with artifact {3}{R}{R}")],
     statics: &[static_ability(Layer::PtModify, attached_object, plus_two_power, "Equipped creature gets +2/+0.")],
     back: Some(&BACK),
     ..oracle::DIRE_FLAIL

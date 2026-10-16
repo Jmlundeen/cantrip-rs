@@ -416,7 +416,7 @@ pub struct Cost {
     /// Craft's materials (CR 702.167a): "Exile [materials] from among permanents you control and/or cards in your
     /// graveyard", chosen as the cost is chosen (CR 601.2h by way of 602.2b) and exiled as it is paid, together with
     /// the source when the cost also exiles it (`exile_self`). Only an activated ability's cost carries it.
-    pub materials: Option<Materials>,
+    pub materials: Option<&'static Materials>,
 }
 
 /// What a craft ability exiles besides its source (CR 702.167a): `count` objects, or `count` or more, from among the
