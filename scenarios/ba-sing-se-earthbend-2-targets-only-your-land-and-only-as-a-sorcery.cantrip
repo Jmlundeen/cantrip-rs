@@ -1,0 +1,48 @@
+# Ba Sing Se: "{2}{G}, {T}: Earthbend 2. Activate only as a sorcery." The ability targets a land you control (CR 701.66a):
+# Bot2's Mountain is refused as a target in Bot1's main phase on turn 3. In Bot2's turn 4 the whole ability is refused
+# although Bot1 holds untapped Forest, Mox Jet and Mox Ruby for its {2}{G} (sorcery speed, CR 602.5d). On turn 5 the same
+# payment earthbends Bot1's Forest: a 0/0 land creature with haste and two +1/+1 counters, so a 2/2, that is still a land.
+# Ba Sing Se itself is tapped for the cost and stays a plain land.
+
+[Bot1 Deck]
+Forest
+Ba Sing Se
+Mox Jet
+Mox Ruby
+Mox Pearl
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Mountain
+Mountain x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Ba Sing Se.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+! Bot1.Battlefield.Ba Sing Se.Activate(Ability: Earthbend; Bot2.Battlefield.Mountain)
+[T4 Bot2.Main1]
+! Bot1.Battlefield.Ba Sing Se.Activate(Ability: Earthbend; Bot1.Battlefield.Forest)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Ba Sing Se.Activate(Ability: Earthbend; Bot1.Battlefield.Forest)
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Forest.Power = 2
+Bot1.Battlefield.Forest.Toughness = 2
+Bot1.Battlefield.Forest.Types = Land; Creature
+Bot1.Battlefield.Forest.Keywords = Haste
+Bot1.Battlefield.Forest.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Forest.Tapped = true
+Bot1.Battlefield.Ba Sing Se.Tapped = true
+Bot1.Battlefield.Ba Sing Se.Types = Land
+Bot2.Battlefield.Mountain.Types = Land

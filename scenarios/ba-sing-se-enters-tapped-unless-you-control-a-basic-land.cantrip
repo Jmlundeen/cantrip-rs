@@ -1,0 +1,26 @@
+# Ba Sing Se: "This land enters tapped unless you control a basic land." Bot1's only other land is a Tundra (the Plains
+# and Island types, but not basic, CR 205.4a), so its Ba Sing Se enters tapped; Bot2's own Ba Sing Se beside its Forest
+# (basic) enters untapped, the positive control (the same land, the same game).
+
+[Bot1 Deck]
+Tundra
+Ba Sing Se
+Island x20
+
+[Bot2 Deck]
+Forest
+Ba Sing Se
+Island x20
+
+[Actions]
+Bot1.Hand.Tundra.Play
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Ba Sing Se.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Ba Sing Se.Play
+
+[Expect]
+Bot1.Battlefield.Ba Sing Se.Tapped = true
+Bot2.Battlefield.Ba Sing Se.Tapped = false
+Bot1.Battlefield.Ba Sing Se.Types = Land

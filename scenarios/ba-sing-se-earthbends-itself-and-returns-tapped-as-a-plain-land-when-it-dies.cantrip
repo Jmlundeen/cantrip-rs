@@ -1,0 +1,43 @@
+# Ba Sing Se may earthbend itself: it is tapped for the cost and becomes a 2/2 haste land creature. Lightning Bolt (3
+# damage) kills it, and earthbend's delayed ability (CR 701.66a) returns it to the battlefield tapped: a new object
+# (CR 400.7), a plain land again with no counters, no haste and no longer a creature.
+
+[Bot1 Deck]
+Forest
+Ba Sing Se
+Mox Jet
+Mox Ruby
+Forest x13
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain
+Mountain x13
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Ba Sing Se.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Ba Sing Se.Activate(Ability: Earthbend; Bot1.Battlefield.Ba Sing Se)
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Ba Sing Se.Power = 2
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ba Sing Se)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot2.Graveyard = Lightning Bolt
+Bot1.Battlefield.Ba Sing Se.Tapped = true
+Bot1.Battlefield.Ba Sing Se.Types = Land
+Bot1.Battlefield.Ba Sing Se.Keywords = (absent)
+Bot1.Battlefield.Ba Sing Se.Counters.PlusOnePlusOne = (absent)
+Bot1.Graveyard.Count = 0
