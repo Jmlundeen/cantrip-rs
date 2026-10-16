@@ -479,6 +479,8 @@ pub enum EffectKind {
     Goaded,
     /// "Can't block" (CR 509.1b) for as long as the effect lasts.
     CantBlock,
+    /// "Can't attack" (CR 508.1c) for as long as the effect lasts: a restriction on declaring the creature as an attacker.
+    CantAttack,
     /// The permanent is harnessed (CR 701.64): a designation it keeps as long as it stays where it is
     /// (`Duration::Indefinite`), which turns its infinity abilities on (CR 702.186).
     Harnessed,

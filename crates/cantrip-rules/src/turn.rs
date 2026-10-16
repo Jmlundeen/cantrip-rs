@@ -426,6 +426,8 @@ fn declare_attackers(cx: &mut Cx) -> R<()> {
                 && !chars.is(CardType::Battle)
                 && !obj.tapped
                 && (!chars.has(Keyword::Defender) || cx.s().effects.iter().any(|e| e.affected == id && e.kind == EffectKind::CanAttackDespiteDefender))
+                // CR 508.1c: an effect saying it can't attack.
+                && !cx.s().effects.iter().any(|e| e.affected == id && e.kind == EffectKind::CantAttack)
                 && !summoning_sick(cx.cards(), cx.s(), id)
         })
         .collect();
