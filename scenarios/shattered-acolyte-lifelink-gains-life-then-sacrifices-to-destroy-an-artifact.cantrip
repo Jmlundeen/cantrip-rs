@@ -1,0 +1,43 @@
+# Shattered Acolyte has lifelink (CR 702.15): its 2 combat damage to Bot2 gains Bot1 2 life (22, Bot2 18). After combat,
+# "{1}, Sacrifice this creature: Destroy target artifact or enchantment" (CR 602.2b) pays the {1} and the sacrifice as
+# costs and destroys Bot2's Sol Ring; the Acolyte goes to the graveyard.
+
+[Bot1 Deck]
+Plains
+Plains
+Shattered Acolyte
+Plains x3
+Plains x10
+
+[Bot2 Deck]
+Forest
+Sol Ring
+Forest x5
+Forest x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Shattered Acolyte.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Attack(Shattered Acolyte > Bot2)
+[T5 Bot1.Main2]
+? Bot1.Life = 22
+? Bot2.Life = 18
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Shattered Acolyte.Activate(Sol Ring)
+
+[Expect]
+Bot1.Life = 22
+Bot2.Life = 18
+Bot1.Graveyard = Shattered Acolyte
+Bot2.Graveyard = Sol Ring
+Bot2.Battlefield = Forest

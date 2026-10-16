@@ -1,0 +1,46 @@
+# "Destroy target artifact or enchantment" (CR 115.1): Bot2's Elvish Mystic (a creature) and Forest (a land) are refused as
+# targets; the Fastbond enchantment, beside them, is the positive control and is destroyed. With no artifact or
+# enchantment on the battlefield (turn 3) the ability cannot be activated at all.
+
+[Bot1 Deck]
+Plains
+Plains
+Shattered Acolyte
+Plains x3
+Plains x10
+
+[Bot2 Deck]
+Forest
+Elvish Mystic
+Fastbond
+Forest x4
+Forest x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Shattered Acolyte.Cast
+Bot1.Pass
+! Bot1.Battlefield.Shattered Acolyte.Activate
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Fastbond.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+! Bot1.Battlefield.Shattered Acolyte.Activate(Bot2.Battlefield.Elvish Mystic)
+! Bot1.Battlefield.Shattered Acolyte.Activate(Bot2.Battlefield.Forest)
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Shattered Acolyte.Activate(Fastbond)
+
+[Expect]
+Bot1.Graveyard = Shattered Acolyte
+Bot2.Graveyard = Fastbond
+Bot2.Battlefield = Forest; Forest; Elvish Mystic
