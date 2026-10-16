@@ -1,0 +1,35 @@
+# Free the Fae: "Mill four cards. Then put an instant, sorcery, or Faerie card from among the milled cards into your hand." Bot1 mills Lightning Bolt (instant),
+# Unearth (sorcery), Brazen Borrower (a Faerie creature card) and Bonecrusher Giant (an Adventurer card, which is no instant or sorcery card in a graveyard,
+# CR 715.4, and no Faerie) and takes the sorcery card; the other three stay in the graveyard and the fifth card of the library is not touched.
+
+[Bot1 Deck]
+Picklock Prankster
+Island
+Island
+Mox Sapphire
+Swamp
+Swamp
+Swamp
+Lightning Bolt
+Unearth
+Brazen Borrower
+Bonecrusher Giant
+Ornithopter
+Island x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Picklock Prankster.Cast(Ability: Free the Fae)
+Bot1.Choose(Unearth)
+
+[Expect]
+Bot1.Hand = Island; Swamp; Swamp; Swamp; Unearth
+Bot1.Graveyard = Bonecrusher Giant; Brazen Borrower; Lightning Bolt
+Exile = Picklock Prankster
+Bot1.Library.Count = 9

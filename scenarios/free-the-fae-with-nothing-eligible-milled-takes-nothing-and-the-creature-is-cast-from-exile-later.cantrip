@@ -1,0 +1,38 @@
+# Free the Fae with no instant, sorcery or Faerie card among the four milled (Bonecrusher Giant is an Adventurer card, so neither an instant nor a sorcery in a
+# graveyard, CR 715.4; Ornithopter and two Swamps are no Faerie): nothing is asked and nothing goes to hand (the choice is not "up to", but there is no card
+# to take). The Adventure exiles the card (CR 715.4a), and on turn 3 Bot1 casts Picklock Prankster from exile.
+
+[Bot1 Deck]
+Picklock Prankster
+Island
+Island
+Mox Sapphire
+Swamp
+Swamp
+Swamp
+Bonecrusher Giant
+Ornithopter
+Swamp
+Swamp
+Island x9
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Picklock Prankster.Cast(Ability: Free the Fae)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Exile.Picklock Prankster.Cast
+
+[Expect]
+Exile.Count = 0
+Bot1.Hand.Count = 4
+Bot1.Graveyard = Swamp; Swamp; Ornithopter; Bonecrusher Giant
+Bot1.Battlefield = Island; Island; Mox Sapphire; Picklock Prankster

@@ -1,0 +1,44 @@
+# CR 612: Artificial Evolution changes "Faerie" to "Giant" in Free the Fae on the stack, so its "Faerie card" is a Giant card. The milled Brazen Borrower (a Faerie)
+# is no longer eligible and the Bonecrusher Giant (a Giant, an Adventurer card) is: the only choice is the Giant, and the Borrower stays in the graveyard.
+
+[Bot1 Deck]
+Picklock Prankster
+Artificial Evolution
+Island
+Island
+Mox Sapphire
+Swamp
+Swamp
+Swamp
+Brazen Borrower
+Bonecrusher Giant
+Ornithopter
+Swamp
+Swamp
+Island x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Picklock Prankster.Cast(Ability: Free the Fae)
+Bot1.Hand.Artificial Evolution.Cast(Stack.Free the Fae)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Faerie)
+Bot1.Modes(Giant)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Bonecrusher Giant)
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand = Bonecrusher Giant; Swamp; Swamp; Swamp
+Bot1.Graveyard = Swamp; Ornithopter; Brazen Borrower; Artificial Evolution

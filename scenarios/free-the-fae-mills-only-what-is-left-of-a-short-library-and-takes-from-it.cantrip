@@ -1,0 +1,30 @@
+# Bot1's library holds two cards when Free the Fae resolves (four were to be milled): both are milled (CR 701.17b), the Lightning Bolt is taken, the library is
+# empty, and Bot1 has not lost (it loses only by drawing from it, CR 704.5b).
+
+[Bot1 Deck]
+Picklock Prankster
+Island
+Island
+Mox Sapphire
+Swamp
+Swamp
+Swamp
+Lightning Bolt
+Swamp
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Picklock Prankster.Cast(Ability: Free the Fae)
+Bot1.Choose(Lightning Bolt)
+
+[Expect]
+Result = InProgress
+Bot1.Hand = Island; Swamp; Swamp; Swamp; Lightning Bolt
+Bot1.Graveyard = Swamp
+Bot1.Library.Count = 0
