@@ -1,0 +1,44 @@
+# Volcanic Villain: "Power-up — {5}{R}: Put two +1/+1 counters on this creature." The turn it enters, its mana cost
+# {2}{R} takes the {R} off the red and {2} off the generic (CR 702.193b, 118.7): {3} is left, paid with Mana Crypt's
+# {C}{C} and Mox Pearl's {W}, no red. It ends a 5/4 with haste.
+
+[Bot1 Deck]
+Mountain
+Mox Jet
+Sol Ring
+Mana Crypt
+Mox Pearl
+Volcanic Villain
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mana Crypt.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Volcanic Villain.Cast
+Bot1.Pass
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Volcanic Villain.Activate
+? Bot1.Mana =
+Bot1.Pass
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Volcanic Villain.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Volcanic Villain.Power = 5
+Bot1.Battlefield.Volcanic Villain.Toughness = 4
+Bot1.Battlefield.Volcanic Villain.Keywords = Haste
