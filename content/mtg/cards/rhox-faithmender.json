@@ -1,0 +1,11 @@
+{
+  "name": "Rhox Faithmender",
+  "manaCost": "{3}{W}",
+  "type": "Creature — Rhino Monk",
+  "power": 1,
+  "toughness": 5,
+  "oracleText": "Lifelink (Damage dealt by this creature also causes you to gain that much life.)\nIf you would gain life, you gain twice that much life instead.",
+  "keywords": [
+    "Lifelink"
+  ]
+}

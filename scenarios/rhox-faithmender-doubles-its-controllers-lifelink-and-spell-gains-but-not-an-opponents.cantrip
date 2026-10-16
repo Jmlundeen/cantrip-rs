@@ -1,0 +1,57 @@
+# Rhox Faithmender: "Lifelink" and "If you would gain life, you gain twice that much life instead." On turn 3 it attacks
+# and its 1 combat damage gains Bot1 1 life by lifelink, doubled to 2 (20 -> 22); Bot1's Lightning Helix then gains 3,
+# doubled to 6 (22 -> 28). Bot2's own Lightning Helix on turn 4 gains Bot2 3 life, not doubled: "you" is the
+# Faithmender's controller (20 - 1 - 3 + 3 = 19), and deals Bot1 3 (28 -> 25).
+
+[Bot1 Deck]
+Plains
+Sol Ring
+Black Lotus
+Rhox Faithmender
+Mountain
+Lightning Helix
+Plains x14
+
+[Bot2 Deck]
+Mountain
+Plains
+Lightning Helix
+Island x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Rhox Faithmender.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Attack(Rhox Faithmender > Bot2)
+[T3 Bot1.Main2]
+? Bot1.Life = 22
+? Bot2.Life = 19
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Lightning Helix.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 28
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Lightning Helix.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 4
+Bot1.Life = 25
+Bot2.Life = 19
