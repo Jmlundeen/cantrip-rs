@@ -1,0 +1,48 @@
+# Rakish Revelers: "{2}, Exile this card from your hand: Target land gains "{T}: Add {R}, {G}, or {W}" until this card is cast
+# from exile. You may cast this card for as long as it remains exiled." Bot1 exiles it for {2} to give its Island the
+# ability, which adds one of those three colors and never black, and casts it from exile on the same turn, the Island adding
+# the {W} of its cost. It enters and makes a 1/1 green and white Citizen. Once it was cast, the Island has only {U} again.
+
+[Bot1 Deck]
+Island
+Rakish Revelers
+Black Lotus x3
+Mountain
+Island
+Swamp
+Island
+Island x8
+
+[Bot2 Deck]
+Plains x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Rakish Revelers.Activate(Bot1.Battlefield.Island)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+[T1 Bot1.Main1]
+? Exile = Rakish Revelers
+! Bot1.Battlefield.Island.Activate(Color: Black)
+Bot1.Exile.Rakish Revelers.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Island.Activate(Ability: {R}, {G}, or {W}; Color: White)
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Island.Activate(Color: White)
+Bot1.Battlefield.Island.Activate
+? Bot1.Mana = {U}
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Exile.Count = 0
+Bot1.Battlefield = Island; Rakish Revelers; Citizen
+Bot1.Graveyard = Black Lotus; Black Lotus; Black Lotus
+Bot1.Battlefield.Citizen.Token = true
+Bot1.Battlefield.Citizen.Colors = Green; White
+Bot1.Battlefield.Citizen.Subtypes = Citizen
+Bot1.Battlefield.Citizen.Power = 1
+Bot1.Battlefield.Citizen.Toughness = 1
