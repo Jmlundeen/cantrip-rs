@@ -812,9 +812,14 @@ fn modes_possible(cx: &Cx, asker: &Asker, modal: &ModalDef) -> bool {
 }
 
 /// Whether a spell's targets are announced with the action: one slot of one target, on a spell that is not modal and
-/// does not choose its target after its kicker or X (CR 601.2b-c).
+/// does not choose its target after its kicker or X (CR 601.2b-c), nor how many by its kicker.
 fn targets_with_cast(def: &'static CardDef) -> bool {
-    def.modal.is_none() && !def.late_targets && def.gift.is_none() && def.divide.is_none() && targets_with_action(def.spell_targets())
+    def.modal.is_none()
+        && !def.late_targets
+        && def.gift.is_none()
+        && def.divide.is_none()
+        && targets_with_action(def.spell_targets())
+        && def.spell_targets()[0].if_kicked.is_none()
 }
 
 /// Fills in a spell option's targets, or checks that its modes and targets could be announced: a modal spell needs
@@ -834,6 +839,11 @@ fn offer_spell(cx: &Cx, asker: &Asker, def: &'static CardDef, option: &mut Actio
             })
         };
         return def.kicker.is_some() || met(false) || (def.gift.is_some() && met(true));
+    }
+    // "If this spell was kicked, instead choose ..." (CR 702.33a, 601.2c): the targets wait for the kicker, and it may be
+    // cast if it could be announced either unkicked or, with a kicker to pay, kicked.
+    if def.kicker.is_some() && specs.iter().any(|spec| spec.if_kicked.is_some()) {
+        return slots_satisfiable(cx, asker, specs) || slots_satisfiable(cx, asker, &specs.iter().map(|spec| spec.when_kicked(1)).collect::<Vec<_>>());
     }
     with_targets(cx, asker, specs, option)
 }
@@ -2455,7 +2465,7 @@ fn cast(
     let counted = if item.x > 0 { item.x } else { item.kicked as u16 };
     let mut targets: Vec<Target> = targets.to_vec();
     if let Some(modal) = def.modal {
-        targets = choose_slots(cx, player, spell, &mode_specs(modal, mask), counted)?;
+        targets = choose_slots(cx, player, spell, &mode_specs(modal, mask), counted, item.kicked)?;
         set_item_targets(cx, &targets);
     } else if let Some(divide) = def.divide
         && let Some(spec) = specs.first()
@@ -2477,7 +2487,7 @@ fn cast(
             Divided::Impossible => return Err(Stop::Cancel),
         }
     } else if (resolving || !targets_with_cast(def)) && !specs.is_empty() {
-        targets = choose_slots(cx, player, spell, specs, counted)?;
+        targets = choose_slots(cx, player, spell, specs, counted, item.kicked)?;
         set_item_targets(cx, &targets);
     }
 
@@ -2488,7 +2498,7 @@ fn cast(
         for &spliced in item.data.iter().filter(|&&d| d != 0) {
             let specs = cx.card(CardId(spliced as u16 - 1)).spell.map_or(&[][..], |s| s.targets);
             if !specs.is_empty() {
-                all.extend(choose_slots(cx, player, spell, specs, counted)?);
+                all.extend(choose_slots(cx, player, spell, specs, counted, item.kicked)?);
             }
         }
         if all.len() != targets.len() {
@@ -2795,11 +2805,13 @@ pub fn cast_transformed_during_resolution(cx: &mut Cx, card: ObjectId) -> R<bool
 /// Each target slot's targets, asked in slot order (CR 601.2c), each a target of the slot's own (a player may be
 /// chosen for two slots). A slot that chose nothing ("up to") keeps its place with `Target::None` among the slots, so
 /// every target stays at the index of its slot (CR 601.2c, 115.1), as far as the last one that chose.
-fn choose_slots(cx: &mut Cx, player: PlayerId, source: ObjectId, specs: &[TargetSpec], counted: u16) -> R<Vec<Target>> {
+fn choose_slots(cx: &mut Cx, player: PlayerId, source: ObjectId, specs: &[TargetSpec], counted: u16, kicked: u8) -> R<Vec<Target>> {
     let asker = Asker { source, controller: player };
     let slots = crate::resolve::expand_specs(cx.s(), player, specs);
     let mut targets = Vec::new();
     for (spec, slot_player) in &slots {
+        // CR 702.33a, 601.2c: "if this spell was kicked, instead choose ...", the kicker announced by now.
+        let spec = &spec.when_kicked(kicked);
         let before = targets.len();
         'slot: {
             let candidates =
@@ -2828,7 +2840,8 @@ fn choose_slots(cx: &mut Cx, player: PlayerId, source: ObjectId, specs: &[Target
                 optional: least == 0,
                 least: least.min(count),
                 count,
-                any_number: false,
+                // "Any number of targets" (CR 115.1d) is said so, not as "up to" the candidates there are.
+                any_number: spec.is_any_number(),
             };
             match cx.ask_core(player, ask, true)? {
                 Answer::Targets(chosen) => targets.extend(chosen),
@@ -3216,12 +3229,12 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
 
     let mut targets: Vec<Target> = targets.to_vec();
     if let Some(modal) = def.modal {
-        targets = choose_slots(cx, player, source, &mode_specs(modal, mask), item.x)?;
+        targets = choose_slots(cx, player, source, &mode_specs(modal, mask), item.x, 0)?;
         set_item_targets(cx, &targets);
     } else if !targets_with_action(def.targets) && !def.targets.is_empty() {
         // CR 601.2c by way of 602.2b: slots that are not announced with the action are chosen now, after X (a slot
         // counted by X, as Candelabra of Tawnos's "untap X target lands", reads the X just announced).
-        targets = choose_slots(cx, player, source, def.targets, item.x)?;
+        targets = choose_slots(cx, player, source, def.targets, item.x, 0)?;
         set_item_targets(cx, &targets);
     }
 

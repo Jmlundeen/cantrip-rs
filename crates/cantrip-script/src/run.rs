@@ -473,7 +473,9 @@ impl<'s> Run<'s> {
             // before their next priority (a bare Block: no block is possible, so the declaration is never asked for).
             if let Some(ScriptStep::Refused { action, line, text }) = self.current()
                 && ((action.verb.is_question() && !(matches!(action.verb, ScriptVerb::Choose | ScriptVerb::Colors | ScriptVerb::Name) && action.positional().next().is_some()))
-                    || (matches!(action.verb, ScriptVerb::Target | ScriptVerb::Modes | ScriptVerb::Block) && action.positional().next().is_none()))
+                    || (matches!(action.verb, ScriptVerb::Target | ScriptVerb::Modes | ScriptVerb::Block)
+                        && action.positional().next().is_none()
+                        && action.named("Count").is_none()))
                 && request.player == player_of(action.bot)
             {
                 match request.kind {
@@ -1412,7 +1414,18 @@ impl<'s> Run<'s> {
                     return fail(format!("line {line} says {text} must not be a choice the question allows, but it is"));
                 }
             }
-            RequestKind::ChooseTarget { candidates, .. } => {
+            RequestKind::ChooseTarget { candidates, least, count, .. } => {
+                // `! Bot1.Target(Count: 2)`: the question does not take that many targets (CR 601.2c), though it has the
+                // candidates for it; `Count: 0` is choosing none.
+                if let Some(wanted) = action.named("Count") {
+                    let Ok(wanted) = wanted.trim().parse::<usize>() else { return fail(format!("line {line}: {wanted} is not a number")) };
+                    if wanted > candidates.len() {
+                        return fail(format!("line {line}: {text} proves nothing: there are only {} candidates", candidates.len()));
+                    }
+                    if wanted >= *least as usize && wanted <= *count as usize {
+                        return fail(format!("line {line} says {text} must not be a number of targets the question takes, but it is"));
+                    }
+                }
                 let everything: Vec<ObjectId> = (0..self.game.state.objects.len() as u32).map(ObjectId).collect();
                 // Several names that are all candidates are one answer, which the question must refuse: more targets than
                 // the slot takes (`! Bot1.Target(A; B; C)` for "up to two"), or the same object named twice,

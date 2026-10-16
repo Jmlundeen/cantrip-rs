@@ -87,7 +87,8 @@ The rest of a card is written the same way, one constructor each, the rare parts
 
 ```rust
 spell: spell(&[targets::CREATURE], effect),                       // `spell(&[], effect)` for none
-target(filter), up_to_one(filter), up_to(3, filter),               // target slots; `targets::X.optional()`, `.between(min, max)`, `.counted()`
+target(filter), up_to_one(filter), up_to(3, filter),               // target slots; `targets::X.optional()`, `.between(min, max)`, `.counted()`,
+                                                                  // `.if_kicked(0, TargetSpec::ANY_NUMBER)` ("if this spell was kicked, instead choose any number of ...")
 static MODAL: ModalDef = modes(&[mode(deal_3, "...").targets(&[targets::CREATURE]), mode(gain_3, "...")]).choose(1, 2);
 statics: &[static_ability(Layer::PtModify, attached_object, plus_one, "Equipped creature gets +1/+1.")],
 statics: &[characteristic_defining(Layer::PtDefine, power_is_creatures, "...")],

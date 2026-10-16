@@ -550,17 +550,17 @@ pub const fn spell(targets: &'static [TargetSpec], effect: Effect) -> Option<Spe
 
 /// One target that passes the filter (CR 115.1).
 pub const fn target(filter: TargetFilter) -> TargetSpec {
-    TargetSpec { min: 1, max: 1, filter, label: "" }
+    TargetSpec { min: 1, max: 1, filter, label: "", if_kicked: None }
 }
 
 /// "Up to one target" (CR 115.1d).
 pub const fn up_to_one(filter: TargetFilter) -> TargetSpec {
-    TargetSpec { min: 0, max: 1, filter, label: "" }
+    TargetSpec { min: 0, max: 1, filter, label: "", if_kicked: None }
 }
 
 /// "Up to N targets" (CR 115.1d).
 pub const fn up_to(n: u8, filter: TargetFilter) -> TargetSpec {
-    TargetSpec { min: 0, max: n, filter, label: "" }
+    TargetSpec { min: 0, max: n, filter, label: "", if_kicked: None }
 }
 
 impl TargetSpec {
@@ -577,6 +577,12 @@ impl TargetSpec {
     /// "X targets": as many as the X announced (CR 601.2b-c).
     pub const fn counted(self) -> TargetSpec {
         TargetSpec { min: TargetSpec::COUNTED, max: TargetSpec::COUNTED, ..self }
+    }
+
+    /// "If this spell was kicked, instead choose between `min` and `max` of these targets" (CR 702.33a, 601.2c): The
+    /// Eagles Are Coming!'s and Divine Resilience's "instead choose any number of target creatures" is `if_kicked(0, n)`.
+    pub const fn if_kicked(self, min: u8, max: u8) -> TargetSpec {
+        TargetSpec { if_kicked: Some((min, max)), ..self }
     }
 }
 

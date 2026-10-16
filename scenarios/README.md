@@ -263,6 +263,8 @@ Several names that are all among the candidates are instead one answer, which th
 `! Bot1.Target(Ornithopter#1; Ornithopter#2; Ornithopter#3)` for "up to two target creatures" (more than the slot takes), or one
 object named twice, `! Bot1.Target(Ornithopter#1; Ornithopter#1)`, as many as the slot takes, so that the repetition is what is
 refused (CR 115.3). The engine's own check of the answer decides (`check_answer`).
+`! Bot1.Target(Count: N)` fails instead if the question takes N targets, and proves nothing when it has fewer candidates than
+that; `Count: 0` is choosing none, which no answer naming targets can say. It shows a slot takes at least one target (The Eagles Are Coming! unkicked, where kicked it takes any number).
 
 A mode choice, `! Bot1.Modes(1; 2)`, is checked at that player's next modes question and fails if the question would accept exactly
 those modes (too many for "choose one", a mode that is not eligible): the way to show a spell offers fewer modes than another case

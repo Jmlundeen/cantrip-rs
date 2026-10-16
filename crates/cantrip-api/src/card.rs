@@ -272,6 +272,10 @@ pub struct TargetSpec {
     /// What the slot is for, said to the player choosing it: "Spell or permanent to return to its owner's hand". Empty when the card's one slot says
     /// it all. "{player}" stands for the opponent whose slot it is (`EACH_OPPONENT`).
     pub label: &'static str,
+    /// "If this spell was kicked, instead choose ..." (CR 702.33a, 601.2b-c): the slot's smallest and largest number of
+    /// targets when the spell or the ability's source was kicked, in place of `min` and `max`. The kicker is announced
+    /// before the targets are chosen, so the slot is asked once it is known (`TargetSpec::when_kicked`).
+    pub if_kicked: Option<(u8, u8)>,
 }
 
 impl TargetSpec {
@@ -286,6 +290,9 @@ impl TargetSpec {
     /// many target creatures" (CR 603.12).
     pub const COUNTED: u8 = u8::MAX;
 
+    /// "Any number of targets" (CR 115.1d): as many as a stack item holds.
+    pub const ANY_NUMBER: u8 = cantrip_state::MAX_TARGETS as u8;
+
     /// A `max` of this is "for each opponent, up to one target ...": the slot stands for one slot of its own for each
     /// opponent of the controller (CR 601.2c, 115.1), at most one target each, in seat order. It is not valid inside a mode (a modal slot reads a `max` above 1 as a range). The slot for an opponent
     /// is asked about `Query::slot_opponent`, and an opponent who has left the game keeps their slot, with nothing to
@@ -295,6 +302,20 @@ impl TargetSpec {
     /// Whether a legal target must exist to announce at all (CR 601.2c): a counted slot may be of zero.
     pub const fn required(&self) -> bool {
         self.min > 0 && self.min != TargetSpec::COUNTED
+    }
+
+    /// The slot as it is chosen for a spell or source kicked `kicked` times: with the bounds `if_kicked` gives when it
+    /// was kicked (CR 702.33a, 601.2c), otherwise as printed.
+    pub const fn when_kicked(self, kicked: u8) -> TargetSpec {
+        match self.if_kicked {
+            Some((min, max)) if kicked > 0 => TargetSpec { min, max, if_kicked: None, ..self },
+            _ => self,
+        }
+    }
+
+    /// Whether the slot is "any number of targets" (CR 115.1d): none at least, and as many as an item holds or more.
+    pub const fn is_any_number(&self) -> bool {
+        self.min == 0 && self.max >= TargetSpec::ANY_NUMBER && self.max != TargetSpec::COUNTED && self.max != TargetSpec::EACH_OPPONENT
     }
 
     /// The slot's smallest and largest number of targets, with `counted` read for a bound that is `COUNTED`.

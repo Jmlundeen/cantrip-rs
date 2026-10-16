@@ -425,7 +425,10 @@ fn choose_trigger_targets(
     let asker = Asker { source: trigger.source, controller: trigger.controller };
     let start = targets.len();
     let slots = crate::resolve::expand_specs(cx.s(), trigger.controller, specs);
+    // "If [it] was kicked, instead choose ..." (CR 702.33a, 601.2c), of the source.
+    let kicked = cx.s().obj(trigger.source).kicked;
     for (spec, slot_player) in &slots {
+        let spec = &spec.when_kicked(kicked);
         let before = targets.len();
         'slot: {
             let candidates = target_candidates_given(
@@ -474,7 +477,8 @@ fn choose_trigger_targets(
                 optional: least == 0,
                 least: least.min(count),
                 count,
-                any_number: false,
+                // "Any number of targets" (CR 115.1d) is said so, not as "up to" the candidates there are.
+                any_number: spec.is_any_number(),
             };
             // The ability's controller chooses its targets (CR 603.3d), unless it says that player does: the one it is about.
             let chooser = match trigger.subject {
