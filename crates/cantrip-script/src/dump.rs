@@ -399,6 +399,15 @@ impl StateDump {
                     .map(|t| t.name().to_string())
                     .collect();
                 d.list(&format!("{key}.Types"), types, true);
+                // Its computed supertypes (CR 205.4), absent when it has none: `Legendary`, `Basic; Snow`.
+                let supertypes: Vec<String> = [(c.supertypes.basic, "Basic"), (c.supertypes.legendary, "Legendary"), (c.supertypes.snow, "Snow")]
+                    .into_iter()
+                    .filter(|&(has, _)| has)
+                    .map(|(_, name)| name.to_string())
+                    .collect();
+                if !supertypes.is_empty() {
+                    d.list(&format!("{key}.Supertypes"), supertypes, true);
+                }
                 // Every creature type (Changeling, CR 702.73a) is one entry, not three hundred.
                 let every = Subtype::CREATURE_TYPES.iter().all(|&t| c.subtypes.has(t));
                 let mut subtypes: Vec<String> = c.subtypes.iter().filter(|t| !(every && t.is_creature_type())).map(|t| t.name().to_string()).chain(every.then(|| "(every creature type)".to_string())).collect();

@@ -367,6 +367,7 @@ kind, place it where the action could otherwise be taken, with a wait or `BotN.P
 - `BotN.Battlefield.<Name>.Tapped` and `.Types` (computed card types, `Land; Creature` for an animated land); for
   creatures also `.Power`, `.Toughness`, `.Damage` and `.SummoningSick`
 - `BotN.Battlefield.<Name>.Token` (`true`) for a token, absent for a card
+- `BotN.Battlefield.<Name>.Supertypes` (computed: `Legendary`, `Basic; Snow`), absent when it has none
 - `BotN.Battlefield.<Name>.Subtypes` (computed, sorted: `Hero; Wizard`), absent when it has none; every creature type (Changeling) is the one entry `(every creature type)`
 - `BotN.Battlefield.<Name>.Colors` (computed, sorted: `Green; White`), absent when it is colorless
 - `BotN.Battlefield.<Name>.Counters.PlusOnePlusOne` (or `.Lifelink`, any `CounterKind`), for a permanent that has

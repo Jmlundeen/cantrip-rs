@@ -268,6 +268,8 @@ fn initial(cards: &CardTable, card: CardId, copy: Option<&Copiable>) -> Chars {
         Some(c) => (c.extra_types, c.extra_subtypes, c.extra_abilities, c.extra_keywords, c.colors, c.pt, c.no_cost, c.name, c.words),
         None => (TypeSet::NONE, SubtypeSet::NONE, [None; 4], Keywords::NONE, None, None, false, None, Words::NONE),
     };
+    // "Except it's legendary" (CR 707.9b).
+    let legendary = copy.is_some_and(|c| c.legendary);
     let mut abilities = [None; MAX_ABILITIES];
     let mut n = 0;
     // A dungeon or the rules' own card has more abilities than any object does; nothing reads them as an object's.
@@ -283,7 +285,7 @@ fn initial(cards: &CardTable, card: CardId, copy: Option<&Copiable>) -> Chars {
         card,
         name: copy_name.unwrap_or_else(|| renamed(def, words)),
         types: TypeSet(def.types.0 | extra_types.0),
-        supertypes: def.supertypes,
+        supertypes: Supertypes { legendary: def.supertypes.legendary || legendary, ..def.supertypes },
         // CR 612.4: a token's subtypes are what the text that made it named.
         subtypes: words.subtypes(def.subtypes).union(extra_subtypes),
         // CR 707.9b: a copy that says what it is gets that, not what the card it copies is (707.9d). A token's color

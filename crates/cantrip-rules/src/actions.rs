@@ -3649,6 +3649,16 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
     let discards = choose_discards(cx, player, source, &def.cost)?;
     let exiles = choose_exiles(cx, player, source, &def.cost)?;
     let tappers = choose_tappers(cx, player, source, &def.cost)?;
+    // The permanents the cost chose stay with the ability, for its effect to name ("the tapped creature's power",
+    // `Query::cost_objects`, CR 602.2b, 601.2h, 608.2h).
+    if !chosen.is_empty() || !tappers.is_empty() {
+        let objects: Vec<ObjectId> = chosen.iter().chain(&tappers).copied().collect();
+        let members = cx.st().members_push(&objects);
+        let at = cx.s().stack.len() - 1;
+        let mut with = cx.s().stack[at];
+        with.members = members;
+        cx.st().stack_set(at, with);
+    }
     let counter = choose_counter_kind(cx, player, source, &def.cost)?;
     // Mana of any color pays for it (CR 609.4b): every symbol is paid as generic mana.
     if mana.mana_value() > 0 && static_rules::spend_any_color_for(cx, player, source) {

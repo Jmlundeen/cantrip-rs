@@ -229,6 +229,8 @@ pub struct Copiable {
     pub no_cost: bool,
     /// "Except its name is X" (CR 707.9b): its name, whatever the copied card is called.
     pub name: Option<&'static str>,
+    /// "Except it's legendary" (CR 707.9b): legendary in addition to the supertypes the copied card has.
+    pub legendary: bool,
     /// The words of its text changed from the card's (CR 612.4, 612.2a): a token made by an ability whose text was
     /// changed has the colors and creature types the changed text names, and so does a copy of it.
     pub words: Words,
@@ -247,6 +249,7 @@ impl Copiable {
             pt: None,
             no_cost: false,
             name: None,
+            legendary: false,
             words: Words::NONE,
         }
     }
@@ -267,6 +270,7 @@ impl Copiable {
             || self.pt.is_some()
             || self.name.is_some()
             || self.no_cost
+            || self.legendary
             || !self.words.is_printed()
     }
 
@@ -310,6 +314,12 @@ impl Copiable {
     /// "Except it has no mana cost."
     pub fn costless(mut self) -> Copiable {
         self.no_cost = true;
+        self
+    }
+
+    /// "Except it's legendary" (CR 707.9b, 205.4): the supertype added to whatever the copied card has.
+    pub fn legendary(mut self) -> Copiable {
+        self.legendary = true;
         self
     }
 }
@@ -385,7 +395,10 @@ pub struct StackItem {
     pub subject: Target,
     /// What the event that triggered it carried (CR 603.2): the spell cast, the object that targeted.
     pub data: [u32; 2],
-    /// For a "one or more" ability (CR 603.2c): the objects of the batch that triggered it, in `GameState::members`.
+    /// The objects it is about that are not its targets, in `GameState::members`. For a "one or more" ability (CR 603.2c):
+    /// the objects of the batch that triggered it. For an activated ability: the permanents its cost chose and tapped,
+    /// sacrificed or returned (CR 601.2h by way of 602.2b), which its effect may name ("the tapped creature's power",
+    /// station, CR 702.184a); a copy of the ability has the same (CR 707.10).
     pub members: Span,
     /// What names this item while it is on the stack, so that a spell or ability can target it (CR 115.1).
     pub serial: u32,

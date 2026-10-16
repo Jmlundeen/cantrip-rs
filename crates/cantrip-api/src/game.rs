@@ -153,6 +153,19 @@ pub trait Query {
         self.state().members(item.members)
     }
 
+    /// The permanents an activated ability's cost chose and tapped, sacrificed or returned (CR 601.2h by way of 602.2b),
+    /// in the order chosen: "Put a number of charge counters on this permanent equal to the tapped creature's power"
+    /// (station, CR 702.184a), "deals damage equal to the tapped creature's power" (Unerring Sling), "where X is the power of
+    /// the creature tapped this way" (Keldon Battlewagon, Impelled Giant). A crew or saddle cost's creatures are among
+    /// them. Each is the object as it was chosen: read its characteristics with `chars`, which gives those it last had
+    /// on the battlefield once it has left (CR 608.2h). Empty for a spell or a triggered ability.
+    fn cost_objects(&self, item: &StackItem) -> &[ObjectId] {
+        if item.kind != StackKind::Activated {
+            return &[];
+        }
+        self.state().members(item.members)
+    }
+
     fn obj(&self, id: ObjectId) -> &Obj {
         self.state().obj(id)
     }
