@@ -299,6 +299,9 @@ public enum CardChoicePurposeView
 
     /// <summary>The permanent that gets counters, chosen without targeting: the prompt's <c>Counter</c> and <c>CounterCount</c> say which kind and how many (empower Jace's loyalty counters on a Jace token, amass's +1/+1 counters on an Army).</summary>
     PutCounters = 27,
+
+    /// <summary>Craft's materials (CR 702.167a): permanents you control and cards in your graveyard, each of the quality the prompt's <c>Kind</c> names, exiled with the crafting permanent to pay its cost; <c>Minimum</c> to <c>Count</c> of them, or exactly <c>Count</c>.</summary>
+    Craft = 28,
 }
 
 /// <summary>Where cards found by a library search go (CR 701.23).</summary>

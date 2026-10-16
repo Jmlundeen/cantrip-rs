@@ -21,7 +21,7 @@ internal static class PromptPresentation
             Chooser = choose.Player,
             Owner = choose.Owner,
             Source = choose.Source,
-            Minimum = choose.UpTo ? 0 : choose.Count,
+            Minimum = choose.UpTo ? choose.Minimum : choose.Count,
             Maximum = choose.Count,
             Ordered = choose.Purpose is CardChoicePurposeView.PutOnTop or CardChoicePurposeView.Splice,
             Origins = Origins(choose.Cards, view),
@@ -55,7 +55,8 @@ internal static class PromptPresentation
     /// </summary>
     private static bool IsCost(CardChoicePurposeView purpose) => purpose is
         CardChoicePurposeView.ExileToPay or CardChoicePurposeView.TapToPay
-        or CardChoicePurposeView.Sacrifice or CardChoicePurposeView.ReturnToHand or CardChoicePurposeView.TapToReduce;
+        or CardChoicePurposeView.Sacrifice or CardChoicePurposeView.ReturnToHand or CardChoicePurposeView.TapToReduce
+        or CardChoicePurposeView.Craft;
 
     /// <summary>The zones the cards are in, as the view the seat holds places them; a card not in it says nothing.</summary>
     private static List<PromptOriginView> Origins(IEnumerable<ViewHandle> cards, PlayerView? view)
@@ -105,6 +106,7 @@ internal static class PromptPresentation
         CardChoicePurposeView.Blight => PromptActionView.Blight,
         CardChoicePurposeView.TapToReduce => PromptActionView.TapToReduce,
         CardChoicePurposeView.PutCounters => PromptActionView.PutCounters,
+        CardChoicePurposeView.Craft => PromptActionView.Craft,
         _ => PromptActionView.Choose,
     };
 }

@@ -177,6 +177,16 @@ pub fn check(game: &Game, request: &Request, answer: &Answer) -> Result<(), Reje
                 Ok(())
             }
         }
+        (RequestKind::Craft { cards, minimum, maximum, .. }, Answer::Cards(chosen)) => {
+            let n = chosen.len();
+            if !distinct(chosen) || !chosen.iter().all(|c| cards.contains(c)) {
+                no("not among the materials that may be exiled")
+            } else if n < *minimum as usize || n > *maximum as usize {
+                no(format!("{n} chosen, {minimum} to {maximum} wanted (CR 702.167a)"))
+            } else {
+                Ok(())
+            }
+        }
         (RequestKind::CollectEvidence { cards, values, minimum, .. }, Answer::Cards(chosen)) => {
             let total: u32 = chosen.iter().filter_map(|c| cards.iter().position(|x| x == c)).map(|i| values[i] as u32).sum();
             if !distinct(chosen) || !chosen.iter().all(|c| cards.contains(c)) {

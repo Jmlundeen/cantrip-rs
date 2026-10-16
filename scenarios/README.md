@@ -181,6 +181,7 @@ default declines, so a scenario that does not care about such a card need say no
 | `Bot1.Pass` · `Bot1.PayCost` · `Bot1.Decline` · `Bot1.Undo` · `Bot1.Cancel` | priority, unless-costs, mana undo, cancel a spell or ability at any question before it is on the stack |
 | `Bot1.Accept` · `Bot1.Decline` | a "you may" choice, such as Path to Exile's search (default: decline) |
 | `Bot1.Choose(Lightning Bolt; Island)` | Duress, Brainstorm (last chosen ends on top) |
+| `Bot1.Choose(Graveyard.Black Lotus)` | craft's materials (CR 702.167a), permanents and graveyard cards in one question: qualify the zone where a name is in both (default: the fewest it takes, the first offered); a refusal `! Bot1.Choose(Ornithopter)` holds when no such material may be chosen, and one naming only choosable materials holds when that is no answer the question accepts (one of "two creatures") |
 | `Bot1.Discard(Island)` · `Bot1.Search(Black Lotus)` | hand size, library search (`Search()` finds nothing) |
 | `Bot1.Arrange(Top1; Top2 \| Bottom1)` · `Bot1.Arrange(Shuffle)` | cards looked at and placed: one `\|`-separated group per destination, in the order the prompt lists them — scry (top \| bottom), surveil (top \| graveyard), Ponder (top), Stock Up (hand \| bottom) |
 | `Bot1.Attack(Grizzly Bears; Hill Giant > Bot2)` | attackers |

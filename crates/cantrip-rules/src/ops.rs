@@ -354,6 +354,17 @@ pub fn exile_with(cx: &mut Cx, cards: &[ObjectId], by: ObjectId, until_leaves: b
     new
 }
 
+/// Links cards already in exile to `by` (CR 607.2a): `Game::link_exiled`, for the exiled cards used to craft a permanent
+/// (CR 702.167c). Each keeps the zone it came from; none is "until" anything.
+pub fn link_exiled(cx: &mut Cx, cards: &[ObjectId], by: ObjectId) {
+    for &c in cards {
+        if live(cx.s(), c) && cx.s().obj(c).zone.is(ZoneKind::Exile) {
+            let from = cx.s().obj(c).exiled.map_or(cx.s().obj(c).zone, |l| l.from);
+            cx.st().update_obj(c, |o| o.exiled = Some(ExileLink { by, from, until_leaves: false, encoded: false }));
+        }
+    }
+}
+
 /// Exiles a spell card encoded on a creature (CR 702.99a, 702.99b): exiled linked to it, and marked as encoded there.
 pub fn encode(cx: &mut Cx, card: ObjectId, creature: ObjectId) -> Option<ObjectId> {
     let new = *exile_with(cx, &[card], creature, false).first()?;

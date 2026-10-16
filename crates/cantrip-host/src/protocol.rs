@@ -240,6 +240,9 @@ pub enum CardChoicePurposeView {
     /// The permanent that gets counters, chosen without targeting: `Counter` and `CounterCount` say which and how many
     /// (empower Jace's loyalty counters, amass's +1/+1 counters).
     PutCounters,
+    /// Craft's materials (CR 702.167a): permanents you control and cards in your graveyard, of the quality `Kind` names,
+    /// exiled with the crafting permanent to pay the cost; `Minimum` to `Count` of them.
+    Craft,
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -915,6 +918,9 @@ pub struct ChooseCardsPrompt {
     pub counter: String,
     /// For `PutCounters`, how many counters the chosen permanent gets.
     pub counter_count: i32,
+    /// The fewest that may be chosen when `UpTo` makes `Count` a maximum: craft's "one or more" (CR 702.167a). Zero when
+    /// any number up to `Count` will do.
+    pub minimum: i32,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]

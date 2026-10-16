@@ -413,6 +413,25 @@ pub struct Cost {
     /// (CR 601.2b), its power read as the total cost is determined (CR 601.2f), and it is tapped as the cost is paid. It is not
     /// a {T} ability's cost (CR 107.5), so a summoning-sick creature may be tapped. Only a spell's way of casting carries it.
     pub tap_to_reduce: bool,
+    /// Craft's materials (CR 702.167a): "Exile [materials] from among permanents you control and/or cards in your
+    /// graveyard", chosen as the cost is chosen (CR 601.2h by way of 602.2b) and exiled as it is paid, together with
+    /// the source when the cost also exiles it (`exile_self`). Only an activated ability's cost carries it.
+    pub materials: Option<Materials>,
+}
+
+/// What a craft ability exiles besides its source (CR 702.167a): `count` objects, or `count` or more, from among the
+/// permanents the payer controls and the cards in their graveyard, the source apart, each passing `filter`. The filter
+/// reads where the object is: a material named by a type alone ("artifact") is a permanent of that type or a card of
+/// that type in the graveyard (CR 702.167b), one named as a card ("red instant and/or sorcery cards") is a graveyard
+/// card only.
+#[derive(Clone, Copy)]
+pub struct Materials {
+    pub count: u8,
+    /// "One or more", "four or more": at least `count`, as many more as the payer likes.
+    pub or_more: bool,
+    pub filter: ObjectFilter,
+    /// What one material is, as the prompt says it ("artifact", "creature", "Cave").
+    pub quality: &'static str,
 }
 
 /// A cost part whose size is the payer's to set, chosen as the cost is chosen.
@@ -558,6 +577,9 @@ impl Cost {
             (a, None) => a,
         };
         c.blight += other.blight;
+        if c.materials.is_none() {
+            c.materials = other.materials;
+        }
         c
     }
 
@@ -591,6 +613,7 @@ impl Cost {
             behold: None,
             blight: 0,
             tap_to_reduce: false,
+            materials: None,
         };
 
     pub const fn sacrifice(count: u8, filter: ObjectFilter) -> Cost {

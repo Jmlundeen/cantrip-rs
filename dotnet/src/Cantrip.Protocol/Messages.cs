@@ -1216,10 +1216,18 @@ public sealed class ChooseCardsPromptMessage : PromptPayload
     public int CounterCount { get; set; }
 
     /// <summary>
-    /// The first eligible cards, never anything outside <see cref="Eligible"/>. A choice that must add up to a power is
-    /// offered "up to" every candidate, so taking them all meets it whenever anything can.
+    /// The fewest that may be chosen when <see cref="UpTo"/> makes <see cref="Count"/> a maximum: craft's "one or more"
+    /// (CR 702.167a). Zero when any number up to <see cref="Count"/> will do.
     /// </summary>
-    public override AnswerPayload Default() => new CardsChosenAnswer { Cards = [.. Eligible.Take(Count)] };
+    [Key(16)]
+    public int Minimum { get; set; }
+
+    /// <summary>
+    /// The first eligible cards, never anything outside <see cref="Eligible"/>. A choice that must add up to a power is
+    /// offered "up to" every candidate, so taking them all meets it whenever anything can; one with a <see cref="Minimum"/>
+    /// takes that many.
+    /// </summary>
+    public override AnswerPayload Default() => new CardsChosenAnswer { Cards = [.. Eligible.Take(Minimum > 0 ? Minimum : Count)] };
 }
 
 /// <summary>

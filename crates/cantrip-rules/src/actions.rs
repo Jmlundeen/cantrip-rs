@@ -152,7 +152,48 @@ fn can_pay_other(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost) -
             return false;
         }
     }
+    if let Some(m) = cost.materials
+        && material_candidates(cx, source, controller, &m).len() < m.count as usize
+    {
+        return false;
+    }
     true
+}
+
+/// What craft may exile as its materials (CR 702.167a): the permanents the payer controls, then the cards in their
+/// graveyard, that pass the materials' filter, the source apart (it is exiled as itself, not as a material).
+fn material_candidates(cx: &Cx, source: ObjectId, controller: PlayerId, m: &Materials) -> Vec<ObjectId> {
+    let asker = Asker { source, controller };
+    let mut out = cx.permanents_of(controller);
+    out.extend(cx.s().zone(Zone::graveyard(controller)).iter().copied());
+    out.retain(|&id| id != source && (m.filter)(cx, &asker, id));
+    out
+}
+
+/// Chooses craft's materials (CR 702.167a, 601.2h), always asked, even when the choice is forced: exactly `count` of
+/// them, or `count` or more. Too few left to choose among (one gone since the ability was offered) is a cost that can't
+/// be paid, and the activation is taken back.
+fn choose_materials(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) -> R<Vec<ObjectId>> {
+    let Some(m) = cost.materials else { return Ok(Vec::new()) };
+    let cards = material_candidates(cx, source, player, &m);
+    if cards.len() < m.count as usize {
+        return Err(Stop::Cancel);
+    }
+    let maximum = if m.or_more { cards.len().min(255) as u8 } else { m.count };
+    let ask = RequestKind::Craft { source, cards, minimum: m.count, maximum, quality: m.quality };
+    match cx.ask_core(player, ask, true)? {
+        Answer::Cards(cards) => Ok(cards),
+        _ => Err(Stop::Cancel),
+    }
+}
+
+/// Pays craft's exile (CR 702.167a): the source and the materials chosen, from the battlefield and the graveyard, all at
+/// once (CR 601.2h). The source goes first, so the history holds it and then the materials, just before the activation:
+/// what `cantrip_mechanics::craft` reads to find the exiled cards used to craft a permanent (CR 702.167c).
+fn pay_materials(cx: &mut Cx, source: ObjectId, chosen: &[ObjectId]) {
+    let moves: Vec<ops::Moving> =
+        std::iter::once(source).chain(chosen.iter().copied()).map(|id| ops::Moving::to(id, Zone::exile(cx.s().obj(id).owner))).collect();
+    ops::move_together(cx, &moves, ZoneReason::Exile);
 }
 
 /// What a cost that beholds may choose among (CR 701.4a): the permanents its payer controls and the cards in their hand,
@@ -3510,6 +3551,7 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
     let exiles = choose_exiles(cx, player, source, &def.cost)?;
     let tappers = choose_tappers(cx, player, source, &def.cost)?;
     let counter = choose_counter_kind(cx, player, source, &def.cost)?;
+    let materials = choose_materials(cx, player, source, &def.cost)?;
     // Mana of any color pays for it (CR 609.4b): every symbol is paid as generic mana.
     if mana.mana_value() > 0 && static_rules::spend_any_color_for(cx, player, source) {
         mana = ManaCost { generic: mana.mana_value().min(255) as u8, ..ManaCost::ZERO };
@@ -3540,7 +3582,8 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
     }
     pay_exert_and_tappers(cx, source, &def.cost, &tappers);
     note_activation(cx, source, index as usize, def);
-    if def.cost.exile_self {
+    // Craft exiles its source with its materials, last of all (`pay_materials`).
+    if def.cost.exile_self && def.cost.materials.is_none() {
         ops::move_to_for(cx, source, Zone::exile(cx.s().obj(source).owner), ZoneReason::Exile);
     }
     if def.cost.discard_self {
@@ -3562,6 +3605,10 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
     }
     if def.cost.return_self {
         ops::move_to_for(cx, source, Zone::hand(cx.s().obj(source).owner), ZoneReason::Other);
+    }
+    if def.cost.materials.is_some() {
+        assert!(def.cost.exile_self, "craft exiles its source with its materials (CR 702.167a)");
+        pay_materials(cx, source, &materials);
     }
     cx.emit(Event::AbilityActivated { source, ability, player });
     for &t in targets.iter().filter(|&&t| t != Target::None) {

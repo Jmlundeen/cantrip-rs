@@ -686,6 +686,10 @@ impl cantrip_api::Game for Cx<'_> {
         ops::exile_with(self, cards, by, until_leaves)
     }
 
+    fn link_exiled(&mut self, cards: &[ObjectId], by: ObjectId) {
+        ops::link_exiled(self, cards, by);
+    }
+
     fn exile_face_down(&mut self, cards: &[ObjectId], by: Option<ObjectId>) -> Vec<ObjectId> {
         ops::exile_face_down(self, cards, by)
     }

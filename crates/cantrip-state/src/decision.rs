@@ -300,6 +300,10 @@ pub enum RequestKind {
     /// Collect evidence N (CR 701.59a): exile any subset of `cards` (the player's graveyard) whose `values` (their mana
     /// values) add up to `minimum` or more.
     CollectEvidence { source: ObjectId, cards: Vec<ObjectId>, values: Vec<u8>, minimum: u8 },
+    /// Craft's materials (CR 702.167a): exile `minimum` to `maximum` of `cards`, which are permanents the player controls
+    /// and cards in their graveyard, each one of what `quality` names ("artifact", "creature"). An exact number of
+    /// materials has `minimum == maximum`; "one or more" has `maximum` of every card offered.
+    Craft { source: ObjectId, cards: Vec<ObjectId>, minimum: u8, maximum: u8, quality: &'static str },
     /// The targets of a slot that divides a total among them, and each one's share (CR 601.2d): "distribute two +1/+1
     /// counters among up to two target creatures". At most `max_targets` of `candidates` (any number when 0), each with a
     /// share of at least 1, adding up to `total`; none at all when the slot is `optional`.

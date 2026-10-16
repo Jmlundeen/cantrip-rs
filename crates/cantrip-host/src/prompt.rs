@@ -10,6 +10,7 @@
 //! | `UnlessPays`           | `UnlessPaysPromptMessage`                                                          |
 //! | `ChooseCards`          | `ChooseCardsPromptMessage`                                                         |
 //! | `TapForPower`          | `ChooseCardsPromptMessage` (purpose `TapToPay`, `Powers`, `MinimumPower`; harmonize's: `TapToReduce`, up to one) |
+//! | `Craft`                | `ChooseCardsPromptMessage` (purpose `Craft`, the quality as `Kind`, `Minimum` for "one or more")               |
 //! | `ChooseTarget`         | `ChooseTargetPromptMessage`                                                        |
 //! | `ChooseModes`          | `ChooseModesPromptMessage`                                                         |
 //! | `ChooseSubtype`        | `ChooseModesPromptMessage` over the subtypes (the C# engine asks it that way too)  |
@@ -73,7 +74,7 @@ pub fn request_objects(request: &Request) -> HashSet<ObjectId> {
             add(&[*source]);
             add(looked_at);
         }
-        RequestKind::TapForPower { source, cards, .. } | RequestKind::CollectEvidence { source, cards, .. } => {
+        RequestKind::TapForPower { source, cards, .. } | RequestKind::CollectEvidence { source, cards, .. } | RequestKind::Craft { source, cards, .. } => {
             add(&[*source]);
             add(cards);
         }
@@ -696,6 +697,23 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 up_to: true,
                 minimum_mana_value: i32::from(*minimum),
                 mana_values: values.iter().map(|&v| i32::from(v)).collect(),
+                ..Default::default()
+            })
+        }
+        // Craft's materials (CR 702.167a): permanents and graveyard cards together, of the quality the ability names; an exact
+        // number, or at least so many ("one or more").
+        RequestKind::Craft { source, cards, minimum, maximum, quality } => {
+            PromptPayload::ChooseCardsPromptMessage(ChooseCardsPrompt {
+                player,
+                owner: player,
+                source: source_handle(game, handles, *source),
+                purpose: CardChoicePurposeView::Craft,
+                cards: handles_of(handles, cards),
+                eligible: handles_of(handles, cards),
+                count: i32::from(*maximum),
+                up_to: minimum < maximum,
+                minimum: if minimum < maximum { i32::from(*minimum) } else { 0 },
+                kind: (*quality).to_string(),
                 ..Default::default()
             })
         }

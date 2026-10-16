@@ -294,7 +294,7 @@ fn answers(verb: ScriptVerb, kind: &RequestKind) -> bool {
         V::PayCost => matches!(kind, RequestKind::PayCosts { .. }),
         V::Undo => matches!(kind, RequestKind::Priority { .. } | RequestKind::PayCosts { .. }),
         V::Accept | V::Decline => matches!(kind, RequestKind::May { .. } | RequestKind::UnlessPays { .. }),
-        V::Choose => matches!(kind, RequestKind::ChooseCards { .. } | RequestKind::TapForPower { .. } | RequestKind::CollectEvidence { .. }),
+        V::Choose => matches!(kind, RequestKind::ChooseCards { .. } | RequestKind::TapForPower { .. } | RequestKind::CollectEvidence { .. } | RequestKind::Craft { .. }),
         V::ChoosePlayer => matches!(kind, RequestKind::ChoosePlayer { .. }),
         V::Discard => matches!(kind, RequestKind::DiscardToHandSize { .. }),
         V::Attack => matches!(kind, RequestKind::DeclareAttackers { .. }),
@@ -328,6 +328,7 @@ fn kind_name(kind: &RequestKind) -> &'static str {
         RequestKind::ChoosePlayer { .. } => "ChoosePlayer",
         RequestKind::TapForPower { .. } => "TapForPower",
         RequestKind::CollectEvidence { .. } => "CollectEvidence",
+        RequestKind::Craft { .. } => "Craft",
         RequestKind::DeclareAttackers { .. } => "DeclareAttackers",
         RequestKind::DeclareBlockers { .. } => "DeclareBlockers",
         RequestKind::AssignCombatDamage { .. } => "AssignCombatDamage",
@@ -393,6 +394,9 @@ impl<'s> Run<'s> {
             }
             RequestKind::ChooseCards { eligible, count, .. } => {
                 format!("ChooseCards {count} of [{}]", eligible.iter().map(|&i| name(i)).collect::<Vec<_>>().join(", "))
+            }
+            RequestKind::Craft { cards, minimum, maximum, .. } => {
+                format!("Craft {minimum} to {maximum} of [{}]", cards.iter().map(|&i| name(i)).collect::<Vec<_>>().join(", "))
             }
             other => format!("{} {other:?}", kind_name(other)),
         }
@@ -976,6 +980,8 @@ impl<'s> Run<'s> {
                 }
                 Answer::Cards(chosen)
             }
+            // Craft's materials (CR 702.167a): the fewest it takes, the first offered - the permanents before the graveyard.
+            RequestKind::Craft { cards, minimum, .. } => Answer::Cards(cards.iter().take(*minimum as usize).copied().collect()),
             RequestKind::DiscardToHandSize { count, hand } => Answer::Cards(hand[hand.len() - *count as usize..].to_vec()),
             RequestKind::ChooseCards { eligible, count, .. } => Answer::Cards(eligible.iter().take(*count as usize).copied().collect()),
             // A creature that attacks each combat if able attacks whether or not the script says so (CR 508.1d): the first
@@ -1069,6 +1075,7 @@ impl<'s> Run<'s> {
             (V::Choose, RequestKind::TapForPower { purpose: Purpose::TapToReduce, cards, .. }) => Some(self.pick(step, cards, 1, false)?),
             (V::Choose, RequestKind::TapForPower { cards, .. }) => Some(self.pick(step, cards, cards.len() as u8, false)?),
             (V::Choose, RequestKind::CollectEvidence { cards, .. }) => Some(self.pick(step, cards, cards.len() as u8, false)?),
+            (V::Choose, RequestKind::Craft { cards, maximum, .. }) => Some(self.pick(step, cards, *maximum, false)?),
             (V::ChoosePlayer, RequestKind::ChoosePlayer { candidates, .. }) => {
                 let Some(spec) = step.positional().next() else {
                     return fail(format!("line {}: ChoosePlayer needs a player", step.line));
@@ -1519,7 +1526,23 @@ impl<'s> Run<'s> {
                     }
                 }
             }
-            RequestKind::ChooseCards { eligible, .. } | RequestKind::TapForPower { cards: eligible, .. } => {
+            // `! Bot1.Choose(Ornithopter)` for craft: no such material may be chosen. Naming only materials that may be, it is
+            // one answer the question must refuse instead: too few for "two creatures" (CR 702.167a).
+            RequestKind::Craft { cards, .. }
+                if !action.positional().next().is_none()
+                    && action.positional().all(|spec| self.objects(action, spec.trim(), cards).is_ok_and(|found| !found.is_empty())) =>
+            {
+                let mut chosen: Vec<ObjectId> = Vec::new();
+                for spec in action.positional() {
+                    if let Some(id) = self.objects(action, spec.trim(), cards)?.into_iter().find(|id| !chosen.contains(id)) {
+                        chosen.push(id);
+                    }
+                }
+                if check_answer(&self.game, request, &Answer::Cards(chosen)).is_ok() {
+                    return fail(format!("line {line} says {text} must not be an answer the question accepts, but it is"));
+                }
+            }
+            RequestKind::ChooseCards { eligible, .. } | RequestKind::TapForPower { cards: eligible, .. } | RequestKind::Craft { cards: eligible, .. } => {
                 let everything: Vec<ObjectId> = (0..self.game.state.objects.len() as u32).map(ObjectId).collect();
                 for spec in action.positional() {
                     if self.objects(action, spec.trim(), &everything)?.is_empty() {

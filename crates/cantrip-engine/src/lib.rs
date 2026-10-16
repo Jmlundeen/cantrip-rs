@@ -115,6 +115,24 @@ mod tests {
         }
     }
 
+    /// Craft's materials (CR 702.167a) are exiled by activating an ability, which exiles its source with them: no way of
+    /// casting a spell pays them, so a card whose spell costs carry them, or whose craft ability does not exile itself, is
+    /// refused here.
+    #[test]
+    fn only_an_activated_ability_that_exiles_its_source_exiles_materials() {
+        for def in &cards().cards {
+            for ability in def.abilities.iter().chain(def.delayed.iter()) {
+                if let AbilityDef::Activated(a) = ability {
+                    assert!(a.cost.materials.is_none() || a.cost.exile_self, "{}: craft exiles its source with its materials", def.name);
+                }
+            }
+            let spell_costs = def.ways.iter().map(|w| w.cost).chain(def.additional_cost).chain(def.optional_cost.map(|o| o.cost));
+            for cost in spell_costs.chain(def.additional_choice.iter().map(|c| c.cost)) {
+                assert!(cost.materials.is_none(), "{}: a spell's cost can't exile craft materials", def.name);
+            }
+        }
+    }
+
     /// A creature whose power or toughness is printed as a star has it from a characteristic-defining ability (CR 208.2a), and
     /// once that is lost (CR 604.3, 613.1f) the star is worth 0 (CR 208.5): `StaticDef::lost_pt` says what it leaves, so the next
     /// card with a star cannot forget it.

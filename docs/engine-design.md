@@ -355,6 +355,22 @@ needs it: a resolved effect that gives it ("gains hexproof from that color until
 "hexproof from activated and triggered abilities" (Volatile Stormdrake), "hexproof from each of its colors" (Tam), and a
 player's hexproof from a quality (Veil of Summer).
 
+### Craft
+
+Craft with [materials] [cost] (CR 702.167a) is an activated ability whose cost exiles its source and its materials
+(`Cost::materials`, with `exile_self`): `count` objects, or `count` or more, from among the permanents the activator
+controls and the cards in their graveyard, the source apart, each passing the materials' filter, which reads where the
+object is (a type alone is a permanent or a card of that type, CR 702.167b). They are chosen with the rest of the cost,
+before the mana, as a question of their own (`RequestKind::Craft`, minimum and maximum), and exiled together as the last
+of the cost, the source first, so the history holds the source's exile and then the materials' just before the
+activation. The ability is `cantrip_mechanics::craft`'s: it returns the card the cost exiled transformed under its owner's
+control (CR 712.14a; a token, or a card that was only a copy of a craft card, stays where it is) and links the materials,
+read from that stretch of the history, to the new permanent as exiled with it (`Game::link_exiled`, CR 607.2a), which is
+what "the exiled cards used to craft it" (CR 702.167c) are: `exiled_with` of the permanent, gone once it leaves or they
+do. Only an activated ability pays materials (`only_an_activated_ability_that_exiles_its_source_exiles_materials`). No card
+in content copies an activated ability, so a copy of a craft ability (which would find the card already returned) has no
+scenario.
+
 ### Restricted mana
 
 Mana a restriction limits (CR 106.6) is kept in the pool apart from ordinary mana, one `ManaPool` per restriction present
