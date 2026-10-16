@@ -1,0 +1,44 @@
+# Wulfgar of Icewind Dale doubles a "whenever you attack" ability (CR 508.1m, 603.2d): creatures you control being declared
+# as attackers is "a creature you control attacking". Bot1 attacks with Wulfgar and an Ornithopter: Military Intelligence
+# ("Whenever you attack with two or more creatures, draw a card") triggers twice, and Wulfgar's melee twice (6/6).
+# Hand: 7 - 6 played on turn 1 = 1 (Military Intelligence); turn 3 draws an Island (2), plays it and the enchantment (0),
+# draws two = 2.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mox Emerald
+Mox Sapphire
+Ornithopter
+Wulfgar of Icewind Dale
+Military Intelligence
+Island x15
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Wulfgar of Icewind Dale.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Military Intelligence.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Wulfgar of Icewind Dale > Bot2; Ornithopter > Bot2)
+Bot1.Triggers(Wulfgar of Icewind Dale; Wulfgar of Icewind Dale; Military Intelligence; Military Intelligence)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Wulfgar of Icewind Dale.Power = 6
+
+[Expect]
+Bot2.Life = 14
+Bot1.Hand.Count = 2

@@ -1,0 +1,60 @@
+# Wulfgar of Icewind Dale: "If a creature you control attacking causes a triggered ability of a permanent you control to
+# trigger" (CR 603.2d) - the attacking creature must be its controller's. Bot1 has two Curses of Predation ("Whenever a
+# creature attacks enchanted player, put a +1/+1 counter on it"), one on Bot2 (turn 3) and one on itself (turn 5).
+# Wulfgar attacking Bot2 on turn 3 triggers the first Curse twice (two counters) and melee twice: 4/4 + 2 + 2 = 8, Bot2 at
+# 12. On turn 6 Bot2's Elvish Mystic attacking Bot1 triggers the second Curse, a permanent Bot1 controls, but no creature
+# Bot1 controls attacked: once, one counter, a 2/2 that deals 2.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mox Emerald
+Wulfgar of Icewind Dale
+Curse of Predation
+Curse of Predation
+Forest
+Island x15
+
+[Bot2 Deck]
+Forest
+Elvish Mystic
+Forest x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Wulfgar of Icewind Dale.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Curse of Predation.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Wulfgar of Icewind Dale > Bot2)
+Bot1.Triggers(Wulfgar of Icewind Dale; Wulfgar of Icewind Dale; Curse of Predation; Curse of Predation)
+[T3 Bot1.Main2]
+? Bot2.Life = 12
+? Bot1.Battlefield.Wulfgar of Icewind Dale.Counters.PlusOnePlusOne = 2
+[T5 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Curse of Predation.Cast(Bot1)
+[T6 Bot2.Main1]
+Bot2.Attack(Elvish Mystic > Bot1)
+[T6 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 18
+Bot2.Life = 12
+Bot2.Battlefield.Elvish Mystic.Counters.PlusOnePlusOne = 1
