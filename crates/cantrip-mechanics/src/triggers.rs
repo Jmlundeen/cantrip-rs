@@ -145,7 +145,7 @@ fn cascade_resolves(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// player is the one attacked, or the controller of the planeswalker or protector of the battle attacked (CR 508.5).
 /// Emrakul, the Aeons Torn and Ulamog's Crusher print it.
 pub const fn annihilator<const N: u8>(text: &'static str) -> AbilityDef {
-    triggered(when(EventMask::ATTACKS, this_attacks_defender), annihilate::<N>, text)
+    triggered(ANNIHILATOR, annihilate::<N>, text)
 }
 
 /// "Whenever this creature attacks" (CR 508.1m, 603.2): its own attack, whatever it attacks. Aragorn, King of Gondor and
@@ -213,9 +213,19 @@ pub fn you_attack(_: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
 }
 
 fn annihilate<const N: u8>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(defending) = g.defending_player(item.subject) else { return Ok(()) };
-    crate::sacrifice_chosen(g, defending, item.object, N, |_| true)
+    annihilate_n(g, item, N)
 }
+
+/// Annihilator's resolution (CR 702.86a) for an N worked out as it resolves: the defending player sacrifices `n`
+/// permanents. Ulamog, the Defiler's "annihilator X, where X is the number of +1/+1 counters on it" calls it, with its
+/// own `triggered(ANNIHILATOR, ..)`.
+pub fn annihilate_n(g: &mut dyn Game, item: &StackItem, n: u8) -> Result<(), Suspend> {
+    let Some(defending) = g.defending_player(item.subject) else { return Ok(()) };
+    crate::sacrifice_chosen(g, defending, item.object, n, |_| true)
+}
+
+/// Annihilator's trigger (CR 702.86a): "whenever this creature attacks", about the player or permanent it attacks.
+pub const ANNIHILATOR: Trigger = when(EventMask::ATTACKS, this_attacks_defender);
 
 /// Cascade (CR 702.85a): "When you cast this spell, exile cards from the top of your library until you exile a nonland
 /// card that costs less. You may cast it without paying its mana cost. Put all cards exiled this way that weren't cast
