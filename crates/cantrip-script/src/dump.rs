@@ -244,9 +244,12 @@ impl StateDump {
                 format!("{} lasting {}", mana_text(&player.pool), mana_text(&lasting))
             };
             // Restricted mana apart, each kind with its restriction: "{R}{R} (GainsHaste)".
-            for restriction in ManaRestriction::ALL {
+            // In `ManaRestriction::NAMED`'s order, those of subtypes after in the order they came.
+            let mut restricted: Vec<(ManaRestriction, ManaPool)> = s.restricted_of(p).collect();
+            restricted.sort_by_key(|(r, _)| ManaRestriction::NAMED.iter().position(|(n, _)| n == r).unwrap_or(usize::MAX));
+            for &(restriction, pool) in &restricted {
                 for m in Mana::ALL {
-                    let n = player.restricted[restriction.index()].get(m);
+                    let n = pool.get(m);
                     if n > 0 {
                         let mut one = ManaPool::default();
                         one.0[m as usize] = n;

@@ -300,10 +300,14 @@ shapes have an example:
   what it may be spent on (CR 106.6) is added by a mana ability with `.only_for(restriction)` (or `g.add_restricted_mana(..)`
   from an effect): `ManaRestriction::Spells(types)` is "spend this mana only to cast [type] spells" (`ARTIFACT_SPELLS`,
   `INSTANT_OR_SORCERY_SPELLS`, `PLANESWALKER_SPELLS`), `ManaRestriction::Abilities(types)` "spend this mana only to
-  activate abilities [of [type] sources]" (`ABILITIES` for any source, `LAND_ABILITIES`, `ARTIFACT_ABILITIES`), and
-  `NotNonartifactSpells`, `GainsHaste` and `LegendaryUncounterable` the rest. Each has its own place in the pool, so a new
-  parameter is added to `ManaRestriction::ALL` (the build fails on a card naming one that is not there), and the host
-  gives it a word on the wire (`restriction_view`).
+  activate abilities [of [type] sources]" (`ABILITIES` for any source, `LAND_ABILITIES`, `ARTIFACT_ABILITIES`),
+  `ManaRestriction::Subtypes(..)` "spend this mana only to cast [subtype] [creature] spells" (`SubtypeSpells::of(Dragon)`,
+  `::either(Dragon, Omen)`, `SubtypeSpells::CHOSEN_TYPE_CREATURE` for "a creature spell of the chosen type",
+  `.uncounterable()` for Cavern of Souls), and `NotNonartifactSpells`, `GainsHaste` and `LegendaryUncounterable` the
+  rest. A mana ability's subtype is read through its source's words and its chosen type as it is activated; an effect
+  that adds the mana reads `g.words(item.object).subtype(..)` itself. A new restriction of card types is added to
+  `ManaRestriction::NAMED` (the build fails on a card naming one that is not there), and the host gives it a word on the
+  wire (`restriction_view`). "N mana in any combination of colors" is `cantrip_mechanics::choose_colors`.
 - **Gift** (CR 702.174) is `CardDef.gift`, one of `cantrip_mechanics::gift`'s constants (a card, a Food, a tapped Fish, a
   Treasure, an Octopus, an extra turn); the promise and the opponent are asked before the targets, the spell's effect reads
   `item.gift.is_some()` and a target filter `gift::promised(q, asker.source)`. An instant or sorcery gives it as it

@@ -13,6 +13,9 @@ use crate::vocab::*;
 #[derive(Clone, Debug)]
 pub struct GameState {
     pub players: Vec<Player>,
+    /// Restricted mana in the players' pools (CR 106.6), in the order each player's restrictions first came; an entry
+    /// whose mana is all spent is gone. Empty in nearly every position.
+    pub restricted_mana: Vec<RestrictedMana>,
     pub objects: Vec<Obj>,
     /// Ordered object lists, one per zone slot (`Zone::slot`). Libraries are top first; the others in the order
     /// objects arrived.
@@ -72,7 +75,7 @@ impl GameState {
     fn position(
         &self,
     ) -> (
-        &Vec<Player>,
+        (&Vec<Player>, &Vec<RestrictedMana>),
         &Vec<Obj>,
         &Vec<Vec<ObjectId>>,
         &Vec<StackItem>,
@@ -84,7 +87,7 @@ impl GameState {
         (&Rng, u32, &Outcome, bool, &Vec<ObjectId>, &Vec<StackItem>),
     ) {
         (
-            &self.players,
+            (&self.players, &self.restricted_mana),
             &self.objects,
             &self.zones,
             &self.stack,
@@ -159,6 +162,7 @@ pub enum Undo {
     ObjectPushed,
     ObjectPopped(Box<Obj>),
     Player(PlayerId, Player),
+    RestrictedManaSet(Vec<RestrictedMana>),
     Turn(Turn),
     ZoneInserted { slot: u16, at: u16 },
     ZoneRemoved { slot: u16, at: u16, id: ObjectId },
@@ -207,6 +211,7 @@ impl GameState {
     pub fn new(players: usize, seed: u64) -> GameState {
         GameState {
             players: vec![Player { life: 20, starting_life: 20, ..Player::default() }; players],
+            restricted_mana: Vec::new(),
             objects: Vec::with_capacity(128),
             zones: vec![Vec::new(); Zone::slots(players)],
             stack: Vec::new(),
@@ -339,6 +344,64 @@ impl GameState {
             self.log(Undo::Player(p, old));
             self.set_unsettled();
         }
+    }
+
+    /// The restricted mana in `player`'s pool, each restriction with its mana (CR 106.6).
+    pub fn restricted_of(&self, player: PlayerId) -> impl Iterator<Item = (ManaRestriction, ManaPool)> + '_ {
+        self.restricted_mana.iter().filter(move |r| r.player == player).map(|r| (r.restriction, r.pool))
+    }
+
+    /// Whether `player`'s pool holds any restricted mana.
+    pub fn has_restricted_mana(&self, player: PlayerId) -> bool {
+        self.restricted_mana.iter().any(|r| r.player == player)
+    }
+
+    /// Adds `n` mana of one kind under `restriction` to `player`'s pool.
+    pub fn add_restricted_mana(&mut self, player: PlayerId, restriction: ManaRestriction, mana: Mana, n: u8) {
+        if n == 0 {
+            return;
+        }
+        let old = self.restricted_mana.clone();
+        match self.restricted_mana.iter_mut().find(|r| r.player == player && r.restriction == restriction) {
+            Some(r) => r.pool.0[mana as usize] += n,
+            None => {
+                let mut pool = ManaPool::default();
+                pool.0[mana as usize] = n;
+                self.restricted_mana.push(RestrictedMana { player, restriction, pool });
+            }
+        }
+        self.log(Undo::RestrictedManaSet(old));
+        self.set_unsettled();
+    }
+
+    /// Spends up to `n` mana of one kind under `restriction` from `player`'s pool: how many there were to spend.
+    pub fn spend_restricted_mana(&mut self, player: PlayerId, restriction: ManaRestriction, mana: Mana, n: u8) -> u8 {
+        let Some(at) = self.restricted_mana.iter().position(|r| r.player == player && r.restriction == restriction) else {
+            return 0;
+        };
+        let take = self.restricted_mana[at].pool.get(mana).min(n);
+        if take == 0 {
+            return 0;
+        }
+        let old = self.restricted_mana.clone();
+        self.restricted_mana[at].pool.0[mana as usize] -= take;
+        if self.restricted_mana[at].pool.is_empty() {
+            self.restricted_mana.remove(at);
+        }
+        self.log(Undo::RestrictedManaSet(old));
+        self.set_unsettled();
+        take
+    }
+
+    /// Empties `player`'s restricted mana (CR 106.4).
+    pub fn empty_restricted_mana(&mut self, player: PlayerId) {
+        if !self.has_restricted_mana(player) {
+            return;
+        }
+        let old = self.restricted_mana.clone();
+        self.restricted_mana.retain(|r| r.player != player);
+        self.log(Undo::RestrictedManaSet(old));
+        self.set_unsettled();
     }
 
     pub fn update_turn(&mut self, f: impl FnOnce(&mut Turn)) {
@@ -681,6 +744,7 @@ impl GameState {
             Undo::ObjectPopped(obj) => self.objects.push(*obj),
             Undo::Player(p, old) => self.players[p.index()] = old,
             Undo::Turn(old) => self.turn = old,
+            Undo::RestrictedManaSet(old) => self.restricted_mana = old,
             Undo::ZoneInserted { slot, at } => {
                 self.zones[slot as usize].remove(at as usize);
             }
@@ -773,6 +837,7 @@ impl GameState {
             Undo::ObjectPopped(_) => Undo::ObjectPushed,
             Undo::Player(p, _) => Undo::Player(*p, self.players[p.index()]),
             Undo::Turn(_) => Undo::Turn(self.turn),
+            Undo::RestrictedManaSet(_) => Undo::RestrictedManaSet(self.restricted_mana.clone()),
             Undo::ZoneInserted { slot, at } => {
                 Undo::ZoneRemoved { slot: *slot, at: *at, id: self.zones[*slot as usize][*at as usize] }
             }

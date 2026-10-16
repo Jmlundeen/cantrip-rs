@@ -765,8 +765,15 @@ pub struct Player {
     pub room: u8,
     /// Dungeons this player has completed (CR 309.7).
     pub dungeons_completed: u8,
-    /// Mana in the pool with a restriction on what it may be spent on (CR 106.6), by `ManaRestriction`.
-    pub restricted: [ManaPool; ManaRestriction::COUNT],
+}
+
+/// Mana in a player's pool with a restriction on what it may be spent on (CR 106.6): one entry per player and
+/// restriction, kept in `GameState::restricted_mana` apart from the player, so that a player stays plain data.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub struct RestrictedMana {
+    pub player: PlayerId,
+    pub restriction: ManaRestriction,
+    pub pool: ManaPool,
 }
 
 /// A limit on what some mana may be spent on (CR 106.6).
@@ -796,18 +803,73 @@ pub enum ManaRestriction {
     /// Any source: Omen Hawker, Pit Automaton, The Enigma Jewel. Land sources: Sunken Citadel, Eumidian Lifeseed.
     /// Artifact sources: Soldevi Machinist ("of artifacts"), Steelswarm Operator.
     Abilities(TypeSet),
+    /// "Spend this mana only to cast [a] [subtype] [or [subtype]] [creature] spell[s][, and that spell can't be
+    /// countered]" (CR 106.6, 205.3): only on casting a spell that has one of these subtypes as it is on the stack (its
+    /// characteristics there, CR 601.2g: a changeling creature spell is every creature type, CR 702.73a; a type an effect
+    /// gave it or took away counts). See `SubtypeSpells`.
+    Subtypes(SubtypeSpells),
+}
+
+/// "Spend this mana only to cast [a] [subtype] [or [subtype]] [creature] spell[s]" (CR 106.6, 205.3).
+/// Dragon spells: Desolation of Smaug, Sarkhan, Fireblood. A Dragon spell or an Omen spell: Maelstrom of the Spirit
+/// Dragon. A creature spell of the chosen type: Unclaimed Territory, Pillar of Origins, and Cavern of Souls, whose spell
+/// can't be countered.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub struct SubtypeSpells {
+    /// The subtypes, any one of which the spell must have. Read through the words of the text that names them (CR 612)
+    /// as the mana is added.
+    pub subtypes: [Option<Subtype>; 2],
+    /// "Of the chosen type" (CR 205.3m, 607.2a): as the mana is added, `subtypes` becomes the type chosen for the source
+    /// as it entered, or nothing at all if none was, which then no spell has.
+    pub chosen: bool,
+    /// Only a creature spell (CR 302): "a creature spell of the chosen type", "Dragon creature spells".
+    pub creature: bool,
+    /// "... and that spell can't be countered" (CR 106.6, 701.6): the effect the mana has on the spell it pays for.
+    pub uncounterable: bool,
+}
+
+impl SubtypeSpells {
+    /// "Spend this mana only to cast a creature spell of the chosen type."
+    pub const CHOSEN_TYPE_CREATURE: SubtypeSpells =
+        SubtypeSpells { subtypes: [None, None], chosen: true, creature: true, uncounterable: false };
+
+    /// "Spend this mana only to cast [subtype] spells."
+    pub const fn of(subtype: Subtype) -> SubtypeSpells {
+        SubtypeSpells { subtypes: [Some(subtype), None], chosen: false, creature: false, uncounterable: false }
+    }
+
+    /// "Spend this mana only to cast a [subtype] spell or a [subtype] spell."
+    pub const fn either(a: Subtype, b: Subtype) -> SubtypeSpells {
+        SubtypeSpells { subtypes: [Some(a), Some(b)], chosen: false, creature: false, uncounterable: false }
+    }
+
+    /// "... and that spell can't be countered."
+    pub const fn uncounterable(self) -> SubtypeSpells {
+        SubtypeSpells { uncounterable: true, ..self }
+    }
+
+    /// Whether a spell with these characteristics may be paid for with the mana.
+    fn admits(self, types: TypeSet, subtypes: &SubtypeSet) -> bool {
+        (!self.creature || types.has(CardType::Creature)) && self.subtypes.iter().flatten().any(|&s| subtypes.has(s))
+    }
 }
 
 /// What some mana is being spent on, as far as a restriction on it is concerned (CR 106.6).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum ManaPayment {
-    /// Casting a spell with these card types (CR 601.2g-h).
-    Spell { types: TypeSet, legendary: bool },
+    /// Casting a spell with these card types (CR 601.2g-h). Its subtypes are worked out only where some mana at hand is
+    /// restricted by subtype (`ManaRestriction::Subtypes`), and are empty otherwise.
+    Spell { types: TypeSet, subtypes: SubtypeSet, legendary: bool },
     /// Activating an ability whose source has these card types (CR 602.2b, 605.3a).
     Ability { source: TypeSet },
     /// Anything else: a special action, "unless ... pays", a cost a resolving effect asks for.
     Other,
 }
+
+/// What mana spent on a spell does to it (CR 106.6), as bits of `ManaRestriction::effects`: it gains haste, it can't be
+/// countered.
+pub const MANA_GIVES_HASTE: u8 = 1;
+pub const MANA_MAKES_UNCOUNTERABLE: u8 = 2;
 
 impl ManaRestriction {
     pub const ARTIFACT_SPELLS: ManaRestriction = ManaRestriction::Spells(TypeSet::of(&[CardType::Artifact]));
@@ -818,31 +880,19 @@ impl ManaRestriction {
     pub const LAND_ABILITIES: ManaRestriction = ManaRestriction::Abilities(TypeSet::of(&[CardType::Land]));
     pub const ARTIFACT_ABILITIES: ManaRestriction = ManaRestriction::Abilities(TypeSet::of(&[CardType::Artifact]));
 
-    pub const COUNT: usize = 9;
-    /// Every restriction a printed card's mana carries, each with a place of its own in the pool
-    /// (`Player::restricted`). A card whose mana has a restriction not here is refused where it is written
-    /// (`Adds::only_for` is checked at compile time).
-    pub const ALL: [ManaRestriction; ManaRestriction::COUNT] = [
-        ManaRestriction::NotNonartifactSpells,
-        ManaRestriction::GainsHaste,
-        ManaRestriction::LegendaryUncounterable,
-        ManaRestriction::ARTIFACT_SPELLS,
-        ManaRestriction::INSTANT_OR_SORCERY_SPELLS,
-        ManaRestriction::PLANESWALKER_SPELLS,
-        ManaRestriction::ABILITIES,
-        ManaRestriction::LAND_ABILITIES,
-        ManaRestriction::ARTIFACT_ABILITIES,
-    ];
-    const NAMES: [&'static str; ManaRestriction::COUNT] = [
-        "NotNonartifactSpells",
-        "GainsHaste",
-        "LegendarySpells, CantBeCountered",
-        "ArtifactSpells",
-        "InstantOrSorcerySpells",
-        "PlaneswalkerSpells",
-        "Abilities",
-        "LandAbilities",
-        "ArtifactAbilities",
+    /// The restrictions with no subtype in them, each with the name a scenario and the dump write it by. Those of
+    /// `Subtypes` are named for their subtypes (`name`). A card naming a restriction of card types not here fails the
+    /// build (`Adds::only_for` is checked at compile time), since the host has no word for it on the wire.
+    pub const NAMED: [(ManaRestriction, &'static str); 9] = [
+        (ManaRestriction::NotNonartifactSpells, "NotNonartifactSpells"),
+        (ManaRestriction::GainsHaste, "GainsHaste"),
+        (ManaRestriction::LegendaryUncounterable, "LegendarySpells, CantBeCountered"),
+        (ManaRestriction::ARTIFACT_SPELLS, "ArtifactSpells"),
+        (ManaRestriction::INSTANT_OR_SORCERY_SPELLS, "InstantOrSorcerySpells"),
+        (ManaRestriction::PLANESWALKER_SPELLS, "PlaneswalkerSpells"),
+        (ManaRestriction::ABILITIES, "Abilities"),
+        (ManaRestriction::LAND_ABILITIES, "LandAbilities"),
+        (ManaRestriction::ARTIFACT_ABILITIES, "ArtifactAbilities"),
     ];
 
     const fn same(self, other: ManaRestriction) -> bool {
@@ -857,29 +907,29 @@ impl ManaRestriction {
         }
     }
 
-    /// Its place in the pool (`Player::restricted`), if it has one.
-    pub const fn slot(self) -> Option<usize> {
+    /// Whether the wire has a word for it: one of `NAMED`, or any of `Subtypes`.
+    pub const fn is_known(self) -> bool {
+        if let ManaRestriction::Subtypes(_) = self {
+            return true;
+        }
         let mut i = 0;
-        while i < ManaRestriction::COUNT {
-            if self.same(ManaRestriction::ALL[i]) {
-                return Some(i);
+        while i < ManaRestriction::NAMED.len() {
+            if self.same(ManaRestriction::NAMED[i].0) {
+                return true;
             }
             i += 1;
         }
-        None
+        false
     }
 
-    /// Its place in the pool, as a bit of a set of restrictions too.
-    pub const fn index(self) -> usize {
-        match self.slot() {
-            Some(i) => i,
-            None => panic!("a mana restriction with no place in the pool: add it to ManaRestriction::ALL"),
-        }
+    /// Whether it limits mana by the subtypes of the spell it pays for, which only then need working out.
+    pub fn names_subtypes(self) -> bool {
+        matches!(self, ManaRestriction::Subtypes(_))
     }
 
     /// Whether mana under this restriction may be spent on `payment` (CR 106.6).
-    pub fn may_pay(self, payment: ManaPayment) -> bool {
-        match (self, payment) {
+    pub fn may_pay(self, payment: &ManaPayment) -> bool {
+        match (self, *payment) {
             // "Can't be spent to cast nonartifact spells": everything but casting a nonartifact spell.
             (ManaRestriction::NotNonartifactSpells, ManaPayment::Spell { types, .. }) => types.has(CardType::Artifact),
             (ManaRestriction::NotNonartifactSpells, _) => true,
@@ -887,22 +937,74 @@ impl ManaRestriction {
             (ManaRestriction::LegendaryUncounterable, ManaPayment::Spell { legendary, .. }) => legendary,
             (ManaRestriction::Spells(allowed), ManaPayment::Spell { types, .. }) => allowed.0 & types.0 != 0,
             (ManaRestriction::Abilities(allowed), ManaPayment::Ability { source }) => allowed.0 == 0 || allowed.0 & source.0 != 0,
+            (ManaRestriction::Subtypes(s), ManaPayment::Spell { types, ref subtypes, .. }) => s.admits(types, subtypes),
             _ => false,
         }
     }
 
+    /// What spending this mana on a spell does to it (CR 106.6): `MANA_GIVES_HASTE`, `MANA_MAKES_UNCOUNTERABLE`.
+    pub fn effects(self) -> u8 {
+        match self {
+            ManaRestriction::GainsHaste => MANA_GIVES_HASTE,
+            ManaRestriction::LegendaryUncounterable => MANA_MAKES_UNCOUNTERABLE,
+            ManaRestriction::Subtypes(s) if s.uncounterable => MANA_MAKES_UNCOUNTERABLE,
+            _ => 0,
+        }
+    }
+
     /// The name a scenario's `Spend:` and the state dump write it by: the limit and the effect, as the C# engine does.
-    pub fn name(self) -> &'static str {
-        ManaRestriction::NAMES[self.index()]
+    /// One of `Subtypes` is its subtypes (spaces left out) and "Spells" ("DragonSpells", "DragonOrOmenSpells", "ElfCreatureSpells"),
+    /// "NoTypeCreatureSpells" for a chosen type never chosen, with ", CantBeCountered" after it for its effect.
+    pub fn name(self) -> String {
+        if let ManaRestriction::Subtypes(s) = self {
+            let types: Vec<String> = s.subtypes.iter().flatten().map(|t| t.name().replace(' ', "")).collect();
+            let mut name = if types.is_empty() { "NoType".to_string() } else { types.join("Or") };
+            if s.chosen {
+                name = "ChosenType".to_string();
+            }
+            name.push_str(if s.creature { "CreatureSpells" } else { "Spells" });
+            if s.uncounterable {
+                name.push_str(", CantBeCountered");
+            }
+            return name;
+        }
+        ManaRestriction::NAMED.iter().find(|(r, _)| *r == self).map_or_else(|| format!("{self:?}"), |(_, n)| n.to_string())
     }
 
     /// Reads the words of a `Spend:` piece after the mana symbol: each a name of the limit or the effect.
     pub fn parse<'a>(words: impl Iterator<Item = &'a str>) -> Option<ManaRestriction> {
         let text: Vec<String> = words.map(|w| w.trim_matches(',').to_ascii_lowercase()).filter(|w| !w.is_empty()).collect();
-        ManaRestriction::ALL.into_iter().find(|r| {
-            let own: Vec<String> = r.name().split(',').map(|w| w.trim().to_ascii_lowercase()).collect();
+        let matches = |name: &str| {
+            let own: Vec<String> = name.split(',').map(|w| w.trim().to_ascii_lowercase()).collect();
             own.len() == text.len() && own.iter().all(|w| text.contains(w))
-        })
+        };
+        if let Some((r, _)) = ManaRestriction::NAMED.iter().find(|(_, n)| matches(n)) {
+            return Some(*r);
+        }
+        // A subtype restriction: "DragonSpells", "DragonOrOmenSpells", "ElfCreatureSpells", with "CantBeCountered".
+        let uncounterable = text.iter().any(|w| w == "cantbecountered");
+        if text.len() != 1 + uncounterable as usize {
+            return None;
+        }
+        let limit = text.iter().find(|w| *w != "cantbecountered")?;
+        let (body, creature) = match limit.strip_suffix("creaturespells") {
+            Some(body) => (body, true),
+            None => (limit.strip_suffix("spells")?, false),
+        };
+        // One subtype's name, or two joined by "Or": read against the names themselves, since a name may hold "or" (Orc,
+        // Warrior, Horror).
+        let named = |text: &str| Subtype::ALL.into_iter().find(|t| t.name().replace(' ', "").eq_ignore_ascii_case(text));
+        let subtypes = if body == "notype" {
+            [None, None]
+        } else if let Some(one) = named(body) {
+            [Some(one), None]
+        } else {
+            Subtype::ALL.into_iter().find_map(|first| {
+                let rest = body.strip_prefix(first.name().replace(' ', "").to_ascii_lowercase().as_str())?.strip_prefix("or")?;
+                Some([Some(first), Some(named(rest)?)])
+            })?
+        };
+        Some(ManaRestriction::Subtypes(SubtypeSpells { subtypes, chosen: false, creature, uncounterable }))
     }
 }
 
@@ -1061,6 +1163,28 @@ impl Rng {
             if r >= threshold {
                 return r % bound;
             }
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// A subtype restriction's name reads back as the same restriction, whatever its subtypes hold: "or" inside a name
+    /// (Orc, Warrior, Horror) and spaces (Time Lord) included.
+    #[test]
+    fn subtype_restriction_names_read_back() {
+        let one = |t| ManaRestriction::Subtypes(SubtypeSpells::of(t));
+        let mut all: Vec<ManaRestriction> = Subtype::ALL.into_iter().map(one).collect();
+        all.push(ManaRestriction::Subtypes(SubtypeSpells::either(Subtype::Orc, Subtype::Warrior)));
+        all.push(ManaRestriction::Subtypes(SubtypeSpells::either(Subtype::Horror, Subtype::Orc)));
+        all.push(ManaRestriction::Subtypes(SubtypeSpells::either(Subtype::Dragon, Subtype::Omen)));
+        all.push(ManaRestriction::Subtypes(SubtypeSpells { subtypes: [Some(Subtype::Elf), None], chosen: false, creature: true, uncounterable: true }));
+        all.push(ManaRestriction::Subtypes(SubtypeSpells { subtypes: [None, None], chosen: false, creature: true, uncounterable: false }));
+        for r in all {
+            let name = r.name();
+            assert_eq!(ManaRestriction::parse(name.split_whitespace()), Some(r), "{name}");
         }
     }
 }

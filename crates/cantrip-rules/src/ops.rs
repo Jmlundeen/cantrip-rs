@@ -1066,8 +1066,10 @@ pub fn copy_spell(cx: &mut Cx, spell: ObjectId, copier: PlayerId, new_targets: b
         zone: Zone::STACK,
         timestamp,
         controlled_since: turn,
-        // A copy was paid for by no one: no mana spent (CR 707.10).
+        // A copy was paid for by no one: no mana spent (CR 707.10), so none of what mana does to the spell it pays for
+        // (CR 106.6: Cavern of Souls' "can't be countered", Arena of Glory's haste) is the copy's.
         spent: ManaPool::default(),
+        marks: Marks { cant_be_countered: false, gains_haste: false, ..original.marks },
         card_copy: true,
         prepared_from: None,
         prepared: false,

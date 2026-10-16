@@ -348,6 +348,10 @@ public enum ManaSpendFilterView
     LandAbilities = 8,
     /// <summary>Only to activate abilities of artifact sources.</summary>
     ArtifactAbilities = 9,
+    /// <summary>Only to cast a spell with one of the subtypes named beside it: "Dragon spells", "a Dragon spell or an Omen spell".</summary>
+    SubtypeSpells = 10,
+    /// <summary>Only to cast a creature spell with one of the subtypes named beside it: "a creature spell of the chosen type".</summary>
+    SubtypeCreatureSpells = 11,
 }
 
 /// <summary>What spending some mana does to whatever it pays for (CR 106.6): the effect half of a restriction.</summary>

@@ -44,13 +44,13 @@ pub fn next_step(game: &mut Game) {
     // the combat phase ends (CR 106.4, 500.5a).
     if turn.number > 0 {
         for p in s.seats().collect::<Vec<_>>() {
-            if !s.player(p).pool.is_empty() || !s.player(p).lasting.is_empty() || s.player(p).restricted.iter().any(|r| !r.is_empty()) {
+            if !s.player(p).pool.is_empty() || !s.player(p).lasting.is_empty() {
                 s.update_player(p, |pl| {
                     pl.pool = if combat_ends { ManaPool::default() } else { pl.lasting_mana() };
                     pl.lasting = pl.pool;
-                    pl.restricted = Default::default();
                 });
             }
+            s.empty_restricted_mana(p);
         }
     }
     // CR 724.1d: a turn ended during combat removes every creature and planeswalker from combat as the step ends, as

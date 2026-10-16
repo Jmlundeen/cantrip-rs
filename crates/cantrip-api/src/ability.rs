@@ -288,9 +288,9 @@ impl Adds {
     const NOTHING: Adds = Adds { pool: ManaPool([0; 6]), any: 0, any_color: false, colors: ColorSet::NONE, restricted: None, effect: None };
 
     /// "Spend this mana only ..." (CR 106.6): the mana goes to the pool apart from unrestricted mana.
-    /// A restriction the pool has no place for fails the build (`ManaRestriction::ALL`).
+    /// A restriction of card types that is not one of `ManaRestriction::NAMED` fails the build.
     pub const fn only_for(self, restriction: ManaRestriction) -> Adds {
-        let _ = restriction.index();
+        assert!(restriction.is_known(), "a mana restriction the wire has no word for: add it to ManaRestriction::NAMED");
         Adds { restricted: Some(restriction), ..self }
     }
 

@@ -22,7 +22,7 @@ namespace Cantrip.Protocol;
 public sealed class PlayerView
 {
     /// <summary>Protocol version, checked at the handshake so mismatched builds fail loudly.</summary>
-    public const int ProtocolVersion = 159;
+    public const int ProtocolVersion = 160;
 
     [Key(0)]
     public int Version { get; set; } = ProtocolVersion;
@@ -194,6 +194,14 @@ public sealed class RestrictedManaView
 
     [Key(4)]
     public ManaSpendEffectView Effect { get; set; }
+
+    /// <summary>
+    /// For <see cref="ManaSpendFilterView.SubtypeSpells"/> and <see cref="ManaSpendFilterView.SubtypeCreatureSpells"/>:
+    /// the subtypes, any one of which the spell must have ("Dragon", "Omen"). Empty for a chosen type never chosen,
+    /// which no spell has.
+    /// </summary>
+    [Key(5)]
+    public List<string> SpendSubtypes { get; set; } = [];
 }
 
 /// <summary>

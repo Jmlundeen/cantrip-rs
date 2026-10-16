@@ -1866,6 +1866,10 @@ public sealed class ActionOptionMessage
     /// </summary>
     [Key(27)]
     public bool PaysNothing { get; set; }
+
+    /// <summary>The subtypes <see cref="Filter"/> names, as <see cref="RestrictedManaView.SpendSubtypes"/>.</summary>
+    [Key(28)]
+    public List<string> SpendSubtypes { get; set; } = [];
 }
 
 /// <summary>
@@ -2519,6 +2523,10 @@ public sealed class TakeActionAnswer : AnswerPayload
     /// <summary>What spending that mana does to whatever it pays for, alongside <see cref="Filter"/>.</summary>
     [Key(9)]
     public ManaSpendEffectView Effect { get; set; }
+
+    /// <summary>The subtypes <see cref="Filter"/> names, as <see cref="RestrictedManaView.SpendSubtypes"/>.</summary>
+    [Key(13)]
+    public List<string> SpendSubtypes { get; set; } = [];
 }
 
 /// <summary>

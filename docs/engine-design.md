@@ -357,12 +357,25 @@ player's hexproof from a quality (Veil of Summer).
 
 ### Restricted mana
 
-Mana a restriction limits (CR 106.6) is kept in the pool apart from ordinary mana, one `ManaPool` per restriction
-(`Player::restricted`, by `ManaRestriction::index`). A restriction is either a limit on what may be cast or activated or
-an effect the mana has on what it pays for: `Spells(types)` pays only for casting a spell with one of the card types
-(Mishra's Workshop, Great Hall of the Biblioplex, Gideon's Memorial), `Abilities(types)` only for activating an ability
-whose source has one of them, or any source (Sunken Citadel, Steelswarm Operator, Omen Hawker), and
-`NotNonartifactSpells`, `GainsHaste` and `LegendaryUncounterable` are the three single cards' own. What a payment is for
+Mana a restriction limits (CR 106.6) is kept in the pool apart from ordinary mana, one `ManaPool` per restriction present
+(`GameState::restricted_mana`, a list of player, restriction and pool beside the players, so that a player stays plain
+`Copy` data; written through its own undo entry, only when it changes, and empty in nearly every position). A
+restriction is a limit on what may be cast or activated, and an effect the mana has on what it pays for
+(`ManaRestriction::effects`: haste, can't be countered): `Spells(types)` pays only for casting a spell with one of the
+card types (Mishra's Workshop, Great Hall of the Biblioplex, Gideon's Memorial), `Abilities(types)` only for activating
+an ability whose source has one of them, or any source (Sunken Citadel, Steelswarm Operator, Omen Hawker),
+`Subtypes(SubtypeSpells)` only for casting a spell with one of up to two subtypes, a creature spell where it says so,
+uncounterable where it says so (Desolation of Smaug and Sarkhan, Fireblood's Dragon spells, Maelstrom of the Spirit
+Dragon's Dragon or Omen spells, Unclaimed Territory, Pillar of Origins and Cavern of Souls' creature spell of the chosen
+type), and `NotNonartifactSpells`, `GainsHaste` and `LegendaryUncounterable` are the three single cards' own. A subtype
+is any of hundreds, so the pool's list holds whatever restrictions the game made; those of card types are a named list
+(`ManaRestriction::NAMED`, which the build checks a card's `.only_for` against). A mana ability's restriction is made
+concrete as it is activated (`actions::restriction_from`): its subtype words read through its source's words (CR 612),
+"the chosen type" the source's `chosen_subtype` (CR 607.2a), or none - no spell - for a source that never entered. A spell
+is judged by its characteristics on the stack (`cx.chars`: changeling, text and type changes count); the advice whether
+a card in hand is castable (`spell_kind`) takes the face's subtypes, its changeling and the whole card's own as it is in
+the hand. A spell's subtypes are only worked out where some mana at hand is restricted by subtype. A copy of a spell had
+no mana spent on it, so it gets nothing the mana did to the original (CR 707.10). What a payment is for
 is `ManaPayment`, judged as the cost is paid (`actions::payment_for`): casting a spell on the stack (CR 601.2g), activating
 an ability of a source in any zone - a mana ability's own mana cost too (CR 605.3a) - or anything else, which no
 "abilities" mana pays: a special action (CR 116.2, turning a face-down permanent up, unlocking a door), "unless ... pays"

@@ -283,6 +283,11 @@ pub enum ManaSpendFilterView {
     LandAbilities,
     /// Abilities of artifact sources.
     ArtifactAbilities,
+    /// Spells with one of the subtypes named beside it (`spend_subtypes`): "Dragon spells", "a Dragon spell or an Omen
+    /// spell".
+    SubtypeSpells,
+    /// Creature spells with one of the subtypes named beside it: "a creature spell of the chosen type".
+    SubtypeCreatureSpells,
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -384,6 +389,9 @@ pub struct RestrictedManaView {
     pub amount: i32,
     pub filter: ManaSpendFilterView,
     pub effect: ManaSpendEffectView,
+    /// For `SubtypeSpells` and `SubtypeCreatureSpells`: the subtypes, any one of which the spell must have; empty for a
+    /// chosen type never chosen, which no spell has.
+    pub spend_subtypes: Vec<String>,
 }
 
 /// One object the viewer can see. Characteristics are computed, never printed.
@@ -608,6 +616,8 @@ pub struct ActionOptionMessage {
     pub targets_optional: bool,
     pub filter: ManaSpendFilterView,
     pub effect: ManaSpendEffectView,
+    /// The subtypes `filter` names, as `RestrictedManaView::spend_subtypes`.
+    pub spend_subtypes: Vec<String>,
     pub spell_name: String,
     pub produces_of_any_color_each: i32,
     pub sacrifice_candidates: Vec<ViewHandle>,
@@ -642,6 +652,7 @@ impl ActionOptionMessage {
             targets_optional: false,
             filter: ManaSpendFilterView::None,
             effect: ManaSpendEffectView::None,
+            spend_subtypes: Vec::new(),
             spell_name: String::new(),
             produces_of_any_color_each: 0,
             sacrifice_candidates: Vec::new(),
@@ -1099,6 +1110,8 @@ pub struct TakeActionAnswer {
     pub mana: Option<ManaTypeView>,
     pub filter: ManaSpendFilterView,
     pub effect: ManaSpendEffectView,
+    /// The subtypes `filter` names, as `RestrictedManaView::spend_subtypes`.
+    pub spend_subtypes: Vec<String>,
 }
 
 impl TakeActionAnswer {
@@ -1115,6 +1128,7 @@ impl TakeActionAnswer {
             mana: None,
             filter: ManaSpendFilterView::None,
             effect: ManaSpendEffectView::None,
+            spend_subtypes: Vec::new(),
         }
     }
 
@@ -1125,6 +1139,7 @@ impl TakeActionAnswer {
         answer.tap = option.tap;
         answer.filter = option.filter;
         answer.effect = option.effect;
+        answer.spend_subtypes = option.spend_subtypes.clone();
         answer
     }
 }

@@ -1012,7 +1012,7 @@ impl cantrip_api::Game for Cx<'_> {
     }
 
     fn add_restricted_mana(&mut self, player: PlayerId, mana: Mana, amount: u8, restriction: ManaRestriction) {
-        self.g.state.update_player(player, |p| p.restricted[restriction.index()].0[mana as usize] += amount);
+        self.g.state.add_restricted_mana(player, restriction, mana, amount);
     }
 
     fn add_counters(&mut self, object: ObjectId, kind: CounterKind, amount: i16) {
