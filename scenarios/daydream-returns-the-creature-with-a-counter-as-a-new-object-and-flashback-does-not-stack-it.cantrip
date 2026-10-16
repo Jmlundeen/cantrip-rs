@@ -1,4 +1,4 @@
-# Daydream: "Exile target creature you own, then return that card to the battlefield under your control with a +1/+1
+# Daydream: "Exile target creature you control, then return that card to the battlefield under its owner's control with a +1/+1
 # counter on it." The Ornithopter comes back as a new object (CR 400.7) with one +1/+1 counter (CR 122.6) and is
 # summoning sick again. Flashback {2}{W} (CR 702.34a) exiles the Daydream afterwards, and flashed back at the same
 # creature the counter is not added to: the first counter went with the old object, the new one has exactly one.

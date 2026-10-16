@@ -1,0 +1,41 @@
+# Daydream is a sorcery (CR 307.1, 117.1a): on Bot2's turn, with Bot2's Ornithopter spell on the stack and Bot1 holding
+# priority, neither a hard cast from the hand nor the flashback from the graveyard (CR 702.34a, which follows the
+# card's timing) is offered. Bot1 cast the first Daydream in its own main phase, the positive control, so flashback
+# is available in principle (three Moxen are untapped).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Ornithopter
+Daydream
+Daydream
+Plains x13
+
+[Bot2 Deck]
+Ornithopter
+Plains x19
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Daydream.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Daydream
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+? Stack.Count = 1
+! Bot1.Hand.Daydream.Cast(Ornithopter)
+! Bot1.Graveyard.Daydream.Cast(Ornithopter; Ability: Flashback)
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Daydream
+Bot1.Hand = Daydream

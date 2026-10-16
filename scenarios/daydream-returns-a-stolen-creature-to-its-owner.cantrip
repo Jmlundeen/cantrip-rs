@@ -1,19 +1,21 @@
-# Daydream: "target creature you own" - owned, not controlled (CR 108.3). Bot2's Dack Fayden takes Bot1's Ornithopter
-# (an artifact creature). Bot1 Daydreams it: the legal target is exiled and returns "under your control" (CR 400.7),
-# so it comes back under Bot1, with its +1/+1 counter.
+# Daydream: "Exile target creature you control, then return that card to the battlefield under its owner's control".
+# Bot2's Dack Fayden takes Bot1's Ornithopter (an artifact creature), and Bot2 Daydreams the stolen creature: it
+# is a creature Bot2 controls, so it is legal, and it returns under its owner Bot1's control (CR 400.7), with its
+# +1/+1 counter (CR 122.6) - not under Bot2's.
 
 [Bot1 Deck]
 Mox Pearl
 Ornithopter
-Daydream
-Plains x17
+Plains x18
 
 [Bot2 Deck]
 Mox Sapphire
 Mox Ruby
 Mox Jet
+Mox Pearl
 Dack Fayden
-Plains x16
+Daydream
+Plains x14
 
 [Actions]
 Bot1.Hand.Mox Pearl.Cast
@@ -22,6 +24,7 @@ Bot1.Hand.Ornithopter.Cast
 Bot2.Hand.Mox Sapphire.Cast
 Bot2.Hand.Mox Ruby.Cast
 Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
 Bot2.Battlefield.Mox Sapphire.Activate
 Bot2.Battlefield.Mox Ruby.Activate
 Bot2.Battlefield.Mox Jet.Activate
@@ -31,15 +34,14 @@ Bot1.Pass
 Bot2.Battlefield.Dack Fayden.Activate(Bot1.Battlefield.Ornithopter; Ability: Gain control)
 Bot2.Pass
 Bot1.Pass
-? Bot2.Battlefield = Mox Sapphire; Mox Ruby; Mox Jet; Dack Fayden; Ornithopter
-[T3 Bot1.Main1]
-Bot1.Battlefield.Mox Pearl.Activate
-Bot1.Hand.Daydream.Cast(Bot2.Battlefield.Ornithopter)
-Bot1.Pass
+? Bot2.Battlefield = Mox Sapphire; Mox Ruby; Mox Jet; Mox Pearl; Dack Fayden; Ornithopter
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Daydream.Cast(Bot2.Battlefield.Ornithopter)
 Bot2.Pass
+Bot1.Pass
 
 [Expect]
-Bot2.Battlefield = Mox Sapphire; Mox Ruby; Mox Jet; Dack Fayden
+Bot2.Battlefield = Mox Sapphire; Mox Ruby; Mox Jet; Mox Pearl; Dack Fayden
 Bot1.Battlefield = Mox Pearl; Ornithopter
 Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
-Bot1.Graveyard = Daydream
+Bot2.Graveyard = Daydream

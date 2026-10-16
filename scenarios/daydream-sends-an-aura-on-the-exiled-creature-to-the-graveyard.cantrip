@@ -1,0 +1,37 @@
+# Daydream exiles Bot1's Ornithopter, which carries Rancor. The creature returns as a new object (CR 400.7), so Rancor
+# is no longer attached to anything and is put into the graveyard as a state-based action (CR 704.5m); Rancor's own
+# trigger then returns it to its owner's hand. The creature comes back without Rancor's +2/+0 (power 0 + counter 1).
+
+[Bot1 Deck]
+Mox Pearl
+Black Lotus
+Ornithopter
+Rancor
+Daydream
+Plains x15
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Rancor.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Daydream.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Mox Pearl; Ornithopter
+Bot1.Battlefield.Ornithopter.Power = 1
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot1.Graveyard = Daydream; Black Lotus
+Bot1.Hand.Count = 3
