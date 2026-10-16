@@ -1,0 +1,48 @@
+# An ability that triggers while the turn is being ended is put on the stack in the cleanup step, where players then get
+# priority (CR 724.1f, 514.3a). Ultima destroys the Llanowar Elves that Rancor enchants; Rancor, attached to nothing, is put
+# into the graveyard by the state-based actions checked as the turn ends (CR 724.1c, 704.5m), and its "return it to its
+# owner's hand" triggers then, during the process, so it does not cease to exist (724.1a is about abilities that
+# triggered before). It waits for the cleanup step, goes on the stack there, and resolves: Rancor is back in Bot1's hand.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Rancor
+Ultima
+Mox Pearl
+Black Lotus
+Mox Jet
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Rancor.Cast(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves.Power = 3
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ultima.Cast
+[T3 Bot1.Cleanup]
+? Step = Cleanup
+? Stack.Count = 1
+? Bot1.Graveyard.Count = 5
+[T4 Bot2.Upkeep]
+
+[Expect]
+Turn = 4
+Bot1.Hand = Forest; Rancor
+Bot1.Battlefield = Forest
+Bot1.Graveyard = Mox Jet; Mox Pearl; Llanowar Elves; Black Lotus
+Exile = Ultima

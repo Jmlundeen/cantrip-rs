@@ -1,0 +1,60 @@
+# Ultima destroys every artifact and creature, Bot1's and Bot2's, and ends the turn (CR 701.8a, 724.1). Haywire Mite's
+# "when this creature dies" triggers as Ultima destroys it, but that was before the turn began to end, so the ability
+# ceases to exist and is never put on the stack (CR 724.1a): Bot2 gains no life. Ultima is exiled, not put into the
+# graveyard (724.1b). Lands and the enchantment Dawn of a New Age stay. The end step is skipped (724.1e), so Dawn's "at
+# the beginning of your end step" never triggers: it keeps its hope counter and Bot1 draws nothing. Turn 4 is Bot2's.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Black Lotus
+Ornithopter
+Dawn of a New Age
+Ultima
+Plains x10
+
+[Bot2 Deck]
+Mountain
+Haywire Mite
+Mox Sapphire
+Mountain x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Haywire Mite.Cast
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Dawn of a New Age.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Dawn of a New Age.Counters.Hope = 1
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Ultima.Cast
+[T4 Bot2.Upkeep]
+? ActivePlayer = Bot2
+
+[Expect]
+Turn = 4
+Bot1.Battlefield = Plains; Dawn of a New Age
+Bot1.Battlefield.Dawn of a New Age.Counters.Hope = 1
+Bot2.Battlefield = Mountain
+Bot1.Graveyard = Ornithopter; Mox Ruby; Mox Jet; Mox Pearl; Black Lotus
+Bot2.Graveyard = Mox Sapphire; Haywire Mite
+Exile = Ultima
+Bot1.Life = 20
+Bot2.Life = 20
+Bot1.Hand.Count = 0

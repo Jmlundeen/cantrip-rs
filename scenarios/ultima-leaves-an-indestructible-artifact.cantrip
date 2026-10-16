@@ -1,0 +1,33 @@
+# Ultima destroys (CR 701.8a), so an indestructible artifact survives it (CR 702.12b): The Mind Stone, tapped to help pay
+# for Ultima, is still on the battlefield, while Mox Pearl is destroyed.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+The Mind Stone
+Black Lotus
+Ultima
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.The Mind Stone.Cast
+Bot1.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.The Mind Stone.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Ultima.Cast
+[T4 Bot2.Upkeep]
+
+[Expect]
+Turn = 4
+Bot1.Battlefield = Plains; The Mind Stone
+Bot1.Graveyard = Mox Pearl; Black Lotus
+Exile = Ultima
