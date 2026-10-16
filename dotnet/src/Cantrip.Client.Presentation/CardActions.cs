@@ -137,11 +137,15 @@ public sealed class CardActions
     /// <summary>Offers to pay a Phyrexian mana symbol still owed with life instead of mana (CR 107.4f), one per symbol.</summary>
     public List<ActionOptionMessage> PayLife { get; } = [];
 
-    /// <summary>The offer to put one mana of this kind towards the spell, or null when none is free.</summary>
-    public ActionOptionMessage? AssignFor(ManaTypeView type, ManaSpendFilterView filter, ManaSpendEffectView effect) =>
+    /// <summary>
+    /// The offer to put one mana of this kind towards the spell, or null when none is free. Mana restricted to spells of
+    /// some subtypes is told apart by them too: Dragon mana and Elf mana are different mana (CR 106.6).
+    /// </summary>
+    public ActionOptionMessage? AssignFor(ManaTypeView type, ManaSpendFilterView filter, ManaSpendEffectView effect, IReadOnlyList<string>? subtypes = null) =>
         Assignable.FirstOrDefault(option =>
             option.Produces.Count == 1 && option.Produces[0] == type
-            && option.Filter == filter && option.Effect == effect);
+            && option.Filter == filter && option.Effect == effect
+            && option.SpendSubtypes.SequenceEqual(subtypes ?? []));
 
     public IReadOnlyList<ActionOptionMessage> For(ViewHandle handle) =>
         _bySource.TryGetValue(handle.Value, out List<ActionOptionMessage>? options) ? options : None;
@@ -238,7 +242,7 @@ public sealed class CardActions
                 {
                     notes.Add(option.Filter == ManaSpendFilterView.NotNonartifactSpells
                         ? "can't be spent on nonartifact spells"
-                        : $"only for {Restricted(option.Filter)}");
+                        : $"only for {Restricted(option.Filter, option.SpendSubtypes)}");
                 }
 
                 if (option.Effect == ManaSpendEffectView.GainsHaste)
@@ -561,9 +565,16 @@ public sealed class CardActions
         return 0;
     }
 
-    /// <summary>What restricted mana may be spent on, as a phrase.</summary>
-    public static string Restricted(ManaSpendFilterView filter) => filter switch
+    /// <summary>
+    /// What restricted mana may be spent on, as a phrase. <paramref name="subtypes"/> are those a subtype filter names:
+    /// "Dragon or Omen spells", "Elf creature spells".
+    /// </summary>
+    public static string Restricted(ManaSpendFilterView filter, IReadOnlyList<string>? subtypes = null) => filter switch
     {
+        ManaSpendFilterView.SubtypeSpells or ManaSpendFilterView.SubtypeCreatureSpells when subtypes is not { Count: > 0 } =>
+            "spells of a chosen type, and no type was chosen",
+        ManaSpendFilterView.SubtypeSpells => $"{Subtypes(subtypes)} spells",
+        ManaSpendFilterView.SubtypeCreatureSpells => $"{Subtypes(subtypes)} creature spells",
         ManaSpendFilterView.CreatureSpells => "creature spells",
         ManaSpendFilterView.InstantOrSorcerySpells => "instant and sorcery spells",
         ManaSpendFilterView.ActivatedAbilities => "activated abilities",
@@ -575,6 +586,12 @@ public sealed class CardActions
         ManaSpendFilterView.ArtifactAbilities => "abilities of artifact sources",
         _ => "anything",
     };
+
+    /// <summary>
+    /// The subtypes a restriction names, as its text says them: "Dragon", "Dragon or Omen". None is a chosen type never
+    /// chosen (a copy of the permanent that never entered), which no spell has: callers word that case themselves.
+    /// </summary>
+    public static string Subtypes(IReadOnlyList<string>? subtypes) => string.Join(" or ", subtypes ?? []);
 
     /// <summary>The oracle symbol for a type of mana: "W", "C".</summary>
     public static string Symbol(ManaTypeView type) => type switch

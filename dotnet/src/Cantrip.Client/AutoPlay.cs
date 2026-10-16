@@ -641,6 +641,7 @@ public static class AutoPlay
         Mana = option.Produces[0],
         Filter = option.Filter,
         Effect = option.Effect,
+        SpendSubtypes = option.SpendSubtypes,
     };
 
     /// <summary>

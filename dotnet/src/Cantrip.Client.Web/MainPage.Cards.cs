@@ -582,6 +582,7 @@ public sealed partial class MainPage
         Mana = option.Kind is ActionKindView.AssignMana or ActionKindView.PayLifeForSymbol ? option.Produces[0] : null,
         Filter = option.Filter,
         Effect = option.Effect,
+        SpendSubtypes = option.SpendSubtypes,
     };
 
     private void Send(GameClient client, AnswerPayload answer)
