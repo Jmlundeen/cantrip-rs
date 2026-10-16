@@ -1,0 +1,51 @@
+# Song of Totentanz with X = 2 on turn 5: Bot1 casts an Ornithopter first, then the Song makes two Rats. The creatures Bot1
+# controls as it resolves (Ornithopter and both Rats, all summoning sick) gain haste until end of turn, so all three attack. An
+# Ornithopter cast after the Song, a new object after it resolved, does not gain haste and is refused as an attacker
+# (CR 611.2c). Bot2's own Ornithopter gains nothing. The Rats are 1/1 black Rat tokens, so Bot2 takes 2.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Mountain
+Song of Totentanz
+Ornithopter
+Ornithopter
+Mountain x2
+Mountain x12
+
+[Bot2 Deck]
+Ornithopter
+Island x17
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Hand.Song of Totentanz.Cast(X: 2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Rat#1.Keywords = CantBlock; Haste
+? Bot1.Battlefield.Ornithopter.Keywords = Flying; Haste
+? Bot2.Battlefield.Ornithopter.Keywords = Flying
+Bot1.Hand.Ornithopter.Cast
+! Bot1.Attack(Ornithopter#2 > Bot2)
+Bot1.Attack(Rat#1 > Bot2; Rat#2 > Bot2; Ornithopter#1 > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Graveyard = Song of Totentanz
+Bot1.Battlefield.Rat#1.Token = true
+Bot1.Battlefield.Rat#1.Colors = Black
+Bot1.Battlefield.Rat#1.Subtypes = Rat
+Bot1.Battlefield.Rat#1.Power = 1
+Bot1.Battlefield.Rat#1.Toughness = 1
+Bot2.Life = 18

@@ -1,0 +1,44 @@
+# "This token can't block": Bot2's Llanowar Elves attack into Bot1's Rat token and Ornithopter. The Rat's block is refused
+# (CR 509.1b); the positive control is the Ornithopter, which blocks the same attacker in the same declaration, so Bot1 takes no
+# damage.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Song of Totentanz
+Ornithopter
+Mountain x3
+Mountain x13
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x5
+Forest x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Song of Totentanz.Cast(X: 1)
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Attack(Llanowar Elves > Bot1)
+! Bot1.Block(Rat > Llanowar Elves)
+Bot1.Block(Ornithopter > Llanowar Elves)
+[T4 Bot2.Main2]
+
+[Expect]
+Turn = 4
+Bot1.Life = 20
+Bot1.Battlefield = Mountain; Mountain; Ornithopter; Rat
+Bot2.Battlefield.Llanowar Elves.Damage = 0

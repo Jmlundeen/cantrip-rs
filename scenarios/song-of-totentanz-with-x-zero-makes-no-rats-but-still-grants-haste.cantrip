@@ -1,0 +1,28 @@
+# Song of Totentanz with X = 0 costs only {R}: it creates no Rats, yet its second sentence still happens. Bot1's Ornithopter,
+# cast the same turn and summoning sick, attacks on turn 1. No Rat tokens appear (the battlefield has only the land and the Ornithopter).
+
+[Bot1 Deck]
+Mountain
+Song of Totentanz
+Ornithopter
+Mountain x4
+Mountain x13
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Song of Totentanz.Cast(X: 0)
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Ornithopter > Bot2)
+
+[Expect]
+Turn = 1
+Bot1.Graveyard = Song of Totentanz
+Bot1.Battlefield = Mountain; Ornithopter
+Bot1.Battlefield.Ornithopter.Keywords = Flying; Haste
+Combat.Attackers = Ornithopter > Bot2
