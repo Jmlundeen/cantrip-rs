@@ -1,0 +1,57 @@
+# Maelstrom of the Spirit Dragon. Turn 1: its any-color mana, "only to cast a Dragon spell or an Omen spell" (CR 106.6,
+# 205.3), is red and alone in the pool: Lightning Bolt can't be cast with it, Phyrexian Dragon Engine (a Dragon) is cast
+# with it, Mox Jet's and Mox Pearl's. Turn 5: "{4}, {T}, Sacrifice this land: Search your library for a Dragon card,
+# reveal it, put it into your hand, then shuffle" - Ornithopter is no Dragon card (! Search), Magmatic Hellkite is.
+
+[Bot1 Deck]
+Maelstrom of the Spirit Dragon
+Mox Jet
+Mox Pearl
+Mox Emerald
+Phyrexian Dragon Engine
+Lightning Bolt
+Island
+Mountain
+Mountain
+Ornithopter
+Magmatic Hellkite
+Mountain x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Maelstrom of the Spirit Dragon.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Maelstrom of the Spirit Dragon.Activate(Ability: any color; Color: Red)
+? Bot1.Mana = {R} (DragonOrOmenSpells)
+! Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Phyrexian Dragon Engine.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Maelstrom of the Spirit Dragon.Activate(Ability: Search)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Search(Ornithopter)
+Bot1.Search(Magmatic Hellkite)
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield = Mox Jet; Mox Pearl; Mox Emerald; Phyrexian Dragon Engine; Mountain; Mountain
+Bot1.Graveyard = Maelstrom of the Spirit Dragon
+Bot1.Hand = Lightning Bolt; Island; Magmatic Hellkite
+Bot2.Life = 20

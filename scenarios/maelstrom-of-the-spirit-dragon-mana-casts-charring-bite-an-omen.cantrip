@@ -1,0 +1,43 @@
+# Maelstrom of the Spirit Dragon's mana is "only to cast a Dragon spell or an Omen spell" (CR 106.6, 205.3): Twinmaw
+# Stormbrood cast as its Omen, Charring Bite, is on the stack a Sorcery - Omen alone (CR 720.3b), and is cast with the
+# Maelstrom's {R} and Mox Jet's {B}. Lightning Bolt, an instant with neither subtype, can't be cast with the same mana.
+
+[Bot1 Deck]
+Maelstrom of the Spirit Dragon
+Mox Jet
+Twinmaw Stormbrood
+Lightning Bolt
+Island
+Island
+Island
+Island x8
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x12
+
+[Actions]
+Bot1.Hand.Maelstrom of the Spirit Dragon.Play
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Maelstrom of the Spirit Dragon.Activate(Ability: any color; Color: Red)
+? Bot1.Mana = {R} (DragonOrOmenSpells)
+! Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Twinmaw Stormbrood.Cast(Bot2.Battlefield.Llanowar Elves; Ability: Omen)
+? Stack = Charring Bite
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Mana =
+Bot1.Hand = Lightning Bolt; Island; Island; Island; Island
+Bot2.Graveyard = Llanowar Elves

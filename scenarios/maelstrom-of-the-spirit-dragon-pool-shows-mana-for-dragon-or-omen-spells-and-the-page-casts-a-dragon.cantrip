@@ -1,0 +1,39 @@
+# Browser
+# What the page shows of Maelstrom of the Spirit Dragon's restricted mana (CR 106.6), and that a person can spend it
+# where it may go. Its card menu words each color of the colored ability with what its mana is only for; the {R} it adds sits in the
+# pool as its own chip, captioned with the subtypes it is for, beside Mox Jet's plain {B}; Lightning Bolt can't be cast,
+# and both, with Mox Pearl's {W}, cast Phyrexian Dragon Engine, a Dragon.
+
+[Bot1 Deck]
+Maelstrom of the Spirit Dragon
+Mox Jet
+Mox Pearl
+Phyrexian Dragon Engine
+Lightning Bolt
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Maelstrom of the Spirit Dragon.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Maelstrom of the Spirit Dragon.Activate(Ability: any color; Color: Red)
+? Client.Bot1.Menu = {T}: Add {C}; {T}: Add {W} (only for Dragon or Omen spells); {T}: Add {U} (only for Dragon or Omen spells); {T}: Add {B} (only for Dragon or Omen spells); {T}: Add {R} (only for Dragon or Omen spells); {T}: Add {G} (only for Dragon or Omen spells)
+? Client.Bot1.Mana = 1 Red (dragon or omen spells)
+Bot1.Battlefield.Mox Jet.Activate
+? Client.Bot1.Mana = 1 Black; 1 Red (dragon or omen spells)
+! Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Phyrexian Dragon Engine.Cast(Spend: R DragonOrOmenSpells, B, W)
+Bot1.Pass
+Bot2.Pass
+? Client.Bot1.Mana =
+
+[Expect]
+Turn = 1
+Bot1.Mana =
+Bot1.Battlefield = Maelstrom of the Spirit Dragon; Mox Jet; Mox Pearl; Phyrexian Dragon Engine

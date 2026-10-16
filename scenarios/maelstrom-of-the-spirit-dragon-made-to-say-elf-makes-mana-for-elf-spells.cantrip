@@ -1,0 +1,44 @@
+# Maelstrom of the Spirit Dragon's "Dragon" is a word of its text (CR 612.2), read as its mana is added (CR 106.6):
+# Artificial Evolution changes Dragon to Elf on the land. Its green mana is then for "an Elf spell or an Omen spell":
+# Phyrexian Dragon Engine can't be cast with it and Mox Jet's and Mox Pearl's mana, Llanowar Elves is cast with it.
+
+[Bot1 Deck]
+Maelstrom of the Spirit Dragon
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Artificial Evolution
+Phyrexian Dragon Engine
+Llanowar Elves
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Maelstrom of the Spirit Dragon.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Bot1.Battlefield.Maelstrom of the Spirit Dragon)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Dragon)
+Bot1.Modes(Elf)
+Bot1.Battlefield.Maelstrom of the Spirit Dragon.Activate(Ability: any color; Color: Green)
+? Bot1.Mana = {G} (ElfOrOmenSpells)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Hand.Phyrexian Dragon Engine.Cast
+Bot1.Hand.Llanowar Elves.Cast
+? Bot1.Mana = {W}{B}
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Battlefield = Maelstrom of the Spirit Dragon; Mox Sapphire; Mox Jet; Mox Pearl; Llanowar Elves
+Bot1.Hand = Phyrexian Dragon Engine
+Bot1.Graveyard = Artificial Evolution
