@@ -1,0 +1,51 @@
+# Boommobile's "Exhaust - {X}{2}{R}: This Vehicle deals X damage to any target. Put a +1/+1 counter on this Vehicle." has
+# one target, so if it is gone as the ability resolves nothing happens, the counter included (CR 608.2b). Bot1 pays it
+# for X=0 with three of the four mana its enters trigger made, aimed at Bot2's Llanowar Elves, and in response bolts the
+# Elves with a Mountain: the exhaust resolves to nothing, and the fourth {R} is still there for abilities.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Boommobile
+Lightning Bolt
+Mountain
+Mountain x2
+Mountain x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x5
+Forest x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Hand.Boommobile.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Colors(Red)
+Bot1.Battlefield.Boommobile.Activate(Ability: Exhaust; Bot2.Battlefield.Llanowar Elves; X: 0)
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Graveyard = Llanowar Elves
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Mana = {R} (Abilities)
+Bot1.Battlefield.Boommobile.Counters.PlusOnePlusOne = (absent)
+Bot2.Life = 20
