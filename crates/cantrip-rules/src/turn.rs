@@ -720,11 +720,12 @@ fn combat_damage(cx: &mut Cx) -> R<()> {
         }
     }
     // CR 510.2: all of it is dealt at once, and announced at once (CR 603.2c).
-    let mut batch = Vec::new();
+    let mut batch = ops::DamageBatch::default();
     let events: Vec<Event> = assignments
         .into_iter()
         .filter_map(|(source, target, amount)| ops::deal_damage_with(cx, source, target, amount, true, &mut batch))
         .collect();
+    batch.gain_lifelink(cx);
     cx.emit_batch(&events, None);
     Ok(())
 }

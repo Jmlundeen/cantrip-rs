@@ -100,6 +100,17 @@ pub struct TokenCreation {
     pub count: u32,
 }
 
+/// Life a player is about to gain or lose (CR 119.3, 614.1a): by an effect, as a cost (CR 119.4: paying life is losing
+/// it), as the result of damage (CR 120.3a; the damage itself is a `DamageEvent`, already dealt), by lifelink
+/// (CR 120.3f) or as a life total is set to a number (CR 119.5). `amount` is signed: more than zero is a gain, less a loss,
+/// so "that player loses that much life instead" turns one into the other. An effect that leaves it at zero leaves no
+/// event (CR 119.10). A player who can't gain life meets no replacement of a gain (CR 119.7).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct LifeChange {
+    pub player: PlayerId,
+    pub amount: i32,
+}
+
 /// A proposed event a replacement effect may reshape.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Proposal {
@@ -110,6 +121,7 @@ pub enum Proposal {
     Draw(CardDraw),
     Damage(DamageEvent),
     TokenCreation(TokenCreation),
+    LifeChange(LifeChange),
 }
 
 /// The kinds of event a replacement effect watches for, so an effect is asked only about events it could replace.
@@ -121,6 +133,7 @@ pub enum ReplacementKind {
     Draw,
     Damage,
     TokenCreation,
+    LifeChange,
 }
 
 impl Proposal {
@@ -132,6 +145,7 @@ impl Proposal {
             Proposal::Draw(_) => ReplacementKind::Draw,
             Proposal::Damage(_) => ReplacementKind::Damage,
             Proposal::TokenCreation(_) => ReplacementKind::TokenCreation,
+            Proposal::LifeChange(_) => ReplacementKind::LifeChange,
         }
     }
 }

@@ -984,11 +984,16 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 owner: seat(owner),
             })
         }
-        RequestKind::ChooseReplacement { subject, sources, hints } => {
+        RequestKind::ChooseReplacement { subject, life, sources, hints } => {
             PromptPayload::ChooseReplacementPromptMessage(ChooseReplacementPrompt {
                 player,
                 subject: subject.map_or(ViewHandle::NONE, |s| source_handle(game, handles, s)),
-                event: String::new(),
+                // A change of life is asked of the player whose life it is (CR 616.1).
+                event: match life {
+                    Some(n) if *n > 0 => format!("You would gain {n} life"),
+                    Some(n) => format!("You would lose {} life", n.unsigned_abs()),
+                    None => String::new(),
+                },
                 sources: sources.iter().map(|&s| source_handle(game, handles, s)).collect(),
                 hints: hints.iter().map(|h| (*h).to_string()).collect(),
             })

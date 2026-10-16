@@ -72,7 +72,11 @@ fn subject_of(proposal: &Proposal) -> Option<ObjectId> {
     match proposal {
         Proposal::ZoneChange(z) => Some(z.object),
         Proposal::Counters(c) => Some(c.object),
-        Proposal::DrawInstruction(_) | Proposal::Draw(_) | Proposal::TokenCreation(_) | Proposal::PlayerCounters(_) => None,
+        Proposal::DrawInstruction(_)
+        | Proposal::Draw(_)
+        | Proposal::TokenCreation(_)
+        | Proposal::PlayerCounters(_)
+        | Proposal::LifeChange(_) => None,
         Proposal::Damage(d) => match d.target {
             Target::Object(id) => Some(id),
             _ => None,
@@ -104,6 +108,7 @@ fn affected(cx: &Cx, proposal: &Proposal) -> PlayerId {
         Proposal::DrawInstruction(d) => d.player,
         Proposal::Draw(d) => d.player,
         Proposal::TokenCreation(t) => t.controller,
+        Proposal::LifeChange(l) => l.player,
     }
 }
 
@@ -189,6 +194,10 @@ fn hint_of(cx: &Cx, c: &Candidate) -> &'static str {
 fn choose(cx: &mut Cx, proposal: &Proposal, found: &[Candidate]) -> usize {
     let ask = RequestKind::ChooseReplacement {
         subject: subject_of(proposal),
+        life: match proposal {
+            Proposal::LifeChange(l) => Some(l.amount),
+            _ => None,
+        },
         sources: found.iter().map(|c| c.source).collect(),
         hints: found.iter().map(|c| hint_of(cx, c)).collect(),
     };
@@ -343,6 +352,22 @@ pub fn damage(cx: &mut Cx, event: DamageEvent) -> DamageEvent {
     apply(cx, &mut proposal);
     match proposal {
         Proposal::Damage(event) => event,
+        _ => unreachable!("an effect cannot change the kind of the event"),
+    }
+}
+
+/// Life `player` is about to gain (`amount` above zero) or lose (below zero) (CR 119.3, 614.1a): what remains of it once
+/// every effect has applied, in the order the player chooses (CR 616.1), each judged again on the event as the one
+/// before it left it (CR 616.1f), so a gain turned into a loss meets the effects on losing life. Zero is no event
+/// (CR 119.10).
+pub fn life_change(cx: &mut Cx, player: PlayerId, amount: i32) -> i32 {
+    if !possible(cx, None) {
+        return amount;
+    }
+    let mut proposal = Proposal::LifeChange(LifeChange { player, amount });
+    apply(cx, &mut proposal);
+    match proposal {
+        Proposal::LifeChange(l) => l.amount,
         _ => unreachable!("an effect cannot change the kind of the event"),
     }
 }

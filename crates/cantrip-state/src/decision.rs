@@ -348,8 +348,9 @@ pub enum RequestKind {
     SearchLibrary { source: ObjectId, library: Vec<ObjectId>, eligible: Vec<ObjectId>, count: u8, optional: bool, destination: SearchDestination },
     /// Which of several replacement effects applies to an event first (CR 616.1), asked of the affected player:
     /// `sources` are the objects whose effects apply and `hints` say what each does, in the order they are offered.
-    /// `subject` is the object the event is about, if it is about one.
-    ChooseReplacement { subject: Option<ObjectId>, sources: Vec<ObjectId>, hints: Vec<&'static str> },
+    /// `subject` is the object the event is about, if it is about one; `life`, for an event that changes the affected
+    /// player's life total (CR 119.3), how much: a gain above zero, a loss below.
+    ChooseReplacement { subject: Option<ObjectId>, life: Option<i32>, sources: Vec<ObjectId>, hints: Vec<&'static str> },
 }
 
 /// Where the cards a library search finds are going (CR 701.23), as the searcher is told.

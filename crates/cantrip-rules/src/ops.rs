@@ -1389,7 +1389,7 @@ pub fn damage(cx: &mut Cx, source: ObjectId, target: Target, amount: u16, combat
 /// Deals damage to several recipients at once (CR 120.2, 603.2c): announced as one batch, as combat damage is. How much
 /// each was dealt, in order.
 pub fn damage_together(cx: &mut Cx, hits: &[(ObjectId, Target, u16)]) -> Vec<u16> {
-    let mut batch = Vec::new();
+    let mut batch = DamageBatch::default();
     let mut events = Vec::with_capacity(hits.len());
     let mut dealt = Vec::with_capacity(hits.len());
     for &(source, target, amount) in hits {
@@ -1404,6 +1404,7 @@ pub fn damage_together(cx: &mut Cx, hits: &[(ObjectId, Target, u16)]) -> Vec<u16
             None => dealt.push(0),
         }
     }
+    batch.gain_lifelink(cx);
     cx.emit_batch(&events, None);
     dealt
 }
@@ -1412,18 +1413,42 @@ pub fn damage_together(cx: &mut Cx, hits: &[(ObjectId, Target, u16)]) -> Vec<u16
 /// simultaneously (combat damage, CR 510.2) can be announced as one batch (CR 603.2c): "whenever equipped creature
 /// deals combat damage" triggers once however many recipients there are.
 pub fn deal_damage(cx: &mut Cx, source: ObjectId, target: Target, amount: u16, combat: bool) -> Option<Event> {
-    deal_damage_with(cx, source, target, amount, combat, &mut Vec::new())
+    let mut batch = DamageBatch::default();
+    let event = deal_damage_with(cx, source, target, amount, combat, &mut batch);
+    batch.gain_lifelink(cx);
+    event
 }
 
-/// `deal_damage` as one assignment of a simultaneous event: `batch` holds what the event has dealt to each permanent
-/// so far, for an effect that heals the damage marked before the event (it must not heal the event's own).
+/// What one simultaneous damage event (CR 120.2, 510.2) has done so far, across its assignments.
+#[derive(Default)]
+pub struct DamageBatch {
+    /// What it has dealt to each permanent, for an effect that heals the damage marked before the event (it must not
+    /// heal the event's own).
+    dealt: Vec<(ObjectId, u16)>,
+    /// What each source with lifelink has dealt, and who controls it: one life gain event per source, however many
+    /// recipients it dealt damage to (CR 120.3f; Angel of Vitality's and Leyline of Hope's rulings).
+    lifelink: Vec<(ObjectId, PlayerId, u32)>,
+}
+
+impl DamageBatch {
+    /// The life the event's sources with lifelink cause their controllers to gain (CR 120.3f), once the damage is all
+    /// dealt: one gain for each source.
+    pub fn gain_lifelink(&mut self, cx: &mut Cx) {
+        for (_, controller, amount) in std::mem::take(&mut self.lifelink) {
+            change_life(cx, controller, amount.min(i32::MAX as u32) as i32);
+        }
+    }
+}
+
+/// `deal_damage` as one assignment of a simultaneous event, `batch`. The life its lifelink sources gain is gained by
+/// `DamageBatch::gain_lifelink` once every assignment has been dealt.
 pub fn deal_damage_with(
     cx: &mut Cx,
     source: ObjectId,
     target: Target,
     amount: u16,
     combat: bool,
-    batch: &mut Vec<(ObjectId, u16)>,
+    batch: &mut DamageBatch,
 ) -> Option<Event> {
     if amount == 0 {
         return None;
@@ -1451,7 +1476,7 @@ pub fn deal_damage_with(
             } else {
                 change_life(cx, p, -(amount as i32));
             }
-            lifelink(cx, source, &source_chars, amount);
+            lifelink(cx, source, &source_chars, amount, batch);
             if combat {
                 crate::designations::combat_damage(cx, source, p, amount);
             }
@@ -1477,10 +1502,10 @@ pub fn deal_damage_with(
                 } else {
                     if heal_marked {
                         // CR 614.1a: the damage marked before this event is healed; this event's own stays.
-                        let kept = batch.iter().filter(|(b, _)| *b == id).map(|(_, a)| *a).sum();
+                        let kept = batch.dealt.iter().filter(|(b, _)| *b == id).map(|(_, a)| *a).sum();
                         cx.st().update_obj(id, |o| o.damage = kept);
                     }
-                    batch.push((id, amount));
+                    batch.dealt.push((id, amount));
                     cx.st().update_obj(id, |o| {
                         o.damage += amount;
                         o.deathtouched |= deathtouch;
@@ -1500,7 +1525,7 @@ pub fn deal_damage_with(
                     *loyalty = (*loyalty - amount as i16).max(0);
                 });
             }
-            lifelink(cx, source, &source_chars, amount);
+            lifelink(cx, source, &source_chars, amount, batch);
             Some(Event::Damage { source, target, amount, combat })
         }
     }
@@ -1516,11 +1541,14 @@ fn damage_can_be_prevented(cx: &Cx, source: ObjectId, combat: bool) -> bool {
 }
 
 /// Damage dealt by a source with lifelink also causes its controller to gain that much life (CR 702.15b), as part of
-/// the damage event, not a trigger.
-fn lifelink(cx: &mut Cx, source: ObjectId, chars: &Chars, amount: u16) {
+/// the damage event, not a trigger: added to what the source has dealt in this event, gained once it is all dealt.
+fn lifelink(cx: &mut Cx, source: ObjectId, chars: &Chars, amount: u16, batch: &mut DamageBatch) {
     if chars.has(Keyword::Lifelink) {
         let controller = cx.s().obj(source).controller;
-        change_life(cx, controller, amount as i32);
+        match batch.lifelink.iter_mut().find(|(s, _, _)| *s == source) {
+            Some(entry) => entry.2 += amount as u32,
+            None => batch.lifelink.push((source, controller, amount as u32)),
+        }
     }
 }
 
@@ -1543,11 +1571,17 @@ pub fn change_life(cx: &mut Cx, player: PlayerId, delta: i32) {
         return;
     }
     // CR 119.7: a player who can't gain life gains none, and nothing happens: no life gain event, so nothing that
-    // triggers on one (CR 119.9) triggers.
+    // triggers on one (CR 119.9) triggers, and no replacement effect of a life gain event does anything.
     if delta > 0 && crate::static_rules::cant_gain_life(&*cx, cx.cards(), player) {
         return;
     }
-    cx.st().update_player(player, |p| p.life += delta);
+    // CR 614.1a, 616.1: "you gain that much life plus 1 instead", "they lose twice that much life instead". The event
+    // history records the life that actually changed.
+    let delta = crate::replace::life_change(cx, player, delta);
+    if delta == 0 {
+        return;
+    }
+    cx.st().update_player(player, |p| p.life = p.life.saturating_add(delta));
     cx.emit(Event::LifeChange { player, delta });
 }
 

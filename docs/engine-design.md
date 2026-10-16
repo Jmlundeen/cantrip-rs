@@ -270,9 +270,21 @@ static ability of a permanent on the battlefield does (`CardDef::cant_gain_life`
 Punishment, `opponents_cant_gain_life` for Knight of Dusk's Shadow). The battlefield is searched only when a player would gain
 life, and a permanent that has lost all its abilities has none of these. No life gain event is recorded for a gain that did
 not happen, so "whenever you gain life" does not trigger (CR 119.9); paying life is a loss and is still allowed. The host shows
-"You can't gain life." / "They can't gain life." beside a player's total while it applies (`Game::cant_gain_life`). Not built,
-because no card in content has one: exchanges of life totals, costs that gain life and replacements of life gain (the rest of
-CR 119.7), and "can't lose life" (CR 119.8).
+"You can't gain life." / "They can't gain life." beside a player's total while it applies (`Game::cant_gain_life`).
+
+Replacement effects of a gain or loss of life (CR 614.1a: "you gain that much life plus 1 instead", "they lose twice that much
+life instead", "that player loses that much life instead") are `ReplacementKind::LifeChange` effects over a
+`Proposal::LifeChange { player, amount }`, `amount` signed (a gain above zero, a loss below), applied by `change_life` through
+`replace::life_change` after the can't-gain check (a replacement of a gain of a player who can't gain life does nothing, CR
+119.7) and ordered by the player whose life it is (CR 616.1, `RequestKind::ChooseReplacement`'s `life`, which the host words as
+"You would gain 3 life"). Each is judged again on the event as the one before left it (CR 616.1f), so a gain turned into a loss
+meets the effects on losing life; an amount left at zero is no event (CR 119.10). The `LifeChange` event records the life that
+actually changed, so the history's `life_gained`/`life_lost` count it. Damage is replaced as damage before it is dealt; the life
+lost to it is a separate event (Bloodletter of Aclazotz doubles the loss, not the damage nor its lifelink). Lifelink is one gain
+per source of a simultaneous damage event, however many recipients (`ops::DamageBatch`, CR 120.3f and Angel of Vitality's
+ruling). The shared effects are in `cantrip_mechanics::replacements`. A cost's payability (CR 119.4) is judged on the payment,
+not on what a replacement makes of the loss. Not built, because no card in content has one: exchanges of life totals, costs
+that gain life, and "can't lose life" (CR 119.8).
 
 "Damage can't be prevented" (CR 615.12) is asked by `ops::damage_can_be_prevented` before any prevention: a turn an effect said
 so (Bonecrusher Giant's Stomp) or a `CardDef::unpreventable_damage` static (Questing Beast's combat damage,
