@@ -90,3 +90,23 @@ pub fn label_text(label: &Label) -> &'static str {
         Label::Counter(kind) => kind.name(),
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// A creature whose power or toughness is printed as a star has it from a characteristic-defining ability (CR 208.2a), and
+    /// once that is lost (CR 604.3, 613.1f) the star is worth 0 (CR 208.5): `StaticDef::lost_pt` says what it leaves, so the next
+    /// card with a star cannot forget it.
+    #[test]
+    fn every_star_creature_says_what_its_power_and_toughness_are_once_the_ability_is_lost() {
+        for def in &cards().cards {
+            if !def.is(CardType::Creature) || (def.power.is_some() && def.toughness.is_some()) {
+                continue;
+            }
+            for st in def.statics.iter().filter(|s| s.own && s.layer == Layer::PtDefine) {
+                assert!(st.lost_pt.is_some(), "{}: its power and toughness are defined by an ability, and `.lost_pt(power, toughness)` is missing", def.name);
+            }
+        }
+    }
+}

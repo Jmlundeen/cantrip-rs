@@ -53,6 +53,7 @@ static MODAL: ModalDef = modes(&[
 pub static CARD: CardDef = CardDef {
     abilities: &[modal_triggered(cantrip_mechanics::triggers::THIS_ATTACKS, &MODAL, "Whenever this creature attacks, choose one \u{2014} Discard a card. If you do, draw a card.; or Exile up to one target card from a graveyard.")],
     statics: &[static_ability(Layer::PtDefine, affects, domain, "Domain \u{2014} Territorial Kavu's power and toughness are each equal to the number of basic land types among lands you control.")
-        .own()],
+        .own()
+        .lost_pt(0, 0)],
     ..oracle::TERRITORIAL_KAVU
 };

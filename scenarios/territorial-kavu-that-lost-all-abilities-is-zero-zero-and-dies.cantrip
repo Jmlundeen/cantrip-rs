@@ -1,0 +1,42 @@
+# Territorial Kavu: "Domain - power and toughness are each equal to the number of basic land types among lands you control", a
+# characteristic-defining ability (CR 604.3) over a printed */*. With a Mountain it is a 1/1 (the control). Bot2's The Wondrous Wasp takes
+# the ability away on turn 2, the stars are worth 0 (CR 208.2a, 208.5), and the 0/0 dies (CR 704.5f).
+
+[Bot1 Deck]
+Mountain
+Mox Emerald
+Territorial Kavu
+Mountain x17
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Jet
+The Wondrous Wasp
+Island x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Territorial Kavu.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Territorial Kavu.Power = 1
+? Bot1.Battlefield.Territorial Kavu.Toughness = 1
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.The Wondrous Wasp.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Target(Territorial Kavu)
+Bot2.Pass
+Bot1.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Territorial Kavu
