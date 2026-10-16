@@ -1,0 +1,62 @@
+# Ulamog, the Defiler's annihilator X counts its +1/+1 counters as the ability resolves (the ruling), on Ulamog as it last
+# was on the battlefield if it has gone (CR 113.7a, 608.2h). Ulamog enters with two counters (a Counterspell is the costliest
+# card its cast trigger exiled from Bot2's even, eight-card library: half is four). On turn 3 it attacks, and with the
+# annihilator ability waiting Bot2 Swords to Plowshares it, paying the ward by sacrificing two Moxen. Ulamog is exiled and
+# Bot1 gains 9; the annihilator ability still resolves, X two, and Bot2 sacrifices two of its three remaining permanents.
+
+[Bot1 Deck]
+Island
+Ulamog, the Defiler
+Black Lotus x3
+Island x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Swords to Plowshares
+Plains
+Counterspell
+Plains x3
+Plains x4
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ulamog, the Defiler.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+[T1 Bot1.Main2]
+? Exile = Counterspell; Plains; Plains; Plains
+? Bot2.Library.Count = 4
+? Bot1.Battlefield.Ulamog, the Defiler.Counters.PlusOnePlusOne = 2
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Ulamog, the Defiler > Bot2)
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Ulamog, the Defiler)
+Bot2.Accept
+Bot2.Choose(Mox Jet; Mox Ruby)
+? Stack.Count = 2
+Bot2.Choose(Plains; Mox Sapphire)
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Exile = Counterspell; Plains; Plains; Plains; Ulamog, the Defiler
+Bot1.Life = 29
+Bot2.Life = 20
+Bot2.Battlefield = Mox Pearl
+Bot2.Graveyard = Mox Sapphire; Plains; Swords to Plowshares; Mox Ruby; Mox Jet

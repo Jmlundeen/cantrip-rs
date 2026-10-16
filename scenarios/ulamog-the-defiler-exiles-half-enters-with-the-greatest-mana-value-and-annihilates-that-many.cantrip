@@ -1,0 +1,64 @@
+# Ulamog, the Defiler. Bot1 casts it on turn 1 and its cast trigger has Bot2 exile the top half of its nine-card library,
+# rounded up: five cards, the greatest of them a Counterspell of mana value 2, so Ulamog enters with two +1/+1 counters
+# (9/9). On turn 2 Bot2 Lightning Bolts it with four permanents: Ulamog's "Ward--Sacrifice two permanents" (CR 702.21a)
+# asks it to pay, and it sacrifices the two Moxen it chooses; the Bolt resolves. On turn 3 Ulamog attacks: annihilator X
+# with X its two counters (CR 702.86a), and Bot2, left with exactly two permanents, sacrifices both, then takes 9.
+
+[Bot1 Deck]
+Island
+Ulamog, the Defiler
+Black Lotus x3
+Island x10
+
+[Bot2 Deck]
+Mountain
+Mox Pearl
+Mox Jet
+Mox Ruby
+Lightning Bolt
+Plains
+Plains
+Counterspell
+Plains x4
+Plains x4
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ulamog, the Defiler.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+[T1 Bot1.Main2]
+? Exile = Counterspell; Plains; Plains; Plains; Plains
+? Bot2.Library.Count = 4
+? Bot1.Battlefield.Ulamog, the Defiler.Counters.PlusOnePlusOne = 2
+? Bot1.Battlefield.Ulamog, the Defiler.Power = 9
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Ulamog, the Defiler)
+Bot2.Accept
+Bot2.Choose(Mox Pearl; Mox Jet)
+? Stack = Lightning Bolt
+[T2 Bot2.Main2]
+? Bot1.Battlefield.Ulamog, the Defiler.Damage = 3
+? Bot2.Battlefield = Mountain; Mox Ruby
+[T3 Bot1.Main1]
+Bot1.Attack(Ulamog, the Defiler > Bot2)
+! Bot2.Choose
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot2.Battlefield.Count = 0
+Bot2.Graveyard = Mox Ruby; Mountain; Lightning Bolt; Mox Jet; Mox Pearl
+Bot2.Life = 11
