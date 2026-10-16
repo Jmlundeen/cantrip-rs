@@ -1,0 +1,54 @@
+# Idol of the Deep King // Sovereign's Macuahuitl. With flash the Idol is cast in Bot2's upkeep and deals 2 damage to Bot2.
+# On turn three it crafts with Bot1's Mox Emerald, tapped for mana already (Craft with artifact {2}{R}); Sovereign's
+# Macuahuitl, an Equipment, enters and its trigger attaches it to the target creature Bot1 controls, Llanowar Elves (+2/+0).
+# On turn five Equip {2} moves it to the Ornithopter.
+
+[Bot1 Deck]
+Mountain
+Idol of the Deep King
+Mox Ruby
+Mox Jet
+Mox Emerald
+Llanowar Elves
+Ornithopter
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Upkeep]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Idol of the Deep King.Cast
+Bot1.Target(Bot2)
+[T3 Bot1.Main1]
+? Bot2.Life = 18
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Idol of the Deep King.Activate(Ability: Craft)
+Bot1.Choose(Mox Emerald)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Target(Llanowar Elves)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Sovereign's Macuahuitl.AttachedTo = Llanowar Elves
+? Bot1.Battlefield.Llanowar Elves.Power = 3
+[T5 Bot1.Main1]
+Bot1.Battlefield.Sovereign's Macuahuitl.Activate(Ornithopter; Ability: Equip)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Sovereign's Macuahuitl.AttachedTo = Ornithopter
+Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Llanowar Elves.Power = 1
+Exile = Mox Emerald
