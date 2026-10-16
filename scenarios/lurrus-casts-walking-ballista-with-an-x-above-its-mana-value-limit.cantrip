@@ -1,0 +1,47 @@
+# Lurrus of the Dream-Den's permission ("a permanent spell with mana value 2 or less") is judged on Walking Ballista as it is in the
+# graveyard, where X is 0 (CR 202.3e), before X is announced (CR 601.2b); once cast with X = 2 the spell has mana value 4 on the
+# stack, and that does not undo the permission. Bot1 casts Lurrus on turn 1; on turn 3 Faithless Looting (paid by a Mountain) draws
+# Mox Pearl and Mox Sapphire and discards Ballista and the spare Mountain; four Moxen pay {X}{X} with X = 2: two +1/+1 counters.
+
+[Bot1 Deck]
+Black Lotus
+Lurrus of the Dream-Den
+Faithless Looting
+Mox Ruby
+Mox Jet
+Walking Ballista
+Mountain
+Mountain
+Mox Pearl
+Mox Sapphire
+Island x20
+
+[Bot2 Deck]
+Island x13
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Lurrus of the Dream-Den.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Walking Ballista; Mountain)
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Graveyard.Walking Ballista.Cast(X: 2; Ability: Once during each of your turns)
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Walking Ballista.Power = 2
+Bot1.Graveyard = Faithless Looting; Mountain; Black Lotus
