@@ -1,0 +1,8 @@
+{
+  "name": "Sunspine Lynx",
+  "manaCost": "{2}{R}{R}",
+  "type": "Creature — Elemental Cat",
+  "power": 5,
+  "toughness": 4,
+  "oracleText": "Players can't gain life.\nDamage can't be prevented.\nWhen this creature enters, it deals damage to each player equal to the number of nonbasic lands that player controls."
+}

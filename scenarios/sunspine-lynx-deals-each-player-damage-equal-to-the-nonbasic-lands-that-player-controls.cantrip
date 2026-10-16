@@ -1,0 +1,45 @@
+# Sunspine Lynx: "When this creature enters, it deals damage to each player equal to the number of nonbasic lands that player
+# controls." Each player's own count (CR 120.2): on turn 5 Bot1 controls Badlands and two Mountains, so it is dealt 1 (the
+# basic Mountains don't count, CR 205.4a); Bot2 controls Volcanic Island, Tundra and Mox Pearl, so it is dealt 2 (an artifact
+# is no land). The damage is dealt to both at once.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Badlands
+Black Lotus
+Mox Ruby
+Sunspine Lynx
+Mountain
+Mountain
+Mountain x20
+
+[Bot2 Deck]
+Volcanic Island
+Tundra
+Mox Pearl
+Island
+Island
+Island
+Island
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Volcanic Island.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Tundra.Play
+Bot1.Hand.Badlands.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sunspine Lynx.Cast
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Mountain; Mountain; Badlands; Mox Ruby; Sunspine Lynx
+Bot1.Life = 19
+Bot2.Life = 18

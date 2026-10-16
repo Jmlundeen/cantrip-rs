@@ -1,0 +1,55 @@
+# Sunspine Lynx: "Players can't gain life" is a static ability, so it applies only while the Lynx is on the battlefield
+# (CR 604.1, 611.3a). On turn 2, under Bot1's Lynx, Bot2's Lightning Helix deals 3 to Bot1 but gains Bot2 nothing (17 / 20).
+# Bot2's Swords to Plowshares then exiles the Lynx, and "its controller gains life equal to its power": the Lynx has left by
+# then, so Bot1 gains 5 (22). A second Helix the same turn gains Bot2 its 3 (Bot1 19, Bot2 23).
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Sunspine Lynx
+Mountain
+Mountain
+Mountain
+Mountain
+Mountain x20
+
+[Bot2 Deck]
+Mountain
+Black Lotus
+Mox Ruby
+Lightning Helix
+Swords to Plowshares
+Lightning Helix
+Island
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sunspine Lynx.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Helix.Cast(Bot1)
+Bot2.Pass
+Bot2.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Sunspine Lynx)
+? Bot1.Life = 17
+? Bot2.Life = 20
+Bot2.Pass
+Bot2.Battlefield.Mountain.Activate
+? Bot1.Life = 22
+? Bot1.Battlefield.Count = 1
+Bot2.Hand.Lightning Helix.Cast(Bot1)
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 19
+Bot2.Life = 23
+Exile = Sunspine Lynx
+Bot2.Graveyard = Lightning Helix; Swords to Plowshares; Lightning Helix; Black Lotus

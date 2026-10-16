@@ -1,0 +1,38 @@
+# Sunspine Lynx: "Players can't gain life" (CR 119.7). Bot1's Healer's Hawk (lifelink, CR 702.15b) attacks on turn 3 with the
+# Lynx on the battlefield: the Hawk's 1 damage is dealt to Bot2, but Bot1 gains no life from it. Every land is basic, so the
+# Lynx's enters ability deals no damage to anyone (CR 120.8). (The control, with the life gained:
+# healers-hawk-flies-over-a-ground-blocker-and-lifelink-gains-life-from-combat-damage.)
+
+[Bot1 Deck]
+Plains
+Healer's Hawk
+Black Lotus
+Mox Ruby
+Sunspine Lynx
+Plains
+Plains
+Plains x20
+
+[Bot2 Deck]
+Island x27
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Healer's Hawk.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sunspine Lynx.Cast
+[T1 Bot1.Main2]
+? Bot1.Life = 20
+? Bot2.Life = 20
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Healer's Hawk > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 19
+Bot1.Battlefield = Plains; Healer's Hawk; Mox Ruby; Sunspine Lynx

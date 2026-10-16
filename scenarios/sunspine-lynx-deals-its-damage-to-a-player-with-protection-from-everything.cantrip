@@ -1,0 +1,43 @@
+# Sunspine Lynx: "Damage can't be prevented" (CR 615.12) holds for its own enters damage too. Bot2 casts The One Ring on turn 2
+# and has protection from everything until its next turn (CR 702.16j), which prevents all damage to it (702.16e). On turn 3
+# Bot1's Lynx enters, and Bot2, controlling Volcanic Island, is dealt 1 anyway. (The control, where the protection prevents
+# damage: the-one-ring-protects-its-caster-from-everything-until-their-next-turn.)
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Sunspine Lynx
+Mountain
+Mountain
+Mountain
+Mountain
+Mountain x20
+
+[Bot2 Deck]
+Volcanic Island
+Black Lotus
+The One Ring
+Island
+Island
+Island
+Island
+Island x20
+
+[Actions]
+Bot2.Hand.Volcanic Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Volcanic Island.Activate(Ability: {U})
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.The One Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sunspine Lynx.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Volcanic Island; The One Ring
+Bot1.Life = 20
+Bot2.Life = 19

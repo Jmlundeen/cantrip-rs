@@ -1,0 +1,56 @@
+# Sunspine Lynx: "Damage can't be prevented" (CR 615.12). Protection prevents damage (CR 702.16e), so with the Lynx on the
+# battlefield it can't (the Lynx's ruling). Bot1's True-Name Nemesis has protection from Bot2. On turn 4 Bot2's Fiery Confluence
+# deals 1 damage to each creature three times: the Nemesis, a 3/1, is dealt it anyway and dies; the Lynx, a 5/4, survives the 3.
+# (The control, where the Nemesis takes none: true-name-nemesis-cannot-be-blocked-or-damaged-by-the-chosen-player.) Every land is
+# basic, so the Lynx's enters ability deals no damage.
+
+[Bot1 Deck]
+Island
+Black Lotus
+True-Name Nemesis
+Island
+Island
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Mountain
+Black Lotus
+Mox Ruby
+Sunspine Lynx
+Mountain
+Mox Jet
+Fiery Confluence
+Mountain x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.True-Name Nemesis.Cast
+Bot1.ChoosePlayer(Bot2)
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Sunspine Lynx.Cast
+[T4 Bot2.Main1]
+? Bot1.Life = 20
+? Bot2.Life = 20
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Battlefield.Mountain#2.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Fiery Confluence.Cast
+Bot2.Modes(1; 1; 1)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield = Island
+Bot1.Graveyard = True-Name Nemesis; Black Lotus
+Bot2.Battlefield.Sunspine Lynx.Damage = 3

@@ -121,6 +121,49 @@ fn a_bar_on_casting_outside_the_hand_is_shown_to_both_players_while_it_lasts() {
     assert!(gone_after, "the restriction was still shown after Bot1's next turn began");
 }
 
+/// "Players can't gain life" is shown to both players while it applies (CR 119.7): while Bot1's Sunspine Lynx is on the
+/// battlefield, each player's view says it of them ("You can't gain life.") and of the other ("They can't gain life."), and once
+/// Swords to Plowshares has exiled the Lynx neither says it any more.
+#[test]
+fn players_cant_gain_life_is_shown_to_both_players_while_the_static_ability_applies() {
+    let name = "sunspine-lynx-stops-life-gain-only-while-it-is-on-the-battlefield";
+    let text = std::fs::read_to_string(scripts().join(format!("{name}.cantrip"))).unwrap();
+    let mut session = Session::scenario(&text, name, Vec::new(), &[1]).map_err(|r| r.detail).unwrap();
+    let mut step = session.step();
+    let (mut shown, mut gone_after) = (0, false);
+    for _ in 0..20_000 {
+        let views = [session.view(1).map_err(|r| r.detail).unwrap(), session.view(2).map_err(|r| r.detail).unwrap()];
+        let says = |viewer: usize, about: usize, text: &str| views[viewer].players[about].pending_effects.iter().any(|f| f == text);
+        let applies = says(0, 0, "You can't gain life.");
+        for (viewer, about) in [(0, 0), (0, 1), (1, 0), (1, 1)] {
+            let text = if viewer == about { "You can't gain life." } else { "They can't gain life." };
+            assert_eq!(says(viewer, about, text), applies, "seat {} is told something else of seat {}", viewer + 1, about + 1);
+        }
+        if applies {
+            shown += 1;
+            assert!(!gone_after, "the restriction came back");
+        } else if shown > 0 {
+            gone_after = true;
+        }
+        let scenario = &step["Scenario"];
+        if scenario["Verdict"].is_object() {
+            assert_eq!(scenario["Verdict"]["Passed"], Value::Bool(true));
+            break;
+        }
+        let expected = &scenario["Expected"];
+        let answer: AnswerPayload = if expected["Undo"] == Value::Bool(true) {
+            AnswerPayload::TakeActionAnswer(TakeActionAnswer::new(ActionKindView::UndoManaAbility, ViewHandle::NONE))
+        } else {
+            serde_json::from_value(expected["Answer"].clone()).unwrap()
+        };
+        let id = expected["RequestId"].as_u64().unwrap() as u32;
+        let seat = expected["Seat"].as_i64().unwrap() as i32;
+        step = session.answer(id, seat, &answer).map_err(|r| r.detail).unwrap();
+    }
+    assert!(shown > 0, "no player was ever told they can't gain life");
+    assert!(gone_after, "the restriction was still shown after the Lynx left");
+}
+
 #[test]
 fn every_scenario_passes_at_a_table_with_bot1_driven() {
     let mut entries: Vec<PathBuf> =
