@@ -364,7 +364,7 @@ pub fn add_listed(g: &mut dyn Game, controller: PlayerId, def: &ActivatedDef, ch
 const fn activated(a: AbilityDef, method: &str) -> ActivatedDef {
     match a {
         AbilityDef::Activated(d) => d,
-        AbilityDef::Triggered(_) => panic!("{}", method),
+        AbilityDef::Triggered(_) | AbilityDef::Static(_) => panic!("{}", method),
     }
 }
 
@@ -374,6 +374,7 @@ impl AbilityDef {
         match self {
             AbilityDef::Activated(d) => AbilityDef::Activated(ActivatedDef { targets, ..d }),
             AbilityDef::Triggered(t) => AbilityDef::Triggered(TriggeredDef { targets, ..t }),
+            AbilityDef::Static(_) => panic!("a static ability has no targets"),
         }
     }
 
@@ -407,6 +408,7 @@ impl AbilityDef {
         match self {
             AbilityDef::Activated(d) => AbilityDef::Activated(ActivatedDef { condition: Some(condition), ..d }),
             AbilityDef::Triggered(t) => AbilityDef::Triggered(TriggeredDef { condition: Some(condition), ..t }),
+            AbilityDef::Static(_) => panic!("a static ability has no condition"),
         }
     }
 
@@ -415,6 +417,7 @@ impl AbilityDef {
         match self {
             AbilityDef::Activated(d) => AbilityDef::Activated(ActivatedDef { modal: Some(modal), ..d }),
             AbilityDef::Triggered(t) => AbilityDef::Triggered(TriggeredDef { modal: Some(modal), ..t }),
+            AbilityDef::Static(_) => panic!("a static ability has no modes"),
         }
     }
 
@@ -455,7 +458,7 @@ impl AbilityDef {
 const fn triggered_def(a: AbilityDef, method: &str) -> TriggeredDef {
     match a {
         AbilityDef::Triggered(t) => t,
-        AbilityDef::Activated(_) => panic!("{}", method),
+        AbilityDef::Activated(_) | AbilityDef::Static(_) => panic!("{}", method),
     }
 }
 
@@ -600,6 +603,16 @@ impl ModalDef {
 /// A static ability (CR 604) applying `apply` in `layer` to every object `affects` accepts.
 pub const fn static_ability(layer: Layer, affects: StaticAffects, apply: StaticApply, text: &'static str) -> StaticDef {
     StaticDef { text, layer, affects, apply, ..StaticDef::BLANK }
+}
+
+/// A static ability an effect gives an object (CR 613.1f), to be granted with `EffectKind::AddAbility` from the card's
+/// `delayed` list: the object itself is its source, so "you" and "your" are its controller's (CR 113.6, 109.5), and it
+/// applies in `layer` (which must be `Layer::PtDefine` or later) at the later of the object's timestamp and the
+/// granting effect's (CR 613.7a). It stops when the object loses the ability (CR 613.1f) or the effect ends.
+/// Ms. Marvel, Kamala Khan grants herself "base power is equal to the number of cards in your hand"; any card that
+/// gives a creature a quoted static ability about its characteristics can.
+pub const fn granted_static(layer: Layer, apply: StaticApply, text: &'static str) -> AbilityDef {
+    AbilityDef::Static(StaticDef { text, layer, apply, ..StaticDef::BLANK })
 }
 
 /// A characteristic-defining ability (CR 604.3): it applies to its own object only, in every zone.

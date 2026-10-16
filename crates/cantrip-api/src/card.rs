@@ -734,6 +734,11 @@ pub struct TriggeredDef {
 pub enum AbilityDef {
     Activated(ActivatedDef),
     Triggered(TriggeredDef),
+    /// A static ability an effect gives an object (CR 613.1f, 613.7a): "[this creature] gains 'This creature's base power is
+    /// equal to the number of cards in your hand.'" It is one of a card's `delayed` list, granted with `EffectKind::AddAbility`.
+    /// It affects only the object that has it, with that object as its source (its "you" is the object's controller), in a
+    /// layer after the abilities are settled (`Layer::PtDefine` on): see `StaticDef`.
+    Static(StaticDef),
 }
 
 impl AbilityDef {
@@ -741,6 +746,7 @@ impl AbilityDef {
         match self {
             AbilityDef::Activated(a) => a.text,
             AbilityDef::Triggered(t) => t.text,
+            AbilityDef::Static(s) => s.text,
         }
     }
 }
@@ -1401,6 +1407,15 @@ impl CardTable {
         // Only the same definition twice is merged: two tokens of one name (a Germ, a Golem) are two definitions,
         // and the registry already leaves out a characteristics-only card that has a file of its own.
         cards.dedup_by(|a, b| std::ptr::eq(*a, *b));
+        // A granted static ability's effect is applied in the layers from 7a on, after the layer-6 pass that decides which
+        // abilities an object has (`layers.rs`): one for an earlier layer would be quietly absent, so it is refused.
+        for card in &cards {
+            for ability in card.abilities.iter().chain(card.delayed) {
+                if let AbilityDef::Static(s) = ability {
+                    assert!(s.layer >= Layer::PtDefine, "{}: a granted static ability applies in layer 7 only (CR 613.1f)", card.name);
+                }
+            }
+        }
         let anywhere = cards
             .iter()
             .map(|c| c.abilities.iter().any(|a| matches!(a, AbilityDef::Triggered(t) if t.anywhere)))

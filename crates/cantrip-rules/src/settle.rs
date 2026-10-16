@@ -358,7 +358,7 @@ fn state_based_actions(cx: &mut Cx) -> R<bool> {
 fn triggered(cx: &Cx, ability: AbilityRef) -> &'static TriggeredDef {
     match cx.cards().ability(ability) {
         AbilityDef::Triggered(t) => t,
-        AbilityDef::Activated(_) => unreachable!("a triggered ability"),
+        AbilityDef::Activated(_) | AbilityDef::Static(_) => unreachable!("a triggered ability"),
     }
 }
 

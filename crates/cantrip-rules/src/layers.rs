@@ -134,9 +134,14 @@ pub fn chars_before(cards: &CardTable, state: &GameState, id: ObjectId, stop: La
     // The continuous effects on it, oldest first.
     let fx: Vec<ContinuousEffect> =
         if has_effects { state.effects.iter().filter(|e| e.affected == id).copied().collect() } else { Vec::new() };
+    // The static abilities effects have granted it that it still has once layer 6 is done, each with its timestamp.
+    let mut granted: Vec<(u32, &'static StaticDef)> = Vec::new();
     for layer in LAYERS {
         if layer >= stop {
             break;
+        }
+        if layer == Layer::PtDefine && has_effects {
+            granted = granted_statics(cards, obj.timestamp, &fx, &chars);
         }
         // CR 305.6: the abilities a basic land type carries follow from the types layer 4 settled, as the object's
         // own from the start of layer 6.
@@ -152,8 +157,8 @@ pub fn chars_before(cards: &CardTable, state: &GameState, id: ObjectId, stop: La
             counters(obj, layer, &mut chars);
         }
         // CR 613.7: within a layer, static abilities and other continuous effects apply in timestamp order, interleaved.
-        if has_own || !sources.is_empty() {
-            statics(cards, state, id, def, (colors.is_some(), pt.is_some()), sources, on_battlefield, layer, &fx, &mut chars);
+        if has_own || !sources.is_empty() || !granted.is_empty() {
+            statics(cards, state, id, def, (colors.is_some(), pt.is_some()), sources, on_battlefield, layer, &fx, &granted, &mut chars);
         } else {
             for e in &fx {
                 apply_effect(e, layer, &mut chars);
@@ -161,6 +166,33 @@ pub fn chars_before(cards: &CardTable, state: &GameState, id: ObjectId, stop: La
         }
     }
     chars
+}
+
+/// The static abilities effects have given the object (CR 613.1f) that it has once layer 6 is done, oldest first, each with the
+/// timestamp its effect has (CR 613.7a): the later of the object's own and that of the effect that granted the ability.
+/// "Loses all abilities" (CR 613.1f) at a later timestamp takes the ones granted before it, and a static ability that took
+/// abilities away has taken them from `chars` already: only what the object still has is kept. A grant of the same ability
+/// twice is two effects, each with its own timestamp. Guarded on the object's own effects, so an object nothing granted
+/// anything to costs nothing here.
+fn granted_statics(cards: &CardTable, object_timestamp: u32, fx: &[ContinuousEffect], chars: &Chars) -> Vec<(u32, &'static StaticDef)> {
+    let mut granted: Vec<(u32, AbilityRef)> = Vec::new();
+    for e in fx {
+        match e.kind {
+            EffectKind::AddAbility(ability) if matches!(cards.ability(ability), AbilityDef::Static(_)) => {
+                granted.push((e.timestamp.max(object_timestamp), ability));
+            }
+            EffectKind::LoseAllAbilities => granted.clear(),
+            _ => {}
+        }
+    }
+    granted
+        .into_iter()
+        .filter(|(_, ability)| chars.abilities.contains(&Some(*ability)))
+        .filter_map(|(timestamp, ability)| match cards.ability(ability) {
+            AbilityDef::Static(s) => Some((timestamp, s)),
+            _ => None,
+        })
+        .collect()
 }
 
 /// The permanents (and graveyard cards) whose static abilities could apply to anything, for the state's current epoch:
@@ -361,6 +393,7 @@ fn statics(
     on_battlefield: bool,
     layer: Layer,
     fx: &[ContinuousEffect],
+    granted: &[(u32, &'static StaticDef)],
     chars: &mut Chars,
 ) {
     let view = View { cards, state, stop: layer };
@@ -373,23 +406,47 @@ fn statics(
         }
     }
     // The sources are in timestamp order; a continuous effect older than a source's static ability applies before it.
+    // A static ability an effect granted the object (CR 613.7a) is one of them, at its own timestamp, with the object as
+    // its source (CR 113.6), and applies to that object alone.
     let mut next = 0;
+    let mut next_granted = 0;
+    let mut until = |upto: u32, chars: &mut Chars| {
+        loop {
+            let effect = fx.get(next).filter(|e| e.timestamp < upto);
+            // A granted ability of another layer is passed over: it applies in its own.
+            while granted.get(next_granted).is_some_and(|(_, st)| st.layer != layer) {
+                next_granted += 1;
+            }
+            let own = granted.get(next_granted).filter(|(timestamp, _)| *timestamp < upto);
+            match (effect, own) {
+                (Some(e), Some(&(timestamp, _))) if e.timestamp > timestamp => {
+                    let (_, st) = granted[next_granted];
+                    (st.apply)(&view, id, chars);
+                    next_granted += 1;
+                }
+                (Some(e), _) => {
+                    apply_effect(e, layer, chars);
+                    next += 1;
+                }
+                (None, Some(&(_, st))) => {
+                    (st.apply)(&view, id, chars);
+                    next_granted += 1;
+                }
+                (None, None) => break,
+            }
+        }
+    };
     for &(source, from) in sources {
         let sobj = state.obj(source);
         let scard = sobj.copy.map(|c| c.card).unwrap_or_else(|| cards.face(sobj.card, sobj.transformed));
         for st in cards.get(scard).statics.iter().filter(|s| !s.own && s.layer == layer && s.from == from) {
             if (on_battlefield || st.everywhere) && (st.affects)(&view, source, id, chars) {
-                while next < fx.len() && fx[next].timestamp < sobj.timestamp {
-                    apply_effect(&fx[next], layer, chars);
-                    next += 1;
-                }
+                until(sobj.timestamp, chars);
                 (st.apply)(&view, source, chars);
             }
         }
     }
-    for e in &fx[next..] {
-        apply_effect(e, layer, chars);
-    }
+    until(u32::MAX, chars);
 }
 
 /// A continuous effect a resolved spell or ability created (CR 611.2), applied if it is in `layer`.

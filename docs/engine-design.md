@@ -185,6 +185,11 @@ question over writing each card as explicit stages, which the spike measured, an
   `Query::words` (`Words`, the changes in timestamp order), so the card does what its changed text says. A token's
   colors and creature types are those of the text that made it (`Copiable::words`, 612.4), a permanent spell's effects
   go on to the permanent (400.7a), and an object that has left keeps the words it last had (`LastKnown::words`).
+- **Static abilities granted by effects (613.1f, 613.7a)** are `granted_static` entries (`AbilityDef::Static`) of a card's
+  `delayed` list, given with `EffectKind::AddAbility`. Once layer 6 has settled an object's abilities, those it still has
+  (so "loses all abilities" later in timestamp order takes them) apply to it alone, with it as their source, in their own
+  layer (7a onward, refused at table construction for an earlier one) at the timestamp of the granting effect, merged in
+  timestamp order with the effects and other statics of that layer.
 - **A card's printed characteristics are made once** (`CardTable::printed`), as a pure function of the card, both
   before and after the ability layer, so an object nothing acts on costs a lookup.
 - **The static-ability sources are found once per position** (the epoch cache above), not on every query.

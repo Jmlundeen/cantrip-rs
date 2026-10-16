@@ -48,7 +48,7 @@ fn split_second(cx: &Cx) -> bool {
 fn activated(cx: &Cx, ability: AbilityRef) -> Option<&'static ActivatedDef> {
     match cx.cards().ability(ability) {
         AbilityDef::Activated(a) => Some(a),
-        AbilityDef::Triggered(_) => None,
+        AbilityDef::Triggered(_) | AbilityDef::Static(_) => None,
     }
 }
 
