@@ -1,0 +1,51 @@
+# Roaming Throne doubles triggered abilities of another creature YOU control of the chosen type (CR 603.2d). It names
+# Bird on turn 1. Bot1's Baleful Strix, a Bird, enters the same turn: "draw a card" triggers twice. Bot2's Baleful Strix, a
+# Bird Bot1 does not control, enters on turn 2: its ability triggers once.
+# Bot1's hand: 7 - 6 cast or played on turn 1 = 1, + 2 drawn = 3. Bot2's: 7 + 1 - 3 + 1 = 6.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Mox Jet
+Roaming Throne
+Baleful Strix
+Island
+Island x12
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Jet
+Baleful Strix
+Island x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Roaming Throne.Cast
+Bot1.Pass
+Bot1.Modes(Bird)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Baleful Strix.Cast
+Bot1.Pass
+Bot1.Triggers(Baleful Strix; Baleful Strix)
+[T1 Bot1.Main2]
+? Bot1.Hand.Count = 3
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Baleful Strix.Cast
+[T2 Bot2.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand.Count = 3
+Bot2.Hand.Count = 6
+Bot1.Battlefield.Roaming Throne.ChosenSubtype = Bird
