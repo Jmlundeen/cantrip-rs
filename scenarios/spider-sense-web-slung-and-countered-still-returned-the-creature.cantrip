@@ -1,0 +1,45 @@
+# The creature returned is a cost, paid as Spider-Sense is cast (CR 601.2h), so it stays returned when the spell is
+# countered. On Bot2's turn 4 Bot2 bolts Bot1; Bot1 web-slings Spider-Sense, tapping Birds of Paradise for the {U} and
+# returning it. Bot2 counters Spider-Sense with Counterspell, and the Bolt resolves.
+
+[Bot1 Deck]
+Forest
+Birds of Paradise
+Spider-Sense
+Forest x17
+
+[Bot2 Deck]
+Mox Ruby
+Mox Sapphire
+Island
+Lightning Bolt
+Counterspell
+Island
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Birds of Paradise.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Hand.Spider-Sense.Cast(Stack.Lightning Bolt; Ability: Web-slinging)
+Bot1.Battlefield.Birds of Paradise.Activate(Color: Blue)
+Bot1.Choose(Birds of Paradise)
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Spider-Sense)
+[T4 Bot2.Main2]
+
+[Expect]
+Turn = 4
+Stack.Count = 0
+Bot1.Life = 17
+Bot1.Battlefield = Forest
+Bot1.Graveyard = Spider-Sense
+Bot2.Graveyard = Lightning Bolt; Counterspell

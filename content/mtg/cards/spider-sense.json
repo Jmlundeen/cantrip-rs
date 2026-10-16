@@ -1,0 +1,6 @@
+{
+  "name": "Spider-Sense",
+  "manaCost": "{1}{U}",
+  "type": "Instant",
+  "oracleText": "Web-slinging {U} (You may cast this spell for {U} if you also return a tapped creature you control to its owner's hand.)\nCounter target instant spell, sorcery spell, or triggered ability."
+}

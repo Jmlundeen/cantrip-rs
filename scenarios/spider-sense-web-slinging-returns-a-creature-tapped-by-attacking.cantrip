@@ -1,0 +1,39 @@
+# The creature web-slinging returns needs only to be tapped as the cost is paid (CR 702.188a): one tapped before casting
+# began does. Bot1's Ornithopter attacks, and when Bot2 answers with a Lightning Bolt at Bot1, Bot1 web-slings Spider-Sense
+# for {U} from Mox Sapphire, returning the tapped, attacking Ornithopter. The Bolt is countered, and the Ornithopter, gone
+# from combat (CR 506.4), deals no damage.
+
+[Bot1 Deck]
+Mox Sapphire
+Ornithopter
+Spider-Sense
+Island x17
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Hand.Spider-Sense.Cast(Stack.Lightning Bolt; Ability: Web-slinging)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Choose(Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Life = 20
+Bot2.Life = 20
+Bot1.Battlefield = Mox Sapphire
+Bot1.Hand = Island; Island; Island; Island; Island; Ornithopter
+Bot1.Graveyard = Spider-Sense
+Bot2.Graveyard = Lightning Bolt

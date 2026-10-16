@@ -1,0 +1,35 @@
+# "Counter target instant spell, sorcery spell, or triggered ability." Bot2's Thraben Inspector resolves and its enters
+# trigger (investigate) goes on the stack; Bot1 hard-casts Spider-Sense ({1}{U}: Island and Mox Sapphire) at the trigger
+# and counters it (CR 701.6b): no Clue is made, and the Inspector stays.
+
+[Bot1 Deck]
+Mox Sapphire
+Island
+Spider-Sense
+Island x17
+
+[Bot2 Deck]
+Plains
+Thraben Inspector
+Plains x18
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Thraben Inspector.Cast
+Bot2.Pass
+Bot1.Pass
+? Stack = Thraben Inspector
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Spider-Sense.Cast(Stack.Thraben Inspector)
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot2.Battlefield = Plains; Thraben Inspector
+Bot1.Graveyard = Spider-Sense

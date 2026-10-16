@@ -1,0 +1,44 @@
+# Web-slinging needs a tapped creature as its cost is paid (CR 702.188a, 601.2h). On Bot2's turn 2 Bot1 has an untapped
+# Ornithopter, which nothing can tap, and Birds of Paradise, summoning sick, so its mana ability can't be activated (CR
+# 302.6): no creature is or could become tapped while paying, and web-slinging is not offered against Bot2's Duress. Bot1
+# casts Spider-Sense for its mana cost {1}{U} instead, from Island and Mox Sapphire, and counters the Duress (a sorcery
+# spell), keeping both creatures.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Sapphire
+Island
+Birds of Paradise
+Ornithopter
+Spider-Sense
+Island x14
+
+[Bot2 Deck]
+Swamp
+Duress
+Swamp x18
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Birds of Paradise.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Duress.Cast(Bot1)
+! Bot1.Hand.Spider-Sense.Cast(Stack.Duress; Ability: Web-slinging)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Spider-Sense.Cast(Stack.Duress)
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot1.Battlefield = Mox Emerald; Mox Sapphire; Island; Birds of Paradise; Ornithopter
+Bot1.Graveyard = Spider-Sense
+Bot1.Hand.Count = 1
+Bot2.Graveyard = Duress

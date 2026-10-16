@@ -1,0 +1,46 @@
+# Browser
+# Spider-Sense's web-slinging {U}: "You may cast this spell for {U} if you also return a tapped creature you control to its
+# owner's hand." The creature must be tapped when the costs are paid, not before casting began (CR 601.2g-h, 702.188a;
+# ruling 2025-09-19): Bot1's only creature, Birds of Paradise, is untapped when Bot2 bolts Bot1, so web-slinging is offered
+# because the Birds could tap for mana while it is paid. Bot1 web-slings Spider-Sense at the Bolt, taps the Birds for the
+# {U}, and only then chooses the creature to return: the Birds, tapped for that very mana. The Forest, tapped too, is no
+# creature. The Bolt is countered and Bot1 stays at 20, with the Birds back in hand.
+
+[Bot1 Deck]
+Forest
+Birds of Paradise
+Spider-Sense
+Forest x17
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Birds of Paradise.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Hand.Spider-Sense.Cast(Stack.Lightning Bolt; Ability: Web-slinging)
+? Bot1.Battlefield.Birds of Paradise.Tapped = false
+Bot1.Battlefield.Birds of Paradise.Activate(Color: Blue)
+? Client.Bot1.Prompt.Title = Spider-Sense: choose a tapped creature to return to its owner's hand to pay for it
+Bot1.Choose(Birds of Paradise)
+? Stack = Spider-Sense; Lightning Bolt
+? Bot1.Hand.Count = 6
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Life = 20
+Bot1.Hand.Count = 6
+Bot1.Hand = Forest; Forest; Forest; Forest; Forest; Birds of Paradise
+Bot1.Battlefield = Forest
+Bot1.Graveyard = Spider-Sense
+Bot2.Graveyard = Lightning Bolt

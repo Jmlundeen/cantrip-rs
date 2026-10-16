@@ -1,0 +1,54 @@
+# A copy of a spell cast with web-slinging is not cast (CR 707.10), so nothing is paid for it and no second creature is
+# returned. Bot1's Ornithopter attacks; Bot2 bolts Bot1, and Bot1 web-slings Spider-Sense at the Bolt for {U} (Mox
+# Sapphire), returning the tapped Ornithopter. Bot2 bolts again; Bot1 flashes in Lutri, the Spellchaser with Black
+# Lotus, whose trigger copies Spider-Sense, and the copy is aimed at the second Bolt. Both Bolts are countered, and the
+# second Ornithopter, untapped and not returned, stays.
+
+[Bot1 Deck]
+Mox Sapphire
+Black Lotus
+Ornithopter
+Ornithopter
+Spider-Sense
+Lutri, the Spellchaser
+Island x14
+
+[Bot2 Deck]
+Mox Ruby
+Mountain
+Lightning Bolt
+Lightning Bolt
+Mountain x16
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Hand.Spider-Sense.Cast(Stack.Lightning Bolt; Ability: Web-slinging)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Choose(Ornithopter)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Lutri, the Spellchaser.Cast
+Bot1.Pass
+Bot1.Target(Stack.Lightning Bolt#1)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Life = 20
+Bot2.Life = 20
+Bot1.Battlefield = Mox Sapphire; Ornithopter; Lutri, the Spellchaser
+Bot1.Hand = Island; Island; Ornithopter
+Bot1.Graveyard = Spider-Sense; Black Lotus
+Bot2.Graveyard = Lightning Bolt; Lightning Bolt

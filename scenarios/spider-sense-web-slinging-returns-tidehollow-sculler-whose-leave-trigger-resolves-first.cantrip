@@ -1,0 +1,55 @@
+# Returning a creature is part of casting the spell: an ability that triggers on it leaving waits until the spell is cast
+# (CR 601.2i, 603.3), then goes on the stack above it and resolves first (ruling 2025-09-19). Bot1's Tidehollow Sculler
+# exiled one of Bot2's two Lightning Bolts. The Sculler attacks; Bot2 bolts Bot1 with the other, and Bot1 web-slings
+# Spider-Sense ({U} from Mox Sapphire), returning the tapped Sculler. The Sculler's leave trigger is put on the stack over
+# Spider-Sense and gives Bot2 its exiled Bolt back before Spider-Sense counters the cast one.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Tidehollow Sculler
+Spider-Sense
+Plains x15
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Lightning Bolt
+Mountain x17
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tidehollow Sculler.Cast
+Bot1.Choose(Lightning Bolt)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Attack(Tidehollow Sculler > Bot2)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Hand.Spider-Sense.Cast(Stack.Lightning Bolt; Ability: Web-slinging)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Choose(Tidehollow Sculler)
+? Stack = Tidehollow Sculler; Spider-Sense; Lightning Bolt
+? Exile.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Stack = Spider-Sense; Lightning Bolt
+? Exile.Count = 0
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Life = 20
+Bot2.Life = 20
+Bot1.Battlefield = Mox Pearl; Mox Jet; Mox Sapphire
+Bot1.Hand = Plains; Plains; Plains; Tidehollow Sculler
+Bot1.Graveyard = Spider-Sense
+Bot2.Graveyard = Lightning Bolt
+Bot2.Hand.Count = 6

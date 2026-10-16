@@ -1,0 +1,49 @@
+# Spider-Sense targets an instant spell, a sorcery spell or a triggered ability, nothing else (CR 115.1, 601.2c). With
+# only Bot2's Pyrite Spellbomb ability (activated) on the stack, and then only Bot2's Ornithopter (a creature spell),
+# Spider-Sense has no legal target and is not offered; against Bot2's Lightning Bolt it is, and counters it.
+
+[Bot1 Deck]
+Mox Sapphire
+Island
+Spider-Sense
+Island x17
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Pyrite Spellbomb
+Ornithopter
+Mountain
+Lightning Bolt
+Mountain x14
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Pyrite Spellbomb.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Pyrite Spellbomb.Activate(Bot1; Ability: damage)
+! Bot1.Hand.Spider-Sense.Cast
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+! Bot1.Hand.Spider-Sense.Cast
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Spider-Sense.Cast(Stack.Lightning Bolt)
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot1.Life = 18
+Bot2.Battlefield = Mox Ruby; Mox Jet; Mountain; Ornithopter
+Bot2.Graveyard = Lightning Bolt; Pyrite Spellbomb
+Bot1.Graveyard = Spider-Sense

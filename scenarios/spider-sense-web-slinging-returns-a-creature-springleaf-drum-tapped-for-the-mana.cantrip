@@ -1,0 +1,39 @@
+# A mana ability activated while paying (CR 601.2g) may tap a creature that has no mana ability of its own: Springleaf
+# Drum's "{T}, Tap an untapped creature you control: Add one mana of any color." Bot1's only creature, Ornithopter, is
+# untapped, but the Drum could tap it, so web-slinging is offered against Bot2's Lightning Bolt. The Drum taps the
+# Ornithopter for {U}, and the Ornithopter, now tapped, is the creature returned (CR 702.188a; ruling 2025-09-19).
+
+[Bot1 Deck]
+Island
+Springleaf Drum
+Ornithopter
+Spider-Sense
+Island x16
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Springleaf Drum.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Hand.Spider-Sense.Cast(Stack.Lightning Bolt; Ability: Web-slinging)
+Bot1.Battlefield.Springleaf Drum.Activate(Tap: Ornithopter; Color: Blue)
+Bot1.Choose(Ornithopter)
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot1.Life = 20
+Bot1.Battlefield = Island; Springleaf Drum
+Bot1.Battlefield.Springleaf Drum.Tapped = true
+Bot1.Graveyard = Spider-Sense
+Bot2.Graveyard = Lightning Bolt
