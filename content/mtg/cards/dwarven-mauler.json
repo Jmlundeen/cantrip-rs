@@ -1,0 +1,8 @@
+{
+  "name": "Dwarven Mauler",
+  "manaCost": "{R}",
+  "type": "Creature — Dwarf Warrior",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "Equip abilities you activate that target this creature cost {2} less to activate."
+}

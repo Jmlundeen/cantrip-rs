@@ -1,0 +1,41 @@
+# Dwarven Mauler: "Equip abilities you activate that target this creature cost {2} less to activate" (CR 601.2c,
+# 601.2f, 602.2b). Shadowspear's Equip {2} targeting the Mauler costs {0}: the {R} in the pool is still there after it
+# is attached. Moved to the Ornithopter, the same ability costs the full {2} (the positive control: the reduction is
+# only for an equip ability that targets the Mauler), paid with that {R} and the Mountain.
+
+[Bot1 Deck]
+Mountain
+Dwarven Mauler
+Mox Ruby
+Shadowspear
+Ornithopter
+Island x12
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Dwarven Mauler.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Shadowspear.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+? Bot1.Mana = {R}
+Bot1.Battlefield.Shadowspear.Activate(Ability: Equip; Dwarven Mauler)
+? Bot1.Mana = {R}
+Bot1.Pass
+Bot1.Battlefield.Shadowspear.Activate(Ability: Equip; Ornithopter)
+Bot1.Battlefield.Mountain.Activate
+? Bot1.Mana =
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Bot1.Mana =
+Bot1.Battlefield.Shadowspear.AttachedTo = Ornithopter
+Bot1.Battlefield.Ornithopter.Power = 1
+Bot1.Battlefield.Dwarven Mauler.Power = 2
