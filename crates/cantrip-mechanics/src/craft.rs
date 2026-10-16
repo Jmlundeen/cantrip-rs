@@ -110,6 +110,26 @@ pub fn exiled_cards_used_to_craft(q: &dyn Query, permanent: ObjectId) -> Vec<Obj
     used_to_craft(q.state(), permanent)
 }
 
+/// The total power of the exiled cards used to craft `permanent` (CR 702.167c), each as it is in exile with its own
+/// characteristic-defining ability applied (the Mastercraft Raptor and Wretched Bonemass rulings), 0 for a card with none.
+fn total_crafted_power(q: &dyn LayerQuery, permanent: ObjectId) -> i16 {
+    used_to_craft(q.state(), permanent).into_iter().map(|c| q.chars_with_defined_pt(c).power.unwrap_or(0)).sum()
+}
+
+/// "[This]'s power is equal to the total power of the exiled cards used to craft it" (CR 604.3), a
+/// characteristic-defining ability's apply. Mastercraft Raptor prints it.
+pub fn power_of_total_crafted_power(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
+    chars.power = Some(total_crafted_power(q, source));
+}
+
+/// "[This]'s power and toughness are each equal to the total power of the exiled cards used to craft it" (CR 604.3), a
+/// characteristic-defining ability's apply. Wretched Bonemass prints it.
+pub fn power_and_toughness_of_total_crafted_power(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
+    let total = total_crafted_power(q, source);
+    chars.power = Some(total);
+    chars.toughness = Some(total);
+}
+
 /// `exiled_cards_used_to_craft` from the state alone, for a characteristic-defining ability (CR 604.3), which reads the game
 /// through the layers: the materials are linked to the craft card as it waited in exile (`Game::link_exiled`), and that card
 /// became `permanent` as it returned.

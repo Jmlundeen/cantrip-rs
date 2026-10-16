@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::library::{self, Find};
-use cantrip_mechanics::statics::your_creatures;
+use cantrip_mechanics::statics::{plus_pt, your_creatures};
 use cantrip_mechanics::tokens::{self, GNOME};
 use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_mechanics::craft;
@@ -25,15 +25,9 @@ fn two_gnomes(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// "Creatures you control get +1/+1."
-fn plus_one_plus_one(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.power = chars.power.map(|v| v + 1);
-    chars.toughness = chars.toughness.map(|v| v + 1);
-}
-
 pub static BACK: CardDef = CardDef {
     abilities: &[triggered(THIS_ENTERS, two_gnomes, "When this artifact enters, create two 1/1 colorless Gnome artifact creature tokens.")],
-    statics: &[static_ability(Layer::PtModify, your_creatures, plus_one_plus_one, "Creatures you control get +1/+1.")],
+    statics: &[static_ability(Layer::PtModify, your_creatures, plus_pt::<1, 1>, "Creatures you control get +1/+1.")],
     ..oracle::COSMIUM_KILN
 };
 

@@ -13,16 +13,8 @@ fn dinosaur(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
 /// "Craft with one or more Dinosaurs."
 static DINOSAURS: Materials = craft::materials(1, true, dinosaur, "Dinosaur");
 
-/// "Mastercraft Raptor's power is equal to the total power of the exiled cards used to craft it" (CR 604.3, 702.167c): each
-/// card's power as it is in exile, a characteristic-defining ability of its own included (the card's ruling), none counting
-/// for a card with no power. With none used to craft it, its power is 0.
-fn total_crafted_power(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
-    let total: i16 = craft::used_to_craft(q.state(), source).into_iter().map(|c| q.chars_with_defined_pt(c).power.unwrap_or(0)).sum();
-    chars.power = Some(total);
-}
-
 pub static BACK: CardDef = CardDef {
-    statics: &[characteristic_defining(Layer::PtDefine, total_crafted_power, "Mastercraft Raptor's power is equal to the total power of the exiled cards used to craft it.").lost_pt(0, 4)],
+    statics: &[characteristic_defining(Layer::PtDefine, craft::power_of_total_crafted_power, "Mastercraft Raptor's power is equal to the total power of the exiled cards used to craft it.").lost_pt(0, 4)],
     ..oracle::MASTERCRAFT_RAPTOR
 };
 

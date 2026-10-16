@@ -1,17 +1,8 @@
 use cantrip_api::*;
 use cantrip_mechanics::attach::{attached_object, equip};
+use cantrip_mechanics::statics::plus_pt;
 use cantrip_mechanics::{choose, craft, damage_target, targets};
 use cantrip_oracle as oracle;
-
-/// "Equipped creature gets +2/+0."
-fn plus_two_power(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.power = chars.power.map(|v| v + 2);
-}
-
-/// "Equipped creature gets +3/+0."
-fn plus_three_power(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.power = chars.power.map(|v| v + 3);
-}
 
 /// How many Dire Blunderbusses' abilities one creature can tell apart: each Blunderbuss attached to it gives it an
 /// instance of the attack ability of its own (CR 613.1f), and each instance names its own Blunderbuss as "Dire
@@ -100,7 +91,7 @@ pub static BACK: CardDef = CardDef {
         delayed_trigger(deal_power, "When you do, this creature deals damage equal to its power to target creature.").targets(&[targets::CREATURE]),
     ],
     statics: &[
-        static_ability(Layer::PtModify, attached_object, plus_three_power, "Equipped creature gets +3/+0."),
+        static_ability(Layer::PtModify, attached_object, plus_pt::<3, 0>, "Equipped creature gets +3/+0."),
         static_ability(Layer::Ability, attached_object, grant_attack_ability, "Equipped creature has \"Whenever this creature attacks, you may sacrifice an artifact other than Dire Blunderbuss. When you do, this creature deals damage equal to its power to target creature.\""),
     ],
     ..oracle::DIRE_BLUNDERBUSS
@@ -108,7 +99,7 @@ pub static BACK: CardDef = CardDef {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[equip(mana("{1}"), "Equip {1}"), craft::ability(mana("{3}{R}{R}"), &craft::ARTIFACT, "Craft with artifact {3}{R}{R}")],
-    statics: &[static_ability(Layer::PtModify, attached_object, plus_two_power, "Equipped creature gets +2/+0.")],
+    statics: &[static_ability(Layer::PtModify, attached_object, plus_pt::<2, 0>, "Equipped creature gets +2/+0.")],
     back: Some(&BACK),
     ..oracle::DIRE_FLAIL
 };

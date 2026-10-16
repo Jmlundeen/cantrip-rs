@@ -27,15 +27,6 @@ fn return_to_hand(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// "Wretched Bonemass's power and toughness are each equal to the total power of the exiled cards used to craft it" (CR
-/// 604.3, 702.167c): each card's power as it is in exile, its own characteristic-defining ability applied (the card's
-/// ruling), and 0 for one without.
-fn total_crafted_power(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
-    let total: i16 = craft::used_to_craft(q.state(), source).into_iter().map(|c| q.chars_with_defined_pt(c).power.unwrap_or(0)).sum();
-    chars.power = Some(total);
-    chars.toughness = Some(total);
-}
-
 /// The keywords the Bonemass has while an exiled card used to craft it has them.
 const SHARED: [Keyword; 12] = [
     Keyword::Flying,
@@ -75,7 +66,7 @@ fn crafted_keywords(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
 
 pub static BACK: CardDef = CardDef {
     statics: &[
-        characteristic_defining(Layer::PtDefine, total_crafted_power, "Wretched Bonemass's power and toughness are each equal to the total power of the exiled cards used to craft it.").lost_pt(0, 0),
+        characteristic_defining(Layer::PtDefine, craft::power_and_toughness_of_total_crafted_power, "Wretched Bonemass's power and toughness are each equal to the total power of the exiled cards used to craft it.").lost_pt(0, 0),
         static_ability(Layer::Ability, cantrip_mechanics::statics::itself, crafted_keywords, "This creature has flying as long as an exiled card used to craft it has flying. The same is true for first strike, double strike, deathtouch, haste, hexproof, indestructible, lifelink, menace, protection, reach, trample, and vigilance."),
     ],
     ..oracle::WRETCHED_BONEMASS
