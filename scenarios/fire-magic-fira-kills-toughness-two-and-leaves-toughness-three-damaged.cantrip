@@ -1,0 +1,41 @@
+# Fire Magic, Fira ({R} + {2} = three mana, a Mountain and two Moxen): 2 damage to each creature, exactly lethal to
+# Bot2's Ornithopter (toughness 2) and not to its Sylvan Caryatid (toughness 3), which stays with 2 damage marked.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Fire Magic
+Mountain x3
+Mountain x13
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Sylvan Caryatid
+Ornithopter
+Forest x3
+Forest x13
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Sylvan Caryatid.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Fire Magic.Cast
+Bot1.Modes(Fira)
+
+[Expect]
+Bot1.Graveyard = Fire Magic
+Bot2.Graveyard = Ornithopter
+Bot2.Battlefield.Sylvan Caryatid.Damage = 2
+Stack.Count = 0

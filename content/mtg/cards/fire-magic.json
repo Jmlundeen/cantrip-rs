@@ -1,0 +1,6 @@
+{
+  "name": "Fire Magic",
+  "manaCost": "{R}",
+  "type": "Instant",
+  "oracleText": "Tiered (Choose one additional cost.)\n• Fire — {0} — Fire Magic deals 1 damage to each creature.\n• Fira — {2} — Fire Magic deals 2 damage to each creature.\n• Firaga — {5} — Fire Magic deals 3 damage to each creature."
+}

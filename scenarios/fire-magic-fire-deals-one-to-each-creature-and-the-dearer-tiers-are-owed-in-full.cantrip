@@ -1,0 +1,38 @@
+# Fire Magic, tiered (CR 702.183a): Fire ({R} + {0}) deals 1 damage to each creature, both players', so Bot1's own Mother of
+# Runes (1/1) dies and Bot2's Ornithopter (0/2) survives with 1 damage marked. With a Mountain and a Plains only, Fira
+# ({R} + {2}) and Firaga ({R} + {5}) each still owe their cost once the Mountain has paid {R}: those casts are cancelled,
+# and the same Mountain then casts Fire (the positive control).
+
+[Bot1 Deck]
+Plains
+Mountain
+Mother of Runes
+Fire Magic
+Mountain x3
+Mountain x13
+
+[Bot2 Deck]
+Ornithopter
+Mountain x19
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Mother of Runes.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Fire Magic.Cast
+Bot1.Modes(Fira)
+Bot1.Cancel
+Bot1.Hand.Fire Magic.Cast
+Bot1.Modes(Firaga)
+Bot1.Cancel
+Bot1.Hand.Fire Magic.Cast
+Bot1.Modes(Fire)
+
+[Expect]
+Bot1.Graveyard = Mother of Runes; Fire Magic
+Bot2.Battlefield.Ornithopter.Damage = 1
+Stack.Count = 0
