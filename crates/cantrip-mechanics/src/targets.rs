@@ -65,6 +65,13 @@ fn spell_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
 /// Any target (CR 115.4): a creature, a player, a planeswalker or a battle.
 pub const ANY: TargetSpec = target(any_target_filter);
 pub const CREATURE: TargetSpec = target(creature_filter);
+/// "Another target creature", "other target creature" (CR 115.1, 109.5): a creature on the battlefield other than the source
+/// of the spell or ability. Arwen, Mortal Queen, Restless Vinestalk and Wolverine, Fierce Fighter print it; a slot of up to one
+/// is `up_to_one(other_creature_filter)`.
+pub fn other_creature_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    creature_filter(q, asker, t) && t != Target::Object(asker.source)
+}
+pub const OTHER_CREATURE: TargetSpec = target(other_creature_filter);
 /// "Target tapped creature" (CR 115.1, 608.2b): tapped when chosen and, legality being checked again on resolution, still
 /// tapped then. Ajani, Outland Chaperone, Cryogen Relic and The Wandering Emperor print it.
 pub const TAPPED_CREATURE: TargetSpec = target(tapped_creature_filter);

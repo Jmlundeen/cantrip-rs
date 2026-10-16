@@ -18,11 +18,6 @@ fn becomes_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// "Up to one other target creature" (CR 115.1).
-fn other_creature(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    (targets::CREATURE.filter)(q, asker, t) && t != Target::Object(asker.source)
-}
-
 /// It has base power and toughness 3/3 until end of turn (CR 613.4b).
 fn three_three(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if item.target_count > 0
@@ -39,7 +34,7 @@ pub static CARD: CardDef = CardDef {
         mana_ability(TAP, add_one_of(&[Color::Green, Color::Blue]), "{T}: Add {G} or {U}."),
         ability(cost("{3}{U}{G}"), becomes_creature, "{3}{G}{U}: Until end of turn, this land becomes a 5/5 green and blue Plant creature with trample. It's still a land."),
         triggered(triggers::THIS_ATTACKS, three_three, "Whenever this land attacks, up to one other target creature has base power and toughness 3/3 until end of turn.")
-            .targets(&[up_to_one(other_creature)]),
+            .targets(&[up_to_one(targets::other_creature_filter)]),
     ],
     ..oracle::RESTLESS_VINESTALK
 };
