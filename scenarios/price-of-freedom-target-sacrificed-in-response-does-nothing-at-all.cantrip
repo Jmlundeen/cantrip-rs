@@ -1,0 +1,48 @@
+# Bot1 targets Bot2's Mind Stone; in response Bot2 pays {1} and sacrifices it to draw a card. The spell's only target is
+# illegal, so it does not resolve (CR 608.2b): Bot1 draws nothing for it and Bot2 is never asked about a search. Bot1's
+# hand is its seven cards less Price and four lands, plus the draws of turns 3, 5 and 7 and nothing from the spell.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Price of Freedom
+Mountain x4
+Mountain x12
+
+[Bot2 Deck]
+Forest
+Forest
+Mind Stone
+Forest x4
+Forest x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest#1.Activate
+Bot2.Battlefield.Forest#2.Activate
+Bot2.Hand.Mind Stone.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Price of Freedom.Cast(Bot2.Battlefield.Mind Stone)
+Bot2.Battlefield.Forest#1.Activate
+Bot2.Battlefield.Mind Stone.Activate(Ability: Draw)
+! Bot2.Accept
+
+[Expect]
+Turn = 7
+Bot1.Graveyard = Price of Freedom
+Bot1.Hand.Count = 5
+Bot2.Graveyard = Mind Stone
+Bot2.Battlefield = Forest; Forest; Forest

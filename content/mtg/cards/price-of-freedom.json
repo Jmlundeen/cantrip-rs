@@ -1,0 +1,6 @@
+{
+  "name": "Price of Freedom",
+  "manaCost": "{1}{R}",
+  "type": "Sorcery — Lesson",
+  "oracleText": "Destroy target artifact or land an opponent controls. Its controller may search their library for a basic land card, put it onto the battlefield tapped, then shuffle.\nDraw a card."
+}

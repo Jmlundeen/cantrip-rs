@@ -1,0 +1,54 @@
+# The One Ring is indestructible, so "destroy target artifact" does nothing to it. The rest of the spell is not conditional on
+# the destruction: Bot2, its controller, is still asked and fetches a Forest tapped, and Bot1 still draws.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Price of Freedom
+Mountain x4
+Mountain x12
+
+[Bot2 Deck]
+Forest
+Forest
+Forest
+Forest
+The One Ring
+Forest x2
+Forest x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T8 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest#1.Activate
+Bot2.Battlefield.Forest#2.Activate
+Bot2.Battlefield.Forest#3.Activate
+Bot2.Battlefield.Forest#4.Activate
+Bot2.Hand.The One Ring.Cast
+[T9 Bot1.Main1]
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Price of Freedom.Cast(Bot2.Battlefield.The One Ring)
+Bot2.Accept
+Bot2.Search(Forest)
+
+[Expect]
+Turn = 9
+Bot1.Graveyard = Price of Freedom
+Bot2.Graveyard.Count = 0
+Bot2.Battlefield.The One Ring.Keywords = Indestructible
+Bot2.Battlefield.Forest#5.Tapped = true
+Bot1.Hand.Count = 7

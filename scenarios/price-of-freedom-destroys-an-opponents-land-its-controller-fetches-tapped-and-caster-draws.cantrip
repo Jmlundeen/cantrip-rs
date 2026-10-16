@@ -1,0 +1,37 @@
+# Price of Freedom destroys Bot2's Plains. Bot2, its controller (not the caster), accepts and fetches a Forest, which
+# enters tapped. Then Bot1 draws a card (Sol Ring, the card under the one drawn for the turn). Bot1 casts it as its
+# own card: Lesson sorcery, {1}{R}.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Price of Freedom
+Mountain x4
+Mountain
+Sol Ring
+Mountain x10
+
+[Bot2 Deck]
+Plains x8
+Forest
+Plains x9
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Price of Freedom.Cast(Bot2.Battlefield.Plains)
+Bot2.Accept
+Bot2.Search(Forest)
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Price of Freedom
+Bot1.Hand = Mountain; Mountain; Mountain; Mountain; Mountain; Sol Ring
+Bot2.Graveyard = Plains
+Bot2.Battlefield = Forest
+Bot2.Battlefield.Forest.Tapped = true
