@@ -1,4 +1,3 @@
-# Known bug: a token created under an opponent of Authority of the Consuls enters untapped; the enter-tapped replacement is never applied to token creation (CR 614.1c, 111.1).
 # Authority of the Consuls: "Creatures your opponents control enter tapped" applies to a token as well as to a card.
 # Bot2's Lingering Souls makes two Spirit tokens, which must both enter tapped.
 

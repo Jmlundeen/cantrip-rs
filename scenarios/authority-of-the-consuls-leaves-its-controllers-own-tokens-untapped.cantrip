@@ -1,0 +1,35 @@
+# Authority of the Consuls taps only what enters under an opponent (CR 614.1c, 110.2a): the negative control for tokens.
+# Bot1 casts Authority, then its own Lingering Souls: both Spirit tokens enter untapped under Bot1, and Bot1 gains no life.
+
+[Bot1 Deck]
+Plains
+Authority of the Consuls
+Lingering Souls
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Plains
+Plains x12
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Hand.Authority of the Consuls.Cast
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Pearl#3.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Lingering Souls.Cast
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Spirit#1.Token = true
+Bot1.Battlefield.Spirit#1.Tapped = false
+Bot1.Battlefield.Spirit#2.Tapped = false
+Bot1.Life = 20
+Stack.Count = 0

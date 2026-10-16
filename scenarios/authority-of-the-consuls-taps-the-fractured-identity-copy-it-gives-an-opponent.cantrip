@@ -1,0 +1,39 @@
+# Authority of the Consuls: "Creatures your opponents control enter tapped" applies to a token created under an opponent
+# by Authority's own controller's spell (CR 614.1c, 111.1, 110.2a): the token is judged as it would exist on the
+# battlefield, under the player it enters under (CR 614.12). Bot1 casts Authority, then Fractured Identity on its own
+# Ornithopter, so Bot2 creates the token copy: it enters tapped, and its entering gains Bot1 1 life.
+
+[Bot1 Deck]
+Island
+Ornithopter
+Authority of the Consuls
+Fractured Identity
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Island x12
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Authority of the Consuls.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Fractured Identity.Cast(Bot1.Battlefield.Ornithopter)
+[Bot1.Main2]
+
+[Expect]
+Exile = Ornithopter
+Bot2.Battlefield = Ornithopter
+Bot2.Battlefield.Ornithopter.Token = true
+Bot2.Battlefield.Ornithopter.Tapped = true
+Bot1.Life = 21
+Stack.Count = 0

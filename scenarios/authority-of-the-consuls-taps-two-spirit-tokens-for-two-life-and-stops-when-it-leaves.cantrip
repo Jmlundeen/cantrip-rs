@@ -1,6 +1,6 @@
 # Authority of the Consuls: Bot2's Lingering Souls makes two Spirit tokens at once under Bot2. Tokens are creatures,
 # so the two entering together trigger it twice (CR 603.2c): Bot1 gains 2 life. (That they enter tapped is the
-# known-bug scenario next to this one.)
+# scenario next to this one.)
 # Then Bot2 Disenchants the Authority; once it has left the battlefield Bot2's Ornithopter enters untapped and Bot1
 # gains nothing more.
 

@@ -858,6 +858,35 @@ pub fn create_tokens_worded(
         let aura = spell.filter(|_| cx.card(card).enchant.is_some());
         let mut entering = Entering { object: id, controller, tapped, counters: entry_counters(with), copy, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_odd: None, attach: aura.and_then(|i| i.targets[0].object()), attach_player: aura.and_then(|i| i.targets[0].player()), x: 0 , transformed: false, protector: None, instead: None };
         prepare_entry(cx, &mut entering)?;
+        // The token is judged as it would exist on the battlefield (CR 614.12): a token copy as what it copies.
+        let copy = entering.copy;
+        cx.st().update_obj(id, |o| o.copy = copy);
+        // A token enters the battlefield as it is created (CR 111.1): the replacements of a permanent's entry apply to it
+        // as to any other's (CR 614.1c), "enters tapped" and the counters one gives as it arrives.
+        let change = replace::zone_change(
+            cx,
+            ZoneChange {
+                object: id,
+                from: if spell.is_some() { Zone::STACK } else { Zone::GONE },
+                to: Zone::BATTLEFIELD,
+                reason: if spell.is_some() { ZoneReason::Resolve } else { ZoneReason::Created },
+                controller,
+                tapped: entering.tapped,
+                counters: [0; CounterKind::COUNT],
+                reveal: false,
+                shuffle: false,
+                is_card: false,
+            },
+        );
+        // An effect that sends it elsewhere instead (CR 614.1a): a token anywhere but the battlefield ceases to exist
+        // (CR 111.7), so it is never created. No implemented effect does this to a token yet.
+        if !change.to.is(ZoneKind::Battlefield) {
+            continue;
+        }
+        entering.tapped = change.tapped;
+        for (n, with) in entering.counters.iter_mut().zip(change.counters) {
+            *n += with;
+        }
         entering.counters = replace::counters(cx, id, controller, true, entering.counters);
         cx.st().update_obj(id, |o| {
             o.zone = Zone::BATTLEFIELD;

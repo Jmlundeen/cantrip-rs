@@ -1,0 +1,40 @@
+# Spider-Woman, Stunning Savior: "Artifacts and creatures your opponents control enter tapped" applies to a token as it is
+# created (CR 614.1c, 111.1). Bot1 casts Spider-Woman and its own Thraben Inspector: Bot1's Clue (an artifact token) enters
+# untapped. On turn 2 Bot2's Thraben Inspector enters tapped, and so does the Clue it investigates for.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Spider-Woman, Stunning Savior
+Thraben Inspector
+Mox Pearl
+Plains x15
+
+[Bot2 Deck]
+Plains
+Thraben Inspector
+Plains x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Hand.Spider-Woman, Stunning Savior.Cast
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Hand.Thraben Inspector.Cast
+[Bot1.Main2]
+? Bot1.Battlefield.Clue Token.Tapped = false
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Thraben Inspector.Cast
+[Bot2.Main2]
+
+[Expect]
+Bot2.Battlefield = Plains; Thraben Inspector; Clue Token
+Bot2.Battlefield.Thraben Inspector.Tapped = true
+Bot2.Battlefield.Clue Token.Token = true
+Bot2.Battlefield.Clue Token.Tapped = true
+Bot1.Battlefield.Clue Token.Tapped = false

@@ -1,0 +1,56 @@
+# A copy of a permanent spell resolves as a token (CR 707.10f, 111.13): it is not created, but it enters the battlefield
+# from the stack like any permanent spell, so "creatures your opponents control enter tapped" applies to it (CR 614.1c).
+# Bot2 casts Authority of the Consuls on turn 2. On turn 3 Bot1's Uldaros Theorix exiles the Entombed Ornithopter and the
+# sacrificed Black Lotus and casts copies of both: the Ornithopter token enters tapped and gains Bot2 1 life (Uldaros
+# itself entered tapped and gained the first); the Black Lotus token, not a creature, enters untapped.
+
+[Bot1 Deck]
+Plains
+Entomb
+Uldaros Theorix
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Black Lotus
+Ornithopter
+Plains x12
+
+[Bot2 Deck]
+Plains
+Authority of the Consuls
+Plains x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Ornithopter)
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Authority of the Consuls.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Uldaros Theorix.Cast
+Bot1.Target(Ornithopter)
+Bot1.Target(Black Lotus)
+Bot1.Choose(Ornithopter)
+Bot1.Choose(Black Lotus)
+[Bot1.Main2]
+
+[Expect]
+Exile = Black Lotus; Ornithopter
+Bot1.Battlefield.Ornithopter.Token = true
+Bot1.Battlefield.Ornithopter.Tapped = true
+Bot1.Battlefield.Black Lotus.Token = true
+Bot1.Battlefield.Black Lotus.Tapped = false
+Bot1.Battlefield.Uldaros Theorix.Tapped = true
+Bot2.Life = 22
+Stack.Count = 0

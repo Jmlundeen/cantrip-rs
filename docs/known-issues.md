@@ -40,7 +40,6 @@ keeps it).
 | [KI-3](#ki-3-engine-paths-no-scenario-runs) | Engine paths no scenario runs | Low | Unexercised |
 | [KI-4](#ki-4-scenarios-waiting-on-cards) | Scenarios waiting on cards the engine does not have | Low | Open |
 | [KI-5](#ki-5-a-spell-that-has-left-the-stack-is-judged-by-its-printed-keywords) | A spell that has left the stack is judged by its printed characteristics | Low | Suspected |
-| [KI-6](#ki-6-tokens-do-not-enter-tapped-under-an-enter-tapped-replacement) | Tokens do not enter tapped under an enter-tapped replacement | Medium | Open |
 | [KI-7](#ki-7-the-choice-of-which-jace-token-empower-jace-puts-counters-on-is-captioned-as-a-keep) | The choice of which Jace token empower Jace puts counters on is captioned as a "keep" | Medium | Open |
 
 ## Issues
@@ -129,20 +128,6 @@ information for a spell that leaves the stack, fixes it. No implemented card gra
 no scenario can reach it yet.
 
 **Scenarios.** None yet; the first card that gives a creature spell flying on the stack (then a second flier cast under Momo) reaches it.
-### KI-6: Tokens do not enter tapped under an enter-tapped replacement
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Medium | Open | engine | 2026-10-16, Authority of the Consuls review scenarios |
-
-**Notes.** "Creatures your opponents control enter tapped" (Authority of the Consuls, Spider-Woman, Archon of Emeria's
-nonbasic lands) is a replacement of the entering event (CR 614.1c) and applies to a token as it is created (CR 111.1),
-but `ops::create_tokens_worded` (`crates/cantrip-rules/src/ops.rs`) never runs the `ZoneChange` replacements
-(`replace::zone_change`): it takes `tapped` only from the creating effect and `prepare_entry`. A token made under an
-opponent of such a permanent enters untapped. The enters trigger is unaffected (Authority's life gain works for tokens).
-
-**Scenarios.**
-- [`scenarios/authority-of-the-consuls-taps-a-token-created-under-an-opponent.cantrip`](../scenarios/authority-of-the-consuls-taps-a-token-created-under-an-opponent.cantrip) - two Spirit tokens must enter tapped (marked `# Known bug`).
 ### KI-8: Madness is lost when a discarded card is also replaced by Rest in Peace
 
 | Severity | Status | Area | Found |
