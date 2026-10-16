@@ -1,0 +1,35 @@
+# Web-slinging changes what a spell costs, not when it may be cast (CR 702.188a, 601.3; ruling 2025-09-19: "You must
+# follow all normal timing rules"). Bot1's Ornithopter attacks on turn 3 and is still tapped on Bot2's turn 4, with a
+# Plains for {W}: Spider-Man, Web-Slinger, a creature without flash, is not offered for its web-slinging cost then. In
+# Bot1's own main phase, with the Ornithopter tapped from attacking again, it is.
+
+[Bot1 Deck]
+Plains
+Ornithopter
+Spider-Man, Web-Slinger
+Plains x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Ornithopter.Tapped = true
+! Bot1.Hand.Spider-Man, Web-Slinger.Cast(Ability: Web-slinging)
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+[T5 Bot1.Main2]
+Bot1.Hand.Spider-Man, Web-Slinger.Cast(Ability: Web-slinging)
+Bot1.Battlefield.Plains.Activate
+Bot1.Choose(Ornithopter)
+[T5 Bot1.End]
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield = Plains; Spider-Man, Web-Slinger

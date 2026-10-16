@@ -1,0 +1,42 @@
+# Spider-Man, Web-Slinger: "Web-slinging {W} (You may cast this spell for {W} if you also return a tapped creature you
+# control to its owner's hand.)" (CR 702.188a). Both Ornithopters have attacked and are tapped in Bot1's second main
+# phase of turn 5. Bot1 casts Spider-Man for {W} (a Plains) by web-slinging; only its own Ornithopter may be returned,
+# not Bot2's, also tapped. Spider-Man enters, and Bot1's Ornithopter goes back to hand.
+
+[Bot1 Deck]
+Plains
+Ornithopter
+Spider-Man, Web-Slinger
+Plains x17
+
+[Bot2 Deck]
+Island
+Ornithopter
+Island x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+[T4 Bot2.Main1]
+Bot2.Attack(Ornithopter > Bot1)
+[T5 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+[T5 Bot1.Main2]
+? Bot2.Battlefield.Ornithopter.Tapped = true
+Bot1.Hand.Spider-Man, Web-Slinger.Cast(Ability: Web-slinging)
+Bot1.Battlefield.Plains.Activate
+! Bot1.Choose(Bot2.Battlefield.Ornithopter)
+Bot1.Choose(Bot1.Battlefield.Ornithopter)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield = Plains; Spider-Man, Web-Slinger
+Bot1.Hand.Count = 7
+Bot2.Battlefield = Ornithopter
+Bot2.Battlefield.Ornithopter.Tapped = true

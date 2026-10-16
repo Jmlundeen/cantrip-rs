@@ -1,0 +1,33 @@
+# Web-slinging is an alternative cost the player may choose, not the only way (CR 118.9, 601.2b): Bot1 casts Spider-Man,
+# Web-Slinger for its mana cost {2}{W} (Mox Pearl and two Plains) with its Ornithopter tapped from attacking, and the
+# Ornithopter stays on the battlefield.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Ornithopter
+Spider-Man, Web-Slinger
+Plains x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Attack(Ornithopter > Bot2)
+[T3 Bot1.Main2]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Spider-Man, Web-Slinger.Cast
+[T3 Bot1.End]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield = Plains; Mox Pearl; Ornithopter; Plains; Spider-Man, Web-Slinger
+Bot1.Battlefield.Ornithopter.Tapped = true

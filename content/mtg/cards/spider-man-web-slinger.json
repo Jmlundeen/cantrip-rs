@@ -1,0 +1,8 @@
+{
+  "name": "Spider-Man, Web-Slinger",
+  "manaCost": "{2}{W}",
+  "type": "Legendary Creature — Spider Human Hero",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Web-slinging {W} (You may cast this spell for {W} if you also return a tapped creature you control to its owner's hand.)"
+}
