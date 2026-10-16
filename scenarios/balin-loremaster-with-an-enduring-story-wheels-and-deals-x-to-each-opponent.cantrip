@@ -1,0 +1,45 @@
+# Balin, Loremaster (CR 702.195b, 701.9): Balin and two Moxes are three, so Bot1 has an enduring story as Balin enters, and
+# when its enters ability resolves Bot1 discards a hand of three, draws three, and Balin deals 3 damage to Bot2.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mountain
+Mountain
+Balin, Loremaster
+Plains
+Island
+Island
+Swamp
+Swamp
+Swamp
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Balin, Loremaster.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+? Bot1.Hand = Plains; Island; Island
+Bot1.Accept
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.EnduringStory = true
+Bot1.Graveyard = Island; Island; Plains
+Bot1.Hand = Swamp; Swamp; Swamp
+Bot2.Life = 17
