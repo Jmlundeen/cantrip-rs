@@ -586,6 +586,29 @@ pub fn you_roll_a_die(_: &dyn Query, me: &Asker, event: &Event) -> Option<Fired>
     }
 }
 
+/// An activation (CR 602.2) as the event a "whenever ... activate(s) an ability" trigger sees: the object whose ability
+/// it is, the player who activated it, and the ability. The object is read as it is, or as it last was if paying the cost
+/// took it away (CR 113.7a, 608.2h). Only abilities that use the stack are activations triggers see (`EventMask::of`).
+/// Ajani Unrelenting, Burning-Tree Shaman, Harsh Mentor, Immolation Shaman and Keral Keep Disciples ask it.
+pub fn activation(q: &dyn Query, event: &Event) -> Option<(ObjectId, PlayerId, &'static ActivatedDef)> {
+    let Event::AbilityActivated { source, ability, player } = *event else { return None };
+    q.activated_ability(ability).map(|def| (source, player, def))
+}
+
+/// "Whenever an opponent activates an ability of an artifact, creature, or land [on the battlefield] that isn't a mana
+/// ability, ... to that player" (CR 602.2, 603.2): a permanent's ability (one that functions on the battlefield, not
+/// cycling from a hand or embalm from a graveyard), the permanent an artifact, creature or land as it was when the costs
+/// were paid, a sacrificed one as it last was on the battlefield. The ability is about the activating player. Harsh
+/// Mentor and Immolation Shaman print it.
+pub fn opponent_activates_ability_of_artifact_creature_or_land(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    let (object, player, def) = activation(q, event)?;
+    let types = q.chars(object);
+    let permanent = def.from == ZoneKind::Battlefield
+        && (types.is(CardType::Artifact) || types.is(CardType::Creature) || types.is(CardType::Land));
+    let opponent = q.state().opponents(q.controller(source)).any(|p| p == player);
+    if permanent && opponent && !def.is_mana_ability() { Fired::about(Target::Player(player)) } else { None }
+}
+
 // --- The triggers, each with the events it listens to: `triggered(THIS_ENTERS, effect, text)` ---------------------
 
 pub const THIS_ENTERS: Trigger = when(EventMask::ZONE_CHANGE, this_enters);
@@ -614,3 +637,5 @@ pub const ARTIFACT_SPELL_YOU_CAST: Trigger = when_asked(EventMask::SPELL_CAST, a
 pub const CREATURE_SPELL_YOU_CAST: Trigger = when_asked(EventMask::SPELL_CAST, creature_spell_you_cast);
 pub const DEALS_COMBAT_DAMAGE_TO_PLAYER_SUBJECT: Trigger = when(EventMask::DAMAGE, deals_combat_damage_to_player_subject);
 pub const DEALS_COMBAT_DAMAGE_TO_PLAYER: Trigger = when(EventMask::DAMAGE, deals_combat_damage_to_player);
+pub const OPPONENT_ACTIVATES_ABILITY_OF_ARTIFACT_CREATURE_OR_LAND: Trigger =
+    when(EventMask::ABILITY_ACTIVATED, opponent_activates_ability_of_artifact_creature_or_land);

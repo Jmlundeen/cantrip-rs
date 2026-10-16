@@ -81,6 +81,10 @@ abilities: &[
   that says "you" is `when_asked(mask, f)`, `f` taking the `Asker` and reading `me.controller`, never
   `q.controller(source)`: a delayed triggered ability's "you" is the player who controlled the spell or ability that made
   it (CR 603.7d-e), whoever controls its source now or wherever it has gone.
+  "Whenever ... activate(s) an ability" listens to `EventMask::ABILITY_ACTIVATED` and reads the event with
+  `triggers::activation` (the object, the activating player, the `ActivatedDef`: `is_loyalty_ability()`,
+  `is_mana_ability()`, `from`); only abilities that use the stack are activations a trigger sees - a mana ability's is
+  not emitted yet.
 - **The rest** is a method after the call: `.targets(..)`, `.sorcery_speed()`, `.once_each_turn()`, `.condition(..)`
   (an activation restriction, or a trigger's intervening "if"), `.modal(..)`, `.look_back()`, `.anywhere()`, and the
   others in `ability.rs`. A loyalty ability is already sorcery speed (CR 606.3).
