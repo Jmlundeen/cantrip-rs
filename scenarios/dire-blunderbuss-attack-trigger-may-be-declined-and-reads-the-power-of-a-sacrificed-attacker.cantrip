@@ -1,0 +1,62 @@
+# Dire Blunderbuss's granted ability, "you may sacrifice an artifact other than Dire Blunderbuss. When you do, this
+# creature deals damage equal to its power to target creature." On turn three Bot1 declines (an empty choice): nothing is
+# sacrificed and no reflexive ability triggers (CR 603.12), so no target is asked for. On turn five the attacking
+# Ornithopter, an artifact itself, is the artifact sacrificed: the reflexive ability still triggers, and the creature
+# deals damage equal to its power as it last existed on the battlefield, 3 with the Blunderbuss's +3/+0 (the card's
+# ruling, CR 608.2h), killing Bot2's Ornithopter, the one creature left to target. Bot2's Ornithopter attacking on turn
+# four is no attack of "this creature": nothing triggers then. The sacrificed attacker deals no combat damage.
+
+[Bot1 Deck]
+Mountain
+Dire Flail
+Ornithopter
+Ornithopter
+Black Lotus
+Mox Ruby
+Mox Ruby
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Dire Flail.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Dire Flail.Activate(Ability: Craft)
+Bot1.Choose(Ornithopter#1)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Dire Blunderbuss.Activate(Bot1.Battlefield.Ornithopter; Ability: Equip)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Attack(Bot1.Battlefield.Ornithopter > Bot2)
+Bot1.Choose()
+! Bot1.Target
+[T3 Bot1.Main2]
+? Bot2.Life = 17
+? Bot2.Battlefield = Ornithopter
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Bot2.Battlefield.Ornithopter > Bot1)
+! Bot1.Choose
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Bot1.Battlefield.Ornithopter > Bot2)
+Bot1.Choose(Bot1.Battlefield.Ornithopter)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mountain; Mox Ruby; Mox Ruby; Dire Blunderbuss
+Bot1.Battlefield.Dire Blunderbuss.AttachedTo = (absent)
+Bot1.Graveyard = Ornithopter; Black Lotus
+Bot2.Battlefield = 
+Bot2.Graveyard = Ornithopter; Island
+Bot2.Life = 17

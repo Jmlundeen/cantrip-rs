@@ -1,0 +1,40 @@
+# Craft's materials may be cards in your graveyard (CR 702.167a-b): "an artifact card from your graveyard". Bot1's Black
+# Lotus is sacrificed for the mana that casts Dire Flail, so it is an artifact card in Bot1's graveyard when the Flail
+# crafts the same turn, beside the Moxen and the Sol Ring on the battlefield that could have been chosen instead. The
+# Lotus is chosen and exiled from the graveyard with the Flail as the cost is paid; the Flail returns as Dire
+# Blunderbuss.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Dire Flail
+Mox Ruby
+Mox Ruby
+Sol Ring
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Dire Flail.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Dire Flail.Activate(Ability: Craft)
+Bot1.Choose(Graveyard.Black Lotus)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Sol Ring.Activate
+? Exile = Dire Flail; Black Lotus
+? Bot1.Graveyard.Count = 0
+
+[Expect]
+Bot1.Battlefield = Mountain; Mox Ruby; Mox Ruby; Sol Ring; Dire Blunderbuss
+Exile = Black Lotus
+Bot1.Graveyard.Count = 0

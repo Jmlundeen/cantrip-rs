@@ -1,0 +1,56 @@
+# Craft's materials are permanents YOU control and cards in YOUR graveyard (CR 702.167a). Bot2 has an Ornithopter on the
+# battlefield and a Black Lotus card in its graveyard; Bot1 has five Mountains and Dire Flail, the Flail its only
+# artifact. The Flail can't be its own material ("another artifact"), and the opponent's artifacts are none of Bot1's, so
+# the craft ability is not offered (a cost that can't be paid, CR 602.2b). Once Bot1 casts its own Ornithopter, it is
+# offered (the positive control), and the choice of materials still leaves out Bot2's Ornithopter and Lotus.
+
+[Bot1 Deck]
+Mountain
+Dire Flail
+Ornithopter
+Mountain
+Mountain
+Mountain
+Mountain
+Island x10
+
+[Bot2 Deck]
+Island
+Ornithopter
+Black Lotus
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Dire Flail.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+! Bot1.Battlefield.Dire Flail.Activate(Ability: Craft)
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Dire Flail.Activate(Ability: Craft)
+! Bot1.Choose(Bot2.Battlefield.Ornithopter)
+! Bot1.Choose(Black Lotus)
+Bot1.Choose(Bot1.Battlefield.Ornithopter)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+
+[Expect]
+Bot1.Battlefield = Mountain; Mountain; Mountain; Mountain; Mountain; Dire Blunderbuss
+Bot2.Battlefield = Island; Ornithopter
+Bot2.Graveyard = Island; Black Lotus
+Exile = Ornithopter

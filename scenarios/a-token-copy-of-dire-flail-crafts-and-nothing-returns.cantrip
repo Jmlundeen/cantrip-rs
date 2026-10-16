@@ -1,0 +1,48 @@
+# "Return this card to the battlefield transformed" (CR 702.167a): a token copy of Dire Flail (Three Steps Ahead's copy
+# mode) has the craft ability and may activate it, but the token exiled to pay the cost ceases to exist (CR 111.7,
+# 704.5d), so as the ability resolves there is no card to return and nothing enters. The real Dire Flail, an artifact
+# Bot1 controls other than the token, is the material: exiled, and not returned either - only "this card" is.
+
+[Bot1 Deck]
+Mountain
+Dire Flail
+Three Steps Ahead
+Black Lotus
+Mox Sapphire
+Mox Ruby
+Mox Ruby
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Dire Flail.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Three Steps Ahead.Cast
+Bot1.Modes(2)
+Bot1.Target(Bot1.Battlefield.Dire Flail)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+? Bot1.Battlefield.Dire Flail#2.Token = true
+Bot1.Battlefield.Dire Flail#2.Activate(Ability: Craft)
+Bot1.Choose(Dire Flail)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+? Exile = Dire Flail
+
+[Expect]
+Bot1.Battlefield = Mountain; Island; Mox Sapphire; Mox Ruby; Mox Ruby
+Exile = Dire Flail
+Stack.Count = 0

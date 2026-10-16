@@ -1,0 +1,45 @@
+# "Craft only as a sorcery" (CR 702.167a, 307.1): Bot1 has Dire Flail, an Ornithopter to exile and the mana (Black Lotus
+# and two Moxen) from turn one on. The craft ability is not offered in Bot2's upkeep, nor in Bot1's own upkeep, nor in
+# Bot1's main phase while its Lightning Bolt is on the stack; once the Bolt has resolved, with the stack empty in Bot1's
+# main phase, it is (the positive control).
+
+[Bot1 Deck]
+Mountain
+Dire Flail
+Ornithopter
+Black Lotus
+Mox Ruby
+Mox Ruby
+Lightning Bolt
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Dire Flail.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Upkeep]
+! Bot1.Battlefield.Dire Flail.Activate(Ability: Craft)
+[T3 Bot1.Upkeep]
+! Bot1.Battlefield.Dire Flail.Activate(Ability: Craft)
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+! Bot1.Battlefield.Dire Flail.Activate(Ability: Craft)
+Bot1.Battlefield.Dire Flail.Activate(Ability: Craft)
+Bot1.Choose(Ornithopter)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield = Mountain; Mountain; Mox Ruby; Mox Ruby; Dire Blunderbuss
+Exile = Ornithopter

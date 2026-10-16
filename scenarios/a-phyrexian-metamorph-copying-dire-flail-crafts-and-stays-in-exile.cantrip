@@ -1,0 +1,50 @@
+# The craft rulings (2023-11-10): "If a card that isn't a transforming double-faced card becomes a copy of a card with
+# craft, it'll stay in exile if you activate the craft ability." Phyrexian Metamorph enters as a copy of Dire Flail and
+# so has its craft ability. Activated, it exiles the Metamorph and an Ornithopter; as the ability resolves the Metamorph
+# card, a copy no longer, is not a double-faced card, so it stays in exile (CR 712.14a). The real Dire Flail is
+# untouched.
+
+[Bot1 Deck]
+Mountain
+Dire Flail
+Phyrexian Metamorph
+Black Lotus
+Mox Sapphire
+Mox Ruby
+Mox Ruby
+Ornithopter
+Mountain
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Dire Flail.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Phyrexian Metamorph.Cast
+Bot1.Accept
+Bot1.Target(Dire Flail)
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Dire Flail#2.Activate(Ability: Craft)
+Bot1.Choose(Ornithopter)
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+? Exile = Phyrexian Metamorph; Ornithopter
+
+[Expect]
+Bot1.Battlefield = Mountain; Mountain; Mox Sapphire; Mox Ruby; Mox Ruby; Dire Flail
+Exile = Phyrexian Metamorph; Ornithopter

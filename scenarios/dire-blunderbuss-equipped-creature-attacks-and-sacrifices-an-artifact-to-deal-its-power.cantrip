@@ -1,0 +1,63 @@
+# Both faces of Dire Flail. The Flail equipped (Equip {1}) gives Ornithopter +2/+0; crafting it while it is attached exiles
+# it, so the Ornithopter loses the bonus and Dire Blunderbuss returns unattached (a new object, CR 400.7). Equipped with
+# the Blunderbuss, the Ornithopter is 3/2 and has "Whenever this creature attacks, you may sacrifice an artifact other
+# than Dire Blunderbuss. When you do, this creature deals damage equal to its power to target creature." It attacks:
+# the Blunderbuss itself is not among the artifacts it may sacrifice (the refusal) and a Mox Ruby is (the positive
+# control); the reflexive ability (CR 603.12) then targets Bot2's Ornithopter as it goes on the stack and deals it 3,
+# the attacker's power.
+
+[Bot1 Deck]
+Mountain
+Dire Flail
+Ornithopter
+Ornithopter
+Black Lotus
+Mox Ruby
+Mox Ruby
+Mountain
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Dire Flail.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Dire Flail.Activate(Ornithopter#2; Ability: Equip)
+Bot1.Battlefield.Mox Ruby#1.Activate
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Ornithopter#2.Power = 2
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Dire Flail.Activate(Ability: Craft)
+Bot1.Choose(Ornithopter#1)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Dire Blunderbuss.Activate(Bot1.Battlefield.Ornithopter; Ability: Equip)
+? Bot1.Battlefield.Ornithopter.Power = 0
+? Bot1.Battlefield.Dire Blunderbuss.AttachedTo = (absent)
+Bot1.Battlefield.Mountain#1.Activate
+[T3 Bot1.BeginCombat]
+? Bot1.Battlefield.Ornithopter.Power = 3
+Bot1.Attack(Bot1.Battlefield.Ornithopter > Bot2)
+! Bot1.Choose(Dire Blunderbuss)
+Bot1.Choose(Mox Ruby#1)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mountain; Mountain; Mox Ruby; Ornithopter; Dire Blunderbuss
+Bot1.Battlefield.Dire Blunderbuss.AttachedTo = Ornithopter
+Bot1.Graveyard = Mox Ruby; Black Lotus
+Bot2.Battlefield = 
+Bot2.Graveyard = Ornithopter
+Bot2.Life = 17

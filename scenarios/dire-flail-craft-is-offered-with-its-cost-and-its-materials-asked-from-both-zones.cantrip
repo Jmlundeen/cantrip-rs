@@ -1,0 +1,42 @@
+# Browser
+# Craft in the client (CR 702.167a). Dire Flail's menu offers its craft ability with its cost, "Craft with artifact
+# {3}{R}{R}" (Equip is not, with no creature to equip). Activated, the choice of materials is asked as craft's own: the
+# artifacts Bot1 controls (two Moxen, a Sol Ring) and the Black Lotus card in its graveyard are offered together, and the
+# caption says where they may come from and that they are exiled. The Lotus is chosen from the graveyard and confirmed
+# with "Exile it"; the Flail returns as Dire Blunderbuss.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Dire Flail
+Mox Ruby
+Mox Ruby
+Sol Ring
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Dire Flail.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Dire Flail.Activate(Ability: Craft)
+? Client.Bot1.Menu = Craft with artifact {3}{R}{R}
+? Client.Bot1.Prompt.Title = Dire Flail: craft - choose an artifact you control or an artifact card from your graveyard to exile
+Bot1.Choose(Graveyard.Black Lotus)
+? Client.Bot1.Confirm = Exile it
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Sol Ring.Activate
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mountain; Mox Ruby; Mox Ruby; Sol Ring; Dire Blunderbuss
+Exile = Black Lotus

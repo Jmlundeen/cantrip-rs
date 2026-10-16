@@ -1,0 +1,46 @@
+# Craft (CR 702.167a): "{3}{R}{R}, Exile this artifact, Exile another artifact you control or an artifact card from your
+# graveyard: Return this card transformed under its owner's control. Craft only as a sorcery." Bot1 casts Dire Flail and
+# an Ornithopter, then crafts in the same main phase with Black Lotus and two Moxen, choosing the Ornithopter on the
+# battlefield as the material. The material and the Flail are exiled as the cost is paid, so with the ability on the
+# stack both are already in exile; it resolves into Dire Blunderbuss, a new object (CR 400.7) with the back face's
+# characteristics (CR 712.8e): an Equipment, red by its color indicator, unattached. The Moxen and the Lotus are
+# artifacts too: the choice is the player's.
+
+[Bot1 Deck]
+Mountain
+Dire Flail
+Ornithopter
+Black Lotus
+Mox Ruby
+Mox Ruby
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Dire Flail.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Dire Flail.Activate(Ability: Craft)
+Bot1.Choose(Ornithopter)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+? Stack.Count = 1
+? Exile = Dire Flail; Ornithopter
+? Bot1.Battlefield = Mountain; Mox Ruby; Mox Ruby
+
+[Expect]
+Bot1.Battlefield = Mountain; Mox Ruby; Mox Ruby; Dire Blunderbuss
+Bot1.Battlefield.Dire Blunderbuss.Types = Artifact
+Bot1.Battlefield.Dire Blunderbuss.Subtypes = Equipment
+Bot1.Battlefield.Dire Blunderbuss.Colors = Red
+Bot1.Battlefield.Dire Blunderbuss.AttachedTo = (absent)
+Exile = Ornithopter
+Bot1.Graveyard = Black Lotus
