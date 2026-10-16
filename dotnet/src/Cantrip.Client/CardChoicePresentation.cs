@@ -69,12 +69,15 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
         // Craft (CR 702.167a): the materials are permanents you control and cards in your graveyard, of the quality the ability
         // names, exiled with the crafting permanent as its cost.
         bool craft = prompt.Purpose == CardChoicePurposeView.Craft;
+        // A material named as a card ("red instant and/or sorcery card") is a card in the graveyard alone (CR 702.167b).
+        bool cardsOnly = prompt.Kind.EndsWith(" card", StringComparison.Ordinal);
         string materials = prompt.Kind.Length == 0 ? "other permanents you control and/or cards in your graveyard"
+            : cardsOnly ? $"{Plural(prompt.Kind)} in your graveyard"
             : $"{Plural(prompt.Kind)} you control and/or {prompt.Kind} cards in your graveyard";
         string title = craft
             ? prompt.Minimum > 0
                 ? $"{source}: craft - choose {prompt.Minimum} or more from among {materials} to exile"
-                : prompt.Count == 1 && prompt.Kind.Length > 0
+                : prompt.Count == 1 && prompt.Kind.Length > 0 && !cardsOnly
                     ? $"{source}: craft - choose {article} {prompt.Kind} you control or {article} {prompt.Kind} card from your graveyard to exile"
                     : $"{source}: craft - choose {prompt.Count} from among {materials} to exile"
             : prompt.MinimumPower > 0

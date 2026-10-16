@@ -172,5 +172,13 @@ public sealed class CardChoiceCaptionTests
             "Strategic Betrayal: craft - choose 2 from among creatures you control and/or creature cards in your graveyard to exile",
             CardChoicePresentation.Describe(client, two, []).Title);
         Assert.False(CardChoicePresentation.Describe(client, two, [3]).CanSubmit);
+
+        // Named as cards, the materials are graveyard cards alone (CR 702.167b): Ore-Rich Stalactite's four or more.
+        ChooseCardsPromptMessage cards = Choice(CardChoicePurposeView.Craft, 2, true, elves);
+        cards.Kind = "red instant and/or sorcery card";
+        cards.Minimum = 1;
+        Assert.Equal(
+            "Strategic Betrayal: craft - choose 1 or more from among red instant and/or sorcery cards in your graveyard to exile",
+            CardChoicePresentation.Describe(client, cards, []).Title);
     }
 }
