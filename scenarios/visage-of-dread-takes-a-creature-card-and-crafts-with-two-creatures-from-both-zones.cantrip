@@ -1,0 +1,70 @@
+# Visage of Dread // Dread Osseosaur. As the Visage enters, Bot2 reveals its hand and Bot1 chooses an artifact or creature
+# card from it - not the Lightning Bolt (refused), the Ornithopter - which Bot2 discards. "Craft with two creatures
+# {5}{B}" (CR 702.167a-b) needs two from among the creatures Bot1 controls and the creature cards in its graveyard: with
+# only its bolted Ornithopter in the graveyard it is not offered on turn seven; once a second Ornithopter is on the
+# battlefield it is, and one creature alone is no answer (refused) - the two, one from each zone (the craft rulings), are.
+# Dread Osseosaur, a 5/4 black creature with menace, may mill two cards as it enters (accepted) and as it attacks
+# (declined).
+
+[Bot1 Deck]
+Swamp
+Visage of Dread
+Mox Jet
+Mox Ruby
+Ornithopter
+Lightning Bolt
+Ornithopter
+Swamp
+Swamp
+Swamp
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Visage of Dread.Cast
+! Bot1.Choose(Bot2.Hand.Lightning Bolt)
+Bot1.Choose(Bot2.Hand.Ornithopter)
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+! Bot1.Battlefield.Visage of Dread.Activate(Ability: Craft)
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Visage of Dread.Activate(Ability: Craft)
+! Bot1.Choose(Bot1.Battlefield.Ornithopter)
+Bot1.Choose(Bot1.Battlefield.Ornithopter; Bot1.Graveyard.Ornithopter)
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Swamp#3.Activate
+Bot1.Battlefield.Swamp#4.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Accept
+[T7 Bot1.Main2]
+? Bot1.Graveyard = Island; Island; Lightning Bolt
+? Bot1.Battlefield.Dread Osseosaur.Keywords = Menace
+? Bot1.Battlefield.Dread Osseosaur.Colors = Black
+? Bot1.Battlefield.Dread Osseosaur.Types = Creature
+[T9 Bot1.DeclareAttackers]
+Bot1.Attack(Dread Osseosaur > Bot2)
+Bot1.Decline
+[T9 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 15
+Bot1.Graveyard = Island; Island; Lightning Bolt
+Exile = Ornithopter; Ornithopter

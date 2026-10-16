@@ -1,0 +1,44 @@
+# Dread Osseosaur: "you may mill two cards" can't be chosen with fewer than two cards in the library (the card's ruling), so
+# with one card left Bot1 is not asked as it enters. Before that, Visage of Dread finds no artifact or creature card in
+# Bot2's revealed hand and asks nothing; it then crafts with two Ornithopters on the battlefield.
+
+[Bot1 Deck]
+Swamp
+Visage of Dread
+Black Lotus
+Mox Jet
+Mox Ruby
+Ornithopter
+Ornithopter
+Swamp
+Island
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Visage of Dread.Cast
+! Bot1.Choose
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Visage of Dread.Activate(Ability: Craft)
+Bot1.Choose(Ornithopter#1; Ornithopter#2)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Accept
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Dread Osseosaur.Power = 5
+Bot1.Library = Island
+Bot2.Revealed.Count = 7
