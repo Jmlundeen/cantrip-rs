@@ -1,0 +1,14 @@
+# Deserted Beach: with no other land it enters tapped (CR 614.1c) - the land itself is not counted.
+
+[Bot1 Deck]
+Deserted Beach
+Island x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Deserted Beach.Play
+
+[Expect]
+Bot1.Battlefield.Deserted Beach.Tapped = true

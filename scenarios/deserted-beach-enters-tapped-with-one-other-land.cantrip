@@ -1,0 +1,17 @@
+# Deserted Beach: one other land is not two, so it enters tapped - the boundary under the 'two or more' of its text.
+
+[Bot1 Deck]
+Island
+Deserted Beach
+Island x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Deserted Beach.Play
+
+[Expect]
+Bot1.Battlefield.Deserted Beach.Tapped = true

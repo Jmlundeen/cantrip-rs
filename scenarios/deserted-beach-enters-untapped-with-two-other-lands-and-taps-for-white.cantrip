@@ -1,0 +1,22 @@
+# Deserted Beach: with two other lands it enters untapped (CR 614.1c) and its mana ability adds {W} (chosen as it is activated).
+
+[Bot1 Deck]
+Island
+Island
+Deserted Beach
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Deserted Beach.Play
+Bot1.Battlefield.Deserted Beach.Activate(Color: White)
+
+[Expect]
+Bot1.Battlefield.Deserted Beach.Tapped = true
+Bot1.Mana = {W}

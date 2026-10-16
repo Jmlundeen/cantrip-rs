@@ -1,0 +1,5 @@
+{
+  "name": "Deserted Beach",
+  "type": "Land",
+  "oracleText": "This land enters tapped unless you control two or more other lands.\n{T}: Add {W} or {U}."
+}
