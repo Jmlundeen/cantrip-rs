@@ -651,10 +651,16 @@ pub const fn granted_replacement(kind: ReplacementKind, applies: GrantedApplies,
 
 /// An alternative way to cast the card (CR 118.9): for `cost`, from the zone `from`.
 pub const fn way(cost: Cost, from: ZoneKind, text: &'static str) -> WayDef {
-    WayDef { text, cost, from, exile_after: false, condition: None, instant_speed: false }
+    WayDef { text, cost, from, exile_after: false, condition: None, instant_speed: false, kind: WayKind::Other }
 }
 
 impl WayDef {
+    /// This way is `kind`'s keyword.
+    pub const fn kind(self, kind: WayKind) -> WayDef {
+        WayDef { kind, ..self }
+    }
+
+
     /// It is exiled instead of going anywhere else as it leaves the stack (flashback, CR 702.34a).
     pub const fn exile_after(self) -> WayDef {
         WayDef { exile_after: true, ..self }

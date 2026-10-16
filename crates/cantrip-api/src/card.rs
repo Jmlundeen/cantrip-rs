@@ -745,6 +745,15 @@ impl AbilityDef {
     }
 }
 
+/// Which keyword a way is, where a card asks how another was cast ("if that creature was cast for its warp cost"): the
+/// way's identity, set by the keyword's own constructor. Other keywords' ways are `Other` until a card asks about them.
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+pub enum WayKind {
+    Other,
+    /// Warp (CR 702.185a).
+    Warp,
+}
+
 /// An alternative way to cast a card (CR 118.9): flashback (CR 702.34) from the graveyard, Fireblast's sacrifice.
 #[derive(Clone, Copy)]
 pub struct WayDef {
@@ -758,6 +767,8 @@ pub struct WayDef {
     /// It may be cast this way whenever its caster could cast an instant, whatever the card's own type (sneak, CR 702.190a:
     /// "any time you could cast an instant during your declare blockers step"). `condition` says when that is.
     pub instant_speed: bool,
+    /// Which keyword's way this is.
+    pub kind: WayKind,
 }
 
 #[derive(Clone, Copy)]
