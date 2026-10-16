@@ -3,16 +3,6 @@ use cantrip_mechanics::attach::{attached_object, equip};
 use cantrip_mechanics::library::{look_at_top, Rest};
 use cantrip_oracle as oracle;
 
-/// Equipped creature gets +1/+1 for each artifact you control (layer 7c): the Omnitool itself among them.
-fn artifact_bonus(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
-    let you = q.state().obj(source).controller;
-    let state = q.state();
-    let count = state.battlefield().iter().filter(|&&id| state.obj(id).controller == you && q.chars(id).is(CardType::Artifact)).count();
-    let bonus = count as i16;
-    chars.power = chars.power.map(|v| v + bonus);
-    chars.toughness = chars.toughness.map(|v| v + bonus);
-}
-
 /// Look at the top six cards of your library. You may reveal an artifact card from among them and put it into your
 /// hand. Put the rest on the bottom of your library in a random order. With no artifact card among them nobody is
 /// asked.
@@ -26,6 +16,6 @@ pub static CARD: CardDef = CardDef {
         triggered(cantrip_mechanics::triggers::EQUIPPED_CREATURE_ATTACKS, look, "Whenever equipped creature attacks, look at the top six cards of your library. You may reveal an artifact card from among them and put it into your hand. Put the rest on the bottom of your library in a random order."),
         equip(mana("{3}"), "Equip {3}"),
     ],
-    statics: &[static_ability(Layer::PtModify, attached_object, artifact_bonus, "Equipped creature gets +1/+1 for each artifact you control.")],
+    statics: &[static_ability(Layer::PtModify, attached_object, cantrip_mechanics::statics::plus_one_plus_one_per_artifact_you_control, "Equipped creature gets +1/+1 for each artifact you control.")],
     ..oracle::ADAPTIVE_OMNITOOL
 };

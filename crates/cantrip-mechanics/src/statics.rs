@@ -31,6 +31,24 @@ pub fn have_haste(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.keywords = chars.keywords.with(Keyword::Haste);
 }
 
+/// "... has flying" (CR 702.9, layer 6) as a static ability's `StaticDef::apply`. Dragon's Rage Channeler's delirium and Iron
+/// Man Armor's equipped creature print it.
+pub fn have_flying(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
+    chars.keywords = chars.keywords.with(Keyword::Flying);
+}
+
+/// "Gets +1/+1 for each artifact you control" (CR 613.4c, layer 7c): "you" is the controller of the source, the object that has
+/// the ability (CR 109.5, 113.6), counted as the earlier layers left every permanent, the source itself among them if it is an
+/// artifact. The Construct token (Urza's Saga, Karn, Scion of Urza), Adaptive Omnitool's equipped creature and Iron Man
+/// Armor's animated Equipment print it.
+pub fn plus_one_plus_one_per_artifact_you_control(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
+    let state = view.state();
+    let you = state.obj(source).controller;
+    let n = state.battlefield().iter().filter(|&&id| state.obj(id).controller == you && view.chars(id).is(CardType::Artifact)).count() as i16;
+    chars.power = chars.power.map(|v| v + n);
+    chars.toughness = chars.toughness.map(|v| v + n);
+}
+
 /// "... has trample" (CR 702.19, layer 6) as a static ability's `StaticDef::apply`. Ajani's Anguish, Keen-Eyed Curator, Orcrist
 /// and Rancor print it.
 pub fn have_trample(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {

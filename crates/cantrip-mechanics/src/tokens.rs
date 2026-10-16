@@ -211,20 +211,6 @@ pub static PILOT: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
-/// "This token gets +1/+1 for each artifact you control" (layer 7c): a modification of its printed 0/0, so a lone
-/// Construct counts itself and is a 1/1. "You" is its controller now.
-fn construct_size(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
-    let state = view.state();
-    let you = state.obj(source).controller;
-    let n = state
-        .battlefield()
-        .iter()
-        .filter(|&&id| state.obj(id).controller == you && view.chars(id).is(CardType::Artifact))
-        .count() as i16;
-    chars.power = chars.power.map(|v| v + n);
-    chars.toughness = chars.toughness.map(|v| v + n);
-}
-
 /// The 0/0 colorless Construct artifact creature token with "This token gets +1/+1 for each artifact you control". Urza's Saga
 /// and Urza, Lord High Artificer make it.
 pub static CONSTRUCT: CardDef = CardDef {
@@ -234,7 +220,7 @@ pub static CONSTRUCT: CardDef = CardDef {
     subtypes: SubtypeSet::of(&[Subtype::Construct]),
     power: Some(0),
     toughness: Some(0),
-    statics: &[static_ability(Layer::PtModify, itself, construct_size, "This token gets +1/+1 for each artifact you control.")],
+    statics: &[static_ability(Layer::PtModify, itself, crate::statics::plus_one_plus_one_per_artifact_you_control, "This token gets +1/+1 for each artifact you control.")],
     text: "This token gets +1/+1 for each artifact you control.",
     ..CardDef::BLANK
 };
