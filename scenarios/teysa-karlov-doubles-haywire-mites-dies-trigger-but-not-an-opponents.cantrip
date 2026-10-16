@@ -1,0 +1,61 @@
+# Teysa Karlov: "If a creature dying causes a triggered ability of a permanent you control to trigger, that ability
+# triggers an additional time" (CR 603.2d). The ability may be the dying creature's own "when this creature dies",
+# judged as it last existed (CR 603.10a; the rulings: "Teysa affects a creature's own 'when this creature dies'
+# triggered abilities"). On turn 3 Bot1 sacrifices its Haywire Mite to its own ability, exiling Bot2's Mox Sapphire: "When
+# this creature dies, you gain 2 life" triggers twice, 24 life. Then Bot1 Lightning Bolts Bot2's Haywire Mite: its ability
+# is Bot2's, and Bot2 gains 2 only.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Teysa Karlov
+Mox Ruby
+Haywire Mite
+Mox Emerald
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Mox Pearl
+Mox Sapphire
+Haywire Mite
+Plains x12
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Teysa Karlov.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Haywire Mite.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Haywire Mite.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Haywire Mite.Activate(Bot2.Battlefield.Mox Sapphire)
+Bot1.Triggers(Haywire Mite; Haywire Mite)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 24
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Haywire Mite)
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 24
+Bot2.Life = 22
+Exile = Mox Sapphire
+Bot1.Graveyard = Lightning Bolt; Haywire Mite; Black Lotus
+Bot2.Graveyard = Haywire Mite

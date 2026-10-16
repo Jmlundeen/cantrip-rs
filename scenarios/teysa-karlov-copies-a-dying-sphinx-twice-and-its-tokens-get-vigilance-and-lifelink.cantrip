@@ -1,0 +1,61 @@
+# Teysa Karlov makes Sphinx of False Conclusions' "When this creature dies, if it isn't a token, create a token that's a
+# copy of it" trigger twice (CR 603.2d): each triggering checks its intervening "if" as it triggers and again as it
+# resolves (CR 603.4) - the dead Sphinx, as it last existed, was no token - and each makes a token. The tokens are
+# creature tokens Bot1 controls, so Teysa gives them vigilance and lifelink ("Creature tokens you control have vigilance
+# and lifelink"); Teysa itself, no token, has neither. On turn 5 a token Sphinx dies: it was a token, so its ability does
+# not trigger at all, doubled or not.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Ruby
+Teysa Karlov
+Sphinx of False Conclusions
+Lightning Bolt
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Plains x14
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Teysa Karlov.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sphinx of False Conclusions.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Sphinx of False Conclusions)
+Bot1.Pass
+Bot1.Triggers(Sphinx of False Conclusions; Sphinx of False Conclusions)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Sphinx of False Conclusions#2.Token = true
+? Bot1.Battlefield.Sphinx of False Conclusions#1.Keywords = Flash; Flying; Lifelink; Vigilance
+? Bot1.Battlefield.Teysa Karlov.Keywords = (absent)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Sphinx of False Conclusions)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+[T5 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Lightning Bolt; Sphinx of False Conclusions; Lightning Bolt; Black Lotus
+Bot1.Battlefield = Mox Pearl; Mox Jet; Mox Sapphire; Mox Ruby; Teysa Karlov; Sphinx of False Conclusions
+Bot1.Battlefield.Sphinx of False Conclusions.Token = true
+Bot1.Battlefield.Sphinx of False Conclusions.Keywords = Flash; Flying; Lifelink; Vigilance

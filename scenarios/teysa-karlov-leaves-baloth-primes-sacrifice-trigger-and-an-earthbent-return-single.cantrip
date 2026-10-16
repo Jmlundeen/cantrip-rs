@@ -1,0 +1,79 @@
+# Teysa Karlov doubles what a creature dying causes, and an ability that triggers on the sacrifice that made it die is not
+# that (the rulings: "An ability that triggers on an event that causes a creature to die doesn't trigger twice. For
+# example, an ability that triggers 'whenever you sacrifice a creature' triggers only once"; CR 701.21a). Bot1's Badgermole
+# Cub earthbends its Forest on turn 1 (a 0/0 creature land with a +1/+1 counter, and "When it dies or is exiled, return it
+# to the battlefield tapped", a delayed triggered ability, which Teysa never doubles, CR 603.2d), and Teysa comes down too.
+# Baloth Prime follows on turn 3. On turn 5 Bot1 pays Baloth Prime's "{4}, Sacrifice a land: You gain 2 life" with that
+# Forest: Baloth Prime's "Whenever you sacrifice a land, create a tapped 4/4 green Beast creature token and untap this
+# creature" triggers once - one Beast, and one stun counter taken off by the untap (6, 5 at turn 5's untap step, 4) - and the
+# Forest returns.
+# Teysa's "Creature tokens you control have vigilance and lifelink" reaches the Beast, not Bot2's Bat token (Sanguine
+# Evangelist's, turn 4) nor Bot1's nontoken creatures.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Sol Ring
+Black Lotus
+Badgermole Cub
+Teysa Karlov
+Baloth Prime
+Forest x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Sanguine Evangelist
+Plains
+Plains x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Badgermole Cub.Cast
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Forest.Types = Land; Creature
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Teysa Karlov.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Baloth Prime.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains#1.Activate
+Bot2.Battlefield.Plains#2.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Sanguine Evangelist.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Baloth Prime.Activate
+Bot1.Choose(Forest)
+[T5 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 22
+Bot1.Graveyard = Black Lotus
+Bot1.Battlefield = Forest; Mox Emerald; Mox Pearl; Sol Ring; Badgermole Cub; Teysa Karlov; Baloth Prime; Beast
+Bot1.Battlefield.Forest.Tapped = true
+Bot1.Battlefield.Forest.Types = Land
+Bot1.Battlefield.Baloth Prime.Counters.Stun = 4
+Bot1.Battlefield.Beast.Tapped = true
+Bot1.Battlefield.Beast.Keywords = Lifelink; Vigilance
+Bot1.Battlefield.Badgermole Cub.Keywords = (absent)
+Bot2.Battlefield.Bat.Keywords = Flying

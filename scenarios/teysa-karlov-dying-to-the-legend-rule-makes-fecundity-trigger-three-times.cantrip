@@ -1,0 +1,57 @@
+# Teysa Karlov's rulings: "if you control Teysa and cast a second one, an ability that triggers when it dies due to the
+# 'legend rule' triggers three times." A dying creature's abilities, and the rules about them, are looked back on as the
+# board was before it died (CR 603.10a), both Teysas on it, each adding a triggering (CR 603.2d). Bot1 keeps one Teysa
+# (CR 704.5j) and the other dies: Bot1's Fecundity ("Whenever a creature dies, that creature's controller may draw a card")
+# triggers three times, and Bot1 draws three.
+# Hand: 7 - 6 played on turn 1 = 1 (the second Teysa); turn 3 draws a Plains (2), plays it and Fecundity (0); turn 5 draws
+# a Swamp (1), plays it and Teysa (0), draws three = 3.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Teysa Karlov
+Mox Emerald
+Mox Ruby
+Fecundity
+Teysa Karlov
+Plains
+Swamp
+Island x10
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Teysa Karlov.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Fecundity.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Teysa Karlov.Cast
+Bot1.Pass
+Bot1.Choose(Teysa Karlov)
+Bot1.Triggers(Fecundity; Fecundity; Fecundity)
+Bot1.Accept
+Bot1.Accept
+Bot1.Accept
+[T5 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand.Count = 3
+Bot1.Graveyard = Teysa Karlov; Black Lotus
+Bot1.Battlefield = Plains; Swamp; Mox Jet; Mox Emerald; Mox Ruby; Fecundity; Teysa Karlov

@@ -1,0 +1,59 @@
+# Teysa Karlov doubles a triggered ability of a permanent, not a delayed triggered ability (CR 603.2d, 603.7b). On turn 5
+# Bot1 casts Warhost's Frenzy kicked ("whenever a creature you control dies this turn, draw a card") and sacrifices its
+# Haywire Mite to its own ability, exiling Bot2's Mox Pearl: the Mite's "When this creature dies, you gain 2 life"
+# triggers twice (24 life) and the Frenzy's ability once (one card).
+# Hand: 7 - 6 played on turn 1 = 1 (the Frenzy); turn 3 draws a Swamp (2), plays it (1); turn 5 draws a Forest (2), plays
+# it and the Frenzy (0), draws one = 1.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Teysa Karlov
+Mox Ruby
+Haywire Mite
+Mox Emerald
+Warhost's Frenzy
+Swamp
+Forest
+Island x10
+
+[Bot2 Deck]
+Mox Pearl
+Plains x14
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Teysa Karlov.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Haywire Mite.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Warhost's Frenzy.Cast(Kicked: 1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Haywire Mite.Activate(Bot2.Battlefield.Mox Pearl)
+Bot1.Triggers(Haywire Mite; Haywire Mite; Warhost's Frenzy)
+? Stack.Count = 4
+[T5 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 24
+Bot1.Hand.Count = 1
+Exile = Mox Pearl
+Bot1.Graveyard = Haywire Mite; Warhost's Frenzy; Black Lotus
