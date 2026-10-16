@@ -1,0 +1,45 @@
+# Ruling: the ability resolves even if the spell that caused it is countered. Bot1's second spell on turn 3, Mox Jet,
+# is countered by Bot2's Counterspell (Island and Mox Sapphire); the trigger, which sits above Mox Jet on the stack,
+# resolves first and Zenith gets its +1/+1 counter, and Counterspell then counters Mox Jet.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Emerald
+Cosmogrand Zenith
+Mox Ruby
+Mox Jet
+Plains x12
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Island x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Cosmogrand Zenith.Cast
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Modes(Put a +1/+1 counter)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Mox Jet)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield.Cosmogrand Zenith.Counters.PlusOnePlusOne = 1
+Bot1.Graveyard = Mox Jet
+Bot2.Graveyard = Counterspell

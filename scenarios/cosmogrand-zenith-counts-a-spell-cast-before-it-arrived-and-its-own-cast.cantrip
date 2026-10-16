@@ -1,0 +1,38 @@
+# The ruling: the ability counts any spells cast this turn, Zenith itself included. On turn 3 Bot1 casts Zenith as its
+# first spell (it is not on the battlefield then, so nothing triggers) and Mox Ruby as the second: Zenith is on the
+# battlefield by now and triggers, counting its own cast. A third spell, Mox Sapphire, is a negative control.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Cosmogrand Zenith
+Mox Ruby
+Mox Sapphire
+Plains x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cosmogrand Zenith.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Modes(Create two)
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield.Human Soldier#2.Power = 1
+Bot1.Battlefield.Human Soldier#3 = (absent)
