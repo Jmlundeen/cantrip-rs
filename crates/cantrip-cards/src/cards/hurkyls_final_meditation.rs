@@ -2,8 +2,8 @@ use cantrip_api::*;
 use cantrip_oracle as oracle;
 
 /// "During turns other than yours, this spell costs {3} more to cast." (CR 601.2f): `player` is the one casting it.
-fn three_more_on_other_turns(q: &dyn Query, _: ObjectId, player: PlayerId, costed: Costed) -> i8 {
-    if matches!(costed, Costed::Spell(_)) && q.state().turn.active != player { 3 } else { 0 }
+fn three_more_on_other_turns(q: &dyn Query, _: ObjectId, player: PlayerId, costed: Costed) -> CostDelta {
+    if matches!(costed, Costed::Spell(_)) && q.state().turn.active != player { CostDelta::more(3) } else { CostDelta::NONE }
 }
 
 /// "Return all nonland permanents to their owners' hands. End the turn." Every nonland permanent goes together (a token
