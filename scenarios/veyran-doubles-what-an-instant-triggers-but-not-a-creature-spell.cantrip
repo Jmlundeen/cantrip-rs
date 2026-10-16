@@ -1,0 +1,58 @@
+# Veyran, Voice of Duality: "If you casting or copying an instant or sorcery spell causes a triggered ability of a
+# permanent you control to trigger, that ability triggers an additional time" (CR 603.2d). Turn 1: Bot1 casts Consider, a
+# blue instant, with Veyran and Hydro-Man, Fluid Felon out: Veyran's own magecraft ("Veyran gets +1/+1") and Hydro-Man's
+# "Whenever you cast a blue spell, if Hydro-Man is a creature, he gets +1/+1" each trigger twice - four triggers - and
+# Veyran is a 4/4 and Hydro-Man a 5/5 (Veyran, a blue creature spell cast before, gave him one trigger, undoubled:
+# Veyran was not yet on the battlefield). Turn 3: Bot1 casts Baleful Strix, a blue creature spell: Hydro-Man triggers once (a 3/3) and magecraft not
+# at all (Veyran a 2/2).
+# Turn 1 mana: Black Lotus (UUU) pays Hydro-Man's {U}{U}; the floating {U}, the Volcanic Island's {R} and Mox Jet pay
+# Veyran's {1}{U}{R}; Mox Sapphire pays Consider. Turn 3: Mox Sapphire and Mox Jet pay the Strix.
+
+[Bot1 Deck]
+Volcanic Island
+Black Lotus
+Mox Sapphire
+Mox Jet
+Hydro-Man, Fluid Felon
+Veyran, Voice of Duality
+Consider
+Baleful Strix
+Island x12
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Volcanic Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Hydro-Man, Fluid Felon.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Volcanic Island.Activate(Ability: {R})
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Veyran, Voice of Duality.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Consider.Cast
+Bot1.Triggers(Hydro-Man, Fluid Felon; Hydro-Man, Fluid Felon; Veyran, Voice of Duality; Veyran, Voice of Duality)
+? Stack.Count = 5
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Veyran, Voice of Duality.Power = 4
+? Bot1.Battlefield.Hydro-Man, Fluid Felon.Power = 5
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Baleful Strix.Cast
+? Stack.Count = 2
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Hydro-Man, Fluid Felon.Power = 3
+Bot1.Battlefield.Veyran, Voice of Duality.Power = 2

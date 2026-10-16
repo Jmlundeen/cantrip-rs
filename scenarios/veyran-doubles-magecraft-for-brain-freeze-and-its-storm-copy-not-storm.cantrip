@@ -1,0 +1,52 @@
+# Veyran, Voice of Duality: "you casting or copying an instant or sorcery spell" (CR 603.2d, 707.10). Turn 3, after a Mox,
+# Bot1 casts Brain Freeze targeting Bot2. Casting it triggers Witherbloom Apprentice's magecraft and Veyran's twice each, and
+# its own storm once: storm is an ability of the spell, not of a permanent, so Veyran leaves it alone - five triggers to
+# order. Storm copies it once (one spell before it this turn), and that copy triggers both magecraft abilities twice again.
+# So Witherbloom drains four times (Bot2 20 -> 16, Bot1 20 -> 24), Veyran gets +4/+4 (a 6/6), and Bot2 mills six (seven cards in its graveyard with the one it discarded to hand size on turn 2).
+# Mana: turn 1 Mox Jet and Mox Emerald pay the Apprentice's {B}{G}, Black Lotus (UUU) and the Volcanic Island's {R} pay
+# Veyran's {1}{U}{R}; turn 3 Mox Sapphire and the Volcanic Island pay Brain Freeze's {1}{U}.
+
+[Bot1 Deck]
+Volcanic Island
+Black Lotus
+Mox Jet
+Mox Emerald
+Witherbloom Apprentice
+Veyran, Voice of Duality
+Mox Sapphire
+Brain Freeze
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Volcanic Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Witherbloom Apprentice.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Volcanic Island.Activate(Ability: {R})
+Bot1.Hand.Veyran, Voice of Duality.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Volcanic Island.Activate(Ability: {U})
+Bot1.Hand.Brain Freeze.Cast(Bot2)
+Bot1.Triggers(Witherbloom Apprentice; Witherbloom Apprentice; Veyran, Voice of Duality; Veyran, Voice of Duality; Brain Freeze)
+? Stack.Count = 6
+Bot1.Pass
+Bot1.Target(Bot2)
+Bot1.Triggers(Witherbloom Apprentice; Witherbloom Apprentice; Veyran, Voice of Duality; Veyran, Voice of Duality)
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 24
+Bot2.Life = 16
+Bot2.Graveyard.Count = 7
+Bot1.Battlefield.Veyran, Voice of Duality.Power = 6

@@ -1,0 +1,60 @@
+# Veyran, Voice of Duality doubles only what YOU casting an instant or sorcery triggers (CR 603.2d), and triggers already
+# on the stack stay there when it leaves. Turn 3: Bot1 casts Consider; its Witherbloom Apprentice's magecraft and Veyran's
+# trigger twice each. In response Bot2 Lightning Bolts Veyran: Bot2's own Witherbloom Apprentice triggers once for Bot2's
+# instant (Veyran is no permanent Bot2 controls). Everything resolves: Bot2's drain (Bot1 19, Bot2 21), Veyran dies, then
+# Bot1's two drains (Bot1 21, Bot2 19) - the two Veyran triggers find no Veyran.
+# Mana: turn 1 Mox Jet and Mox Emerald pay the Apprentice, Black Lotus (UUU) and the Volcanic Island's {R} pay Veyran;
+# turn 3 the Volcanic Island pays Consider. Bot2's turn-2 Moxen pay its Apprentice; its Mountain the Bolt on turn 3.
+
+[Bot1 Deck]
+Volcanic Island
+Black Lotus
+Mox Jet
+Mox Emerald
+Witherbloom Apprentice
+Veyran, Voice of Duality
+Consider
+Island x12
+
+[Bot2 Deck]
+Mountain
+Mox Jet
+Mox Emerald
+Witherbloom Apprentice
+Lightning Bolt
+Mountain x12
+
+[Actions]
+Bot1.Hand.Volcanic Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Witherbloom Apprentice.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Volcanic Island.Activate(Ability: {R})
+Bot1.Hand.Veyran, Voice of Duality.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Witherbloom Apprentice.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Volcanic Island.Activate(Ability: {U})
+Bot1.Hand.Consider.Cast
+Bot1.Triggers(Witherbloom Apprentice; Witherbloom Apprentice; Veyran, Voice of Duality; Veyran, Voice of Duality)
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Veyran, Voice of Duality)
+? Stack.Count = 7
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 21
+Bot2.Life = 19
+Bot1.Graveyard = Consider; Veyran, Voice of Duality; Black Lotus

@@ -1,0 +1,8 @@
+{
+  "name": "Veyran, Voice of Duality",
+  "manaCost": "{1}{U}{R}",
+  "type": "Legendary Creature — Efreet Wizard",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Magecraft — Whenever you cast or copy an instant or sorcery spell, Veyran gets +1/+1 until end of turn.\nIf you casting or copying an instant or sorcery spell causes a triggered ability of a permanent you control to trigger, that ability triggers an additional time."
+}
