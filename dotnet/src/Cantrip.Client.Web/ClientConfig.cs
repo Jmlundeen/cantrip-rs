@@ -35,6 +35,7 @@ public static class ClientConfig
         Name = query.GetValueOrDefault("name") is { Length: > 0 } given ? given : "Web Client";
         Perf = query.ContainsKey("perf");
         Test = query.ContainsKey("test");
+        CardSheet = query.ContainsKey("cardsheet");
         Auto = query.ContainsKey("auto");
         Narrate = query.ContainsKey("narrate");
         BotSeed = int.TryParse(query.GetValueOrDefault("bot-seed"), out int botSeed) ? botSeed : null;
@@ -93,6 +94,9 @@ public static class ClientConfig
     /// on canvases with no DOM to find anything in (<see cref="MainPage"/>'s TestState).
     /// </summary>
     public static bool Test { get; }
+
+    /// <summary>Whether to show a sheet of sample card faces instead of the table (<c>?cardsheet</c>), for pictures of how a template lays a face out (<see cref="CardSheetElement"/>).</summary>
+    public static bool CardSheet { get; }
 
     /// <summary>Whether this seat plays itself (<c>?auto</c>), as a bot seat would, for a test to watch a whole game.</summary>
     public static bool Auto { get; }

@@ -9,6 +9,7 @@ header; most pass every argument on to the script behind them.
 |---|---|
 | `test.cmd` | builds everything and runs the fast tests: the C# solution (`dotnet\Cantrip.sln`), then the engine's (`cargo test` over the workspace at the root, which plays `scenarios\`); `/all`, `/noweb`, `/filter`, `/detailed` |
 | `scenario-in-browser.cmd name` | plays one `.cantrip` scenario with Bot1 a browser page, in a window to watch (`/headless` without one); `test.cmd /filter "FullyQualifiedName~ScenarioInBrowser"` plays every scenario marked `# Browser` (`docs/scenarios-in-the-browser.md`) |
+| `card-render.cmd` | draws a sheet of sample card faces with the real web client in a real browser (`?cardsheet`) and saves it as `TestResults\web\CardRenderTests\card-sheet.png`, to look at after a change to the card template |
 
 ## Play a game in the browser
 

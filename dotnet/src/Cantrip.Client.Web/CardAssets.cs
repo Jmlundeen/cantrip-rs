@@ -310,6 +310,14 @@ public sealed class CardTemplate
     public float LandSymbolSize { get; set; }
     public float OuterInset { get; set; }
     public float OuterTextShadowOffset { get; set; }
+
+    /// <summary>How far the name and cost, and the type line, are raised from centred in their bands, in template units.</summary>
+    public float TitleLift { get; set; }
+    public float TypeLift { get; set; }
+
+    /// <summary>The mana cost's own lift, and how far right of the title box's edge the last symbol is centred, in template units.</summary>
+    public float CostLift { get; set; }
+    public float CostShift { get; set; }
     public TextStyles TextStyle { get; set; } = new();
     public PanelLayout? Saga { get; set; }
     public PanelLayout? Class { get; set; }

@@ -74,7 +74,7 @@
     "chapterIconWidth": 82,
     "chapterIconGap": 6,
     "chapterNumberFontSize": 40,
-    "chapterNumberColor": "24170d",
+    "chapterNumberColor": "0f0903",
     "separator": "separator",
     "separatorX": 122,
     "separatorWidth": 354,
@@ -115,10 +115,14 @@
   "rulesAlignment": "left",
   "landSymbolSize": 250,
   "outerInset": 27,
-  "outerTextShadowOffset": 2,
+  "outerTextShadowOffset": 3,
+  "titleLift": 3,
+  "typeLift": 3,
+  "costLift": 0.5,
+  "costShift": 28.7,
   "textStyle": {
     "outerTextColor": "f4eee1",
-    "outerTextShadowColor": "24170d",
+    "outerTextShadowColor": "0f0903",
     "rulesVerticalAlignment": "top"
   }
 }

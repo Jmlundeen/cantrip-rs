@@ -21,6 +21,13 @@ public partial class App : Application
     {
         MainWindow = new Window();
 
+        if (ClientConfig.CardSheet)
+        {
+            MainWindow.Content = new CardSheetElement();
+            MainWindow.Activate();
+            return;
+        }
+
         // Do not repeat app initialization when the Window already has content,
         // just ensure that the window is active
         if (MainWindow.Content is not Frame rootFrame)

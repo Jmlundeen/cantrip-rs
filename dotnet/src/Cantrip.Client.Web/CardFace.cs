@@ -118,13 +118,13 @@ public static partial class CardFace
         float nameX = layout.Title.Left + layout.TextInset;
         float titleRoom = Room(layout, nameX, layout.Title) - (costWidth > 0f ? costWidth + (layout.ManaDiameter / 3f) : 0f);
         int nameSize = FittedSize(CardAssets.Title, card.Name, layout.TitleFontSize, layout.MinimumTitleFontSize, titleRoom);
-        DrawFrameString(canvas, nameX, CapBaseline(CardAssets.Title, layout.Title, nameSize), Fit(CardAssets.Title, card.Name, nameSize, titleRoom), nameSize, outerText, outerShadow, layout.OuterTextShadowOffset);
+        DrawFrameString(canvas, nameX, CapBaseline(CardAssets.Title, layout.Title, nameSize) - layout.TitleLift, Fit(CardAssets.Title, card.Name, nameSize, titleRoom), nameSize, outerText, outerShadow, layout.OuterTextShadowOffset);
 
         string typeLine = TypeLine(card);
         float typeX = layout.Type.Left + layout.TextInset;
         float typeRoom = Room(layout, typeX, layout.Type);
         int typeSize = FittedSize(CardAssets.Title, typeLine, layout.TypeFontSize, layout.MinimumTypeFontSize, typeRoom);
-        DrawFrameString(canvas, typeX, CapBaseline(CardAssets.Title, layout.Type, typeSize), Fit(CardAssets.Title, typeLine, typeSize, typeRoom), typeSize, outerText, outerShadow, layout.OuterTextShadowOffset);
+        DrawFrameString(canvas, typeX, CapBaseline(CardAssets.Title, layout.Type, typeSize) - layout.TypeLift, Fit(CardAssets.Title, typeLine, typeSize, typeRoom), typeSize, outerText, outerShadow, layout.OuterTextShadowOffset);
 
         if (layout.Panel is not null)
         {
@@ -428,6 +428,10 @@ public static partial class CardFace
             ManaDiameter = MathF.Max(5f, MathF.Round(t.ManaSymbolDiameter * scale));
             ManaGap = MathF.Max(1f, MathF.Round(t.ManaSymbolGap * scale));
             OuterTextShadowOffset = MathF.Max(1f, t.OuterTextShadowOffset * scale);
+            TitleLift = t.TitleLift * scale;
+            TypeLift = t.TypeLift * scale;
+            CostLift = t.CostLift * scale;
+            CostShift = t.CostShift * scale;
             LandSymbolSize = MathF.Max(8f, t.LandSymbolSize * scale);
 
             if (saga is not null)
@@ -487,6 +491,10 @@ public static partial class CardFace
         public float ManaDiameter { get; }
         public float ManaGap { get; }
         public float OuterTextShadowOffset { get; }
+        public float TitleLift { get; }
+        public float TypeLift { get; }
+        public float CostLift { get; }
+        public float CostShift { get; }
         public float LandSymbolSize { get; }
 
         /// <summary>A Saga's layout, which this is laid out with, or null for any other card.</summary>
@@ -593,8 +601,8 @@ public static partial class CardFace
             return 0f;
         }
 
-        float centreY = layout.Title.MidY;
-        float right = layout.Title.Right - layout.TextInset;
+        float centreY = layout.Title.MidY - layout.CostLift;
+        float right = layout.Title.Right - layout.TextInset + layout.CostShift;
         float originalRight = right;
 
         for (int i = symbols.Count - 1; i >= 0; i--)
@@ -2042,6 +2050,13 @@ public static partial class CardFace
     {
         if (shadow.Alpha > 0)
         {
+            // A soft halo under the hard offset shadow, so light letters hold their edge against a pale frame.
+            using (var font = new SKFont(CardAssets.Title, size) { Subpixel = true })
+            using (var halo = new SKPaint { Color = shadow.WithAlpha(190), IsAntialias = true, MaskFilter = SKMaskFilter.CreateBlur(SKBlurStyle.Normal, offset * 0.7f) })
+            {
+                canvas.DrawText(value, x + (offset * 0.5f), baseline + (offset * 0.5f), SKTextAlign.Left, font, halo);
+            }
+
             DrawString(canvas, CardAssets.Title, value, x + offset, baseline + offset, size, shadow);
         }
 
