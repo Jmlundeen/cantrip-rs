@@ -1,0 +1,48 @@
+# Sensational Save reads the returned creature's mana value as it last existed on the battlefield (ruling 2025-09-19),
+# copy effects included (CR 707.2, 202.3): Bot1's Phantasmal Image (mana value 2 as a card) entered as a copy of Llanowar
+# Elves, mana value 1. On turn 5 Bot1 web-slings Scarlet Spider, Ben Reilly for {R}{G}, tapping the Image for the {G} with
+# the Elves' mana ability and Mox Ruby for the {R}, and returns the Image: Scarlet Spider enters with one +1/+1 counter,
+# not two.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Mox Sapphire
+Mox Ruby
+Phantasmal Image
+Island
+Scarlet Spider, Ben Reilly
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Phantasmal Image.Cast
+Bot1.Accept
+[T3 Bot1.End]
+? Bot1.Battlefield = Forest; Llanowar Elves; Mox Sapphire; Mox Ruby; Island; Llanowar Elves
+[T5 Bot1.Main1]
+Bot1.Hand.Scarlet Spider, Ben Reilly.Cast(Ability: Web-slinging)
+Bot1.Battlefield.Llanowar Elves#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Choose(Llanowar Elves)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield = Forest; Llanowar Elves; Mox Sapphire; Mox Ruby; Island; Scarlet Spider, Ben Reilly
+Bot1.Battlefield.Llanowar Elves.Tapped = false
+Bot1.Battlefield.Scarlet Spider, Ben Reilly.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Scarlet Spider, Ben Reilly.Power = 5
+Bot1.Hand = Plains; Plains; Phantasmal Image

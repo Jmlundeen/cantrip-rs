@@ -2,21 +2,20 @@ use cantrip_api::*;
 use cantrip_mechanics::web_slinging;
 use cantrip_oracle as oracle;
 
-/// The creature returned to its owner's hand to pay for casting `spell` by web-slinging (CR 702.188a, 601.2h): the one the
-/// history shows leaving the battlefield for a hand between the spell's move to the stack (CR 601.2a) and its becoming
-/// cast (CR 601.2i), which is when its costs are paid. As it last existed on the battlefield, that object.
+/// The creature returned to its owner's hand to pay for casting `spell` by web-slinging (CR 702.188a, 601.2h), as it last
+/// existed on the battlefield: the last permanent the history shows leaving the battlefield for a hand before the spell
+/// became cast (CR 601.2i). Its costs are paid after every mana ability activated while casting it has resolved (CR
+/// 601.2g-h), and web-slinging's return is the first of them paid, so a permanent a mana ability bounced is earlier than it;
+/// the spell has no other cost that returns a permanent. As Kazuul's Fury reads its sacrifice.
 fn returned_creature(q: &dyn Query, spell: ObjectId) -> Option<ObjectId> {
-    let records = q.history().all();
-    let onto_stack = records
-        .iter()
-        .rposition(|r| matches!(r.event, Event::ZoneChange { new, to, .. } if new == spell && to.is(ZoneKind::Stack)))?;
-    records[onto_stack..]
-        .iter()
-        .take_while(|r| !matches!(r.event, Event::Cast(cast) if cast.spell == spell))
-        .find_map(|r| match r.event {
-            Event::ZoneChange { old, from, to, .. } if from.is(ZoneKind::Battlefield) && to.is(ZoneKind::Hand) => Some(old),
-            _ => None,
-        })
+    let history = q.history();
+    let cast = history.all().iter().rev().find(|r| matches!(r.event, Event::Cast(c) if c.spell == spell))?.serial;
+    let returned = history
+        .select(EventQuery::kind(EventMask::ZONE_CHANGE).from(ZoneKind::Battlefield).to(ZoneKind::Hand))
+        .rev()
+        .find(|r| r.serial < cast)?;
+    let Event::ZoneChange { old, .. } = returned.event else { return None };
+    Some(old)
 }
 
 /// Sensational Save: "If Scarlet Spider was cast using web-slinging, he enters with X +1/+1 counters on him, where X is
