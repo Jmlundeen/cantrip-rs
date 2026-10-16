@@ -1,0 +1,40 @@
+# Ancestral Anger (a sorcery, so cast before combat) on Bot1's Llanowar Elves (1/1) gives it trample and +1/+0 (X is 1 with no Ancestral Anger in the graveyard - the spell itself is on the stack, not in it). Blocked by Bot2's
+# Llanowar Elves (1/1), it assigns 1 to the blocker and tramples the other 1 over to Bot2 (CR 702.19b); both Elves die. Bot1 draws a card. Mox Ruby pays for the spell.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Mox Ruby
+Ancestral Anger
+Forest x3
+Forest x8
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ancestral Anger.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot1.Attack(Llanowar Elves)
+? Bot1.Battlefield.Llanowar Elves.Power = 2
+? Bot1.Battlefield.Llanowar Elves.Keywords = Trample
+Bot2.Block(Llanowar Elves > Llanowar Elves)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 19
+Bot2.Graveyard = Llanowar Elves
+Bot1.Graveyard = Llanowar Elves; Ancestral Anger
+Bot1.Hand.Count = 5

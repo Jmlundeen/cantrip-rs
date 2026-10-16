@@ -1,0 +1,6 @@
+{
+  "name": "Ancestral Anger",
+  "manaCost": "{R}",
+  "type": "Sorcery",
+  "oracleText": "Target creature gains trample and gets +X/+0 until end of turn, where X is 1 plus the number of cards named Ancestral Anger in your graveyard.\nDraw a card."
+}

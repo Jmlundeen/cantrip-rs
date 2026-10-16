@@ -1,0 +1,40 @@
+# "Your graveyard" and "named Ancestral Anger": Bot2 casts Ancestral Anger on its own Ornithopter on turn 2, so one is in Bot2's
+# graveyard, and Bot1's own graveyard holds a Lightning Bolt (another name). Bot1's Ancestral Anger on turn 3 still has X = 1:
+# the Ornithopter ends as a 1/2.
+
+[Bot1 Deck]
+Mountain
+Lightning Bolt
+Ornithopter
+Ancestral Anger
+Mountain
+Island x10
+
+[Bot2 Deck]
+Mountain
+Ornithopter
+Ancestral Anger
+Island x11
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Ancestral Anger.Cast(Bot2.Battlefield.Ornithopter)
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Ancestral Anger.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Ancestral Anger
+Bot1.Graveyard = Ancestral Anger; Lightning Bolt
+Bot1.Battlefield.Ornithopter.Power = 1

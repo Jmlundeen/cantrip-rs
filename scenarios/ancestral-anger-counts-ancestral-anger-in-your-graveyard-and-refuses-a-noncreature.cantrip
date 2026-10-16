@@ -1,0 +1,38 @@
+# X is 1 plus the cards named Ancestral Anger in your graveyard as the spell resolves. The first Ancestral Anger gives Bot1's
+# Ornithopter (0/2) +1/+0; the second, cast after the first is in the graveyard, gives +2/+0, so it ends as a 3/2 trampler. Each draws
+# a card. A Mox Ruby is not a creature and is refused as the target (the Ornithopter, an artifact creature, is the control).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Ornithopter
+Ancestral Anger
+Ancestral Anger
+Island
+Island
+Island x9
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mountain.Activate
+! Bot1.Hand.Ancestral Anger.Cast(Bot1.Battlefield.Mox Ruby)
+Bot1.Hand.Ancestral Anger.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+? Bot1.Battlefield.Ornithopter.Power = 1
+? Bot1.Graveyard = Ancestral Anger
+Bot1.Hand.Ancestral Anger.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Ornithopter.Power = 3
+Bot1.Battlefield.Ornithopter.Keywords = Flying; Trample
+Bot1.Graveyard = Ancestral Anger; Ancestral Anger
+Bot1.Hand.Count = 4
