@@ -24,6 +24,12 @@ pub fn have_haste(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.keywords = chars.keywords.with(Keyword::Haste);
 }
 
+/// "... has trample" (CR 702.19, layer 6) as a static ability's `StaticDef::apply`. Ajani's Anguish, Keen-Eyed Curator, Orcrist
+/// and Rancor print it.
+pub fn have_trample(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
+    chars.keywords = chars.keywords.with(Keyword::Trample);
+}
+
 /// The permanent an event put onto the battlefield (CR 603.6a): a zone change to the battlefield, a token's creation
 /// included. What stops "[permanents] entering" from causing abilities to trigger asks it of the event, then judges the
 /// permanent as it exists on the battlefield (`Query::chars` of the new object: copy effects and the other continuous effects

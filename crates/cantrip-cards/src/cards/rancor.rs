@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{attach::attached_object, targets};
+use cantrip_mechanics::{attach::attached_object, statics::have_trample, targets};
 use cantrip_oracle as oracle;
 
 /// "When this Aura is put into a graveyard from the battlefield" (CR 700.4), looked back on (CR 603.10a). "It" is the
@@ -28,17 +28,13 @@ fn plus_two_trample(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.power = chars.power.map(|v| v + 2);
 }
 
-fn trample(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.keywords = chars.keywords.with(Keyword::Trample);
-}
-
 pub static CARD: CardDef = CardDef {
     enchant: Some(targets::CREATURE),
     abilities: &[triggered(when(EventMask::ZONE_CHANGE, put_into_graveyard), return_to_hand, "When Rancor is put into a graveyard from the battlefield, return it to its owner's hand.")
         .look_back()],
     statics: &[
         static_ability(Layer::PtModify, attached_object, plus_two_trample, "Enchanted creature gets +2/+0."),
-        static_ability(Layer::Ability, attached_object, trample, "Enchanted creature has trample."),
+        static_ability(Layer::Ability, attached_object, have_trample, "Enchanted creature has trample."),
     ],
     ..oracle::RANCOR
 };

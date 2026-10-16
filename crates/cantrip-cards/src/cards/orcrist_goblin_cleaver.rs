@@ -1,15 +1,12 @@
 use cantrip_api::*;
 use cantrip_mechanics::attach::{attached_object, equip};
+use cantrip_mechanics::statics::have_trample;
 use cantrip_mechanics::tokens;
 use cantrip_oracle as oracle;
 
 fn plus_two_plus_two(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.power = chars.power.map(|v| v + 2);
     chars.toughness = chars.toughness.map(|v| v + 2);
-}
-
-fn gains_trample(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.keywords = Keywords(chars.keywords.0 | (1 << Keyword::Trample as u8));
 }
 
 /// "Whenever equipped creature deals combat damage to a player": the creature this is attached to dealing combat
@@ -55,7 +52,7 @@ pub static CARD: CardDef = CardDef {
     ],
     statics: &[
         static_ability(Layer::PtModify, attached_object, plus_two_plus_two, "Equipped creature gets +2/+2."),
-        static_ability(Layer::Ability, attached_object, gains_trample, "Equipped creature has trample."),
+        static_ability(Layer::Ability, attached_object, have_trample, "Equipped creature has trample."),
     ],
     ..oracle::ORCRIST_GOBLIN_CLEAVER
 };
