@@ -206,9 +206,10 @@ public sealed class ScenarioPlayer
                 {
                     await _page.ClickAsync(may.Accept ? "Yes" : "No", "button");
                 }
-                else if (state.Dock is { Count: 2 } && state.Prompt == "MayPromptMessage")
+                else if (state.Dock is { Count: >= 2 } && state.Prompt == "MayPromptMessage")
                 {
-                    // A may that names what it does (Cast, Don't cast): the dock's first button is yes, its second no.
+                    // A may that names what it does (Cast, Don't cast; a gift promise, "Gift a tapped Fish", "No gift"): the dock's first
+                    // button is yes, its second no, whatever follows (a Cancel while a spell is announced).
                     await ClickDockAsync(may.Accept ? 0 : 1);
                 }
                 else
