@@ -328,12 +328,16 @@ leaves none is still taken back after it is paid.
 The total cost of a spell or ability is determined once its modes, X and targets are announced (CR 601.2b-c, 601.2f,
 602.2b), so every cost change (`CostChange`) is handed the targets announced, in slot order, and the total is locked in
 there: what happens to a target later changes nothing paid. Casting and activating apply the changes after the targets
-are chosen (`actions::cast`, `activate`), and the payment asks for that total, which is what the client's payment shows;
-an action's menu row reads the cost as printed. Whether an action is worth offering is judged before anything is
-announced: where its one target is announced with the action (equip, most single-target spells) and something could
-change the cost, it is judged for each candidate, and only the candidates it could be paid for are offered. Where the
+are chosen (`actions::cast`, `activate`), and the payment asks for that total, which is what the client's payment shows.
+Whether an action is worth offering is judged before anything is announced: where its one target is announced with the
+action (equip, most single-target spells) and something could change the cost - a cost changer on the battlefield, or
+the spell's or ability's own - it is judged for each candidate, and only the candidates it could be paid for are
+offered; otherwise the cost is judged once, before any target is looked for, as before. An activated ability's menu row
+says what it costs with each candidate where that is not the printed cost (`activation_costs`, the host's
+`option_message`: "Equip {4}. ... (costs {1} targeting Dwarven Mauler)"). Where the
 targets are chosen later (several slots, a modal spell), a change that reads them is not counted in that advice, so a
-reduction that only a target would bring does not make the action offered: no card in content has one. Dwarven Mauler,
+reduction that only a target would bring does not make the action offered: no card in content has one. Ajani's Response
+("{3} less if it targets a tapped creature") is a spell that reads its target this way. Dwarven Mauler,
 Helitrooper and Fervent Champion ("equip abilities you activate that target this creature cost {N} less"), Dragonfire
 Blade ("{1} less for each color of the creature it targets") and Ghostfire Blade ("{2} less if it targets a colorless
 creature") read them.

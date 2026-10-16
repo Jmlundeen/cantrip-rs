@@ -913,6 +913,45 @@ impl Query for AsFace<'_> {
     }
 }
 
+/// What activating the ability `index` of `source` (numbered as its options are) would cost `player` with each of
+/// `candidates` as its one target, the total as it is determined once the target is announced (CR 601.2c, 601.2f,
+/// 602.2b): for the menu row of an action whose cost depends on the target it would be announced with. Empty when
+/// nothing could change that cost (no cost changer on the battlefield, none of the ability's or card's own), which is
+/// nearly always, or when it is no activated ability with a mana cost.
+pub fn activation_costs(game: &crate::Game, player: PlayerId, source: ObjectId, index: u8, candidates: &[Target]) -> Vec<ManaCost> {
+    let Some(ability) = game.chars(source).abilities().nth(index as usize) else { return Vec::new() };
+    let AbilityDef::Activated(def) = game.cards.ability(ability) else { return Vec::new() };
+    let changers = game.state.battlefield().iter().any(|&id| {
+        game.cards.cost_changes[game.cards.current(game.state.obj(id)).0 as usize] && !game.state.lost_all_abilities(id)
+    });
+    let obj = game.state.obj(source);
+    let own = !game.cards.get(obj.copy.map_or(obj.card, |c| c.card)).own_cost_changes.is_empty();
+    if def.special_action || def.cost.mana.x > 0 || !(changers || own || def.cost_change.is_some()) {
+        return Vec::new();
+    }
+    // The rules read the game through a frame's view; a copy of the position (no tree) is enough to ask it.
+    let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false };
+    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0 };
+    candidates.iter().map(|&t| apply_cost_changes(&cx, player, Costed::Ability(source, ability), def.cost.mana, &[t])).collect()
+}
+
+/// What casting `card` for its mana cost would cost `player` with each of `candidates` as its one target, the cost
+/// changes applied as they are once the target is announced (CR 601.2c, 601.2f): for the menu row of a cast whose cost
+/// depends on its target. Empty when nothing could change it (no cost changer on the battlefield, none of the card's
+/// own), which is nearly always.
+pub fn cast_costs(game: &crate::Game, player: PlayerId, card: ObjectId, candidates: &[Target]) -> Vec<ManaCost> {
+    let def = game.cards.get(game.state.obj(card).card);
+    let changers = game.state.battlefield().iter().any(|&id| {
+        game.cards.cost_changes[game.cards.current(game.state.obj(id)).0 as usize] && !game.state.lost_all_abilities(id)
+    });
+    if !(changers || !def.own_cost_changes.is_empty()) {
+        return Vec::new();
+    }
+    let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false };
+    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0 };
+    candidates.iter().map(|&t| apply_cost_changes(&cx, player, Costed::Spell(card), def.cost, &[t])).collect()
+}
+
 /// The cost changes the object `id` carries itself (CR 601.2f): its card's, or a copy's.
 fn own_cost_changes(cx: &Cx, id: ObjectId) -> &'static [CostChange] {
     let obj = cx.s().obj(id);
@@ -1354,6 +1393,44 @@ fn activated_options(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOption>)
             if !can_pay_other(cx, id, player, &def.cost) {
                 continue;
             }
+            // An activation whose mana cost the player cannot meet is not offered, as a spell they cannot afford is not
+            // (CR 602.2b): a seat handed it would cancel at the payment and be handed it again, forever.
+            let owed = if def.special_action { special_action_cost(cx, id, ability, def) } else { def.cost.mana };
+            let judged = owed.x == 0 && owed.mana_value() > 0 && !def.tap_creatures_for_mana && !def.waterbend;
+            // The source's own mana abilities cannot pay for an ability that taps it (CR 602.2b, 605.3b).
+            let own = (judged && def.cost.tap && has_mana_source(cx, id, player)).then(|| available_without(cx, player, Some(id)));
+            let a = judged.then(|| own.as_ref().unwrap_or_else(|| available.get_or_init(|| self::available(cx, player))));
+            // A special action is no ability, so mana limited to activating abilities can't pay for it (CR 116.2, 106.6).
+            let payment = if def.special_action { ManaPayment::Other } else { ManaPayment::Ability { source: chars.types } };
+            let covered = |a: &Available, targets: &[Target]| {
+                // A special action is no activated ability (CR 116.2): what changes the cost of activating abilities does not
+                // touch it, and `special_action` pays the cost as it stands.
+                let mut cost =
+                    if def.special_action { owed } else { change_with(cx, &a.changers, player, Costed::Ability(id, ability), owed, None, targets) };
+                // Mana of any color pays for it (CR 609.4b): every symbol is paid as generic mana.
+                if static_rules::spend_any_color_for(cx, player, id) {
+                    cost = ManaCost { generic: cost.mana_value().min(255) as u8, ..ManaCost::ZERO };
+                }
+                a.covers_for(&cost, payment)
+            };
+            // The total cost is determined once the targets are announced (CR 601.2c, 601.2f, 602.2b), so a change that reads
+            // them ("equip abilities that target this creature cost {2} less") is judged for each candidate a target announced
+            // with the action could be: only those the cost could then be paid for are offered. Only where something could
+            // change the cost - a cost changer on the battlefield, or the ability's or card's own - since nearly nothing does;
+            // otherwise the cost is judged once, before any target is looked for.
+            let each_target = a.is_some_and(|a| {
+                targets_with_action(def.targets)
+                    && !def.special_action
+                    && def.modal.is_none()
+                    && (!a.changers.is_empty() || def.cost_change.is_some() || !own_cost_changes(cx, id).is_empty())
+            });
+            if let Some(a) = a
+                && !each_target
+                && !covered(a, &[])
+                && static_rules::activation_alternative(cx, player, id, def).is_none()
+            {
+                continue;
+            }
             let mut option = ActionOption::on(ActionKind::ActivateAbility, id, index as u8);
             let possible = match def.modal {
                 Some(modal) => modes_possible(cx, &asker, modal),
@@ -1362,46 +1439,14 @@ fn activated_options(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOption>)
             if !possible {
                 continue;
             }
-            // An activation whose mana cost the player cannot meet is not offered, as a spell they cannot afford is not
-            // (CR 602.2b): a seat handed it would cancel at the payment and be handed it again, forever.
-            let owed = if def.special_action { special_action_cost(cx, id, ability, def) } else { def.cost.mana };
-            if owed.x == 0 && owed.mana_value() > 0 && !def.tap_creatures_for_mana && !def.waterbend {
-                // The source's own mana abilities cannot pay for an ability that taps it (CR 602.2b, 605.3b).
-                let own = (def.cost.tap && has_mana_source(cx, id, player)).then(|| available_without(cx, player, Some(id)));
-                let a = own.as_ref().unwrap_or_else(|| available.get_or_init(|| self::available(cx, player)));
-                // A special action is no ability, so mana limited to activating abilities can't pay for it (CR 116.2,
-                // 106.6).
-                let payment = if def.special_action { ManaPayment::Other } else { ManaPayment::Ability { source: chars.types } };
-                let covered = |targets: &[Target]| {
-                    // A special action is no activated ability (CR 116.2): what changes the cost of activating abilities does
-                    // not touch it, and `special_action` pays the cost as it stands.
-                    let mut cost =
-                        if def.special_action { owed } else { change_with(cx, &a.changers, player, Costed::Ability(id, ability), owed, None, targets) };
-                    // Mana of any color pays for it (CR 609.4b): every symbol is paid as generic mana.
-                    if static_rules::spend_any_color_for(cx, player, id) {
-                        cost = ManaCost { generic: cost.mana_value().min(255) as u8, ..ManaCost::ZERO };
+            // A static ability that lets the player pay another cost instead (CR 118.9) leaves every target on offer.
+            if let Some(a) = a.filter(|_| each_target) {
+                let kept: Vec<Target> = option.target_candidates.iter().copied().filter(|&t| covered(a, &[t])).collect();
+                if kept.len() != option.target_candidates.len() && static_rules::activation_alternative(cx, player, id, def).is_none() {
+                    if kept.is_empty() && !(option.targets_optional && covered(a, &[])) {
+                        continue;
                     }
-                    a.covers_for(&cost, payment)
-                };
-                // The total cost is determined once the targets are announced (CR 601.2c, 601.2f, 602.2b), so a change that
-                // reads them ("equip abilities that target this creature cost {2} less") is judged for each candidate a
-                // target announced with the action could be: only those the cost could then be paid for are offered. Asked
-                // only where something could change the cost, since nearly nothing does. A static ability that lets the
-                // player pay another cost instead (CR 118.9) leaves every target on offer.
-                if targets_with_action(def.targets)
-                    && !def.special_action
-                    && def.modal.is_none()
-                    && (!a.changers.is_empty() || def.cost_change.is_some() || !own_cost_changes(cx, id).is_empty())
-                {
-                    let kept: Vec<Target> = option.target_candidates.iter().copied().filter(|&t| covered(&[t])).collect();
-                    if kept.len() != option.target_candidates.len() && static_rules::activation_alternative(cx, player, id, def).is_none() {
-                        if kept.is_empty() && !(option.targets_optional && covered(&[])) {
-                            continue;
-                        }
-                        option.target_candidates = kept;
-                    }
-                } else if !covered(&[]) && static_rules::activation_alternative(cx, player, id, def).is_none() {
-                    continue;
+                    option.target_candidates = kept;
                 }
             }
             options.push(option);
