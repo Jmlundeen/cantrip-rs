@@ -182,6 +182,15 @@ fn artifact_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
     matches!(t, Target::Object(id) if on_battlefield(q, id) && q.chars(id).is(CardType::Artifact))
 }
 
+/// "Target creature or enchantment" (CR 115.1): the filter itself, for a card that adds to it ("an opponent controls").
+/// Shredder's Technique prints it as it is and Feed the Swarm adds the opponent.
+pub fn creature_or_enchantment(q: &dyn Query, _: &Asker, t: Target) -> bool {
+    matches!(t, Target::Object(id) if on_battlefield(q, id) && {
+        let c = q.chars(id);
+        c.is(CardType::Creature) || c.is(CardType::Enchantment)
+    })
+}
+
 fn artifact_or_enchantment_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
     matches!(t, Target::Object(id) if on_battlefield(q, id) && {
         let c = q.chars(id);
