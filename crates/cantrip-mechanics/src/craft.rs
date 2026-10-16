@@ -66,13 +66,15 @@ pub const fn materials(count: u8, or_more: bool, filter: ObjectFilter, quality: 
     Materials { count, or_more, filter, quality }
 }
 
-// A material named by a card type alone is a permanent of that type or a card of that type in the graveyard (CR
-// 702.167b): the candidates the core offers are only ever those, so the filter tests the type and nothing else.
-fn artifact(q: &dyn Query, _: &Asker, id: ObjectId) -> bool {
+/// A material named "artifact": a permanent of that type or a card of that type in the graveyard (CR 702.167b). The
+/// candidates the core offers are only ever those, so the filter tests the type and nothing else; `materials(..)` takes it
+/// for a count of a card's own ("six artifacts", Tetzin, Gnome Champion).
+pub fn artifact(q: &dyn Query, _: &Asker, id: ObjectId) -> bool {
     q.chars(id).is(CardType::Artifact)
 }
 
-fn creature(q: &dyn Query, _: &Asker, id: ObjectId) -> bool {
+/// A material named "creature", as `artifact` is.
+pub fn creature(q: &dyn Query, _: &Asker, id: ObjectId) -> bool {
     q.chars(id).is(CardType::Creature)
 }
 
