@@ -1,0 +1,39 @@
+# Ocelot Pride's ruling: "If the creature token created by Ocelot Pride's last ability is your tenth permanent, you'll get the city's blessing before the ability would check" (CR 702.131b, 702.131d). Bot1 has nine permanents when the end step's ability resolves after the life gain of turn five: the Cat is the tenth, so the blessing is had at once and the same ability copies the Cat.
+
+[Bot1 Deck]
+Plains
+Ocelot Pride
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Ornithopter
+Ornithopter
+Ornithopter
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ocelot Pride.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Attack(Ocelot Pride)
+[T7 Bot1.Main1]
+
+[Expect]
+Turn = 7
+Bot1.Life = 21
+Bot1.Battlefield = Plains; Ocelot Pride; Mox Pearl; Mox Sapphire; Mox Jet; Mox Ruby; Mox Emerald; Ornithopter; Ornithopter; Cat; Cat
+Bot1.CitysBlessing = true

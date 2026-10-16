@@ -202,6 +202,13 @@ impl StateDump {
             if player.dungeons_completed > 0 {
                 d.set(format!("{b}.DungeonsCompleted"), player.dungeons_completed);
             }
+            // The designations a keyword gives for the rest of the game (CR 702.131c, 702.195b): only once had.
+            if player.citys_blessing {
+                d.set(format!("{b}.CitysBlessing"), true);
+            }
+            if player.enduring_story {
+                d.set(format!("{b}.EnduringStory"), true);
+            }
             d.set(format!("{b}.Life"), player.life);
             d.set(format!("{b}.Poison"), player.poison);
             if player.lost {

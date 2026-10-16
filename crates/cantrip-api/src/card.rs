@@ -1387,6 +1387,9 @@ pub struct CardDef {
     /// Ascend (CR 702.131): while a permanent of this card is on the battlefield and its controller controls ten or more
     /// permanents, they get the city's blessing.
     pub ascend: bool,
+    /// Storied (CR 702.195a): while a permanent of this card is on the battlefield and its controller controls three or
+    /// more permanents that are artifacts, Sagas and/or legendary, they have an enduring story for the rest of the game.
+    pub storied: bool,
     /// A permanent of this card whose controller sacrifices it at the beginning of the cleanup step when this says so (CR 514.1, 603.7):
     /// Necromancy's \"if you cast it any time a sorcery couldn't have been cast\".
     pub sacrifice_at_cleanup: Option<fn(&dyn Query, ObjectId) -> bool>,
@@ -1511,6 +1514,7 @@ impl CardDef {
         becomes_aura_enchant: None,
         cast_as_though_flash: false,
         ascend: false,
+        storied: false,
         sacrifice_at_cleanup: None,
         shares_name: false,
         splice: None,
@@ -1618,6 +1622,9 @@ pub struct CardTable {
     /// Which cards stop abilities from triggering (CR 603.2) or make them trigger additional times (CR 603.2d): their sources
     /// are found on the board when something triggers.
     pub trigger_rules: Vec<bool>,
+    /// Which cards give their controller a designation once the board allows it (ascend, CR 702.131b; storied, CR
+    /// 702.195a): their sources are found on the board, and the board counted only for a player one of them works for.
+    pub designators: Vec<bool>,
     /// The rules' own abilities (`crate::intrinsic`): what a basic land type gives a land (CR 305.6).
     pub intrinsic: CardId,
     /// What a face-down permanent is (CR 708.2a): its copiable values.
@@ -1673,6 +1680,7 @@ impl CardTable {
         let cost_changes: Vec<bool> = cards.iter().map(|c| !c.cost_changes.is_empty() || !c.ability_discounts.is_empty()).collect();
         let activation_rules: Vec<bool> = cards.iter().map(|c| !c.activation_rules.is_empty()).collect();
         let trigger_rules: Vec<bool> = cards.iter().map(|c| !c.trigger_rules.is_empty() || !c.additional_triggers.is_empty()).collect();
+        let designators: Vec<bool> = cards.iter().map(|c| c.ascend || c.storied).collect();
         let block_rules: Vec<bool> = cards.iter().map(|c| !c.block_rules.is_empty()).collect();
         let targeting_rules: Vec<bool> = cards.iter().map(|c| !c.targeting_rules.is_empty()).collect();
         let mana_triggers: Vec<bool> =
@@ -1701,6 +1709,7 @@ impl CardTable {
             cost_changes,
             activation_rules,
             trigger_rules,
+            designators,
             intrinsic,
             face_down,
             undercity,

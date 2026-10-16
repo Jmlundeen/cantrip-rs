@@ -260,6 +260,12 @@ shapes have an example:
   `g.become_monarch(p)` or `g.take_initiative(p)`. Their inherent triggers (the end-step draw, the steal by combat
   damage, the venture on taking the initiative and at upkeep) are the rules' own abilities (`cantrip_api::intrinsic`),
   put on the stack from an object in no zone (`designations.rs`). `Query` reads `state().player(p).monarch`.
+- **The city's blessing and an enduring story** (CR 702.131, 702.195) are `Player.citys_blessing` /
+  `Player.enduring_story`, had for the rest of the game; a card with the keyword says `ascend: true` or `storied: true`,
+  and a card asks `g.state().player(p).enduring_story`. The rules give them (`designations::keyword_designations`)
+  with the state-based actions and as each event happens, before what it triggers is looked for (CR 702.131d,
+  702.195c), so a token that is the tenth permanent gives the blessing in time for the rest of the ability that made it.
+  The scenario keys are `BotN.CitysBlessing` and `BotN.EnduringStory`.
 - **Venturing** (CR 701.49, 309) walks `Player.room` through a dungeon card (`CardDef.dungeon`: the arrows of each room;
   the ability of the room is the ability of the same index, its label "Name — text"). The Undercity is
   `cards/undercity.rs`; `g.venture(p)` enters or moves on, and the rules complete it (CR 704.5t, `dungeons_completed`).

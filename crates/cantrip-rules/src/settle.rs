@@ -126,27 +126,10 @@ fn state_based_actions(cx: &mut Cx) -> R<bool> {
         acted = true;
     }
 
-    // CR 702.131b: a player who controls a permanent with ascend and ten or more permanents gets the city's blessing, for the
-    // rest of the game.
-    let big = cx.s().battlefield().len() >= 10;
-    let players: Vec<PlayerId> = if big { cx.s().seats().collect() } else { Vec::new() };
-    for p in players {
-        if cx.s().player(p).citys_blessing || cx.s().player(p).lost {
-            continue;
-        }
-        let mut permanents = 0;
-        let mut ascends = false;
-        for &id in cx.s().battlefield() {
-            let obj = cx.s().obj(id);
-            if obj.controller == p {
-                permanents += 1;
-                ascends |= cx.card(obj.copy.map_or(obj.card, |c| c.card)).ascend && !cx.s().lost_all_abilities(id);
-            }
-        }
-        if ascends && permanents >= 10 {
-            cx.st().update_player(p, |pl| pl.citys_blessing = true);
-            acted = true;
-        }
+    // CR 702.131b, 702.195a: the city's blessing and an enduring story, for the rest of the game, by a board that changed
+    // with no event (an effect ending, a type changing).
+    if crate::designations::keyword_designations(cx) {
+        acted = true;
     }
 
     // CR 704.5f, g, h, i: creatures with no toughness or lethal damage, planeswalkers with no loyalty.
@@ -754,6 +737,10 @@ pub fn collect_triggers(cx: &mut Cx, event: &Event, before: Option<&[ObjectId]>)
 /// members the subjects of the events it matched; a limited one ("triggers only N times each turn", no numbered rule; CR 603.2h is "do this only once each turn") stops triggering once it has used up its
 /// turn, a triggering that happens being noted in the history.
 pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<&[ObjectId]>) {
+    // A designation the events gave is had before anything they trigger is looked for, and the continuous effects that
+    // read it apply to that look (CR 702.131d, 702.195c): Bifur, Melodic Rider entering for the third storied permanent
+    // makes its own enters ability trigger an additional time.
+    crate::designations::keyword_designations(cx);
     let mut found: Found = Vec::new();
     let mut statics = TriggerStatics::new(before);
     for event in events {

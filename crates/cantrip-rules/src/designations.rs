@@ -177,3 +177,65 @@ pub fn complete_dungeons(cx: &mut Cx) -> bool {
     }
     any
 }
+
+/// The designations a static keyword ability gives "any time" the board allows it, for the rest of the game: the city's
+/// blessing (ascend on a permanent, CR 702.131b: ten or more permanents) and an enduring story (storied, CR 702.195a:
+/// three or more permanents that are artifacts, Sagas and/or legendary, each counted once however many of those it is).
+/// A player gets one only while they control a permanent with the keyword that has not lost its abilities, and keeps it
+/// whatever they control afterwards (CR 702.131c, 702.195b). Checked with the state-based actions, and as each event
+/// happens before the abilities it triggers are looked for, so continuous effects that read the designation apply to
+/// that look (CR 702.131d, 702.195c). The board is counted only for a player a permanent with one of the keywords works
+/// for and who lacks its designation. Whether anyone got one.
+pub fn keyword_designations(cx: &mut Cx) -> bool {
+    // Bit `p` of each: player `p` controls a permanent with the keyword and does not have its designation.
+    let (mut blessing, mut story) = (0u32, 0u32);
+    for &id in cx.s().battlefield() {
+        let obj = cx.s().obj(id);
+        let card = cx.cards().current(obj);
+        if !cx.cards().designators[card.0 as usize] {
+            continue;
+        }
+        let def = cx.card(card);
+        let p = obj.controller;
+        let player = cx.s().player(p);
+        if player.lost || cx.s().lost_all_abilities(id) {
+            continue;
+        }
+        if def.ascend && !player.citys_blessing {
+            blessing |= 1 << p.index();
+        }
+        if def.storied && !player.enduring_story {
+            story |= 1 << p.index();
+        }
+    }
+    if blessing | story == 0 {
+        return false;
+    }
+    let mut got = false;
+    for p in cx.s().seats().collect::<Vec<_>>() {
+        let bit = 1u32 << p.index();
+        if (blessing | story) & bit == 0 {
+            continue;
+        }
+        let mine: Vec<ObjectId> = cx.s().battlefield().iter().copied().filter(|&id| cx.s().obj(id).controller == p).collect();
+        if blessing & bit != 0 && mine.len() >= 10 {
+            cx.st().update_player(p, |pl| pl.citys_blessing = true);
+            got = true;
+        }
+        if story & bit != 0 {
+            let storied = mine
+                .iter()
+                .filter(|&&id| {
+                    let chars = cx.chars(id);
+                    chars.is(CardType::Artifact) || chars.has_subtype(Subtype::Saga) || chars.supertypes.legendary
+                })
+                .take(3)
+                .count();
+            if storied >= 3 {
+                cx.st().update_player(p, |pl| pl.enduring_story = true);
+                got = true;
+            }
+        }
+    }
+    got
+}

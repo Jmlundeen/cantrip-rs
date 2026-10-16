@@ -740,6 +740,8 @@ pub struct Player {
     pub experience: u8,
     /// The city's blessing (CR 702.131): had for the rest of the game once gained.
     pub citys_blessing: bool,
+    /// An enduring story (CR 702.195b): had for the rest of the game once gained.
+    pub enduring_story: bool,
     /// The monarch (CR 725): at most one player is, once a game has had one.
     pub monarch: bool,
     /// The player with the initiative (CR 726): at most one.

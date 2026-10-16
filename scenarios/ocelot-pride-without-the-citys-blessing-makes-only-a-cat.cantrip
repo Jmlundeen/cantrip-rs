@@ -1,4 +1,4 @@
-# The control for Ocelot Pride's blessing: with nine permanents Bot1 has no city's blessing, so after the life gain of turn five the end step makes one 1/1 Cat and no copy.
+# The control for Ocelot Pride's blessing: with eight permanents, nine once the Cat is made, Bot1 has no city's blessing, so after the life gain of turn five the end step makes one 1/1 Cat and no copy.
 
 [Bot1 Deck]
 Plains
@@ -28,11 +28,10 @@ Bot1.Hand.Mox Emerald.Cast
 [T3 Bot1.Main1]
 Bot1.Hand.Ornithopter.Cast
 [T5 Bot1.Main1]
-Bot1.Hand.Ornithopter.Cast
 Bot1.Attack(Ocelot Pride)
 [T7 Bot1.Main1]
 
 [Expect]
 Turn = 7
 Bot1.Life = 21
-Bot1.Battlefield = Plains; Ocelot Pride; Mox Pearl; Mox Sapphire; Mox Jet; Mox Ruby; Mox Emerald; Ornithopter; Ornithopter; Cat
+Bot1.Battlefield = Plains; Ocelot Pride; Mox Pearl; Mox Sapphire; Mox Jet; Mox Ruby; Mox Emerald; Ornithopter; Cat
