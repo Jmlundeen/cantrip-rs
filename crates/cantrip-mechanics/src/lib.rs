@@ -368,7 +368,8 @@ pub fn choose_color(g: &mut dyn Game, player: PlayerId, source: ObjectId) -> Res
 
 /// `searcher` searches the library of `owner` (CR 701.23, 701.23f; the two are the same player for "search your
 /// library") for up to `count` cards (exactly as many as can be found, when not `optional`) that pass `eligible`.
-/// Asked only when the library has cards; the search is recorded either way. The library is listed bottom first, as
+/// Asked only when the library has cards and `count` is not zero (a search for zero cards, as Settle the Wreckage
+/// can make, finds nothing and is still a search); the search is recorded either way. The library is listed bottom first, as
 /// the C# engine lists it. `destination` is where the cards found are going, for the question to say.
 pub fn search_library(
     g: &mut dyn Game,
@@ -382,7 +383,7 @@ pub fn search_library(
 ) -> Result<Vec<ObjectId>, Suspend> {
     let mut library: Vec<ObjectId> = g.state().zone(Zone::library(owner)).to_vec();
     library.reverse();
-    let found = if library.is_empty() {
+    let found = if library.is_empty() || count == 0 {
         Vec::new()
     } else {
         let can: Vec<ObjectId> = library.iter().copied().filter(|&c| eligible(g, c)).collect();
