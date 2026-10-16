@@ -1,0 +1,37 @@
+# Binding Negotiation: "Target opponent reveals their hand. You may choose a nonland card from it. If you do, they discard
+# it. Otherwise, you may put a face-up exiled card they own into their graveyard." Bot1 exiled its Simian Spirit Guide for
+# mana on turn 1. On turn 2 Bot2 chooses Bot1's Duress from the revealed hand (an Island is not offered: nonland only), and
+# Bot1 discards it. A card was chosen, so the exile part is never offered: Bot2 is asked nothing more and the Spirit Guide
+# stays in exile.
+
+[Bot1 Deck]
+Simian Spirit Guide
+Duress
+Island x13
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Binding Negotiation
+Swamp x12
+
+[Actions]
+Bot1.Hand.Simian Spirit Guide.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Binding Negotiation.Cast(Bot1)
+! Bot2.Choose(Island)
+Bot2.Choose(Duress)
+! Bot2.Choose
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Exile = Simian Spirit Guide
+Bot1.Graveyard = Duress
+Bot1.Revealed = Duress; Island; Island; Island; Island; Island
+Bot2.Graveyard = Binding Negotiation

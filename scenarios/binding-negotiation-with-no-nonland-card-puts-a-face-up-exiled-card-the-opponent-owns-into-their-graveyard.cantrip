@@ -1,0 +1,40 @@
+# Binding Negotiation's "otherwise": Bot1's revealed hand holds only lands, so there is nothing to choose from it and
+# Bot2 is not asked (CR 608.2d); Bot2 may then put a face-up exiled card Bot1 owns into Bot1's graveyard. Bot1's exile holds
+# its Simian Spirit Guide, exiled for mana, and a Black Lotus Shelldock Isle hid face down, which is not a face-up card
+# (CR 406.3). Bot2's own Elvish Spirit Guide, exiled to help pay for the spell, is not Bot1's. Only the Simian Spirit Guide
+# is offered, and Bot2 puts it into Bot1's graveyard.
+
+[Bot1 Deck]
+Shelldock Isle
+Simian Spirit Guide
+Island x5
+Black Lotus
+Island x3
+Island x10
+
+[Bot2 Deck]
+Swamp
+Elvish Spirit Guide
+Binding Negotiation
+Swamp x12
+
+[Actions]
+Bot1.Hand.Shelldock Isle.Play
+Bot1.Arrange(Black Lotus | Island; Island; Island)
+Bot1.Hand.Simian Spirit Guide.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Elvish Spirit Guide.Activate
+Bot2.Hand.Binding Negotiation.Cast(Bot1)
+! Bot2.Choose(Black Lotus)
+! Bot2.Choose(Elvish Spirit Guide)
+Bot2.Choose(Simian Spirit Guide)
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Exile = (face down); Elvish Spirit Guide
+Bot1.Graveyard = Simian Spirit Guide
+Bot1.Hand.Count = 5
+Bot2.Graveyard = Binding Negotiation

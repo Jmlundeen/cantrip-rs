@@ -1,0 +1,34 @@
+# Binding Negotiation's two choices are both "may". Bot2 reveals Bot1's hand, chooses nothing from it though Bot1's
+# Duress could be taken, and then chooses none of the exiled cards either: nothing is discarded and Bot1's Simian Spirit
+# Guide stays in exile.
+
+[Bot1 Deck]
+Simian Spirit Guide
+Duress
+Island x13
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Binding Negotiation
+Swamp x12
+
+[Actions]
+Bot1.Hand.Simian Spirit Guide.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Binding Negotiation.Cast(Bot1)
+Bot2.Choose()
+Bot2.Choose()
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Exile = Simian Spirit Guide
+Bot1.Graveyard.Count = 0
+Bot1.Hand.Count = 6
+Bot2.Graveyard = Binding Negotiation
