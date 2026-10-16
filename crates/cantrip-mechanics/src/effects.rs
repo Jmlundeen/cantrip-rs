@@ -60,6 +60,14 @@ pub fn draw(g: &mut dyn Game, item: &StackItem, n: u32) -> Result<(), Suspend> {
     Ok(())
 }
 
+/// "Target player draws N cards" (CR 121.1): the player the item targeted in `slot`, if the target is still legal (CR 608.2b).
+/// Ancestral Recall (three), Flame of Anor and Ashling's Command (two) print it.
+pub fn target_player_draws(g: &mut dyn Game, item: &StackItem, slot: usize, n: u32) {
+    if let Some(player) = crate::targets::player(g, item, slot) {
+        g.draw(player, n);
+    }
+}
+
 /// "Draw a card, then discard a card" (CR 121.1, 701.9): the controller draws, then chooses a card of their hand and
 /// discards it. Currency Converter and Sphinx of False Conclusions print it.
 pub fn loot(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {

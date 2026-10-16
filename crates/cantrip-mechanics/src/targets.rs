@@ -147,6 +147,12 @@ pub fn object(g: &dyn Game, item: &StackItem, slot: usize) -> Option<ObjectId> {
     if slot < item.target_count as usize && g.target_legal(item, slot) { item.targets[slot].object() } else { None }
 }
 
+/// The player a resolving item targeted in `slot`, if the target is still legal (CR 608.2b) and is a player: `object`'s twin
+/// for "target player". Used by `effects::target_player_draws`.
+pub fn player(g: &dyn Game, item: &StackItem, slot: usize) -> Option<PlayerId> {
+    if slot < item.target_count as usize && g.target_legal(item, slot) { item.targets[slot].player() } else { None }
+}
+
 /// Every object target of the item that is still legal (CR 608.2b), in slot order. Fiery Confluence-style spells and
 /// Echoing Truth-style "each target" effects read it.
 pub fn legal_objects(g: &dyn Game, item: &StackItem) -> Vec<ObjectId> {

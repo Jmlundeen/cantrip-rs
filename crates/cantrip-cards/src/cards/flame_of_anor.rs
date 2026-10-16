@@ -1,14 +1,10 @@
 use cantrip_api::*;
-use cantrip_mechanics::{damage_target, targets};
+use cantrip_mechanics::{damage_target, effects, targets};
 use cantrip_oracle as oracle;
 
 /// Mode 0: target player draws two cards.
 fn draw_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if g.target_legal(item, 0)
-        && let Target::Player(player) = item.targets[0]
-    {
-        g.draw(player, 2);
-    }
+    effects::target_player_draws(g, item, 0, 2);
     Ok(())
 }
 
