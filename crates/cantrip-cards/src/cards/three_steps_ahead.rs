@@ -17,14 +17,6 @@ fn counter_spell(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// Create a token that's a copy of target artifact or creature you control.
-fn copy_token(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(permanent) = targets::object(g, item, 0) {
-        g.create_token_copies(permanent, item.controller, 1)?;
-    }
-    Ok(())
-}
-
 /// Draw two cards, then discard a card.
 fn loot(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.draw(item.controller, 2);
@@ -36,7 +28,7 @@ const MODES: &[ModeDef] = &[
     mode(counter_spell, "+ {1}{U} — Counter target spell.")
         .targets(&[targets::SPELL])
         .cost(mana("{1}{U}")),
-    mode(copy_token, "+ {3} — Create a token that's a copy of target artifact or creature you control.")
+    mode(cantrip_mechanics::copy::create_token_copy_of_target, "+ {3} — Create a token that's a copy of target artifact or creature you control.")
         .targets(&[target(artifact_or_creature_you_control)])
         .cost(mana("{3}")),
     mode(loot, "+ {2} — Draw two cards, then discard a card.")

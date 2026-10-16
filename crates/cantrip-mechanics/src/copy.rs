@@ -73,3 +73,13 @@ pub fn create_token_copy_of_it(
     g.create_token_copies_of(values, item.controller, 1)?;
     Ok(())
 }
+
+/// "Create a token that's a copy of target [permanent]" (CR 707.2, 111.1): the copiable values of the first target, for
+/// the ability's or spell's controller. Nothing happens if that target is no longer legal (CR 608.2b). Esika's Chariot,
+/// Octomancer, Three Steps Ahead and Caretaker's Talent print it.
+pub fn create_token_copy_of_target(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if let Some(target) = crate::targets::object(g, item, 0) {
+        g.create_token_copies(target, item.controller, 1)?;
+    }
+    Ok(())
+}
