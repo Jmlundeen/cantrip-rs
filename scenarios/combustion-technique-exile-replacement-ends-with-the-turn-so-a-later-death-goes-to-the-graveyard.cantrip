@@ -1,0 +1,65 @@
+# Combustion Technique's "if that creature would die this turn, exile it instead" lasts only the turn it was cast. On turn 3 it
+# deals 3 damage (one Lesson) to Bot2's Auriok Salvagers (2/4), which survives; on turn 5 two Lightning Bolts kill the same Salvagers
+# and it goes to the graveyard (the replacement ended at the cleanup step of turn 3, CR 514.2, 611.2b). The contrast is the scenario
+# in which the Bolt follows the same turn and the creature is exiled.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Mox Sapphire
+Mox Ruby
+Octopus Form
+Combustion Technique
+Lightning Bolt
+Mountain
+Lightning Bolt
+Island x11
+
+[Bot2 Deck]
+Black Lotus
+Mox Pearl
+Auriok Salvagers
+Plains x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Octopus Form.Cast(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Auriok Salvagers.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Combustion Technique.Cast(Auriok Salvagers)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Auriok Salvagers.Damage = 3
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Auriok Salvagers)
+Bot1.Hand.Lightning Bolt.Cast(Auriok Salvagers)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Exile.Count = 0
+Bot2.Graveyard.Count = 2
+Bot2.Battlefield = Mox Pearl

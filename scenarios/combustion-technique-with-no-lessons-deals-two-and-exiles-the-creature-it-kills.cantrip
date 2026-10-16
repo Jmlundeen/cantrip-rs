@@ -1,0 +1,37 @@
+# Combustion Technique: "deals damage equal to 2 plus the number of Lesson cards in your graveyard to target creature. If that creature
+# would die this turn, exile it instead." Bot1's graveyard is empty, so it deals 2 damage to Bot2's Llanowar Elves; the Elves would die,
+# and are exiled instead of going to the graveyard (CR 614.1a, 700.4). The spell itself, on the stack as it resolves, is not a Lesson
+# card in the graveyard to count.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Combustion Technique
+Island x17
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Combustion Technique.Cast(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Exile = Llanowar Elves
+Bot2.Graveyard.Count = 0
+Bot2.Battlefield = Forest
+Bot1.Graveyard = Combustion Technique

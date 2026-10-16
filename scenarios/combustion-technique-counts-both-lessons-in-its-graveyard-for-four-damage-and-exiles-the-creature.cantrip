@@ -1,0 +1,56 @@
+# Combustion Technique with two Lesson cards in Bot1's graveyard - Octopus Form (an instant Lesson, cast on turn 1) and Boomerang Basics
+# (a sorcery Lesson, cast on turn 3) - deals 2 + 2 = 4 damage, exactly the toughness of Bot2's Auriok Salvagers (2/4): it dies, and is
+# exiled instead of going to the graveyard. The contrast is the scenario with a single Lesson, where three damage leaves it alive.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Mox Sapphire
+Mox Ruby
+Octopus Form
+Boomerang Basics
+Combustion Technique
+Island x13
+
+[Bot2 Deck]
+Black Lotus
+Mox Pearl
+Auriok Salvagers
+Plains x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Octopus Form.Cast(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Auriok Salvagers.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Boomerang Basics.Cast(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Combustion Technique.Cast(Auriok Salvagers)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Exile = Auriok Salvagers
+Bot2.Graveyard = Black Lotus
+Bot2.Battlefield = Mox Pearl
+Bot1.Graveyard.Count = 3

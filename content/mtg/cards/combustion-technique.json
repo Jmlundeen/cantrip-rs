@@ -1,0 +1,6 @@
+{
+  "name": "Combustion Technique",
+  "manaCost": "{1}{R}",
+  "type": "Instant — Lesson",
+  "oracleText": "Combustion Technique deals damage equal to 2 plus the number of Lesson cards in your graveyard to target creature. If that creature would die this turn, exile it instead."
+}

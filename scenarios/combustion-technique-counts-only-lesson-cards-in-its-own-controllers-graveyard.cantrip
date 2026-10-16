@@ -1,0 +1,54 @@
+# Combustion Technique counts "Lesson cards in YOUR graveyard". Bot1's graveyard holds only a Lightning Bolt (an instant, not a
+# Lesson); Bot2's holds a Lesson, the Octopus Form it cast on its Auriok Salvagers. Neither counts: the damage is 2 + 0 = 2, so Bot2's
+# 2/4 Salvagers has exactly 2 damage marked afterwards, and nothing is exiled (it did not die).
+
+[Bot1 Deck]
+Forest
+Mox Ruby
+Lightning Bolt
+Combustion Technique
+Island x16
+
+[Bot2 Deck]
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Auriok Salvagers
+Octopus Form
+Plains x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Auriok Salvagers.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Octopus Form.Cast(Auriok Salvagers)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Combustion Technique.Cast(Auriok Salvagers)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Exile.Count = 0
+Bot2.Battlefield.Auriok Salvagers.Damage = 2
+Bot2.Battlefield.Auriok Salvagers.Toughness = 4
+Bot2.Graveyard.Count = 2
+Bot1.Graveyard.Count = 2

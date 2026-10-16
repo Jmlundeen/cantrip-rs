@@ -1,0 +1,61 @@
+# Combustion Technique with one Lesson card in Bot1's graveyard (Octopus Form) deals 2 + 1 = 3 damage: Bot2's Auriok Salvagers (2/4)
+# survives with 3 damage marked - one less than with two Lessons. "If that creature would die this turn, exile it instead" is already
+# in force, for any way it dies (the ruling): Bot1's Lightning Bolt, cast afterwards the same turn, kills it and it is exiled, not put
+# into the graveyard.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Mox Sapphire
+Mox Ruby
+Octopus Form
+Combustion Technique
+Lightning Bolt
+Mountain
+Island x12
+
+[Bot2 Deck]
+Black Lotus
+Mox Pearl
+Auriok Salvagers
+Plains x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Octopus Form.Cast(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Auriok Salvagers.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Combustion Technique.Cast(Auriok Salvagers)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Auriok Salvagers.Damage = 3
+? Exile.Count = 0
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Auriok Salvagers)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Exile = Auriok Salvagers
+Bot2.Graveyard = Black Lotus
+Bot2.Battlefield = Mox Pearl
+Bot1.Graveyard.Count = 3

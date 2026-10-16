@@ -1,0 +1,47 @@
+# Combustion Technique's only target becoming illegal (CR 608.2b): with the spell on the stack aimed at Bot2's Llanowar Elves, Bot2
+# casts its Octopus Form on the Elves, which gain hexproof (and +1/+1). The Elves are no longer a legal target of Bot1's spell, so
+# it does not resolve: no damage, and the exile replacement is not made either - the Elves are a 2/2 with no damage, still on the
+# battlefield, and nothing is in exile. Combustion Technique goes to Bot1's graveyard, countered on resolution.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Combustion Technique
+Island x17
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Mox Sapphire
+Octopus Form
+Forest x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Combustion Technique.Cast(Llanowar Elves)
+Bot1.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Octopus Form.Cast(Llanowar Elves)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Exile.Count = 0
+Bot2.Battlefield.Llanowar Elves.Damage = 0
+Bot2.Battlefield.Llanowar Elves.Power = 2
+Bot2.Battlefield.Llanowar Elves.Toughness = 2
+Bot1.Graveyard = Combustion Technique
+Bot2.Graveyard = Octopus Form
