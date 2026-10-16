@@ -1,0 +1,54 @@
+# Drivnod, Carnage Dominus and Teysa Karlov each make what a creature dying triggers trigger an additional time (CR
+# 603.2d): together, three times. On turn 5 Bot1 sacrifices Haywire Mite to its own ability, exiling Bot2's Mox
+# Sapphire: "When this creature dies, you gain 2 life" triggers three times, 26 life.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Black Lotus
+Drivnod, Carnage Dominus
+Mox Pearl
+Teysa Karlov
+Haywire Mite
+Plains
+Mox Emerald
+Island x10
+
+[Bot2 Deck]
+Mox Sapphire
+Plains x14
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Drivnod, Carnage Dominus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Teysa Karlov.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Haywire Mite.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Haywire Mite.Activate(Bot2.Battlefield.Mox Sapphire)
+Bot1.Triggers(Haywire Mite; Haywire Mite; Haywire Mite)
+? Stack.Count = 4
+[T5 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 26
+Exile = Mox Sapphire

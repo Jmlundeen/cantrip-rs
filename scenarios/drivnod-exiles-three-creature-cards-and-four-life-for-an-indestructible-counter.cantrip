@@ -1,0 +1,64 @@
+# Drivnod, Carnage Dominus: "{B/P}{B/P}, Exile three creature cards from your graveyard: Put an indestructible counter on
+# Drivnod." The exile is a cost (CR 601.2h, 602.2b): with two Ornithopters (two Entombs on turn 3), two Entombs and a Black
+# Lotus in its graveyard Bot1 cannot activate it, though it could pay the Phyrexian symbols with life. On turn 5 two more
+# Entombs put a third Ornithopter and a Lightning Bolt there: Bot1 pays both {B/P} with 2 life each (CR 107.4f), may not
+# choose the Bolt among the cards it exiles, exiles the three Ornithopters, and Drivnod gets an indestructible counter.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Black Lotus
+Drivnod, Carnage Dominus
+Entomb
+Entomb
+Entomb
+Entomb
+Ornithopter
+Ornithopter
+Ornithopter
+Lightning Bolt
+Island x8
+
+[Bot2 Deck]
+Plains x14
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Drivnod, Carnage Dominus.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Ornithopter)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Drivnod, Carnage Dominus.Activate
+[T5 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Ornithopter)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Lightning Bolt)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Drivnod, Carnage Dominus.Activate
+Bot1.Modes(1; 2)
+! Bot1.Choose(Lightning Bolt)
+Bot1.Choose(Ornithopter; Ornithopter; Ornithopter)
+[T5 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 16
+Exile = Ornithopter; Ornithopter; Ornithopter
+Bot1.Graveyard = Entomb; Lightning Bolt; Entomb; Entomb; Entomb; Black Lotus
+Bot1.Battlefield.Drivnod, Carnage Dominus.Counters.Indestructible = 1
+Bot1.Battlefield.Drivnod, Carnage Dominus.Keywords = Indestructible
