@@ -1,0 +1,74 @@
+# The boundary of 5 damage. Sheoldred, the Apocalypse (black, toughness 5) takes exactly lethal damage from Essence Burn on turn 3 and is exiled instead of dying.
+# Alpha Deathclaw (black and green, toughness 6) survives the same 5 damage on turn 5; "if that permanent would die this turn, exile it instead" covers
+# the rest of the turn (CR 611.2c, 614.1a), so when Bot1's Lightning Bolt finishes it afterwards, it is exiled too (Bot2's graveyard stays empty).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mountain
+Essence Burn
+Essence Burn
+Lightning Bolt
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Emerald
+Mox Pearl
+Mox Ruby
+Sheoldred, the Apocalypse
+Swamp
+Alpha Deathclaw
+Swamp x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Sheoldred, the Apocalypse.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Essence Burn.Cast(Bot2.Battlefield.Sheoldred, the Apocalypse)
+Bot1.Pass
+[T3 Bot1.Main2]
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Swamp#2.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Alpha Deathclaw.Cast
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Essence Burn.Cast(Bot2.Battlefield.Alpha Deathclaw)
+Bot1.Pass
+[T5 Bot1.Main2]
+? Bot2.Battlefield.Alpha Deathclaw.Damage = 5
+? Bot2.Battlefield.Alpha Deathclaw.Toughness = 6
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Alpha Deathclaw)
+Bot1.Pass
+
+[Expect]
+Exile = Sheoldred, the Apocalypse; Alpha Deathclaw
+Bot2.Graveyard.Count = 0
+Bot1.Graveyard = Lightning Bolt; Essence Burn; Mountain; Essence Burn

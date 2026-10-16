@@ -1,0 +1,56 @@
+# CR 608.2b: Essence Burn's one target, Bot2's Llanowar Elves, is exiled by Bot2's own Swords to Plowshares in response, so the spell does not resolve and goes to
+# Bot1's graveyard without a replacement effect or damage being made: Bot2 has gained only the 1 life Swords gave it, and nothing else of Bot2's was touched
+# (Bot2's other creature, a Dark Confidant, takes no damage).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mountain
+Essence Burn
+Mountain x14
+
+[Bot2 Deck]
+Mox Emerald
+Mox Pearl
+Mox Jet
+Llanowar Elves
+Dark Confidant
+Swords to Plowshares
+Swamp
+Swamp x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Dark Confidant.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Essence Burn.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Exile = Llanowar Elves
+Bot2.Life = 21
+Bot2.Graveyard = Swords to Plowshares
+Bot2.Battlefield.Dark Confidant.Damage = 0
+Bot1.Graveyard = Essence Burn

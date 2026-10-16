@@ -1,0 +1,59 @@
+# "Target black or green creature or planeswalker": Bot2 controls Llanowar Elves (green), Dark Confidant (black) and Ornithopter (colorless). Bot1 cannot
+# cast Essence Burn at the Ornithopter (the refusal, beside the casts at the green and black creatures that are the positive controls) and the 5 damage
+# kills each of the others, which are exiled instead of dying: Exile holds both, Bot2's graveyard stays empty (CR 614.1a).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Sapphire
+Essence Burn
+Essence Burn
+Mountain
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Mox Emerald
+Mox Jet
+Mox Pearl
+Llanowar Elves
+Dark Confidant
+Ornithopter
+Swamp
+Swamp x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Dark Confidant.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+! Bot1.Hand.Essence Burn.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Essence Burn.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Essence Burn.Cast(Bot2.Battlefield.Dark Confidant)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Llanowar Elves; Dark Confidant
+Bot2.Graveyard.Count = 0
+Bot2.Battlefield = Mox Emerald; Mox Jet; Mox Pearl; Ornithopter
+Bot1.Graveyard = Essence Burn; Essence Burn

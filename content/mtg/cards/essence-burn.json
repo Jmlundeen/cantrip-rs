@@ -1,0 +1,6 @@
+{
+  "name": "Essence Burn",
+  "manaCost": "{1}{R}",
+  "type": "Instant",
+  "oracleText": "Essence Burn deals 5 damage to target black or green creature or planeswalker. If that permanent would die this turn, exile it instead."
+}

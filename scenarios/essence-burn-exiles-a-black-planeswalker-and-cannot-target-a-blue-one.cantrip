@@ -1,0 +1,60 @@
+# "Creature or planeswalker": Liliana of the Veil (black, 3 loyalty) is a legal target on turn 3 and the 5 damage removes all her loyalty counters (CR 120.3c), so
+# she is exiled instead of dying (CR 704.5i, 614.1a). On turn 5 Jace, the Mind Sculptor (blue) is a planeswalker but neither black nor green, so Essence Burn
+# is refused with him as its target (the cast at Liliana was the positive control) and he stays on the battlefield.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mountain
+Essence Burn
+Essence Burn
+Mountain
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Black Lotus
+Liliana of the Veil
+Mox Sapphire
+Mox Jet
+Island
+Island
+Jace, the Mind Sculptor
+Island x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Liliana of the Veil.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Essence Burn.Cast(Bot2.Battlefield.Liliana of the Veil)
+Bot1.Pass
+[T3 Bot1.Main2]
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Island#2.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Jace, the Mind Sculptor.Cast
+Bot2.Pass
+[T5 Bot1.Main1]
+! Bot1.Hand.Essence Burn.Cast(Bot2.Battlefield.Jace, the Mind Sculptor)
+[T5 Bot1.Main2]
+
+[Expect]
+Exile = Liliana of the Veil
+Bot2.Battlefield = Island; Island; Mox Sapphire; Mox Jet; Jace, the Mind Sculptor
+Bot2.Graveyard = Black Lotus
+Bot1.Graveyard = Essence Burn
