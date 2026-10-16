@@ -1,0 +1,55 @@
+# Silk, Web Weaver's "{3}{G}{W}: Creatures you control get +2/+2 and gain vigilance until end of turn" affects only the
+# creatures Bot1 controls as it resolves (CR 611.2c): Bot2's Ornithopter gets nothing, and an Ornithopter Bot1 casts
+# afterwards, with the Citizen its cast makes, stays as it is. The Ornithopter, the Citizen and Silk already there get
+# +2/+2.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Emerald
+Mox Jet
+Black Lotus
+Silk, Web Weaver
+Ornithopter
+Ornithopter
+Plains x11
+
+[Bot2 Deck]
+Island
+Ornithopter
+Island x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Silk, Web Weaver.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Silk, Web Weaver.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield.Silk, Web Weaver.Power = 5
+Bot1.Battlefield.Silk, Web Weaver.Toughness = 7
+Bot1.Battlefield.Ornithopter#1.Power = 2
+Bot1.Battlefield.Ornithopter#2.Power = 0
+Bot1.Battlefield.Human Citizen#1.Power = 3
+Bot1.Battlefield.Human Citizen#2.Power = 1
+Bot2.Battlefield.Ornithopter.Power = 0
+Bot2.Battlefield.Ornithopter.Toughness = 2
