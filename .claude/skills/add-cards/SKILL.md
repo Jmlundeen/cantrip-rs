@@ -208,6 +208,8 @@ If the harness cannot express something a scenario needs - a question, a check, 
 **A scenario that shows a bug is committed, not dropped.** If the engine or another card gets something wrong and you
 cannot fix it in this change, commit the scenario asserting the rules-correct outcome with a `# Known bug: <what, and
 the rule>` line at the top (`scenarios/README.md`, "Known bugs"). It is expected to fail; the fix removes the marker.
+Give it an entry in `docs/known-issues.md` (severity, notes, the scenario), and a reviewer's suspected bug or a path no
+scenario can reach one too; the fix deletes the entry.
 Never delete, weaken or rewrite a scenario to pass because the engine is wrong, and never assert behaviour you know is
 wrong. "0 fail" means no unexpected failures; the known-bug count is reported beside it.
 

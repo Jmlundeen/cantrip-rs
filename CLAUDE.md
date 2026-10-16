@@ -115,3 +115,5 @@ is pushed from there. Card art never goes in: `content/*/images/` is gitignored 
   games), `play-release-build.cmd` (the shipping build), and the bot labs. Generators are in `tools/maintenance/`
   (`new-card.py`); `tools/README.md` lists everything.
 - `docs/engine-design.md` — the engine's design and plan; keep it current when it moves.
+- `docs/known-issues.md` — every known, suspected or unexercised bug, with its severity, notes and the scenarios that
+  show it; an entry is added when a bug is found and not fixed, and deleted by the fix.

@@ -84,6 +84,9 @@ under "known bugs", apart from the failures. The day it passes, both report it a
 line is removed in the same change as the fix. A scenario is never deleted, weakened or rewritten to pass because the
 engine is wrong, and never kept outside `scenarios/`.
 
+Every known bug also has an entry in `docs/known-issues.md` - its severity, notes and the scenarios that show it -
+added with the marked scenario and deleted with the fix.
+
 ## A real start: `[Opening]`
 
 ```
