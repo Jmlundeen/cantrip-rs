@@ -1,0 +1,54 @@
+# "Planeswalkers you control": Bot2's Narset, Parter of Veils (turn 2) has no "[+1]: Add {R}" (the refusal), while it can use her own -2
+# (the positive control is Bot1's Jace using the granted +1 on turn 3, and Narset's printed "Look" ability being offered to Bot2).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Way of the Pyromancer
+Island x4
+Island x10
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Narset, Parter of Veils
+Island x3
+Island x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Way of the Pyromancer.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Island.Activate(Ability: {U})
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Narset, Parter of Veils.Cast
+Bot2.Pass
+Bot1.Pass
+! Bot2.Battlefield.Narset, Parter of Veils.Activate(Ability: Add)
+Bot2.Battlefield.Narset, Parter of Veils.Activate(Ability: Look)
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Jace.Activate(Ability: Add)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {R}
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Jace.Counters.Loyalty = 3
+Bot2.Battlefield.Narset, Parter of Veils.Counters.Loyalty = 3

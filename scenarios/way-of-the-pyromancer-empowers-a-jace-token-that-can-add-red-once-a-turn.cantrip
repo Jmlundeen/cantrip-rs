@@ -1,0 +1,41 @@
+# Way of the Pyromancer (turn 1): its enter trigger empowers Jace 2, making a Jace token with 2 loyalty; "Planeswalkers you control have
+# '[+1]: Add {R}'" gives the token that loyalty ability beside its own two. Using it (a loyalty ability, so it uses the stack) puts the
+# token to 3 loyalty and R in the pool; the token's other loyalty abilities are then refused for the turn (CR 606.3), though its loyalty
+# would allow the -1 (the positive control is the +1 taken first).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Way of the Pyromancer
+Island x4
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Way of the Pyromancer.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Jace.Counters.Loyalty = 2
+Bot1.Battlefield.Jace.Activate(Ability: Add)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {R}
+? Bot1.Battlefield.Jace.Counters.Loyalty = 3
+! Bot1.Battlefield.Jace.Activate(Ability: Surveil)
+! Bot1.Battlefield.Jace.Activate(Ability: Draw)
+! Bot1.Battlefield.Jace.Activate(Ability: Add)
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mountain; Mox Ruby; Way of the Pyromancer; Jace
+Bot1.Battlefield.Jace.Counters.Loyalty = 3

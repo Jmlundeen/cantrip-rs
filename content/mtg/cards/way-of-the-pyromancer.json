@@ -1,0 +1,6 @@
+{
+  "name": "Way of the Pyromancer",
+  "manaCost": "{1}{R}",
+  "type": "Legendary Enchantment",
+  "oracleText": "When Way of the Pyromancer enters, empower Jace 2. (Put two loyalty counters on a Jace token you control. If you don't control one, first create a blue Jace planeswalker token with \"[−1]: Surveil 1\" and \"[−3]: Draw a card.\")\nPlaneswalkers you control have \"[+1]: Add {R}.\""
+}

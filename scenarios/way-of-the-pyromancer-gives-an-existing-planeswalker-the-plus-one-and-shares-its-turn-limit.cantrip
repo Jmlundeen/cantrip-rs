@@ -1,0 +1,54 @@
+# Narset, Parter of Veils (five loyalty, no plus ability of her own) is in play when Way of the Pyromancer arrives on turn 3, and now has
+# "[+1]: Add {R}": activating it makes her loyalty 6 and a red mana. Her own -2 is then refused for the turn, one loyalty ability per
+# planeswalker (CR 606.3), while the Jace token Way empowers may use a loyalty ability of its own that turn. The enter trigger resolves
+# first (turn 3), then both +1 and -1 are used on separate planeswalkers.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mountain
+Mox Ruby
+Narset, Parter of Veils
+Way of the Pyromancer
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate(Ability: {U})
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Narset, Parter of Veils.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Way of the Pyromancer.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Narset, Parter of Veils.Activate(Ability: Add)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {R}
+? Bot1.Battlefield.Narset, Parter of Veils.Counters.Loyalty = 6
+! Bot1.Battlefield.Narset, Parter of Veils.Activate(Ability: Look)
+Bot1.Battlefield.Jace.Activate(Ability: Surveil)
+Bot1.Pass
+Bot1.Arrange(Island)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Narset, Parter of Veils.Counters.Loyalty = 6
+Bot1.Battlefield.Jace.Counters.Loyalty = 1

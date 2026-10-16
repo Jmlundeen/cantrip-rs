@@ -1,0 +1,57 @@
+# Turn 3: Bot1 activates the Jace token's granted "[+1]: Add {R}" and Bot2 destroys Way of the Pyromancer with Disenchant in response.
+# The ability on the stack does not depend on its source (CR 113.7a): it resolves, adding R, and the loyalty cost is already paid (3 loyalty).
+# With Way gone the token no longer has the ability (the refusal) but still has its own -1 (the positive control, taken on turn 5 - the
+# -1 Surveil 1 leaves it at 2).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Way of the Pyromancer
+Island x4
+Island x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Disenchant
+Plains x4
+Plains x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Way of the Pyromancer.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Jace.Activate(Ability: Add)
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Way of the Pyromancer)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Way of the Pyromancer
+? Bot1.Mana = {R}
+? Bot1.Battlefield.Jace.Counters.Loyalty = 3
+[T5 Bot1.Main1]
+! Bot1.Battlefield.Jace.Activate(Ability: Add)
+Bot1.Battlefield.Jace.Activate(Ability: Surveil)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Island)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Jace.Counters.Loyalty = 2
