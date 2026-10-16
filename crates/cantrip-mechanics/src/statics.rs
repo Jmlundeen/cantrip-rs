@@ -11,6 +11,13 @@ pub fn your_creatures(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, 
     so_far.is(CardType::Creature) && s.obj(affected).controller == s.obj(source).controller
 }
 
+/// A static ability that affects only the object that has it (CR 604.1: "this creature", "this land", "this token") as its
+/// `StaticDef::affects`. Anje's Ravager, Emrakul, the Aeons Torn, Multiversal Passage, Roaming Throne, Territorial Kavu and
+/// the Construct token use it.
+pub fn itself(_: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Chars) -> bool {
+    source == affected
+}
+
 /// "... has haste" (CR 702.10, layer 6) as a static ability's `StaticDef::apply`. Anger, Samut, Lavaspur Boots, Skateboard
 /// and dash's haste print it.
 pub fn have_haste(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {

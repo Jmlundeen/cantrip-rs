@@ -1,6 +1,7 @@
 //! The tokens the rules define by name (CR 111.10), as the C# `PredefinedTokens` names them.
 
 use cantrip_api::*;
+use crate::statics::itself;
 
 fn draw_a_card(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.draw(item.controller, 1);
@@ -215,10 +216,6 @@ fn construct_size(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
         .count() as i16;
     chars.power = chars.power.map(|v| v + n);
     chars.toughness = chars.toughness.map(|v| v + n);
-}
-
-fn itself(_: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Chars) -> bool {
-    source == affected
 }
 
 /// The 0/0 colorless Construct artifact creature token with "This token gets +1/+1 for each artifact you control". Urza's Saga

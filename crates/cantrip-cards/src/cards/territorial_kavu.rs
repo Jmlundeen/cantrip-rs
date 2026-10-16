@@ -1,10 +1,7 @@
 use cantrip_api::*;
+use cantrip_mechanics::statics::itself;
 use cantrip_mechanics::{discard_chosen, targets};
 use cantrip_oracle as oracle;
-
-fn affects(_: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Chars) -> bool {
-    source == affected
-}
 
 /// Domain (CR 604.3, 305.6): power and toughness each equal the number of basic land types among lands its controller
 /// controls (its owner, when it is not on the battlefield), a characteristic-defining ability in every zone.
@@ -52,7 +49,7 @@ static MODAL: ModalDef = modes(&[
 
 pub static CARD: CardDef = CardDef {
     abilities: &[modal_triggered(cantrip_mechanics::triggers::THIS_ATTACKS, &MODAL, "Whenever this creature attacks, choose one \u{2014} Discard a card. If you do, draw a card.; or Exile up to one target card from a graveyard.")],
-    statics: &[static_ability(Layer::PtDefine, affects, domain, "Domain \u{2014} Territorial Kavu's power and toughness are each equal to the number of basic land types among lands you control.")
+    statics: &[static_ability(Layer::PtDefine, itself, domain, "Domain \u{2014} Territorial Kavu's power and toughness are each equal to the number of basic land types among lands you control.")
         .own()
         .lost_pt(0, 0)],
     ..oracle::TERRITORIAL_KAVU

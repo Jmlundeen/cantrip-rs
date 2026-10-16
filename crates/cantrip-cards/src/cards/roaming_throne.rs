@@ -1,11 +1,8 @@
 use cantrip_api::*;
+use cantrip_mechanics::statics::itself;
 use cantrip_mechanics::chosen_type::enters_choosing_a_creature_type;
 use cantrip_mechanics::triggers::ward;
 use cantrip_oracle as oracle;
-
-fn itself(_: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Chars) -> bool {
-    source == affected
-}
 
 /// "This creature is the chosen type in addition to its other types." (CR 205.1b, layer 4)
 fn chosen_type_too(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {

@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::statics::itself;
 use cantrip_mechanics::choose;
 use cantrip_mechanics::effects;
 use cantrip_oracle as oracle;
@@ -22,10 +23,6 @@ fn enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
     Ok(())
 }
 
-fn affects(_: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Chars) -> bool {
-    source == affected
-}
-
 /// "This land is the chosen type" (CR 305.7): replaces its subtypes; the mana ability follows from the subtype (CR 305.6).
 fn apply(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
     if let Some(chosen) = q.state().obj(source).chosen_subtype {
@@ -36,6 +33,6 @@ fn apply(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
 pub static CARD: CardDef = CardDef {
     enters: Some(enters),
     labels: &["Plains", "Island", "Swamp", "Mountain", "Forest"],
-    statics: &[static_ability(Layer::Type, affects, apply, "This land is the chosen type.")],
+    statics: &[static_ability(Layer::Type, itself, apply, "This land is the chosen type.")],
     ..oracle::MULTIVERSAL_PASSAGE
 };

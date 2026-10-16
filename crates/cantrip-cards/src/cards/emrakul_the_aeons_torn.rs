@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::statics::itself;
 use cantrip_mechanics::triggers::{annihilator, CAST_THIS_SPELL};
 use cantrip_oracle as oracle;
 
@@ -28,10 +29,6 @@ fn shuffle_graveyard_in(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspen
 /// "Protection from spells that are one or more colors."
 fn protection(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.protection_colored_spells = true;
-}
-
-fn itself(_: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Chars) -> bool {
-    source == affected
 }
 
 pub static CARD: CardDef = CardDef {
