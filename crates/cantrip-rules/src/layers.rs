@@ -398,8 +398,10 @@ fn statics(
     // CR 707.9d: a copy that states its colors or its power and toughness does not copy a characteristic-defining
     // ability that would define them.
     let overridden = (layer == Layer::Color && overrides.0) || (layer == Layer::PtDefine && overrides.1);
+    // CR 604.3, 613.1f: its own characteristic-defining abilities are static abilities, so layer 6 takes them away, and the layers
+    // after it (a power and toughness one, 613.4a) find them gone. Those of layers 4 and 5 were applied before, and stay (CR 613.6).
     for st in def.statics.iter().filter(|s| s.own && s.layer == layer) {
-        if !overridden {
+        if !overridden && !(layer >= Layer::Ability && state.lost_all_abilities(id)) {
             (st.apply)(&view, id, chars);
         }
     }

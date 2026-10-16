@@ -35,6 +35,9 @@ fn damage_by_the_entered_creature(g: &mut dyn Game, item: &StackItem) -> Result<
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(when(EventMask::ZONE_CHANGE, lhurgoyf_enters), damage_by_the_entered_creature, "Whenever this creature or another Lhurgoyf creature you control enters, that creature deals damage equal to its power to any target.")
         .targets(&[targets::ANY])],
+    // Printed */1+*: with its ability gone the star is worth 0 (CR 208.2a, 208.5), so a 0/1.
+    power: Some(0),
+    toughness: Some(1),
     statics: &[goyf::SIZE],
     ..oracle::PYROGOYF
 };
