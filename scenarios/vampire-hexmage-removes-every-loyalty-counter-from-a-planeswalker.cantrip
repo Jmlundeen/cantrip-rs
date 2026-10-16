@@ -1,0 +1,43 @@
+# "Remove all counters from target permanent" takes a planeswalker's loyalty counters too: Bot2's Liliana of the Veil, at 4 loyalty
+# after her +1, is left with none and is put into her owner's graveyard (CR 122.1, 704.5i). Hexmage is sacrificed as the cost.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Vampire Hexmage
+Swamp x17
+
+[Bot2 Deck]
+Swamp
+Swamp
+Swamp
+Liliana of the Veil
+Swamp x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Vampire Hexmage.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp#1.Activate
+Bot2.Battlefield.Swamp#2.Activate
+Bot2.Battlefield.Swamp#3.Activate
+Bot2.Hand.Liliana of the Veil.Cast
+Bot2.Battlefield.Liliana of the Veil.Activate(Ability: +1)
+[T6 Bot2.Main2]
+? Bot2.Battlefield.Liliana of the Veil.Counters.Loyalty = 4
+[T7 Bot1.Main1]
+Bot1.Battlefield.Vampire Hexmage.Activate(Bot2.Battlefield.Liliana of the Veil)
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Vampire Hexmage; Swamp
+Bot2.Graveyard = Liliana of the Veil; Swamp

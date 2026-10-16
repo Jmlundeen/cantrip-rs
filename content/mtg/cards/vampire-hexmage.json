@@ -1,0 +1,11 @@
+{
+  "name": "Vampire Hexmage",
+  "manaCost": "{B}{B}",
+  "type": "Creature — Vampire Shaman",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "First strike\nSacrifice this creature: Remove all counters from target permanent.",
+  "keywords": [
+    "FirstStrike"
+  ]
+}
