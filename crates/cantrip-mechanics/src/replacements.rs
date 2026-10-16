@@ -49,6 +49,24 @@ pub fn plus_one_counters_apply(proposal: &mut Proposal) {
     }
 }
 
+/// "If one or more tokens would be created under your control" (CR 111.1, 614.1a): whose they would be, not who makes
+/// them.
+fn tokens_under_your_control(_: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool {
+    matches!(proposal, Proposal::TokenCreation(t) if t.controller == asker.controller && t.count > 0)
+}
+
+/// "... twice that many of those tokens are created instead."
+fn twice_that_many_tokens(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
+    if let Proposal::TokenCreation(t) = proposal {
+        t.count = t.count.saturating_mul(2);
+    }
+}
+
+/// "If one or more tokens would be created under your control, twice that many of those tokens are created instead."
+/// Elspeth, Storm Slayer and Exalted Sunborn print it.
+pub const DOUBLE_TOKENS: ReplacementDef =
+    replacement(ReplacementKind::TokenCreation, tokens_under_your_control, twice_that_many_tokens, "twice that many tokens are created");
+
 fn buyback_applies(q: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool {
     matches!(proposal, Proposal::ZoneChange(z)
         if z.object == asker.source

@@ -3,18 +3,6 @@ use cantrip_mechanics::{tokens::SOLDIER, destroy_target};
 use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
 
-/// "If one or more tokens would be created under your control" (CR 111.1, 614.1a): whose they would be, not who makes them.
-fn tokens_under_your_control(_: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool {
-    matches!(proposal, Proposal::TokenCreation(t) if t.controller == asker.controller && t.count > 0)
-}
-
-/// "... twice that many of those tokens are created instead."
-fn twice_that_many(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
-    if let Proposal::TokenCreation(t) = proposal {
-        t.count = t.count.saturating_mul(2);
-    }
-}
-
 /// +1: Create a 1/1 white Soldier creature token.
 fn plus_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     cantrip_mechanics::tokens::create(g, item.controller, &SOLDIER, 1)?;
@@ -48,7 +36,7 @@ fn minus_three(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    replacements: &[replacement(ReplacementKind::TokenCreation, tokens_under_your_control, twice_that_many, "twice that many tokens are created")],
+    replacements: &[cantrip_mechanics::replacements::DOUBLE_TOKENS],
     abilities: &[
         ability(loyalty(1), plus_one, "+1: Create a 1/1 white Soldier creature token."),
         ability(loyalty(0), zero, "0: Put a +1/+1 counter on each creature you control. Those creatures gain flying until your next turn."),
