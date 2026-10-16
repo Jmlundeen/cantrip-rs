@@ -1,0 +1,53 @@
+# An alternative cost may be paid whatever zone the spell is cast from (CR 118.9, 601.2b): web-slinging is printed for the
+# hand, but under Yawgmoth's Will ("you may play lands and cast spells from your graveyard") Bot1 casts Spider-Sense from
+# its graveyard for its web-slinging cost {U} (Mox Sapphire), returning its Ornithopter, tapped from attacking, and
+# counters Bot2's second Lightning Bolt. Leaving the stack, it is exiled instead of going to the graveyard, as the Will
+# itself was.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Black Lotus
+Ornithopter
+Spider-Sense
+Yawgmoth's Will
+Island x14
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Mountain x16
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Spider-Sense.Cast(Stack.Lightning Bolt)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Yawgmoth's Will.Cast
+Bot1.Attack(Ornithopter > Bot2)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Graveyard.Spider-Sense.Cast(Stack.Lightning Bolt; Ability: Web-slinging)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Choose(Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Life = 20
+Bot1.Battlefield = Island; Mox Sapphire
+Exile = Spider-Sense; Yawgmoth's Will
+Bot2.Graveyard = Lightning Bolt; Lightning Bolt
