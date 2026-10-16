@@ -1,0 +1,14 @@
+# Deathcap Glade: with no other land it enters tapped (CR 614.1c) - the land itself is not counted.
+
+[Bot1 Deck]
+Deathcap Glade
+Forest x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Deathcap Glade.Play
+
+[Expect]
+Bot1.Battlefield.Deathcap Glade.Tapped = true

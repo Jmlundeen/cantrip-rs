@@ -1,0 +1,22 @@
+# Deathcap Glade: with two other lands it enters untapped (CR 614.1c) and its mana ability adds {B} (chosen as it is activated).
+
+[Bot1 Deck]
+Forest
+Forest
+Deathcap Glade
+Forest x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Deathcap Glade.Play
+Bot1.Battlefield.Deathcap Glade.Activate(Color: Black)
+
+[Expect]
+Bot1.Battlefield.Deathcap Glade.Tapped = true
+Bot1.Mana = {B}

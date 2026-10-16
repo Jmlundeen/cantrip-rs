@@ -1,0 +1,17 @@
+# Deathcap Glade: one other land is not two, so it enters tapped - the boundary under the 'two or more' of its text.
+
+[Bot1 Deck]
+Forest
+Deathcap Glade
+Forest x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Deathcap Glade.Play
+
+[Expect]
+Bot1.Battlefield.Deathcap Glade.Tapped = true
