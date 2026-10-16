@@ -1,0 +1,35 @@
+# Ori without an enduring story (CR 702.195b): Ori and one Mox are two permanents that are artifacts and/or legendary, so
+# Ori is a plain 3/3. It attacks on turn five for 3 and is tapped by it, having no vigilance.
+
+[Bot1 Deck]
+Plains
+Plains
+Mox Pearl
+Ori, Keeper of Songs
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ori, Keeper of Songs.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+[T5 Bot1.Main1]
+Bot1.Attack(Ori, Keeper of Songs)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.EnduringStory = (absent)
+Bot2.Life = 17
+Bot1.Battlefield.Ori, Keeper of Songs.Power = 3
+Bot1.Battlefield.Ori, Keeper of Songs.Keywords = (absent)
+Bot1.Battlefield.Ori, Keeper of Songs.Tapped = true

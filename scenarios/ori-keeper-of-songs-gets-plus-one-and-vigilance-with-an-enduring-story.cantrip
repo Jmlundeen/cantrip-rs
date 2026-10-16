@@ -1,0 +1,36 @@
+# Ori, Keeper of Songs (CR 702.195b): "As long as you have an enduring story, Ori gets +1/+0 and has vigilance." Ori and two
+# Moxes give Bot1 the story as Ori enters; on turn three Ori attacks as a 4/3 with vigilance - Bot2 goes to 16 and Ori stays
+# untapped. The control is ori-keeper-of-songs-without-an-enduring-story-is-a-3-3-that-taps-to-attack.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Ori, Keeper of Songs
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ori, Keeper of Songs.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+[T3 Bot1.Main1]
+Bot1.Attack(Ori, Keeper of Songs)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.EnduringStory = true
+Bot2.Life = 16
+Bot1.Battlefield.Ori, Keeper of Songs.Power = 4
+Bot1.Battlefield.Ori, Keeper of Songs.Toughness = 3
+Bot1.Battlefield.Ori, Keeper of Songs.Keywords = Vigilance
+Bot1.Battlefield.Ori, Keeper of Songs.Tapped = false
