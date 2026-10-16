@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::triggers::NONCREATURE_SPELL_YOU_CAST;
-use cantrip_mechanics::{discard_chosen, pump};
+use cantrip_mechanics::{discard_chosen, effects};
 use cantrip_oracle as oracle;
 
 const ASK: Question = Question::new("Draw", "draw a card?", "If you do, discard a card", "Draw and discard", "Don't draw");
@@ -8,11 +8,7 @@ const ASK: Question = Question::new("Draw", "draw a card?", "If you do, discard 
 /// Creatures you control get +1/+1 until end of turn, and untap those creatures. The creatures are fixed as the ability
 /// resolves (CR 611.2c): "those creatures" is exactly that set.
 fn pump_untap(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let creatures: Vec<ObjectId> =
-        g.permanents_of(item.controller).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
-    for &creature in &creatures {
-        pump(g, item.object, creature, 1, 1);
-    }
+    let creatures = effects::pump_creatures_you_control(g, item, 1, 1);
     for &creature in &creatures {
         g.untap(creature);
     }

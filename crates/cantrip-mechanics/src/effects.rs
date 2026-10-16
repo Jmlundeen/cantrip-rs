@@ -10,6 +10,18 @@ pub fn enters_with_x_counters(_: &mut dyn Game, entering: &mut Entering) -> Resu
     Ok(())
 }
 
+/// "Creatures you control get +`power`/+`toughness` until end of turn" (CR 611.2, 611.2c): the creatures `item`'s controller
+/// controls as it resolves, and no creature that enters later. The creatures, for what the rest of the sentence does to them
+/// ("and gain haste", "untap those creatures"). Assault Formation, Eagles of the North, Fatehold Charm, Haze of Rage, Jeskai
+/// Ascendancy, Silk Web Weaver and Warhost's Frenzy print it.
+pub fn pump_creatures_you_control(g: &mut dyn Game, item: &StackItem, power: i16, toughness: i16) -> Vec<ObjectId> {
+    let creatures: Vec<ObjectId> = g.permanents_of(item.controller).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
+    for &id in &creatures {
+        crate::pump(g, item.object, id, power, toughness);
+    }
+    creatures
+}
+
 /// "Put `n` `kind` counters on each creature you control": on the creatures `player` controls as it is read, one after the
 /// other. The creatures, for what the rest of the sentence does to "those creatures". Abandoned Air Temple, Elspeth,
 /// Storm Slayer, Anduril, Narsil Reforged, Gavony Township, Germination Practicum, Ouroboroid and The Theorist, Jace

@@ -1,15 +1,12 @@
 use cantrip_api::*;
 use cantrip_mechanics::typecycling;
-use cantrip_mechanics::{pump, triggers::THIS_ENTERS};
+use cantrip_mechanics::{effects, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 /// Creatures you control get +1/+0 and gain first strike until end of turn: the creatures there are as it resolves
 /// (CR 611.2c).
 fn pump_creatures(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let creatures: Vec<ObjectId> =
-        g.permanents_of(item.controller).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
-    for id in creatures {
-        pump(g, item.object, id, 1, 0);
+    for id in effects::pump_creatures_you_control(g, item, 1, 0) {
         g.add_effect(item.object, id, EffectKind::AddKeywords(Keywords::of(&[Keyword::FirstStrike])), Duration::EndOfTurn);
     }
     Ok(())

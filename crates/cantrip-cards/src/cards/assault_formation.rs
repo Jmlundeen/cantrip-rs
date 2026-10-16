@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::targets;
+use cantrip_mechanics::{effects, targets};
 use cantrip_oracle as oracle;
 
 /// "Each creature you control assigns combat damage equal to its toughness rather than its power" (CR 510.1a).
@@ -22,11 +22,7 @@ fn attack_despite_defender(g: &mut dyn Game, item: &StackItem) -> Result<(), Sus
 
 /// "{2}{G}: Creatures you control get +0/+1 until end of turn."
 fn plus_one_toughness(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    for id in g.permanents_of(item.controller) {
-        if g.chars(id).is(CardType::Creature) {
-            g.add_effect(item.object, id, EffectKind::Pump(0, 1), Duration::EndOfTurn);
-        }
-    }
+    effects::pump_creatures_you_control(g, item, 0, 1);
     Ok(())
 }
 

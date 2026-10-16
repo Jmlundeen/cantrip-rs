@@ -1,7 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::tokens::{self, HUMAN_CITIZEN};
 use cantrip_mechanics::triggers::CREATURE_SPELL_YOU_CAST;
-use cantrip_mechanics::{pump, web_slinging};
+use cantrip_mechanics::{effects, web_slinging};
 use cantrip_oracle as oracle;
 
 /// "Create a 1/1 green and white Human Citizen creature token."
@@ -13,10 +13,7 @@ fn citizen(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// "Creatures you control get +2/+2 and gain vigilance until end of turn": the creatures there are as it resolves
 /// (CR 611.2c).
 fn pump_creatures(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let creatures: Vec<ObjectId> =
-        g.permanents_of(item.controller).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
-    for id in creatures {
-        pump(g, item.object, id, 2, 2);
+    for id in effects::pump_creatures_you_control(g, item, 2, 2) {
         g.add_effect(item.object, id, EffectKind::AddKeywords(Keywords::of(&[Keyword::Vigilance])), Duration::EndOfTurn);
     }
     Ok(())

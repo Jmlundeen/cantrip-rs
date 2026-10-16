@@ -4,11 +4,7 @@ use cantrip_oracle as oracle;
 /// Creatures you control get +2/+0 until end of turn: the creatures there are as it resolves (CR 611.2c). If this
 /// spell was kicked, whenever a creature you control dies this turn, draw a card.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    for id in g.permanents_of(item.controller) {
-        if g.chars(id).is(CardType::Creature) {
-            g.add_effect(item.object, id, EffectKind::Pump(2, 0), Duration::EndOfTurn);
-        }
-    }
+    cantrip_mechanics::effects::pump_creatures_you_control(g, item, 2, 0);
     if g.obj(item.object).kicked > 0 {
         cantrip_mechanics::delayed::this_turn(g, item, item.object);
     }

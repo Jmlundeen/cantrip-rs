@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{effects, empower, pump, targets};
+use cantrip_mechanics::{effects, empower, targets};
 use cantrip_oracle as oracle;
 
 /// "Draw a card. Empower Jace 2." The card is drawn first, then empower Jace makes the token if there is none and puts
@@ -26,11 +26,7 @@ fn bounce(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 /// "Creatures you control get +1/+2 until end of turn": those there as it resolves (CR 611.2c).
 fn pump_team(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    for id in g.permanents_of(item.controller) {
-        if g.chars(id).is(CardType::Creature) {
-            pump(g, item.object, id, 1, 2);
-        }
-    }
+    effects::pump_creatures_you_control(g, item, 1, 2);
     Ok(())
 }
 
