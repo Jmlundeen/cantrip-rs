@@ -1,0 +1,59 @@
+# Hurkyl's Final Meditation on Bot1's own turn costs its mana cost, {4}{U}{U}{U}: Bot1 floats exactly seven mana and casts
+# it with nothing left over. It returns every nonland permanent to its owner's hand at once - Bot1's Moxen and Sol Ring,
+# Bot2's Orcish Bowmasters - and the Orc Army token, in a hand, ceases to exist (CR 704.5d). Then the turn ends (CR
+# 724.1): the spell is exiled, the lands stay, and turn 4 is Bot2's.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Sol Ring
+Black Lotus
+Hurkyl's Final Meditation
+Island x20
+
+[Bot2 Deck]
+Swamp
+Mox Emerald
+Orcish Bowmasters
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Orcish Bowmasters.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Target(Bot1)
+[T3 Bot1.Main1]
+? Bot2.Battlefield = Swamp; Mox Emerald; Orcish Bowmasters; Orc Army
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Hurkyl's Final Meditation.Cast
+? Bot1.Mana =
+[T4 Bot2.Upkeep]
+
+[Expect]
+Turn = 4
+Bot1.Battlefield = Island
+Bot1.Battlefield.Island.Tapped = false
+Bot2.Battlefield = Swamp
+Bot1.Hand = Mox Sapphire; Mox Jet; Mox Ruby; Mox Pearl; Sol Ring
+Bot2.Hand.Count = 7
+Exile = Hurkyl's Final Meditation
+Bot1.Graveyard = Black Lotus
