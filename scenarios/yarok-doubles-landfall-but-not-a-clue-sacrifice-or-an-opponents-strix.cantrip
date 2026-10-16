@@ -1,0 +1,68 @@
+# Yarok, the Desecrated: "If a permanent entering causes a triggered ability of a permanent you control to trigger, that
+# ability triggers an additional time" (CR 603.2d). A land is a permanent: on turn 3 an Island enters under Bot1's Tireless
+# Tracker and landfall triggers twice, two Clues. Sacrificing a Clue is no entering: the Tracker's "Whenever you sacrifice
+# a Clue, put a +1/+1 counter on this creature" triggers once, one counter. Bot2's Baleful Strix entering on turn 2 is a
+# permanent entering, but its ability is not of a permanent Bot1 controls: Bot2 draws one card.
+# Bot1's hand: 7 - 6 played on turn 1 = 1; turn 3 draws the Island (2), plays it and the Tracker (0), draws one from the
+# Clue (1). Bot2's: 7 + 1 - 3 + 1 = 6.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Mox Jet
+Mox Emerald
+Mox Sapphire
+Yarok, the Desecrated
+Tireless Tracker
+Island
+Forest x10
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Jet
+Baleful Strix
+Island x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Yarok, the Desecrated.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Baleful Strix.Cast
+[T2 Bot2.Main2]
+? Bot2.Hand.Count = 6
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Tireless Tracker.Cast
+Bot1.Pass
+Bot1.Hand.Island.Play
+Bot1.Triggers(Tireless Tracker; Tireless Tracker)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Clue Token#2.Token = true
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Clue Token.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand.Count = 1
+Bot2.Hand.Count = 6
+Bot1.Battlefield = Forest; Island; Mox Jet; Mox Emerald; Mox Sapphire; Yarok, the Desecrated; Tireless Tracker; Clue Token
+Bot1.Battlefield.Tireless Tracker.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Yarok, the Desecrated.Keywords = Deathtouch; Lifelink

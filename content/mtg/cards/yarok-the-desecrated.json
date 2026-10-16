@@ -1,0 +1,12 @@
+{
+  "name": "Yarok, the Desecrated",
+  "manaCost": "{2}{B}{G}{U}",
+  "type": "Legendary Creature — Elemental Horror",
+  "power": 3,
+  "toughness": 5,
+  "oracleText": "Deathtouch, lifelink\nIf a permanent entering causes a triggered ability of a permanent you control to trigger, that ability triggers an additional time.",
+  "keywords": [
+    "Deathtouch",
+    "Lifelink"
+  ]
+}
