@@ -7,9 +7,10 @@
 
 use cantrip_api::*;
 
-/// The alternative cost of warp: cast from the hand for `cost` (CR 118.9).
+/// The alternative cost of warp: cast from the hand for `cost` (CR 118.9), and only from the hand: "You may cast this card
+/// from your hand for its warp cost" (CR 702.185a), so a permission to cast it from exile or a graveyard does not open it.
 pub const fn way(cost: ManaCost, text: &'static str) -> WayDef {
-    cantrip_api::way(Cost::mana(cost), ZoneKind::Hand, text).kind(WayKind::Warp)
+    cantrip_api::way(Cost::mana(cost), ZoneKind::Hand, text).kind(WayKind::Warp).only_from()
 }
 
 /// Warp's delayed ability (CR 702.185a): the way is the card's first and this its first delayed ability.

@@ -1,0 +1,47 @@
+# Warp is cast from the hand only (CR 702.185a: "You may cast this card from your hand for its warp cost"). Bot1 warps
+# Quantum Riddler for {1}{U} on turn 1 (Island, Mox Sapphire); at the end step it is exiled, and its owner may cast it
+# from exile on a later turn. On turn 7 Bot1 has five mana up (four Islands and the Mox), enough for the warp cost, but
+# the card is in exile, so warp is not offered (refused); it is cast for its mana cost {3}{U}{U} instead (the positive
+# control). Not warped this time, it is not exiled at that turn's end step: it is still on the battlefield on turn 8.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Quantum Riddler
+Island
+Island
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Forest x22
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Quantum Riddler.Cast(Ability: Warp)
+[T2 Bot2.Main1]
+? Exile = Quantum Riddler
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+! Bot1.Exile.Quantum Riddler.Cast(Ability: Warp)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Island#3.Activate
+Bot1.Battlefield.Island#4.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Exile.Quantum Riddler.Cast
+[T8 Bot2.Main1]
+
+[Expect]
+Turn = 8
+Stack.Count = 0
+Exile.Count = 0
+Bot1.Battlefield = Island; Island; Island; Island; Mox Sapphire; Quantum Riddler

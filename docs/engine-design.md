@@ -406,7 +406,8 @@ Known gaps:
   cards in hand, which only exists for cards in graveyards (`granted_ways_of`).
 - `web_slinging::way` is a way from the hand (`ZoneKind::Hand`), like every printed alternative cost. Cast from
   elsewhere at priority by a permission or the card's own say-so, a hand way is offered too (`castable`'s `elsewhere`;
-  Spider-Sense from the graveyard under Yawgmoth's Will is a scenario), but a cast made while an effect resolves
+  Spider-Sense from the graveyard under Yawgmoth's Will is a scenario, and sneak's instant-speed way likewise), unless its
+  text names the hand (`WayDef::only_from`: warp, CR 702.185a, so a warped card is cast from exile for its mana cost), but a cast made while an effect resolves
   (`cast_ways_during_resolution`) is offered for the card's mana cost and faces only: an effect that lets a spell be cast
   paying its costs ("cast it from exile this turn") as it resolves can't use web-slinging or any other alternative cost.
 - No scenario reaches Questing Beast's unpreventable damage, Emrakul's extra turn on cast, or Tamiyo's -7 emblem.

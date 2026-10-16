@@ -896,6 +896,11 @@ pub struct WayDef {
     pub cost: Cost,
     /// The zone it is cast from this way.
     pub from: ZoneKind,
+    /// Its own text names that zone: warp's "You may cast this card from your hand for its warp cost" (CR 702.185a). A way
+    /// from the hand that names no zone (Force of Will's, evoke's, web-slinging's) is an alternative cost that may be paid
+    /// whatever zone a rule or permission has the spell cast from (CR 118.9, 601.3); one that names the hand is not open to a
+    /// card cast from anywhere else, as a warped card cast from exile later is not (CR 702.185a).
+    pub only_from: bool,
     /// Exiled instead of going anywhere else as it leaves the stack (flashback, CR 702.34a).
     pub exile_after: bool,
     pub condition: Option<Condition>,

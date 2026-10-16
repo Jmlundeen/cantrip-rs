@@ -1,0 +1,57 @@
+# Warp is cast from the hand only (CR 702.185a: "You may cast this card from your hand for its warp cost"), so a rule
+# that lets a card be cast from another zone does not open it, though it opens an alternative cost that names no zone
+# (CR 118.9, 601.3; Force of Will's, web-slinging's). Bot1 casts Pinnacle Emissary for its mana cost on turn 1 and Bot2
+# bolts it. On turn 3 Bot1 casts Yawgmoth's Will ("you may cast spells from your graveyard"); with Mox Sapphire and Black
+# Lotus up, the warp cost {U/R} could be paid, but the Emissary is in the graveyard, so warp is not offered (refused). It
+# is cast from the graveyard for its mana cost {1}{U}{R} instead (the positive control), and, not warped, it is not
+# exiled at the end step: it is still on the battlefield on turn 4. Black Lotus, sacrificed while the Will applies, and
+# the Will itself are exiled.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Ruby
+Pinnacle Emissary
+Swamp
+Yawgmoth's Will
+Black Lotus
+Island x13
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Pinnacle Emissary.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Pinnacle Emissary)
+[T3 Bot1.Main1]
+? Bot1.Graveyard = Pinnacle Emissary
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Yawgmoth's Will.Cast
+Bot1.Pass
+! Bot1.Graveyard.Pinnacle Emissary.Cast(Ability: Warp)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Graveyard.Pinnacle Emissary.Cast
+[T4 Bot2.Main1]
+
+[Expect]
+Turn = 4
+Stack.Count = 0
+Bot1.Battlefield = Island; Swamp; Mox Sapphire; Mox Ruby; Pinnacle Emissary
+Bot1.Graveyard.Count = 0
+Exile = Black Lotus; Yawgmoth's Will

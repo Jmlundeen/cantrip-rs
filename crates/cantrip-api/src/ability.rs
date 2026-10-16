@@ -718,7 +718,7 @@ pub const fn granted_replacement(kind: ReplacementKind, applies: GrantedApplies,
 
 /// An alternative way to cast the card (CR 118.9): for `cost`, from the zone `from`.
 pub const fn way(cost: Cost, from: ZoneKind, text: &'static str) -> WayDef {
-    WayDef { text, cost, from, exile_after: false, condition: None, instant_speed: false, kind: WayKind::Other }
+    WayDef { text, cost, from, only_from: false, exile_after: false, condition: None, instant_speed: false, kind: WayKind::Other }
 }
 
 impl WayDef {
@@ -727,6 +727,11 @@ impl WayDef {
         WayDef { kind, ..self }
     }
 
+    /// Its text names the zone it is cast from ("cast this card from your hand", CR 702.185a): no permission to cast the
+    /// card from another zone opens it.
+    pub const fn only_from(self) -> WayDef {
+        WayDef { only_from: true, ..self }
+    }
 
     /// It is exiled instead of going anywhere else as it leaves the stack (flashback, CR 702.34a).
     pub const fn exile_after(self) -> WayDef {

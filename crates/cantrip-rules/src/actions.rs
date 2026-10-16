@@ -1651,15 +1651,24 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
             let instant = (def.is(CardType::Instant) || def.keywords.has(Keyword::Flash) || def.cast_as_though_flash || def.types.0 & flash.0 != 0
                 || (!flash_granters.is_empty() && static_rules::grants_flash(cx, &flash_granters, player, id)))
                 && !grant.is_some_and(|g| g.sorcery_speed);
+            // Or by the card's own say-so, for its ordinary cost (CR 113.6b): "You may cast this card from your graveyard";
+            // or by a rule that lets its owner cast spells from their graveyard (Yawgmoth's Will).
+            let from_graveyard = zone.is(ZoneKind::Graveyard) && own && (def.keywords.has(Keyword::CastFromYourGraveyard) || graveyard_play(cx, player));
+            // Or by retrace (CR 702.81a), printed or granted: for its ordinary cost and a land card discarded. Asked only on
+            // the pass that may cast it, at its own speed or by an instant-speed way.
+            let retrace = zone.is(ZoneKind::Graveyard)
+                && own
+                && !from_graveyard
+                && (instant == instants || (instants && def.ways.iter().any(|w| w.instant_speed)))
+                && cx.chars(id).has(Keyword::Retrace)
+                && can_pay_other(cx, id, player, &RETRACE);
+            let elsewhere = permitted || from_graveyard || retrace || adventured;
+            // Whether a way of casting it from the hand is open to it here (CR 118.9, 601.3): one that names no zone is an
+            // alternative cost that may be paid whatever zone a rule or permission has the spell cast from, as Yawgmoth's
+            // Will does for Force of Will's, Daze's or web-slinging's; one whose text names the hand is not (warp, CR
+            // 702.185a). `elsewhere` is a rule or permission that has it cast from this other zone.
+            let from_elsewhere = |way: &WayDef, elsewhere: bool| way.from == ZoneKind::Hand && !way.only_from && !zone.is(ZoneKind::Hand) && elsewhere;
             if instant == instants {
-                // Or by the card's own say-so, for its ordinary cost (CR 113.6b): "You may cast this card from your graveyard".
-                let from_graveyard = zone.is(ZoneKind::Graveyard) && own && (def.keywords.has(Keyword::CastFromYourGraveyard) || graveyard_play(cx, player));
-                // Or by retrace (CR 702.81a), printed or granted: for its ordinary cost and a land card discarded.
-                let retrace = zone.is(ZoneKind::Graveyard)
-                    && own
-                    && !from_graveyard
-                    && cx.chars(id).has(Keyword::Retrace)
-                    && can_pay_other(cx, id, player, &RETRACE);
                 if def.split.is_none()
                     && (zone.is(ZoneKind::Hand) || prepared_copy || adventured || permitted || from_graveyard || retrace)
                     && (def.has_cost || instead.is_some())
@@ -1687,11 +1696,7 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
                     if way.instant_speed {
                         continue;
                     }
-                    // An alternative cost may be used whatever zone the spell is cast from (CR 118.9, 601.2b): one that is
-                    // paid from the hand, as Daze's, Fireblast's and Force of Will's are, also when a permission or the
-                    // card's own say-so has it cast from elsewhere, as Yawgmoth's Will does.
-                    let elsewhere = way.from == ZoneKind::Hand && !zone.is(ZoneKind::Hand) && (permitted || from_graveyard || retrace || adventured);
-                    if (way.from != zone.kind() && !elsewhere) || !own {
+                    if (way.from != zone.kind() && !from_elsewhere(way, elsewhere)) || !own {
                         continue;
                     }
                     if let Some(condition) = way.condition
@@ -1726,9 +1731,13 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
                 }
             }
             // An alternative cost that may be used whenever an instant could be cast, whatever the card is (sneak, CR 702.190a).
+            // From another zone by a permission (sneak names no zone), unless the permission says when (CR 601.3).
             if instants {
                 for (n, way) in def.ways.iter().enumerate() {
-                    if !way.instant_speed || way.from != zone.kind() || !own {
+                    if !way.instant_speed || !own {
+                        continue;
+                    }
+                    if way.from != zone.kind() && !from_elsewhere(way, elsewhere && !grant.is_some_and(|g| g.sorcery_speed)) {
                         continue;
                     }
                     if let Some(condition) = way.condition
