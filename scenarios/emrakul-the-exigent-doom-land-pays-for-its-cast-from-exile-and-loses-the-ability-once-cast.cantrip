@@ -1,0 +1,49 @@
+# Emrakul, the Exigent Doom: "{3}, Exile this card from your hand: Target land gains "{T}: Add {C}{C}" until this card is
+# cast from exile. You may cast this card for as long as it remains exiled." Bot1 pays {3} with a Black Lotus and gives the
+# Island the ability, then casts Emrakul from exile for {10}, the Island's {C}{C} paying part of it (the ruling: the ability
+# may be used while casting Emrakul). Once Emrakul is cast (CR 601.2i) the Island has lost it (CR 611.2a): its cast trigger
+# untaps the Island, which can still tap for {U} but no longer for {C}{C}. Emrakul resolves.
+
+[Bot1 Deck]
+Island
+Emrakul, the Exigent Doom
+Black Lotus x3
+Mana Crypt
+Island
+Island x10
+
+[Bot2 Deck]
+Swamp x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mana Crypt.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Emrakul, the Exigent Doom.Activate(Bot1.Battlefield.Island)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+[T1 Bot1.Main1]
+? Exile = Emrakul, the Exigent Doom
+? Bot1.Graveyard = Black Lotus
+Bot1.Exile.Emrakul, the Exigent Doom.Cast
+Bot1.Battlefield.Island.Activate(Ability: {C}{C})
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mana Crypt.Activate
+? Stack.Count = 2
+? Bot1.Battlefield.Island.Tapped = true
+Bot1.Pass
+! Bot1.Battlefield.Island.Activate(Ability: {C}{C})
+Bot1.Battlefield.Island.Activate(Ability: {U})
+? Bot1.Mana = {U}
+? Stack = Emrakul, the Exigent Doom
+Bot1.Pass
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Battlefield = Island; Mana Crypt; Emrakul, the Exigent Doom
+Bot1.Battlefield.Island.Tapped = true
+Bot1.Graveyard = Black Lotus; Black Lotus; Black Lotus
+Exile.Count = 0

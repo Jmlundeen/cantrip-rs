@@ -1,0 +1,45 @@
+# Emrakul, the Exigent Doom's ward asks for three permanents (CR 702.21a, 118.12). Bot2 controls exactly three (a
+# Mountain and two Moxen) when it Lightning Bolts Emrakul, agrees to pay, and has nothing to choose: all three are
+# sacrificed and the Bolt resolves.
+
+[Bot1 Deck]
+Island
+Emrakul, the Exigent Doom
+Black Lotus x3
+Island x10
+
+[Bot2 Deck]
+Mountain
+Mox Pearl
+Mox Jet
+Lightning Bolt
+Mountain x11
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Emrakul, the Exigent Doom.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Emrakul, the Exigent Doom)
+Bot2.Accept
+! Bot2.Choose
+? Stack = Lightning Bolt
+? Bot2.Battlefield.Count = 0
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot1.Battlefield.Emrakul, the Exigent Doom.Damage = 3
+Bot2.Battlefield.Count = 0
+Bot2.Graveyard = Lightning Bolt; Mox Jet; Mox Pearl; Mountain

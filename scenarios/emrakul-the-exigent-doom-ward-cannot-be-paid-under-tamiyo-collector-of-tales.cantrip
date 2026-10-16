@@ -1,0 +1,54 @@
+# Tamiyo, Collector of Tales: "Spells and abilities your opponents control can't cause you to sacrifice permanents."
+# Her ruling: when an opponent's ability says something happens unless you sacrifice a permanent, you can't choose to
+# sacrifice (CR 101.2). Bot2 controls Tamiyo and five other permanents when it Lightning Bolts Bot1's Emrakul, the Exigent
+# Doom: Emrakul's ward, Bot1's ability, can't be paid, so Bot2 is not asked and the Bolt is countered.
+
+[Bot1 Deck]
+Island
+Emrakul, the Exigent Doom
+Black Lotus x3
+Island x10
+
+[Bot2 Deck]
+Mountain
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Tamiyo, Collector of Tales
+Lightning Bolt
+Mountain x8
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Emrakul, the Exigent Doom.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Tamiyo, Collector of Tales.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Emrakul, the Exigent Doom)
+! Bot2.Accept
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot1.Battlefield.Emrakul, the Exigent Doom.Damage = 0
+Bot2.Battlefield = Mountain; Mox Emerald; Mox Sapphire; Mox Jet; Mox Ruby; Tamiyo, Collector of Tales
+Bot2.Graveyard = Lightning Bolt

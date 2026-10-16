@@ -1,0 +1,44 @@
+# Emrakul, the Exigent Doom's grant is to the land as it is (CR 611.2c, 400.7). Bot1 gives its Island "{T}: Add {C}{C}" on
+# turn 1, and on turn 2 returns that Island to hand to cast Daze for its alternative cost against Bot2's Duress. Played
+# again on turn 3, the Island is a new object the effect knows nothing of: it taps for {U} and no longer for {C}{C}, though
+# Emrakul is still in exile and has not been cast.
+
+[Bot1 Deck]
+Island
+Emrakul, the Exigent Doom
+Black Lotus
+Daze
+Swamp x11
+
+[Bot2 Deck]
+Swamp
+Duress
+Swamp x13
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Emrakul, the Exigent Doom.Activate(Bot1.Battlefield.Island)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+[T1 Bot1.Main2]
+Bot1.Battlefield.Island.Activate(Ability: {C}{C})
+? Bot1.Mana = {C}{C}
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Duress.Cast(Bot1)
+Bot1.Hand.Daze.Cast(Duress; Ability: Return an Island)
+Bot1.Choose(Island)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+! Bot1.Battlefield.Island.Activate(Ability: {C}{C})
+Bot1.Battlefield.Island.Activate(Ability: {U})
+? Bot1.Mana = {U}
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Exile = Emrakul, the Exigent Doom
+Bot1.Battlefield = Island
+Bot1.Graveyard = Daze; Black Lotus
+Bot2.Graveyard = Duress

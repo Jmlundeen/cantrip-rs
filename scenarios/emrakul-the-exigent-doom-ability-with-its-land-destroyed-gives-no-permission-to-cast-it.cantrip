@@ -1,0 +1,42 @@
+# Emrakul, the Exigent Doom's activated ability has one target, the land. Bot1 activates it on Bot2's turn, exiling
+# Emrakul as the cost, and Bot2 answers with Strip Mine on that Island. With its only target gone the ability does not
+# resolve at all (CR 608.2b), so it gives no permission either: Emrakul stays in exile and, with ten mana open on Bot1's
+# next turn, cannot be cast from there, while the Black Lotus that could pay for it is offered.
+
+[Bot1 Deck]
+Island
+Emrakul, the Exigent Doom
+Black Lotus x4
+Swamp
+Swamp x8
+
+[Bot2 Deck]
+Strip Mine
+Swamp x14
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Strip Mine.Play
+Bot2.Pass
+Bot1.Hand.Emrakul, the Exigent Doom.Activate(Bot1.Battlefield.Island)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Battlefield.Strip Mine.Activate(Bot1.Battlefield.Island; Ability: Destroy)
+[T3 Bot1.Main1]
+? Exile = Emrakul, the Exigent Doom
+? Bot1.Graveyard = Island; Black Lotus
+Bot1.Hand.Swamp.Play
+! Bot1.Exile.Emrakul, the Exigent Doom.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Exile = Emrakul, the Exigent Doom
+Bot1.Battlefield = Swamp; Black Lotus; Black Lotus
+Bot1.Mana = {B}{B}{B}
+Bot2.Graveyard = Strip Mine

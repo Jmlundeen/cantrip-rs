@@ -1,0 +1,41 @@
+# Emrakul, the Exigent Doom's grant ends only when the card its cost exiled is cast from exile (CR 611.2a, 400.7). Bot1
+# exiles one Emrakul to give its Island "{T}: Add {C}{C}", then casts a second Emrakul from its hand, the Island's {U}
+# paying the last of it. That cast is from the hand and of another card, so the Island keeps the ability: once the cast
+# trigger has untapped it, it taps for {C}{C}. The exiled Emrakul stays in exile.
+
+[Bot1 Deck]
+Island
+Emrakul, the Exigent Doom
+Emrakul, the Exigent Doom
+Black Lotus x4
+Island x8
+
+[Bot2 Deck]
+Swamp x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Emrakul, the Exigent Doom.Activate(Bot1.Battlefield.Island)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+[T1 Bot1.Main1]
+? Exile = Emrakul, the Exigent Doom
+Bot1.Hand.Emrakul, the Exigent Doom.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate(Ability: {U})
+Bot1.Pass
+Bot1.Battlefield.Island.Activate(Ability: {C}{C})
+? Bot1.Mana = {C}{C}
+? Stack = Emrakul, the Exigent Doom
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Exile = Emrakul, the Exigent Doom
+Bot1.Battlefield = Island; Emrakul, the Exigent Doom
+Bot1.Graveyard.Count = 4

@@ -1,0 +1,54 @@
+# Emrakul, the Exigent Doom has "Ward--Sacrifice three permanents" (CR 702.21a, 118.12). Bot1 casts it on turn 1 off three
+# Black Lotuses and an Island, keeping a fourth Lotus: the exile ability works only from the hand, so Emrakul on the
+# battlefield offers none though the Lotus could pay {3}. On turn 2 Bot2 Lightning Bolts Emrakul. Bot2 controls four
+# permanents, agrees to pay, and chooses three of them, which are sacrificed together; the Bolt resolves and Emrakul,
+# 12/12, takes 3.
+
+[Bot1 Deck]
+Island
+Emrakul, the Exigent Doom
+Black Lotus x4
+Island x9
+
+[Bot2 Deck]
+Mountain
+Mox Pearl
+Mox Jet
+Mox Ruby
+Lightning Bolt
+Mountain x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Emrakul, the Exigent Doom.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+[T1 Bot1.Main2]
+? Bot1.Battlefield = Island; Black Lotus; Emrakul, the Exigent Doom
+! Bot1.Battlefield.Emrakul, the Exigent Doom.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Emrakul, the Exigent Doom)
+Bot2.Accept
+Bot2.Choose(Mox Ruby; Mox Jet; Mountain)
+? Stack = Lightning Bolt
+? Bot2.Battlefield = Mox Pearl
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot1.Battlefield.Emrakul, the Exigent Doom.Damage = 3
+Bot2.Battlefield = Mox Pearl
+Bot2.Graveyard = Lightning Bolt; Mountain; Mox Jet; Mox Ruby

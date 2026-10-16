@@ -1,0 +1,68 @@
+# Two Emrakul, the Exigent Doom grants are separate effects, each ending with its own card (CR 611.2a, 400.7). Bot1 exiles
+# the first Emrakul on turn 1 to give its Island "{T}: Add {C}{C}", and the second on turn 3 to give its Swamp the same.
+# The grants outlast the turns they were made on. On turn 5 Bot1 casts the first Emrakul from exile, the Swamp's {C}{C}
+# paying for part of it: once it is cast the Island has lost its ability and the Swamp keeps its own, which the other
+# Emrakul, still in exile, gave it. The cast trigger untaps both lands to show it, and only Bot1's lands: the Mana Crypt
+# and the Plains Bot2 tapped in response stay tapped.
+
+[Bot1 Deck]
+Island
+Swamp
+Mountain
+Emrakul, the Exigent Doom
+Emrakul, the Exigent Doom
+Black Lotus
+Black Lotus
+Mana Crypt
+Black Lotus
+Mountain x6
+
+[Bot2 Deck]
+Plains x15
+
+[Dice]
+1
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Emrakul, the Exigent Doom.Activate(Bot1.Battlefield.Island)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Emrakul, the Exigent Doom.Activate(Bot1.Battlefield.Swamp)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+[T3 Bot1.Main2]
+? Exile = Emrakul, the Exigent Doom; Emrakul, the Exigent Doom
+? Bot1.Hand = Mountain; Mana Crypt
+Bot1.Hand.Mana Crypt.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot2.Battlefield.Plains.Activate
+Bot1.Exile.Emrakul, the Exigent Doom#1.Cast
+Bot1.Battlefield.Swamp.Activate(Ability: {C}{C})
+Bot1.Battlefield.Island.Activate(Ability: {C}{C})
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Pass
+! Bot1.Battlefield.Island.Activate(Ability: {C}{C})
+Bot1.Battlefield.Island.Activate(Ability: {U})
+Bot1.Battlefield.Swamp.Activate(Ability: {C}{C})
+? Bot1.Mana = {U}{C}{C}
+? Stack = Emrakul, the Exigent Doom
+? Exile = Emrakul, the Exigent Doom
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Exile = Emrakul, the Exigent Doom
+Bot1.Battlefield = Island; Swamp; Mountain; Mana Crypt; Emrakul, the Exigent Doom
+Bot1.Battlefield.Mountain.Tapped = false
+Bot1.Battlefield.Mana Crypt.Tapped = true
+Bot2.Battlefield.Plains.Tapped = true
+Bot1.Life = 20

@@ -1,0 +1,42 @@
+# Emrakul, the Exigent Doom's ruling: "If Emrakul is removed from exile without being cast, the land will continue to have
+# this ability." Bot1 exiles Emrakul on turn 1 to give its Island "{T}: Add {C}{C}". On turn 2 Bot2's Binding Negotiation
+# chooses nothing from Bot1's revealed hand and puts the face-up Emrakul from exile into Bot1's graveyard (a new object, CR
+# 400.7, that can never be cast from exile as that card). On turn 3 the Island still taps for {C}{C}.
+
+[Bot1 Deck]
+Island
+Emrakul, the Exigent Doom
+Black Lotus
+Duress
+Island x11
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Binding Negotiation
+Swamp x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Emrakul, the Exigent Doom.Activate(Bot1.Battlefield.Island)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Binding Negotiation.Cast(Bot1)
+Bot2.Choose()
+Bot2.Choose(Emrakul, the Exigent Doom)
+[T3 Bot1.Main1]
+? Exile.Count = 0
+? Bot1.Graveyard = Emrakul, the Exigent Doom; Black Lotus
+Bot1.Battlefield.Island.Activate(Ability: {C}{C})
+? Bot1.Mana = {C}{C}
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Hand = Duress; Island; Island; Island; Island
+Bot2.Graveyard = Binding Negotiation
