@@ -6,15 +6,7 @@ use cantrip_oracle as oracle;
 /// Mode 0: "Avengers Disassembled deals 3 damage to each creature." One event for every creature (CR 120.2, 603.2c),
 /// the creatures being those on the battlefield as the mode is carried out (CR 608.2c).
 fn damage_creatures(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let hits: Vec<(ObjectId, Target, u16)> = g
-        .state()
-        .battlefield()
-        .iter()
-        .copied()
-        .filter(|&id| g.chars(id).is(CardType::Creature))
-        .map(|id| (item.object, Target::Object(id), 3))
-        .collect();
-    g.damage_together(&hits);
+    cantrip_mechanics::effects::damage_each_creature(g, item, 3);
     Ok(())
 }
 

@@ -117,3 +117,17 @@ pub fn return_spell_or_permanent_to_hand(g: &mut dyn Game, object: ObjectId) {
         g.return_to_hand(&[object]);
     }
 }
+
+/// "[This spell] deals `n` damage to each creature" (Pyroclasm, Fiery Confluence, Avengers Disassembled): one damage event
+/// for every creature on the battlefield as the effect is carried out (CR 608.2c), dealt simultaneously (CR 120.2, 603.2c).
+pub fn damage_each_creature(g: &mut dyn Game, item: &StackItem, n: u16) {
+    let hits: Vec<(ObjectId, Target, u16)> = g
+        .state()
+        .battlefield()
+        .iter()
+        .copied()
+        .filter(|&id| g.chars(id).is(CardType::Creature))
+        .map(|id| (item.object, Target::Object(id), n))
+        .collect();
+    g.damage_together(&hits);
+}

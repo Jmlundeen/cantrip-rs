@@ -4,10 +4,8 @@ use cantrip_oracle as oracle;
 
 /// Fiery Confluence deals 1 damage to each creature.
 fn creatures(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let all: Vec<ObjectId> = g.state().battlefield().iter().copied().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
     // One event (CR 120.2, 603.2c): "whenever a creature is dealt damage" sees them all at once.
-    let hits: Vec<(ObjectId, Target, u16)> = all.into_iter().map(|id| (item.object, Target::Object(id), 1)).collect();
-    g.damage_together(&hits);
+    cantrip_mechanics::effects::damage_each_creature(g, item, 1);
     Ok(())
 }
 
