@@ -460,6 +460,13 @@ impl<'a> Projector<'a> {
             let whose = if p == self.viewer { "you" } else { "they" };
             summary.pending_effects.push(format!("The next spell {whose} cast this turn can't be countered."));
         }
+        // "Whenever [event] this turn" / "until your next turn, whenever [event]" (CR 603.7b): a delayed triggered ability that
+        // waits for its event, on no object, so the page says it beside its controller's life total, in the ability's own words
+        // for the controller and with the controller's name for everyone else.
+        for d in s.delayed.iter().filter(|d| d.controller == p && matches!(d.when, DelayedWhen::ThisTurn | DelayedWhen::UntilNextTurnOf(_))) {
+            let text = game.cards.ability(d.ability).text();
+            summary.pending_effects.push(if p == self.viewer { text.to_string() } else { format!("{}: {text}", summary.name) });
+        }
         // "You may activate loyalty abilities of Jace planeswalkers you control ... any time you could cast an instant"
         // (CR 606.3, 611.2c): a permission about the player, on no object.
         for e in s.effects.iter().filter(|e| e.controller == p) {
