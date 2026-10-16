@@ -1,0 +1,6 @@
+{
+  "name": "Desolation of Smaug",
+  "manaCost": "{2}{R}{R}",
+  "type": "Sorcery",
+  "oracleText": "Desolation of Smaug deals 3 damage to each non-Dragon creature.\nAdd four mana in any combination of colors. Spend this mana only to cast Dragon spells."
+}

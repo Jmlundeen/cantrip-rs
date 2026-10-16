@@ -1,0 +1,57 @@
+# Desolation of Smaug's mana is "only to cast Dragon spells" (CR 106.6): Firdoch Core, a Kindred Artifact with changeling,
+# is every creature type on the stack (CR 702.73a, 205.3m) - a Dragon spell though no creature spell - and is cast with
+# three of the four red mana. Before that, the first Core's "{4}: becomes a 4/4" can't be activated: the restricted mana
+# pays no ability, and Mox Jet with the Core's own mana ability make only two. The last red mana waits through the main
+# phase and is gone in the next one (CR 106.4).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Firdoch Core
+Firdoch Core
+Desolation of Smaug
+Island
+Mountain
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Firdoch Core.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Desolation of Smaug.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Colors(Red; Red; Red; Red)
+? Bot1.Mana = {R}{R}{R}{R} (DragonSpells)
+! Bot1.Battlefield.Firdoch Core.Activate(Ability: {4})
+Bot1.Hand.Firdoch Core.Cast
+? Bot1.Mana = {R} (DragonSpells)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {R} (DragonSpells)
+[T5 Bot1.Main2]
+? Bot1.Mana =
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield = Mountain; Mox Ruby; Mox Jet; Firdoch Core; Mountain; Mountain; Firdoch Core
+Bot1.Graveyard = Desolation of Smaug
+Bot1.Mana =

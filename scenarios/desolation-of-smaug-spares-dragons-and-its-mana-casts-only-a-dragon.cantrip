@@ -1,0 +1,64 @@
+# Desolation of Smaug: "deals 3 damage to each non-Dragon creature. Add four mana in any combination of colors. Spend
+# this mana only to cast Dragon spells." (CR 106.6, 205.3, 106.1b). Turn 5: Bot2's Llanowar Elves dies, Bot1's Phyrexian
+# Dragon Engine (a 2/2 Dragon) is not dealt damage. The four red mana wait in the pool apart from ordinary mana. With them
+# and Mox Jet's untapped black, Lightning Bolt can't be cast (no Dragon spell), while Magmatic Hellkite, a Dragon, is cast
+# with the four of them and leaves the pool empty.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Phyrexian Dragon Engine
+Desolation of Smaug
+Magmatic Hellkite
+Lightning Bolt
+Mountain
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x13
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Phyrexian Dragon Engine.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Desolation of Smaug.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Colors(Red; Red; Red; Red)
+? Bot1.Mana = {R}{R}{R}{R} (DragonSpells)
+? Bot2.Graveyard = Llanowar Elves
+? Bot1.Battlefield.Phyrexian Dragon Engine.Damage = 0
+! Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Hand.Magmatic Hellkite.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield = Mountain; Mox Ruby; Mox Jet; Phyrexian Dragon Engine; Mountain; Mountain; Magmatic Hellkite
+Bot1.Graveyard = Desolation of Smaug
+Bot1.Hand = Lightning Bolt
+Bot2.Graveyard = Llanowar Elves
+Bot2.Life = 20

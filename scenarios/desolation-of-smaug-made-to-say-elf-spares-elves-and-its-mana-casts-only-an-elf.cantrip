@@ -1,0 +1,67 @@
+# Desolation of Smaug's "Dragon" is a word of its text (CR 612.2): Bot1 casts Artificial Evolution on its own Desolation
+# of Smaug on the stack, Dragon to Elf. It now deals 3 damage to each non-Elf creature - Bot1's Phyrexian Dragon Engine
+# dies, Bot2's Llanowar Elves lives - and its mana is "only to cast Elf spells" (CR 106.6). With {R}{R}{G}{G} of it in the
+# pool Magmatic Hellkite, a Dragon its colors could pay for, can't be cast; Bot1's own Llanowar Elves is cast with one {G}.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Phyrexian Dragon Engine
+Desolation of Smaug
+Artificial Evolution
+Mountain
+Llanowar Elves
+Magmatic Hellkite
+Mountain x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x13
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Phyrexian Dragon Engine.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Desolation of Smaug.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Stack.Desolation of Smaug)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Dragon)
+Bot1.Modes(Elf)
+Bot1.Pass
+Bot2.Pass
+Bot1.Colors(Red; Red; Green; Green)
+? Bot1.Mana = {R}{R} (ElfSpells) {G}{G} (ElfSpells)
+! Bot1.Hand.Magmatic Hellkite.Cast
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {R}{R} (ElfSpells) {G} (ElfSpells)
+
+[Expect]
+Turn = 7
+Stack.Count = 0
+Bot1.Graveyard = Phyrexian Dragon Engine; Desolation of Smaug; Artificial Evolution
+Bot1.Battlefield = Mountain; Mox Ruby; Mox Jet; Mox Sapphire; Mountain; Llanowar Elves
+Bot1.Hand = Magmatic Hellkite
+Bot2.Battlefield = Forest; Llanowar Elves
