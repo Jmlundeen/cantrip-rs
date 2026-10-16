@@ -373,6 +373,15 @@ pub fn nonland_permanent_card_in_your_graveyard(q: &dyn Query, asker: &Asker, t:
 /// "Target nonland permanent card from your graveyard". Loamcrafter Faun prints it.
 pub const NONLAND_PERMANENT_CARD_IN_YOUR_GRAVEYARD: TargetSpec = target(nonland_permanent_card_in_your_graveyard);
 
+/// "Target land card from your graveyard" (CR 115.1, 400.7). Titania, Protector of Argoth, Wrenn and Six (up to one) and
+/// Carnivorous Cultivator print it.
+pub fn land_card_in_your_graveyard(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    card_in_your_graveyard(q, asker, t, &[CardType::Land])
+}
+
+/// "Target land card from your graveyard": see `land_card_in_your_graveyard`.
+pub const LAND_CARD_IN_YOUR_GRAVEYARD: TargetSpec = target(land_card_in_your_graveyard);
+
 fn creature_card_in_your_graveyard_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     card_in_your_graveyard(q, asker, t, &[CardType::Creature])
 }
