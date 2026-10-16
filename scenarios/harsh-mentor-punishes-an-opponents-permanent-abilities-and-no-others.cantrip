@@ -1,0 +1,100 @@
+# Harsh Mentor: "Whenever an opponent activates an ability of an artifact, creature, or land on the battlefield, if it isn't a
+# mana ability, this creature deals 2 damage to that player." Bot2 taps Moxen, Mind Stone and Llanowar Elves for mana (mana
+# abilities, CR 605.1a: nothing), activates Ajani Resolute's 0 (a planeswalker's ability, not an artifact's, creature's or land's:
+# nothing, so Bot2 is at 21), forestcycles Generous Ent (a creature card's ability, but from a hand, not on the battlefield - the
+# ruling: nothing) and then activates Mind Stone's "{1}, {T}, Sacrifice this artifact: Draw a card". Mind Stone is in the graveyard
+# once the cost is paid, and it was an artifact on the battlefield as it last was (CR 113.7a): Mentor's trigger goes on the stack
+# above the draw (CR 603.3) and resolves first (Bot2 at 19 with the draw still on the stack). Bot1's own Figure of Destiny
+# activation on turn 3 is no opponent's: Bot1 stays at 20.
+
+[Bot1 Deck]
+Mox Ruby
+Harsh Mentor
+Figure of Destiny
+Mountain x20
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Mox Emerald
+Mind Stone
+Ajani Resolute
+Generous Ent
+Forest
+Llanowar Elves
+Forest x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Harsh Mentor.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Mind Stone.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mind Stone.Activate(Ability: Add)
+Bot2.Hand.Ajani Resolute.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Ajani Resolute.Activate(Ability: gain 1 life)
+? Stack.Count = 1
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot2.Life = 21
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Figure of Destiny.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Figure of Destiny.Activate(Ability: Kithkin Spirit with)
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Battlefield.Llanowar Elves.Activate
+Bot2.Hand.Generous Ent.Activate(Ability: Forestcycling)
+? Stack.Count = 1
+Bot2.Search(Forest)
+? Bot2.Life = 21
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mind Stone.Activate(Ability: Draw)
+? Stack.Count = 2
+? Bot2.Graveyard = Mind Stone; Generous Ent
+Bot2.Pass
+Bot1.Pass
+? Bot2.Life = 19
+? Stack.Count = 1
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 19
+Bot2.Graveyard = Mind Stone; Generous Ent
+Bot1.Battlefield.Figure of Destiny.Power = 2
+Stack.Count = 0
