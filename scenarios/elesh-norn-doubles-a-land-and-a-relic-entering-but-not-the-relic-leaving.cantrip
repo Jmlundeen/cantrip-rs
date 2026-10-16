@@ -1,0 +1,66 @@
+# Elesh Norn, Mother of Machines doubles what a permanent entering triggers, a land as much as a creature, and nothing
+# else (CR 603.2d). On turn 3 Bot1's Tireless Tracker sees an Island enter: landfall triggers twice, two Clues. On turn 5
+# Cryogen Relic ("When this artifact enters or leaves the battlefield, draw a card") enters: two cards; then it is
+# sacrificed for its own ability (no tapped creature to target) and leaves: one card, its leaving no entering.
+# Hand: 7 - 6 played on turn 1 = 1 (the Tracker); turn 3 draws the Island (2), plays both (0); turn 5 draws the Relic (1),
+# casts it (0), draws two as it enters (2) and one as it leaves (3).
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Mox Pearl
+Elesh Norn, Mother of Machines
+Mox Emerald
+Mox Sapphire
+Tireless Tracker
+Island
+Cryogen Relic
+Plains x10
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Elesh Norn, Mother of Machines.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Tireless Tracker.Cast
+Bot1.Pass
+Bot1.Hand.Island.Play
+Bot1.Triggers(Tireless Tracker; Tireless Tracker)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Clue Token#2.Token = true
+? Bot1.Hand.Count = 0
+[T5 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Cryogen Relic.Cast
+Bot1.Pass
+Bot1.Triggers(Cryogen Relic; Cryogen Relic)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 2
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Cryogen Relic.Activate
+Bot1.Pass
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand.Count = 3
+Bot1.Graveyard = Cryogen Relic; Black Lotus
+Bot1.Battlefield = Plains; Island; Mox Pearl; Mox Emerald; Mox Sapphire; Elesh Norn, Mother of Machines; Tireless Tracker; Clue Token; Clue Token

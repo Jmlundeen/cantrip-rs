@@ -1,0 +1,11 @@
+{
+  "name": "Elesh Norn, Mother of Machines",
+  "manaCost": "{4}{W}",
+  "type": "Legendary Creature — Phyrexian Praetor",
+  "power": 4,
+  "toughness": 7,
+  "oracleText": "Vigilance\nIf a permanent entering causes a triggered ability of a permanent you control to trigger, that ability triggers an additional time.\nPermanents entering don't cause abilities of permanents your opponents control to trigger.",
+  "keywords": [
+    "Vigilance"
+  ]
+}

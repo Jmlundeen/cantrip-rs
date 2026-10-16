@@ -1,0 +1,64 @@
+# Elesh Norn, Mother of Machines: "Permanents entering don't cause abilities of permanents your opponents control to
+# trigger" applies to Elesh Norn's own entering (the rulings: "a permanent entering the battlefield at the same time as
+# Elesh Norn (still including Elesh Norn) won't cause abilities of permanents an opponent controls to trigger"), and the
+# doubling doesn't care who controls the entering permanent ("Elesh Norn's abilities don't look at who controls the
+# permanent entering the battlefield").
+# Both players have Authority of the Consuls ("Whenever a creature an opponent controls enters, you gain 1 life"). On
+# turn 3 Bot1's first Ornithopter, before Elesh Norn, gives Bot2 1 life (the control); Elesh Norn entering and a second
+# Ornithopter after it give Bot2 nothing. On turn 4 Bot2's Ornithopter triggers Bot1's Authority twice: Bot1 gains 2.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Mox Pearl
+Authority of the Consuls
+Ornithopter
+Elesh Norn, Mother of Machines
+Ornithopter
+Plains x10
+
+[Bot2 Deck]
+Plains
+Authority of the Consuls
+Ornithopter
+Plains x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Authority of the Consuls.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Authority of the Consuls.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 21
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Elesh Norn, Mother of Machines.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main2]
+? Bot2.Life = 21
+[T4 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Triggers(Authority of the Consuls; Authority of the Consuls)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot2.Life = 21
+Bot1.Battlefield = Plains; Plains; Mox Pearl; Authority of the Consuls; Ornithopter; Ornithopter; Elesh Norn, Mother of Machines
+Bot2.Battlefield = Plains; Authority of the Consuls; Ornithopter

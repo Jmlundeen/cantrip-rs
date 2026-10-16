@@ -1,0 +1,54 @@
+# Elesh Norn, Mother of Machines stops abilities "of permanents your opponents control" - not an ability that functions
+# from a graveyard (CR 603.2, 113.6). Bot2's Sword of the Meek is in Bot2's graveyard (its own Disenchant, turn 2); with
+# Bot1's Elesh Norn out, Bot2's Llanowar Elves, a 1/1, enters on turn 4 and Sword of the Meek's "Whenever a 1/1 creature you
+# control enters, you may return this card from your graveyard to the battlefield, then attach it to that creature" still
+# triggers: Bot2 accepts and the Sword comes back on the Elves. Torpor Orb, which stops it, is the contrast
+# (torpor-orb-stops-sword-of-the-meek-in-the-graveyard-for-a-one-one-entering).
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Mox Pearl
+Elesh Norn, Mother of Machines
+Plains x12
+
+[Bot2 Deck]
+Forest
+Mox Pearl
+Mox Emerald
+Mox Jet
+Sword of the Meek
+Disenchant
+Llanowar Elves
+Forest x9
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Elesh Norn, Mother of Machines.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Sword of the Meek.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Disenchant.Cast(Sword of the Meek)
+[T4 Bot2.Main1]
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Accept
+[T4 Bot2.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot2.Graveyard = Disenchant
+Bot2.Battlefield = Forest; Mox Pearl; Mox Emerald; Mox Jet; Llanowar Elves; Sword of the Meek
+Bot2.Battlefield.Sword of the Meek.AttachedTo = Llanowar Elves

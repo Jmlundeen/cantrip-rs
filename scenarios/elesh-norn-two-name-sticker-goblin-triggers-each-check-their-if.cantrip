@@ -1,0 +1,56 @@
+# Elesh Norn, Mother of Machines makes "Name Sticker" Goblin's enters ability trigger twice, and each triggering is its
+# own ability, checking its intervening "if it's on the battlefield" again as it resolves (CR 603.2d, 603.4). The first
+# resolves and rolls a 1: {R}{R}{R}{R}. With the second still on the stack Bot1 Lightning Bolts its own Goblin from that
+# mana; the second then finds the Goblin gone and rolls nothing, so three red are left in the pool, not seven.
+
+[Dice]
+1
+1
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Mox Pearl
+Elesh Norn, Mother of Machines
+Mox Ruby
+"Name Sticker" Goblin
+Lightning Bolt
+Mountain
+Mountain x8
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Elesh Norn, Mother of Machines.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand."Name Sticker" Goblin.Cast
+Bot1.Pass
+Bot1.Triggers("Name Sticker" Goblin; "Name Sticker" Goblin)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {R}{R}{R}{R}
+? Stack.Count = 1
+Bot1.Hand.Lightning Bolt.Cast("Name Sticker" Goblin)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Bot1.Mana = {R}{R}{R}
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = "Name Sticker" Goblin; Lightning Bolt; Black Lotus
+Bot1.Battlefield = Plains; Mountain; Mox Pearl; Mox Ruby; Elesh Norn, Mother of Machines

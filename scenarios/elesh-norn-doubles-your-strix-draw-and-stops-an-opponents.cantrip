@@ -1,0 +1,57 @@
+# Elesh Norn, Mother of Machines: "If a permanent entering causes a triggered ability of a permanent you control to
+# trigger, that ability triggers an additional time" (CR 603.2d) and "Permanents entering don't cause abilities of
+# permanents your opponents control to trigger" (CR 603.2). Bot1 casts Elesh Norn on turn 1, then a Baleful Strix: its
+# "When this creature enters, draw a card" triggers twice - two separate triggers to order and put on the stack - and
+# Bot1 draws two. On turn 2 Bot2's own Strix enters under Elesh Norn and its ability does not trigger at all: Bot2 draws
+# nothing.
+# Bot1's hand: 7, all cast on turn 1, then the two draws: 2. Bot2's: 7 + 1 drawn on turn 2 - 3 cast = 5.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Mox Pearl
+Elesh Norn, Mother of Machines
+Mox Sapphire
+Mox Jet
+Baleful Strix
+Island x10
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Jet
+Baleful Strix
+Island x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Elesh Norn, Mother of Machines.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Baleful Strix.Cast
+Bot1.Pass
+Bot1.Triggers(Baleful Strix; Baleful Strix)
+? Stack.Count = 2
+[T1 Bot1.Main2]
+? Bot1.Hand.Count = 2
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Baleful Strix.Cast
+[T2 Bot2.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Hand.Count = 2
+Bot2.Hand.Count = 5
+Bot1.Battlefield = Plains; Mox Pearl; Mox Sapphire; Mox Jet; Elesh Norn, Mother of Machines; Baleful Strix
+Bot2.Battlefield = Mox Sapphire; Mox Jet; Baleful Strix

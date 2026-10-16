@@ -1,0 +1,51 @@
+# Elesh Norn, Mother of Machines doubles "a triggered ability of a permanent you control", which a delayed triggered
+# ability is not (CR 603.2d: an effect on an object's triggered abilities doesn't apply to the delayed ones its abilities
+# create; 603.7). Bot1 has Elesh Norn (turn 1) and Aunt May (turn 3), casts Rite of Harmony ("Whenever a creature or
+# enchantment you control enters this turn, draw a card"), then an Ornithopter: Aunt May's "Whenever another creature you
+# control enters, you gain 1 life" triggers twice (22 life) and the Rite's delayed ability once (one card). Three triggers
+# to order. Aunt May entering earlier triggers nothing of its own ("another").
+# Hand: 7 - 5 played on turn 1 = 2; turn 3 draws the Ornithopter (3), casts three (0), draws one = 1.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Mox Pearl
+Elesh Norn, Mother of Machines
+Mox Emerald
+Aunt May
+Rite of Harmony
+Ornithopter
+Plains x10
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Elesh Norn, Mother of Machines.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Aunt May.Cast
+Bot1.Pass
+? Bot1.Life = 20
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Rite of Harmony.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Triggers(Aunt May; Aunt May; Rite of Harmony)
+? Stack.Count = 3
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot1.Hand.Count = 1
+Bot1.Graveyard = Rite of Harmony; Black Lotus
+Bot1.Battlefield = Plains; Mox Pearl; Mox Emerald; Elesh Norn, Mother of Machines; Aunt May; Ornithopter

@@ -1,0 +1,38 @@
+# Elesh Norn, Mother of Machines applies to its own entering (the rulings: "If a permanent entering the battlefield at
+# the same time as Elesh Norn (including Elesh Norn itself) causes a triggered ability of a permanent you control to
+# trigger, that ability triggers an additional time"): the rule is read from the battlefield as it is after the event
+# (CR 603.10). Aunt May, out first, triggers twice as Elesh Norn enters: Bot1 gains 2.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Mox Pearl
+Mox Jet
+Aunt May
+Elesh Norn, Mother of Machines
+Plains
+Plains x10
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Aunt May.Cast
+Bot1.Pass
+? Bot1.Life = 20
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Elesh Norn, Mother of Machines.Cast
+Bot1.Pass
+Bot1.Triggers(Aunt May; Aunt May)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot1.Battlefield = Plains; Mox Pearl; Mox Jet; Aunt May; Elesh Norn, Mother of Machines

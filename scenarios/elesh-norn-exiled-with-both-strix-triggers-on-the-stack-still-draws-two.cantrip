@@ -1,0 +1,51 @@
+# The additional triggering happens as the ability triggers (CR 603.2d); once both are on the stack, the doubler leaving
+# takes nothing back. Bot1's Baleful Strix enters under Elesh Norn, Mother of Machines on turn 3 and its enters ability
+# triggers twice; with both on the stack Bot2 Swords to Plowshares Elesh Norn (Bot1 gains 4). Both triggers still
+# resolve: Bot1 draws two.
+# Hand: 7 - 6 played on turn 1 = 1 (the Strix); turn 3 draws (2), casts the Strix (1), draws two = 3.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Mox Pearl
+Elesh Norn, Mother of Machines
+Mox Sapphire
+Mox Jet
+Baleful Strix
+Island x10
+
+[Bot2 Deck]
+Plains
+Swords to Plowshares
+Plains x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Elesh Norn, Mother of Machines.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Baleful Strix.Cast
+Bot1.Pass
+Bot1.Triggers(Baleful Strix; Baleful Strix)
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Elesh Norn, Mother of Machines)
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Exile = Elesh Norn, Mother of Machines
+Bot1.Life = 24
+Bot1.Hand.Count = 3
+Bot1.Battlefield = Plains; Mox Pearl; Mox Sapphire; Mox Jet; Baleful Strix
