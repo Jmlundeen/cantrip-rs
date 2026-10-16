@@ -1,0 +1,38 @@
+# Gone Fishing (Lake-town Mariners' Adventure) takes exactly two target creatures and/or lands you control (CR 601.2c): Bot1 aims
+# it at Llanowar Elves and a Forest, both are exiled and come back untapped as new objects (CR 400.7), so the Elves are
+# summoning sick again and the Forest can tap for mana a second time.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Island x2
+Lake-town Mariners
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Hand.Lake-town Mariners.Cast(Ability: Adventure)
+Bot1.Target(Llanowar Elves; Forest)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Forest.Tapped = false
+? Bot1.Battlefield.Llanowar Elves.SummoningSick = true
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Exile = Lake-town Mariners
+Bot1.Battlefield = Forest; Island; Island; Llanowar Elves

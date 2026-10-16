@@ -1,0 +1,35 @@
+# With a single Forest the only creature or land of Bot1's to aim at (the Lotuses are neither), Gone Fishing is not a legal cast
+# (CR 608.2g, 601.2c: two targets are needed): the only way Improvisation Capstone offers the exiled Lake-town Mariners is as the creature, which is cast for free with no question
+# about faces. The positive control is improvisation-capstone-casts-gone-fishing-for-free-when-two-permanents-can-be-aimed-at.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Improvisation Capstone
+Forest
+Island x2
+Lake-town Mariners
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Improvisation Capstone.Cast
+Bot1.Choose(Lake-town Mariners)
+! Bot1.Modes
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Battlefield.Lake-town Mariners.Power = 6
+Exile = Improvisation Capstone

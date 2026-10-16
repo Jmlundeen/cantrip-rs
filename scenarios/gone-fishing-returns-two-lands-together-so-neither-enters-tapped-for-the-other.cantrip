@@ -1,0 +1,50 @@
+# Gone Fishing exiles its two targets together and returns them together (CR 608.2c, 101.4, 614.12): Blooming Marsh and Seachrome
+# Coast ("enters tapped unless you control two or fewer other lands") each see only Forest and Island, so both come back untapped.
+# Returned one after the other the second would see three other lands and enter tapped. Seachrome Coast came in tapped (a fourth
+# land), so it was tapped when exiled; the new object is untapped.
+
+[Bot1 Deck]
+Blooming Marsh
+Seachrome Coast
+Forest
+Island
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Lake-town Mariners
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Blooming Marsh.Play
+? Bot1.Battlefield.Blooming Marsh.Tapped = false
+[T7 Bot1.Main1]
+Bot1.Hand.Seachrome Coast.Play
+? Bot1.Battlefield.Seachrome Coast.Tapped = true
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Lake-town Mariners.Cast(Ability: Adventure)
+Bot1.Target(Blooming Marsh; Seachrome Coast)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 7
+Stack.Count = 0
+Bot1.Battlefield.Blooming Marsh.Tapped = false
+Bot1.Battlefield.Seachrome Coast.Tapped = false
+Exile = Lake-town Mariners

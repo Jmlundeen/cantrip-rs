@@ -1,0 +1,53 @@
+# Lake-town Mariners's "ward {2}": Bot2 taps Mox Ruby for the Lightning Bolt and pays the ward with Mox Jet and Mox Sapphire, so the
+# Bolt resolves and deals 3 damage. The negative control is lake-town-mariners-ward-two-counters-a-bolt-whose-caster-cannot-pay.
+# Bot1 casts the Mariners on turn one off a Black Lotus and three Moxen.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Sapphire
+Mox Jet
+Lake-town Mariners
+Island x30
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Lake-town Mariners.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Lake-town Mariners)
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.PayCost
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot1.Battlefield.Lake-town Mariners.Damage = 3
+Bot2.Graveyard = Lightning Bolt

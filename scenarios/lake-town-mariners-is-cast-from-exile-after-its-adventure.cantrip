@@ -1,0 +1,61 @@
+# After Gone Fishing resolves, Lake-town Mariners waits in exile on an adventure (CR 715.4) and can be cast from there as the
+# creature (CR 715.5): Bot1 exiles and returns its two Ornithopters on turn three, and on turn five pays {4}{U}{U} for the 6/5.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mox Pearl
+Ornithopter
+Ornithopter
+Lake-town Mariners
+Island
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Lake-town Mariners.Cast(Ability: Adventure)
+Bot1.Target(Ornithopter#1; Ornithopter#2)
+Bot1.Pass
+Bot2.Pass
+? Exile = Lake-town Mariners
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Exile.Lake-town Mariners.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Exile.Count = 0
+Bot1.Battlefield.Lake-town Mariners.Power = 6
+Bot1.Battlefield.Lake-town Mariners.Toughness = 5

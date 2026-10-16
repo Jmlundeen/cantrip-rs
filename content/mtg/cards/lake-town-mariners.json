@@ -1,0 +1,17 @@
+{
+  "name": "Lake-town Mariners",
+  "manaCost": "{4}{U}{U}",
+  "type": "Creature — Human Citizen",
+  "power": 6,
+  "toughness": 5,
+  "oracleText": "Vigilance\nWard {2} (Whenever this creature becomes the target of a spell or ability an opponent controls, counter it unless that player pays {2}.)",
+  "keywords": [
+    "Vigilance"
+  ],
+  "adventure": {
+    "name": "Gone Fishing",
+    "manaCost": "{3}{U}",
+    "type": "Instant — Adventure",
+    "oracleText": "Exile two target creatures and/or lands you control, then return them to the battlefield under their owner's control."
+  }
+}

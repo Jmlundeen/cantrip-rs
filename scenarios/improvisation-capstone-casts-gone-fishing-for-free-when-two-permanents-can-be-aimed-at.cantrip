@@ -1,0 +1,41 @@
+# A half cast as an effect resolves needs its targets like any cast (CR 608.2g, 601.2c): Improvisation Capstone exiles Lake-town
+# Mariners (mana value 6, so the exile stops there), and with a Forest and an Ornithopter to aim at, Bot1 is asked which face to cast
+# and casts Gone Fishing for free, exiling and returning both. The Mariners wait in exile on an adventure. The negative control is
+# improvisation-capstone-casts-only-the-mariners-creature-when-gone-fishing-has-one-thing-to-aim-at.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Improvisation Capstone
+Forest
+Ornithopter
+Island
+Lake-town Mariners
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Improvisation Capstone.Cast
+Bot1.Choose(Lake-town Mariners)
+Bot1.Modes(Gone Fishing)
+Bot1.Target(Ornithopter; Forest)
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Battlefield.Ornithopter.SummoningSick = true
+Bot1.Battlefield.Forest.Tapped = false
+Exile = Lake-town Mariners; Improvisation Capstone

@@ -1,0 +1,62 @@
+# Gone Fishing returns what it exiles "under their owner's control" (CR 400.3, 110.2): Bot1 takes Bot2's Ornithopter with Oko's -5
+# (trading a Mox Ruby), then exiles and returns the stolen Ornithopter and an Island, and the Ornithopter comes back under Bot2's
+# control.
+
+[Bot1 Deck]
+Island
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Oko, Thief of Crowns
+Island
+Mox Ruby
+Lake-town Mariners
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Oko, Thief of Crowns.Cast
+Bot1.Pass
+Bot1.Battlefield.Oko, Thief of Crowns.Activate(Ability: Food)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Oko, Thief of Crowns.Activate(Ability: Exchange)
+Bot1.Target(Mox Ruby)
+Bot1.Target(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Lake-town Mariners.Cast(Ability: Adventure)
+Bot1.Target(Ornithopter; Island#1)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Exile = Lake-town Mariners
+Bot2.Battlefield = Mox Ruby; Ornithopter
+Bot1.Battlefield = Island; Island; Mox Emerald; Mox Sapphire; Mox Jet; Oko, Thief of Crowns; Food Token
