@@ -202,6 +202,17 @@ public sealed partial class TacticalPlay
             return new ModesChosenAnswer { Modes = [MostCommonCreatureType(client, prompt)] };
         }
 
+        // Which miracle ability to reveal a card with (CR 702.94a): each is the same cast at a different cost, so the cheapest,
+        // and never one that can't be paid.
+        if (prompt.Heading == "Choose which miracle to reveal it with" && prompt.Eligible.Count > 0)
+        {
+            int cheapest = prompt.Eligible
+                .OrderBy(mode => prompt.Modes[mode].Contains("unpayable", StringComparison.Ordinal))
+                .ThenBy(mode => CardReading.ManaValue(prompt.Modes[mode]))
+                .First();
+            return new ModesChosenAnswer { Modes = [cheapest] };
+        }
+
         if (prompt.Eligible.Count == 0 || prompt.AdditionalCost || prompt.Heading.Length > 0)
         {
             return prompt.Default();

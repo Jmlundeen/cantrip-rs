@@ -176,6 +176,29 @@ public sealed class TacticalPromptsTests
         Assert.Empty(away.Targets);
     }
 
+    // --- Which miracle to reveal a card with ------------------------------------------------------------------------
+
+    [Fact]
+    public void Reveals_a_card_with_its_cheapest_miracle_and_never_an_unpayable_one()
+    {
+        GameClient client = Seated([Land(9)]);
+        ChooseModesPromptMessage Miracles(params string[] modes) => new()
+        {
+            Player = Me,
+            Modes = [.. modes],
+            Eligible = [.. Enumerable.Range(0, modes.Length)],
+            Count = 1,
+            AtMost = 1,
+            Heading = "Choose which miracle to reveal it with",
+        };
+
+        // Metamorphosis Fanatic's own {1}{B} and Molecule Man's {0}.
+        Assert.Equal([1], Assert.IsType<ModesChosenAnswer>(Bot().Decide(client, Miracles("Miracle {1}{B}, its own", "Miracle {0}, from Molecule Man"))).Modes);
+        // A cost of nothing to pay is no cost at all: Aminatou's for a card with no mana cost.
+        Assert.Equal([1], Assert.IsType<ModesChosenAnswer>(Bot().Decide(client, Miracles(
+            "Miracle (unpayable: it has no mana cost), from Aminatou, Veil Piercer", "Miracle {2}, from Lorehold, the Historian"))).Modes);
+    }
+
     // --- Choose a creature type -------------------------------------------------------------------------------------
 
     private static ChooseModesPromptMessage CreatureType() => new()
