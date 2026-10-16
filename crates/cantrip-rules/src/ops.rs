@@ -433,6 +433,16 @@ pub fn unlock_door(cx: &mut Cx, id: ObjectId, door: u8, player: PlayerId) {
     cx.emit(Event::DoorUnlocked { permanent: id, door, player });
 }
 
+/// A card name chosen for a permanent as an ability of it resolves (CR 607.2d): kept by the permanent as the object it is
+/// now, so a new object it becomes has none (CR 400.7), and a later choice for it replaces an earlier one. Nothing if it is
+/// no longer on the battlefield.
+pub fn remember_chosen_name(cx: &mut Cx, id: ObjectId, name: CardId) {
+    if !live(cx.s(), id) || !cx.s().obj(id).zone.is(ZoneKind::Battlefield) {
+        return;
+    }
+    cx.st().update_obj(id, |o| o.marks.chosen_card = Some(name));
+}
+
 /// CR 610.3: cards exiled "until [a permanent] leaves the battlefield" return, as a one-shot effect that follows the
 /// event, to the zone they were exiled from; a permanent comes back under its owner's control. Whether any did.
 pub fn return_exiled(cx: &mut Cx) -> R<bool> {

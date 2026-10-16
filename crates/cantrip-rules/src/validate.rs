@@ -78,6 +78,20 @@ fn goaded_into_its_goader(game: &Game, attacker: ObjectId, at: PlayerId, players
     goaders(at) && players.iter().any(|&p| !goaders(p))
 }
 
+/// Why the name of `card` may not be chosen for a question asking for a `kind` of card name, or `None` if it may.
+/// A name chosen "with certain characteristics" is that of a card that has them (CR 201.4a); a player naming a split card
+/// names one of its two names, not both (CR 709.4a).
+pub fn name_problem(cards: &CardTable, kind: NameKind, card: CardId) -> Option<&'static str> {
+    let def = cards.get(card);
+    if !kind.allows(def.is(CardType::Land)) {
+        return Some(if kind == NameKind::Land { "not a land card name" } else { "a land is not a nonland card name" });
+    }
+    if def.split.is_some() {
+        return Some("name one of a split card's names, not both");
+    }
+    None
+}
+
 pub fn check(game: &Game, request: &Request, answer: &Answer) -> Result<(), Rejected> {
     if *answer == Answer::Cancel {
         return if request.may_cancel { Ok(()) } else { no("this cannot be cancelled") };
@@ -272,11 +286,9 @@ pub fn check(game: &Game, request: &Request, answer: &Answer) -> Result<(), Reje
         (RequestKind::ChooseReplacement { sources, .. }, Answer::Index(i)) => {
             if (*i as usize) < sources.len() { Ok(()) } else { no("not one of the replacement effects offered") }
         }
-        (RequestKind::ChooseName { nonland_only, .. }, Answer::Name(name)) => match name {
-            Some(card) if *nonland_only && game.cards.get(*card).is(CardType::Land) => no("a land is not a nonland card name"),
-            // CR 709.4a: a player naming a split card names one of its two names, not both.
-            Some(card) if game.cards.get(*card).split.is_some() => no("name one of a split card's names, not both"),
-            _ => Ok(()),
+        (RequestKind::ChooseName { kind, .. }, Answer::Name(name)) => match name.and_then(|card| name_problem(game.cards, *kind, card)) {
+            Some(problem) => no(problem),
+            None => Ok(()),
         },
         (RequestKind::ChooseSubtype { choices, .. }, Answer::Subtype(s)) => {
             if choices.contains(s) { Ok(()) } else { no("not one of the types offered") }

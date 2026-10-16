@@ -20,7 +20,7 @@ fn enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
             suggestion = Some((def.cost.mana_value(), named));
         }
     }
-    if let Answer::Name(name) = g.ask(you, RequestKind::ChooseName { source, looked_at: hand, suggestion: suggestion.map(|s| s.1), nonland_only: false })? {
+    if let Answer::Name(name) = g.ask(you, RequestKind::ChooseName { source, looked_at: hand, suggestion: suggestion.map(|s| s.1), kind: NameKind::Any })? {
         entering.chosen_card = name;
     }
     Ok(())

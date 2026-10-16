@@ -472,7 +472,7 @@ impl<'s> Run<'s> {
             // `! Bot1.Accept`, `! Bot1.Choose`, a bare `! Bot1.Target` or `! Bot2.Block`...: the player is not asked that kind of question
             // before their next priority (a bare Block: no block is possible, so the declaration is never asked for).
             if let Some(ScriptStep::Refused { action, line, text }) = self.current()
-                && ((action.verb.is_question() && !(matches!(action.verb, ScriptVerb::Choose | ScriptVerb::Colors) && action.positional().next().is_some()))
+                && ((action.verb.is_question() && !(matches!(action.verb, ScriptVerb::Choose | ScriptVerb::Colors | ScriptVerb::Name) && action.positional().next().is_some()))
                     || (matches!(action.verb, ScriptVerb::Target | ScriptVerb::Modes | ScriptVerb::Block) && action.positional().next().is_none()))
                 && request.player == player_of(action.bot)
             {
@@ -1431,6 +1431,15 @@ impl<'s> Run<'s> {
                     }
                     if !self.objects(action, spec.trim(), eligible)?.is_empty() {
                         return fail(format!("line {line} says {text} must not be choosable, but it is"));
+                    }
+                }
+            }
+            // `! Bot1.Name(Lightning Bolt)`: the name may not be chosen (CR 201.4a), checked as the engine checks an answer.
+            RequestKind::ChooseName { kind, .. } => {
+                for spec in action.positional() {
+                    let Some(card) = cards().find(spec.trim()) else { return fail(format!("line {line}: no card is named {spec}")) };
+                    if name_problem(cards(), *kind, card).is_none() {
+                        return fail(format!("line {line} says {text} must not be a name the question allows, but it is"));
                     }
                 }
             }

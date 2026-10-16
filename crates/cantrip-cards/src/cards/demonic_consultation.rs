@@ -8,7 +8,7 @@ use cantrip_oracle as oracle;
 fn consult(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     // Choose a card name first: the instructions are followed in order (CR 608.2c).
-    let Answer::Name(Some(wanted)) = g.ask(you, RequestKind::ChooseName { source: item.object, looked_at: Vec::new(), suggestion: None, nonland_only: false })? else {
+    let Answer::Name(Some(wanted)) = g.ask(you, RequestKind::ChooseName { source: item.object, looked_at: Vec::new(), suggestion: None, kind: NameKind::Any })? else {
         return Ok(());
     };
     let top: Vec<ObjectId> = g.state().zone(Zone::library(you)).iter().take(6).copied().collect();

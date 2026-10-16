@@ -21,7 +21,7 @@ use cantrip_api::*;
 use cantrip_state::{Frame, FrameKind, Mark, Marks, Rng};
 
 pub use actions::describe;
-pub use validate::distribution_problem;
+pub use validate::{distribution_problem, name_problem};
 pub use layers::{chars, live, summoning_sick};
 
 /// One game: the state, what has happened, and the card table it is played with.
@@ -683,6 +683,10 @@ impl cantrip_api::Game for Cx<'_> {
 
     fn unlock_door(&mut self, permanent: ObjectId, door: u8, player: PlayerId) {
         ops::unlock_door(self, permanent, door, player);
+    }
+
+    fn remember_chosen_name(&mut self, permanent: ObjectId, name: CardId) {
+        ops::remember_chosen_name(self, permanent, name);
     }
 
     fn move_together(&mut self, moves: &[(ObjectId, Zone)], reason: ZoneReason) -> Vec<ObjectId> {

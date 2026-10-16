@@ -666,13 +666,13 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
             may_repeat: i32::from(*count) > choices.iter().count() as i32,
             verb: String::new(),
         }),
-        RequestKind::ChooseName { source, looked_at, suggestion, nonland_only } => {
+        RequestKind::ChooseName { source, looked_at, suggestion, kind } => {
             let mut names: Vec<String> = game
                 .cards
                 .cards
                 .iter()
                 // A split card has two names and a player names one of them (CR 709.4a): its halves are listed, not the whole.
-                .filter(|c| c.name != "Intrinsic" && !c.name.is_empty() && c.split.is_none() && !(*nonland_only && c.is(CardType::Land)))
+                .filter(|c| c.name != "Intrinsic" && !c.name.is_empty() && c.split.is_none() && kind.allows(c.is(CardType::Land)))
                 .map(|c| c.name.to_string())
                 .collect();
             names.sort();

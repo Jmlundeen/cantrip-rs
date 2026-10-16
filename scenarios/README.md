@@ -188,7 +188,7 @@ default declines, so a scenario that does not care about such a card need say no
 | `Bot1.Target(Sol Ring)` · `Bot1.Target()` | a triggered ability's target as it goes on the stack, or a chosen mode's as a modal spell is cast; `Target()` chooses none for "up to one" (default: none if optional, else the first candidate) |
 | `Bot1.Target(Island; Mountain)` | a slot that takes several — "Untap X target lands", asked once the mana is paid — takes exactly that many, and they must be different permanents; "up to two target creatures" takes as many as the line gives, at most two |
 | `Bot1.Modes(1; 4)` · `Bot1.Modes(Destroy target artifact)` | a modal spell's modes as it is cast, or a modal triggered ability's as it goes on the stack, by number from 1 or part of their text (default: the first eligible); also the next room of a dungeon when there are two, `Bot1.Modes(Lost Well)` |
-| `Bot1.Name(Lightning Bolt)` | a card name chosen as a permanent enters, as Anointed Peacekeeper's; any card the game knows (default: the costliest nonland card in the hand looked at) |
+| `Bot1.Name(Lightning Bolt)` | a card name, chosen as a permanent enters (Anointed Peacekeeper) or as a spell or ability resolves (Petrified Hamlet's land card name); any card the game knows of the kind asked for (default: the name the card suggests, such as the costliest nonland card in the hand looked at) |
 | `Bot1.Colors(Red; Green)` | colors chosen as a spell or ability resolves (CR 202.2b), by name and in the order asked for; a color repeats where the ability allows it, as Coalition Relic's one mana per charge counter does (default: the first on offer) |
 | `Bot1.Replace(Archon of Emeria)` | which of two applicable replacement effects applies first (CR 616.1), by its source card's name or part of its hint (default: the first offered) |
 | `Bot1.ChoosePlayer(Bot2)` | a player chosen without targeting (CR 608.2d, 614.12a), as True-Name Nemesis asks as it enters (default: the first in turn order) |
@@ -269,6 +269,10 @@ chosen from a revealed hand) and fails if the named card is among those it may t
 card exists in the game. It shows a cost or choice leaves something out (a token as "a nontoken artifact"); pair it with the
 `Bot1.Choose(Thopter Foundry)` that takes the legal card on the next line. Without arguments it is the bare refusal below.
 
+A name, `! Bot1.Name(Lightning Bolt)`, is checked at that player's next card name question and fails if the question would accept
+that name (CR 201.4a: a nonland name where a land card name is asked for passes the refusal); pair it with the `Bot1.Name(...)` that
+answers it on the next line.
+
 A color choice, `! Bot1.Colors(Blue)`, is checked at that player's next color question and fails if the named color is on offer
 (a replacement color that may not be the one being replaced); pair it with the `Bot1.Colors(...)` that answers it on the next line.
 
@@ -338,8 +342,8 @@ kind, place it where the action could otherwise be taken, with a wait or `BotN.P
 - `BotN.Battlefield.<Name>.Saddled`, `true` for a permanent saddled this turn (CR 702.171b) and absent otherwise
 - `BotN.Battlefield.<Name>.Prepared`, `true` for a prepared permanent (CR 722.3a) and absent otherwise; while it is
   set, that permanent's preparation card is the copy in `Exile`
-- `BotN.Battlefield.<Name>.Chosen<Key>`, one per quality chosen about a permanent and kept on it (CR 614.12a):
-  `ChosenName` for a card name, `ChosenParity` for Gollum's odd or even, `ChosenColor` for a chosen colour,
+- `BotN.Battlefield.<Name>.Chosen<Key>`, one per quality chosen about a permanent and kept on it (CR 614.12a, 607.2d):
+  `ChosenName` for a card name (chosen as it entered, or for it as its ability resolved: Petrified Hamlet), `ChosenParity` for Gollum's odd or even, `ChosenColor` for a chosen colour,
   `ChosenSubtype` for a chosen creature type (Three Tree City); and `ChosenModes`, the modes its modal abilities have
   chosen, numbered from 1 and read from the history (`1, 3` for Gollum's counter and draw)
 - `BotN.Battlefield.<Name>.Exerted`, `true` for an exerted permanent (CR 701.43a) and absent otherwise

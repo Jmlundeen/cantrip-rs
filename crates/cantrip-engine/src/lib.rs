@@ -6,7 +6,7 @@ use std::sync::OnceLock;
 pub mod undo;
 
 pub use cantrip_api::*;
-pub use cantrip_rules::{Game, Rejected, Setup, chars, describe, distribution_problem, live, summoning_sick};
+pub use cantrip_rules::{Game, Rejected, Setup, chars, describe, distribution_problem, live, name_problem, summoning_sick};
 
 /// The simplest legal distribution of looked-at cards (the C# `CardDistribution.Greedy`): each destination's
 /// minimum first, in order, then each takes what it accepts up to its maximum, cards in the order looked at.

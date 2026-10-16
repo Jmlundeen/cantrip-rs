@@ -261,8 +261,11 @@ shapes have an example:
   Treasure, an Octopus, an extra turn); the promise and the opponent are asked before the targets, the spell's effect reads
   `item.gift.is_some()` and a target filter `gift::promised(q, asker.source)`. An instant or sorcery gives it as it
   resolves (the core); a permanent lists `gift::trigger(text)`. Tokens a gift makes are listed in the card's `EXTRA`. **Player hexproof** is `EffectKind::PlayerHexproof`.
-- **Names and players**: `RequestKind::ChooseName` (a card name, answered `Answer::Name`) and `ChoosePlayer`; a name chosen as
-  a permanent enters is `Entering.chosen_card`, kept in `Obj.marks.chosen_card`.
+- **Names and players**: `RequestKind::ChooseName` (a card name, answered `Answer::Name`; its `kind`, `NameKind::Any`,
+  `Nonland` or `Land`, is what the name must be the name of, CR 201.4a, and the core refuses any other) and `ChoosePlayer`;
+  a name chosen as a permanent enters is `Entering.chosen_card`, kept in `Obj.marks.chosen_card`, and one chosen for a
+  permanent as its ability resolves ("when this land enters, choose a land card name", a Saga's "choose a card name") is
+  `Game::remember_chosen_name`, kept there too (CR 607.2d): Petrified Hamlet, Medomai's Prophecy.
 - **Modal abilities** are `.modal(..)`. A modal spell whose number of modes is decided by its optional additional cost
   or its kicker ("If this spell's additional cost was paid, choose both instead", Pyrrhic Strike) says so with
   `ModalDef::when_paid(min, max)`: the core then announces the cost before the modes (CR 601.2b) and offers paying an

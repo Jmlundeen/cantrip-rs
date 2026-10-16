@@ -209,6 +209,37 @@ impl Action {
     }
 }
 
+/// What a chosen card name must be the name of (CR 201.4a): "a card name" (any card), "a nonland card name" (Cabal
+/// Therapy, Tamiyo, Collector of Tales), "a land card name" (Petrified Hamlet). The name's own card is what is judged, a
+/// back face by the back face's characteristics alone (CR 201.4d).
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+pub enum NameKind {
+    #[default]
+    Any,
+    Nonland,
+    Land,
+}
+
+impl NameKind {
+    /// Whether the name of a card that is (`land`) or is not a land may be chosen.
+    pub fn allows(self, land: bool) -> bool {
+        match self {
+            NameKind::Any => true,
+            NameKind::Nonland => !land,
+            NameKind::Land => land,
+        }
+    }
+
+    /// The words a card uses for the name it asks for, before "card name": "", "nonland", "land".
+    pub fn word(self) -> &'static str {
+        match self {
+            NameKind::Any => "",
+            NameKind::Nonland => "nonland",
+            NameKind::Land => "land",
+        }
+    }
+}
+
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum RequestKind {
     /// Act or pass (CR 117). Passing is always legal.
@@ -244,8 +275,8 @@ pub enum RequestKind {
     ChooseColors { source: ObjectId, choices: ColorSet, count: u8 },
     /// A card name (CR 201.3, 614.12a): any card the game knows. `looked_at` are the cards the player has just been
     /// shown, and `suggestion` the name an unscripted player takes (the costliest nonland card among them).
-    /// With `nonland_only` the name must be a nonland card's ("choose a nonland card name").
-    ChooseName { source: ObjectId, looked_at: Vec<ObjectId>, suggestion: Option<CardId>, nonland_only: bool },
+    /// `kind` is what the name must be the name of (CR 201.4a): any card, a nonland card or a land card.
+    ChooseName { source: ObjectId, looked_at: Vec<ObjectId>, suggestion: Option<CardId>, kind: NameKind },
     /// One subtype of `choices`, in order ("choose a creature type", CR 205.3m: the C# engine asks it as a modes
     /// question over every creature type, more than a mode index holds).
     ChooseSubtype { source: ObjectId, choices: Vec<Subtype> },
