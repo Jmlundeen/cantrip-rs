@@ -31,6 +31,8 @@ Bot1.Hand.Blossoming Defense.Cast(Bot1.Battlefield.Ornithopter)
 ? Bot1.Battlefield.Ornithopter.Keywords = Flying; Hexproof
 ? Bot1.Battlefield.Ornithopter.Power = 2
 ? Bot1.Battlefield.Ornithopter.Toughness = 4
+? Bot1.Battlefield.Ornithopter.Damage = 0
+? Bot2.Graveyard = Lightning Bolt
 ? Bot2.Battlefield.Ornithopter.Power = 0
 [T3 Bot1.Main1]
 
