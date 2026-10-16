@@ -368,9 +368,22 @@ control (CR 712.14a; a token, or a card that was only a copy of a craft card, st
 materials, read from that stretch of the history, are linked to the craft card in exile as exiled with it
 (`Game::link_exiled`, CR 607.2a), so "the exiled cards used to craft it" (CR 702.167c, `craft::used_to_craft`) are the
 exiled cards linked to the object that became the permanent: there from the moment it enters, readable by a
-characteristic-defining ability through the state (Mastercraft Raptor), and none once it leaves or they do. Only an activated ability pays materials (`only_an_activated_ability_that_exiles_its_source_exiles_materials`). No card
-in content copies an activated ability, so a copy of a craft ability (which would find the card already returned) has no
-scenario.
+characteristic-defining ability through the state (Mastercraft Raptor), and none once it leaves or they do. Such an
+ability reads the cards' power with their own defining abilities applied (`LayerQuery::chars_with_defined_pt`, CR 613.8a:
+a Barrowgoyf used to craft Wretched Bonemass counts as it is in exile). Materials named one by one ("a Dinosaur, a Merfolk,
+a Pirate, and a Vampire", `Materials::parts`) must be separate objects: payable only when each part can be matched to a
+distinct candidate, and asked for in turn. Only an activated ability pays materials
+(`only_an_activated_ability_that_exiles_its_source_exiles_materials`). No card in content copies an activated ability, so
+a copy of a craft ability (which would find the card already returned) has no scenario.
+
+Craft cards not built, each for want of a rule elsewhere: Eye of Ojer Taq ("two that share a card type", and Apex
+Observatory's "the next spell you cast this turn of the chosen type can be cast without paying its mana cost"),
+Paleontologist's Pick-Axe (Dinosaur Headdress makes the equipped creature a copy of a chosen card, a static copy effect),
+The Enigma Jewel (Locus of Enlightenment gains the exiled cards' activated abilities and copies activated abilities),
+Unstable Glyphbridge (Sandswirl Wanderglyph's "they can't attack you or planeswalkers you control this turn"), Braided Net
+("its activated abilities can't be activated for as long as it remains tapped", and net counters) and Master's
+Guide-Mural (Master's Manufactory asks whether an artifact entered under your control this turn, whatever happened to it
+since: the history does not keep the controller or the types an object entered with).
 
 ### Restricted mana
 
