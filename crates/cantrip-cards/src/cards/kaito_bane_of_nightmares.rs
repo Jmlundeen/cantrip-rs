@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::statics::plus_pt;
 use cantrip_mechanics::{ninjutsu::ninjutsu, surveil, targets};
 use cantrip_oracle as oracle;
 
@@ -70,16 +71,10 @@ fn ninjas_you_control(view: &dyn LayerQuery, source: ObjectId, affected: ObjectI
         && chars.has_subtype(view.words(source).subtype(Subtype::Ninja))
 }
 
-fn plus_one_plus_one(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    // CR 613.4b: a modifier only reaches something that has power and toughness to modify.
-    chars.power = chars.power.map(|v| v + 1);
-    chars.toughness = chars.toughness.map(|v| v + 1);
-}
-
 pub static EMBLEM: CardDef = CardDef {
     name: "Kaito, Bane of Nightmares emblem",
     has_cost: false,
-    statics: &[static_ability(Layer::PtModify, ninjas_you_control, plus_one_plus_one, "Ninjas you control get +1/+1.")],
+    statics: &[static_ability(Layer::PtModify, ninjas_you_control, plus_pt::<1, 1>, "Ninjas you control get +1/+1.")],
     text: "Ninjas you control get +1/+1.",
     ..CardDef::BLANK
 };

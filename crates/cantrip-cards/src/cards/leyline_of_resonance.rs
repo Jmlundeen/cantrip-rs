@@ -1,11 +1,7 @@
 use cantrip_api::*;
+use cantrip_mechanics::statics;
 use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
-
-/// "If this card is in your opening hand" (CR 103.6a): any player may, nothing else is required.
-fn in_any_opening_hand(_: &dyn Query, _: &Asker) -> bool {
-    true
-}
 
 /// "An instant or sorcery spell that targets only a single creature you control" (CR 115.1): every target the spell has, as
 /// it was announced (CR 601.2c), is the one creature, however many times it is chosen. A creature card in a graveyard is not a creature you control (CR 110.2). A spell with a player, or a second
@@ -41,6 +37,6 @@ pub static CARD: CardDef = CardDef {
         copy_it,
         "Whenever you cast an instant or sorcery spell that targets only a single creature you control, copy that spell. You may choose new targets for the copy.",
     )],
-    opening_hand: Some(OpeningHandAction { condition: in_any_opening_hand, counter: None, exile_from_hand: 0 }),
+    opening_hand: Some(statics::BEGIN_ON_THE_BATTLEFIELD),
     ..oracle::LEYLINE_OF_RESONANCE
 };

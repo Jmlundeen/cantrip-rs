@@ -61,10 +61,13 @@ pub fn have_double_strike_and_trample(_: &dyn LayerQuery, _: ObjectId, chars: &m
     chars.keywords = chars.keywords.with(Keyword::DoubleStrike).with(Keyword::Trample);
 }
 
-/// "... gets +1/+1" (CR 613.4c, layer 7c) as a static ability's `StaticDef::apply`. Embercleave and Leyline Axe print it.
-pub fn get_plus_one_plus_one(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.power = chars.power.map(|v| v + 1);
-    chars.toughness = chars.toughness.map(|v| v + 1);
+
+/// "If this card is in your opening hand, you may begin the game with it on the battlefield" (CR 103.6a), for `CardDef::opening_hand`:
+/// any player may, nothing else is required. The Leylines (Punishment and Resonance) and Leyline Axe print it.
+pub const BEGIN_ON_THE_BATTLEFIELD: OpeningHandAction = OpeningHandAction { condition: in_any_opening_hand, counter: None, exile_from_hand: 0 };
+
+fn in_any_opening_hand(_: &dyn Query, _: &Asker) -> bool {
+    true
 }
 
 /// The permanent an event put onto the battlefield (CR 603.6a): a zone change to the battlefield, a token's creation

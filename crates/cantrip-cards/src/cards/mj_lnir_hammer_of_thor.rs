@@ -15,7 +15,7 @@ fn four_damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 /// "Double all damage equipped creature would deal" (CR 614.1, 120.3): damage from the creature this Equipment is attached to,
-/// to anything, combat or not. Several Mjölnirs on one creature each double it, once each (CR 616.1).
+/// to anything, combat or not; damage dealt to it, or by another creature, is not changed.
 fn damage_from_equipped_creature(q: &dyn Query, asker: &Asker, p: &Proposal) -> bool {
     matches!(p, Proposal::Damage(d)
         if d.amount > 0 && q.attached_to(asker.source) == Some(d.source) && q.chars(d.source).is(CardType::Creature))
