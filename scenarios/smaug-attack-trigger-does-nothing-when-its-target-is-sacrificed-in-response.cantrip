@@ -1,0 +1,57 @@
+# Smaug's attack trigger targets Bot2's Cathar Commando while Bot1 controls one Treasure; Bot2 sacrifices the Commando in
+# response (to destroy Bot1's Mox Ruby), so the target is gone when the trigger resolves (CR 608.2b) and it deals no
+# damage: Bot2 takes only the 4 combat damage of the now-unblocked Smaug (16).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mountain
+Smaug the Magnificent
+Mountain x2
+Mountain x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Cathar Commando
+Plains x3
+Plains x10
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Smaug the Magnificent.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Cathar Commando.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Smaug the Magnificent > Bot2)
+Bot1.Target(Bot2.Battlefield.Cathar Commando)
+Bot1.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Cathar Commando.Activate(Bot1.Battlefield.Mox Ruby)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot2.Graveyard = Cathar Commando
+Bot1.Graveyard = Mox Ruby

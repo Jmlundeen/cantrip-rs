@@ -1,0 +1,45 @@
+# Smaug the Magnificent (haste) is cast on turn 1 with three Moxen and a Mountain and attacks at once: Bot1 controls no
+# Treasure yet, so its attack trigger deals no damage (CR 120.8) and only the 4 combat damage lands (Bot2 16). At the
+# beginning of Bot1's next upkeep Smaug makes a Treasure; attacking again, the trigger counts that one Treasure and deals 1
+# to Bot2 beside 4 in combat (Bot2 11).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mountain
+Smaug the Magnificent
+Mountain x2
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Smaug the Magnificent.Cast
+Bot1.Pass
+Bot1.Attack(Smaug the Magnificent > Bot2)
+Bot1.Target(Bot2)
+[T1 Bot1.Main2]
+? Bot2.Life = 16
+? Bot1.Battlefield.Treasure Token = (absent)
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Treasure Token.Tapped = false
+Bot1.Attack(Smaug the Magnificent > Bot2)
+Bot1.Target(Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 11
+Bot1.Battlefield.Treasure Token.Tapped = false
