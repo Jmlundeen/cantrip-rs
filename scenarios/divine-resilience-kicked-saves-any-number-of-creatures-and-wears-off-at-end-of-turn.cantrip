@@ -1,0 +1,52 @@
+# Kicked, Divine Resilience gives any number of target creatures you control indestructible until end of turn (CR 702.33a,
+# 601.2c): in response to Bot2's Wrath of God Bot1 chooses two of its three Ornithopters, which survive; the third is
+# destroyed. The indestructibility ends with the turn (CR 514.2): on Bot1's turn the survivors have only flying.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Ornithopter
+Ornithopter
+Ornithopter
+Divine Resilience
+Plains x12
+
+[Bot2 Deck]
+Plains
+Black Lotus
+Wrath of God
+Plains x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+[T4 Bot2.Main2]
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Wrath of God.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Divine Resilience.Cast(Kicked: 1)
+Bot1.Target(Ornithopter#1; Ornithopter#2)
+[T4 Bot2.End]
+? Bot1.Battlefield = Plains; Mox Pearl; Mox Sapphire; Mox Ruby; Ornithopter; Ornithopter
+? Bot1.Graveyard = Ornithopter; Divine Resilience
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield = Plains; Mox Pearl; Mox Sapphire; Mox Ruby; Ornithopter; Ornithopter
+Bot1.Battlefield.Ornithopter#1.Keywords = Flying
+Bot1.Battlefield.Ornithopter#2.Keywords = Flying

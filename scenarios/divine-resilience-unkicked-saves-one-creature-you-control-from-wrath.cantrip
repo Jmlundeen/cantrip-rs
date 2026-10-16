@@ -1,0 +1,44 @@
+# Divine Resilience unkicked gives exactly one target creature you control indestructible until end of turn (CR 601.2c,
+# 702.12b): in response to Bot2's Wrath of God, with two Ornithopters of Bot1's to choose, neither none nor both is a
+# number the question takes, Bot2's Ornithopter is no candidate (the refusals), and one of Bot1's is (the line after). That
+# one survives the Wrath; the other and Bot2's are destroyed.
+
+[Bot1 Deck]
+Plains
+Ornithopter
+Ornithopter
+Divine Resilience
+Plains x16
+
+[Bot2 Deck]
+Plains
+Black Lotus
+Ornithopter
+Wrath of God
+Plains x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Black Lotus.Cast
+[T2 Bot2.Main2]
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Wrath of God.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Divine Resilience.Cast
+! Bot1.Target(Count: 0)
+! Bot1.Target(Count: 2)
+! Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+[T2 Bot2.End]
+
+[Expect]
+Bot1.Battlefield = Plains; Ornithopter
+Bot1.Battlefield.Ornithopter.Keywords = Flying; Indestructible
+Bot1.Graveyard = Ornithopter; Divine Resilience
+Bot2.Graveyard = Wrath of God; Ornithopter; Black Lotus
