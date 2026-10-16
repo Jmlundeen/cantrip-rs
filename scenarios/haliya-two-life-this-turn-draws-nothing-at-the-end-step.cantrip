@@ -1,0 +1,37 @@
+# The control for Haliya's end step: only 2 life gained this turn (herself and an Ornithopter), so "draw a card if you've
+# gained 3 or more life this turn" draws nothing. The Plains played first is not a creature or artifact and gains nothing
+# (and she was not there yet), and Bot2's Ornithopter on turn 2 gains nothing for Bot1 ("you control"); Bot2's end step is
+# not "your end step", so nothing is drawn there either.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Ruby
+Haliya, Guided by Light
+Ornithopter
+Plains x11
+
+[Bot2 Deck]
+Ornithopter
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Haliya, Guided by Light.Cast
+Bot1.Hand.Ornithopter.Cast
+[T1 Bot1.End]
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T2 Bot2.End]
+Bot1.Pass
+
+[Expect]
+Bot1.Life = 22
+Bot2.Life = 20
+Bot1.Hand.Count = 2

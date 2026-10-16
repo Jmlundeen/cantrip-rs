@@ -1,0 +1,8 @@
+{
+  "name": "Haliya, Guided by Light",
+  "manaCost": "{2}{W}",
+  "type": "Legendary Creature — Human Soldier",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Whenever Haliya or another creature or artifact you control enters, you gain 1 life.\nAt the beginning of your end step, draw a card if you've gained 3 or more life this turn.\nWarp {W} (You may cast this card from your hand for its warp cost. Exile this creature at the beginning of the next end step, then you may cast it from exile on a later turn.)"
+}

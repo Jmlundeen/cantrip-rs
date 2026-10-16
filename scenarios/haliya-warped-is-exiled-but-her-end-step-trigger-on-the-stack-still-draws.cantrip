@@ -1,0 +1,30 @@
+# Haliya cast for her warp cost {W} (CR 702.185a) gains 1 life as she enters, and two Moxen cast after her make 3 life this
+# turn. At the beginning of the end step her own trigger and warp's delayed trigger (exile her) fire together; both are on the
+# stack, so she is exiled by the one while the other still resolves, drawing the card.
+
+[Bot1 Deck]
+Plains
+Haliya, Guided by Light
+Mox Pearl
+Mox Ruby
+Plains x11
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Haliya, Guided by Light.Cast(Ability: Warp)
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T1 Bot1.Main2]
+? Bot1.Life = 23
+? Bot1.Hand.Count = 3
+[T1 Bot1.End]
+Bot1.Pass
+
+[Expect]
+Exile = Haliya, Guided by Light
+Bot1.Life = 23
+Bot1.Hand.Count = 4
