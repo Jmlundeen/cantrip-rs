@@ -23,7 +23,7 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
         bool permanents = prompt.Purpose is CardChoicePurposeView.Sacrifice or CardChoicePurposeView.ReturnToHand
             or CardChoicePurposeView.Untap or CardChoicePurposeView.Keep or CardChoicePurposeView.TapToPay
             or CardChoicePurposeView.Destroy or CardChoicePurposeView.Attach or CardChoicePurposeView.Encode
-            or CardChoicePurposeView.Blight;
+            or CardChoicePurposeView.Blight or CardChoicePurposeView.TapToReduce;
         // A mulligan's bottoming is asked by the rules and has no source; an effect's (Valakut Awakening) names its own.
         string source = legend ? "The legend rule"
             : client.Object(context?.Source ?? prompt.Source)?.Name
@@ -41,7 +41,8 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
             _ => Action(context?.Action ?? ActionFor(prompt.Purpose)),
         };
         bool cost = context?.Cause == PromptCauseView.Cost || context is null
-            && prompt.Purpose is CardChoicePurposeView.ExileToPay or CardChoicePurposeView.ReturnToHand or CardChoicePurposeView.TapToPay;
+            && prompt.Purpose is CardChoicePurposeView.ExileToPay or CardChoicePurposeView.ReturnToHand or CardChoicePurposeView.TapToPay
+                or CardChoicePurposeView.TapToReduce;
         // Behold and blight name the cost in their own verb ("to behold", "to blight"): "to pay for it" would add nothing.
         if (cost && prompt.Purpose is not (CardChoicePurposeView.Behold or CardChoicePurposeView.Blight)) verb += " to pay for it";
         ZoneKindView? table = ChoiceTable(client, prompt);
@@ -70,6 +71,9 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
             : prompt.MinimumManaValue > 0
                 ? $"{source}: choose cards with total mana value {prompt.MinimumManaValue} or more to {verb}"
             : prompt.Count == 0 ? $"{source}: nothing to choose"
+            // Harmonize (CR 702.180a): up to one, and what tapping it does to the cost is said before it is chosen.
+            : prompt.Purpose == CardChoicePurposeView.TapToReduce
+                ? $"{source}: tap up to one untapped creature you control to reduce the cost by generic mana equal to its power"
             : prompt.Purpose == CardChoicePurposeView.Behold && prompt.Count == 1 && !prompt.UpTo && prompt.Kind.Length > 0
                 ? $"{source}: choose {article} {kind} you control or reveal {article} {kind} card from your hand to behold"
             : prompt.Purpose == CardChoicePurposeView.Blight && prompt.Count == 1 && !prompt.UpTo
@@ -77,7 +81,11 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
             : prompt.Count == 1 && !prompt.UpTo ? $"{source}: choose {article} {kind} to {verb}{budget}"
             : anyNumber ? $"{source}: choose any number of {many} to {verb}{budget}"
             : $"{source}: choose {(prompt.UpTo ? "up to " : "")}{prompt.Count} {many} to {verb}{budget}";
-        string detail = prompt.MinimumPower > 0
+        string detail = prompt.Purpose == CardChoicePurposeView.TapToReduce
+            ? picked.Count == 0
+                ? $"None tapped: the full cost is paid{where}"
+                : $"Tapping it takes {power} off the generic mana of the cost (never colored mana){where}"
+            : prompt.MinimumPower > 0
             ? $"{picked.Count} chosen  ·  total power {power} of {prompt.MinimumPower}{where}"
             : prompt.MinimumManaValue > 0
                 ? $"{picked.Count} chosen  ·  total mana value {manaValue} of {prompt.MinimumManaValue}{where}"
@@ -98,6 +106,7 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
             CardChoicePurposeView.ReturnToHand => picked.Count == 1 ? "Return it" : $"Return {picked.Count}",
             CardChoicePurposeView.Untap => picked.Count == 0 ? "Untap nothing" : $"Untap {picked.Count}",
             CardChoicePurposeView.TapToPay => picked.Count == 1 ? "Tap it" : $"Tap {picked.Count}",
+            CardChoicePurposeView.TapToReduce => picked.Count == 0 ? "Tap nothing" : power > 0 ? $"Tap it (-{power})" : "Tap it",
             CardChoicePurposeView.PutOntoBattlefield => picked.Count == 0 ? "Put nothing" : "Put onto the battlefield",
             CardChoicePurposeView.PutIntoHand => picked.Count == 0 ? "Take nothing"
                 : forAnother ? "Put into their hand" : "Put into your hand",
@@ -183,6 +192,7 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
         CardChoicePurposeView.Encode => PromptActionView.Encode,
         CardChoicePurposeView.Behold => PromptActionView.Behold,
         CardChoicePurposeView.Blight => PromptActionView.Blight,
+        CardChoicePurposeView.TapToReduce => PromptActionView.TapToReduce,
         _ => PromptActionView.Choose,
     };
 
@@ -210,6 +220,7 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
         PromptActionView.Encode => "encode it on",
         PromptActionView.Behold => "behold",
         PromptActionView.Blight => "blight (put -1/-1 counters on)",
+        PromptActionView.TapToReduce => "tap to reduce the cost",
         _ => "choose",
     };
 }

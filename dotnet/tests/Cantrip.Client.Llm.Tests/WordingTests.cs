@@ -113,6 +113,32 @@ public sealed class WordingTests
     }
 
     [Fact]
+    public void A_harmonize_tap_says_up_to_one_and_that_it_takes_generic_mana_off_the_cost()
+    {
+        var chooser = new ScriptedChooser([0]);
+        ObjectView bears = Creature(3, "Grizzly Bears", 2, 2, Me);
+
+        new Decisions(chooser).Answer(
+            Seated(bears),
+            new ChooseCardsPromptMessage
+            {
+                Player = Me,
+                Source = Handle(9),
+                Purpose = CardChoicePurposeView.TapToReduce,
+                Cards = [Handle(3)],
+                Eligible = [Handle(3)],
+                Powers = [2],
+                Count = 1,
+                UpTo = true,
+            });
+
+        string heading = chooser.Asked[0].Heading;
+        Assert.Contains("up to one untapped creature", heading, StringComparison.Ordinal);
+        Assert.Contains("harmonize", heading, StringComparison.Ordinal);
+        Assert.Contains("generic mana of the cost", heading, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void A_search_of_another_libraries_says_whose_and_where_the_cards_go()
     {
         var chooser = new ScriptedChooser([0]);

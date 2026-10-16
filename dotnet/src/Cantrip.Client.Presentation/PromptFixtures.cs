@@ -475,7 +475,7 @@ public static class PromptFixtures
                 Cause = choose.Purpose is CardChoicePurposeView.KeepLegend or CardChoicePurposeView.OrderSimultaneous
                     ? PromptCauseView.Rule
                     : fixture is "choose-sacrifice-cost" or "choose-return-to-hand"
-                        || choose.Purpose is CardChoicePurposeView.ExileToPay or CardChoicePurposeView.TapToPay
+                        || choose.Purpose is CardChoicePurposeView.ExileToPay or CardChoicePurposeView.TapToPay or CardChoicePurposeView.TapToReduce
                         ? PromptCauseView.Cost : PromptCauseView.Effect,
                 Chooser = choose.Player,
                 Owner = choose.Owner,

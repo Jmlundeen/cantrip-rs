@@ -277,6 +277,39 @@ public sealed partial class TacticalPlay
         return [.. ranked.Take(Math.Clamp(count, 0, cards.Count))];
     }
 
+    /// <summary>
+    /// The creature harmonize taps (CR 702.180a), up to one: none while the mana at hand pays the printed harmonize cost, since the
+    /// creature is then worth more untapped (to attack, to block). Short of the mana, a creature whose power (the prompt's, which
+    /// is what comes off the cost) leaves the rest payable once its own mana is no longer there (CR 702.180b: tapped for the
+    /// cost, it makes none), the one worth least; else the one that comes nearest. Cost increases (Thalia) are not in the
+    /// prompt, so they are not counted: the seat then answers as if there were none, and pays what the game asks.
+    /// </summary>
+    private AnswerPayload TapToReduce(GameClient client, ChooseCardsPromptMessage prompt)
+    {
+        string text = client.Object(prompt.Source) is { } spell ? CardReading.Text(spell) : string.Empty;
+        System.Text.RegularExpressions.Match harmonize = System.Text.RegularExpressions.Regex.Match(text, @"Harmonize ((\{[^}]+\})+)");
+        int cost = harmonize.Success ? CardReading.ManaValue(harmonize.Groups[1].Value) : 0;
+        int mana = Mana(client);
+
+        if (cost <= mana)
+        {
+            return new CardsChosenAnswer { Cards = [] };
+        }
+
+        List<(ViewHandle Card, int Margin)> options = [.. prompt.Eligible.Select((card, index) =>
+        {
+            ObjectView? creature = client.Object(card);
+            int own = creature is { ProducesMana: true } && !creature.SummoningSick ? 1 : 0;
+            return (card, mana - own - (cost - (index < prompt.Powers.Count ? prompt.Powers[index] : 0)));
+        })];
+        List<(ViewHandle Card, int Margin)> enough = [.. options.Where(option => option.Margin >= 0)];
+        ViewHandle chosen = enough.Count > 0
+            ? enough.MinBy(option => client.Object(option.Card) is { } card ? Worth(client, card) : 0).Card
+            : options.MaxBy(option => option.Margin).Card;
+
+        return new CardsChosenAnswer { Cards = [chosen] };
+    }
+
     private AnswerPayload Cards(GameClient client, PlayerView view, ChooseCardsPromptMessage prompt)
     {
         // A choice that has to add up to a power (saddle, crew): the creatures that reach it and give up least, where
@@ -313,6 +346,13 @@ public sealed partial class TacticalPlay
             || prompt.Purpose is CardChoicePurposeView.OrderSimultaneous or CardChoicePurposeView.Vote or CardChoicePurposeView.Splice)
         {
             return prompt.Default();
+        }
+
+        // Harmonize (CR 702.180a): the creature tapped to take its power off the generic mana of the cost. A tapped creature can
+        // neither attack nor block until it untaps, so none is tapped unless the mana for the cost is not there without it.
+        if (prompt.Purpose == CardChoicePurposeView.TapToReduce)
+        {
+            return TapToReduce(client, prompt);
         }
 
         int most = Math.Min(prompt.Count, prompt.Eligible.Count);
