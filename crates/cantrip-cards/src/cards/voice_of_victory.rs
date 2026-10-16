@@ -3,7 +3,7 @@ use cantrip_mechanics::mobilize;
 use cantrip_oracle as oracle;
 
 /// "Your opponents can't cast spells during your turn" (CR 101.2): a cast rule, true for who may cast.
-fn opponents_cant_cast_on_your_turn(q: &dyn Query, asker: &Asker, caster: PlayerId) -> bool {
+fn opponents_cant_cast_on_your_turn(q: &dyn Query, asker: &Asker, caster: PlayerId, _from: ZoneKind) -> bool {
     !(q.state().turn.active == asker.controller && caster != asker.controller)
 }
 

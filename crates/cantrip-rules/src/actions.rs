@@ -1244,9 +1244,11 @@ fn activated_options(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOption>)
                 // Foretell (CR 702.143a): during your own turn.
                 Timing::OwnTurn if cx.s().turn.active != player => continue,
                 // Suspend (CR 702.62a): whenever the card could be cast.
+                // "Could begin to cast this card by putting it onto the stack from your hand" (CR 702.62a): from the zone
+                // the ability works from, which is the zone the card would be cast from.
                 Timing::AsCast
                     if !(chars.is(CardType::Instant) || chars.has(Keyword::Flash) || sorcery_timing(cx, player))
-                        || !static_rules::may_cast(cx, player) =>
+                        || cast_barred(cx, player).contains(zone) =>
                 {
                     continue;
                 }
@@ -1493,11 +1495,17 @@ fn faces_to_cast(def: &'static CardDef) -> Vec<(u8, &'static CardDef)> {
     faces
 }
 
-/// Whether anything forbids `player` to cast a spell now, whatever it is and wherever it is cast from (CR 101.2, 601.3): a
-/// static ability that bars them from casting (Jennifer Walters) or a limit on the spells each player may cast in a turn
-/// (Archon of Emeria) already reached. Asked of every cast alike, whether it is begun with priority or as an effect resolves.
-fn may_begin_cast(cx: &Cx, player: PlayerId) -> bool {
-    !cast_limit(cx).is_some_and(|limit| cx.history().casts_by(player).count() >= limit as usize) && static_rules::may_cast(cx, player)
+/// The kinds of zone from which anything forbids `player` to cast a spell now, whatever the spell is (CR 101.2, 601.3): a
+/// static ability that bars them from casting (Jennifer Walters) or from casting from some zones (Drannith Magistrate), an
+/// effect that does (Avatar's Wrath), or a limit on the spells each player may cast in a turn (Archon of Emeria) already
+/// reached, which bars every zone. Asked of every cast alike, whether it is begun with priority or as an effect resolves,
+/// with the zone the card is in as it is begun (CR 601.2a); a copy of a card is cast from the zone it is created in (CR
+/// 707.12).
+fn cast_barred(cx: &Cx, player: PlayerId) -> ZoneKinds {
+    if cast_limit(cx).is_some_and(|limit| cx.history().casts_by(player).count() >= limit as usize) {
+        return ZoneKinds::ALL;
+    }
+    static_rules::cast_barred(cx, player)
 }
 
 /// Whether the card's own restriction on when it may be cast ("Cast this spell only ...", CR 601.3) allows it now.
@@ -1529,7 +1537,8 @@ fn extra_payable(cx: &Cx, id: ObjectId, player: PlayerId, def: &CardDef) -> bool
 }
 
 fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available>, instants: bool, options: &mut Vec<ActionOption>) {
-    if !may_begin_cast(cx, player) {
+    let barred = cast_barred(cx, player);
+    if ZoneKinds::CAST_FROM.iter().all(|&from| barred.contains(from)) {
         return;
     }
     // Types of spell the player may cast as though they had flash (CR 307.5).
@@ -1537,7 +1546,11 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
     // Or by a static ability's say-so about a kind of spell (Sigarda's Aid): looked for once, empty unless one is on the board.
     let flash_granters = static_rules::flash_granters(cx);
     // Any player's exile, for a card a permission lets them cast from there; their own other zones.
-    let zones = [Zone::hand(player), Zone::graveyard(player)].into_iter().chain(cx.s().seats().map(Zone::exile));
+    // A zone a rule forbids them to cast from is not looked in (CR 101.2).
+    let zones = [Zone::hand(player), Zone::graveyard(player)]
+        .into_iter()
+        .chain(cx.s().seats().map(Zone::exile))
+        .filter(|zone| !barred.contains(zone.kind()));
     let granted: std::cell::OnceCell<Vec<(ObjectId, PlayerId, &'static GrantedWay)>> = std::cell::OnceCell::new();
     for zone in zones {
         let own = zone.player == player;
@@ -1779,6 +1792,7 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
     }
     // The top card of the library, for a player a permanent lets cast spells from there for their mana cost (CR 601.3).
     if cx.cards().any_play_rules
+        && !barred.contains(ZoneKind::Library)
         && let Some(&id) = cx.s().zone(Zone::library(player)).first()
     {
         let def = cx.card(cx.s().obj(id).card);
@@ -1803,7 +1817,8 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
         }
     }
     // The top card of the library, for a player a permanent lets cast from there for life (CR 601.3, 118.9).
-    if land_rules(cx, player).3
+    if !barred.contains(ZoneKind::Library)
+        && land_rules(cx, player).3
         && let Some(&id) = cx.s().zone(Zone::library(player)).first()
     {
         let def = cx.card(cx.s().obj(id).card);
@@ -2550,11 +2565,11 @@ pub fn could_cast_during_resolution(cx: &Cx, card: ObjectId) -> bool {
 /// back face. Fuse is not among them: it applies only in a hand (CR 702.102a).
 pub fn cast_ways_during_resolution(cx: &Cx, card: ObjectId) -> Vec<CastWay> {
     let Some(player) = cx.s().stack.last().map(|i| i.controller) else { return Vec::new() };
-    if !may_begin_cast(cx, player) {
-        return Vec::new();
-    }
     let obj = cx.s().obj(card);
     if !live(cx.s(), card) || matches!(obj.zone.kind(), ZoneKind::Battlefield | ZoneKind::Stack) {
+        return Vec::new();
+    }
+    if cast_barred(cx, player).contains(obj.zone.kind()) {
         return Vec::new();
     }
     let def = cx.card(obj.card);
@@ -2667,11 +2682,11 @@ pub fn cast_during_resolution(cx: &mut Cx, card: ObjectId, terms: CastTerms) -> 
 /// card that is not modal (CR 712.11c-d: its back face has no mana cost of its own), judged as that back face alone.
 pub fn could_cast_transformed_during_resolution(cx: &Cx, card: ObjectId) -> bool {
     let Some(player) = cx.s().stack.last().map(|i| i.controller) else { return false };
-    if !may_begin_cast(cx, player) {
-        return false;
-    }
     let obj = cx.s().obj(card);
     if !live(cx.s(), card) || matches!(obj.zone.kind(), ZoneKind::Battlefield | ZoneKind::Stack) {
+        return false;
+    }
+    if cast_barred(cx, player).contains(obj.zone.kind()) {
         return false;
     }
     let Some(back) = cx.card(obj.card).back else { return false };

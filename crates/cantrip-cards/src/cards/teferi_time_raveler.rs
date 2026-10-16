@@ -4,7 +4,7 @@ use cantrip_oracle as oracle;
 
 /// Each opponent can cast spells only any time they could cast a sorcery (CR 307.1, 101.2): the active player in a
 /// main phase with the stack empty. The prohibition reaches a spell another effect offers during resolution too.
-fn opponents_cast_as_sorcery(q: &dyn Query, asker: &Asker, caster: PlayerId) -> bool {
+fn opponents_cast_as_sorcery(q: &dyn Query, asker: &Asker, caster: PlayerId, _from: ZoneKind) -> bool {
     let s = q.state();
     caster == asker.controller || (caster == s.turn.active && s.turn.step().is_main() && s.stack.is_empty())
 }

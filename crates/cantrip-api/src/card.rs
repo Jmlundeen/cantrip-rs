@@ -978,9 +978,11 @@ impl GrantedWay {
     pub const CAST: GrantedWay = GrantedWay { text: "", cost: |_, _, _, _| None, lands: false, gains: None };
 }
 
-/// A static ability that says whether a player may cast spells right now (CR 101.2, 601.3): false forbids it, and
-/// forbids it for every spell, for a cast an effect offers during resolution too.
-pub type CastRule = fn(&dyn Query, &Asker, PlayerId) -> bool;
+/// A static ability that says whether a player may cast spells right now from a kind of zone (CR 101.2, 601.3): false
+/// forbids it, for every spell cast from that zone, a cast an effect offers during resolution too. "Your opponents can't
+/// cast spells during your turn" (Voice of Victory) ignores the zone; "your opponents can't cast spells from anywhere other
+/// than their hands" (Drannith Magistrate) reads it.
+pub type CastRule = fn(&dyn Query, &Asker, PlayerId, ZoneKind) -> bool;
 
 /// A static ability that limits who may block whom (CR 509.1b): asked of the object that has it, with the blocker and the
 /// attacker of a possible block, either of which may be the object itself; false forbids the block. "This creature can't

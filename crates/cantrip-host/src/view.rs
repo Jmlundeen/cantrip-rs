@@ -474,6 +474,15 @@ impl<'a> Projector<'a> {
                 ));
             }
         }
+        // "Your opponents can't cast spells from anywhere other than their hands" until a turn (CR 101.2, 611.2c): a restriction
+        // on the player, on no object, so the player it stops is told where they may still cast from.
+        for e in s.effects.iter() {
+            if let EffectKind::CantCastSpellsFrom(barred, zones) = e.kind
+                && barred == p
+            {
+                summary.pending_effects.push(self.cant_cast_text(p, zones, e.duration));
+            }
+        }
         if player.room != 0
             && let Some(dungeon) = game.cards.undercity
         {
@@ -482,6 +491,30 @@ impl<'a> Projector<'a> {
             summary.dungeon_room = label.split(" \u{2014} ").next().unwrap_or(label).to_string();
         }
         summary
+    }
+
+    /// "You can't cast spells from anywhere other than your hand until Bot1's next turn", as `viewer` reads a restriction on
+    /// `p` (CR 101.2).
+    fn cant_cast_text(&self, p: PlayerId, zones: ZoneKinds, duration: Duration) -> String {
+        let (who, whose) = if p == self.viewer { ("You", "your") } else { ("They", "their") };
+        let open: Vec<ZoneKind> = ZoneKinds::CAST_FROM.into_iter().filter(|&z| !zones.contains(z)).collect();
+        let from = match open.as_slice() {
+            [] => String::new(),
+            [only] => format!(" from anywhere other than {whose} {}", only.name().to_lowercase()),
+            _ => {
+                let barred: Vec<String> =
+                    ZoneKinds::CAST_FROM.into_iter().filter(|&z| zones.contains(z)).map(|z| z.name().to_lowercase()).collect();
+                format!(" from {whose} {}", barred.join(" or "))
+            }
+        };
+        let until = match duration {
+            Duration::EndOfTurn => " this turn".to_string(),
+            Duration::UntilNextTurnOf(q) if q == self.viewer => " until your next turn".to_string(),
+            Duration::UntilNextTurnOf(q) if q == p => format!(" until {whose} next turn"),
+            Duration::UntilNextTurnOf(q) => format!(" until {}'s next turn", self.names.get(q.index()).cloned().unwrap_or_default()),
+            _ => String::new(),
+        };
+        format!("{who} can't cast spells{from}{until}.")
     }
 
     fn zone_view(&self, kind: ZoneKind, owner: PlayerId, handles: &mut HandleSpace, visible: &HashSet<ObjectId>) -> ZoneView {

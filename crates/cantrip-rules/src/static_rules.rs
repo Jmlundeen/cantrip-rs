@@ -16,15 +16,28 @@ fn sources<'a>(cx: &'a Cx, has: impl Fn(&CardDef) -> bool + 'a) -> impl Iterator
     })
 }
 
-/// Whether anything on the battlefield forbids `player` to cast spells right now (CR 101.2).
-pub fn may_cast(cx: &Cx, player: PlayerId) -> bool {
-    for (id, controller, def) in sources(cx, |d| !d.cast_rules.is_empty()) {
-        let asker = Asker { source: id, controller };
-        if def.cast_rules.iter().any(|rule| !rule(cx, &asker, player)) {
-            return false;
+/// The kinds of zone `player` can't cast spells from right now (CR 101.2, 601.3): those a static ability of a permanent on the
+/// battlefield forbids (Voice of Victory forbids them all on its controller's turn, Drannith Magistrate every zone but the
+/// hand), and those an effect about the player does (`EffectKind::CantCastSpellsFrom`, Avatar's Wrath). A restriction takes
+/// precedence over any permission to cast (CR 101.2).
+pub fn cast_barred(cx: &Cx, player: PlayerId) -> ZoneKinds {
+    let mut barred = ZoneKinds::NONE;
+    for e in &cx.s().effects {
+        if let EffectKind::CantCastSpellsFrom(p, zones) = e.kind
+            && p == player
+        {
+            barred = barred.union(zones);
         }
     }
-    true
+    for (id, controller, def) in sources(cx, |d| !d.cast_rules.is_empty()) {
+        let asker = Asker { source: id, controller };
+        for from in ZoneKinds::CAST_FROM {
+            if !barred.contains(from) && def.cast_rules.iter().any(|rule| !rule(cx, &asker, player, from)) {
+                barred = barred.with(from);
+            }
+        }
+    }
+    barred
 }
 
 /// Whether a static ability makes the damage `source` is about to deal unpreventable (CR 615.12). Asked only when

@@ -894,6 +894,45 @@ impl ZoneKind {
     }
 }
 
+/// A set of zone kinds (CR 400.1): the zones a rule names, as "can't cast spells from graveyards or libraries" (CR 101.2).
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Default)]
+pub struct ZoneKinds(pub u8);
+
+impl ZoneKinds {
+    pub const NONE: ZoneKinds = ZoneKinds(0);
+    /// Every zone: "can't cast spells" wherever they are.
+    pub const ALL: ZoneKinds = ZoneKinds(u8::MAX);
+    /// The zones a spell can be cast from (CR 601.2a): every zone but the battlefield and the stack.
+    pub const CAST_FROM: [ZoneKind; 5] = [ZoneKind::Hand, ZoneKind::Graveyard, ZoneKind::Exile, ZoneKind::Library, ZoneKind::Command];
+
+    pub const fn of(kinds: &[ZoneKind]) -> ZoneKinds {
+        let mut bits = 0u8;
+        let mut i = 0;
+        while i < kinds.len() {
+            bits |= 1 << kinds[i] as u8;
+            i += 1;
+        }
+        ZoneKinds(bits)
+    }
+
+    /// Every zone but these: "from anywhere other than their hands".
+    pub const fn all_but(kinds: &[ZoneKind]) -> ZoneKinds {
+        ZoneKinds(!ZoneKinds::of(kinds).0)
+    }
+
+    pub const fn contains(self, kind: ZoneKind) -> bool {
+        self.0 & (1 << kind as u8) != 0
+    }
+
+    pub const fn union(self, other: ZoneKinds) -> ZoneKinds {
+        ZoneKinds(self.0 | other.0)
+    }
+
+    pub const fn with(self, kind: ZoneKind) -> ZoneKinds {
+        ZoneKinds(self.0 | (1 << kind as u8))
+    }
+}
+
 /// A zone: its kind and, for the zones a player has, whose. The battlefield and the stack belong to nobody; their
 /// `player` is zero.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Default)]

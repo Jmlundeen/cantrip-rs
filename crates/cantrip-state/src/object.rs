@@ -490,6 +490,13 @@ pub enum EffectKind {
     /// The player can't gain life (CR 119.7): Screaming Nemesis's "for the rest of the game" (`Duration::Indefinite`). It is
     /// about the player and outlives its `affected` object, which is only the source.
     CantGainLife(PlayerId),
+    /// The player can't cast spells from these zones (CR 101.2, 601.3, 611.2c): Avatar's Wrath's "until your next turn, your
+    /// opponents can't cast spells from anywhere other than their hands", one effect for each player affected, who are the
+    /// opponents as it resolves. Only casting is stopped: an activated ability is no spell, and a copy of a spell put onto
+    /// the stack is not cast (CR 707.10). It is about the player, so it reaches cards that arrive in those zones later, and
+    /// outlives its `affected` object, which is only the source. A static ability with the same words (Drannith Magistrate)
+    /// is a `CardDef::cast_rules` entry, which is told the zone too.
+    CantCastSpellsFrom(PlayerId, ZoneKinds),
     /// The creature can attack as though it didn't have defender (CR 702.3b, 609.4) for as long as the effect lasts.
     CanAttackDespiteDefender,
     /// "Creatures [this player] controls can't block this turn" (CR 509.1b, 611.2c): a rule about a player, so it reaches creatures
@@ -539,6 +546,7 @@ impl EffectKind {
                 | EffectKind::InstantLoyalty(_)
                 | EffectKind::NoMaximumHandSize
                 | EffectKind::CantGainLife(_)
+                | EffectKind::CantCastSpellsFrom(..)
                 | EffectKind::ReplacementRule(_)
                 | EffectKind::CreaturesCantBlock(_)
                 | EffectKind::PlayFromGraveyard

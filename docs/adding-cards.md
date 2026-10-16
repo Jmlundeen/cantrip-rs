@@ -249,7 +249,10 @@ shapes have an example:
   returns a `CostDelta`: `more(n)` generic, `less(n)` generic, or `less_mana(cost)` for an amount that may be colored,
   whose colored part comes off that color and any excess off generic (CR 118.7). "Activate only once" is `.once()`;
   **cast limits and bans** are
-  `CardDef.cast_rules` (`fn(&dyn Query, &Asker, caster) -> bool`, false forbids: Teferi); **as though it had flash** is
+  `CardDef.cast_rules` (`fn(&dyn Query, &Asker, caster, from: ZoneKind) -> bool`, false forbids casting from that zone:
+  Teferi, Drannith Magistrate's "from anywhere other than their hands"), and a resolved spell's bar on a player casting from
+  some zones is `EffectKind::CantCastSpellsFrom(player, ZoneKinds)` (Avatar's Wrath), both read by the core wherever a
+  cast is begun, during a resolution too (CR 101.2, 601.3); **as though it had flash** is
   `EffectKind::CastAsThoughFlash(types)` for a resolved spell's effect and `CardDef.flash_rules` for a static ability
   ("You may cast Aura and Equipment spells as though they had flash", Sigarda's Aid); a static lifting a loyalty ability's timing is `CardDef.instant_activation`
   (The Wandering Emperor), and a resolved spell's "you may activate loyalty abilities of [Jace] planeswalkers you control
