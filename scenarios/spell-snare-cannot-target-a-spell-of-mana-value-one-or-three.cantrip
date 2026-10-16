@@ -1,0 +1,34 @@
+# "Spell with mana value 2" is exact (CR 202.3): Mind Twist with X = 0 is mana value 1 and with X = 2 is mana value 3, so Spell
+# Snare cannot target either (the refusals); both resolve, and Bot2 discards nothing, then two cards at random. The positive
+# control, X = 1, is spell-snare-counters-a-spell-of-mana-value-two-and-only-two.
+
+[Bot1 Deck]
+Black Lotus
+Mind Twist
+Mind Twist
+Swamp x17
+
+[Bot2 Deck]
+Island
+Island
+Spell Snare
+Island x17
+
+[Actions]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Mind Twist.Cast(Bot2; X: 0)
+Bot2.Battlefield.Island.Activate
+! Bot2.Hand.Spell Snare.Cast(Stack.Mind Twist)
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Mind Twist.Cast(Bot2; X: 2)
+! Bot2.Hand.Spell Snare.Cast(Stack.Mind Twist)
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot2.Hand.Count = 5
+Bot2.Graveyard.Count = 2

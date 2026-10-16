@@ -1,0 +1,30 @@
+# "Counter target spell with mana value 2" (CR 115.1, 202.3, 701.6): Mind Twist is {X}{B}, so with X = 1 it is mana value 2 on
+# the stack (CR 202.3e) and Bot2's Spell Snare counters it: nothing is discarded. The refusals are in
+# spell-snare-cannot-target-a-spell-of-mana-value-one-or-three, with the same setup.
+
+[Bot1 Deck]
+Black Lotus
+Mind Twist
+Swamp x18
+
+[Bot2 Deck]
+Island
+Island
+Spell Snare
+Island x17
+
+[Actions]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Mind Twist.Cast(Bot2; X: 1)
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Spell Snare.Cast(Stack.Mind Twist)
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Mind Twist; Black Lotus
+Bot2.Graveyard = Spell Snare
+Bot2.Hand.Count = 6
