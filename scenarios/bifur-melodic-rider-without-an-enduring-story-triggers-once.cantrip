@@ -1,0 +1,48 @@
+# Bifur without an enduring story (CR 603.2d, 702.195b): Bifur and Mox Ruby are two, so its enters ability triggers once - a
+# 5/6 - and its attack ability once - a 6/7 hitting Bot2 for 6. The control for
+# bifur-melodic-rider-entering-as-the-third-doubles-its-own-enters-ability.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mountain
+Mountain
+Mountain
+Mountain
+Bifur, Melodic Rider
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Bifur, Melodic Rider.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+[T9 Bot1.Main2]
+? Bot1.Battlefield.Bifur, Melodic Rider.Power = 5
+[T11 Bot1.Main1]
+Bot1.Attack(Bifur, Melodic Rider)
+[T11 Bot1.Main2]
+
+[Expect]
+Bot1.EnduringStory = (absent)
+Bot1.Battlefield.Bifur, Melodic Rider.Power = 6
+Bot1.Battlefield.Bifur, Melodic Rider.Toughness = 7
+Bot2.Life = 14

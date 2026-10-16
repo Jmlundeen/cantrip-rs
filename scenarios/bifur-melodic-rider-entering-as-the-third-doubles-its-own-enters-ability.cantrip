@@ -1,0 +1,56 @@
+# Bifur, Melodic Rider and CR 702.195c: "After a player gets an enduring story, continuous effects are reapplied before the
+# game checks to see if ... preceding events have matched any trigger conditions." Bot1 controls Mox Ruby and Mox Pearl;
+# Bifur entering is the third, so Bot1 has the story before Bifur's "enters or attacks" ability is looked for, and Bifur's
+# "if a triggered ability of a Dwarf you control triggers, that ability triggers an additional time" applies to it (the
+# rulings): two +1/+1 counters on Bifur, a 6/7. On turn nine Thraben Inspector, a Human, enters and investigates once only;
+# then Bifur attacks, its ability triggers twice again, and an 8/9 Bifur hits Bot2 for 8. Bifur is the only
+# creature when its ability triggers, so each triggering targets it without asking.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Pearl
+Mountain
+Mountain
+Mountain
+Bifur, Melodic Rider
+Thraben Inspector
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Bifur, Melodic Rider.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+[T7 Bot1.Main2]
+? Bot1.EnduringStory = true
+? Bot1.Battlefield.Bifur, Melodic Rider.Counters.PlusOnePlusOne = 2
+[T9 Bot1.Main1]
+Bot1.Hand.Thraben Inspector.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Attack(Bifur, Melodic Rider)
+[T9 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mountain; Mountain; Mountain; Mountain; Mox Ruby; Mox Pearl; Bifur, Melodic Rider; Thraben Inspector; Clue Token
+Bot1.Battlefield.Bifur, Melodic Rider.Power = 8
+Bot1.Battlefield.Bifur, Melodic Rider.Toughness = 9
+Bot2.Life = 12

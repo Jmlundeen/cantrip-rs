@@ -1,0 +1,8 @@
+{
+  "name": "Bifur, Melodic Rider",
+  "manaCost": "{4}{R/W}{R/W}",
+  "type": "Legendary Creature — Dwarf Bard",
+  "power": 4,
+  "toughness": 5,
+  "oracleText": "Storied (If you control three or more artifacts, legendaries, and/or Sagas, you have an enduring story for the rest of the game.)\nWhenever Bifur enters or attacks, put a +1/+1 counter on target creature.\nAs long as you have an enduring story, if a triggered ability of a Dwarf you control triggers, that ability triggers an additional time."
+}
