@@ -1,0 +1,49 @@
+# Doorkeeper Thrull judges an entering permanent as it exists on the battlefield (CR 603.6a, 707.2). The same game as Torpor
+# Orb's with Phyrexian Metamorph copying Cryogen Relic, with Bot2's Thrull in the Orb's place: the Relic itself, cast on
+# turn 1 before the Thrull, draws (the control); the Metamorph enters as a copy of it, an artifact, so its copied enters
+# ability does not trigger. Hand: 7 - Island, Mox Sapphire, Sol Ring, Relic = 3, + 1 for the Relic = 4; turn 3 draws (5)
+# and casts the Metamorph (4), with no card for the copy.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Sol Ring
+Cryogen Relic
+Phyrexian Metamorph
+Island x12
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Doorkeeper Thrull
+Plains x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Cryogen Relic.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Doorkeeper Thrull.Cast
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 5
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Phyrexian Metamorph.Cast
+Bot1.Accept
+Bot1.Target(Cryogen Relic)
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand.Count = 4
+Bot1.Battlefield = Island; Mox Sapphire; Sol Ring; Cryogen Relic; Cryogen Relic
+Bot1.Battlefield.Cryogen Relic#2.Types = Artifact

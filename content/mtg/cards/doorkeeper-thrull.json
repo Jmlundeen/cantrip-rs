@@ -1,0 +1,12 @@
+{
+  "name": "Doorkeeper Thrull",
+  "manaCost": "{1}{W}",
+  "type": "Creature — Thrull",
+  "power": 1,
+  "toughness": 2,
+  "oracleText": "Flash\nFlying\nArtifacts and creatures entering don't cause abilities to trigger.",
+  "keywords": [
+    "Flash",
+    "Flying"
+  ]
+}

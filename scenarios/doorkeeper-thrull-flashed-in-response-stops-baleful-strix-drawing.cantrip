@@ -1,0 +1,37 @@
+# Doorkeeper Thrull has flash: Bot2 casts it in response to Bot1's Baleful Strix. The Thrull resolves first, so the
+# Strix, an artifact creature, enters under its rule and its "When this creature enters, draw a card" does not trigger
+# (CR 603.2, 603.6a). Bot1's hand: 7 - Island, Mox Jet = 5, + the turn-3 draw - the Strix = 5, and
+# nothing drawn by the Strix.
+
+[Bot1 Deck]
+Island
+Mox Jet
+Baleful Strix
+Island x12
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Doorkeeper Thrull
+Plains x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Baleful Strix.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Doorkeeper Thrull.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand.Count = 5
+Bot1.Battlefield = Island; Mox Jet; Baleful Strix
+Bot2.Battlefield = Plains; Mox Pearl; Doorkeeper Thrull

@@ -1,0 +1,58 @@
+# Doorkeeper Thrull: "Artifacts and creatures entering don't cause abilities to trigger" (CR 603.2, 603.6a). The same
+# game as Torpor Orb's with Tezzeret, Cruel Captain, with Bot2's Thrull in its place: Mox Sapphire, cast before the Thrull,
+# puts a loyalty counter on Tezzeret (4 -> 5), and then neither Ornithopter, nor Mind Stone, nor the Clue does, every one
+# of them an artifact. A Forest is neither an artifact nor a creature, so Tireless Tracker's landfall still triggers and
+# makes the Clue (the rulings: "If a nonartifact, noncreature land enters ... the ability will trigger").
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Sol Ring
+Tezzeret, Cruel Captain
+Mox Sapphire
+Ornithopter
+Tireless Tracker
+Mind Stone
+Forest
+Forest x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Doorkeeper Thrull
+Plains x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Tezzeret, Cruel Captain.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Tezzeret, Cruel Captain.Counters.Loyalty = 5
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Doorkeeper Thrull.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Mind Stone.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Tireless Tracker.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T5 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Forest; Forest; Mox Emerald; Sol Ring; Tezzeret, Cruel Captain; Mox Sapphire; Ornithopter; Mind Stone; Tireless Tracker; Clue Token
+Bot1.Battlefield.Tezzeret, Cruel Captain.Counters.Loyalty = 5
+Bot2.Battlefield = Plains; Mox Pearl; Doorkeeper Thrull
