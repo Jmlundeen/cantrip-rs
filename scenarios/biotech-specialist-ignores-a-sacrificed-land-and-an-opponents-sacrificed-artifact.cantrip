@@ -1,0 +1,35 @@
+# "Whenever you sacrifice an artifact": Bot1 sacrificing a land (Prismatic Vista, which is no artifact) deals nothing, and
+# neither does Bot2 sacrificing its own Black Lotus (Bot2 is not "you"). Bot2 stays at 20; Bot1 at 20 less the Vista's
+# life, 19. The positive controls (a Lander, a Black Lotus of the controller's own) are the sibling scenarios.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Biotech Specialist
+Prismatic Vista
+Island x16
+
+[Bot2 Deck]
+Black Lotus
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Biotech Specialist.Cast
+Bot1.Hand.Prismatic Vista.Play
+Bot1.Battlefield.Prismatic Vista.Activate
+Bot1.Search()
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 19
+Bot2.Life = 20
+Bot1.Graveyard = Prismatic Vista
+Bot2.Graveyard = Black Lotus
+Bot1.Battlefield.Lander Token.Types = Artifact

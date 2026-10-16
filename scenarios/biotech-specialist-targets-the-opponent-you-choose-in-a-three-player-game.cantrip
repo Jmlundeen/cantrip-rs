@@ -1,0 +1,30 @@
+# Biotech Specialist's trigger targets "target opponent": with two opponents the controller chooses, here Bot3, and only
+# that opponent takes the 2 damage; Bot2 stays at 20.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Black Lotus
+Biotech Specialist
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Biotech Specialist.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Target(Bot3)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot3.Life = 18

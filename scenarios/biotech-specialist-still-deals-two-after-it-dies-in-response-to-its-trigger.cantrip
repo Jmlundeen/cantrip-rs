@@ -1,0 +1,36 @@
+# Biotech Specialist's trigger for sacrificing an artifact (Black Lotus, a card rather than a token) is already on the
+# stack when Bot2 kills the creature with Lightning Bolt (1/3, 3 damage). The ability still resolves: the damage is dealt by
+# the creature as it last existed (CR 608.2h, 113.7a), so Bot2 loses 2 life, 20 - 2 - 0 = 18, the Bolt having gone at the
+# creature.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Black Lotus
+Biotech Specialist
+Island x16
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Biotech Specialist.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Biotech Specialist)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Graveyard = Biotech Specialist; Black Lotus
+Bot2.Graveyard = Lightning Bolt

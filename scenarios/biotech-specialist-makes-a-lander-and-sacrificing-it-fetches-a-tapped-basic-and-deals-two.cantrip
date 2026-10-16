@@ -1,0 +1,45 @@
+# Biotech Specialist: "When this creature enters, create a Lander token." The Lander is an artifact with "{2}, {T},
+# Sacrifice this token: Search your library for a basic land card, put it onto the battlefield tapped, then shuffle"
+# (CR 111.10u). Sacrificing it, an artifact, as that cost triggers "Whenever you sacrifice an artifact, this creature
+# deals 2 damage to target opponent" (CR 701.21a): Bot2 goes to 18. The fetched Forest enters tapped, though the library
+# also holds an untouched Mountain; the token is gone (CR 111.7).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Mox Jet
+Mox Pearl
+Biotech Specialist
+Island
+Island
+Mountain
+Forest
+Island x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Biotech Specialist.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+? Bot1.Battlefield.Lander Token.Types = Artifact
+? Bot2.Life = 20
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Lander Token.Activate
+Bot1.Search(Forest)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield = Mox Ruby; Mox Emerald; Mox Jet; Mox Pearl; Biotech Specialist; Forest
+Bot1.Battlefield.Forest.Tapped = true
+Bot1.Library.Count = 12
