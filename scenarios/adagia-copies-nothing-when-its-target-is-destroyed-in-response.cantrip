@@ -1,5 +1,5 @@
 # Adagia, Windswept Bastion's 12+ ability targets "artifact or enchantment you control" (CR 115.1): Bot2's Mox Ruby can't be
-# chosen, Bot1's Mox Jet can. Bot2 destroys the Mox Jet with Abrade in response, so the ability's only target is illegal
+# chosen, nor Bot1's Lake-town Mariners (a creature only) or Adagia itself (a land); Bot1's Mox Jet can. Bot2 destroys the Mox Jet with Abrade in response, so the ability's only target is illegal
 # as it resolves and it does nothing (CR 608.2b): no token is created.
 
 [Bot1 Deck]
@@ -50,6 +50,8 @@ Bot1.Pass
 Bot2.Pass
 ? Bot1.Battlefield.Adagia, Windswept Bastion.Counters.Charge = 12
 ! Bot1.Battlefield.Adagia, Windswept Bastion.Activate(Bot2.Battlefield.Mox Ruby; Ability: Create a token)
+! Bot1.Battlefield.Adagia, Windswept Bastion.Activate(Lake-town Mariners; Ability: Create a token)
+! Bot1.Battlefield.Adagia, Windswept Bastion.Activate(Adagia, Windswept Bastion; Ability: Create a token)
 Bot1.Battlefield.Adagia, Windswept Bastion.Activate(Mox Jet; Ability: Create a token)
 Bot1.Battlefield.Mox Pearl.Activate
 Bot1.Battlefield.Mox Sapphire.Activate
