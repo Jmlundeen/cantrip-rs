@@ -21,10 +21,7 @@ fn size(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
 }
 
 pub static CARD: CardDef = CardDef {
-    // Printed */1+*: with its ability gone the star is worth 0 (CR 208.2a, 208.5), so a 0/1.
-    power: Some(0),
-    toughness: Some(1),
-    statics: &[characteristic_defining(Layer::PtDefine, size, "This creature's power is equal to the number of card types among cards in your graveyard and its toughness is equal to that number plus 1.")],
+    statics: &[characteristic_defining(Layer::PtDefine, size, "This creature's power is equal to the number of card types among cards in your graveyard and its toughness is equal to that number plus 1.").lost_pt(0, 1)],
     ways: &[escape::way_by_types(
         mana("{2}{B}"),
         4,

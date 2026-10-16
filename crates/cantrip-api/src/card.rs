@@ -160,6 +160,9 @@ pub struct StaticDef {
     /// The zone its source functions from (CR 113.6b): the battlefield, the graveyard for Anger's kind, or exile for
     /// cipher's (CR 702.99a).
     pub from: ZoneKind,
+    /// For a characteristic-defining ability of power and toughness printed as stars: what the stars are worth once the
+    /// ability is lost (CR 208.2a, 208.5, 613.1f), as `*/1+*` is 0/1. The card's printed power and toughness stay unset.
+    pub lost_pt: Option<(i16, i16)>,
 }
 
 fn affects_nothing(_: &dyn LayerQuery, _: ObjectId, _: ObjectId, _: &Chars) -> bool {
@@ -178,6 +181,7 @@ impl StaticDef {
             everywhere: false,
             own: false,
             from: ZoneKind::Battlefield,
+            lost_pt: None,
         };
 }
 

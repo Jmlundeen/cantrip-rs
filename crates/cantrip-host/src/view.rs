@@ -813,3 +813,20 @@ impl<'a> Projector<'a> {
         view
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// A power and toughness printed as stars are not a number on the printed card: the goyfs' sizes are their abilities'
+    /// (CR 208.2a), and what the stars are worth once that is lost is the ability's (`StaticDef::lost_pt`), so the card as read
+    /// in a deck builder or a booster shows none.
+    #[test]
+    fn a_printed_card_with_stars_for_power_and_toughness_shows_neither() {
+        let cards = cantrip_engine::cards();
+        for name in ["Tarmogoyf", "Nethergoyf", "Barrowgoyf", "Pyrogoyf"] {
+            let view = printed(cards.get(cards.find(name).expect("the card")));
+            assert_eq!((view.power, view.toughness), (None, None), "{name}");
+        }
+    }
+}

@@ -631,6 +631,11 @@ impl StaticDef {
         StaticDef { own: true, ..self }
     }
 
+    /// What the stars of the power and toughness it defines are worth once it is lost (CR 208.2a, 208.5): `*/1+*` is 0/1.
+    pub const fn lost_pt(self, power: i16, toughness: i16) -> StaticDef {
+        StaticDef { lost_pt: Some((power, toughness)), ..self }
+    }
+
     /// The zone its source functions from, where not the battlefield (CR 113.6b).
     pub const fn from(self, from: ZoneKind) -> StaticDef {
         StaticDef { from, ..self }

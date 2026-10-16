@@ -17,9 +17,6 @@ fn mill_and_take(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(triggers::DEALS_COMBAT_DAMAGE_TO_PLAYER_SUBJECT, mill_and_take, "Whenever this creature deals combat damage to a player, you may mill that many cards. If you do, you may put a creature card from among them into your hand.")],
-    // Printed */1+*: with its ability gone the star is worth 0 (CR 208.2a, 208.5), so a 0/1.
-    power: Some(0),
-    toughness: Some(1),
     statics: &[goyf::SIZE],
     ..oracle::BARROWGOYF
 };
