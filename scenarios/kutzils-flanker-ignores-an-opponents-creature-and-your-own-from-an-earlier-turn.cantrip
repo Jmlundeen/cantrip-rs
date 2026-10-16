@@ -1,0 +1,51 @@
+# Kutzil's Flanker, first mode: only creatures that left "under your control this turn" count. Bot1's own Ornithopter
+# died on turn 1 (an earlier turn: not counted); on turn 2 Bot1 Bolts Bot2's Ornithopter (a creature that left under
+# Bot2's control: not counted) and sacrifices Black Lotus (not a creature), then flashes in the Flanker: no counters,
+# a 3/1. The positive control, a creature of Bot1's leaving in the same turn, is the neighbouring scenario.
+
+[Bot1 Deck]
+Mox Ruby
+Black Lotus
+Mox Pearl
+Ornithopter
+Lightning Bolt
+Lightning Bolt
+Kutzil's Flanker
+Island x15
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Kutzil's Flanker.Cast
+Bot1.Pass
+Bot1.Modes(Put a +1/+1 counter)
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot2.Graveyard = Ornithopter
+Bot1.Graveyard = Lightning Bolt; Black Lotus; Ornithopter; Lightning Bolt
+Bot1.Battlefield.Kutzil's Flanker.Power = 3
+Bot1.Battlefield.Kutzil's Flanker.Toughness = 1

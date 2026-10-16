@@ -1,0 +1,42 @@
+# Kutzil's Flanker, first mode, source gone (CR 113.7a, 400.7): with the trigger on the stack Bot1 Bolts its own Flanker.
+# The trigger still resolves and counts the creature that left (the Flanker itself, which left the battlefield under
+# Bot1's control this turn), but there is no creature left to put counters on, so nothing happens and nothing breaks.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Emerald
+Mox Ruby
+Kutzil's Flanker
+Lightning Bolt
+Island
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Kutzil's Flanker.Cast
+Bot1.Pass
+Bot1.Modes(Put a +1/+1 counter)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Kutzil's Flanker)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Graveyard = Kutzil's Flanker; Lightning Bolt
+Bot1.Battlefield = Mox Pearl; Mox Jet; Mox Emerald; Mox Ruby

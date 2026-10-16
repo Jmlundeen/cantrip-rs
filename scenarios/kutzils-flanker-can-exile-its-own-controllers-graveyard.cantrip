@@ -1,0 +1,46 @@
+# Kutzil's Flanker, third mode: "target player", not "target opponent". Bot1 Bolts its own Ornithopter, then flashes in
+# the Flanker and targets itself: its graveyard (Ornithopter, Lightning Bolt) is exiled. The neighbouring scenario is
+# the opponent-targeting control. The Flanker gets no counters here only if the mode is the third: Ornithopter left,
+# but the first mode was not chosen.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Emerald
+Ornithopter
+Lightning Bolt
+Kutzil's Flanker
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Kutzil's Flanker.Cast
+Bot1.Pass
+Bot1.Modes(Exile target player's graveyard)
+Bot1.Target(Bot1)
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Graveyard =
+Exile = Ornithopter; Lightning Bolt

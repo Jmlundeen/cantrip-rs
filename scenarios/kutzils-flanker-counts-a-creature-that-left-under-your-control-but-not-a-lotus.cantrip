@@ -1,0 +1,38 @@
+# Kutzil's Flanker, first mode: "Put a +1/+1 counter on this creature for each creature that left the battlefield under
+# your control this turn." Bot1 Bolts its own Ornithopter (a creature leaving: one counter) and sacrifices Black Lotus
+# (a noncreature permanent leaving: not counted) before flashing in the Flanker, a 3/1 that becomes a 4/2.
+
+[Bot1 Deck]
+Mox Ruby
+Black Lotus
+Ornithopter
+Lightning Bolt
+Kutzil's Flanker
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Kutzil's Flanker.Cast
+Bot1.Pass
+Bot1.Modes(Put a +1/+1 counter)
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Graveyard = Black Lotus; Ornithopter; Lightning Bolt
+Bot1.Battlefield.Kutzil's Flanker.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Kutzil's Flanker.Power = 4
+Bot1.Battlefield.Kutzil's Flanker.Toughness = 2

@@ -1,0 +1,49 @@
+# Kutzil's Flanker, first mode, "for each creature": on turn 3 Bot1 Bolts its two Ornithopters (two creatures left under
+# its control this turn) and flashes in the Flanker with Black Lotus's mana, a 3/1 that gets two counters, a 5/3. On turn 1
+# Bot1 had already lost nothing, so the count starts at zero each turn.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Ornithopter
+Ornithopter
+Lightning Bolt
+Lightning Bolt
+Kutzil's Flanker
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter#1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Kutzil's Flanker.Cast
+Bot1.Pass
+Bot1.Modes(Put a +1/+1 counter)
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield.Kutzil's Flanker.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Kutzil's Flanker.Power = 5
+Bot1.Battlefield.Kutzil's Flanker.Toughness = 3
