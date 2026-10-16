@@ -1,0 +1,48 @@
+# Roaming Throne doubles only abilities of ANOTHER creature you control of the chosen type (CR 603.2d). It names Wizard
+# and is a Wizard itself, but its own Ward {2} triggers once when Bot2 Lightning Bolts it on turn 2: the Bolt and one ward
+# trigger are on the stack. Bot2 has no mana left to pay {2}, so the Bolt is countered. On turn 3 Bot1's Baleful Strix, a
+# Bird and no Wizard, enters: its "draw a card" triggers once.
+# Bot1's hand: 7 - 5 cast or played on turn 1 = 2; turn 3 draws (3), casts the Strix (2), draws one for it: 3.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Mox Jet
+Roaming Throne
+Baleful Strix
+Island
+Island x12
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Roaming Throne.Cast
+Bot1.Modes(Wizard)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Roaming Throne)
+? Stack.Count = 2
+[T2 Bot2.Main2]
+? Bot2.Graveyard = Lightning Bolt
+? Bot1.Battlefield.Roaming Throne.Damage = 0
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Baleful Strix.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand.Count = 3
+Bot1.Battlefield.Roaming Throne.ChosenSubtype = Wizard

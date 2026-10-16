@@ -1,0 +1,51 @@
+# Roaming Throne: "As this creature enters, choose a creature type" (Wizard), "This creature is the chosen type in
+# addition to its other types" (a Golem Wizard), and "If a triggered ability of another creature you control of the
+# chosen type triggers, it triggers an additional time" (CR 603.2d). With Naban, Dean of Iteration beside it, Emry, Lurker
+# of the Loch - a Wizard creature Bot1 controls, entering - triggers its "mill four cards" three times: once, once more
+# for Naban (a Wizard you control entering) and once more for the Throne (an ability of another Wizard you control). Bot1
+# mills twelve.
+# Mana: turn 1 Black Lotus (UUU) and Mox Jet pay the Throne's {4}, Mox Sapphire and the Island Naban's {1}{U}. Turn 3 Emry
+# costs {2}{U} less {3} for the Throne and two Moxen: {U}, the second Island.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Mox Jet
+Roaming Throne
+Naban, Dean of Iteration
+Emry, Lurker of the Loch
+Island
+Island x20
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Roaming Throne.Cast
+Bot1.Modes(Wizard)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Naban, Dean of Iteration.Cast
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Roaming Throne.Subtypes = Golem; Wizard
+? Bot1.Battlefield.Roaming Throne.ChosenSubtype = Wizard
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Emry, Lurker of the Loch.Cast
+Bot1.Pass
+Bot1.Triggers(Emry, Lurker of the Loch; Emry, Lurker of the Loch; Emry, Lurker of the Loch)
+? Stack.Count = 3
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard.Count = 13
+Bot1.Battlefield.Roaming Throne.Subtypes = Golem; Wizard
