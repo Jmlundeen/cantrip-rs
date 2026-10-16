@@ -145,7 +145,7 @@ pub enum Rest {
 /// and the rest on the bottom of your library" (CR 401.2, 701.20-ish "look"): `reveal` makes it "you may reveal". A
 /// library with fewer cards shows what it has (CR 609.3), and `min` and `max` shrink to the cards that qualify. With
 /// nothing qualifying the player is still asked, to see the cards (the look is the instruction, the taking only its
-/// option), and the hand takes none. The cards taken, as they are in the hand. Once Upon a Time and Narset, Parter of
+/// option), and the hand takes none. `wanted` may capture the words of the source's text (CR 612). The cards taken, as they are in the hand. Once Upon a Time and Narset, Parter of
 /// Veils (one, revealed, random), Dig Through Time and Stock Up (two, chosen order) print it.
 pub fn look_at_top(
     g: &mut dyn Game,
@@ -154,7 +154,7 @@ pub fn look_at_top(
     count: usize,
     (min, max): (u8, u8),
     reveal: bool,
-    wanted: fn(&Chars) -> bool,
+    wanted: impl Fn(&Chars) -> bool,
     rest: Rest,
 ) -> Result<Vec<ObjectId>, Suspend> {
     let looked = top_of_library(g, player, count);
