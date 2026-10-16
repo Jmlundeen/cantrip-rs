@@ -25,7 +25,7 @@ fn enters_tapped_unless_equipment(g: &mut dyn Game, entering: &mut Entering) -> 
 }
 
 /// "This ability costs {1} less to activate for each Equipment you control" (CR 601.2f): generic mana only, never the {R}.
-fn cheaper_per_equipment(q: &dyn Query, _: ObjectId, player: PlayerId, _: Costed) -> CostDelta {
+fn cheaper_per_equipment(q: &dyn Query, _: ObjectId, player: PlayerId, _: Costed, _: &[Target]) -> CostDelta {
     CostDelta::less(equipment_controlled(q, player).len().min(255) as u8)
 }
 

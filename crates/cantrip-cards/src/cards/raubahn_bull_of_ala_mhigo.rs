@@ -5,13 +5,6 @@ use cantrip_oracle as oracle;
 
 const WARD: AbilityDef = ward_life_equal_to_power("Ward\u{2014}Pay life equal to Raubahn's power. (Whenever this creature becomes the target of a spell or ability an opponent controls, counter it unless that player pays life equal to its power.)");
 
-/// "Target Equipment you control" (CR 115.1, 301.5): an Equipment on the battlefield under the ability's controller.
-fn equipment_you_control(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    matches!(t, Target::Object(id) if targets::permanent(q, id)
-        && q.controller(id) == asker.controller
-        && q.chars(id).has_subtype(Subtype::Equipment))
-}
-
 /// "Attach up to one target Equipment you control to target attacking creature" (CR 701.3a): if both targets are still
 /// legal, the Equipment is attached to the creature, and does nothing if it could not be attached there (CR 701.3b, the ruling:
 /// "the Equipment won't move"). With no Equipment chosen, nothing happens. Either target having become illegal leaves the
@@ -30,7 +23,7 @@ pub static CARD: CardDef = CardDef {
         WARD,
         triggered(THIS_ATTACKS, attach, "Whenever Raubahn attacks, attach up to one target Equipment you control to target attacking creature.")
             .targets(&[
-                up_to_one(equipment_you_control).labelled("Equipment to attach"),
+                up_to_one(targets::EQUIPMENT_YOU_CONTROL.filter).labelled("Equipment to attach"),
                 targets::ATTACKING_CREATURE.labelled("Attacking creature to attach it to"),
             ]),
     ],
