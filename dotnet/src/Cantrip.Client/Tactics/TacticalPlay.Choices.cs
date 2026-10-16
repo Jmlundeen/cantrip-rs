@@ -131,6 +131,19 @@ public sealed partial class TacticalPlay
     /// The offered creature type that most of this seat's creatures and creature cards in hand have, the earlier offered on
     /// a tie (the first eligible when none has any).
     /// </summary>
+    /// <summary>What a miracle option costs: its symbols, less the generic mana a "less {4}" takes off them.</summary>
+    private static int MiracleCost(string option)
+    {
+        string text = option.Split(", ")[0];
+        int less = text.IndexOf(" less ", StringComparison.Ordinal);
+        if (less < 0)
+        {
+            return CardReading.ManaValue(text);
+        }
+
+        return Math.Max(0, CardReading.ManaValue(text[..less]) - CardReading.ManaValue(text[less..]));
+    }
+
     private static int MostCommonCreatureType(GameClient client, ChooseModesPromptMessage prompt)
     {
         List<ObjectView> mine = [.. Creatures(client, client.Seat), .. client.MyHand().Where(IsCreature)];
@@ -203,12 +216,12 @@ public sealed partial class TacticalPlay
         }
 
         // Which miracle ability to reveal a card with (CR 702.94a): each is the same cast at a different cost, so the cheapest,
-        // and never one that can't be paid.
+        // and never one that can't be paid. "{5}{W}{W} less {4}" is the cost with the reduction taken off.
         if (prompt.Heading == "Choose which miracle to reveal it with" && prompt.Eligible.Count > 0)
         {
             int cheapest = prompt.Eligible
                 .OrderBy(mode => prompt.Modes[mode].Contains("unpayable", StringComparison.Ordinal))
-                .ThenBy(mode => CardReading.ManaValue(prompt.Modes[mode]))
+                .ThenBy(mode => MiracleCost(prompt.Modes[mode]))
                 .First();
             return new ModesChosenAnswer { Modes = [cheapest] };
         }
