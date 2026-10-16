@@ -1,0 +1,49 @@
+# Harmonic Prodigy's "Shaman" is a word of its text (CR 612): Artificial Evolution replacing Shaman with Elf in it makes its
+# rule "an Elf or another Wizard", so Ignoble Hierarch, still a Goblin Shaman, is no longer one of them. The Prodigy
+# attacks alone on turn 3 and the Hierarch's exalted triggers once: 2/4, 2 damage. (Unchanged, it triggers twice:
+# harmonic-prodigy-doubles-ignoble-hierarchs-exalted.) The Evolution's prowess pump on turn 1 is over by turn 3.
+
+[Bot1 Deck]
+Forest
+Ignoble Hierarch
+Mox Ruby
+Mox Jet
+Harmonic Prodigy
+Mox Sapphire
+Artificial Evolution
+Island x15
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Ignoble Hierarch.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Harmonic Prodigy.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Harmonic Prodigy)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Shaman)
+Bot1.Modes(Elf)
+[T3 Bot1.Main1]
+Bot1.Attack(Harmonic Prodigy > Bot2)
+[T3 Bot1.DeclareBlockers]
+? Stack.Count = 0
+? Bot1.Battlefield.Harmonic Prodigy.Power = 2
+? Bot1.Battlefield.Harmonic Prodigy.Toughness = 4
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield.Harmonic Prodigy.Subtypes = Human; Wizard
