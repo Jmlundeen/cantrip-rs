@@ -1,0 +1,37 @@
+# Sensational Save reads the returned creature's mana value as it last existed on the battlefield, where an {X} in its
+# mana cost is 0 (CR 202.3b; ruling 2025-09-19). Bot1's Walking Ballista ({X}{X}, cast for X = 1) attacks; Bot1 then
+# web-slings Scarlet Spider, Ben Reilly, returning the tapped Ballista: mana value 0, so Scarlet Spider enters with no
+# counters, a 4/3.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Walking Ballista
+Scarlet Spider, Ben Reilly
+Plains x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Walking Ballista.Cast(X: 1)
+[T3 Bot1.Main1]
+Bot1.Attack(Walking Ballista > Bot2)
+[T3 Bot1.Main2]
+Bot1.Hand.Scarlet Spider, Ben Reilly.Cast(Ability: Web-slinging)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Choose(Walking Ballista)
+[T3 Bot1.End]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot2.Life = 19
+Bot1.Battlefield = Mox Ruby; Mox Emerald; Scarlet Spider, Ben Reilly
+Bot1.Battlefield.Scarlet Spider, Ben Reilly.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Scarlet Spider, Ben Reilly.Power = 4

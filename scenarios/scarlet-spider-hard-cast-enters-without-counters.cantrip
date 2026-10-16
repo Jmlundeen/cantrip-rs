@@ -1,0 +1,42 @@
+# Scarlet Spider, Ben Reilly cast for its mana cost {1}{R}{G} was not cast using web-slinging, so Sensational Save does
+# nothing (CR 614.1c): no creature was returned, and he enters a 4/3 with no counters, though Bot1's attacking
+# Spider-Man, Web-Slinger was tapped and could have been returned.
+
+[Bot1 Deck]
+Plains
+Mox Ruby
+Mox Emerald
+Mox Pearl
+Spider-Man, Web-Slinger
+Scarlet Spider, Ben Reilly
+Plains
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Spider-Man, Web-Slinger.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Attack(Spider-Man, Web-Slinger > Bot2)
+[T3 Bot1.Main2]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Scarlet Spider, Ben Reilly.Cast
+[T3 Bot1.End]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield = Plains; Mox Ruby; Mox Emerald; Mox Pearl; Spider-Man, Web-Slinger; Plains; Scarlet Spider, Ben Reilly
+Bot1.Battlefield.Scarlet Spider, Ben Reilly.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Scarlet Spider, Ben Reilly.Power = 4
