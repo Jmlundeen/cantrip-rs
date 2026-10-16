@@ -1,0 +1,37 @@
+# Browser
+# Hidden information (CR 406.3, 708.2): Headliner Scarlett exiles Bot2's top card face down at their upkeep, and it is
+# Firdoch Core, every creature type. Bot1's page sees a face-down card in Bot2's exile: no name, and no type line - not
+# "every creature type", which would say what it is. It does see that Bot2 may play it this turn, which the permission
+# says without naming the card.
+
+[Bot1 Deck]
+Island x20
+
+[Bot2 Deck]
+Sol Ring
+Headliner Scarlett
+Mountain x5
+Mountain
+Firdoch Core
+Mountain x10
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Mountain.Activate
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Headliner Scarlett.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Target(Bot1)
+[T6 Bot2.Main1]
+? Exile.Count = 1
+? Client.Bot1.OpponentExile.(hidden).TypeLine =
+? Client.Bot1.OpponentExile.(hidden).Rules =
+? Client.Bot1.OpponentExile.(hidden).Annotation = Bot2: Playable this turn
+
+[Expect]
+Turn = 6

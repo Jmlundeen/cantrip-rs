@@ -88,10 +88,10 @@ public sealed partial class TacticalPlay
             : [];
 
         double perAttacker = Policy("attacktrigger");
-        double[] triggers = [.. eligible.Select(creature => CardReading.AttackTrigger(creature.OracleText)
-            && !CardReading.Plain(creature.OracleText).Contains("whenever you attack", StringComparison.Ordinal) ? perAttacker : 0)];
+        double[] triggers = [.. eligible.Select(creature => CardReading.AttackTrigger(CardReading.Text(creature))
+            && !CardReading.Plain(CardReading.Text(creature)).Contains("whenever you attack", StringComparison.Ordinal) ? perAttacker : 0)];
         double wheneverYouAttack = perAttacker * client.BattlefieldOf(client.Seat)
-            .Count(permanent => CardReading.Plain(permanent.OracleText).Contains("whenever you attack", StringComparison.Ordinal));
+            .Count(permanent => CardReading.Plain(CardReading.Text(permanent)).Contains("whenever you attack", StringComparison.Ordinal));
 
         double Score(int attacking)
         {

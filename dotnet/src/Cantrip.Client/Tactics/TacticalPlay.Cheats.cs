@@ -54,7 +54,7 @@ public sealed partial class TacticalPlay
 
         foreach (ObjectView creature in client.MyHand().Where(card => IsCreature(card) && card.Handle != exclude))
         {
-            double entering = Entering(client, view, creature.OracleText) + Used(client, view, creature);
+            double entering = Entering(client, view, CardReading.Text(creature)) + Used(client, view, creature);
             double worth;
             if (temporary)
             {
@@ -95,7 +95,7 @@ public sealed partial class TacticalPlay
     {
         int life = LifeOf(view, client.Seat);
         double worth = 0;
-        foreach (string line in CardReading.Plain(creature.OracleText).Split('\n'))
+        foreach (string line in CardReading.Plain(CardReading.Text(creature)).Split('\n'))
         {
             if (LifeForCards().Match(line) is { Success: true } draw
                 && int.TryParse(draw.Groups[1].Value, System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out int pay)
@@ -158,7 +158,7 @@ public sealed partial class TacticalPlay
     /// <summary>Whether this seat holds something that brings a creature back from a graveyard onto the battlefield.</summary>
     private static bool Reanimates(GameClient client) => client.MyHand().Any(card =>
     {
-        string plain = CardReading.Plain(card.OracleText);
+        string plain = CardReading.Plain(CardReading.Text(card));
         return plain.Contains("enchant creature card in a graveyard", StringComparison.Ordinal)
             || (plain.Contains("graveyard", StringComparison.Ordinal) && plain.Contains("onto the battlefield", StringComparison.Ordinal)
                 && plain.Contains("creature card", StringComparison.Ordinal));

@@ -171,6 +171,73 @@ public static partial class CardReading
         string.IsNullOrEmpty(text) ? string.Empty : Reminder().Replace(text.ToLowerInvariant(), string.Empty);
 
     /// <summary>
+    /// What a card's text says it does as it is now: its printed text less the lines whose abilities an effect has taken
+    /// away (CR 613.1f) - empty when all of them are gone. Whatever the bot reads about what a permanent can do reads this,
+    /// not <see cref="ObjectView.OracleText"/>, which is as printed.
+    /// </summary>
+    public static string Text(ObjectView card)
+    {
+        ArgumentNullException.ThrowIfNull(card);
+        if (card.LostAbilities.Count == 0 || card.OracleText.Length == 0)
+        {
+            return card.OracleText;
+        }
+
+        bool[] found = new bool[card.LostAbilities.Count];
+        return string.Join('\n', card.OracleText.Split('\n').Where(line => !TakenAway(line, card.LostAbilities, found)));
+    }
+
+    /// <summary>
+    /// Whether a printed line is wholly something an object has lost: the line, or each of its comma-separated parts
+    /// ("Defender, hexproof"), is one of <paramref name="lost"/>, ignoring reminder text and the case. Marks those it matched.
+    /// </summary>
+    public static bool TakenAway(string line, IReadOnlyList<string> lost, bool[] found)
+    {
+        ArgumentNullException.ThrowIfNull(lost);
+        ArgumentNullException.ThrowIfNull(found);
+        static string Words(string text) => Plain(text).Trim().TrimEnd('.').Trim();
+        string whole = Words(line);
+        if (whole.Length == 0 || lost.Count == 0)
+        {
+            return false;
+        }
+
+        int Find(string wanted)
+        {
+            for (int i = 0; i < lost.Count; i++)
+            {
+                if (Words(lost[i]) == wanted)
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
+        int index = Find(whole);
+        if (index >= 0)
+        {
+            found[index] = true;
+            return true;
+        }
+
+        string[] parts = whole.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+        int[] at = [.. parts.Select(Find)];
+        if (parts.Length == 0 || at.Any(i => i < 0))
+        {
+            return false;
+        }
+
+        foreach (int i in at)
+        {
+            found[i] = true;
+        }
+
+        return true;
+    }
+
+    /// <summary>
     /// The keywords an object has: those on a line of its own in its text, those an effect has granted it, and those
     /// it has a counter for (CR 122.1b).
     /// </summary>

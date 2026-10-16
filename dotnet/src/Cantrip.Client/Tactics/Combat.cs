@@ -52,7 +52,7 @@ public sealed class Unit
             Keys = keys,
             Worth = model.Worth(creature, keys),
             Tapped = creature.Tapped,
-            Connects = CardReading.ConnectTrigger(creature.OracleText),
+            Connects = CardReading.ConnectTrigger(CardReading.Text(creature)),
         };
     }
 }

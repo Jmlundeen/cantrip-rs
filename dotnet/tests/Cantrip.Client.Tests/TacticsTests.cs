@@ -48,6 +48,18 @@ public sealed class CardReadingTests
         Assert.Equal(Keywords.FirstStrike, CardReading.KeywordsOf(drake));
     }
 
+    [Fact]
+    public void A_non_keyword_ability_an_effect_has_taken_away_is_not_read_from_the_text()
+    {
+        ObjectView elves = Creature(1, "Elves", 1, 1, text: "{T}: Add {G}.\nWhen this creature dies, draw a card.");
+        elves.LostAbilities.Add("{T}: Add {G}.");
+
+        Assert.Equal("When this creature dies, draw a card.", CardReading.Text(elves));
+
+        elves.LostAbilities.Add("When this creature dies, draw a card.");
+        Assert.Equal(string.Empty, CardReading.Text(elves));
+    }
+
     [Theory]
     [InlineData("Lightning Bolt deals 3 damage to any target.", EffectKind.Damage, 3)]
     [InlineData("Flame Slash deals 4 damage to target creature.", EffectKind.Damage, 4)]

@@ -47,7 +47,7 @@ public sealed partial class TacticalPlay
                 continue;
             }
 
-            foreach (string line in card.OracleText.Split('\n'))
+            foreach (string line in CardReading.Text(card).Split('\n'))
             {
                 if (line.Contains("target", StringComparison.OrdinalIgnoreCase)
                     && CardReading.Effect(line) is { Kind: not EffectKind.Unknown } read)
@@ -285,10 +285,10 @@ public sealed partial class TacticalPlay
         bool free = Cheating && prompt.Purpose == CardChoicePurposeView.PutOntoBattlefield && !board && known.Count > 0
             && known.TrueForAll(card => IsPermanentCard(card) && !IsLand(card));
 
-        if (free && client.Object(prompt.Source) is { } cheat && FromHandText(CardReading.Plain(cheat.OracleText))
+        if (free && client.Object(prompt.Source) is { } cheat && FromHandText(CardReading.Plain(CardReading.Text(cheat)))
             && known.TrueForAll(card => card.Zone == ZoneKindView.Hand))
         {
-            List<ViewHandle> worth = [.. Cheated(client, view, cheat.OracleText, ViewHandle.None, Mana(client))
+            List<ViewHandle> worth = [.. Cheated(client, view, CardReading.Text(cheat), ViewHandle.None, Mana(client))
                 .Where(one => prompt.Eligible.Contains(one.Creature.Handle))
                 .OrderByDescending(one => one.Net)
                 .Select(one => one.Creature.Handle)];
@@ -320,7 +320,7 @@ public sealed partial class TacticalPlay
             {
                 // "You may discard a card": only for something, and only a card it can spare — a land it has no use for.
                 bool pays = client.Object(prompt.Source) is { } source
-                    && CardReading.Plain(source.OracleText) is var text
+                    && CardReading.Plain(CardReading.Text(source)) is var text
                     && (text.Contains("when you do", StringComparison.Ordinal) || text.Contains("if you do", StringComparison.Ordinal));
                 bool spare = client.Object(ranked[0]) is { } worst && IsLand(worst) && Lands(client, client.Seat) >= 4;
                 take = pays && spare && prompt.Purpose == CardChoicePurposeView.Discard ? 1 : 0;
@@ -329,7 +329,7 @@ public sealed partial class TacticalPlay
                 // prompt's Source is the trigger, whose text is the imprint line. Mox Diamond's discard is not "up to":
                 // the ordinary path above discards the land wanted least.)
                 if (Policy("imprint") > 0 && Policy("rocks") > 0 && client.Object(prompt.Source) is { } mox
-                    && CardReading.Plain(mox.OracleText).Contains("exile a nonartifact, nonland card from your hand", StringComparison.Ordinal))
+                    && CardReading.Plain(CardReading.Text(mox)).Contains("exile a nonartifact, nonland card from your hand", StringComparison.Ordinal))
                 {
                     ranked = [.. ranked.Where(card => client.Object(card) is { Colors.Count: > 0 }), .. ranked.Where(card => client.Object(card) is not { Colors.Count: > 0 })];
                     take = Math.Min(1, ranked.Count);
@@ -384,7 +384,7 @@ public sealed partial class TacticalPlay
                 Cards = [.. eligible
                     .OrderByDescending(land => Makes(land).Count(color => want.Contains(color) && !have.Contains(color)))
                     .ThenByDescending(land => Makes(land).Count)
-                    .ThenBy(land => CardReading.Plain(land.OracleText).Contains("enters tapped", StringComparison.Ordinal))
+                    .ThenBy(land => CardReading.Plain(CardReading.Text(land)).Contains("enters tapped", StringComparison.Ordinal))
                     .Take(most)
                     .Select(land => land.Handle)],
             };
@@ -488,8 +488,8 @@ public sealed partial class TacticalPlay
             // ever.
             "CopySpell" => _copies < CopiesPerTurn
                 && client.Object(prompt.Source) is { } copied
-                && CardReading.Effect(copied.OracleText.Split('.')[0]) is { Kind: EffectKind.Damage or EffectKind.Remove } copy
-                && Pick(client, view, copy, Guess(client, view, copied.OracleText.Split('.')[0]), 1, optional: true).Worth > Policy("margin")
+                && CardReading.Effect(CardReading.Text(copied).Split('.')[0]) is { Kind: EffectKind.Damage or EffectKind.Remove } copy
+                && Pick(client, view, copy, Guess(client, view, CardReading.Text(copied).Split('.')[0]), 1, optional: true).Worth > Policy("margin")
                 && ++_copies > 0,
 
             // Everything else a card says its controller "may" do is something a card's controller wants done: a

@@ -318,20 +318,28 @@ public static partial class CardFace
     public static List<(string Text, bool Spent)> RulesLines(ObjectView card)
     {
         List<(string Text, bool Spent)> lines = [];
+        bool[] found = new bool[card.LostAbilities.Count];
         if (card.OracleText.Length > 0)
         {
             string[] printed = card.OracleText.Split('\n');
             for (int i = 0; i < printed.Length; i++)
             {
-                lines.Add((printed[i], card.SpentLines.Contains(i)));
+                // A printed line an effect has taken away (CR 613.1f) stays as printed, greyed: said once, not twice.
+                lines.Add((printed[i], card.SpentLines.Contains(i) || Cantrip.Client.Tactics.CardReading.TakenAway(printed[i], card.LostAbilities, found)));
             }
         }
 
         lines.AddRange(card.GrantedAbilities.Select(granted => (granted.Text, granted.Spent)));
 
-        // What an effect took away (CR 613.1f): still on the card's face as printed, so it is said to be gone, and greyed
-        // as an ability that is done with.
-        lines.AddRange(card.LostAbilities.Select(lost => ($"Lost: {lost}", true)));
+        // What was lost and is on no printed line (a keyword among others on one, an ability the text does not word so) is said.
+        for (int i = 0; i < found.Length; i++)
+        {
+            if (!found[i])
+            {
+                lines.Add(($"Lost: {card.LostAbilities[i]}", true));
+            }
+        }
+
         lines.AddRange(card.ChosenModes.Select(mode => ($"Chosen: {mode}", false)));
         return lines;
     }

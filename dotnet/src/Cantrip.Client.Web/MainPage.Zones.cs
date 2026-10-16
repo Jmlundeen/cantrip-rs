@@ -472,12 +472,15 @@ public sealed partial class MainPage
         {
             // A card in exile the viewer may play (Bonehoard Dracosaur's, Cori's) lights the button, as a graveyard pile is lit
             // for a card in it that can be cast, and the windows they stand under are on its tooltip.
-            List<ObjectView> playable = [.. exiled.Where(card => _actions.For(card.Handle).Count > 0 || card.PlayPermissions.Any(permission => permission.Seat == client.Seat))];
-            string windows = string.Join("; ", playable.SelectMany(card => card.PlayPermissions.Where(permission => permission.Seat == client.Seat).Select(permission => $"{card.Name}: {permission.Text}")));
+            // Only the cards the server offers an action for are counted as playable; the windows of every permission held
+            // are on the tooltip, and on each card.
+            List<ObjectView> playable = [.. exiled.Where(card => _actions.For(card.Handle).Count > 0)];
+            string windows = string.Join("; ", exiled.Where(card => card.Known).SelectMany(card => card.PlayPermissions.Where(permission => permission.Seat == client.Seat).Select(permission => $"{card.Name}: {permission.Text}")));
             buttons.Add(new PlayerRail.ZoneButtonSpec(
                 playable.Count > 0 ? $"Exile  {exiled.Count}  ·  {playable.Count} playable" : $"Exile  {exiled.Count}",
                 (seat == client.Seat ? "Look at the cards you own in exile" : $"Look at the cards {name} owns in exile")
-                    + (playable.Count > 0 ? $". You may play {playable.Count} of them from there{(windows.Length > 0 ? $" ({windows})" : string.Empty)}." : string.Empty),
+                    + (playable.Count > 0 ? $". {playable.Count} can be played from there now." : string.Empty)
+                    + (windows.Length > 0 ? $" {windows}." : string.Empty),
                 _peek == (ZoneKindView.Exile, seat),
                 () => { TogglePeek(ZoneKindView.Exile, seat); RedrawNow(); },
                 Lit: playable.Count > 0));

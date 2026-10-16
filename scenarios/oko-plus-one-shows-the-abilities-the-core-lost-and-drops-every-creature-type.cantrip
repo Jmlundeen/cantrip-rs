@@ -1,7 +1,7 @@
 # Browser
 # Oko's +1 makes Firdoch Core a green 3/3 Elk that loses all abilities (CR 613.1f). The page shows it: the card face
-# keeps the printed text and says under it what is lost - Changeling, the mana ability and the animation, each greyed
-# under "Lost:" - and the type line, which said "every creature type" before, now reads Elk. Bot1 casts the Core on turn 1
+# keeps the printed text and greys each line that is lost - Changeling, the mana ability and the animation -
+# and the type line, which said "every creature type" before, now reads Elk. Bot1 casts the Core on turn 1
 # and Oko on turn 3, each with the three Moxen.
 
 [Bot1 Deck]
@@ -35,7 +35,7 @@ Bot1.Battlefield.Oko, Thief of Crowns.Activate(Firdoch Core; Ability: Elk)
 Bot1.Pass
 Bot2.Pass
 ? Bot1.Battlefield.Firdoch Core.Subtypes = Elk
-? Client.Bot1.Battlefield.Firdoch Core.Rules = Changeling (This card is every creature type.) / {T}: Add one mana of any color. / {4}: This artifact becomes a 4/4 artifact creature until end of turn. / Lost: Changeling / Lost: {T}: Add one mana of any color. / Lost: {4}: This artifact becomes a 4/4 artifact creature until end of turn.
+? Client.Bot1.Battlefield.Firdoch Core.Rules = (grey) Changeling (This card is every creature type.) / (grey) {T}: Add one mana of any color. / (grey) {4}: This artifact becomes a 4/4 artifact creature until end of turn.
 ? Client.Bot1.Battlefield.Firdoch Core.TypeLine = Creature - Elk
 
 [Expect]

@@ -428,26 +428,26 @@ public sealed class ScenarioPlayer
     /// and clicks it there. The zones are tried in turn - each opened, looked into, shut again if it was not there - and the
     /// card in the one that holds it is returned, its zone left open. Null when none holds it.
     /// </summary>
-    private async Task<CardState?> OpenZoneHoldingAsync(int handle)
+    private async Task<(CardState Card, int Seat, bool Graveyard)?> OpenZoneHoldingAsync(int handle)
     {
         TableState state = await _page.SettledAsync();
-        List<(float X, float Y)> openers = [];
+        List<(int Seat, bool Graveyard, float X, float Y)> openers = [];
         foreach (PlayerState player in state.Players ?? [])
         {
-            openers.AddRange((player.Zones ?? []).Where(z => z.Text.StartsWith("Exile", StringComparison.Ordinal)).Select(z => (z.X, z.Y)));
+            openers.AddRange((player.Zones ?? []).Where(z => z.Text.StartsWith("Exile", StringComparison.Ordinal)).Select(z => (player.Seat, false, z.X, z.Y)));
             if (player.GraveyardX > 0)
             {
-                openers.Add((player.GraveyardX, player.GraveyardY));
+                openers.Add((player.Seat, true, player.GraveyardX, player.GraveyardY));
             }
         }
 
-        foreach ((float x, float y) in openers)
+        foreach ((int seat, bool graveyard, float x, float y) in openers)
         {
             await _page.Page.Mouse.ClickAsync(x, y);
             TableState open = await _page.SettledAsync();
             if (open.Cards.FirstOrDefault(c => c.Visible && c.Handle == handle) is { } found)
             {
-                return found;
+                return (found, seat, graveyard);
             }
 
             // Not in this one: shut it, where its opener is now (the board moves over when a graveyard opens).
@@ -458,17 +458,54 @@ public sealed class ScenarioPlayer
         return null;
     }
 
+    /// <summary>Shuts a zone this driver opened to click a card in it, if it is still open: a player's table is not left so.</summary>
+    private async Task CloseZoneAsync(int seat, bool graveyard)
+    {
+        TableState state = await _page.SettledAsync();
+        PlayerState? player = state.Players?.FirstOrDefault(p => p.Seat == seat);
+        if (graveyard)
+        {
+            if (state.GraveyardsOpen && player is { GraveyardX: > 0 })
+            {
+                await _page.Page.Mouse.ClickAsync(player.GraveyardX, player.GraveyardY);
+                await _page.SettledAsync();
+            }
+
+            return;
+        }
+
+        if (player?.Zones?.FirstOrDefault(z => z.Text.StartsWith("Exile", StringComparison.Ordinal) && z.Open) is { } button)
+        {
+            await _page.Page.Mouse.ClickAsync(button.X, button.Y);
+            await _page.SettledAsync();
+        }
+    }
+
     private async Task ClickHandleAsync(int handle)
     {
         TableState state = await _page.SettledAsync();
-        CardState card = state.Cards.FirstOrDefault(c => c.Visible && c.Handle == handle)
-            ?? await OpenZoneHoldingAsync(handle)
-            ?? throw new Xunit.Sdk.XunitException(
+        CardState? card = state.Cards.FirstOrDefault(c => c.Visible && c.Handle == handle);
+        (int Seat, bool Graveyard)? opened = null;
+        if (card is null && await OpenZoneHoldingAsync(handle) is { } inZone)
+        {
+            card = inZone.Card;
+            opened = (inZone.Seat, inZone.Graveyard);
+        }
+
+        if (card is null)
+        {
+            throw new Xunit.Sdk.XunitException(
                 $"Handle {handle} is not in view. In view: {string.Join(", ", state.Cards.Where(c => c.Visible).Select(c => $"{c.Name} #{c.Handle} ({c.Place})"))}");
+        }
+
         // The stack fans its cards, each covering most of the one beneath: the strip of the card's left edge is the part of
         // it that is always in view.
         float x = card.Place == "stack" ? card.X - card.W / 2 + 6 : card.X;
         await _page.Page.Mouse.ClickAsync(x, card.Y);
+        if (opened is { } zone)
+        {
+            await CloseZoneAsync(zone.Seat, zone.Graveyard);
+        }
     }
 
     private async Task ClickButtonNamedAsync(string label)
@@ -509,7 +546,7 @@ public sealed class ScenarioPlayer
             string row = card.Groups["row"].Value;
             string name = card.Groups["card"].Value;
             string attribute = card.Groups["attr"].Value;
-            if (row is "Exile" or "Graveyard")
+            if (row is "Exile" or "OpponentExile" or "Graveyard")
             {
                 shown = await ReadInZoneAsync(row, name, attribute);
             }
@@ -552,7 +589,7 @@ public sealed class ScenarioPlayer
     }
 
     private static readonly Regex CardKey = new(
-        @"^(?<row>Stack|Hand|Battlefield|OpponentBattlefield|Exile|Graveyard)\.(?<card>.+)\.(?<attr>TypeLine|Rules|Status|Annotation)$",
+        @"^(?<row>Stack|Hand|Battlefield|OpponentBattlefield|Exile|OpponentExile|Graveyard)\.(?<card>.+)\.(?<attr>TypeLine|Rules|Status|Annotation)$",
         RegexOptions.CultureInvariant);
 
     /// <summary>One thing a card's face says, with its lines on one line.</summary>
@@ -571,7 +608,7 @@ public sealed class ScenarioPlayer
     private async Task<string> ReadInZoneAsync(string zone, string name, string attribute)
     {
         TableState state = await _page.SettledAsync();
-        string place = zone == "Exile" ? "choice" : "graveyard";
+        string place = zone == "Graveyard" ? "graveyard" : "choice";
         (float X, float Y)? opener = ZoneOpener(state, zone);
         if (opener is null)
         {
@@ -580,7 +617,7 @@ public sealed class ScenarioPlayer
 
         await _page.Page.Mouse.ClickAsync(opener.Value.X, opener.Value.Y);
         TableState open = await _page.SettledAsync();
-        CardState? found = open.Cards.FirstOrDefault(c => c.Place == place && c.Visible && c.Name == name);
+        CardState? found = open.Cards.FirstOrDefault(c => c.Place == place && c.Visible && c.Name == (name == "(hidden)" ? string.Empty : name));
         string shown = found is null
             ? $"(no {name} in the open {zone}: {string.Join("; ", open.Cards.Where(c => c.Place == place).Select(c => c.Name))})"
             : Face(found, attribute);
@@ -599,8 +636,10 @@ public sealed class ScenarioPlayer
     /// <summary>Where a click opens Bot1's exile or graveyard: the Exile button, or the graveyard pile.</summary>
     private static (float X, float Y)? ZoneOpener(TableState state, string zone)
     {
-        PlayerState? me = state.Players?.FirstOrDefault(p => p.Seat == state.Seat);
-        if (zone == "Exile")
+        PlayerState? me = zone == "OpponentExile"
+            ? state.Players?.FirstOrDefault(p => p.Seat != state.Seat)
+            : state.Players?.FirstOrDefault(p => p.Seat == state.Seat);
+        if (zone is "Exile" or "OpponentExile")
         {
             ZoneButtonState? button = me?.Zones?.FirstOrDefault(z => z.Text.StartsWith("Exile", StringComparison.Ordinal));
             return button is null ? null : (button.X, button.Y);

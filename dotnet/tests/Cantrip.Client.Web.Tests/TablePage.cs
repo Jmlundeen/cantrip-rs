@@ -269,7 +269,8 @@ public sealed record TableState(
     string Title = "",
     string Detail = "",
     IReadOnlyList<string>? Modes = null,
-    IReadOnlyList<string>? LogText = null);
+    IReadOnlyList<string>? LogText = null,
+    bool GraveyardsOpen = false);
 
 /// <summary>
 /// A player's box on the page, which a click on targets them, and the mana in their pool; the facts beside their life
@@ -290,7 +291,7 @@ public sealed record PlayerState(
     float GraveyardY = 0);
 
 /// <summary>A button over a player's piles (Exile, Companion): what it says and its tooltip, whether it is lit, and where it is.</summary>
-public sealed record ZoneButtonState(string Text, string Tooltip, bool Lit, float X, float Y, float W, float H);
+public sealed record ZoneButtonState(string Text, string Tooltip, bool Lit, bool Open, float X, float Y, float W, float H);
 
 /// <summary>A kind of mana in a pool, how much, whether a click spends one, and where it is.</summary>
 public sealed record ManaChipState(string Type, int Count, bool Clickable, float X, float Y, float W, float H);

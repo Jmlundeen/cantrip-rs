@@ -1,7 +1,7 @@
 # Browser
 # "{3}{R}, {T}: Exile the top card of your library. Until the end of your next turn, you may play that card." The card
-# sits in exile through Bot2's turn, and Bot1 has to be able to see that it is theirs to cast: the Exile button is lit
-# and the Lightning Bolt says "until your next turn ends". On turn 5 Bot1 casts it from there and the button is gone.
+# sits in exile through Bot2's turn, and Bot1 has to be able to see that it is theirs to cast: the Lightning Bolt says "until
+# your next turn ends" while nothing can be cast, and the Exile button is lit once it can (turn 5), when Bot1 casts it from there and the button is gone.
 
 [Bot1 Deck]
 Cori Mountain Monastery
@@ -33,7 +33,8 @@ Bot1.Battlefield.Mox Emerald.Activate
 Bot1.Battlefield.Cori Mountain Monastery.Activate(Ability: Exile)
 [T4 Bot2.Main1]
 ? Exile = Lightning Bolt
-? Client.Bot1.Exile.Lit = true
+# Nothing can be cast now (the Moxen are tapped): the button is not lit, but the card says what its window is.
+? Client.Bot1.Exile.Lit = false
 ? Client.Bot1.Exile.Lightning Bolt.Annotation = Playable until your next turn ends
 [T5 Bot1.Main1]
 ? Client.Bot1.Exile.Lit = true

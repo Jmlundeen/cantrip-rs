@@ -1,0 +1,29 @@
+# Browser
+# A Room's abilities are its doors' (CR 709.5), given to the permanent by the layers for the doors unlocked. The page must
+# not take them for abilities an effect gave it: Unholy Annex cast as its left door shows that door's text once as the
+# card's own rules - no granted line repeating it, and nothing lost for the door still locked.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Unholy Annex // Ritual Chamber
+Mox Jet
+Swamp x16
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Unholy Annex // Ritual Chamber.Cast(Ability: Unholy Annex)
+Bot1.Pass
+[T1 Bot1.Main2]
+? Client.Bot1.Battlefield.Unholy Annex.Rules = At the beginning of your end step, draw a card. If you control a Demon, each opponent loses 2 life and you gain 2 life. Otherwise, you lose 2 life. / (You may cast either half. That door unlocks on the battlefield. As a sorcery, you may pay the mana cost of a locked door to unlock it.)
+
+[Expect]
+Turn = 1

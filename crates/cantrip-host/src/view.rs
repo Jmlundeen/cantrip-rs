@@ -582,6 +582,8 @@ impl<'a> Projector<'a> {
         }
         let printed = |ability: AbilityRef| {
             (ability.card == c.card && usize::from(ability.index) < def.abilities.len())
+                // A Room's abilities are its doors' (CR 709.5): the layers give the unlocked ones.
+                || cards.halves[c.card.0 as usize].is_some_and(|(left, right)| ability.card == left || ability.card == right)
                 || copy.is_some_and(|copy| copy.extra_abilities.contains(&Some(ability)))
         };
         for ability in c.abilities.iter().flatten().copied() {
@@ -614,6 +616,14 @@ impl<'a> Projector<'a> {
             Expiry::UntilYourNextEndStep => format!("until {whose} next end step"),
         };
         let mut text = format!("{prefix}{} {window}", if grant.lands { "Playable" } else { "Castable" });
+        // A condition the permission stands under is said, so one not met reads as the conditional it is.
+        if let Some(PlayCondition::AttackedWithThisTurn(subtype)) = grant.when {
+            let who = if mine { "you" } else { "they" };
+            text.push_str(&format!(", if {who} attacked with a {}", subtype.name()));
+        }
+        if grant.sorcery_speed {
+            text.push_str(", as a sorcery");
+        }
         if grant.later_turns {
             text.push_str(", on a later turn");
         }
@@ -755,6 +765,14 @@ impl<'a> Projector<'a> {
                 view.produces_mana = false;
                 view.other_face = None;
                 view.starting_counter = None;
+                // Nothing the layers or the printed card say about it crosses either (CR 406.3): not that it is every creature
+                // type, nor what it was granted or has lost.
+                view.every_creature_type = false;
+                view.type_line_subtypes.clear();
+                view.granted_abilities.clear();
+                view.lost_abilities.clear();
+                view.cant_be_countered = false;
+                view.halves.clear();
             }
             let real = game.cards.get(obj.card).name;
             view.face_down = true;

@@ -1,8 +1,8 @@
 # Browser
 # Stingcaster Mage's trigger gives the Lightning Bolt in Bot1's graveyard flashback until end of turn (CR 702.34a). The
 # graveyard pile is lit, its note says which card can be cast and what becomes of it - "Castable this turn, then exiled"
-# - and the Bolt says so over its art once the graveyard is open. Cast from there it goes on the stack, and is exiled
-# as it leaves it (Exile = Lightning Bolt).
+# - and the Bolt says so over its art once the graveyard is open. Cast from there it goes on the stack, the pile is
+# dark again (the driver shuts the graveyard it opened), and the Bolt is exiled as it leaves the stack.
 
 [Bot1 Deck]
 Mox Ruby
@@ -31,6 +31,7 @@ Bot1.Pass
 ? Client.Bot1.Graveyard.Lightning Bolt.Annotation = Castable this turn, then exiled
 Bot1.Graveyard.Lightning Bolt.Cast(Bot2)
 ? Client.Bot1.Stack = Lightning Bolt
+? Client.Bot1.Graveyard.Lit = false
 ? Bot2.Life = 17
 Bot1.Attack(Stingcaster Mage > Bot2)
 [Bot1.Main2]

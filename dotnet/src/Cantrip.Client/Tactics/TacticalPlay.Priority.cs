@@ -125,7 +125,7 @@ public sealed partial class TacticalPlay
             int given = crew.Select(client.Object).OfType<ObjectView>().Where(CouldAttack).Sum(creature => creature.Power ?? 0);
             int brings = (vehicle.Power ?? 0)
                 + ((keys & (Keywords.Flying | Keywords.Unblockable | Keywords.Menace | Keywords.Trample)) != 0 ? 1 : 0)
-                + (CardReading.AttackTrigger(vehicle.OracleText) ? 1 : 0);
+                + (CardReading.AttackTrigger(CardReading.Text(vehicle)) ? 1 : 0);
 
             if (brings <= given)
             {
@@ -235,7 +235,7 @@ public sealed partial class TacticalPlay
                 continue;
             }
 
-            string text = CardReading.Plain(land.OracleText);
+            string text = CardReading.Plain(CardReading.Text(land));
             List<ColorView> makes = Makes(land);
 
             double score = makes.Count(color => want.Contains(color) && !have.Contains(color))
@@ -282,7 +282,7 @@ public sealed partial class TacticalPlay
             }
         }
 
-        string text = land.OracleText;
+        string text = CardReading.Text(land);
 
         // A fetch land makes whatever the land it finds does.
         int search = text.IndexOf("Search your library for", StringComparison.Ordinal);
@@ -332,7 +332,7 @@ public sealed partial class TacticalPlay
         return pool + client.BattlefieldOf(client.Seat)
             .Where(source => source.ProducesMana && !source.Tapped && (!IsCreature(source) || !source.SummoningSick))
             .Where(source => !counted || !Idle(client, source))
-            .Sum(source => counted && !IsCreature(source) ? Math.Max(CardReading.ManaMade(source.OracleText).Amount, 1) : 1);
+            .Sum(source => counted && !IsCreature(source) ? Math.Max(CardReading.ManaMade(CardReading.Text(source)).Amount, 1) : 1);
     }
 
     /// <summary>
@@ -340,7 +340,7 @@ public sealed partial class TacticalPlay
     /// Amber) and this seat has none: it makes nothing, and is neither mana to plan with nor a land to have cast.
     /// </summary>
     private static bool Idle(GameClient client, ObjectView source) =>
-        CardReading.Plain(source.OracleText).Contains("among legendary creatures and planeswalkers you control", StringComparison.Ordinal)
+        CardReading.Plain(CardReading.Text(source)).Contains("among legendary creatures and planeswalkers you control", StringComparison.Ordinal)
         && !client.BattlefieldOf(client.Seat).Any(permanent => permanent.Supertypes.Contains(SupertypeView.Legendary)
             && (IsCreature(permanent) || permanent.CardTypes.Contains(CardTypeView.Planeswalker)));
 
@@ -584,7 +584,7 @@ public sealed partial class TacticalPlay
         if (!candidate.Option.TargetCandidates.Exists(target => target.IsPlayer && target.Player == rival)
             || candidate.Option.SpellName.Length > 0
             || client.Object(candidate.Option.Source) is not { } card
-            || CardReading.Effect(card.OracleText) is not { Kind: EffectKind.Damage } effect)
+            || CardReading.Effect(CardReading.Text(card)) is not { Kind: EffectKind.Damage } effect)
         {
             return 0;
         }
@@ -626,7 +626,7 @@ public sealed partial class TacticalPlay
         // An adventure, or anything else that casts a spell other than the card: its text is not the card's, so it
         // is weighed as something unread.
         bool other = option.SpellName.Length > 0 && !string.Equals(option.SpellName, card.Name, StringComparison.Ordinal);
-        string text = other ? string.Empty : card.OracleText;
+        string text = other ? string.Empty : CardReading.Text(card);
         bool permanent = !other && IsPermanentCard(card);
 
         int cost = option.AbilityIndex == 0 ? card.ManaValue : CardReading.ManaValue(option.Description) is > 0 and int alternative ? alternative : card.ManaValue;
@@ -807,7 +807,7 @@ public sealed partial class TacticalPlay
         // A permanent that costs its controller life for every counter on it, and whose ability adds one (The One
         // Ring): another is only taken while there are that many turns of the life it will cost to spare.
         if (Policy("burden") > 0 && plain.Contains(" counter on ", StringComparison.Ordinal)
-            && CardReading.Plain(source.OracleText).Contains("you lose 1 life for each", StringComparison.Ordinal)
+            && CardReading.Plain(CardReading.Text(source)).Contains("you lose 1 life for each", StringComparison.Ordinal)
             && LifeOf(view, client.Seat) <= (Policy("burden") * (source.Counters.Sum(counter => counter.Count) + 1)) + 2)
         {
             return null;
@@ -1054,12 +1054,12 @@ public sealed partial class TacticalPlay
         {
             Handle = card.Handle, Zone = ZoneKindView.Battlefield, Kind = card.Kind, Owner = card.Owner, Controller = client.Seat,
             Name = card.Name, CardTypes = card.CardTypes, Subtypes = card.Subtypes, Supertypes = card.Supertypes,
-            OracleText = card.OracleText, ManaValue = card.ManaValue, Colors = card.Colors,
+            OracleText = CardReading.Text(card), ManaValue = card.ManaValue, Colors = card.Colors,
             Counters = [new CounterView { Name = "loyalty", Count = loyalty }],
         };
 
         double first = 0;
-        foreach (string line in card.OracleText.Split('\n'))
+        foreach (string line in CardReading.Text(card).Split('\n'))
         {
             // Only those that aim at nothing are weighed here: an aimed one is weighed once there is something to aim at.
             if (CardReading.Loyalty(line) is not { } change || CardReading.Plain(line).Contains("target", StringComparison.Ordinal))
@@ -1178,7 +1178,7 @@ public sealed partial class TacticalPlay
         }
 
         int cheapest = client.MyHand()
-            .Where(card => card.CardTypes.Contains(CardTypeView.Instant) && CardReading.Effect(card.OracleText).Kind == EffectKind.Counter)
+            .Where(card => card.CardTypes.Contains(CardTypeView.Instant) && CardReading.Effect(CardReading.Text(card)).Kind == EffectKind.Counter)
             .Select(card => Math.Max(card.ManaValue, 1))
             .DefaultIfEmpty(0)
             .Min();
@@ -1266,12 +1266,12 @@ public sealed partial class TacticalPlay
         }
 
         // Graveyard hate is not cashed in for a card while an opponent's graveyard holds a creature worth bringing back.
-        if (CardReading.Draws(effectText) > 0 && Hate(source.OracleText) && FattestDead(client) >= Reanimated)
+        if (CardReading.Draws(effectText) > 0 && Hate(CardReading.Text(source)) && FattestDead(client) >= Reanimated)
         {
             return Policy("graveyard") * 2 * _model.Card;
         }
 
-        if (source.ProducesMana && CardReading.ManaMade(source.OracleText) is { Amount: > 0, Once: false } made)
+        if (source.ProducesMana && CardReading.ManaMade(CardReading.Text(source)) is { Amount: > 0, Once: false } made)
         {
             // Counted as Rock counts them: the others, as they were before this one was cast.
             int sources = client.BattlefieldOf(client.Seat).Count(other => other.ProducesMana && !IsCreature(other) && other.Handle != source.Handle);
@@ -1567,7 +1567,7 @@ public sealed partial class TacticalPlay
                     + (_model.Weight("creature.toughness") * effect.Toughness);
                 // Of its own, only a token or a thing that does nothing, and never what makes its mana (a dork, a Mox):
                 // what a card says is more than the model's guess at it, and a 3/3 is not worth a mana a turn.
-                if (Mine(client, card) && (card.ProducesMana || (card.Kind != ObjectKindView.Token && CardReading.Plain(card.OracleText).Trim().Length > 0)))
+                if (Mine(client, card) && (card.ProducesMana || (card.Kind != ObjectKindView.Token && CardReading.Plain(CardReading.Text(card)).Trim().Length > 0)))
                 {
                     return -Math.Max(value, 0) - 1;
                 }
@@ -1610,7 +1610,7 @@ public sealed partial class TacticalPlay
         {
             // Why a counterspell in hand was not cast is as much worth reading afterwards as why one was.
             if (Narrating && !option.Affordable && option.Kind == ActionKindView.CastSpell && top.Kind != ObjectKindView.AbilityOnStack
-                && client.Object(option.Source) is { } unpaid && CardReading.Effect(unpaid.OracleText).Kind == EffectKind.Counter)
+                && client.Object(option.Source) is { } unpaid && CardReading.Effect(CardReading.Text(unpaid)).Kind == EffectKind.Counter)
             {
                 Note($"{unpaid.Name} in hand against {top.Name}: not enough mana for it");
             }
@@ -1633,7 +1633,7 @@ public sealed partial class TacticalPlay
                 continue;
             }
 
-            string text = option.Kind == ActionKindView.CastSpell ? card.OracleText : option.Description;
+            string text = option.Kind == ActionKindView.CastSpell ? CardReading.Text(card) : option.Description;
             EffectRead effect = CardReading.Effect(text);
 
             // A counterspell paid for with another card (Force of Will) is two cards for one, and is kept for a spell
@@ -1729,12 +1729,12 @@ public sealed partial class TacticalPlay
             .Where(target => target.StillLegal && !target.IsPlayer)
             .Select(target => client.Object(target.Object))
             .FirstOrDefault(card => card is not null && card.Zone == ZoneKindView.Graveyard && IsCreature(card)
-                && CardReading.Plain(top.OracleText) is var raising
+                && CardReading.Plain(CardReading.Text(top)) is var raising
                 && (raising.Contains("enchant creature card in a graveyard", StringComparison.Ordinal)
-                    || CardReading.Effect(top.OracleText) is { Kind: EffectKind.Raise, Amount: > 0 }));
+                    || CardReading.Effect(CardReading.Text(top)) is { Kind: EffectKind.Raise, Amount: > 0 }));
 
         // Exhume aims at nothing: each player brings back one, and theirs is taken to be the best they have.
-        bool exhume = raised is null && CardReading.Plain(top.OracleText)
+        bool exhume = raised is null && CardReading.Plain(CardReading.Text(top))
             .Contains("each player puts a creature card from their graveyard onto the battlefield", StringComparison.Ordinal);
         if (exhume)
         {
@@ -1820,7 +1820,7 @@ public sealed partial class TacticalPlay
     /// <summary>Whether something on the stack, aimed at this creature, would cost this seat the creature.</summary>
     private static bool Threatens(ObjectView spell, ObjectView creature)
     {
-        EffectRead effect = CardReading.Effect(spell.OracleText);
+        EffectRead effect = CardReading.Effect(CardReading.Text(spell));
 
         return effect.Kind switch
         {
@@ -1892,7 +1892,7 @@ public sealed partial class TacticalPlay
                 continue;
             }
 
-            string plain = CardReading.Plain(source.OracleText);
+            string plain = CardReading.Plain(CardReading.Text(source));
             List<string> lines = [.. plain.Split('\n').Where(line => line.Contains(": add ", StringComparison.Ordinal))];
             bool tappedHurts = plain.Contains("becomes tapped, it deals", StringComparison.Ordinal);
             int Pain(string line)
@@ -1905,7 +1905,7 @@ public sealed partial class TacticalPlay
 
             if (lines.Count > 0 && lines.TrueForAll(line => Pain(line) > 0))
             {
-                painful.Add((lines.Min(Pain), Math.Max(CardReading.ManaMade(source.OracleText).Amount, 1)));
+                painful.Add((lines.Min(Pain), Math.Max(CardReading.ManaMade(CardReading.Text(source)).Amount, 1)));
             }
         }
 
@@ -2042,7 +2042,7 @@ public sealed partial class TacticalPlay
                 && (prompt.Verb.Length == 0 || client.View is not { } view || prompt.Verb != "CopySpell"
                 || (_copies < CopiesPerTurn
                     && client.Object(prompt.Subject) is { } copied
-                    && Mode(client, view, copied.OracleText.Split('.')[0]) > Policy("margin")
+                    && Mode(client, view, CardReading.Text(copied).Split('.')[0]) > Policy("margin")
                     && ++_copies > 0));
         }
 

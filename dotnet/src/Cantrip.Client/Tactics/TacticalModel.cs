@@ -377,7 +377,7 @@ public sealed class TacticalModel
             {
                 add("creature.token", 1);
             }
-            else if (permanent.OracleText.Length > 0)
+            else if (CardReading.Text(permanent).Length > 0)
             {
                 // A creature card that says anything at all usually says something good.
                 add("creature.text", 1);

@@ -128,6 +128,7 @@ public sealed partial class MainPage
             json.WriteString("outcome", client?.Outcome is { } outcome ? $"{outcome.Outcome} {outcome.WinningTeam}" : string.Empty);
             json.WriteNumber("flown", _flights.Launched);
             json.WriteNumber("selected", _pending.Count);
+            json.WriteBoolean("graveyardsOpen", _graveyardsOpen);
             json.WriteString("title", _promptTitle.Text);
             json.WriteString("detail", _promptDetail.Text);
             json.WriteStartArray("logText");
@@ -236,7 +237,7 @@ public sealed partial class MainPage
                         // What the face says, as a test reads it: the type line, the rules lines (granted and lost ones
                         // too), the status words at its foot, and the line written over its art.
                         json.WriteString("typeLine", card.Known && !card.FaceDown ? CardFace.TypeLine(card) : string.Empty);
-                        json.WriteString("rules", string.Join(" / ", CardFace.RulesLines(card).Select(line => line.Text)));
+                        json.WriteString("rules", string.Join(" / ", CardFace.RulesLines(card).Select(line => line.Spent ? $"(grey) {line.Text}" : line.Text)));
                         json.WriteString("status", string.Join(", ", CardFace.StatusWords(card)));
                         json.WriteString("annotation", _looks.TryGetValue(card.Handle, out CardLook? shown) ? shown.Annotation ?? string.Empty : string.Empty);
                         WriteBox(json, toPage.TransformBounds(box));
@@ -307,6 +308,7 @@ public sealed partial class MainPage
                         json.WriteString("text", text);
                         json.WriteString("tooltip", tooltip);
                         json.WriteBoolean("lit", lit);
+                        json.WriteBoolean("open", button.On);
                         WriteBox(json, button.TransformToVisual(Root).TransformBounds(new Rect(0, 0, button.ActualWidth, button.ActualHeight)));
                         json.WriteEndObject();
                     }

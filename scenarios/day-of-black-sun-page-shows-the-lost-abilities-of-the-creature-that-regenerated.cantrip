@@ -4,8 +4,8 @@
 # creature with mana value X or less": it is not destroyed and keeps Haste and Trample. Sylvan Caryatid (2) is saved by a
 # regeneration shield from Yavimaya Hollow made in response (CR 701.19): the shield is no ability of the creature, so it
 # still replaces the destruction, and the Caryatid ends the turn tapped and without Defender and Hexproof.
-# The page says so on the card: the Caryatid's printed text, then "Lost:" and each keyword and ability it no longer has,
-# greyed; the Oddity, which kept its abilities, has no such line.
+# The page says so on the card: the Caryatid's printed lines, each greyed as no longer its own,
+# the Oddity, which kept its abilities, has none greyed.
 
 [Bot1 Deck]
 Swamp
@@ -67,7 +67,7 @@ Bot1.Hand.Day of Black Sun.Cast(X: 3)
 Bot2.Battlefield.Yavimaya Hollow.Activate(Bot2.Battlefield.Sylvan Caryatid; Ability: Regenerate)
 Bot2.Battlefield.Forest.Activate
 [T7 Bot1.Main2]
-? Client.Bot1.OpponentBattlefield.Sylvan Caryatid.Rules = Defender, hexproof / {T}: Add one mana of any color. / Lost: Defender / Lost: Hexproof / Lost: {T}: Add one mana of any color.
+? Client.Bot1.OpponentBattlefield.Sylvan Caryatid.Rules = (grey) Defender, hexproof / (grey) {T}: Add one mana of any color.
 ? Client.Bot1.OpponentBattlefield.Ulvenwald Oddity.Rules = Trample, haste / {5}{G}{G}: Transform this creature.
 
 [Expect]
