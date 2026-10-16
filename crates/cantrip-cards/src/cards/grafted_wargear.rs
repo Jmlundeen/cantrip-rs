@@ -20,14 +20,8 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(when(EventMask::UNATTACHED, unattached), cantrip_mechanics::delayed::sacrifice_subject, "Whenever this Equipment becomes unattached from a permanent, sacrifice that permanent.")
             .look_back(),
-        equip(mana(0, 0, 0, 0, 0, 0), "Equip {0}"),
+        equip(mana("{0}"), "Equip {0}"),
     ],
-    statics: &[StaticDef {
-        text: "Equipped creature gets +3/+2.",
-        layer: Layer::PtModify,
-        affects: attached_object,
-        apply: bonus,
-        ..StaticDef::BLANK
-    }],
+    statics: &[static_ability(Layer::PtModify, attached_object, bonus, "Equipped creature gets +3/+2.")],
     ..oracle::GRAFTED_WARGEAR
 };

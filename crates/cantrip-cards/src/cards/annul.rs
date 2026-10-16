@@ -15,6 +15,6 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[TargetSpec { min: 1, max: 1, filter: artifact_or_enchantment_spell, label: "" }], effect }),
+    spell: spell(&[target(artifact_or_enchantment_spell)], effect),
     ..oracle::ANNUL
 };

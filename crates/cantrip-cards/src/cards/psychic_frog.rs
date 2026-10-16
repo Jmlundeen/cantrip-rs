@@ -35,7 +35,7 @@ fn gain_flying(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(when(EventMask::DAMAGE, combat_damage_to_player_or_planeswalker), effects::draw::<1>, "Whenever this creature deals combat damage to a player or planeswalker, draw a card."),
+        triggered(when(EventMask::DAMAGE, combat_damage_to_player_or_planeswalker), |g, item| effects::draw(g, item, 1), "Whenever this creature deals combat damage to a player or planeswalker, draw a card."),
         ability(discard(1, filters::any), grow, "Discard a card: Put a +1/+1 counter on this creature."),
         ability(exile_from_graveyard(3), gain_flying, "Exile three cards from your graveyard: This creature gains flying until end of turn."),
     ],

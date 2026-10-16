@@ -11,4 +11,4 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-pub static CARD: CardDef = CardDef { spell: Some(SpellDef { targets: &[], effect }), ..oracle::IMPERIAL_SEAL };
+pub static CARD: CardDef = CardDef { spell: spell(&[], effect), ..oracle::IMPERIAL_SEAL };

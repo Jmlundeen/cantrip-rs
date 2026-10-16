@@ -22,7 +22,7 @@ fn draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ENTERS, destroy, "When Loran enters, destroy up to one target artifact or enchantment.")
-            .targets(&[TargetSpec { min: 0, max: 1, ..targets::ARTIFACT_OR_ENCHANTMENT }]),
+            .targets(&[targets::ARTIFACT_OR_ENCHANTMENT.between(0, 1)]),
         ability(TAP, draw, "{T}: You and target opponent each draw a card.")
             .targets(&[targets::OPPONENT]),
     ],

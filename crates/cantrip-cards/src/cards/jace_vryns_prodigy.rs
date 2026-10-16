@@ -60,7 +60,7 @@ fn emblem(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static BACK: CardDef = CardDef {
     abilities: &[
         ability(loyalty(1), plus_one, "+1: Up to one target creature gets -2/-0 until your next turn.")
-            .targets(&[TargetSpec { min: 0, ..targets::CREATURE }]),
+            .targets(&[targets::CREATURE.optional()]),
         ability(loyalty(-3), grant_flashback, "\u{2212}3: You may cast target instant or sorcery card from your graveyard this turn. If that spell would be put into your graveyard, exile it instead.")
             .targets(&[targets::INSTANT_OR_SORCERY_IN_YOUR_GRAVEYARD]),
         ability(loyalty(-9), emblem, "\u{2212}9: You get an emblem with \"Whenever you cast a spell, target opponent mills five cards.\""),

@@ -21,4 +21,4 @@ fn will_of_the_council(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
     Ok(())
 }
 
-pub static CARD: CardDef = CardDef { spell: Some(SpellDef { targets: &[], effect: will_of_the_council }), ..oracle::COUNCILS_JUDGMENT };
+pub static CARD: CardDef = CardDef { spell: spell(&[], will_of_the_council), ..oracle::COUNCILS_JUDGMENT };

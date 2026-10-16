@@ -61,6 +61,6 @@ pub static CARD: CardDef = CardDef {
         triggered(cantrip_mechanics::triggers::YOU_ATTACK, pay_energy, "Whenever you attack, you may pay {E}{E}{E}. When you do, put two +1/+1 counters and a flying counter on target attacking creature. It becomes an Angel in addition to its other types."),
     ],
     delayed: &[delayed_trigger(empower, "When you do, put two +1/+1 counters and a flying counter on target attacking creature. It becomes an Angel in addition to its other types.")
-        .targets(&[TargetSpec { min: 1, max: 1, filter: attacking_creature, label: "" }])],
+        .targets(&[target(attacking_creature)])],
     ..oracle::GUIDE_OF_SOULS
 };

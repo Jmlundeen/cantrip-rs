@@ -24,14 +24,8 @@ fn look(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(cantrip_mechanics::triggers::EQUIPPED_CREATURE_ATTACKS, look, "Whenever equipped creature attacks, look at the top six cards of your library. You may reveal an artifact card from among them and put it into your hand. Put the rest on the bottom of your library in a random order."),
-        equip(mana(3, 0, 0, 0, 0, 0), "Equip {3}"),
+        equip(mana("{3}"), "Equip {3}"),
     ],
-    statics: &[StaticDef {
-        text: "Equipped creature gets +1/+1 for each artifact you control.",
-        layer: Layer::PtModify,
-        affects: attached_object,
-        apply: artifact_bonus,
-        ..StaticDef::BLANK
-    }],
+    statics: &[static_ability(Layer::PtModify, attached_object, artifact_bonus, "Equipped creature gets +1/+1 for each artifact you control.")],
     ..oracle::ADAPTIVE_OMNITOOL
 };

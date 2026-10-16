@@ -18,6 +18,6 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[targets::CREATURE_CARD_IN_YOUR_GRAVEYARD], effect }),
+    spell: spell(&[targets::CREATURE_CARD_IN_YOUR_GRAVEYARD], effect),
     ..oracle::ECHOING_RETURN
 };

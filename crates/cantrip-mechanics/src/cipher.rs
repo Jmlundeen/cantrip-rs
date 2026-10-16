@@ -49,14 +49,8 @@ fn grant(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
     }
 }
 
-pub const STATIC: StaticDef = StaticDef {
-    text: "For as long as this card is encoded on that creature, that creature has \"Whenever this creature deals combat damage to a player, you may copy the encoded card and you may cast the copy without paying its mana cost.\"",
-    layer: Layer::Ability,
-    affects,
-    apply: grant,
-    from: ZoneKind::Exile,
-    ..StaticDef::BLANK
-};
+pub const STATIC: StaticDef = static_ability(Layer::Ability, affects, grant, "For as long as this card is encoded on that creature, that creature has \"Whenever this creature deals combat damage to a player, you may copy the encoded card and you may cast the copy without paying its mana cost.\"")
+    .from(ZoneKind::Exile);
 
 /// "You may copy the encoded card and you may cast the copy without paying its mana cost" (CR 702.99a, 707.12): the card
 /// encoded on this creature that granted this ability, if it still is: a creature that has left the battlefield since

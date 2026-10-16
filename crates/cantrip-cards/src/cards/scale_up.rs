@@ -19,7 +19,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[targets::CREATURE_YOU_CONTROL], effect }),
-    overload: Some(mana(4, 0, 0, 0, 0, 2)),
+    spell: spell(&[targets::CREATURE_YOU_CONTROL], effect),
+    overload: Some(mana("{4}{G}{G}")),
     ..oracle::SCALE_UP
 };

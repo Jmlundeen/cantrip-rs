@@ -42,20 +42,8 @@ pub static CARD: CardDef = CardDef {
     abilities: &[ability(cost("{1}"), exile_card, "{1}: Exile target card from a graveyard.")
         .targets(&[targets::CARD_IN_A_GRAVEYARD])],
     statics: &[
-        StaticDef {
-            text: "As long as there are four or more card types among cards exiled with this creature, it gets +4/+4.",
-            layer: Layer::PtModify,
-            affects: itself_with_collection,
-            apply: plus_four,
-            ..StaticDef::BLANK
-        },
-        StaticDef {
-            text: "As long as there are four or more card types among cards exiled with this creature, it has trample.",
-            layer: Layer::Ability,
-            affects: itself_with_collection,
-            apply: trample,
-            ..StaticDef::BLANK
-        },
+        static_ability(Layer::PtModify, itself_with_collection, plus_four, "As long as there are four or more card types among cards exiled with this creature, it gets +4/+4."),
+        static_ability(Layer::Ability, itself_with_collection, trample, "As long as there are four or more card types among cards exiled with this creature, it has trample."),
     ],
     ..oracle::KEEN_EYED_CURATOR
 };

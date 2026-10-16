@@ -8,7 +8,7 @@ use cantrip_api::*;
 
 /// The alternative cost of cleave: cast from the hand for `cost` (CR 118.9). It is the card's first way.
 pub const fn way(cost: ManaCost, text: &'static str) -> WayDef {
-    WayDef { text, cost: Cost::mana(cost), from: ZoneKind::Hand, exile_after: false, condition: None, instant_speed: false }
+    cantrip_api::way(Cost::mana(cost), ZoneKind::Hand, text)
 }
 
 /// Whether the spell was cast for its cleave cost, so that the bracketed words are removed: judged as it resolves.

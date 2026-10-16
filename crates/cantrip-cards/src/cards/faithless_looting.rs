@@ -10,7 +10,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[], effect }),
-    ways: &[flashback::way(mana(2, 0, 0, 0, 1, 0), "Flashback {2}{R}")],
+    spell: spell(&[], effect),
+    ways: &[flashback::way(cost("{2}{R}"), "Flashback {2}{R}")],
     ..oracle::FAITHLESS_LOOTING
 };

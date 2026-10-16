@@ -28,7 +28,7 @@ const KICKER_COST: ManaCost = ManaCost { generic: 1, symbols: [0, 0, 0, 0, 0, 1]
 
 pub static CARD: CardDef = CardDef {
     colors: devoid::COLORS,
-    kicker: Some(Kicker { cost: KICKER_COST, multi: false, waterbend: false }),
+    kicker: kicker(KICKER_COST),
     abilities: &[
         triggered(cantrip_mechanics::triggers::CAST_THIS_SPELL, search, "When you cast this spell, search your library for a land card, put it onto the battlefield, then shuffle.")
             .anywhere(),

@@ -20,6 +20,6 @@ fn your_creature_targeted(q: &dyn Query, source: ObjectId, event: &Event) -> Opt
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[triggered(when(EventMask::BECAME_TARGET, your_creature_targeted), effects::draw::<1>, "Whenever a creature you control or a creature spell you control becomes the target of a spell or ability an opponent controls, draw a card.")],
+    abilities: &[triggered(when(EventMask::BECAME_TARGET, your_creature_targeted), |g, item| effects::draw(g, item, 1), "Whenever a creature you control or a creature spell you control becomes the target of a spell or ability an opponent controls, draw a card.")],
     ..oracle::SURRAK_ELUSIVE_HUNTER
 };

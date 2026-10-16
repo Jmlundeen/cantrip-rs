@@ -36,19 +36,13 @@ fn minus_one_power(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
 }
 
 pub static CARD: CardDef = CardDef {
-    enchant: Some(TargetSpec { min: 1, max: 1, filter: enchant_filter, label: "" }),
+    enchant: Some(target(enchant_filter)),
     abilities: &[
         triggered(THIS_ENTERS, return_enchanted, "When Animate Dead enters, if it's on the battlefield, it loses \"enchant creature card in a graveyard\" and gains \"enchant creature put onto the battlefield with Animate Dead.\" Return enchanted creature card to the battlefield under your control and attach Animate Dead to it.")
             .condition(cantrip_mechanics::triggers::this_is_on_the_battlefield),
         triggered(cantrip_mechanics::triggers::THIS_LEAVES, sacrifice_creature, "When Animate Dead leaves the battlefield, that creature's controller sacrifices it.")
             .look_back(),
     ],
-    statics: &[StaticDef {
-        text: "Enchanted creature gets -1/-0.",
-        layer: Layer::PtModify,
-        affects: attached_object,
-        apply: minus_one_power,
-        ..StaticDef::BLANK
-    }],
+    statics: &[static_ability(Layer::PtModify, attached_object, minus_one_power, "Enchanted creature gets -1/-0.")],
     ..oracle::ANIMATE_DEAD
 };

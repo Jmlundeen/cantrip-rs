@@ -22,20 +22,11 @@ fn destroy_blue(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-static MODAL: ModalDef = ModalDef {
-    modes: &[
-        ModeDef { text: "Counter target spell if it's blue.", targets: &[targets::SPELL], effect: counter_blue, cost: ManaCost::ZERO },
-        ModeDef {
-            text: "Destroy target permanent if it's blue.",
-            targets: &[targets::PERMANENT],
-            effect: destroy_blue,
-            cost: ManaCost::ZERO,
-        },
-    ],
-    min: 1,
-    max: 1,
-    escalate: None,
-    repeat: false, allowed: None,
-};
+static MODAL: ModalDef = modes(&[
+    mode(counter_blue, "Counter target spell if it's blue.")
+        .targets(&[targets::SPELL]),
+    mode(destroy_blue, "Destroy target permanent if it's blue.")
+        .targets(&[targets::PERMANENT]),
+]);
 
 pub static CARD: CardDef = CardDef { spell: Some(SpellDef::MODAL), modal: Some(&MODAL), ..oracle::PYROBLAST };

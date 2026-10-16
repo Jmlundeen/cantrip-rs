@@ -23,7 +23,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// "As an additional cost to cast this spell, you may blight 1" (CR 701.68a, 601.2b): an optional cost announced before
 /// the target (CR 601.2b-c), which is chosen after it. (The tactical bot never pays it: a known limitation.) Cinder Strike, Burning Curiosity and Pyrrhic Strike also blight as an optional cost.
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[TargetSpec { min: 1, max: 1, filter: creature_mv2, label: "" }], effect }),
+    spell: spell(&[target(creature_mv2)], effect),
     late_targets: true,
     optional_cost: Some(blight::optional(1)),
     labels: &["Cast without blighting", "Blight 1: put a -1/-1 counter on a creature you control"],

@@ -21,12 +21,6 @@ fn bonus(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
 pub static CARD: CardDef = CardDef {
     enchant: Some(targets::CREATURE_YOU_CONTROL),
     abilities: &[storm::trigger("Storm (When you cast this spell, copy it for each spell cast before it this turn. You may choose new targets for the copies. Copies become tokens.)")],
-    statics: &[StaticDef {
-        text: "Enchanted creature gets +1/+1 for each enchantment you control.",
-        layer: Layer::PtModify,
-        affects: attached_object,
-        apply: bonus,
-        ..StaticDef::BLANK
-    }],
+    statics: &[static_ability(Layer::PtModify, attached_object, bonus, "Enchanted creature gets +1/+1 for each enchantment you control.")],
     ..oracle::TEMPEST_TECHNIQUE
 };

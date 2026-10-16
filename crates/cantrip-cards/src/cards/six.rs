@@ -28,13 +28,7 @@ fn your_nonland_permanent_cards(q: &dyn LayerQuery, source: ObjectId, affected: 
 
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(triggers::THIS_ATTACKS, mill_and_take, "Whenever Six attacks, mill three cards. You may put a land card from among them into your hand.")],
-    statics: &[StaticDef {
-        text: "During your turn, nonland permanent cards in your graveyard have retrace.",
-        layer: Layer::Ability,
-        affects: your_nonland_permanent_cards,
-        apply: retrace::give,
-        everywhere: true,
-        ..StaticDef::BLANK
-    }],
+    statics: &[static_ability(Layer::Ability, your_nonland_permanent_cards, retrace::give, "During your turn, nonland permanent cards in your graveyard have retrace.")
+        .everywhere()],
     ..oracle::SIX
 };

@@ -84,32 +84,12 @@ fn sacrifice_greatest(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
     Ok(())
 }
 
-static MODAL: ModalDef = ModalDef {
-    modes: &[
-        ModeDef {
-            text: "Put two +1/+1 counters on up to one creature. It gains lifelink until end of turn.",
-            targets: &[],
-            effect: counters,
-            cost: ManaCost::ZERO,
-        },
-        ModeDef { text: "Destroy each creature with power 2 or less.", targets: &[], effect: destroy_small, cost: ManaCost::ZERO },
-        ModeDef {
-            text: "Return up to two creature cards from your graveyard to your hand.",
-            targets: &[],
-            effect: return_creatures,
-            cost: ManaCost::ZERO,
-        },
-        ModeDef {
-            text: "Each opponent sacrifices a creature with the greatest power among creatures they control.",
-            targets: &[],
-            effect: sacrifice_greatest,
-            cost: ManaCost::ZERO,
-        },
-    ],
-    min: 2,
-    max: 2,
-    escalate: None,
-    repeat: false, allowed: None,
-};
+static MODAL: ModalDef = modes(&[
+    mode(counters, "Put two +1/+1 counters on up to one creature. It gains lifelink until end of turn."),
+    mode(destroy_small, "Destroy each creature with power 2 or less."),
+    mode(return_creatures, "Return up to two creature cards from your graveyard to your hand."),
+    mode(sacrifice_greatest, "Each opponent sacrifices a creature with the greatest power among creatures they control."),
+])
+    .choose(2, 2);
 
 pub static CARD: CardDef = CardDef { spell: Some(SpellDef::MODAL), modal: Some(&MODAL), ..oracle::GIXS_COMMAND };

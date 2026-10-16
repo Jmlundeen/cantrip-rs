@@ -28,7 +28,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(triggers::THIS_ENTERS, opponents_sacrifice_three, "When this artifact enters, each opponent sacrifices three creatures of their choice."),
         triggered(triggers::YOUR_UPKEEP, reanimate, "At the beginning of your upkeep, put target creature card from a graveyard onto the battlefield under your control. It's a Phyrexian in addition to its other types.")
-            .targets(&[TargetSpec { min: 1, max: 1, filter: creature_card, label: "" }]),
+            .targets(&[target(creature_card)]),
     ],
     ..oracle::PORTAL_TO_PHYREXIA
 };

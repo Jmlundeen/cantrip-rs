@@ -39,7 +39,7 @@ pub static CARD: CardDef = CardDef {
         mana_ability(TAP, add_one_of(&[Color::Green, Color::Blue]), "{T}: Add {G} or {U}."),
         ability(cost("{3}{U}{G}"), becomes_creature, "{3}{G}{U}: Until end of turn, this land becomes a 5/5 green and blue Plant creature with trample. It's still a land."),
         triggered(triggers::THIS_ATTACKS, three_three, "Whenever this land attacks, up to one other target creature has base power and toughness 3/3 until end of turn.")
-            .targets(&[TargetSpec { min: 0, max: 1, filter: other_creature, label: "" }]),
+            .targets(&[up_to_one(other_creature)]),
     ],
     ..oracle::RESTLESS_VINESTALK
 };

@@ -4,6 +4,6 @@ use cantrip_oracle as oracle;
 
 pub static CARD: CardDef = CardDef {
     own_cost_changes: &[affinity::for_artifacts],
-    spell: Some(SpellDef { targets: &[], effect: effects::draw::<2> }),
+    spell: spell(&[], |g, item| effects::draw(g, item, 2)),
     ..oracle::THOUGHTCAST
 };

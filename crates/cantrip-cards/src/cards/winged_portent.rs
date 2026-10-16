@@ -22,7 +22,7 @@ fn draw_for_creatures(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[], effect: draw_for_creatures }),
-    ways: &[cleave::way(mana(4, 0, 1, 0, 0, 1), "Cleave {4}{G}{U}")],
+    spell: spell(&[], draw_for_creatures),
+    ways: &[cleave::way(mana("{4}{U}{G}"), "Cleave {4}{G}{U}")],
     ..oracle::WINGED_PORTENT
 };

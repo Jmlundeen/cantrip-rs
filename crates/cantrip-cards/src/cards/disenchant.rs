@@ -8,4 +8,4 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-pub static CARD: CardDef = CardDef { spell: Some(SpellDef { targets: &[targets::ARTIFACT_OR_ENCHANTMENT], effect }), ..oracle::DISENCHANT };
+pub static CARD: CardDef = CardDef { spell: spell(&[targets::ARTIFACT_OR_ENCHANTMENT], effect), ..oracle::DISENCHANT };

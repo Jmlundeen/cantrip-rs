@@ -22,8 +22,8 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[], effect }),
-    ways: &[flashback::way(mana(1, 0, 0, 1, 0, 0), "Flashback {1}{B}")],
+    spell: spell(&[], effect),
+    ways: &[flashback::way(cost("{1}{B}"), "Flashback {1}{B}")],
     ..oracle::LINGERING_SOULS
 };
 

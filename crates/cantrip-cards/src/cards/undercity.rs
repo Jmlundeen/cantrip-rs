@@ -113,7 +113,7 @@ pub static CARD: CardDef = CardDef {
         room("Target player loses 5 life.", &[targets::PLAYER], trap),
         room("Goad target creature.", &[targets::CREATURE], arena),
         room("Create a Treasure token.", &[], stash),
-        room("Draw a card.", &[], effects::draw::<1>),
+        room("Draw a card.", &[], |g, item| effects::draw(g, item, 1)),
         room("Create a 4/1 black Skeleton creature token with menace.", &[], catacombs),
         room(
             "Reveal the top ten cards of your library. Put a creature card from among them onto the battlefield with three +1/+1 counters on it. It gains hexproof until your next turn. Then shuffle.",

@@ -12,7 +12,7 @@ fn grant(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[], effect: grant }),
+    spell: spell(&[], grant),
     delayed: &[mana_ability(life(1), add(Mana::C), "Pay 1 life: Add {C}.")],
     ..oracle::CHANNEL
 };

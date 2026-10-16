@@ -75,19 +75,7 @@ pub static CARD: CardDef = CardDef {
             .condition(at_level_two),
     ],
     delayed: &[ward::<1>("Ward {1} (Whenever this permanent becomes the target of a spell or ability an opponent controls, counter it unless that player pays {1}.)")],
-    statics: &[StaticDef {
-        text: "Permanents you control with counters on them have ward {1}.",
-        layer: Layer::Ability,
-        affects: has_counters,
-        apply: grant_ward,
-        ..StaticDef::BLANK
-    }],
-    replacements: &[ReplacementDef {
-        hint: "puts twice that many counters",
-        kind: ReplacementKind::Counters,
-        applies: doubles,
-        apply: double,
-        ..ReplacementDef::BLANK
-    }],
+    statics: &[static_ability(Layer::Ability, has_counters, grant_ward, "Permanents you control with counters on them have ward {1}.")],
+    replacements: &[replacement(ReplacementKind::Counters, doubles, double, "puts twice that many counters")],
     ..oracle::INNKEEPERS_TALENT
 };

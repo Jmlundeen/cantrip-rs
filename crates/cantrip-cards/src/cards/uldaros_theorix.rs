@@ -58,7 +58,7 @@ fn nonland_card_of_a_type_not_yet_chosen(q: &dyn Query, asker: &Asker, t: Target
 }
 
 /// Up to one target for each of the eight card types a nonland card can have.
-const SLOTS: [TargetSpec; TYPES.len()] = [TargetSpec { min: 0, max: 1, filter: nonland_card_of_a_type_not_yet_chosen, label: "Exile up to one target nonland card from your graveyard of a card type none of your other targets has, and copy it" }; TYPES.len()];
+const SLOTS: [TargetSpec; TYPES.len()] = [up_to_one(nonland_card_of_a_type_not_yet_chosen).labelled("Exile up to one target nonland card from your graveyard of a card type none of your other targets has, and copy it"); TYPES.len()];
 
 /// "Exile up to one target nonland card of each card type from your graveyard. Copy those cards. You may cast any number
 /// of spells with total mana value 6 or less from among the copies without paying their mana costs." The targets still

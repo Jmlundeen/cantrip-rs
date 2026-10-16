@@ -8,6 +8,7 @@
 use cantrip_api::*;
 
 /// The alternative cost of flashback: cast from the graveyard for `cost` (CR 118.9), exiled as it leaves the stack.
-pub const fn way(cost: ManaCost, text: &'static str) -> WayDef {
-    WayDef { text, cost: Cost::mana(cost), from: ZoneKind::Graveyard, exile_after: true, condition: None, instant_speed: false }
+pub const fn way(cost: Cost, text: &'static str) -> WayDef {
+    cantrip_api::way(cost, ZoneKind::Graveyard, text)
+        .exile_after()
 }

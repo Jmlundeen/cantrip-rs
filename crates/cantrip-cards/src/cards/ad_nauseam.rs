@@ -19,4 +19,4 @@ fn reveal(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-pub static CARD: CardDef = CardDef { spell: Some(SpellDef { targets: &[], effect: reveal }), ..oracle::AD_NAUSEAM };
+pub static CARD: CardDef = CardDef { spell: spell(&[], reveal), ..oracle::AD_NAUSEAM };

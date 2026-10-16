@@ -17,7 +17,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ENTERS, cantrip_mechanics::effects::become_monarch, "When Aragorn enters, you become the monarch."),
         triggered(triggers::THIS_ATTACKS, cant_block, "Whenever Aragorn attacks, up to one target creature can't block this turn. If you're the monarch, creatures can't block this turn.")
-            .targets(&[TargetSpec { min: 0, ..targets::CREATURE }]),
+            .targets(&[targets::CREATURE.optional()]),
     ],
     ..oracle::ARAGORN_KING_OF_GONDOR
 };

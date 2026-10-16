@@ -22,7 +22,7 @@ fn you_cast_a_creature_spell(q: &dyn Query, source: ObjectId, event: &Event) -> 
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[], effect: watch }),
-    delayed: &[triggered(when(EventMask::SPELL_CAST, you_cast_a_creature_spell), cantrip_mechanics::effects::draw::<1>, "Whenever you cast a creature spell this turn, draw a card.")],
+    spell: spell(&[], watch),
+    delayed: &[triggered(when(EventMask::SPELL_CAST, you_cast_a_creature_spell), |g, item| cantrip_mechanics::effects::draw(g, item, 1), "Whenever you cast a creature spell this turn, draw a card.")],
     ..oracle::GLIMPSE_OF_NATURE
 };

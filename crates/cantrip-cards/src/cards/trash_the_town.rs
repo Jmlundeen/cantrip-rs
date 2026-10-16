@@ -32,24 +32,15 @@ fn grant_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 const MODES: &[ModeDef] = &[
-    ModeDef {
-        text: "+ {2} \u{2014} Put two +1/+1 counters on target creature.",
-        targets: &[targets::CREATURE],
-        effect: counters,
-        cost: mana(2, 0, 0, 0, 0, 0),
-    },
-    ModeDef {
-        text: "+ {1} \u{2014} Target creature gains trample until end of turn.",
-        targets: &[targets::CREATURE],
-        effect: trample,
-        cost: mana(1, 0, 0, 0, 0, 0),
-    },
-    ModeDef {
-        text: "+ {1} \u{2014} Until end of turn, target creature gains \"Whenever this creature deals combat damage to a player, draw two cards.\"",
-        targets: &[targets::CREATURE],
-        effect: grant_draw,
-        cost: mana(1, 0, 0, 0, 0, 0),
-    },
+    mode(counters, "+ {2} \u{2014} Put two +1/+1 counters on target creature.")
+        .targets(&[targets::CREATURE])
+        .cost(mana("{2}")),
+    mode(trample, "+ {1} \u{2014} Target creature gains trample until end of turn.")
+        .targets(&[targets::CREATURE])
+        .cost(mana("{1}")),
+    mode(grant_draw, "+ {1} \u{2014} Until end of turn, target creature gains \"Whenever this creature deals combat damage to a player, draw two cards.\"")
+        .targets(&[targets::CREATURE])
+        .cost(mana("{1}")),
 ];
 
 static MODAL: ModalDef = spree::modal(MODES);
@@ -57,6 +48,6 @@ static MODAL: ModalDef = spree::modal(MODES);
 pub static CARD: CardDef = CardDef {
     spell: Some(SpellDef::MODAL),
     modal: Some(&MODAL),
-    delayed: &[triggered(DEALS_COMBAT_DAMAGE_TO_PLAYER, effects::draw::<2>, "Whenever this creature deals combat damage to a player, draw two cards.")],
+    delayed: &[triggered(DEALS_COMBAT_DAMAGE_TO_PLAYER, |g, item| effects::draw(g, item, 2), "Whenever this creature deals combat damage to a player, draw two cards.")],
     ..oracle::TRASH_THE_TOWN
 };

@@ -29,6 +29,6 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[ability(TAP.and(SACRIFICE_THIS), effect, "{T}, Sacrifice Urza's Bauble: Look at a card at random in target player's hand. You draw a card at the beginning of the next turn's upkeep.")
         .targets(&[targets::PLAYER])],
-    delayed: &[delayed_trigger(effects::draw::<1>, "Draw a card.")],
+    delayed: &[delayed_trigger(|g, item| effects::draw(g, item, 1), "Draw a card.")],
     ..oracle::URZAS_BAUBLE
 };

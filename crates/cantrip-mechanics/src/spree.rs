@@ -8,5 +8,6 @@ use cantrip_api::*;
 
 /// The modal spell of a spree card: at least one of its modes, any number up to all of them, each adding its own cost.
 pub const fn modal(modes: &'static [ModeDef]) -> ModalDef {
-    ModalDef { modes, min: 1, max: modes.len() as u8, escalate: None, repeat: false , allowed: None}
+    cantrip_api::modes(modes)
+    .choose(1, modes.len() as u8)
 }

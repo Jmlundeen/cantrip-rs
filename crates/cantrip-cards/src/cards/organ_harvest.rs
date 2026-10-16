@@ -19,4 +19,4 @@ fn harvest(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-pub static CARD: CardDef = CardDef { spell: Some(SpellDef { targets: &[], effect: harvest }), ..oracle::ORGAN_HARVEST };
+pub static CARD: CardDef = CardDef { spell: spell(&[], harvest), ..oracle::ORGAN_HARVEST };

@@ -14,13 +14,7 @@ fn affects(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Ch
 }
 
 pub static CARD: CardDef = CardDef {
-    statics: &[StaticDef {
-        text: "As long as this card is in your graveyard and you control a Mountain, creatures you control have haste.",
-        layer: Layer::Ability,
-        affects,
-        apply: have_haste,
-        from: ZoneKind::Graveyard,
-        ..StaticDef::BLANK
-    }],
+    statics: &[static_ability(Layer::Ability, affects, have_haste, "As long as this card is in your graveyard and you control a Mountain, creatures you control have haste.")
+        .from(ZoneKind::Graveyard)],
     ..oracle::ANGER
 };

@@ -44,31 +44,15 @@ fn exile_card(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-static MODAL: ModalDef = ModalDef {
-    modes: &[
-        ModeDef { text: "Discard a card. If you do, draw a card.", targets: &[], effect: discard_and_draw, cost: ManaCost::ZERO },
-        ModeDef {
-            text: "Exile up to one target card from a graveyard.",
-            targets: &[TargetSpec { min: 0, ..targets::CARD_IN_A_GRAVEYARD }],
-            effect: exile_card,
-            cost: ManaCost::ZERO,
-        },
-    ],
-    min: 1,
-    max: 1,
-    escalate: None,
-    repeat: false, allowed: None,
-};
+static MODAL: ModalDef = modes(&[
+    mode(discard_and_draw, "Discard a card. If you do, draw a card."),
+    mode(exile_card, "Exile up to one target card from a graveyard.")
+        .targets(&[targets::CARD_IN_A_GRAVEYARD.optional()]),
+]);
 
 pub static CARD: CardDef = CardDef {
     abilities: &[modal_triggered(cantrip_mechanics::triggers::THIS_ATTACKS, &MODAL, "Whenever this creature attacks, choose one \u{2014} Discard a card. If you do, draw a card.; or Exile up to one target card from a graveyard.")],
-    statics: &[StaticDef {
-        text: "Domain \u{2014} Territorial Kavu's power and toughness are each equal to the number of basic land types among lands you control.",
-        layer: Layer::PtDefine,
-        affects,
-        apply: domain,
-        own: true,
-        ..StaticDef::BLANK
-    }],
+    statics: &[static_ability(Layer::PtDefine, affects, domain, "Domain \u{2014} Territorial Kavu's power and toughness are each equal to the number of basic land types among lands you control.")
+        .own()],
     ..oracle::TERRITORIAL_KAVU
 };

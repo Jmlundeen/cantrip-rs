@@ -34,7 +34,7 @@ pub static CARD: CardDef = CardDef {
         triggered(THIS_ENTERS, spirit, "When this artifact enters, create a 1/1 white Spirit creature token with flying."),
         triggered(when(EventMask::ZONE_CHANGE, you_create_creature_tokens), story_counter, "Whenever you create one or more creature tokens, put a story counter on this artifact.")
             .once_per_batch(),
-        ability(cost("{W}, {T}").and(remove_counters(CounterKind::Story, 1)), effects::draw::<1>, "{W}, {T}, Remove a story counter from this artifact: Draw a card."),
+        ability(cost("{W}, {T}").and(remove_counters(CounterKind::Story, 1)), |g, item| effects::draw(g, item, 1), "{W}, {T}, Remove a story counter from this artifact: Draw a card."),
     ],
     ..oracle::STAFF_OF_THE_STORYTELLER
 };

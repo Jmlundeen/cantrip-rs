@@ -11,7 +11,7 @@ const TIME: usize = CounterKind::Time as usize;
 
 /// The alternative cost of impending: cast from the hand for `cost` (CR 118.9). It is the card's first way.
 pub const fn way(cost: ManaCost, text: &'static str) -> WayDef {
-    WayDef { text, cost: Cost::mana(cost), from: ZoneKind::Hand, exile_after: false, condition: None, instant_speed: false }
+    cantrip_api::way(Cost::mana(cost), ZoneKind::Hand, text)
 }
 
 /// "If you cast this spell for its impending cost, it enters with `N` time counters" (CR 702.176a, 614.1c): judged on the
@@ -43,13 +43,7 @@ pub fn not_a_creature(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.toughness = None;
 }
 
-pub const NOT_A_CREATURE: StaticDef = StaticDef {
-    text: "As long as this permanent has a time counter on it, it isn't a creature.",
-    layer: Layer::Type,
-    affects: has_time_counter,
-    apply: not_a_creature,
-    ..StaticDef::BLANK
-};
+pub const NOT_A_CREATURE: StaticDef = static_ability(Layer::Type, has_time_counter, not_a_creature, "As long as this permanent has a time counter on it, it isn't a creature.");
 
 fn your_end_step(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {

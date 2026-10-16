@@ -19,13 +19,7 @@ fn plus_one_plus_one(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.toughness = chars.toughness.map(|v| v + 1);
 }
 
-const STATICS: &[StaticDef] = &[StaticDef {
-    text: "Enchanted creature gets +1/+1.",
-    layer: Layer::PtModify,
-    affects: attached_object,
-    apply: plus_one_plus_one,
-    ..StaticDef::BLANK
-}];
+const STATICS: &[StaticDef] = &[static_ability(Layer::PtModify, attached_object, plus_one_plus_one, "Enchanted creature gets +1/+1.")];
 
 /// "You may pay {1}{G} if this permanent is attached to a creature you control. If you do, create a token that's a copy
 /// of that creature. If you didn't create a token this way, create a 1/1 green Insect creature token." Read the CR 608.2h
@@ -38,7 +32,7 @@ fn landfall_effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(host) = host
         && g.chars(host).is(CardType::Creature)
         && g.obj(host).controller == item.controller
-        && g.unless_pays(item.controller, me, host, mana(1, 0, 0, 0, 0, 1))?
+        && g.unless_pays(item.controller, me, host, mana("{1}{G}"))?
     {
         let values = g.copiable_values(host);
         created = !g.create_token_copies_of(values, item.controller, 1)?.is_empty();

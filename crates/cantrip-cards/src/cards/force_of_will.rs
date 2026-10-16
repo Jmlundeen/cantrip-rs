@@ -12,15 +12,8 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[targets::SPELL], effect }),
+    spell: spell(&[targets::SPELL], effect),
     // You may pay 1 life and exile a blue card from your hand rather than pay this spell's mana cost (CR 118.9).
-    ways: &[WayDef {
-        text: "Pay 1 life, exile a blue card from your hand",
-        cost: Cost { life: 1, exile_from_hand: Some((1, blue_card)), ..Cost::NONE },
-        from: ZoneKind::Hand,
-        exile_after: false,
-        condition: None,
-        instant_speed: false,
-    }],
+    ways: &[way(life(1).and(exile_from_hand(1, blue_card)), ZoneKind::Hand, "Pay 1 life, exile a blue card from your hand")],
     ..oracle::FORCE_OF_WILL
 };

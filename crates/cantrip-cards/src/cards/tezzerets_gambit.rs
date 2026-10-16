@@ -7,4 +7,4 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.proliferate(item.controller, item.object)
 }
 
-pub static CARD: CardDef = CardDef { spell: Some(SpellDef { targets: &[], effect }), ..oracle::TEZZERETS_GAMBIT };
+pub static CARD: CardDef = CardDef { spell: spell(&[], effect), ..oracle::TEZZERETS_GAMBIT };

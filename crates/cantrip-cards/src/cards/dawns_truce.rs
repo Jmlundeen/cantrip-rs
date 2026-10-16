@@ -19,7 +19,7 @@ fn protect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[], effect: protect }),
+    spell: spell(&[], protect),
     gift: Some(Gift::Card),
     ..oracle::DAWNS_TRUCE
 };

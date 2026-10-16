@@ -30,24 +30,12 @@ fn destroy_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[equip(mana(1, 0, 0, 0, 0, 0), "Equip {1}")],
+    abilities: &[equip(mana("{1}"), "Equip {1}")],
     delayed: &[ability(cost("{3}, {T}").and(sacrifice(1, granting_hammer)), destroy_it, "{3}, {T}, Sacrifice Deconstruction Hammer: Destroy target artifact or enchantment.")
         .targets(&[targets::ARTIFACT_OR_ENCHANTMENT])],
     statics: &[
-        StaticDef {
-            text: "Equipped creature gets +1/+1.",
-            layer: Layer::PtModify,
-            affects: attached_object,
-            apply: plus_one,
-            ..StaticDef::BLANK
-        },
-        StaticDef {
-            text: "Equipped creature has \"{3}, {T}, Sacrifice Deconstruction Hammer: Destroy target artifact or enchantment.\"",
-            layer: Layer::Ability,
-            affects: attached_object,
-            apply: grant_destroy,
-            ..StaticDef::BLANK
-        },
+        static_ability(Layer::PtModify, attached_object, plus_one, "Equipped creature gets +1/+1."),
+        static_ability(Layer::Ability, attached_object, grant_destroy, "Equipped creature has \"{3}, {T}, Sacrifice Deconstruction Hammer: Destroy target artifact or enchantment.\""),
     ],
     ..oracle::DECONSTRUCTION_HAMMER
 };

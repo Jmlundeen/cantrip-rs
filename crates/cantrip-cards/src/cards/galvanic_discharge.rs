@@ -26,6 +26,6 @@ fn discharge(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[targets::CREATURE_OR_PLANESWALKER], effect: discharge }),
+    spell: spell(&[targets::CREATURE_OR_PLANESWALKER], discharge),
     ..oracle::GALVANIC_DISCHARGE
 };

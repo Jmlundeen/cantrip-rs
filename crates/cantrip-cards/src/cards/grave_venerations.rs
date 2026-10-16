@@ -29,7 +29,7 @@ pub static CARD: CardDef = CardDef {
         triggered(cantrip_mechanics::triggers::CREATURE_YOU_CONTROL_DIES, drain, "Whenever a creature you control dies, each opponent loses 1 life and you gain 1 life.")
             .look_back(),
         triggered(cantrip_mechanics::triggers::YOUR_END_STEP, return_it, "At the beginning of your end step, if you're the monarch, return up to one target creature card from your graveyard to your hand.")
-            .targets(&[TargetSpec { min: 0, max: 1, ..cantrip_mechanics::targets::CREATURE_CARD_IN_YOUR_GRAVEYARD }])
+            .targets(&[cantrip_mechanics::targets::CREATURE_CARD_IN_YOUR_GRAVEYARD.between(0, 1)])
             .condition(you_are_monarch),
     ],
     ..oracle::GRAVE_VENERATIONS

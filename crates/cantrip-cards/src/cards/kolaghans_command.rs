@@ -32,32 +32,16 @@ fn damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-static MODAL: ModalDef = ModalDef {
-    modes: &[
-        ModeDef {
-            text: "Return target creature card from your graveyard to your hand.",
-            targets: &[targets::CREATURE_CARD_IN_YOUR_GRAVEYARD],
-            effect: return_creature,
-            cost: ManaCost::ZERO,
-        },
-        ModeDef { text: "Target player discards a card.", targets: &[targets::PLAYER], effect: discard, cost: ManaCost::ZERO },
-        ModeDef {
-            text: "Destroy target artifact.",
-            targets: &[targets::ARTIFACT],
-            effect: destroy_artifact,
-            cost: ManaCost::ZERO,
-        },
-        ModeDef {
-            text: "Kolaghan's Command deals 2 damage to any target.",
-            targets: &[targets::ANY],
-            effect: damage,
-            cost: ManaCost::ZERO,
-        },
-    ],
-    min: 2,
-    max: 2,
-    escalate: None,
-    repeat: false, allowed: None,
-};
+static MODAL: ModalDef = modes(&[
+    mode(return_creature, "Return target creature card from your graveyard to your hand.")
+        .targets(&[targets::CREATURE_CARD_IN_YOUR_GRAVEYARD]),
+    mode(discard, "Target player discards a card.")
+        .targets(&[targets::PLAYER]),
+    mode(destroy_artifact, "Destroy target artifact.")
+        .targets(&[targets::ARTIFACT]),
+    mode(damage, "Kolaghan's Command deals 2 damage to any target.")
+        .targets(&[targets::ANY]),
+])
+    .choose(2, 2);
 
 pub static CARD: CardDef = CardDef { spell: Some(SpellDef::MODAL), modal: Some(&MODAL), ..oracle::KOLAGHANS_COMMAND };

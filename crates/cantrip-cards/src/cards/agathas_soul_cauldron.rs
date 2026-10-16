@@ -68,13 +68,7 @@ pub static CARD: CardDef = CardDef {
         .targets(&[targets::CARD_IN_A_GRAVEYARD])],
     delayed: &[delayed_trigger(put_counter, "When a creature card is exiled this way, put a +1/+1 counter on target creature you control.")
         .targets(&[targets::CREATURE_YOU_CONTROL])],
-    statics: &[StaticDef {
-        text: "Creatures you control with +1/+1 counters on them have all activated abilities of all creature cards exiled with Agatha's Soul Cauldron.",
-        layer: Layer::Ability,
-        affects: creature_with_counters,
-        apply: grant_abilities,
-        ..StaticDef::BLANK
-    }],
+    statics: &[static_ability(Layer::Ability, creature_with_counters, grant_abilities, "Creatures you control with +1/+1 counters on them have all activated abilities of all creature cards exiled with Agatha's Soul Cauldron.")],
     spend_any_color: &[creature_you_control],
     ..oracle::AGATHAS_SOUL_CAULDRON
 };

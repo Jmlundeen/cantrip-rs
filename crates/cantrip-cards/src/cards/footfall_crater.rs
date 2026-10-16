@@ -27,15 +27,9 @@ fn grant_ability(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
 
 pub static CARD: CardDef = CardDef {
     enchant: Some(targets::LAND),
-    abilities: &[cycling(mana(1, 0, 0, 0, 0, 0), "Cycling {1} ({1}, Discard this card: Draw a card.)")],
+    abilities: &[cycling(mana("{1}"), "Cycling {1} ({1}, Discard this card: Draw a card.)")],
     delayed: &[ability(TAP, trample_and_haste, "{T}: Target creature gains trample and haste until end of turn.")
         .targets(&[targets::CREATURE])],
-    statics: &[StaticDef {
-        text: "Enchanted land has \"{T}: Target creature gains trample and haste until end of turn.\"",
-        layer: Layer::Ability,
-        affects: attached_object,
-        apply: grant_ability,
-        ..StaticDef::BLANK
-    }],
+    statics: &[static_ability(Layer::Ability, attached_object, grant_ability, "Enchanted land has \"{T}: Target creature gains trample and haste until end of turn.\"")],
     ..oracle::FOOTFALL_CRATER
 };

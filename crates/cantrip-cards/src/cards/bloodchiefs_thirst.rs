@@ -18,8 +18,8 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[TargetSpec { min: 1, max: 1, filter: creature_or_planeswalker, label: "" }], effect }),
-    kicker: Some(Kicker { cost: mana(2, 0, 0, 1, 0, 0), multi: false, waterbend: false }),
+    spell: spell(&[target(creature_or_planeswalker)], effect),
+    kicker: kicker(mana("{2}{B}")),
     late_targets: true,
     ..oracle::BLOODCHIEFS_THIRST
 };

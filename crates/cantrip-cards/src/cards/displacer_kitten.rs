@@ -23,6 +23,6 @@ fn blink(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(NONCREATURE_SPELL_YOU_CAST, blink, "Avoidance \u{2014} Whenever you cast a noncreature spell, exile up to one target nonland permanent you control, then return that card to the battlefield under its owner's control.")
-        .targets(&[TargetSpec { min: 0, max: 1, filter: nonland_permanent_you_control, label: "" }])],
+        .targets(&[up_to_one(nonland_permanent_you_control)])],
     ..oracle::DISPLACER_KITTEN
 };

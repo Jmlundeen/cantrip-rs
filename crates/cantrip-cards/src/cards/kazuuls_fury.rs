@@ -33,7 +33,7 @@ pub static BACK: CardDef = CardDef {
 };
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[targets::ANY], effect }),
+    spell: spell(&[targets::ANY], effect),
     // As an additional cost to cast this spell, sacrifice a creature (CR 118.8).
     additional_cost: Some(Cost::sacrifice(1, targets::filters::creature)),
     back: Some(&BACK),

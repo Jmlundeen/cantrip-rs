@@ -33,9 +33,6 @@ fn exchange(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     keywords: Keywords::of(&[Keyword::SplitSecond]),
-    spell: Some(SpellDef {
-        targets: &[targets::NONCREATURE_SPELL, targets::CREATURE],
-        effect: exchange,
-    }),
+    spell: spell(&[targets::NONCREATURE_SPELL, targets::CREATURE], exchange),
     ..oracle::SUDDEN_SUBSTITUTION
 };

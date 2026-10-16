@@ -15,7 +15,7 @@ pub static CARD: CardDef = CardDef {
     ascend: true,
     abilities: &[
         triggered(triggers::EQUIPPED_CREATURE_ATTACKS, counters, "Whenever equipped creature attacks, put a +1/+1 counter on each creature you control. If you have the city's blessing, put two +1/+1 counters on each creature you control instead."),
-        equip(mana(3, 0, 0, 0, 0, 0), "Equip {3}"),
+        equip(mana("{3}"), "Equip {3}"),
     ],
     ..oracle::AND_RIL_NARSIL_REFORGED
 };

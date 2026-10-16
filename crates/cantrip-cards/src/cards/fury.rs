@@ -17,7 +17,7 @@ fn divided_damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ENTERS, divided_damage, "When this creature enters, it deals 4 damage divided as you choose among any number of target creatures and/or planeswalkers.")
-            .targets(&[TargetSpec { min: 1, max: TargetSpec::COUNTED, filter: targets::CREATURE_OR_PLANESWALKER.filter, label: "" }])
+            .targets(&[targets::CREATURE_OR_PLANESWALKER.between(1, TargetSpec::COUNTED)])
             .divide(Divide { total: 4, of_x: None }),
         evoke::sacrifice_trigger("When Fury enters, if its evoke cost was paid, its controller sacrifices it."),
     ],

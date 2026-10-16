@@ -41,14 +41,8 @@ fn instant_or_sorcery_in_your_graveyard(q: &dyn LayerQuery, source: ObjectId, af
 pub static EMBLEM: CardDef = CardDef {
     name: "Wrenn and Six emblem",
     has_cost: false,
-    statics: &[StaticDef {
-        text: "Instant and sorcery cards in your graveyard have retrace.",
-        layer: Layer::Ability,
-        affects: instant_or_sorcery_in_your_graveyard,
-        apply: retrace::give,
-        everywhere: true,
-        ..StaticDef::BLANK
-    }],
+    statics: &[static_ability(Layer::Ability, instant_or_sorcery_in_your_graveyard, retrace::give, "Instant and sorcery cards in your graveyard have retrace.")
+        .everywhere()],
     text: "Instant and sorcery cards in your graveyard have retrace.",
     ..CardDef::BLANK
 };
@@ -56,7 +50,7 @@ pub static EMBLEM: CardDef = CardDef {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         ability(loyalty(1), return_land, "+1: Return up to one target land card from your graveyard to your hand.")
-            .targets(&[TargetSpec { min: 0, max: 1, filter: land_in_your_graveyard, label: "" }]),
+            .targets(&[up_to_one(land_in_your_graveyard)]),
         ability(loyalty(-1), ping, "\u{2212}1: Wrenn and Six deals 1 damage to any target.")
             .targets(&[targets::ANY]),
         ability(loyalty(-7), emblem, "\u{2212}7: You get an emblem with \"Instant and sorcery cards in your graveyard have retrace.\""),

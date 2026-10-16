@@ -41,11 +41,11 @@ fn exile_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         ability(TAP, exile_land, "{T}: Exile target land card from a graveyard. Add one mana of any color.")
-            .targets(&[TargetSpec { min: 1, max: 1, filter: land_card, label: "" }]),
+            .targets(&[target(land_card)]),
         ability(cost("{B}, {T}"), exile_spell, "{B}, {T}: Exile target instant or sorcery card from a graveyard. Each opponent loses 2 life.")
-            .targets(&[TargetSpec { min: 1, max: 1, filter: instant_or_sorcery_card, label: "" }]),
+            .targets(&[target(instant_or_sorcery_card)]),
         ability(cost("{G}, {T}"), exile_creature, "{G}, {T}: Exile target creature card from a graveyard. You gain 2 life.")
-            .targets(&[TargetSpec { min: 1, max: 1, filter: creature_card, label: "" }]),
+            .targets(&[target(creature_card)]),
     ],
     ..oracle::DEATHRITE_SHAMAN
 };

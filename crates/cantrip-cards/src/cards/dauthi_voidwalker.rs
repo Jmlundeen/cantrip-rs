@@ -43,12 +43,6 @@ fn play_exiled(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[ability(TAP.and(SACRIFICE_THIS), play_exiled, "{T}, Sacrifice Dauthi Voidwalker: Choose an exiled card an opponent owns with a void counter on it. You may play it this turn without paying its mana cost.")],
-    replacements: &[ReplacementDef {
-        hint: "exiles a card an opponent's graveyard would receive",
-        kind: ReplacementKind::ZoneChange,
-        applies,
-        apply,
-        ..ReplacementDef::BLANK
-    }],
+    replacements: &[replacement(ReplacementKind::ZoneChange, applies, apply, "exiles a card an opponent's graveyard would receive")],
     ..oracle::DAUTHI_VOIDWALKER
 };

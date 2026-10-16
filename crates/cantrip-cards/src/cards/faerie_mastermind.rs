@@ -21,7 +21,7 @@ fn everyone_draws(g: &mut dyn Game, _: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(when(EventMask::DREW, opponent_second_draw), cantrip_mechanics::effects::draw::<1>, "Whenever an opponent draws their second card each turn, you draw a card."),
+        triggered(when(EventMask::DREW, opponent_second_draw), |g, item| cantrip_mechanics::effects::draw(g, item, 1), "Whenever an opponent draws their second card each turn, you draw a card."),
         ability(cost("{3}{U}"), everyone_draws, "{3}{U}: Each player draws a card."),
     ],
     ..oracle::FAERIE_MASTERMIND

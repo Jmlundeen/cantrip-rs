@@ -21,7 +21,7 @@ fn exile_graveyards(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         ability(TAP.and(SACRIFICE_THIS), exile_graveyards, "{T}, Sacrifice Soul-Guide Lantern: Exile each opponent's graveyard."),
-        ability(cost("{1}, {T}").and(SACRIFICE_THIS), effects::draw::<1>, "{1}, {T}, Sacrifice Soul-Guide Lantern: Draw a card."),
+        ability(cost("{1}, {T}").and(SACRIFICE_THIS), |g, item| effects::draw(g, item, 1), "{1}, {T}, Sacrifice Soul-Guide Lantern: Draw a card."),
         triggered(THIS_ENTERS, exile_it, "When Soul-Guide Lantern enters, exile target card from a graveyard.")
             .targets(&[targets::CARD_IN_A_GRAVEYARD]),
     ],

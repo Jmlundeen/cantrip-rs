@@ -9,7 +9,7 @@ fn exile(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(cantrip_mechanics::triggers::THIS_DIES, cantrip_mechanics::effects::gain_life::<2>, "When Haywire Mite dies, you gain 2 life.")
+        triggered(cantrip_mechanics::triggers::THIS_DIES, |g, item| cantrip_mechanics::effects::gain_life(g, item, 2), "When Haywire Mite dies, you gain 2 life.")
             .look_back(),
         ability(cost("{G}").and(SACRIFICE_THIS), exile, "{G}, Sacrifice Haywire Mite: Exile target noncreature artifact or noncreature enchantment.")
             .targets(&[targets::NONCREATURE_ARTIFACT_OR_ENCHANTMENT]),

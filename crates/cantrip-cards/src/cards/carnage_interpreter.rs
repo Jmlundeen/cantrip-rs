@@ -30,20 +30,8 @@ fn menace(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(THIS_ENTERS, discard_and_investigate, "When this creature enters, discard your hand, then investigate four times.")],
     statics: &[
-        StaticDef {
-            text: "As long as you have one or fewer cards in hand, this creature gets +2/+2.",
-            layer: Layer::PtModify,
-            affects,
-            apply: plus_two_plus_two,
-            ..StaticDef::BLANK
-        },
-        StaticDef {
-            text: "As long as you have one or fewer cards in hand, this creature has menace.",
-            layer: Layer::Ability,
-            affects,
-            apply: menace,
-            ..StaticDef::BLANK
-        },
+        static_ability(Layer::PtModify, affects, plus_two_plus_two, "As long as you have one or fewer cards in hand, this creature gets +2/+2."),
+        static_ability(Layer::Ability, affects, menace, "As long as you have one or fewer cards in hand, this creature has menace."),
     ],
     ..oracle::CARNAGE_INTERPRETER
 };

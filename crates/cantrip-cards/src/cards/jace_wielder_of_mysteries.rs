@@ -46,13 +46,7 @@ pub static CARD: CardDef = CardDef {
             .targets(&[targets::PLAYER]),
         ability(loyalty(-8), minus_eight, "\u{2212}8: Draw seven cards. Then if your library has no cards in it, you win the game."),
     ],
-    replacements: &[ReplacementDef {
-        hint: "wins the game instead of drawing from an empty library",
-        kind: ReplacementKind::Draw,
-        applies: would_draw_from_nothing,
-        apply: not_drawn,
-        then: Some(win),
-        ..ReplacementDef::BLANK
-    }],
+    replacements: &[replacement(ReplacementKind::Draw, would_draw_from_nothing, not_drawn, "wins the game instead of drawing from an empty library")
+        .then(win)],
     ..oracle::JACE_WIELDER_OF_MYSTERIES
 };

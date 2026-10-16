@@ -60,7 +60,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         ability(loyalty(1), plus_one, "+1: Choose a nonland card name, then reveal the top four cards of your library. Put all cards with the chosen name from among them into your hand and the rest into your graveyard."),
         ability(loyalty(-3), minus_three, "\u{2212}3: Return target card from your graveyard to your hand.")
-            .targets(&[TargetSpec { min: 1, max: 1, filter: card_in_your_graveyard, label: "" }]),
+            .targets(&[target(card_in_your_graveyard)]),
     ],
     ..oracle::TAMIYO_COLLECTOR_OF_TALES
 };

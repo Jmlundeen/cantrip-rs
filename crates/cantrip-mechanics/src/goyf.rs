@@ -19,10 +19,4 @@ fn apply(q: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
 }
 
 /// A characteristic-defining ability (`own`), so it applies in every zone the card is in.
-pub const SIZE: StaticDef = StaticDef {
-    text: "This creature's power is equal to the number of card types among cards in all graveyards and its toughness is equal to that number plus 1.",
-    layer: Layer::PtDefine,
-    apply,
-    own: true,
-    ..StaticDef::BLANK
-};
+pub const SIZE: StaticDef = characteristic_defining(Layer::PtDefine, apply, "This creature's power is equal to the number of card types among cards in all graveyards and its toughness is equal to that number plus 1.");

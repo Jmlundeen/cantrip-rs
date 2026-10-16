@@ -21,6 +21,6 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[TargetSpec { min: 1, max: 1, filter: red_or_green_spell, label: "" }], effect }),
+    spell: spell(&[target(red_or_green_spell)], effect),
     ..oracle::FLASHFREEZE
 };

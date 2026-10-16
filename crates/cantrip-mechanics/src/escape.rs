@@ -17,20 +17,13 @@ pub const fn cost(cost: ManaCost, exile: u8) -> Cost {
 /// The alternative cost of escape: cast from the graveyard for `cost`, exiling `exile` other cards from it. `text` is the
 /// way's full text.
 pub const fn way(mana: ManaCost, exile: u8, text: &'static str) -> WayDef {
-    WayDef { text, cost: cost(mana, exile), from: ZoneKind::Graveyard, exile_after: false, condition: None, instant_speed: false }
+    cantrip_api::way(cost(mana, exile), ZoneKind::Graveyard, text)
 }
 
 /// Escape whose exile is "any number of other cards from your graveyard with `types` or more card types among them"
 /// (CR 702.138a): the cards exiled are chosen as the cost is paid. `text` is the way's full text. Nethergoyf prints it.
 pub const fn way_by_types(mana: ManaCost, types: u8, text: &'static str) -> WayDef {
-    WayDef {
-        text,
-        cost: Cost { mana, variable: Some(VariableCost::ExileFromGraveyardWithTypes(types)), ..Cost::NONE },
-        from: ZoneKind::Graveyard,
-        exile_after: false,
-        condition: None,
-        instant_speed: false,
-    }
+    cantrip_api::way(Cost { mana, variable: Some(VariableCost::ExileFromGraveyardWithTypes(types)), ..Cost::NONE }, ZoneKind::Graveyard, text)
 }
 
 /// "Sacrifice it unless it escaped": always triggers, and is judged as it resolves (CR 702.138b, 701.21a).

@@ -30,23 +30,11 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(when(EventMask::ZONE_CHANGE, equipment_enters), may_attach_that_equipment, "Whenever Hammer of Nazahn or another Equipment you control enters, you may attach that Equipment to target creature you control.")
             .targets(&[targets::CREATURE_YOU_CONTROL]),
-        equip(mana(4, 0, 0, 0, 0, 0), "Equip {4}"),
+        equip(mana("{4}"), "Equip {4}"),
     ],
     statics: &[
-        StaticDef {
-            text: "Equipped creature gets +2/+0.",
-            layer: Layer::PtModify,
-            affects: attached_object,
-            apply: plus_two_power,
-            ..StaticDef::BLANK
-        },
-        StaticDef {
-            text: "Equipped creature has indestructible.",
-            layer: Layer::Ability,
-            affects: attached_object,
-            apply: indestructible,
-            ..StaticDef::BLANK
-        },
+        static_ability(Layer::PtModify, attached_object, plus_two_power, "Equipped creature gets +2/+0."),
+        static_ability(Layer::Ability, attached_object, indestructible, "Equipped creature has indestructible."),
     ],
     ..oracle::HAMMER_OF_NAZAHN
 };

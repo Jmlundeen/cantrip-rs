@@ -52,31 +52,13 @@ fn exile_damaged(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ENTERS, living_weapon, "Living weapon (When this Equipment enters, create a 0/0 black Phyrexian Germ creature token, then attach this to it.)"),
-        equip(mana(7, 0, 0, 0, 0, 0), "Equip {7}"),
+        equip(mana("{7}"), "Equip {7}"),
     ],
     delayed: &[triggered(when(EventMask::DAMAGE, deals_combat_damage_to_creature), exile_damaged, "Whenever this creature deals combat damage to a creature, exile that creature.")],
     statics: &[
-        StaticDef {
-            text: "Equipped creature gets +5/+5.",
-            layer: Layer::PtModify,
-            affects: attached_object,
-            apply: plus_five,
-            ..StaticDef::BLANK
-        },
-        StaticDef {
-            text: "Equipped creature has first strike, trample, indestructible and haste.",
-            layer: Layer::Ability,
-            affects: attached_object,
-            apply: keywords,
-            ..StaticDef::BLANK
-        },
-        StaticDef {
-            text: "Equipped creature has \"Whenever this creature deals combat damage to a creature, exile that creature.\"",
-            layer: Layer::Ability,
-            affects: attached_object,
-            apply: grant_exile,
-            ..StaticDef::BLANK
-        },
+        static_ability(Layer::PtModify, attached_object, plus_five, "Equipped creature gets +5/+5."),
+        static_ability(Layer::Ability, attached_object, keywords, "Equipped creature has first strike, trample, indestructible and haste."),
+        static_ability(Layer::Ability, attached_object, grant_exile, "Equipped creature has \"Whenever this creature deals combat damage to a creature, exile that creature.\""),
     ],
     ..oracle::KALDRA_COMPLEAT
 };

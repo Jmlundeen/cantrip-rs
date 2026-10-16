@@ -21,14 +21,8 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[targets::NONCREATURE_SPELL], effect }),
-    ways: &[WayDef {
-        text: "Exile a blue card from your hand",
-        cost: Cost { exile_from_hand: Some((1, blue_card)), ..Cost::NONE },
-        from: ZoneKind::Hand,
-        exile_after: false,
-        condition: Some(not_your_turn),
-        instant_speed: false,
-    }],
+    spell: spell(&[targets::NONCREATURE_SPELL], effect),
+    ways: &[way(exile_from_hand(1, blue_card), ZoneKind::Hand, "Exile a blue card from your hand")
+        .condition(not_your_turn)],
     ..oracle::FORCE_OF_NEGATION
 };

@@ -26,8 +26,8 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[], effect }),
+    spell: spell(&[], effect),
     // "As an additional cost to cast this spell, you may waterbend {6}."
-    kicker: Some(Kicker { cost: mana(6, 0, 0, 0, 0, 0), multi: false, waterbend: true }),
+    kicker: waterbend_kicker(mana("{6}")),
     ..oracle::SPIRIT_WATER_REVIVAL
 };

@@ -32,27 +32,9 @@ pub static CARD: CardDef = CardDef {
         .targets(&[targets::NONLAND_PERMANENT_AN_OPPONENT_CONTROLS])],
     delayed: &[ward::<2>("Ward {2} (Whenever this creature becomes the target of a spell or ability an opponent controls, counter it unless that player pays {2}.)")],
     statics: &[
-        StaticDef {
-            text: "Enchanted creature gets +1/+0.",
-            layer: Layer::PtModify,
-            affects: attached_object,
-            apply: plus_one_power,
-            ..StaticDef::BLANK
-        },
-        StaticDef {
-            text: "Enchanted creature has lifelink.",
-            layer: Layer::Ability,
-            affects: attached_object,
-            apply: lifelink,
-            ..StaticDef::BLANK
-        },
-        StaticDef {
-            text: "Enchanted creature has ward {2}.",
-            layer: Layer::Ability,
-            affects: attached_object,
-            apply: grant_ward,
-            ..StaticDef::BLANK
-        },
+        static_ability(Layer::PtModify, attached_object, plus_one_power, "Enchanted creature gets +1/+0."),
+        static_ability(Layer::Ability, attached_object, lifelink, "Enchanted creature has lifelink."),
+        static_ability(Layer::Ability, attached_object, grant_ward, "Enchanted creature has ward {2}."),
     ],
     ..oracle::SHELTERED_BY_GHOSTS
 };

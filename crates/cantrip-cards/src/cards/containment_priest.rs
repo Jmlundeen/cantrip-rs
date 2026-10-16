@@ -17,12 +17,6 @@ fn apply(q: &dyn Query, _: &Asker, proposal: &mut Proposal) {
 }
 
 pub static CARD: CardDef = CardDef {
-    replacements: &[ReplacementDef {
-        hint: "exiles a creature that wasn't cast",
-        kind: ReplacementKind::ZoneChange,
-        applies,
-        apply,
-        ..ReplacementDef::BLANK
-    }],
+    replacements: &[replacement(ReplacementKind::ZoneChange, applies, apply, "exiles a creature that wasn't cast")],
     ..oracle::CONTAINMENT_PRIEST
 };

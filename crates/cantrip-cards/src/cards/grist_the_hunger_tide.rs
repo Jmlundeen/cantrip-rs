@@ -88,8 +88,8 @@ pub static CARD: CardDef = CardDef {
     delayed: &[delayed_trigger(destroy_target, "When you do, destroy target creature or planeswalker.")
         .targets(&[targets::CREATURE_OR_PLANESWALKER])],
     statics: &[
-        StaticDef { text: "As long as Grist isn't on the battlefield, it's a 1/1 Insect creature in addition to its other types.", layer: Layer::Type, apply: insect_types, own: true, ..StaticDef::BLANK },
-        StaticDef { text: "As long as Grist isn't on the battlefield, it's a 1/1 Insect creature in addition to its other types.", layer: Layer::PtDefine, apply: insect_size, own: true, ..StaticDef::BLANK },
+        characteristic_defining(Layer::Type, insect_types, "As long as Grist isn't on the battlefield, it's a 1/1 Insect creature in addition to its other types."),
+        characteristic_defining(Layer::PtDefine, insect_size, "As long as Grist isn't on the battlefield, it's a 1/1 Insect creature in addition to its other types."),
     ],
     ..oracle::GRIST_THE_HUNGER_TIDE
 };

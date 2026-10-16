@@ -9,7 +9,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[targets::ANY], effect }),
-    ways: &[flashback::way(mana(4, 0, 0, 0, 1, 0), "Flashback {4}{R}")],
+    spell: spell(&[targets::ANY], effect),
+    ways: &[flashback::way(cost("{4}{R}"), "Flashback {4}{R}")],
     ..oracle::FIREBOLT
 };

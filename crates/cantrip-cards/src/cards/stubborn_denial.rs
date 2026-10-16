@@ -14,11 +14,11 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         counter_target(g, item, 0);
         return Ok(());
     }
-    counter_unless_pays(g, item, 0, mana(1, 0, 0, 0, 0, 0))?;
+    counter_unless_pays(g, item, 0, mana("{1}"))?;
     Ok(())
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[cantrip_mechanics::targets::NONCREATURE_SPELL], effect }),
+    spell: spell(&[cantrip_mechanics::targets::NONCREATURE_SPELL], effect),
     ..oracle::STUBBORN_DENIAL
 };

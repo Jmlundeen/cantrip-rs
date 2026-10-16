@@ -51,23 +51,11 @@ fn treasures_for_type(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(when(EventMask::DAMAGE, equipped_deals_combat_damage_to_a_player), treasures_for_type, "Whenever equipped creature deals combat damage to a player, choose a creature type. Create a Treasure token for each creature you control of that type."),
-        equip(mana(3, 0, 0, 0, 0, 0), "Equip {3}"),
+        equip(mana("{3}"), "Equip {3}"),
     ],
     statics: &[
-        StaticDef {
-            text: "Equipped creature gets +2/+2.",
-            layer: Layer::PtModify,
-            affects: attached_object,
-            apply: plus_two_plus_two,
-            ..StaticDef::BLANK
-        },
-        StaticDef {
-            text: "Equipped creature has trample.",
-            layer: Layer::Ability,
-            affects: attached_object,
-            apply: gains_trample,
-            ..StaticDef::BLANK
-        },
+        static_ability(Layer::PtModify, attached_object, plus_two_plus_two, "Equipped creature gets +2/+2."),
+        static_ability(Layer::Ability, attached_object, gains_trample, "Equipped creature has trample."),
     ],
     ..oracle::ORCRIST_GOBLIN_CLEAVER
 };

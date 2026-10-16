@@ -9,7 +9,7 @@ fn effect(g: &mut dyn Game, _: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[], effect }),
-    ways: &[flashback::way(mana(2, 0, 1, 0, 0, 0), "Flashback {2}{U}")],
+    spell: spell(&[], effect),
+    ways: &[flashback::way(cost("{2}{U}"), "Flashback {2}{U}")],
     ..oracle::ECHO_OF_EONS
 };

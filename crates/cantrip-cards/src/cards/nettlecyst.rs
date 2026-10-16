@@ -27,15 +27,9 @@ fn plus_one_for_each(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ENTERS, living_weapon, "Living weapon (When this Equipment enters, create a 0/0 black Phyrexian Germ creature token, then attach this to it.)"),
-        equip(mana(2, 0, 0, 0, 0, 0), "Equip {2}"),
+        equip(mana("{2}"), "Equip {2}"),
     ],
-    statics: &[StaticDef {
-        text: "Equipped creature gets +1/+1 for each artifact and/or enchantment you control.",
-        layer: Layer::PtModify,
-        affects: attached_object,
-        apply: plus_one_for_each,
-        ..StaticDef::BLANK
-    }],
+    statics: &[static_ability(Layer::PtModify, attached_object, plus_one_for_each, "Equipped creature gets +1/+1 for each artifact and/or enchantment you control.")],
     ..oracle::NETTLECYST
 };
 

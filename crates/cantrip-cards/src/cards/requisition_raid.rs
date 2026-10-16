@@ -26,24 +26,15 @@ fn counters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 const MODES: &[ModeDef] = &[
-    ModeDef {
-        text: "+ {1} — Destroy target artifact.",
-        targets: &[targets::ARTIFACT],
-        effect: destroy_it,
-        cost: mana(1, 0, 0, 0, 0, 0),
-    },
-    ModeDef {
-        text: "+ {1} — Destroy target enchantment.",
-        targets: &[TargetSpec { min: 1, max: 1, filter: enchantment, label: "" }],
-        effect: destroy_it,
-        cost: mana(1, 0, 0, 0, 0, 0),
-    },
-    ModeDef {
-        text: "+ {1} — Put a +1/+1 counter on each creature target player controls.",
-        targets: &[targets::PLAYER],
-        effect: counters,
-        cost: mana(1, 0, 0, 0, 0, 0),
-    },
+    mode(destroy_it, "+ {1} — Destroy target artifact.")
+        .targets(&[targets::ARTIFACT])
+        .cost(mana("{1}")),
+    mode(destroy_it, "+ {1} — Destroy target enchantment.")
+        .targets(&[target(enchantment)])
+        .cost(mana("{1}")),
+    mode(counters, "+ {1} — Put a +1/+1 counter on each creature target player controls.")
+        .targets(&[targets::PLAYER])
+        .cost(mana("{1}")),
 ];
 
 static MODAL: ModalDef = spree::modal(MODES);

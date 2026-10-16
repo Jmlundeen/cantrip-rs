@@ -288,7 +288,7 @@ pub fn airbend(g: &mut dyn Game, item: &StackItem) {
     for exiled in g.exile_all(&targets) {
         let obj = *g.obj(exiled);
         if obj.zone.is(ZoneKind::Exile) && !obj.token && !obj.card_copy {
-            g.allow_play(exiled, obj.owner, PlayGrant { instead: Some(mana(2, 0, 0, 0, 0, 0)), ..PlayGrant::CAST });
+            g.allow_play(exiled, obj.owner, PlayGrant { instead: Some(mana("{2}")), ..PlayGrant::CAST });
         }
     }
 }

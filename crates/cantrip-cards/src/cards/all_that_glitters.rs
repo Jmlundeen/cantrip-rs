@@ -21,12 +21,6 @@ fn apply(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
 
 pub static CARD: CardDef = CardDef {
     enchant: Some(targets::CREATURE),
-    statics: &[StaticDef {
-        text: "Enchanted creature gets +1/+1 for each artifact and/or enchantment you control.",
-        layer: Layer::PtModify,
-        affects: attached_object,
-        apply,
-        ..StaticDef::BLANK
-    }],
+    statics: &[static_ability(Layer::PtModify, attached_object, apply, "Enchanted creature gets +1/+1 for each artifact and/or enchantment you control.")],
     ..oracle::ALL_THAT_GLITTERS
 };

@@ -32,15 +32,9 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         ability(cost("{1}{G}, {T}"), put_counter, "{1}{G}, {T}: Put a +1/+1 counter on target artifact or creature you control. Activate only as a sorcery.")
             .sorcery_speed()
-            .targets(&[TargetSpec { min: 1, max: 1, filter: artifact_or_creature_you_control, label: "" }]),
-        cycling(mana(2, 0, 0, 0, 0, 0), "Cycling {2} ({2}, Discard this card: Draw a card.)"),
+            .targets(&[target(artifact_or_creature_you_control)]),
+        cycling(mana("{2}"), "Cycling {2} ({2}, Discard this card: Draw a card.)"),
     ],
-    replacements: &[ReplacementDef {
-        hint: "puts one more +1/+1 counter",
-        kind: ReplacementKind::Counters,
-        applies,
-        apply,
-        ..ReplacementDef::BLANK
-    }],
+    replacements: &[replacement(ReplacementKind::Counters, applies, apply, "puts one more +1/+1 counter")],
     ..oracle::OZOLITH_THE_SHATTERED_SPIRE
 };

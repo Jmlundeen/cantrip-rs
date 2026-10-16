@@ -1520,16 +1520,6 @@ impl CardTable {
     }
 }
 
-/// Mana cost from symbols: `cost!(1 R)`-like helper for card definitions. Generic first, then colored symbols.
-pub const fn mana(generic: u8, w: u8, u: u8, b: u8, r: u8, g: u8) -> ManaCost {
-    ManaCost { generic, symbols: [w, u, b, r, g, 0], hybrid: [None; 6], phyrexian: [0; 5], x: 0 }
-}
-
-/// A cost of one hybrid symbol.
-pub const fn hybrid(a: Mana, b: Mana) -> ManaCost {
-    ManaCost { generic: 0, symbols: [0; 6], hybrid: [Some((a, b)), None, None, None, None, None], phyrexian: [0; 5], x: 0 }
-}
-
 /// Madness's linked triggered ability (CR 702.35a), the core's own: "when this card is exiled this way, its owner may
 /// cast it by paying [its madness cost] rather than its mana cost; if they don't, they put it into their graveyard."
 /// The card is the ability's source, in exile where the discard put it, and its cost is the card's `madness`.

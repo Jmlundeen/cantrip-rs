@@ -18,7 +18,7 @@ pub static BACK: CardDef = CardDef {
 };
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[targets::CREATURE], effect }),
+    spell: spell(&[targets::CREATURE], effect),
     back: Some(&BACK),
     ..oracle::REVITALIZING_REPAST
 };

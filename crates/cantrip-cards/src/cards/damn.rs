@@ -11,7 +11,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[targets::CREATURE], effect }),
-    overload: Some(mana(2, 2, 0, 0, 0, 0)),
+    spell: spell(&[targets::CREATURE], effect),
+    overload: Some(mana("{2}{W}{W}")),
     ..oracle::DAMN
 };

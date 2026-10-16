@@ -19,7 +19,7 @@ pub static CARD: CardDef = CardDef {
         mana_ability(TAP, add(Mana::C), "{T}: Add {C}."),
         ability(cost("{4}, {T}").and(SACRIFICE_THIS), tutor, "{4}, {T}, Sacrifice Inventors' Fair: Search your library for an artifact card, reveal it, put it into your hand, then shuffle. Activate only if you control three or more artifacts.")
             .condition(three_artifacts),
-        triggered(cantrip_mechanics::triggers::YOUR_UPKEEP, cantrip_mechanics::effects::gain_life::<1>, "At the beginning of your upkeep, if you control three or more artifacts, you gain 1 life.")
+        triggered(cantrip_mechanics::triggers::YOUR_UPKEEP, |g, item| cantrip_mechanics::effects::gain_life(g, item, 1), "At the beginning of your upkeep, if you control three or more artifacts, you gain 1 life.")
             .condition(three_artifacts),
     ],
     ..oracle::INVENTORS_FAIR

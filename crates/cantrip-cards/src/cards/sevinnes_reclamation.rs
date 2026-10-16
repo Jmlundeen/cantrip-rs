@@ -29,7 +29,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[TargetSpec { min: 1, max: 1, filter: permanent_card_in_your_graveyard, label: "" }], effect }),
-    ways: &[flashback::way(mana(4, 1, 0, 0, 0, 0), "Flashback {4}{W}")],
+    spell: spell(&[target(permanent_card_in_your_graveyard)], effect),
+    ways: &[flashback::way(cost("{4}{W}"), "Flashback {4}{W}")],
     ..oracle::SEVINNES_RECLAMATION
 };

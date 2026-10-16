@@ -15,14 +15,8 @@ fn first_spell(q: &dyn Query, asker: &Asker) -> bool {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[], effect }),
-    ways: &[WayDef {
-        text: "Without paying its mana cost",
-        cost: Cost::NONE,
-        from: ZoneKind::Hand,
-        exile_after: false,
-        condition: Some(first_spell),
-        instant_speed: false,
-    }],
+    spell: spell(&[], effect),
+    ways: &[way(Cost::NONE, ZoneKind::Hand, "Without paying its mana cost")
+        .condition(first_spell)],
     ..oracle::ONCE_UPON_A_TIME
 };

@@ -23,7 +23,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         evoke::sacrifice_trigger("When Endurance enters, if its evoke cost was paid, its controller sacrifices it."),
         triggered(THIS_ENTERS, graveyard_to_bottom, "When this creature enters, up to one target player puts all the cards from their graveyard on the bottom of their library in a random order.")
-            .targets(&[TargetSpec { min: 0, ..targets::PLAYER }]),
+            .targets(&[targets::PLAYER.optional()]),
     ],
     // Evoke: exile a green card from your hand rather than pay this spell's mana cost (CR 118.9).
     ways: &[evoke::way(evoke::exile_from_hand(green_card), "Evoke - Exile a green card from your hand")],

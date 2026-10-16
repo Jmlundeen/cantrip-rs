@@ -42,12 +42,6 @@ pub static CARD: CardDef = CardDef {
         triggered(when(EventMask::ZONE_CHANGE, put_into_graveyard), shuffle_graveyard_in, "When Emrakul is put into a graveyard from anywhere, its owner shuffles their graveyard into their library.")
             .anywhere(),
     ],
-    statics: &[StaticDef {
-        text: "Protection from spells that are one or more colors",
-        layer: Layer::Ability,
-        affects: itself,
-        apply: protection,
-        ..StaticDef::BLANK
-    }],
+    statics: &[static_ability(Layer::Ability, itself, protection, "Protection from spells that are one or more colors")],
     ..oracle::EMRAKUL_THE_AEONS_TORN
 };

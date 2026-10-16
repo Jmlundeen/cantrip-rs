@@ -8,7 +8,7 @@ fn exactly_seven_cards_in_hand(q: &dyn Query, asker: &Asker) -> bool {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         mana_ability(TAP, add(Mana::C), "{T}: Add {C}."),
-        ability(TAP, cantrip_mechanics::effects::draw::<1>, "{T}: Draw a card. Activate only if you have exactly seven cards in hand.")
+        ability(TAP, |g, item| cantrip_mechanics::effects::draw(g, item, 1), "{T}: Draw a card. Activate only if you have exactly seven cards in hand.")
             .condition(exactly_seven_cards_in_hand),
     ],
     ..oracle::LIBRARY_OF_ALEXANDRIA

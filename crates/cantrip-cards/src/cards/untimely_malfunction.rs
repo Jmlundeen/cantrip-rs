@@ -37,31 +37,13 @@ fn cant_block(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-static MODAL: ModalDef = ModalDef {
-    modes: &[
-        ModeDef {
-            text: "Destroy target artifact.",
-            targets: &[targets::ARTIFACT],
-            effect: destroy_artifact,
-            cost: ManaCost::ZERO,
-        },
-        ModeDef {
-            text: "Change the target of target spell or ability with a single target.",
-            targets: &[TargetSpec { min: 1, max: 1, filter: spell_or_ability_with_a_single_target, label: "" }],
-            effect: change_target,
-            cost: ManaCost::ZERO,
-        },
-        ModeDef {
-            text: "One or two target creatures can't block this turn.",
-            targets: &[TargetSpec { max: 2, ..targets::CREATURE }],
-            effect: cant_block,
-            cost: ManaCost::ZERO,
-        },
-    ],
-    min: 1,
-    max: 1,
-    escalate: None,
-    repeat: false, allowed: None,
-};
+static MODAL: ModalDef = modes(&[
+    mode(destroy_artifact, "Destroy target artifact.")
+        .targets(&[targets::ARTIFACT]),
+    mode(change_target, "Change the target of target spell or ability with a single target.")
+        .targets(&[target(spell_or_ability_with_a_single_target)]),
+    mode(cant_block, "One or two target creatures can't block this turn.")
+        .targets(&[targets::CREATURE.between(1, 2)]),
+]);
 
 pub static CARD: CardDef = CardDef { spell: Some(SpellDef::MODAL), modal: Some(&MODAL), ..oracle::UNTIMELY_MALFUNCTION };

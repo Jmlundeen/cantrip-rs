@@ -22,14 +22,8 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[TargetSpec { min: 1, max: 1, filter: nonblack_creature, label: "" }], effect }),
-    ways: &[WayDef {
-        text: "Pay 4 life",
-        cost: Cost { life: 4, ..Cost::NONE },
-        from: ZoneKind::Hand,
-        exile_after: false,
-        condition: Some(control_a_swamp),
-        instant_speed: false,
-    }],
+    spell: spell(&[target(nonblack_creature)], effect),
+    ways: &[way(Cost { life: 4, ..Cost::NONE }, ZoneKind::Hand, "Pay 4 life")
+        .condition(control_a_swamp)],
     ..oracle::SNUFF_OUT
 };

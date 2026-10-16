@@ -21,6 +21,6 @@ pub static CARD: CardDef = CardDef {
         triggered(triggers::THIS_ATTACKS, bolt_and_gain, "Whenever Phlage attacks, it deals 3 damage to any target and you gain 3 life.")
             .targets(&[targets::ANY]),
     ],
-    ways: &[escape::way(mana(0, 2, 0, 0, 2, 0), 5, "Escape—{R}{R}{W}{W}, Exile five other cards from your graveyard")],
+    ways: &[escape::way(mana("{W}{W}{R}{R}"), 5, "Escape—{R}{R}{W}{W}, Exile five other cards from your graveyard")],
     ..oracle::PHLAGE_TITAN_OF_FIRES_FURY
 };

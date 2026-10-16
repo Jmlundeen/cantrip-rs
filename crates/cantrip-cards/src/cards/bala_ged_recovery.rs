@@ -21,10 +21,7 @@ pub static BACK: CardDef = CardDef {
 };
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef {
-        targets: &[TargetSpec { min: 1, max: 1, filter: card_in_your_graveyard, label: "" }],
-        effect: recover,
-    }),
+    spell: spell(&[target(card_in_your_graveyard)], recover),
     back: Some(&BACK),
     ..oracle::BALA_GED_RECOVERY
 };

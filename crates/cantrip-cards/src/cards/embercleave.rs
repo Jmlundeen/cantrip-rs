@@ -31,23 +31,11 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ENTERS, attach_to_target, "When Embercleave enters, attach it to target creature you control.")
             .targets(&[targets::CREATURE_YOU_CONTROL]),
-        equip(mana(3, 0, 0, 0, 0, 0), "Equip {3}"),
+        equip(mana("{3}"), "Equip {3}"),
     ],
     statics: &[
-        StaticDef {
-            text: "Equipped creature gets +1/+1.",
-            layer: Layer::PtModify,
-            affects: attached_object,
-            apply: plus_one_plus_one,
-            ..StaticDef::BLANK
-        },
-        StaticDef {
-            text: "Equipped creature has double strike and trample.",
-            layer: Layer::Ability,
-            affects: attached_object,
-            apply: double_strike_and_trample,
-            ..StaticDef::BLANK
-        },
+        static_ability(Layer::PtModify, attached_object, plus_one_plus_one, "Equipped creature gets +1/+1."),
+        static_ability(Layer::Ability, attached_object, double_strike_and_trample, "Equipped creature has double strike and trample."),
     ],
     ..oracle::EMBERCLEAVE
 };

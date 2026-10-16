@@ -8,6 +8,6 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[targets::PERMANENT], effect }),
+    spell: spell(&[targets::PERMANENT], effect),
     ..oracle::VINDICATE
 };

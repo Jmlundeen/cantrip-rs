@@ -43,4 +43,4 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-pub static CARD: CardDef = CardDef { spell: Some(SpellDef { targets: &[], effect }), ..oracle::EXPRESSIVE_ITERATION };
+pub static CARD: CardDef = CardDef { spell: spell(&[], effect), ..oracle::EXPRESSIVE_ITERATION };

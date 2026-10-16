@@ -7,4 +7,4 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-pub static CARD: CardDef = CardDef { spell: Some(SpellDef { targets: &[], effect }), ..oracle::TIME_WALK };
+pub static CARD: CardDef = CardDef { spell: spell(&[], effect), ..oracle::TIME_WALK };

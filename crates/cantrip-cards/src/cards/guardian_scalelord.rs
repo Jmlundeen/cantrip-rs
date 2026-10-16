@@ -36,7 +36,7 @@ fn return_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 const ATTACK_TEXT: &str = "Whenever this creature attacks, return target nonland permanent card with mana value X or less from your graveyard to the battlefield, where X is this creature's power.";
 
 const ATTACK: AbilityDef = triggered(cantrip_mechanics::triggers::THIS_ATTACKS, return_it, ATTACK_TEXT)
-    .targets(&[TargetSpec { min: 1, max: 1, filter: permanent_card_up_to_power, label: "" }]);
+    .targets(&[target(permanent_card_up_to_power)]);
 
 pub static CARD: CardDef = CardDef {
     abilities: &[

@@ -18,7 +18,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
                 let enter = if cost <= value {
                     true
                 } else {
-                    let diff = mana((cost - value) as u8, 0, 0, 0, 0, 0);
+                    let diff = generic((cost - value) as u8);
                     g.unless_pays(player, item.object, card, diff)?
                 };
                 if enter {
@@ -34,4 +34,4 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-pub static CARD: CardDef = CardDef { spell: Some(SpellDef { targets: &[], effect }), ..oracle::TRANSMUTE_ARTIFACT };
+pub static CARD: CardDef = CardDef { spell: spell(&[], effect), ..oracle::TRANSMUTE_ARTIFACT };

@@ -31,6 +31,6 @@ fn counter_and_silence(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
 
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(THIS_ENTERS, counter_and_silence, "When this creature enters, counter up to one target activated or triggered ability. If an ability of an artifact, creature, or planeswalker is countered this way, that permanent loses all abilities for as long as this creature remains on the battlefield.")
-        .targets(&[TargetSpec { min: 0, max: 1, filter: ability_filter, label: "" }])],
+        .targets(&[up_to_one(ability_filter)])],
     ..oracle::TISHANAS_TIDEBINDER
 };

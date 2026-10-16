@@ -23,6 +23,6 @@ fn copy(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(cantrip_mechanics::triggers::THIS_ENTERS_IF_CAST, copy, "When Lutri, the Spellchaser enters, if you cast it, copy target instant or sorcery spell you control. You may choose new targets for the copy.")
-        .targets(&[TargetSpec { min: 1, max: 1, filter: your_instant_or_sorcery_spell, label: "" }])],
+        .targets(&[target(your_instant_or_sorcery_spell)])],
     ..oracle::LUTRI_THE_SPELLCHASER
 };

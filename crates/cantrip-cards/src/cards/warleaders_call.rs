@@ -19,13 +19,7 @@ fn strike(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    statics: &[StaticDef {
-        text: "Creatures you control get +1/+1.",
-        layer: Layer::PtModify,
-        affects,
-        apply,
-        ..StaticDef::BLANK
-    }],
+    statics: &[static_ability(Layer::PtModify, affects, apply, "Creatures you control get +1/+1.")],
     abilities: &[triggered(cantrip_mechanics::triggers::CREATURE_YOU_CONTROL_ENTERS, strike, "Whenever a creature you control enters, this enchantment deals 1 damage to each opponent.")],
     ..oracle::WARLEADERS_CALL
 };

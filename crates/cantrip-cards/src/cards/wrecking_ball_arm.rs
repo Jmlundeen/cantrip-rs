@@ -29,24 +29,12 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         ability(cost("{3}"), attach_to_target, "Equip legendary creature {3}")
             .sorcery_speed()
-            .targets(&[TargetSpec { min: 1, max: 1, filter: legendary_creature_you_control, label: "" }]),
-        equip(mana(7, 0, 0, 0, 0, 0), "Equip {7}"),
+            .targets(&[target(legendary_creature_you_control)]),
+        equip(mana("{7}"), "Equip {7}"),
     ],
     statics: &[
-        StaticDef {
-            text: "Equipped creature has base power and toughness 7/7.",
-            layer: Layer::PtSet,
-            affects: equipped_creature,
-            apply: size,
-            ..StaticDef::BLANK
-        },
-        StaticDef {
-            text: "Equipped creature can't be blocked by creatures with power 2 or less.",
-            layer: Layer::Ability,
-            affects: equipped_creature,
-            apply: evasion,
-            ..StaticDef::BLANK
-        },
+        static_ability(Layer::PtSet, equipped_creature, size, "Equipped creature has base power and toughness 7/7."),
+        static_ability(Layer::Ability, equipped_creature, evasion, "Equipped creature can't be blocked by creatures with power 2 or less."),
     ],
     ..oracle::WRECKING_BALL_ARM
 };

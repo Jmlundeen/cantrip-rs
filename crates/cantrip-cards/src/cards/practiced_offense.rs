@@ -26,8 +26,8 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[targets::PLAYER, targets::CREATURE], effect }),
+    spell: spell(&[targets::PLAYER, targets::CREATURE], effect),
     labels: &["Double strike", "Lifelink"],
-    ways: &[flashback::way(mana(1, 1, 0, 0, 0, 0), "Flashback {1}{W}")],
+    ways: &[flashback::way(cost("{1}{W}"), "Flashback {1}{W}")],
     ..oracle::PRACTICED_OFFENSE
 };

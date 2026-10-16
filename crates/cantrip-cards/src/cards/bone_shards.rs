@@ -9,7 +9,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[targets::CREATURE_OR_PLANESWALKER], effect }),
+    spell: spell(&[targets::CREATURE_OR_PLANESWALKER], effect),
     // As an additional cost to cast this spell, sacrifice a creature or discard a card (CR 601.2b).
     additional_choice: &[
         ExtraCost { text: "Sacrifice a creature", cost: Cost::sacrifice(1, targets::filters::creature) },

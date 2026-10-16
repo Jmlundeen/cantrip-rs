@@ -21,4 +21,4 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-pub static CARD: CardDef = CardDef { spell: Some(SpellDef { targets: &[], effect }), ..oracle::FAITHS_REWARD };
+pub static CARD: CardDef = CardDef { spell: spell(&[], effect), ..oracle::FAITHS_REWARD };

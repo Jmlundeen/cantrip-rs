@@ -17,14 +17,8 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(cantrip_mechanics::triggers::EQUIPPED_CREATURE_ATTACKS, destroy_it, "Whenever equipped creature attacks, destroy target permanent.")
             .targets(&[targets::PERMANENT]),
-        equip(mana(6, 0, 0, 0, 0, 0), "Equip {6}"),
+        equip(mana("{6}"), "Equip {6}"),
     ],
-    statics: &[StaticDef {
-        text: "Equipped creature gets +6/+6.",
-        layer: Layer::PtModify,
-        affects: attached_object,
-        apply: plus_six,
-        ..StaticDef::BLANK
-    }],
+    statics: &[static_ability(Layer::PtModify, attached_object, plus_six, "Equipped creature gets +6/+6.")],
     ..oracle::ARGENTUM_ARMOR
 };

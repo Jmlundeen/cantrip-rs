@@ -14,9 +14,9 @@ fn damage_each(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    kicker: Some(Kicker { cost: mana(2, 0, 0, 0, 0, 0), multi: true, waterbend: false }),
+    kicker: multikicker(mana("{2}")),
     enters: Some(kicker::enters_with_counters::<{ CounterKind::PlusOne as usize }>),
     abilities: &[triggered(THIS_ENTERS, damage_each, "When Batroc enters, he deals damage equal to his power to each of up to X targets, where X is the number of times he was kicked.")
-        .targets(&[TargetSpec { min: 0, max: TargetSpec::COUNTED, filter: targets::ANY.filter, label: "" }])],
+        .targets(&[targets::ANY.between(0, TargetSpec::COUNTED)])],
     ..oracle::BATROC_THE_LEAPER
 };

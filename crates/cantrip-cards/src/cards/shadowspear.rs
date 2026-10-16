@@ -28,23 +28,11 @@ fn opponents_permanents_lose_protection(g: &mut dyn Game, item: &StackItem) -> R
 pub static CARD: CardDef = CardDef {
     abilities: &[
         ability(cost("{1}"), opponents_permanents_lose_protection, "{1}: Permanents your opponents control lose hexproof and indestructible until end of turn."),
-        equip(mana(2, 0, 0, 0, 0, 0), "Equip {2}"),
+        equip(mana("{2}"), "Equip {2}"),
     ],
     statics: &[
-        StaticDef {
-            text: "Equipped creature gets +1/+1.",
-            layer: Layer::PtModify,
-            affects: attached_object,
-            apply: plus_one_plus_one,
-            ..StaticDef::BLANK
-        },
-        StaticDef {
-            text: "Equipped creature has trample and lifelink.",
-            layer: Layer::Ability,
-            affects: attached_object,
-            apply: trample_and_lifelink,
-            ..StaticDef::BLANK
-        },
+        static_ability(Layer::PtModify, attached_object, plus_one_plus_one, "Equipped creature gets +1/+1."),
+        static_ability(Layer::Ability, attached_object, trample_and_lifelink, "Equipped creature has trample and lifelink."),
     ],
     ..oracle::SHADOWSPEAR
 };

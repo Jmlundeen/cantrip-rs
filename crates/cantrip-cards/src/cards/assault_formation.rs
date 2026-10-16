@@ -33,7 +33,7 @@ fn plus_one_toughness(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
 pub static CARD: CardDef = CardDef {
     abilities: &[
         ability(cost("{G}"), attack_despite_defender, "{G}: Target creature with defender can attack this turn as though it didn't have defender.")
-            .targets(&[TargetSpec { min: 1, max: 1, filter: creature_with_defender, label: "" }]),
+            .targets(&[target(creature_with_defender)]),
         ability(cost("{2}{G}"), plus_one_toughness, "{2}{G}: Creatures you control get +0/+1 until end of turn."),
     ],
     damage_by_toughness: &[your_creature],

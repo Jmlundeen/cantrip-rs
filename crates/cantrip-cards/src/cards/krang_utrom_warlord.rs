@@ -16,12 +16,6 @@ fn apply(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
 
 /// "Other artifact creatures you control have flying, trample, indestructible, and haste."
 pub static CARD: CardDef = CardDef {
-    statics: &[StaticDef {
-        text: "Other artifact creatures you control have flying, trample, indestructible, and haste.",
-        layer: Layer::Ability,
-        affects,
-        apply,
-        ..StaticDef::BLANK
-    }],
+    statics: &[static_ability(Layer::Ability, affects, apply, "Other artifact creatures you control have flying, trample, indestructible, and haste.")],
     ..oracle::KRANG_UTROM_WARLORD
 };

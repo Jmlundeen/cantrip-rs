@@ -18,14 +18,8 @@ fn your_turn(q: &dyn Query, asker: &Asker) -> bool {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[targets::CREATURE_OR_PLANESWALKER], effect }),
-    ways: &[WayDef {
-        text: "Sacrifice a Mountain",
-        cost: Cost::sacrifice(1, mountain),
-        from: ZoneKind::Hand,
-        exile_after: false,
-        condition: Some(your_turn),
-        instant_speed: false,
-    }],
+    spell: spell(&[targets::CREATURE_OR_PLANESWALKER], effect),
+    ways: &[way(Cost::sacrifice(1, mountain), ZoneKind::Hand, "Sacrifice a Mountain")
+        .condition(your_turn)],
     ..oracle::MINE_COLLAPSE
 };

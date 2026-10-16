@@ -17,6 +17,6 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[targets::OPPONENT], effect }),
+    spell: spell(&[targets::OPPONENT], effect),
     ..oracle::STRATEGIC_BETRAYAL
 };

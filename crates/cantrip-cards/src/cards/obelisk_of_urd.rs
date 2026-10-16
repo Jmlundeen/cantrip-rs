@@ -25,12 +25,6 @@ fn apply(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
 
 pub static CARD: CardDef = CardDef {
     enters: Some(enters),
-    statics: &[StaticDef {
-        text: "Creatures you control of the chosen type get +2/+2.",
-        layer: Layer::PtModify,
-        affects,
-        apply,
-        ..StaticDef::BLANK
-    }],
+    statics: &[static_ability(Layer::PtModify, affects, apply, "Creatures you control of the chosen type get +2/+2.")],
     ..oracle::OBELISK_OF_URD
 };

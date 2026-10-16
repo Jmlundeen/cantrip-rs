@@ -17,30 +17,12 @@ fn grant_ward(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[equip(mana(1, 0, 0, 0, 0, 0), "Equip {1}")],
+    abilities: &[equip(mana("{1}"), "Equip {1}")],
     delayed: &[ward::<1>("Ward {1} (Whenever this creature becomes the target of a spell or ability an opponent controls, counter it unless that player pays {1}.)")],
     statics: &[
-        StaticDef {
-            text: "Equipped creature gets +1/+0.",
-            layer: Layer::PtModify,
-            affects: attached_object,
-            apply: plus_one_power,
-            ..StaticDef::BLANK
-        },
-        StaticDef {
-            text: "Equipped creature has haste.",
-            layer: Layer::Ability,
-            affects: attached_object,
-            apply: have_haste,
-            ..StaticDef::BLANK
-        },
-        StaticDef {
-            text: "Equipped creature has ward {1}.",
-            layer: Layer::Ability,
-            affects: attached_object,
-            apply: grant_ward,
-            ..StaticDef::BLANK
-        },
+        static_ability(Layer::PtModify, attached_object, plus_one_power, "Equipped creature gets +1/+0."),
+        static_ability(Layer::Ability, attached_object, have_haste, "Equipped creature has haste."),
+        static_ability(Layer::Ability, attached_object, grant_ward, "Equipped creature has ward {1}."),
     ],
     ..oracle::LAVASPUR_BOOTS
 };

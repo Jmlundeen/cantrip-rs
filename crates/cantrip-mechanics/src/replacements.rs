@@ -66,14 +66,8 @@ fn buyback_apply(q: &dyn Query, _: &Asker, proposal: &mut Proposal) {
 /// Buyback's second half (CR 702.27a): "If the buyback cost was paid, put this spell into its owner's hand instead of
 /// into that player's graveyard as it resolves." The cost is the card's `kicker`; only the resolution move is
 /// replaced, so a countered spell goes to the graveyard. Corpse Dance, Capsize and Lava Burst print buyback.
-pub const BUYBACK: ReplacementDef = ReplacementDef {
-    hint: "returned to its owner's hand by buyback",
-    kind: ReplacementKind::ZoneChange,
-    own_everywhere: true,
-    applies: buyback_applies,
-    apply: buyback_apply,
-    then: None,
-};
+pub const BUYBACK: ReplacementDef = replacement(ReplacementKind::ZoneChange, buyback_applies, buyback_apply, "returned to its owner's hand by buyback")
+    .own_everywhere();
 
 fn exile_instead_of_dying_applies(_: &dyn Query, _: &Asker, affected: ObjectId, proposal: &Proposal) -> bool {
     matches!(proposal, Proposal::ZoneChange(z)
@@ -90,12 +84,8 @@ fn exile_instead_of_dying_apply(_: &dyn Query, _: &Asker, _: ObjectId, proposal:
 /// ability makes about one object for the turn, not an ability the creature gains. Only a move from the battlefield to a
 /// graveyard is replaced, so a creature returned to its hand goes there. List it among a card's `granted_replacements`
 /// and make the effect with `exile_if_it_would_die` before anything can kill the creature. Suplex and Mawloc print it.
-pub const EXILE_INSTEAD_OF_DYING: GrantedReplacementDef = GrantedReplacementDef {
-    hint: "exiled instead of dying",
-    kind: ReplacementKind::ZoneChange,
-    applies: exile_instead_of_dying_applies,
-    apply: exile_instead_of_dying_apply,
-};
+pub const EXILE_INSTEAD_OF_DYING: GrantedReplacementDef =
+    granted_replacement(ReplacementKind::ZoneChange, exile_instead_of_dying_applies, exile_instead_of_dying_apply, "exiled instead of dying");
 
 /// Makes `EXILE_INSTEAD_OF_DYING` (the card's replacement number `index`) about `creature` until end of turn. It names the
 /// object, so it does not follow the creature if it leaves and returns as a new object (CR 400.7).

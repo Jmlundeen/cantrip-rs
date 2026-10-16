@@ -95,9 +95,9 @@ pub static CARD: CardDef = CardDef {
             .condition(at_level_two),
         triggered(THIS_ENTERS, loot, "When this Class enters, mill two cards, draw two cards, then discard two cards."),
         triggered(when(EventMask::CLASS_LEVEL, became_level_two), return_artifacts, "When this Class becomes level 2, return up to two target artifact cards from your graveyard to your hand.")
-            .targets(&[TargetSpec { min: 0, max: 2, filter: artifact_card_in_your_graveyard, label: "" }]),
+            .targets(&[up_to(2, artifact_card_in_your_graveyard)]),
         triggered(when(EventMask::STEP_BEGAN, combat_at_level_three), grow_artifact, "At the beginning of combat on your turn, put three +1/+1 counters on target artifact you control. If it isn't a creature, it becomes a 0/0 Robot creature in addition to its other types.")
-            .targets(&[TargetSpec { min: 1, max: 1, filter: artifact_you_control, label: "" }]),
+            .targets(&[target(artifact_you_control)]),
     ],
     ..oracle::DOES_MACHINES
 };

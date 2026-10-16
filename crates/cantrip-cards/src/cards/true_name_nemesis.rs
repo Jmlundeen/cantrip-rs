@@ -22,12 +22,6 @@ fn protection_from_the_chosen_player(q: &dyn LayerQuery, source: ObjectId, chars
 pub static CARD: CardDef = CardDef {
     enters: Some(choose_a_player),
     // "This creature has protection from the chosen player."
-    statics: &[StaticDef {
-        text: "This creature has protection from the chosen player.",
-        layer: Layer::Ability,
-        apply: protection_from_the_chosen_player,
-        own: true,
-        ..StaticDef::BLANK
-    }],
+    statics: &[characteristic_defining(Layer::Ability, protection_from_the_chosen_player, "This creature has protection from the chosen player.")],
     ..oracle::TRUE_NAME_NEMESIS
 };

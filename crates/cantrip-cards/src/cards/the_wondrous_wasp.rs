@@ -13,6 +13,6 @@ fn sting(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(THIS_ENTERS, sting, "Wasp's Sting \u{2014} When The Wondrous Wasp enters, tap up to one target creature. It loses all abilities for as long as The Wondrous Wasp remains on the battlefield.")
-        .targets(&[TargetSpec { min: 0, ..targets::CREATURE }])],
+        .targets(&[targets::CREATURE.optional()])],
     ..oracle::THE_WONDROUS_WASP
 };

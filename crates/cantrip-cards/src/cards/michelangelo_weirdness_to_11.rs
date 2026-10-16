@@ -22,13 +22,7 @@ fn create_mutagen(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(THIS_ENTERS, create_mutagen, "When Michelangelo enters, create a Mutagen token.")],
-    replacements: &[ReplacementDef {
-        hint: "puts one more +1/+1 counter",
-        kind: ReplacementKind::Counters,
-        applies,
-        apply,
-        ..ReplacementDef::BLANK
-    }],
+    replacements: &[replacement(ReplacementKind::Counters, applies, apply, "puts one more +1/+1 counter")],
     ..oracle::MICHELANGELO_WEIRDNESS_TO_11
 };
 

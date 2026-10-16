@@ -11,4 +11,4 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     untap::up_to_lands(g, item.object, item.controller, 6)
 }
 
-pub static CARD: CardDef = CardDef { spell: Some(SpellDef { targets: &[], effect }), ..oracle::TIME_SPIRAL };
+pub static CARD: CardDef = CardDef { spell: spell(&[], effect), ..oracle::TIME_SPIRAL };

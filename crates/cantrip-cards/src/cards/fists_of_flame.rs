@@ -14,6 +14,6 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[targets::CREATURE], effect }),
+    spell: spell(&[targets::CREATURE], effect),
     ..oracle::FISTS_OF_FLAME
 };

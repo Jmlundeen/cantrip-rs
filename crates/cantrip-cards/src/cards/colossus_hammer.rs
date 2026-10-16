@@ -13,22 +13,10 @@ fn loses_flying(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[equip(mana(8, 0, 0, 0, 0, 0), "Equip {8}")],
+    abilities: &[equip(mana("{8}"), "Equip {8}")],
     statics: &[
-        StaticDef {
-            text: "Equipped creature gets +10/+10.",
-            layer: Layer::PtModify,
-            affects: attached_object,
-            apply: plus_ten,
-            ..StaticDef::BLANK
-        },
-        StaticDef {
-            text: "Equipped creature loses flying.",
-            layer: Layer::Ability,
-            affects: attached_object,
-            apply: loses_flying,
-            ..StaticDef::BLANK
-        },
+        static_ability(Layer::PtModify, attached_object, plus_ten, "Equipped creature gets +10/+10."),
+        static_ability(Layer::Ability, attached_object, loses_flying, "Equipped creature loses flying."),
     ],
     ..oracle::COLOSSUS_HAMMER
 };

@@ -31,4 +31,4 @@ fn consult(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-pub static CARD: CardDef = CardDef { spell: Some(SpellDef { targets: &[], effect: consult }), ..oracle::LIM_D_LS_VAULT };
+pub static CARD: CardDef = CardDef { spell: spell(&[], consult), ..oracle::LIM_D_LS_VAULT };

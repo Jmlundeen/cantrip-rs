@@ -15,6 +15,6 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[cantrip_mechanics::targets::NONLAND_PERMANENT], effect }),
+    spell: spell(&[cantrip_mechanics::targets::NONLAND_PERMANENT], effect),
     ..oracle::BOOMERANG_BASICS
 };

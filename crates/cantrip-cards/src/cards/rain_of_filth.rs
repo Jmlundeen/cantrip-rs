@@ -14,7 +14,7 @@ fn grant(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[], effect: grant }),
+    spell: spell(&[], grant),
     delayed: &[mana_ability(SACRIFICE_THIS, add(Mana::B), "Sacrifice this land: Add {B}.")],
     ..oracle::RAIN_OF_FILTH
 };

@@ -49,7 +49,7 @@ fn reanimate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(cantrip_mechanics::triggers::BEGINNING_OF_YOUR_COMBAT, exile_it, "At the beginning of combat on your turn, exile up to one target card from a graveyard.")
-            .targets(&[TargetSpec { min: 0, ..cantrip_mechanics::targets::CARD_IN_A_GRAVEYARD }]),
+            .targets(&[cantrip_mechanics::targets::CARD_IN_A_GRAVEYARD.optional()]),
         ability(cost("{1}{B}"), adapt, "{1}{B}: Adapt 2."),
         triggered(when(EventMask::COUNTERS, plus_one_counters_put), reanimate, "Whenever one or more +1/+1 counters are put on this creature, put a creature card exiled with this creature onto the battlefield under your control with a finality counter on it. It gains haste. Sacrifice it at the beginning of the next end step."),
     ],

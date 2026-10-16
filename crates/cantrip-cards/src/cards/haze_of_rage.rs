@@ -14,8 +14,8 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[], effect }),
-    kicker: Some(Kicker { cost: mana(2, 0, 0, 0, 0, 0), multi: false, waterbend: false }),
+    spell: spell(&[], effect),
+    kicker: kicker(mana("{2}")),
     replacements: &[BUYBACK],
     abilities: &[storm::trigger("Storm (When you cast Haze of Rage, copy it for each spell cast before it this turn.)")],
     ..oracle::HAZE_OF_RAGE

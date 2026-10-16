@@ -27,7 +27,7 @@ fn card_in_your_graveyard(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     targets::card_in_your_graveyard(q, asker, t, &[]) && !q.chosen_targets().contains(&t)
 }
 
-const UP_TO_ONE_CARD: TargetSpec = TargetSpec { min: 0, max: 1, filter: card_in_your_graveyard, label: "" };
+const UP_TO_ONE_CARD: TargetSpec = up_to_one(card_in_your_graveyard);
 
 /// Put a +1/+1 counter on target creature.
 fn counter_on_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -57,37 +57,18 @@ fn bottom_in_any_order(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
     Ok(())
 }
 
-static MODAL: ModalDef = ModalDef {
-    modes: &[
-        ModeDef { text: "Put a +1/+1 counter on target creature.", targets: &[targets::CREATURE], effect: counter_on_creature, cost: ManaCost::ZERO },
-        ModeDef {
-            text: "Bow of Nylea deals 2 damage to target creature with flying.",
-            targets: &[TargetSpec { min: 1, max: 1, filter: creature_with_flying, label: "" }],
-            effect: two_damage,
-            cost: ManaCost::ZERO,
-        },
-        ModeDef { text: "You gain 3 life.", targets: &[], effect: effects::gain_life::<3>, cost: ManaCost::ZERO },
-        ModeDef {
-            text: "Put up to four target cards from your graveyard on the bottom of your library in any order.",
-            targets: &[UP_TO_ONE_CARD, UP_TO_ONE_CARD, UP_TO_ONE_CARD, UP_TO_ONE_CARD],
-            effect: bottom_in_any_order,
-            cost: ManaCost::ZERO,
-        },
-    ],
-    min: 1,
-    max: 1,
-    escalate: None,
-    repeat: false, allowed: None,
-};
+static MODAL: ModalDef = modes(&[
+    mode(counter_on_creature, "Put a +1/+1 counter on target creature.")
+        .targets(&[targets::CREATURE]),
+    mode(two_damage, "Bow of Nylea deals 2 damage to target creature with flying.")
+        .targets(&[target(creature_with_flying)]),
+    mode(|g, item| effects::gain_life(g, item, 3), "You gain 3 life."),
+    mode(bottom_in_any_order, "Put up to four target cards from your graveyard on the bottom of your library in any order.")
+        .targets(&[UP_TO_ONE_CARD, UP_TO_ONE_CARD, UP_TO_ONE_CARD, UP_TO_ONE_CARD]),
+]);
 
 pub static CARD: CardDef = CardDef {
     abilities: &[modal_ability(cost("{1}{G}, {T}"), &MODAL, "{1}{G}, {T}: Choose one \u{2014} put a +1/+1 counter on target creature; Bow of Nylea deals 2 damage to target creature with flying; you gain 3 life; or put up to four target cards from your graveyard on the bottom of your library in any order.")],
-    statics: &[StaticDef {
-        text: "Attacking creatures you control have deathtouch.",
-        layer: Layer::Ability,
-        affects: attacking_creature_you_control,
-        apply: deathtouch,
-        ..StaticDef::BLANK
-    }],
+    statics: &[static_ability(Layer::Ability, attacking_creature_you_control, deathtouch, "Attacking creatures you control have deathtouch.")],
     ..oracle::BOW_OF_NYLEA
 };

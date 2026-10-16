@@ -9,7 +9,7 @@ use cantrip_api::*;
 
 /// The alternative cost of warp: cast from the hand for `cost` (CR 118.9).
 pub const fn way(cost: ManaCost, text: &'static str) -> WayDef {
-    WayDef { text, cost: Cost::mana(cost), from: ZoneKind::Hand, exile_after: false, condition: None, instant_speed: false }
+    cantrip_api::way(Cost::mana(cost), ZoneKind::Hand, text)
 }
 
 /// Warp's delayed ability (CR 702.185a): the way is the card's first and this its first delayed ability.

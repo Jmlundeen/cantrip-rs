@@ -25,8 +25,8 @@ fn dance(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[], effect: dance }),
-    kicker: Some(Kicker { cost: mana(2, 0, 0, 0, 0, 0), multi: false, waterbend: false }),
+    spell: spell(&[], dance),
+    kicker: kicker(mana("{2}")),
     replacements: &[BUYBACK],
     delayed: &[delayed_trigger(cantrip_mechanics::delayed::exile_subject, "Exile it.")],
     ..oracle::CORPSE_DANCE

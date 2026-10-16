@@ -25,7 +25,7 @@ fn cant_be_blocked(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         ability(cost("{1}, {T}"), untap_it, "{1}, {T}: Untap another target artifact.")
-            .targets(&[TargetSpec { min: 1, max: 1, filter: another_artifact, label: "" }]),
+            .targets(&[target(another_artifact)]),
         ability(cost("{3}, {T}"), cant_be_blocked, "{3}, {T}: Target creature can't be blocked this turn.")
             .targets(&[targets::CREATURE]),
     ],

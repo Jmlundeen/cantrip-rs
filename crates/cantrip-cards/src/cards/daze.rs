@@ -4,7 +4,7 @@ use cantrip_oracle as oracle;
 
 /// Counter target spell unless its controller pays {1} (CR 118.12).
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    counter_unless_pays(g, item, 0, mana(1, 0, 0, 0, 0, 0))?;
+    counter_unless_pays(g, item, 0, mana("{1}"))?;
     Ok(())
 }
 
@@ -13,14 +13,7 @@ fn island(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[targets::SPELL], effect }),
-    ways: &[WayDef {
-        text: "Return an Island you control to its owner's hand",
-        cost: Cost::return_to_hand(1, island),
-        from: ZoneKind::Hand,
-        exile_after: false,
-        condition: None,
-        instant_speed: false,
-    }],
+    spell: spell(&[targets::SPELL], effect),
+    ways: &[way(Cost::return_to_hand(1, island), ZoneKind::Hand, "Return an Island you control to its owner's hand")],
     ..oracle::DAZE
 };

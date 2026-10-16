@@ -23,6 +23,6 @@ pub static CARD: CardDef = CardDef {
         triggered(THIS_ENTERS, gain_draw_land, "Whenever Uro enters, you gain 3 life and draw a card, then you may put a land card from your hand onto the battlefield."),
         triggered(cantrip_mechanics::triggers::THIS_ATTACKS, gain_draw_land, "Whenever Uro attacks, you gain 3 life and draw a card, then you may put a land card from your hand onto the battlefield."),
     ],
-    ways: &[escape::way(mana(0, 0, 2, 0, 0, 2), 5, "Escape\u{2014}{G}{G}{U}{U}, Exile five other cards from your graveyard")],
+    ways: &[escape::way(mana("{U}{U}{G}{G}"), 5, "Escape\u{2014}{G}{G}{U}{U}, Exile five other cards from your graveyard")],
     ..oracle::URO_TITAN_OF_NATURES_WRATH
 };

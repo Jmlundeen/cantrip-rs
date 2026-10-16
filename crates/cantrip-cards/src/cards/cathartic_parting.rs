@@ -32,12 +32,6 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef {
-        targets: &[
-            TargetSpec { min: 1, max: 1, filter: opponents_artifact_or_enchantment, label: "" },
-            TargetSpec { min: 0, max: 4, filter: card_in_your_graveyard, label: "" },
-        ],
-        effect,
-    }),
+    spell: spell(&[ target(opponents_artifact_or_enchantment), up_to(4, card_in_your_graveyard), ], effect),
     ..oracle::CATHARTIC_PARTING
 };

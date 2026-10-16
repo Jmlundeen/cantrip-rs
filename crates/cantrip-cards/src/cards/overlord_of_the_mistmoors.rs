@@ -26,7 +26,7 @@ fn two_insects(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    ways: &[impending::way(mana(2, 2, 0, 0, 0, 0), "Impending 4\u{2014}{2}{W}{W}")],
+    ways: &[impending::way(mana("{2}{W}{W}"), "Impending 4\u{2014}{2}{W}{W}")],
     enters: Some(impending::enters::<4>),
     statics: &[impending::NOT_A_CREATURE],
     abilities: &[

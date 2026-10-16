@@ -25,14 +25,8 @@ fn treasures(g: &mut dyn Game, asker: &Asker, before: &Proposal, after: &Proposa
 }
 
 pub static CARD: CardDef = CardDef {
-    replacements: &[ReplacementDef {
-        hint: "replaces an opponent's draw with a Treasure token",
-        kind: ReplacementKind::DrawInstruction,
-        applies: replaces,
-        apply: not_drawn,
-        then: Some(treasures),
-        ..ReplacementDef::BLANK
-    }],
+    replacements: &[replacement(ReplacementKind::DrawInstruction, replaces, not_drawn, "replaces an opponent's draw with a Treasure token")
+        .then(treasures)],
     ..oracle::HULLBREACHER
 };
 

@@ -14,7 +14,8 @@ pub fn discarded_this_turn(q: &dyn Query, asker: &Asker) -> bool {
 
 /// The alternative cost of mayhem: cast from the graveyard for `cost`, if it was discarded this turn.
 pub const fn way(cost: ManaCost, text: &'static str) -> WayDef {
-    WayDef { text, cost: Cost::mana(cost), from: ZoneKind::Graveyard, exile_after: false, condition: Some(discarded_this_turn), instant_speed: false }
+    cantrip_api::way(Cost::mana(cost), ZoneKind::Graveyard, text)
+        .condition(discarded_this_turn)
 }
 
 /// "Each nonland card in your graveyard has mayhem. The mayhem cost is equal to its mana cost": for the cards in the

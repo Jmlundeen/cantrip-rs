@@ -52,16 +52,10 @@ fn return_and_attach(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> 
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        equip(mana(2, 0, 0, 0, 0, 0), "Equip {2}"),
+        equip(mana("{2}"), "Equip {2}"),
         triggered(when(EventMask::ZONE_CHANGE, one_one_enters), return_and_attach, "Whenever a 1/1 creature you control enters, you may return this card from your graveyard to the battlefield, then attach it to that creature.")
             .anywhere(),
     ],
-    statics: &[StaticDef {
-        text: "Equipped creature gets +1/+2.",
-        layer: Layer::PtModify,
-        affects: attached_object,
-        apply: plus_one_plus_two,
-        ..StaticDef::BLANK
-    }],
+    statics: &[static_ability(Layer::PtModify, attached_object, plus_one_plus_two, "Equipped creature gets +1/+2.")],
     ..oracle::SWORD_OF_THE_MEEK
 };

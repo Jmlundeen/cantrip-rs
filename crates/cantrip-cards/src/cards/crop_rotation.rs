@@ -9,7 +9,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[], effect }),
+    spell: spell(&[], effect),
     // As an additional cost to cast this spell, sacrifice a land.
     additional_cost: Some(Cost::sacrifice(1, cantrip_mechanics::targets::filters::land)),
     ..oracle::CROP_ROTATION

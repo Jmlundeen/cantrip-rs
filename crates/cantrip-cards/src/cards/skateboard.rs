@@ -21,23 +21,11 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ENTERS, tap_target, "When this Equipment enters, tap target permanent.")
             .targets(&[targets::PERMANENT]),
-        equip(mana(1, 0, 0, 0, 0, 0), "Equip {1}"),
+        equip(mana("{1}"), "Equip {1}"),
     ],
     statics: &[
-        StaticDef {
-            text: "Equipped creature gets +1/+0.",
-            layer: Layer::PtModify,
-            affects: attached_object,
-            apply: plus_one_power,
-            ..StaticDef::BLANK
-        },
-        StaticDef {
-            text: "Equipped creature has haste.",
-            layer: Layer::Ability,
-            affects: attached_object,
-            apply: have_haste,
-            ..StaticDef::BLANK
-        },
+        static_ability(Layer::PtModify, attached_object, plus_one_power, "Equipped creature gets +1/+0."),
+        static_ability(Layer::Ability, attached_object, have_haste, "Equipped creature has haste."),
     ],
     ..oracle::SKATEBOARD
 };

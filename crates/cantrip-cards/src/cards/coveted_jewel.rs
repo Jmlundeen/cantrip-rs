@@ -31,7 +31,7 @@ fn claim(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         mana_ability(TAP, add_any_color(3), "{T}: Add three mana of any one color."),
-        triggered(triggers::THIS_ENTERS, cantrip_mechanics::effects::draw::<3>, "When this artifact enters, draw three cards."),
+        triggered(triggers::THIS_ENTERS, |g, item| cantrip_mechanics::effects::draw(g, item, 3), "When this artifact enters, draw three cards."),
         triggered(when(EventMask::UNBLOCKED, opponent_attacks_you_unblocked), claim, "Whenever one or more creatures an opponent controls attack you and aren't blocked, that player draws three cards and gains control of this artifact. Untap it.")
             .once_per_batch(),
     ],

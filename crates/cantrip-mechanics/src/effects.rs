@@ -36,8 +36,8 @@ pub fn destroy_all_creatures_no_regen(g: &mut dyn Game, _: &StackItem) -> Result
 
 /// "Draw N cards" (CR 121.1). Chromatic Star and Mind Stone print "draw a card"; Coveted Jewel and Bankrupt in Blood draw
 /// three.
-pub fn draw<const N: u32>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.draw(item.controller, N);
+pub fn draw(g: &mut dyn Game, item: &StackItem, n: u32) -> Result<(), Suspend> {
+    g.draw(item.controller, n);
     Ok(())
 }
 
@@ -50,14 +50,14 @@ pub fn loot(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 /// "You gain N life" (CR 119.3). Zuran Orb and Inventor's Fair print it (two and one).
-pub fn gain_life<const N: i32>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.gain_life(item.controller, N);
+pub fn gain_life(g: &mut dyn Game, item: &StackItem, n: i32) -> Result<(), Suspend> {
+    g.gain_life(item.controller, n);
     Ok(())
 }
 
 /// "Surveil N" (CR 701.25) for the ability's controller. The surveil lands and Dragon's Rage Channeler print it.
-pub fn surveil<const N: usize>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    crate::surveil(g, item.controller, item.object, N)
+pub fn surveil(g: &mut dyn Game, item: &StackItem, n: usize) -> Result<(), Suspend> {
+    crate::surveil(g, item.controller, item.object, n)
 }
 
 /// "You become the monarch" (CR 725.1). Aragorn, King of Gondor and Court of Garenbrig print it.

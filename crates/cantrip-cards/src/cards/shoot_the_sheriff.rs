@@ -19,6 +19,6 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[TargetSpec { min: 1, max: 1, filter: non_outlaw_creature, label: "" }], effect }),
+    spell: spell(&[target(non_outlaw_creature)], effect),
     ..oracle::SHOOT_THE_SHERIFF
 };

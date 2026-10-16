@@ -43,13 +43,7 @@ fn human_for_each_opponent(g: &mut dyn Game, item: &StackItem) -> Result<(), Sus
 }
 
 pub static CARD: CardDef = CardDef {
-    statics: &[StaticDef {
-        text: "Adeline's power is equal to the number of creatures you control.",
-        layer: Layer::PtDefine,
-        apply: power_is_creatures_you_control,
-        own: true,
-        ..StaticDef::BLANK
-    }],
+    statics: &[characteristic_defining(Layer::PtDefine, power_is_creatures_you_control, "Adeline's power is equal to the number of creatures you control.")],
     abilities: &[triggered(triggers::YOU_ATTACK, human_for_each_opponent, "Whenever you attack, for each opponent, create a 1/1 white Human creature token that's tapped and attacking that player or a planeswalker they control.")],
     ..oracle::ADELINE_RESPLENDENT_CATHAR
 };

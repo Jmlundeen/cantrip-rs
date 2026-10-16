@@ -18,14 +18,8 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[TargetSpec { min: 0, max: 2, ..targets::ARTIFACT_OR_ENCHANTMENT }], effect }),
-    ways: &[WayDef {
-        text: "Exile a green card from your hand",
-        cost: Cost { exile_from_hand: Some((1, green_card)), ..Cost::NONE },
-        from: ZoneKind::Hand,
-        exile_after: false,
-        condition: Some(not_your_turn),
-        instant_speed: false,
-    }],
+    spell: spell(&[targets::ARTIFACT_OR_ENCHANTMENT.between(0, 2)], effect),
+    ways: &[way(exile_from_hand(1, green_card), ZoneKind::Hand, "Exile a green card from your hand")
+        .condition(not_your_turn)],
     ..oracle::FORCE_OF_VIGOR
 };

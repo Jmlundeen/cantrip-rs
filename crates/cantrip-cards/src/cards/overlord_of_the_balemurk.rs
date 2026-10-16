@@ -34,7 +34,7 @@ fn mill_then_return(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    ways: &[impending::way(mana(1, 0, 0, 1, 0, 0), "Impending 5\u{2014}{1}{B}")],
+    ways: &[impending::way(mana("{1}{B}"), "Impending 5\u{2014}{1}{B}")],
     enters: Some(impending::enters::<5>),
     statics: &[impending::NOT_A_CREATURE],
     abilities: &[

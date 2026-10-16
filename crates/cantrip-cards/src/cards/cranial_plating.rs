@@ -20,14 +20,8 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         ability(cost("{B}{B}"), attach_to_target, "{B}{B}: Attach this Equipment to target creature you control.")
             .targets(&[targets::CREATURE_YOU_CONTROL]),
-        equip(mana(1, 0, 0, 0, 0, 0), "Equip {1}"),
+        equip(mana("{1}"), "Equip {1}"),
     ],
-    statics: &[StaticDef {
-        text: "Equipped creature gets +1/+0 for each artifact you control.",
-        layer: Layer::PtModify,
-        affects: attached_object,
-        apply: plus_power_per_artifact,
-        ..StaticDef::BLANK
-    }],
+    statics: &[static_ability(Layer::PtModify, attached_object, plus_power_per_artifact, "Equipped creature gets +1/+0 for each artifact you control.")],
     ..oracle::CRANIAL_PLATING
 };

@@ -14,14 +14,8 @@ fn grant_mana_ability(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[equip(mana(1, 0, 0, 0, 0, 0), "Equip {1}")],
+    abilities: &[equip(mana("{1}"), "Equip {1}")],
     delayed: &[mana_ability(TAP, add_any_color(1), "{T}: Add one mana of any color.")],
-    statics: &[StaticDef {
-        text: "Equipped creature has \"{T}: Add one mana of any color.\"",
-        layer: Layer::Ability,
-        affects: attached_object,
-        apply: grant_mana_ability,
-        ..StaticDef::BLANK
-    }],
+    statics: &[static_ability(Layer::Ability, attached_object, grant_mana_ability, "Equipped creature has \"{T}: Add one mana of any color.\"")],
     ..oracle::PARADISE_MANTLE
 };

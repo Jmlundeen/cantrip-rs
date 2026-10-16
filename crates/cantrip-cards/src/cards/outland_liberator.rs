@@ -25,7 +25,7 @@ pub static BACK: CardDef = CardDef {
     abilities: &[
         SACRIFICE,
         triggered(triggers::THIS_ATTACKS, destroy_it, "Whenever this creature attacks, destroy target artifact or enchantment defending player controls.")
-            .targets(&[TargetSpec { min: 1, max: 1, filter: defending_players_artifact_or_enchantment, label: "" }]),
+            .targets(&[target(defending_players_artifact_or_enchantment)]),
     ],
     ..oracle::FRENZIED_TRAPBREAKER
 };

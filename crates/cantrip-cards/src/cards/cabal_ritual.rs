@@ -10,4 +10,4 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-pub static CARD: CardDef = CardDef { spell: Some(SpellDef { targets: &[], effect }), ..oracle::CABAL_RITUAL };
+pub static CARD: CardDef = CardDef { spell: spell(&[], effect), ..oracle::CABAL_RITUAL };

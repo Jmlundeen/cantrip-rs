@@ -3,7 +3,7 @@
 //! (Forestcycling), L\u{f3}rien Revealed (Islandcycling), Oliphaunt (Mountaincycling) and Troll of Khazad-d\u{fb}m
 //! (Swampcycling) print it. Plain cycling (CR 702.29a) is `triggers::cycling`.
 //!
-//! A card with typecycling lists `cantrip_api::ability(subtype, cost, text)` among its `abilities`; `subtype` is the basic land type
+//! A card with typecycling lists `ability(subtype, cost, text)` among its `abilities`; `subtype` is the basic land type
 //! it searches for.
 
 use crate::search_library;

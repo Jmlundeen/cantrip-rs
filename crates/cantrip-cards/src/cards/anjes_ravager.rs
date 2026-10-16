@@ -20,13 +20,7 @@ fn rummage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(triggers::THIS_ATTACKS, rummage, "Whenever this creature attacks, discard your hand, then draw three cards.")],
-    statics: &[StaticDef {
-        text: "This creature attacks each combat if able.",
-        layer: Layer::Ability,
-        affects: is_self,
-        apply: must_attack,
-        ..StaticDef::BLANK
-    }],
-    madness: Some(mana(1, 0, 0, 0, 1, 0)),
+    statics: &[static_ability(Layer::Ability, is_self, must_attack, "This creature attacks each combat if able.")],
+    madness: Some(mana("{1}{R}")),
     ..oracle::ANJES_RAVAGER
 };

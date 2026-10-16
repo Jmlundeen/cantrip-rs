@@ -10,6 +10,6 @@ fn lapse(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[targets::SPELL], effect: lapse }),
+    spell: spell(&[targets::SPELL], lapse),
     ..oracle::MEMORY_LAPSE
 };

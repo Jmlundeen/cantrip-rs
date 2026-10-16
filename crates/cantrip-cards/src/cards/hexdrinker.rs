@@ -31,36 +31,12 @@ fn protection_from_everything(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[level_up::ability(mana(1, 0, 0, 0, 0, 0), "Level up {1}")],
+    abilities: &[level_up::ability(mana("{1}"), "Level up {1}")],
     statics: &[
-        StaticDef {
-            text: "LEVEL 3-7: 4/4",
-            layer: Layer::PtSet,
-            affects: level_three,
-            apply: four_four,
-            ..StaticDef::BLANK
-        },
-        StaticDef {
-            text: "LEVEL 3-7: Protection from instants",
-            layer: Layer::Ability,
-            affects: level_three,
-            apply: protection_from_instants,
-            ..StaticDef::BLANK
-        },
-        StaticDef {
-            text: "LEVEL 8+: 6/6",
-            layer: Layer::PtSet,
-            affects: level_eight,
-            apply: six_six,
-            ..StaticDef::BLANK
-        },
-        StaticDef {
-            text: "LEVEL 8+: Protection from everything",
-            layer: Layer::Ability,
-            affects: level_eight,
-            apply: protection_from_everything,
-            ..StaticDef::BLANK
-        },
+        static_ability(Layer::PtSet, level_three, four_four, "LEVEL 3-7: 4/4"),
+        static_ability(Layer::Ability, level_three, protection_from_instants, "LEVEL 3-7: Protection from instants"),
+        static_ability(Layer::PtSet, level_eight, six_six, "LEVEL 8+: 6/6"),
+        static_ability(Layer::Ability, level_eight, protection_from_everything, "LEVEL 8+: Protection from everything"),
     ],
     ..oracle::HEXDRINKER
 };

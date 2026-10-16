@@ -18,9 +18,9 @@ fn regrowth(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// Emeritus of Abundance's prepare spell (CR 722): not a card here, only ever a copy.
 pub static REGROWTH: CardDef = CardDef {
     name: "Regrowth",
-    cost: mana(1, 0, 0, 0, 0, 1),
+    cost: mana("{1}{G}"),
     types: TypeSet::of(&[CardType::Sorcery]),
-    spell: Some(SpellDef { targets: &[TargetSpec { min: 1, max: 1, filter: card_in_your_graveyard, label: "" }], effect: regrowth }),
+    spell: spell(&[target(card_in_your_graveyard)], regrowth),
     text: "Return target card from your graveyard to your hand.",
     ..CardDef::BLANK
 };

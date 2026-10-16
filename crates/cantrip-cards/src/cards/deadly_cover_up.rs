@@ -44,7 +44,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[], effect }),
+    spell: spell(&[], effect),
     optional_cost: Some(OPTIONAL_COST),
     labels: LABELS,
     ..oracle::DEADLY_COVER_UP

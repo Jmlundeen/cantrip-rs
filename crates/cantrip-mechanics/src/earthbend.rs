@@ -15,7 +15,7 @@ fn land_you_control(q: &dyn Query, asker: &Asker, t: Target) -> bool {
 }
 
 /// "Target land you control."
-pub const TARGET: TargetSpec = TargetSpec { min: 1, max: 1, filter: land_you_control, label: "" };
+pub const TARGET: TargetSpec = target(land_you_control);
 
 /// The land becomes a 0/0 creature with haste that's still a land, with no duration (CR 611.2a); it gets `N` +1/+1
 /// counters; and it is given `RETURN`, the delayed ability 0 of the card whose ability this is.

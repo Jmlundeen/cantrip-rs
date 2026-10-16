@@ -7,13 +7,13 @@ use cantrip_oracle as oracle;
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(spell) = targets::object(g, item, 0) else { return Ok(()) };
     let payer = g.controller(spell);
-    if !g.unless_pays(payer, item.object, spell, mana(3, 0, 0, 0, 0, 0))? {
+    if !g.unless_pays(payer, item.object, spell, mana("{3}"))? {
         g.counter_to(spell, CounterTo::Exile);
     }
     Ok(())
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[targets::SPELL], effect }),
+    spell: spell(&[targets::SPELL], effect),
     ..oracle::NO_MORE_LIES
 };

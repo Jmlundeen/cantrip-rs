@@ -9,7 +9,7 @@ fn battle_display(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 /// The Adventure (CR 715): destroy target artifact.
 pub static BATTLE_DISPLAY: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[targets::ARTIFACT], effect: battle_display }),
+    spell: spell(&[targets::ARTIFACT], battle_display),
     ..oracle::BATTLE_DISPLAY
 };
 

@@ -12,4 +12,4 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-pub static CARD: CardDef = CardDef { spell: Some(SpellDef { targets: &[targets::CREATURE], effect }), ..oracle::TWISTED_IMAGE };
+pub static CARD: CardDef = CardDef { spell: spell(&[targets::CREATURE], effect), ..oracle::TWISTED_IMAGE };

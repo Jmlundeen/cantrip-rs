@@ -37,20 +37,8 @@ pub static CARD: CardDef = CardDef {
     abilities: &[triggered(when(EventMask::ZONE_CHANGE, put_into_graveyard), return_to_hand, "When Rancor is put into a graveyard from the battlefield, return it to its owner's hand.")
         .look_back()],
     statics: &[
-        StaticDef {
-            text: "Enchanted creature gets +2/+0.",
-            layer: Layer::PtModify,
-            affects: attached_object,
-            apply: plus_two_trample,
-            ..StaticDef::BLANK
-        },
-        StaticDef {
-            text: "Enchanted creature has trample.",
-            layer: Layer::Ability,
-            affects: attached_object,
-            apply: trample,
-            ..StaticDef::BLANK
-        },
+        static_ability(Layer::PtModify, attached_object, plus_two_trample, "Enchanted creature gets +2/+0."),
+        static_ability(Layer::Ability, attached_object, trample, "Enchanted creature has trample."),
     ],
     ..oracle::RANCOR
 };

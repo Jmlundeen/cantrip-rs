@@ -65,7 +65,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         ability(loyalty(2), sacrifice_to_draw, "+2: You may sacrifice another permanent. If you do, you gain 1 life and draw a card."),
         ability(loyalty(-3), destroy, "\u{2212}3: Destroy target nonland permanent with mana value 3 or less.")
-            .targets(&[TargetSpec { min: 1, max: 1, filter: nonland_permanent_with_mana_value_three_or_less, label: "" }]),
+            .targets(&[target(nonland_permanent_with_mana_value_three_or_less)]),
         ability(loyalty(-9), emblem, "\u{2212}9: You get an emblem with \"Whenever a creature you control deals combat damage to a player, that player loses the game.\""),
     ],
     ..oracle::VRASKA_GOLGARI_QUEEN

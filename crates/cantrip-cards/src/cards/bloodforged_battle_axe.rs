@@ -29,14 +29,8 @@ fn copy_this(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(when(EventMask::DAMAGE, equipped_deals_combat_damage_to_a_player), copy_this, "Whenever equipped creature deals combat damage to a player, create a token that's a copy of this Equipment."),
-        equip(mana(2, 0, 0, 0, 0, 0), "Equip {2}"),
+        equip(mana("{2}"), "Equip {2}"),
     ],
-    statics: &[StaticDef {
-        text: "Equipped creature gets +2/+0.",
-        layer: Layer::PtModify,
-        affects: attached_object,
-        apply: plus_two_power,
-        ..StaticDef::BLANK
-    }],
+    statics: &[static_ability(Layer::PtModify, attached_object, plus_two_power, "Equipped creature gets +2/+0.")],
     ..oracle::BLOODFORGED_BATTLE_AXE
 };

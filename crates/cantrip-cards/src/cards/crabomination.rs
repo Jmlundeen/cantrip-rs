@@ -33,19 +33,7 @@ fn plunder(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    ways: &[WayDef {
-        text: "Emerge from artifact {5}{B}{B}",
-        cost: Cost {
-            mana: mana(5, 0, 0, 2, 0, 0),
-            permanents: Some(PermanentCost { count: 1, filter: cantrip_mechanics::targets::filters::artifact, to_hand: false }),
-            emerge: true,
-            ..Cost::NONE
-        },
-        from: ZoneKind::Hand,
-        exile_after: false,
-        condition: None,
-        instant_speed: false,
-    }],
+    ways: &[way(Cost { mana: mana("{5}{B}{B}"), permanents: Some(PermanentCost { count: 1, filter: cantrip_mechanics::targets::filters::artifact, to_hand: false }), emerge: true, ..Cost::NONE }, ZoneKind::Hand, "Emerge from artifact {5}{B}{B}")],
     abilities: &[triggered(THIS_ENTERS, plunder, "When this creature enters, target opponent exiles the top card of their library, a card at random from their graveyard, and a card at random from their hand. You may cast a spell from among cards exiled this way without paying its mana cost.")
         .targets(&[targets::OPPONENT])],
     ..oracle::CRABOMINATION

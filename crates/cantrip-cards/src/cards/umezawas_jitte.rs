@@ -37,27 +37,17 @@ fn shrink_target(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-static MODAL: ModalDef = ModalDef {
-    modes: &[
-        ModeDef { text: "Equipped creature gets +2/+2 until end of turn.", targets: &[], effect: pump_equipped, cost: ManaCost::ZERO },
-        ModeDef {
-            text: "Target creature gets -1/-1 until end of turn.",
-            targets: &[targets::CREATURE],
-            effect: shrink_target,
-            cost: ManaCost::ZERO,
-        },
-        ModeDef { text: "You gain 2 life.", targets: &[], effect: cantrip_mechanics::effects::gain_life::<2>, cost: ManaCost::ZERO },
-    ],
-    min: 1,
-    max: 1,
-    escalate: None,
-    repeat: false, allowed: None,
-};
+static MODAL: ModalDef = modes(&[
+    mode(pump_equipped, "Equipped creature gets +2/+2 until end of turn."),
+    mode(shrink_target, "Target creature gets -1/-1 until end of turn.")
+        .targets(&[targets::CREATURE]),
+    mode(|g, item| cantrip_mechanics::effects::gain_life(g, item, 2), "You gain 2 life."),
+]);
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
         modal_ability(remove_counters(CounterKind::Charge, 1), &MODAL, "Remove a charge counter from Umezawa's Jitte: Choose one — equipped creature gets +2/+2 until end of turn; target creature gets -1/-1 until end of turn; or you gain 2 life."),
-        equip(mana(2, 0, 0, 0, 0, 0), "Equip {2}"),
+        equip(mana("{2}"), "Equip {2}"),
         triggered(when(EventMask::DAMAGE, equipped_creature_deals_combat_damage), two_charge_counters, "Whenever equipped creature deals combat damage, put two charge counters on Umezawa's Jitte.")
             .once_per_batch(),
     ],

@@ -22,7 +22,7 @@ fn pay_to_untap(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if !targets::permanent(g, vault) {
         return Ok(());
     }
-    if g.unless_pays(item.controller, vault, vault, mana(4, 0, 0, 0, 0, 0))? && targets::permanent(g, vault) {
+    if g.unless_pays(item.controller, vault, vault, mana("{4}"))? && targets::permanent(g, vault) {
         g.untap(vault);
     }
     Ok(())

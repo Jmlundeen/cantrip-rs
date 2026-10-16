@@ -48,18 +48,12 @@ fn minus_three(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    replacements: &[ReplacementDef {
-        hint: "twice that many tokens are created",
-        kind: ReplacementKind::TokenCreation,
-        applies: tokens_under_your_control,
-        apply: twice_that_many,
-        ..ReplacementDef::BLANK
-    }],
+    replacements: &[replacement(ReplacementKind::TokenCreation, tokens_under_your_control, twice_that_many, "twice that many tokens are created")],
     abilities: &[
         ability(loyalty(1), plus_one, "+1: Create a 1/1 white Soldier creature token."),
         ability(loyalty(0), zero, "0: Put a +1/+1 counter on each creature you control. Those creatures gain flying until your next turn."),
         ability(loyalty(-3), minus_three, "\u{2212}3: Destroy target creature an opponent controls with mana value 3 or greater.")
-            .targets(&[TargetSpec { min: 1, max: 1, filter: opponents_creature_with_value_three_or_more, label: "" }]),
+            .targets(&[target(opponents_creature_with_value_three_or_more)]),
     ],
     ..oracle::ELSPETH_STORM_SLAYER
 };

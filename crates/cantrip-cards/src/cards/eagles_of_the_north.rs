@@ -18,7 +18,7 @@ fn pump_creatures(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ENTERS, pump_creatures, "When Eagles of the North enters, creatures you control get +1/+0 and gain first strike until end of turn."),
-        typecycling::ability(Subtype::Plains, mana(1, 0, 0, 0, 0, 0), "Plainscycling {1} ({1}, Discard this card: Search your library for a Plains card, reveal it, put it into your hand, then shuffle.)"),
+        typecycling::ability(Subtype::Plains, mana("{1}"), "Plainscycling {1} ({1}, Discard this card: Search your library for a Plains card, reveal it, put it into your hand, then shuffle.)"),
     ],
     ..oracle::EAGLES_OF_THE_NORTH
 };

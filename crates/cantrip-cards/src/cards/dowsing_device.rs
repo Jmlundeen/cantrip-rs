@@ -3,7 +3,7 @@ use cantrip_mechanics::{pump, targets};
 use cantrip_oracle as oracle;
 
 /// "up to one target creature you control".
-const UP_TO_ONE_CREATURE_YOU_CONTROL: TargetSpec = TargetSpec { min: 0, max: 1, ..targets::CREATURE_YOU_CONTROL };
+const UP_TO_ONE_CREATURE_YOU_CONTROL: TargetSpec = targets::CREATURE_YOU_CONTROL.between(0, 1);
 
 fn artifacts_you_control(q: &dyn Query, player: PlayerId) -> usize {
     q.permanents_of(player).into_iter().filter(|&id| q.chars(id).is(CardType::Artifact)).count()

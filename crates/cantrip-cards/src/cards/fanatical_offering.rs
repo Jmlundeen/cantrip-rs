@@ -9,7 +9,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[], effect }),
+    spell: spell(&[], effect),
     // As an additional cost to cast this spell, sacrifice an artifact or creature (CR 118.8).
     additional_cost: Some(Cost::sacrifice(1, cantrip_mechanics::targets::filters::artifact_or_creature)),
     ..oracle::FANATICAL_OFFERING

@@ -9,16 +9,11 @@ fn minus_five(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-static MODAL: ModalDef = ModalDef {
-    modes: &[
-        ModeDef { text: "Draw two cards.", targets: &[], effect: effects::draw::<2>, cost: ManaCost::ZERO },
-        ModeDef { text: "Target creature gets -5/-5 until end of turn.", targets: &[targets::CREATURE], effect: minus_five, cost: ManaCost::ZERO },
-    ],
-    min: 1,
-    max: 1,
-    escalate: None,
-    repeat: false, allowed: None,
-};
+static MODAL: ModalDef = modes(&[
+    mode(|g, item| effects::draw(g, item, 2), "Draw two cards."),
+    mode(minus_five, "Target creature gets -5/-5 until end of turn.")
+        .targets(&[targets::CREATURE]),
+]);
 
 pub static CARD: CardDef = CardDef {
     abilities: &[

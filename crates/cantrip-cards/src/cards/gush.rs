@@ -11,14 +11,7 @@ fn island(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[], effect }),
-    ways: &[WayDef {
-        text: "Return two Islands you control to their owner's hand",
-        cost: Cost::return_to_hand(2, island),
-        from: ZoneKind::Hand,
-        exile_after: false,
-        condition: None,
-        instant_speed: false,
-    }],
+    spell: spell(&[], effect),
+    ways: &[way(Cost::return_to_hand(2, island), ZoneKind::Hand, "Return two Islands you control to their owner's hand")],
     ..oracle::GUSH
 };

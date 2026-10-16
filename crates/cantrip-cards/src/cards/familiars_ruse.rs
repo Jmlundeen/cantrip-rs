@@ -9,7 +9,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[targets::SPELL], effect }),
+    spell: spell(&[targets::SPELL], effect),
     // As an additional cost to cast this spell, return a creature you control to its owner's hand (CR 118.8).
     additional_cost: Some(Cost::return_to_hand(1, targets::filters::creature)),
     ..oracle::FAMILIARS_RUSE

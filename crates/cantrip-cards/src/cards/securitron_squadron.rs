@@ -28,7 +28,7 @@ fn counter_on_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    kicker: Some(Kicker { cost: mana(3, 0, 0, 0, 0, 0), multi: true, waterbend: false }),
+    kicker: multikicker(mana("{3}")),
     abilities: &[
         triggers::SQUAD,
         triggered(when(EventMask::ZONE_CHANGE, token_enters), counter_on_it, "Whenever a creature token you control enters, put a +1/+1 counter on it."),

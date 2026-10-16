@@ -20,12 +20,6 @@ fn apply(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
 /// "Each player can't cast more than one spell each turn." (CR 101.2.)
 pub static CARD: CardDef = CardDef {
     cast_limit: 1,
-    replacements: &[ReplacementDef {
-        hint: "enters tapped",
-        kind: ReplacementKind::ZoneChange,
-        applies,
-        apply,
-        ..ReplacementDef::BLANK
-    }],
+    replacements: &[replacement(ReplacementKind::ZoneChange, applies, apply, "enters tapped")],
     ..oracle::ARCHON_OF_EMERIA
 };

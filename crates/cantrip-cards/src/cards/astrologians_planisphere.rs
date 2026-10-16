@@ -64,24 +64,12 @@ fn grow(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ENTERS, job_select, "Job select (When this Equipment enters, create a 1/1 colorless Hero creature token, then attach this to it.)"),
-        equip(mana(2, 0, 0, 0, 0, 0), "Diana \u{2014} Equip {2}"),
+        equip(mana("{2}"), "Diana \u{2014} Equip {2}"),
     ],
     delayed: &[triggered(when(EventMask(EventMask::SPELL_CAST.0 | EventMask::DREW.0), cast_noncreature_or_draw_third), grow, "Whenever you cast a noncreature spell and whenever you draw your third card each turn, put a +1/+1 counter on this creature.")],
     statics: &[
-        StaticDef {
-            text: "Equipped creature is a Wizard in addition to its other types.",
-            layer: Layer::Type,
-            affects: attached_object,
-            apply: wizard,
-            ..StaticDef::BLANK
-        },
-        StaticDef {
-            text: "Equipped creature has \"Whenever you cast a noncreature spell and whenever you draw your third card each turn, put a +1/+1 counter on this creature.\"",
-            layer: Layer::Ability,
-            affects: attached_object,
-            apply: grant_growth,
-            ..StaticDef::BLANK
-        },
+        static_ability(Layer::Type, attached_object, wizard, "Equipped creature is a Wizard in addition to its other types."),
+        static_ability(Layer::Ability, attached_object, grant_growth, "Equipped creature has \"Whenever you cast a noncreature spell and whenever you draw your third card each turn, put a +1/+1 counter on this creature.\""),
     ],
     ..oracle::ASTROLOGIANS_PLANISPHERE
 };

@@ -49,12 +49,6 @@ fn may_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(when(EventMask::BECAME_TARGET, targeted), may_draw, "Whenever you or a permanent you control becomes the target of a spell or ability an opponent controls, you may draw a card.")],
-    replacements: &[ReplacementDef {
-        hint: "can't draw more than one card each turn",
-        kind: ReplacementKind::DrawInstruction,
-        applies: limits,
-        apply: limit,
-        ..ReplacementDef::BLANK
-    }],
+    replacements: &[replacement(ReplacementKind::DrawInstruction, limits, limit, "can't draw more than one card each turn")],
     ..oracle::LEOVOLD_EMISSARY_OF_TREST
 };

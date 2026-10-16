@@ -4,6 +4,6 @@ use cantrip_oracle as oracle;
 
 pub static CARD: CardDef = CardDef {
     enters: Some(mana::enters_tapped),
-    abilities: &lands::bounce_land::<{ lands::R }, { lands::G }>("{T}: Add {R}{G}."),
+    abilities: &lands::bounce_land(Mana::R, Mana::G, "{T}: Add {R}{G}."),
     ..oracle::GRUUL_TURF
 };

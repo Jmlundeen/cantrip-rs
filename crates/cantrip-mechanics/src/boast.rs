@@ -1,7 +1,7 @@
 //! Boast (CR 702.142a): "[Cost]: [Effect]. Activate only if this creature attacked this turn and only once each turn."
 //! Broadside Bombardiers prints it.
 //!
-//! A card with boast lists `cantrip_api::ability(text, cost, targets, effect)` among its `abilities`.
+//! A card with boast lists `ability(text, cost, targets, effect)` among its `abilities`.
 
 use cantrip_api::*;
 

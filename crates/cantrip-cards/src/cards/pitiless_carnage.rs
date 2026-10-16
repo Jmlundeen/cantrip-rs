@@ -22,9 +22,9 @@ fn sacrifice_and_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[], effect: sacrifice_and_draw }),
+    spell: spell(&[], sacrifice_and_draw),
     abilities: &[plot(
-        mana(1, 0, 0, 2, 0, 0),
+        mana("{1}{B}{B}"),
         "Plot {1}{B}{B} (You may pay {1}{B}{B} and exile this card from your hand. Cast it as a sorcery on a later turn without paying its mana cost. Plot only as a sorcery.)",
     )],
     ..oracle::PITILESS_CARNAGE

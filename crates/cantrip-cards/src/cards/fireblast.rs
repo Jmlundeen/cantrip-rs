@@ -12,14 +12,7 @@ fn mountain(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[targets::ANY], effect }),
-    ways: &[WayDef {
-        text: "Sacrifice two Mountains",
-        cost: Cost::sacrifice(2, mountain),
-        from: ZoneKind::Hand,
-        exile_after: false,
-        condition: None,
-        instant_speed: false,
-    }],
+    spell: spell(&[targets::ANY], effect),
+    ways: &[way(Cost::sacrifice(2, mountain), ZoneKind::Hand, "Sacrifice two Mountains")],
     ..oracle::FIREBLAST
 };

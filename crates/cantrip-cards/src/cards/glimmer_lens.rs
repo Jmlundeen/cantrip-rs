@@ -18,8 +18,8 @@ fn equipped_and_another_attack(q: &dyn Query, source: ObjectId, event: &Event) -
 pub static CARD: CardDef = CardDef {
     abilities: &[
         for_mirrodin::TRIGGER,
-        triggered(when(EventMask::ATTACKERS_DECLARED, equipped_and_another_attack), cantrip_mechanics::effects::draw::<1>, "Whenever equipped creature and at least one other creature attack, draw a card."),
-        equip(mana(1, 1, 0, 0, 0, 0), "Equip {1}{W}"),
+        triggered(when(EventMask::ATTACKERS_DECLARED, equipped_and_another_attack), |g, item| cantrip_mechanics::effects::draw(g, item, 1), "Whenever equipped creature and at least one other creature attack, draw a card."),
+        equip(mana("{1}{W}"), "Equip {1}{W}"),
     ],
     ..oracle::GLIMMER_LENS
 };

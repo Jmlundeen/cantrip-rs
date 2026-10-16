@@ -11,6 +11,6 @@ fn apply(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
 
 /// Each land is a Forest in addition to its other land types (CR 305.7, 613.1d).
 pub static CARD: CardDef = CardDef {
-    statics: &[StaticDef { text: "Each land is a Forest in addition to its other land types.", layer: Layer::Type, affects, apply, ..StaticDef::BLANK }],
+    statics: &[static_ability(Layer::Type, affects, apply, "Each land is a Forest in addition to its other land types.")],
     ..oracle::YAVIMAYA_CRADLE_OF_GROWTH
 };

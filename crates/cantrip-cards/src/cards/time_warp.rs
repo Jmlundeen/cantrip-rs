@@ -12,4 +12,4 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-pub static CARD: CardDef = CardDef { spell: Some(SpellDef { targets: &[targets::PLAYER], effect }), ..oracle::TIME_WARP };
+pub static CARD: CardDef = CardDef { spell: spell(&[targets::PLAYER], effect), ..oracle::TIME_WARP };

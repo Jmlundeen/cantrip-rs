@@ -7,13 +7,17 @@
 //! triggered(when(EventMask::ZONE_CHANGE, this_enters), draw_a_card, "When this creature enters, draw a card.")
 //! ```
 //!
-//! What few abilities need (targets, "activate only once each turn", a condition) is a method after the call.
+//! What few abilities need (targets, "activate only once each turn", a condition) is a method after the call. The
+//! rest of a card is written the same way: `spell(&[targets::ANY], effect)`, `target(filter)`,
+//! `static_ability(layer, affects, apply, text)`, `mode(effect, text)`, `replacement(kind, applies, apply, hint)`,
+//! `way(cost, from, text)`, `kicker(mana("{2}"))`.
 
 use cantrip_state::*;
 
 use crate::card::*;
 use crate::event::EventMask;
 use crate::game::Game;
+use crate::replace::{GrantedApplies, GrantedApply, GrantedReplacementDef, ReplacementApplies, ReplacementApply, ReplacementDef, ReplacementKind, ReplacementThen};
 
 /// The tap symbol, {T} (CR 107.5).
 pub const TAP: Cost = Cost { tap: true, ..Cost::NONE };
@@ -62,6 +66,11 @@ pub const fn discard(n: u8, filter: ObjectFilter) -> Cost {
     Cost { discard: Some((n, filter)), ..Cost::NONE }
 }
 
+/// "Exile N cards that pass the filter from your hand", other than this one (CR 118.9).
+pub const fn exile_from_hand(n: u8, filter: ObjectFilter) -> Cost {
+    Cost { exile_from_hand: Some((n, filter)), ..Cost::NONE }
+}
+
 /// "Remove N [kind] counters from this permanent".
 pub const fn remove_counters(kind: CounterKind, n: u8) -> Cost {
     Cost { remove_counters: Some((kind, n)), ..Cost::NONE }
@@ -75,19 +84,37 @@ pub const fn exile_from_graveyard(n: u8) -> Cost {
 /// A cost written in mana symbols as printed: `cost("{2}{G}")`, `cost("{X}{R}")`, `cost("{W/U}")`, `cost("{G/P}")`,
 /// `cost("{1}, {T}")`. Read as the card is compiled: a symbol it doesn't know fails the build.
 pub const fn cost(symbols: &str) -> Cost {
+    let (mana, tap) = parse_symbols(symbols);
+    Cost { mana, tap, ..Cost::NONE }
+}
+
+/// A mana cost written in its symbols as printed: `mana("{2}{G}")`, `mana("{X}{R}")`, `mana("{W/U}")`, `mana("{G/P}")`.
+/// Read as the card is compiled: a symbol it doesn't know fails the build.
+pub const fn mana(symbols: &str) -> ManaCost {
+    let (mana, tap) = parse_symbols(symbols);
+    assert!(!tap, "the tap symbol is not mana: write it in cost()");
+    mana
+}
+
+/// N generic mana, N worked out by the card: `generic(price)`.
+pub const fn generic(n: u8) -> ManaCost {
+    ManaCost { generic: n, ..ManaCost::ZERO }
+}
+
+const fn parse_symbols(symbols: &str) -> (ManaCost, bool) {
     let b = symbols.as_bytes();
-    let mut c = Cost::NONE;
+    let mut c = ManaCost::ZERO;
+    let mut tap = false;
     let mut hybrid = 0;
     let mut i = 0;
     while i < b.len() {
         match b[i] {
             b'{' => {}
-            b'}' | b',' | b' ' => {}
+            b'}' | b',' | b' ' => {
+                i += 1;
+                continue;
+            }
             _ => panic!("a mana symbol is written in braces"),
-        }
-        if b[i] != b'{' {
-            i += 1;
-            continue;
         }
         let mut j = i + 1;
         while j < b.len() && b[j] != b'}' {
@@ -97,24 +124,24 @@ pub const fn cost(symbols: &str) -> Cost {
         let inner = (i + 1, j);
         match inner.1 - inner.0 {
             1 => match b[inner.0] {
-                b'T' => c.tap = true,
-                b'X' => c.mana.x += 1,
-                b'0'..=b'9' => c.mana.generic += b[inner.0] - b'0',
-                m => c.mana.symbols[mana_of(m) as usize] += 1,
+                b'T' => tap = true,
+                b'X' => c.x += 1,
+                b'0'..=b'9' => c.generic += b[inner.0] - b'0',
+                m => c.symbols[mana_of(m) as usize] += 1,
             },
             2 => {
                 assert!(b[inner.0].is_ascii_digit() && b[inner.0 + 1].is_ascii_digit(), "an unknown mana symbol");
-                c.mana.generic += (b[inner.0] - b'0') * 10 + (b[inner.0 + 1] - b'0');
+                c.generic += (b[inner.0] - b'0') * 10 + (b[inner.0 + 1] - b'0');
             }
             3 => {
                 assert!(b[inner.0 + 1] == b'/', "an unknown mana symbol");
                 let first = mana_of(b[inner.0]);
                 if b[inner.0 + 2] == b'P' {
                     assert!(!matches!(first, Mana::C), "Phyrexian colorless mana is not a symbol");
-                    c.mana.phyrexian[first as usize] += 1;
+                    c.phyrexian[first as usize] += 1;
                 } else {
                     assert!(hybrid < 6, "more hybrid symbols than a cost holds");
-                    c.mana.hybrid[hybrid] = Some((first, mana_of(b[inner.0 + 2])));
+                    c.hybrid[hybrid] = Some((first, mana_of(b[inner.0 + 2])));
                     hybrid += 1;
                 }
             }
@@ -122,7 +149,7 @@ pub const fn cost(symbols: &str) -> Cost {
         }
         i = j + 1;
     }
-    c
+    (c, tap)
 }
 
 const fn mana_of(symbol: u8) -> Mana {
@@ -485,28 +512,204 @@ impl AbilityDef {
     }
 }
 
+// --- Spells, targets, modes ---------------------------------------------------------------------------------------
+
+/// An instant's or sorcery's own ability (CR 113.3a): its targets, and what it does as it resolves.
+pub const fn spell(targets: &'static [TargetSpec], effect: Effect) -> Option<SpellDef> {
+    Some(SpellDef { targets, effect })
+}
+
+/// One target that passes the filter (CR 115.1).
+pub const fn target(filter: TargetFilter) -> TargetSpec {
+    TargetSpec { min: 1, max: 1, filter, label: "" }
+}
+
+/// "Up to one target" (CR 115.1d).
+pub const fn up_to_one(filter: TargetFilter) -> TargetSpec {
+    TargetSpec { min: 0, max: 1, filter, label: "" }
+}
+
+/// "Up to N targets" (CR 115.1d).
+pub const fn up_to(n: u8, filter: TargetFilter) -> TargetSpec {
+    TargetSpec { min: 0, max: n, filter, label: "" }
+}
+
+impl TargetSpec {
+    /// The same slot, which may be left without a target ("up to").
+    pub const fn optional(self) -> TargetSpec {
+        TargetSpec { min: 0, ..self }
+    }
+
+    /// The same slot, with between `min` and `max` targets; either may be `TargetSpec::COUNTED`.
+    pub const fn between(self, min: u8, max: u8) -> TargetSpec {
+        TargetSpec { min, max, ..self }
+    }
+
+    /// "X targets": as many as the X announced (CR 601.2b-c).
+    pub const fn counted(self) -> TargetSpec {
+        TargetSpec { min: TargetSpec::COUNTED, max: TargetSpec::COUNTED, ..self }
+    }
+}
+
+/// One mode of a modal spell or ability (CR 700.2).
+pub const fn mode(effect: Effect, text: &'static str) -> ModeDef {
+    ModeDef { text, targets: &[], effect, cost: ManaCost::ZERO }
+}
+
+impl ModeDef {
+    /// Its targets (CR 700.2c).
+    pub const fn targets(self, targets: &'static [TargetSpec]) -> ModeDef {
+        ModeDef { targets, ..self }
+    }
+
+    /// What choosing it adds to the total cost: spree (CR 702.172a).
+    pub const fn cost(self, cost: ManaCost) -> ModeDef {
+        ModeDef { cost, ..self }
+    }
+}
+
+/// "Choose one —" (CR 700.2): the modes, in printed order.
+pub const fn modes(modes: &'static [ModeDef]) -> ModalDef {
+    ModalDef { modes, min: 1, max: 1, escalate: None, repeat: false, allowed: None }
+}
+
+impl ModalDef {
+    /// "Choose one or both", "choose one or more": between `min` and `max` modes.
+    pub const fn choose(self, min: u8, max: u8) -> ModalDef {
+        ModalDef { min, max, ..self }
+    }
+
+    /// Escalate (CR 702.120a): each mode beyond the first costs this more.
+    pub const fn escalate(self, cost: Cost) -> ModalDef {
+        ModalDef { escalate: Some(cost), ..self }
+    }
+
+    /// "You may choose the same mode more than once" (CR 700.2d).
+    pub const fn repeat(self) -> ModalDef {
+        ModalDef { repeat: true, ..self }
+    }
+
+    /// Whether a mode may be chosen now, beyond its targets.
+    pub const fn allowed(self, allowed: fn(&dyn crate::game::Query, &Asker, u8) -> bool) -> ModalDef {
+        ModalDef { allowed: Some(allowed), ..self }
+    }
+}
+
+// --- Static abilities and replacement effects -----------------------------------------------------------------------
+
+/// A static ability (CR 604) applying `apply` in `layer` to every object `affects` accepts.
+pub const fn static_ability(layer: Layer, affects: StaticAffects, apply: StaticApply, text: &'static str) -> StaticDef {
+    StaticDef { text, layer, affects, apply, ..StaticDef::BLANK }
+}
+
+/// A characteristic-defining ability (CR 604.3): it applies to its own object only, in every zone.
+pub const fn characteristic_defining(layer: Layer, apply: StaticApply, text: &'static str) -> StaticDef {
+    StaticDef { text, layer, apply, own: true, ..StaticDef::BLANK }
+}
+
+impl StaticDef {
+    /// It affects objects anywhere, not only permanents (CR 611.3a).
+    pub const fn everywhere(self) -> StaticDef {
+        StaticDef { everywhere: true, ..self }
+    }
+
+    /// It applies to its own object only.
+    pub const fn own(self) -> StaticDef {
+        StaticDef { own: true, ..self }
+    }
+
+    /// The zone its source functions from, where not the battlefield (CR 113.6b).
+    pub const fn from(self, from: ZoneKind) -> StaticDef {
+        StaticDef { from, ..self }
+    }
+}
+
+/// A replacement effect of a static ability (CR 614.1): whether it `applies` to an event of `kind`, and how it
+/// reshapes it. `hint` is what it does in a few words.
+pub const fn replacement(kind: ReplacementKind, applies: ReplacementApplies, apply: ReplacementApply, hint: &'static str) -> ReplacementDef {
+    ReplacementDef { hint, kind, applies, apply, ..ReplacementDef::BLANK }
+}
+
+impl ReplacementDef {
+    /// "If this card would be put into a graveyard from anywhere" (CR 113.6b): it functions in every zone, on its own card.
+    pub const fn own_everywhere(self) -> ReplacementDef {
+        ReplacementDef { own_everywhere: true, ..self }
+    }
+
+    /// What the effect does to the game as it applies, besides reshaping the event.
+    pub const fn then(self, then: ReplacementThen) -> ReplacementDef {
+        ReplacementDef { then: Some(then), ..self }
+    }
+}
+
+/// A replacement effect a resolving spell or ability makes for a while (CR 611.2), about the object it was made for.
+pub const fn granted_replacement(kind: ReplacementKind, applies: GrantedApplies, apply: GrantedApply, hint: &'static str) -> GrantedReplacementDef {
+    GrantedReplacementDef { hint, kind, applies, apply }
+}
+
+// --- Other ways to cast, kickers -------------------------------------------------------------------------------------
+
+/// An alternative way to cast the card (CR 118.9): for `cost`, from the zone `from`.
+pub const fn way(cost: Cost, from: ZoneKind, text: &'static str) -> WayDef {
+    WayDef { text, cost, from, exile_after: false, condition: None, instant_speed: false }
+}
+
+impl WayDef {
+    /// It is exiled instead of going anywhere else as it leaves the stack (flashback, CR 702.34a).
+    pub const fn exile_after(self) -> WayDef {
+        WayDef { exile_after: true, ..self }
+    }
+
+    /// It may be cast this way only when the condition holds.
+    pub const fn condition(self, condition: Condition) -> WayDef {
+        WayDef { condition: Some(condition), ..self }
+    }
+
+    /// It may be cast this way whenever an instant could be (sneak, CR 702.190a).
+    pub const fn instant_speed(self) -> WayDef {
+        WayDef { instant_speed: true, ..self }
+    }
+}
+
+/// Kicker (CR 702.33a): an optional additional cost, paid once.
+pub const fn kicker(cost: ManaCost) -> Option<Kicker> {
+    Some(Kicker { cost, multi: false, waterbend: false })
+}
+
+/// Multikicker (CR 702.33c): paid any number of times.
+pub const fn multikicker(cost: ManaCost) -> Option<Kicker> {
+    Some(Kicker { cost, multi: true, waterbend: false })
+}
+
+/// "As an additional cost to cast this spell, you may waterbend {N}" (CR 701.67a-b).
+pub const fn waterbend_kicker(cost: ManaCost) -> Option<Kicker> {
+    Some(Kicker { cost, multi: false, waterbend: true })
+}
+
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
     fn cost_reads_printed_symbols() {
-        assert_eq!(cost("{2}{G}").mana, mana(2, 0, 0, 0, 0, 1));
+        assert_eq!(cost("{2}{G}").mana, ManaCost { generic: 2, symbols: [0, 0, 0, 0, 1, 0], ..ManaCost::ZERO });
         assert_eq!(cost("{0}").mana, ManaCost::ZERO);
         assert_eq!(cost("{12}").mana.generic, 12);
-        assert_eq!(cost("{X}{R}").mana, ManaCost { x: 1, ..mana(0, 0, 0, 0, 1, 0) });
-        assert_eq!(cost("{1}{G/W}{G/W}").mana, ManaCost { hybrid: [Some((Mana::G, Mana::W)), Some((Mana::G, Mana::W)), None, None, None, None], ..mana(1, 0, 0, 0, 0, 0) });
+        assert_eq!(cost("{X}{R}").mana, ManaCost { x: 1, symbols: [0, 0, 0, 1, 0, 0], ..ManaCost::ZERO });
+        assert_eq!(cost("{1}{G/W}{G/W}").mana, ManaCost { hybrid: [Some((Mana::G, Mana::W)), Some((Mana::G, Mana::W)), None, None, None, None], generic: 1, ..ManaCost::ZERO });
         assert_eq!(cost("{9}{G/P}").mana, ManaCost { generic: 9, phyrexian: [0, 0, 0, 0, 1], ..ManaCost::ZERO });
         assert_eq!(cost("{C}").mana.symbols, [0, 0, 0, 0, 0, 1]);
+        assert_eq!(mana("{2}{G}"), cost("{2}{G}").mana);
         let c = cost("{1}, {T}");
-        assert!(c.tap && c.mana == mana(1, 0, 0, 0, 0, 0));
+        assert!(c.tap && c.mana == generic(1));
     }
 
     #[test]
     fn costs_join() {
         let c = TAP.and(life(1)).and(SACRIFICE_THIS);
         assert!(c.tap && c.sacrifice_self && c.life == 1);
-        assert_eq!(cost("{1}").and(cost("{U}")).mana, mana(1, 0, 1, 0, 0, 0));
+        assert_eq!(cost("{1}").and(cost("{U}")).mana, ManaCost { generic: 1, symbols: [0, 1, 0, 0, 0, 0], ..ManaCost::ZERO });
     }
 
     #[test]

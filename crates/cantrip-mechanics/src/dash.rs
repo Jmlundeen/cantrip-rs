@@ -11,7 +11,7 @@ use cantrip_api::*;
 
 /// The alternative cost of dash: cast from the hand for `cost` (CR 118.9). It is the card's first way.
 pub const fn way(cost: ManaCost, text: &'static str) -> WayDef {
-    WayDef { text, cost: Cost::mana(cost), from: ZoneKind::Hand, exile_after: false, condition: None, instant_speed: false }
+    cantrip_api::way(Cost::mana(cost), ZoneKind::Hand, text)
 }
 
 /// Dash's delayed ability is the card's first and its way the first: the end-step rider pairs them.
@@ -22,13 +22,7 @@ fn dashed(view: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Chars
 }
 
 /// "If this permanent's dash cost was paid, it has haste", read on every pass.
-pub const HASTE: StaticDef = StaticDef {
-    text: "As long as this permanent's dash cost was paid, it has haste.",
-    layer: Layer::Ability,
-    affects: dashed,
-    apply: crate::statics::have_haste,
-    ..StaticDef::BLANK
-};
+pub const HASTE: StaticDef = static_ability(Layer::Ability, dashed, crate::statics::have_haste, "As long as this permanent's dash cost was paid, it has haste.");
 
 /// Return it to its owner's hand: the permanent the dashed spell became (CR 702.109a, 608.3g), if it is still there.
 fn return_to_hand(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {

@@ -14,9 +14,9 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[targets::NONLAND_PERMANENT], effect }),
+    spell: spell(&[targets::NONLAND_PERMANENT], effect),
     // As an additional cost to cast this spell, sacrifice a nonland permanent (CR 118.8), with either way of casting it.
     additional_cost: Some(Cost::sacrifice(1, nonland_permanent_to_sacrifice)),
-    ways: &[flashback::way(mana(2, 1, 0, 1, 0, 0), "Flashback {2}{W}{B}")],
+    ways: &[flashback::way(cost("{2}{W}{B}"), "Flashback {2}{W}{B}")],
     ..oracle::RITE_OF_OBLIVION
 };

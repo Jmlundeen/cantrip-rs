@@ -37,7 +37,7 @@ fn copy_one_of_them(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(THIS_ENTERS, effects::surveil::<2>, "When this creature enters, surveil 2."),
+        triggered(THIS_ENTERS, |g, item| effects::surveil(g, item, 2), "When this creature enters, surveil 2."),
         triggered(when(EventMask::ZONE_CHANGE, from_a_graveyard), copy_one_of_them, "Whenever one or more other creatures you control enter, if they entered or were cast from a graveyard, create a token that's a copy of one of them. This ability triggers only once each turn.")
             .triggers_each_turn(1)
             .once_per_batch(),

@@ -52,18 +52,12 @@ fn draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-static RIDDLE: ModalDef = ModalDef {
-    modes: &[
-        ModeDef { text: "Put a +1/+1 counter on Gollum.", targets: &[], effect: counter, cost: ManaCost::ZERO },
-        ModeDef { text: "Each opponent loses 2 life and you gain 2 life.", targets: &[], effect: drain, cost: ManaCost::ZERO },
-        ModeDef { text: "Draw a card.", targets: &[], effect: draw, cost: ManaCost::ZERO },
-    ],
-    min: 1,
-    max: 1,
-    escalate: None,
-    repeat: false,
-    allowed: Some(not_chosen_before),
-};
+static RIDDLE: ModalDef = modes(&[
+    mode(counter, "Put a +1/+1 counter on Gollum."),
+    mode(drain, "Each opponent loses 2 life and you gain 2 life."),
+    mode(draw, "Draw a card."),
+])
+    .allowed(not_chosen_before);
 
 pub static CARD: CardDef = CardDef {
     enters: Some(enters),

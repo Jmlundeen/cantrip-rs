@@ -13,12 +13,6 @@ fn plus_two_plus_two(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
 }
 
 pub static CARD: CardDef = CardDef {
-    statics: &[StaticDef {
-        text: "Artifact creatures you control get +2/+2.",
-        layer: Layer::PtModify,
-        affects,
-        apply: plus_two_plus_two,
-        ..StaticDef::BLANK
-    }],
+    statics: &[static_ability(Layer::PtModify, affects, plus_two_plus_two, "Artifact creatures you control get +2/+2.")],
     ..oracle::TEMPERED_STEEL
 };

@@ -9,13 +9,6 @@ use crate::library::{search_to_battlefield, Find};
 use crate::{choose, effects, mana, triggers};
 use cantrip_api::*;
 
-/// White, blue, black, red and green as the numbers the generic land templates take.
-pub const W: u8 = 0;
-pub const U: u8 = 1;
-pub const B: u8 = 2;
-pub const R: u8 = 3;
-pub const G: u8 = 4;
-
 /// A subtype as the number the generic land templates take: `sub(Subtype::Island)`.
 pub const fn sub(subtype: Subtype) -> u16 {
     subtype as u16
@@ -88,9 +81,9 @@ fn return_a_land(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// this land enters, return a land you control to its owner's hand" (CR 603.6a): chosen as the ability resolves, not
 /// targeted, and the land itself may be the one; asked whenever there is a land to choose. With `enters:
 /// Some(mana::enters_tapped)` it is Azorius Chancery, Orzhov Basilica and the rest of the cycle.
-pub const fn bounce_land<const A: u8, const B2: u8>(text: &'static str) -> [AbilityDef; 2] {
+pub const fn bounce_land(a: Mana, b: Mana, text: &'static str) -> [AbilityDef; 2] {
     [
-        mana_ability(TAP, add_each(&[Mana::ALL[A as usize], Mana::ALL[B2 as usize]]), text),
+        mana_ability(TAP, add_each(&[a, b]), text),
         triggered(triggers::THIS_ENTERS, return_a_land, "When this land enters, return a land you control to its owner's hand."),
     ]
 }
@@ -128,11 +121,11 @@ pub const fn fetch_basic_land(text: &'static str) -> AbilityDef {
 
 /// The triomes' "Cycling {3}" (CR 702.29): with `enters: Some(mana::enters_tapped)` and its three basic land types, a
 /// triome. Raffine's Tower and Savai Triome print it.
-pub const TRIOME_CYCLING: AbilityDef = triggers::cycling(mana(3, 0, 0, 0, 0, 0), "Cycling {3} ({3}, Discard this card: Draw a card.)");
+pub const TRIOME_CYCLING: AbilityDef = triggers::cycling(mana("{3}"), "Cycling {3} ({3}, Discard this card: Draw a card.)");
 
 /// The surveil lands' "When this land enters, surveil 1" (CR 701.25): with `enters: Some(mana::enters_tapped)`, Meticulous
 /// Archive and Undercity Sewers.
-pub const SURVEIL_LAND: AbilityDef = triggered(triggers::THIS_ENTERS, effects::surveil::<1>, "When this land enters, surveil 1.");
+pub const SURVEIL_LAND: AbilityDef = triggered(triggers::THIS_ENTERS, |g, item| effects::surveil(g, item, 1), "When this land enters, surveil 1.");
 
 /// A horizon land's mana ability: "{T}, Pay 1 life: Add {A} or {B}." (`text` is its full text), the color named as it is
 /// activated (CR 106.5). Horizon Canopy and Fiery Islet print it.
@@ -143,7 +136,7 @@ pub const fn pay_life_for_either(a: Color, b: Color, text: &'static str) -> Abil
 /// A horizon land's other ability: "{1}, {T}, Sacrifice this land: Draw a card." (`text` is its full text, with the land's
 /// name). Horizon Canopy and Fiery Islet print it.
 pub const fn sacrifice_to_draw(text: &'static str) -> AbilityDef {
-    ability(cost("{1}, {T}").and(SACRIFICE_THIS), effects::draw::<1>, text)
+    ability(cost("{1}, {T}").and(SACRIFICE_THIS), |g, item| effects::draw(g, item, 1), text)
 }
 
 fn controls_either<const A: u16, const B2: u16>(q: &dyn Query, asker: &Asker) -> bool {
@@ -152,12 +145,14 @@ fn controls_either<const A: u16, const B2: u16>(q: &dyn Query, asker: &Asker) ->
 
 /// A verge's two mana abilities (CR 602.5b): "{T}: Add {PRIMARY}." and "{T}: Add {SECOND}. Activate only if you control a
 /// [type A] or a [type B]", read through the layers, the types as the verge's text names them (CR 612.2). Blazemire Verge and Thornspire Verge print it.
-pub const fn verge<const PRIMARY: u8, const SECOND: u8, const A: u16, const B2: u16>(
+pub const fn verge<const A: u16, const B2: u16>(
+    primary: Mana,
+    second: Mana,
     primary_text: &'static str,
     second_text: &'static str,
 ) -> [AbilityDef; 2] {
     [
-        mana_ability(TAP, add(Mana::ALL[PRIMARY as usize]), primary_text),
-        mana_ability(TAP, add(Mana::ALL[SECOND as usize]), second_text).condition(controls_either::<A, B2>),
+        mana_ability(TAP, add(primary), primary_text),
+        mana_ability(TAP, add(second), second_text).condition(controls_either::<A, B2>),
     ]
 }

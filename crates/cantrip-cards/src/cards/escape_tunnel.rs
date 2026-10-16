@@ -30,7 +30,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         ability(TAP.and(SACRIFICE_THIS), search, "{T}, Sacrifice this land: Search your library for a basic land card, put it onto the battlefield tapped, then shuffle."),
         ability(TAP.and(SACRIFICE_THIS), cant_be_blocked, "{T}, Sacrifice this land: Target creature with power 2 or less can't be blocked this turn.")
-            .targets(&[TargetSpec { min: 1, max: 1, filter: power_two_or_less, label: "" }]),
+            .targets(&[target(power_two_or_less)]),
     ],
     ..oracle::ESCAPE_TUNNEL
 };

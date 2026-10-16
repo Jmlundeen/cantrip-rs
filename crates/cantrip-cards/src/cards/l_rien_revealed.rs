@@ -8,7 +8,7 @@ fn draw_three(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[], effect: draw_three }),
-    abilities: &[typecycling::ability(Subtype::Island, mana(1, 0, 0, 0, 0, 0), "Islandcycling {1} ({1}, Discard this card: Search your library for an Island card, reveal it, put it into your hand, then shuffle.)")],
+    spell: spell(&[], draw_three),
+    abilities: &[typecycling::ability(Subtype::Island, mana("{1}"), "Islandcycling {1} ({1}, Discard this card: Search your library for an Island card, reveal it, put it into your hand, then shuffle.)")],
     ..oracle::L_RIEN_REVEALED
 };

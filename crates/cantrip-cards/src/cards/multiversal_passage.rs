@@ -36,6 +36,6 @@ fn apply(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
 pub static CARD: CardDef = CardDef {
     enters: Some(enters),
     labels: &["Plains", "Island", "Swamp", "Mountain", "Forest"],
-    statics: &[StaticDef { text: "This land is the chosen type.", layer: Layer::Type, affects, apply, ..StaticDef::BLANK }],
+    statics: &[static_ability(Layer::Type, affects, apply, "This land is the chosen type.")],
     ..oracle::MULTIVERSAL_PASSAGE
 };

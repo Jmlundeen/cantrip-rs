@@ -23,7 +23,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(when(EventMask::DISCARDED, you_discard), that_many_counters, "Whenever you discard one or more cards, put that many +1/+1 counters on this creature.")
             .once_per_batch(),
-        cycling(mana(2, 0, 0, 0, 0, 0), "Cycling {2} ({2}, Discard this card: Draw a card.)"),
+        cycling(mana("{2}"), "Cycling {2} ({2}, Discard this card: Draw a card.)"),
     ],
     ..oracle::MARAUDING_MAKO
 };

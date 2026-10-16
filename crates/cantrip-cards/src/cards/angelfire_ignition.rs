@@ -24,7 +24,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[targets::CREATURE], effect }),
-    ways: &[flashback::way(mana(2, 1, 0, 0, 1, 0), "Flashback {2}{R}{W}")],
+    spell: spell(&[targets::CREATURE], effect),
+    ways: &[flashback::way(cost("{2}{W}{R}"), "Flashback {2}{R}{W}")],
     ..oracle::ANGELFIRE_IGNITION
 };

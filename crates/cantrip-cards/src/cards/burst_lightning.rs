@@ -9,7 +9,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    kicker: Some(Kicker { cost: mana(4, 0, 0, 0, 0, 0), multi: false, waterbend: false }),
-    spell: Some(SpellDef { targets: &[targets::ANY], effect }),
+    kicker: kicker(mana("{4}")),
+    spell: spell(&[targets::ANY], effect),
     ..oracle::BURST_LIGHTNING
 };

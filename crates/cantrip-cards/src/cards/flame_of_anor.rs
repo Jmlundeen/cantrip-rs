@@ -31,27 +31,14 @@ fn two_with_a_wizard(q: &dyn Query, asker: &Asker) -> u8 {
     if q.permanents_of(asker.controller).into_iter().any(|id| q.chars(id).has_subtype(wizard)) { 2 } else { 1 }
 }
 
-static MODAL: ModalDef = ModalDef {
-    modes: &[
-        ModeDef { text: "Target player draws two cards.", targets: &[targets::PLAYER], effect: draw_two, cost: ManaCost::ZERO },
-        ModeDef {
-            text: "Destroy target artifact.",
-            targets: &[targets::ARTIFACT],
-            effect: destroy_artifact,
-            cost: ManaCost::ZERO,
-        },
-        ModeDef {
-            text: "Flame of Anor deals 5 damage to target creature.",
-            targets: &[targets::CREATURE],
-            effect: damage,
-            cost: ManaCost::ZERO,
-        },
-    ],
-    min: 1,
-    max: 1,
-    escalate: None,
-    repeat: false, allowed: None,
-};
+static MODAL: ModalDef = modes(&[
+    mode(draw_two, "Target player draws two cards.")
+        .targets(&[targets::PLAYER]),
+    mode(destroy_artifact, "Destroy target artifact.")
+        .targets(&[targets::ARTIFACT]),
+    mode(damage, "Flame of Anor deals 5 damage to target creature.")
+        .targets(&[targets::CREATURE]),
+]);
 
 pub static CARD: CardDef =
     CardDef { spell: Some(SpellDef::MODAL), modal: Some(&MODAL), modes_up_to: Some(two_with_a_wizard), ..oracle::FLAME_OF_ANOR };

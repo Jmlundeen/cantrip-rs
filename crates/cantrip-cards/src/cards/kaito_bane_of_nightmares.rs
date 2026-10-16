@@ -79,13 +79,7 @@ fn plus_one_plus_one(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
 pub static EMBLEM: CardDef = CardDef {
     name: "Kaito, Bane of Nightmares emblem",
     has_cost: false,
-    statics: &[StaticDef {
-        text: "Ninjas you control get +1/+1.",
-        layer: Layer::PtModify,
-        affects: ninjas_you_control,
-        apply: plus_one_plus_one,
-        ..StaticDef::BLANK
-    }],
+    statics: &[static_ability(Layer::PtModify, ninjas_you_control, plus_one_plus_one, "Ninjas you control get +1/+1.")],
     text: "Ninjas you control get +1/+1.",
     ..CardDef::BLANK
 };
@@ -93,7 +87,7 @@ pub static EMBLEM: CardDef = CardDef {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         ninjutsu(
-            mana(1, 0, 1, 1, 0, 0),
+            mana("{1}{U}{B}"),
             "Ninjutsu {1}{U}{B} ({1}{U}{B}, Return an unblocked attacker you control to hand: Put this card onto the battlefield from your hand tapped and attacking.)",
         ),
         ability(loyalty(1), emblem, "+1: You get an emblem with \"Ninjas you control get +1/+1.\""),
@@ -102,9 +96,9 @@ pub static CARD: CardDef = CardDef {
             .targets(&[targets::CREATURE]),
     ],
     statics: &[
-        StaticDef { text: "During your turn, as long as Kaito has one or more loyalty counters on him, he's a Ninja creature.", layer: Layer::Type, affects, apply: become_a_ninja_creature, ..StaticDef::BLANK },
-        StaticDef { text: "During your turn, as long as Kaito has one or more loyalty counters on him, he has hexproof.", layer: Layer::Ability, affects, apply: hexproof, ..StaticDef::BLANK },
-        StaticDef { text: "During your turn, as long as Kaito has one or more loyalty counters on him, he's a 3/4.", layer: Layer::PtSet, affects, apply: three_four, ..StaticDef::BLANK },
+        static_ability(Layer::Type, affects, become_a_ninja_creature, "During your turn, as long as Kaito has one or more loyalty counters on him, he's a Ninja creature."),
+        static_ability(Layer::Ability, affects, hexproof, "During your turn, as long as Kaito has one or more loyalty counters on him, he has hexproof."),
+        static_ability(Layer::PtSet, affects, three_four, "During your turn, as long as Kaito has one or more loyalty counters on him, he's a 3/4."),
     ],
     ..oracle::KAITO_BANE_OF_NIGHTMARES
 };

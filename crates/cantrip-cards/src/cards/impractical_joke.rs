@@ -13,6 +13,6 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[TargetSpec { min: 0, max: 1, ..cantrip_mechanics::targets::CREATURE_OR_PLANESWALKER }], effect }),
+    spell: spell(&[cantrip_mechanics::targets::CREATURE_OR_PLANESWALKER.between(0, 1)], effect),
     ..oracle::IMPRACTICAL_JOKE
 };

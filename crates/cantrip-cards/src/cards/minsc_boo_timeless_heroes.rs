@@ -89,7 +89,7 @@ pub static CARD: CardDef = CardDef {
         triggered(triggers::THIS_ENTERS, create_boo, "When Minsc & Boo enters and at the beginning of your upkeep, you may create Boo, a legendary 1/1 red Hamster creature token with trample and haste."),
         triggered(triggers::YOUR_UPKEEP, create_boo, "When Minsc & Boo enters and at the beginning of your upkeep, you may create Boo, a legendary 1/1 red Hamster creature token with trample and haste."),
         ability(loyalty(1), plus_one, "+1: Put three +1/+1 counters on up to one target creature with trample or haste.")
-            .targets(&[TargetSpec { min: 0, max: 1, filter: trampler_or_hasty, label: "" }]),
+            .targets(&[up_to_one(trampler_or_hasty)]),
         ability(loyalty(-2), minus_two, "\u{2212}2: Sacrifice a creature. When you do, Minsc & Boo deals X damage to any target, where X is that creature's power. If the sacrificed creature was a Hamster, draw X cards."),
     ],
     delayed: &[delayed_trigger(damage_and_draw, "When you do, Minsc & Boo deals X damage to any target, where X is that creature's power. If the sacrificed creature was a Hamster, draw X cards.")

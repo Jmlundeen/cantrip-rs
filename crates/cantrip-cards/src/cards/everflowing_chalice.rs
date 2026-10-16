@@ -12,7 +12,7 @@ fn add_per_charge_counter(g: &mut dyn Game, asker: &Asker, _: Option<Color>) -> 
 }
 
 pub static CARD: CardDef = CardDef {
-    kicker: Some(Kicker { cost: mana(2, 0, 0, 0, 0, 0), multi: true, waterbend: false }),
+    kicker: multikicker(mana("{2}")),
     enters: Some(kicker::enters_with_counters::<{ CounterKind::Charge as usize }>),
     abilities: &[mana_ability(TAP, add_by(add_per_charge_counter), "{T}: Add {C} for each charge counter on this artifact.")],
     ..oracle::EVERFLOWING_CHALICE

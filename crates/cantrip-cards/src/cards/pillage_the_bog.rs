@@ -14,9 +14,9 @@ fn look(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[], effect: look }),
+    spell: spell(&[], look),
     abilities: &[plot(
-        mana(1, 0, 0, 1, 0, 1),
+        mana("{1}{B}{G}"),
         "Plot {1}{B}{G} (You may pay {1}{B}{G} and exile this card from your hand. Cast it as a sorcery on a later turn without paying its mana cost. Plot only as a sorcery.)",
     )],
     ..oracle::PILLAGE_THE_BOG

@@ -19,10 +19,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[
-            targets::SPELL_OR_PERMANENT.labelled("Return target spell or permanent to its owner's hand"),
-            targets::ANY.labelled("Deal 4 damage to any target"),
-        ], effect }),
+    spell: spell(&[ targets::SPELL_OR_PERMANENT.labelled("Return target spell or permanent to its owner's hand"), targets::ANY.labelled("Deal 4 damage to any target"), ], effect),
     ..oracle::JESKAI_REVELATION
 };
 

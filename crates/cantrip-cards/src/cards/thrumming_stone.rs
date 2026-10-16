@@ -26,13 +26,7 @@ fn grant_ripple(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
 
 pub static CARD: CardDef = CardDef {
     delayed: &[ripple::trigger::<4>("Ripple 4 (When you cast this spell, you may reveal the top four cards of your library. You may cast spells with the same name as this spell from among the revealed cards without paying their mana costs. Put the rest on the bottom of your library.)")],
-    statics: &[StaticDef {
-        text: "Spells you cast have ripple 4.",
-        layer: Layer::Ability,
-        affects: spell_you_cast,
-        apply: grant_ripple,
-        everywhere: true,
-        ..StaticDef::BLANK
-    }],
+    statics: &[static_ability(Layer::Ability, spell_you_cast, grant_ripple, "Spells you cast have ripple 4.")
+        .everywhere()],
     ..oracle::THRUMMING_STONE
 };

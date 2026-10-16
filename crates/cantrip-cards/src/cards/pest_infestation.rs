@@ -15,9 +15,6 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef {
-        targets: &[TargetSpec { min: 0, max: TargetSpec::COUNTED, filter: targets::ARTIFACT_OR_ENCHANTMENT.filter, label: "" }],
-        effect,
-    }),
+    spell: spell(&[targets::ARTIFACT_OR_ENCHANTMENT.between(0, TargetSpec::COUNTED)], effect),
     ..oracle::PEST_INFESTATION
 };

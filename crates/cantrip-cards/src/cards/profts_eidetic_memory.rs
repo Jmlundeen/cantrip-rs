@@ -22,7 +22,7 @@ fn grow(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(triggers::THIS_ENTERS, effects::draw::<1>, "When Proft's Eidetic Memory enters, draw a card."),
+        triggered(triggers::THIS_ENTERS, |g, item| effects::draw(g, item, 1), "When Proft's Eidetic Memory enters, draw a card."),
         triggered(triggers::BEGINNING_OF_YOUR_COMBAT, grow, "At the beginning of combat on your turn, if you've drawn more than one card this turn, put X +1/+1 counters on target creature you control, where X is the number of cards you've drawn this turn minus one.")
             .targets(&[targets::CREATURE_YOU_CONTROL])
             .condition(drawn_more_than_one),

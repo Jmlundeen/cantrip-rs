@@ -38,7 +38,7 @@ fn creature_deals_combat_damage_to_player(q: &dyn Query, source: ObjectId, event
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[], effect }),
+    spell: spell(&[], effect),
     delayed: &[triggered(when(EventMask::DAMAGE, creature_deals_combat_damage_to_player), cantrip_mechanics::effects::become_monarch, "Whenever one or more creatures you control deal combat damage to one or more players this turn, you become the monarch.")
         .once_per_batch()],
     ..oracle::FORTH_EORLINGAS

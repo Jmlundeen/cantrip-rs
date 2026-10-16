@@ -22,20 +22,8 @@ fn plus_one_plus_one(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
 pub static CARD: CardDef = CardDef {
     enchant: Some(targets::CREATURE_YOU_CONTROL),
     statics: &[
-        StaticDef {
-            text: "As long as this Aura entered this turn, enchanted creature has hexproof.",
-            layer: Layer::Ability,
-            affects: enchanted_and_entered_this_turn,
-            apply: hexproof,
-            ..StaticDef::BLANK
-        },
-        StaticDef {
-            text: "Enchanted creature gets +1/+1.",
-            layer: Layer::PtModify,
-            affects: attached_object,
-            apply: plus_one_plus_one,
-            ..StaticDef::BLANK
-        },
+        static_ability(Layer::Ability, enchanted_and_entered_this_turn, hexproof, "As long as this Aura entered this turn, enchanted creature has hexproof."),
+        static_ability(Layer::PtModify, attached_object, plus_one_plus_one, "Enchanted creature gets +1/+1."),
     ],
     ..oracle::SHARDMAGES_RESCUE
 };

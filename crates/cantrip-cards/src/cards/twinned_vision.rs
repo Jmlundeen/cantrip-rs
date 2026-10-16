@@ -10,18 +10,9 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-const HYBRID: Option<(Mana, Mana)> = Some((Mana::U, Mana::R));
-
 /// "Flashback—{1}{U/R}{U/R}, Discard a card." (CR 702.34a): the discard is an additional cost of this way (CR 118.8).
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[], effect }),
-    ways: &[WayDef {
-        cost: Cost {
-            mana: ManaCost { hybrid: [HYBRID, HYBRID, None, None, None, None], ..mana(1, 0, 0, 0, 0, 0) },
-            discard: Some((1, targets::filters::any)),
-            ..Cost::NONE
-        },
-        ..flashback::way(mana(0, 0, 0, 0, 0, 0), "Flashback\u{2014}{1}{U/R}{U/R}, Discard a card")
-    }],
+    spell: spell(&[], effect),
+    ways: &[flashback::way(cost("{1}{U/R}{U/R}").and(discard(1, targets::filters::any)), "Flashback\u{2014}{1}{U/R}{U/R}, Discard a card")],
     ..oracle::TWINNED_VISION
 };

@@ -16,11 +16,11 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
             c.is(CardType::Creature) && c.has(Keyword::Flying)
         });
     let price = if flyer { 4 } else { 1 };
-    cantrip_mechanics::counter_unless_pays(g, item, 0, mana(price, 0, 0, 0, 0, 0))?;
+    cantrip_mechanics::counter_unless_pays(g, item, 0, generic(price))?;
     Ok(())
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[targets::SPELL], effect }),
+    spell: spell(&[targets::SPELL], effect),
     ..oracle::LOFTY_DENIAL
 };

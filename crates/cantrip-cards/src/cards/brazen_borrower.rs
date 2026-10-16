@@ -11,10 +11,7 @@ fn return_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 /// The Adventure (CR 715): Return target nonland permanent an opponent controls to its owner's hand.
 pub static PETTY_THEFT: CardDef = CardDef {
-    spell: Some(SpellDef {
-        targets: &[targets::NONLAND_PERMANENT_AN_OPPONENT_CONTROLS],
-        effect: return_it,
-    }),
+    spell: spell(&[targets::NONLAND_PERMANENT_AN_OPPONENT_CONTROLS], return_it),
     ..oracle::PETTY_THEFT
 };
 

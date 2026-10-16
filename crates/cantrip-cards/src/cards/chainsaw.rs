@@ -42,17 +42,11 @@ fn plus_x_power(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ENTERS, three_damage, "When this Equipment enters, it deals 3 damage to up to one target creature.")
-            .targets(&[TargetSpec { min: 0, max: 1, ..targets::CREATURE }]),
+            .targets(&[targets::CREATURE.between(0, 1)]),
         triggered(when(EventMask::ZONE_CHANGE, creature_dies), rev_counter, "Whenever one or more creatures die, put a rev counter on this Equipment.")
             .once_per_batch(),
-        equip(mana(3, 0, 0, 0, 0, 0), "Equip {3}"),
+        equip(mana("{3}"), "Equip {3}"),
     ],
-    statics: &[StaticDef {
-        text: "Equipped creature gets +X/+0, where X is the number of rev counters on this Equipment.",
-        layer: Layer::PtModify,
-        affects: attached_object,
-        apply: plus_x_power,
-        ..StaticDef::BLANK
-    }],
+    statics: &[static_ability(Layer::PtModify, attached_object, plus_x_power, "Equipped creature gets +X/+0, where X is the number of rev counters on this Equipment.")],
     ..oracle::CHAINSAW
 };

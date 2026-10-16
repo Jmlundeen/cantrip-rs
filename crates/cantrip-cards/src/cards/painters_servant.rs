@@ -33,14 +33,7 @@ fn apply(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
 
 pub static CARD: CardDef = CardDef {
     enters: Some(enters),
-    statics: &[StaticDef {
-        text: "All cards that aren't on the battlefield, spells, and permanents are the chosen color in addition to their other colors.",
-        layer: Layer::Color,
-        affects,
-        apply,
-        everywhere: true,
-        own: false,
-        from: ZoneKind::Battlefield,
-    }],
+    statics: &[static_ability(Layer::Color, affects, apply, "All cards that aren't on the battlefield, spells, and permanents are the chosen color in addition to their other colors.")
+        .everywhere()],
     ..oracle::PAINTERS_SERVANT
 };

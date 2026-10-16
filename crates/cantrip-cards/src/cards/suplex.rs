@@ -19,26 +19,12 @@ fn exile_artifact(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-static MODAL: ModalDef = ModalDef {
-    modes: &[
-        ModeDef {
-            text: "Suplex deals 3 damage to target creature. If that creature would die this turn, exile it instead.",
-            targets: &[targets::CREATURE],
-            effect: damage_creature,
-            cost: ManaCost::ZERO,
-        },
-        ModeDef {
-            text: "Exile target artifact.",
-            targets: &[targets::ARTIFACT],
-            effect: exile_artifact,
-            cost: ManaCost::ZERO,
-        },
-    ],
-    min: 1,
-    max: 1,
-    escalate: None,
-    repeat: false, allowed: None,
-};
+static MODAL: ModalDef = modes(&[
+    mode(damage_creature, "Suplex deals 3 damage to target creature. If that creature would die this turn, exile it instead.")
+        .targets(&[targets::CREATURE]),
+    mode(exile_artifact, "Exile target artifact.")
+        .targets(&[targets::ARTIFACT]),
+]);
 
 pub static CARD: CardDef = CardDef {
     spell: Some(SpellDef::MODAL),

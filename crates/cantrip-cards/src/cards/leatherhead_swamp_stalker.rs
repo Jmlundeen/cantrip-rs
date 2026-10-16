@@ -76,6 +76,6 @@ pub static CARD: CardDef = CardDef {
     enters: Some(enters),
     abilities: &[triggered(DEALS_COMBAT_DAMAGE_TO_PLAYER, remove_counter, "Whenever Leatherhead deals combat damage to a player, you may remove a counter from her. When you do, destroy target artifact or enchantment that player controls.")],
     delayed: &[delayed_trigger(destroy, "When you do, destroy target artifact or enchantment that player controls.")
-        .targets(&[TargetSpec { min: 1, max: 1, filter: artifact_or_enchantment_of_the_attacked_player, label: "" }])],
+        .targets(&[target(artifact_or_enchantment_of_the_attacked_player)])],
     ..oracle::LEATHERHEAD_SWAMP_STALKER
 };

@@ -23,12 +23,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[], effect }),
-    granted_replacements: &[GrantedReplacementDef {
-        hint: "exile that card instead of putting it into your graveyard",
-        kind: ReplacementKind::ZoneChange,
-        applies: exile_instead_applies,
-        apply: exile_instead_apply,
-    }],
+    spell: spell(&[], effect),
+    granted_replacements: &[granted_replacement(ReplacementKind::ZoneChange, exile_instead_applies, exile_instead_apply, "exile that card instead of putting it into your graveyard")],
     ..oracle::YAWGMOTHS_WILL
 };

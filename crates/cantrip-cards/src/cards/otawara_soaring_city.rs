@@ -23,7 +23,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         mana_ability(TAP, add(Mana::U), "{T}: Add {U}."),
         ability(cost("{3}{U}").and(DISCARD_THIS), bounce, "Channel \u{2014} {3}{U}, Discard this card: Return target artifact, creature, enchantment, or planeswalker to its owner's hand. This ability costs {1} less to activate for each legendary creature you control.")
-            .targets(&[TargetSpec { min: 1, max: 1, filter: bounceable, label: "" }])
+            .targets(&[target(bounceable)])
             .from(ZoneKind::Hand),
     ],
     own_cost_changes: &[channel::cheaper_per_legendary_creature],

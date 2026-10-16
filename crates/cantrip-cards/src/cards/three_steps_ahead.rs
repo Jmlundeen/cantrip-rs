@@ -33,14 +33,14 @@ fn loot(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 const MODES: &[ModeDef] = &[
-    ModeDef { text: "+ {1}{U} — Counter target spell.", targets: &[targets::SPELL], effect: counter_spell, cost: mana(1, 0, 1, 0, 0, 0) },
-    ModeDef {
-        text: "+ {3} — Create a token that's a copy of target artifact or creature you control.",
-        targets: &[TargetSpec { min: 1, max: 1, filter: artifact_or_creature_you_control, label: "" }],
-        effect: copy_token,
-        cost: mana(3, 0, 0, 0, 0, 0),
-    },
-    ModeDef { text: "+ {2} — Draw two cards, then discard a card.", targets: &[], effect: loot, cost: mana(2, 0, 0, 0, 0, 0) },
+    mode(counter_spell, "+ {1}{U} — Counter target spell.")
+        .targets(&[targets::SPELL])
+        .cost(mana("{1}{U}")),
+    mode(copy_token, "+ {3} — Create a token that's a copy of target artifact or creature you control.")
+        .targets(&[target(artifact_or_creature_you_control)])
+        .cost(mana("{3}")),
+    mode(loot, "+ {2} — Draw two cards, then discard a card.")
+        .cost(mana("{2}")),
 ];
 
 static MODAL: ModalDef = spree::modal(MODES);

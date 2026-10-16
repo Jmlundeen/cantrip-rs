@@ -18,6 +18,6 @@ fn converge(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[targets::PLAYER, targets::ANY], effect: converge }),
+    spell: spell(&[targets::PLAYER, targets::ANY], converge),
     ..oracle::TOGETHER_AS_ONE
 };

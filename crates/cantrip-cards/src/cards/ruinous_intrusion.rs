@@ -24,9 +24,6 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef {
-        targets: &[targets::ARTIFACT_OR_ENCHANTMENT, targets::CREATURE_YOU_CONTROL],
-        effect,
-    }),
+    spell: spell(&[targets::ARTIFACT_OR_ENCHANTMENT, targets::CREATURE_YOU_CONTROL], effect),
     ..oracle::RUINOUS_INTRUSION
 };

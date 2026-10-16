@@ -18,11 +18,11 @@ fn stun(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(THIS_ENTERS, effects::draw::<1>, "When Cryogen Relic enters, draw a card."),
-        triggered(cantrip_mechanics::triggers::THIS_LEAVES, effects::draw::<1>, "When Cryogen Relic leaves the battlefield, draw a card.")
+        triggered(THIS_ENTERS, |g, item| effects::draw(g, item, 1), "When Cryogen Relic enters, draw a card."),
+        triggered(cantrip_mechanics::triggers::THIS_LEAVES, |g, item| effects::draw(g, item, 1), "When Cryogen Relic leaves the battlefield, draw a card.")
             .look_back(),
         ability(cost("{1}{U}").and(SACRIFICE_THIS), stun, "{1}{U}, Sacrifice Cryogen Relic: Put a stun counter on up to one target tapped creature.")
-            .targets(&[TargetSpec { min: 0, max: 1, filter: tapped_creature, label: "" }]),
+            .targets(&[up_to_one(tapped_creature)]),
     ],
     ..oracle::CRYOGEN_RELIC
 };

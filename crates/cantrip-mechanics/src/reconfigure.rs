@@ -14,11 +14,13 @@ fn other_creature_you_control(q: &dyn Query, asker: &Asker, t: Target) -> bool {
         if id != asker.source && q.is_on_battlefield(id) && q.controller(id) == asker.controller && q.chars(id).is(CardType::Creature))
 }
 
+const OTHER_CREATURE_YOU_CONTROL: TargetSpec = target(other_creature_you_control);
+
 /// "Attach this permanent to another target creature you control": the permanent itself is a creature until attached.
 pub const fn attach(cost: ManaCost, text: &'static str) -> AbilityDef {
     ability(Cost::mana(cost), attach_to_target, text)
         .sorcery_speed()
-        .targets(&[TargetSpec { min: 1, max: 1, filter: other_creature_you_control, label: "" }])
+        .targets(&[OTHER_CREATURE_YOU_CONTROL])
 }
 
 fn unattach_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -42,10 +44,4 @@ fn attached(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Chars)
     source == affected && q.state().obj(source).attached_to.is_some()
 }
 
-pub const NOT_A_CREATURE_WHILE_ATTACHED: StaticDef = StaticDef {
-    text: "As long as this Equipment is attached to a creature, it isn't a creature.",
-    layer: Layer::Type,
-    affects: attached,
-    apply: not_a_creature,
-    ..StaticDef::BLANK
-};
+pub const NOT_A_CREATURE_WHILE_ATTACHED: StaticDef = static_ability(Layer::Type, attached, not_a_creature, "As long as this Equipment is attached to a creature, it isn't a creature.");

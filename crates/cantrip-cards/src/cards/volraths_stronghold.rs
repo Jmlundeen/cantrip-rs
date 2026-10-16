@@ -19,7 +19,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         mana_ability(TAP, add(Mana::C), "{T}: Add {C}."),
         ability(cost("{1}{B}, {T}"), put_on_top, "{1}{B}, {T}: Put target creature card from your graveyard on top of your library.")
-            .targets(&[TargetSpec { min: 1, max: 1, filter: creature_card_in_your_graveyard, label: "" }]),
+            .targets(&[target(creature_card_in_your_graveyard)]),
     ],
     ..oracle::VOLRATHS_STRONGHOLD
 };

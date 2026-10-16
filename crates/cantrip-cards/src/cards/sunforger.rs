@@ -35,14 +35,8 @@ fn search_and_cast(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         ability(cost("{W}{R}").and(UNATTACH_THIS), search_and_cast, "{R}{W}, Unattach this Equipment: Search your library for a red or white instant card with mana value 4 or less and cast that card without paying its mana cost. Then shuffle."),
-        equip(mana(3, 0, 0, 0, 0, 0), "Equip {3}"),
+        equip(mana("{3}"), "Equip {3}"),
     ],
-    statics: &[StaticDef {
-        text: "Equipped creature gets +4/+0.",
-        layer: Layer::PtModify,
-        affects: attached_object,
-        apply: plus_four_power,
-        ..StaticDef::BLANK
-    }],
+    statics: &[static_ability(Layer::PtModify, attached_object, plus_four_power, "Equipped creature gets +4/+0.")],
     ..oracle::SUNFORGER
 };

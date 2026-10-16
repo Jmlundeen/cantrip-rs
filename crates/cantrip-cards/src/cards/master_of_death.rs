@@ -24,7 +24,7 @@ fn pay_to_return(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(THIS_ENTERS, effects::surveil::<2>, "When this creature enters, surveil 2."),
+        triggered(THIS_ENTERS, |g, item| effects::surveil(g, item, 2), "When this creature enters, surveil 2."),
         triggered(cantrip_mechanics::triggers::YOUR_UPKEEP, pay_to_return, "At the beginning of your upkeep, if this card is in your graveyard, you may pay 1 life. If you do, return it to your hand.")
             .condition(in_graveyard)
             .anywhere(),

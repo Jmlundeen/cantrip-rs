@@ -43,7 +43,7 @@ fn controlled_by_the_slots_opponent(q: &dyn Query, asker: &Asker, t: Target) -> 
     targets::permanent(q, id) && filters::artifact_or_creature(q, asker, id) && Some(q.controller(id)) == q.slot_opponent()
 }
 
-const FOR_EACH_OPPONENT: TargetSpec = TargetSpec { min: 0, max: TargetSpec::EACH_OPPONENT, filter: controlled_by_the_slots_opponent, label: "Return up to one target artifact or creature {player} controls to its owner's hand" };
+const FOR_EACH_OPPONENT: TargetSpec = target(controlled_by_the_slots_opponent).between(0, TargetSpec::EACH_OPPONENT).labelled("Return up to one target artifact or creature {player} controls to its owner's hand");
 
 /// "\u{2212}2: For each opponent, return up to one target artifact or creature that player controls to its owner's
 /// hand." The targets still legal are returned together (CR 608.2b).

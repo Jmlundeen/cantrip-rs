@@ -14,19 +14,9 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef {
-        targets: &[TargetSpec { min: 1, max: TargetSpec::COUNTED, filter: targets::CREATURE.filter, label: "" }],
-        effect,
-    }),
+    spell: spell(&[targets::CREATURE.between(1, TargetSpec::COUNTED)], effect),
     divide: Some(Divide { total: 4, of_x: None }),
     // You may exile a red card from your hand rather than pay this spell's mana cost (CR 118.9).
-    ways: &[WayDef {
-        text: "Exile a red card from your hand",
-        cost: Cost { exile_from_hand: Some((1, red_card)), ..Cost::NONE },
-        from: ZoneKind::Hand,
-        exile_after: false,
-        condition: None,
-        instant_speed: false,
-    }],
+    ways: &[way(Cost { exile_from_hand: Some((1, red_card)), ..Cost::NONE }, ZoneKind::Hand, "Exile a red card from your hand")],
     ..oracle::PYROKINESIS
 };

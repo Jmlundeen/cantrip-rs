@@ -25,9 +25,9 @@ fn take_and_attach(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    kicker: Some(Kicker { cost: ManaCost { x: 1, ..ManaCost::ZERO }, multi: false, waterbend: false }),
+    kicker: kicker(mana("{X}")),
     abilities: &[triggered(THIS_ENTERS, take_and_attach, "When this creature enters, if it was kicked, gain control of target artifact with mana value X or less. If that artifact is an Equipment, attach it to this creature.")
-        .targets(&[TargetSpec { min: 1, max: 1, filter: artifact_with_value_at_most_x, label: "" }])
+        .targets(&[target(artifact_with_value_at_most_x)])
         .condition(was_kicked)],
     ..oracle::THIEVING_SKYDIVER
 };

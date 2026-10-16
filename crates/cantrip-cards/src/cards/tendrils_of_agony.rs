@@ -14,7 +14,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[targets::PLAYER], effect }),
+    spell: spell(&[targets::PLAYER], effect),
     abilities: &[storm::trigger("Storm (When you cast this spell, copy it for each spell cast before it this turn. You may choose new targets for the copies.)")],
     ..oracle::TENDRILS_OF_AGONY
 };

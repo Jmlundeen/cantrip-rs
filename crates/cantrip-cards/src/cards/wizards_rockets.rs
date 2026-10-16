@@ -23,7 +23,7 @@ fn add_x_mana(g: &mut dyn Game, asker: &Asker, _: Option<Color>) -> Result<(), S
 pub static CARD: CardDef = CardDef {
     abilities: &[
         mana_ability(cost("{X}, {T}").and(SACRIFICE_THIS), add_by(add_x_mana), "{X}, {T}, Sacrifice this artifact: Add X mana in any combination of colors."),
-        triggered(THIS_DIES, effects::draw::<1>, "When this artifact is put into a graveyard from the battlefield, draw a card.")
+        triggered(THIS_DIES, |g, item| effects::draw(g, item, 1), "When this artifact is put into a graveyard from the battlefield, draw a card.")
             .look_back(),
     ],
     enters: Some(cantrip_mechanics::mana::enters_tapped),

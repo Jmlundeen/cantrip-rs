@@ -32,17 +32,11 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         ability(cost("{W}"), exile_from_graveyard, "{W}: Exile target card from a graveyard. If it was a permanent card, put a +1/+1 counter on this permanent.")
             .targets(&[targets::CARD_IN_A_GRAVEYARD]),
-        reconfigure::attach(mana(2, 0, 0, 0, 0, 0), "Reconfigure {2} ({2}: Attach this permanent to another target creature you control. Reconfigure only as a sorcery.)"),
-        reconfigure::unattach(mana(2, 0, 0, 0, 0, 0), "Reconfigure {2} ({2}: Unattach this permanent. Reconfigure only if it is attached to a creature and only as a sorcery.)"),
+        reconfigure::attach(mana("{2}"), "Reconfigure {2} ({2}: Attach this permanent to another target creature you control. Reconfigure only as a sorcery.)"),
+        reconfigure::unattach(mana("{2}"), "Reconfigure {2} ({2}: Unattach this permanent. Reconfigure only if it is attached to a creature and only as a sorcery.)"),
     ],
     statics: &[
-        StaticDef {
-            text: "Equipped creature gets +1/+1 for each +1/+1 counter on this Equipment.",
-            layer: Layer::PtModify,
-            affects: attached_object,
-            apply: per_counter,
-            ..StaticDef::BLANK
-        },
+        static_ability(Layer::PtModify, attached_object, per_counter, "Equipped creature gets +1/+1 for each +1/+1 counter on this Equipment."),
         reconfigure::NOT_A_CREATURE_WHILE_ATTACHED,
     ],
     reconfigure: true,

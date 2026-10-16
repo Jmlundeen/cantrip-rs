@@ -26,31 +26,10 @@ fn sacrifice_planeswalker(g: &mut dyn Game, item: &StackItem) -> Result<(), Susp
     each_opponent_sacrifices(g, item.controller, item.object, 1, planeswalker)
 }
 
-static MODAL: ModalDef = ModalDef {
-    modes: &[
-        ModeDef {
-            text: "Each opponent sacrifices a nontoken creature of their choice.",
-            targets: &[],
-            effect: sacrifice_nontoken,
-            cost: ManaCost::ZERO,
-        },
-        ModeDef {
-            text: "Each opponent sacrifices a creature token of their choice.",
-            targets: &[],
-            effect: sacrifice_token,
-            cost: ManaCost::ZERO,
-        },
-        ModeDef {
-            text: "Each opponent sacrifices a planeswalker of their choice.",
-            targets: &[],
-            effect: sacrifice_planeswalker,
-            cost: ManaCost::ZERO,
-        },
-    ],
-    min: 1,
-    max: 1,
-    escalate: None,
-    repeat: false, allowed: None,
-};
+static MODAL: ModalDef = modes(&[
+    mode(sacrifice_nontoken, "Each opponent sacrifices a nontoken creature of their choice."),
+    mode(sacrifice_token, "Each opponent sacrifices a creature token of their choice."),
+    mode(sacrifice_planeswalker, "Each opponent sacrifices a planeswalker of their choice."),
+]);
 
 pub static CARD: CardDef = CardDef { spell: Some(SpellDef::MODAL), modal: Some(&MODAL), ..oracle::SHEOLDREDS_EDICT };

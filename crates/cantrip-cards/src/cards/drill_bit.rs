@@ -12,7 +12,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[targets::PLAYER], effect }),
-    ways: &[spectacle::way(mana(0, 0, 0, 1, 0, 0), "Spectacle {B}")],
+    spell: spell(&[targets::PLAYER], effect),
+    ways: &[spectacle::way(mana("{B}"), "Spectacle {B}")],
     ..oracle::DRILL_BIT
 };

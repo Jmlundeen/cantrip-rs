@@ -25,21 +25,13 @@ fn destroy_artifact(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 /// Choose three; you may choose the same mode more than once (CR 700.2d).
-static MODAL: ModalDef = ModalDef {
-    modes: &[
-        ModeDef { text: "Fiery Confluence deals 1 damage to each creature.", targets: &[], effect: creatures, cost: ManaCost::ZERO },
-        ModeDef { text: "Fiery Confluence deals 2 damage to each opponent.", targets: &[], effect: opponents, cost: ManaCost::ZERO },
-        ModeDef {
-            text: "Destroy target artifact.",
-            targets: &[targets::ARTIFACT],
-            effect: destroy_artifact,
-            cost: ManaCost::ZERO,
-        },
-    ],
-    min: 3,
-    max: 3,
-    escalate: None,
-    repeat: true, allowed: None,
-};
+static MODAL: ModalDef = modes(&[
+    mode(creatures, "Fiery Confluence deals 1 damage to each creature."),
+    mode(opponents, "Fiery Confluence deals 2 damage to each opponent."),
+    mode(destroy_artifact, "Destroy target artifact.")
+        .targets(&[targets::ARTIFACT]),
+])
+    .choose(3, 3)
+    .repeat();
 
 pub static CARD: CardDef = CardDef { spell: Some(SpellDef::MODAL), modal: Some(&MODAL), ..oracle::FIERY_CONFLUENCE };

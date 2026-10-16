@@ -11,22 +11,10 @@ fn trample_and_lifelink(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[equip(mana(3, 0, 0, 0, 0, 0), "Equip {3}")],
+    abilities: &[equip(mana("{3}"), "Equip {3}")],
     statics: &[
-        StaticDef {
-            text: "Equipped creature gets +3/+0.",
-            layer: Layer::PtModify,
-            affects: attached_object,
-            apply: plus_three_power,
-            ..StaticDef::BLANK
-        },
-        StaticDef {
-            text: "Equipped creature has trample and lifelink.",
-            layer: Layer::Ability,
-            affects: attached_object,
-            apply: trample_and_lifelink,
-            ..StaticDef::BLANK
-        },
+        static_ability(Layer::PtModify, attached_object, plus_three_power, "Equipped creature gets +3/+0."),
+        static_ability(Layer::Ability, attached_object, trample_and_lifelink, "Equipped creature has trample and lifelink."),
     ],
     ..oracle::LOXODON_WARHAMMER
 };

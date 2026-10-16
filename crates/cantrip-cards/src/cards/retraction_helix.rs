@@ -20,7 +20,7 @@ fn grant(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[targets::CREATURE], effect: grant }),
+    spell: spell(&[targets::CREATURE], grant),
     delayed: &[ability(TAP, return_to_hand, "{T}: Return target nonland permanent to its owner's hand.")
         .targets(&[targets::NONLAND_PERMANENT])],
     ..oracle::RETRACTION_HELIX

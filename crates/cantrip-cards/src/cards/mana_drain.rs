@@ -39,7 +39,7 @@ fn add_mana(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[targets::SPELL], effect: drain }),
+    spell: spell(&[targets::SPELL], drain),
     delayed: &[delayed_trigger(add_mana, "Add an amount of {C} equal to that spell's mana value.")],
     ..oracle::MANA_DRAIN
 };

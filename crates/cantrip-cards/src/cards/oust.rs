@@ -13,6 +13,6 @@ fn oust(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[targets::CREATURE], effect: oust }),
+    spell: spell(&[targets::CREATURE], oust),
     ..oracle::OUST
 };

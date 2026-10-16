@@ -19,15 +19,9 @@ fn plus_one(_: &dyn Query, _: &Asker, p: &mut Proposal) {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[triggered(THIS_ENTERS, effects::draw::<1>, "When this creature enters, draw a card.")],
-    replacements: &[ReplacementDef {
-        hint: "draws one more card",
-        kind: ReplacementKind::DrawInstruction,
-        applies: would_draw,
-        apply: plus_one,
-        ..ReplacementDef::BLANK
-    }],
-    ways: &[warp::way(mana(1, 0, 1, 0, 0, 0), "Warp {1}{U}")],
+    abilities: &[triggered(THIS_ENTERS, |g, item| effects::draw(g, item, 1), "When this creature enters, draw a card.")],
+    replacements: &[replacement(ReplacementKind::DrawInstruction, would_draw, plus_one, "draws one more card")],
+    ways: &[warp::way(mana("{1}{U}"), "Warp {1}{U}")],
     end_step_riders: warp::RIDERS,
     delayed: &[warp::EXILE],
     ..oracle::QUANTUM_RIDDLER

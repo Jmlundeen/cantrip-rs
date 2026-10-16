@@ -13,5 +13,6 @@ pub fn opponent_lost_life(q: &dyn Query, asker: &Asker) -> bool {
 
 /// The alternative cost of spectacle: cast from the hand for `cost` (CR 118.9), if an opponent lost life this turn.
 pub const fn way(cost: ManaCost, text: &'static str) -> WayDef {
-    WayDef { text, cost: Cost::mana(cost), from: ZoneKind::Hand, exile_after: false, condition: Some(opponent_lost_life), instant_speed: false }
+    cantrip_api::way(Cost::mana(cost), ZoneKind::Hand, text)
+        .condition(opponent_lost_life)
 }

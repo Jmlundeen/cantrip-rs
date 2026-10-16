@@ -32,6 +32,6 @@ fn reveal_and_exile(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(THIS_ENTERS, reveal_and_exile, "When Cloak and Dagger enter, choose target opponent and up to one target creature they control. They reveal their hand. You may exile a nonland card from their hand or the chosen creature until Cloak and Dagger leave the battlefield.")
-        .targets(&[targets::OPPONENT, TargetSpec { min: 0, max: 1, filter: creature_they_control, label: "" }])],
+        .targets(&[targets::OPPONENT, up_to_one(creature_they_control)])],
     ..oracle::CLOAK_AND_DAGGER_ENTWINED
 };

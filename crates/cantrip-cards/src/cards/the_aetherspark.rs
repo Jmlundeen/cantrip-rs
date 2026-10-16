@@ -64,18 +64,12 @@ fn minus_ten(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         ability(loyalty(1), plus_one, "+1: Attach The Aetherspark to up to one target creature you control. Put a +1/+1 counter on that creature.")
-            .targets(&[TargetSpec { min: 0, ..targets::CREATURE_YOU_CONTROL }]),
-        ability(loyalty(-5), effects::draw::<2>, "\u{2212}5: Draw two cards."),
+            .targets(&[targets::CREATURE_YOU_CONTROL.optional()]),
+        ability(loyalty(-5), |g, item| effects::draw(g, item, 2), "\u{2212}5: Draw two cards."),
         ability(loyalty(-10), minus_ten, "\u{2212}10: Add ten mana of any one color."),
     ],
     delayed: &[triggered(when(EventMask::DAMAGE, equipped_creature_deals_combat_damage), put_loyalty, "Whenever equipped creature deals combat damage during your turn, put that many loyalty counters on The Aetherspark.")
         .sums_per_subject()],
-    statics: &[StaticDef {
-        text: "As long as The Aetherspark is attached to a creature, The Aetherspark can't be attacked and has \"Whenever equipped creature deals combat damage during your turn, put that many loyalty counters on The Aetherspark.\"",
-        layer: Layer::Ability,
-        affects: while_attached_to_a_creature,
-        apply: grant,
-        ..StaticDef::BLANK
-    }],
+    statics: &[static_ability(Layer::Ability, while_attached_to_a_creature, grant, "As long as The Aetherspark is attached to a creature, The Aetherspark can't be attacked and has \"Whenever equipped creature deals combat damage during your turn, put that many loyalty counters on The Aetherspark.\"")],
     ..oracle::THE_AETHERSPARK
 };

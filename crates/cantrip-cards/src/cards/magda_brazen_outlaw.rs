@@ -50,13 +50,7 @@ pub static CARD: CardDef = CardDef {
         triggered(when(EventMask::TAPPED, dwarf_becomes_tapped), treasure, "Whenever a Dwarf you control becomes tapped, create a Treasure token."),
         ability(sacrifice(5, treasure_you_control), tutor, "Sacrifice five Treasures: Search your library for an artifact or Dragon card, put that card onto the battlefield, then shuffle."),
     ],
-    statics: &[StaticDef {
-        text: "Other Dwarves you control get +1/+0.",
-        layer: Layer::PtModify,
-        affects: other_dwarves_you_control,
-        apply: plus_one_power,
-        ..StaticDef::BLANK
-    }],
+    statics: &[static_ability(Layer::PtModify, other_dwarves_you_control, plus_one_power, "Other Dwarves you control get +1/+0.")],
     ..oracle::MAGDA_BRAZEN_OUTLAW
 };
 

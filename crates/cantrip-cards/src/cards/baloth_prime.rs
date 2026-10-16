@@ -45,7 +45,7 @@ pub static CARD: CardDef = CardDef {
     enters: Some(enters_stunned),
     abilities: &[
         triggered(when(EventMask::ZONE_CHANGE, sacrificed_a_land), wake, "Whenever you sacrifice a land, create a tapped 4/4 green Beast creature token and untap this creature."),
-        ability(cost("{4}").and(sacrifice(1, targets::filters::land)), effects::gain_life::<2>, "{4}, Sacrifice a land: You gain 2 life."),
+        ability(cost("{4}").and(sacrifice(1, targets::filters::land)), |g, item| effects::gain_life(g, item, 2), "{4}, Sacrifice a land: You gain 2 life."),
     ],
     ..oracle::BALOTH_PRIME
 };

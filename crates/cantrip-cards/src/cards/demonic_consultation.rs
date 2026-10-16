@@ -34,6 +34,6 @@ fn consult(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[], effect: consult }),
+    spell: spell(&[], consult),
     ..oracle::DEMONIC_CONSULTATION
 };

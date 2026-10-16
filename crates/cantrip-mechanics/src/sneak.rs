@@ -22,16 +22,7 @@ fn your_declare_blockers_step(q: &dyn Query, asker: &Asker) -> bool {
 /// The alternative cost of sneak: `cost` and an unblocked attacker you control returned to its owner's hand. `text` is the
 /// way's text, which a scenario's `Ability:` matches.
 pub const fn way(cost: ManaCost, text: &'static str) -> WayDef {
-    WayDef {
-        text,
-        cost: Cost {
-            mana: cost,
-            permanents: Some(PermanentCost { count: 1, filter: unblocked_attacker_you_control, to_hand: true }),
-            ..Cost::NONE
-        },
-        from: ZoneKind::Hand,
-        exile_after: false,
-        condition: Some(your_declare_blockers_step),
-        instant_speed: true,
-    }
+    cantrip_api::way(Cost::mana(cost).and(return_to_hand(1, unblocked_attacker_you_control)), ZoneKind::Hand, text)
+        .condition(your_declare_blockers_step)
+        .instant_speed()
 }

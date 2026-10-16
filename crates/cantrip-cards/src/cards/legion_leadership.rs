@@ -20,7 +20,7 @@ pub static BACK: CardDef = CardDef {
 };
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[targets::CREATURE], effect: double }),
+    spell: spell(&[targets::CREATURE], double),
     back: Some(&BACK),
     ..oracle::LEGION_LEADERSHIP
 };

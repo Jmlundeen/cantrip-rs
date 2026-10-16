@@ -25,7 +25,7 @@ fn copy_for_each(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[], effect }),
+    spell: spell(&[], effect),
     optional_cost: Some(OptionalCost {
         cost: Cost { variable: Some(VariableCost::SacrificeOneOrMore(filters::creature)), ..Cost::NONE },
     }),

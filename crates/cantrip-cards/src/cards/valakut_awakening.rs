@@ -28,7 +28,7 @@ pub static BACK: CardDef = CardDef {
 };
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[], effect }),
+    spell: spell(&[], effect),
     back: Some(&BACK),
     ..oracle::VALAKUT_AWAKENING
 };

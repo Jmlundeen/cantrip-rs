@@ -11,10 +11,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef {
-        targets: &[TargetSpec { min: 1, max: TargetSpec::COUNTED, filter: targets::CREATURE.filter, label: "" }],
-        effect,
-    }),
+    spell: spell(&[targets::CREATURE.between(1, TargetSpec::COUNTED)], effect),
     divide: Some(Divide { total: TargetSpec::COUNTED, of_x: None }),
     // As an additional cost to cast this spell, pay X life.
     additional_cost: Some(Cost { pay_x_life: true, ..Cost::NONE }),

@@ -30,13 +30,7 @@ fn heal_the_rest(_: &dyn Query, _: &Asker, p: &mut Proposal) {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(THIS_ENTERS, fight, "When Wolverine enters, he fights up to one other target creature.")
-        .targets(&[TargetSpec { min: 0, max: 1, filter: other_creature, label: "" }])],
-    replacements: &[ReplacementDef {
-        hint: "heal damage already dealt to Wolverine",
-        kind: ReplacementKind::Damage,
-        applies: damage_to_him,
-        apply: heal_the_rest,
-        ..ReplacementDef::BLANK
-    }],
+        .targets(&[up_to_one(other_creature)])],
+    replacements: &[replacement(ReplacementKind::Damage, damage_to_him, heal_the_rest, "heal damage already dealt to Wolverine")],
     ..oracle::WOLVERINE_FIERCE_FIGHTER
 };

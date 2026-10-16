@@ -13,6 +13,6 @@ fn untap_lands(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     // X target lands: the slot is counted by the X announced, and asked once it is (CR 601.2b-c).
     abilities: &[ability(cost("{X}, {T}"), untap_lands, "{X}, {T}: Untap X target lands.")
-        .targets(&[TargetSpec { min: TargetSpec::COUNTED, max: TargetSpec::COUNTED, ..targets::LAND }])],
+        .targets(&[targets::LAND.counted()])],
     ..oracle::CANDELABRA_OF_TAWNOS
 };

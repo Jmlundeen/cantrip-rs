@@ -13,8 +13,8 @@ fn reanimate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    miracle: Some(mana(1, 0, 0, 1, 0, 0)),
+    miracle: Some(mana("{1}{B}")),
     abilities: &[triggered(THIS_ENTERS, reanimate, "When this creature enters, return up to one target creature card from your graveyard to the battlefield with a lifelink counter on it.")
-        .targets(&[TargetSpec { min: 0, ..cantrip_mechanics::targets::CREATURE_CARD_IN_YOUR_GRAVEYARD }])],
+        .targets(&[cantrip_mechanics::targets::CREATURE_CARD_IN_YOUR_GRAVEYARD.optional()])],
     ..oracle::METAMORPHOSIS_FANATIC
 };

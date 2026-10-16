@@ -11,7 +11,7 @@ fn stomp(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 /// The Adventure (CR 715): Damage can't be prevented this turn. Stomp deals 2 damage to any target.
 pub static STOMP: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[targets::ANY], effect: stomp }),
+    spell: spell(&[targets::ANY], stomp),
     ..oracle::STOMP
 };
 

@@ -30,21 +30,9 @@ pub static CARD: CardDef = CardDef {
     abilities: &[WARD],
     delayed: &[WARD],
     statics: &[
-        StaticDef {
-            text: "Spells you control can't be countered.",
-            layer: Layer::Ability,
-            affects: your_spells,
-            apply: uncounterable,
-            everywhere: true,
-            ..StaticDef::BLANK
-        },
-        StaticDef {
-            text: "Other creatures you control have \"Ward\u{2014}Pay 2 life.\"",
-            layer: Layer::Ability,
-            affects: other_creatures_you_control,
-            apply: grant_ward,
-            ..StaticDef::BLANK
-        },
+        static_ability(Layer::Ability, your_spells, uncounterable, "Spells you control can't be countered.")
+            .everywhere(),
+        static_ability(Layer::Ability, other_creatures_you_control, grant_ward, "Other creatures you control have \"Ward\u{2014}Pay 2 life.\""),
     ],
     ..oracle::HEXING_SQUELCHER
 };

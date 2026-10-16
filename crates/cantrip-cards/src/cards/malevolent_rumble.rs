@@ -32,6 +32,6 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-pub static CARD: CardDef = CardDef { spell: Some(SpellDef { targets: &[], effect }), ..oracle::MALEVOLENT_RUMBLE };
+pub static CARD: CardDef = CardDef { spell: spell(&[], effect), ..oracle::MALEVOLENT_RUMBLE };
 
 pub static EXTRA: &[&CardDef] = &[&ELDRAZI_SPAWN];

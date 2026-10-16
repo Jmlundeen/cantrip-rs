@@ -16,6 +16,6 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[targets::NONLAND_PERMANENT], effect }),
+    spell: spell(&[targets::NONLAND_PERMANENT], effect),
     ..oracle::PRISMATIC_ENDING
 };

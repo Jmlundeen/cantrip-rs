@@ -21,14 +21,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[targets::CREATURE_OR_PLANESWALKER], effect }),
-    ways: &[WayDef {
-        text: "Pay {1}{B}; an opponent draws a card",
-        cost: Cost::mana(mana(1, 0, 0, 1, 0, 0)),
-        from: ZoneKind::Hand,
-        exile_after: false,
-        condition: None,
-        instant_speed: false,
-    }],
+    spell: spell(&[targets::CREATURE_OR_PLANESWALKER], effect),
+    ways: &[way(cost("{1}{B}"), ZoneKind::Hand, "Pay {1}{B}; an opponent draws a card")],
     ..oracle::BALEFUL_MASTERY
 };

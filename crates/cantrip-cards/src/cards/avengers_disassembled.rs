@@ -25,26 +25,11 @@ fn destroy_land(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 /// "Choose one or both" (CR 700.2): the modes are carried out in the order printed (CR 700.2d).
-static MODAL: ModalDef = ModalDef {
-    modes: &[
-        ModeDef {
-            text: "Avengers Disassembled deals 3 damage to each creature.",
-            targets: &[],
-            effect: damage_creatures,
-            cost: ManaCost::ZERO,
-        },
-        ModeDef {
-            text: "Destroy target land. Its controller may search their library for a basic land card, put it onto the battlefield tapped, then shuffle.",
-            targets: &[targets::LAND],
-            effect: destroy_land,
-            cost: ManaCost::ZERO,
-        },
-    ],
-    min: 1,
-    max: 2,
-    escalate: None,
-    repeat: false,
-    allowed: None,
-};
+static MODAL: ModalDef = modes(&[
+    mode(damage_creatures, "Avengers Disassembled deals 3 damage to each creature."),
+    mode(destroy_land, "Destroy target land. Its controller may search their library for a basic land card, put it onto the battlefield tapped, then shuffle.")
+        .targets(&[targets::LAND]),
+])
+    .choose(1, 2);
 
 pub static CARD: CardDef = CardDef { spell: Some(SpellDef::MODAL), modal: Some(&MODAL), ..oracle::AVENGERS_DISASSEMBLED };

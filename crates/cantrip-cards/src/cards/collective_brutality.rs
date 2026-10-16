@@ -33,19 +33,12 @@ fn drain(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 /// Escalate (CR 702.120): discard a card for each mode chosen beyond the first.
 const MODES: &[ModeDef] = &[
-    ModeDef {
-        text: "Target opponent reveals their hand. You choose an instant or sorcery card from it. That player discards that card.",
-        targets: &[targets::OPPONENT],
-        effect: strip,
-        cost: ManaCost::ZERO,
-    },
-    ModeDef { text: "Target creature gets -2/-2 until end of turn.", targets: &[targets::CREATURE], effect: shrink, cost: ManaCost::ZERO },
-    ModeDef {
-        text: "Target opponent loses 2 life and you gain 2 life.",
-        targets: &[targets::OPPONENT],
-        effect: drain,
-        cost: ManaCost::ZERO,
-    },
+    mode(strip, "Target opponent reveals their hand. You choose an instant or sorcery card from it. That player discards that card.")
+        .targets(&[targets::OPPONENT]),
+    mode(shrink, "Target creature gets -2/-2 until end of turn.")
+        .targets(&[targets::CREATURE]),
+    mode(drain, "Target opponent loses 2 life and you gain 2 life.")
+        .targets(&[targets::OPPONENT]),
 ];
 
 static MODAL: ModalDef = escalate::modal(MODES, Cost { discard: Some((1, targets::filters::any)), ..Cost::NONE });

@@ -12,4 +12,4 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-pub static CARD: CardDef = CardDef { spell: Some(SpellDef { targets: &[targets::SPELL], effect }), ..oracle::REPRIEVE };
+pub static CARD: CardDef = CardDef { spell: spell(&[targets::SPELL], effect), ..oracle::REPRIEVE };

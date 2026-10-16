@@ -10,6 +10,6 @@ fn effect(g: &mut dyn Game, _: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[], effect }),
+    spell: spell(&[], effect),
     ..oracle::UPHEAVAL
 };

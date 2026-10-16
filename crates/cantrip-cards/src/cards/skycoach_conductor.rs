@@ -23,9 +23,9 @@ fn all_aboard(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// Skycoach Conductor's prepare spell (CR 722): not a card, only ever a copy.
 pub static ALL_ABOARD: CardDef = CardDef {
     name: "All Aboard",
-    cost: mana(0, 0, 1, 0, 0, 0),
+    cost: mana("{U}"),
     types: TypeSet::of(&[CardType::Instant]),
-    spell: Some(SpellDef { targets: &[TargetSpec { min: 1, max: 1, filter: non_pilot_creature_you_control, label: "" }], effect: all_aboard }),
+    spell: spell(&[target(non_pilot_creature_you_control)], all_aboard),
     text: "Exile target non-Pilot creature you control, then return that card to the battlefield under its owner's control.",
     ..CardDef::BLANK
 };

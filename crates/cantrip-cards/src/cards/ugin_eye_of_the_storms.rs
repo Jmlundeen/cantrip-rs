@@ -62,10 +62,10 @@ fn minus_eleven(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(cantrip_mechanics::triggers::CAST_THIS_SPELL, exile_colored, "When you cast this spell, exile up to one target permanent that's one or more colors.")
-            .targets(&[TargetSpec { min: 0, max: 1, filter: colored_permanent, label: "" }])
+            .targets(&[up_to_one(colored_permanent)])
             .anywhere(),
         triggered(when(EventMask::SPELL_CAST, colorless_spell_you_cast), exile_colored, "Whenever you cast a colorless spell, exile up to one target permanent that's one or more colors.")
-            .targets(&[TargetSpec { min: 0, max: 1, filter: colored_permanent, label: "" }]),
+            .targets(&[up_to_one(colored_permanent)]),
         ability(loyalty(2), plus_two, "+2: You gain 3 life and draw a card."),
         ability(loyalty(0), zero, "0: Add {C}{C}{C}."),
         ability(loyalty(-11), minus_eleven, "\u{2212}11: Search your library for any number of colorless nonland cards, exile them, then shuffle. Until end of turn, you may cast those cards without paying their mana costs."),

@@ -21,15 +21,9 @@ fn size(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
 }
 
 pub static CARD: CardDef = CardDef {
-    statics: &[StaticDef {
-        text: "This creature's power is equal to the number of card types among cards in your graveyard and its toughness is equal to that number plus 1.",
-        layer: Layer::PtDefine,
-        apply: size,
-        own: true,
-        ..StaticDef::BLANK
-    }],
+    statics: &[characteristic_defining(Layer::PtDefine, size, "This creature's power is equal to the number of card types among cards in your graveyard and its toughness is equal to that number plus 1.")],
     ways: &[escape::way_by_types(
-        mana(2, 0, 0, 1, 0, 0),
+        mana("{2}{B}"),
         4,
         "Escape\u{2014}{2}{B}, Exile any number of other cards from your graveyard with four or more card types among them.",
     )],

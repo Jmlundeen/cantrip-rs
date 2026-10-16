@@ -31,7 +31,7 @@ fn epiphany(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[], effect: epiphany }),
+    spell: spell(&[], epiphany),
     ..oracle::OCCULT_EPIPHANY
 };
 

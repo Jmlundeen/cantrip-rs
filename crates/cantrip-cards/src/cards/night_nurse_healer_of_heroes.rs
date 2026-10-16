@@ -23,6 +23,6 @@ fn return_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(THIS_ENTERS, return_it, "When Night Nurse enters, choose target permanent card in your graveyard that was put there from anywhere this turn. Return it to your hand.")
-        .targets(&[TargetSpec { min: 1, max: 1, filter: permanent_card_put_there_this_turn, label: "" }])],
+        .targets(&[target(permanent_card_put_there_this_turn)])],
     ..oracle::NIGHT_NURSE_HEALER_OF_HEROES
 };

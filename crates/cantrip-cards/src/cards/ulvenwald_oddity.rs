@@ -19,20 +19,8 @@ fn trample_and_haste(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
 
 pub static BACK: CardDef = CardDef {
     statics: &[
-        StaticDef {
-            text: "Other creatures you control get +1/+1.",
-            layer: Layer::PtModify,
-            affects: other_creatures_you_control,
-            apply: plus_one_plus_one,
-            ..StaticDef::BLANK
-        },
-        StaticDef {
-            text: "Other creatures you control have trample and haste.",
-            layer: Layer::Ability,
-            affects: other_creatures_you_control,
-            apply: trample_and_haste,
-            ..StaticDef::BLANK
-        },
+        static_ability(Layer::PtModify, other_creatures_you_control, plus_one_plus_one, "Other creatures you control get +1/+1."),
+        static_ability(Layer::Ability, other_creatures_you_control, trample_and_haste, "Other creatures you control have trample and haste."),
     ],
     ..oracle::ULVENWALD_BEHEMOTH
 };

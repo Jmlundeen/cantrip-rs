@@ -16,7 +16,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[TargetSpec { min: 1, max: 1, filter: artifact_you_dont_control, label: "" }], effect }),
-    overload: Some(mana(4, 0, 0, 0, 1, 0)),
+    spell: spell(&[target(artifact_you_dont_control)], effect),
+    overload: Some(mana("{4}{R}")),
     ..oracle::VANDALBLAST
 };

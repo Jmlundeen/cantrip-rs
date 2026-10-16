@@ -43,7 +43,7 @@ fn free_first_equip(q: &dyn Query, asker: &Asker, activator: PlayerId, _: Object
 
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(THIS_ENTERS, return_equipment, "When this enchantment enters, return target Equipment card from your graveyard to the battlefield.")
-        .targets(&[TargetSpec { min: 1, max: 1, filter: equipment_in_your_graveyard, label: "" }])],
+        .targets(&[target(equipment_in_your_graveyard)])],
     instant_activation: &[instant_equip],
     ability_alternatives: &[free_first_equip],
     ..oracle::FORGE_ANEW

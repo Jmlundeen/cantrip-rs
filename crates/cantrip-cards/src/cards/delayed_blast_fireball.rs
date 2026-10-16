@@ -27,8 +27,8 @@ fn fireball(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[], effect: fireball }),
+    spell: spell(&[], fireball),
     abilities: &[foretell::ABILITY],
-    foretell: Some(mana(4, 0, 0, 0, 2, 0)),
+    foretell: Some(mana("{4}{R}{R}")),
     ..oracle::DELAYED_BLAST_FIREBALL
 };

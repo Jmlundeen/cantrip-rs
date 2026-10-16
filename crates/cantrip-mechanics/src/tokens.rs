@@ -216,13 +216,7 @@ pub static CONSTRUCT: CardDef = CardDef {
     subtypes: SubtypeSet::of(&[Subtype::Construct]),
     power: Some(0),
     toughness: Some(0),
-    statics: &[StaticDef {
-        text: "This token gets +1/+1 for each artifact you control.",
-        layer: Layer::PtModify,
-        affects: itself,
-        apply: construct_size,
-        ..StaticDef::BLANK
-    }],
+    statics: &[static_ability(Layer::PtModify, itself, construct_size, "This token gets +1/+1 for each artifact you control.")],
     text: "This token gets +1/+1 for each artifact you control.",
     ..CardDef::BLANK
 };

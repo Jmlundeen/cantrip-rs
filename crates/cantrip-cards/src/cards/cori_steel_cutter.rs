@@ -30,27 +30,15 @@ fn make_monk(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        equip(mana(1, 0, 0, 0, 1, 0), "Equip {1}{R}"),
+        equip(mana("{1}{R}"), "Equip {1}{R}"),
         flurry::trigger(
             "Flurry \u{2014} Whenever you cast your second spell each turn, create a 1/1 white Monk creature token with prowess. You may attach this Equipment to it.",
             make_monk,
         ),
     ],
     statics: &[
-        StaticDef {
-            text: "Equipped creature gets +1/+1.",
-            layer: Layer::PtModify,
-            affects: attached_object,
-            apply: plus_one_plus_one,
-            ..StaticDef::BLANK
-        },
-        StaticDef {
-            text: "Equipped creature has trample and haste.",
-            layer: Layer::Ability,
-            affects: attached_object,
-            apply: trample_and_haste,
-            ..StaticDef::BLANK
-        },
+        static_ability(Layer::PtModify, attached_object, plus_one_plus_one, "Equipped creature gets +1/+1."),
+        static_ability(Layer::Ability, attached_object, trample_and_haste, "Equipped creature has trample and haste."),
     ],
     ..oracle::CORI_STEEL_CUTTER
 };

@@ -19,13 +19,7 @@ fn apply(q: &dyn Query, _: &Asker, proposal: &mut Proposal) {
 }
 
 pub static CARD: CardDef = CardDef {
-    replacements: &[ReplacementDef {
-        hint: "shuffles it into its owner's library",
-        kind: ReplacementKind::ZoneChange,
-        own_everywhere: true,
-        applies,
-        apply,
-        ..ReplacementDef::BLANK
-    }],
+    replacements: &[replacement(ReplacementKind::ZoneChange, applies, apply, "shuffles it into its owner's library")
+        .own_everywhere()],
     ..oracle::BLIGHTSTEEL_COLOSSUS
 };

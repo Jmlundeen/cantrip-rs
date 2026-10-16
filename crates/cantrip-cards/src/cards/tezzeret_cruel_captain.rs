@@ -77,7 +77,7 @@ pub static EMBLEM: CardDef = CardDef {
     name: "Tezzeret, Cruel Captain emblem",
     has_cost: false,
     abilities: &[triggered(cantrip_mechanics::triggers::BEGINNING_OF_YOUR_COMBAT, grow_artifact, "At the beginning of combat on your turn, put three +1/+1 counters on target artifact you control. If it's not a creature, it becomes a 0/0 Robot artifact creature.")
-        .targets(&[TargetSpec { min: 1, max: 1, filter: artifact_you_control, label: "" }])],
+        .targets(&[target(artifact_you_control)])],
     text: "At the beginning of combat on your turn, put three +1/+1 counters on target artifact you control. If it's not a creature, it becomes a 0/0 Robot artifact creature.",
     ..CardDef::BLANK
 };
@@ -86,7 +86,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(when(EventMask::ZONE_CHANGE, artifact_enters), add_loyalty, "Whenever an artifact you control enters, put a loyalty counter on Tezzeret."),
         ability(loyalty(0), untap_and_grow, "0: Untap target artifact or creature. If it's an artifact creature, put a +1/+1 counter on it.")
-            .targets(&[TargetSpec { min: 1, max: 1, filter: artifact_or_creature, label: "" }]),
+            .targets(&[target(artifact_or_creature)]),
         ability(loyalty(-3), tutor, "\u{2212}3: Search your library for an artifact card with mana value 1 or less, reveal it, put it into your hand, then shuffle."),
         ability(loyalty(-7), emblem, "\u{2212}7: You get an emblem with \"At the beginning of combat on your turn, put three +1/+1 counters on target artifact you control. If it's not a creature, it becomes a 0/0 Robot artifact creature.\""),
     ],

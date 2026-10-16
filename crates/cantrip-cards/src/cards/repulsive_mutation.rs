@@ -21,15 +21,12 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
             .max()
             .unwrap_or(0)
             .clamp(0, 255) as u8;
-        counter_unless_pays(g, item, 1, mana(greatest, 0, 0, 0, 0, 0))?;
+        counter_unless_pays(g, item, 1, generic(greatest))?;
     }
     Ok(())
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef {
-        targets: &[targets::CREATURE_YOU_CONTROL, TargetSpec { min: 0, max: 1, filter: targets::SPELL.filter, label: "" }],
-        effect,
-    }),
+    spell: spell(&[targets::CREATURE_YOU_CONTROL, targets::SPELL.optional()], effect),
     ..oracle::REPULSIVE_MUTATION
 };

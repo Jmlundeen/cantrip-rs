@@ -17,7 +17,7 @@ fn effect(g: &mut dyn Game, _: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[], effect }),
-    abilities: &[cycling(mana(2, 0, 0, 0, 0, 0), "Cycling {2} ({2}, Discard this card: Draw a card.)")],
+    spell: spell(&[], effect),
+    abilities: &[cycling(mana("{2}"), "Cycling {2} ({2}, Discard this card: Draw a card.)")],
     ..oracle::REBUILD
 };

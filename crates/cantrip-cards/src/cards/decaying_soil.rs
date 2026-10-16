@@ -50,7 +50,7 @@ fn nontoken_creature_to_your_graveyard(q: &dyn Query, source: ObjectId, event: &
 fn pay_to_return(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Target::Object(card) = item.subject else { return Ok(()) };
     let you = item.controller;
-    if g.unless_pays(you, item.object, card, mana(1, 0, 0, 0, 0, 0))? && is_live(g, card) && g.obj(card).zone == Zone::graveyard(you) {
+    if g.unless_pays(you, item.object, card, mana("{1}"))? && is_live(g, card) && g.obj(card).zone == Zone::graveyard(you) {
         g.return_to_hand(&[card]);
     }
     Ok(())
@@ -75,12 +75,6 @@ pub static CARD: CardDef = CardDef {
     abilities: &[triggered(triggers::YOUR_UPKEEP, exile_from_graveyard, "At the beginning of your upkeep, exile a card from your graveyard.")],
     delayed: &[triggered(when(EventMask::ZONE_CHANGE, nontoken_creature_to_your_graveyard), pay_to_return, "Whenever a nontoken creature is put into your graveyard from the battlefield, you may pay {1}. If you do, return that card to your hand.")
         .look_back()],
-    statics: &[StaticDef {
-        text: "Threshold \u{2014} As long as there are seven or more cards in your graveyard, this enchantment has \"Whenever a nontoken creature is put into your graveyard from the battlefield, you may pay {1}. If you do, return that card to your hand.\"",
-        layer: Layer::Ability,
-        affects: has_threshold,
-        apply: grant_return,
-        ..StaticDef::BLANK
-    }],
+    statics: &[static_ability(Layer::Ability, has_threshold, grant_return, "Threshold \u{2014} As long as there are seven or more cards in your graveyard, this enchantment has \"Whenever a nontoken creature is put into your graveyard from the battlefield, you may pay {1}. If you do, return that card to your hand.\"")],
     ..oracle::DECAYING_SOIL
 };

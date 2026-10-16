@@ -47,16 +47,16 @@ fn spell_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
 }
 
 /// Any target (CR 115.4): a creature, a player, a planeswalker or a battle.
-pub const ANY: TargetSpec = TargetSpec { min: 1, max: 1, filter: any_target_filter, label: "" };
-pub const CREATURE: TargetSpec = TargetSpec { min: 1, max: 1, filter: creature_filter, label: "" };
-pub const CREATURE_YOU_CONTROL: TargetSpec = TargetSpec { min: 1, max: 1, filter: creature_you_control_filter, label: "" };
+pub const ANY: TargetSpec = target(any_target_filter);
+pub const CREATURE: TargetSpec = target(creature_filter);
+pub const CREATURE_YOU_CONTROL: TargetSpec = target(creature_you_control_filter);
 /// "Target creature or planeswalker" (CR 115.1). Unholy Heat and Baleful Mastery print it.
-pub const CREATURE_OR_PLANESWALKER: TargetSpec = TargetSpec { min: 1, max: 1, filter: creature_or_planeswalker_filter, label: "" };
-pub const PLAYER: TargetSpec = TargetSpec { min: 1, max: 1, filter: player_filter, label: "" };
-pub const OPPONENT: TargetSpec = TargetSpec { min: 1, max: 1, filter: opponent_filter, label: "" };
-pub const SPELL: TargetSpec = TargetSpec { min: 1, max: 1, filter: spell_filter, label: "" };
+pub const CREATURE_OR_PLANESWALKER: TargetSpec = target(creature_or_planeswalker_filter);
+pub const PLAYER: TargetSpec = target(player_filter);
+pub const OPPONENT: TargetSpec = target(opponent_filter);
+pub const SPELL: TargetSpec = target(spell_filter);
 /// "Target spell or permanent" (CR 115.1): Artificial Evolution and Venser, Shaper Savant print it.
-pub const SPELL_OR_PERMANENT: TargetSpec = TargetSpec { min: 1, max: 1, filter: spell_or_permanent_filter, label: "" };
+pub const SPELL_OR_PERMANENT: TargetSpec = target(spell_or_permanent_filter);
 
 fn spell_or_permanent_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     spell_filter(q, asker, t) || permanent_filter(q, asker, t)
@@ -80,7 +80,7 @@ fn instant_or_sorcery_in_your_graveyard_filter(q: &dyn Query, asker: &Asker, t: 
 
 /// "Target instant or sorcery card in your graveyard" (CR 115.1). Snapcaster Mage and Flashback print it.
 pub const INSTANT_OR_SORCERY_IN_YOUR_GRAVEYARD: TargetSpec =
-    TargetSpec { min: 1, max: 1, filter: instant_or_sorcery_in_your_graveyard_filter, label: "" };
+    target(instant_or_sorcery_in_your_graveyard_filter);
 
 fn noncreature_artifact_or_enchantment_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
     match t {
@@ -94,7 +94,7 @@ fn noncreature_artifact_or_enchantment_filter(q: &dyn Query, _: &Asker, t: Targe
 
 /// "Target noncreature artifact or noncreature enchantment" (CR 115.1). Guerrilla Gorilla and Haywire Mite print it.
 pub const NONCREATURE_ARTIFACT_OR_ENCHANTMENT: TargetSpec =
-    TargetSpec { min: 1, max: 1, filter: noncreature_artifact_or_enchantment_filter, label: "" };
+    target(noncreature_artifact_or_enchantment_filter);
 
 /// The object a resolving item targeted in `slot`, if the target is still legal (CR 608.2b) and is an object (not a
 /// player). Every effect that acts on "target [thing]" begins here rather than pairing `target_legal` with a pattern
@@ -154,24 +154,24 @@ fn noncreature_spell_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
 }
 
 /// "Target artifact" (CR 115.1). Abrade and Embereth Shieldbreaker print it.
-pub const ARTIFACT: TargetSpec = TargetSpec { min: 1, max: 1, filter: artifact_filter, label: "" };
+pub const ARTIFACT: TargetSpec = target(artifact_filter);
 /// "Target artifact or enchantment". Disenchant and Cathar Commando print it.
-pub const ARTIFACT_OR_ENCHANTMENT: TargetSpec = TargetSpec { min: 1, max: 1, filter: artifact_or_enchantment_filter, label: "" };
+pub const ARTIFACT_OR_ENCHANTMENT: TargetSpec = target(artifact_or_enchantment_filter);
 /// "Target permanent". Alpha Deathclaw and Argentum Armor print it.
-pub const PERMANENT: TargetSpec = TargetSpec { min: 1, max: 1, filter: permanent_filter, label: "" };
+pub const PERMANENT: TargetSpec = target(permanent_filter);
 /// "Target nonland permanent". Banishing Knack and Boomerang Basics print it.
-pub const NONLAND_PERMANENT: TargetSpec = TargetSpec { min: 1, max: 1, filter: nonland_permanent_filter, label: "" };
+pub const NONLAND_PERMANENT: TargetSpec = target(nonland_permanent_filter);
 /// "Target nonland permanent an opponent controls". Conclave Tribunal and Sheltered by Ghosts print it.
 pub const NONLAND_PERMANENT_AN_OPPONENT_CONTROLS: TargetSpec =
-    TargetSpec { min: 1, max: 1, filter: nonland_permanent_an_opponent_controls_filter, label: "" };
+    target(nonland_permanent_an_opponent_controls_filter);
 /// "Target creature an opponent controls". Palace Jailer and Mawloc print it.
-pub const CREATURE_AN_OPPONENT_CONTROLS: TargetSpec = TargetSpec { min: 1, max: 1, filter: creature_an_opponent_controls_filter, label: "" };
+pub const CREATURE_AN_OPPONENT_CONTROLS: TargetSpec = target(creature_an_opponent_controls_filter);
 /// "Target land". Candelabra of Tawnos and Strip Mine print it.
-pub const LAND: TargetSpec = TargetSpec { min: 1, max: 1, filter: land_filter, label: "" };
+pub const LAND: TargetSpec = target(land_filter);
 /// "Target card from a graveyard". Emperor of Bones, Ghost Vacuum, Keen-Eyed Curator and Lion Sash print it.
-pub const CARD_IN_A_GRAVEYARD: TargetSpec = TargetSpec { min: 1, max: 1, filter: card_in_a_graveyard_filter, label: "" };
+pub const CARD_IN_A_GRAVEYARD: TargetSpec = target(card_in_a_graveyard_filter);
 /// "Target noncreature spell". Spell Pierce and Stubborn Denial print it.
-pub const NONCREATURE_SPELL: TargetSpec = TargetSpec { min: 1, max: 1, filter: noncreature_spell_filter, label: "" };
+pub const NONCREATURE_SPELL: TargetSpec = target(noncreature_spell_filter);
 
 /// Whether a target is a card of one of these types in the asker's own graveyard ("target creature card in your
 /// graveyard", CR 115.1). Eternal Witness takes any card (`types` empty); Recurring Nightmare and Metamorphosis Fanatic
@@ -193,7 +193,7 @@ fn creature_card_in_your_graveyard_filter(q: &dyn Query, asker: &Asker, t: Targe
 }
 
 /// "Target creature card in your graveyard". Recurring Nightmare and Metamorphosis Fanatic print it.
-pub const CREATURE_CARD_IN_YOUR_GRAVEYARD: TargetSpec = TargetSpec { min: 1, max: 1, filter: creature_card_in_your_graveyard_filter, label: "" };
+pub const CREATURE_CARD_IN_YOUR_GRAVEYARD: TargetSpec = target(creature_card_in_your_graveyard_filter);
 
 /// A card chosen to be sacrificed, discarded or tapped as a cost: the filter shapes `Cost::sacrifice` and
 /// `Cost::discard` take. Each is named by what it accepts.

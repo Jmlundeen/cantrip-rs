@@ -8,12 +8,6 @@ fn haste_and_shroud(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[equip(ManaCost::ZERO, "Equip {0}")],
-    statics: &[StaticDef {
-        text: "Equipped creature has haste and shroud.",
-        layer: Layer::Ability,
-        affects: attached_object,
-        apply: haste_and_shroud,
-        ..StaticDef::BLANK
-    }],
+    statics: &[static_ability(Layer::Ability, attached_object, haste_and_shroud, "Equipped creature has haste and shroud.")],
     ..oracle::LIGHTNING_GREAVES
 };

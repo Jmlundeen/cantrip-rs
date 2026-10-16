@@ -9,13 +9,13 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     damage_target(g, item, 0, 3);
     let target = item.targets[0];
     let Some(copier) = target.player().or_else(|| target.object().map(|id| g.controller(id))) else { return Ok(()) };
-    if g.unless_pays(copier, item.object, item.object, mana(0, 0, 0, 0, 2, 0))? {
+    if g.unless_pays(copier, item.object, item.object, mana("{R}{R}"))? {
         g.copy_spell(item.object, copier, true)?;
     }
     Ok(())
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[targets::ANY], effect }),
+    spell: spell(&[targets::ANY], effect),
     ..oracle::CHAIN_LIGHTNING
 };

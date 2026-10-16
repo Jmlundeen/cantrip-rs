@@ -20,10 +20,7 @@ pub static BACK: CardDef = CardDef {
 };
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef {
-        targets: &[TargetSpec { min: 0, max: 2, filter: targets::CREATURE_OR_PLANESWALKER.filter, label: "" }],
-        effect,
-    }),
+    spell: spell(&[targets::CREATURE_OR_PLANESWALKER.between(0, 2)], effect),
     divide: Some(Divide { total: TargetSpec::COUNTED, of_x: Some(total) }),
     back: Some(&BACK),
     ..oracle::SHATTERSKULL_SMASHING

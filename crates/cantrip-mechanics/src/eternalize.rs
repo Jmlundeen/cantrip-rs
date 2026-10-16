@@ -1,7 +1,7 @@
 //! Eternalize [cost] (CR 702.129a): "[Cost], Exile this card from your graveyard: Create a token that's a copy of it,
 //! except it's a 4/4 black Zombie with no mana cost. Activate only as a sorcery." Fanatic of Rhonas prints it.
 //!
-//! A card with eternalize lists `cantrip_api::ability(cost, text)` among its `abilities`.
+//! A card with eternalize lists `ability(cost, text)` among its `abilities`.
 
 use cantrip_api::*;
 

@@ -33,12 +33,6 @@ fn untap_all(g: &mut dyn Game, _: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(when(EventMask::ZONE_CHANGE, creature_enters), untap_all, "Whenever a creature enters, untap all creatures.")],
-    statics: &[StaticDef {
-        text: "Creatures don't untap during their controllers' untap steps.",
-        layer: Layer::PtModify,
-        affects: creatures,
-        apply: does_not_untap,
-        ..StaticDef::BLANK
-    }],
+    statics: &[static_ability(Layer::PtModify, creatures, does_not_untap, "Creatures don't untap during their controllers' untap steps.")],
     ..oracle::INTRUDER_ALARM
 };

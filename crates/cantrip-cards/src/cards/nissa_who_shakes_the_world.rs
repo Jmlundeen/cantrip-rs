@@ -71,13 +71,7 @@ fn indestructible(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
 pub static EMBLEM: CardDef = CardDef {
     name: "Nissa, Who Shakes the World emblem",
     has_cost: false,
-    statics: &[StaticDef {
-        text: "Lands you control have indestructible.",
-        layer: Layer::Ability,
-        affects: land_its_controller_controls,
-        apply: indestructible,
-        ..StaticDef::BLANK
-    }],
+    statics: &[static_ability(Layer::Ability, land_its_controller_controls, indestructible, "Lands you control have indestructible.")],
     text: "Lands you control have indestructible.",
     ..CardDef::BLANK
 };
@@ -87,7 +81,7 @@ pub static CARD: CardDef = CardDef {
         triggered(when(EventMask::TAPPED, forest_tapped_for_mana), add_green, "Whenever you tap a Forest for mana, add an additional {G}.")
             .mana_ability(),
         ability(loyalty(1), animate_land, "+1: Put three +1/+1 counters on up to one target noncreature land you control. Untap it. It becomes a 0/0 Elemental creature with vigilance and haste that's still a land.")
-            .targets(&[TargetSpec { min: 0, max: 1, filter: noncreature_land_you_control, label: "" }]),
+            .targets(&[up_to_one(noncreature_land_you_control)]),
         ability(loyalty(-8), emblem_and_forests, "\u{2212}8: You get an emblem with \"Lands you control have indestructible.\" Search your library for any number of Forest cards, put them onto the battlefield tapped, then shuffle."),
     ],
     ..oracle::NISSA_WHO_SHAKES_THE_WORLD

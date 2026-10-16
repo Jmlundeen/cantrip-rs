@@ -50,26 +50,13 @@ fn destroy_and_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-static MODAL: ModalDef = ModalDef {
-    modes: &[
-        ModeDef {
-            text: "Counter target spell, activated ability, or triggered ability. Its controller draws a card.",
-            targets: &[TargetSpec { min: 1, max: 1, filter: spell_or_ability, label: "" }],
-            effect: counter_and_draw,
-            cost: ManaCost::ZERO,
-        },
-        ModeDef {
-            text: "Destroy another target creature or planeswalker. Its controller draws a card.",
-            targets: &[TargetSpec { min: 1, max: 1, filter: another_creature_or_planeswalker, label: "" }],
-            effect: destroy_and_draw,
-            cost: ManaCost::ZERO,
-        },
-    ],
-    min: 0,
-    max: 1,
-    escalate: None,
-    repeat: false, allowed: None,
-};
+static MODAL: ModalDef = modes(&[
+    mode(counter_and_draw, "Counter target spell, activated ability, or triggered ability. Its controller draws a card.")
+        .targets(&[target(spell_or_ability)]),
+    mode(destroy_and_draw, "Destroy another target creature or planeswalker. Its controller draws a card.")
+        .targets(&[target(another_creature_or_planeswalker)]),
+])
+.choose(0, 1);
 
 pub static CARD: CardDef = CardDef {
     abilities: &[modal_triggered(THIS_ENTERS, &MODAL, "When Ertai Resurrected enters, choose up to one \u{2014} Counter target spell, activated ability, or triggered ability. Its controller draws a card; or destroy another target creature or planeswalker. Its controller draws a card.")],

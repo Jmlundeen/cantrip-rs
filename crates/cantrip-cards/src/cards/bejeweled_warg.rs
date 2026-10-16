@@ -23,21 +23,11 @@ fn treasure(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     tokens::create_treasure(g, item.controller)
 }
 
-static MODAL: ModalDef = ModalDef {
-    modes: &[
-        ModeDef {
-            text: "Put a +1/+1 counter on target Wolf you control.",
-            targets: &[TargetSpec { min: 1, max: 1, filter: wolf_you_control, label: "" }],
-            effect: counter,
-            cost: ManaCost::ZERO,
-        },
-        ModeDef { text: "Create a Treasure token.", targets: &[], effect: treasure, cost: ManaCost::ZERO },
-    ],
-    min: 1,
-    max: 1,
-    escalate: None,
-    repeat: false, allowed: None,
-};
+static MODAL: ModalDef = modes(&[
+    mode(counter, "Put a +1/+1 counter on target Wolf you control.")
+        .targets(&[target(wolf_you_control)]),
+    mode(treasure, "Create a Treasure token."),
+]);
 
 pub static CARD: CardDef = CardDef {
     abilities: &[modal_triggered(DEALS_COMBAT_DAMAGE_TO_PLAYER, &MODAL, "Whenever this creature deals combat damage to a player, choose one \u{2014} Put a +1/+1 counter on target Wolf you control; or create a Treasure token.")],

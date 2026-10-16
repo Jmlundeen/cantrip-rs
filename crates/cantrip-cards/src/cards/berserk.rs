@@ -29,7 +29,7 @@ fn destroy_if_attacked(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[targets::CREATURE], effect: frenzy }),
+    spell: spell(&[targets::CREATURE], frenzy),
     delayed: &[delayed_trigger(destroy_if_attacked, "At the beginning of the next end step, destroy that creature if it attacked this turn.")],
     cast_only_if: Some(before_combat_damage),
     ..oracle::BERSERK

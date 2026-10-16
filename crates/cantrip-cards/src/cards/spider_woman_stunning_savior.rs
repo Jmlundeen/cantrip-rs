@@ -18,12 +18,6 @@ fn apply(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
 }
 
 pub static CARD: CardDef = CardDef {
-    replacements: &[ReplacementDef {
-        hint: "your opponents' artifacts and creatures enter tapped",
-        kind: ReplacementKind::ZoneChange,
-        applies,
-        apply,
-        ..ReplacementDef::BLANK
-    }],
+    replacements: &[replacement(ReplacementKind::ZoneChange, applies, apply, "your opponents' artifacts and creatures enter tapped")],
     ..oracle::SPIDER_WOMAN_STUNNING_SAVIOR
 };

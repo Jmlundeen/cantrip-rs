@@ -7,5 +7,7 @@ use cantrip_api::*;
 
 /// The modal spell of an escalate card: one or more of its modes, `cost` paid for each beyond the first.
 pub const fn modal(modes: &'static [ModeDef], cost: Cost) -> ModalDef {
-    ModalDef { modes, min: 1, max: modes.len() as u8, escalate: Some(cost), repeat: false , allowed: None}
+    cantrip_api::modes(modes)
+        .choose(1, modes.len() as u8)
+        .escalate(cost)
 }

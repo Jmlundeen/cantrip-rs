@@ -16,7 +16,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: Some(SpellDef { targets: &[targets::OPPONENT], effect }),
-    abilities: &[cycling(mana(3, 0, 0, 0, 0, 0), "Cycling {3} ({3}, Discard this card: Draw a card.)")],
+    spell: spell(&[targets::OPPONENT], effect),
+    abilities: &[cycling(mana("{3}"), "Cycling {3} ({3}, Discard this card: Draw a card.)")],
     ..oracle::INTIMIDATION_TACTICS
 };
