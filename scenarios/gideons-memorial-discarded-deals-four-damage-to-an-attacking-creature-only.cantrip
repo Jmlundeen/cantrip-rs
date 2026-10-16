@@ -1,0 +1,46 @@
+# Gideon's Memorial: "{1}{W}, Discard this card: It deals 4 damage to target attacking or blocking creature." An ability
+# of the card in the hand (CR 113.6, 602.2). Bot2 attacks with Ornithopter and keeps Llanowar Elves home: in the declare
+# attackers step Bot1 can't target the Elves, which is neither attacking nor blocking, and discards the Memorial to deal 4
+# damage to the attacking Ornithopter, which dies before it deals any.
+
+[Bot1 Deck]
+Plains
+Gideon's Memorial
+Plains
+Plains x4
+Plains x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Ornithopter
+Forest x4
+Forest x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T4 Bot2.Main1]
+Bot2.Attack(Ornithopter > Bot1)
+Bot2.Pass
+! Bot1.Hand.Gideon's Memorial.Activate(Bot2.Battlefield.Llanowar Elves)
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Gideon's Memorial.Activate(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Graveyard = Ornithopter
+[T4 Bot2.Main2]
+
+[Expect]
+Turn = 4
+Bot1.Life = 20
+Bot1.Graveyard = Gideon's Memorial
+Bot2.Battlefield = Forest; Llanowar Elves

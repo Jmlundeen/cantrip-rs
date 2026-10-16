@@ -1,0 +1,56 @@
+# Gideon's Memorial: "Creature tokens you control get +1/+0 and have vigilance." (CR 613.4c, 702.20.) Bot1's Cat Warrior
+# token from Ajani is 3/1 with vigilance, attacks on turn 5 and stays untapped; Ajani, no token, is 1/2 with no keyword;
+# Bot2's own Cat Warrior, a token Bot1 does not control, is 2/1.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Gideon's Memorial
+Ajani, Nacatl Pariah
+Plains
+Plains x2
+Plains x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Ajani, Nacatl Pariah
+Plains x4
+Plains x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Gideon's Memorial.Cast
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Ajani, Nacatl Pariah.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ajani, Nacatl Pariah.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Cat Warrior.Power = 3
+? Bot1.Battlefield.Cat Warrior.Toughness = 1
+? Bot1.Battlefield.Cat Warrior.Keywords = Vigilance
+? Bot1.Battlefield.Ajani, Nacatl Pariah.Power = 1
+? Bot1.Battlefield.Ajani, Nacatl Pariah.Keywords = (absent)
+? Bot2.Battlefield.Cat Warrior.Power = 2
+? Bot2.Battlefield.Cat Warrior.Keywords = (absent)
+[T5 Bot1.Main1]
+Bot1.Attack(Cat Warrior > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot2.Life = 17
+Bot1.Battlefield.Cat Warrior.Tapped = false
+Bot1.Battlefield.Cat Warrior.Token = true

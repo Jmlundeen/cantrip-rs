@@ -1,0 +1,40 @@
+# Gideon's Memorial's "It deals 4 damage to target attacking or blocking creature" takes a blocking creature too (CR
+# 509.1g). Bot1's Llanowar Elves attacks, Bot2's Ornithopter blocks it, and in the declare blockers step Bot1 discards the
+# Memorial to kill the blocker. The Elves stays blocked (CR 509.1h) and deals no damage to Bot2.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Gideon's Memorial
+Plains
+Plains x3
+Plains x10
+
+[Bot2 Deck]
+Island
+Ornithopter
+Island x5
+Island x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Attack(Llanowar Elves > Bot2)
+Bot2.Block(Ornithopter > Llanowar Elves)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Gideon's Memorial.Activate(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Graveyard = Ornithopter
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 20
+Bot1.Graveyard = Gideon's Memorial
+Bot1.Battlefield.Llanowar Elves.Damage = 0

@@ -1,0 +1,38 @@
+# Gideon's Memorial: "{T}: Add one mana of any color. Spend this mana only to cast a planeswalker spell." (CR 106.6.)
+# Turn 3, with two Swamps and the Memorial's {B}: Hired Blade, {2}{B}, a creature spell, can't be cast, for only two of
+# the three mana may pay for it; Liliana of the Veil, {1}{B}{B}, a planeswalker spell, is cast with all three.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Gideon's Memorial
+Hired Blade
+Liliana of the Veil
+Swamp
+Swamp x2
+Swamp x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Gideon's Memorial.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Gideon's Memorial.Activate(Color: Black)
+? Bot1.Mana = {B} (PlaneswalkerSpells)
+! Bot1.Hand.Hired Blade.Cast
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Liliana of the Veil.Cast(Spend: B PlaneswalkerSpells, B, B)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Bot1.Mana =
+Bot1.Battlefield.Liliana of the Veil.Counters.Loyalty = 3
+Bot1.Hand.Count = 3
