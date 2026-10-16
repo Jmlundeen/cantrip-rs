@@ -1,0 +1,34 @@
+# "When The Echoverse Fulcrum enters, draw a card, then discard a card" (CR 121.1, 701.9): the draw comes first, so the Island
+# just drawn from the top of the library is among the cards Bot1 can discard, and Bot1 discards it, keeping the Bolt and
+# three Forests; the hand ends where it started, four cards.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+The Echoverse Fulcrum
+Lightning Bolt
+Forest
+Forest
+Forest
+Island
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.The Echoverse Fulcrum.Cast
+Bot1.Pass
+Bot1.Choose(Island)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Island
+Bot1.Hand.Count = 4
+Bot1.Battlefield.The Echoverse Fulcrum.Tapped = false

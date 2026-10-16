@@ -1,0 +1,57 @@
+# "{5}, {T}, Exile The Echoverse Fulcrum: Destroy all creatures. Activate only as a sorcery." On turn 3 Bot1 has five untapped
+# Moxen, but with its own Ornithopter spell on the stack the ability is not offered (CR 307.1, 602.5d); once the spell has
+# resolved it is the positive control and is activated. Both Ornithopters (artifact creatures, Bot2's too) are destroyed
+# together; the Fulcrum itself, exiled as a cost (CR 118.3), is in exile, and the five Moxen, noncreature artifacts, stay.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+The Echoverse Fulcrum
+Ornithopter
+Forest x14
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.The Echoverse Fulcrum.Cast
+Bot1.Pass
+Bot1.Choose(Forest)
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+! Bot1.Battlefield.The Echoverse Fulcrum.Activate
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.The Echoverse Fulcrum.Activate
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = The Echoverse Fulcrum
+Bot1.Graveyard = Ornithopter; Forest
+Bot2.Graveyard = Ornithopter
+Bot1.Battlefield = Mox Jet; Mox Ruby; Mox Pearl; Mox Sapphire; Mox Emerald
+Bot2.Battlefield.Count = 0
