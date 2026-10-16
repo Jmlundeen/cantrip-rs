@@ -1,0 +1,45 @@
+# Daydream: "target creature you own" - owned, not controlled (CR 108.3). Bot2's Dack Fayden takes Bot1's Ornithopter
+# (an artifact creature). Bot1 Daydreams it: the legal target is exiled and returns "under your control" (CR 400.7),
+# so it comes back under Bot1, with its +1/+1 counter.
+
+[Bot1 Deck]
+Mox Pearl
+Ornithopter
+Daydream
+Plains x17
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Dack Fayden
+Plains x16
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Dack Fayden.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Dack Fayden.Activate(Bot1.Battlefield.Ornithopter; Ability: Gain control)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield = Mox Sapphire; Mox Ruby; Mox Jet; Dack Fayden; Ornithopter
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Daydream.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield = Mox Sapphire; Mox Ruby; Mox Jet; Dack Fayden
+Bot1.Battlefield = Mox Pearl; Ornithopter
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot1.Graveyard = Daydream

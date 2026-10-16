@@ -1,0 +1,44 @@
+# Daydream: "Exile target creature you own, then return that card to the battlefield under your control with a +1/+1
+# counter on it." The Ornithopter comes back as a new object (CR 400.7) with one +1/+1 counter (CR 122.6) and is
+# summoning sick again. Flashback {2}{W} (CR 702.34a) exiles the Daydream afterwards, and flashed back at the same
+# creature the counter is not added to: the first counter went with the old object, the new one has exactly one.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Ornithopter
+Daydream
+Plains
+Plains x14
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Daydream.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Ornithopter.Power = 1
+? Bot1.Battlefield.Ornithopter.Toughness = 3
+? Bot1.Battlefield.Ornithopter.SummoningSick = true
+? Bot1.Graveyard = Daydream
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Pearl#3.Activate
+Bot1.Graveyard.Daydream.Cast(Ornithopter; Ability: Flashback)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile = Daydream
+Bot1.Graveyard =
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter.Power = 1

@@ -1,0 +1,49 @@
+# Authority of the Consuls only speaks of creatures: Bot2's Plains enters untapped and gains Bot1 nothing (CR 614.1c,
+# 603.2). Bot2's Ornithopter enters tapped for 1 life; Bot2 then casts Daydream on it, and the creature that returns
+# is a new object (CR 400.7) entering under Bot2's control, so it enters tapped again (with its +1/+1 counter) and
+# Bot1 gains another life.
+
+[Bot1 Deck]
+Plains
+Authority of the Consuls
+Plains x5
+Plains x13
+
+[Bot2 Deck]
+Plains
+Ornithopter
+Daydream
+Plains x4
+Plains x13
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Authority of the Consuls.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+? Bot2.Battlefield.Plains.Tapped = false
+? Bot1.Life = 20
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+? Bot1.Life = 21
+? Bot2.Battlefield.Ornithopter.Tapped = true
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Daydream.Cast(Ornithopter)
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 1
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Life = 22
+Bot2.Battlefield = Plains; Ornithopter
+Bot2.Battlefield.Ornithopter.Tapped = true
+Bot2.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot2.Graveyard = Daydream

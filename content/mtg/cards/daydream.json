@@ -1,0 +1,6 @@
+{
+  "name": "Daydream",
+  "manaCost": "{W}",
+  "type": "Instant",
+  "oracleText": "Exile target creature you own, then return that card to the battlefield under your control with a +1/+1 counter on it.\nFlashback {2}{W} (You may cast this card from your graveyard for its flashback cost. Then exile it.)"
+}
