@@ -368,3 +368,27 @@ pub static SERVO: CardDef = CardDef {
     shares_name: true,
     ..CardDef::BLANK
 };
+
+/// A 1/1 blue Fish creature token (CR 702.174f). Into the Flood Maw's gift makes it, tapped.
+pub static FISH: CardDef = CardDef {
+    name: "Fish",
+    has_cost: false,
+    colors: Some(ColorSet::of(Color::Blue)),
+    types: TypeSet::of(&[CardType::Creature]),
+    subtypes: SubtypeSet::of(&[Subtype::Fish]),
+    power: Some(1),
+    toughness: Some(1),
+    ..CardDef::BLANK
+};
+
+/// An 8/8 blue Octopus creature token (CR 702.174i). "Gift an Octopus" makes it.
+pub static OCTOPUS: CardDef = CardDef {
+    name: "Octopus",
+    has_cost: false,
+    colors: Some(ColorSet::of(Color::Blue)),
+    types: TypeSet::of(&[CardType::Creature]),
+    subtypes: SubtypeSet::of(&[Subtype::Octopus]),
+    power: Some(8),
+    toughness: Some(8),
+    ..CardDef::BLANK
+};
