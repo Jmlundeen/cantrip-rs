@@ -1,0 +1,41 @@
+# Pym Particles on Bot1's own Ornithopter: Bot1 draws a card (library 12 -> 11), the Ornithopter has vigilance and can't be blocked this turn, so
+# Bot2's Ornithopter, a flier that could otherwise block it, may not (the refusal) and the attacker stays untapped. On turn five, with nothing done,
+# the same attack can be blocked (the positive control) and taps, since "until end of turn" and "this turn" are over.
+
+[Bot1 Deck]
+Island
+Island
+Ornithopter
+Pym Particles
+Island x16
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+? Bot1.Library.Count = 12
+Bot1.Hand.Pym Particles.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Library.Count = 11
+? Bot1.Battlefield.Ornithopter.Keywords = CantBeBlocked; Flying; Vigilance
+Bot1.Attack(Ornithopter > Bot2)
+! Bot2.Block(Ornithopter > Ornithopter)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Ornithopter.Tapped = false
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Ornithopter.Keywords = Flying
+Bot1.Attack(Ornithopter > Bot2)
+Bot2.Block(Ornithopter > Ornithopter)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Ornithopter.Tapped = true
+
+[Expect]
+Bot1.Graveyard = Pym Particles

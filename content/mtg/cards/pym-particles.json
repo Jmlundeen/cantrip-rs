@@ -1,0 +1,6 @@
+{
+  "name": "Pym Particles",
+  "manaCost": "{U}",
+  "type": "Sorcery",
+  "oracleText": "Target creature gains vigilance until end of turn and can't be blocked this turn.\nDraw a card."
+}

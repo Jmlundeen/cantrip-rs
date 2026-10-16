@@ -1,0 +1,36 @@
+# Pym Particles targets Bot1's Ornithopter; Bot2 responds with Lightning Bolt and kills the 0/2. Its only target is illegal on resolution, so the
+# spell is countered by the rules (CR 608.2b) and does nothing, the draw included: Bot1's library stays at 12.
+
+[Bot1 Deck]
+Island
+Island
+Ornithopter
+Pym Particles
+Island x16
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Ornithopter.Cast
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Pym Particles.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Library.Count = 12
+Bot1.Graveyard = Pym Particles; Ornithopter
+Bot2.Graveyard = Lightning Bolt
