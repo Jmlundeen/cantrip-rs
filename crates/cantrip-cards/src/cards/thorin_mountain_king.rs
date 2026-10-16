@@ -3,12 +3,6 @@ use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
 
-/// "Any number of target Equipment you control" (CR 115.1d): an Equipment permanent its controller controls.
-fn equipment_you_control(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    matches!(t, Target::Object(id)
-        if targets::permanent(q, id) && q.controller(id) == asker.controller && q.chars(id).has_subtype(Subtype::Equipment))
-}
-
 /// "When Thorin enters, attach any number of target Equipment you control to target creature you control. When one or more
 /// Equipment become attached to that creature this way, that creature deals damage equal to its power to up to one target
 /// creature."
@@ -55,7 +49,7 @@ pub static CARD: CardDef = CardDef {
     )
     .targets(&[
         targets::CREATURE_YOU_CONTROL.labelled("Creature you control to attach the Equipment to"),
-        up_to(TargetSpec::ANY_NUMBER, equipment_you_control).labelled("Equipment you control to attach (any number)"),
+        up_to(TargetSpec::ANY_NUMBER, targets::EQUIPMENT_YOU_CONTROL.filter).labelled("Equipment you control to attach (any number)"),
     ])],
     delayed: &[delayed_trigger(
         creature_deals_damage,

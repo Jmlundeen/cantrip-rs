@@ -283,6 +283,7 @@ A card choice, `! Bot1.Choose(Thopter)`, is checked at that player's next choice
 chosen from a revealed hand) and fails if the named card is among those it may take; it fails as proving nothing when no such
 card exists in the game. It shows a cost or choice leaves something out (a token as "a nontoken artifact"); pair it with the
 `Bot1.Choose(Thopter Foundry)` that takes the legal card on the next line. Without arguments it is the bare refusal below.
+Several names that are all among the cards it may take are instead one answer, which the question must refuse: `! Bot1.Choose(A; B; C)` for "up to two".
 
 A name, `! Bot1.Name(Lightning Bolt)`, is checked at that player's next card name question and fails if the question would accept
 that name (CR 201.4a: a nonland name where a land card name is asked for passes the refusal); pair it with the `Bot1.Name(...)` that

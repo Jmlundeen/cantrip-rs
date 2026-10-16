@@ -23,7 +23,7 @@ static DRAGON: CardDef = CardDef {
 /// has already left the battlefield cannot be).
 fn treasure_and_dragon(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     tokens::create_treasure(g, item.controller)?;
-    let treasures = g.permanents_of(item.controller).into_iter().filter(|&id| g.chars(id).has_subtype(Subtype::Treasure)).count();
+    let treasures = tokens::treasures_controlled(g, item.controller).len();
     if treasures >= 4 && !g.sacrifice(&[item.object]).is_empty() {
         tokens::create(g, item.controller, &DRAGON, 1)?;
     }

@@ -40,16 +40,7 @@ fn affects(view: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Char
     encoded_on(view.state(), source) == Some(affected)
 }
 
-/// "That creature has" the ability (CR 702.99a, 613.1f): the card's delayed ability 0, an ability of the creature, so
-/// its controller controls it, and it is lost with the creature's abilities.
-fn grant(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
-    let card = view.state().obj(source).card;
-    if let Some(slot) = chars.abilities.iter().position(|a| a.is_none()) {
-        chars.abilities[slot] = Some(AbilityRef::delayed(card, 0));
-    }
-}
-
-pub const STATIC: StaticDef = static_ability(Layer::Ability, affects, grant, "For as long as this card is encoded on that creature, that creature has \"Whenever this creature deals combat damage to a player, you may copy the encoded card and you may cast the copy without paying its mana cost.\"")
+pub const STATIC: StaticDef = static_ability(Layer::Ability, affects, crate::statics::grant_delayed_ability, "For as long as this card is encoded on that creature, that creature has \"Whenever this creature deals combat damage to a player, you may copy the encoded card and you may cast the copy without paying its mana cost.\"")
     .from(ZoneKind::Exile);
 
 /// "You may copy the encoded card and you may cast the copy without paying its mana cost" (CR 702.99a, 707.12): the card

@@ -1544,6 +1544,23 @@ impl<'s> Run<'s> {
             }
             RequestKind::ChooseCards { eligible, .. } | RequestKind::TapForPower { cards: eligible, .. } | RequestKind::Craft { cards: eligible, .. } => {
                 let everything: Vec<ObjectId> = (0..self.game.state.objects.len() as u32).map(ObjectId).collect();
+                // Several names that are all eligible are one answer, which the question must refuse: more cards than it takes
+                // (`! Bot1.Choose(A; B; C)` for "up to two"), as for targets.
+                if matches!(request.kind, RequestKind::ChooseCards { .. }) && action.positional().count() > 1 {
+                    let mut named: Vec<ObjectId> = Vec::new();
+                    for spec in action.positional() {
+                        match self.objects(action, spec.trim(), eligible)?.into_iter().find(|id| !named.contains(id)) {
+                            Some(id) => named.push(id),
+                            None => break,
+                        }
+                    }
+                    if named.len() == action.positional().count() {
+                        if check_answer(&self.game, request, &Answer::Cards(named)).is_ok() {
+                            return fail(format!("line {line} says {text} must not be an answer the question accepts, but it is"));
+                        }
+                        return Ok(());
+                    }
+                }
                 for spec in action.positional() {
                     if self.objects(action, spec.trim(), &everything)?.is_empty() {
                         return fail(format!("line {line}: {text} proves nothing: no such card is in the game"));

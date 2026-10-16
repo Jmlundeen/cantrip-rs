@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{empower, triggers::THIS_ENTERS};
+use cantrip_mechanics::{empower, statics, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 /// "When Way of the Pyromancer enters, empower Jace 2."
@@ -22,19 +22,10 @@ fn planeswalkers_you_control(q: &dyn LayerQuery, source: ObjectId, affected: Obj
     so_far.is(CardType::Planeswalker) && s.obj(affected).controller == s.obj(source).controller
 }
 
-/// Gives each such planeswalker this enchantment's own delayed ability 0 as an activated ability of its own (layer 6, CR 613.1f).
-fn grant_plus_one(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
-    let o = view.state().obj(source);
-    let card = o.copy.map(|c| c.card).unwrap_or(o.card);
-    if let Some(slot) = chars.abilities.iter().position(|a| a.is_none()) {
-        chars.abilities[slot] = Some(AbilityRef::delayed(card, 0));
-    }
-}
-
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(THIS_ENTERS, empower_jace, "When Way of the Pyromancer enters, empower Jace 2.")],
     delayed: &[ability(loyalty(1), add_red, "+1: Add {R}.")],
-    statics: &[static_ability(Layer::Ability, planeswalkers_you_control, grant_plus_one, "Planeswalkers you control have \"[+1]: Add {R}.\"")],
+    statics: &[static_ability(Layer::Ability, planeswalkers_you_control, statics::grant_delayed_ability, "Planeswalkers you control have \"[+1]: Add {R}.\"")],
     ..oracle::WAY_OF_THE_PYROMANCER
 };
 
