@@ -1,0 +1,46 @@
+# Hop to It creates three 1/1 white Rabbit creature tokens under its controller's control (CR 111.2, 111.4). They are new
+# creatures, so they are summoning sick on the turn they arrive (CR 302.6): on turn 3 the Rabbits are not offered as attackers
+# though Mother of Runes (in play since turn 1) is, and on turn 5 a Rabbit may attack (the positive control).
+# Cast with Mox Pearl, Mox Pearl and Plains: exactly {2}{W}.
+
+[Bot1 Deck]
+Plains
+Plains
+Mox Pearl
+Mox Pearl
+Mother of Runes
+Hop to It
+Plains x14
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Mother of Runes.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Hand.Hop to It.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Rabbit#1.Token = true
+? Bot1.Battlefield.Rabbit#1.Colors = White
+? Bot1.Battlefield.Rabbit#1.Power = 1
+? Bot1.Battlefield.Rabbit#1.Toughness = 1
+? Bot1.Battlefield.Rabbit#1.SummoningSick = true
+! Bot1.Attack(Rabbit > Bot2)
+Bot1.Attack(Mother of Runes)
+[T5 Bot1.Main1]
+Bot1.Attack(Rabbit > Bot2)
+
+[Expect]
+Bot1.Battlefield = Plains; Plains; Mox Pearl; Mox Pearl; Mother of Runes; Rabbit; Rabbit; Rabbit
+Bot1.Graveyard = Hop to It
+Step = Attackers
+Combat.Attackers = Rabbit > Bot2

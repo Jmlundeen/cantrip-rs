@@ -1,0 +1,43 @@
+# A countered Hop to It never resolves (CR 701.6a), so no Rabbit tokens are created and the card goes to its owner's graveyard.
+# It is a sorcery: Bot1 may not cast it while Bot2's Mox Sapphire is on the stack on Bot2's turn 2, even with all three mana
+# open (CR 307.1), and the same cast on its own turn 3 (the positive control) is offered and then answered by Counterspell.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Pearl
+Plains
+Hop to It
+Plains x14
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Island x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+! Bot1.Hand.Hop to It.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Hand.Hop to It.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Hop to It)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Plains; Mox Pearl; Mox Pearl
+Bot1.Graveyard = Hop to It
+Bot2.Graveyard = Counterspell
