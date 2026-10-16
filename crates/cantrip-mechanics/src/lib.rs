@@ -457,6 +457,12 @@ pub fn trample_until_end_of_turn(g: &mut dyn Game, source: ObjectId, creature: O
     g.add_effect(source, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::Trample])), Duration::EndOfTurn);
 }
 
+/// "The number of artifacts you control": the artifacts `player` controls as it is read (a resolving spell's or ability's X is
+/// counted once, as it resolves, CR 608.2h). Aerid Konstrari, Craterclaw Colossus, Dowsing Device and Fomori Vault print it.
+pub fn artifacts_you_control(q: &dyn Query, player: PlayerId) -> usize {
+    q.permanents_of(player).into_iter().filter(|&id| q.chars(id).is(CardType::Artifact)).count()
+}
+
 /// Scry N (CR 701.22): look at the top N cards of your library, put any number on the bottom in any order and the
 /// rest back on top in any order. Nothing is asked of an empty library. Undercity's Lost Well prints "scry 2".
 pub fn scry(g: &mut dyn Game, player: PlayerId, source: ObjectId, count: usize) -> Result<(), Suspend> {

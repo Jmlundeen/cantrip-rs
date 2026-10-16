@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::pump;
+use cantrip_mechanics::{artifacts_you_control, pump};
 use cantrip_mechanics::tokens;
 use cantrip_mechanics::triggers::{THIS_DIES, THIS_ENTERS};
 use cantrip_oracle as oracle;
@@ -14,11 +14,7 @@ fn create_heartwood(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// the battlefield, it gets nothing (CR 400.7).
 fn make_and_grow(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     tokens::create_heartwood(g, item.controller)?;
-    let artifacts = g
-        .permanents_of(item.controller)
-        .into_iter()
-        .filter(|&p| g.chars(p).is(CardType::Artifact))
-        .count() as i16;
+    let artifacts = artifacts_you_control(g, item.controller) as i16;
     pump(g, item.object, item.object, artifacts, 0);
     Ok(())
 }

@@ -1,13 +1,9 @@
 use cantrip_api::*;
-use cantrip_mechanics::{haste_until_end_of_turn, pump, targets};
+use cantrip_mechanics::{artifacts_you_control, haste_until_end_of_turn, pump, targets};
 use cantrip_oracle as oracle;
 
 /// "up to one target creature you control".
 const UP_TO_ONE_CREATURE_YOU_CONTROL: TargetSpec = targets::CREATURE_YOU_CONTROL.between(0, 1);
-
-fn artifacts_you_control(q: &dyn Query, player: PlayerId) -> usize {
-    q.permanents_of(player).into_iter().filter(|&id| q.chars(id).is(CardType::Artifact)).count()
-}
 
 /// "Whenever this artifact or another artifact you control enters" (CR 603.6a): one ability for both, its own entry
 /// included.

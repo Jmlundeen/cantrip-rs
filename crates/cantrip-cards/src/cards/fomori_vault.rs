@@ -1,5 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::library::{look_at_top, Rest};
+use cantrip_mechanics::artifacts_you_control;
 use cantrip_oracle as oracle;
 
 fn any_card(_: &dyn Query, _: &Asker, _: ObjectId) -> bool {
@@ -11,7 +12,7 @@ fn any_card(_: &dyn Query, _: &Asker, _: ObjectId) -> bool {
 /// nothing, which does nothing.
 fn look(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let player = item.controller;
-    let artifacts = g.permanents_of(player).into_iter().filter(|&id| g.chars(id).is(CardType::Artifact)).count();
+    let artifacts = artifacts_you_control(g, player);
     look_at_top(g, player, item.object, artifacts, (1, 1), false, |_| true, Rest::BottomRandom)?;
     Ok(())
 }
