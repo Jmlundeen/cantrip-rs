@@ -81,6 +81,7 @@ pub mod typecycling;
 pub mod unearth;
 pub mod triggers;
 pub mod warp;
+pub mod web_slinging;
 pub mod targets;
 pub mod text_change;
 pub mod tokens;

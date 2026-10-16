@@ -68,7 +68,9 @@ abilities: &[
 
 - **Costs**: `TAP`, `SACRIFICE_THIS`, `cost("{1}{U}")` (mana symbols as printed, read at compile time; `cost("{1}, {T}")`
   includes the tap), `loyalty(n)`, `life(n)`, `sacrifice(n, filter)`, `discard(n, filter)`, `remove_counters(kind, n)`,
-  `DISCARD_THIS`, `EXILE_THIS`, `EXERT`, joined with `.and(..)`; anything rarer is a `Cost { .., ..Cost::NONE }`. A bare
+  `DISCARD_THIS`, `EXILE_THIS`, `EXERT`, joined with `.and(..)`; `return_tapped_to_hand(n, filter)` is "return N tapped
+  [permanents]", whose permanents are chosen once the mana is paid, so one tapped for mana while paying may be among
+  them (web-slinging, `cantrip_mechanics::web_slinging::way(cost, text)`); anything rarer is a `Cost { .., ..Cost::NONE }`. A bare
   mana cost (equip, flashback, kicker, madness) is `mana("{2}{R}")`, or `generic(n)` for a number the card works out.
 - **Mana**: `add(Mana::G)`, `add_n(Mana::C, 2)`, `add_each(&[Mana::W, Mana::U])`, `add_any_color(1)`,
   `add_one_of(&[Color::Red, Color::Green])`, `.only_for(restriction)`. What these list is what is added; a card whose
@@ -103,7 +105,7 @@ What a `CardDef` can carry (see `crates/cantrip-api/src/card.rs`):
 | --- | --- |
 | `spell: spell(targets, effect)` | an instant's or sorcery's effect, and its target slots |
 | `abilities: &[AbilityDef]` | its activated, mana and triggered abilities, written as above. **Mana abilities first**: the C# engine numbers them first. |
-| `ways: &[way(..)]` | alternative costs (flashback from the graveyard, Fireblast's sacrifice, Gush's return), way 1 onward; `instant_speed` offers one whenever an instant could be cast, whatever the card's type (sneak) |
+| `ways: &[way(..)]` | alternative costs (flashback from the graveyard, Fireblast's sacrifice, Gush's return, web-slinging's tapped creature), way 1 onward; `instant_speed` offers one whenever an instant could be cast, whatever the card's type (sneak); `kind(WayKind::..)` names the keyword a card asks about ("cast using web-slinging": `web_slinging::was_cast_using_web_slinging`) |
 | `enters: Some(fn)` | "as this enters" and "enters with": edits the `Entering` record (tapped, counters, a copy) before it is on the battlefield |
 | `delayed: &[AbilityDef]` | abilities its effects set up to trigger later (`Game::delayed_trigger` with `AbilityRef::delayed(card, n)`), or give an object with `EffectKind::AddAbility`; a quoted static ability it gives is `granted_static(layer, apply, text)` (layer 7 only; its source is the object that has it) |
 | `replacements: &[replacement(..)]` | its replacement effects (CR 614): a `hint`, the event kind (`ZoneChange`, `Counters`, `DrawInstruction`), `applies(q, asker, &Proposal)` and `apply(q, asker, &mut Proposal)`, both pure; `own_everywhere` for "if this card would ... from anywhere". Several that apply to one event are ordered by the affected player (`Replace(...)` in a scenario). The shared "+1/+1 counters, plus one" is in `cantrip_mechanics::replacements` |

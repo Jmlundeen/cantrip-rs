@@ -258,6 +258,16 @@ once its turn-based actions are done (514.3a), and then marks `Turn::cleanup_aga
 everyone has passed. Ultima, Time Stop, Sundial of the Infinite, Glorious End, Day's Undoing, Hurkyl's Final
 Meditation, Discontinuity and Obeka, Brute Chronologist end the turn.
 
+### Casting: when a cost's choices are made
+
+A spell's costs are chosen and paid in the order of CR 601.2b-h, as the C# engine asked them: the permanents a cost
+sacrifices or returns, its discards and exiles are chosen before the mana is paid, an additional cost's choices after it.
+A cost of tapped permanents (`PermanentCost::tapped`, web-slinging's "return a tapped creature you control", CR 702.188a)
+is chosen once the mana is paid, since mana abilities come first (CR 601.2g) and one of them may have tapped the creature
+(Spider-Sense's ruling): it is offered while a creature is tapped or a mana ability its controller could activate would
+tap one, its own {T} or Springleaf Drum's, and a payment that leaves none tapped can't be completed, so the cast is taken
+back (CR 601.2h). Only a spell's cost has one yet; an activated ability's is refused by a debug assertion.
+
 ### Legal moves as a first-class output
 
 Every pending request comes with its legal answers enumerated, cheaply and in a stable order. The client's prompt
@@ -340,6 +350,12 @@ Known gaps:
   permanent face up (`TurnFaceUp`).
 - Serving a scenario's handed-over position to the web client, to look at or play on from, went with the C# engine
   and is not rebuilt.
+- Web-slinging cards that wait: Spider-UK ("if two or more creatures entered the battlefield under your control this
+  turn") needs the controller a creature entered under, which the history cannot answer once control has changed (no
+  event records a change of control); Arachne, Psionic Weaver needs a card type chosen as it enters (`Entering` has a
+  color, a subtype, a player, a name, odd or even, no card type) and a prompt for it; Peter Parker // Amazing
+  Spider-Man's back face grants web-slinging to the legendary spells its controller casts, a way a permanent gives to
+  cards in hand, which only exists for cards in graveyards (`granted_ways_of`).
 - No scenario reaches Questing Beast's unpreventable damage, Emrakul's extra turn on cast, or Tamiyo's -7 emblem.
 - Suspend does not give a creature cast that way haste (no card in content needs it), and several creatures put onto
   the battlefield one after another by an effect (Ghost Vacuum) enter one at a time rather than together.
