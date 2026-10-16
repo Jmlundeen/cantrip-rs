@@ -97,6 +97,19 @@ pub fn discard_hand_then_draw(g: &mut dyn Game, item: &StackItem, n: u32) -> Res
     Ok(())
 }
 
+/// "Each player discards their hand, then draws seven cards": every player, in turn order from the active player
+/// (CR 101.4), discards together and then draws; nobody is asked, a whole hand leaving nothing to choose. Wheel of Fortune
+/// and Reforge the Soul print it.
+pub fn each_player_discards_hand_then_draws_seven(g: &mut dyn Game, _: &StackItem) -> Result<(), Suspend> {
+    let players: Vec<PlayerId> = g.state().apnap().collect();
+    let hands: Vec<ObjectId> = players.iter().flat_map(|&p| g.state().zone(Zone::hand(p)).to_vec()).collect();
+    g.discard_together(&hands);
+    for p in players {
+        g.draw(p, 7);
+    }
+    Ok(())
+}
+
 /// "You gain N life" (CR 119.3). Zuran Orb and Inventor's Fair print it (two and one).
 pub fn gain_life(g: &mut dyn Game, item: &StackItem, n: i32) -> Result<(), Suspend> {
     g.gain_life(item.controller, n);
