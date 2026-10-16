@@ -1,0 +1,42 @@
+# Pillar of Origins names Goblin; its mana is "only to cast a creature spell of the chosen type" (CR 106.6, 205.3m).
+# Woodland Changeling is every creature type, in the hand and on the stack (changeling, CR 702.73a), so it is a Goblin
+# creature spell: it is offered with the Pillar's {G} and Mox Jet's {B} and cast with them. Llanowar Elves, an Elf only,
+# can't be cast with the Pillar's {G}.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Pillar of Origins
+Woodland Changeling
+Llanowar Elves
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Pillar of Origins.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Goblin)
+Bot1.Battlefield.Pillar of Origins.Activate(Color: Green)
+? Bot1.Mana = {G} (GoblinCreatureSpells)
+! Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Woodland Changeling.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Battlefield = Mox Jet; Mox Pearl; Mox Ruby; Pillar of Origins; Woodland Changeling
+Bot1.Hand = Llanowar Elves; Island
