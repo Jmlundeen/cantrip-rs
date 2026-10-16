@@ -1,0 +1,31 @@
+# Enlightened Confidant: the lifelink attack gains 2 life, and Wrath of God (mana value 4, more than 2) surveilled into the
+# graveyard stays there: "mana value less than or equal to the amount of life you gained" is false (the control is the
+# scenario where a card of mana value 1 goes to hand).
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Enlightened Confidant
+Plains x4
+Island
+Wrath of God
+Plains x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Enlightened Confidant.Cast
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot1.Attack(Enlightened Confidant)
+Bot1.Arrange(| Wrath of God)
+[T5 Bot1.Upkeep]
+
+[Expect]
+Bot1.Life = 22
+Bot1.Hand = Island; Plains; Plains; Plains; Plains
+Bot1.Graveyard = Wrath of God; Black Lotus

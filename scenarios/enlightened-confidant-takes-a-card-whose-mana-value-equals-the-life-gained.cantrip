@@ -1,0 +1,28 @@
+# Enlightened Confidant: "less than or equal to": Counterspell (mana value 2) with 2 life gained goes to hand.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Enlightened Confidant
+Plains x4
+Island
+Counterspell
+Plains x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Enlightened Confidant.Cast
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot1.Attack(Enlightened Confidant)
+Bot1.Arrange(| Counterspell)
+[T5 Bot1.Upkeep]
+
+[Expect]
+Bot1.Hand = Counterspell; Island; Plains; Plains; Plains; Plains
+Bot1.Graveyard = Black Lotus

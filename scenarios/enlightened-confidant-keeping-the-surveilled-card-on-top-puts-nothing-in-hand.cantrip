@@ -1,0 +1,31 @@
+# Enlightened Confidant: Lightning Bolt (cheap enough) is kept on top instead of put into the graveyard, so nothing was put
+# into the graveyard "this way" and nothing goes to hand: Bolt is still in the library and is drawn on turn 5.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Enlightened Confidant
+Plains x4
+Island
+Lightning Bolt
+Plains x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Enlightened Confidant.Cast
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot1.Attack(Enlightened Confidant)
+Bot1.Arrange(Lightning Bolt)
+[T5 Bot1.Upkeep]
+? Bot1.Hand = Island; Plains; Plains; Plains; Plains
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Hand = Island; Lightning Bolt; Plains; Plains; Plains; Plains
+Bot1.Graveyard = Black Lotus

@@ -1,0 +1,28 @@
+# Enlightened Confidant: "if you gained life this turn" is an intervening if (CR 603.4). It does not attack on turn 3, so
+# no life is gained and the end step surveils nothing: no question is asked (`! Bot1.Arrange`) and the library is untouched.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Enlightened Confidant
+Plains x4
+Island
+Lightning Bolt
+Plains x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Enlightened Confidant.Cast
+[T3 Bot1.Main1]
+! Bot1.Arrange
+[T5 Bot1.Upkeep]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Library.Count = 12
+Bot1.Hand = Island; Plains; Plains; Plains; Plains

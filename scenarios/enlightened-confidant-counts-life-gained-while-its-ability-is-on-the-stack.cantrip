@@ -1,0 +1,37 @@
+# Enlightened Confidant: the trigger checks "if you gained life this turn" when it would trigger (2 life from the lifelink
+# attack), but the last part counts the life as the ability resolves. With the trigger on the stack at the end step, Bot1 casts
+# Swords to Plowshares on its own Confidant and gains 2 more (4 in all): Wrath of God (mana value 4) surveilled into the
+# graveyard now goes to hand, though it would not have with only the 2. The ability resolves although its source is gone.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Enlightened Confidant
+Swords to Plowshares
+Plains x3
+Island
+Wrath of God
+Plains x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Enlightened Confidant.Cast
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot1.Attack(Enlightened Confidant)
+[T3 Bot1.End]
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Swords to Plowshares.Cast(Enlightened Confidant)
+Bot1.Arrange(| Wrath of God)
+[T5 Bot1.Upkeep]
+
+[Expect]
+Bot1.Life = 24
+Bot1.Hand = Island; Plains; Plains; Plains; Wrath of God
+Bot1.Graveyard = Swords to Plowshares; Black Lotus
+Exile = Enlightened Confidant
