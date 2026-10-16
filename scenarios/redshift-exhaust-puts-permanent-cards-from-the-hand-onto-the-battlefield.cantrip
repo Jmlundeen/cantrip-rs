@@ -1,0 +1,58 @@
+# Redshift, Rocketeer Chief: "Exhaust - {10}{R}{G}: Put any number of permanent cards from your hand onto the
+# battlefield." Turn 7 twelve mana pays it, Redshift's own {G}{G} for abilities among it (CR 106.6). As it resolves
+# Lightning Bolt, no permanent card, can't be chosen; Ornithopter is put onto the battlefield.
+
+[Bot1 Deck]
+Mountain
+Mox Emerald
+Mox Ruby
+Mox Jet
+Redshift, Rocketeer Chief
+Black Lotus
+Lightning Bolt
+Forest
+Sol Ring
+Ornithopter
+Forest x10
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Redshift, Rocketeer Chief.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main1]
+Bot1.Battlefield.Redshift, Rocketeer Chief.Activate(Ability: Add X mana; Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Redshift, Rocketeer Chief.Activate(Ability: Exhaust)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose(Lightning Bolt)
+Bot1.Choose(Ornithopter)
+
+[Expect]
+Turn = 7
+Bot1.Mana =
+Bot1.Battlefield.Ornithopter.Tapped = false
+Bot1.Hand = Lightning Bolt

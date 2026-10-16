@@ -1,0 +1,11 @@
+{
+  "name": "Redshift, Rocketeer Chief",
+  "manaCost": "{R}{G}",
+  "type": "Legendary Creature — Goblin Pilot",
+  "power": 2,
+  "toughness": 3,
+  "oracleText": "Vigilance\n{T}: Add X mana of any one color, where X is Redshift's power. Spend this mana only to activate abilities.\nExhaust — {10}{R}{G}: Put any number of permanent cards from your hand onto the battlefield. (Activate each exhaust ability only once.)",
+  "keywords": [
+    "Vigilance"
+  ]
+}

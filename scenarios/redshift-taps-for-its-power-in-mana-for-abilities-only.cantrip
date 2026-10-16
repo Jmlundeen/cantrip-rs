@@ -1,0 +1,44 @@
+# Redshift, Rocketeer Chief: "{T}: Add X mana of any one color, where X is Redshift's power. Spend this mana only to
+# activate abilities." Turn 3 its power is 2: it adds {G}{G}, which with the three other sources Bot1 has can't cast
+# Karn, Scion of Urza ({4}, a spell, CR 106.6), but pays Aether Spellbomb's "{1}, Sacrifice: Draw a card".
+
+[Bot1 Deck]
+Mountain
+Mox Emerald
+Mox Ruby
+Redshift, Rocketeer Chief
+Aether Spellbomb
+Karn, Scion of Urza
+Forest
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Redshift, Rocketeer Chief.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Aether Spellbomb.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Redshift, Rocketeer Chief.Activate(Ability: Add X mana; Color: Green)
+? Bot1.Mana = {G}{G} (Abilities)
+! Bot1.Hand.Karn, Scion of Urza.Cast
+Bot1.Battlefield.Aether Spellbomb.Activate(Ability: Draw)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Bot1.Mana = {G} (Abilities)
+Bot1.Battlefield.Redshift, Rocketeer Chief.Tapped = true
+Bot1.Battlefield.Redshift, Rocketeer Chief.Keywords = Vigilance
+Bot1.Graveyard = Aether Spellbomb
