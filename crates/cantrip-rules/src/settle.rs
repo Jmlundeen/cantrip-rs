@@ -158,7 +158,14 @@ fn state_based_actions(cx: &mut Cx) -> R<bool> {
     let mut legends: Vec<(ObjectId, &'static str)> = Vec::new();
     let mut bound: Vec<crate::day_night::Bound> = Vec::new();
     let mut battles: Vec<(ObjectId, bool)> = Vec::new();
+    let mut annihilate: Vec<(ObjectId, i16)> = Vec::new();
     for &id in cx.s().battlefield() {
+        // CR 704.5q: a permanent with both +1/+1 and -1/-1 counters loses N of each, N the smaller number. Power and
+        // toughness are the same either way, so the other actions of this check are judged alike; removed below.
+        let both = cx.s().obj(id).counters(CounterKind::PlusOne).min(cx.s().obj(id).counters(CounterKind::MinusOne));
+        if both > 0 {
+            annihilate.push((id, both));
+        }
         let chars = cx.chars(id);
         if let Some(daybound) = crate::day_night::role(chars.keywords) {
             bound.push(crate::day_night::Bound { id, daybound });
@@ -347,6 +354,14 @@ fn state_based_actions(cx: &mut Cx) -> R<bool> {
         }
         ops::move_together(cx, &moves, ZoneReason::StateBased);
         acted = true;
+    }
+    // CR 704.5q, at the same time as the rest (CR 704.3): a permanent leaving in this check leaves with the counters it had.
+    for (id, n) in annihilate {
+        if live(cx.s(), id) && cx.s().obj(id).zone.is(ZoneKind::Battlefield) {
+            ops::add_counters(cx, id, CounterKind::PlusOne, -n);
+            ops::add_counters(cx, id, CounterKind::MinusOne, -n);
+            acted = true;
+        }
     }
 
     // CR 704.5t: a player on the bottommost room of a dungeon with none of its abilities on the stack completes it.

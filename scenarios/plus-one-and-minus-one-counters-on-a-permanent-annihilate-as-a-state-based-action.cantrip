@@ -1,0 +1,48 @@
+# CR 704.5q: "If a permanent has both a +1/+1 counter and a -1/-1 counter on it, N +1/+1 and N -1/-1 counters are removed
+# from it, where N is the smaller of the number of +1/+1 and -1/-1 counters on it." Bot1's Ornithopter gets a +1/+1 counter
+# from Innkeeper's Talent's combat trigger on turn 1. On turn 3 Bot1 blights 1 as it casts Requiting Hex (CR 701.68a),
+# putting a -1/-1 counter on the Ornithopter; before Bot1 next has priority the two counters are removed, so it has none and
+# is a 0/2 again. The Hex then destroys Bot2's Ornithopter and Bot1 gains 2 life.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Ornithopter
+Innkeeper's Talent
+Mox Jet
+Requiting Hex
+Island
+Island x13
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Innkeeper's Talent.Cast
+Bot1.Pass
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Requiting Hex.Cast
+Bot1.Modes(Blight 1)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Choose(Ornithopter)
+? Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = (absent)
+? Bot1.Battlefield.Ornithopter.Counters.MinusOneMinusOne = (absent)
+? Bot1.Battlefield.Ornithopter.Toughness = 2
+
+[Expect]
+Bot1.Life = 22
+Bot2.Graveyard = Ornithopter
