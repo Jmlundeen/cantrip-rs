@@ -38,94 +38,82 @@ pub fn modal_of(cards: &CardTable, state: &GameState, item: &StackItem) -> Optio
     }
 }
 
-/// How many targets each of a modal item's target slots holds (CR 700.2c, 601.2c): one for a slot of at most one target, and
-/// for a slot of a range ("one or two target creatures") what is left of the item's targets once the single ones are
-/// counted, the first such slot taking all of it.
-fn slot_widths(specs: &[TargetSpec], target_count: usize) -> Vec<usize> {
-    let single = specs.iter().filter(|s| s.max <= 1).count();
-    let mut left = target_count.saturating_sub(single);
-    specs
-        .iter()
-        .map(|s| {
-            if s.max <= 1 {
-                1
-            } else {
-                std::mem::take(&mut left)
-            }
-        })
-        .collect()
-}
-
 /// The slots a list of target specs stands for, for a spell or ability controlled by `controller` (CR 601.2c): one each,
 /// except that a `TargetSpec::EACH_OPPONENT` is a slot of at most one target for each seat but the controller's, in seat
 /// order, each with the opponent it is for. A player who has left keeps their seat, so the others keep their places.
-pub(crate) fn expand_specs(state: &GameState, controller: PlayerId, specs: &[TargetSpec]) -> Vec<(TargetSpec, Option<PlayerId>)> {
+/// Each slot also says the index of the spec it comes from, which is what a target chosen for it records
+/// (`StackItem::spec_of`).
+pub(crate) fn expand_specs(state: &GameState, controller: PlayerId, specs: &[TargetSpec]) -> Vec<(TargetSpec, Option<PlayerId>, u8)> {
     let mut out = Vec::with_capacity(specs.len());
-    for spec in specs {
+    for (i, spec) in specs.iter().enumerate() {
         if spec.max == TargetSpec::EACH_OPPONENT {
             let each = TargetSpec { min: 0, max: 1, ..*spec };
-            out.extend(state.seats().filter(|&p| p != controller).map(|p| (each, Some(p))));
+            out.extend(state.seats().filter(|&p| p != controller).map(|p| (each, Some(p), i as u8)));
         } else {
-            out.push((*spec, None));
+            out.push((*spec, None, i as u8));
         }
     }
     out
 }
 
-/// The spec of an item's target `slot`, and the opponent the slot is for if it is one of an each-opponent spec: for a
-/// modal item the slots of its chosen modes in printed order (CR 700.2c, 601.2c), a slot of a range holding several targets.
+/// The spec target `slot` of an item was chosen for, out of `specs` (CR 601.2c): the one it recorded (`StackItem::spec_of`),
+/// wherever in the list a slot of several targets stands. The nth target of a `TargetSpec::EACH_OPPONENT` is a slot of at
+/// most one target for the nth opponent in seat order (`expand_specs`).
+fn recorded_spec(state: &GameState, item: &StackItem, specs: &[TargetSpec], slot: usize) -> Option<(TargetSpec, Option<PlayerId>)> {
+    let at = item.spec_of[slot] as usize;
+    let spec = specs.get(at)?;
+    if spec.max != TargetSpec::EACH_OPPONENT {
+        return Some((*spec, None));
+    }
+    let nth = slot - item.spec_targets(at).start;
+    let opponent = state.seats().filter(|&p| p != item.controller).nth(nth);
+    Some((TargetSpec { min: 0, max: 1, ..*spec }, opponent))
+}
+
+/// The spec of an item's target `slot`, and the opponent the slot is for if it is one of an each-opponent spec: the slot the
+/// target was chosen for (`recorded_spec`), among the item's printed specs or, for a modal item, the specs of its chosen modes
+/// in printed order (CR 700.2c, 601.2c).
 pub(crate) fn slot_spec(cards: &CardTable, state: &GameState, item: &StackItem, slot: usize) -> Option<(TargetSpec, Option<PlayerId>)> {
-    if let Some(modal) = modal_of(cards, state, item) {
-        let mut specs: Vec<&'static TargetSpec> = Vec::new();
-        for (i, mode) in modal.modes.iter().enumerate() {
-            for _ in 0..modal.times(item.modes, i) {
-                specs.extend(mode.targets.iter());
-            }
-        }
-        let owned: Vec<TargetSpec> = specs.iter().map(|s| **s).collect();
-        let mut n = 0;
-        for (spec, width) in specs.into_iter().zip(slot_widths(&owned, item.target_count as usize)) {
-            if slot < n + width {
-                return Some((*spec, None));
-            }
-            n += width;
-        }
+    if slot >= cantrip_state::MAX_TARGETS {
         return None;
     }
+    if let Some(modal) = modal_of(cards, state, item) {
+        return recorded_spec(state, item, &crate::actions::mode_specs(modal, item.modes), slot);
+    }
     let specs = target_specs(cards, state, item);
-    // CR 702.47c: the slots of spliced text follow the spell's own, a target each, in the order the cards were spliced.
-    if item.kind == StackKind::Spell && slot >= specs.len() && item.data.iter().any(|&d| d != 0) {
-        let mut at = specs.len();
+    // CR 702.47c: the slots of spliced text follow the spell's own, in the order the cards were spliced, and are numbered on
+    // from them (`StackItem::spec_of`).
+    if item.kind == StackKind::Spell && item.spec_of[slot] as usize >= specs.len() && item.data.iter().any(|&d| d != 0) {
+        let mut all = specs.to_vec();
         for &spliced in item.data.iter().filter(|&&d| d != 0) {
-            let added = cards.get(CardId(spliced as u16 - 1)).spell.map_or(&[][..], |s| s.targets);
-            if slot < at + added.len() {
-                return Some((added[slot - at], None));
-            }
-            at += added.len();
+            all.extend_from_slice(cards.get(CardId(spliced as u16 - 1)).spell.map_or(&[][..], |s| s.targets));
         }
+        return recorded_spec(state, item, &all, slot);
     }
-    if specs.iter().any(|s| s.max == TargetSpec::EACH_OPPONENT) {
-        return expand_specs(state, item.controller, specs).get(slot).copied();
-    }
-    specs.get(slot.min(specs.len().saturating_sub(1))).map(|s| (*s, None))
+    recorded_spec(state, item, specs, slot)
 }
 
 /// Runs the chosen modes of a modal item in printed order (CR 700.2d), each as if it were a spell of its own with
 /// its own targets in slot 0 onward; a mode whose every target has become illegal does nothing (CR 608.2b).
 pub fn run_modes(cx: &mut Cx, item: &StackItem, modal: &ModalDef) -> Result<(), Suspend> {
     let mut next = 0usize;
-    let widths = slot_widths(&crate::actions::mode_specs(modal, item.modes), item.target_count as usize);
     let mut spec_at = 0usize;
     for (i, mode) in modal.modes.iter().enumerate() {
         // A mode chosen more than once is that many instances in sequence, each with targets of its own (CR 700.2d).
         for _ in 0..modal.times(item.modes, i) {
-            let n: usize = widths[spec_at..spec_at + mode.targets.len()].iter().sum();
-            spec_at += mode.targets.len();
+            // The targets recorded for this instance's slots (`StackItem::spec_of`), their slots renumbered from its first.
+            let ends = spec_at + mode.targets.len();
+            let n = (next..item.target_count as usize).take_while(|&t| (item.spec_of[t] as usize) < ends).count();
             let mut sub = *item;
             sub.modes = modal.once(i);
             sub.targets = [Target::None; cantrip_state::MAX_TARGETS];
             sub.targets[..n].copy_from_slice(&item.targets[next..next + n]);
+            sub.spec_of = [0; cantrip_state::MAX_TARGETS];
+            for t in 0..n {
+                sub.spec_of[t] = item.spec_of[next + t] - spec_at as u8;
+            }
             sub.target_count = n as u8;
+            spec_at = ends;
             next += n;
             if sub.targets().iter().any(|&t| t != Target::None) && (0..n).all(|slot| !target_legal(cx.cards(), cx.s(), &cx.g.log, &sub, slot)) {
                 continue;
@@ -527,5 +515,69 @@ pub fn counter_item(cx: &mut Cx, object: ObjectId, hint: usize) {
         counter(cx, object);
     } else {
         cx.st().stack_remove(at);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn never(_: &dyn Query, _: ObjectId, _: &Event) -> Option<Fired> {
+        None
+    }
+
+    fn nothing(_: &mut dyn Game, _: &StackItem) -> Result<(), Suspend> {
+        Ok(())
+    }
+
+    fn anything(_: &dyn Query, _: &Asker, _: Target) -> bool {
+        true
+    }
+
+    /// Thorin, Mountain-king's shape ("attach any number of target Equipment you control to target creature you control"): a
+    /// slot of any number of targets before a slot of one, then an "up to one" slot.
+    static SPECS: [TargetSpec; 3] = [
+        up_to(TargetSpec::ANY_NUMBER, anything).labelled("any number"),
+        target(anything).labelled("one"),
+        up_to_one(anything).labelled("up to one"),
+    ];
+    static CARD: CardDef = CardDef {
+        name: "Slot Order Test",
+        abilities: &[triggered(when(EventMask::ZONE_CHANGE, never), nothing, "").targets(&SPECS)],
+        ..CardDef::BLANK
+    };
+
+    fn labels(table: &CardTable, state: &GameState, item: &StackItem) -> Vec<&'static str> {
+        (0..item.target_count as usize).map(|slot| slot_spec(table, state, item, slot).expect("a slot").0.label).collect()
+    }
+
+    /// CR 601.2c, 115.1d: each target is judged by the slot it was chosen for, wherever a slot of several targets stands in
+    /// the list; the slot recorded with it (`StackItem::spec_of`) says which.
+    #[test]
+    fn a_slot_of_any_number_of_targets_may_come_before_a_slot_of_one() {
+        let table = CardTable::new([&CARD]);
+        let state = GameState::new(2, 0);
+        let ability = AbilityRef { card: table.id_of(&CARD), index: 0 };
+        let t = |n: u32| Target::Object(ObjectId(n));
+        let item_of = |targets: &[Target], of: &[u8]| {
+            let mut item = crate::actions::stack_item(StackKind::Triggered, ObjectId(0), ability, PlayerId(0), targets);
+            item.spec_of[..of.len()].copy_from_slice(of);
+            item
+        };
+
+        // Two for the first slot, one for the second, one for the third.
+        let item = item_of(&[t(1), t(2), t(3), t(4)], &[0, 0, 1, 2]);
+        assert_eq!(labels(&table, &state, &item), ["any number", "any number", "one", "up to one"]);
+        assert_eq!((item.spec_targets(0), item.spec_targets(1), item.spec_targets(2)), (0..2, 2..3, 3..4));
+
+        // None for the first slot: the first target is the second slot's, not the first's.
+        let item = item_of(&[t(3)], &[1]);
+        assert_eq!(labels(&table, &state, &item), ["one"]);
+        assert_eq!((item.spec_targets(0), item.spec_targets(1), item.spec_targets(2)), (0..0, 0..1, 1..1));
+
+        // Three for the first slot and the "up to one" left unchosen at the end, where no place is kept for it.
+        let item = item_of(&[t(1), t(2), t(5), t(3)], &[0, 0, 0, 1]);
+        assert_eq!(labels(&table, &state, &item), ["any number", "any number", "any number", "one"]);
+        assert_eq!(item.spec_targets(2), 4..4);
     }
 }

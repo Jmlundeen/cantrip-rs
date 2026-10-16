@@ -359,6 +359,11 @@ pub struct StackItem {
     pub controller: PlayerId,
     pub targets: [Target; MAX_TARGETS],
     pub target_count: u8,
+    /// For each target, parallel to `targets`, the target slot it was chosen for (CR 601.2c): the index of its spec in the
+    /// spell's or ability's printed list (a modal item's: in the list of its chosen modes' specs, in printed order, CR
+    /// 700.2c). So a slot that takes a variable number of targets ("attach any number of target Equipment you control to
+    /// target creature you control") can stand anywhere in the list, and each target is judged by its own slot.
+    pub spec_of: [u8; MAX_TARGETS],
     /// The X announced for it (CR 107.3); for a reflexive triggered ability, the number its "that many" counts
     /// (CR 603.12, `PendingTrigger::count`).
     pub x: u16,
@@ -393,6 +398,15 @@ pub struct StackItem {
 impl StackItem {
     pub fn targets(&self) -> &[Target] {
         &self.targets[..self.target_count as usize]
+    }
+
+    /// Where in `targets` the targets chosen for the spec at `spec` are (CR 601.2c): one run, in the order chosen. Empty when
+    /// that slot chose none, or it is past the targets announced (an unchosen "up to one" at the end of the list).
+    pub fn spec_targets(&self, spec: usize) -> std::ops::Range<usize> {
+        let of = &self.spec_of[..self.target_count as usize];
+        let start = of.iter().position(|&s| s as usize >= spec).unwrap_or(of.len());
+        let end = start + of[start..].iter().take_while(|&&s| s as usize == spec).count();
+        start..end
     }
 
     /// What target `slot` was announced to receive of a divided total (CR 601.2d).

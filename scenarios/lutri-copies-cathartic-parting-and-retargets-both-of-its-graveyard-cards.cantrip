@@ -1,0 +1,70 @@
+# Lutri, the Spellchaser copies Cathartic Parting ("The owner of target artifact or enchantment an opponent controls shuffles it
+# into their library. You may shuffle up to four target cards from your graveyard into your library.") and Bot1 chooses new targets
+# for the copy (CR 707.10c, 115.7d). Each target slot keeps the number of targets it was announced with: the first slot's one
+# permanent (Mox Pearl becomes Mox Jet) and the second slot's two graveyard cards together (Lotus Petal and Black Lotus become Black
+# Lotus and Chromatic Star), asked as one choice of two (CR 601.2c). The copy resolves first: Mox Jet, Black Lotus and Chromatic
+# Star are shuffled away, leaving Lotus Petal in the graveyard (the check). The original then shuffles Mox Pearl and Lotus Petal;
+# its Black Lotus target is gone (CR 608.2b). The graveyard cards got there as mana: the Petal, the Lotus and the Star are
+# sacrificed for it (the Star draws a card as it goes).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Lotus Petal
+Black Lotus
+Chromatic Star
+Cathartic Parting
+Lutri, the Spellchaser
+Island x13
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Plains x18
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Lotus Petal.Activate(Color: Green)
+Bot1.Hand.Chromatic Star.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Chromatic Star.Activate(Color: Green)
+Bot1.Pass
+? Bot1.Graveyard.Count = 3
+Bot1.Hand.Cathartic Parting.Cast
+Bot1.Target(Bot2.Battlefield.Mox Pearl)
+Bot1.Target(Lotus Petal; Black Lotus)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lutri, the Spellchaser.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Target(Bot2.Battlefield.Mox Jet)
+Bot1.Target(Black Lotus; Chromatic Star)
+Bot1.Pass
+Bot1.Accept
+? Bot1.Graveyard = Lotus Petal
+? Bot2.Battlefield = Mox Pearl
+Bot1.Pass
+Bot1.Accept
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Count = 0
+Bot2.Library.Count = 14
+Bot1.Graveyard = Cathartic Parting
+Bot1.Library.Count = 14
+Bot1.Battlefield = Mox Sapphire; Mox Ruby; Lutri, the Spellchaser

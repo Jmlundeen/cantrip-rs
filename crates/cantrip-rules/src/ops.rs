@@ -1102,16 +1102,10 @@ fn retarget(cx: &mut Cx, top: usize, object: ObjectId, asked_about: ObjectId, ch
     // of the face it is on the stack as - an Adventure, an Omen, a half (CR 715.3b, 720.3b, 709.3b) - not of its card.
     let specs = cx.card(obj.copy.map_or(obj.card, |c| c.card)).spell_targets();
     let asker = Asker { source: object, controller: chooser };
-    let count = item.target_count as usize;
-    let mut slot_start = 0;
-    for spec in specs {
-        if slot_start >= count {
-            break;
-        }
-        // One slot holds all the targets when there is only one; otherwise a target each, as `target_legal` reads them.
-        let len = if specs.len() == 1 { count } else { 1 };
-        let current: Vec<Target> = item.targets[slot_start..slot_start + len].to_vec();
-        slot_start += len;
+    for (at, spec) in specs.iter().enumerate() {
+        // The targets chosen for this slot, as `target_legal` reads them (`StackItem::spec_of`).
+        let run = item.spec_targets(at);
+        let current: Vec<Target> = item.targets[run.clone()].to_vec();
         // A slot that chose no target (CR 601.2c) has none to change (CR 115.7d).
         if current.iter().all(|&t| t == Target::None) {
             continue;
@@ -1133,8 +1127,7 @@ fn retarget(cx: &mut Cx, top: usize, object: ObjectId, asked_about: ObjectId, ch
             && chosen.len() == current.len()
             && chosen.iter().all(|t| candidates.contains(t))
         {
-            let first = slot_start - len;
-            item.targets[first..slot_start].copy_from_slice(&chosen);
+            item.targets[run].copy_from_slice(&chosen);
         }
     }
     cx.st().stack_set(top, item);

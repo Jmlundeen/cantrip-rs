@@ -419,13 +419,15 @@ fn choose_trigger_targets(
     specs: &[TargetSpec],
     all_of_few: bool,
     targets: &mut Vec<Target>,
+    of: &mut Vec<u8>,
+    first_spec: u8,
 ) -> R<bool> {
     let asker = Asker { source: trigger.source, controller: trigger.controller };
     let start = targets.len();
     let slots = crate::resolve::expand_specs(cx.s(), trigger.controller, specs);
     // "If [it] was kicked, instead choose ..." (CR 702.33a, 601.2c), of the source.
     let kicked = cx.s().obj(trigger.source).kicked;
-    for (spec, slot_player) in &slots {
+    for (spec, slot_player, at) in &slots {
         let spec = &spec.when_kicked(kicked);
         let before = targets.len();
         'slot: {
@@ -491,10 +493,13 @@ fn choose_trigger_targets(
         if slots.len() > 1 && spec.max <= 1 && targets.len() == before {
             targets.push(Target::None);
         }
+        // Each target with the spec it was chosen for (`StackItem::spec_of`), numbered across a modal ability's modes.
+        of.resize(targets.len(), first_spec + at);
     }
     while targets.len() > start && targets.last() == Some(&Target::None) {
         targets.pop();
     }
+    of.truncate(targets.len());
     Ok(true)
 }
 
@@ -502,6 +507,7 @@ fn put_trigger(cx: &mut Cx, trigger: PendingTrigger) -> R<()> {
     let def = triggered(cx, trigger.ability);
     let asker = Asker { source: trigger.source, controller: trigger.controller };
     let mut targets = Vec::new();
+    let mut of: Vec<u8> = Vec::new();
     let mut shares: Vec<u8> = Vec::new();
     let mut mask = 0u8;
     if let Some(modal) = def.modal {
@@ -535,11 +541,13 @@ fn put_trigger(cx: &mut Cx, trigger: PendingTrigger) -> R<()> {
         }
         // Chosen as it goes on the stack: chosen even if the ability is later countered (CR 603.3c, 700.2).
         cx.record(Event::ModesChosen { source: trigger.source, ability: trigger.ability, modes: mask });
+        let mut first_spec = 0u8;
         for (n, mode) in modal.modes.iter().enumerate() {
             for _ in 0..modal.times(mask, n) {
-                if !choose_trigger_targets(cx, &trigger, mode.targets, true, &mut targets)? {
+                if !choose_trigger_targets(cx, &trigger, mode.targets, true, &mut targets, &mut of, first_spec)? {
                     return Ok(());
                 }
+                first_spec += mode.targets.len() as u8;
             }
         }
     } else if let Some(divide) = def.divide
@@ -560,7 +568,7 @@ fn put_trigger(cx: &mut Cx, trigger: PendingTrigger) -> R<()> {
             crate::actions::Divided::Skipped => {}
             crate::actions::Divided::Impossible => return Ok(()),
         }
-    } else if !choose_trigger_targets(cx, &trigger, def.targets, false, &mut targets)? {
+    } else if !choose_trigger_targets(cx, &trigger, def.targets, false, &mut targets, &mut of, 0)? {
         return Ok(());
     }
     let mut item = StackItem {
@@ -570,6 +578,7 @@ fn put_trigger(cx: &mut Cx, trigger: PendingTrigger) -> R<()> {
         controller: trigger.controller,
         targets: [Target::None; cantrip_state::MAX_TARGETS],
         target_count: targets.len() as u8,
+        spec_of: [0; cantrip_state::MAX_TARGETS],
         x: trigger.count.unwrap_or(0),
         kicked: 0,
         paid: 0,
@@ -587,6 +596,7 @@ fn put_trigger(cx: &mut Cx, trigger: PendingTrigger) -> R<()> {
         exile_after: false,
     };
     item.targets[..targets.len()].copy_from_slice(&targets);
+    item.spec_of[..of.len()].copy_from_slice(&of);
     item.shares[..shares.len()].copy_from_slice(&shares);
     cx.st().stack_push(item);
     for &t in targets.iter().filter(|&&t| t != Target::None) {

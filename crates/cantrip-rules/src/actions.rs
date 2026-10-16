@@ -2189,7 +2189,7 @@ pub fn act(cx: &mut Cx, player: PlayerId) -> R<Flow> {
     Ok(Flow::Done)
 }
 
-fn stack_item(kind: StackKind, object: ObjectId, ability: AbilityRef, controller: PlayerId, targets: &[Target]) -> StackItem {
+pub(crate) fn stack_item(kind: StackKind, object: ObjectId, ability: AbilityRef, controller: PlayerId, targets: &[Target]) -> StackItem {
     let mut item = StackItem {
         kind,
         object,
@@ -2197,6 +2197,7 @@ fn stack_item(kind: StackKind, object: ObjectId, ability: AbilityRef, controller
         controller,
         targets: [Target::None; cantrip_state::MAX_TARGETS],
         target_count: targets.len() as u8,
+        spec_of: [0; cantrip_state::MAX_TARGETS],
         x: 0,
         kicked: 0,
         paid: 0,
@@ -2485,9 +2486,10 @@ fn cast(
     // times it was kicked is judged by what was announced.
     let counted = if item.x > 0 { item.x } else { item.kicked as u16 };
     let mut targets: Vec<Target> = targets.to_vec();
+    let mut of: Vec<u8> = Vec::new();
     if let Some(modal) = def.modal {
-        targets = choose_slots(cx, player, spell, &mode_specs(modal, mask), counted, item.kicked)?;
-        set_item_targets(cx, &targets);
+        (targets, of) = choose_slots(cx, player, spell, &mode_specs(modal, mask), counted, item.kicked)?;
+        set_item_targets(cx, &targets, &of);
     } else if let Some(divide) = def.divide
         && let Some(spec) = specs.first()
     {
@@ -2500,7 +2502,7 @@ fn cast(
         match ask_divided(cx, player, spell, spec, total, true)? {
             Divided::Chosen(chosen, shares) => {
                 targets = chosen;
-                set_item_targets(cx, &targets);
+                set_item_targets(cx, &targets, &[]);
                 set_item_shares(cx, &shares);
             }
             Divided::Skipped => {}
@@ -2508,23 +2510,30 @@ fn cast(
             Divided::Impossible => return Err(Stop::Cancel),
         }
     } else if (resolving || !targets_with_cast(def)) && !specs.is_empty() {
-        targets = choose_slots(cx, player, spell, specs, counted, item.kicked)?;
-        set_item_targets(cx, &targets);
+        (targets, of) = choose_slots(cx, player, spell, specs, counted, item.kicked)?;
+        set_item_targets(cx, &targets, &of);
     }
 
     // CR 702.47c, 601.2c: the targets of spliced text are chosen after the spell's own, in the order the cards were spliced.
     if item.data.iter().any(|&d| d != 0) {
         let mut all = targets.clone();
-        all.resize(crate::resolve::expand_specs(cx.s(), player, specs).len().max(all.len()), Target::None);
+        // Targets announced with the cast are the lone slot's, the first.
+        of.resize(targets.len(), 0);
+        // A spliced card's slots are numbered on past the spell's own specs, in splice order (`resolve::slot_spec`), each
+        // target recording its slot, so the spell's own slots need hold no set number of targets.
+        let mut next = specs.len() as u8;
         for &spliced in item.data.iter().filter(|&&d| d != 0) {
             let specs = cx.card(CardId(spliced as u16 - 1)).spell.map_or(&[][..], |s| s.targets);
             if !specs.is_empty() {
-                all.extend(choose_slots(cx, player, spell, specs, counted, item.kicked)?);
+                let (chosen, chosen_of) = choose_slots(cx, player, spell, specs, counted, item.kicked)?;
+                of.extend(chosen_of.iter().map(|&s| next + s));
+                all.extend(chosen);
             }
+            next += specs.len() as u8;
         }
         if all.len() != targets.len() {
             targets = all;
-            set_item_targets(cx, &targets);
+            set_item_targets(cx, &targets, &of);
         }
     }
 
@@ -2827,12 +2836,14 @@ pub fn cast_transformed_during_resolution(cx: &mut Cx, card: ObjectId) -> R<bool
 
 /// Each target slot's targets, asked in slot order (CR 601.2c), each a target of the slot's own (a player may be
 /// chosen for two slots). A slot that chose nothing ("up to") keeps its place with `Target::None` among the slots, so
-/// every target stays at the index of its slot (CR 601.2c, 115.1), as far as the last one that chose.
-fn choose_slots(cx: &mut Cx, player: PlayerId, source: ObjectId, specs: &[TargetSpec], counted: u16, kicked: u8) -> R<Vec<Target>> {
+/// every target stays at the index of its slot (CR 601.2c, 115.1), as far as the last one that chose. Each target comes
+/// with the index of the spec it was chosen for (`StackItem::spec_of`), so a slot of several targets may stand anywhere.
+fn choose_slots(cx: &mut Cx, player: PlayerId, source: ObjectId, specs: &[TargetSpec], counted: u16, kicked: u8) -> R<(Vec<Target>, Vec<u8>)> {
     let asker = Asker { source, controller: player };
     let slots = crate::resolve::expand_specs(cx.s(), player, specs);
     let mut targets = Vec::new();
-    for (spec, slot_player) in &slots {
+    let mut of = Vec::new();
+    for (spec, slot_player, at) in &slots {
         // CR 702.33a, 601.2c: "if this spell was kicked, instead choose ...", the kicker announced by now.
         let spec = &spec.when_kicked(kicked);
         let before = targets.len();
@@ -2874,11 +2885,13 @@ fn choose_slots(cx: &mut Cx, player: PlayerId, source: ObjectId, specs: &[Target
         if slots.len() > 1 && spec.max <= 1 && targets.len() == before {
             targets.push(Target::None);
         }
+        of.resize(targets.len(), *at);
     }
     while targets.last() == Some(&Target::None) {
         targets.pop();
     }
-    Ok(targets)
+    of.truncate(targets.len());
+    Ok((targets, of))
 }
 
 /// What asking a divided slot came to.
@@ -2932,12 +2945,15 @@ fn add_cost(a: ManaCost, b: ManaCost) -> ManaCost {
     c
 }
 
-/// Records the targets chosen for the item being announced, the top of the stack.
-fn set_item_targets(cx: &mut Cx, targets: &[Target]) {
+/// Records the targets chosen for the item being announced, the top of the stack, each with the spec it was chosen for
+/// (`StackItem::spec_of`; none given is the first, a lone slot's).
+fn set_item_targets(cx: &mut Cx, targets: &[Target], of: &[u8]) {
     let at = cx.s().stack.len() - 1;
     let mut with = cx.s().stack[at];
     with.target_count = targets.len() as u8;
     with.targets[..targets.len()].copy_from_slice(targets);
+    with.spec_of = [0; cantrip_state::MAX_TARGETS];
+    with.spec_of[..of.len()].copy_from_slice(of);
     cx.st().stack_set(at, with);
 }
 
@@ -3252,13 +3268,15 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
 
     let mut targets: Vec<Target> = targets.to_vec();
     if let Some(modal) = def.modal {
-        targets = choose_slots(cx, player, source, &mode_specs(modal, mask), item.x, 0)?;
-        set_item_targets(cx, &targets);
+        let of;
+        (targets, of) = choose_slots(cx, player, source, &mode_specs(modal, mask), item.x, 0)?;
+        set_item_targets(cx, &targets, &of);
     } else if !targets_with_action(def.targets) && !def.targets.is_empty() {
         // CR 601.2c by way of 602.2b: slots that are not announced with the action are chosen now, after X (a slot
         // counted by X, as Candelabra of Tawnos's "untap X target lands", reads the X just announced).
-        targets = choose_slots(cx, player, source, def.targets, item.x, 0)?;
-        set_item_targets(cx, &targets);
+        let of;
+        (targets, of) = choose_slots(cx, player, source, def.targets, item.x, 0)?;
+        set_item_targets(cx, &targets, &of);
     }
 
     // Behold and blight are paid when a spell is cast only (CR 701.4a, 701.68a): an activated ability that had them would
