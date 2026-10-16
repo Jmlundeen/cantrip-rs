@@ -1,0 +1,60 @@
+# Each of Beza's four conditions holds at once. Bot1 casts Beza on turn 3 off seven Mox Pearls and has no land and an
+# empty hand; Bot2 on turn 2 played a Mountain, two Mox Rubies, Bolted Bot1 and cast two Blazing Rootwallas: Bot2 controls more lands
+# (1 to 0), has more life (20 to 17), controls more creatures (2 to Beza alone) and holds more cards (2 to 0). Beza makes
+# the Treasure, gains 4 life (17 to 21), makes two Fish, and draws the Island on top of the library (CR 603.4, 608.2c).
+
+[Bot1 Deck]
+Mox Pearl x7
+Beza, the Bounding Spring
+Island
+Island x10
+
+[Bot2 Deck]
+Mountain
+Mox Ruby x2
+Lightning Bolt
+Blazing Rootwalla x2
+Island x2
+Island x10
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Blazing Rootwalla.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Blazing Rootwalla.Cast
+[T3 Bot1.Main1]
+? Bot1.Life = 17
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Beza, the Bounding Spring.Cast
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Life = 21
+Bot2.Life = 20
+Bot1.Hand = Island
+Bot1.Battlefield.Count = 11
+Bot1.Battlefield.Treasure Token.Types = Artifact
+Bot1.Battlefield.Treasure Token.Token = true
+Bot1.Battlefield.Fish#1.Token = true
+Bot1.Battlefield.Fish#1.Power = 1
+Bot1.Battlefield.Fish#1.Toughness = 1
+Bot1.Battlefield.Fish#1.Colors = Blue
+Bot1.Battlefield.Fish#2.Token = true
+Bot2.Hand.Count = 2

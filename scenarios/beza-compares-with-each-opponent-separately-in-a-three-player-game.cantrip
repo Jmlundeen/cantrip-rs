@@ -1,0 +1,68 @@
+# In a game of three, "an opponent" is judged opponent by opponent: Bot2 alone controls more lands than Bot1 (1 to 0) but
+# has the least life (14 after two Bolts at itself, to Bot1's 17), and Bot3 alone has more life (20) but no more lands.
+# Bot1, who draws on turn 1 in a game of three (CR 103.8a), discards the Island to hand size. Creatures (Beza alone against none) and cards in hand (0 against 0 and 0) favour nobody. Beza makes the Treasure
+# because of Bot2 and gains 4 life because of Bot3, and makes no Fish and draws nothing (Ruling 2024-07-26).
+
+[Bot1 Deck]
+Mox Pearl x7
+Island
+Beza, the Bounding Spring
+Island x10
+
+[Bot2 Deck]
+Mountain
+Mox Ruby x4
+Lightning Bolt x3
+Island x10
+
+[Bot3 Deck]
+Mox Jet x8
+Island x10
+
+[Actions]
+Bot1.Discard(Island)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2)
+[T3 Bot3.Main1]
+Bot3.Hand.Mox Jet.Cast
+Bot3.Hand.Mox Jet.Cast
+Bot3.Hand.Mox Jet.Cast
+Bot3.Hand.Mox Jet.Cast
+Bot3.Hand.Mox Jet.Cast
+Bot3.Hand.Mox Jet.Cast
+Bot3.Hand.Mox Jet.Cast
+Bot3.Hand.Mox Jet.Cast
+[T4 Bot1.Main1]
+? Bot1.Life = 17
+? Bot2.Life = 14
+? Bot3.Life = 20
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Beza, the Bounding Spring.Cast
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Life = 21
+Bot1.Hand.Count = 0
+Bot1.Battlefield.Count = 9
+Bot1.Battlefield.Treasure Token.Token = true

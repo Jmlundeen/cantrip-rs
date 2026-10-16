@@ -1,0 +1,50 @@
+# Beza's four comparisons are all strict ("more ... than you"). Bot1 casts Beza on turn 3 off seven Mox Pearls with no
+# land, and Bot2 on turn 2 has cast seven Mox Rubies and a Blazing Rootwalla: lands 0 and 0, life 20 and 20, creatures 1 (Beza) and
+# 1 (Rootwalla), cards in hand 0 and 0. Every count is equal, so no Treasure, no life, no Fish and no card.
+
+[Bot1 Deck]
+Mox Pearl x7
+Beza, the Bounding Spring
+Island x10
+
+[Bot2 Deck]
+Mox Ruby x7
+Blazing Rootwalla
+Island x10
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Blazing Rootwalla.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Beza, the Bounding Spring.Cast
+Bot1.Pass
+? Bot1.Hand.Count = 0
+? Bot2.Hand.Count = 0
+[Bot1.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 20
+Bot1.Hand.Count = 0
+Bot1.Battlefield.Count = 8
+Bot1.Battlefield.Treasure Token = (absent)
+Bot2.Battlefield.Count = 8
