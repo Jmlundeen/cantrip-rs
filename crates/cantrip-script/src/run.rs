@@ -198,6 +198,11 @@ impl<'s> Run<'s> {
         // CANTRIP_VERIFY=1: every rollback is checked to restore the state exactly.
         game.verify = std::env::var_os("CANTRIP_VERIFY").is_some();
         game.state.force_rolls(&script.dice);
+        for &(seat, life) in &script.life {
+            if let Some(player) = game.state.players.get_mut(seat) {
+                player.life = life;
+            }
+        }
         Ok(Run {
             script,
             game,

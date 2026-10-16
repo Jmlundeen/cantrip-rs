@@ -27,6 +27,8 @@ pub struct GameScript {
     pub chooser: i32,
     /// The faces the dice show, in the order they are rolled (a `[Dice]` section: `6; 1; 4`).
     pub dice: Vec<u8>,
+    /// Life totals the players begin with when not 20 (a `[Life]` section: `Bot1: 3`), as (seat index, life).
+    pub life: Vec<(usize, i32)>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -586,6 +588,7 @@ enum Section {
     Expect,
     Opening,
     Dice,
+    Life,
 }
 
 impl GameScript {
@@ -620,6 +623,14 @@ impl GameScript {
                     Section::Actions => script.steps.push(ScriptStep::parse(line, number)?),
                     Section::Expect => script.expectations.push(parse_expectation(line.trim_start_matches('?').trim(), number)?),
                     Section::Opening => script.chooser = opening_line(line)?,
+                    Section::Life => {
+                        let (key, value) = line.split_once(':').unwrap_or(("", ""));
+                        let seat = key.trim().to_ascii_uppercase().strip_prefix("BOT").and_then(|n| n.parse::<usize>().ok()).filter(|n| (1..=4).contains(n));
+                        match (seat, value.trim().parse::<i32>()) {
+                            (Some(seat), Ok(life)) => script.life.push((seat - 1, life)),
+                            _ => return Err(ParseError("a [Life] section gives a starting life total per player, as Bot1: 3".into())),
+                        }
+                    }
                     Section::Dice => {
                         for face in line.split(';') {
                             match face.trim().parse::<u8>() {
@@ -651,6 +662,7 @@ fn section_header(line: &str) -> Option<Section> {
         "[EXPECT]" => Some(Section::Expect),
         "[OPENING]" => Some(Section::Opening),
         "[DICE]" => Some(Section::Dice),
+        "[LIFE]" => Some(Section::Life),
         other => {
             let seat = other.strip_prefix("[BOT")?.strip_suffix(" DECK]")?.parse::<usize>().ok()?;
             (1..=4).contains(&seat).then_some(Section::Deck(seat - 1))

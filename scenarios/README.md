@@ -119,6 +119,12 @@ a graveyard, the first opponent in turn order). Every roll, flip and random choi
 `choose_at_random`) and is recorded as `DieRolled`, `CoinFlipped` or `ChosenAtRandom` in the event history, where triggers
 ("whenever you flip a coin", "win a flip", "roll a die") see it.
 
+## Starting life: `[Life]`
+
+A scenario that needs a player near death says so instead of playing the life away: a `[Life]` section gives a starting life
+total (not the starting life of the format, so "half your starting life total" is unchanged), one player per line, `Bot1: 1`.
+A player it does not name starts at 20.
+
 ## How lines are played
 
 There is **one cursor for the whole list**. When the engine asks a player something, the line under the cursor is
