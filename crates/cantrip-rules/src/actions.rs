@@ -3297,6 +3297,13 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
     if life > 0 {
         ops::change_life(cx, player, -(life as i32));
     }
+    // The costs are paid together (CR 601.2h by way of 602.2b), so {T} is paid on the permanent before any other part of
+    // the cost moves it: it was tapped as it left (CR 118.3), its last-known information says so (CR 608.2h), and
+    // "whenever ... becomes tapped" sees the tap of a permanent still on the battlefield ("{T}, Exile this artifact",
+    // "{T}, Sacrifice a creature" choosing itself).
+    if def.cost.tap {
+        ops::tap(cx, source);
+    }
     pay_permanents(cx, &def.cost, &chosen);
     pay_discards(cx, &discards);
     pay_exiles(cx, &exiles);
@@ -3308,9 +3315,6 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
     note_activation(cx, source, index as usize, def);
     if def.cost.exile_self {
         ops::move_to_for(cx, source, Zone::exile(cx.s().obj(source).owner), ZoneReason::Exile);
-    }
-    if def.cost.tap {
-        ops::tap(cx, source);
     }
     if def.cost.discard_self {
         ops::discard(cx, source);
@@ -3424,11 +3428,12 @@ pub fn activate_mana(
     // mana ability's activation too ("an ability of a creature": Elrond, Moon-Reader) needs it emitted, its trigger
     // waiting for the next time a player would receive priority (CR 603.3).
     cx.record(Event::AbilityActivated { source, ability, player });
-    if def.cost.exile_self {
-        ops::move_to_for(cx, source, Zone::exile(cx.s().obj(source).owner), ZoneReason::Exile);
-    }
+    // {T} is paid on the permanent before any other part of the cost moves it (CR 605.3a, 601.2h, 118.3): see `activate`.
     if def.cost.tap {
         ops::tap(cx, source);
+    }
+    if def.cost.exile_self {
+        ops::move_to_for(cx, source, Zone::exile(cx.s().obj(source).owner), ZoneReason::Exile);
     }
     // A mana ability's own mana cost (Chromatic Star's {1}) is paid like any other (CR 605.3a, 601.2g).
     if mana != ManaCost::ZERO {

@@ -149,6 +149,24 @@ impl StateDump {
             d.list("Exile.FaceDown", hidden, false);
         }
 
+        // Every permanent that left the battlefield, in order, from the history, as it last was there (CR 608.2h): "(tapped)"
+        // when it was tapped as it left. A tap the history records after the permanent had left is not one it left with
+        // (CR 701.26a: only a permanent becomes tapped), so a cost that taps and moves its source must pay the tap first.
+        let records = game.history().all();
+        let left: Vec<String> = records
+            .iter()
+            .enumerate()
+            .filter_map(|(at, r)| match r.event {
+                Event::ZoneChange { old, from, .. } if from.is(ZoneKind::Battlefield) => {
+                    let tapped_later = records[at + 1..].iter().any(|later| matches!(later.event, Event::Tapped { permanent } if permanent == old));
+                    let tapped = s.obj(old).tapped && !tapped_later;
+                    Some(if tapped { format!("{} (tapped)", game.name(old)) } else { game.name(old).to_string() })
+                }
+                _ => None,
+            })
+            .collect();
+        d.list("LeftBattlefield", left, true);
+
         let attackers = s
             .attackers
             .iter()

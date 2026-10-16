@@ -1,0 +1,38 @@
+# "{2}, {T}, Sacrifice this artifact: Search your library for a land card ..." The costs of an activated ability are paid
+# together (CR 602.2b, 601.2h): the {T} is paid on the Map while it is a permanent, so it is sacrificed tapped and its
+# last-known information says so (CR 608.2h, 701.26a). `LeftBattlefield` reads the history in order: a tap recorded after
+# the Map had gone to the graveyard would not count as the Map leaving tapped.
+
+[Bot1 Deck]
+Island
+Island
+Expedition Map
+Island
+Island
+Island
+Island
+Island
+Island
+Mountain
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Expedition Map.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Expedition Map.Activate
+? LeftBattlefield = Expedition Map (tapped)
+Bot1.Search(Mountain)
+
+[Expect]
+LeftBattlefield = Expedition Map (tapped)
+Bot1.Graveyard = Expedition Map
+Bot1.Battlefield = Island; Island
+Bot1.Hand = Island; Island; Island; Island; Island; Mountain

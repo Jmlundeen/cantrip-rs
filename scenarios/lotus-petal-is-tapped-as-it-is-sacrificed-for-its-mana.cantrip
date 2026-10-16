@@ -1,0 +1,24 @@
+# "{T}, Sacrifice Lotus Petal: Add one mana of any color." A mana ability's costs are paid as any ability's are (CR 605.3a,
+# 602.2b, 601.2h), together: the {T} is paid on the Petal while it is a permanent, so it is sacrificed tapped and its
+# last-known information says so (CR 608.2h, 701.26a). `LeftBattlefield` reads the history in order: a tap recorded after
+# the Petal had gone to the graveyard would not count as the Petal leaving tapped. The {B} it adds is checked in the pool.
+
+[Bot1 Deck]
+Lotus Petal
+Island x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Pass
+Bot1.Battlefield.Lotus Petal.Activate(Color: Black)
+? Bot1.Mana = {B}
+? LeftBattlefield = Lotus Petal (tapped)
+Bot1.Pass
+
+[Expect]
+LeftBattlefield = Lotus Petal (tapped)
+Bot1.Graveyard = Lotus Petal
+Bot1.Battlefield.Count = 0

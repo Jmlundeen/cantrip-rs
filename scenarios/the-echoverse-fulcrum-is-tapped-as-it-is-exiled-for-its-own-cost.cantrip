@@ -1,0 +1,62 @@
+# "{5}, {T}, Exile The Echoverse Fulcrum: Destroy all creatures." The costs of an activated ability are paid together
+# (CR 602.2b, 601.2h), so the {T} is paid on the Fulcrum while it is still a permanent: it becomes tapped on the
+# battlefield (CR 701.26a) and is exiled tapped, and its last-known information says so (CR 608.2h). A tap recorded after
+# it had gone to exile would be a tap of a card that is no longer a permanent. `LeftBattlefield` reads the history in order:
+# the Fulcrum leaves first, as the cost, tapped; the two Ornithopters (Bot1's own and Bot2's), destroyed as the ability
+# resolves, leave untapped. The five Moxen that paid the {5} were tapped but never left.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+The Echoverse Fulcrum
+Ornithopter
+Forest x14
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.The Echoverse Fulcrum.Cast
+Bot1.Pass
+Bot1.Choose(Forest)
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.The Echoverse Fulcrum.Activate
+? Stack.Count = 1
+? LeftBattlefield = The Echoverse Fulcrum (tapped)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+LeftBattlefield = The Echoverse Fulcrum (tapped); Ornithopter; Ornithopter
+Exile = The Echoverse Fulcrum
+Bot1.Graveyard = Ornithopter; Forest
+Bot2.Graveyard = Ornithopter
+Bot1.Battlefield = Mox Jet; Mox Ruby; Mox Pearl; Mox Sapphire; Mox Emerald
+Bot1.Battlefield.Mox Jet.Tapped = true
+Bot2.Battlefield.Count = 0
