@@ -1417,11 +1417,17 @@ public static partial class CardFace
         DrawString(canvas, CardAssets.Title, damage, layout.Body.Left - width - 3, Baseline(CardAssets.Title, layout.Body, size), size, SKColor.Parse("e2483c"));
     }
 
+    /// <summary>The counters the face draws as pills: every kind the card has, except the one its body already shows (loyalty, defense).</summary>
+    public static IEnumerable<CounterView> ShownCounters(ObjectView card)
+    {
+        string? body = BodyCounter(card);
+        return card.Counters.Where(c => c.Count > 0 && c.Name != body);
+    }
+
     /// <summary>The counters on a permanent, one pill per kind across the art box, each with how many beside it: "4 × (+1/+1)".</summary>
     private static float DrawCounters(SKCanvas canvas, ObjectView card, Layout layout, float cardWidth)
     {
-        string? body = BodyCounter(card);
-        List<CounterView> shown = [.. card.Counters.Where(c => c.Count > 0 && c.Name != body)];
+        List<CounterView> shown = [.. ShownCounters(card)];
         if (shown.Count == 0)
         {
             return 0f;

@@ -257,6 +257,7 @@ public sealed partial class MainPage
                         json.WriteString("typeLine", card.Known && !card.FaceDown ? CardFace.TypeLine(card) : string.Empty);
                         json.WriteString("rules", string.Join(" / ", CardFace.RulesLines(card).Select(line => line.Spent ? $"(grey) {line.Text}" : line.Text)));
                         json.WriteString("status", string.Join(", ", CardFace.StatusWords(card)));
+                        json.WriteString("counters", string.Join("; ", CardFace.ShownCounters(card).Select(counter => $"{counter.Count} × {counter.Name}")));
                         json.WriteString("annotation", _looks.TryGetValue(card.Handle, out CardLook? shown) ? shown.Annotation ?? string.Empty : string.Empty);
                         WriteBox(json, toPage.TransformBounds(box));
                         if (lower is { } down && raise is { } up)
