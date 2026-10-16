@@ -1,0 +1,48 @@
+# Hydro-Man, Fluid Felon: Bot1 casts Consider (blue) and the pump trigger goes on the stack; in response Bot1 Bolts Hydro-Man. The trigger's
+# intervening "if Hydro-Man is a creature" is checked again as it resolves (CR 603.4) and is false: it is removed and does nothing, and the
+# Consider still resolves. (A creature that stops being one while staying on the battlefield cannot be arranged with the cards in the
+# engine: his own land trigger always resolves below a trigger put on the stack after it.)
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Sapphire
+Hydro-Man, Fluid Felon
+Mox Ruby
+Lightning Bolt
+Consider
+Island x10
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Hand.Hydro-Man, Fluid Felon.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Consider.Cast
+? Stack.Count = 2
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Hydro-Man, Fluid Felon)
+? Stack.Count = 3
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard.Count = 3
+Bot1.Battlefield.Count = 4

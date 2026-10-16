@@ -1,7 +1,7 @@
 # Hydro-Man, Fluid Felon. T1: Bot1 casts him with Island and Mox Sapphire. At his end step he untaps and becomes a land with
 # "{T}: Add U" until Bot1's next turn: he taps for U the turn he entered (a land has no summoning sickness) and a Consider cast with
-# that mana does not pump him, because the "if Hydro-Man is a creature" is false (CR 603.4); he is exactly a land (Legendary kept,
-# the creature types and power gone, CR 205.1a). T3: he is a creature again as the turn begins. Consider (blue) pumps him +1/+1 each
+# that mana does not pump him, because the "if Hydro-Man is a creature" is false (CR 603.4); he is exactly a land (the creature types and
+# power gone, CR 205.1a). T3: he is a creature again as the turn begins. Consider (blue) pumps him +1/+1 each
 # time; Mox Ruby (colorless) and Lightning Bolt (red) do not, and neither does Bot2's own blue Consider, cast on Bot1's turn.
 
 [Bot1 Deck]
@@ -39,6 +39,7 @@ Bot2.Pass
 ? Bot1.Battlefield.Hydro-Man, Fluid Felon.Power = (absent)
 Bot1.Battlefield.Hydro-Man, Fluid Felon.Activate
 Bot1.Hand.Consider.Cast
+? Stack.Count = 1
 Bot1.Pass
 Bot2.Pass
 Bot1.Arrange(Lightning Bolt |)

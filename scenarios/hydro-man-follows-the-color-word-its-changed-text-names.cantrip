@@ -1,0 +1,59 @@
+# Trait Doctoring replaces the color word blue with red in Hydro-Man's text until end of turn (CR 612.1): "Whenever you cast a red spell"
+# is what he now says. On turn 3 (he is a creature again) Trait Doctoring itself is blue and cast before the change, so it pumps him to 3/3;
+# once it resolves, Lightning Bolt (red) pumps him to 4/4, and Consider (blue) no longer does. As printed, the Bolt would not and Consider would.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Sapphire
+Hydro-Man, Fluid Felon
+Trait Doctoring
+Mox Ruby
+Lightning Bolt
+Consider
+Island x10
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Hand.Hydro-Man, Fluid Felon.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Hydro-Man, Fluid Felon.Power = 2
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Trait Doctoring.Cast(Hydro-Man, Fluid Felon)
+Bot1.Pass
+Bot2.Pass
+Bot2.Pass
+Bot1.Modes(Replace a color word)
+Bot1.Colors(Blue)
+Bot1.Colors(Red)
+? Bot1.Battlefield.Hydro-Man, Fluid Felon.Power = 3
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot2.Pass
+? Bot1.Battlefield.Hydro-Man, Fluid Felon.Power = 4
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Consider.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+? Bot1.Battlefield.Hydro-Man, Fluid Felon.Power = 4
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Hydro-Man, Fluid Felon.Power = 4
