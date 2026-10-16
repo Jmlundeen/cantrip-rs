@@ -44,7 +44,7 @@ fn pump_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         mana_ability(TAP, add(Mana::C), "{T}: Add {C}."),
-        mana_ability(TAP.and(life(1)), add_any_color(1).only_for(ManaRestriction::InstantOrSorcerySpells), "{T}, Pay 1 life: Add one mana of any color. Spend this mana only to cast an instant or sorcery spell."),
+        mana_ability(TAP.and(life(1)), add_any_color(1).only_for(ManaRestriction::INSTANT_OR_SORCERY_SPELLS), "{T}, Pay 1 life: Add one mana of any color. Spend this mana only to cast an instant or sorcery spell."),
         ability(cost("{5}"), becomes_creature, "{5}: If this land isn't a creature, it becomes a 2/4 Wizard creature with \"Whenever you cast an instant or sorcery spell, this creature gets +1/+0 until end of turn.\" It's still a land."),
     ],
     delayed: &[triggered(when(EventMask::SPELL_CAST, instant_or_sorcery_you_cast), pump_one, "Whenever you cast an instant or sorcery spell, this creature gets +1/+0 until end of turn.")],

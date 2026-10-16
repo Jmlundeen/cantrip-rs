@@ -639,11 +639,12 @@ pub fn mana_ability_options(cx: &Cx, player: PlayerId, options: &mut Vec<ActionO
                 if static_rules::spend_any_color_for(cx, player, id) {
                     cost = ManaCost { generic: cost.mana_value().min(255) as u8, ..ManaCost::ZERO };
                 }
-                if !a.covers_ability(&cost) {
+                if !a.covers_for(&cost, ManaPayment::Ability { source: chars.types }) {
                     continue;
                 }
             }
             let mut option = ActionOption::on(ActionKind::ActivateAbility, id, index as u8);
+            option.restriction = def.restricted;
             if let Some(p) = def.cost.permanents {
                 let asker = Asker { source: id, controller: player };
                 option.target_candidates = cx
@@ -707,7 +708,7 @@ pub fn mana_ability_options(cx: &Cx, player: PlayerId, options: &mut Vec<ActionO
             {
                 continue;
             }
-            options.push(ActionOption::on(ActionKind::ActivateAbility, id, index as u8));
+            options.push(ActionOption { restriction: a.restricted, ..ActionOption::on(ActionKind::ActivateAbility, id, index as u8) });
         }
     }
 }
@@ -1051,16 +1052,11 @@ pub fn can_afford(cx: &Cx, player: PlayerId, source: ObjectId, cost: &ManaCost) 
         return true;
     }
     let a = available(cx, player);
+    let chars = cx.chars(source);
     if cx.s().obj(source).zone.is(ZoneKind::Stack) {
-        let chars = cx.chars(source);
-        let kind = SpellKind {
-            artifact: chars.is(CardType::Artifact),
-            instant_or_sorcery: chars.is(CardType::Instant) || chars.is(CardType::Sorcery),
-            legendary: chars.supertypes.legendary,
-        };
-        a.covers_spell(cost, kind)
+        a.covers_for(cost, ManaPayment::Spell { types: chars.types, legendary: chars.supertypes.legendary })
     } else {
-        a.covers_ability(cost)
+        a.covers_for(cost, ManaPayment::Ability { source: chars.types })
     }
 }
 
@@ -1077,7 +1073,7 @@ pub struct Available {
     /// The permanents that change what things cost.
     changers: Vec<ObjectId>,
     /// Restricted mana the pool and the one-ability mana sources hold, by `ManaRestriction` (CR 106.6): each kind pays
-    /// only what `Available::covers_spell` and `covers_ability` say it may. Mana that pays anything (`GainsHaste`) is in
+    /// only what `Available::covers_for` says it may. Mana that pays anything (`GainsHaste`) is in
     /// `fixed`.
     restricted: [[u8; 6]; ManaRestriction::COUNT],
     /// Of the same, mana of any one color a mana ability adds (Great Hall of the Biblioplex, Delighted Halfling).
@@ -1095,7 +1091,7 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
     let mut restricted = cx.s().player(player).restricted.map(|pool| pool.0);
     // Mana that pays anything is not a limit (CR 106.6): it is spent as ordinary mana is.
     for m in 0..6 {
-        fixed[m] += std::mem::take(&mut restricted[ManaRestriction::GainsHaste as usize][m]);
+        fixed[m] += std::mem::take(&mut restricted[ManaRestriction::GainsHaste.index()][m]);
     }
     let mut restricted_flex = [0u32; ManaRestriction::COUNT];
     let mut flex: u32 = 0;
@@ -1142,7 +1138,7 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
             spent = spent.max(def.cost.mana.mana_value());
             let class = match def.restricted {
                 Some(ManaRestriction::GainsHaste) | None => ManaRestriction::COUNT,
-                Some(kind) => kind as usize,
+                Some(kind) => kind.index(),
             };
             if class == ManaRestriction::COUNT {
                 unrestricted = Some(def);
@@ -1166,9 +1162,9 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
             }
             (1, Some(def)) if let Some(kind) = def.restricted => {
                 for m in 0..6 {
-                    restricted[kind as usize][m] += def.adds.0[m];
+                    restricted[kind.index()][m] += def.adds.0[m];
                 }
-                restricted_flex[kind as usize] += def.adds_any as u32;
+                restricted_flex[kind.index()] += def.adds_any as u32;
             }
             (1, Some(def)) => {
                 for m in 0..6 {
@@ -1195,27 +1191,15 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
     Available { fixed, flex, consume, unknown: false, changers: cost_change_sources(cx), restricted, restricted_flex }
 }
 
-/// What a spell is, as far as the mana limited to some spells is concerned (CR 106.6).
-#[derive(Clone, Copy)]
-pub struct SpellKind {
-    pub artifact: bool,
-    pub instant_or_sorcery: bool,
-    pub legendary: bool,
-}
-
-/// The kind of spell a card or face is when cast.
-fn spell_kind(def: &CardDef) -> SpellKind {
-    SpellKind {
-        artifact: def.is(CardType::Artifact),
-        instant_or_sorcery: def.is(CardType::Instant) || def.is(CardType::Sorcery),
-        legendary: def.supertypes.legendary,
-    }
+/// The spell a card or face is when cast, as far as the mana limited to some spells is concerned (CR 106.6).
+fn spell_kind(def: &CardDef) -> ManaPayment {
+    ManaPayment::Spell { types: def.types, legendary: def.supertypes.legendary }
 }
 
 impl Available {
     /// This with the restricted mana of the kinds in `kinds` (a bit for each `ManaRestriction`) added to what any spell
     /// or ability may spend.
-    fn with_restricted(&self, kinds: u8) -> Available {
+    fn with_restricted(&self, kinds: u16) -> Available {
         let mut with = Available {
             fixed: self.fixed,
             flex: self.flex,
@@ -1236,25 +1220,16 @@ impl Available {
         with
     }
 
-    /// Whether `cost` could be paid for a spell of this kind: restricted mana that may be spent on a spell like it counts
-    /// (CR 106.6, 601.2g).
-    pub fn covers_spell(&self, cost: &ManaCost, kind: SpellKind) -> bool {
-        let mut kinds = 0u8;
-        if kind.artifact {
-            kinds |= 1 << ManaRestriction::NotNonartifactSpells as u8 | 1 << ManaRestriction::ArtifactSpells as u8;
-        }
-        if kind.instant_or_sorcery {
-            kinds |= 1 << ManaRestriction::InstantOrSorcerySpells as u8;
-        }
-        if kind.legendary {
-            kinds |= 1 << ManaRestriction::LegendaryUncounterable as u8;
+    /// Whether `cost` could be paid for `payment` (casting a spell of a kind, activating an ability of a source): the
+    /// restricted mana that may be spent on it counts (CR 106.6, 601.2g, 602.2b).
+    pub fn covers_for(&self, cost: &ManaCost, payment: ManaPayment) -> bool {
+        let mut kinds = 0u16;
+        for (i, restriction) in ManaRestriction::ALL.into_iter().enumerate() {
+            if (self.restricted[i] != [0; 6] || self.restricted_flex[i] != 0) && restriction.may_pay(payment) {
+                kinds |= 1 << i;
+            }
         }
         self.with_restricted(kinds).covers(cost)
-    }
-
-    /// Whether `cost` could be paid for an ability: restricted mana that is not limited to spells counts.
-    pub fn covers_ability(&self, cost: &ManaCost) -> bool {
-        self.with_restricted(1 << ManaRestriction::NotNonartifactSpells as u8).covers(cost)
     }
 
     /// Whether `cost` could be paid with it (advice, CR 601.2g).
@@ -1373,7 +1348,10 @@ fn activated_options(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOption>)
                 if static_rules::spend_any_color_for(cx, player, id) {
                     cost = ManaCost { generic: cost.mana_value().min(255) as u8, ..ManaCost::ZERO };
                 }
-                if !a.covers_ability(&cost) && static_rules::activation_alternative(cx, player, id, def).is_none() {
+                // A special action is no ability, so mana limited to activating abilities can't pay for it (CR 116.2,
+                // 106.6).
+                let payment = if def.special_action { ManaPayment::Other } else { ManaPayment::Ability { source: chars.types } };
+                if !a.covers_for(&cost, payment) && static_rules::activation_alternative(cx, player, id, def).is_none() {
                     continue;
                 }
             }
@@ -1818,7 +1796,7 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
                     let mut option = ActionOption::on(ActionKind::CastSpell, id, way);
                     if {
                         let a = available.get_or_init(|| self::available(cx, player));
-                        a.covers_spell(&least_cost(cx, a, player, id, half, half.cost), spell_kind(half))
+                        a.covers_for(&least_cost(cx, a, player, id, half, half.cost), spell_kind(half))
                     } && offer_spell(cx, &asker, half, &mut option)
                     {
                         options.push(option);
@@ -1835,7 +1813,7 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
                 let mut option = ActionOption::on(ActionKind::CastSpell, id, WAY_BACK_FACE);
                 if {
                     let a = available.get_or_init(|| self::available(cx, player));
-                    a.covers_spell(&least_cost(cx, a, player, id, back, back.cost), spell_kind(back))
+                    a.covers_for(&least_cost(cx, a, player, id, back, back.cost), spell_kind(back))
                 } && offer_spell(cx, &asker, back, &mut option)
                 {
                     options.push(option);
@@ -1850,7 +1828,7 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
                 let mut option = ActionOption::on(ActionKind::CastSpell, id, WAY_BESTOW);
                 if {
                     let a = available.get_or_init(|| self::available(cx, player));
-                    a.covers_spell(&least_cost(cx, a, player, id, bestow, bestow.cost), spell_kind(bestow))
+                    a.covers_for(&least_cost(cx, a, player, id, bestow, bestow.cost), spell_kind(bestow))
                 } && offer_spell(cx, &asker, bestow, &mut option)
                 {
                     options.push(option);
@@ -1865,7 +1843,7 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
                 let mut option = ActionOption::on(ActionKind::CastSpell, id, WAY_ADVENTURE);
                 if {
                     let a = available.get_or_init(|| self::available(cx, player));
-                    a.covers_spell(&least_cost(cx, a, player, id, adventure, adventure.cost), spell_kind(adventure))
+                    a.covers_for(&least_cost(cx, a, player, id, adventure, adventure.cost), spell_kind(adventure))
                 } && offer_spell(cx, &asker, adventure, &mut option)
                 {
                     options.push(option);
@@ -2010,7 +1988,7 @@ fn has_mana_source(cx: &Cx, id: ObjectId, player: PlayerId) -> bool {
 fn covers_total(cx: &Cx, a: &Available, player: PlayerId, card: ObjectId, def: &CardDef, cost: ManaCost, exiled: u8) -> bool {
     let no_mana = def.keywords.has(Keyword::CantSpendManaToCast);
     if !def.pay_with.any() && !no_mana {
-        return a.covers_spell(&cost, spell_kind(def));
+        return a.covers_for(&cost, spell_kind(def));
     }
     let mut cost = cost;
     let mut creatures: Vec<ColorSet> = Vec::new();
@@ -2034,7 +2012,7 @@ fn covers_total(cx: &Cx, a: &Available, player: PlayerId, card: ObjectId, def: &
     }
     cost = convoked(&cost, &creatures);
     cost.generic = cost.generic.saturating_sub(generic.min(255) as u8);
-    if no_mana { cost.is_zero() } else { a.covers_spell(&cost, spell_kind(def)) }
+    if no_mana { cost.is_zero() } else { a.covers_for(&cost, spell_kind(def)) }
 }
 
 /// The text an option is matched by and a menu row shows: an alternative cost's, a granted way's or an ability's. A cast a
@@ -2544,14 +2522,14 @@ fn cast(
     if let Some(creature) = reducer {
         ops::tap(cx, creature);
     }
-    let helpers = Helpers { with: def.pay_with, waterbend, creatures: false, no_mana: def.keywords.has(Keyword::CantSpendManaToCast), casting: true, reserved: &exiles };
+    let helpers = Helpers { with: def.pay_with, waterbend, creatures: false, no_mana: def.keywords.has(Keyword::CantSpendManaToCast), purpose: Paying::Casting, reserved: &exiles };
     let (spent, restrictions) = pay_mana_used(cx, player, spell, cost.mana, &helpers)?;
     // CR 106.6: a creature spell paid for with mana that gives it haste has haste once it resolves; a spell paid for with
     // mana that makes it uncounterable can't be countered.
-    if restrictions & (1 << ManaRestriction::GainsHaste as u8) != 0 && cx.chars(spell).is(CardType::Creature) {
+    if restrictions & (1 << ManaRestriction::GainsHaste.index()) != 0 && cx.chars(spell).is(CardType::Creature) {
         cx.st().update_obj(spell, |o| o.marks.gains_haste = true);
     }
-    if restrictions & (1 << ManaRestriction::LegendaryUncounterable as u8) != 0 {
+    if restrictions & (1 << ManaRestriction::LegendaryUncounterable.index()) != 0 {
         cx.st().update_obj(spell, |o| o.marks.cant_be_countered = true);
     }
     apply_next_spell_effects(cx, player, spell);
@@ -3273,7 +3251,13 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
     if mana.mana_value() > 0 && static_rules::spend_any_color_for(cx, player, source) {
         mana = ManaCost { generic: mana.mana_value().min(255) as u8, ..ManaCost::ZERO };
     }
-    pay_mana_with(cx, player, source, mana, &Helpers { waterbend: if def.waterbend { u8::MAX } else { 0 }, creatures: def.tap_creatures_for_mana, ..Helpers::NONE })?;
+    pay_mana_with(
+        cx,
+        player,
+        source,
+        mana,
+        &Helpers { waterbend: if def.waterbend { u8::MAX } else { 0 }, creatures: def.tap_creatures_for_mana, purpose: Paying::Activating, ..Helpers::NONE },
+    )?;
     if life > 0 {
         ops::change_life(cx, player, -(life as i32));
     }
@@ -3415,7 +3399,7 @@ pub fn activate_mana(
         } else {
             mana
         };
-        pay_mana(cx, player, source, mana)?;
+        pay_mana_with(cx, player, source, mana, &Helpers { purpose: Paying::Activating, ..Helpers::NONE })?;
     }
     pay_exert_and_tappers(cx, source, &def.cost, &[]);
     if def.cost.discard_hand {
@@ -3639,34 +3623,33 @@ fn assign_options(pool: &ManaPool, restricted: &[(ManaRestriction, ManaPool)], o
     out
 }
 
-/// Whether mana under this restriction may pay for what `source` is (CR 106.6): "can't be spent to cast nonartifact
-/// spells" pays an artifact spell, and everything that is not casting a spell; a limit to some spells pays only the casting
-/// of such a spell (`casting`).
-fn may_spend(cx: &Cx, source: ObjectId, restriction: ManaRestriction, casting: bool) -> bool {
-    // Only casting a spell is limited to spells (CR 106.6, 601.2g): paying "unless its controller pays" (CR 118.12) or a
-    // copy's cost for the spell on the stack is not casting it.
-    let spell = casting && cx.s().obj(source).zone.is(ZoneKind::Stack);
-    match restriction {
-        ManaRestriction::NotNonartifactSpells => !spell || cx.chars(source).is(CardType::Artifact),
-        ManaRestriction::GainsHaste => true,
-        ManaRestriction::LegendaryUncounterable => spell && cx.chars(source).supertypes.legendary,
-        ManaRestriction::ArtifactSpells => spell && cx.chars(source).is(CardType::Artifact),
-        ManaRestriction::InstantOrSorcerySpells => {
-            spell && (cx.chars(source).is(CardType::Instant) || cx.chars(source).is(CardType::Sorcery))
+/// What paying for `source` is, as far as restricted mana is concerned (CR 106.6): casting it, when it is a spell on the
+/// stack being cast; activating one of its abilities; or anything else. Only casting a spell is limited to spells (CR
+/// 601.2g): paying "unless its controller pays" (CR 118.12) or a copy's cost for the spell on the stack is not casting it;
+/// and only an ability's activation is activating one (CR 602.2b, 605.3a), never a special action (CR 116.2). The source
+/// is judged as it is now, as the cost is paid (an ability of a land card in the hand is an ability of a land source).
+fn payment_for(cx: &Cx, source: ObjectId, purpose: Paying) -> ManaPayment {
+    match purpose {
+        Paying::Casting if cx.s().obj(source).zone.is(ZoneKind::Stack) => {
+            let chars = cx.chars(source);
+            ManaPayment::Spell { types: chars.types, legendary: chars.supertypes.legendary }
         }
+        Paying::Activating => ManaPayment::Ability { source: cx.chars(source).types },
+        _ => ManaPayment::Other,
     }
 }
 
 /// The restricted mana `player` has that may pay for `source`, with its restriction.
-fn restricted_for(cx: &Cx, player: PlayerId, source: ObjectId, casting: bool) -> Vec<(ManaRestriction, ManaPool)> {
+fn restricted_for(cx: &Cx, player: PlayerId, source: ObjectId, purpose: Paying) -> Vec<(ManaRestriction, ManaPool)> {
     let p = cx.s().player(player);
     let mut out = Vec::new();
     if p.restricted.iter().all(|r| r.is_empty()) {
         return out;
     }
-    for restriction in ManaRestriction::ALL {
-        let pool = p.restricted[restriction as usize];
-        if !pool.is_empty() && may_spend(cx, source, restriction, casting) {
+    let payment = payment_for(cx, source, purpose);
+    for (i, restriction) in ManaRestriction::ALL.into_iter().enumerate() {
+        let pool = p.restricted[i];
+        if !pool.is_empty() && restriction.may_pay(payment) {
             out.push((restriction, pool));
         }
     }
@@ -3674,9 +3657,9 @@ fn restricted_for(cx: &Cx, player: PlayerId, source: ObjectId, casting: bool) ->
 }
 
 /// The pool a cost for `source` may be paid from: unrestricted mana and the restricted mana that may pay for it.
-fn spendable(cx: &Cx, player: PlayerId, source: ObjectId, casting: bool) -> ManaPool {
+fn spendable(cx: &Cx, player: PlayerId, source: ObjectId, purpose: Paying) -> ManaPool {
     let mut pool = cx.s().player(player).pool;
-    for (_, restricted) in restricted_for(cx, player, source, casting) {
+    for (_, restricted) in restricted_for(cx, player, source, purpose) {
         for m in Mana::ALL {
             pool.0[m as usize] += restricted.0[m as usize];
         }
@@ -3686,17 +3669,17 @@ fn spendable(cx: &Cx, player: PlayerId, source: ObjectId, casting: bool) -> Mana
 
 /// Takes `spent` out of the pool, restricted mana first (it is what the C# engine prefers spending). Which restrictions
 /// the mana taken carried, as a bitmask by `ManaRestriction`.
-fn take_mana(cx: &mut Cx, player: PlayerId, source: ObjectId, casting: bool, spent: &[u8; 6]) -> u8 {
-    let restricted = restricted_for(cx, player, source, casting);
-    let mut used = 0u8;
+fn take_mana(cx: &mut Cx, player: PlayerId, source: ObjectId, purpose: Paying, spent: &[u8; 6]) -> u16 {
+    let restricted = restricted_for(cx, player, source, purpose);
+    let mut used = 0u16;
     cx.st().update_player(player, |p| {
         for mana in Mana::ALL {
             let mut need = spent[mana as usize];
             for (restriction, _) in &restricted {
-                let have = &mut p.restricted[*restriction as usize].0[mana as usize];
+                let have = &mut p.restricted[restriction.index()].0[mana as usize];
                 let take = (*have).min(need);
                 if take > 0 {
-                    used |= 1 << *restriction as u8;
+                    used |= 1 << restriction.index();
                 }
                 *have -= take;
                 need -= take;
@@ -3707,9 +3690,17 @@ fn take_mana(cx: &mut Cx, player: PlayerId, source: ObjectId, casting: bool, spe
     used
 }
 
-fn mana_options_while_paying(cx: &Cx, player: PlayerId) -> Vec<ActionOption> {
+/// The mana abilities `player` may activate while paying for `source` (CR 601.2g, 605.3a), each whose mana is restricted
+/// so that none of it may pay this cost marked as paying nothing (CR 106.6).
+fn mana_options_while_paying(cx: &Cx, player: PlayerId, source: ObjectId, purpose: Paying) -> Vec<ActionOption> {
     let mut options = Vec::new();
     mana_ability_options(cx, player, &mut options);
+    if options.iter().any(|o| o.restriction.is_some()) {
+        let payment = payment_for(cx, source, purpose);
+        for option in &mut options {
+            option.pays_nothing = option.restriction.is_some_and(|r| !r.may_pay(payment));
+        }
+    }
     options
 }
 
@@ -3723,14 +3714,23 @@ pub(crate) struct Helpers<'a> {
     /// An untapped creature tapped pays {1} of the generic mana (Heirloom Epic).
     pub creatures: bool,
     pub no_mana: bool,
-    /// The mana pays for casting `source`, a spell (CR 601.2g): mana limited to some spells (CR 106.6) may be spent.
-    pub casting: bool,
+    /// What the mana pays for (CR 106.6): casting `source`, a spell (CR 601.2g), activating one of its abilities (CR
+    /// 602.2b, 605.3a), or anything else.
+    pub purpose: Paying,
     /// Cards another part of the cost was already chosen to exile (escape's), which delve may not also exile.
     pub reserved: &'a [ObjectId],
 }
 
 impl Helpers<'static> {
-    pub const NONE: Helpers<'static> = Helpers { with: PayWith::NONE, waterbend: 0, creatures: false, no_mana: false, casting: false, reserved: &[] };
+    pub const NONE: Helpers<'static> = Helpers { with: PayWith::NONE, waterbend: 0, creatures: false, no_mana: false, purpose: Paying::Other, reserved: &[] };
+}
+
+/// What a mana payment is for, as far as restricted mana is concerned (CR 106.6): see `payment_for`.
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub(crate) enum Paying {
+    Casting,
+    Activating,
+    Other,
 }
 
 impl Helpers<'_> {
@@ -3740,7 +3740,7 @@ impl Helpers<'_> {
     }
 }
 
-/// Pays a mana cost (CR 601.2g-h) with nothing but mana.
+/// Pays a mana cost (CR 601.2g-h) with nothing but mana, for anything but casting a spell or activating an ability.
 pub fn pay_mana(cx: &mut Cx, player: PlayerId, source: ObjectId, total: ManaCost) -> R<ManaPool> {
     pay_mana_with(cx, player, source, total, &Helpers::NONE)
 }
@@ -3883,10 +3883,10 @@ pub(crate) fn pay_mana_with(cx: &mut Cx, player: PlayerId, source: ObjectId, tot
 }
 
 /// `pay_mana_with`, and which restrictions the mana spent carried (a bitmask by `ManaRestriction`, CR 106.6).
-pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, total: ManaCost, helpers: &Helpers) -> R<(ManaPool, u8)> {
+pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, total: ManaCost, helpers: &Helpers) -> R<(ManaPool, u16)> {
     let mut owed = total;
     let mut paid = ManaPool::default();
-    let mut used = 0u8;
+    let mut used = 0u16;
     // What has paid instead of mana: creatures tapped for convoke (by their colors), and cards exiled or artifacts
     // tapped for {1} each.
     let mut convoking: Vec<ColorSet> = Vec::new();
@@ -3903,7 +3903,7 @@ pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, tot
         if due.is_zero() {
             break;
         }
-        let pool = if helpers.no_mana { ManaPool::default() } else { spendable(cx, player, source, helpers.casting) };
+        let pool = if helpers.no_mana { ManaPool::default() } else { spendable(cx, player, source, helpers.purpose) };
         let candidates =
             if helpers.any() { pay_candidates(cx, player, source, helpers, &cost, &due, &convoking, &delved, bent) } else { Vec::new() };
         let mut decided = ways(&pool, &due);
@@ -3911,7 +3911,7 @@ pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, tot
         // is the player's choice, even when the pool pays the cost one way.
         if let Ways::One(spent) = decided {
             let player_state = cx.s().player(player);
-            let restricted = restricted_for(cx, player, source, helpers.casting);
+            let restricted = restricted_for(cx, player, source, helpers.purpose);
             let mixed = Mana::ALL.iter().any(|&m| {
                 let held_restricted: u8 = restricted.iter().map(|(_, p)| p.get(m)).sum();
                 held_restricted > 0
@@ -3923,8 +3923,8 @@ pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, tot
                 decided = Ways::Many;
             }
         }
-        let spend_pool = |cx: &mut Cx, paid: &mut ManaPool, used: &mut u8, spent: [u8; 6]| {
-            *used |= take_mana(cx, player, source, helpers.casting, &spent);
+        let spend_pool = |cx: &mut Cx, paid: &mut ManaPool, used: &mut u16, spent: [u8; 6]| {
+            *used |= take_mana(cx, player, source, helpers.purpose, &spent);
             for mana in Mana::ALL {
                 paid.0[mana as usize] += spent[mana as usize];
             }
@@ -3936,12 +3936,12 @@ pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, tot
             break;
         }
         let paying = !convoking.is_empty() || generic_paid > 0;
-        let mut options = if paying { Vec::new() } else { mana_options_while_paying(cx, player) };
+        let mut options = if paying { Vec::new() } else { mana_options_while_paying(cx, player, source, helpers.purpose) };
         if matches!(decided, Ways::One(_)) {
             // The pool's one way of paying, which the player may take or pay some other way instead.
             options.push(ActionOption::simple(ActionKind::ConfirmCasting));
         } else if !helpers.no_mana {
-            let restricted = restricted_for(cx, player, source, helpers.casting);
+            let restricted = restricted_for(cx, player, source, helpers.purpose);
             options.extend(assign_options(&cx.s().player(player).pool, &restricted, &due));
         }
         options.extend(candidates);
@@ -3965,8 +3965,8 @@ pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, tot
                     let mana = action.mana.expect("mana");
                     match action.restriction {
                         Some(r) => {
-                            used |= 1 << r as u8;
-                            cx.st().update_player(player, |p| p.restricted[r as usize].0[mana as usize] -= 1)
+                            used |= 1 << r.index();
+                            cx.st().update_player(player, |p| p.restricted[r.index()].0[mana as usize] -= 1)
                         }
                         None => cx.st().update_player(player, |p| p.spend_mana(mana, 1)),
                     }
@@ -4011,8 +4011,8 @@ pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, tot
 /// cost, or decline.
 pub fn unless_pays(cx: &mut Cx, payer: PlayerId, source: ObjectId, subject: ObjectId, total: ManaCost) -> R<bool> {
     loop {
-        let pool = spendable(cx, payer, source, false);
-        let mut options = mana_options_while_paying(cx, payer);
+        let pool = spendable(cx, payer, source, Paying::Other);
+        let mut options = mana_options_while_paying(cx, payer, source, Paying::Other);
         if !matches!(ways(&pool, &total), Ways::None) {
             options.push(ActionOption::simple(ActionKind::PayCost));
         }

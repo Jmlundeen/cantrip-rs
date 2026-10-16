@@ -95,12 +95,7 @@ pub fn translate(
                 targets: a.targets.iter().map(|t| target(handles, game, t)).collect::<Result<_, _>>()?,
                 color: a.color.map(color_of),
                 mana: a.mana.map(mana_of),
-                restriction: match a.filter {
-                    ManaSpendFilterView::NotNonartifactSpells => Some(ManaRestriction::NotNonartifactSpells),
-                    ManaSpendFilterView::ArtifactSpells => Some(ManaRestriction::ArtifactSpells),
-                    ManaSpendFilterView::InstantOrSorcerySpells => Some(ManaRestriction::InstantOrSorcerySpells),
-                    _ => None,
-                },
+                restriction: restriction_of(a.filter, a.effect),
             };
             if let Some(s) = a.sacrifice {
                 action.targets.push(Target::Object(object(handles, game, s)?));
@@ -219,12 +214,9 @@ pub fn payload_of(answer: &Answer, request: &Request, handles: &mut HandleSpace,
             a.ability_index = i32::from(action.index);
             a.color = action.color.map(color_view);
             a.mana = action.mana.map(mana_view);
-            a.filter = match action.restriction {
-                Some(ManaRestriction::NotNonartifactSpells) => ManaSpendFilterView::NotNonartifactSpells,
-                Some(ManaRestriction::ArtifactSpells) => ManaSpendFilterView::ArtifactSpells,
-                Some(ManaRestriction::InstantOrSorcerySpells) => ManaSpendFilterView::InstantOrSorcerySpells,
-                _ => ManaSpendFilterView::None,
-            };
+            if let Some(restriction) = action.restriction {
+                (a.filter, a.effect) = restriction_view(restriction);
+            }
             // A mana ability's sacrifice goes to the wire as `Sacrifice`, not a target (`prompt::option_message`).
             let sacrifices = action.kind == ActionKind::ActivateAbility
                 && action.source.is_some_and(|s| {

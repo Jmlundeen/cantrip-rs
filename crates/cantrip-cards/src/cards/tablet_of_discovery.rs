@@ -15,7 +15,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ENTERS, mill_and_play, "When this artifact enters, mill a card. You may play that card this turn."),
         mana_ability(TAP, add(Mana::R), "{T}: Add {R}."),
-        mana_ability(TAP, add_n(Mana::R, 2).only_for(ManaRestriction::InstantOrSorcerySpells), "{T}: Add {R}{R}. Spend this mana only to cast instant and sorcery spells."),
+        mana_ability(TAP, add_n(Mana::R, 2).only_for(ManaRestriction::INSTANT_OR_SORCERY_SPELLS), "{T}: Add {R}{R}. Spend this mana only to cast instant and sorcery spells."),
     ],
     ..oracle::TABLET_OF_DISCOVERY
 };

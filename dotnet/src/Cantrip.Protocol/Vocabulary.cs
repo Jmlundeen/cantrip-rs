@@ -343,6 +343,11 @@ public enum ManaSpendFilterView
     ArtifactSpells = 4,
     LegendarySpells = 5,
     NotNonartifactSpells = 6,
+    PlaneswalkerSpells = 7,
+    /// <summary>Only to activate abilities of land sources: a land, or a land card in a hand or graveyard.</summary>
+    LandAbilities = 8,
+    /// <summary>Only to activate abilities of artifact sources.</summary>
+    ArtifactAbilities = 9,
 }
 
 /// <summary>What spending some mana does to whatever it pays for (CR 106.6): the effect half of a restriction.</summary>

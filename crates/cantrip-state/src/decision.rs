@@ -158,8 +158,12 @@ pub struct ActionOption {
     pub names_nothing: bool,
     /// For `AssignMana`: the kind of mana.
     pub mana: Option<Mana>,
-    /// For `AssignMana`: the restriction on the mana (CR 106.6), if it has one.
+    /// For `AssignMana`: the restriction on the mana (CR 106.6), if it has one. For a mana ability: the restriction on
+    /// the mana it adds.
     pub restriction: Option<ManaRestriction>,
+    /// For a mana ability offered while a cost is paid: the mana it adds is restricted so that none of it may pay this
+    /// cost (CR 106.6). Activating it is still a choice the player has (CR 601.2g, 605.3a); it only fills the pool.
+    pub pays_nothing: bool,
 }
 
 impl ActionOption {
@@ -175,6 +179,7 @@ impl ActionOption {
             names_nothing: false,
             mana: None,
             restriction: None,
+            pays_nothing: false,
         }
     }
 

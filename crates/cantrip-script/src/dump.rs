@@ -221,7 +221,7 @@ impl StateDump {
             // Restricted mana apart, each kind with its restriction: "{R}{R} (GainsHaste)".
             for restriction in ManaRestriction::ALL {
                 for m in Mana::ALL {
-                    let n = player.restricted[restriction as usize].get(m);
+                    let n = player.restricted[restriction.index()].get(m);
                     if n > 0 {
                         let mut one = ManaPool::default();
                         one.0[m as usize] = n;

@@ -229,12 +229,11 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
     if let Some(mana) = o.mana {
         m.produces = vec![mana_view(mana)];
     }
-    match o.restriction {
-        Some(ManaRestriction::NotNonartifactSpells) => m.filter = ManaSpendFilterView::NotNonartifactSpells,
-        Some(ManaRestriction::ArtifactSpells) => m.filter = ManaSpendFilterView::ArtifactSpells,
-        Some(ManaRestriction::InstantOrSorcerySpells) => m.filter = ManaSpendFilterView::InstantOrSorcerySpells,
-        _ => {}
+    // What restricts the mana: of pool mana to assign, or of the mana a mana ability adds (CR 106.6).
+    if let Some(restriction) = o.restriction {
+        (m.filter, m.effect) = restriction_view(restriction);
     }
+    m.pays_nothing = o.pays_nothing;
     let candidates: Vec<TargetMessage> = o.target_candidates.iter().filter_map(|t| target_message(handles, *t)).collect();
 
     let Some(src) = o.source else {

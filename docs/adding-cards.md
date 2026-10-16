@@ -271,8 +271,14 @@ shapes have an example:
   (The Wandering Emperor), and a resolved spell's "you may activate loyalty abilities of [Jace] planeswalkers you control
   ... any time you could cast an instant" is `EffectKind::InstantLoyalty(Some(Subtype::Jace))` (Jace's Machinations; `None`
   for every planeswalker), which changes only the timing (CR 606.3). The board is searched for these only when something is cast or activated.
-- **Mana**: `PlayGrant.any_type` / `CastTerms.any_type` (mana of any type pays, CR 609.4b); mana that can't be spent on
-  nonartifact spells is `g.add_restricted_mana(..)` from a mana ability with `.only_for(..)` (CR 106.6).
+- **Mana**: `PlayGrant.any_type` / `CastTerms.any_type` (mana of any type pays, CR 609.4b). Mana with a restriction on
+  what it may be spent on (CR 106.6) is added by a mana ability with `.only_for(restriction)` (or `g.add_restricted_mana(..)`
+  from an effect): `ManaRestriction::Spells(types)` is "spend this mana only to cast [type] spells" (`ARTIFACT_SPELLS`,
+  `INSTANT_OR_SORCERY_SPELLS`, `PLANESWALKER_SPELLS`), `ManaRestriction::Abilities(types)` "spend this mana only to
+  activate abilities [of [type] sources]" (`ABILITIES` for any source, `LAND_ABILITIES`, `ARTIFACT_ABILITIES`), and
+  `NotNonartifactSpells`, `GainsHaste` and `LegendaryUncounterable` the rest. Each has its own place in the pool, so a new
+  parameter is added to `ManaRestriction::ALL` (the build fails on a card naming one that is not there), and the host
+  gives it a word on the wire (`restriction_view`).
 - **Gift** (CR 702.174) is `CardDef.gift`, one of `cantrip_mechanics::gift`'s constants (a card, a Food, a tapped Fish, a
   Treasure, an Octopus, an extra turn); the promise and the opponent are asked before the targets, the spell's effect reads
   `item.gift.is_some()` and a target filter `gift::promised(q, asker.source)`. An instant or sorcery gives it as it

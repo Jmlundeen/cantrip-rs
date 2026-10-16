@@ -288,7 +288,9 @@ impl Adds {
     const NOTHING: Adds = Adds { pool: ManaPool([0; 6]), any: 0, any_color: false, colors: ColorSet::NONE, restricted: None, effect: None };
 
     /// "Spend this mana only ..." (CR 106.6): the mana goes to the pool apart from unrestricted mana.
+    /// A restriction the pool has no place for fails the build (`ManaRestriction::ALL`).
     pub const fn only_for(self, restriction: ManaRestriction) -> Adds {
+        let _ = restriction.index();
         Adds { restricted: Some(restriction), ..self }
     }
 

@@ -17,7 +17,8 @@ fn fits(option: &ActionOption, action: &Action) -> bool {
     if option.kind != action.kind || option.source != action.source || option.index != action.index {
         return false;
     }
-    if option.kind == ActionKind::AssignMana && option.mana != action.mana {
+    // Restricted mana is a kind of its own (CR 106.6): spending it is answered with its restriction.
+    if option.kind == ActionKind::AssignMana && (option.mana != action.mana || option.restriction != action.restriction) {
         return false;
     }
     match action.color {

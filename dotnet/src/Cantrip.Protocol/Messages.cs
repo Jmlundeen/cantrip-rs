@@ -1828,6 +1828,14 @@ public sealed class ActionOptionMessage
     /// </summary>
     [Key(26)]
     public string GrantedBy { get; set; } = string.Empty;
+
+    /// <summary>
+    /// For a mana ability offered while a cost is paid: the mana it adds is restricted so that none of it may pay this
+    /// cost (CR 106.6) - Sunken Citadel's two mana for a spell, Mishra's Workshop's for a creature. It may still be
+    /// activated (CR 601.2g); its mana only waits in the pool. <see cref="Filter"/> says what that mana is for.
+    /// </summary>
+    [Key(27)]
+    public bool PaysNothing { get; set; }
 }
 
 /// <summary>

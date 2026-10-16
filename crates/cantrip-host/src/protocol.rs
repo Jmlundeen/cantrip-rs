@@ -278,6 +278,11 @@ pub enum ManaSpendFilterView {
     ArtifactSpells,
     LegendarySpells,
     NotNonartifactSpells,
+    PlaneswalkerSpells,
+    /// Abilities of land sources.
+    LandAbilities,
+    /// Abilities of artifact sources.
+    ArtifactAbilities,
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -606,6 +611,9 @@ pub struct ActionOptionMessage {
     pub alternative: i32,
     pub life_gained: i32,
     pub granted_by: String,
+    /// For a mana ability offered while a cost is paid: its mana is restricted so that none of it may pay this cost
+    /// (CR 106.6).
+    pub pays_nothing: bool,
 }
 
 impl ActionOptionMessage {
@@ -637,6 +645,7 @@ impl ActionOptionMessage {
             alternative: 0,
             life_gained: 0,
             granted_by: String::new(),
+            pays_nothing: false,
         }
     }
 }

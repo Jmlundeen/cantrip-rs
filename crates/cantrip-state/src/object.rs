@@ -761,34 +761,119 @@ pub enum ManaRestriction {
     /// "Spend this mana only to cast a legendary spell, and that spell can't be countered" (CR 106.6, 701.5; Delighted
     /// Halfling): a limit and an effect, each independent of the other, carried by the mana itself.
     LegendaryUncounterable,
-    /// "Spend this mana only to cast artifact spells" (CR 106.6; Mishra's Workshop): not on an ability, nor on any other
-    /// spell.
-    ArtifactSpells,
-    /// "Spend this mana only to cast an instant or sorcery spell" (CR 106.6, 304, 307; Great Hall of the Biblioplex,
-    /// Tablet of Discovery, and the same limit on Abstract Paintmage and Cormela, Glamour Thief): not on an ability, nor
-    /// on any other spell. A spell with flashback or kicker is still an instant or sorcery spell, so it is paid as one.
-    InstantOrSorcerySpells,
+    /// "Spend this mana only to cast [type] spells" (CR 106.6): only on casting a spell (CR 601.2g) that has one of these
+    /// card types - not on an ability, nor on any other spell, nor on a cost paid for a spell that is not casting it
+    /// ("unless its controller pays", CR 118.12). A spell with flashback or kicker is still the spell it is.
+    /// Artifact spells: Mishra's Workshop, Steelswarm Operator. Instant or sorcery spells: Great Hall of the Biblioplex,
+    /// Tablet of Discovery (and the same limit on Abstract Paintmage and Cormela, Glamour Thief). Planeswalker spells:
+    /// Gideon's Memorial.
+    Spells(TypeSet),
+    /// "Spend this mana only to activate abilities [of [type] sources]" (CR 106.6, 602.2b): only on the cost of activating
+    /// an activated ability - a mana ability's included (CR 605.3a), wherever the ability functions from (a land card's
+    /// channel or cycling in the hand) - whose source has one of these card types as the ability is activated; with no
+    /// types, of any source. Never on a spell, a special action (CR 116.2: turning a face-down permanent face up,
+    /// unlocking a door), a triggered ability's cost or "unless ... pays" (CR 118.12).
+    /// Any source: Omen Hawker, Pit Automaton, The Enigma Jewel. Land sources: Sunken Citadel, Eumidian Lifeseed.
+    /// Artifact sources: Soldevi Machinist ("of artifacts"), Steelswarm Operator.
+    Abilities(TypeSet),
+}
+
+/// What some mana is being spent on, as far as a restriction on it is concerned (CR 106.6).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ManaPayment {
+    /// Casting a spell with these card types (CR 601.2g-h).
+    Spell { types: TypeSet, legendary: bool },
+    /// Activating an ability whose source has these card types (CR 602.2b, 605.3a).
+    Ability { source: TypeSet },
+    /// Anything else: a special action, "unless ... pays", a cost a resolving effect asks for.
+    Other,
 }
 
 impl ManaRestriction {
-    pub const COUNT: usize = 5;
+    pub const ARTIFACT_SPELLS: ManaRestriction = ManaRestriction::Spells(TypeSet::of(&[CardType::Artifact]));
+    pub const INSTANT_OR_SORCERY_SPELLS: ManaRestriction =
+        ManaRestriction::Spells(TypeSet::of(&[CardType::Instant, CardType::Sorcery]));
+    pub const PLANESWALKER_SPELLS: ManaRestriction = ManaRestriction::Spells(TypeSet::of(&[CardType::Planeswalker]));
+    pub const ABILITIES: ManaRestriction = ManaRestriction::Abilities(TypeSet::NONE);
+    pub const LAND_ABILITIES: ManaRestriction = ManaRestriction::Abilities(TypeSet::of(&[CardType::Land]));
+    pub const ARTIFACT_ABILITIES: ManaRestriction = ManaRestriction::Abilities(TypeSet::of(&[CardType::Artifact]));
+
+    pub const COUNT: usize = 9;
+    /// Every restriction a printed card's mana carries, each with a place of its own in the pool
+    /// (`Player::restricted`). A card whose mana has a restriction not here is refused where it is written
+    /// (`Adds::only_for` is checked at compile time).
     pub const ALL: [ManaRestriction; ManaRestriction::COUNT] = [
         ManaRestriction::NotNonartifactSpells,
         ManaRestriction::GainsHaste,
         ManaRestriction::LegendaryUncounterable,
-        ManaRestriction::ArtifactSpells,
-        ManaRestriction::InstantOrSorcerySpells,
+        ManaRestriction::ARTIFACT_SPELLS,
+        ManaRestriction::INSTANT_OR_SORCERY_SPELLS,
+        ManaRestriction::PLANESWALKER_SPELLS,
+        ManaRestriction::ABILITIES,
+        ManaRestriction::LAND_ABILITIES,
+        ManaRestriction::ARTIFACT_ABILITIES,
     ];
+    const NAMES: [&'static str; ManaRestriction::COUNT] = [
+        "NotNonartifactSpells",
+        "GainsHaste",
+        "LegendarySpells, CantBeCountered",
+        "ArtifactSpells",
+        "InstantOrSorcerySpells",
+        "PlaneswalkerSpells",
+        "Abilities",
+        "LandAbilities",
+        "ArtifactAbilities",
+    ];
+
+    const fn same(self, other: ManaRestriction) -> bool {
+        match (self, other) {
+            (ManaRestriction::NotNonartifactSpells, ManaRestriction::NotNonartifactSpells)
+            | (ManaRestriction::GainsHaste, ManaRestriction::GainsHaste)
+            | (ManaRestriction::LegendaryUncounterable, ManaRestriction::LegendaryUncounterable) => true,
+            (ManaRestriction::Spells(a), ManaRestriction::Spells(b)) | (ManaRestriction::Abilities(a), ManaRestriction::Abilities(b)) => {
+                a.0 == b.0
+            }
+            _ => false,
+        }
+    }
+
+    /// Its place in the pool (`Player::restricted`), if it has one.
+    pub const fn slot(self) -> Option<usize> {
+        let mut i = 0;
+        while i < ManaRestriction::COUNT {
+            if self.same(ManaRestriction::ALL[i]) {
+                return Some(i);
+            }
+            i += 1;
+        }
+        None
+    }
+
+    /// Its place in the pool, as a bit of a set of restrictions too.
+    pub const fn index(self) -> usize {
+        match self.slot() {
+            Some(i) => i,
+            None => panic!("a mana restriction with no place in the pool: add it to ManaRestriction::ALL"),
+        }
+    }
+
+    /// Whether mana under this restriction may be spent on `payment` (CR 106.6).
+    pub fn may_pay(self, payment: ManaPayment) -> bool {
+        match (self, payment) {
+            // "Can't be spent to cast nonartifact spells": everything but casting a nonartifact spell.
+            (ManaRestriction::NotNonartifactSpells, ManaPayment::Spell { types, .. }) => types.has(CardType::Artifact),
+            (ManaRestriction::NotNonartifactSpells, _) => true,
+            (ManaRestriction::GainsHaste, _) => true,
+            (ManaRestriction::LegendaryUncounterable, ManaPayment::Spell { legendary, .. }) => legendary,
+            (ManaRestriction::Spells(allowed), ManaPayment::Spell { types, .. }) => allowed.0 & types.0 != 0,
+            (ManaRestriction::Abilities(allowed), ManaPayment::Ability { source }) => allowed.0 == 0 || allowed.0 & source.0 != 0,
+            _ => false,
+        }
+    }
 
     /// The name a scenario's `Spend:` and the state dump write it by: the limit and the effect, as the C# engine does.
     pub fn name(self) -> &'static str {
-        match self {
-            ManaRestriction::NotNonartifactSpells => "NotNonartifactSpells",
-            ManaRestriction::GainsHaste => "GainsHaste",
-            ManaRestriction::LegendaryUncounterable => "LegendarySpells, CantBeCountered",
-            ManaRestriction::ArtifactSpells => "ArtifactSpells",
-            ManaRestriction::InstantOrSorcerySpells => "InstantOrSorcerySpells",
-        }
+        ManaRestriction::NAMES[self.index()]
     }
 
     /// Reads the words of a `Spend:` piece after the mana symbol: each a name of the limit or the effect.

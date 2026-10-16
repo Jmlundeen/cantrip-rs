@@ -1801,6 +1801,9 @@ impl<'s> Run<'s> {
             }
             // An ability that adds no mana (a land's sacrifice-to-draw) is not one that adds this color.
             AbilityDef::Activated(d) if !d.is_mana_ability() => false,
+            // Mana of a color to be chosen with no color to choose adds none (CR 106.5): a copy of Sunken Citadel that
+            // never chose one.
+            AbilityDef::Activated(d) if d.any_color => false,
             _ => true,
         }
     }

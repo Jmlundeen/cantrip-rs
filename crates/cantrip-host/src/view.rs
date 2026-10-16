@@ -111,6 +111,37 @@ pub fn color_of(view: ColorView) -> Color {
     }
 }
 
+/// What a restriction on mana is, as the wire says it (CR 106.6): what the mana may be spent on, and what it does to what
+/// it pays for. Every restriction has its own pair, so `restriction_of` reads it back.
+pub fn restriction_view(restriction: ManaRestriction) -> (ManaSpendFilterView, ManaSpendEffectView) {
+    let filter = match restriction {
+        ManaRestriction::NotNonartifactSpells => ManaSpendFilterView::NotNonartifactSpells,
+        ManaRestriction::GainsHaste => ManaSpendFilterView::None,
+        ManaRestriction::LegendaryUncounterable => ManaSpendFilterView::LegendarySpells,
+        r if r == ManaRestriction::ARTIFACT_SPELLS => ManaSpendFilterView::ArtifactSpells,
+        r if r == ManaRestriction::INSTANT_OR_SORCERY_SPELLS => ManaSpendFilterView::InstantOrSorcerySpells,
+        r if r == ManaRestriction::PLANESWALKER_SPELLS => ManaSpendFilterView::PlaneswalkerSpells,
+        r if r == ManaRestriction::ABILITIES => ManaSpendFilterView::ActivatedAbilities,
+        r if r == ManaRestriction::LAND_ABILITIES => ManaSpendFilterView::LandAbilities,
+        r if r == ManaRestriction::ARTIFACT_ABILITIES => ManaSpendFilterView::ArtifactAbilities,
+        r => panic!("a mana restriction the wire has no word for: {}", r.name()),
+    };
+    let effect = match restriction {
+        ManaRestriction::GainsHaste => ManaSpendEffectView::GainsHaste,
+        ManaRestriction::LegendaryUncounterable => ManaSpendEffectView::CantBeCountered,
+        _ => ManaSpendEffectView::None,
+    };
+    (filter, effect)
+}
+
+/// The restriction a filter and an effect from the wire name; none for unrestricted mana.
+pub fn restriction_of(filter: ManaSpendFilterView, effect: ManaSpendEffectView) -> Option<ManaRestriction> {
+    if (filter, effect) == (ManaSpendFilterView::None, ManaSpendEffectView::None) {
+        return None;
+    }
+    ManaRestriction::ALL.into_iter().find(|&r| restriction_view(r) == (filter, effect))
+}
+
 pub fn mana_view(mana: Mana) -> ManaTypeView {
     match mana {
         Mana::W => ManaTypeView::White,
@@ -432,24 +463,12 @@ impl<'a> Projector<'a> {
         for mana in Mana::ALL {
             summary.mana[mana as usize] = i32::from(player.pool.get(mana));
         }
-        for (i, pool) in player.restricted.iter().enumerate() {
+        for (restriction, pool) in ManaRestriction::ALL.into_iter().zip(player.restricted.iter()) {
             for mana in Mana::ALL {
                 let n = pool.get(mana);
                 if n > 0 {
-                    summary.restricted_mana.push(RestrictedManaView {
-                        r#type: Some(mana_view(mana)),
-                        amount: i32::from(n),
-                        filter: if i == ManaRestriction::NotNonartifactSpells as usize {
-                            ManaSpendFilterView::NotNonartifactSpells
-                        } else if i == ManaRestriction::ArtifactSpells as usize {
-                            ManaSpendFilterView::ArtifactSpells
-                        } else if i == ManaRestriction::InstantOrSorcerySpells as usize {
-                            ManaSpendFilterView::InstantOrSorcerySpells
-                        } else {
-                            ManaSpendFilterView::None
-                        },
-                        effect: ManaSpendEffectView::None,
-                    });
+                    let (filter, effect) = restriction_view(restriction);
+                    summary.restricted_mana.push(RestrictedManaView { r#type: Some(mana_view(mana)), amount: i32::from(n), filter, effect });
                 }
             }
         }

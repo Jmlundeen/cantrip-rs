@@ -298,6 +298,23 @@ card-table test (`every_activated_ability_has_a_cost_activation_can_pay`) and an
 client's payment caption for a web-slinging cast says to tap a creature for mana while none is tapped; the cast that
 leaves none is still taken back after it is paid.
 
+### Restricted mana
+
+Mana a restriction limits (CR 106.6) is kept in the pool apart from ordinary mana, one `ManaPool` per restriction
+(`Player::restricted`, by `ManaRestriction::index`). A restriction is either a limit on what may be cast or activated or
+an effect the mana has on what it pays for: `Spells(types)` pays only for casting a spell with one of the card types
+(Mishra's Workshop, Great Hall of the Biblioplex, Gideon's Memorial), `Abilities(types)` only for activating an ability
+whose source has one of them, or any source (Sunken Citadel, Steelswarm Operator, Omen Hawker), and
+`NotNonartifactSpells`, `GainsHaste` and `LegendaryUncounterable` are the three single cards' own. What a payment is for
+is `ManaPayment`, judged as the cost is paid (`actions::payment_for`): casting a spell on the stack (CR 601.2g), activating
+an ability of a source in any zone - a mana ability's own mana cost too (CR 605.3a) - or anything else, which no
+"abilities" mana pays: a special action (CR 116.2, turning a face-down permanent up, unlocking a door), "unless ... pays"
+(CR 118.12). `ManaRestriction::may_pay` is the one rule, read by the payment (`restricted_for`), by the advice whether a
+cost can be paid (`Available::covers_for`), and by the options offered while paying: a mana ability whose mana could pay
+nothing of this cost is still offered (CR 601.2g) and is marked `pays_nothing`, which the bots read. The restriction's
+mana goes where the player sends it: two mana of one restriction may pay one ability or two. The pool empties at the end
+of each step and phase as any mana does (CR 106.4).
+
 ### Legal moves as a first-class output
 
 Every pending request comes with its legal answers enumerated, cheaply and in a stable order. The client's prompt
