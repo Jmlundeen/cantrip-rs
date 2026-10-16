@@ -1,0 +1,54 @@
+# Naban, Dean of Iteration doubles only what a Wizard YOU control entering triggers (CR 603.2d). Turn 1: Aunt May and
+# Authority of the Consuls, then Naban, whose own entering makes Aunt May trigger twice (20 -> 22, the control). Then an
+# Ornithopter, no Wizard: Aunt May triggers once (23). Turn 2: Bot2's Emry, Lurker of the Loch, a Wizard Bot2 controls,
+# enters: Bot1's Authority of the Consuls ("Whenever a creature an opponent controls enters, you gain 1 life") triggers
+# once (24), and Emry's own "mill four cards", Bot2's ability, once: Bot2 mills four.
+# Bot2's Emry costs {2}{U} less {2} for its two Moxen: {U}.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Aunt May
+Authority of the Consuls
+Naban, Dean of Iteration
+Ornithopter
+Island
+Island x10
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Emry, Lurker of the Loch
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Aunt May.Cast
+Bot1.Pass
+Bot1.Hand.Authority of the Consuls.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Naban, Dean of Iteration.Cast
+Bot1.Pass
+Bot1.Triggers(Aunt May; Aunt May)
+[T1 Bot1.Main2]
+? Bot1.Life = 22
+Bot1.Hand.Ornithopter.Cast
+[T1 Bot1.End]
+? Bot1.Life = 23
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Emry, Lurker of the Loch.Cast
+[T2 Bot2.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 24
+Bot2.Graveyard.Count = 4
+Bot2.Battlefield.Emry, Lurker of the Loch.Tapped = true

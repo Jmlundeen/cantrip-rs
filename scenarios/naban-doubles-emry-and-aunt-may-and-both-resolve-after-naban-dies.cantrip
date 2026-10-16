@@ -1,0 +1,58 @@
+# Naban, Dean of Iteration: "If a Wizard you control entering causes a triggered ability of a permanent you control to
+# trigger, that ability triggers an additional time" (CR 603.2d). Naban is a Wizard itself, so on turn 1 its own entering
+# makes Aunt May's "Whenever another creature you control enters, you gain 1 life" trigger twice (20 -> 22). On turn 3
+# Emry, Lurker of the Loch, a Wizard, enters: its own "mill four cards" and Aunt May's ability each trigger twice - four
+# triggers to order. With all four on the stack Bot2 Lightning Bolts Naban: triggers already put on the stack are not
+# undone by the doubler leaving, so Bot1 still mills eight (four twice) and gains 2 (22 -> 24).
+# Emry costs {2}{U} less {1} for each of Bot1's two artifacts: {U}, the Island played on turn 3.
+
+[Bot1 Deck]
+Island
+Mox Pearl
+Mox Sapphire
+Aunt May
+Naban, Dean of Iteration
+Emry, Lurker of the Loch
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Aunt May.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Naban, Dean of Iteration.Cast
+Bot1.Pass
+Bot1.Triggers(Aunt May; Aunt May)
+[T1 Bot1.Main2]
+? Bot1.Life = 22
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Emry, Lurker of the Loch.Cast
+Bot1.Pass
+Bot1.Triggers(Emry, Lurker of the Loch; Emry, Lurker of the Loch; Aunt May; Aunt May)
+? Stack.Count = 4
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Naban, Dean of Iteration)
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 24
+Bot1.Graveyard.Count = 9
+Bot1.Graveyard = Island; Island; Island; Island; Island; Island; Island; Island; Naban, Dean of Iteration
+Bot1.Battlefield = Island; Island; Mox Pearl; Mox Sapphire; Aunt May; Emry, Lurker of the Loch

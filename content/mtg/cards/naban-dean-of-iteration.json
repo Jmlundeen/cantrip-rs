@@ -1,0 +1,8 @@
+{
+  "name": "Naban, Dean of Iteration",
+  "manaCost": "{1}{U}",
+  "type": "Legendary Creature — Human Wizard",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "If a Wizard you control entering causes a triggered ability of a permanent you control to trigger, that ability triggers an additional time."
+}
