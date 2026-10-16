@@ -1449,6 +1449,18 @@ fn faces_to_cast(def: &'static CardDef) -> Vec<(u8, &'static CardDef)> {
     faces
 }
 
+/// Whether anything forbids `player` to cast a spell now, whatever it is and wherever it is cast from (CR 101.2, 601.3): a
+/// static ability that bars them from casting (Jennifer Walters) or a limit on the spells each player may cast in a turn
+/// (Archon of Emeria) already reached. Asked of every cast alike, whether it is begun with priority or as an effect resolves.
+fn may_begin_cast(cx: &Cx, player: PlayerId) -> bool {
+    !cast_limit(cx).is_some_and(|limit| cx.history().casts_by(player).count() >= limit as usize) && static_rules::may_cast(cx, player)
+}
+
+/// Whether the card's own restriction on when it may be cast ("Cast this spell only ...", CR 601.3) allows it now.
+fn cast_only_if_met(cx: &Cx, face: &'static CardDef, asker: &Asker) -> bool {
+    face.cast_only_if.is_none_or(|only_if| only_if(cx, asker))
+}
+
 /// The ways the permanents on the battlefield give cards in graveyards to be cast (CR 604, 118.9): each with the permanent
 /// and its controller, in the order a way number counts them. Nothing is allocated while no permanent has one.
 fn granted_ways_of(cards: &CardTable, s: &GameState) -> Vec<(ObjectId, PlayerId, &'static GrantedWay)> {
@@ -1473,7 +1485,7 @@ fn extra_payable(cx: &Cx, id: ObjectId, player: PlayerId, def: &CardDef) -> bool
 }
 
 fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available>, instants: bool, options: &mut Vec<ActionOption>) {
-    if cast_limit(cx).is_some_and(|limit| cx.history().casts_by(player).count() >= limit as usize) || !static_rules::may_cast(cx, player) {
+    if !may_begin_cast(cx, player) {
         return;
     }
     // Types of spell the player may cast as though they had flash (CR 307.5).
@@ -1507,9 +1519,7 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
                 continue;
             }
             let asker = Asker { source: id, controller: player };
-            if let Some(only_if) = def.cast_only_if
-                && !only_if(cx, &asker)
-            {
+            if !cast_only_if_met(cx, def, &asker) {
                 continue;
             }
             // What a permission to cast it from here says to pay instead of its mana cost (CR 118.9).
@@ -2488,7 +2498,7 @@ pub fn could_cast_during_resolution(cx: &Cx, card: ObjectId) -> bool {
 /// back face. Fuse is not among them: it applies only in a hand (CR 702.102a).
 pub fn cast_ways_during_resolution(cx: &Cx, card: ObjectId) -> Vec<CastWay> {
     let Some(player) = cx.s().stack.last().map(|i| i.controller) else { return Vec::new() };
-    if !static_rules::may_cast(cx, player) {
+    if !may_begin_cast(cx, player) {
         return Vec::new();
     }
     let obj = cx.s().obj(card);
@@ -2497,9 +2507,12 @@ pub fn cast_ways_during_resolution(cx: &Cx, card: ObjectId) -> Vec<CastWay> {
     }
     let def = cx.card(obj.card);
     let asker = Asker { source: card, controller: player };
-    let castable = |face: &'static CardDef| match face.modal {
-        Some(modal) => modes_possible(cx, &asker, modal),
-        None => slots_satisfiable(cx, &asker, face.spell_targets()),
+    let castable = |face: &'static CardDef| {
+        cast_only_if_met(cx, face, &asker)
+            && match face.modal {
+                Some(modal) => modes_possible(cx, &asker, modal),
+                None => slots_satisfiable(cx, &asker, face.spell_targets()),
+            }
     };
     let mut ways = Vec::new();
     if let Some((left, right)) = def.split {
@@ -2602,7 +2615,7 @@ pub fn cast_during_resolution(cx: &mut Cx, card: ObjectId, terms: CastTerms) -> 
 /// card that is not modal (CR 712.11c-d: its back face has no mana cost of its own), judged as that back face alone.
 pub fn could_cast_transformed_during_resolution(cx: &Cx, card: ObjectId) -> bool {
     let Some(player) = cx.s().stack.last().map(|i| i.controller) else { return false };
-    if !static_rules::may_cast(cx, player) {
+    if !may_begin_cast(cx, player) {
         return false;
     }
     let obj = cx.s().obj(card);
@@ -2614,6 +2627,9 @@ pub fn could_cast_transformed_during_resolution(cx: &Cx, card: ObjectId) -> bool
         return false;
     }
     let asker = Asker { source: card, controller: player };
+    if !cast_only_if_met(cx, back, &asker) {
+        return false;
+    }
     if let Some(modal) = back.modal {
         return modes_possible(cx, &asker, modal);
     }
