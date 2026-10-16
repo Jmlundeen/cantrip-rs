@@ -1,0 +1,45 @@
+# Pyrrhic Strike with its blight paid targets Bot2's Phyrexian Dragon Engine with both modes: it is an artifact and a
+# creature of mana value 3, and the spell says "target" twice, so the same object may be chosen once for each (CR 601.2c,
+# 700.2c). It is destroyed by the first mode; the second mode's target is then gone and that mode does nothing (CR 608.2b).
+
+[Bot1 Deck]
+Mox Pearl
+Sol Ring
+Black Lotus
+Endurance
+Pyrrhic Strike
+Plains x2
+Plains x20
+
+[Bot2 Deck]
+Black Lotus
+Phyrexian Dragon Engine
+Island x5
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Endurance.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Phyrexian Dragon Engine.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Pyrrhic Strike.Cast
+Bot1.Modes(Blight 2)
+Bot1.Modes(1; 2)
+Bot1.Target(Phyrexian Dragon Engine)
+Bot1.Target(Phyrexian Dragon Engine)
+Bot1.Choose(Endurance)
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Endurance.Counters.MinusOneMinusOne = 2
+Bot2.Graveyard = Phyrexian Dragon Engine; Black Lotus
+Bot2.Battlefield.Count = 0

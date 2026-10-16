@@ -159,7 +159,7 @@ public sealed partial class TacticalPlay
         // prompt's own order is as good as this seat can do.
         // "You may behold a Dragon" (CR 701.4a): offered only when there is one to choose or reveal, and it costs nothing
         // but showing a card, so it is taken for what it adds. "You may blight 1" stays declined: it shrinks a creature of
-        // its own for a bonus, which this seat does not weigh yet (a known limitation: Requiting Hex's optional blight is never paid).
+        // its own for a bonus, which this seat does not weigh yet (a known limitation: Requiting Hex's and Pyrrhic Strike's optional blight is never paid).
         if (prompt.AdditionalCost && prompt.CostKind == "Behold" && prompt.Count == 1 && prompt.Modes.Count == 2 && prompt.Eligible.Contains(1))
         {
             return new ModesChosenAnswer { Modes = [1] };

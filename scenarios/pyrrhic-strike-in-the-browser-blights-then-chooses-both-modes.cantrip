@@ -1,0 +1,61 @@
+# Browser
+# Bot1 casts Pyrrhic Strike in the browser. The optional blight is asked first, each option saying how many modes it
+# leaves ("choose one", "choose both"), because whether it is paid decides that (CR 601.2b, 700.2). Paid, the modes
+# question says "choose both" and wants two; the creature to blight is captioned as a blight, not a keep. Bot1's
+# Endurance takes the two -1/-1 counters, and Bot2's Sol Ring and Hero of Bladehold are destroyed.
+
+[Bot1 Deck]
+Mox Pearl
+Sol Ring
+Black Lotus
+Endurance
+Pyrrhic Strike
+Plains x2
+Plains x20
+
+[Bot2 Deck]
+Mox Pearl
+Mox Emerald
+Black Lotus
+Sol Ring
+Hero of Bladehold
+Island x2
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Endurance.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Hero of Bladehold.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Pyrrhic Strike.Cast
+? Client.Bot1.Prompt.Title = Pyrrhic Strike: choose an additional cost to pay
+? Client.Bot1.Prompt.Modes = Cast without blighting (choose one); Blight 2: put two -1/-1 counters on a creature you control (choose both)
+Bot1.Modes(Blight 2)
+? Client.Bot1.Prompt.Title = Pyrrhic Strike: choose both
+? Client.Bot1.Prompt.Detail = 0 of 2 chosen
+? Client.Bot1.Prompt.Modes = Destroy target artifact or enchantment.; Destroy target creature with mana value 3 or greater.
+Bot1.Modes(1; 2)
+Bot1.Target(Bot2.Battlefield.Sol Ring)
+Bot1.Target(Hero of Bladehold)
+? Client.Bot1.Prompt.Title = Pyrrhic Strike: choose a creature you control to blight (it gets -1/-1 counters)
+Bot1.Choose(Endurance)
+? Client.Bot1.Confirm =
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Endurance.Counters.MinusOneMinusOne = 2
+Bot1.Graveyard = Pyrrhic Strike; Black Lotus
+Bot2.Graveyard = Hero of Bladehold; Sol Ring; Black Lotus

@@ -1,0 +1,49 @@
+# The creature Pyrrhic Strike's blight puts its two -1/-1 counters on needn't survive it (the card's ruling). Bot1
+# blights its Ornithopter (0/2), which is also the first mode's target (an artifact). The counters go on as the costs are
+# paid (CR 601.2h), after the targets are chosen, and Ornithopter dies to state-based actions before the spell resolves:
+# the first mode's target is gone and that mode does nothing, the second destroys Bot2's Hero of Bladehold (CR 608.2b).
+
+[Bot1 Deck]
+Mox Pearl
+Sol Ring
+Ornithopter
+Pyrrhic Strike
+Plains x3
+Plains x20
+
+[Bot2 Deck]
+Mox Pearl
+Black Lotus
+Hero of Bladehold
+Island x4
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ornithopter.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Hero of Bladehold.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Pyrrhic Strike.Cast
+Bot1.Modes(Blight 2)
+Bot1.Modes(1; 2)
+Bot1.Target(Ornithopter)
+Bot1.Target(Hero of Bladehold)
+Bot1.Choose(Ornithopter)
+? Bot1.Graveyard = Ornithopter
+? Stack = Pyrrhic Strike
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Pyrrhic Strike; Ornithopter
+Bot1.Battlefield = Mox Pearl; Sol Ring
+Bot2.Graveyard = Hero of Bladehold; Black Lotus
+Bot2.Battlefield = Mox Pearl

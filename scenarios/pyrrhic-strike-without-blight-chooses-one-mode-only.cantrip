@@ -1,0 +1,55 @@
+# Pyrrhic Strike cast without paying its additional cost: "Choose one", so both modes together are refused (CR 700.2),
+# though Bot1 controls a creature it could have blighted. The one mode chosen destroys Bot2's Oath of Druids (an
+# enchantment, "target artifact or enchantment"); Bot2's Endurance, which the other mode could have destroyed, stays,
+# and Bot1's Endurance has no counters (the additional cost was not paid).
+
+[Bot1 Deck]
+Mox Pearl
+Sol Ring
+Black Lotus
+Endurance
+Pyrrhic Strike
+Plains x2
+Plains x20
+
+[Bot2 Deck]
+Mox Pearl
+Mox Emerald
+Black Lotus
+Oath of Druids
+Endurance
+Island x2
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Endurance.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Oath of Druids.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Endurance.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Pyrrhic Strike.Cast
+Bot1.Modes(Cast without blighting)
+! Bot1.Modes(1; 2)
+Bot1.Modes(Destroy target artifact or enchantment)
+Bot1.Target(Oath of Druids)
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Endurance.Counters.MinusOneMinusOne = (absent)
+Bot1.Battlefield.Endurance.Toughness = 4
+Bot1.Graveyard = Pyrrhic Strike; Black Lotus
+Bot2.Graveyard = Oath of Druids; Black Lotus
+Bot2.Battlefield = Mox Pearl; Mox Emerald; Endurance

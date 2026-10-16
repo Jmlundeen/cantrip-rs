@@ -1,0 +1,46 @@
+# Paying Pyrrhic Strike's blight means choosing both modes, and a mode with no legal target can't be chosen (CR 700.2a),
+# so with no creature of mana value 3 or greater anywhere (Bot2's Tarmogoyf is mana value 2, Bot1's Ornithopter 0) the
+# blight is not on offer, though Bot1 controls a creature to blight. Cast without it, the one mode destroys Bot2's Mox Pearl.
+# (pyrrhic-strike-with-blight-paid-chooses-both-modes is the same cast with both modes open, where the blight is offered.)
+
+[Bot1 Deck]
+Mox Pearl
+Sol Ring
+Ornithopter
+Pyrrhic Strike
+Plains x3
+Plains x20
+
+[Bot2 Deck]
+Mox Pearl
+Mox Emerald
+Tarmogoyf
+Island x4
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ornithopter.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Tarmogoyf.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Pyrrhic Strike.Cast
+! Bot1.Modes(Blight 2)
+Bot1.Modes(Cast without blighting)
+Bot1.Modes(1)
+Bot1.Target(Bot2.Battlefield.Mox Pearl)
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Mox Pearl; Sol Ring; Ornithopter
+Bot1.Battlefield.Ornithopter.Counters.MinusOneMinusOne = (absent)
+Bot2.Graveyard = Mox Pearl
+Bot2.Battlefield = Mox Emerald; Tarmogoyf

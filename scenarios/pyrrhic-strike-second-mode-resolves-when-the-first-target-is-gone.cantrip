@@ -1,0 +1,52 @@
+# Pyrrhic Strike with its blight paid targets Bot2's Lotus Petal (first mode) and Hero of Bladehold (second mode). In
+# response Bot2 sacrifices Lotus Petal for mana, so the first mode's target is illegal as the spell resolves; the spell
+# still resolves, the first mode does nothing and the second still destroys Hero of Bladehold (CR 608.2b).
+
+[Bot1 Deck]
+Mox Pearl
+Sol Ring
+Black Lotus
+Endurance
+Pyrrhic Strike
+Plains x2
+Plains x20
+
+[Bot2 Deck]
+Mox Pearl
+Black Lotus
+Lotus Petal
+Hero of Bladehold
+Island x3
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Endurance.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Lotus Petal.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Hero of Bladehold.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Pyrrhic Strike.Cast
+Bot1.Modes(Blight 2)
+Bot1.Modes(1; 2)
+Bot1.Target(Lotus Petal)
+Bot1.Target(Hero of Bladehold)
+Bot1.Choose(Endurance)
+Bot2.Battlefield.Lotus Petal.Activate(Color: White)
+? Stack = Pyrrhic Strike
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Endurance.Counters.MinusOneMinusOne = 2
+Bot2.Graveyard = Hero of Bladehold; Lotus Petal; Black Lotus
+Bot2.Battlefield = Mox Pearl

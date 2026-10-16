@@ -1,0 +1,59 @@
+# Pyrrhic Strike cast with its additional cost paid: "you may blight 2" is announced first, and because it was paid,
+# both modes are chosen, not one (CR 601.2b, 700.2): the modes question asks for exactly two, so one alone is refused.
+# Bot1 blights its own Endurance (3/4, left a 1/2 with two -1/-1 counters, CR 701.68a; the counters go on as the costs
+# are paid, after the targets, CR 601.2h), and the spell destroys Bot2's Sol Ring and Hero of Bladehold.
+
+[Bot1 Deck]
+Mox Pearl
+Sol Ring
+Black Lotus
+Endurance
+Pyrrhic Strike
+Plains x2
+Plains x20
+
+[Bot2 Deck]
+Mox Pearl
+Mox Emerald
+Black Lotus
+Sol Ring
+Hero of Bladehold
+Island x2
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Endurance.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Hero of Bladehold.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Pyrrhic Strike.Cast
+Bot1.Modes(Blight 2)
+! Bot1.Modes(1)
+Bot1.Modes(1; 2)
+Bot1.Target(Bot2.Battlefield.Sol Ring)
+Bot1.Target(Hero of Bladehold)
+Bot1.Choose(Endurance)
+? Stack = Pyrrhic Strike
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Endurance.Counters.MinusOneMinusOne = 2
+Bot1.Battlefield.Endurance.Power = 1
+Bot1.Battlefield.Endurance.Toughness = 2
+Bot1.Graveyard = Pyrrhic Strike; Black Lotus
+Bot2.Graveyard = Hero of Bladehold; Sol Ring; Black Lotus
+Bot2.Battlefield = Mox Pearl; Mox Emerald

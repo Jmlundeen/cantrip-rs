@@ -1,0 +1,49 @@
+# Pyrrhic Strike's second mode, chosen alone without blighting: "target creature with mana value 3 or greater" refuses
+# Bot2's Tarmogoyf (mana value 2) and takes Bot2's Endurance (mana value 3), which is destroyed; Tarmogoyf stays.
+# Bot1 controls no creature, so the blight is not on offer (CR 701.68b: a player who can't put the counters on a
+# creature can't choose to blight), though both modes have targets (Bot1's own Sol Ring is an artifact).
+
+[Bot1 Deck]
+Mox Pearl
+Sol Ring
+Pyrrhic Strike
+Plains x4
+Plains x20
+
+[Bot2 Deck]
+Mox Pearl
+Mox Emerald
+Black Lotus
+Tarmogoyf
+Endurance
+Island x2
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Tarmogoyf.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Endurance.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Pyrrhic Strike.Cast
+! Bot1.Modes(Blight 2)
+Bot1.Modes(Cast without blighting)
+Bot1.Modes(Destroy target creature)
+! Bot1.Target(Tarmogoyf)
+Bot1.Target(Endurance)
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Mox Pearl; Sol Ring
+Bot2.Graveyard = Endurance; Black Lotus
+Bot2.Battlefield = Mox Pearl; Mox Emerald; Tarmogoyf

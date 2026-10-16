@@ -1,6 +1,6 @@
 //! Blight (CR 701.68a): "to blight N means to put N -1/-1 counters on a creature you control", used here as an additional
-//! cost ("as an additional cost to cast this spell, you may blight 1"). Requiting Hex is in the engine; Cinder Strike,
-//! Burning Curiosity and Pyrrhic Strike print it as an optional cost, and Wild Unraveling and Bogslither's Embrace as one
+//! cost ("as an additional cost to cast this spell, you may blight 1"). Requiting Hex and Pyrrhic Strike are in the engine; Cinder Strike
+//! and Burning Curiosity print it as an optional cost, and Wild Unraveling and Bogslither's Embrace as one
 //! of two ways to pay. Only a spell's cost is built: an activated ability's blight (Gristle Glutton, Sting-Slinger) is not.
 //! Rule 701.68d ("whenever a player blights") has no event yet.
 //!
