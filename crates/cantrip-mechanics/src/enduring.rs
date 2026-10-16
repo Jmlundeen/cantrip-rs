@@ -1,5 +1,5 @@
 //! The Enduring creatures' last ability: "When this dies, if it was a creature, return it to the battlefield under its
-//! owner's control. It's an enchantment. (It's not a creature.)" Enduring Innocence and Enduring Curiosity print it.
+//! owner's control. It's an enchantment. (It's not a creature.)" Enduring Innocence, Enduring Curiosity and Enduring Courage print it.
 
 use cantrip_api::*;
 

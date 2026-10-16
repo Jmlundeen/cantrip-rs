@@ -1,0 +1,43 @@
+# "Target black or green creature or planeswalker": Fastbond is a green permanent but neither a creature nor a planeswalker, so Essence Burn is refused with it as the
+# target (CR 115.1); the cast at Llanowar Elves, green and a creature, is the positive control. The Elves are exiled and Fastbond is untouched.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mountain
+Essence Burn
+Mountain x15
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Fastbond
+Llanowar Elves
+Forest x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Fastbond.Cast
+Bot2.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Hand.Essence Burn.Cast(Bot2.Battlefield.Fastbond)
+Bot1.Hand.Essence Burn.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Llanowar Elves
+Bot2.Battlefield = Forest; Mox Emerald; Fastbond
+Bot2.Graveyard.Count = 0
+Bot1.Graveyard = Essence Burn

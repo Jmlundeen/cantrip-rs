@@ -3,7 +3,7 @@
 # becomes unattached (CR 301.5c, 704.5p) - the Ornithopter is a 0/2 again - and, with the six artifacts Bot1 controls (the Armor, four Moxen and the Ornithopter),
 # a 6/6 Construct Hero Equipment artifact creature with flying. The second {2} paid finds the "if this Equipment isn't a creature" untrue as it resolves and does
 # nothing (it is still 6/6, one Hero, nothing doubled). It attacks, having been under Bot1's control since turn 1, and deals 6: Bot2 is at 14. On turn 4 it is
-# only an artifact again (CR 514.2).
+# only an artifact again (CR 514.2). Bot2's two Moxen are artifacts too, but "you control" leaves them out of the count: it is 6, not 8.
 
 [Bot1 Deck]
 Mox Jet
@@ -16,7 +16,9 @@ Forest
 Forest x13
 
 [Bot2 Deck]
-Island x20
+Mox Ruby
+Mox Jet
+Island x18
 
 [Actions]
 Bot1.Hand.Ornithopter.Cast
@@ -34,6 +36,9 @@ Bot1.Pass
 [T1 Bot1.Main2]
 ? Bot1.Battlefield.Iron Man Armor.AttachedTo = Ornithopter
 ? Bot1.Battlefield.Ornithopter.Power = 2
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
 [T3 Bot1.Main1]
 Bot1.Battlefield.Mox Jet.Activate
 Bot1.Battlefield.Mox Pearl.Activate

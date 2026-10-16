@@ -17,7 +17,7 @@ fn plus_two_plus_one(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
 /// Equipment that has left the battlefield is a new object the ability does not affect (CR 400.7).
 fn becomes_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let me = item.object;
-    if !g.is_on_battlefield(me) || g.chars(me).is(CardType::Creature) {
+    if g.chars(me).is(CardType::Creature) {
         return Ok(());
     }
     let words = g.words(me);

@@ -1,6 +1,6 @@
 # CR 612: Artificial Evolution changes Giott's text, Dwarf to Thopter, so it now says "Giott or another Thopter you control enters". Bot1's Ornithopter (a Thopter) entering
 # triggers it: Bot1 discards the Magda from its hand and draws the Magda on top of the library. A Dwarf, Magda, entering on turn 3 asks nothing: the stack is empty once
-# she has resolved (Giott's trigger for Dwarves is gone; Giott itself still triggers whatever the word says, which turn 1's first trigger, declined, showed before the change).
+# she has resolved. An Equipment is not a creature type, so Skullclamp entering still triggers it (the stack holds the trigger; the hand is empty, so nothing is asked) (Giott's trigger for Dwarves is gone; Giott itself still triggers whatever the word says, which turn 1's first trigger, declined, showed before the change).
 
 [Bot1 Deck]
 Mox Ruby
@@ -11,8 +11,9 @@ Artificial Evolution
 Ornithopter
 Magda, Brazen Outlaw
 Magda, Brazen Outlaw
+Skullclamp
 Island
-Island x11
+Island x10
 
 [Bot2 Deck]
 Plains x20
@@ -45,9 +46,15 @@ Bot1.Hand.Magda, Brazen Outlaw.Cast
 Bot1.Pass
 Bot2.Pass
 ? Stack.Count = 0
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Skullclamp.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+Bot1.Pass
 [T3 Bot1.Main2]
 
 [Expect]
 Bot1.Battlefield.Giott, King of the Dwarves.Subtypes = Noble; Thopter
 Bot1.Graveyard = Magda, Brazen Outlaw; Artificial Evolution
-Bot1.Battlefield = Mox Ruby; Mox Pearl; Mox Sapphire; Giott, King of the Dwarves; Ornithopter; Magda, Brazen Outlaw
+Bot1.Battlefield = Mox Ruby; Mox Pearl; Mox Sapphire; Giott, King of the Dwarves; Ornithopter; Magda, Brazen Outlaw; Skullclamp

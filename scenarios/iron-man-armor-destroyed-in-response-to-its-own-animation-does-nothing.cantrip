@@ -1,0 +1,53 @@
+# The Armor leaves before its ability resolves: Bot2's Disenchant destroys it in response to the {2} ability on turn 3. The ability finds no Equipment on the battlefield (a new object in
+# the graveyard is not the one it was about, CR 400.7), so nothing becomes a creature; the Ornithopter, which the Armor made a 2/3, is a 0/2 again.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Iron Man Armor
+Ornithopter
+Forest
+Forest x14
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Disenchant
+Island x17
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Iron Man Armor.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Iron Man Armor.Activate(Ability: becomes a 0/0)
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Iron Man Armor)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Graveyard = Iron Man Armor
+Bot2.Graveyard = Disenchant
+Bot1.Battlefield = Mox Jet; Mox Pearl; Mox Ruby; Ornithopter
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Ornithopter.Toughness = 2

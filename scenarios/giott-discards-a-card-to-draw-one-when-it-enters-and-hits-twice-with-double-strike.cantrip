@@ -33,5 +33,7 @@ Bot1.Attack(Giott, King of the Dwarves > Bot2)
 [T3 Bot1.Main2]
 
 [Expect]
+Bot1.Hand = Forest; Island; Island; Island; Swamp
+Bot1.Graveyard = Island
 Bot2.Life = 18
 Bot1.Battlefield.Giott, King of the Dwarves.Keywords = DoubleStrike

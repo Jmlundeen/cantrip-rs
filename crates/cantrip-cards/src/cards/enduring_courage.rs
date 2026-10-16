@@ -5,9 +5,7 @@ use cantrip_oracle as oracle;
 /// "It gets +2/+0 and gains haste until end of turn." Both are continuous effects of this ability (CR 611.2); the entering
 /// creature is the trigger's subject, and if it has left the battlefield by now it is a new object (CR 400.7), so nothing happens.
 fn rally(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Target::Object(creature) = item.subject
-        && g.is_on_battlefield(creature)
-    {
+    if let Target::Object(creature) = item.subject {
         pump(g, item.object, creature, 2, 0);
         haste_until_end_of_turn(g, item.object, creature);
     }
