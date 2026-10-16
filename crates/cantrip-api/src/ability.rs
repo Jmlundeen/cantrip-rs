@@ -513,6 +513,11 @@ impl AbilityDef {
     pub const fn ward(self) -> AbilityDef {
         AbilityDef::Triggered(TriggeredDef { ward: true, ..triggered_def(self, "only a triggered ability is a ward ability") })
     }
+
+    /// Its trigger event is a sacrifice (CR 701.21a), not the zone change it causes: "whenever you sacrifice a land".
+    pub const fn on_sacrifice(self) -> AbilityDef {
+        AbilityDef::Triggered(TriggeredDef { on_sacrifice: true, ..triggered_def(self, "only a triggered ability triggers on a sacrifice") })
+    }
 }
 
 // --- Spells, targets, modes ---------------------------------------------------------------------------------------

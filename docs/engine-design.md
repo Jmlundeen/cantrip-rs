@@ -218,6 +218,18 @@ question over writing each card as explicit stages, which the spike measured, an
 Triggers are indexed by the kinds of event they listen for (`EventMask`), so an event checks only the triggers that
 could match it. "Leaves the battlefield" look-back (CR 603.10) reads the frozen last-known rows.
 
+A static ability that stops abilities from triggering (CR 603.2: Torpor Orb's "Creatures entering don't cause abilities
+to trigger", Doorkeeper Thrull, Hushbringer's "entering or dying") is a `CardDef::trigger_rules` entry, asked by
+`collect_batch` of each event and each triggered ability the event matched (`Triggering`: its source, controller and
+definition); true drops that triggering before it is put on the stack or counted (CR 603.2h). Which permanents' rules
+are asked follows CR 603.10: those on the battlefield after the event for an ability that triggers then (so a rule
+entering with the permanent applies), those before it for a look-back ability (so one dying with the creature applies).
+The rule judges the event through `Query` - an entering permanent as it is on the battlefield, copy and other effects
+applied; a dead one by its last-known characteristics. Replacement effects and "as [this] enters" are not triggers and
+are never asked about. A trigger whose event is a sacrifice rather than the zone change it makes is
+`TriggeredDef::on_sacrifice` (Hushbringer's ruling). The sources are found from the board, once per batch and only once
+something has matched.
+
 ### Legal moves as a first-class output
 
 Every pending request comes with its legal answers enumerated, cheaply and in a stable order. The client's prompt

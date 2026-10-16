@@ -108,6 +108,7 @@ What a `CardDef` can carry (see `crates/cantrip-api/src/card.rs`):
 | `delayed: &[AbilityDef]` | abilities its effects set up to trigger later (`Game::delayed_trigger` with `AbilityRef::delayed(card, n)`), or give an object with `EffectKind::AddAbility`; a quoted static ability it gives is `granted_static(layer, apply, text)` (layer 7 only; its source is the object that has it) |
 | `replacements: &[replacement(..)]` | its replacement effects (CR 614): a `hint`, the event kind (`ZoneChange`, `Counters`, `DrawInstruction`), `applies(q, asker, &Proposal)` and `apply(q, asker, &mut Proposal)`, both pure; `own_everywhere` for "if this card would ... from anywhere". Several that apply to one event are ordered by the affected player (`Replace(...)` in a scenario). The shared "+1/+1 counters, plus one" is in `cantrip_mechanics::replacements` |
 | `cast_limit: N` | "each player can't cast more than N spells each turn" (CR 101.2), while it is on the battlefield |
+| `trigger_rules: &[..]` | "[permanents] entering don't cause abilities to trigger" (CR 603.2), while it is on the battlefield: `fn(q, asker, &Event, &Triggering) -> bool`, true stops that ability triggering on that event. `cantrip_mechanics::statics::creatures_entering_dont_trigger` is Torpor Orb's; `statics::entering(event)` is the permanent an event put onto the battlefield |
 
 ## Card code
 

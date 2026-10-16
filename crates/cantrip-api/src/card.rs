@@ -689,6 +689,7 @@ impl TriggeredDef {
         divide: None,
         subject_chooses_targets: false,
         ward: false,
+        on_sacrifice: false,
     };
 }
 
@@ -739,6 +740,10 @@ pub struct TriggeredDef {
     pub subject_chooses_targets: bool,
     /// A ward ability (CR 702.21a): a targeting rule can stop it from triggering (`TargetingRuleKind::SuppressWard`).
     pub ward: bool,
+    /// Its trigger event is a player sacrificing a permanent (CR 701.21a), not the zone change the sacrifice causes: "whenever
+    /// you sacrifice a land" (Baloth Prime, Tireless Tracker). A rule that stops a creature dying from causing abilities to
+    /// trigger leaves it alone (Hushbringer's rulings: "whenever you sacrifice a creature" still triggers).
+    pub on_sacrifice: bool,
 }
 
 #[derive(Clone, Copy)]
@@ -960,6 +965,32 @@ pub struct TargetingRule {
     pub kind: TargetingRuleKind,
     pub applies: fn(&dyn LayerQuery, ObjectId, ObjectId) -> bool,
 }
+
+/// A triggered ability that an event would trigger, as a [`TriggerRule`] is asked about it: its source (a permanent, or a
+/// card in another zone whose ability functions there), the player who would control it, and its definition.
+#[derive(Clone, Copy)]
+pub struct Triggering<'a> {
+    pub source: ObjectId,
+    pub controller: PlayerId,
+    pub def: &'a TriggeredDef,
+}
+
+/// A static ability that stops abilities from triggering (CR 603.2, 603.2g, 604.1): "Creatures entering don't cause abilities
+/// to trigger" (Torpor Orb, Tocatli Honor Guard, Hushwing Gryff), "Artifacts and creatures entering ..." (Doorkeeper Thrull),
+/// "Creatures entering or dying ..." (Hushbringer), "Permanents entering don't cause abilities of permanents your opponents
+/// control to trigger" (Elesh Norn, Mother of Machines). Asked, with the rule's own asker, of one event and one triggered
+/// ability that event matched; true stops that ability triggering on that event, and it is not put on the stack nor counted
+/// (CR 603.2h). Another event of the same batch still triggers it.
+///
+/// Which rules are asked is the core's (CR 603.10): for an ability that triggers on the board as it is after the event (an
+/// enters ability, CR 603.6a), the permanents on the battlefield after it, so a rule entering with the permanent applies
+/// (the rulings: "If Torpor Orb and a creature enter the battlefield at the same time ..."); for a leaves-the-battlefield
+/// ability, which looks back (CR 603.10a), those on the battlefield before it, so one leaving with the dying creature applies
+/// too. What an event is about is judged by the rule through `Query`: an entering permanent as it is on the battlefield, its
+/// continuous effects applied (the rulings' Opalescence and March of the Machines), a creature that died as it last was there
+/// (`Query::chars` of the old object). Replacement effects and "as [this] enters" (CR 614.1c, 614.12) are not triggered
+/// abilities and are never asked about.
+pub type TriggerRule = fn(&dyn Query, &Asker, &Event, &Triggering) -> bool;
 
 /// A replacement of a turn beginning (CR 614.10, 500.11): "if you would begin your turn while [condition], you may skip
 /// that turn instead. If you do, [on_skip]". Time Vault. A skipped turn is not taken: its steps, its untap and its
@@ -1234,6 +1265,8 @@ pub struct CardDef {
     pub flash_rules: &'static [FlashRule],
     /// Its static abilities that forbid activating abilities (CR 602.5): Clarion Conqueror, Null Rod, Stony Silence.
     pub activation_rules: &'static [ActivationRule],
+    /// Its static abilities that stop abilities from triggering (CR 603.2), while it is on the battlefield: Torpor Orb.
+    pub trigger_rules: &'static [TriggerRule],
     /// Gift (CR 702.174): an optional additional cost of promising an opponent a gift, given as it resolves, before its
     /// other effects (an instant or sorcery), or when it enters (a permanent).
     pub gift: Option<GiftDef>,
@@ -1327,6 +1360,7 @@ impl CardDef {
         instant_activation: &[],
         flash_rules: &[],
         activation_rules: &[],
+        trigger_rules: &[],
         gift: None,
     };
 
@@ -1398,6 +1432,8 @@ pub struct CardTable {
     pub cost_changes: Vec<bool>,
     /// Which cards forbid activating abilities (CR 602.5): their sources are found on the board, as cost changes' are.
     pub activation_rules: Vec<bool>,
+    /// Which cards stop abilities from triggering (CR 603.2): their sources are found on the board when something triggers.
+    pub trigger_rules: Vec<bool>,
     /// The rules' own abilities (`crate::intrinsic`): what a basic land type gives a land (CR 305.6).
     pub intrinsic: CardId,
     /// What a face-down permanent is (CR 708.2a): its copiable values.
@@ -1453,6 +1489,7 @@ impl CardTable {
         let any_cast_limit = cards.iter().any(|c| c.cast_limit > 0);
         let cost_changes: Vec<bool> = cards.iter().map(|c| !c.cost_changes.is_empty() || !c.ability_discounts.is_empty()).collect();
         let activation_rules: Vec<bool> = cards.iter().map(|c| !c.activation_rules.is_empty()).collect();
+        let trigger_rules: Vec<bool> = cards.iter().map(|c| !c.trigger_rules.is_empty()).collect();
         let block_rules: Vec<bool> = cards.iter().map(|c| !c.block_rules.is_empty()).collect();
         let targeting_rules: Vec<bool> = cards.iter().map(|c| !c.targeting_rules.is_empty()).collect();
         let mana_triggers: Vec<bool> =
@@ -1481,6 +1518,7 @@ impl CardTable {
             mana_triggers,
             cost_changes,
             activation_rules,
+            trigger_rules,
             intrinsic,
             face_down,
             undercity,

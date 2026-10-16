@@ -569,7 +569,7 @@ fn put_trigger(cx: &mut Cx, trigger: PendingTrigger) -> R<()> {
 
 type Found = Vec<(PendingTrigger, &'static TriggeredDef)>;
 
-fn consider(cx: &Cx, source: ObjectId, look_back: bool, event: &Event, mask: EventMask, found: &mut Found) {
+fn consider(cx: &Cx, source: ObjectId, look_back: bool, event: &Event, mask: EventMask, stoppers: &mut Stoppers, found: &mut Found) {
     let chars = layers::chars(cx.cards(), cx.s(), source);
     let controller = cx.s().obj(source).controller;
     for ability in chars.abilities() {
@@ -584,6 +584,9 @@ fn consider(cx: &Cx, source: ObjectId, look_back: bool, event: &Event, mask: Eve
             }
             // "Ward abilities of those creatures don't trigger" (CR 702.21a, Nowhere to Run): asked only of a ward that matched.
             if t.ward && layers::targeting_rule(cx.cards(), cx.s(), TargetingRuleKind::SuppressWard, source) {
+                continue;
+            }
+            if stoppers.stop(cx, event, &Triggering { source, controller, def: t }) {
                 continue;
             }
             found.push((
@@ -606,6 +609,45 @@ fn chapter_reached(cx: &Cx, source: ObjectId, chapter: u8, event: &Event) -> Opt
     }
 }
 
+/// The permanents with static abilities that stop abilities from triggering (CR 603.2, `CardDef::trigger_rules`): found from
+/// the board, once per batch and only when an ability has matched, so a batch that triggers nothing pays nothing. An
+/// ability that triggers on the board as it is after the events asks those on the battlefield now; a leaves-the-battlefield
+/// ability, which looks back (CR 603.10a), asks those that were there before, the ones leaving with the event included.
+struct Stoppers<'a> {
+    before: Option<&'a [ObjectId]>,
+    now: Option<Vec<ObjectId>>,
+    then: Option<Vec<ObjectId>>,
+}
+
+impl<'a> Stoppers<'a> {
+    fn new(before: Option<&'a [ObjectId]>) -> Self {
+        Stoppers { before, now: None, then: None }
+    }
+
+    /// Whether a static ability stops this ability triggering on this event.
+    fn stop(&mut self, cx: &Cx, event: &Event, triggering: &Triggering) -> bool {
+        let sources = if triggering.def.look_back && self.before.is_some() {
+            let before = self.before.unwrap_or_default();
+            self.then.get_or_insert_with(|| trigger_rule_sources(cx, before))
+        } else {
+            self.now.get_or_insert_with(|| trigger_rule_sources(cx, cx.s().battlefield()))
+        };
+        sources.iter().any(|&id| {
+            let obj = cx.s().obj(id);
+            let asker = Asker { source: id, controller: obj.controller };
+            cx.card(cx.cards().current(obj)).trigger_rules.iter().any(|rule| rule(cx, &asker, event, triggering))
+        })
+    }
+}
+
+/// Those of `ids` whose card has a rule that stops abilities from triggering, and has not lost its abilities (CR 613.1f).
+fn trigger_rule_sources(cx: &Cx, ids: &[ObjectId]) -> Vec<ObjectId> {
+    ids.iter()
+        .copied()
+        .filter(|&id| cx.cards().trigger_rules[cx.cards().current(cx.s().obj(id)).0 as usize] && !cx.s().lost_all_abilities(id))
+        .collect()
+}
+
 /// Every triggered ability this event triggers (CR 603.2).
 pub fn collect_triggers(cx: &mut Cx, event: &Event, before: Option<&[ObjectId]>) {
     collect_batch(cx, std::slice::from_ref(event), before);
@@ -618,6 +660,7 @@ pub fn collect_triggers(cx: &mut Cx, event: &Event, before: Option<&[ObjectId]>)
 /// turn, a triggering that happens being noted in the history.
 pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<&[ObjectId]>) {
     let mut found: Found = Vec::new();
+    let mut stoppers = Stoppers::new(before);
     for event in events {
         let mask = EventMask::of(event);
         if mask.0 == 0 {
@@ -625,15 +668,15 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<&[ObjectId]>)
         }
         let now: Vec<ObjectId> = cx.s().battlefield().to_vec();
         for &id in before.unwrap_or(&now) {
-            consider(cx, id, true, event, mask, &mut found);
+            consider(cx, id, true, event, mask, &mut stoppers, &mut found);
         }
         for &id in &now {
-            consider(cx, id, false, event, mask, &mut found);
+            consider(cx, id, false, event, mask, &mut stoppers, &mut found);
         }
         // An emblem's triggered abilities function in the command zone (CR 114.4).
         if !cx.s().zone(Zone::COMMAND).is_empty() {
             for id in cx.s().zone(Zone::COMMAND).to_vec() {
-                consider(cx, id, false, event, mask, &mut found);
+                consider(cx, id, false, event, mask, &mut stoppers, &mut found);
             }
         }
         // Delayed abilities of "whenever [event] this turn" (CR 603.7b), each of which triggers on every match.
@@ -643,6 +686,7 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<&[ObjectId]>)
                     && let AbilityDef::Triggered(t) = cx.cards().ability(d.ability)
                     && t.listens.intersects(mask)
                     && let Some(fired) = (t.matches)(cx, d.source, event)
+                    && !stoppers.stop(cx, event, &Triggering { source: d.source, controller: d.controller, def: t })
                 {
                     found.push((
                         PendingTrigger {
@@ -696,6 +740,9 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<&[ObjectId]>)
                     if let Some(condition) = t.condition
                         && !condition(cx, &Asker { source: id, controller })
                     {
+                        continue;
+                    }
+                    if stoppers.stop(cx, event, &Triggering { source: id, controller, def: t }) {
                         continue;
                     }
                     found.push((
