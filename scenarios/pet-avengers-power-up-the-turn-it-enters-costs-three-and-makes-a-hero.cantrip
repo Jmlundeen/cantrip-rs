@@ -1,0 +1,49 @@
+# Pet Avengers: "Power-up — {6}{G}: Put a +1/+1 counter on this creature and create a 3/2 white Hero creature token
+# with vigilance." The turn it enters, its mana cost {3}{G} takes the {G} off the green and {3} off the generic (CR
+# 702.193b, 118.7): {3} is left, Black Lotus's {W}{W}{W}, all spent. It ends a 5/5 beside a 3/2 white Hero with
+# vigilance.
+
+[Bot1 Deck]
+Forest
+Mox Ruby
+Sol Ring
+Mox Jet
+Pet Avengers
+Black Lotus
+Forest
+Forest x10
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Pet Avengers.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Pet Avengers.Activate
+? Bot1.Mana =
+Bot1.Pass
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Pet Avengers.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Pet Avengers.Power = 5
+Bot1.Battlefield.Hero.Token = true
+Bot1.Battlefield.Hero.Colors = White
+Bot1.Battlefield.Hero.Subtypes = Hero
+Bot1.Battlefield.Hero.Keywords = Vigilance
+Bot1.Battlefield.Hero.Power = 3
+Bot1.Battlefield.Hero.Toughness = 2
