@@ -107,12 +107,24 @@ pub fn cast_way(g: &mut dyn Game, player: PlayerId, card: ObjectId, ways: Vec<Ca
 /// where it was (`could_cast_during_resolution` asks), so one already cast is not offered.
 /// Etali, Primal Conqueror and Improvisation Capstone print it.
 pub fn cast_any_number_free(g: &mut dyn Game, player: PlayerId, source: ObjectId, cards: &[ObjectId]) -> Result<(), Suspend> {
-    loop {
+    cast_up_to_free(g, player, source, cards, usize::MAX)
+}
+
+/// "You may cast up to `most` spells from among [these cards] without paying their mana costs": as `cast_any_number_free`,
+/// nothing more offered once `most` have been cast; a cast given up does not count. Doom Reigns Supreme and Plargg and
+/// Nassari print it with two.
+pub fn cast_up_to_free(g: &mut dyn Game, player: PlayerId, source: ObjectId, cards: &[ObjectId], most: usize) -> Result<(), Suspend> {
+    let mut cast = 0;
+    while cast < most {
         let castable: Vec<ObjectId> = cards.iter().copied().filter(|&c| g.could_cast_during_resolution(c)).collect();
         let chosen = cards_from(g, player, source, Purpose::CastFree, cards.to_vec(), castable, 1, true)?;
         let Some(&card) = chosen.first() else { return Ok(()) };
         g.cast_during_resolution(card, Some(ManaCost::ZERO))?;
+        if g.obj(card).became.is_some() {
+            cast += 1;
+        }
     }
+    Ok(())
 }
 
 /// The labels "choose odd or even" offers, odd first: a card that asks it lists them as its `labels`.
