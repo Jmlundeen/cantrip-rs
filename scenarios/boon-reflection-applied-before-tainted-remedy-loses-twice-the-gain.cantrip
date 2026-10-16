@@ -1,0 +1,57 @@
+# Bot2 controls Boon Reflection and Bot1 Tainted Remedy. Bot2 casts Lightning Helix at Bot1 and would gain 3 life; Bot2
+# chooses Boon Reflection first (CR 616.1): the gain becomes 6, and Tainted Remedy then makes it a loss of 6 (CR 616.1f;
+# Tainted Remedy's 2015-06-22 ruling, with Alhammarret's Archive): 20 -> 14. The other order loses 3
+# (tainted-remedy-applied-first-leaves-boon-reflection-nothing-to-double).
+
+[Bot1 Deck]
+Swamp
+Sol Ring
+Mox Jet
+Tainted Remedy
+Swamp x16
+
+[Bot2 Deck]
+Plains
+Sol Ring
+Black Lotus
+Boon Reflection
+Mountain
+Lightning Helix
+Plains
+Island x13
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tainted Remedy.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Hand.Boon Reflection.Cast
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Lightning Helix.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+Bot2.Replace(Boon Reflection)
+
+[Expect]
+Turn = 4
+Bot1.Life = 17
+Bot2.Life = 14

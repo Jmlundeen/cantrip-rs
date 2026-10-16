@@ -1,0 +1,6 @@
+{
+  "name": "Tainted Remedy",
+  "manaCost": "{2}{B}",
+  "type": "Enchantment",
+  "oracleText": "If an opponent would gain life, that player loses that much life instead."
+}

@@ -1,0 +1,48 @@
+# Leyline of Punishment begins the game on Bot1's battlefield: "Players can't gain life." A replacement effect that would
+# replace a life gain event affecting a player who can't gain life does nothing (CR 119.7). So when Bot1's Swords to
+# Plowshares exiles Bot2's Healer's Hawk, Bot2 neither gains 1 life nor, through Tainted Remedy, loses it (20).
+
+[Bot1 Deck]
+Leyline of Punishment
+Swamp
+Sol Ring
+Mox Jet
+Tainted Remedy
+Plains
+Swords to Plowshares
+Swamp x13
+
+[Bot2 Deck]
+Plains
+Healer's Hawk
+Island x18
+
+[Actions]
+Bot1.Accept
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tainted Remedy.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Healer's Hawk.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Swords to Plowshares.Cast(Healer's Hawk)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Leyline of Punishment.Types = Enchantment
+Bot2.Life = 20
+Exile = Healer's Hawk

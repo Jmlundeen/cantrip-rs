@@ -1,0 +1,57 @@
+# Bot1 controls Tainted Remedy ("If an opponent would gain life, that player loses that much life instead") and Bloodletter
+# of Aclazotz, and on its turn 3 exiles Bot2's Healer's Hawk with Swords to Plowshares: Bot2 would gain 1 life. Only
+# Tainted Remedy applies to a gain, and makes it a loss of 1; Bloodletter now applies to that loss (CR 616.1f) and doubles
+# it: Bot2 loses 2 (20 -> 18). No choice is asked: at each step only one effect applies.
+
+[Bot1 Deck]
+Swamp
+Sol Ring
+Mox Jet
+Mox Pearl
+Tainted Remedy
+Bloodletter of Aclazotz
+Swords to Plowshares
+Swamp
+Swamp x12
+
+[Bot2 Deck]
+Plains
+Healer's Hawk
+Island x18
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tainted Remedy.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Healer's Hawk.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Bloodletter of Aclazotz.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Swords to Plowshares.Cast(Healer's Hawk)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Bot1.Life = 20
+Bot2.Life = 18
+Exile = Healer's Hawk

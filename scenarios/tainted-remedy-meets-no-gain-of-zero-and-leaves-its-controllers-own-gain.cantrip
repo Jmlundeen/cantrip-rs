@@ -1,0 +1,54 @@
+# Tainted Remedy replaces only an opponent's gain of life. Bot1 exiles Bot2's Ornithopter with Swords to Plowshares: Bot2
+# "gains life equal to its power", 0, which is no life gain event (CR 119.10), so there is nothing to replace and Bot2
+# loses nothing (20). Bot1's own Lightning Helix then gains Bot1 3 life, untouched: Bot1 is not its own opponent
+# (20 -> 23), and Bot2 takes the 3 damage (20 -> 17).
+
+[Bot1 Deck]
+Swamp
+Sol Ring
+Mox Jet
+Tainted Remedy
+Plains
+Swords to Plowshares
+Mountain
+Lightning Helix
+Swamp x12
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tainted Remedy.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Swords to Plowshares.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 20
+? Exile = Ornithopter
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Lightning Helix.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Bot1.Life = 23
+Bot2.Life = 17
