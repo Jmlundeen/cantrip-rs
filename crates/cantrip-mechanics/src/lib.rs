@@ -36,6 +36,7 @@ pub mod harness;
 pub mod hexproof_from;
 pub mod hideaway_play;
 pub mod cleave;
+pub mod craft;
 pub mod crew;
 pub mod devoid;
 pub mod double;
