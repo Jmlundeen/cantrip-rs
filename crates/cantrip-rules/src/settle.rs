@@ -413,6 +413,14 @@ fn choose_trigger_targets(
                 trigger.subject,
                 *slot_player,
             );
+            // A bound that is the number of times the source was kicked, or its X (CR 702.33d, 107.3m).
+            let source = cx.s().obj(trigger.source);
+            let counted = if source.x > 0 { source.x } else { source.kicked as u16 };
+            let (least, most) = spec.bounds(counted);
+            if candidates.len() < least as usize {
+                // Fewer legal targets than the slot's minimum: it is removed from the stack (CR 603.3d, 601.2c).
+                return Ok(false);
+            }
             if candidates.is_empty() {
                 if spec.required() {
                     // With no legal target, it is removed from the stack (CR 603.3d).
@@ -429,10 +437,6 @@ fn choose_trigger_targets(
                 targets.extend(candidates);
                 break 'slot;
             }
-            // A bound that is the number of times the source was kicked, or its X (CR 702.33d, 107.3m).
-            let source = cx.s().obj(trigger.source);
-            let counted = if source.x > 0 { source.x } else { source.kicked as u16 };
-            let (least, most) = spec.bounds(counted);
             if most == 0 {
                 break 'slot;
             }

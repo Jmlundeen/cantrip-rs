@@ -1,4 +1,3 @@
-# Known bug: "Untap X target lands" is announced with fewer legal lands than X (CR 601.2c, 602.2b).
 # Candelabra of Tawnos needs X target lands, and only one land is on the battlefield: with Moxen to pay {X}, X of 2 cannot be
 # announced, only 1 can - an ability whose targets cannot all be chosen cannot be activated.
 

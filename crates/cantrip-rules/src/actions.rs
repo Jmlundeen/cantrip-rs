@@ -2500,14 +2500,17 @@ fn choose_slots(cx: &mut Cx, player: PlayerId, source: ObjectId, specs: &[Target
         'slot: {
             let candidates =
                 target_candidates_given(cx, &asker, spec, if slots.len() > 1 { &targets } else { &[] }, Target::None, *slot_player);
+            let (least, most) = spec.bounds(counted);
+            // Fewer legal targets than the slot's minimum is not a legal announcement (CR 601.2c, 602.2b): given up whole.
+            if candidates.len() < least as usize {
+                return Err(Stop::Cancel);
+            }
             if candidates.is_empty() {
-                // A required slot with nothing to aim at is not a legal announcement (CR 601.2c): given up whole.
                 if spec.required() {
                     return Err(Stop::Cancel);
                 }
                 break 'slot;
             }
-            let (least, most) = spec.bounds(counted);
             if most == 0 {
                 break 'slot;
             }
@@ -2858,7 +2861,16 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
         item.modes = mask;
     }
     if mana.x > 0 {
-        let n = announce(cx, player, source, mana, None, mana.x, 1000)?;
+        // "X target lands" cannot be announced past the legal targets there are (CR 601.2c, 602.2b).
+        let asker = Asker { source, controller: player };
+        let cap = def
+            .targets
+            .iter()
+            .filter(|spec| spec.min == TargetSpec::COUNTED)
+            .map(|spec| target_candidates(cx, &asker, spec).len().min(1000) as u16)
+            .min()
+            .unwrap_or(1000);
+        let n = announce(cx, player, source, mana, None, mana.x, cap)?;
         mana.generic += n as u8 * mana.x;
         item.x = n;
     }
