@@ -1,0 +1,11 @@
+{
+  "name": "Helitrooper",
+  "manaCost": "{1}{W}",
+  "type": "Creature — Human Soldier",
+  "power": 1,
+  "toughness": 2,
+  "oracleText": "Flying\nWhenever this creature attacks, another target attacking creature gains flying until end of turn.\nEquip abilities you activate that target this creature cost {2} less to activate.",
+  "keywords": [
+    "Flying"
+  ]
+}

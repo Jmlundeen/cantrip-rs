@@ -1,0 +1,52 @@
+# Helitrooper: "Equip abilities you activate that target this creature cost {2} less to activate" - Shadowspear's
+# Equip {2} targeting it costs {0}: the {R} in the pool is still there (CR 601.2c, 601.2f, 602.2b). "Whenever this
+# creature attacks, another target attacking creature gains flying until end of turn": Helitrooper itself is not a
+# candidate ("another"); Knight of Grace is, and flies until end of turn.
+
+[Bot1 Deck]
+Plains
+Mox Ruby
+Knight of Grace
+Mox Pearl
+Shadowspear
+Ornithopter
+Helitrooper
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Knight of Grace.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Shadowspear.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Helitrooper.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+? Bot1.Mana = {R}
+Bot1.Battlefield.Shadowspear.Activate(Ability: Equip; Helitrooper)
+? Bot1.Mana = {R}
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Attack(Helitrooper > Bot2; Knight of Grace > Bot2; Ornithopter > Bot2)
+! Bot1.Target(Helitrooper)
+Bot1.Target(Knight of Grace)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Knight of Grace.Keywords = FirstStrike; Flying
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Shadowspear.AttachedTo = Helitrooper
+Bot1.Battlefield.Helitrooper.Power = 2
+Bot1.Battlefield.Helitrooper.Keywords = Flying; Lifelink; Trample
+Bot2.Life = 16
+Bot1.Life = 22
