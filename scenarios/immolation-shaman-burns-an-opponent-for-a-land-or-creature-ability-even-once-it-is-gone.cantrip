@@ -1,0 +1,93 @@
+# Immolation Shaman: "Whenever an opponent activates an ability of an artifact, creature, or land that isn't a mana ability, this
+# creature deals 1 damage to that player." On turn 2 Bot2 cracks Wooded Foothills (pay 1 life, sacrifice it): a land's ability, the
+# land gone once the cost is paid and judged as it last was (CR 113.7a). The trigger is above the fetch (Stack.Count = 2) and
+# resolves first: Bot2 is at 18 before searching. Moxen tapped for mana trigger nothing. On turn 3 Bot1 activates the Shaman's own
+# "{3}{R}{R}: +3/+3 and menace" (his own ability, no opponent's: Bot1 stays at 20). On turn 4 Bot2 activates Figure of Destiny (a
+# creature's ability) and, with the trigger on the stack, Lightning Bolts the Shaman: the trigger still resolves, the damage dealt by
+# the Shaman as it last was on the battlefield (CR 113.7a, 608.2h): Bot2 at 17.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Immolation Shaman
+Black Lotus
+Mountain x20
+
+[Bot2 Deck]
+Wooded Foothills
+Mox Ruby
+Figure of Destiny
+Lightning Bolt
+Island
+Island
+Island
+Island
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Immolation Shaman.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Wooded Foothills.Play
+Bot2.Battlefield.Wooded Foothills.Activate
+? Stack.Count = 2
+? Bot2.Life = 19
+Bot2.Pass
+Bot1.Pass
+? Bot2.Life = 18
+? Stack.Count = 1
+Bot2.Search(Mountain)
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Figure of Destiny.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot2.Life = 18
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Immolation Shaman.Activate
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Immolation Shaman.Power = 4
+? Bot1.Battlefield.Immolation Shaman.Toughness = 6
+? Bot1.Battlefield.Immolation Shaman.Keywords = Menace
+? Bot1.Life = 20
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Figure of Destiny.Activate
+? Stack.Count = 2
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Immolation Shaman)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Immolation Shaman; Black Lotus
+? Bot2.Life = 18
+Bot2.Pass
+Bot1.Pass
+? Bot2.Life = 17
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 17
+Bot1.Graveyard = Immolation Shaman; Black Lotus
+Bot2.Battlefield.Figure of Destiny.Power = 2
+Bot2.Graveyard = Lightning Bolt; Wooded Foothills
+Stack.Count = 0
