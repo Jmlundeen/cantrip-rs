@@ -34,6 +34,21 @@ pub fn this_is_on_the_battlefield(q: &dyn Query, asker: &Asker) -> bool {
     q.is_on_battlefield(asker.source) && q.obj(asker.source).became.is_none()
 }
 
+/// "Whenever a token you control enters" / "whenever one or more tokens you control enter" (CR 603.6a): a token under the
+/// source's controller's control as it entered, however it was made (created, or a copy of a permanent spell). The event's
+/// subject is the token, so a batch that entered together is the subjects of the matching events (CR 603.2c). Belladonna
+/// Took and Caretaker's Talent print it.
+pub fn token_you_control_enters(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::ZoneChange { new, to, .. }
+            if to.is(ZoneKind::Battlefield) && q.obj(*new).token && q.controller(*new) == q.controller(source) =>
+        {
+            Fired::about(Target::Object(*new))
+        }
+        _ => None,
+    }
+}
+
 /// Landfall (CR 207.2c): a land entering the battlefield under your control, by any means. Icetill Explorer and
 /// Tireless Tracker print it.
 pub fn landfall(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
