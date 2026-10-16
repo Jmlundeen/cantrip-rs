@@ -437,6 +437,11 @@ public static class GameText
             text.Append(", has the city's blessing");
         }
 
+        if (player.HasEnduringStory)
+        {
+            text.Append(", has an enduring story");
+        }
+
         if (player.Dungeon.Length > 0)
         {
             text.Append(CultureInfo.InvariantCulture, $", in {player.Dungeon} at {player.DungeonRoom}");

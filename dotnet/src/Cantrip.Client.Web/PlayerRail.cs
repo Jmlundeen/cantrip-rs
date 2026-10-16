@@ -400,6 +400,11 @@ public sealed class PlayerRail : Border
             Add("City's blessing", Theme.Accent, tooltip: "Has the city's blessing for the rest of the game. Cards with ascend and others check for it.");
         }
 
+        if (player.HasEnduringStory)
+        {
+            Add("Enduring story", Theme.Accent, tooltip: "Has an enduring story for the rest of the game. Cards with storied and others check for it.");
+        }
+
         // Effects waiting on the player that sit on no object (CR 611.2c): "the next spell you cast can't be countered".
         foreach (string pending in player.PendingEffects)
         {

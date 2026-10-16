@@ -14,7 +14,7 @@
 //!   no record of who has been shown which hidden card, so only a reveal of this step crosses (as an object).
 //! - `SpellTargetView::text` is empty and `still_legal` always true.
 //! - Face-down permanents (morph, manifest) are not in the engine yet.
-//! - `PlayerSummaryView::counters` and `has_citys_blessing`: the engine has neither.
+//! - `PlayerSummaryView::counters`: not filled.
 
 use std::collections::HashSet;
 
@@ -463,6 +463,8 @@ impl<'a> Projector<'a> {
             lands_played_this_turn: i32::from(player.lands_played),
             is_monarch: player.monarch,
             has_initiative: player.initiative,
+            has_citys_blessing: player.citys_blessing,
+            has_enduring_story: player.enduring_story,
             energy: i32::from(player.energy),
             dungeons_completed: i32::from(player.dungeons_completed),
             ..Default::default()

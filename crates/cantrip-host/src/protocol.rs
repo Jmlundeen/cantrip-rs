@@ -373,6 +373,8 @@ pub struct PlayerSummaryView {
     /// Effects waiting on this player that no object carries, one line each: "The next spell you cast this turn can't be
     /// countered" (CR 611.2c). Public, like the permanent effects on the table.
     pub pending_effects: Vec<String>,
+    /// An enduring story (CR 702.195b): public, as the city's blessing is.
+    pub has_enduring_story: bool,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]

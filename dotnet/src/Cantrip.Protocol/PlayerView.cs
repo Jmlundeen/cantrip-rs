@@ -169,6 +169,13 @@ public sealed class PlayerSummaryView
     [Key(19)]
     public List<string> PendingEffects { get; set; } = [];
 
+    /// <summary>
+    /// Whether this player has an enduring story (CR 702.195b), which storied gives. Public, as the city's blessing is,
+    /// and like it had by any number of players at once and kept for the rest of the game.
+    /// </summary>
+    [Key(20)]
+    public bool HasEnduringStory { get; set; }
+
     public override string ToString() => $"seat {Seat} '{Name}' {Life} life";
 }
 
