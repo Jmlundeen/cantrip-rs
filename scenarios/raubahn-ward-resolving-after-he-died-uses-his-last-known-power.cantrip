@@ -1,14 +1,18 @@
 # The ruling: "If Raubahn is no longer on the battlefield at that time, use Raubahn's power as it last existed." Bot2 casts
-# Lightning Bolt at the 2/2 Raubahn, and with the first ward trigger still on the stack casts a second Bolt at him. The second
-# ward trigger resolves first (Bot2 pays 2), the second Bolt kills him, and the first ward trigger then resolves with him in
-# the graveyard: Bot2 is still asked, and pays 2 again, his last known power (20 - 2 - 2 = 16). The first Bolt, with its
+# Lightning Bolt at Raubahn, a 4/2 with the Bloodforged Battle-Axe, and with the first ward trigger still on the stack casts a second Bolt at him. The second
+# ward trigger resolves first (Bot2 pays 4), the second Bolt kills him, and the first ward trigger then resolves with him in
+# the graveyard: Bot2 is still asked, and pays 4 again, his last known power (20 - 4 - 4 = 12). The first Bolt, with its
 # target gone, does nothing.
 
 [Bot1 Deck]
 Mountain
 Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
 Raubahn, Bull of Ala Mhigo
-Island x15
+Bloodforged Battle-Axe
+Island x13
 
 [Bot2 Deck]
 Mox Ruby
@@ -20,9 +24,17 @@ Mountain x13
 [Actions]
 Bot1.Hand.Mountain.Play
 Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
 Bot1.Battlefield.Mountain.Activate
 Bot1.Battlefield.Mox Ruby.Activate
 Bot1.Hand.Raubahn, Bull of Ala Mhigo.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Bloodforged Battle-Axe.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Bloodforged Battle-Axe.Activate(Raubahn, Bull of Ala Mhigo)
 [T2 Bot2.Main1]
 Bot2.Hand.Mox Ruby.Cast
 Bot2.Pass
@@ -36,9 +48,13 @@ Bot2.Accept
 Bot2.Accept
 Bot1.Pass
 [T3 Bot1.Main1]
-? Bot2.Life = 16
+? Bot2.Life = 12
 
 [Expect]
-Bot2.Life = 16
+Turn = 3
+Stack.Count = 0
+Bot2.Life = 12
+Bot1.Life = 20
 Bot1.Graveyard = Raubahn, Bull of Ala Mhigo
+Bot1.Battlefield = Mountain; Mox Ruby; Mox Pearl; Mox Jet; Mox Sapphire; Bloodforged Battle-Axe
 Bot2.Graveyard = Lightning Bolt; Lightning Bolt

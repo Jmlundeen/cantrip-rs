@@ -43,4 +43,8 @@ Bot1.Target(Ornithopter)
 ? Bot2.Life = 16
 
 [Expect]
+Bot1.Battlefield.Bloodforged Battle-Axe#1.AttachedTo = Ornithopter
+Bot1.Battlefield.Bloodforged Battle-Axe#2.Token = true
+Bot1.Battlefield.Raubahn, Bull of Ala Mhigo.Power = 2
+Bot1.Battlefield.Ornithopter.Power = 2
 Bot2.Life = 16

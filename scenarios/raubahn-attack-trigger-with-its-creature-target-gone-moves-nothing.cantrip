@@ -51,4 +51,9 @@ Bot2.Pass
 ? Bot2.Life = 16
 
 [Expect]
+Bot2.Life = 16
+Bot1.Battlefield.Bloodforged Battle-Axe#1.AttachedTo = Raubahn, Bull of Ala Mhigo
+Bot1.Battlefield.Bloodforged Battle-Axe#2.Token = true
+Bot1.Graveyard = Ornithopter
+Bot2.Graveyard = Lightning Bolt
 Bot1.Battlefield.Raubahn, Bull of Ala Mhigo.Power = 4

@@ -41,4 +41,6 @@ Bot1.Target(Raubahn, Bull of Ala Mhigo)
 ? Bot2.Life = 18
 
 [Expect]
+Bot1.Battlefield.Bloodforged Battle-Axe.AttachedTo = Ornithopter
+Bot1.Battlefield.Ornithopter.Power = 2
 Bot2.Life = 18
