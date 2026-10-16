@@ -1,0 +1,43 @@
+# Extremis Elite: "Power-up — {4}{R}: Put two +1/+1 counters on this creature. It deals 1 damage to any target." The
+# turn it enters, its mana cost {1}{R} takes the {R} off the red and {1} off the generic (CR 702.193b, 118.7): {3} is
+# left, Sol Ring's {C}{C} and Mox Pearl's {W}. It deals 1 damage to Bot2 and ends a 4/4.
+
+[Bot1 Deck]
+Mountain
+Mox Jet
+Sol Ring
+Extremis Elite
+Mox Ruby
+Mox Pearl
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Extremis Elite.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Extremis Elite.Activate(Bot2)
+? Bot1.Mana =
+Bot1.Pass
+
+[Expect]
+Turn = 1
+Bot2.Life = 19
+Bot1.Battlefield.Extremis Elite.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Extremis Elite.Power = 4
