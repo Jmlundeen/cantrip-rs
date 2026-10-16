@@ -22,7 +22,7 @@ namespace Cantrip.Protocol;
 public sealed class PlayerView
 {
     /// <summary>Protocol version, checked at the handshake so mismatched builds fail loudly.</summary>
-    public const int ProtocolVersion = 148;
+    public const int ProtocolVersion = 149;
 
     [Key(0)]
     public int Version { get; set; } = ProtocolVersion;
@@ -161,6 +161,13 @@ public sealed class PlayerSummaryView
     /// </summary>
     [Key(18)]
     public List<CounterView> Counters { get; set; } = [];
+
+    /// <summary>
+    /// Effects waiting on this player that sit on no object, one line each: "The next spell you cast this turn can't be
+    /// countered" (CR 611.2c). Public, as the effects on the table are.
+    /// </summary>
+    [Key(19)]
+    public List<string> PendingEffects { get; set; } = [];
 
     public override string ToString() => $"seat {Seat} '{Name}' {Life} life";
 }
@@ -498,11 +505,58 @@ public sealed class ObjectView
     public int? StartingCounter { get; set; }
 
     /// <summary>
+    /// Whether it is every creature type (Changeling, CR 702.73a). <see cref="Subtypes"/> then holds all of them, about
+    /// three hundred, for anything that asks whether it is a Goblin; a type line prints <see cref="TypeLineSubtypes"/>
+    /// and says the rest in words (<see cref="ShownSubtypes"/>).
+    /// </summary>
+    [Key(49)]
+    public bool EveryCreatureType { get; set; }
+
+    /// <summary>The subtypes a type line prints when <see cref="EveryCreatureType"/>: those it has of its own. Empty otherwise.</summary>
+    [Key(50)]
+    public List<string> TypeLineSubtypes { get; set; } = [];
+
+    /// <summary>The subtypes to print on a type line: <see cref="Subtypes"/>, or for an every-creature-type object its own.</summary>
+    [IgnoreMember]
+    public IReadOnlyList<string> ShownSubtypes => EveryCreatureType ? TypeLineSubtypes : Subtypes;
+
+    /// <summary>
+    /// Permissions to play this card from the zone it is in (CR 601.3, 305.1) - an impulse draw's "this turn", a flashback
+    /// - each with the seat that holds it and what it says. Public: a card in exile is open to all.
+    /// </summary>
+    [Key(51)]
+    public List<PlayPermissionView> PlayPermissions { get; set; } = [];
+
+    /// <summary>A spell that can't be countered because of how it was cast (CR 101.2): Mistrise Village's next spell.</summary>
+    [Key(52)]
+    public bool CantBeCountered { get; set; }
+
+    /// <summary>
+    /// The abilities it printed and an effect has taken from it (CR 613.1f), as they read: keywords by name. The abilities it
+    /// was given are <see cref="GrantedAbilities"/>.
+    /// </summary>
+    [Key(53)]
+    public List<string> LostAbilities { get; set; } = [];
+
+    /// <summary>
     /// What is printed on this card besides what it shows, to be read beside it: its other face, then its prepare spell.
     /// </summary>
     public IEnumerable<ObjectView> AlsoPrinted() => new[] { OtherFace, PrepareSpell }.OfType<ObjectView>();
 
     public override string ToString() => Known ? $"{Handle} {Name}" : $"{Handle} (unknown)";
+}
+
+/// <summary>A standing permission to play a card, and whose.</summary>
+[MessagePackObject]
+public sealed class PlayPermissionView
+{
+    /// <summary>The seat that may play it.</summary>
+    [Key(0)]
+    public int Seat { get; set; }
+
+    /// <summary>What it may do and until when, as it reads: "Playable this turn".</summary>
+    [Key(1)]
+    public string Text { get; set; } = string.Empty;
 }
 
 /// <summary>One ability an effect has given an object, as it reads.</summary>

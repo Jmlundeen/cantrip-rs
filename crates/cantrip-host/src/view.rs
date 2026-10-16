@@ -10,7 +10,7 @@
 //!
 //! # Left at the default, because the engine has no notion of it
 //!
-//! - `ObjectView::fingerprint`, `spent_lines`, `granted_abilities`, `known_by` and `ZoneView::known`: the engine keeps
+//! - `ObjectView::fingerprint`, `spent_lines`, `known_by` and `ZoneView::known`: the engine keeps
 //!   no record of who has been shown which hidden card, so only a reveal of this step crosses (as an object).
 //! - `SpellTargetView::text` is empty and `still_legal` always true.
 //! - Face-down permanents (morph, manifest) are not in the engine yet.
@@ -171,6 +171,43 @@ pub fn supertypes_view(s: Supertypes) -> Vec<SupertypeView> {
 pub fn subtypes_view(set: SubtypeSet) -> Vec<String> {
     set.iter().map(|t| t.name().to_string()).collect()
 }
+
+/// The keywords as a card's text words them, for the ones an effect gave an object or took from it.
+const KEYWORD_WORDS: [(Keyword, &str); 33] = [
+    (Keyword::Flying, "Flying"),
+    (Keyword::Haste, "Haste"),
+    (Keyword::Vigilance, "Vigilance"),
+    (Keyword::Trample, "Trample"),
+    (Keyword::FirstStrike, "First strike"),
+    (Keyword::DoubleStrike, "Double strike"),
+    (Keyword::Deathtouch, "Deathtouch"),
+    (Keyword::Lifelink, "Lifelink"),
+    (Keyword::Reach, "Reach"),
+    (Keyword::Defender, "Defender"),
+    (Keyword::Flash, "Flash"),
+    (Keyword::Hexproof, "Hexproof"),
+    (Keyword::Indestructible, "Indestructible"),
+    (Keyword::Menace, "Menace"),
+    (Keyword::Infect, "Infect"),
+    (Keyword::Shadow, "Shadow"),
+    (Keyword::Shroud, "Shroud"),
+    (Keyword::CantBeCountered, "This spell can't be countered."),
+    (Keyword::CantBlock, "This creature can't block."),
+    (Keyword::CanBlockOnlyCreaturesWithFlying, "This creature can block only creatures with flying."),
+    (Keyword::DoesNotUntap, "This permanent doesn't untap during your untap step."),
+    (Keyword::CrewsAsThoughPowerTwoGreater, "This creature crews Vehicles as though its power were 2 greater."),
+    (Keyword::CantBeBlocked, "This creature can't be blocked."),
+    (Keyword::CantSpendManaToCast, "You can't spend mana to cast this spell."),
+    (Keyword::CastFromYourGraveyard, "You may cast this card from your graveyard."),
+    (Keyword::Retrace, "Retrace"),
+    (Keyword::Daybound, "Daybound"),
+    (Keyword::Nightbound, "Nightbound"),
+    (Keyword::SplitSecond, "Split second"),
+    (Keyword::CantBeAttacked, "This permanent can't be attacked."),
+    (Keyword::CantBeBlockedByPowerTwoOrLess, "This creature can't be blocked by creatures with power 2 or less."),
+    (Keyword::CantBeBlockedExceptByThreeOrMore, "This creature can't be blocked except by three or more creatures."),
+    (Keyword::Changeling, "Changeling"),
+];
 
 /// A mana cost in oracle notation; empty for no mana cost at all (CR 202.1b).
 pub fn cost_text(def: &CardDef) -> String {
@@ -416,6 +453,13 @@ impl<'a> Projector<'a> {
                 }
             }
         }
+        // "The next spell you cast this turn can't be countered" (CR 611.2c): an effect about the player, one per activation,
+        // that sits on no object.
+        let waiting = s.effects.iter().filter(|e| e.controller == p && e.kind == EffectKind::NextSpellCantBeCountered).count();
+        for _ in 0..waiting {
+            let whose = if p == self.viewer { "you" } else { "they" };
+            summary.pending_effects.push(format!("The next spell {whose} cast this turn can't be countered."));
+        }
         if player.room != 0
             && let Some(dungeon) = game.cards.undercity
         {
@@ -519,6 +563,66 @@ impl<'a> Projector<'a> {
         view
     }
 
+    /// What the layers gave an object's abilities and took from them (CR 613.1f), against the abilities it started with: the
+    /// card's own, or a copy's. A keyword or ability it has that it did not start with is granted, and one it started with
+    /// and has not is lost. The abilities a land has from its basic land types are the rules' and are neither. Nothing is
+    /// allocated for an object the layers left alone, which is nearly every one.
+    fn ability_changes(&self, view: &mut ObjectView, c: &Chars, copy: Option<Copiable>) {
+        let cards = self.game.cards;
+        let def = cards.get(c.card);
+        let base = Keywords(def.keywords.0 | copy.map_or(0, |copy| copy.extra_keywords.0));
+        if c.keywords != base {
+            for (keyword, words) in KEYWORD_WORDS {
+                if c.keywords.has(keyword) && !base.has(keyword) {
+                    view.granted_abilities.push(AbilityTextView { text: words.to_string(), spent: false });
+                } else if base.has(keyword) && !c.keywords.has(keyword) {
+                    view.lost_abilities.push(words.to_string());
+                }
+            }
+        }
+        let printed = |ability: AbilityRef| {
+            (ability.card == c.card && usize::from(ability.index) < def.abilities.len())
+                || copy.is_some_and(|copy| copy.extra_abilities.contains(&Some(ability)))
+        };
+        for ability in c.abilities.iter().flatten().copied() {
+            if ability.card != cards.intrinsic && !printed(ability) {
+                view.granted_abilities.push(AbilityTextView { text: cards.ability(ability).text().to_string(), spent: false });
+            }
+        }
+        for index in 0..def.abilities.len().min(c.abilities.len()) {
+            let ability = AbilityRef { card: c.card, index: index as u8 };
+            if !c.abilities.contains(&Some(ability)) {
+                view.lost_abilities.push(def.abilities[index].text().to_string());
+            }
+        }
+    }
+
+    /// A standing permission to play a card, as the viewer reads it: who may, what, and until when.
+    fn permission_text(&self, permission: &PlayPermission) -> String {
+        let mine = permission.player == self.viewer;
+        let (prefix, whose) = if mine {
+            (String::new(), "your".to_string())
+        } else {
+            let name = self.names.get(permission.player.index()).cloned().unwrap_or_default();
+            (format!("{name}: "), "their".to_string())
+        };
+        let grant = permission.grant;
+        let window = match grant.expiry {
+            Expiry::Never => "while it stays here".to_string(),
+            Expiry::EndOfTurn => "this turn".to_string(),
+            Expiry::EndOfYourNextTurn => format!("until {whose} next turn ends"),
+            Expiry::UntilYourNextEndStep => format!("until {whose} next end step"),
+        };
+        let mut text = format!("{prefix}{} {window}", if grant.lands { "Playable" } else { "Castable" });
+        if grant.later_turns {
+            text.push_str(", on a later turn");
+        }
+        if grant.exile_after {
+            text.push_str(", then exiled");
+        }
+        text
+    }
+
     fn describe(&self, id: ObjectId, handle: ViewHandle, item: Option<StackItem>, handles: &mut HandleSpace) -> ObjectView {
         let game = self.game;
         let s = &game.state;
@@ -612,6 +716,26 @@ impl<'a> Projector<'a> {
             view.oracle_text = crate::text::changed_text(&text, def.name, Query::words(game, id));
             view.unlocked_doors = vec![doors & DOOR_LEFT != 0, doors & DOOR_RIGHT != 0];
         }
+
+        // Every creature type (Changeling): the type line prints the types the card has of its own, and says the rest.
+        if (c.is(CardType::Creature) || c.is(CardType::Kindred))
+            && Subtype::CREATURE_TYPES.iter().all(|&t| c.subtypes.has(t))
+        {
+            view.every_creature_type = true;
+            view.type_line_subtypes =
+                c.subtypes.iter().filter(|t| !t.is_creature_type() || def.subtypes.has(*t)).map(|t| t.name().to_string()).collect();
+        }
+        view.cant_be_countered = obj.marks.cant_be_countered;
+        for permission in s.permissions.iter().filter(|p| p.card == id) {
+            view.play_permissions.push(PlayPermissionView {
+                seat: seat(permission.player),
+                text: self.permission_text(permission),
+            });
+        }
+        if (on_battlefield || zone.is(ZoneKind::Stack)) && !obj.face_down {
+            self.ability_changes(&mut view, &c, obj.copy);
+        }
+
         if obj.face_down {
             // Face down (CR 708.2a, 406.3): what it is face down goes to every seat, a nameless 2/2 on the battlefield and no
             // characteristics at all in exile; what it really is only to a seat that may look at it, its controller

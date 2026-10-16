@@ -355,6 +355,9 @@ pub struct PlayerSummaryView {
     pub has_citys_blessing: bool,
     /// Counters on the player by name (CR 122.1), poison and energy apart.
     pub counters: Vec<CounterView>,
+    /// Effects waiting on this player that no object carries, one line each: "The next spell you cast this turn can't be
+    /// countered" (CR 611.2c). Public, like the permanent effects on the table.
+    pub pending_effects: Vec<String>,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
@@ -428,6 +431,25 @@ pub struct ObjectView {
     /// anything else. A locked door is unlocked by an activation offered on the Room (CR 709.5e).
     pub unlocked_doors: Vec<bool>,
     pub starting_counter: Option<i32>,
+    /// It is every creature type (Changeling, CR 702.73a): `subtypes` then holds all of them, for a client that asks "is it a
+    /// Goblin?", and `type_line_subtypes` what its type line prints.
+    pub every_creature_type: bool,
+    pub type_line_subtypes: Vec<String>,
+    /// Permissions to play this card from where it is (CR 601.3, 305.1): an impulse draw's "this turn", a flashback.
+    pub play_permissions: Vec<PlayPermissionView>,
+    /// A spell that can't be countered because of what was done as it was cast (CR 101.2, 701.6a).
+    pub cant_be_countered: bool,
+    /// The abilities it printed and has lost (CR 613.1f), as they read; `granted_abilities` holds those it was given.
+    pub lost_abilities: Vec<String>,
+}
+
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(rename_all = "PascalCase")]
+pub struct PlayPermissionView {
+    /// The seat that may play the card.
+    pub seat: i32,
+    /// What it may do and until when, as it reads: "Playable this turn".
+    pub text: String,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
