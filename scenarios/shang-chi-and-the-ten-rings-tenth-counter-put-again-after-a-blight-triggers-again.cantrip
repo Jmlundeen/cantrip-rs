@@ -1,0 +1,65 @@
+# "When the tenth +1/+1 counter is put on Shang-Chi" counts the counters it has, as a Saga's chapters do (CR 714.2b): with
+# its tenth-counter trigger on the stack on turn 7, Bot1 casts Requiting Hex and blights 1, putting a -1/-1 counter on
+# Shang-Chi; the state-based action takes it and one +1/+1 counter away (CR 704.5q), leaving nine. The Hex destroys Bot2's
+# Ornithopter and Bot1 gains 2. Then the trigger resolves: of the five cards Bot1 draws, the first puts a tenth +1/+1
+# counter on Shang-Chi again, so the ability triggers a second time - five more cards and 5 more life. Nine counters, plus
+# ten from those draws: nineteen. Life: 20 + 2 + 5 + 5.
+
+[Bot1 Deck]
+Island
+Mox Pearl
+Mox Sapphire
+Shang-Chi and the Ten Rings
+Black Lotus
+Wheel of Fortune
+Mox Jet
+Island
+Island
+Requiting Hex
+Island x40
+
+[Bot2 Deck]
+Ornithopter
+Island x40
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Shang-Chi and the Ten Rings.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Wheel of Fortune.Cast
+Bot1.Pass
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Shang-Chi and the Ten Rings.Counters.PlusOnePlusOne = 9
+[T7 Bot1.Draw]
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Shang-Chi and the Ten Rings.Counters.PlusOnePlusOne = 10
+? Stack.Count = 1
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Requiting Hex.Cast
+Bot1.Modes(Blight 1)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Choose(Shang-Chi and the Ten Rings)
+? Bot1.Battlefield.Shang-Chi and the Ten Rings.Counters.PlusOnePlusOne = 9
+? Bot1.Battlefield.Shang-Chi and the Ten Rings.Counters.MinusOneMinusOne = (absent)
+[T7 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Shang-Chi and the Ten Rings.Counters.PlusOnePlusOne = 19
+Bot1.Life = 32
+Bot2.Battlefield.Count = 0
+Bot1.Hand.Count = 17

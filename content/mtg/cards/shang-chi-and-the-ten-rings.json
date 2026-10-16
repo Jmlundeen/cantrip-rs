@@ -1,0 +1,11 @@
+{
+  "name": "Shang-Chi and the Ten Rings",
+  "manaCost": "{1}{W}{U}",
+  "type": "Legendary Creature — Human Warrior Hero",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "First strike\nWhenever you draw a card, put a +1/+1 counter on Shang-Chi.\nWhen the tenth +1/+1 counter is put on Shang-Chi, you draw five cards and gain 5 life.",
+  "keywords": [
+    "FirstStrike"
+  ]
+}

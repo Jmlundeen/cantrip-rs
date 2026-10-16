@@ -1,0 +1,49 @@
+# Shang-Chi and the Ten Rings: "Whenever you draw a card, put a +1/+1 counter on Shang-Chi. When the tenth +1/+1 counter
+# is put on Shang-Chi, you draw five cards and gain 5 life." Each of Bot1's draws puts a counter on it: one on turn 3, one on
+# turn 5, and seven from Wheel of Fortune on turn 5 - nine, and nothing more happens (Bot2's seven draws are not Bot1's).
+# The turn-7 draw puts the tenth on it (CR 122.6, 603.2): Bot1 draws five more cards, each another counter (no second
+# tenth), and gains 5 life. Shang-Chi ends with fifteen counters, a 17/17 with first strike.
+
+[Bot1 Deck]
+Island
+Mox Pearl
+Mox Sapphire
+Shang-Chi and the Ten Rings
+Black Lotus
+Wheel of Fortune
+Island
+Island x40
+
+[Bot2 Deck]
+Island x40
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Shang-Chi and the Ten Rings.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Shang-Chi and the Ten Rings.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Wheel of Fortune.Cast
+Bot1.Pass
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Shang-Chi and the Ten Rings.Counters.PlusOnePlusOne = 9
+? Bot1.Life = 20
+? Bot1.Hand.Count = 7
+[T7 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Shang-Chi and the Ten Rings.Counters.PlusOnePlusOne = 15
+Bot1.Battlefield.Shang-Chi and the Ten Rings.Power = 17
+Bot1.Battlefield.Shang-Chi and the Ten Rings.Keywords = FirstStrike
+Bot1.Life = 25
+Bot1.Hand.Count = 13
