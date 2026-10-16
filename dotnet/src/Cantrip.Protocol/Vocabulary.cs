@@ -293,6 +293,9 @@ public enum CardChoicePurposeView
 
     /// <summary>A copy of the chosen card is cast as the effect resolves without paying its mana cost (CR 707.12); choosing nothing declines (Uldaros Theorix).</summary>
     CastCopyFree = 25,
+
+    /// <summary>Up to one untapped creature you control is tapped as part of casting, and its power (the prompt's <c>Powers</c>) comes off the generic mana of the total cost; choosing nothing pays the full cost (harmonize, CR 702.180).</summary>
+    TapToReduce = 26,
 }
 
 /// <summary>Where cards found by a library search go (CR 701.23).</summary>

@@ -1035,6 +1035,8 @@ impl<'s> Run<'s> {
             }
             (V::Cancel, _) if request.may_cancel => Some(Answer::Cancel),
             (V::Choose, RequestKind::ChooseCards { eligible, count, up_to, .. }) => Some(self.pick(step, eligible, *count, !up_to)?),
+            // Harmonize's creature is up to one (CR 702.180a): unless the script taps one, none is.
+            (V::Choose, RequestKind::TapForPower { purpose: Purpose::TapToReduce, cards, .. }) => Some(self.pick(step, cards, 1, false)?),
             (V::Choose, RequestKind::TapForPower { cards, .. }) => Some(self.pick(step, cards, cards.len() as u8, false)?),
             (V::Choose, RequestKind::CollectEvidence { cards, .. }) => Some(self.pick(step, cards, cards.len() as u8, false)?),
             (V::ChoosePlayer, RequestKind::ChoosePlayer { candidates, .. }) => {
@@ -1421,7 +1423,7 @@ impl<'s> Run<'s> {
                     }
                 }
             }
-            RequestKind::ChooseCards { eligible, .. } => {
+            RequestKind::ChooseCards { eligible, .. } | RequestKind::TapForPower { cards: eligible, .. } => {
                 let everything: Vec<ObjectId> = (0..self.game.state.objects.len() as u32).map(ObjectId).collect();
                 for spec in action.positional() {
                     if self.objects(action, spec.trim(), &everything)?.is_empty() {

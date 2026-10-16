@@ -9,7 +9,7 @@
 //! | `PayCosts`             | `PayCostsPromptMessage` (announcing X/kicks sets `AnnouncesXOrKicks`)              |
 //! | `UnlessPays`           | `UnlessPaysPromptMessage`                                                          |
 //! | `ChooseCards`          | `ChooseCardsPromptMessage`                                                         |
-//! | `TapForPower`          | `ChooseCardsPromptMessage` (purpose `TapToPay`, `Powers`, `MinimumPower`)          |
+//! | `TapForPower`          | `ChooseCardsPromptMessage` (purpose `TapToPay`, `Powers`, `MinimumPower`; harmonize's: `TapToReduce`, up to one) |
 //! | `ChooseTarget`         | `ChooseTargetPromptMessage`                                                        |
 //! | `ChooseModes`          | `ChooseModesPromptMessage`                                                         |
 //! | `ChooseSubtype`        | `ChooseModesPromptMessage` over the subtypes (the C# engine asks it that way too)  |
@@ -352,6 +352,7 @@ fn purpose_view(purpose: Purpose, opening: bool) -> CardChoicePurposeView {
         Purpose::Encode => V::Encode,
         Purpose::Behold => V::Behold,
         Purpose::Blight => V::Blight,
+        Purpose::TapToReduce => V::TapToReduce,
         Purpose::SeparatePiles
         | Purpose::ChoosePile
         | Purpose::CopyAsEnters
@@ -533,15 +534,17 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
             })
         }
         RequestKind::TapForPower { source, purpose, cards, powers, minimum } => {
-            let _ = purpose;
+            // Harmonize's creature (CR 702.180a) is up to one, and `powers` is what tapping each takes off the cost.
+            let reduce = *purpose == Purpose::TapToReduce;
             PromptPayload::ChooseCardsPromptMessage(ChooseCardsPrompt {
                 player,
                 owner: player,
                 source: source_handle(game, handles, *source),
-                purpose: CardChoicePurposeView::TapToPay,
+                purpose: if reduce { CardChoicePurposeView::TapToReduce } else { CardChoicePurposeView::TapToPay },
                 cards: handles_of(handles, cards),
                 eligible: handles_of(handles, cards),
-                count: cards.len() as i32,
+                count: if reduce { 1 } else { cards.len() as i32 },
+                kind: if reduce { "creature".into() } else { String::new() },
                 up_to: true,
                 minimum_power: i32::from(*minimum),
                 powers: powers.iter().map(|&p| i32::from(p)).collect(),

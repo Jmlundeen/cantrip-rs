@@ -147,6 +147,9 @@ pub fn check(game: &Game, request: &Request, answer: &Answer) -> Result<(), Reje
                 Ok(())
             }
         }
+        (RequestKind::TapForPower { purpose: Purpose::TapToReduce, .. }, Answer::Cards(chosen)) if chosen.len() > 1 => {
+            no("up to one creature may be tapped (CR 702.180a)")
+        }
         (RequestKind::TapForPower { cards, powers, minimum, .. }, Answer::Cards(chosen)) => {
             let total: u32 = chosen.iter().filter_map(|c| cards.iter().position(|x| x == c)).map(|i| powers[i] as u32).sum();
             if !distinct(chosen) || !chosen.iter().all(|c| cards.contains(c)) {

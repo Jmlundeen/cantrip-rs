@@ -235,6 +235,8 @@ pub enum CardChoicePurposeView {
     Blight,
     CastFree,
     CastCopyFree,
+    /// Up to one untapped creature tapped as a cost, its power coming off the generic mana of the total cost (harmonize, CR 702.180).
+    TapToReduce,
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]

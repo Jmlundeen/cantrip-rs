@@ -332,6 +332,11 @@ pub struct Cost {
     /// put as it is paid. Payable only with a creature to put them on (CR 701.68b). Requiting Hex, Cinder Strike,
     /// Paid when a spell is cast only: an activation does not choose or pay it yet.
     pub blight: u8,
+    /// Harmonize's additional part (CR 702.180a-b): tap up to one untapped creature you control, and the total cost comes down
+    /// by generic mana equal to its power (never by colored mana, CR 601.2f). The creature is chosen as the cost is chosen
+    /// (CR 601.2b), its power read as the total cost is determined (CR 601.2f), and it is tapped as the cost is paid. It is not
+    /// a {T} ability's cost (CR 107.5), so a summoning-sick creature may be tapped. Only a spell's way of casting carries it.
+    pub tap_to_reduce: bool,
 }
 
 /// A cost part whose size is the payer's to set, chosen as the cost is chosen.
@@ -418,6 +423,7 @@ impl Cost {
         c.exile_self |= other.exile_self;
         c.pay_x_life |= other.pay_x_life;
         c.emerge |= other.emerge;
+        c.tap_to_reduce |= other.tap_to_reduce;
         c.tap_permanents |= other.tap_permanents;
         c.remove_any_counter |= other.remove_any_counter;
         if c.loyalty.is_none() {
@@ -495,6 +501,7 @@ impl Cost {
             collect_evidence: 0,
             behold: None,
             blight: 0,
+            tap_to_reduce: false,
         };
 
     pub const fn sacrifice(count: u8, filter: ObjectFilter) -> Cost {

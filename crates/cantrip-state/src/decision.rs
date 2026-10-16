@@ -430,6 +430,9 @@ pub enum Purpose {
     Behold,
     /// The creature a cost blights (CR 701.68a).
     Blight,
+    /// The creature harmonize taps, if any (CR 702.180a-b): up to one untapped creature, whose power comes off the generic
+    /// mana of the total cost.
+    TapToReduce,
     /// "You may cast it without paying its mana cost" as an effect resolves (CR 118.9, 608.2g), the card staying where it is
     /// if not: suspend, rebound, hideaway, Malcolm.
     CastFree,

@@ -1533,9 +1533,7 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
                         continue;
                     }
                     let a = available.get_or_init(|| self::available(cx, player));
-                    let mut cost = least_cost(cx, a, player, id, def, way.cost.mana);
-                    cost.generic = cost.generic.saturating_sub(emerge_reduction(cx, player, id, &way.cost));
-                    if !covers_total(cx, a, player, id, def, cost, way.cost.exile_from_graveyard) {
+                    if !way_covered(cx, a, player, id, def, &way.cost) {
                         continue;
                     }
                     let mut option = ActionOption::on(ActionKind::CastSpell, id, (n + 1) as u8);
@@ -1571,9 +1569,7 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
                         continue;
                     }
                     let a = available.get_or_init(|| self::available(cx, player));
-                    let mut cost = least_cost(cx, a, player, id, def, way.cost.mana);
-                    cost.generic = cost.generic.saturating_sub(emerge_reduction(cx, player, id, &way.cost));
-                    if !covers_total(cx, a, player, id, def, cost, way.cost.exile_from_graveyard) {
+                    if !way_covered(cx, a, player, id, def, &way.cost) {
                         continue;
                     }
                     let mut option = ActionOption::on(ActionKind::CastSpell, id, (n + 1) as u8);
@@ -1720,6 +1716,60 @@ fn emerge_reduction(cx: &Cx, player: PlayerId, card: ObjectId, cost: &Cost) -> u
         cx.permanents_of(player).into_iter().filter(|&id| (p.filter)(cx, &asker, id)).map(|id| cx.mana_value(id)).collect();
     values.sort_unstable_by(|a, b| b.cmp(a));
     values.iter().take(p.count as usize).sum::<u32>().min(255) as u8
+}
+
+/// The creatures a cost that taps one to reduce its mana may tap (CR 702.180a): the controller's untapped creatures. A
+/// creature with summoning sickness may be tapped, since this is not its own {T} ability (CR 302.6, 107.5).
+fn reducer_candidates(cx: &Cx, controller: PlayerId) -> Vec<ObjectId> {
+    cx.permanents_of(controller).into_iter().filter(|&id| !cx.s().obj(id).tapped && cx.chars(id).is(CardType::Creature)).collect()
+}
+
+/// What tapping `creature` takes off the generic mana of the total cost (CR 702.180a): its power, none if that is below 0.
+fn reduction_of(cx: &Cx, creature: ObjectId) -> u8 {
+    cx.chars(creature).power.unwrap_or(0).clamp(0, 255) as u8
+}
+
+/// Whether a way of casting `card` is worth offering (advice, CR 601.2g): the least its mana can come to, with emerge's
+/// richest sacrifice, is covered; or, for harmonize (CR 702.180a), is covered once some untapped creature is tapped for
+/// its power, that creature then not tapping for mana.
+fn way_covered(cx: &Cx, a: &Available, player: PlayerId, card: ObjectId, def: &CardDef, way: &Cost) -> bool {
+    let mut cost = least_cost(cx, a, player, card, def, way.mana);
+    cost.generic = cost.generic.saturating_sub(emerge_reduction(cx, player, card, way));
+    if covers_total(cx, a, player, card, def, cost, way.exile_from_graveyard) {
+        return true;
+    }
+    way.tap_to_reduce
+        && reducer_candidates(cx, player).into_iter().any(|creature| {
+            let without = available_without(cx, player, Some(creature));
+            let mut reduced = cost;
+            reduced.generic = reduced.generic.saturating_sub(reduction_of(cx, creature));
+            covers_total(cx, &without, player, card, def, reduced, way.exile_from_graveyard)
+        })
+}
+
+/// Chooses the creature a cost taps to reduce its mana (CR 702.180b, 601.2b): up to one untapped creature, asked as the cost
+/// is chosen, before any target. Nothing is asked when there is no creature to tap.
+///
+/// The prompt says what tapping each creature takes off: its power, but never more than the generic mana the total cost has as far
+/// as it is known now (the cost changes in play applied), since colored mana does not come down (CR 601.2f).
+///
+/// That total is read here, before X and kicker are announced (CR 601.2b), so a future harmonize card with X or a kicker must
+/// recompute it once they are, or the caption's min(power, generic) understates what comes off.
+fn choose_reducer(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) -> R<Option<ObjectId>> {
+    if !cost.tap_to_reduce {
+        return Ok(None);
+    }
+    let eligible = reducer_candidates(cx, player);
+    if eligible.is_empty() {
+        return Ok(None);
+    }
+    let generic = apply_cost_changes(cx, player, Costed::Spell(source), cost.mana).generic;
+    let powers = eligible.iter().map(|&c| reduction_of(cx, c).min(generic)).collect();
+    let ask = RequestKind::TapForPower { source, purpose: Purpose::TapToReduce, cards: eligible, powers, minimum: 0 };
+    match cx.ask_core(player, ask, true)? {
+        Answer::Cards(cards) => Ok(cards.first().copied()),
+        _ => Err(Stop::Cancel),
+    }
 }
 
 fn is_land(q: &dyn Query, _: &Asker, id: ObjectId) -> bool {
@@ -2072,6 +2122,9 @@ fn cast(
         cx.st().update_obj(spell, |o| o.paid = 1);
     }
 
+    // CR 702.180b, 601.2b: the creature harmonize taps is chosen as the harmonize cost is, before any target.
+    let reducer = choose_reducer(cx, player, spell, &cost)?;
+
     // CR 601.2b: X, and how many times it is kicked, are announced, and the total cost follows (CR 601.2f).
     // CR 107.3a, 601.2b: X is announced for a cost that includes it. A way that casts the face itself (an Adventure,
     // CR 715.3b; a back face, CR 712.8a; one half of a split card, CR 709.3) pays that face's own mana cost, X included;
@@ -2150,6 +2203,11 @@ fn cast(
     let life = announce_life(cx, player, spell, &mut cost.mana)?;
     // CR 601.2f: the total cost, with what increases or reduces it.
     cost.mana = apply_cost_changes(cx, player, Costed::Spell(spell), cost.mana);
+    // CR 702.180a, 601.2f: the total cost comes down by generic mana equal to the tapped creature's power, read as the total
+    // cost is determined, after what raises it; colored mana never comes down.
+    if let Some(creature) = reducer {
+        cost.mana.generic = cost.mana.generic.saturating_sub(reduction_of(cx, creature));
+    }
     // CR 601.2b, 702.174a: gift is an optional additional cost, announced before the targets.
     let promised = def.gift.is_some()
         && cx.s().opponents(player).any(|p| !cx.s().player(p).lost)
@@ -2242,6 +2300,11 @@ fn cast(
     }
     // CR 701.67b: the tapping pays only the generic mana of the waterbend cost, whatever else the total has.
     let waterbend = def.kicker.filter(|k| k.waterbend).map_or(0, |k| k.cost.generic.saturating_mul(item.kicked));
+    // CR 702.180b, 601.2h: the creature is tapped as the total cost is paid. It is tapped before the mana is, since a cost
+    // may be paid in any order, so it cannot also be tapped for mana: the tap it was chosen for is its own.
+    if let Some(creature) = reducer {
+        ops::tap(cx, creature);
+    }
     let helpers = Helpers { with: def.pay_with, waterbend, creatures: false, no_mana: def.keywords.has(Keyword::CantSpendManaToCast), casting: true, reserved: &exiles };
     let (spent, restrictions) = pay_mana_used(cx, player, spell, cost.mana, &helpers)?;
     // CR 106.6: a creature spell paid for with mana that gives it haste has haste once it resolves; a spell paid for with
