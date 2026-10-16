@@ -354,6 +354,31 @@ pub static SOLDIER: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+/// The 2/1 green Spider creature token with reach. Spiders-Man, Heroic Horde and Peter Parker make it.
+pub static SPIDER: CardDef = CardDef {
+    name: "Spider",
+    has_cost: false,
+    colors: Some(ColorSet::of(Color::Green)),
+    types: TypeSet::of(&[CardType::Creature]),
+    subtypes: SubtypeSet::of(&[Subtype::Spider]),
+    power: Some(2),
+    toughness: Some(1),
+    keywords: Keywords::of(&[Keyword::Reach]),
+    ..CardDef::BLANK
+};
+
+/// The 1/1 green and white Human Citizen creature token. Silk, Web Weaver and News Helicopter make it.
+pub static HUMAN_CITIZEN: CardDef = CardDef {
+    name: "Human Citizen",
+    has_cost: false,
+    colors: Some(ColorSet(0b10001)),
+    types: TypeSet::of(&[CardType::Creature]),
+    subtypes: SubtypeSet::of(&[Subtype::Human, Subtype::Citizen]),
+    power: Some(1),
+    toughness: Some(1),
+    ..CardDef::BLANK
+};
+
 /// The 2/2 red Rebel creature token. Glimmer Lens and Otharri, Suns' Glory make it.
 pub static REBEL: CardDef = CardDef {
     name: "Rebel",

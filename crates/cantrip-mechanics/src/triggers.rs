@@ -469,6 +469,18 @@ pub fn creature_you_control_dies(q: &dyn Query, source: ObjectId, event: &Event)
     }
 }
 
+/// "Whenever you cast a creature spell" (CR 603.2): its controller's spells only, judged on the spell as it is on the stack
+/// (CR 601.2i), so a card that is a creature only there counts. Bontu's Monument, Glimpse of Nature, Silk, Web Weaver and
+/// Spider-Man India print it.
+pub fn creature_spell_you_cast(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::SpellCast { spell, player, .. } if *player == q.controller(source) && q.chars(*spell).is(CardType::Creature) => {
+            Fired::PLAIN
+        }
+        _ => None,
+    }
+}
+
 /// "Whenever you cast an artifact spell" (CR 603.2). Pinnacle Emissary and Ravenous Robots print it.
 pub fn artifact_spell_you_cast(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
@@ -550,5 +562,6 @@ pub const CREATURE_YOU_CONTROL_ENTERS: Trigger = when(EventMask::ZONE_CHANGE, cr
 pub const CREATURE_DIES: Trigger = when(EventMask::ZONE_CHANGE, creature_dies);
 pub const CREATURE_YOU_CONTROL_DIES: Trigger = when(EventMask::ZONE_CHANGE, creature_you_control_dies);
 pub const ARTIFACT_SPELL_YOU_CAST: Trigger = when(EventMask::SPELL_CAST, artifact_spell_you_cast);
+pub const CREATURE_SPELL_YOU_CAST: Trigger = when(EventMask::SPELL_CAST, creature_spell_you_cast);
 pub const DEALS_COMBAT_DAMAGE_TO_PLAYER_SUBJECT: Trigger = when(EventMask::DAMAGE, deals_combat_damage_to_player_subject);
 pub const DEALS_COMBAT_DAMAGE_TO_PLAYER: Trigger = when(EventMask::DAMAGE, deals_combat_damage_to_player);
