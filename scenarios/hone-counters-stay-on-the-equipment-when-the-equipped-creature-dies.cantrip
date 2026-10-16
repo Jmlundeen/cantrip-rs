@@ -1,0 +1,53 @@
+# The hone counters are the Equipment's, not the creature's (CR 122.1j): Paradise Mantle, with the hone counter Dwalin's entering
+# put on it, is equipped to Dwalin (3/1); Bot2's Lightning Bolt kills Dwalin on turn 6, the Mantle stays on the battlefield unattached
+# (CR 704.5n) with its counter, and equipped to Ornithopter on turn 7 it makes Ornithopter 1/2.
+
+[Bot1 Deck]
+Plains
+Mountain
+Paradise Mantle
+Dwalin, Weaponmaster
+Ornithopter
+Plains
+Plains x14
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Paradise Mantle.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Dwalin, Weaponmaster.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Paradise Mantle.Activate(Dwalin, Weaponmaster; Ability: Equip)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Dwalin, Weaponmaster.Power = 3
+[T6 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Dwalin, Weaponmaster)
+[T6 Bot2.Main2]
+? Bot1.Graveyard = Dwalin, Weaponmaster
+? Bot1.Battlefield.Paradise Mantle.AttachedTo = (absent)
+? Bot1.Battlefield.Paradise Mantle.Counters.Hone = 1
+? Bot1.Battlefield.Ornithopter.Power = 0
+[T7 Bot1.Main1]
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Paradise Mantle.Activate(Ornithopter; Ability: Equip)
+
+[Expect]
+Bot1.Battlefield.Paradise Mantle.AttachedTo = Ornithopter
+Bot1.Battlefield.Paradise Mantle.Counters.Hone = 1
+Bot1.Battlefield.Ornithopter.Power = 1
+Bot1.Battlefield.Ornithopter.Toughness = 2

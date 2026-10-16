@@ -1,0 +1,44 @@
+# A copy of Dwalin has its triggered ability (CR 707.2), and "you" is the copy's controller (CR 109.5). Bot1's Dwalin enters and
+# puts a hone counter on Bot1's Paradise Mantle. Bot2's Phantasmal Image enters as a copy of Dwalin: its own "enters" trigger puts
+# a hone counter on Bot2's Mantle alone, so Bot1's Mantle keeps its one.
+
+[Bot1 Deck]
+Plains
+Mountain
+Paradise Mantle
+Dwalin, Weaponmaster
+Plains x16
+
+[Bot2 Deck]
+Island
+Island
+Paradise Mantle
+Phantasmal Image
+Island x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Paradise Mantle.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Paradise Mantle.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Dwalin, Weaponmaster.Cast
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Paradise Mantle.Counters.Hone = 1
+? Bot2.Battlefield.Paradise Mantle.Counters.Hone = (absent)
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island#1.Activate
+Bot2.Battlefield.Island#2.Activate
+Bot2.Hand.Phantasmal Image.Cast
+Bot2.Accept
+[T4 Bot2.Main2]
+
+[Expect]
+Bot2.Battlefield.Dwalin, Weaponmaster.Subtypes = Dwarf; Illusion; Warrior
+Bot2.Battlefield.Paradise Mantle.Counters.Hone = 1
+Bot1.Battlefield.Paradise Mantle.Counters.Hone = 1

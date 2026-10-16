@@ -1,0 +1,67 @@
+# The +1/+0 is the hone counter's, not an ability of the Equipment (CR 122.1j; the ruling: "even if the Equipment loses some of
+# its abilities, each hone counter will still grant +1/+0"). Paradise Mantle, with the hone counter Dwalin's entering put on it, is
+# equipped to Dwalin on turn 5. Turn 7: Bot1 activates the Mantle's equip ability to move it to Ornithopter, and Bot2 flashes in
+# Tishana's Tidebinder to counter that ability, so the Mantle stays on Dwalin and loses all its abilities while the Tidebinder
+# remains (Dwalin, which could tap for mana with the Mantle's granted ability on turn 5, no longer can). Dwalin is still 3/1;
+# attacking, it puts a second hone counter on the Mantle, which still counts: Dwalin strikes for 4.
+
+[Bot1 Deck]
+Plains
+Mountain
+Paradise Mantle
+Dwalin, Weaponmaster
+Ornithopter
+Plains
+Plains
+Plains x13
+
+[Bot2 Deck]
+Island
+Island
+Tishana's Tidebinder
+Island x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Paradise Mantle.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Dwalin, Weaponmaster.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Paradise Mantle.Activate(Dwalin, Weaponmaster; Ability: Equip)
+[T5 Bot1.Main2]
+Bot1.Battlefield.Dwalin, Weaponmaster.Activate(Color: White)
+[T6 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Paradise Mantle.Activate(Ornithopter; Ability: Equip)
+Bot2.Battlefield.Island#1.Activate
+Bot2.Battlefield.Island#2.Activate
+Bot2.Battlefield.Island#3.Activate
+Bot2.Hand.Tishana's Tidebinder.Cast
+Bot2.Target(Stack.Paradise Mantle)
+Bot1.Pass
+! Bot1.Battlefield.Dwalin, Weaponmaster.Activate
+Bot1.Attack(Dwalin, Weaponmaster > Bot2)
+? Bot1.Battlefield.Paradise Mantle.AttachedTo = Dwalin, Weaponmaster
+? Bot1.Battlefield.Dwalin, Weaponmaster.Power = 3
+[T7 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Tishana's Tidebinder.Power = 3
+Bot2.Life = 16
+Bot1.Battlefield.Paradise Mantle.AttachedTo = Dwalin, Weaponmaster
+Bot1.Battlefield.Paradise Mantle.Counters.Hone = 2
+Bot1.Battlefield.Dwalin, Weaponmaster.Power = 4
+Bot1.Battlefield.Ornithopter.Power = 0

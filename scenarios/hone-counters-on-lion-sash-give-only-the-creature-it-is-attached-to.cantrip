@@ -1,0 +1,55 @@
+# A hone counter gives +1/+0 to the creature its Equipment is attached to (CR 122.1j), and to nothing else. Lion Sash, unattached,
+# is an Equipment creature: Dwalin's entering puts a hone counter on it, and it stays 1/1 - its own counter is not attached to it.
+# Reconfigured onto Dwalin (CR 702.151) it makes Dwalin 3/1; reconfigured off again (unattached, CR 701.3d) Dwalin is 2/1 and the
+# Sash is a 1/1 creature with its counter still on it.
+
+[Bot1 Deck]
+Plains
+Plains
+Lion Sash
+Dwalin, Weaponmaster
+Plains
+Mountain
+Plains
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Lion Sash.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Dwalin, Weaponmaster.Cast
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Lion Sash.Counters.Hone = 1
+? Bot1.Battlefield.Lion Sash.Power = 1
+? Bot1.Battlefield.Lion Sash.Toughness = 1
+? Bot1.Battlefield.Dwalin, Weaponmaster.Power = 2
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Lion Sash.Activate(Bot1.Battlefield.Dwalin, Weaponmaster; Ability: Attach)
+Bot1.Pass
+Bot1.Battlefield.Plains#3.Activate
+? Bot1.Battlefield.Lion Sash.AttachedTo = Dwalin, Weaponmaster
+? Bot1.Battlefield.Dwalin, Weaponmaster.Power = 3
+? Bot1.Battlefield.Dwalin, Weaponmaster.Toughness = 1
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Lion Sash.Activate(Ability: Unattach)
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Lion Sash.AttachedTo = (absent)
+Bot1.Battlefield.Lion Sash.Counters.Hone = 1
+Bot1.Battlefield.Lion Sash.Power = 1
+Bot1.Battlefield.Lion Sash.Toughness = 1
+Bot1.Battlefield.Dwalin, Weaponmaster.Power = 2

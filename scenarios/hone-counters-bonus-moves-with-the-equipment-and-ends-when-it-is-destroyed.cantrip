@@ -1,0 +1,61 @@
+# A hone counter's +1/+0 goes to whatever creature its Equipment is attached to, and only while it is (CR 122.1j, 613.4c; the
+# rulings). Dwalin's entering puts a hone counter on Paradise Mantle. Turn 5: equipped to Dwalin, the Mantle makes it 3/1; equipped
+# on to Ornithopter, it leaves Dwalin 2/1 and makes Ornithopter 1/2. Turn 6: Bot2's Disenchant destroys the Mantle and Ornithopter
+# is 0/2 again.
+
+[Bot1 Deck]
+Plains
+Mountain
+Paradise Mantle
+Dwalin, Weaponmaster
+Ornithopter
+Plains
+Plains x14
+
+[Bot2 Deck]
+Plains
+Plains
+Disenchant
+Plains x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Paradise Mantle.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Dwalin, Weaponmaster.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Paradise Mantle.Activate(Dwalin, Weaponmaster; Ability: Equip)
+Bot1.Pass
+Bot1.Battlefield.Plains#2.Activate
+? Bot1.Battlefield.Paradise Mantle.AttachedTo = Dwalin, Weaponmaster
+? Bot1.Battlefield.Dwalin, Weaponmaster.Power = 3
+? Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Paradise Mantle.Activate(Ornithopter; Ability: Equip)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Paradise Mantle.AttachedTo = Ornithopter
+? Bot1.Battlefield.Paradise Mantle.Counters.Hone = 1
+? Bot1.Battlefield.Dwalin, Weaponmaster.Power = 2
+? Bot1.Battlefield.Ornithopter.Power = 1
+? Bot1.Battlefield.Ornithopter.Toughness = 2
+[T6 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains#1.Activate
+Bot2.Battlefield.Plains#2.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Paradise Mantle)
+[T6 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Paradise Mantle
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot1.Battlefield.Dwalin, Weaponmaster.Power = 2

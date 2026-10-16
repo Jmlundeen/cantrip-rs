@@ -1,0 +1,64 @@
+# "Whenever Dwalin enters or attacks, put a hone counter on each Equipment you control" (CR 603.2, 122.1j). Turn 3: Dwalin
+# enters and both of Bot1's Paradise Mantles get a hone counter; Bot1's Ornithopter (an artifact, not an Equipment) and
+# Bot2's Paradise Mantle (an Equipment Bot1 doesn't control) get none, and Dwalin stays 2/1, since an Equipment attached to
+# nothing gives no one anything. Turn 5: both Mantles - which say nothing about hone counters - are equipped to Dwalin, and their
+# counters add up, making Dwalin 4/1 as the attack trigger waits on the stack; the trigger puts a second counter on each Mantle
+# and Dwalin strikes first for 6.
+
+[Bot1 Deck]
+Plains
+Mountain
+Paradise Mantle
+Paradise Mantle
+Dwalin, Weaponmaster
+Ornithopter
+Plains
+Plains x13
+
+[Bot2 Deck]
+Paradise Mantle
+Island x19
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Paradise Mantle.Cast
+Bot1.Hand.Paradise Mantle.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Paradise Mantle.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Dwalin, Weaponmaster.Cast
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Paradise Mantle#1.Counters.Hone = 1
+? Bot1.Battlefield.Paradise Mantle#2.Counters.Hone = 1
+? Bot1.Battlefield.Dwalin, Weaponmaster.Power = 2
+? Bot1.Battlefield.Ornithopter.Counters.Hone = (absent)
+? Bot2.Battlefield.Paradise Mantle.Counters.Hone = (absent)
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Paradise Mantle#1.Activate(Dwalin, Weaponmaster; Ability: Equip)
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+? Bot1.Battlefield.Dwalin, Weaponmaster.Power = 3
+Bot1.Battlefield.Paradise Mantle#2.Activate(Dwalin, Weaponmaster; Ability: Equip)
+Bot1.Attack(Dwalin, Weaponmaster > Bot2)
+? Stack.Count = 1
+? Bot1.Battlefield.Dwalin, Weaponmaster.Power = 4
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Bot1.Battlefield.Paradise Mantle#1.AttachedTo = Dwalin, Weaponmaster
+Bot1.Battlefield.Paradise Mantle#1.Counters.Hone = 2
+Bot1.Battlefield.Paradise Mantle#2.AttachedTo = Dwalin, Weaponmaster
+Bot1.Battlefield.Paradise Mantle#2.Counters.Hone = 2
+Bot1.Battlefield.Dwalin, Weaponmaster.Power = 6
+Bot1.Battlefield.Dwalin, Weaponmaster.Toughness = 1
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Ornithopter.Counters.Hone = (absent)
+Bot2.Battlefield.Paradise Mantle.Counters.Hone = (absent)
