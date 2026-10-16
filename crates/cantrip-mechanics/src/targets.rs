@@ -248,7 +248,7 @@ pub fn card_in_your_graveyard(q: &dyn Query, asker: &Asker, t: Target, types: &[
 }
 
 /// `card_in_your_graveyard` with "mana value N or less" (CR 202.3, `Query::mana_value`; X is 0 in a graveyard,
-/// CR 107.3b). Unearth, Carnage, Crimson Chaos, Sevinne's Reclamation and Helping Hand print it.
+/// CR 202.3e). Unearth, Carnage, Crimson Chaos, Sevinne's Reclamation and Helping Hand print it.
 pub fn card_in_your_graveyard_with_mana_value_at_most(q: &dyn Query, asker: &Asker, t: Target, types: &[CardType], max: u32) -> bool {
     card_in_your_graveyard(q, asker, t, types) && matches!(t, Target::Object(id) if q.mana_value(id) <= max)
 }
@@ -302,6 +302,12 @@ fn creature_card_in_your_graveyard_filter(q: &dyn Query, asker: &Asker, t: Targe
 /// "Target creature card in your graveyard". Recurring Nightmare and Metamorphosis Fanatic print it.
 pub const CREATURE_CARD_IN_YOUR_GRAVEYARD: TargetSpec = target(creature_card_in_your_graveyard_filter);
 
+/// "A nontoken artifact" (CR 111.1): an artifact permanent that is a card, not a token. Thopter Foundry sacrifices one as a
+/// cost (`filters::nontoken_artifact`) and Lorehold Charm makes each opponent sacrifice one.
+pub fn is_nontoken_artifact(q: &dyn Query, id: ObjectId) -> bool {
+    !q.obj(id).token && q.chars(id).is(CardType::Artifact)
+}
+
 /// A card chosen to be sacrificed, discarded or tapped as a cost: the filter shapes `Cost::sacrifice` and
 /// `Cost::discard` take. Each is named by what it accepts.
 pub mod filters {
@@ -322,6 +328,10 @@ pub mod filters {
     /// An artifact. Crabomination (emerge) and Time Sieve sacrifice one.
     pub fn artifact(q: &dyn Query, _: &Asker, id: ObjectId) -> bool {
         q.chars(id).is(CardType::Artifact)
+    }
+    /// A nontoken artifact. Thopter Foundry sacrifices one.
+    pub fn nontoken_artifact(q: &dyn Query, _: &Asker, id: ObjectId) -> bool {
+        super::is_nontoken_artifact(q, id)
     }
     /// An artifact or a creature. Deadly Dispute, Eviscerator's Insight and Fanatical Offering sacrifice one.
     pub fn artifact_or_creature(q: &dyn Query, _: &Asker, id: ObjectId) -> bool {

@@ -13,7 +13,7 @@ pub fn enters_with_x_counters(_: &mut dyn Game, entering: &mut Entering) -> Resu
 /// "Creatures you control get +`power`/+`toughness` until end of turn" (CR 611.2, 611.2c): the creatures `item`'s controller
 /// controls as it resolves, and no creature that enters later. The creatures, for what the rest of the sentence does to them
 /// ("and gain haste", "untap those creatures"). Assault Formation, Eagles of the North, Fatehold Charm, Haze of Rage, Jeskai
-/// Ascendancy, Silk Web Weaver and Warhost's Frenzy print it.
+/// Ascendancy, Lorehold Charm, Silk Web Weaver and Warhost's Frenzy print it.
 pub fn pump_creatures_you_control(g: &mut dyn Game, item: &StackItem, power: i16, toughness: i16) -> Vec<ObjectId> {
     let creatures: Vec<ObjectId> = g.permanents_of(item.controller).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
     for &id in &creatures {
