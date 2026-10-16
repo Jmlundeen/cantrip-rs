@@ -695,6 +695,10 @@ pub enum Keyword {
     /// every zone (CR 604.3). The layers add the creature types (`cantrip-rules` `layers.rs`), so card code asks
     /// `has_subtype` as for any creature type. Printed on Firdoch Core.
     Changeling = 32,
+    /// Decayed (CR 702.147a): "This creature can't block" and "When this creature attacks, sacrifice it at end of combat".
+    /// A core keyword because a keyword counter gives it (CR 122.1b) in layer 6: the blocking rule reads it, and the
+    /// layers give an object that has it once layer 6 is done the rules' triggered ability (`intrinsic::DECAYED`).
+    Decayed = 33,
 }
 
 /// Day and night (CR 731.1): the designation the game itself has, belonging to no player. A game starts with neither
@@ -808,23 +812,72 @@ counter_kinds! {
     // CR 122.1j: each one on an Equipment gives the creature it is attached to +1/+0 (the layers, 613.4c).
     Hone = 32, "hone", "Hone";
     Quest = 33, "quest", "Quest";
+    // The rest of the keyword counters of CR 122.1b (flying, lifelink, indestructible and hexproof are above).
+    FirstStrike = 34, "first strike", "FirstStrike";
+    DoubleStrike = 35, "double strike", "DoubleStrike";
+    Deathtouch = 36, "deathtouch", "Deathtouch";
+    Decayed = 37, "decayed", "Decayed";
+    Haste = 38, "haste", "Haste";
+    Menace = 39, "menace", "Menace";
+    Reach = 40, "reach", "Reach";
+    Shadow = 41, "shadow", "Shadow";
+    Trample = 42, "trample", "Trample";
+    Vigilance = 43, "vigilance", "Vigilance";
 }
 
 impl CounterKind {
-    /// The keyword counters (CR 122.1b).
-    pub const KEYWORDS: [CounterKind; 4] =
-        [CounterKind::Flying, CounterKind::Lifelink, CounterKind::Indestructible, CounterKind::Hexproof];
+    /// The keyword counters (CR 122.1b): "flying, first strike, double strike, deathtouch, decayed, exalted, haste, hexproof,
+    /// indestructible, lifelink, menace, reach, shadow, trample, and vigilance". Exalted is not here: it is a triggered
+    /// ability the core does not give (`triggers::EXALTED` is printed on the cards that have it), and no card in content puts
+    /// an exalted counter.
+    pub const KEYWORDS: [CounterKind; 14] = [
+        CounterKind::Flying,
+        CounterKind::FirstStrike,
+        CounterKind::DoubleStrike,
+        CounterKind::Deathtouch,
+        CounterKind::Decayed,
+        CounterKind::Haste,
+        CounterKind::Hexproof,
+        CounterKind::Indestructible,
+        CounterKind::Lifelink,
+        CounterKind::Menace,
+        CounterKind::Reach,
+        CounterKind::Shadow,
+        CounterKind::Trample,
+        CounterKind::Vigilance,
+    ];
 
     /// The keyword a keyword counter grants (CR 122.1b).
     pub fn keyword(self) -> Option<Keyword> {
         match self {
             CounterKind::Flying => Some(Keyword::Flying),
-            CounterKind::Lifelink => Some(Keyword::Lifelink),
-            CounterKind::Indestructible => Some(Keyword::Indestructible),
+            CounterKind::FirstStrike => Some(Keyword::FirstStrike),
+            CounterKind::DoubleStrike => Some(Keyword::DoubleStrike),
+            CounterKind::Deathtouch => Some(Keyword::Deathtouch),
+            CounterKind::Decayed => Some(Keyword::Decayed),
+            CounterKind::Haste => Some(Keyword::Haste),
             CounterKind::Hexproof => Some(Keyword::Hexproof),
+            CounterKind::Indestructible => Some(Keyword::Indestructible),
+            CounterKind::Lifelink => Some(Keyword::Lifelink),
+            CounterKind::Menace => Some(Keyword::Menace),
+            CounterKind::Reach => Some(Keyword::Reach),
+            CounterKind::Shadow => Some(Keyword::Shadow),
+            CounterKind::Trample => Some(Keyword::Trample),
+            CounterKind::Vigilance => Some(Keyword::Vigilance),
             _ => None,
         }
     }
+
+    /// The keyword counters as a bitset of `CounterKind` indices, for a quick "has it any" test.
+    pub const KEYWORD_MASK: u64 = {
+        let mut mask = 0u64;
+        let mut i = 0;
+        while i < Self::KEYWORDS.len() {
+            mask |= 1u64 << Self::KEYWORDS[i] as u8;
+            i += 1;
+        }
+        mask
+    };
 }
 
 /// The steps of a turn (CR 500), in order.

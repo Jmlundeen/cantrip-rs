@@ -1,0 +1,57 @@
+# A keyword counter gives its keyword in layer 6 at the timestamp of its counters (CR 122.1b, 613.1f, 613.7c), so an effect
+# that makes the permanent lose all abilities afterwards takes it: the counter stays, the keyword goes.
+# Arwen's ability puts a +1/+1 counter and a lifelink counter on Ornithopter and it gains indestructible until end of turn; then
+# Oko's +1 makes Ornithopter a 3/3 Elk that loses all abilities, the lifelink of the earlier counter and the earlier
+# indestructible with them. The +1/+1 counter still counts (layer 7c): a 4/4.
+# Bot1 turn 1 plays the artifacts; on turn 3, with the Ornithopter drawn: Black Lotus (GGG) and Mox Pearl pay Arwen {1}{G}{W} (a G left over), that G, Mox Sapphire and Mox Ruby pay
+# Oko {1}{G}{U}, and Mox Emerald pays Arwen's {1}.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Oko, Thief of Crowns
+Arwen, Mortal Queen
+Ornithopter
+Forest x12
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Arwen, Mortal Queen.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot1.Battlefield.Arwen, Mortal Queen.Activate(Ornithopter)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot1.Hand.Oko, Thief of Crowns.Cast
+? Bot1.Battlefield.Ornithopter.Keywords = Flying; Indestructible; Lifelink
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot1.Battlefield.Oko, Thief of Crowns.Activate(Ability: Elk; Ornithopter)
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Counters.Lifelink = 1
+Bot1.Battlefield.Ornithopter.Keywords = (absent)
+Bot1.Battlefield.Ornithopter.Power = 4
+Bot1.Battlefield.Ornithopter.Toughness = 4

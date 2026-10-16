@@ -7,6 +7,7 @@ use cantrip_state::*;
 use crate::ability::*;
 use crate::card::*;
 use crate::game::{Game, Query, Suspend};
+use crate::{Event, EventMask};
 
 fn draw_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.draw(item.controller, 1);
@@ -49,6 +50,32 @@ pub const SUSPEND_CAST: u8 = 11;
 /// The unlock special actions of a Room's locked doors (CR 709.5e): the rules give one for each locked door.
 pub const UNLOCK_LEFT: u8 = 12;
 pub const UNLOCK_RIGHT: u8 = 13;
+/// Decayed's triggered ability (CR 702.147a), which the layers give a creature that has decayed once layer 6 is done, and
+/// the delayed one it sets up.
+pub const DECAYED: u8 = 14;
+pub const DECAYED_SACRIFICE: u8 = 15;
+
+/// "When this creature attacks" (CR 508.3a).
+fn this_attacks(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::Attacks { attacker, .. } if *attacker == source => Fired::PLAIN,
+        _ => None,
+    }
+}
+
+/// "When this creature attacks, sacrifice it at end of combat" (CR 702.147a): "at end of combat" is at the beginning of the
+/// end of combat step (CR 511.2), the next one, which is this combat's.
+fn decayed_attacks(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let ability = AbilityRef { card: g.card_id(&INTRINSIC), index: DECAYED_SACRIFICE };
+    g.delayed_trigger(DelayedWhen::Step { step: Step::EndOfCombat, on_turn_of: None }, item.object, item.controller, ability, Target::None);
+    Ok(())
+}
+
+/// "Sacrifice it": the creature that attacked, if it is still that permanent (CR 400.7, 701.21a).
+fn decayed_sacrifice(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    g.sacrifice(&[item.object]);
+    Ok(())
+}
 
 /// "A player who controls a permanent that has one or more locked halves may pay the mana cost of a locked half of that
 /// permanent to give that permanent the appropriate unlocked designation" (CR 709.5e). The cost is the door's own, which
@@ -145,6 +172,8 @@ pub static INTRINSIC: CardDef = CardDef {
         inherent("Suspend: when the last time counter is removed from this card, if it's exiled, you may cast it without paying its mana cost.", suspend_cast),
         unlock("Unlock the left door by paying its mana cost.", unlock_left, left_is_locked),
         unlock("Unlock the right door by paying its mana cost.", unlock_right, right_is_locked),
+        triggered(when(EventMask::ATTACKS, this_attacks), decayed_attacks, "When this creature attacks, sacrifice it at end of combat."),
+        inherent("Decayed: sacrifice this creature at end of combat.", decayed_sacrifice),
     ],
     ..CardDef::BLANK
 };

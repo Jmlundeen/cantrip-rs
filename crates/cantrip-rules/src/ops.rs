@@ -1775,6 +1775,11 @@ pub fn add_counters(cx: &mut Cx, id: ObjectId, kind: CounterKind, amount: i16) {
     // The counters that were put are announced (CR 121.1, 122.6a), for a Saga's chapters (CR 714.2b) and for "whenever counters
     // are put on this", as many as the replacements left, with the player who put them.
     let put = counts[kind as usize];
+    // CR 613.7c: a counter gets a timestamp as it is put on, and every counter of its kind already there gets the same one;
+    // the ability a keyword counter gives applies in layer 6 at it (CR 613.1f, 122.1b).
+    if put > 0 && CounterKind::KEYWORD_MASK & (1 << kind as u8) != 0 && cx.s().obj(id).zone.is(ZoneKind::Battlefield) {
+        cx.st().stamp_counters(id, kind);
+    }
     if put > 0 {
         let by = cx.actor();
         let total = cx.s().obj(id).counters(kind);

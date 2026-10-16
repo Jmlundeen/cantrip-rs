@@ -134,14 +134,23 @@ pub fn chars_before(cards: &CardTable, state: &GameState, id: ObjectId, stop: La
         if stop > Layer::Ability && chars.is(CardType::Battle) {
             intrinsic_siege(cards, &mut chars);
         }
+        if stop > Layer::Ability {
+            intrinsic_keyword_abilities(cards, &mut chars);
+        }
         return chars;
     }
     let mut chars = start();
     let colors = obj.copy.and_then(|c| c.colors);
     let pt = obj.copy.and_then(|c| c.pt);
     // The continuous effects on it, oldest first.
-    let fx: Vec<ContinuousEffect> =
+    let mut fx: Vec<ContinuousEffect> =
         if has_effects { state.effects.iter().filter(|e| e.affected == id).copied().collect() } else { Vec::new() };
+    // CR 122.1b, 613.1f, 613.7c: the ability a keyword counter gives applies in layer 6 at the timestamp of its counters, in
+    // timestamp order with the effects there, so "loses all abilities" takes it from counters put on before it and not
+    // from those put on after.
+    if has_counters {
+        keyword_counters(state, id, obj, &mut fx);
+    }
     // The static abilities effects have granted it that it still has once layer 6 is done, each with its timestamp.
     let mut granted: Vec<(u32, &'static StaticDef)> = Vec::new();
     for layer in LAYERS {
@@ -159,10 +168,8 @@ pub fn chars_before(cards: &CardTable, state: &GameState, id: ObjectId, stop: La
         if layer == Layer::Ability && chars.is(CardType::Battle) {
             intrinsic_siege(cards, &mut chars);
         }
-        // Keyword counters first: they have been on the object since before any effect that took its abilities away, and a
-        // "loses hexproof" effect has to reach the hexproof a counter gives (CR 613.1f, 122.1b).
-        if has_counters {
-            counters(obj, layer, &mut chars);
+        if has_counters && layer == Layer::PtModify {
+            counters(obj, &mut chars);
         }
         if has_hone && layer == Layer::PtModify {
             hone(cards, state, id, honed, &mut chars);
@@ -175,8 +182,46 @@ pub fn chars_before(cards: &CardTable, state: &GameState, id: ObjectId, stop: La
                 apply_effect(e, layer, &mut chars);
             }
         }
+        if layer == Layer::Ability {
+            intrinsic_keyword_abilities(cards, &mut chars);
+        }
     }
     chars
+}
+
+/// Each kind of keyword counter on the object (CR 122.1b) as the layer-6 effect it is, "gains [keyword]", at the timestamp
+/// of its counters (CR 613.7c), put among the effects in timestamp order.
+fn keyword_counters(state: &GameState, id: ObjectId, obj: &Obj, fx: &mut Vec<ContinuousEffect>) {
+    for kind in CounterKind::KEYWORDS {
+        if obj.counters(kind) > 0
+            && let Some(k) = kind.keyword()
+        {
+            let timestamp = state.counter_stamp(id, kind);
+            let at = fx.partition_point(|e| e.timestamp <= timestamp);
+            fx.insert(
+                at,
+                ContinuousEffect {
+                    source: id,
+                    controller: obj.controller,
+                    timestamp,
+                    affected: id,
+                    kind: EffectKind::AddKeywords(Keywords::of(&[k])),
+                    duration: Duration::Indefinite,
+                },
+            );
+        }
+    }
+}
+
+/// The abilities the rules give an object for a keyword it has once layer 6 is done (CR 702.147a): decayed's triggered
+/// ability, whether the keyword is printed, granted or a counter's. Its static half ("this creature can't block") is read
+/// off the keyword by the blocking rule.
+fn intrinsic_keyword_abilities(cards: &CardTable, chars: &mut Chars) {
+    if chars.keywords.has(Keyword::Decayed)
+        && let Some(slot) = chars.abilities.iter().position(|a| a.is_none())
+    {
+        chars.abilities[slot] = Some(AbilityRef { card: cards.intrinsic, index: cantrip_api::intrinsic::DECAYED });
+    }
 }
 
 /// The static abilities effects have given the object (CR 613.1f) that it has once layer 6 is done, oldest first, each with the
@@ -402,6 +447,7 @@ fn printed(cards: &CardTable, card: CardId, rules: bool) -> &Chars {
             if chars.is(CardType::Battle) {
                 intrinsic_siege(cards, &mut chars);
             }
+            intrinsic_keyword_abilities(cards, &mut chars);
         }
         Box::new(chars)
     })
@@ -567,26 +613,12 @@ fn apply_effect(effect: &ContinuousEffect, layer: Layer, chars: &mut Chars) {
     }
 }
 
-/// Counters' effects: keyword counters in layer 6 (CR 613.1f, 122.1b), +1/+1 and -1/-1 in 7c (CR 613.4c).
-fn counters(obj: &Obj, layer: Layer, chars: &mut Chars) {
-    match layer {
-        Layer::Ability => {
-            for kind in CounterKind::KEYWORDS {
-                if obj.counters(kind) > 0
-                    && let Some(k) = kind.keyword()
-                {
-                    chars.keywords = chars.keywords.with(k);
-                }
-            }
-        }
-        Layer::PtModify => {
-            let plus = obj.counters(CounterKind::PlusOne) - obj.counters(CounterKind::MinusOne);
-            if plus != 0 {
-                chars.power = chars.power.map(|v| v + plus);
-                chars.toughness = chars.toughness.map(|v| v + plus);
-            }
-        }
-        _ => {}
+/// +1/+1 and -1/-1 counters, in layer 7c (CR 613.4c). Keyword counters are layer 6's, among its effects (`keyword_counters`).
+fn counters(obj: &Obj, chars: &mut Chars) {
+    let plus = obj.counters(CounterKind::PlusOne) - obj.counters(CounterKind::MinusOne);
+    if plus != 0 {
+        chars.power = chars.power.map(|v| v + plus);
+        chars.toughness = chars.toughness.map(|v| v + plus);
     }
 }
 

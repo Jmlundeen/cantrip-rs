@@ -358,7 +358,8 @@ shapes have an example:
   "When the Nth [kind] counter is put on this" (the Plans, Shang-Chi and the Ten Rings) is
   `when_asked(EventMask::COUNTERS, triggers::nth_counter_put_on_this::<{ CounterKind::Plan as u8 }, 4>)`. A new kind of counter
   is one line in `counter_kinds!` (`cantrip-state/src/vocab.rs`); the host and the client name it from there. A kind the
-  rules give an effect is the core's: keyword counters (CR 122.1b), and hone counters (CR 122.1j), whose +1/+0 the layers
+  rules give an effect is the core's: keyword counters (CR 122.1b: every one but exalted, each kind's keyword given in layer 6
+  at the timestamp of its counters, CR 613.7c, so a card only puts them), and hone counters (CR 122.1j), whose +1/+0 the layers
   give the creature an Equipment with them is attached to (7c), so a card only puts them (Dwalin, Weaponmaster; Sting,
   Bilbo's Sword).
   **Costs**: `Cost.unattach_self`.

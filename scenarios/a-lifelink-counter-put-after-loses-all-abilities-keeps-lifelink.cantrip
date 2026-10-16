@@ -1,6 +1,5 @@
-# Known bug: keyword counters are applied before every effect in layer 6 (layers.rs), so "loses all abilities" wipes a
-# lifelink counter put on the permanent afterwards. Each counter has its own timestamp (CR 613.7c) and layer 6 applies in
-# timestamp order (CR 613.7), so a counter put on after the effect gives its keyword (the Abigale, Eloquent First-Year
+# A keyword counter on a permanent gives it the keyword in layer 6 at the timestamp of its counters (CR 122.1b, 613.1f, 613.7c),
+# so "loses all abilities" does not take the lifelink of a counter put on afterwards (the Abigale, Eloquent First-Year
 # ruling: "If the affected creature gains an ability after Abigale's last ability resolves, it will keep that ability").
 # Oko's +1 turns Bot1's Mox Ruby into a 3/3 Elk creature that loses all abilities; afterwards Arwen's ability puts a +1/+1
 # counter and a lifelink counter on it and it gains indestructible until end of turn (a later effect, so it also stays).

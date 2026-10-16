@@ -509,13 +509,13 @@ fn declare_attackers(cx: &mut Cx) -> R<()> {
     Ok(())
 }
 
-/// Whether `blocker` may block `attacker` (CR 509.1b): a creature that can't block, one that can block only creatures
-/// with flying, flying (CR 702.9b), shadow (CR 702.28b), protection (CR 702.16f). Menace (CR 702.110b) is about the
+/// Whether `blocker` may block `attacker` (CR 509.1b): a creature that can't block (decayed's too, CR 702.147a), one that
+/// can block only creatures with flying, flying (CR 702.9b), shadow (CR 702.28b), protection (CR 702.16f). Menace (CR 702.110b) is about the
 /// whole declaration, not a pair.
 fn can_block(cx: &Cx, blocker: ObjectId, attacker: ObjectId, rule_sources: &[ObjectId]) -> bool {
     let a = cx.chars(attacker);
     let b = cx.chars(blocker);
-    if a.has(Keyword::CantBeBlocked) || b.has(Keyword::CantBlock) || (b.has(Keyword::CanBlockOnlyCreaturesWithFlying) && !a.has(Keyword::Flying)) {
+    if a.has(Keyword::CantBeBlocked) || b.has(Keyword::CantBlock) || b.has(Keyword::Decayed) || (b.has(Keyword::CanBlockOnlyCreaturesWithFlying) && !a.has(Keyword::Flying)) {
         return false;
     }
     if a.has(Keyword::Flying) && !b.has(Keyword::Flying) && !b.has(Keyword::Reach) {

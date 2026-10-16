@@ -517,6 +517,26 @@ longer suspected"): no card in content says so.
 
 "You may look at the top card of your library any time" (CR 401.2) is `PlayRule::LookAtLibraryTop` (Bolas's Citadel, Mystic
 Forge, a solved Case of the Locked Hothouse): the host shows that card to its player (`Game::may_look_at_library_top`).
+### Keyword counters
+
+A keyword counter gives its permanent the keyword it is named for (CR 122.1b): flying, first strike, double strike,
+deathtouch, decayed, haste, hexproof, indestructible, lifelink, menace, reach, shadow, trample and vigilance
+(`CounterKind::KEYWORDS`). The ability is a layer-6 effect (CR 613.1f) with the timestamp of its counters: each counter
+gets one as it is put on, and every counter of its kind already there gets the same (CR 613.7c). `ops::add_counters`
+stamps the kind (`GameState::counter_stamps`, written only when a keyword counter is put on a permanent, and empty in
+nearly every game); a kind the permanent entered with has the permanent's own timestamp. `layers::keyword_counters` puts
+each kind the object has among its layer-6 effects as "gains [keyword]" at that timestamp, so "loses all abilities" takes
+the keyword of a counter put on before it and not of one put on after (Abigale, Eloquent First-Year's ruling), and a
+second counter of the kind put on after the loss gives the keyword back to them all. Counters of one kind give the
+keyword once. Decayed (CR 702.147a) is a core keyword for this reason: the blocking rule reads its "can't block", and
+the layers give an object that has decayed once layer 6 is done the rules' triggered ability (`intrinsic::DECAYED`:
+"when this creature attacks, sacrifice it at end of combat", a delayed trigger at the next end of combat step), whether
+the keyword is printed, granted or a counter's. Not built, because no card in content needs them: exalted counters
+(exalted is a triggered ability each card prints, `triggers::EXALTED`), counters of a keyword's variants ("hexproof from
+white", CR 122.1b), and keyword counters on a card in a zone other than the battlefield. Adding ten counter kinds made
+every object 20 bytes larger (the dense counter array); the benchmark measured 6.12-6.56 us per decision before and
+6.28-7.12 us after, alternating the two builds on a busy machine (2026-10-16), and as much with the layer-6 work turned
+off, so the cost is the larger row.
 
 ### Legal moves as a first-class output
 

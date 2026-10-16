@@ -85,6 +85,7 @@ fn keyword_name(k: u8) -> &'static str {
         27 => "Nightbound",
         28 => "SplitSecond",
         32 => "Changeling",
+        33 => "Decayed",
         _ => "?",
     }
 }

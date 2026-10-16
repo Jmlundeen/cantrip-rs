@@ -16,6 +16,10 @@ pub struct GameState {
     /// Restricted mana in the players' pools (CR 106.6), in the order each player's restrictions first came; an entry
     /// whose mana is all spent is gone. Empty in nearly every position.
     pub restricted_mana: Vec<RestrictedMana>,
+    /// The timestamp of each kind of keyword counter on a permanent that has had one put on it since it entered (CR 613.7c):
+    /// that of the latest counter of the kind, which every counter of the kind shares. A kind with no entry is as old as the
+    /// permanent (it entered with them). Empty in nearly every game; rows of objects that have left are dropped as it is written.
+    pub counter_stamps: Vec<CounterStamp>,
     pub objects: Vec<Obj>,
     /// Ordered object lists, one per zone slot (`Zone::slot`). Libraries are top first; the others in the order
     /// objects arrived.
@@ -61,6 +65,14 @@ pub struct GameState {
     pub static_sources: std::cell::RefCell<StaticSources>,
 }
 
+/// When the keyword counters of one kind on a permanent were put on it (CR 613.7c), for layer 6's timestamp order.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub struct CounterStamp {
+    pub object: ObjectId,
+    pub kind: CounterKind,
+    pub timestamp: u32,
+}
+
 /// The layers' list of static-ability sources, made for one epoch of the state it sits in.
 #[derive(Clone, Debug)]
 pub struct StaticSources {
@@ -75,7 +87,7 @@ impl GameState {
     fn position(
         &self,
     ) -> (
-        (&Vec<Player>, &Vec<RestrictedMana>),
+        (&Vec<Player>, &Vec<RestrictedMana>, &Vec<CounterStamp>),
         &Vec<Obj>,
         &Vec<Vec<ObjectId>>,
         &Vec<StackItem>,
@@ -87,7 +99,7 @@ impl GameState {
         (&Rng, u32, &Outcome, bool, &Vec<ObjectId>, &Vec<StackItem>),
     ) {
         (
-            (&self.players, &self.restricted_mana),
+            (&self.players, &self.restricted_mana, &self.counter_stamps),
             &self.objects,
             &self.zones,
             &self.stack,
@@ -163,6 +175,7 @@ pub enum Undo {
     ObjectPopped(Box<Obj>),
     Player(PlayerId, Player),
     RestrictedManaSet(Vec<RestrictedMana>),
+    CounterStampsSet(Vec<CounterStamp>),
     Turn(Turn),
     ZoneInserted { slot: u16, at: u16 },
     ZoneRemoved { slot: u16, at: u16, id: ObjectId },
@@ -212,6 +225,7 @@ impl GameState {
         GameState {
             players: vec![Player { life: 20, starting_life: 20, ..Player::default() }; players],
             restricted_mana: Vec::new(),
+            counter_stamps: Vec::new(),
             objects: Vec::with_capacity(128),
             zones: vec![Vec::new(); Zone::slots(players)],
             stack: Vec::new(),
@@ -591,6 +605,26 @@ impl GameState {
         self.log(Undo::BlocksSet(old));
     }
 
+    /// The timestamp keyword counters of `kind` on `object` have (CR 613.7c): that of the latest one put on it, or the
+    /// object's own for those it entered with.
+    pub fn counter_stamp(&self, object: ObjectId, kind: CounterKind) -> u32 {
+        self.counter_stamps
+            .iter()
+            .find(|s| s.object == object && s.kind == kind)
+            .map_or(self.obj(object).timestamp, |s| s.timestamp)
+    }
+
+    /// Gives the keyword counters of `kind` on `object` a new timestamp, as one more is put on it (CR 613.7c). The rows of
+    /// objects that have since left their zone (CR 400.7) go as it is written.
+    pub fn stamp_counters(&mut self, object: ObjectId, kind: CounterKind) {
+        let timestamp = self.timestamp();
+        let old = self.counter_stamps.clone();
+        let objects = &self.objects;
+        self.counter_stamps.retain(|s| objects[s.object.index()].became.is_none() && !(s.object == object && s.kind == kind));
+        self.counter_stamps.push(CounterStamp { object, kind, timestamp });
+        self.log(Undo::CounterStampsSet(old));
+    }
+
     pub fn see_statics(&mut self) {
         if !self.statics_seen {
             self.statics_seen = true;
@@ -745,6 +779,7 @@ impl GameState {
             Undo::Player(p, old) => self.players[p.index()] = old,
             Undo::Turn(old) => self.turn = old,
             Undo::RestrictedManaSet(old) => self.restricted_mana = old,
+            Undo::CounterStampsSet(old) => self.counter_stamps = old,
             Undo::ZoneInserted { slot, at } => {
                 self.zones[slot as usize].remove(at as usize);
             }
@@ -838,6 +873,7 @@ impl GameState {
             Undo::Player(p, _) => Undo::Player(*p, self.players[p.index()]),
             Undo::Turn(_) => Undo::Turn(self.turn),
             Undo::RestrictedManaSet(_) => Undo::RestrictedManaSet(self.restricted_mana.clone()),
+            Undo::CounterStampsSet(_) => Undo::CounterStampsSet(self.counter_stamps.clone()),
             Undo::ZoneInserted { slot, at } => {
                 Undo::ZoneRemoved { slot: *slot, at: *at, id: self.zones[*slot as usize][*at as usize] }
             }
