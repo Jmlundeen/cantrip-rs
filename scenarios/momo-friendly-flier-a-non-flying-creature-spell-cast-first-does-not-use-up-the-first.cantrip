@@ -1,0 +1,44 @@
+# Only creature spells with flying count: Cathar Commando ({1}{W}, no flying) is cast first and paid in full (Plains and Mox Jet, nothing
+# floating); Faerie Mastermind is still the first flying creature spell and Mox Sapphire alone pays it.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Momo, Friendly Flier
+Cathar Commando
+Faerie Mastermind
+Plains x14
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Momo, Friendly Flier.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cathar Commando.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Faerie Mastermind.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Cathar Commando.Types = Creature
+Bot1.Battlefield.Faerie Mastermind.Types = Creature
+Bot1.Battlefield.Momo, Friendly Flier.Power = 2

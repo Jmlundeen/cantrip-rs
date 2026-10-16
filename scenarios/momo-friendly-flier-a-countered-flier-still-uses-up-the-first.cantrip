@@ -1,0 +1,56 @@
+# The first Faerie Mastermind is cast for {U} (Mox Sapphire) and countered by Bot2's Counterspell, so it is in the graveyard when the second is cast:
+# the first still used up "the first", so the second pays in full, Island and Mox Jet for {U}{B}, and nothing floats.
+
+[Bot1 Deck]
+Island
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Momo, Friendly Flier
+Faerie Mastermind
+Faerie Mastermind
+Island x13
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Island x17
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Momo, Friendly Flier.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Faerie Mastermind.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Faerie Mastermind)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Faerie Mastermind
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Faerie Mastermind.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Faerie Mastermind
+Bot1.Battlefield.Faerie Mastermind.Types = Creature
+Bot2.Graveyard = Counterspell

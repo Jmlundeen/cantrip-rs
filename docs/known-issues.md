@@ -39,6 +39,7 @@ keeps it).
 | [KI-2](#ki-2-a-harmonize-cost-reduction-cannot-be-checked-in-the-browser) | A harmonize cost reduction cannot be checked in the browser | Low | Open |
 | [KI-3](#ki-3-engine-paths-no-scenario-runs) | Engine paths no scenario runs | Low | Unexercised |
 | [KI-4](#ki-4-scenarios-waiting-on-cards) | Scenarios waiting on cards the engine does not have | Low | Open |
+| [KI-5](#ki-5-a-spell-that-has-left-the-stack-is-judged-by-its-printed-keywords) | A spell that has left the stack is judged by its printed characteristics | Low | Suspected |
 
 ## Issues
 
@@ -109,3 +110,20 @@ Traveler, Innocent Blood, Planar Void.
 - [`scenarios/quest-for-ancient-secrets-sees-a-spell-that-paused-for-its-opponents-choice-land-in-the-graveyard.cantrip`](../scenarios/quest-for-ancient-secrets-sees-a-spell-that-paused-for-its-opponents-choice-land-in-the-graveyard.cantrip)
 - [`scenarios/quest-for-ancient-secrets-counts-both-an-innocent-blood-sacrifice-and-the-spell-itself.cantrip`](../scenarios/quest-for-ancient-secrets-counts-both-an-innocent-blood-sacrifice-and-the-spell-itself.cantrip)
 - [`scenarios/dying-pest-tokens-hand-over-their-trigger-order.cantrip`](../scenarios/dying-pest-tokens-hand-over-their-trigger-order.cantrip)
+
+### KI-5: A spell that has left the stack is judged by its printed keywords
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Suspected | engine | 2026-10-16, review of Momo, Friendly Flier |
+
+**Notes.** `layers::chars_before` computes `spell` from the object's zone being the stack, and applies continuous effects only to
+a spell or a permanent on the battlefield. An earlier cast, read through `q.chars(c.spell)` after the spell resolved, was countered or
+left the stack (its old object is a card row in another zone or `Gone`), therefore has its printed characteristics, not the ones it
+had as it was cast (CR 601.2i, 400.7). Momo, Friendly Flier asks "was an earlier spell this turn a non-Lemur creature spell with
+flying" this way: a creature spell given flying (or stripped of it) while it was on the stack is misjudged afterwards. The history's
+`Cast` record keeps types, colors and mana value but not subtypes or keywords; recording them there, or keeping last-known
+information for a spell that leaves the stack, fixes it. No implemented card grants or removes a keyword on a spell on the stack, so
+no scenario can reach it yet.
+
+**Scenarios.** None yet; the first card that gives a creature spell flying on the stack (then a second flier cast under Momo) reaches it.
