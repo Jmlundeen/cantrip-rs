@@ -1,0 +1,58 @@
+# Pyrrhic Strike with its blight paid targets Bot2's Lotus Petal (first mode) and Hero of Bladehold (second mode). In
+# response Bot2 sacrifices Lotus Petal for {W} and with it exiles Hero of Bladehold with Swords to Plowshares: every
+# target is illegal as the spell would resolve, so it doesn't resolve and does nothing (CR 608.2b), and goes to the
+# graveyard. The blight was a cost, paid as it was cast: Endurance keeps its two -1/-1 counters.
+
+[Bot1 Deck]
+Mox Pearl
+Sol Ring
+Black Lotus
+Endurance
+Pyrrhic Strike
+Plains x2
+Plains x20
+
+[Bot2 Deck]
+Mox Pearl
+Black Lotus
+Lotus Petal
+Hero of Bladehold
+Swords to Plowshares
+Island x2
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Endurance.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Lotus Petal.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Hero of Bladehold.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Pyrrhic Strike.Cast
+Bot1.Modes(Blight 2)
+Bot1.Modes(1; 2)
+Bot1.Target(Lotus Petal)
+Bot1.Target(Hero of Bladehold)
+Bot1.Choose(Endurance)
+Bot2.Battlefield.Lotus Petal.Activate(Color: White)
+Bot2.Hand.Swords to Plowshares.Cast(Hero of Bladehold)
+Bot2.Pass
+? Stack = Swords to Plowshares; Pyrrhic Strike
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Endurance.Counters.MinusOneMinusOne = 2
+Bot1.Graveyard = Pyrrhic Strike; Black Lotus
+Bot2.Life = 23
+Exile = Hero of Bladehold
+Bot2.Graveyard = Swords to Plowshares; Lotus Petal; Black Lotus
+Bot2.Battlefield = Mox Pearl

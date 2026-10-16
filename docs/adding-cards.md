@@ -260,8 +260,8 @@ shapes have an example:
   a permanent enters is `Entering.chosen_card`, kept in `Obj.marks.chosen_card`.
 - **Modal abilities** are `.modal(..)`. A modal spell whose number of modes is decided by its optional additional cost
   or its kicker ("If this spell's additional cost was paid, choose both instead", Pyrrhic Strike) says so with
-  `ModalDef::when_paid(min, max)`: the core then announces the cost before the modes (CR 601.2b) and offers paying only
-  when that many modes could be chosen (CR 700.2a). **Playing from the top of a library for life** is
+  `ModalDef::when_paid(min, max)`: the core then announces the cost before the modes (CR 601.2b) and offers paying an
+  optional additional cost only when that many modes could be chosen (CR 700.2a); a kicker is not gated yet. **Playing from the top of a library for life** is
   `PlayRule::LibraryTop` (Bolas's Citadel).
 
 ## Rules bricks added with the second wave of cards

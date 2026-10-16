@@ -854,9 +854,11 @@ pub struct ModalDef {
     pub allowed: Option<fn(&dyn Query, &Asker, u8) -> bool>,
     /// How many modes a spell chooses, `(min, max)`, instead of `min` to `max` when its optional additional cost is paid or it
     /// is kicked: "Choose one. If this spell's additional cost was paid, choose both instead" (Pyrrhic Strike), "If this
-    /// spell was kicked, choose any number instead" (Inscription of Abundance, Insight and Ruin). The intention to pay is
-    /// announced in the same step as the modes (CR 601.2b), and the number of modes is defined by it, so the cost is
-    /// announced first and the modes after it; paying is offered only when that many modes could be chosen (CR 700.2a).
+    /// spell was kicked, choose any number instead" (Inscription of Abundance, Inscription of Insight, Inscription of Ruin).
+    /// The intention to pay is announced in the same step as the modes (CR 601.2b), and the number of modes is defined by
+    /// it, so the cost is announced first and the modes after it. An optional additional cost (`CardDef::optional_cost`) is
+    /// offered only when that many modes could be chosen (CR 700.2a). Only that cost is gated: a kicker is not yet (no card
+    /// in content is a kicked modal spell), and gating it is owed with the first one.
     /// A spell's own: a modal triggered ability (Depth Defiler's) does not read it.
     pub when_paid: Option<(u8, u8)>,
 }

@@ -710,7 +710,7 @@ public sealed partial class MainPage
     {
         string source = client.Object(prompt.Source)?.Name ?? "A spell";
         // Every one of two modes is "both", in the card's words: "If this spell's additional cost was paid, choose both instead".
-        string count = prompt.Count == 2 && prompt.Modes.Count == 2 ? "both" : Spelled(prompt.Count);
+        string count = prompt.Count == 2 && prompt.Modes.Count == 2 && !prompt.MayRepeat ? "both" : Spelled(prompt.Count);
         bool range = prompt.Most > prompt.Count;
         bool oneClick = prompt.Count == 1 && !range;
         bool searched = prompt.Modes.Count > LongOptionList;

@@ -1,0 +1,58 @@
+# Pyrrhic Strike with its blight paid targets Bot2's Mox Pearl (first mode) and Hero of Bladehold (second mode). In
+# response Bot2 exiles its own Hero of Bladehold with Swords to Plowshares (paid with Lotus Petal), so the second mode's
+# target is illegal as the spell resolves; the spell still resolves, the first mode destroys Mox Pearl and the second does
+# nothing (CR 608.2b).
+
+[Bot1 Deck]
+Mox Pearl
+Sol Ring
+Black Lotus
+Endurance
+Pyrrhic Strike
+Plains x2
+Plains x20
+
+[Bot2 Deck]
+Mox Pearl
+Black Lotus
+Lotus Petal
+Hero of Bladehold
+Swords to Plowshares
+Island x2
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Endurance.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Lotus Petal.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Hero of Bladehold.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Pyrrhic Strike.Cast
+Bot1.Modes(Blight 2)
+Bot1.Modes(1; 2)
+Bot1.Target(Bot2.Battlefield.Mox Pearl)
+Bot1.Target(Hero of Bladehold)
+Bot1.Choose(Endurance)
+Bot2.Battlefield.Lotus Petal.Activate(Color: White)
+Bot2.Hand.Swords to Plowshares.Cast(Hero of Bladehold)
+Bot2.Pass
+? Stack = Swords to Plowshares; Pyrrhic Strike
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Endurance.Counters.MinusOneMinusOne = 2
+Bot1.Graveyard = Pyrrhic Strike; Black Lotus
+Bot2.Life = 23
+Exile = Hero of Bladehold
+Bot2.Graveyard = Mox Pearl; Swords to Plowshares; Lotus Petal; Black Lotus
+Bot2.Battlefield.Count = 0

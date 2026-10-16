@@ -1,0 +1,43 @@
+# Paying Pyrrhic Strike's blight means choosing both modes (CR 700.2a), so with no artifact or enchantment on the
+# battlefield (both Black Lotuses were sacrificed for mana) the blight is not on offer, though Bot2's Endurance (mana value
+# 3) is there for the second mode and Bot1 controls Stoneforge Mystic to blight. Cast without it, the one mode destroys
+# Endurance. (pyrrhic-strike-cannot-blight-when-one-mode-has-no-target is the same with the other mode's target missing.)
+
+[Bot1 Deck]
+Plains
+Stoneforge Mystic
+Black Lotus
+Pyrrhic Strike
+Plains x3
+Plains x20
+
+[Bot2 Deck]
+Black Lotus
+Endurance
+Island x5
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Endurance.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Stoneforge Mystic.Cast
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Pyrrhic Strike.Cast
+! Bot1.Modes(Blight 2)
+Bot1.Modes(Cast without blighting)
+Bot1.Modes(Destroy target creature)
+Bot1.Target(Endurance)
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Plains; Plains; Stoneforge Mystic
+Bot1.Battlefield.Stoneforge Mystic.Counters.MinusOneMinusOne = (absent)
+Bot2.Graveyard = Endurance; Black Lotus
