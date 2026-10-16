@@ -1,0 +1,37 @@
+# Cease costs {1}{B/G}: Mox Emerald's green pays the hybrid symbol (and Mox Ruby the generic one). Both graveyards are empty on
+# turn 1, so there is no card to exile - "up to two" is none - and the spell is still cast: its player target alone makes it
+# castable. Bot1 gains 2 life (20 to 22) and draws a card, with nothing exiled.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Cease // Desist
+Forest
+Forest
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Cease // Desist.Cast(Ability: Cease)
+Bot1.Target(Bot1)
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Exile.Count = 0
+Bot1.Life = 22
+Bot2.Life = 20
+Bot1.Graveyard = Cease // Desist
+Bot1.Hand = Forest; Forest; Forest; Forest; Forest
+Bot1.Battlefield = Mox Ruby; Mox Emerald
+Stack.Count = 0
+

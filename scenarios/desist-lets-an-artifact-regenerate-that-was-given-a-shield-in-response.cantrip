@@ -1,0 +1,44 @@
+# Desist: "Destroy all artifacts and enchantments." Destroying can be regenerated (CR 701.19): with Desist on the stack Bot1
+# sacrifices Welding Jar to give its untapped Mox Jet a regeneration shield. Desist destroys every other artifact - the Moxen
+# and Black Lotus spent on it, which are gone for good - but Mox Jet is not destroyed: it is tapped instead (CR 701.19c), and
+# it stays tapped though it was untapped when Desist was cast. Welding Jar went to the graveyard as a cost.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Emerald
+Mox Ruby
+Mox Jet
+Black Lotus
+Cease // Desist
+Welding Jar
+Forest
+Forest x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Welding Jar.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Cease // Desist.Cast(Ability: Desist)
+Bot1.Battlefield.Welding Jar.Activate(Bot1.Battlefield.Mox Jet)
+? Stack.Count = 2
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Forest; Mox Jet
+Bot1.Battlefield.Mox Jet.Tapped = true
+Bot1.Graveyard.Count = 6
+Stack.Count = 0

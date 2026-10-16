@@ -1,0 +1,62 @@
+# Cease: "Exile up to two target cards from a single graveyard." "Up to two" allows one. Bot1's graveyard holds two Lightning
+# Bolts (cast on turns 1 and 3), Bot2's holds two (turns 2 and 4). Bot1 chooses one of its own as the first card; for the second
+# card Bot2's Bolt is refused (another graveyard) and Bot1's other Bolt is on offer, which Bot1 declines: exactly one card is
+# exiled, the other three Bolts stay where they are. Bot1 is the player: 20 - 3 - 3 = 14, +2 = 16, and draws.
+
+[Bot1 Deck]
+Swamp
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Cease // Desist
+Mountain
+Swamp
+Forest x13
+
+[Bot2 Deck]
+Mountain
+Mountain
+Lightning Bolt
+Lightning Bolt
+Mountain x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Cease // Desist.Cast(Ability: Cease)
+Bot1.Target(Bot1.Graveyard.Lightning Bolt#1)
+! Bot1.Target(Bot2.Graveyard.Lightning Bolt#1)
+! Bot1.Target(Bot2.Graveyard.Lightning Bolt#2)
+Bot1.Target()
+Bot1.Target(Bot1)
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Exile = Lightning Bolt
+Exile.Count = 1
+Bot1.Graveyard = Cease // Desist; Lightning Bolt
+Bot2.Graveyard = Lightning Bolt; Lightning Bolt
+Bot1.Life = 16
+Bot2.Life = 14
+Bot1.Hand.Count = 3
+Stack.Count = 0

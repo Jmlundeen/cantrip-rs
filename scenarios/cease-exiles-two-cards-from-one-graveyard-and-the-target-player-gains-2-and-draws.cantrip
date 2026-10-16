@@ -1,0 +1,58 @@
+# Cease // Desist, cast as Cease: "Exile up to two target cards from a single graveyard. Target player gains 2 life and
+# draws a card." Bot2's graveyard holds two Lightning Bolts (it Bolted Bot1 on turns 2 and 4), Bot1's holds the one it Bolted
+# Bot2 with on turn 3. On turn 5 Bot1 casts Cease on Bot2's two Bolts, naming itself as the player: both Bolts leave Bot2's
+# graveyard for exile, Bot1's own Bolt is untouched, and Bot1 gains 2 life (14 after two Bolts, so 16) and draws one card.
+# The cast half is a card of its own in the graveyard (CR 709.4), not a half.
+
+[Bot1 Deck]
+Swamp
+Mountain
+Swamp
+Lightning Bolt
+Cease // Desist
+Forest
+Forest
+Forest x13
+
+[Bot2 Deck]
+Mountain
+Mountain
+Lightning Bolt
+Lightning Bolt
+Mountain x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Cease // Desist.Cast(Ability: Cease)
+Bot1.Target(Bot2.Graveyard.Lightning Bolt#1)
+Bot1.Target(Bot2.Graveyard.Lightning Bolt#2)
+Bot1.Target(Bot1)
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Life = 16
+Bot2.Life = 17
+Bot2.Graveyard.Count = 0
+Exile = Lightning Bolt; Lightning Bolt
+Exile.Count = 2
+Bot1.Graveyard = Cease // Desist; Lightning Bolt
+Bot1.Hand = Forest; Forest; Forest; Forest; Forest
+Stack.Count = 0

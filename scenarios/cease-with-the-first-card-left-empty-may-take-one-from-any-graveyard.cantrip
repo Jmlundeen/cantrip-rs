@@ -1,0 +1,58 @@
+# Cease: "Exile up to two target cards from a single graveyard." Choosing no first card and a Lightning Bolt of Bot2's graveyard
+# as the second is the same as choosing that one card: "up to two" lets Bot1 choose any one card from any graveyard, however the
+# slots are filled. Bot1's own Bolt and Bot2's other Bolt stay. The player is Bot2, the opponent: "target player gains 2 life and
+# draws a card" is not limited to the caster (17 to 19, one card drawn).
+
+[Bot1 Deck]
+Swamp
+Mountain
+Swamp
+Lightning Bolt
+Cease // Desist
+Forest
+Forest
+Forest x13
+
+[Bot2 Deck]
+Mountain
+Mountain
+Lightning Bolt
+Lightning Bolt
+Mountain x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Cease // Desist.Cast(Ability: Cease)
+Bot1.Target()
+Bot1.Target(Bot2.Graveyard.Lightning Bolt#1)
+Bot1.Target(Bot2)
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Exile = Lightning Bolt
+Exile.Count = 1
+Bot2.Graveyard = Lightning Bolt
+Bot1.Graveyard = Cease // Desist; Lightning Bolt
+Bot2.Life = 19
+Bot2.Hand.Count = 6
+Bot1.Life = 14
+Bot1.Hand.Count = 4
+Stack.Count = 0

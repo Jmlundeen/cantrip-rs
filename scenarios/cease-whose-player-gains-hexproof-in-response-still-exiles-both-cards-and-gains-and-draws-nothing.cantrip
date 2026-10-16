@@ -1,0 +1,64 @@
+# Cease: "Target player gains 2 life and draws a card." Bot1 casts Cease on Bot2's two Lightning Bolts, naming Bot2 as the
+# player. In response Bot2 casts Dawn's Truce, which gives Bot2 hexproof until end of turn (the gift is not promised), so Bot2 is
+# no longer a legal target of a spell Bot1 controls (CR 608.2b). The Bolts are still legal targets and are exiled; the player,
+# an illegal target, gains no life and draws nothing (Bot2 stays at 20 life and its hand is not drawn from).
+
+[Bot1 Deck]
+Swamp
+Mountain
+Cease // Desist
+Forest
+Forest
+Forest
+Forest
+Forest x13
+
+[Bot2 Deck]
+Mountain
+Plains
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Dawn's Truce
+Mountain
+Mountain x13
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Cease // Desist.Cast(Ability: Cease)
+Bot1.Target(Bot2.Graveyard.Lightning Bolt#1)
+Bot1.Target(Bot2.Graveyard.Lightning Bolt#2)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Dawn's Truce.Cast
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Exile = Lightning Bolt; Lightning Bolt
+Exile.Count = 2
+Bot2.Graveyard = Dawn's Truce
+Bot2.Life = 20
+Bot2.Hand.Count = 3
+Bot1.Life = 14
+Bot1.Graveyard = Cease // Desist
+Stack.Count = 0

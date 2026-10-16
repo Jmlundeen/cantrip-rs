@@ -1,0 +1,67 @@
+# Cease // Desist, cast as Desist ({4}{G/W}{G/W}): "Destroy all artifacts and enchantments." Bot1 pays the hybrid symbols with
+# Mox Pearl's white and Mox Emerald's green (Black Lotus is taken as black, so it can pay only generic mana), Mox Jet and Lotus
+# paying the four generic. On turn 3 Bot2 has an artifact (Mox Emerald, Mox Pearl), an artifact creature (Ornithopter), an
+# enchantment (Fastbond), a nonartifact creature (Llanowar Elves), a land, and The One Ring, an indestructible artifact.
+# Desist destroys every artifact and enchantment of both players - Bot1's own Moxen too - except The One Ring (CR 702.12b),
+# and leaves Llanowar Elves and the lands alone.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Emerald
+Mox Jet
+Black Lotus
+Cease // Desist
+Forest
+Forest
+Forest
+Forest x13
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Black Lotus
+The One Ring
+Fastbond
+Ornithopter
+Llanowar Elves
+Forest x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Fastbond.Cast
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.The One Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+? Bot2.Battlefield.Count = 7
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cease // Desist.Cast(Ability: Desist)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Battlefield = Forest; Llanowar Elves; The One Ring
+Bot2.Battlefield.Count = 3
+Bot2.Graveyard.Count = 5
+Bot1.Battlefield = Forest; Forest
+Bot1.Graveyard.Count = 5
+Stack.Count = 0

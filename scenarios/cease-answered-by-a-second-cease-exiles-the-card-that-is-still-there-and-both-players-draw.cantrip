@@ -1,0 +1,70 @@
+# Cease: a target that becomes illegal does not stop the rest (CR 608.2b). Bot2's graveyard holds two Lightning Bolts. Bot1 casts
+# Cease on both (naming itself as the player) and, holding priority, a second Cease on the first Bolt alone with Bot2 as its
+# player. The second resolves first: the first Bolt is exiled and Bot2 gains 2 (17 to 19) and draws. Then the first Cease
+# resolves: its first Bolt is gone (CR 400.7: the target is illegal) but the second Bolt is still there and is exiled, and
+# Bot1, a legal target still, gains 2 (14 to 16) and draws. Two Bolts end in exile and Bot2's graveyard is empty.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Emerald
+Mountain
+Lightning Bolt
+Cease // Desist
+Cease // Desist
+Swamp
+Forest x13
+
+[Bot2 Deck]
+Mountain
+Mountain
+Lightning Bolt
+Lightning Bolt
+Mountain x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Cease // Desist.Cast(Ability: Cease)
+Bot1.Target(Bot2.Graveyard.Lightning Bolt#1)
+Bot1.Target(Bot2.Graveyard.Lightning Bolt#2)
+Bot1.Target(Bot1)
+Bot1.Hand.Cease // Desist.Cast(Ability: Cease)
+Bot1.Target(Bot2.Graveyard.Lightning Bolt#1)
+Bot1.Target()
+Bot1.Target(Bot2)
+? Stack.Count = 2
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Exile = Lightning Bolt; Lightning Bolt
+Exile.Count = 2
+Bot2.Graveyard.Count = 0
+Bot1.Graveyard = Cease // Desist; Cease // Desist; Lightning Bolt
+Bot1.Life = 16
+Bot2.Life = 19
+# Bot1 drew the Forest of turn 5 and one from the first Cease; the second Cease drew for Bot2.
+Bot1.Hand = Forest; Forest
+Bot2.Hand.Count = 6
+Stack.Count = 0
