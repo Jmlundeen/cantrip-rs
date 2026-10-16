@@ -1,0 +1,34 @@
+# Archenemy's Charm, first mode: "Exile target creature or planeswalker." Bot2 controls an Ornithopter (an artifact creature)
+# and a Mox Ruby (an artifact that is no creature or planeswalker). The Mox is refused as the target; the Ornithopter is
+# the positive control and is exiled (CR 406.2), not destroyed: it reaches exile and not the graveyard.
+
+[Bot1 Deck]
+Black Lotus
+Archenemy's Charm
+Swamp x25
+
+[Bot2 Deck]
+Ornithopter
+Mox Ruby
+Island x25
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Archenemy's Charm.Cast
+Bot1.Modes(Exile target creature or planeswalker)
+! Bot1.Target(Bot2.Battlefield.Mox Ruby)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot2.Pass
+? Bot1.Battlefield.Count = 0
+
+[Expect]
+Exile = Ornithopter
+Bot2.Graveyard.Count = 0
+Bot2.Battlefield = Mox Ruby
+Bot1.Graveyard = Archenemy's Charm; Black Lotus
+Stack.Count = 0

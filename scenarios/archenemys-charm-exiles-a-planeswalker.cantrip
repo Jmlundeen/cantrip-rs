@@ -1,0 +1,41 @@
+# Archenemy's Charm, first mode: "Exile target creature or planeswalker." Bot2's Chandra, Torch of Defiance (cast off Black
+# Lotus and a Mox Ruby) is a planeswalker and a legal target; it is exiled (CR 406.2), not put into the graveyard.
+
+[Bot1 Deck]
+Black Lotus
+Archenemy's Charm
+Swamp x25
+
+[Bot2 Deck]
+Black Lotus
+Mox Ruby
+Chandra, Torch of Defiance
+Mountain x4
+Mountain x12
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Chandra, Torch of Defiance.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Archenemy's Charm.Cast
+Bot1.Modes(Exile target creature or planeswalker)
+Bot1.Target(Bot2.Battlefield.Chandra, Torch of Defiance)
+Bot2.Pass
+
+[Expect]
+Exile = Chandra, Torch of Defiance
+Bot2.Battlefield = Mox Ruby
+Bot2.Graveyard = Black Lotus
+Bot1.Graveyard = Archenemy's Charm; Black Lotus

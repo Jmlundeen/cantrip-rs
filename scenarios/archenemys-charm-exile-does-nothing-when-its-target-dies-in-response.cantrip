@@ -1,0 +1,37 @@
+# Archenemy's Charm, first mode, CR 608.2b: the only target is no longer on the battlefield when the spell resolves, so the
+# spell does not resolve. Bot2 kills its own Ornithopter in response with Lightning Bolt: the Ornithopter is in Bot2's
+# graveyard (where the Charm cannot exile it) and nothing is in exile.
+
+[Bot1 Deck]
+Black Lotus
+Archenemy's Charm
+Swamp x25
+
+[Bot2 Deck]
+Ornithopter
+Mox Ruby
+Lightning Bolt
+Island x25
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Archenemy's Charm.Cast
+Bot1.Modes(Exile target creature or planeswalker)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+
+[Expect]
+Exile.Count = 0
+Bot2.Graveyard = Ornithopter; Lightning Bolt
+Bot1.Graveyard = Archenemy's Charm; Black Lotus
+Bot2.Battlefield = Mox Ruby
+Stack.Count = 0

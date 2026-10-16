@@ -1,0 +1,44 @@
+# Archenemy's Charm, second mode: "from your graveyard". Bot2's own Ornithopter (killed by its own Lightning Bolt) is a creature
+# card in an opponent's graveyard and is refused as a target (CR 115.1). One target is enough ("one or two"): Bot1 chooses
+# Chandra, Torch of Defiance alone, and the Ornithopter that is in Bot1's own graveyard as well stays there.
+
+[Bot1 Deck]
+Mox Ruby
+Faithless Looting
+Ornithopter
+Chandra, Torch of Defiance
+Black Lotus
+Archenemy's Charm
+Swamp
+Swamp x25
+
+[Bot2 Deck]
+Ornithopter
+Mox Ruby
+Lightning Bolt
+Island x25
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Ornithopter; Chandra, Torch of Defiance)
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Archenemy's Charm.Cast
+Bot1.Modes(Return one or two target creature and/or planeswalker cards)
+! Bot1.Target(Bot2.Graveyard.Ornithopter)
+Bot1.Target(Bot1.Graveyard.Chandra, Torch of Defiance)
+Bot2.Pass
+
+[Expect]
+Bot1.Hand = Chandra, Torch of Defiance; Swamp; Swamp; Swamp; Swamp
+Bot1.Graveyard = Archenemy's Charm; Black Lotus; Faithless Looting; Ornithopter
+Bot2.Graveyard = Ornithopter; Lightning Bolt
+Stack.Count = 0

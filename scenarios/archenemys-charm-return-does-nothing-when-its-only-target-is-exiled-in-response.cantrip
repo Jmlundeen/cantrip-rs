@@ -1,0 +1,43 @@
+# Archenemy's Charm, second mode, CR 608.2b: its only target (Chandra in Bot1's graveyard) is exiled by Bot2's Ghost Vacuum in
+# response, so the spell does not resolve: nothing returns to hand and the card stays in exile.
+
+[Bot1 Deck]
+Mox Ruby
+Faithless Looting
+Ornithopter
+Chandra, Torch of Defiance
+Black Lotus
+Archenemy's Charm
+Swamp
+Swamp x25
+
+[Bot2 Deck]
+Mox Ruby
+Ghost Vacuum
+Island x25
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Ornithopter; Chandra, Torch of Defiance)
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Ghost Vacuum.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Archenemy's Charm.Cast
+Bot1.Modes(Return one or two target creature and/or planeswalker cards)
+Bot1.Target(Bot1.Graveyard.Chandra, Torch of Defiance)
+Bot2.Battlefield.Ghost Vacuum.Activate(Bot1.Graveyard.Chandra, Torch of Defiance)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+
+[Expect]
+Exile = Chandra, Torch of Defiance
+Bot1.Hand = Swamp; Swamp; Swamp; Swamp
+Bot1.Graveyard = Archenemy's Charm; Black Lotus; Faithless Looting; Ornithopter
+Stack.Count = 0

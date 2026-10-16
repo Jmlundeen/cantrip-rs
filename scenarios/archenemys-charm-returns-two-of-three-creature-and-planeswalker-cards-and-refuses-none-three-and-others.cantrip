@@ -1,0 +1,49 @@
+# Archenemy's Charm, second mode: "Return one or two target creature and/or planeswalker cards from your graveyard to your
+# hand." Bot1's graveyard holds two Ornithopters (creature cards: one discarded to Faithless Looting, one killed by Bot2's
+# Lightning Bolt), Chandra, Torch of Defiance (a planeswalker card) and Faithless Looting (a sorcery card).
+# Refused: no target at all (the slot takes at least one), three targets (at most two), and Faithless Looting (neither type).
+# Positive control: an Ornithopter and Chandra (a creature and a planeswalker card) are chosen and both return together
+# (CR 400.3); the second Ornithopter stays in the graveyard.
+
+[Bot1 Deck]
+Mox Ruby
+Faithless Looting
+Ornithopter
+Ornithopter
+Chandra, Torch of Defiance
+Black Lotus
+Archenemy's Charm
+Swamp x25
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x25
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Ornithopter; Chandra, Torch of Defiance)
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Archenemy's Charm.Cast
+Bot1.Modes(Return one or two target creature and/or planeswalker cards)
+! Bot1.Target(Count: 0)
+! Bot1.Target(Bot1.Graveyard.Ornithopter#1; Bot1.Graveyard.Ornithopter#2; Bot1.Graveyard.Chandra, Torch of Defiance)
+! Bot1.Target(Bot1.Graveyard.Faithless Looting)
+Bot1.Target(Bot1.Graveyard.Ornithopter#1; Bot1.Graveyard.Chandra, Torch of Defiance)
+Bot2.Pass
+? Bot1.Hand.Count = 5
+
+[Expect]
+Bot1.Hand = Ornithopter; Chandra, Torch of Defiance; Swamp; Swamp; Swamp
+Bot1.Graveyard = Archenemy's Charm; Black Lotus; Faithless Looting; Ornithopter
+Bot2.Graveyard = Lightning Bolt
+Stack.Count = 0
