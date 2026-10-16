@@ -1,0 +1,66 @@
+# Hexproof from [quality] judges the spell as it is (CR 702.11d, 105.2): a source whose color changes changes the
+# answer. General Ferrous Rokiric has hexproof from monocolored; Knight of Malice has hexproof from white. On turn 2
+# Bot2's Lightning Bolt, red alone, can't target the General, and kills the Ornithopter instead (the positive control).
+# On turn 4 Bot2's Painter's Servant enters naming white: every spell is white in addition to its other colors, so the
+# next Lightning Bolt is red and white - multicolored, not monocolored. Now it can't target Knight of Malice (a white
+# spell), and can target the General, which dies.
+
+[Bot1 Deck]
+Plains
+Mox Ruby
+Mox Jet
+Sol Ring
+General Ferrous Rokiric
+Knight of Malice
+Ornithopter
+Island x10
+
+[Bot2 Deck]
+Mountain
+Mox Pearl
+Sol Ring
+Lightning Bolt
+Lightning Bolt
+Painter's Servant
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.General Ferrous Rokiric.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+! Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.General Ferrous Rokiric)
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Knight of Malice.Cast
+[T4 Bot2.Main1]
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Hand.Painter's Servant.Cast
+Bot2.Pass
+Bot2.Colors(White)
+Bot2.Battlefield.Mountain.Activate
+! Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Knight of Malice)
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.General Ferrous Rokiric)
+Bot2.Pass
+
+[Expect]
+Turn = 4
+Bot1.Graveyard = General Ferrous Rokiric; Ornithopter
+Bot1.Battlefield.Knight of Malice.Power = 3
+Bot1.Battlefield.Knight of Malice.HexproofFrom = White

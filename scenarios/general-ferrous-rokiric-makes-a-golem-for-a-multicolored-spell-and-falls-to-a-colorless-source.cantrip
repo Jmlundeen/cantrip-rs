@@ -1,0 +1,64 @@
+# General Ferrous Rokiric: "Whenever you cast a multicolored spell, create a 4/4 red and white Golem artifact creature
+# token." Bot1's Lightning Helix (red and white) makes one; its Lightning Bolt (red alone) makes none. Its "hexproof
+# from monocolored" (CR 702.11d) is nothing against a colorless source, which is not monocolored (CR 105.2c; Sphinx
+# of the Guildpact's ruling): Bot2's Walking Ballista removes a counter to deal 1 damage to the General, and it dies.
+
+[Bot1 Deck]
+Mountain
+Mox Pearl
+Mox Ruby
+General Ferrous Rokiric
+Lightning Helix
+Lightning Bolt
+Island
+Island x10
+
+[Bot2 Deck]
+Mox Jet
+Mox Sapphire
+Walking Ballista
+Island
+Island
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.General Ferrous Rokiric.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Walking Ballista.Cast(X: 1)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Lightning Helix.Cast(Bot2)
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Golem.Power = 4
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Battlefield.Walking Ballista.Activate(Bot1.Battlefield.General Ferrous Rokiric)
+Bot2.Pass
+
+[Expect]
+Turn = 4
+Bot1.Graveyard = General Ferrous Rokiric; Lightning Bolt; Lightning Helix
+Bot1.Battlefield = Mountain; Mox Pearl; Mox Ruby; Golem
+Bot1.Battlefield.Golem.Colors = Red; White
+Bot1.Battlefield.Golem.Types = Artifact; Creature
+Bot1.Battlefield.Golem.Subtypes = Golem
+Bot1.Battlefield.Golem.Toughness = 4
+Bot1.Battlefield.Golem.Token = true
+Bot1.Life = 23
+Bot2.Life = 14

@@ -1,0 +1,8 @@
+{
+  "name": "General Ferrous Rokiric",
+  "manaCost": "{1}{R}{W}",
+  "type": "Legendary Creature — Human Soldier",
+  "power": 3,
+  "toughness": 1,
+  "oracleText": "Hexproof from monocolored\nWhenever you cast a multicolored spell, create a 4/4 red and white Golem artifact creature token."
+}
