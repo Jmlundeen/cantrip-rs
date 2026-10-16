@@ -44,10 +44,12 @@ Bot1.Battlefield.Mountain#2.Activate
 Bot1.Battlefield.Chromatic Star.Activate(Color: Red)
 [T4 Bot2.Upkeep]
 ? Bot1.Hand.Count = 1
+? Bot1.Battlefield.Case of the Crimson Pulse.Solved = (absent)
 [T5 Bot1.Draw]
 ? Bot1.Hand.Count = 2
 
 [Expect]
+Bot1.Battlefield.Case of the Crimson Pulse.Solved = (absent)
 Bot1.Battlefield = Case of the Crimson Pulse; Mountain; Mountain; Mox Jet; Mox Ruby; Ornithopter; Ornithopter; Ornithopter; Ornithopter
 Bot1.Hand = Ornithopter; Ornithopter
 Bot1.Graveyard = Chromatic Star

@@ -32,6 +32,7 @@ Bot1.Hand.Case of the Crimson Pulse.Cast
 ? Stack.Count = 0
 
 [Expect]
+Bot1.Battlefield.Case of the Crimson Pulse.Solved = (absent)
 Bot1.Battlefield = Case of the Crimson Pulse; Mountain; Mox Jet; Mox Ruby; Ornithopter; Ornithopter; Ornithopter
 Bot1.Hand = Ornithopter; Ornithopter
 Bot1.Graveyard = 

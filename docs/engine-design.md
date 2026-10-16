@@ -467,6 +467,29 @@ open to it costs nothing, and a requirement to attack a certain player (or a goa
 counts that player while attacking them is free. The board is searched for these only as attackers are declared. The
 benchmark measured 5.73 us per decision before and 5.76-5.85 us after (2026-10-16, the same noisy machine).
 
+### Cases and the solved designation; suspect
+
+Solved (CR 719.3b) is a designation, `Marks::solved`: no ability and no copiable value, so a permanent that becomes a copy of
+a solved Case is not solved, a solved Case that becomes a copy of another Case stays solved, and a Case that leaves and
+returns is a new object without it (CR 400.7). `Game::solve` (CR 719.3a) gives it to a permanent on the battlefield that
+lacks it and records `Event::Solved`; `Query::is_solved` reads it, and a static ability of the layers reads it off its source's
+row. `cantrip_mechanics::solved` is every Case's two keyword abilities (CR 702.169): `to_solve(condition, text)` is "At the
+beginning of your end step, if [condition] and this Case is not solved, this Case becomes solved", both halves an intervening
+"if" (CR 603.4); a "Solved" triggered ability is `solved::triggered`, which triggers only if the Case is solved
+(`TriggeredDef::only_if`, asked with the trigger event and never again, CR 702.169c); an activated one is `solved::ability`
+("Activate only if this Case is solved", CR 702.169d); a static one of play rules is `solved::play_rules(&[..])`, a
+`PlayRule::While` ("as long as", CR 702.169b) that every reader of play rules walks through (`actions::each_play_rule`). The
+host greys a Case's "To solve" line once it is solved and its "Solved" line while it is not, and says SOLVED on the card.
+
+Suspect (CR 701.60) is `Game::suspect`: an `EffectKind::Suspected` on the permanent until it leaves the battlefield, read as
+the designation (`Query::is_suspected`), whose layer-6 grant is menace and "This creature can't block" (CR 701.60c) at the
+effect's timestamp, so "loses all abilities" later takes them while the creature stays suspected (the rulings). A suspected
+permanent is not suspected again (CR 701.60d). `Event::Suspected` is recorded. Nothing yet ends the designation early ("is no
+longer suspected"): no card in content says so.
+
+"You may look at the top card of your library any time" (CR 401.2) is `PlayRule::LookAtLibraryTop` (Bolas's Citadel, Mystic
+Forge, a solved Case of the Locked Hothouse): the host shows that card to its player (`Game::may_look_at_library_top`).
+
 ### Legal moves as a first-class output
 
 Every pending request comes with its legal answers enumerated, cheaply and in a stable order. The client's prompt

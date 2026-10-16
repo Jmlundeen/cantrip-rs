@@ -402,6 +402,11 @@ impl Game {
     pub fn cant_gain_life(&self, player: PlayerId) -> bool {
         static_rules::cant_gain_life(self, self.cards, player)
     }
+
+    /// Whether `player` may look at the top card of their library any time (CR 401.2), as a permanent they control says.
+    pub fn may_look_at_library_top(&self, player: PlayerId) -> bool {
+        actions::may_look_at_library_top(self, self.cards, player)
+    }
 }
 
 /// The view of the game a frame's run has: what card code is handed as `&mut dyn Game`.
@@ -960,6 +965,14 @@ impl cantrip_api::Game for Cx<'_> {
 
     fn become_saddled(&mut self, permanent: ObjectId) {
         ops::saddle(self, permanent);
+    }
+
+    fn solve(&mut self, permanent: ObjectId) {
+        ops::solve(self, permanent);
+    }
+
+    fn suspect(&mut self, permanent: ObjectId) {
+        ops::suspect(self, permanent);
     }
 
     fn fight(&mut self, first: ObjectId, second: ObjectId) {

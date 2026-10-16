@@ -346,6 +346,12 @@ impl StateDump {
                 if obj.marks.monstrous {
                     d.set(format!("{key}.Monstrous"), true);
                 }
+                if obj.marks.solved {
+                    d.set(format!("{key}.Solved"), true);
+                }
+                if game.is_suspected(id) {
+                    d.set(format!("{key}.Suspected"), true);
+                }
                 if game.is_saddled(id) {
                     d.set(format!("{key}.Saddled"), true);
                 }

@@ -51,6 +51,10 @@ pub enum Event {
     Unblocked { attacker: ObjectId, defender: Target },
     /// A permanent became monstrous (CR 701.37a).
     Monstrous { permanent: ObjectId },
+    /// A Case became solved (CR 719.3a-b): it was not solved before.
+    Solved { permanent: ObjectId },
+    /// A permanent became suspected (CR 701.60a): it was not suspected before (CR 701.60d).
+    Suspected { permanent: ObjectId },
     StepBegan { step: Step },
     /// `amount` counters of `kind` were put on a permanent (CR 122.6), as many as the replacement effects left (CR 614.1a),
     /// or it entered with them. `total` is how many of that kind it has once they are on it, so "when the fourth plan
@@ -174,6 +178,8 @@ impl Event {
             Event::Tapped { permanent }
             | Event::TappedForMana { permanent, .. }
             | Event::Monstrous { permanent }
+            | Event::Solved { permanent }
+            | Event::Suspected { permanent }
             | Event::DoorUnlocked { permanent, .. } => permanent == object,
             Event::Unattached { attachment, from } => attachment == object || from == object,
             Event::LifeChange { .. } | Event::Searched { .. } | Event::AttackersDeclared { .. } | Event::StepBegan { .. } | Event::BecameMonarch { .. } | Event::GaveGift { .. } | Event::ChosenAtRandom { .. } | Event::CoinFlipped { .. } | Event::DieRolled { .. } | Event::TurnEnded { .. } | Event::Scried { .. } | Event::Surveilled { .. } => false,
@@ -227,6 +233,8 @@ impl EventMask {
     pub const CRIME: EventMask = EventMask(1 << 37);
     pub const SCRIED: EventMask = EventMask(1 << 38);
     pub const SURVEILLED: EventMask = EventMask(1 << 39);
+    pub const SOLVED: EventMask = EventMask(1 << 40);
+    pub const SUSPECTED: EventMask = EventMask(1 << 41);
 
     /// An event's kind as the history files it: every event has one. `of` is what triggers listen for, which leaves
     /// out the records no ability triggers on.
@@ -265,6 +273,8 @@ impl EventMask {
             Event::Unblocked { .. } => EventMask::UNBLOCKED,
             Event::Blocks { .. } => EventMask::BLOCKS,
             Event::Monstrous { .. } => EventMask::MONSTROUS,
+            Event::Solved { .. } => EventMask::SOLVED,
+            Event::Suspected { .. } => EventMask::SUSPECTED,
             Event::CountersPut { .. } => EventMask::COUNTERS,
             Event::Transformed { .. } => EventMask::TRANSFORMED,
             Event::Unattached { .. } => EventMask::UNATTACHED,

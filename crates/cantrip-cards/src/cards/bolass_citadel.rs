@@ -11,10 +11,10 @@ fn drain(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-// "You may look at the top card of your library any time" (CR 401.2) is what a client shows its controller; the rules
-// part is the permission to play from it, which is `PlayRule::LibraryTop`.
+// "You may look at the top card of your library any time" (CR 401.2), which the host shows its controller, and the
+// permission to play from it, for life.
 pub static CARD: CardDef = CardDef {
     abilities: &[ability(TAP.and(sacrifice(10, nonland)), drain, "{T}, Sacrifice ten nonland permanents: Each opponent loses 10 life.")],
-    play_rules: &[PlayRule::LibraryTop],
+    play_rules: &[PlayRule::LookAtLibraryTop, PlayRule::LibraryTop],
     ..oracle::BOLASS_CITADEL
 };

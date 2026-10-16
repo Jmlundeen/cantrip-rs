@@ -538,6 +538,8 @@ fn apply_effect(effect: &ContinuousEffect, layer: Layer, chars: &mut Chars) {
             (Layer::Ability, EffectKind::ProtectionFromEverything) => chars.protection_everything = true,
             (Layer::Ability, EffectKind::ProtectionFromPlayer(p)) => chars.protection_players |= 1 << p.0,
             (Layer::Ability, EffectKind::AddKeywords(k)) => chars.keywords = Keywords(chars.keywords.0 | k.0),
+            // CR 701.60c: a suspected permanent has menace and "This creature can't block" for as long as it is suspected.
+            (Layer::Ability, EffectKind::Suspected) => chars.keywords = chars.keywords.with(Keyword::Menace).with(Keyword::CantBlock),
             // CR 613.1f: lost at this effect's timestamp, so a keyword granted after it is kept. Losing hexproof loses every
             // "hexproof from [quality]" too (CR 702.11e).
             (Layer::Ability, EffectKind::LoseKeywords(k)) => {

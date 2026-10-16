@@ -819,6 +819,11 @@ impl TriggeredDef {
     /// who controls the ability.
     #[inline]
     pub fn fires(&self, q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> {
+        if let Some(only_if) = self.only_if
+            && !only_if(q, asker)
+        {
+            return None;
+        }
         match self.asked {
             Some(asked) => asked(q, asker, event),
             None => (self.matches)(q, asker.source, event),
@@ -835,6 +840,7 @@ impl TriggeredDef {
         look_back: false,
         anywhere: false,
         condition: None,
+        only_if: None,
         once_per_batch: false,
         batch_by_data: false,
         mana_ability: false,
@@ -866,6 +872,10 @@ pub struct TriggeredDef {
     /// upkeep, if this card is in your graveyard" does.
     pub anywhere: bool,
     pub condition: Option<TriggerCondition>,
+    /// "This ability triggers only if ..." (CR 702.169c, a Case's "Solved — [triggered ability]"): asked with the trigger
+    /// event, as part of it, and never again. Not an intervening "if" (CR 603.4), which `condition` is: that is asked again
+    /// as the ability resolves.
+    pub only_if: Option<TriggerCondition>,
     /// A "one or more" ability (CR 603.2c): the events of one simultaneous batch that it matches trigger it once.
     /// `matches` is asked of each event and the subject objects of those that match are the batch's members, which
     /// the resolving ability reads with `Query::event_objects`.
@@ -1380,6 +1390,16 @@ pub enum PlayRule {
     /// "You may cast [spells that pass the filter] from the top of your library" (CR 601.3), for their mana cost: Mystic Forge's
     /// artifact and colorless spells. Lands are not played from there.
     LibraryTopSpells(fn(&dyn Query, ObjectId) -> bool),
+    /// "You may play lands from the top of your library" (CR 305.1): Case of the Locked Hothouse, solved. Bolas's Citadel's
+    /// `LibraryTop` includes it.
+    LibraryTopLands,
+    /// "You may look at the top card of your library any time" (CR 401.2): the player sees it whenever they could look, which
+    /// the host shows them. Bolas's Citadel, Mystic Forge, Case of the Locked Hothouse (solved).
+    LookAtLibraryTop,
+    /// "As long as [condition], [rules]": the rules apply only while the condition holds, asked with the permanent as source
+    /// and its controller. A Case's "Solved - [static ability]" means "As long as this Case is solved, [static ability]"
+    /// (CR 702.169b): `cantrip_mechanics::solved::play_rules`.
+    While(Condition, &'static [PlayRule]),
     /// "You have no maximum hand size" (CR 402.2): Proft's Eidetic Memory.
     NoMaximumHandSize,
 }

@@ -443,6 +443,14 @@ impl AbilityDef {
         }
     }
 
+    /// "This ability triggers only if ..." (CR 702.169c): asked with the trigger event only, never as the ability resolves.
+    pub const fn only_if(self, only_if: Condition) -> AbilityDef {
+        match self {
+            AbilityDef::Triggered(t) => AbilityDef::Triggered(TriggeredDef { only_if: Some(only_if), ..t }),
+            AbilityDef::Activated(_) | AbilityDef::Static(_) => panic!("only a triggered ability triggers only if"),
+        }
+    }
+
     /// Its modes (CR 700.2): chosen on activation, or as the triggered ability is put on the stack.
     pub const fn modal(self, modal: &'static ModalDef) -> AbilityDef {
         match self {

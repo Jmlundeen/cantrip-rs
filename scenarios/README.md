@@ -375,6 +375,8 @@ kind, place it where the action could otherwise be taken, with a wait or `BotN.P
 - `BotN.Battlefield.<Name>.HexproofFrom` (`Black; White`, `Monocolored`, sorted), the qualities of its "hexproof from"
   abilities (CR 702.11d), printed or granted, absent when it has none
 - `BotN.Battlefield.<Name>.Monstrous`, `true` for a monstrous permanent (CR 701.37b) and absent otherwise
+- `BotN.Battlefield.<Name>.Solved`, `true` for a solved permanent (a Case, CR 719.3b) and absent otherwise
+- `BotN.Battlefield.<Name>.Suspected`, `true` for a suspected permanent (CR 701.60b) and absent otherwise
 - `BotN.Battlefield.<Name>.Saddled`, `true` for a permanent saddled this turn (CR 702.171b) and absent otherwise
 - `BotN.Battlefield.<Name>.Prepared`, `true` for a prepared permanent (CR 722.3a) and absent otherwise; while it is
   set, that permanent's preparation card is the copy in `Exile`

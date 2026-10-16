@@ -1711,32 +1711,68 @@ fn graveyard_play(cx: &Cx, player: PlayerId) -> bool {
     cx.s().effects.iter().any(|e| e.kind == EffectKind::PlayFromGraveyard && e.controller == player)
 }
 
-/// What `player`'s permanents let them do about land plays (CR 305.2): the land plays beyond the one, whether there is
-/// no limit, and whether lands may be played from the graveyard.
-fn land_rules(cx: &Cx, player: PlayerId) -> (u32, bool, bool, bool) {
-    // "Until end of turn, you may play lands and cast spells from your graveyard" (CR 305.1, 601.3): Yawgmoth's Will.
-    let (mut extra, mut unlimited, mut graveyard, mut top) = (0u32, false, graveyard_play(cx, player), false);
-    if !cx.cards().any_play_rules {
-        return (extra, unlimited, graveyard, top);
-    }
-    for &id in cx.s().battlefield() {
-        let obj = cx.s().obj(id);
-        let card = obj.copy.map_or(obj.card, |c| c.card);
-        if obj.controller != player || !cx.cards().play_rules[card.0 as usize] || cx.s().lost_all_abilities(id) {
-            continue;
-        }
-        for rule in cx.card(card).play_rules {
+/// The play rules that apply to `player` now (`CardDef::play_rules`), each with the permanent whose rule it is: those of the
+/// permanents they control, and with `command` of the emblems they have (CR 114.4), that have not lost their abilities (CR
+/// 613.1f). A rule under "as long as" (`PlayRule::While`) applies only while its condition holds for its permanent: a
+/// Case's "Solved - [static ability]" (CR 702.169b).
+pub fn each_play_rule(q: &dyn Query, cards: &CardTable, player: PlayerId, command: bool, mut f: impl FnMut(ObjectId, &'static PlayRule)) {
+    fn walk(q: &dyn Query, asker: &Asker, rules: &'static [PlayRule], f: &mut impl FnMut(ObjectId, &'static PlayRule)) {
+        for rule in rules {
             match rule {
-                PlayRule::ExtraLandPlays(n) => extra += *n as u32,
-                PlayRule::AnyNumberOfLandPlays => unlimited = true,
-                PlayRule::LandsFromGraveyard => graveyard = true,
-                PlayRule::LibraryTop => top = true,
-                PlayRule::LibraryTopSpells(_) => {}
-                PlayRule::NoMaximumHandSize => {}
+                PlayRule::While(condition, inner) => {
+                    if condition(q, asker) {
+                        walk(q, asker, inner, f);
+                    }
+                }
+                other => f(asker.source, other),
             }
         }
     }
-    (extra, unlimited, graveyard, top)
+    if !cards.any_play_rules {
+        return;
+    }
+    let s = q.state();
+    let emblems: &[ObjectId] = if command { s.zone(Zone::COMMAND) } else { &[] };
+    for &id in s.battlefield().iter().chain(emblems) {
+        let obj = s.obj(id);
+        let card = cards.current(obj);
+        if obj.controller != player || !cards.play_rules[card.0 as usize] || s.lost_all_abilities(id) {
+            continue;
+        }
+        walk(q, &Asker { source: id, controller: player }, cards.get(card).play_rules, &mut f);
+    }
+}
+
+/// What `player`'s permanents let them do about land plays (CR 305.2) and the top of their library (CR 305.1, 601.3).
+#[derive(Clone, Copy, Default)]
+struct LandRules {
+    /// The land plays beyond the one.
+    extra: u32,
+    /// No limit to the land plays.
+    unlimited: bool,
+    /// Lands may be played from the graveyard.
+    graveyard: bool,
+    /// Lands may be played and spells cast from the top of the library, the spells for life (Bolas's Citadel).
+    top_for_life: bool,
+    /// Lands may be played from the top of the library (Bolas's Citadel; Case of the Locked Hothouse, solved).
+    top_lands: bool,
+}
+
+fn land_rules(cx: &Cx, player: PlayerId) -> LandRules {
+    // "Until end of turn, you may play lands and cast spells from your graveyard" (CR 305.1, 601.3): Yawgmoth's Will.
+    let mut rules = LandRules { graveyard: graveyard_play(cx, player), ..LandRules::default() };
+    each_play_rule(cx, cx.cards(), player, false, |_, rule| match rule {
+        PlayRule::ExtraLandPlays(n) => rules.extra += *n as u32,
+        PlayRule::AnyNumberOfLandPlays => rules.unlimited = true,
+        PlayRule::LandsFromGraveyard => rules.graveyard = true,
+        PlayRule::LibraryTop => {
+            rules.top_for_life = true;
+            rules.top_lands = true;
+        }
+        PlayRule::LibraryTopLands => rules.top_lands = true,
+        PlayRule::LibraryTopSpells(_) | PlayRule::NoMaximumHandSize | PlayRule::LookAtLibraryTop | PlayRule::While(..) => {}
+    });
+    rules
 }
 
 /// Whether a permanent `player` controls, an emblem they have (CR 114.4), or an effect a resolved spell made for the rest
@@ -1745,19 +1781,21 @@ pub fn no_maximum_hand_size(cx: &Cx, player: PlayerId) -> bool {
     if cx.s().effects.iter().any(|e| e.kind == EffectKind::NoMaximumHandSize && e.controller == player) {
         return true;
     }
-    cx.cards().any_play_rules
-        && cx.s().battlefield().iter().chain(cx.s().zone(Zone::COMMAND)).any(|&id| {
-            let obj = cx.s().obj(id);
-            let card = obj.copy.map_or(obj.card, |c| c.card);
-            obj.controller == player
-                && cx.cards().play_rules[card.0 as usize]
-                && !cx.s().lost_all_abilities(id)
-                && cx.card(card).play_rules.iter().any(|r| matches!(r, PlayRule::NoMaximumHandSize))
-        })
+    let mut none = false;
+    each_play_rule(cx, cx.cards(), player, true, |_, rule| none |= matches!(rule, PlayRule::NoMaximumHandSize));
+    none
+}
+
+/// Whether `player` may look at the top card of their library any time (CR 401.2): a permanent they control says so (Bolas's
+/// Citadel, Mystic Forge, Case of the Locked Hothouse once solved).
+pub fn may_look_at_library_top(q: &dyn Query, cards: &CardTable, player: PlayerId) -> bool {
+    let mut may = false;
+    each_play_rule(q, cards, player, false, |_, rule| may |= matches!(rule, PlayRule::LookAtLibraryTop));
+    may
 }
 
 fn land_plays(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOption>) {
-    let (extra, unlimited, from_graveyard, from_top) = land_rules(cx, player);
+    let LandRules { extra, unlimited, graveyard: from_graveyard, top_lands: from_top, .. } = land_rules(cx, player);
     if !unlimited && cx.s().player(player).lands_played as u32 >= 1 + extra {
         return;
     }
@@ -2182,17 +2220,11 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
         && let Some(&id) = cx.s().zone(Zone::library(player)).first()
     {
         let def = cx.card(cx.s().obj(id).card);
-        let allowed = cx.s().battlefield().iter().any(|&p| {
-            let obj = cx.s().obj(p);
-            let card = cx.cards().current(obj);
-            obj.controller == player
-                && cx.cards().play_rules[card.0 as usize]
-                && !cx.s().lost_all_abilities(p)
-                && cx.card(card).play_rules.iter().any(|r| matches!(r, PlayRule::LibraryTopSpells(f) if f(cx, id)))
-        });
+        let mut allowed = false;
+        each_play_rule(cx, cx.cards(), player, false, |_, rule| allowed |= matches!(rule, PlayRule::LibraryTopSpells(f) if f(cx, id)));
         let instant = def.is(CardType::Instant) || def.keywords.has(Keyword::Flash) || def.types.0 & flash.0 != 0;
         // Where a permanent lets them pay life instead, that cast below is the one offered.
-        if allowed && !land_rules(cx, player).3 && !def.is(CardType::Land) && def.has_cost && instant == instants {
+        if allowed && !land_rules(cx, player).top_for_life && !def.is(CardType::Land) && def.has_cost && instant == instants {
             let a = available.get_or_init(|| self::available(cx, player));
             let mut option = ActionOption::on(ActionKind::CastSpell, id, 0);
             if covers_total(cx, a, player, id, def, least_cost(cx, a, player, id, def, def.cost, &[]), 0)
@@ -2204,7 +2236,7 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
     }
     // The top card of the library, for a player a permanent lets cast from there for life (CR 601.3, 118.9).
     if !barred.contains(ZoneKind::Library)
-        && land_rules(cx, player).3
+        && land_rules(cx, player).top_for_life
         && let Some(&id) = cx.s().zone(Zone::library(player)).first()
     {
         let def = cx.card(cx.s().obj(id).card);
@@ -2456,7 +2488,7 @@ pub fn act(cx: &mut Cx, player: PlayerId) -> R<Flow> {
             let any_type = permitted.is_some_and(|p| p.grant.any_type);
             let more = permitted.map_or(0, |p| p.grant.more);
             // From the top of a library by a permanent's permission: life instead of the mana cost (CR 118.9).
-            let (instead, life) = if cx.s().obj(source).zone.is(ZoneKind::Library) && land_rules(cx, player).3 {
+            let (instead, life) = if cx.s().obj(source).zone.is(ZoneKind::Library) && land_rules(cx, player).top_for_life {
                 (Some(ManaCost::ZERO), cx.card(cx.s().obj(source).card).cost.mana_value().min(255) as u8)
             } else {
                 (instead, 0)
@@ -3044,7 +3076,7 @@ pub fn could_play_land_during_resolution(cx: &Cx, card: ObjectId) -> bool {
     if !cx.card(obj.card).is(CardType::Land) || cx.s().player(player).lost {
         return false;
     }
-    let (extra, unlimited, _, _) = land_rules(cx, player);
+    let LandRules { extra, unlimited, .. } = land_rules(cx, player);
     unlimited || (cx.s().player(player).lands_played as u32) < 1 + extra
 }
 

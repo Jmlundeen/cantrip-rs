@@ -281,6 +281,11 @@ shapes have an example:
 - **Venturing** (CR 701.49, 309) walks `Player.room` through a dungeon card (`CardDef.dungeon`: the arrows of each room;
   the ability of the room is the ability of the same index, its label "Name — text"). The Undercity is
   `cards/undercity.rs`; `g.venture(p)` enters or moves on, and the rules complete it (CR 704.5t, `dungeons_completed`).
+- **Cases** (CR 719): `cantrip_mechanics::solved`. A Case's file lists `solved::to_solve(condition, text)` with its own
+  condition (an intervening "if" asked of the Case and its controller) and its "Solved" ability as `solved::triggered(trigger,
+  effect, text)`, `solved::ability(cost, effect, text)` or, for play rules, `play_rules: &[solved::play_rules(&[..])]`. Solved
+  is `Marks::solved` (`q.is_solved(id)`, scenario key `.Solved`). **Suspect** (CR 701.60) is `g.suspect(creature)`
+  (`q.is_suspected(id)`, scenario key `.Suspected`).
 - **Revolt** is `cantrip_mechanics::history::permanent_left_battlefield_this_turn(q, p)`. **Harness** (CR 701.64) is an effect:
   `g.add_effect(id, id, EffectKind::Harnessed, Duration::Indefinite)`, read by a static that grants the infinity ability
   (The Mind Stone). `Duration::UntilNextTurnOf(p)` is "until your next turn".

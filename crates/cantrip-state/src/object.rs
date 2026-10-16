@@ -98,7 +98,7 @@ pub struct Obj {
     pub seen_by: u8,
 }
 
-/// What a permanent is marked with: exerted (CR 701.43), monstrous (CR 701.37), saddled (CR 702.171), a player chosen
+/// What a permanent is marked with: exerted (CR 701.43), monstrous (CR 701.37), solved (CR 719.3b), saddled (CR 702.171), a player chosen
 /// as it entered (CR 614.12a), and whose it was before an effect changed its controller (CR 613.1b). All of it ends
 /// when the object does: a permanent that changes zones is a new object (CR 400.7) with none.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Default)]
@@ -111,6 +111,10 @@ pub struct Marks {
     pub exerted_by: Option<PlayerId>,
     /// It has become monstrous (CR 701.37b).
     pub monstrous: bool,
+    /// It has become solved (CR 719.3b): a designation, neither an ability nor a copiable value, kept until it leaves the
+    /// battlefield. A permanent that becomes a copy of a solved Case is not solved; a solved Case that becomes a copy of
+    /// another Case stays solved.
+    pub solved: bool,
     /// The player protecting a battle (CR 310.9): chosen as it entered (CR 310.9a), the defending player of what
     /// attacks it (CR 310.9d) and the only one who may block that.
     pub protector: Option<PlayerId>,
@@ -484,6 +488,11 @@ pub enum EffectKind {
     /// The permanent is harnessed (CR 701.64): a designation it keeps as long as it stays where it is
     /// (`Duration::Indefinite`), which turns its infinity abilities on (CR 702.186).
     Harnessed,
+    /// The permanent is suspected (CR 701.60): a designation it keeps until it leaves the battlefield or an effect ends it
+    /// (`Duration::Indefinite`), neither an ability nor a copiable value (CR 701.60b). While it lasts the permanent has
+    /// menace and "This creature can't block" (CR 701.60c), given in layer 6 at the effect's timestamp, so "loses all
+    /// abilities" later takes them though it stays suspected (the rulings).
+    Suspected,
     /// The effect's controller has hexproof (CR 702.11c): their opponents' spells and abilities can't target them. It
     /// is about the player and outlives its `affected` object, which is only the source.
     PlayerHexproof,

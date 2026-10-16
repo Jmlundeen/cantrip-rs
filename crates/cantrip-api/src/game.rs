@@ -275,6 +275,17 @@ pub trait Query {
         o.marks.saddled_turn == self.state().turn.number && (here || self.state().last_known(id).is_some())
     }
 
+    /// Whether a permanent is solved (CR 719.3b): the designation it was given when it became solved, kept until it leaves
+    /// the battlefield. One that has left is as it last was there (CR 608.2h); the new object it became is not solved.
+    fn is_solved(&self, id: ObjectId) -> bool {
+        self.obj(id).marks.solved
+    }
+
+    /// Whether a permanent is suspected (CR 701.60b): the designation lasts until it leaves the battlefield.
+    fn is_suspected(&self, id: ObjectId) -> bool {
+        self.state().effects.iter().any(|e| e.affected == id && e.kind == EffectKind::Suspected)
+    }
+
     /// Whether `target` could be chosen by `asker` for a spell or ability: hexproof and protection (CR 702.11,
     /// 702.16b). The slot's own filter is the card's; this is the rules'.
     fn can_target(&self, asker: &Asker, target: Target) -> bool;
@@ -511,6 +522,12 @@ pub trait Game: Query {
     fn monstrosity(&mut self, permanent: ObjectId, counters: i16);
     /// A creature becomes saddled until end of turn (CR 702.171b).
     fn become_saddled(&mut self, permanent: ObjectId);
+    /// A permanent becomes solved (CR 719.3a-b): one on the battlefield that is not solved is given the designation, and
+    /// what watches for it sees `Event::Solved`. One that has left the battlefield, or is solved already, is unchanged.
+    fn solve(&mut self, permanent: ObjectId);
+    /// Suspect a creature (CR 701.60a): a permanent on the battlefield that is not suspected becomes suspected (CR
+    /// 701.60d) until it leaves the battlefield, having menace and "This creature can't block" (CR 701.60c).
+    fn suspect(&mut self, permanent: ObjectId);
     /// Two creatures fight (CR 701.14a): each deals damage equal to its power to the other, at once; one that fights
     /// itself deals twice its power to itself (CR 701.14c). Nothing happens unless both are creatures on the battlefield
     /// (CR 701.14b).

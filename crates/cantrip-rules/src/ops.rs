@@ -1962,6 +1962,28 @@ pub fn saddle(cx: &mut Cx, id: ObjectId) {
     cx.st().update_obj(id, |o| o.marks.saddled_turn = turn);
 }
 
+/// A permanent becomes solved (CR 719.3a): it is given the solved designation (CR 719.3b), which it keeps until it leaves
+/// the battlefield, and what watches for a Case becoming solved triggers. An object that has left the battlefield is a new
+/// object (CR 400.7) and becomes nothing; one already solved stays as it is, and nothing triggers.
+pub fn solve(cx: &mut Cx, id: ObjectId) {
+    if !live(cx.s(), id) || !cx.s().obj(id).zone.is(ZoneKind::Battlefield) || cx.s().obj(id).marks.solved {
+        return;
+    }
+    cx.st().update_obj(id, |o| o.marks.solved = true);
+    cx.emit(Event::Solved { permanent: id });
+}
+
+/// Suspect a creature (CR 701.60a): a permanent on the battlefield becomes suspected until it leaves the battlefield, an
+/// effect whose layer-6 grant is menace and "This creature can't block" (CR 701.60c). A suspected permanent can't become
+/// suspected again (CR 701.60d), and nothing triggers then.
+pub fn suspect(cx: &mut Cx, id: ObjectId) {
+    if !live(cx.s(), id) || !cx.s().obj(id).zone.is(ZoneKind::Battlefield) || Query::is_suspected(cx, id) {
+        return;
+    }
+    Game::add_effect(cx, id, id, EffectKind::Suspected, Duration::Indefinite);
+    cx.emit(Event::Suspected { permanent: id });
+}
+
 /// Two creatures fight (CR 701.14a): each deals damage equal to its power to the other, at once, as one event (CR 120.2;
 /// not combat damage, CR 701.14d). A creature that fights itself deals damage to itself equal to twice its power (CR
 /// 701.14c). Nothing happens unless both are creatures on the battlefield (CR 701.14b).

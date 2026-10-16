@@ -15,9 +15,9 @@ fn exile_top(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-// "You may look at the top card of your library any time" (CR 401.2) is what a client shows its controller.
+// "You may look at the top card of your library any time" (CR 401.2), which the host shows its controller.
 pub static CARD: CardDef = CardDef {
     abilities: &[ability(TAP.and(life(1)), exile_top, "{T}, Pay 1 life: Exile the top card of your library.")],
-    play_rules: &[PlayRule::LibraryTopSpells(artifact_or_colorless)],
+    play_rules: &[PlayRule::LookAtLibraryTop, PlayRule::LibraryTopSpells(artifact_or_colorless)],
     ..oracle::MYSTIC_FORGE
 };
