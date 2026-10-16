@@ -1,0 +1,42 @@
+# The Cultivator's trigger targets a land card in Bot1's graveyard only (CR 115.1). With Lightning Bolt (cast on turn 1) and the Mountain Enroot fetched on turn 5 both in the
+# graveyard, the Bolt is not a legal target and the Mountain is: only the Mountain returns to hand and the Bolt stays. Enroot's search takes the library's Mountain and
+# not the Island beside it.
+
+[Bot1 Deck]
+Mountain
+Carnivorous Cultivator
+Forest x4
+Lightning Bolt
+Counterspell
+Duress
+Mountain
+Island x3
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Carnivorous Cultivator.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Exile.Enroot.Cast
+Bot1.Search(Mountain)
+Bot1.Attack(Carnivorous Cultivator > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 15
+Bot1.Graveyard = Lightning Bolt
+Bot1.Hand = Forest; Forest; Counterspell; Duress; Mountain
+Bot1.Library.Count = 3
+Stack.Count = 0

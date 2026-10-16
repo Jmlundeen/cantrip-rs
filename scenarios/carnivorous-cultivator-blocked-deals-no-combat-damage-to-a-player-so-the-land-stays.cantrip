@@ -1,0 +1,46 @@
+# "Whenever this creature deals combat damage to a player": Bot2's Ornithopter blocks the Cultivator on turn 5, so its damage goes to a creature and the ability does not
+# trigger (CR 510.2, 603.2). The Mountain Enroot put in the graveyard - a legal target - stays there, the Ornithopter dies to the 2 damage (0/2), and Bot2 loses no life.
+
+[Bot1 Deck]
+Carnivorous Cultivator
+Forest x6
+Lightning Bolt
+Counterspell
+Duress
+Mountain
+Island
+
+[Bot2 Deck]
+Ornithopter
+Mountain x19
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Carnivorous Cultivator.Cast
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Exile.Enroot.Cast
+Bot1.Search(Mountain)
+Bot1.Attack(Carnivorous Cultivator > Bot2)
+Bot2.Block(Ornithopter > Carnivorous Cultivator)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot2.Graveyard = Ornithopter
+Bot2.Battlefield = Mountain; Mountain
+Bot1.Graveyard = Mountain
+Bot1.Hand = Forest; Forest; Forest; Lightning Bolt; Counterspell
+Bot1.Battlefield.Carnivorous Cultivator.Damage = 0
+Stack.Count = 0

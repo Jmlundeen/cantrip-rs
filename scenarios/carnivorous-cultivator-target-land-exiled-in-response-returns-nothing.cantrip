@@ -1,0 +1,50 @@
+# Carnivorous Cultivator, prepared and then unprepared by casting Enroot, fetches a Mountain into the graveyard and connects on turn 5. Its trigger targets that
+# Mountain, the only land card there, and Bot2 answers with Ghost Vacuum: the Mountain is exiled, so the target is illegal as the ability resolves and it does
+# nothing (CR 608.2b); the Mountain is not returned to hand, and no other card is returned in its place.
+
+[Bot1 Deck]
+Carnivorous Cultivator
+Forest x6
+Lightning Bolt
+Counterspell
+Duress
+Mountain
+Island
+
+[Bot2 Deck]
+Mountain
+Ghost Vacuum
+Mountain x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Ghost Vacuum.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Carnivorous Cultivator.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Exile.Enroot.Cast
+Bot1.Search(Mountain)
+Bot1.Attack(Carnivorous Cultivator > Bot2)
+Bot1.Pass
+Bot2.Battlefield.Ghost Vacuum.Activate(Bot1.Graveyard.Mountain)
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main2]
+? Exile = Mountain
+? Bot1.Graveyard.Count = 0
+
+[Expect]
+Bot2.Life = 18
+Exile = Mountain
+Bot1.Graveyard.Count = 0
+Bot1.Hand = Forest; Forest; Forest; Lightning Bolt; Counterspell
+Stack.Count = 0

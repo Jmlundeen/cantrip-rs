@@ -1,0 +1,41 @@
+# With only Lightning Bolt in the graveyard there is no legal target for "return target land card from your graveyard" (CR 603.3d): the trigger is removed from the game
+# without being put on the stack, nothing is asked, and the Bolt - not a land card - is not returned in its place. The Cultivator is still prepared (Enroot is never cast),
+# and still deals its damage.
+
+[Bot1 Deck]
+Mountain
+Carnivorous Cultivator
+Forest x4
+Lightning Bolt
+Counterspell
+Duress
+Mountain
+Island x3
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Carnivorous Cultivator.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Attack(Carnivorous Cultivator > Bot2)
+! Bot1.Target
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 15
+Bot1.Graveyard = Lightning Bolt
+Bot1.Hand = Forest; Forest; Counterspell; Duress
+Bot1.Battlefield.Carnivorous Cultivator.Prepared = true
+Exile = Enroot
+Stack.Count = 0

@@ -1,0 +1,48 @@
+# Carnivorous Cultivator enters prepared (CR 722.3a): a copy of Enroot waits in exile. On turn 5 Bot1 casts that copy (CR 722.3c) for {G}: the Cultivator stops being
+# prepared and the copy is gone (CR 722.3d; a copy of a spell is no card, so it leaves nothing in the graveyard, CR 707.10a), and the search takes the Mountain from the library to the graveyard, then shuffles (CR 701.23; the three cards left in the
+# library are only counted, a shuffle having mixed them). The Cultivator attacks the empty board, deals 2 combat damage to Bot2 and its trigger returns the Mountain,
+# the only land card in the graveyard, to Bot1's hand.
+
+[Bot1 Deck]
+Carnivorous Cultivator
+Forest x6
+Lightning Bolt
+Counterspell
+Duress
+Mountain
+Island
+Ornithopter
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Carnivorous Cultivator.Cast
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Carnivorous Cultivator.Prepared = true
+? Exile = Enroot
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Exile.Enroot.Cast
+! Bot1.Search(Duress)
+Bot1.Search(Mountain)
+? Bot1.Battlefield.Carnivorous Cultivator.Prepared = (absent)
+? Exile.Count = 0
+? Bot1.Graveyard = Mountain
+Bot1.Attack(Carnivorous Cultivator > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Hand = Forest; Forest; Forest; Lightning Bolt; Counterspell; Mountain
+Bot1.Graveyard.Count = 0
+Bot1.Library.Count = 3
+Exile.Count = 0
+Stack.Count = 0

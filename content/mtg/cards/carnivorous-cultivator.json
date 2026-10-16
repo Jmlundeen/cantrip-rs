@@ -1,0 +1,17 @@
+{
+  "name": "Carnivorous Cultivator",
+  "manaCost": "{1}{G}",
+  "type": "Creature — Elf Warlock",
+  "power": 2,
+  "toughness": 3,
+  "oracleText": "Deathtouch\nThis creature enters prepared. (While it's prepared, you may cast a copy of its spell. Doing so unprepares it.)\nWhenever this creature deals combat damage to a player, return target land card from your graveyard to your hand.",
+  "keywords": [
+    "Deathtouch"
+  ],
+  "prepare": {
+    "name": "Enroot",
+    "manaCost": "{G}",
+    "type": "Sorcery",
+    "oracleText": "Search your library for a land card, put it into your graveyard, then shuffle."
+  }
+}
