@@ -1,0 +1,30 @@
+# Sea Drake's enters trigger takes exactly two target lands you control (CR 601.2c) and returns both to their owner's hand. Three
+# Islands pay for it, two are chosen and bounced, the third stays.
+
+[Bot1 Deck]
+Island x3
+Sea Drake
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Island#3.Activate
+Bot1.Hand.Sea Drake.Cast
+Bot1.Pass
+Bot1.Target(Bot1.Battlefield.Island#1; Bot1.Battlefield.Island#2)
+Bot1.Pass
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield = Sea Drake; Island
+Bot1.Battlefield.Count = 2

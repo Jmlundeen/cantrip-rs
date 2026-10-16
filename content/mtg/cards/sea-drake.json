@@ -1,0 +1,9 @@
+{
+  "name": "Sea Drake",
+  "manaCost": "{2}{U}",
+  "type": "Creature — Drake",
+  "power": 4,
+  "toughness": 3,
+  "oracleText": "Flying\nWhen this creature enters, return two target lands you control to their owner's hand.",
+  "keywords": ["Flying"]
+}

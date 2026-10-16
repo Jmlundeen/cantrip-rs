@@ -1,0 +1,40 @@
+# "Two target lands you control" (CR 115.1): an opponent's Island is no candidate, though it is a land. Bot1's own two Islands are the
+# positive control.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Sea Drake
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sea Drake.Cast
+Bot1.Pass
+! Bot1.Target(Bot2.Battlefield.Island)
+Bot1.Target(Bot1.Battlefield.Island#1; Bot1.Battlefield.Island#2)
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield = Sea Drake; Mox Sapphire; Mox Jet; Mox Ruby
+Bot2.Battlefield = Island

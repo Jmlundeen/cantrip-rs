@@ -1,0 +1,47 @@
+# One of Sea Drake's two targets becoming illegal does not stop the other (CR 608.2b): in response to the trigger Bot1 sacrifices
+# its targeted Strip Mine to destroy Bot2's Island, and the Island Bot1 also targeted still returns to its owner's hand.
+
+[Bot1 Deck]
+Strip Mine
+Island
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Sea Drake
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Strip Mine.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sea Drake.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Strip Mine; Island)
+Bot1.Battlefield.Strip Mine.Activate(Ability: Destroy; Bot2.Battlefield.Island)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield = Sea Drake; Mox Sapphire; Mox Jet; Mox Ruby
+Bot1.Graveyard = Strip Mine
+Bot2.Battlefield.Count = 0
+Bot2.Graveyard = Island

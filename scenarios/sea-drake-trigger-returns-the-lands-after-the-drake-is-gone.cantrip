@@ -1,0 +1,45 @@
+# The trigger is independent of its source (CR 113.7a, 603.3): Bot1 Bolts its own Sea Drake in response, and both lands still return to
+# hand as the trigger resolves.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Ruby
+Sea Drake
+Lightning Bolt
+Island
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Sea Drake.Cast
+Bot1.Pass
+Bot1.Target(Island#1; Island#2)
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Lightning Bolt.Cast(Sea Drake)
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield = Mox Sapphire; Mox Jet; Mox Ruby; Mox Ruby
+Bot1.Graveyard = Sea Drake; Lightning Bolt
