@@ -1,0 +1,50 @@
+# A copy of Casey Jones has his triggered ability (CR 707.2), and "you" is the copy's controller (CR 109.5). Bot1's Casey enters on turn 5 and Bot2's Phantasmal Image
+# enters as a copy of him on turn 6: Bot2 draws three, and the delayed discard it sets up is Casey Jones's ability, not the Image's own (the Image has none), controlled by
+# Bot2. At Bot1's upkeep on turn 7 only Bot1 discards three (7 to 4 in hand); at Bot2's upkeep on turn 8 Bot2 discards three at random too. Both hands are all
+# basic lands of one kind, so which cards are taken cannot matter.
+
+[Bot1 Deck]
+Casey Jones, Vigilante
+Mountain x32
+
+[Bot2 Deck]
+Phantasmal Image
+Island x32
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Hand.Casey Jones, Vigilante.Cast
+Bot1.Pass
+[T6 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Island#2.Activate
+Bot2.Hand.Phantasmal Image.Cast
+Bot2.Accept
+Bot2.Pass
+[T6 Bot2.Main2]
+? Bot2.Battlefield.Casey Jones, Vigilante.Subtypes = Berserker; Human; Illusion
+? Bot2.Hand.Count = 9
+[T7 Bot1.Main1]
+? Bot2.Graveyard.Count = 2
+? Bot1.Graveyard.Count = 4
+? Bot2.Hand.Count = 7
+[T8 Bot2.Main1]
+
+[Expect]
+Bot2.Graveyard.Count = 5
+Bot2.Hand.Count = 5
+Bot1.Graveyard.Count = 4
+Bot1.Hand.Count = 5
+Stack.Count = 0

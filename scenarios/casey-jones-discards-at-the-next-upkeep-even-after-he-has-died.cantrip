@@ -1,0 +1,45 @@
+# The discard is a delayed triggered ability (CR 603.7), not an ability of Casey Jones on the battlefield: Bot2 kills him with Lightning Bolt on turn 6 (3 toughness),
+# and at the beginning of Bot1's next upkeep, turn 7, Bot1 still discards three cards at random (CR 603.7e: it is controlled by the player who controlled the ability
+# that created it). Bot1's hand is all Mountains, so which are taken cannot matter. The draw of three happened on entering (8 cards, one discarded in cleanup).
+
+[Bot1 Deck]
+Casey Jones, Vigilante
+Mountain x32
+
+[Bot2 Deck]
+Mountain
+Mountain
+Lightning Bolt
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Hand.Casey Jones, Vigilante.Cast
+Bot1.Pass
+[T6 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Casey Jones, Vigilante)
+Bot2.Pass
+Bot1.Pass
+[T6 Bot2.Main2]
+? Bot1.Battlefield = Mountain; Mountain; Mountain
+? Bot1.Graveyard.Count = 2
+[T7 Bot1.Main1]
+
+[Expect]
+Bot1.Graveyard = Mountain; Mountain; Mountain; Casey Jones, Vigilante; Mountain
+Bot1.Hand.Count = 5
+Bot1.Battlefield = Mountain; Mountain; Mountain
+Stack.Count = 0

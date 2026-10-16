@@ -1,0 +1,8 @@
+{
+  "name": "Casey Jones, Vigilante",
+  "manaCost": "{1}{R}{R}",
+  "type": "Legendary Creature — Human Berserker",
+  "power": 4,
+  "toughness": 3,
+  "oracleText": "When Casey Jones enters, draw three cards. At the beginning of your next upkeep, discard three cards at random."
+}
