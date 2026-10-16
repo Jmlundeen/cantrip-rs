@@ -1,0 +1,56 @@
+# "Whenever a token you control enters" is any token, a noncreature Clue included, and only your own: Bot2's Thraben
+# Inspector investigates on turn 2 and Bot1's life does not move (negative control: the same trigger is Bot1's on
+# turn 3). The count of resolutions restarts every turn (CR 608.2m): on turn 3 Bot1's first Clue gains 1 life, as a
+# first resolution does, and its second Clue draws a card, the second.
+
+[Bot1 Deck]
+Belladonna Took
+Mox Pearl
+Mox Jet
+Thraben Inspector
+Thraben Inspector
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Plains
+Thraben Inspector
+Plains x10
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Belladonna Took.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Thraben Inspector.Cast
+Bot2.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot1.Life = 20
+? Bot2.Battlefield = Plains; Thraben Inspector; Clue Token
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Thraben Inspector.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+? Bot1.Life = 21
+? Bot1.Hand.Count = 3
+Bot1.Hand.Thraben Inspector.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Life = 21
+Bot1.Hand.Count = 3
+Bot1.Battlefield = Mox Pearl; Mox Jet; Belladonna Took; Plains; Thraben Inspector; Thraben Inspector; Clue Token; Clue Token

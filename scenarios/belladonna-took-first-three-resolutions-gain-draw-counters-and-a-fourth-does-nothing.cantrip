@@ -1,0 +1,59 @@
+# Belladonna Took's ability counts its own resolutions this turn (CR 608.2m). Lingering Souls makes two Spirit tokens
+# at once: the first trigger gains 1 life, the second draws a card. Its flashback makes two more: the third resolution
+# puts a +1/+1 counter on each creature Bella controls (Belladonna and all four Spirits, since the tokens are there
+# already) and the fourth does nothing at all (no life, no card, no counters) - the boundaries 1, 2, 3 and 4.
+# Mana is activated just before each cast so each payment is exact: Ruby + Pearl for Belladonna, Black Lotus for
+# Souls, Jet + Emerald for the flashback.
+
+[Bot1 Deck]
+Belladonna Took
+Lingering Souls
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Emerald
+Black Lotus
+Plains x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Belladonna Took.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Lingering Souls.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+? Stack.Count = 0
+? Bot1.Life = 21
+? Bot1.Hand.Count = 1
+? Bot1.Battlefield.Belladonna Took.Power = 2
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Graveyard.Lingering Souls.Cast(Ability: Flashback)
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Life = 21
+Bot1.Hand.Count = 1
+Bot1.Battlefield.Belladonna Took.Power = 3
+Bot1.Battlefield.Spirit#1.Power = 2
+Bot1.Battlefield.Spirit#4.Power = 2
+Bot2.Life = 20
