@@ -1,0 +1,52 @@
+# Sarkhan's "whenever a Dragon you control enters" trigger is on the stack when Bot2 Lightning Bolts Sarkhan (a 2/2): he dies, and
+# the trigger then resolves with no Sarkhan to put the counter on or to become a Dragon, so it does nothing (CR 608.2b,
+# 400.7). Nova Hellkite, cast for its warp cost on turn 3, is unaffected and Bot1 keeps his Treasure.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Pearl
+Mox Jet
+Sarkhan, Dragon Ascendant
+Nova Hellkite
+Island
+Island x10
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x13
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sarkhan, Dragon Ascendant.Cast
+Bot1.Choose(Nova Hellkite)
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Nova Hellkite.Cast(Ability: Warp)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Sarkhan, Dragon Ascendant)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+? Bot1.Graveyard = Sarkhan, Dragon Ascendant
+? Bot1.Battlefield = Mountain; Mox Ruby; Mox Pearl; Mox Jet; Nova Hellkite; Treasure Token
+? Stack.Count = 0
+
+[Expect]
+Bot2.Graveyard = Lightning Bolt

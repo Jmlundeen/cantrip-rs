@@ -1,0 +1,56 @@
+# Sarkhan, Dragon Ascendant. Turn 1: Sarkhan enters with a Nova Hellkite (a Dragon card) in Bot1's hand, and its "you may behold
+# a Dragon" reveals it from there, so a Treasure token is created; the Hellkite stays in the hand. Ornithopter, cast
+# afterwards, is no Dragon and Sarkhan stays a 2/2. Turn 3: the Hellkite is cast for its warp cost, using the Treasure: a
+# Dragon enters under Bot1's control, so Sarkhan gets a +1/+1 counter (3/3) and until end of turn is a Dragon too, with flying.
+# Sarkhan, the Ornithopter and the hasty Hellkite attack: 3 + 0 + 4 = 7. At turn 4 Sarkhan is a plain 3/3 again.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Pearl
+Mox Jet
+Ornithopter
+Sarkhan, Dragon Ascendant
+Nova Hellkite
+Island
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sarkhan, Dragon Ascendant.Cast
+Bot1.Choose(Nova Hellkite)
+? Bot1.Revealed = Nova Hellkite
+? Bot1.Battlefield.Treasure Token.Token = true
+Bot1.Hand.Ornithopter.Cast
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Sarkhan, Dragon Ascendant.Power = 2
+? Bot1.Hand = Nova Hellkite
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Treasure Token.Activate(Color: Red)
+Bot1.Hand.Nova Hellkite.Cast(Ability: Warp)
+[T3 Bot1.DeclareAttackers]
+? Bot1.Battlefield.Sarkhan, Dragon Ascendant.Power = 3
+? Bot1.Battlefield.Sarkhan, Dragon Ascendant.Toughness = 3
+? Bot1.Battlefield.Sarkhan, Dragon Ascendant.Subtypes = Dragon; Druid; Human
+? Bot1.Battlefield.Sarkhan, Dragon Ascendant.Keywords = Flying
+? Bot1.Battlefield.Sarkhan, Dragon Ascendant.Counters.PlusOnePlusOne = 1
+Bot1.Attack(Sarkhan, Dragon Ascendant > Bot2; Nova Hellkite > Bot2)
+[T4 Bot2.Main1]
+? Bot2.Life = 13
+? Bot1.Battlefield.Sarkhan, Dragon Ascendant.Power = 3
+? Bot1.Battlefield.Sarkhan, Dragon Ascendant.Subtypes = Druid; Human
+? Bot1.Battlefield.Sarkhan, Dragon Ascendant.Keywords = (absent)
+
+[Expect]
+Bot2.Life = 13
+Exile = Nova Hellkite

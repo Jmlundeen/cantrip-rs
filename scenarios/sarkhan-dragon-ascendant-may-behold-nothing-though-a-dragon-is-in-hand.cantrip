@@ -1,0 +1,27 @@
+# "You may behold a Dragon": with a Nova Hellkite in hand Bot1 chooses none (`Choose()`), so nothing is revealed and no Treasure
+# is created. The control is the first Sarkhan scenario, where the same hand beholds the Hellkite.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Sarkhan, Dragon Ascendant
+Nova Hellkite
+Island x12
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sarkhan, Dragon Ascendant.Cast
+Bot1.Choose()
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Count = 3
+? Bot1.Revealed = (absent)
+
+[Expect]
+Bot1.Battlefield = Mountain; Mox Ruby; Sarkhan, Dragon Ascendant
+Bot1.Hand = Island; Island; Island; Nova Hellkite

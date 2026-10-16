@@ -1,0 +1,26 @@
+# With no Dragon permanent and no Dragon card in hand there is nothing to behold: Sarkhan's enters trigger asks nothing
+# (`! Bot1.Choose`) and creates no Treasure (CR 701.4a, 608.2d "if you do"). An Ornithopter in hand is not a Dragon.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Sarkhan, Dragon Ascendant
+Ornithopter
+Island x12
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sarkhan, Dragon Ascendant.Cast
+! Bot1.Choose
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Count = 3
+? Bot1.Revealed = (absent)
+
+[Expect]
+Bot1.Battlefield = Mountain; Mox Ruby; Sarkhan, Dragon Ascendant

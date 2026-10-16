@@ -1,0 +1,50 @@
+# Whether a permanent is a Dragon is judged as it enters (CR 603.6a): Phantasmal Image enters as a copy of Bot1's Nova Hellkite, a
+# Dragon, so it triggers Sarkhan too (it is a Dragon you control), as the Hellkite itself did. Two triggers, two +1/+1 counters:
+# Sarkhan is a 4/4 Dragon with flying until end of turn, a 2/2 again with the counters on turn 4 (a 4/4). The Hellkite's enters
+# trigger, shared by the copy, has no creature an opponent controls to hit and is left off the stack.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Sapphire
+Mox Jet
+Sarkhan, Dragon Ascendant
+Nova Hellkite
+Island
+Phantasmal Image
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sarkhan, Dragon Ascendant.Cast
+Bot1.Choose(Nova Hellkite)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Treasure Token.Activate(Color: Red)
+Bot1.Hand.Nova Hellkite.Cast(Ability: Warp)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Phantasmal Image.Cast
+Bot1.Accept
+Bot1.Target(Bot1.Battlefield.Nova Hellkite)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Sarkhan, Dragon Ascendant.Power = 4
+? Bot1.Battlefield.Sarkhan, Dragon Ascendant.Counters.PlusOnePlusOne = 2
+? Bot1.Battlefield.Sarkhan, Dragon Ascendant.Subtypes = Dragon; Druid; Human
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Sarkhan, Dragon Ascendant.Subtypes = Druid; Human
+? Bot1.Battlefield.Sarkhan, Dragon Ascendant.Power = 4
+
+[Expect]
+Bot1.Battlefield.Sarkhan, Dragon Ascendant.Toughness = 4

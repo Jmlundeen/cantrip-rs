@@ -1,0 +1,40 @@
+# Behold (CR 701.4a) is "choose a Dragon you control or reveal a Dragon card from your hand". Turn 3: Nova Hellkite is cast for
+# its warp cost and is on the battlefield when Sarkhan enters, so the Dragon beheld is that permanent: it is chosen (the hand
+# holds no Dragon card), nothing is revealed (`Bot1.Revealed` is absent), and the Treasure is created. The Hellkite had entered
+# before Sarkhan, so there is no counter on him: he is a 2/2.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Sarkhan, Dragon Ascendant
+Nova Hellkite
+Island x12
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Nova Hellkite.Cast(Ability: Warp)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sarkhan, Dragon Ascendant.Cast
+Bot1.Choose(Nova Hellkite)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Treasure Token.Token = true
+? Bot1.Revealed = (absent)
+? Bot1.Battlefield.Sarkhan, Dragon Ascendant.Power = 2
+
+[Expect]
+Bot1.Battlefield.Sarkhan, Dragon Ascendant.Subtypes = Druid; Human
