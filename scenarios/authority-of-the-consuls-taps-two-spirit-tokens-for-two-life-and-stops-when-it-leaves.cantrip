@@ -1,0 +1,60 @@
+# Authority of the Consuls: Bot2's Lingering Souls makes two Spirit tokens at once under Bot2. Tokens are creatures,
+# so the two entering together trigger it twice (CR 603.2c): Bot1 gains 2 life. (That they enter tapped is the
+# known-bug scenario next to this one.)
+# Then Bot2 Disenchants the Authority; once it has left the battlefield Bot2's Ornithopter enters untapped and Bot1
+# gains nothing more.
+
+[Bot1 Deck]
+Plains
+Authority of the Consuls
+Plains x5
+Plains x13
+
+[Bot2 Deck]
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Lingering Souls
+Disenchant
+Ornithopter
+Plains
+Plains x13
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Authority of the Consuls.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Pearl#1.Activate
+Bot2.Battlefield.Mox Pearl#2.Activate
+Bot2.Battlefield.Mox Pearl#3.Activate
+Bot2.Hand.Lingering Souls.Cast
+Bot2.Pass
+Bot1.Pass
+Bot1.Triggers(Authority of the Consuls; Authority of the Consuls)
+? Stack.Count = 2
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+? Bot1.Life = 22
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Pearl#1.Activate
+Bot2.Battlefield.Mox Pearl#2.Activate
+Bot2.Hand.Disenchant.Cast(Authority of the Consuls)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield = Plains
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Life = 22
+Bot2.Battlefield.Ornithopter.Tapped = false
+Bot1.Graveyard = Authority of the Consuls
