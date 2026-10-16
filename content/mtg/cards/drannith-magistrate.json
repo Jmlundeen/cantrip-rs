@@ -1,0 +1,8 @@
+{
+  "name": "Drannith Magistrate",
+  "manaCost": "{1}{W}",
+  "type": "Creature — Human Wizard",
+  "power": 1,
+  "toughness": 3,
+  "oracleText": "Your opponents can't cast spells from anywhere other than their hands."
+}

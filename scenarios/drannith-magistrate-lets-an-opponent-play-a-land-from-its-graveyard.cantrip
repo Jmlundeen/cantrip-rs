@@ -1,0 +1,51 @@
+# Drannith Magistrate stops casting spells, not playing lands (CR 305.1, 101.2; its ruling: "your opponents may play lands
+# from zones other than their hand"). Bot1 casts the Magistrate turn 1. Bot2 casts Crucible of Worlds and Faithless Looting
+# from its hand in turn 2, discarding a Mountain. In turn 4 it plays that Mountain from its graveyard, but with mana for it
+# is refused Faithless Looting's flashback from the same graveyard.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Drannith Magistrate
+Plains x4
+Plains x10
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Emerald
+Crucible of Worlds
+Faithless Looting
+Island
+Island
+Mountain
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Drannith Magistrate.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Crucible of Worlds.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Faithless Looting.Cast
+Bot2.Choose(Mountain; Island)
+[T4 Bot2.Main1]
+Bot2.Graveyard.Mountain.Play
+! Bot2.Graveyard.Faithless Looting.Cast
+
+[Expect]
+Turn = 4
+Bot2.Battlefield = Mountain; Mountain; Mox Ruby; Mox Jet; Mox Emerald; Crucible of Worlds
+Bot2.Graveyard = Faithless Looting; Island

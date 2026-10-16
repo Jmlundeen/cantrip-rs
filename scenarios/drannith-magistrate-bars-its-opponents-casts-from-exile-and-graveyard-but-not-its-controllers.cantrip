@@ -1,0 +1,83 @@
+# "Your opponents can't cast spells from anywhere other than their hands" (CR 101.2, 601.3), a static ability of Drannith
+# Magistrate, which Bot1 casts turn 1.
+# - Turn 2: Bot2 casts from its hand freely - Faithless Looting, and Bonecrusher Giant's Adventure Stomp, which exiles the
+#   Giant on an Adventure (CR 715.4).
+# - Turn 3: Bot1, Drannith's controller and no opponent of itself, flashes back its own Faithless Looting.
+# - Turn 4, with mana for each: Bot2 can't cast Bonecrusher Giant from exile (CR 715.5's permission is overruled) nor its
+#   Looting by flashback. It Lightning Bolts the Magistrate and then casts the Giant from exile: the control.
+# - Turn 6: Bot2 flashes back its Looting, the other control.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Drannith Magistrate
+Mountain
+Faithless Looting
+Black Lotus
+Plains
+Plains x10
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Emerald
+Faithless Looting
+Bonecrusher Giant
+Mox Sapphire
+Mountain
+Island
+Island
+Lightning Bolt
+Island x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Drannith Magistrate.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Faithless Looting.Cast
+Bot2.Choose(Island; Island)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Bonecrusher Giant.Cast(Bot1; Ability: Adventure)
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Plains; Plains)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Graveyard.Faithless Looting.Cast(Ability: Flashback)
+Bot1.Choose(Plains; Plains)
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+! Bot2.Exile.Bonecrusher Giant.Cast
+! Bot2.Graveyard.Faithless Looting.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Drannith Magistrate)
+[T4 Bot2.Main2]
+Bot2.Battlefield.Mountain#2.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Exile.Bonecrusher Giant.Cast
+[T6 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Graveyard.Faithless Looting.Cast(Ability: Flashback)
+
+[Expect]
+Turn = 6
+Bot1.Life = 18
+Bot1.Graveyard = Drannith Magistrate; Plains; Plains; Black Lotus; Plains; Plains
+Bot2.Battlefield.Bonecrusher Giant.Power = 4
+Exile = Faithless Looting; Faithless Looting
