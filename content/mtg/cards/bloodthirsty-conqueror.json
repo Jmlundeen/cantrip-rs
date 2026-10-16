@@ -1,0 +1,12 @@
+{
+  "name": "Bloodthirsty Conqueror",
+  "manaCost": "{3}{B}{B}",
+  "type": "Creature — Vampire Knight",
+  "power": 5,
+  "toughness": 5,
+  "oracleText": "Flying, deathtouch\nWhenever an opponent loses life, you gain that much life.",
+  "keywords": [
+    "Flying",
+    "Deathtouch"
+  ]
+}

@@ -1,0 +1,49 @@
+# Bloodthirsty Conqueror only answers an opponent's loss of life: Bot1 bolting their own face loses 3 (20 -> 17) and gains
+# nothing, and Bot2 is untouched at 20. Refusal-side partner of ...gains-life-equal-to-damage-dealt-to-an-opponent, where
+# the same Bolt at Bot2 gains 3 (the positive control). Bot1's life going back up would show the trigger firing for the
+# wrong player.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Bloodthirsty Conqueror
+Lightning Bolt
+Swamp x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Bloodthirsty Conqueror.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+[Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Life = 17
+Bot2.Life = 20
+Bot1.Graveyard = Lightning Bolt

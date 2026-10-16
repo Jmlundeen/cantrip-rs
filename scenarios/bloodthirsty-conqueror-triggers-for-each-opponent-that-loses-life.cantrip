@@ -1,0 +1,61 @@
+# Bloodthirsty Conqueror in a three-player game: "whenever an opponent loses life" triggers once for each opponent that loses
+# life. Boltwave deals 3 damage to each of Bot2 and Bot3 at once (CR 120.2), so two triggers each gain Bot1 3: 20 + 6 = 26.
+# One trigger per opponent and not one for the pair is what the 26 shows (a single trigger would give 23 or 29).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Bloodthirsty Conqueror
+Boltwave
+Swamp x13
+
+[Bot2 Deck]
+Island x20
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Bloodthirsty Conqueror.Cast
+Bot1.Pass
+[T4 Bot1.Main1]
+? Bot1.Life = 20
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Boltwave.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+? Bot2.Life = 17
+? Bot3.Life = 17
+? Bot1.Life = 20
+Bot1.Triggers(Bloodthirsty Conqueror; Bloodthirsty Conqueror)
+Bot1.Pass
+? Stack.Count = 2
+Bot2.Pass
+Bot3.Pass
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Turn = 4
+Stack.Count = 0
+Bot2.Life = 17
+Bot3.Life = 17
+Bot1.Life = 26

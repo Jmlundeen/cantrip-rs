@@ -1,0 +1,52 @@
+# Bloodthirsty Conqueror: damage dealt to an opponent causes that opponent to lose life (ruling 2024-11-08), so Bot1 gains
+# that much. Lightning Bolt at Bot2 costs Bot2 3 and gains Bot1 3 (20 + 3 = 23). Positive control for the refusal case
+# in bloodthirsty-conqueror-gains-nothing-when-its-controller-loses-life.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Bloodthirsty Conqueror
+Lightning Bolt
+Swamp x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Bloodthirsty Conqueror.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot1.Life = 20
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+? Stack.Count = 1
+Bot2.Pass
+? Bot2.Life = 17
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot2.Life = 17
+Bot1.Life = 23
+Bot1.Battlefield.Bloodthirsty Conqueror.Power = 5
+Bot1.Battlefield.Bloodthirsty Conqueror.Keywords = Deathtouch; Flying
