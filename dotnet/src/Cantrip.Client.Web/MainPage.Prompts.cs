@@ -1172,7 +1172,8 @@ public sealed partial class MainPage
     /// <summary>Which of several replacement effects applies first (CR 616.1).</summary>
     private void FillChooseReplacement(GameClient client, ChooseReplacementPromptMessage prompt)
     {
-        string subject = client.Object(prompt.Subject)?.Name ?? "it";
+        // The object the event is about, or for an event about none, what the event is ("You would gain 3 life").
+        string subject = client.Object(prompt.Subject)?.Name ?? (prompt.Event.Length > 0 ? prompt.Event : "it");
 
         Prompt(
             $"{subject}: which applies first?",

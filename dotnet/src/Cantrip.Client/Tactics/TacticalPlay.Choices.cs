@@ -701,6 +701,28 @@ public sealed partial class TacticalPlay
         return new MayChosenAnswer { Accept = accept };
     }
 
+    /// <summary>
+    /// Which replacement effect applies first (CR 616.1). Only a gain of this seat's life is ordered on purpose: an effect
+    /// that turns it into a loss goes first, before anything makes the gain (and so the loss) bigger, and one that adds to
+    /// it goes before one that multiplies it. Anything else, and two effects on a loss, are as good in any order to a seat
+    /// that does not know what they are.
+    /// </summary>
+    private static AnswerPayload Replacement(ChooseReplacementPromptMessage prompt)
+    {
+        if (!prompt.Event.StartsWith("You would gain", StringComparison.Ordinal))
+        {
+            return prompt.Default();
+        }
+
+        int first = prompt.Hints.FindIndex(hint => hint.Contains("lose", StringComparison.Ordinal));
+        if (first < 0)
+        {
+            first = prompt.Hints.FindIndex(hint => hint.Contains("plus", StringComparison.Ordinal));
+        }
+
+        return first < 0 ? prompt.Default() : new ReplacementChosenAnswer { Index = first };
+    }
+
     private static AnswerPayload Player(GameClient client, ChoosePlayerPromptMessage prompt)
     {
         if (prompt.Candidates.Count == 0)

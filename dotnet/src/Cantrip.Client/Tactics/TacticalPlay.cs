@@ -297,14 +297,15 @@ public sealed partial class TacticalPlay : IAutoPlayer
                 Player = starting.Candidates.Contains(client.Seat) ? client.Seat : starting.Candidates[0],
             },
             ChooseColorsPromptMessage colors => Colors(client, view, colors),
+            ChooseReplacementPromptMessage replacement => Replacement(replacement),
 
             // A card name: the card that asks says which name is worth choosing, knowing what the name does (Anointed
             // Peacekeeper's costliest spell in the hand it looked at, Petrified Hamlet's land of the opponent's that it
             // stops), and this seat knows no card by name to do better.
             NameCardPromptMessage naming => new CardNamedAnswer { Name = naming.Suggestion },
 
-            // The engine's own division of combat damage, the first replacement and the order things triggered in
-            // are each legal and each as good as this seat can do without knowing what the triggers are.
+            // The engine's own division of combat damage and the order things triggered in are each legal and each as
+            // good as this seat can do without knowing what the triggers are.
             _ => prompt.Default(),
         };
     }

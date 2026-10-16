@@ -347,6 +347,12 @@ public sealed class ScenarioPlayer
                 await DistributeAsync(distributed, state);
                 return;
 
+            case ReplacementChosenAnswer replacement:
+                // Which of several replacement effects applies first (CR 616.1): the dock has a button for each, "Source: what
+                // it does", in the order the question offers them.
+                await ClickDockAsync(replacement.Index);
+                return;
+
             default:
                 throw new NotDrivenException(expected.Answer?.GetType().Name ?? "nothing", state);
         }
