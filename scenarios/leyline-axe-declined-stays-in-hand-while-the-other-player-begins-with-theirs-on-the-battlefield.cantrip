@@ -1,0 +1,48 @@
+# Leyline Axe's opening-hand action is a "may", for each player who holds one (CR 103.6a): Bot1 declines, so the Axe stays in its
+# hand and is an ordinary artifact it casts for {4} later (four Moxen on turn 1, the Axe on the battlefield afterwards); Bot2,
+# asked after the starting player, accepts, and its own Axe is on its battlefield from the start.
+
+[Bot1 Deck]
+Leyline Axe
+Mox Ruby
+Mox Emerald
+Mox Jet
+Mox Pearl
+Mountain
+Mountain
+Mountain x12
+
+[Bot2 Deck]
+Leyline Axe
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest x12
+
+[Actions]
+Bot1.Decline
+Bot2.Accept
+? Bot1.Battlefield.Count = 0
+? Bot2.Battlefield = Leyline Axe
+? Bot2.Hand.Count = 6
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Leyline Axe.Cast
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Leyline Axe; Mox Ruby; Mox Emerald; Mox Jet; Mox Pearl
+Bot2.Battlefield = Leyline Axe
+Stack.Count = 0

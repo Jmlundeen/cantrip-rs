@@ -1,0 +1,54 @@
+# Leyline Axe: "If this card is in your opening hand, you may begin the game with it on the battlefield" (CR 103.6a): Bot1 accepts,
+# so on turn 1 the Axe is on the battlefield and still in no hand. Four Moxen pay for a Llanowar Elves ({G}) and Equip {3} (sorcery
+# speed), making the Elves a 2/2 with double strike and trample. On turn 3 it attacks and Bot2's Llanowar Elves blocks: 2 damage
+# in the first-strike step, 1 lethal to the blocker and 1 trampling through (CR 702.19b), then in the regular step the blocker is
+# gone and all 2 go to the player (CR 702.19e): 3 damage, the blocker dead.
+
+[Bot1 Deck]
+Leyline Axe
+Mox Ruby
+Mox Emerald
+Mox Jet
+Mox Pearl
+Llanowar Elves
+Mountain
+Mountain x12
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x16
+
+[Actions]
+Bot1.Accept
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+? Bot1.Battlefield.Leyline Axe.Types = Artifact
+? Bot1.Hand = Llanowar Elves; Mountain
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Leyline Axe.Activate(Bot1.Battlefield.Llanowar Elves; Ability: Equip)
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Llanowar Elves.Power = 2
+? Bot1.Battlefield.Llanowar Elves.Toughness = 2
+? Bot1.Battlefield.Llanowar Elves.Keywords = DoubleStrike; Trample
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Llanowar Elves)
+Bot2.Block(Bot2.Battlefield.Llanowar Elves > Bot1.Battlefield.Llanowar Elves)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot2.Graveyard = Llanowar Elves
+Bot1.Battlefield.Leyline Axe.AttachedTo = Llanowar Elves
+Bot1.Battlefield.Llanowar Elves.Damage = 0
