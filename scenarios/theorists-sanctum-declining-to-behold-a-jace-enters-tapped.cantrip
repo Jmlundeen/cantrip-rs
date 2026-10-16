@@ -18,3 +18,4 @@ Bot1.Choose()
 [Expect]
 Bot1.Battlefield.Theorist's Sanctum.Tapped = true
 Bot1.Hand = Island; Island; Island; Island; Island; Jace, the Mind Sculptor
+Bot1.Revealed = (absent)

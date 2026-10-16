@@ -1,0 +1,69 @@
+# Empower Jace with several Jace planeswalker tokens under your control: "you'll choose one of those tokens to put the loyalty
+# counters on". Bot1 empowers on turn 1 (a Jace token with 2 loyalty). Bot2 casts Jace, the Mind Sculptor on turn 2, and on turn 3
+# Bot1's Fractured Identity exiles it and gives Bot1 a token copy that keeps the printed 3 loyalty - a second Jace planeswalker
+# token. On turn 5 the empower asks which token; Bot1 picks the first one, which goes to 4, and the copy stays at 3. (The second
+# Sanctum beholds the first token on turn 3, so it is untapped and pays for the spell.)
+
+[Bot1 Deck]
+Theorist's Sanctum
+Theorist's Sanctum
+Black Lotus
+Jace, the Mind Sculptor
+Mox Pearl
+Mox Sapphire
+Fractured Identity
+Mox Jet
+Island
+Island x14
+
+[Bot2 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Jace, the Mind Sculptor
+Island x3
+Island x14
+
+[Actions]
+Bot1.Hand.Theorist's Sanctum.Play
+Bot1.Choose(Jace, the Mind Sculptor)
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Theorist's Sanctum.Activate(Ability: Empower)
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Jace, the Mind Sculptor.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot2.Battlefield.Jace, the Mind Sculptor.Counters.Loyalty = 3
+Bot1.Hand.Theorist's Sanctum.Play
+Bot1.Choose(Jace)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Theorist's Sanctum#1.Activate(Ability: Add)
+Bot1.Battlefield.Theorist's Sanctum#2.Activate(Ability: Add)
+Bot1.Hand.Fractured Identity.Cast(Bot2.Battlefield.Jace, the Mind Sculptor)
+Bot2.Pass
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Jace, the Mind Sculptor.Counters.Loyalty = 3
+Bot1.Battlefield.Theorist's Sanctum#1.Activate(Ability: Empower)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot2.Pass
+Bot1.Choose(Jace)
+
+[Expect]
+Bot1.Battlefield.Jace.Counters.Loyalty = 4
+Bot1.Battlefield.Jace, the Mind Sculptor.Counters.Loyalty = 3
+Bot1.Battlefield.Jace, the Mind Sculptor.Token = true
+Exile = Jace, the Mind Sculptor

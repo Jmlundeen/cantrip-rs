@@ -31,15 +31,23 @@ pub static JACE: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
-/// "Empower Jace N" for `controller`, `source` being the object whose ability does it.
-pub fn jace(g: &mut dyn Game, controller: PlayerId, source: ObjectId, n: i16) -> Result<(), Suspend> {
-    let owned: Vec<ObjectId> = g
-        .permanents_of(controller)
+fn jace_tokens(g: &dyn Game, controller: PlayerId) -> Vec<ObjectId> {
+    g.permanents_of(controller)
         .into_iter()
         .filter(|&id| g.obj(id).token && g.chars(id).is(CardType::Planeswalker) && g.chars(id).has_subtype(Subtype::Jace))
-        .collect();
+        .collect()
+}
+
+/// "Empower Jace N" for `controller`, `source` being the object whose ability does it. With several Jace planeswalker
+/// tokens (a token copy of a Jace keeps its printed loyalty) the player chooses which gets the counters.
+pub fn jace(g: &mut dyn Game, controller: PlayerId, source: ObjectId, n: i16) -> Result<(), Suspend> {
+    let mut owned = jace_tokens(g, controller);
+    if owned.is_empty() {
+        tokens::create(g, controller, &JACE, 1)?;
+        owned = jace_tokens(g, controller);
+    }
     let jace = match owned.as_slice() {
-        [] => tokens::create(g, controller, &JACE, 1)?.first().copied(),
+        [] => None,
         [only] => Some(*only),
         _ => choose::cards_from_kind(g, controller, source, Purpose::Optional, "Jace planeswalker token", owned.clone(), owned, 1, false)?.first().copied(),
     };

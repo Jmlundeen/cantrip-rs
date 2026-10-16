@@ -1,0 +1,63 @@
+# A token copy of Jace, the Mind Sculptor is a Jace planeswalker token (it keeps its printed 3 loyalty). Bot2 casts the Mind
+# Sculptor on turn 2; on turn 3 Bot1's Fractured Identity exiles it and Bot1 gets the copy. Bot1 then plays Theorist's Sanctum, which
+# beholds that copy (a permanent: chosen, not revealed), so it enters untapped. On turn 5 empower Jace has a Jace planeswalker
+# token already, the copy, so it makes no new token and puts the two counters on the copy (5); with a single token nothing is asked.
+
+[Bot1 Deck]
+Island
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Fractured Identity
+Theorist's Sanctum
+Island
+Island x14
+
+[Bot2 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Jace, the Mind Sculptor
+Island x3
+Island x14
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Jace, the Mind Sculptor.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Fractured Identity.Cast(Bot2.Battlefield.Jace, the Mind Sculptor)
+Bot2.Pass
+? Bot1.Battlefield.Jace, the Mind Sculptor.Token = true
+Bot1.Hand.Theorist's Sanctum.Play
+Bot1.Choose(Jace, the Mind Sculptor)
+? Bot1.Battlefield.Theorist's Sanctum.Tapped = false
+[T5 Bot1.Main1]
+Bot1.Battlefield.Theorist's Sanctum.Activate(Ability: Empower)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Choose
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Jace, the Mind Sculptor.Counters.Loyalty = 5
+Bot1.Battlefield.Count = 7
+Bot1.Revealed = (absent)
