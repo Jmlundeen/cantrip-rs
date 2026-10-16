@@ -9,20 +9,20 @@ use cantrip_oracle as oracle;
 fn snap(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.add_counters(item.object, CounterKind::PlusOne, 2);
     let me = g.card_id(&CARD);
-    let odd = choose::one_of(g, item.controller, item.object, vec![Label::Card(me, 0), Label::Card(me, 1)])? == 0;
+    let odd = choose::odd_or_even(g, item.controller, item.object, me)?;
     let doomed: Vec<ObjectId> = g
         .state()
         .battlefield()
         .iter()
         .copied()
-        .filter(|&id| id != item.object && g.chars(id).is(CardType::Creature) && (g.mana_value(id) % 2 == 1) == odd)
+        .filter(|&id| id != item.object && g.chars(id).is(CardType::Creature) && choose::mana_value_of_quality(g, id, odd))
         .collect();
     g.destroy_all(&doomed);
     Ok(())
 }
 
 pub static CARD: CardDef = CardDef {
-    labels: &["Odd", "Even"],
+    labels: choose::ODD_OR_EVEN,
     abilities: &[power_up::ability(
         cost("{C}{W}{U}{B}{R}{G}"),
         snap,

@@ -1,0 +1,84 @@
+# Thanos, the Mad Titan's power-up, choosing even: a token has mana value 0 (it has no mana cost, CR 111.4, 202.3a) and
+# so does a face-down 2/2 (CR 708.2a), and zero is even. Bot2's two Lingering Souls Spirit tokens and the creature Bot2
+# manifested with Turn Inside Out are all destroyed, leaving Bot2 no creature.
+
+[Bot1 Deck]
+Island
+Sol Ring
+Mox Ruby
+Mox Pearl
+Mox Jet
+Forest
+Thanos, the Mad Titan
+Island x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Lingering Souls
+Ornithopter
+Mountain
+Mox Ruby
+Turn Inside Out
+Lightning Bolt
+Island x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Lingering Souls.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Turn Inside Out.Cast(Ornithopter)
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Ornithopter)
+Bot2.Pass
+Bot1.Pass
+Bot2.Arrange(Island | Island)
+[T5 Bot1.Main1]
+? Bot2.Battlefield..FaceDown = true
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Thanos, the Mad Titan.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Thanos, the Mad Titan.Activate
+Bot1.Pass
+Bot1.Modes(Even)
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot2.Battlefield = Plains; Mox Pearl; Mox Jet; Mountain; Mox Ruby
+Bot1.Battlefield.Thanos, the Mad Titan.Counters.PlusOnePlusOne = 2

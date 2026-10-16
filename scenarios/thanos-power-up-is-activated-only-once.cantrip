@@ -1,0 +1,58 @@
+# Thanos, the Mad Titan's power-up is activated only once (CR 702.193a). He enters on turn 5 and powers up for {C}{U}{G}
+# (his {R}{W}{B} off {C}{W}{U}{B}{R}{G}, CR 702.193b), paid with Sol Ring's {C}{C}, the Island and the Forest. Once it
+# has resolved, Bot1 still has the spare {C}, Mox Sapphire and Mox Emerald, which would pay {C}{U}{G} again, and the
+# ability is not offered a second time.
+
+[Bot1 Deck]
+Island
+Sol Ring
+Mox Ruby
+Mox Pearl
+Mox Jet
+Forest
+Thanos, the Mad Titan
+Mox Sapphire
+Mox Emerald
+Island x10
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Thanos, the Mad Titan.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Thanos, the Mad Titan.Activate
+? Bot1.Mana = {C}
+Bot1.Pass
+Bot1.Modes(Odd)
+! Bot1.Battlefield.Thanos, the Mad Titan.Activate
+
+[Expect]
+Turn = 5
+Bot1.Mana = {C}
+Bot1.Battlefield.Thanos, the Mad Titan.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Mox Sapphire.Tapped = false
+Bot1.Battlefield.Mox Emerald.Tapped = false
