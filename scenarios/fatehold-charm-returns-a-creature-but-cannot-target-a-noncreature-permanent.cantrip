@@ -1,0 +1,42 @@
+# Fatehold Charm's second mode: "Return target spell or creature to its owner's hand." Bot2's Mox Sapphire is a permanent but
+# not a creature, so it is no candidate; Bot2's Llanowar Elves is, and goes back to Bot2's hand. Nothing is drawn and no Jace
+# token is made: only the mode chosen happens (CR 700.2).
+
+[Bot1 Deck]
+Tundra
+Mox Sapphire
+Fatehold Charm
+Island x4
+Island x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Mox Sapphire
+Forest x4
+Forest x13
+
+[Actions]
+Bot1.Hand.Tundra.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Tundra.Activate(Ability: {W})
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Fatehold Charm.Cast
+Bot1.Modes(Return target spell or creature)
+! Bot1.Target(Bot2.Battlefield.Mox Sapphire)
+Bot1.Target(Llanowar Elves)
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Hand.Count = 6
+Bot2.Hand = Llanowar Elves; Forest; Forest; Forest; Forest; Forest
+Bot2.Battlefield = Forest; Mox Sapphire
+Bot1.Hand.Count = 5
+Bot1.Graveyard = Fatehold Charm
+Bot1.Battlefield.Count = 2

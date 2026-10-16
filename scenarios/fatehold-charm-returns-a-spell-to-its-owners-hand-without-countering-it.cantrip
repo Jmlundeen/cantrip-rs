@@ -1,0 +1,35 @@
+# Fatehold Charm returning target spell to its owner's hand: Bot2's Lightning Bolt aimed at Bot1 leaves the stack for
+# Bot2's hand (CR 400.3), so it never resolves and never reaches the graveyard - it was not countered. Bot1 keeps 20 life.
+
+[Bot1 Deck]
+Tundra
+Mox Sapphire
+Fatehold Charm
+Island x4
+Island x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x5
+Mountain x13
+
+[Actions]
+Bot1.Hand.Tundra.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Tundra.Activate(Ability: {W})
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Fatehold Charm.Cast
+Bot1.Modes(Return target spell or creature)
+Bot1.Target(Stack.Lightning Bolt)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Hand = Lightning Bolt; Mountain; Mountain; Mountain; Mountain; Mountain; Mountain
+Bot2.Graveyard =
+Bot1.Graveyard = Fatehold Charm
+Stack.Count = 0

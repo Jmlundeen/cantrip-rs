@@ -1,0 +1,42 @@
+# Fatehold Charm's first mode: "Draw a card. Empower Jace 2." Bot1 controls Jace, the Mind Sculptor, a nontoken Jace, which
+# empower Jace never chooses (the card's ruling), so a blue Jace planeswalker token is created and gets the two loyalty
+# counters, and Jace, the Mind Sculptor keeps its 3. The card drawn is the Ornithopter on top of the library.
+
+[Bot1 Deck]
+Tundra
+Black Lotus
+Mox Sapphire
+Mox Sapphire
+Jace, the Mind Sculptor
+Fatehold Charm
+Island
+Ornithopter
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Tundra.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Jace, the Mind Sculptor.Cast
+Bot2.Pass
+? Bot1.Battlefield.Jace, the Mind Sculptor.Counters.Loyalty = 3
+Bot1.Battlefield.Tundra.Activate(Ability: {W})
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Fatehold Charm.Cast
+Bot1.Modes(Draw a card)
+Bot2.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Island; Ornithopter
+Bot1.Graveyard = Fatehold Charm; Black Lotus
+Bot1.Battlefield.Jace.Counters.Loyalty = 2
+Bot1.Battlefield.Jace.Token = true
+Bot1.Battlefield.Jace, the Mind Sculptor.Counters.Loyalty = 3
+Bot1.Battlefield.Count = 5

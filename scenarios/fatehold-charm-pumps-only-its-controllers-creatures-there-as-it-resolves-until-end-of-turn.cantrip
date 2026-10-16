@@ -1,0 +1,49 @@
+# Fatehold Charm's third mode: "Creatures you control get +1/+2 until end of turn." Bot1's Llanowar Elves becomes 2/3 and
+# Bot2's stays 1/1 (only "you control"). The Ornithopter cast after the charm resolved is not affected: the set of creatures
+# is fixed as the effect begins (CR 611.2c). Next turn the Elves are 1/1 again (CR 514.2).
+
+[Bot1 Deck]
+Tundra
+Mox Sapphire
+Llanowar Elves
+Fatehold Charm
+Ornithopter
+Forest
+Island x1
+Island x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x5
+Forest x13
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Tundra.Play
+Bot1.Battlefield.Tundra.Activate(Ability: {W})
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Fatehold Charm.Cast
+Bot1.Modes(Creatures you control get)
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves.Power = 2
+? Bot1.Battlefield.Llanowar Elves.Toughness = 3
+? Bot2.Battlefield.Llanowar Elves.Power = 1
+? Bot2.Battlefield.Llanowar Elves.Toughness = 1
+Bot1.Hand.Ornithopter.Cast
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Toughness = 2
+? Bot1.Battlefield.Ornithopter.Power = 0
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot1.Battlefield.Llanowar Elves.Toughness = 1
+Bot1.Battlefield.Ornithopter.Toughness = 2

@@ -1,0 +1,41 @@
+# "If you control a Jace planeswalker token, you can't choose to create a new one when you empower Jace" (the ruling): the
+# first Fatehold Charm makes the token with two loyalty, the second puts two more on the same token, so Bot1 has one Jace
+# token with 4 loyalty. Each charm draws a card first.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Sapphire
+Fatehold Charm
+Fatehold Charm
+Island
+Island
+Ornithopter
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Fatehold Charm.Cast
+Bot1.Modes(Draw a card)
+Bot2.Pass
+? Bot1.Battlefield.Jace.Counters.Loyalty = 2
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Fatehold Charm.Cast
+Bot1.Modes(Draw a card)
+Bot2.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Jace.Counters.Loyalty = 4
+Bot1.Battlefield.Count = 4
+Bot1.Hand = Island; Ornithopter; Lightning Bolt
+Bot1.Graveyard = Fatehold Charm; Fatehold Charm; Black Lotus
