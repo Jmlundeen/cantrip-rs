@@ -1,0 +1,58 @@
+# Clay-Fired Bricks // Cosmium Kiln. As the Bricks enter Bot1 searches for a basic Plains card (an Island may not be found),
+# reveals it, puts it into its hand and shuffles, and gains 2 life. On turn three that Plains is played and the Bricks craft
+# with a Mox Ruby (Craft with artifact {5}{W}{W}) into Cosmium Kiln, which makes two 1/1 colorless Gnome artifact creature
+# tokens as it enters; "Creatures you control get +1/+1" makes them 2/2 and Bot1's Ornithopter 1/3, and leaves Bot2's
+# Ornithopter as it is.
+
+[Bot1 Deck]
+Plains
+Clay-Fired Bricks
+Black Lotus
+Mox Pearl
+Mox Jet
+Mox Ruby
+Ornithopter
+Island
+Plains
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Clay-Fired Bricks.Cast
+! Bot1.Search(Island)
+Bot1.Search(Plains)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+? Bot1.Life = 22
+? Bot1.Revealed = Plains
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Clay-Fired Bricks.Activate(Ability: Craft)
+Bot1.Choose(Mox Ruby)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Plains; Plains; Mox Pearl; Mox Jet; Ornithopter; Cosmium Kiln; Gnome; Gnome
+Bot1.Battlefield.Gnome#1.Power = 2
+Bot1.Battlefield.Gnome#2.Toughness = 2
+Bot1.Battlefield.Gnome#1.Types = Artifact; Creature
+Bot1.Battlefield.Ornithopter.Toughness = 3
+Bot2.Battlefield.Ornithopter.Toughness = 2
+Bot1.Battlefield.Cosmium Kiln.Colors = White
+Exile = Mox Ruby
