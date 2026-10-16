@@ -1,0 +1,8 @@
+{
+  "name": "Tocatli Honor Guard",
+  "manaCost": "{1}{W}",
+  "type": "Creature — Human Soldier",
+  "power": 1,
+  "toughness": 3,
+  "oracleText": "Creatures entering don't cause abilities to trigger."
+}

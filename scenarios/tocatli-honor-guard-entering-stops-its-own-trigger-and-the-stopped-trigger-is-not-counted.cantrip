@@ -1,0 +1,53 @@
+# Tocatli Honor Guard's "Creatures entering don't cause abilities to trigger" applies to its own entering (the rulings:
+# "This includes abilities that would trigger when Tocatli Honor Guard itself enters"; CR 603.6a: the newcomers are on
+# the battlefield when the event is checked). Enduring Innocence draws "whenever one or more other creatures you control
+# with power 2 or less enter", once each turn (CR 603.2h). On turn 1 Ornithopter enters and it draws (the control). On
+# turn 3 the Honor Guard, power 1, enters and it does not draw; a trigger that never happened does not use up the turn, so
+# once Bot1 has Bolted its own Honor Guard, the second Ornithopter draws.
+# Hand: 7 - Plains, Mox Pearl, Mox Ruby, Black Lotus, Innocence, Ornithopter = 1, + 1 drawn = 2; turn 3 draws (3), casts
+# the Honor Guard (2) and the Bolt (1), and the Ornithopter (0), + 1 drawn = 1.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Ruby
+Black Lotus
+Enduring Innocence
+Ornithopter
+Tocatli Honor Guard
+Lightning Bolt
+Ornithopter
+Plains x10
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Enduring Innocence.Cast
+Bot1.Hand.Ornithopter.Cast
+[T1 Bot1.Main2]
+? Bot1.Hand.Count = 2
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 3
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Tocatli Honor Guard.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+? Stack.Count = 0
+? Bot1.Hand.Count = 2
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Tocatli Honor Guard)
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand.Count = 1
+Bot1.Battlefield = Plains; Mox Pearl; Mox Ruby; Enduring Innocence; Ornithopter; Ornithopter
+Bot1.Graveyard = Tocatli Honor Guard; Lightning Bolt; Black Lotus
