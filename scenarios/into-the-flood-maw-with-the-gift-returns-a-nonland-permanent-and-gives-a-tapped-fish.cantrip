@@ -1,0 +1,49 @@
+# Gift promised (CR 702.174f): Bot2 creates a tapped 1/1 blue Fish creature token as the spell resolves, and the target is instead a nonland
+# permanent an opponent controls (CR 702.174m): Bot2's Mox Pearl, which is not a creature, goes back to its owner's hand.
+# Not a land (Bot2's Plains), not Bot1's own permanent (Bot1's Ornithopter). Without the gift Mox Pearl is no target: the file before.
+
+[Bot1 Deck]
+Island
+Into the Flood Maw
+Ornithopter
+Plains x18
+
+[Bot2 Deck]
+Ornithopter
+Mox Pearl
+Plains
+Plains x17
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Into the Flood Maw.Cast
+Bot1.Accept
+! Bot1.Target(Bot2.Battlefield.Plains)
+! Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Target(Bot2.Battlefield.Mox Pearl)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Into the Flood Maw
+Bot1.Battlefield = Island; Ornithopter
+Bot2.Battlefield = Plains; Ornithopter; Fish
+Bot2.Battlefield.Fish.Token = true
+Bot2.Battlefield.Fish.Tapped = true
+Bot2.Battlefield.Fish.Power = 1
+Bot2.Battlefield.Fish.Toughness = 1
+Bot2.Battlefield.Fish.Colors = Blue
+Bot2.Battlefield.Fish.Subtypes = Fish
+Bot2.Battlefield.Fish.Types = Creature
+Bot2.Hand.Count = 6

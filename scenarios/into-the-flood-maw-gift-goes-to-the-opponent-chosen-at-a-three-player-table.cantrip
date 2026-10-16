@@ -1,0 +1,43 @@
+# Gift promised at a table of three (CR 702.174a): Bot1 chooses which opponent is promised the gift. Bot3 is chosen, so Bot3 creates the tapped
+# Fish and Bot2 does not, though Bot2's Mox Pearl is the nonland permanent returned.
+
+[Bot1 Deck]
+Island
+Into the Flood Maw
+Plains x18
+
+[Bot2 Deck]
+Mox Pearl
+Plains x18
+
+[Bot3 Deck]
+Ornithopter
+Plains x18
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot3.Pass
+[T3 Bot3.Main1]
+Bot3.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Into the Flood Maw.Cast
+Bot1.Accept
+Bot1.ChoosePlayer(Bot3)
+Bot1.Target(Bot2.Battlefield.Mox Pearl)
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Into the Flood Maw
+Bot2.Battlefield = 
+Bot2.Hand.Count = 8
+Bot3.Battlefield = Ornithopter; Fish
+Bot3.Battlefield.Fish.Tapped = true

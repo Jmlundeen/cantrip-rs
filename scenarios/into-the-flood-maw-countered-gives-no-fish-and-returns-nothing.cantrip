@@ -1,0 +1,39 @@
+# Gift promised, but the spell is countered before it resolves: the gift isn't given and the Ornithopter stays (CR 702.174j).
+
+[Bot1 Deck]
+Island
+Into the Flood Maw
+Plains x18
+
+[Bot2 Deck]
+Ornithopter
+Island
+Mox Sapphire
+Counterspell
+Plains x16
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Into the Flood Maw.Cast
+Bot1.Accept
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Into the Flood Maw)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Into the Flood Maw
+Bot2.Graveyard = Counterspell
+Bot2.Battlefield = Island; Mox Sapphire; Ornithopter

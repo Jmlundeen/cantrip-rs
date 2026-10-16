@@ -1,0 +1,21 @@
+# Into the Flood Maw needs a creature an opponent controls, or, promising its gift, a nonland permanent an opponent controls (CR 601.2c): Bot2 has only a Plains, so it is not offered either way.
+
+[Bot1 Deck]
+Island
+Into the Flood Maw
+Plains x18
+
+[Bot2 Deck]
+Plains
+Plains x19
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+! Bot1.Hand.Into the Flood Maw.Cast
+
+[Expect]
+Bot2.Battlefield = Plains

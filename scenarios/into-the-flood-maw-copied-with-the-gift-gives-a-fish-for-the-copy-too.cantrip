@@ -1,0 +1,48 @@
+# Gift promised, then the spell is copied by Lutri, the Spellchaser: the copy was promised the gift to the same opponent (ruling 2024-07-26). The copy takes a new
+# target, so both resolve: the copy returns Bot2's Ornithopter and Bot2 creates a tapped Fish, then the original returns Mox Pearl and Bot2 creates another.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Into the Flood Maw
+Lutri, the Spellchaser
+Plains x18
+
+[Bot2 Deck]
+Ornithopter
+Mox Pearl
+Plains x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Into the Flood Maw.Cast
+Bot1.Accept
+Bot1.Target(Bot2.Battlefield.Mox Pearl)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Lutri, the Spellchaser.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Battlefield = Fish; Fish
+Bot2.Battlefield.Count = 2
+Bot2.Hand.Count = 8

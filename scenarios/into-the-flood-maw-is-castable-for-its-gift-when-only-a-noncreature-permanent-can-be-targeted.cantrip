@@ -1,0 +1,28 @@
+# Into the Flood Maw with no creature an opponent controls: without the gift it has no target, but with it (a nonland permanent) it does, so it is offered and cast promising the gift (CR 601.2c, 702.174m).
+# With only a land to go at, it is not offered at all: the refusal.
+
+[Bot1 Deck]
+Island
+Into the Flood Maw
+Plains x18
+
+[Bot2 Deck]
+Mox Pearl
+Plains x19
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Into the Flood Maw.Cast
+Bot1.Accept
+Bot1.Target(Bot2.Battlefield.Mox Pearl)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Into the Flood Maw
+Bot2.Battlefield = Fish

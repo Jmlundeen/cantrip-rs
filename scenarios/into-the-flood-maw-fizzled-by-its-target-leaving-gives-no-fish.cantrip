@@ -1,0 +1,38 @@
+# Gift promised, but its only target is gone as the spell would resolve: Bot2 kills its own Ornithopter in response, so every target is illegal and the
+# spell doesn't resolve (CR 608.2b). The gift isn't given (CR 702.174j; ruling 2024-07-26): Bot2 gets no Fish.
+
+[Bot1 Deck]
+Island
+Into the Flood Maw
+Plains x18
+
+[Bot2 Deck]
+Ornithopter
+Mountain
+Lightning Bolt
+Plains x17
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Into the Flood Maw.Cast
+Bot1.Accept
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Into the Flood Maw
+Bot2.Graveyard = Ornithopter; Lightning Bolt
+Bot2.Battlefield = Mountain
+Bot2.Hand.Count = 5

@@ -1,0 +1,31 @@
+# Gift promised: "instead return target nonland permanent an opponent controls" includes creatures. Bot2's Ornithopter goes back to its owner's hand
+# and Bot2 is given the tapped Fish (CR 702.174f, 702.174j).
+
+[Bot1 Deck]
+Island
+Into the Flood Maw
+Plains x18
+
+[Bot2 Deck]
+Ornithopter
+Plains x18
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Into the Flood Maw.Cast
+Bot1.Accept
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Into the Flood Maw
+Bot2.Battlefield = Fish
+Bot2.Battlefield.Fish.Tapped = true
+Bot2.Hand.Count = 8
