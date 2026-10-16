@@ -189,7 +189,9 @@ fn assign_parts(cx: &Cx, asker: &Asker, parts: &[MaterialPart], candidates: &[Ob
 fn material_candidates(cx: &Cx, source: ObjectId, controller: PlayerId, m: &Materials) -> Vec<ObjectId> {
     let asker = Asker { source, controller };
     let mut out = cx.permanents_of(controller);
-    out.extend(cx.s().zone(Zone::graveyard(controller)).iter().copied());
+    // Cards in the graveyard: a token put there (a Treasure sacrificed for the mana) is no card, and ceases to exist there
+    // (CR 111.7, 704.5d).
+    out.extend(cx.s().zone(Zone::graveyard(controller)).iter().copied().filter(|&id| !cx.s().obj(id).token));
     out.retain(|&id| id != source && (m.filter)(cx, &asker, id));
     out
 }
@@ -199,6 +201,10 @@ fn material_candidates(cx: &Cx, source: ObjectId, controller: PlayerId, m: &Mate
 /// be paid, and the activation is taken back.
 fn choose_materials(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) -> R<Vec<ObjectId>> {
     let Some(m) = cost.materials else { return Ok(Vec::new()) };
+    // The source is exiled with them: one a mana ability moved while paying can't be (CR 601.2h).
+    if !live(cx.s(), source) {
+        return Err(Stop::Cancel);
+    }
     let cards = material_candidates(cx, source, player, m);
     if cards.len() < m.count as usize {
         return Err(Stop::Cancel);
@@ -243,8 +249,12 @@ fn choose_materials(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost
 /// once (CR 601.2h). The source goes first, so the history holds it and then the materials, just before the activation:
 /// what `cantrip_mechanics::craft` reads to find the exiled cards used to craft a permanent (CR 702.167c).
 fn pay_materials(cx: &mut Cx, source: ObjectId, chosen: &[ObjectId]) {
-    let moves: Vec<ops::Moving> =
-        std::iter::once(source).chain(chosen.iter().copied()).map(|id| ops::Moving::to(id, Zone::exile(cx.s().obj(id).owner))).collect();
+    // Nothing that is no longer the object it was is moved (CR 400.7).
+    let moves: Vec<ops::Moving> = std::iter::once(source)
+        .chain(chosen.iter().copied())
+        .filter(|&id| live(cx.s(), id))
+        .map(|id| ops::Moving::to(id, Zone::exile(cx.s().obj(id).owner)))
+        .collect();
     ops::move_together(cx, &moves, ZoneReason::Exile);
 }
 
@@ -3603,7 +3613,6 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
     let exiles = choose_exiles(cx, player, source, &def.cost)?;
     let tappers = choose_tappers(cx, player, source, &def.cost)?;
     let counter = choose_counter_kind(cx, player, source, &def.cost)?;
-    let materials = choose_materials(cx, player, source, &def.cost)?;
     // Mana of any color pays for it (CR 609.4b): every symbol is paid as generic mana.
     if mana.mana_value() > 0 && static_rules::spend_any_color_for(cx, player, source) {
         mana = ManaCost { generic: mana.mana_value().min(255) as u8, ..ManaCost::ZERO };
@@ -3615,6 +3624,10 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
         mana,
         &Helpers { waterbend: if def.waterbend { u8::MAX } else { 0 }, creatures: def.tap_creatures_for_mana, purpose: Paying::Activating, ..Helpers::NONE },
     )?;
+    // Craft's materials are exiled as the cost is paid (CR 601.2h by way of 602.2b), after the mana abilities (CR 601.2g):
+    // they are chosen now, from what is still there, so a Black Lotus sacrificed for the mana is no material. Too few left
+    // is a cost that can't be paid, and the activation is taken back.
+    let materials = choose_materials(cx, player, source, &def.cost)?;
     if life > 0 {
         ops::change_life(cx, player, -(life as i32));
     }

@@ -50,12 +50,12 @@ Bot1.Hand.Mountain.Play
 Bot1.Battlefield.Ore-Rich Stalactite.Activate
 Bot1.Hand.Lightning Bolt.Cast(Bot2)
 Bot1.Battlefield.Ore-Rich Stalactite.Activate(Ability: Craft)
-Bot1.Choose(Lightning Bolt; Lightning Bolt; Lightning Bolt; Lightning Bolt)
 Bot1.Battlefield.Mountain#1.Activate
 Bot1.Battlefield.Mountain#2.Activate
 Bot1.Battlefield.Mountain#3.Activate
 Bot1.Battlefield.Mountain#4.Activate
 Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Choose(Lightning Bolt; Lightning Bolt; Lightning Bolt; Lightning Bolt)
 [T9 Bot1.Main1]
 ? Exile.Count = 4
 Bot1.Hand.Mountain.Play

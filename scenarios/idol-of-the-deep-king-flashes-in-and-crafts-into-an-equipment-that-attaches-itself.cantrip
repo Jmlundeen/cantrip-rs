@@ -33,10 +33,10 @@ Bot1.Battlefield.Mox Emerald.Activate
 Bot1.Hand.Llanowar Elves.Cast
 Bot1.Hand.Ornithopter.Cast
 Bot1.Battlefield.Idol of the Deep King.Activate(Ability: Craft)
-Bot1.Choose(Mox Emerald)
 Bot1.Battlefield.Mountain.Activate
 Bot1.Battlefield.Mox Ruby.Activate
 Bot1.Battlefield.Mox Jet.Activate
+Bot1.Choose(Mox Emerald)
 Bot1.Target(Llanowar Elves)
 [T3 Bot1.Main2]
 ? Bot1.Battlefield.Sovereign's Macuahuitl.AttachedTo = Llanowar Elves

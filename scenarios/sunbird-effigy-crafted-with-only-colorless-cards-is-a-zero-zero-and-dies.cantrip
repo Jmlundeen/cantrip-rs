@@ -27,10 +27,10 @@ Bot1.Hand.Black Lotus.Cast
 Bot1.Hand.Mox Jet.Cast
 Bot1.Hand.Mox Emerald.Cast
 Bot1.Battlefield.Sunbird Standard.Activate(Ability: Craft)
-Bot1.Choose(Mox Jet)
 Bot1.Battlefield.Black Lotus.Activate(Color: Green)
 Bot1.Battlefield.Mox Emerald.Activate
 Bot1.Battlefield.Sunbird Standard.Activate(Color: Green)
+Bot1.Choose(Mox Jet)
 [T1 Bot1.Main2]
 
 [Expect]

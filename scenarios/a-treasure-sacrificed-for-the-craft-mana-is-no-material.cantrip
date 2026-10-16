@@ -1,0 +1,64 @@
+# Craft's materials are chosen once the mana is paid (CR 601.2g-h). Deadly Dispute (sacrificing Cecil, Dark Knight, no artifact)
+# makes a Treasure. On turn seven Dire Flail crafts with the Treasure as the only other artifact Bot1 has anywhere: the Treasure
+# sacrificed for the mana ceases to exist (CR 111.7), so nothing is left to exile and the activation is taken back (CR
+# 602.2b, 601.2h) - the Flail, the Treasure and the lands stay as they were. On turn nine, with a second Ornithopter on the
+# battlefield, the Treasure pays for the craft again and the Ornithopter is the material: the Treasure is nowhere, the
+# Ornithopter alone in exile.
+
+[Bot1 Deck]
+Swamp
+Dire Flail
+Deadly Dispute
+Cecil, Dark Knight
+Mountain
+Mountain
+Mountain
+Island
+Island
+Ornithopter
+Mountain
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Cecil, Dark Knight.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Deadly Dispute.Cast
+Bot1.Choose(Cecil, Dark Knight)
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Hand.Dire Flail.Cast
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Dire Flail.Activate(Ability: Craft)
+Bot1.Battlefield.Treasure Token.Activate(Color: Red)
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Pass
+? Bot1.Battlefield = Swamp; Mountain; Mountain; Mountain; Dire Flail; Treasure Token
+? Bot1.Battlefield.Treasure Token.Tapped = false
+[T9 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Dire Flail.Activate(Ability: Craft)
+Bot1.Battlefield.Treasure Token.Activate(Color: Red)
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Choose(Ornithopter)
+[T9 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Swamp; Mountain; Mountain; Mountain; Mountain; Dire Blunderbuss
+Exile = Ornithopter

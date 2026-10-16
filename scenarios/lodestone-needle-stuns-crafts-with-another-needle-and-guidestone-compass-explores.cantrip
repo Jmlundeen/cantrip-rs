@@ -47,10 +47,10 @@ Bot1.Battlefield.Island#2.Activate
 Bot1.Hand.Lodestone Needle.Cast
 Bot1.Target()
 Bot1.Battlefield.Lodestone Needle#1.Activate(Ability: Craft)
-Bot1.Choose(Lodestone Needle)
 Bot1.Battlefield.Mox Sapphire.Activate
 Bot1.Battlefield.Mox Jet.Activate
 Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Choose(Lodestone Needle)
 [T4 Bot2.Upkeep]
 ! Bot1.Battlefield.Guidestone Compass.Activate
 ? Bot2.Battlefield.Ornithopter.Tapped = true

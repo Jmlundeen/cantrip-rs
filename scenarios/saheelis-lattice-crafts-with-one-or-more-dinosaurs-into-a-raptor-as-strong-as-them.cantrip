@@ -37,11 +37,11 @@ Bot1.Hand.Rampaging Ferocidon.Cast
 [T5 Bot1.Main1]
 Bot1.Hand.Mountain.Play
 Bot1.Battlefield.Saheeli's Lattice.Activate(Ability: Craft)
-! Bot1.Choose(Ornithopter)
-Bot1.Choose(Rampaging Ferocidon; Graveyard.Giant Cindermaw)
 Bot1.Battlefield.Black Lotus.Activate(Color: Red)
 Bot1.Battlefield.Mountain#1.Activate
 Bot1.Battlefield.Mountain#2.Activate
+! Bot1.Choose(Ornithopter)
+Bot1.Choose(Rampaging Ferocidon; Graveyard.Giant Cindermaw)
 [T5 Bot1.Main2]
 
 [Expect]

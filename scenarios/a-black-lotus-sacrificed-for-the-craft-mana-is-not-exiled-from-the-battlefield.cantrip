@@ -1,0 +1,37 @@
+# Craft's materials are exiled as the cost is paid (CR 601.2h by way of 602.2b), after the mana abilities (CR 601.2g), so
+# they are chosen from what is still there once the mana is paid. Black Lotus, sacrificed for the {3}{R}{R}, is no longer
+# the artifact on the battlefield (CR 400.7); Bot1 chooses the Ornithopter, and the Lotus is in the graveyard alone, never
+# also in exile.
+
+[Bot1 Deck]
+Mountain
+Dire Flail
+Ornithopter
+Black Lotus
+Mox Ruby
+Mox Ruby
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Dire Flail.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Dire Flail.Activate(Ability: Craft)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Choose(Ornithopter)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mountain; Mox Ruby; Mox Ruby; Dire Blunderbuss
+Bot1.Graveyard = Black Lotus
+Exile = Ornithopter

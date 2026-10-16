@@ -30,11 +30,11 @@ Bot2.Hand.Ornithopter.Cast
 [T3 Bot1.Main1]
 Bot1.Hand.Island.Play
 Bot1.Battlefield.Waterlogged Hulk.Activate(Ability: Craft)
-Bot1.Choose(Island#1)
 Bot1.Battlefield.Island.Activate
 Bot1.Battlefield.Mox Sapphire.Activate
 Bot1.Battlefield.Mox Jet.Activate
 Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Choose(Island#1)
 [T5 Bot1.Main1]
 Bot1.Battlefield.Watertight Gondola.Activate(Ability: Crew)
 Bot1.Choose(Llanowar Elves)

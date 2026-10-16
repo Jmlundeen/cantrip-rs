@@ -36,11 +36,11 @@ Bot2.Hand.Ornithopter.Cast
 [T3 Bot1.Main1]
 Bot1.Hand.Island.Play
 Bot1.Battlefield.Inverted Iceberg.Activate(Ability: Craft)
-Bot1.Choose(Graveyard.Ornithopter)
 Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
 Bot1.Battlefield.Island#1.Activate
 Bot1.Battlefield.Island#2.Activate
 Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Choose(Graveyard.Ornithopter)
 [T5 Bot1.DeclareAttackers]
 ? Bot1.Battlefield.Iceberg Titan.Power = 6
 Bot1.Attack(Iceberg Titan > Bot2)

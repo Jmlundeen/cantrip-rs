@@ -34,12 +34,12 @@ Bot1.Target(Bot1.Battlefield.Dire Flail)
 Bot1.Hand.Island.Play
 ? Bot1.Battlefield.Dire Flail#2.Token = true
 Bot1.Battlefield.Dire Flail#2.Activate(Ability: Craft)
-Bot1.Choose(Dire Flail)
 Bot1.Battlefield.Mountain.Activate
 Bot1.Battlefield.Island.Activate
 Bot1.Battlefield.Mox Sapphire.Activate
 Bot1.Battlefield.Mox Ruby#1.Activate
 Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Choose(Dire Flail)
 ? Exile = Dire Flail
 
 [Expect]

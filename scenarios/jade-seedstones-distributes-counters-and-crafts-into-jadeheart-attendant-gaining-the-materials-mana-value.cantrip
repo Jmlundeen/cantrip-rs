@@ -47,12 +47,12 @@ Bot1.Hand.Lightning Bolt.Cast(Embereth Shieldbreaker)
 [T7 Bot1.Main1]
 ? Bot1.Graveyard = Embereth Shieldbreaker; Lightning Bolt
 Bot1.Battlefield.Jade Seedstones.Activate(Ability: Craft)
-Bot1.Choose(Graveyard.Embereth Shieldbreaker)
 Bot1.Battlefield.Black Lotus.Activate(Color: Green)
 Bot1.Battlefield.Mox Emerald.Activate
 Bot1.Battlefield.Mountain.Activate
 Bot1.Battlefield.Forest#1.Activate
 Bot1.Battlefield.Forest#2.Activate
+Bot1.Choose(Graveyard.Embereth Shieldbreaker)
 [T7 Bot1.Main2]
 
 [Expect]

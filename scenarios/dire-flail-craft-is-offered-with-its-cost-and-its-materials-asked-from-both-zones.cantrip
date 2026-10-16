@@ -28,13 +28,13 @@ Bot1.Hand.Mox Ruby.Cast
 Bot1.Hand.Sol Ring.Cast
 Bot1.Battlefield.Dire Flail.Activate(Ability: Craft)
 ? Client.Bot1.Menu = Craft with artifact {3}{R}{R}
-? Client.Bot1.Prompt.Title = Dire Flail: craft - choose an artifact you control or an artifact card from your graveyard to exile
-Bot1.Choose(Graveyard.Black Lotus)
-? Client.Bot1.Confirm = Exile it
 Bot1.Battlefield.Mountain.Activate
 Bot1.Battlefield.Mox Ruby#1.Activate
 Bot1.Battlefield.Mox Ruby#2.Activate
 Bot1.Battlefield.Sol Ring.Activate
+? Client.Bot1.Prompt.Title = Dire Flail: craft - choose an artifact you control or an artifact card from your graveyard to exile
+Bot1.Choose(Graveyard.Black Lotus)
+? Client.Bot1.Confirm = Exile it
 [T1 Bot1.Main2]
 
 [Expect]

@@ -41,12 +41,12 @@ Bot1.Hand.Mox Ruby.Cast
 [T3 Bot1.Main1]
 Bot1.Hand.Island.Play
 Bot1.Battlefield.Kaslem's Stonetree.Activate(Ability: Craft)
-! Bot1.Choose(Island)
-Bot1.Choose(Sunken Citadel)
 Bot1.Battlefield.Black Lotus.Activate(Color: Green)
 Bot1.Battlefield.Forest.Activate
 Bot1.Battlefield.Mox Emerald.Activate
 Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Choose(Island)
+Bot1.Choose(Sunken Citadel)
 [T3 Bot1.Main2]
 
 [Expect]

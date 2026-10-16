@@ -39,10 +39,10 @@ Bot2.Hand.Mountain.Play
 [T3 Bot1.Main1]
 Bot1.Hand.Mountain.Play
 Bot1.Battlefield.Oteclan Landmark.Activate(Ability: Craft)
-Bot1.Choose(Ornithopter)
 Bot1.Battlefield.Mox Pearl.Activate
 Bot1.Battlefield.Mox Ruby.Activate
 Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Choose(Ornithopter)
 [T4 Bot2.Main1]
 ? Bot1.Battlefield.Oteclan Levitator.Types = Artifact; Creature
 ? Bot1.Battlefield.Oteclan Levitator.Subtypes = Golem

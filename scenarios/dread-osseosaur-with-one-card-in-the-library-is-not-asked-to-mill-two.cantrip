@@ -30,11 +30,11 @@ Bot1.Hand.Mox Ruby.Cast
 [T3 Bot1.Main1]
 Bot1.Hand.Swamp.Play
 Bot1.Battlefield.Visage of Dread.Activate(Ability: Craft)
-Bot1.Choose(Ornithopter#1; Ornithopter#2)
 Bot1.Battlefield.Black Lotus.Activate(Color: Black)
 Bot1.Battlefield.Swamp#1.Activate
 Bot1.Battlefield.Swamp#2.Activate
 Bot1.Battlefield.Mox Jet.Activate
+Bot1.Choose(Ornithopter#1; Ornithopter#2)
 ! Bot1.Accept
 [T3 Bot1.Main2]
 

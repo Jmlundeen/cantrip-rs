@@ -40,12 +40,12 @@ Bot1.Divide(Llanowar Elves: 3)
 ? Bot1.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = 3
 Bot1.Hand.Forest.Play
 Bot1.Battlefield.Jade Seedstones.Activate(Ability: Craft)
-Bot1.Choose(Spirit)
 Bot1.Battlefield.Black Lotus.Activate(Color: Green)
 Bot1.Battlefield.Forest#1.Activate
 Bot1.Battlefield.Forest#2.Activate
 Bot1.Battlefield.Plains.Activate
 Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Choose(Spirit)
 [T5 Bot1.Main2]
 
 [Expect]

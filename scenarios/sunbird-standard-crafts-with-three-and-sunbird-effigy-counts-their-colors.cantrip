@@ -36,10 +36,10 @@ Bot1.Battlefield.Mox Emerald.Activate
 Bot1.Hand.Sunbird Standard.Cast
 [T5 Bot1.Main1]
 Bot1.Battlefield.Sunbird Standard.Activate(Ability: Craft)
-Bot1.Choose(Llanowar Elves; Graveyard.Lightning Bolt; Mox Ruby)
 Bot1.Battlefield.Black Lotus.Activate(Color: Green)
 Bot1.Battlefield.Mountain.Activate
 Bot1.Battlefield.Sunbird Standard.Activate(Color: White)
+Bot1.Choose(Llanowar Elves; Graveyard.Lightning Bolt; Mox Ruby)
 [T5 Bot1.DeclareAttackers]
 ? Bot1.Battlefield.Sunbird Effigy.Power = 2
 ? Bot1.Battlefield.Sunbird Effigy.Toughness = 2

@@ -35,12 +35,12 @@ Bot1.Hand.Mountain.Play
 [T5 Bot1.Main1]
 Bot1.Hand.Mountain.Play
 Bot1.Battlefield.Saheeli's Lattice.Activate(Ability: Craft)
-Bot1.Choose(Graveyard.Giant Cindermaw)
 Bot1.Battlefield.Mountain#1.Activate
 Bot1.Battlefield.Mountain#2.Activate
 Bot1.Battlefield.Mountain#3.Activate
 Bot1.Battlefield.Mox Ruby#1.Activate
 Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Choose(Graveyard.Giant Cindermaw)
 [T5 Bot1.Main2]
 
 [Expect]

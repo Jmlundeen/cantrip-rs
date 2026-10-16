@@ -28,10 +28,10 @@ Bot1.Hand.Black Lotus.Cast
 Bot1.Hand.Mox Ruby.Cast
 Bot1.Hand.Mox Ruby.Cast
 Bot1.Battlefield.Dire Flail.Activate(Ability: Craft)
-Bot1.Choose(Ornithopter)
 Bot1.Battlefield.Black Lotus.Activate(Color: Red)
 Bot1.Battlefield.Mox Ruby#1.Activate
 Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Choose(Ornithopter)
 ? Stack.Count = 1
 ? Exile = Dire Flail; Ornithopter
 ? Bot1.Battlefield = Mountain; Mox Ruby; Mox Ruby

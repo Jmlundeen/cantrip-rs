@@ -42,9 +42,9 @@ Bot2.Hand.Ornithopter.Cast
 Bot1.Hand.Ornithopter.Cast
 Bot1.Battlefield.Black Lotus.Activate(Color: Red)
 Bot1.Battlefield.Dire Flail#1.Activate(Ability: Craft)
-Bot1.Choose(Graveyard.Black Lotus)
 Bot1.Battlefield.Mox Ruby#1.Activate
 Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Choose(Graveyard.Black Lotus)
 Bot1.Battlefield.Dire Blunderbuss.Activate(Bot1.Battlefield.Ornithopter; Ability: Equip)
 Bot1.Battlefield.Mountain.Activate
 [T5 Bot1.Main1]
@@ -52,12 +52,12 @@ Bot1.Hand.Ornithopter.Cast
 [T7 Bot1.Main1]
 Bot1.Hand.Mountain.Play
 Bot1.Battlefield.Dire Flail.Activate(Ability: Craft)
-Bot1.Choose(Ornithopter#2)
 Bot1.Battlefield.Mountain#1.Activate
 Bot1.Battlefield.Mountain#2.Activate
 Bot1.Battlefield.Mox Ruby#1.Activate
 Bot1.Battlefield.Mox Ruby#2.Activate
 Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Choose(Ornithopter#2)
 [T9 Bot1.Main1]
 Bot1.Hand.Mountain.Play
 Bot1.Battlefield.Dire Blunderbuss#2.Activate(Bot1.Battlefield.Ornithopter; Ability: Equip)

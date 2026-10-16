@@ -26,11 +26,11 @@ Bot1.Hand.Mox Ruby.Cast
 Bot1.Hand.Mox Ruby.Cast
 Bot1.Hand.Sol Ring.Cast
 Bot1.Battlefield.Dire Flail.Activate(Ability: Craft)
-Bot1.Choose(Graveyard.Black Lotus)
 Bot1.Battlefield.Mountain.Activate
 Bot1.Battlefield.Mox Ruby#1.Activate
 Bot1.Battlefield.Mox Ruby#2.Activate
 Bot1.Battlefield.Sol Ring.Activate
+Bot1.Choose(Graveyard.Black Lotus)
 ? Exile = Dire Flail; Black Lotus
 ? Bot1.Graveyard.Count = 0
 

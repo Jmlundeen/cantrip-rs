@@ -45,14 +45,14 @@ Bot2.Choose(Ornithopter)
 [T5 Bot1.Main1]
 Bot1.Hand.Swamp.Play
 Bot1.Battlefield.Tithing Blade.Activate(Ability: Craft)
-! Bot1.Choose(Mox Jet)
-! Bot1.Choose(Bot2.Battlefield.Llanowar Elves)
-Bot1.Choose(Graveyard.Llanowar Elves)
 Bot1.Battlefield.Mox Jet.Activate
 Bot1.Battlefield.Swamp#1.Activate
 Bot1.Battlefield.Swamp#2.Activate
 Bot1.Battlefield.Swamp#3.Activate
 Bot1.Battlefield.Mox Emerald.Activate
+! Bot1.Choose(Mox Jet)
+! Bot1.Choose(Bot2.Battlefield.Llanowar Elves)
+Bot1.Choose(Graveyard.Llanowar Elves)
 [T5 Bot1.Main2]
 ? Bot1.Battlefield.Consuming Sepulcher.Colors = Black
 ? Bot2.Battlefield = Forest; Llanowar Elves

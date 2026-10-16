@@ -38,10 +38,10 @@ Bot2.Hand.Ornithopter.Cast
 [T3 Bot1.Main1]
 Bot1.Hand.Mountain.Play
 Bot1.Battlefield.Dire Flail.Activate(Ability: Craft)
-Bot1.Choose(Ornithopter#1)
 Bot1.Battlefield.Black Lotus.Activate(Color: Red)
 Bot1.Battlefield.Mox Ruby#1.Activate
 Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Choose(Ornithopter#1)
 Bot1.Battlefield.Dire Blunderbuss.Activate(Bot1.Battlefield.Ornithopter; Ability: Equip)
 ? Bot1.Battlefield.Ornithopter.Power = 0
 ? Bot1.Battlefield.Dire Blunderbuss.AttachedTo = (absent)
