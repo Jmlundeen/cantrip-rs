@@ -1,0 +1,44 @@
+# The tax is on spells "your opponents" cast: Bot1, who controls Aven Interrupter, flashes back Faithless Looting from
+# its own graveyard for the printed {2}{R}. Three Mox Rubies tapped are all of it: nothing is left in the pool with the
+# spell on the stack. (Bot2's flashback costs {2} more: aven-interrupter-makes-an-opponents-flashback-cost-two-more.)
+
+[Bot1 Deck]
+Mox Pearl x2
+Mox Ruby x3
+Aven Interrupter
+Mountain
+Faithless Looting
+Island x12
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Aven Interrupter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Island; Island)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Graveyard.Faithless Looting.Cast(Ability: Flashback)
+? Bot1.Mana = 
+Bot1.Pass
+Bot1.Choose(Island; Island)
+[Bot1.Main2]
+
+[Expect]
+Exile = Faithless Looting
+Bot1.Graveyard.Count = 4

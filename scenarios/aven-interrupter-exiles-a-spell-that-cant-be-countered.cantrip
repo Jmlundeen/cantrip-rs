@@ -1,0 +1,38 @@
+# Abrupt Decay can't be countered, but Aven Interrupter doesn't counter it: it exiles it (ruling 2024-04-12). Bot2 aims the
+# Decay at one of Bot1's Mox Pearls; Bot1 flashes in Aven in response and the Decay is exiled (plotted) instead of
+# resolving, so all three Pearls are still on the battlefield.
+
+[Bot1 Deck]
+Mox Pearl x3
+Aven Interrupter
+Island x12
+
+[Bot2 Deck]
+Mox Jet
+Mox Emerald
+Abrupt Decay
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Abrupt Decay.Cast(Bot1.Battlefield.Mox Pearl)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Aven Interrupter.Cast
+[Bot2.Main2]
+
+[Expect]
+Exile = Abrupt Decay
+Stack.Count = 0
+Bot2.Graveyard.Count = 0
+Bot1.Battlefield = Aven Interrupter; Mox Pearl; Mox Pearl; Mox Pearl

@@ -1,0 +1,60 @@
+# Bot2 Bolts Bot1 on turn 2; Bot1 flashes in Aven Interrupter in response and its enters trigger exiles the Bolt, which
+# becomes plotted: Bot1 takes no damage. The Bolt cannot be cast the turn it was plotted (CR 702.170d; the refusal, with the
+# two Mox Rubies that could pay for it untapped). On turn 4 Bot2 casts it from exile without paying its mana cost, but
+# Aven's static ability makes a spell an opponent casts from exile cost {2} more (CR 601.2f, 118.9d): the two Rubies tapped
+# are all of it, and nothing is left in the pool when the Bolt is on the stack. A Bolt cast from hand the same turn costs only {R} (the control).
+
+[Bot1 Deck]
+Mox Pearl x3
+Aven Interrupter
+Island x12
+
+[Bot2 Deck]
+Mountain x2
+Mox Ruby x2
+Lightning Bolt x2
+Island
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Aven Interrupter.Cast
+Bot1.Target(Lightning Bolt)
+[Bot2.Main2]
+? Bot1.Life = 20
+? Exile = Lightning Bolt
+? Bot2.Graveyard.Count = 0
+! Bot2.Exile.Lightning Bolt.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Exile.Lightning Bolt.Cast(Bot1)
+? Bot2.Mana = 
+? Stack = Lightning Bolt
+[Bot2.Main2]
+? Bot1.Life = 17
+Bot2.Battlefield.Mountain#2.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[Bot2.End]
+
+[Expect]
+Bot1.Life = 14
+Bot1.Battlefield.Aven Interrupter.Keywords = Flash; Flying
+Bot2.Graveyard = Lightning Bolt; Lightning Bolt
+Exile.Count = 0
+Bot2.Battlefield.Mountain#1.Tapped = false
+Bot2.Battlefield.Mountain#2.Tapped = true
+Bot2.Battlefield.Mox Ruby#1.Tapped = true
+Bot2.Battlefield.Mox Ruby#2.Tapped = true

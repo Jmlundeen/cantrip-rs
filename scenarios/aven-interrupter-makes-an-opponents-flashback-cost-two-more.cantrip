@@ -1,0 +1,54 @@
+# Aven Interrupter taxes a spell an opponent casts from a graveyard by {2} (CR 601.2f). Bot1 flashes in Aven on its turn.
+# On turn 2 Bot2 casts Faithless Looting from hand for {R} (the control: from hand, no tax). Flashback {2}{R} would be
+# affordable with the four red mana of Bot2's Mox Rubies, but the cost is {4}{R}: the refusal. With a Mox Sapphire cast and tapped
+# as the fifth mana the flashback is cast, and the five mana are all of it (the pool is empty with the spell on the stack); it is exiled by flashback.
+
+[Bot1 Deck]
+Mox Pearl x3
+Aven Interrupter
+Island x12
+
+[Bot2 Deck]
+Mountain
+Mox Ruby x4
+Mox Sapphire
+Faithless Looting
+Island
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Aven Interrupter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Faithless Looting.Cast
+? Bot2.Mana = 
+Bot2.Pass
+Bot2.Choose(Island; Island)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+! Bot2.Graveyard.Faithless Looting.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Graveyard.Faithless Looting.Cast(Ability: Flashback)
+? Bot2.Mana = 
+Bot2.Pass
+Bot2.Choose(Island; Island)
+[Bot2.Main2]
+
+[Expect]
+Exile = Faithless Looting
+Bot2.Graveyard.Count = 4
+Bot2.Hand.Count = 1

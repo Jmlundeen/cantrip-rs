@@ -1,0 +1,39 @@
+# Bot2 casts Mox Ruby, Mox Sapphire, then Brain Freeze, whose storm puts two copies on the stack (CR 702.40a), all
+# aimed at Bot1. Bot1 passes once so that the storm trigger resolves and the copies exist, then flashes in Aven Interrupter and exiles the topmost copy. A copy that leaves the stack ceases to
+# exist (CR 111.7, 707.10a): it is not in exile and is not plotted. The Brain Freeze and the other copy resolve, so
+# Bot1 mills six cards (9 in the library, 3 left) and no Brain Freeze is in exile.
+
+[Bot1 Deck]
+Mox Pearl x3
+Aven Interrupter
+Island x12
+
+[Bot2 Deck]
+Mox Ruby
+Mox Sapphire
+Brain Freeze
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Brain Freeze.Cast(Bot1)
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Aven Interrupter.Cast
+Bot1.Target(Stack.Brain Freeze#1)
+[Bot2.Main2]
+
+[Expect]
+Exile.Count = 0
+Stack.Count = 0
+Bot1.Library.Count = 3
+Bot2.Graveyard = Brain Freeze

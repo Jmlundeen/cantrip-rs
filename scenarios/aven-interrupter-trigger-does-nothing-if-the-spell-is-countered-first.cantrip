@@ -1,0 +1,45 @@
+# The Aven's enters trigger targets Bot2's Lightning Bolt. Bot2 responds by countering its own Bolt with Counterspell, so
+# (Bot2 first lets the Aven resolve, so the trigger is on the stack with the Bolt as its target) the target is illegal when the trigger resolves (CR 608.2b) and nothing is exiled or plotted: the Bolt is in the
+# graveyard, not in exile, and cannot be cast again.
+
+[Bot1 Deck]
+Mox Pearl x3
+Aven Interrupter
+Island x12
+
+[Bot2 Deck]
+Mountain
+Mox Sapphire x2
+Lightning Bolt
+Counterspell
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Aven Interrupter.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 2
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Lightning Bolt)
+[Bot2.Main2]
+
+[Expect]
+Exile.Count = 0
+Stack.Count = 0
+Bot2.Graveyard = Counterspell; Lightning Bolt
+Bot1.Life = 20

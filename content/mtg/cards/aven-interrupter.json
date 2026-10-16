@@ -1,0 +1,12 @@
+{
+  "name": "Aven Interrupter",
+  "manaCost": "{1}{W}{W}",
+  "type": "Creature — Bird Rogue",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Flash\nFlying\nWhen this creature enters, exile target spell. It becomes plotted. (Its owner may cast it as a sorcery on a later turn without paying its mana cost.)\nSpells your opponents cast from graveyards or from exile cost {2} more to cast.",
+  "keywords": [
+    "Flash",
+    "Flying"
+  ]
+}
