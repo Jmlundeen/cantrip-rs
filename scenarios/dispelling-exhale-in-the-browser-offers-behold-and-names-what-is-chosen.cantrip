@@ -1,8 +1,8 @@
 # Browser
 # Bot1 casts Dispelling Exhale at Bot2's Lightning Bolt in the browser. The additional cost is offered as a choice with its cost in
 # words ("Behold a Dragon: choose a Dragon you control or reveal one from your hand") beside "Cast without beholding", under a title that
-# says it is an additional cost; then the choice of what to behold is captioned "choose a permanent or card to behold", not "keep" or
-# "discard". Kokusho is revealed from the hand and stays in it; Bot2 cannot pay {4}, so the Bolt is countered.
+# says it is an additional cost; then the choice of what to behold is captioned "choose a Dragon you control or reveal a Dragon card from
+# your hand to behold", not "keep" or "discard", and is confirmed with "Behold it". Kokusho is revealed from the hand and stays in it; Bot2 cannot pay {4}, so the Bolt is countered.
 
 [Bot1 Deck]
 Mox Sapphire
@@ -31,8 +31,10 @@ Bot1.Hand.Dispelling Exhale.Cast
 ? Client.Bot1.Prompt.Modes = Cast without beholding; Behold a Dragon: choose a Dragon you control or reveal one from your hand
 Bot1.Modes(Behold a Dragon)
 Bot1.Target(Stack.Lightning Bolt)
-? Client.Bot1.Prompt.Title = Dispelling Exhale: choose a permanent or card to behold
+? Client.Bot1.Prompt.Title = Dispelling Exhale: choose a Dragon you control or reveal a Dragon card from your hand to behold
+? Client.Bot1.Prompt.Detail = 0 of 1 chosen  ·  click them in your hand
 Bot1.Choose(Kokusho, the Evening Star)
+? Client.Bot1.Confirm = Behold it
 Bot2.Pass
 Bot2.Decline
 [T4 Bot2.Main2]

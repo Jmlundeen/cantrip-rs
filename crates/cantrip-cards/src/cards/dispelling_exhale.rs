@@ -16,7 +16,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     spell: Some(SpellDef { targets: &[targets::SPELL], effect }),
     late_targets: true,
-    optional_cost: Some(behold::optional(behold::dragon)),
+    optional_cost: Some(behold::optional(behold::dragon, "Dragon")),
     labels: &["Cast without beholding", "Behold a Dragon: choose a Dragon you control or reveal one from your hand"],
     ..oracle::DISPELLING_EXHALE
 };

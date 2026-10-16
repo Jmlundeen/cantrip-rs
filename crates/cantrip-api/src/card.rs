@@ -318,7 +318,8 @@ pub struct Cost {
     /// filter ("behold a Dragon"), chosen as the cost is chosen. Nothing moves: a permanent is only chosen, a hand card
     /// is revealed as the cost is paid (CR 601.2h). Payable only with that many to choose among. Dispelling Exhale,
     /// Caustic Exhale, Kinsbaile Aspirant. Paid when a spell is cast only: an activation does not choose or pay it yet.
-    pub behold: Option<(u8, ObjectFilter)>,
+    /// The quality's name ("Dragon") is what the prompt says.
+    pub behold: Option<(u8, ObjectFilter, &'static str)>,
     /// Blight N (CR 701.68a): put this many -1/-1 counters on a creature you control, chosen as the cost is chosen and
     /// put as it is paid. Payable only with a creature to put them on (CR 701.68b). Requiting Hex, Cinder Strike,
     /// Paid when a spell is cast only: an activation does not choose or pay it yet.
@@ -411,9 +412,9 @@ impl Cost {
         c.collect_evidence += other.collect_evidence;
         // Two beholds add only when they ask for the same quality (CR 701.4a): one filter can't stand for two.
         c.behold = match (self.behold, other.behold) {
-            (Some((a, f)), Some((b, g))) => {
+            (Some((a, f, name)), Some((b, g, _))) => {
                 debug_assert!(f as usize == g as usize, "two beholds of different qualities can't be combined");
-                Some((a + b, f))
+                Some((a + b, f, name))
             }
             (a, b) => a.or(b),
         };

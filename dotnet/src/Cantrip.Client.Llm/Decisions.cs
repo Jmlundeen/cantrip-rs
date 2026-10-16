@@ -1061,7 +1061,7 @@ public sealed class Decisions
             CardChoicePurposeView.Untap => $"{source}: untap {many}{kind} permanent(s).",
             CardChoicePurposeView.Attach => $"{source}: attach {many}{kind} permanent(s) you control to the creature.",
             CardChoicePurposeView.Encode => $"{source}: choose up to one creature you control to exile it encoded on (cipher).",
-            CardChoicePurposeView.Behold => $"{source}: choose {many}{kind} permanent(s) you control or card(s) in your hand to behold as a cost. Nothing is lost: a permanent is only chosen and a card is only revealed.",
+            CardChoicePurposeView.Behold => $"{source}: choose {many}{(kind.Length > 0 ? kind : " matching")} permanent(s) you control or card(s) in your hand to behold as a cost. Nothing is lost: a permanent is only chosen and a card is only revealed (to your opponent), so prefer a permanent.",
             CardChoicePurposeView.Blight => $"{source}: choose a creature you control to put the -1/-1 counter(s) of the cost on. It shrinks, and dies if its toughness reaches 0, so choose the creature you can best spare, not your best.",
             CardChoicePurposeView.KeepLegend => "You control more than one legend with the same name. Choose the one to keep; the rest go to the graveyard.",
             CardChoicePurposeView.Keep => $"{source}: choose the{kind} one to keep. The rest are sacrificed.",

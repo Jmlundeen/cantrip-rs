@@ -120,7 +120,7 @@ fn can_pay_other(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost) -
             return false;
         }
     }
-    if let Some((n, _)) = cost.behold
+    if let Some((n, _, _)) = cost.behold
         && behold_candidates(cx, source, controller, cost).len() < n as usize
     {
         return false;
@@ -141,7 +141,7 @@ fn can_pay_other(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost) -
 /// What a cost that beholds may choose among (CR 701.4a): the permanents its payer controls and the cards in their hand,
 /// the source apart, that pass the filter.
 fn behold_candidates(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost) -> Vec<ObjectId> {
-    let Some((_, filter)) = cost.behold else { return Vec::new() };
+    let Some((_, filter, _)) = cost.behold else { return Vec::new() };
     let asker = Asker { source, controller };
     let mut out = cx.permanents_of(controller);
     out.extend(cx.s().zone(Zone::hand(controller)).iter().copied());
@@ -151,7 +151,7 @@ fn behold_candidates(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cos
 
 /// Chooses what a cost beholds (CR 701.4a, 601.2h), always asked, even when the choice is forced.
 fn choose_behold(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) -> R<Vec<ObjectId>> {
-    let Some((n, _)) = cost.behold else { return Ok(Vec::new()) };
+    let Some((n, _, _)) = cost.behold else { return Ok(Vec::new()) };
     let eligible = behold_candidates(cx, source, player, cost);
     let ask = RequestKind::ChooseCards { source, purpose: Purpose::Behold, cards: eligible.clone(), eligible, count: n, up_to: false };
     match cx.ask_core(player, ask, true)? {
@@ -2858,6 +2858,9 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
         set_item_targets(cx, &targets);
     }
 
+    // Behold and blight are paid when a spell is cast only (CR 701.4a, 701.68a): an activated ability that had them would
+    // get the cost for free.
+    debug_assert!(def.cost.behold.is_none() && def.cost.blight == 0, "an activated ability's behold or blight is not built");
     let chosen = choose_permanents(cx, player, source, &def.cost)?;
     // What an attacking creature the cost returns or sacrifices was attacking, for the effect to read (ninjutsu,
     // CR 702.49a: the ninja attacks the same player, planeswalker or battle).

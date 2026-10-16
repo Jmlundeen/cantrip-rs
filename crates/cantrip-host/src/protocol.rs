@@ -894,6 +894,8 @@ pub struct ChooseModesPrompt {
     pub heading: String,
     pub at_most: i32,
     pub affordable: Vec<i32>,
+    /// For an optional additional cost that is a keyword action: "Behold" or "Blight"; empty otherwise.
+    pub cost_kind: String,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]

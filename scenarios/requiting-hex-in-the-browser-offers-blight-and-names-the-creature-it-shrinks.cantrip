@@ -1,7 +1,7 @@
 # Browser
 # Bot1 casts Requiting Hex in the browser. The optional cost is offered with what it does ("Blight 1: put a -1/-1 counter on a creature
 # you control") beside "Cast without blighting", under a title that says it is an additional cost; the creature to put the counter on is
-# captioned "choose a creature to blight", not "keep". Bot1's Ornithopter takes it, Bot2's Llanowar Elves is destroyed and Bot1 gains 2.
+# captioned "choose a creature you control to blight (it gets -1/-1 counters)", not "keep"; one creature on the battlefield answers on the click, with no button to confirm. Bot1's Ornithopter takes it, Bot2's Llanowar Elves is destroyed and Bot1 gains 2.
 
 [Bot1 Deck]
 Mox Jet
@@ -29,8 +29,10 @@ Bot1.Hand.Requiting Hex.Cast
 ? Client.Bot1.Prompt.Modes = Cast without blighting; Blight 1: put a -1/-1 counter on a creature you control
 Bot1.Modes(Blight 1)
 Bot1.Target(Bot2.Battlefield.Llanowar Elves)
-? Client.Bot1.Prompt.Title = Requiting Hex: choose a creature to blight (put -1/-1 counters on)
+? Client.Bot1.Prompt.Title = Requiting Hex: choose a creature you control to blight (it gets -1/-1 counters)
+? Client.Bot1.Prompt.Detail = 0 of 1 chosen  ·  click them on the battlefield
 Bot1.Choose(Ornithopter)
+? Client.Bot1.Confirm =
 [T3 Bot1.Main2]
 
 [Expect]

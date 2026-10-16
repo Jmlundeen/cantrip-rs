@@ -364,6 +364,29 @@ fn purpose_view(purpose: Purpose, opening: bool) -> CardChoicePurposeView {
     }
 }
 
+/// The costs a spell's card may ask a keyword action for: its optional cost, its additional cost, and each of its choices.
+fn costs_of(game: &Game, source: ObjectId) -> Vec<Cost> {
+    let def = game.cards.get(game.state.obj(source).card);
+    def.optional_cost.map(|o| o.cost).into_iter().chain(def.additional_cost).chain(def.additional_choice.iter().map(|c| c.cost)).collect()
+}
+
+/// "Behold" or "Blight" for an additional cost that is that keyword action, else nothing.
+fn cost_kind(game: &Game, source: ObjectId) -> &'static str {
+    let costs = costs_of(game, source);
+    if costs.iter().any(|c| c.behold.is_some()) {
+        "Behold"
+    } else if costs.iter().any(|c| c.blight > 0) {
+        "Blight"
+    } else {
+        ""
+    }
+}
+
+/// The quality a spell's behold cost names ("Dragon").
+fn beheld_quality(game: &Game, source: ObjectId) -> &'static str {
+    costs_of(game, source).iter().find_map(|c| c.behold.map(|(_, _, quality)| quality)).unwrap_or("")
+}
+
 fn may_verb(purpose: Purpose) -> String {
     match purpose {
         Purpose::Cast => "CastDuringResolution".into(),
@@ -438,8 +461,13 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 eligible: handles_of(handles, eligible),
                 count: i32::from(*count),
                 up_to: *up_to,
-                // Blight (CR 701.68a) is a creature you control; the client says so in its caption.
-                kind: if *purpose == Purpose::Blight { "creature".into() } else { String::new() },
+                // Blight (CR 701.68a) is a creature you control; behold (CR 701.4a) names its quality ("Dragon"): the
+                // client says so in its caption.
+                kind: match purpose {
+                    Purpose::Blight => "creature".into(),
+                    Purpose::Behold => beheld_quality(game, *source).into(),
+                    _ => String::new(),
+                },
                 ..Default::default()
             })
         }
@@ -501,6 +529,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 heading: String::new(),
                 at_most: i32::from(*at_most),
                 affordable: affordable.iter().map(|&m| i32::from(m)).collect(),
+                cost_kind: if *additional_cost { cost_kind(game, *source).into() } else { String::new() },
             })
         }
         RequestKind::ChooseSubtype { source, choices } => PromptPayload::ChooseModesPromptMessage(ChooseModesPrompt {

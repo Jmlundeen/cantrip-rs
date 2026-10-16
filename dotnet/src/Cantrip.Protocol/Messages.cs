@@ -902,6 +902,12 @@ public sealed class ChooseModesPromptMessage : PromptPayload
     public List<int> Affordable { get; set; } = [];
 
     /// <summary>
+    /// For an additional cost that is a keyword action, which: <c>Behold</c> or <c>Blight</c>. Empty otherwise.
+    /// </summary>
+    [Key(10)]
+    public string CostKind { get; set; } = string.Empty;
+
+    /// <summary>
     /// The eligible modes in the order worth trying them: those <see cref="Affordable"/> names first, then the rest, each
     /// group in printed order.
     /// </summary>

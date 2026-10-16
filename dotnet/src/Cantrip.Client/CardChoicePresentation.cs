@@ -56,6 +56,10 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
             : prompt.MinimumManaValue > 0
                 ? $"{source}: choose cards with total mana value {prompt.MinimumManaValue} or more to {verb}"
             : prompt.Count == 0 ? $"{source}: nothing to choose"
+            : prompt.Purpose == CardChoicePurposeView.Behold && prompt.Count == 1 && !prompt.UpTo && prompt.Kind.Length > 0
+                ? $"{source}: choose {article} {kind} you control or reveal {article} {kind} card from your hand to behold"
+            : prompt.Purpose == CardChoicePurposeView.Blight && prompt.Count == 1 && !prompt.UpTo
+                ? $"{source}: choose a creature you control to blight (it gets -1/-1 counters)"
             : prompt.Count == 1 && !prompt.UpTo ? $"{source}: choose {article} {kind} to {verb}"
             : $"{source}: choose {(prompt.UpTo ? "up to " : "")}{prompt.Count} {many} to {verb}";
         string detail = prompt.MinimumPower > 0

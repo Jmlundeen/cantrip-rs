@@ -138,9 +138,8 @@ public sealed partial class TacticalPlay
         // prompt's own order is as good as this seat can do.
         // "You may behold a Dragon" (CR 701.4a): offered only when there is one to choose or reveal, and it costs nothing
         // but showing a card, so it is taken for what it adds. "You may blight 1" stays declined: it shrinks a creature of
-        // its own for a bonus, which this seat does not weigh yet.
-        if (prompt.AdditionalCost && prompt.Count == 1 && prompt.Modes.Count == 2 && prompt.Eligible.Contains(1)
-            && prompt.Modes[1].StartsWith("Behold", StringComparison.Ordinal))
+        // its own for a bonus, which this seat does not weigh yet (a known limitation: Requiting Hex's optional blight is never paid).
+        if (prompt.AdditionalCost && prompt.CostKind == "Behold" && prompt.Count == 1 && prompt.Modes.Count == 2 && prompt.Eligible.Contains(1))
         {
             return new ModesChosenAnswer { Modes = [1] };
         }
@@ -255,6 +254,14 @@ public sealed partial class TacticalPlay
         }
 
         int most = Math.Min(prompt.Count, prompt.Eligible.Count);
+
+        // What to behold (CR 701.4a): a permanent on the battlefield before a card from the hand, since revealing a card tells the
+        // opponent what is in it and choosing a permanent tells them nothing.
+        if (prompt.Purpose == CardChoicePurposeView.Behold)
+        {
+            List<ViewHandle> beheld = [.. prompt.Eligible.OrderBy(card => client.Object(card)?.Zone == ZoneKindView.Battlefield ? 0 : 1)];
+            return new CardsChosenAnswer { Cards = [.. beheld.Take(most)] };
+        }
 
         // Giving something up, or taking something: which end of the ranking is wanted.
         bool losing = prompt.Purpose is CardChoicePurposeView.Discard or CardChoicePurposeView.Sacrifice or CardChoicePurposeView.Exile

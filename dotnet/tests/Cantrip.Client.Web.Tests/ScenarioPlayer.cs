@@ -31,6 +31,9 @@ public sealed class ScenarioPlayer
     private readonly ScenarioTable _table;
     private readonly List<string> _trace = [];
 
+    /// <summary>The label of the button the last choice of cards was confirmed with; empty when the last pick answered itself.</summary>
+    private string _lastConfirm = string.Empty;
+
     private ScenarioPlayer(TablePage page, ScenarioTable table)
     {
         _page = page;
@@ -210,11 +213,13 @@ public sealed class ScenarioPlayer
                 // An exact count answers itself on the last click; otherwise the dock's button, named for what it does
                 // with that many ("Discard 1"), or the pass key where that is the button.
                 TableState after = await _page.SettledAsync();
+                _lastConfirm = string.Empty;
                 if (after.RequestId == state.RequestId)
                 {
                     ControlState? confirm = after.Controls.FirstOrDefault(c => c.Kind == "button" && (c.Label.EndsWith($" {chosen.Cards.Count}", StringComparison.Ordinal) || chosen.Cards.Count == 1 && c.Label.EndsWith(" it", StringComparison.Ordinal)));
                     if (confirm is not null)
                     {
+                        _lastConfirm = confirm.Label;
                         await _page.Page.Mouse.ClickAsync(confirm.X, confirm.Y);
                     }
                     else
@@ -429,7 +434,7 @@ public sealed class ScenarioPlayer
     // --- What the client shows ---
 
     /// <summary>A <c>Client.</c> line judged against the page; null when it holds, else what was wrong.</summary>
-    private static string? Judge(ScenarioCheck check, TableState state)
+    private string? Judge(ScenarioCheck check, TableState state)
     {
         string[] parts = check.Key.Split('.', 4);
         if (parts.Length < 3 || parts[1] != "Bot1")
@@ -443,6 +448,11 @@ public sealed class ScenarioPlayer
             ? list.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Length.ToString(System.Globalization.CultureInfo.InvariantCulture)
             : Read(what, state);
         // A line of the game log, by its whole text: the value if the log has it, nothing if not.
+        if (what == "Confirm")
+        {
+            shown = _lastConfirm;
+        }
+
         if (what == "Log.Has")
         {
             shown = state.LogText?.Contains(check.Value) == true ? check.Value : string.Empty;
@@ -458,7 +468,7 @@ public sealed class ScenarioPlayer
     }
 
     private const string ClientKeys =
-        "Stack, Hand, Battlefield, OpponentBattlefield, OpponentHand (the cards known in it), each with .Count, Button.<label> (shown or absent), Arrows (the latest resolution's targets), Over, Prompt.Title, Prompt.Detail, Prompt.Modes, Log.Has (a line of the game log, by its text)";
+        "Stack, Hand, Battlefield, OpponentBattlefield, OpponentHand (the cards known in it), each with .Count, Button.<label> (shown or absent), Arrows (the latest resolution's targets), Over, Prompt.Title, Prompt.Detail, Prompt.Modes, Log.Has (a line of the game log, by its text), Confirm (the button the last choice of cards was confirmed with)";
 
     private static string? Read(string what, TableState state)
     {
