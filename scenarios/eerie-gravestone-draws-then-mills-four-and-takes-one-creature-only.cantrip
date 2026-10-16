@@ -1,0 +1,49 @@
+# Eerie Gravestone: "When this artifact enters, draw a card." Cast for {2}, it draws Island (the top card). Then
+# "{1}{B}, Sacrifice this artifact: Mill four cards. You may put a creature card from among them into your hand": the
+# Gravestone is sacrificed as the cost (it is in the graveyard), the top four (Llanowar Elves, Birds of Paradise, Plains, Forest)
+# are milled, and only a creature among them may be chosen - Plains is refused beside the positive control, Birds of Paradise,
+# which is taken. The other three milled cards stay in the graveyard (CR 701.17a); the library keeps the rest.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mox Sapphire
+Mox Pearl
+Eerie Gravestone
+Island
+Island
+Llanowar Elves
+Birds of Paradise
+Plains
+Forest
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Eerie Gravestone.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+? Bot1.Hand.Count = 2
+? Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Eerie Gravestone.Activate
+! Bot1.Choose(Plains)
+Bot1.Choose(Birds of Paradise)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Island; Island; Birds of Paradise
+Bot1.Graveyard = Forest; Plains; Llanowar Elves; Eerie Gravestone
+Bot1.Library.Count = 10
+Bot1.Battlefield.Count = 5

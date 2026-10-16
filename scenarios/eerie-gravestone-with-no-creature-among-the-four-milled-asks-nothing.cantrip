@@ -1,0 +1,43 @@
+# Eerie Gravestone: "You may put a creature card from among them into your hand": the four milled cards are Plains,
+# Forest, Island, Plains - no creature - so nobody is asked (! Bot1.Choose). A Llanowar Elves below them, in the
+# library, is not among the cards milled and stays there.
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mox Sapphire
+Mox Pearl
+Eerie Gravestone
+Island
+Island
+Plains
+Forest
+Island
+Plains
+Llanowar Elves
+Island x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Eerie Gravestone.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Eerie Gravestone.Activate
+! Bot1.Choose
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Island; Island
+Bot1.Graveyard = Plains; Island; Forest; Plains; Eerie Gravestone
+Bot1.Library.Count = 9

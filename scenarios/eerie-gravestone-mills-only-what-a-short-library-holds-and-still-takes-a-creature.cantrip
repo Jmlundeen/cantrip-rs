@@ -1,0 +1,39 @@
+# Eerie Gravestone with only two cards left in the library after its draw: "Mill four cards" mills the two there are
+# (CR 701.17b), and the creature among them, Birds of Paradise, may be taken. The library is empty.
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mox Sapphire
+Mox Pearl
+Eerie Gravestone
+Island
+Island
+Plains
+Birds of Paradise
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Eerie Gravestone.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Eerie Gravestone.Activate
+Bot1.Choose(Birds of Paradise)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Island; Island; Birds of Paradise
+Bot1.Graveyard = Plains; Eerie Gravestone
+Bot1.Library.Count = 0
+Bot1.Status = (absent)
