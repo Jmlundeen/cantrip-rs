@@ -8,9 +8,8 @@ use cantrip_api::*;
 
 /// "This creature enters with X +1/+1 counters on it", for the X it was cast with. Put onto the battlefield without
 /// being cast, X is 0.
-pub fn enters(_: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
-    entering.counters[CounterKind::PlusOne as usize] += entering.x as i16;
-    Ok(())
+pub fn enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
+    crate::effects::enters_with_x_counters(g, entering)
 }
 
 /// "If X is 5 or more" (CR 603.4): checked as it enters and again as the trigger resolves.

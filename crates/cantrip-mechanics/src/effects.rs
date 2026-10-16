@@ -3,6 +3,13 @@
 
 use cantrip_api::*;
 
+/// "This creature enters with X +1/+1 counters on it" (CR 614.1c), for the X it was cast with; put onto the battlefield
+/// without being cast, X is 0. Walking Ballista, Guiding Hydra and the ravenous creatures print it.
+pub fn enters_with_x_counters(_: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
+    entering.counters[CounterKind::PlusOne as usize] += entering.x as i16;
+    Ok(())
+}
+
 /// "Put `n` `kind` counters on each creature you control": on the creatures `player` controls as it is read, one after the
 /// other. The creatures, for what the rest of the sentence does to "those creatures". Abandoned Air Temple, Elspeth,
 /// Storm Slayer, Anduril, Narsil Reforged, Gavony Township, Germination Practicum, Ouroboroid and The Theorist, Jace
