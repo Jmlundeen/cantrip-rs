@@ -1,0 +1,11 @@
+{
+  "name": "Rampaging Ferocidon",
+  "manaCost": "{2}{R}",
+  "type": "Creature — Dinosaur",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Menace\nPlayers can't gain life.\nWhenever another creature enters, this creature deals 1 damage to that creature's controller.",
+  "keywords": [
+    "Menace"
+  ]
+}
