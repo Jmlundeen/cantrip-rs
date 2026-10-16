@@ -1,0 +1,23 @@
+# "When this land enters, scry 1" (CR 701.22): Bot1 plays Crystal Grotto and sends the Lightning Bolt it looks at to the bottom, so
+# the Black Lotus under it is now on top and Counterspell next. "{T}: Add {C}" adds one colorless mana.
+
+[Bot1 Deck]
+Crystal Grotto
+Island x6
+Lightning Bolt
+Black Lotus
+Counterspell
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Crystal Grotto.Play
+Bot1.Arrange( | Lightning Bolt)
+Bot1.Battlefield.Crystal Grotto.Activate(Ability: Add {C})
+? Bot1.Mana = {C}
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Library = Black Lotus; Counterspell; Lightning Bolt
+Bot1.Battlefield.Crystal Grotto.Tapped = true
