@@ -1,0 +1,47 @@
+# Hercules, Prince of Power: "Power-up — {4}{G}: Put a +1/+1 counter on Hercules. He gains vigilance, indestructible,
+# and haste until end of turn." The turn he enters, his mana cost {2}{G} takes the {G} off the green and {2} off the
+# generic (CR 702.193b, 118.7): {2} is left, Mox Pearl's {W} and Mox Ruby's {R}. He is a 4/4 with the three keywords
+# that turn, and they have ended by Bot2's turn (CR 514.2).
+
+[Bot1 Deck]
+Forest
+Mox Jet
+Sol Ring
+Hercules, Prince of Power
+Mox Pearl
+Mox Ruby
+Forest
+Forest x10
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Hercules, Prince of Power.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Hercules, Prince of Power.Activate
+? Bot1.Mana =
+Bot1.Pass
+[Bot1.Main2]
+? Bot1.Battlefield.Hercules, Prince of Power.Keywords = Haste; Indestructible; Vigilance
+[T2 Bot2.Main1]
+
+[Expect]
+Turn = 2
+Bot1.Battlefield.Hercules, Prince of Power.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Hercules, Prince of Power.Power = 4
+Bot1.Battlefield.Hercules, Prince of Power.Keywords = (absent)
