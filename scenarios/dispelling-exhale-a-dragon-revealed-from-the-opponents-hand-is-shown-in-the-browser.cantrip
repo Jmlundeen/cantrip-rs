@@ -1,0 +1,45 @@
+# Browser
+# Bot2 casts Dispelling Exhale at Bot1's Lightning Bolt and beholds the Kokusho in its hand (CR 701.4a): the card is revealed, so Bot1's
+# page says so in its game log ("Bot2 reveals Kokusho, the Evening Star.") and, before, knew nothing of Bot2's hand. Bot1 cannot pay {4}
+# and declines. The log does not call the spell "kicked": behold is no kicker.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Lightning Bolt
+Mountain x5
+Mountain x13
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Sapphire
+Kokusho, the Evening Star
+Dispelling Exhale
+Island x3
+Island x14
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+? Client.Bot1.OpponentHand =
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Sapphire#2.Activate
+Bot2.Hand.Dispelling Exhale.Cast
+Bot2.Modes(Behold a Dragon)
+Bot2.Target(Stack.Lightning Bolt)
+Bot2.Choose(Kokusho, the Evening Star)
+Bot1.Pass
+? Client.Bot1.Log.Has = Bot2 reveals [Kokusho, the Evening Star].
+? Client.Bot1.Log.Has = Bot2 casts [Dispelling Exhale] targeting [Lightning Bolt].
+Bot1.Decline
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot2.Revealed = Kokusho, the Evening Star
+Bot1.Graveyard = Lightning Bolt

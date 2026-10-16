@@ -265,7 +265,11 @@ public sealed record TableState(
     int RequestId = 0,
     int Seat = 0,
     IReadOnlyList<PlayerState>? Players = null,
-    IReadOnlyList<EffectState>? Effects = null);
+    IReadOnlyList<EffectState>? Effects = null,
+    string Title = "",
+    string Detail = "",
+    IReadOnlyList<string>? Modes = null,
+    IReadOnlyList<string>? LogText = null);
 
 /// <summary>A player's box on the page, which a click on targets them, and the mana in their pool.</summary>
 public sealed record PlayerState(int Seat, float X, float Y, float W, float H, IReadOnlyList<ManaChipState> Mana);

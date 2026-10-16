@@ -57,6 +57,9 @@ A key starting `Client.` is about what the page shows, not the game's state, and
 | `Client.Bot1.Button.Undo` | `shown` or `absent`: a button whose label holds the text |
 | `Client.Bot1.Arrows` | what the latest resolution's arrows point at: card names, or `player 2` |
 | `Client.Bot1.Over` | `true` once the page says the game is over |
+| `Client.Bot1.Prompt.Title`, `.Detail` | the dock's caption and its line under it for the question asked now: what the choice says it does |
+| `Client.Bot1.Prompt.Modes` | the options of a choice of modes, as buttons: an additional cost's, with its cost in words |
+| `Client.Bot1.Log.Has` | the game log has a line with exactly this text (cards in it in brackets), shown as the value or as nothing |
 
 Only Bot1 is a page for now, so only `Client.Bot1.` keys can be judged.
 

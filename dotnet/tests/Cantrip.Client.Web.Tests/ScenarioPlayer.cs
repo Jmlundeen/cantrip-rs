@@ -212,7 +212,7 @@ public sealed class ScenarioPlayer
                 TableState after = await _page.SettledAsync();
                 if (after.RequestId == state.RequestId)
                 {
-                    ControlState? confirm = after.Controls.FirstOrDefault(c => c.Kind == "button" && c.Label.EndsWith($" {chosen.Cards.Count}", StringComparison.Ordinal));
+                    ControlState? confirm = after.Controls.FirstOrDefault(c => c.Kind == "button" && (c.Label.EndsWith($" {chosen.Cards.Count}", StringComparison.Ordinal) || chosen.Cards.Count == 1 && c.Label.EndsWith(" it", StringComparison.Ordinal)));
                     if (confirm is not null)
                     {
                         await _page.Page.Mouse.ClickAsync(confirm.X, confirm.Y);
@@ -226,13 +226,43 @@ public sealed class ScenarioPlayer
                 return;
             }
 
+            case ModesChosenAnswer modes:
+            {
+                // A choice of modes: a button for each, named by the mode's text; one mode answers on its click, several
+                // are picked and then sent with Done.
+                foreach (int mode in modes.Modes)
+                {
+                    string label = state.Modes is { } asked && mode < asked.Count
+                        ? asked[mode]
+                        : throw new NotDrivenException($"mode {mode}, which the page does not list", state);
+                    await ClickButtonNamedAsync(label);
+                }
+
+                TableState after = await _page.SettledAsync();
+                if (after.RequestId == state.RequestId && modes.Modes.Count != 1)
+                {
+                    await ClickButtonStartingAsync("Done");
+                }
+
+                return;
+            }
+
             case TargetsChosenAnswer targets:
+            {
                 foreach (TargetMessage target in targets.Targets)
                 {
                     await ClickTargetAsync(target);
                 }
 
+                // A target chosen as the spell is cast, after its additional cost, is confirmed with "Done with 1 target".
+                TableState after = await _page.SettledAsync();
+                if (after.RequestId == state.RequestId && after.Controls.Any(c => c.Kind == "button" && c.Label.StartsWith("Done with", StringComparison.Ordinal)))
+                {
+                    await ClickButtonStartingAsync("Done with");
+                }
+
                 return;
+            }
 
             default:
                 throw new NotDrivenException(expected.Answer?.GetType().Name ?? "nothing", state);
@@ -245,6 +275,14 @@ public sealed class ScenarioPlayer
         {
             case ActionKindView.ConfirmCasting:
                 await _page.ClickAsync("Okay", "button");
+                return;
+
+            case ActionKindView.PayCost:
+                await ClickButtonStartingAsync("Pay");
+                return;
+
+            case ActionKindView.DeclineCost:
+                await ClickButtonStartingAsync("Don't pay");
                 return;
 
             case ActionKindView.CancelCasting:
@@ -366,7 +404,18 @@ public sealed class ScenarioPlayer
         CardState card = state.Cards.FirstOrDefault(c => c.Visible && c.Handle == handle)
             ?? throw new Xunit.Sdk.XunitException(
                 $"Handle {handle} is not in view. In view: {string.Join(", ", state.Cards.Where(c => c.Visible).Select(c => $"{c.Name} #{c.Handle} ({c.Place})"))}");
-        await _page.Page.Mouse.ClickAsync(card.X, card.Y);
+        // The stack fans its cards, each covering most of the one beneath: the strip of the card's left edge is the part of
+        // it that is always in view.
+        float x = card.Place == "stack" ? card.X - card.W / 2 + 6 : card.X;
+        await _page.Page.Mouse.ClickAsync(x, card.Y);
+    }
+
+    private async Task ClickButtonNamedAsync(string label)
+    {
+        TableState state = await _page.SettledAsync();
+        ControlState button = state.Controls.FirstOrDefault(c => c.Kind == "button" && c.Label == label)
+            ?? throw new Xunit.Sdk.XunitException($"No button '{label}'. There are: {string.Join(", ", state.Controls.Where(c => c.Kind == "button").Select(c => c.Label))}");
+        await _page.Page.Mouse.ClickAsync(button.X, button.Y);
     }
 
     private async Task ClickButtonStartingAsync(string start)
@@ -393,16 +442,23 @@ public sealed class ScenarioPlayer
         string? shown = what.EndsWith(".Count", StringComparison.Ordinal) && Read(what[..^".Count".Length], state) is { } list
             ? list.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Length.ToString(System.Globalization.CultureInfo.InvariantCulture)
             : Read(what, state);
+        // A line of the game log, by its whole text: the value if the log has it, nothing if not.
+        if (what == "Log.Has")
+        {
+            shown = state.LogText?.Contains(check.Value) == true ? check.Value : string.Empty;
+        }
+
         if (shown is null)
         {
             return $"line {check.Line}: {check.Key} is not a client key: {ClientKeys}";
         }
 
-        return Same(shown, check.Value) ? null : $"line {check.Line}: {check.Key} expected \"{check.Value}\", the page shows \"{shown}\"";
+        return Same(shown, check.Value) ? null : $"line {check.Line}: {check.Key} expected \"{check.Value}\", the page shows \"{shown}\"" +
+            (what == "Log.Has" ? "; its log ends: " + string.Join(" | ", (state.LogText ?? []).TakeLast(8)) : string.Empty);
     }
 
     private const string ClientKeys =
-        "Stack, Hand, Battlefield, OpponentBattlefield, OpponentHand (the cards known in it), each with .Count, Button.<label> (shown or absent), Arrows (the latest resolution's targets), Over";
+        "Stack, Hand, Battlefield, OpponentBattlefield, OpponentHand (the cards known in it), each with .Count, Button.<label> (shown or absent), Arrows (the latest resolution's targets), Over, Prompt.Title, Prompt.Detail, Prompt.Modes, Log.Has (a line of the game log, by its text)";
 
     private static string? Read(string what, TableState state)
     {
@@ -419,6 +475,9 @@ public sealed class ScenarioPlayer
             // A Room's doors as its face shows them: `Battlefield.<Room name>.Doors` is "Unholy Annex:unlocked; Ritual Chamber:locked", and
             // `.Actions` what the card offers to do, as its menu words it. A Room with no door unlocked has no name: `Battlefield..Doors`.
             _ when RoomKey(what, state) is { } shown => shown,
+            "Prompt.Title" => state.Title,
+            "Prompt.Detail" => state.Detail,
+            "Prompt.Modes" => state.Modes is { } modes ? string.Join("; ", modes) : string.Empty,
             _ when what.StartsWith("Button.", StringComparison.Ordinal) =>
                 state.Controls.Any(c => c.Kind == "button" && c.Label.Contains(what["Button.".Length..], StringComparison.Ordinal)) ? "shown" : "absent",
             _ => null,

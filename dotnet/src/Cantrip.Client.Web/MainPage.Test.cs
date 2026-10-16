@@ -128,6 +128,25 @@ public sealed partial class MainPage
             json.WriteString("outcome", client?.Outcome is { } outcome ? $"{outcome.Outcome} {outcome.WinningTeam}" : string.Empty);
             json.WriteNumber("flown", _flights.Launched);
             json.WriteNumber("selected", _pending.Count);
+            json.WriteString("title", _promptTitle.Text);
+            json.WriteString("detail", _promptDetail.Text);
+            json.WriteStartArray("logText");
+            foreach (LogLine line in _journal.Lines)
+            {
+                json.WriteStringValue(line.Text);
+            }
+
+            json.WriteEndArray();
+            json.WriteStartArray("modes");
+            if (client?.Prompt?.Prompt is ChooseModesPromptMessage modesAsked)
+            {
+                foreach (string mode in modesAsked.Modes)
+                {
+                    json.WriteStringValue(mode);
+                }
+            }
+
+            json.WriteEndArray();
 
             // Each ability shown resolving, newest last: the way it cut on the whole, and each arrow's.
             json.WriteStartArray("effects");

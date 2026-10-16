@@ -17,6 +17,6 @@ pub static CARD: CardDef = CardDef {
     spell: Some(SpellDef { targets: &[targets::SPELL], effect }),
     late_targets: true,
     optional_cost: Some(behold::optional(behold::dragon)),
-    labels: &["Cast without beholding", "Behold a Dragon"],
+    labels: &["Cast without beholding", "Behold a Dragon: choose a Dragon you control or reveal one from your hand"],
     ..oracle::DISPELLING_EXHALE
 };

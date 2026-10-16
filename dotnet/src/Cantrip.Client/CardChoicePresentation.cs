@@ -35,8 +35,10 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
         string verb = forAnother ? "put into its owner's hand" : Action(context?.Action ?? ActionFor(prompt.Purpose));
         bool cost = context?.Cause == PromptCauseView.Cost || context is null
             && prompt.Purpose is CardChoicePurposeView.ExileToPay or CardChoicePurposeView.ReturnToHand or CardChoicePurposeView.TapToPay;
-        if (cost) verb += " to pay for it";
-        string one = permanents ? "permanent" : "card";
+        // Behold and blight name the cost in their own verb ("to behold", "to blight"): "to pay for it" would add nothing.
+        if (cost && prompt.Purpose is not (CardChoicePurposeView.Behold or CardChoicePurposeView.Blight)) verb += " to pay for it";
+        // Behold (CR 701.4a) is a permanent you control or a card in your hand.
+        string one = prompt.Purpose == CardChoicePurposeView.Behold ? "permanent or card" : permanents ? "permanent" : "card";
         string many = prompt.Count == 1 ? one : one + "s";
         string kind = prompt.Kind.Length > 0 ? prompt.Kind : one;
         string article = "aeiou".Contains(kind[0], StringComparison.OrdinalIgnoreCase) ? "an" : "a";
@@ -92,7 +94,7 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
             CardChoicePurposeView.Attach => picked.Count == 0 ? "Attach nothing" : picked.Count == 1 ? "Attach it" : $"Attach {picked.Count}",
             CardChoicePurposeView.Encode => picked.Count == 0 ? "Encode on nothing" : "Encode on it",
             CardChoicePurposeView.Behold => picked.Count == 1 ? "Behold it" : $"Behold {picked.Count}",
-            CardChoicePurposeView.Blight => "Put the counter on it",
+            CardChoicePurposeView.Blight => "Blight it",
             // "Discard nothing" only where declining is an answer; a mandatory discard still counts down to its number.
             _ => picked.Count == 0 && prompt.UpTo ? "Discard nothing"
                 : picked.Count == 1 ? "Discard it" : $"Discard {picked.Count}",

@@ -55,8 +55,7 @@ internal static class PromptPresentation
     /// </summary>
     private static bool IsCost(CardChoicePurposeView purpose) => purpose is
         CardChoicePurposeView.ExileToPay or CardChoicePurposeView.TapToPay
-        or CardChoicePurposeView.Sacrifice or CardChoicePurposeView.ReturnToHand
-        or CardChoicePurposeView.Behold or CardChoicePurposeView.Blight;
+        or CardChoicePurposeView.Sacrifice or CardChoicePurposeView.ReturnToHand;
 
     /// <summary>The zones the cards are in, as the view the seat holds places them; a card not in it says nothing.</summary>
     private static List<PromptOriginView> Origins(IEnumerable<ViewHandle> cards, PlayerView? view)

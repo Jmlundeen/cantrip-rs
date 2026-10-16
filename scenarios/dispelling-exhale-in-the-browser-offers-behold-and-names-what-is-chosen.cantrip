@@ -1,0 +1,44 @@
+# Browser
+# Bot1 casts Dispelling Exhale at Bot2's Lightning Bolt in the browser. The additional cost is offered as a choice with its cost in
+# words ("Behold a Dragon: choose a Dragon you control or reveal one from your hand") beside "Cast without beholding", under a title that
+# says it is an additional cost; then the choice of what to behold is captioned "choose a permanent or card to behold", not "keep" or
+# "discard". Kokusho is revealed from the hand and stays in it; Bot2 cannot pay {4}, so the Bolt is countered.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Kokusho, the Evening Star
+Dispelling Exhale
+Island x3
+Island x14
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x5
+Mountain x13
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Dispelling Exhale.Cast
+? Client.Bot1.Prompt.Title = Dispelling Exhale: choose an additional cost to pay
+? Client.Bot1.Prompt.Modes = Cast without beholding; Behold a Dragon: choose a Dragon you control or reveal one from your hand
+Bot1.Modes(Behold a Dragon)
+Bot1.Target(Stack.Lightning Bolt)
+? Client.Bot1.Prompt.Title = Dispelling Exhale: choose a permanent or card to behold
+Bot1.Choose(Kokusho, the Evening Star)
+Bot2.Pass
+Bot2.Decline
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Hand = Kokusho, the Evening Star; Island; Island; Island; Island
+Bot1.Revealed = Kokusho, the Evening Star
+Bot2.Graveyard = Lightning Bolt

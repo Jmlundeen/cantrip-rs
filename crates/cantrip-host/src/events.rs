@@ -110,9 +110,9 @@ fn spell_facts(game: &Game, spell: ObjectId) -> (Vec<Target>, Option<i32>, Vec<S
         }
     }
     let x = (def.cost.x > 0).then_some(i32::from(item.x));
-    // The log's one `kicked` count is "how many additional costs beyond the mana were paid": `kicked` for a kicker,
-    // `paid` for an optional cost. No printed card has both, so the sum names exactly one of them today.
-    (item.targets().to_vec(), x, modes, i32::from(item.kicked) + i32::from(item.paid), item.gift)
+    // The log says "kicked" for this count, so it is the kicker's alone: an optional additional cost (`paid`: behold, blight,
+    // bargain) is not a kicker, and its payment shows in the log as what it did (a card revealed, a creature sacrificed).
+    (item.targets().to_vec(), x, modes, i32::from(item.kicked), item.gift)
 }
 
 impl Tracker {

@@ -438,6 +438,8 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 eligible: handles_of(handles, eligible),
                 count: i32::from(*count),
                 up_to: *up_to,
+                // Blight (CR 701.68a) is a creature you control; the client says so in its caption.
+                kind: if *purpose == Purpose::Blight { "creature".into() } else { String::new() },
                 ..Default::default()
             })
         }

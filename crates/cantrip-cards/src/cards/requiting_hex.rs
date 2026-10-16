@@ -26,6 +26,6 @@ pub static CARD: CardDef = CardDef {
     spell: Some(SpellDef { targets: &[TargetSpec { min: 1, max: 1, filter: creature_mv2 }], effect }),
     late_targets: true,
     optional_cost: Some(blight::optional(1)),
-    labels: &["Cast without blighting", "Blight 1"],
+    labels: &["Cast without blighting", "Blight 1: put a -1/-1 counter on a creature you control"],
     ..oracle::REQUITING_HEX
 };
