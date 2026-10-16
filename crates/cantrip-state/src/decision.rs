@@ -415,6 +415,8 @@ pub enum Purpose {
     PutOntoBattlefield,
     /// A plain "you may" with nothing more to say about it.
     Optional,
+    /// "The player whose turn it is may end the turn" (CR 724.1): Obeka, Brute Chronologist.
+    EndTurn,
     /// The rest of the C# engine's purposes (CardChoicePurpose), one for one.
     PutOnTop,
     KeepLegend,

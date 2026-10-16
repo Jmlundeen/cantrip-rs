@@ -31,7 +31,6 @@ Bot1.Pass
 Bot2.Pass
 [T2 Bot2.End]
 ! Bot1.Target
-Bot2.Pass
 [T3 Bot1.Upkeep]
 
 [Expect]

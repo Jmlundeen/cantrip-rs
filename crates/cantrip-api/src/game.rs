@@ -422,6 +422,14 @@ pub trait Game: Query {
     /// "After this phase, there is an additional combat phase" (CR 500.8), from the precombat main phase or a combat phase: a
     /// whole combat phase, from its beginning, follows the combat phase that is under way (or the one that is next).
     fn add_combat_phase(&mut self);
+    /// "End the turn" (CR 724.1), from a resolving spell or ability: triggered abilities waiting to be put on the stack
+    /// cease to exist (724.1a); every object on the stack is exiled, the resolving one included (724.1b), whose
+    /// remaining instructions still happen after this; state-based actions are checked with no player given priority
+    /// and no triggered ability put on the stack (724.1c); and once the resolution is over the step under way ends, every
+    /// creature and planeswalker is removed from combat, and the game skips straight to the cleanup step (724.1d) - a new
+    /// cleanup step when it is ended during one. Abilities that trigger from here on go on the stack in that cleanup step,
+    /// and players then get priority, with another cleanup step after it (724.1f, 514.3a).
+    fn end_the_turn(&mut self) -> Result<(), Suspend>;
 
     /// `player` wins the game (CR 104.2b): their opponents lose and the game ends at once. Nothing if they have lost, or
     /// are losing to a state-based action (CR 104.3f).

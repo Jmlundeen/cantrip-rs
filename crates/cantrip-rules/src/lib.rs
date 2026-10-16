@@ -862,6 +862,10 @@ impl cantrip_api::Game for Cx<'_> {
         self.g.state.update_turn(|t| t.extra_combats = t.extra_combats.saturating_add(1));
     }
 
+    fn end_the_turn(&mut self) -> Result<(), Suspend> {
+        turn::end_the_turn(self).map_err(|_| Suspend)
+    }
+
     fn lose_game(&mut self, player: PlayerId) {
         ops::lose_game(self, player);
     }

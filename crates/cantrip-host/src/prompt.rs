@@ -374,6 +374,7 @@ fn purpose_view(purpose: Purpose, opening: bool) -> CardChoicePurposeView {
         | Purpose::Targets
         | Purpose::Color
         | Purpose::Optional
+        | Purpose::EndTurn
         | Purpose::RevealForMiracle
         | Purpose::CastForMiracleCost
         | Purpose::PromiseGift(_)

@@ -230,6 +230,23 @@ are never asked about, and neither is the end of an "until" exile (CR 610.3, a o
 `TriggeredDef::on_sacrifice` (Hushbringer's ruling). The sources are found from the board, once per batch and only once
 something has matched.
 
+### Ending the turn and the cleanup step
+
+"End the turn" (CR 724.1) is `Game::end_the_turn`, called by a resolving spell or ability (`turn::end_the_turn`): the
+waiting triggered abilities cease to exist (724.1a), every object on the stack is exiled at once, the resolving one
+included, whose later instructions still run (724.1b), and state-based actions are checked alone (724.1c,
+`settle::state_based_actions_alone`). It records `Event::TurnEnded` and sets `Turn::ending`; the priority round below the
+resolution then ends without asking anyone, and `next_step` removes every creature from combat if the turn was in
+combat and goes straight to a cleanup step of the same turn - a new one if it was already in one (724.1d). The end step
+is never begun, so nothing "at the beginning of the end step" triggers (724.1e). Abilities that trigger during the
+process wait for that cleanup step (724.1f).
+
+The cleanup step (CR 514) gives priority only when state-based actions were performed or a triggered ability is waiting
+once its turn-based actions are done (514.3a), and then marks `Turn::cleanup_again`, so another cleanup step follows when
+everyone has passed. Ultima, Time Stop, Sundial of the Infinite, Glorious End, Day's Undoing, Hurkyl's Final Meditation
+and Obeka, Brute Chronologist end the turn; Discontinuity waits for colored cost reductions ("costs {2}{U}{U} less",
+CR 601.2f), which `CostChange` cannot express.
+
 ### Legal moves as a first-class output
 
 Every pending request comes with its legal answers enumerated, cheaply and in a stable order. The client's prompt
@@ -268,7 +285,7 @@ zone-change batch and 28% the layer recompute. The targets set then: 10 us per d
 `cargo run --release -p cantrip-bench -- --games 128` measures the engine on the same games every run ("engine
 answering ... us per decision", one thread). The spike
 (nineteen cards, no features) answered in 1.95 us. With every card and every rules feature it is **5.06 us** per
-decision (2026-10-15). The last six feature landings had taken it from 6.93 to 7.5-7.8 us; a sampling profile found
+decision (2026-10-15), 5.90 us after ending the turn (CR 724) and the exact cleanup step (2026-10-16, 5.99 us before). The last six feature landings had taken it from 6.93 to 7.5-7.8 us; a sampling profile found
 the cost in the layers, not in the new features' own code:
 
 - `chars()` rebuilt a card's printed values for every object on every question, and scanned the battlefield for

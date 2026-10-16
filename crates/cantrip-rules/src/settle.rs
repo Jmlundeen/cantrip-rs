@@ -36,6 +36,29 @@ pub fn settle(cx: &mut Cx) -> R<Flow> {
     Ok(Flow::Done)
 }
 
+/// State-based actions checked and performed until none applies (CR 704.3), with the returns of cards exiled until a
+/// permanent left that follow from them (CR 610.3), and no triggered ability put on the stack: the check of the cleanup
+/// step (CR 514.3a) and of a turn being ended (CR 724.1c). Whether anything was done.
+pub fn state_based_actions_alone(cx: &mut Cx) -> R<bool> {
+    let mut acted = false;
+    loop {
+        if state_based_actions(cx)? {
+            acted = true;
+            continue;
+        }
+        if cx.s().is_over() {
+            break;
+        }
+        if ops::return_exiled(cx)? {
+            acted = true;
+            continue;
+        }
+        break;
+    }
+    cx.st().clear_unsettled();
+    Ok(acted)
+}
+
 /// Checks every state-based action at once and performs those that apply, simultaneously (CR 704.3). Whether any did.
 fn state_based_actions(cx: &mut Cx) -> R<bool> {
     let mut acted = false;

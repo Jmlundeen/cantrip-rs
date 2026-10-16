@@ -277,7 +277,10 @@ shapes have an example:
   `CantBeBlockedByPowerTwoOrLess`, `CantBeBlockedExceptByThreeOrMore` (`Chars::minimum_blockers`, menace's two too).
   A scenario refuses an attack or a block with `! Bot2.Attack(A > B)` / `! Bot2.Block(A > B)`.
 - **Counters**: `Event::CountersPut` carries `by` (CR 122.6a), the player who put them. **Costs**: `Cost.unattach_self`.
-- **Turns**: `DelayedWhen::UntilNextTurnOf(p)`; `CardDef.turn_begin` skips a turn (Time Vault, CR 614.10).
+- **Turns**: `DelayedWhen::UntilNextTurnOf(p)`; `CardDef.turn_begin` skips a turn (Time Vault, CR 614.10); "end the
+  turn" is `g.end_the_turn()?` (CR 724.1, Time Stop), after which the rest of the effect still runs (Glorious End), and
+  "the player whose turn it is may end the turn" asks with `Purpose::EndTurn` (Obeka). "Activate only during your turn"
+  is `cantrip_mechanics::your_turn`.
 - **Spells**: copies of permanent spells become tokens (CR 707.10f), `Event::Copied` (magecraft); abilities a static grants
   to a spell on the stack are seen by the cast-trigger scan; `Game::play_land_during_resolution`; `mechanics::hideaway`.
 - **Mana**: an `{X}` in a mana ability's cost is announced and read as `Obj::x` of its source; an `any_color` ability with

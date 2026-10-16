@@ -26,6 +26,10 @@ pub fn next_step(game: &mut Game) {
     let s = &mut game.state;
     let turn = s.turn;
     let ending = turn.step();
+    // The combat phase ends with its end of combat step, or with whatever step of it an effect ended the turn in
+    // (CR 724.1d).
+    let combat_ends = ending == Step::EndOfCombat
+        || (turn.ending && matches!(ending, Step::BeginCombat | Step::DeclareAttackers | Step::DeclareBlockers | Step::CombatDamage));
 
     // Mana empties as each step ends (CR 500.4), except the mana that lasts until the end of combat, which is lost as
     // the combat phase ends (CR 106.4, 500.5a).
@@ -33,14 +37,16 @@ pub fn next_step(game: &mut Game) {
         for p in s.seats().collect::<Vec<_>>() {
             if !s.player(p).pool.is_empty() || !s.player(p).lasting.is_empty() || s.player(p).restricted.iter().any(|r| !r.is_empty()) {
                 s.update_player(p, |pl| {
-                    pl.pool = if ending == Step::EndOfCombat { ManaPool::default() } else { pl.lasting_mana() };
+                    pl.pool = if combat_ends { ManaPool::default() } else { pl.lasting_mana() };
                     pl.lasting = pl.pool;
                     pl.restricted = Default::default();
                 });
             }
         }
     }
-    if turn.number > 0 && ending == Step::EndOfCombat {
+    // CR 724.1d: a turn ended during combat removes every creature and planeswalker from combat as the step ends, as
+    // the end of the combat phase does.
+    if turn.number > 0 && combat_ends {
         s.set_attackers(Vec::new());
         s.set_blocks(Vec::new());
         s.update_turn(|t| {
@@ -51,6 +57,10 @@ pub fn next_step(game: &mut Game) {
 
     let (number, active, step) = if turn.number == 0 {
         (1, turn.starting, Step::Untap)
+    } else if turn.ending || (ending == Step::Cleanup && turn.cleanup_again) {
+        // CR 724.1d: the turn ended, so the game skips straight to the cleanup step, a new one if it was ended during
+        // one; and a cleanup step in which players had priority is followed by another (CR 514.3a).
+        (turn.number, turn.active, Step::Cleanup)
     } else {
         match ending.next() {
             // With no attackers declared, the declare blockers and combat damage steps are skipped (CR 508.8): an
@@ -83,6 +93,8 @@ pub fn next_step(game: &mut Game) {
         t.set_step(step);
         t.priority = active;
         t.passes = 0;
+        t.ending = false;
+        t.cleanup_again = false;
     });
     s.frame_push(Frame::new(FrameKind::BeginStep));
 }
@@ -288,8 +300,12 @@ pub fn begin_step(cx: &mut Cx) -> R<Flow> {
         Step::CombatDamage => combat_damage(cx)?,
         Step::Cleanup => {
             cleanup(cx)?;
-            // CR 514.3a: if a state-based action was due or a trigger fired during cleanup, players get priority.
-            if cx.s().unsettled || !cx.s().triggers.is_empty() {
+            // CR 514.3a: the state-based actions due are performed; if any were, or a triggered ability is waiting to be
+            // put on the stack (one that triggered during the cleanup step, or while an effect ended the turn, CR
+            // 724.1f), players get priority, and another cleanup step follows this one.
+            let acted = crate::settle::state_based_actions_alone(cx)?;
+            if acted || !cx.s().triggers.is_empty() {
+                cx.st().update_turn(|t| t.cleanup_again = true);
                 push_priority(cx);
             }
             return Ok(Flow::Done);
@@ -778,6 +794,43 @@ fn cleanup(cx: &mut Cx) -> R<()> {
     Ok(())
 }
 
+/// An effect ends the turn (CR 724.1), as the spell or ability with that instruction resolves. What follows the
+/// resolution - no more priority in this step, the step's end with combat's, the cleanup step - is `Turn::ending`'s, read
+/// by `priority` and `next_step`.
+pub fn end_the_turn(cx: &mut Cx) -> R<()> {
+    let player = cx.s().turn.active;
+    cx.record(Event::TurnEnded { player });
+    // CR 724.1a: abilities that triggered before this began and are not yet on the stack cease to exist. Those that
+    // trigger from here on wait for the cleanup step (724.1f).
+    while let Some(last) = cx.s().triggers.len().checked_sub(1) {
+        cx.st().trigger_remove(last);
+    }
+    // CR 724.1b: every object on the stack is exiled, the resolving one among them, all at once. An ability on the stack
+    // is no card, and is gone; a copy of a spell, exiled, ceases to exist as the state-based actions are checked
+    // (CR 704.5e, 707.10a). Exiled is not countered.
+    let spells: Vec<ops::Moving> = cx
+        .s()
+        .stack
+        .iter()
+        .rev()
+        .filter(|i| i.kind == StackKind::Spell)
+        .map(|i| ops::Moving::to(i.object, Zone::exile(cx.s().obj(i.object).owner)))
+        .collect();
+    for at in (0..cx.s().stack.len()).rev() {
+        if cx.s().stack[at].kind != StackKind::Spell {
+            cx.st().stack_remove(at);
+        }
+    }
+    if !spells.is_empty() {
+        ops::move_together(cx, &spells, ZoneReason::Exile);
+    }
+    // CR 724.1c: state-based actions, with no player given priority and no triggered ability put on the stack.
+    crate::settle::state_based_actions_alone(cx)?;
+    // CR 724.1d: the step ends once this resolution is over, and the game skips straight to the cleanup step.
+    cx.st().update_turn(|t| t.ending = true);
+    Ok(())
+}
+
 /// The next player in turn order after `p` who has not lost (CR 800.4a).
 fn next_in_game(s: &GameState, p: PlayerId) -> PlayerId {
     let mut next = s.next_player(p);
@@ -790,6 +843,11 @@ fn next_in_game(s: &GameState, p: PlayerId) -> PlayerId {
 /// A priority round: state-based actions and triggers first, then the player with priority acts or passes; when
 /// everyone has passed in succession the top of the stack resolves, or with an empty stack the step ends (CR 117).
 pub fn priority(cx: &mut Cx) -> R<Flow> {
+    // CR 724.1c-d: an effect has ended the turn. No player gets priority again in this step, and the abilities that
+    // triggered since wait for the cleanup step (724.1f).
+    if cx.s().turn.ending {
+        return Ok(Flow::Done);
+    }
     if cx.s().unsettled || !cx.s().triggers.is_empty() {
         cx.st().frame_push(Frame::new(FrameKind::Settle));
         return Ok(Flow::Again);

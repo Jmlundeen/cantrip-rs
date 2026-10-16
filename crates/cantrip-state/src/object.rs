@@ -838,6 +838,11 @@ pub struct Turn {
     /// The player whose turn in the ordinary rotation was taken last, while extra turns are being taken (CR 500.7: an
     /// extra turn is taken between turns and does not move the rotation); none while no extra turn has been taken.
     pub rotation: Option<PlayerId>,
+    /// An effect has ended the turn (CR 724.1d): the step under way ends with no player given priority again, and the
+    /// game skips straight to the cleanup step.
+    pub ending: bool,
+    /// Players were given priority in this cleanup step (CR 514.3a), so another cleanup step follows it.
+    pub cleanup_again: bool,
 }
 
 impl Turn {

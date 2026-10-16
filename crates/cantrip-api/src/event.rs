@@ -90,6 +90,8 @@ pub enum Event {
     ModesChosen { source: ObjectId, ability: AbilityRef, modes: u8 },
     /// The player did what an ability says they may do only once each turn (CR 603.2h: "do this only once each turn").
     Done { source: ObjectId, ability: AbilityRef, player: PlayerId },
+    /// An effect ended the turn (CR 724.1) of `player`, the player whose turn it was: recorded as the stack is exiled.
+    TurnEnded { player: PlayerId },
 }
 
 impl Event {
@@ -113,7 +115,8 @@ impl Event {
             | Event::DoorUnlocked { player, .. }
             | Event::CoinFlipped { player, .. }
             | Event::DieRolled { player, .. }
-            | Event::Done { player, .. } => Some(player),
+            | Event::Done { player, .. }
+            | Event::TurnEnded { player } => Some(player),
             Event::Cast(c) => Some(c.player),
             Event::BecameTarget { controller, .. } => Some(controller),
             Event::Damage { target: Target::Player(p), .. } => Some(p),
@@ -149,7 +152,7 @@ impl Event {
             | Event::Monstrous { permanent }
             | Event::DoorUnlocked { permanent, .. } => permanent == object,
             Event::Unattached { attachment, from } => attachment == object || from == object,
-            Event::LifeChange { .. } | Event::Searched { .. } | Event::AttackersDeclared { .. } | Event::StepBegan { .. } | Event::BecameMonarch { .. } | Event::GaveGift { .. } | Event::ChosenAtRandom { .. } | Event::CoinFlipped { .. } | Event::DieRolled { .. } => false,
+            Event::LifeChange { .. } | Event::Searched { .. } | Event::AttackersDeclared { .. } | Event::StepBegan { .. } | Event::BecameMonarch { .. } | Event::GaveGift { .. } | Event::ChosenAtRandom { .. } | Event::CoinFlipped { .. } | Event::DieRolled { .. } | Event::TurnEnded { .. } => false,
         }
     }
 }
@@ -196,6 +199,7 @@ impl EventMask {
     pub const MODES_CHOSEN: EventMask = EventMask(1 << 33);
     pub const DOOR_UNLOCKED: EventMask = EventMask(1 << 34);
     pub const GAVE_GIFT: EventMask = EventMask(1 << 35);
+    pub const TURN_ENDED: EventMask = EventMask(1 << 36);
 
     /// An event's kind as the history files it: every event has one. `of` is what triggers listen for, which leaves
     /// out the records no ability triggers on.
@@ -212,6 +216,7 @@ impl EventMask {
             Event::Triggered { .. } => EventMask::TRIGGERED,
             Event::ModesChosen { .. } => EventMask::MODES_CHOSEN,
             Event::Done { .. } => EventMask::DONE,
+            Event::TurnEnded { .. } => EventMask::TURN_ENDED,
             other => EventMask::of(other),
         }
     }

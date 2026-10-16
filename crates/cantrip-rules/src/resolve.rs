@@ -417,7 +417,10 @@ pub fn resolve(cx: &mut Cx) -> R<Flow> {
                 // It has resolved (CR 608.2m: "the first time this ability has resolved this turn").
                 cx.record(Event::Resolved { source: item.object, ability: item.ability });
             }
-            cx.st().stack_remove(at);
+            // An ability that ended the turn has left the stack already, with everything else on it (CR 724.1b).
+            if cx.s().stack.get(at).is_some_and(|i| i.serial == item.serial) {
+                cx.st().stack_remove(at);
+            }
         }
     }
     Ok(Flow::Done)
