@@ -1,0 +1,53 @@
+# "Whenever a Dragon you control enters" counts tokens (CR 603.6a, 111.1): Feywild Caretaker's end step trigger on turn 3 creates a
+# 1/1 Faerie Dragon token, which enters under Bot1's control as a Dragon, so Sarkhan gets a +1/+1 counter (3/3) and is a Dragon with
+# flying until the end of that turn - still so when the token enters during the end step. The Caretaker (an Orc Wizard) entering
+# earlier in the turn did nothing: Sarkhan was a 2/2 until the token came. With no Dragon to behold on turn 1 nothing was asked.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Sapphire
+Mox Jet
+Sol Ring
+Sarkhan, Dragon Ascendant
+Feywild Caretaker
+Island
+Forest
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sarkhan, Dragon Ascendant.Cast
+! Bot1.Choose
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Feywild Caretaker.Cast
+Bot1.Pass
+Bot1.Search(Forest)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Sarkhan, Dragon Ascendant.Power = 2
+[T4 Bot2.Upkeep]
+? Bot1.Battlefield.Sarkhan, Dragon Ascendant.Subtypes = Druid; Human
+? Bot1.Battlefield.Sarkhan, Dragon Ascendant.Keywords = (absent)
+
+[Expect]
+Turn = 4
+Bot1.Battlefield = Mountain; Mox Ruby; Mox Sapphire; Mox Jet; Sol Ring; Sarkhan, Dragon Ascendant; Feywild Caretaker; Faerie Dragon
+Bot1.Battlefield.Sarkhan, Dragon Ascendant.Power = 3
+Bot1.Battlefield.Sarkhan, Dragon Ascendant.Toughness = 3
+Bot1.Battlefield.Sarkhan, Dragon Ascendant.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Faerie Dragon.Token = true
+Bot1.Battlefield.Faerie Dragon.Subtypes = Dragon; Faerie

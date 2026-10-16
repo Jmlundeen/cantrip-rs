@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::triggers::THIS_ENTERS;
-use cantrip_mechanics::{behold, targets, tokens};
+use cantrip_mechanics::{behold, tokens};
 use cantrip_oracle as oracle;
 
 /// "When Sarkhan enters, you may behold a Dragon. If you do, create a Treasure token." (CR 701.4a, 608.2d): the choice of a
@@ -29,13 +29,10 @@ fn dragon_you_control_enters(q: &dyn Query, me: &Asker, event: &Event) -> Option
 }
 
 /// "Put a +1/+1 counter on Sarkhan. Until end of turn, Sarkhan becomes a Dragon in addition to his other types and gains
-/// flying." (CR 611.2, 205.1b, 613.1): if he is still on the battlefield, he gets the counter, the Dragon type (a layer 4
+/// flying." (CR 611.2, 205.1b, 613.1): he gets the counter, the Dragon type (a layer 4
 /// effect that adds to his types, read through his text's creature type word) and flying (layer 6) until the turn ends.
 fn grow(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let sarkhan = item.object;
-    if !targets::permanent(g, sarkhan) {
-        return Ok(());
-    }
     g.add_counters(sarkhan, CounterKind::PlusOne, 1);
     let dragon = g.words(sarkhan).subtype(Subtype::Dragon);
     g.add_effect(sarkhan, sarkhan, EffectKind::AddSubtype(dragon), Duration::EndOfTurn);

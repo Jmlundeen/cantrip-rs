@@ -37,4 +37,8 @@ Bot1.Choose(Nova Hellkite)
 ? Bot1.Battlefield.Sarkhan, Dragon Ascendant.Power = 2
 
 [Expect]
+Bot1.Battlefield = Mountain; Mox Ruby; Mox Pearl; Mox Jet; Mox Sapphire; Sarkhan, Dragon Ascendant; Nova Hellkite; Treasure Token
+Bot1.Revealed = (absent)
+Bot1.Battlefield.Sarkhan, Dragon Ascendant.Power = 2
+Bot1.Battlefield.Sarkhan, Dragon Ascendant.Toughness = 2
 Bot1.Battlefield.Sarkhan, Dragon Ascendant.Subtypes = Druid; Human

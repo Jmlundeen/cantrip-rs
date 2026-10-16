@@ -48,4 +48,8 @@ Bot2.Pass
 ? Bot1.Battlefield.Sarkhan, Dragon Ascendant.Keywords = (absent)
 
 [Expect]
+Bot1.Battlefield.Sarkhan, Dragon Ascendant.Power = 2
+Bot1.Battlefield.Sarkhan, Dragon Ascendant.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Sarkhan, Dragon Ascendant.Damage = 1
+Bot2.Battlefield.Nova Hellkite.Types = Creature
 Bot1.Battlefield.Sarkhan, Dragon Ascendant.Subtypes = Druid; Human

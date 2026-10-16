@@ -23,5 +23,8 @@ Bot1.Choose()
 ? Bot1.Revealed = (absent)
 
 [Expect]
+Bot1.Revealed = (absent)
+Bot1.Battlefield.Sarkhan, Dragon Ascendant.Power = 2
+Bot1.Battlefield.Sarkhan, Dragon Ascendant.Counters.PlusOnePlusOne = (absent)
 Bot1.Battlefield = Mountain; Mox Ruby; Sarkhan, Dragon Ascendant
 Bot1.Hand = Island; Island; Island; Nova Hellkite

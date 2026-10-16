@@ -23,4 +23,8 @@ Bot1.Hand.Sarkhan, Dragon Ascendant.Cast
 ? Bot1.Revealed = (absent)
 
 [Expect]
+Bot1.Revealed = (absent)
+Bot1.Battlefield.Sarkhan, Dragon Ascendant.Power = 2
+Bot1.Battlefield.Sarkhan, Dragon Ascendant.Subtypes = Druid; Human
+Bot1.Hand = Island; Island; Island; Ornithopter
 Bot1.Battlefield = Mountain; Mox Ruby; Sarkhan, Dragon Ascendant
