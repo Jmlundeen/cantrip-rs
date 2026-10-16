@@ -189,12 +189,16 @@ pub fn look_at_top(
     };
     match rest {
         Rest::BottomChosen => g.arrange_library(player, &[], &bottom),
-        Rest::BottomRandom => {
-            let rest: Vec<ObjectId> = looked.into_iter().filter(|c| is_live(g, *c) && g.obj(*c).zone == Zone::library(player)).collect();
-            g.bottom_in_random_order(player, &rest);
-        }
+        Rest::BottomRandom => rest_to_bottom_in_random_order(g, player, &looked),
     }
     Ok(taken)
+}
+
+/// "Put the rest on the bottom of your library in a random order" (CR 401.4) after looking at `looked`, cards of `player`'s
+/// library: those still in it, a card taken having left. Narset, Parter of Veils, Once Upon a Time and United Battlefront print it.
+pub fn rest_to_bottom_in_random_order(g: &mut dyn Game, player: PlayerId, looked: &[ObjectId]) {
+    let rest: Vec<ObjectId> = looked.iter().copied().filter(|c| is_live(g, *c) && g.obj(*c).zone == Zone::library(player)).collect();
+    g.bottom_in_random_order(player, &rest);
 }
 
 /// "Reveal the top `count` cards of your library. You may put a card that passes `wanted` from among them into your hand.
