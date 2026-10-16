@@ -364,10 +364,11 @@ object is (a type alone is a permanent or a card of that type, CR 702.167b). The
 before the mana, as a question of their own (`RequestKind::Craft`, minimum and maximum), and exiled together as the last
 of the cost, the source first, so the history holds the source's exile and then the materials' just before the
 activation. The ability is `cantrip_mechanics::craft`'s: it returns the card the cost exiled transformed under its owner's
-control (CR 712.14a; a token, or a card that was only a copy of a craft card, stays where it is) and links the materials,
-read from that stretch of the history, to the new permanent as exiled with it (`Game::link_exiled`, CR 607.2a), which is
-what "the exiled cards used to craft it" (CR 702.167c) are: `exiled_with` of the permanent, gone once it leaves or they
-do. Only an activated ability pays materials (`only_an_activated_ability_that_exiles_its_source_exiles_materials`). No card
+control (CR 712.14a; a token, or a card that was only a copy of a craft card, stays where it is). Before it moves, the
+materials, read from that stretch of the history, are linked to the craft card in exile as exiled with it
+(`Game::link_exiled`, CR 607.2a), so "the exiled cards used to craft it" (CR 702.167c, `craft::used_to_craft`) are the
+exiled cards linked to the object that became the permanent: there from the moment it enters, readable by a
+characteristic-defining ability through the state (Mastercraft Raptor), and none once it leaves or they do. Only an activated ability pays materials (`only_an_activated_ability_that_exiles_its_source_exiles_materials`). No card
 in content copies an activated ability, so a copy of a craft ability (which would find the card already returned) has no
 scenario.
 
