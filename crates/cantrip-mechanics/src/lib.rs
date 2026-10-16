@@ -437,9 +437,21 @@ pub fn scry(g: &mut dyn Game, player: PlayerId, source: ObjectId, count: usize) 
 /// the order chosen, so the last is on top) and the rest back on top in any order. Nothing is asked of an empty
 /// library. Second card: Consider, Thought Monitor's surveil, any "surveil 2".
 pub fn surveil(g: &mut dyn Game, player: PlayerId, source: ObjectId, count: usize) -> Result<(), Suspend> {
+    surveil_into_graveyard(g, player, source, count).map(|_| ())
+}
+
+/// `surveil`, saying which cards it put into the graveyard (the new objects, those that really arrived there: a
+/// replacement effect may have sent one elsewhere) for text that goes on to speak of them ("if you put a card ... into
+/// your graveyard this way"). Enlightened Confidant prints it.
+pub fn surveil_into_graveyard(
+    g: &mut dyn Game,
+    player: PlayerId,
+    source: ObjectId,
+    count: usize,
+) -> Result<Vec<ObjectId>, Suspend> {
     let looked = top_of_library(g, player, count);
     if looked.is_empty() {
-        return Ok(());
+        return Ok(Vec::new());
     }
     let ask = RequestKind::DistributeCards {
         source,
@@ -450,12 +462,14 @@ pub fn surveil(g: &mut dyn Game, player: PlayerId, source: ObjectId, count: usiz
         ],
         may_shuffle: false,
     };
+    let mut binned = Vec::new();
     if let Answer::Placements { placements, .. } = g.ask(player, ask)? {
         let moves: Vec<(ObjectId, Zone)> = placements[1].iter().map(|&c| (c, Zone::graveyard(player))).collect();
-        g.move_together(&moves, ZoneReason::Other);
+        let moved = g.move_together(&moves, ZoneReason::Other);
+        binned = moved.into_iter().filter(|&c| g.obj(c).zone.is(ZoneKind::Graveyard)).collect();
         g.arrange_library(player, &placements[0], &[]);
     }
-    Ok(())
+    Ok(binned)
 }
 
 /// What "becomes a P/T [colors] [subtype] creature with [keywords]" makes of a permanent (CR 205.1b, 613.1). `colors`

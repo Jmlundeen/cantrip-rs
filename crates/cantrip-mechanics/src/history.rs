@@ -94,3 +94,9 @@ pub fn creatures_died_this_turn(q: &dyn Query, under: Option<PlayerId>) -> usize
         })
         .count()
 }
+
+/// "If you gained life this turn" (CR 603.4, 119.3): whether `player` has gained any life this turn. Ocelot Pride's and
+/// Enlightened Confidant's intervening ifs print it.
+pub fn gained_life_this_turn(q: &dyn Query, player: PlayerId) -> bool {
+    q.history().life_gained(player) > 0
+}
