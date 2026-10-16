@@ -1,0 +1,50 @@
+# Two Panharmonicons: each adds one triggering, so an ability triggers three times, not four (CR 603.2d; the rulings:
+# "If you control two Panharmonicons, an artifact or creature entering the battlefield causes abilities to trigger three
+# times"). Bot1's Baleful Strix enters on turn 5 under both: three triggers to order, three cards.
+# Hand: 7 - 5 played on turn 1 = 2; turn 3 draws an Island (3), plays it and the second Panharmonicon (1); turn 5 draws
+# an Island (2), plays it and the Strix (0), draws three = 3.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Panharmonicon
+Panharmonicon
+Mox Sapphire
+Mox Jet
+Baleful Strix
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Plains x14
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Panharmonicon.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Panharmonicon.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Baleful Strix.Cast
+Bot1.Pass
+Bot1.Triggers(Baleful Strix; Baleful Strix; Baleful Strix)
+? Stack.Count = 3
+[T5 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand.Count = 3
+Bot1.Battlefield = Island; Island; Mox Pearl; Mox Sapphire; Mox Jet; Panharmonicon; Panharmonicon; Baleful Strix

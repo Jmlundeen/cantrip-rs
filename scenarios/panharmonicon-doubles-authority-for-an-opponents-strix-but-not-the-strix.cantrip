@@ -1,0 +1,45 @@
+# Panharmonicon doubles a triggered ability of a permanent its controller controls, whoever controls the artifact or
+# creature entering (the rulings: "You don't need to control the permanent entering the battlefield, only the permanent
+# that has the triggered ability"), and only those: Bot2's Baleful Strix entering on turn 2 triggers Bot1's Authority of
+# the Consuls twice (Bot1 gains 2) and Bot2's own "draw a card" once.
+# Bot2's hand: 7 + 1 drawn on turn 2 - 3 cast + 1 = 6.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Mox Pearl
+Authority of the Consuls
+Panharmonicon
+Plains x10
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Jet
+Baleful Strix
+Island x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Authority of the Consuls.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Panharmonicon.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Baleful Strix.Cast
+Bot2.Pass
+Bot1.Triggers(Authority of the Consuls; Authority of the Consuls)
+[T2 Bot2.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 22
+Bot2.Hand.Count = 6
+Bot2.Battlefield = Mox Sapphire; Mox Jet; Baleful Strix
+Bot2.Battlefield.Baleful Strix.Tapped = true

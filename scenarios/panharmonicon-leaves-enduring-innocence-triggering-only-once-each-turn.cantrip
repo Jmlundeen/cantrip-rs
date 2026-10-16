@@ -1,0 +1,54 @@
+# Each additional triggering is a triggering (CR 603.2d), so "This ability triggers only once each turn" (CR 603.2h)
+# counts it: Enduring Innocence's "Whenever one or more other creatures you control with power 2 or less enter, draw a
+# card" triggers once for an Ornithopter entering under Panharmonicon, not twice, and not again for a second Ornithopter
+# that turn. On turn 5 it triggers again, once: the limit is the turn's.
+# Hand: 7 - 4 played on turn 1 = 3; turn 3 draws a Plains (4), plays it, Enduring Innocence and both Ornithopters (0),
+# draws one (1); turn 5 draws the third Ornithopter (2), casts it (1), draws one (2).
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Mox Pearl
+Panharmonicon
+Enduring Innocence
+Ornithopter
+Ornithopter
+Plains
+Ornithopter
+Plains x10
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Panharmonicon.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Enduring Innocence.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Bot1.Hand.Count = 2
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main2]
+? Bot1.Hand.Count = 1
+[T5 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+[T5 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand.Count = 2
+Bot1.Battlefield = Plains; Plains; Mox Pearl; Panharmonicon; Enduring Innocence; Ornithopter; Ornithopter; Ornithopter

@@ -1,0 +1,44 @@
+# Panharmonicon applies to its own entering (the rulings: "If an artifact or creature entering the battlefield at the same
+# time as Panharmonicon (including Panharmonicon itself) causes a triggered ability of a permanent you control to trigger,
+# that ability triggers an additional time"). Haliya, Guided by Light ("Whenever Haliya or another creature or artifact
+# you control enters, you gain 1 life") enters after the Moxen and the Lotus, alone: 1 life. Panharmonicon, an artifact,
+# enters next and Haliya triggers twice: 2 more, 23.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Haliya, Guided by Light
+Panharmonicon
+Plains x10
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Haliya, Guided by Light.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 21
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Panharmonicon.Cast
+Bot1.Pass
+Bot1.Triggers(Haliya, Guided by Light; Haliya, Guided by Light)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 23
+Bot1.Battlefield = Plains; Mox Pearl; Mox Jet; Mox Sapphire; Haliya, Guided by Light; Panharmonicon

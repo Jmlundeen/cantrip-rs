@@ -1,0 +1,6 @@
+{
+  "name": "Panharmonicon",
+  "manaCost": "{4}",
+  "type": "Artifact",
+  "oracleText": "If an artifact or creature entering causes a triggered ability of a permanent you control to trigger, that ability triggers an additional time."
+}

@@ -1,0 +1,63 @@
+# Panharmonicon: "If an artifact or creature entering causes a triggered ability of a permanent you control to trigger,
+# that ability triggers an additional time" (CR 603.2d). On turn 3 an Island enters under Tireless Tracker: a land is
+# neither, so landfall triggers once, one Clue. On turn 5 Cryogen Relic ("When this artifact enters or leaves the
+# battlefield, draw a card") enters: an artifact, two cards; then it is sacrificed for its own ability (no tapped creature
+# to target) and leaves: one card, a leaving no entering.
+# Hand: 7 - 6 played on turn 1 = 1 (the Tracker); turn 3 draws the Island (2), plays both (0); turn 5 draws the Relic (1),
+# casts it (0), draws two as it enters (2) and one as it leaves (3).
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Mox Pearl
+Panharmonicon
+Mox Emerald
+Mox Sapphire
+Tireless Tracker
+Island
+Cryogen Relic
+Forest x10
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Panharmonicon.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Tireless Tracker.Cast
+Bot1.Pass
+Bot1.Hand.Island.Play
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Clue Token.Token = true
+? Bot1.Hand.Count = 0
+[T5 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Cryogen Relic.Cast
+Bot1.Pass
+Bot1.Triggers(Cryogen Relic; Cryogen Relic)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 2
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Cryogen Relic.Activate
+[T5 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand.Count = 3
+Bot1.Graveyard = Cryogen Relic; Black Lotus
+Bot1.Battlefield = Forest; Island; Mox Pearl; Mox Emerald; Mox Sapphire; Panharmonicon; Tireless Tracker; Clue Token
