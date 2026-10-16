@@ -1,5 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::destroy_target;
+use cantrip_mechanics::effects::SACRIFICE_TO_DESTROY_ARTIFACT_OR_ENCHANTMENT;
 use cantrip_mechanics::targets;
 use cantrip_mechanics::triggers;
 use cantrip_oracle as oracle;
@@ -17,13 +18,9 @@ fn destroy_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// "{1}, Sacrifice this creature: Destroy target artifact or enchantment." Both faces have it.
-const SACRIFICE: AbilityDef = ability(cost("{1}").and(SACRIFICE_THIS), destroy_it, "{1}, Sacrifice this creature: Destroy target artifact or enchantment.")
-    .targets(&[targets::ARTIFACT_OR_ENCHANTMENT]);
-
 pub static BACK: CardDef = CardDef {
     abilities: &[
-        SACRIFICE,
+        SACRIFICE_TO_DESTROY_ARTIFACT_OR_ENCHANTMENT,
         triggered(triggers::THIS_ATTACKS, destroy_it, "Whenever this creature attacks, destroy target artifact or enchantment defending player controls.")
             .targets(&[target(defending_players_artifact_or_enchantment)]),
     ],
@@ -31,7 +28,7 @@ pub static BACK: CardDef = CardDef {
 };
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[SACRIFICE],
+    abilities: &[SACRIFICE_TO_DESTROY_ARTIFACT_OR_ENCHANTMENT],
     back: Some(&BACK),
     ..oracle::OUTLAND_LIBERATOR
 };

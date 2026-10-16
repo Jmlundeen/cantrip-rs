@@ -148,6 +148,21 @@ pub fn sacrifice_self(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
     Ok(())
 }
 
+/// "Destroy target [thing]" (CR 701.8): the ability's first target.
+fn destroy_first_target(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    crate::destroy_target(g, item, 0);
+    Ok(())
+}
+
+/// "{1}, Sacrifice this creature: Destroy target artifact or enchantment." Cathar Commando, Outland Liberator
+/// (and its back face) and Shattered Acolyte print it.
+pub const SACRIFICE_TO_DESTROY_ARTIFACT_OR_ENCHANTMENT: AbilityDef = ability(
+    cost("{1}").and(SACRIFICE_THIS),
+    destroy_first_target,
+    "{1}, Sacrifice this creature: Destroy target artifact or enchantment.",
+)
+.targets(&[crate::targets::ARTIFACT_OR_ENCHANTMENT]);
+
 /// "Transform this [permanent]" (CR 701.28): the ability's source. Aang, Swift Savior and Concealing Curtains print it.
 pub fn transform_self(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.transform(item.object);
