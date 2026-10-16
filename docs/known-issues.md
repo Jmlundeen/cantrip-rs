@@ -42,6 +42,7 @@ keeps it).
 | [KI-5](#ki-5-a-spell-that-has-left-the-stack-is-judged-by-its-printed-keywords) | A spell that has left the stack is judged by its printed characteristics | Low | Suspected |
 | [KI-6](#ki-6-tokens-do-not-enter-tapped-under-an-enter-tapped-replacement) | Tokens do not enter tapped under an enter-tapped replacement | Medium | Open |
 | [KI-8](#ki-8-madness-is-lost-when-a-discarded-card-is-also-replaced-by-rest-in-peace) | Madness is lost when a discarded card is also replaced by Rest in Peace | Medium | Open |
+| [KI-7](#ki-7-empower-jace-with-several-jace-planeswalker-tokens-is-not-exercised) | Empower Jace with several Jace planeswalker tokens is not exercised | Low | Unexercised |
 
 ## Issues
 
@@ -157,3 +158,20 @@ offer madness as a replacement the affected player orders with the other.
 
 **Scenarios.**
 - [`scenarios/rest-in-peace-lets-a-discarded-madness-card-be-cast-by-choosing-madness-first.cantrip`](../scenarios/rest-in-peace-lets-a-discarded-madness-card-be-cast-by-choosing-madness-first.cantrip) - Basking Rootwalla discarded under Rest in Peace is cast for {0} (marked `# Known bug`).
+
+### KI-7: Empower Jace with several Jace planeswalker tokens is not exercised
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Unexercised | mechanics | 2026-10-16, Theorist's Sanctum |
+
+**Notes.** The ruling on empower Jace says that with several Jace planeswalker tokens under your control "you'll choose
+one of those tokens to put the loyalty counters on". `cantrip_mechanics::empower::jace` asks that choice
+(`choose::cards_from_kind`, `Purpose::Optional`, kind "Jace planeswalker token"), but no scenario reaches it: a second
+Jace token can only come from a token copy of the first (Fractured Identity), and a copy enters with the token's printed
+0 loyalty and is put into the graveyard by the state-based action before anything can empower it. The question is worded
+"choose a Jace planeswalker token to choose" by the client (no `Purpose` says "to put the counters on"; the core is
+closed to this change).
+
+**Scenarios.** None yet; a card that copies a planeswalker with loyalty counters, or one that puts loyalty counters on
+the copy as it enters, reaches it.

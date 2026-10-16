@@ -1,0 +1,30 @@
+# The Jace planeswalker token empower Jace makes has "-1: Surveil 1." (a loyalty ability, CR 606): the turn it is made it
+# has 2 loyalty, Bot1 activates the -1 in its second main phase, looks at the top card of its library and puts it into the
+# graveyard.
+
+[Bot1 Deck]
+Theorist's Sanctum
+Black Lotus
+Jace, the Mind Sculptor
+Island x4
+Mountain
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Theorist's Sanctum.Play
+Bot1.Choose(Jace, the Mind Sculptor)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Theorist's Sanctum.Activate(Ability: Empower)
+Bot2.Pass
+[T1 Bot1.Main2]
+Bot1.Battlefield.Jace.Activate(Ability: Surveil)
+Bot2.Pass
+Bot1.Arrange( | Mountain)
+
+[Expect]
+Bot1.Battlefield.Jace.Counters.Loyalty = 1
+Bot1.Graveyard = Mountain; Black Lotus

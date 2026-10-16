@@ -1,0 +1,39 @@
+# Theorist's Sanctum: "{2}{U}, {T}: Empower Jace 2." With no Jace planeswalker token, empower Jace creates a blue Jace
+# planeswalker token with 0 loyalty and puts two loyalty counters on it. Bot1 beholds a Jace card in hand for the first
+# Sanctum, pays for the empower with Black Lotus, and on turn 3 a second Sanctum beholds the token (a permanent: chosen, not
+# revealed), so it enters untapped and nothing more is revealed than the Jace card of turn 1.
+
+[Bot1 Deck]
+Theorist's Sanctum
+Theorist's Sanctum
+Black Lotus
+Jace, the Mind Sculptor
+Island x3
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Theorist's Sanctum.Play
+Bot1.Choose(Jace, the Mind Sculptor)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Theorist's Sanctum.Activate(Ability: Empower)
+? Stack.Count = 1
+Bot2.Pass
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Jace.Counters.Loyalty = 2
+? Bot1.Battlefield.Theorist's Sanctum.Tapped = true
+[T3 Bot1.Main1]
+Bot1.Hand.Theorist's Sanctum.Play
+Bot1.Choose(Jace)
+? Bot1.Battlefield.Theorist's Sanctum#2.Tapped = false
+
+[Expect]
+Bot1.Battlefield.Jace.Types = Planeswalker
+Bot1.Battlefield.Jace.Subtypes = Jace
+Bot1.Battlefield.Jace.Counters.Loyalty = 2
+Bot1.Battlefield.Theorist's Sanctum#1.Tapped = false
+Bot1.Battlefield.Theorist's Sanctum#2.Tapped = false
+Bot1.Revealed = Jace, the Mind Sculptor

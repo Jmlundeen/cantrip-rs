@@ -1,0 +1,45 @@
+# Empower Jace with a Jace planeswalker token already under your control does not make another: "you have to put the
+# loyalty counters on your existing Jace planeswalker token". Turn 1 makes the token (2 loyalty) with Black Lotus's mana;
+# turn 3 a second Sanctum beholds the token and empowers again, paid by both Mox Sapphires and the first Sanctum, and the
+# token has 4 loyalty - one Jace, not two. Its "-3: Draw a card." then draws (loyalty 1).
+
+[Bot1 Deck]
+Theorist's Sanctum
+Theorist's Sanctum
+Black Lotus
+Jace, the Mind Sculptor
+Mox Sapphire
+Mox Sapphire
+Island
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Theorist's Sanctum.Play
+Bot1.Choose(Jace, the Mind Sculptor)
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Theorist's Sanctum.Activate(Ability: Empower)
+Bot2.Pass
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Jace.Counters.Loyalty = 2
+[T3 Bot1.Main1]
+Bot1.Hand.Theorist's Sanctum.Play
+Bot1.Choose(Jace)
+Bot1.Battlefield.Theorist's Sanctum#2.Activate(Ability: Empower)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Theorist's Sanctum#1.Activate
+Bot2.Pass
+? Bot1.Battlefield.Jace.Counters.Loyalty = 4
+Bot1.Battlefield.Jace.Activate(Ability: Draw)
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Jace.Counters.Loyalty = 1
+Bot1.Battlefield.Count = 5
+Bot1.Hand.Count = 4

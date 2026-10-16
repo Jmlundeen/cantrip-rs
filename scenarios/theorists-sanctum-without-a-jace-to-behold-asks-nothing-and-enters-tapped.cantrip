@@ -1,0 +1,21 @@
+# Theorist's Sanctum: with nothing to behold there is no choice to make (CR 608.2d, 701.4a), so nobody is asked and the land
+# enters tapped. Bot1's hand holds a card that is not a Jace (Ajani, Nacatl Pariah, a Cat Warrior; only its back face is an Ajani)
+# and its battlefield no Jace; the sibling scenarios give the same land a Jace and it asks. The Sanctum
+# itself is no Jace either.
+
+[Bot1 Deck]
+Theorist's Sanctum
+Ajani, Nacatl Pariah
+Island x5
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Theorist's Sanctum.Play
+! Bot1.Choose
+
+[Expect]
+Bot1.Battlefield.Theorist's Sanctum.Tapped = true
+Bot1.Revealed = (absent)

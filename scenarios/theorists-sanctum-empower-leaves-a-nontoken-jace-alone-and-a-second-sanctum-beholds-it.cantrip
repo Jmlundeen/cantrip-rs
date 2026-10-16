@@ -1,0 +1,45 @@
+# Empower Jace puts its counters only on a Jace planeswalker TOKEN (the card's ruling: "empower Jace won't let you put
+# loyalty counters on nontoken Jace planeswalkers"), so with Jace, the Mind Sculptor (a card, 3 loyalty) already under Bot1's
+# control it makes its own token and the Mind Sculptor stays at 3. Before that, a second Sanctum beholds the Mind Sculptor
+# on the battlefield: a permanent, so it is chosen and nothing is revealed, and the land enters untapped. The first Sanctum
+# entered tapped on turn 1 (Bot1 declined to behold the Mind Sculptor from its hand).
+
+[Bot1 Deck]
+Theorist's Sanctum
+Theorist's Sanctum
+Black Lotus
+Jace, the Mind Sculptor
+Mox Sapphire
+Mox Sapphire
+Island
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Theorist's Sanctum.Play
+Bot1.Choose()
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Jace, the Mind Sculptor.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Jace, the Mind Sculptor.Counters.Loyalty = 3
+Bot1.Hand.Theorist's Sanctum.Play
+Bot1.Choose(Jace, the Mind Sculptor)
+? Bot1.Battlefield.Theorist's Sanctum#2.Tapped = false
+Bot1.Battlefield.Theorist's Sanctum#1.Activate(Ability: Empower)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Theorist's Sanctum#2.Activate
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Jace, the Mind Sculptor.Counters.Loyalty = 3
+Bot1.Battlefield.Jace.Counters.Loyalty = 2
+Bot1.Battlefield.Jace.Token = true
+Bot1.Revealed = (absent)
