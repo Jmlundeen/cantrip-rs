@@ -436,6 +436,8 @@ Known gaps:
   text names the hand (`WayDef::only_from`: warp, CR 702.185a, so a warped card is cast from exile for its mana cost), but a cast made while an effect resolves
   (`cast_ways_during_resolution`) is offered for the card's mana cost and faces only: an effect that lets a spell be cast
   paying its costs ("cast it from exile this turn") as it resolves can't use web-slinging or any other alternative cost.
+- Costs to attack (CR 508.1g-h: "creatures can't attack you unless their controller pays {1} for each") are not built:
+  Dáin, Lord of the Iron Hills, the one storied card not in content, waits on it.
 - No scenario reaches Questing Beast's unpreventable damage, Emrakul's extra turn on cast, or Tamiyo's -7 emblem.
 - Suspend does not give a creature cast that way haste (no card in content needs it), and several creatures put onto
   the battlefield one after another by an effect (Ghost Vacuum) enter one at a time rather than together.

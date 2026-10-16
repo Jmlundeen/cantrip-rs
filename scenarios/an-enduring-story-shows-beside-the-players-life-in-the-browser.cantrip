@@ -1,0 +1,40 @@
+# Browser
+# An enduring story (CR 702.195b) is a designation on the player, on no card. Before Fíli arrives Bot1's page shows nothing
+# beside its life total; once Fíli and two Moxes give Bot1 the story it says "Enduring story" there, and on Bot2's turn too,
+# since the designation lasts for the rest of the game. Bot2 has none.
+
+[Bot1 Deck]
+Plains
+Plains
+Mox Pearl
+Mox Jet
+Fíli the Pathfinder
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+? Client.Bot1.Facts =
+Bot1.Hand.Plains.Play
+Bot1.Hand.Fíli the Pathfinder.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+[T3 Bot1.Main2]
+? Bot1.EnduringStory = true
+? Client.Bot1.Facts = Enduring story
+? Client.Bot1.OpponentFacts =
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.EnduringStory = true
+Client.Bot1.Facts = Enduring story
+Client.Bot1.OpponentFacts =
