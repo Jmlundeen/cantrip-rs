@@ -1,0 +1,73 @@
+# Lodestone Needle // Guidestone Compass. With flash the first Needle is cast in Bot2's end step: "tap up to one target
+# artifact or creature and put two stun counters on it" taps Bot2's Ornithopter and stuns it twice, so its next untap step
+# only takes a stun counter off (CR 122.1d). The second Needle chooses no target and does nothing. The first crafts with
+# the second (Craft with artifact {2}{U}) into Guidestone Compass: "{1}, {T}: Target creature you control explores.
+# Activate only as a sorcery" is not offered in Bot2's upkeep (refused); on turn five Llanowar Elves explores a nonland
+# card (a +1/+1 counter, the card put into the graveyard), on turn seven a land (into the hand).
+
+[Bot1 Deck]
+Island
+Lodestone Needle
+Lodestone Needle
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Llanowar Elves
+Island
+Island
+Ornithopter
+Island
+Forest
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T2 Bot2.End]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Lodestone Needle.Cast
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+[T3 Bot1.Main1]
+? Bot2.Battlefield.Ornithopter.Tapped = true
+? Bot2.Battlefield.Ornithopter.Counters.Stun = 2
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Lodestone Needle.Cast
+Bot1.Target()
+Bot1.Battlefield.Lodestone Needle#1.Activate(Ability: Craft)
+Bot1.Choose(Lodestone Needle)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+[T4 Bot2.Upkeep]
+! Bot1.Battlefield.Guidestone Compass.Activate
+? Bot2.Battlefield.Ornithopter.Tapped = true
+? Bot2.Battlefield.Ornithopter.Counters.Stun = 1
+[T5 Bot1.Main1]
+Bot1.Battlefield.Guidestone Compass.Activate(Llanowar Elves)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Accept
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = 1
+? Bot1.Graveyard = Ornithopter
+[T7 Bot1.Main1]
+Bot1.Battlefield.Guidestone Compass.Activate(Llanowar Elves)
+Bot1.Battlefield.Mox Jet.Activate
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = 1
+Bot1.Hand = Island; Island; Forest
+Exile = Lodestone Needle
