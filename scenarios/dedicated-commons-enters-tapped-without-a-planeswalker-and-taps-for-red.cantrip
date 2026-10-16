@@ -1,0 +1,20 @@
+# With no planeswalker anywhere, Dedicated Commons enters tapped (CR 614.1c) - the land itself is not a planeswalker - so it cannot be
+# tapped for mana that turn (refused), and on Bot1's next turn it untaps and taps for {R}, the other of its two colors.
+
+[Bot1 Deck]
+Dedicated Commons
+Island x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Dedicated Commons.Play
+! Bot1.Battlefield.Dedicated Commons.Activate(Color: Red)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Dedicated Commons.Activate(Color: Red)
+? Bot1.Mana = {R}
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Dedicated Commons.Tapped = true
