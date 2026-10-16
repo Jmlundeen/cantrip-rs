@@ -167,6 +167,7 @@ default declines, so a scenario that does not care about such a card need say no
 | `Bot1.Battlefield.Candelabra of Tawnos.Activate(X: 2)` | X in an ability's cost, raised the way a cast's is |
 | `Bot1.Hand.Batroc the Leaper.Cast(Kicked: 2)` | kicker or multikicker paid that many times; unsaid is not kicked |
 | `Bot1.Hand.Hogaak, Arisen Necropolis.Cast(Convoke: Llanowar Elves, Ornithopter; Delve: 2)` | what pays a cost instead of mana (CR 601.2h): `Convoke:` taps the named creatures, one per question in the order given (CR 702.51a), and `Delve:` exiles that many graveyard cards, the first offered each time (CR 702.66a) |
+| `Bot1.Graveyard.Unholy Annex // Ritual Chamber.Cast(Ability: Unholy Annex: Once during each of your turns)` | a cast a permanent grants (Serra Paragon, Lurrus, Underworld Breach) of a card with more than one face is offered once per face (a Room's two doors, an Adventure) and judged on that face, so its text reads `Face name: the way's text`; name the face first |
 | `Bot1.Hand.Daze.Cast(Duress; Ability: Return)` | cast for an alternative cost by part of its text, as its Adventure with `Ability: Adventure`, or as one half of a split card with `Ability: Death`; without `Ability:`, the mana cost — which a split card, never cast as itself, does not offer |
 | `Bot1.Battlefield.Black Lotus.Activate(Color: Blue)` | mana of any one color |
 | `Bot1.Battlefield.Urza, Lord High Artificer.Activate(Ability: Add; Tap: Sol Ring)` | choose the untapped permanent paying a mana ability's tap cost |
