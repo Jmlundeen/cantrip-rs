@@ -1,0 +1,47 @@
+# Ninja of the Hand: "Power-up — {4}{B}: Each opponent discards a card. Put a +1/+1 counter on this creature." The
+# turn it enters, its mana cost {2}{B} takes the {B} off the black and {2} off the generic (CR 702.193b, 118.7): {2} is
+# left, Mox Pearl's {W} and Mox Ruby's {R}. Bot2 discards a card of their choice and the Ninja ends a 3/3.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Sol Ring
+Ninja of the Hand
+Mox Pearl
+Mox Ruby
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Island
+Lightning Bolt
+Island x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Ninja of the Hand.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Ninja of the Hand.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Choose(Lightning Bolt)
+
+[Expect]
+Turn = 1
+Bot2.Graveyard = Lightning Bolt
+Bot2.Hand.Count = 6
+Bot1.Battlefield.Ninja of the Hand.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ninja of the Hand.Power = 3
