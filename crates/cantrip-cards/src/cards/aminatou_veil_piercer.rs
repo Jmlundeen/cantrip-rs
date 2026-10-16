@@ -7,20 +7,21 @@ fn enchantment_in_your_hand(q: &dyn Query, asker: &Asker, card: ObjectId) -> boo
     miracle::in_your_hand(q, asker, card) && q.chars(card).is(CardType::Enchantment)
 }
 
-/// "Its miracle cost is equal to its mana cost reduced by {4}": the generic part of its mana cost, less four, and the rest
-/// as printed (CR 601.2f: a reduction by generic mana takes off generic mana only, and never below nothing); an {X} in it
-/// stays, its value chosen as the card is cast (CR 107.3a). A card with no mana cost has a miracle cost that can't be paid
-/// (CR 118.6). `card` is the face being cast, a Room's door (CR 709.3a), or the whole card as it is revealed.
-fn mana_cost_less_four(q: &dyn Query, card: CardId) -> Option<ManaCost> {
+/// "Its miracle cost is equal to its mana cost reduced by {4}": its mana cost, {X} and all, reduced by {4} as the total cost
+/// is determined (`less: 4`), once X is announced (CR 107.3a, 601.2f), so the reduction takes generic mana only, X's
+/// included, and never below nothing (CR 118.7a). A card with no mana cost has a miracle cost that can't be paid (CR 118.6).
+/// `card` is the face being cast, a Room's door (CR 709.3a), or the whole card as it is revealed.
+fn its_mana_cost(q: &dyn Query, card: CardId) -> Option<ManaCost> {
     let def = q.card(card);
-    def.has_cost.then(|| ManaCost { generic: def.cost.generic.saturating_sub(4), ..def.cost })
+    def.has_cost.then_some(def.cost)
 }
 
 pub static CARD: CardDef = CardDef {
     granted_miracles: &[GrantedMiracle {
         text: "Aminatou, Veil Piercer's miracle: its mana cost reduced by {4}",
         has: enchantment_in_your_hand,
-        cost: mana_cost_less_four,
+        cost: its_mana_cost,
+        less: 4,
     }],
     abilities: &[triggered(triggers::YOUR_UPKEEP, |g, item| effects::surveil(g, item, 2), "At the beginning of your upkeep, surveil 2.")],
     ..oracle::AMINATOU_VEIL_PIERCER

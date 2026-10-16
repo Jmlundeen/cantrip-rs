@@ -1,0 +1,47 @@
+# Aminatou: "Its miracle cost is equal to its mana cost reduced by {4}." The Meathook Massacre's mana cost is {X}{B}{B}:
+# the miracle cost is that cost reduced by {4} as the total cost is determined, once X is announced (CR 107.3a, 601.2f),
+# and the reduction takes generic mana, X's included (CR 118.7a). Bot1 announces X = 5 and pays {1}{B}{B} out of
+# {C}{C}{B}{B} from Sol Ring, a Swamp and Mox Jet, leaving {C} ({5}{B}{B} would not have been paid). The Massacre's -5/-5
+# kills Aminatou herself, and Bot2 loses 1 life for it.
+[Bot1 Deck]
+Swamp
+Sol Ring
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Aminatou, Veil Piercer
+Island
+The Meathook Massacre
+Island
+Island x15
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Aminatou, Veil Piercer.Cast
+
+[T3 Bot1.Upkeep]
+Bot1.Arrange(The Meathook Massacre; Island |)
+[T3 Bot1.Draw]
+Bot1.Accept
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Accept(X: 5)
+Bot1.Pass
+? Bot1.Mana = {C}
+[T3 Bot1.Main1]
+[Expect]
+Bot1.Battlefield.The Meathook Massacre.Types = Enchantment
+Bot1.Graveyard = Aminatou, Veil Piercer
+Bot1.Battlefield.Mox Pearl.Tapped = false
+Bot2.Life = 19
