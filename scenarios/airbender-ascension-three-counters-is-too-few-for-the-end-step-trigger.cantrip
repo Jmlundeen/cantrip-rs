@@ -1,0 +1,42 @@
+# Airbender Ascension: "At the beginning of your end step, if this enchantment has four or more quest counters on it ..." is an
+# intervening "if" (CR 603.4): with only three counters it does not trigger at all, so no target is asked for and nothing
+# is flickered. Three Ornithopters enter on turn 1; at the end step nothing is put on the stack (no target is asked for): the
+# enchantment has three counters, not the four a flicker (a creature entering again) would make.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Airbender Ascension
+Ornithopter
+Ornithopter
+Ornithopter
+Plains x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Airbender Ascension.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Pass
+[T1 Bot1.End]
+! Bot1.Target
+[T2 Bot2.Upkeep]
+
+[Expect]
+Bot1.Battlefield = Plains; Mox Pearl; Airbender Ascension; Ornithopter; Ornithopter; Ornithopter
+Bot1.Battlefield.Airbender Ascension.Counters.Quest = 3

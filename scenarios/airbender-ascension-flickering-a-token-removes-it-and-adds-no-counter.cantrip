@@ -1,0 +1,60 @@
+# Airbender Ascension: "exile up to one target creature you control, then return it to the battlefield under its owner's
+# control". A token that is exiled ceases to exist and does not return (CR 111.7), so flickering a Spirit token just removes
+# it. Two Ornithopters (turn 1) and Lingering Souls' two Spirit tokens (turn 3) make four quest counters; at the turn 3 end
+# step Bot1 targets a Spirit. One Spirit is left, nothing is in exile, and since no creature entered again the enchantment
+# still has four counters (a returned creature would make five).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Airbender Ascension
+Lingering Souls
+Ornithopter
+Ornithopter
+Plains
+Plains x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Airbender Ascension.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Lingering Souls.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.BeginCombat]
+? Bot1.Battlefield.Airbender Ascension.Counters.Quest = 4
+[T3 Bot1.End]
+Bot1.Target(Spirit)
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Upkeep]
+
+[Expect]
+Bot1.Battlefield = Plains; Plains; Mox Pearl; Mox Jet; Airbender Ascension; Ornithopter; Ornithopter; Spirit
+Bot1.Battlefield.Airbender Ascension.Counters.Quest = 4
+Bot1.Graveyard = Lingering Souls
+Exile = 

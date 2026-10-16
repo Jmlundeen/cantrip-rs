@@ -1,0 +1,65 @@
+# Airbender Ascension: "Whenever a creature you control enters, put a quest counter on this enchantment. At the beginning of
+# your end step, if this enchantment has four or more quest counters on it, exile up to one target creature you control, then
+# return it to the battlefield under its owner's control." Four Ornithopters enter over turns 1 and 3 (counters 4; Bot2's
+# Ornithopter, which Bot1 does not control, adds none). At Bot1's turn 3 end step the trigger asks for a target: Bot2's
+# Ornithopter is refused (not "you control"), Bot1's own is chosen. It is exiled and returns as a NEW object (CR 400.7): it is
+# summoning sick again and, entering under Bot1's control, puts a fifth quest counter on the enchantment.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Airbender Ascension
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Plains
+Plains x20
+
+[Bot2 Deck]
+Island
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Airbender Ascension.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Airbender Ascension.Counters.Quest = 2
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.BeginCombat]
+? Bot1.Battlefield.Airbender Ascension.Counters.Quest = 4
+[T3 Bot1.End]
+! Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Target(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Upkeep]
+
+[Expect]
+Bot1.Battlefield = Plains; Plains; Mox Pearl; Airbender Ascension; Ornithopter; Ornithopter; Ornithopter; Ornithopter
+Bot1.Battlefield.Airbender Ascension.Counters.Quest = 5
+Bot2.Battlefield = Ornithopter
+Exile = 

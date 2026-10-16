@@ -1,0 +1,69 @@
+# Airbender Ascension: "exile up to one target creature you control, then return it to the battlefield under its OWNER'S
+# control". Bot1 gets four quest counters (three Ornithopters on turn 1; the kicked Thieving Skydiver on turn 3) and the
+# Skydiver takes Bot2's Ornithopter (Bot1 controls it but does not own it; gaining control is not entering, so no counter).
+# At the turn 3 end step Bot1 targets that stolen Ornithopter: it returns under Bot2's control. It is no longer a creature
+# Bot1 controls, so it makes no fifth counter. Bot1 ends with the four counters and Bot2 has its Ornithopter back.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Airbender Ascension
+Thieving Skydiver
+Ornithopter
+Ornithopter
+Ornithopter
+Island
+Plains x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Airbender Ascension.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Thieving Skydiver.Cast(Kicked: 1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.BeginCombat]
+? Bot1.Battlefield.Airbender Ascension.Counters.Quest = 4
+? Bot2.Battlefield.Count = 0
+[T3 Bot1.End]
+Bot1.Target(Bot1.Battlefield.Ornithopter#4)
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Upkeep]
+
+[Expect]
+Bot1.Battlefield.Airbender Ascension.Counters.Quest = 4
+Bot2.Battlefield = Ornithopter
+Bot1.Battlefield = Plains; Mox Pearl; Island; Airbender Ascension; Thieving Skydiver; Ornithopter; Ornithopter; Ornithopter
