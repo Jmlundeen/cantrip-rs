@@ -1,0 +1,44 @@
+# She-Hulk, Jade Defender's power-up targets Bot1's own Lotus Petal, and in response Bot1 sacrifices the Petal for mana.
+# The ability's only target is gone as it would resolve, so it does not resolve (CR 608.2b): She-Hulk gets no counter.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Sol Ring
+She-Hulk, Jade Defender
+Lotus Petal
+Black Lotus
+Forest x10
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.She-Hulk, Jade Defender.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.She-Hulk, Jade Defender.Activate(Lotus Petal)
+Bot1.Battlefield.Lotus Petal.Activate(Color: Green)
+Bot1.Pass
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Graveyard = Lotus Petal; Black Lotus
+Bot1.Battlefield.She-Hulk, Jade Defender.Counters.PlusOnePlusOne = (absent)

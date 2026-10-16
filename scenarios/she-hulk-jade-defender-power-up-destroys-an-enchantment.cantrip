@@ -1,0 +1,50 @@
+# She-Hulk, Jade Defender's power-up destroys "up to one target artifact or enchantment": an enchantment, Bot1's own
+# Oath of Druids, cast on turn 1. She enters on turn 3 and her power-up costs {1}{G} (CR 702.193b, 118.7); Oath of
+# Druids goes to the graveyard and she gets her counter.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Oath of Druids
+Mox Jet
+Sol Ring
+She-Hulk, Jade Defender
+Mox Ruby
+Forest
+Forest x10
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Oath of Druids.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.She-Hulk, Jade Defender.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.She-Hulk, Jade Defender.Activate(Oath of Druids)
+? Bot1.Mana =
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Oath of Druids
+Bot1.Battlefield.She-Hulk, Jade Defender.Counters.PlusOnePlusOne = 1

@@ -1,0 +1,51 @@
+# She-Hulk, Jade Defender's power-up is activated only once (CR 702.193a). It enters on turn 3 and its power-up, {4}{G}{G} less its mana
+# cost {3}{G}, costs {1}{G} (CR 702.193b, 118.7); once that has resolved, Mana Crypt, Mox Jet and Black Lotus (which can make {G}) are still untapped,
+# enough for {1}{G} again, and the ability is not offered a second time.
+
+[Bot1 Deck]
+Ancient Tomb
+Mana Crypt
+Sol Ring
+Mox Emerald
+Mox Jet
+She-Hulk, Jade Defender
+Black Lotus
+Forest
+Forest x10
+
+[Bot2 Deck]
+Island x14
+
+[Dice]
+1
+
+[Actions]
+Bot1.Hand.Ancient Tomb.Play
+Bot1.Hand.Mana Crypt.Cast
+Bot1.Pass
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Ancient Tomb.Activate
+Bot1.Hand.She-Hulk, Jade Defender.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.She-Hulk, Jade Defender.Activate
+? Bot1.Mana =
+Bot1.Pass
+! Bot1.Battlefield.She-Hulk, Jade Defender.Activate
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.She-Hulk, Jade Defender.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Mana Crypt.Tapped = false
