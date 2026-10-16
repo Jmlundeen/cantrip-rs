@@ -1,0 +1,8 @@
+{
+  "name": "Environmental Scientist",
+  "manaCost": "{1}{G}",
+  "type": "Creature — Human Druid",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "When this creature enters, you may search your library for a basic land card, reveal it, put it into your hand, then shuffle."
+}

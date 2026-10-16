@@ -1,0 +1,38 @@
+# A search for a quality may find nothing (CR 701.23b): Bot1 accepts the "may", a Forest (a legal find) is in the library,
+# and takes nothing. Nothing is revealed (no Revealed key), the hand stays as it was and the library keeps its 11 cards.
+# (Unlike declining, the search was done, so the library is shuffled; the engine records no shuffle for a script to
+# check, so only the first scenario's order, unshuffled when declined, is asserted.)
+
+[Bot1 Deck]
+Mox Emerald
+Forest
+Environmental Scientist
+Island
+Plains
+Mountain
+Island
+Forest
+Swamp
+Taiga
+Llanowar Elves
+Mountain
+Plains x6
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Environmental Scientist.Cast
+Bot1.Accept
+Bot1.Search()
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Hand = Island; Plains; Mountain; Island
+Bot1.Battlefield = Mox Emerald; Forest; Environmental Scientist
+Bot1.Library.Count = 11

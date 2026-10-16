@@ -5,7 +5,7 @@
 //! The "enters tapped" part of a land is `mana::enters_tapped`, `mana::enters_tapped_unless_pay_two_life` (shock lands) or
 //! `enters_tapped_unless_you_control` or `enters_tapped_unless_you_control_either` below; the card sets it in `enters`.
 
-use crate::library::{search_to_battlefield, Find};
+use crate::library::{search_to_battlefield, search_to_hand, Find};
 use crate::{choose, effects, mana, triggers};
 use cantrip_api::*;
 
@@ -93,6 +93,35 @@ pub fn search_basic_land_to_battlefield(g: &mut dyn Game, player: PlayerId, sour
         chars.is(CardType::Land) && chars.supertypes.basic
     })?;
     Ok(())
+}
+
+/// What "you may search your library for a basic land card, reveal it, put it into your hand, then shuffle" asks.
+pub const FETCH_BASIC_TO_HAND: Question = Question::new(
+    "SearchLibrary",
+    "search your library for a basic land card?",
+    "Reveal it and put it into your hand, then shuffle",
+    "Search",
+    "Don't search",
+);
+
+/// "Search your library for a basic land card, reveal it, put it into your hand, then shuffle" (CR 701.23): the player
+/// finding one or none, and the library shuffled either way. Bushwhack's first mode and Environmental Scientist print it.
+pub fn search_basic_land_to_hand(g: &mut dyn Game, player: PlayerId, source: ObjectId) -> Result<(), Suspend> {
+    search_to_hand(g, player, source, Find::ONE.revealed(), |q, c| {
+        let chars = q.chars(c);
+        chars.is(CardType::Land) && chars.supertypes.basic
+    })?;
+    Ok(())
+}
+
+/// "You may search your library for a basic land card, reveal it, put it into your hand, then shuffle": asked first
+/// whether to, and declining skips the search and the shuffle (CR 701.23). Environmental Scientist's enters trigger
+/// (`search_basic_land_to_hand` is Bushwhack's, which does not say "may").
+pub fn may_search_basic_land_to_hand(g: &mut dyn Game, player: PlayerId, source: ObjectId) -> Result<(), Suspend> {
+    if !effects::ask_may(g, player, source, Purpose::Ask(&FETCH_BASIC_TO_HAND))? {
+        return Ok(());
+    }
+    search_basic_land_to_hand(g, player, source)
 }
 
 fn return_a_land(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {

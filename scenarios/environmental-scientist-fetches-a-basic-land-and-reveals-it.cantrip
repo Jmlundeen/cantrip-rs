@@ -1,0 +1,42 @@
+# Environmental Scientist's enters trigger: Bot1 accepts the "may", and may take any basic land card from the library - here a
+# Swamp, though Forest comes first - which is revealed (Revealed) and put into the hand. The Taiga (a nonbasic land with
+# basic land types) and the Llanowar Elves (a nonland) are not on offer (`! Bot1.Search(..)`); the library is one card
+# smaller (11 to 10) and the Scientist stays on the battlefield.
+
+[Bot1 Deck]
+Mox Emerald
+Forest
+Environmental Scientist
+Island
+Plains
+Mountain
+Island
+Forest
+Taiga
+Llanowar Elves
+Swamp
+Mountain
+Plains x6
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Environmental Scientist.Cast
+Bot1.Accept
+! Bot1.Search(Taiga)
+! Bot1.Search(Llanowar Elves)
+Bot1.Search(Swamp)
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Hand = Island; Island; Plains; Mountain; Swamp
+Bot1.Revealed = Swamp
+Bot1.Battlefield = Mox Emerald; Forest; Environmental Scientist
+Bot1.Library.Count = 10
+Stack.Count = 0

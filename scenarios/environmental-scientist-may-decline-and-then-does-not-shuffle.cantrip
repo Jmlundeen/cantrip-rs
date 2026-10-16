@@ -1,0 +1,36 @@
+# "You may search": Bot1 declines, so there is no search, nothing is revealed, no card moves and - the search being what
+# shuffles (CR 701.23) - the library is not shuffled: it is still in the order the decklist gave, a Swamp (a legal find)
+# in it. The Scientist still enters.
+
+[Bot1 Deck]
+Mox Emerald
+Forest
+Environmental Scientist
+Island
+Plains
+Mountain
+Island
+Forest
+Swamp
+Taiga
+Llanowar Elves
+Mountain
+Plains x6
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Environmental Scientist.Cast
+Bot1.Decline
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Hand = Island; Plains; Mountain; Island
+Bot1.Battlefield = Mox Emerald; Forest; Environmental Scientist
+Bot1.Library = Forest; Swamp; Taiga; Llanowar Elves; Mountain; Plains; Plains; Plains; Plains; Plains; Plains
