@@ -1,0 +1,14 @@
+# Dreamroot Cascade: with no other land it enters tapped (CR 614.1c) - the land itself is not counted.
+
+[Bot1 Deck]
+Dreamroot Cascade
+Island x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Dreamroot Cascade.Play
+
+[Expect]
+Bot1.Battlefield.Dreamroot Cascade.Tapped = true

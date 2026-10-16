@@ -1,0 +1,22 @@
+# Dreamroot Cascade: with two other lands it enters untapped (CR 614.1c) and its mana ability adds {G} (chosen as it is activated).
+
+[Bot1 Deck]
+Island
+Island
+Dreamroot Cascade
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Dreamroot Cascade.Play
+Bot1.Battlefield.Dreamroot Cascade.Activate(Color: Green)
+
+[Expect]
+Bot1.Battlefield.Dreamroot Cascade.Tapped = true
+Bot1.Mana = {G}
