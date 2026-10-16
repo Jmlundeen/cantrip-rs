@@ -1,0 +1,40 @@
+# "Whenever a land YOU control enters": Bloodghast sits in Bot1's graveyard (Lightning Bolt, turn 2). Bot2 playing an
+# Island on turn 4 asks Bot1 nothing (refusal, placed after the pass that takes the priority a trigger would have given),
+# and the Bloodghast is still in the graveyard at the start of turn 5, when Bot1's own Island brings it back (the positive
+# control).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Bloodghast
+Island
+Island x16
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island
+Island x17
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Bloodghast.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Bloodghast)
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot1.Pass
+! Bot1.Accept
+[T5 Bot1.Main1]
+? Bot1.Graveyard = Bloodghast
+Bot1.Hand.Island.Play
+Bot1.Accept
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield = Swamp; Mox Jet; Island; Bloodghast

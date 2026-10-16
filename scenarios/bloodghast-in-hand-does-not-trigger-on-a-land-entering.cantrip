@@ -1,0 +1,21 @@
+# Bloodghast's landfall works only from the graveyard (CR 113.6k): with the card still in hand, Bot1 playing a Swamp on
+# turn 1 asks nothing (refusal, placed after the pass for the priority a trigger would have given), and nothing leaves the
+# hand but the land.
+
+[Bot1 Deck]
+Swamp
+Bloodghast
+Island x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Pass
+! Bot1.Accept
+[T2 Bot2.Main1]
+
+[Expect]
+Bot1.Hand.Count = 6
+Bot1.Battlefield = Swamp

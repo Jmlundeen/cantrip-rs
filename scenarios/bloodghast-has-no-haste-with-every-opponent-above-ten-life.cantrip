@@ -1,0 +1,34 @@
+# Bloodghast: "This creature has haste as long as an opponent has 10 or less life." Three Bolts and a Black Lotus take
+# Bot2 from 20 to 11 on turn 1 - one above the line - and the Bloodghast cast afterwards is summoning sick with no haste.
+# Turn 3's scenario, with Bot2 at exactly 10, is its sibling.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Black Lotus
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Bloodghast
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Bloodghast.Cast
+[T1 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 11
+Bot1.Battlefield.Bloodghast.SummoningSick = true
+Bot1.Battlefield.Bloodghast.Keywords = CantBlock

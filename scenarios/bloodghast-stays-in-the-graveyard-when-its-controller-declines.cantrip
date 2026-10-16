@@ -1,0 +1,32 @@
+# Bloodghast's landfall return is a "may": after Lightning Bolt kills it, Bot1 plays an Island on turn 3 and declines, so
+# the Bloodghast stays in the graveyard (and Bot1's land is the only new permanent).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Bloodghast
+Island
+Island x16
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Bloodghast.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Bloodghast)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Decline
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Bloodghast
+Bot1.Battlefield = Swamp; Mox Jet; Island

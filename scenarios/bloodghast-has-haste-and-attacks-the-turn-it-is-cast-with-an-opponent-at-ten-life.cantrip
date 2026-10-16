@@ -1,0 +1,41 @@
+# Bloodghast has haste while an opponent has 10 or less life: on turn 3 two Lightning Bolts and a Fireblast (sacrificing two
+# Mountains, tapped for their mana first) take Bot2 from 20 to exactly 10, the line itself. Black Lotus and Mox Jet then pay
+# for the Bloodghast, which attacks the turn it is cast for 2: Bot2 ends at 8.
+
+[Bot1 Deck]
+Mountain
+Mox Jet
+Black Lotus
+Lightning Bolt
+Lightning Bolt
+Fireblast
+Mountain
+Bloodghast
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Hand.Fireblast.Cast(Bot2; Ability: Sacrifice)
+Bot1.Choose(Mountain; Mountain)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Bloodghast.Cast
+? Bot2.Life = 10
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Bloodghast > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 8
+Bot1.Battlefield.Bloodghast.Keywords = CantBlock; Haste
