@@ -1,0 +1,76 @@
+# The cast of a defeated Siege (CR 310.12b) is a cast like any other, so "each player can't cast more than one spell each
+# turn" (Archon of Emeria, CR 101.2, 601.2) binds it. The setup is the control scenario's, "a defeated siege is cast
+# transformed": Bot1's Gorilla takes the Invasion of Gobakhan down to 1 defense on turn 3. Bot2's Archon of Emeria comes down on
+# turn 4 (after a Mox Pearl and a Sol Ring, cast while it is not yet out); the Siege's own enter trigger took the Lightning Bolt
+# from Bot2's hand, out of the way. On turn 5 Bot1 casts a Mox Jet before combat, and the Gorilla's damage then removes the last counter: the Siege is
+# exiled and the transformed cast is not offered (`! Bot1.Accept`), so it stays in exile and the Gorilla gets no counter.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Guerrilla Gorilla
+Plains
+Mox Pearl
+Invasion of Gobakhan
+Plains
+Plains
+Mox Jet
+Plains x8
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Sol Ring
+Archon of Emeria
+Lightning Bolt
+Plains x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Invasion of Gobakhan.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Choose(Lightning Bolt)
+Bot1.Attack(Guerrilla Gorilla > Bot1.Battlefield.Invasion of Gobakhan)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Invasion of Gobakhan.Counters.Defense = 1
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Battlefield.Plains#2.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Archon of Emeria.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Guerrilla Gorilla > Bot1.Battlefield.Invasion of Gobakhan)
+[T5 Bot1.CombatDamage]
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+! Bot1.Accept
+[T5 Bot1.End]
+
+[Expect]
+Turn = 5
+Exile = Invasion of Gobakhan; Lightning Bolt
+Bot1.Battlefield = Forest; Plains; Mox Emerald; Mox Pearl; Mox Jet; Guerrilla Gorilla
+Bot1.Battlefield.Guerrilla Gorilla.Power = 2

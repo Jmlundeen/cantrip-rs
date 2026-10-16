@@ -1,0 +1,48 @@
+# Positive control for "cascade cannot cast berserk in the second main phase": "Cast this spell only before the combat
+# damage step" (Berserk, CR 601.3) is met in the first main phase, so Bloodbraid Challenger's cascade (CR 702.85a) offers
+# the exiled Berserk, cast for nothing at Embereth Shieldbreaker: a 4/1 trampler until end of turn.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Embereth Shieldbreaker
+Forest
+Mox Emerald
+Mox Jet
+Mox Pearl
+Bloodbraid Challenger
+Berserk
+Island x5
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Embereth Shieldbreaker.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Bloodbraid Challenger.Cast
+? Stack.Count = 2
+Bot1.Accept
+Bot1.Target(Bot1.Battlefield.Embereth Shieldbreaker)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Embereth Shieldbreaker.Power = 4
+[Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Berserk
+Bot1.Library = Island; Island; Island; Island; Island

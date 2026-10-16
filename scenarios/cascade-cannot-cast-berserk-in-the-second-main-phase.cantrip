@@ -1,0 +1,47 @@
+# "Cast this spell only before the combat damage step" (Berserk, CR 601.3) binds a cast made as another spell's cascade
+# trigger resolves, as it binds any cast (CR 101.2: "can't" beats "can"). Bot1 casts Bloodbraid Challenger in the second main
+# phase of turn 3; its cascade (CR 702.85a) exiles Berserk, mana value 1, which may not be cast then: no offer is made
+# (`! Bot1.Accept`) and the card goes to the bottom of the library. The first-main-phase cast in "cascade casts berserk before
+# combat damage" is the positive control.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Embereth Shieldbreaker
+Forest
+Mox Emerald
+Mox Jet
+Mox Pearl
+Bloodbraid Challenger
+Berserk
+Island x5
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Embereth Shieldbreaker.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+[T3 Bot1.Main2]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Bloodbraid Challenger.Cast
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+! Bot1.Accept
+
+[Expect]
+Turn = 3
+Bot1.Graveyard =
+Bot1.Library = Island; Island; Island; Island; Island; Berserk

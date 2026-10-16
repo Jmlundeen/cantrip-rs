@@ -1,4 +1,3 @@
-# Known bug: a spell cast while another spell or ability resolves ignores "each player can't cast more than one spell each turn" (Archon of Emeria, CR 101.2, 601.2): could_cast_during_resolution in cantrip-rules checks may_cast but not cast_limit, so Bot1, who has cast a spell this turn, is offered the cipher copy.
 # The copy the cipher trigger makes is cast during the trigger's resolution (CR 702.99a, 707.12), so the rules on casting apply to
 # it. If you can't cast it, you don't (the ruling: it ceases to exist at once, with no later chance). Trait Doctoring is
 # encoded on Llanowar Elves. On turn 5 the Elves connect with no Archon of Emeria out, and the copy is offered and cast (the
