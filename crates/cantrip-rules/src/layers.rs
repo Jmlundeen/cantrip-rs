@@ -107,9 +107,13 @@ pub fn chars_before(cards: &CardTable, state: &GameState, id: ObjectId, stop: La
     let has_own = !def.statics.is_empty();
     // The permanents (and graveyard cards) whose static abilities could apply, found once for every layer: most games
     // look at a flag and find none.
-    let found = (cards.any_statics && state.statics_seen).then(|| static_sources(cards, state));
+    // `statics_seen` is set by hone counters as well (CR 122.1j), which need no card with a static ability.
+    let found = state.statics_seen.then(|| static_sources(cards, state));
     let sources: &[(ObjectId, ZoneKind)] = found.as_ref().map_or(&[], |f| &f.list);
-    if !has_effects && !has_counters && !has_own && sources.is_empty() {
+    // The permanents with hone counters attached to it, if any are.
+    let honed: &[ObjectId] = found.as_ref().map_or(&[], |f| &f.honed);
+    let has_hone = on_battlefield && honed.iter().any(|&e| state.obj(e).attached_to == Some(id));
+    if !has_effects && !has_counters && !has_own && sources.is_empty() && !has_hone {
         if obj.copy.is_none() && !spell && !room {
             // Nothing acts on it: the card's own values, made once.
             return *printed(cards, card, stop > Layer::Ability);
@@ -155,6 +159,9 @@ pub fn chars_before(cards: &CardTable, state: &GameState, id: ObjectId, stop: La
         // "loses hexproof" effect has to reach the hexproof a counter gives (CR 613.1f, 122.1b).
         if has_counters {
             counters(obj, layer, &mut chars);
+        }
+        if has_hone && layer == Layer::PtModify {
+            hone(cards, state, id, honed, &mut chars);
         }
         // CR 613.7: within a layer, static abilities and other continuous effects apply in timestamp order, interleaved.
         if has_own || !sources.is_empty() || !granted.is_empty() {
@@ -207,6 +214,7 @@ fn static_sources<'a>(cards: &CardTable, state: &'a GameState) -> std::cell::Ref
     {
         let mut made = state.static_sources.borrow_mut();
         made.list.clear();
+        made.honed.clear();
         let note = |list: &mut Vec<(ObjectId, ZoneKind)>, source: ObjectId, from: ZoneKind| {
             let sobj = state.obj(source);
             let scard = sobj.copy.map(|c| c.card).unwrap_or_else(|| cards.face(sobj.card, sobj.transformed));
@@ -217,6 +225,10 @@ fn static_sources<'a>(cards: &CardTable, state: &'a GameState) -> std::cell::Ref
         };
         for &source in state.battlefield() {
             note(&mut made.list, source, ZoneKind::Battlefield);
+            // CR 122.1j: hone counters act on what their permanent is attached to, abilities or none.
+            if state.obj(source).counters(CounterKind::Hone) > 0 && live(state, source) {
+                made.honed.push(source);
+            }
         }
         // An emblem's static abilities function in the command zone (CR 114.4).
         for &source in state.zone(Zone::COMMAND) {
@@ -542,6 +554,22 @@ fn counters(obj: &Obj, layer: Layer, chars: &mut Chars) {
             }
         }
         _ => {}
+    }
+}
+
+/// Hone counters (CR 122.1j): "A hone counter on an Equipment gives +1/+0 to any creature that Equipment is attached to",
+/// in layer 7c with the other counters (CR 613.4c). The effect is the counter's, not an ability's, so an Equipment that has
+/// lost its abilities still gives it, and one that mentions no hone counter does too (the rulings). Each permanent with hone
+/// counters attached to `id` gives one +1/+0 per counter while it is an Equipment; a creature gets nothing from a power it
+/// lacks.
+fn hone(cards: &CardTable, state: &GameState, id: ObjectId, honed: &[ObjectId], chars: &mut Chars) {
+    for &equipment in honed {
+        let e = state.obj(equipment);
+        // Its types are settled by layer 4, before any power is: what it is attached to cannot change them.
+        if e.attached_to == Some(id) && chars_before(cards, state, equipment, Layer::Color).has_subtype(Subtype::Equipment) {
+            let bonus = e.counters(CounterKind::Hone);
+            chars.power = chars.power.map(|v| v + bonus);
+        }
     }
 }
 

@@ -76,7 +76,8 @@ abilities: &[
   `add_one_of(&[Color::Red, Color::Green])`, `.only_for(restriction)`. What these list is what is added; a card whose
   mana ability does more writes the effect itself with `.by(f)` (the listing then only says what it can add) or
   `add_by(f)` when nothing can be listed (Gaea's Cradle).
-- **Triggers**: `cantrip_mechanics::triggers` names the common ones (`THIS_ENTERS`, `THIS_DIES`, `YOUR_UPKEEP`, ...); a
+- **Triggers**: `cantrip_mechanics::triggers` names the common ones (`THIS_ENTERS`, `THIS_DIES`, `YOUR_UPKEEP`,
+  `THIS_ENTERS_OR_ATTACKS` - one ability with two trigger events, never two abilities, ...); a
   card's own is `when(EventMask::DAMAGE, my_match_fn)`. A Saga's chapter is `chapter(n, effect, text)`. A trigger event
   that says "you" is `when_asked(mask, f)`, `f` taking the `Asker` and reading `me.controller`, never
   `q.controller(source)`: a delayed triggered ability's "you" is the player who controlled the spell or ability that made
@@ -317,7 +318,10 @@ shapes have an example:
   the permanent has once they are on it; a permanent entering with counters announces each kind it has, lore included.
   "When the Nth [kind] counter is put on this" (the Plans, Shang-Chi and the Ten Rings) is
   `when_asked(EventMask::COUNTERS, triggers::nth_counter_put_on_this::<{ CounterKind::Plan as u8 }, 4>)`. A new kind of counter
-  is one line in `counter_kinds!` (`cantrip-state/src/vocab.rs`); the host and the client name it from there.
+  is one line in `counter_kinds!` (`cantrip-state/src/vocab.rs`); the host and the client name it from there. A kind the
+  rules give an effect is the core's: keyword counters (CR 122.1b), and hone counters (CR 122.1j), whose +1/+0 the layers
+  give the creature an Equipment with them is attached to (7c), so a card only puts them (Dwalin, Weaponmaster; Sting,
+  Bilbo's Sword).
   **Costs**: `Cost.unattach_self`.
 - **Turns**: `DelayedWhen::UntilNextTurnOf(p)`; `DelayedWhen::EachStep` for "at the beginning of each [step] ... for the
   rest of the game", never used up and on no object (paradigm, CR 702.192a); `CardDef.turn_begin` skips a turn (Time Vault, CR 614.10); "end the

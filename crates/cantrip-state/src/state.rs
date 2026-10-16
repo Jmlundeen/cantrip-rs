@@ -36,8 +36,9 @@ pub struct GameState {
     pub blocks: Vec<Block>,
     /// Extra turns waiting to be taken (CR 500.7): the most recently created last, and taken first.
     pub extra_turns: Vec<PlayerId>,
-    /// Whether an object whose card has static abilities has ever been made in this game: until one has, the layers
-    /// skip looking for static sources at all. Only ever set, so it can be stale only towards looking.
+    /// Whether an object whose card has static abilities has ever been made in this game, or a hone counter put on a
+    /// permanent (CR 122.1j): until one has, the layers skip looking for static sources, and hone counters, at all. Only
+    /// ever set, so it can be stale only towards looking.
     pub statics_seen: bool,
     pub agenda: Vec<Frame>,
     pub rng: Rng,
@@ -62,6 +63,9 @@ pub struct GameState {
 pub struct StaticSources {
     pub epoch: u64,
     pub list: Vec<(ObjectId, ZoneKind)>,
+    /// The permanents with hone counters on them (CR 122.1j), in battlefield order: what each gives the creature it is
+    /// attached to is no ability of it, so it is found apart from `list`, whatever abilities the permanent has lost.
+    pub honed: Vec<ObjectId>,
 }
 
 impl GameState {
@@ -226,7 +230,7 @@ impl GameState {
             unsettled: true,
             journal: Journal::default(),
             epoch: 0,
-            static_sources: std::cell::RefCell::new(StaticSources { epoch: u64::MAX, list: Vec::new() }),
+            static_sources: std::cell::RefCell::new(StaticSources { epoch: u64::MAX, list: Vec::new(), honed: Vec::new() }),
         }
     }
 

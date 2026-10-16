@@ -1687,6 +1687,10 @@ pub fn add_counters(cx: &mut Cx, id: ObjectId, kind: CounterKind, amount: i16) {
             }
         }
     });
+    // The layers look for hone counters from now on (CR 122.1j).
+    if counts[CounterKind::Hone as usize] > 0 {
+        cx.st().see_statics();
+    }
     // CR 310.12b: when the last defense counter comes off a Siege, its defeat ability triggers.
     if kind == CounterKind::Defense && defense > 0 && cx.s().obj(id).counters(CounterKind::Defense) == 0 {
         siege_defeat_triggers(cx, id);
@@ -1826,15 +1830,15 @@ pub fn tap(cx: &mut Cx, id: ObjectId) {
     cx.emit(Event::Tapped { permanent: id });
 }
 
-/// Marks the game as one where static abilities may apply, once an object whose card has any is made (the layers'
-/// guard; `GameState::statics_seen`).
+/// Marks the game as one where static abilities may apply, once an object whose card has any is made, or one that has
+/// hone counters (CR 122.1j) (the layers' guard; `GameState::statics_seen`).
 fn note_statics(cx: &mut Cx, id: ObjectId) {
     if cx.s().statics_seen {
         return;
     }
     let obj = cx.s().obj(id);
     let card = obj.copy.map(|c| c.card).unwrap_or_else(|| cx.cards().face(obj.card, obj.transformed));
-    if cx.cards().statics[card.0 as usize] {
+    if cx.cards().statics[card.0 as usize] || obj.counters(CounterKind::Hone) > 0 {
         cx.st().see_statics();
     }
 }
