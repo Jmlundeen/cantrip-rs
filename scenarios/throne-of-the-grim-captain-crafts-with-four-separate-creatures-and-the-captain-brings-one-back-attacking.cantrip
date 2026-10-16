@@ -1,0 +1,79 @@
+# Throne of the Grim Captain // The Grim Captain. The Throne's "{T}: Mill two cards" puts Rampaging Ferocidon (a Dinosaur)
+# and Voldaren Epicure (a Vampire) into Bot1's graveyard. "Craft with a Dinosaur, a Merfolk, a Pirate, and a Vampire {4}"
+# (CR 702.167a-b) needs four separate objects (the card's ruling): with Hullbreacher, a Merfolk Pirate, as the only Merfolk
+# and the only Pirate it is not offered (refused); once Spyglass Siren, a Pirate, is out it is, each material asked for in
+# turn - the Hullbreacher, chosen as the Merfolk, is not offered again as the Pirate (refused). The Grim Captain, a 7/7 with
+# menace, trample, lifelink and hexproof, attacks on turn seven: Bot2 sacrifices a nonland permanent of its choice (its Mox
+# Pearl, keeping the Ornithopter), and Bot1 puts Voldaren Epicure, an exiled creature card used to craft it (CR 702.167c),
+# onto the battlefield tapped and attacking (CR 508.4); its enters ability deals 1 damage to Bot2. On turn nine Bot2
+# sacrifices its last nonland permanent, the Ornithopter, and Bot1 puts nothing onto the battlefield (an empty choice).
+
+[Bot1 Deck]
+Island
+Throne of the Grim Captain
+Mox Sapphire
+Mox Ruby
+Hullbreacher
+Black Lotus
+Spyglass Siren
+Rampaging Ferocidon
+Voldaren Epicure
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Mox Pearl
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Throne of the Grim Captain.Cast
+Bot1.Battlefield.Throne of the Grim Captain.Activate(Ability: Mill)
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+? Bot1.Graveyard = Voldaren Epicure; Rampaging Ferocidon
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Hullbreacher.Cast
+! Bot1.Battlefield.Throne of the Grim Captain.Activate(Ability: Craft)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Spyglass Siren.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Throne of the Grim Captain.Activate(Ability: Craft)
+Bot1.Choose(Graveyard.Rampaging Ferocidon)
+Bot1.Choose(Hullbreacher)
+! Bot1.Choose(Hullbreacher)
+Bot1.Choose(Spyglass Siren)
+Bot1.Choose(Graveyard.Voldaren Epicure)
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Island#3.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+[T7 Bot1.DeclareAttackers]
+Bot1.Attack(The Grim Captain > Bot2)
+Bot2.Choose(Mox Pearl)
+Bot1.Choose(Voldaren Epicure)
+[T7 Bot1.Main2]
+? Bot2.Life = 11
+[T9 Bot1.DeclareAttackers]
+Bot1.Attack(The Grim Captain > Bot2)
+Bot1.Choose()
+[T9 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = 
+Bot2.Life = 4
+Bot1.Life = 34
+Exile = Rampaging Ferocidon; Hullbreacher; Spyglass Siren
