@@ -1,0 +1,62 @@
+# Dragonhawk, Fate's Tempest: "until your next end step" is the next end step that has not begun. Dragonhawk enters on turn 1
+# (a Bolt is exiled and not played: 2 damage at that end step, Bot2 18). In that same end step, once that has resolved, Bot1
+# flickers it with Ephemerate: the second trigger exiles a second Bolt, and this turn's end step has already begun, so Bot1
+# may play it until the end step of turn 3. Bot1 declines the rebound cast and casts that Bolt on turn 3 (it would be gone if
+# the permission ended with turn 1's end step). That cast card is not still exiled at turn 3's end step, so no more damage:
+# Bot2 ends at 20 - 2 - 3 = 15.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Black Lotus
+Dragonhawk, Fate's Tempest
+Ephemerate
+Plains
+Plains
+Lightning Bolt
+Lightning Bolt
+Plains
+Plains x6
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Dragonhawk, Fate's Tempest.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+? Exile = Lightning Bolt
+[T1 Bot1.End]
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 18
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Ephemerate.Cast(Dragonhawk, Fate's Tempest)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Exile = Lightning Bolt; Lightning Bolt; Ephemerate
+[T3 Bot1.Upkeep]
+Bot1.Decline
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 15
+[T4 Bot2.Main1]
+
+[Expect]
+Bot2.Life = 15
+Exile = Lightning Bolt; Ephemerate
+Bot1.Graveyard = Lightning Bolt; Black Lotus

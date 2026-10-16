@@ -34,16 +34,6 @@ fn wizard(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
     chars.subtypes = chars.subtypes.with(view.words(source).subtype(Subtype::Wizard));
 }
 
-/// The equipped creature has the Equipment's delayed ability 0 (CR 613.1f): one triggered ability with two conditions, an
-/// ability it controls and that is gone the moment the Equipment stops being attached to it.
-fn grant_growth(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
-    let o = view.state().obj(source);
-    let card = o.copy.map(|c| c.card).unwrap_or(o.card);
-    if let Some(slot) = chars.abilities.iter().position(|a| a.is_none()) {
-        chars.abilities[slot] = Some(AbilityRef::delayed(card, 0));
-    }
-}
-
 /// "Whenever you cast a noncreature spell and whenever you draw your third card each turn" (CR 603.2, 121.2): the
 /// history as it was just before the draw holds the two earlier ones.
 fn cast_noncreature_or_draw_third(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
@@ -69,7 +59,7 @@ pub static CARD: CardDef = CardDef {
     delayed: &[triggered(when_asked(EventMask(EventMask::SPELL_CAST.0 | EventMask::DREW.0), cast_noncreature_or_draw_third), grow, "Whenever you cast a noncreature spell and whenever you draw your third card each turn, put a +1/+1 counter on this creature.")],
     statics: &[
         static_ability(Layer::Type, attached_object, wizard, "Equipped creature is a Wizard in addition to its other types."),
-        static_ability(Layer::Ability, attached_object, grant_growth, "Equipped creature has \"Whenever you cast a noncreature spell and whenever you draw your third card each turn, put a +1/+1 counter on this creature.\""),
+        static_ability(Layer::Ability, attached_object, cantrip_mechanics::statics::grant_delayed_ability, "Equipped creature has \"Whenever you cast a noncreature spell and whenever you draw your third card each turn, put a +1/+1 counter on this creature.\""),
     ],
     ..oracle::ASTROLOGIANS_PLANISPHERE
 };

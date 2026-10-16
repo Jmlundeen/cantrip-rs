@@ -7,12 +7,7 @@ fn affects(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Ch
     so_far.is(CardType::Artifact) && so_far.is(CardType::Creature) && q.state().obj(affected).controller == q.state().obj(source).controller
 }
 
-fn plus_two_plus_two(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.power = chars.power.map(|v| v + 2);
-    chars.toughness = chars.toughness.map(|v| v + 2);
-}
-
 pub static CARD: CardDef = CardDef {
-    statics: &[static_ability(Layer::PtModify, affects, plus_two_plus_two, "Artifact creatures you control get +2/+2.")],
+    statics: &[static_ability(Layer::PtModify, affects, cantrip_mechanics::statics::plus_pt::<2, 2>, "Artifact creatures you control get +2/+2.")],
     ..oracle::TEMPERED_STEEL
 };

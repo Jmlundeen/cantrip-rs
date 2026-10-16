@@ -5,24 +5,9 @@ use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
 
-fn plus_five(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.power = chars.power.map(|v| v + 5);
-    chars.toughness = chars.toughness.map(|v| v + 5);
-}
-
 fn keywords(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     for k in [Keyword::FirstStrike, Keyword::Trample, Keyword::Indestructible, Keyword::Haste] {
         chars.keywords = chars.keywords.with(k);
-    }
-}
-
-/// The equipped creature has the Equipment's delayed ability 0 (CR 301.5a, 613.1f): a triggered ability it controls,
-/// gone the moment the Equipment stops being attached to it.
-fn grant_exile(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
-    let o = view.state().obj(source);
-    let card = o.copy.map(|c| c.card).unwrap_or(o.card);
-    if let Some(slot) = chars.abilities.iter().position(|a| a.is_none()) {
-        chars.abilities[slot] = Some(AbilityRef::delayed(card, 0));
     }
 }
 
@@ -56,9 +41,9 @@ pub static CARD: CardDef = CardDef {
     ],
     delayed: &[triggered(when(EventMask::DAMAGE, deals_combat_damage_to_creature), exile_damaged, "Whenever this creature deals combat damage to a creature, exile that creature.")],
     statics: &[
-        static_ability(Layer::PtModify, attached_object, plus_five, "Equipped creature gets +5/+5."),
+        static_ability(Layer::PtModify, attached_object, cantrip_mechanics::statics::plus_pt::<5, 5>, "Equipped creature gets +5/+5."),
         static_ability(Layer::Ability, attached_object, keywords, "Equipped creature has first strike, trample, indestructible and haste."),
-        static_ability(Layer::Ability, attached_object, grant_exile, "Equipped creature has \"Whenever this creature deals combat damage to a creature, exile that creature.\""),
+        static_ability(Layer::Ability, attached_object, cantrip_mechanics::statics::grant_delayed_ability, "Equipped creature has \"Whenever this creature deals combat damage to a creature, exile that creature.\""),
     ],
     ..oracle::KALDRA_COMPLEAT
 };

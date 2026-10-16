@@ -17,14 +17,8 @@ fn affects(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Ch
         && s.obj(affected).controller == s.obj(source).controller
 }
 
-/// "+2/+2" (CR 613.4c): only something that has power and toughness to modify gets it.
-fn apply(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.power = chars.power.map(|v| v + 2);
-    chars.toughness = chars.toughness.map(|v| v + 2);
-}
-
 pub static CARD: CardDef = CardDef {
     enters: Some(enters),
-    statics: &[static_ability(Layer::PtModify, affects, apply, "Creatures you control of the chosen type get +2/+2.")],
+    statics: &[static_ability(Layer::PtModify, affects, cantrip_mechanics::statics::plus_pt::<2, 2>, "Creatures you control of the chosen type get +2/+2.")],
     ..oracle::OBELISK_OF_URD
 };

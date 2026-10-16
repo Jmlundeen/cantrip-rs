@@ -17,11 +17,6 @@ fn cheaper_per_attacker(q: &dyn Query, _: ObjectId, player: PlayerId, costed: Co
     CostDelta::less(attackers.min(255) as u8)
 }
 
-fn plus_one_plus_one(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.power = chars.power.map(|v| v + 1);
-    chars.toughness = chars.toughness.map(|v| v + 1);
-}
-
 fn double_strike_and_trample(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.keywords = chars.keywords.with(Keyword::DoubleStrike).with(Keyword::Trample);
 }
@@ -34,7 +29,7 @@ pub static CARD: CardDef = CardDef {
         equip(mana("{3}"), "Equip {3}"),
     ],
     statics: &[
-        static_ability(Layer::PtModify, attached_object, plus_one_plus_one, "Equipped creature gets +1/+1."),
+        static_ability(Layer::PtModify, attached_object, cantrip_mechanics::statics::plus_pt::<1, 1>, "Equipped creature gets +1/+1."),
         static_ability(Layer::Ability, attached_object, double_strike_and_trample, "Equipped creature has double strike and trample."),
     ],
     ..oracle::EMBERCLEAVE

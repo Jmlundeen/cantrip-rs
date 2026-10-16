@@ -28,6 +28,21 @@ pub fn this_turn(g: &mut dyn Game, item: &StackItem, source: ObjectId) {
     g.delayed_trigger(DelayedWhen::ThisTurn, source, item.controller, AbilityRef::delayed(this, 0), Target::None);
 }
 
+/// `at_next_end_step_about` for "at the beginning of your next end step" (CR 603.7): the first end step of the ability's
+/// controller's turn that has not begun yet, which is this turn's when the ability resolves before it. Dragonhawk, Fate's
+/// Tempest uses it for the cards it exiled.
+pub fn at_your_next_end_step_about(g: &mut dyn Game, item: &StackItem, ability: u8, created: &[ObjectId]) {
+    let o = *g.obj(item.object);
+    let card = o.copy.map(|c| c.card).unwrap_or(o.card);
+    g.delayed_trigger_about(
+        DelayedWhen::Step { step: Step::End, on_turn_of: Some(item.controller) },
+        item.object,
+        item.controller,
+        AbilityRef::delayed(card, ability),
+        created,
+    );
+}
+
 /// Sets up the card's delayed ability number `ability` to trigger at the beginning of the next end step (CR 603.7), carrying
 /// the objects `created` (CR 603.7c) to the moment it triggers, where `event_objects` of its stack item gives them back.
 /// The ability is the card as the source has it now, or the card it copies. Mobilize's Warriors and Dalkovan Encampment's

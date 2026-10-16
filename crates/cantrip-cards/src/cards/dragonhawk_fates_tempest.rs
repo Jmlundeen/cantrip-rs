@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::library;
+use cantrip_mechanics::{delayed, library};
 use cantrip_mechanics::triggers::THIS_ENTERS_OR_ATTACKS;
 use cantrip_oracle as oracle;
 
@@ -14,22 +14,14 @@ fn exile_and_play(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let x = g.permanents_of(you).into_iter().filter(|&id| g.chars(id).is(CardType::Creature) && g.chars(id).power.is_some_and(|p| p >= 4)).count();
     let grant = PlayGrant { lands: true, expiry: Expiry::UntilYourNextEndStep, ..PlayGrant::CAST };
     let exiled = library::exile_top_may_play(g, you, x, you, grant);
-    let o = *g.obj(item.object);
-    let card = o.copy.map(|c| c.card).unwrap_or(o.card);
-    g.delayed_trigger_about(
-        DelayedWhen::Step { step: Step::End, on_turn_of: Some(you) },
-        item.object,
-        you,
-        AbilityRef::delayed(card, 0),
-        &exiled,
-    );
+    delayed::at_your_next_end_step_about(g, item, 0, &exiled);
     Ok(())
 }
 
 /// Dragonhawk deals 2 damage to each opponent for each of the cards that is still the card it was and still in exile
 /// (CR 400.7): one source, one amount for each opponent, dealt together (CR 120.3).
 fn burn(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let still_exiled = g.event_objects(item).iter().filter(|&&id| is_live(g, id) && g.obj(id).zone.is(ZoneKind::Exile)).count();
+    let still_exiled = library::still_exiled(g, g.event_objects(item)).len();
     if still_exiled == 0 {
         return Ok(());
     }

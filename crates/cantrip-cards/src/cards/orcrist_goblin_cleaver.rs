@@ -4,11 +4,6 @@ use cantrip_mechanics::statics::have_trample;
 use cantrip_mechanics::tokens;
 use cantrip_oracle as oracle;
 
-fn plus_two_plus_two(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.power = chars.power.map(|v| v + 2);
-    chars.toughness = chars.toughness.map(|v| v + 2);
-}
-
 /// "Whenever equipped creature deals combat damage to a player": the creature this is attached to dealing combat
 /// damage to a player (CR 510.2); each such event is one player and one trigger (CR 603.2c).
 fn equipped_deals_combat_damage_to_a_player(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
@@ -51,7 +46,7 @@ pub static CARD: CardDef = CardDef {
         equip(mana("{3}"), "Equip {3}"),
     ],
     statics: &[
-        static_ability(Layer::PtModify, attached_object, plus_two_plus_two, "Equipped creature gets +2/+2."),
+        static_ability(Layer::PtModify, attached_object, cantrip_mechanics::statics::plus_pt::<2, 2>, "Equipped creature gets +2/+2."),
         static_ability(Layer::Ability, attached_object, have_trample, "Equipped creature has trample."),
     ],
     ..oracle::ORCRIST_GOBLIN_CLEAVER

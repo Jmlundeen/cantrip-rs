@@ -31,7 +31,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
             return Ok(());
         }
     }
-    if is_live(g, card) && g.obj(card).zone.is(ZoneKind::Exile) {
+    if cantrip_mechanics::library::is_still_exiled(g, card) {
         g.return_to_hand(&[card]);
     }
     Ok(())

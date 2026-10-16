@@ -1,0 +1,50 @@
+# Doc Ock's Tentacles already equips Kokusho (turn 1, mana value 5, +4/+4). On turn 3 a Quantum Riddler (mana value 5) enters
+# and Bot1 accepts the new trigger: the Equipment moves to the Riddler (CR 701.3c), so Kokusho is back to 5/5 and the Riddler
+# is 8/10, and the Tentacles are attached to the Riddler alone.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Black Lotus
+Black Lotus
+Doc Ock's Tentacles
+Kokusho, the Evening Star
+Quantum Riddler
+Plains x6
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Doc Ock's Tentacles.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Kokusho, the Evening Star.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Accept
+? Bot1.Battlefield.Kokusho, the Evening Star.Power = 9
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Quantum Riddler.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Accept
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Kokusho, the Evening Star.Power = 5
+Bot1.Battlefield.Quantum Riddler.Power = 8
+Bot1.Battlefield.Quantum Riddler.Toughness = 10
+Bot1.Battlefield.Doc Ock's Tentacles.AttachedTo = Quantum Riddler

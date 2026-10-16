@@ -14,16 +14,11 @@ fn hexproof(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.keywords = chars.keywords.with(Keyword::Hexproof);
 }
 
-fn plus_one_plus_one(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.power = chars.power.map(|v| v + 1);
-    chars.toughness = chars.toughness.map(|v| v + 1);
-}
-
 pub static CARD: CardDef = CardDef {
     enchant: Some(targets::CREATURE_YOU_CONTROL),
     statics: &[
         static_ability(Layer::Ability, enchanted_and_entered_this_turn, hexproof, "As long as this Aura entered this turn, enchanted creature has hexproof."),
-        static_ability(Layer::PtModify, attached_object, plus_one_plus_one, "Enchanted creature gets +1/+1."),
+        static_ability(Layer::PtModify, attached_object, cantrip_mechanics::statics::plus_pt::<1, 1>, "Enchanted creature gets +1/+1."),
     ],
     ..oracle::SHARDMAGES_RESCUE
 };

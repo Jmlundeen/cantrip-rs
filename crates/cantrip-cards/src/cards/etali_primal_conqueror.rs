@@ -7,7 +7,7 @@ use cantrip_oracle as oracle;
 fn dig(g: &mut dyn Game, player: PlayerId, found: &mut Vec<ObjectId>) {
     while let Some(&top) = g.state().zone(Zone::library(player)).first() {
         let exiled = g.exile(top);
-        if is_live(g, exiled) && g.obj(exiled).zone.is(ZoneKind::Exile) && !g.chars(exiled).is(CardType::Land) {
+        if cantrip_mechanics::library::is_still_exiled(g, exiled) && !g.chars(exiled).is(CardType::Land) {
             found.push(exiled);
             return;
         }

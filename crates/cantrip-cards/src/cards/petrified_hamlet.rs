@@ -45,21 +45,13 @@ fn named_land(view: &dyn LayerQuery, source: ObjectId, _: ObjectId, chars: &Char
         && view.state().obj(source).marks.chosen_card.is_some_and(|name| chars.name == view.cards().get(name).name)
 }
 
-fn grant_mana_ability(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
-    let o = view.state().obj(source);
-    let card = o.copy.map(|c| c.card).unwrap_or(o.card);
-    if let Some(slot) = chars.abilities.iter().position(|a| a.is_none()) {
-        chars.abilities[slot] = Some(AbilityRef::delayed(card, 0));
-    }
-}
-
 pub static CARD: CardDef = CardDef {
     abilities: &[
         mana_ability(TAP, add(Mana::C), "{T}: Add {C}."),
         triggered(THIS_ENTERS, choose_land_name, "When this land enters, choose a land card name."),
     ],
     delayed: &[mana_ability(TAP, add(Mana::C), "{T}: Add {C}.")],
-    statics: &[static_ability(Layer::Ability, named_land, grant_mana_ability, "Lands with the chosen name have \"{T}: Add {C}.\"")],
+    statics: &[static_ability(Layer::Ability, named_land, cantrip_mechanics::statics::grant_delayed_ability, "Lands with the chosen name have \"{T}: Add {C}.\"")],
     activation_rules: &[may_activate],
     ..oracle::PETRIFIED_HAMLET
 };

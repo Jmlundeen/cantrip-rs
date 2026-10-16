@@ -1,15 +1,10 @@
 use cantrip_api::*;
 use cantrip_mechanics::{flurry, tokens};
-use cantrip_mechanics::attach::{attached_object, equip};
+use cantrip_mechanics::attach::{self, attached_object, equip};
 use cantrip_mechanics::tokens::MONK;
 use cantrip_oracle as oracle;
 
 const ASK: Question = Question::new("Attach", "attach it to the Monk token?", "", "Attach it", "Don't attach");
-
-fn plus_one_plus_one(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.power = chars.power.map(|v| v + 1);
-    chars.toughness = chars.toughness.map(|v| v + 1);
-}
 
 fn trample_and_haste(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.keywords = chars.keywords.with(Keyword::Trample).with(Keyword::Haste);
@@ -19,15 +14,8 @@ fn trample_and_haste(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
 /// (CR 701.3b), and then it may be attached to it.
 fn make_monk(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let made = tokens::create(g, item.controller, &MONK, 1)?;
-    let equipment = item.object;
     let Some(&token) = made.first() else { return Ok(()) };
-    if !is_live(g, equipment) || !g.is_on_battlefield(token) {
-        return Ok(());
-    }
-    if cantrip_mechanics::effects::ask_may(g, item.controller, equipment, Purpose::Ask(&ASK))? {
-        g.attach(equipment, token);
-    }
-    Ok(())
+    attach::may_attach_to(g, item.controller, item.object, token, Purpose::Ask(&ASK))
 }
 
 pub static CARD: CardDef = CardDef {
@@ -39,7 +27,7 @@ pub static CARD: CardDef = CardDef {
         ),
     ],
     statics: &[
-        static_ability(Layer::PtModify, attached_object, plus_one_plus_one, "Equipped creature gets +1/+1."),
+        static_ability(Layer::PtModify, attached_object, cantrip_mechanics::statics::plus_pt::<1, 1>, "Equipped creature gets +1/+1."),
         static_ability(Layer::Ability, attached_object, trample_and_haste, "Equipped creature has trample and haste."),
     ],
     ..oracle::CORI_STEEL_CUTTER

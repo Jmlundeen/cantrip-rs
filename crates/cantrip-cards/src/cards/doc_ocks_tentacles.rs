@@ -1,6 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::attach::{attached_object, equip};
-use cantrip_mechanics::effects::ask_may;
+use cantrip_mechanics::attach::{self, attached_object, equip};
 use cantrip_oracle as oracle;
 
 /// "Whenever a creature you control with mana value 5 or greater enters" (CR 603.6a): the creature under your control as it
@@ -20,28 +19,11 @@ fn big_creature_you_control_enters(q: &dyn Query, me: &Asker, event: &Event) -> 
     }
 }
 
-/// "You may attach this Equipment to it" (CR 701.3a): chosen as the ability resolves. Nothing is offered when the Equipment
-/// has left the battlefield (a new object, CR 400.7) or the creature has, or is no longer a creature (CR 301.5c, 701.3b).
+/// "You may attach this Equipment to it" (CR 701.3a): the entering creature is the trigger's subject. An Equipment already
+/// attached elsewhere moves to it (CR 701.3c).
 fn may_attach_to_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let equipment = item.object;
     let Target::Object(creature) = item.subject else { return Ok(()) };
-    if !is_live(g, equipment)
-        || !g.is_on_battlefield(equipment)
-        || !is_live(g, creature)
-        || !g.is_on_battlefield(creature)
-        || !g.chars(creature).is(CardType::Creature)
-    {
-        return Ok(());
-    }
-    if ask_may(g, item.controller, equipment, Purpose::Attach)? {
-        g.attach(equipment, creature);
-    }
-    Ok(())
-}
-
-fn plus_four_plus_four(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.power = chars.power.map(|v| v + 4);
-    chars.toughness = chars.toughness.map(|v| v + 4);
+    attach::may_attach_to(g, item.controller, item.object, creature, Purpose::Attach)
 }
 
 pub static CARD: CardDef = CardDef {
@@ -53,6 +35,6 @@ pub static CARD: CardDef = CardDef {
         ),
         equip(mana("{5}"), "Equip {5}"),
     ],
-    statics: &[static_ability(Layer::PtModify, attached_object, plus_four_plus_four, "Equipped creature gets +4/+4.")],
+    statics: &[static_ability(Layer::PtModify, attached_object, cantrip_mechanics::statics::plus_pt::<4, 4>, "Equipped creature gets +4/+4.")],
     ..oracle::DOC_OCKS_TENTACLES
 };

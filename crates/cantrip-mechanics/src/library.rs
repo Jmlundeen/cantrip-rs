@@ -271,6 +271,19 @@ pub fn reveal_top_to_hand(g: &mut dyn Game, player: PlayerId) -> Option<(ObjectI
     Some((moved.first().copied().unwrap_or(top), value))
 }
 
+/// Whether `card` is still the card it was and in exile (CR 400.7): "if it's still exiled", after it may have been cast or
+/// played from there, or moved by a replacement effect. Beseech the Mirror, Etali, Primal Conqueror, Tersa Lightshatter and
+/// Dragonhawk, Fate's Tempest ask it.
+pub fn is_still_exiled(q: &dyn Query, card: ObjectId) -> bool {
+    is_live(q, card) && q.obj(card).zone.is(ZoneKind::Exile)
+}
+
+/// The `cards` that are still exiled (`is_still_exiled`), in order. Crabomination, Dragonhawk, Fate's Tempest and cascade's
+/// "put the rest on the bottom" ask it.
+pub fn still_exiled(q: &dyn Query, cards: &[ObjectId]) -> Vec<ObjectId> {
+    cards.iter().copied().filter(|&c| is_still_exiled(q, c)).collect()
+}
+
 /// "Exile the top `count` cards of `from`'s library. `who` may play them" under `grant` (CR 406, 305.1, 601.3): the cards
 /// leave together, face up, and each that really reached exile (a replacement may send it elsewhere) can be played
 /// under the grant, a land among them under the ordinary land-play rules. The cards still in exile. Laelia, the Blade

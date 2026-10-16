@@ -24,19 +24,9 @@ fn reveal_top(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// Gives the creature Nadu's own delayed ability 0 (CR 613.1f). The creature is the ability's source, so the limit of
-/// two triggerings each turn (CR 603.2h) is counted for each creature on its own.
-fn grant(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
-    let o = view.state().obj(source);
-    let card = o.copy.map(|c| c.card).unwrap_or(o.card);
-    if let Some(slot) = chars.abilities.iter().position(|a| a.is_none()) {
-        chars.abilities[slot] = Some(AbilityRef::delayed(card, 0));
-    }
-}
-
 pub static CARD: CardDef = CardDef {
     delayed: &[triggered(when(EventMask::BECAME_TARGET, targeted), reveal_top, "Whenever this creature becomes the target of a spell or ability, reveal the top card of your library. If it's a land card, put it onto the battlefield. Otherwise, put it into your hand. This ability triggers only twice each turn.")
         .triggers_each_turn(2)],
-    statics: &[static_ability(Layer::Ability, your_creatures, grant, "Creatures you control have \"Whenever this creature becomes the target of a spell or ability, reveal the top card of your library. If it's a land card, put it onto the battlefield. Otherwise, put it into your hand. This ability triggers only twice each turn.\"")],
+    statics: &[static_ability(Layer::Ability, your_creatures, cantrip_mechanics::statics::grant_delayed_ability, "Creatures you control have \"Whenever this creature becomes the target of a spell or ability, reveal the top card of your library. If it's a land card, put it onto the battlefield. Otherwise, put it into your hand. This ability triggers only twice each turn.\"")],
     ..oracle::NADU_WINGED_WISDOM
 };

@@ -16,9 +16,7 @@ fn bolt_and_gain(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         escape::sacrifice_unless_escaped("When Phlage enters, sacrifice it unless it escaped."),
-        triggered(triggers::THIS_ENTERS, bolt_and_gain, "When Phlage enters, it deals 3 damage to any target and you gain 3 life.")
-            .targets(&[targets::ANY]),
-        triggered(triggers::THIS_ATTACKS, bolt_and_gain, "Whenever Phlage attacks, it deals 3 damage to any target and you gain 3 life.")
+        triggered(triggers::THIS_ENTERS_OR_ATTACKS, bolt_and_gain, "Whenever Phlage enters or attacks, it deals 3 damage to any target and you gain 3 life.")
             .targets(&[targets::ANY]),
     ],
     ways: &[escape::way(mana("{W}{W}{R}{R}"), 5, "Escape—{R}{R}{W}{W}, Exile five other cards from your graveyard")],

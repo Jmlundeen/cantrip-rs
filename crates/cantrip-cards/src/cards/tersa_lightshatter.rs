@@ -28,7 +28,7 @@ fn exile_and_play(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let cards: Vec<ObjectId> = g.state().zone(Zone::graveyard(player)).to_vec();
     let Some(card) = cantrip_mechanics::library::random_of(g, &cards) else { return Ok(()) };
     let exiled = g.exile(card);
-    if is_live(g, exiled) && g.obj(exiled).zone.is(ZoneKind::Exile) {
+    if cantrip_mechanics::library::is_still_exiled(g, exiled) {
         g.allow_play(exiled, player, PlayGrant { lands: true, expiry: Expiry::EndOfTurn, ..PlayGrant::CAST });
     }
     Ok(())

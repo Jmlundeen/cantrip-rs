@@ -18,11 +18,6 @@ fn affects(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Chars) 
     source == affected && state.zone(Zone::hand(state.obj(source).controller)).len() <= 1
 }
 
-fn plus_two_plus_two(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.power = chars.power.map(|v| v + 2);
-    chars.toughness = chars.toughness.map(|v| v + 2);
-}
-
 fn menace(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.keywords = chars.keywords.with(Keyword::Menace);
 }
@@ -30,7 +25,7 @@ fn menace(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(THIS_ENTERS, discard_and_investigate, "When this creature enters, discard your hand, then investigate four times.")],
     statics: &[
-        static_ability(Layer::PtModify, affects, plus_two_plus_two, "As long as you have one or fewer cards in hand, this creature gets +2/+2."),
+        static_ability(Layer::PtModify, affects, cantrip_mechanics::statics::plus_pt::<2, 2>, "As long as you have one or fewer cards in hand, this creature gets +2/+2."),
         static_ability(Layer::Ability, affects, menace, "As long as you have one or fewer cards in hand, this creature has menace."),
     ],
     ..oracle::CARNAGE_INTERPRETER

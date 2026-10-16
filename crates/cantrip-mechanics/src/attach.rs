@@ -39,6 +39,23 @@ pub fn may_attach_that_equipment(g: &mut dyn Game, item: &StackItem) -> Result<(
     Ok(())
 }
 
+/// "You may attach this Equipment to it" (CR 701.3a) for an `equipment` and the `creature` the ability is about: the choice is
+/// made as the ability resolves, and nothing is asked when the Equipment or the creature has left the battlefield (a new
+/// object, CR 400.7) or the creature is no longer a creature, since it could not be attached (CR 301.5c, 701.3b). `purpose`
+/// words the question. Doc Ock's Tentacles and Cori-Steel Cutter print it.
+pub fn may_attach_to(g: &mut dyn Game, player: PlayerId, equipment: ObjectId, creature: ObjectId, purpose: Purpose) -> Result<(), Suspend> {
+    if is_live(g, equipment)
+        && g.is_on_battlefield(equipment)
+        && is_live(g, creature)
+        && g.is_on_battlefield(creature)
+        && g.chars(creature).is(CardType::Creature)
+        && crate::effects::ask_may(g, player, equipment, purpose)?
+    {
+        g.attach(equipment, creature);
+    }
+    Ok(())
+}
+
 /// "Whenever an Equipment you control enters" (CR 603.6a): the entering Equipment is what the trigger is about. Sigarda's Aid
 /// prints it (Hammer of Nazahn's reads "this or another", so it has a matcher of its own).
 pub fn equipment_you_control_enters(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {

@@ -24,7 +24,8 @@ fn plunder(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         return Ok(());
     }
     // Only the cards that really arrived in exile: a replacement can send a card somewhere else instead.
-    let exiled: Vec<ObjectId> = g.exile_all(&taken).into_iter().filter(|&c| is_live(g, c) && g.obj(c).zone.is(ZoneKind::Exile)).collect();
+    let exiled = g.exile_all(&taken);
+    let exiled = cantrip_mechanics::library::still_exiled(g, &exiled);
     let castable: Vec<ObjectId> = exiled.iter().copied().filter(|&c| g.could_cast_during_resolution(c)).collect();
     if let Some(&card) = choose::cards_from(g, item.controller, item.object, Purpose::CastFree, exiled, castable, 1, true)?.first() {
         g.cast_during_resolution(card, Some(ManaCost::ZERO))?;

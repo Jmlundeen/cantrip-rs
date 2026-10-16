@@ -5,11 +5,6 @@ use cantrip_oracle as oracle;
 
 const ASK: Question = Question::new("ReturnAndAttach", "return it to the battlefield attached to that creature?", "", "Return it", "Leave it");
 
-fn plus_one_plus_two(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.power = chars.power.map(|v| v + 1);
-    chars.toughness = chars.toughness.map(|v| v + 2);
-}
-
 /// "Whenever a 1/1 creature you control enters": it functions from its owner's graveyard (CR 113.6k), which is the one
 /// zone its effect moves the card out of. The creature is read as it stands on the battlefield (CR 603.6a), counters and
 /// static effects included; "that creature" is carried as the trigger's subject.
@@ -58,6 +53,6 @@ pub static CARD: CardDef = CardDef {
         triggered(when(EventMask::ZONE_CHANGE, one_one_enters), return_and_attach, "Whenever a 1/1 creature you control enters, you may return this card from your graveyard to the battlefield, then attach it to that creature.")
             .anywhere(),
     ],
-    statics: &[static_ability(Layer::PtModify, attached_object, plus_one_plus_two, "Equipped creature gets +1/+2.")],
+    statics: &[static_ability(Layer::PtModify, attached_object, cantrip_mechanics::statics::plus_pt::<1, 2>, "Equipped creature gets +1/+2.")],
     ..oracle::SWORD_OF_THE_MEEK
 };

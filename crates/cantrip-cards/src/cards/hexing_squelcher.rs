@@ -18,21 +18,13 @@ fn other_creatures_you_control(q: &dyn LayerQuery, source: ObjectId, affected: O
     affected != source && so_far.is(CardType::Creature) && q.state().obj(affected).controller == q.state().obj(source).controller
 }
 
-fn grant_ward(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
-    let o = view.state().obj(source);
-    let card = o.copy.map(|c| c.card).unwrap_or(o.card);
-    if let Some(slot) = chars.abilities.iter().position(|a| a.is_none()) {
-        chars.abilities[slot] = Some(AbilityRef::delayed(card, 0));
-    }
-}
-
 pub static CARD: CardDef = CardDef {
     abilities: &[WARD],
     delayed: &[WARD],
     statics: &[
         static_ability(Layer::Ability, your_spells, uncounterable, "Spells you control can't be countered.")
             .everywhere(),
-        static_ability(Layer::Ability, other_creatures_you_control, grant_ward, "Other creatures you control have \"Ward\u{2014}Pay 2 life.\""),
+        static_ability(Layer::Ability, other_creatures_you_control, cantrip_mechanics::statics::grant_delayed_ability, "Other creatures you control have \"Ward\u{2014}Pay 2 life.\""),
     ],
     ..oracle::HEXING_SQUELCHER
 };

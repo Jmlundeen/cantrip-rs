@@ -14,19 +14,9 @@ fn spell_you_cast(view: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _
         && s.stack.iter().any(|i| i.kind == StackKind::Spell && i.object == affected && i.controller == s.obj(source).controller)
 }
 
-/// Layer 6 (CR 613.1f): ripple's triggered ability, the Stone's delayed ability 0, on each such spell. Each Stone grants
-/// its own instance, and each triggers separately (CR 702.60b).
-fn grant_ripple(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
-    let o = view.state().obj(source);
-    let card = o.copy.map(|c| c.card).unwrap_or(o.card);
-    if let Some(slot) = chars.abilities.iter().position(|a| a.is_none()) {
-        chars.abilities[slot] = Some(AbilityRef::delayed(card, 0));
-    }
-}
-
 pub static CARD: CardDef = CardDef {
     delayed: &[ripple::trigger::<4>("Ripple 4 (When you cast this spell, you may reveal the top four cards of your library. You may cast spells with the same name as this spell from among the revealed cards without paying their mana costs. Put the rest on the bottom of your library.)")],
-    statics: &[static_ability(Layer::Ability, spell_you_cast, grant_ripple, "Spells you cast have ripple 4.")
+    statics: &[static_ability(Layer::Ability, spell_you_cast, cantrip_mechanics::statics::grant_delayed_ability, "Spells you cast have ripple 4.")
         .everywhere()],
     ..oracle::THRUMMING_STONE
 };

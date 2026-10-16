@@ -149,7 +149,7 @@ fn cascade_resolves(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     }
 
     // What was cast has left exile with its identity; the rest go to the bottom, shuffled among themselves.
-    let rest: Vec<ObjectId> = exiled.into_iter().filter(|&c| is_live(g, c) && g.obj(c).zone.is(ZoneKind::Exile)).collect();
+    let rest = crate::library::still_exiled(g, &exiled);
     g.put_into_library(&rest, LibraryPlace::BottomInRandomOrder);
     Ok(())
 }

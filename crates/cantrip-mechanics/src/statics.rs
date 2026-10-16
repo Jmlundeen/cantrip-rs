@@ -131,3 +131,24 @@ pub fn opponents_cant_gain_life(_: &dyn Query, asker: &Asker, player: PlayerId) 
 pub fn damage_cant_be_prevented(_: &dyn Query, _: &Asker, _: ObjectId, _: bool) -> bool {
     true
 }
+
+/// "Gets +P/+T" (CR 613.4c): the power and toughness change of an Equipment's, Aura's or permanent's static ability, as the
+/// `apply` of a `Layer::PtModify` static (a negative number is a minus). Cori-Steel Cutter, Embercleave, Grafted Wargear,
+/// Doc Ock's Tentacles and the other plain "+N/+M" statics print it.
+pub fn plus_pt<const P: i16, const T: i16>(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
+    chars.power = chars.power.map(|v| v + P);
+    chars.toughness = chars.toughness.map(|v| v + T);
+}
+
+/// "Has [an ability]" (CR 113.6, 613.1f) for the card's delayed ability number 0: a static ability that gives the objects it
+/// affects the ability the card lists first in `delayed` (the card as the source has it now, or the card it copies).
+/// Astrologian's Planisphere, Decaying Soil, Deconstruction Hammer, Footfall Crater, Hexing Squelcher, Kaldra Compleat,
+/// Lavaspur Boots, Nadu, Paradise Mantle, Petrified Hamlet, Quicksilver Dagger, Sheltered by Ghosts and Thrumming Stone
+/// grant theirs this way.
+pub fn grant_delayed_ability(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
+    let o = view.state().obj(source);
+    let card = o.copy.map(|c| c.card).unwrap_or(o.card);
+    if let Some(slot) = chars.abilities.iter().position(|a| a.is_none()) {
+        chars.abilities[slot] = Some(AbilityRef::delayed(card, 0));
+    }
+}

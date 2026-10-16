@@ -14,12 +14,7 @@ pub static INSECT: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
-fn plus_one_plus_one(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.power = chars.power.map(|v| v + 1);
-    chars.toughness = chars.toughness.map(|v| v + 1);
-}
-
-const STATICS: &[StaticDef] = &[static_ability(Layer::PtModify, attached_object, plus_one_plus_one, "Enchanted creature gets +1/+1.")];
+const STATICS: &[StaticDef] = &[static_ability(Layer::PtModify, attached_object, cantrip_mechanics::statics::plus_pt::<1, 1>, "Enchanted creature gets +1/+1.")];
 
 /// "You may pay {1}{G} if this permanent is attached to a creature you control. If you do, create a token that's a copy
 /// of that creature. If you didn't create a token this way, create a 1/1 green Insect creature token." Read the CR 608.2h
