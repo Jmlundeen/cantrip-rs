@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{choose, triggers::THIS_ENTERS};
+use cantrip_mechanics::{choose, haste_until_end_of_turn, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 /// "You may discard a card. If you do, draw two cards." Choosing no card declines; the draw follows a card that was
@@ -18,7 +18,7 @@ fn haste(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let creatures: Vec<ObjectId> =
         g.permanents_of(item.controller).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
     for id in creatures {
-        g.add_effect(item.object, id, EffectKind::AddKeywords(Keywords::of(&[Keyword::Haste])), Duration::EndOfTurn);
+        haste_until_end_of_turn(g, item.object, id);
     }
     Ok(())
 }

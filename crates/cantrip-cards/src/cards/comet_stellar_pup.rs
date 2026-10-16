@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::choose;
+use cantrip_mechanics::{choose, haste_until_end_of_turn};
 use cantrip_oracle as oracle;
 
 /// A 1/1 green Squirrel creature token.
@@ -30,7 +30,7 @@ fn roll(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
             let squirrel = g.card_id(&SQUIRREL);
             let made = g.create_tokens_together(&[(squirrel, you), (squirrel, you)])?;
             for token in made {
-                g.add_effect(comet, token, EffectKind::AddKeywords(Keywords::of(&[Keyword::Haste])), Duration::EndOfTurn);
+                haste_until_end_of_turn(g, comet, token);
             }
         }
         // "[-1], then return a card with mana value 2 or less from your graveyard to your hand."

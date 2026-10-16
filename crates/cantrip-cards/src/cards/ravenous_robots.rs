@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::tokens;
+use cantrip_mechanics::{haste_until_end_of_turn, tokens};
 use cantrip_oracle as oracle;
 
 /// The 1/1 colorless Robot artifact creature token. It shares its name with the other Robot token (Melded Moxite's).
@@ -29,7 +29,7 @@ fn tokens_gain_haste(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> 
         .filter(|&id| g.obj(id).token && g.chars(id).is(CardType::Creature))
         .collect();
     for id in tokens {
-        g.add_effect(item.object, id, EffectKind::AddKeywords(Keywords::of(&[Keyword::Haste])), Duration::EndOfTurn);
+        haste_until_end_of_turn(g, item.object, id);
     }
     Ok(())
 }

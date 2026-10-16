@@ -26,6 +26,7 @@ pub mod library;
 pub mod impending;
 pub mod firebending;
 pub mod flashback;
+pub mod harmonize;
 pub mod flurry;
 pub mod goyf;
 pub mod harness;
@@ -382,6 +383,11 @@ pub fn pump(g: &mut dyn Game, source: ObjectId, creature: ObjectId, power: i16, 
     if g.is_on_battlefield(creature) && g.obj(creature).became.is_none() {
         g.add_effect(source, creature, EffectKind::Pump(power, toughness), Duration::EndOfTurn);
     }
+}
+
+/// "[It] gains haste until end of turn" (CR 611.2, 702.10): a continuous effect from the resolving ability's source.
+pub fn haste_until_end_of_turn(g: &mut dyn Game, source: ObjectId, creature: ObjectId) {
+    g.add_effect(source, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::Haste])), Duration::EndOfTurn);
 }
 
 /// Scry N (CR 701.22): look at the top N cards of your library, put any number on the bottom in any order and the

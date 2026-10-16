@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{pump, targets};
+use cantrip_mechanics::{haste_until_end_of_turn, pump, targets};
 use cantrip_oracle as oracle;
 
 /// "up to one target creature you control".
@@ -20,10 +20,6 @@ fn artifact_enters(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fir
         }
         _ => None,
     }
-}
-
-fn haste_until_end_of_turn(g: &mut dyn Game, source: ObjectId, creature: ObjectId) {
-    g.add_effect(source, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::Haste])), Duration::EndOfTurn);
 }
 
 /// The target gets +1/+0 and haste until end of turn; then the artifacts are counted as it resolves, and the

@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::haste_until_end_of_turn;
 use cantrip_mechanics::replacements::BUYBACK;
 use cantrip_oracle as oracle;
 
@@ -19,7 +20,7 @@ fn dance(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if !g.is_on_battlefield(returned) {
         return Ok(());
     }
-    g.add_effect(item.object, returned, EffectKind::AddKeywords(Keywords::of(&[Keyword::Haste])), Duration::EndOfTurn);
+    haste_until_end_of_turn(g, item.object, returned);
     cantrip_mechanics::delayed::at_next_end_step(g, item, 0, Target::Object(returned));
     Ok(())
 }
