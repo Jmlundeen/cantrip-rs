@@ -1,0 +1,44 @@
+# Recruit (CR 701.70a): "If you discarded a nonland card this way, create a 1/1 white Human Soldier". Bot2's first noncreature
+# spell on turn 2 (Lightning Bolt) triggers the Queen; Bot1's hand is Ornithopter, Mountain, Mountain, Island and the drawn Island, and it
+# discards a Mountain, a land, so there is no Soldier. The draw and the discard still happen. Scenario
+# the-queen-of-dale-recruits-only-for-an-opponents-first-noncreature-spell-each-turn discards the nonland card (the positive control).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+The Queen of Dale
+Ornithopter
+Mountain
+Mountain
+Island x20
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x5
+Mountain x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.The Queen of Dale.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot1.Choose(Mountain)
+Bot2.Pass
+Bot1.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 17
+Bot1.Library.Count = 18
+Bot1.Hand = Ornithopter; Mountain; Island; Island
+Bot1.Graveyard = Mountain
+Bot1.Battlefield = Plains; Mox Pearl; The Queen of Dale
