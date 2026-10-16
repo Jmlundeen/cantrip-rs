@@ -1,0 +1,48 @@
+# "Whenever a creature you control deals combat damage to a player, draw a card." Turn 1 Bot1 casts Enduring Curiosity and Mother of Runes
+# (Island and four Moxen pay for both). Turn 3 both attack an empty board: each deals damage, so Bot1 draws twice (any creature you control,
+# not only Curiosity). Turn 5 only Ornithopter (power 0) attacks: it deals no damage, so there is no event and no draw.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Mox Ruby
+Enduring Curiosity
+Mother of Runes
+Ornithopter
+Island x12
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Enduring Curiosity.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Mother of Runes.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+? Bot1.Hand.Count = 0
+Bot1.Attack(Enduring Curiosity; Mother of Runes > Bot2)
+[T3 Bot1.Main2]
+? Bot1.Hand.Count = 2
+[T5 Bot1.Main1]
+? Bot1.Hand.Count = 3
+Bot1.Attack(Ornithopter > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 3
+Bot2.Life = 15

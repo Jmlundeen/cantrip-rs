@@ -1,0 +1,52 @@
+# A nontoken permanent that is a copy of Enduring Curiosity has its dies ability (ruling 2024-11-08): Bot1's Phantasmal Image copies the
+# Curiosity on turn 3. On turn 4 Bot2's Lightning Bolt targets the Image, whose own ability sacrifices it (it is a creature, so it "dies as a
+# creature"); the copy's ability returns the card, Phantasmal Image, to the battlefield under its owner's control as an enchantment with no
+# other card type. Bot1 declines to have it copy anything. Not a creature, it is not zero-toughness and stays. The Bolt then fizzles.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Mox Ruby
+Enduring Curiosity
+Phantasmal Image
+Island x13
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x13
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Enduring Curiosity.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Phantasmal Image.Cast
+Bot1.Accept
+[T4 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Enduring Curiosity#2)
+Bot2.Pass
+Bot1.Decline
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Phantasmal Image.Types = Enchantment
+Bot1.Battlefield.Enduring Curiosity.Types = Enchantment; Creature
+Bot1.Graveyard.Count = 0
+Bot2.Graveyard = Lightning Bolt; Island
+Stack.Count = 0

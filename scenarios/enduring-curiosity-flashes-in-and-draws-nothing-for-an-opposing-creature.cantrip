@@ -1,0 +1,48 @@
+# Flash: Bot1 casts Enduring Curiosity on turn 2 in response to Bot2's Llanowar Elves, with the Elves still on the stack. It draws only for
+# "a creature you control": on turn 4 Bot2's Elves hit Bot1 and Bot1 draws nothing (its hand stays at 1).
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Mox Ruby
+Enduring Curiosity
+Island
+Island x13
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x13
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Enduring Curiosity.Cast
+Bot1.Pass
+[T2 Bot2.Main2]
+? Bot1.Battlefield.Enduring Curiosity.Types = Enchantment; Creature
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Attack(Llanowar Elves)
+[T4 Bot2.Main2]
+? Bot1.Life = 19
+? Bot1.Hand.Count = 1
+
+[Expect]
+Bot1.Hand.Count = 1
+Bot1.Life = 19
