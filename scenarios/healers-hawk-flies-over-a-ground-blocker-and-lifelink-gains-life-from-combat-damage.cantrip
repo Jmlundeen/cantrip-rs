@@ -1,0 +1,37 @@
+# Flying (CR 702.9b) and lifelink (CR 702.15b): Healer's Hawk cannot be blocked by Bot2's Elvish Mystic (refusal) but can by its Ornithopter, a flier (positive control). Blocked by the 0-power Ornithopter it deals 1 damage, so Bot1 gains 1 life; the next turn it attacks unblocked for 1, gaining 1 more life while Bot2 loses 1.
+
+[Bot1 Deck]
+Plains
+Plains
+Healer's Hawk
+Plains x12
+
+[Bot2 Deck]
+Forest
+Elvish Mystic
+Ornithopter
+Forest x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Healer's Hawk.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Healer's Hawk > Bot2)
+! Bot2.Block(Elvish Mystic > Healer's Hawk)
+Bot2.Block(Ornithopter > Healer's Hawk)
+[Bot1.Main2]
+? Bot1.Life = 21
+? Bot2.Life = 20
+[T5 Bot1.Main1]
+Bot1.Attack(Healer's Hawk > Bot2)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot2.Life = 19
