@@ -1,0 +1,59 @@
+# A turn ended in combat skips every phase and step left, an additional combat phase among them (CR 724.1d, 500.8). Fear
+# of Missing Out attacks with delirium, untaps itself and sets up an additional combat phase after this one; Bot2 then
+# casts Time Stop in the declare attackers step. The attacker is removed from combat, no damage is dealt, the additional
+# combat never happens, and turn 4 is Bot2's: Bot2 is still at 20.
+
+[Bot1 Deck]
+Ornithopter
+Black Lotus
+Lightning Bolt
+Fear of Missing Out
+Forest
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Mox Ruby
+Sol Ring
+Time Stop
+Island x10
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Hand.Fear of Missing Out.Cast
+Bot1.Choose(Forest)
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Sol Ring.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Fear of Missing Out)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Fear of Missing Out.Tapped = false
+? Stack.Count = 0
+Bot1.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Hand.Time Stop.Cast
+[T4 Bot2.Upkeep]
+? Combat.Attackers.Count = 0
+
+[Expect]
+Turn = 4
+Bot2.Life = 20
+Exile = Time Stop

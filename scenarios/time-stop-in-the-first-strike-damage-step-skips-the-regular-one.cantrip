@@ -1,0 +1,59 @@
+# Time Stop in the first-strike combat damage step (CR 510.4) ends the turn before the regular one (CR 724.1d): Death-
+# Greeter's Champion, a 3/2 double striker with its backup counter, deals its first-strike 3 and never its second, so Bot2
+# is on 17. The next combat is a combat like any other: on turn 5 the Champion deals 3 and 3 again (Bot2 on 11).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Death-Greeter's Champion
+Mountain x10
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Mox Ruby
+Sol Ring
+Time Stop
+Island x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Death-Greeter's Champion.Cast
+Bot1.Pass
+Bot2.Pass
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Sol Ring.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Death-Greeter's Champion > Bot2)
+[T3 Bot1.Damage]
+? Bot2.Life = 17
+Bot1.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Hand.Time Stop.Cast
+[T4 Bot2.Upkeep]
+? Bot2.Life = 17
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Death-Greeter's Champion > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot2.Life = 11
+Exile = Time Stop
