@@ -1407,7 +1407,7 @@ impl<'s> Run<'s> {
                     }
                     chosen.push(index as u8);
                 }
-                let allowed = chosen.len() >= *count as usize && chosen.len() <= *at_most as usize && chosen.iter().all(|m| eligible.contains(m));
+                let allowed = chosen.len() >= *count as usize && chosen.len() <= (*at_most).max(*count) as usize && chosen.iter().all(|m| eligible.contains(m));
                 if allowed {
                     return fail(format!("line {line} says {text} must not be a choice the question allows, but it is"));
                 }
