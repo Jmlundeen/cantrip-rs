@@ -290,9 +290,7 @@ pub static GOLD: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
-/// A red and green Heartwood artifact token with "{T}: Add {R} or {G}." Defined by the token's reminder text on Aerid Konstrari and the 2026-08-21 ruling
-/// on it ("Heartwood tokens are a kind of predefined token"); the bundled Comprehensive Rules (CR 111.10) do not list it. Aerid
-/// Konstrari makes it.
+/// A red and green Heartwood artifact token with "{T}: Add {R} or {G}." (CR 111.10x). Aerid Konstrari makes it.
 pub static HEARTWOOD: CardDef = CardDef {
     name: "Heartwood Token",
     has_cost: false,
