@@ -11,6 +11,13 @@ pub fn your_creatures(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, 
     so_far.is(CardType::Creature) && s.obj(affected).controller == s.obj(source).controller
 }
 
+/// "Creature tokens you control" (CR 111.1, 613.1f): a creature under the source's controller's control, as the earlier
+/// layers made it, that is a token. Teysa Karlov, Caretaker's Talent (at level 3) and Gideon's Memorial use it as
+/// `StaticDef::affects`.
+pub fn your_creature_tokens(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool {
+    q.state().obj(affected).token && your_creatures(q, source, affected, so_far)
+}
+
 /// A static ability that affects only the object that has it (CR 604.1: "this creature", "this land", "this token") as its
 /// `StaticDef::affects`. Anje's Ravager, Emrakul, the Aeons Torn, Multiversal Passage, Roaming Throne, Territorial Kavu and
 /// the Construct token use it.

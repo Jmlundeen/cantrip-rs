@@ -5,11 +5,7 @@ use cantrip_oracle as oracle;
 /// "Creature tokens you control", at level 3 (CR 716.2a): a creature as the earlier layers made it, a token, under the
 /// Class's controller's control.
 fn your_creature_tokens(view: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool {
-    let s = view.state();
-    s.obj(source).class_level >= 3
-        && so_far.is(CardType::Creature)
-        && s.obj(affected).token
-        && s.obj(affected).controller == s.obj(source).controller
+    view.state().obj(source).class_level >= 3 && cantrip_mechanics::statics::your_creature_tokens(view, source, affected, so_far)
 }
 
 fn plus_two_plus_two(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
