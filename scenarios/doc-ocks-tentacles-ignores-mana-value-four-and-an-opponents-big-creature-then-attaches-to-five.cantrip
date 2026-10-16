@@ -1,0 +1,65 @@
+# Doc Ock's Tentacles' trigger needs "a creature you control with mana value 5 or greater". Refusals, each with the positive
+# control at the end (Kokusho, mana value 5, accepted): Bot1's Cogwork Librarian (mana value 4, the boundary just under) and
+# Bot2's own Kokusho (mana value 5, but not a creature Bot1 controls) ask Bot1 nothing (`! Bot1.Accept`).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Black Lotus
+Black Lotus
+Doc Ock's Tentacles
+Cogwork Librarian
+Kokusho, the Evening Star
+Swamp
+Swamp x4
+
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Black Lotus
+Kokusho, the Evening Star
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Doc Ock's Tentacles.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cogwork Librarian.Cast
+Bot1.Pass
+Bot1.Pass
+! Bot1.Accept
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Kokusho, the Evening Star.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+! Bot1.Accept
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Kokusho, the Evening Star.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Accept
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Kokusho, the Evening Star.Power = 9
+Bot1.Battlefield.Doc Ock's Tentacles.AttachedTo = Kokusho, the Evening Star
+Bot1.Battlefield.Cogwork Librarian.Power = 3
+Bot2.Battlefield.Kokusho, the Evening Star.Power = 5

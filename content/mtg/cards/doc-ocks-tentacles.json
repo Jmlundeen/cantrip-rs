@@ -1,0 +1,6 @@
+{
+  "name": "Doc Ock's Tentacles",
+  "manaCost": "{1}",
+  "type": "Artifact — Equipment",
+  "oracleText": "Whenever a creature you control with mana value 5 or greater enters, you may attach this Equipment to it.\nEquipped creature gets +4/+4.\nEquip {5}"
+}

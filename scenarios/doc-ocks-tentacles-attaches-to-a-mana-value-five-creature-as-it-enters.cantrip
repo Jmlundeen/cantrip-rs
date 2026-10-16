@@ -1,0 +1,38 @@
+# Doc Ock's Tentacles: "Whenever a creature you control with mana value 5 or greater enters, you may attach this Equipment to
+# it." Bot1 casts Tentacles with Mox Pearl, then Kokusho (mana value exactly 5: the boundary, {3}{B}{B} from a Black Lotus,
+# Mox Jet and Mox Ruby); the trigger resolves and Bot1 accepts, so Kokusho is a 9/9 (+4/+4).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Black Lotus
+Doc Ock's Tentacles
+Kokusho, the Evening Star
+Plains
+Plains x4
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Doc Ock's Tentacles.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Kokusho, the Evening Star.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Accept
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Kokusho, the Evening Star.Power = 9
+Bot1.Battlefield.Kokusho, the Evening Star.Toughness = 9
+Bot1.Battlefield.Doc Ock's Tentacles.AttachedTo = Kokusho, the Evening Star

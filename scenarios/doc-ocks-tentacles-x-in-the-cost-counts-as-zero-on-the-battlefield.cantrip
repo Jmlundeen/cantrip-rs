@@ -1,0 +1,36 @@
+# Doc Ock's Tentacles' ruling: "If a creature has {X} in its mana cost, X is 0 when determining its mana value." Bot1 casts
+# Walking Ballista for X = 3 (six mana, though it enters with three counters): its mana value on the battlefield is 0,
+# so the Tentacles do not trigger (`! Bot1.Accept`) and stay unattached.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Black Lotus
+Black Lotus
+Doc Ock's Tentacles
+Walking Ballista
+Swamp x5
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Doc Ock's Tentacles.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Walking Ballista.Cast(X: 3)
+Bot1.Pass
+Bot1.Pass
+! Bot1.Accept
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Walking Ballista.Power = 3

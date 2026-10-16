@@ -1,0 +1,51 @@
+# Doc Ock's Tentacles: a Phantasmal Image (mana value 2) entering as a copy of Bot2's Quantum Riddler (mana cost {3}{U}{U})
+# has the copied mana cost (CR 707.2), so it is "a creature you control with mana value 5 or greater" as it enters
+# (CR 603.6a, 614.1c): the Tentacles trigger, Bot1 accepts, and the Image is a 4/6 plus 4/4 = 8/10.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Sapphire
+Mox Jet
+Doc Ock's Tentacles
+Phantasmal Image
+Swamp
+Swamp x4
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Jet
+Black Lotus
+Quantum Riddler
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Doc Ock's Tentacles.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Quantum Riddler.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Phantasmal Image.Cast
+Bot1.Pass
+Bot1.Accept
+Bot1.Pass
+Bot1.Pass
+Bot1.Accept
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Quantum Riddler.Power = 8
+Bot1.Battlefield.Quantum Riddler.Toughness = 10
+Bot1.Battlefield.Doc Ock's Tentacles.AttachedTo = Quantum Riddler

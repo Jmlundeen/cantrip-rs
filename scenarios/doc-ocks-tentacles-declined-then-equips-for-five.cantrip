@@ -1,0 +1,47 @@
+# Doc Ock's Tentacles: "you may attach" - Bot1 declines when Kokusho enters, so the Equipment stays unattached and Kokusho
+# is a 5/5. Next turn Equip {5} (Black Lotus, Mox Jet, Mox Ruby) attaches it: +4/+4 (9/9).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Black Lotus
+Black Lotus
+Doc Ock's Tentacles
+Kokusho, the Evening Star
+Swamp
+Swamp x4
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Doc Ock's Tentacles.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Kokusho, the Evening Star.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Decline
+? Bot1.Battlefield.Kokusho, the Evening Star.Power = 5
+? Bot1.Battlefield.Kokusho, the Evening Star.Toughness = 5
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Doc Ock's Tentacles.Activate(Bot1.Battlefield.Kokusho, the Evening Star; Ability: Equip {5})
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Kokusho, the Evening Star.Power = 9
+Bot1.Battlefield.Kokusho, the Evening Star.Toughness = 9
+Bot1.Battlefield.Doc Ock's Tentacles.AttachedTo = Kokusho, the Evening Star

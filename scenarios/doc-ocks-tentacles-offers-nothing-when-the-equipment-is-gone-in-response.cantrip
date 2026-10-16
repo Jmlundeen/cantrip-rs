@@ -1,0 +1,52 @@
+# Doc Ock's Tentacles' trigger is on the stack when Bot2 destroys the Equipment in response with Abrupt Decay (mana value
+# 1): with the Equipment gone there is nothing to attach (CR 400.7, 701.3b) and Bot1 is asked nothing (`! Bot1.Accept`);
+# Kokusho, which did enter, is a plain 5/5.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Black Lotus
+Doc Ock's Tentacles
+Kokusho, the Evening Star
+Swamp
+Swamp x4
+
+[Bot2 Deck]
+Mox Jet
+Mox Emerald
+Abrupt Decay
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Doc Ock's Tentacles.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Kokusho, the Evening Star.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 1
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Abrupt Decay.Cast(Bot1.Battlefield.Doc Ock's Tentacles)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+! Bot1.Accept
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Doc Ock's Tentacles; Black Lotus
+Bot1.Battlefield.Kokusho, the Evening Star.Power = 5

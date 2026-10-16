@@ -1,0 +1,51 @@
+# Doc Ock's Tentacles' trigger comes from a permanent entering. Bot2's Elesh Norn, Mother of Machines ("Permanents entering
+# don't cause abilities of permanents your opponents control to trigger", CR 603.2) stops it: Bot1's Kokusho (mana value 5)
+# enters and Bot1 is asked nothing (`! Bot1.Accept`). The positive control is the same entry without Elesh Norn, in
+# doc-ocks-tentacles-attaches-to-a-mana-value-five-creature-as-it-enters.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Black Lotus
+Doc Ock's Tentacles
+Kokusho, the Evening Star
+Swamp
+Swamp x4
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Black Lotus
+Elesh Norn, Mother of Machines
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Doc Ock's Tentacles.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Elesh Norn, Mother of Machines.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Kokusho, the Evening Star.Cast
+Bot1.Pass
+Bot1.Pass
+! Bot1.Accept
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Kokusho, the Evening Star.Power = 5
+Bot2.Battlefield.Elesh Norn, Mother of Machines.Power = 4
