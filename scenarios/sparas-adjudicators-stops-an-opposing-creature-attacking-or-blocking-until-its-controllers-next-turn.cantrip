@@ -1,0 +1,72 @@
+# Browser
+# Spara's Adjudicators: "When this creature enters, target creature an opponent controls can't attack or block until your
+# next turn." Bot1 exiles it for {2} on turn 3 to give its Island "{T}: Add {G}, {W}, or {U}" (never red) and casts it from
+# exile at once, the Island adding the {G}. Its trigger targets Bot2's Llanowar Elves. That turn the Elves can't block
+# Bot1's Basking Rootwalla (CR 509.1b), though Bot2's Ornithopter could; on turn 4 they can't attack (CR 508.1c), though the
+# Ornithopter does. Bot1's next turn, turn 5, ends both, and on turn 6 the Elves attack. Since the Adjudicators was cast,
+# the Island taps only for {U} again. In the browser, the Island shows the ability it was given, and the Elves say they
+# can't attack or block until Bot1's next turn.
+
+[Bot1 Deck]
+Forest
+Basking Rootwalla
+Spara's Adjudicators
+Black Lotus
+Black Lotus
+Island
+Island
+Island x8
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Ornithopter
+Forest x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Basking Rootwalla.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Spara's Adjudicators.Activate(Bot1.Battlefield.Island)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Pass
+! Bot1.Battlefield.Island.Activate(Color: Red)
+? Client.Bot1.Battlefield.Island.Rules = {T}: Add {G}, {W}, or {U}.
+Bot1.Exile.Spara's Adjudicators.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate(Ability: {G}, {W}, or {U}; Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Target(Llanowar Elves)
+Bot1.Pass
+? Bot1.Battlefield = Forest; Basking Rootwalla; Island; Spara's Adjudicators
+? Client.Bot1.OpponentBattlefield.Llanowar Elves.Rules = {T}: Add {G}. / Can't attack until your next turn. / Can't block until your next turn.
+Bot1.Attack(Basking Rootwalla > Bot2)
+! Bot2.Block(Llanowar Elves > Basking Rootwalla)
+[T4 Bot2.Main1]
+! Bot2.Attack(Llanowar Elves > Bot1)
+Bot2.Attack(Ornithopter > Bot1)
+[T5 Bot1.Main1]
+! Bot1.Battlefield.Island.Activate(Color: Green)
+Bot1.Battlefield.Island.Activate
+? Bot1.Mana = {U}
+[T6 Bot2.Main1]
+Bot2.Attack(Llanowar Elves > Bot1)
+[T6 Bot2.Main2]
+
+[Expect]
+Turn = 6
+Stack.Count = 0
+Bot1.Life = 19
+Bot2.Life = 19
+Bot2.Battlefield = Forest; Llanowar Elves; Ornithopter
+Bot2.Battlefield.Llanowar Elves.Tapped = true

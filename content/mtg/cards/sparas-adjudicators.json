@@ -1,0 +1,8 @@
+{
+  "name": "Spara's Adjudicators",
+  "manaCost": "{2}{G}{W}{U}",
+  "type": "Creature — Cat Citizen",
+  "power": 4,
+  "toughness": 4,
+  "oracleText": "When this creature enters, target creature an opponent controls can't attack or block until your next turn.\n{2}, Exile this card from your hand: Target land gains \"{T}: Add {G}, {W}, or {U}\" until this card is cast from exile. You may cast this card for as long as it remains exiled."
+}
