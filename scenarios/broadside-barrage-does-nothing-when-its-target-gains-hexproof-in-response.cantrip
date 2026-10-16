@@ -1,0 +1,50 @@
+# Bot2 responds with Snakeskin Veil on the Elvish Mystic (+1/+1 counter and hexproof): the Barrage's only target is no
+# longer legal, so it doesn't resolve (CR 608.2b): no damage, and no card drawn or discarded (the ruling). The Mystic
+# is a 2/2 with the counter, and `! Bot1.Choose` shows no discard was asked.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Broadside Barrage
+Island
+Mountain
+Forest
+Swamp
+Swamp x12
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Elvish Mystic
+Snakeskin Veil
+Forest
+Forest
+Forest
+Forest x13
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T2 Bot2.End]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Broadside Barrage.Cast(Bot2.Battlefield.Elvish Mystic)
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Snakeskin Veil.Cast(Bot2.Battlefield.Elvish Mystic)
+! Bot1.Choose
+[T3 Bot1.Upkeep]
+
+[Expect]
+Bot2.Battlefield.Elvish Mystic.Power = 2
+Bot2.Battlefield.Elvish Mystic.Damage = 0
+Bot1.Graveyard = Broadside Barrage
+Bot1.Hand = Forest; Island; Mountain
+Bot1.Library.Count = 13

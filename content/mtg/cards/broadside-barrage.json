@@ -1,0 +1,6 @@
+{
+  "name": "Broadside Barrage",
+  "manaCost": "{1}{U}{R}",
+  "type": "Instant",
+  "oracleText": "Broadside Barrage deals 5 damage to target creature or planeswalker. Draw a card, then discard a card."
+}

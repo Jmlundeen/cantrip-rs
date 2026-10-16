@@ -1,0 +1,56 @@
+# Exactly 5 damage, no more: Bot2's Bringer of the Last Gift (6/6, cast on turn 2 with Black Lotus and the five Moxen)
+# survives it with 5 damage marked (the script ends in that end step, before cleanup removes the damage, CR 514.2), and the
+# draw and discard still happen.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Broadside Barrage
+Island
+Mountain
+Forest
+Swamp
+Swamp x12
+
+[Bot2 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Bringer of the Last Gift
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Bringer of the Last Gift.Cast
+[T2 Bot2.End]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Broadside Barrage.Cast(Bot2.Battlefield.Bringer of the Last Gift)
+Bot1.Choose(Forest)
+
+[Expect]
+Bot2.Battlefield.Bringer of the Last Gift.Damage = 5
+Bot2.Battlefield.Bringer of the Last Gift.Toughness = 6
+Bot2.Graveyard = Black Lotus
+Bot1.Graveyard = Broadside Barrage; Forest
+Bot1.Hand = Island; Mountain; Swamp

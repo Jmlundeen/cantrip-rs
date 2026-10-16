@@ -1,0 +1,52 @@
+# With no other card in hand the loot draws the Swamp and must discard it (CR 701.9): Bot1 plays three Ornithopters and
+# the Moxen on turn 1, so the Barrage is its last card.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Broadside Barrage
+Ornithopter
+Ornithopter
+Ornithopter
+Swamp
+Swamp x12
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Pearl
+Brazen Borrower
+Island
+Island
+Island
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Brazen Borrower.Cast
+[T2 Bot2.End]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Broadside Barrage.Cast(Bot2.Battlefield.Brazen Borrower)
+Bot1.Choose(Swamp)
+[T3 Bot1.Upkeep]
+
+[Expect]
+Bot2.Graveyard = Brazen Borrower
+Bot1.Graveyard = Broadside Barrage; Swamp
+Bot1.Hand.Count = 0
+Bot1.Library.Count = 12

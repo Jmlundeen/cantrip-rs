@@ -1,0 +1,51 @@
+# Damage dealt to a planeswalker removes that many loyalty counters (CR 120.3c): 5 damage to Jace, the Mind Sculptor
+# (loyalty 3) leaves none, and it is put into its owner's graveyard (CR 704.5i). The loot follows.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Broadside Barrage
+Island
+Mountain
+Forest
+Swamp
+Swamp x12
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Pearl
+Mox Ruby
+Jace, the Mind Sculptor
+Island
+Island
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Jace, the Mind Sculptor.Cast
+[T2 Bot2.End]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Broadside Barrage.Cast(Bot2.Battlefield.Jace, the Mind Sculptor)
+Bot1.Choose(Forest)
+[T3 Bot1.Upkeep]
+
+[Expect]
+Bot2.Graveyard = Jace, the Mind Sculptor
+Bot2.Battlefield = Island; Mox Sapphire; Mox Pearl; Mox Ruby
+Bot1.Graveyard = Broadside Barrage; Forest
+Bot1.Hand = Island; Mountain; Swamp

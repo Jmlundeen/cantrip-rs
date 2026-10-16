@@ -1,0 +1,51 @@
+# Broadside Barrage (cast in Bot2's end step on turn 2 with three Moxen) deals 5 damage to Bot2's Brazen Borrower (3/1), which
+# dies; then Bot1 draws a card (the Swamp on top of the library) and discards a card of its choice, the Forest. In that order:
+# the draw comes first, so the Swamp is in the hand to choose from (the discard of the Swamp itself is the other answer).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Broadside Barrage
+Island
+Mountain
+Forest
+Swamp
+Swamp x12
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Pearl
+Brazen Borrower
+Island
+Island
+Island
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Brazen Borrower.Cast
+[T2 Bot2.End]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Broadside Barrage.Cast(Bot2.Battlefield.Brazen Borrower)
+Bot1.Choose(Forest)
+[T3 Bot1.Upkeep]
+
+[Expect]
+Bot2.Battlefield = Island; Mox Sapphire; Mox Pearl
+Bot2.Graveyard = Brazen Borrower
+Bot1.Graveyard = Broadside Barrage; Forest
+Bot1.Hand = Island; Mountain; Swamp
+Bot1.Library.Count = 12
