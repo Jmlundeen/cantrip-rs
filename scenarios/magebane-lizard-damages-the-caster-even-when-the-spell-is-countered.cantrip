@@ -1,0 +1,58 @@
+# Magebane Lizard (official ruling): its ability resolves before the spell that caused it to trigger, and resolves even if that spell
+# is countered. Bot2 casts Lightning Bolt at Bot1: the Lizard's trigger for Bolt is on the stack above it. Bot1 answers with
+# Counterspell, which is also a noncreature spell, so a second trigger (about Bot1, its first noncreature spell this turn)
+# goes above that. Both resolve first: Bot1 takes 1 (20 -> 19), then Counterspell counters Bolt (Bolt's 3 never arrives), and
+# Bot2's trigger still resolves with Bolt gone: Bot2 takes 1 (20 -> 19).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Magebane Lizard
+Mox Sapphire
+Black Lotus
+Counterspell
+Mountain
+Mountain x12
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x14
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Magebane Lizard.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Counterspell.Cast(Stack.Lightning Bolt)
+? Stack.Count = 4
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 19
+? Bot2.Life = 20
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+? Bot2.Life = 20
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 19
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 19
+Bot2.Life = 19
+Bot2.Graveyard = Lightning Bolt
+Bot1.Graveyard = Counterspell; Black Lotus
+Stack.Count = 0

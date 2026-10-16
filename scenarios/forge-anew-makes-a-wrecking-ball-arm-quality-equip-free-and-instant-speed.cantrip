@@ -1,0 +1,53 @@
+# Forge Anew with a quality equip: Wrecking Ball Arm's "Equip legendary creature {3}" is an equip ability (CR 702.6a) like any
+# other, so Forge Anew gives it instant speed on its controller's turn and lets the first one each turn be paid with {0}:
+# with Mox Emerald on the stack and no mana left, Bot1 equips it to
+# Ragavan (legendary) for nothing, and Ragavan is a 7/7.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Ragavan, Nimble Pilferer
+Wrecking Ball Arm
+Forge Anew
+Mox Emerald
+Island
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Wrecking Ball Arm.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ragavan, Nimble Pilferer.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Forge Anew.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Wrecking Ball Arm.Activate(Ragavan, Nimble Pilferer; Ability: Equip legendary creature)
+Bot1.Accept
+Bot1.Pass
+Bot1.Pass
+[Bot1.Main1]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Mana =
+Bot1.Battlefield.Wrecking Ball Arm.AttachedTo = Ragavan, Nimble Pilferer
+Bot1.Battlefield.Ragavan, Nimble Pilferer.Power = 7
