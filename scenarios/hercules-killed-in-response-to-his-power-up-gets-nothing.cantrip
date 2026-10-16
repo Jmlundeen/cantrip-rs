@@ -1,0 +1,44 @@
+# Hercules, Prince of Power powers up, and Bot1 kills him with Lightning Bolt in response. The ability resolves with
+# its source gone: the card in the graveyard is a new object (CR 400.7), so no counter is put on it and no keywords
+# granted, and nothing else happens.
+
+[Bot1 Deck]
+Forest
+Mana Crypt
+Hercules, Prince of Power
+Mox Pearl
+Mox Jet
+Mox Ruby
+Lightning Bolt
+Forest x10
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mana Crypt.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Hand.Hercules, Prince of Power.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Hercules, Prince of Power.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Hercules, Prince of Power)
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Graveyard.Count = 2
+Bot1.Battlefield = Forest; Mana Crypt; Mox Pearl; Mox Jet; Mox Ruby
