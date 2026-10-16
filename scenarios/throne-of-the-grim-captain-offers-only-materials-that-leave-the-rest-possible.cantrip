@@ -1,0 +1,55 @@
+# Throne of the Grim Captain's materials are asked one at a time, and each question offers only what still leaves every
+# later one a separate object (CR 702.167a, the card's ruling). Bot1's Merfolk are Hullbreacher (a Merfolk Pirate) and
+# Thieving Skydiver; its only Pirate is the Hullbreacher. So as the Merfolk, Hullbreacher is not offered (refused) - taking
+# it would leave no Pirate - and the Skydiver is; then the Hullbreacher is the Pirate.
+
+[Bot1 Deck]
+Island
+Throne of the Grim Captain
+Mox Sapphire
+Mox Ruby
+Hullbreacher
+Black Lotus
+Thieving Skydiver
+Rampaging Ferocidon
+Voldaren Epicure
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Throne of the Grim Captain.Cast
+Bot1.Battlefield.Throne of the Grim Captain.Activate(Ability: Mill)
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Hullbreacher.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Thieving Skydiver.Cast
+Bot1.Battlefield.Throne of the Grim Captain.Activate(Ability: Craft)
+Bot1.Choose(Graveyard.Rampaging Ferocidon)
+! Bot1.Choose(Hullbreacher)
+Bot1.Choose(Thieving Skydiver)
+Bot1.Choose(Hullbreacher)
+Bot1.Choose(Graveyard.Voldaren Epicure)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island#2.Activate
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.The Grim Captain.Power = 7
+Exile = Rampaging Ferocidon; Thieving Skydiver; Hullbreacher; Voldaren Epicure

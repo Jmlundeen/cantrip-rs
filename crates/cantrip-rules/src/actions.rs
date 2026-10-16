@@ -165,20 +165,23 @@ fn can_pay_other(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost) -
 /// ruling): a matching of every part to a distinct candidate passing its filter, found by trying each in turn. True for
 /// materials of one kind.
 fn parts_can_be_matched(cx: &Cx, source: ObjectId, controller: PlayerId, m: &Materials, candidates: &[ObjectId]) -> bool {
-    fn assign(cx: &Cx, asker: &Asker, parts: &[MaterialPart], candidates: &[ObjectId], used: &mut Vec<ObjectId>) -> bool {
-        let Some((part, rest)) = parts.split_first() else { return true };
-        for &c in candidates {
-            if !used.contains(&c) && (part.filter)(cx, asker, c) {
-                used.push(c);
-                if assign(cx, asker, rest, candidates, used) {
-                    return true;
-                }
-                used.pop();
+    m.parts.is_empty() || assign_parts(cx, &Asker { source, controller }, m.parts, candidates, &mut Vec::new())
+}
+
+/// Whether `parts` can each take a distinct candidate passing its filter, none of `used` among them.
+fn assign_parts(cx: &Cx, asker: &Asker, parts: &[MaterialPart], candidates: &[ObjectId], used: &mut Vec<ObjectId>) -> bool {
+    let Some((part, rest)) = parts.split_first() else { return true };
+    for &c in candidates {
+        if !used.contains(&c) && (part.filter)(cx, asker, c) {
+            used.push(c);
+            let found = assign_parts(cx, asker, rest, candidates, used);
+            used.pop();
+            if found {
+                return true;
             }
         }
-        false
     }
-    m.parts.is_empty() || assign(cx, &Asker { source, controller }, m.parts, candidates, &mut Vec::new())
+    false
 }
 
 /// What craft may exile as its materials (CR 702.167a): the permanents the payer controls, then the cards in their
@@ -200,13 +203,23 @@ fn choose_materials(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost
     if cards.len() < m.count as usize {
         return Err(Stop::Cancel);
     }
-    // Materials named one by one: each asked in turn among what is left that passes its filter. A choice that leaves a
-    // later one with nothing is a cost that can't be paid, and the activation is taken back (CR 602.2b, 601.2h).
+    // Materials named one by one: each asked in turn among what is left that passes its filter and still leaves each later
+    // one a separate object, so no choice offered is one that can't be finished. With none (one gone since the ability was
+    // offered) the cost can't be paid, and the activation is taken back (CR 602.2b, 601.2h).
     if !m.parts.is_empty() {
         let asker = Asker { source, controller: player };
         let mut chosen: Vec<ObjectId> = Vec::new();
-        for part in m.parts {
-            let left: Vec<ObjectId> = cards.iter().copied().filter(|&c| !chosen.contains(&c) && (part.filter)(cx, &asker, c)).collect();
+        for (i, part) in m.parts.iter().enumerate() {
+            let left: Vec<ObjectId> = cards
+                .iter()
+                .copied()
+                .filter(|&c| {
+                    !chosen.contains(&c) && (part.filter)(cx, &asker, c) && {
+                        let mut used: Vec<ObjectId> = chosen.iter().copied().chain(std::iter::once(c)).collect();
+                        assign_parts(cx, &asker, &m.parts[i + 1..], &cards, &mut used)
+                    }
+                })
+                .collect();
             if left.is_empty() {
                 return Err(Stop::Cancel);
             }
