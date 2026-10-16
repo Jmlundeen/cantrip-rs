@@ -1,0 +1,41 @@
+# Aunt May's trigger puts the counter on the Spider only if it is still the same object (CR 400.7): Spectacular Spider-Man is
+# sacrificed to its own ability in response, so the life is still gained (1) and the card in the graveyard gets nothing.
+# The control is the first scenario, where the Spider stays and is given its counter.
+[Bot1 Deck]
+Plains
+Aunt May
+Mox Pearl
+Mox Jet
+Spectacular Spider-Man
+Plains
+Plains
+Plains x20
+[Bot2 Deck]
+Plains x20
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Aunt May.Cast
+Bot1.Pass
+? Bot1.Life = 20
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Spectacular Spider-Man.Cast
+Bot1.Pass
+? Stack.Count = 1
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Spectacular Spider-Man.Activate(Ability: Sacrifice)
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+[Expect]
+Bot1.Life = 21
+Bot1.Graveyard = Spectacular Spider-Man
+Bot1.Battlefield.Aunt May.Power = 0
+Stack.Count = 0

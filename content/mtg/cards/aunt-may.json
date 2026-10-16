@@ -1,0 +1,8 @@
+{
+  "name": "Aunt May",
+  "manaCost": "{W}",
+  "type": "Legendary Creature — Human Citizen",
+  "power": 0,
+  "toughness": 2,
+  "oracleText": "Whenever another creature you control enters, you gain 1 life. If it's a Spider, put a +1/+1 counter on it."
+}

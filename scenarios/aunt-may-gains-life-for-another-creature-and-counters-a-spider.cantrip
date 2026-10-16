@@ -1,0 +1,57 @@
+# Aunt May: "Whenever another creature you control enters, you gain 1 life. If it's a Spider, put a +1/+1 counter on it."
+# Aunt May entering is not "another" creature (life stays 20), Spectacular Spider-Man (a Spider) gains a life and a counter,
+# Mother of Runes (not a Spider) gains a life and no counter, and an opponent's creature entering gives nothing (CR 603.2).
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Aunt May
+Spectacular Spider-Man
+Plains
+Mother of Runes
+Plains x20
+[Bot2 Deck]
+Plains
+Mother of Runes
+Plains x20
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Aunt May.Cast
+Bot1.Pass
+? Bot1.Life = 20
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Spectacular Spider-Man.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+? Bot1.Life = 21
+? Bot1.Battlefield.Spectacular Spider-Man.Counters.PlusOnePlusOne = 1
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Mother of Runes.Cast
+Bot2.Pass
+Bot1.Pass
+[T2 Bot2.Main2]
+? Bot1.Life = 21
+? Bot2.Life = 20
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Hand.Mother of Runes.Cast
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+[Expect]
+Bot1.Life = 22
+Bot2.Life = 20
+Bot1.Battlefield.Spectacular Spider-Man.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Spectacular Spider-Man.Power = 4
+Bot1.Battlefield.Mother of Runes.Power = 1
+Bot1.Battlefield.Aunt May.Power = 0
