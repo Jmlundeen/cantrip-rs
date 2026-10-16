@@ -141,3 +141,50 @@ fn opponents_enter_tapped_apply(_: &dyn Query, _: &Asker, proposal: &mut Proposa
 pub const fn opponents_enter_tapped<const WHICH: u8>(hint: &'static str) -> ReplacementDef {
     replacement(ReplacementKind::ZoneChange, opponents_enter_tapped_applies::<WHICH>, opponents_enter_tapped_apply, hint)
 }
+
+/// "If you would gain life" (CR 119.10, 614.1a): a gain of life by the effect's controller. Zero is no gain.
+fn you_would_gain_life(_: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool {
+    matches!(proposal, Proposal::LifeChange(l) if l.player == asker.controller && l.amount > 0)
+}
+
+fn twice_that_much_life(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
+    if let Proposal::LifeChange(l) = proposal {
+        l.amount = l.amount.saturating_mul(2);
+    }
+}
+
+fn that_much_life_plus_one(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
+    if let Proposal::LifeChange(l) = proposal {
+        l.amount = l.amount.saturating_add(1);
+    }
+}
+
+/// "If you would gain life, you gain twice that much life instead." Each applies once to each gain, so two make four
+/// times as much (Boon Reflection's ruling); a life total set higher is a gain of the difference (CR 119.5), doubled.
+/// Boon Reflection, Rhox Faithmender, Alhammarret's Archive and The Wind Crystal print it.
+pub const GAIN_TWICE_THAT_MUCH_LIFE: ReplacementDef =
+    replacement(ReplacementKind::LifeChange, you_would_gain_life, twice_that_much_life, "you gain twice that much life");
+
+/// "If you would gain life, you gain that much life plus 1 instead." Once to each life gain event, however much it is
+/// (Angel of Vitality's ruling); a second such effect adds another. Angel of Vitality, Leyline of Hope, Heron of Hope
+/// and Honor Troll print it.
+pub const GAIN_THAT_MUCH_LIFE_PLUS_ONE: ReplacementDef =
+    replacement(ReplacementKind::LifeChange, you_would_gain_life, that_much_life_plus_one, "you gain that much life plus 1");
+
+/// "If an opponent would gain life": a gain by a player other than the effect's controller who is their opponent.
+fn opponent_would_gain_life(q: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool {
+    matches!(proposal, Proposal::LifeChange(l)
+        if l.amount > 0 && q.state().opponents(asker.controller).any(|p| p == l.player))
+}
+
+fn loses_that_much_life(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
+    if let Proposal::LifeChange(l) = proposal {
+        l.amount = -l.amount;
+    }
+}
+
+/// "If an opponent would gain life, that player loses that much life instead." The gain becomes a loss, which the
+/// effects on losing life then meet (CR 616.1f), and no effect on gaining life applies to it any more (Tainted Remedy's
+/// ruling). Tainted Remedy and Plague Drone print it.
+pub const OPPONENTS_LOSE_LIFE_INSTEAD_OF_GAINING: ReplacementDef =
+    replacement(ReplacementKind::LifeChange, opponent_would_gain_life, loses_that_much_life, "you lose that much life instead");
