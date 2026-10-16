@@ -54,3 +54,6 @@ docs/cube-lists/card-ratings.json
 
 # Rust binaries live in a crate's src/bin, which the C# build-output rule above would otherwise hide.
 !crates/**/src/bin/
+
+# The last commit of cantrip-rs the update notes reported (the update-notes skill).
+.claude/skills/update-notes/last-reported-commit.txt
