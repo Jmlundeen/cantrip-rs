@@ -1,0 +1,5 @@
+{
+  "name": "Floodfarm Verge",
+  "type": "Land",
+  "oracleText": "{T}: Add {W}.\n{T}: Add {U}. Activate only if you control a Plains or an Island."
+}

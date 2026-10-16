@@ -1,0 +1,21 @@
+# "You control a Plains or an Island": an Island of its own enables {U}; the opponent's Plains (turn 2) does not.
+
+[Bot1 Deck]
+Floodfarm Verge
+Island
+Swamp x15
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Floodfarm Verge.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Floodfarm Verge.Activate(Ability: {U})
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Floodfarm Verge.Activate(Ability: {U})
+
+[Expect]
+Bot1.Mana = {U}

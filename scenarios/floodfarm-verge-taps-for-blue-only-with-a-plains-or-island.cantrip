@@ -1,0 +1,27 @@
+# Floodfarm Verge: its {U} ability is offered only while you control a Plains or an Island (CR 602.5b). Alone it makes
+# {W}; a Swamp beside it does not unlock {U} (negative control); a Plains does (an Island would do as well), and the
+# Verge itself, which has no basic land types, does not count.
+
+[Bot1 Deck]
+Floodfarm Verge
+Swamp
+Plains
+Plains x17
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Floodfarm Verge.Play
+! Bot1.Battlefield.Floodfarm Verge.Activate(Ability: {U})
+Bot1.Battlefield.Floodfarm Verge.Activate(Ability: {W})
+? Bot1.Mana = {W}
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+! Bot1.Battlefield.Floodfarm Verge.Activate(Ability: {U})
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Floodfarm Verge.Activate(Ability: {U})
+
+[Expect]
+Bot1.Mana = {U}
