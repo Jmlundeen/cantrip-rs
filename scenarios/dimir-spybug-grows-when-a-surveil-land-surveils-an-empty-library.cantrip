@@ -1,0 +1,39 @@
+# Dimir Spybug: "Whenever you surveil" triggers once the surveil is done "even if some or all of those actions were
+# impossible" (CR 701.25d; the ruling: "It even triggers if you have no cards in your library"). Bot1's deck is its
+# opening hand and nothing else. On turn 1 Bot1 casts the Spybug with Mox Sapphire and Mox Jet and plays Meticulous
+# Archive: its enters trigger surveils 1 with an empty library, so nothing is looked at (`! Bot1.Arrange`), and the
+# Spybug still triggers and gets its counter.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Dimir Spybug
+Meticulous Archive
+Island
+Island
+Island
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dimir Spybug.Cast
+Bot1.Pass
+Bot1.Hand.Meticulous Archive.Play
+Bot1.Pass
+! Bot1.Arrange
+? Stack.Count = 1
+Bot1.Pass
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Library.Count = 0
+Bot1.Battlefield.Dimir Spybug.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Dimir Spybug.Power = 2

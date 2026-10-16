@@ -1,0 +1,55 @@
+# Dimir Spybug's trigger resolves after the Spybug has died: "put a +1/+1 counter on this creature" finds no creature (CR
+# 400.7, 608.2b's object gone), so nothing happens and the card in the graveyard gets nothing. Bot1 casts the Spybug on
+# turn 1 (Mox Sapphire and Mox Jet). On turn 3 Bot1 casts Consider and surveils 1, and with the Spybug's trigger on the
+# stack Bot2 casts Lightning Bolt at it. The trigger then resolves and does nothing.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Dimir Spybug
+Consider
+Island
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain
+Mountain
+Mountain
+Mountain
+Mountain
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dimir Spybug.Cast
+Bot1.Pass
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Consider.Cast
+Bot1.Pass
+Bot1.Arrange( | Island)
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Dimir Spybug)
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield = Mox Sapphire; Mox Jet; Island
+Bot1.Graveyard = Dimir Spybug; Consider; Island
+Bot2.Graveyard = Lightning Bolt

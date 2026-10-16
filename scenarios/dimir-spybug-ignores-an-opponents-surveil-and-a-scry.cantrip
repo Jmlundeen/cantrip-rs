@@ -1,0 +1,63 @@
+# Dimir Spybug: "Whenever you surveil" is its controller's surveil, and a surveil only. Bot1 casts the Spybug on turn 1
+# (Mox Sapphire and Mox Jet). On turn 2 Bot2 casts Consider and surveils 1: Bot1's Spybug does not trigger. On turn 3
+# Bot1 casts Preordain, a scry (CR 701.22), not a surveil: no counter either. Then Bot1 casts Consider and surveils 1:
+# the Spybug triggers, one counter.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Dimir Spybug
+Preordain
+Consider
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Island
+Consider
+Island
+Island
+Island
+Island
+Island
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dimir Spybug.Cast
+Bot1.Pass
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Consider.Cast
+Bot2.Pass
+Bot2.Arrange( | Island)
+? Stack.Count = 0
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Dimir Spybug.Counters.PlusOnePlusOne = (absent)
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Hand.Preordain.Cast
+Bot1.Pass
+Bot1.Arrange(Island; Island |)
+? Stack.Count = 0
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Consider.Cast
+Bot1.Pass
+Bot1.Arrange( | Island)
+? Stack.Count = 1
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield.Dimir Spybug.Counters.PlusOnePlusOne = 1
+Bot1.Graveyard = Consider; Island; Preordain
+Bot2.Graveyard = Consider; Island

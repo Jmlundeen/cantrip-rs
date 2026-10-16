@@ -1,0 +1,12 @@
+{
+  "name": "Dimir Spybug",
+  "manaCost": "{U}{B}",
+  "type": "Creature — Insect",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "Flying\nMenace (This creature can't be blocked except by two or more creatures.)\nWhenever you surveil, put a +1/+1 counter on this creature.",
+  "keywords": [
+    "Flying",
+    "Menace"
+  ]
+}
