@@ -1,0 +1,64 @@
+# Waterlogged Hulk // Watertight Gondola. The Hulk's "{T}: Mill a card" (twice), Emry, Lurker of the Loch's "mill four
+# cards" and Overlord of the Balemurk's (cast for its impending cost) put ten Islands into Bot1's graveyard; on turn five
+# "Craft with Island {3}{U}" (CR 702.167a-b) exiles one of those Island cards and the Hulk returns as Watertight Gondola, a
+# 4/4 Vehicle with vigilance. On turn seven Emry crews it (Crew 1) and it attacks beside an Ornithopter: with nine
+# permanent cards in Bot1's graveyard, "Descend 8 - This Vehicle can't be blocked" holds, so Bot2's Ornithopter may not
+# block it (refused) and blocks the other attacker instead. Vigilance leaves it untapped.
+
+[Bot1 Deck]
+Island
+Waterlogged Hulk
+Mox Sapphire
+Mox Jet
+Emry, Lurker of the Loch
+Overlord of the Balemurk
+Ornithopter
+Island x9
+Island
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Waterlogged Hulk.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Waterlogged Hulk.Activate(Ability: Mill)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Emry, Lurker of the Loch.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Waterlogged Hulk.Activate(Ability: Mill)
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Overlord of the Balemurk.Cast(Ability: Impending)
+[T5 Bot1.Main1]
+? Bot1.Graveyard.Count = 10
+Bot1.Battlefield.Waterlogged Hulk.Activate(Ability: Craft)
+Bot1.Choose(Graveyard.Island)
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+[T7 Bot1.Main1]
+Bot1.Battlefield.Watertight Gondola.Activate(Ability: Crew)
+Bot1.Choose(Emry, Lurker of the Loch)
+[T7 Bot1.DeclareAttackers]
+Bot1.Attack(Watertight Gondola > Bot2; Bot1.Battlefield.Ornithopter > Bot2)
+! Bot2.Block(Bot2.Battlefield.Ornithopter > Watertight Gondola)
+Bot2.Block(Bot2.Battlefield.Ornithopter > Bot1.Battlefield.Ornithopter)
+[T7 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot1.Battlefield.Watertight Gondola.Tapped = false
+Bot1.Battlefield.Watertight Gondola.Keywords = CantBeBlocked; Vigilance
+Bot1.Graveyard.Count = 9
+Exile = Island

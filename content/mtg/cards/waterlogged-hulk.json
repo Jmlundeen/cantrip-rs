@@ -1,0 +1,19 @@
+{
+  "name": "Waterlogged Hulk",
+  "manaCost": "{U}",
+  "type": "Artifact",
+  "oracleText": "{T}: Mill a card. (Put the top card of your library into your graveyard.)\nCraft with Island {3}{U} ({3}{U}, Exile this artifact, Exile an Island you control or an Island card from your graveyard: Return this card transformed under its owner's control. Craft only as a sorcery.)",
+  "backFace": {
+    "name": "Watertight Gondola",
+    "type": "Artifact — Vehicle",
+    "power": 4,
+    "toughness": 4,
+    "colorIndicator": [
+      "Blue"
+    ],
+    "oracleText": "Vigilance\nDescend 8 — This Vehicle can't be blocked as long as there are eight or more permanent cards in your graveyard.\nCrew 1 (Tap any number of creatures you control with total power 1 or more: This Vehicle becomes an artifact creature until end of turn.)",
+    "keywords": [
+      "Vigilance"
+    ]
+  }
+}

@@ -1,0 +1,51 @@
+# Waterlogged Hulk // Watertight Gondola. "Craft with Island {3}{U}" exiles an Island Bot1 controls (CR 702.167b: a
+# permanent of that type). With no permanent card in Bot1's graveyard, descend 8 does not hold: the Gondola, crewed by
+# Llanowar Elves, attacks and Bot2's Ornithopter blocks it, and dies to its 4 damage.
+
+[Bot1 Deck]
+Island
+Waterlogged Hulk
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Llanowar Elves
+Island
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Waterlogged Hulk.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Waterlogged Hulk.Activate(Ability: Craft)
+Bot1.Choose(Island#1)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+[T5 Bot1.Main1]
+Bot1.Battlefield.Watertight Gondola.Activate(Ability: Crew)
+Bot1.Choose(Llanowar Elves)
+[T5 Bot1.DeclareAttackers]
+? Bot1.Battlefield.Watertight Gondola.Keywords = Vigilance
+Bot1.Attack(Watertight Gondola > Bot2)
+Bot2.Block(Bot2.Battlefield.Ornithopter > Watertight Gondola)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield =
+Bot2.Graveyard = Ornithopter; Island
+Bot2.Life = 20
+Exile = Island
