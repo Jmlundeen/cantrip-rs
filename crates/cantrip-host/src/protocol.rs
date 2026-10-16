@@ -243,6 +243,8 @@ pub enum CardChoicePurposeView {
     /// Craft's materials (CR 702.167a): permanents you control and cards in your graveyard, of the quality `Kind` names,
     /// exiled with the crafting permanent to pay the cost; `Minimum` to `Count` of them.
     Craft,
+    /// A card chosen to be revealed from among cards looked at; what becomes of it is the effect's to say (Break Out).
+    Reveal,
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]

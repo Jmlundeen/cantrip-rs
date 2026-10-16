@@ -147,6 +147,7 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
             CardChoicePurposeView.Blight => "Blight it",
             CardChoicePurposeView.PutCounters => $"Put {Counters(prompt)} on it",
             CardChoicePurposeView.Craft => picked.Count == 1 ? "Exile it" : $"Exile {picked.Count}",
+            CardChoicePurposeView.Reveal => picked.Count == 0 ? "Reveal nothing" : "Reveal it",
             // "Discard nothing" only where declining is an answer; a mandatory discard still counts down to its number.
             _ => picked.Count == 0 && prompt.UpTo ? "Discard nothing"
                 : picked.Count == 1 ? "Discard it" : $"Discard {picked.Count}",
@@ -219,6 +220,7 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
         CardChoicePurposeView.TapToReduce => PromptActionView.TapToReduce,
         CardChoicePurposeView.PutCounters => PromptActionView.PutCounters,
         CardChoicePurposeView.Craft => PromptActionView.Craft,
+        CardChoicePurposeView.Reveal => PromptActionView.Reveal,
         _ => PromptActionView.Choose,
     };
 
@@ -249,6 +251,7 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
         PromptActionView.TapToReduce => "tap to reduce the cost",
         PromptActionView.PutCounters => "put the counters on",
         PromptActionView.Craft => "exile to craft",
+        PromptActionView.Reveal => "reveal",
         _ => "choose",
     };
 

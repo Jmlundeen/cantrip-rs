@@ -181,4 +181,22 @@ public sealed class CardChoiceCaptionTests
             "Strategic Betrayal: craft - choose 1 or more from among red instant and/or sorcery cards in your graveyard to exile",
             CardChoicePresentation.Describe(client, cards, []).Title);
     }
+    /// <summary>
+    /// A card revealed from among those looked at (Break Out) may then go into the hand or onto the battlefield, so the caption
+    /// says only what is true of the choice: it is revealed.
+    /// </summary>
+    [Fact]
+    public void Reveal_says_reveal_and_not_where_the_card_goes()
+    {
+        ObjectView mystic = Card(3, "Elvish Mystic", ZoneKindView.Library, Me);
+        GameClient client = Seated([Spell(), mystic]);
+
+        ChooseCardsPromptMessage reveal = Choice(CardChoicePurposeView.Reveal, 1, true, mystic);
+        reveal.Kind = "creature";
+        CardChoicePresentation shown = CardChoicePresentation.Describe(client, reveal, [3]);
+        Assert.Contains("reveal", shown.Title);
+        Assert.DoesNotContain("hand", shown.Title);
+        Assert.Equal("Reveal it", shown.Confirm);
+        Assert.Equal("Reveal nothing", CardChoicePresentation.Describe(client, reveal, []).Confirm);
+    }
 }

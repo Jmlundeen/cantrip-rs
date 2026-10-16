@@ -1165,6 +1165,7 @@ public sealed class Decisions
             CardChoicePurposeView.PutOntoBattlefield => $"{source}: put {many}{kind} card(s) onto the battlefield.",
             CardChoicePurposeView.PutIntoHand => $"{source}: put {many}{kind} card(s) into your hand.",
             CardChoicePurposeView.PutIntoGraveyard => $"{source}: put {many}{kind} card(s) into the graveyard.",
+            CardChoicePurposeView.Reveal => $"{source}: choose {many}{kind} card(s) to reveal. What happens to a revealed card is on the card's text.",
             CardChoicePurposeView.ReturnToHand => prompt.Kind.Length > 0
                 ? $"{source}: return {many}{kind}(s) you control to their owner's hand."
                 : $"{source}: return {many} permanent(s) to their owner's hand.",

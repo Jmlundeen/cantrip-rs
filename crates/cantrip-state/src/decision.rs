@@ -585,6 +585,9 @@ pub enum Purpose {
     /// The creature harmonize taps, if any (CR 702.180a-b): up to one untapped creature, whose power comes off the generic
     /// mana of the total cost.
     TapToReduce,
+    /// A card chosen to be revealed (CR 701.20a) from among cards looked at: what becomes of it is for the effect to say
+    /// (Break Out reveals a creature card, then puts it onto the battlefield or into the hand).
+    Reveal,
     /// "You may cast it without paying its mana cost" as an effect resolves (CR 118.9, 608.2g), the card staying where it is
     /// if not: suspend, rebound, hideaway, Malcolm.
     CastFree,

@@ -433,7 +433,8 @@ public sealed partial class TacticalPlay
             return new CardsChosenAnswer { Cards = [.. materials.Take(need)] };
         }
 
-        // Giving something up, or taking something: which end of the ranking is wanted.
+        // Giving something up, or taking something: which end of the ranking is wanted. A card revealed to be kept or put into play
+        // (Break Out) is taken, so the ordinary best-first ranking stands.
         bool losing = prompt.Purpose is CardChoicePurposeView.Discard or CardChoicePurposeView.Sacrifice or CardChoicePurposeView.Exile
             or CardChoicePurposeView.PutOnBottom or CardChoicePurposeView.PutIntoGraveyard or CardChoicePurposeView.PutOnTop
             or CardChoicePurposeView.ExileToPay or CardChoicePurposeView.TapToPay or CardChoicePurposeView.Destroy

@@ -302,6 +302,9 @@ public enum CardChoicePurposeView
 
     /// <summary>Craft's materials (CR 702.167a): permanents you control and cards in your graveyard, each of the quality the prompt's <c>Kind</c> names, exiled with the crafting permanent to pay its cost; <c>Minimum</c> to <c>Count</c> of them, or exactly <c>Count</c>.</summary>
     Craft = 28,
+
+    /// <summary>A card chosen to be revealed from among cards just looked at (CR 701.20a); what becomes of it is the effect's to say, so the prompt's wording is only "reveal" (Break Out).</summary>
+    Reveal = 29,
 }
 
 /// <summary>Where cards found by a library search go (CR 701.23).</summary>

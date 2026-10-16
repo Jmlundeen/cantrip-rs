@@ -402,6 +402,7 @@ fn purpose_view(purpose: Purpose, opening: bool) -> CardChoicePurposeView {
         Purpose::Behold => V::Behold,
         Purpose::Blight => V::Blight,
         Purpose::TapToReduce => V::TapToReduce,
+        Purpose::Reveal => V::Reveal,
         Purpose::PutCounters(..) => V::PutCounters,
         Purpose::SeparatePiles
         | Purpose::ChoosePile
