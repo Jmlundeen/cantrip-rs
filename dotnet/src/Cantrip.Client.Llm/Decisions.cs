@@ -261,7 +261,7 @@ public sealed class Decisions
 
         ActionKindView.ActivateAbility => option.Affordable && !MakesMana(option),
         ActionKindView.CastSpell => option.Affordable && (!option.HasX || option.MaxX >= 0),
-        ActionKindView.TurnFaceUp or ActionKindView.TakeCompanion or ActionKindView.Plot or ActionKindView.Suspend or ActionKindView.Foretell => option.Affordable,
+        ActionKindView.TurnFaceUp or ActionKindView.TakeCompanion or ActionKindView.Plot or ActionKindView.Suspend or ActionKindView.Foretell or ActionKindView.UnlockDoor => option.Affordable,
         _ => false,
     };
 
@@ -299,6 +299,8 @@ public sealed class Decisions
                 $"Suspend {name}: exile it {option.Description}; one comes off at each of your upkeeps, and when the last does you may cast it for free.",
             ActionKindView.Foretell =>
                 $"Foretell {name}: exile it face down {option.Description}, then cast it from exile for its foretell cost on a later turn.",
+            ActionKindView.UnlockDoor =>
+                $"Unlock a door of {name}, a Room: {option.Description}. That door's text then counts, and its \"when you unlock this door\" ability triggers.",
             _ => $"{option.Kind}: {name}",
         };
     }

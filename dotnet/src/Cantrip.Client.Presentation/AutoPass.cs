@@ -136,6 +136,7 @@ public static class AutoPass
             ActionKindView.Plot => option.Affordable,
             ActionKindView.Suspend => option.Affordable,
             ActionKindView.Foretell => option.Affordable,
+            ActionKindView.UnlockDoor => option.Affordable,
             _ => false,
         });
     }

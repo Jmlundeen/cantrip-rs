@@ -261,7 +261,7 @@ public sealed class ScenarioPlayer
                 return;
             }
 
-            case ActionKindView.PlayLand or ActionKindView.CastSpell or ActionKindView.ActivateAbility or ActionKindView.TurnFaceUp:
+            case ActionKindView.PlayLand or ActionKindView.CastSpell or ActionKindView.ActivateAbility or ActionKindView.TurnFaceUp or ActionKindView.UnlockDoor:
             {
                 await ClickHandleAsync(action.Source.Value);
                 TableState after = await _page.SettledAsync();
@@ -296,6 +296,11 @@ public sealed class ScenarioPlayer
         List<ControlState> rows = [.. state.Controls.Where(c => c.Kind == "item")];
         ControlState? row = action.Color is { } color
             ? rows.FirstOrDefault(r => r.Label.Contains($"{{{Symbol(color)}}}", StringComparison.Ordinal))
+            // A Room with both doors locked offers an unlock for each, the left's ability before the right's (CR 709.5e).
+            : action.Kind == ActionKindView.UnlockDoor && rows.Count == 2 ? rows[action.AbilityIndex == 0 ? 0 : 1]
+            // A split card's menu offers its halves in the order they are printed, the left's way before the right's (CR 709.3).
+            : action.Kind == ActionKindView.CastSpell && rows.Count == 2 && action.AbilityIndex is 238 or 239
+                ? rows[action.AbilityIndex == 239 ? 0 : 1]
             : rows.Count == 1 ? rows[0] : null;
         if (row is null)
         {
@@ -385,10 +390,32 @@ public sealed class ScenarioPlayer
             "OpponentHand" => string.Join("; ", state.Cards.Where(c => c.Place == string.Empty && c.Row == string.Empty && c.Name.Length > 0 && c.Handle == 0).Select(c => c.Name)),
             "Arrows" => state.Effects is { Count: > 0 } effects ? string.Join("; ", effects[^1].Arrows.Select(a => a.To)) : string.Empty,
             "Over" => state.Over ? "true" : "false",
+            // A Room's doors as its face shows them: `Battlefield.<Room name>.Doors` is "Unholy Annex:unlocked; Ritual Chamber:locked", and
+            // `.Actions` what the card offers to do, as its menu words it. A Room with no door unlocked has no name: `Battlefield..Doors`.
+            _ when RoomKey(what, state) is { } shown => shown,
             _ when what.StartsWith("Button.", StringComparison.Ordinal) =>
                 state.Controls.Any(c => c.Kind == "button" && c.Label.Contains(what["Button.".Length..], StringComparison.Ordinal)) ? "shown" : "absent",
             _ => null,
         };
+    }
+
+    private static string? RoomKey(string what, TableState state)
+    {
+        foreach ((string prefix, string place) in new[] { ("Battlefield.", "battlefield"), ("OpponentBattlefield.", "opponent-battlefield") })
+        {
+            foreach (string field in new[] { "Doors", "Actions" })
+            {
+                string suffix = "." + field;
+                if (what.StartsWith(prefix, StringComparison.Ordinal) && what.EndsWith(suffix, StringComparison.Ordinal) && what.Length >= prefix.Length + suffix.Length)
+                {
+                    string name = what[prefix.Length..^suffix.Length];
+                    CardState? card = state.Cards.FirstOrDefault(c => c.Place == place && c.Name == name);
+                    return card is null ? null : field == "Doors" ? card.Doors : card.Actions;
+                }
+            }
+        }
+
+        return null;
     }
 
     /// <summary>Lists compare as sets, as the dump's hand and battlefield do; the value names the empty list by nothing.</summary>

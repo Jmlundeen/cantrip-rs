@@ -2095,6 +2095,7 @@ public sealed partial class MainPage
         HashSet<int> plottable = [];
         HashSet<int> suspendable = [];
         HashSet<int> foretellable = [];
+        HashSet<int> unlockable = [];
         var companion = false;
 
         foreach (ActionOptionMessage option in priority.Options)
@@ -2132,6 +2133,10 @@ public sealed partial class MainPage
 
                 case ActionKindView.Foretell:
                     foretellable.Add(option.Source.Value);
+                    break;
+
+                case ActionKindView.UnlockDoor:
+                    unlockable.Add(option.Source.Value);
                     break;
 
                 default:
@@ -2179,6 +2184,11 @@ public sealed partial class MainPage
         if (foretellable.Count > 0)
         {
             parts.Add(foretellable.Count == 1 ? "Foretell a card" : $"Foretell a card ({foretellable.Count})");
+        }
+
+        if (unlockable.Count > 0)
+        {
+            parts.Add(unlockable.Count == 1 ? "Unlock a door" : $"Unlock a door ({unlockable.Count})");
         }
 
         return parts.Count == 0 ? "Nothing to play" : string.Join("  ·  ", parts);

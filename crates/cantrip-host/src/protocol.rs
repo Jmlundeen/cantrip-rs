@@ -199,6 +199,9 @@ pub enum ActionKindView {
     Plot,
     Suspend,
     Foretell,
+    /// Unlocks a locked door of the named Room by paying that door's mana cost (CR 709.5e). A special action, at sorcery
+    /// timing. `ability_index` says which door: the option's `description` names it and its cost.
+    UnlockDoor,
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]

@@ -197,6 +197,7 @@ pub fn printed(def: &CardDef) -> ObjectView {
         produces_mana: def.abilities.iter().any(|a| matches!(a, AbilityDef::Activated(d) if d.mana.is_some())),
         starting_counter: def.loyalty.map(i32::from),
         other_face: def.back.map(|back| Box::new(printed(back))),
+        halves: def.split.map_or_else(Vec::new, |(left, right)| vec![printed(left), printed(right)]),
         ..Default::default()
     }
 }
@@ -593,6 +594,8 @@ impl<'a> Projector<'a> {
             is_copy: obj.copy.is_some_and(|c| Copiable { words: Words::NONE, ..c } != Copiable::of(obj.card)) || obj.card_copy,
             starting_counter: if on_battlefield { None } else { def.loyalty.map(i32::from) },
             other_face: def.back.map(|back| Box::new(printed(back))),
+            // A split card as it is printed, its halves side by side (CR 709.1); on the stack only the half cast exists (CR 709.3b).
+            halves: if zone.is(ZoneKind::Stack) { Vec::new() } else { def.split.map_or_else(Vec::new, |(left, right)| vec![printed(left), printed(right)]) },
             ..Default::default()
         };
 

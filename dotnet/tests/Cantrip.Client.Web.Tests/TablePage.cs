@@ -301,7 +301,9 @@ public sealed record CardState(
     Spot? FlewFrom = null,
     string Place = "",
     int Handle = 0,
-    bool Tapped = false);
+    bool Tapped = false,
+    string Doors = "",
+    string Actions = "");
 
 /// <summary>A card named in a line of text - the game log, a draft's picks - where its name is, and whether it is in view.</summary>
 public sealed record MentionState(string Name, bool Visible, float X, float Y, float W, float H);

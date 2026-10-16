@@ -204,10 +204,28 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
     {
         m.kind = ActionKindView::TurnFaceUp;
     }
+    // A Room's locked door is unlocked by paying its mana cost (CR 709.5e): its own kind, saying which door and what it costs.
+    if o.kind == ActionKind::ActivateAbility
+        && let Some(s) = o.source
+        && let Some(a) = game.chars(s).abilities().nth(o.index as usize)
+        && a.card == game.cards.intrinsic
+        && matches!(a.index, intrinsic::UNLOCK_LEFT | intrinsic::UNLOCK_RIGHT)
+    {
+        let room = game.cards.get(game.chars(s).card);
+        if let Some((left, right)) = room.split {
+            let door = if a.index == intrinsic::UNLOCK_LEFT { left } else { right };
+            m.kind = ActionKindView::UnlockDoor;
+            m.cost_text = door.cost.to_string();
+            m.spell_name = door.name.to_string();
+        }
+    }
     m.targets_required = i32::from(o.targets_required);
     m.targets_optional = o.targets_optional;
     m.color_choices = colors_view(o.color_choices);
     m.description = describe(game.cards, &game.state, o).to_string();
+    if m.kind == ActionKindView::UnlockDoor {
+        m.description = format!("Unlock {} {}", m.spell_name, m.cost_text);
+    }
     if let Some(mana) = o.mana {
         m.produces = vec![mana_view(mana)];
     }

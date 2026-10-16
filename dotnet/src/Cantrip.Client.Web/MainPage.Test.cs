@@ -204,6 +204,14 @@ public sealed partial class MainPage
                         json.WriteString("place", place);
                         json.WriteNumber("handle", card.Handle.Value);
                         json.WriteBoolean("tapped", card.Tapped);
+                        // A Room's doors as the face draws them, each by name and whether it is locked (CR 709.5c), and what the
+                        // card offers its controller to do, as the menu words it (the unlock reads with its cost).
+                        json.WriteString("doors", card.UnlockedDoors.Count > 0 && card.UnlockedDoors.Count == card.Halves.Count
+                            ? string.Join("; ", card.Halves.Select((half, i) => $"{half.Name}:{(card.UnlockedDoors[i] ? "unlocked" : "locked")}"))
+                            : string.Empty);
+                        json.WriteString("actions", client is null
+                            ? string.Empty
+                            : string.Join(" | ", _actions.For(card.Handle).Select(option => CardActions.Describe(client, option))));
                         WriteBox(json, toPage.TransformBounds(box));
                         if (lower is { } down && raise is { } up)
                         {

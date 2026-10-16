@@ -301,6 +301,7 @@ public sealed partial class TacticalPlay
             ActionKindView.CastSpell => $"cast {NameOf(client, action.Source)}",
             ActionKindView.ActivateAbility => $"activate {NameOf(client, action.Source)}#{action.AbilityIndex}",
             ActionKindView.PlayLand => $"play {NameOf(client, action.Source)}",
+            ActionKindView.UnlockDoor => $"unlock a door of {NameOf(client, action.Source)}",
             _ => action.Source.IsNone ? action.Kind.ToString() : $"{action.Kind} {NameOf(client, action.Source)}",
         } + (action.Targets.Count > 0 ? $" -> {Targets(client, action.Targets)}" : string.Empty),
         AttackersDeclaredAnswer attack => attack.Attacks.Count == 0 ? "no attack"

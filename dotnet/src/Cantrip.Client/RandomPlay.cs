@@ -247,7 +247,7 @@ public sealed class RandomPlay : IAutoPlayer
 
         ActionKindView.ActivateAbility => option.Affordable && !MakesMana(option),
         ActionKindView.CastSpell => option.Affordable && (!option.HasX || option.MaxX >= 0),
-        ActionKindView.TurnFaceUp or ActionKindView.TakeCompanion or ActionKindView.Plot or ActionKindView.Suspend => option.Affordable,
+        ActionKindView.TurnFaceUp or ActionKindView.TakeCompanion or ActionKindView.Plot or ActionKindView.Suspend or ActionKindView.UnlockDoor => option.Affordable,
 
         // Nothing else belongs at priority. Taking back a mana ability is only ever offered after activating one,
         // which this seat does not do here.

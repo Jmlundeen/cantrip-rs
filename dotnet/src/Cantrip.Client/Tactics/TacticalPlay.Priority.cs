@@ -530,6 +530,12 @@ public sealed partial class TacticalPlay
 
                 candidates.AddRange(Casts(client, view, option, card, budget));
             }
+            else if (option.Kind == ActionKindView.UnlockDoor)
+            {
+                // Unlocking a Room's door (CR 709.5e) is a card's worth of text for the door's mana cost, paid at once with no
+                // stack: it is weighed as a permanent put onto the table, and it is only offered when it can be paid.
+                candidates.Add(new Candidate(option, _model.Card, CardReading.ManaValue(option.CostText), [], Kick: false, Permanent: true, Hostile: false));
+            }
             else if (option.Kind == ActionKindView.ActivateAbility
                 && option.Produces.Count == 0 && option.ProducesOfAnyOneColor == 0 && option.ProducesOfAnyColorEach == 0)
             {

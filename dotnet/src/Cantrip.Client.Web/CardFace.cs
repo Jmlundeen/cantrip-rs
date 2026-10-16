@@ -172,10 +172,34 @@ public static partial class CardFace
             canvas.Save();
             canvas.Translate(i * (layout.Width - overlap), 0f);
             DrawPrinted(canvas, card.Halves[i], layout, SKRect.Create(layout.Width, layout.Height), dimmed, body, pixelScale);
+
+            // A Room's door that is locked (CR 709.5c): its printed face is still all there to read, under a veil and a word.
+            if (card.UnlockedDoors.Count == card.Halves.Count && !card.UnlockedDoors[i])
+            {
+                DrawLocked(canvas, SKRect.Create(layout.Width, layout.Height));
+            }
+
             canvas.Restore();
         }
 
         canvas.Restore();
+    }
+
+    /// <summary>The mark of a locked door (CR 709.5): a translucent veil over the door's face, so what is printed on it still reads, and LOCKED across it.</summary>
+    private static void DrawLocked(SKCanvas canvas, SKRect door)
+    {
+        using var veil = new SKPaint { Color = new SKColor(10, 10, 20, 120), IsAntialias = true };
+        canvas.DrawRect(door, veil);
+
+        float size = MathF.Max(8f, door.Height * 0.16f);
+        using var font = new SKFont(CardAssets.Title, size);
+        string word = "LOCKED";
+        float x = door.MidX - (font.MeasureText(word) / 2f);
+        float y = door.MidY + (size * FigureHeight / 2f);
+        using var halo = new SKPaint { Color = new SKColor(0, 0, 0, 220), IsAntialias = true, Style = SKPaintStyle.Stroke, StrokeWidth = MathF.Max(1.5f, size * 0.12f) };
+        using var ink = new SKPaint { Color = new SKColor(255, 214, 120), IsAntialias = true };
+        canvas.DrawText(word, x, y, font, halo);
+        canvas.DrawText(word, x, y, font, ink);
     }
 
     /// <summary>

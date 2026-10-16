@@ -292,6 +292,13 @@ public sealed class CardActions
             return option.Description.Length > 0 ? option.Description : "Turn face up";
         }
 
+        // Unlocking a Room's door (CR 709.5e): which door and what it costs are the whole of what tells this apart from
+        // the Room's other abilities, and the server says both.
+        if (option.Kind == ActionKindView.UnlockDoor)
+        {
+            return option.Description.Length > 0 ? option.Description : "Unlock a door";
+        }
+
         // Taking your companion from outside the game (CR 116.2g): the server says which card and what it costs.
         if (option.Kind == ActionKindView.TakeCompanion)
         {

@@ -84,6 +84,7 @@ internal static class Faces
             .Append(card.ManaCost).Append('|')
             .Append(card.OracleText).Append('|')
             .AppendJoin(',', card.Halves.Select(half => half.Name)).Append('|')
+            .AppendJoin(',', card.UnlockedDoors).Append('|')
             .AppendJoin(',', card.GrantedAbilities.Select(a => a.ToString())).Append('|')
             .AppendJoin(',', card.SpentLines).Append('|')
             .AppendJoin('|', card.ChosenModes).Append('|')

@@ -211,6 +211,9 @@ public enum ActionKindView
 
     /// <summary>Exiles the named card from your hand face down for {2} (CR 702.143a). A special action, during your turn.</summary>
     Foretell = 18,
+
+    /// <summary>Unlocks a locked door of the named Room by paying that door's mana cost (CR 709.5e). A special action, at sorcery timing.</summary>
+    UnlockDoor = 19,
 }
 
 /// <summary>Why a client is choosing cards.</summary>

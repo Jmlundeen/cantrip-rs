@@ -70,6 +70,8 @@ fn kind_of(kind: ActionKindView) -> Result<ActionKind, Untranslatable> {
         ActionKindView::ExileToPay => ActionKind::ExileToPay,
         // Turning a face-down permanent face up is its one ability (CR 708.2a), offered as an activation.
         ActionKindView::TurnFaceUp => ActionKind::ActivateAbility,
+        // Unlocking a Room's door is the intrinsic ability it was offered as (CR 709.5e).
+        ActionKindView::UnlockDoor => ActionKind::ActivateAbility,
         other => return Err(Untranslatable::Illegal(format!("{other:?} is not something this engine offers"))),
     })
 }

@@ -254,6 +254,15 @@ taken out of the frame's middle and the seams cross-faded, so the border, the na
 whole card's are at that size, and the halves overlap by one outer border. Each half's art is its own, under its own
 name (`leave`, `chance`). On the stack the card is the half that was cast and is drawn as a whole card of its own.
 
+A Room (CR 709.5) on the battlefield is drawn the same way, its two doors as its halves (`ObjectView.Halves`, filled for any
+split card that is not on the stack), and the door that is locked (`ObjectView.UnlockedDoors`, left then right) is
+veiled and marked LOCKED over its still readable face (`DrawLocked`); a Room with no door unlocked has no name and shows
+both doors locked. Each locked door has its own action in the Room's menu, `ActionKindView.UnlockDoor`, worded with the
+door's name and cost ("Unlock Ritual Chamber {3}{B}{B}"), apart from the Room's other abilities; the tactical bot takes
+it as a card's worth of text for that cost, and the language-model client is told what it is. `?test` publishes each
+card's `doors` and `actions`, which a scenario reads as `Client.Bot1.Battlefield.<Room>.Doors` and `.Actions`
+(`room-doors-show-locked-and-unlocked-and-the-unlock-is-offered-with-its-cost`).
+
 A token of its own - a Food, a Clue, a Treasure, a 2/2 Goblin Shaman - is kitbashed the same way (`token` in the
 template): the frame's rows are laid down again as stretches, a stretch of the art box's twice and a stretch of the rules
 box's not at all, so the rules box is half as tall and the art box takes the room. A token that copies a card reads as
