@@ -1,0 +1,11 @@
+{
+  "name": "Giant Cindermaw",
+  "manaCost": "{2}{R}",
+  "type": "Creature — Dinosaur Beast",
+  "power": 4,
+  "toughness": 3,
+  "oracleText": "Trample (This creature can deal excess combat damage to the player or planeswalker it's attacking.)\nPlayers can't gain life.",
+  "keywords": [
+    "Trample"
+  ]
+}
