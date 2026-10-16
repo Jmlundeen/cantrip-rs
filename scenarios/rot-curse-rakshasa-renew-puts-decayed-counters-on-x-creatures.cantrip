@@ -1,0 +1,65 @@
+# Rot-Curse Rakshasa: "Renew — {X}{B}{B}, Exile this card from your graveyard: Put a decayed counter on each of X target
+# creatures. Activate only as a sorcery."
+# Turn 3: the Rakshasa attacks (Bot2 takes 5) and is sacrificed at end of combat; in the second main phase Bot1 renews it with
+# X = 2 on Bot2's Cecil, Dark Knight and Embereth Shieldbreaker. Each has decayed by its counter (CR 122.1b). On turn 4 the
+# Shieldbreaker attacks, which triggers the decayed it got from the counter: it deals Bot1 2 and is sacrificed at end of
+# combat (CR 702.147a). Cecil, which did not attack, stays, with deathtouch and decayed.
+# Turn 1: Swamp and Mox Jet pay the Rakshasa. Turn 3: the other Swamp and Mox Jet; the four pay {2}{B}{B}.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Rot-Curse Rakshasa
+Swamp
+Mox Jet
+Island x15
+
+[Bot2 Deck]
+Mox Jet
+Cecil, Dark Knight
+Mountain
+Mox Ruby
+Embereth Shieldbreaker
+Island x15
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Rot-Curse Rakshasa.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Cecil, Dark Knight.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Embereth Shieldbreaker.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Attack(Rot-Curse Rakshasa > Bot2)
+[T3 Bot1.Main2]
+? Bot1.Graveyard = Rot-Curse Rakshasa
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Graveyard.Rot-Curse Rakshasa.Activate(X: 2)
+Bot1.Target(Cecil, Dark Knight; Embereth Shieldbreaker)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Embereth Shieldbreaker.Keywords = Decayed
+? Bot2.Battlefield.Cecil, Dark Knight.Counters.Decayed = 1
+[T4 Bot2.Main1]
+Bot2.Attack(Embereth Shieldbreaker > Bot1)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 18
+Bot2.Life = 15
+Bot2.Graveyard = Embereth Shieldbreaker
+Bot2.Battlefield.Cecil, Dark Knight.Keywords = Deathtouch; Decayed
+Exile = Rot-Curse Rakshasa

@@ -1,0 +1,12 @@
+{
+  "name": "Rot-Curse Rakshasa",
+  "manaCost": "{1}{B}",
+  "type": "Creature — Demon",
+  "power": 5,
+  "toughness": 5,
+  "oracleText": "Trample\nDecayed (This creature can't block. When it attacks, sacrifice it at end of combat.)\nRenew — {X}{B}{B}, Exile this card from your graveyard: Put a decayed counter on each of X target creatures. Activate only as a sorcery.",
+  "keywords": [
+    "Trample",
+    "Decayed"
+  ]
+}

@@ -1,0 +1,45 @@
+# Rot-Curse Rakshasa has decayed, whose "this creature can't block" (CR 702.147a, 509.1b) keeps it out of Bot1's blocks:
+# when Bot2's Embereth Shieldbreaker attacks on turn 4, the Rakshasa may not block it, and Bot1's Cecil, Dark Knight (the
+# positive control) may and does. Cecil's deathtouch kills the Shieldbreaker; Cecil's Darkness ability makes Bot1 lose the
+# 2 Cecil dealt. The Rakshasa never attacked, so it is still on the battlefield.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Jet
+Rot-Curse Rakshasa
+Cecil, Dark Knight
+Island x15
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Embereth Shieldbreaker
+Island x17
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Hand.Rot-Curse Rakshasa.Cast
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Cecil, Dark Knight.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Embereth Shieldbreaker.Cast
+[T4 Bot2.Main1]
+Bot2.Attack(Embereth Shieldbreaker > Bot1)
+! Bot1.Block(Rot-Curse Rakshasa > Embereth Shieldbreaker)
+Bot1.Block(Cecil, Dark Knight > Embereth Shieldbreaker)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 18
+Bot2.Graveyard = Embereth Shieldbreaker
+Bot1.Battlefield = Swamp; Mox Jet; Mox Jet; Rot-Curse Rakshasa; Cecil, Dark Knight
+Bot1.Battlefield.Rot-Curse Rakshasa.Keywords = Decayed; Trample

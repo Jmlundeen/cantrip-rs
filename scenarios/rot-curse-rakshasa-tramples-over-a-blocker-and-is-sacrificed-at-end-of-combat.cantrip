@@ -1,0 +1,41 @@
+# Rot-Curse Rakshasa: "Trample. Decayed (This creature can't block. When it attacks, sacrifice it at end of combat.)"
+# Decayed (CR 702.147a) is "this creature can't block" and "when this creature attacks, sacrifice it at end of combat".
+# On turn 3 the 5/5 attacks and Bot2's Embereth Shieldbreaker (2/1) blocks: trample assigns 1 to the blocker and 4 to Bot2
+# (CR 702.19b). Its attack trigger set up "sacrifice it at end of combat", at the beginning of the end of combat step
+# (CR 511.2), so after the damage it goes to the graveyard; the 2 damage the Shieldbreaker dealt would not have killed it.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Rot-Curse Rakshasa
+Island x17
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Embereth Shieldbreaker
+Island x17
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Rot-Curse Rakshasa.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Embereth Shieldbreaker.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Rot-Curse Rakshasa > Bot2)
+Bot2.Block(Embereth Shieldbreaker > Rot-Curse Rakshasa)
+Bot1.AssignDamage(Rot-Curse Rakshasa > Embereth Shieldbreaker: 1; Rot-Curse Rakshasa > Bot2: 4)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot2.Graveyard = Embereth Shieldbreaker
+Bot1.Graveyard = Rot-Curse Rakshasa
+Bot1.Battlefield = Swamp; Mox Jet

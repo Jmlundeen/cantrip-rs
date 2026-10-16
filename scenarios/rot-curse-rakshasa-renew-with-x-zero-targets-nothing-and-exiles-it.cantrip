@@ -1,0 +1,43 @@
+# Rot-Curse Rakshasa's renew with X = 0 ({B}{B}): "each of X target creatures" is no creatures, so it targets nothing and puts
+# no counters, though Bot2's Cecil, Dark Knight could have been targeted; the Rakshasa is still exiled, as the cost.
+# Turn 3: the Rakshasa attacks (Bot2 takes 5) and is sacrificed at end of combat; the two Swamps pay the renew afterwards.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Rot-Curse Rakshasa
+Swamp
+Island x16
+
+[Bot2 Deck]
+Mox Jet
+Cecil, Dark Knight
+Island x18
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Rot-Curse Rakshasa.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Cecil, Dark Knight.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Attack(Rot-Curse Rakshasa > Bot2)
+[T3 Bot1.Main2]
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Graveyard.Rot-Curse Rakshasa.Activate(X: 0)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.End]
+
+[Expect]
+Bot2.Life = 15
+Bot2.Battlefield.Cecil, Dark Knight.Counters.Decayed = (absent)
+Bot2.Battlefield.Cecil, Dark Knight.Keywords = Deathtouch
+Exile = Rot-Curse Rakshasa
+Bot1.Graveyard.Count = 0

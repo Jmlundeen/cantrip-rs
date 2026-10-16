@@ -1,0 +1,63 @@
+# A decayed counter put on before "loses all abilities" gives nothing (CR 122.1b, 613.7c): Rot-Curse Rakshasa's renew (X = 1)
+# puts a decayed counter on Bot2's Embereth Shieldbreaker, then Abigale, Eloquent First-Year's trigger makes it lose all
+# abilities - decayed with them - and puts a flying, a first strike and a lifelink counter on it. On turn 4 the Shieldbreaker
+# attacks: nothing makes it sacrificed at end of combat, so it stays; Bot1 takes 2 and Bot2 gains 2 by lifelink.
+# Turn 3: the Rakshasa attacks (Bot2 takes 5) and is sacrificed at end of combat; two Swamps and a Mox Jet pay {1}{B}{B}, the
+# other Mox Jet and Mox Pearl Abigale.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Rot-Curse Rakshasa
+Swamp
+Mox Jet
+Mox Pearl
+Abigale, Eloquent First-Year
+Island x13
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Embereth Shieldbreaker
+Island x17
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Rot-Curse Rakshasa.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Embereth Shieldbreaker.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Attack(Rot-Curse Rakshasa > Bot2)
+[T3 Bot1.Main2]
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Graveyard.Rot-Curse Rakshasa.Activate(X: 1)
+Bot1.Target(Embereth Shieldbreaker)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Embereth Shieldbreaker.Keywords = Decayed
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Abigale, Eloquent First-Year.Cast
+Bot1.Target(Embereth Shieldbreaker)
+[T4 Bot2.Main1]
+Bot2.Attack(Embereth Shieldbreaker > Bot1)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 18
+Bot2.Life = 17
+Bot2.Battlefield.Embereth Shieldbreaker.Counters.Decayed = 1
+Bot2.Battlefield.Embereth Shieldbreaker.Keywords = FirstStrike; Flying; Lifelink
+Bot2.Graveyard.Count = 0
