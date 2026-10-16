@@ -422,6 +422,17 @@ public sealed partial class TacticalPlay
             return new CardsChosenAnswer { Cards = [.. beheld.Take(most)] };
         }
 
+        // Craft's materials (CR 702.167a) are exiled for good: the fewest the ability takes (its minimum for "one or more"),
+        // cards from the graveyard before permanents still at work, and among each the ones worth least.
+        if (prompt.Purpose == CardChoicePurposeView.Craft)
+        {
+            int need = prompt.UpTo ? Math.Max(prompt.Minimum, 1) : prompt.Count;
+            List<ViewHandle> materials = [.. prompt.Eligible
+                .OrderBy(card => client.Object(card)?.Zone == ZoneKindView.Battlefield ? 1 : 0)
+                .ThenBy(card => client.Object(card) is { } known ? Worth(client, known) : 0)];
+            return new CardsChosenAnswer { Cards = [.. materials.Take(need)] };
+        }
+
         // Giving something up, or taking something: which end of the ranking is wanted.
         bool losing = prompt.Purpose is CardChoicePurposeView.Discard or CardChoicePurposeView.Sacrifice or CardChoicePurposeView.Exile
             or CardChoicePurposeView.PutOnBottom or CardChoicePurposeView.PutIntoGraveyard or CardChoicePurposeView.PutOnTop

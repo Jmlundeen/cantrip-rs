@@ -1081,7 +1081,11 @@ public sealed class Decisions
             UpTo = prompt.UpTo,
         });
 
-        return new CardsChosenAnswer { Cards = [.. picks.Select(pick => prompt.Eligible[pick])] };
+        List<ViewHandle> chosen = [.. picks.Select(pick => prompt.Eligible[pick])];
+
+        // Craft's "one or more" (CR 702.167a): an answer short of the least it takes is made up with the first ones offered.
+        chosen.AddRange(prompt.Eligible.Where(card => !chosen.Contains(card)).Take(Math.Max(prompt.Minimum - chosen.Count, 0)));
+        return new CardsChosenAnswer { Cards = chosen };
     }
 
     /// <summary>A choice that has to add up to a total power, as saddle's does (CR 702.171a): one creature at a time.</summary>
@@ -1182,6 +1186,7 @@ public sealed class Decisions
             CardChoicePurposeView.TapToPay => $"{source}: tap creatures to pay its cost.",
             CardChoicePurposeView.ExileToPay => $"{source}: exile {many}{kind} card(s) from your hand to pay for it.",
             CardChoicePurposeView.OrderSimultaneous => $"{source}: choose which happens first.",
+            CardChoicePurposeView.Craft => $"{source}: craft - choose {(prompt.Minimum > 0 ? $"{prompt.Minimum} or more" : many)}{(kind.Length > 0 ? kind : " other permanent or card")}(s) from among the permanents you control and the cards in your graveyard to exile with {source} as the cost of its craft ability; then it returns transformed. The materials are exiled for good, so choose those you can best spare, cards in your graveyard before permanents.",
             CardChoicePurposeView.PutOnBottom => $"You kept a hand after mulliganing: choose {many} card(s) to put on the bottom of your library.",
             _ => $"{source}: choose {many}{kind} card(s).",
         };

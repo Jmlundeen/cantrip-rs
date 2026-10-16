@@ -66,7 +66,18 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
         };
         int power = Cantrip.Core.Decisions.TotalPower.Of(prompt.Eligible, prompt.Powers, picked.Select(h => new ViewHandle(h)));
         int manaValue = Cantrip.Core.Decisions.TotalManaValue.Of(prompt.Eligible, prompt.ManaValues, picked.Select(h => new ViewHandle(h)));
-        string title = prompt.MinimumPower > 0
+        // Craft (CR 702.167a): the materials are permanents you control and cards in your graveyard, of the quality the ability
+        // names, exiled with the crafting permanent as its cost.
+        bool craft = prompt.Purpose == CardChoicePurposeView.Craft;
+        string materials = prompt.Kind.Length == 0 ? "other permanents you control and/or cards in your graveyard"
+            : $"{Plural(prompt.Kind)} you control and/or {prompt.Kind} cards in your graveyard";
+        string title = craft
+            ? prompt.Minimum > 0
+                ? $"{source}: craft - choose {prompt.Minimum} or more from among {materials} to exile"
+                : prompt.Count == 1 && prompt.Kind.Length > 0
+                    ? $"{source}: craft - choose {article} {prompt.Kind} you control or {article} {prompt.Kind} card from your graveyard to exile"
+                    : $"{source}: craft - choose {prompt.Count} from among {materials} to exile"
+            : prompt.MinimumPower > 0
             ? $"{source}: choose creatures with total power {prompt.MinimumPower} or more to tap"
             : prompt.MinimumManaValue > 0
                 ? $"{source}: choose cards with total mana value {prompt.MinimumManaValue} or more to {verb}"
@@ -87,7 +98,9 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
             : prompt.Count == 1 && !prompt.UpTo ? $"{source}: choose {article} {kind} to {verb}{budget}"
             : anyNumber ? $"{source}: choose any number of {many} to {verb}{budget}"
             : $"{source}: choose {(prompt.UpTo ? "up to " : "")}{prompt.Count} {many} to {verb}{budget}";
-        string detail = prompt.Purpose == CardChoicePurposeView.TapToReduce
+        string detail = craft
+            ? $"{picked.Count} chosen  ·  exiled with {source} to pay the craft cost; {source} returns transformed"
+            : prompt.Purpose == CardChoicePurposeView.TapToReduce
             ? picked.Count == 0
                 ? $"None tapped: the full cost is paid{where}"
                 : $"Tapping it takes {power} off the generic mana of the cost (never colored mana){where}"
@@ -130,13 +143,14 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
             CardChoicePurposeView.Behold => picked.Count == 0 && prompt.UpTo ? "Behold nothing" : picked.Count == 1 ? "Behold it" : $"Behold {picked.Count}",
             CardChoicePurposeView.Blight => "Blight it",
             CardChoicePurposeView.PutCounters => $"Put {Counters(prompt)} on it",
+            CardChoicePurposeView.Craft => picked.Count == 1 ? "Exile it" : $"Exile {picked.Count}",
             // "Discard nothing" only where declining is an answer; a mandatory discard still counts down to its number.
             _ => picked.Count == 0 && prompt.UpTo ? "Discard nothing"
                 : picked.Count == 1 ? "Discard it" : $"Discard {picked.Count}",
         };
         bool valid = picked.Distinct().Count() == picked.Count
             && picked.All(handle => prompt.Eligible.Any(eligible => eligible.Value == handle))
-            && (prompt.UpTo ? picked.Count <= prompt.Count : picked.Count == prompt.Count)
+            && (prompt.UpTo ? picked.Count <= prompt.Count && picked.Count >= prompt.Minimum : picked.Count == prompt.Count)
             && power >= prompt.MinimumPower
             && manaValue >= prompt.MinimumManaValue;
         bool answersOnLastPick = table == ZoneKindView.Battlefield && !prompt.UpTo && prompt.MinimumPower == 0 && prompt.MinimumManaValue == 0
@@ -201,6 +215,7 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
         CardChoicePurposeView.Blight => PromptActionView.Blight,
         CardChoicePurposeView.TapToReduce => PromptActionView.TapToReduce,
         CardChoicePurposeView.PutCounters => PromptActionView.PutCounters,
+        CardChoicePurposeView.Craft => PromptActionView.Craft,
         _ => PromptActionView.Choose,
     };
 
@@ -230,8 +245,12 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
         PromptActionView.Blight => "blight (put -1/-1 counters on)",
         PromptActionView.TapToReduce => "tap to reduce the cost",
         PromptActionView.PutCounters => "put the counters on",
+        PromptActionView.Craft => "exile to craft",
         _ => "choose",
     };
+
+    /// <summary>A material named by its quality, more than one: "artifacts", "creatures", "Caves".</summary>
+    private static string Plural(string kind) => kind.EndsWith('y') ? kind[..^1] + "ies" : kind + "s";
 
     /// <summary>The counters a <see cref="CardChoicePurposeView.PutCounters"/> choice puts on what is chosen: "2 loyalty counters", "a +1/+1 counter".</summary>
     public static string Counters(ChooseCardsPromptMessage prompt)

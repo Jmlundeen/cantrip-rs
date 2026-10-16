@@ -137,4 +137,40 @@ public sealed class CardChoiceCaptionTests
         Assert.Equal("Strategic Betrayal: choose an Army to put a +1/+1 counter on", amass.Title);
         Assert.Equal("Put a +1/+1 counter on it", amass.Confirm);
     }
+
+    /// <summary>
+    /// Craft's materials (CR 702.167a) are permanents you control and cards in your graveyard, exiled with the crafting
+    /// permanent: the caption says both zones and the quality, "one or more" is said as such, and fewer than that is no answer.
+    /// </summary>
+    [Fact]
+    public void Craft_materials_say_both_zones_and_one_or_more_needs_one()
+    {
+        ObjectView bears = Card(3, "Grizzly Bears", ZoneKindView.Battlefield, Me);
+        ObjectView elves = Card(4, "Llanowar Elves", ZoneKindView.Graveyard, Me);
+        GameClient client = Seated([Spell(), bears, elves]);
+
+        ChooseCardsPromptMessage one = Choice(CardChoicePurposeView.Craft, 1, false, bears, elves);
+        one.Kind = "creature";
+        CardChoicePresentation exactly = CardChoicePresentation.Describe(client, one, [3]);
+        Assert.Equal("Strategic Betrayal: craft - choose a creature you control or a creature card from your graveyard to exile", exactly.Title);
+        Assert.Equal("Exile it", exactly.Confirm);
+        Assert.True(exactly.CanSubmit);
+
+        ChooseCardsPromptMessage more = Choice(CardChoicePurposeView.Craft, 2, true, bears, elves);
+        more.Kind = "creature";
+        more.Minimum = 1;
+        Assert.Equal(
+            "Strategic Betrayal: craft - choose 1 or more from among creatures you control and/or creature cards in your graveyard to exile",
+            CardChoicePresentation.Describe(client, more, []).Title);
+        Assert.False(CardChoicePresentation.Describe(client, more, []).CanSubmit);
+        Assert.True(CardChoicePresentation.Describe(client, more, [3, 4]).CanSubmit);
+        Assert.Equal("Exile 2", CardChoicePresentation.Describe(client, more, [3, 4]).Confirm);
+
+        ChooseCardsPromptMessage two = Choice(CardChoicePurposeView.Craft, 2, false, bears, elves);
+        two.Kind = "creature";
+        Assert.Equal(
+            "Strategic Betrayal: craft - choose 2 from among creatures you control and/or creature cards in your graveyard to exile",
+            CardChoicePresentation.Describe(client, two, []).Title);
+        Assert.False(CardChoicePresentation.Describe(client, two, [3]).CanSubmit);
+    }
 }

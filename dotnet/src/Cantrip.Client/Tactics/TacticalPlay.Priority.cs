@@ -793,6 +793,17 @@ public sealed partial class TacticalPlay
             plain = "attach to target creature you control";
         }
 
+        // Craft (CR 702.167a): "Craft with [materials] [cost]" exiles this and its materials and returns the card as its other
+        // face. Worth what that face is worth over this one, less a quarter of a card for the material it gives up - the
+        // material chosen is the one worth least, a graveyard card first (Choices).
+        if (CardReading.Plain(described).TrimStart().StartsWith("craft with", StringComparison.Ordinal))
+        {
+            double better = source.OtherFace is { } back ? _model.Worth(back) - _model.Worth(source) - (0.25 * _model.Card) : 0;
+            return better > 0
+                ? new Candidate(option, better, CardReading.ManaValue(described), [], Kick: false, Permanent: true, Hostile: false)
+                : null;
+        }
+
         int cost = CardReading.ManaValue(costText);
         string name = source.Name.ToLowerInvariant();
         bool sacrificesItself = costText.Contains("sacrifice this", StringComparison.Ordinal)

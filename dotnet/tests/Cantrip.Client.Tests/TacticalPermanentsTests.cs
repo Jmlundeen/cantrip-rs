@@ -543,6 +543,55 @@ public sealed class TacticalPermanentsTests
     }
 
     [Fact]
+    public void Crafts_with_the_fewest_materials_a_graveyard_card_before_a_permanent()
+    {
+        // Craft (CR 702.167a): the materials are exiled for good, so a card already in the graveyard goes before a creature
+        // still on the battlefield, and "one or more" takes one.
+        ObjectView dead = Creature(4, "Elf", 1, 1);
+        dead.Zone = ZoneKindView.Graveyard;
+        dead.ZoneOwner = Me;
+        GameClient client = Seated([Creature(3, "Bear", 2, 2), dead, Creature(5, "Giant", 5, 5)]);
+        var prompt = new ChooseCardsPromptMessage
+        {
+            Player = Me,
+            Owner = Me,
+            Purpose = CardChoicePurposeView.Craft,
+            Cards = [Handle(3), Handle(4), Handle(5)],
+            Eligible = [Handle(3), Handle(4), Handle(5)],
+            Count = 3,
+            UpTo = true,
+            Minimum = 1,
+            Kind = "creature",
+        };
+
+        Assert.Equal([Handle(4)], Assert.IsType<CardsChosenAnswer>(Bot().Decide(client, prompt)).Cards);
+
+        prompt.UpTo = false;
+        prompt.Minimum = 0;
+        prompt.Count = 2;
+        Assert.Equal([Handle(4), Handle(3)], Assert.IsType<CardsChosenAnswer>(Bot().Decide(client, prompt)).Cards);
+    }
+
+    [Fact]
+    public void Crafts_into_a_better_face_and_not_into_a_worse_one()
+    {
+        // Craft (CR 702.167a) turns the card into its other face: a 6/6 is worth the trade for a bare artifact; the same
+        // artifact turning into a lesser artifact is not.
+        ObjectView inverted = Artifact(2, "Inverted Iceberg", "Craft with artifact {4}{U}{U}");
+        inverted.OtherFace = Creature(0, "Iceberg Titan", 6, 6);
+        GameClient client = Seated([inverted, Artifact(3, "Ornithopter")]);
+        ActionOptionMessage craft = Ability(2, 0, "Craft with artifact {4}{U}{U}");
+
+        TakeActionAnswer taken = Assert.IsType<TakeActionAnswer>(Bot().Decide(client, Priority(craft)));
+        Assert.Equal(Handle(2), taken.Source);
+
+        ObjectView worse = Artifact(2, "Inverted Iceberg", "Craft with artifact {4}{U}{U}");
+        worse.OtherFace = Artifact(0, "Iceberg Shard");
+        GameClient other = Seated([worse, Artifact(3, "Ornithopter")]);
+        Assert.IsType<PassAnswer>(Bot().Decide(other, Priority(craft)));
+    }
+
+    [Fact]
     public void Does_not_tap_a_bigger_attacker_to_crew_a_smaller_Vehicle()
     {
         GameClient client = Seated([Vehicle(2, "Cart", 2, 2, "Crew 2"), Creature(3, "Giant", 5, 5)]);

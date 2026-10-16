@@ -627,8 +627,10 @@ public sealed class RandomPlay : IAutoPlayer
                 : prompt.Default();
         }
 
+        // "Up to" a number takes any number down to the least the prompt allows: none, or craft's "one or more" (CR 702.167a).
         int most = Math.Min(prompt.Count, prompt.Eligible.Count);
-        return new CardsChosenAnswer { Cards = Some(prompt.Eligible, prompt.UpTo ? _random.Next(most + 1) : most) };
+        int least = Math.Min(prompt.Minimum, most);
+        return new CardsChosenAnswer { Cards = Some(prompt.Eligible, prompt.UpTo ? least + _random.Next(most - least + 1) : most) };
     }
 
     /// <summary>Drawn cards from a library search, including finding nothing where that is allowed (CR 701.19d).</summary>
