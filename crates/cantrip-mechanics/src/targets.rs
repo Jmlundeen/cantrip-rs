@@ -255,6 +255,14 @@ fn creature_card_in_your_graveyard_filter(q: &dyn Query, asker: &Asker, t: Targe
 /// "Target creature card in your graveyard". Recurring Nightmare and Metamorphosis Fanatic print it.
 pub const CREATURE_CARD_IN_YOUR_GRAVEYARD: TargetSpec = target(creature_card_in_your_graveyard_filter);
 
+fn small_creature_card_in_your_graveyard_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    card_in_your_graveyard(q, asker, t, &[CardType::Creature]) && matches!(t, Target::Object(id) if q.mana_value(id) <= 3)
+}
+
+/// "Target creature card with mana value 3 or less from your graveyard" (CR 115.1, 202.3). Unearth and Call a Surprise
+/// Witness print it.
+pub const CREATURE_CARD_WITH_MANA_VALUE_3_OR_LESS_IN_YOUR_GRAVEYARD: TargetSpec = target(small_creature_card_in_your_graveyard_filter);
+
 /// A card chosen to be sacrificed, discarded or tapped as a cost: the filter shapes `Cost::sacrifice` and
 /// `Cost::discard` take. Each is named by what it accepts.
 pub mod filters {
