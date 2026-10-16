@@ -1,0 +1,44 @@
+# Known bug: a spell cast without paying its mana cost still announces X (actions.rs `x_symbols` ignores `instead`), so Walking Ballista
+# cast free is given X = 1 when the player asks for it and pays {1}{1} from the pool; CR 107.3b says X is 0.
+#
+# CR 107.3b: if a spell is cast without paying its mana cost, X is 0. Mind's Desire exiles the top card of a library of Walking
+# Ballistas (so the shuffle cannot matter) for each of its copies, and Bot1 may cast one free until end of turn. Two mana float
+# unspent in Bot1's pool from the extra Moxen, so it could pay X = 1 ({X}{X}) if X were announced; it is not, the Ballista
+# enters with no +1/+1 counters, is a 0/0, and dies (CR 704.5f).
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mind's Desire
+Mox Pearl
+Mox Emerald
+Walking Ballista x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Mind's Desire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Exile.Walking Ballista.Cast(X: 1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Walking Ballista = (absent)
+
+[Expect]
+Bot1.Graveyard = Walking Ballista
