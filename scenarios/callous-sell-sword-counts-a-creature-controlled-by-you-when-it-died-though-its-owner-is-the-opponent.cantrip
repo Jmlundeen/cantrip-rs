@@ -1,0 +1,46 @@
+# "Died under your control" is about the controller as it died, not the owner (CR 700.4, 109.4). Bot2 owns an Ornithopter (an artifact creature); on turn 3
+# Bot1 takes it with Dack Fayden's -2 ("gain control of target artifact"), and Burn Together has it (power 0, so it deals no damage) hit Bot2 and be
+# sacrificed. It goes to Bot2's graveyard, its owner's, yet it died under Bot1's control, so the Sell-Sword cast from exile enters with one counter.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Sapphire
+Mox Jet
+Black Lotus
+Dack Fayden
+Island
+Island
+Callous Sell-Sword
+Island x12
+
+[Bot2 Deck]
+Ornithopter
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Dack Fayden.Cast
+Bot1.Battlefield.Dack Fayden.Activate(Ornithopter; Ability: Gain control)
+Bot1.Pass
+Bot1.Hand.Callous Sell-Sword.Cast(Ability: Burn Together)
+Bot1.Target(Ornithopter)
+Bot1.Target(Bot2)
+? Bot1.Battlefield.Ornithopter.Types = Artifact; Creature
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+? Bot2.Graveyard = Ornithopter
+? Exile = Callous Sell-Sword
+Bot1.Exile.Callous Sell-Sword.Cast
+
+[Expect]
+Bot1.Battlefield.Callous Sell-Sword.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Callous Sell-Sword.Power = 3

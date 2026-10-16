@@ -1,0 +1,49 @@
+# The converse: Bot2 steals Bot1's Ornithopter with Dack Fayden's -2 on turn 2 and keeps it. On turn 3 Bot1 bolts it: it dies under Bot2's control, though
+# Bot1 owns it, so it does not count (CR 700.4) and the Sell-Sword cast from hand enters as a 2/2.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Swamp
+Ornithopter
+Lightning Bolt
+Island
+Island
+Callous Sell-Sword
+Island x12
+
+[Bot2 Deck]
+Mox Ruby
+Mox Sapphire
+Mountain
+Dack Fayden
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Dack Fayden.Cast
+Bot2.Battlefield.Dack Fayden.Activate(Ornithopter; Ability: Gain control)
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+? Bot2.Battlefield.Ornithopter.Types = Artifact; Creature
+[T3 Bot1.Main2]
+? Bot1.Graveyard = Ornithopter; Lightning Bolt
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Callous Sell-Sword.Cast
+
+[Expect]
+Bot1.Battlefield.Callous Sell-Sword.Power = 2
+Bot1.Battlefield.Callous Sell-Sword.Toughness = 2

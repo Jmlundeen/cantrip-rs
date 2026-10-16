@@ -1,0 +1,60 @@
+# Callous Sell-Sword (cast as a creature): "for each creature that died under your control this turn". Bot2 bolts Bot1's Simian Spirit Guide on
+# turn 2, so a creature of Bot1's died, but last turn. On turn 3 Bot1 bolts Bot2's Elvish Spirit Guide: a creature died this turn, but under
+# Bot2's control. The Sell-Sword enters as the printed 2/2 with no counters.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Emerald
+Mox Pearl
+Mountain
+Simian Spirit Guide
+Lightning Bolt
+Callous Sell-Sword
+Mountain x12
+
+[Bot2 Deck]
+Mox Ruby
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Mountain
+Elvish Spirit Guide
+Lightning Bolt
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Simian Spirit Guide.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Elvish Spirit Guide.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Simian Spirit Guide)
+[T3 Bot1.Main1]
+? Bot1.Graveyard = Simian Spirit Guide
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Elvish Spirit Guide)
+[T3 Bot1.Main2]
+? Bot2.Graveyard = Elvish Spirit Guide; Lightning Bolt
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Callous Sell-Sword.Cast
+
+[Expect]
+Bot1.Battlefield.Callous Sell-Sword.Power = 2
+Bot1.Battlefield.Callous Sell-Sword.Toughness = 2

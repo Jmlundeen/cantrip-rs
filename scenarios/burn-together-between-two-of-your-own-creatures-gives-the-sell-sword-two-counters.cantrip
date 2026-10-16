@@ -1,0 +1,46 @@
+# Burn Together aimed at one's own creature: the Simian Spirit Guide (power 2) deals 2 to the Elvish Spirit Guide, also Bot1's, and is then sacrificed.
+# Two creatures died under Bot1's control this turn, so the Sell-Sword, cast from exile afterwards, enters with two +1/+1 counters: a 4/4.
+# (Both targets are Bot1's: the first slot "creature you control" and the "any other target" slot may be one's own.)
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Emerald
+Mox Pearl
+Black Lotus
+Simian Spirit Guide
+Callous Sell-Sword
+Elvish Spirit Guide
+Mountain x12
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Simian Spirit Guide.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Elvish Spirit Guide.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Callous Sell-Sword.Cast(Ability: Burn Together)
+Bot1.Target(Simian Spirit Guide)
+Bot1.Target(Elvish Spirit Guide)
+[T3 Bot1.Main2]
+? Bot1.Graveyard = Elvish Spirit Guide; Simian Spirit Guide; Black Lotus
+? Exile = Callous Sell-Sword
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Exile.Callous Sell-Sword.Cast
+
+[Expect]
+Bot1.Battlefield.Callous Sell-Sword.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Callous Sell-Sword.Power = 4
+Bot1.Battlefield.Callous Sell-Sword.Toughness = 4

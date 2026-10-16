@@ -1,0 +1,36 @@
+# Burn Together's "any other target" may be a player (CR 115.1): the Simian Spirit Guide deals damage equal to its power, 2, to Bot2, then is sacrificed.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Emerald
+Mox Pearl
+Mountain
+Simian Spirit Guide
+Callous Sell-Sword
+Mountain x12
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Simian Spirit Guide.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Callous Sell-Sword.Cast(Ability: Burn Together)
+Bot1.Target(Simian Spirit Guide)
+Bot1.Target(Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Exile = Callous Sell-Sword
+Bot1.Graveyard = Simian Spirit Guide

@@ -1,0 +1,61 @@
+# Callous Sell-Sword // Burn Together (CR 715). Bot2's Elvish Spirit Guide is on the battlefield. On turn 3 Bot1 casts Burn Together: the Simian Spirit
+# Guide (power 2) deals 2 damage to the other target, the Elvish Spirit Guide, then is sacrificed. Two creatures died, but only the Simian under Bot1's
+# control counts (CR 700.4), and the Adventure resolved so the card was exiled. Cast from exile, the Sell-Sword enters with one +1/+1 counter
+# (CR 614.1c): a 3/3. Targets: Bot2's Elvish is refused for the first slot, "creature you control", and allowed for the other target; the creature
+# already chosen is refused as the other target ("any other target", CR 115.1).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Emerald
+Mox Pearl
+Mountain
+Simian Spirit Guide
+Callous Sell-Sword
+Mountain x12
+
+[Bot2 Deck]
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Elvish Spirit Guide
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Simian Spirit Guide.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Elvish Spirit Guide.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Callous Sell-Sword.Cast(Ability: Burn Together)
+! Bot1.Target(Elvish Spirit Guide)
+Bot1.Target(Simian Spirit Guide)
+! Bot1.Target(Simian Spirit Guide)
+Bot1.Target(Elvish Spirit Guide)
+[T3 Bot1.Main2]
+? Bot1.Graveyard = Simian Spirit Guide
+? Bot2.Graveyard = Elvish Spirit Guide
+? Exile = Callous Sell-Sword
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Exile.Callous Sell-Sword.Cast
+
+[Expect]
+Exile.Count = 0
+Bot1.Battlefield.Callous Sell-Sword.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Callous Sell-Sword.Power = 3
+Bot1.Battlefield.Callous Sell-Sword.Toughness = 3

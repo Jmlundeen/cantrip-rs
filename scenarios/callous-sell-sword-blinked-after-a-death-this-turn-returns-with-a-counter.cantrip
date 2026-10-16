@@ -1,0 +1,37 @@
+# A Sell-Sword that enters otherwise than by being cast (CR 614.1c applies to any entering): it was cast on turn 1 as a 2/2 with no deaths. On turn 3 Bot1 bolts its
+# own Ornithopter, then Ephemerate exiles and returns the Sell-Sword: a new object (CR 400.7) that enters with a counter for the Ornithopter, a 3/3.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Ornithopter
+Callous Sell-Sword
+Lightning Bolt
+Ephemerate
+Island x14
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Callous Sell-Sword.Cast
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Callous Sell-Sword.Power = 2
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter)
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ephemerate.Cast(Callous Sell-Sword)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Callous Sell-Sword.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Callous Sell-Sword.Power = 3

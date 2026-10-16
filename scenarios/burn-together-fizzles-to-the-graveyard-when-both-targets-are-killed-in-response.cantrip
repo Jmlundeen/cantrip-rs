@@ -1,0 +1,61 @@
+# Burn Together (CR 608.2b, 715.4c): Bot2 bolts both targets in response, the Simian Spirit Guide and its own Elvish Spirit Guide. Every target is illegal, so
+# the spell does not resolve: nothing is sacrificed or damaged beyond the bolts, and the Adventure card goes to the graveyard, not to exile.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Emerald
+Mox Pearl
+Mountain
+Simian Spirit Guide
+Callous Sell-Sword
+Mountain x12
+
+[Bot2 Deck]
+Mox Ruby
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Mountain
+Elvish Spirit Guide
+Lightning Bolt
+Lightning Bolt
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Simian Spirit Guide.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Elvish Spirit Guide.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Callous Sell-Sword.Cast(Ability: Burn Together)
+Bot1.Target(Simian Spirit Guide)
+Bot1.Target(Elvish Spirit Guide)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Simian Spirit Guide)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Elvish Spirit Guide)
+Bot1.Pass
+[T3 Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Exile.Count = 0
+Bot1.Graveyard = Callous Sell-Sword; Simian Spirit Guide
+Bot2.Graveyard = Lightning Bolt; Elvish Spirit Guide; Lightning Bolt
