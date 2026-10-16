@@ -1,0 +1,16 @@
+# Demolition Field: "{T}: Add {C}."
+
+[Bot1 Deck]
+Demolition Field
+Island x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Demolition Field.Play
+Bot1.Battlefield.Demolition Field.Activate(Ability: {T}: Add {C})
+
+[Expect]
+Bot1.Battlefield.Demolition Field.Tapped = true
+Bot1.Mana = {C}

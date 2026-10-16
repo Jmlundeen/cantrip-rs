@@ -1,0 +1,40 @@
+# Demolition Field: both searches are "may". Bot2 (the destroyed land's controller) declines its search and nothing is fetched
+# for it; Bot1's own search is a separate choice and still happens (a Plains enters). The neighbouring scenarios are the controls
+# where each accepts.
+
+[Bot1 Deck]
+Island
+Island
+Demolition Field
+Island x16
+Plains
+
+[Bot2 Deck]
+Island
+Bazaar of Baghdad
+Island x16
+Island
+Forest
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Bazaar of Baghdad.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Demolition Field.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Demolition Field.Activate(Ability: Destroy; Bot2.Battlefield.Bazaar of Baghdad)
+Bot2.Decline
+Bot1.Accept
+Bot1.Search(Plains)
+
+[Expect]
+Bot1.Graveyard = Demolition Field
+Bot1.Battlefield = Island; Island; Plains
+Bot2.Graveyard = Bazaar of Baghdad
+Bot2.Battlefield = Island

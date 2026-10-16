@@ -1,0 +1,39 @@
+# Demolition Field: Bot2 fetches a Forest, then Bot1 declines its own "you may search", so no Plains enters for Bot1. The
+# other scenarios are the controls where Bot1 accepts.
+
+[Bot1 Deck]
+Island
+Island
+Demolition Field
+Island x16
+Plains
+
+[Bot2 Deck]
+Island
+Bazaar of Baghdad
+Island x16
+Island
+Forest
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Bazaar of Baghdad.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Demolition Field.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Demolition Field.Activate(Ability: Destroy; Bot2.Battlefield.Bazaar of Baghdad)
+Bot2.Accept
+Bot2.Search(Forest)
+Bot1.Decline
+
+[Expect]
+Bot1.Graveyard = Demolition Field
+Bot1.Battlefield = Island; Island
+Bot2.Graveyard = Bazaar of Baghdad
+Bot2.Battlefield = Island; Forest
