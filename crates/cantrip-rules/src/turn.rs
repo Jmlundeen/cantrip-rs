@@ -312,6 +312,9 @@ fn skip_turn(cx: &mut Cx, player: PlayerId) -> R<bool> {
         let card = obj.copy.map_or(obj.card, |c| c.card);
         let asker = Asker { source: id, controller: player };
         // A scan once a turn of what is on the battlefield, for a card that has such a rule.
+        if !cx.card(card).turn_begin.is_empty() && cx.s().lost_all_abilities(id) {
+            continue;
+        }
         for rule in cx.card(card).turn_begin {
             if (rule.applies)(&*cx, &asker, player)
                 && cx.ask_core(player, RequestKind::May { source: id, purpose: Purpose::Optional }, false)? == Answer::Yes
@@ -455,7 +458,10 @@ fn can_block(cx: &Cx, blocker: ObjectId, attacker: ObjectId) -> bool {
     for id in [blocker, attacker] {
         let obj = cx.s().obj(id);
         let card = obj.copy.map_or(obj.card, |c| c.card);
-        if cx.cards().block_rules[card.0 as usize] && !cx.card(card).block_rules.iter().all(|rule| rule(cx, id, blocker, attacker)) {
+        if cx.cards().block_rules[card.0 as usize]
+            && !cx.s().lost_all_abilities(id)
+            && !cx.card(card).block_rules.iter().all(|rule| rule(cx, id, blocker, attacker))
+        {
             return false;
         }
     }

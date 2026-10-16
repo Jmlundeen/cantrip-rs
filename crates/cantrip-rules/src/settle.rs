@@ -117,7 +117,7 @@ fn state_based_actions(cx: &mut Cx) -> R<bool> {
             let obj = cx.s().obj(id);
             if obj.controller == p {
                 permanents += 1;
-                ascends |= cx.card(obj.copy.map_or(obj.card, |c| c.card)).ascend;
+                ascends |= cx.card(obj.copy.map_or(obj.card, |c| c.card)).ascend && !cx.s().lost_all_abilities(id);
             }
         }
         if ascends && permanents >= 10 {

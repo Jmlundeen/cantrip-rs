@@ -211,9 +211,7 @@ fn static_sources<'a>(cards: &CardTable, state: &'a GameState) -> std::cell::Ref
             let sobj = state.obj(source);
             let scard = sobj.copy.map(|c| c.card).unwrap_or_else(|| cards.face(sobj.card, sobj.transformed));
             // A permanent that has lost all its abilities has no static abilities (CR 613.1f).
-            let lost = !state.effects.is_empty()
-                && state.effects.iter().any(|e| e.affected == source && e.kind == EffectKind::LoseAllAbilities);
-            if cards.statics[scard.0 as usize] && list.len() < MAX_STATIC_SOURCES && live(state, source) && !lost {
+            if cards.statics[scard.0 as usize] && list.len() < MAX_STATIC_SOURCES && live(state, source) && !state.lost_all_abilities(source) {
                 list.push((source, from));
             }
         };
@@ -669,10 +667,8 @@ pub fn targeting_rule(cards: &CardTable, state: &GameState, kind: TargetingRuleK
         let obj = state.obj(source);
         let card = cards.current(obj);
         // A permanent that has lost all its abilities has no static abilities (CR 613.1f).
-        let lost = !state.effects.is_empty()
-            && state.effects.iter().any(|e| e.affected == source && e.kind == EffectKind::LoseAllAbilities);
         cards.targeting_rules[card.0 as usize]
-            && !lost
+            && !state.lost_all_abilities(source)
             && cards.get(card).targeting_rules.iter().any(|r| r.kind == kind && (r.applies)(&view, source, subject))
     })
 }

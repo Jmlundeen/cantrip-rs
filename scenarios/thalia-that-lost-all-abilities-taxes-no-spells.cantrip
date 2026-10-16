@@ -1,4 +1,3 @@
-# Known bug: a permanent's cost changes are read off its card whether or not it has lost all its abilities (CR 613.1f); `cost_change_sources` and `change_with` in actions.rs never look at LoseAllAbilities.
 # Thalia, Guardian of Thraben: "Noncreature spells cost {1} more to cast". Bot1 casts her on turn 1 with Mox Pearl and Mox Jet; with
 # only Mox Ruby untapped a Lightning Bolt ({1}{R} under Thalia) is not offered (the control). Bot2's The Wondrous Wasp strips Thalia
 # on turn 4, her tax with her: on turn 5 Mox Ruby alone pays for the Bolt, and Mox Pearl and Mox Jet stay untapped.

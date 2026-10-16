@@ -1,4 +1,3 @@
-# Known bug: a permanent's activation restrictions are read off its card whether or not it has lost all its abilities (CR 613.1f, 602.5); `activation_forbidders` and `activation_barred` in static_rules.rs never look at LoseAllAbilities.
 # Clarion Conqueror: "Activated abilities of artifacts, creatures, and planeswalkers can't be activated." Bot1 casts it on turn 1 with
 # three Moxen, and on turn 3 Mox Ruby is not offered (the control, as in clarion-conqueror-stops-the-activated-abilities-of-artifacts-
 # mana-abilities-included). Bot2's The Wondrous Wasp, paid for with two Islands on turn 4, strips the Conqueror of every ability: on

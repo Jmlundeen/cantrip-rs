@@ -1,4 +1,3 @@
-# Known bug: a permanent's rule that makes damage unpreventable is read off its card whether or not it has lost all its abilities (CR 613.1f, 615.12); `sources` in static_rules.rs never looks at LoseAllAbilities.
 # Questing Beast: "Combat damage that would be dealt by creatures you control can't be prevented". (The control is
 # questing-beast-makes-combat-damage-unpreventable-through-the-one-ring.) Bot2 casts The One Ring on turn 2, protection from everything
 # until its next turn, and The Wondrous Wasp, which strips the Beast of every ability: on turn 3 all the Beast's damage is prevented.

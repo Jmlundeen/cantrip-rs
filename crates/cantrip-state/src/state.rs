@@ -248,6 +248,14 @@ impl GameState {
         self.zone(Zone::BATTLEFIELD)
     }
 
+    /// Whether `id` has lost all its abilities (CR 613.1f): the abilities its card prints, which are what static rules read
+    /// off a card, are gone. The one answer every such rule is judged by - the static abilities `layers.rs` collects, play
+    /// rules, cost changes, replacement effects, restrictions - so that they agree with the layer-6 loss; abilities granted
+    /// after it are the object's own and do not come back through the card. Free while no effect is lasting.
+    pub fn lost_all_abilities(&self, id: ObjectId) -> bool {
+        !self.effects.is_empty() && self.effects.iter().any(|e| e.affected == id && e.kind == EffectKind::LoseAllAbilities)
+    }
+
     /// Every seat at the table, in seat order, a player who has left the game included: for walking the zones by owner.
     /// "Each player" is `apnap`, never this.
     pub fn seats(&self) -> impl Iterator<Item = PlayerId> + use<> {

@@ -11,7 +11,8 @@ fn sources<'a>(cx: &'a Cx, has: impl Fn(&CardDef) -> bool + 'a) -> impl Iterator
     cx.s().battlefield().iter().filter_map(move |&id| {
         let obj = cx.s().obj(id);
         let def = cx.card(cx.cards().current(obj));
-        has(def).then_some((id, obj.controller, def))
+        // A permanent that has lost all its abilities has none of these rules (CR 613.1f).
+        (has(def) && !cx.s().lost_all_abilities(id)).then_some((id, obj.controller, def))
     })
 }
 
@@ -117,7 +118,7 @@ pub fn activation_forbidders(cx: &Cx) -> Vec<ObjectId> {
         .copied()
         .filter(|&id| {
             let obj = cx.s().obj(id);
-            cx.cards().activation_rules[cx.cards().current(obj).0 as usize]
+            cx.cards().activation_rules[cx.cards().current(obj).0 as usize] && !cx.s().lost_all_abilities(id)
         })
         .collect()
 }

@@ -782,7 +782,7 @@ fn cost_change_sources(cx: &Cx) -> Vec<ObjectId> {
         .copied()
         .filter(|&id| {
             let obj = cx.s().obj(id);
-            cx.cards().cost_changes[cx.cards().current(obj).0 as usize]
+            cx.cards().cost_changes[cx.cards().current(obj).0 as usize] && !cx.s().lost_all_abilities(id)
         })
         .collect()
 }
@@ -1306,12 +1306,6 @@ fn graveyard_play(cx: &Cx, player: PlayerId) -> bool {
     cx.s().effects.iter().any(|e| e.kind == EffectKind::PlayFromGraveyard && e.controller == player)
 }
 
-/// Whether a permanent has lost all its abilities (CR 613.1f), and with them its play rules, which are read off its card:
-/// the same test `layers.rs` makes of a static-ability source.
-fn lost_abilities(cx: &Cx, id: ObjectId) -> bool {
-    cx.s().effects.iter().any(|e| e.affected == id && e.kind == EffectKind::LoseAllAbilities)
-}
-
 /// What `player`'s permanents let them do about land plays (CR 305.2): the land plays beyond the one, whether there is
 /// no limit, and whether lands may be played from the graveyard.
 fn land_rules(cx: &Cx, player: PlayerId) -> (u32, bool, bool, bool) {
@@ -1323,7 +1317,7 @@ fn land_rules(cx: &Cx, player: PlayerId) -> (u32, bool, bool, bool) {
     for &id in cx.s().battlefield() {
         let obj = cx.s().obj(id);
         let card = obj.copy.map_or(obj.card, |c| c.card);
-        if obj.controller != player || !cx.cards().play_rules[card.0 as usize] || lost_abilities(cx, id) {
+        if obj.controller != player || !cx.cards().play_rules[card.0 as usize] || cx.s().lost_all_abilities(id) {
             continue;
         }
         for rule in cx.card(card).play_rules {
@@ -1352,7 +1346,7 @@ pub fn no_maximum_hand_size(cx: &Cx, player: PlayerId) -> bool {
             let card = obj.copy.map_or(obj.card, |c| c.card);
             obj.controller == player
                 && cx.cards().play_rules[card.0 as usize]
-                && !lost_abilities(cx, id)
+                && !cx.s().lost_all_abilities(id)
                 && cx.card(card).play_rules.iter().any(|r| matches!(r, PlayRule::NoMaximumHandSize))
         })
 }
@@ -1422,7 +1416,9 @@ fn cast_limit(cx: &Cx) -> Option<u8> {
         .iter()
         .map(|&id| {
             let obj = cx.s().obj(id);
-            cx.card(obj.copy.map_or(obj.card, |c| c.card)).cast_limit
+            // A permanent that has lost all its abilities limits nothing (CR 613.1f).
+            let limit = cx.card(obj.copy.map_or(obj.card, |c| c.card)).cast_limit;
+            if limit > 0 && cx.s().lost_all_abilities(id) { 0 } else { limit }
         })
         .filter(|&n| n > 0)
         .min()
@@ -1435,6 +1431,9 @@ fn granted_ways_of(cards: &CardTable, s: &GameState) -> Vec<(ObjectId, PlayerId,
     for &id in s.battlefield() {
         let obj = s.obj(id);
         let def = cards.get(cards.current(obj));
+        if !def.granted_ways.is_empty() && s.lost_all_abilities(id) {
+            continue;
+        }
         for way in def.granted_ways {
             ways.push((id, obj.controller, way));
         }
@@ -1691,7 +1690,7 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
             let card = cx.cards().current(obj);
             obj.controller == player
                 && cx.cards().play_rules[card.0 as usize]
-                && !lost_abilities(cx, p)
+                && !cx.s().lost_all_abilities(p)
                 && cx.card(card).play_rules.iter().any(|r| matches!(r, PlayRule::LibraryTopSpells(f) if f(cx, id)))
         });
         let instant = def.is(CardType::Instant) || def.keywords.has(Keyword::Flash) || def.types.0 & flash.0 != 0;

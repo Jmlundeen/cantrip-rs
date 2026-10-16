@@ -82,7 +82,8 @@ pub fn may_cause_discard_or_sacrifice(q: &dyn Query, causer: PlayerId, player: P
     for &id in q.state().battlefield() {
         let o = q.obj(id);
         let def = q.card(o.copy.map_or(o.card, |c| c.card));
-        if def.cause_rules.is_empty() {
+        // A permanent that has lost all its abilities has no such rule (CR 613.1f).
+        if def.cause_rules.is_empty() || q.state().lost_all_abilities(id) {
             continue;
         }
         let asker = Asker { source: id, controller: o.controller };

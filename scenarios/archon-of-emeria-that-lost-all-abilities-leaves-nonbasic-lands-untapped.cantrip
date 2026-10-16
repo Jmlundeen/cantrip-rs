@@ -1,4 +1,3 @@
-# Known bug: a permanent's replacement effects are read off its card whether or not it has lost all its abilities (CR 613.1f, 614); `replacements` in replace.rs never looks at LoseAllAbilities.
 # Archon of Emeria: "Nonbasic lands your opponents control enter tapped". Bot2 casts it on turn 2 with Black Lotus. On turn 3 Bot1 casts
 # The Wondrous Wasp, which strips the Archon of every ability, and then plays Strip Mine: it enters untapped. (The control is
 # archon-of-emeria-taps-an-opponents-nonbasic-land-and-limits-each-player-to-one-spell: the same land enters tapped without the Wasp.)

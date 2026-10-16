@@ -1,4 +1,3 @@
-# Known bug: a permanent's cast limit is read off its card whether or not it has lost all its abilities (CR 613.1f, 101.2); `cast_limit` in actions.rs never looks at LoseAllAbilities.
 # Archon of Emeria: "Each player can't cast more than one spell each turn". Bot2 casts it on turn 2 with Black Lotus. On turn 3 Bot1
 # casts The Wondrous Wasp, which strips the Archon of every ability, its limit with them: Bot1 may cast Duress as well. (The control is
 # archon-of-emeria-taps-an-opponents-nonbasic-land-and-limits-each-player-to-one-spell: the same turn without the Wasp bars the second spell.)

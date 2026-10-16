@@ -1,4 +1,3 @@
-# Known bug: a permanent's discounts to activated abilities are read off its card whether or not it has lost all its abilities (CR 613.1f, 601.2f); `change_with` in actions.rs never looks at LoseAllAbilities.
 # Zirda, the Dawnwaker: "Abilities you activate that aren't mana abilities cost {2} less to activate." (The control is
 # zirda-takes-two-off-an-ability-you-activate.) Bot1 casts it on turn 1 with three Moxen. Bot2's The Wondrous Wasp strips it on turn 2,
 # and on turn 3 Inventors' Fair's {4} search, which three Moxen cannot pay for alone, is not offered.

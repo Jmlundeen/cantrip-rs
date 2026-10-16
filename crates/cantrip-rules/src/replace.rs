@@ -91,7 +91,8 @@ fn candidates(cx: &Cx, proposal: &Proposal, applied: &[Applied]) -> Vec<Candidat
     let mut found = Vec::new();
     let mut consider = |id: ObjectId, own_only: bool| {
         let card = card_of(cx, id);
-        if !cards.replaces[card.0 as usize] {
+        // A permanent that has lost all its abilities has no replacement effects (CR 613.1f).
+        if !cards.replaces[card.0 as usize] || cx.s().lost_all_abilities(id) {
             return;
         }
         let asker = Asker { source: id, controller: controller_of(cx, id, proposal) };

@@ -1,4 +1,3 @@
-# Known bug: a permanent's rules about what may cause its controller to discard or sacrifice are read off its card whether or not it has lost all its abilities (CR 613.1f, 101.2); `may_cause_discard_or_sacrifice` in game.rs never looks at LoseAllAbilities.
 # Tamiyo, Collector of Tales: spells and abilities Bot2 controls can't cause Bot1 to discard (CR 101.2). (The control is
 # tamiyo-collector-of-tales-keeps-its-hand-from-hymn-and-collects-a-named-card.) Bot1 casts her on turn 1. On turn 3 Bot2 flashes in
 # Tishana's Tidebinder against her +1, which is countered, and she loses all abilities: Bot2's Hymn to Tourach on turn 4 takes two
