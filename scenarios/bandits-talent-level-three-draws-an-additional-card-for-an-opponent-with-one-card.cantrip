@@ -1,0 +1,52 @@
+# Bandit's Talent level 3: "At the beginning of your draw step, draw an additional card for each opponent who has one or
+# fewer cards in hand." Bot1 reaches level 3 on turn 1 (Black Lotus pays the Class and level 2, four Moxen level 3) and
+# empties its hand. Bot2 mulligans to three Mountains, the enters trigger takes two, and after turn 2 (a draw and a land
+# played) it holds one card, "one or fewer": in Bot1's turn-3 draw step Bot1 draws its card and one more. Bot2's turn-2
+# upkeep at level 2 cost it 2 life with the single card it held.
+
+[Opening]
+Chooser: Bot1
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Bandit's Talent
+Island x13
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.PlayFirst
+Bot2.Mulligan
+Bot2.Mulligan
+Bot2.Mulligan
+Bot2.Mulligan
+Bot2.Keep
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Bandit's Talent.Cast
+Bot1.Battlefield.Bandit's Talent.Activate(Ability: Level 2)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Bandit's Talent.Activate(Ability: Level 3)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+? Bot2.Hand.Count = 1
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Hand.Count = 2
+Bot2.Hand.Count = 1
+Bot2.Life = 18

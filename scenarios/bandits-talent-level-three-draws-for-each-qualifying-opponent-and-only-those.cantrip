@@ -1,0 +1,67 @@
+# Bandit's Talent level 3 in a three-player game counts opponents, one card each, and only those with one or fewer
+# cards in hand at the draw step. Bot2 mulligans to three Mountains and Bot3 to two (the players decide in turn, round
+# by round); the enters trigger leaves Bot2 one card and Bot3 none, so Bot1's turn-4 draw step draws its card and two
+# more.
+# Bot2 and Bot3 each lose 2 life at their own upkeeps (level 2) while they hold one or fewer cards.
+
+[Opening]
+Chooser: Bot1
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Bandit's Talent
+Island x13
+
+[Bot2 Deck]
+Mountain x20
+
+[Bot3 Deck]
+Mountain x20
+
+[Actions]
+Bot1.PlayFirst
+Bot2.Mulligan
+Bot3.Mulligan
+Bot2.Mulligan
+Bot3.Mulligan
+Bot2.Mulligan
+Bot3.Mulligan
+Bot2.Mulligan
+Bot3.Mulligan
+Bot2.Keep
+Bot3.Mulligan
+Bot3.Keep
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Bandit's Talent.Cast
+Bot1.Battlefield.Bandit's Talent.Activate(Ability: Level 2)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Bandit's Talent.Activate(Ability: Level 3)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+? Bot2.Hand.Count = 1
+[T3 Bot3.Main1]
+? Bot3.Hand.Count = 1
+Bot3.Hand.Mountain.Play
+[T4 Bot1.Main1]
+
+[Expect]
+# The first player draws on turn 1 of a game of more than two (CR 103.8a): one Island held, then the draw step's card and two more.
+Bot1.Hand.Count = 4
+Bot2.Hand.Count = 1
+Bot3.Hand.Count = 0
+Bot2.Life = 18
+Bot3.Life = 18

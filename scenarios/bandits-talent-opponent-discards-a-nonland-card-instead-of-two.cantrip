@@ -1,0 +1,29 @@
+# Bandit's Talent: "When this Class enters, each opponent discards two cards unless they discard a nonland card." Bot2
+# holds Lightning Bolt and six Islands; it chooses the one-card discard (CR 608.2d), and that card must be a nonland
+# card: the Island is refused (beside the Bolt it takes). One card leaves, six remain.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Bandit's Talent
+Island x17
+
+[Bot2 Deck]
+Lightning Bolt
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Bandit's Talent.Cast
+Bot2.Modes(Discard a nonland card)
+! Bot2.Choose(Island)
+Bot2.Choose(Lightning Bolt)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Lightning Bolt
+Bot2.Hand.Count = 6
+Bot1.Battlefield = Mox Jet; Mox Ruby; Bandit's Talent

@@ -1,0 +1,32 @@
+# Bandit's Talent in a three-player game: each opponent, Bot2 then Bot3 in turn order (CR 101.4), makes their own choice.
+# Bot2 holds a Lightning Bolt and takes the nonland discard; Bot3 holds only Forests, is asked nothing and discards two.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Bandit's Talent
+Island x17
+
+[Bot2 Deck]
+Lightning Bolt
+Island x19
+
+[Bot3 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Bandit's Talent.Cast
+Bot2.Modes(Discard a nonland card)
+Bot2.Choose(Lightning Bolt)
+Bot3.Choose(Forest; Forest)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Lightning Bolt
+Bot2.Hand.Count = 6
+Bot3.Graveyard = Forest; Forest
+Bot3.Hand.Count = 5

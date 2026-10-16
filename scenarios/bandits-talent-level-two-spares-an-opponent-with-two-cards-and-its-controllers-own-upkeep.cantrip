@@ -1,0 +1,45 @@
+# Bandit's Talent level 2 only hits "that player" when they have "one or fewer cards in hand": Bot2 mulligans to four
+# Mountains, the enters trigger takes two, and its two remaining cards are not "one or fewer", so its turn-2 upkeep costs
+# it nothing. The trigger is for each opponent's upkeep and not its controller's: Bot1 empties its whole hand (Black
+# Lotus, five Moxen and the Class: no cards in hand) and its own turn-3 upkeep does not cost it life either.
+
+[Opening]
+Chooser: Bot1
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Bandit's Talent
+Island x13
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.PlayFirst
+Bot2.Mulligan
+Bot2.Mulligan
+Bot2.Mulligan
+Bot2.Keep
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Bandit's Talent.Cast
+Bot1.Battlefield.Bandit's Talent.Activate(Ability: Level 2)
+[T2 Bot2.Main1]
+? Bot2.Life = 20
+? Bot2.Hand.Count = 3
+[T3 Bot1.Main1]
+
+[Expect]
+Bot2.Life = 20
+Bot1.Life = 20
+Bot1.Hand.Count = 1

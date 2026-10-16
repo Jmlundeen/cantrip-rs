@@ -1,0 +1,43 @@
+# Bandit's Talent: the draw ability is level 3's. At level 2 only, with Bot2 down to one card in hand (which costs it
+# 2 life at its upkeep), Bot1's turn-3 draw step draws just the one card of the turn.
+
+[Opening]
+Chooser: Bot1
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Bandit's Talent
+Island x13
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.PlayFirst
+Bot2.Mulligan
+Bot2.Mulligan
+Bot2.Mulligan
+Bot2.Mulligan
+Bot2.Keep
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Bandit's Talent.Cast
+Bot1.Battlefield.Bandit's Talent.Activate(Ability: Level 2)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+? Bot2.Hand.Count = 1
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Hand.Count = 1
+Bot2.Life = 18

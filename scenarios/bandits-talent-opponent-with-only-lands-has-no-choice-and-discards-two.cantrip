@@ -1,0 +1,25 @@
+# Bandit's Talent: with no nonland card in hand the "unless they discard a nonland card" choice cannot be made, so Bot2
+# (seven Islands) is asked no mode (refusal) and discards two cards.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Bandit's Talent
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Bandit's Talent.Cast
+! Bot2.Modes
+Bot2.Choose(Island; Island)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Island; Island
+Bot2.Hand.Count = 5

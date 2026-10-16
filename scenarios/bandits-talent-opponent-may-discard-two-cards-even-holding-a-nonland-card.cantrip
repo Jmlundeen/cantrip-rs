@@ -1,0 +1,27 @@
+# Bandit's Talent: the opponent may instead discard two cards, any two (ruling 2024-07-26: "two cards which may or may
+# not be nonland cards"). Bot2 holds Lightning Bolt and Islands, chooses the two-card discard and puts two Islands in
+# the graveyard, keeping the Bolt: five cards remain.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Bandit's Talent
+Island x17
+
+[Bot2 Deck]
+Lightning Bolt
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Bandit's Talent.Cast
+Bot2.Modes(Discard two cards)
+Bot2.Choose(Island; Island)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Island; Island
+Bot2.Hand = Lightning Bolt; Island; Island; Island; Island

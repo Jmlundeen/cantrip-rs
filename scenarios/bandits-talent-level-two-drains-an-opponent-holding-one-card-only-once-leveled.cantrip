@@ -1,0 +1,44 @@
+# Bandit's Talent level 2: "At the beginning of each opponent's upkeep, if that player has one or fewer cards in hand,
+# they lose 2 life." Bot2 mulligans to three Mountains (CR 103.5) and the enters trigger takes two of them, leaving one
+# card: one is "one or fewer" (CR 603.4). In Bot2's upkeep of turn 2 the Class is still level 1 and nothing is lost
+# (checked in Main1, Bot2 having played a land to keep one card); Bot1 pays {B} for Level 2 on turn 3, and in Bot2's
+# upkeep of turn 4 the one card in hand costs it 2 life.
+
+[Opening]
+Chooser: Bot1
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Bandit's Talent
+Island x17
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.PlayFirst
+Bot2.Mulligan
+Bot2.Mulligan
+Bot2.Mulligan
+Bot2.Mulligan
+Bot2.Keep
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Bandit's Talent.Cast
+[T2 Bot2.Main1]
+? Bot2.Life = 20
+? Bot2.Hand.Count = 2
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+? Bot2.Life = 20
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Bandit's Talent.Activate(Ability: Level 2)
+[T4 Bot2.Main1]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Life = 20
+Bot2.Hand.Count = 2
