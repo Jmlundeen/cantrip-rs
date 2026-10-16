@@ -1,0 +1,35 @@
+# The trigger puts the counters on Hatcher "it", the creature that dealt the damage; if it has left the battlefield by the
+# time the trigger resolves there is nothing to put them on (CR 400.7). Hatcher connects on turn 3 and Bot2 burns it with
+# Lightning Bolt with the trigger on the stack: it dies, Bot2 still took the 1 damage, and no counter is put anywhere.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Drake Hatcher
+Island x17
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Drake Hatcher.Cast
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Drake Hatcher)
+[T3 Bot1.CombatDamage]
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Drake Hatcher)
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot2.Life = 19
+Bot1.Graveyard = Drake Hatcher
+Bot1.Battlefield = Island; Mox Sapphire

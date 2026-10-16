@@ -1,0 +1,53 @@
+# Browser
+# Drake Hatcher: "Whenever this creature deals combat damage to a player, put that many incubation counters on it." On turn 3
+# it hits for 1 (one counter) and, with vigilance, stays untapped. On turn 5 casting Mox Jet (a noncreature spell) pumps it
+# with prowess to 2/4 and it hits for 2, so the counters are 3: "that many" is the damage dealt, not the number of hits.
+# "Remove three incubation counters": with one counter the ability is refused (a cost cannot be paid), with three it
+# makes a 2/2 blue flying Drake token and the counters are gone. The refusal and its control are the same line.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Drake Hatcher
+Mox Jet
+Island
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Drake Hatcher.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Drake Hatcher)
+[T3 Bot1.Main2]
+? Bot2.Life = 19
+? Bot1.Battlefield.Drake Hatcher.Counters.Incubation = 1
+? Bot1.Battlefield.Drake Hatcher.Tapped = False
+? Client.Bot1.Battlefield.Drake Hatcher.Counters = 1 × incubation
+! Bot1.Battlefield.Drake Hatcher.Activate(Ability: Create a 2/2)
+[T5 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Attack(Drake Hatcher)
+[T5 Bot1.Main2]
+? Bot2.Life = 17
+? Bot1.Battlefield.Drake Hatcher.Power = 2
+? Client.Bot1.Battlefield.Drake Hatcher.Counters = 3 × incubation
+Bot1.Battlefield.Drake Hatcher.Activate(Ability: Create a 2/2)
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Drake; Drake Hatcher; Island; Mox Jet; Mox Sapphire
+Bot1.Battlefield.Drake Hatcher.Counters.Incubation = (absent)
+Bot1.Battlefield.Drake.Token = true
+Bot1.Battlefield.Drake.Power = 2
+Bot1.Battlefield.Drake.Toughness = 2
+Bot1.Battlefield.Drake.Colors = Blue
+Bot1.Battlefield.Drake.Subtypes = Drake
+Bot1.Battlefield.Drake.Keywords = Flying

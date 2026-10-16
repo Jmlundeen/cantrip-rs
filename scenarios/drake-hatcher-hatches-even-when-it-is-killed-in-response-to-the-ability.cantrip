@@ -1,0 +1,41 @@
+# The counters are a cost (CR 602.2b), paid when the ability is activated, so the Drake is made even if Hatcher is gone
+# when it resolves: the ability on the stack is independent of its source (CR 113.7a). Hatcher hits for 1 on turns 3, 5 and
+# 7 (no spell is cast, so no prowess), making three counters. On turn 7 it removes them for the Drake, and Bot2 answers by
+# burning the 1/3 Hatcher with Lightning Bolt. Hatcher dies; the Drake still arrives.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Drake Hatcher
+Island x17
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Drake Hatcher.Cast
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Drake Hatcher)
+[T5 Bot1.Main1]
+Bot1.Attack(Drake Hatcher)
+[T7 Bot1.Main1]
+Bot1.Attack(Drake Hatcher)
+[T7 Bot1.Main2]
+? Bot1.Battlefield.Drake Hatcher.Counters.Incubation = 3
+Bot1.Battlefield.Drake Hatcher.Activate(Ability: Create a 2/2)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Drake Hatcher)
+Bot2.Pass
+[T7 Bot1.End]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Drake Hatcher
+Bot1.Battlefield = Drake; Island; Mox Sapphire

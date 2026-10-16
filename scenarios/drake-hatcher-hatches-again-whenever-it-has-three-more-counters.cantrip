@@ -1,0 +1,49 @@
+# Drake Hatcher's ability can be activated again and again, once for every three counters. On turn 3 Bot1 casts four
+# Moxen before attacking, and prowess makes Hatcher a 5/7 that hits for 5: five counters. It removes three for a Drake and
+# keeps two. On turn 5 it hits for 1 (no spell cast), making three counters again, and removes those for a second Drake.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Drake Hatcher
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mox Pearl
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Drake Hatcher.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Attack(Drake Hatcher)
+[T3 Bot1.Main2]
+? Bot2.Life = 15
+? Bot1.Battlefield.Drake Hatcher.Counters.Incubation = 5
+Bot1.Battlefield.Drake Hatcher.Activate(Ability: Create a 2/2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Drake Hatcher.Counters.Incubation = 2
+? Bot1.Battlefield.Drake.Power = 2
+[T5 Bot1.Main1]
+Bot1.Attack(Drake Hatcher)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Drake Hatcher.Counters.Incubation = 3
+Bot1.Battlefield.Drake Hatcher.Activate(Ability: Create a 2/2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 14
+Bot1.Battlefield = Drake; Drake; Drake Hatcher; Island; Mox Emerald; Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire
+Bot1.Battlefield.Drake Hatcher.Counters.Incubation = (absent)

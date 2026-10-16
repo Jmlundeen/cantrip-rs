@@ -1,0 +1,28 @@
+# Browser
+# Drake Hatcher under Bot2's control: Bot2 hits Bot1 on turn 4 for 1 and the incubation counter is put on it. The page for
+# Bot1 draws the counter on the creature on the opponent's side of the table as it does on its own (a counter is public
+# state), legibly as "1 x incubation".
+
+[Bot1 Deck]
+Island x20
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Drake Hatcher
+Island x17
+
+[Actions]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Drake Hatcher.Cast
+[T4 Bot2.Main1]
+Bot2.Attack(Drake Hatcher)
+[T4 Bot2.Main2]
+? Client.Bot1.OpponentBattlefield.Drake Hatcher.Counters = 1 × incubation
+
+[Expect]
+Bot1.Life = 19
+Bot2.Battlefield.Drake Hatcher.Counters.Incubation = 1
