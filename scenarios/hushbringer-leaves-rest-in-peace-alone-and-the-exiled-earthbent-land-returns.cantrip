@@ -1,0 +1,52 @@
+# Replacement effects are unaffected by Hushbringer (the rulings: "Leyline of the Void will still exile creatures that
+# would die"). Bot1's Badgermole Cub earthbends its Forest; Bot2 has Hushbringer and Rest in Peace out, and Bolts the
+# creature land on turn 4. Rest in Peace exiles it instead of letting it die (CR 614.1a), so it never dies, and its "When
+# this land dies or is put into exile, return it to the battlefield tapped" triggers for the exile: the Forest returns.
+# Hushbringer's own game where the sacrificed land dies, and does not return, is the contrast.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Badgermole Cub
+Forest x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Hushbringer
+Rest in Peace
+Lightning Bolt
+Plains x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Badgermole Cub.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Hushbringer.Cast
+[T4 Bot2.Main1]
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Rest in Peace.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Forest)
+[T4 Bot2.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Forest; Mox Emerald; Badgermole Cub
+Bot1.Battlefield.Forest.Tapped = true
+Bot1.Battlefield.Forest.Types = Land
+Bot1.Graveyard.Count = 0
+Exile = Lightning Bolt
