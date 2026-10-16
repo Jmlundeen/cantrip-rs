@@ -1,5 +1,10 @@
 use cantrip_api::*;
-use cantrip_mechanics::{attach::{attach_to_target, attached_object, equip}, targets, triggers::THIS_ENTERS};
+use cantrip_mechanics::{
+    attach::{attach_to_target, attached_object, equip},
+    statics::{have_double_strike_and_trample, plus_pt},
+    targets,
+    triggers::THIS_ENTERS,
+};
 use cantrip_oracle as oracle;
 
 /// This spell costs {1} less to cast for each attacking creature you control (CR 601.2f, 506.4): generic mana only,
@@ -17,10 +22,6 @@ fn cheaper_per_attacker(q: &dyn Query, _: ObjectId, player: PlayerId, costed: Co
     CostDelta::less(attackers.min(255) as u8)
 }
 
-fn double_strike_and_trample(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.keywords = chars.keywords.with(Keyword::DoubleStrike).with(Keyword::Trample);
-}
-
 pub static CARD: CardDef = CardDef {
     own_cost_changes: &[cheaper_per_attacker],
     abilities: &[
@@ -29,8 +30,8 @@ pub static CARD: CardDef = CardDef {
         equip(mana("{3}"), "Equip {3}"),
     ],
     statics: &[
-        static_ability(Layer::PtModify, attached_object, cantrip_mechanics::statics::plus_pt::<1, 1>, "Equipped creature gets +1/+1."),
-        static_ability(Layer::Ability, attached_object, double_strike_and_trample, "Equipped creature has double strike and trample."),
+        static_ability(Layer::PtModify, attached_object, plus_pt::<1, 1>, "Equipped creature gets +1/+1."),
+        static_ability(Layer::Ability, attached_object, have_double_strike_and_trample, "Equipped creature has double strike and trample."),
     ],
     ..oracle::EMBERCLEAVE
 };

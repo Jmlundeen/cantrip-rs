@@ -55,6 +55,18 @@ pub fn have_trample(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.keywords = chars.keywords.with(Keyword::Trample);
 }
 
+/// "... has double strike and trample" (CR 702.4, 702.19, layer 6) as a static ability's `StaticDef::apply`. Embercleave and
+/// Leyline Axe print it.
+pub fn have_double_strike_and_trample(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
+    chars.keywords = chars.keywords.with(Keyword::DoubleStrike).with(Keyword::Trample);
+}
+
+/// "... gets +1/+1" (CR 613.4c, layer 7c) as a static ability's `StaticDef::apply`. Embercleave and Leyline Axe print it.
+pub fn get_plus_one_plus_one(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
+    chars.power = chars.power.map(|v| v + 1);
+    chars.toughness = chars.toughness.map(|v| v + 1);
+}
+
 /// The permanent an event put onto the battlefield (CR 603.6a): a zone change to the battlefield, a token's creation
 /// included. What stops "[permanents] entering" from causing abilities to trigger asks it of the event, then judges the
 /// permanent as it exists on the battlefield (`Query::chars` of the new object: copy effects and the other continuous effects
