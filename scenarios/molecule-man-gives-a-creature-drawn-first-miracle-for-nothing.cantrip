@@ -1,0 +1,42 @@
+# Molecule Man: "Nonland cards in your hand have miracle {0}." Llanowar Elves, the first card Bot1 draws on turn 5, is
+# revealed as it is drawn (CR 702.94a) and cast for {0} as the linked ability resolves: no mana is spent, and every
+# mana source Bot1 has is still untapped.
+[Bot1 Deck]
+Mountain
+Sol Ring
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Molecule Man
+Plains
+Plains
+Llanowar Elves
+Plains x15
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Molecule Man.Cast
+
+[T5 Bot1.Draw]
+Bot1.Accept
+? Bot1.Revealed = Llanowar Elves
+Bot1.Accept
+[T5 Bot1.Main1]
+[Expect]
+Bot1.Battlefield.Llanowar Elves.SummoningSick = true
+Bot1.Battlefield.Sol Ring.Tapped = false
+Bot1.Battlefield.Mountain.Tapped = false
+Bot1.Hand = Plains

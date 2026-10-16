@@ -1,0 +1,38 @@
+# Molecule Man gives miracle only to nonland cards: an Island, the first card Bot1 draws on turn 5, has none, so Bot1 is
+# not asked to reveal it. The positive control is molecule-man-gives-a-creature-drawn-first-miracle-for-nothing.
+[Bot1 Deck]
+Mountain
+Sol Ring
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Molecule Man
+Plains
+Plains
+Island
+Plains x15
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Molecule Man.Cast
+
+[T5 Bot1.Upkeep]
+Bot1.Pass
+! Bot1.Accept
+[T5 Bot1.Main1]
+[Expect]
+Stack.Count = 0
+Bot1.Hand = Plains; Island

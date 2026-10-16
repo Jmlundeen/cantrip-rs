@@ -1,0 +1,8 @@
+{
+  "name": "Molecule Man",
+  "manaCost": "{6}",
+  "type": "Legendary Creature — Human Villain",
+  "power": 5,
+  "toughness": 5,
+  "oracleText": "Nonland cards in your hand have miracle {0}. (You may cast a card for its miracle cost when you draw it if it's the first card you drew this turn.)"
+}

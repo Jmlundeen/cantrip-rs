@@ -1,0 +1,44 @@
+# The same choice the other way: Bot1 reveals Metamorphosis Fanatic with its own miracle, and its linked ability asks the
+# card's own cost (CR 607.5), not Molecule Man's {0}: Bot1 pays {1}{B} out of {C}{C}{B} from Sol Ring and a Swamp,
+# leaving {C}.
+[Bot1 Deck]
+Mountain
+Sol Ring
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Molecule Man
+Swamp
+Plains
+Metamorphosis Fanatic
+Plains x15
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Molecule Man.Cast
+
+[T5 Bot1.Draw]
+Bot1.Accept
+Bot1.Modes(Its own)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Accept
+? Bot1.Mana = {C}
+[T5 Bot1.Main1]
+[Expect]
+Bot1.Battlefield.Metamorphosis Fanatic.SummoningSick = true
+Bot1.Battlefield.Sol Ring.Tapped = true
+Bot1.Hand = Plains

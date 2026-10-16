@@ -1,0 +1,42 @@
+# Metamorphosis Fanatic has miracle {1}{B} of its own and Molecule Man gives it miracle {0}: two miracle abilities, each
+# linked to its own triggered ability (CR 607.5). Bot1 reveals it with Molecule Man's and casts it for nothing, so Sol
+# Ring and the lands stay untapped; nothing is in Bot1's graveyard, so the Fanatic returns nothing.
+[Bot1 Deck]
+Mountain
+Sol Ring
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Molecule Man
+Plains
+Plains
+Metamorphosis Fanatic
+Plains x15
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Molecule Man.Cast
+
+[T5 Bot1.Draw]
+Bot1.Accept
+Bot1.Modes(Molecule Man)
+Bot1.Accept
+[T5 Bot1.Main1]
+[Expect]
+Bot1.Battlefield.Metamorphosis Fanatic.SummoningSick = true
+Bot1.Battlefield.Sol Ring.Tapped = false
+Bot1.Battlefield.Mountain.Tapped = false
+Bot1.Hand = Plains

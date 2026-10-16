@@ -1,0 +1,51 @@
+# Lorehold, the Historian gives Hop to It miracle {2} and Molecule Man gives it miracle {0}: Bot1 says which it is revealed
+# with (CR 607.5) and takes Molecule Man's, so it is cast for nothing and Sol Ring stays untapped. Bot1 declines Lorehold's
+# discard in Bot2's turn 4 upkeep, and has no card to discard in the next.
+[Bot1 Deck]
+Mountain
+Sol Ring
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Lorehold, the Historian
+Plains
+Molecule Man
+Plains
+Hop to It
+Plains x15
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Lorehold, the Historian.Cast
+[T4 Bot2.Upkeep]
+Bot1.Choose()
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Hand.Molecule Man.Cast
+[T7 Bot1.Draw]
+Bot1.Accept
+Bot1.Modes(Molecule Man)
+Bot1.Accept
+[T7 Bot1.Main1]
+[Expect]
+Bot1.Graveyard = Hop to It
+Bot1.Battlefield.Rabbit#3.Token = true
+Bot1.Battlefield.Sol Ring.Tapped = false
+Bot1.Hand.Count = 0
