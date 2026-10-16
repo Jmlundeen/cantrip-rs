@@ -2,7 +2,8 @@
 # target creature you control. It gains flying until end of turn." Bot1 web-slings it on turn 3 for {1}{G}{W} (Forest,
 # Plains, and Llanowar Elves tapped for {G} and returned, CR 601.2g, 702.188a), then casts the Elves again with Mox
 # Emerald: the trigger targets Spider-Man India, the only creature Bot1 controls (the Elves are still a spell), and it
-# becomes a 5/5 flier. On turn 5 the counter stays.
+# becomes a 5/5 flier. Mox Emerald, a noncreature spell, triggers nothing, and neither does Bot2's Ornithopter on turn 4,
+# a creature spell Bot1 didn't cast. On turn 5 the flying is gone (CR 514.2) and the one counter stays.
 
 [Bot1 Deck]
 Forest
@@ -13,7 +14,9 @@ Mox Emerald
 Forest x15
 
 [Bot2 Deck]
-Island x20
+Island
+Ornithopter
+Island x18
 
 [Actions]
 Bot1.Hand.Forest.Play
@@ -28,16 +31,23 @@ Bot1.Battlefield.Plains.Activate
 Bot1.Choose(Llanowar Elves)
 [T3 Bot1.Main2]
 Bot1.Hand.Mox Emerald.Cast
+? Stack = Mox Emerald
 Bot1.Battlefield.Mox Emerald.Activate
 Bot1.Hand.Llanowar Elves.Cast
 [T3 Bot1.End]
 ? Bot1.Battlefield.Spider-Man India.Counters.PlusOnePlusOne = 1
 ? Bot1.Battlefield.Spider-Man India.Keywords = Flying
 ? Bot1.Battlefield.Spider-Man India.Power = 5
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+? Stack = Ornithopter
 [T5 Bot1.Main1]
 
 [Expect]
 Turn = 5
 Bot1.Battlefield = Forest; Plains; Spider-Man India; Mox Emerald; Llanowar Elves
 Bot1.Battlefield.Spider-Man India.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Spider-Man India.Keywords = (absent)
 Bot1.Battlefield.Spider-Man India.Toughness = 5
+Bot2.Battlefield = Island; Ornithopter
