@@ -664,11 +664,12 @@ pub enum CounterKind {
     Silver = 27,
     Chorus = 28,
     Burden = 29,
+    Incubation = 30,
 }
 
 impl CounterKind {
-    pub const COUNT: usize = 30;
-    pub const ALL: [CounterKind; 30] = [CounterKind::PlusOne, CounterKind::MinusOne, CounterKind::Loyalty, CounterKind::Time, CounterKind::Lore, CounterKind::Stun, CounterKind::Charge, CounterKind::Defense, CounterKind::Finality, CounterKind::Flying, CounterKind::Lifelink, CounterKind::Indestructible, CounterKind::Hexproof, CounterKind::Corpse, CounterKind::Fade, CounterKind::Level, CounterKind::Story, CounterKind::Wish, CounterKind::Rev, CounterKind::Mining, CounterKind::Influence, CounterKind::Oil, CounterKind::Shield, CounterKind::Fellowship, CounterKind::Hope, CounterKind::Void, CounterKind::Luck, CounterKind::Silver, CounterKind::Chorus, CounterKind::Burden];
+    pub const COUNT: usize = 31;
+    pub const ALL: [CounterKind; 31] = [CounterKind::PlusOne, CounterKind::MinusOne, CounterKind::Loyalty, CounterKind::Time, CounterKind::Lore, CounterKind::Stun, CounterKind::Charge, CounterKind::Defense, CounterKind::Finality, CounterKind::Flying, CounterKind::Lifelink, CounterKind::Indestructible, CounterKind::Hexproof, CounterKind::Corpse, CounterKind::Fade, CounterKind::Level, CounterKind::Story, CounterKind::Wish, CounterKind::Rev, CounterKind::Mining, CounterKind::Influence, CounterKind::Oil, CounterKind::Shield, CounterKind::Fellowship, CounterKind::Hope, CounterKind::Void, CounterKind::Luck, CounterKind::Silver, CounterKind::Chorus, CounterKind::Burden, CounterKind::Incubation];
 
     /// The counter's name as Oracle text writes it (CR 122.1).
     pub fn name(self) -> &'static str {
@@ -703,6 +704,7 @@ impl CounterKind {
             CounterKind::Silver => "silver",
             CounterKind::Chorus => "chorus",
             CounterKind::Burden => "burden",
+            CounterKind::Incubation => "incubation",
         }
     }
 
@@ -739,6 +741,7 @@ impl CounterKind {
             CounterKind::Silver => "Silver",
             CounterKind::Chorus => "Chorus",
             CounterKind::Burden => "Burden",
+            CounterKind::Incubation => "Incubation",
         }
     }
 
