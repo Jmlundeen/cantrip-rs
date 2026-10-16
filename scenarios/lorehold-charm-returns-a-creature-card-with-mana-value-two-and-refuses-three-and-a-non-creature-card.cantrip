@@ -1,0 +1,40 @@
+# Lorehold Charm, second mode: "Return target artifact or creature card with mana value 2 or less from your graveyard to the
+# battlefield." Faithless Looting leaves three cards in Bot1's graveyard: Misshapen Fiend (a creature card with mana value
+# exactly 2, the boundary), Simian Spirit Guide (a creature card with mana value 3, refused) and Faithless Looting itself (neither
+# artifact nor creature, refused). Only the Fiend is chosen and it returns to the battlefield under Bot1's control; the
+# other two stay.
+
+[Bot1 Deck]
+Mox Ruby
+Faithless Looting
+Simian Spirit Guide
+Misshapen Fiend
+Lorehold Charm
+Mox Pearl
+Mox Jet
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Simian Spirit Guide; Misshapen Fiend)
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Lorehold Charm.Cast
+Bot1.Modes(Return target artifact or creature card)
+! Bot1.Target(Simian Spirit Guide)
+! Bot1.Target(Faithless Looting)
+Bot1.Target(Misshapen Fiend)
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Ruby; Mox Pearl; Misshapen Fiend
+Bot1.Graveyard = Lorehold Charm; Faithless Looting; Simian Spirit Guide
+Bot1.Battlefield.Misshapen Fiend.Tapped = false

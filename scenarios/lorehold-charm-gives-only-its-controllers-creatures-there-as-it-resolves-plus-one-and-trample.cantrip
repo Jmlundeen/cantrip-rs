@@ -1,0 +1,44 @@
+# Lorehold Charm, third mode: "Creatures you control get +1/+1 and gain trample until end of turn." Bot1's first Ornithopter
+# becomes a 1/3 with trample; Bot2's Ornithopter is not Bot1's and stays 0/2 without trample; a second Ornithopter Bot1 casts after
+# the charm resolved is not affected (CR 611.2c). At the next turn the first one is a 0/2 without trample again (CR 514.2).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Ornithopter
+Lorehold Charm
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Lorehold Charm.Cast
+Bot1.Modes(Creatures you control get)
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Power = 1
+? Bot1.Battlefield.Ornithopter.Toughness = 3
+? Bot1.Battlefield.Ornithopter.Keywords = Flying; Trample
+? Bot2.Battlefield.Ornithopter.Power = 0
+? Bot2.Battlefield.Ornithopter.Toughness = 2
+? Bot2.Battlefield.Ornithopter.Keywords = Flying
+Bot1.Hand.Ornithopter.Cast
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter#2.Power = 0
+? Bot1.Battlefield.Ornithopter#2.Keywords = Flying
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Ornithopter#1.Power = 0
+Bot1.Battlefield.Ornithopter#1.Toughness = 2
+Bot1.Battlefield.Ornithopter#1.Keywords = Flying

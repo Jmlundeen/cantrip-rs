@@ -1,0 +1,52 @@
+# Lorehold Charm, second mode, an artifact card: Sol Ring (mana value 1) and Ornithopter (mana value 0, an artifact creature) are
+# in Bot1's graveyard after Faithless Looting. First charm targets Sol Ring, which returns untapped. After that, a second
+# Lorehold Charm targets Ornithopter and Bot2 exiles Ornithopter with Ghost Vacuum in response: the only target is illegal on
+# resolution so the spell does nothing (CR 608.2b) and the Ornithopter stays in exile.
+
+[Bot1 Deck]
+Mox Ruby
+Faithless Looting
+Sol Ring
+Ornithopter
+Lorehold Charm
+Lorehold Charm
+Mox Pearl
+Mox Jet
+Island x20
+
+[Bot2 Deck]
+Ghost Vacuum
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Sol Ring; Ornithopter)
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Ghost Vacuum.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Lorehold Charm.Cast
+Bot1.Modes(Return target artifact or creature card)
+Bot1.Target(Sol Ring)
+Bot2.Pass
+? Bot1.Battlefield.Sol Ring.Tapped = false
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Lorehold Charm.Cast
+Bot1.Modes(Return target artifact or creature card)
+Bot1.Target(Ornithopter)
+Bot2.Battlefield.Ghost Vacuum.Activate(Ornithopter)
+Bot2.Pass
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Ruby; Mox Pearl; Sol Ring
+Exile = Ornithopter

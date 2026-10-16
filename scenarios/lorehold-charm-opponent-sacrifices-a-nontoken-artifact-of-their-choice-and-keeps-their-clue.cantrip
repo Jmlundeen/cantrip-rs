@@ -1,0 +1,43 @@
+# Lorehold Charm, first mode: "Each opponent sacrifices a nontoken artifact of their choice." Bot2 controls two Moxen, a Clue
+# token (a token artifact, from Thraben Inspector's investigate) and the Inspector (a creature, not an artifact). The Clue is
+# refused as a choice (a token), Mox Jet is chosen and sacrificed: Mox Sapphire, the Clue and the Inspector stay. Bot1's own
+# artifacts are untouched (Bot1's Mox Ruby and Mox Pearl). Bot1's graveyard is empty, so the return mode has no legal target and
+# cannot be chosen, beside the first mode, which can.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Lorehold Charm
+Island x20
+
+[Bot2 Deck]
+Plains
+Thraben Inspector
+Mox Jet
+Mox Sapphire
+Plains x14
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Thraben Inspector.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Lorehold Charm.Cast
+! Bot1.Modes(Return target artifact or creature card)
+Bot1.Modes(Each opponent sacrifices)
+! Bot2.Choose(Clue Token)
+! Bot2.Choose(Thraben Inspector)
+Bot2.Choose(Mox Jet)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Clue Token; Plains; Mox Sapphire; Thraben Inspector
+Bot2.Graveyard = Mox Jet
+Bot1.Battlefield = Mox Ruby; Mox Pearl

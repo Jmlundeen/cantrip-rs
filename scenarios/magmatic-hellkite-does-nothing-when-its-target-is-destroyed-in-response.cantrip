@@ -1,6 +1,6 @@
 # Magmatic Hellkite: its trigger targets Bazaar of Baghdad (Bot2 also has Wasteland, so the choice is asked); in response
 # Bot2 sacrifices Wasteland to destroy that Bazaar. The target is illegal as the ability tries to resolve, so it does not
-# resolve (CR 608.2b, ruling 2022-10-14): no search is offered to anyone and Bot2's library is untouched.
+# resolve (CR 608.2b): no search is offered to anyone and Bot2's library is untouched.
 
 [Bot1 Deck]
 Mountain

@@ -1,4 +1,4 @@
-# Magmatic Hellkite: the search does not depend on the land having been destroyed (ruling 2022-10-14). In response to the
+# Magmatic Hellkite: the search does not depend on the land having been destroyed. In response to the
 # trigger Bot2 animates Creeping Tar Pit and makes it indestructible until end of turn (Revitalizing Repast), so the destroy does
 # nothing, yet Bot2, its controller, still searches and puts a Forest onto the battlefield tapped with a stun counter.
 # The Tar Pit stays on the battlefield; Bot1 searches nothing.
