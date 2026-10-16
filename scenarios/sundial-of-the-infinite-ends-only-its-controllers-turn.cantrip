@@ -1,0 +1,42 @@
+# "Activate only during your turn" (CR 602.5b): on Bot2's turn 2 Bot1 has an untapped Island and Sundial of the Infinite
+# but is not offered the ability. On its own turn 3 it is: Bot2 casts Lightning Bolt at Bot1 in Bot1's main phase, and Bot1
+# answers with Sundial. The turn ends (CR 724.1): the Bolt is exiled with the Sundial's ability (724.1b), so Bot1 stays at
+# 20, and turn 4 is Bot2's.
+
+[Bot1 Deck]
+Island
+Mox Jet
+Mox Pearl
+Sundial of the Infinite
+Island x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sundial of the Infinite.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Pass
+! Bot1.Battlefield.Sundial of the Infinite.Activate
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Sundial of the Infinite.Activate
+[T4 Bot2.Upkeep]
+
+[Expect]
+Turn = 4
+Bot1.Life = 20
+Exile = Lightning Bolt
+Bot1.Battlefield.Sundial of the Infinite.Tapped = true
+Bot2.Graveyard.Count = 0

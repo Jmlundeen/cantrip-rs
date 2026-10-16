@@ -1,0 +1,62 @@
+# An effect that ends the turn during the cleanup step begins a new cleanup step (CR 724.1d). Bot1 refills its hand with
+# Wheel of Fortune and Ancestral Recall and ends turn 3 with nine cards: it discards two at cleanup, which triggers
+# Marauding Mako, so players get priority in the cleanup step (CR 514.3a). Bot1 activates Sundial of the Infinite there
+# (it is still Bot1's turn): the Mako's ability is exiled from the stack (724.1b) and never puts its counters on. A new
+# cleanup step begins, in which Bot1, at seven cards, discards nothing and nothing triggers, so no one gets priority and
+# turn 4 is Bot2's.
+
+[Bot1 Deck]
+Mountain
+Mox Jet
+Mox Pearl
+Sundial of the Infinite
+Marauding Mako
+Mox Ruby
+Mox Sapphire
+Wheel of Fortune
+Ancestral Recall
+Island x20
+
+[Bot2 Deck]
+Plains x30
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sundial of the Infinite.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Marauding Mako.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Wheel of Fortune.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 9
+Bot1.Discard(Island; Island)
+? Step = Cleanup
+? Stack.Count = 1
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Sundial of the Infinite.Activate
+[T4 Bot2.Upkeep]
+
+[Expect]
+Turn = 4
+Bot1.Battlefield.Marauding Mako.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Marauding Mako.Power = 1
+Bot1.Battlefield.Sundial of the Infinite.Tapped = true
+Bot1.Hand.Count = 7
