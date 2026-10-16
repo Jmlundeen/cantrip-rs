@@ -1,0 +1,27 @@
+# Adventurer's Inn: "When this land enters, you gain 2 life." and "{T}: Add {C}." It enters untapped, so on the turn it is
+# played Bot1 taps it for {C} and casts Sol Ring ({1}) with it. Bot1 20 -> 22.
+
+[Bot1 Deck]
+Adventurer's Inn
+Sol Ring
+Plains x18
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Adventurer's Inn.Play
+Bot1.Pass
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Adventurer's Inn.Activate
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot2.Life = 20
+Bot1.Battlefield.Adventurer's Inn.Tapped = true
+Bot1.Battlefield.Adventurer's Inn.Subtypes = Town
+Bot1.Battlefield.Sol Ring.Tapped = false
+Bot1.Mana = 
+Stack.Count = 0

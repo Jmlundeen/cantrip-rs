@@ -1,0 +1,28 @@
+# The enters trigger is independent of its source (CR 603.3, 608.2): Bot2 sacrifices its Strip Mine to destroy Bot1's Adventurer's
+# Inn in response to the trigger, and the trigger still resolves, so Bot1 gains 2 life although the Inn is in the graveyard.
+# Bot2's Strip Mine is played on turn 2 and Bot1 plays the Inn on turn 3.
+
+[Bot1 Deck]
+Adventurer's Inn
+Plains x19
+
+[Bot2 Deck]
+Strip Mine
+Plains x19
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Strip Mine.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Adventurer's Inn.Play
+Bot1.Pass
+Bot2.Battlefield.Strip Mine.Activate(Ability: Destroy target land; Bot1.Battlefield.Adventurer's Inn)
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot1.Graveyard = Adventurer's Inn
+Bot1.Battlefield.Count = 0
+Bot2.Graveyard = Strip Mine
+Stack.Count = 0

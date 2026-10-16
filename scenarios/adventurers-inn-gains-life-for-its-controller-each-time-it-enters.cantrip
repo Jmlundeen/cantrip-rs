@@ -1,0 +1,22 @@
+# The life is gained by the Inn's controller: each player who plays one gains 2. Bot1 plays its Inn on turn 1 and Bot2 its
+# own on turn 2, so both end at 22 (Bot2's Inn does nothing for Bot1).
+
+[Bot1 Deck]
+Adventurer's Inn
+Plains x19
+
+[Bot2 Deck]
+Adventurer's Inn
+Plains x19
+
+[Actions]
+Bot1.Hand.Adventurer's Inn.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Adventurer's Inn.Play
+? Bot1.Life = 22
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot2.Life = 22
+Stack.Count = 0

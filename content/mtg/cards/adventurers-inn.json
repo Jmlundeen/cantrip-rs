@@ -1,0 +1,5 @@
+{
+  "name": "Adventurer's Inn",
+  "type": "Land — Town",
+  "oracleText": "When this land enters, you gain 2 life.\n{T}: Add {C}."
+}
