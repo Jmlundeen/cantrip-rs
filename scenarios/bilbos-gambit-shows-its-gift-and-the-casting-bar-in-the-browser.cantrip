@@ -1,0 +1,47 @@
+# Browser
+# As a person sees it: the gift question names the Treasure, and once the Gambit has resolved with the gift promised both
+# pages say that nobody can cast spells this turn (an effect on the players, CR 611.2c), "You" for the viewer and "They"
+# for the opponent, beside the life totals. Bot2 gets its Treasure and the Bolt is back in its hand.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Bilbo's Gambit
+Plains x15
+
+[Bot2 Deck]
+Mox Ruby
+Mox Ruby
+Lightning Bolt
+Plains x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Bilbo's Gambit.Cast
+? Client.Bot1.Prompt.Title = Bilbo's Gambit: promise an opponent a Treasure?
+? Client.Bot1.Prompt.Detail = They create a Treasure token before the spell's other effects, and the card does more if you do
+? Client.Bot1.Facts =
+Bot1.Accept
+Bot1.Target(Stack.Lightning Bolt)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Client.Bot1.Facts = You can't cast spells this turn
+? Client.Bot1.OpponentFacts = They can't cast spells this turn
+! Bot2.Hand.Lightning Bolt.Cast
+
+[Expect]
+Bot1.Life = 20
+Bot2.Battlefield = Mox Ruby; Mox Ruby; Treasure Token
+Bot2.Hand.Count = 6

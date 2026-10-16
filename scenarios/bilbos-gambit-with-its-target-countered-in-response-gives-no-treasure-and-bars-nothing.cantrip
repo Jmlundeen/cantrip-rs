@@ -1,0 +1,56 @@
+# CR 608.2b: Bot1 casts Bilbo's Gambit promising the gift at Bot2's Lightning Bolt, and Bot2 counters its own Bolt with
+# Counterspell. The Gambit's only target is gone, so it doesn't resolve: the gift is not given (Bot2 gets no Treasure),
+# nothing is returned, and the rest of its effects do not happen (Bot2 casts Mox Pearl afterwards, which "players can't
+# cast spells this turn" would forbid). The Bolt is in Bot2's graveyard, the Gambit in Bot1's.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Bilbo's Gambit
+Plains x15
+
+[Bot2 Deck]
+Mox Ruby
+Mox Sapphire
+Mox Sapphire
+Lightning Bolt
+Counterspell
+Mox Pearl
+Plains x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Bilbo's Gambit.Cast
+Bot1.Accept
+Bot1.Target(Stack.Lightning Bolt)
+Bot1.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Sapphire#2.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Lightning Bolt)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Bot2.Battlefield = Mox Ruby; Mox Sapphire; Mox Sapphire
+Bot2.Hand.Mox Pearl.Cast
+Bot1.Pass
+
+[Expect]
+Bot1.Life = 20
+Bot1.Graveyard = Bilbo's Gambit
+Bot2.Graveyard = Counterspell; Lightning Bolt
+Bot2.Battlefield = Mox Ruby; Mox Sapphire; Mox Sapphire; Mox Pearl
