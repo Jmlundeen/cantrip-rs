@@ -1,0 +1,62 @@
+# Twinflame Travelers' "Elemental" is a word of its text (CR 612): Artificial Evolution replacing Elemental with Merfolk in
+# it makes it a Merfolk Sorcerer whose rule reads "another Merfolk you control". Casting the Evolution on turn 3, still
+# under the old text, makes Hydro-Man, Fluid Felon's "Whenever you cast a blue spell, if Hydro-Man is a creature, he gets
+# +1/+1" trigger twice; Emry, Lurker of the Loch, a blue spell cast after the change, once (Hydro-Man 5/5). Emry, a
+# Merfolk, then enters and its "mill four cards" triggers twice: eight cards milled.
+# Turn 1: Black Lotus (UUU) pays Hydro-Man's {U}{U}; the floating {U}, Mox Ruby, Mox Sapphire and the Volcanic Island pay
+# the Travelers. Turn 3: Mox Sapphire pays the Evolution; Emry costs {U} with two artifacts (the Moxen), paid by the
+# Volcanic Island. Bot1's graveyard: the Lotus, the Evolution and eight milled.
+
+[Bot1 Deck]
+Volcanic Island
+Black Lotus
+Mox Ruby
+Mox Sapphire
+Hydro-Man, Fluid Felon
+Twinflame Travelers
+Artificial Evolution
+Emry, Lurker of the Loch
+Island x14
+
+[Bot2 Deck]
+Swamp x16
+
+[Actions]
+Bot1.Hand.Volcanic Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Hydro-Man, Fluid Felon.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Volcanic Island.Activate(Ability: {R})
+Bot1.Hand.Twinflame Travelers.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Twinflame Travelers)
+Bot1.Triggers(Hydro-Man, Fluid Felon; Hydro-Man, Fluid Felon)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Elemental)
+Bot1.Modes(Merfolk)
+? Bot1.Battlefield.Twinflame Travelers.Subtypes = Merfolk; Sorcerer
+Bot1.Battlefield.Volcanic Island.Activate(Ability: {U})
+Bot1.Hand.Emry, Lurker of the Loch.Cast
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Triggers(Emry, Lurker of the Loch; Emry, Lurker of the Loch)
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Hydro-Man, Fluid Felon.Power = 5
+Bot1.Graveyard.Count = 10

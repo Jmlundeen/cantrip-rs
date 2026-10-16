@@ -1,0 +1,54 @@
+# Twinflame Travelers doubles triggered abilities of another ELEMENTAL you control (CR 603.2d), not of your other
+# permanents. Turn 1: Hydro-Man, Fluid Felon (an Elemental) and the Travelers. Turn 3: Aunt May, a Human Citizen, then an
+# Ornithopter: Aunt May's "Whenever another creature you control enters, you gain 1 life" triggers once (21). Turn 5,
+# the control: Consider, a blue instant, makes Hydro-Man's "Whenever you cast a blue spell, if Hydro-Man is a creature, he
+# gets +1/+1" trigger twice - a 4/4.
+# Turn 1: Black Lotus (UUU) pays Hydro-Man's {U}{U}; the floating {U}, Mox Ruby, Mox Sapphire and Mox Pearl pay the
+# Travelers. Turn 3: Mox Pearl pays Aunt May. Turn 5: Mox Sapphire pays Consider.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Sapphire
+Mox Pearl
+Hydro-Man, Fluid Felon
+Twinflame Travelers
+Aunt May
+Ornithopter
+Consider
+Island x12
+
+[Bot2 Deck]
+Swamp x16
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Hydro-Man, Fluid Felon.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Twinflame Travelers.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Aunt May.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main2]
+? Bot1.Life = 21
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Consider.Cast
+Bot1.Triggers(Hydro-Man, Fluid Felon; Hydro-Man, Fluid Felon)
+[T5 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 21
+Bot1.Battlefield.Hydro-Man, Fluid Felon.Power = 4
+Bot1.Battlefield.Hydro-Man, Fluid Felon.Toughness = 4
