@@ -41,7 +41,7 @@ static SIX_ARTIFACTS: Materials = craft::materials(6, false, craft::artifact, "a
 /// "Up to one other target double-faced artifact you control."
 fn other_double_faced_artifact_you_control(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     matches!(t, Target::Object(id)
-        if id != asker.source && is_live(q, id) && q.is_on_battlefield(id) && q.controller(id) == asker.controller
+        if id != asker.source && cantrip_mechanics::targets::permanent(q, id) && q.controller(id) == asker.controller
             && double_faced_artifact(q, id))
 }
 
