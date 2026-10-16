@@ -1,0 +1,36 @@
+# Gift a Treasure promised, the target is Bot1's own Ornithopter: the 3 damage goes to that creature's controller, which is Bot1 (a creature's controller, not the opponent
+# the gift went to). Bot2 creates the Treasure, the Ornithopter dies, Bot1 is at 17.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Blooming Blast
+Ornithopter
+Plains x18
+
+[Bot2 Deck]
+Ornithopter
+Mountain
+Lightning Bolt
+Plains x17
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Blooming Blast.Cast
+Bot1.Accept
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 17
+Bot2.Life = 20
+Bot1.Graveyard = Ornithopter; Blooming Blast
+Bot2.Battlefield = Treasure Token

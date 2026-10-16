@@ -1,0 +1,36 @@
+# Gift not promised: Blooming Blast deals 2 damage to the Ornithopter and nothing to its controller, and Bot2 creates no Treasure.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Blooming Blast
+Plains x18
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Plains x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Blooming Blast.Cast
+Bot1.Decline
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Blooming Blast
+Bot1.Battlefield = Mountain; Mox Ruby
+Bot2.Battlefield =
+Bot2.Graveyard = Ornithopter
+Bot2.Life = 20
