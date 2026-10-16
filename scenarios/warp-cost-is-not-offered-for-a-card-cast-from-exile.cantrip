@@ -1,0 +1,56 @@
+# Known bug: a warped card in exile that its owner may cast on a later turn is offered a second cast for its warp cost; warp is "cast this card from your hand for its warp cost" (CR 702.185a) and the way is a hand-only one (actions.rs lets any hand way through for a card cast by permission from another zone).
+# Nova Hellkite is cast for its warp cost {2}{R} on turn 3 and exiled at the end step. On turn 5 it is castable from exile, but
+# only for its mana cost {3}{R}{R}: the warp way must not be offered there, so `! Bot1.Exile.Nova Hellkite.Cast(Ability: Warp)`
+# must hold beside the positive control, the plain cast for the mana cost, on the next line.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mountain
+Nova Hellkite
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Elvish Mystic
+Forest x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Nova Hellkite.Cast(Ability: Warp)
+Bot1.Target(Llanowar Elves)
+[T4 Bot2.Main1]
+? Exile = Nova Hellkite
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+! Bot1.Exile.Nova Hellkite.Cast(Ability: Warp)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Exile.Nova Hellkite.Cast
+
+[Expect]
+Bot1.Battlefield.Nova Hellkite.Power = 4
+Exile.Count = 0

@@ -151,3 +151,20 @@ Resonance, Lutri, storm and replicate copies). A fix has `retarget` take the spe
 
 **Scenarios.**
 - [`scenarios/restoration-magic-copy-may-be-aimed-at-a-new-target.cantrip`](../scenarios/restoration-magic-copy-may-be-aimed-at-a-new-target.cantrip) - the copy of a Cura aimed at a Plains (marked `# Known bug`).
+
+### KI-10: A warped card cast from exile is offered its warp cost again
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Medium | Open | engine | 2026-10-16, Nova Hellkite |
+
+**Notes.** Warp is "you may cast this card from your hand for its warp cost" (CR 702.185a), and a card exiled by warp is cast on
+a later turn only for its mana cost. In `crates/cantrip-rules/src/actions.rs` (the loop over `def.ways` in the cast options)
+`elsewhere` lets any way whose `from` is the hand be offered for a card cast by permission from another zone (Yawgmoth's Will,
+Retrace, Adventure), which is right for Daze or Fireblast but not for a way the keyword limits to the hand. The warped card
+in exile is therefore offered both `CastSpell #0` and `CastSpell #1 Warp {2}{R}`; the second would put a second delayed exile
+trigger on it. Affects every warp card (Quantum Riddler, Pinnacle Emissary, Haliya, Nova Hellkite). A fix keeps `WayKind::Warp`
+out of `elsewhere`.
+
+**Scenarios.**
+- [`scenarios/warp-cost-is-not-offered-for-a-card-cast-from-exile.cantrip`](../scenarios/warp-cost-is-not-offered-for-a-card-cast-from-exile.cantrip) - Nova Hellkite in exile, `! Exile.Cast(Ability: Warp)` (marked `# Known bug`).

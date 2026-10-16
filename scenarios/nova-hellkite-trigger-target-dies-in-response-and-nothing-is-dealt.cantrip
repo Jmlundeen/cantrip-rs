@@ -1,0 +1,55 @@
+# Nova Hellkite's enters trigger has the lone Llanowar Elves as its target (chosen automatically, as the only creature an
+# opponent controls). Bot2 answers with Lightning Bolt on its own Elves while the trigger is on the stack, so the target is gone
+# when the trigger resolves and it does nothing (CR 608.2b): the Hellkite is untouched, no damage is dealt anywhere else (Bot2's
+# life only drops by the 4 of its attack), and Bot1's other creature, Ornithopter, is not hit in its place.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Ornithopter
+Nova Hellkite
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Forest
+Mox Ruby
+Llanowar Elves
+Lightning Bolt
+Forest x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Nova Hellkite.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Llanowar Elves)
+[T3 Bot1.DeclareAttackers]
+? Bot2.Graveyard = Llanowar Elves; Lightning Bolt
+? Bot1.Battlefield.Nova Hellkite.Damage = 0
+? Bot1.Battlefield.Ornithopter.Damage = 0
+Bot1.Attack(Nova Hellkite > Bot2)
+[T4 Bot2.Main1]
+? Bot2.Life = 16
+
+[Expect]
+Bot2.Life = 16
+Bot1.Battlefield.Nova Hellkite.Damage = 0
+Bot1.Battlefield.Ornithopter.Damage = 0
