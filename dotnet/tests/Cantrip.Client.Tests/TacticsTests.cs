@@ -78,6 +78,10 @@ public sealed class CardReadingTests
     [InlineData("Pyrokinesis deals 4 damage divided as you choose among any number of target creatures.", EffectKind.Damage, 4)]
     [InlineData("Put target nonland permanent into its owner's library just beneath the top X cards of that library.", EffectKind.Bounce, 0)]
     [InlineData("Target player takes an extra turn after this one.", EffectKind.Help, 0)]
+    [InlineData("When this creature enters, draw two cards, then discard two cards. When you discard one or more nonland cards this way, tap up to that many target creatures and put a stun counter on each of them.", EffectKind.Harm, 0)]
+    [InlineData("When this creature enters, you may discard any number of cards. When you do, up to that many target creatures each get -2/-2 until end of turn.", EffectKind.Shrink, 2)]
+    [InlineData("When this creature enters, you may discard one or more land cards. When you do, return up to that many target nonland permanent cards from your graveyard to your hand.", EffectKind.Raise, 0)]
+    [InlineData("Whenever you attack, you may sacrifice one or more Treasures. When you do, up to that many target creatures gain double strike until end of turn.", EffectKind.Help, 0)]
     [InlineData("Draw two cards.", EffectKind.Unknown, 0)]
     public void An_effect_is_read_off_its_words(string text, EffectKind kind, int amount)
     {

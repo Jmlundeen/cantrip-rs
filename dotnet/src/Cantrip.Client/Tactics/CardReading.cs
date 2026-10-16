@@ -358,7 +358,7 @@ public static partial class CardReading
             return new EffectRead(EffectKind.Raise, 1);
         }
 
-        if ((plain.Contains("return target", StringComparison.Ordinal) || plain.Contains("return up to one target", StringComparison.Ordinal))
+        if ((plain.Contains("return target", StringComparison.Ordinal) || plain.Contains("return up to", StringComparison.Ordinal))
             && plain.Contains("graveyard to", StringComparison.Ordinal) && plain.Contains("hand", StringComparison.Ordinal))
         {
             return new EffectRead(EffectKind.Raise, 0);
@@ -414,6 +414,7 @@ public static partial class CardReading
         if (plain.Contains("you control", StringComparison.Ordinal) && plain.Contains("target", StringComparison.Ordinal)
             || plain.Contains("target player draws", StringComparison.Ordinal)
             || (plain.Contains("target", StringComparison.Ordinal) && plain.Contains(" gains ", StringComparison.Ordinal))
+            || plain.Contains("target creatures gain ", StringComparison.Ordinal)
             || plain.Contains("gets +", StringComparison.Ordinal) || plain.Contains("+1/+1 counter", StringComparison.Ordinal)
             || plain.Contains("untap target", StringComparison.Ordinal) || plain.Contains("attach", StringComparison.Ordinal)
             || plain.StartsWith("equip", StringComparison.Ordinal) || plain.Contains(": equip", StringComparison.Ordinal)
@@ -428,7 +429,8 @@ public static partial class CardReading
             return new EffectRead(EffectKind.Harm, Number(discard.Groups[1].Value));
         }
 
-        if (plain.Contains("tap target", StringComparison.Ordinal) || plain.Contains("can't block", StringComparison.Ordinal)
+        if (plain.Contains("tap target", StringComparison.Ordinal) || plain.Contains("tap up to", StringComparison.Ordinal)
+            || plain.Contains("can't block", StringComparison.Ordinal)
             || plain.Contains("can't attack", StringComparison.Ordinal)
             || plain.Contains("reveals their hand", StringComparison.Ordinal)
             || plain.Contains("that much damage", StringComparison.Ordinal)
