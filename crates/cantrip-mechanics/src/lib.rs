@@ -74,6 +74,7 @@ pub mod retrace;
 pub mod ripple;
 pub mod replacements;
 pub mod statics;
+pub mod storied;
 pub mod storm;
 pub mod spree;
 pub mod tiered;
