@@ -1,0 +1,41 @@
+# Interaction with mobilize: after the Headliner attacks, its Warrior token and an Ornithopter are creatures Bot1
+# controls. Sacrificing the attacking Headliner (it leaves combat) deals damage equal to the 2 left (Warrior and
+# Ornithopter), killing Bot2's 0/2 Ornithopter. The Warrior still attacks and deals 1 to Bot2.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Stadium Headliner
+Ornithopter
+Mountain x13
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Stadium Headliner.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Attack(Stadium Headliner)
+Bot1.Pass
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Stadium Headliner.Activate(Bot2.Battlefield.Ornithopter)
+[Bot1.Main2]
+? Bot2.Graveyard = Ornithopter
+? Bot1.Battlefield.Warrior.Tapped = true
+[T3 Bot1.End]
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Stadium Headliner
+Bot2.Life = 19
+Bot2.Graveyard = Ornithopter

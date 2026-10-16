@@ -1,0 +1,43 @@
+# Ruling 2025-04-04: the number of creatures is counted when the ability resolves. Bot1 has two Ornithopters (so it
+# would deal 2), but Bot2 Bolts one in response: only 1 damage is dealt and Bot2's 0/2 Ornithopter survives. The
+# Headliner was sacrificed as a cost, so the ability resolves regardless.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Stadium Headliner
+Ornithopter
+Ornithopter
+Mountain x13
+
+[Bot2 Deck]
+Mountain
+Ornithopter
+Lightning Bolt
+Island x17
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Stadium Headliner.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ornithopter#1.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter#1.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Stadium Headliner.Activate(Bot2.Battlefield.Ornithopter)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter#1)
+[Bot1.Main2]
+? Bot2.Battlefield.Ornithopter.Damage = 1
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Ornithopter; Stadium Headliner
+Bot2.Graveyard = Lightning Bolt
+Bot2.Battlefield = Mountain; Ornithopter

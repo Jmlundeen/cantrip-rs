@@ -1,0 +1,40 @@
+# CR 608.2b: Bot2 Bolts its own Ornithopter in response to the ability. The only target is gone when it resolves, so
+# the ability does nothing: Bot1's Ornithopter is untouched, Bot2's life is unaffected, and the Headliner is already
+# sacrificed.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Stadium Headliner
+Ornithopter
+Mountain x13
+
+[Bot2 Deck]
+Mountain
+Ornithopter
+Lightning Bolt
+Island x17
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Stadium Headliner.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Stadium Headliner.Activate(Bot2.Battlefield.Ornithopter)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+[Bot1.Main2]
+? Bot1.Battlefield.Ornithopter.Damage = 0
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Stadium Headliner
+Bot2.Graveyard = Ornithopter; Lightning Bolt
+Bot2.Life = 20

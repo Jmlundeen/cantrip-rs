@@ -1,0 +1,28 @@
+# Stadium Headliner's mobilize 1 (CR 702.181a): attacking on turn 3 it creates one tapped and attacking 1/1 red Warrior
+# (CR 508.4), so Bot2 takes 1 + 1 = 2. The Warrior is sacrificed at the beginning of the next end step.
+
+[Bot1 Deck]
+Mountain
+Stadium Headliner
+Mountain x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Stadium Headliner.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Stadium Headliner)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Count = 3
+? Bot1.Battlefield.Warrior.Tapped = true
+? Bot2.Life = 18
+[T3 Bot1.End]
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Bot2.Life = 18
+Bot1.Battlefield = Mountain; Stadium Headliner

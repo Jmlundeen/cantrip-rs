@@ -1,0 +1,36 @@
+# {1}{R}, Sacrifice: it deals damage equal to the number of creatures Bot1 controls, counted on resolution (ruling
+# 2025-04-04), so the sacrificed Headliner is not counted: two Ornithopters make 2 damage, which kills Bot2's 0/2.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Stadium Headliner
+Ornithopter
+Ornithopter
+Mountain x13
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Stadium Headliner.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ornithopter#1.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter#1.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Stadium Headliner.Activate(Bot2.Battlefield.Ornithopter)
+[Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Graveyard = Ornithopter
+Bot1.Graveyard = Stadium Headliner
