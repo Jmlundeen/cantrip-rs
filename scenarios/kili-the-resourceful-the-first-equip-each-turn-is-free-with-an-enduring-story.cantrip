@@ -1,0 +1,62 @@
+# Kíli the Resourceful (CR 702.195b, 118.9): "As long as you have an enduring story, you may pay {0} rather than pay the
+# equip cost of the first equip ability you activate each turn." Kíli and Mox Pearl are two on turn one; Shadowspear, a
+# legendary Equipment, is the third on turn three, and Kíli draws a card for it ("another Dwarf or Equipment you control
+# enters"); Bloodforged Battle-Axe entering the same turn draws nothing, the ability triggering only once each turn. Bot1
+# then equips Shadowspear to Kíli for {0}. With every mana source tapped, Battle-Axe's equip is not offered that turn: the
+# second equip ability has no {0} alternative and Equip {2} can't be paid. On turn five it is the first again, and Bot1
+# equips the Axe to Thraben Inspector for {0}, the turn's Plains left untapped.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Kíli the Resourceful
+Plains
+Shadowspear
+Bloodforged Battle-Axe
+Thraben Inspector
+Plains
+Island
+Plains
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Kíli the Resourceful.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+[T3 Bot1.Main1]
+? Bot1.EnduringStory = (absent)
+Bot1.Hand.Plains.Play
+Bot1.Hand.Shadowspear.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Pass
+Bot1.Hand.Bloodforged Battle-Axe.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot1.Hand.Thraben Inspector.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Pass
+Bot1.Pass
+? Bot1.EnduringStory = true
+? Bot1.Hand.Count = 2
+Bot1.Battlefield.Shadowspear.Activate(Kíli the Resourceful; Ability: Equip)
+Bot1.Accept
+Bot1.Pass
+! Bot1.Battlefield.Bloodforged Battle-Axe.Activate(Ability: Equip)
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Bloodforged Battle-Axe.Activate(Thraben Inspector; Ability: Equip)
+Bot1.Accept
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Shadowspear.AttachedTo = Kíli the Resourceful
+Bot1.Battlefield.Bloodforged Battle-Axe.AttachedTo = Thraben Inspector
+Bot1.Battlefield.Plains#3.Tapped = false
+Bot1.Battlefield.Kíli the Resourceful.Power = 2
+Bot1.Battlefield.Thraben Inspector.Power = 3

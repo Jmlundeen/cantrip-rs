@@ -1,0 +1,44 @@
+# Two permanents with storied (CR 702.195a): Kíli and Mox Pearl are two; Fíli entering on turn five is the third, and Bot1
+# has an enduring story - one designation, however many storied permanents give it. Fíli entering triggers Kíli ("another
+# Dwarf"), and so would the Dwarf token Fíli's own enters ability makes, but Kíli's ability triggers only once each turn:
+# Bot1 draws one card, Fíli replacing itself in hand. Fíli pumps Kíli to 2/3.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Kíli the Resourceful
+Plains
+Plains
+Fíli the Pathfinder
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Kíli the Resourceful.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+? Bot1.Hand.Count = 4
+Bot1.Hand.Fíli the Pathfinder.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.EnduringStory = true
+Bot1.Hand.Count = 4
+Bot1.Battlefield = Plains; Plains; Plains; Mox Pearl; Kíli the Resourceful; Fíli the Pathfinder; Dwarf
+Bot1.Battlefield.Kíli the Resourceful.Power = 2
+Bot1.Battlefield.Kíli the Resourceful.Toughness = 3

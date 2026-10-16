@@ -1,0 +1,59 @@
+# Kíli's {0} is for the equip cost of its controller's equip ability only (CR 118.9, 702.6a). Bot1 has an enduring story
+# (Kíli, Mox Pearl, Shadowspear), and Shadowspear's "{1}: Permanents your opponents control lose hexproof and
+# indestructible" is paid with Mox Pearl's mana, no {0} offered. On turn four Bot2, tapped out after casting Bloodforged
+# Battle-Axe and Ragavan, is not offered the Axe's Equip {2}: "you" is Kíli's controller. Its positive control is
+# kili-the-resourceful-the-first-equip-each-turn-is-free-with-an-enduring-story, where a tapped-out Bot1 equips for {0}.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Kíli the Resourceful
+Plains
+Shadowspear
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Bloodforged Battle-Axe
+Ragavan, Nimble Pilferer
+Island
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Kíli the Resourceful.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Shadowspear.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Pass
+Bot1.Pass
+? Bot1.EnduringStory = true
+Bot1.Battlefield.Shadowspear.Activate(Ability: {1}:)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Mox Pearl.Tapped = true
+[T4 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Bloodforged Battle-Axe.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Pass
+Bot2.Hand.Ragavan, Nimble Pilferer.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Pass
+! Bot2.Battlefield.Bloodforged Battle-Axe.Activate(Ability: Equip)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot2.EnduringStory = (absent)
+Bot2.Battlefield.Bloodforged Battle-Axe.AttachedTo = (absent)

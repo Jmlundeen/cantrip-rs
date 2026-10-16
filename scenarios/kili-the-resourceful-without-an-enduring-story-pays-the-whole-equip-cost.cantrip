@@ -1,0 +1,47 @@
+# Kíli's free equip needs an enduring story (CR 702.195b): Kíli and Bloodforged Battle-Axe are only two permanents that are
+# artifacts and/or legendary, so Bot1 has none. With one Plains open on turn five the Axe's Equip {2} is not offered - there
+# is no {0} to pay instead - and on turn seven, two Plains open, Bot1 equips it to Kíli paying both. Kíli draws a card when
+# the Axe, an Equipment, enters.
+
+[Bot1 Deck]
+Plains
+Plains
+Kíli the Resourceful
+Bloodforged Battle-Axe
+Plains
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Kíli the Resourceful.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+[T5 Bot1.Main1]
+? Bot1.Hand.Count = 6
+Bot1.Hand.Bloodforged Battle-Axe.Cast
+Bot1.Battlefield.Plains.Activate
+[T5 Bot1.Main2]
+? Bot1.Hand.Count = 6
+! Bot1.Battlefield.Bloodforged Battle-Axe.Activate(Ability: Equip)
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Bloodforged Battle-Axe.Activate(Kíli the Resourceful; Ability: Equip)
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Pass
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.EnduringStory = (absent)
+Bot1.Battlefield.Bloodforged Battle-Axe.AttachedTo = Kíli the Resourceful
+Bot1.Battlefield.Kíli the Resourceful.Power = 3
+Bot1.Battlefield.Plains#1.Tapped = true
+Bot1.Battlefield.Plains#2.Tapped = true
+Bot1.Battlefield.Plains#3.Tapped = false
