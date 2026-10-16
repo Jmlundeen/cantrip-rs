@@ -1,0 +1,59 @@
+# Knight of Grace has hexproof from black and gets +1/+0 as long as any player controls a black permanent; Knight of
+# Malice has hexproof from white and gets +1/+0 for a white permanent. Side by side each pumps the other: both 3/2.
+# Bot2's Fatal Push (black) can't target Knight of Grace (CR 702.11d) but can target Knight of Malice, which dies; with
+# no black permanent left, Knight of Grace is 2/2 again. Bot2's Lightning Bolt (red) then targets and kills Knight of
+# Grace: hexproof from black is no hexproof from red.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Sol Ring
+Knight of Grace
+Knight of Malice
+Island
+Island x10
+
+[Bot2 Deck]
+Swamp
+Fatal Push
+Lightning Bolt
+Mountain
+Island
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Knight of Grace.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Knight of Malice.Cast
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Knight of Grace.Power = 3
+? Bot1.Battlefield.Knight of Malice.Power = 3
+? Bot1.Battlefield.Knight of Grace.HexproofFrom = Black
+? Bot1.Battlefield.Knight of Malice.HexproofFrom = White
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+! Bot2.Hand.Fatal Push.Cast(Bot1.Battlefield.Knight of Grace)
+Bot2.Hand.Fatal Push.Cast(Bot1.Battlefield.Knight of Malice)
+Bot2.Pass
+[T2 Bot2.Main2]
+? Bot1.Battlefield.Knight of Grace.Power = 2
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Knight of Grace)
+Bot2.Pass
+
+[Expect]
+Turn = 4
+Bot1.Graveyard = Knight of Grace; Knight of Malice
+Bot2.Graveyard = Lightning Bolt; Fatal Push
