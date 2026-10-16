@@ -1,0 +1,11 @@
+{
+  "name": "Baird, Steward of Argive",
+  "manaCost": "{2}{W}{W}",
+  "type": "Legendary Creature — Human Soldier",
+  "power": 2,
+  "toughness": 4,
+  "oracleText": "Vigilance\nCreatures can't attack you or planeswalkers you control unless their controller pays {1} for each of those creatures.",
+  "keywords": [
+    "Vigilance"
+  ]
+}
