@@ -1,0 +1,57 @@
+# Solved is a designation, not a copiable value, kept until the permanent leaves the battlefield (CR 719.3b; the rulings:
+# "A solved Case that somehow becomes a copy of a different Case stays solved"). On turn 1 Lion's Eye Diamond discards Bot1's
+# hand (delirium: artifact, creature, enchantment, instant), and Shifting Woodland becomes a copy of Case of the Crimson Pulse
+# in the graveyard until end of turn. With no cards in hand at the end step its "To solve" makes it solved; the copy ends in
+# the cleanup step and the land is still solved. On turn 3 it becomes a copy of Case of the Uneaten Feast, a Case it never
+# solved, and is solved at once: Uneaten Feast's "Solved" ability is offered (CR 702.169d), and its sacrifice lets the
+# Ornithopter in the graveyard be cast. Neither Case's ability did anything while the Woodland was a land: turn 3's upkeep
+# asked for no discard (the hand is the one card drawn).
+
+[Bot1 Deck]
+Shifting Woodland
+Lion's Eye Diamond
+Mox Emerald
+Ornithopter
+Case of the Crimson Pulse
+Case of the Uneaten Feast
+Lightning Bolt
+Black Lotus
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Shifting Woodland.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Lion's Eye Diamond.Cast
+Bot1.Battlefield.Lion's Eye Diamond.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Shifting Woodland.Activate(Bot1.Graveyard.Case of the Crimson Pulse; Ability: Delirium)
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Case of the Crimson Pulse.Types = Enchantment
+? Bot1.Battlefield.Case of the Crimson Pulse.Solved = (absent)
+[T1 Bot1.End]
+? Bot1.Hand.Count = 0
+? Stack.Count = 1
+[T2 Bot2.Upkeep]
+? Bot1.Battlefield.Shifting Woodland.Types = Land
+? Bot1.Battlefield.Shifting Woodland.Solved = true
+[T3 Bot1.Main1]
+? Bot1.Hand = Black Lotus
+? Bot1.Graveyard.Count = 5
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Shifting Woodland.Activate(Bot1.Graveyard.Case of the Uneaten Feast; Ability: Delirium)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Case of the Uneaten Feast.Solved = true
+Bot1.Battlefield.Case of the Uneaten Feast.Activate
+Bot1.Pass
+Bot1.Graveyard.Ornithopter.Cast
+
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield = Mox Emerald; Ornithopter
+Bot1.Graveyard = Shifting Woodland; Black Lotus; Lion's Eye Diamond; Lightning Bolt; Case of the Uneaten Feast; Case of the Crimson Pulse

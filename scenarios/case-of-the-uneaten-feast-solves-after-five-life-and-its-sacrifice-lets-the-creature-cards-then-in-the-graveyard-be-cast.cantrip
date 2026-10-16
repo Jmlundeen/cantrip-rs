@@ -1,0 +1,78 @@
+# Case of the Uneaten Feast. On turn 1 Bot1 casts it and then five Ornithopters; each entering creature it controls gains it 1
+# life ("Whenever a creature you control enters, you gain 1 life"): 25. Before the end step the "Solved" ability is not
+# offered (CR 702.169d: activate only if this Case is solved). At the beginning of the end step it has gained 5 life this turn,
+# so "To solve" triggers and the Case becomes solved (CR 719.3a). On turn 2 Bot2 bolts two Ornithopters. On turn 3 Bot1
+# sacrifices the Case: the creature cards in its graveyard as the ability resolves - the two Ornithopters - may be cast from
+# there until end of turn (CR 611.2c), but not the Case itself, which is no creature card (its Plains is untapped to pay {W}).
+# Bot1 casts the newer Ornithopter from the graveyard; with it on the stack Bot2 bolts a third, which reaches the graveyard
+# after the ability resolved and may not be cast. The Case is gone, so the Ornithopter cast from the graveyard gains no life.
+# On turn 5 the older Ornithopter left in the graveyard may no longer be cast either: "until end of turn" is over.
+
+[Bot1 Deck]
+Plains
+Case of the Uneaten Feast
+Ornithopter x5
+Plains x10
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Case of the Uneaten Feast.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+! Bot1.Battlefield.Case of the Uneaten Feast.Activate
+Bot1.Hand.Ornithopter.Cast
+[T1 Bot1.End]
+? Bot1.Life = 25
+? Stack.Count = 1
+? Bot1.Battlefield.Case of the Uneaten Feast.Solved = (absent)
+[T2 Bot2.Upkeep]
+? Bot1.Battlefield.Case of the Uneaten Feast.Solved = true
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Case of the Uneaten Feast.Activate
+Bot1.Pass
+? Bot1.Graveyard.Count = 3
+! Bot1.Graveyard.Case of the Uneaten Feast.Cast
+Bot1.Graveyard.Ornithopter.Cast
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby#2.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+! Bot1.Graveyard.Ornithopter#1.Cast
+[T5 Bot1.Main1]
+! Bot1.Graveyard.Ornithopter#2.Cast
+! Bot1.Graveyard.Ornithopter#1.Cast
+
+[Expect]
+Bot1.Life = 25
+Bot1.Battlefield = Ornithopter; Ornithopter; Ornithopter; Plains
+Bot1.Graveyard = Ornithopter; Case of the Uneaten Feast; Ornithopter
+Bot2.Graveyard = Lightning Bolt; Lightning Bolt; Lightning Bolt

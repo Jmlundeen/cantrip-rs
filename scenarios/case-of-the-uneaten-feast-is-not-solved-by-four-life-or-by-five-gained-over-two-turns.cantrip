@@ -1,0 +1,40 @@
+# "To solve - You've gained 5 or more life this turn" (CR 719.3a) counts this turn's life gain only. On turn 1 Bot1 casts the
+# Case and four Ornithopters: 4 life gained (24), so at the beginning of its end step nothing triggers and the Case stays
+# unsolved. On turn 3 one more Ornithopter makes five gained in all, but one this turn: nothing triggers again. Its "Solved"
+# ability is never offered (CR 702.169d), with the Case untapped and nothing else to pay.
+
+[Bot1 Deck]
+Plains
+Case of the Uneaten Feast
+Ornithopter x4
+Plains
+Ornithopter
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Case of the Uneaten Feast.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T1 Bot1.End]
+? Bot1.Life = 24
+? Stack.Count = 0
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Case of the Uneaten Feast.Activate
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.End]
+? Bot1.Life = 25
+? Stack.Count = 0
+[T4 Bot2.Upkeep]
+! Bot1.Battlefield.Case of the Uneaten Feast.Activate
+
+[Expect]
+Bot1.Life = 25
+Bot1.Battlefield.Case of the Uneaten Feast.Solved = (absent)
+Bot1.Battlefield = Case of the Uneaten Feast; Ornithopter; Ornithopter; Ornithopter; Ornithopter; Ornithopter; Plains
