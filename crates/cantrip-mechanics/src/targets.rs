@@ -234,6 +234,12 @@ pub fn card_in_your_graveyard(q: &dyn Query, asker: &Asker, t: Target, types: &[
     }
 }
 
+/// `card_in_your_graveyard` with "mana value N or less" (CR 202.3, `Query::mana_value`; X is 0 in a graveyard,
+/// CR 107.3b). Unearth, Carnage, Crimson Chaos, Sevinne's Reclamation and Helping Hand print it.
+pub fn card_in_your_graveyard_with_mana_value_at_most(q: &dyn Query, asker: &Asker, t: Target, types: &[CardType], max: u32) -> bool {
+    card_in_your_graveyard(q, asker, t, types) && matches!(t, Target::Object(id) if q.mana_value(id) <= max)
+}
+
 fn creature_card_in_your_graveyard_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     card_in_your_graveyard(q, asker, t, &[CardType::Creature])
 }

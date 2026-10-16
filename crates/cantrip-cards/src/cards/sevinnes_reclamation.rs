@@ -6,12 +6,13 @@ use cantrip_oracle as oracle;
 
 /// "Target permanent card with mana value 3 or less from your graveyard."
 fn permanent_card_in_your_graveyard(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    targets::card_in_your_graveyard(
+    targets::card_in_your_graveyard_with_mana_value_at_most(
         q,
         asker,
         t,
         &[CardType::Artifact, CardType::Creature, CardType::Enchantment, CardType::Land, CardType::Planeswalker, CardType::Battle],
-    ) && matches!(t, Target::Object(id) if q.mana_value(id) <= 3)
+        3,
+    )
 }
 
 /// Return the target to the battlefield; then, if this spell was cast from a graveyard (any way), the controller may

@@ -5,12 +5,7 @@ use cantrip_oracle as oracle;
 
 /// "Target creature card with mana value 3 or less from your graveyard."
 fn cheap_creature_card(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    match t {
-        Target::Object(id) => {
-            targets::card_in_your_graveyard(q, asker, t, &[CardType::Creature]) && q.card(q.obj(id).card).cost.mana_value() <= 3
-        }
-        _ => false,
-    }
+    targets::card_in_your_graveyard_with_mana_value_at_most(q, asker, t, &[CardType::Creature], 3)
 }
 
 /// Return the creature card to the battlefield under the ability's controller. It gains "This creature attacks each

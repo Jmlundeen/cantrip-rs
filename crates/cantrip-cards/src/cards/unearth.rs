@@ -4,7 +4,7 @@ use cantrip_oracle as oracle;
 
 /// Target creature card with mana value 3 or less from your graveyard.
 fn small_creature_in_your_graveyard(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    targets::card_in_your_graveyard(q, asker, t, &[CardType::Creature]) && matches!(t, Target::Object(id) if q.mana_value(id) <= 3)
+    targets::card_in_your_graveyard_with_mana_value_at_most(q, asker, t, &[CardType::Creature], 3)
 }
 
 /// Return target creature card with mana value 3 or less from your graveyard to the battlefield.
