@@ -1,0 +1,57 @@
+# Magebane Lizard hurts whoever casts the noncreature spell, not its controller (Bot2 here), and counts the noncreature spells
+# the player has cast as the ability RESOLVES (CR 608.2h), not as it triggered. Bot2 casts Mox Ruby (1 damage, 20 -> 19), then
+# Lightning Bolt A (its trigger goes on the stack), and with that trigger still waiting casts Lightning Bolt B in response. B's
+# trigger resolves first: Mox Ruby, A and B make 3 (19 -> 16). A's trigger then also counts 3, B being cast since it triggered
+# (16 -> 13); counted when it triggered it would have been 2. Bot1, who controls the Lizard, takes nothing from Bot2's spells
+# beyond the Bolts' own 6 (20 -> 14).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Magebane Lizard
+Mountain x21
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Magebane Lizard.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot2.Life = 19
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 0
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+? Stack.Count = 2
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+? Stack.Count = 4
+Bot2.Pass
+Bot1.Pass
+? Bot2.Life = 16
+? Stack.Count = 3
+Bot2.Pass
+Bot1.Pass
+? Bot2.Life = 16
+Bot2.Pass
+Bot1.Pass
+? Bot2.Life = 13
+[T2 Bot2.Main2]
+
+[Expect]
+Bot2.Life = 13
+Bot1.Life = 14
+Stack.Count = 0

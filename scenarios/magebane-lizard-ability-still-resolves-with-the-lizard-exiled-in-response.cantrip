@@ -1,0 +1,54 @@
+# Magebane Lizard's triggered ability is independent of its source (CR 113.7a, 608.2h): with the trigger of Bot2's Mox Jet on the
+# stack, Bot2 casts Swords to Plowshares on the Lizard in response (its own trigger goes above it). That second trigger resolves
+# first: Mox Pearl, Mox Jet and Swords are 3 noncreature spells, 3 damage (19 -> 16). Swords exiles the Lizard (Bot1 gains 1,
+# its power). The first trigger then resolves with the Lizard gone: it still counts 3 and the damage is still dealt by the
+# Lizard as it last was (16 -> 13).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Magebane Lizard
+Mountain x21
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Swords to Plowshares
+Mountain x21
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Magebane Lizard.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot2.Life = 19
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 0
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Magebane Lizard)
+? Stack.Count = 4
+Bot2.Pass
+Bot1.Pass
+? Bot2.Life = 16
+? Bot1.Battlefield.Magebane Lizard.Power = 1
+Bot2.Pass
+Bot1.Pass
+? Bot1.Life = 21
+? Bot2.Life = 16
+Bot2.Pass
+Bot1.Pass
+? Bot2.Life = 13
+[T2 Bot2.Main2]
+
+[Expect]
+Bot2.Life = 13
+Bot1.Life = 21
+Exile =Magebane Lizard
+Stack.Count = 0

@@ -1,0 +1,8 @@
+{
+  "name": "Magebane Lizard",
+  "manaCost": "{1}{R}",
+  "type": "Creature — Lizard",
+  "power": 1,
+  "toughness": 4,
+  "oracleText": "Whenever a player casts a noncreature spell, this creature deals damage to that player equal to the number of noncreature spells they've cast this turn."
+}

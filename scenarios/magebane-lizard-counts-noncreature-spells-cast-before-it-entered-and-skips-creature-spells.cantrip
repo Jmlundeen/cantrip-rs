@@ -1,0 +1,43 @@
+# Magebane Lizard: "Whenever a player casts a noncreature spell, this creature deals damage to that player equal to the number of
+# noncreature spells they've cast this turn." Turn 1: Bot1 casts Mox Ruby and Mox Emerald before the Lizard exists (no trigger
+# then), casts the Lizard (a creature spell, and not on the battlefield anyway), then Mox Jet: the Lizard's controller is a player
+# too, and the two Moxen cast before it entered count (the official ruling), so the damage is 3 (20 -> 17). Turn 3: the count is
+# per turn: a creature spell (Llanowar Elves) draws nothing and does not count as one, and Mox Pearl is the first noncreature
+# spell of the turn, 1 damage (17 -> 16).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Mox Jet
+Magebane Lizard
+Llanowar Elves
+Mox Pearl
+Mountain
+Mountain x20
+
+[Bot2 Deck]
+Mountain x24
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+? Bot1.Life = 20
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Magebane Lizard.Cast
+? Bot1.Life = 20
+Bot1.Hand.Mox Jet.Cast
+[T1 Bot1.Main2]
+? Bot1.Life = 17
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+? Bot1.Life = 17
+Bot1.Hand.Mox Pearl.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 16
+Bot2.Life = 20
+Bot1.Battlefield = Magebane Lizard; Llanowar Elves; Mox Emerald; Mox Jet; Mox Pearl; Mox Ruby
+Stack.Count = 0
