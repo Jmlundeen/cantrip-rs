@@ -1,0 +1,56 @@
+# Isshin, Two Heavens as One doubles abilities of permanents its controller controls, whoever's creature is attacking
+# (CR 603.2d): Bot2 attacks Bot1 with Hero of Bladehold, and Bot1's Emberwilde Captain ("Whenever an opponent attacks you
+# while you're the monarch, this creature deals damage to that player equal to the number of cards in their hand")
+# triggers twice. Bot2's own Hero abilities are not Bot1's: they trigger once each, two Soldiers.
+# Turn 1: Bot1 casts Isshin (Mox Ruby, Mox Pearl, Mox Jet) and the Captain (Black Lotus RRR and the Mountain), and becomes
+# the monarch. Turn 2: Bot2 casts the Hero (Black Lotus WWW and a Plains). Turn 4: Bot2 attacks with the Hero, with five
+# cards in hand (7 + 1 drawn - 4 played + 1 drawn), and takes 5 twice.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mox Ruby
+Mox Pearl
+Mox Jet
+Isshin, Two Heavens as One
+Emberwilde Captain
+Island x15
+
+[Bot2 Deck]
+Plains
+Black Lotus
+Mox Pearl
+Hero of Bladehold
+Plains x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Isshin, Two Heavens as One.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Emberwilde Captain.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Hero of Bladehold.Cast
+[T4 Bot2.Main1]
+? Bot2.Hand.Count = 5
+Bot2.Attack(Hero of Bladehold > Bot1)
+Bot2.Triggers(Hero of Bladehold; Hero of Bladehold)
+Bot1.Triggers(Emberwilde Captain; Emberwilde Captain)
+[T4 Bot2.DeclareBlockers]
+? Bot2.Life = 10
+
+[Expect]
+Bot2.Battlefield = Plains; Mox Pearl; Hero of Bladehold; Soldier; Soldier

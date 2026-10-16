@@ -1,0 +1,58 @@
+# Isshin, Two Heavens as One makes Tersa Lightshatter's attack trigger twice, and each copy checks its intervening "if"
+# again as it resolves (CR 603.2d, 603.4): with exactly seven cards in the graveyard both trigger, the first exiles one at
+# random, and the second finds six and does nothing. Tersa's enters ability is not caused by attacking and triggers once
+# (one discard question).
+# Turn 1: Bot1 Wheels with Black Lotus's RRR (graveyard: Lotus, three Islands, Wheel = 5), then casts Mox Pearl, Mox Jet
+# and Isshin (Mox Ruby, Pearl, Jet) from the new hand. Turn 3: Tersa (two Mountains and the Ruby) discards two Islands (7)
+# and draws two, and attacks. Hand after the Wheel: 7 - Pearl, Jet, Isshin = 4; turn 3 draws (5), plays a Mountain (4),
+# casts Tersa (3), discards two and draws two (3).
+
+[Bot1 Deck]
+Black Lotus
+Wheel of Fortune
+Mountain
+Mox Ruby
+Island x3
+Isshin, Two Heavens as One
+Tersa Lightshatter
+Mox Pearl
+Mox Jet
+Mountain
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Wheel of Fortune.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Isshin, Two Heavens as One.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Tersa Lightshatter.Cast
+Bot1.Choose(Island; Island)
+? Bot1.Graveyard.Count = 7
+Bot1.Attack(Tersa Lightshatter > Bot2)
+Bot1.Triggers(Tersa Lightshatter; Tersa Lightshatter)
+[T3 Bot1.Main2]
+
+[Expect]
+Exile.Count = 1
+Bot1.Graveyard.Count = 6
+Bot1.Hand.Count = 3
+Bot2.Life = 17

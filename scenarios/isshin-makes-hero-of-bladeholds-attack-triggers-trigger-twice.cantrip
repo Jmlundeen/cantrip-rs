@@ -1,0 +1,46 @@
+# Isshin, Two Heavens as One: "If a creature attacking causes a triggered ability of a permanent you control to trigger,
+# that ability triggers an additional time" (CR 603.2d). Hero of Bladehold attacks: its battle cry and its "create two
+# 1/1 Soldier tokens that are tapped and attacking" each trigger twice - four triggers, each its own. Bot1 puts the two
+# battle cries on the stack first, so both token abilities resolve first: four Soldiers, then two battle cries, each
+# giving every other attacking creature +1/+0. Each Soldier is 3/1, the Hero 3/4: 3 + 4 x 3 = 15 damage.
+# Turn 1: Isshin (Mox Ruby, Plains, Mox Jet). Turn 3: the Hero (Black Lotus for WWW and the Plains). Turn 5: the attack.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Mox Ruby
+Mox Jet
+Isshin, Two Heavens as One
+Hero of Bladehold
+Island
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Isshin, Two Heavens as One.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Hero of Bladehold.Cast
+[T5 Bot1.Main1]
+Bot1.Attack(Hero of Bladehold > Bot2)
+Bot1.Triggers(battle cry; battle cry; Soldier; Soldier)
+[T5 Bot1.DeclareBlockers]
+? Combat.Attackers = Hero of Bladehold > Bot2; Soldier > Bot2; Soldier > Bot2; Soldier > Bot2; Soldier > Bot2
+? Bot1.Battlefield.Soldier#1.Power = 3
+? Bot1.Battlefield.Soldier#4.Power = 3
+? Bot1.Battlefield.Hero of Bladehold.Power = 3
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 5
+Bot1.Battlefield = Plains; Mox Ruby; Mox Jet; Isshin, Two Heavens as One; Hero of Bladehold; Soldier; Soldier; Soldier; Soldier

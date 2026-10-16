@@ -1,0 +1,8 @@
+{
+  "name": "Isshin, Two Heavens as One",
+  "manaCost": "{R}{W}{B}",
+  "type": "Legendary Creature — Human Samurai",
+  "power": 3,
+  "toughness": 4,
+  "oracleText": "If a creature attacking causes a triggered ability of a permanent you control to trigger, that ability triggers an additional time."
+}

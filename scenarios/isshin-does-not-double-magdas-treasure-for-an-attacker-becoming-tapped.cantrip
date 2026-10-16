@@ -1,0 +1,38 @@
+# Isshin, Two Heavens as One affects only abilities whose trigger is attacking itself, not one that triggers on something
+# an attack also does, such as becoming tapped (the rulings, CR 603.2d). Magda, Brazen Outlaw attacks beside Isshin and
+# becomes tapped: "Whenever a Dwarf you control becomes tapped, create a Treasure token" triggers once - one Treasure.
+# Turn 1: Isshin (Mox Ruby, Mox Pearl, Mox Jet). Turn 3: Magda (Mountain and the Ruby). Turn 5: both attack, for 2 + 3.
+
+[Bot1 Deck]
+Mountain
+Mox Pearl
+Mox Jet
+Mox Ruby
+Isshin, Two Heavens as One
+Magda, Brazen Outlaw
+Island
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Isshin, Two Heavens as One.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Magda, Brazen Outlaw.Cast
+[T5 Bot1.Main1]
+Bot1.Attack(Magda, Brazen Outlaw > Bot2; Isshin, Two Heavens as One > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 15
+Bot1.Battlefield = Mountain; Mox Pearl; Mox Jet; Mox Ruby; Isshin, Two Heavens as One; Magda, Brazen Outlaw; Treasure Token
