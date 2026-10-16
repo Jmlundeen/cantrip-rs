@@ -1,0 +1,60 @@
+# Awaken the Honored Dead, chapter III, CR 608.2b: Bot1 discards a Swamp and targets its own milled Ornithopter with the reflexive
+# ability; in response Bot2 exiles that Ornithopter with Ghost Vacuum, so the ability's only target is gone and it does not
+# resolve: nothing returns to hand and the Ornithopter stays in exile. (The discarded Swamp is not returned instead.)
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Sapphire
+Awaken the Honored Dead
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Ornithopter
+Sol Ring
+Forest
+Swamp x20
+
+[Bot2 Deck]
+Mox Ruby
+Ghost Vacuum
+Ornithopter
+Island x4
+Island x25
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Ghost Vacuum.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Awaken the Honored Dead.Cast
+Bot2.Pass
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T7 Bot1.Main1]
+Bot1.Choose(Swamp)
+Bot1.Target(Bot1.Graveyard.Ornithopter)
+Bot2.Battlefield.Ghost Vacuum.Activate(Bot1.Graveyard.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main2]
+
+[Expect]
+Exile = Ornithopter
+Bot1.Hand = Swamp; Swamp; Swamp; Swamp; Swamp
+Bot1.Graveyard = Awaken the Honored Dead; Swamp; Forest; Sol Ring
+Bot2.Graveyard = Ornithopter
+Stack.Count = 0

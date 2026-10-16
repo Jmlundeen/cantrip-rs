@@ -1,0 +1,53 @@
+# Awaken the Honored Dead, chapter III: "When you do, return target creature or land card from your graveyard to your hand."
+# Chapter II milled Sol Ring, Black Lotus and Mox Ruby, so the graveyard holds no creature or land card, and Bot1 discards a Mox
+# Pearl (an artifact), which is none either. The reflexive ability triggers (a card was discarded) but has no legal target
+# when it would go on the stack, so it is removed from the stack (CR 603.3d): Bot1 is asked for no target, and the Pearl stays in
+# the graveyard with the milled cards.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Sapphire
+Awaken the Honored Dead
+Mox Pearl
+Swamp
+Swamp
+Swamp
+Swamp
+Sol Ring
+Black Lotus
+Mox Ruby
+Swamp x20
+
+[Bot2 Deck]
+Island
+Ornithopter
+Island x25
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Awaken the Honored Dead.Cast
+Bot2.Pass
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T7 Bot1.Main1]
+Bot1.Choose(Mox Pearl)
+! Bot1.Target
+Bot1.Pass
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Swamp; Swamp; Swamp; Swamp; Swamp
+Bot1.Graveyard = Awaken the Honored Dead; Mox Pearl; Mox Ruby; Black Lotus; Sol Ring
+Stack.Count = 0

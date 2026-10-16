@@ -1,0 +1,62 @@
+# Awaken the Honored Dead, chapter III: with no card in hand there is nothing to discard, so Bot1 is not asked (CR 701.9a, a
+# discard moves a card from the hand; it is a choice as the chapter resolves and not a cost) and the reflexive ability never triggers. Bot1's hand is emptied by
+# casting every card as it comes: three free Ornithopters, the Moxen and the Saga, and on turn 7 the Dark Ritual drawn that turn,
+# cast in the draw step off the Mox Jet. The Sol Ring, Forest and Ornithopter milled by chapter II stay in the graveyard.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Sapphire
+Awaken the Honored Dead
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Sol Ring
+Forest
+Ornithopter
+Dark Ritual
+Swamp x20
+
+[Bot2 Deck]
+Island
+Ornithopter
+Island x25
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Awaken the Honored Dead.Cast
+Bot2.Pass
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+[T7 Bot1.Draw]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dark Ritual.Cast
+[T7 Bot1.Main1]
+? Bot1.Hand.Count = 0
+Bot1.Pass
+! Bot1.Choose
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 0
+Bot1.Graveyard.Count = 5
+Stack.Count = 0

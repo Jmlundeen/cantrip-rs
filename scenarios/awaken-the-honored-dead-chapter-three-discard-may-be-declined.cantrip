@@ -1,0 +1,53 @@
+# Awaken the Honored Dead, chapter III: "You may discard a card." Bot1 declines (it chooses no card): nothing is discarded, the
+# reflexive "when you do" ability never triggers, so no target is asked for and nothing returns to hand. The same chapter with
+# the discard taken is the first Awaken scenario. Chapter I destroyed Bot2's Ornithopter and II milled the Ornithopter, Sol Ring
+# and Forest, which stay in the graveyard with the sacrificed Saga.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Sapphire
+Awaken the Honored Dead
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Ornithopter
+Sol Ring
+Forest
+Swamp x20
+
+[Bot2 Deck]
+Island
+Ornithopter
+Island x25
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Awaken the Honored Dead.Cast
+Bot2.Pass
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T7 Bot1.Main1]
+Bot1.Choose()
+! Bot1.Target
+Bot1.Pass
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Swamp; Swamp; Swamp; Swamp; Swamp; Swamp
+Bot1.Graveyard = Awaken the Honored Dead; Forest; Sol Ring; Ornithopter
+Bot2.Graveyard = Ornithopter
+Stack.Count = 0

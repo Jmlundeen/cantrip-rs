@@ -1,0 +1,60 @@
+# Awaken the Honored Dead, all three chapters. I (turn 3, as it enters): "Destroy target nonland permanent" - Bot2's Island is
+# refused (a land), Bot2's Ornithopter is destroyed. II (turn 5): "Mill three cards" - the Ornithopter, Sol Ring and Forest on top
+# of Bot1's library go to its graveyard. III (turn 7): "You may discard a card. When you do, return target creature or land card
+# from your graveyard to your hand" - Bot1 discards a Swamp; the reflexive ability's target is chosen as it goes on the stack:
+# Sol Ring (neither creature nor land) and the Ornithopter in Bot2's graveyard are refused, Bot1's own milled Ornithopter is
+# chosen and returned. After chapter III the Saga is sacrificed (CR 714.4) and sits in the graveyard with the rest.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Sapphire
+Awaken the Honored Dead
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Ornithopter
+Sol Ring
+Forest
+Swamp x20
+
+[Bot2 Deck]
+Island
+Ornithopter
+Island x25
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Awaken the Honored Dead.Cast
+Bot2.Pass
+! Bot1.Target(Bot2.Battlefield.Island)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot2.Pass
+? Bot2.Graveyard = Ornithopter
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main2]
+? Bot1.Graveyard.Count = 3
+[T7 Bot1.Main1]
+Bot1.Choose(Swamp)
+! Bot1.Target(Bot1.Graveyard.Sol Ring)
+! Bot1.Target(Bot2.Graveyard.Ornithopter)
+Bot1.Target(Bot1.Graveyard.Ornithopter)
+Bot2.Pass
+
+[Expect]
+Bot1.Hand = Ornithopter; Swamp; Swamp; Swamp; Swamp; Swamp
+Bot2.Graveyard = Ornithopter
+Bot1.Graveyard = Awaken the Honored Dead; Swamp; Forest; Sol Ring
+Stack.Count = 0
