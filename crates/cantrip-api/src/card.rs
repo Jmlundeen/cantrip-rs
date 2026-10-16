@@ -139,6 +139,12 @@ pub trait LayerQuery {
     fn cards(&self) -> &CardTable;
     /// Another object's characteristics, through the layers before the one being applied.
     fn chars(&self, id: ObjectId) -> Chars;
+    /// Another object's characteristics with its own characteristic-defining abilities of power and toughness applied too
+    /// (layer 7a): what a characteristic-defining ability that reads the power of other objects needs, since those abilities
+    /// apply first (CR 613.8a dependency). Mastercraft Raptor and Wretched Bonemass read the cards used to craft them, a
+    /// Tarmogoyf among them counting as it is in exile (their rulings). Only for an object that is not the one being
+    /// computed and whose own abilities do not read it back.
+    fn chars_with_defined_pt(&self, id: ObjectId) -> Chars;
     /// The words an object's text has now (CR 612): what a static ability names, read through its source's words.
     fn words(&self, id: ObjectId) -> Words {
         crate::words(self.state(), id)

@@ -17,7 +17,7 @@ static DINOSAURS: Materials = craft::materials(1, true, dinosaur, "Dinosaur");
 /// card's power as it is in exile, a characteristic-defining ability of its own included (the card's ruling), none counting
 /// for a card with no power. With none used to craft it, its power is 0.
 fn total_crafted_power(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
-    let total: i16 = craft::used_to_craft(q.state(), source).into_iter().map(|c| q.chars(c).power.unwrap_or(0)).sum();
+    let total: i16 = craft::used_to_craft(q.state(), source).into_iter().map(|c| q.chars_with_defined_pt(c).power.unwrap_or(0)).sum();
     chars.power = Some(total);
 }
 

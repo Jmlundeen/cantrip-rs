@@ -50,6 +50,10 @@ impl LayerQuery for View<'_> {
     fn chars(&self, id: ObjectId) -> Chars {
         chars_before(self.cards, self.state, id, self.stop)
     }
+
+    fn chars_with_defined_pt(&self, id: ObjectId) -> Chars {
+        chars_before(self.cards, self.state, id, Layer::PtSet)
+    }
 }
 
 /// More permanents with static abilities than any game has at once; past it, the rest are not looked at.
