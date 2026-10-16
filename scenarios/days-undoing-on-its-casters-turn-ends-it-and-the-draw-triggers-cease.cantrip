@@ -1,0 +1,46 @@
+# Day's Undoing on Bot1's own turn: each player shuffles their hand and graveyard into their library and draws seven, then
+# the turn ends (CR 724.1). Bot1's seven draws trigger Bot2's Orcish Bowmasters seven times, but those abilities
+# triggered before the turn began to end, so they cease to exist and are never put on the stack (CR 724.1a; the card's
+# ruling): Bot1 stays at 19 and the Orc Army keeps the one counter its enters trigger gave it. Day's Undoing is exiled,
+# not shuffled in (it was on the stack) nor put into the graveyard (724.1b). Turn 4 is Bot2's.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Ruby
+Day's Undoing
+Island x20
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Orcish Bowmasters
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Orcish Bowmasters.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Target(Bot1)
+[T3 Bot1.Main1]
+? Bot1.Life = 19
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Day's Undoing.Cast
+[T4 Bot2.Upkeep]
+? ActivePlayer = Bot2
+
+[Expect]
+Turn = 4
+Bot1.Life = 19
+Bot2.Battlefield.Orc Army.Counters.PlusOnePlusOne = 1
+Bot1.Hand.Count = 7
+Exile = Day's Undoing
+Bot1.Graveyard.Count = 0

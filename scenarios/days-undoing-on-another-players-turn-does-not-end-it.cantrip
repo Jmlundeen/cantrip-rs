@@ -1,0 +1,42 @@
+# "If it's your turn, end the turn": cast on Bot2's turn (Teferi, Time Raveler's +1 lets Bot1 cast sorceries as though
+# they had flash), Day's Undoing shuffles hands and graveyards in and has each player draw seven, and the turn goes on:
+# Bot2 still reaches its end step, and Day's Undoing, having resolved, is put into Bot1's graveyard.
+
+[Bot1 Deck]
+Plains
+Mox Sapphire
+Mox Jet
+Black Lotus
+Teferi, Time Raveler
+Day's Undoing
+Island x20
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Teferi, Time Raveler.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Teferi, Time Raveler.Activate(Ability: +1)
+[T2 Bot2.Main1]
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Day's Undoing.Cast
+[T2 Bot2.End]
+? Turn = 2
+? Bot1.Graveyard = Day's Undoing
+? Bot1.Hand.Count = 7
+? Bot2.Hand.Count = 7
+
+[Expect]
+Turn = 2
+Bot1.Graveyard = Day's Undoing
+Exile.Count = 0
