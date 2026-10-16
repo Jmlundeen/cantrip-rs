@@ -1,0 +1,8 @@
+{
+  "name": "Silk, Web Weaver",
+  "manaCost": "{2}{G}{W}",
+  "type": "Legendary Creature — Spider Human Hero",
+  "power": 3,
+  "toughness": 5,
+  "oracleText": "Web-slinging {1}{G}{W} (You may cast this spell for {1}{G}{W} if you also return a tapped creature you control to its owner's hand.)\nWhenever you cast a creature spell, create a 1/1 green and white Human Citizen creature token.\n{3}{G}{W}: Creatures you control get +2/+2 and gain vigilance until end of turn."
+}

@@ -1,0 +1,68 @@
+# Silk, Web Weaver: "Web-slinging {1}{G}{W}"; "Whenever you cast a creature spell, create a 1/1 green and white Human
+# Citizen creature token."; "{3}{G}{W}: Creatures you control get +2/+2 and gain vigilance until end of turn."
+# Turn 3: Bot1 web-slings Silk for {1}{G}{W} (a Forest, a Plains and Llanowar Elves, tapped for {G} and then returned,
+# CR 601.2g, 702.188a). Silk's own cast makes nothing: it is on the stack, not the battlefield, as it is cast. Mox Emerald,
+# a noncreature spell, makes nothing; Llanowar Elves, cast again, makes a Citizen. Turn 4: Bot2's Ornithopter, not Bot1's
+# spell, makes nothing. Turn 5: Silk's ability gives each creature Bot1 controls +2/+2 and vigilance, and Silk and the
+# Citizen attack for 8 without tapping.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Silk, Web Weaver
+Plains
+Mox Emerald
+Forest
+Forest
+Forest x13
+
+[Bot2 Deck]
+Island
+Ornithopter
+Island x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Silk, Web Weaver.Cast(Ability: Web-slinging)
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Choose(Llanowar Elves)
+[T3 Bot1.Main2]
+Bot1.Hand.Mox Emerald.Cast
+? Stack = Mox Emerald
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+? Stack = Silk, Web Weaver; Llanowar Elves
+[T4 Bot2.Main1]
+? Bot1.Battlefield = Forest; Plains; Silk, Web Weaver; Mox Emerald; Llanowar Elves; Human Citizen
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T5 Bot1.Main1]
+? Bot2.Battlefield = Island; Ornithopter
+? Bot1.Battlefield.Count = 6
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Silk, Web Weaver.Activate
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Attack(Silk, Web Weaver; Human Citizen > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot2.Life = 12
+Bot1.Battlefield.Silk, Web Weaver.Power = 5
+Bot1.Battlefield.Silk, Web Weaver.Toughness = 7
+Bot1.Battlefield.Silk, Web Weaver.Tapped = false
+Bot1.Battlefield.Human Citizen.Power = 3
+Bot1.Battlefield.Human Citizen.Tapped = false
+Bot1.Battlefield.Human Citizen.Colors = Green; White
+Bot1.Battlefield.Human Citizen.Subtypes = Citizen; Human
+Bot1.Battlefield.Llanowar Elves.Power = 3
