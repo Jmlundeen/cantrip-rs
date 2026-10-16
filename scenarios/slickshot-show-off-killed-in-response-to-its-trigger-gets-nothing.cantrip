@@ -1,0 +1,35 @@
+# The trigger resolves after Show-Off left the battlefield (CR 400.7, 608.2b): on turn three Bot1 casts Lightning Bolt at
+# Bot2, the trigger goes on the stack, and Bot2 answers with its own Lightning Bolt on Show-Off (an opponent's spell does not
+# trigger it). Show-Off dies; the trigger resolves and does nothing (it is a different object if it ever came back).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Slickshot Show-Off
+Lightning Bolt
+Mountain x14
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Mountain x14
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Slickshot Show-Off.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Slickshot Show-Off)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Lightning Bolt; Slickshot Show-Off
+Bot2.Life = 17
+Stack.Count = 0

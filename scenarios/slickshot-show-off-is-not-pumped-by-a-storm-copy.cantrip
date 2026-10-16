@@ -1,0 +1,47 @@
+# Casting is not copying (CR 707.10): Show-Off gets +2 per spell cast, not per copy. On turn three Bot1 casts Lightning Bolt
+# (power 3) and then Brain Freeze with storm; Brain Freeze's one storm copy is put on the stack, not cast, so the power is 5
+# and not 7. (Bot2 also discards its eighth card to hand size, hence 7 cards in its graveyard.)
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mox Sapphire
+Slickshot Show-Off
+Lightning Bolt
+Brain Freeze
+Mountain x12
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Slickshot Show-Off.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Hand.Brain Freeze.Cast(Bot2)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Battlefield.Slickshot Show-Off.Power = 5
+Bot2.Life = 17
+Bot2.Graveyard.Count = 7

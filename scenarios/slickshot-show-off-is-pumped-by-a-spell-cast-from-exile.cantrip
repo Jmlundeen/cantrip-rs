@@ -1,0 +1,39 @@
+# "Whenever you cast a noncreature spell" does not care where it is cast from (CR 601.2, 603.2): Pillage the Bog, plotted on
+# turn one, is cast free from exile on turn three and pumps Show-Off to 3 power.
+
+[Bot1 Deck]
+Mountain
+Mox Jet
+Mox Emerald
+Mox Ruby
+Mox Ruby
+Slickshot Show-Off
+Pillage the Bog
+Mountain x13
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Slickshot Show-Off.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Pillage the Bog.Activate(Ability: Plot)
+[T3 Bot1.Main1]
+Bot1.Exile.Pillage the Bog.Cast
+Bot1.Arrange(Mountain | Mountain)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Slickshot Show-Off.Power = 3
+Exile.Count = 0
