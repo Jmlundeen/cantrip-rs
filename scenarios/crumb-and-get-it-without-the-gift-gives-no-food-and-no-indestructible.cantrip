@@ -1,0 +1,36 @@
+# Gift not promised: Bot1's Ornithopter gets +2/+2 until end of turn and nothing else, and Bot2 creates no Food.
+
+[Bot1 Deck]
+Plains
+Crumb and Get It
+Ornithopter
+Plains x18
+
+[Bot2 Deck]
+Ornithopter
+Mountain
+Lightning Bolt
+Plains x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Crumb and Get It.Cast
+Bot1.Decline
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Power = 2
+? Bot1.Battlefield.Ornithopter.Keywords = Flying
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Crumb and Get It
+Bot2.Battlefield = Ornithopter
+Bot1.Battlefield.Ornithopter.Toughness = 4

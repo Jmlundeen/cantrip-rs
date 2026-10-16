@@ -1,0 +1,40 @@
+# Gift a Food promised (CR 702.174d): Bot2 creates a Food token as the spell resolves, and Bot1's Ornithopter gets +2/+2 and indestructible until end of turn.
+# Only a creature Bot1 controls is a target: not Bot2's Ornithopter, which is on the battlefield (the refusal, with Bot1's own Ornithopter its control).
+
+[Bot1 Deck]
+Plains
+Crumb and Get It
+Ornithopter
+Plains x18
+
+[Bot2 Deck]
+Ornithopter
+Mountain
+Lightning Bolt
+Plains x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Crumb and Get It.Cast
+Bot1.Accept
+! Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Power = 2
+? Bot1.Battlefield.Ornithopter.Toughness = 4
+? Bot1.Battlefield.Ornithopter.Keywords = Flying; Indestructible
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Crumb and Get It
+Bot2.Battlefield = Food Token; Ornithopter
+Bot2.Battlefield.Food Token.Token = true
+Bot1.Battlefield.Ornithopter.Power = 2

@@ -1,0 +1,33 @@
+# Crumb and Get It targets a creature you control (CR 601.2c): with only Bot2's Ornithopter out, it is not offered, gift or no gift. Once Bot1 has one it is
+# (the positive control is the cast).
+
+[Bot1 Deck]
+Plains
+Crumb and Get It
+Ornithopter
+Plains x18
+
+[Bot2 Deck]
+Ornithopter
+Plains x19
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Hand.Crumb and Get It.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Crumb and Get It.Cast
+Bot1.Decline
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Crumb and Get It
+Bot1.Battlefield.Ornithopter.Power = 2
