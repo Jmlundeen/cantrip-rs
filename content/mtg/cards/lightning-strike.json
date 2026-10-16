@@ -1,0 +1,6 @@
+{
+  "name": "Lightning Strike",
+  "manaCost": "{1}{R}",
+  "type": "Instant",
+  "oracleText": "Lightning Strike deals 3 damage to any target."
+}

@@ -1,0 +1,49 @@
+# Lightning Strike deals 3 damage to any target (CR 120.3, 704.5g). Bot1 strikes Bot2's Drannith Magistrate (toughness 3, lethal
+# at exactly the boundary) and Concealing Curtains (toughness 4, which survives with 3 damage marked, one short).
+# Bot1 holds Mountain + three Mox Rubies (four red mana) and casts at instant speed on Bot2's turn 2.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Lightning Strike
+Lightning Strike
+Island x15
+
+[Bot2 Deck]
+Plains
+Mox Jet
+Mox Pearl
+Concealing Curtains
+Drannith Magistrate
+Island x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Concealing Curtains.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Drannith Magistrate.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Strike.Cast(Bot2.Battlefield.Drannith Magistrate)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Strike.Cast(Bot2.Battlefield.Concealing Curtains)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot2.Graveyard = Drannith Magistrate
+Bot2.Battlefield.Concealing Curtains.Damage = 3
+Bot2.Life = 20
+Bot1.Graveyard = Lightning Strike; Lightning Strike

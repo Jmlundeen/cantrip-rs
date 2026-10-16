@@ -1,0 +1,24 @@
+# "Any target" includes a player: Lightning Strike aimed at Bot2 takes Bot2 from 20 to 17 and nothing else changes.
+# The refusal is the positive control's twin: the resolved Strike in the graveyard cannot be cast again.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Lightning Strike
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Strike.Cast(Bot2)
+! Bot1.Graveyard.Lightning Strike.Cast(Bot2)
+
+[Expect]
+Bot2.Life = 17
+Bot1.Life = 20
+Bot1.Graveyard = Lightning Strike
