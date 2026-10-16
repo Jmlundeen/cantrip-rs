@@ -1,0 +1,12 @@
+{
+  "name": "Steamcore Scholar",
+  "manaCost": "{2}{U}",
+  "type": "Creature — Weird Detective",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Flying, vigilance\nWhen this creature enters, draw two cards. Then discard two cards unless you discard an instant or sorcery card or a creature card with flying.",
+  "keywords": [
+    "Flying",
+    "Vigilance"
+  ]
+}

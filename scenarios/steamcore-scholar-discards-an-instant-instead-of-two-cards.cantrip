@@ -1,0 +1,36 @@
+# Steamcore Scholar: when it enters you draw two cards, then discard two cards unless you discard an instant or sorcery
+# card or a creature card with flying. Lightning Bolt in hand after the draw makes the one-card discard available;
+# the player takes it and chooses the Bolt. The Island is not an eligible card for it (refusal beside the positive choice).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Steamcore Scholar
+Lightning Bolt
+Island
+Island
+Plains
+Plains
+Plains x13
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Steamcore Scholar.Cast
+Bot1.Modes(Discard an instant)
+! Bot1.Choose(Island)
+Bot1.Choose(Lightning Bolt)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Lightning Bolt
+Bot1.Hand.Count = 4
+Bot1.Battlefield.Steamcore Scholar.Keywords = Flying; Vigilance

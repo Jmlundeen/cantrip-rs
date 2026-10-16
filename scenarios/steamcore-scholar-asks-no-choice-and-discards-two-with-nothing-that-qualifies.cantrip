@@ -1,0 +1,33 @@
+# Steamcore Scholar: with no instant, sorcery or flying creature card in hand after the draw (Thraben Inspector does
+# not qualify) the choice of how to discard is not offered, and two cards are discarded.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Steamcore Scholar
+Thraben Inspector
+Island
+Plains
+Plains
+Mountain
+Plains x11
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Steamcore Scholar.Cast
+! Bot1.Modes
+Bot1.Choose(Thraben Inspector; Island)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Island; Thraben Inspector
+Bot1.Hand.Count = 3

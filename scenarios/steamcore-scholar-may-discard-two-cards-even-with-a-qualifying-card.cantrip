@@ -1,0 +1,33 @@
+# Steamcore Scholar (ruling 2024-02-02): you can discard any two cards even when one has the listed characteristics.
+# Lightning Bolt is in hand, the player chooses the two-card discard and puts the Bolt and an Island in the graveyard.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Steamcore Scholar
+Lightning Bolt
+Island
+Island
+Plains
+Plains
+Plains x13
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Steamcore Scholar.Cast
+Bot1.Modes(Discard two cards)
+Bot1.Choose(Lightning Bolt; Island)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Island; Lightning Bolt
+Bot1.Hand.Count = 3
