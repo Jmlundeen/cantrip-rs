@@ -4,7 +4,7 @@
   "type": "Creature — Vampire Knight",
   "power": 5,
   "toughness": 5,
-  "oracleText": "Flying, deathtouch\nWhenever an opponent loses life, you gain that much life.",
+  "oracleText": "Flying, deathtouch\nWhenever an opponent loses life, you gain that much life. (Damage causes loss of life.)",
   "keywords": [
     "Flying",
     "Deathtouch"

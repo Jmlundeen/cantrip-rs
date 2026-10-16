@@ -2,14 +2,6 @@ use cantrip_api::*;
 use cantrip_mechanics::{mana, targets};
 use cantrip_oracle as oracle;
 
-/// Return target card from your graveyard to your hand.
-fn recover(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(card) = targets::object(g, item, 0) {
-        g.return_to_hand(&[card]);
-    }
-    Ok(())
-}
-
 pub static BACK: CardDef = CardDef {
     abilities: &[mana_ability(TAP, add(Mana::G), "{T}: Add {G}.")],
     enters: Some(mana::enters_tapped),
@@ -17,7 +9,7 @@ pub static BACK: CardDef = CardDef {
 };
 
 pub static CARD: CardDef = CardDef {
-    spell: spell(&[targets::CARD_IN_YOUR_GRAVEYARD], recover),
+    spell: spell(&[targets::CARD_IN_YOUR_GRAVEYARD], cantrip_mechanics::effects::return_first_target_to_hand),
     back: Some(&BACK),
     ..oracle::BALA_GED_RECOVERY
 };

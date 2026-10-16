@@ -2,20 +2,12 @@ use cantrip_api::*;
 use cantrip_mechanics::{targets, triggers};
 use cantrip_oracle as oracle;
 
-/// Return target card from your graveyard to your hand.
-fn regrowth(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(card) = targets::object(g, item, 0) {
-        g.return_to_hand(&[card]);
-    }
-    Ok(())
-}
-
 /// Emeritus of Abundance's prepare spell (CR 722): not a card here, only ever a copy.
 pub static REGROWTH: CardDef = CardDef {
     name: "Regrowth",
     cost: mana("{1}{G}"),
     types: TypeSet::of(&[CardType::Sorcery]),
-    spell: spell(&[targets::CARD_IN_YOUR_GRAVEYARD], regrowth),
+    spell: spell(&[targets::CARD_IN_YOUR_GRAVEYARD], cantrip_mechanics::effects::return_first_target_to_hand),
     text: "Return target card from your graveyard to your hand.",
     ..CardDef::BLANK
 };

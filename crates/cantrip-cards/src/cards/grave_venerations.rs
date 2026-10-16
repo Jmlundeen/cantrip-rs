@@ -1,5 +1,4 @@
 use cantrip_api::*;
-use cantrip_mechanics::targets;
 use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
@@ -15,20 +14,12 @@ fn you_are_monarch(q: &dyn Query, asker: &Asker) -> bool {
     q.state().player(asker.controller).monarch
 }
 
-/// Return up to one target creature card from your graveyard to your hand, if it is still a legal target.
-fn return_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(card) = targets::object(g, item, 0) {
-        g.return_to_hand(&[card]);
-    }
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ENTERS, cantrip_mechanics::effects::become_monarch, "When this enchantment enters, you become the monarch."),
         triggered(cantrip_mechanics::triggers::CREATURE_YOU_CONTROL_DIES, drain, "Whenever a creature you control dies, each opponent loses 1 life and you gain 1 life.")
             .look_back(),
-        triggered(cantrip_mechanics::triggers::YOUR_END_STEP, return_it, "At the beginning of your end step, if you're the monarch, return up to one target creature card from your graveyard to your hand.")
+        triggered(cantrip_mechanics::triggers::YOUR_END_STEP, cantrip_mechanics::effects::return_first_target_to_hand, "At the beginning of your end step, if you're the monarch, return up to one target creature card from your graveyard to your hand.")
             .targets(&[cantrip_mechanics::targets::CREATURE_CARD_IN_YOUR_GRAVEYARD.between(0, 1)])
             .condition(you_are_monarch),
     ],

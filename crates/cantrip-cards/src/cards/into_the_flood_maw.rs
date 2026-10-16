@@ -14,21 +14,11 @@ fn creature_or_nonland_permanent(q: &dyn Query, asker: &Asker, t: Target) -> boo
     (filter.filter)(q, asker, t)
 }
 
-/// "Return target creature an opponent controls to its owner's hand. If the gift was promised, instead return target
-/// nonland permanent an opponent controls to its owner's hand." The gift itself was given before this runs
-/// (CR 702.174j).
-fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(permanent) = targets::object(g, item, 0) {
-        g.return_to_hand(&[permanent]);
-    }
-    Ok(())
-}
-
 /// "Gift a tapped Fish" (CR 702.174f): the Fish is the card's own token.
 pub static EXTRA: &[&CardDef] = &[&tokens::FISH];
 
 pub static CARD: CardDef = CardDef {
-    spell: spell(&[target(creature_or_nonland_permanent)], effect),
+    spell: spell(&[target(creature_or_nonland_permanent)], cantrip_mechanics::effects::return_first_target_to_hand),
     gift: Some(gift::TAPPED_FISH),
     ..oracle::INTO_THE_FLOOD_MAW
 };

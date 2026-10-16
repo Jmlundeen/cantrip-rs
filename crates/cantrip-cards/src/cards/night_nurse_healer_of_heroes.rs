@@ -9,15 +9,8 @@ fn permanent_card_put_there_this_turn(q: &dyn Query, asker: &Asker, t: Target) -
     targets::permanent_card_in_your_graveyard(q, asker, t) && matches!(t, Target::Object(id) if cantrip_mechanics::history::arrived_this_turn(q, id))
 }
 
-fn return_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(card) = targets::object(g, item, 0) {
-        g.return_to_hand(&[card]);
-    }
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
-    abilities: &[triggered(THIS_ENTERS, return_it, "When Night Nurse enters, choose target permanent card in your graveyard that was put there from anywhere this turn. Return it to your hand.")
+    abilities: &[triggered(THIS_ENTERS, cantrip_mechanics::effects::return_first_target_to_hand, "When Night Nurse enters, choose target permanent card in your graveyard that was put there from anywhere this turn. Return it to your hand.")
         .targets(&[target(permanent_card_put_there_this_turn)])],
     ..oracle::NIGHT_NURSE_HEALER_OF_HEROES
 };

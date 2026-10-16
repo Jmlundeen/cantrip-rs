@@ -11,18 +11,10 @@ fn bounceable(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     })
 }
 
-/// Channel: return the target to its owner's hand.
-fn bounce(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(permanent) = targets::object(g, item, 0) {
-        g.return_to_hand(&[permanent]);
-    }
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
     abilities: &[
         mana_ability(TAP, add(Mana::U), "{T}: Add {U}."),
-        ability(cost("{3}{U}").and(DISCARD_THIS), bounce, "Channel \u{2014} {3}{U}, Discard this card: Return target artifact, creature, enchantment, or planeswalker to its owner's hand. This ability costs {1} less to activate for each legendary creature you control.")
+        ability(cost("{3}{U}").and(DISCARD_THIS), cantrip_mechanics::effects::return_first_target_to_hand, "Channel \u{2014} {3}{U}, Discard this card: Return target artifact, creature, enchantment, or planeswalker to its owner's hand. This ability costs {1} less to activate for each legendary creature you control.")
             .targets(&[target(bounceable)])
             .from(ZoneKind::Hand),
     ],

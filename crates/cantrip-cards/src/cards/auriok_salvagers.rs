@@ -12,15 +12,8 @@ fn cheap_artifact_in_your_graveyard(q: &dyn Query, asker: &Asker, t: Target) -> 
     }
 }
 
-fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(card) = targets::object(g, item, 0) {
-        g.return_to_hand(&[card]);
-    }
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
-    abilities: &[ability(cost("{1}{W}"), effect, "{1}{W}: Return target artifact card with mana value 1 or less from your graveyard to your hand.")
+    abilities: &[ability(cost("{1}{W}"), cantrip_mechanics::effects::return_first_target_to_hand, "{1}{W}: Return target artifact card with mana value 1 or less from your graveyard to your hand.")
         .targets(&[target(cheap_artifact_in_your_graveyard)])],
     ..oracle::AURIOK_SALVAGERS
 };

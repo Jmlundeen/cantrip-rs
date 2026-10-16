@@ -2,14 +2,6 @@ use cantrip_api::*;
 use cantrip_mechanics::{damage_target, discard_chosen, targets};
 use cantrip_oracle as oracle;
 
-/// Mode 0: return target creature card from your graveyard to your hand.
-fn return_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(card) = targets::object(g, item, 0) {
-        g.return_to_hand(&[card]);
-    }
-    Ok(())
-}
-
 /// Mode 1: target player discards a card.
 fn discard(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if g.target_legal(item, 0)
@@ -33,7 +25,7 @@ fn damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 static MODAL: ModalDef = modes(&[
-    mode(return_creature, "Return target creature card from your graveyard to your hand.")
+    mode(cantrip_mechanics::effects::return_first_target_to_hand, "Return target creature card from your graveyard to your hand.")
         .targets(&[targets::CREATURE_CARD_IN_YOUR_GRAVEYARD]),
     mode(discard, "Target player discards a card.")
         .targets(&[targets::PLAYER]),
