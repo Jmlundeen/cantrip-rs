@@ -1,0 +1,48 @@
+# The trigger goes on the stack above the Bolt, so the Bolt can be countered before it resolves. Bot2 counters it with Counterspell; the
+# trigger still resolves and copies the Bolt as it last was on the stack (CR 707.10, 608.2h), and Bot1 aims the copy at Bot2.
+
+[Bot1 Deck]
+Leyline of Resonance
+Forest
+Forest
+Mountain
+Llanowar Elves
+Lightning Bolt
+Forest x14
+
+[Bot2 Deck]
+Island
+Island
+Island
+Counterspell
+Island x14
+
+[Actions]
+Bot1.Accept
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Llanowar Elves)
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Battlefield.Island#1.Activate
+Bot2.Battlefield.Island#2.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Lightning Bolt)
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2)
+Bot1.Pass
+[T5 Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Llanowar Elves.Damage = 0
+Bot1.Graveyard = Lightning Bolt

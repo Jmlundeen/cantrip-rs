@@ -1,0 +1,33 @@
+# "A single creature you control": Lightning Bolt at Bot2's Llanowar Elves targets a creature, but not one Bot1 controls, so nothing is
+# copied (the Bolt at Bot1's own Elves is copied in leyline-of-resonance-copy-of-lightning-bolt-may-be-aimed-at-a-new-target).
+
+[Bot1 Deck]
+Leyline of Resonance
+Mountain
+Lightning Bolt
+Island x14
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Island x12
+
+[Actions]
+Bot1.Accept
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Llanowar Elves)
+? Stack.Count = 1
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Llanowar Elves
+Bot2.Life = 20

@@ -1,0 +1,35 @@
+# Leyline of Resonance costs {2}{R}{R}, so it is a red enchantment. Bot1 declines the opening-hand action, then casts it from hand with
+# four Mountains.
+
+[Bot1 Deck]
+Leyline of Resonance
+Mountain
+Mountain
+Mountain
+Mountain
+Island
+Island
+Mountain x10
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Decline
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Battlefield.Mountain#4.Activate
+Bot1.Hand.Leyline of Resonance.Cast
+Bot1.Pass
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Leyline of Resonance.Colors = Red

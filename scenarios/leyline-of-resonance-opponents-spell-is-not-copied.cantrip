@@ -1,0 +1,32 @@
+# "Whenever you cast": Bot1's Leyline does not answer Bot2's spells. Bot2 casts Lightning Bolt at its own Llanowar Elves, a single creature
+# its caster controls, and only the Bolt is on the stack.
+
+[Bot1 Deck]
+Leyline of Resonance
+Island x14
+
+[Bot2 Deck]
+Forest
+Mountain
+Llanowar Elves
+Lightning Bolt
+Island x12
+
+[Actions]
+Bot1.Accept
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Llanowar Elves)
+? Stack.Count = 1
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot2.Graveyard = Llanowar Elves; Lightning Bolt

@@ -1,0 +1,42 @@
+# "A single creature you control" is a permanent (CR 110.2, 109.4). Bot1's Bolt at its own Llanowar Elves is copied (the copy goes to Bot2) and
+# kills the Elves; the Reanimate that then targets the Elves card in Bot1's graveyard is alone on the stack.
+
+[Bot1 Deck]
+Leyline of Resonance
+Forest
+Mountain
+Swamp
+Llanowar Elves
+Lightning Bolt
+Reanimate
+Forest x10
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Accept
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Llanowar Elves)
+? Stack.Count = 2
+Bot1.Pass
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Reanimate.Cast(Llanowar Elves)
+? Stack.Count = 1
+Bot1.Pass
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Llanowar Elves.Power = 1

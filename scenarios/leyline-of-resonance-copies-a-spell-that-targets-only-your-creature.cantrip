@@ -1,0 +1,40 @@
+# Leyline of Resonance: "If this card is in your opening hand, you may begin the game with it on the battlefield" (CR 103.6a);
+# "Whenever you cast an instant or sorcery spell that targets only a single creature you control, copy that spell. You may choose
+# new targets for the copy." Bot1 begins with the Leyline out, plays Llanowar Elves, and casts Snakeskin Veil on it: the trigger
+# copies the Veil (CR 707.10), the Elves are the only creature the copy could be aimed at, so it asks nothing and keeps them, and the Elves get a counter from each (2/2 -> 3/3).
+
+[Bot1 Deck]
+Leyline of Resonance
+Forest
+Forest
+Llanowar Elves
+Snakeskin Veil
+Island
+Island
+Forest x10
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Accept
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Hand.Snakeskin Veil.Cast(Llanowar Elves)
+? Stack.Count = 2
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Battlefield.Leyline of Resonance.Types = Enchantment
+Bot1.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Llanowar Elves.Power = 3
+Bot1.Battlefield.Llanowar Elves.Keywords = Hexproof
+Bot1.Graveyard = Snakeskin Veil

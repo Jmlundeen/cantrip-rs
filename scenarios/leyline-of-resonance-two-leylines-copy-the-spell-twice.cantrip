@@ -1,0 +1,35 @@
+# Each Leyline triggers on its own (CR 603.2): with two out, Snakeskin Veil on Bot1's Llanowar Elves is copied twice, three +1/+1 counters in
+# all (the two triggers are ordered by default; identical, so either order). The copies are not cast, so they set off nothing more (CR 707.10).
+
+[Bot1 Deck]
+Leyline of Resonance
+Leyline of Resonance
+Forest
+Forest
+Llanowar Elves
+Snakeskin Veil
+Island
+Forest x10
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Accept
+Bot1.Accept
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Hand.Snakeskin Veil.Cast(Llanowar Elves)
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = 3

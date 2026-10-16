@@ -1,0 +1,39 @@
+# Leyline of Resonance: the copy may have new targets (CR 707.10c). Bot1 casts Lightning Bolt at its own Llanowar Elves (the Bolt targets
+# only a single creature Bot1 controls), the trigger copies it, and Bot1 aims the copy at Bot2: the copy resolves first (3 damage to
+# Bot2), then the original kills the Elves.
+
+[Bot1 Deck]
+Leyline of Resonance
+Forest
+Mountain
+Llanowar Elves
+Lightning Bolt
+Island
+Island
+Forest x10
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Accept
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Llanowar Elves)
+? Stack.Count = 2
+Bot1.Pass
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot2.Life = 17
+Bot1.Life = 20
+Bot1.Graveyard = Llanowar Elves; Lightning Bolt

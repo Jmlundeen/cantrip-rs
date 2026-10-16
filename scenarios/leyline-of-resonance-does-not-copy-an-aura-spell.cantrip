@@ -1,0 +1,35 @@
+# "An instant or sorcery spell": All That Glitters is an Aura spell, which targets only Bot1's Llanowar Elves yet is not copied (CR 304.1,
+# 303.4a); the Aura alone is on the stack. Positive control: Snakeskin Veil on the same creature is copied
+# (leyline-of-resonance-copies-a-spell-that-targets-only-your-creature).
+
+[Bot1 Deck]
+Leyline of Resonance
+Forest
+Plains
+Plains
+Llanowar Elves
+All That Glitters
+Island
+Forest x10
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Accept
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.All That Glitters.Cast(Llanowar Elves)
+? Stack.Count = 1
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.All That Glitters.AttachedTo = Llanowar Elves

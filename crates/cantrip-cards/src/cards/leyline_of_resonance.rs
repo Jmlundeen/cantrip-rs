@@ -1,0 +1,46 @@
+use cantrip_api::*;
+use cantrip_mechanics::targets;
+use cantrip_oracle as oracle;
+
+/// "If this card is in your opening hand" (CR 103.6a): any player may, nothing else is required.
+fn in_any_opening_hand(_: &dyn Query, _: &Asker) -> bool {
+    true
+}
+
+/// "An instant or sorcery spell that targets only a single creature you control" (CR 115.1): every target the spell has, as
+/// it was announced (CR 601.2c), is the one creature, however many times it is chosen. A creature card in a graveyard is not a creature you control (CR 110.2). A spell with a player, or a second
+/// object, as a target does not qualify, and neither does one with no targets.
+fn instant_or_sorcery_targeting_only_one_creature_you_control(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    let Event::SpellCast { spell, player, .. } = event else { return None };
+    let you = q.controller(source);
+    let chars = q.chars(*spell);
+    if *player != you || !(chars.is(CardType::Instant) || chars.is(CardType::Sorcery)) {
+        return None;
+    }
+    let state = q.state();
+    let item = state.stack.iter().find(|i| i.kind == StackKind::Spell && i.object == *spell).or_else(|| state.left_stack(*spell))?;
+    let mut chosen = item.targets[..item.target_count as usize].iter();
+    let first = chosen.next()?.object()?;
+    if chosen.any(|t| t.object() != Some(first)) || !targets::permanent(q, first) || !q.chars(first).is(CardType::Creature) || q.controller(first) != you {
+        return None;
+    }
+    Fired::about(Target::Object(*spell))
+}
+
+/// "Copy that spell. You may choose new targets for the copy" (CR 707.10, 707.10c).
+fn copy_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    // The subject is always the spell that was cast (`Fired::about` above).
+    let spell = item.subject.object().expect("the cast spell");
+    g.copy_spell(spell, item.controller, true)?;
+    Ok(())
+}
+
+pub static CARD: CardDef = CardDef {
+    abilities: &[triggered(
+        when(EventMask::SPELL_CAST, instant_or_sorcery_targeting_only_one_creature_you_control),
+        copy_it,
+        "Whenever you cast an instant or sorcery spell that targets only a single creature you control, copy that spell. You may choose new targets for the copy.",
+    )],
+    opening_hand: Some(OpeningHandAction { condition: in_any_opening_hand, counter: None, exile_from_hand: 0 }),
+    ..oracle::LEYLINE_OF_RESONANCE
+};

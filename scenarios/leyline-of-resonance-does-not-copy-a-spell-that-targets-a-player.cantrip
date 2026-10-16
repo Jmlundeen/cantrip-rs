@@ -1,0 +1,24 @@
+# Leyline of Resonance copies only a spell that targets a creature you control. Lightning Bolt at Bot2 has no creature as a target, so the
+# Bolt is the only thing on the stack (positive control: the Bolt at Bot1's own Elves, in leyline-of-resonance-copy-of-lightning-bolt-may-be-aimed-at-a-new-target).
+
+[Bot1 Deck]
+Leyline of Resonance
+Mountain
+Lightning Bolt
+Island x14
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Accept
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Stack.Count = 1
+Bot1.Pass
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17

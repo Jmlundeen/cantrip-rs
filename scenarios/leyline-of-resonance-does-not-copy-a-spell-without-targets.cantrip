@@ -1,0 +1,23 @@
+# A spell with no targets does not "target only a single creature you control": Brainstorm is alone on the stack with the Leyline out.
+
+[Bot1 Deck]
+Leyline of Resonance
+Island
+Brainstorm
+Island x14
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Accept
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Brainstorm.Cast
+? Stack.Count = 1
+Bot1.Pass
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Brainstorm

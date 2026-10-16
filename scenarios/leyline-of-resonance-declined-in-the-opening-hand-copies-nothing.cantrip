@@ -1,0 +1,34 @@
+# "You may begin the game with it on the battlefield" (CR 103.6a): Bot1 declines, so the Leyline stays in hand and a Snakeskin Veil on Bot1's
+# Llanowar Elves is not copied (one +1/+1 counter, not two). Positive control: leyline-of-resonance-copies-a-spell-that-targets-only-your-creature.
+
+[Bot1 Deck]
+Leyline of Resonance
+Forest
+Forest
+Llanowar Elves
+Snakeskin Veil
+Island
+Island
+Forest x10
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Decline
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Hand.Snakeskin Veil.Cast(Llanowar Elves)
+? Stack.Count = 1
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = 1
+Bot1.Hand = Leyline of Resonance; Island; Island; Forest

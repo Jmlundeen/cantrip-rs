@@ -1,0 +1,36 @@
+# "An instant or sorcery spell": Impolite Entrance is a sorcery that targets Bot1's Llanowar Elves, so the Leyline copies it. The Elves gain
+# trample and haste either way, and Bot1 draws a card from the spell and one from its copy.
+
+[Bot1 Deck]
+Leyline of Resonance
+Forest
+Mountain
+Mountain
+Llanowar Elves
+Impolite Entrance
+Island
+Forest x10
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Accept
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Impolite Entrance.Cast(Llanowar Elves)
+? Stack.Count = 2
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Keywords = Haste; Trample
+Bot1.Hand.Count = 5
+Bot1.Graveyard = Impolite Entrance

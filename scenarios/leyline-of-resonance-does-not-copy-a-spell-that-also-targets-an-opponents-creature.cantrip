@@ -1,0 +1,39 @@
+# Untimely Malfunction's third mode announced at Bot1's Llanowar Elves and Bot2's Ornithopter: one creature Bot1 controls, but not the only
+# target, so the spell is alone on the stack. Positive control: Snakeskin Veil on one creature is copied
+# (leyline-of-resonance-copies-a-spell-that-targets-only-your-creature).
+
+[Bot1 Deck]
+Leyline of Resonance
+Forest
+Llanowar Elves
+Mountain
+Untimely Malfunction
+Mountain x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Accept
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Untimely Malfunction.Cast
+Bot1.Modes(3)
+Bot1.Target(Llanowar Elves; Ornithopter)
+? Stack.Count = 1
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Untimely Malfunction
