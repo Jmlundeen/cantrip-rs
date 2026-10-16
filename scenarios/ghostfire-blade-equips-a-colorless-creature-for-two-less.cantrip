@@ -1,0 +1,46 @@
+# Ghostfire Blade: "Equip {3}. This Equipment's equip ability costs {2} less to activate if it targets a colorless
+# creature" (CR 601.2c, 601.2f, 602.2b). Targeting the colorless Ornithopter it costs {1}, paid with the {R} in the
+# pool; moved to the green Llanowar Elves, it costs the full {3}, paid with {B}{C}{C}. Each pool is emptied exactly.
+
+[Bot1 Deck]
+Mox Emerald
+Llanowar Elves
+Mox Jet
+Sol Ring
+Ghostfire Blade
+Ornithopter
+Mox Ruby
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Ghostfire Blade.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Ghostfire Blade.Activate(Ornithopter)
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+? Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Ghostfire Blade.Activate(Llanowar Elves)
+? Bot1.Mana =
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Ghostfire Blade.AttachedTo = Llanowar Elves
+Bot1.Battlefield.Llanowar Elves.Power = 3
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Mox Emerald.Tapped = false

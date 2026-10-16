@@ -1,0 +1,6 @@
+{
+  "name": "Ghostfire Blade",
+  "manaCost": "{1}",
+  "type": "Artifact — Equipment",
+  "oracleText": "Equipped creature gets +2/+2.\nEquip {3}\nThis Equipment's equip ability costs {2} less to activate if it targets a colorless creature."
+}
