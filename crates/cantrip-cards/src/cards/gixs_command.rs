@@ -38,7 +38,7 @@ fn counters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     };
     if targets::permanent(g, chosen) {
         g.add_counters(chosen, CounterKind::PlusOne, 2);
-        g.add_effect(item.object, chosen, EffectKind::AddKeywords(Keywords::of(&[Keyword::Lifelink])), Duration::EndOfTurn);
+        cantrip_mechanics::effects::gain_lifelink_until_end_of_turn(g, item.object, chosen);
     }
     Ok(())
 }
