@@ -268,6 +268,16 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
                 def.ways.get(o.index as usize - 1).map_or(def.cost, |w| w.cost.mana)
             };
             m.has_x = cost.x > 0;
+            // A cost that depends on the target it is cast with (CR 601.2c, 601.2f): the row says what the cast costs with
+            // each candidate, where that is not its mana cost.
+            if o.index == 0 && o.targets_required == 1 && !o.target_candidates.is_empty() {
+                let player = game.state.obj(src).controller;
+                let costs = cast_costs(game, player, src, &o.target_candidates);
+                if costs.iter().any(|&c| c != cost) {
+                    let each = costs_by_target(game, &o.target_candidates, &costs);
+                    m.description = if m.description.is_empty() { format!("costs {each}") } else { format!("{} (costs {each})", m.description) };
+                }
+            }
             m.target_candidates = candidates;
         }
         ActionKind::ActivateAbility => {
@@ -290,6 +300,14 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
                         m.targets_required = 0;
                         return m;
                     }
+                } else if o.targets_required == 1 && !o.target_candidates.is_empty() {
+                    // A cost that depends on the target it is announced with (CR 601.2c, 601.2f, 602.2b): the row says what
+                    // the activation costs with each candidate, where that is not the printed cost.
+                    let player = game.state.obj(src).controller;
+                    let costs = activation_costs(game, player, src, o.index, &o.target_candidates);
+                    if costs.iter().any(|&c| c != d.cost.mana) {
+                        m.description = format!("{} (costs {})", m.description, costs_by_target(game, &o.target_candidates, &costs));
+                    }
                 }
             }
             m.target_candidates = candidates;
@@ -302,6 +320,20 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
         _ => m.target_candidates = candidates,
     }
     m
+}
+
+/// What an action costs with each candidate target, for its menu row: "{1} targeting Dwarven Mauler, {4} targeting
+/// Ornithopter".
+fn costs_by_target(game: &Game, candidates: &[Target], costs: &[ManaCost]) -> String {
+    let each: Vec<String> = candidates
+        .iter()
+        .zip(costs)
+        .map(|(t, cost)| match t.object() {
+            Some(id) => format!("{cost} targeting {}", game.name(id)),
+            None => format!("{cost} targeting a player"),
+        })
+        .collect();
+    each.join(", ")
 }
 
 fn options_messages(game: &Game, handles: &mut HandleSpace, options: &[ActionOption]) -> Vec<ActionOptionMessage> {

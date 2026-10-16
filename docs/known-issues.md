@@ -155,3 +155,21 @@ Resonance, Lutri, storm and replicate copies). A fix has `retarget` take the spe
 
 **Scenarios.**
 - [`scenarios/restoration-magic-copy-may-be-aimed-at-a-new-target.cantrip`](../scenarios/restoration-magic-copy-may-be-aimed-at-a-new-target.cantrip) - the copy of a Cura aimed at a Plains (marked `# Known bug`).
+
+### KI-10: A lone action whose cost depends on its target shows only the printed cost until the payment
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Open | client | 2026-10-16, review of target-aware costs |
+
+**Notes.** The total cost of a spell or ability is determined once its target is announced (CR 601.2c, 601.2f, 602.2b).
+The host words what an activation or a cast costs with each candidate into the action's description ("Equip {2} (costs
+{0} targeting Dwarven Mauler, {2} targeting Ornithopter)", `prompt.rs` `costs_by_target`), which the card menu shows when a
+card has two or more actions. A card with a single action (Dragonfire Blade's equip, Ajani's Response in hand) goes
+straight to its targets when clicked, with no menu row: the targeting caption ("Target for Dragonfire Blade") does not say
+what each target would cost, and the real total first shows at the payment ("{1} of {1} still to pay"), where the player
+may still cancel. Targets the cost could not be paid for are not offered. A fix shows the description in the targeting
+caption, or the cost on each candidate as it is pointed at.
+
+**Scenarios.**
+- [`scenarios/dragonfire-blade-equip-shows-its-reduced-cost-and-the-granted-hexproof-in-the-browser.cantrip`](../scenarios/dragonfire-blade-equip-shows-its-reduced-cost-and-the-granted-hexproof-in-the-browser.cantrip) - the menu row of a two-action card (Shadowspear) and the payment of a one-action card (the Blade).
