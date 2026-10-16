@@ -1,0 +1,48 @@
+# Bot2 answers with Dawn's Truce, so Bot2 has hexproof from Bot1's spell: its only target is no longer legal, so the spell
+# doesn't resolve (CR 608.2b) and neither the sacrifice nor the 2 life happens. The Elvish Mystic stays.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Break Under Pressure
+Swamp
+Swamp
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mox Emerald
+Elvish Mystic
+Dawn's Truce
+Plains
+Plains
+Plains x13
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Break Under Pressure.Cast(Bot2)
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Dawn's Truce.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Battlefield = Plains; Mox Pearl; Mox Emerald; Elvish Mystic
+Bot2.Graveyard = Dawn's Truce
+Bot1.Graveyard = Break Under Pressure

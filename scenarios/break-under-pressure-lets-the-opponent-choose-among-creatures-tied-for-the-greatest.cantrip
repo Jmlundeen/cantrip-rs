@@ -1,0 +1,49 @@
+# Elvish Mystic and Llanowar Elves (both mana value 1) tie for the greatest among Bot2's creatures; the Ornithopter (mana
+# value 0) is not in the running. Bot2, who sacrifices, chooses (CR 701.21a): the Llanowar Elves, though the Mystic is
+# first. Only that one is sacrificed; `! Bot2.Choose(Ornithopter)` shows the Ornithopter was never an option.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Break Under Pressure
+Swamp
+Swamp
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Elvish Mystic
+Llanowar Elves
+Ornithopter
+Forest
+Forest
+Forest x13
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Break Under Pressure.Cast(Bot2)
+! Bot2.Choose(Ornithopter)
+Bot2.Choose(Llanowar Elves)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot2.Graveyard = Llanowar Elves
+Bot2.Battlefield = Forest; Mox Emerald; Elvish Mystic; Ornithopter

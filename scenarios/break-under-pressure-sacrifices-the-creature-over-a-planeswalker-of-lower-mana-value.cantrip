@@ -1,0 +1,55 @@
+# The other direction of the one group: Bot2 controls Liliana of the Veil (mana value 3) and Sheoldred, the Apocalypse
+# (mana value 4). In Bot2's end step on turn 4 Bot1 casts Break Under Pressure; the creature is sacrificed, the planeswalker
+# stays, and Bot1 gains 2 life (Sheoldred gone, Bot1 loses nothing more).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Break Under Pressure
+Swamp
+Swamp
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Liliana of the Veil
+Swamp
+Sheoldred, the Apocalypse
+Swamp x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Liliana of the Veil.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp#1.Activate
+Bot2.Battlefield.Swamp#2.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Sheoldred, the Apocalypse.Cast
+[T4 Bot2.End]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Break Under Pressure.Cast(Bot2)
+! Bot2.Choose
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Life = 22
+Bot2.Graveyard = Sheoldred, the Apocalypse
+Bot2.Battlefield.Liliana of the Veil.Tapped = false
+Bot1.Graveyard = Break Under Pressure

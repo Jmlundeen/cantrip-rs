@@ -1,0 +1,54 @@
+# Creatures and planeswalkers are one group (ruling): Bot2 controls Jace, the Mind Sculptor (mana value 4) and Elvish Mystic
+# (mana value 1). Break Under Pressure on turn 3 makes Bot2 sacrifice the planeswalker, with the greatest mana value;
+# nothing is asked (a single permanent has it, `! Bot2.Choose`), the Mystic stays, and Bot1 gains 2 life.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Break Under Pressure
+Swamp
+Swamp
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Pearl
+Mox Ruby
+Mox Emerald
+Jace, the Mind Sculptor
+Elvish Mystic
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Jace, the Mind Sculptor.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Break Under Pressure.Cast(Bot2)
+! Bot2.Choose
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot2.Graveyard = Jace, the Mind Sculptor
+Bot2.Battlefield = Island; Mox Sapphire; Mox Pearl; Mox Ruby; Mox Emerald; Elvish Mystic
+Bot1.Graveyard = Break Under Pressure

@@ -1,0 +1,6 @@
+{
+  "name": "Break Under Pressure",
+  "manaCost": "{2}{B}",
+  "type": "Instant",
+  "oracleText": "Target opponent sacrifices a creature or planeswalker with the greatest mana value among creatures and planeswalkers they control. You gain 2 life."
+}
