@@ -1054,6 +1054,7 @@ fn retarget(cx: &mut Cx, top: usize, object: ObjectId, asked_about: ObjectId, ch
             purpose: Purpose::Targets,
             candidates: candidates.clone(),
             optional: false,
+            least: current.len() as u8,
             count: current.len() as u8,
             any_number: false,
         };
@@ -1131,6 +1132,7 @@ pub fn change_target(cx: &mut Cx, of: Target, chooser: PlayerId) -> R<()> {
                 purpose: Purpose::Targets,
                 candidates: others.clone(),
                 optional: false,
+                least: 1,
                 count: 1,
                 any_number: false,
             };
@@ -1704,6 +1706,7 @@ pub fn proliferate(cx: &mut Cx, player: PlayerId, source: ObjectId) -> R<()> {
         count: candidates.len().min(255) as u8,
         candidates,
         optional: true,
+            least: 0,
         any_number: true,
     };
     let Answer::Targets(chosen) = cx.ask_core(player, ask, false)? else { return Ok(()) };

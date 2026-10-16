@@ -20,10 +20,12 @@ public sealed partial class TacticalPlay
         EffectRead effect = Reading(client, prompt.Text, prompt.Source, prompt.Ability);
         (List<TargetMessage> targets, _) = Pick(client, view, effect, prompt.Candidates, prompt.Count, prompt.Optional);
 
-        // A slot that takes several wants exactly that many (CR 601.2c), so it is filled with the best of what is left.
-        if (!prompt.Optional && targets.Count < Math.Min(prompt.Count, prompt.Candidates.Count))
+        // A slot that takes several wants that many (CR 601.2c), or its minimum where it is a printed range ("one or two
+        // target creatures"), so it is filled with the best of what is left.
+        int fewest = Math.Min(prompt.Minimum > 0 ? prompt.Minimum : prompt.Count, prompt.Candidates.Count);
+        if (!prompt.Optional && targets.Count < fewest)
         {
-            targets.AddRange(prompt.Candidates.Where(candidate => !targets.Contains(candidate)).Take(prompt.Count - targets.Count));
+            targets.AddRange(prompt.Candidates.Where(candidate => !targets.Contains(candidate)).Take(fewest - targets.Count));
         }
 
         return new TargetsChosenAnswer { Targets = targets };

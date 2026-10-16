@@ -230,10 +230,11 @@ pub enum RequestKind {
     /// `kind` is what the asking card calls what may be chosen when it says more than "card" ("artifact or creature",
     /// "nonland"), empty otherwise: the dock words the choice as the card does.
     ChooseCards { source: ObjectId, purpose: Purpose, cards: Vec<ObjectId>, eligible: Vec<ObjectId>, count: u8, up_to: bool, kind: &'static str },
+    /// `least` to `count` targets are chosen (a range, "one or two target creatures", CR 601.2c); `optional` is `least == 0`.
     /// Targets for an ability as it goes on the stack, or any other "choose a [thing]" the C# engine asks as targets.
     /// `label` is what the slot is for as its card words it (`TargetSpec::label`, empty when it has nothing to add), and
     /// `slot_player` the opponent whose slot it is when the ability has one for each opponent.
-    ChooseTarget { source: ObjectId, purpose: Purpose, candidates: Vec<Target>, optional: bool, count: u8, any_number: bool, label: &'static str, slot_player: Option<PlayerId> },
+    ChooseTarget { source: ObjectId, purpose: Purpose, candidates: Vec<Target>, optional: bool, least: u8, count: u8, any_number: bool, label: &'static str, slot_player: Option<PlayerId> },
     /// One or more of these labelled options (a pile, a mode), by index.
     /// `count` to `at_most` of them when `at_most` is more than `count` (zero `count` is "up to"). `affordable` is
     /// the eligible modes whose own cost the chooser could pay as well, advice for a default; `additional_cost`

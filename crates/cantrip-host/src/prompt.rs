@@ -563,7 +563,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 ..Default::default()
             })
         }
-        RequestKind::ChooseTarget { source, purpose, candidates, optional, count, any_number, label, slot_player } => {
+        RequestKind::ChooseTarget { source, purpose, candidates, optional, least, count, any_number, label, slot_player } => {
             let source_handle = source_handle(game, handles, *source);
             PromptPayload::ChooseTargetPromptMessage(ChooseTargetPrompt {
                 player,
@@ -574,7 +574,8 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 optional: *optional,
                 count: i32::from(*count),
                 targeted: *purpose == Purpose::Targets,
-                minimum: if *optional { 0 } else { i32::from(*count) },
+                // Only a printed range has a minimum (the wire's zero is "exactly count, or none where optional").
+                minimum: if *least > 0 && least < count { i32::from(*least) } else { 0 },
                 any_number: *any_number,
                 for_player: slot_player.map_or(0, seat),
             })

@@ -499,9 +499,16 @@ public sealed class RandomPlay : IAutoPlayer
             return new TargetsChosenAnswer();
         }
 
-        return prompt.Optional && _random.Next(prompt.Candidates.Count + 1) == 0
-            ? new TargetsChosenAnswer()
-            : new TargetsChosenAnswer { Targets = Some(prompt.Candidates, prompt.Count) };
+        if (prompt.Optional && _random.Next(prompt.Candidates.Count + 1) == 0)
+        {
+            return new TargetsChosenAnswer();
+        }
+
+        // A printed range, "one or two target creatures" (CR 601.2c), takes any number from its minimum to its count.
+        int fewest = prompt.Optional ? 0 : prompt.Minimum > 0 ? prompt.Minimum : prompt.Count;
+        int number = Math.Min(prompt.Candidates.Count, fewest + _random.Next(prompt.Count - fewest + 1));
+
+        return new TargetsChosenAnswer { Targets = Some(prompt.Candidates, Math.Max(number, 1)) };
     }
 
     /// <summary>

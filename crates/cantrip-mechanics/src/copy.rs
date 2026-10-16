@@ -36,6 +36,7 @@ pub fn enter_as_copy(
             purpose: Purpose::CopyWhich,
             candidates: candidates.iter().map(|&id| Target::Object(id)).collect(),
             optional: false,
+            least: 1,
             count: 1,
             any_number: false,
         };

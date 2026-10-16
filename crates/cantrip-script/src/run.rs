@@ -975,12 +975,8 @@ impl<'s> Run<'s> {
                 }
                 Answer::Modes(modes.into_iter().take(*count as usize).collect())
             }
-            RequestKind::ChooseTarget { candidates, optional, count, .. } => {
-                if *optional {
-                    Answer::Targets(Vec::new())
-                } else {
-                    Answer::Targets(candidates.iter().take(*count as usize).copied().collect())
-                }
+            RequestKind::ChooseTarget { candidates, least, .. } => {
+                Answer::Targets(candidates.iter().take(*least as usize).copied().collect())
             }
             // The whole total on the first candidate, whatever the slot allows: a legal division, not a good one.
             RequestKind::ChooseDividedTargets { candidates, total, .. } => {
@@ -1016,10 +1012,10 @@ impl<'s> Run<'s> {
         Ok(match (step.verb, &request.kind) {
             // A cast an effect makes as it resolves (CR 608.2g) asks for its targets with the spell already on the
             // stack (CR 601.2a); the `Cast(...)` line that names it gives them.
-            (V::Cast, RequestKind::ChooseTarget { source, purpose: Purpose::Targets, candidates, optional, count, .. })
+            (V::Cast, RequestKind::ChooseTarget { source, purpose: Purpose::Targets, candidates, least, count, .. })
                 if self.game.state.stack.iter().any(|i| i.kind == StackKind::Spell && i.object == *source) =>
             {
-                self.choose_target(step, candidates, *optional, *count)?
+                self.choose_target(step, candidates, *least, *count)?
             }
             (V::Play | V::Cast | V::Activate | V::Foretell | V::Suspend, _) => match options {
                 Some(options) => self.match_option(step, options)?,
@@ -1061,8 +1057,8 @@ impl<'s> Run<'s> {
             (V::Modes | V::Name, RequestKind::ChooseModes { modes, eligible, count, at_most, .. }) => {
                 Some(self.modes(step, modes, eligible, *count, (*at_most).max(*count))?)
             }
-            (V::Target, RequestKind::ChooseTarget { candidates, optional, count, .. }) => {
-                self.choose_target(step, candidates, *optional, *count)?
+            (V::Target, RequestKind::ChooseTarget { candidates, least, count, .. }) => {
+                self.choose_target(step, candidates, *least, *count)?
             }
             (V::Divide, RequestKind::ChooseDividedTargets { candidates, .. }) => Some(self.divide(step, candidates)?),
             (V::Colors, RequestKind::ChooseColors { choices, count, .. }) => {
@@ -1604,16 +1600,16 @@ impl<'s> Run<'s> {
         Ok(Answer::Divided(shares))
     }
 
-    fn choose_target(&self, step: &ActionStep, candidates: &[Target], optional: bool, count: u8) -> R<Option<Answer>> {
+    fn choose_target(&self, step: &ActionStep, candidates: &[Target], least: u8, count: u8) -> R<Option<Answer>> {
         let specs: Vec<&str> = step.positional().collect();
         if specs.is_empty() {
-            if !optional {
+            if least > 0 {
                 return fail(format!("line {}: this needs a target", step.line));
             }
             return Ok(Some(Answer::Targets(Vec::new())));
         }
-        if (optional && specs.len() > count as usize) || (!optional && specs.len() != count as usize) {
-            return fail(format!("line {}: takes {count} target(s) but the line gives {}", step.line, specs.len()));
+        if specs.len() > count as usize || specs.len() < least as usize {
+            return fail(format!("line {}: takes {least} to {count} target(s) but the line gives {}", step.line, specs.len()));
         }
         let mut targets = Vec::new();
         for spec in specs {

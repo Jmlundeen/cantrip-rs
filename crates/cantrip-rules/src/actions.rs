@@ -2517,6 +2517,7 @@ fn choose_slots(cx: &mut Cx, player: PlayerId, source: ObjectId, specs: &[Target
                 purpose: Purpose::Targets,
                 candidates,
                 optional: least == 0,
+                least: least.min(count),
                 count,
                 any_number: false,
             };

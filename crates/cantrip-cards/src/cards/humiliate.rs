@@ -20,6 +20,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
                 purpose: Purpose::Targets,
                 candidates: creatures.iter().map(|&id| Target::Object(id)).collect(),
                 optional: false,
+                least: 1,
                 count: 1,
                 any_number: false,
             };

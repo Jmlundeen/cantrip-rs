@@ -31,6 +31,7 @@ fn mind_swap(g: &mut dyn Game, entry: &mut Entering) -> Result<(), Suspend> {
         purpose: Purpose::CopyWhich,
         candidates: cards.iter().map(|&id| Target::Object(id)).collect(),
         optional: false,
+        least: 1,
         count: 1,
         any_number: false,
     };

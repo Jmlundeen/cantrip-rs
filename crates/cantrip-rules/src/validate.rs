@@ -99,12 +99,12 @@ pub fn check(game: &Game, request: &Request, answer: &Answer) -> Result<(), Reje
                 Ok(())
             }
         }
-        (RequestKind::ChooseTarget { candidates, optional, count, .. }, Answer::Targets(targets)) => {
+        (RequestKind::ChooseTarget { candidates, least, count, .. }, Answer::Targets(targets)) => {
             let n = targets.len() as u8;
             if !distinct(targets) || !targets.iter().all(|t| candidates.contains(t)) {
                 no("not among the candidates")
-            } else if n > *count || (!optional && n != *count) {
-                no(format!("{n} chosen, {count} wanted"))
+            } else if n > *count || n < *least {
+                no(format!("{n} chosen, {least} to {count} wanted (CR 601.2c)"))
             } else {
                 Ok(())
             }

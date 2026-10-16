@@ -51,6 +51,7 @@ pub fn choose_among(g: &mut dyn Game, you: PlayerId, source: ObjectId, candidate
                 purpose: Purpose::Targets,
                 candidates: candidates.to_vec(),
                 optional: false,
+                least: 1,
                 count: 1,
                 any_number: false,
             };

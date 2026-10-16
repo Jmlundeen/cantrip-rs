@@ -104,6 +104,7 @@ pub fn choose_aura_hosts(cx: &mut Cx, moves: &mut Vec<ops::Moving>) -> R<()> {
                     purpose: Purpose::Attach,
                     candidates: hosts,
                     optional: false,
+                    least: 1,
                     count: 1,
                     any_number: false,
                 };

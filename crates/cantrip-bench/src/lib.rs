@@ -176,8 +176,8 @@ pub fn decide(game: &Game, random: &mut Random, request: &Request) -> Answer {
             let n = if *up_to { random.below(*count as usize + 1) } else { *count as usize };
             Answer::Cards(random.some(eligible, n))
         }
-        RequestKind::ChooseTarget { candidates, optional, count, .. } => {
-            let n = if *optional { random.below(*count as usize + 1) } else { *count as usize };
+        RequestKind::ChooseTarget { candidates, least, count, .. } => {
+            let n = *least as usize + random.below((*count - *least) as usize + 1);
             Answer::Targets(random.some(candidates, n))
         }
         RequestKind::ChooseModes { eligible, count, .. } => Answer::Modes(random.some(eligible, *count as usize)),

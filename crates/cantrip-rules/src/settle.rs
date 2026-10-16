@@ -442,6 +442,7 @@ fn choose_trigger_targets(
                 purpose: Purpose::Targets,
                 candidates,
                 optional: least == 0,
+                least: least.min(count),
                 count,
                 any_number: false,
             };

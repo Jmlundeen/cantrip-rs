@@ -33,6 +33,7 @@ fn minus_six(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
             purpose: Purpose::SeparatePiles,
             candidates,
             optional: true,
+            least: 0,
             count,
             any_number: true,
         };

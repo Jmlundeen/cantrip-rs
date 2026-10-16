@@ -1,4 +1,4 @@
-# Known bug: a target slot of "one or two" cannot be announced with one target while two are legal (CR 601.2c).
+# Browser
 # Untimely Malfunction's third mode may take just one of the two legal targets ("one or two target creatures", CR 601.2c): only the chosen Ornithopter can't block, so the other blocks the Elves and no damage is dealt.
 
 [Bot1 Deck]
