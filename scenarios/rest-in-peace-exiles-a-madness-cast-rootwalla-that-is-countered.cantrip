@@ -1,0 +1,60 @@
+# Bot1 has Rest in Peace out on turn 1; Bot2 has two Islands and Counterspell by turn 5. There Faithless Looting makes
+# Bot1 discard Basking Rootwalla and a Mountain; Bot1 orders madness first (CR 616.1), so the Rootwalla is exiled and
+# its trigger lets Bot1 cast it for {0} (CR 702.35a). It is a spell like any other (the madness rulings): Bot2 counters
+# it, and the countered card's move to the graveyard is an ordinary one that Rest in Peace exiles - madness applies only
+# to a discard. Counterspell is exiled after it resolves too.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Rest in Peace
+Mountain
+Faithless Looting
+Basking Rootwalla
+Mountain
+Mountain
+Mountain
+Mountain x11
+
+[Bot2 Deck]
+Island
+Island
+Counterspell
+Island x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Rest in Peace.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Basking Rootwalla; Mountain)
+Bot1.Replace(madness)
+Bot1.Accept
+? Stack = Basking Rootwalla
+Bot1.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Island#2.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Basking Rootwalla)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield = Plains; Mox Pearl; Mountain; Rest in Peace
+Bot1.Graveyard.Count = 0
+Bot2.Graveyard.Count = 0
+Exile = Faithless Looting; Mountain; Basking Rootwalla; Counterspell

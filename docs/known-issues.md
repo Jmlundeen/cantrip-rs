@@ -130,17 +130,3 @@ information for a spell that leaves the stack, fixes it. No implemented card gra
 no scenario can reach it yet.
 
 **Scenarios.** None yet; the first card that gives a creature spell flying on the stack (then a second flier cast under Momo) reaches it.
-### KI-8: Madness is lost when a discarded card is also replaced by Rest in Peace
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Medium | Open | engine | 2026-10-16, review of Rest in Peace |
-
-**Notes.** A card with madness discarded while Rest in Peace (or any "exile instead of graveyard" replacement) is on the
-battlefield should let its owner choose the order of the two replacements (CR 616.1, 702.35a); the Rest in Peace ruling
-says madness still works. `crates/cantrip-rules/src/ops.rs` (about lines 104-112) computes `madness` only if the
-destination after `replace::zone_change` is still the graveyard, so the card is just exiled and never cast. A fix has to
-offer madness as a replacement the affected player orders with the other.
-
-**Scenarios.**
-- [`scenarios/rest-in-peace-lets-a-discarded-madness-card-be-cast-by-choosing-madness-first.cantrip`](../scenarios/rest-in-peace-lets-a-discarded-madness-card-be-cast-by-choosing-madness-first.cantrip) - Basking Rootwalla discarded under Rest in Peace is cast for {0} (marked `# Known bug`).

@@ -93,18 +93,14 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
                 reveal: false,
                 shuffle: false,
                 is_card: !old.token && !old.card_copy,
+                madness: false,
             },
         );
-        let mut to = change.to;
-        // Madness (CR 702.35a): a card discarded from the hand is exiled instead of put into the graveyard. It was
-        // still discarded; the linked ability is queued below, once the exiled card exists.
-        let madness = reason == ZoneReason::Discard
-            && from.is(ZoneKind::Hand)
-            && to.is(ZoneKind::Graveyard)
-            && cx.cards().get(old.copy.map_or(old.card, |c| c.card)).madness.is_some();
-        if madness {
-            to = Zone::exile(old.owner);
-        }
+        let to = change.to;
+        // Madness (CR 702.35a) exiled a discarded card in place of its graveyard, one of the replacements above: it was
+        // still discarded, and the linked ability is queued below, once the exiled card exists - if no later effect sent
+        // it on elsewhere, so that it was "exiled this way".
+        let madness = change.madness && to.is(ZoneKind::Exile);
         if from.is(ZoneKind::Battlefield) {
             let c = layers::chars(cx.cards(), cx.s(), m.id);
             let words = cantrip_api::words(cx.s(), m.id);
@@ -886,6 +882,7 @@ pub fn create_tokens_worded(
                 reveal: false,
                 shuffle: false,
                 is_card: false,
+                madness: false,
             },
         );
         // An effect that sends it elsewhere instead (CR 614.1a): a token anywhere but the battlefield ceases to exist

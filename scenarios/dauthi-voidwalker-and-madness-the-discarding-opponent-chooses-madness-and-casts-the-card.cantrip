@@ -1,0 +1,43 @@
+# Bot1 has Dauthi Voidwalker ("if a card would be put into an opponent's graveyard from anywhere, instead exile it with a
+# void counter on it") out on turn 1. On turn 2 Bot2 discards Basking Rootwalla and a Mountain to Faithless Looting. Two
+# replacements apply to the Rootwalla's discard, madness (CR 702.35a) and the Voidwalker's; Bot2, the card's owner and
+# the affected player, orders them (CR 616.1), not the Voidwalker's controller. Bot2 takes madness first, so the card is
+# exiled without a void counter and Bot2 casts it for {0} (the Voidwalker ruling: madness still works). The Mountain and
+# the Looting are exiled with void counters.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Dauthi Voidwalker
+Swamp x17
+
+[Bot2 Deck]
+Mountain
+Faithless Looting
+Basking Rootwalla
+Mountain
+Mountain x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dauthi Voidwalker.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Faithless Looting.Cast
+Bot2.Choose(Basking Rootwalla; Mountain)
+Bot2.Replace(madness)
+? Stack.Count = 1
+Bot2.Accept
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot2.Battlefield = Mountain; Basking Rootwalla
+Bot2.Graveyard.Count = 0
+Exile = Faithless Looting; Mountain

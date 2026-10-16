@@ -1,0 +1,47 @@
+# Bot1 has Rest in Peace out on turn 1. On turn 3 Faithless Looting makes Bot1 discard Basking Rootwalla and Blazing
+# Rootwalla at once (CR 101.4). Each card's discard is its own event with its own replacements, so Bot1 orders madness and
+# Rest in Peace once for each (CR 616.1): madness first for Basking Rootwalla, Rest in Peace first for Blazing Rootwalla.
+# Only Basking Rootwalla's madness triggers (one ability on the stack), and Bot1 casts it for {0}; Blazing Rootwalla is
+# simply exiled. The Island is Bot2's turn-2 discard to hand size.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Rest in Peace
+Mountain
+Faithless Looting
+Basking Rootwalla
+Blazing Rootwalla
+Mountain
+Mountain
+Mountain x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Rest in Peace.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Basking Rootwalla; Blazing Rootwalla)
+Bot1.Replace(madness)
+Bot1.Replace(Rest in Peace)
+? Stack.Count = 1
+Bot1.Accept
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield = Plains; Mox Pearl; Mountain; Rest in Peace; Basking Rootwalla
+Bot1.Graveyard.Count = 0
+Exile = Faithless Looting; Island; Blazing Rootwalla

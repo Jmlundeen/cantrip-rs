@@ -33,6 +33,9 @@ pub struct ZoneChange {
     pub shuffle: bool,
     /// It is a card, not a token or a copy of a spell (CR 108.2).
     pub is_card: bool,
+    /// Its own madness (CR 702.35a) has exiled it in place of the graveyard it was discarded to: the core's replacement,
+    /// ordered with the others (CR 616.1), whose linked "when this card is exiled this way" trigger follows the move.
+    pub madness: bool,
 }
 
 /// Counters that would be put on a permanent (CR 122.6, 614.1a): by an effect, or as it enters with them.

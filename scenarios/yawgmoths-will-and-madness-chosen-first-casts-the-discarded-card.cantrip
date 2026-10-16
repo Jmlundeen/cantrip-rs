@@ -1,0 +1,43 @@
+# Bot1 casts Yawgmoth's Will on turn 3 ("if a card would be put into your graveyard from anywhere this turn, exile that
+# card instead"), a replacement effect a spell made (CR 611.2), then discards Basking Rootwalla and a Mountain to Faithless
+# Looting. Madness (CR 702.35a) and the Will's effect both replace the Rootwalla's discard; Bot1 orders madness first
+# (CR 616.1), so its trigger lets Bot1 cast the Rootwalla for {0}. The Mountain, the Looting and the Will itself are
+# exiled; Dark Ritual went to the graveyard before the Will resolved.
+
+[Bot1 Deck]
+Swamp
+Dark Ritual
+Yawgmoth's Will
+Mountain
+Faithless Looting
+Basking Rootwalla
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Yawgmoth's Will.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Basking Rootwalla; Mountain)
+Bot1.Replace(madness)
+? Stack.Count = 1
+Bot1.Accept
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield = Swamp; Mountain; Basking Rootwalla
+Bot1.Graveyard = Dark Ritual
+Exile = Yawgmoth's Will; Faithless Looting; Mountain

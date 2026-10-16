@@ -1,0 +1,46 @@
+# Bot1 has Rest in Peace out on turn 1. On turn 3 Faithless Looting makes Bot1 discard Basking Rootwalla and a Mountain.
+# Bot1 orders madness first (CR 616.1): the Rootwalla is discarded into exile and its madness ability triggers - it is on
+# the stack at the next priority (CR 702.35a). Bot1 declines to cast it, so the trigger puts it into its owner's
+# graveyard; Rest in Peace replaces that move in turn and the card ends in exile, as it would have with Rest in Peace
+# first. The Island is Bot2's turn-2 discard to hand size.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Rest in Peace
+Mountain
+Faithless Looting
+Basking Rootwalla
+Mountain
+Mountain
+Mountain
+Mountain x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Rest in Peace.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Basking Rootwalla; Mountain)
+Bot1.Replace(madness)
+? Stack.Count = 1
+Bot1.Decline
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield = Plains; Mox Pearl; Mountain; Rest in Peace
+Bot1.Graveyard.Count = 0
+Exile = Faithless Looting; Island; Mountain; Basking Rootwalla

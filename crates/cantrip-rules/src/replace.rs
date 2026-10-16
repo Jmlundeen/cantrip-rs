@@ -2,25 +2,50 @@
 //! order them when there are several, and applying them one at a time until none is left.
 //!
 //! The effects belong to cards (`CardDef::replacements`): the core knows no card. An event that nothing on the board
-//! could replace costs one scan of the battlefield for a flag per card, and nothing is built.
+//! could replace costs one scan of the battlefield for a flag per card, and nothing is built. One keyword's replacement
+//! is the core's own and is ordered with the cards' like any other: madness (CR 702.35a), of a card being discarded.
 
 use cantrip_api::*;
 
 use crate::layers::live;
 use crate::Cx;
 
+/// Where a replacement effect is defined.
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+enum Origin {
+    /// One of its source card's `replacements`.
+    Printed,
+    /// One a spell or ability made (CR 611.2, `EffectKind::Replacement`), named by that effect's timestamp: one of its
+    /// source card's `granted_replacements`.
+    Granted(u32),
+    /// Madness's static ability (CR 702.35a), the core's own keyword replacement, of the discarded card itself.
+    Madness,
+}
+
 /// One effect that applies to the event: its source, and which of the source's replacements it is.
 #[derive(Clone, Copy)]
 struct Candidate {
     source: ObjectId,
     index: u8,
-    /// For a replacement effect a spell or ability made (CR 611.2, `EffectKind::Replacement`): the timestamp of that
-    /// effect, which names it. `index` is then one of its source card's `granted_replacements`.
-    effect: Option<u32>,
+    origin: Origin,
 }
 
-/// An effect already applied to the event (CR 614.5): its source, its index, and the effect that made it if it has one.
-type Applied = (ObjectId, u8, Option<u32>);
+/// An effect already applied to the event (CR 614.5): its source, its index and where it is defined.
+type Applied = (ObjectId, u8, Origin);
+
+/// What madness's replacement says it does, for the player who orders it with others (CR 616.1).
+const MADNESS_HINT: &str = "madness discards it into exile, then it may be cast for its madness cost";
+
+/// Madness (CR 702.35a): "If a player would discard this card, that player discards it, but exiles it instead of putting
+/// it into their graveyard." A static ability of the card itself, functioning while it is in a hand; once another
+/// effect has sent the card elsewhere than the graveyard it no longer applies (CR 616.1f).
+fn madness_applies(cx: &Cx, z: &ZoneChange) -> bool {
+    z.reason == ZoneReason::Discard
+        && z.from.is(ZoneKind::Hand)
+        && z.to.is(ZoneKind::Graveyard)
+        && cx.cards().get(card_of(cx, z.object)).madness.is_some()
+        && !cx.s().lost_all_abilities(z.object)
+}
 
 /// The card whose definition a permanent's abilities come from: the card it copies, if it copies one.
 fn card_of(cx: &Cx, id: ObjectId) -> CardId {
@@ -98,11 +123,11 @@ fn candidates(cx: &Cx, proposal: &Proposal, applied: &[Applied]) -> Vec<Candidat
         let asker = Asker { source: id, controller: controller_of(cx, id, proposal) };
         for (index, def) in cards.get(card).replacements.iter().enumerate() {
             let index = index as u8;
-            if def.kind != kind || (own_only && !def.own_everywhere) || applied.contains(&(id, index, None)) {
+            if def.kind != kind || (own_only && !def.own_everywhere) || applied.contains(&(id, index, Origin::Printed)) {
                 continue;
             }
             if (def.applies)(cx, &asker, proposal) {
-                found.push(Candidate { source: id, index, effect: None });
+                found.push(Candidate { source: id, index, origin: Origin::Printed });
             }
         }
     };
@@ -128,24 +153,34 @@ fn candidates(cx: &Cx, proposal: &Proposal, applied: &[Applied]) -> Vec<Candidat
             continue;
         }
         let def = &cards.get(card_of(cx, e.source)).granted_replacements[index as usize];
-        if def.kind != kind || applied.contains(&(e.source, index, Some(e.timestamp))) {
+        if def.kind != kind || applied.contains(&(e.source, index, Origin::Granted(e.timestamp))) {
             continue;
         }
         let asker = Asker { source: e.source, controller: e.controller };
         if (def.applies)(cx, &asker, e.affected, proposal) {
-            found.push(Candidate { source: e.source, index, effect: Some(e.timestamp) });
+            found.push(Candidate { source: e.source, index, origin: Origin::Granted(e.timestamp) });
         }
     }
-    found.sort_by_key(|c| (c.source, c.index, c.effect));
+    found.sort_by_key(|c| (c.source, c.index, c.origin));
+    // The discarded card's own madness (CR 702.35a), ordered with the rest (CR 616.1). It is offered first, as the
+    // order its owner almost always wants: declining the cast still puts the card into the graveyard, where the other
+    // effects meet it again. A player or bot who takes the first offer keeps the madness.
+    if let Proposal::ZoneChange(z) = proposal
+        && !applied.contains(&(z.object, 0, Origin::Madness))
+        && madness_applies(cx, z)
+    {
+        found.insert(0, Candidate { source: z.object, index: 0, origin: Origin::Madness });
+    }
     found
 }
 
 /// What an effect says it does, for the player who orders several (CR 616.1).
 fn hint_of(cx: &Cx, c: &Candidate) -> &'static str {
     let card = cx.cards().get(card_of(cx, c.source));
-    match c.effect {
-        None => card.replacements[c.index as usize].hint,
-        Some(_) => card.granted_replacements[c.index as usize].hint,
+    match c.origin {
+        Origin::Printed => card.replacements[c.index as usize].hint,
+        Origin::Granted(_) => card.granted_replacements[c.index as usize].hint,
+        Origin::Madness => MADNESS_HINT,
     }
 }
 
@@ -173,10 +208,10 @@ fn apply(cx: &mut Cx, proposal: &mut Proposal) {
             return;
         }
         let pick = if found.len() > 1 { choose(cx, proposal, &found) } else { 0 };
-        let Candidate { source, index, effect } = found[pick];
-        applied.push((source, index, effect));
-        match effect {
-            None => {
+        let Candidate { source, index, origin } = found[pick];
+        applied.push((source, index, origin));
+        match origin {
+            Origin::Printed => {
                 let def = &cx.cards().get(card_of(cx, source)).replacements[index as usize];
                 let (apply, then) = (def.apply, def.then);
                 let asker = Asker { source, controller: controller_of(cx, source, proposal) };
@@ -186,11 +221,19 @@ fn apply(cx: &mut Cx, proposal: &mut Proposal) {
                     then(cx, &asker, &before, proposal);
                 }
             }
-            Some(timestamp) => {
+            Origin::Granted(timestamp) => {
                 let e = *cx.s().effects.iter().find(|e| e.timestamp == timestamp).expect("the effect that applies");
                 let def = &cx.cards().get(card_of(cx, source)).granted_replacements[index as usize];
                 let asker = Asker { source, controller: e.controller };
                 (def.apply)(&*cx, &asker, e.affected, proposal);
+            }
+            // "That player discards it, but exiles it instead of putting it into their graveyard" (CR 702.35a): the
+            // graveyard is its owner's (CR 400.3), and so is the exile it goes to.
+            Origin::Madness => {
+                if let Proposal::ZoneChange(z) = proposal {
+                    z.to = Zone::exile(z.to.player);
+                    z.madness = true;
+                }
             }
         }
     }
@@ -198,7 +241,7 @@ fn apply(cx: &mut Cx, proposal: &mut Proposal) {
 
 /// An object about to change zones (CR 614.1a, 614.1c): what remains of the move once every effect has applied.
 pub fn zone_change(cx: &mut Cx, change: ZoneChange) -> ZoneChange {
-    if !possible(cx, Some(change.object)) {
+    if !possible(cx, Some(change.object)) && !madness_applies(cx, &change) {
         return change;
     }
     let mut proposal = Proposal::ZoneChange(change);
