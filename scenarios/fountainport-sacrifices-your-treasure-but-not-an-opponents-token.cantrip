@@ -1,0 +1,45 @@
+# Fountainport's "Sacrifice a token" (CR 701.21): Generous Plunderer gives Bot1 a Treasure and Bot2 a tapped one (a
+# non-creature token). Turn 5, two Mountains for {2}: Bot1's own Treasure is sacrificed to draw a card, and Bot2's
+# survives. Turn 7, with Bot2's Treasure still there and the nontoken Plunderer on the battlefield but no token of Bot1's,
+# the ability is refused, though {2} is available: neither is a token Bot1 controls.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Generous Plunderer
+Fountainport
+Mountain
+Mountain
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Generous Plunderer.Cast
+[T5 Bot1.Upkeep]
+Bot1.Accept
+[T5 Bot1.Main1]
+Bot1.Hand.Fountainport.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Fountainport.Activate(Ability: Sacrifice a token)
+[T5 Bot1.Main2]
+? Bot1.Battlefield = Mountain; Mountain; Generous Plunderer; Fountainport
+? Bot2.Battlefield = Treasure Token
+? Bot1.Hand.Count = 6
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+! Bot1.Battlefield.Fountainport.Activate(Ability: Sacrifice a token)
+
+[Expect]
+Bot2.Battlefield = Treasure Token
+Bot1.Hand.Count = 6

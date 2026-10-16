@@ -1,0 +1,21 @@
+# Fountainport's first ability, "{T}: Add {C}" (CR 605): tapped on turn 1, its one colorless mana pays for Sol Ring, and
+# the land is tapped afterwards.
+
+[Bot1 Deck]
+Fountainport
+Sol Ring
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Fountainport.Play
+Bot1.Battlefield.Fountainport.Activate(Ability: Add)
+? Bot1.Mana = {C}
+Bot1.Hand.Sol Ring.Cast
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Fountainport; Sol Ring
+Bot1.Battlefield.Fountainport.Tapped = true
