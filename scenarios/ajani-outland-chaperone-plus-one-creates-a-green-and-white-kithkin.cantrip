@@ -1,0 +1,27 @@
+# Ajani, Outland Chaperone: "+1: Create a 1/1 green and white Kithkin creature token." Black Lotus pays for him on turn 1; the
+# +1 adds a loyalty counter (3 to 4, CR 606.4) and the token is a 1/1 Kithkin that is both green and white (CR 111.4), a token.
+
+[Bot1 Deck]
+Black Lotus
+Ajani, Outland Chaperone
+Plains x25
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Ajani, Outland Chaperone.Cast
+Bot1.Battlefield.Ajani, Outland Chaperone.Activate(Ability: Kithkin)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Ajani, Outland Chaperone.Counters.Loyalty = 4
+Bot1.Battlefield.Kithkin.Token = true
+Bot1.Battlefield.Kithkin.Power = 1
+Bot1.Battlefield.Kithkin.Toughness = 1
+Bot1.Battlefield.Kithkin.Colors = Green; White
+Bot1.Battlefield.Kithkin.Subtypes = Kithkin
+Bot1.Battlefield.Kithkin.Types = Creature
+Stack.Count = 0

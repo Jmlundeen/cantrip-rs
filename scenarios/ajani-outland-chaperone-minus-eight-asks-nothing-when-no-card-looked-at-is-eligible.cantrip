@@ -1,0 +1,68 @@
+# Ajani, Outland Chaperone, -8: with no nonland permanent card of mana value 3 or less among the cards looked at (Beza costs four,
+# Lightning Bolt is not a permanent, Plains is a land) nobody is asked to choose, and the library keeps all three. The positive
+# control, where a card is eligible and Bot1 is asked, is the scenario that puts eligible cards onto the battlefield.
+# Same route to 8 loyalty as the scenario with the full library: +1 on turns 1, 3 and 5, and two Tezzeret's Gambits.
+
+[Bot1 Deck]
+Black Lotus
+Ajani, Outland Chaperone
+Tezzeret's Gambit
+Tezzeret's Gambit
+Plains
+Mox Ruby
+Mox Pearl
+Plains x7
+Beza, the Bounding Spring
+Lightning Bolt
+Plains
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Ajani, Outland Chaperone.Cast
+Bot1.Pass
+Bot1.Battlefield.Ajani, Outland Chaperone.Activate(Ability: Kithkin)
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Tezzeret's Gambit.Cast
+Bot1.Modes(1)
+Bot1.Pass
+Bot1.Target(Bot1.Battlefield.Ajani, Outland Chaperone)
+? Bot1.Battlefield.Ajani, Outland Chaperone.Counters.Loyalty = 5
+[T3 Bot1.Main1]
+Bot1.Battlefield.Ajani, Outland Chaperone.Activate(Ability: Kithkin)
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Tezzeret's Gambit.Cast
+Bot1.Modes(1)
+Bot1.Pass
+Bot1.Target(Bot1.Battlefield.Ajani, Outland Chaperone)
+? Bot1.Battlefield.Ajani, Outland Chaperone.Counters.Loyalty = 7
+[T5 Bot1.Main1]
+Bot1.Battlefield.Ajani, Outland Chaperone.Activate(Ability: Kithkin)
+Bot1.Pass
+? Bot1.Battlefield.Ajani, Outland Chaperone.Counters.Loyalty = 8
+? Bot1.Life = 16
+[T7 Bot1.Main1]
+Bot1.Battlefield.Ajani, Outland Chaperone.Activate(Ability: Look at the top X)
+Bot1.Pass
+! Bot1.Choose
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Plains; Mox Ruby; Mox Pearl; Kithkin; Kithkin; Kithkin
+Bot1.Library.Count = 3
+Stack.Count = 0

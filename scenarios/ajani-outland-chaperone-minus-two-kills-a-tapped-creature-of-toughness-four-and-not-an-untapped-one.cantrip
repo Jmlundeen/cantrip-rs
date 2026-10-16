@@ -1,0 +1,49 @@
+# Ajani, Outland Chaperone: "-2: Ajani deals 4 damage to target tapped creature." Bot2's Fanatic of Rhonas (1/4, exactly lethal)
+# attacks on turn 4 and is tapped; its untapped Llanowar Elves, cast after combat, are not a legal target (CR 115.1), and with no
+# tapped creature on turn 1 the -2 is not offered at all. The same ability then kills the tapped Fanatic: 4 damage on toughness 4.
+
+[Bot1 Deck]
+Black Lotus
+Ajani, Outland Chaperone
+Plains x25
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Fanatic of Rhonas
+Llanowar Elves
+Forest
+Forest x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Ajani, Outland Chaperone.Cast
+Bot1.Pass
+! Bot1.Battlefield.Ajani, Outland Chaperone.Activate(Ability: 4 damage)
+Bot1.Battlefield.Ajani, Outland Chaperone.Activate(Ability: Kithkin)
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Fanatic of Rhonas.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Attack(Fanatic of Rhonas > Bot1)
+[T4 Bot2.Main2]
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T5 Bot1.Main1]
+? Bot2.Battlefield.Fanatic of Rhonas.Tapped = true
+? Bot2.Battlefield.Llanowar Elves.Tapped = false
+! Bot1.Battlefield.Ajani, Outland Chaperone.Activate(Bot2.Battlefield.Llanowar Elves; Ability: 4 damage)
+Bot1.Battlefield.Ajani, Outland Chaperone.Activate(Bot2.Battlefield.Fanatic of Rhonas; Ability: 4 damage)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Fanatic of Rhonas
+Bot2.Battlefield.Llanowar Elves.Damage = 0
+Bot1.Battlefield.Ajani, Outland Chaperone.Counters.Loyalty = 2
+Bot1.Life = 19
+Stack.Count = 0

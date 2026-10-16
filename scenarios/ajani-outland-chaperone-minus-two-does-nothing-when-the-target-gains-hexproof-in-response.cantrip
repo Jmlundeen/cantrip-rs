@@ -1,0 +1,46 @@
+# Ajani, Outland Chaperone: "-2: Ajani deals 4 damage to target tapped creature." The loyalty cost is paid on activation (CR 606.4),
+# so when Bot2 answers with Snakeskin Veil, which gives the tapped Fanatic of Rhonas hexproof, the target is illegal as the ability
+# tries to resolve (CR 608.2b) and it does nothing: the Fanatic is a 2/5 with no damage, and Ajani is at 2 loyalty regardless.
+
+[Bot1 Deck]
+Black Lotus
+Ajani, Outland Chaperone
+Plains x25
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Fanatic of Rhonas
+Snakeskin Veil
+Forest
+Forest x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Ajani, Outland Chaperone.Cast
+Bot1.Pass
+Bot1.Battlefield.Ajani, Outland Chaperone.Activate(Ability: Kithkin)
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Fanatic of Rhonas.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Attack(Fanatic of Rhonas > Bot1)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Ajani, Outland Chaperone.Activate(Bot2.Battlefield.Fanatic of Rhonas; Ability: 4 damage)
+Bot1.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Snakeskin Veil.Cast(Fanatic of Rhonas)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Snakeskin Veil
+Bot2.Battlefield.Fanatic of Rhonas.Damage = 0
+Bot2.Battlefield.Fanatic of Rhonas.Tapped = true
+Bot2.Battlefield.Fanatic of Rhonas.Toughness = 5
+Bot1.Battlefield.Ajani, Outland Chaperone.Counters.Loyalty = 2
+Stack.Count = 0
