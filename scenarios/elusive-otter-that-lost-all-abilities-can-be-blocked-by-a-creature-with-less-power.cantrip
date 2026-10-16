@@ -1,0 +1,45 @@
+# Known bug: a permanent's block restrictions are read off its card whether or not it has lost all its abilities (CR 613.1f, 509.1b); `can_block` in turn.rs never looks at LoseAllAbilities.
+# Elusive Otter (1/1): "Creatures with power less than this creature's power can't block it". On turn 3 Bot2's Ornithopter (power 0)
+# may not block it (the control, as in elusive-otter-cant-be-blocked-by-a-creature-with-less-power), and the Otter hits for 1. Bot2's
+# The Wondrous Wasp strips the Otter of every ability on turn 4, the restriction with them: on turn 5 the Ornithopter blocks it.
+
+[Bot1 Deck]
+Island
+Elusive Otter
+Island x18
+
+[Bot2 Deck]
+Island
+Island
+Ornithopter
+The Wondrous Wasp
+Island x16
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Elusive Otter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Elusive Otter > Bot2)
+! Bot2.Block(Bot2.Battlefield.Ornithopter > Bot1.Battlefield.Elusive Otter)
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.The Wondrous Wasp.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Target(Elusive Otter)
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Elusive Otter > Bot2)
+Bot2.Block(Bot2.Battlefield.Ornithopter > Bot1.Battlefield.Elusive Otter)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 19

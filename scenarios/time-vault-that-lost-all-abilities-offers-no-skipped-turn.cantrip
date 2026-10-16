@@ -1,0 +1,51 @@
+# Known bug: a permanent's replacements of its controller's turn beginning are read off its card whether or not it has lost all its abilities (CR 613.1f, 614.10); `skip_turn` in turn.rs never looks at LoseAllAbilities.
+# Time Vault: "If you would begin your turn while this artifact is tapped, you may skip that turn instead." (The control is
+# time-vault-skips-its-controllers-turn-to-untap-and-takes-an-extra-turn.) Bot1 casts it tapped on turn 1. Bot2's Oko, Thief of Crowns
+# makes it a 3/3 Elk with no abilities on turn 2, so turn 3 begins for Bot1 with no offer to skip it, and the Elk, which no longer
+# stays tapped, untaps.
+
+[Bot1 Deck]
+Island
+Mox Jet
+Time Vault
+Island x3
+Island x20
+
+[Bot2 Deck]
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Oko, Thief of Crowns
+Forest x3
+Forest x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Time Vault.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Oko, Thief of Crowns.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Oko, Thief of Crowns.Activate(Time Vault; Ability: Elk)
+Bot2.Pass
+Bot1.Pass
+[T2 Bot2.End]
+Bot1.Pass
+! Bot1.Accept
+[T3 Bot1.Main1]
+? Turn = 3
+? Bot1.Battlefield.Time Vault.Tapped = false
+
+[Expect]
+Turn = 3
+ActivePlayer = Bot1

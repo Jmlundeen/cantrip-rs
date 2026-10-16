@@ -1,0 +1,63 @@
+# Known bug: a permanent's rules about what may cause its controller to discard or sacrifice are read off its card whether or not it has lost all its abilities (CR 613.1f, 101.2); `may_cause_discard_or_sacrifice` in game.rs never looks at LoseAllAbilities.
+# Tamiyo, Collector of Tales: spells and abilities Bot2 controls can't cause Bot1 to discard (CR 101.2). (The control is
+# tamiyo-collector-of-tales-keeps-its-hand-from-hymn-and-collects-a-named-card.) Bot1 casts her on turn 1. On turn 3 Bot2 flashes in
+# Tishana's Tidebinder against her +1, which is countered, and she loses all abilities: Bot2's Hymn to Tourach on turn 4 takes two
+# cards from Bot1's hand.
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Sapphire
+Sol Ring
+Tamiyo, Collector of Tales
+Island
+Island
+Island
+Lightning Bolt
+Island
+Lightning Bolt
+Mountain
+Island x20
+
+[Bot2 Deck]
+Swamp
+Black Lotus
+Hymn to Tourach
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Tishana's Tidebinder
+Swamp x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Tamiyo, Collector of Tales.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Tamiyo, Collector of Tales.Activate(Ability: Choose a nonland card name)
+Bot1.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Tishana's Tidebinder.Cast
+Bot2.Target(Stack.Tamiyo, Collector of Tales)
+[T3 Bot1.Main2]
+? Bot1.Hand.Count = 3
+[T4 Bot2.Main1]
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Hymn to Tourach.Cast(Bot1)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Hand.Count = 1

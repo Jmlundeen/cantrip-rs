@@ -1,0 +1,40 @@
+# Questing Beast: "Combat damage that would be dealt by creatures you control can't be prevented" (CR 615.12). Bot2 casts The One Ring
+# on turn 2, with protection from everything until its next turn (CR 702.16j), which would prevent all damage to it; on turn 3 the hasty
+# Beast Bot1 cast with Black Lotus and Mox Jet on turn 1 hits for 4 anyway. (The control for
+# questing-beast-that-lost-all-abilities-has-its-damage-prevented.)
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Questing Beast
+Forest x4
+Forest x20
+
+[Bot2 Deck]
+Black Lotus
+Mox Jet
+The One Ring
+Forest x4
+Forest x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Questing Beast.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.The One Ring.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Questing Beast > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16

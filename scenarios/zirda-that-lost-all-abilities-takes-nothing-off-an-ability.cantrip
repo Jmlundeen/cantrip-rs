@@ -1,0 +1,52 @@
+# Known bug: a permanent's discounts to activated abilities are read off its card whether or not it has lost all its abilities (CR 613.1f, 601.2f); `change_with` in actions.rs never looks at LoseAllAbilities.
+# Zirda, the Dawnwaker: "Abilities you activate that aren't mana abilities cost {2} less to activate." (The control is
+# zirda-takes-two-off-an-ability-you-activate.) Bot1 casts it on turn 1 with three Moxen. Bot2's The Wondrous Wasp strips it on turn 2,
+# and on turn 3 Inventors' Fair's {4} search, which three Moxen cannot pay for alone, is not offered.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Zirda, the Dawnwaker
+Inventors' Fair
+Island x3
+Sol Ring
+Island x10
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Jet
+The Wondrous Wasp
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Zirda, the Dawnwaker.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.The Wondrous Wasp.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Target(Zirda, the Dawnwaker)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Inventors' Fair.Play
+! Bot1.Battlefield.Inventors' Fair.Activate(Ability: Search)
+
+[Expect]
+Bot1.Hand.Count = 3

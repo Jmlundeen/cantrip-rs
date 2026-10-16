@@ -1,0 +1,44 @@
+# Known bug: a permanent's replacement effects are read off its card whether or not it has lost all its abilities (CR 613.1f, 614); `replacements` in replace.rs never looks at LoseAllAbilities.
+# Archon of Emeria: "Nonbasic lands your opponents control enter tapped". Bot2 casts it on turn 2 with Black Lotus. On turn 3 Bot1 casts
+# The Wondrous Wasp, which strips the Archon of every ability, and then plays Strip Mine: it enters untapped. (The control is
+# archon-of-emeria-taps-an-opponents-nonbasic-land-and-limits-each-player-to-one-spell: the same land enters tapped without the Wasp.)
+
+[Bot1 Deck]
+Strip Mine
+Mox Sapphire
+Mox Jet
+The Wondrous Wasp
+Swamp x3
+Swamp x13
+
+[Bot2 Deck]
+Plains
+Black Lotus
+Archon of Emeria
+Plains x4
+Plains x13
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Archon of Emeria.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.The Wondrous Wasp.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Archon of Emeria)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Strip Mine.Play
+? Bot1.Battlefield.Strip Mine.Tapped = false
+
+[Expect]
+Bot1.Battlefield.Strip Mine.Tapped = false

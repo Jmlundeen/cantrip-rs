@@ -1,0 +1,53 @@
+# Known bug: a permanent's rule that makes damage unpreventable is read off its card whether or not it has lost all its abilities (CR 613.1f, 615.12); `sources` in static_rules.rs never looks at LoseAllAbilities.
+# Questing Beast: "Combat damage that would be dealt by creatures you control can't be prevented". (The control is
+# questing-beast-makes-combat-damage-unpreventable-through-the-one-ring.) Bot2 casts The One Ring on turn 2, protection from everything
+# until its next turn, and The Wondrous Wasp, which strips the Beast of every ability: on turn 3 all the Beast's damage is prevented.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Questing Beast
+Forest x4
+Forest x20
+
+[Bot2 Deck]
+Black Lotus
+Mox Jet
+Mox Sapphire
+Mox Ruby
+The One Ring
+The Wondrous Wasp
+Forest x4
+Forest x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Questing Beast.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.The One Ring.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.The Wondrous Wasp.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Target(Questing Beast)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Questing Beast > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20

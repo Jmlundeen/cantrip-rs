@@ -1,0 +1,48 @@
+# Known bug: the ways a permanent gives cards in graveyards to be cast are read off its card whether or not it has lost all its abilities (CR 613.1f, 604); `granted_ways_of` in actions.rs never looks at LoseAllAbilities.
+# Lurrus of the Dream-Den: "Once during each of your turns, you may cast a permanent spell with mana value 2 or less from your
+# graveyard." (The control is lurrus-casts-one-cheap-permanent-from-the-graveyard-each-turn.) Bot1 casts it on turn 1 with Black Lotus;
+# Bot2's The Wondrous Wasp strips it on turn 2, and on turn 3 Faithless Looting discards Ornithopter but it cannot be cast from there.
+[Bot1 Deck]
+Black Lotus
+Lurrus of the Dream-Den
+Faithless Looting
+Mox Ruby
+Ornithopter
+Mountain
+Mountain
+Island x20
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Jet
+The Wondrous Wasp
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Lurrus of the Dream-Den.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.The Wondrous Wasp.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Target(Lurrus of the Dream-Den)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Ornithopter; Mox Ruby)
+! Bot1.Graveyard.Ornithopter.Cast
+
+[Expect]
+Bot1.Graveyard = Faithless Looting; Black Lotus; Ornithopter; Mox Ruby

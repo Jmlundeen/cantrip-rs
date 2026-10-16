@@ -1,0 +1,46 @@
+# Known bug: a permanent's casting restrictions are read off its card whether or not it has lost all its abilities (CR 613.1f, 101.2); `sources` in static_rules.rs never looks at LoseAllAbilities.
+# Voice of Victory: "Your opponents can't cast spells during your turn." (The control is voice-of-victory-stops-an-opponents-spell-until-
+# their-own-turn.) Bot1 casts it on turn 1. Bot2's The Wondrous Wasp strips it on turn 2, leaving Mox Ruby untapped, and in Bot1's
+# turn-3 upkeep Bot2 casts Lightning Bolt.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Voice of Victory
+Plains x12
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Ruby
+The Wondrous Wasp
+Lightning Bolt
+Island x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Voice of Victory.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.The Wondrous Wasp.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Target(Voice of Victory)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Upkeep]
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Battlefield.Mox Ruby.Activate
+? Turn = 3
+
+[Expect]
+Turn = 3
+Bot1.Life = 17
+Bot2.Graveyard = Lightning Bolt

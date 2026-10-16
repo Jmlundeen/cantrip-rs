@@ -1,0 +1,64 @@
+# Known bug: a permanent's permission to spend mana as though it were any color is read off its card whether or not it has lost all its abilities (CR 613.1f, 609.4b); `sources` in static_rules.rs never looks at LoseAllAbilities.
+# Agatha's Soul Cauldron: "You may spend mana as though it were mana of any color to activate abilities of creatures you control."
+# (The control is agathas-soul-cauldron-any-color-mana-is-for-creature-abilities-only.) Bot1 casts it and Blazing Rootwalla on turn 1.
+# Bot2's Oko, Thief of Crowns makes the Cauldron an Elk with no abilities on turn 2. On turn 3 the {U} of Mox Sapphire cannot pay for
+# Rootwalla's "{R}: +2/+0": the {U} stays in the pool, and Mox Ruby pays.
+
+[Bot1 Deck]
+Mountain
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Blazing Rootwalla
+Agatha's Soul Cauldron
+Mountain
+Mountain x14
+
+[Bot2 Deck]
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Oko, Thief of Crowns
+Forest x3
+Forest x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Agatha's Soul Cauldron.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Blazing Rootwalla.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Oko, Thief of Crowns.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Oko, Thief of Crowns.Activate(Agatha's Soul Cauldron; Ability: Elk)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Blazing Rootwalla.Activate
+? Bot1.Mana = {U}
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Blazing Rootwalla.Power = 3
+Bot1.Battlefield.Mox Ruby.Tapped = true
