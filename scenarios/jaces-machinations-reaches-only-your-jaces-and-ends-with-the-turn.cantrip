@@ -1,0 +1,62 @@
+# Jace's Machinations reaches only "Jace planeswalkers you control", and only "until end of turn" (CR 606.3, 611.2c,
+# 514.2).
+#
+# Bot1 casts Liliana of the Veil on turn one; Bot2 casts Jace, the Mind Sculptor on turn two. In Bot2's end step Bot1
+# casts the Machinations and gets a Jace token. Bot1 may then activate the token's -1 there, but not Liliana's abilities:
+# she is no Jace. Bot2, though it is Bot2's own turn, may not activate its Mind Sculptor in its end step: the permission
+# is Bot1's alone, and Bot2's Jace is not one Bot1 controls.
+#
+# On turn three the permission is gone: in Bot1's upkeep the token's abilities are not offered (a new turn, so the one
+# activation a turn is not what refuses them), while in Bot1's main phase they are, at sorcery speed as usual.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Mox Sapphire
+Liliana of the Veil
+Jace's Machinations
+Island x15
+
+[Bot2 Deck]
+Island
+Black Lotus
+Jace, the Mind Sculptor
+Island x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Liliana of the Veil.Cast
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Jace, the Mind Sculptor.Cast
+[T2 Bot2.End]
+Bot1.Hand.Jace's Machinations.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot2.Pass
+! Bot2.Battlefield.Jace, the Mind Sculptor.Activate
+Bot2.Pass
+! Bot1.Battlefield.Liliana of the Veil.Activate
+Bot1.Battlefield.Jace.Activate(Ability: Surveil)
+? Stack.Count = 1
+Bot2.Pass
+? Bot1.Battlefield.Jace.Counters.Loyalty = 7
+[T3 Bot1.Upkeep]
+! Bot1.Battlefield.Jace.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Jace.Activate(Ability: Surveil)
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Jace.Counters.Loyalty = 6
+Bot1.Battlefield.Liliana of the Veil.Counters.Loyalty = 3
+Bot2.Battlefield.Jace, the Mind Sculptor.Counters.Loyalty = 3

@@ -1,0 +1,65 @@
+# Jace's Machinations: "until end of turn, you may activate loyalty abilities of Jace planeswalkers you control on any
+# player's turn any time you could cast an instant" (CR 606.3, 611.2c), then empower Jace 8.
+#
+# Bot1 casts Jace, the Mind Sculptor on turn one and does not activate it. In Bot2's upkeep on turn two Bot1 casts the
+# Machinations: it makes a Jace token with 8 loyalty. Still in Bot2's upkeep, Bot1 activates the Mind Sculptor's +2 (on
+# the opponent's turn, outside a main phase). Once it has resolved, the stack is empty and Bot1 has priority again, but
+# no second loyalty ability of the Mind Sculptor is offered: one per permanent each turn still holds (ruling: "You may
+# still activate only one loyalty ability of each permanent you control during the turn"). Then Bot2 casts Lightning
+# Bolt at Bot1, and Bot1 answers it with the Jace token's -3 - a planeswalker that entered this turn, with the Bolt on the
+# stack - which resolves first and draws.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Mox Sapphire
+Mox Sapphire
+Jace, the Mind Sculptor
+Jace's Machinations
+Island x14
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x14
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Hand.Jace, the Mind Sculptor.Cast
+[T2 Bot2.Upkeep]
+! Bot1.Battlefield.Jace, the Mind Sculptor.Activate
+Bot1.Hand.Jace's Machinations.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Mox Sapphire#3.Activate
+Bot2.Pass
+Bot1.Battlefield.Jace, the Mind Sculptor.Activate(Bot2; Ability: +2)
+? Bot1.Battlefield.Jace.Counters.Loyalty = 8
+Bot2.Pass
+! Bot1.Battlefield.Jace, the Mind Sculptor.Activate
+? Stack.Count = 0
+? Bot1.Battlefield.Jace, the Mind Sculptor.Counters.Loyalty = 5
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Battlefield.Mountain.Activate
+Bot1.Battlefield.Jace.Activate(Ability: Draw)
+? Stack.Count = 2
+? Bot1.Hand.Count = 0
+Bot2.Pass
+? Stack.Count = 1
+? Bot1.Hand.Count = 1
+
+[Expect]
+Turn = 2
+Bot1.Life = 17
+Bot1.Battlefield.Jace.Counters.Loyalty = 5
+Bot1.Battlefield.Jace, the Mind Sculptor.Counters.Loyalty = 5
+Bot1.Hand.Count = 1
+Bot1.Graveyard = Jace's Machinations; Black Lotus

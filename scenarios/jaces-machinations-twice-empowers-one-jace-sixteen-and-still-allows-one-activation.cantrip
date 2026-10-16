@@ -1,0 +1,48 @@
+# Two Jace's Machinations, the second cast in response to the first. The second resolves first and makes the Jace token
+# with 8 loyalty; the first puts 8 more on that same token rather than making another (the ruling: "If you control a
+# Jace planeswalker token, you can't choose to create a new one"), so one token has 16.
+#
+# Two permissions to activate loyalty abilities at instant speed are still one loyalty activation per permanent each
+# turn (CR 606.3): in Bot1's own end step - its own turn, but no main phase - the token's -1 is activated, and after it
+# resolves no other ability of the token is offered.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Mox Sapphire
+Mox Sapphire
+Jace's Machinations
+Jace's Machinations
+Island x14
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Jace's Machinations.Cast
+Bot1.Hand.Jace's Machinations.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+? Stack.Count = 2
+Bot2.Pass
+? Bot1.Battlefield.Jace.Counters.Loyalty = 8
+Bot2.Pass
+? Bot1.Battlefield.Jace.Counters.Loyalty = 16
+[T1 Bot1.End]
+Bot1.Battlefield.Jace.Activate(Ability: Surveil)
+Bot2.Pass
+! Bot1.Battlefield.Jace.Activate
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Jace.Counters.Loyalty = 15
+Bot1.Battlefield.Count = 5
