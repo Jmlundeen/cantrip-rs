@@ -1,0 +1,35 @@
+# "During your turn, this spell costs {2}{U}{U} less to cast" (CR 601.2f, 118.7b): on Bot1's own turn 3 Discontinuity
+# costs {1}{U}, and Bot1 floats exactly that to answer Bot2's Lightning Bolt with it, nothing left over. It ends the turn
+# (CR 724.1): the Bolt and Discontinuity are exiled, Bot1 stays at 20, and turn 4 is Bot2's.
+
+[Bot1 Deck]
+Island
+Mox Jet
+Discontinuity
+Island x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Discontinuity.Cast
+? Stack = Discontinuity; Lightning Bolt
+? Bot1.Mana =
+[T4 Bot2.Upkeep]
+
+[Expect]
+Turn = 4
+Bot1.Life = 20
+Exile = Lightning Bolt; Discontinuity

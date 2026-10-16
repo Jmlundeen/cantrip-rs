@@ -243,9 +243,8 @@ process wait for that cleanup step (724.1f).
 
 The cleanup step (CR 514) gives priority only when state-based actions were performed or a triggered ability is waiting
 once its turn-based actions are done (514.3a), and then marks `Turn::cleanup_again`, so another cleanup step follows when
-everyone has passed. Ultima, Time Stop, Sundial of the Infinite, Glorious End, Day's Undoing, Hurkyl's Final Meditation
-and Obeka, Brute Chronologist end the turn; Discontinuity waits for colored cost reductions ("costs {2}{U}{U} less",
-CR 601.2f), which `CostChange` cannot express.
+everyone has passed. Ultima, Time Stop, Sundial of the Infinite, Glorious End, Day's Undoing, Hurkyl's Final
+Meditation, Discontinuity and Obeka, Brute Chronologist end the turn.
 
 ### Legal moves as a first-class output
 

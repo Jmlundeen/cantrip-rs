@@ -1,0 +1,36 @@
+# Discontinuity's reduction is for its caster's own turn only: on Bot2's turn 2 it costs its full {3}{U}{U}{U}, and Bot1
+# floats exactly six mana for it with nothing left over. It ends Bot2's turn (CR 724.1); turn 3 is Bot1's.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Black Lotus
+Sol Ring
+Discontinuity
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+[T2 Bot2.Main1]
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Discontinuity.Cast
+? Stack = Discontinuity
+? Bot1.Mana =
+[T3 Bot1.Upkeep]
+
+[Expect]
+Turn = 3
+Exile = Discontinuity
+Bot1.Battlefield.Island.Tapped = false
