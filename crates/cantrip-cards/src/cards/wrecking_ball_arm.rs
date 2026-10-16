@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::attach::{attach_to_target, attached_object, equip};
+use cantrip_mechanics::attach::{attached_object, equip, equip_quality};
 use cantrip_oracle as oracle;
 
 /// The equipped creature: what the Equipment is attached to while it is still that creature (CR 301.5a).
@@ -27,9 +27,7 @@ fn legendary_creature_you_control(q: &dyn Query, asker: &Asker, t: Target) -> bo
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        ability(cost("{3}"), attach_to_target, "Equip legendary creature {3}")
-            .sorcery_speed()
-            .targets(&[target(legendary_creature_you_control)]),
+        equip_quality(mana("{3}"), &[target(legendary_creature_you_control)], "Equip legendary creature {3}"),
         equip(mana("{7}"), "Equip {7}"),
     ],
     statics: &[

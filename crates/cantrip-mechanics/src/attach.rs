@@ -23,6 +23,13 @@ pub const fn equip(mana: ManaCost, text: &'static str) -> AbilityDef {
         .equip()
 }
 
+/// Equip [quality] [cost] (CR 702.6a): "[cost]: Attach this to target [quality] creature you control. Equip only as a sorcery."
+/// `creature` is the one target slot: the creature, its quality and "you control" included. Wrecking Ball Arm's "Equip legendary creature {3}" and
+/// Mjölnir's "Equip worthy {1}" print it.
+pub const fn equip_quality(mana: ManaCost, creature: &'static [TargetSpec], text: &'static str) -> AbilityDef {
+    ability(Cost::mana(mana), attach_to_target, text).sorcery_speed().targets(creature).equip()
+}
+
 /// "You may attach that Equipment to target creature you control" (CR 701.3a), for a trigger that fired about the Equipment
 /// (`Fired::about`) and targets a creature: nothing if the Equipment has left the battlefield (a new object, CR 400.7); a creature that is no longer a legal
 /// target leaves the ability to do nothing (CR 608.2b); the choice is made as the ability resolves. Hammer of Nazahn and
