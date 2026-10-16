@@ -9,10 +9,6 @@ fn other_dwarves_you_control(q: &dyn LayerQuery, source: ObjectId, affected: Obj
     affected != source && so_far.has_subtype(q.words(source).subtype(Subtype::Dwarf)) && s.obj(affected).controller == s.obj(source).controller
 }
 
-fn plus_one_power(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.power = chars.power.map(|v| v + 1);
-}
-
 /// "Whenever a Dwarf you control becomes tapped" (CR 701.26a, 603.2): by any path that taps a permanent.
 fn dwarf_becomes_tapped(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
@@ -46,7 +42,7 @@ pub static CARD: CardDef = CardDef {
         triggered(when(EventMask::TAPPED, dwarf_becomes_tapped), treasure, "Whenever a Dwarf you control becomes tapped, create a Treasure token."),
         ability(sacrifice(5, cantrip_mechanics::targets::filters::treasure), tutor, "Sacrifice five Treasures: Search your library for an artifact or Dragon card, put that card onto the battlefield, then shuffle."),
     ],
-    statics: &[static_ability(Layer::PtModify, other_dwarves_you_control, plus_one_power, "Other Dwarves you control get +1/+0.")],
+    statics: &[static_ability(Layer::PtModify, other_dwarves_you_control, cantrip_mechanics::statics::plus_pt::<1, 0>, "Other Dwarves you control get +1/+0.")],
     ..oracle::MAGDA_BRAZEN_OUTLAW
 };
 

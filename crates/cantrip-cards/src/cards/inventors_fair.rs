@@ -1,10 +1,11 @@
 use cantrip_api::*;
+use cantrip_mechanics::artifacts_you_control;
 use cantrip_mechanics::library::{search_to_hand, Find};
 use cantrip_oracle as oracle;
 
 /// Whether the controller controls three or more artifacts (CR 109.5).
 fn three_artifacts(q: &dyn Query, asker: &Asker) -> bool {
-    q.permanents_of(asker.controller).into_iter().filter(|&id| q.chars(id).is(CardType::Artifact)).count() >= 3
+    artifacts_you_control(q, asker.controller) >= 3
 }
 
 /// Search your library for an artifact card, reveal it, put it into your hand, then shuffle. The search may come up

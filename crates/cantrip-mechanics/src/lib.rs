@@ -458,7 +458,8 @@ pub fn trample_until_end_of_turn(g: &mut dyn Game, source: ObjectId, creature: O
 }
 
 /// "The number of artifacts you control": the artifacts `player` controls as it is read (a resolving spell's or ability's X is
-/// counted once, as it resolves, CR 608.2h). Aerid Konstrari, Craterclaw Colossus, Dowsing Device and Fomori Vault print it.
+/// counted once, as it resolves, CR 608.2h). Aerid Konstrari, Craterclaw Colossus, Dowsing Device, Fomori Vault, Override and Tolarian Academy print it, and Mox Opal and Inventor's Fair's metalcraft
+/// count it against three. (Adaptive Omnitool and Cranial Plating count through the layers of a static ability, which is a `LayerQuery`, not a `Query`.)
 pub fn artifacts_you_control(q: &dyn Query, player: PlayerId) -> usize {
     q.permanents_of(player).into_iter().filter(|&id| q.chars(id).is(CardType::Artifact)).count()
 }

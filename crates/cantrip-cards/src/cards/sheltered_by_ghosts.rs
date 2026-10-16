@@ -8,10 +8,6 @@ fn exile_until_it_leaves(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspe
     Ok(())
 }
 
-fn plus_one_power(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.power = chars.power.map(|v| v + 1);
-}
-
 fn lifelink(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.keywords = chars.keywords.with(Keyword::Lifelink);
 }
@@ -22,7 +18,7 @@ pub static CARD: CardDef = CardDef {
         .targets(&[targets::NONLAND_PERMANENT_AN_OPPONENT_CONTROLS])],
     delayed: &[ward::<2>("Ward {2} (Whenever this creature becomes the target of a spell or ability an opponent controls, counter it unless that player pays {2}.)")],
     statics: &[
-        static_ability(Layer::PtModify, attached_object, plus_one_power, "Enchanted creature gets +1/+0."),
+        static_ability(Layer::PtModify, attached_object, cantrip_mechanics::statics::plus_pt::<1, 0>, "Enchanted creature gets +1/+0."),
         static_ability(Layer::Ability, attached_object, lifelink, "Enchanted creature has lifelink."),
         static_ability(Layer::Ability, attached_object, cantrip_mechanics::statics::grant_delayed_ability, "Enchanted creature has ward {2}."),
     ],

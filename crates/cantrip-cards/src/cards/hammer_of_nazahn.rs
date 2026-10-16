@@ -18,10 +18,6 @@ fn equipment_enters(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fi
     }
 }
 
-fn plus_two_power(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.power = chars.power.map(|v| v + 2);
-}
-
 fn indestructible(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.keywords = chars.keywords.with(Keyword::Indestructible);
 }
@@ -33,7 +29,7 @@ pub static CARD: CardDef = CardDef {
         equip(mana("{4}"), "Equip {4}"),
     ],
     statics: &[
-        static_ability(Layer::PtModify, attached_object, plus_two_power, "Equipped creature gets +2/+0."),
+        static_ability(Layer::PtModify, attached_object, cantrip_mechanics::statics::plus_pt::<2, 0>, "Equipped creature gets +2/+0."),
         static_ability(Layer::Ability, attached_object, indestructible, "Equipped creature has indestructible."),
     ],
     ..oracle::HAMMER_OF_NAZAHN

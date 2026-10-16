@@ -13,10 +13,6 @@ fn tap_target(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-fn plus_one_power(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.power = chars.power.map(|v| v + 1);
-}
-
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ENTERS, tap_target, "When this Equipment enters, tap target permanent.")
@@ -24,7 +20,7 @@ pub static CARD: CardDef = CardDef {
         equip(mana("{1}"), "Equip {1}"),
     ],
     statics: &[
-        static_ability(Layer::PtModify, attached_object, plus_one_power, "Equipped creature gets +1/+0."),
+        static_ability(Layer::PtModify, attached_object, cantrip_mechanics::statics::plus_pt::<1, 0>, "Equipped creature gets +1/+0."),
         static_ability(Layer::Ability, attached_object, have_haste, "Equipped creature has haste."),
     ],
     ..oracle::SKATEBOARD

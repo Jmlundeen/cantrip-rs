@@ -16,15 +16,11 @@ fn draw_if_three(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-fn plus_three_power(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.power = chars.power.map(|v| v + 3);
-}
-
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(cantrip_mechanics::triggers::EQUIPPED_CREATURE_ATTACKS, draw_if_three, "Whenever equipped creature attacks, draw a card if you control three or more attacking creatures."),
         equip(mana("{2}"), "Equip {2}"),
     ],
-    statics: &[static_ability(Layer::PtModify, attached_object, plus_three_power, "Equipped creature gets +3/+0.")],
+    statics: &[static_ability(Layer::PtModify, attached_object, cantrip_mechanics::statics::plus_pt::<3, 0>, "Equipped creature gets +3/+0.")],
     ..oracle::STORMBEACON_BLADE
 };

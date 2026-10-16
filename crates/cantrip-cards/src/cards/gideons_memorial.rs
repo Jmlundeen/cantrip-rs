@@ -2,11 +2,6 @@ use cantrip_api::*;
 use cantrip_mechanics::{damage_target, statics::your_creature_tokens, targets};
 use cantrip_oracle as oracle;
 
-/// "... get +1/+0" (CR 613.4c, layer 7c): only what has a power.
-fn plus_one_plus_zero(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.power = chars.power.map(|v| v + 1);
-}
-
 /// "... and have vigilance" (CR 702.20, layer 6).
 fn have_vigilance(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.keywords = chars.keywords.with(Keyword::Vigilance);
@@ -35,7 +30,7 @@ pub static CARD: CardDef = CardDef {
             .from(ZoneKind::Hand),
     ],
     statics: &[
-        static_ability(Layer::PtModify, your_creature_tokens, plus_one_plus_zero, "Creature tokens you control get +1/+0 and have vigilance."),
+        static_ability(Layer::PtModify, your_creature_tokens, cantrip_mechanics::statics::plus_pt::<1, 0>, "Creature tokens you control get +1/+0 and have vigilance."),
         static_ability(Layer::Ability, your_creature_tokens, have_vigilance, "Creature tokens you control get +1/+0 and have vigilance."),
     ],
     ..oracle::GIDEONS_MEMORIAL

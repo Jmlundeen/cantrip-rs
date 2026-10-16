@@ -3,10 +3,6 @@ use cantrip_mechanics::attach::{attached_object, equip};
 use cantrip_mechanics::search_library;
 use cantrip_oracle as oracle;
 
-fn plus_four_power(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.power = chars.power.map(|v| v + 4);
-}
-
 /// A red or white instant card with mana value 4 or less.
 fn quality(red: Color, white: Color) -> impl Fn(&dyn Query, ObjectId) -> bool {
     move |q, card| {
@@ -37,6 +33,6 @@ pub static CARD: CardDef = CardDef {
         ability(cost("{W}{R}").and(UNATTACH_THIS), search_and_cast, "{R}{W}, Unattach this Equipment: Search your library for a red or white instant card with mana value 4 or less and cast that card without paying its mana cost. Then shuffle."),
         equip(mana("{3}"), "Equip {3}"),
     ],
-    statics: &[static_ability(Layer::PtModify, attached_object, plus_four_power, "Equipped creature gets +4/+0.")],
+    statics: &[static_ability(Layer::PtModify, attached_object, cantrip_mechanics::statics::plus_pt::<4, 0>, "Equipped creature gets +4/+0.")],
     ..oracle::SUNFORGER
 };

@@ -2,10 +2,6 @@ use cantrip_api::*;
 use cantrip_mechanics::attach::{attached_object, equip};
 use cantrip_oracle as oracle;
 
-fn plus_two_power(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.power = chars.power.map(|v| v + 2);
-}
-
 /// "Whenever equipped creature deals combat damage to a player": the creature this is attached to dealing combat
 /// damage to a player (CR 510.2); each such event is one player and one trigger (CR 603.2c).
 fn equipped_deals_combat_damage_to_a_player(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
@@ -31,6 +27,6 @@ pub static CARD: CardDef = CardDef {
         triggered(when(EventMask::DAMAGE, equipped_deals_combat_damage_to_a_player), copy_this, "Whenever equipped creature deals combat damage to a player, create a token that's a copy of this Equipment."),
         equip(mana("{2}"), "Equip {2}"),
     ],
-    statics: &[static_ability(Layer::PtModify, attached_object, plus_two_power, "Equipped creature gets +2/+0.")],
+    statics: &[static_ability(Layer::PtModify, attached_object, cantrip_mechanics::statics::plus_pt::<2, 0>, "Equipped creature gets +2/+0.")],
     ..oracle::BLOODFORGED_BATTLE_AXE
 };
