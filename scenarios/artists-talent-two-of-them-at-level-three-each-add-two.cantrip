@@ -1,0 +1,70 @@
+# Two Artist's Talents, both at level 3: each is its own replacement effect (CR 614.5, 616.1) and both apply to the same
+# damage, so Lightning Bolt deals 3 + 2 + 2 = 7 to Bot2 (20 to 13). The Bolt also triggers both level-1 abilities (two loots,
+# both declined). Levels: Talents on turn 1 (Mox Ruby and a Mountain for the red), level 2 on both on turn 3, level 3 on both
+# on turn 5, each level paid with three sources.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Emerald
+Mountain
+Artist's Talent
+Artist's Talent
+Mountain
+Lightning Bolt
+Island
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Artist's Talent.Cast
+Bot2.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Artist's Talent.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Artist's Talent#1.Activate(Ability: Level 2)
+Bot2.Pass
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Artist's Talent#2.Activate(Ability: Level 2)
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Artist's Talent#1.Activate(Ability: Level 3)
+Bot2.Pass
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Artist's Talent#2.Activate(Ability: Level 3)
+Bot2.Pass
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Choose()
+Bot1.Choose()
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 13
+Stack.Count = 0

@@ -1,0 +1,43 @@
+# Artist's Talent, level 2: "Noncreature spells you cast cost {1} less to cast" takes off generic mana only (CR 118.7c, ruling
+# 2024-07-26). With every Mox tapped for Level 2 Bot1 has no mana: Sol Ring ({1}) is cast anyway, for {0}, but Lightning Bolt
+# ({R}, nothing generic to reduce) is refused - the positive control beside the refusal. Before that, with plenty of mana untapped
+# and the Class at level 1, "{2}{R}: Level 3" is refused (CR 716.2b: only while the Class is level 2); Level 2 is the control.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Artist's Talent
+Sol Ring
+Lightning Bolt
+Island
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Artist's Talent.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Artist's Talent.Activate(Ability: Level 3)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Artist's Talent.Activate(Ability: Level 2)
+Bot2.Pass
+! Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Hand.Sol Ring.Cast
+Bot1.Choose()
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Mox Ruby; Mox Jet; Mox Pearl; Artist's Talent; Sol Ring
+Bot1.Hand = Lightning Bolt; Island; Island
+Bot2.Life = 20
+Stack.Count = 0
