@@ -1,0 +1,8 @@
+{
+  "name": "Bebop & Rocksteady",
+  "manaCost": "{1}{B/G}{B/G}",
+  "type": "Legendary Creature — Boar Rhino Mutant",
+  "power": 7,
+  "toughness": 5,
+  "oracleText": "Whenever Bebop & Rocksteady attack or block, sacrifice a permanent unless you discard a card."
+}

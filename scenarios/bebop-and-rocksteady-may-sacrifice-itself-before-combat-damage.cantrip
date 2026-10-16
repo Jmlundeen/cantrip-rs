@@ -1,0 +1,36 @@
+# Bebop & Rocksteady's trigger resolves in the declare attackers step, before blockers and damage, and the permanent
+# sacrificed may be Bebop & Rocksteady itself (it is "a permanent"): sacrificed, it deals no combat damage, so Bot2 keeps
+# its 20 life. Bot1 declined the discard.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Emerald
+Bebop & Rocksteady
+Island
+Forest
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Bebop & Rocksteady.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Bebop & Rocksteady > Bot2)
+Bot1.Decline
+Bot1.Choose(Bebop & Rocksteady)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Bebop & Rocksteady
+Bot1.Battlefield = Mox Jet; Mox Ruby; Mox Emerald
+Bot1.Hand.Count = 4
+Bot2.Life = 20

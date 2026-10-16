@@ -1,0 +1,41 @@
+# Bebop & Rocksteady attacks when its controller has no card in hand (Black Lotus, five Moxen and Bebop are all cast on
+# turn 1, and the Island drawn on turn 3 is played): "unless you discard a card" cannot be met, so no question about
+# discarding is asked (refusal) and a permanent is sacrificed, here Mox Pearl.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Emerald
+Bebop & Rocksteady
+Mox Pearl
+Mox Sapphire
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Bebop & Rocksteady.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Bebop & Rocksteady > Bot2)
+! Bot1.Accept
+Bot1.Choose(Mox Pearl)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 0
+Bot1.Graveyard = Mox Pearl
+Bot1.Battlefield.Count = 7
+Bot2.Life = 13

@@ -1,0 +1,47 @@
+# Bebop & Rocksteady blocking (CR 509.1) triggers the same "sacrifice a permanent unless you discard a card": Bot2's
+# Llanowar Elves attacks on turn 4, Bebop blocks it and its controller discards the Forest (the Elves die to 7
+# damage). On turn 3 Bot1 had attacked with only an Ornithopter of its own, Bebop staying home: nothing triggered
+# (refusal of the question) and no cost was paid for another creature attacking.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Emerald
+Bebop & Rocksteady
+Ornithopter
+Forest
+Island
+Island x13
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x18
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Bebop & Rocksteady.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Ornithopter > Bot2)
+! Bot1.Accept
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Llanowar Elves > Bot1)
+Bot1.Block(Bebop & Rocksteady > Llanowar Elves)
+Bot1.Accept
+Bot1.Choose(Forest)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot2.Graveyard = Llanowar Elves
+Bot1.Graveyard = Forest
+Bot1.Battlefield = Mox Jet; Mox Ruby; Mox Emerald; Bebop & Rocksteady; Ornithopter
