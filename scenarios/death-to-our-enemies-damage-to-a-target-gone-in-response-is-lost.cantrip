@@ -1,0 +1,48 @@
+# Death to Our Enemies' divided damage when one of its two targets becomes illegal (CR 608.2b): Bot1 puts the fourth plan
+# counter on it with Mox Emerald on turn 3 and divides the 7 as 5 to Bot2 and 2 to Bot2's Ornithopter. In response Bot1
+# Lightning Bolts the Ornithopter itself. The reflexive ability still resolves for its legal target - Bot2 takes the 5 it
+# was given - and the Ornithopter's 2 are dealt to nobody. The Bolt, a noncreature spell, triggers nothing: the
+# enchantment was sacrificed.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Death to Our Enemies
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Lightning Bolt
+Island x12
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Death to Our Enemies.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Divide(Bot2: 5; Bot2.Battlefield.Ornithopter: 2)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+? Stack.Count = 3
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 15
+Bot2.Graveyard = Ornithopter
+Bot1.Graveyard = Lightning Bolt; Death to Our Enemies; Black Lotus
+Bot1.Battlefield = Mountain; Mox Pearl; Mox Sapphire; Mox Jet; Mox Emerald; Treasure Token; Treasure Token; Treasure Token; Treasure Token

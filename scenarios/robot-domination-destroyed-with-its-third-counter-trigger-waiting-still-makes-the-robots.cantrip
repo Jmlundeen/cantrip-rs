@@ -1,0 +1,90 @@
+# Robot Domination's third-plan-counter trigger, with the enchantment gone: "sacrifice it and create three 2/2 colorless
+# Robot Villain artifact creature tokens" are two instructions, and the second does not depend on the first. Bot1 reaches
+# the third plan counter as in the main scenario (a mill, its Ornithopter bolted, two Ornithopters milled at once), and
+# Bot2 destroys the enchantment with Disenchant in response to the trigger. Nothing can be sacrificed (CR 701.21a), but
+# Bot1 still gets its three Robot Villains.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Robot Domination
+Mox Sapphire
+Thought Scour
+Thought Scour
+Island
+Ornithopter
+Ornithopter
+Island
+Mountain
+Lightning Bolt
+Thought Scour
+Island
+Ornithopter
+Ornithopter
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Disenchant
+Island x4
+Ornithopter
+Ornithopter
+Island x11
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Robot Domination.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Thought Scour.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Graveyard = Ornithopter; Ornithopter
+? Bot1.Life = 20
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Thought Scour.Cast(Bot1)
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Robot Domination.Counters.Plan = 1
+? Bot1.Life = 19
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Robot Domination.Counters.Plan = 2
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Thought Scour.Cast(Bot1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Robot Domination.Counters.Plan = 3
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Robot Domination)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 17
+Bot2.Graveyard.Count = 3
+Bot1.Battlefield = Mox Jet; Mox Sapphire; Island; Mountain; Robot Villain; Robot Villain; Robot Villain

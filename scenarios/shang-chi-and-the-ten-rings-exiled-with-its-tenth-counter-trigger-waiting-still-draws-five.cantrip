@@ -1,0 +1,58 @@
+# Shang-Chi and the Ten Rings' abilities with Shang-Chi gone (CR 113.7a, 400.7): its tenth +1/+1 counter is put by the
+# turn-7 draw, and with that trigger on the stack Bot2 exiles it with Path to Exile. The trigger still resolves - Bot1
+# draws five cards and gains 5 life - and the five "whenever you draw a card" triggers it then has put nothing on the
+# Shang-Chi that left: it is in exile with no counters, nothing triggers a second time, and Bot1 is at 25.
+
+[Bot1 Deck]
+Island
+Mox Pearl
+Mox Sapphire
+Shang-Chi and the Ten Rings
+Black Lotus
+Wheel of Fortune
+Island
+Island x40
+
+[Bot2 Deck]
+Island x7
+Island
+Island
+Plains
+Path to Exile
+Island x30
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Shang-Chi and the Ten Rings.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Wheel of Fortune.Cast
+Bot1.Pass
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Shang-Chi and the Ten Rings.Counters.PlusOnePlusOne = 9
+[T6 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T7 Bot1.Draw]
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Shang-Chi and the Ten Rings.Counters.PlusOnePlusOne = 10
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Path to Exile.Cast(Bot1.Battlefield.Shang-Chi and the Ten Rings)
+[T7 Bot1.Main1]
+
+[Expect]
+Exile = Shang-Chi and the Ten Rings
+Bot1.Life = 25
+Bot1.Hand.Count = 13
+Bot1.Battlefield.Count = 3

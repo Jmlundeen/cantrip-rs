@@ -1,0 +1,74 @@
+# Doom Reigns Supreme's "target opponent exiles the top five cards of their library" with fewer than five there: Bot2's
+# library holds only three cards by turn 5 (Lightning Bolt, Ornithopter, Ancestral Recall), so those three are exiled and
+# Bot1 may cast up to two of them free - the Ornithopter and the Bolt (at Bot2) - and the Ancestral Recall stays in exile.
+# The rest is as in the main scenario: five Villain entries drain Bot2 to 15 before the Bolt.
+
+[Bot1 Deck]
+Plains
+Mox Jet
+Doom Reigns Supreme
+Black Lotus
+Serpent Specialist
+Mox Sapphire
+Aerial Doombot
+Ephemerate
+Aerial Doombot
+Island x13
+
+[Bot2 Deck]
+Island x7
+Island
+Island
+Lightning Bolt
+Ornithopter
+Ancestral Recall
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Doom Reigns Supreme.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Serpent Specialist.Cast
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Doom Reigns Supreme.Counters.Plan = 1
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Aerial Doombot.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot2.Life = 18
+? Bot1.Life = 22
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Ephemerate.Cast(Aerial Doombot)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Doom Reigns Supreme.Counters.Plan = 3
+[T5 Bot1.Upkeep]
+Bot1.Accept
+Bot1.Target(Aerial Doombot)
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Doom Reigns Supreme.Counters.Plan = 4
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Aerial Doombot.Cast
+Bot1.Choose(Ornithopter)
+Bot1.Choose(Lightning Bolt)
+Bot1.Target(Bot2)
+! Bot1.Choose
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 12
+Bot1.Life = 25
+Bot1.Graveyard = Doom Reigns Supreme; Ephemerate; Black Lotus
+Bot2.Graveyard = Lightning Bolt; Island; Island
+Exile = Ancestral Recall
+Bot2.Library.Count = 0
+Bot1.Battlefield = Plains; Mox Jet; Serpent Specialist; Mox Sapphire; Aerial Doombot; Aerial Doombot; Ornithopter

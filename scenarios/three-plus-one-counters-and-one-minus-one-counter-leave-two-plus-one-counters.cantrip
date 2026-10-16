@@ -1,0 +1,55 @@
+# CR 704.5q with unequal numbers: "N +1/+1 and N -1/-1 counters are removed from it, where N is the smaller of the number
+# of +1/+1 and -1/-1 counters on it." Shang-Chi and the Ten Rings gets three +1/+1 counters from the three cards Ancestral
+# Recall draws (Requiting Hex, Ornithopter and an Island). Bot1 casts the Ornithopter and then the Hex at it, blighting 1:
+# the -1/-1 counter goes on Shang-Chi, and the state-based action takes one of each away, leaving two +1/+1 counters and
+# no -1/-1 counter - a 4/4.
+
+[Bot1 Deck]
+Island
+Mox Pearl
+Mox Sapphire
+Shang-Chi and the Ten Rings
+Black Lotus
+Ancestral Recall
+Mox Jet
+Requiting Hex
+Ornithopter
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Shang-Chi and the Ten Rings.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+? Bot1.Battlefield.Shang-Chi and the Ten Rings.Counters.PlusOnePlusOne = 3
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Requiting Hex.Cast
+Bot1.Modes(Blight 1)
+Bot1.Target(Ornithopter)
+Bot1.Choose(Shang-Chi and the Ten Rings)
+? Bot1.Battlefield.Shang-Chi and the Ten Rings.Counters.PlusOnePlusOne = 2
+? Bot1.Battlefield.Shang-Chi and the Ten Rings.Counters.MinusOneMinusOne = (absent)
+? Bot1.Battlefield.Shang-Chi and the Ten Rings.Power = 4
+
+[Expect]
+Bot1.Battlefield.Shang-Chi and the Ten Rings.Counters.PlusOnePlusOne = 2
+Bot1.Graveyard = Requiting Hex; Ornithopter; Ancestral Recall; Black Lotus
