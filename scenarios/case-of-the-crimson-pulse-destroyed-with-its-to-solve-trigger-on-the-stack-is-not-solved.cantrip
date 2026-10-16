@@ -1,0 +1,59 @@
+# "To solve" triggers at the beginning of Bot1's end step on turn 3 (no cards in hand: the Case, cast on turn 1, is unsolved).
+# With the trigger on the stack Bot2 flashes in Cathar Commando and sacrifices it to destroy the Case. The trigger then resolves
+# for a Case that is no longer on the battlefield: it is a new object in the graveyard (CR 400.7) and "this Case becomes solved"
+# does nothing to it (it is not solved there either). Nothing is solved on the battlefield, so on turn 5 no card is discarded
+# or drawn at the upkeep (there is no Case): one card in hand after the draw step.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Case of the Crimson Pulse
+Ornithopter x3
+Ornithopter x12
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Cathar Commando
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Case of the Crimson Pulse.Cast
+Bot1.Choose(Ornithopter)
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.End]
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Hand.Cathar Commando.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Cathar Commando.Activate(Bot1.Battlefield.Case of the Crimson Pulse)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Case of the Crimson Pulse; Ornithopter
+[T5 Bot1.Draw]
+? Bot1.Hand.Count = 1
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Count = 8

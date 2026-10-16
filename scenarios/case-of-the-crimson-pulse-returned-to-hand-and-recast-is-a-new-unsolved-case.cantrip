@@ -1,0 +1,56 @@
+# A Case stays solved only until it leaves the battlefield (CR 719.3b). On turn 1 Bot1 casts the Case, discards an Ornithopter
+# to its enters trigger, draws two and casts all three Ornithopters it holds: no cards in hand at the end step, so it is solved.
+# On turn 3 the solved Case discards the (empty) hand and draws two at the upkeep (three cards in hand after the draw step:
+# the second solved check). Bot1 then bounces the Case with Boomerang Basics (it controlled it, so it draws a card) and casts it again
+# with a full hand: it is a new object, unsolved. Four cards in hand at the end step, so it is not solved, and at the next
+# upkeep it discards nothing: the graveyard still holds only the three cards put there on turns 1 and 3.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Case of the Crimson Pulse
+Ornithopter x6
+Boomerang Basics
+Ornithopter x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Case of the Crimson Pulse.Cast
+Bot1.Choose(Ornithopter)
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Upkeep]
+? Bot1.Hand.Count = 0
+? Bot1.Graveyard.Count = 1
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 3
+Bot1.Hand.Boomerang Basics.Cast(Case of the Crimson Pulse)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Case of the Crimson Pulse.Cast
+Bot1.Choose(Ornithopter)
+[T3 Bot1.End]
+? Bot1.Hand.Count = 4
+? Bot1.Graveyard.Count = 3
+[T5 Bot1.Draw]
+? Bot1.Hand.Count = 5
+? Bot1.Graveyard.Count = 3
+
+[Expect]
+Bot1.Battlefield.Count = 8

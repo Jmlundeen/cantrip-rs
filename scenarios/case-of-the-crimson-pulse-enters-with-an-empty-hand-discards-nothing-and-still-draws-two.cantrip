@@ -1,0 +1,35 @@
+# Case of the Crimson Pulse's enters trigger with no cards in hand (its ruling): there is nothing to discard, so no discard is
+# asked, and the two cards are drawn anyway. Bot1 casts its three Ornithopters first, then the Case with the last of its hand,
+# so the hand is empty as the trigger resolves; the graveyard stays empty and two cards are held. (Two cards in hand at the end
+# step, so it is not solved.)
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Case of the Crimson Pulse
+Ornithopter x3
+Ornithopter x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Case of the Crimson Pulse.Cast
+! Bot1.Choose
+[T2 Bot2.Upkeep]
+? Bot1.Hand.Count = 2
+? Bot1.Graveyard.Count = 0
+? Stack.Count = 0
+
+[Expect]
+Bot1.Battlefield.Count = 7

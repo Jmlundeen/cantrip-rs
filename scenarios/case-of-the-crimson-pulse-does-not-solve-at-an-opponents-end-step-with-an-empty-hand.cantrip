@@ -1,0 +1,39 @@
+# "To solve" is "At the beginning of YOUR end step" (CR 719.3a). Bot1 has three cards in hand at its own end step (turn 1), so the Case is
+# unsolved; during Bot2's turn it empties its hand with Lion's Eye Diamond, and at the beginning of Bot2's end step, with no cards
+# in Bot1's hand, nothing triggers (the stack is empty). The Case is still unsolved: at Bot1's next upkeep it does not discard the
+# hand, and the hand at the draw step is the one card drawn on turn 3 (a solved Case would have drawn two more).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Case of the Crimson Pulse
+Lion's Eye Diamond
+Ornithopter
+Ornithopter
+Ornithopter x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Lion's Eye Diamond.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Case of the Crimson Pulse.Cast
+Bot1.Choose(Ornithopter)
+[T2 Bot2.Upkeep]
+? Bot1.Hand.Count = 3
+Bot1.Battlefield.Lion's Eye Diamond.Activate(Color: Red)
+[T2 Bot2.End]
+? Bot1.Hand.Count = 0
+? Stack.Count = 0
+[T3 Bot1.Draw]
+? Bot1.Hand.Count = 1
+
+[Expect]
+Bot1.Battlefield.Count = 4

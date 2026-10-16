@@ -1,0 +1,55 @@
+# Case of the Crimson Pulse. On turn 1 its enters trigger makes Bot1 discard a card (an Ornithopter) and draw two: four
+# cards in hand at the end step, so "To solve" - no cards in hand - does not trigger and the Case stays unsolved. On turn 3 Bot1
+# casts the five Ornithopters it holds (they cost {0}) and has none in hand at the end step: the Case becomes solved. From then
+# on "Solved - At the beginning of your upkeep, discard your hand, then draw two cards" works: on turn 5 the hand is empty at
+# the upkeep, nothing is discarded and two cards are drawn (then the draw step's); on turn 7 the three cards held are discarded
+# and two drawn (then the draw step's). A solved Case stays solved with cards in hand.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Case of the Crimson Pulse
+Ornithopter x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Case of the Crimson Pulse.Cast
+Bot1.Choose(Ornithopter)
+[T2 Bot2.Upkeep]
+? Bot1.Hand.Count = 4
+? Bot1.Graveyard = Ornithopter
+? Stack.Count = 0
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 5
+? Bot1.Graveyard.Count = 1
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.End]
+? Bot1.Hand.Count = 0
+[T4 Bot2.Upkeep]
+? Stack.Count = 0
+[T5 Bot1.Draw]
+? Bot1.Hand.Count = 3
+? Bot1.Graveyard.Count = 1
+[T5 Bot1.Main1]
+? Bot1.Hand.Count = 3
+[T7 Bot1.Draw]
+? Bot1.Hand.Count = 3
+? Bot1.Graveyard.Count = 4
+[T7 Bot1.Main1]
+? Bot1.Hand.Count = 3
+
+[Expect]
+Bot1.Battlefield.Count = 9

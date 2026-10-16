@@ -1,0 +1,51 @@
+# "To solve" checks its condition twice (its ruling): when the end step begins and again as the ability resolves. On turn 3 Bot1's hand
+# is empty at the beginning of its end step, so "To solve - You have no cards in hand" triggers; in response Bot1 sacrifices a
+# Chromatic Star, whose draw puts a card in hand, and as the ability resolves the condition is false: the Case does not become
+# solved. The proof is the next upkeep: an unsolved Case does not discard the hand (one card held, then the draw step's: two),
+# where a solved one would have discarded it and drawn two (three).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Case of the Crimson Pulse
+Chromatic Star
+Ornithopter
+Ornithopter
+Mountain
+Ornithopter
+Ornithopter
+Ornithopter x4
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Chromatic Star.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Case of the Crimson Pulse.Cast
+! Bot1.Choose
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.End]
+? Stack.Count = 1
+? Bot1.Hand.Count = 0
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Chromatic Star.Activate(Color: Red)
+[T4 Bot2.Upkeep]
+? Bot1.Hand.Count = 1
+[T5 Bot1.Draw]
+? Bot1.Hand.Count = 2
+
+[Expect]
+Bot1.Battlefield.Count = 9
