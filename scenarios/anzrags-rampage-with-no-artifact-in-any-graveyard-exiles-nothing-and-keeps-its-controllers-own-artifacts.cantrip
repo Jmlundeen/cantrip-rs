@@ -1,0 +1,43 @@
+# X is the number of artifacts put into graveyards from the battlefield this turn, and it is zero here: Bot1 pays for Anzrag's Rampage
+# with two Mountains and three Moxen, which are tapped, not sacrificed, and Bot2 controls no artifact. Nothing is destroyed
+# (Bot1's own artifacts are not "artifacts you don't control"), nothing is exiled (the top card of the library, a creature,
+# stays where it is) and no creature is offered.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+Anzrag's Rampage
+Mountain
+Island
+Island
+Llanowar Elves
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Anzrag's Rampage.Cast
+Bot1.Pass
+! Bot1.Choose
+[T3 Bot1.Main2]
+? Exile.Count = 0
+? Bot1.Library = Llanowar Elves; Island; Island; Island; Island; Island; Island; Island; Island; Island; Island
+
+[Expect]
+Bot1.Battlefield = Mountain; Mountain; Mox Ruby; Mox Jet; Mox Pearl
+Bot1.Graveyard = Anzrag's Rampage
+Bot2.Battlefield.Count = 0

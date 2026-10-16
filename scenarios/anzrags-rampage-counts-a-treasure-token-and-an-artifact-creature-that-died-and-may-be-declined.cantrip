@@ -1,0 +1,64 @@
+# Anzrag's Rampage counts artifacts "put into graveyards from the battlefield this turn" for any reason, tokens included
+# (its ruling). Before it, Bot1's Blooming Blast, with the gift promised, gives Bot2 a Treasure token and kills Bot2's
+# Ornithopter (an artifact creature): that is one artifact put into a graveyard. The Rampage then destroys the Treasure
+# token, which goes to the graveyard for a moment and counts too: X = 2, and the top two cards, both creatures, are exiled.
+# "You may put a creature card exiled this way onto the battlefield": Bot1 declines, so both stay in exile and nothing
+# is returned to hand at the end step.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Emerald
+Blooming Blast
+Mountain
+Mountain
+Anzrag's Rampage
+Llanowar Elves
+Ragavan, Nimble Pilferer
+Mountain x10
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Blooming Blast.Cast
+Bot1.Accept
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield = Treasure Token
+? Bot2.Graveyard = Ornithopter; Island
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Anzrag's Rampage.Cast
+Bot1.Pass
+Bot1.Choose()
+[T5 Bot1.Main2]
+? Bot2.Battlefield.Count = 0
+? Exile = Llanowar Elves; Ragavan, Nimble Pilferer
+[T6 Bot2.Upkeep]
+? Exile.Count = 2
+
+[Expect]
+Bot2.Graveyard = Ornithopter; Island
+Bot1.Battlefield = Mountain; Mountain; Mountain; Mox Ruby; Mox Jet; Mox Pearl; Mox Emerald
+Bot1.Graveyard = Anzrag's Rampage; Blooming Blast

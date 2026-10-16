@@ -1,0 +1,60 @@
+# The creature Anzrag's Rampage puts onto the battlefield comes back to hand "at the beginning of the next end step" only if it is
+# still there: Bot2 answers with Lightning Bolt once Llanowar Elves has arrived, the Elves die, and at the end step the delayed
+# ability finds a creature that is not the object it was about (CR 603.7c, 400.7). The Elves stay in the graveyard, not in
+# Bot1's hand. X is 2 (Bot2's Mox Pearl and Sol Ring); the Bolt is paid for with Bot2's untapped Mountain.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+Anzrag's Rampage
+Mountain
+Island
+Island
+Llanowar Elves
+Island
+Island x10
+
+[Bot2 Deck]
+Mountain
+Mox Pearl
+Sol Ring
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Anzrag's Rampage.Cast
+Bot1.Pass
+Bot1.Choose(Llanowar Elves)
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield = Mountain; Mountain; Mox Ruby; Mox Jet; Mox Pearl
+? Bot1.Graveyard = Llanowar Elves; Anzrag's Rampage
+[T4 Bot2.Upkeep]
+? Bot1.Hand.Count = 2
+
+[Expect]
+Bot1.Graveyard = Llanowar Elves; Anzrag's Rampage
+Bot1.Hand = Island; Island
+Exile.Count = 1
+Bot2.Graveyard = Lightning Bolt; Sol Ring; Mox Pearl

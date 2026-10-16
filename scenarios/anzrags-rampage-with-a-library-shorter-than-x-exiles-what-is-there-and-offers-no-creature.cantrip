@@ -1,0 +1,51 @@
+# X is 2 (Bot2's Sol Ring and Mind Stone, destroyed) but Bot1's library holds one card, a Lightning Bolt: exiling the top X
+# cards of a library with fewer exiles them all (CR 401.5 is about drawing; nothing here loses the game). No creature card was
+# exiled, so no "you may put a creature card" question is asked. Bot1 pays with two Mountains and three Moxen, tapped, not
+# sacrificed.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+Anzrag's Rampage
+Mountain
+Island
+Island
+Lightning Bolt
+
+[Bot2 Deck]
+Island
+Sol Ring
+Mind Stone
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Hand.Mind Stone.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Anzrag's Rampage.Cast
+Bot1.Pass
+! Bot1.Choose
+[T3 Bot1.Main2]
+? Exile = Lightning Bolt
+? Bot1.Library.Count = 0
+? Bot2.Graveyard = Mind Stone; Sol Ring
+
+[Expect]
+Bot1.Battlefield = Mountain; Mountain; Mox Ruby; Mox Jet; Mox Pearl
+Bot2.Battlefield = Island

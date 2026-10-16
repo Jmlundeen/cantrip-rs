@@ -1,0 +1,62 @@
+# Anzrag's Rampage destroys the artifacts its controller does not control and counts every artifact put into a graveyard from
+# the battlefield this turn, for any reason: here Bot1's two Black Lotuses, sacrificed to pay for it, and Bot2's Sol Ring and
+# Mind Stone it destroys (X = 4). Bot1's own Mox Jet is not destroyed. The top four cards are exiled; of them Bot1 puts
+# Llanowar Elves onto the battlefield (the Lightning Bolt and Ragavan stay exiled, the Mountain stays too), it has haste, so it
+# attacks the turn it arrives, and it is returned to Bot1's hand at the beginning of the end step.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Anzrag's Rampage
+Mox Jet
+Mountain
+Mountain
+Mountain
+Mountain
+Mountain
+Llanowar Elves
+Lightning Bolt
+Ragavan, Nimble Pilferer
+Mountain x10
+
+[Bot2 Deck]
+Island
+Sol Ring
+Mind Stone
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Hand.Mind Stone.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Anzrag's Rampage.Cast
+Bot1.Pass
+Bot1.Choose(Llanowar Elves)
+? Bot2.Battlefield.Count = 1
+? Bot1.Graveyard = Anzrag's Rampage; Black Lotus; Black Lotus
+? Bot2.Graveyard = Mind Stone; Sol Ring
+? Bot1.Battlefield = Mox Jet; Llanowar Elves
+? Bot1.Battlefield.Llanowar Elves.Keywords = Haste
+? Exile.Count = 3
+? Exile = Mountain; Lightning Bolt; Ragavan, Nimble Pilferer
+? Bot1.Library.Count = 10
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Llanowar Elves > Bot2)
+[T3 Bot1.End]
+? Bot1.Battlefield = Mox Jet; Llanowar Elves
+[T4 Bot2.Upkeep]
+? Bot1.Hand = Llanowar Elves; Mountain; Mountain; Mountain; Mountain
+
+[Expect]
+Bot2.Life = 19
+Bot1.Battlefield = Mox Jet
+Bot1.Hand.Count = 5
