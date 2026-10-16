@@ -1,0 +1,48 @@
+# A copy of Time Stop ends the turn as well (CR 707.10): Lutri, cast with Time Stop on the stack, copies it as it enters,
+# and the copy resolves first. Every object on the stack is exiled (CR 724.1b), so the original Time Stop never resolves:
+# it is exiled, and the copy, exiled too, ceases to exist (CR 704.5e). The turn ends; the next is Bot2's.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Ruby
+Black Lotus
+Sol Ring
+Time Stop
+Lutri, the Spellchaser
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Time Stop.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lutri, the Spellchaser.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Stack = Time Stop; Time Stop
+[T4 Bot2.Upkeep]
+? Turn = 4
+? Stack.Count = 0
+
+[Expect]
+Turn = 4
+Exile = Time Stop
+Bot1.Battlefield = Island; Island; Mox Sapphire; Mox Ruby; Sol Ring; Lutri, the Spellchaser
+Bot1.Graveyard = Black Lotus

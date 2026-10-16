@@ -1,0 +1,50 @@
+# Time Stop ends the turn (CR 724.1) on the opponent's turn. Bot2 casts Lightning Bolt at Bot1 in its own precombat main
+# phase, and Bot1 answers with Time Stop: every object on the stack is exiled (724.1b), so the Bolt never resolves and
+# Bot1 stays at 20, and Time Stop is exiled too, though it resolved (it is not put into the graveyard). The turn skips
+# straight to the cleanup step (724.1d): Bot2 never gets its combat, second main phase or end step, and the next turn is
+# Bot1's, turn 3.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Mox Ruby
+Sol Ring
+Time Stop
+Island x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Time Stop.Cast
+[T3 Bot1.Upkeep]
+? Turn = 3
+? ActivePlayer = Bot1
+? Stack.Count = 0
+
+[Expect]
+Turn = 3
+Bot1.Life = 20
+Exile = Lightning Bolt; Time Stop
+Bot1.Graveyard.Count = 0
+Bot2.Graveyard.Count = 0

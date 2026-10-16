@@ -1,0 +1,47 @@
+# Exiling a spell is not countering it (CR 724.1b, 701.6): Bot2's Abrupt Decay, which can't be countered, is aimed at
+# Bot1's Sol Ring, and Bot1's Time Stop exiles it from the stack all the same. Sol Ring survives, and Abrupt Decay is in
+# exile, not the graveyard.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Mox Ruby
+Sol Ring
+Time Stop
+Island x10
+
+[Bot2 Deck]
+Swamp
+Mox Emerald
+Abrupt Decay
+Swamp x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Abrupt Decay.Cast(Sol Ring)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Time Stop.Cast
+[T3 Bot1.Upkeep]
+
+[Expect]
+Turn = 3
+Exile = Abrupt Decay; Time Stop
+Bot1.Battlefield = Island; Mox Sapphire; Mox Jet; Mox Pearl; Mox Ruby; Sol Ring
+Bot2.Graveyard.Count = 0

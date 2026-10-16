@@ -1,0 +1,62 @@
+# A turn ended by Time Stop goes through its cleanup step in full (CR 724.1d, 514.1): Bot1, whose turn Bot2 ends, holds
+# eight cards and discards one, which triggers Marauding Mako. A trigger waiting in the cleanup step gives players
+# priority there (CR 514.3a): Bot1 casts Shore Up on the Mako while the trigger is on the stack. Once the stack is empty
+# and both pass, another cleanup step begins, and it ends Shore Up's "until end of turn" effect (CR 514.2): on Bot2's
+# turn 10 the Mako is a 2/2, its base 1/1 with one +1/+1 counter, not the 3/3 Shore Up made it.
+
+[Bot1 Deck]
+Mountain
+Marauding Mako
+Mox Sapphire
+Shore Up
+Island x3
+Island x10
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Mox Ruby
+Sol Ring
+Time Stop
+Island x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Marauding Mako.Cast
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Sol Ring.Cast
+[T5 Bot1.Main1]
+[T9 Bot1.Main1]
+? Bot1.Hand.Count = 8
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Hand.Time Stop.Cast
+Bot1.Discard(Island)
+? Step = Cleanup
+? Stack.Count = 1
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Shore Up.Cast(Marauding Mako)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Marauding Mako.Power = 2
+[T10 Bot2.Upkeep]
+
+[Expect]
+Turn = 10
+Bot1.Battlefield.Marauding Mako.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Marauding Mako.Power = 2
+Bot1.Battlefield.Marauding Mako.Toughness = 2
+Bot1.Hand.Count = 6
+Bot1.Graveyard = Shore Up; Island

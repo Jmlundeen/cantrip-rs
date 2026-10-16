@@ -1,0 +1,44 @@
+# The player whose turn it is discards down to their maximum hand size in the cleanup step a turn ended by Time Stop
+# skips to (CR 724.1d, 514.1). Bot1 plays nothing, so it holds eight cards after its turn-3 draw; Bot2 ends that turn in
+# the draw step, and Bot1 discards one card of its choice at cleanup.
+
+[Bot1 Deck]
+Island x7
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Mox Ruby
+Sol Ring
+Time Stop
+Island x10
+
+[Actions]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Sol Ring.Cast
+[T3 Bot1.Draw]
+? Bot1.Hand.Count = 8
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Hand.Time Stop.Cast
+Bot1.Discard(Lightning Bolt)
+[T4 Bot2.Upkeep]
+
+[Expect]
+Turn = 4
+Bot1.Hand.Count = 7
+Bot1.Graveyard = Lightning Bolt
+Bot2.Graveyard.Count = 0
+Exile = Time Stop

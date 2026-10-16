@@ -1,0 +1,58 @@
+# Time Stop cast in the declare attackers step ends the turn in combat (CR 724.1d): the attacking Llanowar Elves are
+# removed from combat, so no combat damage is dealt and Bot2 stays at 20. Shore Up's +1/+1 "until end of turn" was on the
+# Elves (a 2/2 as it attacks); the turn's cleanup step still happens, so the effect ends (CR 514.2) and the Elves are a 1/1
+# on Bot2's turn 4, the next turn.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Island
+Shore Up
+Island x10
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Mox Ruby
+Sol Ring
+Time Stop
+Island x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Shore Up.Cast(Llanowar Elves)
+Bot1.Attack(Llanowar Elves > Bot2)
+? Combat.Attackers.Count = 1
+? Bot1.Battlefield.Llanowar Elves.Power = 2
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Hand.Time Stop.Cast
+[T4 Bot2.Upkeep]
+? ActivePlayer = Bot2
+? Combat.Attackers.Count = 0
+? Bot1.Battlefield.Llanowar Elves.Power = 1
+
+[Expect]
+Turn = 4
+Bot2.Life = 20
+Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot1.Battlefield.Llanowar Elves.Toughness = 1
+Exile = Time Stop
+Bot1.Graveyard = Shore Up
