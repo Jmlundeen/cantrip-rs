@@ -19,13 +19,10 @@ fn creature_defending_player_controls(q: &dyn Query, asker: &Asker, t: Target) -
 }
 
 /// "Put a +1/+1 counter on it and tap up to one target creature defending player controls." The counter goes on the
-/// equipped creature that attacked, if it is still on the battlefield (CR 400.7), whatever the target does; a target no
-/// longer legal is not tapped (CR 608.2b).
+/// equipped creature that attacked - nothing, once it has left the battlefield (a new object, CR 400.7; `add_counters`
+/// skips it) - whatever the target does; a target no longer legal is not tapped (CR 608.2b).
 fn counter_and_tap(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Target::Object(creature) = item.subject
-        && is_live(g, creature)
-        && g.is_on_battlefield(creature)
-    {
+    if let Target::Object(creature) = item.subject {
         g.add_counters(creature, CounterKind::PlusOne, 1);
     }
     if let Some(defender) = targets::object(g, item, 0) {
