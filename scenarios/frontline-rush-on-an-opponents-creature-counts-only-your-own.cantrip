@@ -1,0 +1,38 @@
+# Frontline Rush's target is any creature, not only one its controller controls, and X counts only the creatures its
+# controller controls: with just Mother of Runes (X = 1), Bot2's Ornithopter (one of Bot2's two) goes from 0/2 to 1/3.
+
+[Bot1 Deck]
+Plains
+Mountain
+Mother of Runes
+Frontline Rush
+Plains x3
+Mountain x3
+Plains x13
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Mountain x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Mother of Runes.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Frontline Rush.Cast
+Bot1.Modes(Target creature gets +X/+X until end of turn, where X is the number of creatures you control.)
+Bot1.Target(Bot2.Battlefield.Ornithopter#1)
+
+[Expect]
+Bot2.Battlefield.Ornithopter#1.Power = 1
+Bot2.Battlefield.Ornithopter#1.Toughness = 3
+Bot2.Battlefield.Ornithopter#2.Power = 0
+Bot1.Battlefield.Mother of Runes.Power = 1
+Bot1.Graveyard = Frontline Rush
+Stack.Count = 0

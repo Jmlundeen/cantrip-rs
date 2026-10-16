@@ -1,0 +1,32 @@
+# Frontline Rush, the first mode ({R}{W}): two 1/1 red Goblin creature tokens, with no target asked (CR 115.1).
+
+[Bot1 Deck]
+Plains
+Mountain
+Frontline Rush
+Plains x3
+Mountain x3
+Plains x13
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Frontline Rush.Cast
+Bot1.Modes(Create two 1/1 red Goblin creature tokens.)
+! Bot1.Target
+
+[Expect]
+Bot1.Battlefield.Goblin#1.Power = 1
+Bot1.Battlefield.Goblin#1.Toughness = 1
+Bot1.Battlefield.Goblin#1.Token = true
+Bot1.Battlefield.Goblin#1.Colors = Red
+Bot1.Battlefield.Goblin#1.Subtypes = Goblin
+Bot1.Battlefield.Goblin#2.Token = true
+Bot1.Graveyard = Frontline Rush
+Stack.Count = 0

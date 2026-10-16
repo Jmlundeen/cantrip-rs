@@ -1,0 +1,45 @@
+# Frontline Rush's X is worked out once, as it resolves (official ruling). Cast with Mother of Runes and Ornithopter in
+# play (two creatures), it has one left when Bot2's Lightning Bolt kills the Ornithopter in response: Mother of Runes
+# becomes 2/2, not 3/3.
+
+[Bot1 Deck]
+Plains
+Mountain
+Mother of Runes
+Ornithopter
+Frontline Rush
+Plains x3
+Mountain x3
+Plains x13
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Mother of Runes.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Frontline Rush.Cast
+Bot1.Modes(Target creature gets +X/+X until end of turn, where X is the number of creatures you control.)
+Bot1.Target(Bot1.Battlefield.Mother of Runes)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Mother of Runes.Power = 2
+Bot1.Battlefield.Mother of Runes.Toughness = 2
+Bot1.Graveyard = Frontline Rush; Ornithopter
+Bot2.Graveyard = Lightning Bolt
+Stack.Count = 0

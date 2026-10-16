@@ -1,0 +1,44 @@
+# Frontline Rush, second mode, on Mother of Runes; Bot2 answers with Lightning Bolt, which resolves first and kills the
+# 1/1. The spell's only target is illegal on resolution, so it does nothing (CR 608.2b) and goes to the graveyard; Bot1's
+# Ornithopter does not get +X/+X.
+
+[Bot1 Deck]
+Plains
+Mountain
+Mother of Runes
+Ornithopter
+Frontline Rush
+Plains x3
+Mountain x3
+Plains x13
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Mother of Runes.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Frontline Rush.Cast
+Bot1.Modes(Target creature gets +X/+X until end of turn, where X is the number of creatures you control.)
+Bot1.Target(Bot1.Battlefield.Mother of Runes)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Mother of Runes)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Frontline Rush; Mother of Runes
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot2.Graveyard = Lightning Bolt
+Stack.Count = 0

@@ -1,0 +1,39 @@
+# Frontline Rush, the second mode: +X/+X where X is the number of creatures its controller controls. Bot1 has Mother of
+# Runes and Ornithopter (X = 2) and Bot2 has two Ornithopters that do not count: Mother of Runes becomes 3/3.
+
+[Bot1 Deck]
+Plains
+Mountain
+Mother of Runes
+Ornithopter
+Frontline Rush
+Plains x3
+Mountain x3
+Plains x13
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Mountain x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Mother of Runes.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Frontline Rush.Cast
+Bot1.Modes(Target creature gets +X/+X until end of turn, where X is the number of creatures you control.)
+Bot1.Target(Bot1.Battlefield.Mother of Runes)
+
+[Expect]
+Bot1.Battlefield.Mother of Runes.Power = 3
+Bot1.Battlefield.Mother of Runes.Toughness = 3
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Graveyard = Frontline Rush
+Stack.Count = 0
