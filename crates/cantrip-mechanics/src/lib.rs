@@ -17,6 +17,7 @@ pub mod dash;
 pub mod combat;
 pub mod copy;
 pub mod channel;
+pub mod class;
 pub mod choose;
 pub mod cipher;
 pub mod chosen_type;

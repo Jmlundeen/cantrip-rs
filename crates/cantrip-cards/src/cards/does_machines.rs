@@ -1,29 +1,7 @@
 use cantrip_api::*;
-use cantrip_mechanics::{discard_chosen, targets};
+use cantrip_mechanics::{class, discard_chosen, targets};
 use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
-
-fn level(q: &dyn Query, source: ObjectId) -> u8 {
-    q.obj(source).class_level.max(1)
-}
-
-fn at_level_one(q: &dyn Query, asker: &Asker) -> bool {
-    level(q, asker.source) == 1
-}
-
-fn at_level_two(q: &dyn Query, asker: &Asker) -> bool {
-    level(q, asker.source) == 2
-}
-
-fn become_level_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.set_class_level(item.object, 2);
-    Ok(())
-}
-
-fn become_level_three(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.set_class_level(item.object, 3);
-    Ok(())
-}
 
 /// "When this Class enters, mill two cards, draw two cards, then discard two cards."
 fn loot(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -32,13 +10,6 @@ fn loot(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.draw(you, 2);
     discard_chosen(g, you, item.object, 2)?;
     Ok(())
-}
-
-fn became_level_two(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
-    match event {
-        Event::ClassLevel { object, level: 2 } if *object == source => Fired::PLAIN,
-        _ => None,
-    }
 }
 
 /// "Target artifact cards from your graveyard" (CR 115.1), up to two.
@@ -58,7 +29,7 @@ fn return_artifacts(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 fn combat_at_level_three(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
         Event::StepBegan { step: Step::BeginCombat }
-            if q.state().turn.active == q.controller(source) && level(q, source) >= 3 =>
+            if q.state().turn.active == q.controller(source) && class::level(q, source) >= 3 =>
         {
             Fired::PLAIN
         }
@@ -87,14 +58,10 @@ fn grow_artifact(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        ability(cost("{1}{U}"), become_level_two, "{1}{U}: Level 2")
-            .sorcery_speed()
-            .condition(at_level_one),
-        ability(cost("{4}{U}"), become_level_three, "{4}{U}: Level 3")
-            .sorcery_speed()
-            .condition(at_level_two),
+        class::level_two("{1}{U}", "{1}{U}: Level 2"),
+        class::level_three("{4}{U}", "{4}{U}: Level 3"),
         triggered(THIS_ENTERS, loot, "When this Class enters, mill two cards, draw two cards, then discard two cards."),
-        triggered(when(EventMask::CLASS_LEVEL, became_level_two), return_artifacts, "When this Class becomes level 2, return up to two target artifact cards from your graveyard to your hand.")
+        triggered(class::BECOMES_LEVEL_TWO, return_artifacts, "When this Class becomes level 2, return up to two target artifact cards from your graveyard to your hand.")
             .targets(&[up_to(2, artifact_card_in_your_graveyard)]),
         triggered(when(EventMask::STEP_BEGAN, combat_at_level_three), grow_artifact, "At the beginning of combat on your turn, put three +1/+1 counters on target artifact you control. If it isn't a creature, it becomes a 0/0 Robot creature in addition to its other types.")
             .targets(&[target(artifact_you_control)]),

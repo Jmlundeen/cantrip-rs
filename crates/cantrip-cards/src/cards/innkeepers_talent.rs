@@ -1,30 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::replacements::{double_counters_applies, double_counters_apply};
-use cantrip_mechanics::{targets, triggers::ward};
+use cantrip_mechanics::{class, targets, triggers::ward};
 use cantrip_oracle as oracle;
-
-/// The level a Class is at (CR 716.4): a designation, never a counter.
-fn level(q: &dyn Query, source: ObjectId) -> u8 {
-    q.obj(source).class_level.max(1)
-}
-
-fn at_level_one(q: &dyn Query, asker: &Asker) -> bool {
-    level(q, asker.source) == 1
-}
-
-fn at_level_two(q: &dyn Query, asker: &Asker) -> bool {
-    level(q, asker.source) == 2
-}
-
-fn become_level_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.set_class_level(item.object, 2);
-    Ok(())
-}
-
-fn become_level_three(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.set_class_level(item.object, 3);
-    Ok(())
-}
 
 fn counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(creature) = targets::object(g, item, 0) {
@@ -67,12 +44,8 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(cantrip_mechanics::triggers::BEGINNING_OF_YOUR_COMBAT, counter, "At the beginning of combat on your turn, put a +1/+1 counter on target creature you control.")
             .targets(&[targets::CREATURE_YOU_CONTROL]),
-        ability(cost("{G}"), become_level_two, "{G}: Level 2")
-            .sorcery_speed()
-            .condition(at_level_one),
-        ability(cost("{3}{G}"), become_level_three, "{3}{G}: Level 3")
-            .sorcery_speed()
-            .condition(at_level_two),
+        class::level_two("{G}", "{G}: Level 2"),
+        class::level_three("{3}{G}", "{3}{G}: Level 3"),
     ],
     delayed: &[ward::<1>("Ward {1} (Whenever this permanent becomes the target of a spell or ability an opponent controls, counter it unless that player pays {1}.)")],
     statics: &[static_ability(Layer::Ability, has_counters, grant_ward, "Permanents you control with counters on them have ward {1}.")],

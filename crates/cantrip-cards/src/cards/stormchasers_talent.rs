@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{targets, tokens};
+use cantrip_mechanics::{class, targets, tokens};
 use cantrip_mechanics::triggers::{PROWESS, THIS_ENTERS};
 use cantrip_oracle as oracle;
 
@@ -22,35 +22,6 @@ fn otter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-fn level(q: &dyn Query, source: ObjectId) -> u8 {
-    q.obj(source).class_level.max(1)
-}
-
-fn at_level_one(q: &dyn Query, asker: &Asker) -> bool {
-    level(q, asker.source) == 1
-}
-
-fn at_level_two(q: &dyn Query, asker: &Asker) -> bool {
-    level(q, asker.source) == 2
-}
-
-fn become_level_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.set_class_level(item.object, 2);
-    Ok(())
-}
-
-fn become_level_three(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.set_class_level(item.object, 3);
-    Ok(())
-}
-
-fn became_level_two(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
-    match event {
-        Event::ClassLevel { object, level: 2 } if *object == source => Fired::PLAIN,
-        _ => None,
-    }
-}
-
 fn return_to_hand(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(card) = targets::object(g, item, 0) {
         g.return_to_hand(&[card]);
@@ -63,7 +34,7 @@ fn cast_at_level_three(q: &dyn Query, source: ObjectId, event: &Event) -> Option
     match event {
         Event::SpellCast { spell, player, .. }
             if *player == q.controller(source)
-                && level(q, source) >= 3
+                && class::level(q, source) >= 3
                 && (q.chars(*spell).is(CardType::Instant) || q.chars(*spell).is(CardType::Sorcery)) =>
         {
             Fired::PLAIN
@@ -74,14 +45,10 @@ fn cast_at_level_three(q: &dyn Query, source: ObjectId, event: &Event) -> Option
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        ability(cost("{3}{U}"), become_level_two, "{3}{U}: Level 2")
-            .sorcery_speed()
-            .condition(at_level_one),
-        ability(cost("{5}{U}"), become_level_three, "{5}{U}: Level 3")
-            .sorcery_speed()
-            .condition(at_level_two),
+        class::level_two("{3}{U}", "{3}{U}: Level 2"),
+        class::level_three("{5}{U}", "{5}{U}: Level 3"),
         triggered(THIS_ENTERS, otter, "When this Class enters, create a 1/1 blue and red Otter creature token with prowess."),
-        triggered(when(EventMask::CLASS_LEVEL, became_level_two), return_to_hand, "When this Class becomes level 2, return target instant or sorcery card from your graveyard to your hand.")
+        triggered(class::BECOMES_LEVEL_TWO, return_to_hand, "When this Class becomes level 2, return target instant or sorcery card from your graveyard to your hand.")
             .targets(&[targets::INSTANT_OR_SORCERY_IN_YOUR_GRAVEYARD]),
         triggered(when(EventMask::SPELL_CAST, cast_at_level_three), otter, "Whenever you cast an instant or sorcery spell, create a 1/1 blue and red Otter creature token with prowess."),
     ],
