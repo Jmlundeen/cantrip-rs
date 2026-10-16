@@ -1,0 +1,6 @@
+{
+  "name": "Ancient Cornucopia",
+  "manaCost": "{2}{G}",
+  "type": "Artifact",
+  "oracleText": "Whenever you cast a spell that's one or more colors, you may gain 1 life for each of that spell's colors. Do this only once each turn.\n{T}: Add one mana of any color."
+}

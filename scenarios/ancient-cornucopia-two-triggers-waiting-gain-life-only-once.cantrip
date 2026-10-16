@@ -1,0 +1,53 @@
+# Ancient Cornucopia: "Do this only once each turn." Bot1 casts a Lightning Bolt and, while that cast's trigger is still on the
+# stack, a second Lightning Bolt: both triggered (Bot1 had gained no life when each was cast, CR 603.2h). The second trigger,
+# on top, resolves first and Bot1 accepts, gaining 1. When the first trigger then resolves the action has been done this
+# turn, so it does nothing and Bot1 is not asked (the refusal): the life gain happens once, 20 + 1 = 21.
+
+[Bot1 Deck]
+Forest
+Mox Jet
+Mox Pearl
+Mox Ruby
+Ancient Cornucopia
+Lightning Bolt
+Lightning Bolt
+Forest x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ancient Cornucopia.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Ancient Cornucopia.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Stack.Count = 4
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+! Bot1.Accept
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 21
+Bot2.Life = 14
+Bot1.Graveyard = Lightning Bolt; Lightning Bolt

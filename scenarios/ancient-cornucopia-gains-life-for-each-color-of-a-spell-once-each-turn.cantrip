@@ -1,0 +1,67 @@
+# Ancient Cornucopia: "Whenever you cast a spell that's one or more colors, you may gain 1 life for each of that spell's colors.
+# Do this only once each turn." (CR 603.2h: once Bot1 has gained life with it this turn it does not trigger again.)
+# Turn 1: Bot1 casts Cornucopia, then a colorless Ornithopter: no trigger (the spell has no color; the refusal shows it is not asked).
+# Turn 3: Lightning Helix is red and white, two colors: Bot1 accepts and gains 2 (and 3 from the Helix); then a Lightning Bolt, one
+# color, is cast with Cornucopia's own mana and Bot1 is not asked at all (a refusal), because the life gain was done this turn.
+# Turn 5: a new turn, so a Lightning Bolt (one color) triggers it again and Bot1 gains 1 (Cornucopia's mana pays for the Bolt).
+# Life: 20 + 2 + 3 + 1 = 26; Bot2 takes 3 three times.
+
+[Bot1 Deck]
+Forest
+Mox Jet
+Mox Pearl
+Mox Ruby
+Ancient Cornucopia
+Lightning Helix
+Ornithopter
+Lightning Bolt
+Lightning Bolt
+Forest x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ancient Cornucopia.Cast
+Bot1.Pass
+! Bot1.Accept
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+! Bot1.Accept
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Lightning Helix.Cast(Bot2)
+Bot1.Pass
+Bot1.Accept
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 25
+Bot1.Battlefield.Ancient Cornucopia.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+! Bot1.Accept
+Bot2.Pass
+? Bot1.Life = 25
+[T5 Bot1.Main1]
+Bot1.Battlefield.Ancient Cornucopia.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot1.Accept
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 26
+Bot2.Life = 11
+Bot1.Graveyard = Lightning Bolt; Lightning Bolt; Lightning Helix

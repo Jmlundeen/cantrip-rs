@@ -1,0 +1,49 @@
+# Ancient Cornucopia: "you may gain 1 life ... Do this only once each turn." The turn is used up only by actually gaining life
+# (CR 603.2h: it "triggers only if its source's controller has not yet taken the indicated action that turn"). On turn 3 Bot1
+# casts two Lightning Bolts, each red: for the first it declines (no life), so the second still triggers it and Bot1 accepts and
+# gains 1. Life 20 + 1 = 21, and Bot2 takes 6 (to 14).
+
+[Bot1 Deck]
+Forest
+Mox Jet
+Mox Pearl
+Mox Ruby
+Ancient Cornucopia
+Lightning Bolt
+Lightning Bolt
+Forest x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ancient Cornucopia.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot1.Decline
+Bot2.Pass
+? Bot1.Life = 20
+Bot1.Battlefield.Ancient Cornucopia.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot1.Accept
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 21
+Bot2.Life = 14
+Bot1.Graveyard = Lightning Bolt; Lightning Bolt

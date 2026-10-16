@@ -1,0 +1,59 @@
+# Ancient Cornucopia: "gain 1 life for each of that spell's colors" and the ruling: "Ancient Cornucopia's triggered ability resolves
+# before the spell that caused it to trigger. The ability will resolve even if that spell is countered. If that spell is
+# countered, use its last known information to determine what colors it was." On turn 3 Bot1 casts Lightning Helix (red and white);
+# with Cornucopia's trigger on top of it, Bot2 counters the Helix with Counterspell (itself a blue spell, which does not trigger
+# Bot1's Cornucopia: "you cast"). The Helix is countered before the trigger resolves; Bot1 still accepts and gains 2 life (the Helix's
+# two colors), and takes no gain from the Helix itself (3 damage and 3 life never happen).
+
+[Bot1 Deck]
+Forest
+Mox Jet
+Mox Pearl
+Mox Ruby
+Ancient Cornucopia
+Lightning Helix
+Forest x13
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Island x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ancient Cornucopia.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Lightning Helix.Cast(Bot2)
+Bot1.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Lightning Helix)
+! Bot1.Accept
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot2.Life = 20
+Bot1.Graveyard = Lightning Helix
+Bot2.Graveyard = Counterspell
