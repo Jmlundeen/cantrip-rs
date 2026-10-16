@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::attach::{attached_object, equip};
-use cantrip_mechanics::statics::plus_power;
+use cantrip_mechanics::statics::plus_pt;
 use cantrip_mechanics::triggers::{THIS_ATTACKS, THIS_ENTERS};
 use cantrip_mechanics::{targets, tokens};
 use cantrip_oracle as oracle;
@@ -13,7 +13,7 @@ pub static AXE: CardDef = CardDef {
     types: TypeSet::of(&[CardType::Artifact]),
     subtypes: SubtypeSet::of(&[Subtype::Equipment]),
     abilities: &[equip(mana("{2}"), "Equip {2}")],
-    statics: &[static_ability(Layer::PtModify, attached_object, plus_power::<1>, "Equipped creature gets +1/+0.")],
+    statics: &[static_ability(Layer::PtModify, attached_object, plus_pt::<1, 0>, "Equipped creature gets +1/+0.")],
     text: "Equipped creature gets +1/+0.\nEquip {2}",
     ..CardDef::BLANK
 };
