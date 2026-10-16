@@ -106,9 +106,17 @@ pub trait Query {
     fn card(&self, id: CardId) -> &'static CardDef;
 
     /// The activated ability (CR 602) an ability reference names, if it names one: what an activation recorded in the
-    /// history was, or one of an object's abilities (`chars(id).abilities()`) is.
+    /// history was, or one of an object's abilities (`chars(id).abilities()`) is - a printed one, or one an effect grants
+    /// (`AbilityRef::delayed`, in the granting card's `delayed` list: Deconstruction Hammer's). The core's own abilities and
+    /// the history's markers (madness, rebound, miracle, a granted way used, extra loyalty activations allowed) are none.
     fn activated_ability(&self, ability: AbilityRef) -> Option<&'static ActivatedDef> {
-        match self.card(ability.card).abilities.get(ability.index as usize) {
+        let card = self.card(ability.card);
+        let def = if ability.is_delayed() {
+            card.delayed.get((ability.index - AbilityRef::DELAYED) as usize)
+        } else {
+            card.abilities.get(ability.index as usize)
+        };
+        match def {
             Some(AbilityDef::Activated(def)) => Some(def),
             _ => None,
         }

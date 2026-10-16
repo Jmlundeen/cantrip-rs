@@ -603,11 +603,12 @@ pub(crate) type Again = Vec<(ObjectId, u8)>;
 
 type Found = Vec<(PendingTrigger, &'static TriggeredDef, Again)>;
 
-/// `permanent`: the source is on the battlefield (or was, for a look-back ability); false for an emblem in the command zone,
-/// which is no permanent (CR 114.4), so "a triggered ability of a permanent" does not mean its abilities.
 /// The triggered abilities of `source` that `event` triggers, onto `found`: those that look back (CR 603.10a) or those that
 /// don't, as `look_back` says. With `later`, both, the object's characteristics found once: the look-back ones onto `found`,
 /// the others onto `later`.
+///
+/// `permanent`: the source is on the battlefield (or was, for a look-back ability); false for an emblem in the command zone,
+/// which is no permanent (CR 114.4), so "a triggered ability of a permanent" does not mean its abilities.
 #[allow(clippy::too_many_arguments)]
 fn consider(
     cx: &Cx,
