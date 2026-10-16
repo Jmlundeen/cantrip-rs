@@ -1,0 +1,40 @@
+# Bounce Off: "target creature or Vehicle". Bot2's Smuggler's Copter is a Vehicle that is not a creature (nobody crewed it),
+# and is a legal target (CR 205.3g); it returns to Bot2's hand. Bot2's Sol Ring is an artifact that is neither, so it is
+# refused as a target (the refusal), with the Copter beside it as the positive control. Sol Ring and Mox Pearl stay put.
+
+[Bot1 Deck]
+Island
+Bounce Off
+Island x18
+
+[Bot2 Deck]
+Mox Pearl
+Sol Ring
+Smuggler's Copter
+Island x17
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Pass
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Hand.Smuggler's Copter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+! Bot1.Hand.Bounce Off.Cast(Bot2.Battlefield.Sol Ring)
+Bot1.Hand.Bounce Off.Cast(Bot2.Battlefield.Smuggler's Copter)
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot2.Battlefield = Mox Pearl; Sol Ring
+Bot2.Hand.Count = 6
+Bot1.Graveyard = Bounce Off

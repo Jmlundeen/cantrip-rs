@@ -1,0 +1,6 @@
+{
+  "name": "Bounce Off",
+  "manaCost": "{U}",
+  "type": "Instant",
+  "oracleText": "Return target creature or Vehicle to its owner's hand."
+}

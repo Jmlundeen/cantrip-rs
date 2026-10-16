@@ -1,0 +1,31 @@
+# Bounce Off returns target creature to its owner's hand: Bot2's Ornithopter leaves the battlefield and goes to Bot2's hand
+# (7 cards + the turn-2 draw - the Ornithopter cast + the Ornithopter back = 8); it does not go to the graveyard.
+
+[Bot1 Deck]
+Island
+Bounce Off
+Island x18
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Bounce Off.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot2.Battlefield.Count = 0
+Bot2.Hand.Count = 8
+Bot2.Graveyard.Count = 0
+Bot1.Graveyard = Bounce Off
