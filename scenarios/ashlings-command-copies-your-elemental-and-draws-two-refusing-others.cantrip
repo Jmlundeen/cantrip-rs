@@ -1,0 +1,68 @@
+# Ashling's Command, modes 1 and 2: "Create a token that's a copy of target Elemental you control" and "Target player draws two
+# cards". Bot1 controls a Volcanic Villain (an Elemental Villain) and an Ornithopter; Bot2 controls its own Volcanic Villain.
+# Refused as the first target: Bot2's Elemental (not "you control") and Bot1's Ornithopter (not an Elemental); the Villain Bot1
+# controls is the positive control. Bot1 targets itself for the draw: it draws two cards (the Plains on top of its library).
+# The token is a copy of the Villain (a 3/2 with haste, a token), and the Villain is still there.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Sol Ring
+Volcanic Villain
+Ashling's Command
+Ornithopter
+Plains x15
+
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Sol Ring
+Volcanic Villain
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot2.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Volcanic Villain.Cast
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Volcanic Villain.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Ashling's Command.Cast
+Bot1.Modes(1; 2)
+! Bot1.Target(Bot2.Battlefield.Volcanic Villain)
+! Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Target(Bot1.Battlefield.Volcanic Villain)
+Bot1.Target(Bot1)
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Volcanic Villain#1.Token = (absent)
+Bot1.Battlefield.Volcanic Villain#2.Token = true
+Bot1.Battlefield.Volcanic Villain#2.Power = 3
+Bot1.Battlefield.Volcanic Villain#2.Toughness = 2
+Bot1.Battlefield.Volcanic Villain#2.Keywords = Haste
+Bot1.Hand = Plains; Plains; Plains
+Bot1.Graveyard = Ashling's Command
+Bot2.Battlefield = Mox Jet; Mox Ruby; Sol Ring; Volcanic Villain
+Stack.Count = 0

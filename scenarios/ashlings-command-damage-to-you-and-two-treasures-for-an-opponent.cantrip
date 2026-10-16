@@ -1,0 +1,46 @@
+# Ashling's Command, modes 3 and 4 aimed the other way: Bot1 targets itself for the damage and Bot2 for the Treasures. "Each
+# creature target player controls" is Bot1's own Ornithopter this time, which dies, while Bot2's Picklock Prankster takes nothing;
+# the two Treasure tokens are Bot2's, created under its control, and Bot1 gets none.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Black Lotus
+Ashling's Command
+Ornithopter
+Plains x16
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Jet
+Picklock Prankster
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Picklock Prankster.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ashling's Command.Cast
+Bot1.Modes(3; 4)
+Bot1.Target(Bot1)
+Bot1.Target(Bot2)
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Mox Sapphire; Mox Ruby
+Bot1.Graveyard = Ornithopter; Ashling's Command; Black Lotus
+Bot2.Battlefield = Mox Sapphire; Mox Jet; Picklock Prankster; Treasure Token; Treasure Token
+Bot2.Battlefield.Picklock Prankster.Damage = 0
+Stack.Count = 0

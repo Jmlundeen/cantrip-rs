@@ -1,0 +1,53 @@
+# Ashling's Command, modes 1 and 2, CR 608.2b: if one target is illegal the spell still does what it can with the other. Bot1
+# targets its Volcanic Villain and itself; in response Bot2 kills the Villain with Lightning Bolt. No token is made (the
+# first mode has no legal target), but the second mode resolves and Bot1 draws two cards.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Sol Ring
+Volcanic Villain
+Ashling's Command
+Plains x16
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot2.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Volcanic Villain.Cast
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Ashling's Command.Cast
+Bot1.Modes(1; 2)
+Bot1.Target(Bot1.Battlefield.Volcanic Villain)
+Bot1.Target(Bot1)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Volcanic Villain)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Mox Jet; Mox Ruby; Mox Sapphire; Sol Ring
+Bot1.Graveyard = Ashling's Command; Volcanic Villain
+Bot2.Graveyard = Lightning Bolt
+Bot1.Hand = Plains; Plains; Plains; Plains
+Stack.Count = 0

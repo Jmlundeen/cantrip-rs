@@ -1,0 +1,54 @@
+# Ashling's Command, modes 3 and 4 in a game of three, CR 608.2b and 800.4a: Bot1 targets Bot3 for the 2 damage to each creature
+# it controls and itself for two Treasures. In response Bot3, whose library is empty, casts Ancestral Recall on itself and
+# loses the game; the first target is then illegal, so no damage is dealt (Bot3's Ornithopter has left with it anyway, and
+# Bot2's Ornithopter, controlled by neither target, is untouched), but the second mode still resolves: Bot1 gets two Treasures.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Black Lotus
+Ashling's Command
+Plains x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Bot3 Deck]
+Mox Sapphire
+Ancestral Recall
+Ornithopter
+Island x4
+Island
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot3.Main1]
+Bot3.Hand.Mox Sapphire.Cast
+Bot3.Hand.Ornithopter.Cast
+[T4 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ashling's Command.Cast
+Bot1.Modes(3; 4)
+Bot1.Target(Bot3)
+Bot1.Target(Bot1)
+Bot2.Pass
+Bot3.Battlefield.Mox Sapphire.Activate
+Bot3.Hand.Ancestral Recall.Cast(Bot3)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot3.Status = Lost
+Bot1.Battlefield = Mox Sapphire; Mox Ruby; Treasure Token; Treasure Token
+Bot2.Battlefield = Ornithopter
+Bot2.Battlefield.Ornithopter.Damage = 0
+Stack.Count = 0
