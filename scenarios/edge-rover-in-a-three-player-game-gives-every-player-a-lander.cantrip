@@ -1,0 +1,36 @@
+# Edge Rover: "each player creates a Lander token" is every player at the table, not only the controller and one
+# opponent (CR 101.4): in a three-player game Bot1, Bot2 and Bot3 each end with exactly one Lander token (a token, an
+# artifact), the Rover itself in Bot1's graveyard.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Edge Rover
+Lightning Bolt
+Island x3
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Edge Rover.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Edge Rover)
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Edge Rover; Lightning Bolt
+Bot1.Battlefield = Mox Emerald; Mox Ruby; Lander Token
+Bot2.Battlefield = Lander Token
+Bot3.Battlefield = Lander Token
+Bot2.Battlefield.Lander Token.Token = true
+Bot3.Battlefield.Lander Token.Token = true

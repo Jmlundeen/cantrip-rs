@@ -1,0 +1,33 @@
+# Edge Rover: the trigger is "when this creature dies" - put into a graveyard from the battlefield (CR 700.4). Swords to
+# Plowshares exiles it, so nobody creates a Lander: both battlefields hold only what they did. Rover's controller still
+# gains 2 life (its power) from the Swords, proving the Swords resolved on the Rover. The positive control, the same
+# Rover bolted and dying, is edge-rover-dies-and-each-player-creates-a-lander-the-opponents-works-for-the-opponent.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Edge Rover
+Swords to Plowshares
+Island x3
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Edge Rover.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Swords to Plowshares.Cast(Edge Rover)
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Life = 22
+Exile = Edge Rover
+Bot1.Graveyard = Swords to Plowshares
+Bot1.Battlefield = Mox Emerald; Mox Pearl
+Bot2.Battlefield.Count = 0

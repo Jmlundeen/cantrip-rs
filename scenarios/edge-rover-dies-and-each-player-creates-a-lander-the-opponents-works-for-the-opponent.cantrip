@@ -1,0 +1,53 @@
+# Edge Rover: "When this creature dies, each player creates a Lander token." Bolted, it dies, and Bot1 and Bot2 each
+# create one under their own control (CR 111.10u, 101.4): the Rover is in Bot1's graveyard, and the Lander tokens stand
+# one on each battlefield. Bot2's Lander is Bot2's to use on Bot2's own turn: {2}, {T}, sacrifice it, search for a basic
+# land (Swamp, though Islands remain in the library), tapped. Bot1's own Lander is untouched, still on its battlefield.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Edge Rover
+Lightning Bolt
+Island x3
+Island x10
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Jet
+Island x5
+Island
+Swamp
+Island x9
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Edge Rover.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+? Bot1.Battlefield.Edge Rover.Types = Artifact; Creature
+Bot1.Hand.Lightning Bolt.Cast(Edge Rover)
+Bot1.Pass
+[Bot1.Main2]
+? Bot1.Battlefield.Lander Token.Types = Artifact
+? Bot2.Battlefield.Lander Token.Types = Artifact
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Lander Token.Activate
+Bot2.Search(Swamp)
+[Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Edge Rover; Lightning Bolt
+Bot1.Battlefield = Mox Emerald; Mox Ruby; Lander Token
+Bot1.Battlefield.Lander Token.Token = true
+Bot1.Battlefield.Lander Token.Tapped = false
+Bot2.Battlefield = Mox Sapphire; Mox Jet; Swamp
+Bot2.Battlefield.Swamp.Tapped = true
+Bot2.Graveyard.Count = 0
+Bot2.Library.Count = 9
+Bot2.Hand.Count = 6
