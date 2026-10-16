@@ -1,0 +1,52 @@
+# "Its controller creates a 2/2 white Ox": the player who controls the target as the spell resolves, not its owner. Bot1's
+# kicked Thieving Skydiver (X = 1) takes Bot2's Sol Ring; Bot2 then casts Bovine Intervention at that Sol Ring. It is
+# destroyed and goes to its owner Bot2's graveyard, and Bot1, who controlled it, gets the Ox. Bot2 gets none.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Thieving Skydiver
+Island x17
+
+[Bot2 Deck]
+Mox Jet
+Mox Pearl
+Island
+Sol Ring
+Bovine Intervention
+Island x15
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Thieving Skydiver.Cast(Kicked: 1)
+Bot1.Pass
+Bot1.Target(Sol Ring)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield = Island; Thieving Skydiver; Sol Ring
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Bovine Intervention.Cast(Bot1.Battlefield.Sol Ring)
+Bot2.Pass
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot2.Graveyard = Bovine Intervention; Sol Ring
+Bot1.Battlefield = Island; Thieving Skydiver; Ox
+Bot1.Battlefield.Ox.Token = true
+Bot2.Battlefield = Mox Jet; Mox Pearl; Island
