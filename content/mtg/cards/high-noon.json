@@ -1,0 +1,6 @@
+{
+  "name": "High Noon",
+  "manaCost": "{1}{W}",
+  "type": "Enchantment",
+  "oracleText": "Each player can't cast more than one spell each turn.\n{4}{R}, Sacrifice this enchantment: It deals 5 damage to any target."
+}

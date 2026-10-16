@@ -1,0 +1,56 @@
+# High Noon: "Each player can't cast more than one spell each turn." Bot1 casts High Noon as its fourth spell of turn 1
+# (nothing limits it before it is out), and is then refused a fifth (ruling: it has cast a spell this turn). Bot2's
+# turn 2: one spell, a second refused. Turn 3: Bot1 casts one spell, a second is refused, then pays {4}{R} and
+# sacrifices High Noon (an activated ability, not a spell, so the limit does not touch it): 5 damage to Bot2, and the
+# limit is gone, so the second spell is cast at once.
+
+[Bot1 Deck]
+Plains
+Mox Ruby
+Mox Pearl
+Sol Ring
+High Noon
+Mox Jet
+Mox Sapphire
+Plains x13
+
+[Bot2 Deck]
+Mox Emerald
+Mox Sapphire
+Plains x17
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.High Noon.Cast
+! Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+! Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+! Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.High Noon.Activate(Bot2)
+Bot1.Hand.Mox Sapphire.Cast
+[Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 15
+Bot1.Graveyard = High Noon
+Bot1.Battlefield.Mox Sapphire.Tapped = false

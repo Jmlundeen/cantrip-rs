@@ -1,0 +1,68 @@
+# High Noon's {4}{R}, Sacrifice: 5 damage to any target, at the boundary: Bot2's Troll of Khazad-dum is 6/5, so exactly
+# 5 damage destroys it (CR 704.5g). Bot1 casts High Noon on turn 3 and sacrifices it the same turn; High Noon has gone to
+# the graveyard as the cost (CR 602.2c), and its limit with it.
+
+[Bot1 Deck]
+Plains
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Emerald
+Sol Ring
+High Noon
+Plains x13
+
+[Bot2 Deck]
+Plains
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Sol Ring
+Troll of Khazad-dûm
+Plains x13
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Hand.Troll of Khazad-dûm.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.High Noon.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.High Noon.Activate(Bot2.Battlefield.Troll of Khazad-dûm)
+[Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Graveyard = Troll of Khazad-dûm
+Bot2.Life = 20
+Bot1.Graveyard = High Noon
