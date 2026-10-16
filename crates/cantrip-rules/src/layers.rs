@@ -684,3 +684,72 @@ pub fn summoning_sick(cards: &CardTable, state: &GameState, id: ObjectId) -> boo
     let c = chars(cards, state, id);
     c.is(CardType::Creature) && !c.has(Keyword::Haste) && obj.controlled_since >= state.player(obj.controller).turn_began
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn noop(_: &dyn LayerQuery, _: ObjectId, _: &mut Chars) {}
+
+    static HOLDER: CardDef = CardDef {
+        name: "Holder",
+        delayed: &[granted_static(Layer::PtSet, noop, "This creature's base power is 3.")],
+        ..CardDef::BLANK
+    };
+
+    fn effect(timestamp: u32, kind: EffectKind) -> ContinuousEffect {
+        ContinuousEffect {
+            source: ObjectId(1),
+            controller: PlayerId(0),
+            timestamp,
+            affected: ObjectId(1),
+            kind,
+            duration: Duration::EndOfTurn,
+        }
+    }
+
+    fn stamps(granted: Vec<(u32, &'static StaticDef)>) -> Vec<u32> {
+        granted.into_iter().map(|(t, _)| t).collect()
+    }
+
+    /// CR 613.1f, 613.7: "loses all abilities" takes the abilities the object has when it applies, so a grant with a LATER
+    /// timestamp is kept, one with an EARLIER timestamp is lost, and an object stripped first and given the ability by a
+    /// later effect has it (at the later effect's timestamp, CR 613.7a). No card can express the stripped-first case
+    /// with Ms. Marvel: without her abilities she has no Embiggen Fist to make the grant.
+    #[test]
+    fn a_loses_all_abilities_applies_only_to_grants_before_it() {
+        let cards = CardTable::new([&HOLDER]);
+        let card = cards.find("Holder").unwrap();
+        let ability = AbilityRef::delayed(card, 0);
+        let mut abilities = [None; MAX_ABILITIES];
+        abilities[0] = Some(ability);
+        let chars = Chars {
+            card,
+            name: "Holder",
+            types: TypeSet::NONE,
+            supertypes: Supertypes::default(),
+            subtypes: SubtypeSet::NONE,
+            colors: ColorSet::NONE,
+            power: Some(1),
+            toughness: Some(4),
+            keywords: Keywords::NONE,
+            protection: ColorSet::NONE,
+            protection_colorless: false,
+            protection_players: 0,
+            protection_types: TypeSet::NONE,
+            spell: false,
+            protection_colored_spells: false,
+            protection_everything: false,
+            must_attack: false,
+            abilities,
+            no_cost: false,
+        };
+        let grant = |t| effect(t, EffectKind::AddAbility(ability));
+        let strip = |t| effect(t, EffectKind::LoseAllAbilities);
+
+        assert!(granted_statics(&cards, 1, &[grant(5), strip(7)], &chars).is_empty());
+        assert_eq!(stamps(granted_statics(&cards, 1, &[strip(5), grant(7)], &chars)), [7]);
+        assert_eq!(stamps(granted_statics(&cards, 1, &[grant(3), strip(5), grant(7)], &chars)), [7]);
+        assert_eq!(stamps(granted_statics(&cards, 9, &[grant(7)], &chars)), [9]);
+    }
+}
