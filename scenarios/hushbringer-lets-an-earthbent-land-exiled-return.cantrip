@@ -1,0 +1,43 @@
+# Hushbringer stops creatures entering or dying from causing triggers, and nothing else (CR 603.2). Bot1's Badgermole Cub
+# earthbends its Forest; Bot2's Hushbringer arrives; on turn 4 Bot2 exiles the creature land with Swords to Plowshares.
+# Being exiled is not dying (CR 700.4), so "When this land dies or is put into exile, return it to the battlefield tapped"
+# triggers and the Forest comes back, tapped and a land only, and Bot1 gains 1 life for its power. The returning Forest is
+# not a creature, so its entering is not stopped either.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Badgermole Cub
+Forest x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Hushbringer
+Swords to Plowshares
+Plains x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Badgermole Cub.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Hushbringer.Cast
+[T4 Bot2.Main1]
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Forest)
+[T4 Bot2.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 21
+Bot1.Battlefield = Forest; Mox Emerald; Badgermole Cub
+Bot1.Battlefield.Forest.Tapped = true
+Bot1.Battlefield.Forest.Types = Land
+Bot2.Graveyard = Swords to Plowshares

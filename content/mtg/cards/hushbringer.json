@@ -1,0 +1,12 @@
+{
+  "name": "Hushbringer",
+  "manaCost": "{1}{W}",
+  "type": "Creature — Faerie",
+  "power": 1,
+  "toughness": 2,
+  "oracleText": "Flying, lifelink\nCreatures entering or dying don't cause abilities to trigger.",
+  "keywords": [
+    "Flying",
+    "Lifelink"
+  ]
+}

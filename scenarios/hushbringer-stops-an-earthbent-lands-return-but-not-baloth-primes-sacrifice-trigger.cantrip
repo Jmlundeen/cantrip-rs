@@ -1,0 +1,63 @@
+# Hushbringer judges a dying permanent as it last existed on the battlefield (CR 603.10a; the rulings: "if a land that has
+# become a creature dies, an ability that triggers when it dies doesn't trigger"), and stops only what the dying causes
+# ("An ability that triggers on an event that causes a creature to die will still trigger. For example, an ability that
+# triggers 'whenever you sacrifice a creature' still triggers"; CR 701.21a).
+# Bot1's Badgermole Cub earthbends its Forest on turn 1: a 0/0 creature land with a +1/+1 counter and "When this land dies
+# or is put into exile, return it to the battlefield tapped". Bot2's Hushbringer comes down on turn 2. On turn 3 Bot1 pays
+# Baloth Prime's "{4}, Sacrifice a land: You gain 2 life" with that Forest: Baloth Prime's "Whenever you sacrifice a land"
+# triggers (a tapped 4/4 Beast, and the untap takes a stun counter off: 6, 5 at the untap step, 4), and the Forest's
+# return does not - it stays in the graveyard. Badgermole Cub's own game, where the Bolted Forest returns, is the control.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Sol Ring
+Black Lotus
+Badgermole Cub
+Baloth Prime
+Forest x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Hushbringer
+Plains x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Badgermole Cub.Cast
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Forest.Types = Land; Creature
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Baloth Prime.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Hushbringer.Cast
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Baloth Prime.Counters.Stun = 5
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Baloth Prime.Activate
+Bot1.Choose(Forest)
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 22
+Bot1.Graveyard = Forest; Black Lotus
+Bot1.Battlefield = Mox Emerald; Mox Pearl; Sol Ring; Badgermole Cub; Baloth Prime; Beast
+Bot1.Battlefield.Baloth Prime.Counters.Stun = 4
+Bot1.Battlefield.Beast.Tapped = true

@@ -1,0 +1,50 @@
+# Hushbringer: "Creatures entering or dying don't cause abilities to trigger" (CR 603.2). With Bot2's Hushbringer out,
+# Bot1's Baleful Strix enters and draws nothing; Bot1's Cryogen Relic, an artifact and no creature, is sacrificed and
+# still draws as it leaves (it does not die as a creature). Hand: 7 - Island, Mox Sapphire, Mox Jet, Relic = 3, + 1 for
+# the Relic entering on turn 1 = 4; turn 3 draws (5) and casts the Strix (4); turn 5 draws (5) and the Relic leaving
+# draws (6).
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Cryogen Relic
+Baleful Strix
+Island x12
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Hushbringer
+Plains x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Cryogen Relic.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Hushbringer.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Baleful Strix.Cast
+[T3 Bot1.Main2]
+? Bot1.Hand.Count = 4
+[T5 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Cryogen Relic.Activate
+[T5 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand.Count = 6
+Bot1.Graveyard = Cryogen Relic
+Bot1.Battlefield = Island; Mox Sapphire; Mox Jet; Baleful Strix

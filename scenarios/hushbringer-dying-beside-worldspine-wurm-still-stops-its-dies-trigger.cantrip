@@ -1,0 +1,67 @@
+# A creature dying at the same time as Hushbringer, Hushbringer included, doesn't cause abilities to trigger (the
+# rulings): a dies ability looks back to the board as it was before the event (CR 603.10a), and Hushbringer was on it.
+# Worldspine Wurm's own game, with Bot2's Hushbringer out before the Wrath of God: the Wrath destroys both, and no Wurm
+# tokens are made, while the Wurm's own "put into a graveyard from anywhere" ability still shuffles it into the library
+# (it triggers on the board after the event, where Hushbringer no longer is).
+
+[Bot1 Deck]
+Ancient Tomb
+Mana Crypt
+Black Lotus
+Mox Emerald
+Sol Ring
+Worldspine Wurm
+Forest
+Forest x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Sol Ring
+Wrath of God
+Hushbringer
+Plains
+Plains x10
+
+[Actions]
+Bot1.Hand.Ancient Tomb.Play
+Bot1.Hand.Mana Crypt.Cast
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Hushbringer.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Ancient Tomb.Activate
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Worldspine Wurm.Cast
+Bot1.Pass
+[Bot1.Main2]
+? Bot1.Battlefield.Worldspine Wurm.Power = 15
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Plains#2.Activate
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Hand.Wrath of God.Cast
+Bot2.Pass
+[T5 Bot1.Upkeep]
+
+[Expect]
+Bot1.Graveyard = Black Lotus
+Bot1.Library.Count = 10
+Bot1.Battlefield = Ancient Tomb; Forest; Mana Crypt; Mox Emerald; Sol Ring
+Bot2.Graveyard = Wrath of God; Hushbringer

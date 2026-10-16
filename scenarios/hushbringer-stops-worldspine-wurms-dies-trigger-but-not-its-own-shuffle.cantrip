@@ -1,0 +1,68 @@
+# Hushbringer: "Creatures ... dying don't cause abilities to trigger" (CR 603.2, 700.4). Bot2's Bitter Triumph destroys
+# Bot1's Worldspine Wurm while Bot2's Hushbringer is on the battlefield: "When this creature dies, create three 5/5 Wurm
+# tokens" does not trigger, so no Wurms. The Wurm's other ability, "When Worldspine Wurm is put into a graveyard from
+# anywhere, shuffle it into its owner's library", is the dying card's own and still triggers (the rulings: "It will
+# trigger if the ability is of a dying creature that triggers only when that creature is put into a graveyard from
+# anywhere"): the card goes back into the library, which grows by one (Worldspine Wurm's Wrath of God game is the control).
+
+[Bot1 Deck]
+Ancient Tomb
+Mana Crypt
+Black Lotus
+Mox Emerald
+Sol Ring
+Worldspine Wurm
+Forest
+Forest x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Hushbringer
+Swamp
+Bitter Triumph
+Plains
+Plains x10
+
+[Actions]
+Bot1.Hand.Ancient Tomb.Play
+Bot1.Hand.Mana Crypt.Cast
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Hushbringer.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Ancient Tomb.Activate
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Worldspine Wurm.Cast
+Bot1.Pass
+[Bot1.Main2]
+? Bot1.Battlefield.Worldspine Wurm.Power = 15
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Bitter Triumph.Cast(Bot1.Battlefield.Worldspine Wurm)
+Bot2.Modes(Pay 3 life)
+[T4 Bot2.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Black Lotus
+Bot1.Library.Count = 10
+Bot1.Battlefield = Ancient Tomb; Forest; Mana Crypt; Mox Emerald; Sol Ring
+Bot2.Battlefield = Plains; Swamp; Mox Pearl; Mox Jet; Hushbringer
+Bot2.Graveyard = Bitter Triumph
+Bot2.Life = 17
