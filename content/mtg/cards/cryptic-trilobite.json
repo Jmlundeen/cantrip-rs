@@ -1,0 +1,8 @@
+{
+  "name": "Cryptic Trilobite",
+  "manaCost": "{X}{X}",
+  "type": "Creature — Trilobite",
+  "power": 0,
+  "toughness": 0,
+  "oracleText": "This creature enters with X +1/+1 counters on it.\nRemove a +1/+1 counter from this creature: Add {C}{C}. Spend this mana only to activate abilities.\n{1}, {T}: Put a +1/+1 counter on this creature."
+}

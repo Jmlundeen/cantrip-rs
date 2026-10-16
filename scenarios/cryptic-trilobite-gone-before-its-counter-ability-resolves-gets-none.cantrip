@@ -1,0 +1,37 @@
+# Cryptic Trilobite cast for X=1 enters with one counter. Turn 3 its "{1}, {T}: Put a +1/+1 counter on this creature" is
+# activated; in response its last counter is removed for {C}{C}, so it is a 0/0 and dies (CR 704.5f). The ability
+# resolves with nothing to put the counter on (CR 400.7), and the {C}{C} waits in the pool for an ability.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Cryptic Trilobite
+Island
+Island x3
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Cryptic Trilobite.Cast(X: 1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Cryptic Trilobite.Counters.PlusOnePlusOne = 1
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Cryptic Trilobite.Activate(Ability: Put a +1/+1 counter)
+Bot1.Battlefield.Cryptic Trilobite.Activate(Ability: Remove)
+? Bot1.Graveyard = Cryptic Trilobite
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Mana = {C}{C} (Abilities)
+Bot1.Graveyard = Cryptic Trilobite

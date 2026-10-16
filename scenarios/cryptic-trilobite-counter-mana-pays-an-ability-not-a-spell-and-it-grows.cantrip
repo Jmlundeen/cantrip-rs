@@ -1,0 +1,68 @@
+# Cryptic Trilobite: "This creature enters with X +1/+1 counters on it. Remove a +1/+1 counter from this creature: Add
+# {C}{C}. Spend this mana only to activate abilities. {1}, {T}: Put a +1/+1 counter on this creature."
+# Turn 1 it is cast for X=2 ({X}{X} is {4}) and enters with two counters. With every other source spent but Mox Jet, a
+# counter removed - no {T}, so not held back by summoning sickness - gives {C}{C} that pays Aether Spellbomb's
+# "{1}, Sacrifice: Draw a card" but not Karn, Scion of Urza's {4}, a spell (CR 106.6). Turn 3 four untapped sources cast
+# Karn (the control); turn 5 an Island pays its "{1}, {T}" and the counter it lost comes back.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Mox Jet
+Cryptic Trilobite
+Aether Spellbomb
+Karn, Scion of Urza
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Cryptic Trilobite.Cast(X: 2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Cryptic Trilobite.Counters.PlusOnePlusOne = 2
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Aether Spellbomb.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Cryptic Trilobite.Activate(Ability: Remove)
+? Bot1.Mana = {C}{C} (Abilities)
+? Bot1.Battlefield.Cryptic Trilobite.Counters.PlusOnePlusOne = 1
+! Bot1.Hand.Karn, Scion of Urza.Cast
+Bot1.Battlefield.Aether Spellbomb.Activate(Ability: Draw)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {C} (Abilities)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Karn, Scion of Urza.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Cryptic Trilobite.Activate(Ability: Put a +1/+1 counter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Cryptic Trilobite.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Cryptic Trilobite.Power = 2
+Bot1.Battlefield.Cryptic Trilobite.Tapped = true
+Bot1.Battlefield.Karn, Scion of Urza.Counters.Loyalty = 5
+Bot1.Graveyard = Aether Spellbomb; Black Lotus
