@@ -1,0 +1,64 @@
+# Jade Seedstones // Jadeheart Attendant. As the Seedstones enter, three +1/+1 counters are divided among Bot1's Llanowar
+# Elves and Embereth Shieldbreaker, two and one (CR 601.2d). The Shieldbreaker is then bolted into Bot1's graveyard, and
+# on turn seven the Seedstones craft with it, a creature card in the graveyard (Craft with creature {5}{G}{G}), returning
+# as Jadeheart Attendant, a 7/7 green Golem artifact creature. "When this creature enters, you gain life equal to the mana
+# value of the exiled card used to craft it" (CR 702.167c): the Shieldbreaker's, 2.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Black Lotus
+Jade Seedstones
+Embereth Shieldbreaker
+Lightning Bolt
+Mountain
+Forest
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Embereth Shieldbreaker.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Hand.Jade Seedstones.Cast
+Bot1.Divide(Llanowar Elves: 2; Embereth Shieldbreaker: 1)
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+? Bot1.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = 2
+? Bot1.Battlefield.Embereth Shieldbreaker.Counters.PlusOnePlusOne = 1
+Bot1.Hand.Lightning Bolt.Cast(Embereth Shieldbreaker)
+[T7 Bot1.Main1]
+? Bot1.Graveyard = Embereth Shieldbreaker; Lightning Bolt
+Bot1.Battlefield.Jade Seedstones.Activate(Ability: Craft)
+Bot1.Choose(Graveyard.Embereth Shieldbreaker)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Jadeheart Attendant.Power = 7
+Bot1.Battlefield.Jadeheart Attendant.Toughness = 7
+Bot1.Battlefield.Jadeheart Attendant.Types = Artifact; Creature
+Bot1.Battlefield.Jadeheart Attendant.Colors = Green
+Bot1.Life = 22
+Exile = Embereth Shieldbreaker

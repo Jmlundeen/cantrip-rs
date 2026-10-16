@@ -1,0 +1,54 @@
+# A token may be one of craft's materials (the craft rulings, 2023-11-10): Jade Seedstones crafts with the Spirit token
+# Staff of the Storyteller made, a creature Bot1 controls. The token is exiled and ceases to exist (CR 111.7, 704.5d), so it
+# is no "exiled card used to craft it" (CR 702.167c): Jadeheart Attendant's enters trigger gains Bot1 no life. Before
+# that the Seedstones put all three of their counters on one target, the Llanowar Elves.
+
+[Bot1 Deck]
+Plains
+Staff of the Storyteller
+Mox Pearl
+Black Lotus
+Mox Emerald
+Jade Seedstones
+Llanowar Elves
+Forest
+Forest
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Staff of the Storyteller.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Jade Seedstones.Cast
+Bot1.Divide(Llanowar Elves: 3)
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = 3
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Jade Seedstones.Activate(Ability: Craft)
+Bot1.Choose(Spirit)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Jadeheart Attendant.Power = 7
+Bot1.Life = 20
+Exile.Count = 0
