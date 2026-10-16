@@ -1,0 +1,46 @@
+# Izzet Spellementals: a Standard meta deck (19 players, record 33-39).
+#
+# Imported from the Arcanum standard meta export (exports/standard_meta_decklists.json).
+
+1 Abrade
+1 Annul
+3 Burst Lightning
+1 Chandra, Torch of Defiance
+4 Eddymurk Crab
+1 Fire Magic
+1 Flashfreeze
+4 Flow State
+2 Get Out
+1 Great Hall of the Biblioplex
+4 Hearth Elemental
+1 Hydro-Man, Fluid Felon
+2 Impractical Joke
+6 Island
+1 Multiversal Passage
+4 Opt
+4 Prismari Charm
+1 Ral, Crackling Wit
+4 Riverpyre Verge
+1 Sear
+2 Seasoned Cryomancer
+4 Sleight of Hand
+1 Soul-Guide Lantern
+2 Spell Snare
+4 Spirebluff Canal
+4 Steam Vents
+2 Stormcarved Coast
+4 Sunderflock
+1 Sunspine Lynx
+1 Three Steps Ahead
+1 Traumatic Critique
+1 Wan Shi Tong, Librarian
+1 Winternight Stories
+
+Sideboard
+2 Avengers Disassembled
+2 Broadside Barrage
+3 Colorstorm Stallion
+2 Disdainful Stroke
+2 Ghost Vacuum
+2 Spell Pierce
+2 Spell Snare
