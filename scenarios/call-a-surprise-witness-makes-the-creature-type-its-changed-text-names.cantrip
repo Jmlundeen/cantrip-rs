@@ -1,0 +1,46 @@
+# "It's a Spirit in addition to its other types": the word is the Witness's own text (CR 612). Bot1 casts the Witness
+# on its own Hired Blade (killed by its own Lightning Bolt) and, in response, Artificial Evolution changes the spell's
+# text, Spirit to Elf (CR 612.1). The Blade returns with its flying counter as a Human Assassin Elf, not a Spirit.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Hired Blade
+Lightning Bolt
+Artificial Evolution
+Call a Surprise Witness
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Hired Blade.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Hired Blade)
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Call a Surprise Witness.Cast(Bot1.Graveyard.Hired Blade)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Call a Surprise Witness)
+Bot1.Pass
+Bot1.Modes(Spirit)
+Bot1.Modes(Elf)
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Hired Blade.Counters.Flying = 1
+Bot1.Battlefield.Hired Blade.Subtypes = Assassin; Elf; Human
+Stack.Count = 0

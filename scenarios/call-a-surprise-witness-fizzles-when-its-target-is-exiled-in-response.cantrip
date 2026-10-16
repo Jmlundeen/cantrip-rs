@@ -1,0 +1,55 @@
+# Call a Surprise Witness with its only target gone (CR 608.2b): Bot1's Hired Blade dies to its own Lightning Bolt on turn
+# 3 and the Witness targets it, but Bot2 answers by sacrificing Soul-Guide Lantern to exile Bot1's graveyard. The Blade is
+# a new object in exile (CR 400.7), the spell has no legal target and does nothing: no creature comes back, and the
+# Witness itself is put into the graveyard on resolution (CR 608.2b).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Hired Blade
+Lightning Bolt
+Call a Surprise Witness
+Island x12
+
+[Bot2 Deck]
+Mox Ruby
+Soul-Guide Lantern
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Hired Blade.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Soul-Guide Lantern.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Hired Blade)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Hired Blade; Lightning Bolt
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Call a Surprise Witness.Cast(Bot1.Graveyard.Hired Blade)
+Bot1.Pass
+Bot2.Battlefield.Soul-Guide Lantern.Activate(Ability: Exile each)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Exile = Hired Blade; Lightning Bolt
+Bot1.Graveyard = Call a Surprise Witness
+Bot1.Battlefield = Mox Emerald; Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire
+Stack.Count = 0

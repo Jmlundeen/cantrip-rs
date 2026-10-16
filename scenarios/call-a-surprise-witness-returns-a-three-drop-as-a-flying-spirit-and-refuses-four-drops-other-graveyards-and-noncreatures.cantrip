@@ -1,0 +1,71 @@
+# Call a Surprise Witness: "Return target creature card with mana value 3 or less from your graveyard to the battlefield.
+# Put a flying counter on it. It's a Spirit in addition to its other types."
+# Bot1 casts Hired Blade (mana value 3) and Questing Beast (mana value 4) on turn 1; Bot2 casts an Ornithopter on turn 2;
+# Bot1's Wrath of God on turn 3 puts all three creature cards in graveyards, with Black Lotus (a noncreature card of mana
+# value 0, sacrificed for mana) already in Bot1's. On turn 5 the Witness is refused for each of those but the right one:
+# Questing Beast (4 is over the limit), Bot2's Ornithopter (not Bot1's graveyard, though 0 is under it), Black Lotus (not
+# a creature). Hired Blade, at exactly 3, comes back: a 3/2 with a flying counter (so it has flying, CR 122.1b) and the
+# Spirit type added to Human Assassin (CR 205.1b, 611.2a), beside the Flash it already had.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Gleemox
+Black Lotus
+Hired Blade
+Questing Beast
+Mox Pearl
+Wrath of God
+Call a Surprise Witness
+Island x12
+
+[Bot2 Deck]
+Mox Ruby
+Ornithopter
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Questing Beast.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Black)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Hired Blade.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: White)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Wrath of God.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Wrath of God; Questing Beast; Hired Blade; Black Lotus
+? Bot2.Graveyard = Ornithopter
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Call a Surprise Witness.Cast(Bot1.Graveyard.Questing Beast)
+! Bot1.Hand.Call a Surprise Witness.Cast(Bot2.Graveyard.Ornithopter)
+! Bot1.Hand.Call a Surprise Witness.Cast(Bot1.Graveyard.Black Lotus)
+Bot1.Hand.Call a Surprise Witness.Cast(Bot1.Graveyard.Hired Blade)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Hired Blade.Power = 3
+Bot1.Battlefield.Hired Blade.Toughness = 2
+Bot1.Battlefield.Hired Blade.Counters.Flying = 1
+Bot1.Battlefield.Hired Blade.Subtypes = Assassin; Human; Spirit
+Bot1.Graveyard = Call a Surprise Witness; Wrath of God; Questing Beast; Black Lotus
+Bot2.Graveyard = Ornithopter
+Stack.Count = 0
