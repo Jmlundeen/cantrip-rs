@@ -1,17 +1,14 @@
 use cantrip_api::*;
-use cantrip_mechanics::choose;
 use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
 
 /// "You may discard a card. When you do, ...": the discard is a choice made as the ability resolves (CR 701.9), not a
 /// cost, so a player with no cards is not asked. The reflexive trigger (CR 603.12) follows a card really discarded.
 fn discard_for_counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let hand = g.state().zone(Zone::hand(item.controller)).to_vec();
-    let chosen = choose::cards(g, item.controller, item.object, Purpose::Discard, hand, 1, true)?;
-    let Some(&card) = chosen.first() else { return Ok(()) };
-    g.discard(card);
-    let this = g.card_id(&CARD);
-    g.reflexive_trigger(item.object, item.controller, AbilityRef::delayed(this, 0), Target::None);
+    if cantrip_mechanics::effects::may_discard_a_card(g, item)? {
+        let this = g.card_id(&CARD);
+        g.reflexive_trigger(item.object, item.controller, AbilityRef::delayed(this, 0), Target::None);
+    }
     Ok(())
 }
 
