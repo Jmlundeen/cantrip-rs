@@ -1228,6 +1228,16 @@ public static partial class CardFace
             parts.Add("MONSTROUS");
         }
 
+        if (card.Solved)
+        {
+            parts.Add("SOLVED");
+        }
+
+        if (card.Suspected)
+        {
+            parts.Add("SUSPECTED");
+        }
+
         if (card.ClassLevel > 0)
         {
             parts.Add($"LEVEL {card.ClassLevel}");

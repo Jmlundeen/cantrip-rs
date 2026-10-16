@@ -571,6 +571,16 @@ public static class GameText
             parts.Add("monstrous");
         }
 
+        if (card.Solved)
+        {
+            parts.Add("solved");
+        }
+
+        if (card.Suspected)
+        {
+            parts.Add("suspected");
+        }
+
         if (card.ClassLevel > 0)
         {
             parts.Add($"level {card.ClassLevel}");

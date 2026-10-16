@@ -213,6 +213,8 @@ public static class BoardRows
             .Append(card.SummoningSick ? 'S' : 'r')
             .Append(card.FaceDown ? 'F' : 'f')
             .Append(card.Monstrous ? 'M' : 'm')
+            .Append(card.Solved ? 'V' : 'v')
+            .Append(card.Suspected ? 'Q' : 'q')
             .Append(card.ClassLevel)
             .Append(card.Harnessed ? 'H' : 'h')
             .Append(card.Exerted ? 'E' : 'e')

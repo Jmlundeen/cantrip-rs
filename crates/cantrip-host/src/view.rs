@@ -373,6 +373,12 @@ pub fn observable(game: &Game, viewer: PlayerId, extra: &HashSet<ObjectId>) -> H
     }
     visible.extend(s.battlefield().iter().copied());
     visible.extend(s.zone(Zone::COMMAND).iter().copied());
+    // "You may look at the top card of your library any time" (CR 401.2): its player sees it while a permanent says so.
+    if game.may_look_at_library_top(viewer)
+        && let Some(&top) = s.zone(Zone::library(viewer)).first()
+    {
+        visible.insert(top);
+    }
     visible.extend(stack_entries(s).iter().map(StackEntry::key));
     for &id in extra {
         if !is_ability_key(id) && (id.index() < s.objects.len()) && live(s, id) {
@@ -865,6 +871,8 @@ impl<'a> Projector<'a> {
             summoning_sick: on_battlefield && summoning_sick(game.cards, s, id),
             produces_mana: c.abilities().any(|a| matches!(game.cards.ability(a), AbilityDef::Activated(d) if d.is_mana_ability())),
             monstrous: obj.marks.monstrous,
+            solved: on_battlefield && obj.marks.solved,
+            suspected: on_battlefield && effect(EffectKind::Suspected),
             exerted: obj.marks.exerted_by.is_some(),
             saddled: game.is_saddled(id),
             goaded: effect(EffectKind::Goaded),
@@ -905,6 +913,20 @@ impl<'a> Projector<'a> {
                 c.subtypes.iter().filter(|t| !t.is_creature_type() || def.subtypes.has(*t)).map(|t| t.name().to_string()).collect();
         }
         view.cant_be_countered = obj.marks.cant_be_countered;
+        // A Case's two keyword lines (CR 719.3): once it is solved its "To solve" ability can do nothing more (CR 719.3a), and
+        // its "Solved" ability may affect the game only while it is (CR 719.3c), so the line that can't is greyed.
+        if on_battlefield && c.subtypes.has(Subtype::Case) {
+            for (i, line) in view.oracle_text.split('\n').enumerate() {
+                let idle = if line.starts_with("To solve") {
+                    obj.marks.solved
+                } else {
+                    line.starts_with("Solved") && !obj.marks.solved
+                };
+                if idle {
+                    view.spent_lines.push(i as i32);
+                }
+            }
+        }
         for permission in s.permissions.iter().filter(|p| p.card == id) {
             view.play_permissions.push(PlayPermissionView {
                 seat: seat(permission.player),

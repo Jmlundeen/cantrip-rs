@@ -22,7 +22,7 @@ namespace Cantrip.Protocol;
 public sealed class PlayerView
 {
     /// <summary>Protocol version, checked at the handshake so mismatched builds fail loudly.</summary>
-    public const int ProtocolVersion = 163;
+    public const int ProtocolVersion = 164;
 
     [Key(0)]
     public int Version { get; set; } = ProtocolVersion;
@@ -431,7 +431,8 @@ public sealed class ObjectView
     /// <summary>
     /// The lines of <see cref="OracleText"/>, counted from zero between newlines, whose ability has done all it may this
     /// turn or this game — triggered as often as it says it may (CR 603.2h), or a loyalty, boast or exhaust ability
-    /// already used (CR 606.3, 702.142a, 702.177a) — so a client can grey them out. A granted ability says so on its own
+    /// already used (CR 606.3, 702.142a, 702.177a), or a Case's "To solve" once it is solved and its "Solved" ability while it
+    /// is not (CR 719.3a, 719.3c) — so a client can grey them out. A granted ability says so on its own
     /// <see cref="AbilityTextView.Spent"/>.
     /// </summary>
     [Key(38)]
@@ -565,6 +566,20 @@ public sealed class ObjectView
     /// </summary>
     [Key(54)]
     public ObjectView? InsetSpell { get; set; }
+
+    /// <summary>
+    /// Whether this permanent is solved (CR 719.3b): a Case whose "To solve" ability has made it so. A designation it keeps
+    /// until it leaves the battlefield; it turns on the Case's "Solved" ability (CR 719.3c).
+    /// </summary>
+    [Key(55)]
+    public bool Solved { get; set; }
+
+    /// <summary>
+    /// Whether this permanent is suspected (CR 701.60b): a designation it keeps until it leaves the battlefield, giving it
+    /// menace and "This creature can't block" (CR 701.60c).
+    /// </summary>
+    [Key(56)]
+    public bool Suspected { get; set; }
 
     /// <summary>
     /// What is printed on this card besides what it shows, to be read beside it: its other face, then its prepare spell,

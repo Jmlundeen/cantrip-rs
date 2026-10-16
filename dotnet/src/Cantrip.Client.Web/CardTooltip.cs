@@ -245,6 +245,16 @@ public sealed class CardTooltip : Canvas
             lines.Add("Monstrous (CR 701.37b).");
         }
 
+        if (card.Solved)
+        {
+            lines.Add("Solved (CR 719.3b): its \"Solved\" ability works.");
+        }
+
+        if (card.Suspected)
+        {
+            lines.Add("Suspected (CR 701.60): menace, and can't block.");
+        }
+
         if (card.ClassLevel > 0)
         {
             lines.Add($"Level {card.ClassLevel} (CR 716).");
