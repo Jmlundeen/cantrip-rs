@@ -1,0 +1,36 @@
+# Underworld Breach's escape cost is the card's mana cost plus exiling three other cards (CR 702.138a), so X is announced and paid in it
+# (CR 107.3a, 601.2b). Walking Ballista, discarded by Faithless Looting, escapes with X = 1 for {1}{1} = {2} (Mox Ruby and the Mountain) and
+# exiles the Lotus, the Looting and the Island: it enters with one +1/+1 counter. Cast with X = 0 it would die at once.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Black Lotus
+Faithless Looting
+Walking Ballista
+Underworld Breach
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Underworld Breach.Cast
+Bot1.Pass
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Walking Ballista; Island)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Graveyard.Walking Ballista.Cast(X: 1; Ability: Escape)
+Bot1.Choose(Black Lotus; Faithless Looting; Island)
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 1
+Bot1.Graveyard.Count = 0
+Exile.Count = 3

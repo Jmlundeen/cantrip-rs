@@ -1,0 +1,50 @@
+# A way a permanent grants is judged and costed on the face being cast; casting a Room is choosing a door (CR 709.3), so Underworld Breach's
+# escape for Unholy Annex // Ritual Chamber is the door's mana cost plus three exiled cards. The right door, Ritual Chamber, costs {3}{B}{B}:
+# all five of two Mox Jet, a Mox Pearl, the Mox Ruby and the Mountain go to it (Unholy Annex's {2}{B} would have taken three); the Room
+# is cast as the right door only because that cost is the door's. It enters with Ritual Chamber's door unlocked and Unholy Annex's locked (CR 709.5d). On turn 3 (Breach is sacrificed at the end step)
+# the Lotus pays for Breach and Faithless Looting, which discards the Room and an Island.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Jet
+Black Lotus
+Underworld Breach
+Mox Pearl
+Faithless Looting
+Unholy Annex // Ritual Chamber
+Island x20
+
+[Bot2 Deck]
+Island x13
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Underworld Breach.Cast
+Bot1.Pass
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Unholy Annex // Ritual Chamber; Island)
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Graveyard.Unholy Annex // Ritual Chamber.Cast(Ability: Ritual Chamber: Escape)
+Bot1.Choose(Black Lotus; Faithless Looting; Island)
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Ritual Chamber.Doors = Ritual Chamber
+Bot1.Battlefield.Ritual Chamber.ManaValue = 5
+Bot1.Battlefield.Demon.Power = 6
+Bot1.Graveyard.Count = 0
+Exile.Count = 3

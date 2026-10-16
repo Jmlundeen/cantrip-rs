@@ -1,0 +1,42 @@
+# Lurrus of the Dream-Den lets a permanent spell with mana value 2 or less be cast from the graveyard. Walking Ballista has {X}{X} and
+# in the graveyard X is 0 (CR 202.3e), so its mana value is 0 and it qualifies; the cast pays the mana cost, so X is announced
+# (CR 107.3a, 601.2b) and is paid in the cost ({X}{X}). Bot1 casts Lurrus on turn 1, discards Ballista to Faithless Looting on turn 3
+# (Mountain pays the Looting) and casts it from the graveyard with X = 1 for the two Moxen: it enters with one +1/+1 counter, a 1/1.
+# The permission still held after X was chosen (the cast is judged before X, on the card as it was).
+
+[Bot1 Deck]
+Black Lotus
+Lurrus of the Dream-Den
+Faithless Looting
+Mox Ruby
+Mox Jet
+Walking Ballista
+Mountain
+Mountain
+Island x20
+
+[Bot2 Deck]
+Island x13
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Lurrus of the Dream-Den.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Walking Ballista; Island)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Graveyard.Walking Ballista.Cast(X: 1; Ability: Once during each of your turns)
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Walking Ballista.Power = 1
+Bot1.Graveyard = Faithless Looting; Island; Black Lotus

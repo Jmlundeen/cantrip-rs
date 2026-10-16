@@ -1,0 +1,49 @@
+# Underworld Breach's escape is judged and costed on the half being cast (CR 709.3): Life // Death escapes as Death for Death's {1}{B}
+# plus three exiled cards, not for the two halves' {G} + {1}{B}, and not for Life's {G}, which no mana here could pay. Bot1's Mox Jet and Mox
+# Pearl pay {1}{B}; Death returns the Marauding Mako (mana value 1) to the battlefield and Bot1 loses 1 life. The Lotus pays for Breach and
+# Faithless Looting, which discards Life // Death and the Mako; Lightning Bolt (Mox Ruby) is the third card exiled besides the Lotus and
+# the Looting; the sorcery, resolved, goes back to the graveyard. Breach is sacrificed at the end step, so it all happens on turn 3.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Black Lotus
+Underworld Breach
+Lightning Bolt
+Island
+Faithless Looting
+Life // Death
+Marauding Mako
+Island x20
+
+[Bot2 Deck]
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Underworld Breach.Cast
+Bot1.Pass
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Life // Death; Marauding Mako)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Graveyard.Life // Death.Cast(Bot1.Graveyard.Marauding Mako; Ability: Death: Escape)
+Bot1.Choose(Black Lotus; Faithless Looting; Lightning Bolt)
+Bot1.Pass
+
+[Expect]
+Bot1.Life = 19
+Bot2.Life = 17
+Bot1.Battlefield = Marauding Mako; Mox Jet; Mox Pearl; Mox Ruby; Underworld Breach
+Bot1.Graveyard = Life // Death
+Exile.Count = 3
