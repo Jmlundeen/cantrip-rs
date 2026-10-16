@@ -1,0 +1,41 @@
+# A gain of 0 life is no life gain event, and "if you would gain life" effects don't apply to it (CR 119.10). Bot1 exiles its
+# own Ornithopter (power 0) with Swords to Plowshares under Angel of Vitality: Bot1 "gains life equal to its power", 0,
+# and the Angel does not make that 1. Bot1 stays at 20.
+
+[Bot1 Deck]
+Plains
+Sol Ring
+Mox Pearl
+Angel of Vitality
+Ornithopter
+Plains
+Swords to Plowshares
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Angel of Vitality.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Hand.Swords to Plowshares.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Bot1.Life = 20
+Exile = Ornithopter

@@ -1,0 +1,45 @@
+# Each creature with lifelink dealing combat damage causes a separate life gain event (Angel of Vitality's 2024-11-08
+# ruling), even when they deal it at the same time: two Healer's Hawks attack Bot2 on turn 5 under Angel of Vitality, and
+# each 1 life becomes 2, so Bot1 gains 4 (20 -> 24), not 3 as one gain of 2 would make. Bot2 loses 2 (20 -> 18).
+
+[Bot1 Deck]
+Plains
+Sol Ring
+Mox Pearl
+Angel of Vitality
+Healer's Hawk
+Healer's Hawk
+Plains
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Angel of Vitality.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Hand.Healer's Hawk.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Healer's Hawk.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Pass
+Bot1.Attack(Healer's Hawk#1 > Bot2; Healer's Hawk#2 > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Life = 24
+Bot2.Life = 18
