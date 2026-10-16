@@ -1,0 +1,52 @@
+# Flitterwing Nuisance enters with a -1/-1 counter (a 1/1 flier). On turn 3 Bot1 pays {2}{U} and removes that counter (it
+# becomes a 2/2), which sets up "whenever a creature you control deals combat damage to a player or planeswalker THIS TURN,
+# draw a card". It attacks Bot2 and draws one card (hand 3 after the land, 4 after the draw trigger). The ability is spent (no counter to remove: the second activation is refused). On turn 5 it attacks again with
+# no new activation: the delayed ability lasted only until the end of turn 3, so no card is drawn.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Flitterwing Nuisance
+Island
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Swamp x24
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Flitterwing Nuisance.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Flitterwing Nuisance.Power = 1
+? Bot1.Battlefield.Flitterwing Nuisance.Toughness = 1
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Flitterwing Nuisance.Activate
+Bot1.Pass
+? Bot1.Battlefield.Flitterwing Nuisance.Power = 2
+? Bot1.Hand.Count = 3
+! Bot1.Battlefield.Flitterwing Nuisance.Activate
+Bot1.Attack(Flitterwing Nuisance > Bot2)
+[T3 Bot1.Main2]
+? Bot1.Hand.Count = 4
+? Bot2.Life = 18
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Attack(Flitterwing Nuisance > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 4
+Bot2.Life = 16
+Bot1.Battlefield.Flitterwing Nuisance.Power = 2

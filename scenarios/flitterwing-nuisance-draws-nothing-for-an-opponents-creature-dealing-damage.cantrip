@@ -1,0 +1,49 @@
+# "A creature YOU control": with the delayed ability set up (Bot1 pays {2}{U} and removes the counter during turn 4's
+# declare blockers step), Bot2's Elvish Mystic deals its combat damage to Bot1 and Bot1 draws nothing. The positive
+# control is flitterwing-nuisance-draws-for-combat-damage-this-turn-only (Bot1's own creature draws). Bot1 does not play
+# a land on turn 3, so its hand is 3 (after turn 1) + 1 (turn-3 draw) = 4 throughout, and it takes 1.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Flitterwing Nuisance
+Island
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Mox Emerald
+Elvish Mystic
+Swamp x22
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Flitterwing Nuisance.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Attack(Elvish Mystic > Bot1)
+[T4 Bot2.DeclareBlockers]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Flitterwing Nuisance.Activate
+Bot1.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 19
+Bot1.Hand.Count = 4
+Bot1.Battlefield.Flitterwing Nuisance.Power = 2

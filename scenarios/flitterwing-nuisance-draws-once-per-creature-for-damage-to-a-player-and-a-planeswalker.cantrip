@@ -1,0 +1,62 @@
+# "Whenever a creature you control deals combat damage to a player or planeswalker this turn, draw a card" triggers for
+# each creature and each player or planeswalker it damaged. On turn 3, after Bot1 pays {2}{U} and removes the counter, the
+# 2/2 Flitterwing Nuisance attacks Bot2 and the Elvish Mystic attacks Bot2's Liliana of the Veil (loyalty 3): two
+# creatures, a player and a planeswalker, two cards. Hand: 1 after turn 1, 2 after the turn-3 draw, then +2 = 4.
+
+[Bot1 Deck]
+Island
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Elvish Mystic
+Flitterwing Nuisance
+Island
+Island x20
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Liliana of the Veil
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Flitterwing Nuisance.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Liliana of the Veil.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot2.Battlefield.Liliana of the Veil.Counters.Loyalty = 3
+? Bot1.Hand.Count = 2
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Flitterwing Nuisance.Activate
+Bot1.Pass
+Bot1.Attack(Flitterwing Nuisance > Bot2; Elvish Mystic > Bot2.Battlefield.Liliana of the Veil)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 4
+Bot2.Life = 18
+Bot2.Battlefield.Liliana of the Veil.Counters.Loyalty = 2

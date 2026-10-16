@@ -2,12 +2,6 @@ use cantrip_api::*;
 use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
 
-/// "This creature enters with six -1/-1 counters on it" (CR 614.1c).
-fn enters_with_counters(_: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
-    entering.counters[CounterKind::MinusOne as usize] += 6;
-    Ok(())
-}
-
 /// "Whenever one or more permanent cards are put into your graveyard from anywhere while this creature has a -1/-1
 /// counter on it" (CR 603.2c): asked of each card that arrives, and one trigger for the cards that arrive together. A
 /// permanent card is a nontoken card of a permanent type. The counters are the ones it has as the cards arrive.
@@ -29,7 +23,7 @@ fn remove_a_counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    enters: Some(enters_with_counters),
+    enters: Some(cantrip_mechanics::effects::enters_with_minus_one_counters::<6>),
     abilities: &[triggered(when(EventMask::ZONE_CHANGE, permanent_card_to_your_graveyard), remove_a_counter, "Whenever one or more permanent cards are put into your graveyard from anywhere while this creature has a -1/-1 counter on it, remove a -1/-1 counter from this creature.")
         .once_per_batch()],
     ..oracle::MOONSHADOW

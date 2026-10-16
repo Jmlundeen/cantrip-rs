@@ -10,6 +10,13 @@ pub fn enters_with_x_counters(_: &mut dyn Game, entering: &mut Entering) -> Resu
     Ok(())
 }
 
+/// "This creature enters with `N` -1/-1 counters on it" (CR 614.1c). Glen Elendra Guardian, Flitterwing Nuisance (one)
+/// and Moonshadow (six) print it.
+pub fn enters_with_minus_one_counters<const N: i16>(_: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
+    entering.counters[CounterKind::MinusOne as usize] += N;
+    Ok(())
+}
+
 /// "Creatures you control get +`power`/+`toughness` until end of turn" (CR 611.2, 611.2c): the creatures `item`'s controller
 /// controls as it resolves, and no creature that enters later. The creatures, for what the rest of the sentence does to them
 /// ("and gain haste", "untap those creatures"). Assault Formation, Eagles of the North, Fatehold Charm, Haze of Rage, Jeskai

@@ -1,0 +1,51 @@
+# Combat damage to a creature is not damage to a player or planeswalker. On turn 3, with the delayed ability set up, the
+# unblocked Flitterwing Nuisance (flying 2/2) damages Bot2 and draws one card (the positive control), while the Elvish
+# Mystic is blocked by Bot2's Ornithopter, deals its damage to that creature and draws nothing. Hand: 2 after the
+# turn-3 draw, 3 after the one card.
+
+[Bot1 Deck]
+Island
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Elvish Mystic
+Flitterwing Nuisance
+Island
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Flitterwing Nuisance.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 2
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Flitterwing Nuisance.Activate
+Bot1.Pass
+Bot1.Attack(Flitterwing Nuisance > Bot2; Elvish Mystic > Bot2)
+Bot2.Block(Ornithopter > Bot1.Battlefield.Elvish Mystic)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 3
+Bot2.Life = 18
+Bot2.Battlefield.Ornithopter.Damage = 1
