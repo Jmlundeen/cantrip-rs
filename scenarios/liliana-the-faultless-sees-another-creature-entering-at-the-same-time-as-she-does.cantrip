@@ -1,0 +1,61 @@
+# CR 603.6a: permanents that enter at the same time see each other enter. Liliana and her Ornithopter are both Bolted on turn 3, and Faith's
+# Reward returns them to the battlefield together: Liliana triggers for the Ornithopter ("another"), once, and not for herself. Bot1 goes from 21 (Ornithopter cast on turn 1) to 22.
+
+[Bot1 Deck]
+Plains
+Liliana the Faultless
+Ornithopter
+Mox Jet
+Mox Sapphire
+Mox Ruby
+Faith's Reward
+Plains x13
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Mountain x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Liliana the Faultless.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+? Bot1.Life = 21
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Liliana the Faultless)
+Bot1.Pass
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faith's Reward.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot1.Battlefield.Liliana the Faultless.Types = Creature
+Bot1.Battlefield.Ornithopter.Types = Artifact; Creature
