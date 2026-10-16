@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{double, targets, triggers::THIS_ENTERS};
+use cantrip_mechanics::{counters_divided, double, targets, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 /// Distribute two +1/+1 counters among up to two target creatures. Then if you're the monarch, double the number of
@@ -10,13 +10,7 @@ use cantrip_oracle as oracle;
 /// monarch" is asked as the ability resolves. Doubling is putting as many as a creature already has (CR 122.8), each
 /// creature's count read before any is doubled.
 fn distribute_then_double(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    for slot in 0..item.target_count as usize {
-        if let Some(creature) = targets::object(g, item, slot)
-            && item.share(slot) > 0
-        {
-            g.add_counters(creature, CounterKind::PlusOne, item.share(slot) as i16);
-        }
-    }
+    counters_divided(g, item, CounterKind::PlusOne);
     if g.state().player(item.controller).monarch {
         double::counters_on_creatures_you_control(g, item.controller, CounterKind::PlusOne);
     }

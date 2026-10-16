@@ -318,6 +318,21 @@ pub fn damage_divided(g: &mut dyn Game, item: &StackItem) {
     g.damage_together(&hits);
 }
 
+/// Puts on each target of the resolving item its own share of the counters it was divided into (CR 601.2d, 122.1):
+/// "distribute N [kind] counters among [targets]". The shares were fixed as the spell or ability was put on the stack, a
+/// target that has since become illegal is left out and its counters are lost (CR 608.2b). That each target gets at least
+/// one is the announcement's rule (the core's `Divide`), not asked again here. Court of Garenbrig and Elusive
+/// Otter's Grove's Bounty print it.
+pub fn counters_divided(g: &mut dyn Game, item: &StackItem, kind: CounterKind) {
+    for slot in 0..item.target_count as usize {
+        if let Some(object) = targets::object(g, item, slot)
+            && item.share(slot) > 0
+        {
+            g.add_counters(object, kind, item.share(slot) as i16);
+        }
+    }
+}
+
 /// A one-color choice (CR 105.1), asked of `player`.
 pub fn choose_color(g: &mut dyn Game, player: PlayerId, source: ObjectId) -> Result<Color, Suspend> {
     let answer = g.ask(player, RequestKind::ChooseColors { source, choices: ColorSet(0b11111), count: 1 })?;

@@ -9,11 +9,19 @@ use cantrip_api::*;
 
 /// The alternative cost of warp: cast from the hand for `cost` (CR 118.9).
 pub const fn way(cost: ManaCost, text: &'static str) -> WayDef {
-    cantrip_api::way(Cost::mana(cost), ZoneKind::Hand, text)
+    cantrip_api::way(Cost::mana(cost), ZoneKind::Hand, text).kind(WayKind::Warp)
 }
 
 /// Warp's delayed ability (CR 702.185a): the way is the card's first and this its first delayed ability.
 pub const RIDERS: &[(u8, u8)] = &[(1, 0)];
+
+/// "Was cast for its warp cost" (CR 702.185a): the permanent (or spell) was cast through the way a card with warp lists
+/// as warp (`WayKind::Warp`, set by `way`). Another keyword's way is not warp's, and a permanent that was not cast (a
+/// token, a copy, one put onto the battlefield) was not cast for it. Full Bore asks it.
+pub fn was_cast_for_warp(q: &dyn Query, id: ObjectId) -> bool {
+    let object = q.state().obj(id);
+    object.cast_way > 0 && q.card(object.card).ways.get(object.cast_way as usize - 1).is_some_and(|w| w.kind == WayKind::Warp)
+}
 
 /// Exile the permanent the warped spell became, if it is still on the battlefield, and let its owner cast it from
 /// exile on a later turn, for its mana cost: warp's cost is a way from the hand only, so it is not offered again.
