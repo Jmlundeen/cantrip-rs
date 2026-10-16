@@ -1,0 +1,53 @@
+# Cerebral Download with no artifact: X is 0, counted as it resolves (the ruling), and surveil 0 is no surveil (CR
+# 701.25c: "no surveil event occurs. Abilities that trigger whenever a player surveils won't trigger"). Bot1 casts
+# Dimir Spybug on turn 3 (Swamp and Island). On turn 5 Bot1 casts Black Lotus and sacrifices it for the Download's mana,
+# so no artifact is left when the spell resolves: nothing is looked at (`! Bot1.Arrange`), the Spybug gets no counter, and
+# Bot1 draws Counterspell, Lightning Bolt and Ponder. The positive control is the scenario in which artifacts stay.
+
+[Bot1 Deck]
+Swamp
+Island
+Island
+Black Lotus
+Dimir Spybug
+Cerebral Download
+Swamp
+Island
+Island
+Counterspell
+Lightning Bolt
+Ponder
+Swamp x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Dimir Spybug.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Island#1.Activate
+Bot1.Hand.Cerebral Download.Cast
+Bot1.Pass
+! Bot1.Arrange
+? Stack.Count = 0
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield = Swamp; Island; Island; Dimir Spybug
+Bot1.Battlefield.Dimir Spybug.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Dimir Spybug.Power = 1
+Bot1.Graveyard = Cerebral Download; Black Lotus
+Bot1.Hand = Swamp; Island; Island; Counterspell; Lightning Bolt; Ponder
+Bot1.Library.Count = 10

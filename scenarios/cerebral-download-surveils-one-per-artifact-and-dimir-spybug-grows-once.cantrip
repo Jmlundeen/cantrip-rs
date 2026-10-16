@@ -1,0 +1,61 @@
+# Cerebral Download: "Surveil X, where X is the number of artifacts you control. Then draw three cards." With Dimir
+# Spybug: "Whenever you surveil, put a +1/+1 counter on this creature." Bot1 casts the Spybug on turn 1 (Island and Mox
+# Jet), with Mox Sapphire and Sol Ring also out. On turn 3 Bot1 casts Cerebral Download with all three artifacts still
+# on the battlefield: X is 3, so Bot1 looks at Counterspell, Lightning Bolt and Ponder, puts all three into the graveyard,
+# and draws the three Islands beneath. The Spybug gets one counter for the one surveil, however many cards were looked
+# at (the ruling), and the trigger comes after the whole spell has resolved.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Sol Ring
+Mox Jet
+Dimir Spybug
+Cerebral Download
+Swamp
+Island
+Counterspell
+Lightning Bolt
+Ponder
+Island
+Island
+Island
+Swamp x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dimir Spybug.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Cerebral Download.Cast
+Bot1.Pass
+Bot1.Arrange( | Counterspell; Lightning Bolt; Ponder)
+? Stack.Count = 1
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield.Dimir Spybug.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Dimir Spybug.Power = 2
+Bot1.Battlefield.Dimir Spybug.Toughness = 2
+Bot1.Graveyard.Count = 4
+Bot1.Hand = Island; Island; Island; Island
+Bot1.Library = Swamp; Swamp; Swamp; Swamp; Swamp; Swamp; Swamp; Swamp; Swamp; Swamp
