@@ -10,14 +10,7 @@ fn non_pilot_creature_you_control(q: &dyn Query, asker: &Asker, t: Target) -> bo
 /// control: a new object (CR 400.7). A token exiled ceases to exist, and nothing returns.
 fn all_aboard(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
-    let token = g.obj(creature).token;
-    let owner = g.obj(creature).owner;
-    let exiled = g.exile(creature);
-    if token || !g.obj(exiled).zone.is(ZoneKind::Exile) {
-        return Ok(());
-    }
-    g.put_onto_battlefield(exiled, owner, false)?;
-    Ok(())
+    cantrip_mechanics::exile_and_return(g, &[creature])
 }
 
 /// Skycoach Conductor's prepare spell (CR 722): not a card, only ever a copy.

@@ -11,14 +11,7 @@ fn nonland_permanent_you_control(q: &dyn Query, asker: &Asker, t: Target) -> boo
 /// ceases to exist in exile and does not return (CR 111.7).
 fn blink(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(permanent) = targets::object(g, item, 0) else { return Ok(()) };
-    let token = g.obj(permanent).token;
-    let owner = g.obj(permanent).owner;
-    let exiled = g.exile(permanent);
-    if token || !g.obj(exiled).zone.is(ZoneKind::Exile) {
-        return Ok(());
-    }
-    g.put_onto_battlefield(exiled, owner, false)?;
-    Ok(())
+    cantrip_mechanics::exile_and_return(g, &[permanent])
 }
 
 pub static CARD: CardDef = CardDef {

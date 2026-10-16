@@ -15,12 +15,7 @@ fn other_nonland_permanent_you_control(q: &dyn Query, asker: &Asker, t: Target) 
 /// Exile it, then return that card to the battlefield under its owner's control: a new object (CR 400.7).
 fn blink(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(permanent) = targets::object(g, item, 0) else { return Ok(()) };
-    let owner = g.obj(permanent).owner;
-    let exiled = g.exile(permanent);
-    if g.obj(exiled).zone.is(ZoneKind::Exile) && !g.obj(exiled).token {
-        g.put_onto_battlefield(exiled, owner, false)?;
-    }
-    Ok(())
+    cantrip_mechanics::exile_and_return(g, &[permanent])
 }
 
 pub static CARD: CardDef = CardDef {

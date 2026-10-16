@@ -225,6 +225,20 @@ pub fn exile_and_return_transformed(g: &mut dyn Game, permanent: ObjectId, under
     Ok(())
 }
 
+/// "Exile [these permanents], then return them to the battlefield under their owner's control": all exiled at once (CR 608.2c,
+/// 101.4), then all returned at once, as new objects (CR 400.7). A token exiled this way ceases to exist and does not return
+/// (CR 111.7). Ephemerate, Displacer Kitten, Skycoach Conductor, The Mind Stone and Gone Fishing print it.
+pub fn exile_and_return(g: &mut dyn Game, permanents: &[ObjectId]) -> Result<(), Suspend> {
+    let returning: Vec<(ObjectId, PlayerId)> = g
+        .exile_all(permanents)
+        .into_iter()
+        .filter(|&card| !g.obj(card).token && g.obj(card).zone.is(ZoneKind::Exile))
+        .map(|card| (card, g.obj(card).owner))
+        .collect();
+    g.put_all_onto_battlefield(&returning)?;
+    Ok(())
+}
+
 /// Exiles the targeted card, if it is still a legal target.
 pub fn exile_target(g: &mut dyn Game, item: &StackItem, slot: usize) -> bool {
     if !g.target_legal(item, slot) {

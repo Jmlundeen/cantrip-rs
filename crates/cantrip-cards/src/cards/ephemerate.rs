@@ -7,12 +7,7 @@ use cantrip_oracle as oracle;
 /// the creature is no longer a legal target (CR 608.2b).
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
-    let owner = g.obj(creature).owner;
-    let exiled = g.exile(creature);
-    if !g.obj(exiled).token && g.obj(exiled).zone.is(ZoneKind::Exile) {
-        g.put_onto_battlefield(exiled, owner, false)?;
-    }
-    Ok(())
+    cantrip_mechanics::exile_and_return(g, &[creature])
 }
 
 pub static CARD: CardDef = CardDef {
