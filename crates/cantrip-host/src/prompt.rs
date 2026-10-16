@@ -543,6 +543,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 // client says so in its caption. Any other choice is worded as the asking card words it ("nonland"), if it does.
                 kind: match purpose {
                     Purpose::Blight => "creature".into(),
+                    Purpose::Behold if !kind.is_empty() => (*kind).to_string(),
                     Purpose::Behold => beheld_quality(game, *source).into(),
                     _ => (*kind).to_string(),
                 },

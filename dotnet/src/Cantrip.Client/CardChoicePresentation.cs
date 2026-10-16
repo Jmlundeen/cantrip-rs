@@ -76,6 +76,9 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
                 ? $"{source}: tap up to one untapped creature you control to reduce the cost by generic mana equal to its power"
             : prompt.Purpose == CardChoicePurposeView.Behold && prompt.Count == 1 && !prompt.UpTo && prompt.Kind.Length > 0
                 ? $"{source}: choose {article} {kind} you control or reveal {article} {kind} card from your hand to behold"
+            // "You may behold" as a permanent enters (CR 614.12a): choosing none is the answer that doesn't.
+            : prompt.Purpose == CardChoicePurposeView.Behold && prompt.Count == 1 && prompt.UpTo && prompt.Kind.Length > 0
+                ? $"{source}: you may choose {article} {kind} you control or reveal {article} {kind} card from your hand to behold"
             : prompt.Purpose == CardChoicePurposeView.Blight && prompt.Count == 1 && !prompt.UpTo
                 ? $"{source}: choose a creature you control to blight (it gets -1/-1 counters)"
             : prompt.Count == 1 && !prompt.UpTo ? $"{source}: choose {article} {kind} to {verb}{budget}"
@@ -121,7 +124,7 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
                 : picked.Count == 1 ? "Put it on the bottom" : $"Put {picked.Count} on the bottom",
             CardChoicePurposeView.Attach => picked.Count == 0 ? "Attach nothing" : picked.Count == 1 ? "Attach it" : $"Attach {picked.Count}",
             CardChoicePurposeView.Encode => picked.Count == 0 ? "Encode on nothing" : "Encode on it",
-            CardChoicePurposeView.Behold => picked.Count == 1 ? "Behold it" : $"Behold {picked.Count}",
+            CardChoicePurposeView.Behold => picked.Count == 0 && prompt.UpTo ? "Behold nothing" : picked.Count == 1 ? "Behold it" : $"Behold {picked.Count}",
             CardChoicePurposeView.Blight => "Blight it",
             // "Discard nothing" only where declining is an answer; a mandatory discard still counts down to its number.
             _ => picked.Count == 0 && prompt.UpTo ? "Discard nothing"
