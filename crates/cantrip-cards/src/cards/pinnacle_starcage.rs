@@ -1,21 +1,7 @@
 use cantrip_api::*;
-use cantrip_mechanics::tokens;
+use cantrip_mechanics::tokens::{self, ROBOT_2_2};
 use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
-
-/// The 2/2 colorless Robot artifact creature token. It shares its name with the other Robot tokens (Ravenous Robots'
-/// and Melded Moxite's).
-pub static ROBOT: CardDef = CardDef {
-    name: "Robot",
-    has_cost: false,
-    colors: Some(ColorSet::NONE),
-    types: TypeSet::of(&[CardType::Artifact, CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Robot]),
-    power: Some(2),
-    toughness: Some(2),
-    shares_name: true,
-    ..CardDef::BLANK
-};
 
 /// "Exile all artifacts and creatures with mana value 2 or less until this artifact leaves the battlefield" (CR 610.3):
 /// every one on the battlefield, whoever controls it, exiled together; the ones on the battlefield are chosen as the
@@ -43,7 +29,7 @@ fn release(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let moved = g.put_into_graveyard(&exiled);
     let count = moved.iter().filter(|&&id| g.obj(id).zone.is(ZoneKind::Graveyard)).count();
     if count > 0 {
-        tokens::create(g, item.controller, &ROBOT, count as u32)?;
+        tokens::create(g, item.controller, &ROBOT_2_2, count as u32)?;
     }
     g.sacrifice(&[item.object]);
     Ok(())
@@ -57,4 +43,4 @@ pub static CARD: CardDef = CardDef {
     ..oracle::PINNACLE_STARCAGE
 };
 
-pub static EXTRA: &[&CardDef] = &[&ROBOT];
+pub static EXTRA: &[&CardDef] = &[&ROBOT_2_2];

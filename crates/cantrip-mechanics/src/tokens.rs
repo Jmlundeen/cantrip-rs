@@ -93,6 +93,20 @@ fn explore_target(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
+/// A colorless 2/2 Robot artifact creature token. Melded Moxite and Pinnacle Starcage create it. It shares its name with
+/// the 1/1 Robot (Ravenous Robots'), so the card table keeps the definitions apart.
+pub static ROBOT_2_2: CardDef = CardDef {
+    name: "Robot",
+    has_cost: false,
+    colors: Some(ColorSet::NONE),
+    types: TypeSet::of(&[CardType::Artifact, CardType::Creature]),
+    subtypes: SubtypeSet::of(&[Subtype::Robot]),
+    power: Some(2),
+    toughness: Some(2),
+    shares_name: true,
+    ..CardDef::BLANK
+};
+
 /// A colorless Map artifact token with "{1}, {T}, Sacrifice this token: Target creature you control explores.
 /// Activate only as a sorcery." (CR 111.10s). Fanatical Offering and Seasoned Dungeoneer make it.
 pub static MAP: CardDef = CardDef {
