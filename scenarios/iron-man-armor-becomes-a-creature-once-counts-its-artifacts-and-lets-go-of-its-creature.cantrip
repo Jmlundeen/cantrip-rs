@@ -1,0 +1,66 @@
+# "{2}: If this Equipment isn't a creature, it becomes a 0/0 Construct Hero artifact creature with flying and 'This creature gets +1/+1 for each artifact you control' until
+# end of turn." On turn 1 the Armor attaches to Bot1's Ornithopter (2/3). On turn 3 Bot1 pays {2}: the Armor becomes a creature, so it is an Equipment creature and
+# becomes unattached (CR 301.5c, 704.5p) - the Ornithopter is a 0/2 again - and, with the six artifacts Bot1 controls (the Armor, four Moxen and the Ornithopter),
+# a 6/6 Construct Hero Equipment artifact creature with flying. The second {2} paid finds the "if this Equipment isn't a creature" untrue as it resolves and does
+# nothing (it is still 6/6, one Hero, nothing doubled). It attacks, having been under Bot1's control since turn 1, and deals 6: Bot2 is at 14. On turn 4 it is
+# only an artifact again (CR 514.2).
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Mox Sapphire
+Iron Man Armor
+Ornithopter
+Forest
+Forest x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Iron Man Armor.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Iron Man Armor.AttachedTo = Ornithopter
+? Bot1.Battlefield.Ornithopter.Power = 2
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Iron Man Armor.Activate(Ability: becomes a 0/0)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Iron Man Armor.Types = Artifact; Creature
+? Bot1.Battlefield.Iron Man Armor.Subtypes = Construct; Equipment; Hero
+? Bot1.Battlefield.Iron Man Armor.Power = 6
+? Bot1.Battlefield.Iron Man Armor.Toughness = 6
+? Bot1.Battlefield.Iron Man Armor.Keywords = Flying
+? Bot1.Battlefield.Iron Man Armor.AttachedTo = (absent)
+? Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Iron Man Armor.Activate(Ability: becomes a 0/0)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Iron Man Armor.Power = 6
+? Bot1.Battlefield.Iron Man Armor.Subtypes = Construct; Equipment; Hero
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Iron Man Armor > Bot2)
+[T3 Bot1.Main2]
+? Bot2.Life = 14
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Iron Man Armor.Types = Artifact
+? Bot1.Battlefield.Iron Man Armor.Subtypes = Equipment
+
+[Expect]
+Bot2.Life = 14

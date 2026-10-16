@@ -1,0 +1,58 @@
+# "When this Equipment enters, attach it to target creature you control. Equipped creature gets +2/+1 and has flying. Equip {2}." On turn 1 Bot1's Armor enters and attaches to
+# Llanowar Elves, a 1/1 ground creature: it becomes a 3/2 with flying. On turn 3 Equip is refused while Bot1's Ornithopter is on the stack (sorcery speed, CR 702.6a;
+# the equip a moment later, with the stack empty, is the positive control): paying {2} moves the Armor to Ornithopter (0/2 flying -> 2/3 flying) and
+# the Elves are a 1/1 with no keywords again.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Pearl
+Mox Ruby
+Llanowar Elves
+Iron Man Armor
+Ornithopter
+Forest x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Iron Man Armor.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+Bot1.Pass
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Iron Man Armor.AttachedTo = Llanowar Elves
+? Bot1.Battlefield.Llanowar Elves.Power = 3
+? Bot1.Battlefield.Llanowar Elves.Toughness = 2
+? Bot1.Battlefield.Llanowar Elves.Keywords = Flying
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+! Bot1.Battlefield.Iron Man Armor.Activate(Ability: Equip {2})
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Iron Man Armor.Activate(Ability: Equip {2}; Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Iron Man Armor.AttachedTo = Ornithopter
+Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Ornithopter.Toughness = 3
+Bot1.Battlefield.Ornithopter.Keywords = Flying
+Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot1.Battlefield.Llanowar Elves.Toughness = 1
+Bot1.Battlefield.Llanowar Elves.Keywords = (absent)

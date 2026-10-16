@@ -1,0 +1,48 @@
+# CR 612: Artificial Evolution changes Iron Man Armor's text, Construct to Elf, so its animation now reads "becomes a 0/0 Elf Hero artifact creature": on turn 3 it is an
+# Elf, not a Construct, and still a Hero and an Equipment. With no creature of Bot1's on turn 1 its enters trigger has no target and is not put on the stack (CR 603.3d), so the
+# Armor starts unattached.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Mox Sapphire
+Iron Man Armor
+Artificial Evolution
+Forest
+Forest x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Iron Man Armor.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Iron Man Armor)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Construct)
+Bot1.Modes(Elf)
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Iron Man Armor.AttachedTo = (absent)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Iron Man Armor.Activate(Ability: becomes a 0/0)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Iron Man Armor.Subtypes = Elf; Equipment; Hero
+Bot1.Battlefield.Iron Man Armor.Types = Artifact; Creature
+Bot1.Battlefield.Iron Man Armor.Power = 5
