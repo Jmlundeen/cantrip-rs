@@ -80,7 +80,7 @@ fn goaded_into_its_goader(game: &Game, attacker: ObjectId, at: PlayerId, players
 
 /// Why the name of `card` may not be chosen for a question asking for a `kind` of card name, or `None` if it may.
 /// A name chosen "with certain characteristics" is that of a card that has them (CR 201.4a); a player naming a split card
-/// names one of its two names, not both (CR 709.4a).
+/// names one of its two names, not both (CR 201.4b, 709.4a).
 pub fn name_problem(cards: &CardTable, kind: NameKind, card: CardId) -> Option<&'static str> {
     let def = cards.get(card);
     if !kind.allows(def.is(CardType::Land)) {
