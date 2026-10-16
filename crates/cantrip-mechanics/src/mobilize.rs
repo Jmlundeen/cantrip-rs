@@ -34,15 +34,7 @@ fn create_warriors<const N: u8>(g: &mut dyn Game, item: &StackItem) -> Result<()
     let tokens: Vec<(CardId, PlayerId)> = (0..N).map(|_| (warrior, item.controller)).collect();
     // The Warriors are the keyword's (CR 702.181a), whatever the card's text says now.
     let created = g.create_tokens_worded(&tokens, true, Some(item.subject), Words::NONE)?;
-    let o = *g.obj(item.object);
-    let card = o.copy.map(|c| c.card).unwrap_or(o.card);
-    g.delayed_trigger_about(
-        DelayedWhen::Step { step: Step::End, on_turn_of: None },
-        item.object,
-        item.controller,
-        AbilityRef::delayed(card, 0),
-        &created,
-    );
+    crate::delayed::at_next_end_step_about(g, item, 0, &created);
     Ok(())
 }
 
@@ -51,17 +43,4 @@ pub const fn trigger<const N: u8>(text: &'static str) -> AbilityDef {
     triggered(when(EventMask::ATTACKS, attacks), create_warriors::<N>, text)
 }
 
-/// Sacrifices the surviving tokens in one action; a token another player controls now cannot be sacrificed by this
-/// ability's controller.
-fn sacrifice_warriors(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let survivors: Vec<ObjectId> = g
-        .event_objects(item)
-        .iter()
-        .copied()
-        .filter(|&id| is_live(g, id) && g.is_on_battlefield(id) && g.controller(id) == item.controller)
-        .collect();
-    g.sacrifice(&survivors);
-    Ok(())
-}
-
-pub const SACRIFICE: AbilityDef = delayed_trigger(sacrifice_warriors, "Sacrifice the tokens created by mobilize.");
+pub const SACRIFICE: AbilityDef = delayed_trigger(crate::delayed::sacrifice_created, "Sacrifice the tokens created by mobilize.");
