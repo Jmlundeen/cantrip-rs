@@ -1,0 +1,47 @@
+# "each with mana value 3 or less": Bot1's only creature card in its graveyard, after Bot2's Wrath of God, is Argothian Elder (mana value 4), so Leonardo's
+# Technique has no legal target and is not offered although {3}{W} is available (CR 115.1, 601.2c). The positive control, with a Hired Blade of mana value 3, is
+# leonardos-technique-returns-a-mana-value-three-creature-card-and-leaves-a-mana-value-four-one.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Jet
+Mox Pearl
+Gleemox
+Argothian Elder
+Swamp
+Leonardo's Technique
+Swamp x12
+
+[Bot2 Deck]
+Black Lotus
+Mox Pearl
+Wrath of God
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Argothian Elder.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Wrath of God.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Green)
+! Bot1.Hand.Leonardo's Technique.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Emerald; Mox Jet; Mox Pearl; Gleemox
+Bot1.Graveyard = Argothian Elder; Black Lotus

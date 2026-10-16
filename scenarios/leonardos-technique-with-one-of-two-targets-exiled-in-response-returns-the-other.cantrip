@@ -1,0 +1,57 @@
+# CR 608.2b: with two targets, if one is illegal when Leonardo's Technique resolves the spell still does what it can with the other. Bot1 targets an
+# Ornithopter and a Hired Blade; in response Bot2 exiles the Hired Blade with Ghost Vacuum, so only the Ornithopter returns to the battlefield.
+
+[Bot1 Deck]
+Ornithopter
+Hired Blade
+Mox Pearl
+Mox Jet
+Mox Emerald
+Plains
+Swamp
+Leonardo's Technique
+Swamp x12
+
+[Bot2 Deck]
+Black Lotus
+Mox Pearl
+Mox Jet
+Wrath of God
+Ghost Vacuum
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Hired Blade.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Ghost Vacuum.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Wrath of God.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Leonardo's Technique.Cast
+Bot1.Target(Ornithopter; Hired Blade)
+Bot1.Pass
+Bot2.Battlefield.Ghost Vacuum.Activate(Ability: Exile target; Bot1.Graveyard.Hired Blade)
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Exile = Hired Blade
+Bot1.Battlefield = Mox Pearl; Mox Jet; Mox Emerald; Plains; Ornithopter
+Bot1.Graveyard = Leonardo's Technique

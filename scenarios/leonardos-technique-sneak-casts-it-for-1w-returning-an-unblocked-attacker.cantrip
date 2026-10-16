@@ -1,0 +1,57 @@
+# Sneak {1}{W} (CR 702.190a): Bot2's Wrath of God (turn 2) puts Bot1's Hired Blade in the graveyard; Bot1 casts a second Ornithopter on turn 3, attacks with it on
+# turn 5 and, once Bot2 has not blocked, casts Leonardo's Technique in the declare blockers step for {1}{W} (Plains, Mox Pearl), returning the attacker to its
+# hand. The Hired Blade enters the battlefield; the Ornithopter dealt no damage.
+
+[Bot1 Deck]
+Hired Blade
+Ornithopter
+Mox Pearl
+Mox Jet
+Plains
+Swamp
+Swamp
+Ornithopter
+Leonardo's Technique
+Swamp x11
+
+[Bot2 Deck]
+Black Lotus
+Mox Pearl
+Mox Jet
+Wrath of God
+Ghost Vacuum
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Hired Blade.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Ghost Vacuum.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Wrath of God.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+[T5 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+[T5 Bot1.DeclareBlockers]
+Bot1.Hand.Leonardo's Technique.Cast(Ability: Sneak)
+Bot1.Choose(Ornithopter)
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot1.Battlefield = Mox Pearl; Mox Jet; Plains; Hired Blade
+Bot1.Hand = Ornithopter; Ornithopter; Swamp; Swamp
+Bot1.Graveyard = Leonardo's Technique

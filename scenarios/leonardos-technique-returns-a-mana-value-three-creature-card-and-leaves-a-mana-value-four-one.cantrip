@@ -1,0 +1,52 @@
+# "each with mana value 3 or less": Bot1's graveyard holds Hired Blade (mana value 3, the boundary) and Argothian Elder (mana value 4) after Bot2's Wrath of
+# God. Leonardo's Technique returns only the Blade and leaves the Elder - one target is enough for "one or two" (CR 115.1, 601.2c). The refusal for a graveyard
+# of the Elder alone is leonardos-technique-is-not-offered-with-only-a-creature-card-of-mana-value-four.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Jet
+Mox Pearl
+Gleemox
+Argothian Elder
+Hired Blade
+Leonardo's Technique
+Swamp x12
+
+[Bot2 Deck]
+Black Lotus
+Mox Pearl
+Wrath of God
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Argothian Elder.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Black)
+Bot1.Hand.Hired Blade.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Wrath of God.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Green)
+Bot1.Hand.Leonardo's Technique.Cast
+Bot1.Target(Hired Blade)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Emerald; Mox Jet; Mox Pearl; Gleemox; Hired Blade
+Bot1.Graveyard = Leonardo's Technique; Argothian Elder; Black Lotus

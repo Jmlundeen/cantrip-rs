@@ -1,0 +1,30 @@
+# A target is needed to cast a spell (CR 601.2c): with Bot1's graveyard empty, Leonardo's Technique is not offered although its {3}{W} is available (four
+# Moxes). The positive controls are the other Leonardo's Technique scenarios.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Emerald
+Gleemox
+Leonardo's Technique
+Swamp x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Gleemox.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Gleemox.Activate(Color: Green)
+! Bot1.Hand.Leonardo's Technique.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+
+[Expect]
+Bot1.Graveyard.Count = 0
+Bot1.Hand = Leonardo's Technique; Swamp; Swamp
