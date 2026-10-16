@@ -1,0 +1,41 @@
+# "If you cast it": Bringer put onto the battlefield from the graveyard with Reanimate (Entomb put it there) was not
+# cast, so the trigger never happens (CR 603.4; ruling). Bot2's Ornithopter and Bot1's own Mox stay, and Bot1 pays 8 life
+# for the Reanimate (Bringer's mana value). The positive control, cast, is in
+# bringer-of-the-last-gift-sacrifices-all-other-creatures-and-returns-the-cards-that-were-already-in-graveyards.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Entomb
+Reanimate
+Swamp
+Swamp
+Swamp
+Bringer of the Last Gift
+Swamp x12
+
+[Bot2 Deck]
+Island
+Ornithopter
+Island x18
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Bringer of the Last Gift)
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Reanimate.Cast(Bot1.Graveyard.Bringer of the Last Gift)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 12
+Bot1.Battlefield = Swamp; Swamp; Mox Jet; Bringer of the Last Gift
+Bot2.Battlefield = Ornithopter
+Bot1.Graveyard = Reanimate; Entomb
+Stack.Count = 0

@@ -1,0 +1,58 @@
+# Same game without the Bolt: Bot1's own Ornithopter is on the battlefield when Bringer enters, and is sacrificed with
+# Bot2's Elvish Mystic ("each player"). Both just-sacrificed creature cards stay in their graveyards; only the Llanowar
+# Elves Entomb put into Bot2's graveyard before returns. The Bringer itself, "other" excluded, stays.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Bringer of the Last Gift
+Ornithopter
+Swamp x13
+
+[Bot2 Deck]
+Swamp
+Mox Ruby
+Mox Emerald
+Entomb
+Lightning Bolt
+Elvish Mystic
+Island
+Island
+Llanowar Elves
+Island x11
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Entomb.Cast
+Bot2.Search(Llanowar Elves)
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Bringer of the Last Gift.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Jet; Mox Ruby; Mox Pearl; Mox Emerald; Swamp; Bringer of the Last Gift
+Bot1.Graveyard = Ornithopter; Black Lotus
+Bot2.Battlefield = Swamp; Mox Ruby; Mox Emerald; Llanowar Elves
+Bot2.Graveyard = Elvish Mystic; Entomb

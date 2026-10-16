@@ -1,0 +1,11 @@
+{
+  "name": "Bringer of the Last Gift",
+  "manaCost": "{6}{B}{B}",
+  "type": "Creature — Vampire Demon",
+  "power": 6,
+  "toughness": 6,
+  "oracleText": "Flying\nWhen this creature enters, if you cast it, each player sacrifices all other creatures they control. Then each player returns all creature cards from their graveyard that weren't put there this way to the battlefield.",
+  "keywords": [
+    "Flying"
+  ]
+}

@@ -1,0 +1,64 @@
+# Bringer of the Last Gift, cast on turn 3 with Black Lotus, four Moxen and a Swamp. Before it: Bot1's Ornithopter was
+# killed by Bot2's Lightning Bolt (a creature card in Bot1's graveyard), Bot2 put a Llanowar Elves into its graveyard with
+# Entomb, and Bot2 controls an Elvish Mystic. The enters trigger (it was cast): each player sacrifices all other creatures
+# they control, so the Mystic is sacrificed; then each player returns all creature cards from their graveyard "that
+# weren't put there this way" - Bot1's Ornithopter and Bot2's Llanowar Elves return, the Elvish Mystic just sacrificed
+# does not and stays in Bot2's graveyard.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Bringer of the Last Gift
+Ornithopter
+Swamp x13
+
+[Bot2 Deck]
+Swamp
+Mox Ruby
+Mox Emerald
+Entomb
+Lightning Bolt
+Elvish Mystic
+Island
+Island
+Llanowar Elves
+Island x11
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Entomb.Cast
+Bot2.Search(Llanowar Elves)
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Bringer of the Last Gift.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Jet; Mox Ruby; Mox Pearl; Mox Emerald; Swamp; Bringer of the Last Gift; Ornithopter
+Bot1.Graveyard = Black Lotus
+Bot2.Battlefield = Swamp; Mox Ruby; Mox Emerald; Llanowar Elves
+Bot2.Graveyard = Elvish Mystic; Lightning Bolt; Entomb
+Stack.Count = 0
