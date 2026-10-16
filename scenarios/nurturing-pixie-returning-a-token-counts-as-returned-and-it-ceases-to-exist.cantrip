@@ -1,0 +1,35 @@
+# Nurturing Pixie: "If a permanent was returned this way, put a +1/+1 counter". A token is a permanent and is returned
+# to its owner's hand (CR 400.3), where it ceases to exist (CR 111.7, 704.5d); it was still returned, so the Pixie
+# grows. Turn 1: Thraben Inspector makes a Clue. Turn 3: Pixie returns the Clue: the Clue is gone, nothing in hand for
+# it, and the Pixie is 2/2.
+
+[Bot1 Deck]
+Plains
+Plains
+Nurturing Pixie
+Thraben Inspector
+Plains x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Thraben Inspector.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Nurturing Pixie.Cast
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Target(Clue Token)
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield = Plains; Plains; Thraben Inspector; Nurturing Pixie
+Bot1.Battlefield.Nurturing Pixie.Power = 2
+Bot1.Battlefield.Nurturing Pixie.Counters.PlusOnePlusOne = 1

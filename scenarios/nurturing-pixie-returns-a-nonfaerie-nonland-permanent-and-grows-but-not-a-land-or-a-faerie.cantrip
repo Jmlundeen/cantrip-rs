@@ -1,0 +1,45 @@
+# Nurturing Pixie: "return up to one target non-Faerie, nonland permanent you control to its owner's hand. If a permanent
+# was returned this way, put a +1/+1 counter on this creature." Turn 1: the first Pixie enters with nothing it may
+# target (a Plains is a land, and it is itself a Faerie), so its trigger is removed and it stays 1/1. Turn 3: Thraben
+# Inspector (and its Clue), then the second Pixie: the target question offers no Plains (a land), neither Pixie (a
+# Faerie), but the Inspector, which is taken (the positive control for the refusals). The Inspector returns to hand and
+# the second Pixie is 2/2 with a counter; the first, untouched, is still 1/1.
+
+[Bot1 Deck]
+Plains
+Plains
+Nurturing Pixie
+Nurturing Pixie
+Thraben Inspector
+Plains x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Nurturing Pixie.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Thraben Inspector.Cast
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Pass
+Bot1.Pass
+Bot1.Hand.Nurturing Pixie.Cast
+Bot1.Battlefield.Plains#2.Activate
+! Bot1.Target(Plains)
+! Bot1.Target(Nurturing Pixie)
+Bot1.Target(Thraben Inspector)
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Hand.Count = 4
+Bot1.Battlefield = Plains; Plains; Nurturing Pixie; Nurturing Pixie; Clue Token
+? Bot1.Battlefield.Nurturing Pixie#1.Power = 1
+? Bot1.Battlefield.Nurturing Pixie#2.Power = 2
+? Bot1.Battlefield.Nurturing Pixie#2.Counters.PlusOnePlusOne = 1
