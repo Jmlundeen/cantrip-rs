@@ -1,0 +1,68 @@
+# Browser
+# What the page shows of a Room (CR 709.5): Unholy Annex cast as its left door shows that door unlocked and Ritual Chamber locked, its
+# locked door still printed on the card; the unlock of Ritual Chamber is offered on the Room with that door's name and cost,
+# {3}{B}{B}, once the fifth mana source is there; after the unlock both doors show unlocked. Bot2's Ritual Chamber, cast on
+# turn 2, is shown on Bot1's page with the other door locked. The doors are the face's own, read from `?test` as
+# `Client.Bot1.Battlefield.<Room>.Doors`, and the menu's words as `.Actions`.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Unholy Annex // Ritual Chamber
+Mox Jet
+Mox Jet
+Mox Jet
+Swamp
+Swamp
+Swamp x15
+
+[Bot2 Deck]
+Swamp
+Black Lotus
+Mox Jet
+Unholy Annex // Ritual Chamber
+Swamp x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Unholy Annex // Ritual Chamber.Cast(Ability: Unholy Annex)
+Bot1.Pass
+[T1 Bot1.Main2]
+? Client.Bot1.Battlefield.Unholy Annex.Doors = Unholy Annex:unlocked; Ritual Chamber:locked
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Unholy Annex // Ritual Chamber.Cast(Ability: Ritual Chamber)
+Bot2.Pass
+[T2 Bot2.Main2]
+? Client.Bot1.OpponentBattlefield.Ritual Chamber.Doors = Unholy Annex:locked; Ritual Chamber:unlocked
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+? Client.Bot1.Battlefield.Unholy Annex.Actions = Unlock Ritual Chamber {3}{B}{B}
+Bot1.Battlefield.Unholy Annex.Activate(Ability: right door)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Pass
+[T3 Bot1.Main2]
+? Client.Bot1.Battlefield.Unholy Annex // Ritual Chamber.Doors = Unholy Annex:unlocked; Ritual Chamber:unlocked
+
+[Expect]
+Bot1.Battlefield.Demon.Power = 6

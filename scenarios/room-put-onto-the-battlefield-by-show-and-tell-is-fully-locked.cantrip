@@ -1,3 +1,4 @@
+# Browser
 # A Room that enters without being cast enters with neither door unlocked (CR 709.5d): Bot1's Show and Tell puts Unholy Annex //
 # Ritual Chamber from the hand onto the battlefield. It is nameless with no abilities, and no door was unlocked, so there is no
 # Demon; at Bot1's end step it neither draws nor costs life. (Bot2 has no card to put onto the battlefield.) Black Lotus and
@@ -30,6 +31,8 @@ Bot1.Choose(Unholy Annex // Ritual Chamber)
 ? Bot1.Battlefield..Doors.Count = 0
 ? Bot1.Battlefield..Types = Enchantment
 ? Bot1.Battlefield..ManaValue = 0
+# Nameless on the page too, with both doors shown and both locked (the page draws the halves with their printed text).
+? Client.Bot1.Battlefield..Doors = Unholy Annex:locked; Ritual Chamber:locked
 [T2 Bot2.Upkeep]
 
 [Expect]
