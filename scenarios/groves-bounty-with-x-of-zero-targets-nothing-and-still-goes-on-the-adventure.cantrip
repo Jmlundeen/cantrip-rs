@@ -1,0 +1,30 @@
+# Grove's Bounty cast for {G} with X = 0 (CR 107.3): "any number of target creatures" includes none, so it needs no target, puts
+# nothing anywhere, and as an Adventure it still resolves and is exiled (CR 715.4) - an Ornithopter on the table gets no counter.
+# The Otter is then cast from exile on turn 3 for {U}.
+
+[Bot1 Deck]
+Forest
+Elusive Otter
+Ornithopter
+Island
+Forest x15
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Elusive Otter.Cast(Ability: Adventure)
+Bot1.Battlefield.Forest.Activate
+[T1 Bot1.Main2]
+? Exile = Elusive Otter
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Exile.Elusive Otter.Cast
+
+[Expect]
+Exile.Count = 0
+Bot1.Battlefield = Elusive Otter; Forest; Island; Ornithopter
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = (absent)

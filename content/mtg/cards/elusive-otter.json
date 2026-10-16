@@ -1,0 +1,14 @@
+{
+  "name": "Elusive Otter",
+  "manaCost": "{U}",
+  "type": "Creature — Otter",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "Prowess (Whenever you cast a noncreature spell, this creature gets +1/+1 until end of turn.)\nCreatures with power less than this creature's power can't block it.",
+  "adventure": {
+    "name": "Grove's Bounty",
+    "manaCost": "{X}{G}",
+    "type": "Sorcery — Adventure",
+    "oracleText": "Distribute X +1/+1 counters among any number of target creatures you control. (Then exile this card. You may cast the creature later from exile.)"
+  }
+}

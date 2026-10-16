@@ -1,0 +1,39 @@
+# Official ruling: Elusive Otter's power is compared to a blocker's only as blockers are declared (CR 509.1b); once it has
+# been legally blocked, changing power does not undo the block. Llanowar Elves (power 1) legally blocks the 1/1 Otter; Bot1
+# then casts Lightning Bolt at Bot2, a noncreature spell, and prowess makes the Otter 2/2 (CR 702.108a). The Elves still block it:
+# the Otter kills them and survives with 1 damage, and Bot2 takes only the Bolt's 3.
+
+[Bot1 Deck]
+Island
+Elusive Otter
+Mox Ruby
+Lightning Bolt
+Island x16
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Elusive Otter.Cast
+Bot1.Battlefield.Island.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Elusive Otter > Bot2)
+Bot2.Block(Bot2.Battlefield.Llanowar Elves > Bot1.Battlefield.Elusive Otter)
+[T3 Bot1.DeclareBlockers]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Elusive Otter.Power = 2
+
+[Expect]
+Bot2.Life = 17
+Bot2.Graveyard = Llanowar Elves
+Bot1.Battlefield.Elusive Otter.Damage = 1

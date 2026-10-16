@@ -1,0 +1,47 @@
+# Elusive Otter's block restriction reads its power as it is (CR 509.1b, 613). Casting Mishra's Bauble, a noncreature spell,
+# triggers prowess and makes it a 2/2 until end of turn (CR 702.108a), so Bot2's Llanowar Elves (power 1) can no longer block
+# it, as well as the Ornithopter (power 0); Cathar Commando (power 3, not less than 2) still can, and the two trade.
+
+[Bot1 Deck]
+Island
+Elusive Otter
+Mishra's Bauble
+Island x17
+
+[Bot2 Deck]
+Forest
+Mox Pearl
+Mox Jet
+Llanowar Elves
+Cathar Commando
+Ornithopter
+Forest x14
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Elusive Otter.Cast
+Bot1.Battlefield.Island.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Cathar Commando.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mishra's Bauble.Cast
+[T3 Bot1.DeclareAttackers]
+? Bot1.Battlefield.Elusive Otter.Power = 2
+Bot1.Attack(Elusive Otter > Bot2)
+! Bot2.Block(Bot2.Battlefield.Ornithopter > Bot1.Battlefield.Elusive Otter)
+! Bot2.Block(Bot2.Battlefield.Llanowar Elves > Bot1.Battlefield.Elusive Otter)
+Bot2.Block(Bot2.Battlefield.Cathar Commando > Bot1.Battlefield.Elusive Otter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot2.Graveyard = Cathar Commando
+Bot1.Graveyard = Elusive Otter

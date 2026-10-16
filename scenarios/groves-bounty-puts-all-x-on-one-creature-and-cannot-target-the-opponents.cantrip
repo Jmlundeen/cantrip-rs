@@ -1,0 +1,38 @@
+# Grove's Bounty says "target creatures you control" (CR 115.1): Bot2's Llanowar Elves is not offered as a target, while Bot1's own
+# Ornithopter, the positive control, is. With X = 2 and a single target it takes all X (CR 601.2d): two +1/+1 counters.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Elusive Otter
+Ornithopter
+Forest x15
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+! Bot1.Hand.Elusive Otter.Cast(Bot2.Battlefield.Llanowar Elves; Ability: Adventure)
+Bot1.Hand.Elusive Otter.Cast(X: 2; Ability: Adventure)
+Bot1.Divide(Ornithopter: 2)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Elusive Otter
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 2
+Bot2.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = (absent)

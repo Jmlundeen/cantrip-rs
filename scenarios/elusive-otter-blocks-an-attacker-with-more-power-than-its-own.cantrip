@@ -1,0 +1,34 @@
+# Elusive Otter's restriction is about creatures blocking *it* (CR 509.1b): as a blocker it is unrestricted. 
+# Bot2's Cathar Commando (power 3) attacks and Bot1's Otter (power 1) may block it, even though the
+# Otter's power is less than the attacker's. The Otter dies and the Commando (3/1) takes 1 and dies too.
+
+[Bot1 Deck]
+Island
+Elusive Otter
+Island x18
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Cathar Commando
+Plains x17
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Elusive Otter.Cast
+Bot1.Battlefield.Island.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Cathar Commando.Cast
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Cathar Commando > Bot1)
+Bot1.Block(Elusive Otter > Cathar Commando)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Graveyard = Elusive Otter
+Bot2.Graveyard = Cathar Commando

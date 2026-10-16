@@ -1,0 +1,46 @@
+# Grove's Bounty (CR 715, 601.2d): Bot1 casts Elusive Otter as its Adventure with X = 3 on turn 1 (Black Lotus for GGG and a
+# Mox Emerald for the {G}), choosing as it is cast to put one +1/+1 counter on its Ornithopter and two on its Elvish Mystic.
+# Each target must get at least one. As it resolves the Adventure is exiled instead of going to the graveyard, and on turn 3
+# Bot1 casts the Otter itself from exile for {U}.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Mox Emerald
+Elusive Otter
+Ornithopter
+Elvish Mystic
+Island
+Forest x13
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Hand.Elusive Otter.Cast(X: 3; Ability: Adventure)
+Bot1.Divide(Ornithopter: 1; Elvish Mystic: 2)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+[T1 Bot1.Main2]
+? Exile = Elusive Otter
+? Bot1.Graveyard = Black Lotus
+? Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Elvish Mystic.Counters.PlusOnePlusOne = 2
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Exile.Elusive Otter.Cast
+
+[Expect]
+Exile.Count = 0
+Bot1.Battlefield.Elusive Otter.Power = 1
+Bot1.Battlefield.Ornithopter.Power = 1
+Bot1.Battlefield.Ornithopter.Toughness = 3
+Bot1.Battlefield.Elvish Mystic.Power = 3
+Bot1.Battlefield.Elvish Mystic.Toughness = 3

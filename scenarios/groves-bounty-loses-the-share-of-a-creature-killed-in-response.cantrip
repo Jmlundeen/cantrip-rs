@@ -1,0 +1,42 @@
+# Grove's Bounty with X = 3 divides its counters 1 / 2 between Bot1's Ornithopter and Elvish Mystic as it is cast. In response
+# Bot2 Bolts the Mystic, so its share is lost (CR 608.2b) and only the Ornithopter gets its one counter (official ruling: the
+# original distribution still applies and the counters for illegal targets are lost). The Adventure still resolves, so it is exiled.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Mox Emerald
+Elusive Otter
+Ornithopter
+Elvish Mystic
+Forest x14
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Elvish Mystic.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Elusive Otter.Cast(X: 3; Ability: Adventure)
+Bot1.Divide(Ornithopter: 1; Elvish Mystic: 2)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Elvish Mystic)
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Elusive Otter
+Bot1.Graveyard = Elvish Mystic; Black Lotus
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter.Toughness = 3
+Bot2.Graveyard = Lightning Bolt

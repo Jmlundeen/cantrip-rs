@@ -1,0 +1,30 @@
+# "Any number of target creatures" includes none (CR 601.2d, 115.1): with X = 2 and an Ornithopter to aim at, Bot1 may still
+# choose no target (an empty Divide), and then no counters are put anywhere. The Adventure resolves and is exiled (CR 715.4).
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Elusive Otter
+Ornithopter
+Forest x15
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Elusive Otter.Cast(X: 2; Ability: Adventure)
+Bot1.Divide()
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Elusive Otter
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = (absent)
