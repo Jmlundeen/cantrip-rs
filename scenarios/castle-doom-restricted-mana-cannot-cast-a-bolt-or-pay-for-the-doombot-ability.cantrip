@@ -1,0 +1,47 @@
+# The Castle's any-color mana is for artifact spells only (CR 106.6). Bot1 has two Castles: on turn 3 the first is tapped for {R} (restricted) and Mox Pearl and Mox Sapphire
+# stay untapped, with an Ornithopter to sacrifice. The pool is {R} (ArtifactSpells) and two unrestricted mana, three in all, yet:
+#   - Lightning Bolt (needs {R}, a Mox makes only {W} or {U}) is not offered: restricted mana can't cast a nonartifact spell;
+#   - the second Castle's "{3}, {T}, Sacrifice an artifact" is not offered: restricted mana can't pay an activation, so only two of the three mana count.
+# A free Mox Jet then supplies the third unrestricted mana and the very same activation is offered (the positive control) and makes a Doombot.
+
+[Bot1 Deck]
+Castle Doom
+Castle Doom
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Ornithopter
+Lightning Bolt
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Castle Doom.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Castle Doom.Play
+Bot1.Battlefield.Castle Doom.Activate(Ability: any color; Color: Red)
+? Bot1.Mana = {R} (ArtifactSpells)
+! Bot1.Hand.Lightning Bolt.Cast(Bot2)
+! Bot1.Battlefield.Castle Doom#2.Activate(Ability: Doombot)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Castle Doom#2.Activate(Ability: Doombot)
+Bot1.Choose(Ornithopter)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+? Bot1.Mana = {R} (ArtifactSpells)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Castle Doom; Castle Doom; Mox Pearl; Mox Sapphire; Mox Jet; Doombot
+Bot1.Graveyard = Ornithopter
+Bot2.Life = 20
+Stack.Count = 0

@@ -1,5 +1,5 @@
 # Enroot searches for a land card, and a search for a quality may find nothing (CR 701.23b): Bot1's library holds no land, so Bot1 finds nothing (the search is answered
-# with none), the graveyard stays empty and the library is shuffled all the same (CR 701.23, a search ends with a shuffle). The copy is still cast, so the Cultivator is no
+# with none), the graveyard stays empty and the library keeps its three cards. The copy is still cast, so the Cultivator is no
 # longer prepared and the copy is gone.
 
 [Bot1 Deck]

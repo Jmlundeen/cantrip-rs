@@ -1,0 +1,37 @@
+# Enroot is a sorcery (CR 307.1, 722.3c: the copy is cast with its own types): the prepared Cultivator's copy waits in exile, and with a Mox Emerald untapped to pay for it,
+# Bot1 is not offered it during Bot2's upkeep on turn 4. In Bot1's own main phase on turn 5 with an empty stack the same cast is offered (the positive control) and finds
+# the Mountain.
+
+[Bot1 Deck]
+Carnivorous Cultivator
+Mox Emerald
+Forest x5
+Island x3
+Mountain
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Carnivorous Cultivator.Cast
+Bot1.Pass
+[T4 Bot2.Upkeep]
+! Bot1.Exile.Enroot.Cast
+[T5 Bot1.Main1]
+Bot1.Exile.Enroot.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Search(Mountain)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Mountain
+Exile.Count = 0
+Bot1.Battlefield.Carnivorous Cultivator.Prepared = (absent)
+Stack.Count = 0

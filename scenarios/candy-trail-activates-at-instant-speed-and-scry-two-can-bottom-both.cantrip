@@ -1,5 +1,5 @@
-# Candy Trail's ability has no timing restriction, so Bot1 activates it during Bot2's upkeep on turn 4 (it is not a Clue or Food token, but an artifact with the printed
-# ability; CR 602.5d: instant speed unless stated). Its scry 2 on turn 1 puts both looked-at cards (Lightning Bolt, Black Lotus) on the bottom (CR 701.22a), so the top of
+# Candy Trail's ability has no timing restriction, so Bot1 activates it during Bot2's upkeep on turn 4 (it is a Food Clue artifact card with the printed
+# ability, not a token; CR 602.5d: instant speed unless stated). Its scry 2 on turn 1 puts both looked-at cards (Lightning Bolt, Black Lotus) on the bottom (CR 701.22a), so the top of
 # the library is Counterspell, drawn on turn 3, and the activation draws the card below it, Mountain. Life is 20 + 3.
 
 [Bot1 Deck]

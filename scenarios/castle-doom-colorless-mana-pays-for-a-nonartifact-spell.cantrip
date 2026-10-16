@@ -1,0 +1,39 @@
+# Castle Doom's "{T}: Add {C}" is unrestricted (CR 106.6 applies only to the any-color ability). On turn 4 Bot2's Duress is on the stack; Bot1 taps the Castle for {C} and an
+# Island for {U} and casts Mana Leak, a nonartifact spell, on it. Bot2 does not pay {3}, so Duress is countered and Bot1 keeps its hand (a Mana Leak paid for with the
+# Castle's {C}). Compare the any-color mana, which can't pay for it.
+
+[Bot1 Deck]
+Castle Doom
+Island
+Mana Leak
+Island x20
+
+[Bot2 Deck]
+Swamp
+Swamp
+Duress
+Swamp x20
+
+[Actions]
+Bot1.Hand.Castle Doom.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Duress.Cast(Bot1)
+Bot1.Battlefield.Castle Doom.Activate(Ability: Add {C})
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Mana Leak.Cast(Duress)
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot2.Graveyard = Duress
+Bot1.Graveyard = Mana Leak
+Bot1.Hand.Count = 5
+Bot1.Mana =
+Stack.Count = 0

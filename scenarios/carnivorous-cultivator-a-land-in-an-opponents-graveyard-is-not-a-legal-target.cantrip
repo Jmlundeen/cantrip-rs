@@ -1,0 +1,46 @@
+# "Return target land card from YOUR graveyard": Bot2 casts Entomb on turn 2 and puts a Mountain into Bot2's graveyard; Bot1's own graveyard has no land card. When the
+# Cultivator deals combat damage to Bot2 on turn 5 its trigger has no legal target (CR 115.1, 603.3d) and is removed: nothing is asked, the Mountain stays in Bot2's
+# graveyard and Bot1's hand gains nothing.
+
+[Bot1 Deck]
+Carnivorous Cultivator
+Forest x6
+Lightning Bolt
+Counterspell
+Duress
+Island x3
+
+[Bot2 Deck]
+Swamp
+Entomb
+Swamp x5
+Swamp
+Mountain
+Swamp x11
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Entomb.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Search(Mountain)
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Carnivorous Cultivator.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Attack(Carnivorous Cultivator > Bot2)
+! Bot1.Target
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot2.Graveyard = Entomb; Mountain
+Bot1.Hand = Forest; Forest; Forest; Lightning Bolt; Counterspell
+Stack.Count = 0

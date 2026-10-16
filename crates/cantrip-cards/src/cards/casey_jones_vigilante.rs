@@ -21,7 +21,7 @@ fn enters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// "Discard three cards at random" (CR 701.9b): a smaller hand is discarded whole.
+/// "Discard three cards at random" (CR 701.9a-b): the player chooses nothing, and a smaller hand is discarded whole.
 fn discard_three(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     discard_at_random(g, item.controller, 3);
     Ok(())

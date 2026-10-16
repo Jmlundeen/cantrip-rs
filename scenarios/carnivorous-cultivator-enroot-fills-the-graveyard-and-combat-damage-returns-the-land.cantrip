@@ -1,6 +1,6 @@
 # Carnivorous Cultivator enters prepared (CR 722.3a): a copy of Enroot waits in exile. On turn 5 Bot1 casts that copy (CR 722.3c) for {G}: the Cultivator stops being
-# prepared and the copy is gone (CR 722.3d; a copy of a spell is no card, so it leaves nothing in the graveyard, CR 707.10a), and the search takes the Mountain from the library to the graveyard, then shuffles (CR 701.23; the three cards left in the
-# library are only counted, a shuffle having mixed them). The Cultivator attacks the empty board, deals 2 combat damage to Bot2 and its trigger returns the Mountain,
+# prepared and the copy is gone (CR 722.3d; a copy of a spell is no card, so it leaves nothing in the graveyard, CR 707.10a), and the search takes the Mountain from the library to the graveyard (CR 701.23; the three cards left in the
+# library are only counted). The Cultivator attacks the empty board, deals 2 combat damage to Bot2 and its trigger returns the Mountain,
 # the only land card in the graveyard, to Bot1's hand.
 
 [Bot1 Deck]

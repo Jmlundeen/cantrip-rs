@@ -1,0 +1,46 @@
+# Casey Jones's enters trigger is on the stack when Bot2 answers with Lightning Bolt and kills him (3 toughness). The ability exists independently of its source (CR 113.7a):
+# it still resolves, Bot1 draws three cards (5 Mountains to 8, then cleanup discards one to seven), and the delayed discard it sets up (CR 603.7) still happens at Bot1's
+# next upkeep on turn 7, taking three more at random. Bot1's hand is all Mountains, so which are taken cannot matter. The graveyard, top first: three Mountains from the
+# upkeep, the cleanup Mountain, and Casey Jones at the bottom.
+
+[Bot1 Deck]
+Casey Jones, Vigilante
+Mountain x32
+
+[Bot2 Deck]
+Mountain
+Mountain
+Lightning Bolt
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Hand.Casey Jones, Vigilante.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Casey Jones, Vigilante)
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main2]
+? Bot1.Battlefield = Mountain; Mountain; Mountain
+? Bot1.Hand.Count = 8
+[T7 Bot1.Main1]
+
+[Expect]
+Bot1.Graveyard = Mountain; Mountain; Mountain; Mountain; Casey Jones, Vigilante
+Bot1.Hand.Count = 5
+Bot1.Battlefield = Mountain; Mountain; Mountain
+Stack.Count = 0

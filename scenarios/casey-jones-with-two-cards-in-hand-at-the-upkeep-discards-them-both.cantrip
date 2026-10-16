@@ -1,0 +1,43 @@
+# "Discard three cards at random" with fewer than three cards in hand discards the whole hand (CR 701.9). Bot1 plays out its free Ornithopters, casts Casey Jones on
+# turn 5 and draws Ornithopter, Mountain, Mountain; it casts the Ornithopter and keeps two Mountains. At the upkeep on turn 7 both Mountains are discarded and nothing more
+# is asked or lost; the draw step then draws an Island.
+
+[Bot1 Deck]
+Casey Jones, Vigilante
+Mountain x3
+Ornithopter x3
+Ornithopter x3
+Mountain x2
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ornithopter.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Hand.Casey Jones, Vigilante.Cast
+Bot1.Pass
+[T5 Bot1.Main2]
+Bot1.Hand.Ornithopter.Cast
+? Bot1.Hand = Mountain; Mountain
+[T7 Bot1.Upkeep]
+Bot1.Pass
+! Bot1.Discard
+[T7 Bot1.Main1]
+
+[Expect]
+Bot1.Graveyard = Mountain; Mountain
+Bot1.Hand = Island
+Stack.Count = 0
