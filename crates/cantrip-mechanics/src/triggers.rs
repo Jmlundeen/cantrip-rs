@@ -415,6 +415,20 @@ pub fn another_creature_you_control_enters(q: &dyn Query, source: ObjectId, even
     }
 }
 
+/// "Whenever a creature dies" (CR 700.4, 603.10a), looked back on: any creature, anyone's, as it last was on the battlefield.
+/// The ability carries the player who then controlled it (CR 608.2h). Use with `look_back: true`. Fecundity and Ashes of the
+/// Abhorrent print it.
+pub fn creature_dies(q: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::ZoneChange { old, from, to, .. }
+            if from.is(ZoneKind::Battlefield) && to.is(ZoneKind::Graveyard) && q.chars(*old).is(CardType::Creature) =>
+        {
+            Fired::about(Target::Player(q.controller(*old)))
+        }
+        _ => None,
+    }
+}
+
 /// "Whenever a creature you control dies" (CR 700.4, 603.10a), looked back on: the creature as it last was on the
 /// battlefield, under the controller it last had. Use with `look_back: true`. Grave Venerations and Warhost's Frenzy
 /// print it.
@@ -509,6 +523,7 @@ pub const BEGINNING_OF_YOUR_COMBAT: Trigger = when(EventMask::STEP_BEGAN, beginn
 pub const YOUR_END_STEP: Trigger = when(EventMask::STEP_BEGAN, your_end_step);
 pub const EACH_END_STEP: Trigger = when(EventMask::STEP_BEGAN, each_end_step);
 pub const CREATURE_YOU_CONTROL_ENTERS: Trigger = when(EventMask::ZONE_CHANGE, creature_you_control_enters);
+pub const CREATURE_DIES: Trigger = when(EventMask::ZONE_CHANGE, creature_dies);
 pub const CREATURE_YOU_CONTROL_DIES: Trigger = when(EventMask::ZONE_CHANGE, creature_you_control_dies);
 pub const ARTIFACT_SPELL_YOU_CAST: Trigger = when(EventMask::SPELL_CAST, artifact_spell_you_cast);
 pub const DEALS_COMBAT_DAMAGE_TO_PLAYER_SUBJECT: Trigger = when(EventMask::DAMAGE, deals_combat_damage_to_player_subject);

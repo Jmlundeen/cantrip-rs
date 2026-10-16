@@ -1,19 +1,6 @@
 use cantrip_api::*;
+use cantrip_mechanics::triggers::CREATURE_DIES;
 use cantrip_oracle as oracle;
-
-/// "Whenever a creature dies" (CR 700.4): any creature, anyone's, judged on the board as it was before it died
-/// (CR 603.10a). The ability carries the player who controlled it as it last existed on the battlefield (CR 608.2h),
-/// who is not necessarily Fecundity's controller.
-fn creature_dies(q: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired> {
-    match event {
-        Event::ZoneChange { old, from, to, .. }
-            if from.is(ZoneKind::Battlefield) && to.is(ZoneKind::Graveyard) && q.chars(*old).is(CardType::Creature) =>
-        {
-            Fired::about(Target::Player(q.controller(*old)))
-        }
-        _ => None,
-    }
-}
 
 /// That creature's controller may draw a card; a player who has left the game is asked nothing.
 fn may_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -28,7 +15,7 @@ fn may_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[triggered(when(EventMask::ZONE_CHANGE, creature_dies), may_draw, "Whenever a creature dies, that creature's controller may draw a card.")
+    abilities: &[triggered(CREATURE_DIES, may_draw, "Whenever a creature dies, that creature's controller may draw a card.")
         .look_back()],
     ..oracle::FECUNDITY
 };

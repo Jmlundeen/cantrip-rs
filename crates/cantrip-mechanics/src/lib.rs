@@ -313,13 +313,20 @@ pub fn exile_target_until_leaves_effect(g: &mut dyn Game, item: &StackItem) -> R
     Ok(())
 }
 
-/// Airbend (CR 701.65a): exiles the resolving ability's legal targets together, and each card exiled this way may be
-/// cast by its owner for {2} rather than its mana cost for as long as it stays exiled. A token or a copy is exiled and
-/// gone: only a card can be cast again. Appa, Steadfast Guardian and Aang, Swift Savior print it.
+/// Airbend (CR 701.65a): exiles the resolving ability's legal targets together (`airbend_all`). Appa, Steadfast Guardian
+/// and Aang, Swift Savior print it.
 pub fn airbend(g: &mut dyn Game, item: &StackItem) {
     let targets: Vec<ObjectId> =
         (0..item.target_count as usize).filter(|&slot| g.target_legal(item, slot)).filter_map(|slot| item.targets[slot].object()).collect();
-    for exiled in g.exile_all(&targets) {
+    airbend_all(g, &targets);
+}
+
+/// Airbend (CR 701.65a) these objects, targeted or not: they are exiled together, and each card exiled this way may be cast
+/// by its owner for {2} rather than its mana cost for as long as it stays exiled. A token or a copy is exiled and gone: only
+/// a card can be cast again. Avatar's Wrath ("airbend all other creatures") and Monk Gyatso ("you may airbend that
+/// creature") airbend what they name without targeting it; `airbend` is the targeted form.
+pub fn airbend_all(g: &mut dyn Game, objects: &[ObjectId]) {
+    for exiled in g.exile_all(objects) {
         let obj = *g.obj(exiled);
         if obj.zone.is(ZoneKind::Exile) && !obj.token && !obj.card_copy {
             g.allow_play(exiled, obj.owner, PlayGrant { instead: Some(mana("{2}")), ..PlayGrant::CAST });
