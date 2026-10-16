@@ -21,12 +21,14 @@ pub static NINJA_TURTLE_SPIRIT: CardDef = CardDef {
 /// ones that attack the same thing are created together (CR 101.4). They were never declared as attackers (CR 508.4).
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let token = g.card_id(&NINJA_TURTLE_SPIRIT);
-    if sneak::paid(item) {
+    if sneak::paid(g, item) {
         let mut chosen: Vec<Target> = Vec::new();
         for _ in 0..3 {
             chosen.extend(choose_attack_target(g, item.controller, item.object)?);
         }
         create_attacking(g, item.controller, token, &chosen)?;
+        // With nothing to attack (no defender is left to choose) they still enter tapped, as the sneak cost says.
+        g.create_tokens(token, item.controller, 3 - chosen.len() as u32, true)?;
     } else {
         g.create_tokens(token, item.controller, 3, false)?;
     }

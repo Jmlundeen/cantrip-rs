@@ -1,0 +1,54 @@
+# Ruling (CR 707.10): a copy of a bargained spell is also bargained. Bot1 has Leyline of Resonance out and casts Torch the Tower
+# bargained, sacrificing Shared Animosity (an enchantment), at its own Ornithopter; the Leyline copies the spell and the copy is
+# aimed at Bot2's Keen-Eyed Curator (a 3/3). The copy deals 3, not 2, and the Curator is exiled instead of dying, and the copy
+# scries 1 as well as the original (two scries asked). The original then kills the Ornithopter, exiled too.
+
+[Bot1 Deck]
+Leyline of Resonance
+Black Lotus
+Shared Animosity
+Mox Ruby
+Torch the Tower
+Ornithopter
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Mox Emerald
+Forest
+Keen-Eyed Curator
+Forest x17
+
+[Actions]
+Bot1.Accept
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Shared Animosity.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Forest.Play
+Bot2.Hand.Keen-Eyed Curator.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Forest.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Torch the Tower.Cast(Ornithopter)
+Bot1.Modes(Bargain:)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Choose(Shared Animosity)
+? Stack.Count = 2
+Bot1.Pass
+Bot1.Target(Bot2.Battlefield.Keen-Eyed Curator)
+Bot1.Pass
+Bot1.Arrange(Mountain | )
+Bot1.Pass
+Bot1.Arrange(Mountain | )
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Keen-Eyed Curator; Ornithopter
+Bot2.Graveyard.Count = 0
+Stack.Count = 0
