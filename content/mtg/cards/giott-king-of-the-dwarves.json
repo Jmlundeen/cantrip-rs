@@ -1,0 +1,11 @@
+{
+  "name": "Giott, King of the Dwarves",
+  "manaCost": "{R}{W}",
+  "type": "Legendary Creature — Dwarf Noble",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "Double strike\nWhenever Giott or another Dwarf you control enters and whenever an Equipment you control enters, you may discard a card. If you do, draw a card.",
+  "keywords": [
+    "DoubleStrike"
+  ]
+}

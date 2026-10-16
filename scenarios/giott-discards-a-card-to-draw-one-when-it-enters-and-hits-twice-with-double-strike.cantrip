@@ -1,0 +1,37 @@
+# "Whenever Giott or another Dwarf you control enters ... you may discard a card. If you do, draw a card." Giott itself entering is the first of the events: Bot1 discards the
+# Island and draws the Swamp from the top of the library (Bot1 goes first, so there is no draw before it). On turn 3 Giott's double strike (CR 702.4) deals its 1 power
+# twice to the unblocked attacker's player: Bot2 is at 18.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Giott, King of the Dwarves
+Island
+Island
+Island
+Island
+Swamp
+Forest
+Forest x11
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Giott, King of the Dwarves.Cast
+Bot1.Choose(Island)
+[T1 Bot1.Main2]
+? Bot1.Graveyard = Island
+? Bot1.Hand.Count = 4
+? Bot1.Library.Count = 12
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Giott, King of the Dwarves > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield.Giott, King of the Dwarves.Keywords = DoubleStrike

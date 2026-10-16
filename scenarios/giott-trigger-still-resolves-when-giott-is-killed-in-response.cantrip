@@ -1,0 +1,45 @@
+# The trigger does not depend on Giott staying on the battlefield: Bot2's Lightning Bolt kills Giott (1/1) in response to its own enters trigger on turn 3, and the trigger still
+# resolves (CR 113.7a, 608.2), so Bot1 may discard the Island and draw the Swamp from the top of the library.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Giott, King of the Dwarves
+Island
+Island
+Island
+Island
+Plains
+Swamp
+Forest
+Forest x11
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Plains x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Giott, King of the Dwarves.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Giott, King of the Dwarves)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Choose(Island)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Island; Giott, King of the Dwarves
+Bot2.Graveyard = Lightning Bolt
+Bot1.Hand.Count = 5
