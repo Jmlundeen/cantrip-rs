@@ -1,0 +1,38 @@
+# Guiding Hydra cast for X = 2 (Plains and two Moxen, CR 107.3) enters with two +1/+1 counters (CR 614.1c), a 3/2. At the
+# beginning of combat on its controller's turn the trigger asks whether to remove one; accepted, "if you do" (CR 608.2c) puts
+# a counter on each OTHER creature its controller controls: the Ornithopter gets one, the Hydra itself keeps its remaining
+# one, and the Mox artifacts, which are not creatures, get none.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Ruby
+Ornithopter
+Guiding Hydra
+Plains x11
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Guiding Hydra.Cast(X: 2)
+[T1 Bot1.BeginCombat]
+? Bot1.Battlefield.Guiding Hydra.Counters.PlusOnePlusOne = 2
+Bot1.Accept
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Guiding Hydra.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Guiding Hydra.Power = 2
+Bot1.Battlefield.Guiding Hydra.Toughness = 1
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter.Power = 1
+Bot1.Battlefield.Ornithopter.Toughness = 3
+Bot1.Battlefield.Count = 5

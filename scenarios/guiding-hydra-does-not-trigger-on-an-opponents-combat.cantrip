@@ -1,0 +1,26 @@
+# "At the beginning of combat on your turn": Bot1's Guiding Hydra (X = 1) is asked on turn 1 (declined, the control) but
+# not at the beginning of Bot2's combat on turn 2 (a "you may" put to Bot1 there would fail `! Bot1.Accept`).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Guiding Hydra
+Plains x12
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Guiding Hydra.Cast(X: 1)
+[T1 Bot1.BeginCombat]
+Bot1.Decline
+[T2 Bot2.BeginCombat]
+! Bot1.Accept
+
+[Expect]
+Turn = 2
+Bot1.Battlefield.Guiding Hydra.Counters.PlusOnePlusOne = 1
