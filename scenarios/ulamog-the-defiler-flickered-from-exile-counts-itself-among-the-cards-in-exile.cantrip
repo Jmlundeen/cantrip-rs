@@ -1,0 +1,42 @@
+# Ulamog, the Defiler's ruling: "If Ulamog is entering the battlefield directly from exile, it will see itself when
+# determining which card has the greatest mana value among cards in exile." Cast on turn 1, Ulamog enters with two
+# +1/+1 counters (a Counterspell is the costliest card its cast trigger exiled). Bot1 then Ephemerates it: Ulamog is
+# exiled and returned as a new object (CR 400.7), and as it enters it is still in exile, so the greatest mana value there is
+# its own 10. It enters with ten counters, a 17/17.
+
+[Bot1 Deck]
+Island
+Ulamog, the Defiler
+Black Lotus x4
+Ephemerate
+Island x8
+
+[Bot2 Deck]
+Plains x7
+Counterspell
+Plains x8
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ulamog, the Defiler.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Ulamog, the Defiler.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Ephemerate.Cast(Ulamog, the Defiler)
+[T1 Bot1.End]
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Battlefield = Island; Ulamog, the Defiler
+Bot1.Battlefield.Ulamog, the Defiler.Counters.PlusOnePlusOne = 10
+Bot1.Battlefield.Ulamog, the Defiler.Power = 17
+Exile = Counterspell; Plains; Plains; Plains; Plains; Ephemerate

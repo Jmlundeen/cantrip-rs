@@ -1,0 +1,37 @@
+# Ulamog, the Defiler put onto the battlefield by Show and Tell is not cast, so its cast trigger exiles nothing, and with no
+# card in exile the greatest mana value there is none: it enters with no +1/+1 counters, a 7/7. On turn 3 it attacks with
+# annihilator X, X zero (CR 702.86a): Bot2 sacrifices nothing and is asked nothing, and takes 7.
+
+[Bot1 Deck]
+Island
+Ulamog, the Defiler
+Black Lotus
+Show and Tell
+Island x11
+
+[Bot2 Deck]
+Plains x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Ulamog, the Defiler)
+Bot2.Choose()
+[T1 Bot1.Main2]
+? Exile.Count = 0
+? Bot1.Battlefield.Ulamog, the Defiler.Power = 7
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Attack(Ulamog, the Defiler > Bot2)
+! Bot2.Choose
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield.Ulamog, the Defiler.Counters.PlusOnePlusOne = (absent)
+Bot2.Battlefield = Plains
+Bot2.Life = 13
