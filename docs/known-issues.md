@@ -40,6 +40,7 @@ keeps it).
 | [KI-3](#ki-3-engine-paths-no-scenario-runs) | Engine paths no scenario runs | Low | Unexercised |
 | [KI-4](#ki-4-scenarios-waiting-on-cards) | Scenarios waiting on cards the engine does not have | Low | Open |
 | [KI-5](#ki-5-a-spell-that-has-left-the-stack-is-judged-by-its-printed-keywords) | A spell that has left the stack is judged by its printed characteristics | Low | Suspected |
+| [KI-9](#ki-9-a-copy-of-a-modal-spell-cannot-be-given-new-targets) | A copy of a modal spell cannot be given new targets | Medium | Open |
 
 ## Issues
 
@@ -130,3 +131,18 @@ information for a spell that leaves the stack, fixes it. No implemented card gra
 no scenario can reach it yet.
 
 **Scenarios.** None yet; the first card that gives a creature spell flying on the stack (then a second flier cast under Momo) reaches it.
+### KI-9: A copy of a modal spell cannot be given new targets
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Medium | Open | engine | 2026-10-16, Restoration Magic copied by Leyline of Resonance |
+
+**Notes.** "You may choose new targets for the copy" (CR 707.10c, 115.7d) is offered by `retarget` in
+`crates/cantrip-rules/src/ops.rs` from `cx.card(obj.card).spell_targets()`, the spell's printed target slots. A modal spell's
+targets are those of the modes it was cast with (`ModeDef::targets`, chosen by `StackItem::modes`, as `cast_modes`/the target-spec
+builder in `crates/cantrip-rules/src/actions.rs` reads them), so the copy keeps its old targets and is never asked.
+Affects every modal spell (spree, tiered, escalate, "choose one") that is copied with a chance to retarget (Leyline of
+Resonance, Lutri, storm and replicate copies). A fix has `retarget` take the specs of the copy's chosen modes.
+
+**Scenarios.**
+- [`scenarios/restoration-magic-copy-may-be-aimed-at-a-new-target.cantrip`](../scenarios/restoration-magic-copy-may-be-aimed-at-a-new-target.cantrip) - the copy of a Cura aimed at a Plains (marked `# Known bug`).

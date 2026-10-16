@@ -1,0 +1,46 @@
+# Thalia, Guardian of Thraben ("Noncreature spells cost {1} more to cast") raises the total cost of Restoration Magic,
+# mode cost included (CR 601.2f): Cure is {W}+{0}+{1} = 2 and Cura {W}+{1}+{1} = 3. Bot1 holds two Plains. Cura would owe
+# {1} and is cancelled; Cure is paid exactly by the two (the empty pool afterwards shows the tax was charged, else a
+# Plains' mana would be left over), and gives Mother of Runes hexproof and indestructible.
+
+[Bot1 Deck]
+Plains
+Plains
+Mother of Runes
+Restoration Magic
+Plains x3
+Plains x13
+
+[Bot2 Deck]
+Plains
+Black Lotus
+Thalia, Guardian of Thraben
+Plains x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Mother of Runes.Cast
+Bot2.Hand.Plains.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Thalia, Guardian of Thraben.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Restoration Magic.Cast
+Bot1.Modes(Cura)
+Bot1.Target(Bot1.Battlefield.Mother of Runes)
+Bot1.Cancel
+Bot1.Hand.Restoration Magic.Cast
+Bot1.Modes(Cure)
+Bot1.Target(Bot1.Battlefield.Mother of Runes)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Restoration Magic
+Bot1.Life = 20
+Bot1.Battlefield.Mother of Runes.Keywords = Hexproof; Indestructible

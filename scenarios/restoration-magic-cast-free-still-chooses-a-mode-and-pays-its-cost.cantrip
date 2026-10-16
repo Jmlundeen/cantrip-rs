@@ -1,0 +1,55 @@
+# Restoration Magic cast without paying its mana cost (Mind's Desire, CR 118.9, 601.3): "you must still choose exactly
+# one mode and pay the associated additional cost" (ruling of 2025-06-06). Every card of Bot1's library is Restoration
+# Magic, so the exiled card is one. With the pool empty, Cura's {1} is owed and the cast is cancelled; Cure ({0}) is
+# then cast for nothing as the positive control (a Cure gains no life). Bot1's Mox Pearl pays Cura's {1} on the next
+# cast, and its 3 life is gained. Mind's Desire and its five storm copies each exiled one, so four stay in exile
+# after the two casts.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mind's Desire
+Mox Pearl
+Plains
+Restoration Magic x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Mind's Desire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Exile.Restoration Magic.Cast
+Bot1.Modes(Cura)
+Bot1.Target(Bot1.Battlefield.Mox Jet)
+Bot1.Cancel
+Bot1.Exile.Restoration Magic.Cast
+Bot1.Modes(Cure)
+Bot1.Target(Bot1.Battlefield.Mox Jet)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 20
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Exile.Restoration Magic.Cast
+Bot1.Modes(Cura)
+Bot1.Target(Bot1.Battlefield.Mox Jet)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+
+[Expect]
+Bot1.Life = 23
+Exile.Count = 4
+Bot1.Battlefield.Mox Jet.Keywords = Hexproof; Indestructible

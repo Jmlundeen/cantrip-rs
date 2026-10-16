@@ -1,0 +1,48 @@
+# A copy of Restoration Magic (CR 707.10) is the same spell with the same mode: Leyline of Resonance copies Bot1's Cura (it
+# targets only a single creature Bot1 controls). The copy keeps the mode (no modes question is asked, the ruling of
+# 2025-06-06: "You cannot choose a new mode") and pays nothing: the two Plains tapped for Cura are the only mana spent and
+# nothing is owed for the copy. Both resolve: Mother of Runes gains hexproof and indestructible and Bot1 gains 3 life for
+# each, 6 in all (a Cura copy gains life, so the mode is Cura and not Cure).
+
+[Bot1 Deck]
+Leyline of Resonance
+Plains
+Plains
+Mother of Runes
+Restoration Magic
+Plains
+Plains
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Accept
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Mother of Runes.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Restoration Magic.Cast
+Bot1.Modes(Cura)
+Bot1.Target(Bot1.Battlefield.Mother of Runes)
+? Stack.Count = 2
+! Bot1.Modes
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 2
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Life = 26
+Bot1.Battlefield.Mother of Runes.Keywords = Hexproof; Indestructible
+Bot1.Graveyard = Restoration Magic

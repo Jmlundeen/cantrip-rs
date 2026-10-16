@@ -874,7 +874,7 @@ pub struct OptionalCost {
 }
 
 /// One mode of a modal spell or ability (CR 700.2). Its target slots are each one target (CR 700.2c); `cost` is what
-/// choosing it adds to the total cost, for spree (CR 702.172a).
+/// choosing it adds to the total cost, for spree (CR 702.172a) and tiered (CR 702.183a).
 #[derive(Clone, Copy)]
 pub struct ModeDef {
     pub text: &'static str,

@@ -1,0 +1,56 @@
+# Restoration Magic's mana value is its mana cost's, {W} = 1, whichever mode is chosen and whatever cost it adds
+# (CR 702.183a, 202.3). Cura costs {W}{1} to cast, so counting the mode's cost would make it mana value 2. Bot2's Spell
+# Snare ("Counter target spell with mana value 2") has Pyroclasm ({1}{R}, mana value 2) to target, so it is castable, and
+# Bot1's Cura on the stack is not among its targets (the refusal); Pyroclasm is the positive control and is countered.
+# Cura then resolves: Bot1's Mother of Runes gains hexproof and indestructible and Bot1 gains 3 life.
+
+[Bot1 Deck]
+Plains
+Plains
+Mother of Runes
+Restoration Magic
+Plains x3
+Plains x13
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Mox Sapphire
+Pyroclasm
+Spell Snare
+Mountain x3
+Mountain x13
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Mother of Runes.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Pyroclasm.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Restoration Magic.Cast
+Bot1.Modes(Cura)
+Bot1.Target(Bot1.Battlefield.Mother of Runes)
+Bot1.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+! Bot2.Hand.Spell Snare.Cast(Stack.Restoration Magic)
+Bot2.Hand.Spell Snare.Cast(Stack.Pyroclasm)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Mother of Runes.Keywords = Hexproof; Indestructible
+Bot1.Battlefield.Mother of Runes.Damage = 0
+Bot1.Life = 23
+Bot2.Graveyard = Spell Snare; Pyroclasm

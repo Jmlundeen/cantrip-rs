@@ -580,7 +580,7 @@ impl ModeDef {
         ModeDef { targets, ..self }
     }
 
-    /// What choosing it adds to the total cost: spree (CR 702.172a).
+    /// What choosing it adds to the total cost: spree (CR 702.172a), tiered (CR 702.183a).
     pub const fn cost(self, cost: ManaCost) -> ModeDef {
         ModeDef { cost, ..self }
     }
