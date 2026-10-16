@@ -1,0 +1,45 @@
+# Binding Negotiation against an empty hand: Bot1 has played out all seven cards on turn 1 (five Moxen and a Black Lotus,
+# and a Simian Spirit Guide exiled for mana), so there is nothing to reveal and nothing to choose from it. No card was
+# chosen, so Bot2 may put a face-up exiled card Bot1 owns into Bot1's graveyard, and puts the Spirit Guide there.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Black Lotus
+Simian Spirit Guide
+Island x8
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Binding Negotiation
+Swamp x12
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Simian Spirit Guide.Activate
+[T2 Bot2.Main1]
+? Bot1.Hand.Count = 0
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Binding Negotiation.Cast(Bot1)
+Bot2.Choose(Simian Spirit Guide)
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Exile.Count = 0
+Bot1.Graveyard = Simian Spirit Guide
+Bot1.Revealed = (absent)
+Bot2.Graveyard = Binding Negotiation
