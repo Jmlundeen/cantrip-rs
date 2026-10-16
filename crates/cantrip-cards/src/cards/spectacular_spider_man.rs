@@ -14,12 +14,7 @@ fn gain_flying(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 fn protect_team(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     for creature in g.permanents_of(item.controller) {
         if g.chars(creature).is(CardType::Creature) {
-            g.add_effect(
-                item.object,
-                creature,
-                EffectKind::AddKeywords(Keywords::of(&[Keyword::Hexproof, Keyword::Indestructible])),
-                Duration::EndOfTurn,
-            );
+            cantrip_mechanics::effects::gain_hexproof_and_indestructible_until_end_of_turn(g, item.object, creature);
         }
     }
     Ok(())

@@ -72,6 +72,7 @@ pub mod replacements;
 pub mod statics;
 pub mod storm;
 pub mod spree;
+pub mod tiered;
 pub mod sneak;
 pub mod spectacle;
 pub mod suspend;

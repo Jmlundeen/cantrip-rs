@@ -46,9 +46,8 @@ fn counters_on_attackers(g: &mut dyn Game, _: &StackItem) -> Result<(), Suspend>
 fn protect_creatures(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let creatures: Vec<ObjectId> =
         g.permanents_of(item.controller).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
-    let keywords = Keywords::of(&[Keyword::Hexproof, Keyword::Indestructible]);
     for id in creatures {
-        g.add_effect(item.object, id, EffectKind::AddKeywords(keywords), Duration::EndOfTurn);
+        cantrip_mechanics::effects::gain_hexproof_and_indestructible_until_end_of_turn(g, item.object, id);
     }
     Ok(())
 }
