@@ -1,0 +1,52 @@
+# Bold Biochemist's power-up is activated only once (CR 702.193a). It enters on turn 3 and its power-up, {5}{U} less its mana
+# cost {1}{U}, costs {4} (CR 702.193b, 118.7); once that has resolved, Sol Ring, Mana Crypt and Black Lotus are still untapped,
+# enough for {4} again, and the ability is not offered a second time.
+
+[Bot1 Deck]
+Ancient Tomb
+Mana Crypt
+Sol Ring
+Mox Sapphire
+Mox Jet
+Bold Biochemist
+Black Lotus
+Ancient Tomb
+Ancient Tomb x10
+
+[Bot2 Deck]
+Island x14
+
+[Dice]
+1
+
+[Actions]
+Bot1.Hand.Ancient Tomb.Play
+Bot1.Hand.Mana Crypt.Cast
+Bot1.Pass
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Ancient Tomb.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Bold Biochemist.Cast
+Bot1.Pass
+Bot1.Battlefield.Ancient Tomb#1.Activate
+Bot1.Battlefield.Ancient Tomb#2.Activate
+Bot1.Battlefield.Bold Biochemist.Activate
+? Bot1.Mana =
+Bot1.Pass
+! Bot1.Battlefield.Bold Biochemist.Activate
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Bold Biochemist.Counters.PlusOnePlusOne = 1
+Bot1.Hand.Count = 2
+Bot1.Battlefield.Mana Crypt.Tapped = false
