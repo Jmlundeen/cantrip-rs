@@ -253,6 +253,24 @@ pub const CARD_IN_A_GRAVEYARD: TargetSpec = target(card_in_a_graveyard_filter);
 /// "Target noncreature spell". Spell Pierce and Stubborn Denial print it.
 pub const NONCREATURE_SPELL: TargetSpec = target(noncreature_spell_filter);
 
+/// "Target [color A] or [color B] spell" (CR 115.1, 105.2): a spell on the stack that is either color, or both. The color
+/// words are those of the targeting spell's own text (CR 612), so a text-changing effect on it changes them; `A` and `B`
+/// are `Color`s as `u8`. Flashfreeze (red or green) and Precise Redaction (white or black) print it.
+fn spell_of_either_color_filter<const A: u8, const B: u8>(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    let words = q.words(asker.source);
+    spell_filter(q, asker, t)
+        && matches!(t, Target::Object(id) if {
+            let colors = q.chars(id).colors;
+            colors.has(words.color(Color::ALL[A as usize])) || colors.has(words.color(Color::ALL[B as usize]))
+        })
+}
+
+/// "Target [color A] or [color B] spell": see `spell_of_either_color_filter`. Used as
+/// `targets::spell_of_either_color::<{ Color::Red as u8 }, { Color::Green as u8 }>()`.
+pub const fn spell_of_either_color<const A: u8, const B: u8>() -> TargetSpec {
+    target(spell_of_either_color_filter::<A, B>)
+}
+
 /// Whether a target is a card of one of these types in the asker's own graveyard ("target creature card in your
 /// graveyard", CR 115.1). Eternal Witness takes any card (`types` empty); Recurring Nightmare and Metamorphosis Fanatic
 /// take a creature card.

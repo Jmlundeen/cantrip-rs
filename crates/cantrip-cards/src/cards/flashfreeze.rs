@@ -1,26 +1,14 @@
 use cantrip_api::*;
-use cantrip_mechanics::counter_target;
+use cantrip_mechanics::{counter_target, targets};
 use cantrip_oracle as oracle;
 
-/// "target red or green spell": a spell on the stack that is red, green or both, the color words read through this
-/// spell's own text (CR 612).
-fn red_or_green_spell(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    let words = q.words(asker.source);
-    matches!(t, Target::Object(id)
-        if q.state().stack.iter().any(|i| i.kind == StackKind::Spell && i.object == id)
-            && {
-                let colors = q.chars(id).colors;
-                colors.has(words.color(Color::Red)) || colors.has(words.color(Color::Green))
-            })
-}
-
-/// "Counter target red or green spell."
+/// "Counter target red or green spell." (The color words are read through this spell's own text, CR 612, by the target slot.)
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     counter_target(g, item, 0);
     Ok(())
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: spell(&[target(red_or_green_spell)], effect),
+    spell: spell(&[targets::spell_of_either_color::<{ Color::Red as u8 }, { Color::Green as u8 }>()], effect),
     ..oracle::FLASHFREEZE
 };
