@@ -1,0 +1,11 @@
+{
+  "name": "Bloodletter of Aclazotz",
+  "manaCost": "{1}{B}{B}{B}",
+  "type": "Creature — Vampire Demon",
+  "power": 2,
+  "toughness": 4,
+  "oracleText": "Flying\nIf an opponent would lose life during your turn, they lose twice that much life instead. (Damage causes loss of life.)",
+  "keywords": [
+    "Flying"
+  ]
+}

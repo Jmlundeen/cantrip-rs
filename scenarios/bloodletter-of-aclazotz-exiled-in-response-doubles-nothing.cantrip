@@ -1,0 +1,49 @@
+# A replacement effect applies to the event as it happens (CR 614.1, 614.4): Bot1 Bolts Bot2 on its own turn 3 with
+# Bloodletter of Aclazotz on the battlefield, and Bot2 answers with Swords to Plowshares on Bloodletter. Bot1 gains 2
+# (Bloodletter's power: 20 -> 22, not doubled - it is no loss and Bot1 no opponent), and when the Bolt resolves there is
+# no Bloodletter left: Bot2 loses 3, not 6 (20 -> 17).
+
+[Bot1 Deck]
+Mountain
+Mox Jet
+Black Lotus
+Bloodletter of Aclazotz
+Lightning Bolt
+Mountain
+Swamp x14
+
+[Bot2 Deck]
+Plains
+Swords to Plowshares
+Island x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Bloodletter of Aclazotz.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Bloodletter of Aclazotz)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Life = 22
+? Exile = Bloodletter of Aclazotz
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Bot1.Life = 22
+Bot2.Life = 17
+Exile = Bloodletter of Aclazotz

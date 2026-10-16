@@ -1,0 +1,48 @@
+# Two Bloodletters of Aclazotz under Bot1 both apply to one loss of life by Bot2. Bot2, the player whose life it is, chooses
+# which applies first (CR 616.1); the second still applies to the event the first has doubled (CR 616.1f), and neither
+# applies twice (CR 614.5). Lightning Bolt on Bot1's turn 5: 3 becomes 6 becomes 12 (20 -> 8).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Black Lotus
+Bloodletter of Aclazotz
+Bloodletter of Aclazotz
+Dark Ritual
+Swamp
+Mountain
+Lightning Bolt
+Swamp x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Bloodletter of Aclazotz.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Bloodletter of Aclazotz.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot2.Replace(Bloodletter of Aclazotz)
+
+[Expect]
+Turn = 5
+Bot2.Life = 8

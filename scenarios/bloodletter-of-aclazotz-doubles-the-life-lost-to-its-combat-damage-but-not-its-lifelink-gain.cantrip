@@ -1,0 +1,44 @@
+# Bloodletter of Aclazotz wears Basilisk Collar (deathtouch and lifelink) and attacks Bot2 on Bot1's turn 3. Its 2 combat
+# damage makes Bot2 lose 2 life (CR 120.3a), which Bloodletter doubles to 4 (20 -> 16). The damage itself is still 2, so
+# lifelink gains Bot1 only 2 (CR 120.3f; Bloodletter's 2023-11-10 ruling: a 1/1 lifelinker makes the opponent lose 2 and
+# you gain 1): 20 -> 22, not 24.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Black Lotus
+Bloodletter of Aclazotz
+Basilisk Collar
+Swamp
+Swamp
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Bloodletter of Aclazotz.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Hand.Basilisk Collar.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Basilisk Collar.Activate(Bloodletter of Aclazotz)
+Bot1.Pass
+Bot1.Attack(Bloodletter of Aclazotz > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Life = 22
+Bot2.Life = 16

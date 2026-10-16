@@ -1,0 +1,49 @@
+# Paying life is losing it (CR 119.4), so Bloodletter of Aclazotz doubles life an opponent pays on its controller's turn.
+# Bot2 plays Marsh Flats on its turn 2 and cracks it on Bot1's turn 3: the cost is 1 life, and Bot2 loses 2 (20 -> 18).
+# On its own turn 4 Bot2 cracks Polluted Delta for the same 1 life, and loses only 1 (18 -> 17).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Black Lotus
+Bloodletter of Aclazotz
+Swamp x16
+
+[Bot2 Deck]
+Marsh Flats
+Polluted Delta
+Island x5
+Island
+Swamp x4
+Island x8
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Bloodletter of Aclazotz.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Marsh Flats.Play
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Battlefield.Marsh Flats.Activate
+? Bot2.Life = 18
+Bot2.Pass
+Bot2.Search(Swamp)
+[T4 Bot2.Main1]
+Bot2.Hand.Polluted Delta.Play
+Bot2.Battlefield.Polluted Delta.Activate
+? Bot2.Life = 17
+Bot2.Pass
+Bot2.Search(Swamp)
+
+[Expect]
+Turn = 4
+Bot1.Life = 20
+Bot2.Life = 17
+Bot2.Battlefield = Swamp; Swamp

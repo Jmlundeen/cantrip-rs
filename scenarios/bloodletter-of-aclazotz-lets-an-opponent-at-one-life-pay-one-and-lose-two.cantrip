@@ -1,0 +1,47 @@
+# A player may pay life only if their life total is at least the payment (CR 119.4): the payment, not the loss a
+# replacement effect makes of it. Bot2 pays 19 life for Toxic Deluge on its own turn 2 (no Bloodletter yet: 20 -> 1).
+# Bot1 casts Bloodletter of Aclazotz on turn 3, and Bot2, at 1 life, may still crack Marsh Flats for its 1 life; Bloodletter
+# makes that a loss of 2 (1 -> -1), and Bot2 loses the game (CR 119.6, 704.5a).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Dark Ritual
+Bloodletter of Aclazotz
+Swamp
+Swamp x15
+
+[Bot2 Deck]
+Marsh Flats
+Black Lotus
+Toxic Deluge
+Island x17
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Marsh Flats.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Toxic Deluge.Cast(X: 19)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Life = 1
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Bloodletter of Aclazotz.Cast
+Bot1.Pass
+Bot1.Pass
+Bot2.Battlefield.Marsh Flats.Activate
+
+[Expect]
+Turn = 3
+Bot2.Life = -1
+Bot2.Status = Lost

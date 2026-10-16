@@ -1,0 +1,48 @@
+# Bloodletter of Aclazotz: "If an opponent would lose life during your turn, they lose twice that much life instead."
+# Bot1 casts it on turn 1. On Bot2's turn 2 a Lightning Bolt to Bot2 is 3 damage and 3 life lost: not Bot1's turn, so
+# nothing is doubled (20 -> 17). On Bot1's turn 3 the same Bolt makes Bot2 lose 6 (17 -> 11). On that turn Bot1 itself
+# pays 1 life for Marsh Flats: Bot1 is not an opponent of Bloodletter's controller, so it loses only the 1 (CR 119.4,
+# 614.1a).
+
+[Bot1 Deck]
+Mountain
+Mox Jet
+Black Lotus
+Bloodletter of Aclazotz
+Lightning Bolt
+Lightning Bolt
+Marsh Flats
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Bloodletter of Aclazotz.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 17
+[T3 Bot1.Main1]
+Bot1.Hand.Marsh Flats.Play
+Bot1.Battlefield.Marsh Flats.Activate
+Bot1.Search(Swamp)
+? Bot1.Life = 19
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Bot1.Life = 19
+Bot2.Life = 11
