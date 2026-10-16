@@ -1,0 +1,52 @@
+# CR 610.3c: "until this artifact leaves the battlefield" - if it has already left when the trigger resolves, the permanent is
+# not exiled at all. On turn 5 Solitary Cell's trigger targets Bot2's Elvish Mystic and in response Bot2 sacrifices
+# Haywire Mite (gaining 2 life) to exile the Cell: the Mystic stays on the battlefield and the Cell is the only card in exile.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Plains
+Solitary Cell
+Plains x14
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Haywire Mite
+Elvish Mystic
+Forest
+Forest
+Forest x10
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Haywire Mite.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Solitary Cell.Cast
+Bot1.Pass
+Bot1.Target(Elvish Mystic)
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Haywire Mite.Activate(Solitary Cell)
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Exile = Solitary Cell
+Bot2.Life = 22
+Bot2.Battlefield = Forest; Forest; Mox Emerald; Elvish Mystic

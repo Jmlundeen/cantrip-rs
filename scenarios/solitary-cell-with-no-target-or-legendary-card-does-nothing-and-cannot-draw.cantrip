@@ -1,0 +1,39 @@
+# With nothing of Bot2's on the battlefield, Solitary Cell's enters trigger has no legal target and is removed from the
+# stack (CR 603.3d): nothing is exiled. Its second ability needs "Discard a legendary card" as a cost (CR 118.3): Bot1's
+# hand holds only Mountains, so it cannot be activated even with {1} available from the Mox Jet. (The activation with a
+# legendary card in hand, beside a refused Mountain, is solitary-cell-exiles-a-mana-value-three-permanent...)
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Solitary Cell
+Mountain
+Mountain
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Solitary Cell.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Battlefield.Solitary Cell.Activate
+[Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Stack.Count = 0
+Bot1.Hand.Count = 3
+Bot1.Battlefield.Solitary Cell.Tapped = false

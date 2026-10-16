@@ -1,0 +1,82 @@
+# "Exile target nonland permanent an opponent controls with mana value 3 or less" (CR 115.1, 202.3): Bot2 controls Smaug the
+# Magnificent (mana value 4, one past the boundary), a Mountain (a land), and Brazen Borrower (mana value exactly 3);
+# Bot1's own Mox Jet is also on the battlefield. Only the Borrower is a candidate: the others are refused beside it. It
+# is exiled until Solitary Cell leaves the battlefield (CR 610.3).
+# Then "{1}, {T}, Discard a legendary card: Draw a card.": the Mountain in Bot1's hand is not a legal discard
+# (refused beside Smaug the Magnificent, the legendary control), the Smaug is, and Bot1 draws.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Solitary Cell
+Smaug the Magnificent
+Mountain
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+Smaug the Magnificent
+Island
+Mox Sapphire
+Brazen Borrower
+Island x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Smaug the Magnificent.Cast
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Brazen Borrower.Cast
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Solitary Cell.Cast
+Bot1.Pass
+! Bot1.Target(Bot2.Battlefield.Smaug the Magnificent)
+! Bot1.Target(Bot2.Battlefield.Mountain)
+! Bot1.Target(Bot1.Battlefield.Mox Jet)
+Bot1.Target(Brazen Borrower)
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+? Exile = Brazen Borrower
+? Bot2.Battlefield.Count = 8
+Bot1.Battlefield.Solitary Cell.Activate
+! Bot1.Choose(Mountain)
+Bot1.Choose(Smaug the Magnificent)
+[Bot1.Main2]
+
+[Expect]
+Exile = Brazen Borrower
+Bot1.Graveyard = Smaug the Magnificent
+Bot1.Hand.Count = 4
+Bot1.Battlefield.Solitary Cell.Tapped = true
