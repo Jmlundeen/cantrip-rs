@@ -249,6 +249,15 @@ impl EventMask {
             Event::LifeChange { .. } => EventMask::LIFE_CHANGE,
             Event::Countered { .. } => EventMask::COUNTERED,
             Event::Copied { .. } => EventMask::COPIED,
+            // "Whenever you activate a loyalty ability", "whenever a player activates an ability that isn't a mana ability"
+            // (CR 602.2, 603.2): an activation, once the ability is on the stack and its costs are paid, is an event abilities
+            // trigger on, so they go on the stack above it and resolve first. Only activations of abilities that use the stack
+            // are emitted. A mana ability's activation (CR 605.3) is only recorded: no card here triggers on one yet (those
+            // that would, "whenever you activate an ability of a creature" - Elrond, Moon-Reader, Ceaseless Searblades - wait
+            // for it to be emitted too). The markers kept for the history (an extra loyalty activation allowed, a way a
+            // permanent gave used) are only recorded, and a special action (CR 116.2) or a copy of an ability (CR 707.10) is
+            // no activation.
+            Event::AbilityActivated { .. } => EventMask::ABILITY_ACTIVATED,
             Event::DoorUnlocked { .. } => EventMask::DOOR_UNLOCKED,
             Event::GaveGift { .. } => EventMask::GAVE_GIFT,
             _ => EventMask(0),

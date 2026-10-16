@@ -19,7 +19,7 @@ fn return_equipment(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 /// Whether the ability `index` of `source` is an equip ability (CR 702.6a).
 fn is_equip(q: &dyn Query, ability: AbilityRef) -> bool {
-    matches!(q.card(ability.card).abilities.get(ability.index as usize), Some(AbilityDef::Activated(d)) if d.equip)
+    q.activated_ability(ability).is_some_and(|d| d.equip)
 }
 
 /// "During your turn, you may activate equip abilities any time you could cast an instant" (CR 702.6a, 602.5d).

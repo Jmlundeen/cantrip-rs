@@ -5,7 +5,7 @@
 use cantrip_state::*;
 
 use crate::card::{CounterTo, LibraryPlace};
-use crate::card::{Asker, CardDef};
+use crate::card::{AbilityDef, ActivatedDef, Asker, CardDef};
 use crate::chars::Chars;
 use crate::history::{History, Record};
 
@@ -104,6 +104,15 @@ pub trait Query {
     }
 
     fn card(&self, id: CardId) -> &'static CardDef;
+
+    /// The activated ability (CR 602) an ability reference names, if it names one: what an activation recorded in the
+    /// history was, or one of an object's abilities (`chars(id).abilities()`) is.
+    fn activated_ability(&self, ability: AbilityRef) -> Option<&'static ActivatedDef> {
+        match self.card(ability.card).abilities.get(ability.index as usize) {
+            Some(AbilityDef::Activated(def)) => Some(def),
+            _ => None,
+        }
+    }
 
     /// An object's characteristics after every continuous effect (CR 613).
     fn chars(&self, id: ObjectId) -> Chars;

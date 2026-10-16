@@ -8,9 +8,7 @@ fn instant_loyalty(q: &dyn Query, asker: &Asker, source: ObjectId, index: u8, ac
     source == asker.source
         && activator == asker.controller
         && cantrip_mechanics::history::entered_this_turn(q, source)
-        && q.chars(source).abilities().nth(index as usize).is_some_and(|a| {
-            matches!(q.card(a.card).abilities.get(a.index as usize), Some(AbilityDef::Activated(d)) if d.cost.loyalty.is_some())
-        })
+        && q.chars(source).abilities().nth(index as usize).and_then(|a| q.activated_ability(a)).is_some_and(|d| d.is_loyalty_ability())
 }
 
 /// +1: put a +1/+1 counter on up to one target creature. It gains first strike until end of turn.

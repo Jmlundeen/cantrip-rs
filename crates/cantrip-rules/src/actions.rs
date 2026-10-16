@@ -3385,8 +3385,10 @@ pub fn activate_mana(
         cx.st().update_obj(source, |o| o.x = n);
     }
     note_activation(cx, source, index as usize, def);
-    // A mana ability is activated (CR 605.3) as any ability is, and the history says so; no ability triggers on it, for
-    // the abilities that care about activations are about those that aren't mana abilities.
+    // A mana ability is activated (CR 605.3) as any ability is, and the history says so. It is not emitted: the cards here
+    // that trigger on activations name loyalty abilities or abilities that aren't mana abilities; one that triggers on a
+    // mana ability's activation too ("an ability of a creature": Elrond, Moon-Reader) needs it emitted, its trigger
+    // waiting for the next time a player would receive priority (CR 603.3).
     cx.record(Event::AbilityActivated { source, ability, player });
     if def.cost.exile_self {
         ops::move_to_for(cx, source, Zone::exile(cx.s().obj(source).owner), ZoneReason::Exile);

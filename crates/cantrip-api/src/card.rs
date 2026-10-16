@@ -719,6 +719,11 @@ pub(crate) fn no_match(_: &dyn Query, _: ObjectId, _: &Event) -> Option<Fired> {
 }
 
 impl ActivatedDef {
+    /// A loyalty ability (CR 606.2): an activated ability with a loyalty symbol in its cost.
+    pub const fn is_loyalty_ability(&self) -> bool {
+        self.cost.loyalty.is_some()
+    }
+
     /// A mana ability (CR 605.1a): one with an effect of its own that adds mana, or one that lists the mana it adds.
     pub const fn is_mana_ability(&self) -> bool {
         if self.mana.is_some() || self.adds_any > 0 {
