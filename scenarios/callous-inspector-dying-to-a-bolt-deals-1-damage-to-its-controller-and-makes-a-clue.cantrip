@@ -32,4 +32,5 @@ Bot1.Life = 19
 Bot2.Life = 20
 Bot1.Graveyard = Callous Inspector
 Bot1.Battlefield = Swamp; Clue Token
+Bot1.Battlefield.Clue Token.Token = true
 Bot2.Battlefield = Mountain

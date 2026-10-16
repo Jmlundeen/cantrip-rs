@@ -1,0 +1,33 @@
+# The return ability's cost includes {T} (CR 302.6): the turn the Familiar enters it can't be activated, though a card to
+# discard and the mana to pay ({1}{G} from the untapped Mox Emerald and Mox Pearl) are there. The control, the same ability
+# used from turn 5 on, is bramble-familiar-discards-a-card-to-return-itself-to-hand.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Forest
+Bramble Familiar
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Bramble Familiar.Cast
+[T1 Bot1.Main2]
+! Bot1.Battlefield.Bramble Familiar.Activate(Ability: Return)
+
+[Expect]
+Bot1.Hand = Island; Island
+Bot1.Battlefield.Bramble Familiar.Tapped = false
+Bot1.Battlefield.Mox Emerald.Tapped = false
+Bot1.Battlefield.Mox Pearl.Tapped = false

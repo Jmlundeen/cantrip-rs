@@ -1,6 +1,6 @@
 # A land card is among the three kinds Fetch Quest takes. Only a Mountain and instants/artifacts are milled, so the Mountain
 # is the one offered (the instant is refused, the Mountain is the control); it enters under Bot1's control, not tapped
-# (nothing says it enters tapped), and it is no land drop (it was put, not played, CR 305.1: Bot1 has played no land).
+# (nothing says it enters tapped), and counts as no land drop (it was not played, CR 305.2... Bot1 has played no land).
 
 [Bot1 Deck]
 Black Lotus

@@ -4,7 +4,8 @@ use cantrip_mechanics::triggers::THIS_DIES;
 use cantrip_oracle as oracle;
 
 /// "When this creature dies, it deals 1 damage to you. Create a Clue token." The damage is dealt by the creature as it last
-/// existed on the battlefield (CR 603.10a, 608.2h) to the ability's controller; the Clue is created, which is not investigating (CR 701.16a).
+/// existed on the battlefield (CR 603.10a, 608.2h) to the ability's controller; the Clue is created, which is not investigating (CR 701.16a). That ruling is unexercised:
+/// nothing in the engine watches for investigating, so no scenario can tell the two apart.
 fn dies(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.damage(item.object, Target::Player(item.controller), 1);
     tokens::create(g, item.controller, &tokens::CLUE, 1)?;

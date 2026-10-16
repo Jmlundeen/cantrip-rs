@@ -1,0 +1,45 @@
+# An Aura among the milled cards can be the card chosen (it is an enchantment card). Put onto the battlefield rather than
+# cast, it is not targeted: it enters attached to a creature its controller chooses as it enters (CR 303.4f), here the
+# Ornithopter, which gets Rancor's +2/+0.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Mox Jet
+Bramble Familiar
+Ornithopter
+Lightning Bolt
+Sol Ring
+Rancor
+Lightning Bolt
+Sol Ring
+Lightning Bolt
+Sol Ring
+Forest x5
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Bramble Familiar.Cast(Ability: Adventure)
+Bot1.Choose(Rancor)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Emerald; Mox Ruby; Mox Pearl; Mox Jet; Ornithopter; Rancor
+Bot1.Battlefield.Rancor.AttachedTo = Ornithopter
+Bot1.Battlefield.Ornithopter.Power = 2
+Exile = Bramble Familiar
