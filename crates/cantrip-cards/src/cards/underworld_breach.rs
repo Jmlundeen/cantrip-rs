@@ -16,14 +16,6 @@ fn escape_cost(q: &dyn Query, asker: &Asker, card: ObjectId, caster: PlayerId) -
     Some(escape::cost(def.cost, 3))
 }
 
-/// "At the beginning of the end step, sacrifice this enchantment": every end step, not only its controller's.
-fn end_step(_: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired> {
-    match event {
-        Event::StepBegan { step: Step::End } => Fired::PLAIN,
-        _ => None,
-    }
-}
-
 fn sacrifice_this(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if g.is_on_battlefield(item.object) && g.controller(item.object) == item.controller {
         g.sacrifice(&[item.object]);
@@ -33,6 +25,6 @@ fn sacrifice_this(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     granted_ways: &[GrantedWay { text: "Escape", cost: escape_cost, ..GrantedWay::CAST }],
-    abilities: &[triggered(when(EventMask::STEP_BEGAN, end_step), sacrifice_this, "At the beginning of the end step, sacrifice this enchantment.")],
+    abilities: &[triggered(cantrip_mechanics::triggers::EACH_END_STEP, sacrifice_this, "At the beginning of the end step, sacrifice this enchantment.")],
     ..oracle::UNDERWORLD_BREACH
 };

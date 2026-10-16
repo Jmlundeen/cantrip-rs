@@ -378,6 +378,14 @@ pub fn your_end_step(q: &dyn Query, source: ObjectId, event: &Event) -> Option<F
     your_step(q, source, event, Step::End)
 }
 
+/// "At the beginning of each end step" (CR 513.1, 603.2): any player's end step began. Gau, Feral Youth and Octomancer print it.
+pub fn each_end_step(_: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::StepBegan { step: Step::End } => Fired::PLAIN,
+        _ => None,
+    }
+}
+
 /// "Whenever a creature you control enters" (CR 603.6a): any creature, this one included, under your control as it
 /// entered. Aura Shards and Warleader's Call print it.
 pub fn creature_you_control_enters(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
@@ -483,6 +491,7 @@ pub const THIS_LEAVES: Trigger = when(EventMask::ZONE_CHANGE, this_leaves);
 pub const YOUR_UPKEEP: Trigger = when(EventMask::STEP_BEGAN, your_upkeep);
 pub const BEGINNING_OF_YOUR_COMBAT: Trigger = when(EventMask::STEP_BEGAN, beginning_of_your_combat);
 pub const YOUR_END_STEP: Trigger = when(EventMask::STEP_BEGAN, your_end_step);
+pub const EACH_END_STEP: Trigger = when(EventMask::STEP_BEGAN, each_end_step);
 pub const CREATURE_YOU_CONTROL_ENTERS: Trigger = when(EventMask::ZONE_CHANGE, creature_you_control_enters);
 pub const CREATURE_YOU_CONTROL_DIES: Trigger = when(EventMask::ZONE_CHANGE, creature_you_control_dies);
 pub const ARTIFACT_SPELL_YOU_CAST: Trigger = when(EventMask::SPELL_CAST, artifact_spell_you_cast);

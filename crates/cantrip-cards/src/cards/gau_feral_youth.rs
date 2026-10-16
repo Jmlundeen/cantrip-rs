@@ -6,13 +6,6 @@ fn counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-fn end_step(_: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired> {
-    match event {
-        Event::StepBegan { step: Step::End } => Fired::PLAIN,
-        _ => None,
-    }
-}
-
 /// "If a card left your graveyard this turn."
 fn card_left(q: &dyn Query, asker: &Asker) -> bool {
     cantrip_mechanics::history::cards_left_graveyard_this_turn(q, asker.controller) > 0
@@ -29,7 +22,7 @@ fn damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(cantrip_mechanics::triggers::THIS_ATTACKS, counter, "Rage \u{2014} Whenever Gau attacks, put a +1/+1 counter on it."),
-        triggered(when(EventMask::STEP_BEGAN, end_step), damage, "At the beginning of each end step, if a card left your graveyard this turn, Gau deals damage equal to its power to each opponent.")
+        triggered(cantrip_mechanics::triggers::EACH_END_STEP, damage, "At the beginning of each end step, if a card left your graveyard this turn, Gau deals damage equal to its power to each opponent.")
             .condition(card_left),
     ],
     ..oracle::GAU_FERAL_YOUTH
