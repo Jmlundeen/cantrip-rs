@@ -410,6 +410,11 @@ pub struct PermanentCost {
     pub count: u8,
     pub filter: ObjectFilter,
     pub to_hand: bool,
+    /// Only tapped permanents pay ("return a tapped creature you control", web-slinging, CR 702.188a). Whether one is
+    /// tapped is judged as the cost is paid (CR 601.2h), after the mana abilities of CR 601.2g: the permanents are
+    /// chosen once the mana is paid, so one tapped for mana while paying may be among them (Spider-Sense's ruling,
+    /// 2025-09-19).
+    pub tapped: bool,
 }
 
 impl Cost {
@@ -490,7 +495,11 @@ impl Cost {
             (a, None) => a,
         };
         c.permanents = match (self.permanents, other.permanents) {
-            (Some(a), Some(b)) => Some(PermanentCost { count: a.count + b.count, ..a }),
+            (Some(a), Some(b)) => {
+                // A tapped permanent chosen after the mana and one chosen before are not one choice.
+                assert!(a.tapped == b.tapped, "two permanent costs, only one of them for tapped permanents");
+                Some(PermanentCost { count: a.count + b.count, ..a })
+            }
             (None, b) => b,
             (a, None) => a,
         };
@@ -551,16 +560,22 @@ impl Cost {
         };
 
     pub const fn sacrifice(count: u8, filter: ObjectFilter) -> Cost {
-        Cost { permanents: Some(PermanentCost { count, filter, to_hand: false }), ..Cost::NONE }
+        Cost { permanents: Some(PermanentCost { count, filter, to_hand: false, tapped: false }), ..Cost::NONE }
     }
 
     /// Tap `count` untapped permanents you control that pass the filter, as a cost (CR 118.3).
     pub const fn tap_untapped(count: u8, filter: ObjectFilter) -> Cost {
-        Cost { permanents: Some(PermanentCost { count, filter, to_hand: false }), tap_permanents: true, ..Cost::NONE }
+        Cost { permanents: Some(PermanentCost { count, filter, to_hand: false, tapped: false }), tap_permanents: true, ..Cost::NONE }
     }
 
     pub const fn return_to_hand(count: u8, filter: ObjectFilter) -> Cost {
-        Cost { permanents: Some(PermanentCost { count, filter, to_hand: true }), ..Cost::NONE }
+        Cost { permanents: Some(PermanentCost { count, filter, to_hand: true, tapped: false }), ..Cost::NONE }
+    }
+
+    /// Return `count` tapped permanents you control that pass the filter to their owners' hands (web-slinging, CR
+    /// 702.188a): chosen once the mana is paid (`PermanentCost::tapped`).
+    pub const fn return_tapped_to_hand(count: u8, filter: ObjectFilter) -> Cost {
+        Cost { permanents: Some(PermanentCost { count, filter, to_hand: true, tapped: true }), ..Cost::NONE }
     }
 
     pub const fn mana(mana: ManaCost) -> Cost {
@@ -825,6 +840,8 @@ pub enum WayKind {
     Other,
     /// Warp (CR 702.185a).
     Warp,
+    /// Web-slinging (CR 702.188a).
+    WebSlinging,
 }
 
 /// An alternative way to cast a card (CR 118.9): flashback (CR 702.34) from the graveyard, Fireblast's sacrifice.

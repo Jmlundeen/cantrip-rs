@@ -113,7 +113,17 @@ fn can_pay_other(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost) -
     }
     if let Some(p) = cost.permanents {
         let asker = Asker { source, controller };
-        let candidates = cx.permanents_of(controller).into_iter().filter(|&id| (p.filter)(cx, &asker, id)).count();
+        let mut candidates = cx.permanents_of(controller).into_iter().filter(|&id| pays_permanents(cx, &p, &asker, id)).count();
+        // Tapped permanents are judged once the mana abilities have been activated (CR 601.2g-h): an untapped one that
+        // passes the filter and one of its controller's mana abilities could tap will do.
+        if p.tapped && candidates < p.count as usize {
+            let tappable = tappable_for_mana(cx, controller);
+            candidates += cx
+                .permanents_of(controller)
+                .into_iter()
+                .filter(|&id| !cx.s().obj(id).tapped && (p.filter)(cx, &asker, id) && tappable.contains(&id))
+                .count();
+        }
         if candidates < p.count as usize {
             return false;
         }
@@ -357,11 +367,50 @@ fn pay_exiles(cx: &mut Cx, chosen: &[ObjectId]) {
     ops::move_together(cx, &moves, ZoneReason::Exile);
 }
 
-/// Chooses the permanents a cost names (CR 601.2h), always asked, even when the choice is forced.
+/// Whether `id` may pay a permanents cost now: it passes the cost's filter, and is tapped if the cost asks for tapped
+/// permanents ("return a tapped creature you control", CR 702.188a).
+fn pays_permanents(cx: &Cx, p: &PermanentCost, asker: &Asker, id: ObjectId) -> bool {
+    (!p.tapped || cx.s().obj(id).tapped) && (p.filter)(cx, asker, id)
+}
+
+/// The untapped permanents `player`'s mana abilities could tap as they are activated now (CR 601.2g, 605.3a): each one
+/// whose own mana ability has {T} in its cost, and each one a mana ability's "tap an untapped [permanent] you control"
+/// could tap.
+fn tappable_for_mana(cx: &Cx, player: PlayerId) -> Vec<ObjectId> {
+    let mut options = Vec::new();
+    mana_ability_options(cx, player, &mut options);
+    let mut out = Vec::new();
+    for o in &options {
+        let Some(source) = o.source else { continue };
+        if o.index >= PLAYER_MANA_ABILITY {
+            continue;
+        }
+        let Some(def) = cx.chars(source).abilities().nth(o.index as usize).and_then(|a| activated(cx, a)) else { continue };
+        if def.cost.tap && !cx.s().obj(source).tapped {
+            out.push(source);
+        }
+        if def.cost.tap_permanents {
+            out.extend(o.target_candidates.iter().filter_map(|t| t.object()));
+        }
+    }
+    out
+}
+
+/// Whether a cost's permanents are chosen once its mana is paid (CR 601.2h): those that must be tapped, which a mana
+/// ability activated while paying (CR 601.2g) may have tapped. The others are chosen with the rest of the cost, before.
+fn permanents_after_mana(cost: &Cost) -> bool {
+    cost.permanents.is_some_and(|p| p.tapped)
+}
+
+/// Chooses the permanents a cost names (CR 601.2h), always asked, even when the choice is forced. Too few to choose
+/// among (tapped ones, judged once the mana is paid) is a cost that can't be paid: the announcement is taken back.
 fn choose_permanents(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) -> R<Vec<ObjectId>> {
     let Some(p) = cost.permanents else { return Ok(Vec::new()) };
     let asker = Asker { source, controller: player };
-    let eligible: Vec<ObjectId> = cx.permanents_of(player).into_iter().filter(|&id| (p.filter)(cx, &asker, id)).collect();
+    let eligible: Vec<ObjectId> = cx.permanents_of(player).into_iter().filter(|&id| pays_permanents(cx, &p, &asker, id)).collect();
+    if p.tapped && eligible.len() < p.count as usize {
+        return Err(Stop::Cancel);
+    }
     let purpose = if cost.tap_permanents {
         Purpose::TapToPay
     } else if p.to_hand {
@@ -369,7 +418,13 @@ fn choose_permanents(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cos
     } else {
         Purpose::SacrificeCost
     };
-    let ask = RequestKind::ChooseCards { source, purpose, cards: eligible.clone(), eligible, count: p.count, up_to: false, kind: "" };
+    // A cost of tapped permanents says so, and names creatures when those are all it can take (web-slinging's).
+    let kind = match p.tapped {
+        true if eligible.iter().all(|&id| cx.chars(id).is(CardType::Creature)) => "tapped creature",
+        true => "tapped permanent",
+        false => "",
+    };
+    let ask = RequestKind::ChooseCards { source, purpose, cards: eligible.clone(), eligible, count: p.count, up_to: false, kind };
     match cx.ask_core(player, ask, true)? {
         Answer::Cards(cards) => Ok(cards),
         _ => Err(Stop::Cancel),
@@ -585,7 +640,7 @@ pub fn mana_ability_options(cx: &Cx, player: PlayerId, options: &mut Vec<ActionO
                 option.target_candidates = cx
                     .permanents_of(player)
                     .into_iter()
-                    .filter(|&o| (p.filter)(cx, &asker, o))
+                    .filter(|&o| pays_permanents(cx, &p, &asker, o))
                     .map(Target::Object)
                     .collect();
                 option.targets_required = p.count;
@@ -1849,7 +1904,7 @@ fn emerge_reduction(cx: &Cx, player: PlayerId, card: ObjectId, cost: &Cost) -> u
     let Some(p) = cost.permanents.filter(|_| cost.emerge) else { return 0 };
     let asker = Asker { source: card, controller: player };
     let mut values: Vec<u32> =
-        cx.permanents_of(player).into_iter().filter(|&id| (p.filter)(cx, &asker, id)).map(|id| cx.mana_value(id)).collect();
+        cx.permanents_of(player).into_iter().filter(|&id| pays_permanents(cx, &p, &asker, id)).map(|id| cx.mana_value(id)).collect();
     values.sort_unstable_by(|a, b| b.cmp(a));
     values.iter().take(p.count as usize).sum::<u32>().min(255) as u8
 }
@@ -2448,8 +2503,10 @@ fn cast(
     }
 
     // CR 601.2f-h: permanents the cost names are chosen, the mana paid, then the rest of the cost; an additional
-    // cost's choices come once the mana is paid (CR 601.2h), as the C# engine asks them.
-    let chosen = choose_permanents(cx, player, spell, &cost)?;
+    // cost's choices come once the mana is paid (CR 601.2h), as the C# engine asks them, and so do tapped permanents
+    // (web-slinging's), which a mana ability activated while paying may have tapped (CR 601.2g).
+    let late = permanents_after_mana(&cost);
+    let mut chosen = if late { Vec::new() } else { choose_permanents(cx, player, spell, &cost)? };
     let discards = choose_discards(cx, player, spell, &cost)?;
     let mut exiles = choose_exiles(cx, player, spell, &cost)?;
     let (way_sacrifices, way_exiles) = choose_variable(cx, player, spell, &cost, item.x)?;
@@ -2479,6 +2536,9 @@ fn cast(
         cx.st().update_obj(spell, |o| o.marks.cant_be_countered = true);
     }
     apply_next_spell_effects(cx, player, spell);
+    if late {
+        chosen = choose_permanents(cx, player, spell, &cost)?;
+    }
     let extra_chosen = choose_permanents(cx, player, spell, &extra)?;
     let beheld = choose_behold(cx, player, spell, &cost)?;
     let extra_beheld = choose_behold(cx, player, spell, &extra)?;
@@ -3168,6 +3228,9 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
     // Behold and blight are paid when a spell is cast only (CR 701.4a, 701.68a): an activated ability that had them would
     // get the cost for free.
     debug_assert!(def.cost.behold.is_none() && def.cost.blight == 0, "an activated ability's behold or blight is not built");
+    // A cost of tapped permanents is chosen once the mana is paid (CR 601.2g-h), which only a spell's does yet: no
+    // activated ability has one.
+    debug_assert!(!permanents_after_mana(&def.cost), "an activated ability's cost of tapped permanents is not built");
     let chosen = choose_permanents(cx, player, source, &def.cost)?;
     // What an attacking creature the cost returns or sacrifices was attacking, for the effect to read (ninjutsu,
     // CR 702.49a: the ninja attacks the same player, planeswalker or battle).

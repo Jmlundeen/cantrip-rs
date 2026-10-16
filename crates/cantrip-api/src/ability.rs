@@ -56,6 +56,12 @@ pub const fn return_to_hand(n: u8, filter: ObjectFilter) -> Cost {
     Cost::return_to_hand(n, filter)
 }
 
+/// "Return N tapped [permanents] you control to their owner's hand" (web-slinging, CR 702.188a): chosen once the mana
+/// is paid, so one tapped for mana while paying may be returned (`PermanentCost::tapped`).
+pub const fn return_tapped_to_hand(n: u8, filter: ObjectFilter) -> Cost {
+    Cost::return_tapped_to_hand(n, filter)
+}
+
 /// "Tap N untapped [permanents] you control" (CR 118.3): not the {T} symbol.
 pub const fn tap_untapped(n: u8, filter: ObjectFilter) -> Cost {
     Cost::tap_untapped(n, filter)
