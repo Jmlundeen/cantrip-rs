@@ -1229,6 +1229,9 @@ impl Available {
                 kinds |= 1 << i;
             }
         }
+        if kinds == 0 {
+            return self.covers(cost);
+        }
         self.with_restricted(kinds).covers(cost)
     }
 
