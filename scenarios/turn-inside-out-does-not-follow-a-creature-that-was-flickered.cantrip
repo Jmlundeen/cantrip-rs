@@ -1,0 +1,41 @@
+# CR 400.7: Ephemerate exiles Llanowar Elves and returns them, a new object that the delayed trigger "when it dies this
+# turn" (CR 603.7c) knows nothing about, and the +3/+0 ended with the old object too. Lightning Bolt then kills the new
+# Elves: no dread is manifested, the Gorilla stays in the library.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Llanowar Elves
+Turn Inside Out
+Lightning Bolt
+Mox Pearl
+Ephemerate
+Guerrilla Gorilla
+Island x12
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Turn Inside Out.Cast(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves.Power = 4
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ephemerate.Cast(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot1.Hand.Lightning Bolt.Cast(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Llanowar Elves; Lightning Bolt; Turn Inside Out; Black Lotus
+Bot1.Library.Count = 13

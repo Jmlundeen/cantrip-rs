@@ -1,0 +1,38 @@
+# "Dies" is any trip from the battlefield to the graveyard (CR 700.4), not only a trip caused by damage: Bot1 sacrifices
+# the pumped Llanowar Elves to Ashnod's Altar and the delayed ability still triggers, so dread is manifested - the
+# Gorilla face down, the Island into the graveyard.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Llanowar Elves
+Turn Inside Out
+Ashnod's Altar
+Mox Ruby
+Island
+Guerrilla Gorilla
+Island
+Island x11
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Ashnod's Altar.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Turn Inside Out.Cast(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves.Power = 4
+Bot1.Battlefield.Ashnod's Altar.Activate(Sacrifice: Llanowar Elves)
+Bot1.Arrange(Guerrilla Gorilla | Island)
+
+[Expect]
+Bot1.Battlefield..FaceDownName = Guerrilla Gorilla
+Bot1.Graveyard = Island; Llanowar Elves; Turn Inside Out; Black Lotus

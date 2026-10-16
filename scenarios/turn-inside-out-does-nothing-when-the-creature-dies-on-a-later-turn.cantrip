@@ -1,0 +1,39 @@
+# "When it dies this turn": the delayed trigger (CR 603.7b) lasts only until the turn ends. The pumped Llanowar Elves
+# survive turn one; on turn three Lightning Bolt kills them and nothing is manifested - the Gorilla stays on top of the
+# library. Beside the positive control in turn-inside-out-manifests-dread-when-the-pumped-creature-dies.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Llanowar Elves
+Turn Inside Out
+Lightning Bolt
+Mountain
+Island
+Guerrilla Gorilla
+Island x12
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Turn Inside Out.Cast(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves.Power = 4
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Llanowar Elves; Lightning Bolt; Turn Inside Out; Black Lotus
+Bot1.Battlefield = Forest; Mountain

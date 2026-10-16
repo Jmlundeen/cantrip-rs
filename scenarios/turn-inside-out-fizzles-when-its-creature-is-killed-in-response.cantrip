@@ -1,0 +1,34 @@
+# CR 608.2b: Lightning Bolt kills Llanowar Elves in response to Turn Inside Out, so the spell's only target is illegal and
+# it does not resolve at all: no +3/+0 and no delayed trigger is created, so the Elves' dying (before the spell) and
+# anything after it manifest nothing. Bot1's library is untouched.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Llanowar Elves
+Turn Inside Out
+Lightning Bolt
+Island x2
+Guerrilla Gorilla
+Island x12
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Turn Inside Out.Cast(Llanowar Elves)
+Bot1.Hand.Lightning Bolt.Cast(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Turn Inside Out; Llanowar Elves; Lightning Bolt; Black Lotus
+Bot1.Library.Count = 13
+Bot1.Battlefield = Forest

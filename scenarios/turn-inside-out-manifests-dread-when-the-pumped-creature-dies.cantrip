@@ -1,0 +1,40 @@
+# Turn Inside Out gives Llanowar Elves +3/+0 (a 4/1), and "when it dies this turn" is a delayed triggered ability
+# (CR 603.7c) that waits for that creature. Lightning Bolt then kills the Elves: the ability triggers (CR 700.4,
+# looking back, CR 603.10a) and its controller manifests dread (CR 701.62a): of Guerrilla Gorilla and Island the Gorilla
+# goes onto the battlefield face down as a nameless 2/2 and the Island into the graveyard.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Llanowar Elves
+Turn Inside Out
+Lightning Bolt
+Island x2
+Guerrilla Gorilla
+Island
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Turn Inside Out.Cast(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves.Power = 4
+Bot1.Hand.Lightning Bolt.Cast(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Guerrilla Gorilla | Island)
+
+[Expect]
+Bot1.Graveyard = Island; Llanowar Elves; Lightning Bolt; Turn Inside Out; Black Lotus
+Bot1.Battlefield..FaceDown = true
+Bot1.Battlefield..FaceDownName = Guerrilla Gorilla
+Bot1.Battlefield..Power = 2
+Bot1.Battlefield..Toughness = 2
