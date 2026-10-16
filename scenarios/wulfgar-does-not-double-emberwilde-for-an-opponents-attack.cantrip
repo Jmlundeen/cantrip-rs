@@ -50,3 +50,11 @@ Bot1.Hand.Emberwilde Captain.Cast
 Bot2.Attack(Elvish Mystic > Bot1)
 [T4 Bot2.DeclareBlockers]
 ? Bot2.Life = 13
+
+[Expect]
+Turn = 4
+Monarch = Bot1
+Bot2.Life = 13
+Bot1.Life = 20
+Bot2.Hand.Count = 7
+Bot1.Battlefield.Wulfgar of Icewind Dale.Power = 4
