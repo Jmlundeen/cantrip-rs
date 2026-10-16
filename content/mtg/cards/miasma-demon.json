@@ -1,0 +1,11 @@
+{
+  "name": "Miasma Demon",
+  "manaCost": "{4}{B}{B}",
+  "type": "Creature — Demon",
+  "power": 5,
+  "toughness": 4,
+  "oracleText": "Flying\nWhen this creature enters, you may discard any number of cards. When you do, up to that many target creatures each get -2/-2 until end of turn.",
+  "keywords": [
+    "Flying"
+  ]
+}

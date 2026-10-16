@@ -1,0 +1,43 @@
+# Miasma Demon: Bot1 discards one card, so the reflexive ability takes up to one target (CR 603.12): two are refused,
+# and the Demon itself gets -2/-2, a 3/2 until end of turn (CR 611.2a, 514.2); on Bot2's turn it is a 5/4 again.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Black Lotus
+Dark Ritual
+Miasma Demon
+Lightning Bolt
+Brainstorm
+Force of Will
+Island x12
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Hand.Miasma Demon.Cast
+Bot1.Choose(Brainstorm)
+! Bot1.Target(Miasma Demon; Bot2.Battlefield.Ornithopter)
+Bot1.Target(Miasma Demon)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Miasma Demon.Power = 3
+? Bot1.Battlefield.Miasma Demon.Toughness = 2
+? Bot2.Battlefield.Ornithopter.Toughness = 2
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Hand = Lightning Bolt; Force of Will
+Bot1.Battlefield.Miasma Demon.Power = 5
+Bot1.Battlefield.Miasma Demon.Toughness = 4

@@ -1,0 +1,47 @@
+# Miasma Demon: entering, Bot1 discards three cards (any number, CR 701.9). The reflexive ability (CR 603.12) takes up
+# to "that many", three, target creatures: four are refused (the Demon is a fourth candidate), and Bot2's three
+# Ornithopters each get -2/-2 and die (CR 704.5f). The Demon is not touched.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Black Lotus
+Dark Ritual
+Miasma Demon
+Lightning Bolt
+Brainstorm
+Force of Will
+Island x12
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Ornithopter
+Island x17
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Hand.Miasma Demon.Cast
+Bot1.Choose(Lightning Bolt; Brainstorm; Force of Will)
+! Bot1.Target(Bot2.Battlefield.Ornithopter#1; Bot2.Battlefield.Ornithopter#2; Bot2.Battlefield.Ornithopter#3; Miasma Demon)
+Bot1.Target(Bot2.Battlefield.Ornithopter#1; Bot2.Battlefield.Ornithopter#2; Bot2.Battlefield.Ornithopter#3)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 0
+Bot1.Graveyard = Force of Will; Brainstorm; Lightning Bolt; Dark Ritual; Black Lotus
+Bot2.Graveyard = Ornithopter; Ornithopter; Ornithopter
+Bot2.Battlefield.Count = 0
+Bot1.Battlefield.Miasma Demon.Power = 5
+Bot1.Battlefield.Miasma Demon.Toughness = 4

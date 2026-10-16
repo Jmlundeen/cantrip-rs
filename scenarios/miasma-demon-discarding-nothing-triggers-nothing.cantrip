@@ -1,0 +1,39 @@
+# Miasma Demon: Bot1 chooses to discard no cards. Discarding none is not doing it, so the reflexive "when you do"
+# ability does not trigger (CR 603.12): no target is asked for and Bot2's Ornithopter is untouched. The scenarios
+# that discard are the positive control.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Black Lotus
+Dark Ritual
+Miasma Demon
+Lightning Bolt
+Brainstorm
+Force of Will
+Island x12
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Hand.Miasma Demon.Cast
+Bot1.Choose()
+! Bot1.Target
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Lightning Bolt; Brainstorm; Force of Will
+Bot2.Battlefield.Ornithopter.Toughness = 2
+Stack.Count = 0
