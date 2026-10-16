@@ -150,6 +150,12 @@ fn nonland_permanent_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
     matches!(t, Target::Object(id) if on_battlefield(q, id) && !q.chars(id).is(CardType::Land))
 }
 
+/// "Target nonland permanent you control" as a filter (CR 115.1), for a card that narrows it further or asks for it
+/// as "up to one". Displacer Kitten and Nurturing Pixie print it.
+pub fn nonland_permanent_you_control_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    nonland_permanent_filter(q, asker, t) && matches!(t, Target::Object(id) if q.controller(id) == asker.controller)
+}
+
 fn nonland_permanent_an_opponent_controls_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     nonland_permanent_filter(q, asker, t) && matches!(t, Target::Object(id) if q.controller(id) != asker.controller)
 }

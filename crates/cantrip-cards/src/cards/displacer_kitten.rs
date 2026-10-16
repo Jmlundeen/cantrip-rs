@@ -2,11 +2,6 @@ use cantrip_api::*;
 use cantrip_mechanics::{triggers::NONCREATURE_SPELL_YOU_CAST, targets};
 use cantrip_oracle as oracle;
 
-/// "Up to one target nonland permanent you control".
-fn nonland_permanent_you_control(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    matches!(t, Target::Object(id) if q.controller(id) == asker.controller) && (targets::NONLAND_PERMANENT.filter)(q, asker, t)
-}
-
 /// Exile it, then return that card to the battlefield under its owner's control: a new object (CR 400.7). A token
 /// ceases to exist in exile and does not return (CR 111.7).
 fn blink(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -16,6 +11,6 @@ fn blink(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(NONCREATURE_SPELL_YOU_CAST, blink, "Avoidance \u{2014} Whenever you cast a noncreature spell, exile up to one target nonland permanent you control, then return that card to the battlefield under its owner's control.")
-        .targets(&[up_to_one(nonland_permanent_you_control)])],
+        .targets(&[up_to_one(targets::nonland_permanent_you_control_filter)])],
     ..oracle::DISPLACER_KITTEN
 };
