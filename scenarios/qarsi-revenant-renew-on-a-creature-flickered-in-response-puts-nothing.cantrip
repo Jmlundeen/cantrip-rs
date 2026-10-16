@@ -1,0 +1,55 @@
+# Qarsi Revenant's renew targets Bot1's Cecil, Dark Knight; in response Ephemerate exiles Cecil and returns it, a new object
+# (CR 400.7), so the target is gone and the ability puts no counters (CR 608.2b). Qarsi stays exiled: that was the cost.
+# Turn 1: Swamp and the Mox Jets pay Qarsi; Bot2 Bolts it. Turn 3: Plains, a third Mox Jet pays Cecil, the Swamp and two Jets
+# renew, the Plains Ephemerate.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Jet
+Qarsi Revenant
+Cecil, Dark Knight
+Plains
+Ephemerate
+Mox Jet
+Island x12
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Qarsi Revenant.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Qarsi Revenant)
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet#3.Activate
+Bot1.Hand.Cecil, Dark Knight.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Graveyard.Qarsi Revenant.Activate(Cecil, Dark Knight)
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Ephemerate.Cast(Cecil, Dark Knight)
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Cecil, Dark Knight.Keywords = Deathtouch
+Bot1.Battlefield.Cecil, Dark Knight.Counters.Flying = (absent)
+Bot1.Battlefield.Cecil, Dark Knight.Counters.Deathtouch = (absent)
+Bot1.Battlefield.Cecil, Dark Knight.Counters.Lifelink = (absent)
+Exile = Ephemerate; Qarsi Revenant

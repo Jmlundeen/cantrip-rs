@@ -1,0 +1,61 @@
+# Qarsi Revenant: "Renew — {2}{B}, Exile this card from your graveyard: Put a flying counter, a deathtouch counter, and a
+# lifelink counter on target creature. Activate only as a sorcery."
+# Bot2 Lightning Bolts Qarsi on turn 2. On Bot2's turn 4, with Bot1's Swamp and two Mox Jets untapped, the ability is not
+# offered (only as a sorcery, CR 602.5d); on Bot1's turn 5 it is, and puts the three counters on Embereth Shieldbreaker, a
+# vanilla 2/1, which has flying, deathtouch and lifelink by them (CR 122.1b). Qarsi is exiled as the cost. Shieldbreaker
+# attacks unblocked: Bot2 takes 2 and Bot1 gains 2.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Jet
+Qarsi Revenant
+Mountain
+Mox Ruby
+Embereth Shieldbreaker
+Island x13
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Qarsi Revenant.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Qarsi Revenant)
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Embereth Shieldbreaker.Cast
+[T4 Bot2.Main1]
+! Bot1.Graveyard.Qarsi Revenant.Activate(Embereth Shieldbreaker)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Graveyard.Qarsi Revenant.Activate(Embereth Shieldbreaker)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Embereth Shieldbreaker.Counters.Flying = 1
+? Bot1.Battlefield.Embereth Shieldbreaker.Counters.Deathtouch = 1
+? Bot1.Battlefield.Embereth Shieldbreaker.Counters.Lifelink = 1
+Bot1.Attack(Embereth Shieldbreaker > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot2.Life = 18
+Bot1.Battlefield.Embereth Shieldbreaker.Keywords = Deathtouch; Flying; Lifelink
+Exile = Qarsi Revenant
+Bot1.Graveyard.Count = 0

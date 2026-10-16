@@ -1,0 +1,70 @@
+# Keyword counters and timestamps (CR 613.7c): "each counter receives a timestamp as it's put on an object. If that object
+# already has a counter of that kind on it, each counter of that kind receives a new timestamp identical to that of the new
+# counter."
+# Qarsi Revenant's renew puts a flying, a deathtouch and a lifelink counter on Bot2's Cecil, Dark Knight. Then Abigale,
+# Eloquent First-Year's trigger makes Cecil lose all abilities and puts a flying, a first strike and a lifelink counter on
+# it. The loss takes the deathtouch of the earlier deathtouch counter (and the printed deathtouch); the flying and lifelink
+# counters all have the new counters' later timestamp, so Cecil keeps flying and lifelink, and has first strike.
+# On turn 4 Cecil attacks unblocked: Bot1 takes 2, Bot2 gains 2 and loses none to its lost Darkness ability.
+# Turn 1: Swamp and the Mox Jets pay Qarsi; Bot2 Bolts it. Turn 3: Plains, the Swamp and Jets pay renew, Mox Pearl and the
+# Plains Abigale.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Jet
+Qarsi Revenant
+Plains
+Mox Pearl
+Abigale, Eloquent First-Year
+Island x13
+
+[Bot2 Deck]
+Mox Jet
+Cecil, Dark Knight
+Mox Ruby
+Lightning Bolt
+Island x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Qarsi Revenant.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Cecil, Dark Knight.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Qarsi Revenant)
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Graveyard.Qarsi Revenant.Activate(Cecil, Dark Knight)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Cecil, Dark Knight.Keywords = Deathtouch; Flying; Lifelink
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Abigale, Eloquent First-Year.Cast
+Bot1.Target(Cecil, Dark Knight)
+[T3 Bot1.Main2]
+? Bot2.Battlefield.Cecil, Dark Knight.Counters.Flying = 2
+? Bot2.Battlefield.Cecil, Dark Knight.Counters.Deathtouch = 1
+? Bot2.Battlefield.Cecil, Dark Knight.Counters.Lifelink = 2
+? Bot2.Battlefield.Cecil, Dark Knight.Counters.FirstStrike = 1
+[T4 Bot2.Main1]
+Bot2.Attack(Cecil, Dark Knight > Bot1)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 18
+Bot2.Life = 22
+Bot2.Battlefield.Cecil, Dark Knight.Keywords = FirstStrike; Flying; Lifelink
