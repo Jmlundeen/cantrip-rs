@@ -1,0 +1,42 @@
+# "Up to two": Bot1 puts only Skullclamp onto the battlefield from the seven cards it looks at (Skullclamp and six Islands). The
+# other six go to the bottom of the library, below the cards that were not looked at: the eighth card, Mox Emerald, is now on top
+# and Sol Ring, which was not looked at, is next. The six cards at the bottom are all Islands, so their random order cannot show.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+United Battlefront
+Island
+Island
+Skullclamp
+Island x6
+Mox Emerald
+Sol Ring
+Mox Sapphire
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.United Battlefront.Cast
+Bot1.Pass
+Bot1.Choose(Skullclamp)
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Plains; Mox Pearl; Mox Jet; Mox Ruby; Skullclamp
+Bot1.Library = Mox Emerald; Sol Ring; Mox Sapphire; Island; Island; Island; Island; Island; Island

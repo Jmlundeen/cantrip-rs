@@ -1,0 +1,43 @@
+# Nothing among the top seven (a creature, a land, an instant, a mana value 4 permanent, and Islands) may be put onto the battlefield:
+# Bot1 is asked nothing (the bare refusal) but has looked at the seven cards, and they go to the bottom: Mox Emerald, the eighth, is on top.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+United Battlefront
+Island
+Island
+Showdown of the Skalds
+Ornithopter
+Lightning Bolt
+Island x4
+Mox Emerald
+Island x3
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.United Battlefront.Cast
+Bot1.Pass
+! Bot1.Choose
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Looked = Showdown of the Skalds; Ornithopter; Lightning Bolt; Island; Island; Island; Island
+Bot1.Battlefield = Plains; Mox Pearl; Mox Jet; Mox Ruby
+Bot1.Library.Count = 11

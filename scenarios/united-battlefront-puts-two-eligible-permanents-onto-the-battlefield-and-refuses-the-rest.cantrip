@@ -1,0 +1,55 @@
+# United Battlefront (turn 1) looks at the top seven cards: Showdown of the Skalds (mana value 4), The Misty Mountains Cold (mana value
+# 3, the boundary), Ornithopter (a creature), Island, Lightning Bolt (not a permanent), Skullclamp and Sol Ring. The ones it
+# may not put onto the battlefield are refused (a mana value 4 enchantment, a creature, a land, an instant), while the mana value 3
+# Saga and Skullclamp are put onto the battlefield together; Sol Ring, the third eligible card, would be a third, and the other four go
+# to the bottom with it. The Saga enters with its first lore counter and makes a Treasure.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+United Battlefront
+Island
+Island
+Showdown of the Skalds
+The Misty Mountains Cold
+Ornithopter
+Island
+Lightning Bolt
+Skullclamp
+Sol Ring
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.United Battlefront.Cast
+Bot1.Pass
+! Bot1.Choose(Showdown of the Skalds)
+! Bot1.Choose(Ornithopter)
+! Bot1.Choose(Island)
+! Bot1.Choose(Lightning Bolt)
+Bot1.Choose(The Misty Mountains Cold; Skullclamp)
+Bot1.Pass
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Looked = Showdown of the Skalds; The Misty Mountains Cold; Ornithopter; Island; Lightning Bolt; Skullclamp; Sol Ring
+Bot1.Battlefield = Plains; Mox Pearl; Mox Jet; Mox Ruby; The Misty Mountains Cold; Skullclamp; Treasure Token
+Bot1.Battlefield.The Misty Mountains Cold.Counters.Lore = 1
+Bot1.Graveyard = United Battlefront
+Bot1.Library.Count = 18

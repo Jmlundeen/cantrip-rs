@@ -1,0 +1,42 @@
+# "Up to two" includes none: Bot1 looks at Skullclamp, Sol Ring and five Islands (eligible cards among them) and takes nothing, so the
+# battlefield is unchanged and all seven go to the bottom of the library in a random order; the eighth card, Mox Emerald, is on top
+# and the library is still full.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+United Battlefront
+Island
+Island
+Skullclamp
+Sol Ring
+Island x5
+Mox Emerald
+Island x3
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.United Battlefront.Cast
+Bot1.Pass
+Bot1.Choose()
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Plains; Mox Pearl; Mox Jet; Mox Ruby
+Bot1.Library.Count = 11

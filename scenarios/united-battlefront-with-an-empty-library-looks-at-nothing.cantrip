@@ -1,0 +1,37 @@
+# An empty library has nothing to look at: United Battlefront resolves without asking (the bare refusal) and does nothing more.
+# (Bot1 would lose at its next draw, which the script never reaches.)
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+United Battlefront
+Island
+Island
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.United Battlefront.Cast
+Bot1.Pass
+! Bot1.Choose
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Plains; Mox Pearl; Mox Jet; Mox Ruby
+Bot1.Library.Count = 0
+Bot1.Graveyard = United Battlefront

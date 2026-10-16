@@ -1,0 +1,40 @@
+# CR 609.3: with fewer than seven cards in the library, Bot1 looks at all it has (Skullclamp and two Islands), puts Skullclamp onto
+# the battlefield and the two Islands go to the bottom of the library.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+United Battlefront
+Island
+Island
+Skullclamp
+Island
+Island
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.United Battlefront.Cast
+Bot1.Pass
+Bot1.Choose(Skullclamp)
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Looked = Skullclamp; Island; Island
+Bot1.Battlefield = Plains; Mox Pearl; Mox Jet; Mox Ruby; Skullclamp
+Bot1.Library = Island; Island

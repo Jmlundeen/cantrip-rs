@@ -1,0 +1,39 @@
+# A card in a library with {X} in its mana cost has X of 0 (CR 202.3e, ruling): Engineered Explosives (mana cost {X}) has mana value 0
+# among the top seven, so it can be put onto the battlefield (enters with no charge counters, having been cast for no X).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+United Battlefront
+Island
+Island
+Engineered Explosives
+Island x6
+Mox Emerald
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.United Battlefront.Cast
+Bot1.Pass
+Bot1.Choose(Engineered Explosives)
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Plains; Mox Pearl; Mox Jet; Mox Ruby; Engineered Explosives
+Bot1.Library = Mox Emerald; Island; Island; Island; Island; Island; Island
