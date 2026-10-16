@@ -1,4 +1,3 @@
-# Known bug: a permanent's play rules (no maximum hand size, extra land plays, ...) are read off its card whether or not it has lost all its abilities (CR 613.1f, 402.2); `no_maximum_hand_size` and `land_rules` in actions.rs never look at LoseAllAbilities.
 # Bot2's The Wondrous Wasp strips Ms. Marvel of every ability on turn 2, her "You have no maximum hand size" with them. On turn 3
 # Bot1 draws up to eight cards with two Ancestral Recalls and, having no such ability, must discard one at cleanup (CR 514.1).
 # (ms-marvel-gives-no-maximum-hand-size is the positive control: the same turn without the Wasp discards nothing.)
