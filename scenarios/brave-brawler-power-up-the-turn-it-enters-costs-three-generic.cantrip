@@ -1,0 +1,44 @@
+# Brave Brawler: "Power-up — {4}{W}: Put two +1/+1 counters on this creature." The turn it enters, its mana cost
+# {1}{W} takes the {W} off the white and {1} off the generic (CR 702.193b, 118.7): {3} is left, paid with Sol Ring's
+# {C}{C} and Mox Ruby's {R}, no white among them. It ends a 4/3 with lifelink.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Sol Ring
+Mox Ruby
+Brave Brawler
+Plains
+Plains x10
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Brave Brawler.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Brave Brawler.Activate
+? Bot1.Mana =
+Bot1.Pass
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Brave Brawler.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Brave Brawler.Power = 4
+Bot1.Battlefield.Brave Brawler.Toughness = 3
+Bot1.Battlefield.Brave Brawler.Keywords = Lifelink
