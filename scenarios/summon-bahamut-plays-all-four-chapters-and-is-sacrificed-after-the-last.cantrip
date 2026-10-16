@@ -1,0 +1,87 @@
+# Summon: Bahamut ({9}) is cast on turn 3 with Black Lotus, four Moxen and a Sol Ring. As it enters it gets a lore counter
+# (CR 714.3a): chapter I destroys Bot2's Ornithopter. After Bot1's draw on turn 5 it gets another (CR 714.3b): chapter II
+# is "up to one", Bot2's Island is a land and so refused as a target, and Bot1 chooses none, so Mox Jet stays. On turn 5 Bot1
+# also casts Smaug the Magnificent (mana value 4). Chapter III on turn 7 draws two cards. Chapter IV on turn 9 deals damage
+# equal to the total mana value of Bot1's OTHER permanents to each opponent: Smaug 4 + Sol Ring 1 + the Moxen 0 and the Treasure
+# tokens 0 = 5 (Bot2 15; counting the 9-mana Saga itself would make 14). It is then sacrificed (CR 714.4).
+
+[Bot1 Deck]
+Black Lotus
+Sol Ring
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Summon: Bahamut
+Mountain
+Smaug the Magnificent
+Mountain x12
+
+[Bot2 Deck]
+Island
+Mox Jet
+Ornithopter
+Island x13
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Summon: Bahamut.Cast
+Bot1.Pass
+Bot1.Target(Ornithopter)
+Bot1.Pass
+Bot1.Pass
+? Bot2.Battlefield = Island; Mox Jet
+? Bot1.Battlefield.Summon: Bahamut.Counters.Lore = 1
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Summon: Bahamut.Counters.Lore = 2
+! Bot1.Target(Bot2.Battlefield.Island)
+Bot1.Target()
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Smaug the Magnificent.Cast
+Bot1.Pass
+? Bot2.Battlefield = Island; Mox Jet
+[T7 Bot1.Main1]
+? Bot1.Hand.Count = 1
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Summon: Bahamut.Counters.Lore = 3
+? Bot1.Hand.Count = 3
+[T9 Bot1.Main1]
+Bot1.Pass
+Bot1.Pass
+[T9 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 15
+Bot1.Graveyard = Summon: Bahamut; Black Lotus
+Bot1.Battlefield.Summon: Bahamut = (absent)

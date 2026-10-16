@@ -1,0 +1,68 @@
+# Chapter I of Summon: Bahamut targets Bot2's Cathar Commando; Bot2 responds by sacrificing it (to destroy Bot1's Mox Ruby),
+# so the target is gone when the chapter resolves (CR 608.2b) and nothing else is destroyed: Bot2's Plains and Moxen remain.
+# The Saga stays with its one lore counter.
+
+[Bot1 Deck]
+Black Lotus
+Sol Ring
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Summon: Bahamut
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Cathar Commando
+Plains x3
+Plains x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Cathar Commando.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Summon: Bahamut.Cast
+Bot1.Pass
+Bot1.Target(Cathar Commando)
+Bot1.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Cathar Commando.Activate(Bot1.Battlefield.Mox Ruby)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Cathar Commando
+Bot2.Battlefield = Plains; Mox Pearl; Mox Jet
+Bot1.Graveyard = Mox Ruby; Black Lotus
+Bot1.Battlefield.Summon: Bahamut.Counters.Lore = 1

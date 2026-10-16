@@ -1,0 +1,11 @@
+{
+  "name": "Summon: Bahamut",
+  "manaCost": "{9}",
+  "type": "Enchantment Creature — Saga Dragon",
+  "power": 9,
+  "toughness": 9,
+  "oracleText": "(As this Saga enters and after your draw step, add a lore counter. Sacrifice after IV.)\nI, II — Destroy up to one target nonland permanent.\nIII — Draw two cards.\nIV — Mega Flare — This creature deals damage equal to the total mana value of other permanents you control to each opponent.\nFlying",
+  "keywords": [
+    "Flying"
+  ]
+}
