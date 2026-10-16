@@ -159,7 +159,7 @@ pub fn this_attacks(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fi
 
 /// "Whenever this permanent enters or attacks" (CR 603.2, 603.6a): one triggered ability with two conditions, either its own entering the
 /// battlefield or its own attack. Overlord of the Balemurk, Overlord of the Mistmoors, Sentinel of the Nameless City, Archon of Cruelty
-/// and Dragonhawk, Fate's Tempest print it. The `listens` mask is `ZONE_CHANGE` and `ATTACKS`.
+/// Dragonhawk, Fate's Tempest and Dread Osseosaur print it. The `listens` mask is `ZONE_CHANGE` and `ATTACKS`.
 pub fn this_enters_or_attacks(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     this_enters(q, source, event).or_else(|| this_attacks(q, source, event))
 }
