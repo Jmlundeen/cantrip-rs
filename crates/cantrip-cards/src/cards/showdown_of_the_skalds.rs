@@ -1,13 +1,12 @@
 use cantrip_api::*;
-use cantrip_mechanics::{library::exile_top_may_play, targets};
+use cantrip_mechanics::{library::exile_top_play_until_end_of_next_turn, targets};
 use cantrip_oracle as oracle;
 
 /// Chapter I: "Exile the top four cards of your library. Until the end of your next turn, you may play those cards."
 /// The four leave together, face up (CR 101.4); each that reaches exile may be played, cast or as the land for the
 /// turn (CR 305.1), until the cleanup step of its controller's next turn (CR 514.2). A library of fewer exiles what it has.
 fn exile_four(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let grant = PlayGrant { instead: None, lands: true, expiry: Expiry::EndOfYourNextTurn, ..PlayGrant::CAST };
-    exile_top_may_play(g, item.controller, 4, item.controller, grant);
+    exile_top_play_until_end_of_next_turn(g, item.controller, 4);
     Ok(())
 }
 

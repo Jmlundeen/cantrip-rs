@@ -304,6 +304,15 @@ pub fn exile_top_may_play(g: &mut dyn Game, from: PlayerId, count: usize, who: P
     exiled
 }
 
+/// "Exile the top `count` cards of your library. Until the end of your next turn, you may play [it / those cards]"
+/// (`exile_top_may_play`): the grant is to play, not only cast, a land among them under the ordinary land-play rules, until the
+/// cleanup step of `player`'s next turn (CR 514.2). The cards still in exile. Cori Mountain Monastery (one), Clockwork
+/// Percussionist (one), The Legend of Roku (three) and Showdown of the Skalds (four) print it.
+pub fn exile_top_play_until_end_of_next_turn(g: &mut dyn Game, player: PlayerId, count: usize) -> Vec<ObjectId> {
+    let grant = PlayGrant { instead: None, lands: true, expiry: Expiry::EndOfYourNextTurn, ..PlayGrant::CAST };
+    exile_top_may_play(g, player, count, player, grant)
+}
+
 /// "[One] of `items` chosen at random" (CR 701.9c, 705): one is drawn from the game's own generator, so the same game picks
 /// the same one; no draw is made when there is no choice. None from an empty list. Crabomination picks a card at random
 /// from a graveyard and a hand, Chaos Defiler one of the creatures chosen, Ursine Monstrosity an opponent and Tersa

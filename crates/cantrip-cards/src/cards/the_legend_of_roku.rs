@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::{firebending, tokens};
-use cantrip_mechanics::{exile_and_return_transformed, library::exile_top_may_play};
+use cantrip_mechanics::{exile_and_return_transformed, library::exile_top_play_until_end_of_next_turn};
 use cantrip_oracle as oracle;
 
 /// I: "Exile the top three cards of your library. Until the end of your next turn, you may play those cards." The
@@ -8,8 +8,7 @@ use cantrip_oracle as oracle;
 /// longer control the Saga, until their next turn's cleanup step. A library holding fewer than three exiles what it
 /// has.
 fn chapter_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let grant = PlayGrant { instead: None, lands: true, expiry: Expiry::EndOfYourNextTurn, ..PlayGrant::CAST };
-    exile_top_may_play(g, item.controller, 3, item.controller, grant);
+    exile_top_play_until_end_of_next_turn(g, item.controller, 3);
     Ok(())
 }
 
