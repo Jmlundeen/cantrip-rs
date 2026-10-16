@@ -69,6 +69,7 @@ pub mod paradigm;
 pub mod plot;
 pub mod power_up;
 pub mod ravenous;
+pub mod recruit;
 pub mod reconfigure;
 pub mod regenerate;
 pub mod saddle;

@@ -389,6 +389,18 @@ pub static HUMAN_CITIZEN: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+/// The 1/1 white Human Soldier creature token. Cosmogrand Zenith makes it, and recruit (CR 701.70a: The Queen of Dale) does.
+pub static HUMAN_SOLDIER: CardDef = CardDef {
+    name: "Human Soldier",
+    has_cost: false,
+    colors: Some(ColorSet::of(Color::White)),
+    types: TypeSet::of(&[CardType::Creature]),
+    subtypes: SubtypeSet::of(&[Subtype::Human, Subtype::Soldier]),
+    power: Some(1),
+    toughness: Some(1),
+    ..CardDef::BLANK
+};
+
 /// The 2/2 red Rebel creature token. Glimmer Lens and Otharri, Suns' Glory make it.
 pub static REBEL: CardDef = CardDef {
     name: "Rebel",

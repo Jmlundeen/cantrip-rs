@@ -2,21 +2,9 @@ use cantrip_api::*;
 use cantrip_mechanics::{flurry, tokens};
 use cantrip_oracle as oracle;
 
-/// The 1/1 white Human Soldier creature token.
-static HUMAN_SOLDIER: CardDef = CardDef {
-    name: "Human Soldier",
-    has_cost: false,
-    colors: Some(ColorSet::of(Color::White)),
-    types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Human, Subtype::Soldier]),
-    power: Some(1),
-    toughness: Some(1),
-    ..CardDef::BLANK
-};
-
 /// Mode 0: "Create two 1/1 white Human Soldier creature tokens", together (CR 101.4).
 fn make_tokens(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    tokens::create(g, item.controller, &HUMAN_SOLDIER, 2)?;
+    tokens::create(g, item.controller, &tokens::HUMAN_SOLDIER, 2)?;
     Ok(())
 }
 
@@ -41,4 +29,4 @@ pub static CARD: CardDef = CardDef {
     ..oracle::COSMOGRAND_ZENITH
 };
 
-pub static EXTRA: &[&CardDef] = &[&HUMAN_SOLDIER];
+pub static EXTRA: &[&CardDef] = &[&tokens::HUMAN_SOLDIER];
