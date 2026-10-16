@@ -181,6 +181,18 @@ public sealed class LogWriterTests
                 }));
     }
 
+    [Fact]
+    public void A_look_names_the_cards_to_the_one_who_looked_and_counts_them_for_anyone_else()
+    {
+        // Medomai's Prophecy's "look at the top card of each player's library": Alice looks at an Island and a Swamp;
+        // Bot 2, who did not look, is told only that she looked at two cards.
+        var looked = new CardsLookedAtEvent { Player = Me, Cards = [Hidden, Swamp] };
+
+        Assert.Equal("You look at [Island] and [Swamp].", LogWriter.Write(Me, View(Me), looked)!.Text);
+        Assert.Equal("Alice looks at 2 cards.", LogWriter.Write(Rival, View(Rival), looked)!.Text);
+        Assert.Equal("Alice looks at a card.", LogWriter.Write(Rival, View(Rival), new CardsLookedAtEvent { Player = Me, Cards = [Hidden] })!.Text);
+    }
+
     private static List<string> Lines(params GameEventView[] events) =>
         [.. events.Select(entry => LogWriter.Write(Me, View(Me), entry)?.Text).OfType<string>()];
 

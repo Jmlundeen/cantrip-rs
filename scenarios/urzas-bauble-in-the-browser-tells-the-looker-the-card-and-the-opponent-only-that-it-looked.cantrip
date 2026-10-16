@@ -1,0 +1,35 @@
+# Browser
+# A look at a hidden card is the looker's alone: Bot1's Urza's Bauble looks at a card at random in Bot2's hand of Islands,
+# and Bot1's log names it; Bot2's Bauble then looks at one of Bot1's, and Bot1's log says only that Bot2 looked at a card.
+# The same event carries Medomai's Prophecy's look at the top card of each library.
+
+[Bot1 Deck]
+Urza's Bauble
+Island x14
+
+[Bot2 Deck]
+Island x7
+Urza's Bauble
+Island x7
+
+[Actions]
+Bot1.Hand.Urza's Bauble.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Urza's Bauble.Activate(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Client.Bot1.Log.Has = You look at [Island].
+[T2 Bot2.Main1]
+Bot2.Hand.Urza's Bauble.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Urza's Bauble.Activate(Bot1)
+Bot2.Pass
+Bot1.Pass
+? Client.Bot1.Log.Has = Bot2 looks at a card.
+
+[Expect]
+Turn = 2
+Bot1.Graveyard = Urza's Bauble
+Bot2.Graveyard = Urza's Bauble

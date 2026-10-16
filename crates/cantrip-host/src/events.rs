@@ -17,6 +17,7 @@
 //! | `Tapped`                                          | `TapChangedEvent`                                   |
 //! | `SpellCast`                                       | `SpellCastEvent` (targets, X, modes, kicks)         |
 //! | `Revealed`                                        | `CardsRevealedEvent`                                |
+//! | `Looked` (those of one player in a row together)  | `CardsLookedAtEvent`, the cards known to the looker alone |
 //! | `CountersPut` (lore only, as the engine reports)  | `CountersPutEvent`                                  |
 //! | `Transformed`                                     | `TransformedEvent`                                  |
 //! | a new activated/triggered item on the stack       | `AbilityActivatedEvent`                             |
@@ -57,6 +58,8 @@ pub enum Proto {
     /// did, and none before.
     AbilityResolved { serial: u32, source: ObjectId, controller: PlayerId, targets: Vec<Target>, first: u64 },
     Revealed { player: PlayerId, cards: Vec<ObjectId> },
+    /// Hidden cards one player looked at: known to that player, and to nobody else.
+    Looked { player: PlayerId, cards: Vec<ObjectId> },
     Counters { object: ObjectId, name: String, count: i32 },
     Transformed { object: ObjectId, from: String, to: String },
     Lost { player: PlayerId, reason: LossReasonView },
@@ -177,6 +180,10 @@ impl Tracker {
                 out.push(Proto::Cast { spell, controller: player, targets, x, modes, kicked, gift });
             }
             Event::Revealed { player, card } => out.push(Proto::Revealed { player, cards: vec![card] }),
+            Event::Looked { player, card } => match out.last_mut() {
+                Some(Proto::Looked { player: looker, cards }) if *looker == player => cards.push(card),
+                _ => out.push(Proto::Looked { player, cards: vec![card] }),
+            },
             Event::CountersPut { object, kind, amount, .. } => {
                 out.push(Proto::Counters { object, name: kind.name().to_string(), count: i32::from(amount) });
             }
@@ -459,6 +466,10 @@ impl Teller<'_> {
             Proto::Revealed { player, cards } => {
                 let cards = cards.iter().map(|c| self.handle_for(*c)).collect();
                 Some(GameEventView::CardsRevealedEvent(CardsRevealedEvent { player: seat(*player), cards }))
+            }
+            Proto::Looked { player, cards } => {
+                let cards = cards.iter().map(|c| self.handle_for(*c)).collect();
+                Some(GameEventView::CardsLookedAtEvent(CardsLookedAtEvent { player: seat(*player), cards }))
             }
             Proto::Counters { object, name, count } => {
                 let h = self.handle_for(*object);

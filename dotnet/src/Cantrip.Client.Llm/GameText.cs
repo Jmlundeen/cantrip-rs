@@ -332,6 +332,10 @@ public static class GameText
 
             DayNightBecameEvent designation => $"It became {designation.Designation.ToString().ToLowerInvariant()}.",
 
+            CardsLookedAtEvent looked when looked.Cards.Count > 0 =>
+                $"{Seat(client, looked.Player)} looked at "
+                + string.Join(", ", looked.Cards.Select(card => Named(client, card))) + ".",
+
             CardsRevealedEvent revealed when revealed.Cards.Count > 0 =>
                 $"{Seat(client, revealed.Player)} revealed "
                 + string.Join(", ", revealed.Cards.Select(card => Named(client, card))) + ".",

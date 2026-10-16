@@ -967,6 +967,8 @@ pub struct NameCardPrompt {
     pub hand: Vec<ViewHandle>,
     pub names: Vec<String>,
     pub suggestion: String,
+    /// What the name must be the name of, in the card's words before "card name" (CR 201.4a): "", "nonland" or "land".
+    pub kind: String,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
@@ -1362,7 +1364,7 @@ fn greedy_distribution(prompt: &DistributeCardsPrompt) -> Vec<Vec<ViewHandle>> {
 
 // --- Events (Messages.cs, GameEventView) ---
 
-/// Something that happened, as a viewer may be told it: one of 27 kinds, each the C# class of the
+/// Something that happened, as a viewer may be told it: one of 29 kinds, each the C# class of the
 /// same name.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(tag = "$type")]
@@ -1396,6 +1398,7 @@ pub enum GameEventView {
     AbilityResolvedEvent(AbilityResolvedEvent),
     CoinFlippedEvent(CoinFlippedEvent),
     TurnEndedEvent(TurnEndedEvent),
+    CardsLookedAtEvent(CardsLookedAtEvent),
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -1469,6 +1472,14 @@ pub struct LibraryShuffledEvent {
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct CardsRevealedEvent {
+    pub player: i32,
+    pub cards: Vec<ViewHandle>,
+}
+
+/// A player looked at hidden cards (a library's top card, a card of a hand): the cards are known to that player alone.
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(rename_all = "PascalCase")]
+pub struct CardsLookedAtEvent {
     pub player: i32,
     pub cards: Vec<ViewHandle>,
 }

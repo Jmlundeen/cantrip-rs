@@ -354,6 +354,14 @@ impl Session {
         let seats: Vec<PlayerId> = self.game.state.seats().collect();
         for &p in &seats {
             let mut extra = revealed.clone();
+            // Cards a player looked at are shown to that player alone.
+            for proto in &protos {
+                if let Proto::Looked { player, cards } = proto
+                    && *player == p
+                {
+                    extra.extend(cards.iter().copied());
+                }
+            }
             if let Some(request) = pending.as_ref().filter(|r| r.player == p) {
                 extra.extend(request_objects(request));
             }

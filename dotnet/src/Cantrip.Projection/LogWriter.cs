@@ -146,6 +146,13 @@ public static class LogWriter
                 _ => $"{Does(arranged.Player, "put", "puts")} {Cards(arranged.OnTop)} on top and {Cards(arranged.OnBottom)} on the bottom.",
             },
 
+            // The one who looked reads what they saw; anyone else, only how many cards were looked at.
+            CardsLookedAtEvent looked => looked.Cards.Count == 0
+                ? null
+                : looked.Player == seat
+                    ? $"{Does(looked.Player, "look", "looks")} at {string.Join(" and ", looked.Cards.Select(Card))}."
+                    : $"{Does(looked.Player, "look", "looks")} at {(looked.Cards.Count == 1 ? "a card" : Cards(looked.Cards.Count))}.",
+
             CardsRevealedEvent revealed => revealed.Cards.Count == 0
                 ? null
                 : $"{Does(revealed.Player, "reveal", "reveals")} {string.Join(", ", revealed.Cards.Select(Card))}.",

@@ -305,6 +305,18 @@ public sealed class ScenarioPlayer
                 return;
             }
 
+            case CardNamedAnswer named:
+            {
+                // A card name is typed into the dock's box, as a person names a card that is not in front of them, and sent
+                // with the button the typing settles on ("Name Wasteland"). Only names the question allows are matched.
+                ControlState box = state.Controls.FirstOrDefault(c => c.Kind == "textbox")
+                    ?? throw new NotDrivenException($"the name {named.Name}, with no box to type it in", state);
+                await _page.Page.Mouse.ClickAsync(box.X, box.Y);
+                await _page.Page.Keyboard.TypeAsync(named.Name);
+                await ClickButtonNamedAsync($"Name {named.Name}");
+                return;
+            }
+
             default:
                 throw new NotDrivenException(expected.Answer?.GetType().Name ?? "nothing", state);
         }

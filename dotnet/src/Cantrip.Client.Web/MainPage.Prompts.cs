@@ -1029,18 +1029,20 @@ public sealed partial class MainPage
     }
 
     /// <summary>
-    /// A card name chosen as a permanent enters (CR 614.12a, 201.4). The hand being looked at is laid out to click; any
-    /// other name is typed, and the button names whatever the typing settles on.
+    /// A card name chosen as a permanent enters (CR 614.12a, 201.4) or as a spell or ability resolves, worded with the
+    /// kind of card the name must be (CR 201.4a: "a land card name"). The hand being looked at is laid out to click; any
+    /// other name is typed, and the button names whatever the typing settles on. Only the names offered can be chosen.
     /// </summary>
     private void FillNameCard(GameClient client, NameCardPromptMessage prompt)
     {
         string source = client.Object(prompt.Source)?.Name ?? "This permanent";
         bool looking = prompt.Owner > 0;
         string owner = looking ? NameOf(client, prompt.Owner) : string.Empty;
+        string kind = prompt.Kind.Length > 0 ? prompt.Kind + " " : string.Empty;
 
         Prompt(
-            $"{source}: choose a card name",
-            !looking ? "Type any card name"
+            $"{source}: choose a {kind}card name",
+            !looking ? $"Type the name of any {kind}card"
             : prompt.Hand.Count == 0 ? $"{owner}'s hand is empty  ·  type any name"
             : $"Looking at {owner}'s hand  ·  click a card, or type any name");
 
@@ -1068,7 +1070,7 @@ public sealed partial class MainPage
 
         var field = new TextBox
         {
-            PlaceholderText = "Any card name",
+            PlaceholderText = $"Any {kind}card name",
             Text = _selection.NameTyped,
             Width = 220,
             FontSize = 13,
@@ -1079,7 +1081,7 @@ public sealed partial class MainPage
         string? Match() => CardNameMatch(prompt.Names, _selection.NameTyped);
 
         DockButton naming = AddButton(
-            Match() is { } matched ? $"Name {matched}" : "Name a card",
+            Match() is { } matched ? $"Name {matched}" : $"Name a {kind}card",
             () =>
             {
                 if (Match() is { } chosen)
@@ -1094,7 +1096,7 @@ public sealed partial class MainPage
         {
             _selection.NameTyped = field.Text;
             string? matched = Match();
-            naming.Caption = matched is null ? "Name a card" : $"Name {matched}";
+            naming.Caption = matched is null ? $"Name a {kind}card" : $"Name {matched}";
             naming.Enabled = matched is not null;
         };
 

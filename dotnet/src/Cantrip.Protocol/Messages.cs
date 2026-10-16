@@ -157,6 +157,7 @@ public sealed class EventsMessage : ServerMessage
 [Union(26, typeof(AbilityResolvedEvent))]
 [Union(27, typeof(CoinFlippedEvent))]
 [Union(28, typeof(TurnEndedEvent))]
+[Union(29, typeof(CardsLookedAtEvent))]
 public abstract class GameEventView;
 
 /// <summary>The seat chosen at random decided who takes the first turn (CR 103.1).</summary>
@@ -468,6 +469,25 @@ public sealed class EventsRetractedEvent : GameEventView
 {
     [Key(0)]
     public List<long> Sequences { get; set; } = [];
+}
+
+/// <summary>
+/// A player looked at hidden cards: the top card of each library (Medomai's Prophecy), a card at random of a hand
+/// (Urza's Bauble).
+/// <para>
+/// Told to every seat, but only the player who looked is shown the cards: to anyone else they are cards it may not see,
+/// and the log says how many.
+/// </para>
+/// </summary>
+[MessagePackObject]
+public sealed class CardsLookedAtEvent : GameEventView
+{
+    /// <summary>Who looked.</summary>
+    [Key(0)]
+    public int Player { get; set; }
+
+    [Key(1)]
+    public List<ViewHandle> Cards { get; set; } = [];
 }
 
 /// <summary>
@@ -1449,8 +1469,9 @@ public sealed class ChooseColorsPromptMessage : PromptPayload
 }
 
 /// <summary>
-/// This client chooses a card name (CR 201.4) as a permanent enters (CR 614.12a), as Anointed Peacekeeper's "As this
-/// creature enters, look at an opponent's hand, then choose any card name". Answered with a
+/// This client chooses a card name (CR 201.4): as a permanent enters (CR 614.12a), as Anointed Peacekeeper's "As this
+/// creature enters, look at an opponent's hand, then choose any card name", or as a spell or ability resolves, as
+/// Petrified Hamlet's "choose a land card name". Answered with a
 /// <see cref="CardNamedAnswer"/> naming one of <see cref="Names"/>.
 /// </summary>
 [MessagePackObject]
@@ -1459,7 +1480,7 @@ public sealed class NameCardPromptMessage : PromptPayload
     [Key(0)]
     public int Player { get; set; }
 
-    /// <summary>The card about to enter.</summary>
+    /// <summary>The card about to enter, or the source of the spell or ability asking.</summary>
     [Key(1)]
     public ViewHandle Source { get; set; }
 
@@ -1478,6 +1499,13 @@ public sealed class NameCardPromptMessage : PromptPayload
     /// <summary>A name worth choosing: the costliest nonland card in the hand looked at, or the first name there is.</summary>
     [Key(5)]
     public string Suggestion { get; set; } = string.Empty;
+
+    /// <summary>
+    /// What the name must be the name of, in the card's own words before "card name" (CR 201.4a): empty for any card,
+    /// "nonland" (Tamiyo, Collector of Tales) or "land" (Petrified Hamlet). <see cref="Names"/> already holds only those.
+    /// </summary>
+    [Key(6)]
+    public string Kind { get; set; } = string.Empty;
 
     /// <summary>The suggestion, which is always one of <see cref="Names"/>.</summary>
     public override AnswerPayload Default() => new CardNamedAnswer { Name = Suggestion };

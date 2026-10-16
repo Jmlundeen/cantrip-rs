@@ -685,6 +685,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 hand: handles_of(handles, looked_at),
                 suggestion: suggestion.map_or_else(|| names.first().cloned().unwrap_or_default(), |c| game.cards.get(c).name.to_string()),
                 names,
+                kind: kind.word().to_string(),
             })
         }
         RequestKind::May { source, purpose } => {
