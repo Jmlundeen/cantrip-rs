@@ -1,0 +1,50 @@
+# Aminatou's miracle cost is the card's mana cost reduced by {4}: that is the cost, and an increase is added to it
+# (CR 601.2f, and miracle's rulings: the miracle cost, then increases, then reductions). Caretaker's Talent ({2}{W})
+# under Bot2's Thalia, Guardian of Thraben ("noncreature spells cost {1} more") costs {W} plus {1}: Bot1 pays {1}{W} out of
+# {C}{C}{W}, leaving {C} (the tax added before a {4} reduction would have left {C}{C}).
+[Bot1 Deck]
+Plains
+Sol Ring
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Aminatou, Veil Piercer
+Island
+Caretaker's Talent
+Island
+Island x15
+[Bot2 Deck]
+Plains
+Mox Pearl
+Thalia, Guardian of Thraben
+Plains x17
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Aminatou, Veil Piercer.Cast
+
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Thalia, Guardian of Thraben.Cast
+[T3 Bot1.Upkeep]
+Bot1.Arrange(Caretaker's Talent; Island |)
+[T3 Bot1.Draw]
+Bot1.Accept
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Accept
+[Expect]
+Bot1.Mana = {C}
+Bot1.Battlefield.Caretaker's Talent.Types = Enchantment
+Bot2.Battlefield.Thalia, Guardian of Thraben.Power = 2

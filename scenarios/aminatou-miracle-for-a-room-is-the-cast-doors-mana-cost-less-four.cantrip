@@ -37,9 +37,8 @@ Bot1.Battlefield.Mox Jet.Activate
 Bot1.Battlefield.Sol Ring.Activate
 Bot1.Accept
 Bot1.Modes(Ritual Chamber)
-? Bot1.Mana = {C}{C}
-[T3 Bot1.Main1]
 [Expect]
+Bot1.Mana = {C}{C}
 Bot1.Battlefield.Ritual Chamber.Doors = Ritual Chamber
 Bot1.Battlefield.Demon.Power = 6
 Bot1.Hand = Island

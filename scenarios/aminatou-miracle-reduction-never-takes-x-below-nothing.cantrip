@@ -1,0 +1,42 @@
+# Aminatou's "its mana cost reduced by {4}" on The Meathook Massacre ({X}{B}{B}) with X = 2: the reduction takes X's two
+# generic mana and the rest of it is lost, never taking colored mana and never going below nothing (CR 118.7a), so Bot1
+# pays {B}{B} out of {C}{C}{B}{B}, leaving {C}{C}. Aminatou, 2/4, survives the -2/-2.
+[Bot1 Deck]
+Swamp
+Sol Ring
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Aminatou, Veil Piercer
+Island
+The Meathook Massacre
+Island
+Island x15
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Aminatou, Veil Piercer.Cast
+
+[T3 Bot1.Upkeep]
+Bot1.Arrange(The Meathook Massacre; Island |)
+[T3 Bot1.Draw]
+Bot1.Accept
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Accept(X: 2)
+[Expect]
+Bot1.Mana = {C}{C}
+Bot1.Battlefield.The Meathook Massacre.Types = Enchantment
+Bot1.Battlefield.Aminatou, Veil Piercer.Toughness = 2
+Bot2.Life = 20

@@ -1,6 +1,6 @@
 # Aminatou: "Its miracle cost is equal to its mana cost reduced by {4}." The Meathook Massacre's mana cost is {X}{B}{B}:
-# the miracle cost is that cost reduced by {4} as the total cost is determined, once X is announced (CR 107.3a, 601.2f),
-# and the reduction takes generic mana, X's included (CR 118.7a). Bot1 announces X = 5 and pays {1}{B}{B} out of
+# the miracle cost is that cost reduced by {4}, and with no generic mana of its own the reduction comes off X's once X is
+# announced (CR 107.3a, 118.7a), never off colored mana. Bot1 announces X = 5 and pays {1}{B}{B} out of
 # {C}{C}{B}{B} from Sol Ring, a Swamp and Mox Jet, leaving {C} ({5}{B}{B} would not have been paid). The Massacre's -5/-5
 # kills Aminatou herself, and Bot2 loses 1 life for it.
 [Bot1 Deck]
@@ -37,10 +37,8 @@ Bot1.Battlefield.Sol Ring.Activate
 Bot1.Battlefield.Swamp.Activate
 Bot1.Battlefield.Mox Jet.Activate
 Bot1.Accept(X: 5)
-Bot1.Pass
-? Bot1.Mana = {C}
-[T3 Bot1.Main1]
 [Expect]
+Bot1.Mana = {C}
 Bot1.Battlefield.The Meathook Massacre.Types = Enchantment
 Bot1.Graveyard = Aminatou, Veil Piercer
 Bot1.Battlefield.Mox Pearl.Tapped = false
