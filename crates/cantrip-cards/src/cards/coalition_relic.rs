@@ -24,11 +24,8 @@ fn release(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if released <= 0 {
         return Ok(());
     }
-    let ask = RequestKind::ChooseColors { source: relic, choices: ColorSet(0b11111), count: released as u8 };
-    if let Answer::Colors(colors) = g.ask(item.controller, ask)? {
-        for color in colors {
-            g.add_mana(item.controller, color.mana(), 1);
-        }
+    for color in cantrip_mechanics::choose_colors(g, item.controller, relic, ColorSet(0b11111), released as u8)? {
+        g.add_mana(item.controller, color.mana(), 1);
     }
     Ok(())
 }

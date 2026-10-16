@@ -11,10 +11,8 @@ fn add_x_mana(g: &mut dyn Game, asker: &Asker, _: Option<Color>) -> Result<(), S
         return Ok(());
     }
     let choices = ColorSet(ColorSet::of(Color::Blue).0 | ColorSet::of(Color::Red).0);
-    if let Answer::Colors(colors) = g.ask(asker.controller, RequestKind::ChooseColors { source: asker.source, choices, count: x })? {
-        for color in colors {
-            g.add_mana(asker.controller, color.mana(), 1);
-        }
+    for color in cantrip_mechanics::choose_colors(g, asker.controller, asker.source, choices, x)? {
+        g.add_mana(asker.controller, color.mana(), 1);
     }
     Ok(())
 }

@@ -15,12 +15,8 @@ fn chapter_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 /// II: "Add one mana of any color." The color is chosen as the chapter resolves.
 fn chapter_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let ask = RequestKind::ChooseColors { source: item.object, choices: ColorSet(0b11111), count: 1 };
-    if let Answer::Colors(colors) = g.ask(item.controller, ask)? {
-        for color in colors {
-            g.add_mana(item.controller, color.mana(), 1);
-        }
-    }
+    let color = cantrip_mechanics::choose_color(g, item.controller, item.object)?;
+    g.add_mana(item.controller, color.mana(), 1);
     Ok(())
 }
 

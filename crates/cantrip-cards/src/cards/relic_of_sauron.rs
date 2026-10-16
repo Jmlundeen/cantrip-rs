@@ -6,10 +6,8 @@ use cantrip_oracle as oracle;
 /// chosen as the mana is added.
 fn add_two(g: &mut dyn Game, asker: &Asker, _: Option<Color>) -> Result<(), Suspend> {
     let choices = ColorSet(ColorSet::of(Color::Blue).0 | ColorSet::of(Color::Black).0 | ColorSet::of(Color::Red).0);
-    if let Answer::Colors(colors) = g.ask(asker.controller, RequestKind::ChooseColors { source: asker.source, choices, count: 2 })? {
-        for color in colors {
-            g.add_mana(asker.controller, color.mana(), 1);
-        }
+    for color in cantrip_mechanics::choose_colors(g, asker.controller, asker.source, choices, 2)? {
+        g.add_mana(asker.controller, color.mana(), 1);
     }
     Ok(())
 }

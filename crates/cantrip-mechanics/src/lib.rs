@@ -398,11 +398,22 @@ pub fn counters_divided(g: &mut dyn Game, item: &StackItem, kind: CounterKind) {
 
 /// A one-color choice (CR 105.1), asked of `player`.
 pub fn choose_color(g: &mut dyn Game, player: PlayerId, source: ObjectId) -> Result<Color, Suspend> {
-    let answer = g.ask(player, RequestKind::ChooseColors { source, choices: ColorSet(0b11111), count: 1 })?;
-    Ok(match answer {
-        Answer::Colors(colors) => colors.first().copied().unwrap_or(Color::White),
-        _ => Color::White,
-    })
+    // The core holds the answer to the question: exactly one of the five colors (`validate`).
+    let Answer::Colors(colors) = g.ask(player, RequestKind::ChooseColors { source, choices: ColorSet(0b11111), count: 1 })? else {
+        unreachable!("the core answers a color choice with colors")
+    };
+    Ok(colors[0])
+}
+
+/// "`count` mana in any combination of [colors]" (CR 106.1b): a color for each mana, among `choices`, repeats allowed,
+/// asked of `player` in one question. Manamorphose, Orcish Lumberjack, Relic of Sauron, Sunken Ruins, Vivi Ornitier,
+/// Coalition Relic, Wizard's Rockets, Desolation of Smaug and Sarkhan, Fireblood ask it.
+pub fn choose_colors(g: &mut dyn Game, player: PlayerId, source: ObjectId, choices: ColorSet, count: u8) -> Result<Vec<Color>, Suspend> {
+    // The core holds the answer to the question: `count` colors, each among `choices` (`validate`).
+    let Answer::Colors(colors) = g.ask(player, RequestKind::ChooseColors { source, choices, count })? else {
+        unreachable!("the core answers a color choice with colors")
+    };
+    Ok(colors)
 }
 
 /// `searcher` searches the library of `owner` (CR 701.23, 701.23f; the two are the same player for "search your
