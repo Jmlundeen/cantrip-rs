@@ -1,0 +1,43 @@
+# Two Equipment (two Paradise Mantles) take {2} off {4}{R}: three Moxen (Ruby for the {R}, Jet and Pearl for {2}) pay it
+# exactly, and the pool is empty afterwards (CR 601.2f), with the fourth Mox untapped and unused. The ability makes a
+# Dwarf.
+
+[Bot1 Deck]
+Paradise Mantle
+Paradise Mantle
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+The Lonely Mountain
+Forest x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Paradise Mantle.Cast
+Bot1.Pass
+Bot1.Hand.Paradise Mantle.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.The Lonely Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.The Lonely Mountain.Activate(Ability: Dwarf)
+Bot1.Pass
+[Bot1.Main2]
+? Bot1.Mana =
+
+[Expect]
+Bot1.Battlefield.Dwarf.Token = true
+Bot1.Battlefield.Mox Sapphire.Tapped = false
+Bot1.Battlefield.The Lonely Mountain.Tapped = true

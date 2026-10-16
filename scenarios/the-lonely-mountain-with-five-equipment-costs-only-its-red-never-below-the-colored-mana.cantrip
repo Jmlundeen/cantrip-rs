@@ -1,0 +1,46 @@
+# "{4}{R}, {T}: Create a 2/2 red Dwarf creature token. This ability costs {1} less to activate for each Equipment you control."
+# With five Paradise Mantles (mana value 0, five Equipment, one more than the generic {4}) the cost is {R} and no less
+# (CR 601.2f, 118.7): the colored mana is not reduced, and a single Mox Ruby pays it, leaving the pool empty. The land
+# entered untapped because Bot1 controlled an Equipment, and the token is a 2/2 red Dwarf.
+
+[Bot1 Deck]
+Paradise Mantle
+Paradise Mantle
+Paradise Mantle
+Paradise Mantle
+Paradise Mantle
+Mox Ruby
+The Lonely Mountain
+Forest x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Paradise Mantle.Cast
+Bot1.Pass
+Bot1.Hand.Paradise Mantle.Cast
+Bot1.Pass
+Bot1.Hand.Paradise Mantle.Cast
+Bot1.Pass
+Bot1.Hand.Paradise Mantle.Cast
+Bot1.Pass
+Bot1.Hand.Paradise Mantle.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.The Lonely Mountain.Play
+? Bot1.Battlefield.The Lonely Mountain.Tapped = false
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.The Lonely Mountain.Activate(Ability: Dwarf)
+Bot1.Pass
+[Bot1.Main2]
+? Bot1.Mana =
+
+[Expect]
+Bot1.Battlefield.Dwarf.Token = true
+Bot1.Battlefield.Dwarf.Power = 2
+Bot1.Battlefield.Dwarf.Toughness = 2
+Bot1.Battlefield.Dwarf.Colors = Red
+Bot1.Battlefield.Dwarf.Subtypes = Dwarf
+Bot1.Battlefield.The Lonely Mountain.Tapped = true

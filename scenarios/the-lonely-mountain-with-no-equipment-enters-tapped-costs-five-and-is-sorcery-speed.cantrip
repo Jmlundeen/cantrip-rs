@@ -1,0 +1,47 @@
+# With no Equipment the land enters tapped (CR 614.1c) and {4}{R} is paid in full by five Moxen on turn 3. While Bot1's own
+# Ornithopter spell is on the stack the ability is not offered ("activate only as a sorcery", CR 307.1), though the mana is
+# there; once it resolves the same activation is the positive control, and the pool is empty afterwards.
+
+[Bot1 Deck]
+The Lonely Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Ornithopter
+Forest x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.The Lonely Mountain.Play
+? Bot1.Battlefield.The Lonely Mountain.Tapped = true
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+! Bot1.Battlefield.The Lonely Mountain.Activate(Ability: Dwarf)
+Bot1.Pass
+Bot1.Battlefield.The Lonely Mountain.Activate(Ability: Dwarf)
+Bot1.Pass
+[Bot1.Main2]
+? Bot1.Mana =
+
+[Expect]
+Bot1.Battlefield.Dwarf.Token = true
+Bot1.Battlefield.The Lonely Mountain.Tapped = true
