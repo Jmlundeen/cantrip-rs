@@ -7,6 +7,8 @@ use cantrip_mechanics::tokens;
 use cantrip_mechanics::triggers;
 use cantrip_oracle as oracle;
 
+const ASK: Question = Question::new("CreateToken", "create Boo?", "A legendary 1/1 red Hamster creature token with trample and haste", "Create Boo", "Don't");
+
 /// Boo, a legendary 1/1 red Hamster creature token with trample and haste (CR 205.4a, 111.4).
 pub static BOO: CardDef = CardDef {
     name: "Boo",
@@ -23,7 +25,7 @@ pub static BOO: CardDef = CardDef {
 
 /// "You may create Boo": asked of the controller, then the token.
 fn create_boo(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if effects::ask_may(g, item.controller, item.object, Purpose::Optional)? {
+    if effects::ask_may(g, item.controller, item.object, Purpose::Ask(&ASK))? {
         tokens::create(g, item.controller, &BOO, 1)?;
     }
     Ok(())

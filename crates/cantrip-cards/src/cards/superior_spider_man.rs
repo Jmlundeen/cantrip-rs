@@ -1,6 +1,14 @@
 use cantrip_api::*;
 use cantrip_oracle as oracle;
 
+const ASK: Question = Question::new(
+    "CopyAsEnters",
+    "enter as a copy of a creature card in a graveyard?",
+    "When you do, that card is exiled. If you don't, it enters as itself",
+    "Choose a card",
+    "Enter as itself",
+);
+
 /// Every creature card in every graveyard (CR 608.2d): chosen rather than targeted, so an opponent's graveyard is as available
 /// as your own.
 fn copyable(g: &dyn Game) -> Vec<ObjectId> {
@@ -23,7 +31,7 @@ fn mind_swap(g: &mut dyn Game, entry: &mut Entering) -> Result<(), Suspend> {
         return Ok(());
     }
     let controller = entry.controller;
-    if g.ask(controller, RequestKind::May { source: entering, purpose: Purpose::CopyAsEnters })? != Answer::Yes {
+    if g.ask(controller, RequestKind::May { source: entering, purpose: Purpose::Ask(&ASK) })? != Answer::Yes {
         return Ok(());
     }
     let ask = RequestKind::ChooseTarget { label: "", slot_player: None,

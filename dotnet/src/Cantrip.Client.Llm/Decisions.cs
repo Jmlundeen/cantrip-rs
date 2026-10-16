@@ -1501,6 +1501,19 @@ public sealed class Decisions
             };
         }
 
+        // A card that words its own question: the question, and what each answer does, as its buttons say it.
+        if (prompt.Question.Length > 0)
+        {
+            string question = prompt.Question.Contains("{source}", StringComparison.Ordinal)
+                ? prompt.Question.Replace("{source}", source, StringComparison.Ordinal)
+                : $"{source}: {prompt.Question}";
+            string detail = prompt.Detail.Length > 0 ? $" {prompt.Detail}." : string.Empty;
+            return new MayChosenAnswer
+            {
+                Accept = Yes($"{question}{detail} Yes is \"{prompt.Yes}\", no is \"{prompt.No}\". Do you say yes?"),
+            };
+        }
+
         return new MayChosenAnswer
         {
             Accept = Yes($"{source} says you may {Verb(prompt.Verb)}{amount}. Do you?"),

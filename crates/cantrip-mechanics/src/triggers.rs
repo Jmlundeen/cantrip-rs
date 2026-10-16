@@ -2,6 +2,10 @@
 
 use cantrip_api::*;
 
+/// What ward's discard cost asks the player whose spell or ability targeted, the question on that spell or ability.
+const WARD_DISCARD: Question =
+    Question::new("DiscardUnlessCountered", "Discard a card, or {source} is countered?", "Ward: what it targeted can't be targeted for free", "Discard a card", "Let it be countered").no_default();
+
 /// "When this enters" (CR 603.6a): the entering object's own zone change onto the battlefield.
 pub fn this_enters(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
@@ -273,13 +277,30 @@ pub const fn ward<const N: u8>(text: &'static str) -> AbilityDef {
         .ward()
 }
 
+/// What ward's life cost asks the player whose spell or ability targeted, the question on that spell or ability: pay it,
+/// or have it countered.
+fn ward_life_question(n: u8) -> &'static Question {
+    const DETAIL: &str = "Ward: what it targeted can't be targeted for free";
+    const TWO: Question =
+        Question::new("PayLifeUnlessCountered", "Pay 2 life, or {source} is countered?", DETAIL, "Pay 2 life", "Let it be countered").amount(2).no_default();
+    const THREE: Question =
+        Question::new("PayLifeUnlessCountered", "Pay 3 life, or {source} is countered?", DETAIL, "Pay 3 life", "Let it be countered").amount(3).no_default();
+    const ANY: Question =
+        Question::new("PayLifeUnlessCountered", "Pay the life, or {source} is countered?", DETAIL, "Pay the life", "Let it be countered").no_default();
+    match n {
+        2 => &TWO,
+        3 => &THREE,
+        _ => &ANY,
+    }
+}
+
 fn ward_life_effect<const N: u8>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Target::Object(by) = item.subject else { return Ok(()) };
     let payer = PlayerId(item.data[0] as u8);
     // A cost of life is paid only by a player with that much (CR 119.4), so nobody else is asked; the payer says whether
     // to pay, as the C# engine's unlessPaysLife asked it.
     let paid = g.state().player(payer).life >= N as i32
-        && g.ask(payer, RequestKind::May { source: item.object, purpose: Purpose::Optional })? == Answer::Yes;
+        && g.ask(payer, RequestKind::May { source: by, purpose: Purpose::Ask(ward_life_question(N)) })? == Answer::Yes;
     if paid {
         g.lose_life(payer, N as i32);
     } else {
@@ -300,7 +321,7 @@ fn ward_discard_effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
     let payer = PlayerId(item.data[0] as u8);
     // A player with no card in hand cannot pay and is not asked; one who can is asked whether to, and then which card.
     if !g.state().zone(Zone::hand(payer)).is_empty()
-        && matches!(g.ask(payer, RequestKind::May { source: by, purpose: Purpose::Discard })?, Answer::Yes)
+        && matches!(g.ask(payer, RequestKind::May { source: by, purpose: Purpose::Ask(&WARD_DISCARD) })?, Answer::Yes)
     {
         crate::discard_chosen(g, payer, item.object, 1)?;
         return Ok(());

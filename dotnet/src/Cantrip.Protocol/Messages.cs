@@ -1352,6 +1352,29 @@ public sealed class MayPromptMessage : PromptPayload
     [Key(3)]
     public int Amount { get; set; }
 
+    /// <summary>
+    /// The card's own question, for a "you may" it words itself: after the source's name and a colon ("pay 2 life?"), or
+    /// with <c>{source}</c> where the name goes. Empty for one the client words from <see cref="Verb"/>.
+    /// </summary>
+    [Key(4)]
+    public string Question { get; set; } = string.Empty;
+
+    /// <summary>What the choice means beyond its buttons ("If you don't, it enters tapped"), with a worded question.</summary>
+    [Key(5)]
+    public string Detail { get; set; } = string.Empty;
+
+    /// <summary>The accepting button's caption, named for what it does ("Pay 2 life"), with a worded question.</summary>
+    [Key(6)]
+    public string Yes { get; set; } = string.Empty;
+
+    /// <summary>The declining button's caption ("Enters tapped"), with a worded question.</summary>
+    [Key(7)]
+    public string No { get; set; } = string.Empty;
+
+    /// <summary>Neither answer is the default, so passing through prompts never pays or risks it by accident.</summary>
+    [Key(8)]
+    public bool NoDefault { get; set; }
+
     /// <summary>Not doing it: "you may" never has to be taken up.</summary>
     public override AnswerPayload Default() => new MayChosenAnswer { Accept = false };
 }

@@ -2,12 +2,14 @@ use cantrip_api::*;
 use cantrip_mechanics::{triggers::THIS_ENTERS, effects, library::{search_to_hand, Find}};
 use cantrip_oracle as oracle;
 
+const ASK: Question = Question::new("SearchLibrary", "search your library for up to two cards with mana value 1 or less?", "Artifact, creature and/or enchantment cards, revealed and put into your hand, then shuffle", "Search", "Don't search");
+
 /// You may search your library for up to two artifact, creature, and/or enchantment cards with mana value 1 or less,
 /// reveal them, put them into your hand, then shuffle (CR 701.23). The "may" is asked first; declining skips the
 /// search and the shuffle.
 fn search(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let player = item.controller;
-    if !effects::ask_may(g, player, item.object, Purpose::Optional)? {
+    if !effects::ask_may(g, player, item.object, Purpose::Ask(&ASK))? {
         return Ok(());
     }
     search_to_hand(g, player, item.object, Find::ONE.revealed().up_to(2), |q, c| {

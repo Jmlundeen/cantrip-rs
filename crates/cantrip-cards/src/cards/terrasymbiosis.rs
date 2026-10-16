@@ -2,6 +2,8 @@ use cantrip_api::*;
 use cantrip_mechanics::effects::ask_may;
 use cantrip_oracle as oracle;
 
+const ASK: Question = Question::new("Draw", "draw that many cards?", "One for each +1/+1 counter put  ·  only once each turn", "Draw", "Don't draw");
+
 fn draw_ability(q: &dyn Query, source: ObjectId) -> AbilityRef {
     AbilityRef { card: q.chars(source).card, index: 0 }
 }
@@ -31,7 +33,7 @@ fn may_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if item.data[0] == 0 || g.history().done(item.object, item.ability) {
         return Ok(());
     }
-    if !ask_may(g, item.controller, item.object, Purpose::Optional)? {
+    if !ask_may(g, item.controller, item.object, Purpose::Ask(&ASK))? {
         return Ok(());
     }
     g.note_done(item.object, item.ability);

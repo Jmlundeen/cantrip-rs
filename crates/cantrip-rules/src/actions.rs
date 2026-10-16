@@ -11,6 +11,15 @@ use cantrip_state::Span;
 use crate::layers::{self, live, summoning_sick};
 use crate::{Cx, Flow, R, Stop, ops, static_rules};
 
+/// What a static ability that offers another cost for an activated ability asks (CR 118.9, 602.2b): Forge Anew.
+const ALTERNATIVE_ACTIVATION_COST: Question = Question::new(
+    "AlternativeCost",
+    "pay its alternative cost instead of the ability's mana cost?",
+    "",
+    "Use the alternative cost",
+    "Pay the mana cost",
+);
+
 pub fn sorcery_timing(cx: &Cx, player: PlayerId) -> bool {
     let s = cx.s();
     s.turn.active == player && s.turn.step().is_main() && s.stack.is_empty()
@@ -3198,7 +3207,7 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
     // CR 118.9, 602.2b: a static ability may let the player pay another cost rather than the ability's mana cost.
     if let Some((granter, alternative)) = static_rules::activation_alternative(cx, player, source, def)
         && alternative != mana
-        && matches!(cx.ask_core(player, RequestKind::May { source: granter, purpose: Purpose::AlternativeCost }, true)?, Answer::Yes)
+        && matches!(cx.ask_core(player, RequestKind::May { source: granter, purpose: Purpose::Ask(&ALTERNATIVE_ACTIVATION_COST) }, true)?, Answer::Yes)
     {
         mana = alternative;
     }

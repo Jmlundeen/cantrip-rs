@@ -19,7 +19,7 @@ fn reveal_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         let chooser = match opponents.len() {
             0 => None,
             1 => Some(opponents[0]),
-            _ => choose::player(g, you, item.object, opponents, "Choose", 0)?,
+            _ => choose::player(g, you, item.object, opponents, "ChooseRevealedCard", 0)?,
         };
         if let Some(chooser) = chooser
             && let Some(card) = choose::card(g, chooser, item.object, Purpose::PutIntoHand, revealed.clone())?

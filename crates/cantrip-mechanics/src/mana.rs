@@ -13,7 +13,7 @@ pub fn enters_tapped(_: &mut dyn Game, entering: &mut Entering) -> Result<(), Su
 /// player with the life to pay is asked. Blood Crypt and Breeding Pool print it.
 pub fn enters_tapped_unless_pay_two_life(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
     let paid = g.state().player(entering.controller).life >= 2
-        && g.ask(entering.controller, RequestKind::May { source: entering.object, purpose: Purpose::Optional })? == Answer::Yes;
+        && g.ask(entering.controller, RequestKind::May { source: entering.object, purpose: Purpose::Ask(&PAY_TWO_LIFE_OR_TAPPED) })? == Answer::Yes;
     if paid {
         g.lose_life(entering.controller, 2);
     } else {
@@ -26,7 +26,7 @@ pub fn enters_tapped_unless_pay_two_life(g: &mut dyn Game, entering: &mut Enteri
 /// pain lands'. Soporific Springs and Shatterskull, the Hammer Pass print it.
 pub fn enters_tapped_unless_pay_three_life(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
     let paid = g.state().player(entering.controller).life >= 3
-        && g.ask(entering.controller, RequestKind::May { source: entering.object, purpose: Purpose::Optional })? == Answer::Yes;
+        && g.ask(entering.controller, RequestKind::May { source: entering.object, purpose: Purpose::Ask(&PAY_THREE_LIFE_OR_TAPPED) })? == Answer::Yes;
     if paid {
         g.lose_life(entering.controller, 3);
     } else {
@@ -85,3 +85,11 @@ pub fn sunburst(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend
     entering.counters[CounterKind::Charge as usize] += colors;
     Ok(())
 }
+
+/// What a land that may be paid for with 2 life asks as it enters: "Pay 2 life" or "Enters tapped".
+pub const PAY_TWO_LIFE_OR_TAPPED: Question =
+    Question::new("PayLife", "pay 2 life?", "If you don't, it enters tapped", "Pay 2 life", "Enters tapped").amount(2).no_default();
+
+/// What a land that may be paid for with 3 life asks as it enters: "Pay 3 life" or "Enters tapped".
+pub const PAY_THREE_LIFE_OR_TAPPED: Question =
+    Question::new("PayLife", "pay 3 life?", "If you don't, it enters tapped", "Pay 3 life", "Enters tapped").amount(3).no_default();

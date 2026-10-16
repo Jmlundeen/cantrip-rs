@@ -2,6 +2,8 @@ use cantrip_api::*;
 use cantrip_mechanics::attach::{attached_object, equip};
 use cantrip_oracle as oracle;
 
+const ASK: Question = Question::new("RevealUntilSharesCreatureType", "reveal until you reveal a creature card that shares a creature type?", "That card goes into your hand; the rest go on the bottom of your library in a random order", "Reveal", "Don't reveal");
+
 fn plus_three_one(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.power = chars.power.map(|v| v + 3);
     chars.toughness = chars.toughness.map(|v| v + 1);
@@ -28,7 +30,7 @@ fn reveal_until_shared(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
     let you = item.controller;
     let Target::Object(dead) = item.subject else { return Ok(()) };
     let types = g.chars(dead).subtypes;
-    if !cantrip_mechanics::effects::ask_may(g, you, item.object, Purpose::Optional)? {
+    if !cantrip_mechanics::effects::ask_may(g, you, item.object, Purpose::Ask(&ASK))? {
         return Ok(());
     }
     let mut revealed: Vec<ObjectId> = Vec::new();

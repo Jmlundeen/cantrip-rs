@@ -3,6 +3,8 @@ use cantrip_mechanics::attach::{attached_object, equip};
 use cantrip_mechanics::effects::ask_may;
 use cantrip_oracle as oracle;
 
+const ASK: Question = Question::new("ReturnAndAttach", "return it to the battlefield attached to that creature?", "", "Return it", "Leave it");
+
 fn plus_one_plus_two(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.power = chars.power.map(|v| v + 1);
     chars.toughness = chars.toughness.map(|v| v + 2);
@@ -33,7 +35,7 @@ fn return_and_attach(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> 
     if !is_live(g, sword) || g.obj(sword).zone != Zone::graveyard(item.controller) {
         return Ok(());
     }
-    if !ask_may(g, item.controller, sword, Purpose::Optional)? {
+    if !ask_may(g, item.controller, sword, Purpose::Ask(&ASK))? {
         return Ok(());
     }
     let returned = g.put_onto_battlefield(sword, item.controller, false)?;

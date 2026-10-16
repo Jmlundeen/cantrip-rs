@@ -2,6 +2,8 @@ use cantrip_api::*;
 use cantrip_mechanics::{damage_target, targets};
 use cantrip_oracle as oracle;
 
+const ASK: Question = Question::new("PayEnergy", "pay an energy counter?", "Each one paid is 1 more damage  ·  pay one at a time, as many as you like", "Pay 1 energy", "Pay no more");
+
 /// You get {E}{E}{E} (three energy counters), then you may pay any amount of {E}. Galvanic Discharge deals that much
 /// damage to that permanent.
 ///
@@ -13,7 +15,7 @@ fn discharge(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.change_energy(you, 3);
     let mut paid = 0u16;
     while g.state().player(you).energy > 0 {
-        if !cantrip_mechanics::effects::ask_may(g, you, item.object, Purpose::Optional)? {
+        if !cantrip_mechanics::effects::ask_may(g, you, item.object, Purpose::Ask(&ASK))? {
             break;
         }
         g.change_energy(you, -1);

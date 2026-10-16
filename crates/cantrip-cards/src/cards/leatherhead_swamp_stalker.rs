@@ -3,6 +3,8 @@ use cantrip_mechanics::targets;
 use cantrip_mechanics::triggers::DEALS_COMBAT_DAMAGE_TO_PLAYER;
 use cantrip_oracle as oracle;
 
+const ASK: Question = Question::new("RemoveACounter", "remove a counter from her?", "When you do, destroy target artifact or enchantment that player controls", "Remove a counter", "Keep it");
+
 /// "Leatherhead enters with a hexproof counter on her" (CR 122.1b, 614.1c): a keyword counter that grants hexproof for as
 /// long as it is there.
 fn enters(_: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
@@ -41,7 +43,7 @@ fn remove_counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         return Ok(());
     }
     let Some(kind) = counter_to_shed(g, me) else { return Ok(()) };
-    if !cantrip_mechanics::effects::ask_may(g, item.controller, me, Purpose::Optional)? {
+    if !cantrip_mechanics::effects::ask_may(g, item.controller, me, Purpose::Ask(&ASK))? {
         return Ok(());
     }
     g.add_counters(me, kind, -1);

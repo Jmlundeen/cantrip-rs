@@ -2,6 +2,8 @@ use cantrip_api::*;
 use cantrip_mechanics::{choose, damage_target, exile_and_return_transformed, targets, triggers, effects, tokens};
 use cantrip_oracle as oracle;
 
+const ASK: Question = Question::new("ExileAndReturn", "exile Ajani, then return him to the battlefield transformed?", "He returns as Ajani, Nacatl Avenger", "Exile and transform", "Don't");
+
 /// The 2/1 white Cat Warrior token both faces make.
 pub static CAT_WARRIOR: CardDef = CardDef {
     name: "Cat Warrior",
@@ -43,7 +45,7 @@ fn cats_die(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
 /// "You may exile Ajani, then return him to the battlefield transformed under his owner's control." The choice is
 /// asked whether or not he is still there; if he is not, there is nothing to exile (CR 400.7).
 fn exile_and_return(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if !effects::ask_may(g, item.controller, item.object, Purpose::Optional)? {
+    if !effects::ask_may(g, item.controller, item.object, Purpose::Ask(&ASK))? {
         return Ok(());
     }
     let owner = g.obj(item.object).owner;

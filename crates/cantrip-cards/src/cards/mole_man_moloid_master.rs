@@ -4,9 +4,11 @@ use cantrip_mechanics::tokens;
 use cantrip_mechanics::triggers;
 use cantrip_oracle as oracle;
 
+const ASK: Question = Question::new("Mill", "mill a card?", "", "Mill", "Don't mill");
+
 /// "You may mill a card": asked first, then the mill (CR 701.17a).
 fn may_mill(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if effects::ask_may(g, item.controller, item.object, Purpose::Optional)? {
+    if effects::ask_may(g, item.controller, item.object, Purpose::Ask(&ASK))? {
         g.mill(item.controller, 1);
     }
     Ok(())

@@ -1,0 +1,22 @@
+# Browser
+# Hallowed Fountain: "As this land enters, you may pay 2 life. If you don't, it enters tapped." Bot1's page asks it in the
+# card's words, with buttons named for what each answer does, not Yes and No: "Pay 2 life", or "Enters tapped". Bot1 pays:
+# the land is untapped and life is 18.
+
+[Bot1 Deck]
+Hallowed Fountain
+Plains x19
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Hallowed Fountain.Play
+? Client.Bot1.Prompt.Title = Hallowed Fountain: pay 2 life?
+? Client.Bot1.Prompt.Detail = If you don't, it enters tapped
+? Client.Bot1.Dock = Pay 2 life; Enters tapped
+Bot1.Accept
+
+[Expect]
+Bot1.Life = 18
+Bot1.Battlefield.Hallowed Fountain.Tapped = false

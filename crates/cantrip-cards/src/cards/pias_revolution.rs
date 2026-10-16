@@ -3,6 +3,8 @@ use cantrip_mechanics::effects;
 use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
 
+const ASK: Question = Question::new("TakeDamageInsteadOfReturn", "have it deal 3 damage to you?", "If you don't, the artifact card returns to its owner's hand", "Take 3 damage", "Let it return").amount(3).no_default();
+
 /// "Whenever a nontoken artifact is put into your graveyard from the battlefield": "your graveyard" is the owner's
 /// (CR 400.3), judged on the board as the artifact last existed (CR 603.10a). The card is the ability's subject.
 fn artifact_to_your_graveyard(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
@@ -23,7 +25,7 @@ fn artifact_to_your_graveyard(q: &dyn Query, source: ObjectId, event: &Event) ->
 /// returns to its owner's hand, provided it is still in the graveyard. The choice is theirs either way.
 fn return_unless_damaged(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Target::Player(opponent) = item.targets[0] else { return Ok(()) };
-    if effects::ask_may(g, opponent, item.object, Purpose::Optional)? {
+    if effects::ask_may(g, opponent, item.object, Purpose::Ask(&ASK))? {
         g.damage(item.object, Target::Player(opponent), 3);
         return Ok(());
     }

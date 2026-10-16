@@ -3,6 +3,8 @@ use cantrip_mechanics::choose;
 use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
 
+const ASK: Question = Question::new("PutCounters", "put two +1/+1 counters on a creature?", "It gains lifelink until end of turn", "Choose a creature", "No creature");
+
 fn creatures(g: &dyn Query) -> Vec<ObjectId> {
     g.state().battlefield().iter().copied().filter(|&id| g.chars(id).is(CardType::Creature)).collect()
 }
@@ -14,7 +16,7 @@ fn counters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if candidates.is_empty() {
         return Ok(());
     }
-    if !cantrip_mechanics::effects::ask_may(g, item.controller, item.object, Purpose::Optional)? {
+    if !cantrip_mechanics::effects::ask_may(g, item.controller, item.object, Purpose::Ask(&ASK))? {
         return Ok(());
     }
     let chosen = if candidates.len() == 1 {

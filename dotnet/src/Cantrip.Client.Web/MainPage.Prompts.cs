@@ -895,6 +895,9 @@ public sealed partial class MainPage
         {
             "Draw" => prompt.Amount == 1 ? "draws a card" : $"draws {prompt.Amount} cards",
             "Gift" => "is promised the gift",
+            "LookAtHand" => "shows you their hand, then you choose a card name",
+            "ChooseRevealedCard" => "chooses which revealed card goes into your hand; the other is exiled with a silver counter",
+            "GainControl" => "gains control of this artifact",
             _ => prompt.Verb,
         };
 
@@ -1503,6 +1506,16 @@ public sealed partial class MainPage
 
         string Named(string fallback) => client.Object(prompt.Source)?.Name ?? fallback;
 
+        // A card that words its own question: its title, and buttons named for what each answer does.
+        if (prompt.Question.Length > 0)
+        {
+            string title = prompt.Question.Contains("{source}", StringComparison.Ordinal)
+                ? prompt.Question.Replace("{source}", source, StringComparison.Ordinal)
+                : $"{source}: {prompt.Question}";
+            Ask(title, prompt.Detail, prompt.Yes, prompt.No, yesIsPrimary: !prompt.NoDefault);
+            return;
+        }
+
         switch (prompt.Verb)
         {
             case "PayLife":
@@ -1774,9 +1787,16 @@ public sealed partial class MainPage
         };
 
         // An ability waiting on the stack carries the sentence it was printed with, so that is the hint whenever there is one.
-        string detail = client.Object(prompt.Source) is { Kind: ObjectKindView.AbilityOnStack, OracleText.Length: > 0 } asking
+        string detail = client.Object(prompt.Source) is { OracleText.Length: > 0 } asking
             ? asking.OracleText
-            : "You may, but you don't have to";
+            : string.Empty;
+
+        // A plain "you may" a card has not worded: the card's own text is all there is to say what yes does.
+        if (prompt.Verb is "Optional" or "")
+        {
+            Ask(source, detail, "Yes", "No");
+            return;
+        }
 
         Ask($"{source}: {action}?", detail, "Yes", "No");
     }

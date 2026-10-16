@@ -2,6 +2,8 @@ use cantrip_api::*;
 use cantrip_mechanics::{choose, tokens};
 use cantrip_oracle as oracle;
 
+const ASK: Question = Question::new("Exile", "exile the discarded card from your graveyard?", "", "Exile it", "Leave it");
+
 /// "Whenever you discard a card": the card, in the graveyard, is what the ability is about.
 fn you_discard(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
@@ -17,7 +19,7 @@ fn exile_discarded(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if !is_live(g, card) || !g.obj(card).zone.is(ZoneKind::Graveyard) {
         return Ok(());
     }
-    if cantrip_mechanics::effects::ask_may(g, item.controller, item.object, Purpose::Optional)? {
+    if cantrip_mechanics::effects::ask_may(g, item.controller, item.object, Purpose::Ask(&ASK))? {
         g.exile_with(&[card], item.object, false);
     }
     Ok(())

@@ -4,6 +4,8 @@ use cantrip_mechanics::attach::{attached_object, equip};
 use cantrip_mechanics::tokens::MONK;
 use cantrip_oracle as oracle;
 
+const ASK: Question = Question::new("Attach", "attach it to the Monk token?", "", "Attach it", "Don't attach");
+
 fn plus_one_plus_one(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.power = chars.power.map(|v| v + 1);
     chars.toughness = chars.toughness.map(|v| v + 1);
@@ -22,7 +24,7 @@ fn make_monk(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if !is_live(g, equipment) || !g.is_on_battlefield(token) {
         return Ok(());
     }
-    if cantrip_mechanics::effects::ask_may(g, item.controller, equipment, Purpose::Optional)? {
+    if cantrip_mechanics::effects::ask_may(g, item.controller, equipment, Purpose::Ask(&ASK))? {
         g.attach(equipment, token);
     }
     Ok(())

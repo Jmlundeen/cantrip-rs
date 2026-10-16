@@ -2,6 +2,10 @@
 
 use cantrip_api::*;
 
+/// What a permanent that may enter as a copy asks (CR 707.2): yes, and what it copies is chosen next.
+const COPY_AS_ENTERS: Question =
+    Question::new("CopyAsEnters", "enter as a copy?", "You choose what it copies next. If you don't, it enters as itself", "Choose a copy", "Enter as itself");
+
 /// "You may have this [permanent] enter as a copy of any [permanent that passes `eligible`] on the battlefield, except
 /// [`exception`]" (CR 614.1c, 707.2, 707.9): a choice, not a target (CR 608.2d), so hexproof and protection narrow nothing
 /// and an opponent's permanent is as available as your own. With nothing to copy nothing is asked, and with one candidate which to copy is not. The exception becomes part of the copy's own copiable values (CR 707.9b),
@@ -25,7 +29,7 @@ pub fn enter_as_copy(
         return Ok(());
     }
     let controller = g.obj(entering).controller;
-    if g.ask(controller, RequestKind::May { source: entering, purpose: Purpose::CopyAsEnters })? != Answer::Yes {
+    if g.ask(controller, RequestKind::May { source: entering, purpose: Purpose::Ask(&COPY_AS_ENTERS) })? != Answer::Yes {
         return Ok(());
     }
     let chosen = if candidates.len() == 1 {

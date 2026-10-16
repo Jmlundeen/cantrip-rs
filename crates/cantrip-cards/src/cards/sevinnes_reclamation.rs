@@ -4,6 +4,8 @@ use cantrip_mechanics::flashback;
 use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
 
+const ASK: Question = Question::new("CopyThisSpell", "copy this spell?", "You may choose a new target for the copy", "Copy it", "Don't copy");
+
 /// "Target permanent card with mana value 3 or less from your graveyard."
 fn permanent_card_in_your_graveyard(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     targets::card_in_your_graveyard_with_mana_value_at_most(
@@ -22,7 +24,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         g.put_onto_battlefield(card, item.controller, false)?;
     }
     if g.obj(item.object).cast_from == Some(ZoneKind::Graveyard)
-        && effects::ask_may(g, item.controller, item.object, Purpose::Optional)?
+        && effects::ask_may(g, item.controller, item.object, Purpose::Ask(&ASK))?
     {
         g.copy_spell(item.object, item.controller, true)?;
     }

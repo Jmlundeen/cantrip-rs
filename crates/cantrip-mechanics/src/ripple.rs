@@ -26,7 +26,7 @@ fn ripple<const N: usize>(g: &mut dyn Game, item: &StackItem) -> Result<(), Susp
     if library.is_empty() {
         return Ok(());
     }
-    if g.ask(you, RequestKind::May { source: spell, purpose: Purpose::Optional })? != Answer::Yes {
+    if g.ask(you, RequestKind::May { source: spell, purpose: Purpose::Ask(&REVEAL_FOR_RIPPLE) })? != Answer::Yes {
         return Ok(());
     }
     let revealed = library;
@@ -73,3 +73,12 @@ pub const fn trigger<const N: usize>(text: &'static str) -> AbilityDef {
     triggered(when(EventMask::SPELL_CAST, cast_this_spell), ripple::<N>, text)
         .anywhere()
 }
+
+/// What ripple asks: whether to reveal, the cards to cast chosen after.
+const REVEAL_FOR_RIPPLE: Question = Question::new(
+    "RevealForRipple",
+    "reveal the top cards of your library for ripple?",
+    "Cast any with this spell's name without paying their mana costs  \u{b7}  the rest go on the bottom",
+    "Reveal",
+    "Don't reveal",
+);

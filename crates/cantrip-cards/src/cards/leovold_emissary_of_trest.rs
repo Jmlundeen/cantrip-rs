@@ -2,6 +2,8 @@ use cantrip_api::*;
 use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
 
+const ASK: Question = Question::new("Draw", "draw a card?", "", "Draw", "Don't draw");
+
 /// "Each opponent can't draw more than one card each turn." A draw instruction is cut down to the one card the player
 /// has not drawn yet this turn (CR 101.2, 121.2): nothing at all once they have drawn.
 fn limits(_: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool {
@@ -41,7 +43,7 @@ fn may_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if barred {
         return Ok(());
     }
-    if cantrip_mechanics::effects::ask_may(g, you, item.object, Purpose::Optional)? {
+    if cantrip_mechanics::effects::ask_may(g, you, item.object, Purpose::Ask(&ASK))? {
         g.draw(you, 1);
     }
     Ok(())

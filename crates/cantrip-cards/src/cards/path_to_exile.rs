@@ -12,7 +12,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
     let owner = g.controller(creature);
     g.exile(creature);
-    if !effects::ask_may(g, owner, item.object, Purpose::Optional)? {
+    if !effects::ask_may(g, owner, item.object, Purpose::Ask(&cantrip_mechanics::lands::FETCH_BASIC_TAPPED))? {
         return Ok(());
     }
     search_to_battlefield(g, owner, item.object, Find::ONE, true, |q, c| {

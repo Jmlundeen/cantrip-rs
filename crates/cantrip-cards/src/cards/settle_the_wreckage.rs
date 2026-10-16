@@ -4,6 +4,8 @@ use cantrip_mechanics::library::{Find, search_to_battlefield};
 use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
 
+const ASK: Question = Question::new("SearchLibrary", "search your library for that many basic land cards?", "One for each creature exiled. They enter tapped, then you shuffle", "Search", "Don't search");
+
 /// "Exile all attacking creatures target player controls. That player may search their library for that many basic land
 /// cards, put those cards onto the battlefield tapped, then shuffle." The spell targets only the player (CR 115.1), so
 /// hexproof creatures are exiled too. The creatures go in one move (CR 608.2f); "that many" is the number of attacking
@@ -20,7 +22,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         .collect();
     let count = g.exile_all(&attackers).len().min(u8::MAX as usize) as u8;
     // With "that many" zero the player is still asked, and a search for zero cards is still a search and a shuffle.
-    if !effects::ask_may(g, player, item.object, Purpose::Optional)? {
+    if !effects::ask_may(g, player, item.object, Purpose::Ask(&ASK))? {
         return Ok(());
     }
     search_to_battlefield(g, player, item.object, Find::ONE.up_to(count), true, |q, c| {

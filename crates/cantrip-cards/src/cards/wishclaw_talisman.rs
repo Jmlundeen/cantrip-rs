@@ -23,7 +23,7 @@ fn search_and_give(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let opponents: Vec<PlayerId> = g.state().opponents(player).collect();
     let new_controller = match opponents.len() {
         1 => Some(opponents[0]),
-        _ => choose::player(g, player, me, opponents, "gains control of this artifact.", 0)?,
+        _ => choose::player(g, player, me, opponents, "GainControl", 0)?,
     };
     let Some(new_controller) = new_controller else { return Ok(()) };
     g.gain_control(me, me, new_controller, Duration::Indefinite);

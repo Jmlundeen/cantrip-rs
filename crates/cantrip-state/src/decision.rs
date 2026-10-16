@@ -418,6 +418,44 @@ pub enum Gift {
     Octopus,
 }
 
+/// A "you may" in the words of the card or rule that asks it (CR 608.2d), so the player is asked what the card says and
+/// each answer is named for what it does: "Pay 2 life" and "Enters tapped", not Yes and No.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub struct Question {
+    /// What the bots read the choice by, a verb of the card vocabulary: `PayLife`, `Draw`, `SearchLibrary`.
+    pub verb: &'static str,
+    /// The question, after the source's name and a colon ("pay 2 life?"), or with `{source}` where the name goes.
+    pub ask: &'static str,
+    /// What the choice means beyond its buttons: "If you don't, it enters tapped". May be empty.
+    pub detail: &'static str,
+    /// The button that accepts, named for what it does.
+    pub yes: &'static str,
+    /// The button that declines, named for what it does.
+    pub no: &'static str,
+    /// How much, for a verb with an amount: the life `PayLife` pays.
+    pub amount: u8,
+    /// Whether accepting is the default a player passing through prompts takes. False for a choice that costs or risks
+    /// something, so passing never pays it by accident.
+    pub yes_is_default: bool,
+}
+
+impl Question {
+    /// A question whose answer yes is the default, with no amount.
+    pub const fn new(verb: &'static str, ask: &'static str, detail: &'static str, yes: &'static str, no: &'static str) -> Self {
+        Question { verb, ask, detail, yes, no, amount: 0, yes_is_default: true }
+    }
+
+    /// The same question, with an amount for its verb.
+    pub const fn amount(self, amount: u8) -> Self {
+        Question { amount, ..self }
+    }
+
+    /// The same question, with neither answer the default.
+    pub const fn no_default(self) -> Self {
+        Question { yes_is_default: false, ..self }
+    }
+}
+
 /// Why a player is choosing.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum Purpose {
@@ -444,8 +482,11 @@ pub enum Purpose {
     PutOnLibrary,
     /// A card put onto the battlefield (Show and Tell).
     PutOntoBattlefield,
-    /// A plain "you may" with nothing more to say about it.
+    /// A plain "you may" with nothing more to say about it. A prompt that asks only this shows the source's text and Yes
+    /// and No; a card says what it asks with [`Purpose::Ask`] instead.
     Optional,
+    /// A "you may" worded by the card or rule that asks it: the question, and what each answer does.
+    Ask(&'static Question),
     /// "The player whose turn it is may end the turn" (CR 724.1): Obeka, Brute Chronologist.
     EndTurn,
     /// The rest of the C# engine's purposes (CardChoicePurpose), one for one.

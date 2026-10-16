@@ -2,6 +2,8 @@ use cantrip_api::*;
 use cantrip_mechanics::{channel, targets, effects, library::{search_to_battlefield, Find}};
 use cantrip_oracle as oracle;
 
+const ASK: Question = Question::new("SearchLibrary", "search your library for a land card with a basic land type?", "It goes onto the battlefield, then you shuffle", "Search", "Don't search");
+
 /// "Target artifact, enchantment, or nonbasic land an opponent controls" (CR 115.1).
 fn opponents_target(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     matches!(t, Target::Object(id) if targets::permanent(q, id)
@@ -18,7 +20,7 @@ fn destroy_and_search(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
     let Some(target) = targets::object(g, item, 0) else { return Ok(()) };
     let player = g.controller(target);
     g.destroy(target);
-    if !effects::ask_may(g, player, item.object, Purpose::Optional)? {
+    if !effects::ask_may(g, player, item.object, Purpose::Ask(&ASK))? {
         return Ok(());
     }
     search_to_battlefield(g, player, item.object, Find::ONE, false, |q, c| {

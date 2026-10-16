@@ -2,6 +2,8 @@ use cantrip_api::*;
 use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
 
+const ASK: Question = Question::new("DealDamage", "deal that much damage to the target?", "Only once each turn", "Deal the damage", "Don't");
+
 /// "Your opponents can't cast spells during your turn" (CR 101.2): a cast rule, true for who may cast. The opponents of
 /// the permanent's controller may not, while it is that controller's turn.
 fn opponents_cant_cast_on_your_turn(q: &dyn Query, asker: &Asker, caster: PlayerId, _from: ZoneKind) -> bool {
@@ -43,7 +45,7 @@ fn retaliate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if amount == 0 {
         return Ok(());
     }
-    if !cantrip_mechanics::effects::ask_may(g, item.controller, item.object, Purpose::Optional)? {
+    if !cantrip_mechanics::effects::ask_may(g, item.controller, item.object, Purpose::Ask(&ASK))? {
         return Ok(());
     }
     g.note_done(item.object, item.ability);

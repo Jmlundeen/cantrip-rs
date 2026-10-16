@@ -2,6 +2,8 @@ use cantrip_api::*;
 use cantrip_mechanics::{targets, effects};
 use cantrip_oracle as oracle;
 
+const ASK: Question = Question::new("ShuffleIntoLibrary", "shuffle the targeted cards from your graveyard into your library?", "If you don't, they stay in your graveyard", "Shuffle them in", "Leave them");
+
 /// "Target cards from your graveyard" (CR 115.1).
 fn card_in_your_graveyard(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     targets::card_in_your_graveyard(q, asker, t, &[])
@@ -18,7 +20,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
     let you = item.controller;
     let cards: Vec<ObjectId> = (1..item.target_count as usize).filter_map(|slot| targets::object(g, item, slot)).collect();
-    if !effects::ask_may(g, you, item.object, Purpose::Optional)? {
+    if !effects::ask_may(g, you, item.object, Purpose::Ask(&ASK))? {
         return Ok(());
     }
     g.put_into_library(&cards, LibraryPlace::Top);

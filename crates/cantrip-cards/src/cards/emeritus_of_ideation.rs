@@ -2,6 +2,8 @@ use cantrip_api::*;
 use cantrip_mechanics::{choose, triggers::ward, triggers, effects};
 use cantrip_oracle as oracle;
 
+const ASK: Question = Question::new("Exile", "exile eight cards from your graveyard?", "If you do, it becomes prepared", "Exile eight", "Don't exile");
+
 /// "This creature enters prepared" (CR 614.1d, 722.3a).
 fn enters_prepared(_: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
     entering.prepared = true;
@@ -16,7 +18,7 @@ fn exile_eight(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if graveyard.len() < 8 {
         return Ok(());
     }
-    if !effects::ask_may(g, you, item.object, Purpose::Optional)? {
+    if !effects::ask_may(g, you, item.object, Purpose::Ask(&ASK))? {
         return Ok(());
     }
     let chosen = choose::cards(g, you, item.object, Purpose::Exile, graveyard, 8, false)?;

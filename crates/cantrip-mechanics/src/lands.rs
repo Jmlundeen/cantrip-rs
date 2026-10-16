@@ -79,7 +79,7 @@ pub fn destroy_target_its_controller_may_fetch_basic(g: &mut dyn Game, item: &St
 /// first whether to, and declining skips the search and the shuffle (CR 701.23). Ghost Quarter, Erode and Avengers
 /// Disassembled (through `destroy_target_its_controller_may_fetch_basic`) and Demolition Field's own search print it.
 pub fn may_fetch_basic(g: &mut dyn Game, player: PlayerId, source: ObjectId, tapped: bool) -> Result<(), Suspend> {
-    if !effects::ask_may(g, player, source, Purpose::Optional)? {
+    if !effects::ask_may(g, player, source, Purpose::Ask(if tapped { &FETCH_BASIC_TAPPED } else { &FETCH_BASIC }))? {
         return Ok(());
     }
     search_to_battlefield(g, player, source, Find::ONE, tapped, |q, c| {
@@ -177,3 +177,21 @@ pub const fn verge<const A: u16, const B2: u16>(
         mana_ability(TAP, add(second), second_text).condition(controls_either::<A, B2>),
     ]
 }
+
+/// What "[player] may search their library for a basic land card, put it onto the battlefield, then shuffle" asks.
+pub const FETCH_BASIC: Question = Question::new(
+    "SearchLibrary",
+    "search your library for a basic land card?",
+    "It goes onto the battlefield, then you shuffle",
+    "Search",
+    "Don't search",
+);
+
+/// The same search, the land put onto the battlefield tapped (Path to Exile, Erode).
+pub const FETCH_BASIC_TAPPED: Question = Question::new(
+    "SearchLibrary",
+    "search your library for a basic land card?",
+    "It enters tapped, then you shuffle",
+    "Search",
+    "Don't search",
+);

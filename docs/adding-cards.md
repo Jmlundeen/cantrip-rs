@@ -133,6 +133,11 @@ stops there (`?` carries the `Suspend` out). Once the question is answered, the 
   is skipped in some places and not in others (a lone copy candidate is taken; a sacrifice of exactly as many as
   there are is taken; a discard is always asked unless the hand is empty); match the existing cards, since the
   scenarios rely on it.
+- A "you may" is worded by the card: `effects::ask_may(g, player, source, Purpose::Ask(&ASK))` with a `const ASK: Question`
+  beside it - the question in the card's words ("pay 2 life?", shown after the source's name), what it means beyond its
+  buttons, and the buttons named for what each answer does ("Pay 2 life", "Enters tapped"), not Yes and No; a verb the
+  bots read it by (`PayLife`, `Draw`, `SearchLibrary`); `.no_default()` when saying yes costs or risks something.
+  `Purpose::Optional` shows only the card's text and Yes and No.
 - Most questions are asked through `cantrip_mechanics::choose` (`card`, `cards`, `card_from`, `cards_from`, `player`,
   `one_of`), which return the thing chosen. The core checks every answer against its question before the card sees
   it, so a card never matches on an answer of the wrong shape.

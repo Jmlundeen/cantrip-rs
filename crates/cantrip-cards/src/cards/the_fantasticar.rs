@@ -4,6 +4,9 @@ use cantrip_mechanics::tokens;
 use cantrip_mechanics::triggers::{noncreature_spell_you_cast, NONCREATURE_SPELL_YOU_CAST};
 use cantrip_oracle as oracle;
 
+const ASK_1: Question = Question::new("Animate", "become an artifact creature until end of turn?", "", "Become a creature", "Don't");
+const ASK_2: Question = Question::new("SacrificeForTokens", "sacrifice it?", "If you do, create four 4/4 colorless Construct artifact creature tokens with flying and haste", "Sacrifice it", "Keep it");
+
 /// A 4/4 colorless Construct artifact creature token with flying and haste. Other Constructs of the same name are
 /// different definitions (Urza's, Retrofitter Foundry's).
 pub static CONSTRUCT: CardDef = CardDef {
@@ -21,7 +24,7 @@ pub static CONSTRUCT: CardDef = CardDef {
 
 /// You may have The Fantasticar become an artifact creature until end of turn.
 fn animate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if !ask_may(g, item.controller, item.object, Purpose::Optional)? {
+    if !ask_may(g, item.controller, item.object, Purpose::Ask(&ASK_1))? {
         return Ok(());
     }
     if is_live(g, item.object) && g.is_on_battlefield(item.object) {
@@ -48,7 +51,7 @@ fn sacrifice_and_create(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspen
     if !here(g) {
         return Ok(());
     }
-    if !ask_may(g, you, me, Purpose::Optional)? {
+    if !ask_may(g, you, me, Purpose::Ask(&ASK_2))? {
         return Ok(());
     }
     if !here(g) {

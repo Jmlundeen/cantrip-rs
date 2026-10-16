@@ -3,6 +3,9 @@ use cantrip_mechanics::effects;
 use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
+const ASK: Question =
+    Question::new("PayLifeToReturn", "pay 1 life to return it to your hand?", "", "Pay 1 life", "Leave it").amount(1);
+
 /// "At the beginning of your upkeep, if this card is in your graveyard."
 fn in_graveyard(q: &dyn Query, asker: &Asker) -> bool {
     let obj = q.obj(asker.source);
@@ -15,7 +18,7 @@ fn pay_to_return(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if g.state().player(item.controller).life < 1 {
         return Ok(());
     }
-    if effects::ask_may(g, item.controller, card, Purpose::ReturnToHand)? {
+    if effects::ask_may(g, item.controller, card, Purpose::Ask(&ASK))? {
         g.lose_life(item.controller, 1);
         g.return_to_hand(&[card]);
     }

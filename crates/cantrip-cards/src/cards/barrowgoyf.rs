@@ -2,9 +2,11 @@ use cantrip_api::*;
 use cantrip_mechanics::{choose, goyf, triggers, effects};
 use cantrip_oracle as oracle;
 
+const ASK: Question = Question::new("Mill", "mill that many cards?", "If you do, you may put a creature card from among them into your hand", "Mill", "Don't mill");
+
 /// You may mill that many cards; if you do, you may put a creature card from among them into your hand (CR 701.17c).
 fn mill_and_take(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if !effects::ask_may(g, item.controller, item.object, Purpose::Optional)? {
+    if !effects::ask_may(g, item.controller, item.object, Purpose::Ask(&ASK))? {
         return Ok(());
     }
     let player = item.controller;

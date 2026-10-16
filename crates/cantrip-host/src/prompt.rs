@@ -374,6 +374,7 @@ fn purpose_view(purpose: Purpose, opening: bool) -> CardChoicePurposeView {
         | Purpose::Targets
         | Purpose::Color
         | Purpose::Optional
+        | Purpose::Ask(_)
         | Purpose::EndTurn
         | Purpose::RevealForMiracle
         | Purpose::CastForMiracleCost
@@ -688,9 +689,20 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 kind: kind.word().to_string(),
             })
         }
+        RequestKind::May { source, purpose: Purpose::Ask(question) } => PromptPayload::MayPromptMessage(MayPrompt {
+            player,
+            source: source_handle(game, handles, *source),
+            verb: question.verb.into(),
+            amount: i32::from(question.amount),
+            question: question.ask.into(),
+            detail: question.detail.into(),
+            yes: question.yes.into(),
+            no: question.no.into(),
+            no_default: !question.yes_is_default,
+        }),
         RequestKind::May { source, purpose } => {
             let (verb, amount) = may_verb(*purpose);
-            PromptPayload::MayPromptMessage(MayPrompt { player, source: source_handle(game, handles, *source), verb, amount })
+            PromptPayload::MayPromptMessage(MayPrompt { player, source: source_handle(game, handles, *source), verb, amount, ..MayPrompt::default() })
         }
         RequestKind::ChoosePlayer { source, candidates, verb, amount } => PromptPayload::ChoosePlayerPromptMessage(ChoosePlayerPrompt {
             player,

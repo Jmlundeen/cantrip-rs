@@ -3,10 +3,12 @@ use cantrip_mechanics::targets;
 use cantrip_mechanics::tokens::TREASURE;
 use cantrip_oracle as oracle;
 
+const ASK: Question = Question::new("CreateTreasure", "create a Treasure token?", "If you do, target opponent creates a tapped Treasure token", "Create a Treasure", "No Treasure");
+
 /// You may create a Treasure token. When you do (CR 603.12), target opponent creates a tapped Treasure token: a
 /// creation that did not happen does not satisfy "when you do".
 fn maybe_treasure(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if !cantrip_mechanics::effects::ask_may(g, item.controller, item.object, Purpose::Optional)? {
+    if !cantrip_mechanics::effects::ask_may(g, item.controller, item.object, Purpose::Ask(&ASK))? {
         return Ok(());
     }
     let made = cantrip_mechanics::tokens::create(g, item.controller, &TREASURE, 1)?;

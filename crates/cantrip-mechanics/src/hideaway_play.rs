@@ -9,7 +9,7 @@ use cantrip_api::*;
 pub fn play_exiled_card(g: &mut dyn Game, source: ObjectId, you: PlayerId) -> Result<(), Suspend> {
     let Some(&card) = g.exiled_with(source).first() else { return Ok(()) };
     if g.could_play_land_during_resolution(card) {
-        if g.ask(you, RequestKind::May { source: card, purpose: Purpose::Optional })? == Answer::Yes {
+        if g.ask(you, RequestKind::May { source: card, purpose: Purpose::Ask(&PLAY_EXILED_LAND) })? == Answer::Yes {
             g.play_land_during_resolution(card)?;
         }
     } else if g.could_cast_during_resolution(card)
@@ -19,3 +19,12 @@ pub fn play_exiled_card(g: &mut dyn Game, source: ObjectId, you: PlayerId) -> Re
     }
     Ok(())
 }
+
+/// What playing an exiled land asks: a land played this way is the turn's land play (the hideaway rulings).
+const PLAY_EXILED_LAND: Question = Question::new(
+    "PlayLandDuringResolution",
+    "Play {source}?",
+    "It uses your land play this turn. If you don't, it stays in exile",
+    "Play it",
+    "Don't play",
+);

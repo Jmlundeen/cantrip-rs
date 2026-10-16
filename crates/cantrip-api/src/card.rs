@@ -1120,6 +1120,8 @@ pub struct TurnBeginRule {
     pub applies: fn(&dyn Query, &Asker, PlayerId) -> bool,
     /// What the effect does once its controller has chosen to skip the turn.
     pub on_skip: fn(&mut dyn Game, &Asker) -> Result<(), Suspend>,
+    /// What its controller is asked, in the card's words.
+    pub question: &'static Question,
 }
 
 /// A static ability that says whether a spell or ability may cause a player to discard cards or sacrifice permanents

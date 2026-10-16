@@ -2,6 +2,8 @@ use cantrip_api::*;
 use cantrip_mechanics::{crew::crew, discard_chosen, effects::ask_may};
 use cantrip_oracle as oracle;
 
+const ASK: Question = Question::new("Draw", "draw a card?", "If you do, discard a card", "Draw and discard", "Don't draw");
+
 /// "Whenever this Vehicle attacks or blocks" (CR 508.1, 509.1).
 fn this_attacks_or_blocks(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
@@ -15,7 +17,7 @@ fn this_attacks_or_blocks(_: &dyn Query, source: ObjectId, event: &Event) -> Opt
 /// the player said yes, so a draw that a replacement took or an empty library made discards nothing.
 fn loot(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let player = item.controller;
-    if !ask_may(g, player, item.object, Purpose::Optional)? {
+    if !ask_may(g, player, item.object, Purpose::Ask(&ASK))? {
         return Ok(());
     }
     let before = g.history().drawn(player);

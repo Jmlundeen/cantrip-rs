@@ -2,6 +2,8 @@ use cantrip_api::*;
 use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
 
+const ASK: Question = Question::new("PayEnergyCost", "pay three energy?", "When you do, put two +1/+1 counters and a flying counter on target attacking creature, and it becomes an Angel", "Pay 3 energy", "Don't pay").amount(3);
+
 /// You gain 1 life and get {E} (an energy counter).
 fn bank(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.gain_life(item.controller, 1);
@@ -16,7 +18,7 @@ fn pay_energy(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if g.state().player(you).energy < 3 {
         return Ok(());
     }
-    if !cantrip_mechanics::effects::ask_may(g, you, item.object, Purpose::Optional)? {
+    if !cantrip_mechanics::effects::ask_may(g, you, item.object, Purpose::Ask(&ASK))? {
         return Ok(());
     }
     g.change_energy(you, -3);

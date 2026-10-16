@@ -918,6 +918,18 @@ pub struct MayPrompt {
     pub source: ViewHandle,
     pub verb: String,
     pub amount: i32,
+    /// The card's own words for a worded "you may" (`Purpose::Ask`), each empty for one that is not.
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub question: String,
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub detail: String,
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub yes: String,
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub no: String,
+    /// Neither answer is the default a player passing through prompts takes.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub no_default: bool,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
@@ -1650,7 +1662,7 @@ mod tests {
 
     #[test]
     fn prompts_are_tagged_with_the_csharp_class_name() {
-        let prompt = PromptPayload::MayPromptMessage(MayPrompt { player: 1, source: ViewHandle(7), verb: "SearchLibrary".into(), amount: 0 });
+        let prompt = PromptPayload::MayPromptMessage(MayPrompt { player: 1, source: ViewHandle(7), verb: "SearchLibrary".into(), amount: 0, ..MayPrompt::default() });
         let json = serde_json::to_string(&prompt).unwrap();
         assert_eq!(json, r#"{"$type":"MayPromptMessage","Player":1,"Source":7,"Verb":"SearchLibrary","Amount":0}"#);
         let back: PromptPayload = serde_json::from_str(&json).unwrap();

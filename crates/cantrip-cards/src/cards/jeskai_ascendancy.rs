@@ -3,6 +3,8 @@ use cantrip_mechanics::triggers::NONCREATURE_SPELL_YOU_CAST;
 use cantrip_mechanics::{discard_chosen, pump};
 use cantrip_oracle as oracle;
 
+const ASK: Question = Question::new("Draw", "draw a card?", "If you do, discard a card", "Draw and discard", "Don't draw");
+
 /// Creatures you control get +1/+1 until end of turn, and untap those creatures. The creatures are fixed as the ability
 /// resolves (CR 611.2c): "those creatures" is exactly that set.
 fn pump_untap(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -21,7 +23,7 @@ fn pump_untap(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// the player said yes.
 fn loot(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let player = item.controller;
-    if !cantrip_mechanics::effects::ask_may(g, player, item.object, Purpose::Optional)? {
+    if !cantrip_mechanics::effects::ask_may(g, player, item.object, Purpose::Ask(&ASK))? {
         return Ok(());
     }
     let before = g.state().zone(Zone::hand(player)).len();

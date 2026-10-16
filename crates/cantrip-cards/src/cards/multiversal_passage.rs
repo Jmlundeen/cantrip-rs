@@ -14,7 +14,7 @@ fn enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
     entering.chosen_subtype = Some(TYPES[chosen as usize]);
 
     let paid = g.state().player(entering.controller).life >= 2
-        && effects::ask_may(g, entering.controller, entering.object, Purpose::Optional)?;
+        && effects::ask_may(g, entering.controller, entering.object, Purpose::Ask(&cantrip_mechanics::mana::PAY_TWO_LIFE_OR_TAPPED))?;
     if paid {
         g.lose_life(entering.controller, 2);
     } else {

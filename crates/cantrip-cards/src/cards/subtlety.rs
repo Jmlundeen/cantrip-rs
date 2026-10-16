@@ -4,6 +4,8 @@ use cantrip_mechanics::{evoke, targets};
 use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
+const ASK: Question = Question::new("PutOnTop", "put your spell on top of your library?", "If you don't, it goes on the bottom", "Top", "Bottom");
+
 fn blue_card(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
     q.chars(id).colors.has(q.words(asker.source).color(Color::Blue))
 }
@@ -22,7 +24,7 @@ fn creature_or_planeswalker_spell(q: &dyn Query, asker: &Asker, t: Target) -> bo
 fn put_into_library(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(spell) = targets::object(g, item, 0) else { return Ok(()) };
     let owner = g.obj(spell).owner;
-    let top = ask_may(g, owner, item.object, Purpose::Optional)?;
+    let top = ask_may(g, owner, item.object, Purpose::Ask(&ASK))?;
     g.remove_spell(spell, if top { CounterTo::LibraryTop } else { CounterTo::LibraryBottom });
     Ok(())
 }

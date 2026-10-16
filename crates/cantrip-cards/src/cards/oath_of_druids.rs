@@ -2,6 +2,8 @@ use cantrip_api::*;
 use cantrip_mechanics::effects;
 use cantrip_oracle as oracle;
 
+const ASK: Question = Question::new("RevealUntilCreature", "reveal until you reveal a creature card?", "It goes onto the battlefield; every other card revealed goes into your graveyard", "Reveal", "Don't reveal");
+
 /// "At the beginning of each player's upkeep" (CR 503.1): the ability is about that player, "the first player".
 fn each_upkeep(q: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired> {
     match event {
@@ -23,7 +25,7 @@ fn player_ahead_on_creatures(q: &dyn Query, _: &Asker, t: Target) -> bool {
 /// before anything moves; a library with no creature card is revealed to the last card and every one of them is buried.
 fn reveal(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Target::Player(who) = item.subject else { return Ok(()) };
-    if !effects::ask_may(g, who, item.object, Purpose::Optional)? {
+    if !effects::ask_may(g, who, item.object, Purpose::Ask(&ASK))? {
         return Ok(());
     }
     let mut revealed: Vec<ObjectId> = Vec::new();

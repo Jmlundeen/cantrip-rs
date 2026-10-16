@@ -2,6 +2,8 @@ use cantrip_api::*;
 use cantrip_mechanics::{damage_target, targets, effects};
 use cantrip_oracle as oracle;
 
+const ASK: Question = Question::new("Untap", "untap it?", "", "Untap", "Leave it tapped");
+
 fn ping(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     damage_target(g, item, 0, 1);
     Ok(())
@@ -20,7 +22,7 @@ fn creature_enters(q: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired> {
 
 /// "You may untap this artifact", asked as the ability resolves (CR 608.2d).
 fn may_untap(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if effects::ask_may(g, item.controller, item.object, Purpose::Optional)? {
+    if effects::ask_may(g, item.controller, item.object, Purpose::Ask(&ASK))? {
         g.untap(item.object);
     }
     Ok(())

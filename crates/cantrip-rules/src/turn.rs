@@ -6,6 +6,15 @@ use cantrip_state::{Frame, FrameKind};
 use crate::layers::{self, live, summoning_sick};
 use crate::{Cx, Flow, Game, R, actions, ops};
 
+/// What a card that may begin the game on the battlefield asks (CR 103.6a): the Leylines, Gemstone Caverns.
+const BEGIN_ON_BATTLEFIELD: Question = Question::new(
+    "BeginOnBattlefield",
+    "Begin the game with {source} on the battlefield?",
+    "If you don't, it stays in your opening hand",
+    "Put it onto the battlefield",
+    "Keep it in hand",
+);
+
 /// Shuffles a zone with the state's own generator (Fisher-Yates).
 pub fn shuffle(state: &mut GameState, zone: Zone) {
     let mut cards: Vec<ObjectId> = state.zone(zone).to_vec();
@@ -222,7 +231,7 @@ pub fn opening(cx: &mut Cx) -> R<Flow> {
             if !(action.condition)(cx, &Asker { source: card, controller: p }) {
                 continue;
             }
-            if !matches!(cx.ask_core(p, RequestKind::May { source: card, purpose: Purpose::Optional }, false)?, Answer::Yes) {
+            if !matches!(cx.ask_core(p, RequestKind::May { source: card, purpose: Purpose::Ask(&BEGIN_ON_BATTLEFIELD) }, false)?, Answer::Yes) {
                 continue;
             }
             let with: Vec<(CounterKind, i16)> = action.counter.map(|(k, n)| (k, n as i16)).into_iter().collect();
@@ -333,7 +342,7 @@ fn skip_turn(cx: &mut Cx, player: PlayerId) -> R<bool> {
         }
         for rule in cx.card(card).turn_begin {
             if (rule.applies)(&*cx, &asker, player)
-                && cx.ask_core(player, RequestKind::May { source: id, purpose: Purpose::Optional }, false)? == Answer::Yes
+                && cx.ask_core(player, RequestKind::May { source: id, purpose: Purpose::Ask(rule.question) }, false)? == Answer::Yes
             {
                 (rule.on_skip)(cx, &asker)?;
                 return Ok(true);
