@@ -1,0 +1,52 @@
+# Exalted Sunborn: "If one or more tokens would be created under your control, twice that many of those tokens are created
+# instead" (CR 614.1a, 111.1). Bot1 casts it on turn 1 for {3}{W}{W} (Black Lotus's white and two Moxen), a 4/5 with flying
+# and lifelink. Bot2's Lingering Souls on turn 2 makes just its two Spirits (the refusal: they are not under Bot1's
+# control); Bot1's own Lingering Souls on turn 3 makes four (the positive control).
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Jet
+Exalted Sunborn
+Lingering Souls
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Black Lotus
+Lingering Souls
+Plains x5
+Plains x10
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Exalted Sunborn.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Lingering Souls.Cast
+[T2 Bot2.Main2]
+? Bot2.Battlefield.Count = 2
+? Bot1.Battlefield.Count = 3
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Lingering Souls.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Count = 2
+Bot1.Battlefield.Count = 8
+Bot1.Battlefield.Spirit#4.Power = 1
+Bot1.Battlefield.Spirit#4.Token = true
+Bot1.Battlefield.Exalted Sunborn.Power = 4
+Bot1.Battlefield.Exalted Sunborn.Toughness = 5
+Bot1.Battlefield.Exalted Sunborn.Keywords = Flying; Lifelink
