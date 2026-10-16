@@ -1,0 +1,65 @@
+# A declaration whose total cost to attack is not paid is illegal (CR 508.1, 508.1j: no partial payment) and the game
+# returns to the moment before it (CR 733): the attacking player may then declare fewer attackers. Bot2's Ghostly Prison
+# asks {2} for each creature attacking Bot2. On turn 3 Bot1, with only Mox Ruby and Mox Sapphire for mana, declares both
+# Llanowar Elves ({4}), taps Mox Ruby towards it and gives the declaration up: the Elves untap, the Mox untaps and its mana
+# is gone (the mana ability is undone with the rest). Bot1 then declares one Elf and pays its {2} with both Moxen. One Elf
+# attacks; Bot2 goes to 19.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Llanowar Elves
+Mox Ruby
+Mox Sapphire
+Forest
+Forest x10
+
+[Bot2 Deck]
+Plains
+Black Lotus
+Ghostly Prison
+Plains
+Plains
+Plains
+Plains
+Plains x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Ghostly Prison.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Attack(Llanowar Elves; Llanowar Elves)
+? Combat.AttackCost = {4}
+Bot1.Battlefield.Mox Ruby.Activate
+? Bot1.Mana = {R}
+? Combat.AttackCost = {4}
+Bot1.Cancel
+? Bot1.Mana =
+? Bot1.Battlefield.Mox Ruby.Tapped = false
+? Bot1.Battlefield.Llanowar Elves#1.Tapped = false
+? Bot1.Battlefield.Llanowar Elves#2.Tapped = false
+Bot1.Attack(Llanowar Elves)
+? Combat.AttackCost = {2}
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 19
+Bot1.Battlefield.Mox Ruby.Tapped = true
+Bot1.Battlefield.Mox Sapphire.Tapped = true
+Bot1.Battlefield.Llanowar Elves#1.Tapped = true
+Bot1.Battlefield.Llanowar Elves#2.Tapped = false
+Bot1.Mana =

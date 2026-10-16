@@ -1,0 +1,49 @@
+# The chosen attackers become tapped (CR 508.1f) before any cost to attack is determined and paid (CR 508.1h-j), so a
+# creature cannot tap for mana to pay its own way past Ghostly Prison. On turn 3 Bot1's only mana is the Llanowar Elves
+# it declares as an attacker: while the {2} is owed its mana ability is not offered, nothing can pay, and Bot1 gives the
+# declaration up. The Elves untap with it (CR 733), and the declaration made again is no attack at all: with no mana a
+# taxed attack cannot be made. Bot2 stays at 20 and the Elves end untapped.
+
+[Bot1 Deck]
+Lotus Petal
+Llanowar Elves
+Island
+Island
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Plains
+Black Lotus
+Ghostly Prison
+Plains
+Plains
+Plains
+Plains
+Plains x10
+
+[Actions]
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Battlefield.Lotus Petal.Activate(Color: Green)
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Ghostly Prison.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Llanowar Elves)
+? Combat.AttackCost = {2}
+! Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Cancel
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Llanowar Elves.Tapped = false
+Bot1.Battlefield.Llanowar Elves.Activate
+? Bot1.Mana = {G}
+
+[Expect]
+Turn = 3
+Bot2.Life = 20
+Bot1.Battlefield.Llanowar Elves.Tapped = true
+Combat.Attackers.Count = 0

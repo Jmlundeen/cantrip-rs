@@ -1,0 +1,69 @@
+# Browser
+# What a player sees of a cost to attack (CR 508.1d, 508.1h-j) under Bot2's Ghostly Prison: the attackers dock says what
+# attacking Bot2 costs a creature and the mana there is for it; the payment that follows the declaration is titled for
+# the attack, not for Ghostly Prison as if it were a spell, and says Cancel declares attackers again. Bot1 declares both
+# Llanowar Elves ({4}), taps Mox Ruby, gives the payment up - the Mox untaps, the declaration is taken back (CR 733) - and
+# declares one Elf, paying {2} with both Moxen. Bot2 takes 1.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Llanowar Elves
+Mox Ruby
+Mox Sapphire
+Forest
+Forest x10
+
+[Bot2 Deck]
+Plains
+Black Lotus
+Ghostly Prison
+Plains
+Plains
+Plains
+Plains
+Plains x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Ghostly Prison.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T3 Bot1.BeginCombat]
+Bot1.Pass
+? Client.Bot1.Prompt.Title = Declare attackers
+? Client.Bot1.Prompt.Detail = 2 can attack  ·  attacking Bot2 costs {2} a creature (you can make up to 6 mana)
+Bot1.Attack(Llanowar Elves; Llanowar Elves)
+? Combat.AttackCost = {4}
+? Client.Bot1.Prompt.Title = Pay {4} to attack with 2 creatures
+? Client.Bot1.Prompt.Detail = Ghostly Prison asks it  ·  {4} still to pay  ·  tap a land  ·  Cancel declares attackers again
+Bot1.Battlefield.Mox Ruby.Activate
+? Bot1.Mana = {R}
+Bot1.Cancel
+? Bot1.Battlefield.Mox Ruby.Tapped = false
+? Client.Bot1.Prompt.Title = Declare attackers
+Bot1.Attack(Llanowar Elves)
+? Combat.AttackCost = {2}
+? Client.Bot1.Prompt.Title = Pay {2} to attack with Llanowar Elves
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 19
+Bot1.Battlefield.Mox Ruby.Tapped = true
+Bot1.Battlefield.Mox Sapphire.Tapped = true
+Bot1.Battlefield.Llanowar Elves#1.Tapped = true
+Bot1.Battlefield.Llanowar Elves#2.Tapped = false
+Bot1.Mana =

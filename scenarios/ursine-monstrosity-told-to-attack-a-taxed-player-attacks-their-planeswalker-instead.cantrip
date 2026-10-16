@@ -1,0 +1,57 @@
+# "This creature attacks that player this combat if able" never makes its controller pay a cost to attack (CR 508.1d):
+# Ursine Monstrosity's beginning-of-combat ability chooses Bot2, whose Ghostly Prison makes attacking Bot2 cost {2}. Bot1
+# has Mox Ruby and Mox Sapphire to pay with but need not; the Monstrosity still attacks each combat if able where that is
+# free, so declaring no attackers is refused, and it attacks Bot2's Liliana of the Veil for nothing - a declaration that
+# would be refused (it attacks someone other than the player it must attack) if attacking Bot2 cost nothing. Liliana dies
+# to 4 damage, Bot2 stays at 20 and both Moxen stay untapped.
+
+[Bot1 Deck]
+Black Lotus
+Ursine Monstrosity
+Mox Ruby
+Mox Sapphire
+Forest
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Plains
+Black Lotus
+Ghostly Prison
+Mox Pearl
+Mox Jet
+Liliana of the Veil
+Plains
+Plains x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Ursine Monstrosity.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Ghostly Prison.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Liliana of the Veil.Cast
+[T3 Bot1.Main1]
+! Bot1.Attack()
+Bot1.Attack(Ursine Monstrosity > Liliana of the Veil)
+? Combat.Attackers = Ursine Monstrosity > Liliana of the Veil
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 20
+Bot2.Graveyard = Liliana of the Veil; Black Lotus
+Bot1.Battlefield.Ursine Monstrosity.Tapped = true
+Bot1.Battlefield.Mox Ruby.Tapped = false
+Bot1.Battlefield.Mox Sapphire.Tapped = false

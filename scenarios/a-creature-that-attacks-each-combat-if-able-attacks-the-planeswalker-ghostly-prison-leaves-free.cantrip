@@ -1,0 +1,53 @@
+# A cost to attack is not a requirement (CR 508.1d), but the requirement still holds where an attack costs nothing: Ghostly
+# Prison taxes only attacks on its controller, not on a planeswalker they control (the rulings). With Bot2's Ghostly Prison
+# and Liliana of the Veil out, Anje's Ravager (attacks each combat if able) must attack Liliana: a declaration of no
+# attackers is refused on turn 3, and the Ravager attacks Liliana for nothing. Liliana, at 3 loyalty, takes 3 and dies;
+# Bot2 stays at 20; Mox Ruby, which could have paid, stays untapped.
+
+[Bot1 Deck]
+Black Lotus
+Anje's Ravager
+Mox Ruby
+Island
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Plains
+Black Lotus
+Ghostly Prison
+Mox Pearl
+Mox Jet
+Liliana of the Veil
+Plains
+Plains x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Anje's Ravager.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Ghostly Prison.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Liliana of the Veil.Cast
+[T3 Bot1.Main1]
+! Bot1.Attack()
+Bot1.Attack(Anje's Ravager > Liliana of the Veil)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 20
+Bot2.Graveyard = Liliana of the Veil; Black Lotus
+Bot1.Battlefield.Anje's Ravager.Tapped = true
+Bot1.Battlefield.Mox Ruby.Tapped = false

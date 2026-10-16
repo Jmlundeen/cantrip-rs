@@ -1,0 +1,61 @@
+# Paying a cost to attack and a cost reduction that counts attackers: under Bot2's Ghostly Prison Bot1 pays {4} to attack
+# with both Llanowar Elves (CR 508.1h-j), Black Lotus and Mox Emerald paying it, and then in the declare attackers step casts
+# Embercleave, which "costs {1} less to cast for each attacking creature you control": {2}{R}{R}, paid by the second Black
+# Lotus and Mox Ruby, so the Forest stays untapped (a full {4}{R}{R} could not have been paid at all). Embercleave goes on an
+# Elf (2/2 double strike, trample): 4 from it and 1 from the other, Bot2 to 15.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Llanowar Elves
+Black Lotus
+Black Lotus
+Mox Ruby
+Embercleave
+Island x10
+
+[Bot2 Deck]
+Plains
+Black Lotus
+Ghostly Prison
+Plains
+Plains
+Plains
+Plains
+Plains x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Ghostly Prison.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Llanowar Elves; Llanowar Elves)
+? Combat.AttackCost = {4}
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+[T3 Bot1.Attackers]
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Embercleave.Cast
+Bot1.Target(Llanowar Elves)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 15
+Bot1.Battlefield.Embercleave.AttachedTo = Llanowar Elves
+Bot1.Battlefield.Forest.Tapped = false
+Bot1.Battlefield.Mox Ruby.Tapped = true
+Bot1.Battlefield.Mox Emerald.Tapped = true
+Bot1.Graveyard = Black Lotus; Black Lotus

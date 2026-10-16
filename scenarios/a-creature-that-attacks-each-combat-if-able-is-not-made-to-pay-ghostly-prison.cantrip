@@ -1,0 +1,56 @@
+# "Attacks each combat if able" never makes a player pay a cost to attack (CR 508.1d: "If a creature can't attack unless
+# a player pays a cost, that player is not required to pay that cost"). Anje's Ravager must attack each combat if able;
+# with Bot2's Ghostly Prison out and no planeswalker or battle to attack instead, Bot1 declares no attackers on turn 3
+# and the declaration is legal: the Ravager stays home, untapped, its attack trigger never fires (Bot1's hand is not
+# discarded), and Bot2 stays at 20, though Bot1 had Mox Ruby and Mox Sapphire to pay with. On turn 5 Bot1 chooses to
+# pay, and the Ravager attacks after all - the requirement would have been obeyed by attacking and paying too.
+
+[Bot1 Deck]
+Black Lotus
+Anje's Ravager
+Mox Ruby
+Mox Sapphire
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Plains
+Black Lotus
+Ghostly Prison
+Plains
+Plains
+Plains
+Plains
+Plains x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Anje's Ravager.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Ghostly Prison.Cast
+[T3 Bot1.Main1]
+Bot1.Attack()
+[T3 Bot1.Main2]
+? Bot2.Life = 20
+? Bot1.Battlefield.Anje's Ravager.Tapped = false
+? Bot1.Hand.Count = 4
+[T5 Bot1.Main1]
+Bot1.Attack(Anje's Ravager)
+? Combat.AttackCost = {2}
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot2.Life = 17
+Bot1.Battlefield.Anje's Ravager.Tapped = true
+Bot1.Battlefield.Mox Ruby.Tapped = true
+Bot1.Battlefield.Mox Sapphire.Tapped = true

@@ -1,0 +1,59 @@
+# In a game of three, Ghostly Prison's "creatures can't attack you unless ..." taxes only attacks on its controller
+# (CR 508.1d, 508.1h): Bot1's Llanowar Elves attacking Bot3 costs nothing, the other attacking Bot2 costs {2}. On turn 4
+# Bot1 pays {2} with Mox Ruby and Mox Sapphire (after Mox Ruby alone {R} waits in the pool, so the total is more than
+# {1}), and Mox Emerald stays untapped - the attack on Bot3 added nothing (a {4} total could not be paid by the two
+# Moxen). Each defender takes 1.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Llanowar Elves
+Mox Ruby
+Mox Sapphire
+Island
+Island x10
+
+[Bot2 Deck]
+Plains
+Black Lotus
+Ghostly Prison
+Plains
+Plains
+Plains
+Plains
+Plains x10
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Ghostly Prison.Cast
+[T4 Bot1.Main1]
+Bot1.Attack(Llanowar Elves > Bot3; Llanowar Elves > Bot2)
+? Combat.AttackCost = {2}
+? Combat.AttackCost.Attackers = Llanowar Elves
+Bot1.Battlefield.Mox Ruby.Activate
+? Bot1.Mana = {R}
+Bot1.Battlefield.Mox Sapphire.Activate
+[T4 Bot1.Main2]
+
+[Expect]
+Turn = 4
+Bot2.Life = 19
+Bot3.Life = 19
+Bot1.Battlefield.Mox Ruby.Tapped = true
+Bot1.Battlefield.Mox Sapphire.Tapped = true
+Bot1.Battlefield.Mox Emerald.Tapped = false
+Bot1.Mana =

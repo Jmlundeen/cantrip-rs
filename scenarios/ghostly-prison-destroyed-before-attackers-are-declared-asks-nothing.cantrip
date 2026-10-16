@@ -1,0 +1,56 @@
+# The cost to attack is determined as attackers are declared (CR 508.1h), from the effects then in force: a Ghostly Prison
+# destroyed in the beginning of combat step asks nothing (CR 611.3a, its static ability is gone with it). Bot1 casts
+# Disenchant on it with Mox Pearl and Mox Ruby, then attacks with both Llanowar Elves: no payment, Mox Sapphire and Mox
+# Emerald stay untapped, and Bot2 takes 2.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Llanowar Elves
+Mox Pearl
+Mox Ruby
+Mox Sapphire
+Disenchant
+Island x10
+
+[Bot2 Deck]
+Plains
+Black Lotus
+Ghostly Prison
+Plains
+Plains
+Plains
+Plains
+Plains x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Ghostly Prison.Cast
+[T3 Bot1.BeginCombat]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Disenchant.Cast(Ghostly Prison)
+Bot1.Attack(Llanowar Elves; Llanowar Elves)
+? Combat.Attackers = Llanowar Elves > Bot2; Llanowar Elves > Bot2
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 18
+Bot2.Graveyard = Ghostly Prison; Black Lotus
+Bot1.Battlefield.Mox Sapphire.Tapped = false
+Bot1.Battlefield.Mox Emerald.Tapped = false
+Bot1.Battlefield.Llanowar Elves#1.Tapped = true
+Bot1.Battlefield.Llanowar Elves#2.Tapped = true
