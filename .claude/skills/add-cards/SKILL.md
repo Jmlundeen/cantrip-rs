@@ -195,9 +195,20 @@ A card's scenarios, together, must:
   that touch the same rules - a sweeper with indestructible and with regeneration; an enters trigger with a copy and a
   flicker; a cost reduction with an alternative cost and X; a replacement with another replacement and the affected
   player choosing their order (CR 616.1); a static ability with a layer-dependent one. One scenario per interaction.
-- **Assert the outcome precisely** (`[Expect]` and `?` checks): zones, life totals, counters, tapped state,
-  attachments, controller, the stack - the keys that prove the behaviour and no others, so a scenario fails for the
-  right reason.
+- **Verify the rules, not just that the script runs.** Every scenario ends with an `[Expect]` block that states the
+  state the rules require at the end of the game - zones (battlefield, graveyard, exile, hand, library counts), life
+  totals, counters, tapped state, attachments, controller, power and toughness, keywords, the stack - taken from the
+  Oracle text, the rulings and the Comprehensive Rules, **never copied from whatever the engine produced**. A scenario
+  that merely plays through without such an `[Expect]` proves nothing; one with only `?` mid-game checks and no
+  `[Expect]` is not accepted; and an `[Expect]` that would also hold if the rule under test were broken is not
+  accepted either. Each sentence of the card's text, each ruling and each corner case is proven by an expectation that
+  fails when that rule is wrong. Put `?` checks where the position matters before the end (the stack, a prompt, a
+  count at resolution) and `!` refusals beside a positive control. Then prove the scenario can fail: break the card (or
+  the rule) and confirm the scenario goes red, as the `write-game-script` skill says, and say in the review which
+  expectation catches which sentence. List the expectations a reviewer should check against the rules: a reviewer
+  checks the expected values themselves against the rules, not only that they pass.
+- **Assert the outcome precisely** (`[Expect]` and `?` checks): the keys that prove the behaviour and no others, so a
+  scenario fails for the right reason.
 
 Name each scenario for the behaviour it proves (`wrath-of-god-destroys-a-creature-regenerated-in-response`) and start
 it with a `#` comment: what it shows, why its actions are arranged that way, and the rule it proves.
