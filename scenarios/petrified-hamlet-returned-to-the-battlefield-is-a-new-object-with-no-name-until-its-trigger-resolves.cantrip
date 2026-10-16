@@ -1,0 +1,59 @@
+# A Hamlet that leaves and comes back is a new object (CR 400.7) and does not remember the old one's name (CR 607.2d):
+# Bot1's Hamlet names Arid Mesa and stops it, Strip Mine destroys the Hamlet, and Sevinne's Reclamation returns it. While
+# the new Hamlet's trigger is on the stack it has no chosen name, so Bot2 cracks Arid Mesa in response; the trigger then
+# names Wasteland, and the new Hamlet remembers that.
+
+[Bot1 Deck]
+Plains
+Petrified Hamlet
+Sevinne's Reclamation
+Plains
+Plains
+Island x10
+
+[Bot2 Deck]
+Arid Mesa
+Strip Mine
+Island x12
+Mountain
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Arid Mesa.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Petrified Hamlet.Play
+Bot1.Pass
+Bot2.Pass
+Bot1.Name(Arid Mesa)
+[T4 Bot2.Main1]
+! Bot2.Battlefield.Arid Mesa.Activate(Ability: Search)
+Bot2.Hand.Strip Mine.Play
+Bot2.Battlefield.Strip Mine.Activate(Bot1.Battlefield.Petrified Hamlet; Ability: Destroy)
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sevinne's Reclamation.Cast(Petrified Hamlet)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield = Petrified Hamlet; Plains; Plains; Plains
+Bot1.Pass
+Bot2.Battlefield.Arid Mesa.Activate(Ability: Search)
+Bot2.Pass
+Bot1.Pass
+Bot2.Search(Mountain)
+Bot1.Pass
+Bot2.Pass
+Bot1.Name(Wasteland)
+
+[Expect]
+Turn = 7
+Bot1.Battlefield.Petrified Hamlet.ChosenName = Wasteland
+Bot2.Battlefield = Mountain
+Bot2.Graveyard = Arid Mesa; Island; Strip Mine

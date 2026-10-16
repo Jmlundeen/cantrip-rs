@@ -1,0 +1,35 @@
+# Browser
+# Petrified Hamlet at a table: Bot1's page asks for "a land card name" as the trigger resolves (CR 201.4a), worded so,
+# offering land names only - Lightning Bolt is refused - and Wasteland is typed and named. The chosen name is drawn on the
+# Hamlet, and Bot1's Wasteland, now with two "{T}: Add {C}" abilities (its own and the Hamlet's), taps for {C}.
+
+[Bot1 Deck]
+Wasteland
+Petrified Hamlet
+Island x13
+
+[Bot2 Deck]
+Wasteland
+Island x14
+
+[Actions]
+Bot1.Hand.Wasteland.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Wasteland.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Petrified Hamlet.Play
+Bot1.Pass
+Bot2.Pass
+? Client.Bot1.Prompt.Title = Petrified Hamlet: choose a land card name
+? Client.Bot1.Prompt.Detail = Type the name of any land card
+! Bot1.Name(Lightning Bolt)
+Bot1.Name(Wasteland)
+? Client.Bot1.Battlefield.Petrified Hamlet.Annotation = Wasteland
+! Bot1.Battlefield.Wasteland.Activate(Ability: Destroy)
+Bot1.Battlefield.Wasteland.Activate(Ability: #3)
+? Bot1.Mana = {C}
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Petrified Hamlet.ChosenName = Wasteland
+Bot1.Battlefield.Wasteland.Tapped = true

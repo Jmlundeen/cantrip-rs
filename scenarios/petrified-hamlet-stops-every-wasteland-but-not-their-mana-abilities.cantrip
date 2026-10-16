@@ -1,0 +1,46 @@
+# Petrified Hamlet's trigger asks for a land card name as it resolves (CR 201.4a): Lightning Bolt is refused, Wasteland
+# is taken and remembered by the Hamlet (CR 607.2d). From then on Wasteland's destroy ability can't be activated by
+# either player, the Hamlet's controller included (CR 602.5), but its {T}: Add {C} still can, a mana ability
+# (CR 605.1a). Strip Mine, not the chosen name, destroys the Hamlet (the control), and with the Hamlet gone Bot2's
+# Wasteland destroys Bot1's.
+
+[Bot1 Deck]
+Wasteland
+Petrified Hamlet
+Island x13
+
+[Bot2 Deck]
+Wasteland
+Strip Mine
+Island x13
+
+[Actions]
+Bot1.Hand.Wasteland.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Wasteland.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Petrified Hamlet.Play
+Bot1.Pass
+Bot2.Pass
+! Bot1.Name(Lightning Bolt)
+Bot1.Name(Wasteland)
+? Bot1.Battlefield.Petrified Hamlet.ChosenName = Wasteland
+! Bot1.Battlefield.Wasteland.Activate(Ability: Destroy)
+Bot1.Battlefield.Wasteland.Activate(Ability: #1)
+? Bot1.Mana = {C}
+[T4 Bot2.Main1]
+! Bot2.Battlefield.Wasteland.Activate(Ability: Destroy)
+Bot2.Hand.Strip Mine.Play
+Bot2.Battlefield.Strip Mine.Activate(Bot1.Battlefield.Petrified Hamlet; Ability: Destroy)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Petrified Hamlet
+Bot2.Battlefield.Wasteland.Activate(Bot1.Battlefield.Wasteland; Ability: Destroy)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 4
+Bot1.Battlefield.Count = 0
+Bot1.Graveyard = Wasteland; Petrified Hamlet
+Bot2.Graveyard = Wasteland; Strip Mine

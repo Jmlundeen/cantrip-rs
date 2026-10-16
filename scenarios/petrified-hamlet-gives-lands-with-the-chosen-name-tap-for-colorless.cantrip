@@ -1,0 +1,37 @@
+# Lands with the chosen name have "{T}: Add {C}" (CR 613.1f): Bot1's Hamlet names Island, and Bot2's Island taps for {C}
+# as well as for {U} (CR 305.6); Bot2's Mountain, not named Island, is given nothing. The Hamlet's own {T}: Add {C} is
+# untouched by its rule, being a mana ability.
+
+[Bot1 Deck]
+Petrified Hamlet
+Island x14
+
+[Bot2 Deck]
+Island
+Mountain
+Island x13
+
+[Actions]
+Bot1.Hand.Petrified Hamlet.Play
+Bot1.Pass
+Bot2.Pass
+Bot1.Name(Island)
+Bot1.Battlefield.Petrified Hamlet.Activate
+? Bot1.Mana = {C}
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate(Ability: {C})
+? Bot2.Mana = {C}
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+! Bot2.Battlefield.Mountain.Activate(Ability: {C})
+Bot2.Battlefield.Island.Activate(Ability: {U})
+? Bot2.Mana = {U}
+Bot2.Battlefield.Mountain.Activate
+? Bot2.Mana = {U}{R}
+
+[Expect]
+Turn = 4
+Bot1.Battlefield.Petrified Hamlet.ChosenName = Island
+Bot2.Battlefield.Island.Tapped = true
+Bot2.Battlefield.Mountain.Tapped = true

@@ -1,0 +1,55 @@
+# "Activated abilities of sources with the chosen name" reach a land card in a hand (CR 602.5): Bot2's Hamlet names
+# Otawara, Soaring City, and Bot1 can't channel the Otawara in its hand at Bot2's Llanowar Elves, though it has the mana
+# and a target. Once Bot1's Wasteland has destroyed the Hamlet, the same channel is offered and returns the Elves.
+
+[Bot1 Deck]
+Island
+Otawara, Soaring City
+Island
+Island
+Island
+Wasteland
+Island x10
+
+[Bot2 Deck]
+Petrified Hamlet
+Forest
+Llanowar Elves
+Island x13
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Petrified Hamlet.Play
+Bot2.Pass
+Bot1.Pass
+Bot2.Name(Otawara, Soaring City)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+! Bot1.Hand.Otawara, Soaring City.Activate(Bot2.Battlefield.Llanowar Elves)
+[T9 Bot1.Main1]
+Bot1.Hand.Wasteland.Play
+Bot1.Battlefield.Wasteland.Activate(Bot2.Battlefield.Petrified Hamlet; Ability: Destroy)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Otawara, Soaring City.Activate(Bot2.Battlefield.Llanowar Elves)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 9
+Bot1.Graveyard = Otawara, Soaring City; Wasteland
+Bot2.Graveyard = Petrified Hamlet; Island
+Bot2.Battlefield = Forest

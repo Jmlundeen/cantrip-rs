@@ -1,0 +1,28 @@
+# An unscripted player's name for Petrified Hamlet is the land an opponent controls most of among those with an ability
+# that is not a mana ability, the ones the Hamlet stops: Bot2 has two Wastelands and an Arid Mesa (and a basic Island,
+# which has only a mana ability), so Bot1, given no Name line, names Wasteland.
+
+[Bot1 Deck]
+Petrified Hamlet
+Island x14
+
+[Bot2 Deck]
+Arid Mesa
+Wasteland
+Wasteland
+Island
+Island x11
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Arid Mesa.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Wasteland.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Wasteland.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Petrified Hamlet.Play
+
+[Expect]
+Turn = 7
+Bot1.Battlefield.Petrified Hamlet.ChosenName = Wasteland

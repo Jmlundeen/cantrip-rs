@@ -1,0 +1,39 @@
+# The name is chosen as the trigger resolves (CR 603.2, 608.2): Bot1 destroys its own Hamlet with Wasteland in response,
+# so when the trigger resolves the name is still chosen but no Hamlet remembers it (CR 607.2d, 400.7), and Bot2's Arid
+# Mesa, the name chosen, is activated on the next turn.
+
+[Bot1 Deck]
+Wasteland
+Petrified Hamlet
+Island x13
+Mountain
+
+[Bot2 Deck]
+Arid Mesa
+Island x13
+Mountain
+
+[Actions]
+Bot1.Hand.Wasteland.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Arid Mesa.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Petrified Hamlet.Play
+Bot1.Battlefield.Wasteland.Activate(Bot1.Battlefield.Petrified Hamlet; Ability: Destroy)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Petrified Hamlet; Wasteland
+Bot1.Pass
+Bot2.Pass
+Bot1.Name(Arid Mesa)
+[T4 Bot2.Main1]
+Bot2.Battlefield.Arid Mesa.Activate(Ability: Search)
+Bot2.Pass
+Bot1.Pass
+Bot2.Search(Mountain)
+
+[Expect]
+Turn = 4
+Bot1.Battlefield.Count = 0
+Bot2.Battlefield = Mountain
+Bot2.Graveyard = Arid Mesa

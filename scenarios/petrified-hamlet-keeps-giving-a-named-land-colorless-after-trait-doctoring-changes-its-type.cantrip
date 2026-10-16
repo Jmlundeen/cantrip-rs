@@ -1,0 +1,39 @@
+# A text-changing effect changes a land type, never a name (CR 612.2): Bot1's Hamlet names Forest, and after Trait
+# Doctoring makes Bot1's Forest an Island it is still named Forest, so it still has the Hamlet's "{T}: Add {C}" beside
+# the {U} its new type gives it (CR 305.6), and no longer taps for {G}.
+
+[Bot1 Deck]
+Forest
+Petrified Hamlet
+Island
+Trait Doctoring
+Island x11
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Petrified Hamlet.Play
+Bot1.Pass
+Bot2.Pass
+Bot1.Name(Forest)
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Trait Doctoring.Cast(Forest)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Replace a basic land type)
+Bot1.Modes(Forest)
+Bot1.Modes(Island)
+? Bot1.Battlefield.Forest.Subtypes = Island
+! Bot1.Battlefield.Forest.Activate(Ability: {G})
+Bot1.Battlefield.Forest.Activate(Ability: {C})
+? Bot1.Mana = {C}
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Forest.Tapped = true
+Bot1.Battlefield.Petrified Hamlet.ChosenName = Forest

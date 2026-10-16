@@ -1,0 +1,42 @@
+# Each Hamlet's chosen name is its own (CR 607.2d): Bot1's names Wasteland and Bot2's names Arid Mesa, and both rules
+# hold at once - Bot2 can't activate its Wasteland and Bot1 can't crack its Arid Mesa, each stopped by the other
+# player's Hamlet, while both Hamlets still tap for {C}.
+
+[Bot1 Deck]
+Arid Mesa
+Petrified Hamlet
+Island x13
+
+[Bot2 Deck]
+Wasteland
+Petrified Hamlet
+Island x13
+
+[Actions]
+Bot1.Hand.Arid Mesa.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Wasteland.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Petrified Hamlet.Play
+Bot1.Pass
+Bot2.Pass
+Bot1.Name(Wasteland)
+[T4 Bot2.Main1]
+Bot2.Hand.Petrified Hamlet.Play
+Bot2.Pass
+Bot1.Pass
+Bot2.Name(Arid Mesa)
+? Bot1.Battlefield.Petrified Hamlet.ChosenName = Wasteland
+? Bot2.Battlefield.Petrified Hamlet.ChosenName = Arid Mesa
+! Bot2.Battlefield.Wasteland.Activate(Ability: Destroy)
+Bot2.Battlefield.Petrified Hamlet.Activate
+? Bot2.Mana = {C}
+[T5 Bot1.Main1]
+! Bot1.Battlefield.Arid Mesa.Activate(Ability: Search)
+Bot1.Battlefield.Petrified Hamlet.Activate
+? Bot1.Mana = {C}
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Arid Mesa; Petrified Hamlet
+Bot2.Battlefield = Petrified Hamlet; Wasteland
