@@ -1,0 +1,91 @@
+# Magmatic Hellkite: "Its controller searches" means the land's controller, not its owner. Bot2's Dack Fayden emblem ("Whenever
+# you cast a spell that targets one or more permanents, gain control of those permanents") takes Bot1's Bazaar of Baghdad when Bot2
+# casts Pyroblast at it (not blue, so Pyroblast does nothing else). On turn 13 Bot1's Hellkite destroys the Bazaar, which Bot2
+# controls, so it is an opponent's nonbasic land and a legal target. The destroyed Bazaar goes to Bot1's graveyard (its owner's),
+# while Bot2, the controller, searches its own library and gets a Forest, tapped with a stun counter. Bot1 searches nothing.
+
+[Bot1 Deck]
+Bazaar of Baghdad
+Mountain
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Magmatic Hellkite
+Mountain
+Mountain x20
+
+[Bot2 Deck]
+Volcanic Island
+Volcanic Island
+Volcanic Island
+Dack Fayden
+Pyroblast
+Forest
+Forest
+Forest x20
+
+[Actions]
+Bot1.Hand.Bazaar of Baghdad.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Volcanic Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Volcanic Island.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Volcanic Island.Play
+Bot2.Battlefield.Volcanic Island#1.Activate(Ability: Add {U})
+Bot2.Battlefield.Volcanic Island#2.Activate(Ability: Add {R})
+Bot2.Battlefield.Volcanic Island#3.Activate(Ability: Add {U})
+Bot2.Hand.Dack Fayden.Cast
+[T6 Bot2.Main2]
+Bot2.Battlefield.Dack Fayden.Activate(Bot2; Ability: draws two)
+Bot2.Choose(Forest; Forest)
+[T8 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Dack Fayden.Activate(Bot2; Ability: draws two)
+Bot2.Choose(Forest; Forest)
+[T10 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Dack Fayden.Activate(Bot2; Ability: draws two)
+Bot2.Choose(Forest; Forest)
+[T12 Bot2.Main1]
+? Bot2.Battlefield.Dack Fayden.Counters.Loyalty = 6
+Bot2.Battlefield.Dack Fayden.Activate(Ability: emblem)
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Volcanic Island#1.Activate(Ability: Add {R})
+Bot2.Hand.Pyroblast.Cast
+Bot2.Modes(Destroy target permanent)
+Bot2.Target(Bot1.Battlefield.Bazaar of Baghdad)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Bazaar of Baghdad.Tapped = false
+Bot1.Pass
+Bot2.Pass
+[T13 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Magmatic Hellkite.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot2.Search(Forest)
+
+[Expect]
+Bot1.Graveyard = Bazaar of Baghdad
+Bot2.Battlefield.Forest#3.Tapped = true
+Bot2.Battlefield.Forest#3.Counters.Stun = 1
+Bot1.Battlefield.Magmatic Hellkite.Tapped = false
