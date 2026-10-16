@@ -1,0 +1,38 @@
+# The greatest mana value is judged as End of the Hunt resolves (CR 608.2d), not when it is cast: Bot2 controls no creature
+# when it is cast, flashes in Hired Blade in response, and is then asked, so the Blade is the creature exiled.
+
+[Bot1 Deck]
+Swamp
+Swamp
+End of the Hunt
+Swamp x14
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Hired Blade
+Swamp x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.End of the Hunt.Cast(Bot2)
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Hired Blade.Cast
+Bot2.Choose(Hired Blade)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Swamp; Mox Jet; Mox Ruby
+Exile = Hired Blade
+Stack.Count = 0

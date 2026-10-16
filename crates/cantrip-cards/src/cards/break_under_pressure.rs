@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{sacrifice_one_of, targets};
+use cantrip_mechanics::{effects, sacrifice_one_of, targets};
 use cantrip_oracle as oracle;
 
 /// "Target opponent sacrifices a creature or planeswalker with the greatest mana value among creatures and planeswalkers
@@ -10,16 +10,7 @@ use cantrip_oracle as oracle;
 /// the spell doesn't resolve (CR 608.2b) and nothing happens.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Target::Player(opponent) = item.targets[0] else { return Ok(()) };
-    let group: Vec<ObjectId> = g
-        .permanents_of(opponent)
-        .into_iter()
-        .filter(|&id| {
-            let chars = g.chars(id);
-            chars.is(CardType::Creature) || chars.is(CardType::Planeswalker)
-        })
-        .collect();
-    let greatest = group.iter().map(|&id| g.mana_value(id)).max().unwrap_or(0);
-    let tied: Vec<ObjectId> = group.into_iter().filter(|&id| g.mana_value(id) == greatest).collect();
+    let tied = effects::greatest_mana_value_creature_or_planeswalker(g, opponent);
     sacrifice_one_of(g, opponent, item.object, 1, tied)?;
     g.gain_life(item.controller, 2);
     Ok(())

@@ -1,0 +1,49 @@
+# Sylvan Caryatid (hexproof, mana value 2) is the greatest-mana-value creature of Bot2 beside an Elvish Mystic (1). The spell
+# targets the opponent, not a permanent (a player is the only target), so hexproof doesn't save the Caryatid: it is exiled.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+End of the Hunt
+Swamp
+Swamp
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Sylvan Caryatid
+Elvish Mystic
+Forest
+Forest
+Forest x13
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Sylvan Caryatid.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Battlefield.Forest#1.Activate
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.End of the Hunt.Cast(Bot2)
+Bot2.Choose(Sylvan Caryatid)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 20
+Exile = Sylvan Caryatid
+Bot2.Graveyard.Count = 0
+Bot2.Battlefield = Forest; Forest; Mox Emerald; Elvish Mystic

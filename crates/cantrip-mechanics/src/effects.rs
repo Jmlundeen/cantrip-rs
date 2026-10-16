@@ -309,3 +309,21 @@ pub fn gain_indestructible_until_end_of_turn(g: &mut dyn Game, source: ObjectId,
 pub fn gain_hexproof_and_indestructible_until_end_of_turn(g: &mut dyn Game, source: ObjectId, target: ObjectId) {
     g.add_effect(source, target, EffectKind::AddKeywords(Keywords::of(&[Keyword::Hexproof, Keyword::Indestructible])), Duration::EndOfTurn);
 }
+
+/// "A creature or planeswalker with the greatest mana value among creatures and planeswalkers they control": the
+/// permanents `player` controls now that tie for the greatest mana value (`Query::mana_value`: tokens, copies and face-down
+/// permanents read as the rules say) in the one group of their creatures and planeswalkers, so a planeswalker of 5 outranks a
+/// creature of 3. The player chooses among them (CR 701.21a, 608.2d). Break Under Pressure sacrifices one of them; End of
+/// the Hunt exiles one.
+pub fn greatest_mana_value_creature_or_planeswalker(g: &dyn Game, player: PlayerId) -> Vec<ObjectId> {
+    let group: Vec<ObjectId> = g
+        .permanents_of(player)
+        .into_iter()
+        .filter(|&id| {
+            let chars = g.chars(id);
+            chars.is(CardType::Creature) || chars.is(CardType::Planeswalker)
+        })
+        .collect();
+    let greatest = group.iter().map(|&id| g.mana_value(id)).max().unwrap_or(0);
+    group.into_iter().filter(|&id| g.mana_value(id) == greatest).collect()
+}

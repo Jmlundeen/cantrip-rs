@@ -1,0 +1,39 @@
+# Bot2 controls only a land and a Mox (artifact): nothing to exile and nothing asked (a bare ! Bot2.Choose would fail if
+# asked); the lands and artifacts are not "a creature or planeswalker" and stay, and no life is gained.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+End of the Hunt
+Swamp
+Swamp
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.End of the Hunt.Cast(Bot2)
+! Bot2.Choose
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 20
+Exile.Count = 0
+Bot2.Graveyard.Count = 0
+Bot2.Battlefield = Island; Mox Sapphire
+Bot1.Graveyard = End of the Hunt
