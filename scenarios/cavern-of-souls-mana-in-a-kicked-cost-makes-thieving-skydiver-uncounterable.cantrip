@@ -1,0 +1,57 @@
+# Cavern of Souls names Rogue. Its rulings: the spell can't be countered if the Cavern's mana is spent on any cost of it,
+# an additional cost such as kicker included (CR 106.6, 601.2f-h: kicker's {X} is part of the total cost the mana pays).
+# Thieving Skydiver, a Merfolk Rogue, is cast kicked with X 1 for {2}{U}: two Islands and the Cavern's mana. Bot2's
+# Counterspell resolves and does nothing; the Skydiver enters (its kicked trigger has no artifact to take, and is removed).
+
+[Bot1 Deck]
+Cavern of Souls
+Island
+Island
+Thieving Skydiver
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island
+Island
+Counterspell
+Island
+Island
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Cavern of Souls.Play
+Bot1.Modes(Rogue)
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Cavern of Souls.Activate(Ability: any color; Color: Blue)
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+? Bot1.Mana = {U}{U} {U} (RogueCreatureSpells, CantBeCountered)
+Bot1.Hand.Thieving Skydiver.Cast(Kicked: 1)
+Bot1.Pass
+Bot2.Battlefield.Island#1.Activate
+Bot2.Battlefield.Island#2.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Thieving Skydiver)
+Bot2.Pass
+Bot1.Pass
+? Stack = Thieving Skydiver
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Mana =
+Bot1.Battlefield = Cavern of Souls; Island; Island; Thieving Skydiver
+Bot2.Graveyard = Counterspell

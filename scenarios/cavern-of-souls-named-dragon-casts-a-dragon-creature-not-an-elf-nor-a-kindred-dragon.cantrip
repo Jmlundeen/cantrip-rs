@@ -1,0 +1,42 @@
+# Cavern of Souls names Dragon. Its colored mana is only for "a creature spell of the chosen type" (CR 106.6, 205.3m):
+# alone as {G} it can't cast Llanowar Elves (an Elf); as {R} with Mox Jet's and Mox Pearl's mana it can't cast Firdoch
+# Core, a Dragon spell by changeling but no creature spell (CR 702.73a, 205.3m); it does cast Phyrexian Dragon Engine.
+
+[Bot1 Deck]
+Cavern of Souls
+Mox Jet
+Mox Pearl
+Llanowar Elves
+Firdoch Core
+Phyrexian Dragon Engine
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Cavern of Souls.Play
+Bot1.Modes(Dragon)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Cavern of Souls.Activate(Ability: any color; Color: Green)
+? Bot1.Mana = {G} (DragonCreatureSpells, CantBeCountered)
+! Bot1.Hand.Llanowar Elves.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Cavern of Souls.Activate(Ability: any color; Color: Red)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+? Bot1.Mana = {W}{B} {R} (DragonCreatureSpells, CantBeCountered)
+! Bot1.Hand.Firdoch Core.Cast
+Bot1.Hand.Phyrexian Dragon Engine.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield = Cavern of Souls; Mox Jet; Mox Pearl; Phyrexian Dragon Engine
+Bot1.Hand = Llanowar Elves; Firdoch Core; Island; Island; Island

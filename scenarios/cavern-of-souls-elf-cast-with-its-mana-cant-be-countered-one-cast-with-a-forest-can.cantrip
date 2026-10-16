@@ -1,0 +1,66 @@
+# Cavern of Souls names Elf as it enters. "Spend this mana only to cast a creature spell of the chosen type, and that
+# spell can't be countered" (CR 106.6, 701.6): turn 7, Bot1's first Llanowar Elves is cast with the Cavern's {G}, and
+# Bot2's Counterspell resolves and does nothing - the Elves enter. The second Llanowar Elves, cast with a Forest, is the
+# control: the second Counterspell counters it. The uncounterability belongs to the spell the mana was spent on.
+
+[Bot1 Deck]
+Cavern of Souls
+Forest
+Llanowar Elves
+Llanowar Elves
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Counterspell
+Island
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Cavern of Souls.Play
+Bot1.Modes(Elf)
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T7 Bot1.Main1]
+Bot1.Battlefield.Cavern of Souls.Activate(Ability: any color; Color: Green)
+? Bot1.Mana = {G} (ElfCreatureSpells, CantBeCountered)
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Battlefield.Island#1.Activate
+Bot2.Battlefield.Island#2.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Llanowar Elves)
+Bot2.Pass
+Bot1.Pass
+? Stack = Llanowar Elves
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield = Cavern of Souls; Forest; Llanowar Elves
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Battlefield.Island#3.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Llanowar Elves)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 7
+Stack.Count = 0
+Bot1.Battlefield = Cavern of Souls; Forest; Llanowar Elves
+Bot1.Graveyard = Llanowar Elves
+Bot2.Graveyard = Counterspell; Counterspell
