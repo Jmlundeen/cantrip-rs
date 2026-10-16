@@ -3,6 +3,26 @@
 
 use cantrip_api::*;
 
+/// "Add {U} for each artifact you control" (CR 106.5): counted as the ability resolves, possibly none. A mana ability's
+/// `add_by`: Tolarian Academy, and Uthros, Titanic Godcore's 12+ ability.
+pub fn add_blue_for_each_artifact(g: &mut dyn Game, asker: &Asker, _: Option<Color>) -> Result<(), Suspend> {
+    let artifacts = crate::artifacts_you_control(g, asker.controller);
+    if artifacts > 0 {
+        g.add_mana(asker.controller, Mana::U, artifacts.min(255) as u8);
+    }
+    Ok(())
+}
+
+/// "Add {G} for each creature you control" (CR 106.5): counted as the ability resolves, possibly none. A mana ability's
+/// `add_by`: Gaea's Cradle, and Evendo, Waking Haven's 12+ ability.
+pub fn add_green_for_each_creature(g: &mut dyn Game, asker: &Asker, _: Option<Color>) -> Result<(), Suspend> {
+    let creatures = g.permanents_of(asker.controller).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).count();
+    if creatures > 0 {
+        g.add_mana(asker.controller, Mana::G, creatures.min(255) as u8);
+    }
+    Ok(())
+}
+
 /// "This land enters tapped" (CR 614.1c): the modal double-faced lands' (Bala Ged Sanctuary, Haven of the Harvest).
 pub fn enters_tapped(_: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
     entering.tapped = true;

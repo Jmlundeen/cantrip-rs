@@ -1,20 +1,8 @@
 use cantrip_api::*;
+use cantrip_mechanics::mana;
 use cantrip_oracle as oracle;
 
-/// "{T}: Add {G} for each creature you control." (CR 106.5): counted as the ability resolves, possibly none.
-fn add_green_for_each_creature(g: &mut dyn Game, asker: &Asker, _: Option<Color>) -> Result<(), Suspend> {
-    let creatures = g
-        .permanents_of(asker.controller)
-        .into_iter()
-        .filter(|&id| g.chars(id).is(CardType::Creature))
-        .count();
-    if creatures > 0 {
-        g.add_mana(asker.controller, Mana::G, creatures as u8);
-    }
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
-    abilities: &[mana_ability(TAP, add_by(add_green_for_each_creature), "{T}: Add {G} for each creature you control.")],
+    abilities: &[mana_ability(TAP, add_by(mana::add_green_for_each_creature), "{T}: Add {G} for each creature you control.")],
     ..oracle::GAEAS_CRADLE
 };

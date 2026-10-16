@@ -77,6 +77,10 @@ abilities: &[
   `craft::exiled_cards_used_to_craft(q, permanent)` (`craft::used_to_craft(state, ..)` in a characteristic-defining
   ability, with `LayerQuery::chars_with_defined_pt` for their power); anything rarer is a `Cost { .., ..Cost::NONE }`. A bare
   mana cost (equip, flashback, kicker, madness) is `mana("{2}{R}")`, or `generic(n)` for a number the card works out.
+  What an activated ability's cost tapped, sacrificed or returned ("the tapped creature's power", "the sacrificed
+  creature") is `g.cost_objects(item)`, in the order chosen, read with `chars` (last-known once gone, CR 608.2h).
+  Station (CR 702.184a) is `cantrip_mechanics::station::ability(text)`, and each "N+ |" striation a static with
+  `station::charged::<N>` (`has::<INDEX>` for its abilities, `is_a_creature` and `base_pt::<P, T>` for its P/T box).
 - **Mana**: `add(Mana::G)`, `add_n(Mana::C, 2)`, `add_each(&[Mana::W, Mana::U])`, `add_any_color(1)`,
   `add_one_of(&[Color::Red, Color::Green])`, `.only_for(restriction)`. What these list is what is added; a card whose
   mana ability does more writes the effect itself with `.by(f)` (the listing then only says what it can add) or

@@ -397,6 +397,34 @@ Unstable Glyphbridge (Sandswirl Wanderglyph's "they can't attack you or planeswa
 Guide-Mural (Master's Manufactory asks whether an artifact entered under your control this turn, whatever happened to it
 since: the history does not keep the controller or the types an object entered with).
 
+### What a cost chose, for the effect to read
+
+An activated ability's cost may choose permanents - tap, sacrifice or return them (CR 601.2h by way of 602.2b), crew's and
+saddle's creatures too - and its effect may name what it chose: "Put a number of charge counters on this permanent equal to
+the tapped creature's power" (station, CR 702.184a), "deals damage equal to the tapped creature's power" (Unerring Sling),
+"where X is the power of the creature tapped this way" (Keldon Battlewagon, Impelled Giant). `actions::activate` keeps them
+on the stack item, in `GameState::members` through `StackItem::members` (the span a "one or more" trigger keeps its batch in,
+which an activated ability had no use for), as they are chosen, so a copy of the ability has them too (CR 707.10); the effect
+reads them with `Query::cost_objects(item)`, an object id each, whose characteristics `chars` gives as they are now or, once
+the object has left, as it last existed (CR 608.2h). Nothing is pushed for an ability whose cost chose nothing, so the
+benchmark is unchanged. A spell's additional cost is still read from the history (Kazuul's Fury, Broadside Bombardiers'
+boast ability): the cast path does not keep its chosen permanents yet.
+
+### Station
+
+Station (CR 702.184a) is `cantrip_mechanics::station::ability(text)`: "tap another untapped creature you control" as a cost
+(`Cost::tap_untapped`, not the {T} symbol, so a summoning-sick creature pays it and the station permanent needs no untapping),
+sorcery speed, and an effect putting charge counters equal to the tapped creature's power (`cost_objects`), none for a power
+of 0 or less. A station symbol (CR 721.2) is the card's own static ability gated on its charge counters,
+`station::charged::<N>` as the static's `affects`: "{N+}[abilities]" grants the abilities, which the card lists in its
+`delayed` list (`station::has::<INDEX>`, layer 6), and a "[P/T]" box also makes it a creature in layer 4
+(`station::is_a_creature`) with that base power and toughness in layer 7b (`station::base_pt::<P, T>`). A station card prints
+no power or toughness in its content file (CR 721.2c). Counters from anywhere count and counters removed take the abilities
+away (Vampire Hexmage), and a copy has the striations with its own counters (Phyrexian Metamorph). Adagia, Windswept Bastion;
+Uthros, Titanic Godcore; Evendo, Waking Haven; Wurmwall Sweeper. The web client greys a striation whose number the
+permanent's charge counters have not reached (`CardReading.StationUnreached`); the ability it gives is listed with its
+abilities once it has it. "Except it's legendary" (CR 707.9b) is `Copiable::legendary`.
+
 ### Effects that end when a card is cast from exile
 
 "Until this card is cast from exile" (CR 611.2a, 400.7) is `Duration::UntilCastFromExile(card)`, the object in exile.
