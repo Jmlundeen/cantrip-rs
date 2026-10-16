@@ -1,0 +1,59 @@
+# "Exile all attacking creatures target player controls. That player may search ... for that many basic land cards,
+# put those cards onto the battlefield tapped": Bot1 attacks with two of its three Ornithopters; Bot2 casts Settle the
+# Wreckage on Bot1. Only the two attackers are exiled (the one that stayed home is not an attacker, and Bot2's own
+# Ornithopter is not Bot1's). Bot1 may then find two basic lands, and the Overgrown Tomb (nonbasic) is refused. Bot1
+# finds only one (finding fewer is allowed): a Forest, tapped; the rest stays in the library.
+
+[Bot1 Deck]
+Ornithopter
+Ornithopter
+Ornithopter
+Island
+Island
+Island
+Island
+Island
+Island
+Overgrown Tomb
+Forest
+Forest
+Island x6
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Settle the Wreckage
+Ornithopter
+Plains
+Plains x10
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2; Ornithopter#2 > Bot2)
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Settle the Wreckage.Cast(Bot1)
+Bot1.Accept
+! Bot1.Search(Overgrown Tomb)
+Bot1.Search(Forest)
+[Bot1.Main2]
+
+[Expect]
+Exile = Ornithopter; Ornithopter
+Bot1.Battlefield = Ornithopter; Forest
+Bot1.Battlefield.Forest.Tapped = true
+Bot2.Battlefield = Plains; Mox Pearl; Mox Jet; Mox Ruby; Ornithopter
+Bot2.Graveyard = Settle the Wreckage
