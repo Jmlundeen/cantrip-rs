@@ -53,6 +53,7 @@ pub mod lands;
 pub mod mana;
 pub mod manifest_dread;
 pub mod mayhem;
+pub mod melee;
 pub mod mobilize;
 pub mod ninjutsu;
 pub mod offspring;
