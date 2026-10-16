@@ -1,0 +1,35 @@
+# Faerie Dreamthief: "Flying" and "When this creature enters, surveil 1." Bot1 pays {B} from a Black Lotus, the enters
+# trigger surveils, and Bot1 puts the top card (Mountain) into the graveyard (CR 701.25a). The 1/1 flies. Its graveyard
+# ability is offered only from a graveyard (CR 113.6k): on the battlefield, with {B}{B}{B} still available (the Lotus's
+# two remaining plus Mox Jet), the refusal cannot be about mana - the positive control is the scenario that exiles it
+# from the graveyard.
+
+[Bot1 Deck]
+Mox Jet
+Black Lotus
+Faerie Dreamthief
+Island x4
+Mountain
+Plains x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Faerie Dreamthief.Cast
+Bot1.Arrange(| Mountain)
+? Bot1.Graveyard = Mountain; Black Lotus
+? Bot1.Battlefield.Faerie Dreamthief.Keywords = Flying
+? Bot1.Battlefield.Faerie Dreamthief.Power = 1
+? Bot1.Battlefield.Faerie Dreamthief.Toughness = 1
+! Bot1.Battlefield.Faerie Dreamthief.Activate
+
+[Expect]
+Bot1.Graveyard = Mountain; Black Lotus
+Bot1.Battlefield = Mox Jet; Faerie Dreamthief
+Bot1.Library.Count = 12
+Bot1.Hand = Island; Island; Island; Island
+Bot1.Life = 20

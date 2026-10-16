@@ -1,0 +1,35 @@
+# Faerie Dreamthief: "{2}{B}, Exile this card from your graveyard: You draw a card and you lose 1 life." Faithless
+# Looting puts it into the graveyard (discarding it with an Island). Black Lotus's {R}{R}{R} pays Looting's {R}; the
+# remaining {R}{R} cannot pay {2}{B} (no black source yet), so the ability is refused; once Mox Jet is cast and adds {B} it is offered, exiles
+# the card as a cost, and Bot1 draws the top card (a Mountain) and loses exactly 1 life (20 -> 19).
+
+[Bot1 Deck]
+Black Lotus
+Faithless Looting
+Faerie Dreamthief
+Mox Jet
+Island x2
+Plains x3
+Mountain x9
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Faerie Dreamthief; Island)
+? Bot1.Graveyard = Faithless Looting; Island; Faerie Dreamthief; Black Lotus
+? Bot1.Mana = {R}{R}
+! Bot1.Graveyard.Faerie Dreamthief.Activate
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Graveyard.Faerie Dreamthief.Activate
+
+[Expect]
+Exile = Faerie Dreamthief
+Bot1.Life = 19
+Bot1.Graveyard = Faithless Looting; Island; Black Lotus
+Bot1.Hand = Island; Plains; Plains; Plains; Mountain
+Bot1.Library.Count = 8
