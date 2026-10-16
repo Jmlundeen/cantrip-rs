@@ -203,6 +203,30 @@ pub fn subtypes_view(set: SubtypeSet) -> Vec<String> {
     set.iter().map(|t| t.name().to_string()).collect()
 }
 
+/// "Hexproof from [quality]" as a card's text words it (CR 702.11d, 702.11f-g): "Hexproof from monocolored", "Hexproof from
+/// white and from black", "Hexproof from artifacts, creatures, and enchantments", "Hexproof from each color".
+pub fn hexproof_from_text(qualities: HexproofFrom) -> String {
+    let mut words: Vec<String> = Vec::new();
+    if qualities.colors() == ColorSet(0x1f) {
+        words.push("each color".to_string());
+    } else {
+        words.extend(qualities.colors().iter().map(|c| c.name().to_lowercase()));
+    }
+    if qualities.has(HexproofFrom::MONOCOLORED) {
+        words.push("monocolored".to_string());
+    }
+    if qualities.has(HexproofFrom::MULTICOLORED) {
+        words.push("multicolored".to_string());
+    }
+    words.extend(qualities.types().iter().map(|t| format!("{}s", t.name().to_lowercase())));
+    match words.len() {
+        0 => String::new(),
+        1 => format!("Hexproof from {}", words[0]),
+        2 => format!("Hexproof from {} and from {}", words[0], words[1]),
+        n => format!("Hexproof from {}, and {}", words[..n - 1].join(", "), words[n - 1]),
+    }
+}
+
 /// The keywords as a card's text words them, for the ones an effect gave an object or took from it.
 const KEYWORD_WORDS: [(Keyword, &str); 33] = [
     (Keyword::Flying, "Flying"),
@@ -676,6 +700,18 @@ impl<'a> Projector<'a> {
                 }
             }
         }
+        // "Hexproof from [quality]" (CR 702.11d): the qualities it has and did not start with are granted, those it started
+        // with and has not are lost.
+        if c.hexproof_from != def.hexproof_from {
+            let granted = HexproofFrom(c.hexproof_from.0 & !def.hexproof_from.0);
+            let lost = HexproofFrom(def.hexproof_from.0 & !c.hexproof_from.0);
+            if !granted.is_empty() {
+                view.granted_abilities.push(AbilityTextView { text: hexproof_from_text(granted), spent: false });
+            }
+            if !lost.is_empty() {
+                view.lost_abilities.push(hexproof_from_text(lost));
+            }
+        }
         let printed = |ability: AbilityRef| {
             (ability.card == c.card && usize::from(ability.index) < def.abilities.len())
                 // A Room's abilities are its doors' (CR 709.5): the layers give the unlocked ones.
@@ -927,5 +963,19 @@ mod tests {
             let view = printed(cards.get(cards.find(name).expect("the card")));
             assert_eq!((view.power, view.toughness), (None, None), "{name}");
         }
+    }
+
+    /// "Hexproof from [quality]" granted to a card is worded as printed cards word it (CR 702.11d, 702.11f-g).
+    #[test]
+    fn hexproof_from_is_worded_as_cards_print_it() {
+        let black = HexproofFrom::color(Color::Black);
+        let white = HexproofFrom::color(Color::White);
+        assert_eq!(hexproof_from_text(HexproofFrom::MONOCOLORED), "Hexproof from monocolored");
+        assert_eq!(hexproof_from_text(white.and(black)), "Hexproof from white and from black");
+        assert_eq!(hexproof_from_text(HexproofFrom::EACH_COLOR), "Hexproof from each color");
+        let types = HexproofFrom::card_type(CardType::Artifact)
+            .and(HexproofFrom::card_type(CardType::Creature))
+            .and(HexproofFrom::card_type(CardType::Enchantment));
+        assert_eq!(hexproof_from_text(types), "Hexproof from artifacts, creatures, and enchantments");
     }
 }
