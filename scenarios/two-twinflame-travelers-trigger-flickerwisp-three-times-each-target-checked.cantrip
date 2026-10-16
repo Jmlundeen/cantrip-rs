@@ -1,0 +1,66 @@
+# Two Twinflame Travelers each make a triggered ability of another Elemental Bot1 controls trigger an additional time
+# (CR 603.2d): Flickerwisp's "When Flickerwisp enters, exile another target permanent ..." triggers three times. Each
+# triggering chooses its own target as it goes on the stack (CR 603.3d): the first and second Bot2's Mox Jet, the third
+# Bot2's Island. The last one put on the stack resolves first and exiles the Island, the next exiles the Mox, and the
+# first, whose target has left the battlefield, is removed as it tries to resolve (CR 608.2b). Only the two that resolved
+# set up a return (a delayed triggered ability is no ability of Flickerwisp, so the Travelers do not double it either):
+# the Mox and the Island come back at the beginning of the end step.
+# Mana: turn 1 Mox Ruby and Black Lotus (UUU) pay the first Travelers; turn 3 the Volcanic Island, Plateau, Ruby and Pearl
+# the second; turn 5 Plains, Pearl and Ruby pay Flickerwisp's {1}{W}{W}.
+
+[Bot1 Deck]
+Volcanic Island
+Black Lotus
+Mox Ruby
+Mox Pearl
+Twinflame Travelers
+Twinflame Travelers
+Flickerwisp
+Plateau
+Plains
+Island x12
+
+[Bot2 Deck]
+Island
+Mox Jet
+Island x14
+
+[Actions]
+Bot1.Hand.Volcanic Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Twinflame Travelers.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plateau.Play
+Bot1.Battlefield.Volcanic Island.Activate(Ability: {U})
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Plateau.Activate(Ability: {R})
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Twinflame Travelers.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Flickerwisp.Cast
+Bot1.Pass
+Bot1.Triggers(Flickerwisp; Flickerwisp; Flickerwisp)
+Bot1.Target(Bot2.Battlefield.Mox Jet)
+Bot1.Target(Bot2.Battlefield.Mox Jet)
+Bot1.Target(Bot2.Battlefield.Island)
+? Stack.Count = 3
+[T5 Bot1.Main2]
+? Stack.Count = 0
+? Exile = Mox Jet; Island
+? Bot2.Battlefield.Count = 0
+[T6 Bot2.Upkeep]
+
+[Expect]
+Exile.Count = 0
+Bot2.Battlefield = Island; Mox Jet

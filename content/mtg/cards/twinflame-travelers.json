@@ -1,0 +1,11 @@
+{
+  "name": "Twinflame Travelers",
+  "manaCost": "{2}{U}{R}",
+  "type": "Creature — Elemental Sorcerer",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Flying\nIf a triggered ability of another Elemental you control triggers, it triggers an additional time.",
+  "keywords": [
+    "Flying"
+  ]
+}
