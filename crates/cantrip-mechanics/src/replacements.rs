@@ -188,3 +188,33 @@ fn loses_that_much_life(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
 /// ruling). Tainted Remedy and Plague Drone print it.
 pub const OPPONENTS_LOSE_LIFE_INSTEAD_OF_GAINING: ReplacementDef =
     replacement(ReplacementKind::LifeChange, opponent_would_gain_life, loses_that_much_life, "you lose that much life instead");
+
+/// "All damage that would be dealt to you and other permanents you control is dealt to this creature instead" (CR 614.1a,
+/// 120.3): whether it replaces this damage - to its controller, or to a permanent its controller controls other than
+/// itself, from any source. The damage is then dealt to it by the same source, and the effects not yet applied are judged
+/// against it (CR 614.6, 616.1f): a second such creature redirects it once more, and protection of the creature prevents
+/// it. Ancient Adamantoise and Palisade Giant print it.
+fn damage_to_you_and_your_other_permanents(q: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool {
+    let Proposal::Damage(d) = proposal else { return false };
+    d.amount > 0
+        && match d.target {
+            Target::Player(p) => p == asker.controller,
+            Target::Object(id) => id != asker.source && q.is_on_battlefield(id) && q.controller(id) == asker.controller,
+            _ => false,
+        }
+}
+
+/// "... is dealt to this creature instead."
+fn dealt_to_this_creature_instead(_: &dyn Query, asker: &Asker, proposal: &mut Proposal) {
+    if let Proposal::Damage(d) = proposal {
+        d.target = Target::Object(asker.source);
+    }
+}
+
+/// See [`damage_to_you_and_your_other_permanents`].
+pub const DAMAGE_TO_YOU_AND_YOUR_OTHER_PERMANENTS_IS_DEALT_TO_THIS: ReplacementDef = replacement(
+    ReplacementKind::Damage,
+    damage_to_you_and_your_other_permanents,
+    dealt_to_this_creature_instead,
+    "the damage is dealt to this creature instead",
+);
