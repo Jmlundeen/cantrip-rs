@@ -63,6 +63,21 @@ pub fn choose_among(g: &mut dyn Game, you: PlayerId, source: ObjectId, candidate
     })
 }
 
+/// `count` of `token`, each tapped and attacking what its controller chooses for it (CR 508.4): `choose_attack_target` once per
+/// token, asked only when there is a choice and before any token is made, and the ones that attack the same thing created
+/// together (CR 101.4). Nothing is made when there is nothing to attack. Hero of Bladehold and Dalkovan Encampment print it
+/// with two.
+pub fn create_attacking_of_your_choice(g: &mut dyn Game, you: PlayerId, source: ObjectId, token: CardId, count: usize) -> Result<Vec<ObjectId>, Suspend> {
+    let mut chosen: Vec<Target> = Vec::new();
+    for _ in 0..count {
+        match choose_attack_target(g, you, source)? {
+            Some(target) => chosen.push(target),
+            None => break,
+        }
+    }
+    create_attacking(g, you, token, &chosen)
+}
+
 /// A player and the planeswalkers they control: what "that player or a planeswalker they control" can be attacked as
 /// (CR 508.4, 508.5). Adeline, Resplendent Cathar prints it.
 pub fn player_or_their_planeswalkers(g: &dyn Game, player: PlayerId) -> Vec<Target> {

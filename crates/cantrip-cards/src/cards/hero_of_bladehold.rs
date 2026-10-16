@@ -1,22 +1,14 @@
 use cantrip_api::*;
 use cantrip_mechanics::battle_cry;
-use cantrip_mechanics::combat::{choose_attack_target, create_attacking};
+use cantrip_mechanics::combat::create_attacking_of_your_choice;
 use cantrip_mechanics::tokens::SOLDIER;
 use cantrip_oracle as oracle;
 
 /// Two 1/1 white Soldier tokens, tapped and attacking (CR 508.4): their controller chooses what each one attacks as it
-/// enters, a player, a planeswalker or a battle, asked only when there is a choice. The ones that attack the same thing
-/// are created together (CR 101.4).
+/// enters.
 fn soldiers(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let soldier = g.card_id(&SOLDIER);
-    let mut chosen: Vec<Target> = Vec::new();
-    for _ in 0..2 {
-        match choose_attack_target(g, item.controller, item.object)? {
-            Some(target) => chosen.push(target),
-            None => break,
-        }
-    }
-    create_attacking(g, item.controller, soldier, &chosen)?;
+    create_attacking_of_your_choice(g, item.controller, item.object, soldier, 2)?;
     Ok(())
 }
 
