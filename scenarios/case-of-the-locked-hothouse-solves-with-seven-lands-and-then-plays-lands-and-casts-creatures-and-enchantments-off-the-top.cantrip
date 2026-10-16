@@ -1,0 +1,64 @@
+# Case of the Locked Hothouse. "To solve - You control seven or more lands" (CR 719.3a): Fastbond puts five Forests out on
+# turn 1 (four damage), and with five lands, then six on turn 3, nothing triggers at Bot1's end step. With the seventh on
+# turn 5 the Case becomes solved. On turn 7 "Solved - ... you may play lands and cast creature and enchantment spells from the
+# top of your library" (CR 702.169b, 305.1, 601.3) works: the Forest on top is played from there, the Llanowar Elves under it
+# cast, and then a second Fastbond, an enchantment; the Sol Ring under that, an artifact, is not offered though there is mana
+# for it.
+
+[Bot1 Deck]
+Forest
+Fastbond
+Case of the Locked Hothouse
+Forest x4
+Forest
+Forest
+Island
+Forest
+Llanowar Elves
+Fastbond
+Sol Ring
+Forest x6
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Fastbond.Cast
+Bot1.Hand.Forest.Play
+Bot1.Hand.Forest.Play
+Bot1.Hand.Forest.Play
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Forest#3.Activate
+Bot1.Battlefield.Forest#4.Activate
+Bot1.Battlefield.Forest#5.Activate
+Bot1.Hand.Case of the Locked Hothouse.Cast
+[T1 Bot1.End]
+? Bot1.Life = 16
+? Stack.Count = 0
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T3 Bot1.End]
+? Stack.Count = 0
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T5 Bot1.End]
+? Stack.Count = 1
+[T6 Bot2.Upkeep]
+? Bot1.Battlefield.Case of the Locked Hothouse.Solved = true
+[T7 Bot1.Main1]
+Bot1.Library.Forest.Play
+Bot1.Library.Llanowar Elves.Cast
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Library.Fastbond.Cast
+Bot1.Battlefield.Forest#2.Activate
+! Bot1.Library.Sol Ring.Cast
+
+[Expect]
+Bot1.Life = 16
+Bot1.LandsPlayed = 1
+Bot1.Battlefield = Case of the Locked Hothouse; Fastbond; Fastbond; Forest; Forest; Forest; Forest; Forest; Forest; Forest; Forest; Llanowar Elves
+Bot1.Hand = Island
+Bot1.Library.Count = 7

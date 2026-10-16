@@ -1,0 +1,48 @@
+# Case of the Locked Hothouse, unsolved. "You may play an additional land on each of your turns" (CR 305.2): Bot1 plays two
+# Forests on turn 1 and a third is refused. Its "Solved" ability is off (CR 702.169b, 719.3c): with a land play left, the
+# Forest on top of the library may not be played; on turn 3 the Llanowar Elves on top may not be cast though a Forest is there
+# to pay for them, and the Forest drawn is played as the turn's first land from the hand. Two and then four lands at its
+# end steps: not seven, so it is never solved.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Case of the Locked Hothouse
+Forest
+Forest
+Forest
+Island
+Forest
+Llanowar Elves
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Case of the Locked Hothouse.Cast
+Bot1.Hand.Forest.Play
+! Bot1.Library.Forest.Play
+Bot1.Hand.Forest.Play
+! Bot1.Hand.Forest.Play
+[T1 Bot1.End]
+? Stack.Count = 0
+[T3 Bot1.Main1]
+! Bot1.Library.Llanowar Elves.Cast
+Bot1.Hand.Forest.Play
+Bot1.Hand.Forest.Play
+! Bot1.Library.Llanowar Elves.Cast
+! Bot1.Hand.Island.Play
+[T3 Bot1.End]
+? Stack.Count = 0
+
+[Expect]
+Bot1.LandsPlayed = 2
+Bot1.Battlefield = Case of the Locked Hothouse; Forest; Forest; Forest; Forest; Mox Emerald
+Bot1.Battlefield.Case of the Locked Hothouse.Solved = (absent)
+Bot1.Hand = Island
+Bot1.Library.Count = 11
