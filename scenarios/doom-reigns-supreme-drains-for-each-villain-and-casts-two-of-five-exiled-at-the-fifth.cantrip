@@ -1,0 +1,83 @@
+# Doom Reigns Supreme: "Whenever a Villain you control enters, each opponent loses 1 life and you gain 1 life. Put a plan
+# counter on this enchantment. When the fifth plan counter is put on this enchantment, sacrifice it. When you do, target
+# opponent exiles the top five cards of their library. You may cast up to two spells from among the exiled cards without
+# paying their mana costs." Bot1's Villains enter five times: Serpent Specialist and Aerial Doombot cast on turn 1, the
+# Doombot blinked by Ephemerate on turn 3 and again by its rebound in the turn-5 upkeep, and a second Doombot on turn 5.
+# Each drains 1. The fifth plan counter sacrifices it; Bot2 exiles Lightning Bolt, Ornithopter, Ancestral Recall, an Island
+# and a Mountain, and Bot1 casts two of them free - the Ornithopter and the Bolt (at Bot2) - and is offered no third: the
+# Ancestral Recall stays in exile with the lands. The Bolt it first chose and gave up at its target (CR 733.1) counts as
+# none of the two.
+
+[Bot1 Deck]
+Plains
+Mox Jet
+Doom Reigns Supreme
+Black Lotus
+Serpent Specialist
+Mox Sapphire
+Aerial Doombot
+Ephemerate
+Aerial Doombot
+Island x13
+
+[Bot2 Deck]
+Island x7
+Island
+Island
+Lightning Bolt
+Ornithopter
+Ancestral Recall
+Island
+Mountain
+Island x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Doom Reigns Supreme.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Serpent Specialist.Cast
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Doom Reigns Supreme.Counters.Plan = 1
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Aerial Doombot.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot2.Life = 18
+? Bot1.Life = 22
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Ephemerate.Cast(Aerial Doombot)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Doom Reigns Supreme.Counters.Plan = 3
+[T5 Bot1.Upkeep]
+Bot1.Accept
+Bot1.Target(Aerial Doombot)
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Doom Reigns Supreme.Counters.Plan = 4
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Aerial Doombot.Cast
+Bot1.Choose(Lightning Bolt)
+Bot1.Cancel
+Bot1.Choose(Ornithopter)
+Bot1.Choose(Lightning Bolt)
+Bot1.Target(Bot2)
+! Bot1.Choose
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 12
+Bot1.Life = 25
+Bot1.Graveyard = Doom Reigns Supreme; Ephemerate; Black Lotus
+Bot2.Graveyard = Lightning Bolt; Island; Island
+Exile = Ancestral Recall; Island; Mountain
+Bot1.Battlefield = Plains; Mox Jet; Serpent Specialist; Mox Sapphire; Aerial Doombot; Aerial Doombot; Ornithopter

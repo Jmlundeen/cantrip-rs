@@ -1,0 +1,65 @@
+# "Sacrifice it. When you do, ..." (CR 603.12): with Doom Reigns Supreme's fifth-plan-counter trigger on the stack, Bot2
+# destroys it with Disenchant. The trigger resolves with nothing to sacrifice (CR 701.21a), so the reflexive ability never
+# triggers: Bot2 exiles nothing and Bot1 casts nothing. The five drains happened all the same (Bot2 at 15, Bot1 at 25).
+
+[Bot1 Deck]
+Plains
+Mox Jet
+Doom Reigns Supreme
+Black Lotus
+Serpent Specialist
+Mox Sapphire
+Aerial Doombot
+Ephemerate
+Aerial Doombot
+Island x13
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Disenchant
+Island x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Doom Reigns Supreme.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Serpent Specialist.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Aerial Doombot.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Ephemerate.Cast(Aerial Doombot)
+[T5 Bot1.Upkeep]
+Bot1.Accept
+Bot1.Target(Aerial Doombot)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Aerial Doombot.Cast
+Bot2.Pass
+Bot2.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Doom Reigns Supreme)
+! Bot1.Choose
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 15
+Bot1.Life = 25
+Bot1.Graveyard = Doom Reigns Supreme; Ephemerate; Black Lotus
+Exile.Count = 0
