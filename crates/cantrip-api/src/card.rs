@@ -438,6 +438,17 @@ pub struct Materials {
     pub filter: ObjectFilter,
     /// What one material is, as the prompt says it ("artifact", "creature", "Cave").
     pub quality: &'static str,
+    /// Materials named one by one ("a Dinosaur, a Merfolk, a Pirate, and a Vampire"): each a separate object passing its
+    /// own filter (the Throne of the Grim Captain ruling: one changeling is not enough), chosen one after another. Empty
+    /// for materials of one kind; when it is not, `count` is its length and `filter` takes what any of them takes.
+    pub parts: &'static [MaterialPart],
+}
+
+/// One of materials named one by one: what it must be, and what the prompt calls it.
+#[derive(Clone, Copy)]
+pub struct MaterialPart {
+    pub filter: ObjectFilter,
+    pub quality: &'static str,
 }
 
 /// A cost part whose size is the payer's to set, chosen as the cost is chosen.

@@ -152,12 +152,33 @@ fn can_pay_other(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost) -
             return false;
         }
     }
-    if let Some(m) = cost.materials
-        && material_candidates(cx, source, controller, &m).len() < m.count as usize
-    {
-        return false;
+    if let Some(m) = cost.materials {
+        let candidates = material_candidates(cx, source, controller, m);
+        if candidates.len() < m.count as usize || !parts_can_be_matched(cx, source, controller, m, &candidates) {
+            return false;
+        }
     }
     true
+}
+
+/// Whether materials named one by one can each be a separate object of the candidates (the Throne of the Grim Captain
+/// ruling): a matching of every part to a distinct candidate passing its filter, found by trying each in turn. True for
+/// materials of one kind.
+fn parts_can_be_matched(cx: &Cx, source: ObjectId, controller: PlayerId, m: &Materials, candidates: &[ObjectId]) -> bool {
+    fn assign(cx: &Cx, asker: &Asker, parts: &[MaterialPart], candidates: &[ObjectId], used: &mut Vec<ObjectId>) -> bool {
+        let Some((part, rest)) = parts.split_first() else { return true };
+        for &c in candidates {
+            if !used.contains(&c) && (part.filter)(cx, asker, c) {
+                used.push(c);
+                if assign(cx, asker, rest, candidates, used) {
+                    return true;
+                }
+                used.pop();
+            }
+        }
+        false
+    }
+    m.parts.is_empty() || assign(cx, &Asker { source, controller }, m.parts, candidates, &mut Vec::new())
 }
 
 /// What craft may exile as its materials (CR 702.167a): the permanents the payer controls, then the cards in their
@@ -175,9 +196,27 @@ fn material_candidates(cx: &Cx, source: ObjectId, controller: PlayerId, m: &Mate
 /// be paid, and the activation is taken back.
 fn choose_materials(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) -> R<Vec<ObjectId>> {
     let Some(m) = cost.materials else { return Ok(Vec::new()) };
-    let cards = material_candidates(cx, source, player, &m);
+    let cards = material_candidates(cx, source, player, m);
     if cards.len() < m.count as usize {
         return Err(Stop::Cancel);
+    }
+    // Materials named one by one: each asked in turn among what is left that passes its filter. A choice that leaves a
+    // later one with nothing is a cost that can't be paid, and the activation is taken back (CR 602.2b, 601.2h).
+    if !m.parts.is_empty() {
+        let asker = Asker { source, controller: player };
+        let mut chosen: Vec<ObjectId> = Vec::new();
+        for part in m.parts {
+            let left: Vec<ObjectId> = cards.iter().copied().filter(|&c| !chosen.contains(&c) && (part.filter)(cx, &asker, c)).collect();
+            if left.is_empty() {
+                return Err(Stop::Cancel);
+            }
+            let ask = RequestKind::Craft { source, cards: left, minimum: 1, maximum: 1, quality: part.quality };
+            match cx.ask_core(player, ask, true)? {
+                Answer::Cards(one) => chosen.extend(one),
+                _ => return Err(Stop::Cancel),
+            }
+        }
+        return Ok(chosen);
     }
     let maximum = if m.or_more { cards.len().min(255) as u8 } else { m.count };
     let ask = RequestKind::Craft { source, cards, minimum: m.count, maximum, quality: m.quality };
