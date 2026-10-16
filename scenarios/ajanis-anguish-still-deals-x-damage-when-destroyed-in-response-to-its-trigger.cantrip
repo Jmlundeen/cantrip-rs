@@ -1,0 +1,57 @@
+# Ajani's Anguish: "When this enchantment enters, it deals X damage to any target." Bot2 answers the trigger by destroying the
+# enchantment with Disenchant. The ability is independent of its source (CR 113.7a) and the damage is dealt by the enchantment as
+# it last existed (CR 608.2h), with the X it was cast with: Bot2 still takes 2 and goes to 18. The trample it gave is gone with
+# it: Bot1's Ornithopter has only flying again. The positive control for the trample is the neighbouring scenario at X = 0.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Ornithopter
+Ajani's Anguish
+Plains x25
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Disenchant
+Plains x25
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ajani's Anguish.Cast(X: 2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2)
+? Bot1.Battlefield.Ornithopter.Keywords = Flying; Trample
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Ajani's Anguish)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Graveyard = Ajani's Anguish
+Bot1.Battlefield.Ornithopter.Keywords = Flying
+Stack.Count = 0

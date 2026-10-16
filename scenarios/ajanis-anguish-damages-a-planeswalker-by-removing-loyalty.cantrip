@@ -1,0 +1,53 @@
+# Ajani's Anguish: "any target" includes a planeswalker (CR 115.4), and damage dealt to one is removed as loyalty counters
+# (CR 120.3c): X = 2 on Bot2's Ajani Resolute, which has exactly 2 loyalty, leaves it with none and it goes to its owner's
+# graveyard as a state-based action (CR 704.5i).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Ajani's Anguish
+Plains x25
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Ajani Resolute
+Plains x25
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Ajani Resolute.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Ajani Resolute.Counters.Loyalty = 2
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ajani's Anguish.Cast(X: 2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2.Battlefield.Ajani Resolute)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Ajani Resolute
+Bot2.Battlefield = Mox Pearl; Mox Jet
+Stack.Count = 0

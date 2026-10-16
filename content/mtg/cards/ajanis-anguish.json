@@ -1,0 +1,6 @@
+{
+  "name": "Ajani's Anguish",
+  "manaCost": "{X}{R}",
+  "type": "Enchantment",
+  "oracleText": "When this enchantment enters, it deals X damage to any target.\nCreatures you control have trample."
+}

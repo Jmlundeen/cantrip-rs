@@ -1,0 +1,52 @@
+# Ajani's Anguish: the trigger's target is checked again as it resolves (CR 608.2b). X = 2 would kill Bot2's Ornithopter (0/2), but
+# Bot2 answers with Snakeskin Veil: hexproof makes it an illegal target of Bot1's ability, so the trigger does nothing (no damage,
+# and the Veil's +1/+1 counter keeps it a 1/3).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Ajani's Anguish
+Plains x25
+
+[Bot2 Deck]
+Forest
+Ornithopter
+Snakeskin Veil
+Plains x25
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ajani's Anguish.Cast(X: 2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Snakeskin Veil.Cast(Ornithopter)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Forest; Ornithopter
+Bot2.Battlefield.Ornithopter.Damage = 0
+Bot2.Battlefield.Ornithopter.Toughness = 3
+Bot2.Graveyard = Snakeskin Veil
+Stack.Count = 0

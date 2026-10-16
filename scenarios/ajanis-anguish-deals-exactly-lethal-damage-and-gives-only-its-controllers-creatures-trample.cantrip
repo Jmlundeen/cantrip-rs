@@ -1,0 +1,54 @@
+# Ajani's Anguish: "When this enchantment enters, it deals X damage to any target. Creatures you control have trample." Cast on turn 3
+# for X = 2, the trigger targets one of Bot2's two Ornithopters (0/2): 2 damage is exactly lethal, so it dies and the other is
+# untouched. Bot1's own Ornithopter has trample from the enchantment (a static ability, CR 604.2) and Bot2's does not.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Ornithopter
+Ajani's Anguish
+Plains x25
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Plains x25
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+? Bot1.Battlefield.Ornithopter.Keywords = Flying
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ajani's Anguish.Cast(X: 2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2.Battlefield.Ornithopter#1)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Ornithopter
+Bot2.Battlefield = Ornithopter
+Bot2.Battlefield.Ornithopter.Damage = 0
+Bot2.Battlefield.Ornithopter.Keywords = Flying
+Bot1.Battlefield.Ornithopter.Keywords = Flying; Trample
+Bot1.Battlefield.Ajani's Anguish.Types = Enchantment
+Stack.Count = 0

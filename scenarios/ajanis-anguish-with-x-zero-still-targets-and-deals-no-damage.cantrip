@@ -1,0 +1,32 @@
+# Ajani's Anguish: with X = 0 ({R} alone) the enters trigger still goes on the stack and takes its target (Bot2), and deals 0
+# damage (CR 120.8: no damage is dealt, so Bot2 stays at 20 life). The enchantment's trample is there all the same: Bot1's
+# Ornithopter has it. A positive control for damage to a player is the next scenario's Disenchant case at X = 2.
+
+[Bot1 Deck]
+Mox Ruby
+Ornithopter
+Ajani's Anguish
+Plains x25
+
+[Bot2 Deck]
+Plains x25
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ajani's Anguish.Cast(X: 0)
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot1.Life = 20
+Bot1.Battlefield.Ornithopter.Keywords = Flying; Trample
+Stack.Count = 0
