@@ -1,0 +1,42 @@
+# Pillar of Origins names Construct as it enters; its any-color mana is "only to cast a creature spell of the chosen
+# type" (CR 106.6, 205.3m). Its {G} alone can't cast Llanowar Elves, an Elf. With Mox Ruby's {R} it pays the {X}{X} of
+# Walking Ballista, a Construct, for X of 1 (CR 107.3, 601.2f-h: X is part of the cost the mana pays).
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Pillar of Origins
+Llanowar Elves
+Walking Ballista
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Pillar of Origins.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Construct)
+Bot1.Battlefield.Pillar of Origins.Activate(Color: Green)
+? Bot1.Mana = {G} (ConstructCreatureSpells)
+! Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Walking Ballista.Cast(X: 1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Battlefield = Mox Jet; Mox Pearl; Mox Ruby; Pillar of Origins; Walking Ballista
+Bot1.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 1
+Bot1.Hand = Llanowar Elves; Island
