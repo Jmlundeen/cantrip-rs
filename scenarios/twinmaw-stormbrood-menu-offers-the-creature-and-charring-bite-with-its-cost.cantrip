@@ -1,0 +1,50 @@
+# Browser
+# As a player casts an omen card they choose to cast it normally or as its Omen (CR 720.3), so Bot1's page offers both in
+# Twinmaw Stormbrood's menu when both can be paid for: "Cast Twinmaw Stormbrood" ({5}{W}, printed on the card) and "Cast
+# Charring Bite {1}{R}..." - the Omen named as the spell it casts, with the Omen's own cost, which the creature card in the
+# hand does not show, and a target to choose. Bot1 casts Charring Bite at Bot2's Llanowar Elves; the stack shows Charring
+# Bite (CR 720.3b), and as it resolves the card is shuffled into Bot1's library (CR 720.3d): eight cards, none in the
+# graveyard.
+
+[Bot1 Deck]
+Mountain
+Mox Pearl
+Mox Ruby
+Sol Ring
+Twinmaw Stormbrood
+Plains
+Island
+Island x8
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x13
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Forest.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Twinmaw Stormbrood.Cast(Bot2.Battlefield.Llanowar Elves; Ability: Omen)
+? Client.Bot1.Menu = Cast Twinmaw Stormbrood; Cast Charring Bite {1}{R}...
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+? Stack = Charring Bite
+? Client.Bot1.Stack = Charring Bite
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 20
+Bot1.Library.Count = 8
+Bot1.Graveyard.Count = 0
+Exile.Count = 0
+Bot2.Graveyard = Llanowar Elves

@@ -1,0 +1,56 @@
+# An omen card may be cast as its Omen wherever a permission lets the card be cast (CR 601.3, 720.3), on the permission's
+# terms. Bot1's Robber of the Rich attacks on turn 1 (haste) while Bot2 holds more cards, and exiles the top card of Bot2's
+# library, Bot2's Twinmaw Stormbrood; Bot1 attacked with a Rogue this turn, so it may cast that card, spending mana as
+# though it were mana of any color. In the second main phase Bot1 casts it as Charring Bite for {1}{R} paid with a Mox
+# Sapphire and a Mox Jet - no red at all - at its own Robber, the only creature without flying. The Robber dies, and the
+# Bite is shuffled into its owner's library, Bot2's (CR 720.3d): back to the eight cards Bot2's library had before the
+# exile. Bot1's library is untouched and nothing is left in exile.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Robber of the Rich
+Mox Sapphire
+Mox Jet
+Island
+Island
+Island x8
+
+[Bot2 Deck]
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Twinmaw Stormbrood
+Island x7
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Robber of the Rich.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+[T1 Bot1.DeclareAttackers]
+Bot1.Attack(Robber of the Rich > Bot2)
+[T1 Bot1.Main2]
+? Exile = Twinmaw Stormbrood
+? Bot2.Library.Count = 7
+Bot1.Exile.Twinmaw Stormbrood.Cast(Bot1.Battlefield.Robber of the Rich; Ability: Omen)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+? Stack = Charring Bite
+[T1 Bot1.End]
+
+[Expect]
+Stack.Count = 0
+Exile.Count = 0
+Bot1.Graveyard = Robber of the Rich
+Bot2.Library.Count = 8
+Bot2.Graveyard.Count = 0
+Bot1.Library.Count = 8
+Bot2.Life = 18

@@ -1,0 +1,33 @@
+# In every zone but the stack an omen card has only its normal characteristics (CR 720.4): in Bot1's hand Twinmaw
+# Stormbrood is a creature card, although its Omen, Charring Bite, is a sorcery. Duress chooses "a noncreature, nonland
+# card", so it cannot take the Twinmaw; it takes the Lightning Bolt beside it (the positive control).
+
+[Bot1 Deck]
+Twinmaw Stormbrood
+Lightning Bolt
+Island
+Island
+Island
+Island
+Island
+Island x8
+
+[Bot2 Deck]
+Swamp
+Duress
+Swamp x13
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Duress.Cast(Bot1)
+Bot2.Battlefield.Swamp.Activate
+! Bot2.Choose(Twinmaw Stormbrood)
+Bot2.Choose(Lightning Bolt)
+[T2 Bot2.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Lightning Bolt
+Bot1.Hand = Twinmaw Stormbrood; Island; Island; Island; Island; Island
+Bot2.Graveyard = Duress

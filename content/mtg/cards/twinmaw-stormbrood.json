@@ -1,0 +1,15 @@
+{
+  "name": "Twinmaw Stormbrood",
+  "manaCost": "{5}{W}",
+  "type": "Creature — Dragon",
+  "power": 5,
+  "toughness": 4,
+  "oracleText": "Flying\nWhen this creature enters, you gain 5 life.",
+  "keywords": ["Flying"],
+  "omen": {
+    "name": "Charring Bite",
+    "manaCost": "{1}{R}",
+    "type": "Sorcery — Omen",
+    "oracleText": "Charring Bite deals 5 damage to target creature without flying. (Then shuffle this card into its owner's library.)"
+  }
+}

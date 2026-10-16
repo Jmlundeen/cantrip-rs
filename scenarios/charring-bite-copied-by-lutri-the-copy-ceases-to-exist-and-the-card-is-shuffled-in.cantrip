@@ -1,0 +1,62 @@
+# A copy of an Omen spell is an Omen too (CR 720.3c): it has Charring Bite's characteristics, a sorcery, so Lutri's
+# "copy target instant or sorcery spell you control" can take the Omen on the stack at all (CR 720.3b). Bot1 casts
+# Charring Bite at Bot2's first Llanowar Elves and flashes in Lutri, whose trigger copies it; the copy is aimed at the
+# second Elves. Both resolve, killing both Elves. The copy is "shuffled into its owner's library" too, but a copy of a spell
+# is no card and ceases to exist out of the stack (CR 707.10a, 704.5e; the ruling: "the copy ceases to exist as a
+# state-based action"), so only the card itself joins Bot1's library: eight cards, not nine, and nothing of Bot1's is in
+# a graveyard or exile.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Sapphire
+Sol Ring
+Twinmaw Stormbrood
+Lutri, the Spellchaser
+Island
+Island x8
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Llanowar Elves
+Forest x11
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Twinmaw Stormbrood.Cast(Bot2.Battlefield.Llanowar Elves#1; Ability: Omen)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lutri, the Spellchaser.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Pass
+Bot1.Target(Bot2.Battlefield.Llanowar Elves#2)
+? Stack.Count = 2
+? Bot1.Library.Count = 7
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot2.Graveyard = Llanowar Elves; Llanowar Elves
+Bot2.Battlefield = Forest; Mox Emerald
+Bot1.Library.Count = 8
+Bot1.Graveyard.Count = 0
+Exile.Count = 0
+Bot1.Battlefield = Mountain; Island; Mox Ruby; Mox Sapphire; Sol Ring; Lutri, the Spellchaser

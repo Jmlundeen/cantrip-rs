@@ -1,0 +1,43 @@
+# An Omen spell whose every target has become illegal doesn't resolve (CR 608.2b): it is put into its owner's graveyard
+# and is not shuffled into the library (CR 720.3d happens only as it resolves; the ruling says so). Bot1 aims Charring
+# Bite at its own Llanowar Elves and Bot2 bolts the Elves in response. The Elves dies first, then the Bite is removed:
+# Twinmaw Stormbrood is on top of Bot1's graveyard and the library holds the seven cards it had after the draw.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Mountain
+Mox Ruby
+Twinmaw Stormbrood
+Island
+Island
+Island x8
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x13
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Twinmaw Stormbrood.Cast(Bot1.Battlefield.Llanowar Elves; Ability: Omen)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot2.Battlefield.Mountain.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Twinmaw Stormbrood; Llanowar Elves
+Bot1.Library.Count = 7
+Exile.Count = 0
+Bot1.Battlefield = Forest; Mountain; Mox Ruby
+Bot2.Graveyard = Lightning Bolt

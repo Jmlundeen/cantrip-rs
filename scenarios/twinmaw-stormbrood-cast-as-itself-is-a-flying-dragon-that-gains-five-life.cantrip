@@ -1,0 +1,42 @@
+# An omen card cast normally is the card itself (CR 720.3, 720.4): Twinmaw Stormbrood for {5}{W} (Black Lotus for white,
+# Sol Ring and a Plains), a 5/4 flying Dragon. "When this creature enters, you gain 5 life": Bot1 goes to 25. The
+# Omen's characteristics play no part: it enters as the creature, not shuffled anywhere.
+
+[Bot1 Deck]
+Plains
+Sol Ring
+Black Lotus
+Twinmaw Stormbrood
+Plains
+Island
+Island
+Island x8
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Plains.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Twinmaw Stormbrood.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Plains#1.Activate
+? Stack = Twinmaw Stormbrood
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 25
+Bot1.Battlefield = Plains; Plains; Sol Ring; Twinmaw Stormbrood
+Bot1.Battlefield.Twinmaw Stormbrood.Keywords = Flying
+Bot1.Battlefield.Twinmaw Stormbrood.Power = 5
+Bot1.Battlefield.Twinmaw Stormbrood.Toughness = 4
+Bot1.Battlefield.Twinmaw Stormbrood.Subtypes = Dragon
+Bot1.Battlefield.Twinmaw Stormbrood.Colors = White
+Bot1.Graveyard = Black Lotus
+Bot1.Library.Count = 7

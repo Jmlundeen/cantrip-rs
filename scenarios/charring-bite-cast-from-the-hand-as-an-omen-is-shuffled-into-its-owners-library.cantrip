@@ -1,0 +1,62 @@
+# Twinmaw Stormbrood cast from the hand as its Omen, Charring Bite (CR 720.3): on the stack it is that sorcery alone
+# (CR 720.3b), named Charring Bite. As a sorcery it is not offered on Bot2's turn with a spell on the stack (CR 307.1, judged
+# by the Omen alone, CR 720.3a), though Bot1 has the mana and Golos is there to target; on Bot1's own main phase it is
+# (the positive control). It may target only a creature without flying, so Bot2's Ornithopter is refused, and its 5
+# damage kills Golos, Tireless Pilgrim, a 3/5 (four would not). It costs the Omen's {1}{R}, paid by a Mountain and a Mox
+# Ruby. As it resolves its controller shuffles it into its owner's library instead of putting it into the graveyard (CR
+# 720.3d): Bot1's library grows by one (seven left after the turn-3 draw, eight after), and nothing of Bot1's is in the
+# graveyard or exile. The creature was never cast, so no enters trigger gained Bot1 5 life.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Twinmaw Stormbrood
+Island
+Island
+Island
+Island
+Island x8
+
+[Bot2 Deck]
+Forest
+Sol Ring
+Black Lotus
+Golos, Tireless Pilgrim
+Ornithopter
+Forest
+Forest
+Forest x8
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Golos, Tireless Pilgrim.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+! Bot1.Hand.Twinmaw Stormbrood.Cast(Bot2.Battlefield.Golos, Tireless Pilgrim; Ability: Omen)
+[T3 Bot1.Main1]
+! Bot1.Hand.Twinmaw Stormbrood.Cast(Bot2.Battlefield.Ornithopter; Ability: Omen)
+Bot1.Hand.Twinmaw Stormbrood.Cast(Bot2.Battlefield.Golos, Tireless Pilgrim; Ability: Omen)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+? Stack = Charring Bite
+? Bot1.Library.Count = 7
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 20
+Bot1.Hand = Island; Island; Island; Island; Island
+Bot1.Library.Count = 8
+Bot1.Graveyard.Count = 0
+Exile.Count = 0
+Bot1.Battlefield = Mountain; Mox Ruby
+Bot2.Graveyard = Golos, Tireless Pilgrim; Black Lotus
+Bot2.Battlefield = Forest; Sol Ring; Ornithopter

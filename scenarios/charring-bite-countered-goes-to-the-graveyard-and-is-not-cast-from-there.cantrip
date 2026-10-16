@@ -1,0 +1,59 @@
+# An Omen spell that is countered is put into its owner's graveyard like any spell, not shuffled into the library (CR
+# 720.3d applies only as it resolves; the ruling: "If an Omen spell is countered ... it won't be shuffled into its owner's
+# library"). Bot1 casts Charring Bite at its own Llanowar Elves and Bot2 counters it: Twinmaw Stormbrood is in Bot1's
+# graveyard and Bot1's library is unchanged. Nothing lets Bot1 cast a card from its graveyard, so neither face of the
+# Twinmaw there is offered (CR 601.3), while the second Twinmaw, in the hand, is cast as Charring Bite on turn 5 (the
+# positive control) and kills the Elves, and that one is shuffled into the library.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Mountain
+Mox Ruby
+Twinmaw Stormbrood
+Twinmaw Stormbrood
+Mountain
+Island x8
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Island x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Twinmaw Stormbrood.Cast(Bot1.Battlefield.Llanowar Elves; Ability: Omen)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Charring Bite)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+[T3 Bot1.Main2]
+? Bot1.Graveyard = Twinmaw Stormbrood
+? Bot1.Library.Count = 7
+? Bot1.Battlefield.Llanowar Elves.Power = 1
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+! Bot1.Graveyard.Twinmaw Stormbrood.Cast
+Bot1.Hand.Twinmaw Stormbrood.Cast(Bot1.Battlefield.Llanowar Elves; Ability: Omen)
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+[T5 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Llanowar Elves; Twinmaw Stormbrood
+Bot1.Library.Count = 7
+Bot1.Hand = Island; Island
+Exile.Count = 0
+Bot1.Battlefield = Forest; Mountain; Mountain; Mox Ruby
+Bot2.Graveyard = Counterspell
