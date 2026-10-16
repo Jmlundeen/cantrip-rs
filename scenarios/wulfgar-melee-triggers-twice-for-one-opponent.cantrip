@@ -1,0 +1,32 @@
+# Wulfgar of Icewind Dale: "If a creature you control attacking causes a triggered ability of a permanent you control to
+# trigger, that ability triggers an additional time" - its own melee among them (the rulings, CR 603.2d, 702.121a).
+# Wulfgar attacks Bot2 alone: melee triggers twice, each +1/+1 for the one opponent attacked, so a 6/6 deals 6.
+# Turn 1: Wulfgar ({3}{R}{G}: the Mountain, Black Lotus for GGG and Mox Emerald). Turn 3: the attack.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mox Emerald
+Wulfgar of Icewind Dale
+Island x15
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Wulfgar of Icewind Dale.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Wulfgar of Icewind Dale > Bot2)
+Bot1.Triggers(Wulfgar of Icewind Dale; Wulfgar of Icewind Dale)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Wulfgar of Icewind Dale.Power = 6
+? Bot1.Battlefield.Wulfgar of Icewind Dale.Toughness = 6
+
+[Expect]
+Bot2.Life = 14

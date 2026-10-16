@@ -1,0 +1,41 @@
+# Two effects that each make an ability trigger an additional time add up (CR 603.2d): with Isshin, Two Heavens as One
+# ("a creature attacking") and Wulfgar of Icewind Dale ("a creature you control attacking") both out, Wulfgar's melee
+# triggers three times, not four: a 7/7 attacking for 7.
+# Turn 1: Wulfgar (the Mountain, Black Lotus GGG, Mox Emerald), with Mox Pearl and Mox Jet cast. Turn 3: Isshin (the
+# Mountain, Pearl and Jet), then Wulfgar attacks alone.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mox Emerald
+Mox Pearl
+Mox Jet
+Wulfgar of Icewind Dale
+Isshin, Two Heavens as One
+Island x15
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Wulfgar of Icewind Dale.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Isshin, Two Heavens as One.Cast
+Bot1.Attack(Wulfgar of Icewind Dale > Bot2)
+Bot1.Triggers(Wulfgar of Icewind Dale; Wulfgar of Icewind Dale; Wulfgar of Icewind Dale)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Wulfgar of Icewind Dale.Power = 7
+
+[Expect]
+Bot2.Life = 13

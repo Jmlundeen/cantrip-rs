@@ -1,0 +1,52 @@
+# Wulfgar of Icewind Dale doubles only what a creature its controller controls attacking triggers (CR 603.2d): Bot2
+# attacking Bot1 with an Elvish Mystic triggers Bot1's Emberwilde Captain ("Whenever an opponent attacks you while you're
+# the monarch ...") once, for the seven cards in Bot2's hand. (Isshin, which says "a creature attacking", doubles it:
+# isshin-doubles-emberwilde-for-an-opponents-attack-but-not-the-attackers-own-trigger.) The Captain's own enters
+# ability, which no attack caused, triggers once too: Bot1 becomes the monarch.
+# Turn 1: Wulfgar (Mountain, Black Lotus GGG, Mox Emerald). Turn 2: Bot2's Mystic. Turn 3: the Captain (two Mountains,
+# Mox Ruby, Mox Jet). Turn 4: Bot2 (7 + 1 - 2 + 1 = 7 cards) attacks Bot1 with the Mystic, unblocked.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mox Emerald
+Mox Ruby
+Mox Jet
+Wulfgar of Icewind Dale
+Emberwilde Captain
+Mountain
+Island x15
+
+[Bot2 Deck]
+Forest
+Elvish Mystic
+Forest x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Wulfgar of Icewind Dale.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Emberwilde Captain.Cast
+[T3 Bot1.Main2]
+? Monarch = Bot1
+[T4 Bot2.Main1]
+? Bot2.Hand.Count = 7
+Bot2.Attack(Elvish Mystic > Bot1)
+[T4 Bot2.DeclareBlockers]
+? Bot2.Life = 13

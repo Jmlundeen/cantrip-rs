@@ -1,0 +1,42 @@
+# Melee counts the opponents its controller attacked this combat, not planeswalkers (CR 702.121a, the rulings): Wulfgar of
+# Icewind Dale attacks Bot2's Liliana of the Veil alone. Melee still triggers - twice, by Wulfgar's own rule - but each
+# gives +0/+0, so a 4/4 deals 4 to Liliana (loyalty 3), who dies, and Bot2 takes nothing.
+# Turn 1: Wulfgar (Mountain, Black Lotus GGG, Mox Emerald). Turn 2: Liliana (a Swamp and Black Lotus BBB). Turn 3: the
+# attack. (wulfgar-melee-triggers-twice-for-one-opponent is the attack on the player.)
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mox Emerald
+Wulfgar of Icewind Dale
+Island x15
+
+[Bot2 Deck]
+Swamp
+Black Lotus
+Liliana of the Veil
+Swamp x17
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Wulfgar of Icewind Dale.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Liliana of the Veil.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Wulfgar of Icewind Dale > Bot2.Battlefield.Liliana of the Veil)
+Bot1.Triggers(Wulfgar of Icewind Dale; Wulfgar of Icewind Dale)
+[T3 Bot1.DeclareBlockers]
+? Bot1.Battlefield.Wulfgar of Icewind Dale.Power = 4
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot2.Graveyard = Liliana of the Veil; Black Lotus
