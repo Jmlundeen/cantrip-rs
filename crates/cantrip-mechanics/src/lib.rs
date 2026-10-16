@@ -201,7 +201,11 @@ pub fn each_opponent_sacrifices(
     Ok(())
 }
 
-pub(crate) fn sacrifice_one_of(g: &mut dyn Game, player: PlayerId, source: ObjectId, count: u8, eligible: Vec<ObjectId>) -> Result<(), Suspend> {
+/// "[Player] sacrifices `count` of `eligible`" (CR 701.21): the permanents the effect allows are decided by the caller (a
+/// quality of the group, such as the greatest mana value among them), chosen by that player when there is a choice and all
+/// of them taken when there are no more than `count`. `sacrifice_chosen` and `each_opponent_sacrifices` filter by kind; Break
+/// Under Pressure's "with the greatest mana value among creatures and planeswalkers they control" cannot be a kind.
+pub fn sacrifice_one_of(g: &mut dyn Game, player: PlayerId, source: ObjectId, count: u8, eligible: Vec<ObjectId>) -> Result<(), Suspend> {
     if eligible.len() <= count as usize {
         g.sacrifice(&eligible);
         return Ok(());
