@@ -1,0 +1,38 @@
+# Sunbird Effigy's power and toughness are the number of colors among the exiled cards used to craft it (CR 702.167c,
+# 604.3). Crafted with a colorless Mox Jet alone, there are none: it is 0/0 and is put into its owner's graveyard as a state-
+# based action (CR 704.5f), where it is Sunbird Standard again (CR 712.8a).
+
+[Bot1 Deck]
+Mountain
+Sunbird Standard
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sunbird Standard.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Sunbird Standard.Activate(Ability: Craft)
+Bot1.Choose(Mox Jet)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sunbird Standard.Activate(Color: Green)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Sunbird Standard; Black Lotus
+Exile = Mox Jet

@@ -1,0 +1,16 @@
+{
+  "name": "Sunbird Standard",
+  "manaCost": "{3}",
+  "type": "Artifact",
+  "oracleText": "{T}: Add one mana of any color.\nCraft with one or more {5} ({5}, Exile this artifact, Exile one or more other permanents you control and/or cards from your graveyard: Return this card transformed under its owner's control. Craft only as a sorcery.)",
+  "backFace": {
+    "name": "Sunbird Effigy",
+    "type": "Artifact Creature — Bird Construct",
+    "oracleText": "Flying, vigilance, haste\nSunbird Effigy's power and toughness are each equal to the number of colors among the exiled cards used to craft it.\n{T}: For each color among the exiled cards used to craft this creature, add one mana of that color.",
+    "keywords": [
+      "Flying",
+      "Vigilance",
+      "Haste"
+    ]
+  }
+}

@@ -1,0 +1,54 @@
+# Sunbird Standard // Sunbird Effigy. "Craft with one or more {5}" (CR 702.167a) takes any other permanents Bot1 controls
+# and cards from its graveyard: here three - Llanowar Elves (green), the Lightning Bolt card in the graveyard (red) and a
+# colorless Mox Ruby. Sunbird Effigy's power and toughness are the number of colors among the exiled cards used to craft
+# it (CR 702.167c, 604.3): 2/2, with flying, vigilance and haste, so it attacks the turn it is crafted. Its "{T}: For each
+# color among the exiled cards used to craft this creature, add one mana of that color" adds {R} and {G}. The Standard's
+# own "{T}: Add one mana of any color" pays for it.
+
+[Bot1 Deck]
+Mountain
+Sunbird Standard
+Black Lotus
+Mox Ruby
+Mox Emerald
+Llanowar Elves
+Lightning Bolt
+Forest
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sunbird Standard.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Sunbird Standard.Activate(Ability: Craft)
+Bot1.Choose(Llanowar Elves; Graveyard.Lightning Bolt; Mox Ruby)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Sunbird Standard.Activate(Color: White)
+[T5 Bot1.DeclareAttackers]
+? Bot1.Battlefield.Sunbird Effigy.Power = 2
+? Bot1.Battlefield.Sunbird Effigy.Toughness = 2
+? Bot1.Battlefield.Sunbird Effigy.Keywords = Flying; Haste; Vigilance
+Bot1.Attack(Sunbird Effigy > Bot2)
+[T5 Bot1.Main2]
+Bot1.Battlefield.Sunbird Effigy.Activate
+? Bot1.Mana = {R}{G}
+
+[Expect]
+Bot2.Life = 15
+Exile = Llanowar Elves; Lightning Bolt; Mox Ruby
