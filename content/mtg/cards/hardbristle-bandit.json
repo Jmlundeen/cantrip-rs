@@ -1,0 +1,8 @@
+{
+  "name": "Hardbristle Bandit",
+  "manaCost": "{1}{G}",
+  "type": "Creature — Plant Rogue",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "{T}: Add one mana of any color.\nWhenever you commit a crime, untap this creature. This ability triggers only once each turn. (Targeting opponents, anything they control, and/or cards in their graveyards is a crime.)"
+}

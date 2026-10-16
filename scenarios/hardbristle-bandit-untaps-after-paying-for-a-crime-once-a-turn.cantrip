@@ -1,0 +1,51 @@
+# Hardbristle Bandit: "{T}: Add one mana of any color." pays for a Lightning Bolt at Bot2, a crime, and "whenever you
+# commit a crime, untap this creature" untaps it before the Bolt resolves. Tapped for a second Bolt at Bot2 the same
+# turn, it stays tapped: the ability "triggers only once each turn". On Bot2's turn a third Bolt from a Mountain is a
+# crime on a new turn, and it untaps again.
+
+[Bot1 Deck]
+Forest
+Hardbristle Bandit
+Mountain
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Mox Emerald
+Forest x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Hardbristle Bandit.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Hardbristle Bandit.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Bot1.Battlefield.Hardbristle Bandit.Tapped = true
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Hardbristle Bandit.Tapped = false
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Hardbristle Bandit.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Hardbristle Bandit.Tapped = true
+[T4 Bot2.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Stack.Count = 2
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Crimes = Lightning Bolt; Lightning Bolt; Lightning Bolt
+Bot1.Battlefield.Hardbristle Bandit.Tapped = false
+Bot2.Life = 11
