@@ -13,7 +13,7 @@ fn attacking_creature(q: &dyn Query, asker: &Asker, t: Target) -> bool {
 fn grant(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
     g.add_effect(item.object, creature, EffectKind::Pump(2, 2), Duration::EndOfTurn);
-    g.add_effect(item.object, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::Trample])), Duration::EndOfTurn);
+    cantrip_mechanics::trample_until_end_of_turn(g, item.object, creature);
     let this = g.obj(item.object).card;
     g.add_effect(item.object, creature, EffectKind::AddAbility(AbilityRef::delayed(this, 0)), Duration::EndOfTurn);
     Ok(())

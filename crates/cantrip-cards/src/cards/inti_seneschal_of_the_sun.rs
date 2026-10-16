@@ -24,7 +24,7 @@ fn attacking_creature(q: &dyn Query, _: &Asker, t: Target) -> bool {
 fn empower(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
     g.add_counters(creature, CounterKind::PlusOne, 1);
-    g.add_effect(item.object, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::Trample])), Duration::EndOfTurn);
+    cantrip_mechanics::trample_until_end_of_turn(g, item.object, creature);
     Ok(())
 }
 

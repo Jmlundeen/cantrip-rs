@@ -6,7 +6,7 @@ use cantrip_oracle as oracle;
 fn boost(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(creature) = targets::object(g, item, 0) {
         pump(g, item.object, creature, item.x as i16, 0);
-        g.add_effect(item.object, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::Trample])), Duration::EndOfTurn);
+        cantrip_mechanics::trample_until_end_of_turn(g, item.object, creature);
     }
     Ok(())
 }

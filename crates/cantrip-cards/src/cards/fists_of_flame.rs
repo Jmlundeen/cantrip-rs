@@ -9,7 +9,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
     let drawn = g.history().drawn(item.controller) as i16;
     pump(g, item.object, creature, drawn, 0);
-    g.add_effect(item.object, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::Trample])), Duration::EndOfTurn);
+    cantrip_mechanics::trample_until_end_of_turn(g, item.object, creature);
     Ok(())
 }
 

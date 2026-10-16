@@ -391,6 +391,12 @@ pub fn haste_until_end_of_turn(g: &mut dyn Game, source: ObjectId, creature: Obj
     g.add_effect(source, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::Haste])), Duration::EndOfTurn);
 }
 
+/// "[It] gains trample until end of turn" (CR 611.2, 702.19): a continuous effect from the resolving spell or ability's source.
+/// Ancestral Anger, Berserk and Fists of Flame print it.
+pub fn trample_until_end_of_turn(g: &mut dyn Game, source: ObjectId, creature: ObjectId) {
+    g.add_effect(source, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::Trample])), Duration::EndOfTurn);
+}
+
 /// Scry N (CR 701.22): look at the top N cards of your library, put any number on the bottom in any order and the
 /// rest back on top in any order. Nothing is asked of an empty library. Undercity's Lost Well prints "scry 2".
 pub fn scry(g: &mut dyn Game, player: PlayerId, source: ObjectId, count: usize) -> Result<(), Suspend> {

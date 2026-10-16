@@ -20,7 +20,7 @@ fn grow(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         g.add_counters(token, CounterKind::PlusOne, 1);
     }
     for &token in &tokens {
-        g.add_effect(item.object, token, EffectKind::AddKeywords(Keywords::of(&[Keyword::Trample])), Duration::EndOfTurn);
+        cantrip_mechanics::trample_until_end_of_turn(g, item.object, token);
     }
     Ok(())
 }

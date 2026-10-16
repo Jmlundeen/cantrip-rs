@@ -15,7 +15,7 @@ fn counters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// Mode 1: "Target creature gains trample until end of turn."
 fn trample(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(creature) = targets::object(g, item, 0) {
-        g.add_effect(item.object, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::Trample])), Duration::EndOfTurn);
+        cantrip_mechanics::trample_until_end_of_turn(g, item.object, creature);
     }
     Ok(())
 }

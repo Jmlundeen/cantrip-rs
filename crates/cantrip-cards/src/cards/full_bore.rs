@@ -8,7 +8,8 @@ fn bore(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
     pump(g, item.object, creature, 3, 2);
     if warp::was_cast_for_warp(g, creature) {
-        g.add_effect(item.object, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::Trample, Keyword::Haste])), Duration::EndOfTurn);
+        cantrip_mechanics::trample_until_end_of_turn(g, item.object, creature);
+        cantrip_mechanics::haste_until_end_of_turn(g, item.object, creature);
     }
     Ok(())
 }
