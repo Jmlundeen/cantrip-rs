@@ -127,6 +127,28 @@ public sealed partial class TacticalPlay
         return new TargetsDividedAnswer { Shares = shares };
     }
 
+    /// <summary>
+    /// The offered creature type that most of this seat's creatures and creature cards in hand have, the earlier offered on
+    /// a tie (the first eligible when none has any).
+    /// </summary>
+    private static int MostCommonCreatureType(GameClient client, ChooseModesPromptMessage prompt)
+    {
+        List<ObjectView> mine = [.. Creatures(client, client.Seat), .. client.MyHand().Where(IsCreature)];
+        int best = prompt.Eligible[0];
+        int most = 0;
+        foreach (int mode in prompt.Eligible)
+        {
+            string type = prompt.Modes[mode];
+            int count = mine.Count(card => card.Subtypes.Exists(subtype => string.Equals(subtype, type, StringComparison.OrdinalIgnoreCase)));
+            if (count > most)
+            {
+                (best, most) = (mode, count);
+            }
+        }
+
+        return best;
+    }
+
     /// <summary>The modes worth most on this board, as many as are asked for.</summary>
     private AnswerPayload Modes(GameClient client, PlayerView view, ChooseModesPromptMessage prompt)
     {
@@ -170,6 +192,14 @@ public sealed partial class TacticalPlay
             && prompt.Modes[0].StartsWith("Discard an instant or sorcery", StringComparison.Ordinal))
         {
             return new ModesChosenAnswer { Modes = [0] };
+        }
+
+        // "As this enters, choose a creature type" (Roaming Throne, Chronicle of Victory, Door of Destinies): every such card
+        // rewards the type this seat has most of, so the type most common among its creatures on the battlefield and the
+        // creature cards in its hand; with none of any offered type, the prompt's own first.
+        if (prompt.Heading == "Choose a creature type" && prompt.Eligible.Count > 0)
+        {
+            return new ModesChosenAnswer { Modes = [MostCommonCreatureType(client, prompt)] };
         }
 
         if (prompt.Eligible.Count == 0 || prompt.AdditionalCost || prompt.Heading.Length > 0)

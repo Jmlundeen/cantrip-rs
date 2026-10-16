@@ -175,4 +175,46 @@ public sealed class TacticalPromptsTests
         }));
         Assert.Empty(away.Targets);
     }
+
+    // --- Choose a creature type -------------------------------------------------------------------------------------
+
+    private static ChooseModesPromptMessage CreatureType() => new()
+    {
+        Player = Me,
+        Modes = ["Elf", "Goblin", "Wizard"],
+        Eligible = [0, 1, 2],
+        Count = 1,
+        AtMost = 1,
+        Heading = "Choose a creature type",
+    };
+
+    private static ObjectView Typed(ObjectView card, params string[] subtypes)
+    {
+        card.Subtypes = [.. subtypes];
+        return card;
+    }
+
+    [Fact]
+    public void Names_the_creature_type_it_has_most_of_on_the_battlefield_and_in_hand()
+    {
+        // Roaming Throne's choice: two Wizards (one in hand) beat one Goblin, and an opponent's Elves count for nothing.
+        GameClient client = Seated([
+            Typed(Creature(3, "Goblin Guide", 2, 2), "Goblin"),
+            Typed(Creature(4, "Snapcaster Mage", 2, 1), "Human", "Wizard"),
+            Typed(InHand(5, "Tersa Lightshatter", CardTypeView.Creature, 3, power: 3, toughness: 3), "Orc", "Wizard"),
+            Typed(Creature(6, "Llanowar Elves", 1, 1, controller: Them), "Elf"),
+            Typed(Creature(7, "Elvish Mystic", 1, 1, controller: Them), "Elf"),
+            Typed(Creature(8, "Fyndhorn Elves", 1, 1, controller: Them), "Elf"),
+        ]);
+
+        Assert.Equal([2], Assert.IsType<ModesChosenAnswer>(Bot().Decide(client, CreatureType())).Modes);
+    }
+
+    [Fact]
+    public void Names_the_first_creature_type_offered_with_none_of_any()
+    {
+        GameClient client = Seated([Typed(Creature(3, "Ornithopter", 0, 2), "Thopter")]);
+
+        Assert.Equal([0], Assert.IsType<ModesChosenAnswer>(Bot().Decide(client, CreatureType())).Modes);
+    }
 }
