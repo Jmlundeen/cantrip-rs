@@ -1,0 +1,6 @@
+{
+  "name": "Boltwave",
+  "manaCost": "{R}",
+  "type": "Sorcery",
+  "oracleText": "Boltwave deals 3 damage to each opponent."
+}
