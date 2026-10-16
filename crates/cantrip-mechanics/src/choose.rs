@@ -111,8 +111,8 @@ pub fn cast_any_number_free(g: &mut dyn Game, player: PlayerId, source: ObjectId
 }
 
 /// "You may cast up to `most` spells from among [these cards] without paying their mana costs": as `cast_any_number_free`,
-/// nothing more offered once `most` have been cast; a cast given up does not count. Doom Reigns Supreme and Plargg and
-/// Nassari print it with two.
+/// nothing more offered once `most` have been cast; a cast given up does not count. Doom Reigns Supreme uses it with
+/// two; Plargg and Nassari (not in content yet) is the second printed card with the same words.
 pub fn cast_up_to_free(g: &mut dyn Game, player: PlayerId, source: ObjectId, cards: &[ObjectId], most: usize) -> Result<(), Suspend> {
     let mut cast = 0;
     while cast < most {

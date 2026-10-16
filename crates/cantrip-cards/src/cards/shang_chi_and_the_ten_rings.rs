@@ -20,7 +20,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(triggers::YOU_DRAW_A_CARD, grow, "Whenever you draw a card, put a +1/+1 counter on Shang-Chi."),
         triggered(
-            when(EventMask::COUNTERS, triggers::nth_counter_put_on_this::<{ CounterKind::PlusOne as u8 }, 10>),
+            when_asked(EventMask::COUNTERS, triggers::nth_counter_put_on_this::<{ CounterKind::PlusOne as u8 }, 10>),
             ten_rings,
             "When the tenth +1/+1 counter is put on Shang-Chi, you draw five cards and gain 5 life.",
         ),

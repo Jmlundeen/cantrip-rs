@@ -38,7 +38,7 @@ pub static CARD: CardDef = CardDef {
         triggered(triggers::LANDFALL, counters, "Landfall \u{2014} Whenever a land you control enters, put a +1/+1 counter on target creature you control and a plan counter on this enchantment.")
             .targets(&[targets::CREATURE_YOU_CONTROL]),
         triggered(
-            when(EventMask::COUNTERS, triggers::nth_counter_put_on_this::<{ CounterKind::Plan as u8 }, 4>),
+            when_asked(EventMask::COUNTERS, triggers::nth_counter_put_on_this::<{ CounterKind::Plan as u8 }, 4>),
             sacrifice_it,
             "When the fourth plan counter is put on this enchantment, sacrifice it. When you do, put an indestructible counter on target creature you control.",
         ),

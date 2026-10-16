@@ -16,9 +16,9 @@ pub static ROBOT_VILLAIN: CardDef = CardDef {
 /// "Whenever one or more creature cards are put into your graveyard from anywhere" (CR 603.2c, 603.6a): asked of each card
 /// that arrives in its controller's graveyard - a card, so not a token (CR 111.1) - and one trigger for those that arrive
 /// together.
-fn creature_cards_to_your_graveyard(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+fn creature_cards_to_your_graveyard(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     let Event::ZoneChange { new, to, .. } = event else { return None };
-    if *to == Zone::graveyard(q.controller(source)) && !q.obj(*new).token && q.chars(*new).is(CardType::Creature) {
+    if *to == Zone::graveyard(me.controller) && !q.obj(*new).token && q.chars(*new).is(CardType::Creature) {
         Fired::PLAIN
     } else {
         None
@@ -45,13 +45,13 @@ fn robots(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(
-            when(EventMask::ZONE_CHANGE, creature_cards_to_your_graveyard),
+            when_asked(EventMask::ZONE_CHANGE, creature_cards_to_your_graveyard),
             draw_lose_and_plan,
             "Whenever one or more creature cards are put into your graveyard from anywhere, you draw a card, lose 1 life, and put a plan counter on this enchantment.",
         )
         .once_per_batch(),
         triggered(
-            when(EventMask::COUNTERS, triggers::nth_counter_put_on_this::<{ CounterKind::Plan as u8 }, 3>),
+            when_asked(EventMask::COUNTERS, triggers::nth_counter_put_on_this::<{ CounterKind::Plan as u8 }, 3>),
             robots,
             "When the third plan counter is put on this enchantment, sacrifice it and create three 2/2 colorless Robot Villain artifact creature tokens.",
         ),

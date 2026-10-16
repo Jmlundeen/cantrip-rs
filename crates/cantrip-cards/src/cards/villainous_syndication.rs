@@ -46,7 +46,7 @@ pub static CARD: CardDef = CardDef {
         )
         .sorcery_speed(),
         triggered(
-            when(EventMask::COUNTERS, triggers::nth_counter_put_on_this::<{ CounterKind::Plan as u8 }, 4>),
+            when_asked(EventMask::COUNTERS, triggers::nth_counter_put_on_this::<{ CounterKind::Plan as u8 }, 4>),
             sacrifice_it,
             "When the fourth plan counter is put on this enchantment, sacrifice it. When you do, return target creature card from your graveyard to the battlefield.",
         ),

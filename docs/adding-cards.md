@@ -312,7 +312,7 @@ shapes have an example:
 - **Counters**: `Event::CountersPut` carries `by` (CR 122.6a), the player who put them, and `total`, how many of the kind
   the permanent has once they are on it; a permanent entering with counters announces each kind it has, lore included.
   "When the Nth [kind] counter is put on this" (the Plans, Shang-Chi and the Ten Rings) is
-  `when(EventMask::COUNTERS, triggers::nth_counter_put_on_this::<{ CounterKind::Plan as u8 }, 4>)`. A new kind of counter
+  `when_asked(EventMask::COUNTERS, triggers::nth_counter_put_on_this::<{ CounterKind::Plan as u8 }, 4>)`. A new kind of counter
   is one line in `counter_kinds!` (`cantrip-state/src/vocab.rs`); the host and the client name it from there.
   **Costs**: `Cost.unattach_self`.
 - **Turns**: `DelayedWhen::UntilNextTurnOf(p)`; `CardDef.turn_begin` skips a turn (Time Vault, CR 614.10); "end the

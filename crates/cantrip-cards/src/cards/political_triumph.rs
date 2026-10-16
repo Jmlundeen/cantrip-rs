@@ -23,7 +23,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(triggers::CREATURE_YOU_CONTROL_ENTERS, scry_and_plan, "Whenever a creature you control enters, scry 1 and put a plan counter on this enchantment."),
         triggered(
-            when(EventMask::COUNTERS, triggers::nth_counter_put_on_this::<{ CounterKind::Plan as u8 }, 4>),
+            when_asked(EventMask::COUNTERS, triggers::nth_counter_put_on_this::<{ CounterKind::Plan as u8 }, 4>),
             triumph,
             "When the fourth plan counter is put on this enchantment, sacrifice it, draw a card, and put a +1/+1 counter on each creature you control.",
         ),

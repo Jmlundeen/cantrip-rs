@@ -33,7 +33,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(triggers::NONCREATURE_SPELL_YOU_CAST, treasure_and_plan, "Whenever you cast a noncreature spell, create a tapped Treasure token and put a plan counter on this enchantment."),
         triggered(
-            when(EventMask::COUNTERS, triggers::nth_counter_put_on_this::<{ CounterKind::Plan as u8 }, 4>),
+            when_asked(EventMask::COUNTERS, triggers::nth_counter_put_on_this::<{ CounterKind::Plan as u8 }, 4>),
             sacrifice_it,
             "When the fourth plan counter is put on this enchantment, sacrifice it. When you do, it deals 7 damage divided as you choose among one or two targets.",
         ),

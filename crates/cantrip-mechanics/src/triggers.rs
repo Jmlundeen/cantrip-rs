@@ -90,9 +90,9 @@ pub fn cast_this_spell(_: &dyn Query, source: ObjectId, event: &Event) -> Option
 
 /// "Whenever you draw a card" (CR 120.3, 603.2): the source's controller drew. Sheoldred, the Apocalypse, Teferi, Hero of
 /// Dominaria's emblem and Shang-Chi and the Ten Rings print it.
-pub fn you_draw_a_card(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+pub fn you_draw_a_card(_: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match event {
-        Event::Drew { player, .. } if *player == q.controller(source) => Fired::PLAIN,
+        Event::Drew { player, .. } if *player == me.controller => Fired::PLAIN,
         _ => None,
     }
 }
@@ -104,9 +104,9 @@ pub fn you_draw_a_card(q: &dyn Query, source: ObjectId, event: &Event) -> Option
 /// again if counters were removed and the Nth is put once more, as a Saga's chapters count (CR 714.2b). Political
 /// Triumph, Death to Our Enemies and the other Plans print it with plan counters; Shang-Chi and the Ten Rings with +1/+1
 /// counters.
-pub fn nth_counter_put_on_this<const KIND: u8, const N: i16>(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+pub fn nth_counter_put_on_this<const KIND: u8, const N: i16>(_: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match event {
-        Event::CountersPut { object, kind, amount, total, .. } if *object == source && *kind as u8 == KIND && total - amount < N && *total >= N => {
+        Event::CountersPut { object, kind, amount, total, .. } if *object == me.source && *kind as u8 == KIND && total - amount < N && *total >= N => {
             Fired::PLAIN
         }
         _ => None,
@@ -653,7 +653,7 @@ pub const THIS_ENTERS: Trigger = when(EventMask::ZONE_CHANGE, this_enters);
 pub const THIS_ENTERS_IF_CAST: Trigger = when(EventMask::ZONE_CHANGE, this_enters_if_cast);
 pub const LANDFALL: Trigger = when_asked(EventMask::ZONE_CHANGE, landfall);
 pub const YOU_UNLOCK_THIS_RIGHT_DOOR: Trigger = when(EventMask::DOOR_UNLOCKED, you_unlock_this_right_door);
-pub const YOU_DRAW_A_CARD: Trigger = when(EventMask::DREW, you_draw_a_card);
+pub const YOU_DRAW_A_CARD: Trigger = when_asked(EventMask::DREW, you_draw_a_card);
 pub const CAST_THIS_SPELL: Trigger = when(EventMask::SPELL_CAST, cast_this_spell);
 pub const MAGECRAFT: Trigger = when_asked(EventMask(EventMask::SPELL_CAST.0 | EventMask::COPIED.0), you_cast_or_copy_instant_or_sorcery);
 pub const THIS_ATTACKS: Trigger = when(EventMask::ATTACKS, this_attacks);

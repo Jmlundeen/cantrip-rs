@@ -4,12 +4,12 @@ use cantrip_oracle as oracle;
 
 /// "Whenever a Villain you control enters" (CR 603.6a): the permanent as it entered, its creature type read through this
 /// enchantment's text (CR 612).
-fn villain_you_control_enters(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+fn villain_you_control_enters(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match event {
         Event::ZoneChange { new, to, .. }
             if to.is(ZoneKind::Battlefield)
-                && q.controller(*new) == q.controller(source)
-                && q.chars(*new).has_subtype(q.words(source).subtype(Subtype::Villain)) =>
+                && q.controller(*new) == me.controller
+                && q.chars(*new).has_subtype(q.words(me.source).subtype(Subtype::Villain)) =>
         {
             Fired::PLAIN
         }
@@ -51,12 +51,12 @@ fn exile_and_cast(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(
-            when(EventMask::ZONE_CHANGE, villain_you_control_enters),
+            when_asked(EventMask::ZONE_CHANGE, villain_you_control_enters),
             drain_and_plan,
             "Whenever a Villain you control enters, each opponent loses 1 life and you gain 1 life. Put a plan counter on this enchantment.",
         ),
         triggered(
-            when(EventMask::COUNTERS, triggers::nth_counter_put_on_this::<{ CounterKind::Plan as u8 }, 5>),
+            when_asked(EventMask::COUNTERS, triggers::nth_counter_put_on_this::<{ CounterKind::Plan as u8 }, 5>),
             sacrifice_it,
             "When the fifth plan counter is put on this enchantment, sacrifice it. When you do, target opponent exiles the top five cards of their library. You may cast up to two spells from among the exiled cards without paying their mana costs.",
         ),
