@@ -80,6 +80,23 @@ pub fn may_discard_to_draw(g: &mut dyn Game, item: &StackItem, n: u32) -> Result
     Ok(())
 }
 
+/// "Discard a card, then draw N cards" (CR 701.9, 121.1): the controller chooses a card of their hand and discards it (nothing is
+/// asked of an empty hand), then draws, whether or not they discarded. Fear of Missing Out (one card) and Case of the Crimson
+/// Pulse (two) print it.
+pub fn discard_then_draw(g: &mut dyn Game, item: &StackItem, n: u32) -> Result<(), Suspend> {
+    crate::discard_chosen(g, item.controller, item.object, 1)?;
+    g.draw(item.controller, n);
+    Ok(())
+}
+
+/// "Discard your hand, then draw N cards" (CR 701.9, 121.1): the whole hand goes at once with no choice, then the draw
+/// happens whatever the hand was. Anjes Ravager (three cards) and Case of the Crimson Pulse (two) print it.
+pub fn discard_hand_then_draw(g: &mut dyn Game, item: &StackItem, n: u32) -> Result<(), Suspend> {
+    g.discard_hand(item.controller);
+    g.draw(item.controller, n);
+    Ok(())
+}
+
 /// "You gain N life" (CR 119.3). Zuran Orb and Inventor's Fair print it (two and one).
 pub fn gain_life(g: &mut dyn Game, item: &StackItem, n: i32) -> Result<(), Suspend> {
     g.gain_life(item.controller, n);

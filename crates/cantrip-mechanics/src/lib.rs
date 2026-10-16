@@ -77,6 +77,7 @@ pub mod storm;
 pub mod spree;
 pub mod tiered;
 pub mod sneak;
+pub mod solved;
 pub mod spectacle;
 pub mod suspend;
 pub mod typecycling;

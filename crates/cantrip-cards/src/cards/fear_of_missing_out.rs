@@ -1,13 +1,6 @@
 use cantrip_api::*;
-use cantrip_mechanics::{delirium, discard_chosen, targets, triggers::THIS_ENTERS};
+use cantrip_mechanics::{delirium, effects, targets, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
-
-/// When this creature enters, discard a card, then draw a card.
-fn rummage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    discard_chosen(g, item.controller, item.object, 1)?;
-    g.draw(item.controller, 1);
-    Ok(())
-}
 
 /// An intervening "if" (CR 603.4): delirium.
 fn has_delirium(q: &dyn Query, asker: &Asker) -> bool {
@@ -25,7 +18,7 @@ fn untap_and_extra_combat(g: &mut dyn Game, item: &StackItem) -> Result<(), Susp
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(THIS_ENTERS, rummage, "When this creature enters, discard a card, then draw a card."),
+        triggered(THIS_ENTERS, |g, item| effects::discard_then_draw(g, item, 1), "When this creature enters, discard a card, then draw a card."),
         triggered(cantrip_mechanics::triggers::THIS_ATTACKS, untap_and_extra_combat, "Delirium \u{2014} Whenever this creature attacks for the first time each turn, if there are four or more card types among cards in your graveyard, untap target creature. After this phase, there is an additional combat phase.")
             .targets(&[targets::CREATURE])
             .condition(has_delirium)
