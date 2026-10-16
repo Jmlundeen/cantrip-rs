@@ -1,0 +1,52 @@
+# Tamiyo, Collector of Tales: "Spells and abilities your opponents control can't cause you to discard cards." Her ruling:
+# when an opponent's ability says something happens unless you discard a card, you can't choose to discard (CR 101.2).
+# Bot2 controls Tamiyo, holds cards it could discard, and Lightning Bolts Bot1's Sunset Saboteur: the Saboteur's
+# "Ward--Discard a card" can't be paid, so Bot2 is not asked and the Bolt is countered. (The neighbouring scenario, Tamiyo
+# left in hand, is the positive control.)
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Sunset Saboteur
+Swamp x13
+
+[Bot2 Deck]
+Mountain
+Mox Emerald
+Mox Sapphire
+Mox Pearl
+Mox Ruby
+Tamiyo, Collector of Tales
+Lightning Bolt
+Island x8
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sunset Saboteur.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Tamiyo, Collector of Tales.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Sunset Saboteur)
+Bot2.Pass
+! Bot2.Accept
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot1.Battlefield = Swamp; Mox Jet; Sunset Saboteur
+Bot2.Graveyard = Lightning Bolt
+Bot2.Battlefield = Mountain; Mox Emerald; Mox Sapphire; Mox Pearl; Mox Ruby; Tamiyo, Collector of Tales

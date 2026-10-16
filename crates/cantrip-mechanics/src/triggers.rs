@@ -404,8 +404,11 @@ pub const fn ward_life_equal_to_power(text: &'static str) -> AbilityDef {
 fn ward_discard_effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Target::Object(by) = item.subject else { return Ok(()) };
     let payer = PlayerId(item.data[0] as u8);
-    // A player with no card in hand cannot pay and is not asked; one who can is asked whether to, and then which card.
+    // A player with no card in hand cannot pay and is not asked, nor is one whom the ward's controller's abilities can't make
+    // discard (CR 101.2; Tamiyo, Collector of Tales's ruling: "something happens unless you discard" can't be paid); one who
+    // can is asked whether to, and then which card.
     if !g.state().zone(Zone::hand(payer)).is_empty()
+        && may_cause_discard_or_sacrifice(&*g, item.controller, payer, false)
         && matches!(g.ask(payer, RequestKind::May { source: by, purpose: Purpose::Ask(&WARD_DISCARD) })?, Answer::Yes)
     {
         crate::discard_chosen(g, payer, item.object, 1)?;

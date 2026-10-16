@@ -1,0 +1,43 @@
+# The positive control for Tamiyo, Collector of Tales against ward: the same position with Tamiyo left in Bot2's hand.
+# Bot2 Lightning Bolts Bot1's Sunset Saboteur, is asked to pay its "Ward--Discard a card", discards Tamiyo, and the Bolt
+# kills the Saboteur.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Sunset Saboteur
+Swamp x13
+
+[Bot2 Deck]
+Mountain
+Mox Emerald
+Mox Sapphire
+Mox Pearl
+Mox Ruby
+Tamiyo, Collector of Tales
+Lightning Bolt
+Island x8
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sunset Saboteur.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Sunset Saboteur)
+Bot2.Accept
+Bot2.Choose(Tamiyo, Collector of Tales)
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot1.Graveyard = Sunset Saboteur
+Bot2.Graveyard = Lightning Bolt; Tamiyo, Collector of Tales
