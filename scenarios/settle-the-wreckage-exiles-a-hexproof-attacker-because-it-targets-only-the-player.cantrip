@@ -1,0 +1,59 @@
+# Settle the Wreckage "targets only the player" (CR 115.1, official ruling): attacking creatures with hexproof are exiled as it
+# resolves. Bot1's Liliana the Faultless gives its Ornithopter hexproof (the page shows Flying; Hexproof), it attacks, and Bot2's
+# Settle the Wreckage, aimed at Bot1, exiles it anyway; Bot1 finds a basic Forest, tapped. Liliana, who did not attack, stays.
+
+[Bot1 Deck]
+Plains
+Liliana the Faultless
+Ornithopter
+Mox Pearl
+Island
+Plains
+Plains
+Plains
+Forest
+Island x11
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Settle the Wreckage
+Plains x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Liliana the Faultless.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Liliana the Faultless.Activate(Bot1.Battlefield.Ornithopter)
+Bot1.Choose(Island)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Keywords = Flying; Hexproof
+Bot1.Attack(Ornithopter > Bot2)
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Settle the Wreckage.Cast(Bot1)
+Bot1.Accept
+Bot1.Search(Forest)
+[Bot1.Main2]
+
+[Expect]
+Exile = Ornithopter
+Bot1.Battlefield.Forest.Tapped = true
+Bot2.Graveyard = Settle the Wreckage
