@@ -1,0 +1,96 @@
+# Keral Keep Disciples: "Whenever you activate a loyalty ability of a Chandra planeswalker, this creature deals 1 damage to each
+# opponent." On turn 2 Bot2 activates his own Chandra, Torch of Defiance's "+1: Add {R}{R}": a Chandra's loyalty ability, but not
+# Bot1's activation, so nobody is hurt. On turn 3 Bot1 does the same with his Chandra: that +1 adds mana, yet it is a loyalty
+# ability and so no mana ability (CR 605.1a) - it uses the stack, the trigger goes above it (Stack.Count = 2) and resolves first
+# (the ruling: Bot2 at 19 while the +1 waits). On turn 5 Bot1 activates Ajani Resolute's 0, a loyalty ability of a planeswalker
+# that isn't a Chandra: nothing (Bot2 stays at 19).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Black Lotus
+Keral Keep Disciples
+Chandra, Torch of Defiance
+Mox Jet
+Mox Pearl
+Mountain
+Ajani Resolute
+Mountain x20
+
+[Bot2 Deck]
+Black Lotus
+Chandra, Torch of Defiance
+Mountain
+Island
+Island
+Island
+Island
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Keral Keep Disciples.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Chandra, Torch of Defiance.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Chandra, Torch of Defiance.Activate(Ability: Add)
+? Stack.Count = 1
+Bot2.Pass
+Bot1.Pass
+? Bot1.Life = 20
+? Bot2.Life = 20
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Chandra, Torch of Defiance.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Chandra, Torch of Defiance.Activate(Ability: Add)
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 19
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {R}{R}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ajani Resolute.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Ajani Resolute.Activate(Ability: gain 1 life)
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 21
+Bot2.Life = 19
+Bot1.Battlefield.Chandra, Torch of Defiance.Counters.Loyalty = 5
+Bot2.Battlefield.Chandra, Torch of Defiance.Counters.Loyalty = 5
+Stack.Count = 0

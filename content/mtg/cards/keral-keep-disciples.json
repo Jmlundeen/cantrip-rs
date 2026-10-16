@@ -1,0 +1,8 @@
+{
+  "name": "Keral Keep Disciples",
+  "manaCost": "{2}{R}{R}",
+  "type": "Creature — Human Monk",
+  "power": 4,
+  "toughness": 3,
+  "oracleText": "Whenever you activate a loyalty ability of a Chandra planeswalker, this creature deals 1 damage to each opponent."
+}
