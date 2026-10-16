@@ -63,8 +63,9 @@ pub fn promised(q: &dyn Query, spell: ObjectId) -> bool {
     q.obj(spell).gift.is_some() || q.gift_assumed()
 }
 
-/// The intervening "if" (CR 603.4, 702.174b): its gift cost was paid.
-fn gift_paid(q: &dyn Query, asker: &Asker) -> bool {
+/// The intervening "if" (CR 603.4, 702.174b): its gift cost was paid. The gift triggered ability has it, and so does a
+/// permanent's own "when this enters, if the gift was promised" (Scrapshooter).
+pub fn paid(q: &dyn Query, asker: &Asker) -> bool {
     q.obj(asker.source).gift.is_some()
 }
 
@@ -83,5 +84,5 @@ fn give_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 /// "When this permanent enters, if its gift cost was paid, [gift]" (CR 702.174b).
 pub const fn trigger(text: &'static str) -> AbilityDef {
-    triggered(crate::triggers::THIS_ENTERS, give_it, text).condition(gift_paid)
+    triggered(crate::triggers::THIS_ENTERS, give_it, text).condition(paid)
 }
