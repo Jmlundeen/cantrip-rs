@@ -1,0 +1,40 @@
+# Helping Hand's only target, Hired Blade, is exiled from Bot1's graveyard by Bot2's Ghost Vacuum while the spell is on
+# the stack. The target is illegal on resolution, so the spell is countered (CR 608.2b): the creature in exile is a
+# new object (CR 400.7) and stays there, nothing enters the battlefield.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Hired Blade
+Faithless Looting
+Helping Hand
+Plains x15
+
+[Bot2 Deck]
+Plains
+Ghost Vacuum
+Plains x10
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Hired Blade; Plains)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Ghost Vacuum.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Helping Hand.Cast(Bot1.Graveyard.Hired Blade)
+Bot1.Pass
+Bot2.Battlefield.Ghost Vacuum.Activate(Ability: Exile target; Bot1.Graveyard.Hired Blade)
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Exile = Hired Blade
+Bot1.Battlefield = Mox Ruby; Mox Pearl
+Bot1.Graveyard = Helping Hand; Faithless Looting; Plains

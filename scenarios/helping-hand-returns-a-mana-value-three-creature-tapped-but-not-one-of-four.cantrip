@@ -1,0 +1,34 @@
+# "Return target creature card with mana value 3 or less from your graveyard to the battlefield tapped": Faithless Looting
+# puts Hired Blade (mana value 3, exactly the limit) and Questing Beast (mana value 4, one over) into Bot1's graveyard.
+# Questing Beast is refused as a target and Hired Blade, the positive control for the same cast, is returned
+# tapped (CR 115.1, 601.2c, 110.2a, 614.1c); Questing Beast stays in the graveyard.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Hired Blade
+Questing Beast
+Faithless Looting
+Helping Hand
+Plains
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Hired Blade; Questing Beast)
+! Bot1.Hand.Helping Hand.Cast(Bot1.Graveyard.Questing Beast)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Helping Hand.Cast(Bot1.Graveyard.Hired Blade)
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Ruby; Mox Pearl; Hired Blade
+Bot1.Battlefield.Hired Blade.Tapped = true
+Bot1.Graveyard = Helping Hand; Faithless Looting; Questing Beast
