@@ -1,0 +1,48 @@
+# Saheeli's Lattice: "you may discard a card" declined (an empty choice) draws nothing. "One or more Dinosaurs" takes one:
+# Giant Cindermaw, bolted into Bot1's graveyard, alone, so Mastercraft Raptor's power is the Cindermaw's 4 (CR 702.167c).
+
+[Bot1 Deck]
+Mountain
+Saheeli's Lattice
+Giant Cindermaw
+Mox Ruby
+Black Lotus
+Lightning Bolt
+Mox Ruby
+Mountain
+Mountain
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Saheeli's Lattice.Cast
+Bot1.Choose()
+? Bot1.Hand.Count = 4
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Giant Cindermaw.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Lightning Bolt.Cast(Giant Cindermaw)
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Saheeli's Lattice.Activate(Ability: Craft)
+Bot1.Choose(Graveyard.Giant Cindermaw)
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Mastercraft Raptor.Power = 4
+Exile = Giant Cindermaw

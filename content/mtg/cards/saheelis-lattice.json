@@ -1,0 +1,15 @@
+{
+  "name": "Saheeli's Lattice",
+  "manaCost": "{1}{R}",
+  "type": "Artifact",
+  "oracleText": "When this artifact enters, you may discard a card. If you do, draw two cards.\nCraft with one or more Dinosaurs {4}{R} ({4}{R}, Exile this artifact, Exile one or more Dinosaurs you control and/or Dinosaur cards from your graveyard: Return this card transformed under its owner's control. Craft only as a sorcery.)",
+  "backFace": {
+    "name": "Mastercraft Raptor",
+    "type": "Artifact Creature — Dinosaur",
+    "toughness": 4,
+    "colorIndicator": [
+      "Red"
+    ],
+    "oracleText": "Mastercraft Raptor's power is equal to the total power of the exiled cards used to craft it."
+  }
+}

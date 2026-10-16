@@ -1,0 +1,52 @@
+# Saheeli's Lattice // Mastercraft Raptor. As the Lattice enters Bot1 discards Giant Cindermaw and draws two. "Craft with one
+# or more Dinosaurs {4}{R}" (CR 702.167a-b): Dinosaurs Bot1 controls and Dinosaur cards in its graveyard - the Ornithopter,
+# a creature but no Dinosaur, may not be chosen (refused); Rampaging Ferocidon on the battlefield and the Cindermaw in the
+# graveyard, two of them, are. Mastercraft Raptor's power is the total power of the exiled cards used to craft it (CR
+# 702.167c, 604.3): 3 and 4, 7, its toughness the printed 4.
+
+[Bot1 Deck]
+Mountain
+Saheeli's Lattice
+Rampaging Ferocidon
+Giant Cindermaw
+Mox Ruby
+Black Lotus
+Ornithopter
+Mountain
+Mountain
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Saheeli's Lattice.Cast
+Bot1.Choose(Giant Cindermaw)
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Rampaging Ferocidon.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Saheeli's Lattice.Activate(Ability: Craft)
+! Bot1.Choose(Ornithopter)
+Bot1.Choose(Rampaging Ferocidon; Graveyard.Giant Cindermaw)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Mastercraft Raptor.Power = 7
+Bot1.Battlefield.Mastercraft Raptor.Toughness = 4
+Bot1.Battlefield.Mastercraft Raptor.Subtypes = Dinosaur
+Bot1.Battlefield.Mastercraft Raptor.Colors = Red
+Exile = Rampaging Ferocidon; Giant Cindermaw
