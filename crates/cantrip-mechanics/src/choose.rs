@@ -136,6 +136,22 @@ pub fn odd_or_even(g: &mut dyn Game, player: PlayerId, source: ObjectId, card: C
     Ok(one_of(g, player, source, vec![Label::Card(card, 0), Label::Card(card, 1)])? == 0)
 }
 
+/// The labels "you may tap or untap [it]" offers: a card that asks it lists them as its `labels`.
+pub const TAP_OR_UNTAP: &[&str] = &["Tap", "Untap", "Do nothing"];
+
+/// "You may tap or untap target [permanent]" (CR 701.26): the target chosen as the ability went on the stack, and as it
+/// resolves its controller chooses Tap, Untap or Do nothing (CR 608.2d); nothing if the target is no longer legal (CR
+/// 608.2b). `card` is the card (the face) whose `labels` are `TAP_OR_UNTAP`. Sewer-veillance Cam and Iceberg Titan print it.
+pub fn may_tap_or_untap_target(g: &mut dyn Game, item: &StackItem, card: CardId) -> Result<(), Suspend> {
+    let Some(permanent) = crate::targets::object(g, item, 0) else { return Ok(()) };
+    match one_of(g, item.controller, item.object, vec![Label::Card(card, 0), Label::Card(card, 1), Label::Card(card, 2)])? {
+        0 => g.tap(permanent),
+        1 => g.untap(permanent),
+        _ => {}
+    }
+    Ok(())
+}
+
 /// Whether an object's mana value is of the chosen quality, odd or even: zero is even (Gollum, Riddle Master; Thanos, the
 /// Mad Titan).
 pub fn mana_value_of_quality(q: &dyn Query, id: ObjectId, odd: bool) -> bool {

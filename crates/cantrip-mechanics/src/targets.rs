@@ -236,6 +236,16 @@ pub const ARTIFACT: TargetSpec = target(artifact_filter);
 /// "Target artifact or creature you control" (CR 115.1, 205.2a). Concerted Care, Oko, Thief of Crowns (the permanent it exchanges),
 /// Ozolith, the Shattered Spire and Three Steps Ahead print it.
 pub const ARTIFACT_OR_CREATURE_YOU_CONTROL: TargetSpec = target(artifact_or_creature_you_control_filter);
+/// "Target artifact or creature": a permanent that is either (CR 115.1). Oko, Thief of Crowns, Tezzeret, Cruel Captain, Touch
+/// the Spirit Realm, Iceberg Titan and Lodestone Needle print it.
+pub const ARTIFACT_OR_CREATURE: TargetSpec = target(artifact_or_creature_filter);
+/// The filter of `ARTIFACT_OR_CREATURE`, for a slot that is "up to one" of them.
+pub fn artifact_or_creature_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
+    matches!(t, Target::Object(id) if on_battlefield(q, id) && {
+        let c = q.chars(id);
+        c.is(CardType::Artifact) || c.is(CardType::Creature)
+    })
+}
 /// "Target artifact or enchantment". Disenchant and Cathar Commando print it.
 pub const ARTIFACT_OR_ENCHANTMENT: TargetSpec = target(artifact_or_enchantment_filter);
 /// "Target permanent". Alpha Deathclaw and Argentum Armor print it.

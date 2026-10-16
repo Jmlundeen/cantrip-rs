@@ -22,13 +22,6 @@ fn add_loyalty(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-fn artifact_or_creature(q: &dyn Query, _: &Asker, t: Target) -> bool {
-    matches!(t, Target::Object(id) if q.is_on_battlefield(id) && {
-        let c = q.chars(id);
-        c.is(CardType::Artifact) || c.is(CardType::Creature)
-    })
-}
-
 /// "Untap target artifact or creature. If it's an artifact creature, put a +1/+1 counter on it."
 fn untap_and_grow(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(target) = targets::object(g, item, 0) else { return Ok(()) };
@@ -86,7 +79,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(when(EventMask::ZONE_CHANGE, artifact_enters), add_loyalty, "Whenever an artifact you control enters, put a loyalty counter on Tezzeret."),
         ability(loyalty(0), untap_and_grow, "0: Untap target artifact or creature. If it's an artifact creature, put a +1/+1 counter on it.")
-            .targets(&[target(artifact_or_creature)]),
+            .targets(&[targets::ARTIFACT_OR_CREATURE]),
         ability(loyalty(-3), tutor, "\u{2212}3: Search your library for an artifact card with mana value 1 or less, reveal it, put it into your hand, then shuffle."),
         ability(loyalty(-7), emblem, "\u{2212}7: You get an emblem with \"At the beginning of combat on your turn, put three +1/+1 counters on target artifact you control. If it's not a creature, it becomes a 0/0 Robot artifact creature.\""),
     ],

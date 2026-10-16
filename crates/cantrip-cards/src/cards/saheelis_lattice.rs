@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::craft;
-use cantrip_mechanics::effects::may_discard_to_draw_two;
+use cantrip_mechanics::effects;
 use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
@@ -28,7 +28,7 @@ pub static BACK: CardDef = CardDef {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(THIS_ENTERS, may_discard_to_draw_two, "When this artifact enters, you may discard a card. If you do, draw two cards."),
+        triggered(THIS_ENTERS, |g, item| effects::may_discard_to_draw(g, item, 2), "When this artifact enters, you may discard a card. If you do, draw two cards."),
         craft::ability(mana("{4}{R}"), &DINOSAURS, "Craft with one or more Dinosaurs {4}{R}"),
     ],
     back: Some(&BACK),
