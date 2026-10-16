@@ -197,6 +197,17 @@ pub static GOLEM: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+/// The 1/1 colorless Gnome artifact creature token. Cosmium Kiln and The Golden-Gear Colossus make it.
+pub static GNOME: CardDef = CardDef {
+    name: "Gnome",
+    has_cost: false,
+    types: TypeSet::of(&[CardType::Artifact, CardType::Creature]),
+    subtypes: SubtypeSet::of(&[Subtype::Gnome]),
+    power: Some(1),
+    toughness: Some(1),
+    ..CardDef::BLANK
+};
+
 /// The 1/1 colorless Pilot creature token: "This token crews Vehicles as though its power were 2 greater." Shorikai,
 /// Genesis Engine and Reckoner Bankbuster make it.
 pub static PILOT: CardDef = CardDef {
