@@ -1,0 +1,29 @@
+# "Activate only if you control a Mountain or a Plains": the Verge alone refuses {R} (a Swamp beside it does not help, and
+# {W} is always there); a Mountain enables {R}. Bot2's Plains does not count (you control).
+
+[Bot1 Deck]
+Sunbillow Verge
+Swamp
+Mountain
+Swamp x17
+
+[Bot2 Deck]
+Plains
+Plains x19
+
+[Actions]
+Bot1.Hand.Sunbillow Verge.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Sunbillow Verge.Activate(Ability: {R})
+Bot1.Hand.Swamp.Play
+! Bot1.Battlefield.Sunbillow Verge.Activate(Ability: {R})
+Bot1.Battlefield.Sunbillow Verge.Activate(Ability: {W})
+? Bot1.Mana = {W}
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Sunbillow Verge.Activate(Ability: {R})
+
+[Expect]
+Bot1.Mana = {R}
