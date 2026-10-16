@@ -1,0 +1,49 @@
+# Basilisk Collar (equip {2}) gives the equipped creature deathtouch and lifelink. Llanowar Elves, a 1/1, equipped, attacks into
+# Bot2's Ornithopter (a 0/2): its one damage is lethal because of deathtouch, so the Ornithopter dies, and Bot1 gains 1 from
+# lifelink. Bot1's own Ornithopter, which is not equipped, keeps only flying (a negative control), and the equip ability is
+# sorcery speed (CR 702.6a) and can't target a creature Bot1 does not control, with an equip at sorcery speed as the control.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Llanowar Elves
+Basilisk Collar
+Ornithopter
+Forest
+Forest
+Forest x12
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Basilisk Collar.Cast
+Bot1.Battlefield.Mox Jet.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Basilisk Collar.Activate(Ability: Equip; Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Basilisk Collar.Activate(Ability: Equip; Llanowar Elves)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Llanowar Elves > Bot2)
+? Bot1.Battlefield.Llanowar Elves.Keywords = Deathtouch; Lifelink
+? Bot1.Battlefield.Ornithopter.Keywords = Flying
+! Bot1.Battlefield.Basilisk Collar.Activate(Ability: Equip; Ornithopter)
+Bot2.Block(Ornithopter > Llanowar Elves)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 21
+Bot2.Life = 20
+Bot2.Graveyard = Ornithopter
+Bot1.Battlefield.Llanowar Elves.Damage = 0
+Bot1.Battlefield.Basilisk Collar.AttachedTo = Llanowar Elves
