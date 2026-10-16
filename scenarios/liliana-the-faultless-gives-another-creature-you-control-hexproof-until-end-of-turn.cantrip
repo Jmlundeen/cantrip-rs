@@ -1,0 +1,60 @@
+# "{1}, {T}, Discard a card: Another target creature or planeswalker you control gains hexproof until end of turn." Turn 1 Liliana is
+# summoning sick (the {T} cost, CR 302.6): refused with mana and a card to discard on hand. Turn 3 she pays {1} (Mox Pearl) and discards a Plains
+# for her Ornithopter; she cannot target herself ("another"), nor Bot2's Ornithopter ("you control"). With hexproof Bot2's Bolt cannot target
+# the Ornithopter (the refusal), yet the same Bolt can target Liliana (the control, and she dies). Turn 4 the hexproof is over and a second
+# Bolt kills the Ornithopter. CR 702.11b, 611.2a.
+
+[Bot1 Deck]
+Plains
+Liliana the Faultless
+Ornithopter
+Mox Pearl
+Plains
+Plains
+Island
+Plains x13
+
+[Bot2 Deck]
+Mountain
+Ornithopter
+Lightning Bolt
+Lightning Bolt
+Mountain x2
+Mountain x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Liliana the Faultless.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+! Bot1.Battlefield.Liliana the Faultless.Activate(Bot1.Battlefield.Ornithopter)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Battlefield.Liliana the Faultless.Activate(Bot1.Battlefield.Liliana the Faultless)
+! Bot1.Battlefield.Liliana the Faultless.Activate(Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Liliana the Faultless.Activate(Bot1.Battlefield.Ornithopter)
+Bot1.Choose(Plains)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Keywords = Flying; Hexproof
+? Bot1.Battlefield.Liliana the Faultless.Tapped = true
+Bot2.Battlefield.Mountain.Activate
+! Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Liliana the Faultless)
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Ornithopter; Liliana the Faultless; Plains
+Bot2.Battlefield.Ornithopter.Keywords = Flying

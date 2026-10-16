@@ -1,0 +1,51 @@
+# "Whenever another creature or planeswalker you control enters, you gain 1 life." Turn 1: Liliana herself enters (no life: "another"), then
+# Mox Pearl (a noncreature artifact: none) and Ornithopter (a creature: +1). Turn 2 Bot2's Ornithopter (an opponent's creature: none).
+# Turn 3: Teferi, Time Raveler (a planeswalker, not a creature: +1). CR 603.6a.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Liliana the Faultless
+Ornithopter
+Mox Sapphire
+Teferi, Time Raveler
+Island
+Plains x13
+
+[Bot2 Deck]
+Ornithopter
+Mountain x19
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Liliana the Faultless.Cast
+Bot1.Pass
+? Bot1.Life = 20
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+? Bot1.Life = 20
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+? Bot1.Life = 20
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Pass
+[Bot1.Main2]
+? Bot1.Life = 21
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot1.Life = 21
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Teferi, Time Raveler.Cast
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot1.Battlefield.Teferi, Time Raveler.Types = Planeswalker
+Bot2.Life = 20

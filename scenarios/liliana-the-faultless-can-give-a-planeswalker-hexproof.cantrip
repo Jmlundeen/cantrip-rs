@@ -1,0 +1,42 @@
+# "Another target creature or planeswalker you control": Liliana targets her Teferi, Time Raveler, a planeswalker and no creature (CR 115.1),
+# and it gains hexproof until end of turn. Mox Jet pays the {1}; the Plains drawn is discarded.
+
+[Bot1 Deck]
+Plains
+Liliana the Faultless
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Teferi, Time Raveler
+Island
+Plains x14
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Liliana the Faultless.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Teferi, Time Raveler.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Liliana the Faultless.Activate(Bot1.Battlefield.Teferi, Time Raveler)
+Bot1.Choose(Plains)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Teferi, Time Raveler.Keywords = Hexproof
+Bot1.Graveyard = Plains
+Bot1.Battlefield.Liliana the Faultless.Tapped = true

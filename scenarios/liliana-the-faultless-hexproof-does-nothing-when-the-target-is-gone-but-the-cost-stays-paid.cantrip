@@ -1,0 +1,44 @@
+# CR 608.2b: with Liliana's ability on the stack targeting her Ornithopter, Bot2's Bolt kills the Ornithopter first (no hexproof yet); the ability then
+# finds its only target illegal and does nothing, though the {1}, the {T} and the discarded Plains were paid (CR 602.2b).
+
+[Bot1 Deck]
+Plains
+Liliana the Faultless
+Ornithopter
+Mox Pearl
+Plains
+Plains
+Island
+Plains x13
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Liliana the Faultless.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Liliana the Faultless.Activate(Bot1.Battlefield.Ornithopter)
+Bot1.Choose(Plains)
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Ornithopter; Plains
+Bot1.Battlefield.Liliana the Faultless.Tapped = true
+Stack.Count = 0

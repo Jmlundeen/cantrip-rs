@@ -1,0 +1,8 @@
+{
+  "name": "Liliana the Faultless",
+  "manaCost": "{W}",
+  "type": "Legendary Creature — Human Cleric",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "Whenever another creature or planeswalker you control enters, you gain 1 life.\n{1}, {T}, Discard a card: Another target creature or planeswalker you control gains hexproof until end of turn."
+}
