@@ -3,21 +3,41 @@
 # scenario where it enters beside one and activates the same turn; the control for the Swamp type is
 # dalkovan-encampment-enters-untapped-beside-a-swamp-by-type.
 
+# Only lands Bot1 controls count: Bot2's Mountain does not (the control is dalkovan-encampment-enters-untapped-beside-a-swamp-by-type
+# and the Mountain in the scenario of its ability). Tapped, it cannot tap for {W} and its {2}{W}, {T} ability is refused even
+# with three Moxen to pay the rest (the refusals).
+
 [Bot1 Deck]
 Plains
-Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
 Dalkovan Encampment
-Plains x17
+Plains x15
 
 [Bot2 Deck]
-Plains x20
+Mountain
+Plains x19
 
 [Actions]
 Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
 [T3 Bot1.Main1]
 Bot1.Hand.Dalkovan Encampment.Play
 ! Bot1.Battlefield.Dalkovan Encampment.Activate(Ability: {T}: Add {W})
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Battlefield.Dalkovan Encampment.Activate(Ability: Whenever you attack)
 [Bot1.Main2]
 
 [Expect]
 Bot1.Battlefield.Dalkovan Encampment.Tapped = true
+Bot2.Battlefield = Mountain

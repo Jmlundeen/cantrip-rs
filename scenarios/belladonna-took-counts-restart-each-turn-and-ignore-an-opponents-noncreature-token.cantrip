@@ -1,7 +1,8 @@
 # "Whenever a token you control enters" is any token, a noncreature Clue included, and only your own: Bot2's Thraben
 # Inspector investigates on turn 2 and Bot1's life does not move (negative control: the same trigger is Bot1's on
 # turn 3). The count of resolutions restarts every turn (CR 608.2m): on turn 3 Bot1's first Clue gains 1 life, as a
-# first resolution does, and its second Clue draws a card, the second.
+# first resolution does, and its second Clue draws a card, the second. On turn 5 the count has restarted again: the third
+# Clue is a first resolution once more and gains 1 life (22), it does not do the third resolution's counters.
 
 [Bot1 Deck]
 Belladonna Took
@@ -11,6 +12,7 @@ Thraben Inspector
 Thraben Inspector
 Plains
 Plains
+Thraben Inspector
 Plains x10
 
 [Bot2 Deck]
@@ -49,8 +51,17 @@ Bot1.Hand.Thraben Inspector.Cast
 Bot1.Pass
 Bot1.Pass
 Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Thraben Inspector.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+[T5 Bot1.Main2]
 
 [Expect]
-Bot1.Life = 21
-Bot1.Hand.Count = 3
-Bot1.Battlefield = Mox Pearl; Mox Jet; Belladonna Took; Plains; Thraben Inspector; Thraben Inspector; Clue Token; Clue Token
+Bot1.Life = 22
+Bot1.Battlefield = Belladonna Took; Clue Token; Clue Token; Clue Token; Mox Jet; Mox Pearl; Plains; Plains; Thraben Inspector; Thraben Inspector; Thraben Inspector

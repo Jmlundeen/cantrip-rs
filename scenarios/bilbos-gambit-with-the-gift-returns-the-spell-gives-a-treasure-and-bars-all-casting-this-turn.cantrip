@@ -1,13 +1,15 @@
 # Bot2 Bolts Bot1. Bot1 answers with Bilbo's Gambit promising the gift: Bot2's Lightning Bolt returns to its owner's hand
 # (not countered), Bot2 creates a Treasure as it resolves (CR 702.174j) and no player can cast spells for the rest of the
 # turn. Bot2 has an untapped Mox Ruby and the Bolt back in hand yet cannot cast it (refusal; its control is the
-# no-gift scenario, where the same recast is offered). On turn 3 Bot1's own spell is cast again: the bar ended with the
+# no-gift scenario, where the same recast is offered). Bot1, the Gambit's controller, is barred too: its own Lightning Bolt
+# in hand, with an untapped Mox Ruby, is refused. On turn 3 Bot1's own Bolt is cast: the bar ended with the
 # turn.
 
 [Bot1 Deck]
 Plains
 Mox Pearl
-Mox Jet
+Mox Ruby
+Lightning Bolt
 Bilbo's Gambit
 Plains x14
 
@@ -20,6 +22,8 @@ Plains x14
 [Actions]
 Bot1.Hand.Plains.Play
 Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
 Bot1.Pass
 [T2 Bot2.Main1]
 Bot2.Hand.Mox Ruby.Cast
@@ -40,9 +44,13 @@ Bot2.Pass
 ? Bot2.Hand.Count = 6
 ? Bot2.Battlefield = Mox Ruby; Mox Ruby; Treasure Token
 ! Bot2.Hand.Lightning Bolt.Cast
+! Bot1.Hand.Lightning Bolt.Cast(Bot2)
 [T3 Bot1.Main1]
-Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
 
 [Expect]
-Bot1.Battlefield = Plains; Mox Pearl; Mox Jet
-Bot1.Graveyard = Bilbo's Gambit
+Bot2.Life = 17
+Bot1.Graveyard = Lightning Bolt; Bilbo's Gambit

@@ -1,0 +1,57 @@
+# The controller of the Gambit is barred too, and from every zone (CR 101.2): Snapcaster Mage gave Bot1's Lightning Bolt in its
+# graveyard flashback until end of turn, and with Mox Ruby untapped Bot1 could cast it. Bot1 then casts the Gambit promising the
+# gift at Bot2's Bolt; once it resolves Bot1 is refused the flashback cast (the refusal) and Bot2's Bolt is back in its hand.
+# The control, in which the same flashback cast is made, is bilbos-gambit-without-the-gift-leaves-a-flashback-cast-open.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Pearl
+Black Lotus
+Lightning Bolt
+Snapcaster Mage
+Bilbo's Gambit
+Plains x13
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Plains x14
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Snapcaster Mage.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Bilbo's Gambit.Cast
+Bot1.Accept
+Bot1.Target(Stack.Lightning Bolt)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Bot1.Life = 20
+? Bot2.Life = 17
+? Bot2.Hand.Count = 7
+! Bot1.Graveyard.Lightning Bolt.Cast(Bot2)
+
+[Expect]
+Bot1.Graveyard = Bilbo's Gambit; Black Lotus; Lightning Bolt

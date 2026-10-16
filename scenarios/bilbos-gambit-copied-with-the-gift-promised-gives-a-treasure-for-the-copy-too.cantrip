@@ -1,8 +1,8 @@
 # The gift promised on a spell is promised on its copy too, to the same opponent (ruling 2024-07-26). Bot2 casts two
 # Lightning Bolts at Bot1; Bot1's Bilbo's Gambit (gift promised) takes the first and Lutri, the Spellchaser copies it
 # with the second Bolt as the copy's new target. The copy resolves first (the second Bolt returns, Bot2 creates a
-# Treasure), then the original (the first Bolt returns, Bot2 creates another): two Treasures, both Bolts back in hand,
-# and Bot1 undamaged. A copy is not cast, so Lutri's cast before either resolved is allowed; afterwards nobody can cast.
+# Treasure), then the original (the first Bolt returns, Bot2 creates another): two Treasures (one is sacrificed at the end for the refusal's mana), both Bolts back in hand,
+# and Bot1 undamaged. A copy is not cast, so Lutri's cast before either resolved is allowed; afterwards nobody can cast: Bot2 has a Bolt back in hand and red mana from a Treasure, and is refused it.
 
 [Bot1 Deck]
 Island
@@ -59,10 +59,14 @@ Bot2.Pass
 ? Bot2.Battlefield = Mox Ruby; Mox Ruby; Treasure Token
 Bot1.Pass
 Bot2.Pass
+? Stack.Count = 0
+? Bot2.Battlefield = Mox Ruby; Mox Ruby; Treasure Token; Treasure Token
+Bot2.Battlefield.Treasure Token.Activate(Color: Red)
+! Bot2.Hand.Lightning Bolt.Cast(Bot1)
 
 [Expect]
 Stack.Count = 0
 Bot1.Life = 20
 Bot1.Graveyard = Bilbo's Gambit
-Bot2.Battlefield = Mox Ruby; Mox Ruby; Treasure Token; Treasure Token
+Bot2.Battlefield = Mox Ruby; Mox Ruby; Treasure Token
 Bot2.Hand = Lightning Bolt; Lightning Bolt; Plains; Plains; Plains; Plains

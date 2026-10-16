@@ -1,0 +1,72 @@
+# Each Belladonna Took counts the resolutions of its own ability (CR 608.2m). Turn 4, Bot2 (with its own Belladonna) casts
+# Thraben Inspector: its Clue is Bot2's first resolution, Bot2 gains 1 (21). Then, with the second Inspector on the
+# stack, Bot2 casts Bilbo's Gambit on it promising Bot1 the gift: the Inspector returns to Bot2's hand, no one can cast
+# spells this turn (Bot2 is refused the Inspector, the refusal), and the Treasure Bot1 creates is a token Bot1 controls
+# that entered, so Bot1's Belladonna triggers: the first resolution of Bot1's own ability this turn, not the second
+# of a shared count - Bot1 gains 1 (21), it does not draw.
+
+[Bot1 Deck]
+Belladonna Took
+Mox Pearl
+Mox Jet
+Plains x17
+
+[Bot2 Deck]
+Belladonna Took
+Mox Pearl
+Mox Jet
+Mox Ruby
+Thraben Inspector
+Thraben Inspector
+Bilbo's Gambit
+Plains
+Plains
+Plains x10
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Belladonna Took.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Belladonna Took.Cast
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Thraben Inspector.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Thraben Inspector.Cast
+Bot2.Battlefield.Plains#2.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Bilbo's Gambit.Cast
+Bot2.Accept
+Bot2.Target(Stack.Thraben Inspector)
+[T4 Bot2.Main1]
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 0
+? Bot1.Life = 21
+? Bot1.Hand.Count = 5
+? Bot2.Life = 21
+! Bot2.Hand.Thraben Inspector.Cast
+
+[Expect]
+Bot1.Battlefield = Belladonna Took; Mox Jet; Mox Pearl; Treasure Token
+Bot2.Battlefield = Belladonna Took; Clue Token; Mox Jet; Mox Pearl; Mox Ruby; Plains; Plains; Thraben Inspector
