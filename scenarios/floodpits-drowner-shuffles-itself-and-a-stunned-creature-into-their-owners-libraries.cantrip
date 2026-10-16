@@ -1,0 +1,60 @@
+# Floodpits Drowner: "{1}{U}, {T}: Shuffle this creature and target creature with a stun counter on it into their owners'
+# libraries." Bot1 flashes the Drowner in on turn 4 targeting Llanowar Elves, which Bot2 has just tapped for mana (so it is
+# tapped already and still gets the stun counter), beside Birds of Paradise, which has none. On turn 5 the activation
+# refuses Birds (no stun counter) beside Elves (the positive control), and the stun counter does not need a tap to
+# be there. It then shuffles the Drowner into Bot1's library and the Elves into Bot2's (CR 701.24a): each library
+# grows by one and neither card is on the battlefield.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Floodpits Drowner
+Island
+Island x24
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Birds of Paradise
+Forest
+Forest x24
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Llanowar Elves.Activate
+Bot2.Hand.Birds of Paradise.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Floodpits Drowner.Cast
+Bot1.Pass
+Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Llanowar Elves.Tapped = true
+? Bot2.Battlefield.Llanowar Elves.Counters.Stun = 1
+? Bot2.Battlefield.Birds of Paradise.Counters.Stun = (absent)
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+! Bot1.Battlefield.Floodpits Drowner.Activate(Bot2.Battlefield.Birds of Paradise)
+Bot1.Battlefield.Floodpits Drowner.Activate(Bot2.Battlefield.Llanowar Elves)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Island; Island; Island
+Bot1.Library.Count = 20
+Bot2.Battlefield.Llanowar Elves = (absent)
+Bot2.Battlefield = Birds of Paradise; Forest; Forest
+Bot2.Library.Count = 20
+Bot1.Graveyard.Count = 0

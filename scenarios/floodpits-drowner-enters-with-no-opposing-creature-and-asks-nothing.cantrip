@@ -1,0 +1,31 @@
+# Floodpits Drowner: "When this creature enters, tap target creature an opponent controls..." With no creature an opponent
+# controls there is no legal target, so the trigger is removed from the stack (CR 603.3d) and no target is asked, even
+# though the Drowner itself is a creature. The Drowner is still on the battlefield, untapped (Vigilance aside).
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Floodpits Drowner
+Island x25
+
+[Bot2 Deck]
+Forest x25
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Floodpits Drowner.Cast
+Bot1.Pass
+! Bot1.Target
+Bot2.Pass
+[T2 Bot2.Main1]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Battlefield = Floodpits Drowner; Island; Mox Sapphire
+Bot1.Battlefield.Floodpits Drowner.Tapped = false
+Bot1.Battlefield.Floodpits Drowner.Counters.Stun = (absent)

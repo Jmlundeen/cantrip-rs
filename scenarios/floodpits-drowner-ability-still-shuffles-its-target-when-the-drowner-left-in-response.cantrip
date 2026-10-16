@@ -1,0 +1,58 @@
+# Floodpits Drowner: the source leaving the battlefield does not counter its ability. Bot1 activates it targeting the stunned
+# Llanowar Elves and Bot2 Lightning Bolts the Drowner (2/1) in response. The Drowner is a new object in the graveyard
+# (CR 400.7) and is not shuffled into the library; the Elves still are, into Bot2's library (CR 608.2b).
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Floodpits Drowner
+Island
+Island x24
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Mountain
+Lightning Bolt
+Forest
+Forest
+Forest
+Forest x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Llanowar Elves.Activate
+Bot2.Pass
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Floodpits Drowner.Cast
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Floodpits Drowner.Activate(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Floodpits Drowner)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Island; Island; Island
+Bot1.Graveyard = Floodpits Drowner
+Bot1.Library.Count = 19
+Bot2.Graveyard = Lightning Bolt
+Bot2.Battlefield.Llanowar Elves = (absent)
+Bot2.Library.Count = 19

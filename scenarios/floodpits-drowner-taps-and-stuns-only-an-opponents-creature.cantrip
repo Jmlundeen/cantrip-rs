@@ -1,0 +1,50 @@
+# Floodpits Drowner: "Flash. When this creature enters, tap target creature an opponent controls and put a stun counter on
+# it." On Bot2's turn 4 Bot1 flashes it in (Flash, CR 702.8a) after Bot2 has cast Birds of Paradise. The trigger refuses
+# Bot1's own Drowner ("an opponent controls") beside the legal Birds (the positive control); Birds is untapped and ends
+# up tapped with a stun counter (CR 122.1g). On turn 6 Bot2's untap step removes the counter instead of untapping it.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Floodpits Drowner
+Island
+Island x24
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Birds of Paradise
+Forest
+Forest x24
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest#1.Activate
+Bot2.Hand.Birds of Paradise.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Floodpits Drowner.Cast
+Bot1.Pass
+! Bot1.Target(Bot1.Battlefield.Floodpits Drowner)
+Bot1.Target(Bot2.Battlefield.Birds of Paradise)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Birds of Paradise.Tapped = true
+? Bot2.Battlefield.Birds of Paradise.Counters.Stun = 1
+? Bot2.Battlefield.Llanowar Elves.Tapped = false
+? Bot2.Battlefield.Llanowar Elves.Counters.Stun = (absent)
+[T6 Bot2.Main1]
+
+[Expect]
+Bot2.Battlefield.Birds of Paradise.Tapped = true
+Bot2.Battlefield.Birds of Paradise.Counters.Stun = (absent)
