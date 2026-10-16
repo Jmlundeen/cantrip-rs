@@ -1,0 +1,38 @@
+# The reflexive "attach it" trigger (CR 603.12) has Dain as its only target; Bot2 passes for the spell and for the enters trigger, then
+# exiles Dain with Swords to Plowshares in response to the reflexive trigger. Its target is illegal, so it does nothing (CR 608.2b):
+# the Axe stays on the battlefield, unattached, and Bot1 (the Axe's controller) gains 1 life from the Swords.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Dáin Ironfoot
+Island x16
+
+[Bot2 Deck]
+Mox Pearl
+Swords to Plowshares
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dáin Ironfoot.Cast
+Bot2.Pass
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Dáin Ironfoot)
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Dáin Ironfoot
+Bot1.Life = 21
+Bot1.Battlefield.Axe.Subtypes = Equipment
+Stack.Count = 0

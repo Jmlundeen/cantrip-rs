@@ -1,0 +1,43 @@
+# "When Dain enters, create ... Axe ... When you do, attach it to target creature you control": Bot1 aims the reflexive trigger at the first
+# Ornithopter, not at Dain, so it is 1/2 with the Axe (+1/+0), Dain stays 1/4 and the second Ornithopter 0/2. On turn 3 all three attack:
+# "each equipped attacking creature gains double strike" - only the equipped Ornithopter has it (Keywords checked beside the unequipped
+# controls). Damage: 1 x 2 (Ornithopter, double strike) + 1 (Dain) + 0 = 3, so Bot2 is at 17.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Ornithopter
+Ornithopter
+Dáin Ironfoot
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dáin Ironfoot.Cast
+Bot1.Target(Ornithopter#1)
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Axe.Types = Artifact
+? Bot1.Battlefield.Axe.Subtypes = Equipment
+? Bot1.Battlefield.Ornithopter#1.Power = 1
+? Bot1.Battlefield.Ornithopter#2.Power = 0
+? Bot1.Battlefield.Dáin Ironfoot.Power = 1
+[T3 Bot1.Main1]
+Bot1.Attack(Dáin Ironfoot; Ornithopter#1; Ornithopter#2 > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Ornithopter#1.Keywords = DoubleStrike; Flying
+Bot1.Battlefield.Ornithopter#2.Keywords = Flying
+Bot1.Battlefield.Dáin Ironfoot.Keywords = (absent)

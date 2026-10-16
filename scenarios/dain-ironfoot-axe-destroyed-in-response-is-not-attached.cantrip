@@ -1,0 +1,43 @@
+# The reflexive "attach it" trigger is about the Axe token. Bot2 passes for the spell and the enters trigger, then destroys the Axe with
+# Abrade in response to the reflexive trigger. The token is gone (it ceases to exist, CR 111.7), so nothing is attached: Dain is still
+# 1/4, and he is not equipped (the "equipped" check of his attack trigger is covered by the other scenarios).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Dáin Ironfoot
+Island x16
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Abrade
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dáin Ironfoot.Cast
+Bot2.Pass
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Abrade.Cast
+Bot2.Modes(Destroy target artifact)
+Bot2.Target(Bot1.Battlefield.Axe)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Dáin Ironfoot; Mox Jet; Mox Pearl; Mox Ruby
+Bot1.Battlefield.Dáin Ironfoot.Power = 1
+Bot2.Graveyard = Abrade
+Stack.Count = 0

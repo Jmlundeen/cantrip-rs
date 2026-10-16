@@ -1,0 +1,32 @@
+# With Dain the only creature, the reflexive "attach it to target creature you control" can only choose Dain (the engine's first
+# candidate), so the Axe (+1/+0) is on him and "each equipped attacking creature" includes Dain himself: attacking alone he is 2/4 with
+# double strike and deals 2 + 2 = 4. The Axe's equip ability is sorcery speed (CR 702.6a): it is not offered in Bot2's turn.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Dáin Ironfoot
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dáin Ironfoot.Cast
+[T2 Bot2.Main1]
+! Bot1.Battlefield.Axe.Activate(Ability: Equip)
+[T3 Bot1.Main1]
+Bot1.Attack(Dáin Ironfoot > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot1.Battlefield.Dáin Ironfoot.Power = 2
+Bot1.Battlefield.Dáin Ironfoot.Keywords = DoubleStrike
