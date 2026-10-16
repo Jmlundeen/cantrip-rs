@@ -297,6 +297,7 @@ fn leave_stack(cx: &mut Cx, item: &StackItem, reason: ZoneReason) {
     // the beginning of their next upkeep.
     if def.rebound && reason == ZoneReason::Resolve && obj.cast_from == Some(ZoneKind::Hand) {
         let new = ops::move_to_for(cx, item.object, Zone::exile(obj.owner), reason);
+        let since = cx.g.log.len() as u32;
         cx.st().delayed_push(cantrip_state::Delayed {
             when: DelayedWhen::Step { step: Step::Upkeep, on_turn_of: Some(item.controller) },
             source: new,
@@ -304,6 +305,7 @@ fn leave_stack(cx: &mut Cx, item: &StackItem, reason: ZoneReason) {
             ability: AbilityRef::rebound(obj.card),
             subject: Target::None,
             members: cantrip_state::Span::default(),
+            since,
         });
         return;
     }

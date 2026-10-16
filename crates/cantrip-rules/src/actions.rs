@@ -2542,6 +2542,7 @@ pub(crate) fn stack_item(kind: StackKind, object: ObjectId, ability: AbilityRef,
         gift: None,
         shares: [0; cantrip_state::MAX_TARGETS],
         exile_after: false,
+        since: 0,
     };
     item.targets[..targets.len()].copy_from_slice(targets);
     item
@@ -2811,6 +2812,7 @@ fn cast(
         item.gift = Some(to);
         cx.st().update_obj(spell, |o| o.gift = Some(to));
     }
+    item.since = cx.g.log.len() as u32;
     cx.st().stack_push(item);
 
     // CR 601.2c: targets slot by slot, where they were not announced with the action; a slot counted by X or by the
@@ -2971,6 +2973,7 @@ fn cast(
     // becomes, which `Obj::became` follows.
     for &(rider_way, delayed) in def.end_step_riders {
         if rider_way == way {
+            let since = cx.g.log.len() as u32;
             cx.st().delayed_push(cantrip_state::Delayed {
                 when: DelayedWhen::Step { step: Step::End, on_turn_of: None },
                 source: spell,
@@ -2978,6 +2981,7 @@ fn cast(
                 ability: AbilityRef::delayed(face, delayed),
                 subject: Target::Object(spell),
                 members: cantrip_state::Span::default(),
+                since,
             });
         }
     }
@@ -3609,6 +3613,8 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
         item.x = n;
     }
     let life = announce_life(cx, player, source, &mut mana)?;
+    // CR 602.2a, 701.27f: put on the stack now, before its costs are paid.
+    item.since = cx.g.log.len() as u32;
     cx.st().stack_push(item);
 
     let mut targets: Vec<Target> = targets.to_vec();

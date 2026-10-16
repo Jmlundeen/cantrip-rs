@@ -1,0 +1,57 @@
+# CR 701.27f: "If an activated or triggered ability of a permanent that isn't a delayed triggered ability of that
+# permanent tries to transform it, the permanent does so only if it hasn't transformed or converted since the ability
+# was put onto the stack." Sunfall makes an Incubator with one +1/+1 counter on turn 1. On turn 3 Bot1 activates its
+# "{2}: Transform this token." twice, holding priority, so both are on the stack. The top one resolves and the token
+# turns into the Phyrexian; the one below finds it has transformed since it was put on the stack and does nothing, so the
+# token stays a 1/1 Phyrexian artifact creature. Were the instruction obeyed, it would turn back into an Incubator
+# (`incubator-token-transforms-into-a-phyrexian-creature-with-its-counters` is the single activation that transforms).
+
+[Bot1 Deck]
+Ornithopter
+Black Lotus
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Sunfall
+Island x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Sunfall.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Incubator Token.Activate(Ability: Transform)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Incubator Token.Activate(Ability: Transform)
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+? Bot1.Battlefield.Phyrexian Token.Power = 1
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Mox Pearl; Mox Jet; Mox Ruby; Mox Sapphire; Phyrexian Token
+Bot1.Battlefield.Phyrexian Token.Types = Artifact; Creature
+Bot1.Battlefield.Phyrexian Token.Power = 1
+Bot1.Battlefield.Phyrexian Token.Counters.PlusOnePlusOne = 1

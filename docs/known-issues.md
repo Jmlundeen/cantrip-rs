@@ -40,7 +40,6 @@ keeps it).
 | [KI-3](#ki-3-engine-paths-no-scenario-runs) | Engine paths no scenario runs | Low | Unexercised |
 | [KI-4](#ki-4-scenarios-waiting-on-cards) | Scenarios waiting on cards the engine does not have | Low | Open |
 | [KI-5](#ki-5-a-spell-that-has-left-the-stack-is-judged-by-its-printed-keywords) | A spell that has left the stack is judged by its printed characteristics | Low | Suspected |
-| [KI-22](#ki-22-an-ability-that-transforms-its-source-ignores-whether-it-has-transformed-since) | An ability that transforms its source ignores a transform since it was put on the stack | Low | Open |
 | [KI-24](#ki-24-under-bolass-citadel-the-top-of-a-library-is-cast-only-for-life) | Under Bolas's Citadel the top of a library is cast only for life | Medium | Open |
 | [KI-25](#ki-25-a-spacecrafts-power-and-toughness-box-is-not-drawn-before-it-is-a-creature) | A Spacecraft's power and toughness box is not drawn before it is a creature | Low | Open |
 
@@ -186,23 +185,6 @@ caption, or the cost on each candidate as it is pointed at.
 **Scenarios.**
 - [`scenarios/dragonfire-blade-equip-shows-its-reduced-cost-and-the-granted-hexproof-in-the-browser.cantrip`](../scenarios/dragonfire-blade-equip-shows-its-reduced-cost-and-the-granted-hexproof-in-the-browser.cantrip) - the menu row of a two-action card (Shadowspear) and the payment of a one-action card (the Blade).
 
-### KI-22: An ability that transforms its source ignores whether it has transformed since
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Open | engine | 2026-10-16, Aang, at the Crossroads and Temple of the Dead |
-
-**Notes.** "If an activated or triggered ability of a permanent ... tries to transform it, the permanent does so only if it
-hasn't transformed or converted since the ability was put onto the stack. If a delayed triggered ability ... tries to transform
-that permanent, the permanent does so only if it hasn't transformed or converted since that delayed triggered ability was
-created" (CR 701.27f, 701.28e). `ops::transform` (`crates/cantrip-rules/src/ops.rs`) turns the permanent over whenever it is
-asked, and neither a stack item nor a `Delayed` record keeps the point in the history it was made at. Aang, at the Crossroads
-(its delayed "transform Aang at the beginning of the next upkeep", ruling 2025-10-02: it won't transform back if it already
-transformed) waits on this and was not added; Norman Osborn, Temple of the Dead and Aang, Swift Savior transform through
-`effects::transform_self` and are exact except when something else transforms the permanent in response. A fix stores the history
-head in the stack item and in `Delayed` and makes `Game::transform` take it.
-
-**Scenarios.** None yet: no implemented card can transform another permanent in response to one of these abilities.
 
 ### KI-23: A creature fighting itself (CR 701.14c) is implemented but no scenario can reach it
 

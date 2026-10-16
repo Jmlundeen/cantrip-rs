@@ -410,6 +410,10 @@ pub struct StackItem {
     /// For an instant or sorcery spell: if it would be put into a graveyard as it leaves the stack, it is exiled
     /// instead (Bilbo's "cast this way").
     pub exile_after: bool,
+    /// The serial of the first event in the history after it was put on the stack (the history's head then), or, for a
+    /// delayed triggered ability, after that ability was created (`Delayed::since`): what an instruction to transform its
+    /// source asks the history about (CR 701.27f).
+    pub since: u32,
 }
 
 impl StackItem {
@@ -688,6 +692,9 @@ pub struct PendingTrigger {
     /// For a reflexive triggered ability whose effect counts what its first part did ("tap up to that many target
     /// creatures", CR 603.12): that number. A `TargetSpec::COUNTED` bound reads it, and it is the stack item's `x`.
     pub count: Option<u16>,
+    /// For a delayed triggered ability, the history's head when it was created (`Delayed::since`), which its stack item
+    /// keeps (CR 701.27f); none for any other, whose item takes the head as it is put on the stack.
+    pub since: Option<u32>,
 }
 
 /// A run of `GameState::members`: the objects of one batch of simultaneous events, kept for the ability they
@@ -710,6 +717,8 @@ pub struct Delayed {
     /// The objects the ability is about (CR 603.7c), kept in `GameState::members`: a mobilize ability's Warriors, which it
     /// sacrifices together. `StackItem::members` once it triggers.
     pub members: Span,
+    /// The history's head when it was created: "since that delayed triggered ability was created" (CR 701.27f).
+    pub since: u32,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]

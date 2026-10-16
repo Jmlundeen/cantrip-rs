@@ -252,6 +252,18 @@ A delayed triggered ability waits as a `Delayed` record in the state, on no obje
 (`DelayedWhen::Step`), at each such step for the rest of the game (`EachStep`: paradigm, CR 702.192a, which goes on whatever
 happens to the card it came from), or on events this turn, until an event or until a player's next turn.
 
+An instruction to transform (CR 701.27) is `ops::transform`, which turns a double-faced permanent over and records
+`Event::Transformed`. An activated or triggered ability of a permanent that tries to transform that permanent does so only
+if it hasn't transformed since the ability was put onto the stack, and a delayed triggered ability of it only if it
+hasn't since that delayed ability was created (CR 701.27f); otherwise the instruction is ignored. The verb asks the
+history: each `StackItem` keeps `since`, the history's head when it was put on the stack (as it is cast, as an ability
+is activated, before its costs, CR 602.2a, as a triggered ability or a copy goes on the stack), and a `Delayed` keeps its
+own, which its pending trigger and stack item carry; the resolving item's source transforming at or after that serial
+stops it. An ability of another object and a spell are not stopped, and a permanent that left and came back is a new
+object the instruction never finds (CR 400.7). Aang, at the Crossroads's delayed ability (its 2025-10-02 ruling), the
+activated transforms of the Incubator token, Ulvenwald Oddity, Aang, Swift Savior, Norman Osborn and Temple of the
+Dead, and Dowsing Device's and Cecil, Dark Knight's triggered ones are what it governs. Nothing in content converts (CR 701.28), so no convert event is recorded.
+
 A crime (CR 700.13) is `Event::CrimeCommitted { player, by }`, emitted by `ops::commit_crime` from the three procedures that
 choose targets for a new object - casting a spell (CR 601.2i), activating an ability (CR 602.2) and putting a triggered
 ability on the stack (CR 603.3d), the trigger's controller the criminal - after their `BecameTarget` events, once for the

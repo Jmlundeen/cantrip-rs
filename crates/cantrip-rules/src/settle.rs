@@ -594,6 +594,8 @@ fn put_trigger(cx: &mut Cx, trigger: PendingTrigger) -> R<()> {
         gift: cx.s().obj(trigger.source).gift,
         shares: [0; cantrip_state::MAX_TARGETS],
         exile_after: false,
+        // Put on the stack now, or, a delayed triggered ability, created when its `Delayed` was (CR 701.27f).
+        since: trigger.since.unwrap_or(cx.g.log.len() as u32),
     };
     item.targets[..targets.len()].copy_from_slice(&targets);
     item.spec_of[..of.len()].copy_from_slice(&of);
@@ -658,7 +660,7 @@ fn consider(
                 _ => &mut *found,
             };
             into.push((
-                PendingTrigger { source, ability, controller, subject: fired.subject, data: fired.data, members: Span::default(), count: None },
+                PendingTrigger { source, ability, controller, subject: fired.subject, data: fired.data, members: Span::default(), count: None, since: None },
                 t,
                 again,
             ));
@@ -810,6 +812,8 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<&[ObjectId]>)
                             data: fired.data,
                             members: Span::default(),
                             count: None,
+                            // A delayed ability goes on the stack with the moment it was created (CR 701.27f).
+                            since: Some(d.since),
                         },
                         t,
                         Again::new(),
@@ -864,7 +868,7 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<&[ObjectId]>)
                     let mut again = Again::new();
                     statics.additional(cx, event, &triggering, &mut again);
                     found.push((
-                        PendingTrigger { source: id, ability, controller, subject: fired.subject, data: fired.data, members: Span::default(), count: None },
+                        PendingTrigger { source: id, ability, controller, subject: fired.subject, data: fired.data, members: Span::default(), count: None, since: None },
                         t,
                         again,
                     ));
@@ -966,7 +970,7 @@ pub fn step_began(cx: &mut Cx, step: Step) {
             } else {
                 at += 1;
             }
-            cx.st().trigger_push(PendingTrigger { source: d.source, ability: d.ability, controller: d.controller, subject: d.subject, data: [0; 2], members: d.members, count: None });
+            cx.st().trigger_push(PendingTrigger { source: d.source, ability: d.ability, controller: d.controller, subject: d.subject, data: [0; 2], members: d.members, count: None, since: Some(d.since) });
         } else {
             at += 1;
         }
@@ -998,6 +1002,7 @@ fn suspended_cards(cx: &mut Cx, active: PlayerId) {
             data: [0; 2],
             members: Span::default(),
             count: None,
+            since: None,
         });
     }
 }

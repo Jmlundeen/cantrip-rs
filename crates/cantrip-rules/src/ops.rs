@@ -265,6 +265,7 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
                 data: [0; 2],
                 members: cantrip_state::Span::default(),
                 count: None,
+                since: None,
             });
         }
 
@@ -693,16 +694,36 @@ fn enters_with_intrinsic_counters(cards: &CardTable, new: &mut Obj) {
     }
 }
 
-/// Transforms a permanent (CR 701.28): its other face is up. The same object, so nothing about it is new (CR 701.28f).
-/// Only a double-faced card on the battlefield transforms; a copy of one does not (CR 701.28c).
+/// Transforms a permanent (CR 701.27a): its other face is up. The same object, so nothing about it is new (CR 712.18).
+/// Only a double-faced card on the battlefield transforms; a copy of one does not (CR 701.27c).
 ///
 /// A permanent with daybound or nightbound "can't transform except due to its daybound (nightbound) ability"
 /// (CR 702.145b, 702.145e): day and night turn it over (`turn_over`), no effect does.
 pub fn transform(cx: &mut Cx, id: ObjectId) {
-    if !live(cx.s(), id) || crate::day_night::role(cx.chars(id).keywords).is_some() {
+    if !live(cx.s(), id) || crate::day_night::role(cx.chars(id).keywords).is_some() || transformed_since_its_ability(cx, id) {
         return;
     }
     turn_over(cx, id);
+}
+
+/// CR 701.27f: "If an activated or triggered ability of a permanent that isn't a delayed triggered ability of that
+/// permanent tries to transform it, the permanent does so only if it hasn't transformed or converted since the ability
+/// was put onto the stack. If a delayed triggered ability of a permanent tries to transform that permanent, the permanent
+/// does so only if it hasn't transformed or converted since that delayed triggered ability was created." The resolving
+/// ability's `StackItem::since` is the history's head at that moment (`Delayed::since` for a delayed one), so the question
+/// is whether the history has recorded the permanent transforming from there on. An ability of another object, and a
+/// spell, transform it whatever has happened (Tetzin's "transform up to one other target double-faced artifact"). The same
+/// object only: one that left and came back is a new object (CR 400.7), and the instruction finds nothing to transform.
+/// Aang, at the Crossroads's delayed ability (its 2025-10-02 ruling); the activated transforms of the Incubator token,
+/// Ulvenwald Oddity, Aang, Swift Savior, Norman Osborn and Temple of the Dead; Dowsing Device's and Cecil, Dark Knight's
+/// triggered ones.
+fn transformed_since_its_ability(cx: &Cx, id: ObjectId) -> bool {
+    match cx.resolving() {
+        Some(item) if item.kind != StackKind::Spell && item.object == id => cx.g.log[(item.since as usize).min(cx.g.log.len())..]
+            .iter()
+            .any(|r| matches!(r.event, Event::Transformed { object } if object == id)),
+        _ => false,
+    }
 }
 
 /// Turns a permanent over (CR 701.28), once whatever is doing it has established that it may.
@@ -1091,6 +1112,8 @@ pub fn copy_spell(cx: &mut Cx, spell: ObjectId, copier: PlayerId, new_targets: b
     item.object = copy;
     item.controller = copier;
     item.serial = 0;
+    // A copy is put onto the stack as it is created (CR 707.10, 701.27f).
+    item.since = cx.g.log.len() as u32;
     cx.st().stack_push(item);
     let top = cx.s().stack.len() - 1;
 
@@ -1312,6 +1335,7 @@ pub fn draw(cx: &mut Cx, player: PlayerId) {
                 data: miracle.data(),
                 members: cantrip_state::Span::default(),
                 count: None,
+                since: None,
             });
         }
     }
@@ -1854,6 +1878,7 @@ fn siege_defeat_triggers(cx: &mut Cx, id: ObjectId) {
         data: [0; 2],
         members: cantrip_state::Span::default(),
         count: None,
+        since: None,
     });
 }
 

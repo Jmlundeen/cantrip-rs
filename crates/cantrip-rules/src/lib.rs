@@ -467,6 +467,7 @@ impl<'a> Cx<'a> {
             data: [0; 2],
             members: cantrip_state::Span::default(),
             count,
+            since: None,
         });
     }
 
@@ -519,13 +520,22 @@ impl<'a> Cx<'a> {
         match frame.kind {
             FrameKind::Act { player } => Cause::Player(player),
             FrameKind::BeginStep | FrameKind::Opening => Cause::Turn,
-            FrameKind::Resolve => match self.g.state.stack.last() {
+            FrameKind::Resolve => match self.resolving() {
                 Some(item) if item.kind == StackKind::Spell => Cause::Spell(item.object),
                 Some(item) => Cause::Ability { source: item.object, ability: item.ability },
                 None => Cause::Rules,
             },
             _ => Cause::Rules,
         }
+    }
+
+    /// The spell or ability resolving, when the frame being run is its resolution: the top of the stack.
+    pub(crate) fn resolving(&self) -> Option<&StackItem> {
+        let frame = self.g.state.agenda.get(self.frame)?;
+        if frame.kind != FrameKind::Resolve {
+            return None;
+        }
+        self.g.state.stack.last()
     }
 
 }
@@ -802,11 +812,13 @@ impl cantrip_api::Game for Cx<'_> {
 
     fn delayed_trigger_about(&mut self, when: DelayedWhen, source: ObjectId, controller: PlayerId, ability: AbilityRef, objects: &[ObjectId]) {
         let members = self.g.state.members_push(objects);
-        self.g.state.delayed_push(cantrip_state::Delayed { when, source, controller, ability, subject: Target::None, members });
+        let since = self.g.log.len() as u32;
+        self.g.state.delayed_push(cantrip_state::Delayed { when, source, controller, ability, subject: Target::None, members, since });
     }
 
     fn delayed_trigger(&mut self, when: DelayedWhen, source: ObjectId, controller: PlayerId, ability: AbilityRef, subject: Target) {
-        self.g.state.delayed_push(cantrip_state::Delayed { when, source, controller, ability, subject, members: cantrip_state::Span::default() });
+        let since = self.g.log.len() as u32;
+        self.g.state.delayed_push(cantrip_state::Delayed { when, source, controller, ability, subject, members: cantrip_state::Span::default(), since });
     }
 
     fn reflexive_trigger(&mut self, source: ObjectId, controller: PlayerId, ability: AbilityRef, subject: Target) {

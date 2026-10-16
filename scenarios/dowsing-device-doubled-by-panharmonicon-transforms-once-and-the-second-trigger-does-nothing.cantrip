@@ -1,0 +1,49 @@
+# CR 701.27f for a triggered ability: a permanent's own ability transforms it only if it hasn't transformed since the
+# ability was put onto the stack. Panharmonicon makes Dowsing Device's entering trigger twice (CR 603.2d). Both resolve
+# with five artifacts on the battlefield, then four once the Device is Geode Grotto (a land): Sol Ring, Mox Ruby, Mox
+# Pearl and Panharmonicon, so "if you control four or more artifacts" holds for each. The first turns the Device into
+# Geode Grotto; the second finds it has transformed since that ability went on the stack, and the land stays Geode
+# Grotto rather than turning back into Dowsing Device.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Pearl
+Sol Ring
+Panharmonicon
+Dowsing Device
+Mountain
+Mountain x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Panharmonicon.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Dowsing Device.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Triggers(Dowsing Device; Dowsing Device)
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+? Bot1.Battlefield.Geode Grotto.Types = Land
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Mountain; Mox Ruby; Mox Pearl; Sol Ring; Panharmonicon; Geode Grotto
+Bot1.Battlefield.Geode Grotto.Types = Land
