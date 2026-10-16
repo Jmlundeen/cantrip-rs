@@ -1,0 +1,48 @@
+# Six cards (Black Lotus, five Dark Rituals) are in Bot1's graveyard. With Eye of Jace's upkeep trigger on the stack
+# Bot2 destroys it with Disenchant, which makes seven cards (Eye of Jace itself is one) once the trigger resolves. The
+# ability is independent of its source: Bot1 still surveils (keeping the Island), the sacrifice finds nothing to
+# sacrifice, and the damage and the life gain still happen, the damage dealt by the artifact as it last existed (CR 113.7a,
+# 608.2h). The Eye is in the graveyard once, not twice.
+
+[Bot1 Deck]
+Black Lotus
+Eye of Jace
+Dark Ritual x5
+Island x2
+Swamp x11
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Disenchant
+Island x17
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Eye of Jace.Cast
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Hand.Dark Ritual.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Upkeep]
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Disenchant.Cast(Eye of Jace)
+Bot1.Arrange(Island)
+[T3 Bot1.Main1]
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Eye of Jace; Dark Ritual; Dark Ritual; Dark Ritual; Dark Ritual; Dark Ritual; Black Lotus
+Bot1.Battlefield =
+Bot1.Hand = Island
+Bot1.Life = 22
+Bot2.Life = 18
+Bot2.Graveyard = Disenchant
+Stack.Count = 0

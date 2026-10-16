@@ -1,0 +1,46 @@
+# Boundary. Five Dark Rituals are in Bot1's graveyard. Upkeep of turn 3: the Island is binned, six cards, and Eye of Jace
+# stays (nothing is dealt, nothing gained). Bot1 then draws and casts a sixth Dark Ritual: seven cards. Upkeep of
+# turn 5: Eye of Jace keeps the Swamp on top, binning nothing, and still goes off because seven cards are in the
+# graveyard (the check is the count, not the binning).
+
+[Bot1 Deck]
+Swamp
+Eye of Jace
+Dark Ritual x5
+Island
+Dark Ritual
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Hand.Eye of Jace.Cast
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Hand.Dark Ritual.Cast
+[T3 Bot1.Upkeep]
+Bot1.Arrange(| Island)
+[T3 Bot1.Main1]
+? Bot1.Graveyard.Count = 6
+? Bot1.Battlefield.Count = 2
+? Bot1.Life = 20
+? Bot2.Life = 20
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Dark Ritual.Cast
+[T5 Bot1.Upkeep]
+? Bot1.Graveyard.Count = 7
+? Bot1.Battlefield.Count = 2
+Bot1.Arrange(Swamp)
+
+[Expect]
+Turn = 5
+Bot1.Graveyard = Eye of Jace; Dark Ritual; Island; Dark Ritual; Dark Ritual; Dark Ritual; Dark Ritual; Dark Ritual
+Bot1.Battlefield = Swamp
+Bot1.Life = 22
+Bot2.Life = 18
+Stack.Count = 0

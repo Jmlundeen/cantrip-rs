@@ -1,0 +1,34 @@
+# Black Lotus and five Dark Rituals leave six cards in Bot1's graveyard, Eye of Jace is on the battlefield. At the
+# beginning of Bot1's upkeep it surveils 1 and puts the Island into the graveyard: the seventh card, counted after the
+# surveil (CR 701.25), so Eye of Jace is sacrificed, deals 2 damage to Bot2 and Bot1 gains 2 life.
+
+[Bot1 Deck]
+Black Lotus
+Eye of Jace
+Dark Ritual x5
+Island x2
+Swamp x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Eye of Jace.Cast
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Hand.Dark Ritual.Cast
+[T3 Bot1.Upkeep]
+? Bot1.Graveyard.Count = 6
+Bot1.Arrange(| Island)
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Eye of Jace; Island; Dark Ritual; Dark Ritual; Dark Ritual; Dark Ritual; Dark Ritual; Black Lotus
+Bot1.Battlefield =
+Bot1.Life = 22
+Bot2.Life = 18
+Stack.Count = 0
