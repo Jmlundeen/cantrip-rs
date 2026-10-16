@@ -10,16 +10,12 @@ fn each_upkeep(q: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired> {
     }
 }
 
-fn creatures(q: &dyn Query, player: PlayerId) -> usize {
-    q.permanents_of(player).into_iter().filter(|&id| q.chars(id).is(CardType::Creature)).count()
-}
-
 /// "Target player who controls more creatures than they do and is their opponent": measured against the player whose
 /// upkeep it is, not against the enchantment's controller.
 fn player_ahead_on_creatures(q: &dyn Query, _: &Asker, t: Target) -> bool {
     let Target::Player(other) = t else { return false };
     let them = q.state().turn.active;
-    other != them && q.state().opponents(them).any(|p| p == other) && creatures(q, other) > creatures(q, them)
+    other != them && q.state().opponents(them).any(|p| p == other) && cantrip_mechanics::creatures_you_control(q, other) > cantrip_mechanics::creatures_you_control(q, them)
 }
 
 /// The first player may reveal cards from the top of their library until they reveal a creature card. If they do, they put

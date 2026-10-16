@@ -293,6 +293,12 @@ pub fn airbend(g: &mut dyn Game, item: &StackItem) {
     }
 }
 
+/// "The number of creatures [player] controls": every creature on the battlefield they control, read through the layers.
+/// Ajani, Nacatl Pariah, Emeritus of Truce, Oath of Druids and Stadium Headliner count it exactly so.
+pub fn creatures_you_control(q: &dyn Query, player: PlayerId) -> usize {
+    q.permanents_of(player).into_iter().filter(|&id| q.chars(id).is(CardType::Creature)).count()
+}
+
 /// Deals damage to the target in `slot`, if it is still legal.
 pub fn damage_target(g: &mut dyn Game, item: &StackItem, slot: usize, amount: u16) {
     if g.target_legal(item, slot) {

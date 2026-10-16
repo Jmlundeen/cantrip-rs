@@ -79,7 +79,7 @@ fn zero(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 fn damage_for_creatures(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let creatures = g.permanents_of(item.controller).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).count();
+    let creatures = cantrip_mechanics::creatures_you_control(g, item.controller);
     damage_target(g, item, 0, creatures as u16);
     Ok(())
 }

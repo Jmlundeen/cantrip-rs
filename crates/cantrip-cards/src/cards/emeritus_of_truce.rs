@@ -17,17 +17,13 @@ pub static INKLING: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
-fn creatures(q: &dyn Query, player: PlayerId) -> usize {
-    q.permanents_of(player).into_iter().filter(|&id| q.chars(id).is(CardType::Creature)).count()
-}
-
 /// Target player creates the Inkling. Then, counting with it (CR 608.2c), if an opponent controls more creatures
 /// than you, this creature becomes prepared, if it is still this creature on the battlefield.
 fn enters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(player) = item.targets[0].player() else { return Ok(()) };
     tokens::create(g, player, &INKLING, 1)?;
-    let mine = creatures(g, item.controller);
-    let outnumbered = g.state().opponents(item.controller).collect::<Vec<_>>().into_iter().any(|o| creatures(g, o) > mine);
+    let mine = cantrip_mechanics::creatures_you_control(g, item.controller);
+    let outnumbered = g.state().opponents(item.controller).collect::<Vec<_>>().into_iter().any(|o| cantrip_mechanics::creatures_you_control(g, o) > mine);
     if outnumbered {
         g.become_prepared(item.object);
     }
