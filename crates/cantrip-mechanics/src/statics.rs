@@ -75,6 +75,18 @@ fn in_any_opening_hand(_: &dyn Query, _: &Asker) -> bool {
     true
 }
 
+/// "This creature gets +1/+0 as long as any player controls a [color] permanent" (layer 7c) as a static ability's
+/// `StaticDef::apply`, `COLOR` a `Color` as `u8`: no matter how many there are, and whoever controls them. The color is a
+/// word of the source's text (CR 612.2), and a permanent's color is what the layers before this one made it. Knight of
+/// Grace (black) and Knight of Malice (white) print it.
+pub fn plus_one_zero_while_any_player_controls<const COLOR: u8>(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
+    let color = view.words(source).color(Color::ALL[COLOR as usize]);
+    let state = view.state();
+    if state.battlefield().iter().any(|&id| view.chars(id).colors.has(color)) {
+        chars.power = chars.power.map(|p| p + 1);
+    }
+}
+
 /// The permanent an event put onto the battlefield (CR 603.6a): a zone change to the battlefield, a token's creation
 /// included. What stops "[permanents] entering" from causing abilities to trigger asks it of the event, then judges the
 /// permanent as it exists on the battlefield (`Query::chars` of the new object: copy effects and the other continuous effects

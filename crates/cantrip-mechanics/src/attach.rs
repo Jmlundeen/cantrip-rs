@@ -30,6 +30,21 @@ pub const fn equip_quality(mana: ManaCost, creature: &'static [TargetSpec], text
     ability(Cost::mana(mana), attach_to_target, text).sorcery_speed().targets(creature).equip()
 }
 
+/// "Equip abilities you activate that target this creature cost {N} less to activate" (CR 601.2f, 602.2b): a static
+/// ability of the creature, read with the targets announced for the equip ability (the total cost is determined after
+/// them, CR 601.2c), taking off generic mana only (CR 118.7a: an equip cost of {G} is not reduced) and never below
+/// {0}. Any equip ability, a variant with a restriction ("equip legendary creature") too; reconfigure is not one.
+/// Dwarven Mauler and Helitrooper ({2}), Fervent Champion ({3}).
+pub fn equip_targeting_this_costs_less<const N: u8>(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, targets: &[Target]) -> CostDelta {
+    let Costed::Ability(_, ability) = costed else { return CostDelta::NONE };
+    let equip = q.activated_ability(ability).is_some_and(|d| d.equip);
+    if equip && player == q.controller(source) && targets.contains(&Target::Object(source)) {
+        CostDelta::less(N)
+    } else {
+        CostDelta::NONE
+    }
+}
+
 /// "You may attach that Equipment to target creature you control" (CR 701.3a), for a trigger that fired about the Equipment
 /// (`Fired::about`) and targets a creature: nothing if the Equipment has left the battlefield (a new object, CR 400.7); a creature that is no longer a legal
 /// target leaves the ability to do nothing (CR 608.2b); the choice is made as the ability resolves. Hammer of Nazahn and
