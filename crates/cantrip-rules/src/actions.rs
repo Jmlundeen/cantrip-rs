@@ -1213,8 +1213,12 @@ fn activated_options(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOption>)
                 _ => {}
             }
             let sorcery = def.timing == Timing::Sorcery || def.cost.loyalty.is_some();
-            // A static ability may lift the timing restriction of a loyalty ability (CR 606.3).
-            if sorcery && !sorcery_timing(cx, player) && !static_rules::instant_activation(cx, player, id, index as u8) {
+            // A static ability, or an effect about the player, may lift the timing restriction of a loyalty ability (CR 606.3).
+            if sorcery
+                && !sorcery_timing(cx, player)
+                && !(def.cost.loyalty.is_some() && static_rules::instant_loyalty(cx, player, id))
+                && !static_rules::instant_activation(cx, player, id, index as u8)
+            {
                 continue;
             }
             // A loyalty ability once per turn per permanent (CR 606.3).

@@ -475,6 +475,12 @@ pub enum EffectKind {
     /// "You may cast [spells of these types] as though they had flash" (CR 307.5, 702.8): the effect's controller may
     /// cast them whenever they could cast an instant. Outlives its `affected` object, the source.
     CastAsThoughFlash(TypeSet),
+    /// "You may activate loyalty abilities of [Jace] planeswalkers you control on any player's turn any time you could cast
+    /// an instant" (CR 606.3, 611.2c; Jace's Machinations): the effect's controller may activate the loyalty abilities of the
+    /// planeswalkers they control that have this planeswalker type (every planeswalker for `None`) whenever they have
+    /// priority. Only the timing changes: one loyalty ability per permanent each turn still holds. A rule about the player,
+    /// so it reaches planeswalkers that arrive later and outlives its `affected` object, which is only the source.
+    InstantLoyalty(Option<Subtype>),
     /// The effect's controller has no maximum hand size (CR 402.2) for as long as it lasts: Spirit Water Revival's "for the rest
     /// of the game" (`Duration::Indefinite`). About the player, so it outlives its `affected` object, which is only the source.
     NoMaximumHandSize,
@@ -527,6 +533,7 @@ impl EffectKind {
             EffectKind::PlayerHexproof
                 | EffectKind::PlayerProtectionFromEverything
                 | EffectKind::CastAsThoughFlash(_)
+                | EffectKind::InstantLoyalty(_)
                 | EffectKind::NoMaximumHandSize
                 | EffectKind::CantGainLife(_)
                 | EffectKind::ReplacementRule(_)

@@ -109,6 +109,19 @@ pub fn instant_activation(cx: &Cx, player: PlayerId, source: ObjectId, index: u8
     false
 }
 
+/// Whether an effect lets `player` activate the loyalty abilities of `planeswalker`, a permanent they control, any time they
+/// could cast an instant (`EffectKind::InstantLoyalty`, CR 606.3, 611.2c). Read from the effects in force, so a game with
+/// none pays one pass over them, and only when a loyalty ability is asked about outside sorcery timing.
+pub fn instant_loyalty(cx: &Cx, player: PlayerId, planeswalker: ObjectId) -> bool {
+    cx.s().effects.iter().any(|e| match e.kind {
+        EffectKind::InstantLoyalty(kind) if e.controller == player => {
+            let c = cx.chars(planeswalker);
+            c.is(CardType::Planeswalker) && kind.is_none_or(|t| c.has_subtype(t))
+        }
+        _ => false,
+    })
+}
+
 /// The permanents whose cards forbid activating abilities (CR 602.5): found from the board, not the card table, and empty
 /// (so unallocated) in nearly every game. Asked once per question, then `activation_barred` per ability.
 pub fn activation_forbidders(cx: &Cx) -> Vec<ObjectId> {

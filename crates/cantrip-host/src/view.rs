@@ -460,6 +460,20 @@ impl<'a> Projector<'a> {
             let whose = if p == self.viewer { "you" } else { "they" };
             summary.pending_effects.push(format!("The next spell {whose} cast this turn can't be countered."));
         }
+        // "You may activate loyalty abilities of Jace planeswalkers you control ... any time you could cast an instant"
+        // (CR 606.3, 611.2c): a permission about the player, on no object.
+        for e in s.effects.iter().filter(|e| e.controller == p) {
+            if let EffectKind::InstantLoyalty(kind) = e.kind {
+                let they = if p == self.viewer { "you" } else { "they" };
+                let walkers = kind.map_or("planeswalkers".to_string(), |t| format!("{} planeswalkers", t.name()));
+                let until = if e.duration == Duration::EndOfTurn { " this turn" } else { "" };
+                summary.pending_effects.push(format!(
+                    "{}{} may activate loyalty abilities of {walkers} {they} control any time {they} could cast an instant{until}.",
+                    they[..1].to_uppercase(),
+                    &they[1..]
+                ));
+            }
+        }
         if player.room != 0
             && let Some(dungeon) = game.cards.undercity
         {

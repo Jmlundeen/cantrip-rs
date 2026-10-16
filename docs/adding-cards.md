@@ -247,7 +247,9 @@ shapes have an example:
   `CardDef.cast_rules` (`fn(&dyn Query, &Asker, caster) -> bool`, false forbids: Teferi); **as though it had flash** is
   `EffectKind::CastAsThoughFlash(types)` for a resolved spell's effect and `CardDef.flash_rules` for a static ability
   ("You may cast Aura and Equipment spells as though they had flash", Sigarda's Aid); a static lifting a loyalty ability's timing is `CardDef.instant_activation`
-  (The Wandering Emperor). The board is searched for these only when something is cast or activated.
+  (The Wandering Emperor), and a resolved spell's "you may activate loyalty abilities of [Jace] planeswalkers you control
+  ... any time you could cast an instant" is `EffectKind::InstantLoyalty(Some(Subtype::Jace))` (Jace's Machinations; `None`
+  for every planeswalker), which changes only the timing (CR 606.3). The board is searched for these only when something is cast or activated.
 - **Mana**: `PlayGrant.any_type` / `CastTerms.any_type` (mana of any type pays, CR 609.4b); mana that can't be spent on
   nonartifact spells is `g.add_restricted_mana(..)` from a mana ability with `.only_for(..)` (CR 106.6).
 - **Gift** (CR 702.174) is `CardDef.gift`, one of `cantrip_mechanics::gift`'s constants (a card, a Food, a tapped Fish, a
