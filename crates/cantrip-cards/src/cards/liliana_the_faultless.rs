@@ -2,10 +2,6 @@ use cantrip_api::*;
 use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
 
-fn any_card(_: &dyn Query, _: &Asker, _: ObjectId) -> bool {
-    true
-}
-
 /// "Whenever another creature or planeswalker you control enters" (CR 603.6a): judged on what it is as it enters.
 fn another_creature_or_planeswalker_enters(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
@@ -32,7 +28,7 @@ fn another_creature_or_planeswalker_you_control(q: &dyn Query, asker: &Asker, t:
 /// The target gains hexproof until end of turn (CR 702.11b, 611.2a); nothing happens if it is no longer legal (CR 608.2b).
 fn hexproof(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(permanent) = targets::object(g, item, 0) {
-        g.add_effect(item.object, permanent, EffectKind::AddKeywords(Keywords::of(&[Keyword::Hexproof])), Duration::EndOfTurn);
+        cantrip_mechanics::effects::gain_hexproof_until_end_of_turn(g, item.object, permanent);
     }
     Ok(())
 }
@@ -40,7 +36,7 @@ fn hexproof(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(when(EventMask::ZONE_CHANGE, another_creature_or_planeswalker_enters), |g, item| { g.gain_life(item.controller, 1); Ok(()) }, "Whenever another creature or planeswalker you control enters, you gain 1 life."),
-        ability(cost("{1}, {T}").and(discard(1, any_card)), hexproof, "{1}, {T}, Discard a card: Another target creature or planeswalker you control gains hexproof until end of turn.")
+        ability(cost("{1}, {T}").and(discard(1, targets::filters::any)), hexproof, "{1}, {T}, Discard a card: Another target creature or planeswalker you control gains hexproof until end of turn.")
             .targets(&[target(another_creature_or_planeswalker_you_control)]),
     ],
     ..oracle::LILIANA_THE_FAULTLESS

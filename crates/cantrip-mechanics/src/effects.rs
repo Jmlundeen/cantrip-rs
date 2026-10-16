@@ -138,3 +138,9 @@ pub fn damage_each_creature(g: &mut dyn Game, item: &StackItem, n: u16) {
         .collect();
     g.damage_together(&hits);
 }
+
+/// "`target` gains hexproof until end of turn" (CR 702.11b, 611.2a): a layer 6 keyword for the rest of the turn, from the
+/// effect's source. Liliana the Faultless, Octopus Form, Shore Up and Snakeskin Veil print it.
+pub fn gain_hexproof_until_end_of_turn(g: &mut dyn Game, source: ObjectId, target: ObjectId) {
+    g.add_effect(source, target, EffectKind::AddKeywords(Keywords::of(&[Keyword::Hexproof])), Duration::EndOfTurn);
+}
