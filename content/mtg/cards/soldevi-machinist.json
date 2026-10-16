@@ -1,0 +1,8 @@
+{
+  "name": "Soldevi Machinist",
+  "manaCost": "{1}{U}",
+  "type": "Creature — Human Wizard Artificer",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "{T}: Add {C}{C}. Spend this mana only to activate abilities of artifacts."
+}

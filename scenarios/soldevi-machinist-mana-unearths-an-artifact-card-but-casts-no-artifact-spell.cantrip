@@ -1,0 +1,70 @@
+# Soldevi Machinist: "{T}: Add {C}{C}. Spend this mana only to activate abilities of artifacts." (CR 106.6; its ruling:
+# not on artifact spells.) Turn 3, with only the Machinist's {C}{C} in the pool, Sol Ring can't be cast; with a Mountain's
+# {R} it can (the control). Turn 5 the {C}{C} pays two of the {3}{R}{R} of Phyrexian Dragon Engine's unearth: an ability
+# of an artifact card in the graveyard is an ability of an artifact source (CR 702.84a).
+
+[Bot1 Deck]
+Mountain
+Mox Sapphire
+Soldevi Machinist
+Phyrexian Dragon Engine
+Sol Ring
+Ponder
+Lightning Bolt
+Mountain
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Swamp
+Thoughtseize
+Swamp x5
+Swamp x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Soldevi Machinist.Cast
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Thoughtseize.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+Bot2.Choose(Phyrexian Dragon Engine)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ponder.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Soldevi Machinist.Activate
+? Bot1.Mana = {C}{C} (ArtifactAbilities)
+! Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {C}{C} (ArtifactAbilities)
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Soldevi Machinist.Activate
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+? Bot1.Mana = {R}{R}{R} {C}{C} (ArtifactAbilities)
+Bot1.Graveyard.Phyrexian Dragon Engine.Activate(Ability: Unearth; Spend: C ArtifactAbilities, C ArtifactAbilities, R)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Bot1.Mana =
+Bot1.Battlefield.Phyrexian Dragon Engine.Tapped = false
+Bot1.Battlefield.Sol Ring.Tapped = false
+Bot2.Life = 15
