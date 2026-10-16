@@ -3,14 +3,6 @@ use cantrip_mechanics::{choose, effects};
 use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
-/// "At the beginning of each opponent's upkeep" (CR 503.1).
-fn opponents_upkeep(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
-    match event {
-        Event::StepBegan { step: Step::Upkeep } if q.state().turn.active != q.controller(source) => Fired::PLAIN,
-        _ => None,
-    }
-}
-
 /// Untap a creature you control, chosen as it resolves and not targeted; if you've completed a dungeon, untap all
 /// creatures you control instead (CR 309.7, 608.2d, 701.26). An already untapped creature may be chosen too.
 fn untap(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -30,7 +22,7 @@ fn untap(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ENTERS, effects::take_the_initiative, "When this creature enters, you take the initiative."),
-        triggered(when(EventMask::STEP_BEGAN, opponents_upkeep), untap, "At the beginning of each opponent's upkeep, untap a creature you control. If you've completed a dungeon, untap all creatures you control instead."),
+        triggered(cantrip_mechanics::triggers::EACH_OPPONENTS_UPKEEP, untap, "At the beginning of each opponent's upkeep, untap a creature you control. If you've completed a dungeon, untap all creatures you control instead."),
     ],
     ..oracle::WHITE_PLUME_ADVENTURER
 };

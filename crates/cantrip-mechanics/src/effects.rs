@@ -70,7 +70,7 @@ pub fn loot(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 /// "You may discard a card. If you do, draw `n` cards" (CR 701.9, 121.1): the controller chooses a card of their hand to
 /// discard or none; the draw follows a card that was actually discarded, and nothing is asked of an empty hand. Melded
-/// Moxite and Bitter Reunion draw two, Giott, King of the Dwarves draws one.
+/// Moxite and Bitter Reunion draw two, Giott, King of the Dwarves and Lorehold, the Historian draw one.
 pub fn may_discard_to_draw(g: &mut dyn Game, item: &StackItem, n: u32) -> Result<(), Suspend> {
     let hand = g.state().zone(Zone::hand(item.controller)).to_vec();
     if let Some(&card) = crate::choose::cards(g, item.controller, item.object, Purpose::Discard, hand, 1, true)?.first() {

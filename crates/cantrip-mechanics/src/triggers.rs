@@ -498,6 +498,15 @@ pub fn your_upkeep(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     your_step(q, me, event, Step::Upkeep)
 }
 
+/// "At the beginning of each opponent's upkeep" (CR 503.1a, 603.2): the upkeep began on another player's turn. Abhorrent
+/// Oculus, White Plume Adventurer and Lorehold, the Historian print it.
+pub fn each_opponents_upkeep(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::StepBegan { step: Step::Upkeep } if q.state().turn.active != me.controller => Fired::PLAIN,
+        _ => None,
+    }
+}
+
 /// "At the beginning of combat on your turn" (CR 507.1). Luminarch Aspirant and Ouroboroid print it.
 pub fn beginning_of_your_combat(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     your_step(q, me, event, Step::BeginCombat)
@@ -728,6 +737,7 @@ pub const YOU_CAST_A_SPELL_FROM_EXILE: Trigger = when_asked(EventMask::SPELL_CAS
 pub const THIS_DIES: Trigger = when(EventMask::ZONE_CHANGE, this_dies);
 pub const THIS_LEAVES: Trigger = when(EventMask::ZONE_CHANGE, this_leaves);
 pub const YOUR_UPKEEP: Trigger = when_asked(EventMask::STEP_BEGAN, your_upkeep);
+pub const EACH_OPPONENTS_UPKEEP: Trigger = when_asked(EventMask::STEP_BEGAN, each_opponents_upkeep);
 pub const BEGINNING_OF_YOUR_COMBAT: Trigger = when_asked(EventMask::STEP_BEGAN, beginning_of_your_combat);
 pub const YOUR_END_STEP: Trigger = when_asked(EventMask::STEP_BEGAN, your_end_step);
 pub const EACH_END_STEP: Trigger = when(EventMask::STEP_BEGAN, each_end_step);
