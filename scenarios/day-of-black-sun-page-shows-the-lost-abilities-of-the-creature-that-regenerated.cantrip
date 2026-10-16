@@ -1,0 +1,80 @@
+# Browser
+# X = 3: every creature with mana value 3 or less loses all abilities until end of turn and is destroyed - the caster's own
+# Embereth Shieldbreaker (2) too, and Bot2's Llanowar Elves (1). Bot2's Ulvenwald Oddity (mana value 4) is no part of "each
+# creature with mana value X or less": it is not destroyed and keeps Haste and Trample. Sylvan Caryatid (2) is saved by a
+# regeneration shield from Yavimaya Hollow made in response (CR 701.19): the shield is no ability of the creature, so it
+# still replaces the destruction, and the Caryatid ends the turn tapped and without Defender and Hexproof.
+# The page says so on the card: the Caryatid's printed text, then "Lost:" and each keyword and ability it no longer has,
+# greyed; the Oddity, which kept its abilities, has no such line.
+
+[Bot1 Deck]
+Swamp
+Mox Ruby
+Embereth Shieldbreaker
+Day of Black Sun
+Swamp
+Swamp
+Swamp
+Swamp x12
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Mox Jet
+Ulvenwald Oddity
+Sylvan Caryatid
+Yavimaya Hollow
+Llanowar Elves
+Forest x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Embereth Shieldbreaker.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Sylvan Caryatid.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Yavimaya Hollow.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Ulvenwald Oddity.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Day of Black Sun.Cast(X: 3)
+Bot2.Battlefield.Yavimaya Hollow.Activate(Bot2.Battlefield.Sylvan Caryatid; Ability: Regenerate)
+Bot2.Battlefield.Forest.Activate
+[T7 Bot1.Main2]
+? Client.Bot1.OpponentBattlefield.Sylvan Caryatid.Rules = Defender, hexproof / {T}: Add one mana of any color. / Lost: Defender / Lost: Hexproof / Lost: {T}: Add one mana of any color.
+? Client.Bot1.OpponentBattlefield.Ulvenwald Oddity.Rules = Trample, haste / {5}{G}{G}: Transform this creature.
+
+[Expect]
+Turn = 7
+Bot1.Graveyard = Day of Black Sun; Embereth Shieldbreaker
+Bot2.Graveyard = Llanowar Elves
+Bot2.Battlefield.Sylvan Caryatid.Tapped = true
+Bot2.Battlefield.Sylvan Caryatid.Keywords = (absent)
+Bot2.Battlefield.Ulvenwald Oddity.Keywords = Haste; Trample
+Stack.Count = 0

@@ -1,0 +1,49 @@
+# Browser
+# "{3}{R}, {T}: Exile the top card of your library. Until the end of your next turn, you may play that card." The card
+# sits in exile through Bot2's turn, and Bot1 has to be able to see that it is theirs to cast: the Exile button is lit
+# and the Lightning Bolt says "until your next turn ends". On turn 5 Bot1 casts it from there and the button is gone.
+
+[Bot1 Deck]
+Cori Mountain Monastery
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Emerald
+Mountain
+Mountain
+Mountain
+Lightning Bolt
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Cori Mountain Monastery.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T3 Bot1.Main1]
+? Client.Bot1.Button.Exile = absent
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Cori Mountain Monastery.Activate(Ability: Exile)
+[T4 Bot2.Main1]
+? Exile = Lightning Bolt
+? Client.Bot1.Exile.Lit = true
+? Client.Bot1.Exile.Lightning Bolt.Annotation = Playable until your next turn ends
+[T5 Bot1.Main1]
+? Client.Bot1.Exile.Lit = true
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+? Client.Bot1.Button.Exile = absent
+
+[Expect]
+Bot1.Graveyard = Lightning Bolt
+Exile.Count = 0
+Bot2.Life = 17

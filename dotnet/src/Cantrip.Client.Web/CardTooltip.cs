@@ -225,6 +225,16 @@ public sealed class CardTooltip : Canvas
             lines.Add($"{ObjectChoice.Label(choice.Key)}: {choice.Value}.");
         }
 
+        if (card.CantBeCountered && card.Zone == ZoneKindView.Stack)
+        {
+            lines.Add("Can't be countered (CR 101.2).");
+        }
+
+        foreach (PlayPermissionView permission in card.PlayPermissions)
+        {
+            lines.Add($"{permission.Text}.");
+        }
+
         if (card.Tapped)
         {
             lines.Add("Tapped.");

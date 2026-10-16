@@ -232,6 +232,13 @@ public sealed partial class MainPage
                         json.WriteString("actions", client is null
                             ? string.Empty
                             : string.Join(" | ", _actions.For(card.Handle).Select(option => CardActions.Describe(client, option))));
+
+                        // What the face says, as a test reads it: the type line, the rules lines (granted and lost ones
+                        // too), the status words at its foot, and the line written over its art.
+                        json.WriteString("typeLine", card.Known && !card.FaceDown ? CardFace.TypeLine(card) : string.Empty);
+                        json.WriteString("rules", string.Join(" / ", CardFace.RulesLines(card).Select(line => line.Text)));
+                        json.WriteString("status", string.Join(", ", CardFace.StatusWords(card)));
+                        json.WriteString("annotation", _looks.TryGetValue(card.Handle, out CardLook? shown) ? shown.Annotation ?? string.Empty : string.Empty);
                         WriteBox(json, toPage.TransformBounds(box));
                         if (lower is { } down && raise is { } up)
                         {
@@ -279,6 +286,41 @@ public sealed partial class MainPage
                     json.WriteStartObject();
                     json.WriteNumber("seat", rail.Seat);
                     WriteBox(json, rail.Avatar.TransformToVisual(Root).TransformBounds(new Rect(0, 0, rail.Avatar.ActualWidth, rail.Avatar.ActualHeight)));
+
+                    // The facts beside the life total, and the buttons into exile and a sideboard, with whether they are lit.
+                    json.WriteStartArray("facts");
+                    foreach (string fact in rail.FactsShown())
+                    {
+                        json.WriteStringValue(fact);
+                    }
+
+                    json.WriteEndArray();
+                    json.WriteStartArray("zones");
+                    foreach ((string text, string tooltip, bool lit, DockButton button) in rail.ZoneButtonsShown())
+                    {
+                        if (button.ActualWidth <= 0)
+                        {
+                            continue;
+                        }
+
+                        json.WriteStartObject();
+                        json.WriteString("text", text);
+                        json.WriteString("tooltip", tooltip);
+                        json.WriteBoolean("lit", lit);
+                        WriteBox(json, button.TransformToVisual(Root).TransformBounds(new Rect(0, 0, button.ActualWidth, button.ActualHeight)));
+                        json.WriteEndObject();
+                    }
+
+                    json.WriteEndArray();
+                    json.WriteBoolean("graveyardLit", rail.GraveyardLit);
+                    json.WriteString("graveyardNote", rail.GraveyardNote ?? string.Empty);
+                    if (rail.GraveyardPile.ActualWidth > 0)
+                    {
+                        Rect pile = rail.GraveyardPile.TransformToVisual(Root).TransformBounds(new Rect(0, 0, rail.GraveyardPile.ActualWidth, rail.GraveyardPile.ActualHeight));
+                        json.WriteNumber("graveyardX", Math.Round(pile.X + (pile.Width / 2), 1));
+                        json.WriteNumber("graveyardY", Math.Round(pile.Y + (pile.Height / 2), 1));
+                    }
+
                     json.WriteStartArray("mana");
                     foreach ((PlayerRail.ManaChipSpec spec, FrameworkElement chip) in rail.Chips())
                     {
@@ -390,6 +432,7 @@ public sealed partial class MainPage
                 json.WriteStartObject();
                 json.WriteString("kind", kind);
                 json.WriteString("label", label);
+                json.WriteNumber("ability", kind == "item" && child is Border { Tag: int ability } ? ability : -1);
                 WriteBox(json, target.TransformToVisual(Root).TransformBounds(new Rect(0, 0, target.ActualWidth, target.ActualHeight)));
                 json.WriteEndObject();
 

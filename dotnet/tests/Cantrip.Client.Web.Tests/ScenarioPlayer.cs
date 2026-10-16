@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Cantrip.Art;
 using Cantrip.Protocol;
 using Cantrip.Server.Host;
@@ -101,8 +102,9 @@ public sealed class ScenarioPlayer
 
             foreach (ScenarioCheck check in progress.Checks)
             {
-                if (Judge(check, state) is { } wrong)
+                if (await JudgeAsync(check, state) is { } wrong)
                 {
+                    await _page.PictureAsync("check-failed");
                     return Failure(wrong);
                 }
             }
@@ -116,8 +118,9 @@ public sealed class ScenarioPlayer
 
                 foreach (ScenarioCheck check in verdict.Client)
                 {
-                    if (Judge(check, state) is { } wrong)
+                    if (await JudgeAsync(check, state) is { } wrong)
                     {
+                        await _page.PictureAsync("check-failed");
                         return Failure(wrong);
                     }
                 }
@@ -294,6 +297,15 @@ public sealed class ScenarioPlayer
                 await _page.ClickAsync("Cancel", "button");
                 return;
 
+            // The value of X, a click at a time on the dock's plus and minus.
+            case ActionKindView.IncreaseX:
+                await _page.ClickAsync("+", "button");
+                return;
+
+            case ActionKindView.DecreaseX:
+                await _page.ClickAsync("−", "button");
+                return;
+
             case ActionKindView.AssignMana:
             {
                 PlayerState me = state.Players?.FirstOrDefault(p => p.Seat == state.Seat)
@@ -337,6 +349,14 @@ public sealed class ScenarioPlayer
     private async Task ChooseRowAsync(TakeActionAnswer action, TableState state)
     {
         List<ControlState> rows = [.. state.Controls.Where(c => c.Kind == "item")];
+
+        // A card with several abilities lists them: the rows of the one the answer is. A menu of one ability's rows (a mana
+        // ability's colours) is the same menu whole.
+        if (rows.Any(r => r.Ability == action.AbilityIndex))
+        {
+            rows = [.. rows.Where(r => r.Ability == action.AbilityIndex)];
+        }
+
         ControlState? row = action.Color is { } color
             ? rows.FirstOrDefault(r => r.Label.Contains($"{{{Symbol(color)}}}", StringComparison.Ordinal))
             : DoorOf(action, state) is { } door ? rows.FirstOrDefault(r => r.Label.Contains(door, StringComparison.Ordinal))
@@ -403,10 +423,46 @@ public sealed class ScenarioPlayer
         await _page.Page.Mouse.ClickAsync(box.X, box.Y);
     }
 
+    /// <summary>
+    /// A card in a graveyard or in exile is drawn only while that zone is open: a person opens the pile, or the Exile button,
+    /// and clicks it there. The zones are tried in turn - each opened, looked into, shut again if it was not there - and the
+    /// card in the one that holds it is returned, its zone left open. Null when none holds it.
+    /// </summary>
+    private async Task<CardState?> OpenZoneHoldingAsync(int handle)
+    {
+        TableState state = await _page.SettledAsync();
+        List<(float X, float Y)> openers = [];
+        foreach (PlayerState player in state.Players ?? [])
+        {
+            openers.AddRange((player.Zones ?? []).Where(z => z.Text.StartsWith("Exile", StringComparison.Ordinal)).Select(z => (z.X, z.Y)));
+            if (player.GraveyardX > 0)
+            {
+                openers.Add((player.GraveyardX, player.GraveyardY));
+            }
+        }
+
+        foreach ((float x, float y) in openers)
+        {
+            await _page.Page.Mouse.ClickAsync(x, y);
+            TableState open = await _page.SettledAsync();
+            if (open.Cards.FirstOrDefault(c => c.Visible && c.Handle == handle) is { } found)
+            {
+                return found;
+            }
+
+            // Not in this one: shut it, where its opener is now (the board moves over when a graveyard opens).
+            await _page.Page.Mouse.ClickAsync(x, y);
+            await _page.SettledAsync();
+        }
+
+        return null;
+    }
+
     private async Task ClickHandleAsync(int handle)
     {
         TableState state = await _page.SettledAsync();
         CardState card = state.Cards.FirstOrDefault(c => c.Visible && c.Handle == handle)
+            ?? await OpenZoneHoldingAsync(handle)
             ?? throw new Xunit.Sdk.XunitException(
                 $"Handle {handle} is not in view. In view: {string.Join(", ", state.Cards.Where(c => c.Visible).Select(c => $"{c.Name} #{c.Handle} ({c.Place})"))}");
         // The stack fans its cards, each covering most of the one beneath: the strip of the card's left edge is the part of
@@ -434,7 +490,7 @@ public sealed class ScenarioPlayer
     // --- What the client shows ---
 
     /// <summary>A <c>Client.</c> line judged against the page; null when it holds, else what was wrong.</summary>
-    private string? Judge(ScenarioCheck check, TableState state)
+    private async Task<string?> JudgeAsync(ScenarioCheck check, TableState state)
     {
         string[] parts = check.Key.Split('.', 4);
         if (parts.Length < 3 || parts[1] != "Bot1")
@@ -443,19 +499,47 @@ public sealed class ScenarioPlayer
         }
 
         string what = string.Join('.', parts.Skip(2));
-        // A list's .Count, as the dump's lists have one.
-        string? shown = what.EndsWith(".Count", StringComparison.Ordinal) && Read(what[..^".Count".Length], state) is { } list
-            ? list.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Length.ToString(System.Globalization.CultureInfo.InvariantCulture)
-            : Read(what, state);
-        // A line of the game log, by its whole text: the value if the log has it, nothing if not.
-        if (what == "Confirm")
-        {
-            shown = _lastConfirm;
-        }
 
-        if (what == "Log.Has")
+        // What the face of one card says: Client.Bot1.Battlefield.Firdoch Core.TypeLine. A card in exile or a graveyard is
+        // only drawn while that zone is open, so the zone is opened to read it, as a player opens it to look.
+        Match card = CardKey.Match(what);
+        string? shown;
+        if (card.Success)
         {
-            shown = state.LogText?.Contains(check.Value) == true ? check.Value : string.Empty;
+            string row = card.Groups["row"].Value;
+            string name = card.Groups["card"].Value;
+            string attribute = card.Groups["attr"].Value;
+            if (row is "Exile" or "Graveyard")
+            {
+                shown = await ReadInZoneAsync(row, name, attribute);
+            }
+            else
+            {
+                string place = row switch { "OpponentBattlefield" => "opponent-battlefield", _ => row.ToLowerInvariant() };
+                CardState? found = state.Cards.FirstOrDefault(c => c.Place == place && c.Name == name);
+                shown = found is null
+                    ? $"(no {name} in {row}: {string.Join("; ", state.Cards.Where(c => c.Place == place).Select(c => c.Name))})"
+                    : Face(found, attribute);
+            }
+        }
+        else
+        {
+            // A list's .Count, as the dump's lists have one.
+            shown = what.EndsWith(".Count", StringComparison.Ordinal) && Read(what[..^".Count".Length], state) is { } list
+                ? list.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Length.ToString(System.Globalization.CultureInfo.InvariantCulture)
+                : Read(what, state);
+
+            // The button the last choice of cards was confirmed with.
+            if (what == "Confirm")
+            {
+                shown = _lastConfirm;
+            }
+
+            // A line of the game log, by its whole text: the value if the log has it, nothing if not.
+            if (what == "Log.Has")
+            {
+                shown = state.LogText?.Contains(check.Value) == true ? check.Value : string.Empty;
+            }
         }
 
         if (shown is null)
@@ -467,14 +551,85 @@ public sealed class ScenarioPlayer
             (what == "Log.Has" ? "; its log ends: " + string.Join(" | ", (state.LogText ?? []).TakeLast(8)) : string.Empty);
     }
 
+    private static readonly Regex CardKey = new(
+        @"^(?<row>Stack|Hand|Battlefield|OpponentBattlefield|Exile|Graveyard)\.(?<card>.+)\.(?<attr>TypeLine|Rules|Status|Annotation)$",
+        RegexOptions.CultureInvariant);
+
+    /// <summary>One thing a card's face says, with its lines on one line.</summary>
+    private static string Face(CardState card, string attribute) => attribute switch
+    {
+        "TypeLine" => card.TypeLine,
+        "Rules" => card.Rules,
+        "Status" => card.Status,
+        _ => card.Annotation.ReplaceLineEndings(" / "),
+    };
+
+    /// <summary>
+    /// What a card's face says in a zone drawn only while it is open: Bot1's exile (the button over the piles) or graveyard
+    /// (the pile), opened as a player opens it and shut again after.
+    /// </summary>
+    private async Task<string> ReadInZoneAsync(string zone, string name, string attribute)
+    {
+        TableState state = await _page.SettledAsync();
+        string place = zone == "Exile" ? "choice" : "graveyard";
+        (float X, float Y)? opener = ZoneOpener(state, zone);
+        if (opener is null)
+        {
+            return $"(no {zone} to open)";
+        }
+
+        await _page.Page.Mouse.ClickAsync(opener.Value.X, opener.Value.Y);
+        TableState open = await _page.SettledAsync();
+        CardState? found = open.Cards.FirstOrDefault(c => c.Place == place && c.Visible && c.Name == name);
+        string shown = found is null
+            ? $"(no {name} in the open {zone}: {string.Join("; ", open.Cards.Where(c => c.Place == place).Select(c => c.Name))})"
+            : Face(found, attribute);
+
+        // Shut again, where the zone's opener now is.
+        (float X, float Y)? closer = ZoneOpener(open, zone);
+        if (closer is not null)
+        {
+            await _page.Page.Mouse.ClickAsync(closer.Value.X, closer.Value.Y);
+            await _page.SettledAsync();
+        }
+
+        return shown;
+    }
+
+    /// <summary>Where a click opens Bot1's exile or graveyard: the Exile button, or the graveyard pile.</summary>
+    private static (float X, float Y)? ZoneOpener(TableState state, string zone)
+    {
+        PlayerState? me = state.Players?.FirstOrDefault(p => p.Seat == state.Seat);
+        if (zone == "Exile")
+        {
+            ZoneButtonState? button = me?.Zones?.FirstOrDefault(z => z.Text.StartsWith("Exile", StringComparison.Ordinal));
+            return button is null ? null : (button.X, button.Y);
+        }
+
+        return me is { GraveyardX: > 0 } ? (me.GraveyardX, me.GraveyardY) : null;
+    }
+
     private const string ClientKeys =
-        "Stack, Hand, Battlefield, OpponentBattlefield, OpponentHand (the cards known in it), each with .Count, Button.<label> (shown or absent), Arrows (the latest resolution's targets), Over, Prompt.Title, Prompt.Detail, Prompt.Modes, Log.Has (a line of the game log, by its text), Confirm (the button the last choice of cards was confirmed with)";
+        "Stack, Hand, Battlefield, OpponentBattlefield, OpponentHand (the cards known in it), each with .Count; <Row>.<Card>.TypeLine, .Rules, .Status or .Annotation (rows Stack, Hand, Battlefield, OpponentBattlefield, Exile, Graveyard); Facts, OpponentFacts (beside the life total); Exile.Lit, .Caption, .Tooltip and OpponentExile.*; Graveyard.Lit, .Note; Button.<label> (shown or absent), Arrows (the latest resolution's targets), Over, Prompt.Title, Prompt.Detail, Prompt.Modes, Log.Has (a line of the game log, by its text), Confirm (the button the last choice of cards was confirmed with)";
 
     private static string? Read(string what, TableState state)
     {
         string Names(string place) => string.Join("; ", state.Cards.Where(c => c.Place == place).Select(c => c.Name));
+        PlayerState? me = state.Players?.FirstOrDefault(p => p.Seat == state.Seat);
+        PlayerState? them = state.Players?.FirstOrDefault(p => p.Seat != state.Seat);
+        static ZoneButtonState? Exile(PlayerState? player) => player?.Zones?.FirstOrDefault(z => z.Text.StartsWith("Exile", StringComparison.Ordinal));
         return what switch
         {
+            "Facts" => string.Join("; ", me?.Facts ?? []),
+            "OpponentFacts" => string.Join("; ", them?.Facts ?? []),
+            "Exile.Lit" => (Exile(me)?.Lit ?? false) ? "true" : "false",
+            "Exile.Caption" => Exile(me)?.Text ?? string.Empty,
+            "Exile.Tooltip" => Exile(me)?.Tooltip ?? string.Empty,
+            "OpponentExile.Lit" => (Exile(them)?.Lit ?? false) ? "true" : "false",
+            "OpponentExile.Caption" => Exile(them)?.Text ?? string.Empty,
+            "OpponentExile.Tooltip" => Exile(them)?.Tooltip ?? string.Empty,
+            "Graveyard.Lit" => (me?.GraveyardLit ?? false) ? "true" : "false",
+            "Graveyard.Note" => me?.GraveyardNote ?? string.Empty,
             "Stack" => Names("stack"),
             "Hand" => Names("hand"),
             "Battlefield" => Names("battlefield"),

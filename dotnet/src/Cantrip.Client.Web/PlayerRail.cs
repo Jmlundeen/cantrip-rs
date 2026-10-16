@@ -27,7 +27,7 @@ public sealed class PlayerRail : Border
     public sealed record PileSpec(int Count, ObjectView? Top, Action? Click, bool Lit, string? Note);
 
     /// <summary>A button over the piles into a zone that is not drawn as a pile: a share of exile, a sideboard.</summary>
-    public sealed record ZoneButtonSpec(string Text, string Tooltip, bool Open, Action Click);
+    public sealed record ZoneButtonSpec(string Text, string Tooltip, bool Open, Action Click, bool Lit = false);
 
     public const double RailWidth = 208;
     private const double PileWidth = 85;
@@ -332,14 +332,14 @@ public sealed class PlayerRail : Border
 
         // Rebuilt only when what the buttons say has changed; a click goes to the latest action given for its place.
         _zones = zones;
-        if (!zones.Select(zone => (zone.Text, zone.Tooltip, zone.Open)).SequenceEqual(_zonesShown))
+        if (!zones.Select(zone => (zone.Text, zone.Tooltip, zone.Open, zone.Lit)).SequenceEqual(_zonesShown))
         {
-            _zonesShown = [.. zones.Select(zone => (zone.Text, zone.Tooltip, zone.Open))];
+            _zonesShown = [.. zones.Select(zone => (zone.Text, zone.Tooltip, zone.Open, zone.Lit))];
             _zoneButtons.Children.Clear();
             for (int i = 0; i < zones.Count; i++)
             {
                 int place = i;
-                var button = new DockButton(zones[i].Text, primary: false, fontSize: 12) { On = zones[i].Open, Tooltip = zones[i].Tooltip }.Filling();
+                var button = new DockButton(zones[i].Text, primary: false, fontSize: 12) { On = zones[i].Open, Lit = zones[i].Lit, Tooltip = zones[i].Tooltip }.Filling();
                 button.Clicked += () => _zones[place].Click();
                 _zoneButtons.Children.Add(button);
             }
@@ -354,6 +354,7 @@ public sealed class PlayerRail : Border
         ShowPile(graveyard, _graveyardSlot, _graveyardTop, _graveyardCount);
         _graveyardClick = graveyard.Click;
         GraveyardNote = graveyard.Note;
+        GraveyardLit = graveyard.Lit;
     }
 
     /// <summary>
@@ -399,6 +400,12 @@ public sealed class PlayerRail : Border
             Add("City's blessing", Theme.Accent, tooltip: "Has the city's blessing for the rest of the game. Cards with ascend and others check for it.");
         }
 
+        // Effects waiting on the player that sit on no object (CR 611.2c): "the next spell you cast can't be countered".
+        foreach (string pending in player.PendingEffects)
+        {
+            Add(pending.TrimEnd('.'), Theme.Accent, tooltip: pending + " It ends with the turn if no spell is cast.");
+        }
+
         // Where their venture marker is (CR 309.4), and how many dungeons they have completed (CR 309.7): the room alone,
         // which fits beside the life total, and the dungeon it is in in the tooltip.
         if (player.Dungeon.Length > 0 || player.DungeonsCompleted > 0)
@@ -438,7 +445,17 @@ public sealed class PlayerRail : Border
 
     private List<(string Text, Color Tint, double Fill, string? Tooltip)> _factsShown = [];
     private IReadOnlyList<ZoneButtonSpec> _zones = [];
-    private List<(string Text, string Tooltip, bool Open)> _zonesShown = [];
+    private List<(string Text, string Tooltip, bool Open, bool Lit)> _zonesShown = [];
+
+    /// <summary>The zone buttons shown with what they say and whether they are lit, for a page driven by a test (MainPage.Test.cs).</summary>
+    public IEnumerable<(string Text, string Tooltip, bool Lit, DockButton Button)> ZoneButtonsShown() =>
+        _zoneButtons.Children.OfType<DockButton>().Select((button, i) => (_zonesShown[i].Text, _zonesShown[i].Tooltip, _zonesShown[i].Lit, button));
+
+    /// <summary>The words of the facts shown beside the life total, for a page driven by a test.</summary>
+    public IEnumerable<string> FactsShown() => _factsShown.Select(fact => fact.Text);
+
+    /// <summary>What the graveyard pile's tooltip adds, and whether it is lit, for a page driven by a test.</summary>
+    public bool GraveyardLit { get; private set; }
 
     /// <summary>What each mana chip shown was made for, and the text that says its count.</summary>
     private readonly List<(ManaChipSpec Spec, TextBlock Count)> _chips = [];

@@ -1,0 +1,48 @@
+# Browser
+# "The next spell you cast this turn can't be countered" (CR 611.2c) sits on the player, not on any card. Once Mistrise
+# Village's ability has resolved the page says it beside Bot1's life total; the Lightning Bolt cast next is marked as it
+# is cast (CR 601.2) and its row on the stack says "can't be countered"; the effect is used up, so it is gone from the
+# player. The second Bolt, with nothing waiting, carries no mark.
+
+[Bot1 Deck]
+Forest
+Mox Sapphire
+Mox Ruby
+Mox Ruby
+Mistrise Village
+Lightning Bolt
+Lightning Bolt
+Forest x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mistrise Village.Play
+? Client.Bot1.Facts =
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mistrise Village.Activate(Ability: next spell)
+Bot1.Pass
+? Client.Bot1.Facts = The next spell you cast this turn can't be countered
+? Client.Bot1.OpponentFacts =
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Client.Bot1.Stack.Lightning Bolt.Status = CAN'T BE COUNTERED
+? Client.Bot1.Facts =
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 17
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Client.Bot1.Stack.Lightning Bolt.Status =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Bot2.Life = 14

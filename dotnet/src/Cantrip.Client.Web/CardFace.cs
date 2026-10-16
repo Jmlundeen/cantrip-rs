@@ -300,7 +300,15 @@ public static partial class CardFace
             front = front.Length > 0 ? $"Token {front}" : "Token";
         }
 
-        return card.Subtypes.Count == 0 ? front : $"{front} - {string.Join(' ', card.Subtypes)}";
+        // An object that is every creature type (Changeling) prints the types it has of its own and says the rest: the
+        // three hundred it has would not fit a card, and say less than the words do.
+        IReadOnlyList<string> subtypes = card.ShownSubtypes;
+        if (card.EveryCreatureType)
+        {
+            return subtypes.Count == 0 ? $"{front} - every creature type" : $"{front} - {string.Join(' ', subtypes)}, every creature type";
+        }
+
+        return subtypes.Count == 0 ? front : $"{front} - {string.Join(' ', subtypes)}";
     }
 
     /// <summary>
@@ -320,6 +328,10 @@ public static partial class CardFace
         }
 
         lines.AddRange(card.GrantedAbilities.Select(granted => (granted.Text, granted.Spent)));
+
+        // What an effect took away (CR 613.1f): still on the card's face as printed, so it is said to be gone, and greyed
+        // as an ability that is done with.
+        lines.AddRange(card.LostAbilities.Select(lost => ($"Lost: {lost}", true)));
         lines.AddRange(card.ChosenModes.Select(mode => ($"Chosen: {mode}", false)));
         return lines;
     }
@@ -1187,9 +1199,14 @@ public static partial class CardFace
     /// says it more plainly than a word would. Nor is a creature just arrived: its mark is over its art, drawn by the row
     /// it is on (<see cref="DrawArrival"/>), so the face is the same before and after.
     /// </summary>
-    private static List<string> StatusWords(ObjectView card)
+    public static List<string> StatusWords(ObjectView card)
     {
         List<string> parts = [];
+        if (card.CantBeCountered && card.Zone == ZoneKindView.Stack)
+        {
+            parts.Add("CAN'T BE COUNTERED");
+        }
+
         if (card.Monstrous)
         {
             parts.Add("MONSTROUS");

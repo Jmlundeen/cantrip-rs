@@ -86,6 +86,9 @@ internal static class Faces
             .AppendJoin(',', card.Halves.Select(half => half.Name)).Append('|')
             .AppendJoin(',', card.UnlockedDoors).Append('|')
             .AppendJoin(',', card.GrantedAbilities.Select(a => a.ToString())).Append('|')
+            .AppendJoin(',', card.LostAbilities).Append('|')
+            .Append(card.CantBeCountered ? 'U' : 'u').Append(card.EveryCreatureType ? 'Y' : 'y').Append('|')
+            .AppendJoin(',', card.TypeLineSubtypes).Append('|')
             .AppendJoin(',', card.SpentLines).Append('|')
             .AppendJoin('|', card.ChosenModes).Append('|')
             .Append(card.KnownBy.Count).Append('|')
@@ -140,6 +143,8 @@ internal static class Faces
         && card.Choices.Count == 0
         && card.KnownBy.Count == 0
         && card.GrantedAbilities.Count == 0
+        && card.LostAbilities.Count == 0
+        && !card.CantBeCountered
         && card.SpentLines.Count == 0
         && card.ChosenModes.Count == 0
         && card.ClassLevel == 0

@@ -30,12 +30,13 @@ public sealed class CardMenu
 
     /// <summary>Opens at a point in <paramref name="over"/>'s coordinates, with one row per choice.</summary>
     /// <param name="fontSize">The rows' type size: 13 for a card's menu, 12 for a drop-down's list.</param>
-    public void Open(UIElement over, Point at, IReadOnlyList<(string Text, Action OnChosen)> choices, double fontSize = 13)
+    public void Open(UIElement over, Point at, IReadOnlyList<(string Text, Action OnChosen)> choices, double fontSize = 13, IReadOnlyList<int>? abilities = null)
     {
         ArgumentNullException.ThrowIfNull(choices);
 
         _rows.Children.Clear();
 
+        int index = 0;
         foreach ((string text, Action onChosen) in choices)
         {
             var row = new Border
@@ -44,6 +45,8 @@ public sealed class CardMenu
                 Padding = new Thickness(12, 5, 12, 5),
                 Background = Theme.Brush(Color.FromArgb(0, 0, 0, 0)),
                 Child = new SymbolText(fontSize, Theme.Fg) { Text = text },
+                // Which ability of the card the row is, for a page driven by a test to tell rows that read alike.
+                Tag = abilities is not null && index < abilities.Count ? abilities[index] : -1,
             };
 
             row.PointerEntered += (_, _) => row.Background = Theme.Brush(Theme.ControlHover);
@@ -59,6 +62,7 @@ public sealed class CardMenu
             };
 
             _rows.Children.Add(row);
+            index++;
         }
 
         _popup.XamlRoot = over.XamlRoot;

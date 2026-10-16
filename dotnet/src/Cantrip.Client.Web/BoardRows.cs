@@ -229,6 +229,9 @@ public static class BoardRows
             .Append(card.ManaCost).Append('|')
             .Append(card.OracleText).Append('|')
             .AppendJoin(',', card.GrantedAbilities.Select(a => a.ToString())).Append('|')
+            .AppendJoin(',', card.LostAbilities).Append('|')
+            .Append(card.CantBeCountered ? 'U' : 'u').Append(card.EveryCreatureType ? 'Y' : 'y').Append('|')
+            .AppendJoin(',', card.TypeLineSubtypes).Append('|')
             .AppendJoin(',', card.SpentLines).Append('|')
             .AppendJoin('|', card.ChosenModes).Append('|');
 

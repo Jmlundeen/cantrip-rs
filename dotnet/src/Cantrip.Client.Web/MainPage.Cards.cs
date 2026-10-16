@@ -138,11 +138,26 @@ public sealed partial class MainPage
                 look = look with { Annotation = above is null ? owned : $"{above}\n{owned}" };
             }
 
+            // A card in exile or a graveyard that may be played says until when, and a flashback that it is exiled after.
+            if (PermissionAnnotation(card) is { } window)
+            {
+                look = look with { Annotation = look.Annotation is null ? window : $"{look.Annotation}\n{window}" };
+            }
+
             _looks[card.Handle] = look;
         }
 
         return look;
     }
+
+    /// <summary>
+    /// What a card in exile or a graveyard may be played for, and until when (CR 601.3, 305.1): one line for each permission
+    /// it stands under. Null for a card nobody may play from where it is.
+    /// </summary>
+    private static string? PermissionAnnotation(ObjectView card) =>
+        card.PlayPermissions.Count > 0 && card.Zone is ZoneKindView.Exile or ZoneKindView.Graveyard
+            ? string.Join("\n", card.PlayPermissions.Select(permission => permission.Text))
+            : null;
 
     /// <summary>A card placed on one of the rows, drawn as its look says.</summary>
     private CardBoardElement.BoardCell Cell(GameClient client, ObjectView card, float left, float top, bool tapped)
@@ -354,7 +369,7 @@ public sealed partial class MainPage
                     () => { Take(client, option, color, combination, sacrifice); RedrawNow(); }));
         }
 
-        _menu.Open(Root, _pointer, items);
+        _menu.Open(Root, _pointer, items, abilities: [.. entries.Select(entry => entry[0].Option.AbilityIndex)]);
     }
 
     /// <summary>Whether auto-mana answers a card's menu: on by default or not, and Shift held turns it the other way.</summary>
@@ -448,7 +463,7 @@ public sealed partial class MainPage
                 () => { Take(client, option, color, combination, sacrifice); RedrawNow(); }));
         }
 
-        _menu.Open(Root, _pointer, items);
+        _menu.Open(Root, _pointer, items, abilities: [.. rows.Select(row => row.Option.AbilityIndex)]);
     }
 
     private static string CostChoiceLabel(GameClient client, List<ManaRow> entry)

@@ -1,0 +1,45 @@
+# Browser
+# Bonehoard Dracosaur exiles Mountain and Lightning Bolt and Bot1 "may play them this turn" (CR 305.1, 601.3). A player
+# has to see that from the table: the Exile button over Bot1's piles is lit with the number that can be played, and each
+# card in the open exile says "this turn" - the land "Playable", the Bolt too, since the permission is to play. On turn 4
+# "this turn" is over: the Bolt is still in exile but the button is not lit and the card says nothing.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Black Lotus
+Bonehoard Dracosaur
+Island x3
+Mountain
+Lightning Bolt
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Bonehoard Dracosaur.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+? Client.Bot1.Button.Exile = absent
+[T3 Bot1.Main1]
+? Exile = Mountain; Lightning Bolt
+? Client.Bot1.Exile.Lit = true
+? Client.Bot1.Exile.Lightning Bolt.Annotation = Playable this turn
+? Client.Bot1.Exile.Mountain.Annotation = Playable this turn
+[T4 Bot2.Main1]
+? Exile = Mountain; Lightning Bolt
+? Client.Bot1.Exile.Lit = false
+? Client.Bot1.Exile.Lightning Bolt.Annotation =
+
+[Expect]
+Turn = 4

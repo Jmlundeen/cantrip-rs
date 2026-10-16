@@ -271,8 +271,26 @@ public sealed record TableState(
     IReadOnlyList<string>? Modes = null,
     IReadOnlyList<string>? LogText = null);
 
-/// <summary>A player's box on the page, which a click on targets them, and the mana in their pool.</summary>
-public sealed record PlayerState(int Seat, float X, float Y, float W, float H, IReadOnlyList<ManaChipState> Mana);
+/// <summary>
+/// A player's box on the page, which a click on targets them, and the mana in their pool; the facts beside their life
+/// total, the buttons into exile and a sideboard, and their graveyard pile: whether it is lit, its note and where to click.
+/// </summary>
+public sealed record PlayerState(
+    int Seat,
+    float X,
+    float Y,
+    float W,
+    float H,
+    IReadOnlyList<ManaChipState> Mana,
+    IReadOnlyList<string>? Facts = null,
+    IReadOnlyList<ZoneButtonState>? Zones = null,
+    bool GraveyardLit = false,
+    string GraveyardNote = "",
+    float GraveyardX = 0,
+    float GraveyardY = 0);
+
+/// <summary>A button over a player's piles (Exile, Companion): what it says and its tooltip, whether it is lit, and where it is.</summary>
+public sealed record ZoneButtonState(string Text, string Tooltip, bool Lit, float X, float Y, float W, float H);
 
 /// <summary>A kind of mana in a pool, how much, whether a click spends one, and where it is.</summary>
 public sealed record ManaChipState(string Type, int Count, bool Clickable, float X, float Y, float W, float H);
@@ -308,12 +326,16 @@ public sealed record CardState(
     bool Tapped = false,
     string Doors = "",
     string Actions = "",
-    string Halves = "");
+    string Halves = "",
+    string TypeLine = "",
+    string Rules = "",
+    string Status = "",
+    string Annotation = "");
 
 /// <summary>A card named in a line of text - the game log, a draft's picks - where its name is, and whether it is in view.</summary>
 public sealed record MentionState(string Name, bool Visible, float X, float Y, float W, float H);
 
 /// <summary>A control on the page: <c>button</c>, <c>toggle</c>, <c>dropdown</c> (by its caption), <c>textbox</c> (by its placeholder) or <c>item</c> (a menu row).</summary>
-public sealed record ControlState(string Kind, string Label, float X, float Y, float W, float H);
+public sealed record ControlState(string Kind, string Label, float X, float Y, float W, float H, int Ability = -1);
 
 public sealed record Spot(float X, float Y);

@@ -61,6 +61,10 @@ A key starting `Client.` is about what the page shows, not the game's state, and
 | `Client.Bot1.Prompt.Modes` | the options of a choice of modes, as buttons: an additional cost's, with its cost in words |
 | `Client.Bot1.Confirm` | the label of the button the last choice of cards was confirmed with ("Behold it"); nothing when the last click answered by itself |
 | `Client.Bot1.Log.Has` | the game log has a line with exactly this text (cards in it in brackets), shown as the value or as nothing |
+| `Client.Bot1.<Row>.<Card>.TypeLine`, `.Rules`, `.Status`, `.Annotation` | what the face of that card says: its type line (`Kindred Artifact - Shapeshifter, every creature type`), its rules lines joined by ` / ` (granted keywords after the printed text, abilities lost as `Lost: ...`), the status words at its foot (`CAN'T BE COUNTERED`), the line over its art (`Playable this turn`). `<Row>` is `Stack`, `Hand`, `Battlefield`, `OpponentBattlefield`, or `Exile` or `Graveyard`, which the page opens to read, as a player does |
+| `Client.Bot1.Facts`, `.OpponentFacts` | the facts beside a player's life total, as a set: `The next spell you cast this turn can't be countered` |
+| `Client.Bot1.Exile.Lit`, `.Caption`, `.Tooltip` (and `OpponentExile.`) | the Exile button over a player's piles: `true` when a card in it may be played, what it says, its tooltip |
+| `Client.Bot1.Graveyard.Lit`, `.Note` | the graveyard pile: lit when a card in it can be cast, and the note its tooltip adds |
 
 Only Bot1 is a page for now, so only `Client.Bot1.` keys can be judged.
 

@@ -39,6 +39,15 @@ public sealed class CardReadingTests
         Assert.Equal(Keywords.Trample | Keywords.Flying, CardReading.KeywordsOf(creature));
     }
 
+    [Fact]
+    public void A_keyword_an_effect_has_taken_away_is_not_had_though_the_printed_text_says_it()
+    {
+        ObjectView drake = Creature(1, "Drake", 2, 2, text: "Flying, first strike");
+        drake.LostAbilities.Add("Flying");
+
+        Assert.Equal(Keywords.FirstStrike, CardReading.KeywordsOf(drake));
+    }
+
     [Theory]
     [InlineData("Lightning Bolt deals 3 damage to any target.", EffectKind.Damage, 3)]
     [InlineData("Flame Slash deals 4 damage to target creature.", EffectKind.Damage, 4)]

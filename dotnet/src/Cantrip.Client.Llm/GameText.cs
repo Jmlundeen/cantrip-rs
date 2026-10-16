@@ -131,6 +131,16 @@ public static class GameText
                 .Append('"');
         }
 
+        if (oracle && card.LostAbilities.Count > 0)
+        {
+            text.Append(" | lost: \"").Append(string.Join(" / ", card.LostAbilities)).Append('"');
+        }
+
+        foreach (PlayPermissionView permission in card.PlayPermissions)
+        {
+            text.Append(" | ").Append(permission.Text);
+        }
+
         if (oracle && card.OtherFace is { Name.Length: > 0 } back)
         {
             text.Append(" | other face: ").Append(Card(client, back, oracle: true));
@@ -394,6 +404,11 @@ public static class GameText
             text.Append(CultureInfo.InvariantCulture, $", {counter.Count} {counter.Name} counter(s)");
         }
 
+        foreach (string pending in player.PendingEffects)
+        {
+            text.Append(", ").Append(pending.TrimEnd('.'));
+        }
+
         if (player.IsMonarch)
         {
             text.Append(", the monarch");
@@ -485,7 +500,8 @@ public static class GameText
 
     private static string Types(ObjectView card)
     {
-        if (card.CardTypes.Count == 0 && card.Subtypes.Count == 0)
+        IReadOnlyList<string> subtypes = card.ShownSubtypes;
+        if (card.CardTypes.Count == 0 && subtypes.Count == 0 && !card.EveryCreatureType)
         {
             return string.Empty;
         }
@@ -494,7 +510,13 @@ public static class GameText
             " ",
             card.Supertypes.Select(type => type.ToString()).Concat(card.CardTypes.Select(type => type.ToString())));
 
-        return card.Subtypes.Count > 0 ? $"{front} - {string.Join(" ", card.Subtypes)}" : front;
+        // Every creature type (Changeling) is said in words: its three hundred types would fill the prompt.
+        if (card.EveryCreatureType)
+        {
+            return subtypes.Count > 0 ? $"{front} - {string.Join(" ", subtypes)}, every creature type" : $"{front} - every creature type";
+        }
+
+        return subtypes.Count > 0 ? $"{front} - {string.Join(" ", subtypes)}" : front;
     }
 
     /// <summary>Everything about a permanent that is true right now and is not one of its printed characteristics.</summary>
@@ -550,6 +572,11 @@ public static class GameText
         if (card.Goaded)
         {
             parts.Add("goaded, so it must attack");
+        }
+
+        if (card.CantBeCountered && card.Zone == ZoneKindView.Stack)
+        {
+            parts.Add("can't be countered");
         }
 
         return string.Join(", ", parts);

@@ -443,10 +443,20 @@ public sealed partial class MainPage
             : contents.Count == 0 && known.Count > 0
             ? $"You know {known.Count} card{(known.Count == 1 ? string.Empty : "s")} in this library. Click to look."
             : offers && !_graveyardsOpen
-            ? $"A card here can be {(plays ? "played" : activates ? "activated" : "cast")}. Click to look."
+            ? $"A card here can be {(plays ? "played" : activates ? "activated" : "cast")}{GraveyardWindows(client, contents)}. Click to look."
             : null;
 
         return new PlayerRail.PileSpec(count, top is null ? null : Standing(top, -900_000 - seat), click, lit, note);
+    }
+
+    /// <summary>
+    /// The permissions the viewer holds on cards in a graveyard (Stingcaster Mage's flashback), for the pile's note: " (Lightning
+    /// Bolt: Castable this turn, then exiled)". Empty when it is no permission that lets them be cast.
+    /// </summary>
+    private static string GraveyardWindows(GameClient client, IReadOnlyList<ObjectView> contents)
+    {
+        string[] windows = [.. contents.SelectMany(card => card.PlayPermissions.Where(permission => permission.Seat == client.Seat).Select(permission => $"{card.Name}: {permission.Text}"))];
+        return windows.Length == 0 ? string.Empty : $" ({string.Join("; ", windows)})";
     }
 
     /// <summary>
@@ -460,11 +470,17 @@ public sealed partial class MainPage
         List<ObjectView> exiled = ExileOf(client, seat);
         if (exiled.Count > 0)
         {
+            // A card in exile the viewer may play (Bonehoard Dracosaur's, Cori's) lights the button, as a graveyard pile is lit
+            // for a card in it that can be cast, and the windows they stand under are on its tooltip.
+            List<ObjectView> playable = [.. exiled.Where(card => _actions.For(card.Handle).Count > 0 || card.PlayPermissions.Any(permission => permission.Seat == client.Seat))];
+            string windows = string.Join("; ", playable.SelectMany(card => card.PlayPermissions.Where(permission => permission.Seat == client.Seat).Select(permission => $"{card.Name}: {permission.Text}")));
             buttons.Add(new PlayerRail.ZoneButtonSpec(
-                $"Exile  {exiled.Count}",
-                seat == client.Seat ? "Look at the cards you own in exile" : $"Look at the cards {name} owns in exile",
+                playable.Count > 0 ? $"Exile  {exiled.Count}  ·  {playable.Count} playable" : $"Exile  {exiled.Count}",
+                (seat == client.Seat ? "Look at the cards you own in exile" : $"Look at the cards {name} owns in exile")
+                    + (playable.Count > 0 ? $". You may play {playable.Count} of them from there{(windows.Length > 0 ? $" ({windows})" : string.Empty)}." : string.Empty),
                 _peek == (ZoneKindView.Exile, seat),
-                () => { TogglePeek(ZoneKindView.Exile, seat); RedrawNow(); }));
+                () => { TogglePeek(ZoneKindView.Exile, seat); RedrawNow(); },
+                Lit: playable.Count > 0));
         }
 
         // A sideboard holds cards outside the game, which for now means a companion (CR 702.139).
@@ -690,9 +706,10 @@ public sealed partial class MainPage
             CardLook look = LookOf(client, card);
             if (card.ExiledWith != ViewHandle.None && client.Object(card.ExiledWith) is { } holder)
             {
-                look = look with { Annotation = $"Under {holder.Name}" };
+                look = look with { Annotation = look.Annotation is null ? $"Under {holder.Name}" : $"Under {holder.Name}\n{look.Annotation}" };
             }
 
+            _looks[card.Handle] = look;
             AddChoice(card, look);
         }
     }

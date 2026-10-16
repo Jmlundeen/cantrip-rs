@@ -1,0 +1,34 @@
+# Browser
+# Samut, Hazoret's Champion gives haste to the creatures its controller controls (CR 702.10, 613.1f): the Elves, cast
+# before it, are summoning sick until it resolves. The card shows what the printed text does not say - after Samut, a
+# line "Haste" beneath the Elves' own ability.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Samut, Hazoret's Champion
+Llanowar Elves
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+? Client.Bot1.Battlefield.Llanowar Elves.Rules = {T}: Add {G}.
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Samut, Hazoret's Champion.Cast
+Bot1.Pass
+? Client.Bot1.Battlefield.Llanowar Elves.Rules = {T}: Add {G}. / Haste
+Bot1.Attack(Samut, Hazoret's Champion; Llanowar Elves > Bot2)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17

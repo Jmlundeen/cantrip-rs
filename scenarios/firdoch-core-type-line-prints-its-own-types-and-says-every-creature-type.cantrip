@@ -1,0 +1,54 @@
+# Browser
+# Changeling (CR 702.73a) gives Firdoch Core every creature type, about three hundred. A player reads the card as it is
+# printed - "Kindred Artifact - Shapeshifter" - and the page says the rest in words, "every creature type", instead of
+# printing the whole set: in hand, on the battlefield and animated alike. The engine still has the whole set (the
+# `Subtypes` check below), which the page keeps for a question like "is it a Pirate?".
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Sol Ring
+Firdoch Core
+Swamp
+Swamp
+Swamp x12
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Ornithopter
+Swamp
+Swamp
+Swamp x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+? Client.Bot1.Hand.Firdoch Core.TypeLine = Kindred Artifact - Shapeshifter, every creature type
+Bot1.Hand.Firdoch Core.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+? Bot1.Battlefield.Firdoch Core.Subtypes = (every creature type)
+? Client.Bot1.Battlefield.Firdoch Core.TypeLine = Kindred Artifact - Shapeshifter, every creature type
+? Client.Bot1.OpponentBattlefield.Ornithopter.TypeLine = Artifact Creature - Thopter
+Bot1.Battlefield.Firdoch Core.Activate(Ability: {4})
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Firdoch Core.Types = Kindred; Artifact; Creature
+? Client.Bot1.Battlefield.Firdoch Core.TypeLine = Kindred Artifact Creature - Shapeshifter, every creature type
+
+[Expect]
+Bot1.Battlefield.Firdoch Core.Power = 4

@@ -198,7 +198,15 @@ public static partial class CardReading
             }
         }
 
-        return found;
+        // What an effect has taken away (Day of Black Sun) is still in the printed text it reads above, and is not had: a
+        // keyword granted again after it is not on this list, since the object has it.
+        Keywords lost = Keywords.None;
+        foreach (string gone in card.LostAbilities)
+        {
+            lost |= Line(Plain(gone));
+        }
+
+        return found & ~lost;
     }
 
     /// <summary>The keywords on one line, when keywords are all the line is: "First strike, lifelink".</summary>

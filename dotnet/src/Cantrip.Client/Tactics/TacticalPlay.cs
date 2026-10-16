@@ -368,6 +368,7 @@ public sealed partial class TacticalPlay : IAutoPlayer
             hash.Add(card.AttachedTo.Value);
             hash.Add(card.Subtypes.Count);
             hash.Add(card.GrantedAbilities.Count);
+            hash.Add(card.LostAbilities.Count);
 
             foreach (CounterView counter in card.Counters)
             {

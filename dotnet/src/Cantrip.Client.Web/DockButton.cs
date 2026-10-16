@@ -101,6 +101,22 @@ public sealed class DockButton : Border
         }
     }
 
+    private bool _lit;
+
+    /// <summary>Edged in the ready colour: there is something behind it to do, as a card outlined on the table has.</summary>
+    public bool Lit
+    {
+        get => _lit;
+        set
+        {
+            if (_lit != value)
+            {
+                _lit = value;
+                Restyle();
+            }
+        }
+    }
+
     /// <summary>
     /// A button with no ground or edge until it is pointed at, and softer type that brightens then: for the
     /// side panel's hide arrow and small actions that should not compete with the page. Returns the button.
@@ -147,7 +163,7 @@ public sealed class DockButton : Border
         }
 
         Background = Theme.Brush(fill);
-        BorderBrush = Theme.Brush(!_enabled ? DisabledBorder : _on ? Theme.Accent : Theme.ControlBorder);
+        BorderBrush = Theme.Brush(!_enabled ? DisabledBorder : _lit ? Theme.Ready : _on ? Theme.Accent : Theme.ControlBorder);
         _label.Color = accent ? Theme.FgOnAccent : _enabled ? Theme.Fg : Theme.FgMuted;
     }
 
