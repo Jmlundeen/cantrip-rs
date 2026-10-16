@@ -135,7 +135,21 @@ public sealed class RandomPlay : IAutoPlayer
             _draws = 0;
         }
 
-        client.Answer(_draws >= Draws ? asked.Prompt.Default() : Decide(asked.Prompt));
+        AnswerPayload answer = _draws >= Draws ? asked.Prompt.Default() : Decide(asked.Prompt);
+
+        // Costs to attack (CR 508.1h-j): a payment given up is remembered, and the declarations of the rest of that turn
+        // cost nothing, so a seat that cannot pay does not declare the same attack for ever.
+        switch (asked.Prompt, answer)
+        {
+            case (PayCostsPromptMessage pay, TakeActionAnswer taken):
+                AttackCosts.Answered(client, pay, taken);
+                break;
+            case (DeclareAttackersPromptMessage attackers, AttackersDeclaredAnswer declared):
+                declared.Attacks = AttackCosts.Within(attackers, declared.Attacks, AttackCosts.Mana(client, attackers));
+                break;
+        }
+
+        client.Answer(answer);
         return true;
     }
 

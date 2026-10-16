@@ -588,6 +588,23 @@ public sealed class TacticalPlayTests
     }
 
     [Fact]
+    public void With_no_mana_it_attacks_the_planeswalker_a_tax_on_the_player_leaves_free()
+    {
+        // Ghostly Prison taxes attacks on its controller, not on their planeswalker: with no mana the Bear still attacks,
+        // at the planeswalker, which costs nothing.
+        ObjectView walker = Creature(5, "Liliana", 0, 0, Them);
+        walker.CardTypes = [CardTypeView.Planeswalker];
+        walker.Counters = [new CounterView { Name = "loyalty", Count = 3 }];
+        GameClient client = Seated([Creature(1, "Bear", 2, 2), walker], step: TurnStepView.DeclareAttackers);
+
+        DeclareAttackersPromptMessage prompt = Taxed(2, 0, 1);
+        prompt.AttackablePlaneswalkers.Add(Handle(5));
+
+        AttackMessage attack = Assert.Single(Assert.IsType<AttackersDeclaredAnswer>(Bot().Decide(client, prompt)).Attacks);
+        Assert.Equal(Handle(5), attack.TargetPermanent);
+    }
+
+    [Fact]
     public void A_payment_to_attack_given_up_leaves_only_free_attacks_that_turn()
     {
         GameClient client = Seated([Creature(1, "Bear", 2, 2)], step: TurnStepView.DeclareAttackers);

@@ -93,11 +93,16 @@ public sealed partial class TacticalPlay
         double wheneverYouAttack = perAttacker * client.BattlefieldOf(client.Seat)
             .Count(permanent => CardReading.Plain(CardReading.Text(permanent)).Contains("whenever you attack", StringComparison.Ordinal));
 
-        // Costs to attack (CR 508.1h): what each creature costs to send at the defender, and the mana there is to pay
-        // with, less what a creature that taps for mana stops making by attacking (CR 508.1f). An attack that cannot be
-        // paid for is never made: the payment would be given up and the attack declared again.
+        // Costs to attack (CR 508.1h): what each creature costs to send at the defender or, more cheaply where that is
+        // so, at one of the defender's planeswalkers (Ghostly Prison taxes the player, not the planeswalker), and the mana
+        // there is to pay with, less what a creature that taps for mana stops making by attacking (CR 508.1f). An attack
+        // that cannot be paid for is never made: the payment would be given up and the attack declared again.
+        List<ViewHandle> theirWalkers = [.. prompt.AttackablePlaneswalkers.Where(walker => client.Object(walker)?.Controller == defender)];
+        int AttackCost(ViewHandle attacker, ViewHandle walker) => prompt.CostOf(walker.IsNone
+            ? new AttackMessage { Attacker = attacker, TargetPlayer = defender }
+            : new AttackMessage { Attacker = attacker, TargetPermanent = walker })?.ManaValue ?? 0;
         int[] costs = [.. attackers.Select(attacker =>
-            prompt.CostOf(new AttackMessage { Attacker = attacker.Handle, TargetPlayer = defender })?.ManaValue ?? 0)];
+            theirWalkers.Aggregate(AttackCost(attacker.Handle, ViewHandle.None), (least, walker) => Math.Min(least, AttackCost(attacker.Handle, walker))))];
         int mana = AttackCosts.Mana(client, prompt);
         bool[] makesMana = [.. eligible.Select(creature => CardReading.Plain(CardReading.Text(creature)).Contains("{t}: add", StringComparison.Ordinal))];
         bool MakesMana(ViewHandle creature) =>
@@ -149,7 +154,7 @@ public sealed partial class TacticalPlay
                 return Combat.Win;
             }
 
-            double score = result.Value - (Policy("attackcost") * CostOf(attacking & ~forced));
+            double score = result.Value;
             List<Unit> back = [.. home];
 
             for (int a = 0; a < attackers.Count; a++)
@@ -285,7 +290,40 @@ public sealed partial class TacticalPlay
             }
         }
 
-        Dictionary<ViewHandle, ViewHandle> aside = Aside(client, prompt, defender, attackers, blockers, best, myLife, theirLife);
+        // Mana paid to attack is mana the turn's second main phase does not have: the creatures that cost something to
+        // send are sent only if the attack gains a play's worth (the margin) over the same attack without them.
+        int paid = 0;
+        for (int a = 0; a < attackers.Count; a++)
+        {
+            if (costs[a] > 0 && (forced & (1 << a)) == 0)
+            {
+                paid |= 1 << a;
+            }
+        }
+
+        if ((best & paid) != 0 && bestScore < Combat.Win && bestScore - Score(best & ~paid) < Policy("margin"))
+        {
+            best &= ~paid;
+            bestScore = Score(best);
+        }
+
+        Dictionary<ViewHandle, ViewHandle> aside = Aside(
+            client, prompt, defender, attackers, blockers, best, myLife, theirLife, aims => AimedCost(aims) <= mana);
+
+        // What sending the attackers at these planeswalkers (none: at the player) costs, to keep to the mana there is.
+        int AimedCost(ViewHandle[] aims)
+        {
+            int total = 0;
+            for (int a = 0; a < attackers.Count; a++)
+            {
+                if ((best & (1 << a)) != 0 && (forced & (1 << a)) == 0)
+                {
+                    total += AttackCost(attackers[a].Handle, aims[a]);
+                }
+            }
+
+            return total;
+        }
 
         if (Narrating)
         {
@@ -355,7 +393,7 @@ public sealed partial class TacticalPlay
     /// </summary>
     private Dictionary<ViewHandle, ViewHandle> Aside(
         GameClient client, DeclareAttackersPromptMessage prompt, int defender, List<Unit> attackers, List<Unit> blockers, int attacking,
-        int myLife, int theirLife)
+        int myLife, int theirLife, Func<ViewHandle[], bool> affordable)
     {
         Dictionary<ViewHandle, ViewHandle> aside = [];
         if (Policy("walkers") <= 0 || attacking == 0 || prompt.AttackablePlaneswalkers.Count == 0)
@@ -416,7 +454,7 @@ public sealed partial class TacticalPlay
 
         foreach (int[] aims in new[] { unblocked, everything })
         {
-            if (!aims.Any(aim => aim >= 0))
+            if (!aims.Any(aim => aim >= 0) || !affordable([.. aims.Select(aim => aim >= 0 ? walkers[aim].Handle : ViewHandle.None)]))
             {
                 continue;
             }
