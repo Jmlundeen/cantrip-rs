@@ -1,0 +1,69 @@
+# CR 608.2b, 702.192a. Restoration Seminar aimed at Bot1's Ornithopter in the graveyard (Bot2 Bolted it on turn 2). In response
+# Bot2's Lion Sash exiles the Ornithopter, so the Seminar's only target is illegal: it does not resolve (it is put into the
+# graveyard, not exiled) and "after you first resolve a spell with this name" never happens, so on turn 5 no copy is offered
+# (`! Bot1.Accept`) - the Seminar is in the graveyard, not exile - and nothing returns.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Pearl
+Mox Ruby
+Mox Sapphire
+Black Lotus
+Ornithopter
+Restoration Seminar
+Island x13
+
+[Bot2 Deck]
+Plains
+Mox Ruby
+Mox Pearl
+Mox Pearl
+Lion Sash
+Lightning Bolt
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Lion Sash.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Restoration Seminar.Cast(Bot1.Graveyard.Ornithopter)
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Lion Sash.Activate(Bot1.Graveyard.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+? Exile = Ornithopter
+? Bot1.Graveyard = Restoration Seminar; Black Lotus
+[T5 Bot1.Main1]
+! Bot1.Accept
+
+[Expect]
+Exile = Ornithopter
+Bot1.Battlefield.Count = 4

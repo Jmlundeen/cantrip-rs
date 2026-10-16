@@ -1,0 +1,68 @@
+# Restoration Seminar: "Return target nonland permanent card from your graveyard to the battlefield." Paradigm: it is exiled as
+# it resolves, and at the beginning of each of its owner's first main phases they may cast a copy of it from exile without paying
+# its mana cost (CR 702.192a, 707.12). Bot2 Bolts Bot1's Ornithopter on turn 2. Turn 3: Bot1 Strip Mines Bot2's Island - the
+# Strip Mine is a land card in the graveyard, which the Seminar cannot target (the refused cast) beside the
+# Ornithopter, which it can - and casts the Seminar with four Moxen and a Black Lotus ({5}{W}{W}): the Ornithopter comes back.
+# Bot2 Bolts it again on turn 4; on turn 5 the copy is accepted and returns it a second time, the card still in exile.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Pearl
+Mox Ruby
+Mox Sapphire
+Black Lotus
+Ornithopter
+Restoration Seminar
+Strip Mine
+Island x12
+
+[Bot2 Deck]
+Mox Ruby
+Island
+Lightning Bolt
+Lightning Bolt
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Strip Mine.Play
+Bot1.Battlefield.Strip Mine.Activate(Ability: Destroy target land; Bot2.Battlefield.Island)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Hand.Restoration Seminar.Cast(Bot1.Graveyard.Strip Mine)
+Bot1.Hand.Restoration Seminar.Cast(Bot1.Graveyard.Ornithopter)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Ornithopter.Power = 0
+? Exile = Restoration Seminar
+? Bot1.Graveyard = Black Lotus; Strip Mine
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Accept
+Bot1.Target(Ornithopter)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Ornithopter.Power = 0
+? Exile = Restoration Seminar
+
+[Expect]
+Stack.Count = 0
+Exile = Restoration Seminar
+Bot1.Graveyard = Black Lotus; Strip Mine

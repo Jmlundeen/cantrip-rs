@@ -168,3 +168,19 @@ out of `elsewhere`.
 
 **Scenarios.**
 - [`scenarios/warp-cost-is-not-offered-for-a-card-cast-from-exile.cantrip`](../scenarios/warp-cost-is-not-offered-for-a-card-cast-from-exile.cantrip) - Nova Hellkite in exile, `! Exile.Cast(Ability: Warp)` (marked `# Known bug`).
+
+### KI-11: A paradigm delayed trigger ends when its card leaves exile
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Suspected | engine | 2026-10-16, Restoration Seminar |
+
+**Notes.** Paradigm (CR 702.192a) creates a delayed triggered ability when the first spell of that name resolves, which triggers at
+the beginning of each of its controller's first main phases for the rest of the game; the ruling: once it has resolved, it does
+not matter what happens to the card in exile, and the copy is still made. `cantrip_mechanics::paradigm::TRIGGER` is instead the
+card's own triggered ability, kept in exile and asked of the card object that the first spell became (`is_the_first_to_resolve`),
+so if that card leaves exile (any effect that moves a card out of exile) the trigger stops, since the API has no delayed trigger
+that lasts for the rest of the game. Affects Germination Practicum, Improvisation Capstone and Restoration Seminar. No implemented
+card moves a card out of exile that is not its own, so no scenario can reach it yet.
+
+**Scenarios.** None yet; the first card that moves another player's exiled card (to hand, to a library, or exiles it again) reaches it.
