@@ -1,0 +1,43 @@
+# Restoration Magic, Cura ({W} + {1}) on Mother of Runes; Bot2 answers with Lightning Bolt, which resolves first and kills
+# the 1/1. The spell's only target is illegal on resolution, so it is countered and none of its effects happen: Bot1 does
+# not gain the 3 life (CR 608.2b), and the Restoration Magic goes to the graveyard.
+
+[Bot1 Deck]
+Plains
+Plains
+Mother of Runes
+Restoration Magic
+Plains x3
+Plains x13
+
+[Bot2 Deck]
+Mountain
+Mountain
+Lightning Bolt
+Mountain x4
+Mountain x13
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Mother of Runes.Cast
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Restoration Magic.Cast
+Bot1.Modes(Cura)
+Bot1.Target(Bot1.Battlefield.Mother of Runes)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Mother of Runes)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 20
+Bot1.Graveyard = Restoration Magic; Mother of Runes
+Bot2.Graveyard = Lightning Bolt
+Stack.Count = 0

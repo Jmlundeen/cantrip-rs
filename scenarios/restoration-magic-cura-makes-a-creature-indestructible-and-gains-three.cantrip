@@ -1,0 +1,52 @@
+# Restoration Magic, Cura ({W} + {1}, both Plains): in response to Bot2's Pyroclasm, which deals 2 damage to each
+# creature without targeting, Bot1's Mother of Runes gains hexproof and indestructible until end of turn and Bot1 gains
+# 3 life. Indestructible keeps the 1/1 alive through lethal damage (CR 702.12b); Bot2's Ornithopter, with no protection,
+# is the negative control and dies in the same Pyroclasm (CR 704.5g).
+
+[Bot1 Deck]
+Plains
+Plains
+Mother of Runes
+Restoration Magic
+Plains x3
+Plains x13
+
+[Bot2 Deck]
+Mountain
+Mountain
+Ornithopter
+Pyroclasm
+Mountain x3
+Mountain x13
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Mother of Runes.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mountain#2.Activate
+Bot2.Hand.Pyroclasm.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Restoration Magic.Cast
+Bot1.Modes(Cura)
+Bot1.Target(Bot1.Battlefield.Mother of Runes)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 23
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Mother of Runes.Keywords = Hexproof; Indestructible
+Bot1.Battlefield.Mother of Runes.Damage = 2
+Bot1.Graveyard = Restoration Magic
+Bot2.Graveyard = Ornithopter; Pyroclasm
+Bot1.Life = 23

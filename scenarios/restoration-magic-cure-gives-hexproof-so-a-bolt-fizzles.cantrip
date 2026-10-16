@@ -1,0 +1,48 @@
+# Restoration Magic, tiered (CR 702.183a): Cure costs {0} on top of the {W}, so one Plains pays for it. In response to
+# Bot2's Lightning Bolt at Mother of Runes, Bot1 gives the Mother hexproof and indestructible until end of turn; the Bolt's
+# only target is illegal on resolution (CR 608.2b), so it does nothing and Bot1 gains no life (Cure has no life gain).
+# The spell's mana value stays 1 whatever the mode (CR 702.183a, 202.3).
+
+[Bot1 Deck]
+Plains
+Plains
+Mother of Runes
+Restoration Magic
+Plains x3
+Plains x13
+
+[Bot2 Deck]
+Mountain
+Mountain
+Lightning Bolt
+Pyroclasm
+Mountain x3
+Mountain x13
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Mother of Runes.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Mother of Runes)
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Restoration Magic.Cast
+Bot1.Modes(Cure)
+Bot1.Target(Bot1.Battlefield.Mother of Runes)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mother of Runes.Keywords = Hexproof; Indestructible
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Mother of Runes.Keywords = Hexproof; Indestructible
+Bot1.Graveyard = Restoration Magic
+Bot2.Graveyard = Lightning Bolt
+Bot1.Life = 20

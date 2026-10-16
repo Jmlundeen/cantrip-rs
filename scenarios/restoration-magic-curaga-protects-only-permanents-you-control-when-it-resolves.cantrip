@@ -1,0 +1,46 @@
+# Restoration Magic, Curaga ({W} + {3}{W}, paid with Black Lotus, Mox Pearl and a Plains): it has no target (no target
+# question is asked, CR 115.1), and "permanents you control" are the ones there are as it resolves, and only those
+# (CR 611.2c). Mother of Runes, Mox Pearl and the first Plains gain hexproof
+# and indestructible until end of turn and Bot1 gains 6 life. The Plains played after it resolves does not, and neither
+# does Bot2's Mountain (not a permanent Bot1 controls).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Black Lotus
+Mother of Runes
+Restoration Magic
+Plains
+Plains
+Plains x13
+
+[Bot2 Deck]
+Mountain
+Mountain x19
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Mother of Runes.Cast
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Restoration Magic.Cast
+Bot1.Modes(Curaga)
+! Bot1.Target
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Plains.Play
+
+[Expect]
+Bot1.Life = 26
+Bot1.Graveyard = Restoration Magic; Black Lotus
+Bot1.Battlefield.Mother of Runes.Keywords = Hexproof; Indestructible
+Bot1.Battlefield.Mox Pearl.Keywords = Hexproof; Indestructible
+Bot1.Battlefield.Plains#1.Keywords = Hexproof; Indestructible
+Bot1.Battlefield.Plains#2.Keywords = (absent)
+Bot2.Battlefield.Mountain.Keywords = (absent)

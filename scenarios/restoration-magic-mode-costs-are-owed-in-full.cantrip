@@ -1,0 +1,36 @@
+# Restoration Magic, tiered (CR 702.183a): the mode's cost is paid on top of {W}, so each mode needs its own mana. With
+# the only Plains tapped for Mother of Runes the spell is not offered at all (positive control: with the Plains back it
+# is). With that one Plains, Cure ({0}) pays but Cura ({1}) and Curaga ({3}{W}) each still owe their cost when the
+# Plains has paid {W}: those casts are cancelled, and the same Plains then casts Cure.
+
+[Bot1 Deck]
+Plains
+Plains
+Mother of Runes
+Restoration Magic
+Plains x3
+Plains x13
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Mother of Runes.Cast
+! Bot1.Hand.Restoration Magic.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Restoration Magic.Cast
+Bot1.Modes(Cura)
+Bot1.Target(Bot1.Battlefield.Mother of Runes)
+Bot1.Cancel
+Bot1.Hand.Restoration Magic.Cast
+Bot1.Modes(Curaga)
+Bot1.Cancel
+Bot1.Hand.Restoration Magic.Cast
+Bot1.Modes(Cure)
+Bot1.Target(Bot1.Battlefield.Mother of Runes)
+
+[Expect]
+Bot1.Graveyard = Restoration Magic
