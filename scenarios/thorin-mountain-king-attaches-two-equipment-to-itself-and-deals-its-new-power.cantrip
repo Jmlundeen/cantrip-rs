@@ -1,0 +1,76 @@
+# Thorin enters (turn 3) with Skullclamp and Sword of the Meek unattached in play and targets itself and both Equipment (any
+# number of targets, CR 115.1d). Both become attached, so Thorin is 3/4 +1/-1 +1/+2 = 5/5, and the reflexive ability has it deal
+# damage equal to its power, 5 (read after the attach), to Bot2's 4/4 Ulvenwald Oddity, which dies.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Emerald
+Mox Jet
+Skullclamp
+Sword of the Meek
+Thorin, Mountain-king
+Island
+Island x20
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Sol Ring
+Ulvenwald Oddity
+Forest x2
+Forest x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Skullclamp.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sword of the Meek.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Hand.Ulvenwald Oddity.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Thorin, Mountain-king.Cast
+Bot1.Pass
+Bot1.Target(Thorin, Mountain-king)
+Bot1.Target(Skullclamp; Sword of the Meek)
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Ulvenwald Oddity)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Skullclamp.AttachedTo = Thorin, Mountain-king
+Bot1.Battlefield.Sword of the Meek.AttachedTo = Thorin, Mountain-king
+Bot1.Battlefield.Thorin, Mountain-king.Power = 5
+Bot1.Battlefield.Thorin, Mountain-king.Toughness = 5
+Bot2.Graveyard = Ulvenwald Oddity
+Bot2.Battlefield = Forest; Mox Emerald; Mox Jet; Sol Ring

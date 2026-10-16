@@ -1,0 +1,60 @@
+# Thorin's trigger targets Llanowar Elves and the unattached Sword of the Meek (turn 3); in response Bot2 kills the Elves with
+# Lightning Bolt. The Elves are no longer a legal target (CR 608.2b) so there is nothing to attach the Sword to: it stays
+# unattached, nothing "becomes attached" and the reflexive ability never triggers (the bare refusal).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Emerald
+Llanowar Elves
+Sword of the Meek
+Thorin, Mountain-king
+Island
+Island x20
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x5
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sword of the Meek.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Hand.Thorin, Mountain-king.Cast
+Bot1.Pass
+Bot1.Target(Llanowar Elves)
+Bot1.Target(Sword of the Meek)
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Llanowar Elves
+Bot1.Battlefield.Sword of the Meek.AttachedTo = (absent)
+Bot2.Graveyard = Lightning Bolt

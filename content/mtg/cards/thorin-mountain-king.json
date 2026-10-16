@@ -1,0 +1,11 @@
+{
+  "name": "Thorin, Mountain-king",
+  "manaCost": "{3}{R}",
+  "type": "Legendary Creature — Dwarf Noble",
+  "power": 3,
+  "toughness": 4,
+  "oracleText": "Trample\nWhen Thorin enters, attach any number of target Equipment you control to target creature you control. When one or more Equipment become attached to that creature this way, that creature deals damage equal to its power to up to one target creature.",
+  "keywords": [
+    "Trample"
+  ]
+}

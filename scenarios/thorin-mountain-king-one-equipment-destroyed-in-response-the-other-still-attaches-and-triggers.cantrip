@@ -1,0 +1,69 @@
+# Thorin targets itself, Skullclamp and Sword of the Meek (turn 3); in response Bot2 destroys Skullclamp with Disenchant. The Sword is
+# still a legal target and becomes attached (CR 608.2b), so the reflexive ability triggers: Thorin, now 4/6, deals 4 damage to itself
+# (it is a creature, so "up to one target creature" may be it) and survives with 4 damage.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Emerald
+Mox Jet
+Skullclamp
+Sword of the Meek
+Thorin, Mountain-king
+Island
+Island x20
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Disenchant
+Plains x4
+Plains x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Skullclamp.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sword of the Meek.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Thorin, Mountain-king.Cast
+Bot1.Pass
+Bot1.Target(Thorin, Mountain-king)
+Bot1.Target(Skullclamp; Sword of the Meek)
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Skullclamp)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Thorin, Mountain-king)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Skullclamp
+Bot1.Battlefield.Sword of the Meek.AttachedTo = Thorin, Mountain-king
+Bot1.Battlefield.Thorin, Mountain-king.Power = 4
+Bot1.Battlefield.Thorin, Mountain-king.Toughness = 6
+Bot1.Battlefield.Thorin, Mountain-king.Damage = 4

@@ -1,0 +1,72 @@
+# Thorin, Mountain-king enters (turn 3) with Llanowar Elves and an unattached Sword of the Meek in play. The trigger attaches the
+# Sword to the Elves, and "that creature deals damage equal to its power": the Elves, now 2/3, not Thorin (3 power), deal 2 to
+# Bot2's Ulvenwald Oddity, which survives with 2 damage. The creature slot is asked first, then the Equipment.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Emerald
+Llanowar Elves
+Sword of the Meek
+Thorin, Mountain-king
+Island
+Island x20
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Sol Ring
+Ulvenwald Oddity
+Forest x2
+Forest x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sword of the Meek.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Hand.Ulvenwald Oddity.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Hand.Thorin, Mountain-king.Cast
+Bot1.Pass
+Bot1.Target(Llanowar Elves)
+Bot1.Target(Sword of the Meek)
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Ulvenwald Oddity)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Sword of the Meek.AttachedTo = Llanowar Elves
+Bot1.Battlefield.Llanowar Elves.Power = 2
+Bot1.Battlefield.Llanowar Elves.Toughness = 3
+Bot1.Battlefield.Thorin, Mountain-king.Power = 3
+Bot2.Battlefield.Ulvenwald Oddity.Damage = 2
