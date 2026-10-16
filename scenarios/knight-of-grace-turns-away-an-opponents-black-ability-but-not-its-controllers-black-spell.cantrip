@@ -1,0 +1,57 @@
+# Hexproof from black (CR 702.11d) also turns away abilities an opponent controls from black sources, and only an
+# opponent's: Bot2's Bloodtithe Harvester (black and red) can't target Knight of Grace with its -X/-X ability, and
+# targets Knight of Malice instead (hexproof from white is nothing to a black and red source), which dies as a 3/2
+# getting -2/-2. While the Harvester, a black permanent, is on the battlefield, Knight of Grace is 3/2. Then Bot1 casts
+# its own Fatal Push on its own Knight of Grace: its controller is not an opponent, so the black spell may target it.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Sol Ring
+Knight of Grace
+Knight of Malice
+Fatal Push
+Island x10
+
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Bloodtithe Harvester
+Island
+Island
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Knight of Grace.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Knight of Malice.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Bloodtithe Harvester.Cast
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Knight of Grace.Power = 3
+! Bot2.Battlefield.Bloodtithe Harvester.Activate(Bot1.Battlefield.Knight of Grace)
+Bot2.Battlefield.Bloodtithe Harvester.Activate(Bot1.Battlefield.Knight of Malice)
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Fatal Push.Cast(Knight of Grace)
+Bot1.Pass
+
+[Expect]
+Turn = 5
+Bot1.Graveyard = Fatal Push; Knight of Grace; Knight of Malice
+Bot2.Graveyard = Bloodtithe Harvester

@@ -1,0 +1,46 @@
+# "Any effect that causes an object to lose hexproof will cause an object to lose all 'hexproof from [quality]'
+# abilities" (CR 702.11e; Knight of Grace's ruling). Bot2's Fatal Push can't target Knight of Grace (hexproof from
+# black) on turn 2. On turn 4 Bot2's Shadowspear makes the permanents Bot1 controls lose hexproof until end of turn,
+# and the same Fatal Push then destroys the Knight.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Knight of Grace
+Island x14
+
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Shadowspear
+Fatal Push
+Island
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Knight of Grace.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Shadowspear.Cast
+Bot2.Pass
+! Bot2.Hand.Fatal Push.Cast(Bot1.Battlefield.Knight of Grace)
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Shadowspear.Activate(Ability: lose hexproof)
+Bot2.Pass
+Bot2.Battlefield.Mox Jet.Activate
+? Bot1.Battlefield.Knight of Grace.HexproofFrom = (absent)
+Bot2.Hand.Fatal Push.Cast(Bot1.Battlefield.Knight of Grace)
+Bot2.Pass
+
+[Expect]
+Turn = 4
+Bot1.Graveyard = Knight of Grace

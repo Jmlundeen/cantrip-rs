@@ -1,0 +1,60 @@
+# "Hexproof from black" and "a black permanent" are words of Knight of Grace's text (CR 612.2). Trait Doctoring
+# replaces black with red in it until end of turn: the Knight now has hexproof from red, so Bot2's Lightning Bolt
+# can't target it, and Bot2's Fatal Push (black) can; and it gets +1/+0 for a red permanent, Bot1's Dwarven Mauler
+# (2/2 before the change, with no black permanent anywhere, 3/2 after).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Ruby
+Mox Sapphire
+Knight of Grace
+Dwarven Mauler
+Trait Doctoring
+Island x10
+
+[Bot2 Deck]
+Mountain
+Mox Jet
+Lightning Bolt
+Fatal Push
+Island
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Knight of Grace.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Dwarven Mauler.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Knight of Grace.Power = 2
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Trait Doctoring.Cast(Knight of Grace)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Replace a color word)
+Bot1.Colors(Black)
+Bot1.Colors(Red)
+Bot1.Pass
+? Bot1.Battlefield.Knight of Grace.HexproofFrom = Red
+? Bot1.Battlefield.Knight of Grace.Power = 3
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Jet.Activate
+! Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Knight of Grace)
+Bot2.Hand.Fatal Push.Cast(Bot1.Battlefield.Knight of Grace)
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Knight of Grace
+Bot2.Graveyard = Fatal Push

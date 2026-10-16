@@ -1,0 +1,11 @@
+{
+  "name": "Knight of Grace",
+  "manaCost": "{1}{W}",
+  "type": "Creature — Human Knight",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "First strike (This creature deals combat damage before creatures without first strike.)\nHexproof from black (This creature can't be the target of black spells or abilities your opponents control.)\nThis creature gets +1/+0 as long as any player controls a black permanent.",
+  "keywords": [
+    "FirstStrike"
+  ]
+}
