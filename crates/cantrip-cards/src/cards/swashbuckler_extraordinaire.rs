@@ -1,0 +1,45 @@
+use cantrip_api::*;
+use cantrip_mechanics::tokens::{self, TREASURE};
+use cantrip_mechanics::{choose, targets, triggers};
+use cantrip_oracle as oracle;
+
+/// When this creature enters, create a Treasure token.
+fn treasure(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    tokens::create(g, item.controller, &TREASURE, 1)?;
+    Ok(())
+}
+
+/// You may sacrifice one or more Treasures (any Treasure you control, token or not), together (CR 701.21). When you do
+/// (CR 603.12), the reflexive ability triggers counting them: "that many" is the number sacrificed, and none sacrificed
+/// is not doing it.
+fn sacrifice_treasures(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let you = item.controller;
+    let treasures: Vec<ObjectId> = g.permanents_of(you).into_iter().filter(|&id| g.chars(id).has_subtype(Subtype::Treasure)).collect();
+    let chosen = choose::cards_from_kind(g, you, item.object, Purpose::Sacrifice, "Treasure", treasures.clone(), treasures, u8::MAX, true)?;
+    let sacrificed = g.sacrifice(&chosen);
+    if !sacrificed.is_empty() {
+        let this = g.card_id(&CARD);
+        g.reflexive_trigger_counted(item.object, you, AbilityRef::delayed(this, 0), Target::None, sacrificed.len() as u16);
+    }
+    Ok(())
+}
+
+/// Up to that many target creatures gain double strike until end of turn: each target still legal (CR 608.2b).
+fn double_strike(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    for creature in targets::legal_objects(g, item) {
+        g.add_effect(item.object, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::DoubleStrike])), Duration::EndOfTurn);
+    }
+    Ok(())
+}
+
+pub static CARD: CardDef = CardDef {
+    abilities: &[
+        triggered(triggers::THIS_ENTERS, treasure, "When this creature enters, create a Treasure token."),
+        triggered(triggers::YOU_ATTACK, sacrifice_treasures, "Whenever you attack, you may sacrifice one or more Treasures. When you do, up to that many target creatures gain double strike until end of turn."),
+    ],
+    delayed: &[delayed_trigger(double_strike, "When you do, up to that many target creatures gain double strike until end of turn.")
+        .targets(&[targets::CREATURE.between(0, TargetSpec::COUNTED)])],
+    ..oracle::SWASHBUCKLER_EXTRAORDINAIRE
+};
+
+pub static EXTRA: &[&CardDef] = &[&TREASURE];

@@ -1,0 +1,28 @@
+# Swashbuckler Extraordinaire: Bot1 attacks with it and chooses to sacrifice no Treasure. Then it did not sacrifice "one
+# or more Treasures", and the reflexive ability does not trigger (CR 603.12): no target is asked for, the Treasure
+# stays, and the Swashbuckler deals its 2 once. The scenario that sacrifices is the positive control.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Swashbuckler Extraordinaire
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Swashbuckler Extraordinaire.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Swashbuckler Extraordinaire > Bot2)
+Bot1.Choose()
+! Bot1.Target
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield = Mountain; Swashbuckler Extraordinaire; Treasure Token
+Bot1.Battlefield.Swashbuckler Extraordinaire.Keywords = (absent)

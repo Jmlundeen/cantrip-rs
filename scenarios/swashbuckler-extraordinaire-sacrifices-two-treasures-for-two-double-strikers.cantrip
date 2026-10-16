@@ -1,0 +1,48 @@
+# Swashbuckler Extraordinaire: entering on turn 1 it makes a Treasure; Deadly Dispute (sacrificing an Ornithopter) makes
+# a second on turn 3. Bot1 attacks with the Swashbuckler and its other Ornithopter, "whenever you attack" triggers
+# (CR 508.1m), and Bot1 sacrifices both Treasures. The reflexive ability (CR 603.12) takes up to two targets: three are
+# refused, and the two attackers gain double strike (CR 702.4): the Swashbuckler deals its 2 twice.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Swashbuckler Extraordinaire
+Ornithopter
+Ornithopter
+Swamp
+Deadly Dispute
+Island x13
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Swashbuckler Extraordinaire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Deadly Dispute.Cast
+Bot1.Choose(Ornithopter)
+[T3 Bot1.BeginCombat]
+? Bot1.Battlefield = Mountain; Swamp; Swashbuckler Extraordinaire; Ornithopter; Treasure Token; Treasure Token
+Bot1.Attack(Swashbuckler Extraordinaire; Bot1.Battlefield.Ornithopter > Bot2)
+Bot1.Choose(Treasure Token; Treasure Token)
+! Bot1.Target(Swashbuckler Extraordinaire; Bot1.Battlefield.Ornithopter; Bot2.Battlefield.Ornithopter)
+Bot1.Target(Swashbuckler Extraordinaire; Bot1.Battlefield.Ornithopter)
+[T3 Bot1.CombatDamage]
+? Bot1.Battlefield.Swashbuckler Extraordinaire.Keywords = DoubleStrike
+? Bot2.Battlefield.Ornithopter.Keywords = Flying
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot1.Battlefield = Mountain; Swamp; Swashbuckler Extraordinaire; Ornithopter
