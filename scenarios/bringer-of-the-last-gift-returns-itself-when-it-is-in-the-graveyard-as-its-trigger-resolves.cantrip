@@ -1,0 +1,67 @@
+# Bot2 destroys the Bringer with Infernal Grasp while its enters trigger is on the stack. The trigger still resolves (the
+# source's presence is not needed, CR 113.7a) and "if you cast it" was checked as it triggered: each player's other
+# creatures are sacrificed (Bot1's Ornithopter, Bot2's Elvish Mystic), and then every creature card that was not put into
+# a graveyard that way returns - the Llanowar Elves Entomb put there, and the Bringer itself, which was put there by the
+# Grasp, not "this way". Returned, it was not cast, so it triggers nothing more.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Bringer of the Last Gift
+Ornithopter
+Swamp x13
+
+[Bot2 Deck]
+Swamp
+Mox Ruby
+Mox Emerald
+Entomb
+Infernal Grasp
+Elvish Mystic
+Mox Jet
+Island
+Llanowar Elves
+Island x11
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Entomb.Cast
+Bot2.Search(Llanowar Elves)
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Bringer of the Last Gift.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Infernal Grasp.Cast(Bot1.Battlefield.Bringer of the Last Gift)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Jet; Mox Ruby; Mox Pearl; Mox Emerald; Swamp; Bringer of the Last Gift
+Bot1.Graveyard = Ornithopter; Black Lotus
+Bot1.Life = 20
+Bot2.Life = 18
+Bot2.Battlefield = Swamp; Mox Ruby; Mox Emerald; Mox Jet; Llanowar Elves
+Bot2.Graveyard = Elvish Mystic; Infernal Grasp; Entomb
+Stack.Count = 0
