@@ -6,9 +6,16 @@
 
 use cantrip_api::*;
 
-/// "As long as you have an enduring story" (CR 702.195b): the controller of `source` has the designation.
+/// "If you have an enduring story" (CR 702.195b): `player` has the designation. Balin, Loremaster asks it as its ability
+/// resolves, of the ability's controller, and Kíli the Resourceful of its controller.
+pub fn has_an_enduring_story(s: &GameState, player: PlayerId) -> bool {
+    s.player(player).enduring_story
+}
+
+/// "As long as you have an enduring story" (CR 702.195b), in a static ability: the controller of `source` has the
+/// designation.
 pub fn you_have_an_enduring_story(s: &GameState, source: ObjectId) -> bool {
-    s.player(s.obj(source).controller).enduring_story
+    has_an_enduring_story(s, s.obj(source).controller)
 }
 
 /// "As long as you have an enduring story, [this creature] gets ..." as a static ability's `StaticDef::affects`: the

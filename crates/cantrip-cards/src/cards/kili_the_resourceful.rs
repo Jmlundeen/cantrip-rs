@@ -9,7 +9,7 @@ use cantrip_oracle as oracle;
 fn free_first_equip(q: &dyn Query, asker: &Asker, activator: PlayerId, _: ObjectId, def: &ActivatedDef) -> Option<ManaCost> {
     if !def.equip
         || activator != asker.controller
-        || !storied::you_have_an_enduring_story(q.state(), asker.source)
+        || !storied::has_an_enduring_story(q.state(), activator)
         || activated_an_equip_ability_this_turn(q, activator)
     {
         return None;
