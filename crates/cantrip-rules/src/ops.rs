@@ -1469,17 +1469,20 @@ pub fn deal_damage_with(
     if amount == 0 {
         return None;
     }
+    // CR 614.1a, 614.6: the replacement effects may change whom the damage is dealt to ("is dealt to this creature
+    // instead") as well as how much; what is left is dealt to whomever they leave it with, by the same source. Protection,
+    // infect, lifelink, deathtouch, loyalty and defense are judged against that recipient.
     let event = replace::damage(cx, DamageEvent { source, target, amount, combat, heal_marked: false });
-    let (amount, heal_marked) = (event.amount, event.heal_marked);
+    let (target, amount, heal_marked) = (event.target, event.amount, event.heal_marked);
     if amount == 0 {
         return None;
     }
+    // Protection prevents the damage (CR 702.16e, 702.16j) unless it can't be prevented (CR 615.12). Where replacement
+    // effects applied, protection was ordered with them (CR 616.1) and has prevented it already if it applies.
     let source_chars = layers::chars(cx.cards(), cx.s(), source);
     match target {
         Target::None | Target::Ability(_) => None,
         Target::Player(p) => {
-            // Protection from everything prevents all damage to the player (CR 702.16j, 702.16e), unless it can't be
-            // prevented (CR 615.12).
             if cx.s().effects.iter().any(|e| e.kind == EffectKind::PlayerProtectionFromEverything && e.controller == p)
                 && damage_can_be_prevented(cx, source, combat)
             {
@@ -1503,7 +1506,6 @@ pub fn deal_damage_with(
                 return None;
             }
             let target_chars = layers::chars(cx.cards(), cx.s(), id);
-            // Protection prevents the damage (CR 702.16e) unless it can't be prevented (CR 615.12).
             let source_controller = cx.s().obj(source).controller;
             if target_chars.protected_from_by(&source_chars, source_controller) && damage_can_be_prevented(cx, source, combat) {
                 return None;
@@ -1545,6 +1547,31 @@ pub fn deal_damage_with(
             Some(Event::Damage { source, target, amount, combat })
         }
     }
+}
+
+/// Whether protection prevents the damage `source` is about to deal to `target` (CR 702.16e): a permanent's protection from
+/// the source's qualities or its controller, or a player's protection from everything (CR 702.16j), unless the damage can't
+/// be prevented (CR 615.12). The object whose protection it is - the permanent, or the source of the player's effect - for
+/// a player ordering it with replacement effects (CR 616.1).
+pub(crate) fn protection_prevents(cx: &Cx, source: ObjectId, target: Target, combat: bool) -> Option<ObjectId> {
+    let by = match target {
+        Target::Player(p) => {
+            cx.s().effects.iter().find(|e| e.kind == EffectKind::PlayerProtectionFromEverything && e.controller == p)?.source
+        }
+        Target::Object(id) => {
+            if !live(cx.s(), id) || !cx.s().obj(id).zone.is(ZoneKind::Battlefield) {
+                return None;
+            }
+            let target_chars = layers::chars(cx.cards(), cx.s(), id);
+            let source_chars = layers::chars(cx.cards(), cx.s(), source);
+            if !target_chars.protected_from_by(&source_chars, cx.s().obj(source).controller) {
+                return None;
+            }
+            id
+        }
+        _ => return None,
+    };
+    damage_can_be_prevented(cx, source, combat).then_some(by)
 }
 
 /// Whether a prevention effect may prevent the damage `source` is about to deal (CR 615.12): not in a turn an effect said

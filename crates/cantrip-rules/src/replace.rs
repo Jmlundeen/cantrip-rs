@@ -20,6 +20,9 @@ enum Origin {
     Granted(u32),
     /// Madness's static ability (CR 702.35a), the core's own keyword replacement, of the discarded card itself.
     Madness,
+    /// Protection's prevention of damage (CR 702.16e, 702.16j), a prevention effect ordered with the replacement effects that
+    /// would change the same damage (CR 616.1): of the protected permanent, or the source of a player's protection.
+    Protection,
 }
 
 /// One effect that applies to the event: its source, and which of the source's replacements it is.
@@ -35,6 +38,9 @@ type Applied = (ObjectId, u8, Origin);
 
 /// What madness's replacement says it does, for the player who orders it with others (CR 616.1).
 const MADNESS_HINT: &str = "madness discards it into exile, then it may be cast for its madness cost";
+
+/// What protection's prevention says it does, for the player who orders it with others (CR 616.1).
+const PROTECTION_HINT: &str = "protection prevents the damage";
 
 /// Madness (CR 702.35a): "If a player would discard this card, that player discards it, but exiles it instead of putting
 /// it into their graveyard." A static ability of the card itself, functioning while it is in a hand; once another
@@ -115,6 +121,12 @@ fn affected(cx: &Cx, proposal: &Proposal) -> PlayerId {
 /// Every effect that applies to the event and has not been applied to it yet (CR 614.5), in a deterministic order:
 /// by source, then by the order the card lists them.
 fn candidates(cx: &Cx, proposal: &Proposal, applied: &[Applied]) -> Vec<Candidate> {
+    // Damage that has been prevented in full is no event any more: nothing is left to replace (CR 615.1).
+    if let Proposal::Damage(d) = proposal
+        && d.amount == 0
+    {
+        return Vec::new();
+    }
     let cards = cx.cards();
     let kind = proposal.kind();
     let subject = subject_of(proposal);
@@ -176,6 +188,17 @@ fn candidates(cx: &Cx, proposal: &Proposal, applied: &[Applied]) -> Vec<Candidat
     {
         found.insert(0, Candidate { source: z.object, index: 0, origin: Origin::Madness });
     }
+    // Protection of whoever the damage would now be dealt to (CR 702.16e), ordered with the effects that would change it
+    // (CR 616.1): prevented first, nothing is redirected; redirected first, it is judged again at its new recipient. It is
+    // offered first, as the order the protected player almost always wants. Only asked about where some other effect
+    // applies too: alone, `ops::deal_damage_with` prevents the damage itself.
+    if let Proposal::Damage(d) = proposal
+        && !found.is_empty()
+        && let Some(by) = crate::ops::protection_prevents(cx, d.source, d.target, d.combat)
+        && !applied.contains(&(by, 0, Origin::Protection))
+    {
+        found.insert(0, Candidate { source: by, index: 0, origin: Origin::Protection });
+    }
     found
 }
 
@@ -186,6 +209,7 @@ fn hint_of(cx: &Cx, c: &Candidate) -> &'static str {
         Origin::Printed => card.replacements[c.index as usize].hint,
         Origin::Granted(_) => card.granted_replacements[c.index as usize].hint,
         Origin::Madness => MADNESS_HINT,
+        Origin::Protection => PROTECTION_HINT,
     }
 }
 
@@ -200,6 +224,10 @@ fn choose(cx: &mut Cx, proposal: &Proposal, found: &[Candidate]) -> usize {
         },
         sources: found.iter().map(|c| c.source).collect(),
         hints: found.iter().map(|c| hint_of(cx, c)).collect(),
+        damage: match proposal {
+            Proposal::Damage(d) => Some(DamageAbout { source: d.source, to: d.target, amount: d.amount }),
+            _ => None,
+        },
     };
     match cx.ask_core(affected(cx, proposal), ask, false) {
         Ok(Answer::Index(i)) if (i as usize) < found.len() => i as usize,
@@ -242,6 +270,12 @@ fn apply(cx: &mut Cx, proposal: &mut Proposal) {
                 if let Proposal::ZoneChange(z) = proposal {
                     z.to = Zone::exile(z.to.player);
                     z.madness = true;
+                }
+            }
+            // CR 702.16e, 615.1: the damage is prevented, all of it.
+            Origin::Protection => {
+                if let Proposal::Damage(d) = proposal {
+                    d.amount = 0;
                 }
             }
         }
@@ -343,7 +377,9 @@ pub fn token_batch(cx: &mut Cx, tokens: &[(CardId, PlayerId)]) -> Option<Vec<(Ca
     changed.then_some(out)
 }
 
-/// Damage about to be dealt (CR 614.1a, 120.3): what remains of it once every effect has applied.
+/// Damage about to be dealt (CR 614.1a, 120.3): what remains of it once every effect has applied - how much, and whom it
+/// is dealt to, which a redirection ("is dealt to this creature instead") changes, after which the effects not yet
+/// applied are judged again against the new recipient and its controller orders them (CR 614.6, 616.1f).
 pub fn damage(cx: &mut Cx, event: DamageEvent) -> DamageEvent {
     if !possible(cx, None) {
         return event;

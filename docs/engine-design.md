@@ -290,7 +290,33 @@ that gain life, and "can't lose life" (CR 119.8).
 so (Bonecrusher Giant's Stomp) or a `CardDef::unpreventable_damage` static (Questing Beast's combat damage,
 `statics::damage_cant_be_prevented` for Sunspine Lynx and Leyline of Punishment). Protection (CR 702.16e, of a permanent or a
 player's protection from everything) is the only prevention effect the engine has today; a prevention shield or other
-prevention effect added later must ask the same function.
+prevention effect added later must ask the same function, and be ordered with the replacement effects that change the same
+damage, as protection is (below).
+
+### Damage redirected, and damage that stays
+
+A replacement effect may change whom damage is dealt to as well as how much (CR 614.1a: "all damage that would be dealt to
+you and other permanents you control is dealt to this creature instead"): `DamageEvent::target` is the recipient, and
+`ops::deal_damage_with` deals what the effects leave to whomever they leave it with, by the same source and still combat
+damage if it was (the rulings). Everything about the recipient is judged there: protection, infect's counters or poison,
+lifelink, deathtouch, a planeswalker's loyalty, a battle's defense, the monarch's combat-damage steal and the `Damage`
+event "deals combat damage to a player" triggers read. Once one effect has applied, the others are judged again against the
+changed event and its recipient's controller orders them (CR 614.6, 616.1f), each applying once (CR 614.5), so with two such
+creatures the damage passes from the one whose effect applied first to the other: the player chooses which takes it, as the
+rulings say. Protection's prevention is ordered with them (CR 616.1, `replace::Origin::Protection`): Pyroclasm's damage to a
+protected creature is either prevented or redirected, as its controller chooses, and protection of the new recipient
+prevents what reaches it. The question carries the damage as the effects have left it (`RequestKind::ChooseReplacement::
+damage`), which the host words into the prompt's `Event` ("3 damage from Lightning Bolt to you"). Ancient Adamantoise has
+the redirection (`cantrip_mechanics::replacements::DAMAGE_TO_YOU_AND_YOUR_OTHER_PERMANENTS_IS_DEALT_TO_THIS`, which Palisade
+Giant prints too).
+
+The cleanup step removes all marked damage (CR 514.2) except from a permanent a static ability keeps it on:
+`CardDef::damage_stays` (`DamageStaysRule`, asked of each damaged permanent by the permanents on the battlefield with their
+abilities, only in a cleanup step with damage marked). Ancient Adamantoise's "damage isn't removed from this creature during
+cleanup steps"; Patient Zero's "from creatures your opponents control" and Case of the Market Melee's "from creatures" are the
+same rule. Effects that remove all damage still do (regeneration, CR 701.19a), and a permanent that leaves and comes back is a
+new object with none (CR 400.7). Having been dealt deathtouch damage is cleared either way: it matters only to the next check
+of state-based actions (CR 704.5h).
 
 ### Miracle, printed and given
 
@@ -579,7 +605,7 @@ answering ... us per decision", one thread). The spike
 decision (2026-10-15), 5.90 us after ending the turn (CR 724) and the exact cleanup step (2026-10-16, 5.99 us before); 6.03-6.45 us after mana
 restricted to abilities of [type] sources (CR 106.6), against 6.08-6.14 us before on the same, noisy, machine. Costs that depend
 on the targets (CR 601.2c, 601.2f) and hexproof from a quality (CR 702.11d), 2026-10-16, three runs alternating with
-origin/main: 5.80, 6.03, 5.83 us before and 5.95, 5.89, 5.82 us after (5.89 mean both). Craft's materials as a cost (CR 702.167a): 5.65-5.94 us against 5.52-6.24 us before, interleaved on a busy machine. The enduring story's look at the board as each event happens (CR 702.195c, 2026-10-16) measured 6.15-6.55 us against 6.01-6.37 us before, alternating the two builds. Stack items record each target's slot (`StackItem::spec_of`, 16 bytes more per stack item): 5.92-6.42 us (best 5.92) against 5.87-5.99 us (best 5.87) before (2026-10-16). The solved designation, suspect and the play-rule walk (`each_play_rule`), alternating with the build before them: 6.38, 6.83, 6.33 us against 6.36, 6.50, 6.08 us (2026-10-16, a busy machine). The last six feature landings had taken it from 6.93 to 7.5-7.8 us; a sampling profile found
+origin/main: 5.80, 6.03, 5.83 us before and 5.95, 5.89, 5.82 us after (5.89 mean both). Craft's materials as a cost (CR 702.167a): 5.65-5.94 us against 5.52-6.24 us before, interleaved on a busy machine. The enduring story's look at the board as each event happens (CR 702.195c, 2026-10-16) measured 6.15-6.55 us against 6.01-6.37 us before, alternating the two builds. Stack items record each target's slot (`StackItem::spec_of`, 16 bytes more per stack item): 5.92-6.42 us (best 5.92) against 5.87-5.99 us (best 5.87) before (2026-10-16). The solved designation, suspect and the play-rule walk (`each_play_rule`), alternating with the build before them: 6.38, 6.83, 6.33 us against 6.36, 6.50, 6.08 us (2026-10-16, a busy machine). Damage redirection and damage that stays (CR 614.1a, 616.1, 514.2), seven runs alternating with origin/main on a busy machine: best 6.46 us against 6.36 us before, medians lost in the noise (2026-10-16). The last six feature landings had taken it from 6.93 to 7.5-7.8 us; a sampling profile found
 the cost in the layers, not in the new features' own code:
 
 - `chars()` rebuilt a card's printed values for every object on every question, and scanned the battlefield for

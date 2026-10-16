@@ -799,10 +799,19 @@ fn cleanup(cx: &mut Cx) -> R<()> {
             ops::discard_together(cx, &cards);
         }
     }
-    for id in cx.s().battlefield().to_vec() {
-        if cx.s().obj(id).damage > 0 || cx.s().obj(id).deathtouched {
+    // CR 514.2: all damage marked on permanents is removed, except where a static ability says it isn't ("damage isn't
+    // removed from this creature during cleanup steps"). Having been dealt deathtouch damage matters only to the next
+    // check of state-based actions (CR 704.5h), so that record goes either way.
+    let damaged: Vec<ObjectId> =
+        cx.s().battlefield().iter().copied().filter(|&id| cx.s().obj(id).damage > 0 || cx.s().obj(id).deathtouched).collect();
+    if !damaged.is_empty() {
+        let stays = crate::static_rules::damage_stays(cx, &damaged);
+        for id in damaged {
+            let keep = stays.contains(&id);
             cx.st().update_obj(id, |o| {
-                o.damage = 0;
+                if !keep {
+                    o.damage = 0;
+                }
                 o.deathtouched = false;
             });
         }

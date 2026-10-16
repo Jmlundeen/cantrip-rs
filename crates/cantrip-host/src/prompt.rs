@@ -113,11 +113,17 @@ pub fn request_objects(request: &Request) -> HashSet<ObjectId> {
             add(library);
             add(eligible);
         }
-        RequestKind::ChooseReplacement { subject, sources, .. } => {
+        RequestKind::ChooseReplacement { subject, sources, damage, .. } => {
             if let Some(s) = subject {
                 add(&[*s]);
             }
             add(sources);
+            if let Some(d) = damage {
+                add(&[d.source]);
+                if let Target::Object(to) = d.to {
+                    add(&[to]);
+                }
+            }
         }
     }
     out
@@ -579,6 +585,18 @@ fn face_text(game: &Game, face: CardId) -> String {
     if def.has_cost { format!("{} {}", def.name, def.cost) } else { def.name.to_string() }
 }
 
+/// Damage that replacement effects are about to change, in words for the player who orders them (CR 616.1): how much,
+/// from what and to whom as the effects applied so far have left it ("3 damage from Lightning Bolt to you").
+fn damage_words(game: &Game, asked: PlayerId, d: DamageAbout) -> String {
+    let to = match d.to {
+        Target::Player(p) if p == asked => "you".to_string(),
+        Target::Player(_) => "your opponent".to_string(),
+        Target::Object(id) => game.name(id).to_string(),
+        _ => "nothing".to_string(),
+    };
+    format!("{} damage from {} to {to}", d.amount, game.name(d.source))
+}
+
 fn handles_of(handles: &mut HandleSpace, ids: &[ObjectId]) -> Vec<ViewHandle> {
     ids.iter().map(|&id| handles.handle(id)).collect()
 }
@@ -984,15 +1002,17 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 owner: seat(owner),
             })
         }
-        RequestKind::ChooseReplacement { subject, life, sources, hints } => {
+        RequestKind::ChooseReplacement { subject, life, sources, hints, damage } => {
             PromptPayload::ChooseReplacementPromptMessage(ChooseReplacementPrompt {
                 player,
                 subject: subject.map_or(ViewHandle::NONE, |s| source_handle(game, handles, s)),
-                // A change of life is asked of the player whose life it is (CR 616.1).
-                event: match life {
-                    Some(n) if *n > 0 => format!("You would gain {n} life"),
-                    Some(n) => format!("You would lose {} life", n.unsigned_abs()),
-                    None => String::new(),
+                // A change of life is asked of the player whose life it is (CR 616.1); damage, of the player it would be
+                // dealt to or whose permanent it would be dealt to, as the effects so far have left it.
+                event: match (life, damage) {
+                    (Some(n), _) if *n > 0 => format!("You would gain {n} life"),
+                    (Some(n), _) => format!("You would lose {} life", n.unsigned_abs()),
+                    (None, Some(d)) => damage_words(game, request.player, *d),
+                    (None, None) => String::new(),
                 },
                 sources: sources.iter().map(|&s| source_handle(game, handles, s)).collect(),
                 hints: hints.iter().map(|h| (*h).to_string()).collect(),

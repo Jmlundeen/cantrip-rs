@@ -349,8 +349,23 @@ pub enum RequestKind {
     /// Which of several replacement effects applies to an event first (CR 616.1), asked of the affected player:
     /// `sources` are the objects whose effects apply and `hints` say what each does, in the order they are offered.
     /// `subject` is the object the event is about, if it is about one; `life`, for an event that changes the affected
-    /// player's life total (CR 119.3), how much: a gain above zero, a loss below.
-    ChooseReplacement { subject: Option<ObjectId>, life: Option<i32>, sources: Vec<ObjectId>, hints: Vec<&'static str> },
+    /// player's life total (CR 119.3), how much: a gain above zero, a loss below; `damage`, for damage about to be dealt,
+    /// what it is as the effects applied so far have left it (whom it would now be dealt to, CR 614.6).
+    ChooseReplacement {
+        subject: Option<ObjectId>,
+        life: Option<i32>,
+        sources: Vec<ObjectId>,
+        hints: Vec<&'static str>,
+        damage: Option<DamageAbout>,
+    },
+}
+
+/// Damage a question about replacement effects is about (CR 616.1): its source, whom it would be dealt to and how much.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub struct DamageAbout {
+    pub source: ObjectId,
+    pub to: Target,
+    pub amount: u16,
 }
 
 /// Where the cards a library search finds are going (CR 701.23), as the searcher is told.

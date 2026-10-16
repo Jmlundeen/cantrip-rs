@@ -52,6 +52,26 @@ pub fn damage_cant_be_prevented(cx: &Cx, source: ObjectId, combat: bool) -> bool
     false
 }
 
+/// Which of the `damaged` permanents keep their damage through this cleanup step (CR 514.2): those a static ability of a
+/// permanent on the battlefield says so of (`CardDef::damage_stays`), while that permanent has its abilities (CR 613.1f).
+/// Asked only in a cleanup step with damage marked, so the battlefield is searched then.
+pub fn damage_stays(cx: &Cx, damaged: &[ObjectId]) -> Vec<ObjectId> {
+    let rules: Vec<(ObjectId, PlayerId, &'static CardDef)> = sources(cx, |d| !d.damage_stays.is_empty()).collect();
+    if rules.is_empty() {
+        return Vec::new();
+    }
+    damaged
+        .iter()
+        .copied()
+        .filter(|&object| {
+            rules.iter().any(|&(id, controller, def)| {
+                let asker = Asker { source: id, controller };
+                def.damage_stays.iter().any(|rule| rule(cx, &asker, object))
+            })
+        })
+        .collect()
+}
+
 /// Whether `player` can't gain life (CR 119.7): a resolved effect about them says so (`EffectKind::CantGainLife`, Screaming
 /// Nemesis's "for the rest of the game"), or a static ability of a permanent on the battlefield does (`CardDef::cant_gain_life`,
 /// Sunspine Lynx's "Players can't gain life"), which stops when the permanent leaves or loses its abilities (CR 611.3a,

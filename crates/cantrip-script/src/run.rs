@@ -1816,6 +1816,15 @@ impl<'s> Run<'s> {
             return fail(format!("line {}: Replace takes one effect, one of: {}", step.line, offered()));
         };
         let wanted = spec.trim().to_lowercase();
+        // A source named with a copy number or a zone (`Ancient Adamantoise#2`, `Bot1.Battlefield.X`): two effects of
+        // same-named permanents, told apart as everywhere else.
+        if spec.contains('#') || spec.contains('.') {
+            let ids = self.objects(step, spec.trim(), sources)?;
+            return match ids.first().and_then(|id| sources.iter().position(|s| s == id)) {
+                Some(i) => Ok(Answer::Index(i as u8)),
+                None => fail(format!("line {}: \"{spec}\" is not one of: {}", step.line, offered())),
+            };
+        }
         let found = (0..sources.len())
             .find(|&i| self.game.name(sources[i]).to_lowercase() == wanted || hints[i].to_lowercase().contains(&wanted));
         match found {

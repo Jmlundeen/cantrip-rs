@@ -1356,6 +1356,11 @@ pub type LifeGainRule = fn(&dyn Query, &Asker, PlayerId) -> bool;
 /// (CR 510.1a): given the rule's own asker.
 pub type DamageByToughnessRule = fn(&dyn Query, &Asker, ObjectId) -> bool;
 
+/// Whether a static ability keeps the damage marked on this permanent through the cleanup step (CR 514.2): given the
+/// rule's own asker. "Damage isn't removed from this creature during cleanup steps" (Ancient Adamantoise); "from creatures
+/// your opponents control" (Patient Zero, Uthgardt Fury) and "from creatures" (Case of the Market Melee) are the same kind.
+pub type DamageStaysRule = fn(&dyn Query, &Asker, ObjectId) -> bool;
+
 /// Whether a static ability lets its controller spend mana as though it were mana of any color to activate the abilities
 /// of this permanent (CR 609.4b): given the rule's own asker and the permanent whose ability is activated.
 pub type SpendAnyColorRule = fn(&dyn Query, &Asker, ObjectId) -> bool;
@@ -1621,6 +1626,9 @@ pub struct CardDef {
     /// "Each creature you control assigns combat damage equal to its toughness rather than its power" (CR 510.1a):
     /// Assault Formation, Doran, the Siege Tower.
     pub damage_by_toughness: &'static [DamageByToughnessRule],
+    /// Its static abilities that keep damage on permanents during cleanup steps (CR 514.2), while it is on the battlefield
+    /// with its abilities. An effect that removes all damage (regeneration, CR 701.19a) still removes it.
+    pub damage_stays: &'static [DamageStaysRule],
     /// "You may spend mana as though it were mana of any color to activate abilities of creatures you control" (CR 609.4b):
     /// Agatha's Soul Cauldron, Mycosynth Lattice's kind.
     pub spend_any_color: &'static [SpendAnyColorRule],
@@ -1733,6 +1741,7 @@ impl CardDef {
         unpreventable_damage: &[],
         cant_gain_life: &[],
         damage_by_toughness: &[],
+        damage_stays: &[],
         spend_any_color: &[],
         cause_rules: &[],
         turn_begin: &[],
