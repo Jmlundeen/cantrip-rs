@@ -1,0 +1,104 @@
+# Ajani Resolute: "-10: You get an emblem with 'Creatures you control get +2/+2.'" Loyalty 10 takes four turns of his own 0
+# (gain 1 life) and a Lightning Helix each turn: every life gain is one loyalty counter (2 + 4 x 2 = 10 on turn 7), and on turn 9
+# the -10 is paid, which sends Ajani to the graveyard (CR 704.5i) but not the emblem, which lasts (CR 114.4, 114.5). It pumps Mother
+# of Runes that Bot1 controls, 1/1 to 3/3, from the command zone (CR 613.4c), and not the one Bot2 controls.
+[Bot1 Deck]
+Plains
+Mox Jet
+Mox Ruby
+Mox Pearl
+Ajani Resolute
+Lightning Helix
+Lightning Helix
+Lightning Helix
+Lightning Helix
+Mother of Runes
+Plains x24
+[Bot2 Deck]
+Plains
+Mother of Runes
+Plains x24
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Ajani Resolute.Cast
+Bot1.Pass
+Bot1.Battlefield.Ajani Resolute.Activate(Ability: gain 1 life)
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Lightning Helix.Cast(Bot2)
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Ajani Resolute.Counters.Loyalty = 4
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Mother of Runes.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Ajani Resolute.Activate(Ability: gain 1 life)
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Lightning Helix.Cast(Bot2)
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Ajani Resolute.Counters.Loyalty = 6
+[T5 Bot1.Main1]
+Bot1.Battlefield.Ajani Resolute.Activate(Ability: gain 1 life)
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Lightning Helix.Cast(Bot2)
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Ajani Resolute.Counters.Loyalty = 8
+[T7 Bot1.Main1]
+Bot1.Battlefield.Ajani Resolute.Activate(Ability: gain 1 life)
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Lightning Helix.Cast(Bot2)
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Hand.Mother of Runes.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Pass
+? Bot1.Battlefield.Ajani Resolute.Counters.Loyalty = 10
+[T9 Bot1.Main1]
+? Bot1.Battlefield.Mother of Runes.Power = 1
+Bot1.Battlefield.Ajani Resolute.Activate(Ability: emblem)
+Bot1.Pass
+Bot1.Pass
+[T9 Bot1.Main2]
+[Expect]
+Bot1.Life = 36
+Bot2.Life = 8
+Bot1.Emblems.Count = 1
+Bot1.Battlefield.Mother of Runes.Power = 3
+Bot1.Battlefield.Mother of Runes.Toughness = 3
+Bot2.Battlefield.Mother of Runes.Power = 1
+Bot2.Battlefield.Mother of Runes.Toughness = 1
+Bot2.Emblems.Count = 0
+Stack.Count = 0

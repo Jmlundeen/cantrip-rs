@@ -1,0 +1,61 @@
+# Ajani Resolute: his 0 and a Lightning Helix bring him from 2 to 4 loyalty on turn 1, so on turn 3 the -4 is offered (the
+# refusal at 3 is in the scenario beside this one): it creates a 2/2 white Cat Soldier token named Ajani's Pridemate and Ajani,
+# at 0 loyalty, goes to the graveyard (CR 704.5i). The token outlives him, and a second Helix then puts a +1/+1 counter on it:
+# "Whenever you gain life" is the token's own ability (CR 603.2), so it grows to 3/3 (and a Helix by Bot2 would not).
+[Bot1 Deck]
+Plains
+Mox Jet
+Mox Ruby
+Mox Pearl
+Ajani Resolute
+Lightning Helix
+Lightning Helix
+Plains x24
+[Bot2 Deck]
+Plains x25
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Ajani Resolute.Cast
+Bot1.Pass
+Bot1.Battlefield.Ajani Resolute.Activate(Ability: gain 1 life)
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Lightning Helix.Cast(Bot2)
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Ajani Resolute.Counters.Loyalty = 4
+[T3 Bot1.Main1]
+Bot1.Battlefield.Ajani Resolute.Activate(Ability: Create)
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Ajani's Pridemate.Power = 2
+? Bot1.Graveyard = Ajani Resolute; Lightning Helix
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Lightning Helix.Cast(Bot2)
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+[Expect]
+Bot1.Life = 27
+Bot2.Life = 14
+Bot1.Graveyard = Lightning Helix; Ajani Resolute; Lightning Helix
+Bot1.Battlefield.Ajani's Pridemate.Power = 3
+Bot1.Battlefield.Ajani's Pridemate.Toughness = 3
+Bot1.Battlefield.Ajani's Pridemate.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ajani's Pridemate.Colors = White
+Bot1.Battlefield.Ajani's Pridemate.Subtypes = Cat; Soldier
+Stack.Count = 0

@@ -1,0 +1,53 @@
+# Ajani Resolute: "Whenever you gain life, put a loyalty counter on Ajani." His own 0 (gain 1 life) brings 2 to 3 on turn 1 and 3
+# to 4 on turn 3, and the -4 is refused at 3 (loyalty is the cost, CR 606.6) with the 0 beside it as the control that works.
+# Bot2's Lightning Helix on turn 4 gains Bot2 life and Bot1 none, so Ajani stays at 4: only "you" gain life counts.
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Ajani Resolute
+Plains x24
+[Bot2 Deck]
+Mountain
+Plains
+Lightning Helix
+Mountain x24
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ajani Resolute.Cast
+Bot1.Pass
+Bot1.Battlefield.Ajani Resolute.Activate(Ability: gain 1 life)
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+? Bot1.Life = 21
+? Bot1.Battlefield.Ajani Resolute.Counters.Loyalty = 3
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Ajani Resolute.Activate(Ability: Create)
+Bot1.Battlefield.Ajani Resolute.Activate(Ability: gain 1 life)
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+? Bot1.Life = 22
+? Bot1.Battlefield.Ajani Resolute.Counters.Loyalty = 4
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Lightning Helix.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main2]
+[Expect]
+Bot1.Life = 19
+Bot2.Life = 23
+Bot1.Battlefield.Ajani Resolute.Counters.Loyalty = 4
+Stack.Count = 0
