@@ -11,6 +11,14 @@ pub fn your_creatures(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, 
     so_far.is(CardType::Creature) && s.obj(affected).controller == s.obj(source).controller
 }
 
+/// "Planeswalkers you control" (CR 613.1f, layer 6): every planeswalker under the source's controller's control, judged on what
+/// the earlier layers made it, and by control, not ownership. Avatar of Burgeoning Echoes and Way of the Pyromancer use it as
+/// `StaticDef::affects`.
+pub fn your_planeswalkers(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool {
+    let s = q.state();
+    so_far.is(CardType::Planeswalker) && s.obj(affected).controller == s.obj(source).controller
+}
+
 /// "Creature tokens you control" (CR 111.1, 613.1f): a creature under the source's controller's control, as the earlier
 /// layers made it, that is a token. Teysa Karlov, Caretaker's Talent (at level 3) and Gideon's Memorial use it as
 /// `StaticDef::affects`.

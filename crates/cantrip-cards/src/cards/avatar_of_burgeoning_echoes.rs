@@ -1,17 +1,11 @@
 use cantrip_api::*;
-use cantrip_mechanics::{empower, lands_you_control, statics::grant_delayed_ability, targets, triggers};
+use cantrip_mechanics::{empower, lands_you_control, statics::{grant_delayed_ability, your_planeswalkers}, targets, triggers};
 use cantrip_oracle as oracle;
 
 /// "Landfall -- Whenever a land you control enters, empower Jace 2." (CR 207.2c): the Jace token is made if its
 /// controller has none, and the counters go on it (see `empower::jace`).
 fn empower_jace(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     empower::jace(g, item.controller, item.object, 2)
-}
-
-/// "Planeswalkers you control" (CR 613.1f, layer 6): every planeswalker under the source's controller's control, judged on
-/// what the earlier layers made it, and by control, not ownership.
-fn your_planeswalkers(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool {
-    so_far.is(CardType::Planeswalker) && q.state().obj(affected).controller == q.state().obj(source).controller
 }
 
 /// The granted "[-10]: Put a +1/+1 counter on target creature for each land you control." The lands are counted as the
