@@ -61,7 +61,6 @@ pub fn have_double_strike_and_trample(_: &dyn LayerQuery, _: ObjectId, chars: &m
     chars.keywords = chars.keywords.with(Keyword::DoubleStrike).with(Keyword::Trample);
 }
 
-
 /// "If this card is in your opening hand, you may begin the game with it on the battlefield" (CR 103.6a), for `CardDef::opening_hand`:
 /// any player may, nothing else is required. The Leylines (Punishment and Resonance) and Leyline Axe print it.
 pub const BEGIN_ON_THE_BATTLEFIELD: OpeningHandAction = OpeningHandAction { condition: in_any_opening_hand, counter: None, exile_from_hand: 0 };
