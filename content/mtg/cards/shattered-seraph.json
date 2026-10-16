@@ -1,0 +1,11 @@
+{
+  "name": "Shattered Seraph",
+  "manaCost": "{4}{W}{U}{B}",
+  "type": "Creature — Angel Rogue",
+  "power": 4,
+  "toughness": 4,
+  "oracleText": "Flying\nWhen this creature enters, you gain 3 life.\n{2}, Exile this card from your hand: Target land gains \"{T}: Add {W}, {U}, or {B}\" until this card is cast from exile. You may cast this card for as long as it remains exiled.",
+  "keywords": [
+    "Flying"
+  ]
+}

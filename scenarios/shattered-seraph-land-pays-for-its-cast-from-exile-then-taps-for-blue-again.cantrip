@@ -1,0 +1,45 @@
+# Shattered Seraph: "{2}, Exile this card from your hand: Target land gains "{T}: Add {W}, {U}, or {B}" until this card is cast
+# from exile. You may cast this card for as long as it remains exiled." Bot1 exiles it for {2} to give its Island the
+# ability, which adds one of those three colors and never red, and casts it from exile on the same turn, the Island adding
+# the {B} of its cost. It enters with flying and Bot1 gains 3 life. Once it was cast, the Island has only {U} again.
+
+[Bot1 Deck]
+Island
+Shattered Seraph
+Black Lotus x3
+Mountain
+Island
+Swamp
+Island
+Island x8
+
+[Bot2 Deck]
+Plains x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Shattered Seraph.Activate(Bot1.Battlefield.Island)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+[T1 Bot1.Main1]
+? Exile = Shattered Seraph
+! Bot1.Battlefield.Island.Activate(Color: Red)
+Bot1.Exile.Shattered Seraph.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Island.Activate(Ability: {W}, {U}, or {B}; Color: Black)
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Island.Activate(Color: Black)
+Bot1.Battlefield.Island.Activate
+? Bot1.Mana = {U}
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Exile.Count = 0
+Bot1.Battlefield = Island; Shattered Seraph
+Bot1.Graveyard = Black Lotus; Black Lotus; Black Lotus
+Bot1.Life = 23
+Bot1.Battlefield.Shattered Seraph.Keywords = Flying
