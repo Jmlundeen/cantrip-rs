@@ -1,0 +1,48 @@
+# Naban, Dean of Iteration judges the entering permanent as it is on the battlefield, continuous effects applied (CR 603.6a,
+# 603.10; the rulings: "Look at each permanent as it exists on the battlefield, taking into account continuous effects"):
+# Roaming Throne, a Golem, names Wizard as it enters and is a Wizard by its own static ability (layer 4), so its entering
+# makes Aunt May trigger twice (24). Roaming Throne's own doubling reaches only Wizards, and Aunt May is none.
+# Turn 1: the Plains pays Aunt May; Mox Sapphire and Mox Jet pay Naban, whose own entering gives two triggers (22).
+# Turn 3: Black Lotus (any three) and Mox Sapphire pay Roaming Throne.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Mox Sapphire
+Mox Jet
+Aunt May
+Naban, Dean of Iteration
+Roaming Throne
+Island x12
+
+[Bot2 Deck]
+Swamp x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Aunt May.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Naban, Dean of Iteration.Cast
+Bot1.Pass
+Bot1.Triggers(Aunt May; Aunt May)
+[T1 Bot1.Main2]
+? Bot1.Life = 22
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Roaming Throne.Cast
+Bot1.Pass
+Bot1.Modes(Wizard)
+Bot1.Triggers(Aunt May; Aunt May)
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 24
+Bot1.Battlefield.Roaming Throne.Subtypes = Golem; Wizard

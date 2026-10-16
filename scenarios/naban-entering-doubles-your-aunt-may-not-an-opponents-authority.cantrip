@@ -1,0 +1,45 @@
+# Naban, Dean of Iteration doubles "a triggered ability of a permanent you control" (CR 603.2d) that a Wizard you control
+# entering triggers, and nothing an opponent controls. On turn 3 Naban, itself a Wizard, enters: Bot1's Aunt May ("Whenever
+# another creature you control enters, you gain 1 life") triggers twice (22), and Bot2's Authority of the Consuls
+# ("Whenever a creature an opponent controls enters, you gain 1 life") once (21), the same event for both.
+
+[Bot1 Deck]
+Plains
+Aunt May
+Mox Sapphire
+Naban, Dean of Iteration
+Plains
+Plains
+Plains
+Island
+Island x10
+
+[Bot2 Deck]
+Plains
+Authority of the Consuls
+Plains x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Aunt May.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Authority of the Consuls.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Naban, Dean of Iteration.Cast
+Bot1.Pass
+Bot1.Triggers(Aunt May; Aunt May)
+? Stack.Count = 3
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 22
+Bot2.Life = 21

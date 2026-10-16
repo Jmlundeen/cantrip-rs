@@ -1,0 +1,64 @@
+# Naban, Dean of Iteration's "Wizard" is a word of its text (CR 612): Artificial Evolution replacing Wizard with Elf in it
+# makes it a Human Elf whose rule reads "If an Elf you control entering causes ...". Naban entering on turn 1, before the
+# change, makes Aunt May trigger twice (22). After it, Llanowar Elves entering on turn 3 makes Aunt May trigger twice (24),
+# and Emry, Lurker of the Loch, a Merfolk Wizard, entering on turn 5 makes it trigger once (25) - beside Emry's own "mill
+# four cards", two triggers to order.
+# Turn 1: the Plains pays Aunt May; Black Lotus (UUU) pays Naban and the Evolution. Turn 3: the Forest pays the Elves.
+# Turn 5: Emry costs {1}{U} with one artifact (Mox Sapphire), paid by the Sapphire and the Plains.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Mox Sapphire
+Aunt May
+Naban, Dean of Iteration
+Artificial Evolution
+Llanowar Elves
+Forest
+Emry, Lurker of the Loch
+Island x12
+
+[Bot2 Deck]
+Swamp x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Aunt May.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Naban, Dean of Iteration.Cast
+Bot1.Pass
+Bot1.Triggers(Aunt May; Aunt May)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 22
+Bot1.Hand.Artificial Evolution.Cast(Naban, Dean of Iteration)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Wizard)
+Bot1.Modes(Elf)
+? Bot1.Battlefield.Naban, Dean of Iteration.Subtypes = Elf; Human
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot1.Triggers(Aunt May; Aunt May)
+[T3 Bot1.Main2]
+? Bot1.Life = 24
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Emry, Lurker of the Loch.Cast
+Bot1.Pass
+Bot1.Triggers(Aunt May; Emry, Lurker of the Loch)
+[T5 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 25
