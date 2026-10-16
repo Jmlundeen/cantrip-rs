@@ -1,0 +1,46 @@
+# Candy Trail's ability has no timing restriction, so Bot1 activates it during Bot2's upkeep on turn 4 (it is not a Clue or Food token, but an artifact with the printed
+# ability; CR 602.5d: instant speed unless stated). Its scry 2 on turn 1 puts both looked-at cards (Lightning Bolt, Black Lotus) on the bottom (CR 701.22a), so the top of
+# the library is Counterspell, drawn on turn 3, and the activation draws the card below it, Mountain. Life is 20 + 3.
+
+[Bot1 Deck]
+Candy Trail
+Island
+Island
+Island
+Island
+Island
+Island
+Lightning Bolt
+Black Lotus
+Counterspell
+Mountain
+Plains
+Forest
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Candy Trail.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Pass
+Bot1.Arrange( | Lightning Bolt; Black Lotus)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Upkeep]
+? Bot1.Life = 20
+? Bot1.Hand.Count = 5
+Bot1.Battlefield.Candy Trail.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+[T4 Bot2.Main1]
+
+[Expect]
+Turn = 4
+Bot1.Life = 23
+Bot1.Battlefield = Island; Island
+Bot1.Graveyard = Candy Trail
+Bot1.Hand = Island; Island; Island; Island; Counterspell; Mountain
+Bot1.Library = Plains; Forest; Lightning Bolt; Black Lotus
+Stack.Count = 0

@@ -1,0 +1,46 @@
+# Candy Trail: "When this artifact enters, scry 2" - Bot1 casts it on turn 1 and looks at the top two cards, Lightning Bolt and Black Lotus. The Lotus stays on top and the Bolt
+# goes to the bottom (CR 701.22). On turn 3 Bot1 pays {2}, taps and sacrifices it: Bot1 gains 3 life (20 to 23) and draws a card - the Lotus drawn for the turn is
+# the first, so the activation draws Counterspell, the next card down (CR 121.1). The Trail is in the graveyard as the cost was paid (CR 602.2b).
+
+[Bot1 Deck]
+Candy Trail
+Island
+Island
+Island
+Island
+Island
+Island
+Lightning Bolt
+Black Lotus
+Counterspell
+Mountain
+Plains
+Forest
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Candy Trail.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Pass
+Bot1.Arrange(Black Lotus | Lightning Bolt)
+[T3 Bot1.Main1]
+? Bot1.Battlefield = Candy Trail; Island
+? Bot1.Library = Counterspell; Mountain; Plains; Forest; Lightning Bolt
+? Bot1.Life = 20
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Candy Trail.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 23
+Bot1.Battlefield = Island; Island
+Bot1.Graveyard = Candy Trail
+Bot1.Hand.Count = 6
+Bot1.Hand = Island; Island; Island; Island; Black Lotus; Counterspell
+Bot1.Library = Mountain; Plains; Forest; Lightning Bolt
+Stack.Count = 0
