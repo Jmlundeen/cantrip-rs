@@ -423,6 +423,12 @@ public sealed class Decisions
             _abandoned.Add(prompt.Spell);
         }
 
+        // A cost to attack given up (CR 508.1h-j): the attack is declared again, with only what costs nothing this turn.
+        if (answer is TakeActionAnswer taken)
+        {
+            AttackCosts.Answered(client, prompt, taken);
+        }
+
         return answer;
     }
 
@@ -577,7 +583,9 @@ public sealed class Decisions
 
             foreach (ViewHandle attacker in prompt.Eligible.Where(forced.Contains))
             {
-                answer.Attacks.Add(new AttackMessage { Attacker = attacker, TargetPlayer = defender });
+                // Where attacking costs nothing, which a cost to attack never stops it doing (CR 508.1d).
+                answer.Attacks.Add(prompt.AttacksFor(attacker).Find(attack => prompt.CostOf(attack) is null)
+                    ?? new AttackMessage { Attacker = attacker, TargetPlayer = defender });
             }
 
             List<ViewHandle> free = [.. prompt.Eligible.Where(attacker => !forced.Contains(attacker))];
@@ -587,7 +595,7 @@ public sealed class Decisions
                 IReadOnlyList<int> picks = Many(new Question
                 {
                     Heading = $"Declare attackers. Which of your creatures attack {GameText.Player(client, defender)}?",
-                    Note = Forced(client, prompt, forced) + Defenders(client, defender),
+                    Note = Forced(client, prompt, forced) + Defenders(client, defender) + AttackCostNote(client, prompt),
                     Choices = [.. free.Select(attacker => GameText.Creature(client, attacker))],
                     Picks = free.Count,
                     UpTo = true,
@@ -599,6 +607,7 @@ public sealed class Decisions
                 }
             }
 
+            answer.Attacks = AttackCosts.Within(prompt, answer.Attacks, AttackCosts.Mana(client, prompt));
             return answer;
         }
 
@@ -612,8 +621,9 @@ public sealed class Decisions
 
             foreach (int seat in players.Where(seat => !prompt.IsForbidden(new AttackMessage { Attacker = attacker, TargetPlayer = seat })))
             {
-                attacks.Add(new AttackMessage { Attacker = attacker, TargetPlayer = seat });
-                choices.Add($"Attack {GameText.Player(client, seat)}.");
+                var attack = new AttackMessage { Attacker = attacker, TargetPlayer = seat };
+                attacks.Add(attack);
+                choices.Add($"Attack {GameText.Player(client, seat)}.{CostOf(prompt, attack)}");
             }
 
             if (must is not { Players.Count: > 0 })
@@ -621,15 +631,17 @@ public sealed class Decisions
                 foreach (ViewHandle walker in prompt.AttackablePlaneswalkers
                     .Where(walker => !prompt.IsForbidden(new AttackMessage { Attacker = attacker, TargetPermanent = walker })))
                 {
-                    attacks.Add(new AttackMessage { Attacker = attacker, TargetPermanent = walker });
-                    choices.Add($"Attack {GameText.Named(client, walker)}.");
+                    var attack = new AttackMessage { Attacker = attacker, TargetPermanent = walker };
+                    attacks.Add(attack);
+                    choices.Add($"Attack {GameText.Named(client, walker)}.{CostOf(prompt, attack)}");
                 }
 
                 foreach (ViewHandle battle in prompt.AttackableBattles
                     .Where(battle => !prompt.IsForbidden(new AttackMessage { Attacker = attacker, TargetPermanent = battle })))
                 {
-                    attacks.Add(new AttackMessage { Attacker = attacker, TargetPermanent = battle });
-                    choices.Add($"Attack the battle {GameText.Named(client, battle)}.");
+                    var attack = new AttackMessage { Attacker = attacker, TargetPermanent = battle };
+                    attacks.Add(attack);
+                    choices.Add($"Attack the battle {GameText.Named(client, battle)}.{CostOf(prompt, attack)}");
                 }
             }
 
@@ -647,7 +659,7 @@ public sealed class Decisions
             int pick = One(new Question
             {
                 Heading = $"Declare attackers. What does {GameText.Creature(client, attacker)} do?",
-                Note = Declared(client, answer.Attacks) + (must is not null ? "\nThis creature must attack." : string.Empty),
+                Note = Declared(client, answer.Attacks) + (must is not null ? "\nThis creature must attack." : string.Empty) + AttackCostNote(client, prompt),
                 Choices = choices,
             });
 
@@ -657,8 +669,28 @@ public sealed class Decisions
             }
         }
 
+        answer.Attacks = AttackCosts.Within(prompt, answer.Attacks, AttackCosts.Mana(client, prompt));
         return answer;
     }
+
+    /// <summary>What one attack costs to declare (CR 508.1h), as a choice says it, or nothing when it costs nothing.</summary>
+    private static string CostOf(DeclareAttackersPromptMessage prompt, AttackMessage attack) =>
+        prompt.CostOf(attack) is { } cost ? $" It costs {cost.Cost} to attack there." : string.Empty;
+
+    /// <summary>
+    /// Costs to attack (CR 508.1d, 508.1h): that an attack costing something is paid once attackers are declared, all of
+    /// it, and how much mana there is for it; nothing where no attack costs anything.
+    /// </summary>
+    private static string AttackCostNote(GameClient client, DeclareAttackersPromptMessage prompt) =>
+        prompt.Costs.Count == 0
+            ? string.Empty
+            : "\nSome attacks cost mana to declare (\"creatures can't attack you unless their controller pays ...\"): "
+                + string.Join(", ", prompt.Costs
+                    .DistinctBy(cost => (cost.TargetPlayer, cost.TargetPermanent.Value))
+                    .Select(cost => $"attacking {(cost.TargetPermanent.IsNone ? GameText.Player(client, cost.TargetPlayer) : GameText.Named(client, cost.TargetPermanent))} costs {cost.Cost} a creature"))
+                + ". The total is paid once attackers are declared"
+                + (prompt.CanPay >= 0 ? $", and you have {prompt.CanPay} mana for it." : ".")
+                + " A creature that must attack never has to pay to.";
 
     /// <summary>
     /// Declares blockers (CR 509.1).

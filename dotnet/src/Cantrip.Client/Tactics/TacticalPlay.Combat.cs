@@ -93,15 +93,63 @@ public sealed partial class TacticalPlay
         double wheneverYouAttack = perAttacker * client.BattlefieldOf(client.Seat)
             .Count(permanent => CardReading.Plain(CardReading.Text(permanent)).Contains("whenever you attack", StringComparison.Ordinal));
 
+        // Costs to attack (CR 508.1h): what each creature costs to send at the defender, and the mana there is to pay
+        // with, less what a creature that taps for mana stops making by attacking (CR 508.1f). An attack that cannot be
+        // paid for is never made: the payment would be given up and the attack declared again.
+        int[] costs = [.. attackers.Select(attacker =>
+            prompt.CostOf(new AttackMessage { Attacker = attacker.Handle, TargetPlayer = defender })?.ManaValue ?? 0)];
+        int mana = AttackCosts.Mana(client, prompt);
+        bool[] makesMana = [.. eligible.Select(creature => CardReading.Plain(CardReading.Text(creature)).Contains("{t}: add", StringComparison.Ordinal))];
+        bool MakesMana(ViewHandle creature) =>
+            attackers.FindIndex(attacker => attacker.Handle == creature) is >= 0 and var a && makesMana[a] && !attackers[a].Has(Keywords.Vigilance);
+
+        int CostOf(int attacking)
+        {
+            int total = 0;
+            for (int a = 0; a < attackers.Count; a++)
+            {
+                if ((attacking & (1 << a)) != 0)
+                {
+                    total += costs[a];
+                }
+            }
+
+            return total;
+        }
+
+        bool Affordable(int attacking)
+        {
+            if (prompt.Costs.Count == 0)
+            {
+                return true;
+            }
+
+            int have = mana;
+            for (int a = 0; a < attackers.Count && have != int.MaxValue; a++)
+            {
+                if ((attacking & (1 << a)) != 0 && makesMana[a] && !attackers[a].Has(Keywords.Vigilance))
+                {
+                    have--;
+                }
+            }
+
+            return CostOf(attacking) <= have;
+        }
+
         double Score(int attacking)
         {
+            if (!Affordable(attacking & ~forced))
+            {
+                return double.NegativeInfinity;
+            }
+
             Combat.Result result = combat.BestBlocks(attacking, budget: 300, pairs: blockers.Count <= 6);
             if (result.Lethal)
             {
                 return Combat.Win;
             }
 
-            double score = result.Value;
+            double score = result.Value - (Policy("attackcost") * CostOf(attacking & ~forced));
             List<Unit> back = [.. home];
 
             for (int a = 0; a < attackers.Count; a++)
@@ -287,6 +335,7 @@ public sealed partial class TacticalPlay
             }
         }
 
+        answer.Attacks = AttackCosts.Within(prompt, answer.Attacks, mana, MakesMana);
         return answer;
     }
 

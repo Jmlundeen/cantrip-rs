@@ -38,7 +38,9 @@ public static class AutoPlay
                 return true;
 
             case PayCostsPromptMessage pay:
-                client.Answer(Pay(pay));
+                TakeActionAnswer paying = Pay(pay);
+                AttackCosts.Answered(client, pay, paying);
+                client.Answer(paying);
                 return true;
 
             case UnlessPaysPromptMessage unless:
@@ -55,19 +57,21 @@ public static class AutoPlay
                 return true;
 
             case DeclareAttackersPromptMessage attackers:
-                // Attacks with everything it can. Terrible play, but it makes games finish by damage rather than by
-                // running out of cards, which is what makes a self-played game a useful smoke test.
+                // Attacks with everything it can, and can pay for (CR 508.1h). Terrible play, but it makes games finish by
+                // damage rather than by running out of cards, which is what makes a self-played game a useful smoke test.
                 client.Answer(new AttackersDeclaredAnswer
                 {
-                    Attacks =
-                    [
-                        // A goaded creature at a seat its requirement allows (CR 701.15b), and any other at the first
-                        // thing it may attack (CR 508.1c).
-                        .. attackers.Eligible.Select(creature =>
-                            attackers.Requirements.FirstOrDefault(r => r.Attacker == creature) is { Players.Count: > 0 } must
-                                ? new AttackMessage { Attacker = creature, TargetPlayer = must.Players[0] }
-                                : attackers.AttacksFor(creature)[0]),
-                    ],
+                    Attacks = AttackCosts.Within(
+                        attackers,
+                        [
+                            // A goaded creature at a seat its requirement allows (CR 701.15b), and any other at the first
+                            // thing it may attack (CR 508.1c).
+                            .. attackers.Eligible.Select(creature =>
+                                attackers.Requirements.FirstOrDefault(r => r.Attacker == creature) is { Players.Count: > 0 } must
+                                    ? new AttackMessage { Attacker = creature, TargetPlayer = must.Players[0] }
+                                    : attackers.AttacksFor(creature)[0]),
+                        ],
+                        AttackCosts.Mana(client, attackers)),
                 });
 
                 return true;

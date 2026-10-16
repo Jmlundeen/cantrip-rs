@@ -1866,10 +1866,11 @@ public sealed partial class TacticalPlay
 
             if (instead is not null)
             {
-                return AutoPlay.Answer(instead);
+                answer = AutoPlay.Answer(instead);
             }
         }
 
+        AttackCosts.Answered(client, prompt, answer);
         return answer;
     }
 

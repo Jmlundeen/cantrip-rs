@@ -361,11 +361,27 @@ public sealed partial class MainPage
                 colorless = string.Empty;
             }
 
-            Prompt(
-                _actions.Assignable.Count > 0 ? $"Choose mana for {name}" : $"Pay for {name}",
-                covered
-                    ? $"your pool covers {prompt.Total}  ·  {how}"
-                    : $"{prompt.Remaining} of {prompt.Total} still to pay  ·  {how}{colorless}{(prompt.SpendsNoMana ? string.Empty : AutoManaNote())}");
+            // A cost to attack (CR 508.1h-j): what it pays for is the attack, not the permanent that makes attacking cost
+            // something; giving it up takes the declaration back.
+            if (prompt.Attackers.Count > 0)
+            {
+                string attackers = prompt.Attackers.Count == 1
+                    ? client.Object(prompt.Attackers[0])?.Name ?? "1 creature"
+                    : $"{prompt.Attackers.Count} creatures";
+                Prompt(
+                    $"Pay {prompt.Total} to attack with {attackers}",
+                    covered
+                        ? $"{name} asks it  ·  your pool covers it  ·  {how}"
+                        : $"{name} asks it  ·  {prompt.Remaining} still to pay  ·  {how}  ·  Cancel declares attackers again");
+            }
+            else
+            {
+                Prompt(
+                    _actions.Assignable.Count > 0 ? $"Choose mana for {name}" : $"Pay for {name}",
+                    covered
+                        ? $"your pool covers {prompt.Total}  ·  {how}"
+                        : $"{prompt.Remaining} of {prompt.Total} still to pay  ·  {how}{colorless}{(prompt.SpendsNoMana ? string.Empty : AutoManaNote())}");
+            }
 
             if (covered && _actions.Confirm is { } pay)
             {
@@ -1850,6 +1866,9 @@ public sealed partial class MainPage
         // A goaded creature left home (CR 701.15b): what the server would refuse, so the button waits and the dock says why.
         AttackRequirementMessage? unmet = prompt.Requirements.FirstOrDefault(requirement => !requirement.MetBy(declared));
 
+        // A cost to attack (CR 508.1h): what the attack chosen so far costs in all, paid once it is locked in.
+        string cost = prompt.TotalCostText(declared);
+
         Prompt(
             "Declare attackers",
             unmet is not null
@@ -1857,18 +1876,18 @@ public sealed partial class MainPage
                   + (unmet.Players.Count > 0 ? $" {string.Join(" or ", unmet.Players.Select(seat => NameOf(client, seat)))}" : string.Empty)
                 : _pending.Count > 0
                     ? $"Choose what to attack ({_pending.Count} selected)"
-                    : _attacking.Count switch
+                    : (_attacking.Count switch
                     {
                         0 => $"{prompt.Eligible.Count} can attack",
                         1 => "1 attacking",
                         _ => $"{_attacking.Count} attacking",
-                    });
+                    }) + AttackCostNote(client, prompt, cost));
 
         AddButton(
-            _attacking.Count == 0 ? "No attack" : $"Attack with {_attacking.Count}",
+            _attacking.Count == 0 ? "No attack" : cost.Length > 0 ? $"Attack with {_attacking.Count}, pay {cost}" : $"Attack with {_attacking.Count}",
             () => Send(client, new AttackersDeclaredAnswer { Attacks = declared }),
             enabled: unmet is null,
-            primary: true).Tooltip = "Lock in the attack" + Suffix(PassKey);
+            primary: true).Tooltip = (cost.Length > 0 ? $"Lock in the attack, then pay {cost} to attack" : "Lock in the attack") + Suffix(PassKey);
 
         if (_pending.Count > 0)
         {
@@ -1904,6 +1923,37 @@ public sealed partial class MainPage
                 _needsRedraw = true;
             });
         }
+    }
+
+    /// <summary>
+    /// What attacking costs, for the attackers dock's line (CR 508.1d, 508.1h): the total of the attack chosen so far and
+    /// the mana the player has for it; with nothing chosen, what attacking each defender costs a creature. Empty where
+    /// nothing costs anything to attack.
+    /// </summary>
+    private static string AttackCostNote(GameClient client, DeclareAttackersPromptMessage prompt, string cost)
+    {
+        if (prompt.Costs.Count == 0)
+        {
+            return string.Empty;
+        }
+
+        string mana = prompt.CanPay >= 0 ? $" (you can make up to {prompt.CanPay} mana)" : string.Empty;
+        if (cost.Length > 0)
+        {
+            return $"  ·  costs {cost} to attack{mana}";
+        }
+
+        // Each defender whose attack costs something, by what one creature attacking it costs.
+        List<string> each = [];
+        foreach (AttackCostMessage first in prompt.Costs.DistinctBy(c => (c.TargetPlayer, c.TargetPermanent.Value)))
+        {
+            string whom = first.TargetPermanent.IsNone
+                ? NameOf(client, first.TargetPlayer)
+                : client.Object(first.TargetPermanent)?.Name ?? "a permanent";
+            each.Add($"attacking {whom} costs {first.Cost} a creature");
+        }
+
+        return $"  ·  {string.Join(", ", each)}{mana}";
     }
 
     private void FillBlockers(GameClient client, DeclareBlockersPromptMessage prompt)

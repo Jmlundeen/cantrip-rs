@@ -435,6 +435,8 @@ public sealed class RandomPlay : IAutoPlayer
             }
         }
 
+        // What it can pay for (CR 508.1h): an attack whose cost is given up is declared again, and may come out the same.
+        answer.Attacks = AttackCosts.Within(prompt, answer.Attacks, prompt.CanPay < 0 ? int.MaxValue : prompt.CanPay);
         return answer;
     }
 

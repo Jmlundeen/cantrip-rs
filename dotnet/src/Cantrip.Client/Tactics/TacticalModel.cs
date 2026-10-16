@@ -100,6 +100,9 @@ public sealed class TacticalModel
         ["policy.crackback"] = 0.50,
         // What it costs to end its turn dead to an attack it could not block.
         ["policy.exposed"] = 3.00,
+        // What a mana paid to attack costs (CR 508.1h: "creatures can't attack you unless their controller pays {2} for
+        // each"), mana the turn's second main phase then does not have.
+        ["policy.attackcost"] = 0.05,
         // "Whenever this attacks" and "whenever you attack", each time one triggers.
         ["policy.attacktrigger"] = 0.25,
         // "Whenever this deals combat damage to a player", each time one does.

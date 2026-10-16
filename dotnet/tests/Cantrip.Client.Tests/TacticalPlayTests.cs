@@ -514,6 +514,70 @@ public sealed class TacticalPlayTests
         Assert.Equal([1], Attacking(Bot().Decide(client, prompt)));
     }
 
+    /// <summary>Attackers under a cost to attack (CR 508.1h): each creature attacking the opponent costs <paramref name="each"/>.</summary>
+    private static DeclareAttackersPromptMessage Taxed(int each, int canPay, params int[] eligible)
+    {
+        DeclareAttackersPromptMessage prompt = Attackers(eligible);
+        prompt.Costs = [.. eligible.Select(creature => new AttackCostMessage
+        {
+            Attacker = Handle(creature),
+            TargetPlayer = Them,
+            Cost = $"{{{each}}}",
+            ManaValue = each,
+            Generic = each,
+        })];
+        prompt.CanPay = canPay;
+        return prompt;
+    }
+
+    [Fact]
+    public void Attacks_with_only_as_many_as_it_can_pay_to_attack_with()
+    {
+        // Ghostly Prison's {2} a creature with three mana: one of the two Bears attacks, which costs {2}; both would cost {4}.
+        GameClient client = Seated([Creature(1, "Bear", 2, 2), Creature(2, "Bear", 2, 2)], step: TurnStepView.DeclareAttackers);
+
+        List<int> attacking = Attacking(Bot().Decide(client, Taxed(2, 3, 1, 2)));
+
+        Assert.Single(attacking);
+    }
+
+    [Fact]
+    public void Does_not_attack_when_it_cannot_pay_to_attack()
+    {
+        GameClient client = Seated([Creature(1, "Bear", 2, 2)], step: TurnStepView.DeclareAttackers);
+
+        Assert.Empty(Attacking(Bot().Decide(client, Taxed(2, 1, 1))));
+    }
+
+    [Fact]
+    public void A_creature_that_must_attack_is_not_made_to_pay_to()
+    {
+        // The only attack open to it costs {2} and there is no mana: a cost is never a requirement (CR 508.1d), and the
+        // engine leaves such a creature out of the requirements; one that is in them goes where attacking is free.
+        GameClient client = Seated([Creature(1, "Bear", 2, 2), Creature(5, "Jace", 0, 0, Them)], step: TurnStepView.DeclareAttackers);
+
+        DeclareAttackersPromptMessage prompt = Taxed(2, 0, 1);
+        prompt.AttackablePlaneswalkers.Add(Handle(5));
+        prompt.Requirements.Add(new AttackRequirementMessage { Attacker = Handle(1) });
+
+        AttackMessage attack = Assert.Single(Assert.IsType<AttackersDeclaredAnswer>(Bot().Decide(client, prompt)).Attacks);
+        Assert.Equal(Handle(5), attack.TargetPermanent);
+    }
+
+    [Fact]
+    public void A_payment_to_attack_given_up_leaves_only_free_attacks_that_turn()
+    {
+        GameClient client = Seated([Creature(1, "Bear", 2, 2)], step: TurnStepView.DeclareAttackers);
+        DeclareAttackersPromptMessage prompt = Taxed(2, 5, 1);
+        Assert.Equal(5, AttackCosts.Mana(client, prompt));
+
+        var payment = new PayCostsPromptMessage { Attackers = [Handle(1)], Total = "{2}", Remaining = "{2}", RemainingGeneric = 2 };
+        AttackCosts.Answered(client, payment, new TakeActionAnswer { Kind = ActionKindView.CancelCasting });
+
+        Assert.Equal(0, AttackCosts.Mana(client, prompt));
+        Assert.Empty(Attacking(Bot().Decide(client, prompt)));
+    }
+
     private static DeclareBlockersPromptMessage Blockers(int[] attackers, int[] eligible) => new()
     {
         Player = Me,
