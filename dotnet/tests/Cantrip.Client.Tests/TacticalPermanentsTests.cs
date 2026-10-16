@@ -520,6 +520,65 @@ public sealed class TacticalPermanentsTests
         Assert.IsType<PassAnswer>(Bot().Decide(eaten, Priority(Ability(2, 0, "Crew 1"))));
     }
 
+    // --- Station ------------------------------------------------------------------------------------------------------------
+
+    private const string StationText = "Station (Tap another creature you control: Put charge counters equal to its power on this Spacecraft. Station only as a sorcery. It's an artifact creature at 4+.)";
+
+    private static ObjectView Spacecraft(int handle, int charge)
+    {
+        ObjectView ship = Artifact(handle, "Wurmwall Sweeper", "When this Spacecraft enters, surveil 2.\n" + StationText + "\n4+ | Flying");
+        ship.Subtypes = ["Spacecraft"];
+        ship.Counters = charge > 0 ? [new CounterView { Name = "charge", Count = charge }] : [];
+        return ship;
+    }
+
+    [Fact]
+    public void The_last_station_symbol_is_read_off_a_station_cards_text()
+    {
+        Assert.Equal(12, CardReading.LastStationThreshold("This land enters tapped.\n{T}: Add {U}.\nStation (...)\n12+ | {U}, {T}: Add {U} for each artifact you control."));
+        Assert.Equal(20, CardReading.LastStationThreshold("Station (...)\n10+ | Whenever you attack, ...\n20+ | Flying"));
+        Assert.Equal(0, CardReading.LastStationThreshold("Crew 1"));
+    }
+
+    [Fact]
+    public void Stations_after_combat_with_the_creature_of_most_power_and_taps_that_one_for_it()
+    {
+        GameClient client = Seated([Spacecraft(2, 0), Creature(3, "Goblin", 1, 1), Creature(4, "Giant", 5, 5)], step: TurnStepView.PostcombatMain);
+
+        TakeActionAnswer action = Assert.IsType<TakeActionAnswer>(Bot().Decide(client, Priority(Ability(2, 1, StationText))));
+        Assert.Equal(Handle(2), action.Source);
+
+        var prompt = new ChooseCardsPromptMessage
+        {
+            Player = Me,
+            Owner = Me,
+            Source = Handle(2),
+            Purpose = CardChoicePurposeView.TapToPay,
+            Cards = [Handle(3), Handle(4)],
+            Eligible = [Handle(3), Handle(4)],
+            Count = 1,
+        };
+        Assert.Equal([Handle(4)], Assert.IsType<CardsChosenAnswer>(Bot().Decide(client, prompt)).Cards);
+
+        Assert.IsType<PassAnswer>(Without("station").Decide(client, Priority(Ability(2, 1, StationText))));
+    }
+
+    [Fact]
+    public void Does_not_station_before_combat_past_its_last_symbol_with_no_power_or_with_a_needed_blocker()
+    {
+        Assert.IsType<PassAnswer>(Bot().Decide(Seated([Spacecraft(2, 0), Creature(4, "Giant", 5, 5)]), Priority(Ability(2, 1, StationText))));
+
+        GameClient full = Seated([Spacecraft(2, 4), Creature(4, "Giant", 5, 5)], step: TurnStepView.PostcombatMain);
+        Assert.IsType<PassAnswer>(Bot().Decide(full, Priority(Ability(2, 1, StationText))));
+
+        GameClient wall = Seated([Spacecraft(2, 0), Creature(4, "Wall", 0, 4)], step: TurnStepView.PostcombatMain);
+        Assert.IsType<PassAnswer>(Bot().Decide(wall, Priority(Ability(2, 1, StationText))));
+
+        // The Giant is what keeps the Bear out on the way back.
+        GameClient guard = Seated([Spacecraft(2, 0), Creature(4, "Giant", 5, 5), Creature(5, "Bear", 2, 2, Them)], step: TurnStepView.PostcombatMain);
+        Assert.IsType<PassAnswer>(Bot().Decide(guard, Priority(Ability(2, 1, StationText))));
+    }
+
     [Fact]
     public void Collects_evidence_with_the_fewest_cards_that_reach_the_total()
     {

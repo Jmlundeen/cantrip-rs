@@ -164,6 +164,10 @@ public static partial class CardReading
     [GeneratedRegex(@"^\s*crew (\d+)")]
     private static partial Regex CrewClause();
 
+    // A station symbol opening a striation of a station card's text (CR 721.2): "12+ | ...".
+    [GeneratedRegex(@"^\s*(\d+)\+\s*\|", RegexOptions.Multiline)]
+    private static partial Regex StationSymbol();
+
     [GeneratedRegex(@"target (?:player|opponent) discards (a|an|one|two|three|four|x|\d+) cards?")]
     private static partial Regex DiscardClause();
 
@@ -645,6 +649,28 @@ public static partial class CardReading
     /// <summary>How many Phyrexian mana symbols (CR 107.4f) a mana cost has, each payable with two life instead: 2 for "{1}{B/P}{B/P}".</summary>
     public static int Phyrexian(string manaCost) =>
         ManaSymbol().Matches(manaCost ?? string.Empty).Count(symbol => symbol.Value.EndsWith("/P}", StringComparison.OrdinalIgnoreCase));
+
+    /// <summary>
+    /// The number of a station card's last station symbol (CR 721.2: "{N+}" opens each striation, "12+ | ..."), past which
+    /// more charge counters give it nothing more; zero for a card with none.
+    /// </summary>
+    public static int LastStationThreshold(string text) =>
+        StationSymbol().Matches(text ?? string.Empty).Select(symbol => Number(symbol.Groups[1].Value)).DefaultIfEmpty(0).Max();
+
+    /// <summary>
+    /// Whether a line of a permanent's printed text is a striation (CR 721.2a: "12+ | ...") whose station symbol its charge
+    /// counters have not reached: on the battlefield, that striation's abilities are not had yet.
+    /// </summary>
+    public static bool StationUnreached(ObjectView card, string line)
+    {
+        ArgumentNullException.ThrowIfNull(card);
+        if (card.Zone != ZoneKindView.Battlefield || StationSymbol().Match(line ?? string.Empty) is not { Success: true } symbol)
+        {
+            return false;
+        }
+
+        return (card.Counters.Find(counter => counter.Name == "charge")?.Count ?? 0) < Number(symbol.Groups[1].Value);
+    }
 
     /// <summary>The power a crew ability asks for (CR 702.122a) — 3 for "Crew 3" — or zero for an ability that is not one.</summary>
     public static int Crew(string ability) =>

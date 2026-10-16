@@ -83,6 +83,9 @@ public sealed partial class TacticalPlay : IAutoPlayer
     /// </summary>
     private bool _webSlinging;
 
+    /// <summary>The creature <c>Station</c> chose to tap for a station ability, which the cost's choice then taps.</summary>
+    private ViewHandle _stationWith = ViewHandle.None;
+
     /// <summary>The optional cost last decided, so one decision covers the whole payment.</summary>
     private ViewHandle _unless;
     private bool _paying;

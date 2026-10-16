@@ -60,7 +60,13 @@ public sealed partial class TacticalPlay
             // A Vehicle is crewed last of all, by whatever the turn's spells left with nothing better to do: a
             // creature cast this turn cannot attack, and it can crew.
             AnswerPayload best = Best(client, view, prompt, hostileOnly: false);
-            return best is PassAnswer && view.Step == TurnStepView.PrecombatMain && Crew(client, view, prompt) is { } crewed ? crewed : best;
+            if (best is PassAnswer && view.Step == TurnStepView.PrecombatMain && Crew(client, view, prompt) is { } crewed)
+            {
+                return crewed;
+            }
+
+            // After combat, a creature with nothing left to do this turn stations (CR 702.184a).
+            return best is PassAnswer && view.Step == TurnStepView.PostcombatMain && Station(client, view, prompt) is { } stationed ? stationed : best;
         }
 
         // On an opponent's turn: removal once attackers are declared, when what is coming is known and before it is
@@ -157,6 +163,60 @@ public sealed partial class TacticalPlay
                 continue;
             }
 
+            return Take(view, new Candidate(option, 0, 0, [], Kick: false, Permanent: false, Hostile: false));
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Stations a permanent (CR 702.184a: "Tap another untapped creature you control: Put a number of charge counters on this
+    /// permanent equal to the tapped creature's power. Activate only as a sorcery.") after combat, with the untapped creature
+    /// of most power, while the permanent is short of its last station symbol (CR 721.2: "N+") and tapping that creature
+    /// leaves no more of the opponent's attack back through than without it. A creature with no power adds nothing.
+    /// </summary>
+    private TakeActionAnswer? Station(GameClient client, PlayerView view, PriorityPromptMessage prompt)
+    {
+        if (Policy("station") <= 0)
+        {
+            return null;
+        }
+
+        int rival = Rival(client, view);
+
+        foreach (ActionOptionMessage option in prompt.Options)
+        {
+            if (option.Kind != ActionKindView.ActivateAbility || !option.Affordable || Spent(client, option)
+                || !CardReading.Plain(option.Description).TrimStart().StartsWith("station", StringComparison.Ordinal)
+                || client.Object(option.Source) is not { Zone: ZoneKindView.Battlefield } station)
+            {
+                continue;
+            }
+
+            int charge = station.Counters.Find(counter => counter.Name == "charge")?.Count ?? 0;
+            if (charge >= CardReading.LastStationThreshold(CardReading.Text(station)))
+            {
+                continue;
+            }
+
+            List<ObjectView> able = [.. Creatures(client, client.Seat).Where(creature => !creature.Tapped && creature.Handle != station.Handle)];
+            if (able.Where(creature => (creature.Power ?? 0) > 0).OrderByDescending(creature => creature.Power ?? 0).FirstOrDefault() is not { } tapped)
+            {
+                continue;
+            }
+
+            // The creature stays tapped through the opponent's turn: what more of their attack gets through is the price.
+            int life = LifeOf(view, client.Seat);
+            List<Unit> coming = [.. Creatures(client, rival).Where(creature => (creature.Power ?? 0) > 0).Select(creature => Unit.From(creature, _model))
+                .Where(creature => !creature.Has(Keywords.Defender))];
+            List<Unit> home = [.. able.Select(creature => Unit.From(creature, _model))];
+            List<Unit> left = [.. home.Where(creature => creature.Handle != tapped.Handle)];
+            if (Exposure(coming, left) > Exposure(coming, home))
+            {
+                continue;
+            }
+
+            _stationWith = tapped.Handle;
             return Take(view, new Candidate(option, 0, 0, [], Kick: false, Permanent: false, Hostile: false));
         }
 

@@ -44,6 +44,7 @@ keeps it).
 | [KI-21](#ki-21-a-keyword-counter-put-on-after-an-effect-took-its-abilities-away-gives-nothing) | A keyword counter put on after "loses all abilities" gives nothing | Medium | Open |
 | [KI-22](#ki-22-an-ability-that-transforms-its-source-ignores-whether-it-has-transformed-since) | An ability that transforms its source ignores a transform since it was put on the stack | Low | Open |
 | [KI-24](#ki-24-under-bolass-citadel-the-top-of-a-library-is-cast-only-for-life) | Under Bolas's Citadel the top of a library is cast only for life | Medium | Open |
+| [KI-25](#ki-25-a-spacecrafts-power-and-toughness-box-is-not-drawn-before-it-is-a-creature) | A Spacecraft's power and toughness box is not drawn before it is a creature | Low | Open |
 
 ## Issues
 
@@ -165,6 +166,22 @@ Resonance, Lutri, storm and replicate copies). A fix has `retarget` take the spe
 
 **Scenarios.**
 - [`scenarios/restoration-magic-copy-may-be-aimed-at-a-new-target.cantrip`](../scenarios/restoration-magic-copy-may-be-aimed-at-a-new-target.cantrip) - the copy of a Cura aimed at a Plains (marked `# Known bug`).
+
+### KI-25: A Spacecraft's power and toughness box is not drawn before it is a creature
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Open | client | 2026-10-16, station (Wurmwall Sweeper) |
+
+**Notes.** A station card's [P/T] box belongs to its striation (CR 721.2b): the permanent has that base power and
+toughness only while it has N or more charge counters, and a station card has none in any other zone (CR 721.2c). So its
+content file prints no `power`/`toughness`, and the striation's static gives them (`station::base_pt`). The page draws the
+2/2 once the Sweeper is a creature, but a player looking at it in hand, or on the battlefield below the threshold, reads only
+"It's an artifact creature at 4+" and "4+ | Flying" - not what size it will be. A fix carries the box to the client as
+presentation (a `stationPt` beside the Oracle text, drawn in the striation), never as a characteristic.
+
+**Scenarios.**
+- [`scenarios/wurmwall-sweeper-is-a-flying-artifact-creature-only-while-it-has-four-charge-counters.cantrip`](../scenarios/wurmwall-sweeper-is-a-flying-artifact-creature-only-while-it-has-four-charge-counters.cantrip) - the engine side (no power below four, 2/2 at four).
 
 ### KI-10: A lone action whose cost depends on its target shows only the printed cost until the payment
 

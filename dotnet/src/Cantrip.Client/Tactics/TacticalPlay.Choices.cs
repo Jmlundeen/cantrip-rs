@@ -425,6 +425,17 @@ public sealed partial class TacticalPlay
 
         int most = Math.Min(prompt.Count, prompt.Eligible.Count);
 
+        // Station's creature (CR 702.184a): its power is the counters the permanent gets, so the one Station chose, or else
+        // the one of most power - not the one worth least, as another cost that taps would have it.
+        if (prompt.Purpose == CardChoicePurposeView.TapToPay && client.Object(prompt.Source) is { } stationed
+            && CardReading.LastStationThreshold(CardReading.Text(stationed)) > 0)
+        {
+            ViewHandle chosen = prompt.Eligible.Contains(_stationWith) ? _stationWith
+                : prompt.Eligible.OrderByDescending(card => client.Object(card)?.Power ?? 0).First();
+            _stationWith = ViewHandle.None;
+            return new CardsChosenAnswer { Cards = [chosen] };
+        }
+
         // What to behold (CR 701.4a): a permanent on the battlefield before a card from the hand, since revealing a card tells the
         // opponent what is in it and choosing a permanent tells them nothing.
         if (prompt.Purpose == CardChoicePurposeView.Behold)

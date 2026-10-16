@@ -324,8 +324,10 @@ public static partial class CardFace
             string[] printed = card.OracleText.Split('\n');
             for (int i = 0; i < printed.Length; i++)
             {
-                // A printed line an effect has taken away (CR 613.1f) stays as printed, greyed: said once, not twice.
-                lines.Add((printed[i], card.SpentLines.Contains(i) || Cantrip.Client.Tactics.CardReading.TakenAway(printed[i], card.LostAbilities, found)));
+                // A printed line an effect has taken away (CR 613.1f) stays as printed, greyed: said once, not twice. So does a
+                // station card's striation its charge counters have not reached (CR 721.2a).
+                lines.Add((printed[i], card.SpentLines.Contains(i) || Cantrip.Client.Tactics.CardReading.TakenAway(printed[i], card.LostAbilities, found)
+                    || Cantrip.Client.Tactics.CardReading.StationUnreached(card, printed[i])));
             }
         }
 

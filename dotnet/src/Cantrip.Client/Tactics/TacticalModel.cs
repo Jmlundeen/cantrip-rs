@@ -123,6 +123,9 @@ public sealed class TacticalModel
         ["policy.walkers"] = 1.00,
         // Whether a Vehicle is crewed to attack with: 1, or 0 for never.
         ["policy.crew"] = 1.00,
+        // Whether a permanent with station is stationed after combat by an untapped creature with power, while it is short of
+        // its last station symbol: 1, or 0 for never.
+        ["policy.station"] = 1.00,
         // The life this seat must have left after paying two for a Phyrexian mana symbol it has no mana for; 0 for
         // never paying life for one.
         ["policy.phyrexian"] = 8.00,
