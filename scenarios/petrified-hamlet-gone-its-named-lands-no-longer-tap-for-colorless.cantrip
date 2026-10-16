@@ -1,0 +1,34 @@
+# The Hamlet's "{T}: Add {C}" is a static ability's (CR 611.3a): Bot1's Hamlet names Island and Bot2's Island taps for {C};
+# once Bot2's Strip Mine has destroyed the Hamlet, the Island taps for {U} only.
+
+[Bot1 Deck]
+Petrified Hamlet
+Island x14
+
+[Bot2 Deck]
+Island
+Strip Mine
+Island x13
+
+[Actions]
+Bot1.Hand.Petrified Hamlet.Play
+Bot1.Pass
+Bot2.Pass
+Bot1.Name(Island)
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate(Ability: {C})
+? Bot2.Mana = {C}
+[T4 Bot2.Main1]
+Bot2.Hand.Strip Mine.Play
+Bot2.Battlefield.Strip Mine.Activate(Bot1.Battlefield.Petrified Hamlet; Ability: Destroy)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Petrified Hamlet
+! Bot2.Battlefield.Island.Activate(Ability: {C})
+Bot2.Battlefield.Island.Activate(Ability: {U})
+? Bot2.Mana = {U}
+
+[Expect]
+Turn = 4
+Bot2.Battlefield.Island.Tapped = true
