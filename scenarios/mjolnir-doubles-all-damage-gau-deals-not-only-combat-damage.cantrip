@@ -1,0 +1,74 @@
+# "Double all damage equipped creature would deal" is every kind of damage from that creature (CR 614.1, 120.3), not only combat
+# damage. Gau, Feral Youth (legendary, red and green: worthy, CR 700.16) is equipped on turn 3 (Mjölnir's enters trigger is
+# given no target) and attacks: its Rage makes it a 3/3, and its combat damage of 3 becomes 6 (Bot2 20 -> 14). On turn 5 Faithless
+# Looting is flashed back from the graveyard, a card leaving it, so Gau deals damage equal to its power to each opponent as the end
+# step begins: its power is still 3, the damage it would deal is doubled to 6 (14 -> 8). Nothing else doubles: Bot1 takes none.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Emerald
+Mox Jet
+Gau, Feral Youth
+Faithless Looting
+Mjölnir, Hammer of Thor
+Island
+Island
+Mountain
+Mountain
+Island x12
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Gau, Feral Youth.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Island; Island)
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Mjölnir, Hammer of Thor.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target()
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mjölnir, Hammer of Thor.Activate(Bot1.Battlefield.Gau, Feral Youth; Ability: Equip)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mjölnir, Hammer of Thor.AttachedTo = Gau, Feral Youth
+Bot1.Attack(Gau, Feral Youth)
+[T3 Bot1.Main2]
+? Bot2.Life = 14
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Graveyard.Faithless Looting.Cast(Ability: Flashback)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Island; Island)
+[T6 Bot2.Upkeep]
+
+[Expect]
+Bot2.Life = 8
+Bot1.Life = 20
+Bot1.Battlefield.Gau, Feral Youth.Power = 3

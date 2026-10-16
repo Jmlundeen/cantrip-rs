@@ -1,0 +1,81 @@
+# "{2}{R}, Discard this card: It deals 2 damage to each creature." works from a hand only (CR 113.6b): with one Mjölnir on the
+# battlefield and a second in hand, the battlefield one has no such ability to activate (refused) while the one in hand does.
+# The discarded card deals 2 damage to every creature, both players' (CR 120.3): Bot1's Magda, Brazen Outlaw (toughness 1) and
+# Bot2's Belladonna Took (toughness 2, exactly lethal) die, Bot2's Adeline, Resplendent Cathar (toughness 4) lives with 2 damage;
+# neither player loses life. The damage is the discarded card's (the Mjölnir on the battlefield is attached to nothing), so
+# Adeline has 2 damage marked and survives.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Black Lotus
+Magda, Brazen Outlaw
+Mjölnir, Hammer of Thor
+Mjölnir, Hammer of Thor
+Mountain x12
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Black Lotus
+Belladonna Took
+Adeline, Resplendent Cathar
+Plains
+Plains
+Plains x12
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Magda, Brazen Outlaw.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Mjölnir, Hammer of Thor.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target()
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Belladonna Took.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Adeline, Resplendent Cathar.Cast
+[T3 Bot1.Main1]
+? Bot2.Battlefield.Adeline, Resplendent Cathar.Power = 2
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Battlefield.Mjölnir, Hammer of Thor.Activate(Ability: Discard)
+Bot1.Hand.Mjölnir, Hammer of Thor.Activate(Ability: Discard)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 20
+Bot1.Graveyard = Magda, Brazen Outlaw; Mjölnir, Hammer of Thor; Black Lotus
+Bot2.Graveyard = Belladonna Took; Black Lotus
+Bot2.Battlefield.Adeline, Resplendent Cathar.Damage = 2
+Bot1.Battlefield = Mjölnir, Hammer of Thor; Mox Jet; Mox Pearl; Mox Ruby

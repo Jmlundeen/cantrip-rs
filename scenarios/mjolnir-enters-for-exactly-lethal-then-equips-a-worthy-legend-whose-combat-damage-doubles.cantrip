@@ -1,0 +1,66 @@
+# Mjölnir, Hammer of Thor: "When Mjölnir enters, it deals 4 damage to up to one target creature." Bot2's Adeline, Resplendent Cathar is a
+# 1/4 (its power is the number of creatures Bot2 controls): exactly four damage is lethal and she dies. "Equip worthy {1}"
+# (sorcery speed) then attaches it to Magda, Brazen Outlaw, a legendary red Dwarf (CR 700.16), and "Double all damage equipped
+# creature would deal" (CR 614.1): Magda attacks the empty board and her combat damage of 2 becomes 4 (Bot2 20 -> 16). Magda
+# is a 2/1 here: attacking taps her, which makes a Treasure, and nothing else changes her damage.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Pearl
+Magda, Brazen Outlaw
+Mjölnir, Hammer of Thor
+Black Lotus
+Mountain
+Mountain x12
+
+[Bot2 Deck]
+Black Lotus
+Adeline, Resplendent Cathar
+Plains
+Plains
+Plains
+Plains
+Plains
+Plains x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Magda, Brazen Outlaw.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Adeline, Resplendent Cathar.Cast
+[T3 Bot1.Main1]
+? Bot2.Battlefield.Adeline, Resplendent Cathar.Toughness = 4
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Hand.Mjölnir, Hammer of Thor.Cast
+Bot1.Target(Adeline, Resplendent Cathar)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Graveyard = Adeline, Resplendent Cathar; Black Lotus
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mjölnir, Hammer of Thor.Activate(Bot1.Battlefield.Magda, Brazen Outlaw; Ability: Equip)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mjölnir, Hammer of Thor.AttachedTo = Magda, Brazen Outlaw
+Bot1.Attack(Magda, Brazen Outlaw)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot2.Graveyard = Adeline, Resplendent Cathar; Black Lotus
+Bot1.Battlefield.Mjölnir, Hammer of Thor.AttachedTo = Magda, Brazen Outlaw
+Bot1.Battlefield.Magda, Brazen Outlaw.Damage = 0

@@ -1,0 +1,63 @@
+# "When Mjölnir enters, it deals 4 damage to up to one target creature": the target is chosen as the trigger is put on the stack
+# (CR 603.3d). Bot2 answers by exiling its own Belladonna Took with Swords to Plowshares, so the target is gone when the trigger
+# resolves (CR 608.2b): it does nothing, and the 4 damage is not redirected to anything else. Bot2 gains 2 (Belladonna's power).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Black Lotus
+Mjölnir, Hammer of Thor
+Mountain x14
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Belladonna Took
+Swords to Plowshares
+Plains x14
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Belladonna Took.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Mjölnir, Hammer of Thor.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Belladonna Took)
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Belladonna Took)
+? Stack.Count = 2
+Bot2.Pass
+Bot1.Pass
+? Exile = Belladonna Took
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 22
+Bot2.Battlefield = Plains; Mox Pearl; Mox Jet
+Bot1.Battlefield.Count = 4
+Exile = Belladonna Took
+Stack.Count = 0
