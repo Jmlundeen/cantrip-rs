@@ -167,6 +167,10 @@ public static partial class CardReading
     [GeneratedRegex(@"target (?:player|opponent) discards (a|an|one|two|three|four|x|\d+) cards?")]
     private static partial Regex DiscardClause();
 
+    /// <summary>"Tap up to that many target creatures", not "untap up to three lands".</summary>
+    [GeneratedRegex(@"\btap up to")]
+    private static partial Regex TapUpTo();
+
     /// <summary>A card's rules text as this reads it: lower case, with reminder text taken out.</summary>
     public static string Plain(string text) =>
         string.IsNullOrEmpty(text) ? string.Empty : Reminder().Replace(text.ToLowerInvariant(), string.Empty);
@@ -429,7 +433,7 @@ public static partial class CardReading
             return new EffectRead(EffectKind.Harm, Number(discard.Groups[1].Value));
         }
 
-        if (plain.Contains("tap target", StringComparison.Ordinal) || plain.Contains("tap up to", StringComparison.Ordinal)
+        if (plain.Contains("tap target", StringComparison.Ordinal) || TapUpTo().IsMatch(plain)
             || plain.Contains("can't block", StringComparison.Ordinal)
             || plain.Contains("can't attack", StringComparison.Ordinal)
             || plain.Contains("reveals their hand", StringComparison.Ordinal)

@@ -82,6 +82,8 @@ public sealed class CardReadingTests
     [InlineData("When this creature enters, you may discard any number of cards. When you do, up to that many target creatures each get -2/-2 until end of turn.", EffectKind.Shrink, 2)]
     [InlineData("When this creature enters, you may discard one or more land cards. When you do, return up to that many target nonland permanent cards from your graveyard to your hand.", EffectKind.Raise, 0)]
     [InlineData("Whenever you attack, you may sacrifice one or more Treasures. When you do, up to that many target creatures gain double strike until end of turn.", EffectKind.Help, 0)]
+    [InlineData("Untap up to three lands.", EffectKind.Unknown, 0)]
+    [InlineData("+1: Draw a card. At the beginning of the next end step, untap up to two lands.", EffectKind.Unknown, 0)]
     [InlineData("Draw two cards.", EffectKind.Unknown, 0)]
     public void An_effect_is_read_off_its_words(string text, EffectKind kind, int amount)
     {
