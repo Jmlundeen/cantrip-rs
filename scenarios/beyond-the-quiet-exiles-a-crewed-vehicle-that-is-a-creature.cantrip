@@ -1,0 +1,39 @@
+# Beyond the Quiet exiles creatures, and a Vehicle is one only while crewed: on turn 3 Bot1's Llanowar Elves crews
+# Smuggler's Copter (tapping the Elves) and the sorcery then exiles both, the Elves and the artifact creature Copter.
+# The Moxen, the Forest and the sacrificed Black Lotus's pool mana are not creatures and stay.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Smuggler's Copter
+Black Lotus
+Mox Pearl
+Mox Jet
+Beyond the Quiet
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Smuggler's Copter.Cast
+Bot1.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Smuggler's Copter.Activate(Ability: Crew)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Beyond the Quiet.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Llanowar Elves; Smuggler's Copter
+Bot1.Graveyard = Beyond the Quiet; Black Lotus
+Bot1.Battlefield = Forest; Mox Pearl; Mox Jet

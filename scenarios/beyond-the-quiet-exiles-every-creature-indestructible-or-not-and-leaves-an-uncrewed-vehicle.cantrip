@@ -1,0 +1,59 @@
+# Beyond the Quiet: "Exile all creatures and Spacecraft." Bot1's Ornithopter, Bot2's Llanowar Elves and Bot2's Iron Shield
+# Elf all go to exile, the Elf having discarded its Island in response to become indestructible: exile is not
+# destruction, so indestructible does not help (CR 702.12b), and nothing dies, so no creature reaches a graveyard.
+# Bot1's Smuggler's Copter is an uncrewed Vehicle, an artifact and no creature, and stays; so do the Moxen and lands.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Jet
+Beyond the Quiet
+Ornithopter
+Smuggler's Copter
+Mox Ruby
+Island x13
+
+[Bot2 Deck]
+Forest
+Mox Jet
+Mox Ruby
+Iron-Shield Elf
+Llanowar Elves
+Island
+Island
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Smuggler's Copter.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Iron-Shield Elf.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Beyond the Quiet.Cast
+Bot2.Battlefield.Iron-Shield Elf.Activate
+Bot2.Choose(Island)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Ornithopter; Llanowar Elves; Iron-Shield Elf
+Bot1.Graveyard = Beyond the Quiet; Black Lotus
+Bot2.Graveyard = Island
+Bot1.Battlefield = Mox Pearl; Mox Jet; Mox Ruby; Smuggler's Copter
+Bot2.Battlefield = Forest; Mox Jet; Mox Ruby
