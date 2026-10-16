@@ -1,0 +1,59 @@
+# James, Wandering Dad // Follow Him. Turn 1 Follow Him ("Investigate X times") is cast as an Adventure for X=2 and makes
+# two Clues; James goes to exile (CR 715.4) and is cast from there on turn 3. Turn 5, with two Islands and Mox Sapphire
+# untapped, his "{T}: Add {C}{C}. Spend this mana only to activate abilities." can't help cast Karn, Scion of Urza ({4}), a
+# spell (CR 106.6), but both {C} pay one Clue's "{2}, Sacrifice this token: Draw a card."; a third Island then casts Karn.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Sapphire
+James, Wandering Dad
+Karn, Scion of Urza
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.James, Wandering Dad.Cast(Ability: Adventure; X: 2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield = Clue Token; Clue Token; Island
+? Exile = James, Wandering Dad
+Bot1.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Exile.James, Wandering Dad.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.James, Wandering Dad.Activate
+? Bot1.Mana = {C}{C} (Abilities)
+! Bot1.Hand.Karn, Scion of Urza.Cast
+Bot1.Battlefield.Clue Token#1.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Island#3.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Karn, Scion of Urza.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Clue Token; Island; Island; Island; James, Wandering Dad; Karn, Scion of Urza; Mox Sapphire
+Bot1.Battlefield.James, Wandering Dad.Tapped = true
+Bot1.Battlefield.Karn, Scion of Urza.Counters.Loyalty = 5

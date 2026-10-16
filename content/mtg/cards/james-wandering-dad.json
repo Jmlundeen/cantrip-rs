@@ -1,0 +1,14 @@
+{
+  "name": "James, Wandering Dad",
+  "manaCost": "{2}{U}",
+  "type": "Legendary Creature — Human Scientist",
+  "power": 2,
+  "toughness": 4,
+  "oracleText": "{T}: Add {C}{C}. Spend this mana only to activate abilities.",
+  "adventure": {
+    "name": "Follow Him",
+    "manaCost": "{X}{U}{U}",
+    "type": "Instant — Adventure",
+    "oracleText": "Investigate X times. (Then exile this card. You may cast the creature later from exile.)"
+  }
+}
