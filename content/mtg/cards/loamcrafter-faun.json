@@ -1,0 +1,8 @@
+{
+  "name": "Loamcrafter Faun",
+  "manaCost": "{2}{G}",
+  "type": "Creature — Satyr Druid",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "When this creature enters, you may discard one or more land cards. When you do, return up to that many target nonland permanent cards from your graveyard to your hand."
+}

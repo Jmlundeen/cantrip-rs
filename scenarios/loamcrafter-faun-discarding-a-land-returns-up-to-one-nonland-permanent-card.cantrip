@@ -1,0 +1,37 @@
+# Loamcrafter Faun: entering, Bot1 may discard only land cards (Brainstorm is refused, the Island taken). One land
+# discarded makes "up to one" target (CR 603.12): two are refused, and so are Lightning Bolt (an instant, not a
+# permanent card) and the Island just discarded (a land); Black Lotus returns to Bot1's hand and Lotus Petal stays.
+
+[Bot1 Deck]
+Forest
+Lotus Petal
+Black Lotus
+Lightning Bolt
+Loamcrafter Faun
+Island
+Brainstorm
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Lotus Petal.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Loamcrafter Faun.Cast
+! Bot1.Choose(Brainstorm)
+Bot1.Choose(Island)
+! Bot1.Target(Black Lotus; Lotus Petal)
+! Bot1.Target(Lightning Bolt)
+! Bot1.Target(Island)
+Bot1.Target(Black Lotus)
+
+[Expect]
+Bot1.Hand = Brainstorm; Black Lotus
+Bot1.Graveyard.Count = 3
+Bot2.Life = 17

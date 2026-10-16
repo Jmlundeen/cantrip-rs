@@ -1,0 +1,31 @@
+# Loamcrafter Faun: Bot1 discards both Islands in its hand, so the reflexive ability returns up to two (CR 603.12):
+# Black Lotus and Lotus Petal both come back to Bot1's hand, together.
+
+[Bot1 Deck]
+Forest
+Lotus Petal
+Black Lotus
+Lightning Bolt
+Loamcrafter Faun
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Lotus Petal.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Loamcrafter Faun.Cast
+Bot1.Choose(Island; Island)
+Bot1.Target(Black Lotus; Lotus Petal)
+
+[Expect]
+Bot1.Hand = Black Lotus; Lotus Petal
+Bot1.Graveyard = Island; Island; Lightning Bolt
