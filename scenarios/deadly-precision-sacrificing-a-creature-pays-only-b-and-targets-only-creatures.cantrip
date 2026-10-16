@@ -1,0 +1,36 @@
+# Deadly Precision's other additional cost: sacrifice an artifact or creature (CR 601.2b, 118.8). Bot1 has just a Swamp, so the
+# spell costs {B} and the Ornithopter is sacrificed instead of paying {4}; its own Island stays in hand. "Destroy target
+# creature": Bot2 controls a Mox Emerald (an artifact, not a creature) beside its Llanowar Elves, and the cast aimed at the
+# Mox is refused (the positive control is the cast at the Elves on the next line). Only the Elves is destroyed.
+
+[Bot1 Deck]
+Swamp
+Ornithopter
+Deadly Precision
+Island x12
+
+[Bot2 Deck]
+Mox Emerald
+Llanowar Elves
+Forest x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+! Bot1.Hand.Deadly Precision.Cast(Bot2.Battlefield.Mox Emerald)
+Bot1.Hand.Deadly Precision.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Modes(Sacrifice an artifact or creature)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Swamp
+Bot1.Graveyard = Deadly Precision; Ornithopter
+Bot2.Battlefield = Mox Emerald
+Bot2.Graveyard = Llanowar Elves

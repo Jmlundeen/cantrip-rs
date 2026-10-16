@@ -1,0 +1,31 @@
+# Neither additional cost of Deadly Precision can be paid (CR 601.2b, 118.3): on turn 3 Bot1 has two Swamps - {B} plus {4}
+# is five mana - and no artifact or creature to sacrifice, so the spell is not offered though Bot2 has a creature to
+# destroy. The positive control is deadly-precision-paying-four-destroys-a-creature-and-keeps-yours: the same spell and
+# target with five mana, and it is cast.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Deadly Precision
+Island x12
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+! Bot1.Hand.Deadly Precision.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Deadly Precision; Island; Island; Island; Island; Island
+Bot1.Graveyard.Count = 0
+Bot2.Battlefield = Forest; Llanowar Elves

@@ -1,0 +1,47 @@
+# Deadly Precision's additional cost, first way: pay {4} (CR 601.2b, 118.8). Bot1 controls an Ornithopter it could have
+# sacrificed instead and chooses to pay {4}: the total is {B}{4}, five mana from the Swamp and four Moxen. Ornithopter stays
+# (the sacrifice was not paid as well), Bot2's Llanowar Elves is destroyed. The cost choice is offered because both ways
+# can be paid (the other scenarios sacrifice, or have no creature or artifact to sacrifice).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Ornithopter
+Deadly Precision
+Island x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Deadly Precision.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Modes(Pay {4})
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Swamp; Mox Jet; Mox Ruby; Mox Pearl; Mox Sapphire; Ornithopter
+Bot1.Graveyard = Deadly Precision
+Bot2.Battlefield = Forest
+Bot2.Graveyard = Llanowar Elves
