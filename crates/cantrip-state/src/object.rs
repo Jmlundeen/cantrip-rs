@@ -583,6 +583,11 @@ pub enum Duration {
     WhileSourceOnBattlefield,
     /// Until the next turn of this player begins (CR 611.2b): "until your next turn".
     UntilNextTurnOf(PlayerId),
+    /// "Until this card is cast from exile" (CR 611.2a, 400.7): until this object, a card in exile, becomes cast (CR
+    /// 601.2i) - after its costs are paid, so a mana ability the effect grants may help pay for it. A card that leaves
+    /// exile any other way is a new object (CR 400.7) that can never be cast as this one, so the effect then lasts as long
+    /// as its affected object does. Emrakul, the Exigent Doom and Streets of New Capenna's Glamorous Outlaw cycle.
+    UntilCastFromExile(ObjectId),
 }
 
 /// When a permission to play a card ends (CR 611.2).

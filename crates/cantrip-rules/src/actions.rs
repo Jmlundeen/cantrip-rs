@@ -2963,6 +2963,11 @@ fn cast(
         from: cast_from,
         way,
     }));
+    // "Until this card is cast from exile" (CR 611.2a, 400.7) ends now, as the card that was in exile becomes cast: the
+    // effects about it were there while its costs were paid.
+    if cast_from == ZoneKind::Exile && cx.s().effects.iter().any(|e| e.duration == Duration::UntilCastFromExile(card)) {
+        cx.st().effects_retain(|e| e.duration != Duration::UntilCastFromExile(card));
+    }
     let nth = cx.history().casts_by(player).count().min(255) as u8;
     cx.emit(Event::SpellCast { spell, player, nth });
     for &t in targets.iter().filter(|&&t| t != Target::None) {
