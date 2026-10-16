@@ -3,15 +3,6 @@ use cantrip_mechanics::damage_target;
 use cantrip_mechanics::{attach::attached_object, targets};
 use cantrip_oracle as oracle;
 
-/// "Target player or planeswalker" (CR 115.4): any target narrowed to players and planeswalkers.
-fn player_or_planeswalker(q: &dyn Query, _: &Asker, t: Target) -> bool {
-    match t {
-        Target::Player(_) => true,
-        Target::Object(id) => targets::permanent(q, id) && q.chars(id).is(CardType::Planeswalker),
-        Target::None | Target::Ability(_) => false,
-    }
-}
-
 /// "This creature deals 1 damage to target player or planeswalker. You draw a card." The creature is the source, and
 /// "you" is whoever controls it.
 fn ping_and_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -23,7 +14,7 @@ fn ping_and_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     enchant: Some(targets::CREATURE),
     delayed: &[ability(TAP, ping_and_draw, "{T}: This creature deals 1 damage to target player or planeswalker. You draw a card.")
-        .targets(&[target(player_or_planeswalker)])],
+        .targets(&[targets::PLAYER_OR_PLANESWALKER])],
     statics: &[static_ability(Layer::Ability, attached_object, cantrip_mechanics::statics::grant_delayed_ability, "Enchanted creature has \"{T}: This creature deals 1 damage to target player or planeswalker. You draw a card.\"")],
     ..oracle::QUICKSILVER_DAGGER
 };

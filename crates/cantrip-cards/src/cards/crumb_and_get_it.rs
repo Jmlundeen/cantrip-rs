@@ -9,7 +9,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
     pump(g, item.object, creature, 2, 2);
     if item.gift.is_some() {
-        g.add_effect(item.object, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::Indestructible])), Duration::EndOfTurn);
+        cantrip_mechanics::effects::gain_indestructible_until_end_of_turn(g, item.object, creature);
     }
     Ok(())
 }

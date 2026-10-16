@@ -31,6 +31,14 @@ fn creature_you_control_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool 
     creature_filter(q, asker, t) && matches!(t, Target::Object(id) if q.controller(id) == asker.controller)
 }
 
+fn player_or_planeswalker_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
+    match t {
+        Target::Player(_) => true,
+        Target::Object(id) => on_battlefield(q, id) && q.chars(id).is(CardType::Planeswalker),
+        Target::None | Target::Ability(_) => false,
+    }
+}
+
 fn creature_or_planeswalker_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
     matches!(t, Target::Object(id) if on_battlefield(q, id) && {
         let c = q.chars(id);
@@ -57,6 +65,9 @@ pub const CREATURE: TargetSpec = target(creature_filter);
 /// tapped then. Ajani, Outland Chaperone, Cryogen Relic and The Wandering Emperor print it.
 pub const TAPPED_CREATURE: TargetSpec = target(tapped_creature_filter);
 pub const CREATURE_YOU_CONTROL: TargetSpec = target(creature_you_control_filter);
+/// "Target player or planeswalker" (CR 115.1, 115.4): any target narrowed to players and planeswalkers. Boros Charm, Kyren
+/// Negotiations and Quicksilver Dagger print it.
+pub const PLAYER_OR_PLANESWALKER: TargetSpec = target(player_or_planeswalker_filter);
 /// "Target creature or planeswalker" (CR 115.1). Unholy Heat and Baleful Mastery print it.
 pub const CREATURE_OR_PLANESWALKER: TargetSpec = target(creature_or_planeswalker_filter);
 pub const PLAYER: TargetSpec = target(player_filter);

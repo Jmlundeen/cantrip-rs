@@ -6,7 +6,7 @@ use cantrip_oracle as oracle;
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Target::Object(creature) = item.targets[0] {
         g.add_counters(creature, CounterKind::PlusOne, 1);
-        g.add_effect(item.object, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::Indestructible])), Duration::EndOfTurn);
+        cantrip_mechanics::effects::gain_indestructible_until_end_of_turn(g, item.object, creature);
     }
     Ok(())
 }

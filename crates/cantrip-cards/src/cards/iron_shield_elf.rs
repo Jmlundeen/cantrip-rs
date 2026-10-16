@@ -12,7 +12,7 @@ fn any_card(_: &dyn Query, _: &Asker, _: ObjectId) -> bool {
 fn shield(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let elf = item.object;
     if targets::permanent(g, elf) {
-        g.add_effect(elf, elf, EffectKind::AddKeywords(Keywords::of(&[Keyword::Indestructible])), Duration::EndOfTurn);
+        cantrip_mechanics::effects::gain_indestructible_until_end_of_turn(g, elf, elf);
         g.tap(elf);
     }
     Ok(())

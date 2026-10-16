@@ -7,7 +7,7 @@ use cantrip_oracle as oracle;
 /// with no target chosen, it does nothing.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     for creature in targets::legal_objects(g, item) {
-        g.add_effect(item.object, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::Indestructible])), Duration::EndOfTurn);
+        cantrip_mechanics::effects::gain_indestructible_until_end_of_turn(g, item.object, creature);
     }
     Ok(())
 }
