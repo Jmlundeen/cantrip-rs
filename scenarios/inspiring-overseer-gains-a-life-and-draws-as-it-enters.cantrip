@@ -1,0 +1,29 @@
+# Inspiring Overseer ({2}{W}, 2/1 flyer): "When this creature enters, you gain 1 life and draw a card." Cast on turn five
+# from three Plains; the trigger resolves to 21 life and one more card in hand. Bot2 is untouched (negative control).
+
+[Bot1 Deck]
+Plains x3
+Inspiring Overseer
+Plains x12
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Inspiring Overseer.Cast
+[T5 Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Life = 21
+Bot2.Life = 20
+Bot1.Hand.Count = 6
+Bot1.Battlefield.Inspiring Overseer.Keywords = Flying

@@ -1,0 +1,38 @@
+# "When this creature enters, you gain 1 life and draw a card": the trigger is independent of the Overseer once it is on the
+# stack (CR 113.7a). Bot2 bolts the 2/1 in response to the trigger; it dies (toughness 1 boundary, 3 damage) and Bot1 still
+# gains 1 life and draws. Negative control: Bot2 gains nothing.
+
+[Bot1 Deck]
+Plains x3
+Inspiring Overseer
+Plains x12
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x13
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Inspiring Overseer.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Inspiring Overseer)
+[T5 Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Life = 21
+Bot2.Life = 20
+Bot1.Graveyard = Inspiring Overseer
+Bot2.Graveyard = Lightning Bolt; Mountain
+Bot1.Hand.Count = 6
+Bot1.Library.Count = 6
