@@ -1,0 +1,68 @@
+# Bolt Bend (CR 115.7a, 115.7d, rulings 2024-11-08): Bot1's Lightning Bolt targets Bot2's Ornithopter; in response Bot2
+# gives it hexproof with Blossoming Defense, so the Bolt's own target is now illegal - "it doesn't matter if the original
+# target has somehow become illegal itself". Bot2 then casts Bolt Bend on the Bolt and chooses the new target, but legality
+# is judged for the Bolt's controller, Bot1: the hexproof Ornithopter is not among the candidates (the refusal), only Bot1
+# and Bot2 are. Bot2 picks itself, so the Bolt takes Bot2 to 17 and the Ornithopter takes no damage.
+
+[Bot1 Deck]
+Mox Ruby
+Lightning Bolt
+Island x18
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Emerald
+Mox Sapphire
+Ornithopter
+Blossoming Defense
+Bolt Bend
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Blossoming Defense.Cast(Bot2.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Bolt Bend.Cast(Stack.Lightning Bolt)
+Bot2.Pass
+Bot1.Pass
+! Bot2.Target(Bot2.Battlefield.Ornithopter)
+Bot2.Target(Bot2)
+Bot2.Pass
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot2.Life = 17
+Bot1.Life = 20
+Bot2.Battlefield.Ornithopter.Damage = 0
+Bot2.Battlefield.Ornithopter.Keywords = Flying; Hexproof
+Bot1.Graveyard = Lightning Bolt
+Bot2.Graveyard = Bolt Bend; Blossoming Defense

@@ -1,0 +1,69 @@
+# Bolt Bend (ruling 2024-11-08): "If a spell or ability targets multiple things, you can't target it with Bolt Bend, even if
+# all but one of those targets have become illegal." Bot1's Kolaghan's Command destroys Bot2's Ornithopter and deals 2
+# damage to Bot2. In response Bot2's Blossoming Defense gives the Ornithopter hexproof: its target is now illegal, the
+# player target is the only legal one left, yet Bolt Bend (all four of its other Moxen untapped) is refused. The Command
+# resolves for the player alone: Bot2 at 18, and the Ornithopter survives.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Kolaghan's Command
+Island x16
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Emerald
+Mox Sapphire
+Ornithopter
+Blossoming Defense
+Bolt Bend
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Kolaghan's Command.Cast
+Bot1.Modes(3; 4)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Blossoming Defense.Cast(Bot2.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+! Bot2.Hand.Bolt Bend.Cast(Stack.Kolaghan's Command)
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot2.Life = 18
+Bot2.Battlefield.Ornithopter.Keywords = Flying; Hexproof
+Bot2.Graveyard = Blossoming Defense
+Bot2.Hand.Count = 1
+Bot1.Graveyard = Kolaghan's Command

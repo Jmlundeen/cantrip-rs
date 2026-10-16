@@ -1,0 +1,71 @@
+# Bolt Bend's discount at exactly power 4: Bot1's Giant Cindermaw is a 4/3, so Bolt Bend costs {R} and tapping Mox Ruby #2
+# alone pays for it (it would be refused for want of mana otherwise). Rulings 2024-11-08: once cast, losing the creature
+# does not change the cost or the spell. Bot2's Lightning Bolt targets the Cindermaw; Bot1 casts Bolt Bend; Bot2 responds
+# with Bovine Intervention and destroys the Cindermaw (Bot1 gets an Ox). Bolt Bend then resolves anyway: the Bolt's own
+# target is gone, which does not matter, and Bot1, asked, picks Bot2 for the new target. Bot2 17; Bot1 stays at 20.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Pearl
+Mox Jet
+Giant Cindermaw
+Bolt Bend
+Island
+Island x13
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mox Pearl
+Mox Jet
+Bovine Intervention
+Mountain x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Giant Cindermaw.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Giant Cindermaw)
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Bolt Bend.Cast(Stack.Lightning Bolt)
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Bovine Intervention.Cast(Bot1.Battlefield.Giant Cindermaw)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+[Bot2.Main2]
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot2.Life = 17
+Bot1.Life = 20
+Bot1.Graveyard = Bolt Bend; Giant Cindermaw
+Bot1.Battlefield.Ox.Token = true
+Bot2.Graveyard = Lightning Bolt; Bovine Intervention
