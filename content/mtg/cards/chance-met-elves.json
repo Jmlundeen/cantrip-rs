@@ -1,0 +1,8 @@
+{
+  "name": "Chance-Met Elves",
+  "manaCost": "{2}{G}",
+  "type": "Creature — Elf Warrior",
+  "power": 3,
+  "toughness": 2,
+  "oracleText": "Whenever you scry, put a +1/+1 counter on this creature. This ability triggers only once each turn."
+}

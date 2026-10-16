@@ -1,0 +1,61 @@
+# Chance-Met Elves: "Whenever you scry, put a +1/+1 counter on this creature. This ability triggers only once each
+# turn." Bot1 casts the Elves on turn 1 (Mox Sapphire for Sol Ring, Sol Ring and Mox Emerald for the Elves). On turn 3
+# Bot1 casts two Preordains, each scrying 2 (CR 701.22): the first scry triggers the Elves, the second does not (it
+# triggers only once each turn), so the Elves have one counter. On turn 5 a third Preordain's scry triggers it again,
+# a new turn: two counters, a 5/4.
+
+[Bot1 Deck]
+Mox Sapphire
+Sol Ring
+Mox Emerald
+Chance-Met Elves
+Preordain
+Island
+Island
+Preordain
+Preordain
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Chance-Met Elves.Cast
+Bot1.Pass
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Preordain.Cast
+Bot1.Pass
+Bot1.Arrange(Preordain; Island |)
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+? Bot1.Battlefield.Chance-Met Elves.Counters.PlusOnePlusOne = 1
+Bot1.Hand.Preordain.Cast
+Bot1.Pass
+Bot1.Arrange(Island; Island |)
+? Stack.Count = 0
+[T5 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Preordain.Cast
+Bot1.Pass
+Bot1.Arrange(Island; Island |)
+Bot1.Pass
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield.Chance-Met Elves.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Chance-Met Elves.Power = 5
+Bot1.Battlefield.Chance-Met Elves.Toughness = 4
+Bot1.Graveyard = Preordain; Preordain; Preordain

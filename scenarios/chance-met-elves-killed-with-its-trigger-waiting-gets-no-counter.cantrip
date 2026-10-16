@@ -1,0 +1,57 @@
+# Chance-Met Elves' trigger resolves after the Elves have died: "put a +1/+1 counter on this creature" finds no creature
+# (CR 400.7), so nothing happens. Bot1 casts the Elves on turn 1. On turn 3 Bot1 casts Preordain and scries 2, and with
+# the Elves' trigger on the stack Bot2 casts Lightning Bolt at them. The trigger then resolves and does nothing.
+
+[Bot1 Deck]
+Mox Sapphire
+Sol Ring
+Mox Emerald
+Chance-Met Elves
+Preordain
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain
+Mountain
+Mountain
+Mountain
+Mountain
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Chance-Met Elves.Cast
+Bot1.Pass
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Preordain.Cast
+Bot1.Pass
+Bot1.Arrange(Island; Island |)
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Chance-Met Elves)
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield = Mox Sapphire; Sol Ring; Mox Emerald; Island
+Bot1.Graveyard = Chance-Met Elves; Preordain
+Bot2.Graveyard = Lightning Bolt
