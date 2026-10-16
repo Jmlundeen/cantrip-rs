@@ -197,12 +197,14 @@ public sealed class TacticalPromptsTests
         // A cost of nothing to pay is no cost at all: Aminatou's for a card with no mana cost.
         Assert.Equal([1], Assert.IsType<ModesChosenAnswer>(Bot().Decide(client, Miracles(
             "Miracle (unpayable: it has no mana cost), from Aminatou, Veil Piercer", "Miracle {2}, from Lorehold, the Historian"))).Modes);
-        // Aminatou's reduction is taken off the cost: {5}{W}{W} less {4} is three, dearer than Lorehold's {2}; {4}{W} less {4}
-        // is one, cheaper.
+        // The server words Aminatou's cost already reduced: {1}{W}{W} is three, dearer than Lorehold's {2}; {W} is one, cheaper;
+        // what X's reduction says in brackets is not mana.
         Assert.Equal([1], Assert.IsType<ModesChosenAnswer>(Bot().Decide(client, Miracles(
-            "Miracle {5}{W}{W} less {4}, from Aminatou, Veil Piercer", "Miracle {2}, from Lorehold, the Historian"))).Modes);
+            "Miracle {1}{W}{W}, from Aminatou, Veil Piercer", "Miracle {2}, from Lorehold, the Historian"))).Modes);
         Assert.Equal([0], Assert.IsType<ModesChosenAnswer>(Bot().Decide(client, Miracles(
-            "Miracle {4}{W} less {4}, from Aminatou, Veil Piercer", "Miracle {2}, from Lorehold, the Historian"))).Modes);
+            "Miracle {W}, from Aminatou, Veil Piercer", "Miracle {2}, from Lorehold, the Historian"))).Modes);
+        Assert.Equal([0], Assert.IsType<ModesChosenAnswer>(Bot().Decide(client, Miracles(
+            "Miracle {X}{B}{B} (X less 4), from Aminatou, Veil Piercer", "Miracle {2}{B}{B}, its own"))).Modes);
     }
 
     // --- Choose a creature type -------------------------------------------------------------------------------------

@@ -131,17 +131,13 @@ public sealed partial class TacticalPlay
     /// The offered creature type that most of this seat's creatures and creature cards in hand have, the earlier offered on
     /// a tie (the first eligible when none has any).
     /// </summary>
-    /// <summary>What a miracle option costs: its symbols, less the generic mana a "less {4}" takes off them.</summary>
+    /// <summary>What a miracle option costs: the symbols of its cost, which the server words already reduced ("Miracle {W},
+    /// from Aminatou, Veil Piercer"); what is said in brackets after them (X's reduction) is not mana.</summary>
     private static int MiracleCost(string option)
     {
         string text = option.Split(", ")[0];
-        int less = text.IndexOf(" less ", StringComparison.Ordinal);
-        if (less < 0)
-        {
-            return CardReading.ManaValue(text);
-        }
-
-        return Math.Max(0, CardReading.ManaValue(text[..less]) - CardReading.ManaValue(text[less..]));
+        int aside = text.IndexOf(" (", StringComparison.Ordinal);
+        return CardReading.ManaValue(aside < 0 ? text : text[..aside]);
     }
 
     private static int MostCommonCreatureType(GameClient client, ChooseModesPromptMessage prompt)
@@ -216,7 +212,7 @@ public sealed partial class TacticalPlay
         }
 
         // Which miracle ability to reveal a card with (CR 702.94a): each is the same cast at a different cost, so the cheapest,
-        // and never one that can't be paid. "{5}{W}{W} less {4}" is the cost with the reduction taken off.
+        // and never one that can't be paid. The cost shown is already reduced; an X in it is left as the bot would announce it.
         if (prompt.Heading == "Choose which miracle to reveal it with" && prompt.Eligible.Count > 0)
         {
             int cheapest = prompt.Eligible
