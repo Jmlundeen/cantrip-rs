@@ -3,9 +3,9 @@ use cantrip_oracle as oracle;
 
 /// This spell costs {X} less to cast, where X is the greatest power among creatures you control (CR 601.2f): generic
 /// mana only; a creature with negative power reduces nothing, and with no creatures there is no reduction.
-fn cheaper_by_greatest_power(q: &dyn Query, _: ObjectId, player: PlayerId, costed: Costed) -> i8 {
+fn cheaper_by_greatest_power(q: &dyn Query, _: ObjectId, player: PlayerId, costed: Costed) -> CostDelta {
     if !matches!(costed, Costed::Spell(_)) {
-        return 0;
+        return CostDelta::NONE;
     }
     let greatest = q
         .permanents_of(player)
@@ -16,7 +16,7 @@ fn cheaper_by_greatest_power(q: &dyn Query, _: ObjectId, player: PlayerId, coste
         .max()
         .unwrap_or(0)
         .max(0);
-    -(greatest.min(127) as i8)
+    CostDelta::less(greatest.min(255) as u8)
 }
 
 /// "{T}: Add {G}{G}. You gain 2 life." A mana ability: the life is gained as it resolves.

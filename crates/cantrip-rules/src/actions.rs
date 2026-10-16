@@ -241,9 +241,9 @@ fn pay_exert_and_tappers(cx: &mut Cx, source: ObjectId, cost: &Cost, tappers: &[
 /// turn, by anyone. Counted for the object (a new object is a new count) and for each instance of an identically
 /// worded ability on its own.
 fn limit_reached(cx: &Cx, id: ObjectId, index: usize, def: &ActivatedDef) -> bool {
-    // Exhaust (CR 702.177a): this permanent has activated this ability before, in any turn. A permanent that left
-    // and came back is another object, with its exhaust abilities unused.
-    if def.exhaust
+    // "Activate only once" (CR 602.5b; exhaust, 702.177a; power-up, 702.193a): this permanent has activated this
+    // ability before, in any turn. A permanent that left and came back is another object, with the ability unused.
+    if def.once
         && let Some(ability) = cx.chars(id).abilities().nth(index)
         && cx
             .history()
@@ -846,29 +846,29 @@ fn change_with(cx: &Cx, sources: &[ObjectId], player: PlayerId, costed: Costed, 
         let obj = cx.s().obj(id);
         match face { Some(face) => cx.card(face), None => cx.card(obj.copy.map_or(obj.card, |c| c.card)) }.own_cost_changes
     };
-    if sources.is_empty() && own.is_empty() {
+    // The ability's own change ("this ability costs ... less", power-up), asked for this ability alone.
+    let ability_own = ability.and_then(|a| activated(cx, a)).and_then(|d| d.cost_change);
+    if sources.is_empty() && own.is_empty() && ability_own.is_none() {
         return cost;
     }
-    let (mut more, mut less) = (0i32, 0i32);
+    let mut more = 0u32;
+    let mut less = ManaCost::ZERO;
+    let mut add = |delta: CostDelta| {
+        more += delta.more as u32;
+        less = less.plus(&delta.less);
+    };
     for change in own {
-        let delta = change(q, id, player, costed) as i32;
-        if delta > 0 {
-            more += delta;
-        } else {
-            less -= delta;
-        }
+        add(change(q, id, player, costed));
+    }
+    if let Some(change) = ability_own {
+        add(change(q, id, player, costed));
     }
     let mut discount = 0u32;
     for &source in sources {
         let obj = cx.s().obj(source);
         let def = cx.card(cx.cards().current(obj));
         for change in def.cost_changes {
-            let delta = change(q, source, player, costed) as i32;
-            if delta > 0 {
-                more += delta;
-            } else {
-                less -= delta;
-            }
+            add(change(q, source, player, costed));
         }
         if let Some(ability) = ability {
             for d in def.ability_discounts {
@@ -876,12 +876,36 @@ fn change_with(cx: &Cx, sources: &[ObjectId], player: PlayerId, costed: Costed, 
             }
         }
     }
-    cost.generic = (cost.generic as i32 + more - less).clamp(0, 255) as u8;
+    // Increases, then reductions (CR 601.2f). Reductions of generic and colored mana commute, so the order the player
+    // could apply them in changes nothing.
+    cost.generic = (cost.generic as u32 + more).min(255) as u8;
+    cost = reduce(cost, &less);
     // "Can't reduce the mana in that cost to less than one mana": applied to the cost the other changes left (CR 601.2f).
     if discount > 0 {
         let room = cost.mana_value().saturating_sub(1);
         cost.generic -= discount.min(room).min(cost.generic as u32) as u8;
     }
+    cost
+}
+
+/// A cost reduced by an amount of mana (CR 118.7): its generic part takes generic mana off only (118.7a); each colored
+/// or colorless symbol takes off one mana of that type, and one the cost has none of (118.7b), or has fewer of (118.7c-d),
+/// takes off generic mana instead; a Phyrexian symbol takes off mana of its color (118.7f). Nothing goes below zero
+/// (CR 601.2f). The reduced symbols are the cost's plain ones of that type: no cost a colored reduction meets has a
+/// hybrid or Phyrexian symbol of its color yet.
+fn reduce(mut cost: ManaCost, by: &ManaCost) -> ManaCost {
+    debug_assert!(by.hybrid.iter().all(Option::is_none), "a reduction by hybrid mana is chosen as it is applied (CR 118.7e): not built");
+    let mut excess = by.generic as u32;
+    for i in 0..6 {
+        let mut n = by.symbols[i] as u32;
+        if i < 5 {
+            n += by.phyrexian[i] as u32;
+        }
+        let off = n.min(cost.symbols[i] as u32);
+        cost.symbols[i] -= off as u8;
+        excess += n - off;
+    }
+    cost.generic = (cost.generic as u32).saturating_sub(excess) as u8;
     cost
 }
 
@@ -3885,4 +3909,35 @@ pub fn unless_pays(cx: &mut Cx, payer: PlayerId, source: ObjectId, subject: Obje
 #[allow(dead_code)]
 fn is_live(cx: &Cx, id: ObjectId) -> bool {
     live(cx.s(), id)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn a_generic_reduction_takes_only_generic_mana_off() {
+        // CR 118.7a: {2} off {1}{W}{W} leaves {W}{W}, never touching the white.
+        assert_eq!(reduce(mana("{1}{W}{W}"), &mana("{2}")), mana("{W}{W}"));
+    }
+
+    #[test]
+    fn a_colored_reduction_takes_its_own_color_off_and_the_rest_from_generic() {
+        // CR 702.193b, 118.7: {3}{W}{W} off {5}{W}{W} is {W}{W} off the white and {3} off the generic.
+        assert_eq!(reduce(mana("{5}{W}{W}"), &mana("{3}{W}{W}")), mana("{2}"));
+        // CR 118.7b: blue the cost does not have comes off its generic mana.
+        assert_eq!(reduce(mana("{3}{R}"), &mana("{U}")), mana("{2}{R}"));
+        // CR 118.7c: more white than the cost has; the excess comes off its generic mana.
+        assert_eq!(reduce(mana("{2}{W}"), &mana("{W}{W}")), mana("{1}"));
+        // CR 118.7d: colorless likewise.
+        assert_eq!(reduce(mana("{2}{C}"), &mana("{C}{C}")), mana("{1}"));
+        // CR 118.7f: a Phyrexian symbol takes off mana of its color.
+        assert_eq!(reduce(mana("{1}{G}"), &mana("{G/P}")), mana("{1}"));
+    }
+
+    #[test]
+    fn a_reduction_takes_nothing_below_zero() {
+        // CR 601.2f: the mana is reduced to nothing, {0}, and no further.
+        assert_eq!(reduce(mana("{1}{U}"), &mana("{3}{U}{U}")), ManaCost::ZERO);
+    }
 }

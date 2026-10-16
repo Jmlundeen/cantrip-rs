@@ -393,9 +393,19 @@ impl AbilityDef {
         AbilityDef::Activated(ActivatedDef { once_each_turn: true, ..activated(self, "only an activated ability is activated once each turn") })
     }
 
-    /// Exhaust (CR 702.177a).
+    /// Exhaust (CR 702.177a): activated only once.
     pub const fn exhaust(self) -> AbilityDef {
-        AbilityDef::Activated(ActivatedDef { exhaust: true, ..activated(self, "only an activated ability has exhaust") })
+        AbilityDef::Activated(ActivatedDef { exhaust: true, once: true, ..activated(self, "only an activated ability has exhaust") })
+    }
+
+    /// "Activate only once." (CR 602.5b)
+    pub const fn once(self) -> AbilityDef {
+        AbilityDef::Activated(ActivatedDef { once: true, ..activated(self, "only an activated ability is activated only once") })
+    }
+
+    /// Its own cost change (CR 601.2f, 602.2b): "this ability costs ... less to activate".
+    pub const fn cost_change(self, change: CostChange) -> AbilityDef {
+        AbilityDef::Activated(ActivatedDef { cost_change: Some(change), ..activated(self, "only an activated ability has a cost") })
     }
 
     /// The zone it functions from, where not the battlefield (CR 113.6).

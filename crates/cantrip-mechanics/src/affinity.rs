@@ -3,10 +3,10 @@
 use cantrip_api::*;
 
 /// This spell costs {1} less to cast for each artifact you control.
-pub fn for_artifacts(q: &dyn Query, _: ObjectId, player: PlayerId, costed: Costed) -> i8 {
+pub fn for_artifacts(q: &dyn Query, _: ObjectId, player: PlayerId, costed: Costed) -> CostDelta {
     if !matches!(costed, Costed::Spell(_)) {
-        return 0;
+        return CostDelta::NONE;
     }
     let artifacts = q.permanents_of(player).into_iter().filter(|&id| q.chars(id).is(CardType::Artifact)).count();
-    -(artifacts.min(127) as i8)
+    CostDelta::less(artifacts.min(255) as u8)
 }

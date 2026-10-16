@@ -18,9 +18,9 @@ fn exile_and_plot(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 /// "Spells your opponents cast from graveyards or from exile cost {2} more to cast" (CR 601.2f): a spell on the stack
 /// that was cast from one of those zones, or a card in one that would be.
-fn opponents_graveyard_and_exile_spells_cost_two_more(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed) -> i8 {
-    let Costed::Spell(spell) = costed else { return 0 };
-    if player != q.controller(source) && matches!(zone_cast_from(q, spell), Some(ZoneKind::Graveyard | ZoneKind::Exile)) { 2 } else { 0 }
+fn opponents_graveyard_and_exile_spells_cost_two_more(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed) -> CostDelta {
+    let Costed::Spell(spell) = costed else { return CostDelta::NONE };
+    if player != q.controller(source) && matches!(zone_cast_from(q, spell), Some(ZoneKind::Graveyard | ZoneKind::Exile)) { CostDelta::more(2) } else { CostDelta::NONE }
 }
 
 pub static CARD: CardDef = CardDef {

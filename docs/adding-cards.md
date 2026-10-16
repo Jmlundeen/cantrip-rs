@@ -244,7 +244,11 @@ shapes have an example:
 - **Revolt** is `cantrip_mechanics::history::permanent_left_battlefield_this_turn(q, p)`. **Harness** (CR 701.64) is an effect:
   `g.add_effect(id, id, EffectKind::Harnessed, Duration::Indefinite)`, read by a static that grants the infinity ability
   (The Mind Stone). `Duration::UntilNextTurnOf(p)` is "until your next turn".
-- **Cost changes** are `CardDef.cost_changes` (Thalia-likes, Bilbo, Anointed Peacekeeper); **cast limits and bans** are
+- **Cost changes** are `CardDef.cost_changes` (Thalia-likes, Bilbo, Anointed Peacekeeper), a spell's own
+  `own_cost_changes` (affinity), and an ability's own `.cost_change(f)` ("this ability costs ... less", power-up). Each
+  returns a `CostDelta`: `more(n)` generic, `less(n)` generic, or `less_mana(cost)` for an amount that may be colored,
+  whose colored part comes off that color and any excess off generic (CR 118.7). "Activate only once" is `.once()`;
+  **cast limits and bans** are
   `CardDef.cast_rules` (`fn(&dyn Query, &Asker, caster) -> bool`, false forbids: Teferi); **as though it had flash** is
   `EffectKind::CastAsThoughFlash(types)` for a resolved spell's effect and `CardDef.flash_rules` for a static ability
   ("You may cast Aura and Equipment spells as though they had flash", Sigarda's Aid); a static lifting a loyalty ability's timing is `CardDef.instant_activation`

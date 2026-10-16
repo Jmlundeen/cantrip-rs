@@ -12,12 +12,12 @@ fn connives(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 /// "Spells you cast from your graveyard cost {2} less to cast" (CR 601.2f): a spell on the stack that was cast from a
 /// graveyard, or a card in one that would be.
-fn graveyard_spells_cost_two_less(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed) -> i8 {
-    let Costed::Spell(spell) = costed else { return 0 };
+fn graveyard_spells_cost_two_less(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed) -> CostDelta {
+    let Costed::Spell(spell) = costed else { return CostDelta::NONE };
     if player == q.controller(source) && zone_cast_from(q, spell) == Some(ZoneKind::Graveyard) {
-        -2
+        CostDelta::less(2)
     } else {
-        0
+        CostDelta::NONE
     }
 }
 

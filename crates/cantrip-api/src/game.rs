@@ -144,18 +144,24 @@ pub trait Query {
         self.obj(id).controller
     }
 
+    /// An object's mana cost (CR 202.1) as its characteristics give it: the card's or the one it copies, none for a copy
+    /// that has none (CR 707.9b) or a face-down permanent (CR 708.2a), and a Room's unlocked doors on the battlefield
+    /// (CR 709.5). Its {X} symbols are counted in `x`, not valued.
+    fn mana_cost(&self, id: ObjectId) -> ManaCost {
+        let c = self.chars(id);
+        if c.no_cost {
+            return ManaCost::ZERO;
+        }
+        let def = self.card(c.card);
+        // A Room on the battlefield has the mana cost of its unlocked doors alone (CR 709.5); anywhere else the card's.
+        if def.is_room() && self.obj(id).zone.is(ZoneKind::Battlefield) { def.room_cost(self.obj(id).marks.doors) } else { def.cost }
+    }
+
     /// An object's mana value (CR 202.3): its mana cost's, or 0 for a copy that has none (CR 707.9b). Each {X} in it
     /// is the value chosen while it is a spell on the stack, as it last was there once it has left (CR 202.3e,
     /// 608.2h), and 0 anywhere else.
     fn mana_value(&self, id: ObjectId) -> u32 {
-        let c = self.chars(id);
-        if c.no_cost {
-            return 0;
-        }
-        let def = self.card(c.card);
-        // A Room on the battlefield has the mana cost of its unlocked doors alone (CR 709.5); anywhere else the card's.
-        let on_battlefield = self.obj(id).zone.is(ZoneKind::Battlefield);
-        let cost = if def.is_room() && on_battlefield { def.room_cost(self.obj(id).marks.doors) } else { def.cost };
+        let cost = self.mana_cost(id);
         let x = if self.obj(id).zone.is(ZoneKind::Stack) {
             self.obj(id).x
         } else {

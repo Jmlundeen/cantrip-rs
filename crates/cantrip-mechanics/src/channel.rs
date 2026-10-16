@@ -5,10 +5,10 @@ use cantrip_api::*;
 
 /// "This ability costs {1} less to activate for each legendary creature you control" (CR 601.2f): the card's own change
 /// to the cost of its channel ability, which functions only from the hand.
-pub fn cheaper_per_legendary_creature(q: &dyn Query, _: ObjectId, player: PlayerId, costed: Costed) -> i8 {
-    let Costed::Ability(card, _) = costed else { return 0 };
+pub fn cheaper_per_legendary_creature(q: &dyn Query, _: ObjectId, player: PlayerId, costed: Costed) -> CostDelta {
+    let Costed::Ability(card, _) = costed else { return CostDelta::NONE };
     if !q.obj(card).zone.is(ZoneKind::Hand) {
-        return 0;
+        return CostDelta::NONE;
     }
     let legends = q
         .permanents_of(player)
@@ -18,5 +18,5 @@ pub fn cheaper_per_legendary_creature(q: &dyn Query, _: ObjectId, player: Player
             chars.is(CardType::Creature) && chars.supertypes.legendary
         })
         .count();
-    -(legends.min(127) as i8)
+    CostDelta::less(legends.min(255) as u8)
 }

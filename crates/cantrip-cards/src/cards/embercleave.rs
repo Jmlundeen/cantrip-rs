@@ -4,9 +4,9 @@ use cantrip_oracle as oracle;
 
 /// This spell costs {1} less to cast for each attacking creature you control (CR 601.2f, 506.4): generic mana only,
 /// and nothing outside combat.
-fn cheaper_per_attacker(q: &dyn Query, _: ObjectId, player: PlayerId, costed: Costed) -> i8 {
+fn cheaper_per_attacker(q: &dyn Query, _: ObjectId, player: PlayerId, costed: Costed) -> CostDelta {
     if !matches!(costed, Costed::Spell(_)) {
-        return 0;
+        return CostDelta::NONE;
     }
     let attackers = q
         .state()
@@ -14,7 +14,7 @@ fn cheaper_per_attacker(q: &dyn Query, _: ObjectId, player: PlayerId, costed: Co
         .iter()
         .filter(|a| q.is_on_battlefield(a.id) && q.controller(a.id) == player && q.chars(a.id).is(CardType::Creature))
         .count();
-    -(attackers.min(127) as i8)
+    CostDelta::less(attackers.min(255) as u8)
 }
 
 fn plus_one_plus_one(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {

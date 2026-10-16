@@ -194,10 +194,43 @@ pub enum Costed {
     Ability(ObjectId, AbilityRef),
 }
 
-/// A static ability that changes what something costs (CR 601.2f, 118.7): the change in generic mana for `costed`
-/// when `player` pays, by the permanent `source` that has it; negative reduces ("cost {1} less"), positive
-/// increases. Zero when it does not apply. Reductions cannot go below zero generic mana (CR 118.7c).
-pub type CostChange = fn(&dyn Query, ObjectId, PlayerId, Costed) -> i8;
+/// What a cost change does to a cost (CR 601.2f, 118.7): generic mana it adds, and an amount of mana it takes off.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct CostDelta {
+    /// Generic mana added: "costs {1} more" (CR 601.2f).
+    pub more: u8,
+    /// The amount of mana the cost is reduced by (CR 118.7). Its generic part reduces only the generic part of the cost
+    /// (118.7a); each colored or colorless symbol reduces mana of its own type, and whatever of it the cost does not have
+    /// reduces generic mana instead (118.7b-d); a Phyrexian symbol reduces mana of its color (118.7f). `x` is not read
+    /// (X is 0 in any mana cost not on the stack, CR 107.3). A hybrid symbol, which the payer would split as the
+    /// reduction is applied (118.7e), is refused: no card that reduces by one is built.
+    pub less: ManaCost,
+}
+
+impl CostDelta {
+    /// No change.
+    pub const NONE: CostDelta = CostDelta { more: 0, less: ManaCost::ZERO };
+
+    /// "Costs {n} more."
+    pub const fn more(n: u8) -> CostDelta {
+        CostDelta { more: n, less: ManaCost::ZERO }
+    }
+
+    /// "Costs {n} less": `n` generic mana off (CR 118.7a).
+    pub const fn less(n: u8) -> CostDelta {
+        CostDelta { more: 0, less: ManaCost { generic: n, ..ManaCost::ZERO } }
+    }
+
+    /// "Costs {W}{W} less", or "reduced by its mana cost": an amount of mana that may be colored (CR 118.7b-d, f).
+    pub const fn less_mana(mana: ManaCost) -> CostDelta {
+        CostDelta { more: 0, less: mana }
+    }
+}
+
+/// A static ability that changes what something costs (CR 601.2f, 118.7): what it does to the cost of `costed` when
+/// `player` pays, by the permanent `source` that has it (`CostDelta::NONE` when it does not apply). Every increase is
+/// applied first, then every reduction, and no part of the cost goes below zero (CR 601.2f).
+pub type CostChange = fn(&dyn Query, ObjectId, PlayerId, Costed) -> CostDelta;
 
 /// A static ability that makes abilities cost less to activate, but never below one mana (CR 601.2f, 118.7): how much
 /// generic mana less the ability `ability` of `permanent` costs `player` to activate, by the permanent `source` that has
@@ -598,9 +631,16 @@ pub struct ActivatedDef {
     /// "Activate only once each turn" (CR 602.5b-c): counted for this object and for each instance of the ability on
     /// its own, whoever activated it.
     pub once_each_turn: bool,
-    /// Exhaust (CR 702.177a): "Activate each exhaust ability only once" by this permanent. Asked of the event history,
-    /// where every activation of an ability, a mana ability's included, is recorded.
+    /// Exhaust (CR 702.177a): "Activate each exhaust ability only once" by this permanent. Implies `once`.
     pub exhaust: bool,
+    /// "Activate only once" (CR 602.5b; exhaust 702.177a, power-up 702.193a): this object has never activated this
+    /// ability. Asked of the event history, where every activation of an ability, a mana ability's included, is recorded;
+    /// a permanent that left and came back is a new object (CR 400.7) with the ability unused.
+    pub once: bool,
+    /// Its own cost change (CR 601.2f by way of 602.2b): "this ability costs {1} less to activate for each ...", power-up's
+    /// "this ability's cost is reduced by this permanent's mana cost" (CR 702.193a). Its `source` is the object whose
+    /// ability it is, and it is asked only for this ability.
+    pub cost_change: Option<CostChange>,
     /// Its modes, chosen on activation before its costs (CR 602.2b, 700.2); `effect` and `targets` are then unused.
     pub modal: Option<&'static ModalDef>,
     /// For a mana ability: its mana can only be spent as this restriction allows (CR 106.6), and goes to the pool
@@ -660,6 +700,8 @@ impl ActivatedDef {
         condition: None,
         once_each_turn: false,
         exhaust: false,
+        once: false,
+        cost_change: None,
         restricted: None,
         waterbend: false,
         tap_creatures_for_mana: false,

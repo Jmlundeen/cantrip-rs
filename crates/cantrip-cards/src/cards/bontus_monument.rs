@@ -3,13 +3,13 @@ use cantrip_oracle as oracle;
 
 /// "Black creature spells you cast cost {1} less to cast" (CR 601.2f): asked of the spell's own characteristics as it
 /// is cast; only its controller's spells, and a generic reduction takes only the generic part (CR 118.7c).
-fn black_creature_spells_cost_less(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed) -> i8 {
-    let Costed::Spell(spell) = costed else { return 0 };
+fn black_creature_spells_cost_less(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed) -> CostDelta {
+    let Costed::Spell(spell) = costed else { return CostDelta::NONE };
     if player != q.controller(source) {
-        return 0;
+        return CostDelta::NONE;
     }
     let chars = q.chars(spell);
-    if chars.is(CardType::Creature) && chars.colors.has(q.words(source).color(Color::Black)) { -1 } else { 0 }
+    if chars.is(CardType::Creature) && chars.colors.has(q.words(source).color(Color::Black)) { CostDelta::less(1) } else { CostDelta::NONE }
 }
 
 /// "Whenever you cast a creature spell": its controller's spells only, judged on the spell as it is on the stack.

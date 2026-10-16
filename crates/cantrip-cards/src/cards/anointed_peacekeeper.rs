@@ -29,16 +29,16 @@ fn enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
 /// Spells your opponents cast with the chosen name cost {2} more to cast. Activated abilities of sources with the
 /// chosen name cost {2} more to activate unless they're mana abilities (CR 601.2f, 602.2b): the rules ask this only of
 /// the abilities that use the stack.
-fn tax(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed) -> i8 {
-    let Some(chosen) = q.obj(source).marks.chosen_card else { return 0 };
+fn tax(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed) -> CostDelta {
+    let Some(chosen) = q.obj(source).marks.chosen_card else { return CostDelta::NONE };
     let (object, spell) = match costed {
         Costed::Spell(id) => (id, true),
         Costed::Ability(id, _) => (id, false),
     };
     if !cantrip_mechanics::library::object_has_name(q, object, chosen) || (spell && player == q.controller(source)) {
-        return 0;
+        return CostDelta::NONE;
     }
-    2
+    CostDelta::more(2)
 }
 
 pub static CARD: CardDef = CardDef {

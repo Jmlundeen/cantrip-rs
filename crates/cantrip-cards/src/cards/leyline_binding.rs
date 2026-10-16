@@ -5,13 +5,13 @@ use cantrip_oracle as oracle;
 
 /// Domain (an ability word): this spell costs {1} less to cast for each basic land type among lands you
 /// control.
-fn domain(q: &dyn Query, _: ObjectId, player: PlayerId, costed: Costed) -> i8 {
+fn domain(q: &dyn Query, _: ObjectId, player: PlayerId, costed: Costed) -> CostDelta {
     if !matches!(costed, Costed::Spell(_)) {
-        return 0;
+        return CostDelta::NONE;
     }
     let lands: Vec<Chars> = q.permanents_of(player).into_iter().map(|id| q.chars(id)).filter(|c| c.is(CardType::Land)).collect();
     let basic = [Subtype::Plains, Subtype::Island, Subtype::Swamp, Subtype::Mountain, Subtype::Forest];
-    -(basic.iter().filter(|&&t| lands.iter().any(|c| c.subtypes.has(t))).count() as i8)
+    CostDelta::less(basic.iter().filter(|&&t| lands.iter().any(|c| c.subtypes.has(t))).count() as u8)
 }
 
 /// "Exile target nonland permanent an opponent controls until this enchantment leaves the battlefield" (CR 610.3).

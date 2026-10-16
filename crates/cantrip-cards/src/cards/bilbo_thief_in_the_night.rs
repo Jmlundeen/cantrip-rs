@@ -4,12 +4,12 @@ use cantrip_oracle as oracle;
 
 /// Spells you cast from anywhere other than your hand cost {1} less to cast (CR 601.2f): the zone a spell is in as its
 /// cost is worked out, or the one it was cast from once it is on the stack.
-fn outside_hand_costs_one_less(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed) -> i8 {
-    let Costed::Spell(spell) = costed else { return 0 };
+fn outside_hand_costs_one_less(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed) -> CostDelta {
+    let Costed::Spell(spell) = costed else { return CostDelta::NONE };
     if player != q.controller(source) {
-        return 0;
+        return CostDelta::NONE;
     }
-    if zone_cast_from(q, spell).is_some_and(|z| z != ZoneKind::Hand) { -1 } else { 0 }
+    if zone_cast_from(q, spell).is_some_and(|z| z != ZoneKind::Hand) { CostDelta::less(1) } else { CostDelta::NONE }
 }
 
 /// Whenever Bilbo attacks, you may cast an artifact, instant, or sorcery spell from your graveyard. If an instant or
