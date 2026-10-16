@@ -1,0 +1,68 @@
+# Oath of Jace: "When Oath of Jace enters, draw three cards, then discard two cards. At the beginning of your upkeep,
+# scry X, where X is the number of planeswalkers you control." Bot1 casts Chance-Met Elves and the Oath on turn 1: the
+# Oath draws Counterspell, Lightning Bolt and Island and discards two of them (Counterspell and Lightning Bolt). In
+# Bot1's turn 3 upkeep Bot1 controls no planeswalker: X is 0 and scry 0 is no scry (CR 701.22b; the ruling: "you won't
+# scry at all. Abilities that trigger whenever you scry won't trigger"), so nothing is looked at (`! Bot1.Arrange`) and
+# the Elves get no counter. Bot1 then casts Karn, Scion of Urza. In the turn 5 upkeep X is 1: Bot1 scries 1, and the
+# Elves trigger and get their counter.
+
+[Bot1 Deck]
+Mox Sapphire
+Sol Ring
+Mox Emerald
+Black Lotus
+Chance-Met Elves
+Oath of Jace
+Karn, Scion of Urza
+Counterspell
+Lightning Bolt
+Island
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Chance-Met Elves.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Oath of Jace.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Choose(Counterspell; Lightning Bolt)
+? Bot1.Graveyard = Lightning Bolt; Counterspell; Black Lotus
+[T3 Bot1.Upkeep]
+Bot1.Pass
+! Bot1.Arrange
+? Bot1.Battlefield.Chance-Met Elves.Counters.PlusOnePlusOne = (absent)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Karn, Scion of Urza.Cast
+Bot1.Pass
+[T5 Bot1.Upkeep]
+Bot1.Pass
+Bot1.Arrange(Island |)
+? Stack.Count = 1
+Bot1.Pass
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield.Chance-Met Elves.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield = Mox Sapphire; Sol Ring; Mox Emerald; Chance-Met Elves; Oath of Jace; Karn, Scion of Urza
+Bot1.Graveyard = Lightning Bolt; Counterspell; Black Lotus

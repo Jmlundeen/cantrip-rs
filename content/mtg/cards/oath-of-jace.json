@@ -1,0 +1,6 @@
+{
+  "name": "Oath of Jace",
+  "manaCost": "{2}{U}",
+  "type": "Legendary Enchantment",
+  "oracleText": "When Oath of Jace enters, draw three cards, then discard two cards.\nAt the beginning of your upkeep, scry X, where X is the number of planeswalkers you control."
+}
