@@ -482,13 +482,17 @@ fn cost_words(cost: Option<ManaCost>) -> String {
 /// What a miracle ability costs, in words, from the card table alone (the card being drawn is no object yet when it is
 /// asked about): a split card's for each half it may be cast as, since a granted cost may be read off the half (CR 709.3a).
 fn miracle_cost_words(game: &Game, miracle: MiracleOf) -> String {
-    match game.cards.get(miracle.card).split {
+    let words = match game.cards.get(miracle.card).split {
         Some((left, right)) if !miracle.is_own() => [left, right]
             .iter()
             .map(|half| format!("{} {}", half.name, cost_words(miracle_cost(game, miracle, game.cards.id_of(half)))))
             .collect::<Vec<_>>()
             .join(" or "),
         _ => cost_words(miracle_cost(game, miracle, miracle.card)),
+    };
+    match miracle_less(game, miracle) {
+        0 => words,
+        less => format!("{words} less {{{less}}}"),
     }
 }
 
@@ -1022,10 +1026,10 @@ mod tests {
 
         assert_eq!(miracle_label(&game, own), "Miracle {1}{B}, its own");
         assert_eq!(miracle_label(&game, given), "Miracle {2}, from Lorehold, the Historian");
-        assert_eq!(miracle_label(&game, MiracleOf { card: hop, granter: aminatou, index: 0 }), "Miracle {W}, from Aminatou, Veil Piercer");
+        assert_eq!(miracle_label(&game, MiracleOf { card: hop, granter: aminatou, index: 0 }), "Miracle {2}{W} less {4}, from Aminatou, Veil Piercer");
         assert_eq!(
             miracle_label(&game, MiracleOf { card: room, granter: aminatou, index: 0 }),
-            "Miracle Unholy Annex {B} or Ritual Chamber {B}{B}, from Aminatou, Veil Piercer"
+            "Miracle Unholy Annex {2}{B} or Ritual Chamber {3}{B}{B} less {4}, from Aminatou, Veil Piercer"
         );
         assert_eq!(cost_words(None), "(unpayable: it has no mana cost)");
 

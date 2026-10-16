@@ -134,7 +134,8 @@ prompt first, where the spell is still in hand and the stack empty, so check it 
 
 A cast an effect makes as it resolves — cascade's, Etali's — has no `Cast` line to say an X or a kicker on, so it is
 announced with X of 0 and unkicked, and paid out of the pool; its other questions (a target, teamwork's creatures)
-are answered by lines as usual.
+are answered by lines as usual. Where a "you may" makes the cast, `Bot1.Accept(X: 5)` announces that X (a miracle cost
+that includes {X}, CR 107.3a).
 
 A **refusal**, `! Bot1.Graveyard.Embereth Shieldbreaker.Cast`, says what must *not* be offered; see [Refusals](#refusals).
 

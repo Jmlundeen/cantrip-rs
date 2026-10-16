@@ -49,6 +49,9 @@ pub struct CastTerms {
     pub any_type: bool,
     /// Generic mana added to its cost (CR 601.2f).
     pub more: u8,
+    /// Generic mana its total cost is reduced by as it is determined, once X is announced and after what increases it
+    /// (CR 601.2f, 118.7a): Aminatou, Veil Piercer's "its mana cost reduced by {4}".
+    pub less: u8,
     /// Life paid with its cost (CR 118.9, 119.4): Bolas's Citadel's mana value.
     pub life: u8,
     /// An instant or sorcery spell cast this way is exiled instead of put into a graveyard.

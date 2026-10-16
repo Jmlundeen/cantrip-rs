@@ -825,6 +825,11 @@ impl<'s> Run<'s> {
                 };
                 self.casting = Some(casting);
             }
+            // `Bot1.Accept(X: 5)`: a cast the "may" makes as it resolves announces that X (CR 107.3a), as a miracle cost that
+            // includes {X} does.
+            (RequestKind::May { .. }, None) if answer == Answer::Yes && step.named("X").is_some() => {
+                self.casting = Some(Casting::new(request.player, x_of(step)?, spend_of(step)?));
+            }
             (RequestKind::UnlessPays { .. }, Some(ActionKind::PayCost)) => {
                 self.casting = Some(Casting::new(request.player, None, spend_of(step)?));
             }

@@ -1069,8 +1069,12 @@ pub struct GrantedMiracle {
     pub has: fn(&dyn Query, &Asker, ObjectId) -> bool,
     /// Its miracle cost, for a card or the face of it being cast: the whole card as it is revealed, and the half, Adventure or
     /// face being cast as the linked ability resolves (CR 709.3a, 715.3a, 712.8a: only that face is evaluated). None is a
-    /// cost based on the mana cost of a card that has none, which can't be paid (CR 118.6).
+    /// cost based on the mana cost of a card that has none, which can't be paid (CR 118.6). An {X} in it is announced as the
+    /// card is cast (CR 107.3a).
     pub cost: fn(&dyn Query, CardId) -> Option<ManaCost>,
+    /// Generic mana the cost is reduced by as the total cost is determined (CR 601.2f, 118.7a): after X is announced and
+    /// after what increases it, so "its mana cost reduced by {4}" takes up to four off an X. 0 for none.
+    pub less: u8,
 }
 
 /// One miracle ability a card in a hand has (CR 702.94a): its own (`granter` none) or one a permanent gives it, named by the
@@ -1115,6 +1119,11 @@ impl Miracle {
             Some((granter, index)) => MiracleOf { card, granter, index },
         }
     }
+}
+
+/// The generic mana a named miracle ability's cost is reduced by as the total cost is determined (CR 601.2f, 118.7a).
+pub fn miracle_less(q: &dyn Query, miracle: MiracleOf) -> u8 {
+    if miracle.is_own() { 0 } else { q.card(miracle.granter).granted_miracles.get(miracle.index as usize).map_or(0, |grant| grant.less) }
 }
 
 /// The cost of a named miracle ability (CR 702.94a) for casting `face` of its card, read from the card table alone: the
@@ -1971,7 +1980,8 @@ fn miracle_resolves(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
             _ => ways[0],
         }
     };
-    g.cast_during_resolution_as(card, CastTerms { instead: Some(cost), way: Some(way.way), ..CastTerms::default() })?;
+    let less = miracle_less(g, named);
+    g.cast_during_resolution_as(card, CastTerms { instead: Some(cost), less, way: Some(way.way), ..CastTerms::default() })?;
     Ok(())
 }
 

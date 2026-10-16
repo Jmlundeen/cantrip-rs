@@ -2163,7 +2163,7 @@ pub fn act(cx: &mut Cx, player: PlayerId) -> R<Flow> {
                 (instead, 0)
             };
             let exile_after = permitted.is_some_and(|p| p.grant.exile_after);
-            cast(cx, player, source, action.index, &action.targets, CastTerms { instead, any_type, life, more, exile_after, copy: false, way: None }, false)?
+            cast(cx, player, source, action.index, &action.targets, CastTerms { instead, any_type, life, more, less: 0, exile_after, copy: false, way: None }, false)?
         }
         ActionKind::ActivateAbility if action.index >= PLAYER_MANA_ABILITY => {
             activate_mana(cx, player, source, action.index, action.color, false, &[])?;
@@ -2240,7 +2240,7 @@ fn cast(
     terms: CastTerms,
     resolving: bool,
 ) -> R<()> {
-    let CastTerms { instead, any_type, exile_after, life, more, copy: _, way: _ } = terms;
+    let CastTerms { instead, any_type, exile_after, life, more, less, copy: _, way: _ } = terms;
     // A way a permanent grants (CR 118.9) names the face cast as well: the cast goes on as that face's own.
     let granted = granted_slot(way);
     let way = granted.map_or(way, |(_, face)| granted_face_way(face));
@@ -2375,7 +2375,12 @@ fn cast(
     // an alternative cost is not that cost, so X is 0 (CR 107.3b).
     // A way a permanent grants (Lurrus, Underworld Breach's escape, mayhem) casts the face for its mana cost, or a cost that
     // includes it, so X is announced (CR 107.3a). Cast without paying its mana cost (`instead`, CR 118.9), X is 0 (CR 107.3b).
-    let x_symbols = if instead.is_none() && (way == 0 || matches!(way, WAY_ADVENTURE | WAY_OMEN | WAY_BACK_FACE | WAY_SPLIT_LEFT | WAY_SPLIT_RIGHT)) { def.cost.x } else { 0 };
+    // A cost paid instead that includes {X} (a miracle cost that is the card's mana cost reduced) announces it (CR 107.3a).
+    let x_symbols = match instead {
+        Some(instead) => instead.x,
+        None if way == 0 || matches!(way, WAY_ADVENTURE | WAY_OMEN | WAY_BACK_FACE | WAY_SPLIT_LEFT | WAY_SPLIT_RIGHT) => def.cost.x,
+        None => 0,
+    };
     let sacrifices_x = matches!(extra.variable, Some(VariableCost::SacrificeX(_)));
     if x_symbols > 0 || def.kicker.is_some() || extra.pay_x_life || sacrifices_x {
         let base = cost.mana;
@@ -2456,6 +2461,10 @@ fn cast(
     let life = announce_life(cx, player, spell, &mut cost.mana)?;
     // CR 601.2f: the total cost, with what increases or reduces it.
     cost.mana = apply_cost_changes(cx, player, Costed::Spell(spell), cost.mana);
+    // A reduction the cast was made with (CR 601.2f, 118.7a), after the increases and with the reductions: generic mana only.
+    if less > 0 {
+        cost.mana = reduce(cost.mana, &ManaCost { generic: less, ..ManaCost::ZERO });
+    }
     // CR 702.180a, 601.2f: the total cost comes down by generic mana equal to the tapped creature's power, read as the total
     // cost is determined, after what raises it; colored mana never comes down.
     if let Some(creature) = reducer {

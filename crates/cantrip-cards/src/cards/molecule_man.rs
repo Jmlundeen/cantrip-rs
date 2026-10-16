@@ -8,6 +8,6 @@ fn nonland_in_your_hand(q: &dyn Query, asker: &Asker, card: ObjectId) -> bool {
 }
 
 pub static CARD: CardDef = CardDef {
-    granted_miracles: &[GrantedMiracle { text: "Molecule Man's miracle {0}", has: nonland_in_your_hand, cost: |_, _| Some(ManaCost::ZERO) }],
+    granted_miracles: &[GrantedMiracle { text: "Molecule Man's miracle {0}", has: nonland_in_your_hand, cost: |_, _| Some(ManaCost::ZERO), less: 0 }],
     ..oracle::MOLECULE_MAN
 };

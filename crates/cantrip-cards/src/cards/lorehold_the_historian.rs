@@ -12,6 +12,7 @@ pub static CARD: CardDef = CardDef {
         text: "Lorehold, the Historian's miracle {2}",
         has: instant_or_sorcery_in_your_hand,
         cost: |_, _| Some(mana("{2}")),
+        less: 0,
     }],
     abilities: &[triggered(
         triggers::EACH_OPPONENTS_UPKEEP,
