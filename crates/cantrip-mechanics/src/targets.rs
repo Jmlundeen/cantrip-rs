@@ -153,6 +153,14 @@ fn land_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
     matches!(t, Target::Object(id) if on_battlefield(q, id) && q.chars(id).is(CardType::Land))
 }
 
+fn nonbasic_land_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    land_filter(q, asker, t) && matches!(t, Target::Object(id) if !q.chars(id).supertypes.basic)
+}
+
+fn nonbasic_land_an_opponent_controls_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    nonbasic_land_filter(q, asker, t) && matches!(t, Target::Object(id) if q.controller(id) != asker.controller)
+}
+
 fn land_you_control_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     land_filter(q, asker, t) && matches!(t, Target::Object(id) if q.controller(id) == asker.controller)
 }
@@ -186,6 +194,10 @@ pub const NONLAND_PERMANENT_AN_OPPONENT_CONTROLS_WITH_MANA_VALUE_2_OR_LESS: Targ
 pub const CREATURE_AN_OPPONENT_CONTROLS: TargetSpec = target(creature_an_opponent_controls_filter);
 /// "Target land". Candelabra of Tawnos and Strip Mine print it.
 pub const LAND: TargetSpec = target(land_filter);
+/// "Target nonbasic land" (CR 115.1, 205.4a). Wasteland prints it.
+pub const NONBASIC_LAND: TargetSpec = target(nonbasic_land_filter);
+/// "Target nonbasic land an opponent controls". Demolition Field prints it.
+pub const NONBASIC_LAND_AN_OPPONENT_CONTROLS: TargetSpec = target(nonbasic_land_an_opponent_controls_filter);
 /// "Target land you control". Earthbend (Badgermole Cub) and Sea Drake print it.
 pub const LAND_YOU_CONTROL: TargetSpec = target(land_you_control_filter);
 /// "Target card from a graveyard". Emperor of Bones, Ghost Vacuum, Keen-Eyed Curator and Lion Sash print it.

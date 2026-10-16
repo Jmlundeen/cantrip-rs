@@ -58,10 +58,17 @@ pub fn destroy_target_its_controller_may_fetch_basic(g: &mut dyn Game, item: &St
     let Some(permanent) = crate::targets::object(g, item, slot) else { return Ok(()) };
     let owner = g.controller(permanent);
     g.destroy(permanent);
-    if !effects::ask_may(g, owner, item.object, Purpose::Optional)? {
+    may_fetch_basic(g, owner, item.object, tapped)
+}
+
+/// "[Player] may search their library for a basic land card, put it onto the battlefield [tapped], then shuffle": asked
+/// first whether to, and declining skips the search and the shuffle (CR 701.23). Ghost Quarter, Erode and Avengers
+/// Disassembled (through `destroy_target_its_controller_may_fetch_basic`) and Demolition Field's own search print it.
+pub fn may_fetch_basic(g: &mut dyn Game, player: PlayerId, source: ObjectId, tapped: bool) -> Result<(), Suspend> {
+    if !effects::ask_may(g, player, source, Purpose::Optional)? {
         return Ok(());
     }
-    search_to_battlefield(g, owner, item.object, Find::ONE, tapped, |q, c| {
+    search_to_battlefield(g, player, source, Find::ONE, tapped, |q, c| {
         let chars = q.chars(c);
         chars.is(CardType::Land) && chars.supertypes.basic
     })?;
