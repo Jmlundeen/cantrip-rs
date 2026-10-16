@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{damage_target, targets};
+use cantrip_mechanics::{damage_target, targets, your_turn};
 use cantrip_oracle as oracle;
 
 /// Mine Collapse deals 5 damage to target creature or planeswalker.
@@ -10,11 +10,6 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 fn mountain(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
     q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Mountain))
-}
-
-/// "If it's your turn" (CR 118.9): the alternative cost may be paid only on its caster's own turn.
-fn your_turn(q: &dyn Query, asker: &Asker) -> bool {
-    q.state().turn.active == asker.controller
 }
 
 pub static CARD: CardDef = CardDef {

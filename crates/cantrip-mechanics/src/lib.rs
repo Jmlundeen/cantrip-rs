@@ -87,6 +87,13 @@ pub mod vote;
 
 use cantrip_api::*;
 
+/// "Activate only during your turn" (CR 602.5b), and "if it's your turn" on an alternative cost (CR 118.9): the
+/// ability's or spell's controller is the active player. Wishclaw Talisman, Vivi Ornitier, Sundial of the Infinite and
+/// Mine Collapse print it.
+pub fn your_turn(q: &dyn Query, asker: &Asker) -> bool {
+    q.state().turn.active == asker.controller
+}
+
 /// A player chooses `count` cards of their hand (all of it if they have fewer) and discards them together
 /// (CR 701.9). Asked even when the choice is forced, except of an empty hand.
 pub fn discard_chosen(g: &mut dyn Game, player: PlayerId, source: ObjectId, count: u8) -> Result<Vec<ObjectId>, Suspend> {
@@ -583,7 +590,7 @@ fn look_for_one(g: &mut dyn Game, player: PlayerId, source: ObjectId, count: usi
 
 /// "Each player shuffles their hand and graveyard into their library, then draws seven cards": every hand and
 /// graveyard moves together (CR 701.24), the libraries are shuffled, and each player draws in turn order from the
-/// active player (CR 101.4); nobody is asked. Echo of Eons, Timetwister and Time Spiral print it.
+/// active player (CR 101.4); nobody is asked. Echo of Eons, Timetwister, Time Spiral and Day's Undoing print it.
 pub fn shuffle_hands_and_graveyards_in_and_draw_seven(g: &mut dyn Game) {
     let players: Vec<PlayerId> = g.state().apnap().collect();
     let mut cards: Vec<ObjectId> = Vec::new();

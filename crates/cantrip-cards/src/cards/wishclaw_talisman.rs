@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::choose;
+use cantrip_mechanics::{choose, your_turn};
 use cantrip_mechanics::library::{Find, search_to_hand};
 use cantrip_oracle as oracle;
 
@@ -7,11 +7,6 @@ use cantrip_oracle as oracle;
 fn enters_with_three_wish_counters(_: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
     entering.counters[CounterKind::Wish as usize] += 3;
     Ok(())
-}
-
-/// "Activate only during your turn" (CR 602.5b).
-fn during_your_turn(q: &dyn Query, asker: &Asker) -> bool {
-    q.state().turn.active == asker.controller
 }
 
 /// "Search your library for a card, put it into your hand, then shuffle. An opponent gains control of this artifact."
@@ -38,6 +33,6 @@ fn search_and_give(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     enters: Some(enters_with_three_wish_counters),
     abilities: &[ability(cost("{1}, {T}").and(remove_counters(CounterKind::Wish, 1)), search_and_give, "{1}, {T}, Remove a wish counter from this artifact: Search your library for a card, put it into your hand, then shuffle. An opponent gains control of this artifact. Activate only during your turn.")
-        .condition(during_your_turn)],
+        .condition(your_turn)],
     ..oracle::WISHCLAW_TALISMAN
 };

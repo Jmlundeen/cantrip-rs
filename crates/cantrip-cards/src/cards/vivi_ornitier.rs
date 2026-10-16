@@ -1,10 +1,6 @@
 use cantrip_api::*;
+use cantrip_mechanics::your_turn;
 use cantrip_oracle as oracle;
-
-/// "Activate only during your turn".
-fn your_turn(q: &dyn Query, asker: &Asker) -> bool {
-    q.state().turn.active == asker.controller
-}
 
 /// "Add X mana in any combination of {U} and/or {R}, where X is Vivi Ornitier's power" (CR 106.1b, 605.3c-d): X is
 /// its power as the mana is added, and each mana is a color of its own choosing. With no power it adds nothing, and
