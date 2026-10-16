@@ -1,7 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::effects::ask_may;
 use cantrip_mechanics::tokens;
-use cantrip_mechanics::triggers::noncreature_spell_you_cast;
+use cantrip_mechanics::triggers::{noncreature_spell_you_cast, NONCREATURE_SPELL_YOU_CAST};
 use cantrip_oracle as oracle;
 
 /// A 4/4 colorless Construct artifact creature token with flying and haste. Other Constructs of the same name are
@@ -63,20 +63,8 @@ fn sacrifice_and_create(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspen
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever you cast a noncreature spell, you may have The Fantasticar become an artifact creature until end of turn.",
-            listens: EventMask::SPELL_CAST,
-            matches: noncreature_spell_you_cast,
-            effect: animate,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever you cast your fourth noncreature spell each turn, you may sacrifice The Fantasticar. If you do, create four 4/4 colorless Construct artifact creature tokens with flying and haste.",
-            listens: EventMask::SPELL_CAST,
-            matches: fourth_noncreature_spell,
-            effect: sacrifice_and_create,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(NONCREATURE_SPELL_YOU_CAST, animate, "Whenever you cast a noncreature spell, you may have The Fantasticar become an artifact creature until end of turn."),
+        triggered(when(EventMask::SPELL_CAST, fourth_noncreature_spell), sacrifice_and_create, "Whenever you cast your fourth noncreature spell each turn, you may sacrifice The Fantasticar. If you do, create four 4/4 colorless Construct artifact creature tokens with flying and haste."),
     ],
     ..oracle::THE_FANTASTICAR
 };

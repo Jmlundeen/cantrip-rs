@@ -20,12 +20,6 @@ fn grow(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "At the beginning of combat on your turn, put X +1/+1 counters on each creature you control, where X is Ouroboroid's power.",
-        listens: EventMask::STEP_BEGAN,
-        matches: cantrip_mechanics::triggers::beginning_of_your_combat,
-        effect: grow,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(cantrip_mechanics::triggers::BEGINNING_OF_YOUR_COMBAT, grow, "At the beginning of combat on your turn, put X +1/+1 counters on each creature you control, where X is Ouroboroid's power.")],
     ..oracle::OUROBOROID
 };

@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::tokens;
-use cantrip_mechanics::triggers::this_enters;
+use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_mechanics::{pump, targets};
 use cantrip_oracle as oracle;
 
@@ -24,21 +24,10 @@ fn shrink(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When Bloodtithe Harvester enters, create a Blood token.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            effect: create_blood,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{T}, Sacrifice Bloodtithe Harvester: Target creature gets -X/-X until end of turn, where X is twice the number of Blood tokens you control. Activate only as a sorcery.",
-            cost: Cost { tap: true, sacrifice_self: true, ..Cost::NONE },
-            timing: Timing::Sorcery,
-            targets: &[targets::CREATURE],
-            effect: shrink,
-            ..ActivatedDef::BLANK
-        }),
+        triggered(THIS_ENTERS, create_blood, "When Bloodtithe Harvester enters, create a Blood token."),
+        ability(TAP.and(SACRIFICE_THIS), shrink, "{T}, Sacrifice Bloodtithe Harvester: Target creature gets -X/-X until end of turn, where X is twice the number of Blood tokens you control. Activate only as a sorcery.")
+            .sorcery_speed()
+            .targets(&[targets::CREATURE]),
     ],
     ..oracle::BLOODTITHE_HARVESTER
 };

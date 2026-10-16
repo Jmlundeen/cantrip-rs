@@ -121,7 +121,7 @@ fn mana_activation(game: &Game, answer: &Answer) -> Option<ObjectId> {
         return Some(source);
     }
     match game.chars(source).abilities().nth(action.index as usize).map(|a| game.cards.ability(a)) {
-        Some(AbilityDef::Activated(d)) if d.mana.is_some() && !d.cost.discard_hand && !d.cost.discard_self && d.cost.discard.is_none() => {
+        Some(AbilityDef::Activated(d)) if d.is_mana_ability() && !d.cost.discard_hand && !d.cost.discard_self && d.cost.discard.is_none() => {
             Some(source)
         }
         _ => None,

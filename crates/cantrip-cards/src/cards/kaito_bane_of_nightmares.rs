@@ -96,28 +96,10 @@ pub static CARD: CardDef = CardDef {
             mana(1, 0, 1, 1, 0, 0),
             "Ninjutsu {1}{U}{B} ({1}{U}{B}, Return an unblocked attacker you control to hand: Put this card onto the battlefield from your hand tapped and attacking.)",
         ),
-        AbilityDef::Activated(ActivatedDef {
-            text: "+1: You get an emblem with \"Ninjas you control get +1/+1.\"",
-            cost: Cost { loyalty: Some(1), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            effect: emblem,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "0: Surveil 2. Then draw a card for each opponent who lost life this turn.",
-            cost: Cost { loyalty: Some(0), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            effect: surveil_then_draw,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "\u{2212}2: Tap target creature. Put two stun counters on it.",
-            cost: Cost { loyalty: Some(-2), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            targets: &[targets::CREATURE],
-            effect: tap_and_stun,
-            ..ActivatedDef::BLANK
-        }),
+        ability(loyalty(1), emblem, "+1: You get an emblem with \"Ninjas you control get +1/+1.\""),
+        ability(loyalty(0), surveil_then_draw, "0: Surveil 2. Then draw a card for each opponent who lost life this turn."),
+        ability(loyalty(-2), tap_and_stun, "\u{2212}2: Tap target creature. Put two stun counters on it.")
+            .targets(&[targets::CREATURE]),
     ],
     statics: &[
         StaticDef { text: "During your turn, as long as Kaito has one or more loyalty counters on him, he's a Ninja creature.", layer: Layer::Type, affects, apply: become_a_ninja_creature, ..StaticDef::BLANK },

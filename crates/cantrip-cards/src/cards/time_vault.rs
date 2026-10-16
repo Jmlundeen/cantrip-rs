@@ -20,12 +20,7 @@ fn extra_turn(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     keywords: Keywords::of(&[Keyword::DoesNotUntap]),
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "{T}: Take an extra turn after this one.",
-        cost: Cost { tap: true, ..Cost::NONE },
-        effect: extra_turn,
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[ability(TAP, extra_turn, "{T}: Take an extra turn after this one.")],
     turn_begin: &[TurnBeginRule { applies: tapped_as_its_controllers_turn_would_begin, on_skip: untap_it }],
     enters: Some(cantrip_mechanics::mana::enters_tapped),
     ..oracle::TIME_VAULT

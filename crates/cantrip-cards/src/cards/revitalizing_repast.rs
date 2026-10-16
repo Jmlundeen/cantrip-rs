@@ -12,7 +12,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static BACK: CardDef = CardDef {
-    abilities: &[mana::tap_for_either(Color::Black, Color::Green, "{T}: Add {B} or {G}.")],
+    abilities: &[mana_ability(TAP, add_one_of(&[Color::Black, Color::Green]), "{T}: Add {B} or {G}.")],
     enters: Some(mana::enters_tapped),
     ..oracle::OLD_GROWTH_GROVE
 };

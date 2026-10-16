@@ -67,10 +67,4 @@ fn remove_a_time_counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspe
     Ok(())
 }
 
-pub const REMOVE_A_TIME_COUNTER: AbilityDef = AbilityDef::Triggered(TriggeredDef {
-    text: "At the beginning of your end step, remove a time counter from it.",
-    listens: EventMask::STEP_BEGAN,
-    matches: your_end_step,
-    effect: remove_a_time_counter,
-    ..TriggeredDef::BLANK
-});
+pub const REMOVE_A_TIME_COUNTER: AbilityDef = triggered(when(EventMask::STEP_BEGAN, your_end_step), remove_a_time_counter, "At the beginning of your end step, remove a time counter from it.");

@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::effects;
-use cantrip_mechanics::{triggers::this_enters, warp};
+use cantrip_mechanics::{triggers::THIS_ENTERS, warp};
 use cantrip_oracle as oracle;
 
 /// "As long as you have one or fewer cards in hand, if you would draw one or more cards" (CR 121.2a, 614.1a): asked as
@@ -19,13 +19,7 @@ fn plus_one(_: &dyn Query, _: &Asker, p: &mut Proposal) {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When this creature enters, draw a card.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: this_enters,
-        effect: effects::draw::<1>,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(THIS_ENTERS, effects::draw::<1>, "When this creature enters, draw a card.")],
     replacements: &[ReplacementDef {
         hint: "draws one more card",
         kind: ReplacementKind::DrawInstruction,

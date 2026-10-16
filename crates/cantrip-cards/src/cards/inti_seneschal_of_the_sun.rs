@@ -46,27 +46,11 @@ fn exile_and_play(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever you attack, you may discard a card. When you do, put a +1/+1 counter on target attacking creature. It gains trample until end of turn.",
-            listens: EventMask::ATTACKERS_DECLARED,
-            matches: cantrip_mechanics::triggers::you_attack,
-            effect: discard_for_counter,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever you discard one or more cards, exile the top card of your library. You may play that card until your next end step.",
-            listens: EventMask::DISCARDED,
-            matches: you_discard,
-            effect: exile_and_play,
-            once_per_batch: true,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(cantrip_mechanics::triggers::YOU_ATTACK, discard_for_counter, "Whenever you attack, you may discard a card. When you do, put a +1/+1 counter on target attacking creature. It gains trample until end of turn."),
+        triggered(when(EventMask::DISCARDED, you_discard), exile_and_play, "Whenever you discard one or more cards, exile the top card of your library. You may play that card until your next end step.")
+            .once_per_batch(),
     ],
-    delayed: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When you do, put a +1/+1 counter on target attacking creature. It gains trample until end of turn.",
-        targets: &[TargetSpec { min: 1, max: 1, filter: attacking_creature }],
-        effect: empower,
-        ..TriggeredDef::BLANK
-    })],
+    delayed: &[delayed_trigger(empower, "When you do, put a +1/+1 counter on target attacking creature. It gains trample until end of turn.")
+        .targets(&[TargetSpec { min: 1, max: 1, filter: attacking_creature }])],
     ..oracle::INTI_SENESCHAL_OF_THE_SUN
 };

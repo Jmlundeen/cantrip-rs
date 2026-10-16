@@ -15,14 +15,8 @@ fn plus_six(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever equipped creature attacks, destroy target permanent.",
-            listens: EventMask::ATTACKS,
-            matches: cantrip_mechanics::triggers::equipped_creature_attacks,
-            targets: &[targets::PERMANENT],
-            effect: destroy_it,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(cantrip_mechanics::triggers::EQUIPPED_CREATURE_ATTACKS, destroy_it, "Whenever equipped creature attacks, destroy target permanent.")
+            .targets(&[targets::PERMANENT]),
         equip(mana(6, 0, 0, 0, 0, 0), "Equip {6}"),
     ],
     statics: &[StaticDef {

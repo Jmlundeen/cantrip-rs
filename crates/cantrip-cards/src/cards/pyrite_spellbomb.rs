@@ -10,19 +10,9 @@ fn damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "{R}, Sacrifice Pyrite Spellbomb: It deals 2 damage to any target.",
-            cost: Cost { mana: mana(0, 0, 0, 0, 1, 0), sacrifice_self: true, ..Cost::NONE },
-            targets: &[targets::ANY],
-            effect: damage,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{1}, Sacrifice Pyrite Spellbomb: Draw a card.",
-            cost: Cost { mana: mana(1, 0, 0, 0, 0, 0), sacrifice_self: true, ..Cost::NONE },
-            effect: effects::draw::<1>,
-            ..ActivatedDef::BLANK
-        }),
+        ability(cost("{R}").and(SACRIFICE_THIS), damage, "{R}, Sacrifice Pyrite Spellbomb: It deals 2 damage to any target.")
+            .targets(&[targets::ANY]),
+        ability(cost("{1}").and(SACRIFICE_THIS), effects::draw::<1>, "{1}, Sacrifice Pyrite Spellbomb: Draw a card."),
     ],
     ..oracle::PYRITE_SPELLBOMB
 };

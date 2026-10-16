@@ -8,11 +8,6 @@ fn draw_seven(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "Pay 7 life: Draw seven cards.",
-        cost: Cost { life: 7, ..Cost::NONE },
-        effect: draw_seven,
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[ability(life(7), draw_seven, "Pay 7 life: Draw seven cards.")],
     ..oracle::GRISELBRAND
 };

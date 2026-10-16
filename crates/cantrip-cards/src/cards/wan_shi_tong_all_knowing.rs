@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{choose, targets, tokens, triggers::this_enters};
+use cantrip_mechanics::{choose, targets, tokens, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 /// "This token can't block or be blocked by non-Spirit creatures" (CR 509.1b): of any possible block it is in, the other
@@ -52,24 +52,12 @@ fn make_spirits(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     labels: &["Second from the top", "On the bottom"],
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When Wan Shi Tong enters, target nonland permanent's owner puts it into their library second from the top or on the bottom.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            targets: &[targets::NONLAND_PERMANENT],
-            effect: put_into_library,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever one or more cards are put into a library from anywhere, create two 1/1 colorless Spirit creature tokens with \"This token can't block or be blocked by non-Spirit creatures.\"",
-            listens: EventMask::ZONE_CHANGE,
-            matches: cards_into_a_library,
-            effect: make_spirits,
-            look_back: true,
-            once_per_batch: true,
-            batch_by_data: true,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(THIS_ENTERS, put_into_library, "When Wan Shi Tong enters, target nonland permanent's owner puts it into their library second from the top or on the bottom.")
+            .targets(&[targets::NONLAND_PERMANENT]),
+        triggered(when(EventMask::ZONE_CHANGE, cards_into_a_library), make_spirits, "Whenever one or more cards are put into a library from anywhere, create two 1/1 colorless Spirit creature tokens with \"This token can't block or be blocked by non-Spirit creatures.\"")
+            .look_back()
+            .once_per_batch()
+            .batch_by_data(),
     ],
     ..oracle::WAN_SHI_TONG_ALL_KNOWING
 };

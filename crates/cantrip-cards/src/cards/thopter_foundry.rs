@@ -30,11 +30,6 @@ fn make_thopter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static EXTRA: &[&CardDef] = &[&THOPTER];
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "{1}, Sacrifice a nontoken artifact: Create a 1/1 blue Thopter artifact creature token with flying. You gain 1 life.",
-        cost: Cost { mana: mana(1, 0, 0, 0, 0, 0), ..Cost::sacrifice(1, nontoken_artifact) },
-        effect: make_thopter,
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[ability(cost("{1}").and(sacrifice(1, nontoken_artifact)), make_thopter, "{1}, Sacrifice a nontoken artifact: Create a 1/1 blue Thopter artifact creature token with flying. You gain 1 life.")],
     ..oracle::THOPTER_FOUNDRY
 };

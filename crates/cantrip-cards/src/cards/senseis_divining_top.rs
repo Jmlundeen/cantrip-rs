@@ -35,18 +35,8 @@ fn draw_and_put_on_top(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "{1}: Look at the top three cards of your library, then put them back in any order.",
-            cost: Cost { mana: mana(1, 0, 0, 0, 0, 0), ..Cost::NONE },
-            effect: look,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{T}: Draw a card, then put Sensei's Divining Top on top of its owner's library.",
-            cost: Cost { tap: true, ..Cost::NONE },
-            effect: draw_and_put_on_top,
-            ..ActivatedDef::BLANK
-        }),
+        ability(cost("{1}"), look, "{1}: Look at the top three cards of your library, then put them back in any order."),
+        ability(TAP, draw_and_put_on_top, "{T}: Draw a card, then put Sensei's Divining Top on top of its owner's library."),
     ],
     ..oracle::SENSEIS_DIVINING_TOP
 };

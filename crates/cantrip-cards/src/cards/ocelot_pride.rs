@@ -49,14 +49,8 @@ fn cats(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     ascend: true,
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "At the beginning of your end step, if you gained life this turn, create a 1/1 white Cat creature token. Then if you have the city's blessing, for each token you control that entered this turn, create a token that's a copy of it.",
-        listens: EventMask::STEP_BEGAN,
-        matches: triggers::your_end_step,
-        effect: cats,
-        condition: Some(gained_life_this_turn),
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(triggers::YOUR_END_STEP, cats, "At the beginning of your end step, if you gained life this turn, create a 1/1 white Cat creature token. Then if you have the city's blessing, for each token you control that entered this turn, create a token that's a copy of it.")
+        .condition(gained_life_this_turn)],
     ..oracle::OCELOT_PRIDE
 };
 

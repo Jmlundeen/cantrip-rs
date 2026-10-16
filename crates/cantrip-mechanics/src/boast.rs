@@ -1,7 +1,7 @@
 //! Boast (CR 702.142a): "[Cost]: [Effect]. Activate only if this creature attacked this turn and only once each turn."
 //! Broadside Bombardiers prints it.
 //!
-//! A card with boast lists `ability(text, cost, targets, effect)` among its `abilities`.
+//! A card with boast lists `cantrip_api::ability(text, cost, targets, effect)` among its `abilities`.
 
 use cantrip_api::*;
 
@@ -16,13 +16,8 @@ pub const fn ability(
     targets: &'static [TargetSpec],
     effect: fn(&mut dyn Game, &StackItem) -> Result<(), Suspend>,
 ) -> AbilityDef {
-    AbilityDef::Activated(ActivatedDef {
-        text,
-        cost,
-        targets,
-        effect,
-        condition: Some(attacked_this_turn),
-        once_each_turn: true,
-        ..ActivatedDef::BLANK
-    })
+    cantrip_api::ability(cost, effect, text)
+        .targets(targets)
+        .condition(attacked_this_turn)
+        .once_each_turn()
 }

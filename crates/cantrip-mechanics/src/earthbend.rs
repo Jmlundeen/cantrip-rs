@@ -6,7 +6,7 @@
 //! `RETURN` as its first `delayed` ability: the land is given that ability, standing for the delayed trigger that
 //! watches it.
 
-use crate::triggers::this_enters;
+use crate::triggers::THIS_ENTERS;
 use cantrip_api::*;
 
 fn land_you_control(q: &dyn Query, asker: &Asker, t: Target) -> bool {
@@ -36,14 +36,8 @@ pub fn effect<const N: i16>(g: &mut dyn Game, item: &StackItem) -> Result<(), Su
 
 /// "When this enters, earthbend N": `text` names the card.
 pub const fn enters<const N: i16>(text: &'static str) -> AbilityDef {
-    AbilityDef::Triggered(TriggeredDef {
-        text,
-        listens: EventMask::ZONE_CHANGE,
-        matches: this_enters,
-        targets: &[TARGET],
-        effect: effect::<N>,
-        ..TriggeredDef::BLANK
-    })
+    triggered(THIS_ENTERS, effect::<N>, text)
+        .targets(&[TARGET])
 }
 
 /// "When this dies or is put into exile" (CR 700.4): leaving the battlefield for a graveyard or exile, judged as it was.
@@ -66,11 +60,5 @@ fn return_tapped(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-pub const RETURN: AbilityDef = AbilityDef::Triggered(TriggeredDef {
-    text: "When this land dies or is put into exile, return it to the battlefield tapped.",
-    listens: EventMask::ZONE_CHANGE,
-    matches: dies_or_is_exiled,
-    effect: return_tapped,
-    look_back: true,
-    ..TriggeredDef::BLANK
-});
+pub const RETURN: AbilityDef = triggered(when(EventMask::ZONE_CHANGE, dies_or_is_exiled), return_tapped, "When this land dies or is put into exile, return it to the battlefield tapped.")
+    .look_back();

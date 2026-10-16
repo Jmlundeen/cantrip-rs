@@ -58,21 +58,9 @@ fn minus_three(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     cause_rules: &[opponents_cant_cause_you],
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "+1: Choose a nonland card name, then reveal the top four cards of your library. Put all cards with the chosen name from among them into your hand and the rest into your graveyard.",
-            cost: Cost { loyalty: Some(1), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            effect: plus_one,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "\u{2212}3: Return target card from your graveyard to your hand.",
-            cost: Cost { loyalty: Some(-3), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            targets: &[TargetSpec { min: 1, max: 1, filter: card_in_your_graveyard }],
-            effect: minus_three,
-            ..ActivatedDef::BLANK
-        }),
+        ability(loyalty(1), plus_one, "+1: Choose a nonland card name, then reveal the top four cards of your library. Put all cards with the chosen name from among them into your hand and the rest into your graveyard."),
+        ability(loyalty(-3), minus_three, "\u{2212}3: Return target card from your graveyard to your hand.")
+            .targets(&[TargetSpec { min: 1, max: 1, filter: card_in_your_graveyard }]),
     ],
     ..oracle::TAMIYO_COLLECTOR_OF_TALES
 };

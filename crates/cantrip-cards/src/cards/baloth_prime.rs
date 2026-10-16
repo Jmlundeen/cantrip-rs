@@ -44,19 +44,8 @@ fn wake(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     enters: Some(enters_stunned),
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever you sacrifice a land, create a tapped 4/4 green Beast creature token and untap this creature.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: sacrificed_a_land,
-            effect: wake,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{4}, Sacrifice a land: You gain 2 life.",
-            cost: Cost { mana: mana(4, 0, 0, 0, 0, 0), permanents: Some(PermanentCost { count: 1, filter: targets::filters::land, to_hand: false }), ..Cost::NONE },
-            effect: effects::gain_life::<2>,
-            ..ActivatedDef::BLANK
-        }),
+        triggered(when(EventMask::ZONE_CHANGE, sacrificed_a_land), wake, "Whenever you sacrifice a land, create a tapped 4/4 green Beast creature token and untap this creature."),
+        ability(cost("{4}").and(sacrifice(1, targets::filters::land)), effects::gain_life::<2>, "{4}, Sacrifice a land: You gain 2 life."),
     ],
     ..oracle::BALOTH_PRIME
 };

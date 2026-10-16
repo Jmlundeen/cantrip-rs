@@ -14,14 +14,8 @@ fn copy_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When you cast this spell, if you've cast another spell this turn, copy this spell. (The copy becomes a token.)",
-        listens: EventMask::SPELL_CAST,
-        matches: cantrip_mechanics::triggers::cast_this_spell,
-        condition: Some(cast_another_spell_this_turn),
-        effect: copy_it,
-        anywhere: true,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(cantrip_mechanics::triggers::CAST_THIS_SPELL, copy_it, "When you cast this spell, if you've cast another spell this turn, copy this spell. (The copy becomes a token.)")
+        .condition(cast_another_spell_this_turn)
+        .anywhere()],
     ..oracle::SAGE_OF_THE_SKIES
 };

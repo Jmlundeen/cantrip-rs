@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::attach::{attached_object, equip};
-use cantrip_mechanics::{triggers::this_enters, tokens};
+use cantrip_mechanics::{triggers::THIS_ENTERS, tokens};
 use cantrip_oracle as oracle;
 
 /// The 1/1 colorless Hero creature token job select makes.
@@ -63,22 +63,10 @@ fn grow(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Job select (When this Equipment enters, create a 1/1 colorless Hero creature token, then attach this to it.)",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            effect: job_select,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(THIS_ENTERS, job_select, "Job select (When this Equipment enters, create a 1/1 colorless Hero creature token, then attach this to it.)"),
         equip(mana(2, 0, 0, 0, 0, 0), "Diana \u{2014} Equip {2}"),
     ],
-    delayed: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever you cast a noncreature spell and whenever you draw your third card each turn, put a +1/+1 counter on this creature.",
-        listens: EventMask(EventMask::SPELL_CAST.0 | EventMask::DREW.0),
-        matches: cast_noncreature_or_draw_third,
-        effect: grow,
-        ..TriggeredDef::BLANK
-    })],
+    delayed: &[triggered(when(EventMask(EventMask::SPELL_CAST.0 | EventMask::DREW.0), cast_noncreature_or_draw_third), grow, "Whenever you cast a noncreature spell and whenever you draw your third card each turn, put a +1/+1 counter on this creature.")],
     statics: &[
         StaticDef {
             text: "Equipped creature is a Wizard in addition to its other types.",

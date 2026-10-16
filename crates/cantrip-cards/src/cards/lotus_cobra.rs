@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::choose_color;
-use cantrip_mechanics::triggers::landfall;
+use cantrip_mechanics::triggers::LANDFALL;
 use cantrip_oracle as oracle;
 
 /// Landfall: add one mana of any color, chosen as the ability resolves (CR 106.1b). A triggered ability that adds mana
@@ -12,12 +12,6 @@ fn add_mana_of_any_color(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspe
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Landfall \u{2014} Whenever a land you control enters, add one mana of any color.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: landfall,
-        effect: add_mana_of_any_color,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(LANDFALL, add_mana_of_any_color, "Landfall \u{2014} Whenever a land you control enters, add one mana of any color.")],
     ..oracle::LOTUS_COBRA
 };

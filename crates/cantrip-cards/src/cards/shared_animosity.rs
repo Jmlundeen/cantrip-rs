@@ -33,12 +33,6 @@ fn bonus(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever a creature you control attacks, it gets +1/+0 until end of turn for each other attacking creature that shares a creature type with it.",
-        listens: EventMask::ATTACKS,
-        matches: creature_you_control_attacks,
-        effect: bonus,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(when(EventMask::ATTACKS, creature_you_control_attacks), bonus, "Whenever a creature you control attacks, it gets +1/+0 until end of turn for each other attacking creature that shares a creature type with it.")],
     ..oracle::SHARED_ANIMOSITY
 };

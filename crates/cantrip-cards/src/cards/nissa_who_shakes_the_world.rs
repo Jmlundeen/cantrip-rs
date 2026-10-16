@@ -85,29 +85,11 @@ pub static EMBLEM: CardDef = CardDef {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever you tap a Forest for mana, add an additional {G}.",
-            listens: EventMask::TAPPED,
-            matches: forest_tapped_for_mana,
-            effect: add_green,
-            mana_ability: true,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "+1: Put three +1/+1 counters on up to one target noncreature land you control. Untap it. It becomes a 0/0 Elemental creature with vigilance and haste that's still a land.",
-            cost: Cost { loyalty: Some(1), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            targets: &[TargetSpec { min: 0, max: 1, filter: noncreature_land_you_control }],
-            effect: animate_land,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "\u{2212}8: You get an emblem with \"Lands you control have indestructible.\" Search your library for any number of Forest cards, put them onto the battlefield tapped, then shuffle.",
-            cost: Cost { loyalty: Some(-8), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            effect: emblem_and_forests,
-            ..ActivatedDef::BLANK
-        }),
+        triggered(when(EventMask::TAPPED, forest_tapped_for_mana), add_green, "Whenever you tap a Forest for mana, add an additional {G}.")
+            .mana_ability(),
+        ability(loyalty(1), animate_land, "+1: Put three +1/+1 counters on up to one target noncreature land you control. Untap it. It becomes a 0/0 Elemental creature with vigilance and haste that's still a land.")
+            .targets(&[TargetSpec { min: 0, max: 1, filter: noncreature_land_you_control }]),
+        ability(loyalty(-8), emblem_and_forests, "\u{2212}8: You get an emblem with \"Lands you control have indestructible.\" Search your library for any number of Forest cards, put them onto the battlefield tapped, then shuffle."),
     ],
     ..oracle::NISSA_WHO_SHAKES_THE_WORLD
 };

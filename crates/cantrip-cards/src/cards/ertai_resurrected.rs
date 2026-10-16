@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::targets;
-use cantrip_mechanics::triggers::this_enters;
+use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
 /// "Target spell, activated ability, or triggered ability" (CR 115.1): a spell or an ability on the stack.
@@ -72,12 +72,6 @@ static MODAL: ModalDef = ModalDef {
 };
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When Ertai Resurrected enters, choose up to one \u{2014} Counter target spell, activated ability, or triggered ability. Its controller draws a card; or destroy another target creature or planeswalker. Its controller draws a card.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: this_enters,
-        modal: Some(&MODAL),
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[modal_triggered(THIS_ENTERS, &MODAL, "When Ertai Resurrected enters, choose up to one \u{2014} Counter target spell, activated ability, or triggered ability. Its controller draws a card; or destroy another target creature or planeswalker. Its controller draws a card.")],
     ..oracle::ERTAI_RESURRECTED
 };

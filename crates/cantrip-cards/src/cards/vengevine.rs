@@ -25,13 +25,7 @@ fn return_to_battlefield(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspe
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever you cast a spell, if it's the second creature spell you cast this turn, you may return this card from your graveyard to the battlefield.",
-        listens: EventMask::SPELL_CAST,
-        matches: second_creature_spell,
-        effect: return_to_battlefield,
-        anywhere: true,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(when(EventMask::SPELL_CAST, second_creature_spell), return_to_battlefield, "Whenever you cast a spell, if it's the second creature spell you cast this turn, you may return this card from your graveyard to the battlefield.")
+        .anywhere()],
     ..oracle::VENGEVINE
 };

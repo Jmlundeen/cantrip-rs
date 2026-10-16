@@ -37,12 +37,7 @@ fn search_and_give(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     enters: Some(enters_with_three_wish_counters),
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "{1}, {T}, Remove a wish counter from this artifact: Search your library for a card, put it into your hand, then shuffle. An opponent gains control of this artifact. Activate only during your turn.",
-        cost: Cost { mana: mana(1, 0, 0, 0, 0, 0), tap: true, remove_counters: Some((CounterKind::Wish, 1)), ..Cost::NONE },
-        condition: Some(during_your_turn),
-        effect: search_and_give,
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[ability(cost("{1}, {T}").and(remove_counters(CounterKind::Wish, 1)), search_and_give, "{1}, {T}, Remove a wish counter from this artifact: Search your library for a card, put it into your hand, then shuffle. An opponent gains control of this artifact. Activate only during your turn.")
+        .condition(during_your_turn)],
     ..oracle::WISHCLAW_TALISMAN
 };

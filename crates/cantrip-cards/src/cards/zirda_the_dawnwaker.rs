@@ -18,13 +18,8 @@ fn cant_block(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "{1}, {T}: Target creature can't block this turn.",
-        cost: Cost { mana: mana(1, 0, 0, 0, 0, 0), tap: true, ..Cost::NONE },
-        targets: &[targets::CREATURE],
-        effect: cant_block,
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[ability(cost("{1}, {T}"), cant_block, "{1}, {T}: Target creature can't block this turn.")
+        .targets(&[targets::CREATURE])],
     ability_discounts: &[two_less],
     ..oracle::ZIRDA_THE_DAWNWAKER
 };

@@ -98,7 +98,8 @@ fn throne(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 const fn room(text: &'static str, targets: &'static [TargetSpec], effect: Effect) -> AbilityDef {
-    AbilityDef::Triggered(TriggeredDef { text, targets, effect, ..TriggeredDef::BLANK })
+    delayed_trigger(effect, text)
+        .targets(targets)
 }
 
 pub static CARD: CardDef = CardDef {

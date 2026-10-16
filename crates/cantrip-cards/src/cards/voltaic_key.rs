@@ -11,12 +11,7 @@ fn untap_artifact(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "{1}, {T}: Untap target artifact.",
-        cost: Cost { mana: mana(1, 0, 0, 0, 0, 0), tap: true, ..Cost::NONE },
-        targets: &[targets::ARTIFACT],
-        effect: untap_artifact,
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[ability(cost("{1}, {T}"), untap_artifact, "{1}, {T}: Untap target artifact.")
+        .targets(&[targets::ARTIFACT])],
     ..oracle::VOLTAIC_KEY
 };

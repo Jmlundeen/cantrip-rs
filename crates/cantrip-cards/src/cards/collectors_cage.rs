@@ -2,7 +2,7 @@ use cantrip_api::*;
 use cantrip_mechanics::hideaway;
 use cantrip_mechanics::hideaway_play::play_exiled_card;
 use cantrip_mechanics::targets;
-use cantrip_mechanics::triggers::this_enters;
+use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
 fn hide_a_card(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -38,20 +38,9 @@ fn counter_then_play(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> 
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Hideaway 5 (When this artifact enters, look at the top five cards of your library, exile one face down, then put the rest on the bottom in a random order.)",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            effect: hide_a_card,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{1}, {T}: Put a +1/+1 counter on target creature you control. Then if you control three or more creatures with different powers, you may play the exiled card without paying its mana cost.",
-            cost: Cost { mana: mana(1, 0, 0, 0, 0, 0), tap: true, ..Cost::NONE },
-            targets: &[targets::CREATURE_YOU_CONTROL],
-            effect: counter_then_play,
-            ..ActivatedDef::BLANK
-        }),
+        triggered(THIS_ENTERS, hide_a_card, "Hideaway 5 (When this artifact enters, look at the top five cards of your library, exile one face down, then put the rest on the bottom in a random order.)"),
+        ability(cost("{1}, {T}"), counter_then_play, "{1}, {T}: Put a +1/+1 counter on target creature you control. Then if you control three or more creatures with different powers, you may play the exiled card without paying its mana cost.")
+            .targets(&[targets::CREATURE_YOU_CONTROL]),
     ],
     ..oracle::COLLECTORS_CAGE
 };

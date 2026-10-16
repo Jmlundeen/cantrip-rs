@@ -13,13 +13,7 @@ fn shatter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever a creature you control enters, you may destroy target artifact or enchantment.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: triggers::creature_you_control_enters,
-        targets: &[targets::ARTIFACT_OR_ENCHANTMENT],
-        effect: shatter,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(triggers::CREATURE_YOU_CONTROL_ENTERS, shatter, "Whenever a creature you control enters, you may destroy target artifact or enchantment.")
+        .targets(&[targets::ARTIFACT_OR_ENCHANTMENT])],
     ..oracle::AURA_SHARDS
 };

@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::{discard_chosen, targets};
-use cantrip_mechanics::triggers::this_enters;
+use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
 fn level(q: &dyn Query, source: ObjectId) -> u8 {
@@ -87,45 +87,17 @@ fn grow_artifact(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "{1}{U}: Level 2",
-            cost: Cost::mana(mana(1, 0, 1, 0, 0, 0)),
-            timing: Timing::Sorcery,
-            condition: Some(at_level_one),
-            effect: become_level_two,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{4}{U}: Level 3",
-            cost: Cost::mana(mana(4, 0, 1, 0, 0, 0)),
-            timing: Timing::Sorcery,
-            condition: Some(at_level_two),
-            effect: become_level_three,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When this Class enters, mill two cards, draw two cards, then discard two cards.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            effect: loot,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When this Class becomes level 2, return up to two target artifact cards from your graveyard to your hand.",
-            listens: EventMask::CLASS_LEVEL,
-            matches: became_level_two,
-            targets: &[TargetSpec { min: 0, max: 2, filter: artifact_card_in_your_graveyard }],
-            effect: return_artifacts,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "At the beginning of combat on your turn, put three +1/+1 counters on target artifact you control. If it isn't a creature, it becomes a 0/0 Robot creature in addition to its other types.",
-            listens: EventMask::STEP_BEGAN,
-            matches: combat_at_level_three,
-            targets: &[TargetSpec { min: 1, max: 1, filter: artifact_you_control }],
-            effect: grow_artifact,
-            ..TriggeredDef::BLANK
-        }),
+        ability(cost("{1}{U}"), become_level_two, "{1}{U}: Level 2")
+            .sorcery_speed()
+            .condition(at_level_one),
+        ability(cost("{4}{U}"), become_level_three, "{4}{U}: Level 3")
+            .sorcery_speed()
+            .condition(at_level_two),
+        triggered(THIS_ENTERS, loot, "When this Class enters, mill two cards, draw two cards, then discard two cards."),
+        triggered(when(EventMask::CLASS_LEVEL, became_level_two), return_artifacts, "When this Class becomes level 2, return up to two target artifact cards from your graveyard to your hand.")
+            .targets(&[TargetSpec { min: 0, max: 2, filter: artifact_card_in_your_graveyard }]),
+        triggered(when(EventMask::STEP_BEGAN, combat_at_level_three), grow_artifact, "At the beginning of combat on your turn, put three +1/+1 counters on target artifact you control. If it isn't a creature, it becomes a 0/0 Robot creature in addition to its other types.")
+            .targets(&[TargetSpec { min: 1, max: 1, filter: artifact_you_control }]),
     ],
     ..oracle::DOES_MACHINES
 };

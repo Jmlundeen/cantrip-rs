@@ -1,5 +1,4 @@
 use cantrip_api::*;
-use cantrip_mechanics::mana::tap_for_either;
 use cantrip_mechanics::targets;
 use cantrip_mechanics::triggers;
 use cantrip_mechanics::{Animation, animate};
@@ -37,21 +36,10 @@ fn three_three(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     enters: Some(cantrip_mechanics::mana::enters_tapped),
     abilities: &[
-        tap_for_either(Color::Green, Color::Blue, "{T}: Add {G} or {U}."),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{3}{G}{U}: Until end of turn, this land becomes a 5/5 green and blue Plant creature with trample. It's still a land.",
-            cost: Cost { mana: mana(3, 0, 1, 0, 0, 1), ..Cost::NONE },
-            effect: becomes_creature,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever this land attacks, up to one other target creature has base power and toughness 3/3 until end of turn.",
-            listens: EventMask::ATTACKS,
-            matches: triggers::this_attacks,
-            targets: &[TargetSpec { min: 0, max: 1, filter: other_creature }],
-            effect: three_three,
-            ..TriggeredDef::BLANK
-        }),
+        mana_ability(TAP, add_one_of(&[Color::Green, Color::Blue]), "{T}: Add {G} or {U}."),
+        ability(cost("{3}{U}{G}"), becomes_creature, "{3}{G}{U}: Until end of turn, this land becomes a 5/5 green and blue Plant creature with trample. It's still a land."),
+        triggered(triggers::THIS_ATTACKS, three_three, "Whenever this land attacks, up to one other target creature has base power and toughness 3/3 until end of turn.")
+            .targets(&[TargetSpec { min: 0, max: 1, filter: other_creature }]),
     ],
     ..oracle::RESTLESS_VINESTALK
 };

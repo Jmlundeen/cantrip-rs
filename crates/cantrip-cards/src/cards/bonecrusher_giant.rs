@@ -33,13 +33,7 @@ fn two_to_its_controller(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspe
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever this creature becomes the target of a spell, this creature deals 2 damage to that spell's controller.",
-        listens: EventMask::BECAME_TARGET,
-        matches: targeted_by_spell,
-        effect: two_to_its_controller,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(when(EventMask::BECAME_TARGET, targeted_by_spell), two_to_its_controller, "Whenever this creature becomes the target of a spell, this creature deals 2 damage to that spell's controller.")],
     adventure: Some(&STOMP),
     ..oracle::BONECRUSHER_GIANT
 };

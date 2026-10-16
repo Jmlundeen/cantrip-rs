@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::targets;
-use cantrip_mechanics::triggers::this_enters;
+use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
 fn destroy(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -21,21 +21,10 @@ fn draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When Loran enters, destroy up to one target artifact or enchantment.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            targets: &[TargetSpec { min: 0, max: 1, ..targets::ARTIFACT_OR_ENCHANTMENT }],
-            effect: destroy,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{T}: You and target opponent each draw a card.",
-            cost: Cost { tap: true, ..Cost::NONE },
-            targets: &[targets::OPPONENT],
-            effect: draw,
-            ..ActivatedDef::BLANK
-        }),
+        triggered(THIS_ENTERS, destroy, "When Loran enters, destroy up to one target artifact or enchantment.")
+            .targets(&[TargetSpec { min: 0, max: 1, ..targets::ARTIFACT_OR_ENCHANTMENT }]),
+        ability(TAP, draw, "{T}: You and target opponent each draw a card.")
+            .targets(&[targets::OPPONENT]),
     ],
     ..oracle::LORAN_OF_THE_THIRD_PATH
 };

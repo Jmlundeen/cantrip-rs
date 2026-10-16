@@ -42,14 +42,8 @@ fn become_prepared(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever this creature attacks, if you control eight or more lands, this creature becomes prepared.",
-        listens: EventMask::ATTACKS,
-        matches: triggers::this_attacks,
-        condition: Some(eight_lands),
-        effect: become_prepared,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(triggers::THIS_ATTACKS, become_prepared, "Whenever this creature attacks, if you control eight or more lands, this creature becomes prepared.")
+        .condition(eight_lands)],
     enters: Some(enters_prepared),
     prepare: Some(&REGROWTH),
     ..oracle::EMERITUS_OF_ABUNDANCE

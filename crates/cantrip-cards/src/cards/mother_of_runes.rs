@@ -12,12 +12,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "{T}: Target creature you control gains protection from the color of your choice until end of turn.",
-        cost: Cost { tap: true, ..Cost::NONE },
-        targets: &[targets::CREATURE_YOU_CONTROL],
-        effect,
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[ability(TAP, effect, "{T}: Target creature you control gains protection from the color of your choice until end of turn.")
+        .targets(&[targets::CREATURE_YOU_CONTROL])],
     ..oracle::MOTHER_OF_RUNES
 };

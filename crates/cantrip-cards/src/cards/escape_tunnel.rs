@@ -28,19 +28,9 @@ fn cant_be_blocked(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "{T}, Sacrifice this land: Search your library for a basic land card, put it onto the battlefield tapped, then shuffle.",
-            cost: Cost { tap: true, sacrifice_self: true, ..Cost::NONE },
-            effect: search,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{T}, Sacrifice this land: Target creature with power 2 or less can't be blocked this turn.",
-            cost: Cost { tap: true, sacrifice_self: true, ..Cost::NONE },
-            targets: &[TargetSpec { min: 1, max: 1, filter: power_two_or_less }],
-            effect: cant_be_blocked,
-            ..ActivatedDef::BLANK
-        }),
+        ability(TAP.and(SACRIFICE_THIS), search, "{T}, Sacrifice this land: Search your library for a basic land card, put it onto the battlefield tapped, then shuffle."),
+        ability(TAP.and(SACRIFICE_THIS), cant_be_blocked, "{T}, Sacrifice this land: Target creature with power 2 or less can't be blocked this turn.")
+            .targets(&[TargetSpec { min: 1, max: 1, filter: power_two_or_less }]),
     ],
     ..oracle::ESCAPE_TUNNEL
 };

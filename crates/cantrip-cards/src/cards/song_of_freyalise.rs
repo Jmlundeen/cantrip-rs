@@ -1,5 +1,4 @@
 use cantrip_api::*;
-use cantrip_mechanics::mana::TAP_FOR_ANY_COLOR;
 use cantrip_oracle as oracle;
 
 fn creatures_you_control(g: &dyn Game, player: PlayerId) -> Vec<ObjectId> {
@@ -32,26 +31,11 @@ fn rally(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "I \u{2014} Until your next turn, creatures you control gain \"{T}: Add one mana of any color.\"",
-            chapter: 1,
-            effect: grant_mana,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "II \u{2014} Until your next turn, creatures you control gain \"{T}: Add one mana of any color.\"",
-            chapter: 2,
-            effect: grant_mana,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "III \u{2014} Put a +1/+1 counter on each creature you control. Those creatures gain vigilance, trample, and indestructible until end of turn.",
-            chapter: 3,
-            effect: rally,
-            ..TriggeredDef::BLANK
-        }),
+        chapter(1, grant_mana, "I \u{2014} Until your next turn, creatures you control gain \"{T}: Add one mana of any color.\""),
+        chapter(2, grant_mana, "II \u{2014} Until your next turn, creatures you control gain \"{T}: Add one mana of any color.\""),
+        chapter(3, rally, "III \u{2014} Put a +1/+1 counter on each creature you control. Those creatures gain vigilance, trample, and indestructible until end of turn."),
     ],
     // The ability chapters I and II grant.
-    delayed: &[TAP_FOR_ANY_COLOR],
+    delayed: &[mana_ability(TAP, add_any_color(1), "{T}: Add one mana of any color.")],
     ..oracle::SONG_OF_FREYALISE
 };

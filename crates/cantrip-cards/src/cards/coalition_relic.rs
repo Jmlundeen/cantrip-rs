@@ -1,5 +1,4 @@
 use cantrip_api::*;
-use cantrip_mechanics::mana::TAP_FOR_ANY_COLOR;
 use cantrip_oracle as oracle;
 
 /// Storing mana adds none, so this is an ordinary activated ability (CR 605.1a): it uses the stack.
@@ -36,20 +35,9 @@ fn release(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        TAP_FOR_ANY_COLOR,
-        AbilityDef::Activated(ActivatedDef {
-            text: "{T}: Put a charge counter on Coalition Relic.",
-            cost: Cost { tap: true, ..Cost::NONE },
-            effect: store,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "At the beginning of your precombat main phase, remove all charge counters from Coalition Relic. Add one mana of any color for each charge counter removed this way.",
-            listens: EventMask::STEP_BEGAN,
-            matches: your_precombat_main,
-            effect: release,
-            ..TriggeredDef::BLANK
-        }),
+        mana_ability(TAP, add_any_color(1), "{T}: Add one mana of any color."),
+        ability(TAP, store, "{T}: Put a charge counter on Coalition Relic."),
+        triggered(when(EventMask::STEP_BEGAN, your_precombat_main), release, "At the beginning of your precombat main phase, remove all charge counters from Coalition Relic. Add one mana of any color for each charge counter removed this way."),
     ],
     ..oracle::COALITION_RELIC
 };

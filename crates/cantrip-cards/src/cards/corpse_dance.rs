@@ -28,6 +28,6 @@ pub static CARD: CardDef = CardDef {
     spell: Some(SpellDef { targets: &[], effect: dance }),
     kicker: Some(Kicker { cost: mana(2, 0, 0, 0, 0, 0), multi: false, waterbend: false }),
     replacements: &[BUYBACK],
-    delayed: &[AbilityDef::Triggered(TriggeredDef { text: "Exile it.", effect: cantrip_mechanics::delayed::exile_subject, ..TriggeredDef::BLANK })],
+    delayed: &[delayed_trigger(cantrip_mechanics::delayed::exile_subject, "Exile it.")],
     ..oracle::CORPSE_DANCE
 };

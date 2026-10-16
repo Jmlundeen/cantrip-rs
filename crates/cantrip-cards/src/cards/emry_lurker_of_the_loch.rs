@@ -1,7 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::targets;
 use cantrip_mechanics::affinity;
-use cantrip_mechanics::triggers::this_enters;
+use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
 fn mill_four(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -25,20 +25,9 @@ fn allow_cast(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     own_cost_changes: &[affinity::for_artifacts],
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When Emry, Lurker of the Loch enters, mill four cards.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            effect: mill_four,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{T}: Choose target artifact card in your graveyard. You may cast that card this turn.",
-            cost: Cost { tap: true, ..Cost::NONE },
-            targets: &[TargetSpec { min: 1, max: 1, filter: artifact_card_in_your_graveyard }],
-            effect: allow_cast,
-            ..ActivatedDef::BLANK
-        }),
+        triggered(THIS_ENTERS, mill_four, "When Emry, Lurker of the Loch enters, mill four cards."),
+        ability(TAP, allow_cast, "{T}: Choose target artifact card in your graveyard. You may cast that card this turn.")
+            .targets(&[TargetSpec { min: 1, max: 1, filter: artifact_card_in_your_graveyard }]),
     ],
     ..oracle::EMRY_LURKER_OF_THE_LOCH
 };

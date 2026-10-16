@@ -65,30 +65,14 @@ fn double(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "At the beginning of combat on your turn, put a +1/+1 counter on target creature you control.",
-            listens: EventMask::STEP_BEGAN,
-            matches: cantrip_mechanics::triggers::beginning_of_your_combat,
-            targets: &[targets::CREATURE_YOU_CONTROL],
-            effect: counter,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{G}: Level 2",
-            cost: Cost::mana(mana(0, 0, 0, 0, 0, 1)),
-            timing: Timing::Sorcery,
-            condition: Some(at_level_one),
-            effect: become_level_two,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{3}{G}: Level 3",
-            cost: Cost::mana(mana(3, 0, 0, 0, 0, 1)),
-            timing: Timing::Sorcery,
-            condition: Some(at_level_two),
-            effect: become_level_three,
-            ..ActivatedDef::BLANK
-        }),
+        triggered(cantrip_mechanics::triggers::BEGINNING_OF_YOUR_COMBAT, counter, "At the beginning of combat on your turn, put a +1/+1 counter on target creature you control.")
+            .targets(&[targets::CREATURE_YOU_CONTROL]),
+        ability(cost("{G}"), become_level_two, "{G}: Level 2")
+            .sorcery_speed()
+            .condition(at_level_one),
+        ability(cost("{3}{G}"), become_level_three, "{3}{G}: Level 3")
+            .sorcery_speed()
+            .condition(at_level_two),
     ],
     delayed: &[ward::<1>("Ward {1} (Whenever this permanent becomes the target of a spell or ability an opponent controls, counter it unless that player pays {1}.)")],
     statics: &[StaticDef {

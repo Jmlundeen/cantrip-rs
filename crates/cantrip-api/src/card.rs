@@ -382,41 +382,78 @@ impl Cost {
     }
 
     /// This cost and another paid together: the parts of the same kind add (an additional cost's discard and an
-    /// escalate cost's discard are discards of one choice).
-    pub fn and(self, other: Cost) -> Cost {
+    /// escalate cost's discard are discards of one choice). A card writes "{1}, {T}" as `cost("{1}").and(TAP)`.
+    pub const fn and(self, other: Cost) -> Cost {
         let mut c = self;
         c.mana.generic += other.mana.generic;
-        for i in 0..6 {
+        let mut i = 0;
+        while i < 6 {
             c.mana.symbols[i] += other.mana.symbols[i];
+            i += 1;
+        }
+        let mut i = 0;
+        while i < 6 {
+            if c.mana.hybrid[i].is_none() {
+                c.mana.hybrid[i] = other.mana.hybrid[i];
+            }
+            i += 1;
+        }
+        let mut i = 0;
+        while i < 5 {
+            c.mana.phyrexian[i] += other.mana.phyrexian[i];
+            i += 1;
+        }
+        c.mana.x += other.mana.x;
+        c.tap |= other.tap;
+        c.sacrifice_self |= other.sacrifice_self;
+        c.discard_self |= other.discard_self;
+        c.exile_self |= other.exile_self;
+        c.pay_x_life |= other.pay_x_life;
+        c.emerge |= other.emerge;
+        c.tap_permanents |= other.tap_permanents;
+        c.remove_any_counter |= other.remove_any_counter;
+        if c.loyalty.is_none() {
+            c.loyalty = other.loyalty;
+        }
+        if c.remove_counters.is_none() {
+            c.remove_counters = other.remove_counters;
         }
         c.life += other.life;
         c.exile_from_graveyard += other.exile_from_graveyard;
         c.exile_from_hand = match (self.exile_from_hand, other.exile_from_hand) {
             (Some((a, f)), Some((b, _))) => Some((a + b, f)),
-            (a, b) => a.or(b),
+            (None, b) => b,
+            (a, None) => a,
         };
         c.discard = match (self.discard, other.discard) {
             (Some((a, f)), Some((b, _))) => Some((a + b, f)),
-            (a, b) => a.or(b),
+            (None, b) => b,
+            (a, None) => a,
         };
         c.permanents = match (self.permanents, other.permanents) {
             (Some(a), Some(b)) => Some(PermanentCost { count: a.count + b.count, ..a }),
-            (a, b) => a.or(b),
+            (None, b) => b,
+            (a, None) => a,
         };
-        c.tap_creatures = self.tap_creatures.or(other.tap_creatures);
+        if c.tap_creatures.is_none() {
+            c.tap_creatures = other.tap_creatures;
+        }
         c.exert |= other.exert;
         c.unattach_self |= other.unattach_self;
         c.return_self |= other.return_self;
-        c.variable = self.variable.or(other.variable);
+        if c.variable.is_none() {
+            c.variable = other.variable;
+        }
         c.discard_hand |= other.discard_hand;
         c.collect_evidence += other.collect_evidence;
         // Two beholds add only when they ask for the same quality (CR 701.4a): one filter can't stand for two.
         c.behold = match (self.behold, other.behold) {
-            (Some((a, f, name)), Some((b, g, _))) => {
-                debug_assert!(f as usize == g as usize, "two beholds of different qualities can't be combined");
+            (Some((a, f, name)), Some((b, _, other_name))) => {
+                assert!(same_str(name, other_name), "two beholds of different qualities can't be combined");
                 Some((a + b, f, name))
             }
-            (a, b) => a.or(b),
+            (None, b) => b,
+            (a, None) => a,
         };
         c.blight += other.blight;
         c
@@ -490,7 +527,23 @@ pub struct SuspendDef {
     pub cost: ManaCost,
 }
 
-/// An activated ability (CR 602).
+/// Whether two texts are the same, as the compiler can ask it.
+pub(crate) const fn same_str(a: &str, b: &str) -> bool {
+    let (a, b) = (a.as_bytes(), b.as_bytes());
+    if a.len() != b.len() {
+        return false;
+    }
+    let mut i = 0;
+    while i < a.len() {
+        if a[i] != b[i] {
+            return false;
+        }
+        i += 1;
+    }
+    true
+}
+
+/// An activated ability (CR 602). A card writes one with `ability` or `mana_ability` (`crate::ability`).
 #[derive(Clone, Copy)]
 pub struct ActivatedDef {
     /// The ability's text, which a scenario's `Ability:` names it by.
@@ -499,8 +552,10 @@ pub struct ActivatedDef {
     pub timing: Timing,
     pub targets: &'static [TargetSpec],
     pub effect: Effect,
-    /// A mana ability (CR 605.1a): resolves immediately with this, and `effect` is unused. One with {X} in its cost
-    /// has X announced first (CR 107.3a, 605.3a); the effect reads it as `Obj::x` of its source.
+    /// A mana ability's own effect (CR 605.1a), where it does more than add the mana `adds` and `adds_any` list: it
+    /// resolves immediately, and `effect` is unused. One with {X} in its cost has X announced first (CR 107.3a, 605.3a);
+    /// the effect reads it as `Obj::x` of its source. A mana ability with none adds what it lists
+    /// (`is_mana_ability`, `add_listed`).
     pub mana: Option<ManaEffect>,
     /// A mana ability that adds mana of any one color: the activation names the color (CR 106.5).
     pub any_color: bool,
@@ -554,6 +609,21 @@ fn no_match(_: &dyn Query, _: ObjectId, _: &Event) -> Option<Fired> {
 }
 
 impl ActivatedDef {
+    /// A mana ability (CR 605.1a): one with an effect of its own that adds mana, or one that lists the mana it adds.
+    pub const fn is_mana_ability(&self) -> bool {
+        if self.mana.is_some() || self.adds_any > 0 {
+            return true;
+        }
+        let mut i = 0;
+        while i < 6 {
+            if self.adds.0[i] > 0 {
+                return true;
+            }
+            i += 1;
+        }
+        false
+    }
+
     pub const BLANK: ActivatedDef = ActivatedDef {
         text: "",
         cost: Cost::NONE,

@@ -65,42 +65,18 @@ fn seize(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static EMBLEM: CardDef = CardDef {
     name: "Dack Fayden emblem",
     has_cost: false,
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever you cast a spell that targets one or more permanents, gain control of those permanents.",
-        listens: EventMask::SPELL_CAST,
-        matches: you_cast_a_spell_that_targets_a_permanent,
-        effect: seize,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(when(EventMask::SPELL_CAST, you_cast_a_spell_that_targets_a_permanent), seize, "Whenever you cast a spell that targets one or more permanents, gain control of those permanents.")],
     text: "Whenever you cast a spell that targets one or more permanents, gain control of those permanents.",
     ..CardDef::BLANK
 };
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "+1: Target player draws two cards, then discards two cards.",
-            cost: Cost { loyalty: Some(1), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            targets: &[targets::PLAYER],
-            effect: plus_one,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "\u{2212}2: Gain control of target artifact.",
-            cost: Cost { loyalty: Some(-2), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            targets: &[targets::ARTIFACT],
-            effect: steal,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "\u{2212}6: You get an emblem with \"Whenever you cast a spell that targets one or more permanents, gain control of those permanents.\"",
-            cost: Cost { loyalty: Some(-6), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            effect: emblem,
-            ..ActivatedDef::BLANK
-        }),
+        ability(loyalty(1), plus_one, "+1: Target player draws two cards, then discards two cards.")
+            .targets(&[targets::PLAYER]),
+        ability(loyalty(-2), steal, "\u{2212}2: Gain control of target artifact.")
+            .targets(&[targets::ARTIFACT]),
+        ability(loyalty(-6), emblem, "\u{2212}6: You get an emblem with \"Whenever you cast a spell that targets one or more permanents, gain control of those permanents.\""),
     ],
     ..oracle::DACK_FAYDEN
 };

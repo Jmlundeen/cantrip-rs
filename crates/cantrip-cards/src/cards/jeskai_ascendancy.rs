@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::triggers::noncreature_spell_you_cast;
+use cantrip_mechanics::triggers::NONCREATURE_SPELL_YOU_CAST;
 use cantrip_mechanics::{discard_chosen, pump};
 use cantrip_oracle as oracle;
 
@@ -34,20 +34,8 @@ fn loot(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever you cast a noncreature spell, creatures you control get +1/+1 until end of turn. Untap those creatures.",
-            listens: EventMask::SPELL_CAST,
-            matches: noncreature_spell_you_cast,
-            effect: pump_untap,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever you cast a noncreature spell, you may draw a card. If you do, discard a card.",
-            listens: EventMask::SPELL_CAST,
-            matches: noncreature_spell_you_cast,
-            effect: loot,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(NONCREATURE_SPELL_YOU_CAST, pump_untap, "Whenever you cast a noncreature spell, creatures you control get +1/+1 until end of turn. Untap those creatures."),
+        triggered(NONCREATURE_SPELL_YOU_CAST, loot, "Whenever you cast a noncreature spell, you may draw a card. If you do, discard a card."),
     ],
     ..oracle::JESKAI_ASCENDANCY
 };

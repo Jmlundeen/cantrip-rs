@@ -73,13 +73,7 @@ fn roll(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "0: Roll a six-sided die.",
-        cost: Cost { loyalty: Some(0), ..Cost::NONE },
-        timing: Timing::Sorcery,
-        effect: roll,
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[ability(cantrip_api::loyalty(0), roll, "0: Roll a six-sided die.")],
     ..oracle::COMET_STELLAR_PUP
 };
 

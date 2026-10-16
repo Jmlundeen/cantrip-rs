@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::triggers::this_enters;
+use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
 /// "Whenever an opponent attacks you" (CR 508.1): one declaration, however many creatures attack, with at least one
@@ -33,21 +33,9 @@ fn burn(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When this creature enters, you become the monarch.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            effect: cantrip_mechanics::effects::become_monarch,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever an opponent attacks you while you're the monarch, this creature deals damage to that player equal to the number of cards in their hand.",
-            listens: EventMask::ATTACKERS_DECLARED,
-            matches: opponent_attacks_you,
-            condition: Some(you_are_the_monarch),
-            effect: burn,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(THIS_ENTERS, cantrip_mechanics::effects::become_monarch, "When this creature enters, you become the monarch."),
+        triggered(when(EventMask::ATTACKERS_DECLARED, opponent_attacks_you), burn, "Whenever an opponent attacks you while you're the monarch, this creature deals damage to that player equal to the number of cards in their hand.")
+            .condition(you_are_the_monarch),
     ],
     ..oracle::EMBERWILDE_CAPTAIN
 };

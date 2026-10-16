@@ -1,6 +1,5 @@
 use cantrip_api::*;
 use cantrip_mechanics::targets;
-use cantrip_mechanics::mana;
 use cantrip_oracle as oracle;
 
 /// "Target legendary creature": on the battlefield, whoever controls it.
@@ -18,14 +17,9 @@ fn bounce(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        mana::tap_for(mana::add_w, Mana::W, "{T}: Add {W}."),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{T}: Return target legendary creature to its owner's hand.",
-            cost: Cost { tap: true, ..Cost::NONE },
-            targets: &[TargetSpec { min: 1, max: 1, filter: legendary_creature }],
-            effect: bounce,
-            ..ActivatedDef::BLANK
-        }),
+        mana_ability(TAP, add(Mana::W), "{T}: Add {W}."),
+        ability(TAP, bounce, "{T}: Return target legendary creature to its owner's hand.")
+            .targets(&[TargetSpec { min: 1, max: 1, filter: legendary_creature }]),
     ],
     ..oracle::KARAKAS
 };

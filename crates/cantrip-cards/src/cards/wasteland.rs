@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{destroy_target, mana};
+use cantrip_mechanics::destroy_target;
 use cantrip_oracle as oracle;
 
 fn nonbasic_land(q: &dyn Query, _: &Asker, t: Target) -> bool {
@@ -17,14 +17,9 @@ fn destroy_land(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        mana::tap_for(mana::add_c, Mana::C, "{T}: Add {C}."),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{T}, Sacrifice Wasteland: Destroy target nonbasic land.",
-            cost: Cost { tap: true, sacrifice_self: true, ..Cost::NONE },
-            targets: &[TargetSpec { min: 1, max: 1, filter: nonbasic_land }],
-            effect: destroy_land,
-            ..ActivatedDef::BLANK
-        }),
+        mana_ability(TAP, add(Mana::C), "{T}: Add {C}."),
+        ability(TAP.and(SACRIFICE_THIS), destroy_land, "{T}, Sacrifice Wasteland: Destroy target nonbasic land.")
+            .targets(&[TargetSpec { min: 1, max: 1, filter: nonbasic_land }]),
     ],
     ..oracle::WASTELAND
 };

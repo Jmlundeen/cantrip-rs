@@ -59,20 +59,8 @@ fn tap_myr(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When this creature enters, create four 1/1 colorless Myr artifact creature tokens.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: triggers::this_enters,
-            effect: myr,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever this creature attacks, you may tap X untapped Myr you control. If you do, this creature gets +X/+0 until end of turn and deals X damage to the player or planeswalker it's attacking.",
-            listens: EventMask::ATTACKS,
-            matches: triggers::this_attacks_defender,
-            effect: tap_myr,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(triggers::THIS_ENTERS, myr, "When this creature enters, create four 1/1 colorless Myr artifact creature tokens."),
+        triggered(triggers::THIS_ATTACKS_DEFENDER, tap_myr, "Whenever this creature attacks, you may tap X untapped Myr you control. If you do, this creature gets +X/+0 until end of turn and deals X damage to the player or planeswalker it's attacking."),
     ],
     ..oracle::MYR_BATTLESPHERE
 };

@@ -2,7 +2,7 @@
 //! at the beginning of the next end step or if it would leave the battlefield. Unearth only as a sorcery." Phyrexian
 //! Dragon Engine prints it.
 //!
-//! A card with unearth lists `ability(cost, text)` among its `abilities` and `EXILE` as its first `delayed` ability.
+//! A card with unearth lists `cantrip_api::ability(cost, text)` among its `abilities` and `EXILE` as its first `delayed` ability.
 
 use cantrip_api::*;
 
@@ -31,14 +31,9 @@ fn unearth(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub const fn ability(cost: ManaCost, text: &'static str) -> AbilityDef {
-    AbilityDef::Activated(ActivatedDef {
-        text,
-        cost: Cost::mana(cost),
-        timing: Timing::Sorcery,
-        from: ZoneKind::Graveyard,
-        effect: unearth,
-        ..ActivatedDef::BLANK
-    })
+    cantrip_api::ability(Cost::mana(cost), unearth, text)
+        .sorcery_speed()
+        .from(ZoneKind::Graveyard)
 }
 
 fn exile_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -51,4 +46,4 @@ fn exile_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-pub const EXILE: AbilityDef = AbilityDef::Triggered(TriggeredDef { text: "Exile it.", effect: exile_it, ..TriggeredDef::BLANK });
+pub const EXILE: AbilityDef = delayed_trigger(exile_it, "Exile it.");

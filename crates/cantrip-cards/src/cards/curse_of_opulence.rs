@@ -21,14 +21,8 @@ fn gold(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever enchanted player is attacked, create a Gold token. Each opponent attacking that player does the same.",
-        listens: EventMask::ATTACKS,
-        matches: cantrip_mechanics::triggers::enchanted_player_attacked,
-        effect: gold,
-        once_per_batch: true,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(cantrip_mechanics::triggers::ENCHANTED_PLAYER_ATTACKED, gold, "Whenever enchanted player is attacked, create a Gold token. Each opponent attacking that player does the same.")
+        .once_per_batch()],
     enchant: Some(targets::PLAYER),
     ..oracle::CURSE_OF_OPULENCE
 };

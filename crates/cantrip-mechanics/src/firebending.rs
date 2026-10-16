@@ -19,11 +19,5 @@ fn firebend<const N: u8>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspe
 
 /// `text` is the card's own reminder text.
 pub const fn trigger<const N: u8>(text: &'static str) -> AbilityDef {
-    AbilityDef::Triggered(TriggeredDef {
-        text,
-        listens: EventMask::ATTACKS,
-        matches: attacks,
-        effect: firebend::<N>,
-        ..TriggeredDef::BLANK
-    })
+    triggered(when(EventMask::ATTACKS, attacks), firebend::<N>, text)
 }

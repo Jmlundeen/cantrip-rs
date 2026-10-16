@@ -33,13 +33,7 @@ fn create_a_pest(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         ward_life::<3>("Ward\u{2014}Pay 3 life. (Whenever this creature becomes the target of a spell or ability an opponent controls, counter it unless that player pays 3 life.)"),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Magecraft \u{2014} Whenever you cast or copy an instant or sorcery spell, create a 1/1 black and green Pest creature token with \"When this token dies, you gain 1 life.\"",
-            listens: EventMask(EventMask::SPELL_CAST.0 | EventMask::COPIED.0),
-            matches: cast_or_copy,
-            effect: create_a_pest,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(when(EventMask(EventMask::SPELL_CAST.0 | EventMask::COPIED.0), cast_or_copy), create_a_pest, "Magecraft \u{2014} Whenever you cast or copy an instant or sorcery spell, create a 1/1 black and green Pest creature token with \"When this token dies, you gain 1 life.\""),
     ],
     ..oracle::SEDGEMOOR_WITCH
 };

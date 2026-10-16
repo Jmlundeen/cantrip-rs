@@ -41,13 +41,7 @@ pub static CARD: CardDef = CardDef {
         Keyword::CantBeBlockedByPowerTwoOrLess,
     ]),
     unpreventable_damage: &[creatures_you_control_deal_unpreventable_combat_damage],
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever Questing Beast deals combat damage to an opponent, it deals that much damage to target planeswalker that player controls.",
-        listens: EventMask::DAMAGE,
-        matches: deals_combat_damage_to_an_opponent,
-        targets: &[TargetSpec { min: 1, max: 1, filter: planeswalker_that_player_controls }],
-        effect: damage_the_planeswalker,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(when(EventMask::DAMAGE, deals_combat_damage_to_an_opponent), damage_the_planeswalker, "Whenever Questing Beast deals combat damage to an opponent, it deals that much damage to target planeswalker that player controls.")
+        .targets(&[TargetSpec { min: 1, max: 1, filter: planeswalker_that_player_controls }])],
     ..oracle::QUESTING_BEAST
 };

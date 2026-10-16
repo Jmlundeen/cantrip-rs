@@ -1,7 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::effects;
 use cantrip_mechanics::mayhem;
-use cantrip_mechanics::triggers::deals_combat_damage_to_player;
+use cantrip_mechanics::triggers::DEALS_COMBAT_DAMAGE_TO_PLAYER;
 use cantrip_mechanics::connive;
 use cantrip_oracle as oracle;
 
@@ -29,20 +29,9 @@ pub static BACK: CardDef = CardDef {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever Norman Osborn deals combat damage to a player, he connives.",
-            listens: EventMask::DAMAGE,
-            matches: deals_combat_damage_to_player,
-            effect: connives,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{1}{U}{B}{R}: Transform Norman Osborn. Activate only as a sorcery.",
-            cost: Cost { mana: mana(1, 0, 1, 1, 1, 0), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            effect: effects::transform_self,
-            ..ActivatedDef::BLANK
-        }),
+        triggered(DEALS_COMBAT_DAMAGE_TO_PLAYER, connives, "Whenever Norman Osborn deals combat damage to a player, he connives."),
+        ability(cost("{1}{U}{B}{R}"), effects::transform_self, "{1}{U}{B}{R}: Transform Norman Osborn. Activate only as a sorcery.")
+            .sorcery_speed(),
     ],
     back: Some(&BACK),
     ..oracle::NORMAN_OSBORN

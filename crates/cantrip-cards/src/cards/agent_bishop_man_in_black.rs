@@ -11,13 +11,7 @@ fn counters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "At the beginning of combat on your turn, put a +1/+1 counter on each of up to two target creatures.",
-        listens: EventMask::STEP_BEGAN,
-        matches: triggers::beginning_of_your_combat,
-        targets: &[TargetSpec { min: 0, max: 2, ..targets::CREATURE }],
-        effect: counters,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(triggers::BEGINNING_OF_YOUR_COMBAT, counters, "At the beginning of combat on your turn, put a +1/+1 counter on each of up to two target creatures.")
+        .targets(&[TargetSpec { min: 0, max: 2, ..targets::CREATURE }])],
     ..oracle::AGENT_BISHOP_MAN_IN_BLACK
 };

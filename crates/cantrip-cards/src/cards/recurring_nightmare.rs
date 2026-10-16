@@ -14,13 +14,8 @@ fn reanimate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "Sacrifice a creature, Return this enchantment to its owner's hand: Return target creature card from your graveyard to the battlefield. Activate only as a sorcery.",
-        cost: Cost { return_self: true, ..Cost::sacrifice(1, filters::creature) },
-        timing: Timing::Sorcery,
-        targets: &[cantrip_mechanics::targets::CREATURE_CARD_IN_YOUR_GRAVEYARD],
-        effect: reanimate,
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[ability(RETURN_THIS.and(sacrifice(1, filters::creature)), reanimate, "Sacrifice a creature, Return this enchantment to its owner's hand: Return target creature card from your graveyard to the battlefield. Activate only as a sorcery.")
+        .sorcery_speed()
+        .targets(&[cantrip_mechanics::targets::CREATURE_CARD_IN_YOUR_GRAVEYARD])],
     ..oracle::RECURRING_NIGHTMARE
 };

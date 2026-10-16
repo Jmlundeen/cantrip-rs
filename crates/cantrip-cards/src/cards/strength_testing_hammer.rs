@@ -30,13 +30,7 @@ fn roll_and_pump(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever equipped creature attacks, roll a six-sided die. That creature gets +X/+0 until end of turn, where X is the result. Then if it has the greatest power or is tied for greatest power among creatures on the battlefield, draw a card.",
-            listens: EventMask::ATTACKS,
-            matches: cantrip_mechanics::triggers::equipped_creature_attacks_subject,
-            effect: roll_and_pump,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(cantrip_mechanics::triggers::EQUIPPED_CREATURE_ATTACKS_SUBJECT, roll_and_pump, "Whenever equipped creature attacks, roll a six-sided die. That creature gets +X/+0 until end of turn, where X is the result. Then if it has the greatest power or is tied for greatest power among creatures on the battlefield, draw a card."),
         equip(mana(3, 0, 0, 0, 0, 0), "Equip {3}"),
     ],
     ..oracle::STRENGTH_TESTING_HAMMER

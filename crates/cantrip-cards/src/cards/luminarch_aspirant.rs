@@ -11,13 +11,7 @@ fn counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "At the beginning of combat on your turn, put a +1/+1 counter on target creature you control.",
-        listens: EventMask::STEP_BEGAN,
-        matches: cantrip_mechanics::triggers::beginning_of_your_combat,
-        targets: &[targets::CREATURE_YOU_CONTROL],
-        effect: counter,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(cantrip_mechanics::triggers::BEGINNING_OF_YOUR_COMBAT, counter, "At the beginning of combat on your turn, put a +1/+1 counter on target creature you control.")
+        .targets(&[targets::CREATURE_YOU_CONTROL])],
     ..oracle::LUMINARCH_ASPIRANT
 };

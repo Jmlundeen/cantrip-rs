@@ -259,7 +259,7 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
             let ability = game.chars(src).abilities().nth(o.index as usize).map(|a| game.cards.ability(a));
             if let Some(AbilityDef::Activated(d)) = ability {
                 m.life_cost = i32::from(d.cost.life);
-                if d.mana.is_some() {
+                if d.is_mana_ability() {
                     for mana in Mana::ALL {
                         for _ in 0..d.adds.get(mana) {
                             m.produces.push(mana_view(mana));

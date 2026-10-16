@@ -2,11 +2,6 @@ use cantrip_api::*;
 use cantrip_mechanics::triggers;
 use cantrip_oracle as oracle;
 
-fn three_of_one_color(g: &mut dyn Game, asker: &Asker, color: Option<Color>) -> Result<(), Suspend> {
-    g.add_mana(asker.controller, color.unwrap_or(Color::White).mana(), 3);
-    Ok(())
-}
-
 /// "Whenever one or more creatures an opponent controls attack you and aren't blocked" (CR 509.1h): one trigger for
 /// the whole combat, however many of them there were.
 fn opponent_attacks_you_unblocked(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
@@ -35,29 +30,10 @@ fn claim(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "{T}: Add three mana of any one color.",
-            cost: Cost { tap: true, ..Cost::NONE },
-            mana: Some(three_of_one_color),
-            any_color: true,
-            adds_any: 3,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When this artifact enters, draw three cards.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: triggers::this_enters,
-            effect: cantrip_mechanics::effects::draw::<3>,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever one or more creatures an opponent controls attack you and aren't blocked, that player draws three cards and gains control of this artifact. Untap it.",
-            listens: EventMask::UNBLOCKED,
-            matches: opponent_attacks_you_unblocked,
-            effect: claim,
-            once_per_batch: true,
-            ..TriggeredDef::BLANK
-        }),
+        mana_ability(TAP, add_any_color(3), "{T}: Add three mana of any one color."),
+        triggered(triggers::THIS_ENTERS, cantrip_mechanics::effects::draw::<3>, "When this artifact enters, draw three cards."),
+        triggered(when(EventMask::UNBLOCKED, opponent_attacks_you_unblocked), claim, "Whenever one or more creatures an opponent controls attack you and aren't blocked, that player draws three cards and gains control of this artifact. Untap it.")
+            .once_per_batch(),
     ],
     ..oracle::COVETED_JEWEL
 };

@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{choose, triggers::this_enters};
+use cantrip_mechanics::{choose, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 /// One player's dig: exile from the top, one card at a time, until a nonland card is exiled or the library runs out. A card a
@@ -32,32 +32,15 @@ fn give_poison(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static BACK: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever Etali deals combat damage to a player, they get that many poison counters.",
-        listens: EventMask::DAMAGE,
-        matches: cantrip_mechanics::triggers::deals_combat_damage_to_player_subject,
-        effect: give_poison,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(cantrip_mechanics::triggers::DEALS_COMBAT_DAMAGE_TO_PLAYER_SUBJECT, give_poison, "Whenever Etali deals combat damage to a player, they get that many poison counters.")],
     ..oracle::ETALI_PRIMAL_SICKNESS
 };
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When Etali enters, each player exiles cards from the top of their library until they exile a nonland card. You may cast any number of spells from among the nonland cards exiled this way without paying their mana costs.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            effect: exile_and_cast_free,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{9}{G/P}: Transform Etali. Activate only as a sorcery.",
-            cost: Cost::mana(ManaCost { generic: 9, phyrexian: [0, 0, 0, 0, 1], ..ManaCost::ZERO }),
-            timing: Timing::Sorcery,
-            effect: cantrip_mechanics::effects::transform_self,
-            ..ActivatedDef::BLANK
-        }),
+        triggered(THIS_ENTERS, exile_and_cast_free, "When Etali enters, each player exiles cards from the top of their library until they exile a nonland card. You may cast any number of spells from among the nonland cards exiled this way without paying their mana costs."),
+        ability(cost("{9}{G/P}"), cantrip_mechanics::effects::transform_self, "{9}{G/P}: Transform Etali. Activate only as a sorcery.")
+            .sorcery_speed(),
     ],
     back: Some(&BACK),
     ..oracle::ETALI_PRIMAL_CONQUEROR

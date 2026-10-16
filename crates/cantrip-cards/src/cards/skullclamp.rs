@@ -24,14 +24,8 @@ fn equipped_creature_dies(q: &dyn Query, source: ObjectId, event: &Event) -> Opt
 pub static CARD: CardDef = CardDef {
     abilities: &[
         equip(mana(1, 0, 0, 0, 0, 0), "Equip {1}"),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever equipped creature dies, draw two cards.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: equipped_creature_dies,
-            effect: effects::draw::<2>,
-            look_back: true,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(when(EventMask::ZONE_CHANGE, equipped_creature_dies), effects::draw::<2>, "Whenever equipped creature dies, draw two cards.")
+            .look_back(),
     ],
     statics: &[StaticDef {
         text: "Equipped creature gets +1/-1.",

@@ -39,13 +39,8 @@ fn exile_card(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "{1}: Exile target card from a graveyard.",
-        cost: Cost { mana: mana(1, 0, 0, 0, 0, 0), ..Cost::NONE },
-        targets: &[targets::CARD_IN_A_GRAVEYARD],
-        effect: exile_card,
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[ability(cost("{1}"), exile_card, "{1}: Exile target card from a graveyard.")
+        .targets(&[targets::CARD_IN_A_GRAVEYARD])],
     statics: &[
         StaticDef {
             text: "As long as there are four or more card types among cards exiled with this creature, it gets +4/+4.",

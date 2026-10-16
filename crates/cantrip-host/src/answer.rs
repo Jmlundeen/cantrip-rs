@@ -230,7 +230,7 @@ pub fn payload_of(answer: &Answer, request: &Request, handles: &mut HandleSpace,
                 && action.source.is_some_and(|s| {
                     matches!(
                         game.chars(s).abilities().nth(action.index as usize).map(|a| game.cards.ability(a)),
-                        Some(AbilityDef::Activated(d)) if d.mana.is_some() && d.cost.permanents.is_some()
+                        Some(AbilityDef::Activated(d)) if d.is_mana_ability() && d.cost.permanents.is_some()
                     )
                 });
             if sacrifices && let Some(Target::Object(id)) = action.targets.first() {

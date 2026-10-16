@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::library::{Find, search_to_hand};
-use cantrip_mechanics::triggers::this_enters;
+use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
 /// "You may search your library for an instant or sorcery card with mana value 2 or less, reveal it, put it into your
@@ -14,12 +14,6 @@ fn search(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When Spellseeker enters, you may search your library for an instant or sorcery card with mana value 2 or less, reveal it, put it into your hand, then shuffle.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: this_enters,
-        effect: search,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(THIS_ENTERS, search, "When Spellseeker enters, you may search your library for an instant or sorcery card with mana value 2 or less, reveal it, put it into your hand, then shuffle.")],
     ..oracle::SPELLSEEKER
 };

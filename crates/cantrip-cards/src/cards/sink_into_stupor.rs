@@ -27,7 +27,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static BACK: CardDef = CardDef {
-    abilities: &[mana::tap_for(mana::add_u, Mana::U, "{T}: Add {U}.")],
+    abilities: &[mana_ability(TAP, add(Mana::U), "{T}: Add {U}.")],
     enters: Some(mana::enters_tapped_unless_pay_three_life),
     ..oracle::SOPORIFIC_SPRINGS
 };

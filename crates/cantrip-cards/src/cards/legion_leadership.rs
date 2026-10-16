@@ -14,7 +14,7 @@ fn double(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static BACK: CardDef = CardDef {
-    abilities: &[mana::tap_for_either(Color::Red, Color::White, "{T}: Add {R} or {W}.")],
+    abilities: &[mana_ability(TAP, add_one_of(&[Color::Red, Color::White]), "{T}: Add {R} or {W}.")],
     enters: Some(mana::enters_tapped),
     ..oracle::LEGION_STRONGHOLD
 };

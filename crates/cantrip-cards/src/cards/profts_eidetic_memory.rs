@@ -22,22 +22,10 @@ fn grow(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When Proft's Eidetic Memory enters, draw a card.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: triggers::this_enters,
-            effect: effects::draw::<1>,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "At the beginning of combat on your turn, if you've drawn more than one card this turn, put X +1/+1 counters on target creature you control, where X is the number of cards you've drawn this turn minus one.",
-            listens: EventMask::STEP_BEGAN,
-            matches: triggers::beginning_of_your_combat,
-            condition: Some(drawn_more_than_one),
-            targets: &[targets::CREATURE_YOU_CONTROL],
-            effect: grow,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(triggers::THIS_ENTERS, effects::draw::<1>, "When Proft's Eidetic Memory enters, draw a card."),
+        triggered(triggers::BEGINNING_OF_YOUR_COMBAT, grow, "At the beginning of combat on your turn, if you've drawn more than one card this turn, put X +1/+1 counters on target creature you control, where X is the number of cards you've drawn this turn minus one.")
+            .targets(&[targets::CREATURE_YOU_CONTROL])
+            .condition(drawn_more_than_one),
     ],
     play_rules: &[PlayRule::NoMaximumHandSize],
     ..oracle::PROFTS_EIDETIC_MEMORY

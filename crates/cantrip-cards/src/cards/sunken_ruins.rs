@@ -1,5 +1,4 @@
 use cantrip_api::*;
-use cantrip_mechanics::mana;
 use cantrip_oracle as oracle;
 
 /// "Add {U}{U}, {U}{B}, or {B}{B}" (CR 106.1b, 605.3): two mana, each a color of its own choosing from the two, chosen as
@@ -16,17 +15,8 @@ fn add_two(g: &mut dyn Game, asker: &Asker, _: Option<Color>) -> Result<(), Susp
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        mana::tap_for(mana::add_c, Mana::C, "{T}: Add {C}."),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{U/B}, {T}: Add {U}{U}, {U}{B}, or {B}{B}.",
-            cost: Cost {
-                mana: ManaCost { hybrid: [Some((Mana::U, Mana::B)), None, None, None, None, None], ..mana(0, 0, 0, 0, 0, 0) },
-                tap: true,
-                ..Cost::NONE
-            },
-            mana: Some(add_two),
-            ..ActivatedDef::BLANK
-        }),
+        mana_ability(TAP, add(Mana::C), "{T}: Add {C}."),
+        mana_ability(cost("{U/B}, {T}"), add_by(add_two), "{U/B}, {T}: Add {U}{U}, {U}{B}, or {B}{B}."),
     ],
     ..oracle::SUNKEN_RUINS
 };

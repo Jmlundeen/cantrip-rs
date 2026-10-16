@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::choose;
-use cantrip_mechanics::triggers::this_enters;
+use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
 /// When this enters, discard up to two cards, then draw that many cards. The discards happen together (CR 701.9),
@@ -36,21 +36,9 @@ fn exile_and_play(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When Tersa Lightshatter enters, discard up to two cards, then draw that many cards.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            effect: discard_and_draw,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever Tersa Lightshatter attacks, if there are seven or more cards in your graveyard, exile a card at random from your graveyard. You may play that card this turn.",
-            listens: EventMask::ATTACKS,
-            matches: cantrip_mechanics::triggers::this_attacks,
-            effect: exile_and_play,
-            condition: Some(seven_in_graveyard),
-            ..TriggeredDef::BLANK
-        }),
+        triggered(THIS_ENTERS, discard_and_draw, "When Tersa Lightshatter enters, discard up to two cards, then draw that many cards."),
+        triggered(cantrip_mechanics::triggers::THIS_ATTACKS, exile_and_play, "Whenever Tersa Lightshatter attacks, if there are seven or more cards in your graveyard, exile a card at random from your graveyard. You may play that card this turn.")
+            .condition(seven_in_graveyard),
     ],
     ..oracle::TERSA_LIGHTSHATTER
 };

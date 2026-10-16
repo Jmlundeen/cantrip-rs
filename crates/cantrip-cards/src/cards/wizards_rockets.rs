@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::effects;
-use cantrip_mechanics::triggers::this_dies;
+use cantrip_mechanics::triggers::THIS_DIES;
 use cantrip_oracle as oracle;
 
 /// "Add X mana in any combination of colors" (CR 106.1b): X was announced with the activation (CR 107.3a, 605.3a) and
@@ -22,20 +22,9 @@ fn add_x_mana(g: &mut dyn Game, asker: &Asker, _: Option<Color>) -> Result<(), S
 /// "When this artifact is put into a graveyard from the battlefield" (CR 700.4, 603.10a): looked back on.
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "{X}, {T}, Sacrifice this artifact: Add X mana in any combination of colors.",
-            cost: Cost { mana: ManaCost { x: 1, ..ManaCost::ZERO }, tap: true, sacrifice_self: true, ..Cost::NONE },
-            mana: Some(add_x_mana),
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When this artifact is put into a graveyard from the battlefield, draw a card.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_dies,
-            effect: effects::draw::<1>,
-            look_back: true,
-            ..TriggeredDef::BLANK
-        }),
+        mana_ability(cost("{X}, {T}").and(SACRIFICE_THIS), add_by(add_x_mana), "{X}, {T}, Sacrifice this artifact: Add X mana in any combination of colors."),
+        triggered(THIS_DIES, effects::draw::<1>, "When this artifact is put into a graveyard from the battlefield, draw a card.")
+            .look_back(),
     ],
     enters: Some(cantrip_mechanics::mana::enters_tapped),
     ..oracle::WIZARDS_ROCKETS

@@ -54,14 +54,8 @@ fn exile_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static EMBLEM: CardDef = CardDef {
     name: "Teferi, Hero of Dominaria emblem",
     has_cost: false,
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever you draw a card, exile target permanent an opponent controls.",
-        listens: EventMask::DREW,
-        matches: you_draw,
-        targets: &[TargetSpec { min: 1, max: 1, filter: opponents_permanent }],
-        effect: exile_it,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(when(EventMask::DREW, you_draw), exile_it, "Whenever you draw a card, exile target permanent an opponent controls.")
+        .targets(&[TargetSpec { min: 1, max: 1, filter: opponents_permanent }])],
     text: "Whenever you draw a card, exile target permanent an opponent controls.",
     ..CardDef::BLANK
 };
@@ -70,33 +64,11 @@ pub static EXTRA: &[&CardDef] = &[&EMBLEM];
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "+1: Draw a card. At the beginning of the next end step, untap up to two lands.",
-            cost: Cost { loyalty: Some(1), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            effect: plus_one,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "\u{2212}3: Put target nonland permanent into its owner's library third from the top.",
-            cost: Cost { loyalty: Some(-3), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            targets: &[targets::NONLAND_PERMANENT],
-            effect: minus_three,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "\u{2212}8: You get an emblem with \"Whenever you draw a card, exile target permanent an opponent controls.\"",
-            cost: Cost { loyalty: Some(-8), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            effect: emblem,
-            ..ActivatedDef::BLANK
-        }),
+        ability(loyalty(1), plus_one, "+1: Draw a card. At the beginning of the next end step, untap up to two lands."),
+        ability(loyalty(-3), minus_three, "\u{2212}3: Put target nonland permanent into its owner's library third from the top.")
+            .targets(&[targets::NONLAND_PERMANENT]),
+        ability(loyalty(-8), emblem, "\u{2212}8: You get an emblem with \"Whenever you draw a card, exile target permanent an opponent controls.\""),
     ],
-    delayed: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Untap up to two lands.",
-        effect: untap_two_lands,
-        ..TriggeredDef::BLANK
-    })],
+    delayed: &[delayed_trigger(untap_two_lands, "Untap up to two lands.")],
     ..oracle::TEFERI_HERO_OF_DOMINARIA
 };

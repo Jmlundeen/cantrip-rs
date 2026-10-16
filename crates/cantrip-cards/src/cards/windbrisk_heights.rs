@@ -1,8 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::hideaway;
 use cantrip_mechanics::hideaway_play::play_exiled_card;
-use cantrip_mechanics::mana::PLAINS;
-use cantrip_mechanics::triggers::this_enters;
+use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
 fn hide_a_card(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -36,20 +35,9 @@ fn play_the_exiled_card(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspen
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        PLAINS,
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Hideaway 4 (When this land enters, look at the top four cards of your library, exile one face down, then put the rest on the bottom of your library in a random order.)",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            effect: hide_a_card,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{W}, {T}: You may play the exiled card without paying its mana cost if you attacked with three or more creatures this turn.",
-            cost: Cost { mana: mana(0, 1, 0, 0, 0, 0), tap: true, ..Cost::NONE },
-            effect: play_the_exiled_card,
-            ..ActivatedDef::BLANK
-        }),
+        mana_ability(TAP, add(Mana::W), "{T}: Add {W}."),
+        triggered(THIS_ENTERS, hide_a_card, "Hideaway 4 (When this land enters, look at the top four cards of your library, exile one face down, then put the rest on the bottom of your library in a random order.)"),
+        ability(cost("{W}, {T}"), play_the_exiled_card, "{W}, {T}: You may play the exiled card without paying its mana cost if you attacked with three or more creatures this turn."),
     ],
     enters: Some(cantrip_mechanics::mana::enters_tapped),
     ..oracle::WINDBRISK_HEIGHTS

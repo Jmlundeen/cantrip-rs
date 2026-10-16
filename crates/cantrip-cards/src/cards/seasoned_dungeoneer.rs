@@ -27,21 +27,9 @@ fn protect_and_explore(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When this creature enters, you take the initiative.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: triggers::this_enters,
-            effect: cantrip_mechanics::effects::take_the_initiative,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever you attack, target attacking Cleric, Rogue, Warrior, or Wizard gains protection from creatures until end of turn. It explores.",
-            listens: EventMask::ATTACKERS_DECLARED,
-            matches: triggers::you_attack,
-            targets: &[TargetSpec { min: 1, max: 1, filter: attacking_party_member }],
-            effect: protect_and_explore,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(triggers::THIS_ENTERS, cantrip_mechanics::effects::take_the_initiative, "When this creature enters, you take the initiative."),
+        triggered(triggers::YOU_ATTACK, protect_and_explore, "Whenever you attack, target attacking Cleric, Rogue, Warrior, or Wizard gains protection from creatures until end of turn. It explores.")
+            .targets(&[TargetSpec { min: 1, max: 1, filter: attacking_party_member }]),
     ],
     ..oracle::SEASONED_DUNGEONEER
 };

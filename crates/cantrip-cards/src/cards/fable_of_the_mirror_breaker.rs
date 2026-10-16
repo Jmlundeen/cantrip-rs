@@ -18,13 +18,7 @@ pub static GOBLIN_SHAMAN: CardDef = CardDef {
     subtypes: SubtypeSet::of(&[Subtype::Goblin, Subtype::Shaman]),
     power: Some(2),
     toughness: Some(2),
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever this token attacks, create a Treasure token.",
-        listens: EventMask::ATTACKS,
-        matches: cantrip_mechanics::triggers::this_attacks,
-        effect: make_treasure,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(cantrip_mechanics::triggers::THIS_ATTACKS, make_treasure, "Whenever this token attacks, create a Treasure token.")],
     text: "Whenever this token attacks, create a Treasure token.",
     ..CardDef::BLANK
 };
@@ -80,41 +74,17 @@ fn copy_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static BACK: CardDef = CardDef {
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "{1}, {T}: Create a token that's a copy of another target nonlegendary creature you control, except it has haste. Sacrifice it at the beginning of the next end step.",
-        cost: Cost { mana: mana(1, 0, 0, 0, 0, 0), tap: true, ..Cost::NONE },
-        targets: &[TargetSpec { min: 1, max: 1, filter: another_nonlegendary_creature_you_control }],
-        effect: copy_creature,
-        ..ActivatedDef::BLANK
-    })],
-    delayed: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Sacrifice it at the beginning of the next end step.",
-        effect: cantrip_mechanics::delayed::sacrifice_subject,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[ability(cost("{1}, {T}"), copy_creature, "{1}, {T}: Create a token that's a copy of another target nonlegendary creature you control, except it has haste. Sacrifice it at the beginning of the next end step.")
+        .targets(&[TargetSpec { min: 1, max: 1, filter: another_nonlegendary_creature_you_control }])],
+    delayed: &[delayed_trigger(cantrip_mechanics::delayed::sacrifice_subject, "Sacrifice it at the beginning of the next end step.")],
     ..oracle::REFLECTION_OF_KIKI_JIKI
 };
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "I \u{2014} Create a 2/2 red Goblin Shaman creature token with \"Whenever this token attacks, create a Treasure token.\"",
-            chapter: 1,
-            effect: chapter_one,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "II \u{2014} You may discard up to two cards. If you do, draw that many cards.",
-            chapter: 2,
-            effect: chapter_two,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "III \u{2014} Exile this Saga, then return it to the battlefield transformed under your control.",
-            chapter: 3,
-            effect: chapter_three,
-            ..TriggeredDef::BLANK
-        }),
+        chapter(1, chapter_one, "I \u{2014} Create a 2/2 red Goblin Shaman creature token with \"Whenever this token attacks, create a Treasure token.\""),
+        chapter(2, chapter_two, "II \u{2014} You may discard up to two cards. If you do, draw that many cards."),
+        chapter(3, chapter_three, "III \u{2014} Exile this Saga, then return it to the battlefield transformed under your control."),
     ],
     back: Some(&BACK),
     ..oracle::FABLE_OF_THE_MIRROR_BREAKER

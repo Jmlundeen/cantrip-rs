@@ -35,10 +35,6 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     spell: Some(SpellDef { targets: &[TargetSpec { min: 1, max: 1, filter: legendary_creature_card_in_your_graveyard }], effect }),
     splice: Some(mana(2, 0, 0, 1, 0, 0)),
-    delayed: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Exile it at the beginning of the next end step.",
-        effect: cantrip_mechanics::delayed::exile_subject,
-        ..TriggeredDef::BLANK
-    })],
+    delayed: &[delayed_trigger(cantrip_mechanics::delayed::exile_subject, "Exile it at the beginning of the next end step.")],
     ..oracle::GORYOS_VENGEANCE
 };

@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::targets;
-use cantrip_mechanics::triggers::this_enters;
+use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
 /// "Target card from your graveyard": any card in the graveyard of the ability's controller.
@@ -18,13 +18,7 @@ fn return_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When this creature enters, you may return target card from your graveyard to your hand.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: this_enters,
-        targets: &[TargetSpec { min: 1, max: 1, filter: card_in_your_graveyard }],
-        effect: return_it,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(THIS_ENTERS, return_it, "When this creature enters, you may return target card from your graveyard to your hand.")
+        .targets(&[TargetSpec { min: 1, max: 1, filter: card_in_your_graveyard }])],
     ..oracle::ETERNAL_WITNESS
 };

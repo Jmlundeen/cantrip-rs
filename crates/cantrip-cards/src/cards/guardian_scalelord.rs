@@ -35,20 +35,14 @@ fn return_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 const ATTACK_TEXT: &str = "Whenever this creature attacks, return target nonland permanent card with mana value X or less from your graveyard to the battlefield, where X is this creature's power.";
 
-const ATTACK: TriggeredDef = TriggeredDef {
-    text: ATTACK_TEXT,
-    listens: EventMask::ATTACKS,
-    matches: cantrip_mechanics::triggers::this_attacks,
-    targets: &[TargetSpec { min: 1, max: 1, filter: permanent_card_up_to_power }],
-    effect: return_it,
-    ..TriggeredDef::BLANK
-};
+const ATTACK: AbilityDef = triggered(cantrip_mechanics::triggers::THIS_ATTACKS, return_it, ATTACK_TEXT)
+    .targets(&[TargetSpec { min: 1, max: 1, filter: permanent_card_up_to_power }]);
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
         backup::trigger("When this creature enters, put a +1/+1 counter on target creature. If that's another creature, it gains the following abilities until end of turn.", backup),
-        AbilityDef::Triggered(ATTACK),
+        ATTACK,
     ],
-    delayed: &[AbilityDef::Triggered(ATTACK)],
+    delayed: &[ATTACK],
     ..oracle::GUARDIAN_SCALELORD
 };

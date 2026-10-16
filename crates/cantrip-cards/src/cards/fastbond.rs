@@ -25,14 +25,8 @@ fn burn(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever you play a land, if it wasn't the first land you played this turn, this enchantment deals 1 damage to you.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: you_play_a_land,
-        effect: burn,
-        condition: Some(not_the_first),
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(when(EventMask::ZONE_CHANGE, you_play_a_land), burn, "Whenever you play a land, if it wasn't the first land you played this turn, this enchantment deals 1 damage to you.")
+        .condition(not_the_first)],
     play_rules: &[PlayRule::AnyNumberOfLandPlays],
     ..oracle::FASTBOND
 };

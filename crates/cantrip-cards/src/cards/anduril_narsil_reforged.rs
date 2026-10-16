@@ -14,13 +14,7 @@ fn counters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     ascend: true,
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever equipped creature attacks, put a +1/+1 counter on each creature you control. If you have the city's blessing, put two +1/+1 counters on each creature you control instead.",
-            listens: EventMask::ATTACKS,
-            matches: triggers::equipped_creature_attacks,
-            effect: counters,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(triggers::EQUIPPED_CREATURE_ATTACKS, counters, "Whenever equipped creature attacks, put a +1/+1 counter on each creature you control. If you have the city's blessing, put two +1/+1 counters on each creature you control instead."),
         equip(mana(3, 0, 0, 0, 0, 0), "Equip {3}"),
     ],
     ..oracle::AND_RIL_NARSIL_REFORGED

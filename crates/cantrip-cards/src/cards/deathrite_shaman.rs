@@ -40,27 +40,12 @@ fn exile_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "{T}: Exile target land card from a graveyard. Add one mana of any color.",
-            cost: Cost { tap: true, ..Cost::NONE },
-            targets: &[TargetSpec { min: 1, max: 1, filter: land_card }],
-            effect: exile_land,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{B}, {T}: Exile target instant or sorcery card from a graveyard. Each opponent loses 2 life.",
-            cost: Cost { mana: mana(0, 0, 0, 1, 0, 0), tap: true, ..Cost::NONE },
-            targets: &[TargetSpec { min: 1, max: 1, filter: instant_or_sorcery_card }],
-            effect: exile_spell,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{G}, {T}: Exile target creature card from a graveyard. You gain 2 life.",
-            cost: Cost { mana: mana(0, 0, 0, 0, 0, 1), tap: true, ..Cost::NONE },
-            targets: &[TargetSpec { min: 1, max: 1, filter: creature_card }],
-            effect: exile_creature,
-            ..ActivatedDef::BLANK
-        }),
+        ability(TAP, exile_land, "{T}: Exile target land card from a graveyard. Add one mana of any color.")
+            .targets(&[TargetSpec { min: 1, max: 1, filter: land_card }]),
+        ability(cost("{B}, {T}"), exile_spell, "{B}, {T}: Exile target instant or sorcery card from a graveyard. Each opponent loses 2 life.")
+            .targets(&[TargetSpec { min: 1, max: 1, filter: instant_or_sorcery_card }]),
+        ability(cost("{G}, {T}"), exile_creature, "{G}, {T}: Exile target creature card from a graveyard. You gain 2 life.")
+            .targets(&[TargetSpec { min: 1, max: 1, filter: creature_card }]),
     ],
     ..oracle::DEATHRITE_SHAMAN
 };

@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{top_of_library, triggers::this_enters};
+use cantrip_mechanics::{top_of_library, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 /// Mana symbols of `color` (blue as the Oracle prints it, or what a text change made it) in a permanent's mana cost (CR 700.5): hybrid and Phyrexian blue symbols each count once. A copy
@@ -46,12 +46,6 @@ fn look_and_win(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When this creature enters, look at the top X cards of your library, where X is your devotion to blue. Put up to one of them on top of your library and the rest on the bottom of your library in a random order. If X is greater than or equal to the number of cards in your library, you win the game.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: this_enters,
-        effect: look_and_win,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(THIS_ENTERS, look_and_win, "When this creature enters, look at the top X cards of your library, where X is your devotion to blue. Put up to one of them on top of your library and the rest on the bottom of your library in a random order. If X is greater than or equal to the number of cards in your library, you win the game.")],
     ..oracle::THASSAS_ORACLE
 };

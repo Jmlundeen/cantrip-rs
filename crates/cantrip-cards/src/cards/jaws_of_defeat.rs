@@ -29,13 +29,7 @@ fn drain(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever a creature you control enters, target opponent loses life equal to the difference between that creature's power and its toughness.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: creature_you_control_enters,
-        targets: &[targets::OPPONENT],
-        effect: drain,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(when(EventMask::ZONE_CHANGE, creature_you_control_enters), drain, "Whenever a creature you control enters, target opponent loses life equal to the difference between that creature's power and its toughness.")
+        .targets(&[targets::OPPONENT])],
     ..oracle::JAWS_OF_DEFEAT
 };

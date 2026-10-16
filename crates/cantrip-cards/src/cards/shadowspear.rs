@@ -27,12 +27,7 @@ fn opponents_permanents_lose_protection(g: &mut dyn Game, item: &StackItem) -> R
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "{1}: Permanents your opponents control lose hexproof and indestructible until end of turn.",
-            cost: Cost { mana: mana(1, 0, 0, 0, 0, 0), ..Cost::NONE },
-            effect: opponents_permanents_lose_protection,
-            ..ActivatedDef::BLANK
-        }),
+        ability(cost("{1}"), opponents_permanents_lose_protection, "{1}: Permanents your opponents control lose hexproof and indestructible until end of turn."),
         equip(mana(2, 0, 0, 0, 0, 0), "Equip {2}"),
     ],
     statics: &[

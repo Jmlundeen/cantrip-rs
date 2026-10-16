@@ -23,13 +23,7 @@ fn drone(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever you cast an artifact spell, create a 1/1 colorless Drone artifact creature token with flying and \"This token can block only creatures with flying.\"",
-        listens: EventMask::SPELL_CAST,
-        matches: cantrip_mechanics::triggers::artifact_spell_you_cast,
-        effect: drone,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(cantrip_mechanics::triggers::ARTIFACT_SPELL_YOU_CAST, drone, "Whenever you cast an artifact spell, create a 1/1 colorless Drone artifact creature token with flying and \"This token can block only creatures with flying.\"")],
     ways: &[warp::way(hybrid(Mana::U, Mana::R), "Warp {U/R}")],
     end_step_riders: warp::RIDERS,
     delayed: &[warp::EXILE],

@@ -21,13 +21,7 @@ pub static MOLOID: CardDef = CardDef {
     subtypes: SubtypeSet::of(&[Subtype::Minion]),
     power: Some(1),
     toughness: Some(1),
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever this token attacks, you may mill a card.",
-        listens: EventMask::ATTACKS,
-        matches: triggers::this_attacks,
-        effect: may_mill,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(triggers::THIS_ATTACKS, may_mill, "Whenever this token attacks, you may mill a card.")],
     ..CardDef::BLANK
 };
 
@@ -40,13 +34,7 @@ fn make_moloid(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     // "You may play lands from your graveyard" (CR 305.1): each still uses a land play (CR 305.2).
     play_rules: &[PlayRule::LandsFromGraveyard],
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Landfall \u{2014} Whenever a land you control enters, create a 1/1 green Minion creature token named Moloid with \"Whenever this token attacks, you may mill a card.\"",
-        listens: EventMask::ZONE_CHANGE,
-        matches: triggers::landfall,
-        effect: make_moloid,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(triggers::LANDFALL, make_moloid, "Landfall \u{2014} Whenever a land you control enters, create a 1/1 green Minion creature token named Moloid with \"Whenever this token attacks, you may mill a card.\"")],
     ..oracle::MOLE_MAN_MOLOID_MASTER
 };
 

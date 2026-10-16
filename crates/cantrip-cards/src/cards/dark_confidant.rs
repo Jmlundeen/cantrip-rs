@@ -12,12 +12,6 @@ fn reveal(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "At the beginning of your upkeep, reveal the top card of your library and put that card into your hand. You lose life equal to its mana value.",
-        listens: EventMask::STEP_BEGAN,
-        matches: cantrip_mechanics::triggers::your_upkeep,
-        effect: reveal,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(cantrip_mechanics::triggers::YOUR_UPKEEP, reveal, "At the beginning of your upkeep, reveal the top card of your library and put that card into your hand. You lose life equal to its mana value.")],
     ..oracle::DARK_CONFIDANT
 };

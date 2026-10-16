@@ -35,14 +35,8 @@ fn grant(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
 }
 
 pub static CARD: CardDef = CardDef {
-    delayed: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever this creature becomes the target of a spell or ability, reveal the top card of your library. If it's a land card, put it onto the battlefield. Otherwise, put it into your hand. This ability triggers only twice each turn.",
-        listens: EventMask::BECAME_TARGET,
-        matches: targeted,
-        effect: reveal_top,
-        triggers_each_turn: 2,
-        ..TriggeredDef::BLANK
-    })],
+    delayed: &[triggered(when(EventMask::BECAME_TARGET, targeted), reveal_top, "Whenever this creature becomes the target of a spell or ability, reveal the top card of your library. If it's a land card, put it onto the battlefield. Otherwise, put it into your hand. This ability triggers only twice each turn.")
+        .triggers_each_turn(2)],
     statics: &[StaticDef {
         text: "Creatures you control have \"Whenever this creature becomes the target of a spell or ability, reveal the top card of your library. If it's a land card, put it onto the battlefield. Otherwise, put it into your hand. This ability triggers only twice each turn.\"",
         layer: Layer::Ability,

@@ -4,8 +4,8 @@ use cantrip_oracle as oracle;
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        mana::tap_for(mana::add_c, Mana::C, "{T}: Add {C}."),
-        mana::tap_for_either_and_hurt(Color::Blue, Color::Black, "{T}: Add {U} or {B}. This artifact deals 1 damage to you."),
+        mana_ability(TAP, add(Mana::C), "{T}: Add {C}."),
+        mana_ability(TAP, add_one_of(&[Color::Blue, Color::Black]).by(mana::add_chosen_and_hurt), "{T}: Add {U} or {B}. This artifact deals 1 damage to you."),
     ],
     ..oracle::TALISMAN_OF_DOMINANCE
 };

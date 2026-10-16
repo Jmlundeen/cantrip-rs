@@ -67,27 +67,9 @@ fn construct(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "+1: Reveal the top two cards of your library. An opponent chooses one of them. Put that card into your hand and exile the other with a silver counter on it.",
-            cost: Cost { loyalty: Some(1), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            effect: reveal_two,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "\u{2212}1: Put a card you own with a silver counter on it from exile into your hand.",
-            cost: Cost { loyalty: Some(-1), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            effect: reclaim,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "\u{2212}2: Create a 0/0 colorless Construct artifact creature token with \"This token gets +1/+1 for each artifact you control.\"",
-            cost: Cost { loyalty: Some(-2), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            effect: construct,
-            ..ActivatedDef::BLANK
-        }),
+        ability(loyalty(1), reveal_two, "+1: Reveal the top two cards of your library. An opponent chooses one of them. Put that card into your hand and exile the other with a silver counter on it."),
+        ability(loyalty(-1), reclaim, "\u{2212}1: Put a card you own with a silver counter on it from exile into your hand."),
+        ability(loyalty(-2), construct, "\u{2212}2: Create a 0/0 colorless Construct artifact creature token with \"This token gets +1/+1 for each artifact you control.\""),
     ],
     ..oracle::KARN_SCION_OF_URZA
 };

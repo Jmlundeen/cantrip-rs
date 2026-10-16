@@ -12,19 +12,9 @@ fn bounce(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "{U}, Sacrifice Aether Spellbomb: Return target creature to its owner's hand.",
-            cost: Cost { mana: mana(0, 0, 1, 0, 0, 0), sacrifice_self: true, ..Cost::NONE },
-            targets: &[targets::CREATURE],
-            effect: bounce,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{1}, Sacrifice Aether Spellbomb: Draw a card.",
-            cost: Cost { mana: mana(1, 0, 0, 0, 0, 0), sacrifice_self: true, ..Cost::NONE },
-            effect: effects::draw::<1>,
-            ..ActivatedDef::BLANK
-        }),
+        ability(cost("{U}").and(SACRIFICE_THIS), bounce, "{U}, Sacrifice Aether Spellbomb: Return target creature to its owner's hand.")
+            .targets(&[targets::CREATURE]),
+        ability(cost("{1}").and(SACRIFICE_THIS), effects::draw::<1>, "{1}, Sacrifice Aether Spellbomb: Draw a card."),
     ],
     ..oracle::AETHER_SPELLBOMB
 };

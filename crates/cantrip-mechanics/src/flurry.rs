@@ -12,11 +12,5 @@ fn your_second_spell(q: &dyn Query, source: ObjectId, event: &Event) -> Option<F
 }
 
 pub const fn trigger(text: &'static str, effect: fn(&mut dyn Game, &StackItem) -> Result<(), Suspend>) -> AbilityDef {
-    AbilityDef::Triggered(TriggeredDef {
-        text,
-        listens: EventMask::SPELL_CAST,
-        matches: your_second_spell,
-        effect,
-        ..TriggeredDef::BLANK
-    })
+    triggered(when(EventMask::SPELL_CAST, your_second_spell), effect, text)
 }

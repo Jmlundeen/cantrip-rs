@@ -1,7 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::attach::living_weapon;
 use cantrip_mechanics::attach::{attached_object, equip};
-use cantrip_mechanics::triggers::this_enters;
+use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
 
@@ -51,22 +51,10 @@ fn exile_damaged(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Living weapon (When this Equipment enters, create a 0/0 black Phyrexian Germ creature token, then attach this to it.)",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            effect: living_weapon,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(THIS_ENTERS, living_weapon, "Living weapon (When this Equipment enters, create a 0/0 black Phyrexian Germ creature token, then attach this to it.)"),
         equip(mana(7, 0, 0, 0, 0, 0), "Equip {7}"),
     ],
-    delayed: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever this creature deals combat damage to a creature, exile that creature.",
-        listens: EventMask::DAMAGE,
-        matches: deals_combat_damage_to_creature,
-        effect: exile_damaged,
-        ..TriggeredDef::BLANK
-    })],
+    delayed: &[triggered(when(EventMask::DAMAGE, deals_combat_damage_to_creature), exile_damaged, "Whenever this creature deals combat damage to a creature, exile that creature.")],
     statics: &[
         StaticDef {
             text: "Equipped creature gets +5/+5.",

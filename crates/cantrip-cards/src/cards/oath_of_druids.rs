@@ -55,14 +55,8 @@ fn reveal(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "At the beginning of each player's upkeep, that player chooses target player who controls more creatures than they do and is their opponent. The first player may reveal cards from the top of their library until they reveal a creature card. If the first player does, that player puts that card onto the battlefield and all other cards revealed this way into their graveyard.",
-        listens: EventMask::STEP_BEGAN,
-        matches: each_upkeep,
-        targets: &[TargetSpec { min: 1, max: 1, filter: player_ahead_on_creatures }],
-        subject_chooses_targets: true,
-        effect: reveal,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(when(EventMask::STEP_BEGAN, each_upkeep), reveal, "At the beginning of each player's upkeep, that player chooses target player who controls more creatures than they do and is their opponent. The first player may reveal cards from the top of their library until they reveal a creature card. If the first player does, that player puts that card onto the battlefield and all other cards revealed this way into their graveyard.")
+        .targets(&[TargetSpec { min: 1, max: 1, filter: player_ahead_on_creatures }])
+        .subject_chooses_targets()],
     ..oracle::OATH_OF_DRUIDS
 };

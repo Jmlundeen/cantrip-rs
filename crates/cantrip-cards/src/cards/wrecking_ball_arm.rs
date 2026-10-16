@@ -27,14 +27,9 @@ fn legendary_creature_you_control(q: &dyn Query, asker: &Asker, t: Target) -> bo
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "Equip legendary creature {3}",
-            cost: Cost { mana: mana(3, 0, 0, 0, 0, 0), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            targets: &[TargetSpec { min: 1, max: 1, filter: legendary_creature_you_control }],
-            effect: attach_to_target,
-            ..ActivatedDef::BLANK
-        }),
+        ability(cost("{3}"), attach_to_target, "Equip legendary creature {3}")
+            .sorcery_speed()
+            .targets(&[TargetSpec { min: 1, max: 1, filter: legendary_creature_you_control }]),
         equip(mana(7, 0, 0, 0, 0, 0), "Equip {7}"),
     ],
     statics: &[

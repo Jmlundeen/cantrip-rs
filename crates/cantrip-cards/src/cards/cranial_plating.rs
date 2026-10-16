@@ -18,13 +18,8 @@ fn plus_power_per_artifact(view: &dyn LayerQuery, source: ObjectId, chars: &mut 
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "{B}{B}: Attach this Equipment to target creature you control.",
-            cost: Cost::mana(mana(0, 0, 0, 2, 0, 0)),
-            targets: &[targets::CREATURE_YOU_CONTROL],
-            effect: attach_to_target,
-            ..ActivatedDef::BLANK
-        }),
+        ability(cost("{B}{B}"), attach_to_target, "{B}{B}: Attach this Equipment to target creature you control.")
+            .targets(&[targets::CREATURE_YOU_CONTROL]),
         equip(mana(1, 0, 0, 0, 0, 0), "Equip {1}"),
     ],
     statics: &[StaticDef {

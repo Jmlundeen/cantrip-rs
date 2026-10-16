@@ -2,7 +2,7 @@ use cantrip_api::*;
 use cantrip_mechanics::ravenous;
 use cantrip_mechanics::replacements::{EXILE_INSTEAD_OF_DYING, exile_if_it_would_die};
 use cantrip_mechanics::targets;
-use cantrip_mechanics::triggers::this_enters;
+use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
 /// It fights up to one target creature an opponent controls. If that creature would die this turn, exile it instead. The
@@ -22,14 +22,8 @@ pub static CARD: CardDef = CardDef {
     enters: Some(ravenous::enters),
     abilities: &[
         ravenous::draw_trigger("When Mawloc enters, if X is 5 or more, draw a card."),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Terror from the Deep \u{2014} When Mawloc enters, it fights up to one target creature an opponent controls. If that creature would die this turn, exile it instead.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            targets: &[TargetSpec { min: 0, max: 1, filter: targets::CREATURE_AN_OPPONENT_CONTROLS.filter }],
-            effect: terror_from_the_deep,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(THIS_ENTERS, terror_from_the_deep, "Terror from the Deep \u{2014} When Mawloc enters, it fights up to one target creature an opponent controls. If that creature would die this turn, exile it instead.")
+            .targets(&[TargetSpec { min: 0, max: 1, filter: targets::CREATURE_AN_OPPONENT_CONTROLS.filter }]),
     ],
     granted_replacements: &[EXILE_INSTEAD_OF_DYING],
     ..oracle::MAWLOC

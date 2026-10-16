@@ -46,14 +46,8 @@ fn mill_five(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static EMBLEM: CardDef = CardDef {
     name: "Jace, Telepath Unbound emblem",
     has_cost: false,
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever you cast a spell, target opponent mills five cards.",
-        listens: EventMask::SPELL_CAST,
-        matches: you_cast_a_spell,
-        targets: &[targets::OPPONENT],
-        effect: mill_five,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(when(EventMask::SPELL_CAST, you_cast_a_spell), mill_five, "Whenever you cast a spell, target opponent mills five cards.")
+        .targets(&[targets::OPPONENT])],
     text: "Whenever you cast a spell, target opponent mills five cards.",
     ..CardDef::BLANK
 };
@@ -65,40 +59,17 @@ fn emblem(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static BACK: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "+1: Up to one target creature gets -2/-0 until your next turn.",
-            cost: Cost { loyalty: Some(1), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            targets: &[TargetSpec { min: 0, ..targets::CREATURE }],
-            effect: plus_one,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "\u{2212}3: You may cast target instant or sorcery card from your graveyard this turn. If that spell would be put into your graveyard, exile it instead.",
-            cost: Cost { loyalty: Some(-3), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            targets: &[targets::INSTANT_OR_SORCERY_IN_YOUR_GRAVEYARD],
-            effect: grant_flashback,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "\u{2212}9: You get an emblem with \"Whenever you cast a spell, target opponent mills five cards.\"",
-            cost: Cost { loyalty: Some(-9), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            effect: emblem,
-            ..ActivatedDef::BLANK
-        }),
+        ability(loyalty(1), plus_one, "+1: Up to one target creature gets -2/-0 until your next turn.")
+            .targets(&[TargetSpec { min: 0, ..targets::CREATURE }]),
+        ability(loyalty(-3), grant_flashback, "\u{2212}3: You may cast target instant or sorcery card from your graveyard this turn. If that spell would be put into your graveyard, exile it instead.")
+            .targets(&[targets::INSTANT_OR_SORCERY_IN_YOUR_GRAVEYARD]),
+        ability(loyalty(-9), emblem, "\u{2212}9: You get an emblem with \"Whenever you cast a spell, target opponent mills five cards.\""),
     ],
     ..oracle::JACE_TELEPATH_UNBOUND
 };
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "{T}: Draw a card, then discard a card. If there are five or more cards in your graveyard, exile Jace, then return him to the battlefield transformed under his owner's control.",
-        cost: Cost { tap: true, ..Cost::NONE },
-        effect: loot,
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[ability(TAP, loot, "{T}: Draw a card, then discard a card. If there are five or more cards in your graveyard, exile Jace, then return him to the battlefield transformed under his owner's control.")],
     back: Some(&BACK),
     ..oracle::JACE_VRYNS_PRODIGY
 };

@@ -31,13 +31,8 @@ fn destroy_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[equip(mana(1, 0, 0, 0, 0, 0), "Equip {1}")],
-    delayed: &[AbilityDef::Activated(ActivatedDef {
-        text: "{3}, {T}, Sacrifice Deconstruction Hammer: Destroy target artifact or enchantment.",
-        cost: Cost { mana: mana(3, 0, 0, 0, 0, 0), tap: true, ..Cost::sacrifice(1, granting_hammer) },
-        targets: &[targets::ARTIFACT_OR_ENCHANTMENT],
-        effect: destroy_it,
-        ..ActivatedDef::BLANK
-    })],
+    delayed: &[ability(cost("{3}, {T}").and(sacrifice(1, granting_hammer)), destroy_it, "{3}, {T}, Sacrifice Deconstruction Hammer: Destroy target artifact or enchantment.")
+        .targets(&[targets::ARTIFACT_OR_ENCHANTMENT])],
     statics: &[
         StaticDef {
             text: "Equipped creature gets +1/+1.",

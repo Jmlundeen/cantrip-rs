@@ -20,13 +20,7 @@ fn soldier(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever you cast a noncreature spell, create a 1/1 colorless Soldier artifact creature token.",
-        listens: EventMask::SPELL_CAST,
-        matches: cantrip_mechanics::triggers::noncreature_spell_you_cast,
-        effect: soldier,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(cantrip_mechanics::triggers::NONCREATURE_SPELL_YOU_CAST, soldier, "Whenever you cast a noncreature spell, create a 1/1 colorless Soldier artifact creature token.")],
     ..oracle::THIRD_PATH_ICONOCLAST
 };
 

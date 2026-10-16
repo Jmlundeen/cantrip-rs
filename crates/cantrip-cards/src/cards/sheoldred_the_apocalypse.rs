@@ -27,20 +27,8 @@ fn lose_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever you draw a card, you gain 2 life.",
-            listens: EventMask::DREW,
-            matches: you_draw,
-            effect: effects::gain_life::<2>,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever an opponent draws a card, they lose 2 life.",
-            listens: EventMask::DREW,
-            matches: opponent_draws,
-            effect: lose_two,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(when(EventMask::DREW, you_draw), effects::gain_life::<2>, "Whenever you draw a card, you gain 2 life."),
+        triggered(when(EventMask::DREW, opponent_draws), lose_two, "Whenever an opponent draws a card, they lose 2 life."),
     ],
     ..oracle::SHEOLDRED_THE_APOCALYPSE
 };

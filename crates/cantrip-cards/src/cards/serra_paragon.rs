@@ -52,13 +52,7 @@ pub static CARD: CardDef = CardDef {
         lands: true,
         gains: Some(0),
     }],
-    delayed: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When this permanent is put into a graveyard from the battlefield, exile it and you gain 2 life.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: put_into_graveyard,
-        effect: exile_and_gain,
-        look_back: true,
-        ..TriggeredDef::BLANK
-    })],
+    delayed: &[triggered(when(EventMask::ZONE_CHANGE, put_into_graveyard), exile_and_gain, "When this permanent is put into a graveyard from the battlefield, exile it and you gain 2 life.")
+        .look_back()],
     ..oracle::SERRA_PARAGON
 };

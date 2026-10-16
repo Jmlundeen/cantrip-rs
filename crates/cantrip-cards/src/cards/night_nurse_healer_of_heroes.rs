@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::targets;
-use cantrip_mechanics::triggers::this_enters;
+use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
 /// "Target permanent card in your graveyard that was put there from anywhere this turn" (CR 115.1, 608.2b): a card
@@ -22,13 +22,7 @@ fn return_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When Night Nurse enters, choose target permanent card in your graveyard that was put there from anywhere this turn. Return it to your hand.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: this_enters,
-        targets: &[TargetSpec { min: 1, max: 1, filter: permanent_card_put_there_this_turn }],
-        effect: return_it,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(THIS_ENTERS, return_it, "When Night Nurse enters, choose target permanent card in your graveyard that was put there from anywhere this turn. Return it to your hand.")
+        .targets(&[TargetSpec { min: 1, max: 1, filter: permanent_card_put_there_this_turn }])],
     ..oracle::NIGHT_NURSE_HEALER_OF_HEROES
 };

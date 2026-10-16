@@ -8,11 +8,6 @@ fn extra_turn(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "{T}, Sacrifice five artifacts: Take an extra turn after this one.",
-        cost: Cost { tap: true, permanents: Some(PermanentCost { count: 5, filter: cantrip_mechanics::targets::filters::artifact, to_hand: false }), ..Cost::NONE },
-        effect: extra_turn,
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[ability(TAP.and(sacrifice(5, cantrip_mechanics::targets::filters::artifact)), extra_turn, "{T}, Sacrifice five artifacts: Take an extra turn after this one.")],
     ..oracle::TIME_SIEVE
 };

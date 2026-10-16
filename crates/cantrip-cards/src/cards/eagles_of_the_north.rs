@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::typecycling;
-use cantrip_mechanics::{pump, triggers::this_enters};
+use cantrip_mechanics::{pump, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 /// Creatures you control get +1/+0 and gain first strike until end of turn: the creatures there are as it resolves
@@ -17,13 +17,7 @@ fn pump_creatures(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When Eagles of the North enters, creatures you control get +1/+0 and gain first strike until end of turn.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            effect: pump_creatures,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(THIS_ENTERS, pump_creatures, "When Eagles of the North enters, creatures you control get +1/+0 and gain first strike until end of turn."),
         typecycling::ability(Subtype::Plains, mana(1, 0, 0, 0, 0, 0), "Plainscycling {1} ({1}, Discard this card: Search your library for a Plains card, reveal it, put it into your hand, then shuffle.)"),
     ],
     ..oracle::EAGLES_OF_THE_NORTH

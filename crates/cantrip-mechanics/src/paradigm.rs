@@ -56,11 +56,5 @@ fn cast_a_copy(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-pub const TRIGGER: AbilityDef = AbilityDef::Triggered(TriggeredDef {
-    text: "Paradigm: at the beginning of each of your first main phases, you may cast a copy of this spell from exile without paying its mana cost.",
-    listens: EventMask::STEP_BEGAN,
-    matches: your_first_main_phase,
-    effect: cast_a_copy,
-    anywhere: true,
-    ..TriggeredDef::BLANK
-});
+pub const TRIGGER: AbilityDef = triggered(when(EventMask::STEP_BEGAN, your_first_main_phase), cast_a_copy, "Paradigm: at the beginning of each of your first main phases, you may cast a copy of this spell from exile without paying its mana cost.")
+    .anywhere();

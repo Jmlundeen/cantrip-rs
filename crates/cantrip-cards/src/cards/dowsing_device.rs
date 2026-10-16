@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{mana, pump, targets};
+use cantrip_mechanics::{pump, targets};
 use cantrip_oracle as oracle;
 
 /// "up to one target creature you control".
@@ -51,28 +51,17 @@ fn grotto_pump(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static BACK: CardDef = CardDef {
     abilities: &[
-        mana::tap_for(mana::add_r, Mana::R, "{T}: Add {R}."),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{2}{R}, {T}: Until end of turn, target creature gains haste and gets +X/+0, where X is the number of artifacts you control. Activate only as a sorcery.",
-            cost: Cost { mana: cantrip_api::mana(2, 0, 0, 0, 1, 0), tap: true, ..Cost::NONE },
-            timing: Timing::Sorcery,
-            targets: &[targets::CREATURE],
-            effect: grotto_pump,
-            ..ActivatedDef::BLANK
-        }),
+        mana_ability(TAP, add(Mana::R), "{T}: Add {R}."),
+        ability(cost("{2}{R}, {T}"), grotto_pump, "{2}{R}, {T}: Until end of turn, target creature gains haste and gets +X/+0, where X is the number of artifacts you control. Activate only as a sorcery.")
+            .sorcery_speed()
+            .targets(&[targets::CREATURE]),
     ],
     ..oracle::GEODE_GROTTO
 };
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever this artifact or another artifact you control enters, up to one target creature you control gets +1/+0 and gains haste until end of turn. Then transform this artifact if you control four or more artifacts.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: artifact_enters,
-        targets: &[UP_TO_ONE_CREATURE_YOU_CONTROL],
-        effect: pump_then_transform,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(when(EventMask::ZONE_CHANGE, artifact_enters), pump_then_transform, "Whenever this artifact or another artifact you control enters, up to one target creature you control gets +1/+0 and gains haste until end of turn. Then transform this artifact if you control four or more artifacts.")
+        .targets(&[UP_TO_ONE_CREATURE_YOU_CONTROL])],
     back: Some(&BACK),
     ..oracle::DOWSING_DEVICE
 };

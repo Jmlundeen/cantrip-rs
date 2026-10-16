@@ -50,13 +50,7 @@ pub static CARD: CardDef = CardDef {
         own: true,
         ..StaticDef::BLANK
     }],
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever you attack, for each opponent, create a 1/1 white Human creature token that's tapped and attacking that player or a planeswalker they control.",
-        listens: EventMask::ATTACKERS_DECLARED,
-        matches: triggers::you_attack,
-        effect: human_for_each_opponent,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(triggers::YOU_ATTACK, human_for_each_opponent, "Whenever you attack, for each opponent, create a 1/1 white Human creature token that's tapped and attacking that player or a planeswalker they control.")],
     ..oracle::ADELINE_RESPLENDENT_CATHAR
 };
 

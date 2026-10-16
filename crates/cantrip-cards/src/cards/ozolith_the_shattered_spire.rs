@@ -30,14 +30,9 @@ fn put_counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "{1}{G}, {T}: Put a +1/+1 counter on target artifact or creature you control. Activate only as a sorcery.",
-            cost: Cost { mana: mana(1, 0, 0, 0, 0, 1), tap: true, ..Cost::NONE },
-            timing: Timing::Sorcery,
-            targets: &[TargetSpec { min: 1, max: 1, filter: artifact_or_creature_you_control }],
-            effect: put_counter,
-            ..ActivatedDef::BLANK
-        }),
+        ability(cost("{1}{G}, {T}"), put_counter, "{1}{G}, {T}: Put a +1/+1 counter on target artifact or creature you control. Activate only as a sorcery.")
+            .sorcery_speed()
+            .targets(&[TargetSpec { min: 1, max: 1, filter: artifact_or_creature_you_control }]),
         cycling(mana(2, 0, 0, 0, 0, 0), "Cycling {2} ({2}, Discard this card: Draw a card.)"),
     ],
     replacements: &[ReplacementDef {

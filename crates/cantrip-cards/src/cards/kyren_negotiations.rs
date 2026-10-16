@@ -21,12 +21,7 @@ fn ping(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "Tap an untapped creature you control: This enchantment deals 1 damage to target player or planeswalker.",
-        cost: TAP_AN_UNTAPPED_CREATURE,
-        targets: &[TargetSpec { min: 1, max: 1, filter: player_or_planeswalker }],
-        effect: ping,
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[ability(TAP_AN_UNTAPPED_CREATURE, ping, "Tap an untapped creature you control: This enchantment deals 1 damage to target player or planeswalker.")
+        .targets(&[TargetSpec { min: 1, max: 1, filter: player_or_planeswalker }])],
     ..oracle::KYREN_NEGOTIATIONS
 };

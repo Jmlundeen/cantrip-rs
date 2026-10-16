@@ -21,12 +21,7 @@ fn grant(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     spell: Some(SpellDef { targets: &[targets::CREATURE], effect: grant }),
-    delayed: &[AbilityDef::Activated(ActivatedDef {
-        text: "{T}: Return target nonland permanent to its owner's hand.",
-        cost: Cost { tap: true, ..Cost::NONE },
-        targets: &[cantrip_mechanics::targets::NONLAND_PERMANENT],
-        effect: return_to_hand,
-        ..ActivatedDef::BLANK
-    })],
+    delayed: &[ability(TAP, return_to_hand, "{T}: Return target nonland permanent to its owner's hand.")
+        .targets(&[cantrip_mechanics::targets::NONLAND_PERMANENT])],
     ..oracle::BANISHING_KNACK
 };

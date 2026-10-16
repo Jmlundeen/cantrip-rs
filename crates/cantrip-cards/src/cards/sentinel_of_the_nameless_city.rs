@@ -9,20 +9,8 @@ fn map(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever this creature enters, create a Map token.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: triggers::this_enters,
-            effect: map,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever this creature attacks, create a Map token.",
-            listens: EventMask::ATTACKS,
-            matches: triggers::this_attacks,
-            effect: map,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(triggers::THIS_ENTERS, map, "Whenever this creature enters, create a Map token."),
+        triggered(triggers::THIS_ATTACKS, map, "Whenever this creature attacks, create a Map token."),
     ],
     ..oracle::SENTINEL_OF_THE_NAMELESS_CITY
 };

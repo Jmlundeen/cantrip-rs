@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::library::{search_to_battlefield, Find};
-use cantrip_mechanics::triggers::this_enters;
+use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
 /// When Golos enters, you may search your library for a land card, put that card onto the battlefield tapped, then
@@ -21,19 +21,8 @@ fn exile_three(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When Golos enters, you may search your library for a land card, put that card onto the battlefield tapped, then shuffle.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            effect: fetch_land,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{2}{W}{U}{B}{R}{G}: Exile the top three cards of your library. You may play them this turn without paying their mana costs.",
-            cost: Cost { mana: mana(2, 1, 1, 1, 1, 1), ..Cost::NONE },
-            effect: exile_three,
-            ..ActivatedDef::BLANK
-        }),
+        triggered(THIS_ENTERS, fetch_land, "When Golos enters, you may search your library for a land card, put that card onto the battlefield tapped, then shuffle."),
+        ability(cost("{2}{W}{U}{B}{R}{G}"), exile_three, "{2}{W}{U}{B}{R}{G}: Exile the top three cards of your library. You may play them this turn without paying their mana costs."),
     ],
     ..oracle::GOLOS_TIRELESS_PILGRIM
 };

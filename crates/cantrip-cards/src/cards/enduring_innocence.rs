@@ -45,23 +45,11 @@ fn return_as_enchantment(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspe
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever one or more other creatures you control with power 2 or less enter, draw a card. This ability triggers only once each turn.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: small_creatures_enter,
-            effect: cantrip_mechanics::effects::draw::<1>,
-            once_per_batch: true,
-            triggers_each_turn: 1,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When Enduring Innocence dies, if it was a creature, return it to the battlefield under its owner's control. It's an enchantment. (It's not a creature.)",
-            listens: EventMask::ZONE_CHANGE,
-            matches: dies_as_a_creature,
-            effect: return_as_enchantment,
-            look_back: true,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(when(EventMask::ZONE_CHANGE, small_creatures_enter), cantrip_mechanics::effects::draw::<1>, "Whenever one or more other creatures you control with power 2 or less enter, draw a card. This ability triggers only once each turn.")
+            .triggers_each_turn(1)
+            .once_per_batch(),
+        triggered(when(EventMask::ZONE_CHANGE, dies_as_a_creature), return_as_enchantment, "When Enduring Innocence dies, if it was a creature, return it to the battlefield under its owner's control. It's an enchantment. (It's not a creature.)")
+            .look_back(),
     ],
     ..oracle::ENDURING_INNOCENCE
 };

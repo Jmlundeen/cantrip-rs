@@ -1,5 +1,4 @@
 use cantrip_api::*;
-use cantrip_mechanics::mana;
 use cantrip_oracle as oracle;
 
 /// "This land enters tapped unless you control a basic land" (CR 614.1c): read on the battlefield as it is while the
@@ -24,13 +23,8 @@ fn counters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     enters: Some(enters),
     abilities: &[
-        mana::tap_for(mana::add_w, Mana::W, "{T}: Add {W}."),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{3}{W}, {T}: Put a +1/+1 counter on each creature you control.",
-            cost: Cost { mana: mana(3, 1, 0, 0, 0, 0), tap: true, ..Cost::NONE },
-            effect: counters,
-            ..ActivatedDef::BLANK
-        }),
+        mana_ability(TAP, add(Mana::W), "{T}: Add {W}."),
+        ability(cost("{3}{W}, {T}"), counters, "{3}{W}, {T}: Put a +1/+1 counter on each creature you control."),
     ],
     ..oracle::ABANDONED_AIR_TEMPLE
 };

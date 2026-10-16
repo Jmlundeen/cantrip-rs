@@ -1,8 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::library::exile_top_may_play;
-use cantrip_mechanics::mana::add_u;
 use cantrip_mechanics::tokens::{self, CONSTRUCT};
-use cantrip_mechanics::triggers::this_enters;
+use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
 /// When Urza enters, create a 0/0 colorless Construct artifact creature token with "This token gets +1/+1 for each artifact
@@ -33,26 +32,9 @@ fn play_top(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         // Mana abilities first.
-        AbilityDef::Activated(ActivatedDef {
-            text: "Tap an untapped artifact you control: Add {U}.",
-            cost: Cost::tap_untapped(1, untapped_artifact_you_control),
-            mana: Some(add_u),
-            adds: ManaPool([0, 1, 0, 0, 0, 0]),
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When Urza enters, create a 0/0 colorless Construct artifact creature token with \"This token gets +1/+1 for each artifact you control.\"",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            effect: make_construct,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{5}: Shuffle your library, then exile the top card. Until end of turn, you may play that card without paying its mana cost.",
-            cost: Cost { mana: mana(5, 0, 0, 0, 0, 0), ..Cost::NONE },
-            effect: play_top,
-            ..ActivatedDef::BLANK
-        }),
+        mana_ability(Cost::tap_untapped(1, untapped_artifact_you_control), add(Mana::U), "Tap an untapped artifact you control: Add {U}."),
+        triggered(THIS_ENTERS, make_construct, "When Urza enters, create a 0/0 colorless Construct artifact creature token with \"This token gets +1/+1 for each artifact you control.\""),
+        ability(cost("{5}"), play_top, "{5}: Shuffle your library, then exile the top card. Until end of turn, you may play that card without paying its mana cost."),
     ],
     ..oracle::URZA_LORD_HIGH_ARTIFICER
 };

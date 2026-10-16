@@ -1,7 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::battle_cry;
 use cantrip_mechanics::tokens;
-use cantrip_mechanics::triggers::{this_dies, this_enters};
+use cantrip_mechanics::triggers::{THIS_DIES, THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 /// A 1/1 black Bat creature token with flying.
@@ -25,21 +25,9 @@ fn make_bat(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         battle_cry::TRIGGER,
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When Sanguine Evangelist enters, create a 1/1 black Bat creature token with flying.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            effect: make_bat,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When Sanguine Evangelist dies, create a 1/1 black Bat creature token with flying.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_dies,
-            effect: make_bat,
-            look_back: true,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(THIS_ENTERS, make_bat, "When Sanguine Evangelist enters, create a 1/1 black Bat creature token with flying."),
+        triggered(THIS_DIES, make_bat, "When Sanguine Evangelist dies, create a 1/1 black Bat creature token with flying.")
+            .look_back(),
     ],
     ..oracle::SANGUINE_EVANGELIST
 };

@@ -41,13 +41,7 @@ fn recast(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever Bilbo attacks, you may cast an artifact, instant, or sorcery spell from your graveyard. If an instant or sorcery spell cast this way would be put into your graveyard, exile it instead.",
-        listens: EventMask::ATTACKS,
-        matches: triggers::this_attacks,
-        effect: recast,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(triggers::THIS_ATTACKS, recast, "Whenever Bilbo attacks, you may cast an artifact, instant, or sorcery spell from your graveyard. If an instant or sorcery spell cast this way would be put into your graveyard, exile it instead.")],
     cost_changes: &[outside_hand_costs_one_less],
     ..oracle::BILBO_THIEF_IN_THE_NIGHT
 };

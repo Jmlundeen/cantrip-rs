@@ -3,7 +3,7 @@
 //!
 //! A card with offspring gives `kicker(cost)` as its `kicker` and lists `trigger(text)` among its `abilities`.
 
-use crate::triggers::this_enters;
+use crate::triggers::THIS_ENTERS;
 use cantrip_api::*;
 
 /// The additional cost, paid once.
@@ -24,12 +24,6 @@ fn create_offspring(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub const fn trigger(text: &'static str) -> AbilityDef {
-    AbilityDef::Triggered(TriggeredDef {
-        text,
-        listens: EventMask::ZONE_CHANGE,
-        matches: this_enters,
-        condition: Some(offspring_paid),
-        effect: create_offspring,
-        ..TriggeredDef::BLANK
-    })
+    triggered(THIS_ENTERS, create_offspring, text)
+        .condition(offspring_paid)
 }

@@ -12,11 +12,6 @@ fn becomes_saddled(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub const fn ability(power: u8, text: &'static str) -> AbilityDef {
-    AbilityDef::Activated(ActivatedDef {
-        text,
-        cost: Cost { tap_creatures: Some(TapCreatures { power, crew: false }), ..Cost::NONE },
-        timing: Timing::Sorcery,
-        effect: becomes_saddled,
-        ..ActivatedDef::BLANK
-    })
+    cantrip_api::ability(Cost { tap_creatures: Some(TapCreatures { power, crew: false }), ..Cost::NONE }, becomes_saddled, text)
+        .sorcery_speed()
 }

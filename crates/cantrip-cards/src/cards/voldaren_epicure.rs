@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::tokens;
-use cantrip_mechanics::triggers::this_enters;
+use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
 /// It deals 1 damage to each opponent, then creates a Blood token.
@@ -11,13 +11,7 @@ fn ping_and_blood(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When Voldaren Epicure enters, it deals 1 damage to each opponent. Create a Blood token.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: this_enters,
-        effect: ping_and_blood,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(THIS_ENTERS, ping_and_blood, "When Voldaren Epicure enters, it deals 1 damage to each opponent. Create a Blood token.")],
     ..oracle::VOLDAREN_EPICURE
 };
 

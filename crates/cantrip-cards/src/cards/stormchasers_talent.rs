@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::{targets, tokens};
-use cantrip_mechanics::triggers::{PROWESS, this_enters};
+use cantrip_mechanics::triggers::{PROWESS, THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 /// The 1/1 blue and red Otter creature token with prowess.
@@ -74,44 +74,16 @@ fn cast_at_level_three(q: &dyn Query, source: ObjectId, event: &Event) -> Option
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "{3}{U}: Level 2",
-            cost: Cost::mana(mana(3, 0, 1, 0, 0, 0)),
-            timing: Timing::Sorcery,
-            condition: Some(at_level_one),
-            effect: become_level_two,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{5}{U}: Level 3",
-            cost: Cost::mana(mana(5, 0, 1, 0, 0, 0)),
-            timing: Timing::Sorcery,
-            condition: Some(at_level_two),
-            effect: become_level_three,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When this Class enters, create a 1/1 blue and red Otter creature token with prowess.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            effect: otter,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When this Class becomes level 2, return target instant or sorcery card from your graveyard to your hand.",
-            listens: EventMask::CLASS_LEVEL,
-            matches: became_level_two,
-            targets: &[targets::INSTANT_OR_SORCERY_IN_YOUR_GRAVEYARD],
-            effect: return_to_hand,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever you cast an instant or sorcery spell, create a 1/1 blue and red Otter creature token with prowess.",
-            listens: EventMask::SPELL_CAST,
-            matches: cast_at_level_three,
-            effect: otter,
-            ..TriggeredDef::BLANK
-        }),
+        ability(cost("{3}{U}"), become_level_two, "{3}{U}: Level 2")
+            .sorcery_speed()
+            .condition(at_level_one),
+        ability(cost("{5}{U}"), become_level_three, "{5}{U}: Level 3")
+            .sorcery_speed()
+            .condition(at_level_two),
+        triggered(THIS_ENTERS, otter, "When this Class enters, create a 1/1 blue and red Otter creature token with prowess."),
+        triggered(when(EventMask::CLASS_LEVEL, became_level_two), return_to_hand, "When this Class becomes level 2, return target instant or sorcery card from your graveyard to your hand.")
+            .targets(&[targets::INSTANT_OR_SORCERY_IN_YOUR_GRAVEYARD]),
+        triggered(when(EventMask::SPELL_CAST, cast_at_level_three), otter, "Whenever you cast an instant or sorcery spell, create a 1/1 blue and red Otter creature token with prowess."),
     ],
     ..oracle::STORMCHASERS_TALENT
 };

@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::{destroy_target, persist};
-use cantrip_mechanics::triggers::this_enters;
+use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
 fn noncreature_permanent(q: &dyn Query, _: &Asker, t: Target) -> bool {
@@ -14,14 +14,8 @@ fn destroy_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When this creature enters, destroy target noncreature permanent.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            targets: &[TargetSpec { min: 1, max: 1, filter: noncreature_permanent }],
-            effect: destroy_it,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(THIS_ENTERS, destroy_it, "When this creature enters, destroy target noncreature permanent.")
+            .targets(&[TargetSpec { min: 1, max: 1, filter: noncreature_permanent }]),
         persist::trigger("Persist (When this creature dies, if it had no -1/-1 counters on it, return it to the battlefield under its owner's control with a -1/-1 counter on it.)"),
     ],
     ..oracle::WOODFALL_PRIMUS

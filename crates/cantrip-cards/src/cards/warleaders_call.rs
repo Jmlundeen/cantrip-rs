@@ -26,12 +26,6 @@ pub static CARD: CardDef = CardDef {
         apply,
         ..StaticDef::BLANK
     }],
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever a creature you control enters, this enchantment deals 1 damage to each opponent.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: cantrip_mechanics::triggers::creature_you_control_enters,
-        effect: strike,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(cantrip_mechanics::triggers::CREATURE_YOU_CONTROL_ENTERS, strike, "Whenever a creature you control enters, this enchantment deals 1 damage to each opponent.")],
     ..oracle::WARLEADERS_CALL
 };

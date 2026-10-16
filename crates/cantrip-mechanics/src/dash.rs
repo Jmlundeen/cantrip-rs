@@ -43,8 +43,4 @@ fn return_to_hand(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-pub const RETURN: AbilityDef = AbilityDef::Triggered(TriggeredDef {
-    text: "Return it to its owner's hand.",
-    effect: return_to_hand,
-    ..TriggeredDef::BLANK
-});
+pub const RETURN: AbilityDef = delayed_trigger(return_to_hand, "Return it to its owner's hand.");

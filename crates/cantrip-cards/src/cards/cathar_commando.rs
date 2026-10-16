@@ -8,12 +8,7 @@ fn destroy_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "{1}, Sacrifice Cathar Commando: Destroy target artifact or enchantment.",
-        cost: Cost { mana: mana(1, 0, 0, 0, 0, 0), sacrifice_self: true, ..Cost::NONE },
-        targets: &[targets::ARTIFACT_OR_ENCHANTMENT],
-        effect: destroy_it,
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[ability(cost("{1}").and(SACRIFICE_THIS), destroy_it, "{1}, Sacrifice Cathar Commando: Destroy target artifact or enchantment.")
+        .targets(&[targets::ARTIFACT_OR_ENCHANTMENT])],
     ..oracle::CATHAR_COMMANDO
 };

@@ -31,12 +31,6 @@ fn return_same_name(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever a player casts a creature spell, each player returns all cards with the same name as that spell from their graveyard to the battlefield.",
-        listens: EventMask::SPELL_CAST,
-        matches: creature_spell_cast,
-        effect: return_same_name,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(when(EventMask::SPELL_CAST, creature_spell_cast), return_same_name, "Whenever a player casts a creature spell, each player returns all cards with the same name as that spell from their graveyard to the battlefield.")],
     ..oracle::BLOODBOND_MARCH
 };

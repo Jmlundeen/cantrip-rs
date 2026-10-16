@@ -40,12 +40,6 @@ fn may_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever you put one or more +1/+1 counters on a creature you control, you may draw that many cards. Do this only once each turn.",
-        listens: EventMask::COUNTERS,
-        matches: you_put_plus_one_counters,
-        effect: may_draw,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(when(EventMask::COUNTERS, you_put_plus_one_counters), may_draw, "Whenever you put one or more +1/+1 counters on a creature you control, you may draw that many cards. Do this only once each turn.")],
     ..oracle::TERRASYMBIOSIS
 };

@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::targets;
-use cantrip_mechanics::triggers::this_enters;
+use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
 /// Domain (an ability word): this spell costs {1} less to cast for each basic land type among lands you
@@ -24,13 +24,7 @@ fn exile_until_it_leaves(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspe
 
 pub static CARD: CardDef = CardDef {
     own_cost_changes: &[domain],
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When this enchantment enters, exile target nonland permanent an opponent controls until this enchantment leaves the battlefield.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: this_enters,
-        targets: &[targets::NONLAND_PERMANENT_AN_OPPONENT_CONTROLS],
-        effect: exile_until_it_leaves,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(THIS_ENTERS, exile_until_it_leaves, "When this enchantment enters, exile target nonland permanent an opponent controls until this enchantment leaves the battlefield.")
+        .targets(&[targets::NONLAND_PERMANENT_AN_OPPONENT_CONTROLS])],
     ..oracle::LEYLINE_BINDING
 };

@@ -39,27 +39,11 @@ fn raid(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "At the beginning of your upkeep, you may create a Treasure token. When you do, target opponent creates a tapped Treasure token.",
-            listens: EventMask::STEP_BEGAN,
-            matches: cantrip_mechanics::triggers::your_upkeep,
-            effect: maybe_treasure,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever this creature attacks, it deals damage to defending player equal to the number of artifacts they control.",
-            listens: EventMask::ATTACKS,
-            matches: cantrip_mechanics::triggers::this_attacks_defender,
-            effect: raid,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(cantrip_mechanics::triggers::YOUR_UPKEEP, maybe_treasure, "At the beginning of your upkeep, you may create a Treasure token. When you do, target opponent creates a tapped Treasure token."),
+        triggered(cantrip_mechanics::triggers::THIS_ATTACKS_DEFENDER, raid, "Whenever this creature attacks, it deals damage to defending player equal to the number of artifacts they control."),
     ],
-    delayed: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When you do, target opponent creates a tapped Treasure token.",
-        targets: &[targets::OPPONENT],
-        effect: gift,
-        ..TriggeredDef::BLANK
-    })],
+    delayed: &[delayed_trigger(gift, "When you do, target opponent creates a tapped Treasure token.")
+        .targets(&[targets::OPPONENT])],
     ..oracle::GENEROUS_PLUNDERER
 };
 

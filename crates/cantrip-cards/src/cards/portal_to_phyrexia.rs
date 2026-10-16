@@ -26,21 +26,9 @@ fn reanimate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When this artifact enters, each opponent sacrifices three creatures of their choice.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: triggers::this_enters,
-            effect: opponents_sacrifice_three,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "At the beginning of your upkeep, put target creature card from a graveyard onto the battlefield under your control. It's a Phyrexian in addition to its other types.",
-            listens: EventMask::STEP_BEGAN,
-            matches: triggers::your_upkeep,
-            targets: &[TargetSpec { min: 1, max: 1, filter: creature_card }],
-            effect: reanimate,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(triggers::THIS_ENTERS, opponents_sacrifice_three, "When this artifact enters, each opponent sacrifices three creatures of their choice."),
+        triggered(triggers::YOUR_UPKEEP, reanimate, "At the beginning of your upkeep, put target creature card from a graveyard onto the battlefield under your control. It's a Phyrexian in addition to its other types.")
+            .targets(&[TargetSpec { min: 1, max: 1, filter: creature_card }]),
     ],
     ..oracle::PORTAL_TO_PHYREXIA
 };

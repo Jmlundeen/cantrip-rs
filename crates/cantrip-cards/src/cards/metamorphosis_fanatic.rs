@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::targets;
-use cantrip_mechanics::triggers::this_enters;
+use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
 /// "Return up to one target creature card from your graveyard to the battlefield with a lifelink counter on it": the
@@ -14,13 +14,7 @@ fn reanimate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     miracle: Some(mana(1, 0, 0, 1, 0, 0)),
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When this creature enters, return up to one target creature card from your graveyard to the battlefield with a lifelink counter on it.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: this_enters,
-        targets: &[TargetSpec { min: 0, ..cantrip_mechanics::targets::CREATURE_CARD_IN_YOUR_GRAVEYARD }],
-        effect: reanimate,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(THIS_ENTERS, reanimate, "When this creature enters, return up to one target creature card from your graveyard to the battlefield with a lifelink counter on it.")
+        .targets(&[TargetSpec { min: 0, ..cantrip_mechanics::targets::CREATURE_CARD_IN_YOUR_GRAVEYARD }])],
     ..oracle::METAMORPHOSIS_FANATIC
 };

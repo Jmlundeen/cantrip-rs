@@ -17,15 +17,10 @@ pub fn attach_to_target(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspen
 /// Equip [cost] (CR 702.6a): "[cost]: Attach this to target creature you control. Activate only as a sorcery."
 /// `text` is the ability's text, which a scenario's `Ability:` matches. Umezawa's Jitte and Lavaspur Boots print it.
 pub const fn equip(mana: ManaCost, text: &'static str) -> AbilityDef {
-    AbilityDef::Activated(ActivatedDef {
-        text,
-        cost: Cost { mana, ..Cost::NONE },
-        timing: Timing::Sorcery,
-        targets: &[targets::CREATURE_YOU_CONTROL],
-        effect: attach_to_target,
-        equip: true,
-        ..ActivatedDef::BLANK
-    })
+    ability(Cost::mana(mana), attach_to_target, text)
+        .sorcery_speed()
+        .targets(&[targets::CREATURE_YOU_CONTROL])
+        .equip()
 }
 
 /// "You may attach that Equipment to target creature you control" (CR 701.3a), for a trigger that fired about the Equipment

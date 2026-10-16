@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::tokens::{self, investigate};
-use cantrip_mechanics::triggers::this_enters;
+use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -8,13 +8,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When Thraben Inspector enters, investigate.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: this_enters,
-        effect,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(THIS_ENTERS, effect, "When Thraben Inspector enters, investigate.")],
     ..oracle::THRABEN_INSPECTOR
 };
 

@@ -59,30 +59,10 @@ fn make_construct(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "{3}: Untap Retrofitter Foundry.",
-            cost: Cost::mana(mana(3, 0, 0, 0, 0, 0)),
-            effect: untap_this,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{2}, {T}: Create a 1/1 colorless Servo artifact creature token.",
-            cost: Cost { mana: mana(2, 0, 0, 0, 0, 0), tap: true, ..Cost::NONE },
-            effect: make_servo,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{1}, {T}, Sacrifice a Servo: Create a 1/1 colorless Thopter artifact creature token with flying.",
-            cost: Cost { mana: mana(1, 0, 0, 0, 0, 0), tap: true, ..Cost::sacrifice(1, is_servo) },
-            effect: make_thopter,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{T}, Sacrifice a Thopter: Create a 4/4 colorless Construct artifact creature token.",
-            cost: Cost { tap: true, ..Cost::sacrifice(1, is_thopter) },
-            effect: make_construct,
-            ..ActivatedDef::BLANK
-        }),
+        ability(cost("{3}"), untap_this, "{3}: Untap Retrofitter Foundry."),
+        ability(cost("{2}, {T}"), make_servo, "{2}, {T}: Create a 1/1 colorless Servo artifact creature token."),
+        ability(cost("{1}, {T}").and(sacrifice(1, is_servo)), make_thopter, "{1}, {T}, Sacrifice a Servo: Create a 1/1 colorless Thopter artifact creature token with flying."),
+        ability(TAP.and(sacrifice(1, is_thopter)), make_construct, "{T}, Sacrifice a Thopter: Create a 4/4 colorless Construct artifact creature token."),
     ],
     ..oracle::RETROFITTER_FOUNDRY
 };

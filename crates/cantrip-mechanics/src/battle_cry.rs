@@ -21,10 +21,4 @@ fn pump_other_attackers(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspen
     Ok(())
 }
 
-pub const TRIGGER: AbilityDef = AbilityDef::Triggered(TriggeredDef {
-    text: "Battle cry (Whenever this creature attacks, each other attacking creature gets +1/+0 until end of turn.)",
-    listens: EventMask::ATTACKS,
-    matches: this_attacks,
-    effect: pump_other_attackers,
-    ..TriggeredDef::BLANK
-});
+pub const TRIGGER: AbilityDef = triggered(when(EventMask::ATTACKS, this_attacks), pump_other_attackers, "Battle cry (Whenever this creature attacks, each other attacking creature gets +1/+0 until end of turn.)");

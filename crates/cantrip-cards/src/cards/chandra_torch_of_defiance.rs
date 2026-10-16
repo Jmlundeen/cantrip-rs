@@ -56,49 +56,19 @@ fn five_damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static EMBLEM: CardDef = CardDef {
     name: "Chandra, Torch of Defiance emblem",
     has_cost: false,
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever you cast a spell, this emblem deals 5 damage to any target.",
-        listens: EventMask::SPELL_CAST,
-        matches: you_cast,
-        targets: &[targets::ANY],
-        effect: five_damage,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(when(EventMask::SPELL_CAST, you_cast), five_damage, "Whenever you cast a spell, this emblem deals 5 damage to any target.")
+        .targets(&[targets::ANY])],
     text: "Whenever you cast a spell, this emblem deals 5 damage to any target.",
     ..CardDef::BLANK
 };
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "+1: Exile the top card of your library. You may cast that card. If you don't, Chandra deals 2 damage to each opponent.",
-            cost: Cost { loyalty: Some(1), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            effect: impulse,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "+1: Add {R}{R}.",
-            cost: Cost { loyalty: Some(1), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            effect: add_red_red,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "\u{2212}3: Chandra deals 4 damage to target creature.",
-            cost: Cost { loyalty: Some(-3), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            targets: &[targets::CREATURE],
-            effect: four_damage,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "\u{2212}7: You get an emblem with \"Whenever you cast a spell, this emblem deals 5 damage to any target.\"",
-            cost: Cost { loyalty: Some(-7), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            effect: emblem,
-            ..ActivatedDef::BLANK
-        }),
+        ability(loyalty(1), impulse, "+1: Exile the top card of your library. You may cast that card. If you don't, Chandra deals 2 damage to each opponent."),
+        ability(loyalty(1), add_red_red, "+1: Add {R}{R}."),
+        ability(loyalty(-3), four_damage, "\u{2212}3: Chandra deals 4 damage to target creature.")
+            .targets(&[targets::CREATURE]),
+        ability(loyalty(-7), emblem, "\u{2212}7: You get an emblem with \"Whenever you cast a spell, this emblem deals 5 damage to any target.\""),
     ],
     ..oracle::CHANDRA_TORCH_OF_DEFIANCE
 };

@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{choose, triggers::this_enters, mana};
+use cantrip_mechanics::{choose, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 /// Imprint (CR 607.2a): "you may exile a nonartifact, nonland card from your hand", exiled with this artifact. Nothing
@@ -29,22 +29,9 @@ fn imprinted_colors(q: &dyn Query, asker: &Asker) -> ColorSet {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "{T}: Add one mana of any of the exiled card's colors.",
-            cost: Cost { tap: true, ..Cost::NONE },
-            mana: Some(mana::add_chosen),
-            any_color: true,
-            colors_from: Some(imprinted_colors),
-            adds_any: 1,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Imprint \u{2014} When this artifact enters, you may exile a nonartifact, nonland card from your hand.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            effect: imprint,
-            ..TriggeredDef::BLANK
-        }),
+        mana_ability(TAP, add_any_color(1), "{T}: Add one mana of any of the exiled card's colors.")
+            .colors_from(imprinted_colors),
+        triggered(THIS_ENTERS, imprint, "Imprint \u{2014} When this artifact enters, you may exile a nonartifact, nonland card from your hand."),
     ],
     ..oracle::CHROME_MOX
 };

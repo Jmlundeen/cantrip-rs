@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{airbend, triggers::this_enters, targets};
+use cantrip_mechanics::{airbend, triggers::THIS_ENTERS, targets};
 use cantrip_oracle as oracle;
 
 /// "Up to one other target creature or spell": a creature on the battlefield, or a spell on the stack, other than Aang.
@@ -32,33 +32,16 @@ fn counters_on_tapped_creatures(g: &mut dyn Game, item: &StackItem) -> Result<()
 }
 
 pub static BACK: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever Aang and La attack, put a +1/+1 counter on each tapped creature you control.",
-        listens: EventMask::ATTACKS,
-        matches: cantrip_mechanics::triggers::this_attacks,
-        effect: counters_on_tapped_creatures,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(cantrip_mechanics::triggers::THIS_ATTACKS, counters_on_tapped_creatures, "Whenever Aang and La attack, put a +1/+1 counter on each tapped creature you control.")],
     ..oracle::AANG_AND_LA_OCEANS_FURY
 };
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When Aang enters, airbend up to one other target creature or spell.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            targets: &[TargetSpec { min: 0, max: 1, filter: other_creature_or_spell }],
-            effect: airbend_it,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "Waterbend {8}: Transform Aang. (While paying a waterbend cost, you can tap your artifacts and creatures to help. Each one pays for {1}.)",
-            cost: Cost { mana: mana(8, 0, 0, 0, 0, 0), ..Cost::NONE },
-            waterbend: true,
-            effect: cantrip_mechanics::effects::transform_self,
-            ..ActivatedDef::BLANK
-        }),
+        triggered(THIS_ENTERS, airbend_it, "When Aang enters, airbend up to one other target creature or spell.")
+            .targets(&[TargetSpec { min: 0, max: 1, filter: other_creature_or_spell }]),
+        ability(cost("{8}"), cantrip_mechanics::effects::transform_self, "Waterbend {8}: Transform Aang. (While paying a waterbend cost, you can tap your artifacts and creatures to help. Each one pays for {1}.)")
+            .waterbend(),
     ],
     back: Some(&BACK),
     ..oracle::AANG_SWIFT_SAVIOR

@@ -24,12 +24,7 @@ fn grind(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "{3}, {T}: Target player mills two cards. If two cards that share a color were milled this way, repeat this process.",
-        cost: Cost { mana: mana(3, 0, 0, 0, 0, 0), tap: true, ..Cost::NONE },
-        targets: &[targets::PLAYER],
-        effect: grind,
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[ability(cost("{3}, {T}"), grind, "{3}, {T}: Target player mills two cards. If two cards that share a color were milled this way, repeat this process.")
+        .targets(&[targets::PLAYER])],
     ..oracle::GRINDSTONE
 };

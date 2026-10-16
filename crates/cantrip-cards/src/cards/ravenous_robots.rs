@@ -36,19 +36,8 @@ fn tokens_gain_haste(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> 
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever you cast an artifact spell, create a 1/1 colorless Robot artifact creature token.",
-            listens: EventMask::SPELL_CAST,
-            matches: cantrip_mechanics::triggers::artifact_spell_you_cast,
-            effect: make_a_robot,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{R}, {T}: Creature tokens you control gain haste until end of turn.",
-            cost: Cost { mana: mana(0, 0, 0, 0, 1, 0), tap: true, ..Cost::NONE },
-            effect: tokens_gain_haste,
-            ..ActivatedDef::BLANK
-        }),
+        triggered(cantrip_mechanics::triggers::ARTIFACT_SPELL_YOU_CAST, make_a_robot, "Whenever you cast an artifact spell, create a 1/1 colorless Robot artifact creature token."),
+        ability(cost("{R}, {T}"), tokens_gain_haste, "{R}, {T}: Creature tokens you control gain haste until end of turn."),
     ],
     ..oracle::RAVENOUS_ROBOTS
 };

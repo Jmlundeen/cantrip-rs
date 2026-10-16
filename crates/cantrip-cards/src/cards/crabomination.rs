@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::{choose, targets};
-use cantrip_mechanics::triggers::this_enters;
+use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_mechanics::library::random_of;
 use cantrip_oracle as oracle;
 
@@ -46,13 +46,7 @@ pub static CARD: CardDef = CardDef {
         condition: None,
         instant_speed: false,
     }],
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When this creature enters, target opponent exiles the top card of their library, a card at random from their graveyard, and a card at random from their hand. You may cast a spell from among cards exiled this way without paying its mana cost.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: this_enters,
-        targets: &[targets::OPPONENT],
-        effect: plunder,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(THIS_ENTERS, plunder, "When this creature enters, target opponent exiles the top card of their library, a card at random from their graveyard, and a card at random from their hand. You may cast a spell from among cards exiled this way without paying its mana cost.")
+        .targets(&[targets::OPPONENT])],
     ..oracle::CRABOMINATION
 };

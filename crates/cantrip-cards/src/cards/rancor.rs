@@ -34,14 +34,8 @@ fn trample(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
 
 pub static CARD: CardDef = CardDef {
     enchant: Some(targets::CREATURE),
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When Rancor is put into a graveyard from the battlefield, return it to its owner's hand.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: put_into_graveyard,
-        effect: return_to_hand,
-        look_back: true,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(when(EventMask::ZONE_CHANGE, put_into_graveyard), return_to_hand, "When Rancor is put into a graveyard from the battlefield, return it to its owner's hand.")
+        .look_back()],
     statics: &[
         StaticDef {
             text: "Enchanted creature gets +2/+0.",

@@ -27,15 +27,9 @@ fn add_mana(g: &mut dyn Game, asker: &Asker, color: Option<Color>) -> Result<(),
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "{T}: Add {C}. If Gemstone Caverns has a luck counter on it, instead add one mana of any color.",
-        cost: Cost { tap: true, ..Cost::NONE },
-        mana: Some(add_mana),
-        any_color: true,
-        colors_from: Some(lucky_colors),
-        // What it adds depends on the counter, so no yield is stated: anything may be payable.
-        ..ActivatedDef::BLANK
-    })],
+    // What it adds depends on the counter, so no yield is stated: anything may be payable.
+    abilities: &[mana_ability(TAP, add_by(add_mana).choose_color(), "{T}: Add {C}. If Gemstone Caverns has a luck counter on it, instead add one mana of any color.")
+        .colors_from(lucky_colors)],
     opening_hand: Some(OpeningHandAction {
         condition: not_the_starting_player,
         counter: Some((CounterKind::Luck, 1)),

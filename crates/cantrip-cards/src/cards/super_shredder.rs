@@ -18,13 +18,7 @@ fn grow(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever another permanent leaves the battlefield, put a +1/+1 counter on Super Shredder.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: another_permanent_leaves,
-        look_back: true,
-        effect: grow,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(when(EventMask::ZONE_CHANGE, another_permanent_leaves), grow, "Whenever another permanent leaves the battlefield, put a +1/+1 counter on Super Shredder.")
+        .look_back()],
     ..oracle::SUPER_SHREDDER
 };

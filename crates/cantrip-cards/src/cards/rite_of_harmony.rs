@@ -28,12 +28,6 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     spell: Some(SpellDef { targets: &[], effect }),
     ways: &[flashback::way(mana(2, 1, 0, 0, 0, 1), "Flashback {2}{G}{W}")],
-    delayed: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever a creature or enchantment you control enters this turn, draw a card.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: creature_or_enchantment_you_control_enters,
-        effect: effects::draw::<1>,
-        ..TriggeredDef::BLANK
-    })],
+    delayed: &[triggered(when(EventMask::ZONE_CHANGE, creature_or_enchantment_you_control_enters), effects::draw::<1>, "Whenever a creature or enchantment you control enters this turn, draw a card.")],
     ..oracle::RITE_OF_HARMONY
 };

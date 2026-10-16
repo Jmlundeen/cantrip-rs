@@ -1,7 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::lands::{enters_tapped_unless_you_control_either, sub};
 use cantrip_mechanics::library::exile_top_may_play;
-use cantrip_mechanics::mana;
 use cantrip_oracle as oracle;
 
 /// "{3}{R}, {T}: Exile the top card of your library. Until the end of your next turn, you may play that card." The
@@ -16,13 +15,8 @@ fn exile_top(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     enters: Some(enters_tapped_unless_you_control_either::<{ sub(Subtype::Plains) }, { sub(Subtype::Island) }>),
     abilities: &[
-        mana::tap_for(mana::add_r, Mana::R, "{T}: Add {R}."),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{3}{R}, {T}: Exile the top card of your library. Until the end of your next turn, you may play that card.",
-            cost: Cost { mana: mana(3, 0, 0, 0, 1, 0), tap: true, ..Cost::NONE },
-            effect: exile_top,
-            ..ActivatedDef::BLANK
-        }),
+        mana_ability(TAP, add(Mana::R), "{T}: Add {R}."),
+        ability(cost("{3}{R}, {T}"), exile_top, "{3}{R}, {T}: Exile the top card of your library. Until the end of your next turn, you may play that card."),
     ],
     ..oracle::CORI_MOUNTAIN_MONASTERY
 };

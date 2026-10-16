@@ -28,14 +28,8 @@ fn indestructible(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever Hammer of Nazahn or another Equipment you control enters, you may attach that Equipment to target creature you control.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: equipment_enters,
-            targets: &[targets::CREATURE_YOU_CONTROL],
-            effect: may_attach_that_equipment,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(when(EventMask::ZONE_CHANGE, equipment_enters), may_attach_that_equipment, "Whenever Hammer of Nazahn or another Equipment you control enters, you may attach that Equipment to target creature you control.")
+            .targets(&[targets::CREATURE_YOU_CONTROL]),
         equip(mana(4, 0, 0, 0, 0, 0), "Equip {4}"),
     ],
     statics: &[

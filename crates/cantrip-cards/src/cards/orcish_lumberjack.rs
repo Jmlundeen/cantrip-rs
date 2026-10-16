@@ -17,12 +17,6 @@ fn add_three(g: &mut dyn Game, asker: &Asker, _: Option<Color>) -> Result<(), Su
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "{T}, Sacrifice a Forest: Add three mana in any combination of {R} and/or {G}.",
-        cost: Cost { tap: true, permanents: Some(PermanentCost { count: 1, filter: forest_you_control, to_hand: false }), ..Cost::NONE },
-        mana: Some(add_three),
-        adds_any: 3,
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[mana_ability(TAP.and(Cost::sacrifice(1, forest_you_control)), add_by(add_three).yields_any(3), "{T}, Sacrifice a Forest: Add three mana in any combination of {R} and/or {G}.")],
     ..oracle::ORCISH_LUMBERJACK
 };

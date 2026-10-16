@@ -1,7 +1,7 @@
 //! Eternalize [cost] (CR 702.129a): "[Cost], Exile this card from your graveyard: Create a token that's a copy of it,
 //! except it's a 4/4 black Zombie with no mana cost. Activate only as a sorcery." Fanatic of Rhonas prints it.
 //!
-//! A card with eternalize lists `ability(cost, text)` among its `abilities`.
+//! A card with eternalize lists `cantrip_api::ability(cost, text)` among its `abilities`.
 
 use cantrip_api::*;
 
@@ -20,12 +20,7 @@ fn make_token(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub const fn ability(cost: ManaCost, text: &'static str) -> AbilityDef {
-    AbilityDef::Activated(ActivatedDef {
-        text,
-        cost: Cost { mana: cost, exile_self: true, ..Cost::NONE },
-        timing: Timing::Sorcery,
-        effect: make_token,
-        from: ZoneKind::Graveyard,
-        ..ActivatedDef::BLANK
-    })
+    cantrip_api::ability(Cost::mana(cost).and(EXILE_THIS), make_token, text)
+        .sorcery_speed()
+        .from(ZoneKind::Graveyard)
 }

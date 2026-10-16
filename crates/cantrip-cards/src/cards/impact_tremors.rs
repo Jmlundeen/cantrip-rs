@@ -23,12 +23,6 @@ fn tremor(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever a creature you control enters, this enchantment deals 1 damage to each opponent.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: your_creature_enters,
-        effect: tremor,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(when(EventMask::ZONE_CHANGE, your_creature_enters), tremor, "Whenever a creature you control enters, this enchantment deals 1 damage to each opponent.")],
     ..oracle::IMPACT_TREMORS
 };

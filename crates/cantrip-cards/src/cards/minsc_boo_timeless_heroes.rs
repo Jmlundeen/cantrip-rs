@@ -86,42 +86,14 @@ fn damage_and_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When Minsc & Boo enters and at the beginning of your upkeep, you may create Boo, a legendary 1/1 red Hamster creature token with trample and haste.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: triggers::this_enters,
-            effect: create_boo,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When Minsc & Boo enters and at the beginning of your upkeep, you may create Boo, a legendary 1/1 red Hamster creature token with trample and haste.",
-            listens: EventMask::STEP_BEGAN,
-            matches: triggers::your_upkeep,
-            effect: create_boo,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "+1: Put three +1/+1 counters on up to one target creature with trample or haste.",
-            cost: Cost { loyalty: Some(1), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            targets: &[TargetSpec { min: 0, max: 1, filter: trampler_or_hasty }],
-            effect: plus_one,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "\u{2212}2: Sacrifice a creature. When you do, Minsc & Boo deals X damage to any target, where X is that creature's power. If the sacrificed creature was a Hamster, draw X cards.",
-            cost: Cost { loyalty: Some(-2), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            effect: minus_two,
-            ..ActivatedDef::BLANK
-        }),
+        triggered(triggers::THIS_ENTERS, create_boo, "When Minsc & Boo enters and at the beginning of your upkeep, you may create Boo, a legendary 1/1 red Hamster creature token with trample and haste."),
+        triggered(triggers::YOUR_UPKEEP, create_boo, "When Minsc & Boo enters and at the beginning of your upkeep, you may create Boo, a legendary 1/1 red Hamster creature token with trample and haste."),
+        ability(loyalty(1), plus_one, "+1: Put three +1/+1 counters on up to one target creature with trample or haste.")
+            .targets(&[TargetSpec { min: 0, max: 1, filter: trampler_or_hasty }]),
+        ability(loyalty(-2), minus_two, "\u{2212}2: Sacrifice a creature. When you do, Minsc & Boo deals X damage to any target, where X is that creature's power. If the sacrificed creature was a Hamster, draw X cards."),
     ],
-    delayed: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When you do, Minsc & Boo deals X damage to any target, where X is that creature's power. If the sacrificed creature was a Hamster, draw X cards.",
-        targets: &[targets::ANY],
-        effect: damage_and_draw,
-        ..TriggeredDef::BLANK
-    })],
+    delayed: &[delayed_trigger(damage_and_draw, "When you do, Minsc & Boo deals X damage to any target, where X is that creature's power. If the sacrificed creature was a Hamster, draw X cards.")
+        .targets(&[targets::ANY])],
     ..oracle::MINSC_BOO_TIMELESS_HEROES
 };
 

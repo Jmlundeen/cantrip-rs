@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{double, targets, triggers::this_enters};
+use cantrip_mechanics::{double, targets, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 /// Distribute two +1/+1 counters among up to two target creatures. Then if you're the monarch, double the number of
@@ -25,22 +25,10 @@ fn distribute_then_double(g: &mut dyn Game, item: &StackItem) -> Result<(), Susp
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When this enchantment enters, you become the monarch.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            effect: cantrip_mechanics::effects::become_monarch,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "At the beginning of your upkeep, distribute two +1/+1 counters among up to two target creatures. Then if you're the monarch, double the number of +1/+1 counters on each creature you control.",
-            listens: EventMask::STEP_BEGAN,
-            matches: cantrip_mechanics::triggers::your_upkeep,
-            targets: &[TargetSpec { min: 0, max: 2, filter: targets::CREATURE.filter }],
-            divide: Some(Divide { total: 2, of_x: None }),
-            effect: distribute_then_double,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(THIS_ENTERS, cantrip_mechanics::effects::become_monarch, "When this enchantment enters, you become the monarch."),
+        triggered(cantrip_mechanics::triggers::YOUR_UPKEEP, distribute_then_double, "At the beginning of your upkeep, distribute two +1/+1 counters among up to two target creatures. Then if you're the monarch, double the number of +1/+1 counters on each creature you control.")
+            .targets(&[TargetSpec { min: 0, max: 2, filter: targets::CREATURE.filter }])
+            .divide(Divide { total: 2, of_x: None }),
     ],
     ..oracle::COURT_OF_GARENBRIG
 };

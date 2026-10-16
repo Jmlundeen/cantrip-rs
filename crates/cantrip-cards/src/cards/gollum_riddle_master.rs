@@ -68,12 +68,6 @@ static RIDDLE: ModalDef = ModalDef {
 pub static CARD: CardDef = CardDef {
     enters: Some(enters),
     labels: &["Odd", "Even"],
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever an opponent casts a spell with mana value of the chosen quality, choose one that hasn't been chosen \u{2014} put a +1/+1 counter on Gollum; or each opponent loses 2 life and you gain 2 life; or draw a card.",
-        listens: EventMask::SPELL_CAST,
-        matches: opponent_casts_a_matching_spell,
-        modal: Some(&RIDDLE),
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[modal_triggered(when(EventMask::SPELL_CAST, opponent_casts_a_matching_spell), &RIDDLE, "Whenever an opponent casts a spell with mana value of the chosen quality, choose one that hasn't been chosen \u{2014} put a +1/+1 counter on Gollum; or each opponent loses 2 life and you gain 2 life; or draw a card.")],
     ..oracle::GOLLUM_RIDDLE_MASTER
 };

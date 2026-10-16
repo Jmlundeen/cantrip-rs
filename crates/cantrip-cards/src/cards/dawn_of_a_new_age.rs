@@ -33,12 +33,6 @@ fn hope(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     enters: Some(enters),
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "At the beginning of your end step, remove a hope counter from this enchantment. If you do, draw a card. Then if this enchantment has no hope counters on it, sacrifice it and you gain 4 life.",
-        listens: EventMask::STEP_BEGAN,
-        matches: cantrip_mechanics::triggers::your_end_step,
-        effect: hope,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(cantrip_mechanics::triggers::YOUR_END_STEP, hope, "At the beginning of your end step, remove a hope counter from this enchantment. If you do, draw a card. Then if this enchantment has no hope counters on it, sacrifice it and you gain 4 life.")],
     ..oracle::DAWN_OF_A_NEW_AGE
 };

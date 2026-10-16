@@ -50,29 +50,11 @@ fn minus_six(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "+1: Each player discards a card.",
-            cost: Cost { loyalty: Some(1), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            effect: plus_one,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "\u{2212}2: Target player sacrifices a creature.",
-            cost: Cost { loyalty: Some(-2), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            targets: &[targets::PLAYER],
-            effect: minus_two,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "\u{2212}6: Separate all permanents target player controls into two piles. That player sacrifices all permanents in the pile of their choice.",
-            cost: Cost { loyalty: Some(-6), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            targets: &[targets::PLAYER],
-            effect: minus_six,
-            ..ActivatedDef::BLANK
-        }),
+        ability(loyalty(1), plus_one, "+1: Each player discards a card."),
+        ability(loyalty(-2), minus_two, "\u{2212}2: Target player sacrifices a creature.")
+            .targets(&[targets::PLAYER]),
+        ability(loyalty(-6), minus_six, "\u{2212}6: Separate all permanents target player controls into two piles. That player sacrifices all permanents in the pile of their choice.")
+            .targets(&[targets::PLAYER]),
     ],
     ..oracle::LILIANA_OF_THE_VEIL
 };

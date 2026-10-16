@@ -8,12 +8,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "Sacrifice this artifact: Regenerate target artifact.",
-        cost: Cost { sacrifice_self: true, ..Cost::NONE },
-        targets: &[targets::ARTIFACT],
-        effect,
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[ability(SACRIFICE_THIS, effect, "Sacrifice this artifact: Regenerate target artifact.")
+        .targets(&[targets::ARTIFACT])],
     ..oracle::WELDING_JAR
 };

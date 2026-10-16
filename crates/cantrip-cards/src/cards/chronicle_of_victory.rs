@@ -13,13 +13,7 @@ fn first_strike_and_trample(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) 
 
 pub static CARD: CardDef = CardDef {
     enters: Some(cantrip_mechanics::chosen_type::enters_choosing_a_creature_type),
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever you cast a spell of the chosen type, draw a card.",
-        listens: EventMask::SPELL_CAST,
-        matches: cantrip_mechanics::chosen_type::you_cast_chosen_type,
-        effect: effects::draw::<1>,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(when(EventMask::SPELL_CAST, cantrip_mechanics::chosen_type::you_cast_chosen_type), effects::draw::<1>, "Whenever you cast a spell of the chosen type, draw a card.")],
     statics: &[
         StaticDef {
             text: "Creatures you control of the chosen type get +2/+2.",

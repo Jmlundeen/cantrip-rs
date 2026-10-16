@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{targets, triggers::this_enters};
+use cantrip_mechanics::{targets, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 /// "Up to one other target creature."
@@ -29,14 +29,8 @@ fn heal_the_rest(_: &dyn Query, _: &Asker, p: &mut Proposal) {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When Wolverine enters, he fights up to one other target creature.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: this_enters,
-        targets: &[TargetSpec { min: 0, max: 1, filter: other_creature }],
-        effect: fight,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(THIS_ENTERS, fight, "When Wolverine enters, he fights up to one other target creature.")
+        .targets(&[TargetSpec { min: 0, max: 1, filter: other_creature }])],
     replacements: &[ReplacementDef {
         hint: "heal damage already dealt to Wolverine",
         kind: ReplacementKind::Damage,

@@ -31,25 +31,14 @@ fn reveal(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static BACK: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When this creature transforms into Revealing Eye, target opponent reveals their hand. You may choose a nonland card from it. If you do, that player discards that card, then draws a card.",
-        listens: EventMask::TRANSFORMED,
-        matches: this_transforms,
-        targets: &[targets::OPPONENT],
-        effect: reveal,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(when(EventMask::TRANSFORMED, this_transforms), reveal, "When this creature transforms into Revealing Eye, target opponent reveals their hand. You may choose a nonland card from it. If you do, that player discards that card, then draws a card.")
+        .targets(&[targets::OPPONENT])],
     ..oracle::REVEALING_EYE
 };
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "{2}{B}: Transform Concealing Curtains. Activate only as a sorcery.",
-        cost: Cost { mana: mana(2, 0, 0, 1, 0, 0), ..Cost::NONE },
-        timing: Timing::Sorcery,
-        effect: cantrip_mechanics::effects::transform_self,
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[ability(cost("{2}{B}"), cantrip_mechanics::effects::transform_self, "{2}{B}: Transform Concealing Curtains. Activate only as a sorcery.")
+        .sorcery_speed()],
     back: Some(&BACK),
     ..oracle::CONCEALING_CURTAINS
 };

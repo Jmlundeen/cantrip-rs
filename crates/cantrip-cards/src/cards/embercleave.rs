@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{attach::{attach_to_target, attached_object, equip}, targets, triggers::this_enters};
+use cantrip_mechanics::{attach::{attach_to_target, attached_object, equip}, targets, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 /// This spell costs {1} less to cast for each attacking creature you control (CR 601.2f, 506.4): generic mana only,
@@ -29,14 +29,8 @@ fn double_strike_and_trample(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars)
 pub static CARD: CardDef = CardDef {
     own_cost_changes: &[cheaper_per_attacker],
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When Embercleave enters, attach it to target creature you control.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            targets: &[targets::CREATURE_YOU_CONTROL],
-            effect: attach_to_target,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(THIS_ENTERS, attach_to_target, "When Embercleave enters, attach it to target creature you control.")
+            .targets(&[targets::CREATURE_YOU_CONTROL]),
         equip(mana(3, 0, 0, 0, 0, 0), "Equip {3}"),
     ],
     statics: &[

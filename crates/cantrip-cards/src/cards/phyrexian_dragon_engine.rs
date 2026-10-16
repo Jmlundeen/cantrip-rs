@@ -29,13 +29,7 @@ fn rummage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         unearth::ability(mana(3, 0, 0, 0, 2, 0), "Unearth {3}{R}{R}"),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When this creature enters from your graveyard, you may discard your hand. If you do, draw three cards.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: enters_from_your_graveyard,
-            effect: rummage,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(when(EventMask::ZONE_CHANGE, enters_from_your_graveyard), rummage, "When this creature enters from your graveyard, you may discard your hand. If you do, draw three cards."),
     ],
     delayed: &[unearth::EXILE],
     ..oracle::PHYREXIAN_DRAGON_ENGINE

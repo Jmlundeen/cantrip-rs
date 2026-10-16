@@ -1,5 +1,4 @@
 use cantrip_api::*;
-use cantrip_mechanics::mana;
 use cantrip_mechanics::library::{search_to_hand, Find};
 use cantrip_oracle as oracle;
 
@@ -17,22 +16,11 @@ fn tutor(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        mana::tap_for(mana::add_c, Mana::C, "{T}: Add {C}."),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{4}, {T}, Sacrifice Inventors' Fair: Search your library for an artifact card, reveal it, put it into your hand, then shuffle. Activate only if you control three or more artifacts.",
-            cost: Cost { mana: mana(4, 0, 0, 0, 0, 0), tap: true, sacrifice_self: true, ..Cost::NONE },
-            effect: tutor,
-            condition: Some(three_artifacts),
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "At the beginning of your upkeep, if you control three or more artifacts, you gain 1 life.",
-            listens: EventMask::STEP_BEGAN,
-            matches: cantrip_mechanics::triggers::your_upkeep,
-            effect: cantrip_mechanics::effects::gain_life::<1>,
-            condition: Some(three_artifacts),
-            ..TriggeredDef::BLANK
-        }),
+        mana_ability(TAP, add(Mana::C), "{T}: Add {C}."),
+        ability(cost("{4}, {T}").and(SACRIFICE_THIS), tutor, "{4}, {T}, Sacrifice Inventors' Fair: Search your library for an artifact card, reveal it, put it into your hand, then shuffle. Activate only if you control three or more artifacts.")
+            .condition(three_artifacts),
+        triggered(cantrip_mechanics::triggers::YOUR_UPKEEP, cantrip_mechanics::effects::gain_life::<1>, "At the beginning of your upkeep, if you control three or more artifacts, you gain 1 life.")
+            .condition(three_artifacts),
     ],
     ..oracle::INVENTORS_FAIR
 };

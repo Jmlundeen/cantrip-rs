@@ -48,13 +48,7 @@ fn create_warriors<const N: u8>(g: &mut dyn Game, item: &StackItem) -> Result<()
 
 /// Mobilize N itself; `text` is the card's own reminder text.
 pub const fn trigger<const N: u8>(text: &'static str) -> AbilityDef {
-    AbilityDef::Triggered(TriggeredDef {
-        text,
-        listens: EventMask::ATTACKS,
-        matches: attacks,
-        effect: create_warriors::<N>,
-        ..TriggeredDef::BLANK
-    })
+    triggered(when(EventMask::ATTACKS, attacks), create_warriors::<N>, text)
 }
 
 /// Sacrifices the surviving tokens in one action; a token another player controls now cannot be sacrificed by this
@@ -70,8 +64,4 @@ fn sacrifice_warriors(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
     Ok(())
 }
 
-pub const SACRIFICE: AbilityDef = AbilityDef::Triggered(TriggeredDef {
-    text: "Sacrifice the tokens created by mobilize.",
-    effect: sacrifice_warriors,
-    ..TriggeredDef::BLANK
-});
+pub const SACRIFICE: AbilityDef = delayed_trigger(sacrifice_warriors, "Sacrifice the tokens created by mobilize.");

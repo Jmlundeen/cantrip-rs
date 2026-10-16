@@ -39,7 +39,7 @@ fn mana_ability(game: &Game, option: &ActionOption) -> Option<&'static Activated
     let source = option.source?;
     let ability = game.chars(source).abilities().nth(option.index as usize)?;
     match game.cards.ability(ability) {
-        AbilityDef::Activated(a) if a.mana.is_some() => Some(a),
+        AbilityDef::Activated(a) if a.is_mana_ability() => Some(a),
         _ => None,
     }
 }

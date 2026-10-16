@@ -19,11 +19,6 @@ fn destroy_matching(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     enters: Some(mana::sunburst),
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "{2}, Sacrifice Engineered Explosives: Destroy each nonland permanent with mana value equal to the number of charge counters on Engineered Explosives.",
-        cost: Cost { mana: mana(2, 0, 0, 0, 0, 0), sacrifice_self: true, ..Cost::NONE },
-        effect: destroy_matching,
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[ability(cost("{2}").and(SACRIFICE_THIS), destroy_matching, "{2}, Sacrifice Engineered Explosives: Destroy each nonland permanent with mana value equal to the number of charge counters on Engineered Explosives.")],
     ..oracle::ENGINEERED_EXPLOSIVES
 };

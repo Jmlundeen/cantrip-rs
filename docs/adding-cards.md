@@ -55,6 +55,29 @@ pub static CARD: CardDef = CardDef {
 };
 ```
 
+Abilities are written cost first, then what the ability does, then the printed text (`crates/cantrip-api/src/ability.rs`):
+
+```rust
+abilities: &[
+    mana_ability(TAP, add(Mana::G), "{T}: Add {G}."),
+    ability(cost("{2}{G}"), pump_team, "{2}{G}: Creatures you control get +0/+1 until end of turn."),
+    ability(loyalty(1), plus_one, "+1: Target player draws two cards, then discards two cards.").targets(&[targets::PLAYER]),
+    triggered(THIS_ENTERS, draw_a_card, "When this creature enters, draw a card."),
+],
+```
+
+- **Costs**: `TAP`, `SACRIFICE_THIS`, `cost("{1}{U}")` (mana symbols as printed, read at compile time; `cost("{1}, {T}")`
+  includes the tap), `loyalty(n)`, `life(n)`, joined with `.and(..)`; anything rarer is a `Cost { .., ..Cost::NONE }`.
+- **Mana**: `add(Mana::G)`, `add_n(Mana::C, 2)`, `add_each(&[Mana::W, Mana::U])`, `add_any_color(1)`,
+  `add_one_of(&[Color::Red, Color::Green])`, `.only_for(restriction)`. What these list is what is added; a card whose
+  mana ability does more writes the effect itself with `.by(f)` (the listing then only says what it can add) or
+  `add_by(f)` when nothing can be listed (Gaea's Cradle).
+- **Triggers**: `cantrip_mechanics::triggers` names the common ones (`THIS_ENTERS`, `THIS_DIES`, `YOUR_UPKEEP`, ...); a
+  card's own is `when(EventMask::DAMAGE, my_match_fn)`. A Saga's chapter is `chapter(n, effect, text)`.
+- **The rest** is a method after the call: `.targets(..)`, `.sorcery_speed()`, `.once_each_turn()`, `.condition(..)`
+  (an activation restriction, or a trigger's intervening "if"), `.modal(..)`, `.look_back()`, `.anywhere()`, and the
+  others in `ability.rs`. A loyalty ability is already sorcery speed (CR 606.3).
+
 Definitions a card brings with it (a token, a copy's exception) go in `pub static EXTRA: &[&CardDef]` in the same
 file. The generator's constant name is the card name upper-cased with every run of non-alphanumerics as `_`.
 
@@ -63,7 +86,7 @@ What a `CardDef` can carry (see `crates/cantrip-api/src/card.rs`):
 | Field | For |
 | --- | --- |
 | `spell: Some(SpellDef { targets, effect })` | an instant's or sorcery's effect, and its target slots |
-| `abilities: &[AbilityDef]` | activated abilities (`ActivatedDef`: cost, timing, targets, effect, or `mana` for a mana ability) and triggered ones (`TriggeredDef`: what it listens for, a match function, targets, effect, `look_back` for leaves-the-battlefield, `anywhere` for graveyard/hand triggers, `condition` for an intervening if). **Mana abilities first**: the C# engine numbers them first. |
+| `abilities: &[AbilityDef]` | its activated, mana and triggered abilities, written as above. **Mana abilities first**: the C# engine numbers them first. |
 | `ways: &[WayDef]` | alternative costs (flashback from the graveyard, Fireblast's sacrifice, Gush's return), way 1 onward; `instant_speed` offers one whenever an instant could be cast, whatever the card's type (sneak) |
 | `enters: Some(fn)` | "as this enters" and "enters with": edits the `Entering` record (tapped, counters, a copy) before it is on the battlefield |
 | `delayed: &[AbilityDef]` | abilities its effects set up to trigger later (`Game::delayed_trigger` with `AbilityRef::delayed(card, n)`) |
@@ -205,12 +228,12 @@ shapes have an example:
   ("You may cast Aura and Equipment spells as though they had flash", Sigarda's Aid); a static lifting a loyalty ability's timing is `CardDef.instant_activation`
   (The Wandering Emperor). The board is searched for these only when something is cast or activated.
 - **Mana**: `PlayGrant.any_type` / `CastTerms.any_type` (mana of any type pays, CR 609.4b); mana that can't be spent on
-  nonartifact spells is `g.add_restricted_mana(..)` from an `ActivatedDef { restricted: Some(..) }` ability (CR 106.6).
+  nonartifact spells is `g.add_restricted_mana(..)` from a mana ability with `.only_for(..)` (CR 106.6).
 - **Gift** (CR 702.174) is `CardDef.gift`; the promise is asked with the spell, and the spell's effect reads
   `item.gift.is_some()`. **Player hexproof** is `EffectKind::PlayerHexproof`.
 - **Names and players**: `RequestKind::ChooseName` (a card name, answered `Answer::Name`) and `ChoosePlayer`; a name chosen as
   a permanent enters is `Entering.chosen_card`, kept in `Obj.marks.chosen_card`.
-- **Modal triggered abilities** are `TriggeredDef.modal`; **playing from the top of a library for life** is
+- **Modal abilities** are `.modal(..)`; **playing from the top of a library for life** is
   `PlayRule::LibraryTop` (Bolas's Citadel).
 
 ## Rules bricks added with the second wave of cards

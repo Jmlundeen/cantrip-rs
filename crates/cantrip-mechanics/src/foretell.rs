@@ -18,12 +18,7 @@ fn foretell(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-pub static ABILITY: AbilityDef = AbilityDef::Activated(ActivatedDef {
-    text: "Foretell {2} (During your turn, you may pay {2} and exile this card from your hand face down. Cast it on a later turn for its foretell cost.)",
-    cost: Cost { mana: mana(2, 0, 0, 0, 0, 0), ..Cost::NONE },
-    timing: Timing::OwnTurn,
-    from: ZoneKind::Hand,
-    effect: foretell,
-    special_action: true,
-    ..ActivatedDef::BLANK
-});
+pub static ABILITY: AbilityDef = ability(cost("{2}"), foretell, "Foretell {2} (During your turn, you may pay {2} and exile this card from your hand face down. Cast it on a later turn for its foretell cost.)")
+    .timing(Timing::OwnTurn)
+    .from(ZoneKind::Hand)
+    .special_action();

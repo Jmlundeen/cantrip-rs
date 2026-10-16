@@ -9,11 +9,6 @@ fn search(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "{2}, {T}, Sacrifice Expedition Map: Search your library for a land card, reveal it, put it into your hand, then shuffle.",
-        cost: Cost { mana: mana(2, 0, 0, 0, 0, 0), tap: true, sacrifice_self: true, ..Cost::NONE },
-        effect: search,
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[ability(cost("{2}, {T}").and(SACRIFICE_THIS), search, "{2}, {T}, Sacrifice Expedition Map: Search your library for a land card, reveal it, put it into your hand, then shuffle.")],
     ..oracle::EXPEDITION_MAP
 };

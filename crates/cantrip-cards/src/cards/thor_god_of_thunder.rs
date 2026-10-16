@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{damage_target, targets, triggers::this_enters};
+use cantrip_mechanics::{damage_target, targets, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 /// "Target Equipment, instant, or sorcery card from your graveyard."
@@ -52,22 +52,10 @@ fn spell_damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When Thor enters, exile target Equipment, instant, or sorcery card from your graveyard. Until the end of your next turn, you may play that card.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            targets: &[TargetSpec { min: 1, max: 1, filter: equipment_instant_or_sorcery_in_your_graveyard }],
-            effect: exile_and_play,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever you cast a noncreature spell, Thor deals damage equal to that spell's mana value to any target.",
-            listens: EventMask::SPELL_CAST,
-            matches: you_cast_a_noncreature_spell,
-            targets: &[targets::ANY],
-            effect: spell_damage,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(THIS_ENTERS, exile_and_play, "When Thor enters, exile target Equipment, instant, or sorcery card from your graveyard. Until the end of your next turn, you may play that card.")
+            .targets(&[TargetSpec { min: 1, max: 1, filter: equipment_instant_or_sorcery_in_your_graveyard }]),
+        triggered(when(EventMask::SPELL_CAST, you_cast_a_noncreature_spell), spell_damage, "Whenever you cast a noncreature spell, Thor deals damage equal to that spell's mana value to any target.")
+            .targets(&[targets::ANY]),
     ],
     ..oracle::THOR_GOD_OF_THUNDER
 };

@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::tokens;
-use cantrip_mechanics::triggers::this_dies;
+use cantrip_mechanics::triggers::THIS_DIES;
 use cantrip_oracle as oracle;
 
 /// The 5/5 green Wurm creature token with trample it makes.
@@ -44,22 +44,10 @@ fn shuffle_it_in(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When this creature dies, create three 5/5 green Wurm creature tokens with trample.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_dies,
-            look_back: true,
-            effect: three_wurms,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When Worldspine Wurm is put into a graveyard from anywhere, shuffle it into its owner's library.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: put_into_a_graveyard,
-            effect: shuffle_it_in,
-            anywhere: true,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(THIS_DIES, three_wurms, "When this creature dies, create three 5/5 green Wurm creature tokens with trample.")
+            .look_back(),
+        triggered(when(EventMask::ZONE_CHANGE, put_into_a_graveyard), shuffle_it_in, "When Worldspine Wurm is put into a graveyard from anywhere, shuffle it into its owner's library.")
+            .anywhere(),
     ],
     ..oracle::WORLDSPINE_WURM
 };

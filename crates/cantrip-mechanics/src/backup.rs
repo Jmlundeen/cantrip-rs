@@ -7,19 +7,13 @@
 //! creature's own ability as a delayed ability, that one.
 
 use crate::targets;
-use crate::triggers::this_enters;
+use crate::triggers::THIS_ENTERS;
 use cantrip_api::*;
 
 /// The backup trigger: it enters, targeting a creature; `effect` resolves it with `resolve`.
 pub const fn trigger(text: &'static str, effect: fn(&mut dyn Game, &StackItem) -> Result<(), Suspend>) -> AbilityDef {
-    AbilityDef::Triggered(TriggeredDef {
-        text,
-        listens: EventMask::ZONE_CHANGE,
-        matches: this_enters,
-        targets: &[targets::CREATURE],
-        effect,
-        ..TriggeredDef::BLANK
-    })
+    triggered(THIS_ENTERS, effect, text)
+        .targets(&[targets::CREATURE])
 }
 
 /// Put `n` +1/+1 counters on the target creature; if that is another creature, it gains `keywords` and, if given, the

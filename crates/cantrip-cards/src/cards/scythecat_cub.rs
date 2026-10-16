@@ -17,13 +17,7 @@ fn landfall(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Landfall \u{2014} Whenever a land you control enters, put a +1/+1 counter on target creature you control. If this is the second time this ability has resolved this turn, double the number of +1/+1 counters on that creature instead.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: triggers::landfall,
-        targets: &[targets::CREATURE_YOU_CONTROL],
-        effect: landfall,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(when(EventMask::ZONE_CHANGE, triggers::landfall), landfall, "Landfall \u{2014} Whenever a land you control enters, put a +1/+1 counter on target creature you control. If this is the second time this ability has resolved this turn, double the number of +1/+1 counters on that creature instead.")
+        .targets(&[targets::CREATURE_YOU_CONTROL])],
     ..oracle::SCYTHECAT_CUB
 };

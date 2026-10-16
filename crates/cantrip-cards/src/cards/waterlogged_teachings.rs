@@ -15,7 +15,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static BACK: CardDef = CardDef {
-    abilities: &[mana::tap_for_either(Color::Blue, Color::Black, "{T}: Add {U} or {B}.")],
+    abilities: &[mana_ability(TAP, add_one_of(&[Color::Blue, Color::Black]), "{T}: Add {U} or {B}.")],
     enters: Some(mana::enters_tapped),
     ..oracle::INUNDATED_ARCHIVE
 };

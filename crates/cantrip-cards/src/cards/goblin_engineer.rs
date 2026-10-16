@@ -2,7 +2,7 @@ use cantrip_api::*;
 use cantrip_mechanics::targets;
 use cantrip_mechanics::library::{search_to_graveyard, Find};
 use cantrip_mechanics::targets::card_in_graveyard;
-use cantrip_mechanics::triggers::this_enters;
+use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
 /// When Goblin Engineer enters, you may search your library for an artifact card, put it into your graveyard, then
@@ -32,25 +32,9 @@ fn reanimate_artifact(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When this creature enters, you may search your library for an artifact card, put it into your graveyard, then shuffle.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            effect: search_artifact,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{R}, {T}, Sacrifice an artifact: Return target artifact card with mana value 3 or less from your graveyard to the battlefield.",
-            cost: Cost {
-                mana: mana(0, 0, 0, 0, 1, 0),
-                tap: true,
-                permanents: Some(PermanentCost { count: 1, filter: targets::filters::artifact, to_hand: false }),
-                ..Cost::NONE
-            },
-            targets: &[TargetSpec { min: 1, max: 1, filter: cheap_artifact_in_your_graveyard }],
-            effect: reanimate_artifact,
-            ..ActivatedDef::BLANK
-        }),
+        triggered(THIS_ENTERS, search_artifact, "When this creature enters, you may search your library for an artifact card, put it into your graveyard, then shuffle."),
+        ability(cost("{R}, {T}").and(sacrifice(1, targets::filters::artifact)), reanimate_artifact, "{R}, {T}, Sacrifice an artifact: Return target artifact card with mana value 3 or less from your graveyard to the battlefield.")
+            .targets(&[TargetSpec { min: 1, max: 1, filter: cheap_artifact_in_your_graveyard }]),
     ],
     ..oracle::GOBLIN_ENGINEER
 };

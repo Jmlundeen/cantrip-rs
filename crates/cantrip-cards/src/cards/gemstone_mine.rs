@@ -20,13 +20,6 @@ fn add_one_of_any_color(g: &mut dyn Game, asker: &Asker, color: Option<Color>) -
 
 pub static CARD: CardDef = CardDef {
     enters: Some(enters_with_mining_counters),
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "{T}, Remove a mining counter from this land: Add one mana of any color. If there are no mining counters on this land, sacrifice it.",
-        cost: Cost { tap: true, remove_counters: Some((CounterKind::Mining, 1)), ..Cost::NONE },
-        mana: Some(add_one_of_any_color),
-        any_color: true,
-        adds_any: 1,
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[mana_ability(TAP.and(remove_counters(CounterKind::Mining, 1)), add_any_color(1).by(add_one_of_any_color), "{T}, Remove a mining counter from this land: Add one mana of any color. If there are no mining counters on this land, sacrifice it.")],
     ..oracle::GEMSTONE_MINE
 };

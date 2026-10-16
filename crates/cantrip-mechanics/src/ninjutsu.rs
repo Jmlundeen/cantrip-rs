@@ -23,15 +23,6 @@ fn put_onto_battlefield_attacking(g: &mut dyn Game, item: &StackItem) -> Result<
 /// onto the battlefield from your hand tapped and attacking." Kaito, Bane of Nightmares and Fallen Shinobi print it;
 /// `text` is the ability's full text, which a scenario's `Ability:` matches.
 pub const fn ninjutsu(cost: ManaCost, text: &'static str) -> AbilityDef {
-    AbilityDef::Activated(ActivatedDef {
-        text,
-        cost: Cost {
-            mana: cost,
-            permanents: Some(PermanentCost { count: 1, filter: unblocked_attacker_you_control, to_hand: true }),
-            ..Cost::NONE
-        },
-        from: ZoneKind::Hand,
-        effect: put_onto_battlefield_attacking,
-        ..ActivatedDef::BLANK
-    })
+    ability(Cost::mana(cost).and(return_to_hand(1, unblocked_attacker_you_control)), put_onto_battlefield_attacking, text)
+        .from(ZoneKind::Hand)
 }

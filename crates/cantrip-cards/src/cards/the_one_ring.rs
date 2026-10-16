@@ -29,26 +29,9 @@ fn add_burden_and_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When The One Ring enters, if you cast it, you gain protection from everything until your next turn.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: cantrip_mechanics::triggers::this_enters_if_cast,
-            effect: protect_you,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "At the beginning of your upkeep, you lose 1 life for each burden counter on The One Ring.",
-            listens: EventMask::STEP_BEGAN,
-            matches: cantrip_mechanics::triggers::your_upkeep,
-            effect: lose_life_for_burden,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{T}: Put a burden counter on The One Ring, then draw a card for each burden counter on The One Ring.",
-            cost: Cost { tap: true, ..Cost::NONE },
-            effect: add_burden_and_draw,
-            ..ActivatedDef::BLANK
-        }),
+        triggered(cantrip_mechanics::triggers::THIS_ENTERS_IF_CAST, protect_you, "When The One Ring enters, if you cast it, you gain protection from everything until your next turn."),
+        triggered(cantrip_mechanics::triggers::YOUR_UPKEEP, lose_life_for_burden, "At the beginning of your upkeep, you lose 1 life for each burden counter on The One Ring."),
+        ability(TAP, add_burden_and_draw, "{T}: Put a burden counter on The One Ring, then draw a card for each burden counter on The One Ring."),
     ],
     ..oracle::THE_ONE_RING
 };

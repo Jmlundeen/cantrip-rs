@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::targets::filters;
-use cantrip_mechanics::triggers::cast_this_spell;
+use cantrip_mechanics::triggers::CAST_THIS_SPELL;
 use cantrip_oracle as oracle;
 
 /// You draw a card and lose 1 life.
@@ -30,14 +30,8 @@ pub static CARD: CardDef = CardDef {
         cost: Cost { variable: Some(VariableCost::SacrificeOneOrMore(filters::creature)), ..Cost::NONE },
     }),
     labels: &["Cast without sacrificing", "Sacrifice one or more creatures"],
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When you do, copy this spell for each creature sacrificed this way.",
-        listens: EventMask::SPELL_CAST,
-        matches: cast_this_spell,
-        condition: Some(sacrificed_creatures),
-        effect: copy_for_each,
-        anywhere: true,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(CAST_THIS_SPELL, copy_for_each, "When you do, copy this spell for each creature sacrificed this way.")
+        .condition(sacrificed_creatures)
+        .anywhere()],
     ..oracle::PLUMB_THE_FORBIDDEN
 };

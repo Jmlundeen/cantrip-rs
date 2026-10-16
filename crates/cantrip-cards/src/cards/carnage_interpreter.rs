@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::tokens;
-use cantrip_mechanics::triggers::this_enters;
+use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
 /// Discard your hand (together, nothing chosen), then investigate four times.
@@ -28,13 +28,7 @@ fn menace(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When this creature enters, discard your hand, then investigate four times.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: this_enters,
-        effect: discard_and_investigate,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(THIS_ENTERS, discard_and_investigate, "When this creature enters, discard your hand, then investigate four times.")],
     statics: &[
         StaticDef {
             text: "As long as you have one or fewer cards in hand, this creature gets +2/+2.",

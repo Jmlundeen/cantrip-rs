@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{attach::attached_object, bestow, tokens, triggers::landfall};
+use cantrip_mechanics::{attach::attached_object, bestow, tokens, triggers::LANDFALL};
 use cantrip_oracle as oracle;
 
 /// The 1/1 green Insect creature token it makes.
@@ -49,13 +49,7 @@ fn landfall_effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-const ABILITIES: &[AbilityDef] = &[AbilityDef::Triggered(TriggeredDef {
-    text: "Landfall \u{2014} Whenever a land you control enters, you may pay {1}{G} if this permanent is attached to a creature you control. If you do, create a token that's a copy of that creature. If you didn't create a token this way, create a 1/1 green Insect creature token.",
-    listens: EventMask::ZONE_CHANGE,
-    matches: landfall,
-    effect: landfall_effect,
-    ..TriggeredDef::BLANK
-})];
+const ABILITIES: &[AbilityDef] = &[triggered(LANDFALL, landfall_effect, "Landfall \u{2014} Whenever a land you control enters, you may pay {1}{G} if this permanent is attached to a creature you control. If you do, create a token that's a copy of that creature. If you didn't create a token this way, create a 1/1 green Insect creature token.")];
 
 /// Bestow {1}{G} (CR 702.103): while it is bestowed it is an Aura enchantment with "enchant creature", not a creature,
 /// and has the same abilities.

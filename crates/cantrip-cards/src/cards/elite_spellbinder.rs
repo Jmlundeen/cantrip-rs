@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{choose, targets, triggers::this_enters};
+use cantrip_mechanics::{choose, targets, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 /// When this creature enters, look at target opponent's hand. You may exile a nonland card from it. For as long as that
@@ -19,13 +19,7 @@ fn look_and_exile(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When this creature enters, look at target opponent's hand. You may exile a nonland card from it. For as long as that card remains exiled, its owner may play it. A spell cast this way costs {2} more to cast.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: this_enters,
-        targets: &[targets::OPPONENT],
-        effect: look_and_exile,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(THIS_ENTERS, look_and_exile, "When this creature enters, look at target opponent's hand. You may exile a nonland card from it. For as long as that card remains exiled, its owner may play it. A spell cast this way costs {2} more to cast.")
+        .targets(&[targets::OPPONENT])],
     ..oracle::ELITE_SPELLBINDER
 };

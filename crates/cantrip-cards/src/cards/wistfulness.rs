@@ -60,23 +60,11 @@ pub static CARD: CardDef = CardDef {
         }), "Evoke {G/U}{G/U}")],
     abilities: &[
         evoke::sacrifice_trigger("When Wistfulness enters, if its evoke cost was paid, its controller sacrifices it."),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When this creature enters, if {G}{G} was spent to cast it, exile target artifact or enchantment an opponent controls.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: green_entered,
-            condition: Some(green_spent),
-            targets: &[TargetSpec { min: 1, max: 1, filter: artifact_or_enchantment_an_opponent_controls }],
-            effect: exile_it,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When this creature enters, if {U}{U} was spent to cast it, draw two cards, then discard a card.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: blue_entered,
-            condition: Some(blue_spent),
-            effect: draw_then_discard,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(when(EventMask::ZONE_CHANGE, green_entered), exile_it, "When this creature enters, if {G}{G} was spent to cast it, exile target artifact or enchantment an opponent controls.")
+            .targets(&[TargetSpec { min: 1, max: 1, filter: artifact_or_enchantment_an_opponent_controls }])
+            .condition(green_spent),
+        triggered(when(EventMask::ZONE_CHANGE, blue_entered), draw_then_discard, "When this creature enters, if {U}{U} was spent to cast it, draw two cards, then discard a card.")
+            .condition(blue_spent),
     ],
     ..oracle::WISTFULNESS
 };

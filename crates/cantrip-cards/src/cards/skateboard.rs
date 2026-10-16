@@ -2,7 +2,7 @@ use cantrip_api::*;
 use cantrip_mechanics::attach::{attached_object, equip};
 use cantrip_mechanics::statics::have_haste;
 use cantrip_mechanics::targets;
-use cantrip_mechanics::triggers::this_enters;
+use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
 /// "Tap target permanent" (CR 701.26a); a target that became illegal is no longer tapped (CR 608.2b).
@@ -19,14 +19,8 @@ fn plus_one_power(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When this Equipment enters, tap target permanent.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            targets: &[targets::PERMANENT],
-            effect: tap_target,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(THIS_ENTERS, tap_target, "When this Equipment enters, tap target permanent.")
+            .targets(&[targets::PERMANENT]),
         equip(mana(1, 0, 0, 0, 0, 0), "Equip {1}"),
     ],
     statics: &[

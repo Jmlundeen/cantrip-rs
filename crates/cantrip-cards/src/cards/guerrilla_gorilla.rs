@@ -8,13 +8,8 @@ fn destroy(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "Sacrifice Guerrilla Gorilla: Destroy target noncreature artifact or noncreature enchantment. Activate only as a sorcery.",
-        cost: Cost { sacrifice_self: true, ..Cost::NONE },
-        timing: Timing::Sorcery,
-        targets: &[targets::NONCREATURE_ARTIFACT_OR_ENCHANTMENT],
-        effect: destroy,
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[ability(SACRIFICE_THIS, destroy, "Sacrifice Guerrilla Gorilla: Destroy target noncreature artifact or noncreature enchantment. Activate only as a sorcery.")
+        .sorcery_speed()
+        .targets(&[targets::NONCREATURE_ARTIFACT_OR_ENCHANTMENT])],
     ..oracle::GUERRILLA_GORILLA
 };

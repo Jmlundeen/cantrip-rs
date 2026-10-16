@@ -38,12 +38,7 @@ pub static BACK: CardDef = CardDef {
 };
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "{5}{G}{G}: Transform this creature.",
-        cost: Cost { mana: mana(5, 0, 0, 0, 0, 2), ..Cost::NONE },
-        effect: effects::transform_self,
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[ability(cost("{5}{G}{G}"), effects::transform_self, "{5}{G}{G}: Transform this creature.")],
     back: Some(&BACK),
     ..oracle::ULVENWALD_ODDITY
 };

@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::attach::{attached_object, equip};
-use cantrip_mechanics::triggers::this_enters;
+use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_mechanics::{damage_target, targets};
 use cantrip_oracle as oracle;
 
@@ -41,22 +41,10 @@ fn plus_x_power(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When this Equipment enters, it deals 3 damage to up to one target creature.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            targets: &[TargetSpec { min: 0, max: 1, ..targets::CREATURE }],
-            effect: three_damage,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever one or more creatures die, put a rev counter on this Equipment.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: creature_dies,
-            effect: rev_counter,
-            once_per_batch: true,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(THIS_ENTERS, three_damage, "When this Equipment enters, it deals 3 damage to up to one target creature.")
+            .targets(&[TargetSpec { min: 0, max: 1, ..targets::CREATURE }]),
+        triggered(when(EventMask::ZONE_CHANGE, creature_dies), rev_counter, "Whenever one or more creatures die, put a rev counter on this Equipment.")
+            .once_per_batch(),
         equip(mana(3, 0, 0, 0, 0, 0), "Equip {3}"),
     ],
     statics: &[StaticDef {

@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{choose, triggers::this_enters};
+use cantrip_mechanics::{choose, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 /// "You may discard a card. If you do, draw two cards." Choosing no card declines; the draw follows a card that was
@@ -25,19 +25,8 @@ fn haste(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When Bitter Reunion enters, you may discard a card. If you do, draw two cards.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            effect: discard_to_draw,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{1}, Sacrifice Bitter Reunion: Creatures you control gain haste until end of turn.",
-            cost: Cost { mana: mana(1, 0, 0, 0, 0, 0), sacrifice_self: true, ..Cost::NONE },
-            effect: haste,
-            ..ActivatedDef::BLANK
-        }),
+        triggered(THIS_ENTERS, discard_to_draw, "When Bitter Reunion enters, you may discard a card. If you do, draw two cards."),
+        ability(cost("{1}").and(SACRIFICE_THIS), haste, "{1}, Sacrifice Bitter Reunion: Creatures you control gain haste until end of turn."),
     ],
     ..oracle::BITTER_REUNION
 };

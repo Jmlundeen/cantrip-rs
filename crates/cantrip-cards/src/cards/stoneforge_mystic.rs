@@ -1,7 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::choose;
 use cantrip_mechanics::library::{Find, search_to_hand};
-use cantrip_mechanics::triggers::this_enters;
+use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
 fn equipment(q: &dyn Query, id: ObjectId) -> bool {
@@ -29,19 +29,8 @@ fn put_equipment_in(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When Stoneforge Mystic enters, you may search your library for an Equipment card, reveal it, put it into your hand, then shuffle.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            effect: search,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{1}{W}, {T}: You may put an Equipment card from your hand onto the battlefield.",
-            cost: Cost { mana: mana(1, 1, 0, 0, 0, 0), tap: true, ..Cost::NONE },
-            effect: put_equipment_in,
-            ..ActivatedDef::BLANK
-        }),
+        triggered(THIS_ENTERS, search, "When Stoneforge Mystic enters, you may search your library for an Equipment card, reveal it, put it into your hand, then shuffle."),
+        ability(cost("{1}{W}, {T}"), put_equipment_in, "{1}{W}, {T}: You may put an Equipment card from your hand onto the battlefield."),
     ],
     ..oracle::STONEFORGE_MYSTIC
 };

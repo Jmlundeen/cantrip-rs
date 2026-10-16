@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{choose, top_of_library, triggers::this_enters};
+use cantrip_mechanics::{choose, top_of_library, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 /// "Reveal the top ten cards of your library. For each card type, you may put a card of that type from among the
@@ -29,12 +29,6 @@ fn unify(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When Atraxa enters, reveal the top ten cards of your library. For each card type, you may put a card of that type from among the revealed cards into your hand. Put the rest on the bottom of your library in a random order.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: this_enters,
-        effect: unify,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(THIS_ENTERS, unify, "When Atraxa enters, reveal the top ten cards of your library. For each card type, you may put a card of that type from among the revealed cards into your hand. Put the rest on the bottom of your library in a random order.")],
     ..oracle::ATRAXA_GRAND_UNIFIER
 };

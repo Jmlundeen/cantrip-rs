@@ -30,13 +30,8 @@ fn per_counter(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "{W}: Exile target card from a graveyard. If it was a permanent card, put a +1/+1 counter on this permanent.",
-            cost: Cost { mana: mana(0, 1, 0, 0, 0, 0), ..Cost::NONE },
-            targets: &[targets::CARD_IN_A_GRAVEYARD],
-            effect: exile_from_graveyard,
-            ..ActivatedDef::BLANK
-        }),
+        ability(cost("{W}"), exile_from_graveyard, "{W}: Exile target card from a graveyard. If it was a permanent card, put a +1/+1 counter on this permanent.")
+            .targets(&[targets::CARD_IN_A_GRAVEYARD]),
         reconfigure::attach(mana(2, 0, 0, 0, 0, 0), "Reconfigure {2} ({2}: Attach this permanent to another target creature you control. Reconfigure only as a sorcery.)"),
         reconfigure::unattach(mana(2, 0, 0, 0, 0, 0), "Reconfigure {2} ({2}: Unattach this permanent. Reconfigure only if it is attached to a creature and only as a sorcery.)"),
     ],

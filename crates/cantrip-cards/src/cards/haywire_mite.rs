@@ -9,21 +9,10 @@ fn exile(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When Haywire Mite dies, you gain 2 life.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: cantrip_mechanics::triggers::this_dies,
-            effect: cantrip_mechanics::effects::gain_life::<2>,
-            look_back: true,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{G}, Sacrifice Haywire Mite: Exile target noncreature artifact or noncreature enchantment.",
-            cost: Cost { mana: mana(0, 0, 0, 0, 0, 1), sacrifice_self: true, ..Cost::NONE },
-            targets: &[targets::NONCREATURE_ARTIFACT_OR_ENCHANTMENT],
-            effect: exile,
-            ..ActivatedDef::BLANK
-        }),
+        triggered(cantrip_mechanics::triggers::THIS_DIES, cantrip_mechanics::effects::gain_life::<2>, "When Haywire Mite dies, you gain 2 life.")
+            .look_back(),
+        ability(cost("{G}").and(SACRIFICE_THIS), exile, "{G}, Sacrifice Haywire Mite: Exile target noncreature artifact or noncreature enchantment.")
+            .targets(&[targets::NONCREATURE_ARTIFACT_OR_ENCHANTMENT]),
     ],
     ..oracle::HAYWIRE_MITE
 };

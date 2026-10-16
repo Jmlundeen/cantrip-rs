@@ -28,13 +28,7 @@ fn copy_this(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever equipped creature deals combat damage to a player, create a token that's a copy of this Equipment.",
-            listens: EventMask::DAMAGE,
-            matches: equipped_deals_combat_damage_to_a_player,
-            effect: copy_this,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(when(EventMask::DAMAGE, equipped_deals_combat_damage_to_a_player), copy_this, "Whenever equipped creature deals combat damage to a player, create a token that's a copy of this Equipment."),
         equip(mana(2, 0, 0, 0, 0, 0), "Equip {2}"),
     ],
     statics: &[StaticDef {

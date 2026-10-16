@@ -68,42 +68,18 @@ fn schedule_return(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static EMBLEM: CardDef = CardDef {
     name: "Daretti, Scrap Savant emblem",
     has_cost: false,
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever an artifact is put into your graveyard from the battlefield, return that card to the battlefield at the beginning of the next end step.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: artifact_to_your_graveyard,
-        effect: schedule_return,
-        ..TriggeredDef::BLANK
-    })],
-    delayed: &[AbilityDef::Triggered(TriggeredDef { text: "Return that card to the battlefield.", effect: cantrip_mechanics::delayed::return_subject_to_battlefield, ..TriggeredDef::BLANK })],
+    abilities: &[triggered(when(EventMask::ZONE_CHANGE, artifact_to_your_graveyard), schedule_return, "Whenever an artifact is put into your graveyard from the battlefield, return that card to the battlefield at the beginning of the next end step.")],
+    delayed: &[delayed_trigger(cantrip_mechanics::delayed::return_subject_to_battlefield, "Return that card to the battlefield.")],
     text: "Whenever an artifact is put into your graveyard from the battlefield, return that card to the battlefield at the beginning of the next end step.",
     ..CardDef::BLANK
 };
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "+2: Discard up to two cards, then draw that many cards.",
-            cost: Cost { loyalty: Some(2), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            effect: plus_two,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "\u{2212}2: Sacrifice an artifact. If you do, return target artifact card from your graveyard to the battlefield.",
-            cost: Cost { loyalty: Some(-2), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            targets: &[TargetSpec { min: 1, max: 1, filter: artifact_card_in_your_graveyard }],
-            effect: minus_two,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "\u{2212}10: You get an emblem with \"Whenever an artifact is put into your graveyard from the battlefield, return that card to the battlefield at the beginning of the next end step.\"",
-            cost: Cost { loyalty: Some(-10), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            effect: make_emblem,
-            ..ActivatedDef::BLANK
-        }),
+        ability(loyalty(2), plus_two, "+2: Discard up to two cards, then draw that many cards."),
+        ability(loyalty(-2), minus_two, "\u{2212}2: Sacrifice an artifact. If you do, return target artifact card from your graveyard to the battlefield.")
+            .targets(&[TargetSpec { min: 1, max: 1, filter: artifact_card_in_your_graveyard }]),
+        ability(loyalty(-10), make_emblem, "\u{2212}10: You get an emblem with \"Whenever an artifact is put into your graveyard from the battlefield, return that card to the battlefield at the beginning of the next end step.\""),
     ],
     ..oracle::DARETTI_SCRAP_SAVANT
 };

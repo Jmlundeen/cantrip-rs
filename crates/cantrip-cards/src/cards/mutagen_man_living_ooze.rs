@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::tokens;
-use cantrip_mechanics::triggers::this_enters;
+use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
 /// "Activated abilities of artifact tokens you control cost {1} less to activate" (CR 601.2f, 118.7): the source of the
@@ -25,13 +25,7 @@ fn make_mutagens(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     cost_changes: &[artifact_token_abilities_cost_less],
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When Mutagen Man enters, create X Mutagen tokens.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: this_enters,
-        effect: make_mutagens,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(THIS_ENTERS, make_mutagens, "When Mutagen Man enters, create X Mutagen tokens.")],
     ..oracle::MUTAGEN_MAN_LIVING_OOZE
 };
 

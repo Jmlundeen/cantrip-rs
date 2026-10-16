@@ -36,11 +36,5 @@ fn fade(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 /// `text` names the card.
 pub const fn upkeep(text: &'static str) -> AbilityDef {
-    AbilityDef::Triggered(TriggeredDef {
-        text,
-        listens: EventMask::STEP_BEGAN,
-        matches: your_upkeep,
-        effect: fade,
-        ..TriggeredDef::BLANK
-    })
+    triggered(when(EventMask::STEP_BEGAN, your_upkeep), fade, text)
 }

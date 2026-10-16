@@ -1,7 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::effects::ask_may;
 use cantrip_mechanics::library::{Find, search_to_hand};
-use cantrip_mechanics::triggers::this_enters;
+use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
 /// You may search your library for an artifact card with mana value 1 or less, reveal it, put it into your hand, then
@@ -19,12 +19,6 @@ fn search(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When Trinket Mage enters, you may search your library for an artifact card with mana value 1 or less, reveal that card, put it into your hand, then shuffle.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: this_enters,
-        effect: search,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(THIS_ENTERS, search, "When Trinket Mage enters, you may search your library for an artifact card with mana value 1 or less, reveal that card, put it into your hand, then shuffle.")],
     ..oracle::TRINKET_MAGE
 };

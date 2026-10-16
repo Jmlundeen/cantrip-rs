@@ -28,13 +28,7 @@ fn may_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever a creature dies, that creature's controller may draw a card.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: creature_dies,
-        effect: may_draw,
-        look_back: true,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(when(EventMask::ZONE_CHANGE, creature_dies), may_draw, "Whenever a creature dies, that creature's controller may draw a card.")
+        .look_back()],
     ..oracle::FECUNDITY
 };

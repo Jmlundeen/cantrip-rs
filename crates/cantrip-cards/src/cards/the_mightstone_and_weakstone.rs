@@ -1,13 +1,6 @@
 use cantrip_api::*;
-use cantrip_mechanics::{effects, pump, targets, triggers::this_enters};
+use cantrip_mechanics::{effects, pump, targets, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
-
-/// {T}: Add {C}{C}. This mana can't be spent to cast nonartifact spells (CR 106.6): it pays artifact spells, and
-/// abilities and everything else that is not a spell.
-fn add_restricted(g: &mut dyn Game, asker: &Asker, _: Option<Color>) -> Result<(), Suspend> {
-    g.add_restricted_mana(asker.controller, Mana::C, 2, ManaRestriction::NotNonartifactSpells);
-    Ok(())
-}
 
 fn minus_five(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(creature) = targets::object(g, item, 0) {
@@ -29,21 +22,8 @@ static MODAL: ModalDef = ModalDef {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When The Mightstone and Weakstone enters, choose one \u{2014} draw two cards; or target creature gets -5/-5 until end of turn.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            modal: Some(&MODAL),
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{T}: Add {C}{C}. This mana can't be spent to cast nonartifact spells.",
-            cost: Cost { tap: true, ..Cost::NONE },
-            mana: Some(add_restricted),
-            adds: ManaPool([0, 0, 0, 0, 0, 2]),
-            restricted: Some(ManaRestriction::NotNonartifactSpells),
-            ..ActivatedDef::BLANK
-        }),
+        modal_triggered(THIS_ENTERS, &MODAL, "When The Mightstone and Weakstone enters, choose one \u{2014} draw two cards; or target creature gets -5/-5 until end of turn."),
+        mana_ability(TAP, add_n(Mana::C, 2).only_for(ManaRestriction::NotNonartifactSpells), "{T}: Add {C}{C}. This mana can't be spent to cast nonartifact spells."),
     ],
     ..oracle::THE_MIGHTSTONE_AND_WEAKSTONE
 };

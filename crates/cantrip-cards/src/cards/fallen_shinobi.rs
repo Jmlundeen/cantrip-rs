@@ -18,13 +18,7 @@ pub static CARD: CardDef = CardDef {
             mana(2, 0, 1, 1, 0, 0),
             "Ninjutsu {2}{U}{B} ({2}{U}{B}, Return an unblocked attacker you control to hand: Put this card onto the battlefield from your hand tapped and attacking.)",
         ),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever this creature deals combat damage to a player, that player exiles the top two cards of their library. Until end of turn, you may play those cards without paying their mana costs.",
-            listens: EventMask::DAMAGE,
-            matches: cantrip_mechanics::triggers::deals_combat_damage_to_player_subject,
-            effect: plunder,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(cantrip_mechanics::triggers::DEALS_COMBAT_DAMAGE_TO_PLAYER_SUBJECT, plunder, "Whenever this creature deals combat damage to a player, that player exiles the top two cards of their library. Until end of turn, you may play those cards without paying their mana costs."),
     ],
     ..oracle::FALLEN_SHINOBI
 };

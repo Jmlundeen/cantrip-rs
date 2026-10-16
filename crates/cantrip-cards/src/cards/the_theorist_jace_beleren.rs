@@ -65,35 +65,11 @@ fn ultimate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "At the beginning of each opponent's draw step, you draw a card.",
-            listens: EventMask::STEP_BEGAN,
-            matches: opponents_draw_step,
-            effect: draw_a_card,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "+1: Create a 1/1 blue Illusion creature token.",
-            cost: Cost { loyalty: Some(1), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            effect: make_illusion,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "\u{2212}2: For each opponent, return up to one target artifact or creature that player controls to its owner's hand.",
-            cost: Cost { loyalty: Some(-2), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            targets: &[FOR_EACH_OPPONENT],
-            effect: bounce,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "\u{2212}6: Draw three cards. Then put X +1/+1 counters on each creature you control, where X is the number of cards in your hand.",
-            cost: Cost { loyalty: Some(-6), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            effect: ultimate,
-            ..ActivatedDef::BLANK
-        }),
+        triggered(when(EventMask::STEP_BEGAN, opponents_draw_step), draw_a_card, "At the beginning of each opponent's draw step, you draw a card."),
+        ability(loyalty(1), make_illusion, "+1: Create a 1/1 blue Illusion creature token."),
+        ability(loyalty(-2), bounce, "\u{2212}2: For each opponent, return up to one target artifact or creature that player controls to its owner's hand.")
+            .targets(&[FOR_EACH_OPPONENT]),
+        ability(loyalty(-6), ultimate, "\u{2212}6: Draw three cards. Then put X +1/+1 counters on each creature you control, where X is the number of cards in your hand."),
     ],
     ..oracle::THE_THEORIST_JACE_BELEREN
 };

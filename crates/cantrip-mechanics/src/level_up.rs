@@ -16,11 +16,6 @@ pub fn levels(view: &dyn LayerQuery, source: ObjectId) -> i16 {
 }
 
 pub const fn ability(cost: ManaCost, text: &'static str) -> AbilityDef {
-    AbilityDef::Activated(ActivatedDef {
-        text,
-        cost: Cost { mana: cost, ..Cost::NONE },
-        timing: Timing::Sorcery,
-        effect: add_level,
-        ..ActivatedDef::BLANK
-    })
+    cantrip_api::ability(Cost::mana(cost), add_level, text)
+        .sorcery_speed()
 }

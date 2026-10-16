@@ -1,7 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::effects;
 use cantrip_mechanics::targets;
-use cantrip_mechanics::triggers::this_enters;
+use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
 /// Exile target creature an opponent controls until an opponent becomes the monarch (CR 610.3). The wait outlives Palace Jailer:
@@ -48,28 +48,10 @@ fn return_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When this creature enters, you become the monarch.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            effect: effects::become_monarch,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When this creature enters, exile target creature an opponent controls until an opponent becomes the monarch.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            targets: &[cantrip_mechanics::targets::CREATURE_AN_OPPONENT_CONTROLS],
-            effect: exile_until_crowned,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(THIS_ENTERS, effects::become_monarch, "When this creature enters, you become the monarch."),
+        triggered(THIS_ENTERS, exile_until_crowned, "When this creature enters, exile target creature an opponent controls until an opponent becomes the monarch.")
+            .targets(&[cantrip_mechanics::targets::CREATURE_AN_OPPONENT_CONTROLS]),
     ],
-    delayed: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Until an opponent becomes the monarch, the exiled card stays exiled.",
-        listens: EventMask::BECAME_MONARCH,
-        matches: opponent_became_monarch,
-        effect: return_it,
-        ..TriggeredDef::BLANK
-    })],
+    delayed: &[triggered(when(EventMask::BECAME_MONARCH, opponent_became_monarch), return_it, "Until an opponent becomes the monarch, the exiled card stays exiled.")],
     ..oracle::PALACE_JAILER
 };

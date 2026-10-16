@@ -1,5 +1,4 @@
 use cantrip_api::*;
-use cantrip_mechanics::mana::{add_c, tap_for};
 use cantrip_oracle as oracle;
 
 /// "As Three Tree City enters, choose a creature type" (CR 614.1c, 614.12a), kept on the permanent.
@@ -32,15 +31,8 @@ fn add_for_chosen_type(g: &mut dyn Game, asker: &Asker, color: Option<Color>) ->
 pub static CARD: CardDef = CardDef {
     enters: Some(enters),
     abilities: &[
-        tap_for(add_c, Mana::C, "{T}: Add {C}."),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{2}, {T}: Choose a color. Add an amount of mana of that color equal to the number of creatures you control of the chosen type.",
-            cost: Cost { tap: true, mana: mana(2, 0, 0, 0, 0, 0), ..Cost::NONE },
-            mana: Some(add_for_chosen_type),
-            any_color: true,
-            adds_any: 1,
-            ..ActivatedDef::BLANK
-        }),
+        mana_ability(TAP, add(Mana::C), "{T}: Add {C}."),
+        mana_ability(cost("{2}, {T}"), add_any_color(1).by(add_for_chosen_type), "{2}, {T}: Choose a color. Add an amount of mana of that color equal to the number of creatures you control of the chosen type."),
     ],
     ..oracle::THREE_TREE_CITY
 };

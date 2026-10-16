@@ -15,11 +15,6 @@ fn add_green_for_each_creature(g: &mut dyn Game, asker: &Asker, _: Option<Color>
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "{T}: Add {G} for each creature you control.",
-        cost: Cost { tap: true, ..Cost::NONE },
-        mana: Some(add_green_for_each_creature),
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[mana_ability(TAP, add_by(add_green_for_each_creature), "{T}: Add {G} for each creature you control.")],
     ..oracle::GAEAS_CRADLE
 };

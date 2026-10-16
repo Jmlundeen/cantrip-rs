@@ -44,28 +44,11 @@ fn become_avatar(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-const HYBRID: Option<(Mana, Mana)> = Some((Mana::R, Mana::W));
-
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "{R/W}: This creature becomes a Kithkin Spirit with base power and toughness 2/2.",
-            cost: Cost::mana(ManaCost { hybrid: [HYBRID, None, None, None, None, None], ..mana(0, 0, 0, 0, 0, 0) }),
-            effect: become_spirit,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{R/W}{R/W}{R/W}: If this creature is a Spirit, it becomes a Kithkin Spirit Warrior with base power and toughness 4/4.",
-            cost: Cost::mana(ManaCost { hybrid: [HYBRID, HYBRID, HYBRID, None, None, None], ..mana(0, 0, 0, 0, 0, 0) }),
-            effect: become_warrior,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{R/W}{R/W}{R/W}{R/W}{R/W}{R/W}: If this creature is a Warrior, it becomes a Kithkin Spirit Warrior Avatar with base power and toughness 8/8, flying, and first strike.",
-            cost: Cost::mana(ManaCost { hybrid: [HYBRID; 6], ..mana(0, 0, 0, 0, 0, 0) }),
-            effect: become_avatar,
-            ..ActivatedDef::BLANK
-        }),
+        ability(cost("{R/W}"), become_spirit, "{R/W}: This creature becomes a Kithkin Spirit with base power and toughness 2/2."),
+        ability(cost("{R/W}{R/W}{R/W}"), become_warrior, "{R/W}{R/W}{R/W}: If this creature is a Spirit, it becomes a Kithkin Spirit Warrior with base power and toughness 4/4."),
+        ability(cost("{R/W}{R/W}{R/W}{R/W}{R/W}{R/W}"), become_avatar, "{R/W}{R/W}{R/W}{R/W}{R/W}{R/W}: If this creature is a Warrior, it becomes a Kithkin Spirit Warrior Avatar with base power and toughness 8/8, flying, and first strike."),
     ],
     ..oracle::FIGURE_OF_DESTINY
 };

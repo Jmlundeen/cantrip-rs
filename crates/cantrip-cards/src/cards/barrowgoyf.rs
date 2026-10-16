@@ -16,13 +16,7 @@ fn mill_and_take(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever this creature deals combat damage to a player, you may mill that many cards. If you do, you may put a creature card from among them into your hand.",
-        listens: EventMask::DAMAGE,
-        matches: triggers::deals_combat_damage_to_player_subject,
-        effect: mill_and_take,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(triggers::DEALS_COMBAT_DAMAGE_TO_PLAYER_SUBJECT, mill_and_take, "Whenever this creature deals combat damage to a player, you may mill that many cards. If you do, you may put a creature card from among them into your hand.")],
     statics: &[goyf::SIZE],
     ..oracle::BARROWGOYF
 };

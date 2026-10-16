@@ -38,12 +38,6 @@ fn reveal(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever Raph & Mikey attack, reveal cards from the top of your library until you reveal a creature card. Put that card onto the battlefield tapped and attacking and the rest on the bottom of your library in a random order.",
-        listens: EventMask::ATTACKS,
-        matches: triggers::this_attacks,
-        effect: reveal,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(triggers::THIS_ATTACKS, reveal, "Whenever Raph & Mikey attack, reveal cards from the top of your library until you reveal a creature card. Put that card onto the battlefield tapped and attacking and the rest on the bottom of your library in a random order.")],
     ..oracle::RAPH_MIKEY_TROUBLEMAKERS
 };

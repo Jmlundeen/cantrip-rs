@@ -19,12 +19,6 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     spell: Some(SpellDef { targets: &[], effect }),
     kicker: Some(Kicker { cost: mana(0, 0, 0, 1, 0, 0), multi: false, waterbend: false }),
-    delayed: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever a creature you control dies this turn, draw a card.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: cantrip_mechanics::triggers::creature_you_control_dies,
-        effect: cantrip_mechanics::effects::draw::<1>,
-        ..TriggeredDef::BLANK
-    })],
+    delayed: &[triggered(cantrip_mechanics::triggers::CREATURE_YOU_CONTROL_DIES, cantrip_mechanics::effects::draw::<1>, "Whenever a creature you control dies this turn, draw a card.")],
     ..oracle::WARHOSTS_FRENZY
 };

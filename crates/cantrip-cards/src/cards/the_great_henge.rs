@@ -1,5 +1,4 @@
 use cantrip_api::*;
-use cantrip_mechanics::mana;
 use cantrip_oracle as oracle;
 
 /// This spell costs {X} less to cast, where X is the greatest power among creatures you control (CR 601.2f): generic
@@ -59,14 +58,8 @@ fn counter_and_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     own_cost_changes: &[cheaper_by_greatest_power],
     abilities: &[
-        mana::tap_for_n(add_gg_and_gain, Mana::G, 2, "{T}: Add {G}{G}. You gain 2 life."),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever a nontoken creature you control enters, put a +1/+1 counter on it and draw a card.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: nontoken_creature_enters,
-            effect: counter_and_draw,
-            ..TriggeredDef::BLANK
-        }),
+        mana_ability(TAP, add_n(Mana::G, 2).by(add_gg_and_gain), "{T}: Add {G}{G}. You gain 2 life."),
+        triggered(when(EventMask::ZONE_CHANGE, nontoken_creature_enters), counter_and_draw, "Whenever a nontoken creature you control enters, put a +1/+1 counter on it and draw a card."),
     ],
     ..oracle::THE_GREAT_HENGE
 };

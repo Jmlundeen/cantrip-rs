@@ -53,14 +53,8 @@ fn return_and_attach(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> 
 pub static CARD: CardDef = CardDef {
     abilities: &[
         equip(mana(2, 0, 0, 0, 0, 0), "Equip {2}"),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever a 1/1 creature you control enters, you may return this card from your graveyard to the battlefield, then attach it to that creature.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: one_one_enters,
-            effect: return_and_attach,
-            anywhere: true,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(when(EventMask::ZONE_CHANGE, one_one_enters), return_and_attach, "Whenever a 1/1 creature you control enters, you may return this card from your graveyard to the battlefield, then attach it to that creature.")
+            .anywhere(),
     ],
     statics: &[StaticDef {
         text: "Equipped creature gets +1/+2.",

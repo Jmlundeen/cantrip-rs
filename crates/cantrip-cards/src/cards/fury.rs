@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::evoke;
-use cantrip_mechanics::{damage_divided, targets, triggers::this_enters};
+use cantrip_mechanics::{damage_divided, targets, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 fn red_card(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
@@ -16,15 +16,9 @@ fn divided_damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When this creature enters, it deals 4 damage divided as you choose among any number of target creatures and/or planeswalkers.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            targets: &[TargetSpec { min: 1, max: TargetSpec::COUNTED, filter: targets::CREATURE_OR_PLANESWALKER.filter }],
-            divide: Some(Divide { total: 4, of_x: None }),
-            effect: divided_damage,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(THIS_ENTERS, divided_damage, "When this creature enters, it deals 4 damage divided as you choose among any number of target creatures and/or planeswalkers.")
+            .targets(&[TargetSpec { min: 1, max: TargetSpec::COUNTED, filter: targets::CREATURE_OR_PLANESWALKER.filter }])
+            .divide(Divide { total: 4, of_x: None }),
         evoke::sacrifice_trigger("When Fury enters, if its evoke cost was paid, its controller sacrifices it."),
     ],
     // Evoke: exile a red card from your hand rather than pay this spell's mana cost (CR 118.9).

@@ -37,14 +37,8 @@ fn return_unless_damaged(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspe
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever a nontoken artifact is put into your graveyard from the battlefield, return that card to your hand unless target opponent has this enchantment deal 3 damage to them.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: artifact_to_your_graveyard,
-        targets: &[targets::OPPONENT],
-        effect: return_unless_damaged,
-        look_back: true,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(when(EventMask::ZONE_CHANGE, artifact_to_your_graveyard), return_unless_damaged, "Whenever a nontoken artifact is put into your graveyard from the battlefield, return that card to your hand unless target opponent has this enchantment deal 3 damage to them.")
+        .targets(&[targets::OPPONENT])
+        .look_back()],
     ..oracle::PIAS_REVOLUTION
 };

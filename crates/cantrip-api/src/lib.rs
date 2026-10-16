@@ -11,6 +11,7 @@ pub use cantrip_state::{
 
 pub use cantrip_state::{DOOR_LEFT, DOOR_RIGHT, PAY_CONVOKE, PAY_DELVE, PAY_IMPROVISE, PAY_WATERBEND, PLAYER_MANA_ABILITY};
 
+mod ability;
 mod card;
 mod chars;
 mod event;
@@ -19,6 +20,7 @@ pub mod history;
 pub mod intrinsic;
 mod replace;
 
+pub use ability::*;
 pub use card::*;
 pub use chars::*;
 pub use event::*;

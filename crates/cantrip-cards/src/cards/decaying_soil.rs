@@ -72,21 +72,9 @@ fn grant_return(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "At the beginning of your upkeep, exile a card from your graveyard.",
-        listens: EventMask::STEP_BEGAN,
-        matches: triggers::your_upkeep,
-        effect: exile_from_graveyard,
-        ..TriggeredDef::BLANK
-    })],
-    delayed: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever a nontoken creature is put into your graveyard from the battlefield, you may pay {1}. If you do, return that card to your hand.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: nontoken_creature_to_your_graveyard,
-        effect: pay_to_return,
-        look_back: true,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(triggers::YOUR_UPKEEP, exile_from_graveyard, "At the beginning of your upkeep, exile a card from your graveyard.")],
+    delayed: &[triggered(when(EventMask::ZONE_CHANGE, nontoken_creature_to_your_graveyard), pay_to_return, "Whenever a nontoken creature is put into your graveyard from the battlefield, you may pay {1}. If you do, return that card to your hand.")
+        .look_back()],
     statics: &[StaticDef {
         text: "Threshold \u{2014} As long as there are seven or more cards in your graveyard, this enchantment has \"Whenever a nontoken creature is put into your graveyard from the battlefield, you may pay {1}. If you do, return that card to your hand.\"",
         layer: Layer::Ability,

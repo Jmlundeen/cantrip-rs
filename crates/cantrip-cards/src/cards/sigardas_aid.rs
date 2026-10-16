@@ -11,14 +11,8 @@ fn aura_or_equipment_you_cast(q: &dyn Query, asker: &Asker, spell: ObjectId, cas
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever an Equipment you control enters, you may attach it to target creature you control.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: equipment_you_control_enters,
-        targets: &[targets::CREATURE_YOU_CONTROL],
-        effect: may_attach_that_equipment,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(when(EventMask::ZONE_CHANGE, equipment_you_control_enters), may_attach_that_equipment, "Whenever an Equipment you control enters, you may attach it to target creature you control.")
+        .targets(&[targets::CREATURE_YOU_CONTROL])],
     flash_rules: &[aura_or_equipment_you_cast],
     ..oracle::SIGARDAS_AID
 };

@@ -18,20 +18,9 @@ fn double(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Landfall - Whenever a land you control enters, put a +1/+1 counter on target creature.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: triggers::landfall,
-            targets: &[targets::CREATURE],
-            effect: counter,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{3}{G}{G}: Double the number of +1/+1 counters on each creature you control.",
-            cost: Cost { mana: mana(3, 0, 0, 0, 0, 2), ..Cost::NONE },
-            effect: double,
-            ..ActivatedDef::BLANK
-        }),
+        triggered(triggers::LANDFALL, counter, "Landfall - Whenever a land you control enters, put a +1/+1 counter on target creature.")
+            .targets(&[targets::CREATURE]),
+        ability(cost("{3}{G}{G}"), double, "{3}{G}{G}: Double the number of +1/+1 counters on each creature you control."),
     ],
     ..oracle::BRISTLY_BILL_SPINE_SOWER
 };

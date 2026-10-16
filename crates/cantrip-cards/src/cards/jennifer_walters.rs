@@ -52,27 +52,16 @@ fn retaliate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static BACK: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever a creature you control is dealt damage, you may have The Sensational She-Hulk deal that much damage to any target. Do this only once each turn.",
-        listens: EventMask::DAMAGE,
-        matches: creature_you_control_is_dealt_damage,
-        sums_per_subject: true,
-        targets: &[targets::ANY],
-        effect: retaliate,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(when(EventMask::DAMAGE, creature_you_control_is_dealt_damage), retaliate, "Whenever a creature you control is dealt damage, you may have The Sensational She-Hulk deal that much damage to any target. Do this only once each turn.")
+        .targets(&[targets::ANY])
+        .sums_per_subject()],
     cast_rules: &[opponents_cant_cast_on_your_turn],
     ..oracle::THE_SENSATIONAL_SHE_HULK
 };
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "{3}{G}{W}{W}: Transform Jennifer Walters. Activate only as a sorcery.",
-        cost: Cost { mana: mana(3, 2, 0, 0, 0, 1), ..Cost::NONE },
-        timing: Timing::Sorcery,
-        effect: cantrip_mechanics::effects::transform_self,
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[ability(cost("{3}{W}{W}{G}"), cantrip_mechanics::effects::transform_self, "{3}{G}{W}{W}: Transform Jennifer Walters. Activate only as a sorcery.")
+        .sorcery_speed()],
     cast_rules: &[opponents_cant_cast_on_your_turn],
     back: Some(&BACK),
     ..oracle::JENNIFER_WALTERS

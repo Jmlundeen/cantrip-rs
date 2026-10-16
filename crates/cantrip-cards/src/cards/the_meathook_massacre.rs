@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::{effects, pump};
-use cantrip_mechanics::triggers::this_enters;
+use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
 /// "Each creature gets -X/-X until end of turn": every creature on the battlefield as this resolves, fixed then
@@ -42,29 +42,11 @@ fn drain(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When The Meathook Massacre enters, each creature gets -X/-X until end of turn.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            effect: shrink_all,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever a creature you control dies, each opponent loses 1 life.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: cantrip_mechanics::triggers::creature_you_control_dies,
-            effect: drain,
-            look_back: true,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever a creature an opponent controls dies, you gain 1 life.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: opponents_dies,
-            effect: effects::gain_life::<1>,
-            look_back: true,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(THIS_ENTERS, shrink_all, "When The Meathook Massacre enters, each creature gets -X/-X until end of turn."),
+        triggered(cantrip_mechanics::triggers::CREATURE_YOU_CONTROL_DIES, drain, "Whenever a creature you control dies, each opponent loses 1 life.")
+            .look_back(),
+        triggered(when(EventMask::ZONE_CHANGE, opponents_dies), effects::gain_life::<1>, "Whenever a creature an opponent controls dies, you gain 1 life.")
+            .look_back(),
     ],
     ..oracle::THE_MEATHOOK_MASSACRE
 };

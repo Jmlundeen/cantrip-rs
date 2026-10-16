@@ -14,11 +14,6 @@ fn add_per_charge_counter(g: &mut dyn Game, asker: &Asker, _: Option<Color>) -> 
 pub static CARD: CardDef = CardDef {
     kicker: Some(Kicker { cost: mana(2, 0, 0, 0, 0, 0), multi: true, waterbend: false }),
     enters: Some(kicker::enters_with_counters::<{ CounterKind::Charge as usize }>),
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "{T}: Add {C} for each charge counter on this artifact.",
-        cost: Cost { tap: true, ..Cost::NONE },
-        mana: Some(add_per_charge_counter),
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[mana_ability(TAP, add_by(add_per_charge_counter), "{T}: Add {C} for each charge counter on this artifact.")],
     ..oracle::EVERFLOWING_CHALICE
 };

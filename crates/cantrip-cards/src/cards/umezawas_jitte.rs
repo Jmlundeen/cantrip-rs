@@ -56,21 +56,10 @@ static MODAL: ModalDef = ModalDef {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "Remove a charge counter from Umezawa's Jitte: Choose one — equipped creature gets +2/+2 until end of turn; target creature gets -1/-1 until end of turn; or you gain 2 life.",
-            cost: Cost { remove_counters: Some((CounterKind::Charge, 1)), ..Cost::NONE },
-            modal: Some(&MODAL),
-            ..ActivatedDef::BLANK
-        }),
+        modal_ability(remove_counters(CounterKind::Charge, 1), &MODAL, "Remove a charge counter from Umezawa's Jitte: Choose one — equipped creature gets +2/+2 until end of turn; target creature gets -1/-1 until end of turn; or you gain 2 life."),
         equip(mana(2, 0, 0, 0, 0, 0), "Equip {2}"),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever equipped creature deals combat damage, put two charge counters on Umezawa's Jitte.",
-            listens: EventMask::DAMAGE,
-            matches: equipped_creature_deals_combat_damage,
-            effect: two_charge_counters,
-            once_per_batch: true,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(when(EventMask::DAMAGE, equipped_creature_deals_combat_damage), two_charge_counters, "Whenever equipped creature deals combat damage, put two charge counters on Umezawa's Jitte.")
+            .once_per_batch(),
     ],
     ..oracle::UMEZAWAS_JITTE
 };

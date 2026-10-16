@@ -56,7 +56,3 @@ pub fn return_subject_to_battlefield(g: &mut dyn Game, item: &StackItem) -> Resu
     Ok(())
 }
 
-/// A delayed ability entry that runs `effect` on the subject: what a card lists in its `delayed`.
-pub const fn ability(text: &'static str, effect: fn(&mut dyn Game, &StackItem) -> Result<(), Suspend>) -> AbilityDef {
-    AbilityDef::Triggered(TriggeredDef { text, effect, ..TriggeredDef::BLANK })
-}

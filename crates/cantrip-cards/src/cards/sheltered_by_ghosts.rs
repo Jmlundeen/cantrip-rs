@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{attach::attached_object, exile_target_until_leaves, targets, triggers::{this_enters, ward}};
+use cantrip_mechanics::{attach::attached_object, exile_target_until_leaves, targets, triggers::{THIS_ENTERS, ward}};
 use cantrip_oracle as oracle;
 
 /// "Exile target nonland permanent an opponent controls until this Aura leaves the battlefield" (CR 610.3).
@@ -28,14 +28,8 @@ fn grant_ward(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
 
 pub static CARD: CardDef = CardDef {
     enchant: Some(targets::CREATURE_YOU_CONTROL),
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When Sheltered by Ghosts enters, exile target nonland permanent an opponent controls until Sheltered by Ghosts leaves the battlefield.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: this_enters,
-        targets: &[targets::NONLAND_PERMANENT_AN_OPPONENT_CONTROLS],
-        effect: exile_until_it_leaves,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(THIS_ENTERS, exile_until_it_leaves, "When Sheltered by Ghosts enters, exile target nonland permanent an opponent controls until Sheltered by Ghosts leaves the battlefield.")
+        .targets(&[targets::NONLAND_PERMANENT_AN_OPPONENT_CONTROLS])],
     delayed: &[ward::<2>("Ward {2} (Whenever this creature becomes the target of a spell or ability an opponent controls, counter it unless that player pays {2}.)")],
     statics: &[
         StaticDef {

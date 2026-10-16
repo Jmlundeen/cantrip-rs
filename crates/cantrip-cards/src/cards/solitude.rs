@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::{evoke, targets};
-use cantrip_mechanics::triggers::this_enters;
+use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
 fn white_card(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
@@ -31,14 +31,8 @@ fn exile_and_compensate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspen
 pub static CARD: CardDef = CardDef {
     abilities: &[
         evoke::sacrifice_trigger("When Solitude enters, if its evoke cost was paid, its controller sacrifices it."),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When Solitude enters, exile up to one other target creature. That creature's controller gains life equal to its power.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            targets: &[TargetSpec { min: 0, max: 1, filter: other_creature }],
-            effect: exile_and_compensate,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(THIS_ENTERS, exile_and_compensate, "When Solitude enters, exile up to one other target creature. That creature's controller gains life equal to its power.")
+            .targets(&[TargetSpec { min: 0, max: 1, filter: other_creature }]),
     ],
     // Evoke: exile a white card from your hand rather than pay this spell's mana cost (CR 118.9).
     ways: &[evoke::way(evoke::exile_from_hand(white_card), "Evoke - Exile a white card from your hand")],

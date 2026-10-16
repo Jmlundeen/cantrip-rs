@@ -33,12 +33,6 @@ fn sacrifice_this(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     granted_ways: &[GrantedWay { text: "Escape", cost: escape_cost, ..GrantedWay::CAST }],
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "At the beginning of the end step, sacrifice this enchantment.",
-        listens: EventMask::STEP_BEGAN,
-        matches: end_step,
-        effect: sacrifice_this,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(when(EventMask::STEP_BEGAN, end_step), sacrifice_this, "At the beginning of the end step, sacrifice this enchantment.")],
     ..oracle::UNDERWORLD_BREACH
 };

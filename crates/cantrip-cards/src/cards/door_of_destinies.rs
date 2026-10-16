@@ -15,13 +15,7 @@ fn apply(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
 
 pub static CARD: CardDef = CardDef {
     enters: Some(cantrip_mechanics::chosen_type::enters_choosing_a_creature_type),
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever you cast a spell of the chosen type, put a charge counter on this artifact.",
-        listens: EventMask::SPELL_CAST,
-        matches: cantrip_mechanics::chosen_type::you_cast_chosen_type,
-        effect: charge,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(when(EventMask::SPELL_CAST, cantrip_mechanics::chosen_type::you_cast_chosen_type), charge, "Whenever you cast a spell of the chosen type, put a charge counter on this artifact.")],
     statics: &[StaticDef {
         text: "Creatures you control of the chosen type get +1/+1 for each charge counter on this artifact.",
         layer: Layer::PtModify,

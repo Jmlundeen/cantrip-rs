@@ -28,13 +28,7 @@ fn artifact_abilities(q: &dyn Query, source: ObjectId, player: PlayerId, permane
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever you cast an artifact spell, investigate.",
-        listens: EventMask::SPELL_CAST,
-        matches: you_cast_an_artifact_spell,
-        effect,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(when(EventMask::SPELL_CAST, you_cast_an_artifact_spell), effect, "Whenever you cast an artifact spell, investigate.")],
     ability_discounts: &[artifact_abilities],
     ..oracle::FORENSIC_GADGETEER
 };

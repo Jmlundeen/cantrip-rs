@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::triggers::this_enters_if_cast;
+use cantrip_mechanics::triggers::THIS_ENTERS_IF_CAST;
 use cantrip_mechanics::{choose, targets};
 use cantrip_oracle as oracle;
 
@@ -93,13 +93,7 @@ fn exile_copy_and_cast(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When Uldaros Theorix enters, if you cast him, exile up to one target nonland card of each card type from your graveyard. Copy those cards. You may cast any number of spells with total mana value 6 or less from among the copies without paying their mana costs. (Permanent spells cast this way become tokens.)",
-        listens: EventMask::ZONE_CHANGE,
-        matches: this_enters_if_cast,
-        targets: &SLOTS,
-        effect: exile_copy_and_cast,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(THIS_ENTERS_IF_CAST, exile_copy_and_cast, "When Uldaros Theorix enters, if you cast him, exile up to one target nonland card of each card type from your graveyard. Copy those cards. You may cast any number of spells with total mana value 6 or less from among the copies without paying their mana costs. (Permanent spells cast this way become tokens.)")
+        .targets(&SLOTS)],
     ..oracle::ULDAROS_THEORIX
 };

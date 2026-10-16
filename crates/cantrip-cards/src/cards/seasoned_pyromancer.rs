@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::tokens;
-use cantrip_mechanics::{choose_from_hand, triggers::this_enters};
+use cantrip_mechanics::{choose_from_hand, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 /// The 1/1 red Elemental creature token it makes.
@@ -38,20 +38,9 @@ fn two_elementals(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When this creature enters, discard two cards, then draw two cards. For each nonland card discarded this way, create a 1/1 red Elemental creature token.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            effect: enter,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{3}{R}{R}, Exile this card from your graveyard: Create two 1/1 red Elemental creature tokens.",
-            cost: Cost { mana: mana(3, 0, 0, 0, 2, 0), exile_self: true, ..Cost::NONE },
-            effect: two_elementals,
-            from: ZoneKind::Graveyard,
-            ..ActivatedDef::BLANK
-        }),
+        triggered(THIS_ENTERS, enter, "When this creature enters, discard two cards, then draw two cards. For each nonland card discarded this way, create a 1/1 red Elemental creature token."),
+        ability(cost("{3}{R}{R}").and(EXILE_THIS), two_elementals, "{3}{R}{R}, Exile this card from your graveyard: Create two 1/1 red Elemental creature tokens.")
+            .from(ZoneKind::Graveyard),
     ],
     ..oracle::SEASONED_PYROMANCER
 };

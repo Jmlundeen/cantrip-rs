@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{mana, targets};
+use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
 
 /// "Target creature card from your graveyard" (CR 115.1).
@@ -17,14 +17,9 @@ fn put_on_top(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        mana::tap_for(mana::add_c, Mana::C, "{T}: Add {C}."),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{1}{B}, {T}: Put target creature card from your graveyard on top of your library.",
-            cost: Cost { mana: mana(1, 0, 0, 1, 0, 0), tap: true, ..Cost::NONE },
-            targets: &[TargetSpec { min: 1, max: 1, filter: creature_card_in_your_graveyard }],
-            effect: put_on_top,
-            ..ActivatedDef::BLANK
-        }),
+        mana_ability(TAP, add(Mana::C), "{T}: Add {C}."),
+        ability(cost("{1}{B}, {T}"), put_on_top, "{1}{B}, {T}: Put target creature card from your graveyard on top of your library.")
+            .targets(&[TargetSpec { min: 1, max: 1, filter: creature_card_in_your_graveyard }]),
     ],
     ..oracle::VOLRATHS_STRONGHOLD
 };

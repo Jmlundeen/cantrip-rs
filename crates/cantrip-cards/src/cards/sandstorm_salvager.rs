@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::tokens;
-use cantrip_mechanics::triggers::this_enters;
+use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
 fn golem(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -27,19 +27,8 @@ fn grow(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When Sandstorm Salvager enters, create a 3/3 colorless Golem artifact creature token.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            effect: golem,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{2}, {T}: Put a +1/+1 counter on each creature token you control. They gain trample until end of turn.",
-            cost: Cost { mana: mana(2, 0, 0, 0, 0, 0), tap: true, ..Cost::NONE },
-            effect: grow,
-            ..ActivatedDef::BLANK
-        }),
+        triggered(THIS_ENTERS, golem, "When Sandstorm Salvager enters, create a 3/3 colorless Golem artifact creature token."),
+        ability(cost("{2}, {T}"), grow, "{2}, {T}: Put a +1/+1 counter on each creature token you control. They gain trample until end of turn."),
     ],
     ..oracle::SANDSTORM_SALVAGER
 };

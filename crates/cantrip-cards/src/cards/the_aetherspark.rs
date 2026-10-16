@@ -63,37 +63,13 @@ fn minus_ten(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "+1: Attach The Aetherspark to up to one target creature you control. Put a +1/+1 counter on that creature.",
-            cost: Cost { loyalty: Some(1), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            targets: &[TargetSpec { min: 0, ..targets::CREATURE_YOU_CONTROL }],
-            effect: plus_one,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "\u{2212}5: Draw two cards.",
-            cost: Cost { loyalty: Some(-5), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            effect: effects::draw::<2>,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "\u{2212}10: Add ten mana of any one color.",
-            cost: Cost { loyalty: Some(-10), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            effect: minus_ten,
-            ..ActivatedDef::BLANK
-        }),
+        ability(loyalty(1), plus_one, "+1: Attach The Aetherspark to up to one target creature you control. Put a +1/+1 counter on that creature.")
+            .targets(&[TargetSpec { min: 0, ..targets::CREATURE_YOU_CONTROL }]),
+        ability(loyalty(-5), effects::draw::<2>, "\u{2212}5: Draw two cards."),
+        ability(loyalty(-10), minus_ten, "\u{2212}10: Add ten mana of any one color."),
     ],
-    delayed: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever equipped creature deals combat damage during your turn, put that many loyalty counters on The Aetherspark.",
-        listens: EventMask::DAMAGE,
-        matches: equipped_creature_deals_combat_damage,
-        effect: put_loyalty,
-        sums_per_subject: true,
-        ..TriggeredDef::BLANK
-    })],
+    delayed: &[triggered(when(EventMask::DAMAGE, equipped_creature_deals_combat_damage), put_loyalty, "Whenever equipped creature deals combat damage during your turn, put that many loyalty counters on The Aetherspark.")
+        .sums_per_subject()],
     statics: &[StaticDef {
         text: "As long as The Aetherspark is attached to a creature, The Aetherspark can't be attacked and has \"Whenever equipped creature deals combat damage during your turn, put that many loyalty counters on The Aetherspark.\"",
         layer: Layer::Ability,

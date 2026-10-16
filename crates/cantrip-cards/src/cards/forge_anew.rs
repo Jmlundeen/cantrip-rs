@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::targets;
-use cantrip_mechanics::triggers::this_enters;
+use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
 /// "Target Equipment card from your graveyard" (CR 115.1).
@@ -42,14 +42,8 @@ fn free_first_equip(q: &dyn Query, asker: &Asker, activator: PlayerId, _: Object
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When this enchantment enters, return target Equipment card from your graveyard to the battlefield.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: this_enters,
-        targets: &[TargetSpec { min: 1, max: 1, filter: equipment_in_your_graveyard }],
-        effect: return_equipment,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(THIS_ENTERS, return_equipment, "When this enchantment enters, return target Equipment card from your graveyard to the battlefield.")
+        .targets(&[TargetSpec { min: 1, max: 1, filter: equipment_in_your_graveyard }])],
     instant_activation: &[instant_equip],
     ability_alternatives: &[free_first_equip],
     ..oracle::FORGE_ANEW

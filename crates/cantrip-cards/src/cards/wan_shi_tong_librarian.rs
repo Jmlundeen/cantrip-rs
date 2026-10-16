@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::triggers::this_enters;
+use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
 /// "Put X +1/+1 counters on him. Then draw half X cards, rounded down." X is the one the spell was cast with
@@ -32,20 +32,8 @@ fn grow_and_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When Wan Shi Tong enters, put X +1/+1 counters on him. Then draw half X cards, rounded down.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            effect: enters,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever an opponent searches their library, put a +1/+1 counter on Wan Shi Tong and draw a card.",
-            listens: EventMask::SEARCHED,
-            matches: opponent_searches,
-            effect: grow_and_draw,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(THIS_ENTERS, enters, "When Wan Shi Tong enters, put X +1/+1 counters on him. Then draw half X cards, rounded down."),
+        triggered(when(EventMask::SEARCHED, opponent_searches), grow_and_draw, "Whenever an opponent searches their library, put a +1/+1 counter on Wan Shi Tong and draw a card."),
     ],
     ..oracle::WAN_SHI_TONG_LIBRARIAN
 };

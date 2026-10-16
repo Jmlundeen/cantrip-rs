@@ -21,12 +21,7 @@ fn counter_and_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     enters: Some(enters_with_a_counter),
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "{1}{U}, Remove a counter from this creature: Counter target noncreature spell. Its controller draws a card.",
-        cost: Cost { mana: mana(1, 0, 1, 0, 0, 0), remove_any_counter: true, ..Cost::NONE },
-        targets: &[targets::NONCREATURE_SPELL],
-        effect: counter_and_draw,
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[ability(cost("{1}{U}").and(REMOVE_A_COUNTER), counter_and_draw, "{1}{U}, Remove a counter from this creature: Counter target noncreature spell. Its controller draws a card.")
+        .targets(&[targets::NONCREATURE_SPELL])],
     ..oracle::GLEN_ELENDRA_GUARDIAN
 };

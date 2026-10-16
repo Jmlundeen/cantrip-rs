@@ -1,7 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::evoke;
 use cantrip_mechanics::hand::discard_chosen_from_revealed_hand;
-use cantrip_mechanics::{targets, triggers::this_enters};
+use cantrip_mechanics::{targets, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 fn black_card(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
@@ -18,14 +18,8 @@ fn discard_nonland(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When this creature enters, target opponent reveals their hand. You choose a nonland card from it. That player discards that card.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            targets: &[targets::OPPONENT],
-            effect: discard_nonland,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(THIS_ENTERS, discard_nonland, "When this creature enters, target opponent reveals their hand. You choose a nonland card from it. That player discards that card.")
+            .targets(&[targets::OPPONENT]),
         evoke::sacrifice_trigger("When Grief enters, if its evoke cost was paid, its controller sacrifices it."),
     ],
     // Evoke: exile a black card from your hand rather than pay this spell's mana cost (CR 118.9).

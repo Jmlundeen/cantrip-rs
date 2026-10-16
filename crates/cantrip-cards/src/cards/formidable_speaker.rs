@@ -2,7 +2,7 @@ use cantrip_api::*;
 use cantrip_mechanics::choose;
 use cantrip_mechanics::targets;
 use cantrip_mechanics::library::{search_to_hand, Find};
-use cantrip_mechanics::triggers::this_enters;
+use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
 /// When this creature enters, you may discard a card. If you do, search your library for a creature card, reveal it,
@@ -31,20 +31,9 @@ fn untap_target(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When this creature enters, you may discard a card. If you do, search your library for a creature card, reveal it, put it into your hand, then shuffle.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            effect: discard_and_search,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{1}, {T}: Untap another target permanent.",
-            cost: Cost { mana: mana(1, 0, 0, 0, 0, 0), tap: true, ..Cost::NONE },
-            targets: &[TargetSpec { min: 1, max: 1, filter: other_permanent }],
-            effect: untap_target,
-            ..ActivatedDef::BLANK
-        }),
+        triggered(THIS_ENTERS, discard_and_search, "When this creature enters, you may discard a card. If you do, search your library for a creature card, reveal it, put it into your hand, then shuffle."),
+        ability(cost("{1}, {T}"), untap_target, "{1}, {T}: Untap another target permanent.")
+            .targets(&[TargetSpec { min: 1, max: 1, filter: other_permanent }]),
     ],
     ..oracle::FORMIDABLE_SPEAKER
 };

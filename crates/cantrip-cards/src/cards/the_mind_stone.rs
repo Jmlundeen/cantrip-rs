@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{harness, mana, targets};
+use cantrip_mechanics::{harness, targets};
 use cantrip_oracle as oracle;
 
 /// "Up to one other target nonland permanent you control."
@@ -25,20 +25,14 @@ fn blink(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        mana::tap_for(mana::add_w, Mana::W, "{T}: Add {W}."),
+        mana_ability(TAP, add(Mana::W), "{T}: Add {W}."),
         harness::ability(
             Cost { mana: mana(5, 1, 0, 0, 0, 0), tap: true, ..Cost::NONE },
             "{5}{W}, {T}: Harness The Mind Stone.",
         ),
     ],
-    delayed: &[AbilityDef::Triggered(TriggeredDef {
-        text: "At the beginning of your end step, exile up to one other target nonland permanent you control, then return that card to the battlefield under its owner's control.",
-        listens: EventMask::STEP_BEGAN,
-        matches: cantrip_mechanics::triggers::your_end_step,
-        targets: &[TargetSpec { min: 0, max: 1, filter: other_nonland_permanent_you_control }],
-        effect: blink,
-        ..TriggeredDef::BLANK
-    })],
+    delayed: &[triggered(cantrip_mechanics::triggers::YOUR_END_STEP, blink, "At the beginning of your end step, exile up to one other target nonland permanent you control, then return that card to the battlefield under its owner's control.")
+        .targets(&[TargetSpec { min: 0, max: 1, filter: other_nonland_permanent_you_control }])],
     statics: &[harness::infinity(
         "\u{221e} \u{2014} At the beginning of your end step, exile up to one other target nonland permanent you control, then return that card to the battlefield under its owner's control.",
     )],

@@ -56,14 +56,8 @@ fn reveal_until_shared(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
 pub static CARD: CardDef = CardDef {
     abilities: &[
         equip(mana(1, 0, 0, 0, 0, 0), "Equip {1}"),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever equipped creature dies, you may reveal cards from the top of your library until you reveal a creature card that shares a creature type with it. Put that card into your hand and the rest on the bottom of your library in a random order.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: equipped_creature_dies,
-            effect: reveal_until_shared,
-            look_back: true,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(when(EventMask::ZONE_CHANGE, equipped_creature_dies), reveal_until_shared, "Whenever equipped creature dies, you may reveal cards from the top of your library until you reveal a creature card that shares a creature type with it. Put that card into your hand and the rest on the bottom of your library in a random order.")
+            .look_back(),
     ],
     statics: &[StaticDef {
         text: "Equipped creature gets +3/+1.",

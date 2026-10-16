@@ -11,13 +11,8 @@ fn untap_lands(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "{X}, {T}: Untap X target lands.",
-        cost: Cost { mana: ManaCost { x: 1, ..ManaCost::ZERO }, tap: true, ..Cost::NONE },
-        // X target lands: the slot is counted by the X announced, and asked once it is (CR 601.2b-c).
-        targets: &[TargetSpec { min: TargetSpec::COUNTED, max: TargetSpec::COUNTED, ..targets::LAND }],
-        effect: untap_lands,
-        ..ActivatedDef::BLANK
-    })],
+    // X target lands: the slot is counted by the X announced, and asked once it is (CR 601.2b-c).
+    abilities: &[ability(cost("{X}, {T}"), untap_lands, "{X}, {T}: Untap X target lands.")
+        .targets(&[TargetSpec { min: TargetSpec::COUNTED, max: TargetSpec::COUNTED, ..targets::LAND }])],
     ..oracle::CANDELABRA_OF_TAWNOS
 };

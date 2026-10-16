@@ -10,11 +10,6 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "{T}: Draw two cards, then discard three cards.",
-        cost: Cost { tap: true, ..Cost::NONE },
-        effect,
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[ability(TAP, effect, "{T}: Draw two cards, then discard three cards.")],
     ..oracle::BAZAAR_OF_BAGHDAD
 };

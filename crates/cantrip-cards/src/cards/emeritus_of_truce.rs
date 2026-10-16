@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::{targets, tokens};
-use cantrip_mechanics::triggers::this_enters;
+use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
 /// The 1/1 white and black Inkling creature token with flying.
@@ -35,14 +35,8 @@ fn enters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When this creature enters, target player creates a 1/1 white and black Inkling creature token with flying. Then if an opponent controls more creatures than you, this creature becomes prepared. (While it's prepared, you may cast a copy of its spell. Doing so unprepares it.)",
-        listens: EventMask::ZONE_CHANGE,
-        matches: this_enters,
-        targets: &[targets::PLAYER],
-        effect: enters,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(THIS_ENTERS, enters, "When this creature enters, target player creates a 1/1 white and black Inkling creature token with flying. Then if an opponent controls more creatures than you, this creature becomes prepared. (While it's prepared, you may cast a copy of its spell. Doing so unprepares it.)")
+        .targets(&[targets::PLAYER])],
     prepare: Some(&crate::swords_to_plowshares::CARD),
     ..oracle::EMERITUS_OF_TRUCE
 };

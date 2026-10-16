@@ -31,10 +31,6 @@ fn put_creature_in(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     spell: Some(SpellDef { targets: &[], effect: put_creature_in }),
     splice: Some(mana(2, 0, 0, 0, 2, 0)),
-    delayed: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Sacrifice that creature at the beginning of the next end step.",
-        effect: cantrip_mechanics::delayed::sacrifice_subject,
-        ..TriggeredDef::BLANK
-    })],
+    delayed: &[delayed_trigger(cantrip_mechanics::delayed::sacrifice_subject, "Sacrifice that creature at the beginning of the next end step.")],
     ..oracle::THROUGH_THE_BREACH
 };

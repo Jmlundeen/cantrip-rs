@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{airbend, triggers::this_enters, targets, tokens};
+use cantrip_mechanics::{airbend, triggers::THIS_ENTERS, targets, tokens};
 use cantrip_oracle as oracle;
 
 /// The 1/1 white Ally creature token it makes.
@@ -44,21 +44,9 @@ fn ally(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When Appa enters, airbend any number of other target nonland permanents you control.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            targets: &[TargetSpec { min: 0, max: 16, filter: other_nonland_permanent_you_control }],
-            effect: airbend_them,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever you cast a spell from exile, create a 1/1 white Ally creature token.",
-            listens: EventMask::SPELL_CAST,
-            matches: you_cast_from_exile,
-            effect: ally,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(THIS_ENTERS, airbend_them, "When Appa enters, airbend any number of other target nonland permanents you control.")
+            .targets(&[TargetSpec { min: 0, max: 16, filter: other_nonland_permanent_you_control }]),
+        triggered(when(EventMask::SPELL_CAST, you_cast_from_exile), ally, "Whenever you cast a spell from exile, create a 1/1 white Ally creature token."),
     ],
     ..oracle::APPA_STEADFAST_GUARDIAN
 };

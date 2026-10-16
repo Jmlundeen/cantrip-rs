@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{triggers::noncreature_spell_you_cast, targets};
+use cantrip_mechanics::{triggers::NONCREATURE_SPELL_YOU_CAST, targets};
 use cantrip_oracle as oracle;
 
 /// "Up to one target nonland permanent you control".
@@ -22,13 +22,7 @@ fn blink(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Avoidance \u{2014} Whenever you cast a noncreature spell, exile up to one target nonland permanent you control, then return that card to the battlefield under its owner's control.",
-        listens: EventMask::SPELL_CAST,
-        matches: noncreature_spell_you_cast,
-        targets: &[TargetSpec { min: 0, max: 1, filter: nonland_permanent_you_control }],
-        effect: blink,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(NONCREATURE_SPELL_YOU_CAST, blink, "Avoidance \u{2014} Whenever you cast a noncreature spell, exile up to one target nonland permanent you control, then return that card to the battlefield under its owner's control.")
+        .targets(&[TargetSpec { min: 0, max: 1, filter: nonland_permanent_you_control }])],
     ..oracle::DISPLACER_KITTEN
 };

@@ -42,25 +42,13 @@ fn protect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static BACK: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Protect \u{2014} Whenever Cecil attacks, other attacking creatures gain indestructible until end of turn.",
-        listens: EventMask::ATTACKS,
-        matches: triggers::this_attacks,
-        effect: protect,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(triggers::THIS_ATTACKS, protect, "Protect \u{2014} Whenever Cecil attacks, other attacking creatures gain indestructible until end of turn.")],
     ..oracle::CECIL_REDEEMED_PALADIN
 };
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Darkness \u{2014} Whenever Cecil deals damage, you lose that much life. Then if your life total is less than or equal to half your starting life total, untap Cecil and transform it.",
-        listens: EventMask::DAMAGE,
-        matches: cecil_deals_damage,
-        sums_per_subject: true,
-        effect: darkness,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(when(EventMask::DAMAGE, cecil_deals_damage), darkness, "Darkness \u{2014} Whenever Cecil deals damage, you lose that much life. Then if your life total is less than or equal to half your starting life total, untap Cecil and transform it.")
+        .sums_per_subject()],
     back: Some(&BACK),
     ..oracle::CECIL_DARK_KNIGHT
 };

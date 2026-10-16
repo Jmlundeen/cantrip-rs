@@ -23,13 +23,7 @@ fn soldiers(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         battle_cry::TRIGGER,
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever Hero of Bladehold attacks, create two 1/1 white Soldier creature tokens that are tapped and attacking.",
-            listens: EventMask::ATTACKS,
-            matches: cantrip_mechanics::triggers::this_attacks,
-            effect: soldiers,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(cantrip_mechanics::triggers::THIS_ATTACKS, soldiers, "Whenever Hero of Bladehold attacks, create two 1/1 white Soldier creature tokens that are tapped and attacking."),
     ],
     ..oracle::HERO_OF_BLADEHOLD
 };

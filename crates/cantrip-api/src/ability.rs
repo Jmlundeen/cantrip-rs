@@ -1,0 +1,521 @@
+//! How a card writes its abilities: the cost on the left, what the ability does on the right, its printed text last.
+//!
+//! ```ignore
+//! mana_ability(TAP, add(Mana::G), "{T}: Add {G}.")
+//! ability(cost("{2}{G}"), pump_team, "{2}{G}: Creatures you control get +0/+1 until end of turn.")
+//! ability(loyalty(-2), steal, "\u{2212}2: Gain control of target artifact.").targets(&[targets::ARTIFACT])
+//! triggered(when(EventMask::ZONE_CHANGE, this_enters), draw_a_card, "When this creature enters, draw a card.")
+//! ```
+//!
+//! What few abilities need (targets, "activate only once each turn", a condition) is a method after the call.
+
+use cantrip_state::*;
+
+use crate::card::*;
+use crate::event::EventMask;
+use crate::game::Game;
+
+/// The tap symbol, {T} (CR 107.5).
+pub const TAP: Cost = Cost { tap: true, ..Cost::NONE };
+
+/// "Sacrifice this permanent" (CR 701.21).
+pub const SACRIFICE_THIS: Cost = Cost { sacrifice_self: true, ..Cost::NONE };
+
+/// "Discard this card" (CR 701.9).
+pub const DISCARD_THIS: Cost = Cost { discard_self: true, ..Cost::NONE };
+
+/// "Exile this card" or "Exile this permanent".
+pub const EXILE_THIS: Cost = Cost { exile_self: true, ..Cost::NONE };
+
+/// "Exert this permanent" (CR 701.43a).
+pub const EXERT: Cost = Cost { exert: true, ..Cost::NONE };
+
+/// "Unattach this Equipment" (CR 701.3d).
+pub const UNATTACH_THIS: Cost = Cost { unattach_self: true, ..Cost::NONE };
+
+/// "Return this permanent to its owner's hand".
+pub const RETURN_THIS: Cost = Cost { return_self: true, ..Cost::NONE };
+
+/// "Discard your hand" (CR 701.9).
+pub const DISCARD_HAND: Cost = Cost { discard_hand: true, ..Cost::NONE };
+
+/// "Remove a counter from this permanent", of any kind.
+pub const REMOVE_A_COUNTER: Cost = Cost { remove_any_counter: true, ..Cost::NONE };
+
+/// "Sacrifice N [permanents]" that pass the filter (CR 701.21).
+pub const fn sacrifice(n: u8, filter: ObjectFilter) -> Cost {
+    Cost::sacrifice(n, filter)
+}
+
+/// "Return N [permanents] you control to their owner's hand".
+pub const fn return_to_hand(n: u8, filter: ObjectFilter) -> Cost {
+    Cost::return_to_hand(n, filter)
+}
+
+/// "Tap N untapped [permanents] you control" (CR 118.3): not the {T} symbol.
+pub const fn tap_untapped(n: u8, filter: ObjectFilter) -> Cost {
+    Cost::tap_untapped(n, filter)
+}
+
+/// "Discard N cards" that pass the filter (CR 701.9).
+pub const fn discard(n: u8, filter: ObjectFilter) -> Cost {
+    Cost { discard: Some((n, filter)), ..Cost::NONE }
+}
+
+/// "Remove N [kind] counters from this permanent".
+pub const fn remove_counters(kind: CounterKind, n: u8) -> Cost {
+    Cost { remove_counters: Some((kind, n)), ..Cost::NONE }
+}
+
+/// "Exile N cards from your graveyard" other than this one.
+pub const fn exile_from_graveyard(n: u8) -> Cost {
+    Cost { exile_from_graveyard: n, ..Cost::NONE }
+}
+
+/// A cost written in mana symbols as printed: `cost("{2}{G}")`, `cost("{X}{R}")`, `cost("{W/U}")`, `cost("{G/P}")`,
+/// `cost("{1}, {T}")`. Read as the card is compiled: a symbol it doesn't know fails the build.
+pub const fn cost(symbols: &str) -> Cost {
+    let b = symbols.as_bytes();
+    let mut c = Cost::NONE;
+    let mut hybrid = 0;
+    let mut i = 0;
+    while i < b.len() {
+        match b[i] {
+            b'{' => {}
+            b'}' | b',' | b' ' => {}
+            _ => panic!("a mana symbol is written in braces"),
+        }
+        if b[i] != b'{' {
+            i += 1;
+            continue;
+        }
+        let mut j = i + 1;
+        while j < b.len() && b[j] != b'}' {
+            j += 1;
+        }
+        assert!(j < b.len(), "an unclosed mana symbol");
+        let inner = (i + 1, j);
+        match inner.1 - inner.0 {
+            1 => match b[inner.0] {
+                b'T' => c.tap = true,
+                b'X' => c.mana.x += 1,
+                b'0'..=b'9' => c.mana.generic += b[inner.0] - b'0',
+                m => c.mana.symbols[mana_of(m) as usize] += 1,
+            },
+            2 => {
+                assert!(b[inner.0].is_ascii_digit() && b[inner.0 + 1].is_ascii_digit(), "an unknown mana symbol");
+                c.mana.generic += (b[inner.0] - b'0') * 10 + (b[inner.0 + 1] - b'0');
+            }
+            3 => {
+                assert!(b[inner.0 + 1] == b'/', "an unknown mana symbol");
+                let first = mana_of(b[inner.0]);
+                if b[inner.0 + 2] == b'P' {
+                    assert!(!matches!(first, Mana::C), "Phyrexian colorless mana is not a symbol");
+                    c.mana.phyrexian[first as usize] += 1;
+                } else {
+                    assert!(hybrid < 6, "more hybrid symbols than a cost holds");
+                    c.mana.hybrid[hybrid] = Some((first, mana_of(b[inner.0 + 2])));
+                    hybrid += 1;
+                }
+            }
+            _ => panic!("an unknown mana symbol"),
+        }
+        i = j + 1;
+    }
+    c
+}
+
+const fn mana_of(symbol: u8) -> Mana {
+    match symbol {
+        b'W' => Mana::W,
+        b'U' => Mana::U,
+        b'B' => Mana::B,
+        b'R' => Mana::R,
+        b'G' => Mana::G,
+        b'C' => Mana::C,
+        _ => panic!("an unknown mana symbol"),
+    }
+}
+
+/// A loyalty cost (CR 606.4): `loyalty(1)` for +1, `loyalty(-2)` for -2. Its ability is activated at sorcery speed
+/// (CR 606.3).
+pub const fn loyalty(n: i8) -> Cost {
+    Cost { loyalty: Some(n), ..Cost::NONE }
+}
+
+/// "Pay N life" (CR 119.4).
+pub const fn life(n: u8) -> Cost {
+    Cost { life: n, ..Cost::NONE }
+}
+
+/// An activated ability (CR 602) that uses the stack: pay `cost`, then `effect` as it resolves. A loyalty ability is
+/// activated at sorcery speed (CR 606.3).
+pub const fn ability(cost: Cost, effect: Effect, text: &'static str) -> AbilityDef {
+    AbilityDef::Activated(ActivatedDef {
+        text,
+        cost,
+        effect,
+        timing: if cost.loyalty.is_some() { Timing::Sorcery } else { Timing::Instant },
+        ..ActivatedDef::BLANK
+    })
+}
+
+/// A mana ability (CR 605.1a): pay `cost`, and what `adds` says is added at once, never on the stack (CR 605.3).
+pub const fn mana_ability(cost: Cost, adds: Adds, text: &'static str) -> AbilityDef {
+    AbilityDef::Activated(ActivatedDef {
+        text,
+        cost,
+        mana: adds.effect,
+        adds: adds.pool,
+        adds_any: adds.any,
+        any_color: adds.any_color,
+        colors: adds.colors,
+        restricted: adds.restricted,
+        ..ActivatedDef::BLANK
+    })
+}
+
+/// When a triggered ability triggers (CR 603.2): the events it listens to, and whether one of them is its trigger event.
+#[derive(Clone, Copy)]
+pub struct Trigger {
+    pub listens: EventMask,
+    pub matches: TriggerMatch,
+}
+
+/// The trigger of a triggered ability: `when(EventMask::ZONE_CHANGE, this_enters)`.
+pub const fn when(listens: EventMask, matches: TriggerMatch) -> Trigger {
+    Trigger { listens, matches }
+}
+
+/// A triggered ability (CR 603): when `trigger` triggers, `effect` as it resolves.
+pub const fn triggered(trigger: Trigger, effect: Effect, text: &'static str) -> AbilityDef {
+    AbilityDef::Triggered(TriggeredDef { text, listens: trigger.listens, matches: trigger.matches, effect, ..TriggeredDef::BLANK })
+}
+
+/// A modal activated ability (CR 700.2): pay `cost`, choose among `modes` as it is activated (CR 602.2b).
+pub const fn modal_ability(cost: Cost, modes: &'static ModalDef, text: &'static str) -> AbilityDef {
+    AbilityDef::Activated(ActivatedDef {
+        text,
+        cost,
+        modal: Some(modes),
+        timing: if cost.loyalty.is_some() { Timing::Sorcery } else { Timing::Instant },
+        ..ActivatedDef::BLANK
+    })
+}
+
+/// A modal triggered ability (CR 700.2): when `trigger` triggers, its modes are chosen as it is put on the stack
+/// (CR 603.3c).
+pub const fn modal_triggered(trigger: Trigger, modes: &'static ModalDef, text: &'static str) -> AbilityDef {
+    AbilityDef::Triggered(TriggeredDef { text, listens: trigger.listens, matches: trigger.matches, modal: Some(modes), ..TriggeredDef::BLANK })
+}
+
+/// A delayed triggered ability (CR 603.7), listed in a card's `delayed`: the effect that created it says when it
+/// triggers (`Game::delayed_trigger`), and `effect` is what it does then.
+pub const fn delayed_trigger(effect: Effect, text: &'static str) -> AbilityDef {
+    AbilityDef::Triggered(TriggeredDef { text, effect, ..TriggeredDef::BLANK })
+}
+
+/// A Saga's chapter ability (CR 714.2): it triggers when lore counters on its Saga reach `n`, and the core owns that
+/// trigger.
+pub const fn chapter(n: u8, effect: Effect, text: &'static str) -> AbilityDef {
+    AbilityDef::Triggered(TriggeredDef { text, chapter: n, effect, ..TriggeredDef::BLANK })
+}
+
+/// What a mana ability adds (CR 106.4): mana of kinds it lists, mana of one color chosen as it is activated, or what an
+/// effect of the card's own adds.
+#[derive(Clone, Copy)]
+pub struct Adds {
+    pub pool: ManaPool,
+    /// How many mana of the one color chosen as the ability is activated (CR 106.5).
+    pub any: u8,
+    /// The activation names a color (CR 106.5).
+    pub any_color: bool,
+    /// The colors that one may be; none for all five.
+    pub colors: ColorSet,
+    pub restricted: Option<ManaRestriction>,
+    /// The card's own effect, where the ability does more than add the mana listed: the listing is then only what
+    /// anyone may know of it before it is activated.
+    pub effect: Option<ManaEffect>,
+}
+
+impl Adds {
+    const NOTHING: Adds = Adds { pool: ManaPool([0; 6]), any: 0, any_color: false, colors: ColorSet::NONE, restricted: None, effect: None };
+
+    /// "Spend this mana only ..." (CR 106.6): the mana goes to the pool apart from unrestricted mana.
+    pub const fn only_for(self, restriction: ManaRestriction) -> Adds {
+        Adds { restricted: Some(restriction), ..self }
+    }
+
+    /// The colors its mana of one chosen color may be (CR 106.5): "Add one mana of any color among ...".
+    pub const fn colors(self, colors: ColorSet) -> Adds {
+        Adds { colors, ..self }
+    }
+
+    /// The activation names a color (CR 106.5) for the card's own effect, which may add it or not: Gemstone Caverns'
+    /// "instead add one mana of any color".
+    pub const fn choose_color(self) -> Adds {
+        Adds { any_color: true, ..self }
+    }
+
+    /// For whoever asks before it is activated, it may add `n` mana of any color, chosen by its own effect: Orcish
+    /// Lumberjack's "three mana in any combination of {R} and/or {G}".
+    pub const fn yields_any(self, n: u8) -> Adds {
+        Adds { any: n, ..self }
+    }
+
+    /// What the card's own effect adds, listed as this: "{T}: Add {G} for each creature you control" is
+    /// `add(Mana::G).by(green_for_each_creature)`.
+    pub const fn by(self, effect: ManaEffect) -> Adds {
+        Adds { effect: Some(effect), ..self }
+    }
+}
+
+/// "Add {G}."
+pub const fn add(mana: Mana) -> Adds {
+    add_n(mana, 1)
+}
+
+/// "Add {C}{C}." is `add_n(Mana::C, 2)`.
+pub const fn add_n(mana: Mana, n: u8) -> Adds {
+    let mut pool = [0u8; 6];
+    pool[mana as usize] = n;
+    Adds { pool: ManaPool(pool), ..Adds::NOTHING }
+}
+
+/// "Add {W}{U}." is `add_each(&[Mana::W, Mana::U])`.
+pub const fn add_each(mana: &[Mana]) -> Adds {
+    let mut pool = [0u8; 6];
+    let mut i = 0;
+    while i < mana.len() {
+        pool[mana[i] as usize] += 1;
+        i += 1;
+    }
+    Adds { pool: ManaPool(pool), ..Adds::NOTHING }
+}
+
+/// "Add N mana of any one color." (CR 106.5)
+pub const fn add_any_color(n: u8) -> Adds {
+    Adds { any: n, any_color: true, ..Adds::NOTHING }
+}
+
+/// "Add {R} or {G}." / "Add {B}, {R}, or {G}.": one mana of a color chosen among these as the ability is activated.
+pub const fn add_one_of(colors: &[Color]) -> Adds {
+    let mut set = 0u8;
+    let mut i = 0;
+    while i < colors.len() {
+        set |= ColorSet::of(colors[i]).0;
+        i += 1;
+    }
+    Adds { any: 1, any_color: true, colors: ColorSet(set), ..Adds::NOTHING }
+}
+
+/// A mana ability's effect that the card writes itself, with nothing listed: Gaea's Cradle adds a number no one knows
+/// before it is activated.
+pub const fn add_by(effect: ManaEffect) -> Adds {
+    Adds { effect: Some(effect), ..Adds::NOTHING }
+}
+
+/// Adds what a mana ability with no effect of its own lists (CR 106.4): its fixed mana, and its mana of one color as
+/// the color `chosen` (colorless where it may name colorless, CR 106.7). Restricted mana goes to the pool apart.
+pub fn add_listed(g: &mut dyn Game, controller: PlayerId, def: &ActivatedDef, chosen: Option<Mana>) {
+    let mut pool = def.adds;
+    if let Some(m) = chosen {
+        pool.0[m as usize] += def.adds_any;
+    }
+    for m in Mana::ALL {
+        let n = pool.get(m);
+        if n == 0 {
+            continue;
+        }
+        match def.restricted {
+            Some(r) => g.add_restricted_mana(controller, m, n, r),
+            None => g.add_mana(controller, m, n),
+        }
+    }
+}
+
+const fn activated(a: AbilityDef, method: &str) -> ActivatedDef {
+    match a {
+        AbilityDef::Activated(d) => d,
+        AbilityDef::Triggered(_) => panic!("{}", method),
+    }
+}
+
+impl AbilityDef {
+    /// Its targets (CR 115.1), one slot each.
+    pub const fn targets(self, targets: &'static [TargetSpec]) -> AbilityDef {
+        match self {
+            AbilityDef::Activated(d) => AbilityDef::Activated(ActivatedDef { targets, ..d }),
+            AbilityDef::Triggered(t) => AbilityDef::Triggered(TriggeredDef { targets, ..t }),
+        }
+    }
+
+    /// "Activate only as a sorcery." (CR 602.5d)
+    pub const fn sorcery_speed(self) -> AbilityDef {
+        AbilityDef::Activated(ActivatedDef { timing: Timing::Sorcery, ..activated(self, "only an activated ability has a timing") })
+    }
+
+    /// When it may be activated, beyond sorcery speed: `Timing::OwnTurn` and the like.
+    pub const fn timing(self, timing: Timing) -> AbilityDef {
+        AbilityDef::Activated(ActivatedDef { timing, ..activated(self, "only an activated ability has a timing") })
+    }
+
+    /// "Activate only once each turn." (CR 602.5b)
+    pub const fn once_each_turn(self) -> AbilityDef {
+        AbilityDef::Activated(ActivatedDef { once_each_turn: true, ..activated(self, "only an activated ability is activated once each turn") })
+    }
+
+    /// Exhaust (CR 702.177a).
+    pub const fn exhaust(self) -> AbilityDef {
+        AbilityDef::Activated(ActivatedDef { exhaust: true, ..activated(self, "only an activated ability has exhaust") })
+    }
+
+    /// The zone it functions from, where not the battlefield (CR 113.6).
+    pub const fn from(self, from: ZoneKind) -> AbilityDef {
+        AbilityDef::Activated(ActivatedDef { from, ..activated(self, "only an activated ability is given a zone this way") })
+    }
+
+    /// "Activate only if ..." (CR 602.5b), or a triggered ability's intervening "if" (CR 603.4).
+    pub const fn condition(self, condition: Condition) -> AbilityDef {
+        match self {
+            AbilityDef::Activated(d) => AbilityDef::Activated(ActivatedDef { condition: Some(condition), ..d }),
+            AbilityDef::Triggered(t) => AbilityDef::Triggered(TriggeredDef { condition: Some(condition), ..t }),
+        }
+    }
+
+    /// Its modes (CR 700.2): chosen on activation, or as the triggered ability is put on the stack.
+    pub const fn modal(self, modal: &'static ModalDef) -> AbilityDef {
+        match self {
+            AbilityDef::Activated(d) => AbilityDef::Activated(ActivatedDef { modal: Some(modal), ..d }),
+            AbilityDef::Triggered(t) => AbilityDef::Triggered(TriggeredDef { modal: Some(modal), ..t }),
+        }
+    }
+
+    /// The colors its mana of one chosen color may be, worked out when it is offered (CR 607.2a): "any of the exiled
+    /// card's colors".
+    pub const fn colors_from(self, colors_from: fn(&dyn crate::game::Query, &Asker) -> ColorSet) -> AbilityDef {
+        AbilityDef::Activated(ActivatedDef { colors_from: Some(colors_from), ..activated(self, "only a mana ability names colors") })
+    }
+
+    /// "Add one mana of any type the sacrificed land could produce" (CR 106.7).
+    pub const fn colors_from_sacrifice(self) -> AbilityDef {
+        AbilityDef::Activated(ActivatedDef { colors_from_sacrifice: true, ..activated(self, "only a mana ability names colors") })
+    }
+
+    /// Its mana cost is a waterbend cost (CR 701.67a).
+    pub const fn waterbend(self) -> AbilityDef {
+        AbilityDef::Activated(ActivatedDef { waterbend: true, ..activated(self, "only an activated ability has a mana cost to waterbend") })
+    }
+
+    /// "For each mana in this ability's activation cost, you may tap an untapped creature you control rather than pay
+    /// that mana" (CR 118.3).
+    pub const fn tap_creatures_for_mana(self) -> AbilityDef {
+        AbilityDef::Activated(ActivatedDef { tap_creatures_for_mana: true, ..activated(self, "only an activated ability has an activation cost") })
+    }
+
+    /// A special action (CR 116.2), not an activated ability.
+    pub const fn special_action(self) -> AbilityDef {
+        AbilityDef::Activated(ActivatedDef { special_action: true, ..activated(self, "a special action is taken as an activated ability is") })
+    }
+
+    /// An equip ability (CR 702.6a).
+    pub const fn equip(self) -> AbilityDef {
+        AbilityDef::Activated(ActivatedDef { equip: true, ..activated(self, "only an activated ability equips") })
+    }
+
+}
+
+const fn triggered_def(a: AbilityDef, method: &str) -> TriggeredDef {
+    match a {
+        AbilityDef::Triggered(t) => t,
+        AbilityDef::Activated(_) => panic!("{}", method),
+    }
+}
+
+/// What only a triggered ability (CR 603) has.
+impl AbilityDef {
+    /// A leaves-the-battlefield ability (CR 603.10a): it looks back at the board as it was before the event.
+    pub const fn look_back(self) -> AbilityDef {
+        AbilityDef::Triggered(TriggeredDef { look_back: true, ..triggered_def(self, "only a triggered ability looks back") })
+    }
+
+    /// It functions outside the battlefield too; the ability checks the zone itself.
+    pub const fn anywhere(self) -> AbilityDef {
+        AbilityDef::Triggered(TriggeredDef { anywhere: true, ..triggered_def(self, "only a triggered ability functions anywhere this way") })
+    }
+
+    /// A "one or more" ability (CR 603.2c): the events of one batch that it matches trigger it once.
+    pub const fn once_per_batch(self) -> AbilityDef {
+        AbilityDef::Triggered(TriggeredDef { once_per_batch: true, ..triggered_def(self, "only a triggered ability triggers per batch") })
+    }
+
+    /// With `once_per_batch`: events whose `data[1]` differ are different batches (CR 603.2c).
+    pub const fn batch_by_data(self) -> AbilityDef {
+        AbilityDef::Triggered(TriggeredDef { batch_by_data: true, ..triggered_def(self, "only a triggered ability triggers per batch") })
+    }
+
+    /// A triggered mana ability (CR 605.1b).
+    pub const fn mana_ability(self) -> AbilityDef {
+        AbilityDef::Triggered(TriggeredDef { mana_ability: true, ..triggered_def(self, "an activated mana ability is written with mana_ability()") })
+    }
+
+    /// Events of one batch about the same subject trigger it once, their amounts added up (CR 120.2, 603.2c).
+    pub const fn sums_per_subject(self) -> AbilityDef {
+        AbilityDef::Triggered(TriggeredDef { sums_per_subject: true, ..triggered_def(self, "only a triggered ability sums its events") })
+    }
+
+    /// "This ability triggers only N times each turn" (CR 603.2h).
+    pub const fn triggers_each_turn(self, n: u8) -> AbilityDef {
+        AbilityDef::Triggered(TriggeredDef { triggers_each_turn: n, ..triggered_def(self, "only a triggered ability triggers") })
+    }
+
+    /// Its first target slot divides a total among its targets (CR 601.2d).
+    pub const fn divide(self, divide: Divide) -> AbilityDef {
+        AbilityDef::Triggered(TriggeredDef { divide: Some(divide), ..triggered_def(self, "only a triggered ability divides this way") })
+    }
+
+    /// "That player chooses target ..." (CR 603.3d).
+    pub const fn subject_chooses_targets(self) -> AbilityDef {
+        AbilityDef::Triggered(TriggeredDef { subject_chooses_targets: true, ..triggered_def(self, "only a triggered ability's subject chooses") })
+    }
+
+    /// A ward ability (CR 702.21a).
+    pub const fn ward(self) -> AbilityDef {
+        AbilityDef::Triggered(TriggeredDef { ward: true, ..triggered_def(self, "only a triggered ability is a ward ability") })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn cost_reads_printed_symbols() {
+        assert_eq!(cost("{2}{G}").mana, mana(2, 0, 0, 0, 0, 1));
+        assert_eq!(cost("{0}").mana, ManaCost::ZERO);
+        assert_eq!(cost("{12}").mana.generic, 12);
+        assert_eq!(cost("{X}{R}").mana, ManaCost { x: 1, ..mana(0, 0, 0, 0, 1, 0) });
+        assert_eq!(cost("{1}{G/W}{G/W}").mana, ManaCost { hybrid: [Some((Mana::G, Mana::W)), Some((Mana::G, Mana::W)), None, None, None, None], ..mana(1, 0, 0, 0, 0, 0) });
+        assert_eq!(cost("{9}{G/P}").mana, ManaCost { generic: 9, phyrexian: [0, 0, 0, 0, 1], ..ManaCost::ZERO });
+        assert_eq!(cost("{C}").mana.symbols, [0, 0, 0, 0, 0, 1]);
+        let c = cost("{1}, {T}");
+        assert!(c.tap && c.mana == mana(1, 0, 0, 0, 0, 0));
+    }
+
+    #[test]
+    fn costs_join() {
+        let c = TAP.and(life(1)).and(SACRIFICE_THIS);
+        assert!(c.tap && c.sacrifice_self && c.life == 1);
+        assert_eq!(cost("{1}").and(cost("{U}")).mana, mana(1, 0, 1, 0, 0, 0));
+    }
+
+    #[test]
+    fn mana_abilities_list_what_they_add() {
+        let AbilityDef::Activated(d) = mana_ability(TAP, add(Mana::G), "{T}: Add {G}.") else { panic!() };
+        assert!(d.is_mana_ability() && d.mana.is_none() && d.adds.get(Mana::G) == 1 && d.cost.tap);
+        let AbilityDef::Activated(d) = mana_ability(TAP, add_one_of(&[Color::Red, Color::White]), "{T}: Add {R} or {W}.") else { panic!() };
+        assert!(d.any_color && d.adds_any == 1 && d.colors.has(Color::Red) && d.colors.has(Color::White) && !d.colors.has(Color::Blue));
+        let AbilityDef::Activated(d) = ability(loyalty(-2), |_, _| Ok(()), "-2: Nothing.") else { panic!() };
+        assert!(d.timing == Timing::Sorcery && !d.is_mana_ability());
+    }
+}

@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::triggers::{annihilator, cast_this_spell};
+use cantrip_mechanics::triggers::{annihilator, CAST_THIS_SPELL};
 use cantrip_oracle as oracle;
 
 /// "When you cast this spell, take an extra turn after this one." Triggers from the stack (CR 603.2, 702.85a's shape).
@@ -36,23 +36,11 @@ fn itself(_: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Chars) -
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When you cast this spell, take an extra turn after this one.",
-            listens: EventMask::SPELL_CAST,
-            matches: cast_this_spell,
-            effect: extra_turn,
-            anywhere: true,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(CAST_THIS_SPELL, extra_turn, "When you cast this spell, take an extra turn after this one.")
+            .anywhere(),
         annihilator::<6>("Annihilator 6 (Whenever this creature attacks, defending player sacrifices six permanents.)"),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When Emrakul is put into a graveyard from anywhere, its owner shuffles their graveyard into their library.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: put_into_graveyard,
-            effect: shuffle_graveyard_in,
-            anywhere: true,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(when(EventMask::ZONE_CHANGE, put_into_graveyard), shuffle_graveyard_in, "When Emrakul is put into a graveyard from anywhere, its owner shuffles their graveyard into their library.")
+            .anywhere(),
     ],
     statics: &[StaticDef {
         text: "Protection from spells that are one or more colors",

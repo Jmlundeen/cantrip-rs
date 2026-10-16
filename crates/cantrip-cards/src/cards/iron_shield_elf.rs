@@ -19,11 +19,6 @@ fn shield(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "Discard a card: This creature gains indestructible until end of turn. Tap it.",
-        cost: Cost { discard: Some((1, any_card)), ..Cost::NONE },
-        effect: shield,
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[ability(discard(1, any_card), shield, "Discard a card: This creature gains indestructible until end of turn. Tap it.")],
     ..oracle::IRON_SHIELD_ELF
 };

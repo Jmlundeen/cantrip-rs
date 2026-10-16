@@ -28,13 +28,7 @@ fn exile_eight(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         ward::<2>("Ward {2} (Whenever this creature becomes the target of a spell or ability an opponent controls, counter it unless that player pays {2}.)"),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever this creature attacks, you may exile eight cards from your graveyard. If you do, this creature becomes prepared.",
-            listens: EventMask::ATTACKS,
-            matches: triggers::this_attacks,
-            effect: exile_eight,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(triggers::THIS_ATTACKS, exile_eight, "Whenever this creature attacks, you may exile eight cards from your graveyard. If you do, this creature becomes prepared."),
     ],
     enters: Some(enters_prepared),
     prepare: Some(&crate::ancestral_recall::CARD),

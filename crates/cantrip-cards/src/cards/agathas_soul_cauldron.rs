@@ -64,19 +64,10 @@ fn put_counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "{T}: Exile target card from a graveyard. When a creature card is exiled this way, put a +1/+1 counter on target creature you control.",
-        cost: Cost { tap: true, ..Cost::NONE },
-        targets: &[targets::CARD_IN_A_GRAVEYARD],
-        effect: exile_card,
-        ..ActivatedDef::BLANK
-    })],
-    delayed: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When a creature card is exiled this way, put a +1/+1 counter on target creature you control.",
-        targets: &[targets::CREATURE_YOU_CONTROL],
-        effect: put_counter,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[ability(TAP, exile_card, "{T}: Exile target card from a graveyard. When a creature card is exiled this way, put a +1/+1 counter on target creature you control.")
+        .targets(&[targets::CARD_IN_A_GRAVEYARD])],
+    delayed: &[delayed_trigger(put_counter, "When a creature card is exiled this way, put a +1/+1 counter on target creature you control.")
+        .targets(&[targets::CREATURE_YOU_CONTROL])],
     statics: &[StaticDef {
         text: "Creatures you control with +1/+1 counters on them have all activated abilities of all creature cards exiled with Agatha's Soul Cauldron.",
         layer: Layer::Ability,

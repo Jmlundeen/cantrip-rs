@@ -8,12 +8,7 @@ fn ping(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "Sacrifice a creature: Goblin Bombardment deals 1 damage to any target.",
-        cost: Cost { permanents: Some(PermanentCost { count: 1, filter: targets::filters::creature, to_hand: false }), ..Cost::NONE },
-        targets: &[targets::ANY],
-        effect: ping,
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[ability(sacrifice(1, targets::filters::creature), ping, "Sacrifice a creature: Goblin Bombardment deals 1 damage to any target.")
+        .targets(&[targets::ANY])],
     ..oracle::GOBLIN_BOMBARDMENT
 };

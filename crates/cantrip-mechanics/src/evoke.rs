@@ -4,7 +4,7 @@
 //! A card with evoke lists `way(cost, text)` (or `way_exiling_card`, for the pitch cost) as its only alternative cost
 //! and `sacrifice_trigger(text)` among its `abilities`; the way is the card's first, which is what `evoked` reads.
 
-use crate::triggers::this_enters;
+use crate::triggers::THIS_ENTERS;
 use cantrip_api::*;
 
 /// The alternative cost of evoke: cast from the hand for `cost` (CR 118.9). It is the card's first way.
@@ -31,12 +31,6 @@ fn sacrifice_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 /// "When this enters, if its evoke cost was paid, its controller sacrifices it" (CR 702.74a): `text` names the card.
 pub const fn sacrifice_trigger(text: &'static str) -> AbilityDef {
-    AbilityDef::Triggered(TriggeredDef {
-        text,
-        listens: EventMask::ZONE_CHANGE,
-        matches: this_enters,
-        condition: Some(evoked),
-        effect: sacrifice_it,
-        ..TriggeredDef::BLANK
-    })
+    triggered(THIS_ENTERS, sacrifice_it, text)
+        .condition(evoked)
 }

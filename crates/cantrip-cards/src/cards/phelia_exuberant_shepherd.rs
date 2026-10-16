@@ -42,18 +42,8 @@ fn give_back(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever Phelia attacks, exile up to one other target nonland permanent. At the beginning of the next end step, return that card to the battlefield under its owner's control. If it entered under your control, put a +1/+1 counter on Phelia.",
-        listens: EventMask::ATTACKS,
-        matches: triggers::this_attacks,
-        targets: &[TargetSpec { min: 0, max: 1, filter: other_nonland_permanent }],
-        effect: exile,
-        ..TriggeredDef::BLANK
-    })],
-    delayed: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Return that card to the battlefield under its owner's control. If it entered under your control, put a +1/+1 counter on Phelia.",
-        effect: give_back,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(triggers::THIS_ATTACKS, exile, "Whenever Phelia attacks, exile up to one other target nonland permanent. At the beginning of the next end step, return that card to the battlefield under its owner's control. If it entered under your control, put a +1/+1 counter on Phelia.")
+        .targets(&[TargetSpec { min: 0, max: 1, filter: other_nonland_permanent }])],
+    delayed: &[delayed_trigger(give_back, "Return that card to the battlefield under its owner's control. If it entered under your control, put a +1/+1 counter on Phelia.")],
     ..oracle::PHELIA_EXUBERANT_SHEPHERD
 };

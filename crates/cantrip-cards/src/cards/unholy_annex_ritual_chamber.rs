@@ -5,7 +5,7 @@
 //! Crude Abattoir // Unsavory Kitchen, Funeral Room // Awakening Hall, Derelict Attic // Widow's Walk and the rest.
 
 use cantrip_api::*;
-use cantrip_mechanics::triggers::{self, your_end_step};
+use cantrip_mechanics::triggers::{self, YOUR_END_STEP};
 use cantrip_oracle as oracle;
 
 /// The 6/6 black Demon creature token with flying.
@@ -45,24 +45,12 @@ fn chamber(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static UNHOLY_ANNEX: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "At the beginning of your end step, draw a card. If you control a Demon, each opponent loses 2 life and you gain 2 life. Otherwise, you lose 2 life.",
-        listens: EventMask::STEP_BEGAN,
-        matches: your_end_step,
-        effect: annex,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(YOUR_END_STEP, annex, "At the beginning of your end step, draw a card. If you control a Demon, each opponent loses 2 life and you gain 2 life. Otherwise, you lose 2 life.")],
     ..oracle::UNHOLY_ANNEX
 };
 
 pub static RITUAL_CHAMBER: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When you unlock this door, create a 6/6 black Demon creature token with flying.",
-        listens: EventMask::DOOR_UNLOCKED,
-        matches: triggers::you_unlock_this_right_door,
-        effect: chamber,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(triggers::YOU_UNLOCK_THIS_RIGHT_DOOR, chamber, "When you unlock this door, create a 6/6 black Demon creature token with flying.")],
     ..oracle::RITUAL_CHAMBER
 };
 

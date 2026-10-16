@@ -31,13 +31,7 @@ pub static CARD: CardDef = CardDef {
     kicker: Some(Kicker { cost: mana(3, 0, 0, 0, 0, 0), multi: true, waterbend: false }),
     abilities: &[
         triggers::SQUAD,
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever a creature token you control enters, put a +1/+1 counter on it.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: token_enters,
-            effect: counter_on_it,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(when(EventMask::ZONE_CHANGE, token_enters), counter_on_it, "Whenever a creature token you control enters, put a +1/+1 counter on it."),
     ],
     ..oracle::SECURITRON_SQUADRON
 };

@@ -4,7 +4,7 @@ use cantrip_oracle as oracle;
 
 pub static CARD: CardDef = CardDef {
     enters: Some(mana::enters_tapped_unless_two_or_fewer_other_lands),
-    abilities: &[mana::tap_for_either(Color::Black, Color::Green, "{T}: Add {B} or {G}.")],
+    abilities: &[mana_ability(TAP, add_one_of(&[Color::Black, Color::Green]), "{T}: Add {B} or {G}.")],
     ..oracle::BLOOMING_MARSH
 };
 

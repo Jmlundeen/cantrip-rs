@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::choose;
-use cantrip_mechanics::triggers::this_enters;
+use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
 /// The tapped 2/2 colorless Robot artifact creature token.
@@ -34,19 +34,8 @@ fn make_robot(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When Melded Moxite enters, you may discard a card. If you do, draw two cards.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            effect: discard_to_draw,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{3}, Sacrifice Melded Moxite: Create a tapped 2/2 colorless Robot artifact creature token.",
-            cost: Cost { mana: mana(3, 0, 0, 0, 0, 0), sacrifice_self: true, ..Cost::NONE },
-            effect: make_robot,
-            ..ActivatedDef::BLANK
-        }),
+        triggered(THIS_ENTERS, discard_to_draw, "When Melded Moxite enters, you may discard a card. If you do, draw two cards."),
+        ability(cost("{3}").and(SACRIFICE_THIS), make_robot, "{3}, Sacrifice Melded Moxite: Create a tapped 2/2 colorless Robot artifact creature token."),
     ],
     ..oracle::MELDED_MOXITE
 };

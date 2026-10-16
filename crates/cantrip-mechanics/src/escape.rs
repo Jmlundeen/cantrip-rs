@@ -6,7 +6,7 @@
 //! A card with escape lists `way(cost, exile, text)` as its first way; "unless it escaped" reads the way the permanent
 //! was cast for (CR 702.138b), which `sacrifice_unless_escaped` does for Phlage and Uro.
 
-use crate::triggers::this_enters;
+use crate::triggers::THIS_ENTERS;
 use cantrip_api::*;
 
 /// The escape cost: `cost` and the exiling of `exile` other cards from the graveyard (CR 702.138a).
@@ -47,11 +47,5 @@ fn sacrifice_unless_escaped_effect(g: &mut dyn Game, item: &StackItem) -> Result
 
 /// "When this enters, sacrifice it unless it escaped": `text` names the card.
 pub const fn sacrifice_unless_escaped(text: &'static str) -> AbilityDef {
-    AbilityDef::Triggered(TriggeredDef {
-        text,
-        listens: EventMask::ZONE_CHANGE,
-        matches: this_enters,
-        effect: sacrifice_unless_escaped_effect,
-        ..TriggeredDef::BLANK
-    })
+    triggered(THIS_ENTERS, sacrifice_unless_escaped_effect, text)
 }

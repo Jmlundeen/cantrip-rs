@@ -17,12 +17,6 @@ fn manifest_dread(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     // As an additional cost to cast this spell, exile six cards from your graveyard.
     additional_cost: Some(Cost { exile_from_graveyard: 6, ..Cost::NONE }),
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "At the beginning of each opponent's upkeep, manifest dread. (Look at the top two cards of your library. Put one onto the battlefield face down as a 2/2 creature and the other into your graveyard. Turn it face up any time for its mana cost if it's a creature card.)",
-        listens: EventMask::STEP_BEGAN,
-        matches: opponents_upkeep,
-        effect: manifest_dread,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(when(EventMask::STEP_BEGAN, opponents_upkeep), manifest_dread, "At the beginning of each opponent's upkeep, manifest dread. (Look at the top two cards of your library. Put one onto the battlefield face down as a 2/2 creature and the other into your graveyard. Turn it face up any time for its mana cost if it's a creature card.)")],
     ..oracle::ABHORRENT_OCULUS
 };

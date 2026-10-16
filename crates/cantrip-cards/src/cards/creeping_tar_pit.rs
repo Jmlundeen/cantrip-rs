@@ -22,13 +22,8 @@ fn becomes_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     enters: Some(mana::enters_tapped),
     abilities: &[
-        mana::tap_for_either(Color::Blue, Color::Black, "{T}: Add {U} or {B}."),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{1}{U}{B}: Until end of turn, this land becomes a 3/2 blue and black Elemental creature. It's still a land. It can't be blocked this turn.",
-            cost: Cost { mana: mana(1, 0, 1, 1, 0, 0), ..Cost::NONE },
-            effect: becomes_creature,
-            ..ActivatedDef::BLANK
-        }),
+        mana_ability(TAP, add_one_of(&[Color::Blue, Color::Black]), "{T}: Add {U} or {B}."),
+        ability(cost("{1}{U}{B}"), becomes_creature, "{1}{U}{B}: Until end of turn, this land becomes a 3/2 blue and black Elemental creature. It's still a land. It can't be blocked this turn."),
     ],
     ..oracle::CREEPING_TAR_PIT
 };

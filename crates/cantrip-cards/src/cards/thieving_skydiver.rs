@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{targets, triggers::this_enters};
+use cantrip_mechanics::{targets, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 /// "Target artifact with mana value X or less": the X it was kicked with, read from the creature (CR 702.33a).
@@ -26,14 +26,8 @@ fn take_and_attach(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     kicker: Some(Kicker { cost: ManaCost { x: 1, ..ManaCost::ZERO }, multi: false, waterbend: false }),
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When this creature enters, if it was kicked, gain control of target artifact with mana value X or less. If that artifact is an Equipment, attach it to this creature.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: this_enters,
-        targets: &[TargetSpec { min: 1, max: 1, filter: artifact_with_value_at_most_x }],
-        effect: take_and_attach,
-        condition: Some(was_kicked),
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(THIS_ENTERS, take_and_attach, "When this creature enters, if it was kicked, gain control of target artifact with mana value X or less. If that artifact is an Equipment, attach it to this creature.")
+        .targets(&[TargetSpec { min: 1, max: 1, filter: artifact_with_value_at_most_x }])
+        .condition(was_kicked)],
     ..oracle::THIEVING_SKYDIVER
 };

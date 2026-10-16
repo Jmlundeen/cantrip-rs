@@ -22,13 +22,7 @@ fn plus_three_power(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever equipped creature attacks, draw a card if you control three or more attacking creatures.",
-            listens: EventMask::ATTACKS,
-            matches: cantrip_mechanics::triggers::equipped_creature_attacks,
-            effect: draw_if_three,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(cantrip_mechanics::triggers::EQUIPPED_CREATURE_ATTACKS, draw_if_three, "Whenever equipped creature attacks, draw a card if you control three or more attacking creatures."),
         equip(mana(2, 0, 0, 0, 0, 0), "Equip {2}"),
     ],
     statics: &[StaticDef {

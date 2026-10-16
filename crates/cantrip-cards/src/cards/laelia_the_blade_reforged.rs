@@ -31,21 +31,9 @@ fn grow(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever Laelia, the Blade Reforged attacks, exile the top card of your library. You may play that card this turn.",
-            listens: EventMask::ATTACKS,
-            matches: cantrip_mechanics::triggers::this_attacks,
-            effect: exile_top,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever one or more cards are put into exile from your library and/or your graveyard, put a +1/+1 counter on Laelia, the Blade Reforged.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: cards_exiled,
-            effect: grow,
-            once_per_batch: true,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(cantrip_mechanics::triggers::THIS_ATTACKS, exile_top, "Whenever Laelia, the Blade Reforged attacks, exile the top card of your library. You may play that card this turn."),
+        triggered(when(EventMask::ZONE_CHANGE, cards_exiled), grow, "Whenever one or more cards are put into exile from your library and/or your graveyard, put a +1/+1 counter on Laelia, the Blade Reforged.")
+            .once_per_batch(),
     ],
     ..oracle::LAELIA_THE_BLADE_REFORGED
 };

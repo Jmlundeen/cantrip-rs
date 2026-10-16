@@ -33,13 +33,7 @@ pub static ORC_ARMY: CardDef = CardDef {
 pub static EXTRA: &[&CardDef] = &[&ORC_ARMY];
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When this creature enters and whenever an opponent draws a card except the first one they draw in each of their draw steps, this creature deals 1 damage to any target. Then amass Orcs 1.",
-        listens: EventMask(EventMask::ZONE_CHANGE.0 | EventMask::DREW.0),
-        matches: enters_or_opponent_draws,
-        targets: &[targets::ANY],
-        effect: shoot_and_amass,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(when(EventMask(EventMask::ZONE_CHANGE.0 | EventMask::DREW.0), enters_or_opponent_draws), shoot_and_amass, "When this creature enters and whenever an opponent draws a card except the first one they draw in each of their draw steps, this creature deals 1 damage to any target. Then amass Orcs 1.")
+        .targets(&[targets::ANY])],
     ..oracle::ORCISH_BOWMASTERS
 };

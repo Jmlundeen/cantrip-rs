@@ -15,11 +15,6 @@ fn tutor(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "{G}, Discard a creature card: Search your library for a creature card, reveal that card, put it into your hand, then shuffle.",
-        cost: Cost { mana: mana(0, 0, 0, 0, 0, 1), discard: Some((1, creature_card)), ..Cost::NONE },
-        effect: tutor,
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[ability(cost("{G}").and(discard(1, creature_card)), tutor, "{G}, Discard a creature card: Search your library for a creature card, reveal that card, put it into your hand, then shuffle.")],
     ..oracle::SURVIVAL_OF_THE_FITTEST
 };

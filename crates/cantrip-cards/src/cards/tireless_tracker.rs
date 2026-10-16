@@ -28,20 +28,8 @@ fn grow(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Landfall \u{2014} Whenever a land you control enters, investigate.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: cantrip_mechanics::triggers::landfall,
-            effect: clue,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever you sacrifice a Clue, put a +1/+1 counter on Tireless Tracker.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: you_sacrifice_a_clue,
-            effect: grow,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(cantrip_mechanics::triggers::LANDFALL, clue, "Landfall \u{2014} Whenever a land you control enters, investigate."),
+        triggered(when(EventMask::ZONE_CHANGE, you_sacrifice_a_clue), grow, "Whenever you sacrifice a Clue, put a +1/+1 counter on Tireless Tracker."),
     ],
     ..oracle::TIRELESS_TRACKER
 };

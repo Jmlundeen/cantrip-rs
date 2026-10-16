@@ -19,13 +19,7 @@ fn rummage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever this creature attacks, discard your hand, then draw three cards.",
-        listens: EventMask::ATTACKS,
-        matches: triggers::this_attacks,
-        effect: rummage,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(triggers::THIS_ATTACKS, rummage, "Whenever this creature attacks, discard your hand, then draw three cards.")],
     statics: &[StaticDef {
         text: "This creature attacks each combat if able.",
         layer: Layer::Ability,

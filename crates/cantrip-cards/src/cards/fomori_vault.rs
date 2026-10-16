@@ -1,6 +1,5 @@
 use cantrip_api::*;
 use cantrip_mechanics::library::{look_at_top, Rest};
-use cantrip_mechanics::mana;
 use cantrip_oracle as oracle;
 
 fn any_card(_: &dyn Query, _: &Asker, _: ObjectId) -> bool {
@@ -19,13 +18,8 @@ fn look(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        mana::tap_for(mana::add_c, Mana::C, "{T}: Add {C}."),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{3}, {T}, Discard a card: Look at the top X cards of your library, where X is the number of artifacts you control. Put one of those cards into your hand and the rest on the bottom of your library in a random order.",
-            cost: Cost { mana: mana(3, 0, 0, 0, 0, 0), tap: true, discard: Some((1, any_card)), ..Cost::NONE },
-            effect: look,
-            ..ActivatedDef::BLANK
-        }),
+        mana_ability(TAP, add(Mana::C), "{T}: Add {C}."),
+        ability(cost("{3}, {T}").and(discard(1, any_card)), look, "{3}, {T}, Discard a card: Look at the top X cards of your library, where X is the number of artifacts you control. Put one of those cards into your hand and the rest on the bottom of your library in a random order."),
     ],
     ..oracle::FOMORI_VAULT
 };

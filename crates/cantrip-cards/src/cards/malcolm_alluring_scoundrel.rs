@@ -1,7 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::targets;
 use cantrip_mechanics::choose_from_hand;
-use cantrip_mechanics::triggers::deals_combat_damage_to_player;
+use cantrip_mechanics::triggers::DEALS_COMBAT_DAMAGE_TO_PLAYER;
 use cantrip_oracle as oracle;
 
 /// Put a chorus counter on it (if it is still on the battlefield), draw a card, then discard a card; with four or more
@@ -33,12 +33,6 @@ fn chorus(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever Malcolm deals combat damage to a player, put a chorus counter on it. Draw a card, then discard a card. If there are four or more chorus counters on Malcolm, you may cast the discarded card without paying its mana cost.",
-        listens: EventMask::DAMAGE,
-        matches: deals_combat_damage_to_player,
-        effect: chorus,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(DEALS_COMBAT_DAMAGE_TO_PLAYER, chorus, "Whenever Malcolm deals combat damage to a player, put a chorus counter on it. Draw a card, then discard a card. If there are four or more chorus counters on Malcolm, you may cast the discarded card without paying its mana cost.")],
     ..oracle::MALCOLM_ALLURING_SCOUNDREL
 };

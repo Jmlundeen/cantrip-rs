@@ -540,7 +540,7 @@ pub fn mana_ability_options(cx: &Cx, player: PlayerId, options: &mut Vec<ActionO
         let chars = cx.chars(id);
         for (index, ability) in chars.abilities().enumerate() {
             let Some(def) = activated(cx, ability) else { continue };
-            if def.mana.is_none()
+            if !def.is_mana_ability()
                 || def.from != ZoneKind::Battlefield
                 || limit_reached(cx, id, index, def)
                 || !can_pay_other(cx, id, player, &def.cost)
@@ -623,7 +623,7 @@ pub fn mana_ability_options(cx: &Cx, player: PlayerId, options: &mut Vec<ActionO
         let def = cx.card(cx.s().obj(id).card);
         for (index, ability) in def.abilities.iter().enumerate() {
             let AbilityDef::Activated(a) = ability else { continue };
-            if a.mana.is_none()
+            if !a.is_mana_ability()
                 || a.from != ZoneKind::Hand
                 || !can_pay_other(cx, id, player, &a.cost)
                 || static_rules::activation_barred(cx, &forbidders, id, a)
@@ -984,7 +984,7 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
         let mut unrestricted_count = 0;
         for (index, ability) in chars.abilities().enumerate() {
             let Some(def) = activated(cx, ability) else { continue };
-            if def.mana.is_none()
+            if !def.is_mana_ability()
                 || def.from != ZoneKind::Battlefield
                 || limit_reached(cx, id, index, def)
                 || !can_pay_other(cx, id, player, &def.cost)
@@ -1171,7 +1171,7 @@ fn activated_options(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOption>)
         let chars = cx.chars(id);
         for (index, ability) in chars.abilities().enumerate() {
             let Some(def) = activated(cx, ability) else { continue };
-            if def.mana.is_some()
+            if def.is_mana_ability()
                 || def.from != zone
                 || limit_reached(cx, id, index, def)
                 || static_rules::activation_barred(cx, &forbidders, id, def)
@@ -1728,7 +1728,7 @@ fn has_mana_source(cx: &Cx, id: ObjectId, player: PlayerId) -> bool {
     let forbidders = static_rules::activation_forbidders(cx);
     cx.chars(id).abilities().enumerate().any(|(index, ability)| {
         activated(cx, ability).is_some_and(|def| {
-            def.mana.is_some()
+            def.is_mana_ability()
                 && !limit_reached(cx, id, index, def)
                 && can_pay_other(cx, id, player, &def.cost)
                 && !static_rules::activation_barred(cx, &forbidders, id, def)
@@ -1861,7 +1861,7 @@ pub fn act(cx: &mut Cx, player: PlayerId) -> R<Flow> {
         ActionKind::ActivateAbility => {
             let ability = cx.chars(source).abilities().nth(action.index as usize).expect("ability");
             let def = activated(cx, ability).expect("an activated ability");
-            if def.mana.is_some() {
+            if def.is_mana_ability() {
                 activate_mana(cx, player, source, action.index, action.color, action.mana == Some(Mana::C), &action.targets)?;
             } else if def.special_action {
                 special_action(cx, player, source, ability)?;
@@ -3036,7 +3036,10 @@ pub fn activate_mana(
     }
     let asker = Asker { source, controller: player };
     if !adds_nothing {
-        (def.mana.expect("a mana ability"))(cx, &asker, color)?;
+        match def.mana {
+            Some(effect) => effect(cx, &asker, color)?,
+            None => add_listed(cx, player, def, if colorless { Some(Mana::C) } else { color.map(Color::mana) }),
+        }
     }
     if def.cost.tap {
         tapped_for_mana(cx, player, source);
@@ -3059,7 +3062,10 @@ fn activate_player_mana(cx: &mut Cx, player: PlayerId, source: ObjectId, n: u8) 
     };
     let def = activated(cx, ability).expect("activated");
     pay_life_and_counters(cx, player, source, &def.cost);
-    (def.mana.expect("a mana ability"))(cx, &Asker { source, controller: player }, None)?;
+    match def.mana {
+        Some(effect) => effect(cx, &Asker { source, controller: player }, None)?,
+        None => add_listed(cx, player, def, None),
+    }
     Ok(())
 }
 
@@ -3070,7 +3076,7 @@ fn producible_types(cx: &Cx, land: ObjectId) -> (ColorSet, bool) {
     let (mut colors, mut colorless) = (ColorSet::NONE, false);
     for ability in cx.chars(land).abilities() {
         let Some(def) = activated(cx, ability) else { continue };
-        if def.mana.is_none() || def.from != ZoneKind::Battlefield {
+        if !def.is_mana_ability() || def.from != ZoneKind::Battlefield {
             continue;
         }
         colorless |= def.adds.0[Mana::C as usize] > 0;

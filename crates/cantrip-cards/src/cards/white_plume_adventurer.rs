@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::{choose, effects};
-use cantrip_mechanics::triggers::this_enters;
+use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
 /// "At the beginning of each opponent's upkeep" (CR 503.1).
@@ -29,20 +29,8 @@ fn untap(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When this creature enters, you take the initiative.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            effect: effects::take_the_initiative,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "At the beginning of each opponent's upkeep, untap a creature you control. If you've completed a dungeon, untap all creatures you control instead.",
-            listens: EventMask::STEP_BEGAN,
-            matches: opponents_upkeep,
-            effect: untap,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(THIS_ENTERS, effects::take_the_initiative, "When this creature enters, you take the initiative."),
+        triggered(when(EventMask::STEP_BEGAN, opponents_upkeep), untap, "At the beginning of each opponent's upkeep, untap a creature you control. If you've completed a dungeon, untap all creatures you control instead."),
     ],
     ..oracle::WHITE_PLUME_ADVENTURER
 };

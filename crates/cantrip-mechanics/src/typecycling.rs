@@ -3,7 +3,7 @@
 //! (Forestcycling), L\u{f3}rien Revealed (Islandcycling), Oliphaunt (Mountaincycling) and Troll of Khazad-d\u{fb}m
 //! (Swampcycling) print it. Plain cycling (CR 702.29a) is `triggers::cycling`.
 //!
-//! A card with typecycling lists `ability(subtype, cost, text)` among its `abilities`; `subtype` is the basic land type
+//! A card with typecycling lists `cantrip_api::ability(subtype, cost, text)` among its `abilities`; `subtype` is the basic land type
 //! it searches for.
 
 use crate::search_library;
@@ -40,11 +40,6 @@ pub const fn ability(subtype: Subtype, mana: ManaCost, text: &'static str) -> Ab
         Subtype::Forest => search_forest,
         _ => panic!("typecycling is implemented for the basic land types"),
     };
-    AbilityDef::Activated(ActivatedDef {
-        text,
-        cost: Cost { mana, discard_self: true, ..Cost::NONE },
-        effect,
-        from: ZoneKind::Hand,
-        ..ActivatedDef::BLANK
-    })
+    cantrip_api::ability(Cost::mana(mana).and(DISCARD_THIS), effect, text)
+        .from(ZoneKind::Hand)
 }

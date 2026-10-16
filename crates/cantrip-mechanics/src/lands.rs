@@ -75,12 +75,6 @@ pub fn destroy_target_its_controller_may_fetch_basic(g: &mut dyn Game, item: &St
     Ok(())
 }
 
-fn add_two<const A: u8, const B2: u8>(g: &mut dyn Game, asker: &Asker, _: Option<Color>) -> Result<(), Suspend> {
-    g.add_mana(asker.controller, Mana::ALL[A as usize], 1);
-    g.add_mana(asker.controller, Mana::ALL[B2 as usize], 1);
-    Ok(())
-}
-
 fn return_a_land(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let player = item.controller;
     let lands: Vec<ObjectId> = g.permanents_of(player).into_iter().filter(|&id| g.chars(id).is(CardType::Land)).collect();
@@ -95,24 +89,9 @@ fn return_a_land(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// targeted, and the land itself may be the one; asked whenever there is a land to choose. With `enters:
 /// Some(mana::enters_tapped)` it is Azorius Chancery, Orzhov Basilica and the rest of the cycle.
 pub const fn bounce_land<const A: u8, const B2: u8>(text: &'static str) -> [AbilityDef; 2] {
-    let mut adds = [0u8; 6];
-    adds[A as usize] += 1;
-    adds[B2 as usize] += 1;
     [
-        AbilityDef::Activated(ActivatedDef {
-            text,
-            cost: Cost { tap: true, ..Cost::NONE },
-            mana: Some(add_two::<A, B2>),
-            adds: ManaPool(adds),
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When this land enters, return a land you control to its owner's hand.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: triggers::this_enters,
-            effect: return_a_land,
-            ..TriggeredDef::BLANK
-        }),
+        mana_ability(TAP, add_each(&[Mana::ALL[A as usize], Mana::ALL[B2 as usize]]), text),
+        triggered(triggers::THIS_ENTERS, return_a_land, "When this land enters, return a land you control to its owner's hand."),
     ]
 }
 
@@ -129,12 +108,7 @@ fn fetch_two_types<const A: u16, const B2: u16>(g: &mut dyn Game, item: &StackIt
 /// card, put it onto the battlefield, then shuffle." `text` is the full text. The types are the ones the land's text named
 /// as it was sacrificed (CR 612.2, 113.7a). Flooded Strand and Arid Mesa print it.
 pub const fn fetch_land<const A: u16, const B2: u16>(text: &'static str) -> AbilityDef {
-    AbilityDef::Activated(ActivatedDef {
-        text,
-        cost: Cost { tap: true, sacrifice_self: true, life: 1, ..Cost::NONE },
-        effect: fetch_two_types::<A, B2>,
-        ..ActivatedDef::BLANK
-    })
+    ability(TAP.and(life(1)).and(SACRIFICE_THIS), fetch_two_types::<A, B2>, text)
 }
 
 fn fetch_basic(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -149,12 +123,7 @@ fn fetch_basic(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// card, put it onto the battlefield, then shuffle." Prismatic Vista prints it, and so does every land that borrows its
 /// text.
 pub const fn fetch_basic_land(text: &'static str) -> AbilityDef {
-    AbilityDef::Activated(ActivatedDef {
-        text,
-        cost: Cost { tap: true, sacrifice_self: true, life: 1, ..Cost::NONE },
-        effect: fetch_basic,
-        ..ActivatedDef::BLANK
-    })
+    ability(TAP.and(SACRIFICE_THIS).and(life(1)), fetch_basic, text)
 }
 
 /// The triomes' "Cycling {3}" (CR 702.29): with `enters: Some(mana::enters_tapped)` and its three basic land types, a
@@ -163,42 +132,18 @@ pub const TRIOME_CYCLING: AbilityDef = triggers::cycling(mana(3, 0, 0, 0, 0, 0),
 
 /// The surveil lands' "When this land enters, surveil 1" (CR 701.25): with `enters: Some(mana::enters_tapped)`, Meticulous
 /// Archive and Undercity Sewers.
-pub const SURVEIL_LAND: AbilityDef = AbilityDef::Triggered(TriggeredDef {
-    text: "When this land enters, surveil 1.",
-    listens: EventMask::ZONE_CHANGE,
-    matches: triggers::this_enters,
-    effect: effects::surveil::<1>,
-    ..TriggeredDef::BLANK
-});
+pub const SURVEIL_LAND: AbilityDef = triggered(triggers::THIS_ENTERS, effects::surveil::<1>, "When this land enters, surveil 1.");
 
 /// A horizon land's mana ability: "{T}, Pay 1 life: Add {A} or {B}." (`text` is its full text), the color named as it is
 /// activated (CR 106.5). Horizon Canopy and Fiery Islet print it.
 pub const fn pay_life_for_either(a: Color, b: Color, text: &'static str) -> AbilityDef {
-    AbilityDef::Activated(ActivatedDef {
-        text,
-        cost: Cost { tap: true, life: 1, ..Cost::NONE },
-        mana: Some(mana::add_chosen),
-        any_color: true,
-        colors: ColorSet(ColorSet::of(a).0 | ColorSet::of(b).0),
-        adds_any: 1,
-        ..ActivatedDef::BLANK
-    })
+    mana_ability(TAP.and(life(1)), add_any_color(1).colors(ColorSet(ColorSet::of(a).0 | ColorSet::of(b).0)), text)
 }
 
 /// A horizon land's other ability: "{1}, {T}, Sacrifice this land: Draw a card." (`text` is its full text, with the land's
 /// name). Horizon Canopy and Fiery Islet print it.
 pub const fn sacrifice_to_draw(text: &'static str) -> AbilityDef {
-    AbilityDef::Activated(ActivatedDef {
-        text,
-        cost: Cost { mana: mana(1, 0, 0, 0, 0, 0), tap: true, sacrifice_self: true, ..Cost::NONE },
-        effect: effects::draw::<1>,
-        ..ActivatedDef::BLANK
-    })
-}
-
-fn add_one<const N: u8>(g: &mut dyn Game, asker: &Asker, _: Option<Color>) -> Result<(), Suspend> {
-    g.add_mana(asker.controller, Mana::ALL[N as usize], 1);
-    Ok(())
+    ability(cost("{1}, {T}").and(SACRIFICE_THIS), effects::draw::<1>, text)
 }
 
 fn controls_either<const A: u16, const B2: u16>(q: &dyn Query, asker: &Asker) -> bool {
@@ -211,17 +156,8 @@ pub const fn verge<const PRIMARY: u8, const SECOND: u8, const A: u16, const B2: 
     primary_text: &'static str,
     second_text: &'static str,
 ) -> [AbilityDef; 2] {
-    let mut second = [0u8; 6];
-    second[SECOND as usize] = 1;
     [
-        mana::tap_for(add_one::<PRIMARY>, Mana::ALL[PRIMARY as usize], primary_text),
-        AbilityDef::Activated(ActivatedDef {
-            text: second_text,
-            cost: Cost { tap: true, ..Cost::NONE },
-            mana: Some(add_one::<SECOND>),
-            adds: ManaPool(second),
-            condition: Some(controls_either::<A, B2>),
-            ..ActivatedDef::BLANK
-        }),
+        mana_ability(TAP, add(Mana::ALL[PRIMARY as usize]), primary_text),
+        mana_ability(TAP, add(Mana::ALL[SECOND as usize]), second_text).condition(controls_either::<A, B2>),
     ]
 }

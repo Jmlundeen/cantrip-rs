@@ -19,11 +19,6 @@ fn search(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "{T}, Sacrifice Fabled Passage: Search your library for a basic land card, put it onto the battlefield tapped, then shuffle. Then if you control four or more lands, untap that land.",
-        cost: Cost { tap: true, sacrifice_self: true, ..Cost::NONE },
-        effect: search,
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[ability(TAP.and(SACRIFICE_THIS), search, "{T}, Sacrifice Fabled Passage: Search your library for a basic land card, put it onto the battlefield tapped, then shuffle. Then if you control four or more lands, untap that land.")],
     ..oracle::FABLED_PASSAGE
 };

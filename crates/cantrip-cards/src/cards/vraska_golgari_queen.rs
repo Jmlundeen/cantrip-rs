@@ -56,41 +56,17 @@ fn that_player_loses(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> 
 pub static EMBLEM: CardDef = CardDef {
     name: "Vraska, Golgari Queen emblem",
     has_cost: false,
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever a creature you control deals combat damage to a player, that player loses the game.",
-        listens: EventMask::DAMAGE,
-        matches: creature_you_control_hits_a_player,
-        effect: that_player_loses,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(when(EventMask::DAMAGE, creature_you_control_hits_a_player), that_player_loses, "Whenever a creature you control deals combat damage to a player, that player loses the game.")],
     text: "Whenever a creature you control deals combat damage to a player, that player loses the game.",
     ..CardDef::BLANK
 };
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "+2: You may sacrifice another permanent. If you do, you gain 1 life and draw a card.",
-            cost: Cost { loyalty: Some(2), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            effect: sacrifice_to_draw,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "\u{2212}3: Destroy target nonland permanent with mana value 3 or less.",
-            cost: Cost { loyalty: Some(-3), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            targets: &[TargetSpec { min: 1, max: 1, filter: nonland_permanent_with_mana_value_three_or_less }],
-            effect: destroy,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "\u{2212}9: You get an emblem with \"Whenever a creature you control deals combat damage to a player, that player loses the game.\"",
-            cost: Cost { loyalty: Some(-9), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            effect: emblem,
-            ..ActivatedDef::BLANK
-        }),
+        ability(loyalty(2), sacrifice_to_draw, "+2: You may sacrifice another permanent. If you do, you gain 1 life and draw a card."),
+        ability(loyalty(-3), destroy, "\u{2212}3: Destroy target nonland permanent with mana value 3 or less.")
+            .targets(&[TargetSpec { min: 1, max: 1, filter: nonland_permanent_with_mana_value_three_or_less }]),
+        ability(loyalty(-9), emblem, "\u{2212}9: You get an emblem with \"Whenever a creature you control deals combat damage to a player, that player loses the game.\""),
     ],
     ..oracle::VRASKA_GOLGARI_QUEEN
 };

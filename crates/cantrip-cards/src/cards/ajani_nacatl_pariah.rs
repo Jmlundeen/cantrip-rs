@@ -111,56 +111,22 @@ fn minus_four(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static BACK: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "+2: Put a +1/+1 counter on each Cat you control.",
-            cost: Cost { loyalty: Some(2), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            effect: plus_two,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "0: Create a 2/1 white Cat Warrior creature token. When you do, if you control a red permanent other than Ajani, he deals damage equal to the number of creatures you control to any target.",
-            cost: Cost { loyalty: Some(0), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            effect: zero,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "\u{2212}4: Each opponent chooses an artifact, a creature, an enchantment, and a planeswalker from among the nonland permanents they control, then sacrifices the rest.",
-            cost: Cost { loyalty: Some(-4), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            effect: minus_four,
-            ..ActivatedDef::BLANK
-        }),
+        ability(loyalty(2), plus_two, "+2: Put a +1/+1 counter on each Cat you control."),
+        ability(loyalty(0), zero, "0: Create a 2/1 white Cat Warrior creature token. When you do, if you control a red permanent other than Ajani, he deals damage equal to the number of creatures you control to any target."),
+        ability(loyalty(-4), minus_four, "\u{2212}4: Each opponent chooses an artifact, a creature, an enchantment, and a planeswalker from among the nonland permanents they control, then sacrifices the rest."),
     ],
-    delayed: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When you do, if you control a red permanent other than Ajani, he deals damage equal to the number of creatures you control to any target.",
-        targets: &[targets::ANY],
-        effect: damage_for_creatures,
-        condition: Some(controls_other_red),
-        ..TriggeredDef::BLANK
-    })],
+    delayed: &[delayed_trigger(damage_for_creatures, "When you do, if you control a red permanent other than Ajani, he deals damage equal to the number of creatures you control to any target.")
+        .targets(&[targets::ANY])
+        .condition(controls_other_red)],
     ..oracle::AJANI_NACATL_AVENGER
 };
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When Ajani enters, create a 2/1 white Cat Warrior creature token.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: triggers::this_enters,
-            effect: enters_make_cat,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever one or more other Cats you control die, you may exile Ajani, then return him to the battlefield transformed under his owner's control.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: cats_die,
-            effect: exile_and_return,
-            look_back: true,
-            once_per_batch: true,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(triggers::THIS_ENTERS, enters_make_cat, "When Ajani enters, create a 2/1 white Cat Warrior creature token."),
+        triggered(when(EventMask::ZONE_CHANGE, cats_die), exile_and_return, "Whenever one or more other Cats you control die, you may exile Ajani, then return him to the battlefield transformed under his owner's control.")
+            .look_back()
+            .once_per_batch(),
     ],
     back: Some(&BACK),
     ..oracle::AJANI_NACATL_PARIAH

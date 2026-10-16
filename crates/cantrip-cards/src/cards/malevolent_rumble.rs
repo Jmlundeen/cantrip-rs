@@ -1,6 +1,5 @@
 use cantrip_api::*;
 use cantrip_mechanics::library::reveal_top_take_one_rest_to_graveyard;
-use cantrip_mechanics::mana;
 use cantrip_oracle as oracle;
 
 /// The 0/1 colorless Eldrazi Spawn creature token with "Sacrifice this token: Add {C}."
@@ -11,13 +10,7 @@ pub static ELDRAZI_SPAWN: CardDef = CardDef {
     subtypes: SubtypeSet::of(&[Subtype::Eldrazi, Subtype::Spawn]),
     power: Some(0),
     toughness: Some(1),
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "Sacrifice this token: Add {C}.",
-        cost: Cost { sacrifice_self: true, ..Cost::NONE },
-        mana: Some(mana::add_c),
-        adds: ManaPool([0, 0, 0, 0, 0, 1]),
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[mana_ability(SACRIFICE_THIS, add(Mana::C), "Sacrifice this token: Add {C}.")],
     text: "Sacrifice this token: Add {C}.",
     ..CardDef::BLANK
 };

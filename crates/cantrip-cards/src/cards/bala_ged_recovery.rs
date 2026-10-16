@@ -15,7 +15,7 @@ fn recover(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static BACK: CardDef = CardDef {
-    abilities: &[mana::tap_for(mana::add_g, Mana::G, "{T}: Add {G}.")],
+    abilities: &[mana_ability(TAP, add(Mana::G), "{T}: Add {G}.")],
     enters: Some(mana::enters_tapped),
     ..oracle::BALA_GED_SANCTUARY
 };

@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::targets;
-use cantrip_mechanics::triggers::this_enters;
+use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
 /// Mode 0: put two +1/+1 counters on this creature.
@@ -33,12 +33,6 @@ static MODAL: ModalDef = ModalDef {
 };
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When this creature enters, choose one \u{2014} Put two +1/+1 counters on this creature; or destroy target artifact or enchantment; or you gain 4 life.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: this_enters,
-        modal: Some(&MODAL),
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[modal_triggered(THIS_ENTERS, &MODAL, "When this creature enters, choose one \u{2014} Put two +1/+1 counters on this creature; or destroy target artifact or enchantment; or you gain 4 life.")],
     ..oracle::KNIGHT_OF_AUTUMN
 };

@@ -526,7 +526,7 @@ fn intrinsic_mana(cards: &CardTable, def: &CardDef, chars: &mut Chars) {
     let at = chars
         .abilities
         .iter()
-        .position(|a| !matches!(a, Some(r) if matches!(cards.ability(*r), AbilityDef::Activated(d) if d.mana.is_some())))
+        .position(|a| !matches!(a, Some(r) if matches!(cards.ability(*r), AbilityDef::Activated(d) if d.is_mana_ability())))
         .unwrap_or(MAX_ABILITIES);
     let mut out = [None; MAX_ABILITIES];
     let mut n = 0;

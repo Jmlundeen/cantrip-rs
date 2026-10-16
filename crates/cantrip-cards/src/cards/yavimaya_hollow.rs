@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{mana, regenerate, targets};
+use cantrip_mechanics::{regenerate, targets};
 use cantrip_oracle as oracle;
 
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -9,14 +9,9 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        mana::tap_for(mana::add_c, Mana::C, "{T}: Add {C}."),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{G}, {T}: Regenerate target creature.",
-            cost: Cost { mana: cantrip_api::mana(0, 0, 0, 0, 0, 1), tap: true, ..Cost::NONE },
-            targets: &[targets::CREATURE],
-            effect,
-            ..ActivatedDef::BLANK
-        }),
+        mana_ability(TAP, add(Mana::C), "{T}: Add {C}."),
+        ability(cost("{G}, {T}"), effect, "{G}, {T}: Regenerate target creature.")
+            .targets(&[targets::CREATURE]),
     ],
     ..oracle::YAVIMAYA_HOLLOW
 };

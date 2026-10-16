@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::evoke;
-use cantrip_mechanics::triggers::this_enters;
+use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_mechanics::library::{Find, search_to_hand};
 use cantrip_mechanics::{damage_target, targets};
 use cantrip_oracle as oracle;
@@ -36,23 +36,11 @@ fn search(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         evoke::sacrifice_trigger("When Vibrance enters, if its evoke cost was paid, its controller sacrifices it."),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When this creature enters, if {R}{R} was spent to cast it, this creature deals 3 damage to any target.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            targets: &[targets::ANY],
-            condition: Some(red_red_spent),
-            effect: damage,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When this creature enters, if {G}{G} was spent to cast it, search your library for a land card, reveal it, put it into your hand, then shuffle. You gain 2 life.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            condition: Some(green_green_spent),
-            effect: search,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(THIS_ENTERS, damage, "When this creature enters, if {R}{R} was spent to cast it, this creature deals 3 damage to any target.")
+            .targets(&[targets::ANY])
+            .condition(red_red_spent),
+        triggered(THIS_ENTERS, search, "When this creature enters, if {G}{G} was spent to cast it, search your library for a land card, reveal it, put it into your hand, then shuffle. You gain 2 life.")
+            .condition(green_green_spent),
     ],
     ways: &[evoke::way(Cost::mana(ManaCost {
             generic: 0,

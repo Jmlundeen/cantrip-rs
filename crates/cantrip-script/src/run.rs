@@ -1757,11 +1757,11 @@ impl<'s> Run<'s> {
         let Some(source) = option.source else { return true };
         let Some(ability) = g.chars(source).abilities().nth(option.index as usize) else { return true };
         match g.cards.ability(ability) {
-            AbilityDef::Activated(d) if d.mana.is_some() && d.adds.total() > 0 => {
+            AbilityDef::Activated(d) if d.is_mana_ability() && d.adds.total() > 0 => {
                 d.adds.get(color.map_or(Mana::C, |c| c.mana())) > 0
             }
             // An ability that adds no mana (a land's sacrifice-to-draw) is not one that adds this color.
-            AbilityDef::Activated(d) if d.mana.is_none() => false,
+            AbilityDef::Activated(d) if !d.is_mana_ability() => false,
             _ => true,
         }
     }
@@ -1770,7 +1770,7 @@ impl<'s> Run<'s> {
         let Some(source) = option.source else { return false };
         let g = &self.game;
         let ability = g.chars(source).abilities().nth(option.index as usize);
-        matches!(ability.map(|a| g.cards.ability(a)), Some(AbilityDef::Activated(d)) if d.mana.is_some())
+        matches!(ability.map(|a| g.cards.ability(a)), Some(AbilityDef::Activated(d)) if d.is_mana_ability())
     }
 
     fn match_option(&self, step: &ActionStep, options: &[ActionOption]) -> R<Option<Answer>> {

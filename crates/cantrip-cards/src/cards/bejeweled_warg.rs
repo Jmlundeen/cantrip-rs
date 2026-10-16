@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::{tokens, targets};
-use cantrip_mechanics::triggers::deals_combat_damage_to_player;
+use cantrip_mechanics::triggers::DEALS_COMBAT_DAMAGE_TO_PLAYER;
 use cantrip_oracle as oracle;
 
 /// "Target Wolf you control" (CR 115.1).
@@ -40,13 +40,7 @@ static MODAL: ModalDef = ModalDef {
 };
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever this creature deals combat damage to a player, choose one \u{2014} Put a +1/+1 counter on target Wolf you control; or create a Treasure token.",
-        listens: EventMask::DAMAGE,
-        matches: deals_combat_damage_to_player,
-        modal: Some(&MODAL),
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[modal_triggered(DEALS_COMBAT_DAMAGE_TO_PLAYER, &MODAL, "Whenever this creature deals combat damage to a player, choose one \u{2014} Put a +1/+1 counter on target Wolf you control; or create a Treasure token.")],
     ..oracle::BEJEWELED_WARG
 };
 

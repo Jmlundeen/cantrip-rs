@@ -20,7 +20,7 @@ fn apply(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
 }
 
 pub static BACK: CardDef = CardDef {
-    abilities: &[mana::tap_for_either(Color::Green, Color::White, "{T}: Add {G} or {W}.")],
+    abilities: &[mana_ability(TAP, add_one_of(&[Color::Green, Color::White]), "{T}: Add {G} or {W}.")],
     enters: Some(mana::enters_tapped),
     ..oracle::HAVEN_OF_THE_HARVEST
 };

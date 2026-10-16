@@ -1,7 +1,7 @@
 //! Harness (CR 701.64a) and infinity (CR 702.186): "[Cost]: Harness this permanent" gives it a designation that stays
 //! with it, and the infinity ability is the permanent's only while it is harnessed. The Mind Stone prints both.
 //!
-//! A card with harness lists `ability(cost, text)` among its `abilities`, its infinity ability as its first `delayed`
+//! A card with harness lists `cantrip_api::ability(cost, text)` among its `abilities`, its infinity ability as its first `delayed`
 //! ability, and `infinity(text)` among its `statics`.
 
 use cantrip_api::*;
@@ -24,7 +24,7 @@ fn harness(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 /// The ability that harnesses the permanent, for `cost`.
 pub const fn ability(cost: Cost, text: &'static str) -> AbilityDef {
-    AbilityDef::Activated(ActivatedDef { text, cost, effect: harness, ..ActivatedDef::BLANK })
+    cantrip_api::ability(cost, harness, text)
 }
 
 fn is_self_harnessed(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Chars) -> bool {

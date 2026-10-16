@@ -16,14 +16,9 @@ fn other_creature_you_control(q: &dyn Query, asker: &Asker, t: Target) -> bool {
 
 /// "Attach this permanent to another target creature you control": the permanent itself is a creature until attached.
 pub const fn attach(cost: ManaCost, text: &'static str) -> AbilityDef {
-    AbilityDef::Activated(ActivatedDef {
-        text,
-        cost: Cost { mana: cost, ..Cost::NONE },
-        timing: Timing::Sorcery,
-        targets: &[TargetSpec { min: 1, max: 1, filter: other_creature_you_control }],
-        effect: attach_to_target,
-        ..ActivatedDef::BLANK
-    })
+    ability(Cost::mana(cost), attach_to_target, text)
+        .sorcery_speed()
+        .targets(&[TargetSpec { min: 1, max: 1, filter: other_creature_you_control }])
 }
 
 fn unattach_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -37,14 +32,9 @@ fn is_attached(q: &dyn Query, asker: &Asker) -> bool {
 
 /// "Unattach this permanent": only if it is attached to a creature.
 pub const fn unattach(cost: ManaCost, text: &'static str) -> AbilityDef {
-    AbilityDef::Activated(ActivatedDef {
-        text,
-        cost: Cost { mana: cost, ..Cost::NONE },
-        timing: Timing::Sorcery,
-        condition: Some(is_attached),
-        effect: unattach_it,
-        ..ActivatedDef::BLANK
-    })
+    ability(Cost::mana(cost), unattach_it, text)
+        .sorcery_speed()
+        .condition(is_attached)
 }
 
 /// "While attached, this isn't a creature" (CR 702.151e).

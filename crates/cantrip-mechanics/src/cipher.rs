@@ -78,10 +78,4 @@ fn cast_a_copy(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-pub const TRIGGER: AbilityDef = AbilityDef::Triggered(TriggeredDef {
-    text: "Whenever this creature deals combat damage to a player, you may copy the encoded card and you may cast the copy without paying its mana cost.",
-    listens: EventMask::DAMAGE,
-    matches: crate::triggers::deals_combat_damage_to_player,
-    effect: cast_a_copy,
-    ..TriggeredDef::BLANK
-});
+pub const TRIGGER: AbilityDef = triggered(crate::triggers::DEALS_COMBAT_DAMAGE_TO_PLAYER, cast_a_copy, "Whenever this creature deals combat damage to a player, you may copy the encoded card and you may cast the copy without paying its mana cost.");

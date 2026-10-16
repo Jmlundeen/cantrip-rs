@@ -35,25 +35,9 @@ fn gain_flying(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever this creature deals combat damage to a player or planeswalker, draw a card.",
-            listens: EventMask::DAMAGE,
-            matches: combat_damage_to_player_or_planeswalker,
-            effect: effects::draw::<1>,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "Discard a card: Put a +1/+1 counter on this creature.",
-            cost: Cost { discard: Some((1, filters::any)), ..Cost::NONE },
-            effect: grow,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "Exile three cards from your graveyard: This creature gains flying until end of turn.",
-            cost: Cost { exile_from_graveyard: 3, ..Cost::NONE },
-            effect: gain_flying,
-            ..ActivatedDef::BLANK
-        }),
+        triggered(when(EventMask::DAMAGE, combat_damage_to_player_or_planeswalker), effects::draw::<1>, "Whenever this creature deals combat damage to a player or planeswalker, draw a card."),
+        ability(discard(1, filters::any), grow, "Discard a card: Put a +1/+1 counter on this creature."),
+        ability(exile_from_graveyard(3), gain_flying, "Exile three cards from your graveyard: This creature gains flying until end of turn."),
     ],
     ..oracle::PSYCHIC_FROG
 };

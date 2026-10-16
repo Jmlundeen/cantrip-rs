@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::evoke;
-use cantrip_mechanics::{targets, triggers::this_enters};
+use cantrip_mechanics::{targets, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 fn green_card(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
@@ -22,14 +22,8 @@ fn graveyard_to_bottom(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
 pub static CARD: CardDef = CardDef {
     abilities: &[
         evoke::sacrifice_trigger("When Endurance enters, if its evoke cost was paid, its controller sacrifices it."),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When this creature enters, up to one target player puts all the cards from their graveyard on the bottom of their library in a random order.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            targets: &[TargetSpec { min: 0, ..targets::PLAYER }],
-            effect: graveyard_to_bottom,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(THIS_ENTERS, graveyard_to_bottom, "When this creature enters, up to one target player puts all the cards from their graveyard on the bottom of their library in a random order.")
+            .targets(&[TargetSpec { min: 0, ..targets::PLAYER }]),
     ],
     // Evoke: exile a green card from your hand rather than pay this spell's mana cost (CR 118.9).
     ways: &[evoke::way(evoke::exile_from_hand(green_card), "Evoke - Exile a green card from your hand")],

@@ -31,14 +31,8 @@ fn retaliate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever this creature is dealt damage, it deals that much damage to any other target. If a player is dealt damage this way, they can't gain life for the rest of the game.",
-        listens: EventMask::DAMAGE,
-        matches: dealt_damage,
-        sums_per_subject: true,
-        targets: &[TargetSpec { min: 1, max: 1, filter: any_other_target }],
-        effect: retaliate,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(when(EventMask::DAMAGE, dealt_damage), retaliate, "Whenever this creature is dealt damage, it deals that much damage to any other target. If a player is dealt damage this way, they can't gain life for the rest of the game.")
+        .targets(&[TargetSpec { min: 1, max: 1, filter: any_other_target }])
+        .sums_per_subject()],
     ..oracle::SCREAMING_NEMESIS
 };

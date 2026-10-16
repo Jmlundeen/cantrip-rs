@@ -55,29 +55,11 @@ fn minus_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "+1: Put a +1/+1 counter on up to one target creature. It gains first strike until end of turn.",
-            cost: Cost { loyalty: Some(1), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            targets: &[TargetSpec { min: 0, ..targets::CREATURE }],
-            effect: plus_one,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "\u{2212}1: Create a 2/2 white Samurai creature token with vigilance.",
-            cost: Cost { loyalty: Some(-1), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            effect: minus_one,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "\u{2212}2: Exile target tapped creature. You gain 2 life.",
-            cost: Cost { loyalty: Some(-2), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            targets: &[TargetSpec { min: 1, max: 1, filter: tapped_creature }],
-            effect: minus_two,
-            ..ActivatedDef::BLANK
-        }),
+        ability(loyalty(1), plus_one, "+1: Put a +1/+1 counter on up to one target creature. It gains first strike until end of turn.")
+            .targets(&[TargetSpec { min: 0, ..targets::CREATURE }]),
+        ability(loyalty(-1), minus_one, "\u{2212}1: Create a 2/2 white Samurai creature token with vigilance."),
+        ability(loyalty(-2), minus_two, "\u{2212}2: Exile target tapped creature. You gain 2 life.")
+            .targets(&[TargetSpec { min: 1, max: 1, filter: tapped_creature }]),
     ],
     instant_activation: &[instant_loyalty],
     ..oracle::THE_WANDERING_EMPEROR

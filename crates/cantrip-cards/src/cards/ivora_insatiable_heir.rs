@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::tokens;
-use cantrip_mechanics::triggers::{deals_combat_damage_to_player, this_enters};
+use cantrip_mechanics::triggers::{DEALS_COMBAT_DAMAGE_TO_PLAYER, THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 /// "Create a Blood token."
@@ -24,27 +24,9 @@ fn counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When Ivora enters and whenever it deals combat damage to a player, create a Blood token.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            effect: blood,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When Ivora enters and whenever it deals combat damage to a player, create a Blood token.",
-            listens: EventMask::DAMAGE,
-            matches: deals_combat_damage_to_player,
-            effect: blood,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever you discard a card, put a +1/+1 counter on Ivora.",
-            listens: EventMask::DISCARDED,
-            matches: you_discard,
-            effect: counter,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(THIS_ENTERS, blood, "When Ivora enters and whenever it deals combat damage to a player, create a Blood token."),
+        triggered(DEALS_COMBAT_DAMAGE_TO_PLAYER, blood, "When Ivora enters and whenever it deals combat damage to a player, create a Blood token."),
+        triggered(when(EventMask::DISCARDED, you_discard), counter, "Whenever you discard a card, put a +1/+1 counter on Ivora."),
     ],
     ..oracle::IVORA_INSATIABLE_HEIR
 };

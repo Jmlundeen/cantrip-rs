@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::targets;
-use cantrip_mechanics::triggers::this_enters;
+use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
 /// "Another target permanent": any permanent on the battlefield but the source itself.
@@ -21,18 +21,8 @@ fn exile(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When Flickerwisp enters, exile another target permanent. Return that card to the battlefield under its owner's control at the beginning of the next end step.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: this_enters,
-        targets: &[TargetSpec { min: 1, max: 1, filter: another_permanent }],
-        effect: exile,
-        ..TriggeredDef::BLANK
-    })],
-    delayed: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Return the card exiled with Flickerwisp to the battlefield under its owner's control.",
-        effect: cantrip_mechanics::delayed::return_subject_to_battlefield,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(THIS_ENTERS, exile, "When Flickerwisp enters, exile another target permanent. Return that card to the battlefield under its owner's control at the beginning of the next end step.")
+        .targets(&[TargetSpec { min: 1, max: 1, filter: another_permanent }])],
+    delayed: &[delayed_trigger(cantrip_mechanics::delayed::return_subject_to_battlefield, "Return the card exiled with Flickerwisp to the battlefield under its owner's control.")],
     ..oracle::FLICKERWISP
 };

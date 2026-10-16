@@ -57,26 +57,10 @@ fn empower(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever another creature you control enters, you gain 1 life and get {E} (an energy counter).",
-            listens: EventMask::ZONE_CHANGE,
-            matches: another_creature_enters,
-            effect: bank,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever you attack, you may pay {E}{E}{E}. When you do, put two +1/+1 counters and a flying counter on target attacking creature. It becomes an Angel in addition to its other types.",
-            listens: EventMask::ATTACKERS_DECLARED,
-            matches: cantrip_mechanics::triggers::you_attack,
-            effect: pay_energy,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(when(EventMask::ZONE_CHANGE, another_creature_enters), bank, "Whenever another creature you control enters, you gain 1 life and get {E} (an energy counter)."),
+        triggered(cantrip_mechanics::triggers::YOU_ATTACK, pay_energy, "Whenever you attack, you may pay {E}{E}{E}. When you do, put two +1/+1 counters and a flying counter on target attacking creature. It becomes an Angel in addition to its other types."),
     ],
-    delayed: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When you do, put two +1/+1 counters and a flying counter on target attacking creature. It becomes an Angel in addition to its other types.",
-        targets: &[TargetSpec { min: 1, max: 1, filter: attacking_creature }],
-        effect: empower,
-        ..TriggeredDef::BLANK
-    })],
+    delayed: &[delayed_trigger(empower, "When you do, put two +1/+1 counters and a flying counter on target attacking creature. It becomes an Angel in addition to its other types.")
+        .targets(&[TargetSpec { min: 1, max: 1, filter: attacking_creature }])],
     ..oracle::GUIDE_OF_SOULS
 };

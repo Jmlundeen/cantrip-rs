@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{targets, triggers::this_enters};
+use cantrip_mechanics::{targets, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 /// "Look at target opponent's hand. You may exile a nonland card from it. For as long as that card remains exiled, its
@@ -55,32 +55,15 @@ fn protect_creatures(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> 
 
 pub static BACK: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "At the beginning of your end step, put a +1/+1 counter on each creature that attacked this turn.",
-            listens: EventMask::STEP_BEGAN,
-            matches: cantrip_mechanics::triggers::your_end_step,
-            effect: counters_on_attackers,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "Sacrifice this enchantment: Creatures you control gain hexproof and indestructible until end of turn.",
-            cost: Cost { sacrifice_self: true, ..Cost::NONE },
-            effect: protect_creatures,
-            ..ActivatedDef::BLANK
-        }),
+        triggered(cantrip_mechanics::triggers::YOUR_END_STEP, counters_on_attackers, "At the beginning of your end step, put a +1/+1 counter on each creature that attacked this turn."),
+        ability(SACRIFICE_THIS, protect_creatures, "Sacrifice this enchantment: Creatures you control gain hexproof and indestructible until end of turn."),
     ],
     ..oracle::LIGHTSHIELD_ARRAY
 };
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When this Siege enters, look at target opponent's hand. You may exile a nonland card from it. For as long as that card remains exiled, its owner may play it. A spell cast this way costs {2} more to cast.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: this_enters,
-        targets: &[targets::OPPONENT],
-        effect: take_a_card,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(THIS_ENTERS, take_a_card, "When this Siege enters, look at target opponent's hand. You may exile a nonland card from it. For as long as that card remains exiled, its owner may play it. A spell cast this way costs {2} more to cast.")
+        .targets(&[targets::OPPONENT])],
     back: Some(&BACK),
     ..oracle::INVASION_OF_GOBAKHAN
 };

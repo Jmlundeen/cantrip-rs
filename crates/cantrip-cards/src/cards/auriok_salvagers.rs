@@ -20,12 +20,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "{1}{W}: Return target artifact card with mana value 1 or less from your graveyard to your hand.",
-        cost: Cost::mana(mana(1, 1, 0, 0, 0, 0)),
-        targets: &[TargetSpec { min: 1, max: 1, filter: cheap_artifact_in_your_graveyard }],
-        effect,
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[ability(cost("{1}{W}"), effect, "{1}{W}: Return target artifact card with mana value 1 or less from your graveyard to your hand.")
+        .targets(&[TargetSpec { min: 1, max: 1, filter: cheap_artifact_in_your_graveyard }])],
     ..oracle::AURIOK_SALVAGERS
 };

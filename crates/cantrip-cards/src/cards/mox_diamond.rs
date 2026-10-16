@@ -1,7 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::choose;
 use cantrip_mechanics::effects;
-use cantrip_mechanics::mana;
 use cantrip_oracle as oracle;
 
 /// "If this artifact would enter, you may discard a land card instead. If you do, put this artifact onto the battlefield. If
@@ -24,6 +23,6 @@ fn enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     enters: Some(enters),
-    abilities: &[mana::TAP_FOR_ANY_COLOR],
+    abilities: &[mana_ability(TAP, add_any_color(1), "{T}: Add one mana of any color.")],
     ..oracle::MOX_DIAMOND
 };

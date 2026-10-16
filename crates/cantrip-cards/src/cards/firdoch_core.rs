@@ -1,6 +1,5 @@
 use cantrip_api::*;
 use cantrip_mechanics::Animation;
-use cantrip_mechanics::mana::TAP_FOR_ANY_COLOR;
 use cantrip_oracle as oracle;
 
 /// "{4}: This artifact becomes a 4/4 artifact creature until end of turn." It is an artifact already, and a Kindred
@@ -21,13 +20,8 @@ fn animate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        TAP_FOR_ANY_COLOR,
-        AbilityDef::Activated(ActivatedDef {
-            text: "{4}: This artifact becomes a 4/4 artifact creature until end of turn.",
-            cost: Cost { mana: mana(4, 0, 0, 0, 0, 0), ..Cost::NONE },
-            effect: animate,
-            ..ActivatedDef::BLANK
-        }),
+        mana_ability(TAP, add_any_color(1), "{T}: Add one mana of any color."),
+        ability(cost("{4}"), animate, "{4}: This artifact becomes a 4/4 artifact creature until end of turn."),
     ],
     ..oracle::FIRDOCH_CORE
 };

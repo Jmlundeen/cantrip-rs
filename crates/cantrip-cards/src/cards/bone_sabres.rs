@@ -15,13 +15,7 @@ fn four_counters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever equipped creature attacks, put four +1/+1 counters on it.",
-            listens: EventMask::ATTACKS,
-            matches: cantrip_mechanics::triggers::equipped_creature_attacks_subject,
-            effect: four_counters,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(cantrip_mechanics::triggers::EQUIPPED_CREATURE_ATTACKS_SUBJECT, four_counters, "Whenever equipped creature attacks, put four +1/+1 counters on it."),
         equip(mana(3, 0, 0, 0, 0, 0), "Equip {3}"),
     ],
     ..oracle::BONE_SABRES

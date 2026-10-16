@@ -27,13 +27,7 @@ fn your_nonland_permanent_cards(q: &dyn LayerQuery, source: ObjectId, affected: 
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever Six attacks, mill three cards. You may put a land card from among them into your hand.",
-        listens: EventMask::ATTACKS,
-        matches: triggers::this_attacks,
-        effect: mill_and_take,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(triggers::THIS_ATTACKS, mill_and_take, "Whenever Six attacks, mill three cards. You may put a land card from among them into your hand.")],
     statics: &[StaticDef {
         text: "During your turn, nonland permanent cards in your graveyard have retrace.",
         layer: Layer::Ability,

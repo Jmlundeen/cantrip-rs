@@ -41,28 +41,11 @@ fn become_avatar(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-const HYBRID: Option<(Mana, Mana)> = Some((Mana::G, Mana::W));
-
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "{G/W}: This creature becomes a Kithkin Scout with base power and toughness 2/3.",
-            cost: Cost::mana(ManaCost { hybrid: [HYBRID, None, None, None, None, None], ..mana(0, 0, 0, 0, 0, 0) }),
-            effect: become_scout,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{1}{G/W}{G/W}: If this creature is a Scout, it becomes a Kithkin Soldier with base power and toughness 4/5.",
-            cost: Cost::mana(ManaCost { hybrid: [HYBRID, HYBRID, None, None, None, None], ..mana(1, 0, 0, 0, 0, 0) }),
-            effect: become_soldier,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{3}{G/W}{G/W}{G/W}: If this creature is a Soldier, it becomes a Kithkin Avatar with base power and toughness 7/8 and protection from each of your opponents.",
-            cost: Cost::mana(ManaCost { hybrid: [HYBRID, HYBRID, HYBRID, None, None, None], ..mana(3, 0, 0, 0, 0, 0) }),
-            effect: become_avatar,
-            ..ActivatedDef::BLANK
-        }),
+        ability(cost("{G/W}"), become_scout, "{G/W}: This creature becomes a Kithkin Scout with base power and toughness 2/3."),
+        ability(cost("{1}{G/W}{G/W}"), become_soldier, "{1}{G/W}{G/W}: If this creature is a Scout, it becomes a Kithkin Soldier with base power and toughness 4/5."),
+        ability(cost("{3}{G/W}{G/W}{G/W}"), become_avatar, "{3}{G/W}{G/W}{G/W}: If this creature is a Soldier, it becomes a Kithkin Avatar with base power and toughness 7/8 and protection from each of your opponents."),
     ],
     ..oracle::FIGURE_OF_FABLE
 };

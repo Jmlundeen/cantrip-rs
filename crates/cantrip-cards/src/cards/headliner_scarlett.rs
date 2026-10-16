@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{targets, triggers::this_enters};
+use cantrip_mechanics::{targets, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 /// Creatures target player controls can't block this turn (CR 509.1b): a rule about the player until the turn ends, so it
@@ -27,21 +27,9 @@ fn exile_top_and_play(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When Headliner Scarlett enters, creatures target player controls can't block this turn.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            targets: &[targets::PLAYER],
-            effect: cant_block,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "At the beginning of your upkeep, exile the top card of your library face down. You may look at and play that card this turn.",
-            listens: EventMask::STEP_BEGAN,
-            matches: cantrip_mechanics::triggers::your_upkeep,
-            effect: exile_top_and_play,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(THIS_ENTERS, cant_block, "When Headliner Scarlett enters, creatures target player controls can't block this turn.")
+            .targets(&[targets::PLAYER]),
+        triggered(cantrip_mechanics::triggers::YOUR_UPKEEP, exile_top_and_play, "At the beginning of your upkeep, exile the top card of your library face down. You may look at and play that card this turn."),
     ],
     ..oracle::HEADLINER_SCARLETT
 };

@@ -55,29 +55,11 @@ pub static EMBLEM: CardDef = CardDef {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "+1: Return up to one target land card from your graveyard to your hand.",
-            cost: Cost { loyalty: Some(1), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            targets: &[TargetSpec { min: 0, max: 1, filter: land_in_your_graveyard }],
-            effect: return_land,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "\u{2212}1: Wrenn and Six deals 1 damage to any target.",
-            cost: Cost { loyalty: Some(-1), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            targets: &[targets::ANY],
-            effect: ping,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "\u{2212}7: You get an emblem with \"Instant and sorcery cards in your graveyard have retrace.\"",
-            cost: Cost { loyalty: Some(-7), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            effect: emblem,
-            ..ActivatedDef::BLANK
-        }),
+        ability(loyalty(1), return_land, "+1: Return up to one target land card from your graveyard to your hand.")
+            .targets(&[TargetSpec { min: 0, max: 1, filter: land_in_your_graveyard }]),
+        ability(loyalty(-1), ping, "\u{2212}1: Wrenn and Six deals 1 damage to any target.")
+            .targets(&[targets::ANY]),
+        ability(loyalty(-7), emblem, "\u{2212}7: You get an emblem with \"Instant and sorcery cards in your graveyard have retrace.\""),
     ],
     ..oracle::WRENN_AND_SIX
 };

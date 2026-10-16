@@ -1,7 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::pump;
 use cantrip_mechanics::tokens;
-use cantrip_mechanics::triggers::{this_dies, this_enters};
+use cantrip_mechanics::triggers::{THIS_DIES, THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 /// "Create a Heartwood token."
@@ -27,27 +27,10 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         // "Enters or dies" is one event or the other, never both at once, so it is written as the two triggers it is:
         // a leaves-the-battlefield trigger is looked back on (CR 603.10a), an enters trigger is not (CR 603.6a).
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When Aerid Konstrari enters, create a Heartwood token.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            effect: create_heartwood,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When Aerid Konstrari dies, create a Heartwood token.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_dies,
-            effect: create_heartwood,
-            look_back: true,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{6}: Create a Heartwood token. Then Aerid Konstrari gets +X/+0 until end of turn, where X is the number of artifacts you control.",
-            cost: Cost { mana: mana(6, 0, 0, 0, 0, 0), ..Cost::NONE },
-            effect: make_and_grow,
-            ..ActivatedDef::BLANK
-        }),
+        triggered(THIS_ENTERS, create_heartwood, "When Aerid Konstrari enters, create a Heartwood token."),
+        triggered(THIS_DIES, create_heartwood, "When Aerid Konstrari dies, create a Heartwood token.")
+            .look_back(),
+        ability(cost("{6}"), make_and_grow, "{6}: Create a Heartwood token. Then Aerid Konstrari gets +X/+0 until end of turn, where X is the number of artifacts you control."),
     ],
     ..oracle::AERID_KONSTRARI
 };

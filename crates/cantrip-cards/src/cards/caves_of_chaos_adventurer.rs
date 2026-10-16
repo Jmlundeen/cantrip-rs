@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{triggers::this_enters, triggers, effects};
+use cantrip_mechanics::{triggers::THIS_ENTERS, triggers, effects};
 use cantrip_oracle as oracle;
 
 /// Exile the top card of your library. If you've completed a dungeon, you may play that card this turn without paying
@@ -21,20 +21,8 @@ fn exile_top_and_play(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When this creature enters, you take the initiative.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            effect: effects::take_the_initiative,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever this creature attacks, exile the top card of your library. If you've completed a dungeon, you may play that card this turn without paying its mana cost. Otherwise, you may play that card this turn.",
-            listens: EventMask::ATTACKS,
-            matches: triggers::this_attacks,
-            effect: exile_top_and_play,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(THIS_ENTERS, effects::take_the_initiative, "When this creature enters, you take the initiative."),
+        triggered(triggers::THIS_ATTACKS, exile_top_and_play, "Whenever this creature attacks, exile the top card of your library. If you've completed a dungeon, you may play that card this turn without paying its mana cost. Otherwise, you may play that card this turn."),
     ],
     ..oracle::CAVES_OF_CHAOS_ADVENTURER
 };

@@ -22,13 +22,8 @@ fn plot_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// Plot [cost]: a special action (CR 116.2k) from the hand, at sorcery timing. `text` is the ability's text, which a
 /// scenario's `Ability:` matches.
 pub const fn plot(cost: ManaCost, text: &'static str) -> AbilityDef {
-    AbilityDef::Activated(ActivatedDef {
-        text,
-        cost: Cost::mana(cost),
-        timing: Timing::Sorcery,
-        effect: plot_it,
-        from: ZoneKind::Hand,
-        special_action: true,
-        ..ActivatedDef::BLANK
-    })
+    ability(Cost::mana(cost), plot_it, text)
+        .sorcery_speed()
+        .from(ZoneKind::Hand)
+        .special_action()
 }

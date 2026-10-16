@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::triggers::this_enters;
+use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_mechanics::{damage_target, targets};
 use cantrip_oracle as oracle;
 
@@ -11,13 +11,7 @@ fn bolt(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When this creature enters, it deals 4 damage to target creature.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: this_enters,
-        targets: &[targets::CREATURE],
-        effect: bolt,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(THIS_ENTERS, bolt, "When this creature enters, it deals 4 damage to target creature.")
+        .targets(&[targets::CREATURE])],
     ..oracle::FLAMETONGUE_KAVU
 };

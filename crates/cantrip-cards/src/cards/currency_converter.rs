@@ -57,25 +57,9 @@ fn cash_in(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever you discard a card, you may exile that card from your graveyard.",
-            listens: EventMask::DISCARDED,
-            matches: you_discard,
-            effect: exile_discarded,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{2}, {T}: Draw a card, then discard a card.",
-            cost: Cost { mana: mana(2, 0, 0, 0, 0, 0), tap: true, ..Cost::NONE },
-            effect: cantrip_mechanics::effects::loot,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{T}: Put a card exiled with this artifact into its owner's graveyard. If it's a land card, create a Treasure token. If it's a nonland card, create a 2/2 black Rogue creature token.",
-            cost: Cost { tap: true, ..Cost::NONE },
-            effect: cash_in,
-            ..ActivatedDef::BLANK
-        }),
+        triggered(when(EventMask::DISCARDED, you_discard), exile_discarded, "Whenever you discard a card, you may exile that card from your graveyard."),
+        ability(cost("{2}, {T}"), cantrip_mechanics::effects::loot, "{2}, {T}: Draw a card, then discard a card."),
+        ability(TAP, cash_in, "{T}: Put a card exiled with this artifact into its owner's graveyard. If it's a land card, create a Treasure token. If it's a nonland card, create a 2/2 black Rogue creature token."),
     ],
     ..oracle::CURRENCY_CONVERTER
 };

@@ -84,55 +84,19 @@ pub static EMBLEM: CardDef = CardDef {
 
 pub static BACK: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "+2: Until your next turn, whenever a creature attacks you or a planeswalker you control, it gets -1/-0 until end of turn.",
-            cost: Cost { loyalty: Some(2), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            effect: plus_two,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "\u{2212}3: Return target instant or sorcery card from your graveyard to your hand. If it's a green card, add one mana of any color.",
-            cost: Cost { loyalty: Some(-3), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            targets: &[targets::INSTANT_OR_SORCERY_IN_YOUR_GRAVEYARD],
-            effect: minus_three,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "\u{2212}7: Draw cards equal to half the number of cards in your library, rounded up. You get an emblem with \"You have no maximum hand size.\"",
-            cost: Cost { loyalty: Some(-7), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            effect: minus_seven,
-            ..ActivatedDef::BLANK
-        }),
+        ability(loyalty(2), plus_two, "+2: Until your next turn, whenever a creature attacks you or a planeswalker you control, it gets -1/-0 until end of turn."),
+        ability(loyalty(-3), minus_three, "\u{2212}3: Return target instant or sorcery card from your graveyard to your hand. If it's a green card, add one mana of any color.")
+            .targets(&[targets::INSTANT_OR_SORCERY_IN_YOUR_GRAVEYARD]),
+        ability(loyalty(-7), minus_seven, "\u{2212}7: Draw cards equal to half the number of cards in your library, rounded up. You get an emblem with \"You have no maximum hand size.\""),
     ],
-    delayed: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever a creature attacks you or a planeswalker you control, it gets -1/-0 until end of turn.",
-        listens: EventMask::ATTACKS,
-        matches: creature_attacks_you_or_your_planeswalker,
-        effect: attacker_weakens,
-        ..TriggeredDef::BLANK
-    })],
+    delayed: &[triggered(when(EventMask::ATTACKS, creature_attacks_you_or_your_planeswalker), attacker_weakens, "Whenever a creature attacks you or a planeswalker you control, it gets -1/-0 until end of turn.")],
     ..oracle::TAMIYO_SEASONED_SCHOLAR
 };
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever Tamiyo attacks, investigate.",
-            listens: EventMask::ATTACKS,
-            matches: cantrip_mechanics::triggers::this_attacks,
-            effect: investigate_effect,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When you draw your third card in a turn, exile Tamiyo, then return her to the battlefield transformed under her owner's control.",
-            listens: EventMask::DREW,
-            matches: third_draw,
-            effect: transform_her,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(cantrip_mechanics::triggers::THIS_ATTACKS, investigate_effect, "Whenever Tamiyo attacks, investigate."),
+        triggered(when(EventMask::DREW, third_draw), transform_her, "When you draw your third card in a turn, exile Tamiyo, then return her to the battlefield transformed under her owner's control."),
     ],
     back: Some(&BACK),
     ..oracle::TAMIYO_INQUISITIVE_STUDENT

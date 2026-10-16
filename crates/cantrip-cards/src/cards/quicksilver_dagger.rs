@@ -32,13 +32,8 @@ fn grant_ping(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
 
 pub static CARD: CardDef = CardDef {
     enchant: Some(targets::CREATURE),
-    delayed: &[AbilityDef::Activated(ActivatedDef {
-        text: "{T}: This creature deals 1 damage to target player or planeswalker. You draw a card.",
-        cost: Cost { tap: true, ..Cost::NONE },
-        targets: &[TargetSpec { min: 1, max: 1, filter: player_or_planeswalker }],
-        effect: ping_and_draw,
-        ..ActivatedDef::BLANK
-    })],
+    delayed: &[ability(TAP, ping_and_draw, "{T}: This creature deals 1 damage to target player or planeswalker. You draw a card.")
+        .targets(&[TargetSpec { min: 1, max: 1, filter: player_or_planeswalker }])],
     statics: &[StaticDef {
         text: "Enchanted creature has \"{T}: This creature deals 1 damage to target player or planeswalker. You draw a card.\"",
         layer: Layer::Ability,

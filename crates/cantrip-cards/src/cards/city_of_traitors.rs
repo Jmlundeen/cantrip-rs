@@ -1,5 +1,4 @@
 use cantrip_api::*;
-use cantrip_mechanics::mana;
 use cantrip_oracle as oracle;
 
 /// "When you play another land" (CR 305.1): the special action of playing a land only, not a land put onto the
@@ -17,14 +16,8 @@ fn played_another_land(q: &dyn Query, source: ObjectId, event: &Event) -> Option
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        mana::tap_for_n(mana::add_cc, Mana::C, 2, "{T}: Add {C}{C}."),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When you play another land, sacrifice this land.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: played_another_land,
-            effect: cantrip_mechanics::effects::sacrifice_self,
-            ..TriggeredDef::BLANK
-        }),
+        mana_ability(TAP, add_n(Mana::C, 2), "{T}: Add {C}{C}."),
+        triggered(when(EventMask::ZONE_CHANGE, played_another_land), cantrip_mechanics::effects::sacrifice_self, "When you play another land, sacrifice this land."),
     ],
     ..oracle::CITY_OF_TRAITORS
 };

@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{choose, targets, triggers::this_enters};
+use cantrip_mechanics::{choose, targets, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 /// "Up to one target creature they control": controlled by the very opponent the first slot chose (CR 115.1, 601.2c),
@@ -31,13 +31,7 @@ fn reveal_and_exile(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When Cloak and Dagger enter, choose target opponent and up to one target creature they control. They reveal their hand. You may exile a nonland card from their hand or the chosen creature until Cloak and Dagger leave the battlefield.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: this_enters,
-        targets: &[targets::OPPONENT, TargetSpec { min: 0, max: 1, filter: creature_they_control }],
-        effect: reveal_and_exile,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(THIS_ENTERS, reveal_and_exile, "When Cloak and Dagger enter, choose target opponent and up to one target creature they control. They reveal their hand. You may exile a nonland card from their hand or the chosen creature until Cloak and Dagger leave the battlefield.")
+        .targets(&[targets::OPPONENT, TargetSpec { min: 0, max: 1, filter: creature_they_control }])],
     ..oracle::CLOAK_AND_DAGGER_ENTWINED
 };

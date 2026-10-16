@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{triggers::this_enters, effects, library::{search_to_hand, Find}};
+use cantrip_mechanics::{triggers::THIS_ENTERS, effects, library::{search_to_hand, Find}};
 use cantrip_oracle as oracle;
 
 /// You may search your library for up to two artifact, creature, and/or enchantment cards with mana value 1 or less,
@@ -19,12 +19,6 @@ fn search(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When Brightglass Gearhulk enters, you may search your library for up to two artifact, creature, and/or enchantment cards with mana value 1 or less, reveal them, put them into your hand, then shuffle.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: this_enters,
-        effect: search,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(THIS_ENTERS, search, "When Brightglass Gearhulk enters, you may search your library for up to two artifact, creature, and/or enchantment cards with mana value 1 or less, reveal them, put them into your hand, then shuffle.")],
     ..oracle::BRIGHTGLASS_GEARHULK
 };

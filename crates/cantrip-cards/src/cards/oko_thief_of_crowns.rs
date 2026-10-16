@@ -52,32 +52,14 @@ fn exchange(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "+2: Create a Food token.",
-            cost: Cost { loyalty: Some(2), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            effect: food,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "+1: Target artifact or creature loses all abilities and becomes a green Elk creature with base power and toughness 3/3.",
-            cost: Cost { loyalty: Some(1), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            targets: &[TargetSpec { min: 1, max: 1, filter: artifact_or_creature }],
-            effect: elk,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "\u{2212}5: Exchange control of target artifact or creature you control and target creature an opponent controls with power 3 or less.",
-            cost: Cost { loyalty: Some(-5), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            targets: &[
+        ability(loyalty(2), food, "+2: Create a Food token."),
+        ability(loyalty(1), elk, "+1: Target artifact or creature loses all abilities and becomes a green Elk creature with base power and toughness 3/3.")
+            .targets(&[TargetSpec { min: 1, max: 1, filter: artifact_or_creature }]),
+        ability(loyalty(-5), exchange, "\u{2212}5: Exchange control of target artifact or creature you control and target creature an opponent controls with power 3 or less.")
+            .targets(&[
                 TargetSpec { min: 1, max: 1, filter: artifact_or_creature_you_control },
                 TargetSpec { min: 1, max: 1, filter: small_creature_an_opponent_controls },
-            ],
-            effect: exchange,
-            ..ActivatedDef::BLANK
-        }),
+            ]),
     ],
     ..oracle::OKO_THIEF_OF_CROWNS
 };

@@ -42,21 +42,9 @@ fn minus_eight(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "+1: Target player mills two cards. Draw a card.",
-            cost: Cost { loyalty: Some(1), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            targets: &[targets::PLAYER],
-            effect: plus_one,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "\u{2212}8: Draw seven cards. Then if your library has no cards in it, you win the game.",
-            cost: Cost { loyalty: Some(-8), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            effect: minus_eight,
-            ..ActivatedDef::BLANK
-        }),
+        ability(loyalty(1), plus_one, "+1: Target player mills two cards. Draw a card.")
+            .targets(&[targets::PLAYER]),
+        ability(loyalty(-8), minus_eight, "\u{2212}8: Draw seven cards. Then if your library has no cards in it, you win the game."),
     ],
     replacements: &[ReplacementDef {
         hint: "wins the game instead of drawing from an empty library",

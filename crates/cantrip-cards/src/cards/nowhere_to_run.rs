@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{targets, triggers::this_enters};
+use cantrip_mechanics::{targets, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 /// "Target creature an opponent controls gets -3/-3 until end of turn" (CR 611.2a): -3/-3 from the layer 7c, on the creature
@@ -19,14 +19,8 @@ fn opponents_creature(q: &dyn LayerQuery, source: ObjectId, subject: ObjectId) -
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When this enchantment enters, target creature an opponent controls gets -3/-3 until end of turn.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: this_enters,
-        targets: &[targets::CREATURE_AN_OPPONENT_CONTROLS],
-        effect: minus_three,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(THIS_ENTERS, minus_three, "When this enchantment enters, target creature an opponent controls gets -3/-3 until end of turn.")
+        .targets(&[targets::CREATURE_AN_OPPONENT_CONTROLS])],
     targeting_rules: &[
         // CR 702.11b, 609.4: "as though they didn't have hexproof", so hexproof granted later is ignored too; shroud and
         // protection are not touched. Also the rule for Nowhere to Run's own enters trigger, which targets with it.

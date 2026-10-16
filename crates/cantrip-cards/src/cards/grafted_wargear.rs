@@ -18,14 +18,8 @@ fn unattached(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever this Equipment becomes unattached from a permanent, sacrifice that permanent.",
-            listens: EventMask::UNATTACHED,
-            matches: unattached,
-            effect: cantrip_mechanics::delayed::sacrifice_subject,
-            look_back: true,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(when(EventMask::UNATTACHED, unattached), cantrip_mechanics::delayed::sacrifice_subject, "Whenever this Equipment becomes unattached from a permanent, sacrifice that permanent.")
+            .look_back(),
         equip(mana(0, 0, 0, 0, 0, 0), "Equip {0}"),
     ],
     statics: &[StaticDef {

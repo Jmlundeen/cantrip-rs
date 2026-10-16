@@ -24,28 +24,11 @@ const TEXT: &str = "When this creature enters or becomes monstrous, destroy targ
 pub static CARD: CardDef = CardDef {
     abilities: &[
         // "Enters or becomes monstrous" is two triggers with the same effect.
-        AbilityDef::Triggered(TriggeredDef {
-            text: TEXT,
-            listens: EventMask::ZONE_CHANGE,
-            matches: triggers::this_enters,
-            targets: &[targets::PERMANENT],
-            effect: destroy_it,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: TEXT,
-            listens: EventMask::MONSTROUS,
-            matches: becomes_monstrous,
-            targets: &[targets::PERMANENT],
-            effect: destroy_it,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{5}{B}{G}: Monstrosity 4. (If this creature isn't monstrous, put four +1/+1 counters on it and it becomes monstrous.)",
-            cost: Cost::mana(mana(5, 0, 0, 1, 0, 1)),
-            effect: monstrosity_four,
-            ..ActivatedDef::BLANK
-        }),
+        triggered(triggers::THIS_ENTERS, destroy_it, TEXT)
+            .targets(&[targets::PERMANENT]),
+        triggered(when(EventMask::MONSTROUS, becomes_monstrous), destroy_it, TEXT)
+            .targets(&[targets::PERMANENT]),
+        ability(cost("{5}{B}{G}"), monstrosity_four, "{5}{B}{G}: Monstrosity 4. (If this creature isn't monstrous, put four +1/+1 counters on it and it becomes monstrous.)"),
     ],
     ..oracle::ALPHA_DEATHCLAW
 };

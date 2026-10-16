@@ -11,13 +11,7 @@ fn counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever a creature attacks enchanted player, put a +1/+1 counter on it.",
-        listens: EventMask::ATTACKS,
-        matches: cantrip_mechanics::triggers::enchanted_player_attacked,
-        effect: counter,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(cantrip_mechanics::triggers::ENCHANTED_PLAYER_ATTACKED, counter, "Whenever a creature attacks enchanted player, put a +1/+1 counter on it.")],
     enchant: Some(targets::PLAYER),
     ..oracle::CURSE_OF_PREDATION
 };

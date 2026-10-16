@@ -30,19 +30,8 @@ fn return_exiled(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever a creature you control attacks, exile the top card of your library face down. (You can't look at it.)",
-            listens: EventMask::ATTACKS,
-            matches: creature_you_control_attacks,
-            effect: exile_top,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{1}{R}, Discard your hand, Sacrifice this enchantment: Put all cards exiled with this enchantment into their owners' hands.",
-            cost: Cost { mana: mana(1, 0, 0, 0, 1, 0), discard_hand: true, sacrifice_self: true, ..Cost::NONE },
-            effect: return_exiled,
-            ..ActivatedDef::BLANK
-        }),
+        triggered(when(EventMask::ATTACKS, creature_you_control_attacks), exile_top, "Whenever a creature you control attacks, exile the top card of your library face down. (You can't look at it.)"),
+        ability(cost("{1}{R}").and(DISCARD_HAND).and(SACRIFICE_THIS), return_exiled, "{1}{R}, Discard your hand, Sacrifice this enchantment: Put all cards exiled with this enchantment into their owners' hands."),
     ],
     ..oracle::CONNECTING_THE_DOTS
 };

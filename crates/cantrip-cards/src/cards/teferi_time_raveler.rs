@@ -39,21 +39,9 @@ fn minus_three(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "+1: Until your next turn, you may cast sorcery spells as though they had flash.",
-            cost: Cost { loyalty: Some(1), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            effect: plus_one,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "\u{2212}3: Return up to one target artifact, creature, or enchantment to its owner's hand. Draw a card.",
-            cost: Cost { loyalty: Some(-3), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            targets: &[TargetSpec { min: 0, max: 1, filter: artifact_creature_or_enchantment }],
-            effect: minus_three,
-            ..ActivatedDef::BLANK
-        }),
+        ability(loyalty(1), plus_one, "+1: Until your next turn, you may cast sorcery spells as though they had flash."),
+        ability(loyalty(-3), minus_three, "\u{2212}3: Return up to one target artifact, creature, or enchantment to its owner's hand. Draw a card.")
+            .targets(&[TargetSpec { min: 0, max: 1, filter: artifact_creature_or_enchantment }]),
     ],
     cast_rules: &[opponents_cast_as_sorcery],
     ..oracle::TEFERI_TIME_RAVELER

@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{mana, targets};
+use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
 
 /// "Target non-Human creature that entered this turn" (CR 115.1, 400.7), asked of the event history.
@@ -18,14 +18,9 @@ fn counters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        mana::tap_for(mana::add_c, Mana::C, "{T}: Add {C}."),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{2}, {T}: Put two +1/+1 counters on target non-Human creature that entered this turn.",
-            cost: Cost { mana: mana(2, 0, 0, 0, 0, 0), tap: true, ..Cost::NONE },
-            targets: &[TargetSpec { min: 1, max: 1, filter: non_human_that_entered_this_turn }],
-            effect: counters,
-            ..ActivatedDef::BLANK
-        }),
+        mana_ability(TAP, add(Mana::C), "{T}: Add {C}."),
+        ability(cost("{2}, {T}"), counters, "{2}, {T}: Put two +1/+1 counters on target non-Human creature that entered this turn.")
+            .targets(&[TargetSpec { min: 1, max: 1, filter: non_human_that_entered_this_turn }]),
     ],
     ..oracle::DRANNITH_RUINS
 };

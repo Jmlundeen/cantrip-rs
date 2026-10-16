@@ -28,13 +28,7 @@ fn loot(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever this Vehicle attacks or blocks, you may draw a card. If you do, discard a card.",
-            listens: EventMask(EventMask::ATTACKS.0 | EventMask::BLOCKS.0),
-            matches: this_attacks_or_blocks,
-            effect: loot,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(when(EventMask(EventMask::ATTACKS.0 | EventMask::BLOCKS.0), this_attacks_or_blocks), loot, "Whenever this Vehicle attacks or blocks, you may draw a card. If you do, discard a card."),
         crew(1, "Crew 1 (Tap any number of creatures you control with total power 1 or more: This Vehicle becomes an artifact creature until end of turn.)"),
     ],
     ..oracle::SMUGGLERS_COPTER

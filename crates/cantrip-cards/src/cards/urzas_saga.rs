@@ -1,5 +1,4 @@
 use cantrip_api::*;
-use cantrip_mechanics::mana::{add_c, tap_for};
 use cantrip_mechanics::library::{Find, search_to_battlefield};
 use cantrip_mechanics::tokens::{self, CONSTRUCT};
 use cantrip_oracle as oracle;
@@ -44,33 +43,13 @@ fn chapter_three(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "I \u{2014} This Saga gains \"{T}: Add {C}.\"",
-            chapter: 1,
-            effect: chapter_one,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "II \u{2014} This Saga gains \"{2}, {T}: Create a 0/0 colorless Construct artifact creature token with 'This token gets +1/+1 for each artifact you control.'\"",
-            chapter: 2,
-            effect: chapter_two,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "III \u{2014} Search your library for an artifact card with mana cost {0} or {1}, put it onto the battlefield, then shuffle.",
-            chapter: 3,
-            effect: chapter_three,
-            ..TriggeredDef::BLANK
-        }),
+        chapter(1, chapter_one, "I \u{2014} This Saga gains \"{T}: Add {C}.\""),
+        chapter(2, chapter_two, "II \u{2014} This Saga gains \"{2}, {T}: Create a 0/0 colorless Construct artifact creature token with 'This token gets +1/+1 for each artifact you control.'\""),
+        chapter(3, chapter_three, "III \u{2014} Search your library for an artifact card with mana cost {0} or {1}, put it onto the battlefield, then shuffle."),
     ],
     delayed: &[
-        tap_for(add_c, Mana::C, "{T}: Add {C}."),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{2}, {T}: Create a 0/0 colorless Construct artifact creature token with \"This token gets +1/+1 for each artifact you control.\"",
-            cost: Cost { mana: mana(2, 0, 0, 0, 0, 0), tap: true, ..Cost::NONE },
-            effect: make_construct,
-            ..ActivatedDef::BLANK
-        }),
+        mana_ability(TAP, add(Mana::C), "{T}: Add {C}."),
+        ability(cost("{2}, {T}"), make_construct, "{2}, {T}: Create a 0/0 colorless Construct artifact creature token with \"This token gets +1/+1 for each artifact you control.\""),
     ],
     ..oracle::URZAS_SAGA
 };

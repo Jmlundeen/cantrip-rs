@@ -33,14 +33,8 @@ fn damage_by_the_entered_creature(g: &mut dyn Game, item: &StackItem) -> Result<
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever this creature or another Lhurgoyf creature you control enters, that creature deals damage equal to its power to any target.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: lhurgoyf_enters,
-        targets: &[targets::ANY],
-        effect: damage_by_the_entered_creature,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(when(EventMask::ZONE_CHANGE, lhurgoyf_enters), damage_by_the_entered_creature, "Whenever this creature or another Lhurgoyf creature you control enters, that creature deals damage equal to its power to any target.")
+        .targets(&[targets::ANY])],
     statics: &[goyf::SIZE],
     ..oracle::PYROGOYF
 };

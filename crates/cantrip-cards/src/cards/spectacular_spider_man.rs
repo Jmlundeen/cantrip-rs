@@ -27,18 +27,8 @@ fn protect_team(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "{1}: Spectacular Spider-Man gains flying until end of turn.",
-            cost: Cost::mana(mana(1, 0, 0, 0, 0, 0)),
-            effect: gain_flying,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{1}, Sacrifice Spectacular Spider-Man: Creatures you control gain hexproof and indestructible until end of turn.",
-            cost: Cost { mana: mana(1, 0, 0, 0, 0, 0), sacrifice_self: true, ..Cost::NONE },
-            effect: protect_team,
-            ..ActivatedDef::BLANK
-        }),
+        ability(cost("{1}"), gain_flying, "{1}: Spectacular Spider-Man gains flying until end of turn."),
+        ability(cost("{1}").and(SACRIFICE_THIS), protect_team, "{1}, Sacrifice Spectacular Spider-Man: Creatures you control gain hexproof and indestructible until end of turn."),
     ],
     ..oracle::SPECTACULAR_SPIDER_MAN
 };

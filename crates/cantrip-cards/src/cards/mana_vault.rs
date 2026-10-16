@@ -1,13 +1,7 @@
 use cantrip_api::*;
-use cantrip_mechanics::mana;
 use cantrip_mechanics::targets;
 use cantrip_mechanics::triggers;
 use cantrip_oracle as oracle;
-
-fn add_ccc(g: &mut dyn Game, asker: &Asker, _: Option<Color>) -> Result<(), Suspend> {
-    g.add_mana(asker.controller, Mana::C, 3);
-    Ok(())
-}
 
 /// "At the beginning of your draw step, if this artifact is tapped" (CR 603.4): checked as the step begins and again as
 /// the ability resolves.
@@ -44,22 +38,10 @@ pub static CARD: CardDef = CardDef {
     // "This artifact doesn't untap during your untap step."
     keywords: Keywords::of(&[Keyword::DoesNotUntap]),
     abilities: &[
-        mana::tap_for_n(add_ccc, Mana::C, 3, "{T}: Add {C}{C}{C}."),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "At the beginning of your upkeep, you may pay {4}. If you do, untap this artifact.",
-            listens: EventMask::STEP_BEGAN,
-            matches: triggers::your_upkeep,
-            effect: pay_to_untap,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "At the beginning of your draw step, if this artifact is tapped, it deals 1 damage to you.",
-            listens: EventMask::STEP_BEGAN,
-            matches: your_draw_step,
-            condition: Some(is_tapped),
-            effect: burn,
-            ..TriggeredDef::BLANK
-        }),
+        mana_ability(TAP, add_n(Mana::C, 3), "{T}: Add {C}{C}{C}."),
+        triggered(triggers::YOUR_UPKEEP, pay_to_untap, "At the beginning of your upkeep, you may pay {4}. If you do, untap this artifact."),
+        triggered(when(EventMask::STEP_BEGAN, your_draw_step), burn, "At the beginning of your draw step, if this artifact is tapped, it deals 1 damage to you.")
+            .condition(is_tapped),
     ],
     ..oracle::MANA_VAULT
 };

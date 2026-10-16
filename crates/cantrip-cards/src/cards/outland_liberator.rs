@@ -18,25 +18,14 @@ fn destroy_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 /// "{1}, Sacrifice this creature: Destroy target artifact or enchantment." Both faces have it.
-const SACRIFICE: AbilityDef = AbilityDef::Activated(ActivatedDef {
-    text: "{1}, Sacrifice this creature: Destroy target artifact or enchantment.",
-    cost: Cost { mana: mana(1, 0, 0, 0, 0, 0), sacrifice_self: true, ..Cost::NONE },
-    targets: &[targets::ARTIFACT_OR_ENCHANTMENT],
-    effect: destroy_it,
-    ..ActivatedDef::BLANK
-});
+const SACRIFICE: AbilityDef = ability(cost("{1}").and(SACRIFICE_THIS), destroy_it, "{1}, Sacrifice this creature: Destroy target artifact or enchantment.")
+    .targets(&[targets::ARTIFACT_OR_ENCHANTMENT]);
 
 pub static BACK: CardDef = CardDef {
     abilities: &[
         SACRIFICE,
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever this creature attacks, destroy target artifact or enchantment defending player controls.",
-            listens: EventMask::ATTACKS,
-            matches: triggers::this_attacks,
-            targets: &[TargetSpec { min: 1, max: 1, filter: defending_players_artifact_or_enchantment }],
-            effect: destroy_it,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(triggers::THIS_ATTACKS, destroy_it, "Whenever this creature attacks, destroy target artifact or enchantment defending player controls.")
+            .targets(&[TargetSpec { min: 1, max: 1, filter: defending_players_artifact_or_enchantment }]),
     ],
     ..oracle::FRENZIED_TRAPBREAKER
 };

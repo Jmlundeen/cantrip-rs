@@ -25,31 +25,10 @@ fn drain(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "I \u{2014} You draw two cards and you lose 2 life.",
-            chapter: 1,
-            effect: chapter_one,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "II \u{2014} Whenever a creature you control enters this turn, each opponent loses 1 life and you gain 1 life.",
-            chapter: 2,
-            effect: watch,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "III \u{2014} Whenever a creature you control enters this turn, each opponent loses 1 life and you gain 1 life.",
-            chapter: 3,
-            effect: watch,
-            ..TriggeredDef::BLANK
-        }),
+        chapter(1, chapter_one, "I \u{2014} You draw two cards and you lose 2 life."),
+        chapter(2, watch, "II \u{2014} Whenever a creature you control enters this turn, each opponent loses 1 life and you gain 1 life."),
+        chapter(3, watch, "III \u{2014} Whenever a creature you control enters this turn, each opponent loses 1 life and you gain 1 life."),
     ],
-    delayed: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever a creature you control enters this turn, each opponent loses 1 life and you gain 1 life.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: cantrip_mechanics::triggers::creature_you_control_enters,
-        effect: drain,
-        ..TriggeredDef::BLANK
-    })],
+    delayed: &[triggered(cantrip_mechanics::triggers::CREATURE_YOU_CONTROL_ENTERS, drain, "Whenever a creature you control enters this turn, each opponent loses 1 life and you gain 1 life.")],
     ..oracle::THUNDER_OF_UNITY
 };

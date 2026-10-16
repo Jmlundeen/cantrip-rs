@@ -61,25 +61,10 @@ fn return_both(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "I \u{2014} Exile a permanent card from your graveyard. You gain life equal to its mana value.",
-            chapter: 1,
-            effect: exile_a_permanent_card,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "II \u{2014} Put a number of +1/+1 counters on target creature you control equal to the mana value of the exiled card.",
-            chapter: 2,
-            targets: &[targets::CREATURE_YOU_CONTROL],
-            effect: counters,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "III \u{2014} Return this Saga and the exiled card to their owner's hand.",
-            chapter: 3,
-            effect: return_both,
-            ..TriggeredDef::BLANK
-        }),
+        chapter(1, exile_a_permanent_card, "I \u{2014} Exile a permanent card from your graveyard. You gain life equal to its mana value."),
+        chapter(2, counters, "II \u{2014} Put a number of +1/+1 counters on target creature you control equal to the mana value of the exiled card.")
+            .targets(&[targets::CREATURE_YOU_CONTROL]),
+        chapter(3, return_both, "III \u{2014} Return this Saga and the exiled card to their owner's hand."),
     ],
     ..oracle::THE_AESIR_ESCAPE_VALHALLA
 };

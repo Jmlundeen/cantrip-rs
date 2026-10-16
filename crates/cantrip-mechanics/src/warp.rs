@@ -34,8 +34,4 @@ fn exile_for_later(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-pub const EXILE: AbilityDef = AbilityDef::Triggered(TriggeredDef {
-    text: "Exile this permanent at the beginning of the next end step, then you may cast it from exile on a later turn.",
-    effect: exile_for_later,
-    ..TriggeredDef::BLANK
-});
+pub const EXILE: AbilityDef = delayed_trigger(exile_for_later, "Exile this permanent at the beginning of the next end step, then you may cast it from exile on a later turn.");

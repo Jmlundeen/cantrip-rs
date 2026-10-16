@@ -26,19 +26,9 @@ fn ping(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     enters: Some(enters_with_x_counters),
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "{4}: Put a +1/+1 counter on this creature.",
-            cost: Cost::mana(mana(4, 0, 0, 0, 0, 0)),
-            effect: grow,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "Remove a +1/+1 counter from this creature: It deals 1 damage to any target.",
-            cost: Cost { remove_counters: Some((CounterKind::PlusOne, 1)), ..Cost::NONE },
-            targets: &[targets::ANY],
-            effect: ping,
-            ..ActivatedDef::BLANK
-        }),
+        ability(cost("{4}"), grow, "{4}: Put a +1/+1 counter on this creature."),
+        ability(remove_counters(CounterKind::PlusOne, 1), ping, "Remove a +1/+1 counter from this creature: It deals 1 damage to any target.")
+            .targets(&[targets::ANY]),
     ],
     ..oracle::WALKING_BALLISTA
 };

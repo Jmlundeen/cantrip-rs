@@ -20,14 +20,8 @@ fn rally(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever Oliphaunt attacks, another target creature you control gets +2/+0 and gains trample until end of turn.",
-            listens: EventMask::ATTACKS,
-            matches: triggers::this_attacks,
-            targets: &[TargetSpec { min: 1, max: 1, filter: another_creature_you_control }],
-            effect: rally,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(triggers::THIS_ATTACKS, rally, "Whenever Oliphaunt attacks, another target creature you control gets +2/+0 and gains trample until end of turn.")
+            .targets(&[TargetSpec { min: 1, max: 1, filter: another_creature_you_control }]),
         typecycling::ability(Subtype::Mountain, mana(1, 0, 0, 0, 0, 0), "Mountaincycling {1} ({1}, Discard this card: Search your library for a Mountain card, reveal it, put it into your hand, then shuffle.)"),
     ],
     ..oracle::OLIPHAUNT

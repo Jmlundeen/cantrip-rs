@@ -29,20 +29,9 @@ fn return_tapped(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever Otharri attacks, you get an experience counter. Then create a 2/2 red Rebel creature token that's tapped and attacking for each experience counter you have.",
-            listens: EventMask::ATTACKS,
-            matches: triggers::this_attacks_defender,
-            effect: rebels,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{2}{R}{W}, Tap an untapped Rebel you control: Return this card from your graveyard to the battlefield tapped.",
-            cost: Cost { mana: mana(2, 1, 0, 0, 1, 0), ..Cost::tap_untapped(1, untapped_rebel) },
-            from: ZoneKind::Graveyard,
-            effect: return_tapped,
-            ..ActivatedDef::BLANK
-        }),
+        triggered(triggers::THIS_ATTACKS_DEFENDER, rebels, "Whenever Otharri attacks, you get an experience counter. Then create a 2/2 red Rebel creature token that's tapped and attacking for each experience counter you have."),
+        ability(cost("{2}{W}{R}").and(tap_untapped(1, untapped_rebel)), return_tapped, "{2}{R}{W}, Tap an untapped Rebel you control: Return this card from your graveyard to the battlefield tapped.")
+            .from(ZoneKind::Graveyard),
     ],
     ..oracle::OTHARRI_SUNS_GLORY
 };

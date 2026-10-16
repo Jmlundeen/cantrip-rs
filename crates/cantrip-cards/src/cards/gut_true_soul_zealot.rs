@@ -42,12 +42,6 @@ fn skeleton(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever you attack, you may sacrifice another creature or an artifact. If you do, create a 4/1 black Skeleton creature token with menace that's tapped and attacking.",
-        listens: EventMask::ATTACKERS_DECLARED,
-        matches: cantrip_mechanics::triggers::you_attack,
-        effect: skeleton,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(cantrip_mechanics::triggers::YOU_ATTACK, skeleton, "Whenever you attack, you may sacrifice another creature or an artifact. If you do, create a 4/1 black Skeleton creature token with menace that's tapped and attacking.")],
     ..oracle::GUT_TRUE_SOUL_ZEALOT
 };

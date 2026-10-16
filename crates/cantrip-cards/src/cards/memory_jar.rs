@@ -31,16 +31,7 @@ fn give_back(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "{T}, Sacrifice this artifact: Each player exiles all cards from their hand face down and draws seven cards. At the beginning of the next end step, each player discards their hand and returns to their hand each card they exiled this way.",
-        cost: Cost { tap: true, sacrifice_self: true, ..Cost::NONE },
-        effect,
-        ..ActivatedDef::BLANK
-    })],
-    delayed: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Each player discards their hand and returns to their hand each card they exiled this way.",
-        effect: give_back,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[ability(TAP.and(SACRIFICE_THIS), effect, "{T}, Sacrifice this artifact: Each player exiles all cards from their hand face down and draws seven cards. At the beginning of the next end step, each player discards their hand and returns to their hand each card they exiled this way.")],
+    delayed: &[delayed_trigger(give_back, "Each player discards their hand and returns to their hand each card they exiled this way.")],
     ..oracle::MEMORY_JAR
 };

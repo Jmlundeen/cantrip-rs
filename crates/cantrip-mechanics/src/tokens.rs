@@ -13,12 +13,7 @@ pub static CLUE: CardDef = CardDef {
     has_cost: false,
     types: TypeSet::of(&[CardType::Artifact]),
     subtypes: SubtypeSet::of(&[Subtype::Clue]),
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "{2}, Sacrifice this token: Draw a card.",
-        cost: Cost { mana: mana(2, 0, 0, 0, 0, 0), sacrifice_self: true, ..Cost::NONE },
-        effect: draw_a_card,
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[ability(cost("{2}").and(SACRIFICE_THIS), draw_a_card, "{2}, Sacrifice this token: Draw a card.")],
     text: "{2}, Sacrifice this token: Draw a card.",
     ..CardDef::BLANK
 };
@@ -34,14 +29,7 @@ pub static TREASURE: CardDef = CardDef {
     has_cost: false,
     types: TypeSet::of(&[CardType::Artifact]),
     subtypes: SubtypeSet::of(&[Subtype::Treasure]),
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "{T}, Sacrifice this artifact: Add one mana of any color.",
-        cost: Cost { tap: true, sacrifice_self: true, ..Cost::NONE },
-        mana: Some(add_one_of_any_color),
-        any_color: true,
-        adds_any: 1,
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[mana_ability(TAP.and(SACRIFICE_THIS), add_any_color(1).by(add_one_of_any_color), "{T}, Sacrifice this artifact: Add one mana of any color.")],
     text: "{T}, Sacrifice this artifact: Add one mana of any color.",
     ..CardDef::BLANK
 };
@@ -63,18 +51,7 @@ pub static BLOOD: CardDef = CardDef {
     has_cost: false,
     types: TypeSet::of(&[CardType::Artifact]),
     subtypes: SubtypeSet::of(&[Subtype::Blood]),
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "{1}, {T}, Discard a card, Sacrifice this token: Draw a card.",
-        cost: Cost {
-            mana: mana(1, 0, 0, 0, 0, 0),
-            tap: true,
-            sacrifice_self: true,
-            discard: Some((1, any_card)),
-            ..Cost::NONE
-        },
-        effect: draw_a_card,
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[ability(cost("{1}, {T}").and(SACRIFICE_THIS).and(discard(1, any_card)), draw_a_card, "{1}, {T}, Discard a card, Sacrifice this token: Draw a card.")],
     text: "{1}, {T}, Discard a card, Sacrifice this token: Draw a card.",
     ..CardDef::BLANK
 };
@@ -100,14 +77,9 @@ pub static MUTAGEN: CardDef = CardDef {
     has_cost: false,
     types: TypeSet::of(&[CardType::Artifact]),
     subtypes: SubtypeSet::of(&[Subtype::Mutagen]),
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "{1}, {T}, Sacrifice this token: Put a +1/+1 counter on target creature. Activate only as a sorcery.",
-        cost: Cost { mana: mana(1, 0, 0, 0, 0, 0), tap: true, sacrifice_self: true, ..Cost::NONE },
-        timing: Timing::Sorcery,
-        targets: &[crate::targets::CREATURE],
-        effect: put_plus_one_counter,
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[ability(cost("{1}, {T}").and(SACRIFICE_THIS), put_plus_one_counter, "{1}, {T}, Sacrifice this token: Put a +1/+1 counter on target creature. Activate only as a sorcery.")
+        .sorcery_speed()
+        .targets(&[crate::targets::CREATURE])],
     text: "{1}, {T}, Sacrifice this token: Put a +1/+1 counter on target creature. Activate only as a sorcery.",
     ..CardDef::BLANK
 };
@@ -128,14 +100,9 @@ pub static MAP: CardDef = CardDef {
     has_cost: false,
     types: TypeSet::of(&[CardType::Artifact]),
     subtypes: SubtypeSet::of(&[Subtype::Map]),
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "{1}, {T}, Sacrifice this token: Target creature you control explores. Activate only as a sorcery.",
-        cost: Cost { mana: mana(1, 0, 0, 0, 0, 0), tap: true, sacrifice_self: true, ..Cost::NONE },
-        timing: Timing::Sorcery,
-        targets: &[crate::targets::CREATURE_YOU_CONTROL],
-        effect: explore_target,
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[ability(cost("{1}, {T}").and(SACRIFICE_THIS), explore_target, "{1}, {T}, Sacrifice this token: Target creature you control explores. Activate only as a sorcery.")
+        .sorcery_speed()
+        .targets(&[crate::targets::CREATURE_YOU_CONTROL])],
     text: "{1}, {T}, Sacrifice this token: Target creature you control explores. Activate only as a sorcery.",
     ..CardDef::BLANK
 };
@@ -159,12 +126,7 @@ pub static FOOD: CardDef = CardDef {
     has_cost: false,
     types: TypeSet::of(&[CardType::Artifact]),
     subtypes: SubtypeSet::of(&[Subtype::Food]),
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "{2}, {T}, Sacrifice this token: You gain 3 life.",
-        cost: Cost { mana: mana(2, 0, 0, 0, 0, 0), tap: true, sacrifice_self: true, ..Cost::NONE },
-        effect: gain_three_life,
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[ability(cost("{2}, {T}").and(SACRIFICE_THIS), gain_three_life, "{2}, {T}, Sacrifice this token: You gain 3 life.")],
     text: "{2}, {T}, Sacrifice this token: You gain 3 life.",
     ..CardDef::BLANK
 };
@@ -288,12 +250,7 @@ pub static INCUBATOR: CardDef = CardDef {
     has_cost: false,
     types: TypeSet::of(&[CardType::Artifact]),
     subtypes: SubtypeSet::of(&[Subtype::Incubator]),
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "{2}: Transform this token.",
-        cost: Cost { mana: mana(2, 0, 0, 0, 0, 0), ..Cost::NONE },
-        effect: transform_it,
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[ability(cost("{2}"), transform_it, "{2}: Transform this token.")],
     back: Some(&PHYREXIAN),
     text: "{2}: Transform this token.",
     ..CardDef::BLANK
@@ -322,14 +279,8 @@ pub static PEST: CardDef = CardDef {
     subtypes: SubtypeSet::of(&[Subtype::Pest]),
     power: Some(1),
     toughness: Some(1),
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When this token dies, you gain 1 life.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: crate::triggers::this_dies,
-        effect: gain_a_life,
-        look_back: true,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(crate::triggers::THIS_DIES, gain_a_life, "When this token dies, you gain 1 life.")
+        .look_back()],
     text: "When this token dies, you gain 1 life.",
     ..CardDef::BLANK
 };
@@ -340,14 +291,7 @@ pub static GOLD: CardDef = CardDef {
     has_cost: false,
     types: TypeSet::of(&[CardType::Artifact]),
     subtypes: SubtypeSet::of(&[Subtype::Gold]),
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "Sacrifice this artifact: Add one mana of any color.",
-        cost: Cost { sacrifice_self: true, ..Cost::NONE },
-        mana: Some(add_one_of_any_color),
-        any_color: true,
-        adds_any: 1,
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[mana_ability(SACRIFICE_THIS, add_any_color(1).by(add_one_of_any_color), "Sacrifice this artifact: Add one mana of any color.")],
     text: "Sacrifice this artifact: Add one mana of any color.",
     ..CardDef::BLANK
 };
@@ -361,7 +305,7 @@ pub static HEARTWOOD: CardDef = CardDef {
     colors: Some(ColorSet(0b11000)),
     types: TypeSet::of(&[CardType::Artifact]),
     subtypes: SubtypeSet::of(&[Subtype::Heartwood]),
-    abilities: &[crate::mana::tap_for_either(Color::Red, Color::Green, "{T}: Add {R} or {G}.")],
+    abilities: &[mana_ability(TAP, add_one_of(&[Color::Red, Color::Green]), "{T}: Add {R} or {G}.")],
     text: "{T}: Add {R} or {G}.",
     ..CardDef::BLANK
 };

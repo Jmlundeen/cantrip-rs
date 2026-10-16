@@ -35,12 +35,6 @@ fn plunder(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever this creature attacks, if defending player has more cards in hand than you, exile the top card of their library. During any turn you attacked with a Rogue, you may cast that card and you may spend mana as though it were mana of any color to cast that spell.",
-        listens: EventMask::ATTACKS,
-        matches: attacks_a_richer_player,
-        effect: plunder,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(when(EventMask::ATTACKS, attacks_a_richer_player), plunder, "Whenever this creature attacks, if defending player has more cards in hand than you, exile the top card of their library. During any turn you attacked with a Rogue, you may cast that card and you may spend mana as though it were mana of any color to cast that spell.")],
     ..oracle::ROBBER_OF_THE_RICH
 };

@@ -23,18 +23,8 @@ fn loot(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "{T}: Add 2 mana in any combination of {U}, {B}, and/or {R}.",
-            cost: Cost { tap: true, ..Cost::NONE },
-            mana: Some(add_two),
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{3}, {T}: Draw two cards, then discard a card.",
-            cost: Cost { mana: mana(3, 0, 0, 0, 0, 0), tap: true, ..Cost::NONE },
-            effect: loot,
-            ..ActivatedDef::BLANK
-        }),
+        mana_ability(TAP, add_by(add_two), "{T}: Add 2 mana in any combination of {U}, {B}, and/or {R}."),
+        ability(cost("{3}, {T}"), loot, "{3}, {T}: Draw two cards, then discard a card."),
     ],
     ..oracle::RELIC_OF_SAURON
 };

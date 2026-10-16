@@ -32,20 +32,10 @@ fn grow_and_ping(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "{0}: Add X mana in any combination of {U} and/or {R}, where X is Vivi Ornitier's power. Activate only during your turn and only once each turn.",
-            mana: Some(add_x_mana),
-            condition: Some(your_turn),
-            once_each_turn: true,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever you cast a noncreature spell, put a +1/+1 counter on Vivi Ornitier and it deals 1 damage to each opponent.",
-            listens: EventMask::SPELL_CAST,
-            matches: cantrip_mechanics::triggers::noncreature_spell_you_cast,
-            effect: grow_and_ping,
-            ..TriggeredDef::BLANK
-        }),
+        mana_ability(Cost::NONE, add_by(add_x_mana), "{0}: Add X mana in any combination of {U} and/or {R}, where X is Vivi Ornitier's power. Activate only during your turn and only once each turn.")
+            .condition(your_turn)
+            .once_each_turn(),
+        triggered(cantrip_mechanics::triggers::NONCREATURE_SPELL_YOU_CAST, grow_and_ping, "Whenever you cast a noncreature spell, put a +1/+1 counter on Vivi Ornitier and it deals 1 damage to each opponent."),
     ],
     ..oracle::VIVI_ORNITIER
 };

@@ -56,28 +56,10 @@ pub static CARD: CardDef = CardDef {
         ..ReplacementDef::BLANK
     }],
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "+1: Create a 1/1 white Soldier creature token.",
-            cost: Cost { loyalty: Some(1), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            effect: plus_one,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "0: Put a +1/+1 counter on each creature you control. Those creatures gain flying until your next turn.",
-            cost: Cost { loyalty: Some(0), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            effect: zero,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "\u{2212}3: Destroy target creature an opponent controls with mana value 3 or greater.",
-            cost: Cost { loyalty: Some(-3), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            targets: &[TargetSpec { min: 1, max: 1, filter: opponents_creature_with_value_three_or_more }],
-            effect: minus_three,
-            ..ActivatedDef::BLANK
-        }),
+        ability(loyalty(1), plus_one, "+1: Create a 1/1 white Soldier creature token."),
+        ability(loyalty(0), zero, "0: Put a +1/+1 counter on each creature you control. Those creatures gain flying until your next turn."),
+        ability(loyalty(-3), minus_three, "\u{2212}3: Destroy target creature an opponent controls with mana value 3 or greater.")
+            .targets(&[TargetSpec { min: 1, max: 1, filter: opponents_creature_with_value_three_or_more }]),
     ],
     ..oracle::ELSPETH_STORM_SLAYER
 };

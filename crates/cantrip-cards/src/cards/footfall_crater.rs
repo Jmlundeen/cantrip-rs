@@ -28,13 +28,8 @@ fn grant_ability(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
 pub static CARD: CardDef = CardDef {
     enchant: Some(targets::LAND),
     abilities: &[cycling(mana(1, 0, 0, 0, 0, 0), "Cycling {1} ({1}, Discard this card: Draw a card.)")],
-    delayed: &[AbilityDef::Activated(ActivatedDef {
-        text: "{T}: Target creature gains trample and haste until end of turn.",
-        cost: Cost { tap: true, ..Cost::NONE },
-        targets: &[targets::CREATURE],
-        effect: trample_and_haste,
-        ..ActivatedDef::BLANK
-    })],
+    delayed: &[ability(TAP, trample_and_haste, "{T}: Target creature gains trample and haste until end of turn.")
+        .targets(&[targets::CREATURE])],
     statics: &[StaticDef {
         text: "Enchanted land has \"{T}: Target creature gains trample and haste until end of turn.\"",
         layer: Layer::Ability,

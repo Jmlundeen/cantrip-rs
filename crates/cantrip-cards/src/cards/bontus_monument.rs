@@ -31,12 +31,6 @@ fn drain(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     cost_changes: &[black_creature_spells_cost_less],
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever you cast a creature spell, each opponent loses 1 life and you gain 1 life.",
-        listens: EventMask::SPELL_CAST,
-        matches: you_cast_a_creature_spell,
-        effect: drain,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(when(EventMask::SPELL_CAST, you_cast_a_creature_spell), drain, "Whenever you cast a creature spell, each opponent loses 1 life and you gain 1 life.")],
     ..oracle::BONTUS_MONUMENT
 };

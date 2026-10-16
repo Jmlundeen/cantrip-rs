@@ -3,7 +3,7 @@
 //!
 //! A card with For Mirrodin! lists `TRIGGER` among its `abilities` and `REBEL` among its `EXTRA` definitions.
 
-use crate::triggers::this_enters;
+use crate::triggers::THIS_ENTERS;
 use cantrip_api::*;
 
 /// The 2/2 red Rebel creature token For Mirrodin! makes.
@@ -31,10 +31,4 @@ fn create_and_attach(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> 
     Ok(())
 }
 
-pub const TRIGGER: AbilityDef = AbilityDef::Triggered(TriggeredDef {
-    text: "For Mirrodin! (When this Equipment enters, create a 2/2 red Rebel creature token, then attach this to it.)",
-    listens: EventMask::ZONE_CHANGE,
-    matches: this_enters,
-    effect: create_and_attach,
-    ..TriggeredDef::BLANK
-});
+pub const TRIGGER: AbilityDef = triggered(THIS_ENTERS, create_and_attach, "For Mirrodin! (When this Equipment enters, create a 2/2 red Rebel creature token, then attach this to it.)");

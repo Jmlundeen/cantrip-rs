@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::triggers::this_enters;
+use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
 /// The 1/1 blue Faerie Dragon creature token with flying.
@@ -28,21 +28,9 @@ fn faerie_dragon(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When this creature enters, you take the initiative.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            effect: cantrip_mechanics::effects::take_the_initiative,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "At the beginning of your end step, if you have the initiative, create a 1/1 blue Faerie Dragon creature token with flying.",
-            listens: EventMask::STEP_BEGAN,
-            matches: cantrip_mechanics::triggers::your_end_step,
-            condition: Some(you_have_the_initiative),
-            effect: faerie_dragon,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(THIS_ENTERS, cantrip_mechanics::effects::take_the_initiative, "When this creature enters, you take the initiative."),
+        triggered(cantrip_mechanics::triggers::YOUR_END_STEP, faerie_dragon, "At the beginning of your end step, if you have the initiative, create a 1/1 blue Faerie Dragon creature token with flying.")
+            .condition(you_have_the_initiative),
     ],
     ..oracle::FEYWILD_CARETAKER
 };

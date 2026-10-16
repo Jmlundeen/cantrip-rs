@@ -16,12 +16,7 @@ fn untap_land(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "Tap an untapped creature you control: Untap target basic land.",
-        cost: TAP_AN_UNTAPPED_CREATURE,
-        targets: &[TargetSpec { min: 1, max: 1, filter: basic_land }],
-        effect: untap_land,
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[ability(TAP_AN_UNTAPPED_CREATURE, untap_land, "Tap an untapped creature you control: Untap target basic land.")
+        .targets(&[TargetSpec { min: 1, max: 1, filter: basic_land }])],
     ..oracle::EARTHCRAFT
 };

@@ -1,7 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::targets;
 use cantrip_mechanics::tokens::SERVO;
-use cantrip_mechanics::triggers::noncreature_spell_you_cast;
+use cantrip_mechanics::triggers::NONCREATURE_SPELL_YOU_CAST;
 use cantrip_oracle as oracle;
 
 fn make_servo(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -36,24 +36,12 @@ fn become_copy(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever you cast a noncreature spell, create a 1/1 colorless Servo artifact creature token.",
-            listens: EventMask::SPELL_CAST,
-            matches: noncreature_spell_you_cast,
-            effect: make_servo,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "\u{2212}2: Target artifact you control becomes a copy of another target artifact or creature you control until end of turn, except it's an artifact in addition to its other types.",
-            cost: Cost { loyalty: Some(-2), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            targets: &[
+        triggered(NONCREATURE_SPELL_YOU_CAST, make_servo, "Whenever you cast a noncreature spell, create a 1/1 colorless Servo artifact creature token."),
+        ability(loyalty(-2), become_copy, "\u{2212}2: Target artifact you control becomes a copy of another target artifact or creature you control until end of turn, except it's an artifact in addition to its other types.")
+            .targets(&[
                 TargetSpec { min: 1, max: 1, filter: artifact_you_control },
                 TargetSpec { min: 1, max: 1, filter: other_artifact_or_creature_you_control },
-            ],
-            effect: become_copy,
-            ..ActivatedDef::BLANK
-        }),
+            ]),
     ],
     ..oracle::SAHEELI_SUBLIME_ARTIFICER
 };

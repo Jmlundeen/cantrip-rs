@@ -81,12 +81,7 @@ static MODAL: ModalDef = ModalDef {
 };
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "{1}{G}, {T}: Choose one \u{2014} put a +1/+1 counter on target creature; Bow of Nylea deals 2 damage to target creature with flying; you gain 3 life; or put up to four target cards from your graveyard on the bottom of your library in any order.",
-        cost: Cost { mana: mana(1, 0, 0, 0, 0, 1), tap: true, ..Cost::NONE },
-        modal: Some(&MODAL),
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[modal_ability(cost("{1}{G}, {T}"), &MODAL, "{1}{G}, {T}: Choose one \u{2014} put a +1/+1 counter on target creature; Bow of Nylea deals 2 damage to target creature with flying; you gain 3 life; or put up to four target cards from your graveyard on the bottom of your library in any order.")],
     statics: &[StaticDef {
         text: "Attacking creatures you control have deathtouch.",
         layer: Layer::Ability,

@@ -19,13 +19,8 @@ fn becomes_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     enters: Some(mana::enters_tapped),
     abilities: &[
-        mana::tap_for_either(Color::White, Color::Blue, "{T}: Add {W} or {U}."),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{3}{W}{U}: Until end of turn, this land becomes a 4/4 white and blue Elemental creature with flying and vigilance. It's still a land.",
-            cost: Cost { mana: mana(3, 1, 1, 0, 0, 0), ..Cost::NONE },
-            effect: becomes_creature,
-            ..ActivatedDef::BLANK
-        }),
+        mana_ability(TAP, add_one_of(&[Color::White, Color::Blue]), "{T}: Add {W} or {U}."),
+        ability(cost("{3}{W}{U}"), becomes_creature, "{3}{W}{U}: Until end of turn, this land becomes a 4/4 white and blue Elemental creature with flying and vigilance. It's still a land."),
     ],
     ..oracle::CELESTIAL_COLONNADE
 };

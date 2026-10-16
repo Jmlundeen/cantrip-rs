@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::targets;
-use cantrip_mechanics::{crew::crew, triggers::this_enters};
+use cantrip_mechanics::{crew::crew, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 /// The 2/2 green Cat creature token.
@@ -37,21 +37,9 @@ fn copy_token(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When Esika's Chariot enters, create two 2/2 green Cat creature tokens.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            effect: two_cats,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever Esika's Chariot attacks, create a token that's a copy of target token you control.",
-            listens: EventMask::ATTACKS,
-            matches: cantrip_mechanics::triggers::this_attacks,
-            targets: &[TargetSpec { min: 1, max: 1, filter: token_you_control }],
-            effect: copy_token,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(THIS_ENTERS, two_cats, "When Esika's Chariot enters, create two 2/2 green Cat creature tokens."),
+        triggered(cantrip_mechanics::triggers::THIS_ATTACKS, copy_token, "Whenever Esika's Chariot attacks, create a token that's a copy of target token you control.")
+            .targets(&[TargetSpec { min: 1, max: 1, filter: token_you_control }]),
         crew(4, "Crew 4 (Tap any number of creatures you control with total power 4 or more: This Vehicle becomes an artifact creature until end of turn.)"),
     ],
     ..oracle::ESIKAS_CHARIOT

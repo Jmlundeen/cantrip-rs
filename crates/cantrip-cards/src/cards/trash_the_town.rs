@@ -1,7 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::{effects, spree};
 use cantrip_mechanics::targets;
-use cantrip_mechanics::triggers::deals_combat_damage_to_player;
+use cantrip_mechanics::triggers::DEALS_COMBAT_DAMAGE_TO_PLAYER;
 use cantrip_oracle as oracle;
 
 /// Mode 0: "Put two +1/+1 counters on target creature."
@@ -57,12 +57,6 @@ static MODAL: ModalDef = spree::modal(MODES);
 pub static CARD: CardDef = CardDef {
     spell: Some(SpellDef::MODAL),
     modal: Some(&MODAL),
-    delayed: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever this creature deals combat damage to a player, draw two cards.",
-        listens: EventMask::DAMAGE,
-        matches: deals_combat_damage_to_player,
-        effect: effects::draw::<2>,
-        ..TriggeredDef::BLANK
-    })],
+    delayed: &[triggered(DEALS_COMBAT_DAMAGE_TO_PLAYER, effects::draw::<2>, "Whenever this creature deals combat damage to a player, draw two cards.")],
     ..oracle::TRASH_THE_TOWN
 };

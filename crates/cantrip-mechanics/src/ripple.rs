@@ -70,12 +70,6 @@ fn ripple<const N: usize>(g: &mut dyn Game, item: &StackItem) -> Result<(), Susp
 
 /// Ripple `N` itself; `text` is the ability's own text.
 pub const fn trigger<const N: usize>(text: &'static str) -> AbilityDef {
-    AbilityDef::Triggered(TriggeredDef {
-        text,
-        listens: EventMask::SPELL_CAST,
-        matches: cast_this_spell,
-        effect: ripple::<N>,
-        anywhere: true,
-        ..TriggeredDef::BLANK
-    })
+    triggered(when(EventMask::SPELL_CAST, cast_this_spell), ripple::<N>, text)
+        .anywhere()
 }

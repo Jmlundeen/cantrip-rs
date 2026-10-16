@@ -31,13 +31,7 @@ fn exile_and_make(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "At the beginning of your upkeep, exile the top two cards of your library. You may play them this turn. If you exiled a land card this way, create a 3/1 red Dinosaur creature token. If you exiled a nonland card this way, create a Treasure token.",
-        listens: EventMask::STEP_BEGAN,
-        matches: cantrip_mechanics::triggers::your_upkeep,
-        effect: exile_and_make,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(cantrip_mechanics::triggers::YOUR_UPKEEP, exile_and_make, "At the beginning of your upkeep, exile the top two cards of your library. You may play them this turn. If you exiled a land card this way, create a 3/1 red Dinosaur creature token. If you exiled a nonland card this way, create a Treasure token.")],
     ..oracle::BONEHOARD_DRACOSAUR
 };
 

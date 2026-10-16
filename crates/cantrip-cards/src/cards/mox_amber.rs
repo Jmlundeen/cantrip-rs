@@ -1,5 +1,4 @@
 use cantrip_api::*;
-use cantrip_mechanics::mana;
 use cantrip_oracle as oracle;
 
 /// The colors among the legendary creatures and planeswalkers its controller controls (CR 105.2), read through the
@@ -17,14 +16,7 @@ fn colors_among_legends(q: &dyn Query, asker: &Asker) -> ColorSet {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "{T}: Add one mana of any color among legendary creatures and planeswalkers you control.",
-        cost: Cost { tap: true, ..Cost::NONE },
-        mana: Some(mana::add_chosen),
-        any_color: true,
-        colors_from: Some(colors_among_legends),
-        adds_any: 1,
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[mana_ability(TAP, add_any_color(1), "{T}: Add one mana of any color among legendary creatures and planeswalkers you control.")
+        .colors_from(colors_among_legends)],
     ..oracle::MOX_AMBER
 };

@@ -3,7 +3,7 @@
 //!
 //! A card with persist lists `trigger(text)` among its `abilities`.
 
-use crate::triggers::this_dies;
+use crate::triggers::THIS_DIES;
 use cantrip_api::*;
 
 /// "If it had no -1/-1 counters on it" (CR 603.4): the permanent as it last was on the battlefield.
@@ -20,13 +20,7 @@ fn returns(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub const fn trigger(text: &'static str) -> AbilityDef {
-    AbilityDef::Triggered(TriggeredDef {
-        text,
-        listens: EventMask::ZONE_CHANGE,
-        matches: this_dies,
-        condition: Some(had_no_minus_counters),
-        effect: returns,
-        look_back: true,
-        ..TriggeredDef::BLANK
-    })
+    triggered(THIS_DIES, returns, text)
+        .condition(had_no_minus_counters)
+        .look_back()
 }

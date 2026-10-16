@@ -24,22 +24,11 @@ fn return_exiled(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     enters: Some(fading::enters::<5>),
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "Remove a fade counter from Parallax Wave: Exile target creature.",
-            cost: Cost { remove_counters: Some((CounterKind::Fade, 1)), ..Cost::NONE },
-            targets: &[targets::CREATURE],
-            effect: exile_creature,
-            ..ActivatedDef::BLANK
-        }),
+        ability(remove_counters(CounterKind::Fade, 1), exile_creature, "Remove a fade counter from Parallax Wave: Exile target creature.")
+            .targets(&[targets::CREATURE]),
         fading::upkeep("At the beginning of your upkeep, remove a fade counter from Parallax Wave. If you can't, sacrifice it."),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When Parallax Wave leaves the battlefield, each player returns to the battlefield all cards they own exiled with it.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: triggers::this_leaves,
-            effect: return_exiled,
-            look_back: true,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(triggers::THIS_LEAVES, return_exiled, "When Parallax Wave leaves the battlefield, each player returns to the battlefield all cards they own exiled with it.")
+            .look_back(),
     ],
     ..oracle::PARALLAX_WAVE
 };

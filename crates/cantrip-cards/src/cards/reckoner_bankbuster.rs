@@ -25,12 +25,7 @@ fn draw_then_tokens(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     enters: Some(enters),
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "{2}, {T}, Remove a charge counter from Reckoner Bankbuster: Draw a card. Then if there are no charge counters on Reckoner Bankbuster, create a Treasure token and a 1/1 colorless Pilot creature token with \"This token crews Vehicles as though its power were 2 greater.\"",
-            cost: Cost { mana: mana(2, 0, 0, 0, 0, 0), tap: true, remove_counters: Some((CounterKind::Charge, 1)), ..Cost::NONE },
-            effect: draw_then_tokens,
-            ..ActivatedDef::BLANK
-        }),
+        ability(cost("{2}, {T}").and(remove_counters(CounterKind::Charge, 1)), draw_then_tokens, "{2}, {T}, Remove a charge counter from Reckoner Bankbuster: Draw a card. Then if there are no charge counters on Reckoner Bankbuster, create a Treasure token and a 1/1 colorless Pilot creature token with \"This token crews Vehicles as though its power were 2 greater.\""),
         crew(3, "Crew 3 (Tap any number of other untapped creatures you control with total power 3 or more: This Vehicle becomes an artifact creature until end of turn.)"),
     ],
     ..oracle::RECKONER_BANKBUSTER

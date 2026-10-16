@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::targets;
-use cantrip_mechanics::triggers::deals_combat_damage_to_player;
+use cantrip_mechanics::triggers::DEALS_COMBAT_DAMAGE_TO_PLAYER;
 use cantrip_oracle as oracle;
 
 /// "Leatherhead enters with a hexproof counter on her" (CR 122.1b, 614.1c): a keyword counter that grants hexproof for as
@@ -74,18 +74,8 @@ fn destroy(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     enters: Some(enters),
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever Leatherhead deals combat damage to a player, you may remove a counter from her. When you do, destroy target artifact or enchantment that player controls.",
-        listens: EventMask::DAMAGE,
-        matches: deals_combat_damage_to_player,
-        effect: remove_counter,
-        ..TriggeredDef::BLANK
-    })],
-    delayed: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When you do, destroy target artifact or enchantment that player controls.",
-        targets: &[TargetSpec { min: 1, max: 1, filter: artifact_or_enchantment_of_the_attacked_player }],
-        effect: destroy,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(DEALS_COMBAT_DAMAGE_TO_PLAYER, remove_counter, "Whenever Leatherhead deals combat damage to a player, you may remove a counter from her. When you do, destroy target artifact or enchantment that player controls.")],
+    delayed: &[delayed_trigger(destroy, "When you do, destroy target artifact or enchantment that player controls.")
+        .targets(&[TargetSpec { min: 1, max: 1, filter: artifact_or_enchantment_of_the_attacked_player }])],
     ..oracle::LEATHERHEAD_SWAMP_STALKER
 };

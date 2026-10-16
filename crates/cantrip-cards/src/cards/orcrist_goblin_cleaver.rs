@@ -50,13 +50,7 @@ fn treasures_for_type(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever equipped creature deals combat damage to a player, choose a creature type. Create a Treasure token for each creature you control of that type.",
-            listens: EventMask::DAMAGE,
-            matches: equipped_deals_combat_damage_to_a_player,
-            effect: treasures_for_type,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(when(EventMask::DAMAGE, equipped_deals_combat_damage_to_a_player), treasures_for_type, "Whenever equipped creature deals combat damage to a player, choose a creature type. Create a Treasure token for each creature you control of that type."),
         equip(mana(3, 0, 0, 0, 0, 0), "Equip {3}"),
     ],
     statics: &[

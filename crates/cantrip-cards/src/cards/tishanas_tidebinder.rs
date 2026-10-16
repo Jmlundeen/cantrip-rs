@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::triggers::this_enters;
+use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
 /// "Up to one target activated or triggered ability" (CR 115.1): an ability on the stack. Mana abilities never are.
@@ -30,13 +30,7 @@ fn counter_and_silence(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When this creature enters, counter up to one target activated or triggered ability. If an ability of an artifact, creature, or planeswalker is countered this way, that permanent loses all abilities for as long as this creature remains on the battlefield.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: this_enters,
-        targets: &[TargetSpec { min: 0, max: 1, filter: ability_filter }],
-        effect: counter_and_silence,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(THIS_ENTERS, counter_and_silence, "When this creature enters, counter up to one target activated or triggered ability. If an ability of an artifact, creature, or planeswalker is countered this way, that permanent loses all abilities for as long as this creature remains on the battlefield.")
+        .targets(&[TargetSpec { min: 0, max: 1, filter: ability_filter }])],
     ..oracle::TISHANAS_TIDEBINDER
 };

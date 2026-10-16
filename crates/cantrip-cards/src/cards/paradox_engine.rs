@@ -21,12 +21,6 @@ fn untap_nonland(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever you cast a spell, untap all nonland permanents you control.",
-        listens: EventMask::SPELL_CAST,
-        matches: you_cast_a_spell,
-        effect: untap_nonland,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(when(EventMask::SPELL_CAST, you_cast_a_spell), untap_nonland, "Whenever you cast a spell, untap all nonland permanents you control.")],
     ..oracle::PARADOX_ENGINE
 };

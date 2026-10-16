@@ -47,19 +47,8 @@ fn tutor(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever a Dwarf you control becomes tapped, create a Treasure token.",
-            listens: EventMask::TAPPED,
-            matches: dwarf_becomes_tapped,
-            effect: treasure,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "Sacrifice five Treasures: Search your library for an artifact or Dragon card, put that card onto the battlefield, then shuffle.",
-            cost: Cost { permanents: Some(PermanentCost { count: 5, filter: treasure_you_control, to_hand: false }), ..Cost::NONE },
-            effect: tutor,
-            ..ActivatedDef::BLANK
-        }),
+        triggered(when(EventMask::TAPPED, dwarf_becomes_tapped), treasure, "Whenever a Dwarf you control becomes tapped, create a Treasure token."),
+        ability(sacrifice(5, treasure_you_control), tutor, "Sacrifice five Treasures: Search your library for an artifact or Dragon card, put that card onto the battlefield, then shuffle."),
     ],
     statics: &[StaticDef {
         text: "Other Dwarves you control get +1/+0.",

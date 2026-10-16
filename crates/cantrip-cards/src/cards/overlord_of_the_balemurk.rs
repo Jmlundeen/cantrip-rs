@@ -38,13 +38,7 @@ pub static CARD: CardDef = CardDef {
     enters: Some(impending::enters::<5>),
     statics: &[impending::NOT_A_CREATURE],
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever this permanent enters or attacks, mill four cards, then you may return a non-Avatar creature card or a planeswalker card from your graveyard to your hand.",
-            listens: EventMask(EventMask::ZONE_CHANGE.0 | EventMask::ATTACKS.0),
-            matches: enters_or_attacks,
-            effect: mill_then_return,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(when(EventMask(EventMask::ZONE_CHANGE.0 | EventMask::ATTACKS.0), enters_or_attacks), mill_then_return, "Whenever this permanent enters or attacks, mill four cards, then you may return a non-Avatar creature card or a planeswalker card from your graveyard to your hand."),
         impending::REMOVE_A_TIME_COUNTER,
     ],
     ..oracle::OVERLORD_OF_THE_BALEMURK

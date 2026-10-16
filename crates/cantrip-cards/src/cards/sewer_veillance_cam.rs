@@ -19,29 +19,12 @@ fn tap_or_untap(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     labels: &["Tap", "Untap", "Do nothing"],
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When Sewer-veillance Cam enters, you may tap or untap target creature.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: triggers::this_enters,
-            targets: &[targets::CREATURE],
-            effect: tap_or_untap,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When Sewer-veillance Cam leaves the battlefield, you may tap or untap target creature.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: triggers::this_leaves,
-            targets: &[targets::CREATURE],
-            effect: tap_or_untap,
-            look_back: true,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{3}{U}, Sacrifice Sewer-veillance Cam: Draw two cards.",
-            cost: Cost { mana: mana(3, 0, 1, 0, 0, 0), sacrifice_self: true, ..Cost::NONE },
-            effect: effects::draw::<2>,
-            ..ActivatedDef::BLANK
-        }),
+        triggered(triggers::THIS_ENTERS, tap_or_untap, "When Sewer-veillance Cam enters, you may tap or untap target creature.")
+            .targets(&[targets::CREATURE]),
+        triggered(triggers::THIS_LEAVES, tap_or_untap, "When Sewer-veillance Cam leaves the battlefield, you may tap or untap target creature.")
+            .targets(&[targets::CREATURE])
+            .look_back(),
+        ability(cost("{3}{U}").and(SACRIFICE_THIS), effects::draw::<2>, "{3}{U}, Sacrifice Sewer-veillance Cam: Draw two cards."),
     ],
     ..oracle::SEWER_VEILLANCE_CAM
 };

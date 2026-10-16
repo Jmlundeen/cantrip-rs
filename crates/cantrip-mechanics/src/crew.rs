@@ -12,10 +12,5 @@ fn becomes_a_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
 /// a creature that crews as though its power were greater for more (CR 702.122b). Shorikai, Genesis Engine and Esika's
 /// Chariot print it; `text` is the ability's full text, which a scenario's `Ability:` matches.
 pub const fn crew(power: u8, text: &'static str) -> AbilityDef {
-    AbilityDef::Activated(ActivatedDef {
-        text,
-        cost: Cost { tap_creatures: Some(TapCreatures { power, crew: true }), ..Cost::NONE },
-        effect: becomes_a_creature,
-        ..ActivatedDef::BLANK
-    })
+    ability(Cost { tap_creatures: Some(TapCreatures { power, crew: true }), ..Cost::NONE }, becomes_a_creature, text)
 }

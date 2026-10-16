@@ -12,12 +12,6 @@ fn attack_with_two(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fir
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever you attack with two or more creatures, draw a card.",
-        listens: EventMask::ATTACKERS_DECLARED,
-        matches: attack_with_two,
-        effect: effects::draw::<1>,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(when(EventMask::ATTACKERS_DECLARED, attack_with_two), effects::draw::<1>, "Whenever you attack with two or more creatures, draw a card.")],
     ..oracle::MILITARY_INTELLIGENCE
 };

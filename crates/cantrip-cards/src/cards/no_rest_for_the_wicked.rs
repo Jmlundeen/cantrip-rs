@@ -11,11 +11,6 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "Sacrifice No Rest for the Wicked: Return to your hand all creature cards in your graveyard that were put there from the battlefield this turn.",
-        cost: Cost { sacrifice_self: true, ..Cost::NONE },
-        effect,
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[ability(SACRIFICE_THIS, effect, "Sacrifice No Rest for the Wicked: Return to your hand all creature cards in your graveyard that were put there from the battlefield this turn.")],
     ..oracle::NO_REST_FOR_THE_WICKED
 };

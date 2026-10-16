@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{targets, triggers::this_enters};
+use cantrip_mechanics::{targets, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 /// "Tap up to one target creature. It loses all abilities for as long as The Wondrous Wasp remains on the battlefield"
@@ -12,13 +12,7 @@ fn sting(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Wasp's Sting \u{2014} When The Wondrous Wasp enters, tap up to one target creature. It loses all abilities for as long as The Wondrous Wasp remains on the battlefield.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: this_enters,
-        targets: &[TargetSpec { min: 0, ..targets::CREATURE }],
-        effect: sting,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(THIS_ENTERS, sting, "Wasp's Sting \u{2014} When The Wondrous Wasp enters, tap up to one target creature. It loses all abilities for as long as The Wondrous Wasp remains on the battlefield.")
+        .targets(&[TargetSpec { min: 0, ..targets::CREATURE }])],
     ..oracle::THE_WONDROUS_WASP
 };

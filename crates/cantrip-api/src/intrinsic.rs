@@ -4,41 +4,9 @@
 
 use cantrip_state::*;
 
+use crate::ability::*;
 use crate::card::*;
 use crate::game::{Game, Query, Suspend};
-
-fn add(g: &mut dyn Game, asker: &Asker, mana: Mana) -> Result<(), Suspend> {
-    g.add_mana(asker.controller, mana, 1);
-    Ok(())
-}
-
-fn add_w(g: &mut dyn Game, asker: &Asker, _: Option<Color>) -> Result<(), Suspend> {
-    add(g, asker, Mana::W)
-}
-fn add_u(g: &mut dyn Game, asker: &Asker, _: Option<Color>) -> Result<(), Suspend> {
-    add(g, asker, Mana::U)
-}
-fn add_b(g: &mut dyn Game, asker: &Asker, _: Option<Color>) -> Result<(), Suspend> {
-    add(g, asker, Mana::B)
-}
-fn add_r(g: &mut dyn Game, asker: &Asker, _: Option<Color>) -> Result<(), Suspend> {
-    add(g, asker, Mana::R)
-}
-fn add_g(g: &mut dyn Game, asker: &Asker, _: Option<Color>) -> Result<(), Suspend> {
-    add(g, asker, Mana::G)
-}
-
-const fn tap_for(effect: ManaEffect, mana: Mana, text: &'static str) -> AbilityDef {
-    let mut adds = [0u8; 6];
-    adds[mana as usize] = 1;
-    AbilityDef::Activated(ActivatedDef {
-        text,
-        cost: Cost { tap: true, ..Cost::NONE },
-        mana: Some(effect),
-        adds: ManaPool(adds),
-        ..ActivatedDef::BLANK
-    })
-}
 
 fn draw_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.draw(item.controller, 1);
@@ -64,7 +32,7 @@ fn initiative_subject(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
 }
 
 const fn inherent(text: &'static str, effect: Effect) -> AbilityDef {
-    AbilityDef::Triggered(TriggeredDef { text, effect, ..TriggeredDef::BLANK })
+    delayed_trigger(effect, text)
 }
 
 /// The rules' own triggered abilities, which no object has and which the rules themselves put on the stack
@@ -104,14 +72,10 @@ fn right_is_locked(q: &dyn Query, asker: &Asker) -> bool {
 }
 
 const fn unlock(text: &'static str, effect: Effect, condition: Condition) -> AbilityDef {
-    AbilityDef::Activated(ActivatedDef {
-        text,
-        effect,
-        timing: Timing::Sorcery,
-        special_action: true,
-        condition: Some(condition),
-        ..ActivatedDef::BLANK
-    })
+    ability(Cost::NONE, effect, text)
+        .sorcery_speed()
+        .condition(condition)
+        .special_action()
 }
 
 /// "At the beginning of your upkeep, if this card is suspended, remove a time counter from it." (CR 702.62a)
@@ -164,11 +128,11 @@ pub static INTRINSIC: CardDef = CardDef {
     name: "(rules)",
     has_cost: false,
     abilities: &[
-        tap_for(add_w, Mana::W, "{T}: Add {W}."),
-        tap_for(add_u, Mana::U, "{T}: Add {U}."),
-        tap_for(add_b, Mana::B, "{T}: Add {B}."),
-        tap_for(add_r, Mana::R, "{T}: Add {R}."),
-        tap_for(add_g, Mana::G, "{T}: Add {G}."),
+        mana_ability(TAP, add(Mana::W), "{T}: Add {W}."),
+        mana_ability(TAP, add(Mana::U), "{T}: Add {U}."),
+        mana_ability(TAP, add(Mana::B), "{T}: Add {B}."),
+        mana_ability(TAP, add(Mana::R), "{T}: Add {R}."),
+        mana_ability(TAP, add(Mana::G), "{T}: Add {G}."),
         inherent("At the beginning of the monarch's end step, that player draws a card.", draw_one),
         inherent("Whenever a creature deals combat damage to the monarch, its controller becomes the monarch.", crown_subject),
         inherent("Whenever a player takes the initiative, that player ventures into Undercity.", venture),
@@ -208,12 +172,8 @@ pub static FACE_DOWN: CardDef = CardDef {
     types: TypeSet::of(&[CardType::Creature]),
     power: Some(2),
     toughness: Some(2),
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "Turn this permanent face up by paying its mana cost.",
-        effect: turn_face_up,
-        special_action: true,
-        condition: Some(can_turn_face_up),
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[ability(Cost::NONE, turn_face_up, "Turn this permanent face up by paying its mana cost.")
+        .condition(can_turn_face_up)
+        .special_action()],
     ..CardDef::BLANK
 };

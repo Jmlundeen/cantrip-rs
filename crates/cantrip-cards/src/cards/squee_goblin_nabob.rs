@@ -24,13 +24,7 @@ fn return_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "At the beginning of your upkeep, you may return this card from your graveyard to your hand.",
-        listens: EventMask::STEP_BEGAN,
-        matches: upkeep_in_graveyard,
-        effect: return_it,
-        anywhere: true,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(when(EventMask::STEP_BEGAN, upkeep_in_graveyard), return_it, "At the beginning of your upkeep, you may return this card from your graveyard to your hand.")
+        .anywhere()],
     ..oracle::SQUEE_GOBLIN_NABOB
 };

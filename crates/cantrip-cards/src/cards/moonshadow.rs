@@ -41,13 +41,7 @@ fn remove_a_counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     enters: Some(enters_with_counters),
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever one or more permanent cards are put into your graveyard from anywhere while this creature has a -1/-1 counter on it, remove a -1/-1 counter from this creature.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: permanent_card_to_your_graveyard,
-        effect: remove_a_counter,
-        once_per_batch: true,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(when(EventMask::ZONE_CHANGE, permanent_card_to_your_graveyard), remove_a_counter, "Whenever one or more permanent cards are put into your graveyard from anywhere while this creature has a -1/-1 counter on it, remove a -1/-1 counter from this creature.")
+        .once_per_batch()],
     ..oracle::MOONSHADOW
 };

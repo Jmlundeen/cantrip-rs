@@ -24,20 +24,10 @@ fn cant_be_blocked(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "{1}, {T}: Untap another target artifact.",
-            cost: Cost { mana: mana(1, 0, 0, 0, 0, 0), tap: true, ..Cost::NONE },
-            targets: &[TargetSpec { min: 1, max: 1, filter: another_artifact }],
-            effect: untap_it,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{3}, {T}: Target creature can't be blocked this turn.",
-            cost: Cost { mana: mana(3, 0, 0, 0, 0, 0), tap: true, ..Cost::NONE },
-            targets: &[targets::CREATURE],
-            effect: cant_be_blocked,
-            ..ActivatedDef::BLANK
-        }),
+        ability(cost("{1}, {T}"), untap_it, "{1}, {T}: Untap another target artifact.")
+            .targets(&[TargetSpec { min: 1, max: 1, filter: another_artifact }]),
+        ability(cost("{3}, {T}"), cant_be_blocked, "{3}, {T}: Target creature can't be blocked this turn.")
+            .targets(&[targets::CREATURE]),
     ],
     ..oracle::MANIFOLD_KEY
 };

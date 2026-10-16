@@ -76,49 +76,19 @@ fn grow_artifact(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static EMBLEM: CardDef = CardDef {
     name: "Tezzeret, Cruel Captain emblem",
     has_cost: false,
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "At the beginning of combat on your turn, put three +1/+1 counters on target artifact you control. If it's not a creature, it becomes a 0/0 Robot artifact creature.",
-        listens: EventMask::STEP_BEGAN,
-        matches: cantrip_mechanics::triggers::beginning_of_your_combat,
-        targets: &[TargetSpec { min: 1, max: 1, filter: artifact_you_control }],
-        effect: grow_artifact,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(cantrip_mechanics::triggers::BEGINNING_OF_YOUR_COMBAT, grow_artifact, "At the beginning of combat on your turn, put three +1/+1 counters on target artifact you control. If it's not a creature, it becomes a 0/0 Robot artifact creature.")
+        .targets(&[TargetSpec { min: 1, max: 1, filter: artifact_you_control }])],
     text: "At the beginning of combat on your turn, put three +1/+1 counters on target artifact you control. If it's not a creature, it becomes a 0/0 Robot artifact creature.",
     ..CardDef::BLANK
 };
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever an artifact you control enters, put a loyalty counter on Tezzeret.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: artifact_enters,
-            effect: add_loyalty,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "0: Untap target artifact or creature. If it's an artifact creature, put a +1/+1 counter on it.",
-            cost: Cost { loyalty: Some(0), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            targets: &[TargetSpec { min: 1, max: 1, filter: artifact_or_creature }],
-            effect: untap_and_grow,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "\u{2212}3: Search your library for an artifact card with mana value 1 or less, reveal it, put it into your hand, then shuffle.",
-            cost: Cost { loyalty: Some(-3), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            effect: tutor,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "\u{2212}7: You get an emblem with \"At the beginning of combat on your turn, put three +1/+1 counters on target artifact you control. If it's not a creature, it becomes a 0/0 Robot artifact creature.\"",
-            cost: Cost { loyalty: Some(-7), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            effect: emblem,
-            ..ActivatedDef::BLANK
-        }),
+        triggered(when(EventMask::ZONE_CHANGE, artifact_enters), add_loyalty, "Whenever an artifact you control enters, put a loyalty counter on Tezzeret."),
+        ability(loyalty(0), untap_and_grow, "0: Untap target artifact or creature. If it's an artifact creature, put a +1/+1 counter on it.")
+            .targets(&[TargetSpec { min: 1, max: 1, filter: artifact_or_creature }]),
+        ability(loyalty(-3), tutor, "\u{2212}3: Search your library for an artifact card with mana value 1 or less, reveal it, put it into your hand, then shuffle."),
+        ability(loyalty(-7), emblem, "\u{2212}7: You get an emblem with \"At the beginning of combat on your turn, put three +1/+1 counters on target artifact you control. If it's not a creature, it becomes a 0/0 Robot artifact creature.\""),
     ],
     ..oracle::TEZZERET_CRUEL_CAPTAIN
 };

@@ -26,6 +26,6 @@ fn grave(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     spell: Some(SpellDef { targets: &[], effect: grave }),
-    delayed: &[delayed::ability("Exile it.", delayed::exile_subject)],
+    delayed: &[delayed_trigger(delayed::exile_subject, "Exile it.")],
     ..oracle::SHALLOW_GRAVE
 };

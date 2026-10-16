@@ -28,21 +28,9 @@ fn damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Rage \u{2014} Whenever Gau attacks, put a +1/+1 counter on it.",
-            listens: EventMask::ATTACKS,
-            matches: cantrip_mechanics::triggers::this_attacks,
-            effect: counter,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "At the beginning of each end step, if a card left your graveyard this turn, Gau deals damage equal to its power to each opponent.",
-            listens: EventMask::STEP_BEGAN,
-            matches: end_step,
-            condition: Some(card_left),
-            effect: damage,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(cantrip_mechanics::triggers::THIS_ATTACKS, counter, "Rage \u{2014} Whenever Gau attacks, put a +1/+1 counter on it."),
+        triggered(when(EventMask::STEP_BEGAN, end_step), damage, "At the beginning of each end step, if a card left your graveyard this turn, Gau deals damage equal to its power to each opponent.")
+            .condition(card_left),
     ],
     ..oracle::GAU_FERAL_YOUTH
 };

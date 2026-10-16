@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{mana, pump, targets};
+use cantrip_mechanics::{pump, targets};
 use cantrip_oracle as oracle;
 
 /// Target creature gets +X/+0 and gains trample until end of turn, X being what was paid.
@@ -13,14 +13,9 @@ fn boost(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        mana::tap_for(mana::add_c, Mana::C, "{T}: Add {C}."),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{X}{R}{G}, {T}: Target creature gets +X/+0 and gains trample until end of turn.",
-            cost: Cost { mana: ManaCost { x: 1, ..mana(0, 0, 0, 0, 1, 1) }, tap: true, ..Cost::NONE },
-            targets: &[targets::CREATURE],
-            effect: boost,
-            ..ActivatedDef::BLANK
-        }),
+        mana_ability(TAP, add(Mana::C), "{T}: Add {C}."),
+        ability(cost("{X}{R}{G}, {T}"), boost, "{X}{R}{G}, {T}: Target creature gets +X/+0 and gains trample until end of turn.")
+            .targets(&[targets::CREATURE]),
     ],
     ..oracle::KESSIG_WOLF_RUN
 };

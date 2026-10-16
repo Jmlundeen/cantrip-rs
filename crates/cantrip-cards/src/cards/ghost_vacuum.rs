@@ -28,20 +28,10 @@ fn release(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "{T}: Exile target card from a graveyard.",
-            cost: Cost { tap: true, ..Cost::NONE },
-            targets: &[cantrip_mechanics::targets::CARD_IN_A_GRAVEYARD],
-            effect: exile_it,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "{6}, {T}, Sacrifice this artifact: Put each creature card exiled with this artifact onto the battlefield under your control with a flying counter on it. Each of them is a 1/1 Spirit in addition to its other types. Activate only as a sorcery.",
-            cost: Cost { mana: mana(6, 0, 0, 0, 0, 0), tap: true, sacrifice_self: true, ..Cost::NONE },
-            timing: Timing::Sorcery,
-            effect: release,
-            ..ActivatedDef::BLANK
-        }),
+        ability(TAP, exile_it, "{T}: Exile target card from a graveyard.")
+            .targets(&[cantrip_mechanics::targets::CARD_IN_A_GRAVEYARD]),
+        ability(cost("{6}, {T}").and(SACRIFICE_THIS), release, "{6}, {T}, Sacrifice this artifact: Put each creature card exiled with this artifact onto the battlefield under your control with a flying counter on it. Each of them is a 1/1 Spirit in addition to its other types. Activate only as a sorcery.")
+            .sorcery_speed(),
     ],
     ..oracle::GHOST_VACUUM
 };

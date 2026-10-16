@@ -14,13 +14,7 @@ fn targeted(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
 /// ability to be referred to by.
 pub static EXCEPTION: CardDef = CardDef {
     name: "Phantasmal Image (copy exception)",
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When this creature becomes the target of a spell or ability, sacrifice it.",
-        listens: EventMask::BECAME_TARGET,
-        matches: targeted,
-        effect: effects::sacrifice_self,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(when(EventMask::BECAME_TARGET, targeted), effects::sacrifice_self, "When this creature becomes the target of a spell or ability, sacrifice it.")],
     ..CardDef::BLANK
 };
 

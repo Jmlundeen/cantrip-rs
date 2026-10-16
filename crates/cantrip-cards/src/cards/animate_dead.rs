@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{attach::attached_object, targets, triggers::this_enters};
+use cantrip_mechanics::{attach::attached_object, targets, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 /// "Enchant creature card in a graveyard", and, once its enters ability has returned the creature, "enchant creature
@@ -38,22 +38,10 @@ fn minus_one_power(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
 pub static CARD: CardDef = CardDef {
     enchant: Some(TargetSpec { min: 1, max: 1, filter: enchant_filter }),
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When Animate Dead enters, if it's on the battlefield, it loses \"enchant creature card in a graveyard\" and gains \"enchant creature put onto the battlefield with Animate Dead.\" Return enchanted creature card to the battlefield under your control and attach Animate Dead to it.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            effect: return_enchanted,
-            condition: Some(cantrip_mechanics::triggers::this_is_on_the_battlefield),
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When Animate Dead leaves the battlefield, that creature's controller sacrifices it.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: cantrip_mechanics::triggers::this_leaves,
-            effect: sacrifice_creature,
-            look_back: true,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(THIS_ENTERS, return_enchanted, "When Animate Dead enters, if it's on the battlefield, it loses \"enchant creature card in a graveyard\" and gains \"enchant creature put onto the battlefield with Animate Dead.\" Return enchanted creature card to the battlefield under your control and attach Animate Dead to it.")
+            .condition(cantrip_mechanics::triggers::this_is_on_the_battlefield),
+        triggered(cantrip_mechanics::triggers::THIS_LEAVES, sacrifice_creature, "When Animate Dead leaves the battlefield, that creature's controller sacrifices it.")
+            .look_back(),
     ],
     statics: &[StaticDef {
         text: "Enchanted creature gets -1/-0.",

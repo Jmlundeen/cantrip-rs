@@ -40,28 +40,10 @@ fn rally(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When Okoye enters, you become the monarch.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: triggers::this_enters,
-            effect: effects::become_monarch,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "At the beginning of combat on your turn, put a +1/+1 counter on target creature. Whenever that creature attacks the monarch this turn, it gains double strike and trample until end of turn.",
-            listens: EventMask::STEP_BEGAN,
-            matches: triggers::beginning_of_your_combat,
-            targets: &[targets::CREATURE],
-            effect: vigil,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(triggers::THIS_ENTERS, effects::become_monarch, "When Okoye enters, you become the monarch."),
+        triggered(triggers::BEGINNING_OF_YOUR_COMBAT, vigil, "At the beginning of combat on your turn, put a +1/+1 counter on target creature. Whenever that creature attacks the monarch this turn, it gains double strike and trample until end of turn.")
+            .targets(&[targets::CREATURE]),
     ],
-    delayed: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever that creature attacks the monarch this turn, it gains double strike and trample until end of turn.",
-        listens: EventMask::ATTACKS,
-        matches: attacks_the_monarch,
-        effect: rally,
-        ..TriggeredDef::BLANK
-    })],
+    delayed: &[triggered(when(EventMask::ATTACKS, attacks_the_monarch), rally, "Whenever that creature attacks the monarch this turn, it gains double strike and trample until end of turn.")],
     ..oracle::OKOYE_MIGHTY_AND_ADORED
 };

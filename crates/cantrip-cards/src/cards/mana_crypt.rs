@@ -1,5 +1,4 @@
 use cantrip_api::*;
-use cantrip_mechanics::mana;
 use cantrip_oracle as oracle;
 
 /// Flip a coin; if you lose the flip, this artifact deals 3 damage to you. The flip is a two-sided die (CR 705.1) and
@@ -15,14 +14,8 @@ fn flip(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        mana::tap_for_n(mana::add_cc, Mana::C, 2, "{T}: Add {C}{C}."),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "At the beginning of your upkeep, flip a coin. If you lose the flip, Mana Crypt deals 3 damage to you.",
-            listens: EventMask::STEP_BEGAN,
-            matches: cantrip_mechanics::triggers::your_upkeep,
-            effect: flip,
-            ..TriggeredDef::BLANK
-        }),
+        mana_ability(TAP, add_n(Mana::C, 2), "{T}: Add {C}{C}."),
+        triggered(cantrip_mechanics::triggers::YOUR_UPKEEP, flip, "At the beginning of your upkeep, flip a coin. If you lose the flip, Mana Crypt deals 3 damage to you."),
     ],
     ..oracle::MANA_CRYPT
 };

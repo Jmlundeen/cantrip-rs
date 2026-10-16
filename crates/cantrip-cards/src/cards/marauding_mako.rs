@@ -21,14 +21,8 @@ fn that_many_counters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever you discard one or more cards, put that many +1/+1 counters on this creature.",
-            listens: EventMask::DISCARDED,
-            matches: you_discard,
-            effect: that_many_counters,
-            once_per_batch: true,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(when(EventMask::DISCARDED, you_discard), that_many_counters, "Whenever you discard one or more cards, put that many +1/+1 counters on this creature.")
+            .once_per_batch(),
         cycling(mana(2, 0, 0, 0, 0, 0), "Cycling {2} ({2}, Discard this card: Draw a card.)"),
     ],
     ..oracle::MARAUDING_MAKO

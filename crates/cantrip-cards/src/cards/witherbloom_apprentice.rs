@@ -22,12 +22,6 @@ fn drain(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Magecraft \u{2014} Whenever you cast or copy an instant or sorcery spell, each opponent loses 1 life and you gain 1 life.",
-        listens: EventMask(EventMask::SPELL_CAST.0 | EventMask::COPIED.0),
-        matches: cast_or_copy_instant_or_sorcery,
-        effect: drain,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(when(EventMask(EventMask::SPELL_CAST.0 | EventMask::COPIED.0), cast_or_copy_instant_or_sorcery), drain, "Magecraft \u{2014} Whenever you cast or copy an instant or sorcery spell, each opponent loses 1 life and you gain 1 life.")],
     ..oracle::WITHERBLOOM_APPRENTICE
 };

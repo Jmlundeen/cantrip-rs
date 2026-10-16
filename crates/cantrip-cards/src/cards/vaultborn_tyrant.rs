@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::copy::{create_token_copy_of_it, not_a_token};
-use cantrip_mechanics::triggers::this_dies;
+use cantrip_mechanics::triggers::THIS_DIES;
 use cantrip_oracle as oracle;
 
 /// "Whenever this creature or another creature you control with power 4 or greater enters" (CR 603.2): its own entry,
@@ -33,22 +33,10 @@ fn create_copy(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever this creature or another creature you control with power 4 or greater enters, you gain 3 life and draw a card.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: enters,
-            effect: gain_and_draw,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When this creature dies, if it's not a token, create a token that's a copy of it, except it's an artifact in addition to its other types.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_dies,
-            look_back: true,
-            condition: Some(not_a_token),
-            effect: create_copy,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(when(EventMask::ZONE_CHANGE, enters), gain_and_draw, "Whenever this creature or another creature you control with power 4 or greater enters, you gain 3 life and draw a card."),
+        triggered(THIS_DIES, create_copy, "When this creature dies, if it's not a token, create a token that's a copy of it, except it's an artifact in addition to its other types.")
+            .condition(not_a_token)
+            .look_back(),
     ],
     ..oracle::VAULTBORN_TYRANT
 };

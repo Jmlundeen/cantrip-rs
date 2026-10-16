@@ -20,12 +20,7 @@ fn put_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "{R}: You may put a creature card from your hand onto the battlefield. That creature gains haste. Sacrifice the creature at the beginning of the next end step.",
-        cost: Cost::mana(mana(0, 0, 0, 0, 1, 0)),
-        effect: put_creature,
-        ..ActivatedDef::BLANK
-    })],
-    delayed: &[AbilityDef::Triggered(TriggeredDef { text: "Sacrifice the creature.", effect: cantrip_mechanics::delayed::sacrifice_subject, ..TriggeredDef::BLANK })],
+    abilities: &[ability(cost("{R}"), put_creature, "{R}: You may put a creature card from your hand onto the battlefield. That creature gains haste. Sacrifice the creature at the beginning of the next end step.")],
+    delayed: &[delayed_trigger(cantrip_mechanics::delayed::sacrifice_subject, "Sacrifice the creature.")],
     ..oracle::SNEAK_ATTACK
 };

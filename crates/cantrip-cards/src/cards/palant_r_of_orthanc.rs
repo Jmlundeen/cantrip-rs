@@ -34,13 +34,7 @@ fn offer(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "At the beginning of your end step, put an influence counter on Palant\u{ed}r of Orthanc and scry 2. Then target opponent may have you draw a card. If that player doesn't, you mill X cards, where X is the number of influence counters on Palant\u{ed}r of Orthanc, and that player loses life equal to the total mana value of those cards.",
-        listens: EventMask::STEP_BEGAN,
-        matches: triggers::your_end_step,
-        targets: &[targets::OPPONENT],
-        effect: offer,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(triggers::YOUR_END_STEP, offer, "At the beginning of your end step, put an influence counter on Palant\u{ed}r of Orthanc and scry 2. Then target opponent may have you draw a card. If that player doesn't, you mill X cards, where X is the number of influence counters on Palant\u{ed}r of Orthanc, and that player loses life equal to the total mana value of those cards.")
+        .targets(&[targets::OPPONENT])],
     ..oracle::PALANT_R_OF_ORTHANC
 };

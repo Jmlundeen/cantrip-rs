@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{targets, tokens, triggers::this_enters};
+use cantrip_mechanics::{targets, tokens, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 /// A 5/3 green Elemental creature token.
@@ -51,22 +51,10 @@ pub static EXTRA: &[&CardDef] = &[&ELEMENTAL];
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When Titania, Protector of Argoth enters, return target land card from your graveyard to the battlefield.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            targets: &[TargetSpec { min: 1, max: 1, filter: land_card_in_your_graveyard }],
-            effect: return_land,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever a land you control is put into a graveyard from the battlefield, create a 5/3 green Elemental creature token.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: land_you_control_goes_to_graveyard,
-            effect: create_elemental,
-            look_back: true,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(THIS_ENTERS, return_land, "When Titania, Protector of Argoth enters, return target land card from your graveyard to the battlefield.")
+            .targets(&[TargetSpec { min: 1, max: 1, filter: land_card_in_your_graveyard }]),
+        triggered(when(EventMask::ZONE_CHANGE, land_you_control_goes_to_graveyard), create_elemental, "Whenever a land you control is put into a graveyard from the battlefield, create a 5/3 green Elemental creature token.")
+            .look_back(),
     ],
     ..oracle::TITANIA_PROTECTOR_OF_ARGOTH
 };

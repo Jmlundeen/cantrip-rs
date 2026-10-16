@@ -1,5 +1,4 @@
 use cantrip_api::*;
-use cantrip_mechanics::mana;
 use cantrip_oracle as oracle;
 
 /// Until end of turn, lands you control gain "Sacrifice this land: Add {B}." The set is fixed as this resolves
@@ -16,12 +15,6 @@ fn grant(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     spell: Some(SpellDef { targets: &[], effect: grant }),
-    delayed: &[AbilityDef::Activated(ActivatedDef {
-        text: "Sacrifice this land: Add {B}.",
-        cost: Cost { sacrifice_self: true, ..Cost::NONE },
-        mana: Some(mana::add_b),
-        adds: ManaPool([0, 0, 1, 0, 0, 0]),
-        ..ActivatedDef::BLANK
-    })],
+    delayed: &[mana_ability(SACRIFICE_THIS, add(Mana::B), "Sacrifice this land: Add {B}.")],
     ..oracle::RAIN_OF_FILTH
 };

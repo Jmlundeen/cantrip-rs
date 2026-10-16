@@ -36,32 +36,11 @@ fn counter_on_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "I \u{2014} Exile the top four cards of your library. Until the end of your next turn, you may play those cards.",
-            chapter: 1,
-            effect: exile_four,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "II \u{2014} Whenever you cast a spell this turn, put a +1/+1 counter on target creature you control.",
-            chapter: 2,
-            effect: rally,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "III \u{2014} Whenever you cast a spell this turn, put a +1/+1 counter on target creature you control.",
-            chapter: 3,
-            effect: rally,
-            ..TriggeredDef::BLANK
-        }),
+        chapter(1, exile_four, "I \u{2014} Exile the top four cards of your library. Until the end of your next turn, you may play those cards."),
+        chapter(2, rally, "II \u{2014} Whenever you cast a spell this turn, put a +1/+1 counter on target creature you control."),
+        chapter(3, rally, "III \u{2014} Whenever you cast a spell this turn, put a +1/+1 counter on target creature you control."),
     ],
-    delayed: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever you cast a spell this turn, put a +1/+1 counter on target creature you control.",
-        listens: EventMask::SPELL_CAST,
-        matches: you_cast_a_spell,
-        targets: &[targets::CREATURE_YOU_CONTROL],
-        effect: counter_on_creature,
-        ..TriggeredDef::BLANK
-    })],
+    delayed: &[triggered(when(EventMask::SPELL_CAST, you_cast_a_spell), counter_on_creature, "Whenever you cast a spell this turn, put a +1/+1 counter on target creature you control.")
+        .targets(&[targets::CREATURE_YOU_CONTROL])],
     ..oracle::SHOWDOWN_OF_THE_SKALDS
 };

@@ -27,13 +27,7 @@ pub static CARD: CardDef = CardDef {
     enters: Some(ravenous::enters),
     abilities: &[
         ravenous::draw_trigger("When Jacked Rabbit enters, if X is 5 or more, draw a card."),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever Jacked Rabbit attacks, create a number of 1/1 white Rabbit creature tokens equal to its power.",
-            listens: EventMask::ATTACKS,
-            matches: cantrip_mechanics::triggers::this_attacks,
-            effect: make_rabbits,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(cantrip_mechanics::triggers::THIS_ATTACKS, make_rabbits, "Whenever Jacked Rabbit attacks, create a number of 1/1 white Rabbit creature tokens equal to its power."),
     ],
     ..oracle::JACKED_RABBIT
 };

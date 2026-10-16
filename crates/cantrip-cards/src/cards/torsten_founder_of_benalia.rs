@@ -1,7 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::tokens::{self, SOLDIER};
 use cantrip_mechanics::top_of_library;
-use cantrip_mechanics::triggers::{self, this_enters};
+use cantrip_mechanics::triggers::{self, THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 /// "Reveal the top seven cards of your library. Put any number of creature and/or land cards from among them into
@@ -54,21 +54,9 @@ pub static EXTRA: &[&CardDef] = &[&SOLDIER];
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When Torsten enters, reveal the top seven cards of your library. Put any number of creature and/or land cards from among them into your hand and the rest on the bottom of your library in a random order.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            effect: reveal_seven,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When Torsten dies, create seven 1/1 white Soldier creature tokens.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: triggers::this_dies,
-            effect: create_soldiers,
-            look_back: true,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(THIS_ENTERS, reveal_seven, "When Torsten enters, reveal the top seven cards of your library. Put any number of creature and/or land cards from among them into your hand and the rest on the bottom of your library in a random order."),
+        triggered(triggers::THIS_DIES, create_soldiers, "When Torsten dies, create seven 1/1 white Soldier creature tokens.")
+            .look_back(),
     ],
     ..oracle::TORSTEN_FOUNDER_OF_BENALIA
 };

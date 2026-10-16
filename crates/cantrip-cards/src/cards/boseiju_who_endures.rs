@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{channel, mana, targets, effects, library::{search_to_battlefield, Find}};
+use cantrip_mechanics::{channel, targets, effects, library::{search_to_battlefield, Find}};
 use cantrip_oracle as oracle;
 
 /// "Target artifact, enchantment, or nonbasic land an opponent controls" (CR 115.1).
@@ -33,15 +33,10 @@ fn destroy_and_search(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        mana::tap_for(mana::add_g, Mana::G, "{T}: Add {G}."),
-        AbilityDef::Activated(ActivatedDef {
-            text: "Channel \u{2014} {1}{G}, Discard this card: Destroy target artifact, enchantment, or nonbasic land an opponent controls. That player may search their library for a land card with a basic land type, put it onto the battlefield, then shuffle. This ability costs {1} less to activate for each legendary creature you control.",
-            cost: Cost { mana: mana(1, 0, 0, 0, 0, 1), discard_self: true, ..Cost::NONE },
-            targets: &[TargetSpec { min: 1, max: 1, filter: opponents_target }],
-            effect: destroy_and_search,
-            from: ZoneKind::Hand,
-            ..ActivatedDef::BLANK
-        }),
+        mana_ability(TAP, add(Mana::G), "{T}: Add {G}."),
+        ability(cost("{1}{G}").and(DISCARD_THIS), destroy_and_search, "Channel \u{2014} {1}{G}, Discard this card: Destroy target artifact, enchantment, or nonbasic land an opponent controls. That player may search their library for a land card with a basic land type, put it onto the battlefield, then shuffle. This ability costs {1} less to activate for each legendary creature you control.")
+            .targets(&[TargetSpec { min: 1, max: 1, filter: opponents_target }])
+            .from(ZoneKind::Hand),
     ],
     own_cost_changes: &[channel::cheaper_per_legendary_creature],
     ..oracle::BOSEIJU_WHO_ENDURES

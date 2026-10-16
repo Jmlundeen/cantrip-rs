@@ -15,11 +15,6 @@ fn add_blue_for_each_artifact(g: &mut dyn Game, asker: &Asker, _: Option<Color>)
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "{T}: Add {U} for each artifact you control.",
-        cost: Cost { tap: true, ..Cost::NONE },
-        mana: Some(add_blue_for_each_artifact),
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[mana_ability(TAP, add_by(add_blue_for_each_artifact), "{T}: Add {U} for each artifact you control.")],
     ..oracle::TOLARIAN_ACADEMY
 };

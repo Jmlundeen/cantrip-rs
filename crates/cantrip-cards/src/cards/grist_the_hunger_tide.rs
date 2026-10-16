@@ -81,34 +81,12 @@ fn minus_five(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "+1: Create a 1/1 black and green Insect creature token, then mill a card. If an Insect card was milled this way, put a loyalty counter on Grist and repeat this process.",
-            cost: Cost { loyalty: Some(1), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            effect: plus_one,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "\u{2212}2: You may sacrifice a creature. When you do, destroy target creature or planeswalker.",
-            cost: Cost { loyalty: Some(-2), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            effect: minus_two,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "\u{2212}5: Each opponent loses life equal to the number of creature cards in your graveyard.",
-            cost: Cost { loyalty: Some(-5), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            effect: minus_five,
-            ..ActivatedDef::BLANK
-        }),
+        ability(loyalty(1), plus_one, "+1: Create a 1/1 black and green Insect creature token, then mill a card. If an Insect card was milled this way, put a loyalty counter on Grist and repeat this process."),
+        ability(loyalty(-2), minus_two, "\u{2212}2: You may sacrifice a creature. When you do, destroy target creature or planeswalker."),
+        ability(loyalty(-5), minus_five, "\u{2212}5: Each opponent loses life equal to the number of creature cards in your graveyard."),
     ],
-    delayed: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When you do, destroy target creature or planeswalker.",
-        targets: &[targets::CREATURE_OR_PLANESWALKER],
-        effect: destroy_target,
-        ..TriggeredDef::BLANK
-    })],
+    delayed: &[delayed_trigger(destroy_target, "When you do, destroy target creature or planeswalker.")
+        .targets(&[targets::CREATURE_OR_PLANESWALKER])],
     statics: &[
         StaticDef { text: "As long as Grist isn't on the battlefield, it's a 1/1 Insect creature in addition to its other types.", layer: Layer::Type, apply: insect_types, own: true, ..StaticDef::BLANK },
         StaticDef { text: "As long as Grist isn't on the battlefield, it's a 1/1 Insect creature in addition to its other types.", layer: Layer::PtDefine, apply: insect_size, own: true, ..StaticDef::BLANK },

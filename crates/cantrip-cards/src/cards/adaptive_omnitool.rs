@@ -23,13 +23,7 @@ fn look(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever equipped creature attacks, look at the top six cards of your library. You may reveal an artifact card from among them and put it into your hand. Put the rest on the bottom of your library in a random order.",
-            listens: EventMask::ATTACKS,
-            matches: cantrip_mechanics::triggers::equipped_creature_attacks,
-            effect: look,
-            ..TriggeredDef::BLANK
-        }),
+        triggered(cantrip_mechanics::triggers::EQUIPPED_CREATURE_ATTACKS, look, "Whenever equipped creature attacks, look at the top six cards of your library. You may reveal an artifact card from among them and put it into your hand. Put the rest on the bottom of your library in a random order."),
         equip(mana(3, 0, 0, 0, 0, 0), "Equip {3}"),
     ],
     statics: &[StaticDef {

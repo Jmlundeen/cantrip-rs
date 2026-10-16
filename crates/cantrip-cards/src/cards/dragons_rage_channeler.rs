@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::triggers::noncreature_spell_you_cast;
+use cantrip_mechanics::triggers::NONCREATURE_SPELL_YOU_CAST;
 use cantrip_oracle as oracle;
 
 /// Delirium (an ability word, CR 207.2c): four or more card types among cards in the controller's graveyard.
@@ -34,13 +34,7 @@ fn must_attack(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "Whenever you cast a noncreature spell, surveil 1.",
-        listens: EventMask::SPELL_CAST,
-        matches: noncreature_spell_you_cast,
-        effect: cantrip_mechanics::effects::surveil::<1>,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(NONCREATURE_SPELL_YOU_CAST, cantrip_mechanics::effects::surveil::<1>, "Whenever you cast a noncreature spell, surveil 1.")],
     statics: &[
         StaticDef {
             text: "Delirium \u{2014} As long as there are four or more card types among cards in your graveyard, this creature gets +2/+2.",

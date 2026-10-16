@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{scry, triggers::this_enters, targets, exile_target_until_leaves};
+use cantrip_mechanics::{scry, triggers::THIS_ENTERS, targets, exile_target_until_leaves};
 use cantrip_oracle as oracle;
 
 /// "Up to one other target nonland permanent" (CR 115.1).
@@ -29,21 +29,10 @@ fn sacrifice_and_scry(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Triggered(TriggeredDef {
-            text: "When this enchantment enters, exile up to one other target nonland permanent until this enchantment leaves the battlefield.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: this_enters,
-            targets: &[TargetSpec { min: 0, max: 1, filter: other_nonland_permanent }],
-            effect: exile_until_it_leaves,
-            ..TriggeredDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "Waterbend {3}: Sacrifice this enchantment. If you do, scry 2. (While paying a waterbend cost, you can tap your artifacts and creatures to help. Each one pays for {1}.)",
-            cost: Cost { mana: mana(3, 0, 0, 0, 0, 0), ..Cost::NONE },
-            waterbend: true,
-            effect: sacrifice_and_scry,
-            ..ActivatedDef::BLANK
-        }),
+        triggered(THIS_ENTERS, exile_until_it_leaves, "When this enchantment enters, exile up to one other target nonland permanent until this enchantment leaves the battlefield.")
+            .targets(&[TargetSpec { min: 0, max: 1, filter: other_nonland_permanent }]),
+        ability(cost("{3}"), sacrifice_and_scry, "Waterbend {3}: Sacrifice this enchantment. If you do, scry 2. (While paying a waterbend cost, you can tap your artifacts and creatures to help. Each one pays for {1}.)")
+            .waterbend(),
     ],
     ..oracle::AANGS_ICEBERG
 };

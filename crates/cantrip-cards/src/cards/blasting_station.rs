@@ -28,20 +28,9 @@ fn may_untap(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "{T}, Sacrifice a creature: Blasting Station deals 1 damage to any target.",
-            cost: Cost { tap: true, permanents: Some(PermanentCost { count: 1, filter: targets::filters::creature, to_hand: false }), ..Cost::NONE },
-            targets: &[targets::ANY],
-            effect: ping,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Triggered(TriggeredDef {
-            text: "Whenever a creature enters, you may untap Blasting Station.",
-            listens: EventMask::ZONE_CHANGE,
-            matches: creature_enters,
-            effect: may_untap,
-            ..TriggeredDef::BLANK
-        }),
+        ability(TAP.and(sacrifice(1, targets::filters::creature)), ping, "{T}, Sacrifice a creature: Blasting Station deals 1 damage to any target.")
+            .targets(&[targets::ANY]),
+        triggered(when(EventMask::ZONE_CHANGE, creature_enters), may_untap, "Whenever a creature enters, you may untap Blasting Station."),
     ],
     ..oracle::BLASTING_STATION
 };

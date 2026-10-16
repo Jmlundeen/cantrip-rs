@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{targets, triggers::this_enters};
+use cantrip_mechanics::{targets, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 /// "Look at target opponent's hand. You may exile a nonland card from it until this creature leaves the battlefield"
@@ -27,13 +27,7 @@ fn look_and_exile(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Triggered(TriggeredDef {
-        text: "When this creature enters, look at target opponent's hand. You may exile a nonland card from it until this creature leaves the battlefield.",
-        listens: EventMask::ZONE_CHANGE,
-        matches: this_enters,
-        targets: &[targets::OPPONENT],
-        effect: look_and_exile,
-        ..TriggeredDef::BLANK
-    })],
+    abilities: &[triggered(THIS_ENTERS, look_and_exile, "When this creature enters, look at target opponent's hand. You may exile a nonland card from it until this creature leaves the battlefield.")
+        .targets(&[targets::OPPONENT])],
     ..oracle::DEEP_CAVERN_BAT
 };

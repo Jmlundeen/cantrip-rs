@@ -49,37 +49,13 @@ fn exile_library(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        AbilityDef::Activated(ActivatedDef {
-            text: "+2: Look at the top card of target player's library. You may put that card on the bottom of that player's library.",
-            cost: Cost { loyalty: Some(2), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            targets: &[targets::PLAYER],
-            effect: look_at_top,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "0: Draw three cards, then put two cards from your hand on top of your library in any order.",
-            cost: Cost { loyalty: Some(0), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            effect: brainstorm,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "\u{2212}1: Return target creature to its owner's hand.",
-            cost: Cost { loyalty: Some(-1), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            targets: &[targets::CREATURE],
-            effect: bounce,
-            ..ActivatedDef::BLANK
-        }),
-        AbilityDef::Activated(ActivatedDef {
-            text: "\u{2212}12: Exile all cards from target player's library, then that player shuffles their hand into their library.",
-            cost: Cost { loyalty: Some(-12), ..Cost::NONE },
-            timing: Timing::Sorcery,
-            targets: &[targets::PLAYER],
-            effect: exile_library,
-            ..ActivatedDef::BLANK
-        }),
+        ability(loyalty(2), look_at_top, "+2: Look at the top card of target player's library. You may put that card on the bottom of that player's library.")
+            .targets(&[targets::PLAYER]),
+        ability(loyalty(0), brainstorm, "0: Draw three cards, then put two cards from your hand on top of your library in any order."),
+        ability(loyalty(-1), bounce, "\u{2212}1: Return target creature to its owner's hand.")
+            .targets(&[targets::CREATURE]),
+        ability(loyalty(-12), exile_library, "\u{2212}12: Exile all cards from target player's library, then that player shuffles their hand into their library.")
+            .targets(&[targets::PLAYER]),
     ],
     ..oracle::JACE_THE_MIND_SCULPTOR
 };

@@ -23,13 +23,7 @@ fn look(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[AbilityDef::Activated(ActivatedDef {
-        text: "\u{2212}2: Look at the top four cards of your library. You may reveal a noncreature, nonland card from among them and put it into your hand. Put the rest on the bottom of your library in a random order.",
-        cost: Cost { loyalty: Some(-2), ..Cost::NONE },
-        timing: Timing::Sorcery,
-        effect: look,
-        ..ActivatedDef::BLANK
-    })],
+    abilities: &[ability(loyalty(-2), look, "\u{2212}2: Look at the top four cards of your library. You may reveal a noncreature, nonland card from among them and put it into your hand. Put the rest on the bottom of your library in a random order.")],
     replacements: &[ReplacementDef {
         hint: "can't draw more than one card each turn",
         kind: ReplacementKind::DrawInstruction,

@@ -114,13 +114,7 @@ fn cascade_resolves(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// player is the one attacked, or the controller of the planeswalker or protector of the battle attacked (CR 508.5).
 /// Emrakul, the Aeons Torn and Ulamog's Crusher print it.
 pub const fn annihilator<const N: u8>(text: &'static str) -> AbilityDef {
-    AbilityDef::Triggered(TriggeredDef {
-        text,
-        listens: EventMask::ATTACKS,
-        matches: this_attacks_defender,
-        effect: annihilate::<N>,
-        ..TriggeredDef::BLANK
-    })
+    triggered(when(EventMask::ATTACKS, this_attacks_defender), annihilate::<N>, text)
 }
 
 /// "Whenever this creature attacks" (CR 508.1m, 603.2): its own attack, whatever it attacks. Aragorn, King of Gondor and
@@ -188,14 +182,8 @@ fn annihilate<const N: u8>(g: &mut dyn Game, item: &StackItem) -> Result<(), Sus
 /// Cascade (CR 702.85a): "When you cast this spell, exile cards from the top of your library until you exile a nonland
 /// card that costs less. You may cast it without paying its mana cost. Put all cards exiled this way that weren't cast
 /// on the bottom of your library in a random order." Bloodbraid Challenger and Bloodbraid Elf print it.
-pub const CASCADE: AbilityDef = AbilityDef::Triggered(TriggeredDef {
-    text: "Cascade",
-    listens: EventMask::SPELL_CAST,
-    matches: cast_this_spell,
-    effect: cascade_resolves,
-    anywhere: true,
-    ..TriggeredDef::BLANK
-});
+pub const CASCADE: AbilityDef = triggered(when(EventMask::SPELL_CAST, cast_this_spell), cascade_resolves, "Cascade")
+    .anywhere();
 
 fn cycle_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.draw(item.controller, 1);
@@ -205,13 +193,8 @@ fn cycle_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// Cycling [cost] (CR 702.29a): "[cost], Discard this card: Draw a card", from the hand. `text` is the ability's
 /// full text, which a scenario's `Ability:` matches.
 pub const fn cycling(mana: ManaCost, text: &'static str) -> AbilityDef {
-    AbilityDef::Activated(ActivatedDef {
-        text,
-        cost: Cost { mana, discard_self: true, ..Cost::NONE },
-        effect: cycle_draw,
-        from: ZoneKind::Hand,
-        ..ActivatedDef::BLANK
-    })
+    ability(Cost::mana(mana).and(DISCARD_THIS), cycle_draw, text)
+        .from(ZoneKind::Hand)
 }
 
 fn lone_attacker(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
@@ -234,13 +217,7 @@ fn exalted_pump(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 /// Exalted (CR 702.83a): "Whenever a creature you control attacks alone, that creature gets +1/+1 until end of turn."
 /// Ignoble Hierarch and Noble Hierarch print it word for word.
-pub const EXALTED: AbilityDef = AbilityDef::Triggered(TriggeredDef {
-    text: "Whenever a creature you control attacks alone, that creature gets +1/+1 until end of turn.",
-    listens: EventMask::ATTACKS,
-    matches: lone_attacker,
-    effect: exalted_pump,
-    ..TriggeredDef::BLANK
-});
+pub const EXALTED: AbilityDef = triggered(when(EventMask::ATTACKS, lone_attacker), exalted_pump, "Whenever a creature you control attacks alone, that creature gets +1/+1 until end of turn.");
 
 /// "When this creature enters, if its squad cost was paid": an unpaid cast, or a token copy, does not trigger at all.
 fn entered_squadded(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
@@ -264,13 +241,7 @@ fn squad_copies(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 /// Squad (CR 702.157a): the enters trigger. Securitron Squadron and Sicarian Infiltrator print it word for word; the
 /// additional cost is the card's `kicker`.
-pub const SQUAD: AbilityDef = AbilityDef::Triggered(TriggeredDef {
-    text: "Squad: When this creature enters, if its squad cost was paid, create a token that's a copy of it for each time its squad cost was paid.",
-    listens: EventMask::ZONE_CHANGE,
-    matches: entered_squadded,
-    effect: squad_copies,
-    ..TriggeredDef::BLANK
-});
+pub const SQUAD: AbilityDef = triggered(when(EventMask::ZONE_CHANGE, entered_squadded), squad_copies, "Squad: When this creature enters, if its squad cost was paid, create a token that's a copy of it for each time its squad cost was paid.");
 
 fn ward_matches(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
@@ -298,14 +269,8 @@ fn ward_effect<const N: u8>(g: &mut dyn Game, item: &StackItem) -> Result<(), Su
 /// unless that player pays {N}." A creature granted ward (Lavaspur Boots) has it from the granting card's delayed
 /// abilities; Kappa Cannoneer prints it with {4}.
 pub const fn ward<const N: u8>(text: &'static str) -> AbilityDef {
-    AbilityDef::Triggered(TriggeredDef {
-        text,
-        listens: EventMask::BECAME_TARGET,
-        matches: ward_matches,
-        effect: ward_effect::<N>,
-        ward: true,
-        ..TriggeredDef::BLANK
-    })
+    triggered(when(EventMask::BECAME_TARGET, ward_matches), ward_effect::<N>, text)
+        .ward()
 }
 
 fn ward_life_effect<const N: u8>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -326,14 +291,8 @@ fn ward_life_effect<const N: u8>(g: &mut dyn Game, item: &StackItem) -> Result<(
 /// Ward--Pay N life (CR 702.21a): "Whenever this becomes the target of a spell or ability an opponent controls, counter it
 /// unless that player pays N life." Sedgemoor Witch prints it with 3.
 pub const fn ward_life<const N: u8>(text: &'static str) -> AbilityDef {
-    AbilityDef::Triggered(TriggeredDef {
-        text,
-        listens: EventMask::BECAME_TARGET,
-        matches: ward_matches,
-        effect: ward_life_effect::<N>,
-        ward: true,
-        ..TriggeredDef::BLANK
-    })
+    triggered(when(EventMask::BECAME_TARGET, ward_matches), ward_life_effect::<N>, text)
+        .ward()
 }
 
 fn ward_discard_effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -353,14 +312,8 @@ fn ward_discard_effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
 /// Ward--Discard a card (CR 702.21a, 118.12): "Whenever this becomes the target of a spell or ability an opponent controls,
 /// counter it unless that player discards a card." Sunset Saboteur prints it.
 pub const fn ward_discard(text: &'static str) -> AbilityDef {
-    AbilityDef::Triggered(TriggeredDef {
-        text,
-        listens: EventMask::BECAME_TARGET,
-        matches: ward_matches,
-        effect: ward_discard_effect,
-        ward: true,
-        ..TriggeredDef::BLANK
-    })
+    triggered(when(EventMask::BECAME_TARGET, ward_matches), ward_discard_effect, text)
+        .ward()
 }
 
 /// "Whenever you cast a noncreature spell" (CR 603.2): prowess, Displacer Kitten and Dragon's Rage Channeler print it.
@@ -380,13 +333,7 @@ fn prowess_pump(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 /// Prowess (CR 702.108a): "Whenever you cast a noncreature spell, this creature gets +1/+1 until end of turn", as a
 /// real triggered ability. The Otter token of Stormchaser's Talent and the Monk token of Cori-Steel Cutter carry it.
-pub const PROWESS: AbilityDef = AbilityDef::Triggered(TriggeredDef {
-    text: "Prowess (Whenever you cast a noncreature spell, this creature gets +1/+1 until end of turn.)",
-    listens: EventMask::SPELL_CAST,
-    matches: noncreature_spell_you_cast,
-    effect: prowess_pump,
-    ..TriggeredDef::BLANK
-});
+pub const PROWESS: AbilityDef = triggered(when(EventMask::SPELL_CAST, noncreature_spell_you_cast), prowess_pump, "Prowess (Whenever you cast a noncreature spell, this creature gets +1/+1 until end of turn.)");
 
 /// "When this is put into a graveyard from the battlefield" (CR 700.4 for a creature: "dies"), looked back on: the
 /// ability is the object's as it last existed there (CR 603.10a). Use with `look_back: true`.
@@ -516,3 +463,28 @@ pub fn you_roll_a_die(q: &dyn Query, source: ObjectId, event: &Event) -> Option<
         _ => None,
     }
 }
+
+// --- The triggers, each with the events it listens to: `triggered(THIS_ENTERS, effect, text)` ---------------------
+
+pub const THIS_ENTERS: Trigger = when(EventMask::ZONE_CHANGE, this_enters);
+pub const THIS_ENTERS_IF_CAST: Trigger = when(EventMask::ZONE_CHANGE, this_enters_if_cast);
+pub const LANDFALL: Trigger = when(EventMask::ZONE_CHANGE, landfall);
+pub const YOU_UNLOCK_THIS_RIGHT_DOOR: Trigger = when(EventMask::DOOR_UNLOCKED, you_unlock_this_right_door);
+pub const CAST_THIS_SPELL: Trigger = when(EventMask::SPELL_CAST, cast_this_spell);
+pub const THIS_ATTACKS: Trigger = when(EventMask::ATTACKS, this_attacks);
+pub const THIS_ATTACKS_DEFENDER: Trigger = when(EventMask::ATTACKS, this_attacks_defender);
+pub const EQUIPPED_CREATURE_ATTACKS: Trigger = when(EventMask::ATTACKS, equipped_creature_attacks);
+pub const EQUIPPED_CREATURE_ATTACKS_SUBJECT: Trigger = when(EventMask::ATTACKS, equipped_creature_attacks_subject);
+pub const ENCHANTED_PLAYER_ATTACKED: Trigger = when(EventMask::ATTACKS, enchanted_player_attacked);
+pub const YOU_ATTACK: Trigger = when(EventMask::ATTACKERS_DECLARED, you_attack);
+pub const NONCREATURE_SPELL_YOU_CAST: Trigger = when(EventMask::SPELL_CAST, noncreature_spell_you_cast);
+pub const THIS_DIES: Trigger = when(EventMask::ZONE_CHANGE, this_dies);
+pub const THIS_LEAVES: Trigger = when(EventMask::ZONE_CHANGE, this_leaves);
+pub const YOUR_UPKEEP: Trigger = when(EventMask::STEP_BEGAN, your_upkeep);
+pub const BEGINNING_OF_YOUR_COMBAT: Trigger = when(EventMask::STEP_BEGAN, beginning_of_your_combat);
+pub const YOUR_END_STEP: Trigger = when(EventMask::STEP_BEGAN, your_end_step);
+pub const CREATURE_YOU_CONTROL_ENTERS: Trigger = when(EventMask::ZONE_CHANGE, creature_you_control_enters);
+pub const CREATURE_YOU_CONTROL_DIES: Trigger = when(EventMask::ZONE_CHANGE, creature_you_control_dies);
+pub const ARTIFACT_SPELL_YOU_CAST: Trigger = when(EventMask::SPELL_CAST, artifact_spell_you_cast);
+pub const DEALS_COMBAT_DAMAGE_TO_PLAYER_SUBJECT: Trigger = when(EventMask::DAMAGE, deals_combat_damage_to_player_subject);
+pub const DEALS_COMBAT_DAMAGE_TO_PLAYER: Trigger = when(EventMask::DAMAGE, deals_combat_damage_to_player);

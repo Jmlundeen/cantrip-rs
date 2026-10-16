@@ -26,12 +26,6 @@ fn copy_per_payment(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub const fn trigger(text: &'static str) -> AbilityDef {
-    AbilityDef::Triggered(TriggeredDef {
-        text,
-        listens: EventMask::SPELL_CAST,
-        matches: replicated,
-        effect: copy_per_payment,
-        anywhere: true,
-        ..TriggeredDef::BLANK
-    })
+    triggered(when(EventMask::SPELL_CAST, replicated), copy_per_payment, text)
+        .anywhere()
 }
