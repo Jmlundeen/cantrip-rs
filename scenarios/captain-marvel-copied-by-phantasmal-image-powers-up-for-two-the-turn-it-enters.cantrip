@@ -1,0 +1,64 @@
+# A copy of Captain Marvel, Earth's Protector has her mana cost, {3}{W}{W} (CR 707.2), and power-up reads "this
+# permanent's mana cost" (CR 702.193a): Bot2 casts her and powers her up for {2}; on Bot1's next turn a Phantasmal
+# Image copying her enters, and its own power-up, never activated by that object, costs {2} too, paid with Sol Ring's
+# {C}{C}. Each permanent's power-up is its own: hers having been activated does not stop the copy's.
+
+[Bot1 Deck]
+Island
+Sol Ring
+Phantasmal Image
+Island
+Island x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Black Lotus
+Mox Jet
+Sol Ring
+Captain Marvel, Earth's Protector
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Captain Marvel, Earth's Protector.Cast
+Bot2.Pass
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Battlefield.Captain Marvel, Earth's Protector.Activate
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Phantasmal Image.Cast
+Bot1.Pass
+Bot1.Accept
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Captain Marvel, Earth's Protector.Activate
+? Bot1.Mana =
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Captain Marvel, Earth's Protector.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Captain Marvel, Earth's Protector.Counters.Indestructible = 1
+Bot2.Battlefield.Captain Marvel, Earth's Protector.Counters.PlusOnePlusOne = 1
+Bot2.Battlefield.Captain Marvel, Earth's Protector.Counters.Indestructible = 1

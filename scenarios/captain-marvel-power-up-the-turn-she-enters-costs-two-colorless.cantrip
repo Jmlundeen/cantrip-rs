@@ -1,0 +1,54 @@
+# Captain Marvel, Earth's Protector: "Power-up — {5}{W}{W}: Put a +1/+1 counter and an indestructible counter on
+# Captain Marvel. (Activate each power-up ability only once. Reduce the cost by her mana cost if she entered this
+# turn.)" Bot1 casts her with five white mana, then activates power-up the same turn with Sol Ring's {C}{C} alone: her
+# {3}{W}{W} takes the {W}{W} off the white of {5}{W}{W} and {3} off its generic mana, leaving {2} (CR 702.193a-b, 118.7),
+# which colorless pays and which takes the whole of the {C}{C}. Had only generic mana come off, the {W}{W} would be
+# left to pay and Sol Ring could not. Once it has resolved, she has both counters, and with Mana Crypt's {C}{C} still to
+# spend the ability is not offered again: activate only once.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Black Lotus
+Mana Crypt
+Mox Jet
+Sol Ring
+Captain Marvel, Earth's Protector
+Plains x10
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mana Crypt.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Captain Marvel, Earth's Protector.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Captain Marvel, Earth's Protector.Activate
+? Bot1.Mana =
+Bot1.Pass
+! Bot1.Battlefield.Captain Marvel, Earth's Protector.Activate
+Bot1.Battlefield.Mana Crypt.Activate
+? Bot1.Mana = {C}{C}
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Captain Marvel, Earth's Protector.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Captain Marvel, Earth's Protector.Counters.Indestructible = 1
+Bot1.Battlefield.Captain Marvel, Earth's Protector.Power = 6
+Bot1.Battlefield.Captain Marvel, Earth's Protector.Toughness = 5
+Bot1.Battlefield.Captain Marvel, Earth's Protector.Keywords = Flash; Flying; Indestructible; Lifelink

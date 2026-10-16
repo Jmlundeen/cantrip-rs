@@ -1,0 +1,54 @@
+# Captain Marvel, Earth's Protector powers up for {2} the turn she is cast. Two turns later Ephemerate exiles her and
+# returns her: she is a new object (CR 400.7) that entered this turn, with a power-up ability it has never activated,
+# so power-up is offered again and costs {2} again (CR 702.193a), Sol Ring's {C}{C}. The counters from the first
+# activation left with the old object; she ends with one of each from the second.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Black Lotus
+Mox Jet
+Sol Ring
+Captain Marvel, Earth's Protector
+Ephemerate
+Plains
+Plains x10
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Captain Marvel, Earth's Protector.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Captain Marvel, Earth's Protector.Activate
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Captain Marvel, Earth's Protector.Counters.PlusOnePlusOne = 1
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Hand.Ephemerate.Cast(Captain Marvel, Earth's Protector)
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Captain Marvel, Earth's Protector.Activate
+? Bot1.Mana =
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Captain Marvel, Earth's Protector.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Captain Marvel, Earth's Protector.Counters.Indestructible = 1
+Exile = Ephemerate

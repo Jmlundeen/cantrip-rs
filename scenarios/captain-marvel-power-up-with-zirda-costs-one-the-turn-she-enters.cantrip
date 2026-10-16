@@ -1,0 +1,49 @@
+# Two cost changes on Captain Marvel, Earth's Protector's power-up: her own reduction by her mana cost, {3}{W}{W} off
+# {5}{W}{W} the turn she enters (CR 702.193a-b), and Zirda, the Dawnwaker's "Abilities you activate that aren't mana
+# abilities cost {2} less to activate. This effect can't reduce the mana in that cost to less than one mana" (CR 601.2f).
+# Power-up leaves {2}; Zirda takes it down to one mana, {1}, and no further: Mox Ruby's {R} pays it and is all spent, and
+# Mox Pearl stays untapped.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Ruby
+Zirda, the Dawnwaker
+Black Lotus
+Captain Marvel, Earth's Protector
+Plains
+Plains x10
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Zirda, the Dawnwaker.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Captain Marvel, Earth's Protector.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Captain Marvel, Earth's Protector.Activate
+? Bot1.Mana =
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Captain Marvel, Earth's Protector.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Captain Marvel, Earth's Protector.Counters.Indestructible = 1
+Bot1.Battlefield.Mox Pearl.Tapped = false
