@@ -1,7 +1,8 @@
 # General Ferrous Rokiric: "Whenever you cast a multicolored spell, create a 4/4 red and white Golem artifact creature
 # token." Bot1's Lightning Helix (red and white) makes one; its Lightning Bolt (red alone) makes none. Its "hexproof
 # from monocolored" (CR 702.11d) is nothing against a colorless source, which is not monocolored (CR 105.2c; Sphinx
-# of the Guildpact's ruling): Bot2's Walking Ballista removes a counter to deal 1 damage to the General, and it dies.
+# of the Guildpact's ruling): Bot2's Lightning Bolt (red alone) can't target the General, but Bot2's Walking Ballista
+# removes a counter to deal 1 damage to it, and it dies.
 
 [Bot1 Deck]
 Mountain
@@ -17,8 +18,8 @@ Island x10
 Mox Jet
 Mox Sapphire
 Walking Ballista
-Island
-Island
+Mountain
+Lightning Bolt
 Island
 Island
 Island x10
@@ -37,6 +38,7 @@ Bot2.Hand.Mox Sapphire.Cast
 Bot2.Battlefield.Mox Jet.Activate
 Bot2.Battlefield.Mox Sapphire.Activate
 Bot2.Hand.Walking Ballista.Cast(X: 1)
+Bot2.Hand.Mountain.Play
 [T3 Bot1.Main1]
 Bot1.Battlefield.Mountain.Activate
 Bot1.Battlefield.Mox Pearl.Activate
@@ -48,6 +50,8 @@ Bot1.Battlefield.Mox Ruby.Activate
 Bot1.Hand.Lightning Bolt.Cast(Bot2)
 Bot1.Pass
 [T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+! Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.General Ferrous Rokiric)
 Bot2.Battlefield.Walking Ballista.Activate(Bot1.Battlefield.General Ferrous Rokiric)
 Bot2.Pass
 

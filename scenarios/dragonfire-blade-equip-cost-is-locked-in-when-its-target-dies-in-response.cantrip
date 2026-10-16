@@ -45,7 +45,8 @@ Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Bloodtithe Harvester)
 
 [Expect]
 Turn = 3
-Bot1.Mana =
+Bot1.Battlefield.Mox Jet.Tapped = true
+Bot1.Battlefield.Mox Ruby.Tapped = true
 Bot1.Graveyard = Bloodtithe Harvester
 Bot1.Battlefield.Dragonfire Blade.AttachedTo = (absent)
 Bot1.Battlefield.Sol Ring.Tapped = false

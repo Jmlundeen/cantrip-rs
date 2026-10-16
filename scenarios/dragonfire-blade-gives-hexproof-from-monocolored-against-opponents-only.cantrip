@@ -1,8 +1,9 @@
 # "Equipped creature ... has hexproof from monocolored" (CR 702.11d): it can't be the target of monocolored spells
-# its controller's opponents control, nor of abilities they control from monocolored sources. Bot1's own white Mother
-# of Runes still targets the equipped Dwarven Mauler (hexproof is about opponents, CR 702.11b). Bot2's Lightning Bolt
-# (one color) can't target the Mauler - it kills the unequipped Ornithopter instead, the positive control - and Bot2's
-# Lightning Helix (red and white, CR 105.2b) can, and kills it.
+# its controller's opponents control, nor of abilities they control from monocolored sources. Bot2's Lightning Bolt
+# (one color) can't target the equipped Dwarven Mauler - it kills the unequipped Ornithopter instead, the positive
+# control - and Bot2's Lightning Helix (red and white, CR 105.2b) can. Bot1 answers with its own white Mother of Runes,
+# which may target the Mauler (hexproof is about opponents, CR 702.11b): protection from red makes the Helix's only
+# target illegal, so it does nothing (CR 608.2b) - the Mauler lives and Bot2 gains no life.
 
 [Bot1 Deck]
 Mountain
@@ -43,10 +44,8 @@ Bot2.Hand.Mox Pearl.Cast
 Bot1.Battlefield.Mox Jet.Activate
 Bot1.Battlefield.Dragonfire Blade.Activate(Dwarven Mauler)
 Bot1.Pass
-Bot1.Battlefield.Mother of Runes.Activate(Dwarven Mauler)
+[T3 Bot1.Main2]
 ? Bot1.Battlefield.Dwarven Mauler.HexproofFrom = Monocolored
-Bot1.Pass
-Bot1.Colors(Green)
 [T4 Bot2.Main1]
 Bot2.Battlefield.Mountain.Activate
 ! Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Dwarven Mauler)
@@ -56,9 +55,16 @@ Bot2.Battlefield.Mox Ruby.Activate
 Bot2.Battlefield.Mox Pearl.Activate
 Bot2.Hand.Lightning Helix.Cast(Bot1.Battlefield.Dwarven Mauler)
 Bot2.Pass
+Bot1.Battlefield.Mother of Runes.Activate(Dwarven Mauler)
+Bot1.Pass
+Bot2.Pass
+Bot1.Colors(Red)
 
 [Expect]
 Turn = 4
-Bot1.Graveyard = Dwarven Mauler; Ornithopter
-Bot1.Battlefield.Dragonfire Blade.AttachedTo = (absent)
-Bot2.Life = 23
+Bot1.Graveyard = Ornithopter
+Bot1.Battlefield.Dragonfire Blade.AttachedTo = Dwarven Mauler
+Bot1.Battlefield.Dwarven Mauler.Damage = 0
+Bot1.Battlefield.Mother of Runes.Tapped = true
+Bot2.Graveyard = Lightning Helix; Lightning Bolt
+Bot2.Life = 20
