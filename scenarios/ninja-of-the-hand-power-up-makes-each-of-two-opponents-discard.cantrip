@@ -1,0 +1,51 @@
+# Ninja of the Hand at a table of three: "Each opponent discards a card" asks Bot2 and then Bot3, in turn order (CR
+# 101.4), each choosing their own card; both discard, and the Ninja gets its counter.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Sol Ring
+Ninja of the Hand
+Mox Pearl
+Mox Ruby
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Island
+Lightning Bolt
+Island x12
+
+[Bot3 Deck]
+Mountain
+Counterspell
+Mountain x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Ninja of the Hand.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Ninja of the Hand.Activate
+Bot1.Pass
+Bot2.Choose(Lightning Bolt)
+Bot3.Choose(Counterspell)
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot2.Graveyard = Lightning Bolt
+Bot3.Graveyard = Counterspell
+Bot1.Battlefield.Ninja of the Hand.Counters.PlusOnePlusOne = 1
