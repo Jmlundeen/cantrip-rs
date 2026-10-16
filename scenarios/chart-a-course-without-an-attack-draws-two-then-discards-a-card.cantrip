@@ -1,0 +1,29 @@
+# Chart a Course on a turn the caster did not attack: draw two (Forest, Mountain), then discard a card of the caster's
+# choice, here the Forest (CR 701.9). The discard is asked of the hand including the cards just drawn.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Chart a Course
+Island
+Island
+Island
+Island
+Forest
+Mountain
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Chart a Course.Cast
+Bot1.Choose(Forest)
+
+[Expect]
+Bot1.Graveyard = Chart a Course; Forest
+Bot1.Hand = Island; Island; Island; Island; Mountain

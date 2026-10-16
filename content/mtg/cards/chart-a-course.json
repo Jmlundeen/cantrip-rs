@@ -1,0 +1,6 @@
+{
+  "name": "Chart a Course",
+  "manaCost": "{1}{U}",
+  "type": "Sorcery",
+  "oracleText": "Draw two cards. Then discard a card unless you attacked this turn."
+}

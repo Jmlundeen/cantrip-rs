@@ -1,0 +1,36 @@
+# Chart a Course in the second main phase of a turn the caster attacked on: draw two and no discard is asked
+# ("unless you attacked this turn"), the sorcery resolving with both Forest and Mountain in hand.
+# Control: chart-a-course-without-an-attack-draws-two-then-discards-a-card asks for the discard.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Ornithopter
+Chart a Course
+Island
+Island
+Island
+Swamp
+Forest
+Mountain
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+[Bot1.Main2]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Chart a Course.Cast
+! Bot1.Choose
+[Bot1.End]
+
+[Expect]
+Bot1.Graveyard = Chart a Course
+Bot1.Hand = Island; Island; Island; Swamp; Forest; Mountain

@@ -1,0 +1,35 @@
+# Only an attack this turn spares the discard: Bot1 attacks on turn 3, then on turn 5 casts Chart a Course having not
+# attacked, and discards (Forest).
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Ornithopter
+Chart a Course
+Island
+Island
+Island
+Swamp
+Plains
+Forest
+Mountain
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Chart a Course.Cast
+Bot1.Choose(Forest)
+
+[Expect]
+Bot1.Graveyard = Chart a Course; Forest
+Bot1.Hand = Island; Island; Island; Swamp; Plains; Mountain
