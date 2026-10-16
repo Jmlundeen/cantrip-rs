@@ -1,0 +1,75 @@
+# Oteclan Landmark // Oteclan Levitator. The Landmark enters and scries 2 (the Mountain kept on top, the Island to the
+# bottom). On turn three it crafts with an Ornithopter (Craft with artifact {2}{W}, CR 702.167a) and returns as Oteclan
+# Levitator, a 1/4 white Golem artifact creature with flying (CR 712.8e). On turn seven it attacks beside Llanowar Elves
+# and Embereth Shieldbreaker: "target attacking creature without flying gains flying until end of turn" may not target
+# the Levitator (it has flying) nor Bot2's Shieldbreaker (not attacking), and gives Bot1's Shieldbreaker flying (the
+# positive control, beside the Elves, which keep none), which it has no longer on turn nine.
+
+[Bot1 Deck]
+Plains
+Oteclan Landmark
+Mox Pearl
+Mox Ruby
+Mox Emerald
+Ornithopter
+Llanowar Elves
+Mountain
+Island
+Embereth Shieldbreaker
+Island x10
+
+[Bot2 Deck]
+Mountain
+Embereth Shieldbreaker
+Mountain x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Oteclan Landmark.Cast
+Bot1.Arrange(Mountain | Island)
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Oteclan Landmark.Activate(Ability: Craft)
+Bot1.Choose(Ornithopter)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Oteclan Levitator.Types = Artifact; Creature
+? Bot1.Battlefield.Oteclan Levitator.Subtypes = Golem
+? Bot1.Battlefield.Oteclan Levitator.Colors = White
+? Bot1.Battlefield.Oteclan Levitator.Keywords = Flying
+? Bot1.Battlefield.Oteclan Levitator.Power = 1
+? Bot1.Battlefield.Oteclan Levitator.Toughness = 4
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Battlefield.Mountain#2.Activate
+Bot2.Hand.Embereth Shieldbreaker.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Embereth Shieldbreaker.Cast
+[T7 Bot1.DeclareAttackers]
+Bot1.Attack(Oteclan Levitator > Bot2; Llanowar Elves > Bot2; Bot1.Battlefield.Embereth Shieldbreaker > Bot2)
+! Bot1.Target(Oteclan Levitator)
+! Bot1.Target(Bot2.Battlefield.Embereth Shieldbreaker)
+Bot1.Target(Bot1.Battlefield.Embereth Shieldbreaker)
+[T7 Bot1.Main2]
+? Bot1.Battlefield.Embereth Shieldbreaker.Keywords = Flying
+? Bot1.Battlefield.Llanowar Elves.Keywords = (absent)
+[T9 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Embereth Shieldbreaker.Keywords = (absent)
+Bot2.Life = 16
+Bot1.Library.Count = 9
+Exile = Ornithopter

@@ -1,0 +1,50 @@
+# Oteclan Levitator's attack trigger targets the attacking Llanowar Elves (the only attacking creature without flying, so
+# no question is asked). Bot2 kills the Elves with Lightning Bolt in response: as the trigger resolves its only target is
+# gone, so it does nothing (CR 608.2b). The Levitator still deals its 1 combat damage.
+
+[Bot1 Deck]
+Plains
+Oteclan Landmark
+Mox Pearl
+Mox Ruby
+Mox Jet
+Ornithopter
+Mox Emerald
+Llanowar Elves
+Island x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Oteclan Landmark.Cast
+Bot1.Arrange(Llanowar Elves; Island | )
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Oteclan Landmark.Activate(Ability: Craft)
+Bot1.Choose(Ornithopter)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Oteclan Levitator > Bot2; Llanowar Elves > Bot2)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Llanowar Elves)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Llanowar Elves
+Bot1.Battlefield.Oteclan Levitator.Keywords = Flying
+Bot2.Life = 19

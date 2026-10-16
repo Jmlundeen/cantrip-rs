@@ -1,0 +1,19 @@
+{
+  "name": "Oteclan Landmark",
+  "manaCost": "{W}",
+  "type": "Artifact",
+  "oracleText": "When this artifact enters, scry 2.\nCraft with artifact {2}{W} ({2}{W}, Exile this artifact, Exile another artifact you control or an artifact card from your graveyard: Return this card transformed under its owner's control. Craft only as a sorcery.)",
+  "backFace": {
+    "name": "Oteclan Levitator",
+    "type": "Artifact Creature — Golem",
+    "power": 1,
+    "toughness": 4,
+    "colorIndicator": [
+      "White"
+    ],
+    "oracleText": "Flying\nWhenever this creature attacks, target attacking creature without flying gains flying until end of turn.",
+    "keywords": [
+      "Flying"
+    ]
+  }
+}

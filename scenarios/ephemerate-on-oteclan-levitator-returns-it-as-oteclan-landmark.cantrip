@@ -1,0 +1,44 @@
+# A crafted permanent that leaves and returns is a new object with its front face up (CR 400.7, 712.14): Ephemerate exiles
+# Oteclan Levitator and returns it as Oteclan Landmark, whose "When this artifact enters, scry 2" triggers again. The
+# Ornithopter exiled to craft it stays in exile. The Landmark is no creature, so the rebound copy of Ephemerate on turn
+# five has nothing to target.
+
+[Bot1 Deck]
+Plains
+Oteclan Landmark
+Mox Pearl
+Mox Ruby
+Mox Jet
+Ornithopter
+Island
+Ephemerate
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Oteclan Landmark.Cast
+Bot1.Arrange(Ephemerate; Island | )
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Oteclan Landmark.Activate(Ability: Craft)
+Bot1.Choose(Ornithopter)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Oteclan Levitator.Types = Artifact; Creature
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Ephemerate.Cast(Oteclan Levitator)
+Bot1.Arrange(| Island; Island)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Plains; Mox Pearl; Mox Ruby; Mox Jet; Oteclan Landmark
+Bot1.Battlefield.Oteclan Landmark.Types = Artifact
+Exile = Ornithopter; Ephemerate
