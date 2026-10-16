@@ -371,7 +371,10 @@ public sealed partial class TacticalPlay
             or CardChoicePurposeView.ExileToPay or CardChoicePurposeView.TapToPay or CardChoicePurposeView.Destroy
             // Blight (CR 701.68a) shrinks its own creature: the one worth least takes the counters. Behold loses nothing, so the
             // ordinary best-first ranking stands (every candidate already is the quality the cost names).
-            or CardChoicePurposeView.Blight;
+            or CardChoicePurposeView.Blight
+            // Counters put on its own permanent (empower Jace, amass) help it, so the best one takes them, as the ordinary ranking
+            // does; harmful ones (-1/-1, stun) go on the one worth least.
+            || prompt.Purpose == CardChoicePurposeView.PutCounters && prompt.Counter is "-1/-1" or "stun";
 
         List<ObjectView> known = [.. prompt.Eligible.Select(client.Object).OfType<ObjectView>()];
         bool theirs = known.Count > 0 && known.TrueForAll(card => card.Owner != client.Seat && card.Controller != client.Seat);

@@ -23,7 +23,7 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
         bool permanents = prompt.Purpose is CardChoicePurposeView.Sacrifice or CardChoicePurposeView.ReturnToHand
             or CardChoicePurposeView.Untap or CardChoicePurposeView.Keep or CardChoicePurposeView.TapToPay
             or CardChoicePurposeView.Destroy or CardChoicePurposeView.Attach or CardChoicePurposeView.Encode
-            or CardChoicePurposeView.Blight or CardChoicePurposeView.TapToReduce;
+            or CardChoicePurposeView.Blight or CardChoicePurposeView.TapToReduce or CardChoicePurposeView.PutCounters;
         // A mulligan's bottoming is asked by the rules and has no source; an effect's (Valakut Awakening) names its own.
         string source = legend ? "The legend rule"
             : client.Object(context?.Source ?? prompt.Source)?.Name
@@ -81,6 +81,9 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
                 ? $"{source}: you may choose {article} {kind} you control or reveal {article} {kind} card from your hand to behold"
             : prompt.Purpose == CardChoicePurposeView.Blight && prompt.Count == 1 && !prompt.UpTo
                 ? $"{source}: choose a creature you control to blight (it gets -1/-1 counters)"
+            // Not a target (empower Jace's token, amass's Army): the one chosen gets the counters, and nothing is kept or lost.
+            : prompt.Purpose == CardChoicePurposeView.PutCounters && prompt.Count == 1 && !prompt.UpTo
+                ? $"{source}: choose {article} {kind} to put {Counters(prompt)} on"
             : prompt.Count == 1 && !prompt.UpTo ? $"{source}: choose {article} {kind} to {verb}{budget}"
             : anyNumber ? $"{source}: choose any number of {many} to {verb}{budget}"
             : $"{source}: choose {(prompt.UpTo ? "up to " : "")}{prompt.Count} {many} to {verb}{budget}";
@@ -126,6 +129,7 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
             CardChoicePurposeView.Encode => picked.Count == 0 ? "Encode on nothing" : "Encode on it",
             CardChoicePurposeView.Behold => picked.Count == 0 && prompt.UpTo ? "Behold nothing" : picked.Count == 1 ? "Behold it" : $"Behold {picked.Count}",
             CardChoicePurposeView.Blight => "Blight it",
+            CardChoicePurposeView.PutCounters => $"Put {Counters(prompt)} on it",
             // "Discard nothing" only where declining is an answer; a mandatory discard still counts down to its number.
             _ => picked.Count == 0 && prompt.UpTo ? "Discard nothing"
                 : picked.Count == 1 ? "Discard it" : $"Discard {picked.Count}",
@@ -196,6 +200,7 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
         CardChoicePurposeView.Behold => PromptActionView.Behold,
         CardChoicePurposeView.Blight => PromptActionView.Blight,
         CardChoicePurposeView.TapToReduce => PromptActionView.TapToReduce,
+        CardChoicePurposeView.PutCounters => PromptActionView.PutCounters,
         _ => PromptActionView.Choose,
     };
 
@@ -224,6 +229,20 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
         PromptActionView.Behold => "behold",
         PromptActionView.Blight => "blight (put -1/-1 counters on)",
         PromptActionView.TapToReduce => "tap to reduce the cost",
+        PromptActionView.PutCounters => "put the counters on",
         _ => "choose",
     };
+
+    /// <summary>The counters a <see cref="CardChoicePurposeView.PutCounters"/> choice puts on what is chosen: "2 loyalty counters", "a +1/+1 counter".</summary>
+    public static string Counters(ChooseCardsPromptMessage prompt)
+    {
+        ArgumentNullException.ThrowIfNull(prompt);
+        string kind = prompt.Counter.Length > 0 ? prompt.Counter + " " : string.Empty;
+        return prompt.CounterCount switch
+        {
+            <= 0 => "the counters",
+            1 => $"{(kind.Length > 0 && "aeiou".Contains(kind[0], StringComparison.OrdinalIgnoreCase) ? "an" : "a")} {kind}counter",
+            _ => $"{prompt.CounterCount} {kind}counters",
+        };
+    }
 }

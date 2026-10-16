@@ -40,7 +40,6 @@ keeps it).
 | [KI-3](#ki-3-engine-paths-no-scenario-runs) | Engine paths no scenario runs | Low | Unexercised |
 | [KI-4](#ki-4-scenarios-waiting-on-cards) | Scenarios waiting on cards the engine does not have | Low | Open |
 | [KI-5](#ki-5-a-spell-that-has-left-the-stack-is-judged-by-its-printed-keywords) | A spell that has left the stack is judged by its printed characteristics | Low | Suspected |
-| [KI-7](#ki-7-the-choice-of-which-jace-token-empower-jace-puts-counters-on-is-captioned-as-a-keep) | The choice of which Jace token empower Jace puts counters on is captioned as a "keep" | Medium | Open |
 
 ## Issues
 
@@ -145,21 +144,3 @@ offer madness as a replacement the affected player orders with the other.
 
 **Scenarios.**
 - [`scenarios/rest-in-peace-lets-a-discarded-madness-card-be-cast-by-choosing-madness-first.cantrip`](../scenarios/rest-in-peace-lets-a-discarded-madness-card-be-cast-by-choosing-madness-first.cantrip) - Basking Rootwalla discarded under Rest in Peace is cast for {0} (marked `# Known bug`).
-
-### KI-7: The choice of which Jace token empower Jace puts counters on is captioned as a "keep"
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Medium | Open | client / core | 2026-10-16, Theorist's Sanctum |
-
-**Notes.** With several Jace planeswalker tokens under your control (a token copy of a Jace keeps its printed loyalty,
-so Fractured Identity gives a second one), empower Jace has you choose the token that gets the counters.
-`cantrip_mechanics::empower::jace` asks it with `Purpose::Optional`, which the host (`crates/cantrip-host/src/prompt.rs`)
-maps to the client's keep purpose: the page shows "choose a Jace planeswalker token to keep" with a "Keep it" button,
-which is untrue - nothing is kept or lost, the token picked receives the loyalty counters. The engine side is right (the
-scenario below chooses the token and the counters land on it). The real fix is a `Purpose` for "put the counters on"
-(`cantrip-state`, the core, closed to the card work), mapped in `prompt.rs` and worded by the client; empower Jace
-then asks with it.
-
-**Scenarios.**
-- [`scenarios/theorists-sanctum-empower-with-two-jace-tokens-asks-which-gets-the-counters.cantrip`](../scenarios/theorists-sanctum-empower-with-two-jace-tokens-asks-which-gets-the-counters.cantrip) - the choice between two tokens (headless; the caption is not asserted).
