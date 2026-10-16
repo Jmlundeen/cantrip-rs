@@ -307,19 +307,29 @@ pub fn card_has_name(q: &dyn Query, card: CardId, wanted: CardId) -> bool {
     def.name == name || def.split.is_some_and(|(left, right)| left.name == name || right.name == name)
 }
 
-/// Whether the object `id` has the name `wanted` (CR 201.2a, 709.4a): "an object has the chosen name if one of its names is
-/// the chosen name". A Room on the battlefield has the names of its unlocked doors alone (CR 709.5), any other split
-/// card both halves', and a copy that says "except its name is X" that name (CR 707.9b). Anointed Peacekeeper's "sources with
-/// the chosen name" and any card that asks of a permanent or spell whether it is named so.
-pub fn object_has_name(q: &dyn Query, id: ObjectId, wanted: CardId) -> bool {
-    let name = q.card(wanted).name;
+/// The names the object `id` has (CR 201.2a): a Room on the battlefield those of its unlocked doors alone, and none at all
+/// with neither unlocked (CR 709.5); any other split card both halves' (CR 709.4a); a copy that says "except its name is X"
+/// only that (CR 707.9b); and anything else its own name, one for each of the two faces' names of a card written "A // B".
+pub fn object_names(q: &dyn Query, id: ObjectId) -> Vec<&'static str> {
     let c = q.chars(id);
-    if c.name == name {
-        return true;
+    let obj = q.obj(id);
+    if obj.copy.is_some_and(|copy| copy.name.is_some()) {
+        return vec![c.name];
     }
     let def = q.card(c.card);
-    if def.is_room() && q.obj(id).zone.is(ZoneKind::Battlefield) {
-        return def.unlocked_doors(q.obj(id).marks.doors).any(|half| half.name == name);
+    if def.is_room() && obj.zone.is(ZoneKind::Battlefield) {
+        return def.unlocked_doors(obj.marks.doors).map(|half| half.name).collect();
     }
-    card_has_name(q, c.card, wanted)
+    if let Some((left, right)) = def.split {
+        return vec![left.name, right.name];
+    }
+    c.name.split(" // ").filter(|name| !name.is_empty()).collect()
+}
+
+/// Whether the object `id` has the name `wanted` (CR 201.2a, 709.4a): "an object has the chosen name if one of its names is
+/// the chosen name" (`object_names`). Anointed Peacekeeper's "sources with the chosen name", Tamiyo, Collector of Tales and any
+/// card that asks of a permanent, a spell or a card in a zone whether it is named so.
+pub fn object_has_name(q: &dyn Query, id: ObjectId, wanted: CardId) -> bool {
+    let name = q.card(wanted).name;
+    object_names(q, id).contains(&name)
 }

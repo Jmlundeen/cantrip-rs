@@ -443,12 +443,13 @@ pub fn animate(g: &mut dyn Game, source: ObjectId, permanent: ObjectId, a: &Anim
     g.add_effect(source, permanent, EffectKind::SetPt(a.power, a.toughness), duration);
 }
 
-/// Whether two objects share a name (CR 201.2): a card with two names (a split or double-faced card, "A // B") shares
-/// one with anything that has either. The name is the computed one, so a copy has the name it copies. Echoing Return,
-/// Echoing Ruin and Echoing Truth print "all other [things] with the same name as that [thing]".
+/// Whether two objects share a name (CR 201.2): an object with two names (a split or double-faced card, "A // B") shares
+/// one with anything that has either, a Room on the battlefield has those of its unlocked doors alone (CR 709.5), and a
+/// copy has the name it copies (`library::object_names`). Echoing Return, Echoing Ruin and Echoing Truth print "all other
+/// [things] with the same name as that [thing]", and Bloodbond March and Deadly Cover-Up "with the same name".
 pub fn same_name(q: &dyn Query, a: ObjectId, b: ObjectId) -> bool {
-    let (a, b) = (q.card(q.chars(a).card).name, q.card(q.chars(b).card).name);
-    a.split(" // ").any(|n| !n.is_empty() && b.split(" // ").any(|m| m == n))
+    let theirs = library::object_names(q, b);
+    library::object_names(q, a).iter().any(|name| theirs.contains(name))
 }
 
 /// Explore (CR 701.44): the permanent's controller reveals the top card of their library; a land goes into their hand,
