@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::evoke;
+use cantrip_mechanics::{evoke, targets};
 use cantrip_mechanics::{discard_chosen, exile_target};
 use cantrip_oracle as oracle;
 
@@ -29,16 +29,6 @@ fn blue_spent(q: &dyn Query, asker: &Asker) -> bool {
     spent_two(q, asker.source, Mana::U)
 }
 
-fn artifact_or_enchantment_an_opponent_controls(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    match t {
-        Target::Object(id) if is_live(q, id) && q.is_on_battlefield(id) => {
-            let c = q.chars(id);
-            q.controller(id) != asker.controller && (c.is(CardType::Artifact) || c.is(CardType::Enchantment))
-        }
-        _ => false,
-    }
-}
-
 fn exile_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     exile_target(g, item, 0);
     Ok(())
@@ -61,7 +51,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         evoke::sacrifice_trigger("When Wistfulness enters, if its evoke cost was paid, its controller sacrifices it."),
         triggered(when(EventMask::ZONE_CHANGE, green_entered), exile_it, "When this creature enters, if {G}{G} was spent to cast it, exile target artifact or enchantment an opponent controls.")
-            .targets(&[target(artifact_or_enchantment_an_opponent_controls)])
+            .targets(&[targets::ARTIFACT_OR_ENCHANTMENT_AN_OPPONENT_CONTROLS])
             .condition(green_spent),
         triggered(when(EventMask::ZONE_CHANGE, blue_entered), draw_then_discard, "When this creature enters, if {U}{U} was spent to cast it, draw two cards, then discard a card.")
             .condition(blue_spent),

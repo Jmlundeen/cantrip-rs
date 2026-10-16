@@ -125,6 +125,10 @@ fn artifact_or_enchantment_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
     })
 }
 
+fn artifact_or_enchantment_an_opponent_controls_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    artifact_or_enchantment_filter(q, asker, t) && matches!(t, Target::Object(id) if q.controller(id) != asker.controller)
+}
+
 fn permanent_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
     matches!(t, Target::Object(id) if on_battlefield(q, id))
 }
@@ -161,6 +165,8 @@ pub const ARTIFACT_OR_ENCHANTMENT: TargetSpec = target(artifact_or_enchantment_f
 pub const PERMANENT: TargetSpec = target(permanent_filter);
 /// "Target nonland permanent". Banishing Knack and Boomerang Basics print it.
 pub const NONLAND_PERMANENT: TargetSpec = target(nonland_permanent_filter);
+/// "Target artifact or enchantment an opponent controls". Cathartic Parting, Witch Enchanter, Wistfulness and Scrapshooter print it.
+pub const ARTIFACT_OR_ENCHANTMENT_AN_OPPONENT_CONTROLS: TargetSpec = target(artifact_or_enchantment_an_opponent_controls_filter);
 /// "Target nonland permanent an opponent controls". Conclave Tribunal and Sheltered by Ghosts print it.
 pub const NONLAND_PERMANENT_AN_OPPONENT_CONTROLS: TargetSpec =
     target(nonland_permanent_an_opponent_controls_filter);

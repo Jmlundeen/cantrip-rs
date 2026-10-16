@@ -2,11 +2,6 @@ use cantrip_api::*;
 use cantrip_mechanics::{targets, effects};
 use cantrip_oracle as oracle;
 
-/// "Target artifact or enchantment an opponent controls" (CR 115.1).
-fn opponents_artifact_or_enchantment(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    (targets::ARTIFACT_OR_ENCHANTMENT.filter)(q, asker, t) && matches!(t, Target::Object(id) if q.controller(id) != asker.controller)
-}
-
 /// "Target cards from your graveyard" (CR 115.1).
 fn card_in_your_graveyard(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     targets::card_in_your_graveyard(q, asker, t, &[])
@@ -32,6 +27,6 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: spell(&[ target(opponents_artifact_or_enchantment), up_to(4, card_in_your_graveyard), ], effect),
+    spell: spell(&[ targets::ARTIFACT_OR_ENCHANTMENT_AN_OPPONENT_CONTROLS, up_to(4, card_in_your_graveyard), ], effect),
     ..oracle::CATHARTIC_PARTING
 };
