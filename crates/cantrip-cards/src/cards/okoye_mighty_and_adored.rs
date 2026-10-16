@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::effects;
-use cantrip_mechanics::{targets, triggers};
+use cantrip_mechanics::{delayed, targets, triggers};
 use cantrip_oracle as oracle;
 
 /// "Put a +1/+1 counter on target creature. Whenever that creature attacks the monarch this turn, it gains double
@@ -9,8 +9,7 @@ use cantrip_oracle as oracle;
 fn vigil(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
     g.add_counters(creature, CounterKind::PlusOne, 1);
-    let this = g.card_id(&CARD);
-    g.delayed_trigger(DelayedWhen::ThisTurn, creature, item.controller, AbilityRef::delayed(this, 0), Target::None);
+    delayed::this_turn(g, item, creature);
     Ok(())
 }
 

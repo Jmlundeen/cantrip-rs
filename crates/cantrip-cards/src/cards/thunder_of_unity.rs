@@ -11,8 +11,7 @@ fn chapter_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// II, III: the delayed ability that lasts the turn (CR 603.7b), made by the chapter. "You" is the Saga's controller as
 /// the chapter resolved (CR 603.7d).
 fn watch(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let this = g.card_id(&CARD);
-    g.delayed_trigger(DelayedWhen::ThisTurn, item.object, item.controller, AbilityRef::delayed(this, 0), Target::None);
+    cantrip_mechanics::delayed::this_turn(g, item, item.object);
     Ok(())
 }
 

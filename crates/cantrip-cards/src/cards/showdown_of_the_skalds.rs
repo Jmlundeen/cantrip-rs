@@ -14,8 +14,7 @@ fn exile_four(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// Chapters II and III: each makes its own delayed ability for the turn (CR 603.7b), so two chapters in one turn
 /// trigger twice for each spell.
 fn rally(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let this = g.card_id(&CARD);
-    g.delayed_trigger(DelayedWhen::ThisTurn, item.object, item.controller, AbilityRef::delayed(this, 0), Target::None);
+    cantrip_mechanics::delayed::this_turn(g, item, item.object);
     Ok(())
 }
 

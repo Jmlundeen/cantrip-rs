@@ -10,8 +10,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         }
     }
     if g.obj(item.object).kicked > 0 {
-        let this = g.card_id(&CARD);
-        g.delayed_trigger(DelayedWhen::ThisTurn, item.object, item.controller, AbilityRef::delayed(this, 0), Target::None);
+        cantrip_mechanics::delayed::this_turn(g, item, item.object);
     }
     Ok(())
 }

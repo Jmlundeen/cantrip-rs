@@ -5,8 +5,7 @@ use cantrip_oracle as oracle;
 /// spell this turn", which may trigger any number of times. "You" is the controller of the spell as it resolved
 /// (CR 603.7d).
 fn watch(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let this = g.card_id(&CARD);
-    g.delayed_trigger(DelayedWhen::ThisTurn, item.object, item.controller, AbilityRef::delayed(this, 0), Target::None);
+    cantrip_mechanics::delayed::this_turn(g, item, item.object);
     Ok(())
 }
 

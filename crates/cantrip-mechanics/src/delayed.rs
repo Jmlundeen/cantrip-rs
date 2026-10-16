@@ -17,6 +17,16 @@ pub fn at_next_end_step(g: &mut dyn Game, item: &StackItem, ability: u8, subject
     );
 }
 
+/// Sets up the card's delayed ability number 0 to trigger "this turn" (CR 603.7b): each time its `listens`/`matches`
+/// accept an event, until the turn ends, controlled by the resolving ability's controller. `source` is the object the
+/// ability's `matches` is asked of: the spell for "whenever a creature you control dies this turn", the creature it
+/// is about for "when it dies this turn". Forth Eorlingas!, Glimpse of Nature, Rite of Harmony, Showdown of the Skalds,
+/// Thunder of Unity, Warhost's Frenzy, Okoye and Turn Inside Out use it.
+pub fn this_turn(g: &mut dyn Game, item: &StackItem, source: ObjectId) {
+    let this = g.obj(item.object).card;
+    g.delayed_trigger(DelayedWhen::ThisTurn, source, item.controller, AbilityRef::delayed(this, 0), Target::None);
+}
+
 /// "Sacrifice it": the delayed ability's subject, if it is still the object it was on the battlefield (CR 603.7c, 400.7)
 /// and its controller is the one sacrificing it (CR 701.21a). Sneak Attack and Through the Breach print it at the next
 /// end step.

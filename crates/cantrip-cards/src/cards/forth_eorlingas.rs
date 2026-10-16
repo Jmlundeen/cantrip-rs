@@ -19,8 +19,7 @@ pub static HUMAN_KNIGHT: CardDef = CardDef {
 /// (CR 603.7b). "You" is the spell's controller as it resolved (CR 603.7d).
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     cantrip_mechanics::tokens::create(g, item.controller, &HUMAN_KNIGHT, item.x as u32)?;
-    let this = g.card_id(&CARD);
-    g.delayed_trigger(DelayedWhen::ThisTurn, item.object, item.controller, AbilityRef::delayed(this, 0), Target::None);
+    cantrip_mechanics::delayed::this_turn(g, item, item.object);
     Ok(())
 }
 
