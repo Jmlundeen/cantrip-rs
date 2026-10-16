@@ -1,0 +1,47 @@
+# With one more source (Mox Ruby drawn and cast) the same harmonize cast is offered: tapping Llanowar Elves (power 1) takes {1} off, and the
+# four other sources pay {3}{R}. The Elves are tapped for the cost, so the five sources never all pay (CR 702.180b); the control for the
+# scenario before this one.
+
+[Bot1 Deck]
+Mountain
+Mox Pearl
+Mox Jet
+Black Lotus
+Llanowar Elves
+Wild Ride
+Ornithopter
+Mox Ruby
+Mountain x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Wild Ride.Cast(Ornithopter)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Graveyard.Wild Ride.Cast(Bot1.Battlefield.Ornithopter; Ability: Harmonize)
+Bot1.Choose(Llanowar Elves)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Wild Ride
+Bot1.Mana =
+Bot1.Battlefield.Llanowar Elves.Tapped = true
+Bot1.Battlefield.Mox Ruby.Tapped = true
+Bot1.Battlefield.Ornithopter.Power = 3
+Stack.Count = 0

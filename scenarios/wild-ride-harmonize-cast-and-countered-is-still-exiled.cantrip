@@ -1,0 +1,52 @@
+# A spell cast with harmonize is exiled if it leaves the stack any way at all (CR 702.180a): Bot2 counters the harmonize cast with
+# Counterspell, and Wild Ride goes to exile, not the graveyard. No creature is tapped (up to one).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Ornithopter
+Wild Ride
+Mountain x13
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Island x17
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Wild Ride.Cast(Ornithopter)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Graveyard.Wild Ride.Cast(Ornithopter; Ability: Harmonize)
+Bot1.Choose()
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Wild Ride)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Wild Ride
+Bot1.Graveyard.Count = 0
+Bot2.Graveyard = Counterspell
+Bot1.Battlefield.Ornithopter.Power = 0
+Stack.Count = 0

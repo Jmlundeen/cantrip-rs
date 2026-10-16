@@ -1,0 +1,50 @@
+# Harmonize does not bypass the timing a sorcery has (ruling): with a spell on the stack (Mox Sapphire, cast and not yet
+# resolved) and four of the five mana in the pool, the harmonize cast is refused; once it resolves, the same cast is made (the positive control).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Pearl
+Mox Jet
+Ragavan, Nimble Pilferer
+Wild Ride
+Ornithopter
+Mox Sapphire
+Mountain x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ragavan, Nimble Pilferer.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Wild Ride.Cast(Ornithopter)
+! Bot1.Choose
+Bot1.Pass
+[T1 Bot1.Main2]
+? Bot1.Graveyard = Wild Ride
+? Bot1.Battlefield.Ornithopter.Power = 3
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Mox Sapphire.Cast
+! Bot1.Graveyard.Wild Ride.Cast(Bot1.Battlefield.Ornithopter; Ability: Harmonize)
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Graveyard.Wild Ride.Cast(Bot1.Battlefield.Ornithopter; Ability: Harmonize)
+Bot1.Choose()
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Wild Ride
+Bot1.Mana =
+Stack.Count = 0

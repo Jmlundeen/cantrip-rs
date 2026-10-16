@@ -1,0 +1,55 @@
+# Bot1's Ornithopter died to Bot2's Lightning Bolt after the first Wild Ride, so Bot1 controls no creature to tap. Harmonize from the
+# graveyard (target: Bot2's Ornithopter, any creature) asks for no creature (CR 702.180a: "up to one" of none) and costs {4}{R} in full.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Pearl
+Mox Jet
+Wild Ride
+Ornithopter
+Mox Sapphire
+Mox Emerald
+Mountain x12
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Ornithopter
+Island x17
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Wild Ride.Cast(Ornithopter)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Count = 4
+? Bot1.Graveyard = Ornithopter; Wild Ride
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Graveyard.Wild Ride.Cast(Bot2.Battlefield.Ornithopter; Ability: Harmonize)
+! Bot1.Choose
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Wild Ride
+Bot1.Graveyard = Ornithopter
+Bot1.Mana =
+Bot1.Battlefield.Mox Sapphire.Tapped = true
+Bot2.Battlefield.Ornithopter.Power = 3
+Stack.Count = 0

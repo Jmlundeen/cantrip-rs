@@ -1,0 +1,59 @@
+# Wild Ride cast from the hand ({R}, a sorcery) goes to the graveyard when it resolves and asks for no creature to tap: harmonize is
+# only a way of casting it from the graveyard (CR 702.180a). Bot1 casts it for its harmonize cost, {4}{R}, choosing to tap no creature
+# (CR 702.180a: "up to one"), so all five mana is paid and neither creature is tapped. It resolves, the Ornithopter gets +3/+0, and the
+# card is exiled instead of going to the graveyard (CR 702.180a).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Pearl
+Mox Jet
+Ragavan, Nimble Pilferer
+Wild Ride
+Ornithopter
+Mox Sapphire
+Mountain x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ragavan, Nimble Pilferer.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Wild Ride.Cast(Ornithopter)
+! Bot1.Choose
+Bot1.Pass
+[T1 Bot1.Main2]
+? Bot1.Graveyard = Wild Ride
+? Bot1.Battlefield.Ornithopter.Power = 3
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Graveyard.Wild Ride.Cast(Ornithopter; Ability: Harmonize)
+Bot1.Choose()
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Wild Ride
+Bot1.Graveyard.Count = 0
+Bot1.Mana =
+Bot1.Battlefield.Mountain.Tapped = true
+Bot1.Battlefield.Mox Ruby.Tapped = true
+Bot1.Battlefield.Mox Pearl.Tapped = true
+Bot1.Battlefield.Mox Jet.Tapped = true
+Bot1.Battlefield.Mox Sapphire.Tapped = true
+Bot1.Battlefield.Ornithopter.Tapped = false
+Bot1.Battlefield.Ornithopter.Power = 3
+Bot1.Battlefield.Ragavan, Nimble Pilferer.Tapped = false
+Stack.Count = 0

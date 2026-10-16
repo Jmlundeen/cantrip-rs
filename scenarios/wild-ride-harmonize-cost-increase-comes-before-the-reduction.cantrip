@@ -1,0 +1,61 @@
+# Thalia makes noncreature spells cost {1} more: harmonize {4}{R} is {5}{R} before anything comes off (CR 601.2f: increases first, then
+# reductions). Tapping Wistfulness (power 6) takes all {5} of the generic mana off, leaving {R}, paid by the Mountain. Reducing first and
+# adding the tax after would leave {1}{R}, which one Mountain could not pay.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Ornithopter
+Wild Ride
+Mox Emerald
+Wistfulness
+Mountain x11
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Thalia, Guardian of Thraben
+Island x17
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Wild Ride.Cast(Ornithopter)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Thalia, Guardian of Thraben.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Wistfulness.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Graveyard.Wild Ride.Cast(Bot1.Battlefield.Ornithopter; Ability: Harmonize)
+Bot1.Choose(Wistfulness)
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Exile = Wild Ride
+Bot1.Mana =
+Bot1.Battlefield.Mountain.Tapped = true
+Bot1.Battlefield.Wistfulness.Tapped = true
+Bot1.Battlefield.Ornithopter.Power = 3
+Stack.Count = 0

@@ -1,0 +1,44 @@
+# The creature tapped for the cost can be the spell's own target: the cost is chosen and paid first (CR 601.2b-h), and tapping does not make
+# it an illegal target. Ragavan (power 2, so {2}{R}) is tapped, and Wild Ride still resolves: +3/+0 and haste, tapped all the same.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Pearl
+Mox Jet
+Ragavan, Nimble Pilferer
+Wild Ride
+Ornithopter
+Mountain x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ragavan, Nimble Pilferer.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Wild Ride.Cast(Ornithopter)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Graveyard.Wild Ride.Cast(Bot1.Battlefield.Ragavan, Nimble Pilferer; Ability: Harmonize)
+Bot1.Choose(Ragavan, Nimble Pilferer)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Wild Ride
+Bot1.Mana =
+Bot1.Battlefield.Ragavan, Nimble Pilferer.Tapped = true
+Bot1.Battlefield.Ragavan, Nimble Pilferer.Power = 5
+Bot1.Battlefield.Ragavan, Nimble Pilferer.Keywords = Haste
+Bot1.Battlefield.Mox Ruby.Tapped = false
+Stack.Count = 0

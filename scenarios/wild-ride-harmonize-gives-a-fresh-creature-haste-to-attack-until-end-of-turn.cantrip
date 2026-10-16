@@ -1,0 +1,48 @@
+# A creature cast this turn cannot attack, but one that Wild Ride's harmonize cast gives haste to can (+3/+0 and haste until end of
+# turn, CR 702.10): the second Ornithopter attacks for 3 and the third, with no haste, is refused (CR 302.6). The pump and the haste both end
+# at end of turn (CR 514.2, 611.2a): on Bot2's turn the Ornithopter is a 0/2 again with only flying.
+
+[Bot1 Deck]
+Mountain
+Ornithopter
+Wild Ride
+Ornithopter
+Ornithopter
+Mox Ruby
+Black Lotus
+Mountain x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Wild Ride.Cast(Ornithopter)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Graveyard.Wild Ride.Cast(Bot1.Battlefield.Ornithopter#2; Ability: Harmonize)
+Bot1.Choose()
+? Bot1.Mana =
+Bot1.Pass
+[T3 Bot1.DeclareAttackers]
+! Bot1.Attack(Ornithopter#3 > Bot2)
+Bot1.Attack(Ornithopter#2 > Bot2)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Ornithopter#2.Power = 3
+? Bot1.Battlefield.Ornithopter#2.Keywords = Flying; Haste
+[T4 Bot2.Upkeep]
+? Bot1.Battlefield.Ornithopter#2.Power = 0
+? Bot1.Battlefield.Ornithopter#2.Keywords = Flying
+
+[Expect]
+Bot2.Life = 17
+Exile = Wild Ride

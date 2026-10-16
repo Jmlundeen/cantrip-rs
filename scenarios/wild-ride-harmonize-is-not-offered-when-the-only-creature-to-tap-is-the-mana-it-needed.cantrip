@@ -1,0 +1,35 @@
+# Llanowar Elves is a creature with a mana ability, but a creature tapped for harmonize's cost is tapped for that and cannot also make mana
+# (CR 702.180b). Bot1 has four sources (Mountain, Mox Pearl, Mox Jet, the Elves) and the Ornithopter (power 0): harmonize {4}{R} needs five;
+# tapping the Elves takes {1} off and leaves three other sources for {3}{R}. Not offered (the control, next scenario, has the extra source).
+
+[Bot1 Deck]
+Mountain
+Mox Pearl
+Mox Jet
+Black Lotus
+Llanowar Elves
+Wild Ride
+Ornithopter
+Mox Ruby
+Mountain x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Wild Ride.Cast(Ornithopter)
+Bot1.Pass
+[T3 Bot1.Main1]
+! Bot1.Graveyard.Wild Ride.Cast(Bot1.Battlefield.Ornithopter; Ability: Harmonize)
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Wild Ride; Black Lotus

@@ -1,0 +1,55 @@
+# Wistfulness (power 6, just cast, so summoning sick: harmonize's tap is not a {T} ability, CR 302.6, 107.5) is tapped for harmonize {4}{R}.
+# The reduction is generic mana equal to its power, so the four generic mana go, even though 6 is more than 4, and the {R} stays: only the
+# Mountain is tapped for it (CR 702.180a, 601.2f).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Ornithopter
+Wild Ride
+Mox Emerald
+Wistfulness
+Mountain x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Wild Ride.Cast(Ornithopter)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Wistfulness.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Graveyard.Wild Ride.Cast(Bot1.Battlefield.Ornithopter; Ability: Harmonize)
+Bot1.Choose(Wistfulness)
+? Bot1.Mana =
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Exile = Wild Ride
+Bot1.Mana =
+Bot1.Battlefield.Mountain.Tapped = true
+Bot1.Battlefield.Wistfulness.Tapped = true
+Bot1.Battlefield.Wistfulness.SummoningSick = true
+Bot1.Battlefield.Ornithopter.Tapped = false
+Bot1.Battlefield.Ornithopter.Power = 3
+Stack.Count = 0

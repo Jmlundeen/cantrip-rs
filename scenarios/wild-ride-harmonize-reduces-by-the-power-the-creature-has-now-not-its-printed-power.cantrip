@@ -1,0 +1,46 @@
+# The reduction is the tapped creature's power when the total cost is determined (CR 702.180a, 601.2f), pumps included: a first Wild Ride
+# resolved this turn made the Ornithopter a 3/2, so tapping it takes {3} off harmonize {4}{R} and the second one costs {1}{R}, paid
+# by the Mountain and Mox Pearl, leaving Mox Jet untapped. Printed power 0 would have taken nothing off.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Pearl
+Mox Jet
+Wild Ride
+Wild Ride
+Ornithopter
+Mountain x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Wild Ride.Cast(Ornithopter)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Wild Ride.Cast(Ornithopter)
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+? Bot1.Battlefield.Ornithopter.Power = 3
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Graveyard.Wild Ride.Cast(Ornithopter; Ability: Harmonize)
+Bot1.Choose(Ornithopter)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Wild Ride
+Bot1.Graveyard = Wild Ride
+Bot1.Mana =
+Bot1.Battlefield.Mox Jet.Tapped = false
+Bot1.Battlefield.Ornithopter.Tapped = true
+Bot1.Battlefield.Ornithopter.Power = 6
+Stack.Count = 0

@@ -1,0 +1,57 @@
+# Harmonize {4}{R} with only four sources of mana (Mountain, Mox Ruby, Mox Pearl, Mox Jet): not payable in full, but Bot1 may tap an
+# untapped creature as the cost is chosen, and the total cost is reduced by generic mana equal to its power (CR 702.180a). Ragavan has
+# power 2, so the total is {2}{R}: paid with the Mountain, Pearl and Jet, leaving Mox Ruby untapped, and Ragavan is tapped as the cost
+# is paid (CR 702.180b). Bot2's Ornithopter is a creature but not Bot1's, so it is not offered (refused beside the Ragavan control).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Pearl
+Mox Jet
+Ragavan, Nimble Pilferer
+Wild Ride
+Ornithopter
+Mountain x13
+
+[Bot2 Deck]
+Mox Ruby
+Ornithopter
+Island x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ragavan, Nimble Pilferer.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Wild Ride.Cast(Ornithopter)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Graveyard.Wild Ride.Cast(Bot1.Battlefield.Ornithopter; Ability: Harmonize)
+! Bot1.Choose(Bot2.Battlefield.Ornithopter)
+Bot1.Choose(Ragavan, Nimble Pilferer)
+? Bot1.Mana =
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Wild Ride
+Bot1.Mana =
+Bot1.Battlefield.Mountain.Tapped = true
+Bot1.Battlefield.Mox Pearl.Tapped = true
+Bot1.Battlefield.Mox Jet.Tapped = true
+Bot1.Battlefield.Mox Ruby.Tapped = false
+Bot1.Battlefield.Ragavan, Nimble Pilferer.Tapped = true
+Bot1.Battlefield.Ornithopter.Tapped = false
+Bot1.Battlefield.Ornithopter.Power = 3
+Bot2.Battlefield.Ornithopter.Tapped = false
+Stack.Count = 0

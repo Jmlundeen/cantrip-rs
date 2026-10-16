@@ -1,0 +1,41 @@
+# Bot1 casts Wild Ride with harmonize and chooses Ragavan to tap, then gives the cast up at the payment (CR 733.1): the announcement is
+# undone, so Ragavan is untapped, no mana was spent (the Mountain is untapped), and Wild Ride is still in the graveyard, not exiled.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Pearl
+Mox Jet
+Ragavan, Nimble Pilferer
+Wild Ride
+Ornithopter
+Mountain x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ragavan, Nimble Pilferer.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Wild Ride.Cast(Ornithopter)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Graveyard.Wild Ride.Cast(Bot1.Battlefield.Ornithopter; Ability: Harmonize)
+Bot1.Choose(Ragavan, Nimble Pilferer)
+Bot1.Cancel
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Wild Ride
+Exile.Count = 0
+Bot1.Mana =
+Bot1.Battlefield.Ragavan, Nimble Pilferer.Tapped = false
+Bot1.Battlefield.Mountain.Tapped = false
+Stack.Count = 0

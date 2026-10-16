@@ -1,0 +1,48 @@
+# Ornithopter attacked and is tapped, so it cannot be tapped for harmonize (CR 702.180a: "untapped creature"): the choice offers Ragavan
+# only. Refused: Ornithopter; the control is Ragavan, chosen. Ragavan's power 2 makes the total cost {2}{R}, paid with the Mountain, Pearl and Jet.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Pearl
+Mox Jet
+Ragavan, Nimble Pilferer
+Wild Ride
+Ornithopter
+Mox Sapphire
+Mountain x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ragavan, Nimble Pilferer.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Wild Ride.Cast(Ornithopter)
+Bot1.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Ornithopter > Bot2)
+[T3 Bot1.Main2]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Graveyard.Wild Ride.Cast(Bot1.Battlefield.Ornithopter; Ability: Harmonize)
+! Bot1.Choose(Ornithopter)
+Bot1.Choose(Ragavan, Nimble Pilferer)
+Bot1.Pass
+[T3 Bot1.End]
+
+[Expect]
+Exile = Wild Ride
+Bot1.Mana =
+Bot1.Battlefield.Ornithopter.Tapped = true
+Bot1.Battlefield.Ragavan, Nimble Pilferer.Tapped = true
+Bot1.Battlefield.Mox Ruby.Tapped = false
+Bot2.Life = 20
+Stack.Count = 0

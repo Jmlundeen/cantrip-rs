@@ -1,0 +1,48 @@
+# Same as the cast with Wistfulness's 6 power, but the red mana is spent on Wistfulness: Bot1 is left with white mana (Mox Pearl) alone.
+# Tapping Wistfulness takes only the generic {4} off harmonize {4}{R} (CR 702.180a, 601.2f), leaving {R}, which white mana cannot pay, so
+# the harmonize cast is not offered. The control: with the Mountain untapped it is, and is cast (the scenario before this one).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Ornithopter
+Wild Ride
+Mox Emerald
+Wistfulness
+Mountain x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Wild Ride.Cast(Ornithopter)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Wistfulness.Cast
+Bot1.Pass
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Mox Pearl.Tapped = false
+? Bot1.Battlefield.Wistfulness.Tapped = false
+! Bot1.Graveyard.Wild Ride.Cast(Bot1.Battlefield.Ornithopter)
+
+[Expect]
+Bot1.Graveyard = Wild Ride
+Exile.Count = 0
