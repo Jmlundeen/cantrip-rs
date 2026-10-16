@@ -2,11 +2,6 @@ use cantrip_api::*;
 use cantrip_mechanics::{targets, triggers};
 use cantrip_oracle as oracle;
 
-/// "Target card from your graveyard" (CR 115.1).
-fn card_in_your_graveyard(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    targets::card_in_your_graveyard(q, asker, t, &[])
-}
-
 /// Return target card from your graveyard to your hand.
 fn regrowth(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(card) = targets::object(g, item, 0) {
@@ -20,7 +15,7 @@ pub static REGROWTH: CardDef = CardDef {
     name: "Regrowth",
     cost: mana("{1}{G}"),
     types: TypeSet::of(&[CardType::Sorcery]),
-    spell: spell(&[target(card_in_your_graveyard)], regrowth),
+    spell: spell(&[targets::CARD_IN_YOUR_GRAVEYARD], regrowth),
     text: "Return target card from your graveyard to your hand.",
     ..CardDef::BLANK
 };

@@ -346,3 +346,27 @@ pub fn object_has_name(q: &dyn Query, id: ObjectId, wanted: CardId) -> bool {
     let name = q.card(wanted).name;
     object_names(q, id).contains(&name)
 }
+
+/// "Exile cards from the top of your library until you exile a nonland card [that `qualifies`]" (CR 701.57a, 702.85a): each
+/// card is exiled one at a time, face up, from the top until one is a nonland card `qualifies` accepts, or the library
+/// is empty. Every card that really reached exile, in order (the qualifying one last), and the qualifying card if there
+/// was one; a card a replacement effect sent elsewhere is neither. Cascade (a lesser mana value than the spell's) and
+/// discover (a mana value of N or less) use it.
+pub fn exile_until_nonland(
+    g: &mut dyn Game,
+    player: PlayerId,
+    qualifies: &dyn Fn(&dyn Query, ObjectId) -> bool,
+) -> (Vec<ObjectId>, Option<ObjectId>) {
+    let mut exiled = Vec::new();
+    while let Some(&top) = g.state().zone(Zone::library(player)).first() {
+        let moved = g.exile(top);
+        if !g.obj(moved).zone.is(ZoneKind::Exile) {
+            continue;
+        }
+        exiled.push(moved);
+        if !g.chars(moved).is(CardType::Land) && qualifies(&*g, moved) {
+            return (exiled, Some(moved));
+        }
+    }
+    (exiled, None)
+}

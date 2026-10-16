@@ -43,10 +43,6 @@ fn plus_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-fn card_in_your_graveyard(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    targets::card_in_your_graveyard(q, asker, t, &[])
-}
-
 /// -3: return target card from your graveyard to your hand.
 fn minus_three(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(card) = targets::object(g, item, 0) {
@@ -60,7 +56,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         ability(loyalty(1), plus_one, "+1: Choose a nonland card name, then reveal the top four cards of your library. Put all cards with the chosen name from among them into your hand and the rest into your graveyard."),
         ability(loyalty(-3), minus_three, "\u{2212}3: Return target card from your graveyard to your hand.")
-            .targets(&[target(card_in_your_graveyard)]),
+            .targets(&[targets::CARD_IN_YOUR_GRAVEYARD]),
     ],
     ..oracle::TAMIYO_COLLECTOR_OF_TALES
 };

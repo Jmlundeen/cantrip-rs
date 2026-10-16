@@ -5,11 +5,6 @@ use cantrip_oracle as oracle;
 
 const ASK: Question = Question::new("ReturnToHand", "return the targeted card to your hand?", "", "Return it", "Leave it");
 
-/// "Target card from your graveyard": any card in the graveyard of the ability's controller.
-fn card_in_your_graveyard(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    cantrip_mechanics::targets::card_in_your_graveyard(q, asker, t, &[])
-}
-
 /// You may return the target card to your hand. Asked as the ability resolves, and only if the target is still legal.
 fn return_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(card) = targets::object(g, item, 0) else { return Ok(()) };
@@ -21,6 +16,6 @@ fn return_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(THIS_ENTERS, return_it, "When this creature enters, you may return target card from your graveyard to your hand.")
-        .targets(&[target(card_in_your_graveyard)])],
+        .targets(&[targets::CARD_IN_YOUR_GRAVEYARD])],
     ..oracle::ETERNAL_WITNESS
 };

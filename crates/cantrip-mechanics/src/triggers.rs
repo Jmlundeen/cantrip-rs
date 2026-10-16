@@ -123,20 +123,7 @@ fn cascade_resolves(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let def = g.card(g.chars(item.object).card);
     let limit = def.cost.mana_value() + def.cost.x as u32 * g.obj(item.object).x as u32;
 
-    let mut exiled: Vec<ObjectId> = Vec::new();
-    let mut hit = None;
-    while let Some(&top) = g.state().zone(Zone::library(player)).first() {
-        let moved = g.exile(top);
-        if !g.obj(moved).zone.is(ZoneKind::Exile) {
-            continue;
-        }
-        exiled.push(moved);
-        let chars = g.chars(moved);
-        if !chars.is(CardType::Land) && g.card(chars.card).cost.mana_value() < limit {
-            hit = Some(moved);
-            break;
-        }
-    }
+    let (exiled, hit) = crate::library::exile_until_nonland(g, player, &|q, card| q.card(q.chars(card).card).cost.mana_value() < limit);
     // "You may cast it without paying its mana cost if the resulting spell's mana value is less than this spell's": the face
     // cast is the spell, so only a face under the limit may be (CR 702.85a, 709.3b, 715.3b).
     if let Some(card) = hit {
@@ -388,6 +375,17 @@ pub const fn ward_discard(text: &'static str) -> AbilityDef {
 pub fn noncreature_spell_you_cast(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match event {
         Event::SpellCast { spell, player, .. } if *player == me.controller && !q.chars(*spell).is(CardType::Creature) => {
+            Fired::PLAIN
+        }
+        _ => None,
+    }
+}
+
+/// "Whenever you cast a spell from exile" (CR 601.2a, 603.2): the spell's controller is the ability's controller and the zone
+/// it was cast from, recorded on it, is exile. Appa, Steadfast Guardian and Quintorius Kand print it.
+pub fn you_cast_a_spell_from_exile(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::SpellCast { spell, player, .. } if *player == me.controller && q.obj(*spell).cast_from == Some(ZoneKind::Exile) => {
             Fired::PLAIN
         }
         _ => None,
@@ -685,6 +683,7 @@ pub const EQUIPPED_CREATURE_ATTACKS_SUBJECT: Trigger = when(EventMask::ATTACKS, 
 pub const ENCHANTED_PLAYER_ATTACKED: Trigger = when(EventMask::ATTACKS, enchanted_player_attacked);
 pub const YOU_ATTACK: Trigger = when_asked(EventMask::ATTACKERS_DECLARED, you_attack);
 pub const NONCREATURE_SPELL_YOU_CAST: Trigger = when_asked(EventMask::SPELL_CAST, noncreature_spell_you_cast);
+pub const YOU_CAST_A_SPELL_FROM_EXILE: Trigger = when_asked(EventMask::SPELL_CAST, you_cast_a_spell_from_exile);
 pub const THIS_DIES: Trigger = when(EventMask::ZONE_CHANGE, this_dies);
 pub const THIS_LEAVES: Trigger = when(EventMask::ZONE_CHANGE, this_leaves);
 pub const YOUR_UPKEEP: Trigger = when_asked(EventMask::STEP_BEGAN, your_upkeep);

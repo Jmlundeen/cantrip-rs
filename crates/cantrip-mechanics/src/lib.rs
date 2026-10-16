@@ -14,6 +14,7 @@ pub mod boast;
 pub mod battle_cry;
 pub mod backup;
 pub mod dash;
+pub mod discover;
 pub mod combat;
 pub mod copy;
 pub mod channel;

@@ -248,6 +248,16 @@ pub const NONBASIC_LAND: TargetSpec = target(nonbasic_land_filter);
 pub const NONBASIC_LAND_AN_OPPONENT_CONTROLS: TargetSpec = target(nonbasic_land_an_opponent_controls_filter);
 /// "Target land you control". Earthbend (Badgermole Cub) and Sea Drake print it.
 pub const LAND_YOU_CONTROL: TargetSpec = target(land_you_control_filter);
+/// "Target card from your graveyard" (CR 115.1): any card in the graveyard of the ability's controller, still the card that
+/// was there (CR 400.7). Eternal Witness, Emeritus of Abundance, Bala Ged Recovery, Cathartic Parting, Tamiyo, Collector of Tales
+/// and Quintorius Kand ("any number of target cards from your graveyard") print it.
+pub fn any_card_in_your_graveyard(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    card_in_your_graveyard(q, asker, t, &[])
+}
+
+/// "Target card from your graveyard": see `any_card_in_your_graveyard`.
+pub const CARD_IN_YOUR_GRAVEYARD: TargetSpec = target(any_card_in_your_graveyard);
+
 /// "Target card from a graveyard". Emperor of Bones, Ghost Vacuum, Keen-Eyed Curator and Lion Sash print it.
 pub const CARD_IN_A_GRAVEYARD: TargetSpec = target(card_in_a_graveyard_filter);
 /// "Target noncreature spell". Spell Pierce and Stubborn Denial print it.
