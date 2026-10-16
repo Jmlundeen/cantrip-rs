@@ -1,0 +1,42 @@
+# "Non-Lemur": Momo is a Lemur Bat Ally, so a second Momo cast before Faerie Mastermind is not the first non-Lemur flying creature spell. Momo
+# ({W}) is cast with Plains, then a second Momo with Mox Pearl (the legend rule keeps one, CR 704.5j), then Faerie Mastermind with Mox Sapphire
+# alone: it still costs {U}.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Sapphire
+Momo, Friendly Flier
+Momo, Friendly Flier
+Faerie Mastermind
+Island x14
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Momo, Friendly Flier.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Momo, Friendly Flier.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Faerie Mastermind.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Faerie Mastermind.Types = Creature
+Bot1.Graveyard.Count = 1

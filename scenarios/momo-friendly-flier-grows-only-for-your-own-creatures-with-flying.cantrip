@@ -1,0 +1,44 @@
+# "Whenever another creature you control with flying enters": Cathar Commando (no flying, Bot1's) does not grow Momo, and is paid in full ({1}{W}: Plains and Mox Jet, nothing floating) as a creature spell without flying, nor does Bot2's flying
+# Ornithopter (not Bot1's) on turn 2; the positive control is the flier of the other scenarios, which does.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Momo, Friendly Flier
+Cathar Commando
+Plains x14
+
+[Bot2 Deck]
+Ornithopter
+Mountain x19
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Momo, Friendly Flier.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cathar Commando.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+? Bot1.Battlefield.Cathar Commando.Types = Creature
+? Bot1.Battlefield.Momo, Friendly Flier.Power = 1
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T2 Bot2.Main2]
+? Bot2.Battlefield.Ornithopter.Keywords = Flying
+
+[Expect]
+Bot1.Battlefield.Momo, Friendly Flier.Power = 1
+Bot1.Battlefield.Momo, Friendly Flier.Toughness = 1

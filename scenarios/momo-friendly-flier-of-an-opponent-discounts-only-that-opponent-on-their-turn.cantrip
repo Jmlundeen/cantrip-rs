@@ -1,0 +1,53 @@
+# "You cast": Bot2's Momo ({W}) gives Bot1 nothing: on turn 3 Bot1's Faerie Mastermind is paid in full, Island and Mox Sapphire for {U}{U},
+# and nothing floats; Bot2's Momo is not grown by Bot1's flier. On turn 4 Bot2's own Faerie Mastermind is paid with Island alone.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Faerie Mastermind
+Island x16
+
+[Bot2 Deck]
+Plains
+Island
+Momo, Friendly Flier
+Faerie Mastermind
+Plains x16
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Momo, Friendly Flier.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Faerie Mastermind.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+? Bot2.Battlefield.Momo, Friendly Flier.Power = 1
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Faerie Mastermind.Cast
+? Bot2.Mana =
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Faerie Mastermind.Types = Creature
+Bot2.Battlefield.Faerie Mastermind.Types = Creature
+Bot2.Battlefield.Plains.Tapped = false
+Bot2.Battlefield.Island.Tapped = true
+Bot2.Battlefield.Momo, Friendly Flier.Power = 2

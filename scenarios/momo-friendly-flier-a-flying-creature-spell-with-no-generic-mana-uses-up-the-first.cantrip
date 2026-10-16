@@ -1,0 +1,45 @@
+# The official ruling: the first non-Lemur creature spell with flying cast on your turn gets the reduction only if it has generic mana to take; a
+# spell without it still is "the first". Ornithopter ({0}) is cast first, so Faerie Mastermind ({1}{U}) pays in full: Island and Mox Sapphire are
+# tapped for {U}{U} and nothing is left floating (a reduction would leave one). Momo has grown for both fliers.
+
+[Bot1 Deck]
+Island
+Mox Pearl
+Mox Sapphire
+Momo, Friendly Flier
+Ornithopter
+Faerie Mastermind
+Island x14
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Momo, Friendly Flier.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Faerie Mastermind.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Faerie Mastermind.Types = Creature
+Bot1.Battlefield.Momo, Friendly Flier.Power = 3
+Bot1.Battlefield.Island.Tapped = true
+Bot1.Battlefield.Mox Sapphire.Tapped = true
+Bot1.Mana =

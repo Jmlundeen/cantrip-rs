@@ -1,0 +1,44 @@
+# "During each of your turns": on Bot2's turn 2 the first Faerie Mastermind (flash) is paid in full, Island and Mox Sapphire for {U}{U} with nothing left
+# floating. On turn 3, Bot1's own, the second costs {U}: Mox Sapphire alone pays, the turn-2 cast having used up nothing of it.
+
+[Bot1 Deck]
+Island
+Mox Pearl
+Mox Sapphire
+Momo, Friendly Flier
+Faerie Mastermind
+Faerie Mastermind
+Island x14
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Momo, Friendly Flier.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Faerie Mastermind.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Faerie Mastermind.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Faerie Mastermind#1.Types = Creature
+Bot1.Battlefield.Faerie Mastermind#2.Types = Creature
+Bot1.Mana =

@@ -1,0 +1,47 @@
+# Only "the first" is cheaper. The first Faerie Mastermind is paid with Mox Sapphire alone (discounted). The second ({1}{U}) is then the second flying
+# creature spell of the turn: it is paid in full with Island and Mox Jet, {U}{B}, and nothing is left floating (a reduction would leave one).
+
+[Bot1 Deck]
+Island
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Momo, Friendly Flier
+Faerie Mastermind
+Faerie Mastermind
+Island x13
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Momo, Friendly Flier.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Faerie Mastermind.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Faerie Mastermind.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Faerie Mastermind#1.Types = Creature
+Bot1.Battlefield.Faerie Mastermind#2.Types = Creature
+Bot1.Battlefield.Momo, Friendly Flier.Power = 3
+Bot1.Mana =
