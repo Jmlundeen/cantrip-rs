@@ -1,0 +1,97 @@
+# Floodpits Drowner: the ability's target must be "a creature with a stun counter on it", checked again as it resolves
+# (CR 608.2b). Bot2 has Intruder Alarm ("Creatures don't untap during their controllers' untap steps. Whenever a creature
+# enters, untap all creatures."). On turn 5 Bot1 flashes in its Drowner and stuns Bot2's tapped Llanowar Elves (the Alarm's
+# untap resolves first, being on top of Bot1's trigger by APNAP order, so the counter survives: checked). On turn 7 Bot1
+# activates the Drowner targeting the Elves; in response Bot2 flashes in its own Drowner, and the Alarm's untap takes a
+# stun counter off the Elves instead of untapping them (CR 122.1g). The Elves no longer match, so the ability does
+# nothing: Bot1's Drowner is not shuffled away and the Elves stay.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Floodpits Drowner
+Island
+Island
+Island x23
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Emerald
+Mox Jet
+Mox Pearl
+Llanowar Elves
+Intruder Alarm
+Floodpits Drowner
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Intruder Alarm.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Battlefield.Llanowar Elves.Activate
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Floodpits Drowner.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Llanowar Elves.Tapped = true
+? Bot2.Battlefield.Llanowar Elves.Counters.Stun = 1
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Floodpits Drowner.Activate(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Floodpits Drowner.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Floodpits Drowner.Tapped = true
+Bot2.Battlefield.Llanowar Elves.Tapped = true
+Bot2.Battlefield.Llanowar Elves.Counters.Stun = (absent)
+Bot1.Library.Count = 18
+Bot2.Battlefield.Floodpits Drowner.Counters.Stun = (absent)

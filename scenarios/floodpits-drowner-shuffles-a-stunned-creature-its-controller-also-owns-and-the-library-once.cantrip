@@ -1,0 +1,60 @@
+# Floodpits Drowner: the target may be a creature its own controller controls. Baloth Prime enters tapped with six stun
+# counters (CR 122.1g), so Bot1's Drowner (cast on turn 1) can shuffle itself and Baloth Prime into their owners'
+# libraries, both Bot1's: both leave the battlefield at once and Bot1's library grows by two (one shuffle of one library,
+# CR 701.24a). Bot2's creature-less side shows nothing else moves.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Emerald
+Mox Jet
+Floodpits Drowner
+Mox Pearl
+Baloth Prime
+Island
+Island x18
+
+[Bot2 Deck]
+Forest x25
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Floodpits Drowner.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Baloth Prime.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Baloth Prime.Tapped = true
+? Bot1.Battlefield.Baloth Prime.Counters.Stun = 6
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Floodpits Drowner.Activate(Bot1.Battlefield.Baloth Prime)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Island; Island; Mox Emerald; Mox Jet; Mox Pearl; Mox Sapphire
+Bot1.Library.Count = 20
+Bot1.Graveyard.Count = 0

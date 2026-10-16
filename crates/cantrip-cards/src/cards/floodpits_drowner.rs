@@ -22,7 +22,7 @@ fn creature_with_a_stun_counter(q: &dyn Query, asker: &Asker, t: Target) -> bool
 /// (CR 400.7); the ability does nothing at all when its target is illegal (CR 608.2b).
 fn shuffle_away(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(creature) = targets::object(g, item, 0) {
-        // The target can be the Drowner itself (a stun counter moved onto it while untapped): one object, shuffled once.
+        // Nothing in the Oracle text keeps the Drowner from being its own target: it would then be one object, shuffled once.
         let mut objects = vec![item.object, creature];
         objects.dedup();
         g.put_into_library(&objects, LibraryPlace::ShuffledIn);

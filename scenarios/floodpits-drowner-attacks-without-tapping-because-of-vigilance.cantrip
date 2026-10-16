@@ -1,0 +1,35 @@
+# Floodpits Drowner has Vigilance (CR 702.20b): attacking does not cause it to tap. Bot1 casts it on turn 1 (no creature an
+# opponent controls, so its trigger is removed) and attacks Bot2 with it on turn 3; it is untapped in the declare blockers
+# step and the 2 damage goes through.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Floodpits Drowner
+Island
+Island x25
+
+[Bot2 Deck]
+Forest x25
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Floodpits Drowner.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Attack(Floodpits Drowner > Bot2)
+[T3 Bot1.DeclareBlockers]
+? Combat.Attackers.Count = 1
+? Bot1.Battlefield.Floodpits Drowner.Tapped = false
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield.Floodpits Drowner.Tapped = false
