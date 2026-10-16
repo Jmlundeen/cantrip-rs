@@ -1,0 +1,56 @@
+# Claim the Kingdom: "Landfall - Whenever a land you control enters, put a +1/+1 counter on target creature you control and
+# a plan counter on this enchantment. When the fourth plan counter is put on this enchantment, sacrifice it. When you do,
+# put an indestructible counter on target creature you control." Bot1's Forest on turn 1, then its Fabled Passage on turn 3
+# and the Plains the Passage finds (two lands entering, two triggers) each put a +1/+1 counter on the Ornithopter and a
+# plan counter on the enchantment; Bot2's Islands entering trigger nothing. The Plains played on turn 5 is the fourth:
+# the enchantment is sacrificed and the reflexive ability (CR 603.12) puts an indestructible counter on the Ornithopter
+# (CR 122.1b), now with four +1/+1 counters.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Claim the Kingdom
+Ornithopter
+Forest
+Fabled Passage
+Plains
+Island
+Island
+Plains
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Claim the Kingdom.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T2 Bot2.Main2]
+? Bot1.Battlefield.Claim the Kingdom.Counters.Plan = 1
+? Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+[T3 Bot1.Main1]
+Bot1.Hand.Fabled Passage.Play
+Bot1.Battlefield.Fabled Passage.Activate
+Bot1.Search(Plains)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Claim the Kingdom.Counters.Plan = 3
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Claim the Kingdom; Fabled Passage
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 4
+Bot1.Battlefield.Ornithopter.Counters.Indestructible = 1
+Bot1.Battlefield.Ornithopter.Keywords = Flying; Indestructible

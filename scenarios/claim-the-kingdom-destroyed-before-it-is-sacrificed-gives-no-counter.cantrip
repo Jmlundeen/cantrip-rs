@@ -1,0 +1,57 @@
+# "Sacrifice it. When you do, ..." (CR 603.12): with Claim the Kingdom's fourth-plan-counter trigger on the stack on turn
+# 5, Bot2 destroys the enchantment with Disenchant. The trigger resolves with nothing to sacrifice (CR 701.21a), so the
+# reflexive ability never triggers: the Ornithopter, which got its fourth +1/+1 counter from the landfall ability, gets no
+# indestructible counter.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Claim the Kingdom
+Ornithopter
+Forest
+Fabled Passage
+Plains
+Island
+Island
+Plains
+Island x10
+
+[Bot2 Deck]
+Plains
+Plains
+Disenchant
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Claim the Kingdom.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Fabled Passage.Play
+Bot1.Battlefield.Fabled Passage.Activate
+Bot1.Search(Plains)
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot2.Pass
+Bot2.Battlefield.Plains#1.Activate
+Bot2.Battlefield.Plains#2.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Claim the Kingdom)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Claim the Kingdom; Fabled Passage
+Bot2.Graveyard = Disenchant
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 4
+Bot1.Battlefield.Ornithopter.Counters.Indestructible = (absent)

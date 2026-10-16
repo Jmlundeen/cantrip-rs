@@ -1,0 +1,61 @@
+# Claim the Kingdom's "sacrifice it. When you do, put an indestructible counter on target creature you control": with its
+# fourth-plan-counter trigger on the stack on turn 5, Bot2 kills Bot1's only creature, the Ornithopter (four +1/+1 counters
+# on a 0/2, so a 4/6), with two Lightning Bolts. The trigger then resolves: the
+# enchantment is sacrificed, and the reflexive ability (CR 603.12) has no creature to target, so it is removed from the
+# stack (CR 603.3d) and no indestructible counter is put anywhere.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Claim the Kingdom
+Ornithopter
+Forest
+Fabled Passage
+Plains
+Island
+Island
+Plains
+Island x10
+
+[Bot2 Deck]
+Mountain
+Mountain
+Lightning Bolt
+Lightning Bolt
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Claim the Kingdom.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Fabled Passage.Play
+Bot1.Battlefield.Fabled Passage.Activate
+Bot1.Search(Plains)
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot2.Pass
+? Bot1.Battlefield.Claim the Kingdom.Counters.Plan = 4
+? Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 4
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Battlefield.Mountain#2.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Claim the Kingdom; Ornithopter; Fabled Passage
+Bot1.Battlefield = Mox Emerald; Mox Pearl; Forest; Plains; Plains
+Bot2.Graveyard = Lightning Bolt; Lightning Bolt

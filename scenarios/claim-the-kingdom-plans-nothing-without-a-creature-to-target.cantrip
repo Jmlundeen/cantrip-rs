@@ -1,0 +1,54 @@
+# Claim the Kingdom's landfall ability targets a creature you control, and the plan counter is part of the same ability
+# (CR 603.3d, 608.2b). Bot1's Forest enters on turn 1 with no creature on its side: the ability has no target and is
+# removed from the stack, so no plan counter. On turn 3 its Fabled Passage enters with the Ornithopter as the target, and
+# Bot2 Lightning Bolts the Ornithopter in response: the ability's only target is gone, so it does nothing - no plan counter
+# either. The Plains the Passage then finds enters with no creature to target again.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Claim the Kingdom
+Forest
+Fabled Passage
+Ornithopter
+Island
+Island
+Plains
+Island x11
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Claim the Kingdom.Cast
+Bot1.Pass
+Bot1.Hand.Forest.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Claim the Kingdom.Counters.Plan = (absent)
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Fabled Passage.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+? Stack.Count = 2
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Claim the Kingdom.Counters.Plan = (absent)
+Bot1.Battlefield.Fabled Passage.Activate
+Bot1.Search(Plains)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Claim the Kingdom.Counters.Plan = (absent)
+Bot1.Graveyard = Fabled Passage; Ornithopter
+Bot1.Battlefield = Mox Emerald; Mox Pearl; Claim the Kingdom; Forest; Plains
