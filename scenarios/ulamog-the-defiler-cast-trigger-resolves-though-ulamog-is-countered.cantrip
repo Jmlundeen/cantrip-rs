@@ -1,0 +1,48 @@
+# Ulamog, the Defiler's ruling: its cast trigger resolves before Ulamog does, and still resolves if Ulamog is countered.
+# Bot1 casts Ulamog on turn 3; Bot2 Counterspells it with the trigger above it on the stack. The trigger resolves first:
+# Bot2 exiles the top half of its seven-card library, rounded up (four). Then the Counterspell counters Ulamog.
+
+[Bot1 Deck]
+Island
+Ulamog, the Defiler
+Black Lotus x3
+Island
+Island x9
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Sapphire
+Counterspell
+Plains x4
+Plains x8
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ulamog, the Defiler.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Ulamog, the Defiler)
+? Stack.Count = 3
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Exile = Plains; Plains; Plains; Plains
+Bot2.Library.Count = 3
+Bot1.Graveyard = Ulamog, the Defiler; Black Lotus; Black Lotus; Black Lotus
+Bot1.Battlefield = Island; Island
+Bot2.Graveyard = Counterspell
