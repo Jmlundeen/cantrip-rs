@@ -1,0 +1,54 @@
+# Devout Decree: "target creature or planeswalker that's black or red". Bot2 has Ragavan (red), Llanowar Elves (green),
+# Ornithopter (colorless) and Dark Confidant (black). The refusals: Decree cannot target the Elves or the Ornithopter; the
+# positive controls: it can target Ragavan (red), the second half of "black or red", and the Confidant. Ragavan is exiled.
+
+[Bot1 Deck]
+Plains
+Plains
+Devout Decree
+Plains x4
+Plains
+Lightning Bolt
+Black Lotus
+Plains x4
+
+[Bot2 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Mox Emerald
+Dark Confidant
+Ragavan, Nimble Pilferer
+Llanowar Elves
+Ornithopter
+Island x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Dark Confidant.Cast
+Bot2.Hand.Ragavan, Nimble Pilferer.Cast
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+! Bot1.Hand.Devout Decree.Cast(Bot2.Battlefield.Llanowar Elves)
+! Bot1.Hand.Devout Decree.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Hand.Devout Decree.Cast(Bot2.Battlefield.Ragavan, Nimble Pilferer)
+Bot1.Pass
+Bot1.Arrange(Lightning Bolt |)
+
+[Expect]
+Stack.Count = 0
+Exile = Ragavan, Nimble Pilferer
+Bot2.Battlefield = Mox Jet; Mox Pearl; Mox Ruby; Mox Emerald; Dark Confidant; Llanowar Elves; Ornithopter

@@ -1,0 +1,41 @@
+# Devout Decree: "Exile target creature or planeswalker that's black or red. Scry 1." Bot2's Dark Confidant (black) is exiled
+# by Decree on turn 3 ({1}{W} from two Plains), then Bot1 scries 1: the top card, Lightning Bolt, is kept on top (it is
+# still the first card of the library afterwards).
+
+[Bot1 Deck]
+Plains
+Plains
+Devout Decree
+Plains x4
+Plains
+Lightning Bolt
+Black Lotus
+Plains x4
+
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Dark Confidant
+Island x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Dark Confidant.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Devout Decree.Cast(Bot2.Battlefield.Dark Confidant)
+Bot1.Pass
+Bot1.Arrange(Lightning Bolt |)
+
+[Expect]
+Stack.Count = 0
+Exile = Dark Confidant
+Bot1.Graveyard = Devout Decree
+Bot1.Library = Lightning Bolt; Black Lotus; Plains; Plains; Plains; Plains

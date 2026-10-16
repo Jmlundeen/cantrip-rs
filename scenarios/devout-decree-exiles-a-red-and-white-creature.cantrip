@@ -1,0 +1,36 @@
+# Devout Decree: a creature that is both red and white is "red" (CR 105.2: a multicolored object has each of its colors).
+# Bot2's Figure of Destiny ({R/W} hybrid: red and white) is exiled, and Bot1 scries.
+
+[Bot1 Deck]
+Plains
+Plains
+Devout Decree
+Plains x4
+Plains
+Lightning Bolt
+Black Lotus
+Plains x4
+
+[Bot2 Deck]
+Mox Ruby
+Figure of Destiny
+Island x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Figure of Destiny.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Devout Decree.Cast(Bot2.Battlefield.Figure of Destiny)
+Bot1.Pass
+Bot1.Arrange(Lightning Bolt |)
+
+[Expect]
+Stack.Count = 0
+Exile = Figure of Destiny
+Bot2.Battlefield = Mox Ruby
