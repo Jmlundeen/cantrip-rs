@@ -520,6 +520,22 @@ public sealed partial class MainPage
 
     // --- Targets ---
 
+    /// <summary>
+    /// The slot's own words with the opponent it is for named, ending in the separator the dock puts before its count; empty when
+    /// the card has nothing to say of its slot.
+    /// </summary>
+    private static string SlotLabel(GameClient client, ChooseTargetPromptMessage prompt)
+    {
+        if (prompt.Text.Length == 0)
+        {
+            return string.Empty;
+        }
+
+        string opponent = prompt.ForPlayer == 0 ? "an opponent"
+            : client.View?.Players.FirstOrDefault(player => player.Seat == prompt.ForPlayer)?.Name ?? $"seat {prompt.ForPlayer}";
+        return $"{prompt.Text.Replace("{player}", opponent, StringComparison.Ordinal)}  ·  ";
+    }
+
     /// <summary>Choosing a triggered ability's target as it goes on the stack (CR 603.3d).</summary>
     private void FillChooseTarget(GameClient client, ChooseTargetPromptMessage prompt)
     {
@@ -536,6 +552,9 @@ public sealed partial class MainPage
         string noun = prompt.Targeted ? "target" : "choice";
         string nouns = prompt.Targeted ? "targets" : "choices";
 
+        // What this slot is for, where the card says (Jeskai Revelation's two slots, The Theorist's one for each opponent).
+        string slot = SlotLabel(client, prompt);
+
         Prompt(
             prompt.AnyNumber ? $"Any number of {nouns} for {source}"
                 : prompt.Count == 1 && prompt.Optional ? $"Up to one {noun} for {source}"
@@ -544,10 +563,10 @@ public sealed partial class MainPage
                 : prompt.Minimum > 0 ? $"{prompt.Minimum} to {prompt.Count} {nouns} for {source}"
                 : $"{prompt.Count} {nouns} for {source}",
             prompt.Count == 1 && !prompt.AnyNumber
-                ? $"{prompt.Text}  ·  {(count == 1 ? $"1 possible {noun}" : $"{count} possible {nouns}")}"
+                ? $"{slot}{(count == 1 ? $"1 possible {noun}" : $"{count} possible {nouns}")}"
                 : prompt.AnyNumber
-                ? $"{prompt.Text}  ·  {_pickedTargets.Count} of {count} chosen"
-                : $"{prompt.Text}  ·  {_pickedTargets.Count} of {prompt.Count} chosen, from {count}");
+                ? $"{slot}{_pickedTargets.Count} of {count} chosen"
+                : $"{slot}{_pickedTargets.Count} of {prompt.Count} chosen, from {count}");
 
         if (prompt.Optional)
         {
@@ -681,6 +700,12 @@ public sealed partial class MainPage
     /// Choosing a modal spell's modes (CR 700.2), or one of a card's named options (CR 614.12a): one button per mode, or
     /// for a long list - every creature type (CR 205.3m) - a box to type in and buttons for the options it matches.
     /// </summary>
+    /// <summary>How many modes a range takes, in the words the card would use: "choose one or both", "choose up to two".</summary>
+    private static string RangeTitle(ChooseModesPromptMessage prompt) =>
+        prompt.Count == 0 ? $"choose up to {Spelled(prompt.Most)}"
+        : prompt.Count == 1 && prompt.Most == 2 ? "choose one or both"
+        : $"choose {Spelled(prompt.Count)} to {Spelled(prompt.Most)}";
+
     private void FillChooseModes(GameClient client, ChooseModesPromptMessage prompt)
     {
         string source = client.Object(prompt.Source)?.Name ?? "A spell";
@@ -692,16 +717,17 @@ public sealed partial class MainPage
         Prompt(
             prompt.Heading.Length > 0 ? prompt.Heading
                 : prompt.AdditionalCost ? $"{source}: choose an additional cost to pay"
-                : range ? $"{source}: choose {count} or more"
+                : range ? $"{source}: {RangeTitle(prompt)}"
                 : $"{source}: choose {count}",
             (prompt.Heading.Length > 0
-                ? prompt.Source.IsNone ? "Its room ability triggers as you move in" : "Chosen, not targeted"
+                ? prompt.Detail.Length > 0 ? prompt.Detail
+                : prompt.Source.IsNone ? "Its room ability triggers as you move in" : "Chosen, not targeted"
                 : prompt.AdditionalCost
                 ? "Paid along with its mana cost"
                 : oneClick
-                ? "Each mode's target is chosen next"
+                ? prompt.Detail.Length > 0 ? prompt.Detail : "Each mode's target is chosen next"
                 : range
-                ? $"{_pickedModes.Count} chosen  ·  each one past the first costs, up to {Spelled(prompt.Most)}"
+                ? prompt.Detail.Length > 0 ? $"{_pickedModes.Count} chosen  ·  {prompt.Detail}" : $"{_pickedModes.Count} chosen"
                 : $"{_pickedModes.Count} of {prompt.Count} chosen{(prompt.MayRepeat ? "  ·  the same mode may be chosen more than once" : string.Empty)}")
             + (searched ? $"  ·  type to find one of {prompt.Modes.Count}" : string.Empty));
 
@@ -1313,22 +1339,45 @@ public sealed partial class MainPage
     /// <summary>A library search (CR 701.19), in the choice window, since a library is not on the board.</summary>
     private void FillSearch(GameClient client, SearchLibraryPromptMessage prompt)
     {
+        // Whose library: the searcher's own, or another player's (Deadly Cover-Up searches its owner's), named so the
+        // player never reads "your library" of someone else's.
+        string library = prompt.Owner == 0 || prompt.Owner == client.Seat
+            ? "your library"
+            : $"{client.View?.Players.FirstOrDefault(player => player.Seat == prompt.Owner)?.Name ?? $"seat {prompt.Owner}"}'s library";
+        string title = $"Search {library}";
         string destination = prompt.Destination switch
         {
-            SearchDestinationView.TopOfLibrary => "to put on top",
+            SearchDestinationView.TopOfLibrary => $"to put on top of {library}",
             SearchDestinationView.Graveyard => "to put into your graveyard",
             SearchDestinationView.Battlefield => "to put onto the battlefield",
+            SearchDestinationView.BattlefieldTapped => "to put onto the battlefield tapped",
+            SearchDestinationView.CastFree => "to cast without paying its mana cost",
+            SearchDestinationView.Found => string.Empty,
             SearchDestinationView.Exile => "to exile",
             SearchDestinationView.ExileFaceDown => "to exile face down",
-            SearchDestinationView.Cast => "to cast",
+            SearchDestinationView.Cast => "to cast as the effect resolves",
             _ => "to put into your hand",
         };
+        string take = prompt.Destination switch
+        {
+            SearchDestinationView.Exile or SearchDestinationView.ExileFaceDown => "Exile",
+            SearchDestinationView.Cast or SearchDestinationView.CastFree => "Cast",
+            SearchDestinationView.Battlefield or SearchDestinationView.BattlefieldTapped => "Put onto the battlefield",
+            _ => "Take",
+        };
+
+        // Where they go, said after the cards; a search that says only what it looks for (Transmute Artifact) says what follows.
+        string what = prompt.Destination == SearchDestinationView.Found
+            ? "  ·  what becomes of it is decided once it is found"
+            : $" {destination}";
 
         Prompt(
-            "Search your library",
+            title,
             prompt.Count == 1
-                ? $"Choose a card {destination}  ·  {_picked.Count} chosen"
-                : $"Choose {(prompt.Optional ? "up to " : string.Empty)}{prompt.Count} {destination}  ·  {_picked.Count} chosen");
+                ? $"Choose a card{what}  ·  {_picked.Count} chosen"
+                : prompt.Optional && prompt.Count >= 255
+                ? $"Choose any number of cards{what}  ·  {_picked.Count} chosen"
+                : $"Choose {(prompt.Optional ? "up to " : string.Empty)}{prompt.Count} cards{what}  ·  {_picked.Count} chosen");
 
         HashSet<int> eligible = [.. prompt.Eligible.Select(card => card.Value)];
         List<ObjectView> shown =
@@ -1348,12 +1397,12 @@ public sealed partial class MainPage
             : shown.Count;
         float headings = grouped ? groups.Count * (SearchHeadingHeight + ChoiceGap) : 0f;
 
-        OpenChoices("Search your library", closable: false, Math.Max(1, slots), viewControls: true, headings: headings);
+        OpenChoices(title, closable: false, Math.Max(1, slots), viewControls: true, headings: headings);
         ShowPicked(client, prompt.Count);
 
         if (shown.Count == 0)
         {
-            ShowChoicesEmpty("Nothing in your library can be taken.");
+            ShowChoicesEmpty($"Nothing in {library} can be taken.");
         }
 
         foreach (CardGroup group in groups)
@@ -1377,7 +1426,7 @@ public sealed partial class MainPage
         }
 
         AddButton(
-            _picked.Count == 0 ? "Take" : _picked.Count == 1 ? "Take 1 card" : $"Take {_picked.Count} cards",
+            _picked.Count == 0 ? take : _picked.Count == 1 ? $"{take} 1 card" : $"{take} {_picked.Count} cards",
             () => Send(client, new CardsChosenAnswer { Cards = [.. _picked.Select(h => new ViewHandle(h))] }),
             enabled: prompt.Optional ? _picked.Count > 0 && _picked.Count <= prompt.Count : _picked.Count == prompt.Count,
             primary: true);
@@ -1540,7 +1589,7 @@ public sealed partial class MainPage
 
             // Paradigm (CR 702.192a, 707.12): the card offered is a copy, made for this one cast.
             case "CastCopyWithoutPaying":
-                Ask($"Cast a copy of {Named("that card")} without paying its mana cost?", "If you don't, the copy ceases to exist", "Cast", "Don't cast");
+                Ask($"Cast a copy of {Named("that card")} without paying its mana cost?", "The card stays where it is  ·  if you don't cast the copy, no copy is made", "Cast", "Don't cast");
                 return;
 
             case "CastDiscarded":

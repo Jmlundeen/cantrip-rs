@@ -283,8 +283,9 @@ public sealed class Decisions
 
             ActionKindView.CastSpell =>
                 $"Cast {name}"
+                + CastFrom(client, card)
                 + (card?.ManaCost is { Length: > 0 } cost ? $" for {cost}" : string.Empty)
-                + (option.AbilityIndex > 0 ? " by an alternative cost" : string.Empty)
+                + CastWay(option, card)
                 + (option.HasX ? $" (you can pay for X up to {option.MaxX})" : string.Empty)
                 + (card?.OracleText is { Length: > 0 } spell ? $". It reads: \"{spell.ReplaceLineEndings(" / ")}\"" : ".")
                 + Costs(option),
@@ -303,6 +304,42 @@ public sealed class Decisions
                 $"Unlock a door of {name}, a Room: {option.Description}. That door's text then counts, and its \"when you unlock this door\" ability triggers.",
             _ => $"{option.Kind}: {name}",
         };
+    }
+
+    /// <summary>The zone a card is cast from when it is not the hand: a graveyard, exile, the top of a library (CR 601.2a).</summary>
+    private static string CastFrom(GameClient client, ObjectView? card)
+    {
+        if (card is null)
+        {
+            return string.Empty;
+        }
+
+        string whose = card.ZoneOwner == client.Seat ? "your" : GameText.Whose(client, card.ZoneOwner);
+
+        return card.Zone switch
+        {
+            ZoneKindView.Graveyard => $" from {whose} graveyard",
+            ZoneKindView.Exile => " from exile",
+            ZoneKindView.Library => $" from the top of {whose} library",
+            _ => string.Empty,
+        };
+    }
+
+    /// <summary>
+    /// The way a spell is cast when it is not the plain one, in the rules engine's own words for it: an alternative cost's
+    /// text (emerge, "Flashback {2}{R}, Discard a card"), or a granted flashback's or free cast's. A face or Adventure is
+    /// named by the spell's name already.
+    /// </summary>
+    private static string CastWay(ActionOptionMessage option, ObjectView? card)
+    {
+        bool named = option.Description.Length == 0 || option.Description == option.SpellName || option.Description == card?.Name;
+
+        if (named)
+        {
+            return option.AbilityIndex > 0 && option.SpellName.Length == 0 ? " by an alternative cost" : string.Empty;
+        }
+
+        return option.AbilityIndex > 0 ? $" by an alternative cost ({option.Description})" : $" ({option.Description})";
     }
 
     /// <summary>What an action costs besides mana, where the server says it costs something worth weighing.</summary>
@@ -828,6 +865,13 @@ public sealed class Decisions
 
     // --- Choosing ----------------------------------------------------------------------------------------------------
 
+    /// <summary>What the slot is for, as the card words it, with the opponent whose slot it is named.</summary>
+    private static string Slot(GameClient client, ChooseTargetPromptMessage prompt) =>
+        prompt.Text.Replace(
+            "{player}",
+            prompt.ForPlayer == 0 ? "an opponent" : GameText.Seat(client, prompt.ForPlayer),
+            StringComparison.Ordinal);
+
     private AnswerPayload Target(GameClient client, ChooseTargetPromptMessage prompt)
     {
         if (prompt.Candidates.Count == 0)
@@ -844,7 +888,7 @@ public sealed class Decisions
                 prompt.Candidates,
                 prompt.Count,
                 least: prompt.Optional ? 0 : prompt.Minimum > 0 ? prompt.Minimum : prompt.Count,
-                what: $"{GameText.Named(client, prompt.Ability)} {what}: \"{prompt.Text}\"."),
+                what: $"{GameText.Named(client, prompt.Ability)} {what}" + (prompt.Text.Length > 0 ? $": {Slot(client, prompt)}." : ".")),
         };
     }
 
@@ -910,7 +954,7 @@ public sealed class Decisions
         }
 
         string what = prompt.Heading.Length > 0
-            ? prompt.Heading
+            ? prompt.Source.IsNone ? prompt.Heading : $"{prompt.Heading} ({GameText.Named(client, prompt.Source)})"
             : prompt.AdditionalCost
                 ? $"Casting {GameText.Named(client, prompt.Source)} has an additional cost. Which do you pay?"
                 : $"Casting {GameText.Named(client, prompt.Source)}. Which mode do you choose?";
@@ -931,9 +975,13 @@ public sealed class Decisions
             int pick = One(new Question
             {
                 Heading = prompt.Most > 1 ? $"{what} (choice {slot + 1})" : what,
-                Note = chosen.Count > 0
-                    ? "Already chosen: " + string.Join("; ", chosen.Select(mode => prompt.Modes[mode]))
-                    : string.Empty,
+                Note = string.Join(
+                    " ",
+                    new[]
+                    {
+                        prompt.Detail,
+                        chosen.Count > 0 ? "Already chosen: " + string.Join("; ", chosen.Select(mode => prompt.Modes[mode])) : string.Empty,
+                    }.Where(line => line.Length > 0)),
                 Choices = choices,
             });
 
@@ -1045,14 +1093,19 @@ public sealed class Decisions
         string source = GameText.Named(client, prompt.Source);
         string whose = GameText.Whose(client, prompt.Owner);
         string kind = prompt.Kind.Length > 0 ? $" {prompt.Kind}" : string.Empty;
-        string many = prompt.UpTo ? $"up to {prompt.Count}" : prompt.Count.ToString(CultureInfo.InvariantCulture);
+        string many = prompt.UpTo && prompt.Count >= 255 ? "any number of"
+            : prompt.UpTo ? $"up to {prompt.Count}" : prompt.Count.ToString(CultureInfo.InvariantCulture);
+        string where = Where(client, prompt);
+        string budget = prompt.MaximumManaValue > 0 || prompt.Purpose == CardChoicePurposeView.CastCopyFree
+            ? $" The spells you cast this way have a total mana value of at most {prompt.MaximumManaValue} left."
+            : string.Empty;
 
         return prompt.Purpose switch
         {
             CardChoicePurposeView.Discard => $"{source}: discard {many}{kind} card(s) from {whose} hand.",
             CardChoicePurposeView.Sacrifice => $"{source}: sacrifice {many}{kind} permanent(s).",
             CardChoicePurposeView.Destroy => $"{source}: choose {many}{kind} permanent(s) to destroy.",
-            CardChoicePurposeView.Exile => $"{source}: exile {many}{kind} card(s) from {whose} hand.",
+            CardChoicePurposeView.Exile => $"{source}: exile {many}{kind} card(s){where}.",
             CardChoicePurposeView.PutOnTop => $"{source}: put {many} card(s) on top of the library, last chosen on top.",
             CardChoicePurposeView.PutOntoBattlefield => $"{source}: put {many}{kind} card(s) onto the battlefield.",
             CardChoicePurposeView.PutIntoHand => $"{source}: put {many}{kind} card(s) into your hand.",
@@ -1065,7 +1118,10 @@ public sealed class Decisions
             CardChoicePurposeView.Blight => $"{source}: choose a creature you control to put the -1/-1 counter(s) of the cost on. It shrinks, and dies if its toughness reaches 0, so choose the creature you can best spare, not your best.",
             CardChoicePurposeView.KeepLegend => "You control more than one legend with the same name. Choose the one to keep; the rest go to the graveyard.",
             CardChoicePurposeView.Keep => $"{source}: choose the{kind} one to keep. The rest are sacrificed.",
-            CardChoicePurposeView.Cast => $"{source}: choose {many}{kind} card(s) to cast from the graveyard.",
+            CardChoicePurposeView.Cast => $"{source}: choose {many}{kind} card(s) to cast{where}. You pay each one's costs.",
+            CardChoicePurposeView.CastFree => $"{source}: choose {many}{kind} card(s) to cast{where} without paying their mana costs.",
+            CardChoicePurposeView.CastCopyFree =>
+                $"{source}: choose {many}{kind} {(prompt.Count == 1 ? "copy" : "copies")} to cast{where} without paying their mana costs. The copies cease to exist if not cast.{budget}",
             CardChoicePurposeView.Play => $"{source}: choose {many}{kind} card(s) you may play this turn without paying their cost.",
             CardChoicePurposeView.Vote => $"{source}: cast your vote.",
             CardChoicePurposeView.TapToPay => $"{source}: tap creatures to pay its cost.",
@@ -1074,6 +1130,28 @@ public sealed class Decisions
             CardChoicePurposeView.PutOnBottom => $"You kept a hand after mulliganing: choose {many} card(s) to put on the bottom of your library.",
             _ => $"{source}: choose {many}{kind} card(s).",
         };
+    }
+
+    /// <summary>The zones the cards of a choice are in, as " from your graveyard", " from Alice's hand", " from the battlefield".</summary>
+    private static string Where(GameClient client, ChooseCardsPromptMessage prompt)
+    {
+        List<string> places = [.. prompt.Cards
+            .Select(client.Object)
+            .OfType<ObjectView>()
+            .Select(card => (card.Zone, card.ZoneOwner))
+            .Distinct()
+            .Select(place => place.Zone switch
+            {
+                ZoneKindView.Battlefield => "the battlefield",
+                ZoneKindView.Graveyard => $"{GameText.Whose(client, place.ZoneOwner)} graveyard",
+                ZoneKindView.Library => $"{GameText.Whose(client, place.ZoneOwner)} library",
+                ZoneKindView.Exile => "exile",
+                ZoneKindView.Stack => "the stack",
+                _ => $"{GameText.Whose(client, place.ZoneOwner)} hand",
+            })
+            .Distinct()];
+
+        return places.Count == 0 ? string.Empty : $" from {string.Join(" and ", places)}";
     }
 
     private AnswerPayload Search(GameClient client, SearchLibraryPromptMessage prompt)
@@ -1092,10 +1170,14 @@ public sealed class Decisions
             return prompt.Default();
         }
 
+        string library = prompt.Owner == 0 || prompt.Owner == client.Seat ? "your library" : $"{GameText.Whose(client, prompt.Owner)} library";
+
         IReadOnlyList<int> picks = Many(new Question
         {
-            Heading = $"You are searching your library for {(count == 1 ? "a card" : $"{count} cards")}, "
-                + $"to go to {Destination(prompt.Destination)}. What do you take?",
+            Heading = $"You are searching {library} for {(prompt.Optional && prompt.Count >= 255 ? "any number of cards" : count == 1 ? "a card" : $"{count} cards")}, "
+                + (prompt.Destination == SearchDestinationView.Found
+                    ? "and what becomes of it is decided once it is found. What do you take?"
+                    : $"to go to {Destination(prompt.Destination)}. What do you take?"),
             Note = prompt.Optional ? "You may find nothing, which shuffles the library and takes nothing." : string.Empty,
             Choices = [.. prompt.Eligible.Select(card => GameText.Named(client, card))],
             Picks = count,
@@ -1108,11 +1190,13 @@ public sealed class Decisions
     private static string Destination(SearchDestinationView destination) => destination switch
     {
         SearchDestinationView.Hand => "your hand",
-        SearchDestinationView.TopOfLibrary => "the top of your library",
+        SearchDestinationView.TopOfLibrary => "the top of the library searched",
         SearchDestinationView.Graveyard => "your graveyard",
         SearchDestinationView.Exile => "exile",
         SearchDestinationView.ExileFaceDown => "exile, face down",
         SearchDestinationView.Cast => "the stack, cast by you as the effect resolves",
+        SearchDestinationView.CastFree => "the stack, cast by you as the effect resolves without paying its mana cost",
+        SearchDestinationView.BattlefieldTapped => "the battlefield, tapped",
         _ => "the battlefield",
     };
 
@@ -1342,6 +1426,24 @@ public sealed class Decisions
     {
         string source = GameText.Named(client, prompt.Source);
         string amount = prompt.Amount > 0 ? " " + prompt.Amount.ToString(CultureInfo.InvariantCulture) : string.Empty;
+
+        // The casts an effect offers as it resolves: what they cost, and what becomes of the card if it is not cast.
+        string? cast = prompt.Verb switch
+        {
+            "CastDuringResolution" when prompt.Amount == 1 => "cast it without paying its mana cost. If you do not, it stays where it is.",
+            "CastDuringResolution" => "cast it, paying all its costs. If you do not, it stays where it is.",
+            "CastCopyWithoutPaying" => "cast a copy of it without paying its mana cost. The card stays where it is either way.",
+            "CastTransformed" => "cast it transformed without paying its mana cost. If you do not, it stays in exile.",
+            "CastForMadnessCost" => "cast it by paying its madness cost. If you do not, it is put into your graveyard.",
+            "CastFoundOrPutIntoHand" => "cast it without paying its mana cost. If you do not, it is put into your hand.",
+            "CastWithoutPaying" => "cast it without paying its mana cost. If you do not, it goes on the bottom of your library.",
+            _ => null,
+        };
+
+        if (cast is not null)
+        {
+            return new MayChosenAnswer { Accept = Yes($"{source} says you may {cast} Do you?") };
+        }
 
         return new MayChosenAnswer
         {

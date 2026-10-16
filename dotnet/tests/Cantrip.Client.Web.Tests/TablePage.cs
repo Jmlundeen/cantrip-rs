@@ -270,7 +270,11 @@ public sealed record TableState(
     string Detail = "",
     IReadOnlyList<string>? Modes = null,
     IReadOnlyList<string>? LogText = null,
-    bool GraveyardsOpen = false);
+    bool GraveyardsOpen = false,
+    IReadOnlyList<DockButtonState>? Dock = null);
+
+/// <summary>A button of the dock, in the order the dock offers them, and whether it can be pressed.</summary>
+public sealed record DockButtonState(string Label, bool Enabled);
 
 /// <summary>
 /// A player's box on the page, which a click on targets them, and the mana in their pool; the facts beside their life

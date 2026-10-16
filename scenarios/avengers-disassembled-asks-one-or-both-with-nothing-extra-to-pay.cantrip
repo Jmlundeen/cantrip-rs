@@ -1,0 +1,27 @@
+# Browser
+# Avengers Disassembled: "Choose one or both" - the second mode costs nothing (no escalate, no spree). The question Bot1's
+# page asks says exactly that: "choose one or both", with the count chosen and nothing about what a further mode costs, which
+# it said it did ("each one past the first costs, up to two") whatever the spell. Bot1 casts it with a Black Lotus's red mana
+# and chooses the first mode alone: 3 damage to each creature, of which there are none.
+
+[Bot1 Deck]
+Black Lotus
+Avengers Disassembled
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Avengers Disassembled.Cast
+? Client.Bot1.Prompt.Title = Avengers Disassembled: choose one or both
+? Client.Bot1.Prompt.Detail = 0 chosen
+Bot1.Modes(1)
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Graveyard = Avengers Disassembled; Black Lotus
+Stack.Count = 0

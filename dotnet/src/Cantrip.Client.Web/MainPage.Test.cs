@@ -149,6 +149,24 @@ public sealed partial class MainPage
 
             json.WriteEndArray();
 
+            // What the dock says (its question and the line under it) and the buttons it offers, in order, each with whether it can
+            // be pressed: a scenario's client checks read the wording a player is given (docs/scenarios-in-the-browser.md).
+            json.WriteStartArray("dock");
+            foreach (DockButton button in _buttons.Children.OfType<DockButton>())
+            {
+                if (button.Visibility != Visibility.Visible)
+                {
+                    continue;
+                }
+
+                json.WriteStartObject();
+                json.WriteString("label", Microsoft.UI.Xaml.Automation.AutomationProperties.GetName(button) is { Length: > 0 } named ? named : string.Join(" ", Texts(button)));
+                json.WriteBoolean("enabled", button.Enabled);
+                json.WriteEndObject();
+            }
+
+            json.WriteEndArray();
+
             // Each ability shown resolving, newest last: the way it cut on the whole, and each arrow's.
             json.WriteStartArray("effects");
             foreach (ResolutionEffectsElement.Effect effect in _resolutions.History)

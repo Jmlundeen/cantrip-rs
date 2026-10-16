@@ -1496,6 +1496,13 @@ public sealed partial class TacticalPlay
             return effect.Amount > 0 && IsPermanentCard(card) ? _model.WorthOnceCast(card) + _model.Card : 2 * _model.Card;
         }
 
+        // A card exiled from a graveyard to be made use of (Uldaros Theorix exiles a card of each type to cast copies of them
+        // for nothing): a benefit, worth the copy it gives, not a loss of a card from the graveyard.
+        if (card.Zone == ZoneKindView.Graveyard && effect.Kind == EffectKind.Remove && effect.UsesIt)
+        {
+            return IsPermanentCard(card) ? _model.WorthOnceCast(card) : 2 * _model.Card;
+        }
+
         // A card exiled from a graveyard (Soul-Guide Lantern as it enters, Ghost Vacuum): from an opponent's, a
         // creature that could be brought back before anything else; from this seat's own, as little as anything.
         if (card.Zone == ZoneKindView.Graveyard && effect.Kind == EffectKind.Remove && Policy("graveyard") > 0)

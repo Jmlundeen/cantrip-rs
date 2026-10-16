@@ -76,8 +76,10 @@ fails is the page's.
 - Only Bot1 is a page; the other seats are the script's. Checks of what another seat's page shows, hidden information
   above all (that Bot2's page never shows Bot1's hand), want Bot2 driven too.
 - Things a player does that are not answers to a question - a concession, Pass Turn, a stop toggled - have no lines yet.
-- The driver clicks its way to priority actions, payments, may, card choices, targets, attacks and blocks; other
-  prompts fail as not driven yet.
+- The driver clicks its way to priority actions (a card menu's row by the colour it adds or by `Ability:` text), payments, may,
+  card choices, library searches, modes, targets (and "No target"), attacks and blocks; other prompts fail as not driven yet.
+- A `? Client.` line is judged against the page at the next question the script reaches, so a check of what a prompt says
+  follows the answer that causes it and any `Bot1.Pass` that lets it resolve (`Bot1.Pass` then `? Client.Bot1.Prompt.Title = ...`).
 
 ## Client expectations
 

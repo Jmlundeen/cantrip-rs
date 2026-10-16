@@ -1,0 +1,67 @@
+# Browser
+# Deadly Cover-Up with evidence collected (CR 701.59a): what Bot1's page says at each question. The additional cost is asked as
+# a choice of additional costs; the card exiled from an opponent's graveyard is a card to exile; the rest of its name in that
+# graveyard is "any number of cards" to exile (the rules text's own words); and the library searched is Bot2's, whose cards go
+# to exile, not Bot1's own into its hand, which is what the search used to say ("search your library ... into your hand").
+# Bot2 casts three Ornithopters (all free), so after one is exiled two remain in its graveyard and two are left in its library.
+
+[Bot1 Deck]
+Swamp
+Mox Ruby
+Faithless Looting
+Black Lotus
+Deadly Cover-Up
+Griselbrand
+Swamp
+Swamp
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Ornithopter
+Island x4
+Island
+Ornithopter
+Ornithopter
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Griselbrand; Swamp)
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Deadly Cover-Up.Cast
+? Client.Bot1.Prompt.Title = Deadly Cover-Up: choose an additional cost to pay
+? Client.Bot1.Dock = Cast without collecting evidence; Collect evidence 6; Cancel
+Bot1.Modes(Collect evidence)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Choose(Griselbrand)
+Bot1.Pass
+? Client.Bot1.Prompt.Title = Deadly Cover-Up: choose a card to exile
+Bot1.Choose(Ornithopter)
+? Client.Bot1.Prompt.Title = Deadly Cover-Up: choose any number of cards to exile
+Bot1.Choose(Ornithopter)
+? Client.Bot1.Prompt.Title = Search Bot2's library
+? Client.Bot1.Prompt.Detail = Choose any number of cards to exile  ·  0 chosen
+Bot1.Search(Ornithopter; Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Exile.Count = 5
+Bot2.Battlefield.Count = 1
+Bot2.Graveyard.Count = 1
+Bot2.Library.Count = 10
+Bot2.Hand = Island; Island; Island; Island

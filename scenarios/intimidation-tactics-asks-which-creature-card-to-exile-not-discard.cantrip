@@ -1,0 +1,33 @@
+# Browser
+# Intimidation Tactics: "You choose an artifact or creature card from it. Exile that card." The question Bot1's page asks is
+# about exiling - the dock reads "exile" and offers "Exile", never "Discard" - and says which kind of card the choice
+# is of, as the card words it ("an artifact or creature card"; Bot2's hand is Llanowar Elves, a Lightning Bolt and five
+# Islands), where it once read "choose a card to discard / Discard it" (the purpose was the one a discard from a revealed
+# hand has).
+
+[Bot1 Deck]
+Swamp
+Intimidation Tactics
+Swamp x10
+
+[Bot2 Deck]
+Llanowar Elves
+Lightning Bolt
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Intimidation Tactics.Cast(Bot2)
+Bot1.Pass
+? Client.Bot1.Prompt.Title = Intimidation Tactics: choose an artifact or creature card to exile
+? Client.Bot1.Button.Exile = shown
+? Client.Bot1.Button.Discard = absent
+Bot1.Choose(Llanowar Elves)
+
+[Expect]
+Turn = 1
+Bot1.Graveyard = Intimidation Tactics
+Exile = Llanowar Elves
+Bot2.Graveyard.Count = 0
+Bot2.Hand = Island; Island; Island; Island; Island; Lightning Bolt

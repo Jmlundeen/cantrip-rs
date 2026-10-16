@@ -1,0 +1,67 @@
+# Browser
+# Uldaros Theorix and what Bot1's page says at each question (CR 115.1, 707.12, 701.23). Entomb searches Bot1's own library
+# for a card to put into its graveyard, and says so. Each of Uldaros's eight target slots says what it is for - the card
+# type that no other target covers, exiled and copied - rather than the bare "up to one target". The copy is cast without
+# paying its mana cost, within what is left of the six mana value, and the question says that, and that it is a copy, which
+# it called a card cast from the graveyard. The Adventurer's face is asked as a choice of faces with their costs.
+
+[Bot1 Deck]
+Swamp
+Dark Ritual
+Entomb
+Black Lotus
+Uldaros Theorix
+Swamp
+Swamp
+Bonecrusher Giant
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Hand.Entomb.Cast
+Bot1.Pass
+? Client.Bot1.Prompt.Title = Search your library
+? Client.Bot1.Prompt.Detail = Choose a card to put into your graveyard  ·  0 chosen
+Bot1.Search(Bonecrusher Giant)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Uldaros Theorix.Cast
+Bot1.Pass
+? Client.Bot1.Prompt.Title = Up to one target for Uldaros Theorix
+? Client.Bot1.Prompt.Detail = Exile up to one target nonland card from your graveyard of a card type none of your other targets has, and copy it  ·  4 possible targets
+Bot1.Target(Black Lotus)
+Bot1.Target(Bonecrusher Giant)
+Bot1.Target()
+Bot1.Target()
+Bot1.Target()
+Bot1.Target()
+Bot1.Target()
+Bot1.Target()
+Bot1.Pass
+? Client.Bot1.Prompt.Title = Uldaros Theorix: choose up to 1 copy to cast without paying its mana cost (total mana value 6 or less left to spend)
+Bot1.Choose(Bonecrusher Giant)
+? Client.Bot1.Prompt.Title = Choose which face to cast
+? Client.Bot1.Dock = Bonecrusher Giant {2}{R}; Stomp {1}{R}
+Bot1.Modes(Stomp)
+Bot1.Target(Bot2)
+? Client.Bot1.Prompt.Title = Uldaros Theorix: choose up to 1 copy to cast without paying its mana cost (total mana value 4 or less left to spend)
+Bot1.Choose()
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield = Swamp; Swamp; Swamp; Uldaros Theorix
+Exile = Black Lotus; Bonecrusher Giant
+Stack.Count = 0

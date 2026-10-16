@@ -65,6 +65,8 @@ A key starting `Client.` is about what the page shows, not the game's state, and
 | `Client.Bot1.Facts`, `.OpponentFacts` | the facts beside a player's life total, as a set: `The next spell you cast this turn can't be countered` |
 | `Client.Bot1.Exile.Lit`, `.Caption`, `.Tooltip` (and `OpponentExile.`) | the Exile button over a player's piles: `true` when a card in it may be played, what it says, its tooltip |
 | `Client.Bot1.Graveyard.Lit`, `.Note` | the graveyard pile: lit when a card in it can be cast, and the note its tooltip adds |
+| `Client.Bot1.Dock` | the dock's buttons in order |
+| `Client.Bot1.Menu` | the rows of the card menu the page last opened (a row is judged when the menu opens, not after the click) |
 
 Only Bot1 is a page for now, so only `Client.Bot1.` keys can be judged.
 

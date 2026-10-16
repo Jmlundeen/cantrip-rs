@@ -32,17 +32,31 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
         // is not the one who gets the card, so "your hand" would be a lie to them.
         bool forAnother = prompt.Purpose == CardChoicePurposeView.PutIntoHand
             && (context?.Owner ?? prompt.Owner) != (context?.Chooser ?? prompt.Player);
-        string verb = forAnother ? "put into its owner's hand" : Action(context?.Action ?? ActionFor(prompt.Purpose));
+        string verb = forAnother ? "put into its owner's hand" : prompt.Purpose switch
+        {
+            // A cast says what it costs and what is cast: the cards chosen from may be in any zone, and a copy is not the card.
+            CardChoicePurposeView.Cast => "cast, paying its costs",
+            CardChoicePurposeView.CastFree => "cast without paying its mana cost",
+            CardChoicePurposeView.CastCopyFree => "cast without paying its mana cost",
+            _ => Action(context?.Action ?? ActionFor(prompt.Purpose)),
+        };
         bool cost = context?.Cause == PromptCauseView.Cost || context is null
             && prompt.Purpose is CardChoicePurposeView.ExileToPay or CardChoicePurposeView.ReturnToHand or CardChoicePurposeView.TapToPay;
         // Behold and blight name the cost in their own verb ("to behold", "to blight"): "to pay for it" would add nothing.
         if (cost && prompt.Purpose is not (CardChoicePurposeView.Behold or CardChoicePurposeView.Blight)) verb += " to pay for it";
-        // Behold (CR 701.4a) is a permanent you control or a card in your hand.
-        string one = prompt.Purpose == CardChoicePurposeView.Behold ? "permanent or card" : permanents ? "permanent" : "card";
-        string many = prompt.Count == 1 ? one : one + "s";
-        string kind = prompt.Kind.Length > 0 ? prompt.Kind : one;
-        string article = "aeiou".Contains(kind[0], StringComparison.OrdinalIgnoreCase) ? "an" : "a";
         ZoneKindView? table = ChoiceTable(client, prompt);
+        bool copies = prompt.Purpose == CardChoicePurposeView.CastCopyFree;
+        // Behold (CR 701.4a) is a permanent you control or a card in your hand.
+        string one = prompt.Purpose == CardChoicePurposeView.Behold ? "permanent or card" : copies ? "copy" : permanents ? "permanent" : "card";
+        // The type the asking card narrowed the choice to ("a creature to exile"), the word "card" kept for a card in a zone
+        // that is not the battlefield; the quality a behold names and the creature a blight takes are said as they are.
+        bool said = prompt.Purpose is CardChoicePurposeView.Behold or CardChoicePurposeView.Blight;
+        string kind = prompt.Kind.Length > 0 ? (said || permanents || table == ZoneKindView.Battlefield ? prompt.Kind : prompt.Kind + " card") : one;
+        string many = prompt.Count == 1 ? kind : kind.EndsWith('y') ? kind[..^1] + "ies" : kind + "s";
+        string article = "aeiou".Contains(kind[0], StringComparison.OrdinalIgnoreCase) ? "an" : "a";
+        // "Any number of": every one of several that may be chosen, as the rules text says when it does not name a count.
+        bool anyNumber = prompt.UpTo && prompt.Count >= 255;
+        string budget = prompt.MaximumManaValue > 0 || prompt.Purpose == CardChoicePurposeView.CastCopyFree ? $" (total mana value {prompt.MaximumManaValue} or less left to spend)" : string.Empty;
         string where = table switch
         {
             ZoneKindView.Battlefield when prompt.Count > 0 => "  ·  click them on the battlefield",
@@ -60,8 +74,9 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
                 ? $"{source}: choose {article} {kind} you control or reveal {article} {kind} card from your hand to behold"
             : prompt.Purpose == CardChoicePurposeView.Blight && prompt.Count == 1 && !prompt.UpTo
                 ? $"{source}: choose a creature you control to blight (it gets -1/-1 counters)"
-            : prompt.Count == 1 && !prompt.UpTo ? $"{source}: choose {article} {kind} to {verb}"
-            : $"{source}: choose {(prompt.UpTo ? "up to " : "")}{prompt.Count} {many} to {verb}";
+            : prompt.Count == 1 && !prompt.UpTo ? $"{source}: choose {article} {kind} to {verb}{budget}"
+            : anyNumber ? $"{source}: choose any number of {many} to {verb}{budget}"
+            : $"{source}: choose {(prompt.UpTo ? "up to " : "")}{prompt.Count} {many} to {verb}{budget}";
         string detail = prompt.MinimumPower > 0
             ? $"{picked.Count} chosen  ·  total power {power} of {prompt.MinimumPower}{where}"
             : prompt.MinimumManaValue > 0
@@ -86,7 +101,7 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
             CardChoicePurposeView.PutOntoBattlefield => picked.Count == 0 ? "Put nothing" : "Put onto the battlefield",
             CardChoicePurposeView.PutIntoHand => picked.Count == 0 ? "Take nothing"
                 : forAnother ? "Put into their hand" : "Put into your hand",
-            CardChoicePurposeView.Cast => picked.Count == 0 ? "Cast nothing" : "Cast selected",
+            CardChoicePurposeView.Cast or CardChoicePurposeView.CastFree or CardChoicePurposeView.CastCopyFree => picked.Count == 0 ? "Cast nothing" : "Cast selected",
             CardChoicePurposeView.OrderSimultaneous => "Apply next",
             CardChoicePurposeView.Destroy => picked.Count == 1 ? "Destroy it" : $"Destroy {picked.Count}",
             CardChoicePurposeView.Vote => picked.Count == 1 ? "Vote for it" : "Vote",
@@ -155,7 +170,7 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
         CardChoicePurposeView.Untap => PromptActionView.Untap,
         CardChoicePurposeView.PutOntoBattlefield => PromptActionView.PutOntoBattlefield,
         CardChoicePurposeView.PutIntoHand => PromptActionView.PutIntoHand,
-        CardChoicePurposeView.Cast => PromptActionView.Cast,
+        CardChoicePurposeView.Cast or CardChoicePurposeView.CastFree or CardChoicePurposeView.CastCopyFree => PromptActionView.Cast,
         CardChoicePurposeView.TapToPay => PromptActionView.Tap,
         CardChoicePurposeView.OrderSimultaneous => PromptActionView.OrderReplacement,
         CardChoicePurposeView.Destroy => PromptActionView.Destroy,

@@ -103,6 +103,8 @@ publish its state as JSON on `globalThis.cantripTest`, ten times a second (`Main
   and `raise` steps beside it.
 - `controls` - every `button`, `toggle`, `dropdown` (by its caption), `textbox` (by its placeholder) and `item` (a row
   of an open menu or list), by its `label`, with its box.
+- `title`, `detail` and `dock` - what the dock says: its question, the line under it, and its buttons in order (each
+  with whether it can be pressed).
 
 So Playwright can picture the page and click by name with real mouse events, going through the same hit testing a
 person's clicks do. `&auto` makes the page play its own seat, the one deterministic way or at random from

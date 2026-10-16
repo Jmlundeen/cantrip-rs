@@ -1,0 +1,61 @@
+# Browser
+# Ugin, Eye of the Storms, -11: "Search your library for any number of colorless nonland cards, exile them, then shuffle." The
+# search Bot1's page shows says where the cards go - to exile - and that there is no number to find ("any number of"), where it
+# said "into your hand" (the destination was always a hand). Ugin comes down on turn 1 (a Black Lotus and four Moxen), +2 on turns 1
+# and 3 takes his loyalty from 7 to 11, and on turn 5 he uses the -11 and finds a Sol Ring and an Ornithopter.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Mox Emerald
+Black Lotus
+Ugin, Eye of the Storms
+Island
+Island
+Island
+Island
+Island
+Lightning Bolt
+Sol Ring
+Ornithopter
+Mind Stone
+Island x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Ugin, Eye of the Storms.Cast
+Bot1.Pass
+Bot1.Battlefield.Ugin, Eye of the Storms.Activate(Ability: +2)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Ugin, Eye of the Storms.Activate(Ability: +2)
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Ugin, Eye of the Storms.Activate(Ability: Search)
+Bot1.Pass
+? Client.Bot1.Prompt.Title = Search your library
+? Client.Bot1.Prompt.Detail = Choose any number of cards to exile  ·  0 chosen
+Bot1.Search(Sol Ring; Ornithopter)
+[T5 Bot1.Main2]
+
+[Expect]
+Exile = Sol Ring; Ornithopter
+Bot1.Battlefield.Count = 4

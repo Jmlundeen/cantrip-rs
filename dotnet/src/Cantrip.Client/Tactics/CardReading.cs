@@ -84,7 +84,8 @@ public enum EffectKind
 /// <param name="Kicked">The amount if the spell is kicked, or zero where kicking changes nothing read here.</param>
 /// <param name="OwnerGainsPower">Swords to Plowshares: the target's controller gains life equal to its power.</param>
 /// <param name="Toughness">The toughness a <see cref="EffectKind.Reshape"/> leaves its target with.</param>
-public readonly record struct EffectRead(EffectKind Kind, int Amount = 0, int Kicked = 0, bool OwnerGainsPower = false, int Toughness = 0)
+/// <param name="UsesIt">A <see cref="EffectKind.Remove"/> that exiles a card to make use of it (Uldaros Theorix: "copy those cards"), not to be rid of it.</param>
+public readonly record struct EffectRead(EffectKind Kind, int Amount = 0, int Kicked = 0, bool OwnerGainsPower = false, int Toughness = 0, bool UsesIt = false)
 {
     /// <summary>Whether this is something done to an opponent's things rather than to this seat's own.</summary>
     public bool Hostile => Kind is EffectKind.Damage or EffectKind.Remove or EffectKind.Bounce or EffectKind.Shrink or EffectKind.Reshape
@@ -366,7 +367,8 @@ public static partial class CardReading
         if (plain.Contains("destroy target", StringComparison.Ordinal) || plain.Contains("exile target", StringComparison.Ordinal)
             || plain.Contains("destroy up to", StringComparison.Ordinal) || plain.Contains("exile up to", StringComparison.Ordinal))
         {
-            return new EffectRead(EffectKind.Remove, OwnerGainsPower: plain.Contains("gains life equal to its power", StringComparison.Ordinal));
+            return new EffectRead(EffectKind.Remove, OwnerGainsPower: plain.Contains("gains life equal to its power", StringComparison.Ordinal),
+                UsesIt: plain.Contains("copy", StringComparison.Ordinal));
         }
 
         if (plain.Contains("gain control of target", StringComparison.Ordinal))

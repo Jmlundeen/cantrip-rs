@@ -2062,13 +2062,13 @@ public static class PromptFixtures
                     CardChoicePurposeView.Attach,
                     Viewer,
                     [new ViewHandle(MyKey), new ViewHandle(MyKeyTwo)],
-                    count: 2,
+                    count: byte.MaxValue,
                     upTo: true);
 
             case "choose-attach-one":
-                // The same question with a single Equipment that could move: "up to 1", not "an".
+                // The same question with a single Equipment that could move: still "any number of", as the rules text says.
                 Equipment(view);
-                return Choose(CardChoicePurposeView.Attach, Viewer, [new ViewHandle(MyKey)], count: 1, upTo: true);
+                return Choose(CardChoicePurposeView.Attach, Viewer, [new ViewHandle(MyKey)], count: byte.MaxValue, upTo: true);
 
             case "choose-tap-to-pay":
             {

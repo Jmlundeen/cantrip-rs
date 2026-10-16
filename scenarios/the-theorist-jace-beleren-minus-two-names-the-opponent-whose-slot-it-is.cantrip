@@ -1,0 +1,37 @@
+# Browser
+# The Theorist, Jace Beleren's -2: "For each opponent, return up to one target artifact or creature that player controls to its
+# owner's hand." The ability has a slot for each opponent, and the question Bot1's page asks says whose: Bot2's. It read the
+# bare "Up to one target for The Theorist, Jace Beleren" for every opponent's slot alike. Bot1 chooses Bot2's Ornithopter, which
+# goes back to Bot2's hand (4 -> 2 loyalty after the turn-1 +1).
+
+[Bot1 Deck]
+Island
+Black Lotus
+The Theorist, Jace Beleren
+Island x4
+Island x12
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.The Theorist, Jace Beleren.Cast
+Bot1.Battlefield.The Theorist, Jace Beleren.Activate(Ability: +1)
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.The Theorist, Jace Beleren.Activate(Ability: −2)
+? Client.Bot1.Prompt.Title = Up to one target for The Theorist, Jace Beleren
+? Client.Bot1.Prompt.Detail = Return up to one target artifact or creature Bot2 controls to its owner's hand  ·  1 possible target
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Count = 0
+Bot2.Hand.Count = 8
+Bot1.Battlefield.The Theorist, Jace Beleren.Counters.Loyalty = 2
+Stack.Count = 0

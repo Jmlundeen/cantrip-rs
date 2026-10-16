@@ -1,0 +1,46 @@
+# Browser
+# Faithless Looting has flashback {2}{R} printed on it, and Stingcaster Mage's trigger gives its card in the graveyard
+# flashback "until end of turn. The flashback cost is equal to its mana cost" (CR 702.34a): two ways to cast it from there, which
+# Bot1's page offers as the rows of the card's menu. Each row names its own flashback cost - "Flashback {2}{R}" and
+# "Flashback {R}" - where the granted one read only "Cast Faithless Looting", the same as having no way at all. Bot1 casts the
+# card with the granted flashback, paying {R} out of what Black Lotus left, and the card is exiled instead of going back.
+
+[Bot1 Deck]
+Mox Ruby
+Black Lotus
+Faithless Looting
+Stingcaster Mage
+Mox Pearl
+Mox Sapphire
+Mountain
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Swamp; Swamp)
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Stingcaster Mage.Cast
+Bot1.Pass
+Bot1.Graveyard.Faithless Looting.Cast(Ability: Flashback {R})
+? Client.Bot1.Menu = Cast Faithless Looting — Flashback {2}{R}; Cast Faithless Looting — Flashback {R}
+Bot1.Pass
+Bot1.Choose(Swamp; Swamp)
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Exile = Faithless Looting
+Stack.Count = 0

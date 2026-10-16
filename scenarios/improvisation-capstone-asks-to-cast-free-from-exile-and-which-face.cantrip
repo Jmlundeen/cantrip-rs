@@ -1,0 +1,48 @@
+# Browser
+# Improvisation Capstone: "You may cast any number of spells with total mana value 4 or greater from among them without
+# paying their mana costs" (CR 118.9, 608.2g). What Bot1's page asks says the cast is free and where the cards are: the old
+# caption said they were cast "from the graveyard" and for a price. The Bonecrusher Giant is an Adventurer, so the face is
+# asked next (CR 715.3) as a question of which face to cast, naming each with its cost, not as "choose one" of modes whose
+# targets come next.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Improvisation Capstone
+Island x3
+Bonecrusher Giant
+Inevitable Defeat
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Improvisation Capstone.Cast
+Bot1.Pass
+? Client.Bot1.Prompt.Title = Improvisation Capstone: choose up to 1 card to cast without paying its mana cost
+? Client.Bot1.Prompt.Detail = 0 of 1 chosen
+? Client.Bot1.Button.Cast nothing = shown
+Bot1.Choose(Bonecrusher Giant)
+? Client.Bot1.Prompt.Title = Choose which face to cast
+? Client.Bot1.Prompt.Detail = Only the face you choose is cast, with its own cost and mana value
+? Client.Bot1.Dock = Bonecrusher Giant {2}{R}; Stomp {1}{R}
+Bot1.Modes(Stomp)
+Bot1.Target(Bot2)
+! Bot1.Choose
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot2.Life = 18
+Exile.Count = 3
+Bot1.Library.Count = 11

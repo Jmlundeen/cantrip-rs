@@ -134,6 +134,25 @@ public sealed partial class TacticalPlay
             return LifeForPhyrexian(client, view, prompt);
         }
 
+        // An optional additional cost that gives something up for something: collect evidence (CR 701.59a) pays cards of the
+        // graveyard for what the spell does "if evidence was collected" (Deadly Cover-Up).
+        if (prompt.AdditionalCost && prompt.Count == 1 && prompt.Modes.Count == 2 && prompt.Eligible.Contains(1)
+            && prompt.Modes[1].StartsWith("Collect evidence", StringComparison.Ordinal))
+        {
+            return new ModesChosenAnswer { Modes = [CollectsEvidence(client, view) ? 1 : 0] };
+        }
+
+        // The faces a card may be cast as (CR 709.3): each worth what it does or, for a permanent, what it is, the dearer
+        // of two equal ones first.
+        if (prompt.Eligible.Count > 0 && prompt.Texts.Count == prompt.Modes.Count && prompt.Modes.Count > 1)
+        {
+            int face = prompt.Eligible
+                .OrderByDescending(mode => FaceWorth(client, view, prompt.Modes[mode], prompt.Texts[mode]))
+                .ThenByDescending(mode => CardReading.ManaValue(prompt.Modes[mode]))
+                .First();
+            return new ModesChosenAnswer { Modes = [face] };
+        }
+
         // An additional cost dressed as a choice ("discard a card or pay 3 life"), or a room of a dungeon: the
         // prompt's own order is as good as this seat can do.
         // "You may behold a Dragon" (CR 701.4a): offered only when there is one to choose or reveal, and it costs nothing
@@ -151,18 +170,59 @@ public sealed partial class TacticalPlay
 
         // The modes it could pay for before the ones it could not (spree), and within each the one worth most: a mode
         // chosen and then given up on while paying is a spell that is never cast.
-        List<int> ranked = [.. prompt.Eligible
+        List<(int Mode, double Worth)> worths = [.. prompt.Eligible
             .Select(mode => (Mode: mode, Worth: mode < prompt.Modes.Count ? Mode(client, view, prompt.Modes[mode]) : 0))
             .OrderBy(pair => prompt.Affordable.Count > 0 && !prompt.Affordable.Contains(pair.Mode))
-            .ThenByDescending(pair => pair.Worth)
-            .Select(pair => pair.Mode)];
+            .ThenByDescending(pair => pair.Worth)];
+        List<int> ranked = [.. worths.Select(pair => pair.Mode)];
 
         if (prompt.MayRepeat)
         {
             return new ModesChosenAnswer { Modes = [.. Enumerable.Repeat(ranked[0], prompt.Count)] };
         }
 
-        return new ModesChosenAnswer { Modes = [.. ranked.Take(Math.Max(prompt.Count, 1))] };
+        int take = Math.Max(prompt.Count, 1);
+
+        // "Choose one or both" with nothing to pay for the second: every further mode that is worth doing is free.
+        if (!prompt.ExtraModesCost && prompt.Most > take)
+        {
+            take += worths.Skip(take).Take(prompt.Most - take).Count(pair => pair.Worth > 0);
+        }
+
+        return new ModesChosenAnswer { Modes = [.. ranked.Take(take)] };
+    }
+
+    /// <summary>
+    /// What one face of a card is worth cast: an effect for what it does to the best target there is, and anything else (a
+    /// creature, an artifact) for what a card of that cost is worth on the table.
+    /// </summary>
+    private double FaceWorth(GameClient client, PlayerView view, string name, string text)
+    {
+        if (CardReading.Effect(text).Kind != EffectKind.Unknown)
+        {
+            return Mode(client, view, text);
+        }
+
+        return 0.3 + _model.Card + (0.1 * Math.Min(CardReading.ManaValue(name), 4));
+    }
+
+    /// <summary>
+    /// Whether to pay collect evidence for its bonus: only with something in an opponent's graveyard for the bonus to take
+    /// (it starts there), and with no card of this seat's graveyard it would rather keep - a creature to bring back, or
+    /// anything with flashback, escape or the like - for the cards that pay for it are the best of them.
+    /// </summary>
+    private static bool CollectsEvidence(GameClient client, PlayerView view)
+    {
+        if (!view.Objects.Exists(card => card.Zone == ZoneKindView.Graveyard && card.ZoneOwner != client.Seat))
+        {
+            return false;
+        }
+
+        return !view.Objects.Exists(card => card.Zone == ZoneKindView.Graveyard && card.ZoneOwner == client.Seat
+            && (IsCreature(card) || CardReading.Text(card).Contains("from your graveyard", StringComparison.OrdinalIgnoreCase)
+                || CardReading.Text(card).Contains("flashback", StringComparison.OrdinalIgnoreCase)
+                || CardReading.Text(card).Contains("escape", StringComparison.OrdinalIgnoreCase)
+                || CardReading.Text(card).Contains("unearth", StringComparison.OrdinalIgnoreCase)));
     }
 
     // --- Cards ---------------------------------------------------------------------------------------------------------
@@ -339,7 +399,7 @@ public sealed partial class TacticalPlay
 
         // "You may cast it": a card chosen once this step and offered again was not cast - its cost could not be paid,
         // its mode had no target - and choosing it again only asks the same question again.
-        if (prompt.Purpose is CardChoicePurposeView.Cast or CardChoicePurposeView.Play)
+        if (prompt.Purpose is CardChoicePurposeView.Cast or CardChoicePurposeView.CastFree or CardChoicePurposeView.CastCopyFree or CardChoicePurposeView.Play)
         {
             ranked.RemoveAll(card => _offered.Contains(card.Value));
             take = Math.Min(take, ranked.Count);

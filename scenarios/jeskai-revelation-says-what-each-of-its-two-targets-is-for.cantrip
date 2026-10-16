@@ -1,0 +1,48 @@
+# Browser
+# Jeskai Revelation: "Return target spell or permanent to its owner's hand. Jeskai Revelation deals 4 damage to any target."
+# Two targets, chosen one after the other as it is cast. Each question Bot1's page asks says what that target is for - the first
+# is returned, the second is dealt the damage - where both read the same bare "Target for Jeskai Revelation". Bot1 pays
+# {4}{U}{R}{W} with Black Lotus (blue) and four Moxen, and returns Bot2's Ornithopter and deals the 4 damage to Bot2.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Emerald
+Jeskai Revelation
+Mox Sapphire
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Plains x18
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Jeskai Revelation.Cast
+? Client.Bot1.Prompt.Title = Target for Jeskai Revelation
+? Client.Bot1.Prompt.Detail = Return target spell or permanent to its owner's hand  ·  5 possible targets
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+? Client.Bot1.Prompt.Title = Target for Jeskai Revelation
+? Client.Bot1.Prompt.Detail = Deal 4 damage to any target  ·  3 possible targets
+Bot1.Target(Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Hand.Count = 8
+Bot2.Battlefield.Count = 0
+Bot2.Life = 16
+Bot1.Life = 24

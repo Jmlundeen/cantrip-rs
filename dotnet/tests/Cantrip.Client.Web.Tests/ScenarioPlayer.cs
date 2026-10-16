@@ -35,6 +35,12 @@ public sealed class ScenarioPlayer
     /// <summary>The label of the button the last choice of cards was confirmed with; empty when the last pick answered itself.</summary>
     private string _lastConfirm = string.Empty;
 
+    /// <summary>The rows of the card menu the page last opened, which are gone by the time a check after the click is judged.</summary>
+    private string _lastMenu = string.Empty;
+
+    /// <summary>A zone opened to click a card whose menu is open: shut once its row is chosen.</summary>
+    private (int Seat, bool Graveyard)? _zoneToClose;
+
     private ScenarioPlayer(TablePage page, ScenarioTable table)
     {
         _page = page;
@@ -171,7 +177,7 @@ public sealed class ScenarioPlayer
                 return;
 
             case TakeActionAnswer action:
-                await TakeAsync(action, state);
+                await TakeAsync(action, state, expected.Line);
                 return;
 
             case AttackersDeclaredAnswer attack:
@@ -199,6 +205,11 @@ public sealed class ScenarioPlayer
                 {
                     await _page.ClickAsync(may.Accept ? "Yes" : "No", "button");
                 }
+                else if (state.Dock is { Count: 2 } && state.Prompt == "MayPromptMessage")
+                {
+                    // A may that names what it does (Cast, Don't cast): the dock's first button is yes, its second no.
+                    await ClickDockAsync(may.Accept ? 0 : 1);
+                }
                 else
                 {
                     await ClickButtonStartingAsync(may.Accept ? "Mulligan" : "Keep");
@@ -219,7 +230,15 @@ public sealed class ScenarioPlayer
                 _lastConfirm = string.Empty;
                 if (after.RequestId == state.RequestId)
                 {
-                    ControlState? confirm = after.Controls.FirstOrDefault(c => c.Kind == "button" && (c.Label.EndsWith($" {chosen.Cards.Count}", StringComparison.Ordinal) || chosen.Cards.Count == 1 && c.Label.EndsWith(" it", StringComparison.Ordinal)));
+                    // The dock's own button (a choice window's too): named for what it does with that many ("Discard 2", "Exile it"), else the
+                    // first that can be pressed that is not a cancel; the zone buttons ("Exile 1") are not it.
+                    List<DockButtonState> offered = [.. after.Dock?.Where(b => b.Enabled && !b.Label.StartsWith("Cancel", StringComparison.Ordinal)) ?? []];
+                    DockButtonState? named = offered.FirstOrDefault(b => b.Label.EndsWith($" {chosen.Cards.Count}", StringComparison.Ordinal))
+                        ?? offered.FirstOrDefault(b => chosen.Cards.Count == 1 && b.Label.EndsWith(" it", StringComparison.Ordinal))
+                        ?? offered.FirstOrDefault();
+                    ControlState? confirm = named is null
+                        ? after.Controls.FirstOrDefault(c => c.Kind == "button" && (c.Label.EndsWith($" {chosen.Cards.Count}", StringComparison.Ordinal) || chosen.Cards.Count == 1 && c.Label.EndsWith(" it", StringComparison.Ordinal)))
+                        : after.Controls.FirstOrDefault(c => c.Kind == "button" && c.Label == named.Label);
                     if (confirm is not null)
                     {
                         _lastConfirm = confirm.Label;
@@ -247,7 +266,9 @@ public sealed class ScenarioPlayer
                 }
 
                 TableState after = await _page.SettledAsync();
-                if (after.RequestId == state.RequestId && modes.Modes.Count != 1)
+                // One mode of a plain choice answers on its click; one of a range ("one or both") is sent with Done like several.
+                if (after.RequestId == state.RequestId
+                    && (modes.Modes.Count != 1 || after.Controls.Any(c => c.Kind == "button" && c.Label.StartsWith("Done", StringComparison.Ordinal))))
                 {
                     await ClickButtonStartingAsync("Done");
                 }
@@ -269,6 +290,16 @@ public sealed class ScenarioPlayer
                     await ClickButtonStartingAsync("Done with");
                 }
 
+                // "Up to" nothing is an answer of its own, with a button: "No target", "No choice", "Choose none".
+                if (targets.Targets.Count == 0)
+                {
+                    ControlState none = state.Controls.FirstOrDefault(c => c.Kind == "button"
+                        && (c.Label.StartsWith("No target", StringComparison.Ordinal) || c.Label.StartsWith("No choice", StringComparison.Ordinal)
+                            || c.Label.StartsWith("Choose none", StringComparison.Ordinal)))
+                        ?? throw new NotDrivenException("a choice of no target at all", state);
+                    await _page.Page.Mouse.ClickAsync(none.X, none.Y);
+                }
+
                 return;
             }
 
@@ -277,7 +308,7 @@ public sealed class ScenarioPlayer
         }
     }
 
-    private async Task TakeAsync(TakeActionAnswer action, TableState state)
+    private async Task TakeAsync(TakeActionAnswer action, TableState state, string? line)
     {
         switch (action.Kind)
         {
@@ -324,7 +355,7 @@ public sealed class ScenarioPlayer
                 // A card with more than one thing to do opens a menu: the row the answer is.
                 if (after.Controls.Any(c => c.Kind == "item"))
                 {
-                    await ChooseRowAsync(action, after);
+                    await ChooseRowAsync(action, after, line);
                 }
 
                 foreach (TargetMessage target in action.Targets)
@@ -346,9 +377,19 @@ public sealed class ScenarioPlayer
     }
 
     /// <summary>The menu's row for the answer: the one adding its colour, for a mana ability of any colour.</summary>
-    private async Task ChooseRowAsync(TakeActionAnswer action, TableState state)
+    private async Task ChooseRowAsync(TakeActionAnswer action, TableState state, string? line)
     {
         List<ControlState> rows = [.. state.Controls.Where(c => c.Kind == "item")];
+        _lastMenu = string.Join("; ", rows.Select(r => r.Label));
+
+        // Else, where the script names the ability (`Activate(Ability: +2)`, `Cast(Ability: Flashback {R})`), the row that says it.
+        string? ability = line is null ? null : System.Text.RegularExpressions.Regex.Match(line, @"Ability:\s*(.+?)\)\s*$") is { Success: true } named
+            ? named.Groups[1].Value.Trim()
+            : null;
+        List<ControlState> saying = ability is null
+            ? []
+            : [.. rows.Where(r => r.Label.Contains(ability.Replace("-", "−", StringComparison.Ordinal), StringComparison.OrdinalIgnoreCase)
+                || r.Label.Contains(ability, StringComparison.OrdinalIgnoreCase))];
 
         // A card with several abilities lists them: the rows of the one the answer is. A menu of one ability's rows (a mana
         // ability's colours) is the same menu whole.
@@ -360,13 +401,19 @@ public sealed class ScenarioPlayer
         ControlState? row = action.Color is { } color
             ? rows.FirstOrDefault(r => r.Label.Contains($"{{{Symbol(color)}}}", StringComparison.Ordinal))
             : DoorOf(action, state) is { } door ? rows.FirstOrDefault(r => r.Label.Contains(door, StringComparison.Ordinal))
-            : rows.Count == 1 ? rows[0] : null;
+            : rows.Count == 1 ? rows[0]
+            : saying.Count == 1 ? saying[0] : null;
         if (row is null)
         {
             throw new NotDrivenException($"which row of the menu is {action.Kind}{(action.Color is { } c ? " " + c : string.Empty)}", state);
         }
 
         await _page.Page.Mouse.ClickAsync(row.X, row.Y);
+        if (_zoneToClose is { } open)
+        {
+            _zoneToClose = null;
+            await CloseZoneAsync(open.Seat, open.Graveyard);
+        }
     }
 
     /// <summary>
@@ -500,12 +547,65 @@ public sealed class ScenarioPlayer
 
         // The stack fans its cards, each covering most of the one beneath: the strip of the card's left edge is the part of
         // it that is always in view.
-        float x = card.Place == "stack" ? card.X - card.W / 2 + 6 : card.X;
-        await _page.Page.Mouse.ClickAsync(x, card.Y);
+        (float x, float y) = ClickPoint(opened is null ? state : await _page.SettledAsync(), card);
+        await _page.Page.Mouse.ClickAsync(x, y);
+        // A click that opened a menu is not left: closing the zone would dismiss the menu whose row is about to be chosen.
         if (opened is { } zone)
         {
-            await CloseZoneAsync(zone.Seat, zone.Graveyard);
+            if ((await _page.SettledAsync()).Controls.Any(c => c.Kind == "item"))
+            {
+                _zoneToClose = zone;
+            }
+            else
+            {
+                await CloseZoneAsync(zone.Seat, zone.Graveyard);
+            }
         }
+    }
+
+    /// <summary>
+    /// Where to click a card: its middle, unless cards laid over it (a graveyard's pile, a fanned hand) cover that, and then the first
+    /// place on it that none of them does - as a person goes for the part of the card that shows. The stack's fan shows a strip.
+    /// </summary>
+    private static (float X, float Y) ClickPoint(TableState state, CardState card)
+    {
+        if (card.Place == "stack")
+        {
+            return (card.X - card.W / 2 + 6, card.Y);
+        }
+
+        int at = state.Cards.ToList().IndexOf(card);
+        List<CardState> over = [.. state.Cards.Skip(at + 1).Where(other => other.Visible && other.Place == card.Place && other.Row == card.Row)];
+
+        bool Covered(float x, float y) => over.Any(other =>
+            Math.Abs(x - other.X) <= other.W / 2 && Math.Abs(y - other.Y) <= other.H / 2);
+
+        foreach (float down in new[] { 0f, -0.35f, 0.35f, -0.42f, 0.42f })
+        {
+            foreach (float across in new[] { 0f, -0.3f, 0.3f, -0.42f, 0.42f })
+            {
+                float x = card.X + (across * card.W);
+                float y = card.Y + (down * card.H);
+                if (!Covered(x, y))
+                {
+                    return (x, y);
+                }
+            }
+        }
+
+        return (card.X, card.Y);
+    }
+
+    /// <summary>The dock's button at this place in its order, clicked where it is.</summary>
+    private async Task ClickDockAsync(int index)
+    {
+        TableState state = await _page.SettledAsync();
+        DockButtonState dock = state.Dock is { } buttons && index < buttons.Count
+            ? buttons[index]
+            : throw new NotDrivenException($"the dock's button {index}", state);
+        ControlState button = state.Controls.FirstOrDefault(c => c.Kind == "button" && c.Label == dock.Label)
+            ?? throw new Xunit.Sdk.XunitException($"The dock's button '{dock.Label}' is not a control in view.");
+        await _page.Page.Mouse.ClickAsync(button.X, button.Y);
     }
 
     private async Task ClickButtonNamedAsync(string label)
@@ -649,9 +749,9 @@ public sealed class ScenarioPlayer
     }
 
     private const string ClientKeys =
-        "Stack, Hand, Battlefield, OpponentBattlefield, OpponentHand (the cards known in it), each with .Count; <Row>.<Card>.TypeLine, .Rules, .Status or .Annotation (rows Stack, Hand, Battlefield, OpponentBattlefield, Exile, Graveyard); Facts, OpponentFacts (beside the life total); Exile.Lit, .Caption, .Tooltip and OpponentExile.*; Graveyard.Lit, .Note; Button.<label> (shown or absent), Arrows (the latest resolution's targets), Over, Prompt.Title, Prompt.Detail, Prompt.Modes, Log.Has (a line of the game log, by its text), Confirm (the button the last choice of cards was confirmed with)";
+        "Stack, Hand, Battlefield, OpponentBattlefield, OpponentHand (the cards known in it), each with .Count; <Row>.<Card>.TypeLine, .Rules, .Status or .Annotation (rows Stack, Hand, Battlefield, OpponentBattlefield, Exile, Graveyard); Facts, OpponentFacts (beside the life total); Exile.Lit, .Caption, .Tooltip and OpponentExile.*; Graveyard.Lit, .Note; Button.<label> (shown or absent), Arrows (the latest resolution's targets), Over, Prompt.Title, Prompt.Detail, Prompt.Modes, Log.Has (a line of the game log, by its text), Confirm (the button the last choice of cards was confirmed with), Menu (the rows of the card menu last opened), Dock (the dock's buttons)";
 
-    private static string? Read(string what, TableState state)
+    private string? Read(string what, TableState state)
     {
         string Names(string place) => string.Join("; ", state.Cards.Where(c => c.Place == place).Select(c => c.Name));
         PlayerState? me = state.Players?.FirstOrDefault(p => p.Seat == state.Seat);
@@ -682,6 +782,8 @@ public sealed class ScenarioPlayer
             "Prompt.Title" => state.Title,
             "Prompt.Detail" => state.Detail,
             "Prompt.Modes" => state.Modes is { } modes ? string.Join("; ", modes) : string.Empty,
+            "Menu" => _lastMenu,
+            "Dock" => string.Join("; ", (state.Dock ?? []).Select(b => b.Label)),
             _ when what.StartsWith("Button.", StringComparison.Ordinal) =>
                 state.Controls.Any(c => c.Kind == "button" && c.Label.Contains(what["Button.".Length..], StringComparison.Ordinal)) ? "shown" : "absent",
             _ => null,

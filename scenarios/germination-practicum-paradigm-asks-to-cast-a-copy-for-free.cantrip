@@ -1,0 +1,51 @@
+# Browser
+# CR 702.192a, 707.12. Paradigm: at the beginning of each of its owner's first main phases they may cast a copy of the exiled
+# Germination Practicum without paying its mana cost. What Bot1's page asks says that - a copy, for nothing, the card staying in
+# exile - where the question read "Cast Germination Practicum? You pay its costs", which a free copy never does.
+#
+# Turn 3: Practicum is cast with a Black Lotus and two Forests and puts two +1/+1 counters on Llanowar Elves (3/3). Turn 5: the
+# copy is accepted and cast for free: 5/5.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Llanowar Elves
+Forest
+Germination Practicum
+Forest
+Forest
+Forest x12
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Germination Practicum.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Llanowar Elves.Power = 3
+? Exile.Count = 1
+[T5 Bot1.Main1]
+Bot1.Pass
+? Client.Bot1.Prompt.Title = Cast a copy of Germination Practicum without paying its mana cost?
+? Client.Bot1.Prompt.Detail = The card stays where it is  ·  if you don't cast the copy, no copy is made
+? Client.Bot1.Dock = Cast; Don't cast
+Bot1.Accept
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Llanowar Elves.Power = 5
+? Exile.Count = 1
+
+[Expect]
+Stack.Count = 0
+Exile.Count = 1
+Exile = Germination Practicum
+Bot1.Battlefield.Llanowar Elves.Power = 5
+Bot1.Battlefield.Llanowar Elves.Toughness = 5

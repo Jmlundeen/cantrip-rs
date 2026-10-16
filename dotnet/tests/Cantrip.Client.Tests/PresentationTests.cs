@@ -270,7 +270,7 @@ public sealed class PromptPresentationTests
         var none = CardChoicePresentation.Describe(client, prompt, []);
         Assert.Equal("Attach nothing", none.Confirm);
         Assert.True(none.CanSubmit);
-        Assert.Contains("choose up to 2 permanents to attach", none.Title);
+        Assert.Contains("choose any number of permanents to attach", none.Title);
         Assert.Equal(ZoneKindView.Battlefield, none.BoardZone);
         Assert.False(none.AnswersOnLastPick);
 
@@ -280,7 +280,7 @@ public sealed class PromptPresentationTests
 
         GameClient single = Client("choose-attach-one");
         var one = Assert.IsType<ChooseCardsPromptMessage>(single.Prompt!.Prompt);
-        Assert.Contains("choose up to 1 permanent to attach", CardChoicePresentation.Describe(single, one, []).Title);
+        Assert.Contains("choose any number of permanents to attach", CardChoicePresentation.Describe(single, one, []).Title);
     }
 
     /// <summary>
