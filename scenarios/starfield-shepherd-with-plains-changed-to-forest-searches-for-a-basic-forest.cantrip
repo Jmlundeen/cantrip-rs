@@ -1,0 +1,49 @@
+# CR 612: Trait Doctoring is a sorcery, so it can answer Starfield Shepherd's enters trigger only under Teferi, Time
+# Raveler's +1 ("you may cast sorcery spells as though they had flash"). It replaces Plains with Forest in the
+# Shepherd's text, so the search for "a basic Plains card" reads "a basic Forest card": it refuses a basic Plains and
+# takes a basic Forest. Teferi is paid with a Plains and Black Lotus (blue); the warp cost {1}{W} with Mox Pearl and
+# the Lotus's remaining blue; Trait Doctoring's {U} with Mox Sapphire.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Sapphire
+Black Lotus
+Teferi, Time Raveler
+Starfield Shepherd
+Trait Doctoring
+Plains
+Forest
+Island x15
+
+[Bot2 Deck]
+Swamp x22
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Teferi, Time Raveler.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Teferi, Time Raveler.Activate(Ability: +1)
+Bot1.Hand.Starfield Shepherd.Cast(Ability: Warp)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Trait Doctoring.Cast(Starfield Shepherd)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Replace a basic land type)
+Bot1.Modes(Plains)
+Bot1.Modes(Forest)
+Bot1.Choose(Starfield Shepherd)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Search(Plains)
+Bot1.Search(Forest)
+
+[Expect]
+Bot1.Hand = Forest

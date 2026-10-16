@@ -12,9 +12,10 @@ Island x3
 Walking Ballista
 Birds of Paradise
 Guerrilla Gorilla
+Thalia, Guardian of Thraben
 Lightning Bolt
 Plains
-Island x12
+Island x11
 
 [Bot2 Deck]
 Forest x22
@@ -29,6 +30,7 @@ Bot1.Battlefield.Mox Pearl.Activate
 Bot1.Battlefield.Plains.Activate
 Bot1.Hand.Starfield Shepherd.Cast
 ! Bot1.Search(Guerrilla Gorilla)
+! Bot1.Search(Thalia, Guardian of Thraben)
 ! Bot1.Search(Lightning Bolt)
 Bot1.Search(Birds of Paradise)
 [Bot1.Main2]

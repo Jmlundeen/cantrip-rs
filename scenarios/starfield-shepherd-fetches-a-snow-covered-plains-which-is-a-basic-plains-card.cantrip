@@ -1,0 +1,26 @@
+# Starfield Shepherd's "basic Plains card": Snow-Covered Plains has the basic supertype (besides snow) and the Plains
+# subtype, so the search may take it, even though its name is not "Plains". Mox Pearl and a Plains pay the warp cost.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Starfield Shepherd
+Island x4
+Snow-Covered Plains
+Island x16
+
+[Bot2 Deck]
+Forest x22
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Starfield Shepherd.Cast(Ability: Warp)
+Bot1.Search(Snow-Covered Plains)
+[Bot1.Main2]
+? Bot1.Battlefield.Count = 3
+
+[Expect]
+Bot1.Hand = Island; Island; Island; Island; Snow-Covered Plains

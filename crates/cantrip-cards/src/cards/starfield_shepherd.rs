@@ -8,9 +8,11 @@ use cantrip_oracle as oracle;
 /// A basic Plains card is a card with the basic supertype and the Plains subtype; a nonbasic land of the Plains type
 /// is not one.
 fn search(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    // "Plains" is a word of this card's text (CR 612): read it through the words the Shepherd has now.
+    let plains = g.words(item.object).subtype(Subtype::Plains);
     search_to_hand(g, item.controller, item.object, Find::ONE.revealed(), |q, c| {
         let chars = q.chars(c);
-        (chars.supertypes.basic && chars.has_subtype(Subtype::Plains)) || (chars.is(CardType::Creature) && q.mana_value(c) <= 1)
+        (chars.supertypes.basic && chars.has_subtype(plains)) || (chars.is(CardType::Creature) && q.mana_value(c) <= 1)
     })?;
     Ok(())
 }
