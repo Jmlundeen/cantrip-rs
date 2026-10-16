@@ -1,0 +1,65 @@
+# "Whenever enchanted creature attacks or blocks, attach any number of target Equipment you control to it": Bot1's
+# enchanted Ornithopter blocks Bot2's attacking Ornithopter on turn 4. Bot2's own Skullclamp is refused as a target (it is
+# not an Equipment Bot1 controls) beside Bot1's Skullclamp, the positive control; Bot1 chooses just that one of its two
+# Equipment ("any number" is not "all"), so Lightning Greaves stays unattached. The blocker is then 3/3 with first
+# strike and kills the 0/2 attacker before it deals damage.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Ornithopter
+Super-Soldier Serum
+Skullclamp
+Lightning Greaves
+Plains x13
+
+[Bot2 Deck]
+Mox Jet
+Ornithopter
+Skullclamp
+Island x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Super-Soldier Serum.Cast(Ornithopter)
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Skullclamp.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Skullclamp.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Lightning Greaves.Cast
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Attack(Ornithopter > Bot1)
+Bot1.Block(Bot1.Battlefield.Ornithopter > Bot2.Battlefield.Ornithopter)
+! Bot1.Target(Bot2.Battlefield.Skullclamp)
+Bot1.Target(Bot1.Battlefield.Skullclamp)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot2.Graveyard = Ornithopter
+Bot2.Life = 20
+Bot1.Life = 20
+Bot1.Battlefield.Skullclamp.AttachedTo = Ornithopter
+Bot1.Battlefield.Lightning Greaves.AttachedTo = (absent)
+Bot2.Battlefield.Skullclamp.AttachedTo = (absent)

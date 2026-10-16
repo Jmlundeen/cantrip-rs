@@ -1,0 +1,57 @@
+# Super-Soldier Serum on Bot1's Ornithopter (0/2 flying Thopter): +2/+2, first strike and vigilance, and a legendary Soldier in
+# addition to its other types (Thopter stays); the Skullclamp (+1/-1) cast beside it is not attached to anything. On turn 3 Bot1 casts Lightning
+# Greaves and attacks: "whenever enchanted creature attacks", both Equipment are chosen as targets ("any number") and
+# attached, so the Ornithopter is 3/3 (0 + 2 + 1, 2 + 2 - 1) with haste and shroud too; it deals 3 first-strike damage
+# (Bot2 17) and, having vigilance, is still untapped.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Ornithopter
+Super-Soldier Serum
+Skullclamp
+Lightning Greaves
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Super-Soldier Serum.Cast(Ornithopter)
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Skullclamp.Cast
+Bot1.Pass
+? Bot1.Battlefield.Ornithopter.Power = 2
+? Bot1.Battlefield.Ornithopter.Toughness = 4
+? Bot1.Battlefield.Ornithopter.Subtypes = Soldier; Thopter
+? Bot1.Battlefield.Ornithopter.Keywords = FirstStrike; Flying; Vigilance
+? Bot1.Battlefield.Super-Soldier Serum.AttachedTo = Ornithopter
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Lightning Greaves.Cast
+Bot1.Pass
+Bot1.Attack(Ornithopter > Bot2)
+Bot1.Target(Skullclamp; Lightning Greaves)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Ornithopter.Power = 3
+Bot1.Battlefield.Ornithopter.Toughness = 3
+Bot1.Battlefield.Ornithopter.Tapped = false
+Bot1.Battlefield.Ornithopter.Keywords = FirstStrike; Flying; Haste; Shroud; Vigilance
+Bot1.Battlefield.Skullclamp.AttachedTo = Ornithopter
+Bot1.Battlefield.Lightning Greaves.AttachedTo = Ornithopter

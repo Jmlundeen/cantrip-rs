@@ -1,0 +1,54 @@
+# "Enchanted creature is a legendary ... in addition to its other types" (CR 205.3, layer 4): one Serum on one of Bot1's two
+# Ornithopters leaves them different (only one is legendary), so both stay. The second Serum on the other makes both
+# legendary with the same name, and the legend rule (CR 704.5j) has Bot1 keep one: the other goes to the graveyard, and its
+# Serum, no longer attached to anything, follows (CR 704.5m). The survivor, a 2/4, attacks on turn 5 with no Equipment to
+# choose, and Bot2 takes 2.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Ornithopter
+Ornithopter
+Super-Soldier Serum
+Super-Soldier Serum
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Super-Soldier Serum.Cast(Ornithopter)
+Bot1.Pass
+[Bot1.Main2]
+? Bot1.Battlefield.Ornithopter#1.Subtypes = Soldier; Thopter
+? Bot1.Battlefield.Ornithopter#2.Subtypes = Thopter
+? Bot1.Graveyard.Count = 0
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Super-Soldier Serum.Cast(Ornithopter#2)
+Bot1.Pass
+Bot1.Choose(Ornithopter)
+[T5 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Ornithopter.Toughness = 4
+Bot1.Graveyard = Super-Soldier Serum; Ornithopter

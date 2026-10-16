@@ -1,0 +1,65 @@
+# The attack trigger targets both Skullclamp and Lightning Greaves; in response Bot2 sacrifices Cathar Commando to destroy the
+# Skullclamp. That target is gone when the trigger resolves (CR 608.2b), the other is not: the Greaves is attached to the
+# Ornithopter (2/4, so Bot2 takes 2 from the first striker, 18), and the destroyed Skullclamp is in the graveyard.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Ornithopter
+Super-Soldier Serum
+Skullclamp
+Lightning Greaves
+Plains x13
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Cathar Commando
+Plains x3
+Plains x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Super-Soldier Serum.Cast(Ornithopter)
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Skullclamp.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Cathar Commando.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Lightning Greaves.Cast
+Bot1.Pass
+Bot1.Attack(Ornithopter > Bot2)
+Bot1.Target(Skullclamp; Lightning Greaves)
+Bot1.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Cathar Commando.Activate(Skullclamp)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot2.Graveyard = Cathar Commando
+Bot1.Graveyard = Skullclamp
+Bot1.Battlefield.Lightning Greaves.AttachedTo = Ornithopter

@@ -1,0 +1,60 @@
+# The attack trigger of Super-Soldier Serum targets Bot1's Skullclamp; in response Bot2 sacrifices Cathar Commando to destroy
+# the enchanted Ornithopter (an artifact creature). "It", the creature the Equipment is to be attached to, is gone when the
+# trigger resolves, so nothing is attached (CR 701.3b): Skullclamp stays unattached. The Serum goes to the graveyard with the
+# creature (CR 704.5m).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Ornithopter
+Super-Soldier Serum
+Skullclamp
+Plains x14
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Cathar Commando
+Plains x3
+Plains x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Super-Soldier Serum.Cast(Ornithopter)
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Skullclamp.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Cathar Commando.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+Bot1.Target(Skullclamp)
+Bot1.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Cathar Commando.Activate(Bot1.Battlefield.Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Cathar Commando
+Bot1.Graveyard = Super-Soldier Serum; Ornithopter
+Bot1.Battlefield.Skullclamp.AttachedTo = (absent)
+Bot2.Life = 20
