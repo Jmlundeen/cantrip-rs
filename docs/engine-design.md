@@ -400,6 +400,24 @@ library and ceases to exist. Countered, or with every target gone, either goes t
 `ObjectView::inset_spell`, printed beside the card. Not built: casting the face from the top of a library
 (`PlayRule::LibraryTopSpells`, which offers only the card itself).
 
+### Costs to attack
+
+"Creatures can't attack you unless their controller pays {2} for each creature they control that's attacking you" is a
+cost to attack (CR 508.1d, 508.1h), a `CardDef::attack_costs` entry (`AttackCostRule`) asked, while its permanent is on
+the battlefield with its abilities, of each creature that may attack and each player, planeswalker or battle it may
+attack: the cost of that one attack, or nothing. `cantrip_mechanics::statics` has "attacking you" (Ghostly Prison,
+Propaganda, Windborn Muse; Dáin, Lord of the Iron Hills while its controller has an enduring story) and "attacking you or
+planeswalkers you control" (Baird, Steward of Argive, Archon of Absolution). The declaration (`turn::declare_attackers`)
+follows CR 508.1: the question carries each attack's cost (`RequestKind::DeclareAttackers::costs`, every ability's
+added up, so two Ghostly Prisons ask {4} a creature, and `can_pay`, advice on the mana the player could pay); the chosen
+creatures are tapped (508.1f); the total is locked in (508.1h) and paid with the mana abilities offered while it is owed
+(508.1i-j, `PayCosts` with the `attackers` it pays for). A payment given up (or one that cannot be completed) makes the
+declaration illegal: everything since it is reverted, mana abilities included (CR 733), and attackers are declared again.
+A cost is never a requirement (CR 508.1d): a creature that attacks each combat if able is required only while some attack
+open to it costs nothing, and a requirement to attack a certain player (or a goaded creature's other players) only
+counts that player while attacking them is free. The board is searched for these only as attackers are declared. The
+benchmark measured 5.73 us per decision before and 5.76-5.85 us after (2026-10-16, the same noisy machine).
+
 ### Legal moves as a first-class output
 
 Every pending request comes with its legal answers enumerated, cheaply and in a stable order. The client's prompt
@@ -497,8 +515,9 @@ Known gaps:
   text names the hand (`WayDef::only_from`: warp, CR 702.185a, so a warped card is cast from exile for its mana cost), but a cast made while an effect resolves
   (`cast_ways_during_resolution`) is offered for the card's mana cost and faces only: an effect that lets a spell be cast
   paying its costs ("cast it from exile this turn") as it resolves can't use web-slinging or any other alternative cost.
-- Costs to attack (CR 508.1g-h: "creatures can't attack you unless their controller pays {1} for each") are not built:
-  Dáin, Lord of the Iron Hills, the one storied card not in content, waits on it.
+- Costs to attack are mana only: one that asks for life (Sivitri, Dragon Master's +1), a Phyrexian symbol paid with life
+  (Norn's Annex), tapping or sacrificing, and optional costs to attack (CR 508.1g: exert, enlist, which the engine has
+  as other things) are not built, nor anything that changes a cost to attack. No card in content needs them.
 - No scenario reaches Questing Beast's unpreventable damage, Emrakul's extra turn on cast, or Tamiyo's -7 emblem.
 - Suspend does not give a creature cast that way haste (no card in content needs it), and several creatures put onto
   the battlefield one after another by an effect (Ghost Vacuum) enter one at a time rather than together.

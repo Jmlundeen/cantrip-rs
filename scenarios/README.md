@@ -249,6 +249,9 @@ player, the attacker is attacking that player, and no such block was made; other
 The pairs of one refusal are one declaration: `! Bot2.Block(Bear > Moonshadow)` holds for an attacker with menace (a lone blocker is not
 legal, CR 702.110b), while naming two blockers for it, `! Bot2.Block(Bear#1 > Moonshadow; Bear#2 > Moonshadow)`, would fail.
 
+`! Bot1.Attack()` says declaring no attackers at all is refused at the next declaration (a creature must attack, CR 508.1d).
+`! Bot1.Battlefield.Llanowar Elves.Activate` right after an `Attack` line is checked while that declaration's cost to attack is
+paid, and fails if that mana ability is offered then.
 An attack, `! Bot1.Attack(Sylvan Caryatid > Bot2)`, is checked at the next declaration of attackers and fails if that attacker may attack the
 target. The attacker must be one the question offers, or else one that only a restriction (Defender, "can't attack", summoning sickness) can have left
 out: the asked player's own, untapped, with another creature of theirs offered in the same question.
@@ -323,6 +326,10 @@ kind, place it where the action could otherwise be taken, with a wait or `BotN.P
 - `DayNight` (`Day`, `Night`), once the game has a designation (CR 731.1) and absent while it is neither. The game's
   own, so it names no player.
 - `Stack`, `Exile`, `Combat.Attackers`, `Combat.Blocks`, each with `.Count`
+- `Combat.AttackCost` (`{2}`), `.Remaining` and `.Attackers` (with `.Count`), while a declaration's cost to attack is being
+  paid (CR 508.1h-j: "creatures can't attack you unless their controller pays ..."): the total, what the pool has not yet
+  covered, and the attackers it is for; absent at any other time. A `? Combat.AttackCost = {2}` right after an `Attack`
+  line proves the payment was asked for, and `Bot1.Cancel` then takes the declaration back, to be declared again
 - `LeftBattlefield` (with `.Count`): every permanent that left the battlefield, in the order the history recorded it, as it
   last was there (CR 608.2h): `Expedition Map (tapped)` when it was tapped as it left. A tap the history records only after
   the permanent had left does not count (CR 701.26a), which is how a cost that taps and moves its source shows it paid the tap

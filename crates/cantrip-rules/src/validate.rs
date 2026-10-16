@@ -74,9 +74,10 @@ pub fn distribution_problem(cards: &[ObjectId], destinations: &[Destination], pl
 
 /// A goaded creature attacks a player other than its goaders if it can (CR 701.15b): whether `attacker` attacking
 /// `at` breaks that, some other player being there to attack.
-fn goaded_into_its_goader(game: &Game, attacker: ObjectId, at: PlayerId, players: &[PlayerId]) -> bool {
+fn goaded_into_its_goader(game: &Game, attacker: ObjectId, at: PlayerId, players: &[PlayerId], costs: &[AttackCost]) -> bool {
     let goaders = |p: PlayerId| game.state.effects.iter().any(|e| e.affected == attacker && e.kind == EffectKind::Goaded && e.controller == p);
-    goaders(at) && players.iter().any(|&p| !goaders(p))
+    // "If able" never means paying a cost to attack (CR 508.1d).
+    goaders(at) && players.iter().any(|&p| !goaders(p) && AttackCost::free(costs, attacker, Target::Player(p)))
 }
 
 /// Why the name of `card` may not be chosen for a question asking for a `kind` of card name, or `None` if it may.
@@ -187,7 +188,7 @@ pub fn check(game: &Game, request: &Request, answer: &Answer) -> Result<(), Reje
             }
         }
         (RequestKind::Mulligan { .. }, Answer::Yes | Answer::No) => Ok(()),
-        (RequestKind::DeclareAttackers { eligible, players, planeswalkers, battles, requirements }, Answer::Attack(attacks)) => {
+        (RequestKind::DeclareAttackers { eligible, players, planeswalkers, battles, requirements, costs, .. }, Answer::Attack(attacks)) => {
             let ids: Vec<ObjectId> = attacks.iter().map(|a| a.0).collect();
             let legal = |t: &Target| match t {
                 Target::Player(p) => players.contains(p),
@@ -199,13 +200,15 @@ pub fn check(game: &Game, request: &Request, answer: &Answer) -> Result<(), Reje
             } else if !players.is_empty() && !requirements.iter().all(|r| ids.contains(r)) {
                 no("a creature that attacks each combat if able is not attacking")
             } else if attacks.iter().any(|&(a, t)| {
-                // CR 508.1d: a creature required to attack a certain player attacks that player if able.
+                // CR 508.1d: a creature required to attack a certain player attacks that player if able - able without
+                // paying a cost to attack, which is never required.
                 game.state.effects.iter().any(|e| {
-                    matches!(e.kind, EffectKind::MustAttackPlayer(p) if e.affected == a && players.contains(&p) && t != Target::Player(p))
+                    matches!(e.kind, EffectKind::MustAttackPlayer(p)
+                        if e.affected == a && players.contains(&p) && t != Target::Player(p) && AttackCost::free(costs, a, Target::Player(p)))
                 })
             }) {
                 no("a creature that must attack a certain player is not attacking them")
-            } else if attacks.iter().any(|&(a, t)| matches!(t, Target::Player(p) if goaded_into_its_goader(game, a, p, players))) {
+            } else if attacks.iter().any(|&(a, t)| matches!(t, Target::Player(p) if goaded_into_its_goader(game, a, p, players, costs))) {
                 no("a goaded creature attacks a player other than its goader if able (CR 701.15b)")
             } else {
                 Ok(())

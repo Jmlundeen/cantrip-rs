@@ -1322,6 +1322,16 @@ impl Available {
         with.covers(cost)
     }
 
+    /// How much mana of no restriction it could pay at most (advice): the pool's and what the mana abilities add, less
+    /// what those abilities cost themselves; `u16::MAX` when some ability's yield is not stated.
+    pub fn most_unrestricted(&self) -> u16 {
+        if self.unknown {
+            return u16::MAX;
+        }
+        let total = self.fixed.iter().map(|&n| n as u32).sum::<u32>() + self.flex;
+        total.saturating_sub(self.consume).min(u16::MAX as u32) as u16
+    }
+
     /// Whether `cost` could be paid with it (advice, CR 601.2g).
     pub fn covers(&self, cost: &ManaCost) -> bool {
         if self.unknown || cost.mana_value() == 0 {
@@ -2701,7 +2711,7 @@ fn cast(
     if let Some(creature) = reducer {
         ops::tap(cx, creature);
     }
-    let helpers = Helpers { with: def.pay_with, waterbend, creatures: false, no_mana: def.keywords.has(Keyword::CantSpendManaToCast), purpose: Paying::Casting, reserved: &exiles };
+    let helpers = Helpers { with: def.pay_with, waterbend, creatures: false, no_mana: def.keywords.has(Keyword::CantSpendManaToCast), purpose: Paying::Casting, reserved: &exiles, attackers: &[] };
     let (spent, restrictions) = pay_mana_used(cx, player, spell, cost.mana, &helpers)?;
     // CR 106.6: a creature spell paid for with mana that gives it haste has haste once it resolves; a spell paid for with
     // mana that makes it uncounterable can't be countered.
@@ -3352,7 +3362,7 @@ fn announce(cx: &mut Cx, player: PlayerId, spell: ObjectId, base: ManaCost, kick
         }
         options.push(ActionOption::simple(ActionKind::ConfirmCasting));
         options.push(ActionOption::simple(ActionKind::CancelCasting));
-        let ask = RequestKind::PayCosts { source: spell, total, remaining: total, options, announcing: true, x: n };
+        let ask = RequestKind::PayCosts { source: spell, total, remaining: total, options, announcing: true, x: n, attackers: Vec::new() };
         match cx.ask_core(player, ask, true)? {
             Answer::Act(a) => match a.kind {
                 ActionKind::IncreaseX => n += 1,
@@ -3932,10 +3942,12 @@ pub(crate) struct Helpers<'a> {
     pub purpose: Paying,
     /// Cards another part of the cost was already chosen to exile (escape's), which delve may not also exile.
     pub reserved: &'a [ObjectId],
+    /// The attacking creatures whose cost to attack this pays (CR 508.1h-j), for the question to name.
+    pub attackers: &'a [ObjectId],
 }
 
 impl Helpers<'static> {
-    pub const NONE: Helpers<'static> = Helpers { with: PayWith::NONE, waterbend: 0, creatures: false, no_mana: false, purpose: Paying::Other, reserved: &[] };
+    pub const NONE: Helpers<'static> = Helpers { with: PayWith::NONE, waterbend: 0, creatures: false, no_mana: false, purpose: Paying::Other, reserved: &[], attackers: &[] };
 }
 
 /// What a mana payment is for, as far as restricted mana is concerned (CR 106.6): see `payment_for`.
@@ -4166,7 +4178,7 @@ pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, tot
         } else {
             total
         };
-        let ask = RequestKind::PayCosts { source, total: shown, remaining: due, options, announcing: false, x: 0 };
+        let ask = RequestKind::PayCosts { source, total: shown, remaining: due, options, announcing: false, x: 0, attackers: helpers.attackers.to_vec() };
         let answer = cx.ask_core(player, ask, true)?;
         match answer {
             Answer::Act(action) => match action.kind {

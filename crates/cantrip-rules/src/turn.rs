@@ -4,7 +4,7 @@ use cantrip_api::*;
 use cantrip_state::{Frame, FrameKind};
 
 use crate::layers::{self, live, summoning_sick};
-use crate::{Cx, Flow, Game, R, actions, ops};
+use crate::{Cx, Flow, Game, R, Stop, actions, ops};
 
 /// What a card that may begin the game on the battlefield asks (CR 103.6a): the Leylines, Gemstone Caverns.
 const BEGIN_ON_BATTLEFIELD: Question = Question::new(
@@ -433,18 +433,65 @@ fn declare_attackers(cx: &mut Cx) -> R<()> {
         return Ok(());
     }
     let players: Vec<PlayerId> = cx.s().opponents(active).collect();
-    let requirements: Vec<ObjectId> = eligible.iter().copied().filter(|&id| cx.chars(id).must_attack).collect();
     // CR 310.9b, 508.1b: every battle a defending player protects, whoever controls it. Looked for only when a battle
     // is on the battlefield.
     let battles = attackable_battles(cx, &players);
     let planeswalkers = attackable_planeswalkers(cx, &players);
-    let answer = cx.ask_core(active, RequestKind::DeclareAttackers { eligible, players, planeswalkers, battles, requirements }, false)?;
-    let Answer::Attack(attacks) = answer else { return Ok(()) };
+    // CR 508.1d, 508.1h: what each attack costs, where a static ability makes attacking cost something.
+    let targets: Vec<Target> = players
+        .iter()
+        .map(|&p| Target::Player(p))
+        .chain(planeswalkers.iter().chain(&battles).map(|&id| Target::Object(id)))
+        .collect();
+    let costs = crate::static_rules::attack_costs(cx, &eligible, &targets);
+    // CR 508.1d: a cost to attack is never a requirement, so a creature that attacks each combat if able need not attack
+    // where every attack open to it costs something.
+    let requirements: Vec<ObjectId> = eligible
+        .iter()
+        .copied()
+        .filter(|&id| cx.chars(id).must_attack && targets.iter().any(|&t| AttackCost::free(&costs, id, t)))
+        .collect();
+    let can_pay = if costs.is_empty() { 0 } else { actions::available(cx, active).most_unrestricted() };
+    let kind = RequestKind::DeclareAttackers { eligible, players, planeswalkers, battles, requirements, costs, can_pay };
+    let attacks = loop {
+        // A declaration whose costs are not paid is taken back (CR 508.1, 733): the game returns to the moment before it,
+        // the mana abilities activated while paying undone, and the attackers are declared again.
+        let mark = cx.s().mark();
+        let log_mark = cx.g.log.len();
+        let answer = cx.ask_core(active, kind.clone(), false)?;
+        let Answer::Attack(attacks) = answer else { return Ok(()) };
+        // CR 508.1f: the chosen creatures become tapped, which is no cost, before any cost is paid (CR 508.1g-j).
+        for &(id, _) in &attacks {
+            if !cx.chars(id).has(Keyword::Vigilance) {
+                ops::tap(cx, id);
+            }
+        }
+        let RequestKind::DeclareAttackers { costs, .. } = &kind else { unreachable!() };
+        // CR 508.1h: the total cost to attack, locked in now; mana abilities activated while paying it (CR 508.1i) change
+        // nothing of it. CR 508.1j: it is paid all at once.
+        let total = AttackCost::total(costs, &attacks);
+        if !total.is_zero() {
+            let paying: Vec<ObjectId> = attacks.iter().filter(|&&(a, t)| !AttackCost::free(costs, a, t)).map(|a| a.0).collect();
+            let source = costs
+                .iter()
+                .find(|c| attacks.contains(&(c.attacker, c.target)))
+                .map(|c| c.source)
+                .expect("a cost to attack has a source");
+            let helpers = actions::Helpers { attackers: &paying, ..actions::Helpers::NONE };
+            match actions::pay_mana_with(cx, active, source, total, &helpers) {
+                Ok(_) => {}
+                Err(Stop::Cancel) => {
+                    cx.st().revert(mark);
+                    cx.g.log.truncate(log_mark);
+                    continue;
+                }
+                Err(stop) => return Err(stop),
+            }
+        }
+        break attacks;
+    };
     let mut attackers = Vec::new();
     for (id, target) in attacks {
-        if !cx.chars(id).has(Keyword::Vigilance) {
-            ops::tap(cx, id);
-        }
         attackers.push(Attacker { id, target, blocked: false });
     }
     let attacked = !attackers.is_empty();

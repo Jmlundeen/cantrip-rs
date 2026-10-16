@@ -182,6 +182,15 @@ impl StateDump {
         d.list("Combat.Attackers", attackers, false);
         let blocks = s.blocks.iter().map(|b| format!("{} > {}", game.name(b.blocker), game.name(b.attacker))).collect();
         d.list("Combat.Blocks", blocks, false);
+        // While a declaration's cost to attack is being paid (CR 508.1h-j): the total, what is still owed, and the attackers
+        // it is for. Absent at any other time.
+        if let Some(Request { kind: RequestKind::PayCosts { total, remaining, attackers, .. }, .. }) = game.pending()
+            && !attackers.is_empty()
+        {
+            d.set("Combat.AttackCost", total.to_string());
+            d.set("Combat.AttackCost.Remaining", remaining.to_string());
+            d.list("Combat.AttackCost.Attackers", attackers.iter().map(|&a| game.name(a).to_string()).collect(), true);
+        }
 
         // Only once there is one (CR 725.1, 726.1): most games never have a monarch or the initiative.
         if let Some(p) = s.seats().find(|&p| s.player(p).monarch) {

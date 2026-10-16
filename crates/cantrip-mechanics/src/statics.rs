@@ -184,3 +184,25 @@ pub fn grant_delayed_ability(view: &dyn LayerQuery, source: ObjectId, chars: &mu
         chars.abilities[slot] = Some(AbilityRef::delayed(card, 0));
     }
 }
+
+/// "Creatures can't attack you unless their controller pays {N} for each creature they control that's attacking you" (CR
+/// 508.1d, 508.1h) as a `CardDef::attack_costs` entry: each creature attacking the source's controller costs {N} to
+/// declare; one attacking a planeswalker they control or a battle they protect costs nothing (the rulings: "a creature that
+/// can't attack you can still attack a planeswalker you control"). Ghostly Prison, Propaganda and Windborn Muse print it
+/// with {2}; Dáin, Lord of the Iron Hills with {1}, while its controller has an enduring story.
+pub fn attacking_you_costs<const N: u8>(_: &dyn Query, asker: &Asker, _: ObjectId, target: Target) -> Option<ManaCost> {
+    (target == Target::Player(asker.controller)).then_some(ManaCost { generic: N, ..ManaCost::ZERO })
+}
+
+/// "Creatures can't attack you or planeswalkers you control unless their controller pays {N} for each of those creatures"
+/// (CR 508.1d, 508.1h) as a `CardDef::attack_costs` entry: each creature attacking the source's controller or a planeswalker
+/// they control costs {N} to declare; one attacking a battle costs nothing. Baird, Steward of Argive and Archon of
+/// Absolution print it with {1}.
+pub fn attacking_you_or_your_planeswalkers_costs<const N: u8>(q: &dyn Query, asker: &Asker, _: ObjectId, target: Target) -> Option<ManaCost> {
+    let yours = match target {
+        Target::Player(p) => p == asker.controller,
+        Target::Object(id) => q.chars(id).is(CardType::Planeswalker) && q.controller(id) == asker.controller,
+        _ => false,
+    };
+    yours.then_some(ManaCost { generic: N, ..ManaCost::ZERO })
+}

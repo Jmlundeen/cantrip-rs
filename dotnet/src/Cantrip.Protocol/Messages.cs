@@ -2010,6 +2010,14 @@ public sealed class PayCostsPromptMessage : PromptPayload
     [Key(20)]
     public bool SpendsNoMana { get; set; }
 
+    /// <summary>
+    /// The attacking creatures whose cost to attack this pays (CR 508.1h-j), when it is one: <see cref="Spell"/> is then
+    /// the permanent whose static ability makes attacking cost something (the first, when several do), and giving up takes
+    /// the declaration of attackers back, to be made again. Empty for any other payment.
+    /// </summary>
+    [Key(21)]
+    public List<ViewHandle> Attackers { get; set; } = [];
+
     /// <summary>Giving up on the spell, which is always among the options (CR 733.1).</summary>
     public override AnswerPayload Default() => new TakeActionAnswer { Kind = ActionKindView.CancelCasting };
 }
@@ -2111,6 +2119,50 @@ public sealed class DeclareAttackersPromptMessage : PromptPayload
     [Key(6)]
     public List<AttackMessage> Forbidden { get; set; } = [];
 
+    /// <summary>
+    /// What each attack that costs something to declare costs (CR 508.1d, 508.1h): "creatures can't attack you unless their
+    /// controller pays {2} for each ...". The declaration's total is what its attacks' costs add up to, paid once it is
+    /// declared (a payment prompt follows); a cost is never a requirement, so a creature that must attack need not attack
+    /// where every attack open to it costs something. Attacks not listed cost nothing.
+    /// </summary>
+    [Key(7)]
+    public List<AttackCostMessage> Costs { get; set; } = [];
+
+    /// <summary>
+    /// While <see cref="Costs"/> has any: the most mana the player could pay now (the pool and what their mana abilities
+    /// add, counting creatures that attacking would tap), or -1 when that is not known. Advice only.
+    /// </summary>
+    [Key(8)]
+    public int CanPay { get; set; }
+
+    /// <summary>What <paramref name="attack"/> costs to declare, or null when it costs nothing.</summary>
+    public AttackCostMessage? CostOf(AttackMessage attack) =>
+        Costs.Find(cost => cost.Attacker == attack.Attacker
+            && cost.TargetPermanent == attack.TargetPermanent
+            && (!cost.TargetPermanent.IsNone || cost.TargetPlayer == attack.TargetPlayer));
+
+    /// <summary>The mana value of what declaring <paramref name="attacks"/> costs in all (CR 508.1h).</summary>
+    public int TotalCost(IEnumerable<AttackMessage> attacks) => attacks.Sum(attack => CostOf(attack)?.ManaValue ?? 0);
+
+    /// <summary>
+    /// What declaring <paramref name="attacks"/> costs in all, in oracle notation ("{4}"), or empty when nothing: the
+    /// generic parts added up, any other symbols after them.
+    /// </summary>
+    public string TotalCostText(IEnumerable<AttackMessage> attacks)
+    {
+        List<AttackCostMessage> costs = [.. attacks.Select(CostOf).OfType<AttackCostMessage>()];
+        if (costs.Count == 0)
+        {
+            return string.Empty;
+        }
+
+        int generic = costs.Sum(cost => cost.Generic);
+        string rest = string.Concat(costs.Select(cost => cost.Generic > 0 && cost.Cost.StartsWith('{')
+            ? cost.Cost[(cost.Cost.IndexOf('}') + 1)..]
+            : cost.Cost));
+        return (generic > 0 ? $"{{{generic}}}" : string.Empty) + rest;
+    }
+
     /// <summary>Whether <paramref name="attack"/> is one of <see cref="Forbidden"/>'s pairs.</summary>
     public bool IsForbidden(AttackMessage attack) =>
         Forbidden.Any(refused => refused.Attacker == attack.Attacker
@@ -2129,16 +2181,48 @@ public sealed class DeclareAttackersPromptMessage : PromptPayload
             .Where(attack => !IsForbidden(attack)),
     ];
 
-    /// <summary>Attacking with nobody but the creatures that must, each at the first thing it may.</summary>
+    /// <summary>
+    /// Attacking with nobody but the creatures that must, each at the first thing it may attack for nothing (a cost to
+    /// attack is never required, CR 508.1d).
+    /// </summary>
     public override AnswerPayload Default() => new AttackersDeclaredAnswer
     {
         Attacks =
         [
             .. Requirements.Select(requirement => requirement.Players.Count > 0
                 ? new AttackMessage { Attacker = requirement.Attacker, TargetPlayer = requirement.Players[0] }
-                : AttacksFor(requirement.Attacker)[0]),
+                : AttacksFor(requirement.Attacker).Find(attack => CostOf(attack) is null) ?? AttacksFor(requirement.Attacker)[0]),
         ],
     };
+}
+
+/// <summary>
+/// What one attack costs to declare (CR 508.1d, 508.1h): <see cref="Attacker"/> attacking the seat
+/// <see cref="TargetPlayer"/>, or <see cref="TargetPermanent"/> when that is not none.
+/// </summary>
+[MessagePackObject]
+public sealed class AttackCostMessage
+{
+    [Key(0)]
+    public ViewHandle Attacker { get; set; }
+
+    [Key(1)]
+    public int TargetPlayer { get; set; }
+
+    [Key(2)]
+    public ViewHandle TargetPermanent { get; set; }
+
+    /// <summary>The cost in oracle notation, "{2}".</summary>
+    [Key(3)]
+    public string Cost { get; set; } = string.Empty;
+
+    /// <summary>Its mana value, for adding costs up.</summary>
+    [Key(4)]
+    public int ManaValue { get; set; }
+
+    /// <summary>Its generic part.</summary>
+    [Key(5)]
+    public int Generic { get; set; }
 }
 
 /// <summary>

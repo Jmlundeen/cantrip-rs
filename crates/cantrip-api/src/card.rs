@@ -1191,6 +1191,18 @@ pub type CastRule = fn(&dyn Query, &Asker, PlayerId, ZoneKind) -> bool;
 /// Lookout).
 pub type BlockRule = fn(&dyn Query, ObjectId, ObjectId, ObjectId) -> bool;
 
+/// A static ability that makes attacking cost something (CR 508.1d, 508.1h): "creatures can't attack you unless their
+/// controller pays {2} for each creature they control that's attacking you" (Propaganda, Ghostly Prison, Windborn Muse),
+/// "creatures can't attack you or planeswalkers you control unless their controller pays {1} for each of those creatures"
+/// (Baird, Steward of Argive, Archon of Absolution). Asked, while its source is on the battlefield and has its abilities,
+/// of each creature that may be declared an attacker and each player, planeswalker or battle it may attack: the cost of that
+/// one attack, or `None` when this ability asks nothing of it. Every such cost of every such ability is added up (two
+/// Ghostly Prisons ask {4} a creature) and locked in once the attackers are declared (CR 508.1h); the attacking player may
+/// activate mana abilities and pays it all (CR 508.1i-j), or declares again. A cost is never a requirement: a creature
+/// that attacks each combat if able need not attack where every attack open to it costs something (CR 508.1d).
+/// `cantrip_mechanics::statics` has the shared ones.
+pub type AttackCostRule = fn(&dyn Query, &Asker, ObjectId, Target) -> Option<ManaCost>;
+
 /// What a [`TargetingRule`] changes about targeting.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum TargetingRuleKind {
@@ -1537,6 +1549,8 @@ pub struct CardDef {
     pub cast_rules: &'static [CastRule],
     /// Its static abilities that limit blocking (CR 509.1b), while it is on the battlefield.
     pub block_rules: &'static [BlockRule],
+    /// Its static abilities that make attacking cost something (CR 508.1d, 508.1h), while it is on the battlefield.
+    pub attack_costs: &'static [AttackCostRule],
     /// Its static abilities that change who can target what and whether ward triggers, while it is on the battlefield.
     pub targeting_rules: &'static [TargetingRule],
     /// Its static abilities that make some damage unpreventable (CR 615.12).
@@ -1654,6 +1668,7 @@ impl CardDef {
         dungeon: &[],
         cast_rules: &[],
         block_rules: &[],
+        attack_costs: &[],
         targeting_rules: &[],
         unpreventable_damage: &[],
         cant_gain_life: &[],

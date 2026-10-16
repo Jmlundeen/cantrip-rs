@@ -259,6 +259,9 @@ pub enum RequestKind {
         /// Announcing X or how many times it is kicked (CR 601.2b), with the value so far, rather than paying.
         announcing: bool,
         x: u16,
+        /// The creatures whose cost to attack this pays (CR 508.1h-j), when it is one: `source` is then the permanent
+        /// whose static ability makes attacking cost something (the first, when several do). Empty for anything else.
+        attackers: Vec<ObjectId>,
     },
     /// "Unless [a player] pays" (CR 118.12): activate mana abilities, pay once the pool covers it, or decline.
     UnlessPays { source: ObjectId, subject: ObjectId, total: ManaCost, options: Vec<ActionOption> },
@@ -305,7 +308,20 @@ pub enum RequestKind {
     /// attack (CR 508.1d).
     /// Who attacks what (CR 508.1): each attacker names a player, a planeswalker a defending player controls, or a battle a defending player protects (`battles`,
     /// CR 310.9b, 508.1b).
-    DeclareAttackers { eligible: Vec<ObjectId>, players: Vec<PlayerId>, planeswalkers: Vec<ObjectId>, battles: Vec<ObjectId>, requirements: Vec<ObjectId> },
+    /// `costs` is what each attack that costs something to declare costs (CR 508.1d, 508.1h: "creatures can't attack you
+    /// unless their controller pays {2} for each ..."), one entry for each attacker and what it would attack, empty when
+    /// nothing costs anything; the declaration's total is what its attacks' entries add up to, paid once it is declared.
+    DeclareAttackers {
+        eligible: Vec<ObjectId>,
+        players: Vec<PlayerId>,
+        planeswalkers: Vec<ObjectId>,
+        battles: Vec<ObjectId>,
+        requirements: Vec<ObjectId>,
+        costs: Vec<AttackCost>,
+        /// Advice while `costs` has any: the most mana the attacking player could pay now (their pool and what their mana
+        /// abilities add, `u16::MAX` when that is not known), counting creatures that may yet be tapped by attacking.
+        can_pay: u16,
+    },
     /// How creatures divide their combat damage (CR 510.1c-d): one division per creature with a choice.
     AssignCombatDamage { divisions: Vec<DamageDivision> },
     /// Declare blockers (CR 509.1): `allowed` lists every (blocker, attacker) pair the rules allow.
@@ -349,6 +365,36 @@ pub enum SearchDestination {
     /// Cast by the searcher without paying its mana cost (Sunforger).
     CastFree,
     Found,
+}
+
+/// What declaring one creature as an attacker of one player, planeswalker or battle costs (CR 508.1d, 508.1h): the sum of
+/// every static ability that makes that attack cost something ("creatures can't attack you unless their controller pays
+/// {1} for each of those creatures"). Attacks that cost nothing have no entry.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub struct AttackCost {
+    pub attacker: ObjectId,
+    pub target: Target,
+    pub cost: ManaCost,
+    /// The first permanent whose static ability asks it: what the payment is shown as being for.
+    pub source: ObjectId,
+}
+
+impl AttackCost {
+    /// What declaring `attacks` costs in all (CR 508.1h): each attack's own cost, added up.
+    pub fn total(costs: &[AttackCost], attacks: &[(ObjectId, Target)]) -> ManaCost {
+        let mut total = ManaCost::ZERO;
+        for &(attacker, target) in attacks {
+            if let Some(c) = costs.iter().find(|c| c.attacker == attacker && c.target == target) {
+                total = total.plus(&c.cost);
+            }
+        }
+        total
+    }
+
+    /// Whether `attacker` attacking `target` costs nothing to declare.
+    pub fn free(costs: &[AttackCost], attacker: ObjectId, target: Target) -> bool {
+        !costs.iter().any(|c| c.attacker == attacker && c.target == target)
+    }
 }
 
 /// One creature's combat damage to divide among the creatures it is blocked by (and, with trample, the player or

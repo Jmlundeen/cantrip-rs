@@ -50,8 +50,9 @@ pub fn request_objects(request: &Request) -> HashSet<ObjectId> {
                 add(&[*source, *subject]);
             }
         }
-        RequestKind::PayCosts { source, options, .. } => {
+        RequestKind::PayCosts { source, options, attackers, .. } => {
             add(&[*source]);
+            add(attackers);
             add_options(&mut add, options);
         }
         RequestKind::ChooseCards { source, cards, eligible, .. } => {
@@ -588,7 +589,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
         RequestKind::Priority { options } => {
             PromptPayload::PriorityPromptMessage(PriorityPrompt { player, options: options_messages(game, handles, options) })
         }
-        RequestKind::PayCosts { source, total, remaining, options, announcing, x } => {
+        RequestKind::PayCosts { source, total, remaining, options, announcing, x, attackers } => {
             let def = game.cards.get(game.state.obj(*source).card);
             let kicker = def.kicker;
             let spends_no_mana = game.chars(*source).has(Keyword::CantSpendManaToCast);
@@ -610,6 +611,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 announces_x_or_kicks: *announcing,
                 most_affordable: -1,
                 spends_no_mana,
+                attackers: handles_of(handles, attackers),
                 ..Default::default()
             })
         }
@@ -832,7 +834,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 optional: *optional,
             })
         }
-        RequestKind::DeclareAttackers { eligible, players, planeswalkers, battles, requirements } => {
+        RequestKind::DeclareAttackers { eligible, players, planeswalkers, battles, requirements, costs, can_pay } => {
             PromptPayload::DeclareAttackersPromptMessage(DeclareAttackersPrompt {
                 player,
                 eligible: handles_of(handles, eligible),
@@ -844,6 +846,18 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                     .map(|&a| AttackRequirementMessage { attacker: handles.handle(a), players: Vec::new() })
                     .collect(),
                 forbidden: Vec::new(),
+                costs: costs
+                    .iter()
+                    .map(|c| AttackCostMessage {
+                        attacker: handles.handle(c.attacker),
+                        target_player: c.target.player().map_or(0, seat),
+                        target_permanent: c.target.object().map_or(ViewHandle::NONE, |id| handles.handle(id)),
+                        cost: c.cost.to_string(),
+                        mana_value: c.cost.mana_value() as i32,
+                        generic: i32::from(c.cost.generic),
+                    })
+                    .collect(),
+                can_pay: if *can_pay == u16::MAX { -1 } else { i32::from(*can_pay) },
             })
         }
         RequestKind::AssignCombatDamage { divisions } => PromptPayload::AssignCombatDamagePromptMessage(AssignCombatDamagePrompt {

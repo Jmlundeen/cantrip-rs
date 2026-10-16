@@ -71,6 +71,40 @@ pub fn cant_gain_life(q: &dyn Query, cards: &'static CardTable, player: PlayerId
     })
 }
 
+/// What each attack open to the active player's creatures costs to declare (CR 508.1d, 508.1h): for each of `eligible`
+/// and each of `targets`, every static ability of a permanent on the battlefield that makes that attack cost something
+/// (`CardDef::attack_costs`: Propaganda's "creatures can't attack you unless their controller pays {2} for each creature
+/// they control that's attacking you"), added up, with the first such permanent named as the cost's source. Attacks that
+/// cost nothing have no entry. A board with no such permanent, nearly every board, makes no list.
+pub fn attack_costs(cx: &Cx, eligible: &[ObjectId], targets: &[Target]) -> Vec<AttackCost> {
+    let taxes: Vec<(ObjectId, PlayerId, &'static CardDef)> = sources(cx, |d| !d.attack_costs.is_empty()).collect();
+    if taxes.is_empty() {
+        return Vec::new();
+    }
+    let mut out = Vec::new();
+    for &attacker in eligible {
+        for &target in targets {
+            let mut total = ManaCost::ZERO;
+            let mut first = None;
+            for &(id, controller, def) in &taxes {
+                let asker = Asker { source: id, controller };
+                for rule in def.attack_costs {
+                    if let Some(cost) = rule(cx, &asker, attacker, target)
+                        && !cost.is_zero()
+                    {
+                        total = total.plus(&cost);
+                        first.get_or_insert(id);
+                    }
+                }
+            }
+            if let Some(source) = first {
+                out.push(AttackCost { attacker, target, cost: total, source });
+            }
+        }
+    }
+    out
+}
+
 /// Whether `player` may spend mana as though it were of any color to activate an ability of `source` (CR 609.4b).
 pub fn spend_any_color_for(cx: &Cx, player: PlayerId, source: ObjectId) -> bool {
     sources(cx, |d| !d.spend_any_color.is_empty()).any(|(id, controller, def)| {

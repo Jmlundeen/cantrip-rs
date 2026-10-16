@@ -712,6 +712,22 @@ pub struct AttackRequirementMessage {
     pub players: Vec<i32>,
 }
 
+/// What one attack costs to declare (CR 508.1d, 508.1h): `attacker` attacking the seat `target_player`, or
+/// `target_permanent` when that is not none. Attacks that cost nothing have none.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "PascalCase")]
+pub struct AttackCostMessage {
+    pub attacker: ViewHandle,
+    pub target_player: i32,
+    pub target_permanent: ViewHandle,
+    /// The cost in mana symbols, "{2}".
+    pub cost: String,
+    /// Its mana value, for adding costs up.
+    pub mana_value: i32,
+    /// Its generic part.
+    pub generic: i32,
+}
+
 /// One creature's combat damage and where it may go (CR 510.1).
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
@@ -789,6 +805,10 @@ pub struct DeclareAttackersPrompt {
     pub attackable_battles: Vec<ViewHandle>,
     pub requirements: Vec<AttackRequirementMessage>,
     pub forbidden: Vec<AttackMessage>,
+    /// What each attack that costs something costs (CR 508.1h); the declaration's total is paid once it is declared.
+    pub costs: Vec<AttackCostMessage>,
+    /// While `costs` has any, the most mana the player could pay (advice; -1 when it is not known).
+    pub can_pay: i32,
 }
 
 impl DeclareAttackersPrompt {
@@ -869,6 +889,9 @@ pub struct PayCostsPrompt {
     pub kicker_paid: bool,
     pub variable_kicker: bool,
     pub spends_no_mana: bool,
+    /// The attacking creatures whose cost to attack this pays (CR 508.1h-j); `spell` is then the permanent that makes
+    /// attacking cost something. Empty for any other payment.
+    pub attackers: Vec<ViewHandle>,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]

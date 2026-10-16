@@ -553,6 +553,21 @@ impl<'s> Run<'s> {
                 continue;
             }
 
+            // `! Bot1.Battlefield.Llanowar Elves.Activate` right after an `Attack` line: while the declaration's cost to attack is
+            // paid (CR 508.1i), that mana ability is not offered - the creature was tapped by attacking (CR 508.1f).
+            if let Some(ScriptStep::Refused { action, line, text }) = self.current()
+                && matches!(action.verb, ScriptVerb::Activate)
+                && request.player == player_of(action.bot)
+                && let RequestKind::PayCosts { options, attackers, .. } = &request.kind
+                && !attackers.is_empty()
+            {
+                if !self.offered(action, options, true)?.is_empty() {
+                    return fail(format!("line {line} says {text} must not be offered while paying to attack, but it is"));
+                }
+                self.next();
+                continue;
+            }
+
             // `! Bot1.Undo`: at the player's next priority or payment, there is no mana ability to take back.
             if let Some(ScriptStep::Refused { action, line, text }) = self.current()
                 && matches!(action.verb, ScriptVerb::Undo)
@@ -963,11 +978,19 @@ impl<'s> Run<'s> {
             }
             RequestKind::DiscardToHandSize { count, hand } => Answer::Cards(hand[hand.len() - *count as usize..].to_vec()),
             RequestKind::ChooseCards { eligible, count, .. } => Answer::Cards(eligible.iter().take(*count as usize).copied().collect()),
-            // A creature that attacks each combat if able attacks whether or not the script says so (CR 508.1d).
-            RequestKind::DeclareAttackers { requirements, players, .. } => match players.first() {
-                Some(&p) => Answer::Attack(requirements.iter().map(|&r| (r, Target::Player(p))).collect()),
-                None => Answer::Attack(Vec::new()),
-            },
+            // A creature that attacks each combat if able attacks whether or not the script says so (CR 508.1d): the first
+            // player, planeswalker or battle it may attack without paying a cost to attack, which is never required.
+            RequestKind::DeclareAttackers { requirements, players, planeswalkers, battles, costs, .. } if !players.is_empty() => {
+                let targets: Vec<Target> =
+                    players.iter().map(|&p| Target::Player(p)).chain(planeswalkers.iter().chain(battles).map(|&o| Target::Object(o))).collect();
+                Answer::Attack(
+                    requirements
+                        .iter()
+                        .filter_map(|&r| targets.iter().find(|&&t| AttackCost::free(costs, r, t)).map(|&t| (r, t)))
+                        .collect(),
+                )
+            }
+            RequestKind::DeclareAttackers { .. } => Answer::Attack(Vec::new()),
             RequestKind::AssignCombatDamage { divisions } => Answer::Shares(DamageDivision::suggested_shares(divisions)),
             RequestKind::DeclareBlockers { .. } => Answer::Block(Vec::new()),
             // The first eligible modes, the affordable ones first where the question advises (`FirstEligible`).
@@ -1361,6 +1384,13 @@ impl<'s> Run<'s> {
                 }
             }
             RequestKind::DeclareAttackers { eligible, players, planeswalkers, battles, .. } => {
+                // `! Bot1.Attack()`: declaring no attackers at all is refused, because some creature must attack (CR 508.1d).
+                if action.positional().next().is_none() {
+                    if check_answer(&self.game, request, &Answer::Attack(Vec::new())).is_ok() {
+                        return fail(format!("line {line} says {text} must not be allowed, but declaring no attackers is"));
+                    }
+                    return Ok(());
+                }
                 for spec in action.positional() {
                     let parts: Vec<&str> = spec.split('>').collect();
                     if parts.len() != 2 {
