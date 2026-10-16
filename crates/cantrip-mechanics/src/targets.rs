@@ -149,6 +149,10 @@ fn land_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
     matches!(t, Target::Object(id) if on_battlefield(q, id) && q.chars(id).is(CardType::Land))
 }
 
+fn land_you_control_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    land_filter(q, asker, t) && matches!(t, Target::Object(id) if q.controller(id) == asker.controller)
+}
+
 fn card_in_a_graveyard_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
     matches!(t, Target::Object(id) if { let o = q.obj(id); o.zone.is(ZoneKind::Graveyard) && o.became.is_none() })
 }
@@ -174,6 +178,8 @@ pub const NONLAND_PERMANENT_AN_OPPONENT_CONTROLS: TargetSpec =
 pub const CREATURE_AN_OPPONENT_CONTROLS: TargetSpec = target(creature_an_opponent_controls_filter);
 /// "Target land". Candelabra of Tawnos and Strip Mine print it.
 pub const LAND: TargetSpec = target(land_filter);
+/// "Target land you control". Earthbend (Badgermole Cub) and Sea Drake print it.
+pub const LAND_YOU_CONTROL: TargetSpec = target(land_you_control_filter);
 /// "Target card from a graveyard". Emperor of Bones, Ghost Vacuum, Keen-Eyed Curator and Lion Sash print it.
 pub const CARD_IN_A_GRAVEYARD: TargetSpec = target(card_in_a_graveyard_filter);
 /// "Target noncreature spell". Spell Pierce and Stubborn Denial print it.
