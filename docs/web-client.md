@@ -284,6 +284,12 @@ A Class is drawn from the template's `class` section the same way, on the Saga f
 before the first level line are level 1. On the battlefield the levels above the one the Class has (level 1 when it has none, CR 716.2d) are drawn
 spent. `two-classes-hand-over-one-of-them-at-level-two` is a board of two.
 
+An adventurer or omen card's Adventure or Omen (CR 715.2, 720.2) comes with the card as `ObjectView.InsetSpell`, printed,
+and a close look holds it up beside the card as it does a double-faced card's other face, so its text can be read before it
+is cast. Its row in the card's menu is the spell it casts and that spell's own cost, "Cast Charring Bite {1}{R}...", beside
+"Cast Twinmaw Stormbrood"; on the stack the card is that face alone
+(`twinmaw-stormbrood-menu-offers-the-creature-and-charring-bite-with-its-cost`).
+
 ## The game log
 
 The log is the server's, not the client's. `PlayerLog` (in `Cantrip.Server`) keeps one list of lines for the whole

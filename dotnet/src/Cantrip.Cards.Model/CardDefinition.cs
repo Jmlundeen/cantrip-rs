@@ -74,6 +74,9 @@ public sealed class CardDefinition
     /// <summary>The Adventure of an adventurer card (CR 715.2), written as a card of its own under this card's id, or null.</summary>
     public CardDefinition? Adventure;
 
+    /// <summary>The Omen of an omen card (CR 720.2), written as a card of its own under this card's id, or null.</summary>
+    public CardDefinition? Omen;
+
     /// <summary>
     /// The halves of a split card (CR 709.1), each written as a card of its own under this card's id, in printed order.
     /// Empty for every other card. This definition's own name, mana cost and type line are the halves' combined, which

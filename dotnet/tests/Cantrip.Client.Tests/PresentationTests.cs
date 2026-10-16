@@ -452,6 +452,21 @@ public sealed class PromptPresentationTests
             SpellName = "Battle Display",
         }));
 
+        // CR 720.3: an omen card cast as its Omen casts Charring Bite, whose own cost the server sends, since the creature
+        // card in the hand does not show it.
+        Assert.Equal("Cast Charring Bite {1}{R}...", CardActions.Describe(client, new ActionOptionMessage
+        {
+            Kind = ActionKindView.CastSpell,
+            Source = plain.Source,
+            AbilityIndex = 249,
+            Affordable = true,
+            TargetsRequired = 1,
+            TargetCandidates = [new TargetMessage { Object = plain.Source }],
+            Description = "Charring Bite",
+            SpellName = "Charring Bite",
+            CostText = "{1}{R}",
+        }));
+
         Assert.Equal($"Cast {card} — from exile for {{2}}", CardActions.Describe(client, new ActionOptionMessage
         {
             Kind = ActionKindView.CastSpell,

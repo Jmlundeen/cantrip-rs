@@ -17,7 +17,7 @@ public sealed class CardFileException : Exception
 
 /// <summary>
 /// Reads a card file's printed characteristics: the name, cost, type line, power and toughness, loyalty and defense,
-/// rules text, color indicator, and the other faces a card carries (back face, Adventure, split halves, prepare spell).
+/// rules text, color indicator, and the other faces a card carries (back face, Adventure, Omen, split halves, prepare spell).
 /// <para>
 /// Only that. The rules of a card live in the native engine's card export, which reads the same files for itself, so
 /// what is read here is what a drafter, a deck builder and a card list need: a card as it is printed. Every other key
@@ -171,6 +171,7 @@ public static class CardFileReader
             BackFace = Face(entry, "backFace", id, problems),
             BackFacePlayableAsLand = entry.TryGetProperty("backFacePlayableAsLand", out JsonElement land) && land.ValueKind == JsonValueKind.True,
             Adventure = Face(entry, "adventure", id, problems),
+            Omen = Face(entry, "omen", id, problems),
             Prepare = Face(entry, "prepare", id, problems),
             Halves = halves,
             DraftAbilities = draftAbilities,

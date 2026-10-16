@@ -456,6 +456,9 @@ pub struct ObjectView {
     pub cant_be_countered: bool,
     /// The abilities it printed and has lost (CR 613.1f), as they read; `granted_abilities` holds those it was given.
     pub lost_abilities: Vec<String>,
+    /// For an adventurer or omen card, the Adventure or Omen printed in its inset frame (CR 715.2, 720.2), as printed: the
+    /// spell it may be cast as. None on the stack for the spell cast as that face, which is the face itself.
+    pub inset_spell: Option<Box<ObjectView>>,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]

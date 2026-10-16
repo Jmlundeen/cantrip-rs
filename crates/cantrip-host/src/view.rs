@@ -266,8 +266,15 @@ pub fn printed(def: &CardDef) -> ObjectView {
         starting_counter: def.loyalty.map(i32::from),
         other_face: def.back.map(|back| Box::new(printed(back))),
         halves: def.split.map_or_else(Vec::new, |(left, right)| vec![printed(left), printed(right)]),
+        inset_spell: inset_spell(def),
         ..Default::default()
     }
+}
+
+/// The Adventure or Omen printed in a card's inset frame (CR 715.2, 720.2), as printed, for a player to read beside the
+/// card: it is part of the card in every zone, though the card has only its normal characteristics there (CR 715.4, 720.4).
+fn inset_spell(def: &CardDef) -> Option<Box<ObjectView>> {
+    def.inset_faces().next().map(|(_, _, face)| Box::new(printed(face)))
 }
 
 /// One entry of the stack, bottom first.
@@ -797,6 +804,8 @@ impl<'a> Projector<'a> {
             other_face: def.back.map(|back| Box::new(printed(back))),
             // A split card as it is printed, its halves side by side (CR 709.1); on the stack only the half cast exists (CR 709.3b).
             halves: if zone.is(ZoneKind::Stack) { Vec::new() } else { def.split.map_or_else(Vec::new, |(left, right)| vec![printed(left), printed(right)]) },
+            // Cast as its Adventure or Omen, it is that face alone (CR 715.3b, 720.3b), whose definition has no inset.
+            inset_spell: inset_spell(def),
             ..Default::default()
         };
 
@@ -851,6 +860,7 @@ impl<'a> Projector<'a> {
                 view.toughness = None;
                 view.produces_mana = false;
                 view.other_face = None;
+                view.inset_spell = None;
                 view.starting_counter = None;
                 // Nothing the layers or the printed card say about it crosses either (CR 406.3): not that it is every creature
                 // type, nor what it was granted or has lost.

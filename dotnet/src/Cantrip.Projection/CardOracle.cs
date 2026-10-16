@@ -44,6 +44,7 @@ public sealed partial class CardOracle
             view.OtherFace = card!.BackFace is { } back ? Printed(back) : null;
             view.Halves.AddRange(card.Halves.Select(Printed));
             view.PrepareSpell = card.Prepare is { } prepare ? Printed(prepare) : null;
+            view.InsetSpell = (card.Adventure ?? card.Omen) is { } inset ? Printed(inset) : null;
             return _oracles[id] = view;
         }
     }

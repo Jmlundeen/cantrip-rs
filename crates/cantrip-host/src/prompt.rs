@@ -243,23 +243,26 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
     let def = game.cards.get(game.state.obj(src).card);
     match o.kind {
         ActionKind::CastSpell => {
-            if o.index == WAY_ADVENTURE {
-                m.spell_name = def.adventure.map_or(String::new(), |a| a.name.to_string());
-            }
+            // Cast as its Adventure or its Omen (CR 715.3, 720.3), it is that spell: its name, and its own mana cost.
+            let inset = def.inset_face(o.index);
             // A cast a permanent grants names the face it casts (a Room's door, an Adventure): its name and its cost.
             let granted_face = granted_slot(o.index).and_then(|(_, face)| match face {
                 GRANTED_FACE_LEFT => def.split.map(|h| h.0),
                 GRANTED_FACE_RIGHT => def.split.map(|h| h.1),
                 GRANTED_FACE_ADVENTURE => def.adventure,
+                GRANTED_FACE_OMEN => def.omen,
                 GRANTED_FACE_BACK => def.back,
                 _ => None,
             });
-            if let Some(face) = granted_face {
+            if let Some(face) = granted_face.or(inset) {
                 m.spell_name = face.name.to_string();
             }
-            let cost = if let Some(face) = granted_face {
+            if let Some(face) = inset {
+                m.cost_text = face.cost.to_string();
+            }
+            let cost = if let Some(face) = granted_face.or(inset) {
                 face.cost
-            } else if o.index == 0 || o.index == WAY_ADVENTURE || granted_slot(o.index).is_some() {
+            } else if o.index == 0 || granted_slot(o.index).is_some() {
                 def.cost
             } else {
                 def.ways.get(o.index as usize - 1).map_or(def.cost, |w| w.cost.mana)

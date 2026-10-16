@@ -22,7 +22,7 @@ namespace Cantrip.Protocol;
 public sealed class PlayerView
 {
     /// <summary>Protocol version, checked at the handshake so mismatched builds fail loudly.</summary>
-    public const int ProtocolVersion = 156;
+    public const int ProtocolVersion = 157;
 
     [Key(0)]
     public int Version { get; set; } = ProtocolVersion;
@@ -539,9 +539,23 @@ public sealed class ObjectView
     public List<string> LostAbilities { get; set; } = [];
 
     /// <summary>
-    /// What is printed on this card besides what it shows, to be read beside it: its other face, then its prepare spell.
+    /// For an adventurer or omen card, the Adventure or Omen printed in the inset frame of its text box (CR 715.2, 720.2),
+    /// exactly as printed, as Twinmaw Stormbrood's Charring Bite; null for everything else, and for the spell on the stack
+    /// that was cast as that face, which is the face itself (CR 715.3b, 720.3b).
+    /// <para>
+    /// The card has only its normal characteristics everywhere but the stack (CR 715.4, 720.4), but the inset is printed
+    /// on it, so a player may read it whenever they may read the card: the client holds it up beside the card as it does a
+    /// prepare spell. Printed and nothing more, as <see cref="OtherFace"/> is.
+    /// </para>
     /// </summary>
-    public IEnumerable<ObjectView> AlsoPrinted() => new[] { OtherFace, PrepareSpell }.OfType<ObjectView>();
+    [Key(54)]
+    public ObjectView? InsetSpell { get; set; }
+
+    /// <summary>
+    /// What is printed on this card besides what it shows, to be read beside it: its other face, then its prepare spell,
+    /// then its Adventure or Omen.
+    /// </summary>
+    public IEnumerable<ObjectView> AlsoPrinted() => new[] { OtherFace, PrepareSpell, InsetSpell }.OfType<ObjectView>();
 
     public override string ToString() => Known ? $"{Handle} {Name}" : $"{Handle} (unknown)";
 }

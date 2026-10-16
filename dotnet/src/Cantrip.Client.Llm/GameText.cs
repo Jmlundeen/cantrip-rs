@@ -151,6 +151,12 @@ public static class GameText
             text.Append(" | prepare spell: ").Append(Card(client, prepare, oracle: true));
         }
 
+        // An Adventure or Omen (CR 715.2, 720.2): a spell the card may be cast as instead of itself, named by its subtype.
+        if (oracle && card.InsetSpell is { Name.Length: > 0 } inset)
+        {
+            text.Append(" | may be cast instead as: ").Append(Card(client, inset, oracle: true));
+        }
+
         return text.ToString();
     }
 

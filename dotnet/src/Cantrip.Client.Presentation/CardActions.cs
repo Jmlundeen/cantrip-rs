@@ -347,9 +347,12 @@ public sealed class CardActions
         // A cast that puts a differently named spell on the stack reads as that spell: an adventurer card cast as its
         // Adventure (CR 715.3) casts Battle Display, not Embereth Shieldbreaker some other way, so the Adventure's name
         // is the whole of what there is to say. The server names it; the client never reads it out of the description.
+        // An Adventure's or Omen's own mana cost, which the card in hand does not show, the server sends with it.
         if (option.Kind == ActionKindView.CastSpell && option.SpellName.Length > 0)
         {
-            return $"{verb} {option.SpellName}{ellipsis}";
+            return option.CostText.Length > 0
+                ? $"{verb} {option.SpellName} {option.CostText}{ellipsis}"
+                : $"{verb} {option.SpellName}{ellipsis}";
         }
 
         // An alternative cost (CR 118.9) says what it costs, since that is all that tells it from casting for mana; so

@@ -37,6 +37,23 @@ public sealed class CardOracleTests
         Assert.Equal(ViewHandle.None, view.Handle);
     }
 
+    /// <summary>CR 720.2: an omen card prints its Omen in an inset frame, read beside the card, which is a creature.</summary>
+    [Fact]
+    public void An_omen_card_carries_its_omen_as_printed()
+    {
+        ObjectView view = Oracle("""
+            { "name": "Twinmaw Stormbrood", "manaCost": "{5}{W}", "type": "Creature — Dragon", "power": 5, "toughness": 4,
+              "oracleText": "Flying",
+              "omen": { "name": "Charring Bite", "manaCost": "{1}{R}", "type": "Sorcery — Omen", "oracleText": "Charring Bite deals 5 damage to target creature without flying." } }
+            """).Oracle(new CardId("Twinmaw Stormbrood"))!;
+
+        Assert.Equal([CardTypeView.Creature], view.CardTypes);
+        Assert.Equal("Charring Bite", view.InsetSpell!.Name);
+        Assert.Equal("{1}{R}", view.InsetSpell.ManaCost);
+        Assert.Equal([CardTypeView.Sorcery], view.InsetSpell.CardTypes);
+        Assert.Contains(view.InsetSpell, view.AlsoPrinted());
+    }
+
     [Fact]
     public void A_card_the_content_does_not_have_is_null()
     {
