@@ -295,6 +295,14 @@ pub fn exile_target_until_leaves(g: &mut dyn Game, item: &StackItem, slot: usize
     Some(id)
 }
 
+/// The resolution of "exile target ... until this leaves the battlefield" as a triggered ability's effect: exiles the
+/// slot 0 target (`exile_target_until_leaves`). It is not exiled at all if the source already left (CR 610.3c).
+/// Portable Hole and Seam Rip use it.
+pub fn exile_target_until_leaves_effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    exile_target_until_leaves(g, item, 0);
+    Ok(())
+}
+
 /// Airbend (CR 701.65a): exiles the resolving ability's legal targets together, and each card exiled this way may be
 /// cast by its owner for {2} rather than its mana cost for as long as it stays exiled. A token or a copy is exiled and
 /// gone: only a card can be cast again. Appa, Steadfast Guardian and Aang, Swift Savior print it.

@@ -141,6 +141,10 @@ fn nonland_permanent_an_opponent_controls_filter(q: &dyn Query, asker: &Asker, t
     nonland_permanent_filter(q, asker, t) && matches!(t, Target::Object(id) if q.controller(id) != asker.controller)
 }
 
+fn nonland_permanent_an_opponent_controls_mv2_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    nonland_permanent_an_opponent_controls_filter(q, asker, t) && matches!(t, Target::Object(id) if q.mana_value(id) <= 2)
+}
+
 fn creature_an_opponent_controls_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     creature_filter(q, asker, t) && matches!(t, Target::Object(id) if q.controller(id) != asker.controller)
 }
@@ -174,6 +178,10 @@ pub const ARTIFACT_OR_ENCHANTMENT_AN_OPPONENT_CONTROLS: TargetSpec = target(arti
 /// "Target nonland permanent an opponent controls". Conclave Tribunal and Sheltered by Ghosts print it.
 pub const NONLAND_PERMANENT_AN_OPPONENT_CONTROLS: TargetSpec =
     target(nonland_permanent_an_opponent_controls_filter);
+/// "Target nonland permanent an opponent controls with mana value 2 or less" (CR 115.1, 202.3: X on the battlefield is
+/// 0). Portable Hole and Seam Rip print it.
+pub const NONLAND_PERMANENT_AN_OPPONENT_CONTROLS_WITH_MANA_VALUE_2_OR_LESS: TargetSpec =
+    target(nonland_permanent_an_opponent_controls_mv2_filter);
 /// "Target creature an opponent controls". Palace Jailer and Mawloc print it.
 pub const CREATURE_AN_OPPONENT_CONTROLS: TargetSpec = target(creature_an_opponent_controls_filter);
 /// "Target land". Candelabra of Tawnos and Strip Mine print it.
