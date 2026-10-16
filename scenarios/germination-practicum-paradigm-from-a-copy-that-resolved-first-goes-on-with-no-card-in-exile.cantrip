@@ -1,0 +1,88 @@
+# CR 702.192a, 603.7, 707.10a and the paradigm rulings ("Once a spell with paradigm has resolved, it doesn't matter what
+# happens to the card in exile. Even if the card leaves exile, the delayed triggered ability will still trigger during each of
+# your first main phases, and the copy will still be created"; a copy that isn't cast "will cease to exist the next time
+# state-based actions are checked"). Paradigm's delayed trigger is made by the first spell of the name its controller resolves -
+# a copy too - and lives on no card: here no Germination Practicum is ever in exile.
+#
+# Turn 3: Bot1 casts Germination Practicum and, holding it on the stack, flashes in Lutri, the Spellchaser, whose enters trigger
+# copies it (CR 707.10). The copy resolves first: two +1/+1 counters on Llanowar Elves (3/3) and Lutri (5/4), and, being the
+# first Practicum to resolve, its paradigm makes the delayed trigger; the copy then ceases to exist. Bot2 counters the card
+# itself with Counterspell: it goes to the graveyard, not exile, and makes no trigger. Turn 5: the trigger still offers a copy,
+# created from the spell as it resolved; cast, it makes the Elves 5/5 and Lutri 7/6. Turn 7: the copy is declined, so it
+# ceases to exist (exile stays empty) and nothing grows. Were the trigger tied to a card in exile there would be no offer on
+# turn 5 (the Elves 3/3); were the declined copy left in exile, Exile.Count would be 1.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Black Lotus
+Mox Emerald
+Mox Sapphire
+Germination Practicum
+Lutri, the Spellchaser
+Forest
+Forest x12
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Island x4
+Island x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Germination Practicum.Cast
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Lutri, the Spellchaser.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves.Power = 3
+? Bot1.Battlefield.Lutri, the Spellchaser.Power = 5
+? Stack = Germination Practicum
+Bot1.Pass
+Bot2.Hand.Counterspell.Cast(Stack.Germination Practicum)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Graveyard = Germination Practicum; Black Lotus
+? Exile.Count = 0
+[T5 Bot1.Main1]
+Bot1.Accept
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Llanowar Elves.Power = 5
+? Exile.Count = 0
+[T7 Bot1.Main1]
+Bot1.Decline
+[T7 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Exile.Count = 0
+Bot1.Graveyard = Germination Practicum; Black Lotus
+Bot1.Battlefield.Llanowar Elves.Power = 5
+Bot1.Battlefield.Llanowar Elves.Toughness = 5
+Bot1.Battlefield.Lutri, the Spellchaser.Power = 7
+Bot1.Battlefield.Lutri, the Spellchaser.Toughness = 6
+Bot1.Battlefield.Lutri, the Spellchaser.Counters.PlusOnePlusOne = 4

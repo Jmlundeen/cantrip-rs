@@ -3,6 +3,9 @@
 # Germination Practicum without paying its mana cost. What Bot1's page asks says that - a copy, for nothing, the card staying in
 # exile - where the question read "Cast Germination Practicum? You pay its costs", which a free copy never does.
 #
+# The delayed trigger lives on no card (it goes on whatever happens to the card in exile), so the page says it beside
+# Bot1's life total once the spell has resolved.
+#
 # Turn 3: Practicum is cast with a Black Lotus and two Forests and puts two +1/+1 counters on Llanowar Elves (3/3). Turn 5: the
 # copy is accepted and cast for free: 5/5.
 
@@ -33,6 +36,7 @@ Bot1.Battlefield.Forest.Activate
 [T3 Bot1.Main2]
 ? Bot1.Battlefield.Llanowar Elves.Power = 3
 ? Exile.Count = 1
+? Client.Bot1.Facts = Germination Practicum: Paradigm: at the beginning of each of your first main phases, you may cast a copy of this spell from exile without paying its mana cost
 [T5 Bot1.Main1]
 Bot1.Pass
 ? Client.Bot1.Prompt.Title = Cast a copy of Germination Practicum without paying its mana cost?

@@ -1,0 +1,70 @@
+# CR 702.192a: paradigm's delayed trigger is made "if this is the first time a spell you control with this spell's name has
+# resolved this game" - a spell of the name another player controls does not count, and each player's trigger is their own,
+# at the beginning of their own first main phases.
+#
+# Turn 2: Bot2 resolves a Germination Practicum first (Ornithopter 2/4). Turn 3: Bot1's own Practicum is still the first
+# Bot1 controls to resolve, so it makes Bot1's trigger too (Llanowar Elves 3/3). Turn 4: Bot2 alone is offered a copy, at the
+# beginning of Bot2's first main phase (Ornithopter 4/6). Turn 5: Bot1 is offered theirs (Elves 5/5). Were Bot2's Practicum
+# counted against Bot1, Bot1 would never be offered a copy and the Elves would stay 3/3.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Llanowar Elves
+Forest
+Germination Practicum
+Forest
+Forest
+Forest x12
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Black Lotus
+Ornithopter
+Germination Practicum
+Forest
+Forest
+Forest x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Germination Practicum.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+[T2 Bot2.Main2]
+? Bot2.Battlefield.Ornithopter.Power = 2
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Germination Practicum.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Llanowar Elves.Power = 3
+? Exile.Count = 2
+[T4 Bot2.Main1]
+Bot2.Accept
+[T4 Bot2.Main2]
+? Bot2.Battlefield.Ornithopter.Power = 4
+? Bot1.Battlefield.Llanowar Elves.Power = 3
+[T5 Bot1.Main1]
+Bot1.Accept
+[T5 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Exile = Germination Practicum; Germination Practicum
+Bot1.Battlefield.Llanowar Elves.Power = 5
+Bot1.Battlefield.Llanowar Elves.Toughness = 5
+Bot2.Battlefield.Ornithopter.Power = 4
+Bot2.Battlefield.Ornithopter.Toughness = 6

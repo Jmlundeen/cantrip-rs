@@ -248,6 +248,10 @@ controller; for a delayed triggered ability it is the delayed ability's own cont
 or ability that created it (CR 603.7d-e), whoever controls its source afterwards and wherever the source has gone. Its
 intervening "if" is asked with the same controller as it triggers.
 
+A delayed triggered ability waits as a `Delayed` record in the state, on no object (CR 603.7): once at the next such step
+(`DelayedWhen::Step`), at each such step for the rest of the game (`EachStep`: paradigm, CR 702.192a, which goes on whatever
+happens to the card it came from), or on events this turn, until an event or until a player's next turn.
+
 ### Life: gaining it, and damage that can't be prevented
 
 Every gain and loss of life goes through `ops::change_life` (CR 119.3): an effect's, a cost's (CR 119.4), damage (CR

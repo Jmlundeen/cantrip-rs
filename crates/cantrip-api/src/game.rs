@@ -633,6 +633,11 @@ pub trait Game: Query {
     /// The same, with terms (CR 608.2g): mana of any type may pay for it, an instant or sorcery is exiled instead of
     /// going to a graveyard.
     fn cast_during_resolution_as(&mut self, card: ObjectId, terms: CastTerms) -> Result<bool, Suspend>;
+    /// Creates a copy of an object in exile, owned and controlled by `player` (CR 707.12, 702.192a: "create a copy of this
+    /// object in exile"), and returns it. `of` may have left the zone it was in, a spell that has resolved: the copy is of it
+    /// as it last existed (CR 608.2h). The copy is a copy of a card, which ceases to exist as a state-based action unless it
+    /// is cast (CR 707.10a, 704.5e).
+    fn create_copy_in_exile(&mut self, of: ObjectId, player: PlayerId) -> ObjectId;
     /// Each way the resolving effect's controller could cast `card` now (CR 608.2g), the faces it offers judged one at a time
     /// (CR 709.3a, 715.3a): a split card's halves, an aftermath half only from a graveyard (CR 702.127a); an Adventurer as itself
     /// and as its Adventure; a modal double-faced card's two faces. Fuse is no way here: it applies in a hand only

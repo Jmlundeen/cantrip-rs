@@ -84,7 +84,10 @@ pub enum Event {
     /// One of `count` things was chosen at random (CR 701.9c): the one at `index`. A scenario fixes it like a die of `count`
     /// sides (face `index + 1`).
     ChosenAtRandom { count: u16, index: u16 },
-    /// An activated or triggered ability of this object finished resolving (CR 608.2m).
+    /// An activated or triggered ability of this object finished resolving (CR 608.2m), or, with `AbilityRef::spell`, this
+    /// spell did (CR 608.2, 608.3): a copy too, and a permanent spell once it is on the battlefield; a spell that was countered
+    /// or had no legal target did not resolve (CR 608.2b). Paradigm's "the first time a spell you control with this spell's
+    /// name has resolved this game" reads it.
     Resolved { source: ObjectId, ability: AbilityRef },
     /// A triggered ability of this object triggered and was put on the stack: what "triggers only N times each turn" counts.
     Triggered { source: ObjectId, ability: AbilityRef },

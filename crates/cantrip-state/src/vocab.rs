@@ -986,6 +986,16 @@ impl AbilityRef {
     pub const GRANTED_WAY_USED: u8 = 124;
     /// The history's marker of extra loyalty activations allowed this turn (`actions::EXTRA_LOYALTY_ALLOWED`).
     pub const EXTRA_LOYALTY_ALLOWED: u8 = 123;
+    /// A spell itself, in the history's record that it resolved (`Event::Resolved`, CR 608.2): no ability of the card.
+    pub const SPELL: u8 = 122;
+
+    pub fn spell(card: CardId) -> AbilityRef {
+        AbilityRef { card, index: AbilityRef::SPELL }
+    }
+
+    pub fn is_spell(self) -> bool {
+        self.index == AbilityRef::SPELL
+    }
 
     pub fn miracle(card: CardId) -> AbilityRef {
         AbilityRef { card, index: AbilityRef::MIRACLE }

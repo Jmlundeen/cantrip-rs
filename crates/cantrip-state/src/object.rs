@@ -673,6 +673,10 @@ pub struct Delayed {
 pub enum DelayedWhen {
     /// At the beginning of the next such step, of anyone's turn or one player's. Once.
     Step { step: Step, on_turn_of: Option<PlayerId> },
+    /// "At the beginning of each [step] ... for the rest of the game" (CR 603.7, 702.192a): at every such step, of anyone's
+    /// turn or one player's, and never used up. It is no ability of an object, so it goes on whatever happens to the object
+    /// it came from (paradigm's ruling: "it doesn't matter what happens to the card in exile").
+    EachStep { step: Step, on_turn_of: Option<PlayerId> },
     /// "Whenever [event] this turn" (CR 603.7b): triggers each time the ability's own `listens`/`matches` accept an
     /// event, until the cleanup step ends the turn. The ability's `matches` is asked of `source`.
     ThisTurn,

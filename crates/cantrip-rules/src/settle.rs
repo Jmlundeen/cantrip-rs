@@ -945,7 +945,7 @@ fn add_again(into: &mut Again, again: Again) {
 }
 
 /// A step has begun: its "at the beginning of" abilities trigger, and so do the delayed abilities waiting for it,
-/// which are used up (CR 603.7c).
+/// which are used up (CR 603.7c) unless they wait for each such step for the rest of the game.
 pub fn step_began(cx: &mut Cx, step: Step) {
     let active = cx.s().turn.active;
     // CR 500.4: a duration of "until your next end step" ends as the step begins, before its abilities trigger; a
@@ -956,12 +956,17 @@ pub fn step_began(cx: &mut Cx, step: Step) {
     let mut at = 0;
     while at < cx.s().delayed.len() {
         let d = cx.s().delayed[at];
-        let due = match d.when {
-            DelayedWhen::Step { step: s, on_turn_of } => s == step && on_turn_of.is_none_or(|p| p == active),
-            DelayedWhen::ThisTurn | DelayedWhen::UntilEvent | DelayedWhen::UntilNextTurnOf(_) => false,
+        let (due, used_up) = match d.when {
+            DelayedWhen::Step { step: s, on_turn_of } => (s == step && on_turn_of.is_none_or(|p| p == active), true),
+            DelayedWhen::EachStep { step: s, on_turn_of } => (s == step && on_turn_of.is_none_or(|p| p == active), false),
+            DelayedWhen::ThisTurn | DelayedWhen::UntilEvent | DelayedWhen::UntilNextTurnOf(_) => (false, false),
         };
         if due {
-            cx.st().delayed_remove(at);
+            if used_up {
+                cx.st().delayed_remove(at);
+            } else {
+                at += 1;
+            }
             cx.st().trigger_push(PendingTrigger { source: d.source, ability: d.ability, controller: d.controller, subject: d.subject, data: [0; 2], members: d.members, count: None });
         } else {
             at += 1;

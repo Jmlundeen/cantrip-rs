@@ -1329,9 +1329,10 @@ pub struct CardDef {
     /// Rebound (CR 702.88a): cast from its caster's hand and resolving, it is exiled instead of put into the
     /// graveyard, and its controller may cast it from exile at the beginning of their next upkeep (`REBOUND_ABILITY`).
     pub rebound: bool,
-    /// Paradigm (CR 702.170a): as it resolves it is exiled instead of going to the graveyard, and its owner may cast copies of it
-    /// from exile (a triggered ability of the card, which works from exile).
-    pub paradigm: bool,
+    /// Paradigm (CR 702.192a): its two spell abilities. The one given here (`cantrip_mechanics::paradigm::SPELL_ABILITY`) runs
+    /// after the card's own effect and makes the delayed triggered ability; the core does the other, "exile this spell", as it
+    /// leaves the stack having resolved.
+    pub paradigm: Option<Effect>,
     /// Its standing rules about playing lands and cards from other zones, in force while it is on the battlefield.
     pub play_rules: &'static [PlayRule],
     /// Texts its questions offer as options (`Label::Card`).
@@ -1484,7 +1485,7 @@ impl CardDef {
         adventure: None,
         bestow: None,
         rebound: false,
-        paradigm: false,
+        paradigm: None,
         play_rules: &[],
         labels: &[],
         statics: &[],

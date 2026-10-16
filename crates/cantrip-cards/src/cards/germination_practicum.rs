@@ -10,7 +10,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     spell: spell(&[], effect),
-    paradigm: true,
-    abilities: &[paradigm::TRIGGER],
+    paradigm: Some(paradigm::SPELL_ABILITY),
+    delayed: &[paradigm::TRIGGER],
     ..oracle::GERMINATION_PRACTICUM
 };

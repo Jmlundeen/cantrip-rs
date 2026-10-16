@@ -281,8 +281,8 @@ fn leave_stack(cx: &mut Cx, item: &StackItem, reason: ZoneReason) {
         });
         return;
     }
-    // Paradigm (CR 702.170a): "then exile this spell" as it resolves; a spell that is countered or fizzles is not exiled.
-    if def.paradigm && reason == ZoneReason::Resolve {
+    // Paradigm (CR 702.192a): "exile this spell" as it resolves; a spell that is countered or fizzles is not exiled.
+    if def.paradigm.is_some() && reason == ZoneReason::Resolve {
         ops::move_to_for(cx, item.object, Zone::exile(obj.owner), reason);
         return;
     }
@@ -335,6 +335,11 @@ pub fn resolve(cx: &mut Cx) -> R<Flow> {
                     Some(modal) => run_modes(cx, &item, modal)?,
                     None => (spell.effect)(cx, &item)?,
                 };
+                // Paradigm's spell ability that makes its delayed trigger follows the card's own text (CR 702.192a); "exile
+                // this spell" is `leave_stack`'s.
+                if let Some(paradigm) = def.paradigm {
+                    paradigm(cx, &item)?;
+                }
                 // The spell abilities spliced onto it follow its own (CR 702.47c).
                 for &spliced in item.data.iter().filter(|&&d| d != 0) {
                     if let Some(added) = cx.card(CardId(spliced as u16 - 1)).spell {
@@ -402,6 +407,10 @@ pub fn resolve(cx: &mut Cx) -> R<Flow> {
                     Game::add_effect(cx, new, new, EffectKind::AddAbility(ability), Duration::Indefinite);
                 }
             }
+            // It has resolved (CR 608.2, 608.3), for the history: paradigm's "the first time a spell you control with this
+            // spell's name has resolved this game" (CR 702.192a).
+            let card = cx.s().obj(item.object).card;
+            cx.record(Event::Resolved { source: item.object, ability: AbilityRef::spell(card) });
         }
         StackKind::Activated | StackKind::Triggered => {
             // An intervening "if" no longer true: the ability does nothing (CR 603.4).

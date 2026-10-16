@@ -1102,6 +1102,10 @@ impl cantrip_api::Game for Cx<'_> {
         actions::cast_during_resolution(self, card, terms).map_err(|_| Suspend)
     }
 
+    fn create_copy_in_exile(&mut self, of: ObjectId, player: PlayerId) -> ObjectId {
+        ops::copy_card_into(self, of, player, Zone::exile(player))
+    }
+
     fn allow_play(&mut self, card: ObjectId, player: PlayerId, grant: PlayGrant) {
         let turn = self.g.state.turn.number;
         self.g.state.permission_push(PlayPermission { card, player, grant, turn });

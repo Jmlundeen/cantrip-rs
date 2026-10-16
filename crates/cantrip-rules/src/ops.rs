@@ -936,7 +936,15 @@ fn counters_entered_with(events: &mut Vec<Event>, object: ObjectId, by: PlayerId
 /// A copy of a card (CR 707.12) in the zone the card is in, owned and controlled by `controller`, who is to cast it: a
 /// card_copy object, not a card, which ceases to exist anywhere but the stack it was cast onto and where it began.
 pub fn copy_card(cx: &mut Cx, card: ObjectId, controller: PlayerId) -> ObjectId {
-    let (def, zone) = (cx.s().obj(card).card, cx.s().obj(card).zone);
+    let zone = cx.s().obj(card).zone;
+    copy_card_into(cx, card, controller, zone)
+}
+
+/// A copy of an object (CR 707.12) created in `zone`, owned and controlled by `controller`: `copy_card` for a copy made
+/// somewhere other than where the object is, or of one that has left its zone (paradigm's "create a copy of this object in
+/// exile", CR 702.192a). Its copiable values are the card's, as it last existed (CR 608.2h).
+pub fn copy_card_into(cx: &mut Cx, card: ObjectId, controller: PlayerId, zone: Zone) -> ObjectId {
+    let def = cx.s().obj(card).card;
     let turn = cx.s().turn.number;
     let timestamp = cx.st().timestamp();
     let copy = cx.st().push_obj(Obj { card_copy: true, controlled_since: turn, timestamp, ..Obj::new(def, controller, zone) });
