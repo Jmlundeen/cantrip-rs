@@ -380,8 +380,7 @@ zone-change batch and 28% the layer recompute. The targets set then: 10 us per d
 answering ... us per decision", one thread). The spike
 (nineteen cards, no features) answered in 1.95 us. With every card and every rules feature it is **5.06 us** per
 decision (2026-10-15), 5.90 us after ending the turn (CR 724) and the exact cleanup step (2026-10-16, 5.99 us before); 6.03-6.45 us after mana
-restricted to abilities of [type] sources (CR 106.6), against 6.08-6.14 us before on the same, noisy, machine. The enduring story's look at the board as each event happens (CR 702.195c, 2026-10-16) measured 6.15-6.55 us against 6.01-6.37 us before, alternating the two builds. The last six feature landings had taken it from 6.93 to 7.5-7.8 us; a sampling profile found
-Stack items record each target's slot (`StackItem::spec_of`, 16 bytes more per stack item): 5.92-6.42 us (best 5.92) against 5.87-5.99 us (best 5.87) before (2026-10-16).
+restricted to abilities of [type] sources (CR 106.6), against 6.08-6.14 us before on the same, noisy, machine. The enduring story's look at the board as each event happens (CR 702.195c, 2026-10-16) measured 6.15-6.55 us against 6.01-6.37 us before, alternating the two builds. Stack items record each target's slot (`StackItem::spec_of`, 16 bytes more per stack item): 5.92-6.42 us (best 5.92) against 5.87-5.99 us (best 5.87) before (2026-10-16). The last six feature landings had taken it from 6.93 to 7.5-7.8 us; a sampling profile found
 the cost in the layers, not in the new features' own code:
 
 - `chars()` rebuilt a card's printed values for every object on every question, and scanned the battlefield for
