@@ -1,0 +1,71 @@
+# Tetzin, Gnome Champion // The Golden-Gear Colossus. Tetzin entering mills three cards, Ornithopters, and Bot1 puts one into
+# its hand; a Mox Ruby, an artifact but single-faced, entering triggers nothing; Dire Flail, another double-faced artifact,
+# entering under Bot1's control triggers it again (Mox Jet taken from the three). "Craft with six artifacts {4}" (CR
+# 702.167a-b) exiles six from among the battlefield (three Moxen, an Ornithopter) and the graveyard (two Ornithopters).
+# The Golden-Gear Colossus, a 6/6 with vigilance and trample, enters and transforms up to one other target double-faced
+# artifact Bot1 controls - Dire Flail into Dire Blunderbuss - and makes two 1/1 Gnome artifact creature tokens; attacking on
+# turn five it may not target itself (other) and turns the Blunderbuss back into the Flail, making two more; on turn seven it
+# targets nothing and still makes two.
+
+[Bot1 Deck]
+Mountain
+Mox Sapphire
+Mox Pearl
+Tetzin, Gnome Champion
+Black Lotus
+Dire Flail
+Mox Ruby
+Ornithopter
+Ornithopter
+Ornithopter
+Mox Jet
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Tetzin, Gnome Champion.Cast
+Bot1.Choose(Ornithopter)
+Bot1.Hand.Mox Ruby.Cast
+! Bot1.Choose
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Dire Flail.Cast
+Bot1.Choose(Mox Jet)
+Bot1.Hand.Black Lotus.Cast
+? Bot1.Graveyard = Island; Island; Ornithopter; Ornithopter
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Tetzin, Gnome Champion.Activate(Ability: Craft)
+Bot1.Choose(Mox Sapphire; Mox Pearl; Mox Ruby; Bot1.Battlefield.Ornithopter; Graveyard.Ornithopter#1; Graveyard.Ornithopter#2)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Target(Dire Flail)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Dire Blunderbuss.Types = Artifact
+? Bot1.Battlefield = Mountain; Mox Jet; Dire Blunderbuss; The Golden-Gear Colossus; Gnome; Gnome
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(The Golden-Gear Colossus > Bot2)
+! Bot1.Target(The Golden-Gear Colossus)
+Bot1.Target(Dire Blunderbuss)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Dire Flail.Types = Artifact
+[T7 Bot1.DeclareAttackers]
+Bot1.Attack(The Golden-Gear Colossus > Bot2)
+Bot1.Target()
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mountain; Mox Jet; Dire Flail; The Golden-Gear Colossus; Gnome; Gnome; Gnome; Gnome; Gnome; Gnome
+Bot1.Battlefield.The Golden-Gear Colossus.Tapped = false
+Bot1.Battlefield.The Golden-Gear Colossus.Keywords = Trample; Vigilance
+Bot2.Life = 8
