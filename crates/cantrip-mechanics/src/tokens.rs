@@ -42,6 +42,13 @@ pub fn create_treasure(g: &mut dyn Game, controller: PlayerId) -> Result<(), Sus
     Ok(())
 }
 
+/// Creates a tapped Treasure token (CR 111.10a) under `controller`. Generous Plunderer and Death to Our Enemies print it.
+pub fn create_tapped_treasure(g: &mut dyn Game, controller: PlayerId) -> Result<(), Suspend> {
+    let treasure = g.card_id(&TREASURE);
+    g.create_tokens(treasure, controller, 1, true)?;
+    Ok(())
+}
+
 fn any_card(_: &dyn Query, _: &Asker, _: ObjectId) -> bool {
     true
 }

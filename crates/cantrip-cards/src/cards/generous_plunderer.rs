@@ -23,8 +23,7 @@ fn maybe_treasure(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// Target opponent creates a tapped Treasure token. An opponent who has left the game took the only target with them.
 fn gift(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Target::Player(opponent) = item.targets[0] {
-        let treasure = g.card_id(&TREASURE);
-        g.create_tokens(treasure, opponent, 1, true)?;
+        cantrip_mechanics::tokens::create_tapped_treasure(g, opponent)?;
     }
     Ok(())
 }
