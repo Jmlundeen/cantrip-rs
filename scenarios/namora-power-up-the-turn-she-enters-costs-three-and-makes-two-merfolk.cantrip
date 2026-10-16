@@ -1,0 +1,43 @@
+# Namora, the Sea Queen: "Power-up — {5}{U}: Put a +1/+1 counter on Namora. Create two 1/1 blue Merfolk creature
+# tokens." The turn she enters, her mana cost {2}{U} takes the {U} off the blue and {2} off the generic (CR 702.193b,
+# 118.7): {3} is left, Black Lotus's {R}{R}{R}, all spent. She ends a 3/4 flier beside two 1/1 blue Merfolk.
+
+[Bot1 Deck]
+Island
+Mox Jet
+Sol Ring
+Namora, the Sea Queen
+Black Lotus
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Namora, the Sea Queen.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Namora, the Sea Queen.Activate
+? Bot1.Mana =
+Bot1.Pass
+
+[Expect]
+Turn = 1
+Bot1.Battlefield = Island; Merfolk; Merfolk; Mox Jet; Namora, the Sea Queen; Sol Ring
+Bot1.Battlefield.Namora, the Sea Queen.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Namora, the Sea Queen.Power = 3
+Bot1.Battlefield.Merfolk#1.Colors = Blue
+Bot1.Battlefield.Merfolk#1.Power = 1
+Bot1.Battlefield.Merfolk#2.Toughness = 1

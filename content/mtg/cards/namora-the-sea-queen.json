@@ -1,0 +1,11 @@
+{
+  "name": "Namora, the Sea Queen",
+  "manaCost": "{2}{U}",
+  "type": "Legendary Creature — Mutant Merfolk Hero",
+  "power": 2,
+  "toughness": 3,
+  "oracleText": "Flying\nPower-up — {5}{U}: Put a +1/+1 counter on Namora. Create two 1/1 blue Merfolk creature tokens. (Activate each power-up ability only once. Reduce the cost by her mana cost if she entered this turn.)",
+  "keywords": [
+    "Flying"
+  ]
+}
