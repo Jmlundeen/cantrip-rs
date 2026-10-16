@@ -1,0 +1,50 @@
+# Turn 3: with the ability on the stack Bot2 kills the 1/2 Warden with Lightning Bolt. The counter has no creature to go on (CR 400.7)
+# but "Scry 1" still happens: Bot1 puts the Mountain on top of its library on the bottom (the Island is now on top).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Warden of the Inner Sky
+Island
+Island
+Island
+Mountain
+Island
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Warden of the Inner Sky.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Warden of the Inner Sky.Activate
+Bot1.Choose(Mox Pearl; Mox Jet; Mox Ruby)
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Warden of the Inner Sky)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange( | Mountain)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Warden of the Inner Sky
+Bot1.Battlefield = Plains; Mox Pearl; Mox Jet; Mox Ruby
+Bot1.Library = Island; Mountain

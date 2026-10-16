@@ -1,0 +1,65 @@
+# Warden of the Inner Sky, Plains and five Moxen on turn 1. Tapping three untapped artifacts and/or creatures (the Warden itself may be
+# one, though it just arrived: it is not a {T} ability, CR 302.6) puts a +1/+1 counter on it and scries 1; it can be done again the same
+# turn. The Warden has no flying or vigilance with one counter or with two, and has both with the third (turn 3), a 4/5.
+# The first scry puts Lightning Bolt on the bottom; the second leaves Sol Ring on top, which is drawn on turn 3.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mox Sapphire
+Warden of the Inner Sky
+Lightning Bolt
+Sol Ring
+Mountain
+Mountain
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Warden of the Inner Sky.Cast
+Bot1.Pass
+Bot1.Battlefield.Warden of the Inner Sky.Activate
+Bot1.Choose(Mox Pearl; Mox Jet; Mox Ruby)
+Bot1.Pass
+Bot1.Arrange( | Lightning Bolt)
+? Bot1.Battlefield.Warden of the Inner Sky.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Warden of the Inner Sky.Keywords = (absent)
+? Bot1.Battlefield.Mox Pearl.Tapped = true
+? Bot1.Battlefield.Mox Emerald.Tapped = false
+Bot1.Battlefield.Warden of the Inner Sky.Activate
+Bot1.Choose(Mox Emerald; Mox Sapphire; Warden of the Inner Sky)
+Bot1.Pass
+Bot1.Arrange(Sol Ring)
+? Bot1.Battlefield.Warden of the Inner Sky.Counters.PlusOnePlusOne = 2
+? Bot1.Battlefield.Warden of the Inner Sky.Keywords = (absent)
+? Bot1.Battlefield.Warden of the Inner Sky.Tapped = true
+[T3 Bot1.Main1]
+Bot1.Battlefield.Warden of the Inner Sky.Activate
+Bot1.Choose(Mox Pearl; Mox Jet; Mox Ruby)
+Bot1.Pass
+Bot1.Arrange(Mountain)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Warden of the Inner Sky.Counters.PlusOnePlusOne = 3
+Bot1.Battlefield.Warden of the Inner Sky.Keywords = Flying; Vigilance
+Bot1.Battlefield.Warden of the Inner Sky.Power = 4
+Bot1.Battlefield.Warden of the Inner Sky.Toughness = 5
+Bot1.Hand = Sol Ring
+Bot1.Library = Mountain; Mountain; Lightning Bolt

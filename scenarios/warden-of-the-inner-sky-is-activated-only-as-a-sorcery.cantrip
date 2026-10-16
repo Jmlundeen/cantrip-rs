@@ -1,0 +1,45 @@
+# "Activate only as a sorcery" (CR 307.1): not with a spell on the stack (Mox Emerald is on it, turn 1) and not in the opponent's
+# upkeep (turn 2), though three untapped artifacts and/or creatures stay available both times (the Warden, Mox Emerald and Mox
+# Sapphire: Pearl, Jet and Ruby are tapped on turn 1 by the activation that proves the positive control).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mox Sapphire
+Warden of the Inner Sky
+Island
+Island
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Warden of the Inner Sky.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+! Bot1.Battlefield.Warden of the Inner Sky.Activate
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Warden of the Inner Sky.Activate
+Bot1.Choose(Mox Pearl; Mox Jet; Mox Ruby)
+Bot1.Pass
+Bot1.Arrange(Island)
+? Bot1.Battlefield.Warden of the Inner Sky.Counters.PlusOnePlusOne = 1
+[T2 Bot2.Upkeep]
+! Bot1.Battlefield.Warden of the Inner Sky.Activate
+[T2 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Warden of the Inner Sky.Counters.PlusOnePlusOne = 1

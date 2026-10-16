@@ -1,0 +1,56 @@
+# "Three or more counters on it" are counters of any kind. Arwen, Mortal Queen's ability (turn 1) puts a +1/+1 counter and a lifelink
+# counter on the Warden: two counters, so it has lifelink (from the counter) but no flying or vigilance. On turn 3 its own ability
+# adds a third, a +1/+1 counter, and it gains flying and vigilance as well. (Scenario ...-grows-and-scries-and-flies-with-three-counters
+# is the same threshold with +1/+1 counters alone.)
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Emerald
+Mox Ruby
+Mox Jet
+Warden of the Inner Sky
+Arwen, Mortal Queen
+Island
+Island
+Island
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Warden of the Inner Sky.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Arwen, Mortal Queen.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Arwen, Mortal Queen.Activate(Bot1.Battlefield.Warden of the Inner Sky)
+Bot1.Pass
+[T2 Bot2.Upkeep]
+? Bot1.Battlefield.Warden of the Inner Sky.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Warden of the Inner Sky.Counters.Lifelink = 1
+? Bot1.Battlefield.Warden of the Inner Sky.Keywords = Lifelink
+[T3 Bot1.Main1]
+Bot1.Battlefield.Warden of the Inner Sky.Activate
+Bot1.Choose(Warden of the Inner Sky; Arwen, Mortal Queen; Mox Pearl)
+Bot1.Pass
+Bot1.Arrange(Island)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Warden of the Inner Sky.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Warden of the Inner Sky.Counters.Lifelink = 1
+Bot1.Battlefield.Warden of the Inner Sky.Keywords = Flying; Lifelink; Vigilance

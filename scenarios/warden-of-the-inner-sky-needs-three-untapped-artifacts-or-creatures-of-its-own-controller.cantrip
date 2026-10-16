@@ -1,0 +1,46 @@
+# Turn 3: the Warden and Mox Pearl are Bot1's only untapped artifacts or creatures, though Bot1 has two untapped lands and Bot2 has two
+# untapped Moxen (lands are neither, and Bot2's are not "you control"), so the ability is not offered. Casting Mox Jet makes three and it is,
+# and the Warden gets its counter. A tapped Mox Jet could not pay: it is cast untapped here.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Warden of the Inner Sky
+Mox Jet
+Island
+Island
+Island
+Island
+Island
+
+[Bot2 Deck]
+Mox Ruby
+Mox Emerald
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Warden of the Inner Sky.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+! Bot1.Battlefield.Warden of the Inner Sky.Activate
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Warden of the Inner Sky.Activate
+Bot1.Choose(Warden of the Inner Sky; Mox Pearl; Mox Jet)
+Bot1.Pass
+Bot1.Arrange(Island)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Warden of the Inner Sky.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Mox Jet.Tapped = true
