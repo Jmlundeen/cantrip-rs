@@ -1,0 +1,12 @@
+{
+  "name": "Hushwing Gryff",
+  "manaCost": "{2}{W}",
+  "type": "Creature — Hippogriff",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "Flash\nFlying\nCreatures entering don't cause abilities to trigger.",
+  "keywords": [
+    "Flash",
+    "Flying"
+  ]
+}

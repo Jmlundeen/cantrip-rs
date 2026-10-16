@@ -1,0 +1,67 @@
+# Two permanents with "Creatures entering don't cause abilities to trigger": Bot2's Torpor Orb and Hushwing Gryff. The
+# first Baleful Strix enters under both and draws nothing (one stopped ability, not two); Bot1 Bolts the Gryff, and the
+# second Strix still draws nothing, the Orb's rule alone being enough (CR 603.2). Hushwing Gryff's own game, where the
+# second Strix draws once the Gryff is gone, is the control. Hand: 7 - Island, Mox Jet, Mox Ruby, Mox Sapphire = 3; turn 3
+# draws the Swamp (4), plays it (3), casts a Strix (2), the Bolt (1) and the other Strix (0).
+
+[Bot1 Deck]
+Island
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Baleful Strix
+Baleful Strix
+Lightning Bolt
+Swamp
+Island x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Sol Ring
+Torpor Orb
+Hushwing Gryff
+Plains x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Hand.Torpor Orb.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Hushwing Gryff.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Baleful Strix.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+? Stack.Count = 0
+? Bot1.Hand.Count = 2
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Hushwing Gryff)
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+? Bot2.Graveyard = Hushwing Gryff
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Baleful Strix.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand.Count = 0
+Bot1.Battlefield = Island; Swamp; Mox Jet; Mox Ruby; Mox Sapphire; Baleful Strix; Baleful Strix
+Bot2.Battlefield = Plains; Mox Pearl; Mox Jet; Mox Ruby; Sol Ring; Torpor Orb
