@@ -1,0 +1,50 @@
+# Concerted Care only targets an artifact or creature its caster controls: Bot2's Ornithopter is refused as a target (with Bot1's
+# own Llanowar Elves, the positive control, accepted). With the Elves as the target Bot2 answers with a Lightning Bolt, so
+# the Adventure's only target is gone as it would resolve and it does nothing (CR 608.2b). A spell cast as an Adventure that
+# leaves the stack any way but resolving is not exiled (CR 715.4): Bofur goes to the graveyard and cannot be cast from
+# exile (there is no exiled card to cast).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Mox Jet
+Llanowar Elves
+Bofur, Reliable Guardian
+Forest
+Forest
+Forest x14
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+! Bot1.Hand.Bofur, Reliable Guardian.Cast(Bot2.Battlefield.Ornithopter; Ability: Adventure)
+Bot1.Hand.Bofur, Reliable Guardian.Cast(Bot1.Battlefield.Llanowar Elves; Ability: Adventure)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+! Bot1.Exile.Bofur, Reliable Guardian.Cast
+
+[Expect]
+Bot1.Graveyard = Bofur, Reliable Guardian; Llanowar Elves
+Exile.Count = 0
+Bot1.Battlefield = Mox Emerald; Mox Pearl; Mox Jet

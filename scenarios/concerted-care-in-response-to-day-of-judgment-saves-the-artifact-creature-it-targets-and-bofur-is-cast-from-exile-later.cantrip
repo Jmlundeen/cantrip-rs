@@ -1,0 +1,61 @@
+# Concerted Care, the Adventure of Bofur, Reliable Guardian (instant, {1}{W}): in response to Bot2's Day of Judgment Bot1 gives its
+# Ornithopter (an artifact creature) hexproof and indestructible until end of turn. Day of Judgment destroys the Llanowar Elves,
+# which were not targeted, and not the Ornithopter. The Adventure resolved, so Bofur is exiled "on an adventure" (CR 715.4)
+# and Bot1 casts it from exile as a creature on its own turn ({W}): a 1/1 with lifelink.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Mox Jet
+Llanowar Elves
+Ornithopter
+Bofur, Reliable Guardian
+Mox Ruby
+Forest x14
+
+[Bot2 Deck]
+Island
+Black Lotus
+Day of Judgment
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot2.Hand.Day of Judgment.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Bofur, Reliable Guardian.Cast(Bot1.Battlefield.Ornithopter; Ability: Adventure)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Keywords = Flying; Hexproof; Indestructible
+? Exile = Bofur, Reliable Guardian
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main2]
+? Bot1.Battlefield = Mox Emerald; Mox Pearl; Mox Jet; Ornithopter
+? Bot1.Graveyard = Llanowar Elves
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Exile.Bofur, Reliable Guardian.Cast
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Bofur, Reliable Guardian.Keywords = Lifelink
+? Bot1.Battlefield.Bofur, Reliable Guardian.Power = 1
+
+[Expect]
+Exile.Count = 0
+Bot1.Battlefield = Mox Emerald; Mox Pearl; Mox Jet; Ornithopter; Forest; Bofur, Reliable Guardian
+Bot2.Graveyard = Day of Judgment; Black Lotus

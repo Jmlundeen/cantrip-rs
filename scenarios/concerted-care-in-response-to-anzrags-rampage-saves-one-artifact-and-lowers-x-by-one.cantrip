@@ -1,0 +1,64 @@
+# Bot2's Concerted Care (Bofur's Adventure) in response to Anzrag's Rampage gives Sol Ring indestructible: Sol Ring is not
+# destroyed and is not counted, while Mind Stone, Mox Pearl and Mox Jet (tapped to pay for the Care) are destroyed. X is
+# 3, so the top three cards of Bot1's library are exiled, and Bot1 puts Llanowar Elves from them onto the battlefield.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+Anzrag's Rampage
+Mountain
+Island
+Island
+Llanowar Elves
+Lightning Bolt
+Ragavan, Nimble Pilferer
+Island x10
+
+[Bot2 Deck]
+Island
+Sol Ring
+Mind Stone
+Mox Pearl
+Mox Jet
+Bofur, Reliable Guardian
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Hand.Mind Stone.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Anzrag's Rampage.Cast
+Bot1.Pass
+Bot2.Hand.Bofur, Reliable Guardian.Cast(Bot2.Battlefield.Sol Ring; Ability: Adventure)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Llanowar Elves)
+? Bot2.Battlefield = Island; Sol Ring
+? Bot2.Graveyard = Mox Jet; Mox Pearl; Mind Stone
+? Exile = Bofur, Reliable Guardian; Lightning Bolt; Ragavan, Nimble Pilferer
+? Bot1.Battlefield.Llanowar Elves.Keywords = Haste
+
+[Expect]
+Bot1.Library.Count = 10

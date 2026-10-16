@@ -1,0 +1,17 @@
+{
+  "name": "Bofur, Reliable Guardian",
+  "manaCost": "{W}",
+  "type": "Legendary Creature — Dwarf Scout",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "Lifelink",
+  "keywords": [
+    "Lifelink"
+  ],
+  "adventure": {
+    "name": "Concerted Care",
+    "manaCost": "{1}{W}",
+    "type": "Instant — Adventure",
+    "oracleText": "Target artifact or creature you control gains hexproof and indestructible until end of turn. (Then exile this card. You may cast the creature later from exile.)"
+  }
+}
