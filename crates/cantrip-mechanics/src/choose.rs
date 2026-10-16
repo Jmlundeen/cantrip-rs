@@ -19,11 +19,29 @@ pub fn cards_from(
     count: u8,
     up_to: bool,
 ) -> Result<Vec<ObjectId>, Suspend> {
+    cards_from_kind(g, player, source, purpose, "", shown, eligible, count, up_to)
+}
+
+/// `cards_from` for a choice the asking card words with more than "card": `kind` is its own filter ("nonland", "artifact or
+/// creature"), which the question says to the chooser. Elite Spellbinder and Tidehollow Sculler print "a nonland card".
+pub fn cards_from_kind(
+    g: &mut dyn Game,
+    player: PlayerId,
+    source: ObjectId,
+    purpose: Purpose,
+    kind: &'static str,
+    shown: Vec<ObjectId>,
+    eligible: Vec<ObjectId>,
+    count: u8,
+    up_to: bool,
+) -> Result<Vec<ObjectId>, Suspend> {
     if eligible.is_empty() || count == 0 {
         return Ok(Vec::new());
     }
-    let count = count.min(eligible.len().min(u8::MAX as usize) as u8);
-    match g.ask(player, RequestKind::ChooseCards { source, purpose, cards: shown, eligible, count, up_to })? {
+    // "Any number" (`u8::MAX`, up to) stays the number the question was asked with, so it can say "any number of": a client
+    // told "up to 2" of two cards could not tell it from "up to two".
+    let count = if up_to && count == u8::MAX { count } else { count.min(eligible.len().min(u8::MAX as usize) as u8) };
+    match g.ask(player, RequestKind::ChooseCards { source, purpose, cards: shown, eligible, count, up_to, kind })? {
         Answer::Cards(chosen) => Ok(chosen),
         _ => Ok(Vec::new()),
     }
@@ -76,7 +94,7 @@ pub fn cast_way(g: &mut dyn Game, player: PlayerId, card: ObjectId, ways: Vec<Ca
         0 => Ok(None),
         1 => Ok(Some(ways[0])),
         _ => {
-            let faces = ways.iter().map(|w| Label::Name(w.face)).collect();
+            let faces = ways.iter().map(|w| Label::Face(w.face)).collect();
             Ok(Some(ways[one_of(g, player, card, faces)? as usize]))
         }
     }
@@ -91,7 +109,7 @@ pub fn cast_way(g: &mut dyn Game, player: PlayerId, card: ObjectId, ways: Vec<Ca
 pub fn cast_any_number_free(g: &mut dyn Game, player: PlayerId, source: ObjectId, cards: &[ObjectId]) -> Result<(), Suspend> {
     loop {
         let castable: Vec<ObjectId> = cards.iter().copied().filter(|&c| g.could_cast_during_resolution(c)).collect();
-        let chosen = cards_from(g, player, source, Purpose::Cast, cards.to_vec(), castable, 1, true)?;
+        let chosen = cards_from(g, player, source, Purpose::CastFree, cards.to_vec(), castable, 1, true)?;
         let Some(&card) = chosen.first() else { return Ok(()) };
         g.cast_during_resolution(card, Some(ManaCost::ZERO))?;
     }
