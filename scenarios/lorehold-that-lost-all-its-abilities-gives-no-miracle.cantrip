@@ -1,0 +1,50 @@
+# A permanent that has lost all its abilities gives nothing (CR 613.1f): Bot2's The Wondrous Wasp takes Lorehold's
+# abilities on turn 4, so Hop to It, Bot1's first card of turn 5, has no miracle and Bot1 is not asked to reveal it. The
+# positive control is lorehold-gives-the-first-card-drawn-a-sorcery-miracle-for-two.
+[Bot1 Deck]
+Mountain
+Sol Ring
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Lorehold, the Historian
+Plains
+Plains
+Hop to It
+Plains x15
+[Bot2 Deck]
+Island
+The Wondrous Wasp
+Island x18
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Lorehold, the Historian.Cast
+[T4 Bot2.Upkeep]
+Bot1.Choose()
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island#1.Activate
+Bot2.Battlefield.Island#2.Activate
+Bot2.Hand.The Wondrous Wasp.Cast
+Bot2.Target(Bot1.Battlefield.Lorehold, the Historian)
+[T5 Bot1.Upkeep]
+Bot1.Pass
+! Bot1.Accept
+[T5 Bot1.Main1]
+[Expect]
+Bot1.Battlefield.Lorehold, the Historian.Keywords = (absent)
+Bot1.Hand = Plains; Hop to It
+Stack.Count = 0

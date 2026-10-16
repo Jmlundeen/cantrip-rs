@@ -1,0 +1,42 @@
+# A card that could not be cast as the linked ability resolves is not offered (miracle's ruling: perhaps because there
+# are no legal targets): Cut Down needs a creature with total power and toughness 5 or less, and the only creature is
+# Lorehold (5/5). Bot1 may reveal it, drawn first on turn 5, but is not asked to cast it, and it stays in hand.
+[Bot1 Deck]
+Mountain
+Sol Ring
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Lorehold, the Historian
+Plains
+Plains
+Cut Down
+Plains x15
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Lorehold, the Historian.Cast
+[T4 Bot2.Upkeep]
+Bot1.Choose()
+[T5 Bot1.Draw]
+Bot1.Accept
+? Stack.Count = 1
+Bot1.Pass
+! Bot1.Accept
+[T5 Bot1.Main1]
+[Expect]
+Bot1.Revealed = Cut Down
+Bot1.Hand = Plains; Cut Down
+Bot1.Battlefield.Lorehold, the Historian.Power = 5

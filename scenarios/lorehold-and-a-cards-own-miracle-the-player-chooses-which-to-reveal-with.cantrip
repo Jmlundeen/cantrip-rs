@@ -36,9 +36,8 @@ Bot1.Modes(Its own)
 Bot1.Battlefield.Sol Ring.Activate
 Bot1.Battlefield.Mountain.Activate
 Bot1.Accept
-? Bot1.Mana = {C}
-[T5 Bot1.Main1]
 [Expect]
+Bot1.Mana = {C}
 Bot1.Graveyard = Reforge the Soul; Plains
 Bot1.Hand.Count = 7
 Bot2.Hand.Count = 7

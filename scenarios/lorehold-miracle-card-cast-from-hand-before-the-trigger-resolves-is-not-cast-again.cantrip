@@ -1,0 +1,45 @@
+# A card that leaves the hand before miracle's linked ability resolves can't be cast with it (miracle's ruling, CR 400.7):
+# Bot1 reveals Lightning Strike, drawn first on turn 5, and in response casts it from hand for its mana cost at Bot2. The
+# ability then offers nothing, and Bot2 has taken 3 damage once.
+[Bot1 Deck]
+Mountain
+Sol Ring
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Lorehold, the Historian
+Plains
+Plains
+Lightning Strike
+Plains x15
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Lorehold, the Historian.Cast
+[T4 Bot2.Upkeep]
+Bot1.Choose()
+[T5 Bot1.Draw]
+Bot1.Accept
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Lightning Strike.Cast(Bot2)
+Bot1.Pass
+Bot1.Pass
+! Bot1.Accept
+[T5 Bot1.Main1]
+[Expect]
+Bot2.Life = 17
+Bot1.Graveyard = Lightning Strike
+Stack.Count = 0

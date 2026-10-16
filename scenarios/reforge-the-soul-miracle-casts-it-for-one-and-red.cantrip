@@ -22,10 +22,11 @@ Bot1.Accept
 Bot1.Battlefield.Sol Ring.Activate
 Bot1.Battlefield.Mountain.Activate
 Bot1.Accept
-? Bot1.Mana = {C}
-[T3 Bot1.Main1]
 [Expect]
+Bot1.Mana = {C}
+Bot1.Revealed = Reforge the Soul
 Bot1.Graveyard.Count = 6
+Bot1.Graveyard = Reforge the Soul; Plains; Plains; Plains; Plains; Plains
 Bot1.Hand.Count = 7
 Bot2.Graveyard.Count = 8
 Bot2.Hand.Count = 7

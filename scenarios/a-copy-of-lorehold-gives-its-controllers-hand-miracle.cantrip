@@ -1,0 +1,65 @@
+# A copy of Lorehold has its abilities (CR 707.2): Bot1's Phantasmal Image, copying Bot2's Lorehold, gives Bot1's instants
+# and sorceries miracle {2}, so Hop to It, Bot1's first card of turn 7, is revealed and cast for {2} from Sol Ring. Bot2's
+# Lorehold gives Bot1's hand nothing; each declines its Lorehold's discard.
+[Bot1 Deck]
+Mountain
+Sol Ring
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Island
+Plains
+Phantasmal Image
+Plains
+Hop to It
+Plains x15
+[Bot2 Deck]
+Mountain
+Sol Ring
+Mox Pearl
+Lorehold, the Historian
+Plains
+Island
+Island
+Plains
+Island x12
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Hand.Mox Pearl.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Lorehold, the Historian.Cast
+[T5 Bot1.Upkeep]
+Bot2.Choose()
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Phantasmal Image.Cast
+Bot1.Pass
+Bot1.Accept
+[T6 Bot2.Upkeep]
+Bot1.Choose()
+[T7 Bot1.Upkeep]
+Bot2.Choose()
+[T7 Bot1.Draw]
+Bot1.Accept
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Accept
+[T7 Bot1.Main1]
+[Expect]
+Bot1.Battlefield.Lorehold, the Historian.Subtypes = Dragon; Elder; Illusion
+Bot1.Graveyard = Hop to It
+Bot1.Battlefield.Rabbit#3.Token = true
