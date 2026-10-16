@@ -1,0 +1,71 @@
+# Caretaker's Talent: "{W}: Level 2 / When this Class becomes level 2, create a token that's a copy of target token you
+# control." Bot1 has Ornithopter (a creature, not a token) and, from Lingering Souls in turn 3, two Spirit tokens; Bot2
+# has two Spirits of its own. In turn 5 Level 3 is refused at level 1 (it needs level 2, CR 716.2b); Level 2 is activated;
+# its trigger's target question refuses Bot2's Spirit and the Ornithopter and takes Bot1's Spirit. The copy is a third
+# Spirit, and entering it draws a card - a new turn, the once-each-turn limit reset. Level 2 again is refused with a W
+# in the pool (it is level 2 now). Hand: 0 after Souls, 1 with Talent's card, 2 with the turn-5 draw, 3 with the copy's.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Caretaker's Talent
+Lingering Souls
+Ornithopter
+Plains x12
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Lingering Souls
+Plains
+Plains
+Plains x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Caretaker's Talent.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lingering Souls.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lingering Souls.Cast
+[T5 Bot1.Main1]
+? Bot1.Hand.Count = 2
+! Bot1.Battlefield.Caretaker's Talent.Activate(Ability: Level 3)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Caretaker's Talent.Activate(Ability: Level 2)
+! Bot1.Target(Bot2.Battlefield.Spirit)
+! Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Target(Bot1.Battlefield.Spirit)
+[Bot1.Main2]
+Bot1.Battlefield.Plains.Activate
+! Bot1.Battlefield.Caretaker's Talent.Activate(Ability: Level 2)
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield.Caretaker's Talent.ClassLevel = 2
+Bot1.Hand.Count = 3
+Bot1.Battlefield = Caretaker's Talent; Plains; Plains; Mox Pearl; Mox Jet; Mox Ruby; Ornithopter; Spirit; Spirit; Spirit
+Bot2.Battlefield = Plains; Mox Pearl; Mox Jet; Mox Ruby; Spirit; Spirit

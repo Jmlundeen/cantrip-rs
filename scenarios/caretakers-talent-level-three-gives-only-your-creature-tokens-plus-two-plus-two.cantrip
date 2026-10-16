@@ -1,0 +1,89 @@
+# Caretaker's Talent, level 3: "Creature tokens you control get +2/+2" (CR 613.4c). At level 2 (turn 3) the Spirits are
+# still 1/1. After Level 3 in turn 5 Bot1's three Spirits are 3/3, and the two that Lingering Souls's flashback makes
+# afterwards are 3/3 too (it is a continuous effect, CR 611.3a), while Bot1's Ornithopter (not a token) stays 0/2 and
+# Bot2's Spirit tokens (not under Bot1's control) stay 1/1.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Caretaker's Talent
+Lingering Souls
+Ornithopter
+Plains x13
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Lingering Souls
+Plains
+Plains
+Plains x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Caretaker's Talent.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lingering Souls.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lingering Souls.Cast
+[Bot1.Main2]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Caretaker's Talent.Activate(Ability: Level 2)
+Bot1.Target(Bot1.Battlefield.Spirit)
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Spirit#1.Power = 1
+? Bot1.Battlefield.Spirit#3.Toughness = 1
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Caretaker's Talent.Activate(Ability: Level 3)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Graveyard.Lingering Souls.Cast(Ability: Flashback)
+[Bot1.Main2]
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield.Caretaker's Talent.ClassLevel = 3
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot1.Battlefield.Spirit#1.Power = 3
+Bot1.Battlefield.Spirit#1.Toughness = 3
+Bot1.Battlefield.Spirit#2.Power = 3
+Bot1.Battlefield.Spirit#2.Toughness = 3
+Bot1.Battlefield.Spirit#3.Power = 3
+Bot1.Battlefield.Spirit#3.Toughness = 3
+Bot1.Battlefield.Spirit#4.Power = 3
+Bot1.Battlefield.Spirit#4.Toughness = 3
+Bot1.Battlefield.Spirit#5.Power = 3
+Bot1.Battlefield.Spirit#5.Toughness = 3
+Bot2.Battlefield.Spirit#1.Power = 1
+Bot2.Battlefield.Spirit#1.Toughness = 1
+Bot2.Battlefield.Spirit#2.Power = 1
+Bot2.Battlefield.Spirit#2.Toughness = 1
+Bot1.Battlefield = Caretaker's Talent; Plains; Plains; Plains; Mox Pearl; Mox Jet; Mox Ruby; Ornithopter; Spirit; Spirit; Spirit; Spirit; Spirit

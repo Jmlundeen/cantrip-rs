@@ -1,0 +1,51 @@
+# Caretaker's Talent, level 2: the copy's target is a token (CR 115.1). With the trigger on the stack Bot1 exiles that
+# very Spirit with Swords to Plowshares; the target is illegal on resolution (CR 608.2b) and no copy is made (the other
+# Spirit is still not copied either): one Spirit is left, Bot1 gained 1 life from the exiled 1/1, and the copy's card
+# is not drawn (hand: Souls and Swords after turn 1; 3 after the turn-3 draw, 2 after the Plains, 1 after Souls, 2 with
+# Talent's card; turn 5: 3 with the draw, 2 after Swords).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Caretaker's Talent
+Lingering Souls
+Swords to Plowshares
+Plains x12
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Caretaker's Talent.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lingering Souls.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Caretaker's Talent.Activate(Ability: Level 2)
+Bot1.Target(Bot1.Battlefield.Spirit)
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Spirit)
+[Bot1.Main2]
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield.Caretaker's Talent.ClassLevel = 2
+Bot1.Life = 21
+Bot1.Hand.Count = 2
+Bot1.Graveyard = Swords to Plowshares; Lingering Souls
+Exile.Count = 0
+Bot1.Battlefield = Caretaker's Talent; Plains; Plains; Mox Pearl; Mox Jet; Mox Ruby; Spirit

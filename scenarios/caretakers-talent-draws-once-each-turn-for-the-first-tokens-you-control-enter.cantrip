@@ -1,0 +1,49 @@
+# Caretaker's Talent: "Whenever one or more tokens you control enter, draw a card. This ability triggers only once each
+# turn." In turn 3 Bot1 casts Lingering Souls: its two Spirits enter together, one trigger (CR 603.2c), one card. Then it
+# flashes Lingering Souls back the same turn: two more Spirits enter and nothing triggers, the ability having triggered
+# already this turn. Hand: Souls and a Plains after turn 1; the turn's draw makes 3, the Plains played 2, Souls cast 1,
+# Talent's card 2, the flashback adds nothing.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Caretaker's Talent
+Lingering Souls
+Plains
+Plains x12
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Caretaker's Talent.Cast
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 3
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lingering Souls.Cast
+[Bot1.Main2]
+? Bot1.Hand.Count = 2
+? Bot1.Battlefield = Caretaker's Talent; Mox Jet; Mox Pearl; Mox Ruby; Plains; Plains; Spirit; Spirit
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Graveyard.Lingering Souls.Cast(Ability: Flashback)
+[Bot1.End]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Hand.Count = 2
+Exile = Lingering Souls
+Bot1.Battlefield = Caretaker's Talent; Mox Jet; Mox Pearl; Mox Ruby; Plains; Plains; Spirit; Spirit; Spirit; Spirit

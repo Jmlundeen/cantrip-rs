@@ -1,0 +1,55 @@
+# Caretaker's Talent, level 2: "create a token that's a copy of target token you control" (CR 603.3d). The only creature
+# Bot1 controls is Ornithopter, which is not a token, so the trigger has no legal target and is removed: no target
+# question (! Bot1.Target), no copy, and the Class is still level 2 (the level ability, not the trigger, set it).
+# Bot2's Spirit tokens (a token, but not under Bot1's control) are no target either.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Caretaker's Talent
+Ornithopter
+Plains x13
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Lingering Souls
+Plains
+Plains
+Plains x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Caretaker's Talent.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lingering Souls.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Caretaker's Talent.Activate(Ability: Level 2)
+! Bot1.Target
+[Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield.Caretaker's Talent.ClassLevel = 2
+Bot1.Battlefield = Caretaker's Talent; Plains; Mox Pearl; Mox Jet; Mox Ruby; Ornithopter
+Bot2.Battlefield = Plains; Mox Pearl; Mox Jet; Mox Ruby; Spirit; Spirit

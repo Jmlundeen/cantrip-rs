@@ -1,0 +1,66 @@
+# Caretaker's Talent: "Whenever one or more tokens you control enter" (CR 603.2c, 603.6a) - tokens, and under its
+# controller's control. Bot2's Lingering Souls in turn 2 enters two Spirits under Bot2's control: no card for Bot1 (hand
+# 2 after turn 1, 3 with the turn-3 draw). Bot1's Mox Emerald enters in turn 3 and is a nontoken permanent: no card
+# either (hand 1 after the Plains, Souls waiting). Bot1's own Souls then draws one (0 + 1 at the end of turn 3). The
+# once-a-turn limit is per turn (CR 603.2h): in turn 5 the flashback draws again (draw step 2, flashback 3).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Caretaker's Talent
+Lingering Souls
+Mox Emerald
+Plains x12
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Lingering Souls
+Plains
+Plains
+Plains x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Caretaker's Talent.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lingering Souls.Cast
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 3
+? Bot2.Battlefield = Plains; Mox Pearl; Mox Jet; Mox Ruby; Spirit; Spirit
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Plains.Play
+? Bot1.Hand.Count = 1
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lingering Souls.Cast
+[T5 Bot1.Main1]
+? Bot1.Hand.Count = 2
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Graveyard.Lingering Souls.Cast(Ability: Flashback)
+[Bot1.Main2]
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Hand.Count = 3
+Exile = Lingering Souls
