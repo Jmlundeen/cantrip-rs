@@ -92,3 +92,34 @@ pub const EXILE_INSTEAD_OF_DYING: GrantedReplacementDef =
 pub fn exile_if_it_would_die(g: &mut dyn Game, source: ObjectId, index: u8, creature: ObjectId) {
     g.add_effect(source, creature, EffectKind::Replacement(index), Duration::EndOfTurn);
 }
+
+/// Which permanents `opponents_enter_tapped` taps: a bit set of these.
+pub mod enter_tapped {
+    pub const CREATURES: u8 = 1;
+    pub const ARTIFACTS: u8 = 2;
+    pub const NONBASIC_LANDS: u8 = 4;
+}
+
+fn opponents_enter_tapped_applies<const WHICH: u8>(q: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool {
+    let Proposal::ZoneChange(z) = proposal else { return false };
+    z.to.is(ZoneKind::Battlefield) && !z.tapped && z.controller != asker.controller && {
+        let c = q.chars(z.object);
+        (WHICH & enter_tapped::CREATURES != 0 && c.is(CardType::Creature))
+            || (WHICH & enter_tapped::ARTIFACTS != 0 && c.is(CardType::Artifact))
+            || (WHICH & enter_tapped::NONBASIC_LANDS != 0 && c.is(CardType::Land) && !c.supertypes.basic)
+    }
+}
+
+fn opponents_enter_tapped_apply(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
+    if let Proposal::ZoneChange(z) = proposal {
+        z.tapped = true;
+    }
+}
+
+/// "[Creatures / artifacts and creatures / nonbasic lands] your opponents control enter tapped" (CR 614.1c): the
+/// object is judged as it would exist on the battlefield (CR 614.12), under the player it enters under (CR 110.2a).
+/// `WHICH` is a set of `enter_tapped` bits. Authority of the Consuls (creatures), Spider-Woman, Stunning Savior
+/// (artifacts and creatures) and Archon of Emeria (nonbasic lands) print it.
+pub const fn opponents_enter_tapped<const WHICH: u8>(hint: &'static str) -> ReplacementDef {
+    replacement(ReplacementKind::ZoneChange, opponents_enter_tapped_applies::<WHICH>, opponents_enter_tapped_apply, hint)
+}
