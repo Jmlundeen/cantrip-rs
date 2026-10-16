@@ -1,0 +1,60 @@
+# Leyline of Punishment: "If this card is in your opening hand, you may begin the game with it on the battlefield" (CR 103.6a):
+# Bot1 accepts. "Players can't gain life" (CR 119.7): on turn 2 Bot2's Lightning Helix deals 3 to Bot1 and gains Bot2 nothing.
+# Bot2 then casts The One Ring and has protection from everything until its next turn (CR 702.16j), which would prevent all
+# damage to it; but "Damage can't be prevented" (CR 615.12): on turn 3 Bot1's Fiery Confluence deals 2 damage to each opponent
+# three times, and Bot2 is dealt all 6. (The control, where the protection prevents damage:
+# the-one-ring-protects-its-caster-from-everything-until-their-next-turn.)
+
+[Bot1 Deck]
+Leyline of Punishment
+Mountain
+Black Lotus
+Fiery Confluence
+Mountain
+Mountain
+Mountain
+Mountain x20
+
+[Bot2 Deck]
+Plains
+Black Lotus
+Mox Ruby
+Mox Jet
+Mox Pearl
+Lightning Helix
+The One Ring
+Island x20
+
+[Actions]
+Bot1.Accept
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+? Bot1.Battlefield = Leyline of Punishment; Mountain; Black Lotus
+Bot2.Hand.Plains.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Helix.Cast(Bot1)
+Bot2.Pass
+Bot2.Battlefield.Plains.Activate
+? Bot1.Life = 17
+? Bot2.Life = 20
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.The One Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Hand.Fiery Confluence.Cast
+Bot1.Modes(2; 2; 2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 17
+Bot2.Life = 14
+Bot2.Battlefield = Plains; Mox Ruby; Mox Jet; Mox Pearl; The One Ring
