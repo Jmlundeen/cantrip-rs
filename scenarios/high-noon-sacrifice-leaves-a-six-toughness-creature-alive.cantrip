@@ -1,0 +1,67 @@
+# The non-lethal side of High Noon's 5 damage: Bot2's Quantum Riddler is a 4/6, so 5 damage leaves it on the battlefield
+# with damage marked (the exactly-lethal side is the Troll of Khazad-dum scenario). Bot2 casts it on turn 2 with four
+# Moxen and its land, before High Noon is out.
+
+[Bot1 Deck]
+Plains
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Emerald
+Sol Ring
+High Noon
+Plains x13
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Mox Ruby
+Quantum Riddler
+Plains
+Island x13
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Quantum Riddler.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.High Noon.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.High Noon.Activate(Bot2.Battlefield.Quantum Riddler)
+[Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 20
+Bot1.Graveyard = High Noon
+Bot2.Graveyard.Count = 0
+Bot2.Battlefield.Quantum Riddler.Damage = 5

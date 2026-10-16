@@ -1,0 +1,56 @@
+# High Noon's limit counts spells cast, not spells resolved (ruling 2024-04-12: "If you cast a spell that was
+# countered, you can't cast another spell during the same turn"). Bot2 casts High Noon on turn 4 (its own Moxen and
+# land were cast before it was out). On turn 5 Bot1 casts Ornithopter; Bot2 answers with Lose Focus replicated once
+# (CR 702.56a): the original is Bot2's one spell of the turn, and a second spell (Lightning Bolt, with its red mana
+# untapped) is refused. The replicated copy is put on the stack, not cast (CR 707.10), so it takes no part in the
+# count. Ornithopter is countered, and Bot1's later Mox Jet is still refused because the countered Ornithopter was cast.
+
+[Bot1 Deck]
+Ornithopter
+Mox Jet
+Plains x18
+
+[Bot2 Deck]
+Island
+Mox Pearl
+Mox Emerald
+Mox Jet
+Mox Ruby
+Mox Sapphire
+High Noon
+Lose Focus
+Lightning Bolt
+Island x11
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Sapphire.Cast
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.High Noon.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Lose Focus.Cast(Stack.Ornithopter; Kicked: 1)
+Bot2.Target(Stack.Ornithopter)
+Bot1.Pass
+Bot1.Decline
+[Bot1.Main2]
+! Bot1.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+! Bot2.Hand.Lightning Bolt.Cast(Bot1)
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Count = 0
+Bot1.Graveyard = Ornithopter; Plains
+Bot2.Graveyard = Lose Focus
+Stack.Count = 0

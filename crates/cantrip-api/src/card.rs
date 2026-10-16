@@ -1310,7 +1310,7 @@ pub struct CardDef {
     /// and `ReplacementRule(n)` name the nth. Not standing abilities: they function only while such an effect lasts.
     pub granted_replacements: &'static [GrantedReplacementDef],
     /// "Each player can't cast more than this many spells each turn" (CR 101.2), while it is on the battlefield; 0 for
-    /// no such limit. Archon of Emeria, Rule of Law.
+    /// no such limit. Archon of Emeria, High Noon, Rule of Law.
     pub cast_limit: u8,
     /// Its static abilities that make other things cost more or less (CR 601.2f), while it is on the battlefield.
     pub cost_changes: &'static [CostChange],

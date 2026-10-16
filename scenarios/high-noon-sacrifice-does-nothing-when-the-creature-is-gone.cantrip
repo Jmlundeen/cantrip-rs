@@ -1,6 +1,7 @@
 # CR 608.2b: Bot2 Bolts its own Ornithopter in response to High Noon's ability. The target is gone when the ability
-# resolves, so Bot2's life is unaffected (no redirection) and High Noon was already sacrificed as a cost. It is Bot1's
-# turn and Bot2 has cast no spell this turn, so High Noon lets Bot2 cast this one Bolt (the limit is per player).
+# resolves, so Bot2's life is unaffected (no redirection) and High Noon, sacrificed as a cost, is in the graveyard.
+# This does not test the limit (High Noon is already gone when Bot2 casts the Bolt); the limit's scenarios are the
+# others named high-noon-.
 
 [Bot1 Deck]
 Plains
