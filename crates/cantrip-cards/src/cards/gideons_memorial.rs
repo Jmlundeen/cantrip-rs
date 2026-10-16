@@ -1,11 +1,6 @@
 use cantrip_api::*;
-use cantrip_mechanics::{damage_target, statics::your_creature_tokens, targets};
+use cantrip_mechanics::{damage_target, statics::{have_vigilance, your_creature_tokens}, targets};
 use cantrip_oracle as oracle;
-
-/// "... and have vigilance" (CR 702.20, layer 6).
-fn have_vigilance(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.keywords = chars.keywords.with(Keyword::Vigilance);
-}
 
 /// "Target attacking or blocking creature" (CR 506.4, 508.1, 509.1): a creature on the battlefield that is attacking or
 /// blocking now.

@@ -185,7 +185,9 @@ pub fn complete_dungeons(cx: &mut Cx) -> bool {
 /// whatever they control afterwards (CR 702.131c, 702.195b). Checked with the state-based actions, and as each event
 /// happens before the abilities it triggers are looked for, so continuous effects that read the designation apply to
 /// that look (CR 702.131d, 702.195c). The board is counted only for a player a permanent with one of the keywords works
-/// for and who lacks its designation. Whether anyone got one.
+/// for and who lacks its designation. A face-down permanent (CR 708.2) is the face-down values' copy, so it has neither
+/// keyword and, a nameless 2/2 with no supertypes, counts toward a story only if an effect makes it an artifact.
+/// Whether anyone got one.
 pub fn keyword_designations(cx: &mut Cx) -> bool {
     // Bit `p` of each: player `p` controls a permanent with the keyword and does not have its designation.
     let (mut blessing, mut story) = (0u32, 0u32);

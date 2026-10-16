@@ -1,10 +1,11 @@
 use cantrip_api::*;
-use cantrip_mechanics::statics::{creature_dying_triggers_again, your_creature_tokens};
+use cantrip_mechanics::statics::{creature_dying_triggers_again, have_vigilance, your_creature_tokens};
 use cantrip_oracle as oracle;
 
 /// "... have vigilance and lifelink." (CR 702.20, 702.15)
-fn vigilance_and_lifelink(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.keywords = chars.keywords.with(Keyword::Vigilance).with(Keyword::Lifelink);
+fn vigilance_and_lifelink(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
+    have_vigilance(view, source, chars);
+    chars.keywords = chars.keywords.with(Keyword::Lifelink);
 }
 
 /// "If a creature dying causes a triggered ability of a permanent you control to trigger, that ability triggers an
