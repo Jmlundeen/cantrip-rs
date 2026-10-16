@@ -807,6 +807,7 @@ counter_kinds! {
     Plan = 31, "plan", "Plan";
     // CR 122.1j: each one on an Equipment gives the creature it is attached to +1/+0 (the layers, 613.4c).
     Hone = 32, "hone", "Hone";
+    Quest = 33, "quest", "Quest";
 }
 
 impl CounterKind {
