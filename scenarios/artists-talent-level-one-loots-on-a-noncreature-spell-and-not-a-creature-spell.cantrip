@@ -1,0 +1,40 @@
+# Artist's Talent, level 1: "Whenever you cast a noncreature spell, you may discard a card. If you do, draw a card." With the
+# Class on the battlefield, Bot1 casts an Ornithopter (a creature spell): nothing triggers and Bot1 is asked nothing (the
+# refusal beside the positive control). It then casts Lightning Bolt (noncreature): Bot1 discards the Island and draws the
+# Plains on top of its library, so its hand is the Plains alone, and Bot2 takes 3.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Artist's Talent
+Mountain
+Lightning Bolt
+Ornithopter
+Island
+Plains
+Plains x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Artist's Talent.Cast
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+! Bot1.Choose
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Choose(Island)
+
+[Expect]
+Bot1.Hand = Plains
+Bot1.Graveyard = Lightning Bolt; Island
+Bot2.Life = 17
+Bot1.Library.Count = 15
+Stack.Count = 0

@@ -1,0 +1,48 @@
+# Artist's Talent, level 2 (ruling 2024-07-26): the total cost is the mana cost plus cost increases such as kicker, then the
+# reduction is applied, and it takes off one generic mana. Kicked Burst Lightning costs {R} + {4} = {4}{R}, so {3}{R} at level 2:
+# Bot1 pays it with exactly four mana (Mox Ruby, Mox Jet and Sol Ring's two) and the 4 damage of the kicked spell reaches Bot2.
+# The level was reached on turn 5 with Sol Ring and the Ruby, after the Sol Ring itself was paid for with the Jet at level 1.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Artist's Talent
+Sol Ring
+Burst Lightning
+Island
+Island
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Artist's Talent.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Choose()
+[T5 Bot1.Main1]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Artist's Talent.Activate(Ability: Level 2)
+Bot2.Pass
+[T7 Bot1.Main1]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Burst Lightning.Cast(Bot2; Kicked: 1)
+Bot1.Choose()
+
+[Expect]
+Bot2.Life = 16
+Bot1.Graveyard = Burst Lightning
+Bot1.Battlefield.Mox Ruby.Tapped = true
+Bot1.Battlefield.Mox Jet.Tapped = true
+Bot1.Battlefield.Sol Ring.Tapped = true
+Stack.Count = 0

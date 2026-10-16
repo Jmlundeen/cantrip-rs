@@ -1,0 +1,94 @@
+# Artist's Talent, level 3: "If a source you control would deal noncombat damage to an opponent or a permanent an opponent
+# controls, it deals that much damage plus 2 instead." (CR 614.1, 120.3.) After the three turns it takes to reach level 3, Bot1:
+# Lightning Bolt to Bot2's face deals 5 (20 to 15); Lightning Bolt to its own face deals only 3 (17 to 14: "an opponent");
+# Burst Lightning, 2 damage, kills Bot2's Picklock Prankster (toughness 3) because the damage is 4 (an opponent's permanent);
+# and Embereth Shieldbreaker's combat damage is only 2 (13), not 4. Bot2's own Lightning Bolt on turn 6 deals the 3 it prints
+# to Bot1, a source Bot2 controls (20 to 17).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Artist's Talent
+Mountain
+Mountain
+Burst Lightning
+Embereth Shieldbreaker
+Lightning Bolt
+Lightning Bolt
+Plains x15
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Picklock Prankster
+Lightning Bolt
+Island
+Island
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Artist's Talent.Cast
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Picklock Prankster.Cast
+Bot1.Pass
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Artist's Talent.Activate(Ability: Level 2)
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Artist's Talent.Activate(Ability: Level 3)
+Bot2.Pass
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Embereth Shieldbreaker.Cast
+[T6 Bot2.Main1]
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Pass
+? Bot1.Life = 17
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Choose()
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 15
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Choose()
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 14
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Burst Lightning.Cast(Bot2.Battlefield.Picklock Prankster)
+Bot1.Pass
+Bot1.Attack(Embereth Shieldbreaker > Bot2)
+[T7 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 13
+Bot1.Life = 14
+Bot2.Battlefield = Mox Sapphire; Mox Jet; Mox Ruby; Island
+Bot2.Graveyard = Picklock Prankster; Lightning Bolt
+Stack.Count = 0

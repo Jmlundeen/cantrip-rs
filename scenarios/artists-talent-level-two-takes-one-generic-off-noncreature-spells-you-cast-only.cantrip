@@ -1,0 +1,64 @@
+# Artist's Talent, level 2: "Noncreature spells you cast cost {1} less to cast." (CR 601.2f, 118.7c: a generic reduction.)
+# At level 1 Bot1's first Sol Ring ({1}) is paid for: the Mox Pearl taps. Bot1 levels up on turn 3 with the first Sol Ring's
+# mana and a Mountain, and the second Sol Ring is cast with every Mox untapped and no mana at all, for {0}. The creature spell
+# Embereth Shieldbreaker ({1}{R}) is not reduced: the Mox Ruby and the Mox Jet tap for it. And Bot2's own Sol Ring is
+# not reduced either: the Mox Jet taps (it is "spells you cast", not every player's).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Artist's Talent
+Sol Ring
+Sol Ring
+Mountain
+Embereth Shieldbreaker
+Plains x15
+
+[Bot2 Deck]
+Mox Jet
+Sol Ring
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Artist's Talent.Cast
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Choose()
+? Bot1.Battlefield.Mox Pearl.Tapped = true
+[T3 Bot1.Main1]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Artist's Talent.Activate(Ability: Level 2)
+Bot2.Pass
+Bot1.Hand.Sol Ring.Cast
+Bot1.Choose()
+? Bot1.Battlefield.Mox Ruby.Tapped = false
+? Bot1.Battlefield.Mox Jet.Tapped = false
+? Bot1.Battlefield.Mox Pearl.Tapped = false
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Embereth Shieldbreaker.Cast
+Bot2.Pass
+? Bot1.Battlefield.Mox Pearl.Tapped = false
+[T4 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot1.Pass
+? Bot2.Battlefield.Mox Jet.Tapped = true
+
+[Expect]
+Bot1.Battlefield.Mox Ruby.Tapped = true
+Bot1.Battlefield.Mox Jet.Tapped = true
+Bot1.Battlefield.Mox Pearl.Tapped = false
+Bot1.Battlefield.Embereth Shieldbreaker.Power = 2
+Bot2.Battlefield = Mox Jet; Sol Ring
+Stack.Count = 0

@@ -1,0 +1,36 @@
+# Artist's Talent, level 1: "you may discard a card. If you do, draw a card." Bot1 casts Lightning Bolt and chooses no card to
+# discard: nothing is discarded, and since it did not discard it does not draw: its hand keeps the Island and its library
+# its Plains.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Artist's Talent
+Mountain
+Lightning Bolt
+Island
+Island
+Plains
+Plains x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Artist's Talent.Cast
+Bot2.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Choose()
+
+[Expect]
+Bot1.Hand = Island; Island
+Bot1.Graveyard = Lightning Bolt
+Bot2.Life = 17
+Bot1.Library.Count = 16
+Stack.Count = 0
