@@ -1,0 +1,43 @@
+# Walking Ballista in a library has mana value 0 (CR 202.3e: X is 0 anywhere but the stack), so "a creature card with
+# mana value 1 or less" finds it. Starfield Shepherd is warped on turn 1 (Plains, Mox Pearl) and fetches it; at the end
+# step warp exiles the Shepherd. On turn 3 Bot1 casts it from exile for its real {3}{W}{W} (Black Lotus WWW, Mox Pearl and
+# the Plains) and its enters trigger searches
+# a second time, which this time takes the basic Plains.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Starfield Shepherd
+Black Lotus
+Island x3
+Walking Ballista
+Plains
+Plains
+Island x14
+
+[Bot2 Deck]
+Forest x22
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Starfield Shepherd.Cast(Ability: Warp)
+Bot1.Search(Walking Ballista)
+[T2 Bot2.Main1]
+? Exile = Starfield Shepherd
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Exile.Starfield Shepherd.Cast
+Bot1.Search(Plains)
+[Bot1.Main2]
+? Exile.Count = 0
+
+[Expect]
+Bot1.Battlefield = Island; Plains; Mox Pearl; Starfield Shepherd
+Bot1.Hand.Count = 5

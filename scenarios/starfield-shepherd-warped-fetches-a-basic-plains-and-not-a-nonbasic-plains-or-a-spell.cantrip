@@ -1,0 +1,39 @@
+# Starfield Shepherd (CR 702.185a warp, CR 701.23 search): cast on turn 1 for its warp cost {1}{W} off a Plains and a Mox Pearl, its
+# enters trigger searches for "a basic Plains card or a creature card with mana value 1 or less". The library holds
+# things that are neither - Sacred Foundry (a nonbasic land that is a Plains), Lightning Bolt, and Guerrilla Gorilla (a
+# creature of mana value 3) - all refused, and a basic Plains that is taken and revealed. At the beginning of the end
+# step the Shepherd is exiled by its warp.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Starfield Shepherd
+Island x4
+Sacred Foundry
+Lightning Bolt
+Guerrilla Gorilla
+Plains
+Island x15
+
+[Bot2 Deck]
+Forest x22
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Starfield Shepherd.Cast(Ability: Warp)
+! Bot1.Search(Sacred Foundry)
+! Bot1.Search(Lightning Bolt)
+! Bot1.Search(Guerrilla Gorilla)
+Bot1.Search(Plains)
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Count = 3
+? Exile.Count = 0
+[T2 Bot2.Main1]
+? Exile = Starfield Shepherd
+? Bot1.Battlefield.Count = 2
+
+[Expect]
+Bot1.Hand = Island; Island; Island; Island; Plains

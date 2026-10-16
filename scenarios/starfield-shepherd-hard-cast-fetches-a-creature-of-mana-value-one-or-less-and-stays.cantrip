@@ -1,0 +1,40 @@
+# Starfield Shepherd cast for its full {3}{W}{W} (Black Lotus for WWW, Mox Pearl and a Plains): the search may instead
+# take "a creature card with mana value 1 or less". Library: Walking Ballista (mana value 0 with X = 0 off the stack,
+# CR 202.3e) and Birds of Paradise (1) qualify; Guerrilla Gorilla (a creature of mana value 3) and Lightning Bolt do not,
+# and a basic Plains that is on offer is passed over. Bot1 takes Birds of Paradise, revealed. Not warped, the 3/2 flier stays.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Black Lotus
+Starfield Shepherd
+Island x3
+Walking Ballista
+Birds of Paradise
+Guerrilla Gorilla
+Lightning Bolt
+Plains
+Island x12
+
+[Bot2 Deck]
+Forest x22
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Starfield Shepherd.Cast
+! Bot1.Search(Guerrilla Gorilla)
+! Bot1.Search(Lightning Bolt)
+Bot1.Search(Birds of Paradise)
+[Bot1.Main2]
+? Bot1.Battlefield.Count = 3
+
+[Expect]
+Bot1.Battlefield = Plains; Mox Pearl; Starfield Shepherd
+Bot1.Hand = Island; Island; Island; Birds of Paradise
+Exile.Count = 0
