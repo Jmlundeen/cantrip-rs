@@ -1,0 +1,8 @@
+{
+  "name": "Amalia Benavides Aguirre",
+  "manaCost": "{W}{B}",
+  "type": "Legendary Creature — Vampire Scout",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Ward—Pay 3 life.\nWhenever you gain life, Amalia Benavides Aguirre explores. Then destroy all other creatures if its power is exactly 20. (To have this creature explore, reveal the top card of your library. Put that card into your hand if it's a land. Otherwise, put a +1/+1 counter on this creature, then put the card back or put it into your graveyard.)"
+}

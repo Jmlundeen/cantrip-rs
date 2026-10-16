@@ -1,0 +1,44 @@
+# Amalia Benavides Aguirre: "Whenever YOU gain life". Bot2 sacrifices a land to its own Zuran Orb on turn 2 and gains 2 life
+# (20 to 22); Bot1's Amalia does not trigger: no card leaves Bot1's library (it still holds the 17 cards left after its opening hand), no reveal,
+# no counter, still 2/2. The positive control, Bot1's own life gain exploring, is in the scenarios beside this one.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Amalia Benavides Aguirre
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Plains
+Zuran Orb
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Amalia Benavides Aguirre.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Zuran Orb.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Zuran Orb.Activate(Sacrifice: Plains)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Life = 22
+[T2 Bot2.Main2]
+
+[Expect]
+Bot2.Life = 22
+Bot1.Battlefield = Mox Pearl; Mox Jet; Amalia Benavides Aguirre; Ornithopter
+Bot1.Battlefield.Amalia Benavides Aguirre.Power = 2
+Bot1.Library.Count = 17
+Bot1.Life = 20

@@ -1,0 +1,46 @@
+# Amalia Benavides Aguirre: "Whenever you gain life, Amalia explores." Bot1's library is empty, so no card is revealed; the
+# permanent still explores and, "otherwise" (CR 701.44a-b), gets a +1/+1 counter (the official ruling: "If no card is revealed,
+# most likely because that player's library is empty, the exploring creature receives a +1/+1 counter"). Zuran Orb's
+# sacrifice of a land gains 2 life: Amalia is 3/3 and, power 3 not 20, destroys nothing - Bot1's own Ornithopter lives.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Amalia Benavides Aguirre
+Zuran Orb
+Ornithopter
+Plains
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Amalia Benavides Aguirre.Cast
+Bot1.Pass
+Bot1.Hand.Zuran Orb.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Zuran Orb.Activate(Sacrifice: Plains)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot1.Battlefield = Mox Pearl; Mox Jet; Amalia Benavides Aguirre; Zuran Orb; Ornithopter
+Bot1.Battlefield.Amalia Benavides Aguirre.Power = 3
+Bot1.Battlefield.Amalia Benavides Aguirre.Toughness = 3
+Bot1.Battlefield.Amalia Benavides Aguirre.Counters.PlusOnePlusOne = 1
+Bot1.Library.Count = 0

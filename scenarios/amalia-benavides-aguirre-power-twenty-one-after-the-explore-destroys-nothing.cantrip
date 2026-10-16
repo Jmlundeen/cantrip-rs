@@ -1,0 +1,111 @@
+# Amalia Benavides Aguirre: "Then destroy all other creatures if its power is EXACTLY 20." The same build-up as the scenario where
+# it is 20 (Wrecking Ball Arm 7/7 base, two Ruins counters, one counter from the turn-1 explore, Legion Leadership doubling 10 to
+# 20 on turn 9) - but this time the top card at the last explore is a nonland Mana Vault, so Amalia gets a +1/+1 counter first
+# and her power when the check is made is 21. Nothing is destroyed: both of Bot2's Ornithopters and Bot1's own survive (the
+# last explore's counter is applied before the check, CR 701.44a, and 21 is not 20). Bot1 leaves Mana Vault on top.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Emerald
+Amalia Benavides Aguirre
+Drannith Ruins
+Zuran Orb
+Ornithopter
+Wrecking Ball Arm
+Plains
+Legion Leadership
+Mana Vault
+Plains x10
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Drannith Ruins.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Amalia Benavides Aguirre.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Drannith Ruins.Activate(Ability: Put two; Bot1.Battlefield.Amalia Benavides Aguirre)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Zuran Orb.Cast
+Bot1.Pass
+Bot1.Battlefield.Zuran Orb.Activate(Sacrifice: Drannith Ruins)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Amalia Benavides Aguirre.Power = 5
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Wrecking Ball Arm.Cast
+Bot1.Pass
+[T6 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Wrecking Ball Arm.Activate(Ability: legendary; Bot1.Battlefield.Amalia Benavides Aguirre)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Amalia Benavides Aguirre.Power = 10
+[T8 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T9 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Legion Leadership.Cast(Amalia Benavides Aguirre)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Amalia Benavides Aguirre.Power = 20
+? Bot2.Battlefield.Count = 6
+Bot1.Battlefield.Zuran Orb.Activate(Sacrifice: Plains)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+[T9 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Pearl; Mox Jet; Mox Ruby; Mox Emerald; Amalia Benavides Aguirre; Zuran Orb; Wrecking Ball Arm; Ornithopter
+Bot1.Battlefield.Amalia Benavides Aguirre.Power = 21
+Bot1.Battlefield.Amalia Benavides Aguirre.Counters.PlusOnePlusOne = 4
+Bot1.Life = 24
+Bot2.Battlefield = Island; Island; Island; Island; Ornithopter; Ornithopter
+Bot2.Graveyard.Count = 0
+Bot1.Graveyard = Plains; Legion Leadership; Drannith Ruins
+Bot1.Hand.Count = 0

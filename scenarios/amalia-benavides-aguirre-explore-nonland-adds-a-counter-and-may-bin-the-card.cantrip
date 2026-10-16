@@ -1,0 +1,63 @@
+# Amalia Benavides Aguirre: "Whenever you gain life, Amalia explores." Twice, over two turns, with a nonland card on top (CR 701.44a:
+# a +1/+1 counter, then the revealed card may go into the graveyard). Turn 1: the top card is an Ornithopter; Bot1 declines to bin
+# it, so it stays on top and is the card drawn on turn 3. Turn 3: the top card is Mox Ruby; Bot1 bins it. Amalia is 2/2 + 2
+# counters = 4/4, never 20, so Bot1's Ornithopter survives both times. Zuran Orb's land sacrifices (Plains each turn) gain the life.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Amalia Benavides Aguirre
+Zuran Orb
+Plains
+Ornithopter
+Ornithopter
+Mox Ruby
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Amalia Benavides Aguirre.Cast
+Bot1.Pass
+Bot1.Hand.Zuran Orb.Cast
+Bot1.Pass
+Bot1.Battlefield.Zuran Orb.Activate(Sacrifice: Plains)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Amalia Benavides Aguirre.Power = 3
+? Bot1.Graveyard = Plains
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Zuran Orb.Activate(Sacrifice: Plains)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 24
+Bot1.Battlefield = Mox Pearl; Mox Jet; Amalia Benavides Aguirre; Zuran Orb; Ornithopter
+Bot1.Battlefield.Amalia Benavides Aguirre.Power = 4
+Bot1.Battlefield.Amalia Benavides Aguirre.Toughness = 4
+Bot1.Battlefield.Amalia Benavides Aguirre.Counters.PlusOnePlusOne = 2
+Bot1.Graveyard = Mox Ruby; Plains; Plains
+Bot1.Hand = Ornithopter
+Bot1.Library.Count = 20
+Bot1.Revealed = Ornithopter; Mox Ruby

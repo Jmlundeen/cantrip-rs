@@ -1,0 +1,49 @@
+# Amalia Benavides Aguirre: "Whenever you gain life, Amalia explores." The revealed top card is a Plains, a land: it goes into
+# Bot1's hand and Amalia gets NO +1/+1 counter (CR 701.44a: only "otherwise" does it), staying 2/2. Power 2 is not 20, so
+# nothing is destroyed (Bot1's Ornithopter lives). Zuran Orb's 2 life is gained by sacrificing the Plains Bot1 played; the
+# revealed Plains replaces it in hand, and the library is one card shorter.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Amalia Benavides Aguirre
+Zuran Orb
+Ornithopter
+Ornithopter
+Plains
+Island
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Amalia Benavides Aguirre.Cast
+Bot1.Pass
+Bot1.Hand.Zuran Orb.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Zuran Orb.Activate(Sacrifice: Plains)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot1.Battlefield = Mox Pearl; Mox Jet; Amalia Benavides Aguirre; Zuran Orb; Ornithopter
+Bot1.Battlefield.Amalia Benavides Aguirre.Power = 2
+Bot1.Battlefield.Amalia Benavides Aguirre.Toughness = 2
+Bot1.Hand = Ornithopter; Plains
+Bot1.Library.Count = 21
+Bot1.Revealed = Plains

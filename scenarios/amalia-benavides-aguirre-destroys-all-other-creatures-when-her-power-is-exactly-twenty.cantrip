@@ -1,0 +1,112 @@
+# Amalia Benavides Aguirre: "Whenever you gain life, Amalia explores. Then destroy all other creatures if its power is exactly 20."
+# Her power is built from: Wrecking Ball Arm's base 7/7 (layer 7b) + two +1/+1 counters from Drannith Ruins on turn 1 + one from
+# the turn-1 explore (a nonland Ornithopter, left on top and drawn on turn 3) = 10 on turn 7; Legion Leadership doubles it to 20
+# on turn 9. Zuran Orb's life gain then explores once more: the top card is a Plains, a land, so it goes to hand and Amalia gets
+# no counter - her power is exactly 20 and every OTHER creature is destroyed together, Bot1's own Ornithopter and both of
+# Bot2's included, while Amalia stays. The only earlier life gain (turn 1) made her power 5, and nothing was destroyed then
+# (Bot2's Ornithopters are cast on turn 2 and are still there on turn 9 until this ability resolves).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Emerald
+Amalia Benavides Aguirre
+Drannith Ruins
+Zuran Orb
+Ornithopter
+Wrecking Ball Arm
+Plains
+Legion Leadership
+Plains
+Plains x10
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Drannith Ruins.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Amalia Benavides Aguirre.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Drannith Ruins.Activate(Ability: Put two; Bot1.Battlefield.Amalia Benavides Aguirre)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Zuran Orb.Cast
+Bot1.Pass
+Bot1.Battlefield.Zuran Orb.Activate(Sacrifice: Drannith Ruins)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Amalia Benavides Aguirre.Power = 5
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Wrecking Ball Arm.Cast
+Bot1.Pass
+[T6 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Wrecking Ball Arm.Activate(Ability: legendary; Bot1.Battlefield.Amalia Benavides Aguirre)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Amalia Benavides Aguirre.Power = 10
+[T8 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T9 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Legion Leadership.Cast(Amalia Benavides Aguirre)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Amalia Benavides Aguirre.Power = 20
+? Bot2.Battlefield.Count = 6
+Bot1.Battlefield.Zuran Orb.Activate(Sacrifice: Plains)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T9 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Pearl; Mox Jet; Mox Ruby; Mox Emerald; Amalia Benavides Aguirre; Zuran Orb; Wrecking Ball Arm
+Bot1.Battlefield.Amalia Benavides Aguirre.Power = 20
+Bot1.Battlefield.Amalia Benavides Aguirre.Counters.PlusOnePlusOne = 3
+Bot1.Life = 24
+Bot2.Battlefield = Island; Island; Island; Island
+Bot2.Graveyard = Ornithopter; Ornithopter
+Bot1.Graveyard = Ornithopter; Plains; Legion Leadership; Drannith Ruins
+Bot1.Hand = Plains
