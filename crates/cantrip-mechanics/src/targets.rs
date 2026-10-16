@@ -240,6 +240,14 @@ pub fn card_in_your_graveyard_with_mana_value_at_most(q: &dyn Query, asker: &Ask
     card_in_your_graveyard(q, asker, t, types) && matches!(t, Target::Object(id) if q.mana_value(id) <= max)
 }
 
+fn creature_card_with_mana_value_3_or_less_in_your_graveyard_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    card_in_your_graveyard_with_mana_value_at_most(q, asker, t, &[CardType::Creature], 3)
+}
+
+/// "Target creature card with mana value 3 or less from your graveyard". Unearth, Helping Hand, Carnage, Crimson Chaos,
+/// Call a Surprise Witness and Leonardo's Technique print it.
+pub const CREATURE_CARD_WITH_MANA_VALUE_3_OR_LESS_IN_YOUR_GRAVEYARD: TargetSpec = target(creature_card_with_mana_value_3_or_less_in_your_graveyard_filter);
+
 fn creature_card_in_your_graveyard_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     card_in_your_graveyard(q, asker, t, &[CardType::Creature])
 }
