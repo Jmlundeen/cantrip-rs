@@ -32,9 +32,7 @@ fn create_axe(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// resolves (CR 701.3b), to the creature if it is still a legal target (CR 608.2b).
 fn attach_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Target::Object(axe) = item.subject else { return Ok(()) };
-    if targets::permanent(g, axe)
-        && let Some(creature) = targets::object(g, item, 0)
-    {
+    if let Some(creature) = targets::object(g, item, 0) {
         g.attach(axe, creature);
     }
     Ok(())

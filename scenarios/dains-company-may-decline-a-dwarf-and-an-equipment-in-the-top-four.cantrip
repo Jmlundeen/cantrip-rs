@@ -1,0 +1,33 @@
+# "You MAY reveal a Dwarf or Equipment card": the top four hold a Dwarf (Dain Ironfoot) and an Equipment (Cranial Plating), and Bot1
+# takes neither. Nothing is revealed or put into the hand (the hand is the four Islands it kept), and all four go to the bottom of the
+# library, which keeps its 12 cards.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Dáin's Company
+Island
+Island
+Island
+Island
+Dáin Ironfoot
+Cranial Plating
+Island
+Island
+Mountain x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Dáin's Company.Cast
+Bot1.Arrange( | Dáin Ironfoot; Cranial Plating; Island; Island)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Island; Island; Island; Island
+Bot1.Library.Count = 12

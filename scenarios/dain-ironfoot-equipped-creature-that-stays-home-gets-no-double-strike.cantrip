@@ -1,0 +1,47 @@
+# "Whenever Dain attacks, each equipped ATTACKING creature gains double strike": on turn 3 the Axe is on the first Ornithopter, which
+# stays home; Dain and the unequipped second Ornithopter attack and nobody gains double strike (Keywords checked; 1 damage, Bot2 at 19).
+# On turn 5 Bot1 moves the Axe ({2}) to the second Ornithopter and attacks with Dain and it: now it, equipped and attacking, has double
+# strike (1 x 2) beside Dain's 1 - positive control: Bot2 at 16 - while the first Ornithopter, unequipped and home, has none.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Ornithopter
+Ornithopter
+Dáin Ironfoot
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dáin Ironfoot.Cast
+Bot1.Target(Ornithopter#1)
+[T3 Bot1.Main1]
+Bot1.Attack(Dáin Ironfoot; Ornithopter#2 > Bot2)
+[T3 Bot1.Main2]
+? Bot2.Life = 19
+? Bot1.Battlefield.Ornithopter#1.Keywords = Flying
+? Bot1.Battlefield.Ornithopter#2.Keywords = Flying
+? Bot1.Battlefield.Dáin Ironfoot.Keywords = (absent)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Axe.Activate(Bot1.Battlefield.Ornithopter#2; Ability: Equip)
+Bot1.Attack(Dáin Ironfoot; Ornithopter#2 > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot1.Battlefield.Ornithopter#1.Keywords = Flying
+Bot1.Battlefield.Ornithopter#2.Keywords = DoubleStrike; Flying
+Bot1.Battlefield.Dáin Ironfoot.Keywords = (absent)

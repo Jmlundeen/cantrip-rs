@@ -26,6 +26,7 @@ Bot1.Battlefield.Mox Pearl.Activate
 Bot1.Battlefield.Mox Ruby.Activate
 Bot1.Hand.Karn, Scion of Urza.Cast
 Bot1.Hand.Dedicated Commons.Play
+? Bot1.Battlefield.Dedicated Commons.Tapped = false
 ! Bot1.Battlefield.Dedicated Commons.Activate(Color: Blue)
 Bot1.Battlefield.Dedicated Commons.Activate(Color: White)
 ? Bot1.Mana = {W}
@@ -33,5 +34,5 @@ Bot1.Battlefield.Dedicated Commons.Activate(Color: White)
 Bot2.Hand.Dedicated Commons.Play
 
 [Expect]
-Bot1.Battlefield.Dedicated Commons.Tapped = true
+Bot1.Battlefield.Karn, Scion of Urza.Counters.Loyalty = 5
 Bot2.Battlefield.Dedicated Commons.Tapped = true

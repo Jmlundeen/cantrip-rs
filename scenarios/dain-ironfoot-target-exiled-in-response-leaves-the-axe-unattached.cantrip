@@ -35,4 +35,5 @@ Bot2.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Dáin Ironfoot)
 Exile = Dáin Ironfoot
 Bot1.Life = 21
 Bot1.Battlefield.Axe.Subtypes = Equipment
+Bot1.Battlefield.Axe.AttachedTo = (absent)
 Stack.Count = 0
