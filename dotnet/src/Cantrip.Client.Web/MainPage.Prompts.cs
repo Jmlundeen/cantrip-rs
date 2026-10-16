@@ -1555,11 +1555,26 @@ public sealed partial class MainPage
 
             // Gift (CR 702.174a): an optional additional cost, announced as the spell is cast. Neither button is primary,
             // so passing through the announcement never gives an opponent anything by accident.
-            case "PromiseGift":
+            // Each kind of gift (CR 702.174d-i) is named for what it gives, so the button says what the opponent gets.
+            case "PromiseGiftFood" or "PromiseGiftCard" or "PromiseGiftTappedFish" or "PromiseGiftExtraTurn"
+                or "PromiseGiftTreasure" or "PromiseGiftOctopus":
+                (string gift, string effect) = prompt.Verb switch
+                {
+                    "PromiseGiftFood" => ("a Food", "create a Food token"),
+                    "PromiseGiftCard" => ("a card", "draw a card"),
+                    "PromiseGiftTappedFish" => ("a tapped Fish", "create a tapped 1/1 blue Fish creature token"),
+                    "PromiseGiftExtraTurn" => ("an extra turn", "take an extra turn after this one"),
+                    "PromiseGiftTreasure" => ("a Treasure", "create a Treasure token"),
+                    _ => ("an Octopus", "create an 8/8 blue Octopus creature token"),
+                };
+                // An instant or sorcery gives it as it resolves, before its other effects; a permanent, when it enters.
+                bool instantOrSorcery = client.Object(prompt.Source) is { } cast
+                    && cast.CardTypes.Any(type => type is CardTypeView.Instant or CardTypeView.Sorcery);
+                string when = instantOrSorcery ? "before the spell's other effects" : "when it enters";
                 Ask(
-                    $"{Named("This spell")}: promise an opponent a gift?",
-                    "They receive it before the spell's other effects, and the spell does more if you do",
-                    "Promise a gift",
+                    $"{Named("This spell")}: promise an opponent {gift}?",
+                    $"They {effect} {when}, and the card does more if you do",
+                    $"Gift {gift}",
                     "No gift",
                     yesIsPrimary: false);
                 return;

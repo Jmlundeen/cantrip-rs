@@ -39,6 +39,10 @@ pub struct Obj {
     /// CR 601.2b) was paid as it was cast, carried from the spell to the permanent it becomes. Kept apart from `kicked`
     /// so a card with kicker and another optional cost is not ambiguous.
     pub paid: u8,
+    /// The opponent its gift was promised to as it was cast (CR 702.174k), carried from the spell to the permanent it
+    /// becomes: "if its gift cost was paid" (CR 702.174b). A copy of the spell has it too (CR 707.10); a permanent
+    /// that enters as a copy of one does not (CR 707.9).
+    pub gift: Option<PlayerId>,
     /// The mana spent to cast it, by kind (CR 601.2h): what converge and "if at least two of a color were spent"
     /// read. Carried from the spell to the permanent; a copy has none.
     pub spent: ManaPool,
@@ -169,6 +173,7 @@ impl Obj {
             exile_on_leave: false,
             kicked: 0,
             paid: 0,
+            gift: None,
             spent: ManaPool::default(),
             cast_way: 0,
             class_level: 0,

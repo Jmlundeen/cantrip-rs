@@ -74,7 +74,9 @@ dependencies = [
 name = "cantrip-script"
 version = "0.1.0"
 dependencies = [
+ "cantrip-api",
  "cantrip-engine",
+ "cantrip-mechanics",
 ]
 
 [[package]]

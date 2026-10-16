@@ -1446,6 +1446,29 @@ public sealed class Decisions
             return new MayChosenAnswer { Accept = Yes($"{source} says you may {cast} Do you?") };
         }
 
+        // Gift (CR 702.174a): the opponent's gift is the price of the spell's better mode, so say what it gives them.
+        string? gift = prompt.Verb switch
+        {
+            "PromiseGiftFood" => "they create a Food token",
+            "PromiseGiftCard" => "they draw a card",
+            "PromiseGiftTappedFish" => "they create a tapped 1/1 blue Fish creature token",
+            "PromiseGiftExtraTurn" => "they take an extra turn after this one",
+            "PromiseGiftTreasure" => "they create a Treasure token",
+            "PromiseGiftOctopus" => "they create an 8/8 blue Octopus creature token",
+            _ => null,
+        };
+
+        if (gift is not null)
+        {
+            bool instantOrSorcery = client.Object(prompt.Source) is { } spell
+                && spell.CardTypes.Any(type => type is CardTypeView.Instant or CardTypeView.Sorcery);
+            string when = instantOrSorcery ? "as the spell resolves, before its other effects" : "when the permanent enters";
+            return new MayChosenAnswer
+            {
+                Accept = Yes($"As you cast {source} you may promise an opponent a gift. If you do, {gift} {when}, and the card does more as its text says. Do you promise the gift?"),
+            };
+        }
+
         return new MayChosenAnswer
         {
             Accept = Yes($"{source} says you may {Verb(prompt.Verb)}{amount}. Do you?"),

@@ -370,6 +370,23 @@ pub enum DestinationKind {
     BattlefieldFaceDown,
 }
 
+/// What a gift is (CR 702.174d-i): the effect the chosen opponent gets.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum Gift {
+    /// "Gift a Food": the chosen player creates a Food token (CR 702.174d).
+    Food,
+    /// "Gift a card": the chosen player draws a card (CR 702.174e).
+    Card,
+    /// "Gift a tapped Fish": the chosen player creates a tapped 1/1 blue Fish creature token (CR 702.174f).
+    TappedFish,
+    /// "Gift an extra turn": the chosen player takes an extra turn after this one (CR 702.174g).
+    ExtraTurn,
+    /// "Gift a Treasure": the chosen player creates a Treasure token (CR 702.174h).
+    Treasure,
+    /// "Gift an Octopus": the chosen player creates an 8/8 blue Octopus creature token (CR 702.174i).
+    Octopus,
+}
+
 /// Why a player is choosing.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum Purpose {
@@ -418,8 +435,8 @@ pub enum Purpose {
     Attach,
     /// A creature to exile a card with cipher encoded on (CR 702.99a).
     Encode,
-    /// Whether to promise a gift (CR 702.174a).
-    PromiseGift,
+    /// Whether to promise a gift (CR 702.174a), and which gift it is.
+    PromiseGift(Gift),
     /// "You may reveal this card from your hand as you draw it" (CR 702.94a): miracle.
     RevealForMiracle,
     /// "You may cast it by paying its miracle cost" (CR 702.94a), as the linked ability resolves.

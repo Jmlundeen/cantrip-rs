@@ -362,7 +362,7 @@ fn purpose_view(purpose: Purpose, opening: bool) -> CardChoicePurposeView {
         | Purpose::Optional
         | Purpose::RevealForMiracle
         | Purpose::CastForMiracleCost
-        | Purpose::PromiseGift
+        | Purpose::PromiseGift(_)
         | Purpose::CastTransformedFree
         | Purpose::CastForMadness
         | Purpose::CastFoundOrHand
@@ -405,7 +405,14 @@ fn may_verb(purpose: Purpose) -> (String, i32) {
         Purpose::CastFoundOrHand => "CastFoundOrPutIntoHand",
         Purpose::CastOrBottom => "CastWithoutPaying",
         Purpose::CastForMiracleCost => "CastForMiracleCost",
-        Purpose::PromiseGift => "PromiseGift",
+        Purpose::PromiseGift(gift) => match gift {
+            Gift::Food => "PromiseGiftFood",
+            Gift::Card => "PromiseGiftCard",
+            Gift::TappedFish => "PromiseGiftTappedFish",
+            Gift::ExtraTurn => "PromiseGiftExtraTurn",
+            Gift::Treasure => "PromiseGiftTreasure",
+            Gift::Octopus => "PromiseGiftOctopus",
+        },
         Purpose::CopyAsEnters => "CopyAsEnters",
         other => return (format!("{other:?}"), 0),
     };

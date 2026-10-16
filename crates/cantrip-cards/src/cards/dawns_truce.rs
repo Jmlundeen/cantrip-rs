@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::gift;
 use cantrip_oracle as oracle;
 
 /// You and permanents you control gain hexproof until end of turn. If the gift was promised, permanents you control
@@ -20,6 +21,6 @@ fn protect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     spell: spell(&[], protect),
-    gift: Some(Gift::Card),
+    gift: Some(gift::CARD),
     ..oracle::DAWNS_TRUCE
 };

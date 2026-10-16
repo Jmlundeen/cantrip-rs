@@ -552,7 +552,9 @@ fn put_trigger(cx: &mut Cx, trigger: PendingTrigger) -> R<()> {
         data: trigger.data,
         members: trigger.members,
         serial: 0,
-        gift: None,
+        // CR 603.10, 702.174b: what was true of the source as the ability triggered, for a gift triggered ability to
+        // give its gift after the permanent has left.
+        gift: cx.s().obj(trigger.source).gift,
         shares: [0; cantrip_state::MAX_TARGETS],
         exile_after: false,
     };

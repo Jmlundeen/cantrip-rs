@@ -155,7 +155,7 @@ pub fn target_legal(cards: &CardTable, state: &GameState, events: &[Record], ite
     let q = Reader { cards, state, events };
     // A slot of its own sees what the slots before it chose (CR 601.2c).
     let earlier = if item.target_count > 1 { &item.targets[..slot] } else { &[][..] };
-    (spec.filter)(&Given { q: &q, earlier, subject: item.subject, slot_player }, &asker, target) && layers::can_target(cards, state, &asker, target)
+    (spec.filter)(&Given { q: &q, earlier, subject: item.subject, slot_player, gift: false }, &asker, target) && layers::can_target(cards, state, &asker, target)
 }
 
 /// A `Query` that also says what the earlier target slots chose, for the filter of a later one.
@@ -166,6 +166,8 @@ pub struct Given<'a> {
     pub subject: Target,
     /// The opponent the slot is for, when it is one of a `TargetSpec::EACH_OPPONENT`.
     pub slot_player: Option<PlayerId>,
+    /// The targets are judged as if the spell's gift were promised (`Query::gift_assumed`).
+    pub gift: bool,
 }
 
 impl Query for Given<'_> {
@@ -203,6 +205,10 @@ impl Query for Given<'_> {
 
     fn slot_opponent(&self) -> Option<PlayerId> {
         self.slot_player
+    }
+
+    fn gift_assumed(&self) -> bool {
+        self.gift
     }
 }
 
@@ -314,11 +320,15 @@ pub fn resolve(cx: &mut Cx) -> R<Flow> {
                 return Ok(Flow::Done);
             }
             // Gift (CR 702.174b, 702.174j): the chosen opponent gets it before any of the spell's other effects, and
-            // only as the spell resolves.
-            if let (Some(Gift::Card), Some(to)) = (def.gift, item.gift)
-                && !cx.s().player(to).lost
+            // only as the spell resolves. A spell that was countered or fizzled gave nothing. Whoever left the game
+            // gets nothing (CR 800.4a). A permanent spell gives it when it enters (`cantrip_mechanics::gift`).
+            if let (Some(gift), Some(to)) = (def.gift, item.gift)
+                && (cx.chars(item.object).is(CardType::Instant) || cx.chars(item.object).is(CardType::Sorcery))
             {
-                ops::draw(cx, to);
+                if !cx.s().player(to).lost {
+                    (gift.give)(cx, to)?;
+                }
+                cx.emit(Event::GaveGift { player: item.controller, to, gift: gift.kind });
             }
             if let Some(spell) = def.spell {
                 match def.modal {

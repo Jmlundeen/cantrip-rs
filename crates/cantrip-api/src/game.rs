@@ -184,6 +184,12 @@ pub trait Query {
 
     /// The opponent the target slot being chosen or checked is for, when it is one of a `TargetSpec::EACH_OPPONENT`
     /// ("for each opponent, up to one target creature that player controls", CR 601.2c). `None` outside such a slot.
+    /// Whether the targets are being judged as if the gift of the spell they are for were promised (CR 702.174m): asked of a
+    /// gift spell with no target without it, to see whether the promise would give it one. `gift::promised` reads it.
+    fn gift_assumed(&self) -> bool {
+        false
+    }
+
     fn slot_opponent(&self) -> Option<PlayerId> {
         None
     }
@@ -439,6 +445,9 @@ pub trait Game: Query {
     /// player's library, and "searches their library" is only the case where the two are the same), for whatever
     /// watches searches.
     fn searched(&mut self, player: PlayerId, library: PlayerId);
+    /// `player` gave a gift to `to` (CR 702.174c): the gift triggered ability of a permanent they control resolved. (A
+    /// spell's gift is announced by the core as the spell resolves.)
+    fn gave_gift(&mut self, player: PlayerId, to: PlayerId, gift: Gift);
     /// Attaches an Aura or Equipment to a permanent (CR 701.3a): nothing happens if it could not be attached there
     /// (CR 701.3b) or already is. It becomes a new object with respect to what it is attached to (CR 701.3c, 613.7e).
     fn attach(&mut self, attachment: ObjectId, host: ObjectId);

@@ -119,6 +119,7 @@ impl Game {
                     exile_on_leave: false,
                     kicked: 0,
                     paid: 0,
+                    gift: None,
                     spent: ManaPool::default(),
                     cast_way: 0,
                     class_level: 0,
@@ -888,6 +889,10 @@ impl cantrip_api::Game for Cx<'_> {
         let mut turns = self.g.state.extra_turns.clone();
         turns.extend(std::iter::repeat(player).take(count as usize));
         self.g.state.set_extra_turns(turns);
+    }
+
+    fn gave_gift(&mut self, player: PlayerId, to: PlayerId, gift: Gift) {
+        self.emit(Event::GaveGift { player, to, gift });
     }
 
     fn searched(&mut self, player: PlayerId, library: PlayerId) {

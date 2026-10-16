@@ -645,6 +645,11 @@ pub fn target_candidates(cx: &Cx, asker: &Asker, spec: &TargetSpec) -> Vec<Targe
     target_candidates_given(cx, asker, spec, &[], Target::None, None)
 }
 
+/// The candidates for a slot of a spell as if its gift were promised (`Query::gift_assumed`), without promising it.
+fn target_candidates_if_promised(cx: &Cx, asker: &Asker, spec: &TargetSpec) -> Vec<Target> {
+    candidates(cx, asker, spec, &[], Target::None, None, true)
+}
+
 /// The candidates for a slot after the slots before it chose `earlier` (CR 601.2c); `slot_player` is the opponent the slot
 /// is for when it is one of a `TargetSpec::EACH_OPPONENT`.
 pub fn target_candidates_given(
@@ -655,8 +660,12 @@ pub fn target_candidates_given(
     subject: Target,
     slot_player: Option<PlayerId>,
 ) -> Vec<Target> {
+    candidates(cx, asker, spec, earlier, subject, slot_player, false)
+}
+
+fn candidates(cx: &Cx, asker: &Asker, spec: &TargetSpec, earlier: &[Target], subject: Target, slot_player: Option<PlayerId>, gift: bool) -> Vec<Target> {
     let s = cx.s();
-    let cx = &crate::resolve::Given { q: cx, earlier, subject, slot_player };
+    let cx = &crate::resolve::Given { q: cx, earlier, subject, slot_player, gift };
     let mut out = Vec::new();
     for p in s.seats() {
         let t = Target::Player(p);
@@ -735,7 +744,7 @@ fn modes_possible(cx: &Cx, asker: &Asker, modal: &ModalDef) -> bool {
 /// Whether a spell's targets are announced with the action: one slot of one target, on a spell that is not modal and
 /// does not choose its target after its kicker or X (CR 601.2b-c).
 fn targets_with_cast(def: &'static CardDef) -> bool {
-    def.modal.is_none() && !def.late_targets && def.divide.is_none() && targets_with_action(def.spell_targets())
+    def.modal.is_none() && !def.late_targets && def.gift.is_none() && def.divide.is_none() && targets_with_action(def.spell_targets())
 }
 
 /// Fills in a spell option's targets, or checks that its modes and targets could be announced: a modal spell needs
@@ -745,8 +754,15 @@ fn offer_spell(cx: &Cx, asker: &Asker, def: &'static CardDef, option: &mut Actio
         return modes_possible(cx, asker, modal);
     }
     let specs = def.spell_targets();
-    if def.late_targets || def.divide.is_some() {
-        return def.kicker.is_some() || specs.iter().all(|spec| !spec.required() || !target_candidates(cx, asker, spec).is_empty());
+    // A gift is promised before the targets (CR 601.2b-c, 702.174m), so what may be targeted can depend on it: it is
+    // offered if every required slot has a target without the gift, or with it.
+    if def.late_targets || def.gift.is_some() || def.divide.is_some() {
+        let met = |if_promised: bool| {
+            specs.iter().all(|spec| {
+                !spec.required() || !(if if_promised { target_candidates_if_promised(cx, asker, spec) } else { target_candidates(cx, asker, spec) }).is_empty()
+            })
+        };
+        return def.kicker.is_some() || met(false) || (def.gift.is_some() && met(true));
     }
     with_targets(cx, asker, specs, option)
 }
@@ -2208,10 +2224,25 @@ fn cast(
     if let Some(creature) = reducer {
         cost.mana.generic = cost.mana.generic.saturating_sub(reduction_of(cx, creature));
     }
-    // CR 601.2b, 702.174a: gift is an optional additional cost, announced before the targets.
-    let promised = def.gift.is_some()
+    // CR 601.2b, 702.174a: gift is an optional additional cost, announced, with the opponent it is promised to, before
+    // the targets (CR 702.174m): what may be targeted can depend on it. The opponent is the only one without asking.
+    if let Some(gift) = def.gift
         && cx.s().opponents(player).any(|p| !cx.s().player(p).lost)
-        && matches!(cx.ask_core(player, RequestKind::May { source: spell, purpose: Purpose::PromiseGift }, true)?, Answer::Yes);
+        && matches!(cx.ask_core(player, RequestKind::May { source: spell, purpose: Purpose::PromiseGift(gift.kind) }, true)?, Answer::Yes)
+    {
+        let opponents: Vec<PlayerId> = cx.s().opponents(player).collect();
+        let to = if opponents.len() == 1 {
+            opponents[0]
+        } else {
+            let ask = RequestKind::ChoosePlayer { source: spell, candidates: opponents, verb: "Gift", amount: 0 };
+            match cx.ask_core(player, ask, true)? {
+                Answer::Player(p) => p,
+                _ => return Err(Stop::Cancel),
+            }
+        };
+        item.gift = Some(to);
+        cx.st().update_obj(spell, |o| o.gift = Some(to));
+    }
     cx.st().stack_push(item);
 
     // CR 601.2c: targets slot by slot, where they were not announced with the action; a slot counted by X or by the
@@ -2259,24 +2290,6 @@ fn cast(
             targets = all;
             set_item_targets(cx, &targets);
         }
-    }
-
-    // CR 601.2h, 702.174a: a promised gift is paid by choosing the opponent, the only one without asking.
-    if promised {
-        let opponents: Vec<PlayerId> = cx.s().opponents(player).collect();
-        let to = if opponents.len() == 1 {
-            opponents[0]
-        } else {
-            let ask = RequestKind::ChoosePlayer { source: spell, candidates: opponents, verb: "Gift", amount: 0 };
-            match cx.ask_core(player, ask, true)? {
-                Answer::Player(p) => p,
-                _ => return Err(Stop::Cancel),
-            }
-        };
-        let at = cx.s().stack.len() - 1;
-        let mut with = cx.s().stack[at];
-        with.gift = Some(to);
-        cx.st().stack_set(at, with);
     }
 
     // Mana of any type may pay for it (CR 609.4b).

@@ -581,6 +581,12 @@ public sealed partial class TacticalPlay
             // Pia's Revolution: three damage to keep an artifact out of its owner's hand, while it cannot get close.
             "TakeDamageInsteadOfReturn" => life - prompt.Amount >= 10,
 
+            // Gift (CR 702.174a): what the opponent is given is a price for what the spell does more. A Food or a tapped 1/1
+            // Fish is small; a card, a Treasure, an 8/8 Octopus or an extra turn is worth more to them than any spell's
+            // better mode is to this seat, so those are never promised.
+            "PromiseGiftFood" or "PromiseGiftTappedFish" => true,
+            "PromiseGiftCard" or "PromiseGiftTreasure" or "PromiseGiftOctopus" or "PromiseGiftExtraTurn" => false,
+
             // Each of these is a way to lose to itself, or to hand an opponent something.
             "PayLifeToLookAgain" or "Sacrifice" or "HaveControllerDraw" or "PutIntoGraveyard" or "PutOnBottom"
                 or "ChooseOddOrEven" or "ProtectFromColorless" => false,

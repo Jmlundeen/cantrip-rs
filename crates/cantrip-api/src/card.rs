@@ -1221,16 +1221,18 @@ pub struct CardDef {
     pub flash_rules: &'static [FlashRule],
     /// Its static abilities that forbid activating abilities (CR 602.5): Clarion Conqueror, Null Rod, Stony Silence.
     pub activation_rules: &'static [ActivationRule],
-    /// Gift (CR 702.174): an optional additional cost of promising an opponent a gift, given before its other
-    /// effects.
-    pub gift: Option<Gift>,
+    /// Gift (CR 702.174): an optional additional cost of promising an opponent a gift, given as it resolves, before its
+    /// other effects (an instant or sorcery), or when it enters (a permanent).
+    pub gift: Option<GiftDef>,
 }
 
-/// What a gift is (CR 702.174b-j).
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum Gift {
-    /// "The chosen player draws a card" (CR 702.174e).
-    Card,
+/// A card's gift (CR 702.174a): which gift it is, for the promise to name, and what giving it does to the chosen
+/// player. `cantrip_mechanics::gift` has one for each kind.
+#[derive(Clone, Copy)]
+pub struct GiftDef {
+    pub kind: Gift,
+    /// Gives the gift to the chosen opponent (CR 702.174d-i).
+    pub give: fn(&mut dyn Game, PlayerId) -> Result<(), Suspend>,
 }
 
 impl CardDef {

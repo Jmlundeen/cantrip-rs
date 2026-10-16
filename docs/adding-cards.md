@@ -250,8 +250,10 @@ shapes have an example:
   (The Wandering Emperor). The board is searched for these only when something is cast or activated.
 - **Mana**: `PlayGrant.any_type` / `CastTerms.any_type` (mana of any type pays, CR 609.4b); mana that can't be spent on
   nonartifact spells is `g.add_restricted_mana(..)` from a mana ability with `.only_for(..)` (CR 106.6).
-- **Gift** (CR 702.174) is `CardDef.gift`; the promise is asked with the spell, and the spell's effect reads
-  `item.gift.is_some()`. **Player hexproof** is `EffectKind::PlayerHexproof`.
+- **Gift** (CR 702.174) is `CardDef.gift`, one of `cantrip_mechanics::gift`'s constants (a card, a Food, a tapped Fish, a
+  Treasure, an Octopus, an extra turn); the promise and the opponent are asked before the targets, the spell's effect reads
+  `item.gift.is_some()` and a target filter `gift::promised(q, asker.source)`. An instant or sorcery gives it as it
+  resolves (the core); a permanent lists `gift::trigger(text)`. Tokens a gift makes are listed in the card's `EXTRA`. **Player hexproof** is `EffectKind::PlayerHexproof`.
 - **Names and players**: `RequestKind::ChooseName` (a card name, answered `Answer::Name`) and `ChoosePlayer`; a name chosen as
   a permanent enters is `Entering.chosen_card`, kept in `Obj.marks.chosen_card`.
 - **Modal abilities** are `.modal(..)`; **playing from the top of a library for life** is

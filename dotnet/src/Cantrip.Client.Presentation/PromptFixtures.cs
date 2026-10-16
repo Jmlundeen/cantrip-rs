@@ -232,6 +232,7 @@ public static class PromptFixtures
         "may",
         "may-pay-life",
         "may-promise-gift",
+        "may-promise-gift-tapped-fish",
         "may-pay-life-to-look-again",
         "may-pay-life-to-return",
         "may-reveal-again",
@@ -1310,7 +1311,11 @@ public static class PromptFixtures
             case "may-promise-gift":
                 // Gift's optional additional cost (CR 702.174a), asked as the spell is announced.
                 Announce(view, "Dawn's Truce", "{1}{W}", "Gift a card (You may promise an opponent a gift as you cast this spell. If you do, they draw a card before its other effects.)", Viewer);
-                return new MayPromptMessage { Player = Viewer, Source = new ViewHandle(OnStack), Verb = "PromiseGift" };
+                return new MayPromptMessage { Player = Viewer, Source = new ViewHandle(OnStack), Verb = "PromiseGiftCard" };
+
+            case "may-promise-gift-tapped-fish":
+                Announce(view, "Into the Flood Maw", "{U}", "Gift a tapped Fish (You may promise an opponent a gift as you cast this spell. If you do, they create a tapped 1/1 blue Fish creature token before its other effects.)", Viewer);
+                return new MayPromptMessage { Player = Viewer, Source = new ViewHandle(OnStack), Verb = "PromiseGiftTappedFish" };
 
             case "may-pay-life":
                 return new MayPromptMessage

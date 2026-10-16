@@ -58,6 +58,9 @@ pub enum Event {
     CountersPut { object: ObjectId, kind: CounterKind, amount: i16, by: Option<PlayerId> },
     /// A permanent transformed (CR 701.28): its other face is up now.
     Transformed { object: ObjectId },
+    /// `player` gave a gift (CR 702.174c) to `to`: an instant or sorcery spell they control whose gift cost was paid
+    /// resolved, or the gift triggered ability of a permanent they control resolved.
+    GaveGift { player: PlayerId, to: PlayerId, gift: Gift },
     /// An Aura or Equipment stopped being attached to `from` (CR 701.3d): moved, unattached, or either one left.
     Unattached { attachment: ObjectId, from: ObjectId },
     /// A spell's characteristics as it became cast (CR 601.2i), recorded just before its `SpellCast`: what "the second
@@ -105,6 +108,7 @@ impl Event {
             | Event::AttackersDeclared { player, .. }
             | Event::TappedForMana { player, .. }
             | Event::BecameMonarch { player }
+            | Event::GaveGift { player, .. }
             | Event::Copied { player, .. }
             | Event::DoorUnlocked { player, .. }
             | Event::CoinFlipped { player, .. }
@@ -145,7 +149,7 @@ impl Event {
             | Event::Monstrous { permanent }
             | Event::DoorUnlocked { permanent, .. } => permanent == object,
             Event::Unattached { attachment, from } => attachment == object || from == object,
-            Event::LifeChange { .. } | Event::Searched { .. } | Event::AttackersDeclared { .. } | Event::StepBegan { .. } | Event::BecameMonarch { .. } | Event::ChosenAtRandom { .. } | Event::CoinFlipped { .. } | Event::DieRolled { .. } => false,
+            Event::LifeChange { .. } | Event::Searched { .. } | Event::AttackersDeclared { .. } | Event::StepBegan { .. } | Event::BecameMonarch { .. } | Event::GaveGift { .. } | Event::ChosenAtRandom { .. } | Event::CoinFlipped { .. } | Event::DieRolled { .. } => false,
         }
     }
 }
@@ -191,6 +195,7 @@ impl EventMask {
     pub const LOOKED: EventMask = EventMask(1 << 32);
     pub const MODES_CHOSEN: EventMask = EventMask(1 << 33);
     pub const DOOR_UNLOCKED: EventMask = EventMask(1 << 34);
+    pub const GAVE_GIFT: EventMask = EventMask(1 << 35);
 
     /// An event's kind as the history files it: every event has one. `of` is what triggers listen for, which leaves
     /// out the records no ability triggers on.
@@ -240,6 +245,7 @@ impl EventMask {
             Event::Countered { .. } => EventMask::COUNTERED,
             Event::Copied { .. } => EventMask::COPIED,
             Event::DoorUnlocked { .. } => EventMask::DOOR_UNLOCKED,
+            Event::GaveGift { .. } => EventMask::GAVE_GIFT,
             _ => EventMask(0),
         }
     }
