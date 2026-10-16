@@ -1,0 +1,66 @@
+# Tithing Blade // Consuming Sepulcher. "When this artifact enters, each opponent sacrifices a creature of their choice":
+# Bot2, with Llanowar Elves and an Ornithopter, chooses the Ornithopter. "Craft with creature {4}{B}" (CR 702.167a-b) takes
+# a creature you control or a creature card from your graveyard: Bot1's own Llanowar Elves, bolted into its graveyard, is
+# the one candidate - not the Mox Jet (an artifact, no creature) nor Bot2's Elves (an opponent's). The Blade returns as
+# Consuming Sepulcher, whose upkeep trigger has Bot2 lose 1 life and Bot1 gain 1.
+
+[Bot1 Deck]
+Swamp
+Mox Emerald
+Llanowar Elves
+Mox Ruby
+Lightning Bolt
+Tithing Blade
+Mox Jet
+Swamp
+Swamp
+Island x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Ornithopter
+Forest x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Tithing Blade.Cast
+Bot2.Choose(Ornithopter)
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Tithing Blade.Activate(Ability: Craft)
+! Bot1.Choose(Mox Jet)
+! Bot1.Choose(Bot2.Battlefield.Llanowar Elves)
+Bot1.Choose(Graveyard.Llanowar Elves)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Swamp#3.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Consuming Sepulcher.Colors = Black
+? Bot2.Battlefield = Forest; Llanowar Elves
+[T7 Bot1.Main1]
+
+[Expect]
+Bot1.Graveyard = Lightning Bolt
+Exile = Llanowar Elves
+Bot1.Life = 21
+Bot2.Life = 19
+Bot2.Graveyard = Ornithopter
