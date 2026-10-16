@@ -420,6 +420,29 @@ public sealed class TacticalPlayTests
         Assert.Equal(ActionKindView.IncreaseX, announced.Kind);
     }
 
+    [Fact]
+    public void A_spell_given_up_while_paying_is_not_cast_again_that_turn_under_its_new_handle()
+    {
+        // The cast is taken back (CR 601.2, 733.1) and the card is in the hand again, under a handle the seat has not
+        // seen: it is the same card, and trying it again would only be given up again - a whole step of it, before.
+        GameClient before = Seated([Land(1), InHand(10, "Goblin Guide", CardTypeView.Creature, 1, power: 2, toughness: 2)]);
+        GameClient after = Seated([Land(1), InHand(11, "Goblin Guide", CardTypeView.Creature, 1, power: 2, toughness: 2)]);
+
+        TacticalPlay bot = Bot();
+        Assert.IsType<TakeActionAnswer>(bot.Decide(before, Priority(Cast(10))));
+        TakeActionAnswer paid = Assert.IsType<TakeActionAnswer>(bot.Decide(before, new PayCostsPromptMessage
+        {
+            Player = Me,
+            Spell = Handle(10),
+            Total = "{R}",
+            Options = [new() { Kind = ActionKindView.CancelCasting }],
+        }));
+        Assert.Equal(ActionKindView.CancelCasting, paid.Kind);
+
+        Assert.IsType<PassAnswer>(bot.Decide(after, Priority(Cast(11))));
+        Assert.IsType<TakeActionAnswer>(Bot().Decide(after, Priority(Cast(11))));
+    }
+
     // --- Combat --------------------------------------------------------------------------------------------------------
 
     private static DeclareAttackersPromptMessage Attackers(params int[] eligible) => new()

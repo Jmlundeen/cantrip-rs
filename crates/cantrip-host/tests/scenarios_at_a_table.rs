@@ -254,3 +254,41 @@ fn every_scenario_passes_at_a_table_with_bot1_driven() {
     }
     assert!(failed.is_empty(), "{} of {played} scenarios fail at a table:\n{}", failed.len(), failed.join("\n"));
 }
+
+/// A spell being announced and paid for (CR 601.2a-h) is the caster's alone until it is cast (CR 601.2i), as the events
+/// already have it: Bot2's view, as each step sends it, shows no Lightning Bolt on the stack and no Mountain tapped while
+/// Bot1 is choosing its target and paying - a cast that is taken back is never seen - and shows the Bolt once it is cast.
+#[test]
+fn a_spell_being_announced_is_not_shown_to_the_opponent_until_it_is_cast() {
+    let text = "[Bot1 Deck]\nMountain\nLightning Bolt\nMountain x18\n\n[Bot2 Deck]\nIsland x20\n\n[Actions]\nBot1.Hand.Mountain.Play\nBot1.Hand.Lightning Bolt.Cast(Bot2)\nBot1.Battlefield.Mountain.Activate\n\n[Expect]\nBot2.Life = 17\n";
+    let mut session = Session::scenario(text, "announced-bolt", Vec::new(), &[1]).map_err(|r| r.detail).unwrap();
+    let mut step = session.step();
+    let stack = |view: &Value| -> i64 {
+        view["Zones"].as_array().unwrap().iter().find(|z| z["Kind"] == "Stack").map_or(0, |z| z["Count"].as_i64().unwrap())
+    };
+    let tapped = |view: &Value| view["Objects"].as_array().unwrap().iter().filter(|o| o["Tapped"] == Value::Bool(true)).count();
+    let (mut announcing, mut cast) = (0, 0);
+    for _ in 0..20_000 {
+        let (own, other) = (&step["Views"]["1"], &step["Views"]["2"]);
+        if stack(own) > 0 && stack(other) == 0 {
+            announcing += 1;
+            assert_eq!(tapped(other), 0, "Bot2 saw a Mountain tapped to pay for a spell still being cast");
+            assert_eq!(other["Players"][0]["HandCount"], 6, "Bot2 saw the Bolt leave Bot1's hand");
+        }
+        if stack(other) > 0 {
+            cast += 1;
+        }
+        let scenario = &step["Scenario"];
+        if scenario["Verdict"].is_object() {
+            assert_eq!(scenario["Verdict"]["Passed"], Value::Bool(true), "{}", scenario["Verdict"]["Report"]);
+            break;
+        }
+        let expected = &scenario["Expected"];
+        let answer: AnswerPayload = serde_json::from_value(expected["Answer"].clone()).unwrap();
+        let id = expected["RequestId"].as_u64().unwrap() as u32;
+        let seat = expected["Seat"].as_i64().unwrap() as i32;
+        step = session.answer(id, seat, &answer).map_err(|r| r.detail).unwrap();
+    }
+    assert!(announcing > 0, "Bot1 was never asked anything while the Bolt was being announced");
+    assert!(cast > 0, "Bot2 never saw the Bolt on the stack once it was cast");
+}

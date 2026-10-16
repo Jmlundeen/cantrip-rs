@@ -65,6 +65,15 @@ public sealed partial class TacticalPlay : IAutoPlayer
     /// <summary>The action last taken at priority, and the board as it stood, to tell whether it did anything.</summary>
     private ((int Source, ActionKindView Kind, int Ability) Key, long Board)? _pending;
 
+    /// <summary>The name of the card whose action is <see cref="_pending"/>.</summary>
+    private string? _pendingName;
+
+    /// <summary>
+    /// Spells given up while paying this turn, by card name: the rewind gives the card back to the hand under a new
+    /// handle, so <see cref="_spent"/> would not know it again.
+    /// </summary>
+    private readonly HashSet<(string Name, ActionKindView Kind, int Ability)> _givenUp = [];
+
     /// <summary>Whether the spell being paid for is to be kicked.</summary>
     private bool _kick;
 
@@ -225,6 +234,7 @@ public sealed partial class TacticalPlay : IAutoPlayer
             _settled = _turn < 0 ? null : _seen;
             _turn = view.Turn;
             _spent.Clear();
+            _givenUp.Clear();
             _answered.Clear();
             _copies = 0;
         }

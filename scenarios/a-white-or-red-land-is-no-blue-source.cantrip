@@ -1,0 +1,29 @@
+# A land with "{T}: Add {W}" and "{T}: Add {R}" makes one mana that is white or red - never blue. Beside a Plains,
+# Sunbillow Verge pays Lightning Helix's {R}{W}, but Consider's {U} is not offered to cast: the castability judgement
+# matches each colored symbol to a source that can make that color (CR 106.1, 601.2g), not to "a mana of any color".
+
+[Bot1 Deck]
+Sunbillow Verge
+Plains
+Consider
+Lightning Helix
+Swamp x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Sunbillow Verge.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+! Bot1.Hand.Consider.Cast
+Bot1.Battlefield.Sunbillow Verge.Activate(Ability: {R})
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Lightning Helix.Cast(Bot2)
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Lightning Helix
+Bot1.Hand = Consider; Swamp; Swamp; Swamp; Swamp
+Bot1.Life = 23
+Bot2.Life = 17

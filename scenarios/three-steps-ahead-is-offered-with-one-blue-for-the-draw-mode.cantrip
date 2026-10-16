@@ -1,0 +1,33 @@
+# Spree (CR 702.172a): Three Steps Ahead costs {U} plus each chosen mode's cost. With an Island and two Forests, the
+# {1}{U} counter mode cannot be paid (one blue), but {U} plus the {2} draw mode can, so the spell is offered: whether it
+# can be cast is judged on the cheapest mode the player can pay for, not the cheapest by mana value.
+
+[Bot1 Deck]
+Island
+Forest
+Forest
+Three Steps Ahead
+Forest x3
+Island x2
+Forest x11
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Three Steps Ahead.Cast
+Bot1.Modes(Draw two cards)
+Bot1.Choose(Island)
+
+[Expect]
+Turn = 5
+Bot1.Graveyard = Three Steps Ahead; Island
+Bot1.Mana = 

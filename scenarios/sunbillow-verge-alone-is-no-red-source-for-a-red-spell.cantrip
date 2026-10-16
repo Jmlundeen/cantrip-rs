@@ -1,0 +1,27 @@
+# "{T}: Add {R}. Activate only if you control a Mountain or a Plains" (CR 602.5b): with the Verge its only land, Bot1
+# has no red mana, so Stadium Headliner's {R} is not offered to cast - the castability judgement asks the ability's
+# condition as activating it does (a bot that was offered it cast, failed to pay and retried for the whole step). With
+# a Plains beside it the {R} is there and the Headliner is cast.
+
+[Bot1 Deck]
+Sunbillow Verge
+Stadium Headliner
+Plains
+Swamp x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Sunbillow Verge.Play
+! Bot1.Hand.Stadium Headliner.Cast
+[T3 Bot1.Main1]
+! Bot1.Hand.Stadium Headliner.Cast
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Sunbillow Verge.Activate(Ability: {R})
+Bot1.Hand.Stadium Headliner.Cast
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Plains; Stadium Headliner; Sunbillow Verge
+Bot1.Hand = Swamp; Swamp; Swamp; Swamp; Swamp

@@ -32,6 +32,10 @@ A **step** is what one advance of the game produced:
 ```
 
 `Requests` are every question outstanding, not only new ones; request ids are the host's and never reused within a game.
+A run in progress - a spell or ability being announced and paid for (CR 601.2a-h), a resolution waiting on a question -
+is told to nobody until it completes, since it may yet be taken back: its events wait, and every seat but the one
+answering is sent the view it was last sent. An opponent sees no card leave the hand, no land tapped and no spell on the
+stack until the spell is cast (CR 601.2i), and nothing at all of a cast that is given up.
 Each event object carries a `"Sequence"` beside its `$type`, the host's game-wide event number, the same for every seat
 told of it: it is what `EventsMessage.Sequences`, `AbilityResolvedEvent.First` and the log's line sharing run on. A
 request may carry a `"Presentation"` (`PromptPresentationContext`); without one the C# side derives what it can from the

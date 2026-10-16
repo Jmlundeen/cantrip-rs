@@ -8,7 +8,9 @@
 //! A frame that asks a question is re-run from its start once it is answered, and its log is cut back to where the run
 //! began (`Game::answer`). So only the log up to the start of the run that is waiting is published; the entries of a
 //! run in progress (a spell being announced and paid for) appear when it completes, which is also what the C# engine
-//! tells: nothing about an announcement is told until the spell is paid for.
+//! tells: nothing about an announcement is told until the spell is paid for. The views say no more than the events: while
+//! a run is in progress, every seat but the one answering keeps the view it was last sent, so an opponent sees no spell
+//! being announced, no land tapped to pay for it, and nothing when a cast that cannot be paid for is taken back.
 
 use std::collections::{HashMap, HashSet};
 use std::panic::AssertUnwindSafe;
@@ -53,6 +55,8 @@ pub struct Session {
     told: Vec<Proto>,
     /// What each seat is being shown beyond its zones, as of the last step.
     extra: Vec<HashSet<ObjectId>>,
+    /// The view each seat was last sent: what a seat other than the one answering keeps while a run is in progress.
+    sent: Vec<Option<PlayerView>>,
     /// The mana abilities that can still be taken back (`cantrip_engine::undo`).
     undoable: Undo<Told>,
     /// A scenario being played at this table (`Session::scenario`), or none for a game dealt from decks.
@@ -131,6 +135,7 @@ impl Session {
             conceded: vec![false; seats],
             told: Vec::new(),
             extra: vec![HashSet::new(); seats],
+            sent: vec![None; seats],
             undoable: Undo::default(),
             scenario: None,
             game,
@@ -175,6 +180,7 @@ impl Session {
             conceded: vec![false; seats],
             told: Vec::new(),
             extra: vec![HashSet::new(); seats],
+            sent: vec![None; seats],
             undoable: Undo::default(),
             scenario: Some(Scenario {
                 scripted,
@@ -323,8 +329,17 @@ impl Session {
     }
 
     fn view_for(&mut self, p: PlayerId, mentioned: &HashSet<ObjectId>) -> PlayerView {
+        // A run in progress is the answering player's alone (see the module doc).
+        if self.publishable() < self.game.log.len()
+            && self.pending().is_some_and(|r| r.player != p)
+            && let Some(sent) = &self.sent[p.index()]
+        {
+            return sent.clone();
+        }
         let extra = self.extra[p.index()].clone();
-        player_view(&self.game, p, &mut self.handles[p.index()], &self.names, &self.conceded, &extra, mentioned)
+        let view = player_view(&self.game, p, &mut self.handles[p.index()], &self.names, &self.conceded, &extra, mentioned);
+        self.sent[p.index()] = Some(view.clone());
+        view
     }
 
     pub fn view(&mut self, seat_number: i32) -> Result<PlayerView, Rejection> {

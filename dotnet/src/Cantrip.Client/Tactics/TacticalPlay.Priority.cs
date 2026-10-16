@@ -99,7 +99,7 @@ public sealed partial class TacticalPlay
             int needed = CardReading.Crew(option.Description);
 
             if (option.Kind != ActionKindView.ActivateAbility || needed <= 0
-                || _spent.Contains((option.Source.Value, option.Kind, option.AbilityIndex))
+                || Spent(client, option)
                 || client.Object(option.Source) is not { Zone: ZoneKindView.Battlefield } vehicle
                 || IsCreature(vehicle) || vehicle.Tapped || vehicle.Power is not > 0)
             {
@@ -490,6 +490,11 @@ public sealed partial class TacticalPlay
         return Take(view, first);
     }
 
+    /// <summary>Whether the option was tried this turn to no effect, or is a spell given up while paying for it.</summary>
+    private bool Spent(GameClient client, ActionOptionMessage option) =>
+        _spent.Contains((option.Source.Value, option.Kind, option.AbilityIndex))
+        || (_givenUp.Count > 0 && client.Object(option.Source) is { } card && _givenUp.Contains((card.Name, option.Kind, option.AbilityIndex)));
+
     private TakeActionAnswer Take(PlayerView view, Candidate candidate)
     {
         ActionOptionMessage option = candidate.Option;
@@ -497,6 +502,7 @@ public sealed partial class TacticalPlay
         _kick = candidate.Kick;
         _webSlinging = AutoPlay.IsWebSlinging(option);
         _pending = ((option.Source.Value, option.Kind, option.AbilityIndex), Board(view));
+        _pendingName = view.Objects.FirstOrDefault(card => card.Handle == option.Source)?.Name;
 
         TakeActionAnswer answer = AutoPlay.Answer(option);
         answer.Targets = candidate.Targets;
@@ -510,7 +516,7 @@ public sealed partial class TacticalPlay
 
         foreach (ActionOptionMessage option in prompt.Options)
         {
-            if (_spent.Contains((option.Source.Value, option.Kind, option.AbilityIndex))
+            if (Spent(client, option)
                 || client.Object(option.Source) is not { } card
                 || (!option.Affordable && !ByLife(client, view, option, card, budget)))
             {
@@ -1627,7 +1633,7 @@ public sealed partial class TacticalPlay
                 || option.Kind is not (ActionKindView.CastSpell or ActionKindView.ActivateAbility)
                 || option.Produces.Count > 0 || option.ProducesOfAnyOneColor > 0 || option.ProducesOfAnyColorEach > 0
                 || option.SacrificeCandidates.Count > 0
-                || _spent.Contains((option.Source.Value, option.Kind, option.AbilityIndex))
+                || Spent(client, option)
                 || client.Object(option.Source) is not { } card)
             {
                 continue;
@@ -1850,6 +1856,25 @@ public sealed partial class TacticalPlay
     /// </para>
     /// </summary>
     private TakeActionAnswer Pay(GameClient client, PayCostsPromptMessage prompt)
+    {
+        TakeActionAnswer answer = Paid(client, prompt);
+
+        // A spell given up while paying is not tried again this turn: the rewind can leave the board reading otherwise
+        // than before it (a handle minted afresh), so the check at the next priority cannot be what stops the retrying.
+        if (answer.Kind == ActionKindView.CancelCasting && _pending is { } pending)
+        {
+            _spent.Add(pending.Key);
+
+            if (_pendingName is { } name)
+            {
+                _givenUp.Add((name, pending.Key.Kind, pending.Key.Ability));
+            }
+        }
+
+        return answer;
+    }
+
+    private TakeActionAnswer Paid(GameClient client, PayCostsPromptMessage prompt)
     {
         TakeActionAnswer answer = Paying(client, prompt);
 

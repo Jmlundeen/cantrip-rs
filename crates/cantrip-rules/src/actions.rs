@@ -620,11 +620,6 @@ pub fn mana_ability_options(cx: &Cx, player: PlayerId, options: &mut Vec<ActionO
             {
                 continue;
             }
-            if let Some(condition) = def.condition
-                && !condition(cx, &Asker { source: id, controller: player })
-            {
-                continue;
-            }
             // "Activate only if ..." (CR 602.5b), as Fanatic of Rhonas's ferocious mana.
             if let Some(condition) = def.condition
                 && !condition(cx, &Asker { source: id, controller: player })
@@ -1078,10 +1073,22 @@ fn least_cost(cx: &Cx, available: &Available, player: PlayerId, card: ObjectId, 
     if let Some(modal) = def.modal {
         let mut costs: Vec<ManaCost> = modal.modes.iter().map(|m| m.cost).collect();
         costs.sort_by_key(|c| c.mana_value());
+        // One mode to choose: the cheapest the player could pay for - Three Steps Ahead's {3} when its {1}{U} would need
+        // a second blue.
+        if modal.min <= 1
+            && let Some(i) = costs.iter().position(|&c| available.covers_for(&finish(cx, available, player, card, def, add_cost(cost, c), targets), &spell_kind(cx, available, card, def)))
+        {
+            costs.swap(0, i);
+        }
         for c in costs.into_iter().take(modal.min.max(1) as usize) {
             cost = add_cost(cost, c);
         }
     }
+    finish(cx, available, player, card, def, cost, targets)
+}
+
+/// `least_cost`'s Phyrexian symbols paid with life where the life total allows, and the cost changes applied.
+fn finish(cx: &Cx, available: &Available, player: PlayerId, card: ObjectId, def: &CardDef, mut cost: ManaCost, targets: &[Target]) -> ManaCost {
     let mut life = cx.s().player(player).life;
     for (i, n) in cost.phyrexian.into_iter().enumerate() {
         for _ in 0..n {
@@ -1123,8 +1130,9 @@ pub fn can_afford(cx: &Cx, player: PlayerId, source: ObjectId, cost: &ManaCost) 
 /// The mana a player has to pay with: the pool and what their mana abilities add, summed once for every cost judged.
 pub struct Available {
     fixed: [u8; 6],
-    /// Mana of a color to be chosen.
-    flex: u32,
+    /// Mana of a type to be chosen, by the mana types it may be (a bit for each `Mana`, W U B R G C): a land with
+    /// "{T}: Add {W}" and "{T}: Add {R}" is one mana that is white or red, never blue.
+    flex: [u32; 64],
     /// Some mana ability's yield is not stated: anything may be payable.
     unknown: bool,
     /// Mana that the mana abilities with a mana cost of their own (Chromatic Star's {1}) must be paid first: it is
@@ -1172,7 +1180,7 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
             add_available(&mut restricted, restriction, pool.0, 0);
         }
     }
-    let mut flex: u32 = 0;
+    let mut flex = [0u32; 64];
     let mut consume: u32 = 0;
     // Mana abilities of the player's own (CR 605.1a): paid with life, as often as the life total allows (CR 119.4).
     for effect in cx.s().effects.iter().filter(|e| matches!(e.kind, EffectKind::PlayerManaAbility(_)) && e.controller == player) {
@@ -1202,6 +1210,8 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
         // The one ability that is not restricted, when there is exactly one: its yield is stated, not any color.
         let mut unrestricted: Option<&ActivatedDef> = None;
         let mut unrestricted_count = 0;
+        // The mana types the abilities that are not restricted could add between them.
+        let mut types = 0u8;
         for (index, ability) in chars.abilities().enumerate() {
             let Some(def) = activated(cx, ability) else { continue };
             if !def.is_mana_ability()
@@ -1209,6 +1219,12 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
                 || limit_reached(cx, id, index, def)
                 || !can_pay_other(cx, id, player, &def.cost)
                 || static_rules::activation_barred(cx, &forbidders, id, def)
+            {
+                continue;
+            }
+            // "Activate only if ..." (CR 602.5b): a Verge's second color is not there without its land type.
+            if let Some(condition) = def.condition
+                && !condition(cx, &Asker { source: id, controller: player })
             {
                 continue;
             }
@@ -1221,6 +1237,7 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
                     unrestricted = Some(def);
                     unrestricted_count += 1;
                     widest_free = widest_free.max(adds);
+                    types |= yield_types(cx, id, player, def);
                 }
                 Some(kind) => {
                     let kind = restriction_from(cx, id, kind);
@@ -1243,7 +1260,7 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
                 for m in 0..6 {
                     fixed[m] += def.adds.0[m];
                 }
-                flex += def.adds_any as u32;
+                flex[any_types(cx, id, player, def) as usize] += def.adds_any as u32;
             }
             (1, Some(def)) if let Some(kind) = def.restricted => {
                 add_available(&mut restricted, restriction_from(cx, id, kind), def.adds.0, def.adds_any as u32);
@@ -1252,7 +1269,7 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
                 for m in 0..6 {
                     fixed[m] += def.adds.0[m];
                 }
-                flex += def.adds_any as u32;
+                flex[any_types(cx, id, player, def) as usize] += def.adds_any as u32;
             }
             _ => {
                 match unrestricted {
@@ -1260,9 +1277,9 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
                         for m in 0..6 {
                             fixed[m] += def.adds.0[m];
                         }
-                        flex += def.adds_any as u32;
+                        flex[any_types(cx, id, player, def) as usize] += def.adds_any as u32;
                     }
-                    _ => flex += widest_free,
+                    _ => flex[types as usize] += widest_free,
                 }
                 for (kind, n) in widest {
                     add_available(&mut restricted, kind, [0; 6], n);
@@ -1316,7 +1333,7 @@ impl Available {
                 for m in 0..6 {
                     with.fixed[m] = with.fixed[m].saturating_add(fixed[m]);
                 }
-                with.flex += flex;
+                with.flex[ANY_COLOR as usize] += flex;
             }
         }
         with.covers(cost)
@@ -1328,7 +1345,7 @@ impl Available {
         if self.unknown {
             return u16::MAX;
         }
-        let total = self.fixed.iter().map(|&n| n as u32).sum::<u32>() + self.flex;
+        let total = self.fixed.iter().map(|&n| n as u32).sum::<u32>() + self.flex.iter().sum::<u32>();
         total.saturating_sub(self.consume).min(u16::MAX as u32) as u16
     }
 
@@ -1337,12 +1354,15 @@ impl Available {
         if self.unknown || cost.mana_value() == 0 {
             return true;
         }
-        let (fixed, flex) = (self.fixed, self.flex);
+        let fixed = self.fixed;
+        let flex: u32 = self.flex.iter().sum();
         // What a mana ability costs is paid from what is already there.
         if flex > 0 && (fixed.iter().map(|&n| n as u32).sum::<u32>()) < self.consume {
             return false;
         }
         let mut left = fixed;
+        // The symbols the fixed mana leaves unpaid, by the mana types that could pay each.
+        let mut unpaid = [0u32; 64];
         let mut flex_needed: u32 = 0;
         for m in 0..6 {
             let need = cost.symbols[m];
@@ -1350,9 +1370,7 @@ impl Available {
             let used = need.min(have);
             left[m] -= used;
             if need > used {
-                if m == Mana::C as usize {
-                    return false;
-                }
+                unpaid[1 << m] += (need - used) as u32;
                 flex_needed += (need - used) as u32;
             }
         }
@@ -1362,14 +1380,56 @@ impl Available {
             } else if left[*b as usize] > 0 {
                 left[*b as usize] -= 1;
             } else {
+                unpaid[(1 << *a as usize) | (1 << *b as usize)] += 1;
                 flex_needed += 1;
             }
         }
-        if flex_needed > flex {
+        if flex_needed > 0 && !flex_pays(&unpaid, &self.flex) {
             return false;
         }
         let spare: u32 = (left.iter().map(|&n| n as u32).sum::<u32>() + (flex - flex_needed)).saturating_sub(self.consume);
         spare >= cost.generic as u32
+    }
+}
+
+/// `ColorSet`'s five colors as mana types: what "mana of any color" may be.
+const ANY_COLOR: u8 = 0b11111;
+
+/// Whether the mana of a type to be chosen in `flex` could pay the symbols in `unpaid`, both counted by the mana types
+/// each may be. Hall's condition (each symbol matched to a mana that may pay it): for every set of types, the symbols
+/// payable only within it are no more than the mana that can be one of them.
+fn flex_pays(unpaid: &[u32; 64], flex: &[u32; 64]) -> bool {
+    let needs: Vec<usize> = (1..64).filter(|&m| unpaid[m] > 0).collect();
+    let sources: Vec<usize> = (1..64).filter(|&m| flex[m] > 0).collect();
+    for set in 1..64usize {
+        let need: u32 = needs.iter().filter(|&&m| m & !set == 0).map(|&m| unpaid[m]).sum();
+        if need > 0 && need > sources.iter().filter(|&&m| m & set != 0).map(|&m| flex[m]).sum::<u32>() {
+            return false;
+        }
+    }
+    true
+}
+
+/// The mana types a mana ability could add (a bit for each `Mana`).
+fn yield_types(cx: &Cx, id: ObjectId, player: PlayerId, def: &ActivatedDef) -> u8 {
+    let mut types = 0u8;
+    for m in 0..6 {
+        if def.adds.0[m] > 0 {
+            types |= 1 << m;
+        }
+    }
+    if def.adds_any > 0 {
+        types |= any_types(cx, id, player, def);
+    }
+    types
+}
+
+/// The colors a mana ability's "mana of any color" may be: those it names, or all five.
+fn any_types(cx: &Cx, id: ObjectId, player: PlayerId, def: &ActivatedDef) -> u8 {
+    match def.colors_from {
+        Some(from) => from(cx, &Asker { source: id, controller: player }).0,
+        None if def.colors.is_empty() => ANY_COLOR,
+        None => def.colors.0,
     }
 }
 
