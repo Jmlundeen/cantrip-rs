@@ -1,0 +1,64 @@
+# Veyran, Voice of Duality's "copying an instant or sorcery spell" is a copy of a spell (CR 707.10); copying a card in
+# another zone is not (the rulings: "Some effects instruct you to copy an instant or sorcery card in a zone other than the
+# stack. These copies do not cause magecraft abilities to trigger. However, ... casting the copy will cause magecraft
+# abilities to trigger"). Bot1 Bolts Bot2 on turn 1 with Veyran out (magecraft twice). On turn 5 Uldaros Theorix enters,
+# exiles that Lightning Bolt from the graveyard, copies it and casts the copy at Bot2: magecraft triggers twice, for the
+# cast - not four times - and Veyran is a 4/4.
+# Turn 1: Mox Sapphire, Mox Ruby and Mox Jet pay Veyran; the Volcanic Island pays the Bolt. Turn 5: Mox Sapphire, Mox Jet,
+# both Swamps, Mox Ruby and the Volcanic Island pay Uldaros' {3}{U}{B}{B}.
+
+[Bot1 Deck]
+Volcanic Island
+Mox Ruby
+Mox Sapphire
+Mox Jet
+Veyran, Voice of Duality
+Lightning Bolt
+Uldaros Theorix
+Swamp
+Swamp
+Island x12
+
+[Bot2 Deck]
+Plains x16
+
+[Actions]
+Bot1.Hand.Volcanic Island.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Veyran, Voice of Duality.Cast
+Bot1.Pass
+Bot1.Battlefield.Volcanic Island.Activate(Ability: {R})
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Triggers(Veyran, Voice of Duality; Veyran, Voice of Duality)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Volcanic Island.Activate(Ability: {R})
+Bot1.Hand.Uldaros Theorix.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Lightning Bolt)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Lightning Bolt)
+Bot1.Target(Bot2)
+Bot1.Triggers(Veyran, Voice of Duality; Veyran, Voice of Duality)
+? Stack.Count = 3
+[T5 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot2.Life = 14
+Exile = Lightning Bolt
+Bot1.Battlefield.Veyran, Voice of Duality.Power = 4

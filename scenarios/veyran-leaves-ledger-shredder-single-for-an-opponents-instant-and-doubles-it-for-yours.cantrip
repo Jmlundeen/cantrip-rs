@@ -1,0 +1,70 @@
+# Veyran, Voice of Duality doubles what YOU casting an instant or sorcery triggers (CR 603.2d), even an ability of yours
+# that any player's spell triggers - but not when an opponent casts it. Bot1's Ledger Shredder ("Whenever a player casts
+# their second spell each turn, this creature connives") is out with Veyran from turn 1. On turn 2 Bot2 casts Mox Ruby, then
+# a Lightning Bolt at Bot1, its second spell: the Shredder triggers once (one card drawn and one discarded). On turn 3 Bot1
+# casts two Lightning Bolts at Bot2: the second triggers the Shredder twice, and each Bolt triggers Veyran's magecraft
+# twice (Veyran 6/6). Every card drawn by conniving is an Island, discarded: no counter.
+# Turn 1: Black Lotus (UUU) pays the Shredder's {1}{U} and Veyran's {U}; Mox Ruby its {R} and the Volcanic Island its {1}.
+# Turn 3: Mox Ruby and the Volcanic Island pay the Bolts. Bot1's graveyard: the Lotus, three Islands, two Bolts.
+
+[Bot1 Deck]
+Volcanic Island
+Black Lotus
+Mox Sapphire
+Mox Ruby
+Ledger Shredder
+Veyran, Voice of Duality
+Lightning Bolt
+Island
+Lightning Bolt
+Island x12
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt
+Mountain x12
+
+[Actions]
+Bot1.Hand.Volcanic Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Ledger Shredder.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Volcanic Island.Activate(Ability: {R})
+Bot1.Hand.Veyran, Voice of Duality.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+Bot1.Choose(Island)
+[T2 Bot2.Main2]
+? Bot1.Graveyard.Count = 2
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Triggers(Veyran, Voice of Duality; Veyran, Voice of Duality)
+Bot1.Battlefield.Volcanic Island.Activate(Ability: {R})
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Triggers(Veyran gets; Veyran gets; connives; connives)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Island)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Island)
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 17
+Bot2.Life = 14
+Bot1.Graveyard.Count = 6
+Bot1.Battlefield.Veyran, Voice of Duality.Power = 6
+Bot1.Battlefield.Ledger Shredder.Counters.PlusOnePlusOne = (absent)

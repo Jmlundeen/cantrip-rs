@@ -1,0 +1,40 @@
+# Veyran, Voice of Duality: "If you casting or copying an instant or sorcery spell causes a triggered ability of a
+# permanent you control to trigger, that ability triggers an additional time" (CR 603.2d) - a sorcery as much as an
+# instant, nothing copied. Bot1 casts Duress, a sorcery, with Veyran out: its magecraft ("Veyran gets +1/+1 until end of
+# turn") triggers twice and Veyran is a 4/4. Bot2's hand is all lands, so Duress takes nothing.
+# Mana: Mox Sapphire, Mox Ruby and Mox Jet pay Veyran's {1}{U}{R}; Black Lotus pays Duress.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Veyran, Voice of Duality
+Duress
+Island
+Island x12
+
+[Bot2 Deck]
+Swamp x16
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Veyran, Voice of Duality.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Duress.Cast(Bot2)
+Bot1.Triggers(Veyran, Voice of Duality; Veyran, Voice of Duality)
+? Stack.Count = 3
+[T1 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Duress; Black Lotus
+Bot1.Battlefield.Veyran, Voice of Duality.Power = 4
+Bot1.Battlefield.Veyran, Voice of Duality.Toughness = 4
