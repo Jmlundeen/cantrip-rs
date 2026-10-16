@@ -1,0 +1,41 @@
+# Bushwhack's first mode on turn 1: search for a basic land card. Tolarian Academy (a nonbasic land) is refused, the
+# Island is taken, revealed, and put into the hand; the library was shuffled (CR 701.23). Nothing but basic lands
+# qualifies, though the library holds a Mox Emerald and a creature too.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Elvish Mystic
+Bushwhack
+Forest
+Forest
+Forest
+Tolarian Academy
+Island
+Mox Emerald
+Forest x12
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Snakeskin Veil
+Island
+Island
+Island
+Island x13
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Bushwhack.Cast
+Bot1.Modes(1)
+! Bot1.Search(Tolarian Academy)
+! Bot1.Search(Mox Emerald)
+Bot1.Search(Island)
+? Bot1.Revealed = Island
+
+[Expect]
+Bot1.Hand = Mox Emerald; Elvish Mystic; Forest; Forest; Forest; Island
+Bot1.Graveyard = Bushwhack
+Bot1.Library.Count = 14

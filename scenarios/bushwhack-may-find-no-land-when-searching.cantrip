@@ -1,0 +1,37 @@
+# "Search" may come up empty (CR 701.23b): Bot1 declines to take any land, the Island stays in the library, and nothing is
+# put into the hand.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Elvish Mystic
+Bushwhack
+Forest
+Forest
+Forest
+Tolarian Academy
+Island
+Mox Emerald
+Forest x12
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Snakeskin Veil
+Island
+Island
+Island
+Island x13
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Bushwhack.Cast
+Bot1.Modes(1)
+Bot1.Search()
+
+[Expect]
+Bot1.Hand = Mox Emerald; Elvish Mystic; Forest; Forest; Forest
+Bot1.Graveyard = Bushwhack
+Bot1.Library.Count = 15

@@ -1,0 +1,38 @@
+# The fight mode needs two targets: with no creature on Bot2's side it can't be chosen (`! Bot1.Modes(2)`), though
+# the Mystic is there; the other mode is. The positive control is the fight scenario, where Bot2 has a creature.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Elvish Mystic
+Bushwhack
+Forest
+Forest
+Forest
+Forest x13
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Snakeskin Veil
+Island
+Island
+Island
+Island x13
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Bushwhack.Cast
+! Bot1.Modes(2)
+Bot1.Modes(1)
+Bot1.Search(Forest)
+
+[Expect]
+Bot1.Graveyard = Bushwhack
+Bot1.Battlefield = Forest; Mox Emerald; Elvish Mystic
