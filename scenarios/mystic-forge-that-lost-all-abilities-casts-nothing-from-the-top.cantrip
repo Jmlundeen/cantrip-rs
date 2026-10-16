@@ -1,0 +1,45 @@
+# Mystic Forge's "you may cast artifact spells and colorless spells from the top of your library" is a static ability (CR 604),
+# gone once it loses all abilities (CR 613.1f). Bot1 casts Mox Emerald off the top (the positive control), then Oko, Thief
+# of Crowns makes the Forge a green Elk with no abilities: the Mox Pearl now on top is no longer offered.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mystic Forge
+Mox Sapphire
+Mox Ruby
+Oko, Thief of Crowns
+Island
+Mox Emerald
+Mox Pearl
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Mystic Forge.Cast
+Bot1.Pass
+Bot1.Library.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Oko, Thief of Crowns.Cast
+Bot1.Pass
+Bot1.Battlefield.Oko, Thief of Crowns.Activate(Mystic Forge; Ability: Elk)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mystic Forge.Subtypes = Elk
+! Bot1.Library.Mox Pearl.Cast
+
+[Expect]
+Bot1.Battlefield.Mox Emerald.Tapped = true

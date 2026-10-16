@@ -1,0 +1,51 @@
+# Icetill Explorer's "an additional land" and "play lands from your graveyard" are static abilities (CR 305.2, 604), gone once it
+# loses all abilities (CR 613.1f). Turn 1 is the positive control: Bot1 plays a Forest and then the milled Forest out of its
+# graveyard as the second land. Bot2's The Wondrous Wasp then strips the Explorer on turn 2, and on turn 3 Bot1 plays one
+# Island from its hand (its landfall, an ability too, mills nothing) and is offered neither another land from the hand nor the milled Island from the graveyard.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Black Lotus
+Icetill Explorer
+Forest
+Island
+Island
+Forest
+Island x12
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+The Wondrous Wasp
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Icetill Explorer.Cast
+Bot1.Pass
+Bot1.Hand.Forest.Play
+Bot1.Graveyard.Forest.Play
+? Bot1.LandsPlayed = 2
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.The Wondrous Wasp.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Target(Icetill Explorer)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+! Bot1.Hand.Island.Play
+! Bot1.Graveyard.Island.Play
+
+[Expect]
+Bot1.LandsPlayed = 1
+Bot1.Graveyard.Count = 3
