@@ -2,16 +2,9 @@ use cantrip_api::*;
 use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
 
-fn return_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(id) = targets::object(g, item, 0) {
-        g.return_to_hand(&[id]);
-    }
-    Ok(())
-}
-
 /// The Adventure (CR 715): Return target nonland permanent an opponent controls to its owner's hand.
 pub static PETTY_THEFT: CardDef = CardDef {
-    spell: spell(&[targets::NONLAND_PERMANENT_AN_OPPONENT_CONTROLS], return_it),
+    spell: spell(&[targets::NONLAND_PERMANENT_AN_OPPONENT_CONTROLS], cantrip_mechanics::effects::return_first_target_to_hand),
     ..oracle::PETTY_THEFT
 };
 

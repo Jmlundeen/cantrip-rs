@@ -203,6 +203,17 @@ pub fn return_spell_or_permanent_to_hand(g: &mut dyn Game, object: ObjectId) {
     }
 }
 
+/// "Return target [permanent] to its owner's hand" (CR 400.3): the ability's or
+/// spell's first target, nothing at all if it is no longer a legal target (CR 608.2b). A token that is returned ceases to
+/// exist (CR 111.7). Aether Spellbomb, Banishing Knack, Karakas, Mystic Confluence, Brazen Borrower's Petty Theft and
+/// Bounce Off print it.
+pub fn return_first_target_to_hand(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if let Some(permanent) = crate::targets::object(g, item, 0) {
+        g.return_to_hand(&[permanent]);
+    }
+    Ok(())
+}
+
 /// "[This spell] deals `n` damage to each creature" (Pyroclasm, Fiery Confluence, Avengers Disassembled): one damage event
 /// for every creature on the battlefield as the effect is carried out (CR 608.2c), dealt simultaneously (CR 120.2, 603.2c).
 pub fn damage_each_creature(g: &mut dyn Game, item: &StackItem, n: u16) {

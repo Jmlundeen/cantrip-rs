@@ -9,19 +9,11 @@ fn counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// Return target creature to its owner's hand.
-fn bounce(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(creature) = targets::object(g, item, 0) {
-        g.return_to_hand(&[creature]);
-    }
-    Ok(())
-}
-
 /// Choose three; you may choose the same mode more than once (CR 700.2d).
 static MODAL: ModalDef = modes(&[
     mode(counter, "Counter target spell unless its controller pays {3}.")
         .targets(&[targets::SPELL]),
-    mode(bounce, "Return target creature to its owner's hand.")
+    mode(effects::return_first_target_to_hand, "Return target creature to its owner's hand.")
         .targets(&[targets::CREATURE]),
     mode(|g, item| effects::draw(g, item, 1), "Draw a card."),
 ])
