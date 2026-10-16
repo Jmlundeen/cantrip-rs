@@ -354,6 +354,8 @@ kind, place it where the action could otherwise be taken, with a wait or `BotN.P
 - `BotN.Battlefield.<Name>.Counters.PlusOnePlusOne` (or `.Lifelink`, any `CounterKind`), for a permanent that has
   counters of that kind
 - `BotN.Battlefield.<Name>.Keywords` (`Indestructible; Lifelink`, sorted), computed keywords, absent when it has none
+- `BotN.Battlefield.<Name>.HexproofFrom` (`Black; White`, `Monocolored`, sorted), the qualities of its "hexproof from"
+  abilities (CR 702.11d), printed or granted, absent when it has none
 - `BotN.Battlefield.<Name>.Monstrous`, `true` for a monstrous permanent (CR 701.37b) and absent otherwise
 - `BotN.Battlefield.<Name>.Saddled`, `true` for a permanent saddled this turn (CR 702.171b) and absent otherwise
 - `BotN.Battlefield.<Name>.Prepared`, `true` for a prepared permanent (CR 722.3a) and absent otherwise; while it is

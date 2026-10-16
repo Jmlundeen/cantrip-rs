@@ -338,6 +338,19 @@ Helitrooper and Fervent Champion ("equip abilities you activate that target this
 Blade ("{1} less for each color of the creature it targets") and Ghostfire Blade ("{2} less if it targets a colorless
 creature") read them.
 
+### Hexproof from a quality
+
+"Hexproof from [quality]" (CR 702.11d) is `Chars::hexproof_from`, a `HexproofFrom` bitset of qualities: the five colors,
+monocolored, multicolored and card types. Printed, it is `CardDef::hexproof_from` (part of the copiable values; a color
+word in it changes with the text, CR 612.2); a static ability gives it in layer 6 (`hexproof_from::gives`).
+`layers::can_target` refuses a source with one of the qualities - a spell, or an
+ability's source, as it is now - controlled by an opponent of the permanent's controller, unless a targeting rule lets
+hexproof be ignored; losing hexproof (Shadowspear) or all abilities loses it (CR 702.11e). Knight of Grace, Knight of
+Malice, Sphinx of the Guildpact, General Ferrous Rokiric and Dragonfire Blade have it. Not built, as no card in content
+needs it: a resolved effect that gives it ("gains hexproof from that color until end of turn", Mondo Gecko, Skrelv),
+"hexproof from activated and triggered abilities" (Volatile Stormdrake), "hexproof from each of its colors" (Tam), and a
+player's hexproof from a quality (Veil of Summer).
+
 ### Restricted mana
 
 Mana a restriction limits (CR 106.6) is kept in the pool apart from ordinary mana, one `ManaPool` per restriction

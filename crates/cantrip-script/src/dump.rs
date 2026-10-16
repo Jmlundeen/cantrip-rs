@@ -399,6 +399,20 @@ impl StateDump {
                     keywords.sort();
                     d.list(&format!("{key}.Keywords"), keywords, true);
                 }
+                // Its "hexproof from [quality]" abilities (CR 702.11d), as the qualities' words: `Black; White`, `Monocolored`.
+                if !c.hexproof_from.is_empty() {
+                    let h = c.hexproof_from;
+                    let mut qualities: Vec<String> = h.colors().iter().map(|c| c.name().to_string()).collect();
+                    if h.has(HexproofFrom::MONOCOLORED) {
+                        qualities.push("Monocolored".to_string());
+                    }
+                    if h.has(HexproofFrom::MULTICOLORED) {
+                        qualities.push("Multicolored".to_string());
+                    }
+                    qualities.extend(h.types().iter().map(|t| t.name().to_string()));
+                    qualities.sort();
+                    d.list(&format!("{key}.HexproofFrom"), qualities, true);
+                }
                 if c.is(CardType::Creature) {
                     d.set(format!("{key}.Power"), c.power.unwrap_or(0));
                     d.set(format!("{key}.Toughness"), c.toughness.unwrap_or(0));

@@ -295,12 +295,22 @@ fn initial(cards: &CardTable, card: CardId, copy: Option<&Copiable>) -> Chars {
         spell: false,
         protection_colored_spells: false,
         protection_everything: false,
+        // CR 612.4: a color word of a token's text is the text's that made it.
+        hexproof_from: worded_hexproof(def.hexproof_from, words),
         must_attack: false,
         abilities,
         no_cost,
     };
     changeling(&mut chars);
     chars
+}
+
+/// Printed "hexproof from [quality]" with the color words of its text as `words` has them (CR 612.2).
+fn worded_hexproof(printed: HexproofFrom, words: Words) -> HexproofFrom {
+    if printed.colors().is_empty() || words.is_printed() {
+        return printed;
+    }
+    printed.with_colors(words.colors(printed.colors()))
 }
 
 /// Changeling (CR 702.73a): "This object is every creature type", a characteristic-defining ability that works in every
@@ -480,6 +490,14 @@ fn apply_effect(effect: &ContinuousEffect, layer: Layer, chars: &mut Chars) {
                     chars.subtypes = chars.subtypes.without(from).with(to);
                 }
             }
+            // CR 612.2: a color word of a "hexproof from [color]" ability is a word of the text; only the printed abilities
+            // are there yet (what layer 6 grants comes after).
+            (Layer::Text, EffectKind::ChangeText { from: Word::Color(from), to: Word::Color(to) }) => {
+                let colors = chars.hexproof_from.colors();
+                if colors.has(from) {
+                    chars.hexproof_from = chars.hexproof_from.with_colors(ColorSet(colors.0 & !ColorSet::of(from).0).with(to));
+                }
+            }
             // CR 205.1b: added types are added; a land that becomes a creature is still a land.
             (Layer::Type, EffectKind::AddTypes(types)) => chars.types = TypeSet(chars.types.0 | types.0),
             (Layer::Type, EffectKind::AddSubtype(s)) => chars.subtypes = chars.subtypes.with(s),
@@ -506,6 +524,7 @@ fn apply_effect(effect: &ContinuousEffect, layer: Layer, chars: &mut Chars) {
                 chars.protection_colorless = false;
                 chars.protection_types = TypeSet::NONE;
                 chars.protection_everything = false;
+                chars.hexproof_from = HexproofFrom::NONE;
                 chars.must_attack = false;
                 chars.abilities = [None; MAX_ABILITIES];
             }
@@ -515,8 +534,14 @@ fn apply_effect(effect: &ContinuousEffect, layer: Layer, chars: &mut Chars) {
             (Layer::Ability, EffectKind::ProtectionFromEverything) => chars.protection_everything = true,
             (Layer::Ability, EffectKind::ProtectionFromPlayer(p)) => chars.protection_players |= 1 << p.0,
             (Layer::Ability, EffectKind::AddKeywords(k)) => chars.keywords = Keywords(chars.keywords.0 | k.0),
-            // CR 613.1f: lost at this effect's timestamp, so a keyword granted after it is kept.
-            (Layer::Ability, EffectKind::LoseKeywords(k)) => chars.keywords = Keywords(chars.keywords.0 & !k.0),
+            // CR 613.1f: lost at this effect's timestamp, so a keyword granted after it is kept. Losing hexproof loses every
+            // "hexproof from [quality]" too (CR 702.11e).
+            (Layer::Ability, EffectKind::LoseKeywords(k)) => {
+                chars.keywords = Keywords(chars.keywords.0 & !k.0);
+                if k.has(Keyword::Hexproof) {
+                    chars.hexproof_from = HexproofFrom::NONE;
+                }
+            }
             (Layer::Ability, EffectKind::AddAbility(ability)) => {
                 if let Some(slot) = chars.abilities.iter().position(|a| a.is_none()) {
                     chars.abilities[slot] = Some(ability);
@@ -674,10 +699,8 @@ pub fn can_target(cards: &CardTable, state: &GameState, asker: &Asker, target: T
                 if target_chars.has(Keyword::Shroud) {
                     return false;
                 }
-                if target_chars.has(Keyword::Hexproof)
-                    && obj.controller != asker.controller
-                    && !targeting_rule(cards, state, TargetingRuleKind::IgnoreHexproof, id)
-                {
+                let opponent = obj.controller != asker.controller;
+                if target_chars.has(Keyword::Hexproof) && opponent && !targeting_rule(cards, state, TargetingRuleKind::IgnoreHexproof, id) {
                     return false;
                 }
                 let mut source_chars = chars(cards, state, asker.source);
@@ -687,6 +710,15 @@ pub fn can_target(cards: &CardTable, state: &GameState, asker: &Asker, target: T
                 let source = state.obj(asker.source);
                 if !source.zone.is(ZoneKind::Battlefield) && !source.zone.is(ZoneKind::Stack) {
                     source_chars.spell = true;
+                }
+                // Hexproof from [quality] (CR 702.11d): no [quality] spell an opponent controls, nor an ability an opponent
+                // controls from a [quality] source, the source as it is now (a spell, or an ability's source on the
+                // battlefield or as it last was). A hexproof ability, so what ignores hexproof ignores it (CR 702.11e).
+                if opponent
+                    && target_chars.hexproof_from.covers(source_chars.colors, source_chars.types)
+                    && !targeting_rule(cards, state, TargetingRuleKind::IgnoreHexproof, id)
+                {
+                    return false;
                 }
                 if target_chars.protected_from_by(&source_chars, asker.controller) {
                     return false;
@@ -774,6 +806,7 @@ mod tests {
             spell: false,
             protection_colored_spells: false,
             protection_everything: false,
+            hexproof_from: HexproofFrom::NONE,
             must_attack: false,
             abilities,
             no_cost: false,

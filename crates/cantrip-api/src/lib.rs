@@ -3,7 +3,7 @@
 //! rules' internals: they read the state, and change it only through [`Game`].
 
 pub use cantrip_state::{
-    AbilityRef, Action, ActionKind, ActionOption, Answer, Attacker, Block, CardId, CardType, Color, ColorSet, Copiable,
+    AbilityRef, Action, ActionKind, ActionOption, Answer, Attacker, Block, CardId, CardType, Color, ColorSet, Copiable, HexproofFrom,
     CounterKind, DayNight, Duration, EffectKind, Gift, GameState, Keyword, Keywords, Label, Mana, ManaCost, ManaPool, Marks, MiracleOf, NameKind, Obj, ObjectId,
     Outcome, PlayerId, Purpose, Question, Request, RequestKind, StackItem, StackKind, Step, Subtype, SubtypeSet, Supertypes,
     Target, TypeSet, Word, Words, Zone, ZoneKind, ZoneKinds, ZoneReason, DelayedWhen, ExileLink, Expiry, PlayCondition, PlayGrant, PlayPermission, LastKnown, ManaPayment, ManaRestriction, Destination, DestinationKind, DamageDivision, SearchDestination, WAY_ADVENTURE, WAY_BACK_FACE, WAY_GRANTED, WAY_GRANTED_SLOTS, WAY_GRANTED_STRIDE, GRANTED_FACE_WHOLE, GRANTED_FACE_LEFT, GRANTED_FACE_RIGHT, GRANTED_FACE_ADVENTURE, GRANTED_FACE_BACK, GRANTED_FACE_OMEN, WAY_OMEN, granted_way, granted_slot, granted_face_way, WAY_BESTOW, WAY_OVERLOAD, WAY_SPLIT_LEFT, WAY_SPLIT_RIGHT, WAY_TRANSFORMED,

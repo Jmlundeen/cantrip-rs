@@ -1379,6 +1379,10 @@ pub struct CardDef {
     /// A battle's printed defense (CR 310.4a): it enters with that many defense counters (CR 310.4b).
     pub defense: Option<i16>,
     pub keywords: Keywords,
+    /// Its printed "hexproof from [quality]" abilities (CR 702.11d): a keyword ability, so it is part of its copiable values
+    /// and is lost as keywords are (CR 702.11e). A color word in it is a word of its text (CR 612.2): a text-changing effect
+    /// changes the color.
+    pub hexproof_from: HexproofFrom,
     /// Convoke, delve, improvise: what besides mana may pay its total cost.
     pub pay_with: PayWith,
     pub spell: Option<SpellDef>,
@@ -1590,6 +1594,7 @@ impl CardDef {
         loyalty: None,
         defense: None,
         keywords: Keywords::NONE,
+        hexproof_from: HexproofFrom::NONE,
         pay_with: PayWith::NONE,
         spell: None,
         abilities: &[],

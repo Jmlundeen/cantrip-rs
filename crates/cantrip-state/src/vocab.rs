@@ -418,6 +418,74 @@ impl fmt::Debug for TypeSet {
     }
 }
 
+/// The qualities of "hexproof from [quality]" abilities (CR 702.11d): a permanent with one can't be the target of
+/// [quality] spells its controller's opponents control, nor of abilities they control from [quality] sources. A bit
+/// for each quality: the five colors (`ColorSet`'s bits), monocolored and multicolored (CR 105.2a-b), and card types
+/// (`TypeSet`'s bits, from bit 8: "hexproof from artifacts", "from instants"). "Hexproof from [A] and from [B]" is two
+/// of them (CR 702.11f), "hexproof from each color" one for each color (CR 702.11g), and the same one twice is
+/// redundant (CR 702.11h).
+#[derive(Clone, Copy, PartialEq, Eq, Hash, Default, Debug)]
+pub struct HexproofFrom(pub u32);
+
+impl HexproofFrom {
+    pub const NONE: HexproofFrom = HexproofFrom(0);
+    /// "Hexproof from monocolored": sources that are exactly one color (CR 105.2a).
+    pub const MONOCOLORED: HexproofFrom = HexproofFrom(1 << 5);
+    /// "Hexproof from multicolored": sources that are two or more colors (CR 105.2b).
+    pub const MULTICOLORED: HexproofFrom = HexproofFrom(1 << 6);
+    /// "Hexproof from each color" (CR 702.11g).
+    pub const EACH_COLOR: HexproofFrom = HexproofFrom(0x1f);
+    const TYPES_SHIFT: u32 = 8;
+
+    /// "Hexproof from [color]".
+    pub const fn color(color: Color) -> HexproofFrom {
+        HexproofFrom(1 << color as u8)
+    }
+
+    /// "Hexproof from [card type]s": sources of that card type.
+    pub const fn card_type(t: CardType) -> HexproofFrom {
+        HexproofFrom(1 << (t as u32 + Self::TYPES_SHIFT))
+    }
+
+    /// Both sets of qualities (CR 702.11f).
+    pub const fn and(self, other: HexproofFrom) -> HexproofFrom {
+        HexproofFrom(self.0 | other.0)
+    }
+
+    pub fn is_empty(self) -> bool {
+        self.0 == 0
+    }
+
+    /// The colors it names.
+    pub fn colors(self) -> ColorSet {
+        ColorSet((self.0 & 0x1f) as u8)
+    }
+
+    /// These qualities with the colors it names replaced by `colors`: a text-changing effect's new color word (CR 612.2).
+    pub fn with_colors(self, colors: ColorSet) -> HexproofFrom {
+        HexproofFrom((self.0 & !0x1f) | colors.0 as u32)
+    }
+
+    /// The card types it names.
+    pub fn types(self) -> TypeSet {
+        TypeSet((self.0 >> Self::TYPES_SHIFT) as u16)
+    }
+
+    pub fn has(self, quality: HexproofFrom) -> bool {
+        self.0 & quality.0 == quality.0 && quality.0 != 0
+    }
+
+    /// Whether a source with these colors and card types has one of the qualities (CR 702.11d): one of the colors, one
+    /// color only (monocolored) or two or more (multicolored), one of the card types. A colorless source is none of them.
+    pub fn covers(self, colors: ColorSet, types: TypeSet) -> bool {
+        let n = colors.0.count_ones();
+        self.colors().intersects(colors)
+            || (self.has(HexproofFrom::MONOCOLORED) && n == 1)
+            || (self.has(HexproofFrom::MULTICOLORED) && n >= 2)
+            || self.types().0 & types.0 != 0
+    }
+}
+
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Default, Debug)]
 pub struct Supertypes {
     pub basic: bool,

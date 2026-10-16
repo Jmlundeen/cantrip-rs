@@ -307,7 +307,11 @@ shapes have an example:
 - **Gift** (CR 702.174) is `CardDef.gift`, one of `cantrip_mechanics::gift`'s constants (a card, a Food, a tapped Fish, a
   Treasure, an Octopus, an extra turn); the promise and the opponent are asked before the targets, the spell's effect reads
   `item.gift.is_some()` and a target filter `gift::promised(q, asker.source)`. An instant or sorcery gives it as it
-  resolves (the core); a permanent lists `gift::trigger(text)`. Tokens a gift makes are listed in the card's `EXTRA`. **Player hexproof** is `EffectKind::PlayerHexproof`.
+  resolves (the core); a permanent lists `gift::trigger(text)`. Tokens a gift makes are listed in the card's `EXTRA`. **Player hexproof** is `EffectKind::PlayerHexproof`. **Hexproof from [quality]** (CR 702.11d) printed on a card is
+  `CardDef.hexproof_from` (`HexproofFrom::color(Color::Black)`, `HexproofFrom::MONOCOLORED`, card types with
+  `HexproofFrom::card_type`; a color in it is a word of the text, CR 612.2); given by a static ability it is
+  `cantrip_mechanics::hexproof_from::gives::<Q>` (a resolved effect that gives it, Mondo Gecko's, is not built). The core judges it
+  as a target is chosen, loses it with hexproof (CR 702.11e) and the host shows a granted one on the card.
 - **Names and players**: `RequestKind::ChooseName` (a card name, answered `Answer::Name`; its `kind`, `NameKind::Any`,
   `Nonland` or `Land`, is what the name must be the name of, CR 201.4a, and the core refuses any other) and `ChoosePlayer`;
   a name chosen as a permanent enters is `Entering.chosen_card`, kept in `Obj.marks.chosen_card`, and one chosen for a

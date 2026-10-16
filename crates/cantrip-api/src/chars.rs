@@ -31,6 +31,9 @@ pub struct Chars {
     pub protection_colored_spells: bool,
     /// Protection from everything (CR 702.16e): from every source, whatever it is.
     pub protection_everything: bool,
+    /// Its "hexproof from [quality]" abilities (CR 702.11d). Each is a hexproof ability (702.11e): what takes hexproof away
+    /// takes them, and what lets a player target as though there were no hexproof lets them target past these too.
+    pub hexproof_from: HexproofFrom,
     /// Attacks each combat if able (CR 508.1d).
     pub must_attack: bool,
     pub abilities: [Option<AbilityRef>; MAX_ABILITIES],
