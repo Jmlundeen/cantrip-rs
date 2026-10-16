@@ -1,6 +1,6 @@
-# "Up to two" includes none: Bot1 looks at Skullclamp, Sol Ring and five Islands (eligible cards among them) and takes nothing, so the
-# battlefield is unchanged and all seven go to the bottom of the library in a random order; the eighth card, Mox Emerald, is on top
-# and the library is still full.
+# "Up to two" includes none: Bot1 looks at seven Skullclamps (all eligible) and takes none, so the battlefield is unchanged and all seven go
+# to the bottom of the library: the unlooked cards, Mox Emerald and three Islands, are now on top. (The seven are identical, so their
+# random order shows nothing; had they stayed on top, the library would start with Skullclamp.)
 
 [Bot1 Deck]
 Plains
@@ -10,9 +10,7 @@ Mox Ruby
 United Battlefront
 Island
 Island
-Skullclamp
-Sol Ring
-Island x5
+Skullclamp x7
 Mox Emerald
 Island x3
 
@@ -39,4 +37,4 @@ Bot1.Pass
 
 [Expect]
 Bot1.Battlefield = Plains; Mox Pearl; Mox Jet; Mox Ruby
-Bot1.Library.Count = 11
+Bot1.Library = Mox Emerald; Island; Island; Island; Skullclamp; Skullclamp; Skullclamp; Skullclamp; Skullclamp; Skullclamp; Skullclamp

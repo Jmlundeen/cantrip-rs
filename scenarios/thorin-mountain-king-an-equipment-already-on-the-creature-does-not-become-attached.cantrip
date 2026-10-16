@@ -1,4 +1,4 @@
-# Sword of the Meek is already equipped to Llanowar Elves when Thorin enters (turn 5), so attaching it to the Elves does nothing
+# Sword of the Meek is already equipped to Birds of Paradise when Thorin enters (turn 5), so attaching it to the Birds does nothing
 # (CR 701.3b): it does not "become attached", the reflexive ability does not trigger (Bot1 is never asked for its target, the bare
 # refusal) and Bot2's Ulvenwald Oddity takes no damage. The scenario thorin-mountain-king-an-equipment-already-on-the-creature-
 # and-another-that-is-not-deals-damage is the positive control.
@@ -8,7 +8,7 @@ Mountain
 Mox Ruby
 Mox Emerald
 Mox Jet
-Llanowar Elves
+Birds of Paradise
 Sword of the Meek
 Skullclamp
 Thorin, Mountain-king
@@ -33,7 +33,7 @@ Bot1.Pass
 Bot1.Hand.Mox Jet.Cast
 Bot1.Pass
 Bot1.Battlefield.Mox Emerald.Activate
-Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Birds of Paradise.Cast
 Bot1.Pass
 Bot1.Battlefield.Mountain.Activate
 Bot1.Battlefield.Mox Ruby.Activate
@@ -59,7 +59,7 @@ Bot2.Pass
 [T3 Bot1.Main1]
 Bot1.Battlefield.Mountain.Activate
 Bot1.Battlefield.Mox Ruby.Activate
-Bot1.Battlefield.Sword of the Meek.Activate(Llanowar Elves)
+Bot1.Battlefield.Sword of the Meek.Activate(Birds of Paradise)
 Bot1.Pass
 [T5 Bot1.Main1]
 Bot1.Battlefield.Mountain.Activate
@@ -68,7 +68,7 @@ Bot1.Battlefield.Mox Emerald.Activate
 Bot1.Battlefield.Mox Jet.Activate
 Bot1.Hand.Thorin, Mountain-king.Cast
 Bot1.Pass
-Bot1.Target(Llanowar Elves)
+Bot1.Target(Birds of Paradise)
 Bot1.Target(Sword of the Meek)
 Bot1.Pass
 Bot2.Pass
@@ -78,6 +78,6 @@ Bot2.Pass
 [T5 Bot1.Main2]
 
 [Expect]
-Bot1.Battlefield.Sword of the Meek.AttachedTo = Llanowar Elves
+Bot1.Battlefield.Sword of the Meek.AttachedTo = Birds of Paradise
 Bot1.Battlefield.Skullclamp.AttachedTo = (absent)
 Bot2.Battlefield.Ulvenwald Oddity.Damage = 0

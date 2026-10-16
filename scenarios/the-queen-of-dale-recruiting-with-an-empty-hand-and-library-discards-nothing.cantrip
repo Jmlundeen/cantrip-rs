@@ -1,0 +1,43 @@
+# Recruit (CR 701.70a) with nothing to draw and nothing to discard: Bot1's whole deck is seven cards, all played on turn 1,
+# so (with its four Moxen cast too) its hand and library are empty when Bot2's Mox Ruby triggers her on turn 2. Bot1 has nothing to discard (no question is possible), and
+# having tried to draw from an empty library it loses the game (CR 704.5b).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+The Queen of Dale
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mox Sapphire
+
+[Bot2 Deck]
+Mox Ruby
+Mountain x7
+Mountain x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.The Queen of Dale.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Status = Lost
+Bot1.Hand.Count = 0
+Bot1.Graveyard.Count = 0

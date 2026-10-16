@@ -1,0 +1,79 @@
+# Thorin attaches Sword of the Meek to Birds of Paradise (turn 3), making it 1/3, and the reflexive ability goes on the stack aimed at Bot2's
+# Ulvenwald Oddity. In response Bot2 kills the Birds with Lightning Bolt. The ability still resolves: the Birds, gone, deal damage equal to
+# their last known power (CR 608.2h), 1 and not Thorin's 3, so the Oddity has 1 damage.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Emerald
+Birds of Paradise
+Sword of the Meek
+Thorin, Mountain-king
+Island
+Island x20
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Sol Ring
+Mox Ruby
+Ulvenwald Oddity
+Lightning Bolt
+Forest x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Birds of Paradise.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sword of the Meek.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Hand.Ulvenwald Oddity.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Birds of Paradise.Activate(Color: Red)
+Bot1.Hand.Thorin, Mountain-king.Cast
+Bot1.Pass
+Bot1.Target(Birds of Paradise)
+Bot1.Target(Sword of the Meek)
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Ulvenwald Oddity)
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Birds of Paradise)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Birds of Paradise
+Bot1.Battlefield.Sword of the Meek.AttachedTo = (absent)
+Bot2.Battlefield.Ulvenwald Oddity.Damage = 1
+Bot2.Graveyard = Lightning Bolt

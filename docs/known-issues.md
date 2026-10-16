@@ -174,3 +174,19 @@ caption, or the cost on each candidate as it is pointed at.
 
 **Scenarios.**
 - [`scenarios/dragonfire-blade-equip-shows-its-reduced-cost-and-the-granted-hexproof-in-the-browser.cantrip`](../scenarios/dragonfire-blade-equip-shows-its-reduced-cost-and-the-granted-hexproof-in-the-browser.cantrip) - the menu row of a two-action card (Shadowspear) and the payment of a one-action card (the Blade).
+
+### KI-11: Thorin, Mountain-king asks for the creature before the Equipment
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Open | engine | 2026-10-16, Thorin, Mountain-king |
+
+**Notes.** The printed order is "attach any number of target Equipment you control to target creature you control": Equipment first,
+then the creature. A variable-count target slot has to be the last slot of an ordinary (non-modal) ability, because
+`resolve::slot_spec` reads target N as spec N and lets the last spec take the extra targets, so the card asks for the creature first
+and the Equipment after it, with labels on both. The rules do not order the announcement of targets (CR 601.2c, 603.3d), so the
+outcome is the same; only the order of the prompts differs. A fix lets a slot of a range stand before a single slot and moves the
+card's two specs back into printed order.
+
+**Scenarios.**
+- [`scenarios/thorin-mountain-king-attaches-two-equipment-to-itself-and-deals-its-new-power.cantrip`](../scenarios/thorin-mountain-king-attaches-two-equipment-to-itself-and-deals-its-new-power.cantrip) - answers the creature slot first.

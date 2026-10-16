@@ -1,0 +1,41 @@
+# Recruit with an empty library but a card in hand: the draw finds nothing, the discard is still made (Bot1 chooses the Ornithopter,
+# a nonland card, and so a Soldier is created), and Bot1 loses at the next state check for drawing from an empty library (CR 121.4,
+# 704.5b). The discard being asked is what separates this from the empty hand.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+The Queen of Dale
+Ornithopter
+Mox Jet
+Mox Ruby
+Mox Emerald
+
+[Bot2 Deck]
+Mox Ruby
+Mountain x7
+Mountain x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.The Queen of Dale.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot1.Choose(Ornithopter)
+
+[Expect]
+Bot1.Status = Lost
+Bot1.Graveyard = Ornithopter

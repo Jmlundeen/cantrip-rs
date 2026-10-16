@@ -1,0 +1,56 @@
+# "Each turn": the count starts over. Bot2's first noncreature spell on turn 2 (Mox Ruby) recruits for Bot1 (library 20 -> 19), its second
+# (Mox Jet) does not, Bot1 draws for turn 3 (18), and Bot2's first noncreature spell of turn 4 (Lightning Bolt) recruits again (17).
+# Bot1 discards an Island each time.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+The Queen of Dale
+Island x4
+Island x20
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Lightning Bolt
+Mountain x3
+Mountain x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.The Queen of Dale.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot1.Choose(Island)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Library.Count = 19
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot1.Library.Count = 19
+[T4 Bot2.Main1]
+? Bot1.Library.Count = 18
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+Bot1.Choose(Island)
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Library.Count = 17
+Bot1.Graveyard = Island; Island
+Bot1.Battlefield = Plains; Mox Pearl; The Queen of Dale
