@@ -419,10 +419,12 @@ pub struct Animation {
     pub ability: Option<AbilityRef>,
 }
 
-/// "Until end of turn, this land becomes a P/T [colors] [subtype] creature with [keywords]. It's still a land":
-/// the creature type is added (layer 4) with its subtype, the colors replace its own (5), the keywords are granted (6)
-/// and the base power and toughness set (7b), so counters and pumps count on top. Celestial Colonnade and Creeping Tar
-/// Pit print it, and Firdoch Core, which names no colors or creature type, leaves those two out.
+/// "[Until end of turn,] this land becomes a P/T [colors] [subtype] creature with [keywords]. It's still a land", for the
+/// `duration` the text gives (Great Hall of the Biblioplex has none: `Duration::Indefinite`): the creature type is added
+/// (layer 4) with its subtype, the colors replace its own (5), the keywords and the ability are granted (6) and the base
+/// power and toughness set (7b), so counters and pumps count on top. Celestial Colonnade and Creeping Tar Pit print it
+/// until end of turn, Firdoch Core names no colors or creature type and leaves those two out, and Great Hall of the
+/// Biblioplex gives a triggered ability.
 pub fn animate(g: &mut dyn Game, source: ObjectId, permanent: ObjectId, a: &Animation, duration: Duration) {
     if !g.is_on_battlefield(permanent) || g.obj(permanent).became.is_some() {
         return;

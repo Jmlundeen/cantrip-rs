@@ -1,0 +1,27 @@
+# CR 106.6: an untapped Delighted Halfling could add one mana of any color, but only for a legendary spell, and its {C}
+# ability is the other way to tap it. With nothing else able to add {R} (the Forest adds {G}), a Lightning Bolt is not offered,
+# while Ragavan, Nimble Pilferer, a legendary {R} creature, is the positive control and is cast with the Halfling's mana.
+
+[Bot1 Deck]
+Forest
+Delighted Halfling
+Lightning Bolt
+Ragavan, Nimble Pilferer
+Forest
+Forest x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Delighted Halfling.Cast
+[T3 Bot1.Main1]
+! Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Hand.Ragavan, Nimble Pilferer.Cast
+Bot1.Battlefield.Delighted Halfling.Activate(Ability: any color; Color: Red)
+
+[Expect]
+Bot1.Battlefield = Delighted Halfling; Forest; Ragavan, Nimble Pilferer
+Bot2.Life = 20

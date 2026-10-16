@@ -1,0 +1,40 @@
+# CR 106.6: an untapped Tablet of Discovery can add {R} (any spell) or {R}{R} (instant and sorcery spells only), not both. On
+# the turn it is cast, with its Mox Rubies tapped, a Painter's Servant ({2}, an artifact creature) is not offered: its {R} is
+# one mana and the {R}{R} may not be spent on a creature spell. Stomp ({1}{R}, the instant half of Bonecrusher Giant) is the
+# control: it is offered and the Tablet's {R}{R} pays it.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Tablet of Discovery
+Painter's Servant
+Bonecrusher Giant
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Hand.Tablet of Discovery.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+! Bot1.Hand.Painter's Servant.Cast
+Bot1.Hand.Bonecrusher Giant.Cast(Bot2; Ability: Adventure)
+Bot1.Battlefield.Tablet of Discovery.Activate(Ability: Spend)
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main1]
+
+[Expect]
+Bot2.Life = 18
+Exile = Bonecrusher Giant

@@ -834,8 +834,25 @@ fn least_cost(cx: &Cx, available: &Available, player: PlayerId, card: ObjectId, 
 
 /// Whether `player` could pay `cost` from the mana pool and what the mana abilities they could activate add (advice,
 /// CR 601.2g): a mana ability whose yield is not stated is taken to be able to pay anything.
-pub fn can_afford(cx: &Cx, player: PlayerId, cost: &ManaCost) -> bool {
-    cost.mana_value() == 0 || available(cx, player).covers(cost)
+///
+/// `source` is what the cost is for: a spell on the stack may be paid with the restricted mana its kind allows, anything
+/// else with the restricted mana an ability may spend (CR 106.6).
+pub fn can_afford(cx: &Cx, player: PlayerId, source: ObjectId, cost: &ManaCost) -> bool {
+    if cost.mana_value() == 0 {
+        return true;
+    }
+    let a = available(cx, player);
+    if cx.s().obj(source).zone.is(ZoneKind::Stack) {
+        let chars = cx.chars(source);
+        let kind = SpellKind {
+            artifact: chars.is(CardType::Artifact),
+            instant_or_sorcery: chars.is(CardType::Instant) || chars.is(CardType::Sorcery),
+            legendary: chars.supertypes.legendary,
+        };
+        a.covers_spell(cost, kind)
+    } else {
+        a.covers_ability(cost)
+    }
 }
 
 /// The mana a player has to pay with: the pool and what their mana abilities add, summed once for every cost judged.
@@ -894,8 +911,13 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
         let chars = cx.chars(id);
         let mut only: Option<&ActivatedDef> = None;
         let mut count = 0;
-        let mut widest = 0u32;
+        // The most any one ability adds, for the abilities that are not restricted and for each kind of restriction: they
+        // are alternatives (each taps the permanent), so only the widest of each counts (CR 605.3b).
+        let mut widest = [0u32; ManaRestriction::COUNT + 1];
         let mut spent = 0u32;
+        // The one ability that is not restricted, when there is exactly one: its yield is stated, not any color.
+        let mut unrestricted: Option<&ActivatedDef> = None;
+        let mut unrestricted_count = 0;
         for (index, ability) in chars.abilities().enumerate() {
             let Some(def) = activated(cx, ability) else { continue };
             if def.mana.is_none()
@@ -909,7 +931,15 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
             count += 1;
             only = Some(def);
             spent = spent.max(def.cost.mana.mana_value());
-            widest = widest.max(def.adds.0.iter().map(|&n| n as u32).sum::<u32>() + def.adds_any as u32);
+            let class = match def.restricted {
+                Some(ManaRestriction::GainsHaste) | None => ManaRestriction::COUNT,
+                Some(kind) => kind as usize,
+            };
+            if class == ManaRestriction::COUNT {
+                unrestricted = Some(def);
+                unrestricted_count += 1;
+            }
+            widest[class] = widest[class].max(def.adds.0.iter().map(|&n| n as u32).sum::<u32>() + def.adds_any as u32);
             if def.adds.0.iter().all(|&n| n == 0) && def.adds_any == 0 {
                 return Available { fixed, flex, consume: 0, unknown: true, changers: cost_change_sources(cx), restricted, restricted_flex };
             }
@@ -937,7 +967,20 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
                 }
                 flex += def.adds_any as u32;
             }
-            _ => flex += widest,
+            _ => {
+                match unrestricted {
+                    Some(def) if unrestricted_count == 1 => {
+                        for m in 0..6 {
+                            fixed[m] += def.adds.0[m];
+                        }
+                        flex += def.adds_any as u32;
+                    }
+                    _ => flex += widest[ManaRestriction::COUNT],
+                }
+                for kind in 0..ManaRestriction::COUNT {
+                    restricted_flex[kind] += widest[kind];
+                }
+            }
         }
     }
     Available { fixed, flex, consume, unknown: false, changers: cost_change_sources(cx), restricted, restricted_flex }
@@ -961,8 +1004,9 @@ fn spell_kind(def: &CardDef) -> SpellKind {
 }
 
 impl Available {
-    /// This with the restricted mana of the given kinds added to what any spell or ability may spend.
-    fn with_restricted(&self, kinds: &[ManaRestriction]) -> Available {
+    /// This with the restricted mana of the kinds in `kinds` (a bit for each `ManaRestriction`) added to what any spell
+    /// or ability may spend.
+    fn with_restricted(&self, kinds: u8) -> Available {
         let mut with = Available {
             fixed: self.fixed,
             flex: self.flex,
@@ -972,11 +1016,13 @@ impl Available {
             restricted: [[0; 6]; ManaRestriction::COUNT],
             restricted_flex: [0; ManaRestriction::COUNT],
         };
-        for &kind in kinds {
-            for m in 0..6 {
-                with.fixed[m] += self.restricted[kind as usize][m];
+        for kind in 0..ManaRestriction::COUNT {
+            if kinds & (1 << kind) != 0 {
+                for m in 0..6 {
+                    with.fixed[m] += self.restricted[kind][m];
+                }
+                with.flex += self.restricted_flex[kind];
             }
-            with.flex += self.restricted_flex[kind as usize];
         }
         with
     }
@@ -984,22 +1030,22 @@ impl Available {
     /// Whether `cost` could be paid for a spell of this kind: restricted mana that may be spent on a spell like it counts
     /// (CR 106.6, 601.2g).
     pub fn covers_spell(&self, cost: &ManaCost, kind: SpellKind) -> bool {
-        let mut kinds = Vec::new();
+        let mut kinds = 0u8;
         if kind.artifact {
-            kinds.extend([ManaRestriction::NotNonartifactSpells, ManaRestriction::ArtifactSpells]);
+            kinds |= 1 << ManaRestriction::NotNonartifactSpells as u8 | 1 << ManaRestriction::ArtifactSpells as u8;
         }
         if kind.instant_or_sorcery {
-            kinds.push(ManaRestriction::InstantOrSorcerySpells);
+            kinds |= 1 << ManaRestriction::InstantOrSorcerySpells as u8;
         }
         if kind.legendary {
-            kinds.push(ManaRestriction::LegendaryUncounterable);
+            kinds |= 1 << ManaRestriction::LegendaryUncounterable as u8;
         }
-        self.with_restricted(&kinds).covers(cost)
+        self.with_restricted(kinds).covers(cost)
     }
 
     /// Whether `cost` could be paid for an ability: restricted mana that is not limited to spells counts.
     pub fn covers_ability(&self, cost: &ManaCost) -> bool {
-        self.with_restricted(&[ManaRestriction::NotNonartifactSpells]).covers(cost)
+        self.with_restricted(1 << ManaRestriction::NotNonartifactSpells as u8).covers(cost)
     }
 
     /// Whether `cost` could be paid with it (advice, CR 601.2g).
@@ -2494,7 +2540,7 @@ fn choose_modes(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: Abilit
     let eligible = eligible_modes(cx, &asker, modal);
     let costed = modal.modes.iter().any(|m| m.cost.mana_value() > 0);
     let affordable: Vec<u8> = if costed {
-        eligible.iter().copied().filter(|&i| can_afford(cx, player, &add_cost(base, modal.modes[i as usize].cost))).collect()
+        eligible.iter().copied().filter(|&i| can_afford(cx, player, source, &add_cost(base, modal.modes[i as usize].cost))).collect()
     } else {
         Vec::new()
     };
@@ -2507,7 +2553,7 @@ fn choose_modes(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: Abilit
     if modal.escalate.is_some() {
         let payable = |cx: &Cx, n: u8| {
             let first_n = (1u16 << n).wrapping_sub(1) as u8;
-            can_afford(cx, player, &modal_cost(modal, first_n, base)) && can_pay_other(cx, source, player, &escalate_cost(modal, first_n))
+            can_afford(cx, player, source, &modal_cost(modal, first_n, base)) && can_pay_other(cx, source, player, &escalate_cost(modal, first_n))
         };
         while most > modal.min.max(1) && !payable(cx, most) {
             most -= 1;
@@ -2556,7 +2602,7 @@ fn announce_life(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &mut Man
                         rest.symbols[c.mana() as usize] += 1;
                     }
                     rest.phyrexian = [0; 5];
-                    can_afford(cx, player, &rest)
+                    can_afford(cx, player, source, &rest)
                 })
                 .map(|k| (0..k).collect())
                 .unwrap_or_default();
