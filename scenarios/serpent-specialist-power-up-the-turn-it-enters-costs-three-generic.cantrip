@@ -1,0 +1,41 @@
+# Serpent Specialist: "Power-up — {3}{G}: Put two +1/+1 counters on this creature." The turn it enters, its mana cost
+# {G} takes the {G} off (CR 702.193b, 118.7): {3} is left, paid with Sol Ring's {C}{C} and Mox Ruby's {R}, no green.
+# It ends a 3/3 with deathtouch.
+
+[Bot1 Deck]
+Forest
+Mox Jet
+Sol Ring
+Mox Ruby
+Serpent Specialist
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Serpent Specialist.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Serpent Specialist.Activate
+? Bot1.Mana =
+Bot1.Pass
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Serpent Specialist.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Serpent Specialist.Power = 3
+Bot1.Battlefield.Serpent Specialist.Toughness = 3
+Bot1.Battlefield.Serpent Specialist.Keywords = Deathtouch
