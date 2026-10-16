@@ -1,0 +1,24 @@
+# Castle Doom's first ability: "{T}: Add {C}." carries no restriction. Bot1 taps the Castle on turn 1 and the pool shows plain {C}, not {C} (ArtifactSpells) as the Castle's
+# any-color ability would add (CR 106.6); the {C} pays Sol Ring's {1}, and the Castle is tapped.
+
+[Bot1 Deck]
+Castle Doom
+Sol Ring
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Castle Doom.Play
+Bot1.Battlefield.Castle Doom.Activate(Ability: Add {C})
+? Bot1.Mana = {C}
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Castle Doom; Sol Ring
+Bot1.Battlefield.Castle Doom.Tapped = true
+Bot1.Mana =
+Stack.Count = 0

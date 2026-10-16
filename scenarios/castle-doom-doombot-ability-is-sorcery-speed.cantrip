@@ -1,0 +1,42 @@
+# "Activate only as a sorcery" (CR 307.1, 602.5d): Bot1 has everything for the third ability - three Moxen, an untapped Castle Doom, two Ornithopters to sacrifice - but on
+# turn 2, during Bot2's upkeep, it isn't offered. In Bot1's own main phase on turn 3 with Mox Ruby on the stack it isn't offered either. Once the Ruby has resolved and the
+# stack is empty, the same activation is offered and makes the Doombot, sacrificing one Ornithopter.
+
+[Bot1 Deck]
+Castle Doom
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Ornithopter
+Ornithopter
+Mox Ruby
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Castle Doom.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Upkeep]
+! Bot1.Battlefield.Castle Doom.Activate(Ability: Doombot)
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+! Bot1.Battlefield.Castle Doom.Activate(Ability: Doombot)
+Bot1.Pass
+Bot1.Battlefield.Castle Doom.Activate(Ability: Doombot)
+Bot1.Choose(Ornithopter)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Castle Doom; Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire; Ornithopter; Doombot
+Bot1.Graveyard = Ornithopter
+Stack.Count = 0

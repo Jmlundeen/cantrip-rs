@@ -1,0 +1,44 @@
+# Castle Doom's third ability: Bot1 pays {3} with three Moxen, taps the Castle (it can't pay for itself) and sacrifices an artifact - the Ornithopter, since the Castle is
+# not an artifact and may not be sacrificed (CR 701.21 "sacrifice an artifact", refused beside the positive control). The ability creates a 3/3 colorless Robot Villain
+# artifact creature token named Doombot (CR 111.4). The Ornithopter is in the graveyard (a cost, CR 602.2b), the Moxen are tapped, and the Castle is tapped.
+
+[Bot1 Deck]
+Castle Doom
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Ornithopter
+Mountain
+Mountain
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Castle Doom.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Castle Doom.Activate(Ability: Doombot)
+! Bot1.Choose(Castle Doom)
+Bot1.Choose(Ornithopter)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Castle Doom; Mox Jet; Mox Pearl; Mox Sapphire; Doombot
+Bot1.Battlefield.Doombot.Token = true
+Bot1.Battlefield.Doombot.Power = 3
+Bot1.Battlefield.Doombot.Toughness = 3
+Bot1.Battlefield.Doombot.Types = Artifact; Creature
+Bot1.Battlefield.Doombot.Subtypes = Robot; Villain
+Bot1.Battlefield.Doombot.Colors = (absent)
+Bot1.Battlefield.Castle Doom.Tapped = true
+Bot1.Battlefield.Mox Jet.Tapped = true
+Bot1.Graveyard = Ornithopter
+Stack.Count = 0
