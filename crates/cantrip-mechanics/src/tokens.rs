@@ -426,3 +426,15 @@ pub static OCTOPUS: CardDef = CardDef {
     toughness: Some(8),
     ..CardDef::BLANK
 };
+
+/// A 1/1 white Rabbit creature token. Jacked Rabbit and Hop to It make it.
+pub static RABBIT: CardDef = CardDef {
+    name: "Rabbit",
+    has_cost: false,
+    colors: Some(ColorSet::of(Color::White)),
+    types: TypeSet::of(&[CardType::Creature]),
+    subtypes: SubtypeSet::of(&[Subtype::Rabbit]),
+    power: Some(1),
+    toughness: Some(1),
+    ..CardDef::BLANK
+};

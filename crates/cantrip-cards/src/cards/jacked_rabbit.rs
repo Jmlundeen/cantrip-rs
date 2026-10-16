@@ -1,24 +1,12 @@
 use cantrip_api::*;
-use cantrip_mechanics::ravenous;
+use cantrip_mechanics::{ravenous, tokens::{self, RABBIT}};
 use cantrip_oracle as oracle;
-
-/// The 1/1 white Rabbit creature token its attack makes.
-pub static RABBIT: CardDef = CardDef {
-    name: "Rabbit",
-    has_cost: false,
-    colors: Some(ColorSet::of(Color::White)),
-    types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Rabbit]),
-    power: Some(1),
-    toughness: Some(1),
-    ..CardDef::BLANK
-};
 
 /// Create a number of 1/1 white Rabbit creature tokens equal to this creature's power.
 fn make_rabbits(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let power = g.chars(item.object).power.unwrap_or(0).max(0) as u32;
     if power > 0 {
-        cantrip_mechanics::tokens::create(g, item.controller, &RABBIT, power)?;
+        tokens::create(g, item.controller, &RABBIT, power)?;
     }
     Ok(())
 }
