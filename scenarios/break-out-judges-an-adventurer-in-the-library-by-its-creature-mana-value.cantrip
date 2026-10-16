@@ -1,0 +1,45 @@
+# An Adventurer card in a library has only its normal characteristics (CR 715.4): Bramble Familiar is a creature card of
+# mana value 2 ({1}{G}), though its Adventure, Fetch Quest, costs {5}{G}{G}. Break Out reveals it and may put it onto the
+# battlefield, which Bot1 does; it is the creature, and it has haste until end of turn.
+
+[Bot1 Deck]
+Break Out
+Mountain
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Lightning Bolt
+Bramble Familiar
+Lightning Bolt
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Break Out.Cast
+Bot1.Choose(Bramble Familiar)
+Bot1.Accept
+? Bot1.Revealed = Bramble Familiar
+
+[Expect]
+Bot1.Battlefield = Mountain; Forest; Bramble Familiar
+Bot1.Battlefield.Bramble Familiar.Keywords = Haste
+Bot1.Battlefield.Bramble Familiar.Types = Creature
+Bot1.Hand = Forest; Forest; Forest; Forest; Forest
+Bot1.Library.Count = 10

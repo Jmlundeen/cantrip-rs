@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::effects::ask_may;
-use cantrip_mechanics::{choose, haste_until_end_of_turn, top_of_library};
+use cantrip_mechanics::{choose, haste_until_end_of_turn, library, top_of_library};
 use cantrip_oracle as oracle;
 
 const ASK: Question = Question::new("PutOntoBattlefield", "put the revealed creature card onto the battlefield?", "It gains haste until end of turn. If you don't, it goes into your hand", "Put it onto the battlefield", "Put it into your hand");
@@ -16,7 +16,7 @@ fn break_out(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let looked = top_of_library(g, you, 6);
     g.look_at(you, &looked);
     let creatures: Vec<ObjectId> = looked.iter().copied().filter(|&c| g.chars(c).is(CardType::Creature)).collect();
-    let chosen = choose::cards_from_kind(g, you, item.object, Purpose::PutIntoHand, "creature", looked.clone(), creatures, 1, true)?;
+    let chosen = choose::cards_from_kind(g, you, item.object, Purpose::Reveal, "creature", looked.clone(), creatures, 1, true)?;
     if let Some(&card) = chosen.first() {
         g.reveal(you, &[card]);
         let mut on_battlefield = false;
@@ -31,8 +31,7 @@ fn break_out(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
             g.return_to_hand(&[card]);
         }
     }
-    let rest: Vec<ObjectId> = looked.into_iter().filter(|c| !chosen.contains(c)).collect();
-    g.bottom_in_random_order(you, &rest);
+    library::rest_to_bottom_in_random_order(g, you, &looked);
     Ok(())
 }
 
