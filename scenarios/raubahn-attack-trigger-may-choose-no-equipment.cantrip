@@ -1,0 +1,44 @@
+# "Up to one target Equipment": Raubahn's attack trigger needs only its attacking creature. On turn 3 Bot1 has an Equipment it
+# could attach, the Bloodforged Battle-Axe on the Ornithopter that stays home, and chooses none (`Bot1.Target()`) with Raubahn
+# as the attacking creature: the trigger still goes on the stack and resolves, and the Axe stays where it was, Raubahn
+# remains a 2/2 and Bot2 takes 2.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mountain
+Raubahn, Bull of Ala Mhigo
+Bloodforged Battle-Axe
+Ornithopter
+Island
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Raubahn, Bull of Ala Mhigo.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Bloodforged Battle-Axe.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Bloodforged Battle-Axe.Activate(Ornithopter)
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Raubahn, Bull of Ala Mhigo > Bot2)
+Bot1.Target()
+Bot1.Target(Raubahn, Bull of Ala Mhigo)
+[T3 Bot1.DeclareBlockers]
+? Bot1.Battlefield.Bloodforged Battle-Axe.AttachedTo = Ornithopter
+? Bot1.Battlefield.Raubahn, Bull of Ala Mhigo.Power = 2
+[T4 Bot2.Main1]
+? Bot2.Life = 18
+
+[Expect]
+Bot2.Life = 18

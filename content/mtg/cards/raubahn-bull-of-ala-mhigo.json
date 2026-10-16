@@ -1,0 +1,8 @@
+{
+  "name": "Raubahn, Bull of Ala Mhigo",
+  "manaCost": "{1}{R}",
+  "type": "Legendary Creature — Human Warrior",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Ward—Pay life equal to Raubahn's power.\nWhenever Raubahn attacks, attach up to one target Equipment you control to target attacking creature."
+}

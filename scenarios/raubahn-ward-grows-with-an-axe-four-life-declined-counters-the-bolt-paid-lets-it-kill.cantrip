@@ -1,0 +1,56 @@
+# Raubahn equipped with a Bloodforged Battle-Axe is a 4/2, so his ward costs 4 life (the cost follows his power as the ward
+# resolves). Bot2's first Lightning Bolt is countered when Bot2 declines to pay (still 20 life, Raubahn undamaged, the Bolt in
+# the graveyard); its second, with the payment accepted, costs 4 (to 16) and kills him.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Raubahn, Bull of Ala Mhigo
+Bloodforged Battle-Axe
+Island x13
+
+[Bot2 Deck]
+Mox Ruby
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Mountain x13
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Raubahn, Bull of Ala Mhigo.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Bloodforged Battle-Axe.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Bloodforged Battle-Axe.Activate(Raubahn, Bull of Ala Mhigo)
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Raubahn, Bull of Ala Mhigo)
+Bot2.Decline
+Bot1.Pass
+? Bot2.Life = 20
+? Bot2.Graveyard = Lightning Bolt
+? Bot1.Battlefield.Raubahn, Bull of Ala Mhigo.Damage = 0
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Raubahn, Bull of Ala Mhigo)
+Bot2.Accept
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot2.Life = 16
+
+[Expect]
+Bot2.Life = 16
+Bot1.Graveyard = Raubahn, Bull of Ala Mhigo
+Bot2.Graveyard = Lightning Bolt; Lightning Bolt

@@ -1,0 +1,44 @@
+# The ruling: "If Raubahn is no longer on the battlefield at that time, use Raubahn's power as it last existed." Bot2 casts
+# Lightning Bolt at the 2/2 Raubahn, and with the first ward trigger still on the stack casts a second Bolt at him. The second
+# ward trigger resolves first (Bot2 pays 2), the second Bolt kills him, and the first ward trigger then resolves with him in
+# the graveyard: Bot2 is still asked, and pays 2 again, his last known power (20 - 2 - 2 = 16). The first Bolt, with its
+# target gone, does nothing.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Raubahn, Bull of Ala Mhigo
+Island x15
+
+[Bot2 Deck]
+Mox Ruby
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Mountain x13
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Raubahn, Bull of Ala Mhigo.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Raubahn, Bull of Ala Mhigo)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Raubahn, Bull of Ala Mhigo)
+Bot2.Accept
+Bot2.Accept
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot2.Life = 16
+
+[Expect]
+Bot2.Life = 16
+Bot1.Graveyard = Raubahn, Bull of Ala Mhigo
+Bot2.Graveyard = Lightning Bolt; Lightning Bolt

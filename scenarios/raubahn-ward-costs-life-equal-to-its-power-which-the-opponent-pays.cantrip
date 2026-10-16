@@ -1,0 +1,33 @@
+# Raubahn's "Ward--Pay life equal to Raubahn's power" (CR 702.21a): a 2/2 here, so Bot2 pays 2 life (20 to 18) to let its
+# Lightning Bolt stand, and the Bolt kills him. The ward question is asked of the opponent who targeted, never of Bot1.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Raubahn, Bull of Ala Mhigo
+Island x15
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x13
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Raubahn, Bull of Ala Mhigo.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Raubahn, Bull of Ala Mhigo)
+Bot2.Accept
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot2.Life = 18
+
+[Expect]
+Bot2.Life = 18
+Bot1.Graveyard = Raubahn, Bull of Ala Mhigo
+Bot2.Graveyard = Lightning Bolt

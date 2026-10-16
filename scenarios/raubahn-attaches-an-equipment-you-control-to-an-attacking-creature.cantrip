@@ -1,0 +1,52 @@
+# Raubahn, Bull of Ala Mhigo: "Whenever Raubahn attacks, attach up to one target Equipment you control to target attacking
+# creature." Turn 3 Raubahn attacks alone. The first slot cannot take Bot2's Umezawa's Jitte (not mine) and the second cannot
+# take Bot1's Ornithopter (it is not attacking) - the refusals - and then takes Bloodforged Battle-Axe, which was lying on
+# the battlefield unattached, and Raubahn himself: he is attacking. The Axe's +2/+0 makes him a 4/2 and Bot2 goes to 16.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mountain
+Raubahn, Bull of Ala Mhigo
+Bloodforged Battle-Axe
+Ornithopter
+Island
+Island x10
+
+[Bot2 Deck]
+Mox Jet
+Mox Sapphire
+Umezawa's Jitte
+Island x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Raubahn, Bull of Ala Mhigo.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Bloodforged Battle-Axe.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Umezawa's Jitte.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Raubahn, Bull of Ala Mhigo > Bot2)
+! Bot1.Target(Umezawa's Jitte)
+Bot1.Target(Bloodforged Battle-Axe)
+! Bot1.Target(Ornithopter)
+Bot1.Target(Raubahn, Bull of Ala Mhigo)
+[T3 Bot1.DeclareBlockers]
+? Bot1.Battlefield.Bloodforged Battle-Axe.AttachedTo = Raubahn, Bull of Ala Mhigo
+? Bot1.Battlefield.Raubahn, Bull of Ala Mhigo.Power = 4
+? Bot2.Battlefield.Umezawa's Jitte.AttachedTo = (absent)
+[T4 Bot2.Main1]
+? Bot2.Life = 16
+
+[Expect]
+Bot2.Life = 16

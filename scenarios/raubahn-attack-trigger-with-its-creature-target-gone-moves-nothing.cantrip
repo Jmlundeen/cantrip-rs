@@ -1,0 +1,54 @@
+# Raubahn's attack trigger targets the Bloodforged Battle-Axe (on Raubahn, equipped for {2}) and the attacking Ornithopter.
+# In response Bot2 kills the Ornithopter with Lightning Bolt (CR 608.2b): one target is illegal, so the Axe is not moved - it
+# stays on Raubahn, a 4/2 - and the Ornithopter is in the graveyard. Bot2 takes 4.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mountain
+Raubahn, Bull of Ala Mhigo
+Bloodforged Battle-Axe
+Ornithopter
+Island
+Island x10
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x13
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Raubahn, Bull of Ala Mhigo.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Bloodforged Battle-Axe.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Bloodforged Battle-Axe.Activate(Raubahn, Bull of Ala Mhigo)
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Raubahn, Bull of Ala Mhigo > Bot2; Ornithopter > Bot2)
+Bot1.Target(Bloodforged Battle-Axe)
+Bot1.Target(Ornithopter)
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.DeclareBlockers]
+? Bot1.Battlefield.Bloodforged Battle-Axe.AttachedTo = Raubahn, Bull of Ala Mhigo
+? Bot1.Graveyard = Ornithopter
+[T4 Bot2.Main1]
+? Bot2.Life = 16
+
+[Expect]
+Bot1.Battlefield.Raubahn, Bull of Ala Mhigo.Power = 4
