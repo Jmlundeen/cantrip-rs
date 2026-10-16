@@ -1,0 +1,38 @@
+# Clockwork Percussionist dies with Bot1's library empty (its deck is its seven-card opening hand): "exile the top card of your
+# library" has no card to exile, so nothing is exiled and nothing may be played. Bot1 has not drawn from an empty library, so it
+# has not lost.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Clockwork Percussionist
+Lightning Bolt
+Island
+Island
+Island
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Clockwork Percussionist.Cast
+Bot1.Pass
+[T1 Bot1.Main2]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Clockwork Percussionist)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 1
+Result = InProgress
+Exile.Count = 0
+Bot1.Library.Count = 0
+Bot1.Graveyard.Count = 2
+Bot1.Hand.Count = 3
+Stack.Count = 0

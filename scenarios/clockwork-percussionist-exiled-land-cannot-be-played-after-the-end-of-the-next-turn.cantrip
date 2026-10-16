@@ -1,0 +1,44 @@
+# Clockwork Percussionist: "You may play it until the end of your next turn." The Forest exiled when the Percussionist died on turn 1
+# may be played through turn 3 (the scenario in which Bot1 plays it then is its control) - here Bot1 plays an Island from its hand
+# on turn 3 instead and the permission ends with that turn's cleanup step (CR 514.2). On turn 5, with its land drop open
+# (the Island from hand is played right after as the control), Bot1 may no longer play the Forest from exile.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Clockwork Percussionist
+Lightning Bolt
+Island
+Island
+Island
+Forest
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Clockwork Percussionist.Cast
+Bot1.Pass
+[T1 Bot1.Main2]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Clockwork Percussionist)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Exile = Forest
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+! Bot1.Exile.Forest.Play
+Bot1.Hand.Island.Play
+
+[Expect]
+Turn = 5
+Exile = Forest
+Bot1.Battlefield = Mountain; Mox Ruby; Island; Island
+Bot1.Hand = Island; Island; Island

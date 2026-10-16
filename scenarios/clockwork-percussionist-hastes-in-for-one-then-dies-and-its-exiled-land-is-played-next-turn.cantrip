@@ -1,0 +1,46 @@
+# Clockwork Percussionist: Haste, and "When this creature dies, exile the top card of your library. You may play it until the end of
+# your next turn." On turn 1 it comes in and attacks at once for 1 (haste: Bot2 20 to 19), and in the second main phase Bot1 Bolts
+# it. The Forest on top of Bot1's library is exiled, a land: the turn's land drop is already used (Mountain), so on turn 3 -
+# Bot1's next turn - Bot1 plays the Forest from exile as its land drop. "Play" includes lands (CR 305.1).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Clockwork Percussionist
+Lightning Bolt
+Island
+Island
+Island
+Forest
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Clockwork Percussionist.Cast
+Bot1.Pass
+[T1 Bot1.DeclareAttackers]
+Bot1.Attack(Clockwork Percussionist > Bot2)
+[T1 Bot1.Main2]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Clockwork Percussionist)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Exile = Forest
+[T3 Bot1.Main1]
+Bot1.Exile.Forest.Play
+
+[Expect]
+Turn = 3
+Bot2.Life = 19
+Exile.Count = 0
+Bot1.Battlefield = Mountain; Mox Ruby; Forest
+Bot1.Graveyard.Count = 2
+Bot1.Hand = Island; Island; Island; Island
+Bot1.Library.Count = 11

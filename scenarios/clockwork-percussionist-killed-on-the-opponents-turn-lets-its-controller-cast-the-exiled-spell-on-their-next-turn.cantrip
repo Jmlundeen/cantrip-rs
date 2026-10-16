@@ -1,0 +1,53 @@
+# Clockwork Percussionist dies on the opponent's turn: Bot2 Bolts it on turn 2. "Your next turn" is then turn 3, Bot1's very next
+# turn: the exiled Lightning Bolt is cast from exile on turn 3 with all its costs ({R}, from Mox Ruby) at Bot2's face, 20 - 3. The
+# trigger's "you" is the Percussionist's controller, Bot1, though it was Bot2's spell that killed it: Bot2's own library is untouched
+# (12 cards, having drawn once) and the Bolt cast ends in Bot1's graveyard with the Percussionist.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Clockwork Percussionist
+Island
+Island
+Island
+Island
+Lightning Bolt
+Island x12
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island
+Island
+Island
+Island
+Island
+Island
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Clockwork Percussionist.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Clockwork Percussionist)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+? Exile = Lightning Bolt
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+
+[Expect]
+Turn = 3
+Bot2.Life = 17
+Exile.Count = 0
+Bot1.Graveyard.Count = 2
+Bot2.Graveyard = Lightning Bolt
+Bot2.Library.Count = 12
