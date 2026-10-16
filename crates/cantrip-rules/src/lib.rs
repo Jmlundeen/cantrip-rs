@@ -922,6 +922,14 @@ impl cantrip_api::Game for Cx<'_> {
         self.emit(Event::Searched { player, library });
     }
 
+    fn scried(&mut self, player: PlayerId, count: u16, looked: u16) {
+        self.emit(Event::Scried { player, count, looked });
+    }
+
+    fn surveilled(&mut self, player: PlayerId, count: u16, looked: u16) {
+        self.emit(Event::Surveilled { player, count, looked });
+    }
+
     fn attach(&mut self, attachment: ObjectId, host: ObjectId) {
         ops::attach(self, attachment, host);
     }

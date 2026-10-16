@@ -82,6 +82,10 @@ abilities: &[
   that says "you" is `when_asked(mask, f)`, `f` taking the `Asker` and reading `me.controller`, never
   `q.controller(source)`: a delayed triggered ability's "you" is the player who controlled the spell or ability that made
   it (CR 603.7d-e), whoever controls its source now or wherever it has gone.
+  "Whenever you scry", "whenever you surveil" and "whenever you scry or surveil" are `triggers::YOU_SCRY`, `YOU_SURVEIL`
+  and `YOU_SCRY_OR_SURVEIL`: `cantrip_mechanics::scry` and `surveil` record `Event::Scried` / `Event::Surveilled` once
+  the action is complete, an empty library included (CR 701.22d, 701.25d), and never for scry 0 or surveil 0 (CR
+  701.22b, 701.25c), so every scry and surveil goes through them; the trigger's `data` is the number and the cards looked at.
   "Whenever ... activate(s) an ability" listens to `EventMask::ABILITY_ACTIVATED` and reads the event with
   `triggers::activation` (the object, the activating player, the `ActivatedDef`: `is_loyalty_ability()`,
   `is_mana_ability()`, `from`); only abilities that use the stack are activations a trigger sees - a mana ability's is

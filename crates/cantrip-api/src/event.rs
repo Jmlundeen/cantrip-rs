@@ -105,6 +105,13 @@ pub enum Event {
     /// copy is neither cast nor activated (CR 707.10) and a new target chosen for a spell or ability already on the stack
     /// (CR 115.7) is not choosing it as it is cast, activated or put on the stack: neither commits one.
     CrimeCommitted { player: PlayerId, by: ObjectId },
+    /// `player` scried `count` (CR 701.22a), recorded once the process is complete, even if some or all of it was
+    /// impossible (CR 701.22d): `looked` is how many cards they looked at, fewer than `count` from a short library. Never
+    /// for "scry 0", which is no scry (CR 701.22b).
+    Scried { player: PlayerId, count: u16, looked: u16 },
+    /// `player` surveilled `count` (CR 701.25a), recorded once the process is complete, even if some or all of it was
+    /// impossible (CR 701.25d); `looked` as for `Scried`. Never for "surveil 0" (CR 701.25c).
+    Surveilled { player: PlayerId, count: u16, looked: u16 },
 }
 
 impl Event {
@@ -130,6 +137,8 @@ impl Event {
             | Event::DieRolled { player, .. }
             | Event::Done { player, .. }
             | Event::TurnEnded { player }
+            | Event::Scried { player, .. }
+            | Event::Surveilled { player, .. }
             | Event::CrimeCommitted { player, .. } => Some(player),
             Event::Cast(c) => Some(c.player),
             Event::BecameTarget { controller, .. } => Some(controller),
@@ -167,7 +176,7 @@ impl Event {
             | Event::Monstrous { permanent }
             | Event::DoorUnlocked { permanent, .. } => permanent == object,
             Event::Unattached { attachment, from } => attachment == object || from == object,
-            Event::LifeChange { .. } | Event::Searched { .. } | Event::AttackersDeclared { .. } | Event::StepBegan { .. } | Event::BecameMonarch { .. } | Event::GaveGift { .. } | Event::ChosenAtRandom { .. } | Event::CoinFlipped { .. } | Event::DieRolled { .. } | Event::TurnEnded { .. } => false,
+            Event::LifeChange { .. } | Event::Searched { .. } | Event::AttackersDeclared { .. } | Event::StepBegan { .. } | Event::BecameMonarch { .. } | Event::GaveGift { .. } | Event::ChosenAtRandom { .. } | Event::CoinFlipped { .. } | Event::DieRolled { .. } | Event::TurnEnded { .. } | Event::Scried { .. } | Event::Surveilled { .. } => false,
         }
     }
 }
@@ -216,6 +225,8 @@ impl EventMask {
     pub const GAVE_GIFT: EventMask = EventMask(1 << 35);
     pub const TURN_ENDED: EventMask = EventMask(1 << 36);
     pub const CRIME: EventMask = EventMask(1 << 37);
+    pub const SCRIED: EventMask = EventMask(1 << 38);
+    pub const SURVEILLED: EventMask = EventMask(1 << 39);
 
     /// An event's kind as the history files it: every event has one. `of` is what triggers listen for, which leaves
     /// out the records no ability triggers on.
@@ -277,6 +288,8 @@ impl EventMask {
             Event::DoorUnlocked { .. } => EventMask::DOOR_UNLOCKED,
             Event::GaveGift { .. } => EventMask::GAVE_GIFT,
             Event::CrimeCommitted { .. } => EventMask::CRIME,
+            Event::Scried { .. } => EventMask::SCRIED,
+            Event::Surveilled { .. } => EventMask::SURVEILLED,
             _ => EventMask(0),
         }
     }

@@ -680,6 +680,37 @@ pub fn you_roll_a_die(_: &dyn Query, me: &Asker, event: &Event) -> Option<Fired>
     }
 }
 
+/// "Whenever you scry" (CR 701.22, 603.2): its controller scried, once the scry was complete (CR 701.22d), whatever made
+/// them. Scry 0 is no scry and does not trigger it (CR 701.22b). The scry's number and the cards looked at are the
+/// trigger's `data` ("for each card looked at while scrying this way"). Arwen Undómiel, Chance-Met Elves and
+/// Council's Deliberation print it.
+pub fn you_scry(_: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match *event {
+        Event::Scried { player, count, looked } if player == me.controller => {
+            Some(Fired { subject: Target::None, data: [count as u32, looked as u32] })
+        }
+        _ => None,
+    }
+}
+
+/// "Whenever you surveil" (CR 701.25, 603.2): its controller surveilled, once the surveil was complete (CR 701.25d).
+/// Surveil 0 does not trigger it (CR 701.25c). Its `data` as `you_scry`'s. Dimir Spybug, Blood Operative and Copy
+/// Catchers print it.
+pub fn you_surveil(_: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match *event {
+        Event::Surveilled { player, count, looked } if player == me.controller => {
+            Some(Fired { subject: Target::None, data: [count as u32, looked as u32] })
+        }
+        _ => None,
+    }
+}
+
+/// "Whenever you scry or surveil" (CR 701.22, 701.25): either one, each scry and each surveil on its own. Planetarium of
+/// Wan Shi Tong, Denzilore Fatehold and Diviner of Victory print it.
+pub fn you_scry_or_surveil(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    you_scry(q, me, event).or_else(|| you_surveil(q, me, event))
+}
+
 /// An activation (CR 602.2) as the event a "whenever ... activate(s) an ability" trigger sees: the object whose ability
 /// it is, the player who activated it, and the ability. The object is read as it is, or as it last was if paying the cost
 /// took it away (CR 113.7a, 608.2h). Only abilities that use the stack are activations triggers see (`EventMask::of`).
@@ -722,6 +753,9 @@ pub const THIS_ENTERS: Trigger = when(EventMask::ZONE_CHANGE, this_enters);
 pub const THIS_ENTERS_IF_CAST: Trigger = when(EventMask::ZONE_CHANGE, this_enters_if_cast);
 pub const LANDFALL: Trigger = when_asked(EventMask::ZONE_CHANGE, landfall);
 pub const YOU_UNLOCK_THIS_RIGHT_DOOR: Trigger = when(EventMask::DOOR_UNLOCKED, you_unlock_this_right_door);
+pub const YOU_SCRY: Trigger = when_asked(EventMask::SCRIED, you_scry);
+pub const YOU_SURVEIL: Trigger = when_asked(EventMask::SURVEILLED, you_surveil);
+pub const YOU_SCRY_OR_SURVEIL: Trigger = when_asked(EventMask(EventMask::SCRIED.0 | EventMask::SURVEILLED.0), you_scry_or_surveil);
 pub const YOU_DRAW_A_CARD: Trigger = when_asked(EventMask::DREW, you_draw_a_card);
 pub const CAST_THIS_SPELL: Trigger = when(EventMask::SPELL_CAST, cast_this_spell);
 pub const MAGECRAFT: Trigger = when_asked(EventMask(EventMask::SPELL_CAST.0 | EventMask::COPIED.0), you_cast_or_copy_instant_or_sorcery);

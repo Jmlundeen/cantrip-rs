@@ -486,6 +486,12 @@ pub trait Game: Query {
     /// player's library, and "searches their library" is only the case where the two are the same), for whatever
     /// watches searches.
     fn searched(&mut self, player: PlayerId, library: PlayerId);
+    /// Records that `player` scried `count`, having looked at `looked` cards (CR 701.22a, 701.22d), for whatever watches
+    /// scries: `cantrip_mechanics::scry` calls it once the scry is complete, and never for scry 0 (CR 701.22b).
+    fn scried(&mut self, player: PlayerId, count: u16, looked: u16);
+    /// Records that `player` surveilled `count`, having looked at `looked` cards (CR 701.25a, 701.25d):
+    /// `cantrip_mechanics::surveil` calls it once the surveil is complete, and never for surveil 0 (CR 701.25c).
+    fn surveilled(&mut self, player: PlayerId, count: u16, looked: u16);
     /// `player` gave a gift to `to` (CR 702.174c): the gift triggered ability of a permanent they control resolved. (A
     /// spell's gift is announced by the core as the spell resolves.)
     fn gave_gift(&mut self, player: PlayerId, to: PlayerId, gift: Gift);

@@ -470,23 +470,30 @@ pub fn artifacts_you_control(q: &dyn Query, player: PlayerId) -> usize {
 
 /// Scry N (CR 701.22): look at the top N cards of your library, put any number on the bottom in any order and the
 /// rest back on top in any order. Nothing is asked of an empty library. Undercity's Lost Well prints "scry 2".
+///
+/// The scry is then recorded (`Event::Scried`), for "whenever you scry": once the process is complete, even if some or
+/// all of it was impossible, an empty library included (CR 701.22d). Scry 0 is no scry: nothing is looked at and no
+/// event occurs (CR 701.22b). Every card that scries goes through here.
 pub fn scry(g: &mut dyn Game, player: PlayerId, source: ObjectId, count: usize) -> Result<(), Suspend> {
-    let looked = top_of_library(g, player, count);
-    if looked.is_empty() {
+    if count == 0 {
         return Ok(());
     }
-    let ask = RequestKind::DistributeCards {
-        source,
-        cards: looked.clone(),
-        destinations: vec![
-            Destination { kind: DestinationKind::LibraryTop, min: 0, max: u8::MAX, eligible: looked.clone() },
-            Destination { kind: DestinationKind::LibraryBottom, min: 0, max: u8::MAX, eligible: looked },
-        ],
-        may_shuffle: false,
-    };
-    if let Answer::Placements { placements, .. } = g.ask(player, ask)? {
-        g.arrange_library(player, &placements[0], &placements[1]);
+    let looked = top_of_library(g, player, count);
+    if !looked.is_empty() {
+        let ask = RequestKind::DistributeCards {
+            source,
+            cards: looked.clone(),
+            destinations: vec![
+                Destination { kind: DestinationKind::LibraryTop, min: 0, max: u8::MAX, eligible: looked.clone() },
+                Destination { kind: DestinationKind::LibraryBottom, min: 0, max: u8::MAX, eligible: looked.clone() },
+            ],
+            may_shuffle: false,
+        };
+        if let Answer::Placements { placements, .. } = g.ask(player, ask)? {
+            g.arrange_library(player, &placements[0], &placements[1]);
+        }
     }
+    g.scried(player, count.min(u16::MAX as usize) as u16, looked.len() as u16);
     Ok(())
 }
 
@@ -500,32 +507,39 @@ pub fn surveil(g: &mut dyn Game, player: PlayerId, source: ObjectId, count: usiz
 /// `surveil`, saying which cards it put into the graveyard (the new objects, those that really arrived there: a
 /// replacement effect may have sent one elsewhere) for text that goes on to speak of them ("if you put a card ... into
 /// your graveyard this way"). Enlightened Confidant prints it.
+///
+/// The surveil is then recorded (`Event::Surveilled`), for "whenever you surveil": once the process is complete, even if
+/// some or all of it was impossible, an empty library included (CR 701.25d). Surveil 0 is no surveil: nothing is looked
+/// at and no event occurs (CR 701.25c). Every card that surveils goes through here.
 pub fn surveil_into_graveyard(
     g: &mut dyn Game,
     player: PlayerId,
     source: ObjectId,
     count: usize,
 ) -> Result<Vec<ObjectId>, Suspend> {
-    let looked = top_of_library(g, player, count);
-    if looked.is_empty() {
+    if count == 0 {
         return Ok(Vec::new());
     }
-    let ask = RequestKind::DistributeCards {
-        source,
-        cards: looked.clone(),
-        destinations: vec![
-            Destination { kind: DestinationKind::LibraryTop, min: 0, max: u8::MAX, eligible: looked.clone() },
-            Destination { kind: DestinationKind::Graveyard, min: 0, max: u8::MAX, eligible: looked },
-        ],
-        may_shuffle: false,
-    };
+    let looked = top_of_library(g, player, count);
     let mut binned = Vec::new();
-    if let Answer::Placements { placements, .. } = g.ask(player, ask)? {
-        let moves: Vec<(ObjectId, Zone)> = placements[1].iter().map(|&c| (c, Zone::graveyard(player))).collect();
-        let moved = g.move_together(&moves, ZoneReason::Other);
-        binned = moved.into_iter().filter(|&c| g.obj(c).zone.is(ZoneKind::Graveyard)).collect();
-        g.arrange_library(player, &placements[0], &[]);
+    if !looked.is_empty() {
+        let ask = RequestKind::DistributeCards {
+            source,
+            cards: looked.clone(),
+            destinations: vec![
+                Destination { kind: DestinationKind::LibraryTop, min: 0, max: u8::MAX, eligible: looked.clone() },
+                Destination { kind: DestinationKind::Graveyard, min: 0, max: u8::MAX, eligible: looked.clone() },
+            ],
+            may_shuffle: false,
+        };
+        if let Answer::Placements { placements, .. } = g.ask(player, ask)? {
+            let moves: Vec<(ObjectId, Zone)> = placements[1].iter().map(|&c| (c, Zone::graveyard(player))).collect();
+            let moved = g.move_together(&moves, ZoneReason::Other);
+            binned = moved.into_iter().filter(|&c| g.obj(c).zone.is(ZoneKind::Graveyard)).collect();
+            g.arrange_library(player, &placements[0], &[]);
+        }
     }
+    g.surveilled(player, count.min(u16::MAX as usize) as u16, looked.len() as u16);
     Ok(binned)
 }
 
