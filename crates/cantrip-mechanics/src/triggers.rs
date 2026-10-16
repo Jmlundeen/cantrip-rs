@@ -412,6 +412,58 @@ pub const fn ward_discard(text: &'static str) -> AbilityDef {
         .ward()
 }
 
+/// What ward's sacrifice cost asks the player whose spell or ability targeted, the question on that spell or ability.
+fn ward_sacrifice_question(n: u8) -> &'static Question {
+    const DETAIL: &str = "Ward: what it targeted can't be targeted for free";
+    const TWO: Question = Question::new(
+        "SacrificeUnlessCountered",
+        "Sacrifice two permanents, or {source} is countered?",
+        DETAIL,
+        "Sacrifice two permanents",
+        "Let it be countered",
+    )
+    .amount(2)
+    .no_default();
+    const THREE: Question = Question::new(
+        "SacrificeUnlessCountered",
+        "Sacrifice three permanents, or {source} is countered?",
+        DETAIL,
+        "Sacrifice three permanents",
+        "Let it be countered",
+    )
+    .amount(3)
+    .no_default();
+    match n {
+        2 => &TWO,
+        _ => &THREE,
+    }
+}
+
+fn ward_sacrifice_effect<const N: u8>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let Target::Object(by) = item.subject else { return Ok(()) };
+    let payer = PlayerId(item.data[0] as u8);
+    // A cost is paid only with what it needs (CR 118.3): a player controlling fewer than N permanents can't pay and is not
+    // asked, nor is one whom the ward's controller's abilities can't make sacrifice (CR 101.2; Tamiyo, Collector of Tales's
+    // ruling: "something happens unless you sacrifice" can't be paid). The payer then chooses which N, all sacrificed at once.
+    let permanents = g.permanents_of(payer);
+    if permanents.len() >= N as usize
+        && may_cause_discard_or_sacrifice(&*g, item.controller, payer, true)
+        && g.ask(payer, RequestKind::May { source: by, purpose: Purpose::Ask(ward_sacrifice_question(N)) })? == Answer::Yes
+    {
+        return crate::sacrifice_one_of(g, payer, item.object, N, permanents);
+    }
+    g.counter_item(by, item.data[1] as usize);
+    Ok(())
+}
+
+/// Ward--Sacrifice N permanents (CR 702.21a, 118.12): "Whenever this becomes the target of a spell or ability an opponent
+/// controls, counter it unless that player sacrifices N permanents." Emrakul, the Exigent Doom prints it with three,
+/// Ulamog, the Defiler with two.
+pub const fn ward_sacrifice<const N: u8>(text: &'static str) -> AbilityDef {
+    triggered(when(EventMask::BECAME_TARGET, ward_matches), ward_sacrifice_effect::<N>, text)
+        .ward()
+}
+
 /// "Whenever you cast a noncreature spell" (CR 603.2): prowess, Displacer Kitten and Dragon's Rage Channeler print it.
 pub fn noncreature_spell_you_cast(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match event {

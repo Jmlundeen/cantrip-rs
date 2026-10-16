@@ -55,6 +55,7 @@ pub mod foretell;
 pub mod kicker;
 pub mod level_up;
 pub mod lands;
+pub mod land_until_cast;
 pub mod mana;
 pub mod manifest_dread;
 pub mod mayhem;
@@ -166,7 +167,7 @@ pub fn each_opponent_sacrifices(
     Ok(())
 }
 
-fn sacrifice_one_of(g: &mut dyn Game, player: PlayerId, source: ObjectId, count: u8, eligible: Vec<ObjectId>) -> Result<(), Suspend> {
+pub(crate) fn sacrifice_one_of(g: &mut dyn Game, player: PlayerId, source: ObjectId, count: u8, eligible: Vec<ObjectId>) -> Result<(), Suspend> {
     if eligible.len() <= count as usize {
         g.sacrifice(&eligible);
         return Ok(());

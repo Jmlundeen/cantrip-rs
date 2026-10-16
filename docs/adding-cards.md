@@ -353,6 +353,13 @@ shapes have an example:
   give the creature an Equipment with them is attached to (7c), so a card only puts them (Dwalin, Weaponmaster; Sting,
   Bilbo's Sword).
   **Costs**: `Cost.unattach_self`.
+- **Until a card is cast from exile** (CR 611.2a, 400.7): `Duration::UntilCastFromExile(card)` ends as that object, a
+  card in exile, becomes cast (CR 601.2i, after its costs are paid); the card leaving exile any other way is a new object
+  and the effect goes on. `cantrip_mechanics::land_until_cast::ability::<N>(cost, text)` is the whole "{N}, Exile this
+  card from your hand: Target land gains "{T}: Add ..." until this card is cast from exile. You may cast this card for as
+  long as it remains exiled" (Emrakul, the Exigent Doom; Glamorous Outlaw and its cycle).
+- **Ward with a cost other than mana** (CR 702.21a, 118.12): `triggers::ward_life::<N>`, `ward_discard`, and
+  `ward_sacrifice::<N>` ("Sacrifice N permanents": refused with fewer, and under Tamiyo, Collector of Tales).
 - **Turns**: `DelayedWhen::UntilNextTurnOf(p)`; `DelayedWhen::EachStep` for "at the beginning of each [step] ... for the
   rest of the game", never used up and on no object (paradigm, CR 702.192a); `CardDef.turn_begin` skips a turn (Time Vault, CR 614.10); "end the
   turn" is `g.end_the_turn()?` (CR 724.1, Time Stop), after which the rest of the effect still runs (Glorious End), and
