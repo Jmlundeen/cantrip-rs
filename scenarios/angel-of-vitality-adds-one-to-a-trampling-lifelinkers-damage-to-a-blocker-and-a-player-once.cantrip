@@ -1,0 +1,61 @@
+# Angel of Vitality wears Loxodon Warhammer (+3/+0, trample, lifelink): a 5/2 flier. Bot2's Healer's Hawk blocks it, and
+# it assigns 1 to the Hawk and tramples 4 over to Bot2. One source dealing combat damage to several recipients at once
+# causes one life gain event (CR 120.3f; Angel of Vitality's 2024-11-08 ruling), so the Angel adds 1 once: Bot1 gains
+# 5 + 1 = 6 (20 -> 26), not 7. Bot2 loses 4 and the Hawk's lifelink gains it 1 (20 -> 17). At 26 life the Angel is
+# 7/4, and survives the Hawk's 1 damage.
+
+[Bot1 Deck]
+Plains
+Sol Ring
+Mox Pearl
+Angel of Vitality
+Plains
+Loxodon Warhammer
+Plains
+Plains x13
+
+[Bot2 Deck]
+Plains
+Healer's Hawk
+Island x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Angel of Vitality.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Healer's Hawk.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Hand.Loxodon Warhammer.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Loxodon Warhammer.Activate(Angel of Vitality)
+Bot1.Pass
+Bot1.Attack(Angel of Vitality > Bot2)
+Bot2.Block(Healer's Hawk > Angel of Vitality)
+Bot1.AssignDamage(Angel of Vitality > Healer's Hawk: 1; Angel of Vitality > Bot2: 4)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Life = 26
+Bot2.Life = 17
+Bot2.Graveyard = Healer's Hawk
+Bot1.Battlefield.Angel of Vitality.Power = 7
+Bot1.Battlefield.Angel of Vitality.Toughness = 4
+Bot1.Battlefield.Angel of Vitality.Damage = 1

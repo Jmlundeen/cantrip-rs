@@ -1,0 +1,54 @@
+# Browser
+# Boon Reflection ("you gain twice that much life instead") and Angel of Vitality ("you gain that much life plus 1
+# instead") both apply to Lightning Helix's 3 life. Bot1, whose life it is, chooses Boon Reflection first (CR 616.1): 3
+# becomes 6, and the Angel then adds 1 to the doubled event (CR 616.1f): 7 (20 -> 27). The other order makes 8
+# (angel-of-vitality-applied-before-boon-reflection-gains-eight-from-three). Bot1's page asks it as what the event
+# is - "You would gain 3 life" - and shows each effect with what it does.
+
+[Bot1 Deck]
+Plains
+Sol Ring
+Mox Pearl
+Angel of Vitality
+Plains
+Boon Reflection
+Mountain
+Lightning Helix
+Plains x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Angel of Vitality.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Boon Reflection.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Hand.Lightning Helix.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Client.Bot1.Prompt.Title = You would gain 3 life: which applies first?
+Bot1.Replace(Boon Reflection)
+
+[Expect]
+Turn = 5
+Bot1.Life = 27
+Bot2.Life = 17

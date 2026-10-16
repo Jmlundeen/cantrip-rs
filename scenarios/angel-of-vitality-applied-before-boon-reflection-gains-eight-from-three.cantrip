@@ -1,0 +1,54 @@
+# Angel of Vitality ("you gain that much life plus 1 instead") and Boon Reflection ("you gain twice that much life
+# instead") both apply to Lightning Helix's 3 life. Bot1, whose life it is, chooses the order (CR 616.1): the Angel
+# first, so 3 becomes 4, and Boon Reflection then doubles it to 8 (20 -> 28). The other order makes 7
+# (boon-reflection-applied-before-angel-of-vitality-gains-seven-from-three). At 25 or more life the Angel is a 4/4.
+
+[Bot1 Deck]
+Plains
+Sol Ring
+Mox Pearl
+Angel of Vitality
+Plains
+Boon Reflection
+Mountain
+Lightning Helix
+Plains x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Angel of Vitality.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Boon Reflection.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+? Bot1.Battlefield.Angel of Vitality.Power = 2
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Hand.Lightning Helix.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Replace(Angel of Vitality)
+
+[Expect]
+Turn = 5
+Bot1.Life = 28
+Bot2.Life = 17
+Bot1.Battlefield.Angel of Vitality.Power = 4
+Bot1.Battlefield.Angel of Vitality.Toughness = 4
