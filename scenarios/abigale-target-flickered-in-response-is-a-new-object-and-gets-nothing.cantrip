@@ -1,0 +1,41 @@
+# Abigale, Eloquent First-Year's trigger targets Bot1's own Cecil, Dark Knight; in response Ephemerate exiles Cecil and
+# returns it. The Cecil that returned is a new object (CR 400.7), not the target, which is gone, so the trigger does nothing
+# (CR 608.2b): the new Cecil keeps deathtouch and has no counters.
+# Turn 1: Plains, Mox Jet pays Cecil. Turn 3: Plains, Mox Pearl and a Plains pay Abigale, the other Plains Ephemerate.
+
+[Bot1 Deck]
+Plains
+Mox Jet
+Cecil, Dark Knight
+Mox Pearl
+Abigale, Eloquent First-Year
+Ephemerate
+Plains
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cecil, Dark Knight.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Hand.Abigale, Eloquent First-Year.Cast
+Bot1.Target(Cecil, Dark Knight)
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Ephemerate.Cast(Cecil, Dark Knight)
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Cecil, Dark Knight.Keywords = Deathtouch
+Bot1.Battlefield.Cecil, Dark Knight.Counters.Flying = (absent)
+Bot1.Battlefield.Cecil, Dark Knight.Counters.FirstStrike = (absent)
+Bot1.Battlefield.Cecil, Dark Knight.Counters.Lifelink = (absent)
+Exile = Ephemerate

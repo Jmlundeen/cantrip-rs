@@ -1,0 +1,43 @@
+# Abigale, Eloquent First-Year's trigger resolves on Bot1's Cecil, Dark Knight: no deathtouch, a flying, a first strike and a
+# lifelink counter. Then Ephemerate exiles Cecil and returns it: a new object (CR 400.7) that the indefinite "loses all
+# abilities" no longer affects and that has no counters (CR 122.2), so it has deathtouch again and none of the three.
+# Turn 1: Plains, Mox Jet pays Cecil. Turn 3: Plains, Mox Pearl and a Plains pay Abigale, the other Plains Ephemerate.
+
+[Bot1 Deck]
+Plains
+Mox Jet
+Cecil, Dark Knight
+Mox Pearl
+Abigale, Eloquent First-Year
+Ephemerate
+Plains
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cecil, Dark Knight.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Hand.Abigale, Eloquent First-Year.Cast
+Bot1.Target(Cecil, Dark Knight)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Cecil, Dark Knight.Keywords = FirstStrike; Flying; Lifelink
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Ephemerate.Cast(Cecil, Dark Knight)
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Cecil, Dark Knight.Keywords = Deathtouch
+Bot1.Battlefield.Cecil, Dark Knight.Counters.Flying = (absent)
+Bot1.Battlefield.Cecil, Dark Knight.Counters.FirstStrike = (absent)
+Bot1.Battlefield.Cecil, Dark Knight.Counters.Lifelink = (absent)

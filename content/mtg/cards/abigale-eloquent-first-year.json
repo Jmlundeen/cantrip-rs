@@ -1,0 +1,13 @@
+{
+  "name": "Abigale, Eloquent First-Year",
+  "manaCost": "{W/B}{W/B}",
+  "type": "Legendary Creature — Bird Bard",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "Flying, first strike, lifelink\nWhen Abigale enters, up to one other target creature loses all abilities. Put a flying counter, a first strike counter, and a lifelink counter on that creature.",
+  "keywords": [
+    "Flying",
+    "FirstStrike",
+    "Lifelink"
+  ]
+}

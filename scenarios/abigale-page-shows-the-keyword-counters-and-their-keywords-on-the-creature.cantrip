@@ -1,0 +1,37 @@
+# Browser
+# Abigale, Eloquent First-Year's trigger resolves on Bot2's Cecil, Dark Knight: it loses deathtouch and its Darkness ability,
+# and has a flying, a first strike and a lifelink counter, whose keywords it has (CR 122.1b, 613.7c). Bot1's page shows the
+# opponent's Cecil with the three counters across its art, its printed lines greyed as no longer its own, and the three
+# keywords the counters give it after them.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Abigale, Eloquent First-Year
+Island x17
+
+[Bot2 Deck]
+Mox Jet
+Cecil, Dark Knight
+Island x18
+
+[Actions]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Cecil, Dark Knight.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Abigale, Eloquent First-Year.Cast
+Bot1.Target(Cecil, Dark Knight)
+[T3 Bot1.Main2]
+? Client.Bot1.OpponentBattlefield.Cecil, Dark Knight.Counters = 1 × flying; 1 × lifelink; 1 × first strike
+? Client.Bot1.OpponentBattlefield.Cecil, Dark Knight.Rules = (grey) Deathtouch / (grey) Darkness — Whenever Cecil deals damage, you lose that much life. Then if your life total is less than or equal to half your starting life total, untap Cecil and transform it. / Flying / First strike / Lifelink
+
+[Expect]
+Bot2.Battlefield.Cecil, Dark Knight.Keywords = FirstStrike; Flying; Lifelink
+Bot2.Battlefield.Cecil, Dark Knight.Counters.Flying = 1
+Bot2.Battlefield.Cecil, Dark Knight.Counters.FirstStrike = 1
+Bot2.Battlefield.Cecil, Dark Knight.Counters.Lifelink = 1

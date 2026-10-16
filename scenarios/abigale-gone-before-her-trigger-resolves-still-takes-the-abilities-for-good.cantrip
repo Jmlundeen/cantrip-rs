@@ -1,0 +1,42 @@
+# Abigale, Eloquent First-Year's trigger targets Bot2's Cecil, Dark Knight, and in response Bot1 Lightning Bolts Abigale. The
+# trigger still resolves (CR 113.7a), and its "loses all abilities" lasts indefinitely: it doesn't end when Abigale leaves the
+# battlefield (the ruling). On turn 4 Cecil attacks unblocked with its counters' lifelink and without its Darkness ability:
+# Bot1 takes 2 and Bot2 gains 2 and loses none.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Abigale, Eloquent First-Year
+Mox Ruby
+Lightning Bolt
+Island x15
+
+[Bot2 Deck]
+Mox Jet
+Cecil, Dark Knight
+Island x18
+
+[Actions]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Cecil, Dark Knight.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Abigale, Eloquent First-Year.Cast
+Bot1.Target(Cecil, Dark Knight)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Abigale, Eloquent First-Year)
+[T3 Bot1.Main2]
+? Bot1.Graveyard = Abigale, Eloquent First-Year; Lightning Bolt
+[T4 Bot2.Main1]
+Bot2.Attack(Cecil, Dark Knight > Bot1)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 18
+Bot2.Life = 22
+Bot2.Battlefield.Cecil, Dark Knight.Keywords = FirstStrike; Flying; Lifelink

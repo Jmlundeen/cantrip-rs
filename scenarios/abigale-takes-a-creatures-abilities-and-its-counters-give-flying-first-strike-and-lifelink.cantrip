@@ -1,0 +1,44 @@
+# Abigale, Eloquent First-Year: "When Abigale enters, up to one other target creature loses all abilities. Put a flying
+# counter, a first strike counter, and a lifelink counter on that creature."
+# Abigale's trigger targets Bot2's Cecil, Dark Knight (deathtouch; "whenever Cecil deals damage, you lose that much life").
+# Cecil loses both and has the three counters, put on after the loss, so it has flying, first strike and lifelink (CR 122.1b,
+# 613.7c; the ruling). On turn 4 Cecil attacks unblocked: Bot1 takes 2, and Bot2 gains 2 by lifelink and loses none to the
+# lost Darkness ability (with it Bot2 would be back at 20, without lifelink at 18).
+# Abigale has its own flying, first strike and lifelink. Mox Pearl and Mox Jet pay {W/B}{W/B}.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Abigale, Eloquent First-Year
+Island x17
+
+[Bot2 Deck]
+Mox Jet
+Cecil, Dark Knight
+Island x18
+
+[Actions]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Cecil, Dark Knight.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Abigale, Eloquent First-Year.Cast
+Bot1.Target(Cecil, Dark Knight)
+[T3 Bot1.Main2]
+? Bot2.Battlefield.Cecil, Dark Knight.Keywords = FirstStrike; Flying; Lifelink
+? Bot2.Battlefield.Cecil, Dark Knight.Counters.Flying = 1
+? Bot2.Battlefield.Cecil, Dark Knight.Counters.FirstStrike = 1
+? Bot2.Battlefield.Cecil, Dark Knight.Counters.Lifelink = 1
+[T4 Bot2.Main1]
+Bot2.Attack(Cecil, Dark Knight > Bot1)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 18
+Bot2.Life = 22
+Bot2.Battlefield.Cecil, Dark Knight.Keywords = FirstStrike; Flying; Lifelink
+Bot1.Battlefield.Abigale, Eloquent First-Year.Keywords = FirstStrike; Flying; Lifelink

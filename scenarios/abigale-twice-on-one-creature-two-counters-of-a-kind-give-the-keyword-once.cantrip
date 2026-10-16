@@ -1,0 +1,57 @@
+# Two Abigale, Eloquent First-Year triggers on Bot2's Cecil, Dark Knight: it has two flying, two first strike and two lifelink
+# counters, and each keyword once (CR 122.1b: a counter gives the object the keyword; several of a kind give it no more than
+# one, and lifelink is redundant, CR 702.15f). On turn 6 Cecil attacks unblocked: Bot1 takes 2 and Bot2 gains 2, not 4.
+# The second Abigale is Abigale's legend-rule twin (CR 704.5j): Bot1 keeps the first and the new one goes to the graveyard,
+# its trigger still put on the stack.
+# Turn 1: Swamp. Turn 3: Plains, the Moxes pay the first Abigale. Turn 5: Swamp and Plains pay the second.
+
+[Bot1 Deck]
+Swamp
+Mox Pearl
+Mox Jet
+Abigale, Eloquent First-Year
+Abigale, Eloquent First-Year
+Plains
+Island
+Island x13
+
+[Bot2 Deck]
+Mox Jet
+Cecil, Dark Knight
+Island x18
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Cecil, Dark Knight.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Abigale, Eloquent First-Year.Cast
+Bot1.Target(Cecil, Dark Knight)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Abigale, Eloquent First-Year.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Battlefield.Abigale, Eloquent First-Year#1)
+Bot1.Target(Cecil, Dark Knight)
+[T5 Bot1.Main2]
+? Bot2.Battlefield.Cecil, Dark Knight.Counters.Flying = 2
+? Bot2.Battlefield.Cecil, Dark Knight.Counters.FirstStrike = 2
+? Bot2.Battlefield.Cecil, Dark Knight.Counters.Lifelink = 2
+[T6 Bot2.Main1]
+Bot2.Attack(Cecil, Dark Knight > Bot1)
+[T6 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 18
+Bot2.Life = 22
+Bot2.Battlefield.Cecil, Dark Knight.Keywords = FirstStrike; Flying; Lifelink
+Bot1.Battlefield = Abigale, Eloquent First-Year; Mox Jet; Mox Pearl; Plains; Swamp
+Bot1.Graveyard = Abigale, Eloquent First-Year

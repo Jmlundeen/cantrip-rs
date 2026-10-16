@@ -1,0 +1,35 @@
+# Abigale, Eloquent First-Year's trigger targets "up to one other target creature": with none chosen it does nothing.
+# Bot2's Cecil, Dark Knight could have been chosen and was not, so it keeps deathtouch and gets no counters; Abigale can't
+# target itself ("other"), so the only candidate offered is Cecil.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Abigale, Eloquent First-Year
+Island x17
+
+[Bot2 Deck]
+Mox Jet
+Cecil, Dark Knight
+Island x18
+
+[Actions]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Cecil, Dark Knight.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Abigale, Eloquent First-Year.Cast
+! Bot1.Target(Abigale, Eloquent First-Year)
+Bot1.Target()
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Pearl; Mox Jet; Abigale, Eloquent First-Year
+Bot2.Battlefield.Cecil, Dark Knight.Keywords = Deathtouch
+Bot2.Battlefield.Cecil, Dark Knight.Counters.Flying = (absent)
+Bot2.Battlefield.Cecil, Dark Knight.Counters.FirstStrike = (absent)
+Bot2.Battlefield.Cecil, Dark Knight.Counters.Lifelink = (absent)
