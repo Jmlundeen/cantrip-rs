@@ -1,0 +1,53 @@
+# Known bug: an object's own characteristic-defining abilities of layer 7a and later still apply once it has lost all its abilities (CR 604.3, 613.1f, 613.4a); `statics` in layers.rs applies `def.statics` that are `own` whatever LoseAllAbilities says.
+# Tarmogoyf: "power is equal to the number of card types among cards in all graveyards and its toughness is equal to that number plus 1",
+# a characteristic-defining ability, which is a static ability (CR 604.3). With Lightning Bolt in a graveyard it is 1/2 (the control).
+# Bot2's The Wondrous Wasp takes every ability from it on turn 2, the ability with them, and what is left is the printed */1+* with the
+# star worth 0 (CR 208.2a, 208.5): a 0/1.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Ruby
+Tarmogoyf
+Lightning Bolt
+Island x15
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Jet
+The Wondrous Wasp
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tarmogoyf.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Tarmogoyf.Power = 1
+? Bot1.Battlefield.Tarmogoyf.Toughness = 2
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.The Wondrous Wasp.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Target(Tarmogoyf)
+Bot2.Pass
+Bot1.Pass
+[T2 Bot2.Main2]
+? Bot1.Battlefield.Tarmogoyf.Power = 0
+
+[Expect]
+Bot1.Battlefield.Tarmogoyf.Power = 0
+Bot1.Battlefield.Tarmogoyf.Toughness = 1
