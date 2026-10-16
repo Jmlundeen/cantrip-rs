@@ -92,6 +92,38 @@ public sealed class TacticalPromptsTests
         Assert.Single(Assert.IsType<ModesChosenAnswer>(Bot().Decide(client, OneOrBoth(extraModesCost: true))).Modes);
     }
 
+    // --- A choice between discarding one card or two ------------------------------------------------------------------
+
+    // The host sends no Texts for a card's own labels (Label::Card), so the faces branch does not answer first.
+    private static ChooseModesPromptMessage Discards(string first) => new()
+    {
+        Player = Me,
+        Modes = [first, "Discard two cards"],
+        Eligible = [0, 1],
+        Count = 1,
+    };
+
+    [Fact]
+    public void Discards_one_card_rather_than_two_when_the_one_card_discard_is_offered()
+    {
+        GameClient client = Seated([Creature(3, "Giant", 4, 3, Them)]);
+
+        ModesChosenAnswer answer = Assert.IsType<ModesChosenAnswer>(Bot().Decide(client,
+            Discards("Discard an instant or sorcery card or a creature card with flying")));
+
+        Assert.Equal([0], answer.Modes);
+    }
+
+    [Fact]
+    public void Does_not_apply_the_one_card_discard_rule_to_other_modes()
+    {
+        GameClient client = Seated([Creature(3, "Giant", 4, 3, Them)]);
+
+        ModesChosenAnswer answer = Assert.IsType<ModesChosenAnswer>(Bot().Decide(client, Discards("Draw a card")));
+
+        Assert.Single(answer.Modes);
+    }
+
     // --- The faces a card may be cast as ----------------------------------------------------------------------------
 
     private static ChooseModesPromptMessage Faces() => new()
