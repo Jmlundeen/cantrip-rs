@@ -23,17 +23,11 @@ fn otter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 /// "Whenever you cast an instant or sorcery spell", at level 3.
-fn cast_at_level_three(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
-    match event {
-        Event::SpellCast { spell, player, .. }
-            if *player == q.controller(source)
-                && class::level(q, source) >= 3
-                && (q.chars(*spell).is(CardType::Instant) || q.chars(*spell).is(CardType::Sorcery)) =>
-        {
-            Fired::PLAIN
-        }
-        _ => None,
+fn cast_at_level_three(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    if class::level(q, me.source) < 3 {
+        return None;
     }
+    cantrip_mechanics::triggers::you_cast_instant_or_sorcery(q, me, event)
 }
 
 pub static CARD: CardDef = CardDef {
@@ -43,7 +37,7 @@ pub static CARD: CardDef = CardDef {
         triggered(THIS_ENTERS, otter, "When this Class enters, create a 1/1 blue and red Otter creature token with prowess."),
         triggered(class::BECOMES_LEVEL_TWO, cantrip_mechanics::effects::return_first_target_to_hand, "When this Class becomes level 2, return target instant or sorcery card from your graveyard to your hand.")
             .targets(&[targets::INSTANT_OR_SORCERY_IN_YOUR_GRAVEYARD]),
-        triggered(when(EventMask::SPELL_CAST, cast_at_level_three), otter, "Whenever you cast an instant or sorcery spell, create a 1/1 blue and red Otter creature token with prowess."),
+        triggered(when_asked(EventMask::SPELL_CAST, cast_at_level_three), otter, "Whenever you cast an instant or sorcery spell, create a 1/1 blue and red Otter creature token with prowess."),
     ],
     ..oracle::STORMCHASERS_TALENT
 };

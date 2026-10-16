@@ -526,6 +526,20 @@ pub fn noncreature_spell_you_cast(q: &dyn Query, me: &Asker, event: &Event) -> O
     }
 }
 
+/// "Whenever you cast an instant or sorcery spell" (CR 603.2, 601.2i): a spell cast, not one copied (CR 707.10a), by this
+/// ability's controller, read as it stands on the stack. The spell rides along as the trigger's subject ("that spell").
+/// Colorstorm Stallion's opus and Stormchaser's Talent's third level print it.
+pub fn you_cast_instant_or_sorcery(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::SpellCast { spell, player, .. }
+            if *player == me.controller && (q.chars(*spell).is(CardType::Instant) || q.chars(*spell).is(CardType::Sorcery)) =>
+        {
+            Fired::about(Target::Object(*spell))
+        }
+        _ => None,
+    }
+}
+
 /// "Whenever you cast a spell from exile" (CR 601.2a, 603.2): the spell's controller is the ability's controller and the zone
 /// it was cast from, recorded on it, is exile. Appa, Steadfast Guardian and Quintorius Kand print it.
 pub fn you_cast_a_spell_from_exile(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
@@ -891,6 +905,7 @@ pub const EQUIPPED_CREATURE_ATTACKS: Trigger = when(EventMask::ATTACKS, equipped
 pub const EQUIPPED_CREATURE_ATTACKS_SUBJECT: Trigger = when(EventMask::ATTACKS, equipped_creature_attacks_subject);
 pub const ENCHANTED_PLAYER_ATTACKED: Trigger = when(EventMask::ATTACKS, enchanted_player_attacked);
 pub const YOU_ATTACK: Trigger = when_asked(EventMask::ATTACKERS_DECLARED, you_attack);
+pub const INSTANT_OR_SORCERY_YOU_CAST: Trigger = when_asked(EventMask::SPELL_CAST, you_cast_instant_or_sorcery);
 pub const NONCREATURE_SPELL_YOU_CAST: Trigger = when_asked(EventMask::SPELL_CAST, noncreature_spell_you_cast);
 pub const YOU_CAST_A_SPELL_FROM_EXILE: Trigger = when_asked(EventMask::SPELL_CAST, you_cast_a_spell_from_exile);
 pub const THIS_DIES: Trigger = when(EventMask::ZONE_CHANGE, this_dies);
