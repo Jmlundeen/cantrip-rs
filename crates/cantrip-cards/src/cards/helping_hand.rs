@@ -3,9 +3,9 @@ use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
 
 /// "Return target creature card ... from your graveyard to the battlefield tapped." If the target is gone, the spell
-/// is countered on resolution (CR 608.2b) and never gets here; the one target is legal, so `object` has it (iterating the Option keeps a dead else arm out).
+/// is countered on resolution (CR 608.2b) and never gets here; the one target is legal, so `object` has it.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    for card in targets::object(g, item, 0) {
+    if let Some(card) = targets::object(g, item, 0) {
         g.put_onto_battlefield(card, item.controller, true)?;
     }
     Ok(())
