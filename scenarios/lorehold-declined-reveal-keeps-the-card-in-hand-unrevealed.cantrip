@@ -1,0 +1,38 @@
+# Revealing a card for miracle is a choice (CR 702.94a): Bot1 keeps Hop to It hidden, so nothing triggers and it stays in
+# Bot1's hand, unrevealed.
+[Bot1 Deck]
+Mountain
+Sol Ring
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Lorehold, the Historian
+Plains
+Plains
+Hop to It
+Plains x15
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Lorehold, the Historian.Cast
+[T4 Bot2.Upkeep]
+Bot1.Choose()
+[T5 Bot1.Draw]
+Bot1.Decline
+[T5 Bot1.Main1]
+[Expect]
+Stack.Count = 0
+Bot1.Hand = Plains; Hop to It
+Bot1.Revealed = (absent)

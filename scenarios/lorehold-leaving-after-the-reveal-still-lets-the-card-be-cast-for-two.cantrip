@@ -1,0 +1,54 @@
+# Once Hop to It is revealed and miracle's linked ability has triggered, the ability is independent of Lorehold (CR
+# 113.7a) and of whether the card still has miracle (CR 607.5): Bot2 exiles Lorehold in response, and the ability still
+# lets Bot1 cast Hop to It for {2}, paid with Sol Ring.
+[Bot1 Deck]
+Mountain
+Sol Ring
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Lorehold, the Historian
+Plains
+Plains
+Hop to It
+Plains x15
+[Bot2 Deck]
+Plains
+Swords to Plowshares
+Plains x18
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Lorehold, the Historian.Cast
+[T4 Bot2.Upkeep]
+Bot1.Choose()
+[T5 Bot1.Draw]
+Bot1.Accept
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Lorehold, the Historian)
+Bot1.Pass
+? Exile = Lorehold, the Historian
+? Stack.Count = 1
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Accept
+[T5 Bot1.Main1]
+[Expect]
+Exile = Lorehold, the Historian
+Bot1.Life = 25
+Bot1.Battlefield.Count = 9
+Bot1.Battlefield.Sol Ring.Tapped = true
+Bot1.Graveyard = Hop to It

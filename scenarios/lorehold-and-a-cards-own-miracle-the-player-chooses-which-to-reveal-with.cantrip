@@ -1,0 +1,44 @@
+# Reforge the Soul has miracle {1}{R} of its own, and Lorehold gives it miracle {2} as well: two miracle abilities, each
+# linked only to its own triggered ability (CR 607.5), so Bot1 says which it reveals the card with. Bot1 takes the card's
+# own and pays {1}{R} out of {C}{C}{R}, leaving {C} (Lorehold's {2} would have left {R}).
+[Bot1 Deck]
+Mountain
+Sol Ring
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Lorehold, the Historian
+Plains
+Plains
+Reforge the Soul
+Plains x15
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Lorehold, the Historian.Cast
+[T4 Bot2.Upkeep]
+Bot1.Choose()
+[T5 Bot1.Draw]
+Bot1.Accept
+Bot1.Modes(Its own)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Accept
+? Bot1.Mana = {C}
+[T5 Bot1.Main1]
+[Expect]
+Bot1.Graveyard = Reforge the Soul; Plains
+Bot1.Hand.Count = 7
+Bot2.Hand.Count = 7

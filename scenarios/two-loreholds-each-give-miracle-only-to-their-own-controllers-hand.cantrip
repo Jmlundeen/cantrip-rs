@@ -1,0 +1,64 @@
+# Lorehold is legendary (CR 704.5j), so two Loreholds are one each. Each gives miracle only to its controller's hand
+# (CR 702.94a): Hop to It, Bot1's first card of turn 5, has one miracle ability, Bot1's Lorehold's, so Bot1 is asked
+# only whether to reveal it, not which miracle to reveal it with, and casts it for {2}.
+[Bot1 Deck]
+Mountain
+Sol Ring
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Lorehold, the Historian
+Plains
+Plains
+Hop to It
+Plains x15
+[Bot2 Deck]
+Mountain
+Sol Ring
+Mox Pearl
+Lorehold, the Historian
+Plains
+Island
+Island
+Plains
+Island x12
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Lorehold, the Historian.Cast
+[T4 Bot2.Upkeep]
+Bot1.Choose()
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Lorehold, the Historian.Cast
+[T5 Bot1.Upkeep]
+Bot2.Choose()
+[T5 Bot1.Draw]
+Bot1.Accept
+! Bot1.Modes
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Accept
+[T5 Bot1.Main1]
+[Expect]
+Bot1.Graveyard = Hop to It
+Bot1.Battlefield.Count = 10
+Bot2.Battlefield.Lorehold, the Historian.Tapped = false

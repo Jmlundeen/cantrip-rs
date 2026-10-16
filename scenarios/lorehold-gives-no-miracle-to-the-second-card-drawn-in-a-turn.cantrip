@@ -1,0 +1,44 @@
+# Miracle reveals only the first card drawn in a turn (CR 702.94a), and several draws are made one at a time (CR 121.2).
+# In Bot2's upkeep Bot1 declines Lorehold's discard and casts Ancestral Recall: its first draw, an Island, is Bot1's first
+# card of turn 4, and Hop to It comes second, so Lorehold's miracle {2} is not offered for it, though it is a sorcery.
+[Bot1 Deck]
+Mountain
+Sol Ring
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Lorehold, the Historian
+Plains
+Ancestral Recall
+Island
+Hop to It
+Plains
+Plains
+Plains x15
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Lorehold, the Historian.Cast
+[T4 Bot2.Upkeep]
+Bot1.Choose()
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Pass
+! Bot1.Accept
+[T4 Bot2.Main1]
+[Expect]
+Bot1.Graveyard = Ancestral Recall
+Bot1.Hand = Island; Hop to It; Plains
+Stack.Count = 0

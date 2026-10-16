@@ -1,0 +1,39 @@
+# Lorehold, the Historian gives miracle only to instant and sorcery cards (CR 702.94a): Llanowar Elves, the first card Bot1
+# draws on turn 5, has none, so Bot1 is not asked to reveal it. The positive control is
+# lorehold-gives-the-first-card-drawn-a-sorcery-miracle-for-two.
+[Bot1 Deck]
+Mountain
+Sol Ring
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Lorehold, the Historian
+Plains
+Plains
+Llanowar Elves
+Plains x15
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Lorehold, the Historian.Cast
+[T4 Bot2.Upkeep]
+Bot1.Choose()
+[T5 Bot1.Upkeep]
+Bot1.Pass
+! Bot1.Accept
+[T5 Bot1.Main1]
+[Expect]
+Stack.Count = 0
+Bot1.Hand = Plains; Llanowar Elves

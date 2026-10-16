@@ -1,0 +1,42 @@
+# Lorehold, the Historian: "Each instant and sorcery card in your hand has miracle {2}." Hop to It ({2}{W}) is the first
+# card Bot1 draws on turn 5, so as it is drawn Bot1 may reveal it (CR 702.94a); the linked ability lets Bot1 cast it for
+# {2}, paid with two Mountains and no white mana, and the three Rabbits are made. Bot1 declines Lorehold's discard in
+# Bot2's upkeep, so the draw step's card is the first.
+[Bot1 Deck]
+Mountain
+Black Lotus
+Lorehold, the Historian
+Mountain
+Plains
+Plains
+Plains
+Mountain
+Hop to It
+Plains x15
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Lorehold, the Historian.Cast
+[T4 Bot2.Upkeep]
+Bot1.Choose()
+[T5 Bot1.Draw]
+Bot1.Accept
+? Bot1.Revealed = Hop to It
+? Stack.Count = 1
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Accept
+[T5 Bot1.Main1]
+[Expect]
+Bot1.Battlefield.Count = 6
+Bot1.Battlefield.Mountain#2.Tapped = true
+Bot1.Graveyard = Hop to It; Black Lotus
+Bot1.Hand.Count = 4
+Bot1.Mana =

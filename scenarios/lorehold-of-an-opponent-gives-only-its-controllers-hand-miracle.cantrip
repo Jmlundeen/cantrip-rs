@@ -1,0 +1,61 @@
+# "Each instant and sorcery card in your hand": Bot2's Lorehold gives miracle {2} to Bot2's cards alone. Hop to It, Bot1's
+# first card of turn 5, has none, so Bot1 is not asked; Lightning Strike, Bot2's first card of turn 6, is revealed and
+# cast for {2} from Sol Ring at Bot1. Bot2 declines its Lorehold's discard in Bot1's upkeep.
+[Bot1 Deck]
+Mountain
+Sol Ring
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Island
+Plains
+Plains
+Hop to It
+Plains x15
+[Bot2 Deck]
+Mountain
+Sol Ring
+Mox Pearl
+Lorehold, the Historian
+Plains
+Island
+Island
+Plains
+Island
+Lightning Strike
+Island x10
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Lorehold, the Historian.Cast
+[T5 Bot1.Upkeep]
+Bot2.Choose()
+Bot1.Pass
+! Bot1.Accept
+[T6 Bot2.Draw]
+Bot2.Accept
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Accept
+Bot2.Target(Bot1)
+[T6 Bot2.Main1]
+[Expect]
+Bot1.Life = 17
+Bot1.Hand = Hop to It; Island; Plains
+Bot2.Graveyard = Lightning Strike
