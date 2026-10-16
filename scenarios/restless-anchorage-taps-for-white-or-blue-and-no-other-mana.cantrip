@@ -1,0 +1,29 @@
+# "{T}: Add {W} or {U}": on turn 3 white and blue are offered (white taken) while red, black, green and colorless are
+# refused beside them as the positive control; it entered tapped on turn 1 (CR 614.12), so there was no mana before
+# then. It makes a Map token only when it attacks, and it is not a creature here, so nothing is made.
+
+[Bot1 Deck]
+Restless Anchorage
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Restless Anchorage.Play
+? Bot1.Battlefield.Restless Anchorage.Tapped = true
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Restless Anchorage.Activate(Ability: Add; Color: Red)
+! Bot1.Battlefield.Restless Anchorage.Activate(Ability: Add; Color: Black)
+! Bot1.Battlefield.Restless Anchorage.Activate(Ability: Add; Color: Green)
+! Bot1.Battlefield.Restless Anchorage.Activate(Ability: Add; Color: Colorless)
+Bot1.Battlefield.Restless Anchorage.Activate(Color: White)
+? Bot1.Mana = {W}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Restless Anchorage.Activate(Color: Blue)
+? Bot1.Mana = {U}
+
+[Expect]
+Turn = 5
+Bot1.Mana = {U}
+Bot1.Battlefield = Restless Anchorage

@@ -1,0 +1,59 @@
+# Restless Anchorage enters tapped on turn 1 and is a plain land. On turn 3 Bot1 pays {1}{W}{U} with three Moxen and
+# animates it: until end of turn it is a 2/3 white and blue Bird land creature with flying (CR 613.1d, 613.4b). It attacks
+# beside an Elvish Mystic. Bot2's Llanowar Elves may block the ground attacker but not the Anchorage, which flies
+# (the refusal beside its control: the same Elves do block the Mystic). Attacking creates a Map token, and the Anchorage
+# deals 2 unblocked. On turn 4 the effect is gone: it is only a Land again.
+
+[Bot1 Deck]
+Restless Anchorage
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Elvish Mystic
+Plains
+Plains x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x14
+
+[Actions]
+Bot1.Hand.Restless Anchorage.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Elvish Mystic.Cast
+? Bot1.Battlefield.Restless Anchorage.Tapped = true
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Restless Anchorage.Activate(Ability: Until end of turn)
+Bot1.Attack(Restless Anchorage > Bot2; Elvish Mystic > Bot2)
+? Bot1.Battlefield.Restless Anchorage.Types = Land; Creature
+? Bot1.Battlefield.Restless Anchorage.Subtypes = Bird
+? Bot1.Battlefield.Restless Anchorage.Colors = Blue; White
+? Bot1.Battlefield.Restless Anchorage.Keywords = Flying
+? Bot1.Battlefield.Restless Anchorage.Power = 2
+? Bot1.Battlefield.Restless Anchorage.Toughness = 3
+! Bot2.Block(Llanowar Elves > Restless Anchorage)
+Bot2.Block(Llanowar Elves > Elvish Mystic)
+[T3 Bot1.Main2]
+? Bot2.Life = 18
+? Bot1.Battlefield.Map Token.Types = Artifact
+[T4 Bot2.Main1]
+
+[Expect]
+Turn = 4
+Bot2.Life = 18
+Bot1.Battlefield.Restless Anchorage.Types = Land
+Bot1.Battlefield.Restless Anchorage.Colors = (absent)
+Bot1.Battlefield.Map Token.Types = Artifact
