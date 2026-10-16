@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::choose;
+use cantrip_mechanics::library;
 use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
@@ -7,10 +7,8 @@ use cantrip_oracle as oracle;
 /// way, you gain 2 life.
 fn mill_and_take(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let player = item.controller;
-    let among = g.mill(player, 4);
-    let lands: Vec<ObjectId> = among.iter().copied().filter(|&c| g.chars(c).is(CardType::Land)).collect();
-    let Some(&card) = choose::cards_from(g, player, item.object, Purpose::PutIntoHand, among, lands, 1, true)?.first() else { return Ok(()) };
-    if let Some(&in_hand) = g.return_to_hand(&[card]).first()
+    let taken = library::mill_and_take_one(g, player, item.object, 4, "land", |c| c.is(CardType::Land))?;
+    if let Some(&in_hand) = taken.first()
         && g.obj(in_hand).zone == Zone::hand(player)
         && g.chars(in_hand).subtypes.has(Subtype::Town)
     {
