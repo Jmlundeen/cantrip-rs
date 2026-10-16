@@ -335,6 +335,29 @@ fn prowess_pump(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// real triggered ability. The Otter token of Stormchaser's Talent and the Monk token of Cori-Steel Cutter carry it.
 pub const PROWESS: AbilityDef = triggered(when(EventMask::SPELL_CAST, noncreature_spell_you_cast), prowess_pump, "Prowess (Whenever you cast a noncreature spell, this creature gets +1/+1 until end of turn.)");
 
+/// The instant or sorcery spell `player` cast or copied, if this event is one (CR 601.2i, 707.10): magecraft's trigger event,
+/// and what Veyran, Voice of Duality's "you casting or copying an instant or sorcery spell" names. A copy of a spell is not
+/// cast (CR 707.10a), and a copy of a card that is no spell on the stack is not "copying a spell", so only a copy on the stack
+/// counts. The spell is read as it is on the stack.
+pub fn instant_or_sorcery_cast_or_copied(q: &dyn Query, event: &Event) -> Option<(ObjectId, PlayerId)> {
+    let (spell, player) = match *event {
+        Event::SpellCast { spell, player, .. } => (spell, player),
+        Event::Copied { copy, player, .. } if q.state().stack.iter().any(|i| i.kind == StackKind::Spell && i.object == copy) => (copy, player),
+        _ => return None,
+    };
+    let c = q.chars(spell);
+    (c.is(CardType::Instant) || c.is(CardType::Sorcery)).then_some((spell, player))
+}
+
+/// Magecraft (CR 207.2c, an ability word): "Whenever you cast or copy an instant or sorcery spell", one ability that triggers
+/// on either. Witherbloom Apprentice, Sedgemoor Witch and Veyran, Voice of Duality print it.
+pub fn you_cast_or_copy_instant_or_sorcery(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match instant_or_sorcery_cast_or_copied(q, event) {
+        Some((_, player)) if player == q.controller(source) => Fired::PLAIN,
+        _ => None,
+    }
+}
+
 /// "When this is put into a graveyard from the battlefield" (CR 700.4 for a creature: "dies"), looked back on: the
 /// ability is the object's as it last existed there (CR 603.10a). Use with `look_back: true`.
 pub fn this_dies(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
@@ -509,6 +532,7 @@ pub const THIS_ENTERS_IF_CAST: Trigger = when(EventMask::ZONE_CHANGE, this_enter
 pub const LANDFALL: Trigger = when(EventMask::ZONE_CHANGE, landfall);
 pub const YOU_UNLOCK_THIS_RIGHT_DOOR: Trigger = when(EventMask::DOOR_UNLOCKED, you_unlock_this_right_door);
 pub const CAST_THIS_SPELL: Trigger = when(EventMask::SPELL_CAST, cast_this_spell);
+pub const MAGECRAFT: Trigger = when(EventMask(EventMask::SPELL_CAST.0 | EventMask::COPIED.0), you_cast_or_copy_instant_or_sorcery);
 pub const THIS_ATTACKS: Trigger = when(EventMask::ATTACKS, this_attacks);
 pub const THIS_ATTACKS_DEFENDER: Trigger = when(EventMask::ATTACKS, this_attacks_defender);
 pub const EQUIPPED_CREATURE_ATTACKS: Trigger = when(EventMask::ATTACKS, equipped_creature_attacks);
