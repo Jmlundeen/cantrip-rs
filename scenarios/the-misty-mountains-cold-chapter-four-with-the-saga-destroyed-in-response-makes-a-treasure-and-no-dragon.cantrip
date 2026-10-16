@@ -1,0 +1,53 @@
+# Chapter IV is on the stack on turn 7 with three Treasures out when Bot2 destroys the Saga with Disenchant. The chapter ability
+# still resolves (CR 603.2, 113.7a): it makes the fourth Treasure, but the Saga has already left the battlefield and cannot
+# be sacrificed (CR 400.7, 701.21a), so "if you do" is false and no Dragon is created even though Bot1 controls four Treasures.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Sol Ring
+The Misty Mountains Cold
+Mountain x3
+Mountain x20
+
+[Bot2 Deck]
+Plains
+Plains
+Disenchant
+Plains x4
+Plains x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.The Misty Mountains Cold.Cast
+Bot1.Pass
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T7 Bot1.Main1]
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.The Misty Mountains Cold)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = The Misty Mountains Cold
+Bot2.Pass
+Bot1.Pass
+[T7 Bot1.Main2]
+
+[Expect]
+Turn = 7
+Bot1.Battlefield = Mountain; Mox Ruby; Sol Ring; Treasure Token; Treasure Token; Treasure Token; Treasure Token
+Bot1.Battlefield.Count = 7
+Bot1.Graveyard = The Misty Mountains Cold
+Bot2.Graveyard = Disenchant; Plains

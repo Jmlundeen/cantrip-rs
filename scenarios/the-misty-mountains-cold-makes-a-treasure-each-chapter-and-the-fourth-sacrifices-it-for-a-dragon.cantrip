@@ -1,0 +1,53 @@
+# The Misty Mountains Cold, played through all four chapters (turns 1, 3, 5, 7): each chapter creates a Treasure and then
+# counts the Treasures Bot1 controls. After chapter III there are three, one short, so the Saga stays (a negative at the
+# boundary of "four or more"); chapter IV makes the fourth, the Saga is sacrificed, and "if you do" gives the 6/6 red
+# Dragon with flying (CR 714.2, 701.21a). The Treasures stay: only the Saga is sacrificed.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Sol Ring
+The Misty Mountains Cold
+Mountain x3
+Mountain x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.The Misty Mountains Cold.Cast
+Bot1.Pass
+Bot1.Pass
+[T1 Bot1.Main2]
+? Bot1.Battlefield.The Misty Mountains Cold.Counters.Lore = 1
+? Bot1.Battlefield = Mountain; Mox Ruby; Sol Ring; The Misty Mountains Cold; Treasure Token
+? Bot1.Battlefield.Count = 5
+[T3 Bot1.Main2]
+? Bot1.Battlefield.The Misty Mountains Cold.Counters.Lore = 2
+? Bot1.Battlefield = Mountain; Mox Ruby; Sol Ring; The Misty Mountains Cold; Treasure Token; Treasure Token
+? Bot1.Battlefield.Count = 6
+[T5 Bot1.Main2]
+? Bot1.Battlefield.The Misty Mountains Cold.Counters.Lore = 3
+? Bot1.Battlefield = Mountain; Mox Ruby; Sol Ring; The Misty Mountains Cold; Treasure Token; Treasure Token; Treasure Token
+? Bot1.Battlefield.Count = 7
+[T7 Bot1.Main2]
+
+[Expect]
+Turn = 7
+Bot1.Battlefield = Mountain; Mox Ruby; Sol Ring; Treasure Token; Treasure Token; Treasure Token; Treasure Token; Dragon
+Bot1.Battlefield.Count = 8
+Bot1.Battlefield.Dragon.Power = 6
+Bot1.Battlefield.Dragon.Toughness = 6
+Bot1.Battlefield.Dragon.Keywords = Flying
+Bot1.Battlefield.Dragon.Colors = Red
+Bot1.Battlefield.Dragon.Subtypes = Dragon
+Bot1.Battlefield.Dragon.Token = true
+Bot1.Graveyard = The Misty Mountains Cold

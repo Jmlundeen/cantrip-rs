@@ -1,0 +1,56 @@
+# "If you control four or more Treasures": both players run a Misty Mountains Cold (Bot1 on turn 1, Bot2 on turn 2), so by
+# Bot1's chapter III on turn 5 there are five Treasures in play, three Bot1's and two Bot2's. Bot1 controls three, so its Saga is
+# not sacrificed and no Dragon comes (an opponent's Treasures are not counted); the scenario
+# the-misty-mountains-cold-makes-a-treasure-each-chapter-and-the-fourth-sacrifices-it-for-a-dragon is the positive control.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Sol Ring
+The Misty Mountains Cold
+Mountain x3
+Mountain x20
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Sol Ring
+The Misty Mountains Cold
+Mountain x3
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.The Misty Mountains Cold.Cast
+Bot1.Pass
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Pass
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.The Misty Mountains Cold.Cast
+Bot2.Pass
+Bot2.Pass
+[T4 Bot2.Main2]
+? Bot2.Battlefield.The Misty Mountains Cold.Counters.Lore = 2
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.The Misty Mountains Cold.Counters.Lore = 3
+Bot1.Battlefield = Mountain; Mox Ruby; Sol Ring; The Misty Mountains Cold; Treasure Token; Treasure Token; Treasure Token
+Bot1.Battlefield.Count = 7
+Bot2.Battlefield = Mountain; Mox Ruby; Sol Ring; The Misty Mountains Cold; Treasure Token; Treasure Token
+Bot2.Battlefield.Count = 6
